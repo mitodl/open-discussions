@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "{{ cookiecutter.project_name }}" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Hi, I'm mit_open" %}</h1>
+<div id="container"></div>
+{% load render_bundle %}
+{% render_bundle 'root' %}
+{% endblock %}

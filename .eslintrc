@@ -1,0 +1,72 @@
+{
+  "parser": "babel-eslint",
+  "extends": [
+      "defaults/configurations/google",
+      "eslint:recommended",
+      "plugin:react/recommended"
+  ],
+  "rules": {
+    "quotes": [0], // no opinion on ' vs "
+    "object-curly-spacing": [0],
+    "new-cap": [0], // allows function calls like Immutable.Map(...)
+    "max-len": [2, 120, 2], // 120 max line length, tabs count as 2 spaces
+    "indent": [2, 2], // no tabs, indent is 2 spaces
+    "newline-after-var": [0],
+    "react/jsx-indent-props": [2, 2], // no tabs, indent is two spaces
+    "react/jsx-key": [2], // validate that key prop exists
+    "react/jsx-no-undef": [2], // disallow undeclared variables in JSX
+    "react/prop-types": [0],
+    "react/display-name" : [0],
+    "react/no-find-dom-node": [0],
+    "react/no-unescaped-entities": [0],
+    "no-unused-vars": [ 2, {
+      "vars": "local",
+      "argsIgnorePattern": "action"
+    }],
+    "comma-dangle": [0],
+    "no-unreachable": [2],
+    "semi": [2, "always"],
+    "eqeqeq": [2],
+    "no-var": [2],
+    "camelcase": [2, {
+      "properties": "never"
+    }],
+    "guard-for-in": [2],
+    "prefer-template": [2],
+    "space-infix-ops": [2],
+    "space-before-blocks": [2],
+    "space-in-parens": [2],
+    "flow-vars/define-flow-type": [2],
+    "flow-vars/use-flow-type": [2],
+    "flowtype/space-after-type-colon": [0],
+    "flowtype/space-before-type-colon": [2, "never"],
+    "flowtype/generic-spacing": [2, "never"],
+    "flowtype/no-dupe-keys": [2],
+    "flowtype/no-primitive-constructor-types": [2],
+    "flowtype/object-type-delimiter": [2, "comma"],
+    "mocha/no-exclusive-tests": [2],
+    "mocha/no-skipped-tests": [2],
+    "mocha/no-sibling-hooks": [2],
+    "mocha/no-global-tests": [2],
+    "mocha/handle-done-callback": [2],
+    "mocha/no-top-level-hooks": [2],
+    "mocha/no-identical-title": [2],
+    "mocha/no-nested-tests": [2],
+  },
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true,
+    "mocha": true
+  },
+  "ecmaFeatures": {
+    "jsx": true
+  },
+  "plugins": [
+    "babel",
+    "react",
+    "flowtype",
+    "flow-vars",
+    "mocha"
+  ]
+}

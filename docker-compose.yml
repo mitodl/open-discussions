@@ -1,0 +1,94 @@
+version: '2'
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432"
+
+  redis:
+    image: redis
+    ports:
+      - "6379"
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/web.conf
+      - ./:/src
+    ports:
+      - "8063:8063"
+    links:
+      - web
+      - watch
+
+  python:
+    build: .
+    command: /bin/true
+    volumes:
+      - .:/src
+      - django_media:/var/media
+    environment:
+      DEBUG: 'True'
+      DEV_ENV: 'True'
+      NODE_ENV: 'development'
+      PORT: 8061
+      COVERAGE_DIR: htmlcov
+      DATABASE_URL: postgres://postgres@db:5432/postgres
+      MIT_OPEN_USE_WEBPACK_DEV_SERVER: 'True'
+      MIT_OPEN_SECURE_SSL_REDIRECT: 'False'
+      MIT_OPEN_DB_DISABLE_SSL: 'True'
+      ELASTICSEARCH_URL: elastic:9200
+      CELERY_ALWAYS_EAGER: 'False'
+      BROKER_URL: redis://redis:6379/4
+      CELERY_RESULT_BACKEND: redis://redis:6379/4
+      EXAMS_SFTP_HOST: sftp
+      EXAMS_SFTP_USERNAME: odl
+      EXAMS_SFTP_PASSWORD: 123
+    env_file: .env
+
+  web:
+    image: mit_open_python
+    extends:
+      service: python
+    command: >
+      /bin/bash -c '
+      sleep 3 &&
+      python3 manage.py migrate --no-input &&
+      uwsgi uwsgi.ini'
+    ports:
+      - "8061:8061"
+    links:
+      - db
+      - redis
+
+  watch:
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    working_dir: /src
+    command: >
+      /bin/bash -c './webpack_dev_server.sh --install'
+    ports:
+      - "8062:8062"
+    volumes:
+      - .:/src
+      - yarn-cache:/home/mitodl/.cache/yarn
+    environment:
+      NODE_ENV: 'development'
+    env_file: .env
+
+  celery:
+    image: mit_open_python
+    extends:
+      service: python
+    command: >
+      /bin/bash -c '
+      sleep 3;
+      celery -A mit_open worker -B -l debug'
+    links:
+      - db
+      - redis
+
+volumes:
+  django_media: {}
+  yarn-cache: {}

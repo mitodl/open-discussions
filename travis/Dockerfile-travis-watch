@@ -1,0 +1,21 @@
+FROM mitodl/mit_open_watch_travis
+
+WORKDIR /src
+
+COPY package.json /src
+
+COPY yarn.lock /src
+
+ADD ./webpack_if_prod.sh /src
+
+USER mitodl
+
+RUN yarn install --pure-lockfile
+
+COPY . /src
+
+USER root
+
+RUN chown -R mitodl:mitodl /src
+
+USER mitodl
