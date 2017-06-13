@@ -11,7 +11,7 @@
     var SETTINGS = {{ js_settings_json|safe }};
     </script>
     {% load render_bundle %}
-    {% render_bundle 'root' %}
+    {% render_bundle 'style' %}
     <title>{% block title %}{% endblock %}</title>
     <meta name="description" content="{% block description %}{% endblock %}">
     <meta name="keywords" content="{% block keywords %}{% endblock %}">
