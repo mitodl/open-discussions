@@ -12,14 +12,6 @@ class ViewsTest(TestCase):
     """
     Test that the views work as expected.
     """
-    def test_index_view(self):
-        """Verify the index view is as expected"""
-        response = self.client.get(reverse('mit_open-index'))
-        self.assertContains(
-            response,
-            "Hi, I'm mit_open",
-            status_code=200
-        )
 
     def test_webpack_url(self):
         """Verify that webpack bundle src shows up in production"""

@@ -14,6 +14,7 @@ html5lib==0.999999999
 ipython
 newrelic
 psycopg2==2.6
+praw==4.5.1
 raven
 redis==2.10.5
 requests

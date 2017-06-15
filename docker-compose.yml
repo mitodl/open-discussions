@@ -37,13 +37,11 @@ services:
       MIT_OPEN_USE_WEBPACK_DEV_SERVER: 'True'
       MIT_OPEN_SECURE_SSL_REDIRECT: 'False'
       MIT_OPEN_DB_DISABLE_SSL: 'True'
+      MIT_OPEN_REDDIT_URL: http://reddit.local:8080
       ELASTICSEARCH_URL: elastic:9200
       CELERY_ALWAYS_EAGER: 'False'
       BROKER_URL: redis://redis:6379/4
       CELERY_RESULT_BACKEND: redis://redis:6379/4
-      EXAMS_SFTP_HOST: sftp
-      EXAMS_SFTP_USERNAME: odl
-      EXAMS_SFTP_PASSWORD: 123
     env_file: .env
 
   web:
@@ -60,6 +58,8 @@ services:
     links:
       - db
       - redis
+    external_links:
+      - "nginx:reddit.local"
 
   watch:
     build:
@@ -88,6 +88,11 @@ services:
     links:
       - db
       - redis
+
+networks:
+  default:
+    external:
+      name: reddit_default
 
 volumes:
   django_media: {}
