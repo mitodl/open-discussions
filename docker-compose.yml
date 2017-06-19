@@ -37,7 +37,7 @@ services:
       MIT_OPEN_USE_WEBPACK_DEV_SERVER: 'True'
       MIT_OPEN_SECURE_SSL_REDIRECT: 'False'
       MIT_OPEN_DB_DISABLE_SSL: 'True'
-      MIT_OPEN_REDDIT_URL: http://reddit.local:8080
+      MIT_OPEN_REDDIT_URL: http://reddit.local:8081
       ELASTICSEARCH_URL: elastic:9200
       CELERY_TASK_ALWAYS_EAGER: 'False'
       CELERY_BROKER_URL: redis://redis:6379/4
@@ -61,7 +61,7 @@ services:
       - db
       - redis
     external_links:
-      - "nginx:reddit.local"
+      - "reddit:reddit.local"
 
   watch:
     build:
