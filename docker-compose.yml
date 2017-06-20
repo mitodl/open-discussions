@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 services:
   db:
     image: postgres
@@ -39,9 +39,11 @@ services:
       MIT_OPEN_DB_DISABLE_SSL: 'True'
       MIT_OPEN_REDDIT_URL: http://reddit.local:8080
       ELASTICSEARCH_URL: elastic:9200
-      CELERY_ALWAYS_EAGER: 'False'
-      BROKER_URL: redis://redis:6379/4
+      CELERY_TASK_ALWAYS_EAGER: 'False'
+      CELERY_BROKER_URL: redis://redis:6379/4
       CELERY_RESULT_BACKEND: redis://redis:6379/4
+      DOCKER_HOST: ${DOCKER_HOST:-missing}
+      WEBPACK_DEV_SERVER_HOST: ${WEBPACK_DEV_SERVER_HOST:-localhost}
     env_file: .env
 
   web:
@@ -75,6 +77,8 @@ services:
       - yarn-cache:/home/mitodl/.cache/yarn
     environment:
       NODE_ENV: 'development'
+      DOCKER_HOST: ${DOCKER_HOST:-missing}
+      CONTAINER_NAME: 'watch'
     env_file: .env
 
   celery:

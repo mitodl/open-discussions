@@ -18,7 +18,7 @@ class FeatureFlag(Flag):
     Members should have values of increasing powers of 2 (1, 2, 4, 8, ...)
 
     """
-    EXAMS = auto()
+    EXAMPLE_FEATURE = auto()
 
 
 def webpack_dev_server_host(request):
