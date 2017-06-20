@@ -13,9 +13,7 @@ services:
   python:
     build:
       context: .
-      # TODO: upload dockerfile first then uncomment this line
-      # dockerfile: ./travis/Dockerfile-travis-web
-      dockerfile: ./Dockerfile
+      dockerfile: ./travis/Dockerfile-travis-web
     command: /bin/true
     environment:
       DEBUG: 'False'

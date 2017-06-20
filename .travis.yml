@@ -16,9 +16,7 @@ matrix:
     - install:
       - env | grep TRAVIS > .env
       - env | grep CI >> .env
-      # Uncomment after we upload docker images
-      # - docker build -t travis-watch -f ./travis/Dockerfile-travis-watch .
-      - docker build -t travis-watch -f ./Dockerfile-node .
+      - docker build -t travis-watch -f ./travis/Dockerfile-travis-watch .
       script: bash ./travis/js_tests.sh
       services:
         - docker

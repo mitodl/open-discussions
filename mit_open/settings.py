@@ -416,6 +416,7 @@ MIT_OPEN_REDDIT_CLIENT_ID = get_var('MIT_OPEN_REDDIT_CLIENT_ID', None)
 MIT_OPEN_REDDIT_SECRET = get_var('MIT_OPEN_REDDIT_SECRET', None)
 MIT_OPEN_REDDIT_URL = get_var('MIT_OPEN_REDDIT_URL', '')
 
+
 # features flags
 def get_all_config_keys():
     """Returns all the configuration keys from both environment and configuration files"""
