@@ -209,4 +209,56 @@ class Api:
         if theme_type is not None:
             values['subreddit_type'] = theme_type
 
-        return self.reddit.subreddit(name).mod.update(**values)
+        return self.get_theme(name).mod.update(**values)
+
+    def create_post(self, theme_name, title, text=None, url=None):
+        """
+        Create a new post in a theme_name
+
+        Args:
+            theme_name(str): the theme name identifier
+            title(str): the title of the post
+            text(str): the text of the post
+            url(str): the url of the post
+
+        Raises:
+            ValueError: if both text and url are provided
+
+        Returns:
+            praw.models.Submission: the submitted post
+        """
+        if text is not None and url is not None:
+            raise ValueError('Only one of text and url can be provided')
+        return self.get_theme(theme_name).submit(title, selftext=text, url=url)
+
+    def get_post(self, post_id):
+        """
+        Gets the post
+
+        Args:
+            post_id(str): the base36 id for the post
+
+        Returns:
+            praw.models.Submission: the submitted post
+        """
+        return self.reddit.submission(id=post_id)
+
+    def update_post(self, post_id, text):
+        """
+        Updates the post
+
+        Args:
+            post_id(str): the base36 id for the post
+
+        Raises:
+            ValueError: if the url post was provided
+
+        Returns:
+            praw.models.Submission: the submitted post
+        """
+        post = self.get_post(post_id)
+
+        if not post.selftext:
+            raise ValueError('Post a url cannot be updated')
+
+        return post.edit(text)
