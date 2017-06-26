@@ -37,7 +37,8 @@ services:
       MIT_OPEN_USE_WEBPACK_DEV_SERVER: 'True'
       MIT_OPEN_SECURE_SSL_REDIRECT: 'False'
       MIT_OPEN_DB_DISABLE_SSL: 'True'
-      MIT_OPEN_REDDIT_URL: http://reddit.local:8081
+      MIT_OPEN_REDDIT_URL: https://reddit.local
+      MIT_OPEN_REDDIT_VALIDATE_SSL: 'False'
       ELASTICSEARCH_URL: elastic:9200
       CELERY_TASK_ALWAYS_EAGER: 'False'
       CELERY_BROKER_URL: redis://redis:6379/4
@@ -60,8 +61,9 @@ services:
     links:
       - db
       - redis
-    external_links:
-      - "reddit:reddit.local"
+    # set reddit.local in /etc/hosts
+    extra_hosts:
+      - "reddit.local:192.168.56.111"
 
   watch:
     build:

@@ -1,5 +1,6 @@
 """Themes APIs"""
 import praw
+import requests
 
 from django.conf import settings
 
@@ -69,6 +70,20 @@ def _get_credentials(user=None):
     return _get_user_credentials(user) if user is not None else _get_anonymous_credentials()
 
 
+def _get_requester_kwargs():
+    """
+    Gets the arguments for the praw requester
+
+    Returns:
+        dict: dictionary of requester arguments
+    """
+    session = requests.Session()
+    session.verify = settings.MIT_OPEN_REDDIT_VALIDATE_SSL
+    return {
+        'session': session,
+    }
+
+
 def _get_client(user=None):
     """
     Get a configured Reddit client_id
@@ -86,6 +101,7 @@ def _get_client(user=None):
         oauth_url=settings.MIT_OPEN_REDDIT_URL,
         short_url=settings.MIT_OPEN_REDDIT_URL,
         user_agent=_get_user_agent(),
+        requestor_kwargs=_get_requester_kwargs(),
         **credentials
     )
 
