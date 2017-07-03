@@ -1,4 +1,4 @@
-FROM mitodl/mit_open_web_travis_next
+FROM mitodl/open_discussions_web_travis_next
 
 WORKDIR /tmp
 
@@ -8,7 +8,7 @@ COPY requirements.txt /tmp/requirements.txt
 COPY test_requirements.txt /tmp/test_requirements.txt
 RUN pip install -r requirements.txt && pip install -r test_requirements.txt
 
-# mit_open_web_travis comes with a copy of the source which may not match the current copy, so we need to copy it again
+# open_discussions_web_travis comes with a copy of the source which may not match the current copy, so we need to copy it again
 RUN rm -rf /src
 RUN mkdir /src
 

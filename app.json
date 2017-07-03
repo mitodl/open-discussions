@@ -54,54 +54,54 @@
     "MAILGUN_BCC_TO_EMAIL": {
       "description": "Email address used with bcc email"
     },
-    "MIT_OPEN_ADMIN_EMAIL": {
+    "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
     },
-    "MIT_OPEN_DB_CONN_MAX_AGE": {
+    "OPEN_DISCUSSIONS_DB_CONN_MAX_AGE": {
       "value": "0"
     },
-    "MIT_OPEN_DB_DISABLE_SSL": {
+    "OPEN_DISCUSSIONS_DB_DISABLE_SSL": {
       "value": "true"
     },
-    "MIT_OPEN_EMAIL_HOST": {
+    "OPEN_DISCUSSIONS_EMAIL_HOST": {
       "description": "Outgoing e-mail settings",
       "required": false
     },
-    "MIT_OPEN_EMAIL_PASSWORD": {
+    "OPEN_DISCUSSIONS_EMAIL_PASSWORD": {
       "description": "Outgoing e-mail settings",
       "required": false
     },
-    "MIT_OPEN_EMAIL_PORT": {
+    "OPEN_DISCUSSIONS_EMAIL_PORT": {
       "description": "Outgoing e-mail settings",
       "required": false,
       "value": "587"
     },
-    "MIT_OPEN_EMAIL_TLS": {
+    "OPEN_DISCUSSIONS_EMAIL_TLS": {
       "description": "Outgoing e-mail settings",
       "required": false,
       "value": "True"
     },
-    "MIT_OPEN_EMAIL_USER": {
+    "OPEN_DISCUSSIONS_EMAIL_USER": {
       "description": "Outgoing e-mail settings",
       "required": false
     },
-    "MIT_OPEN_ENVIRONMENT": {
+    "OPEN_DISCUSSIONS_ENVIRONMENT": {
       "description": "The execution environment that the app is in (e.g. dev, staging, prod)"
     },
-    "MIT_OPEN_FROM_EMAIL": {
+    "OPEN_DISCUSSIONS_FROM_EMAIL": {
       "description": "E-mail to use for the from field"
     },
-    "MIT_OPEN_SECURE_SSL_REDIRECT": {
+    "OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT": {
       "description": "Application-level SSL redirect setting.",
       "required": false,
       "value": "True"
     },
-    "MIT_OPEN_USE_S3": {
+    "OPEN_DISCUSSIONS_USE_S3": {
       "description": "Use S3 for storage backend (required on Heroku)",
       "value": "True"
     },
     "NEW_RELIC_APP_NAME": {
-      "default": "mit_open",
+      "default": "open_discussions",
       "description": "Application identifier in New Relic."
     },
     "NODE_MODULES_CACHE": {
@@ -132,7 +132,7 @@
     "MIT",
     "Office of Digital Learning"
   ],
-  "name": "mit_open",
+  "name": "open_discussions",
   "repository": "https://github.com/mitodl/mit-open",
   "scripts": {
     "postdeploy": "./manage.py migrate"

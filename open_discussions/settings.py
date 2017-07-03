@@ -1,5 +1,5 @@
 """
-Django settings for mit_open.
+Django settings for open_discussions.
 
 
 For more information on this file, see
@@ -21,10 +21,10 @@ import yaml
 VERSION = "0.0.0"
 
 CONFIG_PATHS = [
-    os.environ.get('MIT_OPEN_CONFIG', ''),
-    os.path.join(os.getcwd(), 'mit_open.yml'),
-    os.path.join(os.path.expanduser('~'), 'mit_open.yml'),
-    '/etc/mit_open.yml',
+    os.environ.get('OPEN_DISCUSSIONS_CONFIG', ''),
+    os.path.join(os.getcwd(), 'open_discussions.yml'),
+    os.path.join(os.path.expanduser('~'), 'open_discussions.yml'),
+    '/etc/open_discussions.yml',
 ]
 
 
@@ -76,7 +76,7 @@ if DEBUG:
 else:
     ALLOWED_HOSTS = get_var('ALLOWED_HOSTS', [])
 
-SECURE_SSL_REDIRECT = get_var('MIT_OPEN_SECURE_SSL_REDIRECT', True)
+SECURE_SSL_REDIRECT = get_var('OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT', True)
 
 
 WEBPACK_LOADER = {
@@ -106,7 +106,7 @@ INSTALLED_APPS = (
     'server_status',
     'raven.contrib.django.raven_compat',
     # Put our apps after this point
-    'mit_open',
+    'open_discussions',
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_var("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -140,7 +140,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/'
 LOGIN_ERROR_URL = '/'
 
-ROOT_URLCONF = 'mit_open.urls'
+ROOT_URLCONF = 'open_discussions.urls'
 
 TEMPLATES = [
     {
@@ -160,7 +160,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'mit_open.wsgi.application'
+WSGI_APPLICATION = 'open_discussions.wsgi.application'
 
 
 # Database
@@ -174,9 +174,9 @@ DEFAULT_DATABASE_CONFIG = dj_database_url.parse(
         'sqlite:///{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
     )
 )
-DEFAULT_DATABASE_CONFIG['CONN_MAX_AGE'] = int(get_var('MIT_OPEN_DB_CONN_MAX_AGE', 0))
+DEFAULT_DATABASE_CONFIG['CONN_MAX_AGE'] = int(get_var('OPEN_DISCUSSIONS_DB_CONN_MAX_AGE', 0))
 
-if get_var('MIT_OPEN_DB_DISABLE_SSL', False):
+if get_var('OPEN_DISCUSSIONS_DB_DISABLE_SSL', False):
     DEFAULT_DATABASE_CONFIG['OPTIONS'] = {}
 else:
     DEFAULT_DATABASE_CONFIG['OPTIONS'] = {'sslmode': 'require'}
@@ -210,7 +210,7 @@ STATICFILES_DIRS = (
 )
 
 # Request files from the webpack dev server
-USE_WEBPACK_DEV_SERVER = get_var('MIT_OPEN_USE_WEBPACK_DEV_SERVER', False)
+USE_WEBPACK_DEV_SERVER = get_var('OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER', False)
 WEBPACK_DEV_SERVER_HOST = get_var('WEBPACK_DEV_SERVER_HOST', '')
 WEBPACK_DEV_SERVER_PORT = get_var('WEBPACK_DEV_SERVER_PORT', '8062')
 
@@ -218,14 +218,14 @@ WEBPACK_DEV_SERVER_PORT = get_var('WEBPACK_DEV_SERVER_PORT', '8062')
 INTERNAL_IPS = (get_var('HOST_IP', '127.0.0.1'), )
 
 # Configure e-mail settings
-EMAIL_BACKEND = get_var('MIT_OPEN_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = get_var('MIT_OPEN_EMAIL_HOST', 'localhost')
-EMAIL_PORT = get_var('MIT_OPEN_EMAIL_PORT', 25)
-EMAIL_HOST_USER = get_var('MIT_OPEN_EMAIL_USER', '')
-EMAIL_HOST_PASSWORD = get_var('MIT_OPEN_EMAIL_PASSWORD', '')
-EMAIL_USE_TLS = get_var('MIT_OPEN_EMAIL_TLS', False)
-EMAIL_SUPPORT = get_var('MIT_OPEN_SUPPORT_EMAIL', 'support@example.com')
-DEFAULT_FROM_EMAIL = get_var('MIT_OPEN_FROM_EMAIL', 'webmaster@localhost')
+EMAIL_BACKEND = get_var('OPEN_DISCUSSIONS_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = get_var('OPEN_DISCUSSIONS_EMAIL_HOST', 'localhost')
+EMAIL_PORT = get_var('OPEN_DISCUSSIONS_EMAIL_PORT', 25)
+EMAIL_HOST_USER = get_var('OPEN_DISCUSSIONS_EMAIL_USER', '')
+EMAIL_HOST_PASSWORD = get_var('OPEN_DISCUSSIONS_EMAIL_PASSWORD', '')
+EMAIL_USE_TLS = get_var('OPEN_DISCUSSIONS_EMAIL_TLS', False)
+EMAIL_SUPPORT = get_var('OPEN_DISCUSSIONS_SUPPORT_EMAIL', 'support@example.com')
+DEFAULT_FROM_EMAIL = get_var('OPEN_DISCUSSIONS_FROM_EMAIL', 'webmaster@localhost')
 
 MAILGUN_URL = get_var('MAILGUN_URL', '')
 MAILGUN_KEY = get_var('MAILGUN_KEY', None)
@@ -236,19 +236,19 @@ MAILGUN_BCC_TO_EMAIL = get_var('MAILGUN_BCC_TO_EMAIL', 'no-reply@example.com')
 
 
 # e-mail configurable admins
-ADMIN_EMAIL = get_var('MIT_OPEN_ADMIN_EMAIL', '')
+ADMIN_EMAIL = get_var('OPEN_DISCUSSIONS_ADMIN_EMAIL', '')
 if ADMIN_EMAIL != '':
     ADMINS = (('Admins', ADMIN_EMAIL),)
 else:
     ADMINS = ()
 
 # Logging configuration
-LOG_LEVEL = get_var('MIT_OPEN_LOG_LEVEL', 'INFO')
+LOG_LEVEL = get_var('OPEN_DISCUSSIONS_LOG_LEVEL', 'INFO')
 DJANGO_LOG_LEVEL = get_var('DJANGO_LOG_LEVEL', 'INFO')
 
 # For logging to a remote syslog host
-LOG_HOST = get_var('MIT_OPEN_LOG_HOST', 'localhost')
-LOG_HOST_PORT = get_var('MIT_OPEN_LOG_HOST_PORT', 514)
+LOG_HOST = get_var('OPEN_DISCUSSIONS_LOG_HOST', 'localhost')
+LOG_HOST_PORT = get_var('OPEN_DISCUSSIONS_LOG_HOST_PORT', 514)
 
 HOSTNAME = platform.node().split('.')[0]
 DEFAULT_LOG_STANZA = {
@@ -304,7 +304,7 @@ LOGGING = {
     },
     'loggers': {
         'root': DEFAULT_LOG_STANZA,
-        'mit_open': DEFAULT_LOG_STANZA,
+        'open_discussions': DEFAULT_LOG_STANZA,
         'django': {
             'propagate': True,
             'level': DJANGO_LOG_LEVEL,
@@ -330,7 +330,7 @@ LOGGING = {
 }
 
 # Sentry
-ENVIRONMENT = get_var('MIT_OPEN_ENVIRONMENT', 'dev')
+ENVIRONMENT = get_var('OPEN_DISCUSSIONS_ENVIRONMENT', 'dev')
 SENTRY_CLIENT = 'raven.contrib.django.raven_compat.DjangoClient'
 RAVEN_CONFIG = {
     'dsn': get_var('SENTRY_DSN', ''),
@@ -339,7 +339,7 @@ RAVEN_CONFIG = {
 }
 
 # to run the app locally on mac you need to bypass syslog
-if get_var('MIT_OPEN_BYPASS_SYSLOG', False):
+if get_var('OPEN_DISCUSSIONS_BYPASS_SYSLOG', False):
     LOGGING['handlers'].pop('syslog')
     LOGGING['loggers']['root']['handlers'] = ['console']
     LOGGING['loggers']['ui']['handlers'] = ['console']
@@ -355,14 +355,14 @@ REACT_GA_DEBUG = get_var("REACT_GA_DEBUG", False)
 
 MEDIA_ROOT = get_var('MEDIA_ROOT', '/var/media/')
 MEDIA_URL = '/media/'
-MIT_OPEN_USE_S3 = get_var('MIT_OPEN_USE_S3', False)
+OPEN_DISCUSSIONS_USE_S3 = get_var('OPEN_DISCUSSIONS_USE_S3', False)
 AWS_ACCESS_KEY_ID = get_var('AWS_ACCESS_KEY_ID', False)
 AWS_SECRET_ACCESS_KEY = get_var('AWS_SECRET_ACCESS_KEY', False)
 AWS_STORAGE_BUCKET_NAME = get_var('AWS_STORAGE_BUCKET_NAME', False)
 AWS_QUERYSTRING_AUTH = get_var('AWS_QUERYSTRING_AUTH', False)
 # Provide nice validation of the configuration
 if (
-        MIT_OPEN_USE_S3 and
+        OPEN_DISCUSSIONS_USE_S3 and
         (not AWS_ACCESS_KEY_ID or
          not AWS_SECRET_ACCESS_KEY or
          not AWS_STORAGE_BUCKET_NAME)
@@ -372,7 +372,7 @@ if (
         'AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, or '
         'AWS_STORAGE_BUCKET_NAME'
     )
-if MIT_OPEN_USE_S3:
+if OPEN_DISCUSSIONS_USE_S3:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 else:
     # by default use django.core.files.storage.FileSystemStorage with
@@ -410,14 +410,14 @@ CACHES = {
 }
 
 # reddit-specific settings
-MIT_OPEN_REDDIT_ANONYMOUS_CLIENT_ID = get_var('MIT_OPEN_REDDIT_ANONYMOUS_CLIENT_ID', None)
-MIT_OPEN_REDDIT_ANONYMOUS_SECRET = get_var('MIT_OPEN_REDDIT_ANONYMOUS_SECRET', None)
-MIT_OPEN_REDDIT_ANONYMOUS_USERNAME = get_var('MIT_OPEN_REDDIT_ANONYMOUS_USERNAME', None)
-MIT_OPEN_REDDIT_ANONYMOUS_PASSWORD = get_var('MIT_OPEN_REDDIT_ANONYMOUS_PASSWORD', None)
-MIT_OPEN_REDDIT_AUTHENTICATED_CLIENT_ID = get_var('MIT_OPEN_REDDIT_AUTHENTICATED_CLIENT_ID', None)
-MIT_OPEN_REDDIT_AUTHENTICATED_SECRET = get_var('MIT_OPEN_REDDIT_AUTHENTICATED_SECRET', None)
-MIT_OPEN_REDDIT_URL = get_var('MIT_OPEN_REDDIT_URL', '')
-MIT_OPEN_REDDIT_VALIDATE_SSL = get_var('MIT_OPEN_REDDIT_VALIDATE_SSL', True)
+OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_CLIENT_ID = get_var('OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_CLIENT_ID', None)
+OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_SECRET = get_var('OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_SECRET', None)
+OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_USERNAME = get_var('OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_USERNAME', None)
+OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_PASSWORD = get_var('OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_PASSWORD', None)
+OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_CLIENT_ID = get_var('OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_CLIENT_ID', None)
+OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_SECRET = get_var('OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_SECRET', None)
+OPEN_DISCUSSIONS_REDDIT_URL = get_var('OPEN_DISCUSSIONS_REDDIT_URL', '')
+OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL = get_var('OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL', True)
 
 
 # features flags
@@ -425,20 +425,20 @@ def get_all_config_keys():
     """Returns all the configuration keys from both environment and configuration files"""
     return list(set(os.environ.keys()).union(set(FALLBACK_CONFIG.keys())))
 
-MIT_OPEN_FEATURES_PREFIX = get_var('MIT_OPEN_FEATURES_PREFIX', 'FEATURE_')
+OPEN_DISCUSSIONS_FEATURES_PREFIX = get_var('OPEN_DISCUSSIONS_FEATURES_PREFIX', 'FEATURE_')
 FEATURES = {
-    key[len(MIT_OPEN_FEATURES_PREFIX):]: get_var(key, None) for key
-    in get_all_config_keys() if key.startswith(MIT_OPEN_FEATURES_PREFIX)
+    key[len(OPEN_DISCUSSIONS_FEATURES_PREFIX):]: get_var(key, None) for key
+    in get_all_config_keys() if key.startswith(OPEN_DISCUSSIONS_FEATURES_PREFIX)
 }
 
 MIDDLEWARE_FEATURE_FLAG_QS_PREFIX = get_var("MIDDLEWARE_FEATURE_FLAG_QS_PREFIX", None)
-MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME = get_var('MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME', 'MIT_OPEN_FEATURE_FLAGS')
+MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME = get_var('MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME', 'OPEN_DISCUSSIONS_FEATURE_FLAGS')
 MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS = get_var('MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS', 60 * 60)
 
 if MIDDLEWARE_FEATURE_FLAG_QS_PREFIX:
     MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
-        'mit_open.middleware.QueryStringFeatureFlagMiddleware',
-        'mit_open.middleware.CookieFeatureFlagMiddleware',
+        'open_discussions.middleware.QueryStringFeatureFlagMiddleware',
+        'open_discussions.middleware.CookieFeatureFlagMiddleware',
     )
 
 

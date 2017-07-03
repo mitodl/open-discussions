@@ -21,15 +21,15 @@ services:
       PORT: 8063
       NODE_ENV: 'production'
       DATABASE_URL: postgres://postgres@db:5432/postgres
-      MIT_OPEN_SECURE_SSL_REDIRECT: 'False'
-      MIT_OPEN_DB_DISABLE_SSL: 'True'
+      OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
+      OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
       CELERY_BROKER_URL: redis://redis:6379/4
       CELERY_RESULT_BACKEND: redis://redis:6379/4
       XDG_CACHE_HOME: /src/.cache
     env_file: .env
 
   web:
-    image: mit_open_python
+    image: open_discussions_python
     extends:
       service: python
     command: >
@@ -43,13 +43,13 @@ services:
       - db
 
   celery:
-    image: mit_open_python
+    image: open_discussions_python
     extends:
       service: python
     command: >
       /bin/bash -c '
       sleep 3;
-      celery -A mit_open worker -B -l debug'
+      celery -A open_discussions worker -B -l debug'
     links:
       - db
       - redis

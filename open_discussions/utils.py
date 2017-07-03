@@ -1,4 +1,4 @@
-"""mit_open utilities"""
+"""open_discussions utilities"""
 from enum import (
     auto,
     Flag,

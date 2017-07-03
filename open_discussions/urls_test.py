@@ -9,4 +9,4 @@ class URLTests(TestCase):
 
     def test_urls(self):
         """Make sure URLs match with resolved names"""
-        assert reverse('mit_open-index') == '/'
+        assert reverse('open_discussions-index') == '/'

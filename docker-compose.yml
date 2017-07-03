@@ -34,11 +34,11 @@ services:
       PORT: 8061
       COVERAGE_DIR: htmlcov
       DATABASE_URL: postgres://postgres@db:5432/postgres
-      MIT_OPEN_USE_WEBPACK_DEV_SERVER: 'True'
-      MIT_OPEN_SECURE_SSL_REDIRECT: 'False'
-      MIT_OPEN_DB_DISABLE_SSL: 'True'
-      MIT_OPEN_REDDIT_URL: https://reddit.local
-      MIT_OPEN_REDDIT_VALIDATE_SSL: 'False'
+      OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER: 'True'
+      OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
+      OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
+      OPEN_DISCUSSIONS_REDDIT_URL: https://reddit.local
+      OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL: 'False'
       ELASTICSEARCH_URL: elastic:9200
       CELERY_TASK_ALWAYS_EAGER: 'False'
       CELERY_BROKER_URL: redis://redis:6379/4
@@ -48,7 +48,7 @@ services:
     env_file: .env
 
   web:
-    image: mit_open_python
+    image: open_discussions_python
     extends:
       service: python
     command: >
@@ -84,13 +84,13 @@ services:
     env_file: .env
 
   celery:
-    image: mit_open_python
+    image: open_discussions_python
     extends:
       service: python
     command: >
       /bin/bash -c '
       sleep 3;
-      celery -A mit_open worker -B -l debug'
+      celery -A open_discussions worker -B -l debug'
     links:
       - db
       - redis

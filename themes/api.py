@@ -37,8 +37,8 @@ def _get_user_credentials(user):
     # pylint: disable=fixme,unused-argument
     # TODO: get a refresh token
     return {
-        'client_id': settings.MIT_OPEN_REDDIT_AUTHENTICATED_CLIENT_ID,
-        'client_secret': settings.MIT_OPEN_REDDIT_AUTHENTICATED_SECRET,
+        'client_id': settings.OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_CLIENT_ID,
+        'client_secret': settings.OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_SECRET,
     }
 
 
@@ -50,10 +50,10 @@ def _get_anonymous_credentials():
         dict: set of configuration credentials for the user
     """
     return {
-        'client_id': settings.MIT_OPEN_REDDIT_ANONYMOUS_CLIENT_ID,
-        'client_secret': settings.MIT_OPEN_REDDIT_ANONYMOUS_SECRET,
-        'username': settings.MIT_OPEN_REDDIT_ANONYMOUS_USERNAME,
-        'password': settings.MIT_OPEN_REDDIT_ANONYMOUS_PASSWORD,
+        'client_id': settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_CLIENT_ID,
+        'client_secret': settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_SECRET,
+        'username': settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_USERNAME,
+        'password': settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_PASSWORD,
     }
 
 
@@ -78,7 +78,7 @@ def _get_requester_kwargs():
         dict: dictionary of requester arguments
     """
     session = requests.Session()
-    session.verify = settings.MIT_OPEN_REDDIT_VALIDATE_SSL
+    session.verify = settings.OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL
     return {
         'session': session,
     }
@@ -97,9 +97,9 @@ def _get_client(user=None):
     credentials = _get_credentials(user=user)
 
     return praw.Reddit(
-        reddit_url=settings.MIT_OPEN_REDDIT_URL,
-        oauth_url=settings.MIT_OPEN_REDDIT_URL,
-        short_url=settings.MIT_OPEN_REDDIT_URL,
+        reddit_url=settings.OPEN_DISCUSSIONS_REDDIT_URL,
+        oauth_url=settings.OPEN_DISCUSSIONS_REDDIT_URL,
+        short_url=settings.OPEN_DISCUSSIONS_REDDIT_URL,
         user_agent=_get_user_agent(),
         requestor_kwargs=_get_requester_kwargs(),
         **credentials

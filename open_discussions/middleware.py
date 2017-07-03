@@ -1,9 +1,9 @@
-"""Common mit_open middleware"""
+"""Common open_discussions middleware"""
 from django.conf import settings
 from django import shortcuts
 from django.utils.deprecation import MiddlewareMixin
 
-from mit_open.utils import FeatureFlag
+from open_discussions.utils import FeatureFlag
 
 
 class QueryStringFeatureFlagMiddleware(MiddlewareMixin):
@@ -116,5 +116,5 @@ class CookieFeatureFlagMiddleware(MiddlewareMixin):
         Args:
             request (django.http.request.Request): the request to inspect
         """
-        request.mit_open_feature_flags = self.get_feature_flags(request)
+        request.open_discussions_feature_flags = self.get_feature_flags(request)
         return None

@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name
 import pytest
 
-from mit_open.factories import UserFactory
+from open_discussions.factories import UserFactory
 from themes import api
 
 pytestmark = pytest.mark.django_db

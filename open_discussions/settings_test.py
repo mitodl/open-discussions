@@ -15,7 +15,7 @@ from django.test import TestCase
 import semantic_version
 import yaml
 
-from mit_open.settings import load_fallback, get_var
+from open_discussions.settings import load_fallback, get_var
 
 
 class TestSettings(TestCase):
@@ -28,10 +28,10 @@ class TestSettings(TestCase):
         Returns:
             dict: dictionary of the newly reloaded settings ``vars``
         """
-        importlib.reload(sys.modules['mit_open.settings'])
+        importlib.reload(sys.modules['open_discussions.settings'])
         # Restore settings to original settings after test
-        self.addCleanup(importlib.reload, sys.modules['mit_open.settings'])
-        return vars(sys.modules['mit_open.settings'])
+        self.addCleanup(importlib.reload, sys.modules['open_discussions.settings'])
+        return vars(sys.modules['open_discussions.settings'])
 
     def test_load_fallback(self):
         """Verify our YAML load works as expected."""
@@ -41,7 +41,7 @@ class TestSettings(TestCase):
         with open(temp_config_path, 'w') as temp_config:
             temp_config.write(yaml.dump(config_settings))
 
-        with mock.patch('mit_open.settings.CONFIG_PATHS') as config_paths:
+        with mock.patch('open_discussions.settings.CONFIG_PATHS') as config_paths:
             config_paths.__iter__.return_value = [temp_config_path]
             fallback_config = load_fallback()
             self.assertDictEqual(fallback_config, config_settings)
@@ -49,7 +49,7 @@ class TestSettings(TestCase):
     def test_get_var(self):
         """Verify that get_var does the right thing with precedence"""
         with mock.patch.dict(
-            'mit_open.settings.FALLBACK_CONFIG',
+            'open_discussions.settings.FALLBACK_CONFIG',
             {'FOO': 'bar'}
         ):
             # Verify fallback
@@ -77,7 +77,7 @@ class TestSettings(TestCase):
             self.assertEqual(get_var('BAR', []), [1, 2, 3])
         # Make sure real types still work too (i.e. from yaml load)
         with mock.patch.dict(
-            'mit_open.settings.FALLBACK_CONFIG',
+            'open_discussions.settings.FALLBACK_CONFIG',
             {'BLAH': True}
         ):
             self.assertEqual(get_var('BLAH', False), True)
@@ -86,7 +86,7 @@ class TestSettings(TestCase):
         """Verify that we enable and configure S3 with a variable"""
         # Unset, we don't do S3
         with mock.patch.dict('os.environ', {
-            'MIT_OPEN_USE_S3': 'False'
+            'OPEN_DISCUSSIONS_USE_S3': 'False'
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertNotEqual(
@@ -96,13 +96,13 @@ class TestSettings(TestCase):
 
         with self.assertRaises(ImproperlyConfigured):
             with mock.patch.dict('os.environ', {
-                'MIT_OPEN_USE_S3': 'True',
+                'OPEN_DISCUSSIONS_USE_S3': 'True',
             }, clear=True):
                 self.reload_settings()
 
         # Verify it all works with it enabled and configured 'properly'
         with mock.patch.dict('os.environ', {
-            'MIT_OPEN_USE_S3': 'True',
+            'OPEN_DISCUSSIONS_USE_S3': 'True',
             'AWS_ACCESS_KEY_ID': '1',
             'AWS_SECRET_ACCESS_KEY': '2',
             'AWS_STORAGE_BUCKET_NAME': '3',
@@ -117,14 +117,14 @@ class TestSettings(TestCase):
         """Verify that we configure email with environment variable"""
 
         with mock.patch.dict('os.environ', {
-            'MIT_OPEN_ADMIN_EMAIL': ''
+            'OPEN_DISCUSSIONS_ADMIN_EMAIL': ''
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertFalse(settings_vars.get('ADMINS', False))
 
         test_admin_email = 'cuddle_bunnies@example.com'
         with mock.patch.dict('os.environ', {
-            'MIT_OPEN_ADMIN_EMAIL': test_admin_email,
+            'OPEN_DISCUSSIONS_ADMIN_EMAIL': test_admin_email,
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(
@@ -142,7 +142,7 @@ class TestSettings(TestCase):
 
         # Check default state is SSL on
         with mock.patch.dict('os.environ', {
-            'MIT_OPEN_DB_DISABLE_SSL': ''
+            'OPEN_DISCUSSIONS_DB_DISABLE_SSL': ''
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(
@@ -152,7 +152,7 @@ class TestSettings(TestCase):
 
         # Check enabling the setting explicitly
         with mock.patch.dict('os.environ', {
-            'MIT_OPEN_DB_DISABLE_SSL': 'True'
+            'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'True'
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(
@@ -162,7 +162,7 @@ class TestSettings(TestCase):
 
         # Disable it
         with mock.patch.dict('os.environ', {
-            'MIT_OPEN_DB_DISABLE_SSL': 'False'
+            'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'False'
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(

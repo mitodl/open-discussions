@@ -7,7 +7,7 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 from webpack_loader.templatetags.webpack_loader import render_as_tags
 from webpack_loader.utils import get_loader
 
-from mit_open.utils import webpack_dev_server_url
+from open_discussions.utils import webpack_dev_server_url
 
 
 register = template.Library()

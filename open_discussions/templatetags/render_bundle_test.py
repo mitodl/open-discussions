@@ -11,8 +11,8 @@ from django.test import (
     override_settings,
     TestCase,
 )
-from mit_open.utils import webpack_dev_server_url
-from mit_open.templatetags.render_bundle import render_bundle, public_path
+from open_discussions.utils import webpack_dev_server_url
+from open_discussions.templatetags.render_bundle import render_bundle, public_path
 
 
 FAKE_COMMON_BUNDLE = [
@@ -42,7 +42,7 @@ class TestRenderBundle(TestCase):
         get_bundle = Mock(return_value=common_bundle)
         loader = Mock(get_bundle=get_bundle)
         bundle_name = 'bundle_name'
-        with patch('mit_open.templatetags.render_bundle.get_loader', return_value=loader) as get_loader:
+        with patch('open_discussions.templatetags.render_bundle.get_loader', return_value=loader) as get_loader:
             assert render_bundle(context, bundle_name) == (
                 '<script type="text/javascript" src="{base}/{filename}" >'
                 '</script>'.format(
@@ -69,7 +69,7 @@ class TestRenderBundle(TestCase):
         get_bundle = Mock(return_value=common_bundle)
         loader = Mock(get_bundle=get_bundle)
         bundle_name = 'bundle_name'
-        with patch('mit_open.templatetags.render_bundle.get_loader', return_value=loader) as get_loader:
+        with patch('open_discussions.templatetags.render_bundle.get_loader', return_value=loader) as get_loader:
             assert render_bundle(context, bundle_name) == (
                 '<script type="text/javascript" src="{base}/{filename}" >'
                 '</script>'.format(
@@ -93,7 +93,7 @@ class TestRenderBundle(TestCase):
         get_bundle = Mock(side_effect=OSError)
         loader = Mock(get_bundle=get_bundle)
         bundle_name = 'bundle_name'
-        with patch('mit_open.templatetags.render_bundle.get_loader', return_value=loader) as get_loader:
+        with patch('open_discussions.templatetags.render_bundle.get_loader', return_value=loader) as get_loader:
             assert render_bundle(context, bundle_name) == ''
 
             get_bundle.assert_called_with(bundle_name)

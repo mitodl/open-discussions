@@ -10,11 +10,11 @@ from django.test import (
     TestCase,
 )
 
-from mit_open.middleware import (
+from open_discussions.middleware import (
     CookieFeatureFlagMiddleware,
     QueryStringFeatureFlagMiddleware,
 )
-from mit_open.utils import FeatureFlag
+from open_discussions.utils import FeatureFlag
 
 FEATURE_FLAG_COOKIE_NAME = 'TEST_COOKIE'
 FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS = 60
@@ -106,7 +106,7 @@ class CookieFeatureFlagMiddlewareTest(TestCase):
         }
         request.get_signed_cookie.return_value = 1
         assert self.middleware.process_request(request) is None
-        assert request.mit_open_feature_flags == {FeatureFlag.EXAMPLE_FEATURE}
+        assert request.open_discussions_feature_flags == {FeatureFlag.EXAMPLE_FEATURE}
         request.get_signed_cookie.assert_called_once_with(FEATURE_FLAG_COOKIE_NAME)
 
     def test_process_request_invalid_cookie(self):
@@ -116,7 +116,7 @@ class CookieFeatureFlagMiddlewareTest(TestCase):
         }
         request.get_signed_cookie.side_effect = ValueError
         assert self.middleware.process_request(request) is None
-        assert request.mit_open_feature_flags == set()
+        assert request.open_discussions_feature_flags == set()
         request.get_signed_cookie.assert_called_once_with(FEATURE_FLAG_COOKIE_NAME)
 
     def test_process_request_no_cookie(self):
@@ -124,4 +124,4 @@ class CookieFeatureFlagMiddlewareTest(TestCase):
         request.COOKIES = {}
         assert self.middleware.process_request(request) is None
         request.get_signed_cookie.assert_not_called()
-        assert request.mit_open_feature_flags == set()
+        assert request.open_discussions_feature_flags == set()

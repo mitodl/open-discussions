@@ -17,7 +17,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from mit_open.views import index
+from open_discussions.views import index
 
 
 urlpatterns = [
@@ -25,7 +25,7 @@ urlpatterns = [
     url(r'^status/', include('server_status.urls')),
 
     # Example view
-    url(r'^$', index, name='mit_open-index'),
+    url(r'^$', index, name='open_discussions-index'),
 ]
 
 if settings.DEBUG:

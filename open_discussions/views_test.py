@@ -17,8 +17,8 @@ class ViewsTest(TestCase):
         """Verify that webpack bundle src shows up in production"""
         with self.settings(
             GA_TRACKING_ID='fake',
-        ), patch('mit_open.templatetags.render_bundle._get_bundle') as get_bundle:
-            response = self.client.get(reverse('mit_open-index'))
+        ), patch('open_discussions.templatetags.render_bundle._get_bundle') as get_bundle:
+            response = self.client.get(reverse('open_discussions-index'))
 
         bundles = [bundle[0][1] for bundle in get_bundle.call_args_list]
         assert set(bundles) == {

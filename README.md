@@ -1,4 +1,4 @@
-# mit_open
+# open_discussions
 MIT Open
 
 ## Major Dependencies
@@ -15,14 +15,14 @@ MIT Open
 
 #### Create your docker container:
 
-The following commands create a Docker machine named ``mit_open``, start the
+The following commands create a Docker machine named ``open_discussions``, start the
 container, and configure environment variables to facilitate communication
 with the edX instance.
 
-    docker-machine create --driver virtualbox mit_open
-    docker-machine start mit_open
+    docker-machine create --driver virtualbox open_discussions
+    docker-machine start open_discussions
     # 'docker-machine env (machine)' prints export commands for important environment variables
-    eval "$(docker-machine env mit_open)"
+    eval "$(docker-machine env open_discussions)"
 
 
 ## Docker Container Configuration and Start-up
@@ -85,21 +85,21 @@ Start Django, PostgreSQL, and other related services:
 
     docker-compose up
 
-In another terminal tab, navigate to the mit_open directory
+In another terminal tab, navigate to the open_discussions directory
 and add a superuser in the now-running Docker container:
 
     docker-compose run web ./manage.py createsuperuser
 
 You should now be able to do the following:
 
-1. Visit mit_open in your browser on port `8063`. _(OSX Only)_ Docker auto-assigns
- the container IP. Run ``docker-machine ip`` to see it. Your mit_open URL will
+1. Visit open_discussions in your browser on port `8063`. _(OSX Only)_ Docker auto-assigns
+ the container IP. Run ``docker-machine ip`` to see it. Your open_discussions URL will
  be something like this: ``192.168.99.100:8063``.
 
 ## Running Commands and Testing
 
 As shown above, manage commands can be executed on the Docker-contained
-mit_open app. For example, you can run a Python shell with the following command:
+open_discussions app. For example, you can run a Python shell with the following command:
 
     docker-compose run web ./manage.py shell
 

@@ -1,4 +1,4 @@
-FROM mitodl/mit_open_watch_travis
+FROM mitodl/open_discussions_watch_travis
 
 WORKDIR /src
 

@@ -1,12 +1,12 @@
 """
-mit_open views
+open_discussions views
 """
 import json
 
 from django.conf import settings
 from django.shortcuts import render
 
-from mit_open.templatetags.render_bundle import public_path
+from open_discussions.templatetags.render_bundle import public_path
 
 
 def index(request):
