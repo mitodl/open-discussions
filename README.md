@@ -33,8 +33,14 @@ This file should be copied from the example in the codebase:
 
     cp .env.example .env
 
-Set the ``EDXORG_BASE_URL``, ``EDXORG_CLIENT_ID``, and ``EDXORG_CLIENT_SECRET``
-variables in the ``.env`` file appropriately.
+Log in to reddit and create two applications to fill in your `.env` vars:
+
+ - One should be a `webapp` type:
+   - Copy the secret/client id to `MIT_OPEN_REDDIT_AUTHENTICATED_CLIENT_ID` and `MIT_OPEN_REDDIT_AUTHENTICATED_SECRET`
+ - One should be a `script` type:
+   - Copy the secret/client id to `MIT_OPEN_REDDIT_ANONYMOUS_CLIENT_ID` and `MIT_OPEN_REDDIT_ANONYMOUS_SECRET`
+ - Set `MIT_OPEN_REDDIT_ANONYMOUS_USERNAME` and `MIT_OPEN_REDDIT_ANONYMOUS_PASSWORD` to the values of the user that created the script app
+
 
 #### 2) _(OSX only)_ Set up and run the webpack dev server on your host machine
 
