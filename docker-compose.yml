@@ -95,11 +95,6 @@ services:
       - db
       - redis
 
-networks:
-  default:
-    external:
-      name: reddit_default
-
 volumes:
   django_media: {}
   yarn-cache: {}
