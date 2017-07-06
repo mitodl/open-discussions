@@ -105,6 +105,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'server_status',
     'raven.contrib.django.raven_compat',
+    'rest_framework',
     # Put our apps after this point
     'open_discussions',
 )
@@ -449,3 +450,10 @@ if DEBUG:
     MIDDLEWARE_CLASSES = (
         'debug_toolbar.middleware.DebugToolbarMiddleware',
     ) + MIDDLEWARE_CLASSES
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}

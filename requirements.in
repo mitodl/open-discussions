@@ -7,6 +7,7 @@ dj-static==0.0.6
 django-redis==4.7.0
 django-server-status==0.3.2
 django-webpack-loader==0.4.1
+djangorestframework==3.5.2
 factory_boy
 faker
 html5lib==0.999999999
