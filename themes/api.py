@@ -1,6 +1,7 @@
 """Themes APIs"""
-import praw
 import requests
+import praw
+from praw.models.reddit import more
 
 from django.conf import settings
 
@@ -227,8 +228,8 @@ class Api:
         Returns:
             praw.models.Submission: the submitted post
         """
-        if text is not None and url is not None:
-            raise ValueError('Only one of text and url can be provided')
+        if len(list(filter(lambda val: val is not None, [text, url]))) != 1:
+            raise ValueError('Exactly one of text and url must be provided')
         return self.get_theme(theme_name).submit(title, selftext=text, url=url)
 
     def get_post(self, post_id):
@@ -262,3 +263,101 @@ class Api:
             raise ValueError('Post a url cannot be updated')
 
         return post.edit(text)
+
+    def create_comment(self, text, post_id=None, comment_id=None):
+        """
+        Create a new comment in reply to a post or comment
+
+        Args:
+            text(str): the text of the comment
+            post_id(str): the parent post id if replying to a post
+            comment_id(str): the parent comment id if replying to a comment
+
+        Raises:
+            ValueError: if both post_id and comment_id are provided
+
+        Returns:
+            praw.models.Comment: the submitted comment
+        """
+        if len(list(filter(lambda val: val is not None, [post_id, comment_id]))) != 1:
+            raise ValueError('Exactly one of post_id and comment_id must be provided')
+
+        if post_id is not None:
+            return self.get_post(post_id).reply(text)
+
+        return self.get_comment(comment_id).reply(text)
+
+    def update_comment(self, comment_id, text):
+        """
+        Updates a existing comment
+
+        Args:
+            comment_id(str): the id of the comment
+            text(str): the updated text of the comment
+
+        Returns:
+            praw.models.Comment: the updated comment
+        """
+
+        return self.get_comment(comment_id).edit(text)
+
+    def delete_comment(self, comment_id):
+        """
+        Deletes the comment
+
+        Args:
+            comment_id(str): the id of the comment to delete
+
+        """
+        self.get_comment(comment_id).delete()
+
+    def get_comment(self, comment_id):
+        """
+        Gets the comment
+
+        Args:
+            comment_id(str): the base36 id for the comment
+
+        Returns:
+            praw.models.Comment: the comment
+        """
+        return self.reddit.comment(comment_id)
+
+    def list_comments(self, post_id):
+        """
+        Lists the comments of a post_id
+
+        Args:
+            post_id(str): the base36 id for the post
+
+        Returns:
+            praw.models.CommentForest: the base of the comment tree
+        """
+        return self.get_post(post_id).comments
+
+    def more_comments(self, comment_fullname, parent_fullname, count, children=None):
+        """
+        Initializes a MoreComments instance from the passed data and fetches theme
+
+        Args:
+            comment_fullname(str): the fullname for the comment
+            parent_fullname(str): the fullname of the post
+            count(int): the count of comments
+            children(list(str)): the list of more comments (leave empty continue page links)
+
+        Returns:
+            praw.models.MoreComments: the set of more comments
+        """
+        submission_id = parent_fullname.split('_', 1)[1]
+        comment_id = comment_fullname.split('_', 1)[1]
+        data = {
+            'id': comment_id,
+            'name': comment_fullname,
+            'parent_id': parent_fullname,
+            'children': children or [],
+            'count': count,
+        }
+        more_comments = more.MoreComments(self.reddit, data)
+        more_comments.submission = self.reddit.submission(submission_id)
+        more_comments.comments()  # load the comments
+        return more_comments

@@ -132,8 +132,9 @@ def test_create_post_url_and_text(mock_client):
     client = api.Api()
     with pytest.raises(ValueError):
         client.create_post('theme', 'Title', url='http://google.com', text='Text')
-    assert mock_client.subreddit.called_once_with('theme')
-    assert mock_client.subreddit.return_value.submit.call_count == 0
+    with pytest.raises(ValueError):
+        client.create_post('theme', 'Title')
+    assert mock_client.subreddit.call_count == 0
 
 
 def test_get_post(mock_client):
@@ -160,3 +161,84 @@ def test_update_post_invalid(mock_client):
         client.update_post('id', 'Text')
     assert mock_client.submission.called_once_with(id='id')
     assert mock_client.submission.return_value.edit.call_count == 0
+
+
+def test_create_comment_on_post(mock_client):
+    """Makes correct calls for comment on post"""
+    client = api.Api()
+    client.create_comment('text', post_id='id1')
+    assert mock_client.comment.call_count == 0
+    assert mock_client.submission.called_once_with('id1')
+    assert mock_client.submission.return_value.reply.called_once_with('text')
+
+
+def test_create_comment_on_comment(mock_client):
+    """Makes correct calls for comment on comment"""
+    client = api.Api()
+    client.create_comment('text', comment_id='id2')
+    assert mock_client.submission.call_count == 0
+    assert mock_client.comment.called_once_with('id2')
+    assert mock_client.submcommentission.return_value.reply.called_once_with('text')
+
+
+def test_create_comment_args_error(mock_client):
+    """Errors if both args provided"""
+    client = api.Api()
+    with pytest.raises(ValueError):
+        client.create_comment('text', post_id='id1', comment_id='id2')
+    with pytest.raises(ValueError):
+        client.create_comment('text')
+    assert mock_client.submission.call_count == 0
+    assert mock_client.comment.call_count == 0
+
+
+def test_list_comments(mock_client):
+    """Test list_comments"""
+    client = api.Api()
+    result = client.list_comments('id')
+    assert mock_client.submission.called_once_with('id')
+    assert result == mock_client.submission.return_value.comments
+
+
+def test_get_comment(mock_client):
+    """Test get_comment"""
+    client = api.Api()
+    client.get_comment('id')
+    assert mock_client.comment.called_once_with('id')
+
+
+def test_delete_comment(mock_client):
+    """Test delete_comment"""
+    client = api.Api()
+    client.delete_comment('id')
+    assert mock_client.comment.called_once_with('id')
+    assert mock_client.comment.return_value.delete.called_once_with()
+
+
+def test_update_comment(mock_client):
+    """Test update_post passes"""
+    client = api.Api()
+    client.update_comment('id', 'Text')
+    assert mock_client.comment.called_once_with(id='id')
+    assert mock_client.comment.return_value.edit.called_once_with('text')
+
+
+def test_more_comments(mock_client, mocker):
+    """Test more_comments"""
+    client = api.Api()
+    children = ['t1_itmt', 't1_it56t']
+
+    more_patch = mocker.patch('praw.models.reddit.more.MoreComments')
+    result = client.more_comments('t1_gh_3i', 't3_iru_i2', 5, children=children)
+
+    assert more_patch.called_once_with(client.reddit, {
+        'id': 'gh_3i',
+        'name': 't1_gh_3i',
+        'parent_id': 't3_iru_i2',
+        'children': children,
+        'count': 5,
+    })
+    assert result == more_patch.return_value
+    assert mock_client.submission.called_once_with('iru_i2')
+    assert result.submission == mock_client.submission.return_value
+    assert result.comments.called_once_with()
