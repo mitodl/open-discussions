@@ -18,6 +18,7 @@ django-redis==4.7.0
 django-server-status==0.3.2
 django-webpack-loader==0.4.1
 django==1.10.5            # via django-server-status
+djangorestframework==3.5.2
 elasticsearch==5.4.0      # via django-server-status
 factory-boy==2.8.1
 faker==0.7.17
