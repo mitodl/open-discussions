@@ -239,6 +239,7 @@ class Api:
 
         Args:
             post_id(str): the base36 id for the post
+            text (str): The text for the post
 
         Raises:
             ValueError: if the url post was provided
