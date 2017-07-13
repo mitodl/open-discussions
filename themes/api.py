@@ -190,7 +190,7 @@ class Api:
             **other_settings (dict): dict of additional settings
 
         Returns:
-            praw.models.Subreddit: the created subreddit
+            praw.models.Subreddit: the updated subreddit
         """
         if theme_type is not None and theme_type not in VALID_THEME_TYPES:
             raise ValueError('Invalid argument theme_type={}'.format(theme_type))
