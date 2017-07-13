@@ -136,7 +136,7 @@ class Api:
         Returns:
             ListingGenerator(praw.models.Subreddit): a generator over theme listings
         """
-        return self.reddit.user.subreddits() if self.is_anonymous is not None else self.reddit.subreddits.default()
+        return self.reddit.user.subreddits() if not self.is_anonymous else self.reddit.subreddits.default()
 
     def get_theme(self, name):
         """
@@ -260,7 +260,7 @@ class Api:
         post = self.get_post(post_id)
 
         if not post.selftext:
-            raise ValueError('Post a url cannot be updated')
+            raise ValueError('Posts with a url cannot be updated')
 
         return post.edit(text)
 
