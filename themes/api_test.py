@@ -143,7 +143,7 @@ def test_get_post(mock_client):
     """Test get_post"""
     client = api.Api()
     client.get_post('id')
-    assert mock_client.submission.called_once_with(id='id')
+    mock_client.submission.assert_called_once_with(id='id')
 
 
 def test_update_post_valid(mock_client):
@@ -198,7 +198,7 @@ def test_list_comments(mock_client):
     """Test list_comments"""
     client = api.Api()
     result = client.list_comments('id')
-    assert mock_client.submission.called_once_with('id')
+    mock_client.submission.assert_called_once_with(id='id')
     assert result == mock_client.submission.return_value.comments
 
 
@@ -233,7 +233,7 @@ def test_more_comments(mock_client, mocker):
     more_patch = mocker.patch('praw.models.reddit.more.MoreComments')
     result = client.more_comments('t1_gh_3i', 't3_iru_i2', 5, children=children)
 
-    assert more_patch.called_once_with(client.reddit, {
+    more_patch.assert_called_once_with(client.reddit, {
         'id': 'gh_3i',
         'name': 't1_gh_3i',
         'parent_id': 't3_iru_i2',
