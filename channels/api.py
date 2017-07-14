@@ -186,7 +186,8 @@ class Api:
         if channel_type is not None:
             values['subreddit_type'] = channel_type
 
-        return self.get_channel(name).mod.update(**values)
+        self.get_channel(name).mod.update(**values)
+        return self.get_channel(name)
 
     def create_post(self, channel_name, title, text=None, url=None):
         """
