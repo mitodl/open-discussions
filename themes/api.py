@@ -232,6 +232,19 @@ class Api:
             raise ValueError('Exactly one of text and url must be provided')
         return self.get_theme(theme_name).submit(title, selftext=text, url=url)
 
+    def list_posts(self, theme_name):
+        """
+        List posts using the 'hot' algorithm
+
+        Args:
+            theme_name(str): the theme name identifier
+
+        Returns:
+            praw.models.listing.generator.ListingGenerator:
+                A generator of posts for a subreddit
+        """
+        return self.get_theme(theme_name).hot()
+
     def get_post(self, post_id):
         """
         Gets the post

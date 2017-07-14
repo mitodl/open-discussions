@@ -148,6 +148,15 @@ def test_create_post_url_and_text(mock_client):
     assert mock_client.subreddit.call_count == 0
 
 
+def test_list_posts(mock_client):
+    """list_posts should return a generator of posts"""
+    client = api.Api()
+    posts = client.list_posts('theme')
+    assert posts == mock_client.submission.return_value.hot.return_value
+    mock_client.submission.return_value.hot.assert_called_once_with()
+    mock_client.submission.assert_called_once_with('theme')
+
+
 def test_get_post(mock_client):
     """Test get_post"""
     client = api.Api()
