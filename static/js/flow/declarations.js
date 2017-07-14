@@ -1,6 +1,8 @@
 // @flow
 /* eslint-disable no-unused-vars */
 declare var SETTINGS: {
+  gaTrackingID: string,
+  reactGaDebug: boolean,
   public_path: string,
   FEATURES: {
     [key: string]: boolean,

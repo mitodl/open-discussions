@@ -1,34 +1,28 @@
 import React from 'react';
-import { Router } from 'react-router';
 import { Provider } from 'react-redux';
+import { BrowserRouter, Route } from 'react-router-dom';
 
 import App from './containers/App';
+import withTracker from './util/withTracker';
 
-export default class Root extends React.Component {
+export default class Router extends React.Component {
   props: {
-    browserHistory: Object,
-    onRouteUpdate:  () => void,
-    store:          Store,
-    routes:         Object,
+    store:  Store,
   };
 
   render () {
-    const {
-      browserHistory,
-      onRouteUpdate,
-      store,
-      routes
-    } = this.props;
+    const { store, children } = this.props;
 
     return <div>
       <Provider store={store}>
-        <Router history={browserHistory} onUpdate={onRouteUpdate} routes={routes} />
+        <BrowserRouter>
+          {children}
+        </BrowserRouter>
       </Provider>
     </div>;
   }
 }
 
-export const routes = {
-  path: "/",
-  component: App,
-};
+export const routes = (
+  <Route url="/" component={withTracker(App)}/>
+);

@@ -12,7 +12,7 @@ import App from '../containers/App';
 
 export function createAssertReducerResultState<State>(store: Store, getReducerState: (x: any) => State) {
   return (
-    action: () => Action<*,*>, stateLookup: (state: State) => any, defaultValue: any
+    action: (payload: any) => Action<*,*>, stateLookup: (state: State) => any, defaultValue: any
   ): void => {
     const getState = () => stateLookup(getReducerState(store.getState()));
 
@@ -25,8 +25,7 @@ export function createAssertReducerResultState<State>(store: Store, getReducerSt
 }
 
 export const testRoutes = (
-  <Route path="/" component={App}>
-  </Route>
+  <Route path="/" component={App}/>
 );
 
 export const stringStrip = R.compose(R.join(" "), _.words);

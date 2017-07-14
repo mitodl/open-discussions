@@ -1,38 +1,16 @@
 // @flow
 import React from 'react';
-import { connect } from 'react-redux';
-import {
-  updateCheckbox
-} from '../actions';
+import { Route } from 'react-router-dom';
 
-class App extends React.Component {
-  props: {
-    dispatch: () => void,
-    checkbox: {
-      checked: boolean,
-    },
-  };
+import HomePage from './HomePage';
 
-  handleClick(e) {
-    const { dispatch } = this.props;
-    dispatch(updateCheckbox(e.target.checked));
-  }
-
+export default class App extends React.Component {
   render() {
-    const { checked } = this.props.checkbox;
-    return <div>
-      <div id="app-body">
-        Click the checkbox:
-        <input type="checkbox" checked={checked} onClick={this.handleClick.bind(this)} />
+    const { match } = this.props;
+    return (
+      <div>
+        <Route exact path={match.url} component={HomePage}/>
       </div>
-    </div>;
+    );
   }
 }
-
-const mapStateToProps = (state) => {
-  return {
-    checkbox: state.checkbox,
-  };
-};
-
-export default connect(mapStateToProps)(App);
