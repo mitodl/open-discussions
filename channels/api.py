@@ -1,21 +1,21 @@
-"""Themes APIs"""
+"""Channels APIs"""
 import requests
 import praw
 from praw.models.reddit import more
 
 from django.conf import settings
 
-THEME_TYPE_PUBLIC = 'public'
-THEME_TYPE_PRIVATE = 'private'
+CHANNEL_TYPE_PUBLIC = 'public'
+CHANNEL_TYPE_PRIVATE = 'private'
 
-VALID_THEME_TYPES = (
-    THEME_TYPE_PRIVATE,
-    THEME_TYPE_PUBLIC,
+VALID_CHANNEL_TYPES = (
+    CHANNEL_TYPE_PRIVATE,
+    CHANNEL_TYPE_PUBLIC,
 )
 
 USER_AGENT = 'MIT-Open: {version}'
 
-THEME_SETTINGS = (
+CHANNEL_SETTINGS = (
     'header_title',
     'link_type',
     'public_description',
@@ -113,7 +113,7 @@ def _get_user_agent():
 
 
 class Api:
-    """Theme API"""
+    """Channel API"""
     def __init__(self, user=None):
         """Constructor"""
         self.user = user
@@ -127,44 +127,44 @@ class Api:
     def _assert_authenticated(self):
         """Asserts a user is authenticated"""
         if self.is_anonymous:
-            raise Exception('Anonymous user not allowed to update themes')
+            raise Exception('Anonymous user not allowed to update channels')
 
-    def list_themes(self):
+    def list_channels(self):
         """
-        List the themes
+        List the channels
 
         Returns:
-            ListingGenerator(praw.models.Subreddit): a generator over theme listings
+            ListingGenerator(praw.models.Subreddit): a generator over channel listings
         """
         return self.reddit.user.subreddits() if not self.is_anonymous else self.reddit.subreddits.default()
 
-    def get_theme(self, name):
+    def get_channel(self, name):
         """
-        Get the theme
+        Get the channel
 
         Returns:
-            praw.models.Subreddit: the specified theme
+            praw.models.Subreddit: the specified channel
         """
         return self.reddit.subreddit(name)
 
-    def create_theme(self, name, title, theme_type=THEME_TYPE_PUBLIC, **other_settings):
+    def create_channel(self, name, title, channel_type=CHANNEL_TYPE_PUBLIC, **other_settings):
         """
-        Create a theme
+        Create a channel
 
         Args:
-            name (str): name of the theme
-            title (str): title of the theme
-            theme_type (str): type of the theme
+            name (str): name of the channel
+            title (str): title of the channel
+            channel_type (str): type of the channel
             **other_settings (dict): dict of additional settings
 
         Returns:
             praw.models.Subreddit: the created subreddit
         """
-        if theme_type not in VALID_THEME_TYPES:
-            raise ValueError('Invalid argument theme_type={}'.format(theme_type))
+        if channel_type not in VALID_CHANNEL_TYPES:
+            raise ValueError('Invalid argument channel_type={}'.format(channel_type))
 
         for key, value in other_settings.items():
-            if key not in THEME_SETTINGS:
+            if key not in CHANNEL_SETTINGS:
                 raise ValueError('Invalid argument {}={}'.format(key, value))
 
         self._assert_authenticated()
@@ -175,28 +175,28 @@ class Api:
         return self.reddit.subreddit.create(
             name,
             title=title,
-            subreddit_type=theme_type,
+            subreddit_type=channel_type,
             **other_settings
         )
 
-    def update_theme(self, name, title=None, theme_type=None, **other_settings):
+    def update_channel(self, name, title=None, channel_type=None, **other_settings):
         """
-        Updates a theme
+        Updates a channel
 
         Args:
-            name (str): name of the theme
-            title (str): title of the theme
-            theme_type (str): type of the theme
+            name (str): name of the channel
+            title (str): title of the channel
+            channel_type (str): type of the channel
             **other_settings (dict): dict of additional settings
 
         Returns:
             praw.models.Subreddit: the updated subreddit
         """
-        if theme_type is not None and theme_type not in VALID_THEME_TYPES:
-            raise ValueError('Invalid argument theme_type={}'.format(theme_type))
+        if channel_type is not None and channel_type not in VALID_CHANNEL_TYPES:
+            raise ValueError('Invalid argument channel_type={}'.format(channel_type))
 
         for key, value in other_settings.items():
-            if key not in THEME_SETTINGS:
+            if key not in CHANNEL_SETTINGS:
                 raise ValueError('Invalid argument {}={}'.format(key, value))
 
         self._assert_authenticated()
@@ -207,17 +207,17 @@ class Api:
         values = other_settings.copy()
         if title is not None:
             values['title'] = title
-        if theme_type is not None:
-            values['subreddit_type'] = theme_type
+        if channel_type is not None:
+            values['subreddit_type'] = channel_type
 
-        return self.get_theme(name).mod.update(**values)
+        return self.get_channel(name).mod.update(**values)
 
-    def create_post(self, theme_name, title, text=None, url=None):
+    def create_post(self, channel_name, title, text=None, url=None):
         """
-        Create a new post in a theme_name
+        Create a new post in a channel
 
         Args:
-            theme_name(str): the theme name identifier
+            channel_name(str): the channel name identifier
             title(str): the title of the post
             text(str): the text of the post
             url(str): the url of the post
@@ -230,20 +230,20 @@ class Api:
         """
         if len(list(filter(lambda val: val is not None, [text, url]))) != 1:
             raise ValueError('Exactly one of text and url must be provided')
-        return self.get_theme(theme_name).submit(title, selftext=text, url=url)
+        return self.get_channel(channel_name).submit(title, selftext=text, url=url)
 
-    def list_posts(self, theme_name):
+    def list_posts(self, channel_name):
         """
         List posts using the 'hot' algorithm
 
         Args:
-            theme_name(str): the theme name identifier
+            channel_name(str): the channel name identifier
 
         Returns:
             praw.models.listing.generator.ListingGenerator:
                 A generator of posts for a subreddit
         """
-        return self.get_theme(theme_name).hot()
+        return self.get_channel(channel_name).hot()
 
     def get_post(self, post_id):
         """
@@ -350,7 +350,7 @@ class Api:
 
     def more_comments(self, comment_fullname, parent_fullname, count, children=None):
         """
-        Initializes a MoreComments instance from the passed data and fetches theme
+        Initializes a MoreComments instance from the passed data and fetches channel
 
         Args:
             comment_fullname(str): the fullname for the comment

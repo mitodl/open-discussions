@@ -3,7 +3,7 @@
 import pytest
 
 from open_discussions.factories import UserFactory
-from themes import api
+from channels import api
 
 pytestmark = pytest.mark.django_db
 
@@ -11,7 +11,7 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture()
 def mock_get_client(mocker):
     """Mock reddit get_client"""
-    return mocker.patch('themes.api._get_client', autospec=True)
+    return mocker.patch('channels.api._get_client', autospec=True)
 
 
 @pytest.fixture()
@@ -21,99 +21,99 @@ def mock_client(mock_get_client):
 
 
 @pytest.mark.parametrize('create_user', [True, False])
-def test_get_theme_user(mock_get_client, create_user):
-    """Test get_themes for logged-in user"""
+def test_get_channel_user(mock_get_client, create_user):
+    """Test get_channels for logged-in user"""
     user = UserFactory.create() if create_user else None
-    theme = api.Api(user=user).get_theme('test')
-    assert theme == mock_get_client.return_value.subreddit.return_value
+    channel = api.Api(user=user).get_channel('test')
+    assert channel == mock_get_client.return_value.subreddit.return_value
     mock_get_client.assert_called_once_with(user=user)
     mock_get_client.return_value.subreddit.assert_called_once_with('test')
 
 
-def test_list_themes_user(mock_get_client):
-    """Test list_themes for logged-in user"""
+def test_list_channels_user(mock_get_client):
+    """Test list_channels for logged-in user"""
     user = UserFactory.create()
-    themes = api.Api(user=user).list_themes()
-    assert themes == mock_get_client.return_value.user.subreddits.return_value
+    channels = api.Api(user=user).list_channels()
+    assert channels == mock_get_client.return_value.user.subreddits.return_value
     mock_get_client.assert_called_once_with(user=user)
     mock_get_client.return_value.user.subreddits.assert_called_once_with()
 
 
-def test_list_themes_no_user(mock_get_client):
-    """Test list_themes for anonymous user"""
-    themes = api.Api().list_themes()
-    assert themes == mock_get_client.return_value.subreddits.default.return_value
+def test_list_channels_no_user(mock_get_client):
+    """Test list_channels for anonymous user"""
+    channels = api.Api().list_channels()
+    assert channels == mock_get_client.return_value.subreddits.default.return_value
     mock_get_client.assert_called_once_with(user=None)
     mock_get_client.return_value.subreddits.default.assert_called_once_with()
 
 
-@pytest.mark.parametrize('theme_type', api.VALID_THEME_TYPES)
-def test_create_theme_user(mock_get_client, theme_type):
-    """Test create_theme for logged-in user"""
+@pytest.mark.parametrize('channel_type', api.VALID_CHANNEL_TYPES)
+def test_create_channel_user(mock_get_client, channel_type):
+    """Test create_channel for logged-in user"""
     user = UserFactory.create()
-    theme = api.Api(user=user).create_theme('name', 'Title', theme_type=theme_type)
-    assert theme == mock_get_client.return_value.subreddit.create.return_value
+    channel = api.Api(user=user).create_channel('name', 'Title', channel_type=channel_type)
+    assert channel == mock_get_client.return_value.subreddit.create.return_value
     mock_get_client.assert_called_once_with(user=user)
     mock_get_client.return_value.subreddit.create.assert_called_once_with(
-        'name', title='Title', subreddit_type=theme_type
+        'name', title='Title', subreddit_type=channel_type
     )
 
 
-@pytest.mark.parametrize('theme_setting', api.THEME_SETTINGS)
-def test_create_theme_setting(mock_client, theme_setting):
-    """Test create_theme for {theme_setting}"""
+@pytest.mark.parametrize('channel_setting', api.CHANNEL_SETTINGS)
+def test_create_channel_setting(mock_client, channel_setting):
+    """Test create_channel for {channel_setting}"""
     user = UserFactory.create()
-    kwargs = {theme_setting: 'value'}
-    theme = api.Api(user=user).create_theme('name', 'Title', **kwargs)
-    assert theme == mock_client.subreddit.create.return_value
+    kwargs = {channel_setting: 'value'}
+    channel = api.Api(user=user).create_channel('name', 'Title', **kwargs)
+    assert channel == mock_client.subreddit.create.return_value
     mock_client.subreddit.create.assert_called_once_with(
-        'name', title='Title', subreddit_type=api.THEME_TYPE_PUBLIC, **kwargs
+        'name', title='Title', subreddit_type=api.CHANNEL_TYPE_PUBLIC, **kwargs
     )
 
 
-def test_create_theme_invalid_setting(mock_client):
-    """Test create_theme for invalid other_settings"""
+def test_create_channel_invalid_setting(mock_client):
+    """Test create_channel for invalid other_settings"""
     user = UserFactory.create()
     client = api.Api(user=user)
     with pytest.raises(ValueError):
-        client.create_theme('name', 'Title', invalidarg='bad')
+        client.create_channel('name', 'Title', invalidarg='bad')
     assert mock_client.subreddit.create.call_count == 0
 
 
-def test_create_theme_user_invalid_type(mock_client):
-    """Test create_theme for logged-in user"""
+def test_create_channel_user_invalid_type(mock_client):
+    """Test create_channel for logged-in user"""
     user = UserFactory.create()
     client = api.Api(user=user)
     with pytest.raises(ValueError):
-        client.create_theme('name', 'Title', theme_type='notathemetype')
+        client.create_channel('name', 'Title', channel_type='notachanneltype')
     assert mock_client.subreddit.create.call_count == 0
 
 
-def test_create_theme_no_user(mock_client):
-    """Test create_theme for anonymous user"""
+def test_create_channel_no_user(mock_client):
+    """Test create_channel for anonymous user"""
     client = api.Api()
     with pytest.raises(Exception):
-        client.create_theme('name', 'Title')
+        client.create_channel('name', 'Title')
     assert mock_client.subreddit.create.call_count == 0
 
 
-@pytest.mark.parametrize('theme_type', api.VALID_THEME_TYPES)
-def test_update_theme_type(mock_client, theme_type):
-    """Test create_theme for theme_type"""
+@pytest.mark.parametrize('channel_type', api.VALID_CHANNEL_TYPES)
+def test_update_channel_type(mock_client, channel_type):
+    """Test create_channel for channel_type"""
     user = UserFactory.create()
-    theme = api.Api(user=user).update_theme('name', theme_type=theme_type)
-    assert theme == mock_client.subreddit.return_value.mod.update.return_value
+    channel = api.Api(user=user).update_channel('name', channel_type=channel_type)
+    assert channel == mock_client.subreddit.return_value.mod.update.return_value
     mock_client.subreddit.assert_called_once_with('name')
-    mock_client.subreddit.return_value.mod.update.assert_called_once_with(subreddit_type=theme_type)
+    mock_client.subreddit.return_value.mod.update.assert_called_once_with(subreddit_type=channel_type)
 
 
-@pytest.mark.parametrize('theme_setting', api.THEME_SETTINGS + ('title',))
-def test_update_theme_setting(mock_client, theme_setting):
-    """Test update_theme for {theme_setting}"""
+@pytest.mark.parametrize('channel_setting', api.CHANNEL_SETTINGS + ('title',))
+def test_update_channel_setting(mock_client, channel_setting):
+    """Test update_channel for {channel_setting}"""
     user = UserFactory.create()
-    kwargs = {theme_setting: 'value'}
-    theme = api.Api(user=user).update_theme('name', **kwargs)
-    assert theme == mock_client.subreddit.return_value.mod.update.return_value
+    kwargs = {channel_setting: 'value'}
+    channel = api.Api(user=user).update_channel('name', **kwargs)
+    assert channel == mock_client.subreddit.return_value.mod.update.return_value
     mock_client.subreddit.assert_called_once_with('name')
     mock_client.subreddit.return_value.mod.update.assert_called_once_with(**kwargs)
 
@@ -121,18 +121,18 @@ def test_update_theme_setting(mock_client, theme_setting):
 def test_create_post_text(mock_client):
     """Test create_post with text"""
     client = api.Api()
-    post = client.create_post('theme', 'Title', text='Text')
+    post = client.create_post('channel', 'Title', text='Text')
     assert post == mock_client.subreddit.return_value.submit.return_value
-    mock_client.subreddit.assert_called_once_with('theme')
+    mock_client.subreddit.assert_called_once_with('channel')
     mock_client.subreddit.return_value.submit.assert_called_once_with('Title', selftext='Text', url=None)
 
 
 def test_create_post_url(mock_client):
     """Test create_post with url"""
     client = api.Api()
-    post = client.create_post('theme', 'Title', url='http://google.com')
+    post = client.create_post('channel', 'Title', url='http://google.com')
     assert post == mock_client.subreddit.return_value.submit.return_value
-    mock_client.subreddit.assert_called_once_with('theme')
+    mock_client.subreddit.assert_called_once_with('channel')
     mock_client.subreddit.return_value.submit.assert_called_once_with(
         'Title', selftext=None, url='http://google.com'
     )
@@ -142,19 +142,19 @@ def test_create_post_url_and_text(mock_client):
     """Test create_post with url and text raises error"""
     client = api.Api()
     with pytest.raises(ValueError):
-        client.create_post('theme', 'Title', url='http://google.com', text='Text')
+        client.create_post('channel', 'Title', url='http://google.com', text='Text')
     with pytest.raises(ValueError):
-        client.create_post('theme', 'Title')
+        client.create_post('channel', 'Title')
     assert mock_client.subreddit.call_count == 0
 
 
 def test_list_posts(mock_client):
     """list_posts should return a generator of posts"""
     client = api.Api()
-    posts = client.list_posts('theme')
+    posts = client.list_posts('channel')
     assert posts == mock_client.subreddit.return_value.hot.return_value
     mock_client.subreddit.return_value.hot.assert_called_once_with()
-    mock_client.subreddit.assert_called_once_with('theme')
+    mock_client.subreddit.assert_called_once_with('channel')
 
 
 def test_get_post(mock_client):
