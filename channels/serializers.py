@@ -38,14 +38,11 @@ class ChannelSerializer(serializers.Serializer):
         api = Api()
         api.user = True
         try:
-            api.update_channel(
+            return api.update_channel(
                 name=validated_data['display_name'],
                 title=validated_data['title'],
                 channel_type=validated_data['subreddit_type'],
             )
         except APIException as ex:
+            # Note: When this is not a proof of concept we should be careful about leaking information about reddit
             raise ValidationError("{}".format(ex)) from ex
-
-
-class PostSerializer(serializers.Serializer):
-    """Serializer for posts"""

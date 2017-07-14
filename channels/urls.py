@@ -1,8 +1,5 @@
 """URL configurations for channels"""
-from django.conf import settings
-from django.conf.urls import include, url
-from django.contrib import admin
-from rest_framework import routers
+from django.conf.urls import url
 
 from channels.views import (
     ChannelDetailView,
@@ -10,6 +7,6 @@ from channels.views import (
 )
 
 urlpatterns = [
-    url(r'^api/v0/channels/$', ChannelListView.as_view()),
-    url(r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/$', ChannelDetailView.as_view())
+    url(r'^api/v0/channels/$', ChannelListView.as_view(), name='channel-list'),
+    url(r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/$', ChannelDetailView.as_view(), name='channel-detail')
 ]
