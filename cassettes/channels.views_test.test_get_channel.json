@@ -4,7 +4,7 @@
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "grant_type=password&password=george&username=george"
+          "string": ""
         },
         "headers": {
           "User-Agent": [
@@ -20,10 +20,78 @@
             "keep-alive"
           ],
           "Cookie": [
-            "loid=2x4Vt454ZL8ljOotYL; loidcreated=2017-07-18T20%3A59%3A09.137Z"
+            "loid=9EXSxtlJr1cJ3f5u7k; loidcreated=2017-07-21T15%3A55%3A04.230Z"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDLWTc3SLXPWjTfL86zMLQzwDwgM9w6r8nT3TfJwVdJRUEqtKMgsSi2OzwQpNzYzMACKgXXHl1QWpIKMSEpNLEotAqktTs6HCGmBeEWpaUCNGch2OaeFBjhW+uSbJMdn5EU5F0YYGmaUJrnkO5lYgHSkpJZlJqfGZ6aAjIVwlGoBcdvCL7QAAAA="
+        },
+        "headers": {
+          "Date": [
+            "Fri, 21 Jul 2017 18:29:18 GMT"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+      },
+      "recorded_at": "2017-07-21T18:29:18"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "grant_type=refresh_token&refresh_token=3-CfUPAyLo4c_hnZCqX11hubDoB48"
+        },
+        "headers": {
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=9EXSxtlJr1cJ3f5u7k; loidcreated=2017-07-21T15%3A55%3A04.230Z"
           ],
           "Content-Length": [
-            "51"
+            "68"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
@@ -38,11 +106,11 @@
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"access_token\": \"3-wEByJYQTx-58NoIC_fkIJ1CZGF4\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
+          "string": "{\"access_token\": \"3-cH7oBxjVgWVX2AGU_bqLVovWj9I\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
         },
         "headers": {
           "Date": [
-            "Tue, 18 Jul 2017 22:17:46 GMT"
+            "Fri, 21 Jul 2017 18:29:19 GMT"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
@@ -66,13 +134,13 @@
             "1; mode=block"
           ],
           "x-ratelimit-remaining": [
-            "299"
+            "296"
           ],
           "x-ratelimit-used": [
-            "1"
+            "4"
           ],
           "x-ratelimit-reset": [
-            "134"
+            "42"
           ]
         },
         "status": {
@@ -81,7 +149,7 @@
         },
         "url": "https://reddit.local/api/v1/access_token"
       },
-      "recorded_at": "2017-07-18T22:17:46"
+      "recorded_at": "2017-07-21T18:29:19"
     },
     {
       "request": {
@@ -103,10 +171,10 @@
             "keep-alive"
           ],
           "Authorization": [
-            "bearer 3-wEByJYQTx-58NoIC_fkIJ1CZGF4"
+            "bearer 3-cH7oBxjVgWVX2AGU_bqLVovWj9I"
           ],
           "Cookie": [
-            "loid=2x4Vt454ZL8ljOotYL; loidcreated=2017-07-18T20%3A59%3A09.137Z"
+            "loid=9EXSxtlJr1cJ3f5u7k; loidcreated=2017-07-21T15%3A55%3A04.230Z"
           ]
         },
         "method": "GET",
@@ -115,17 +183,17 @@
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"b\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"unit_tests\", \"header_img\": null, \"description_html\": null, \"title\": \"A place for tests\", \"collapse_deleted_comments\": false, \"public_description\": \"\", \"over18\": false, \"public_description_html\": null, \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 2, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 1, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_b\", \"created\": 1500415481.0, \"url\": \"/r/unit_tests/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1500415481.0, \"banner_size\": null, \"user_is_moderator\": true, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"private\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"b\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"unit_tests\", \"header_img\": null, \"description_html\": null, \"title\": \"A new title\", \"collapse_deleted_comments\": false, \"public_description\": \"\", \"over18\": false, \"public_description_html\": null, \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 4, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 1, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_b\", \"created\": 1500415481.0, \"url\": \"/r/unit_tests/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1500415481.0, \"banner_size\": null, \"user_is_moderator\": true, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"public\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
         },
         "headers": {
           "Date": [
-            "Tue, 18 Jul 2017 22:17:46 GMT"
+            "Fri, 21 Jul 2017 18:29:19 GMT"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Content-Length": [
-            "1078"
+            "1071"
           ],
           "Connection": [
             "keep-alive"
@@ -152,16 +220,16 @@
             "private, s-maxage=0, max-age=0, must-revalidate"
           ],
           "x-ratelimit-remaining": [
-            "299.0"
+            "295.0"
           ],
           "x-ratelimit-used": [
-            "1"
+            "5"
           ],
           "x-ratelimit-reset": [
-            "134"
+            "41"
           ],
           "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=TgPXNfB513sQLHQTGDUzBvHsk2i4oGMMlgt6qxtoRHQMkMBu7W2sqTzD4HecGomkuB%2Bl02B0FHE%3D"
+            "https://reddit.local/pixel/of_destiny.png?v=YACRDckNYoUuMui72V51VhRWoQxgs%2F0NI%2FaUcovAUtCb7NrBDD4nDv7w3ra9iVwDAUAxCRVsK98%3D"
           ]
         },
         "status": {
@@ -170,7 +238,7 @@
         },
         "url": "https://reddit.local/r/unit_tests/about/?raw_json=1"
       },
-      "recorded_at": "2017-07-18T22:17:46"
+      "recorded_at": "2017-07-21T18:29:19"
     }
   ],
   "recorded_with": "betamax/0.8.0"

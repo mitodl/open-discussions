@@ -5,6 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 amqp==2.1.4               # via kombu
+betamax-matchers==0.4.0
 betamax==0.8.0
 billiard==3.5.0.2         # via celery
 boto==2.39.0
@@ -43,6 +44,7 @@ pytz==2017.2              # via celery
 pyyaml==3.11
 raven==6.1.0
 redis==2.10.5
+requests-toolbelt==0.8.0  # via betamax-matchers
 requests==2.18.1
 simplegeneric==0.8.1      # via ipython
 six==1.10.0               # via django-server-status, faker, html5lib, prompt-toolkit, python-dateutil, traitlets

@@ -1,15 +1,11 @@
 """Configuration for pytest fixtures"""
 # pylint: disable=unused-argument, redefined-outer-name
-import betamax
 import pytest
 
 from rest_framework.test import APIClient
 
+import open_discussions.betamax_config  # pylint: disable=unused-import
 from open_discussions.factories import UserFactory
-
-
-with betamax.Betamax.configure() as config:
-    config.cassette_library_dir = "cassettes"
 
 
 @pytest.fixture
@@ -23,14 +19,15 @@ def praw_settings(settings):
 
 
 @pytest.fixture
-def use_betamax(mocker, betamax_session, praw_settings):
+def use_betamax(mocker, betamax_recorder, praw_settings):
     """Attach the betamax session to the Api client"""
-    mocker.patch('channels.api._get_session', return_value=betamax_session)
+    mocker.patch('channels.api._get_session', return_value=betamax_recorder.session)
     mocker.patch('channels.api._get_user_credentials', return_value={
         'client_id': praw_settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID,
         'client_secret': praw_settings.OPEN_DISCUSSIONS_REDDIT_SECRET,
         'refresh_token': 'fake',
     })
+    return betamax_recorder
 
 
 @pytest.fixture()

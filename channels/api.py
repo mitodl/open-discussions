@@ -6,7 +6,6 @@ import praw
 from praw.models.reddit import more
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
 
 CHANNEL_TYPE_PUBLIC = 'public'
 CHANNEL_TYPE_PRIVATE = 'private'
@@ -106,8 +105,6 @@ class Api:
     """Channel API"""
     def __init__(self, user):
         """Constructor"""
-        if user is None:
-            user = AnonymousUser()
         self.user = user
         self.reddit = _get_client(user=user)
 
@@ -252,7 +249,7 @@ class Api:
         """
         post = self.get_post(post_id)
 
-        if not post.selftext:
+        if not post.is_self:
             raise ValueError('Posts with a url cannot be updated')
 
         return post.edit(text)

@@ -161,8 +161,8 @@ def test_update_post_valid(mock_client):
 
 
 def test_update_post_invalid(mock_client):
-    """Test update_post raises error if updating """
-    mock_client.submission.return_value.selftext = ''
+    """Test update_post raises error if updating a post which is not a self post"""
+    mock_client.submission.return_value.is_self = ''
     client = api.Api(UserFactory.create())
     with pytest.raises(ValueError):
         client.update_post('id', 'Text')
