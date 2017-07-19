@@ -1,5 +1,6 @@
 Django==1.10.5
 PyYAML==3.11
+betamax
 boto==2.39.0
 celery==4.0.2
 dj-database-url==0.3.0

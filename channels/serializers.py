@@ -1,9 +1,7 @@
 """
 Serializers for channel REST APIs
 """
-from praw.exceptions import APIException
 from rest_framework import serializers
-from rest_framework.validators import ValidationError
 
 from channels.api import (
     Api,
@@ -24,25 +22,24 @@ class ChannelSerializer(serializers.Serializer):
     def create(self, validated_data):
         api = Api()
         api.user = True
-        try:
-            return api.create_channel(
-                name=validated_data['display_name'],
-                title=validated_data['title'],
-                channel_type=validated_data['subreddit_type'],
-            )
-        except (ValueError, APIException) as ex:
-            # Note: When this is not a proof of concept we should be careful about leaking information about reddit
-            raise ValidationError("{}".format(ex)) from ex
+        return api.create_channel(
+            name=validated_data['display_name'],
+            title=validated_data['title'],
+            channel_type=validated_data['subreddit_type'],
+        )
 
     def update(self, instance, validated_data):
         api = Api()
         api.user = True
-        try:
-            return api.update_channel(
-                name=validated_data['display_name'],
-                title=validated_data['title'],
-                channel_type=validated_data['subreddit_type'],
-            )
-        except APIException as ex:
-            # Note: When this is not a proof of concept we should be careful about leaking information about reddit
-            raise ValidationError("{}".format(ex)) from ex
+
+        name = instance.display_name
+        key_map = {
+            'title': 'title',
+            'channel_type': 'subreddit_type',
+        }
+        kwargs = {}
+        for rest_key, reddit_key in key_map.items():
+            if rest_key in validated_data:
+                kwargs[reddit_key] = validated_data[rest_key]
+
+        return api.update_channel(name=name, **kwargs)

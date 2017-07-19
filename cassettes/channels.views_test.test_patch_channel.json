@@ -1,0 +1,358 @@
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "grant_type=password&password=george&username=george"
+        },
+        "headers": {
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=2x4Vt454ZL8ljOotYL; loidcreated=2017-07-18T20%3A59%3A09.137Z"
+          ],
+          "Content-Length": [
+            "51"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Authorization": [
+            "Basic QndDWlpETWd2NWVacnc6dXBQZE9Sb3VyUmQtMVFoNy1yMUptRENxOWxn"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/v1/access_token"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"access_token\": \"3-tc-YWZ_fXCsGD3Y7zdojp24xOHI\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
+        },
+        "headers": {
+          "Date": [
+            "Wed, 19 Jul 2017 15:51:37 GMT"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Content-Length": [
+            "107"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ],
+          "x-ratelimit-remaining": [
+            "297"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-ratelimit-reset": [
+            "503"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/access_token"
+      },
+      "recorded_at": "2017-07-19T15:51:37"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Authorization": [
+            "bearer 3-tc-YWZ_fXCsGD3Y7zdojp24xOHI"
+          ],
+          "Cookie": [
+            "loid=2x4Vt454ZL8ljOotYL; loidcreated=2017-07-18T20%3A59%3A09.137Z"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/unit_tests/about/edit/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"subreddit_settings\", \"data\": {\"default_set\": false, \"subreddit_id\": \"t5_b\", \"domain\": null, \"allow_images\": null, \"show_media\": false, \"wiki_edit_age\": 0, \"submit_text\": \"\", \"spam_links\": null, \"title\": \"A new title\", \"collapse_deleted_comments\": false, \"wikimode\": \"disabled\", \"over_18\": false, \"suggested_comment_sort\": null, \"description\": \"\", \"submit_link_label\": null, \"spam_comments\": null, \"spam_selfposts\": null, \"submit_text_label\": null, \"language\": \"en\", \"wiki_edit_karma\": 0, \"hide_ads\": false, \"header_hover_text\": null, \"public_traffic\": false, \"public_description\": \"\", \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"public\", \"exclude_banned_modqueue\": false, \"content_options\": \"any\"}}"
+        },
+        "headers": {
+          "Date": [
+            "Wed, 19 Jul 2017 15:51:37 GMT"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Content-Length": [
+            "741"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "x-ratelimit-remaining": [
+            "297.0"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-ratelimit-reset": [
+            "503"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=5QnwSfKB9PujMAgEFjTdMzteNWkAr3Vt04Nx%2FyrjNmkbMXso5m2Q92y3WBuIPspcn5jrBInrK8trkNs4vXKgrjFqMcaoH0ZU"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/unit_tests/about/edit/?raw_json=1"
+      },
+      "recorded_at": "2017-07-19T15:51:37"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "allow_top=False&api_type=json&collapse_deleted_comments=False&comment_score_hide_mins=0&description=&exclude_banned_modqueue=False&hide_ads=False&lang=en&link_type=any&over_18=False&public_description=&public_traffic=False&show_media=False&show_media_preview=True&sr=t5_b&submit_text=&title=A+new+title&type=public&wiki_edit_age=0&wiki_edit_karma=0&wikimode=disabled"
+        },
+        "headers": {
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Authorization": [
+            "bearer 3-tc-YWZ_fXCsGD3Y7zdojp24xOHI"
+          ],
+          "Cookie": [
+            "loid=2x4Vt454ZL8ljOotYL; loidcreated=2017-07-18T20%3A59%3A09.137Z"
+          ],
+          "Content-Length": [
+            "366"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Date": [
+            "Wed, 19 Jul 2017 15:51:39 GMT"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "x-ratelimit-remaining": [
+            "296.0"
+          ],
+          "x-ratelimit-used": [
+            "4"
+          ],
+          "x-ratelimit-reset": [
+            "501"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "recorded_at": "2017-07-19T15:51:39"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Authorization": [
+            "bearer 3-tc-YWZ_fXCsGD3Y7zdojp24xOHI"
+          ],
+          "Cookie": [
+            "loid=2x4Vt454ZL8ljOotYL; loidcreated=2017-07-18T20%3A59%3A09.137Z"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/unit_tests/about/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"b\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"unit_tests\", \"header_img\": null, \"description_html\": null, \"title\": \"A new title\", \"collapse_deleted_comments\": false, \"public_description\": \"\", \"over18\": false, \"public_description_html\": null, \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 5, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 1, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_b\", \"created\": 1500415481.0, \"url\": \"/r/unit_tests/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1500415481.0, \"banner_size\": null, \"user_is_moderator\": true, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"public\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+        },
+        "headers": {
+          "Date": [
+            "Wed, 19 Jul 2017 15:51:41 GMT"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Content-Length": [
+            "1071"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "x-ratelimit-remaining": [
+            "295.0"
+          ],
+          "x-ratelimit-used": [
+            "5"
+          ],
+          "x-ratelimit-reset": [
+            "499"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=rDozPn6JIINQwwGSG%2BOYkjkeNAykv%2Bj1zkcFPQ%2B8wDA0We4BylQYLKXZ4QqkZdKHInS145YFJHY%3D"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/unit_tests/about/?raw_json=1"
+      },
+      "recorded_at": "2017-07-19T15:51:40"
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
