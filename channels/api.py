@@ -6,6 +6,7 @@ import praw
 from praw.models.reddit import more
 
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 
 CHANNEL_TYPE_PUBLIC = 'public'
 CHANNEL_TYPE_PRIVATE = 'private'
@@ -39,7 +40,8 @@ def _get_user_credentials(user):
     """
     refresh_token_url = urljoin(settings.OPEN_DISCUSSIONS_REDDIT_URL, '/api/v1/generate_refresh_token')
 
-    resp = requests.get(refresh_token_url, params={'username': user.username}).json()
+    session = _get_session()
+    resp = session.get(refresh_token_url, params={'username': user.username}).json()
     refresh_token = resp['refresh_token']
 
     return {
@@ -68,14 +70,12 @@ def _get_requester_kwargs():
     Returns:
         dict: dictionary of requester arguments
     """
-    session = requests.Session()
-    session.verify = settings.OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL
     return {
-        'session': session,
+        'session': _get_session(),
     }
 
 
-def _get_client(user=None):
+def _get_client(user):
     """
     Get a configured Reddit client_id
 
@@ -106,6 +106,8 @@ class Api:
     """Channel API"""
     def __init__(self, user):
         """Constructor"""
+        if user is None:
+            user = AnonymousUser()
         self.user = user
         self.reddit = _get_client(user=user)
 

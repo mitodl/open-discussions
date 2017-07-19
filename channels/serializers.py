@@ -20,8 +20,7 @@ class ChannelSerializer(serializers.Serializer):
     )
 
     def create(self, validated_data):
-        api = Api()
-        api.user = True
+        api = Api(user=self.context['request'].user)
         return api.create_channel(
             name=validated_data['display_name'],
             title=validated_data['title'],
@@ -29,9 +28,7 @@ class ChannelSerializer(serializers.Serializer):
         )
 
     def update(self, instance, validated_data):
-        api = Api()
-        api.user = True
-
+        api = Api(user=self.context['request'].user)
         name = instance.display_name
         key_map = {
             'title': 'title',
