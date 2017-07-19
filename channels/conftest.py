@@ -14,17 +14,19 @@ def praw_settings(settings):
     settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_SECRET = 'anon_secret'
     settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_USERNAME = 'anon_user'
     settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_PASSWORD = 'anon_pass'
-    settings.OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_CLIENT_ID = 'auth_client_id'
-    settings.OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_SECRET = 'auth_secret'
     settings.OPEN_DISCUSSIONS_REDDIT_URL = 'https://reddit.local'
     settings.OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL = False
+    return settings
 
 
 @pytest.fixture
-def use_betamax(mocker, betamax_session):
+def use_betamax(mocker, betamax_session, praw_settings):
     """Attach the betamax session to the Api client"""
-    mocker.patch('channels.api._get_requester_kwargs', return_value={
-        'session': betamax_session,
+    mocker.patch('channels.api._get_session', return_value=betamax_session)
+    mocker.patch('channels.api._get_user_credentials', return_value={
+        'client_id': praw_settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_CLIENT_ID,
+        'client_secret': praw_settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_SECRET,
+        'refresh_token': 'fake',
     })
 
 

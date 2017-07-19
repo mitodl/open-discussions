@@ -30,13 +30,10 @@ class ChannelSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         api = Api(user=self.context['request'].user)
         name = instance.display_name
-        key_map = {
-            'title': 'title',
-            'channel_type': 'subreddit_type',
-        }
         kwargs = {}
-        for rest_key, reddit_key in key_map.items():
-            if rest_key in validated_data:
-                kwargs[reddit_key] = validated_data[rest_key]
+        if 'title' in validated_data:
+            kwargs['title'] = validated_data['title']
+        if 'subreddit_type' in validated_data:
+            kwargs['channel_type'] = validated_data['subreddit_type']
 
         return api.update_channel(name=name, **kwargs)

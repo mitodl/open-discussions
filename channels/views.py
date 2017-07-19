@@ -4,7 +4,6 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
 )
-from rest_framework.permissions import IsAuthenticated
 
 from channels.api import Api
 from channels.serializers import (
