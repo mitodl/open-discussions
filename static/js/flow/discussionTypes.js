@@ -9,26 +9,18 @@ export type ChannelState = {
   channel: ?Channel,
 };
 
-// common fields among both types of posts
-type PostBase = {
-    id: string,
-    title: string,
-    author: string,  // username
-    upvotes: number,
-    downvotes: number,
-    upvoted: boolean,
-    downvoted: boolean,
+// Post type
+export type Post = {
+  id: string,
+  title: string,
+  author: string,  // username
+  upvotes: number,
+  downvotes: number,
+  upvoted: boolean,
+  downvoted: boolean,
+  url: ?string,
+  text: ?string,
 };
-
-export type LinkPost = PostBase & {
-  url: string,
-};
-
-export type UrlPost = PostBase & {
-  text: string,
-};
-
-export type Post = LinkPost | UrlPost;
 
 export type PostsState = {
   post: ?Post,

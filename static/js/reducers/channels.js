@@ -1,14 +1,18 @@
 // @flow
-import type { Action } from '../flow/reduxTypes';
-import type { ChannelState } from '../flow/discussionTypes';
+import type { Channel } from '../flow/discussionTypes';
+import { makeChannel } from '../factories/channels';
 
-const INITIAL_STATE: ChannelState = {
-  channel: null,
-};
-
-export const channels = (state: ChannelState = INITIAL_STATE, action: Action<any, any>): ChannelState => {
-  switch (action.type) {
-  default:
-    return state;
-  }
+export const channelsEndpoint = {
+  name: 'channels',
+  verbs: [ 'GET' ],
+  getFunc: async (name: string) => {
+    let channel = makeChannel();
+    channel.name = name;
+    return channel;
+  },
+  getSuccessHandler: (payload: Channel, data: Map<string, Channel>) => {
+    let update = new Map(data);
+    update.set(payload.name, payload);
+    return update;
+  },
 };
