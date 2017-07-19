@@ -1,6 +1,11 @@
 """Configuration for pytest fixtures"""
+# pylint: disable=unused-argument, redefined-outer-name
 import betamax
 import pytest
+
+from rest_framework.test import APIClient
+
+from open_discussions.factories import UserFactory
 
 
 with betamax.Betamax.configure() as config:
@@ -33,6 +38,10 @@ def use_betamax(mocker, betamax_session, praw_settings):
 @pytest.fixture()
 def client():
     """Similar to the builtin client but this provides the DRF client instead of the Django test client."""
-    from rest_framework.test import APIClient
-
     return APIClient()
+
+
+@pytest.fixture
+def user(db):
+    """Create a user"""
+    return UserFactory.create()
