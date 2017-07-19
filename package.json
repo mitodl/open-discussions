@@ -91,6 +91,7 @@
     "test": "./scripts/test/js_test.sh",
     "coverage": "COVERAGE=1 ./scripts/test/js_test.sh",
     "codecov": "CODECOV=1 ./scripts/test/js_test.sh",
+    "watch": "WATCH=1 ./scripts/test/js_test.sh",
     "flow": "flow check"
   }
 }

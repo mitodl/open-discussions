@@ -7,6 +7,9 @@ then
 elif [[ ! -z "$CODECOV" ]]
 then
     export CMD="node ./node_modules/nyc/bin/nyc.js --reporter=lcovonly -R spec mocha"
+elif [[ ! -z "$WATCH" ]]
+then
+    export CMD="node ./node_modules/mocha/bin/_mocha --watch"
 else
     export CMD="node ./node_modules/mocha/bin/_mocha"
 fi
