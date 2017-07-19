@@ -1,5 +1,23 @@
 # open_discussions
-MIT Open
+This provides a discussion forum for use with other MIT applications.
+
+## Installation specific to this app
+
+ - First follow the below steps to set up your local environment
+with Docker.
+ - Set up a reddit instance for use as a backing store. See the README
+ at https://github.com/mitodl/reddit-config for instructions on how
+ to set up reddit to work with open-discussions.
+ - Log in to reddit and create a `script` application to fill in your `.env` vars.
+    - Copy the secret/client id to `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_CLIENT_ID` and `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_SECRET`
+ - Set `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_USERNAME` and `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_PASSWORD` to the values of the user that created the script app
+ - Take the client ID, base64 encode it, then add these two lines to `reddit-config/r2/plugins.update`:
+ 
+       [secrets]
+       generate_refresh_token_client_id = <base64 encoded value here>
+
+ - cd to `reddit-config` and run `vagrant provision` to update your `development.ini` file. Then
+   run `vagrant ssh` and `sudo reddit-restart` so reddit has the new configuration.
 
 ## Major Dependencies
 - Docker
@@ -32,15 +50,6 @@ with the edX instance.
 This file should be copied from the example in the codebase:
 
     cp .env.example .env
-
-Log in to reddit and create two applications to fill in your `.env` vars:
-
- - One should be a `webapp` type:
-   - Copy the secret/client id to `OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_CLIENT_ID` and `OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_SECRET`
- - One should be a `script` type:
-   - Copy the secret/client id to `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_CLIENT_ID` and `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_SECRET`
- - Set `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_USERNAME` and `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_PASSWORD` to the values of the user that created the script app
-
 
 #### 2) _(OSX only)_ Set up and run the webpack dev server on your host machine
 

@@ -1,4 +1,6 @@
 """Channels APIs"""
+from urllib.parse import urljoin
+
 import requests
 import praw
 from praw.models.reddit import more
@@ -35,11 +37,13 @@ def _get_user_credentials(user):
     Returns:
         dict: set of configuration credentials for the user
     """
-    # pylint: disable=fixme,unused-argument
-    # TODO: get a refresh token
+    refresh_token_url = urljoin(settings.OPEN_DISCUSSIONS_REDDIT_URL, '/api/v1/generate_refresh_token')
+
+    resp = requests.get(refresh_token_url, params={'username': user.username}).json()
+    refresh_token = resp['refresh_token']
+
     return {
-        'client_id': settings.OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_CLIENT_ID,
-        'client_secret': settings.OPEN_DISCUSSIONS_REDDIT_AUTHENTICATED_SECRET,
+        'refresh_token': refresh_token,
     }
 
 
