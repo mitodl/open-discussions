@@ -1,0 +1,92 @@
+// @flow
+import React from 'react';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+
+import Card from '../components/Card';
+import ChannelSidebar from '../components/ChannelSidebar';
+import PostList from '../components/PostList';
+import Loading from '../components/Loading';
+
+import { actions } from '../actions';
+import { setPostData } from '../actions/post';
+import { safeBulkGet } from '../lib/maps';
+
+import type { Dispatch } from 'redux';
+import type { Match } from 'react-router';
+
+class ChannelPage extends React.Component {
+  props: {
+    match:            Match,
+    dispatch:         Dispatch,
+    channels:         Object,
+    postsForChannel:  Object,
+    posts:            Object,
+  }
+
+  getChannelName() {
+    const { match } = this.props;
+    return match.params.channelName;
+  }
+
+  componentWillMount() {
+    const { dispatch } = this.props;
+    const channelName = this.getChannelName();
+    dispatch(actions.channels.get(channelName));
+    dispatch(actions.postsForChannel.get(channelName)).then(({ posts }) => {
+      dispatch(setPostData(posts));
+    });
+  }
+
+  renderContents(channelName, channels, postsForChannel, posts) {
+    const channel = channels.data.get(channelName);
+    const postIds = postsForChannel.data.get(channelName);
+    return (
+      <div className="double-column">
+        <div>
+          <Link to="/">Discussions</Link>&nbsp;
+          <span>&gt;</span>&nbsp;
+          <span>{channel.title}</span>
+        </div>
+        <div className="first-column">
+          <Card>
+            <PostList
+              channel={channel}
+              posts={safeBulkGet(postIds, posts.data)}
+            />
+          </Card>
+        </div>
+        <div className="second-column">
+          <Card>
+            <ChannelSidebar channel={channel} />
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  render() {
+    const { channels, postsForChannel, posts } = this.props;
+    const channelName = this.getChannelName();
+
+    return (
+      <Loading
+        restStates={[
+          channels,
+          postsForChannel,
+        ]}
+        renderContents={() => this.renderContents(channelName, channels, postsForChannel, posts)}
+      />
+    );
+  }
+}
+
+const mapStateToProps = (state) => {
+  return {
+    channels: state.channels,
+    postsForChannel: state.postsForChannel,
+    posts: state.posts,
+  };
+};
+
+export default connect(mapStateToProps)(ChannelPage);

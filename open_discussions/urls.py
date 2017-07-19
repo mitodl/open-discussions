@@ -25,8 +25,9 @@ urlpatterns = [
     url(r'^status/', include('server_status.urls')),
     url(r'', include('channels.urls')),
 
-    # Example view
+    # React App
     url(r'^$', index, name='open_discussions-index'),
+    url(r'^channel/', index),
 ]
 
 if settings.DEBUG:

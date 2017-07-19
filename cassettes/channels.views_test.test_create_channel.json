@@ -87,7 +87,7 @@
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "api_type=json&link_type=any&name=unit_tests&title=A+place+for+tests&type=private&wikimode=disabled"
+          "string": "api_type=json&link_type=any&name=unit_tests&title=A+place+for+tests&type=private&wikimode=disabled&public_description=public_description"
         },
         "headers": {
           "User-Agent": [
@@ -290,7 +290,7 @@
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"b\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"unit_tests\", \"header_img\": null, \"description_html\": null, \"title\": \"A place for tests\", \"collapse_deleted_comments\": false, \"public_description\": \"\", \"over18\": false, \"public_description_html\": null, \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 4, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 1, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_b\", \"created\": 1500415481.0, \"url\": \"/r/unit_tests/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1500415481.0, \"banner_size\": null, \"user_is_moderator\": true, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"private\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"b\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"unit_tests\", \"header_img\": null, \"description_html\": null, \"title\": \"A place for tests\", \"collapse_deleted_comments\": false, \"public_description\": \"public_description\", \"over18\": false, \"public_description_html\": null, \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 4, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 1, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_b\", \"created\": 1500415481.0, \"url\": \"/r/unit_tests/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1500415481.0, \"banner_size\": null, \"user_is_moderator\": true, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"private\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
         },
         "headers": {
           "Date": [

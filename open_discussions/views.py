@@ -11,7 +11,7 @@ from open_discussions.templatetags.render_bundle import public_path
 
 def index(request):
     """
-    The index view. Display available programs
+    The index view.
     """
 
     js_settings = {

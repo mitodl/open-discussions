@@ -4,6 +4,7 @@
 @import "post";
 @import "postlist";
 @import "card";
+@import "sidebar";
 
 body {
   font-family: 'Roboto', helvetica, arial, sans-serif !important;
@@ -23,10 +24,16 @@ body {
 
     .first-column {
       width: 70%;
+      float: left;
     }
 
     .second-column {
       width: 30%;
+      float: left;
+
+      .card {
+        margin-left: 10px;
+      }
     }
   }
 }

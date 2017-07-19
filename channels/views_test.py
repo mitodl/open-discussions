@@ -18,16 +18,19 @@ def test_list_channels(client, use_betamax, praw_settings, db):
             'channel_type': 'public',
             'name': 'pics',
             'title': '/r/pics',
+            'public_description': '',
         },
         {
             'channel_type': 'public',
             'name': 'videos',
             'title': '/r/videos',
+            'public_description': '',
         },
         {
             'channel_type': 'public',
             'name': 'askhistorians',
             'title': '/r/askhistorians',
+            'public_description': '',
         }
     ]
 
@@ -42,6 +45,7 @@ def test_create_channel(client, use_betamax, praw_settings, db):
         'channel_type': 'private',
         'name': 'unit_tests',
         'title': 'A place for tests',
+        'public_description': 'public_description',
     }
     resp = client.post(url, data=payload)
     assert resp.status_code == 201
@@ -60,6 +64,7 @@ def test_get_channel(client, use_betamax, praw_settings, db):
         'channel_type': 'private',
         'name': 'unit_tests',
         'title': 'A place for tests',
+        'public_description': '',
     }
 
 
@@ -77,4 +82,5 @@ def test_patch_channel(client, use_betamax, praw_settings, db):
         'channel_type': 'public',
         'name': 'unit_tests',
         'title': 'A new title',
+        'public_description': '',
     }

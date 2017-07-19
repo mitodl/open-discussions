@@ -1,15 +1,12 @@
 // @flow
 export type Channel = {
-  id: string,
   name: string,
   title: string,
+  public_description: string,
+  theme_type: string,
+  num_users: number,
 };
 
-export type ChannelState = {
-  channel: ?Channel,
-};
-
-// Post type
 export type Post = {
   id: string,
   title: string,
@@ -22,9 +19,4 @@ export type Post = {
   text: ?string,
   created: string,
   num_comments: number,
-};
-
-export type PostsState = {
-  post: ?Post,
-  posts: ?Array<Post>,
 };

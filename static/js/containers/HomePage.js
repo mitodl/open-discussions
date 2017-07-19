@@ -27,7 +27,7 @@ class HomePage extends React.Component {
 
     return (
       <div className="double-column">
-        Home page
+        <div>Home page</div>
         <div className="first-column">
           <Card>
             <PostList
