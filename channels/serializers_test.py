@@ -49,15 +49,16 @@ def test_update_channel():
     Test updating a channel
     """
     validated_data = {
-        'display_name': 'name',
         'title': 'title',
-        'subreddit_type': 'public',
+        'channel_type': 'public',
     }
+    display_name = 'subreddit'
+    instance = Mock(display_name=display_name)
     with patch('channels.serializers.Api', autospec=True) as api:
-        channel = ChannelSerializer().update(None, validated_data)
+        channel = ChannelSerializer().update(instance, validated_data)
     api.return_value.update_channel.assert_called_once_with(
-        name=validated_data['display_name'],
+        name=display_name,
         title=validated_data['title'],
-        channel_type=validated_data['subreddit_type'],
+        subreddit_type=validated_data['channel_type'],
     )
     assert channel == api.return_value.update_channel.return_value
