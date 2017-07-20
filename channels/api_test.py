@@ -201,7 +201,7 @@ def test_create_comment_args_error(mock_client):
 
 def test_list_comments(mock_client):
     """Test list_comments"""
-    client = api.Api()
+    client = api.Api(UserFactory.create())
     result = client.list_comments('id')
     mock_client.submission.assert_called_once_with(id='id')
     assert result == mock_client.submission.return_value.comments
