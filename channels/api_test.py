@@ -85,8 +85,9 @@ def test_update_channel_type(mock_client, channel_type):
     """Test create_channel for channel_type"""
     user = UserFactory.create()
     channel = api.Api(user=user).update_channel('name', channel_type=channel_type)
-    assert channel == mock_client.subreddit.return_value.mod.update.return_value
-    mock_client.subreddit.assert_called_once_with('name')
+    assert channel == mock_client.subreddit.return_value
+    mock_client.subreddit.assert_called_with('name')
+    assert mock_client.subreddit.call_count == 2
     mock_client.subreddit.return_value.mod.update.assert_called_once_with(subreddit_type=channel_type)
 
 
@@ -96,8 +97,9 @@ def test_update_channel_setting(mock_client, channel_setting):
     user = UserFactory.create()
     kwargs = {channel_setting: 'value'}
     channel = api.Api(user=user).update_channel('name', **kwargs)
-    assert channel == mock_client.subreddit.return_value.mod.update.return_value
-    mock_client.subreddit.assert_called_once_with('name')
+    assert channel == mock_client.subreddit.return_value
+    mock_client.subreddit.assert_called_with('name')
+    assert mock_client.subreddit.call_count == 2
     mock_client.subreddit.return_value.mod.update.assert_called_once_with(**kwargs)
 
 

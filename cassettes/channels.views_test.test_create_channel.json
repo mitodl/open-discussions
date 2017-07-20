@@ -1,0 +1,352 @@
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "grant_type=password&password=george&username=george"
+        },
+        "headers": {
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=2x4Vt454ZL8ljOotYL; loidcreated=2017-07-18T20%3A59%3A09.137Z"
+          ],
+          "Content-Length": [
+            "51"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Authorization": [
+            "Basic QndDWlpETWd2NWVacnc6dXBQZE9Sb3VyUmQtMVFoNy1yMUptRENxOWxn"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/v1/access_token"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"access_token\": \"3-UKtNaJCGAd-Kmu4ZSZK6Jy6Tkbw\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
+        },
+        "headers": {
+          "Date": [
+            "Tue, 18 Jul 2017 22:04:41 GMT"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Content-Length": [
+            "107"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ],
+          "x-ratelimit-remaining": [
+            "298"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-ratelimit-reset": [
+            "320"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/access_token"
+      },
+      "recorded_at": "2017-07-18T22:04:41"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&link_type=any&name=unit_tests&title=A+place+for+tests&type=private&wikimode=disabled"
+        },
+        "headers": {
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Authorization": [
+            "bearer 3-UKtNaJCGAd-Kmu4ZSZK6Jy6Tkbw"
+          ],
+          "Cookie": [
+            "loid=2x4Vt454ZL8ljOotYL; loidcreated=2017-07-18T20%3A59%3A09.137Z"
+          ],
+          "Content-Length": [
+            "98"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Date": [
+            "Tue, 18 Jul 2017 22:04:41 GMT"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "x-ratelimit-remaining": [
+            "297.0"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-ratelimit-reset": [
+            "319"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "recorded_at": "2017-07-18T22:04:41"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "grant_type=password&password=george&username=george"
+        },
+        "headers": {
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=2x4Vt454ZL8ljOotYL; loidcreated=2017-07-18T20%3A59%3A09.137Z"
+          ],
+          "Content-Length": [
+            "51"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Authorization": [
+            "Basic QndDWlpETWd2NWVacnc6dXBQZE9Sb3VyUmQtMVFoNy1yMUptRENxOWxn"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/v1/access_token"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"access_token\": \"3-2ardfuIp4UNQqsLKW6zAH19xFbI\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
+        },
+        "headers": {
+          "Date": [
+            "Tue, 18 Jul 2017 22:08:00 GMT"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Content-Length": [
+            "107"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ],
+          "x-ratelimit-remaining": [
+            "297"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-ratelimit-reset": [
+            "121"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/access_token"
+      },
+      "recorded_at": "2017-07-18T22:08:00"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Accept": [
+            "*/*"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Authorization": [
+            "bearer 3-2ardfuIp4UNQqsLKW6zAH19xFbI"
+          ],
+          "Cookie": [
+            "loid=2x4Vt454ZL8ljOotYL; loidcreated=2017-07-18T20%3A59%3A09.137Z"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/unit_tests/about/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"b\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"unit_tests\", \"header_img\": null, \"description_html\": null, \"title\": \"A place for tests\", \"collapse_deleted_comments\": false, \"public_description\": \"\", \"over18\": false, \"public_description_html\": null, \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 4, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 1, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_b\", \"created\": 1500415481.0, \"url\": \"/r/unit_tests/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1500415481.0, \"banner_size\": null, \"user_is_moderator\": true, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"private\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+        },
+        "headers": {
+          "Date": [
+            "Tue, 18 Jul 2017 22:08:00 GMT"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Content-Length": [
+            "1078"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "x-ratelimit-remaining": [
+            "296.0"
+          ],
+          "x-ratelimit-used": [
+            "4"
+          ],
+          "x-ratelimit-reset": [
+            "120"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=%2BiGLWUOI5Jqo32RiGICdJATPrSZ6yNY8XDuHnYHJ%2FH09ewjxk3gEEgDpfbgeDm1HhpPK36B%2F9o8%3D"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/unit_tests/about/?raw_json=1"
+      },
+      "recorded_at": "2017-07-18T22:08:00"
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
