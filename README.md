@@ -9,9 +9,8 @@ with Docker.
  at https://github.com/mitodl/reddit-config for instructions on how
  to set up reddit to work with open-discussions.
  - Log in to reddit and create a `script` application to fill in your `.env` vars.
-    - Copy the secret/client id to `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_CLIENT_ID` and `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_SECRET`
- - Set `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_USERNAME` and `OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_PASSWORD` to the values of the user that created the script app
- - Take the client ID, base64 encode it, then add these two lines to `reddit-config/r2/plugins.update`:
+    - Copy the secret/client id to `OPEN_DISCUSSIONS_REDDIT_CLIENT_ID` and `OPEN_DISCUSSIONS_REDDIT_SECRET`
+ - Take the client ID, base64 encode it, then add these two lines to `reddit-config/r2/local.update` (creating it first if it doesn't exist):
  
        [secrets]
        generate_refresh_token_client_id = <base64 encoded value here>

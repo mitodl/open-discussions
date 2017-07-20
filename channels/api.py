@@ -43,36 +43,22 @@ def _get_user_credentials(user):
     refresh_token = resp['refresh_token']
 
     return {
+        'client_id': settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID,
+        'client_secret': settings.OPEN_DISCUSSIONS_REDDIT_SECRET,
         'refresh_token': refresh_token,
     }
 
 
-def _get_anonymous_credentials():
+def _get_session():
     """
-    Get credentials for anonymous user
+    Get a session to be used for communicating with reddit
 
     Returns:
-        dict: set of configuration credentials for the user
+        requests.Session: A session
     """
-    return {
-        'client_id': settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_CLIENT_ID,
-        'client_secret': settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_SECRET,
-        'username': settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_USERNAME,
-        'password': settings.OPEN_DISCUSSIONS_REDDIT_ANONYMOUS_PASSWORD,
-    }
-
-
-def _get_credentials(user=None):
-    """
-    Get credentials for authenticated or anonymous user
-
-    Args:
-        user (User): the authenticated user
-
-    Returns:
-        dict: set of configuration credentials for the user
-    """
-    return _get_user_credentials(user) if user is not None else _get_anonymous_credentials()
+    session = requests.Session()
+    session.verify = settings.OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL
+    return session
 
 
 def _get_requester_kwargs():
@@ -99,7 +85,7 @@ def _get_client(user=None):
     Returns:
         praw.Reddit: configured reddit client
     """
-    credentials = _get_credentials(user=user)
+    credentials = _get_user_credentials(user=user)
 
     return praw.Reddit(
         reddit_url=settings.OPEN_DISCUSSIONS_REDDIT_URL,
@@ -118,11 +104,12 @@ def _get_user_agent():
 
 class Api:
     """Channel API"""
-    def __init__(self, user=None):
+    def __init__(self, user):
         """Constructor"""
         self.user = user
         self.reddit = _get_client(user=user)
 
+<<<<<<< Updated upstream
     @property
     def is_anonymous(self):
         """Returns True if user is anonymous"""
@@ -133,6 +120,8 @@ class Api:
         if self.is_anonymous:
             raise Exception('Anonymous user not allowed to update channels')
 
+=======
+>>>>>>> Stashed changes
     def list_channels(self):
         """
         List the channels
@@ -140,7 +129,7 @@ class Api:
         Returns:
             ListingGenerator(praw.models.Subreddit): a generator over channel listings
         """
-        return self.reddit.user.subreddits() if not self.is_anonymous else self.reddit.subreddits.default()
+        return self.reddit.user.subreddits()
 
     def get_channel(self, name):
         """
@@ -171,8 +160,6 @@ class Api:
             if key not in CHANNEL_SETTINGS:
                 raise ValueError('Invalid argument {}={}'.format(key, value))
 
-        self._assert_authenticated()
-
         # pylint: disable=fixme
         # TODO: verify user is authorized to do this
 
@@ -202,8 +189,6 @@ class Api:
         for key, value in other_settings.items():
             if key not in CHANNEL_SETTINGS:
                 raise ValueError('Invalid argument {}={}'.format(key, value))
-
-        self._assert_authenticated()
 
         # pylint: disable=fixme
         # TODO: verify user is authorized to do this
