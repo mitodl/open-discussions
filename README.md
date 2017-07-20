@@ -15,8 +15,7 @@ with Docker.
        [secrets]
        generate_refresh_token_client_id = <base64 encoded value here>
 
- - cd to `reddit-config` and run `vagrant provision` to update your `development.ini` file. Then
-   run `vagrant ssh` and `sudo reddit-restart` so reddit has the new configuration.
+ - cd to `reddit-config` and run `vagrant provision` to update your `development.ini` file.
 
 ## Major Dependencies
 - Docker
