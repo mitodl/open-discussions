@@ -109,19 +109,6 @@ class Api:
         self.user = user
         self.reddit = _get_client(user=user)
 
-<<<<<<< Updated upstream
-    @property
-    def is_anonymous(self):
-        """Returns True if user is anonymous"""
-        return self.user is None
-
-    def _assert_authenticated(self):
-        """Asserts a user is authenticated"""
-        if self.is_anonymous:
-            raise Exception('Anonymous user not allowed to update channels')
-
-=======
->>>>>>> Stashed changes
     def list_channels(self):
         """
         List the channels
