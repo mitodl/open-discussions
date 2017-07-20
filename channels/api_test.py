@@ -26,10 +26,7 @@ def test_get_channel_user(mock_get_client):
     user = UserFactory.create()
     channel = api.Api(user=user).get_channel('test')
     assert channel == mock_get_client.return_value.subreddit.return_value
-    if create_user:
-        mock_get_client.assert_called_once_with(user=user)
-    else:
-        assert isinstance(mock_get_client.call_args[1]['user'], AnonymousUser)
+    mock_get_client.assert_called_once_with(user=user)
     mock_get_client.return_value.subreddit.assert_called_once_with('test')
 
 
