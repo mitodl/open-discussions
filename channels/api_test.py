@@ -1,6 +1,5 @@
 """API tests"""
 # pylint: disable=redefined-outer-name
-from django.contrib.auth.models import AnonymousUser
 import pytest
 
 from open_discussions.factories import UserFactory
