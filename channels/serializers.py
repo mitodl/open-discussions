@@ -126,7 +126,7 @@ class PostSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         if attrs.get('downvoted') and attrs.get('upvoted'):
-            raise ValidationError("Only one of upvote or downvote can be true")
+            raise ValidationError("Only one of upvoted or downvoted can be true")
 
         # url/text validation needs to go in created since it's handled differently
         # than for update
