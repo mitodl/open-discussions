@@ -1,4 +1,10 @@
 .post-summary {
+  padding: 15px 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid $border-grey;
+  }
+
   .upvotes {
     width: 5em;
     padding-top: 1.5em;
@@ -11,8 +17,8 @@
     }
   }
 
-  h3 {
-    margin-bottom: 0;
+  .post-title {
+    font-size: 18px;
   }
 
   .num-comments {
@@ -21,7 +27,9 @@
 
   .authored-by {
     display: block;
-    padding-bottom: 1em;
+    padding-bottom: 5px;
+    font-weight: 300;
+    color: $font-grey;
   }
 
   .summary {

@@ -1,4 +1,6 @@
 // @flow
+import { GET, INITIAL_STATE } from 'redux-hammock/constants';
+
 import { makeChannel } from '../factories/channels';
 import { makeChannelPostList } from '../factories/posts';
 import type { Channel, Post } from '../flow/discussionTypes';
@@ -10,7 +12,7 @@ type ChannelEndpointResponse = {
 
 export const postsForChannelEndpoint = {
   name: 'postsForChannel',
-  verbs: [ 'GET' ],
+  verbs: [ GET ],
   getFunc: async (channelID: string) => {
     let channel = makeChannel();
     channel.name = channelID;
@@ -19,6 +21,7 @@ export const postsForChannelEndpoint = {
       posts: makeChannelPostList()
     };
   },
+  initialState: { ...INITIAL_STATE, data: new Map },
   getSuccessHandler: (payload: ChannelEndpointResponse, data: Map<string, Array<string>>) => {
     const { channel, posts } = payload;
     let update = new Map(data);

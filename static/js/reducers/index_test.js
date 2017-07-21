@@ -2,10 +2,11 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import configureTestStore from 'redux-asserts';
+import { INITIAL_STATE } from 'redux-hammock/constants';
 
 import rootReducer from '../reducers';
 import { actions } from '../actions';
-import { makePost } from '../factories/posts';
+import { makePost, makeChannelPostList } from '../factories/posts';
 import { setPostData } from '../actions/post';
 
 describe('reducers', () => {
@@ -25,10 +26,10 @@ describe('reducers', () => {
       dispatchThen = store.createDispatchThen(state => state.posts);
     });
 
-    it('should have some state', () => {
+    it('should have some initial state', () => {
       assert.deepEqual(
         store.getState().posts,
-        { loaded: false, processing: false }
+        { ...INITIAL_STATE, data: new Map }
       );
     });
 
@@ -63,6 +64,13 @@ describe('reducers', () => {
       const { posts: { data }} = store.getState();
       assert.deepEqual(post, data.get('my great post wow'));
     });
+
+    it('should let you set a list of posts separately', () => {
+      let posts = makeChannelPostList();
+      store.dispatch(setPostData(posts));
+      const { posts: { data }} = store.getState();
+      assert.equal(data.size, 20);
+    });
   });
 
   describe('channels reducer', () => {
@@ -70,11 +78,11 @@ describe('reducers', () => {
       dispatchThen = store.createDispatchThen(state => state.channels);
     });
 
-    it('should have some state', () => {
-      const { channels } = store.getState();
-      assert.deepEqual(channels, {
-        loaded: false, processing: false
-      });
+    it('should have some initial state', () => {
+      assert.deepEqual(
+        store.getState().channels,
+        { ...INITIAL_STATE, data: new Map }
+      );
     });
 
     it('should let you get a channel', () => {
@@ -107,6 +115,13 @@ describe('reducers', () => {
       dispatchThen = store.createDispatchThen(state => state.postsForChannel);
     });
 
+    it('should have some initial state', () => {
+      assert.deepEqual(
+        store.getState().postsForChannel,
+        { ...INITIAL_STATE, data: new Map }
+      );
+    });
+
     it('should let you get the posts for a channel', () => {
       const { requestType, successType } = actions.postsForChannel.get;
       return dispatchThen(
@@ -137,13 +152,20 @@ describe('reducers', () => {
       dispatchThen = store.createDispatchThen(state => state.frontpage);
     });
 
+    it('should have some initial state', () => {
+      assert.deepEqual(
+        store.getState().frontpage,
+        { ...INITIAL_STATE, data: [] }
+      );
+    });
+
     it('should let you get the frontpage', () => {
       const { requestType, successType } = actions.frontpage.get;
       return dispatchThen(
         actions.frontpage.get(),
         [ requestType, successType ]
       ).then(({ data }) => {
-        assert.equal(data.size, 20);
+        assert.lengthOf(data, 20);
       });
     });
   });

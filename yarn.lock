@@ -4915,9 +4915,9 @@ redux-asserts@^0.0.10:
     redux "^3.3.1"
     redux-thunk "^2.0.1"
 
-redux-hammock@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/redux-hammock/-/redux-hammock-0.1.1.tgz#8c703fbd85f444ed059cb17424327a2c19edd7b0"
+redux-hammock@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/redux-hammock/-/redux-hammock-0.2.1.tgz#6c5fe3d221c3b2eb9817477d422926579cefd75e"
   dependencies:
     babel-polyfill "^6.23.0"
     babel-runtime "^6.23.0"

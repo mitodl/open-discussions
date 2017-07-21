@@ -19,11 +19,11 @@ export default class PostSummary extends React.Component {
           <span className="votes">{post.upvotes}</span>
         </div>
         <div className="summary">
-          <h3>{post.title}</h3>
+          <a className="post-title">{ post.title }</a>
           <span className="authored-by">
-            by {post.author || 'someone'}, {formattedDate}
+            by <a>{post.author || 'someone'}</a>, {formattedDate}
           </span>
-          <span className="num-comments">{post.num_comments || 0} Comments</span>
+          <a className="num-comments">{post.num_comments || 0} Comments</a>
         </div>
       </div>
     );

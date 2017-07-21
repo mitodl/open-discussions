@@ -14,7 +14,7 @@ export default class App extends React.Component {
   render() {
     const { match } = this.props;
     return (
-      <div>
+      <div className="app">
         <Route exact path={match.url} component={HomePage}/>
       </div>
     );

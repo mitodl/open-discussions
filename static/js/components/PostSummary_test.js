@@ -14,7 +14,7 @@ describe('PostSummary', () => {
     const wrapper = renderPostSummary(post);
     const summary = wrapper.find('.summary');
     assert.equal(wrapper.find('.votes').text(), post.upvotes.toString());
-    assert.equal(summary.find('h3').text(), post.title);
+    assert.equal(summary.find('a').at(0).text(), post.title);
     assert.equal(wrapper.find('.num-comments').text(), `${post.num_comments} Comments`);
     const authoredBy = wrapper.find('.authored-by').text();
     const expectedPrefix = `by ${post.author}, `;
