@@ -20,6 +20,8 @@ export type Post = {
   downvoted: boolean,
   url: ?string,
   text: ?string,
+  created: string,
+  num_comments: number,
 };
 
 export type PostsState = {

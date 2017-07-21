@@ -20,6 +20,8 @@ describe('posts factories', () => {
       assert.isString(post.author);
       assert.isString(post.text);
       assert.isNull(post.url);
+      assert.isString(post.created);
+      assert.isNumber(post.num_comments);
     });
 
     it('should make a URL post', () => {

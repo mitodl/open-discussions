@@ -14,6 +14,8 @@ export const makePost = (isURLPost: boolean = false): Post => ({
   author: `justareddituser${String(Math.random())}`,
   text: isURLPost ? null : casual.text,
   url: isURLPost ? casual.url : null,
+  created: casual.moment.format(),
+  num_comments: Math.round(Math.random() * 10),
 });
 
 export const makeChannelPostList = () => (
