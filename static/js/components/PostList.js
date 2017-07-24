@@ -1,24 +1,25 @@
 // @flow
 import React from 'react';
-import R from 'ramda';
 
 import PostSummary from './PostSummary';
+
 import type { Post } from '../flow/discussionTypes';
 
-const renderPosts = R.addIndex(R.map)((post, index) => (
-  <PostSummary post={post} key={index} />
+const renderPosts = (posts, showChannelLinks) => posts.map((post, index) => (
+  <PostSummary post={post} key={index} showChannelLink={showChannelLinks} />
 ));
 
 type PostListProps = {
-  posts: Array<Post>
+  posts:             Array<Post>,
+  showChannelLinks?: boolean,
 };
 
 const PostList = (props: PostListProps) => {
-  const { posts } = props;
+  const { posts, showChannelLinks } = props;
 
   return (
     <div className="post-list">
-      { renderPosts(posts) }
+      { renderPosts(posts, showChannelLinks) }
     </div>
   );
 };

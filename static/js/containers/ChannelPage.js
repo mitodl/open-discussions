@@ -2,6 +2,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import R from 'ramda';
 
 import Card from '../components/Card';
 import ChannelSidebar from '../components/ChannelSidebar';
@@ -41,28 +42,33 @@ class ChannelPage extends React.Component {
   renderContents(channelName, channels, postsForChannel, posts) {
     const channel = channels.data.get(channelName);
     const postIds = postsForChannel.data.get(channelName);
-    return (
-      <div className="double-column">
-        <div>
-          <Link to="/">Discussions</Link>&nbsp;
-          <span>&gt;</span>&nbsp;
-          <span>{channel.title}</span>
+
+    if (R.isNil(channel) || R.isNil(postIds)) {
+      return null;
+    } else {
+      return (
+        <div className="double-column">
+          <div>
+            <Link to="/">Discussions</Link>&nbsp;
+            <span>&gt;</span>&nbsp;
+            <span>{channel.title}</span>
+          </div>
+          <div className="first-column">
+            <Card>
+              <PostList
+                channel={channel}
+                posts={safeBulkGet(postIds, posts.data)}
+              />
+            </Card>
+          </div>
+          <div className="second-column">
+            <Card>
+              <ChannelSidebar channel={channel} />
+            </Card>
+          </div>
         </div>
-        <div className="first-column">
-          <Card>
-            <PostList
-              channel={channel}
-              posts={safeBulkGet(postIds, posts.data)}
-            />
-          </Card>
-        </div>
-        <div className="second-column">
-          <Card>
-            <ChannelSidebar channel={channel} />
-          </Card>
-        </div>
-      </div>
-    );
+      );
+    }
   }
 
   render() {

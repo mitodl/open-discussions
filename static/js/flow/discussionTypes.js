@@ -8,15 +8,16 @@ export type Channel = {
 };
 
 export type Post = {
-  id: string,
-  title: string,
-  author: string,  // username
-  upvotes: number,
-  downvotes: number,
-  upvoted: boolean,
-  downvoted: boolean,
-  url: ?string,
-  text: ?string,
-  created: string,
-  num_comments: number,
+  id:            string,
+  title:         string,
+  author:        string,  // username
+  upvotes:       number,
+  downvotes:     number,
+  upvoted:       boolean,
+  downvoted:     boolean,
+  url:           ?string,
+  text:          ?string,
+  created:       string,
+  num_comments:  number,
+  channel_name?: string,
 };

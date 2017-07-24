@@ -21,3 +21,10 @@ export const makePost = (isURLPost: boolean = false): Post => ({
 export const makeChannelPostList = () => (
   R.range(0, 20).map(() => makePost(Math.random() > .5))
 );
+
+export const makeFrontpagePostList = () => (
+  makeChannelPostList().map(post => {
+    post.channel_name = casual.word;
+    return post;
+  })
+);

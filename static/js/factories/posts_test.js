@@ -4,7 +4,8 @@ import R from 'ramda';
 
 import {
   makePost,
-  makeChannelPostList
+  makeChannelPostList,
+  makeFrontpagePostList,
 } from './posts';
 
 describe('posts factories', () => {
@@ -52,6 +53,14 @@ describe('posts factories', () => {
         assert.isNumber(post.upvotes);
         assert.equal(0, post.downvotes);
         assert.isString(post.author);
+      });
+    });
+  });
+
+  describe('makeFrontpagePostList', () => {
+    it('should return a list of posts, with the channel name', () => {
+      makeFrontpagePostList().forEach(post => {
+        assert.isString(post.channel_name);
       });
     });
   });

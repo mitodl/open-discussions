@@ -32,6 +32,7 @@ class HomePage extends React.Component {
           <Card>
             <PostList
               posts={safeBulkGet(frontpage.data, posts.data)}
+              showChannelLinks={true}
             />
           </Card>
         </div>
