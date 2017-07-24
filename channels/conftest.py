@@ -4,7 +4,7 @@ import pytest
 
 from rest_framework.test import APIClient
 
-import open_discussions.betamax_config  # pylint: disable=unused-import
+from open_discussions.betamax_config import setup_betamax
 from open_discussions.factories import UserFactory
 
 
@@ -21,6 +21,7 @@ def praw_settings(settings):
 @pytest.fixture
 def use_betamax(mocker, betamax_recorder, praw_settings):
     """Attach the betamax session to the Api client"""
+    setup_betamax()
     mocker.patch('channels.api._get_session', return_value=betamax_recorder.session)
     mocker.patch('channels.api._get_user_credentials', return_value={
         'client_id': praw_settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID,

@@ -6,7 +6,7 @@ from betamax import Betamax
 import requests
 
 from channels.api import Api
-import open_discussions.betamax_config  # pylint: disable=unused-import
+from open_discussions.betamax_config import setup_betamax
 
 
 @contextmanager
@@ -22,6 +22,7 @@ def record(name, user):
         name (str): The name of the new cassette
         user (django.contrib.auth.models.User): User to authenticate with
     """
+    setup_betamax()
     session = requests.Session()
     session.verify = False
 

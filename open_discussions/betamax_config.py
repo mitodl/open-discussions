@@ -22,9 +22,10 @@ class CustomBodyMatcher(BodyMatcher):
         return recorded_body == request_body
 
 
-Betamax.register_request_matcher(CustomBodyMatcher)
+def setup_betamax():
+    """Do global configuration for betamax. This function is idempotent."""
+    Betamax.register_request_matcher(CustomBodyMatcher)
 
-
-with Betamax.configure() as config:
+    config = Betamax.configure()
     config.cassette_library_dir = "cassettes"
     config.default_cassette_options['match_requests_on'] = ['uri', 'method', 'custom-body']
