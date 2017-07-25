@@ -6,6 +6,7 @@ from datetime import (
     timezone,
 )
 
+from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -62,6 +63,40 @@ class WriteableSerializerMethodField(serializers.SerializerMethodField):
         return data
 
 
+def _apply_vote(instance, validated_data):
+    """
+    Apply a vote provided by the user to a comment or post, if it's different than before.
+
+    Args:
+        instance (Comment or Post): A comment or post
+        validated_data (dict): validated data which contains the new vote from the user
+
+    Returns:
+        bool:
+            True if a change was made, False otherwise
+    """
+    upvote = validated_data.get('upvoted')
+
+    is_upvoted = instance.likes is True
+
+    if upvote and not is_upvoted:
+        instance.upvote()
+    elif upvote is False and is_upvoted:
+        instance.clear_vote()
+    else:
+        return False
+    return True
+
+
+def _parse_bool(value, field_name):
+    """Helper method to parse boolean values"""
+    if value in serializers.BooleanField.TRUE_VALUES:
+        return True
+    if value in serializers.BooleanField.FALSE_VALUES:
+        return False
+    raise ValidationError("{} must be a bool".format(field_name))
+
+
 class PostSerializer(serializers.Serializer):
     """Serializer for posts"""
     url = WriteableSerializerMethodField(allow_null=True)
@@ -95,18 +130,9 @@ class PostSerializer(serializers.Serializer):
         """The channel which contains the post"""
         return instance.subreddit.display_name
 
-    @staticmethod
-    def _parse_bool(value, field_name):
-        """Helper method to parse boolean values"""
-        if value in serializers.BooleanField.TRUE_VALUES:
-            return True
-        if value in serializers.BooleanField.FALSE_VALUES:
-            return False
-        raise ValidationError("{} must be a bool".format(field_name))
-
     def validate_upvoted(self, value):
         """Validate that upvoted is a bool"""
-        return {'upvoted': self._parse_bool(value, 'upvoted')}
+        return {'upvoted': _parse_bool(value, 'upvoted')}
 
     def validate_text(self, value):
         """Validate that text is a string or null"""
@@ -144,7 +170,7 @@ class PostSerializer(serializers.Serializer):
             title=title,
             **kwargs
         )
-        changed = self._apply_vote(post, validated_data)
+        changed = _apply_vote(post, validated_data)
         if not changed:
             return post
         else:
@@ -160,29 +186,72 @@ class PostSerializer(serializers.Serializer):
         if "text" in validated_data:
             instance = api.update_post(post_id=post_id, text=validated_data['text'])
 
-        self._apply_vote(instance, validated_data)
+        _apply_vote(instance, validated_data)
         return api.get_post(post_id=post_id)
 
-    def _apply_vote(self, instance, validated_data):
-        """
-        Apply a vote provided by the user.
 
-        Args:
-            instance (Post): A post
-            validated_data (dict): validated data which contains the new vote from the user
+class CommentSerializer(serializers.Serializer):
+    """Serializer for comments"""
+    id = serializers.CharField(read_only=True)
+    post_id = serializers.SerializerMethodField()
+    comment_id = serializers.CharField(write_only=True, allow_blank=True)
+    text = serializers.CharField(source='body')
+    author_id = serializers.CharField(read_only=True)
+    score = serializers.IntegerField(read_only=True)
+    upvoted = WriteableSerializerMethodField()
+    created = serializers.SerializerMethodField()
+    replies = serializers.SerializerMethodField()
 
-        Returns:
-            bool:
-                True if a change was made, False otherwise
-        """
-        upvote = validated_data.get('upvoted')
+    def get_post_id(self, instance):
+        """The post id for this comment"""
+        try:
+            # This is also available from instance.parent() but this avoids the recursive lookup
+            # which isn't necessary since we only view this from the list view, which has the
+            # post_id parameter.
+            return self.context['view'].kwargs['post_id']
+        except KeyError:
+            # This happens if we don't have the post id in the URL, for example the comment detail view
+            parent = instance.parent()
+            while not isinstance(parent, Submission):
+                parent = parent.parent()
+            return parent.id
 
-        is_upvoted = self.get_upvoted(instance)
+    def get_upvoted(self, instance):
+        """Is a comment upvoted?"""
+        return instance.likes is True
 
-        if upvote and not is_upvoted:
-            instance.upvote()
-        elif upvote is False and is_upvoted:
-            instance.clear_vote()
+    def get_replies(self, instance):
+        """List of replies to this comment"""
+        return [CommentSerializer(reply, context=self.context).data for reply in instance.replies]
+
+    def get_created(self, instance):
+        """The ISO-8601 formatted datetime for the creation time"""
+        return datetime.fromtimestamp(instance.created, tz=timezone.utc).isoformat()
+
+    def validate_upvoted(self, value):
+        """Validate that upvoted is a bool"""
+        return {'upvoted': _parse_bool(value, 'upvoted')}
+
+    def create(self, validated_data):
+        api = Api(user=self.context['request'].user)
+        post_id = self.context['view'].kwargs['post_id']
+
+        kwargs = {}
+        if 'comment_id' in validated_data:
+            kwargs['comment_id'] = validated_data['comment_id']
         else:
-            return False
-        return True
+            kwargs['post_id'] = post_id
+
+        return api.create_comment(
+            text=validated_data['body'],
+            **kwargs
+        )
+
+    def update(self, instance, validated_data):
+        if validated_data.get('comment_id'):
+            raise ValidationError("comment_id must be provided via URL")
+        api = Api(user=self.context['request'].user)
+        if 'body' in validated_data:
+            api.update_comment(comment_id=instance.id, text=validated_data['body'])
+
+        return api.get_comment(comment_id=instance.id)
