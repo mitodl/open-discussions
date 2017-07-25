@@ -97,7 +97,6 @@ def test_create_url_post(client, use_betamax, praw_settings):
         'author_id': user.username,
         'created': '2017-07-21T18:13:18+00:00',
         'upvoted': True,
-        'downvoted': False,
         'id': '2x',
         'num_comments': 0,
         'score': 1,
@@ -124,7 +123,6 @@ def test_create_text_post(client, use_betamax, praw_settings):
         'author_id': user.username,
         'created': '2017-07-21T18:51:15+00:00',
         'upvoted': True,
-        'downvoted': False,
         'id': '2y',
         'num_comments': 0,
         'score': 1,
@@ -147,7 +145,6 @@ def test_get_post(client, use_betamax, praw_settings):
         'author_id': None,
         'created': '2017-07-20T19:58:23+00:00',
         'upvoted': False,
-        'downvoted': False,
         'id': post_id,
         'num_comments': 6,
         'score': 0,
@@ -174,7 +171,6 @@ def test_list_posts(client, use_betamax, praw_settings):
                     '❄️ 🌬 💨 🌪 🌫 🌊 💧 💦 ☔️',
             'title': 'Text post',
             'upvoted': True,
-            'downvoted': False,
             'score': 1,
             'author_id': user.username,
             'id': '30',
@@ -187,7 +183,6 @@ def test_list_posts(client, use_betamax, praw_settings):
             'text': None,
             'title': 'Link post',
             'upvoted': True,
-            'downvoted': False,
             'score': 1,
             'author_id': 'george',
             'id': '2z',
@@ -211,7 +206,6 @@ def test_update_post_text(client, use_betamax, praw_settings):
         'text': 'overwrite',
         'title': 'Text post',
         'upvoted': False,
-        'downvoted': False,
         'score': 1,
         'author_id': user.username,
         'id': post_id,
@@ -234,30 +228,6 @@ def test_update_post_clear_vote(client, use_betamax, praw_settings):
         'text': 'overwrite',
         'title': 'Text post',
         'upvoted': False,
-        'downvoted': False,
-        'score': 1,
-        'author_id': user.username,
-        'id': post_id,
-        'created': '2017-07-21T19:10:26+00:00',
-        'num_comments': 0,
-        'channel_name': 'two_posts',
-    }
-
-
-def test_update_post_downvote(client, use_betamax, praw_settings):
-    """Test updating a post to downvote it"""
-    user = UserFactory.create(username='george')
-    client.force_login(user)
-    post_id = '30'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"downvoted": True})
-    assert resp.status_code == 200
-    assert resp.json() == {
-        'url': None,
-        'text': 'overwrite',
-        'title': 'Text post',
-        'upvoted': False,
-        'downvoted': True,
         'score': 1,
         'author_id': user.username,
         'id': post_id,
@@ -280,7 +250,6 @@ def test_update_post_upvote(client, use_betamax, praw_settings):
         'text': 'overwrite',
         'title': 'Text post',
         'upvoted': True,
-        'downvoted': False,
         'score': 1,
         'author_id': user.username,
         'id': post_id,
@@ -290,26 +259,26 @@ def test_update_post_upvote(client, use_betamax, praw_settings):
     }
 
 
-def test_create_downvote(client, use_betamax, praw_settings):
-    """Test creating a post with a downvote in the body"""
+def test_create_without_upvote(client, use_betamax, praw_settings):
+    """Test creating a post without an upvote in the body"""
     user = UserFactory.create(username='george')
     client.force_login(user)
-    url = reverse('post-list', kwargs={'channel_name': 'subreddit_for_testing'})
+    url = reverse('post-list', kwargs={'channel_name': 'a_channel'})
     resp = client.post(url, {
-        'title': 'new post',
-        'text': 'some text for the post',
+        'title': 'new post without upvote',
+        'text': 'post for testing clear_vote',
+        'upvoted': False,
     })
     assert resp.status_code == 201
     assert resp.json() == {
-        'title': 'new post',
-        'text': 'some text for the post',
+        'title': 'new post without upvote',
+        'text': 'post for testing clear_vote',
         'url': None,
         'author_id': user.username,
-        'created': '2017-07-25T15:31:44+00:00',
+        'created': '2017-07-25T17:57:07+00:00',
         'upvoted': False,
-        'downvoted': True,
-        'id': '2',
+        'id': '3',
         'num_comments': 0,
         'score': 1,
-        'channel_name': 'subreddit_for_testing',
+        'channel_name': 'a_channel',
     }

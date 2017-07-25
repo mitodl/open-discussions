@@ -68,7 +68,6 @@ class PostSerializer(serializers.Serializer):
     text = WriteableSerializerMethodField(allow_null=True)
     title = serializers.CharField()
     upvoted = WriteableSerializerMethodField()
-    downvoted = WriteableSerializerMethodField()
     score = serializers.IntegerField(source='ups', read_only=True)
     author_id = serializers.CharField(read_only=True, source='author')
     id = serializers.CharField(read_only=True)
@@ -87,10 +86,6 @@ class PostSerializer(serializers.Serializer):
     def get_upvoted(self, instance):
         """Did the user upvote this?"""
         return instance.likes is True
-
-    def get_downvoted(self, instance):
-        """Did the user downvote this?"""
-        return instance.likes is False
 
     def get_created(self, instance):
         """The ISO-8601 formatted datetime for the creation time"""
@@ -113,10 +108,6 @@ class PostSerializer(serializers.Serializer):
         """Validate that upvoted is a bool"""
         return {'upvoted': self._parse_bool(value, 'upvoted')}
 
-    def validate_downvoted(self, value):
-        """Validate that downvoted is a bool"""
-        return {'downvoted': self._parse_bool(value, 'downvoted')}
-
     def validate_text(self, value):
         """Validate that text is a string or null"""
         if value is not None and not isinstance(value, str):
@@ -128,14 +119,6 @@ class PostSerializer(serializers.Serializer):
         if value is not None and not isinstance(value, str):
             raise ValidationError("url must be a string")
         return {"url": value}
-
-    def validate(self, attrs):
-        if attrs.get('downvoted') and attrs.get('upvoted'):
-            raise ValidationError("Only one of upvoted or downvoted can be true")
-
-        # url/text validation needs to go in created since it's handled differently
-        # than for update
-        return attrs
 
     def create(self, validated_data):
         title = validated_data['title']
@@ -192,17 +175,13 @@ class PostSerializer(serializers.Serializer):
             bool:
                 True if a change was made, False otherwise
         """
-        downvote = validated_data.get('downvoted')
         upvote = validated_data.get('upvoted')
 
-        is_downvoted = self.get_downvoted(instance)
         is_upvoted = self.get_upvoted(instance)
 
-        if downvote and not is_downvoted:
-            instance.downvote()
-        elif upvote and not is_upvoted:
+        if upvote and not is_upvoted:
             instance.upvote()
-        elif (downvote is False and is_downvoted) or (upvote is False and is_upvoted):
+        elif upvote is False and is_upvoted:
             instance.clear_vote()
         else:
             return False

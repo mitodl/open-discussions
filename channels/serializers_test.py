@@ -99,23 +99,6 @@ def test_post_validate_upvoted():
     assert ex.value.args[0] == 'upvoted must be a bool'
 
 
-def test_post_validate_downvoted():
-    """downvoted must be a bool"""
-    with pytest.raises(ValidationError) as ex:
-        PostSerializer().validate_downvoted("not a bool")
-    assert ex.value.args[0] == 'downvoted must be a bool'
-
-
-def test_post_validate_upvoted_and_downvoted():
-    """Both upvoted and downvoted can't be true at the same time"""
-    with pytest.raises(ValidationError) as ex:
-        PostSerializer().validate({
-            'upvoted': True,
-            'downvoted': True,
-        })
-    assert ex.value.args[0] == 'Only one of upvoted or downvoted can be true'
-
-
 def test_post_validate_text():
     """text must be a string"""
     with pytest.raises(ValidationError) as ex:
