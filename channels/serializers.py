@@ -70,7 +70,7 @@ class PostSerializer(serializers.Serializer):
     upvoted = WriteableSerializerMethodField()
     downvoted = WriteableSerializerMethodField()
     score = serializers.IntegerField(source='ups', read_only=True)
-    author = serializers.CharField(read_only=True)
+    author_id = serializers.CharField(read_only=True, source='author')
     id = serializers.CharField(read_only=True)
     created = serializers.SerializerMethodField()
     num_comments = serializers.IntegerField(read_only=True)
