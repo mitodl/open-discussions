@@ -168,9 +168,12 @@ class PostSerializer(serializers.Serializer):
             return api.get_post(post_id=post.id)
 
     def update(self, instance, validated_data):
-        api = Api(user=self.context['request'].user)
         post_id = self.context['view'].kwargs['post_id']
 
+        if "url" in validated_data:
+            raise ValidationError("Cannot edit url for a post")
+
+        api = Api(user=self.context['request'].user)
         if "text" in validated_data:
             instance = api.update_post(post_id=post_id, text=validated_data['text'])
 

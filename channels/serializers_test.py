@@ -148,3 +148,15 @@ def test_post_neither_text_nor_url():
             "title": "title",
         })
     assert ex.value.args[0] == 'One of text or url must be provided to create a post'
+
+
+def test_post_edit_url():
+    """Cannot update the URL for a post"""
+    with pytest.raises(ValidationError) as ex:
+        PostSerializer(context={
+            "request": Mock(),
+            "view": Mock(kwargs={'post_id': 'post'}),
+        }).update(Mock(), {
+            "url": "url"
+        })
+    assert ex.value.args[0] == 'Cannot edit url for a post'
