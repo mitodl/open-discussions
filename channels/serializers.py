@@ -194,7 +194,7 @@ class CommentSerializer(serializers.Serializer):
     """Serializer for comments"""
     id = serializers.CharField(read_only=True)
     post_id = serializers.SerializerMethodField()
-    comment_id = serializers.CharField(write_only=True, allow_blank=True)
+    comment_id = serializers.CharField(write_only=True, allow_blank=True, required=False)
     text = serializers.CharField(source='body')
     author_id = serializers.CharField(read_only=True, source='author')
     score = serializers.IntegerField(read_only=True)
@@ -242,10 +242,16 @@ class CommentSerializer(serializers.Serializer):
         else:
             kwargs['post_id'] = post_id
 
-        return api.create_comment(
+        comment = api.create_comment(
             text=validated_data['body'],
             **kwargs
         )
+
+        changed = _apply_vote(comment, validated_data)
+        if changed:
+            return api.get_comment(comment.id)
+        else:
+            return comment
 
     def update(self, instance, validated_data):
         if validated_data.get('comment_id'):
@@ -253,5 +259,7 @@ class CommentSerializer(serializers.Serializer):
         api = Api(user=self.context['request'].user)
         if 'body' in validated_data:
             api.update_comment(comment_id=instance.id, text=validated_data['body'])
+
+        _apply_vote(instance, validated_data)
 
         return api.get_comment(comment_id=instance.id)
