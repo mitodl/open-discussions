@@ -1,7 +1,7 @@
 // @flow
 import { GET, INITIAL_STATE } from 'redux-hammock/constants';
 
-import { makeFrontpagePostList } from '../factories/posts';
+import { makeChannelPostList } from '../factories/posts';
 import type { Post } from '../flow/discussionTypes';
 
 export const frontPageEndpoint = {
@@ -9,7 +9,7 @@ export const frontPageEndpoint = {
   verbs: [ GET ],
   initialState: { ...INITIAL_STATE, data: [] },
   getFunc: async () => {
-    let posts = makeFrontpagePostList();
+    let posts = makeChannelPostList();
     return posts;
   },
   getSuccessHandler: (payload: Array<Post>) => (

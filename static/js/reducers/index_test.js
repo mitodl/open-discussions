@@ -70,8 +70,9 @@ describe('reducers', () => {
       let post = makePost();
       post.id = 'my great post wow';
       store.dispatch(setPostData(post));
-      const { posts: { data }} = store.getState();
-      assert.deepEqual(post, data.get('my great post wow'));
+      const { posts } = store.getState();
+      assert.deepEqual(post, posts.data.get('my great post wow'));
+      assert.isTrue(posts.loaded);
     });
 
     it('should let you set a list of posts separately', () => {

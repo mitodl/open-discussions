@@ -2,4 +2,8 @@
   width: 100%;
   background-color: $card-background;
   box-shadow: 0 0 5px $card-shadow;
+
+  .content {
+    margin: 20px;
+  }
 }

@@ -17,6 +17,17 @@
     }
   }
 
+  .text-content-border {
+    margin: 20px;
+    border: 1px solid $border-grey;
+    background-color: $bg-blue;
+    border-radius: 7px;
+
+    .text-content {
+      padding: 20px;
+    }
+  }
+
   .post-title {
     font-size: 18px;
   }

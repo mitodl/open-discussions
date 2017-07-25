@@ -1,25 +1,23 @@
 // @flow
 export type Channel = {
-  name: string,
-  title: string,
+  name:               string,
+  title:              string,
   public_description: string,
-  theme_type: string,
-  num_users: number,
+  theme_type:         string,
+  num_users:          number,
 };
 
 export type Post = {
   id:            string,
   title:         string,
-  author:        string,  // username
-  upvotes:       number,
-  downvotes:     number,
+  author_id:     string,  // username
+  score:         number,
   upvoted:       boolean,
-  downvoted:     boolean,
   url:           ?string,
   text:          ?string,
   created:       string,
   num_comments:  number,
-  channel_name?: string,
+  channel_name:  string,
 };
 
 export type Comment = {

@@ -1,13 +1,13 @@
 // @flow
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import R from 'ramda';
 
 import Card from '../components/Card';
 import ChannelSidebar from '../components/ChannelSidebar';
 import PostList from '../components/PostList';
 import Loading from '../components/Loading';
+import ChannelBreadcrumbs from '../components/ChannelBreadcrumbs';
 
 import { actions } from '../actions';
 import { setPostData } from '../actions/post';
@@ -48,11 +48,7 @@ class ChannelPage extends React.Component {
     } else {
       return (
         <div className="double-column">
-          <div>
-            <Link to="/">Discussions</Link>&nbsp;
-            <span>&gt;</span>&nbsp;
-            <span>{channel.title}</span>
-          </div>
+          <ChannelBreadcrumbs channel={channel} />
           <div className="first-column">
             <Card>
               <PostList

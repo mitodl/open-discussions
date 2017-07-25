@@ -1,12 +1,12 @@
 // @flow
 import React from 'react';
 
-import PostSummary from './PostSummary';
+import PostDisplay from './PostDisplay';
 
 import type { Post } from '../flow/discussionTypes';
 
 const renderPosts = (posts, showChannelLinks) => posts.map((post, index) => (
-  <PostSummary post={post} key={index} showChannelLink={showChannelLinks} />
+  <PostDisplay post={post} key={index} showChannelLink={showChannelLinks} />
 ));
 
 type PostListProps = {

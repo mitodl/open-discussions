@@ -31,7 +31,7 @@ export const postsEndpoint = {
       let update = action.payload instanceof Array
         ? mergeMultiplePosts(action.payload, state.data)
         : mergePostData(action.payload, state.data);
-      return Object.assign({}, state, { data: update });
+      return Object.assign({}, state, { data: update, loaded: true });
     }
   },
 };

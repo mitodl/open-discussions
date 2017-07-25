@@ -5,7 +5,6 @@ import R from 'ramda';
 import {
   makePost,
   makeChannelPostList,
-  makeFrontpagePostList,
 } from './posts';
 
 describe('posts factories', () => {
@@ -14,11 +13,8 @@ describe('posts factories', () => {
       let post = makePost();
       assert.isString(post.id);
       assert.isString(post.title);
-      assert.isNumber(post.upvotes);
-      assert.equal(0, post.downvotes);
       assert.isBoolean(post.upvoted);
-      assert.isBoolean(post.downvoted);
-      assert.isString(post.author);
+      assert.isString(post.author_id);
       assert.isString(post.text);
       assert.isNull(post.url);
       assert.isString(post.created);
@@ -34,13 +30,13 @@ describe('posts factories', () => {
     it('should randomly generate username', () => {
       let firstPost = makePost();
       let secondPost = makePost();
-      assert.notEqual(firstPost.author, secondPost.author);
+      assert.notEqual(firstPost.author_id, secondPost.author_id);
     });
 
     it('should randomly generate upvotes', () => {
       let upvoteScores = R.range(1,20)
         .map(makePost)
-        .map(R.prop('upvotes'));
+        .map(R.prop('score'));
       assert.isAbove(new Set(upvoteScores).size, 1);
     });
   });
@@ -50,16 +46,8 @@ describe('posts factories', () => {
       makeChannelPostList().forEach(post => {
         assert.isString(post.id);
         assert.isString(post.title);
-        assert.isNumber(post.upvotes);
-        assert.equal(0, post.downvotes);
-        assert.isString(post.author);
-      });
-    });
-  });
-
-  describe('makeFrontpagePostList', () => {
-    it('should return a list of posts, with the channel name', () => {
-      makeFrontpagePostList().forEach(post => {
+        assert.isNumber(post.score);
+        assert.isString(post.author_id);
         assert.isString(post.channel_name);
       });
     });
