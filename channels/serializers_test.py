@@ -11,6 +11,7 @@ from rest_framework.exceptions import ValidationError
 
 from channels.serializers import (
     ChannelSerializer,
+    CommentSerializer,
     PostSerializer,
 )
 
@@ -148,7 +149,7 @@ def test_post_edit_url():
 def test_comment_update_with_comment_id():
     """Cannot pass comment_id to a comment, this is provided in the URL"""
     with pytest.raises(ValidationError) as ex:
-        PostSerializer().update(Mock(), {
+        CommentSerializer().update(Mock(), {
             "comment_id": "something"
         })
     assert ex.value.args[0] == 'comment_id must be provided via URL'
