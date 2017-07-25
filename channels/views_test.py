@@ -101,6 +101,7 @@ def test_create_url_post(client, use_betamax, praw_settings):
         'id': '2x',
         'num_comments': 0,
         'score': 1,
+        'channel_name': 'unit_tests',
     }
 
 
@@ -127,6 +128,7 @@ def test_create_text_post(client, use_betamax, praw_settings):
         'id': '2y',
         'num_comments': 0,
         'score': 1,
+        'channel_name': 'unit_tests',
     }
 
 
@@ -149,6 +151,7 @@ def test_get_post(client, use_betamax, praw_settings):
         'id': post_id,
         'num_comments': 6,
         'score': 0,
+        'channel_name': 'george',
     }
 
 
@@ -177,6 +180,7 @@ def test_list_posts(client, use_betamax, praw_settings):
             'id': '30',
             'created': '2017-07-21T19:10:26+00:00',
             'num_comments': 0,
+            'channel_name': 'two_posts',
         },
         {
             'url': 'http://micromasters.mit.edu',
@@ -189,6 +193,7 @@ def test_list_posts(client, use_betamax, praw_settings):
             'id': '2z',
             'created': '2017-07-21T19:09:37+00:00',
             'num_comments': 0,
+            'channel_name': 'two_posts',
         }
     ]
 
@@ -212,6 +217,7 @@ def test_update_post_text(client, use_betamax, praw_settings):
         'id': post_id,
         'created': '2017-07-21T19:10:26+00:00',
         'num_comments': 0,
+        'channel_name': 'two_posts',
     }
 
 
@@ -234,6 +240,7 @@ def test_update_post_clear_vote(client, use_betamax, praw_settings):
         'id': post_id,
         'created': '2017-07-21T19:10:26+00:00',
         'num_comments': 0,
+        'channel_name': 'two_posts',
     }
 
 
@@ -256,6 +263,7 @@ def test_update_post_downvote(client, use_betamax, praw_settings):
         'id': post_id,
         'created': '2017-07-21T19:10:26+00:00',
         'num_comments': 0,
+        'channel_name': 'two_posts',
     }
 
 
@@ -278,6 +286,7 @@ def test_update_post_upvote(client, use_betamax, praw_settings):
         'id': post_id,
         'created': '2017-07-21T19:10:26+00:00',
         'num_comments': 0,
+        'channel_name': 'two_posts',
     }
 
 
@@ -302,4 +311,5 @@ def test_create_downvote(client, use_betamax, praw_settings):
         'id': '2',
         'num_comments': 0,
         'score': 1,
+        'channel_name': 'subreddit_for_testing',
     }

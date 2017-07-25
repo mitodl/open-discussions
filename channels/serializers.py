@@ -74,6 +74,7 @@ class PostSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     created = serializers.SerializerMethodField()
     num_comments = serializers.IntegerField(read_only=True)
+    channel_name = serializers.SerializerMethodField()
 
     def get_url(self, instance):
         """Returns a url or null depending on if it's a self post"""
@@ -94,6 +95,10 @@ class PostSerializer(serializers.Serializer):
     def get_created(self, instance):
         """The ISO-8601 formatted datetime for the creation time"""
         return datetime.fromtimestamp(instance.created, tz=timezone.utc).isoformat()
+
+    def get_channel_name(self, instance):
+        """The channel which contains the post"""
+        return instance.subreddit.display_name
 
     @staticmethod
     def _parse_bool(value, field_name):
