@@ -21,3 +21,14 @@ export type Post = {
   num_comments:  number,
   channel_name?: string,
 };
+
+export type Comment = {
+  id:        string,
+  post_id:   string,
+  text:      string,
+  score:     number,
+  upvoted:   boolean,
+  created:   string,
+  replies:   Array<Comment>,
+  author_id: string,
+};

@@ -1,9 +1,10 @@
 // @flow
-import type { Post } from '../flow/discussionTypes';
-import { makePost } from '../factories/posts';
 import { GET, INITIAL_STATE } from 'redux-hammock/constants';
 
 import { SET_POST_DATA } from '../actions/post';
+import { makePost } from '../factories/posts';
+
+import type { Post } from '../flow/discussionTypes';
 
 const mergePostData = (post: Post, data: Map<string, Post>): Map<string, Post> => {
   let update = new Map(data);

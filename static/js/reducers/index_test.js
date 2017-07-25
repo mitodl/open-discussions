@@ -169,4 +169,30 @@ describe('reducers', () => {
       });
     });
   });
+
+  describe('comments reducer', () => {
+    beforeEach(() => {
+      dispatchThen = store.createDispatchThen(state => state.comments);
+    });
+
+    it('should have some initial state', () => {
+      assert.deepEqual(
+        store.getState().comments,
+        { ...INITIAL_STATE, data: new Map }
+      );
+    });
+
+    it('should let you get the comments for a Post', () => {
+      let post = makePost();
+      const { requestType, successType } = actions.comments.get;
+      return dispatchThen(
+        actions.comments.get(post),
+        [ requestType, successType ],
+      ).then(({ data }) => {
+        let comments = data.get(post.id);
+        assert.isArray(comments);
+        assert.isNotEmpty(comments[0].replies);
+      });
+    });
+  });
 });
