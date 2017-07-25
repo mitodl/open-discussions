@@ -259,28 +259,28 @@ def test_update_post_upvote(client, use_betamax, praw_settings):
     }
 
 
-def test_create_without_upvote(client, use_betamax, praw_settings):
+def test_create_post_without_upvote(client, use_betamax, praw_settings):
     """Test creating a post without an upvote in the body"""
     user = UserFactory.create(username='george')
     client.force_login(user)
-    url = reverse('post-list', kwargs={'channel_name': 'a_channel'})
+    url = reverse('post-list', kwargs={'channel_name': 'subreddit_for_testing'})
     resp = client.post(url, {
-        'title': 'new post without upvote',
-        'text': 'post for testing clear_vote',
+        'title': 'x',
+        'text': 'y',
         'upvoted': False,
     })
     assert resp.status_code == 201
     assert resp.json() == {
-        'title': 'new post without upvote',
-        'text': 'post for testing clear_vote',
+        'title': 'x',
+        'text': 'y',
         'url': None,
         'author_id': user.username,
-        'created': '2017-07-25T17:57:07+00:00',
+        'created': '2017-07-25T22:05:44+00:00',
         'upvoted': False,
-        'id': '3',
+        'id': '5',
         'num_comments': 0,
         'score': 1,
-        'channel_name': 'a_channel',
+        'channel_name': 'subreddit_for_testing',
     }
 
 

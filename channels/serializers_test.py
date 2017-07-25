@@ -143,3 +143,12 @@ def test_post_edit_url():
             "url": "url"
         })
     assert ex.value.args[0] == 'Cannot edit url for a post'
+
+
+def test_comment_update_with_comment_id():
+    """Cannot pass comment_id to a comment, this is provided in the URL"""
+    with pytest.raises(ValidationError) as ex:
+        PostSerializer().update(Mock(), {
+            "comment_id": "something"
+        })
+    assert ex.value.args[0] == 'comment_id must be provided via URL'
