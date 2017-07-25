@@ -196,7 +196,7 @@ class CommentSerializer(serializers.Serializer):
     post_id = serializers.SerializerMethodField()
     comment_id = serializers.CharField(write_only=True, allow_blank=True)
     text = serializers.CharField(source='body')
-    author_id = serializers.CharField(read_only=True)
+    author_id = serializers.CharField(read_only=True, source='author')
     score = serializers.IntegerField(read_only=True)
     upvoted = WriteableSerializerMethodField()
     created = serializers.SerializerMethodField()

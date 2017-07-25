@@ -84,3 +84,7 @@ class CommentDetailView(RetrieveUpdateDestroyAPIView):
         """Get comment"""
         api = Api(user=self.request.user)
         return api.get_comment(self.kwargs['comment_id'])
+
+    def perform_destroy(self, instance):
+        """Delete a comment"""
+        instance.delete()
