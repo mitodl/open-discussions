@@ -151,21 +151,41 @@ class PostSerializer(serializers.Serializer):
 
         api = Api(user=self.context['request'].user)
         channel_name = self.context['view'].kwargs['channel_name']
-        return api.create_post(
+        post = api.create_post(
             channel_name,
             title=title,
             **kwargs
         )
+        changed = self._apply_vote(post, validated_data)
+        if not changed:
+            return post
+        else:
+            return api.get_post(post_id=post.id)
 
     def update(self, instance, validated_data):
         api = Api(user=self.context['request'].user)
         post_id = self.context['view'].kwargs['post_id']
 
-        downvote = validated_data.get('downvoted')
-        upvote = validated_data.get('upvoted')
-
         if "text" in validated_data:
             instance = api.update_post(post_id=post_id, text=validated_data['text'])
+
+        self._apply_vote(instance, validated_data)
+        return api.get_post(post_id=post_id)
+
+    def _apply_vote(self, instance, validated_data):
+        """
+        Apply a vote provided by the user.
+
+        Args:
+            instance (Post): A post
+            validated_data (dict): validated data which contains the new vote from the user
+
+        Returns:
+            bool:
+                True if a change was made, False otherwise
+        """
+        downvote = validated_data.get('downvoted')
+        upvote = validated_data.get('upvoted')
 
         is_downvoted = self.get_downvoted(instance)
         is_upvoted = self.get_upvoted(instance)
@@ -176,5 +196,6 @@ class PostSerializer(serializers.Serializer):
             instance.upvote()
         elif (downvote is False and is_downvoted) or (upvote is False and is_upvoted):
             instance.clear_vote()
-
-        return api.get_post(post_id=post_id)
+        else:
+            return False
+        return True

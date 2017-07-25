@@ -278,3 +278,27 @@ def test_update_post_upvote(client, use_betamax, praw_settings):
         'created': '2017-07-21T19:10:26+00:00',
         'num_comments': 0,
     }
+
+
+def test_create_downvote(client, use_betamax, praw_settings):
+    """Test creating a post with a downvote in the body"""
+    user = UserFactory.create(username='george')
+    client.force_login(user)
+    url = reverse('post-list', kwargs={'channel_name': 'unit_tests'})
+    resp = client.post(url, {
+        'title': 'parameterized testing',
+        'text': 'tests are great',
+    })
+    assert resp.status_code == 201
+    assert resp.json() == {
+        'title': 'parameterized testing',
+        'text': 'tests are great',
+        'url': None,
+        'author': user.username,
+        'created': '2017-07-21T18:51:15+00:00',
+        'upvoted': True,
+        'downvoted': False,
+        'id': '2y',
+        'num_comments': 0,
+        'score': 1,
+    }
