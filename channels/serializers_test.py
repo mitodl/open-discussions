@@ -82,6 +82,7 @@ def test_update_channel(user, is_empty):
     kwargs = {} if is_empty else {
         "title": validated_data['title'],
         "channel_type": validated_data['subreddit_type'],
+        "public_description": validated_data['public_description'],
     }
     api.return_value.update_channel.assert_called_once_with(
         name=display_name,

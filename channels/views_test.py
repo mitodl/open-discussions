@@ -18,14 +18,12 @@ def test_list_channels(client, use_betamax, praw_settings):
     resp = client.get(url)
     assert resp.status_code == 200
     assert resp.json() == [
-        {'title': '/r/pics', 'name': 'pics', 'channel_type': 'public'},
-        {'title': '/r/videos', 'name': 'videos', 'channel_type': 'public'},
-        {'title': '/r/askhistorians', 'name': 'askhistorians', 'channel_type': 'public'},
-        {'title': 'A place for tests', 'name': 'tests', 'channel_type': 'private'},
-        {'title': 'A place for tests', 'name': 'unittests', 'channel_type': 'private'},
-        {'title': 'A place for tests', 'name': 'testing', 'channel_type': 'private'},
-        {'title': 'A new title', 'name': 'unit_tests', 'channel_type': 'public'},
-        {'title': 'another title', 'name': 'george', 'channel_type': 'public'}
+        {
+            'title': 'subreddit for tests',
+            'name': 'subreddit_for_testing',
+            'public_description': 'a public description goes here',
+            'channel_type': 'private',
+        }
     ]
 
 
@@ -37,8 +35,9 @@ def test_create_channel(client, use_betamax, praw_settings):
     url = reverse('channel-list')
     payload = {
         'channel_type': 'private',
-        'name': 'new_channel',
+        'name': 'a_channel',
         'title': 'Channel title',
+        'public_description': 'public',
     }
     resp = client.post(url, data=payload)
     assert resp.status_code == 201
@@ -50,13 +49,14 @@ def test_get_channel(client, use_betamax, praw_settings):
     Get a channel
     """
     client.force_login(UserFactory.create())
-    url = reverse('channel-detail', kwargs={'channel_name': 'unit_tests'})
+    url = reverse('channel-detail', kwargs={'channel_name': 'subreddit_for_testing'})
     resp = client.get(url)
     assert resp.status_code == 200
     assert resp.json() == {
-        'channel_type': 'public',
-        'name': 'unit_tests',
-        'title': 'A new title',
+        'channel_type': 'private',
+        'name': 'subreddit_for_testing',
+        'title': 'subreddit for tests',
+        'public_description': 'a public description goes here',
     }
 
 
@@ -65,15 +65,16 @@ def test_patch_channel(client, use_betamax, praw_settings):
     Update a channel's settings
     """
     client.force_login(UserFactory.create())
-    url = reverse('channel-detail', kwargs={'channel_name': 'unit_tests'})
+    url = reverse('channel-detail', kwargs={'channel_name': 'subreddit_for_testing'})
     resp = client.patch(url, {
-        'title': 'A place for unit tests',
+        'channel_type': 'public',
     }, format='json')
     assert resp.status_code == 200
     assert resp.json() == {
         'channel_type': 'public',
-        'name': 'unit_tests',
-        'title': 'A place for unit tests',
+        'name': 'subreddit_for_testing',
+        'title': 'subreddit for tests',
+        'public_description': 'a public description goes here',
     }
 
 
@@ -284,21 +285,21 @@ def test_create_downvote(client, use_betamax, praw_settings):
     """Test creating a post with a downvote in the body"""
     user = UserFactory.create(username='george')
     client.force_login(user)
-    url = reverse('post-list', kwargs={'channel_name': 'unit_tests'})
+    url = reverse('post-list', kwargs={'channel_name': 'subreddit_for_testing'})
     resp = client.post(url, {
-        'title': 'parameterized testing',
-        'text': 'tests are great',
+        'title': 'new post',
+        'text': 'some text for the post',
     })
     assert resp.status_code == 201
     assert resp.json() == {
-        'title': 'parameterized testing',
-        'text': 'tests are great',
+        'title': 'new post',
+        'text': 'some text for the post',
         'url': None,
         'author': user.username,
-        'created': '2017-07-21T18:51:15+00:00',
-        'upvoted': True,
-        'downvoted': False,
-        'id': '2y',
+        'created': '2017-07-25T15:31:44+00:00',
+        'upvoted': False,
+        'downvoted': True,
+        'id': '2',
         'num_comments': 0,
         'score': 1,
     }

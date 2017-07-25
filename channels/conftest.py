@@ -19,9 +19,14 @@ def praw_settings(settings):
 
 
 @pytest.fixture
-def use_betamax(mocker, betamax_recorder, praw_settings):
-    """Attach the betamax session to the Api client"""
+def configure_betamax():
+    """Configure betamax"""
     setup_betamax()
+
+
+@pytest.fixture
+def use_betamax(mocker, configure_betamax, betamax_recorder, praw_settings):
+    """Attach the betamax session to the Api client"""
     mocker.patch('channels.api._get_session', return_value=betamax_recorder.session)
     mocker.patch('channels.api._get_user_credentials', return_value={
         'client_id': praw_settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID,
