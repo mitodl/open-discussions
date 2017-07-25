@@ -5,6 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 amqp==2.1.4               # via kombu
+betamax-serializers==0.2.0
 betamax==0.8.0
 billiard==3.5.0.2         # via celery
 boto==2.39.0
