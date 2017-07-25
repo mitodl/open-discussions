@@ -1,8 +1,8 @@
 // @flow
+import * as api from '../lib/api';
 import { GET, INITIAL_STATE } from 'redux-hammock/constants';
 
 import { SET_POST_DATA } from '../actions/post';
-import { makePost } from '../factories/posts';
 
 import type { Post } from '../flow/discussionTypes';
 
@@ -23,11 +23,7 @@ const mergeMultiplePosts = (posts: Array<Post>, data: Map<string, Post>): Map<st
 export const postsEndpoint = {
   name: 'posts',
   verbs: [ GET ],
-  getFunc: async (id: string) => {
-    let post = makePost();
-    post.id = id;
-    return post;
-  },
+  getFunc: (id: string) => api.getPost(id),
   initialState: { ...INITIAL_STATE, data: new Map },
   getSuccessHandler: mergePostData,
   extraActions: {

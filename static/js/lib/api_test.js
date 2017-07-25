@@ -2,7 +2,13 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { patchThing } from './api';
+import {
+  getChannel,
+  getPost,
+  getPostsForChannel,
+} from './api';
+import { makeChannel } from '../factories/channels';
+import { makeChannelPostList, makePost } from '../factories/posts';
 import * as fetchFuncs from 'redux-hammock/django_csrf_fetch';
 
 describe('api', function() {
@@ -22,34 +28,38 @@ describe('api', function() {
   });
 
   describe('REST functions', () => {
-    const THING_RESPONSE = {
-      a: "thing"
-    };
-
     let fetchStub;
     beforeEach(() => {
       fetchStub = sandbox.stub(fetchFuncs, 'fetchJSONWithCSRF');
     });
 
-    it('patches a thing', () => {
-      fetchStub.returns(Promise.resolve(THING_RESPONSE));
+    it('gets channel posts', () => {
+      const posts = makeChannelPostList();
+      fetchStub.returns(Promise.resolve(posts));
 
-      return patchThing('jane', THING_RESPONSE).then(thing => {
-        assert.ok(fetchStub.calledWith('/api/v0/thing/jane/', {
-          method: 'PATCH',
-          body: JSON.stringify(THING_RESPONSE)
-        }));
-        assert.deepEqual(thing, THING_RESPONSE);
+      return getPostsForChannel('channelone').then(result => {
+        assert.ok(fetchStub.calledWith('/api/v0/channels/channelone/posts/'));
+        assert.deepEqual(result, posts);
       });
     });
 
-    it('fails to patch a thing', () => {
-      fetchStub.returns(Promise.reject());
-      return patchThing('jane', THING_RESPONSE).catch(() => {
-        assert.ok(fetchStub.calledWith('/api/v0/thing/jane/', {
-          method: 'PATCH',
-          body: JSON.stringify(THING_RESPONSE)
-        }));
+    it('gets channel', () => {
+      const channel = makeChannel();
+      fetchStub.returns(Promise.resolve(channel));
+
+      return getChannel('channelone').then(result => {
+        assert.ok(fetchStub.calledWith('/api/v0/channels/channelone/'));
+        assert.deepEqual(result, channel);
+      });
+    });
+
+    it('gets post', () => {
+      const post = makePost();
+      fetchStub.returns(Promise.resolve(post));
+
+      return getPost('1').then(result => {
+        assert.ok(fetchStub.calledWith(`/api/v0/posts/1/`));
+        assert.deepEqual(result, post);
       });
     });
   });

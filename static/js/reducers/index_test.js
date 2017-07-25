@@ -6,7 +6,9 @@ import { INITIAL_STATE } from 'redux-hammock/constants';
 
 import rootReducer from '../reducers';
 import { actions } from '../actions';
+import * as api from '../lib/api';
 import { makePost, makeChannelPostList } from '../factories/posts';
+import { makeChannel } from '../factories/channels';
 import { setPostData } from '../actions/post';
 
 describe('reducers', () => {
@@ -22,8 +24,15 @@ describe('reducers', () => {
   });
 
   describe('posts reducer', () => {
+    let getPostStub;
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.posts);
+      getPostStub = sandbox.stub(api, 'getPost');
+      getPostStub.callsFake(async (id) => {
+        let post = makePost();
+        post.id = id;
+        return post;
+      });
     });
 
     it('should have some initial state', () => {
@@ -74,8 +83,15 @@ describe('reducers', () => {
   });
 
   describe('channels reducer', () => {
+    let getChannelStub;
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.channels);
+      getChannelStub = sandbox.stub(api, 'getChannel');
+      getChannelStub.callsFake(async (name) => {
+        let channel = makeChannel();
+        channel.name = name;
+        return channel;
+      });
     });
 
     it('should have some initial state', () => {
@@ -111,8 +127,11 @@ describe('reducers', () => {
   });
 
   describe('postsForChannel reducer', () => {
+    let getPostsForChannelStub;
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.postsForChannel);
+      getPostsForChannelStub = sandbox.stub(api, 'getPostsForChannel');
+      getPostsForChannelStub.returns(Promise.resolve(makeChannelPostList()));
     });
 
     it('should have some initial state', () => {
