@@ -237,7 +237,7 @@ class CommentSerializer(serializers.Serializer):
         post_id = self.context['view'].kwargs['post_id']
 
         kwargs = {}
-        if 'comment_id' in validated_data:
+        if validated_data.get('comment_id'):
             kwargs['comment_id'] = validated_data['comment_id']
         else:
             kwargs['post_id'] = post_id
