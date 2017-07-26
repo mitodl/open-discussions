@@ -253,3 +253,11 @@ def test_more_comments(mock_client, mocker):
     mock_client.submission.assert_called_once_with('iru_i2')
     assert result.submission == mock_client.submission.return_value
     result.comments.assert_called_once_with()
+
+
+def test_frontpage(mock_client):
+    """Test front page"""
+    client = api.Api(UserFactory.create())
+    posts = client.front_page()
+    assert posts == mock_client.front.hot.return_value
+    mock_client.front.hot.assert_called_once_with()

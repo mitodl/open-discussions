@@ -6,6 +6,7 @@ from channels.views import (
     ChannelListView,
     CommentDetailView,
     CommentListView,
+    FrontPageView,
     PostDetailView,
     PostListView,
 )
@@ -33,4 +34,5 @@ urlpatterns = [
         CommentDetailView.as_view(),
         name='comment-detail',
     ),
+    url(r'api/v0/frontpage/$', FrontPageView.as_view(), name='frontpage'),
 ]

@@ -1,6 +1,7 @@
 """Views for REST APIs for channels"""
 
 from rest_framework.generics import (
+    ListAPIView,
     ListCreateAPIView,
     RetrieveUpdateAPIView,
     RetrieveUpdateDestroyAPIView,
@@ -88,3 +89,15 @@ class CommentDetailView(RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         """Delete a comment"""
         instance.delete()
+
+
+class FrontPageView(ListAPIView):
+    """
+    View for listing posts
+    """
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        """Get generator for front page posts"""
+        api = Api(user=self.request.user)
+        return api.front_page()

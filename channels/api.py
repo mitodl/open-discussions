@@ -208,6 +208,16 @@ class Api:
             raise ValueError('Exactly one of text and url must be provided')
         return self.get_channel(channel_name).submit(title, selftext=text, url=url)
 
+    def front_page(self):
+        """
+        List posts on front page using 'hot' algorithm
+
+        Returns:
+            praw.models.listing.generator.ListingGenerator:
+                A generator of posts for a subreddit
+        """
+        return self.reddit.front.hot()
+
     def list_posts(self, channel_name):
         """
         List posts using the 'hot' algorithm
