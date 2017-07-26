@@ -2,6 +2,7 @@
 from betamax import Betamax
 from betamax.util import deserialize_prepared_request
 from betamax.matchers.body import BodyMatcher
+from betamax_serializers.pretty_json import PrettyJSONSerializer
 
 
 class CustomBodyMatcher(BodyMatcher):
@@ -25,7 +26,9 @@ class CustomBodyMatcher(BodyMatcher):
 def setup_betamax():
     """Do global configuration for betamax. This function is idempotent."""
     Betamax.register_request_matcher(CustomBodyMatcher)
+    Betamax.register_serializer(PrettyJSONSerializer)
 
     config = Betamax.configure()
     config.cassette_library_dir = "cassettes"
     config.default_cassette_options['match_requests_on'] = ['uri', 'method', 'custom-body']
+    config.default_cassette_options['serialize_with'] = 'prettyjson'
