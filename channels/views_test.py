@@ -454,3 +454,73 @@ def test_delete_comment(client, use_betamax, praw_settings):
     url = reverse('comment-detail', kwargs={'comment_id': '6'})
     resp = client.delete(url)
     assert resp.status_code == 204
+
+
+def test_frontpage(client, use_betamax, praw_settings):
+    """View the front page"""
+    client.force_login(UserFactory.create(username='george'))
+    url = reverse('frontpage')
+    resp = client.get(url)
+    assert resp.status_code == 200
+    assert resp.json() == [
+        {
+            "url": None,
+            "text": "y",
+            "title": "x",
+            "upvoted": False,
+            "score": 1,
+            "author_id": "george",
+            "id": "5",
+            "created": "2017-07-25T22:05:44+00:00",
+            "num_comments": 0,
+            "channel_name": "subreddit_for_testing"
+        },
+        {
+            "url": None,
+            "text": "post for testing clear_vote",
+            "title": "new post without upvote",
+            "upvoted": False,
+            "score": 1,
+            "author_id": "george",
+            "id": "3",
+            "created": "2017-07-25T17:57:07+00:00",
+            "num_comments": 0,
+            "channel_name": "a_channel"
+        },
+        {
+            "url": None,
+            "text": "y",
+            "title": "x",
+            "upvoted": False,
+            "score": 1,
+            "author_id": "george",
+            "id": "4",
+            "created": "2017-07-25T22:02:40+00:00",
+            "num_comments": 0,
+            "channel_name": "subreddit_for_testing"
+        },
+        {
+            "url": None,
+            "text": "some text for the post",
+            "title": "new post",
+            "upvoted": False,
+            "score": 1,
+            "author_id": "george",
+            "id": "2",
+            "created": "2017-07-25T15:31:44+00:00",
+            "num_comments": 6,
+            "channel_name": "subreddit_for_testing"
+        },
+        {
+            "url": None,
+            "text": "some text for the post",
+            "title": "new post",
+            "upvoted": False,
+            "score": 1,
+            "author_id": "george",
+            "id": "1",
+            "created": "2017-07-25T15:07:30+00:00",
+            "num_comments": 0,
+            "channel_name": "subreddit_for_testing"
+        }
+    ]
