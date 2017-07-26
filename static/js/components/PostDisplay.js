@@ -15,6 +15,15 @@ const textContent = post => (
   </div>
 );
 
+const postTitle = (post: Post) =>
+  post.text
+    ? <Link className="post-title" to={postDetailURL(post.channel_name, post.id)}>
+      { post.title }
+    </Link>
+    : <a className="post-title" href={post.url} target="_blank">
+      { post.title }
+    </a>;
+
 export default class PostDisplay extends React.Component {
   props: {
     post:             Post,
@@ -42,7 +51,7 @@ export default class PostDisplay extends React.Component {
           <span className="votes">{post.score}</span>
         </div>
         <div className="summary">
-          <a className="post-title">{ post.title }</a>
+          { postTitle(post) }
           <div className="authored-by">
             by <a>{post.author_id || 'someone'}</a>, {formattedDate} { this.showChannelLink() }
           </div>

@@ -15,7 +15,10 @@ describe('PostDisplay', () => {
     const wrapper = renderPostDisplay({ post });
     const summary = wrapper.find('.summary');
     assert.equal(wrapper.find('.votes').text(), post.score.toString());
-    assert.equal(summary.find('a').at(0).text(), post.title);
+    assert.equal(
+      summary.find(Link).at(0).props().children,
+      post.title
+    );
     assert.deepEqual(
       wrapper.find('.num-comments').props().children,
       [post.num_comments, ' Comments']
@@ -30,7 +33,7 @@ describe('PostDisplay', () => {
     const post = makePost();
     post.channel_name = "channel_name";
     const wrapper = renderPostDisplay({ post: post, showChannelLink: true });
-    assert.equal(wrapper.find(Link).at(0).props().to, '/channel/channel_name');
+    assert.equal(wrapper.find(Link).at(1).props().to, '/channel/channel_name');
   });
 
   it("should display text, if given a text post and the 'expanded' flag", () => {
@@ -47,5 +50,22 @@ describe('PostDisplay', () => {
     post.text = string;
     const wrapper = renderPostDisplay({post: post});
     assert.notInclude(wrapper.text(), string);
+  });
+
+  it('should include an external link, if a url post', () => {
+    let post = makePost(true);
+    const wrapper = renderPostDisplay({ post: post });
+    const { href, target, children } = wrapper.find('a').at(0).props();
+    assert.equal(href, post.url);
+    assert.equal(target, "_blank");
+    assert.equal(children, post.title);
+  });
+
+  it('should link to the detail view, if a text post', () => {
+    let post = makePost();
+    const wrapper = renderPostDisplay({ post: post });
+    const { to, children } = wrapper.find(Link).at(0).props();
+    assert.equal(children, post.title);
+    assert.equal(to, `/channel/${post.channel_name}/${post.id}`);
   });
 });
