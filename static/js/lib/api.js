@@ -9,6 +9,10 @@ import type {
   Post,
 } from '../flow/discussionTypes';
 
+export function getFrontpage(): Promise<Post> {
+  return fetchJSONWithCSRF(`/api/v0/frontpage/`);
+}
+
 export function getChannel(channelName: string): Promise<Channel> {
   return fetchJSONWithCSRF(`/api/v0/channels/${channelName}/`);
 }

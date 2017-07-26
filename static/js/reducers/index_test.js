@@ -168,8 +168,11 @@ describe('reducers', () => {
   });
 
   describe('frontpage reducer', () => {
+    let frontpageStub;
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.frontpage);
+      frontpageStub = sandbox.stub(api, 'getFrontpage');
+      frontpageStub.returns(Promise.resolve(makeChannelPostList()));
     });
 
     it('should have some initial state', () => {

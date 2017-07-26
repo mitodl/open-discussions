@@ -1,17 +1,14 @@
 // @flow
 import { GET, INITIAL_STATE } from 'redux-hammock/constants';
 
-import { makeChannelPostList } from '../factories/posts';
+import * as api from '../lib/api';
 import type { Post } from '../flow/discussionTypes';
 
 export const frontPageEndpoint = {
   name: 'frontpage',
   verbs: [ GET ],
   initialState: { ...INITIAL_STATE, data: [] },
-  getFunc: async () => {
-    let posts = makeChannelPostList();
-    return posts;
-  },
+  getFunc: () => api.getFrontpage(),
   getSuccessHandler: (payload: Array<Post>) => (
     payload.map(post => post.id)
   )

@@ -4,6 +4,7 @@ import sinon from 'sinon';
 
 import {
   getChannel,
+  getFrontpage,
   getPost,
   getPostsForChannel,
 } from './api';
@@ -60,6 +61,16 @@ describe('api', function() {
       return getPost('1').then(result => {
         assert.ok(fetchStub.calledWith(`/api/v0/posts/1/`));
         assert.deepEqual(result, post);
+      });
+    });
+
+    it('gets the frontpage', () => {
+      const posts = makeChannelPostList();
+      fetchStub.returns(Promise.resolve(posts));
+
+      return getFrontpage().then(result => {
+        assert.ok(fetchStub.calledWith(`/api/v0/frontpage/`));
+        assert.deepEqual(result, posts);
       });
     });
   });
