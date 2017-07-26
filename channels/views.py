@@ -9,6 +9,7 @@ from rest_framework.generics import (
 from channels.api import Api
 from channels.serializers import (
     ChannelSerializer,
+    CommentSerializer,
     PostSerializer,
 )
 
@@ -59,3 +60,31 @@ class PostDetailView(RetrieveUpdateDestroyAPIView):
         """Get post"""
         api = Api(user=self.request.user)
         return api.get_post(self.kwargs['post_id'])
+
+
+class CommentListView(ListCreateAPIView):
+    """
+    View for listing and creating comments
+    """
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        """Get generator for comments"""
+        api = Api(user=self.request.user)
+        return api.list_comments(self.kwargs['post_id'])
+
+
+class CommentDetailView(RetrieveUpdateDestroyAPIView):
+    """
+    View for retrieving, updating or destroying comments
+    """
+    serializer_class = CommentSerializer
+
+    def get_object(self):
+        """Get comment"""
+        api = Api(user=self.request.user)
+        return api.get_comment(self.kwargs['comment_id'])
+
+    def perform_destroy(self, instance):
+        """Delete a comment"""
+        instance.delete()

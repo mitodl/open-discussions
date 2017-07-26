@@ -259,26 +259,198 @@ def test_update_post_upvote(client, use_betamax, praw_settings):
     }
 
 
-def test_create_without_upvote(client, use_betamax, praw_settings):
+def test_create_post_without_upvote(client, use_betamax, praw_settings):
     """Test creating a post without an upvote in the body"""
     user = UserFactory.create(username='george')
     client.force_login(user)
-    url = reverse('post-list', kwargs={'channel_name': 'a_channel'})
+    url = reverse('post-list', kwargs={'channel_name': 'subreddit_for_testing'})
     resp = client.post(url, {
-        'title': 'new post without upvote',
-        'text': 'post for testing clear_vote',
+        'title': 'x',
+        'text': 'y',
         'upvoted': False,
     })
     assert resp.status_code == 201
     assert resp.json() == {
-        'title': 'new post without upvote',
-        'text': 'post for testing clear_vote',
+        'title': 'x',
+        'text': 'y',
         'url': None,
         'author_id': user.username,
-        'created': '2017-07-25T17:57:07+00:00',
+        'created': '2017-07-25T22:05:44+00:00',
         'upvoted': False,
-        'id': '3',
+        'id': '5',
         'num_comments': 0,
         'score': 1,
-        'channel_name': 'a_channel',
+        'channel_name': 'subreddit_for_testing',
     }
+
+
+def test_list_comments(client, use_betamax, praw_settings):
+    """List all comments in the comment tree"""
+    client.force_login(UserFactory.create(username='george'))
+    url = reverse('comment-list', kwargs={'post_id': '2'})
+    resp = client.get(url)
+    assert resp.status_code == 200
+    assert resp.json() == [
+        {
+            "id": "1",
+            "post_id": "2",
+            "text": "hello world",
+            "author_id": "george",
+            "score": 1,
+            "upvoted": False,
+            "created": "2017-07-25T17:09:45+00:00",
+            "replies": [
+                {
+                    "id": "2",
+                    "post_id": "2",
+                    "text": "texty text text",
+                    "author_id": "george",
+                    "score": 1,
+                    "upvoted": True,
+                    "created": "2017-07-25T17:15:57+00:00",
+                    "replies": []
+                },
+                {
+                    "id": "3",
+                    "post_id": "2",
+                    "text": "reply2",
+                    "author_id": "george",
+                    "score": 1,
+                    "upvoted": True,
+                    "created": "2017-07-25T17:16:10+00:00",
+                    "replies": []
+                }
+            ]
+        }
+    ]
+
+
+def test_get_comment(client, use_betamax, praw_settings):
+    """View a comment's detail view"""
+    client.force_login(UserFactory.create(username='george'))
+    url = reverse('comment-detail', kwargs={'comment_id': '6'})
+    resp = client.get(url)
+    assert resp.status_code == 200
+    assert resp.json() == {
+        "id": "6",
+        "post_id": "2",
+        "text": "reply_to_comment 3",
+        "author_id": "george",
+        "score": 1,
+        "upvoted": True,
+        "created": "2017-07-25T21:18:47+00:00",
+        "replies": []
+    }
+
+
+def test_create_comment(client, use_betamax, praw_settings):
+    """Create a comment"""
+    client.force_login(UserFactory.create(username='george'))
+    post_id = '2'
+    url = reverse('comment-list', kwargs={'post_id': post_id})
+    resp = client.post(url, data={
+        "text": "reply_to_post 2",
+    })
+    assert resp.status_code == 201
+    assert resp.json() == {
+        'author_id': 'george',
+        'created': '2017-07-25T21:20:35+00:00',
+        'id': '7',
+        'post_id': post_id,
+        'replies': [],
+        'score': 1,
+        'text': 'reply_to_post 2',
+        'upvoted': True,
+    }
+
+
+def test_create_comment_no_upvote(client, use_betamax, praw_settings):
+    """Create a comment without an upvote"""
+    client.force_login(UserFactory.create(username='george'))
+    post_id = '2'
+    url = reverse('comment-list', kwargs={'post_id': post_id})
+    resp = client.post(url, data={
+        "text": "no upvoted",
+        "upvoted": False,
+    })
+    assert resp.status_code == 201
+    assert resp.json() == {
+        'author_id': 'george',
+        'created': '2017-07-25T21:21:48+00:00',
+        'id': '9',
+        'post_id': post_id,
+        'replies': [],
+        'score': 1,
+        'text': 'no upvoted',
+        'upvoted': False,
+    }
+
+
+def test_create_comment_reply_to_comment(client, use_betamax, praw_settings):
+    """Create a comment that's a reply to another comment"""
+    client.force_login(UserFactory.create(username='george'))
+    post_id = '2'
+    url = reverse('comment-list', kwargs={'post_id': post_id})
+    resp = client.post(url, data={
+        "text": "reply_to_comment 3",
+        "comment_id": "3",
+    })
+    assert resp.status_code == 201
+    assert resp.json() == {
+        'author_id': 'george',
+        'created': '2017-07-25T21:18:47+00:00',
+        'id': '6',
+        'post_id': post_id,
+        'replies': [],
+        'score': 1,
+        'text': 'reply_to_comment 3',
+        'upvoted': True,
+    }
+
+
+def test_update_comment_text(client, use_betamax, praw_settings):
+    """Update a comment's text"""
+    client.force_login(UserFactory.create(username='george'))
+    url = reverse('comment-detail', kwargs={'comment_id': '6'})
+    resp = client.patch(url, type='json', data={
+        "text": "updated text",
+    })
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'author_id': 'george',
+        'created': '2017-07-25T21:18:47+00:00',
+        'id': '6',
+        'post_id': '2',
+        'replies': [],
+        'score': 1,
+        'text': 'updated text',
+        'upvoted': False,
+    }
+
+
+def test_update_comment_clear_vote(client, use_betamax, praw_settings):
+    """Update a comment to clear its upvote"""
+    client.force_login(UserFactory.create(username='george'))
+    url = reverse('comment-detail', kwargs={'comment_id': '6'})
+    resp = client.patch(url, type='json', data={
+        "upvoted": False,
+    })
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'author_id': 'george',
+        'created': '2017-07-25T21:18:47+00:00',
+        'id': '6',
+        'post_id': '2',
+        'replies': [],
+        'score': 1,
+        'text': 'reply_to_comment 3',
+        'upvoted': False,
+    }
+
+
+def test_delete_comment(client, use_betamax, praw_settings):
+    """Delete a comment"""
+    client.force_login(UserFactory.create(username='george'))
+    url = reverse('comment-detail', kwargs={'comment_id': '6'})
+    resp = client.delete(url)
+    assert resp.status_code == 204
