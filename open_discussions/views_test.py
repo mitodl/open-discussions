@@ -22,6 +22,7 @@ class ViewsTest(TestCase):
 
         bundles = [bundle[0][1] for bundle in get_bundle.call_args_list]
         assert set(bundles) == {
+            'common',
             'root',
             'style',
         }
