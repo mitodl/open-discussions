@@ -11,6 +11,7 @@ import CommentTree from "../components/CommentTree"
 import { ReplyToPostForm } from "../components/CreateCommentForm"
 
 import { actions } from "../actions"
+import { toggleUpvote } from "../util/api_actions"
 import { anyProcessing, allLoaded } from "../util/rest"
 
 import type { Dispatch } from "redux"
@@ -60,10 +61,12 @@ class PostPage extends React.Component {
     }
   }
 
-  renderContents(postID, posts, channelName, channels, comments, forms) {
-    const post = posts.get(postID)
-    const channel = channels.get(channelName)
-    const commentTreeData = comments.get(postID)
+  renderContents = () => {
+    const { posts, channels, comments, forms, dispatch } = this.props
+    const [postId, channelName] = this.getMatchParams()
+    const post = posts.data.get(postId)
+    const channel = channels.data.get(channelName)
+    const commentTreeData = comments.data.get(postId)
 
     if (R.isNil(channel) || R.isNil(post) || R.isNil(commentTreeData)) {
       return null
@@ -73,7 +76,7 @@ class PostPage extends React.Component {
         <ChannelBreadcrumbs channel={channel} />
         <div className="first-column">
           <Card>
-            <PostDisplay post={post} expanded />
+            <PostDisplay post={post} toggleUpvote={toggleUpvote(dispatch)} expanded />
             <ReplyToPostForm forms={forms} post={post} />
           </Card>
           <CommentTree comments={commentTreeData} forms={forms} />
@@ -83,15 +86,8 @@ class PostPage extends React.Component {
   }
 
   render() {
-    const { posts, channels, comments, forms } = this.props
-    const [postId, channelName] = this.getMatchParams()
-
-    return (
-      <Loading
-        restStates={[posts, channels, comments]}
-        renderContents={() => this.renderContents(postId, posts.data, channelName, channels.data, comments.data, forms)}
-      />
-    )
+    const { posts, channels, comments } = this.props
+    return <Loading restStates={[posts, channels, comments]} renderContents={this.renderContents} />
   }
 }
 

@@ -5,20 +5,23 @@ import PostDisplay from "./PostDisplay"
 
 import type { Post } from "../flow/discussionTypes"
 
-const renderPosts = (posts, showChannelLinks) =>
-  posts.map((post, index) => <PostDisplay post={post} key={index} showChannelLink={showChannelLinks} />)
+const renderPosts = (posts, showChannelLinks, toggleUpvote) =>
+  posts.map((post, index) =>
+    <PostDisplay post={post} key={index} showChannelLink={showChannelLinks} toggleUpvote={toggleUpvote} />
+  )
 
 type PostListProps = {
   posts: Array<Post>,
-  showChannelLinks?: boolean
+  showChannelLinks?: boolean,
+  toggleUpvote: Post => void
 }
 
 const PostList = (props: PostListProps) => {
-  const { posts, showChannelLinks } = props
+  const { posts, showChannelLinks, toggleUpvote } = props
 
   return (
     <div className="post-list">
-      {renderPosts(posts, showChannelLinks)}
+      {renderPosts(posts, showChannelLinks, toggleUpvote)}
     </div>
   )
 }

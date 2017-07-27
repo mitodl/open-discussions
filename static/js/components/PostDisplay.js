@@ -1,6 +1,7 @@
 // @flow
 import React from "react"
 import moment from "moment"
+import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 
 import { postDetailURL } from "../lib/url"
@@ -21,11 +22,23 @@ const postTitle = (post: Post) =>
       {post.title}
     </a>
 
-export default class PostDisplay extends React.Component {
+class PostDisplay extends React.Component {
   props: {
     post: Post,
     showChannelLink?: boolean,
-    expanded?: boolean
+    expanded?: boolean,
+    toggleUpvote: Post => void
+  }
+
+  state: {
+    upvoting: boolean
+  }
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      upvoting: false
+    }
   }
 
   showChannelLink = () => {
@@ -38,13 +51,28 @@ export default class PostDisplay extends React.Component {
       : null
   }
 
+  onToggleUpvote = async () => {
+    const { toggleUpvote, post } = this.props
+    this.setState({
+      upvoting: true
+    })
+    await toggleUpvote(post)
+    this.setState({
+      upvoting: false
+    })
+  }
+
   render() {
     const { post, expanded } = this.props
+    const { upvoting } = this.state
     const formattedDate = moment(post.created).fromNow()
+    const upvoteClass = post.upvoted ? "upvoted" : ""
     return (
       <div className="post-summary">
-        <div className="upvotes">
-          <button> &uArr;</button>
+        <div className={`upvotes ${upvoteClass}`}>
+          <button className="upvote-button" onClick={this.onToggleUpvote} disabled={upvoting}>
+            {" "}&uArr;
+          </button>
           <span className="votes">
             {post.score}
           </span>
@@ -67,3 +95,9 @@ export default class PostDisplay extends React.Component {
     )
   }
 }
+
+const mapStateToProps = state => ({
+  posts: state.posts
+})
+
+export default connect(mapStateToProps)(PostDisplay)

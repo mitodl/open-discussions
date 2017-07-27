@@ -13,6 +13,7 @@ import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 import { safeBulkGet } from "../lib/maps"
 import { getChannelName } from "../lib/util"
+import { toggleUpvote } from "../util/api_actions"
 
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -35,7 +36,9 @@ class ChannelPage extends React.Component {
     })
   }
 
-  renderContents(channelName, channels, postsForChannel, posts) {
+  renderContents = () => {
+    const { channels, postsForChannel, posts, dispatch } = this.props
+    const channelName = getChannelName(this.props)
     const channel = channels.data.get(channelName)
     const postIds = postsForChannel.data.get(channelName)
 
@@ -47,7 +50,11 @@ class ChannelPage extends React.Component {
           <ChannelBreadcrumbs channel={channel} />
           <div className="first-column">
             <Card title={channel.title}>
-              <PostList channel={channel} posts={safeBulkGet(postIds, posts.data)} />
+              <PostList
+                channel={channel}
+                posts={safeBulkGet(postIds, posts.data)}
+                toggleUpvote={toggleUpvote(dispatch)}
+              />
             </Card>
           </div>
           <div className="second-column">
@@ -62,15 +69,8 @@ class ChannelPage extends React.Component {
   }
 
   render() {
-    const { channels, postsForChannel, posts } = this.props
-    const channelName = getChannelName(this.props)
-
-    return (
-      <Loading
-        restStates={[channels, postsForChannel]}
-        renderContents={() => this.renderContents(channelName, channels, postsForChannel, posts)}
-      />
-    )
+    const { channels, postsForChannel } = this.props
+    return <Loading restStates={[channels, postsForChannel]} renderContents={this.renderContents} />
   }
 }
 

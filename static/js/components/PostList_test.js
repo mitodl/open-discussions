@@ -8,7 +8,8 @@ import PostDisplay from "./PostDisplay"
 import { makeChannelPostList } from "../factories/posts"
 
 describe("PostList", () => {
-  const renderPostList = (props = { posts: makeChannelPostList() }) => shallow(<PostList {...props} />)
+  const renderPostList = (props = { posts: makeChannelPostList() }) =>
+    shallow(<PostList toggleUpvote={() => {}} {...props} />)
 
   it("should render a list of posts", () => {
     let wrapper = renderPostList()

@@ -1,14 +1,35 @@
 // @flow
 import React from "react"
 import { assert } from "chai"
-import { shallow } from "enzyme"
+import { mount } from "enzyme"
 import { Link } from "react-router-dom"
 
 import { makePost } from "../factories/posts"
+import IntegrationTestHelper from "../util/integration_test_helper"
 import PostDisplay from "./PostDisplay"
+import Router from "../Router"
 
 describe("PostDisplay", () => {
-  const renderPostDisplay = props => shallow(<PostDisplay {...props} />)
+  let helper
+  const renderPostDisplay = props => {
+    props = {
+      toggleUpvote: () => {},
+      ...props
+    }
+    return mount(
+      <Router store={helper.store} history={helper.browserHistory}>
+        <PostDisplay {...props} />
+      </Router>
+    )
+  }
+
+  beforeEach(() => {
+    helper = new IntegrationTestHelper()
+  })
+
+  afterEach(() => {
+    helper.cleanup()
+  })
 
   it("should render a post correctly", () => {
     const post = makePost()
@@ -60,5 +81,13 @@ describe("PostDisplay", () => {
     const { to, children } = wrapper.find(Link).at(0).props()
     assert.equal(children, post.title)
     assert.equal(to, `/channel/${post.channel_name}/${post.id}`)
+  })
+
+  it("should call the toggleUpvote function when it is clicked", () => {
+    let post = makePost()
+    const toggleUpvote = helper.sandbox.stub()
+    const wrapper = renderPostDisplay({ post: post, toggleUpvote: toggleUpvote })
+    wrapper.find(".upvote-button").simulate("click")
+    assert.isOk(toggleUpvote.calledOnce)
   })
 })
