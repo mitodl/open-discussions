@@ -24,6 +24,10 @@ const devConfig = Object.assign({}, config, {
         'NODE_ENV': '"development"'
       }
     }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'common',
+      minChunks: 2,
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
