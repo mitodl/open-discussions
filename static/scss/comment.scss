@@ -1,0 +1,24 @@
+.comments {
+  .top-level-comment {
+    padding: 15px 0;
+  }
+
+  .comment {
+    margin: 15px 0;
+
+    .author-info {
+      display: flex;
+      flex-direction: row;
+      font-size: 13px;
+      padding-bottom: 8px;
+
+      .author-name {
+        padding-right: 4px;
+      }
+    }
+
+    .replies > .comment {
+      margin-left: 25px;
+    }
+  }
+}

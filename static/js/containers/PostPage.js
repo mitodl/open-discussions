@@ -7,6 +7,7 @@ import Card from "../components/Card"
 import Loading from "../components/Loading"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import PostDisplay from "../components/PostDisplay"
+import CommentTree from "../components/CommentTree"
 
 import { actions } from "../actions"
 import { anyProcessing, allLoaded } from "../util/rest"
@@ -19,7 +20,8 @@ class PostPage extends React.Component {
     match: Match,
     dispatch: Dispatch,
     posts: Object,
-    channels: Object
+    channels: Object,
+    comments: Object
   }
 
   getMatchParams = () => {
@@ -28,12 +30,19 @@ class PostPage extends React.Component {
   }
 
   updateRequirements = () => {
-    const { dispatch, channels, posts } = this.props
+    const { dispatch, channels, posts, comments } = this.props
     const [postID, channelName] = this.getMatchParams()
 
     if (R.isNil(posts.data.get(postID)) && R.isNil(posts.error)) {
-      dispatch(actions.posts.get(postID))
+      dispatch(actions.posts.get(postID)).then(post => {
+        dispatch(actions.comments.get(post))
+      })
+    } else {
+      if (R.isNil(comments.data.get(postID))) {
+        dispatch(actions.comments.get(posts.data.get(postID)))
+      }
     }
+
     if (R.isNil(channels.data.get(channelName)) && R.isNil(channels.error)) {
       dispatch(actions.channels.get(channelName))
     }
@@ -44,19 +53,20 @@ class PostPage extends React.Component {
   }
 
   componentDidUpdate() {
-    const { channels, posts } = this.props
-    let restStates = [channels, posts]
+    const { channels, posts, comments } = this.props
+    let restStates = [channels, posts, comments]
 
     if (!anyProcessing(restStates) || allLoaded(restStates)) {
       this.updateRequirements()
     }
   }
 
-  renderContents(postID, posts, channelName, channels) {
+  renderContents(postID, posts, channelName, channels, comments) {
     const post = posts.get(postID)
     const channel = channels.get(channelName)
+    const commentTreeData = comments.get(postID)
 
-    if (R.isNil(channel) || R.isNil(post)) {
+    if (R.isNil(channel) || R.isNil(post) || R.isNil(commentTreeData)) {
       return null
     }
     return (
@@ -66,19 +76,20 @@ class PostPage extends React.Component {
           <Card>
             <PostDisplay post={post} expanded />
           </Card>
+          <CommentTree comments={commentTreeData} />
         </div>
       </div>
     )
   }
 
   render() {
-    const { posts, channels } = this.props
+    const { posts, channels, comments } = this.props
     const [postId, channelName] = this.getMatchParams()
 
     return (
       <Loading
-        restStates={[posts, channels]}
-        renderContents={() => this.renderContents(postId, posts.data, channelName, channels.data)}
+        restStates={[posts, channels, comments]}
+        renderContents={() => this.renderContents(postId, posts.data, channelName, channels.data, comments.data)}
       />
     )
   }
@@ -86,7 +97,8 @@ class PostPage extends React.Component {
 
 const mapStateToProps = state => ({
   posts:    state.posts,
-  channels: state.channels
+  channels: state.channels,
+  comments: state.comments
 })
 
 export default connect(mapStateToProps)(PostPage)
