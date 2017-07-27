@@ -98,7 +98,7 @@ describe("reducers", () => {
       return dispatchThen(actions.channels.get("wowowowow"), [requestType, successType]).then(channels => {
         let channel = channels.data.get("wowowowow")
         assert.isString(channel.name)
-        assert.equal(channel.theme_type, "public")
+        assert.equal(channel.channel_type, "public")
       })
     })
 

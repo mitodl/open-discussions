@@ -2,9 +2,10 @@
 import { assert } from "chai"
 import sinon from "sinon"
 
-import { getChannel, getFrontpage, getPost, getPostsForChannel } from "./api"
+import { createChannel, getChannel, getFrontpage, getPost, getPostsForChannel } from "./api"
 import { makeChannel } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
+import { POST } from "redux-hammock/constants"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
 describe("api", function() {
@@ -45,6 +46,30 @@ describe("api", function() {
 
       return getChannel("channelone").then(result => {
         assert.ok(fetchStub.calledWith("/api/v0/channels/channelone/"))
+        assert.deepEqual(result, channel)
+      })
+    })
+
+    it("creates a channel", () => {
+      const channel = makeChannel()
+      fetchStub.returns(Promise.resolve(channel))
+
+      const input = {
+        name:               "name",
+        title:              "title",
+        public_description: "public_description",
+        channel_type:       "public"
+      }
+
+      return createChannel(input).then(result => {
+        assert.ok(
+          fetchStub.calledWith(`/api/v0/channels/`, {
+            method: POST,
+            body:   JSON.stringify({
+              ...input
+            })
+          })
+        )
         assert.deepEqual(result, channel)
       })
     })

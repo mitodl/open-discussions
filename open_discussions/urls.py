@@ -28,6 +28,7 @@ urlpatterns = [
     # React App
     url(r'^$', index, name='open_discussions-index'),
     url(r'^channel/', index),
+    url(r'^manage/', index),
 ]
 
 if settings.DEBUG:

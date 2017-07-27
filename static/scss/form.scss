@@ -1,0 +1,15 @@
+.form {
+  padding: 10px;
+
+  .form-item {
+    padding-bottom: 10px;
+
+    .label, .input {
+      display: block;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+  }
+}

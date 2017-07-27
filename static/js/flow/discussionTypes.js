@@ -1,10 +1,13 @@
 // @flow
+
+export type ChannelType = "private" | "public";
+
 export type Channel = {
   name:               string,
   title:              string,
   public_description: string,
-  theme_type:         string,
-  num_users:          number,
+  channel_type:       ChannelType,
+  num_users?:         number,
 }
 
 export type Post = {
