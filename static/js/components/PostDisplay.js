@@ -1,66 +1,67 @@
 // @flow
-import React from 'react';
-import moment from 'moment';
-import { Link } from 'react-router-dom';
+import React from "react"
+import moment from "moment"
+import { Link } from "react-router-dom"
 
-import { postDetailURL } from '../lib/url';
+import { postDetailURL } from "../lib/url"
 
-import type { Post } from '../flow/discussionTypes';
+import type { Post } from "../flow/discussionTypes"
 
-const textContent = post => (
+const textContent = post =>
   <div className="text-content-border">
     <div className="text-content">
-      { post.text }
+      {post.text}
     </div>
   </div>
-);
 
 const postTitle = (post: Post) =>
   post.text
     ? <Link className="post-title" to={postDetailURL(post.channel_name, post.id)}>
-      { post.title }
+      {post.title}
     </Link>
     : <a className="post-title" href={post.url} target="_blank">
-      { post.title }
-    </a>;
+      {post.title}
+    </a>
 
 export default class PostDisplay extends React.Component {
   props: {
-    post:             Post,
+    post: Post,
     showChannelLink?: boolean,
-    expanded?:        boolean,
+    expanded?: boolean
   }
 
   showChannelLink = () => {
-    const { post, showChannelLink } = this.props;
+    const { post, showChannelLink } = this.props
 
     return showChannelLink && post.channel_name
       ? <Link to={`/channel/${post.channel_name}`}>
-        on {post.channel_name}
+          on {post.channel_name}
       </Link>
-      : null;
+      : null
   }
 
   render() {
-    const { post, expanded } = this.props;
-    const formattedDate = moment(post.created).fromNow();
+    const { post, expanded } = this.props
+    const formattedDate = moment(post.created).fromNow()
     return (
       <div className="post-summary">
         <div className="upvotes">
           <button> &uArr;</button>
-          <span className="votes">{post.score}</span>
+          <span className="votes">
+            {post.score}
+          </span>
         </div>
         <div className="summary">
-          { postTitle(post) }
+          {postTitle(post)}
           <div className="authored-by">
-            by <a>{post.author_id || 'someone'}</a>, {formattedDate} { this.showChannelLink() }
+            by <a>{post.author_id || "someone"}</a>, {formattedDate} {this.showChannelLink()}
           </div>
           <Link className="num-comments" to={postDetailURL(post.channel_name, post.id)}>
             {post.num_comments || 0} Comments
           </Link>
         </div>
-        { (expanded && post.text) ? textContent(post) : null }
+        {expanded && post.text ? textContent(post) : null}
       </div>
-    );
+    )
   }
 }

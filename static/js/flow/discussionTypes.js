@@ -5,7 +5,7 @@ export type Channel = {
   public_description: string,
   theme_type:         string,
   num_users:          number,
-};
+}
 
 export type Post = {
   id:            string,
@@ -18,7 +18,7 @@ export type Post = {
   created:       string,
   num_comments:  number,
   channel_name:  string,
-};
+}
 
 export type Comment = {
   id:        string,
@@ -29,4 +29,4 @@ export type Comment = {
   created:   string,
   replies:   Array<Comment>,
   author_id: string,
-};
+}

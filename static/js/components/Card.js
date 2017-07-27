@@ -1,16 +1,15 @@
 // @flow
-import React from 'react';
+import React from "react"
 
 type CardProps = {
-  children: React$Element<*>,
-};
+  children: React$Element<*>
+}
 
-const Card = ({ children }: CardProps) => (
+const Card = ({ children }: CardProps) =>
   <div className="card">
     <div className="content">
-      { children }
+      {children}
     </div>
   </div>
-);
 
-export default Card;
+export default Card

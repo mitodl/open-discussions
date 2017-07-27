@@ -6,7 +6,7 @@ export type RestState<T> = {
   processing: boolean,
   loaded: boolean,
   getStatus?: string,
-};
+}
 
 export type Endpoint = {
   name:                  string,
@@ -28,4 +28,4 @@ export type Endpoint = {
   verbs:                 Array<string>,
   initialState?:         Object,
   usernameInitialState?: Object,
-};
+}

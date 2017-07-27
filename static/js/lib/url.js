@@ -1,5 +1,3 @@
 // @flow
 
-export const postDetailURL = (channelName: string, postID: string) => (
-  `/channel/${channelName}/${postID}`
-);
+export const postDetailURL = (channelName: string, postID: string) => `/channel/${channelName}/${postID}`

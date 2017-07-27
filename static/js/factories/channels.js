@@ -1,10 +1,10 @@
 // @flow
-import casual from 'casual-browserify';
+import casual from "casual-browserify"
 
 export const makeChannel = (privateChannel: boolean = false) => ({
-  name: casual.word,
-  title: casual.title,
-  theme_type: privateChannel ? "private" : "public",
+  name:               casual.word,
+  title:              casual.title,
+  theme_type:         privateChannel ? "private" : "public",
   public_description: casual.description,
-  num_users: casual.integer(0, 500),
-});
+  num_users:          casual.integer(0, 500)
+})

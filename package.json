@@ -53,6 +53,7 @@
     "nyc": "^11.0.3",
     "object.entries": "^1.0.4",
     "postcss-loader": "^2.0.6",
+    "prettier-eslint-cli": "^4.1.1",
     "prop-types": "^15.5.10",
     "ramda": "^0.24.1",
     "react": "^15.6.1",
@@ -93,6 +94,7 @@
     "coverage": "COVERAGE=1 ./scripts/test/js_test.sh",
     "codecov": "CODECOV=1 ./scripts/test/js_test.sh",
     "watch": "WATCH=1 ./scripts/test/js_test.sh",
-    "flow": "flow check"
+    "flow": "flow check",
+    "fmt": "prettier-eslint --write --no-semi --ignore 'static/js/flow/**/*.js' 'static/js/**/*.js'"
   }
 }
