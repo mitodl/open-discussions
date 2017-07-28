@@ -1,0 +1,21 @@
+.new-post-card {
+  .content {
+    .row {
+      margin: 30px 10px;
+      display: flex;
+      flex-direction: row;
+
+      div,button {
+        margin: 5px;
+      }
+
+      .active {
+        font-weight: 700;
+      }
+
+      &.post-types>div {
+        cursor: pointer;
+      }
+    }
+  }
+}

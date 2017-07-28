@@ -6,6 +6,7 @@ import HomePage from "./HomePage"
 import ChannelPage from "./ChannelPage"
 import PostPage from "./PostPage"
 import AdminPage from "./admin/AdminPage"
+import CreatePostPage from "./CreatePostPage"
 
 import type { Match } from "react-router"
 
@@ -22,6 +23,7 @@ export default class App extends React.Component {
         <Route exact path={`${match.url}channel/:channelName`} component={ChannelPage} />
         <Route path={`${match.url}channel/:channelName/:postID`} component={PostPage} />
         <Route path={`${match.url}manage/`} component={AdminPage} />
+        <Route path={`${match.url}create_post/:channelName`} component={CreatePostPage} />
       </div>
     )
   }

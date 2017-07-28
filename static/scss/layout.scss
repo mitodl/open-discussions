@@ -4,6 +4,7 @@
 @import "form";
 @import "post";
 @import "card";
+@import "createPost";
 @import "sidebar";
 @import "comment";
 
@@ -17,6 +18,11 @@ body {
 
   a {
     color: $link-blue;
+  }
+
+  .single-column {
+    margin: auto;
+    width: 700px;  // arbitrarily chosen
   }
 
   .double-column {

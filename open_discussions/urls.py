@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^$', index, name='open_discussions-index'),
     url(r'^channel/', index),
     url(r'^manage/', index),
+    url(r'^create_post/', index),
 ]
 
 if settings.DEBUG:

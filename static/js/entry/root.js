@@ -4,6 +4,7 @@ __webpack_public_path__ = SETTINGS.public_path // eslint-disable-line no-undef, 
 import React from "react"
 import ReactDOM from "react-dom"
 import { AppContainer } from "react-hot-loader"
+import { createBrowserHistory } from "history"
 
 import configureStore from "../store/configureStore"
 import Router, { routes } from "../Router"
@@ -19,9 +20,10 @@ const store = configureStore()
 const rootEl = document.getElementById("container")
 
 const renderApp = Component => {
+  const history = createBrowserHistory()
   ReactDOM.render(
     <AppContainer>
-      <Component store={store}>
+      <Component store={store} history={history}>
         {routes}
       </Component>
     </AppContainer>,

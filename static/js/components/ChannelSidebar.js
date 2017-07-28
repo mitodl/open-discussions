@@ -1,18 +1,23 @@
 // @flow
 import React from "react"
+import { Link } from "react-router-dom"
 
+import { newPostURL } from '../lib/url'
 import type { Channel } from "../flow/discussionTypes"
 
 export default class ChannelSidebar extends React.Component {
   props: {
     channel: Channel
   }
+
   render() {
     const { channel } = this.props
 
     return (
       <div className="sidebar">
-        <button className="new-post">Submit a New Post</button>
+        <Link to={newPostURL(channel.name)} className="new-post">
+          Submit a New Post
+        </Link>
         <h3 className="title">
           {channel.title}
         </h3>

@@ -23,6 +23,19 @@ export type Post = {
   channel_name:  string,
 }
 
+export type PostForm = {
+  isText: boolean,
+  text:   string,
+  url:    string,
+  title:  string,
+}
+
+export type CreatePostPayload = {
+  url?: string,
+  text?: string,
+  title: string,
+};
+
 export type Comment = {
   id:        string,
   post_id:   string,
