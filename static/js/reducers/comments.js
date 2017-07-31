@@ -1,18 +1,29 @@
 // @flow
-import { GET, INITIAL_STATE } from "redux-hammock/constants"
+import { GET, POST, INITIAL_STATE } from "redux-hammock/constants"
 
-import { makeCommentTree } from "../factories/comments"
+import * as api from "../lib/api"
 
-import type { Comment, Post } from "../flow/discussionTypes.js"
+import type { Comment } from "../flow/discussionTypes.js"
+
+export type CommentResponse = {
+  postID: string,
+  data: Array<Comment>
+}
 
 export const commentsEndpoint = {
   name:              "comments",
-  verbs:             [GET],
-  getFunc:           async (post: Post) => makeCommentTree(post),
+  verbs:             [GET, POST],
+  getFunc:           (postID: string) => api.getComments(postID),
   initialState:      { ...INITIAL_STATE, data: new Map() },
-  getSuccessHandler: (comments: Array<Comment>, data: Map<string, Array<Comment>>) => {
+  getSuccessHandler: (response: CommentResponse, data: Map<string, Array<Comment>>) => {
     let update = new Map(data)
-    update.set(comments[0].post_id, comments)
+    update.set(response.postID, response.data)
     return update
+  },
+  postFunc: (postID: string, comment: string, commentId: ?string) => {
+    return api.createComment(postID, comment, commentId)
+  },
+  postSuccessHandler: (payload: Comment, data: Map<string, Comment>) => {
+    return new Map(data)
   }
 }

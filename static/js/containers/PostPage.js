@@ -34,15 +34,11 @@ class PostPage extends React.Component {
     const [postID, channelName] = this.getMatchParams()
 
     if (R.isNil(posts.data.get(postID)) && R.isNil(posts.error)) {
-      dispatch(actions.posts.get(postID)).then(post => {
-        dispatch(actions.comments.get(post))
-      })
-    } else {
-      if (R.isNil(comments.data.get(postID))) {
-        dispatch(actions.comments.get(posts.data.get(postID)))
-      }
+      dispatch(actions.posts.get(postID))
     }
-
+    if (R.isNil(comments.data.get(postID)) && R.isNil(comments.error)) {
+      dispatch(actions.comments.get(postID))
+    }
     if (R.isNil(channels.data.get(channelName)) && R.isNil(channels.error)) {
       dispatch(actions.channels.get(channelName))
     }

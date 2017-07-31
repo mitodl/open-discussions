@@ -1,12 +1,13 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
-
-import { createChannel, getChannel, getFrontpage, getPost, getPostsForChannel } from "./api"
-import { makeChannel } from "../factories/channels"
-import { makeChannelPostList, makePost } from "../factories/posts"
 import { POST } from "redux-hammock/constants"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
+
+import { createChannel, getChannel, getFrontpage, getPost, getPostsForChannel, getComments, createComment } from "./api"
+import { makeChannel } from "../factories/channels"
+import { makeChannelPostList, makePost } from "../factories/posts"
+import { makeCommentTree } from "../factories/comments"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
@@ -91,6 +92,46 @@ describe("api", function() {
       return getFrontpage().then(result => {
         assert.ok(fetchStub.calledWith(`/api/v0/frontpage/`))
         assert.deepEqual(result, posts)
+      })
+    })
+
+    it("gets comments for a post", () => {
+      const post = makePost()
+      const tree = makeCommentTree(post)
+      fetchStub.returns(Promise.resolve(tree))
+
+      return getComments(post.id).then(resp => {
+        assert.deepEqual(resp.data, tree)
+      })
+    })
+
+    it("creates comments for a post", () => {
+      const post = makePost()
+      fetchStub.returns(Promise.resolve())
+
+      return createComment(post.id, "my new comment").then(() => {
+        assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/comments/`))
+        assert.deepEqual(fetchStub.args[0][1], {
+          method: POST,
+          body:   JSON.stringify({ text: "my new comment" })
+        })
+      })
+    })
+
+    it("creates commments replying to comments", () => {
+      const post = makePost()
+      const tree = makeCommentTree(post)
+      fetchStub.returns(Promise.resolve())
+
+      return createComment(post.id, "my new comment", tree[0].id).then(() => {
+        assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/comments/`))
+        assert.deepEqual(fetchStub.args[0][1], {
+          method: POST,
+          body:   JSON.stringify({
+            text:       "my new comment",
+            comment_id: tree[0].id
+          })
+        })
       })
     })
   })
