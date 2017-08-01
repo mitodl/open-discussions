@@ -5,13 +5,24 @@ import sinon from "sinon"
 import { shallow } from "enzyme"
 
 import ChannelEditForm from "./ChannelEditForm"
-import { CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_PRIVATE, newChannel } from "../../lib/channels"
+import {
+  CHANNEL_TYPE_PUBLIC,
+  CHANNEL_TYPE_PRIVATE,
+  newChannel
+} from "../../lib/channels"
 
-import type { Channel } from "../../flow/discussionTypes"
+import type { ChannelEditable } from "../../flow/discussionTypes"
 
 describe("ChannelEditForm", () => {
-  const renderForm = (channel: ?Channel, { onSubmit, onUpdate } = { onSubmit: () => {}, onUpdate: () => {} }) =>
-    shallow(<ChannelEditForm channel={channel} onSubmit={onSubmit} onUpdate={onUpdate} />)
+  const renderForm = (
+    channel: ?ChannelEditable,
+    { onSubmit, onUpdate } = { onSubmit: () => {}, onUpdate: () => {}}) => shallow(
+    <ChannelEditForm
+      channel={channel}
+      onSubmit={onSubmit}
+      onUpdate={onUpdate}
+    />
+  )
   let sandbox, channel
 
   beforeEach(() => {
@@ -29,9 +40,9 @@ describe("ChannelEditForm", () => {
 
   it("should render a blank form", () => {
     let wrapper = renderForm(channel)
-    let [title, name] = wrapper.find('input[type="text"]')
+    let [title, name] = wrapper.find("input[type='text']")
     let [description] = wrapper.find("textarea")
-    let [radioPublic, radioPrivate] = wrapper.find('input[type="radio"]')
+    let [radioPublic, radioPrivate] = wrapper.find("input[type='radio']")
     assert.equal(title.props.value, "")
     assert.equal(name.props.value, "")
     assert.equal(description.props.value, "")
@@ -60,7 +71,7 @@ describe("ChannelEditForm", () => {
     describe("onUpdate", () => {
       for (let inputName of ["title", "name", "public_description"]) {
         it(`should be called when ${inputName} input is modified`, () => {
-          let event = { target: { value: "text" } }
+          let event = { target: { value: "text" }}
           assert.isNotOk(onSubmit.called)
           wrapper.find(`[name="${inputName}"]`).simulate("change", event)
           assert.isOk(onUpdate.calledWith(event))
@@ -69,7 +80,7 @@ describe("ChannelEditForm", () => {
 
       for (let channelType of [CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC]) {
         it(`should be called when ${channelType} channel_type is clicked`, () => {
-          let event = { target: { value: channelType } }
+          let event = { target: { value: channelType }}
           assert.isNotOk(onSubmit.called)
           wrapper.find(`#channel_${channelType}`).simulate("change", event)
           assert.isOk(onUpdate.calledWith(event))
@@ -77,4 +88,5 @@ describe("ChannelEditForm", () => {
       }
     })
   })
+
 })

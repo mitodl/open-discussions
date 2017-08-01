@@ -8,12 +8,13 @@ import { channelURL } from "../../lib/url"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
+import type { ChannelEditable } from "../../flow/discussionTypes"
 
 class CreateChannelPage extends React.Component {
   props: {
-    dispatch: Dispatch,
-    history: Object,
-    channelForm: FormValue
+    dispatch:     Dispatch,
+    history:      Object,
+    channelForm:  FormValue<ChannelEditable>,
   }
 
   componentWillMount() {
@@ -23,11 +24,9 @@ class CreateChannelPage extends React.Component {
 
   onUpdate = (e: Object) => {
     const { dispatch } = this.props
-    dispatch(
-      actions.forms.channel.update({
-        [e.target.name]: e.target.value
-      })
-    )
+    dispatch(actions.forms.channel.update({
+      [e.target.name]: e.target.value
+    }))
   }
 
   onSubmit = (e: Object) => {
@@ -35,7 +34,7 @@ class CreateChannelPage extends React.Component {
 
     e.preventDefault()
 
-    dispatch(actions.channels.post(channelForm.value)).then(channel => {
+    dispatch(actions.channels.post(channelForm.value)).then((channel) => {
       history.push(channelURL(channel.name))
     })
   }
@@ -45,15 +44,19 @@ class CreateChannelPage extends React.Component {
 
     return (
       <div>
-        <ChannelEditForm onSubmit={this.onSubmit} onUpdate={this.onUpdate} channel={channelForm.value} />
+        <ChannelEditForm
+          onSubmit={this.onSubmit}
+          onUpdate={this.onUpdate}
+          channel={channelForm.value}
+        />
       </div>
     )
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    channelForm: state.channelForm
+    channelForm: state.channelForm,
   }
 }
 

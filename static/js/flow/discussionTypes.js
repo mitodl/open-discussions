@@ -7,8 +7,16 @@ export type Channel = {
   title:              string,
   public_description: string,
   channel_type:       ChannelType,
-  num_users?:         number,
+  num_users:          number,
 }
+
+export type ChannelEditable = {
+  name:               string,
+  title:              string,
+  public_description: string,
+  channel_type:       ChannelType,
+}
+
 
 export type Post = {
   id:            string,
@@ -32,4 +40,10 @@ export type Comment = {
   created:   string,
   replies:   Array<Comment>,
   author_id: string,
+}
+
+export type CommentEditable = {
+  id?:       string,
+  post_id:   string,
+  text:      string,
 }

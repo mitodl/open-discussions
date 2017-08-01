@@ -22,9 +22,9 @@ const INITIAL_STATE = {
   errors: {}
 }
 
-export const deriveReducer = (name: string, newDefaults: () => Object): FormReducer => {
+export const deriveReducer = <T>(name: string, newDefaults: () => T): FormReducer<T> => {
   const actionTypes = deriveActionTypes(name)
-  return (state: FormValue = INITIAL_STATE, action: Action<any, null>): FormValue => {
+  return (state: FormValue<T> = INITIAL_STATE, action: Action<$Subtype<T>, null>): FormValue<T> => {
     switch (action.type) {
     case actionTypes.reset:
     case actionTypes.create:
@@ -35,9 +35,10 @@ export const deriveReducer = (name: string, newDefaults: () => Object): FormRedu
     case actionTypes.update:
       return {
         ...state,
+        // $FlowFixMe: flow doesn't handle the spread operators properly here
         value: {
           ...state.value,
-          ...action.payload
+          ...action.payload,
         }
       }
     }
