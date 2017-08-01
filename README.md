@@ -3,19 +3,38 @@ This provides a discussion forum for use with other MIT applications.
 
 ## Installation specific to this app
 
- - First follow the below steps to set up your local environment
-with Docker.
- - Set up a reddit instance for use as a backing store. See the README
- at https://github.com/mitodl/reddit-config for instructions on how
- to set up reddit to work with open-discussions.
- - Log in to reddit and create a `script` application to fill in your `.env` vars.
-    - Copy the secret/client id to `OPEN_DISCUSSIONS_REDDIT_CLIENT_ID` and `OPEN_DISCUSSIONS_REDDIT_SECRET`
- - Take the client ID, base64 encode it, then add these two lines to `reddit-config/r2/local.update` (creating it first if it doesn't exist):
- 
-       [secrets]
-       generate_refresh_token_client_id = <base64 encoded value here>
+This app uses a similar stack to other mitodl apps (Docker/Django/Webpack). Installation steps that are common to
+all of these apps can be found below, beginning with the [Major Dependencies](#major-dependencies) section. **Those 
+installation steps should be completed before the following steps, which are specific to this app.**
 
- - cd to `reddit-config` and run `vagrant provision` to update your `development.ini` file.
+ 1. Set up a reddit instance for use as a backing store. See the README
+ at https://github.com/mitodl/reddit-config for instructions on how
+ to set up reddit to work with open_discussions.
+ 1. With reddit running in the Vagrant VM, log in and create a `script` application to fill in your `.env` vars.
+    - Navigate to `http://reddit.local/` and click the "Log in or sign up" link on the right side of the screen.
+      - If necessary, create a new account using any credentials (no email needed).
+    - Once logged in, click the "preferences" link on the right side of the screen, then click the "apps" tab.
+    - Click the button to create an app. This will reveal a form.
+    - Select the "script" option for this app. "Name" and "Redirect URL" are required, but the values don't matter. Click
+      "create app" when ready. 
+    - You should see a card with information about the created app. The secret and client id can be copied from here:
+      - Under the app name and "personal use script" subheading is the value for `OPEN_DISCUSSIONS_REDDIT_CLIENT_ID`.
+      - Next to the "secret" label is the value for `OPEN_DISCUSSIONS_REDDIT_SECRET`.
+    - Copy the secret/client id to `OPEN_DISCUSSIONS_REDDIT_CLIENT_ID` and `OPEN_DISCUSSIONS_REDDIT_SECRET` in your 
+      open_discussions `.env` file.
+ 1. Base64-encode the client ID and update reddit-config:
+    - Use `printf` to encode the client ID instead of `echo` to avoid encoding the newline (e.g.: `printf "KEY" | base64`)
+    - Add the following lines to `reddit-config/r2/local.update` (create it if it doesn't exist):
+    
+        ```
+        [secrets]
+        generate_refresh_token_client_id = <base64 encoded value here>
+        ```
+ 
+ 1. cd to `reddit-config` and reload/re-provision the Vagrant VM to update the config with your client ID: 
+    `vagrant reload && vagrant provision`.
+ 1. Run the open_discussions container and navigate to the running site in your browser 
+    ([outlined here](#5-run-the-container)).
 
 ## Major Dependencies
 - Docker
@@ -97,9 +116,7 @@ and add a superuser in the now-running Docker container:
 
     docker-compose run web ./manage.py createsuperuser
 
-You should now be able to do the following:
-
-1. Visit open_discussions in your browser on port `8063`. _(OSX Only)_ Docker auto-assigns
+You should now be able to do visit open_discussions in your browser on port `8063`. _(OSX Only)_ Docker auto-assigns
  the container IP. Run ``docker-machine ip`` to see it. Your open_discussions URL will
  be something like this: ``192.168.99.100:8063``.
 
