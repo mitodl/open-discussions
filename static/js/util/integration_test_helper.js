@@ -2,15 +2,12 @@
 import React from "react"
 import { mount } from "enzyme"
 import sinon from "sinon"
-import { createMemoryHistory } from "react-router"
-import { mergePersistedState } from "redux-localstorage"
-import { compose } from "redux"
+import { createMemoryHistory } from "history"
+import configureTestStore from "redux-asserts"
 
-import TestRouter from "../TestRouter"
+import Router, { routes } from "../Router"
 import * as api from "../lib/api"
 import rootReducer from "../reducers"
-import { testRoutes } from "./test_utils"
-import { configureMainTestStore } from "../store/configureStore"
 import type { Action } from "../flow/reduxTypes"
 import type { TestStore } from "../flow/reduxTypes"
 import type { Sandbox } from "../flow/sinonTypes"
@@ -24,11 +21,10 @@ export default class IntegrationTestHelper {
 
   constructor() {
     this.sandbox = sinon.sandbox.create()
-    this.store = configureMainTestStore((...args) => {
+    this.store = configureTestStore((...args) => {
       // uncomment to listen on dispatched actions
       // console.log(args);
-      const reducer = compose(mergePersistedState())(rootReducer)
-      return reducer(...args)
+      return rootReducer(...args)
     })
 
     // we need this to deal with the 'endpoint' objects, it's now necessary
@@ -40,6 +36,10 @@ export default class IntegrationTestHelper {
     this.listenForActions = this.store.createListenForActions()
     this.dispatchThen = this.store.createDispatchThen()
 
+    this.getChannelStub = this.sandbox.stub(api, "getChannel")
+    this.getChannelStub.throws(new Error("not implemented"))
+    this.createPostStub = this.sandbox.stub(api, "createPost")
+    this.createPostStub.throws(new Error("not implemented"))
     this.scrollIntoViewStub = this.sandbox.stub()
     window.HTMLDivElement.prototype.scrollIntoView = this.scrollIntoViewStub
     window.HTMLFieldSetElement.prototype.scrollIntoView = this.scrollIntoViewStub
@@ -78,12 +78,9 @@ export default class IntegrationTestHelper {
       document.body.appendChild(div)
       wrapper = mount(
         <div>
-          <TestRouter
-            browserHistory={this.browserHistory}
-            store={this.store}
-            onRouteUpdate={() => null}
-            routes={testRoutes}
-          />
+          <Router history={this.browserHistory} store={this.store}>
+            {routes}
+          </Router>
         </div>,
         {
           attachTo: div

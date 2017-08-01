@@ -4,7 +4,16 @@ import sinon from "sinon"
 import { POST } from "redux-hammock/constants"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
-import { createChannel, getChannel, getFrontpage, getPost, getPostsForChannel, getComments, createComment } from "./api"
+import {
+  createChannel,
+  getChannel,
+  getFrontpage,
+  getPost,
+  getPostsForChannel,
+  getComments,
+  createComment,
+  createPost
+} from "./api"
 import { makeChannel } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import { makeCommentTree } from "../factories/comments"
@@ -72,6 +81,23 @@ describe("api", function() {
           })
         )
         assert.deepEqual(result, channel)
+      })
+    })
+
+    it("creates a post", () => {
+      const post = makePost()
+      fetchStub.returns(Promise.resolve(post))
+
+      const text = "Text"
+      const title = "Title"
+      const url = "URL"
+      return createPost("channelname", { text, title, url }).then(result => {
+        const body = JSON.stringify({ url, text, title })
+        sinon.assert.calledWith(fetchStub, "/api/v0/channels/channelname/posts/", {
+          body,
+          method: POST
+        })
+        assert.deepEqual(result, post)
       })
     })
 

@@ -1,10 +1,10 @@
 // @flow
 import * as api from "../lib/api"
-import { GET, INITIAL_STATE } from "redux-hammock/constants"
+import { GET, POST, INITIAL_STATE } from "redux-hammock/constants"
 
 import { SET_POST_DATA } from "../actions/post"
 
-import type { Post } from "../flow/discussionTypes"
+import type { CreatePostPayload, Post } from "../flow/discussionTypes"
 
 const mergePostData = (post: Post, data: Map<string, Post>): Map<string, Post> => {
   let update = new Map(data)
@@ -21,12 +21,14 @@ const mergeMultiplePosts = (posts: Array<Post>, data: Map<string, Post>): Map<st
 }
 
 export const postsEndpoint = {
-  name:              "posts",
-  verbs:             [GET],
-  getFunc:           (id: string) => api.getPost(id),
-  initialState:      { ...INITIAL_STATE, data: new Map() },
-  getSuccessHandler: mergePostData,
-  extraActions:      {
+  name:               "posts",
+  verbs:              [GET, POST],
+  getFunc:            (id: string) => api.getPost(id),
+  postFunc:           (name: string, payload: CreatePostPayload) => api.createPost(name, payload),
+  postSuccessHandler: mergePostData,
+  initialState:       { ...INITIAL_STATE, data: new Map() },
+  getSuccessHandler:  mergePostData,
+  extraActions:       {
     [SET_POST_DATA]: (state, action) => {
       let update =
         action.payload instanceof Array

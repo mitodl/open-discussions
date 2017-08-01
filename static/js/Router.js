@@ -1,24 +1,25 @@
 import React from "react"
 import { Provider } from "react-redux"
-import { BrowserRouter, Route } from "react-router-dom"
+import { Route, Router as ReactRouter } from "react-router-dom"
 
 import App from "./containers/App"
 import withTracker from "./util/withTracker"
 
 export default class Router extends React.Component {
   props: {
-    store: Store
+    store: Store,
+    history: Object
   }
 
   render() {
-    const { store, children } = this.props
+    const { store, children, history } = this.props
 
     return (
       <div>
         <Provider store={store}>
-          <BrowserRouter>
+          <ReactRouter history={history}>
             {children}
-          </BrowserRouter>
+          </ReactRouter>
         </Provider>
       </div>
     )

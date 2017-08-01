@@ -12,6 +12,7 @@ import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 import { safeBulkGet } from "../lib/maps"
+import { getChannelName } from "../lib/util"
 
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -25,14 +26,9 @@ class ChannelPage extends React.Component {
     posts: Object
   }
 
-  getChannelName() {
-    const { match } = this.props
-    return match.params.channelName
-  }
-
   componentWillMount() {
     const { dispatch } = this.props
-    const channelName = this.getChannelName()
+    const channelName = getChannelName(this.props)
     dispatch(actions.channels.get(channelName))
     dispatch(actions.postsForChannel.get(channelName)).then(({ posts }) => {
       dispatch(setPostData(posts))
@@ -66,7 +62,7 @@ class ChannelPage extends React.Component {
 
   render() {
     const { channels, postsForChannel, posts } = this.props
-    const channelName = this.getChannelName()
+    const channelName = getChannelName(this.props)
 
     return (
       <Loading

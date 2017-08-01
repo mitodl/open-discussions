@@ -6,7 +6,7 @@ import "isomorphic-fetch"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 import { POST } from "redux-hammock/constants"
 
-import type { Channel, Post } from "../flow/discussionTypes"
+import type { Channel, CreatePostPayload, Post } from "../flow/discussionTypes"
 import type { CommentResponse } from "../reducers/comments"
 
 export function getFrontpage(): Promise<Post> {
@@ -24,8 +24,20 @@ export function createChannel(channel: Channel): Promise<Channel> {
   })
 }
 
-export function getPostsForChannel(channelName: string): Promise<Post> {
+export function getPostsForChannel(channelName: string): Promise<Array<Post>> {
   return fetchJSONWithCSRF(`/api/v0/channels/${channelName}/posts/`)
+}
+
+export function createPost(channelName: string, payload: CreatePostPayload): Promise<Post> {
+  const { text, url, title } = payload
+  return fetchJSONWithCSRF(`/api/v0/channels/${channelName}/posts/`, {
+    method: "POST",
+    body:   JSON.stringify({
+      url:   url,
+      text:  text,
+      title: title
+    })
+  })
 }
 
 export function getPost(postId: string): Promise<Post> {
