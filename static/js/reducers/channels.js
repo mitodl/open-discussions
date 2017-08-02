@@ -1,6 +1,7 @@
 // @flow
 import { GET, POST, INITIAL_STATE } from "redux-hammock/constants"
 
+import { SET_CHANNEL_DATA } from "../actions/channel"
 import type { Channel } from "../flow/discussionTypes"
 import * as api from "../lib/api"
 
@@ -19,5 +20,18 @@ export const channelsEndpoint = {
     let update = new Map(data)
     update.set(payload.name, payload)
     return update
+  },
+  extraActions: {
+    [SET_CHANNEL_DATA]: (state, action) => {
+      const updatedData = new Map(state.data)
+      for (const channel of action.payload) {
+        updatedData.set(channel.name, channel)
+      }
+
+      return {
+        ...state,
+        data: updatedData
+      }
+    }
   }
 }

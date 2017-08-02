@@ -7,6 +7,7 @@
 @import "createPost";
 @import "sidebar";
 @import "comment";
+@import "subscriptions";
 
 body {
   font-family: 'Roboto', helvetica, arial, sans-serif !important;
@@ -44,6 +45,30 @@ body {
       width: 30%;
       float: left;
       padding-left: 15px;
+    }
+  }
+
+  .triple-column {
+    margin: auto;
+    width: 1300px;
+
+    .first-column {
+      width: 15%;
+      float: left;
+    }
+
+    .second-column {
+      width: 70%;
+      float: left;
+
+      .card {
+        margin-left: 10px;
+      }
+    }
+
+    .third-column {
+      width: 15%;
+      float: left;
     }
   }
 }

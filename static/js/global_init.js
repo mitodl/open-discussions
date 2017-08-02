@@ -21,6 +21,11 @@ afterEach(function() {
   document.body.innerHTML = ""
   global.SETTINGS = _createSettings()
   window.location = "http://fake/"
+
+  // Uncomment this to diagnose stray API calls
+  // This adds a 200 ms delay between tests. Since fetchMock is still enabled at this point the next unmatched
+  // fetch attempt which occurs within 200 ms after the test finishes will cause a warning.
+  // return require('./lib/util').wait(200)
 })
 
 // enable chai-as-promised

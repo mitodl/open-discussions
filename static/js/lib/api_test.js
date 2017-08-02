@@ -7,6 +7,7 @@ import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 import {
   createChannel,
   getChannel,
+  getChannels,
   getFrontpage,
   getPost,
   getPostsForChannel,
@@ -14,7 +15,7 @@ import {
   createComment,
   createPost
 } from "./api"
-import { makeChannel } from "../factories/channels"
+import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import { makeCommentTree } from "../factories/comments"
 
@@ -57,6 +58,16 @@ describe("api", function() {
       return getChannel("channelone").then(result => {
         assert.ok(fetchStub.calledWith("/api/v0/channels/channelone/"))
         assert.deepEqual(result, channel)
+      })
+    })
+
+    it("gets a list of channels", () => {
+      const channelList = makeChannelList()
+      fetchStub.returns(Promise.resolve(channelList))
+
+      return getChannels().then(result => {
+        assert.ok(fetchStub.calledWith(("/api/v0/channels/")))
+        assert.deepEqual(result, channelList)
       })
     })
 
