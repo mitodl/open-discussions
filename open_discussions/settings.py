@@ -67,14 +67,7 @@ SECRET_KEY = get_var(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_var('DEBUG', False)
 
-if DEBUG:
-    # Disabling the protection added in 1.10.3 against a DNS rebinding vulnerability:
-    # https://docs.djangoproject.com/en/1.10/releases/1.10.3/#dns-rebinding-vulnerability-when-debug-true
-    # Because we never debug against production data, we are not vulnerable
-    # to this problem.
-    ALLOWED_HOSTS = ['*']
-else:
-    ALLOWED_HOSTS = get_var('ALLOWED_HOSTS', [])
+ALLOWED_HOSTS = ['*']
 
 SECURE_SSL_REDIRECT = get_var('OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT', True)
 
@@ -350,7 +343,6 @@ if get_var('OPEN_DISCUSSIONS_BYPASS_SYSLOG', False):
 STATUS_TOKEN = get_var("STATUS_TOKEN", "")
 HEALTH_CHECK = ['CELERY', 'REDIS', 'POSTGRES']
 
-ADWORDS_CONVERSION_ID = get_var("ADWORDS_CONVERSION_ID", "")
 GA_TRACKING_ID = get_var("GA_TRACKING_ID", "")
 REACT_GA_DEBUG = get_var("REACT_GA_DEBUG", False)
 

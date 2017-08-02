@@ -18,16 +18,8 @@
       "url": "https://github.com/heroku/heroku-buildpack-nginx"
     }
   ],
-  "description": "MIT Open",
+  "description": "open-discussions",
   "env": {
-    "ADWORDS_CONVERSION_ID": {
-      "description": "Id for adwords conversion.",
-      "required": false
-    },
-    "ALLOWED_HOSTS": {
-      "default": "['*']",
-      "description": "Array of allowed hostnames"
-    },
     "AWS_ACCESS_KEY_ID": {
       "description": "AWS Access Key for S3 storage."
     },
@@ -37,9 +29,12 @@
     "AWS_STORAGE_BUCKET_NAME": {
       "description": "S3 Bucket name."
     },
-    "MAILGUN_URL": {
-      "description": "The URL for communicating with Mailgun",
+    "GA_TRACKING_ID": {
+      "description": "Google analytics tracking ID",
       "required": false
+    },
+    "MAILGUN_URL": {
+      "description": "The URL for communicating with Mailgun"
     },
     "MAILGUN_KEY": {
       "description": "The token for authenticating against the Mailgun API"
@@ -61,29 +56,24 @@
       "value": "0"
     },
     "OPEN_DISCUSSIONS_DB_DISABLE_SSL": {
-      "value": "true"
+      "value": "True"
     },
     "OPEN_DISCUSSIONS_EMAIL_HOST": {
-      "description": "Outgoing e-mail settings",
-      "required": false
+      "description": "Outgoing e-mail settings"
     },
     "OPEN_DISCUSSIONS_EMAIL_PASSWORD": {
-      "description": "Outgoing e-mail settings",
-      "required": false
+      "description": "Outgoing e-mail settings"
     },
     "OPEN_DISCUSSIONS_EMAIL_PORT": {
       "description": "Outgoing e-mail settings",
-      "required": false,
       "value": "587"
     },
     "OPEN_DISCUSSIONS_EMAIL_TLS": {
       "description": "Outgoing e-mail settings",
-      "required": false,
       "value": "True"
     },
     "OPEN_DISCUSSIONS_EMAIL_USER": {
-      "description": "Outgoing e-mail settings",
-      "required": false
+      "description": "Outgoing e-mail settings"
     },
     "OPEN_DISCUSSIONS_ENVIRONMENT": {
       "description": "The execution environment that the app is in (e.g. dev, staging, prod)"
@@ -91,17 +81,24 @@
     "OPEN_DISCUSSIONS_FROM_EMAIL": {
       "description": "E-mail to use for the from field"
     },
+    "OPEN_DISCUSSIONS_REDDIT_CLIENT_ID": {
+      "description": "OAuth client ID for authentication with reddit"
+    },
+    "OPEN_DISCUSSIONS_REDDIT_SECRET": {
+      "description": "OAuth secret for authentication with reddit"
+    },
     "OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT": {
       "description": "Application-level SSL redirect setting.",
-      "required": false,
       "value": "True"
+    },
+    "OPEN_DISCUSSIONS_SUPPORT_EMAIL": {
+      "description": "Email address listed for customer support"
     },
     "OPEN_DISCUSSIONS_USE_S3": {
       "description": "Use S3 for storage backend (required on Heroku)",
       "value": "True"
     },
     "NEW_RELIC_APP_NAME": {
-      "default": "open_discussions",
       "description": "Application identifier in New Relic."
     },
     "NODE_MODULES_CACHE": {
@@ -122,8 +119,7 @@
       "description": "The connection settings for Sentry"
     },
     "STATUS_TOKEN": {
-      "description": "Token to access the status API.",
-      "required": true
+      "description": "Token to access the status API."
     }
   },
   "keywords": [
