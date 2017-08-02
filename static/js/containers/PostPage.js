@@ -8,6 +8,7 @@ import Loading from "../components/Loading"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import PostDisplay from "../components/PostDisplay"
 import CommentTree from "../components/CommentTree"
+import CommentEditForm from "../components/CommentEditForm"
 
 import { actions } from "../actions"
 import { anyProcessing, allLoaded } from "../util/rest"
@@ -44,6 +45,14 @@ class PostPage extends React.Component {
     }
   }
 
+  onCommentUpdate = (e) => {
+
+  }
+
+  onCommentSubmit = () => {
+    const { commentForm } = this.props;
+  }
+
   componentWillMount() {
     this.updateRequirements()
   }
@@ -71,6 +80,14 @@ class PostPage extends React.Component {
         <div className="first-column">
           <Card>
             <PostDisplay post={post} expanded />
+          </Card>
+          <Card>
+            <CommentEditForm
+              post={post}
+              form={commentForm}
+              onUpdate={this.onCommentUpdate}
+              onSubmit={this.onCommentSubmit}
+            />
           </Card>
           <CommentTree comments={commentTreeData} />
         </div>
