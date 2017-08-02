@@ -7,7 +7,14 @@ export type Channel = {
   title:              string,
   public_description: string,
   channel_type:       ChannelType,
-  num_users?:         number,
+  num_users:          number,
+}
+
+export type ChannelForm = {
+  name:               string,
+  title:              string,
+  public_description: string,
+  channel_type:       ChannelType,
 }
 
 export type Post = {
@@ -31,7 +38,7 @@ export type PostForm = {
 }
 
 export type CreatePostPayload = {
-  url?: string,
+  url?:  string,
   text?: string,
   title: string,
 };

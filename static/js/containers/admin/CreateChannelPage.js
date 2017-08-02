@@ -1,13 +1,19 @@
 // @flow
 import React from "react"
+import R from "ramda"
 import { connect } from "react-redux"
 
 import ChannelEditForm from "../../components/admin/ChannelEditForm"
 import { actions } from "../../actions"
 import { channelURL } from "../../lib/url"
+import { newChannelForm } from "../../lib/channels"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
+
+const CREATE_CHANNEL_KEY = "channel:new"
+const CREATE_CHANNEL_PAYLOAD = { key: CREATE_CHANNEL_KEY }
+const getForm = R.prop(CREATE_CHANNEL_KEY)
 
 class CreateChannelPage extends React.Component {
   props: {
@@ -18,15 +24,30 @@ class CreateChannelPage extends React.Component {
 
   componentWillMount() {
     const { dispatch } = this.props
-    dispatch(actions.forms.channel.create())
+    dispatch(
+      actions.forms.formBeginEdit(
+        R.merge(CREATE_CHANNEL_PAYLOAD, {
+          value: newChannelForm()
+        })
+      )
+    )
+  }
+
+  componentWillUnmount() {
+    const { dispatch } = this.props
+    dispatch(actions.forms.formEndEdit(CREATE_CHANNEL_PAYLOAD))
   }
 
   onUpdate = (e: Object) => {
     const { dispatch } = this.props
     dispatch(
-      actions.forms.channel.update({
-        [e.target.name]: e.target.value
-      })
+      actions.forms.formUpdate(
+        R.merge(CREATE_CHANNEL_PAYLOAD, {
+          value: {
+            [e.target.name]: e.target.value
+          }
+        })
+      )
     )
   }
 
@@ -43,9 +64,13 @@ class CreateChannelPage extends React.Component {
   render() {
     const { channelForm } = this.props
 
+    if (!channelForm) {
+      return null
+    }
+
     return (
       <div>
-        <ChannelEditForm onSubmit={this.onSubmit} onUpdate={this.onUpdate} channel={channelForm.value} />
+        <ChannelEditForm onSubmit={this.onSubmit} onUpdate={this.onUpdate} form={channelForm.value} />
       </div>
     )
   }
@@ -53,7 +78,7 @@ class CreateChannelPage extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    channelForm: state.channelForm
+    channelForm: getForm(state.forms)
   }
 }
 

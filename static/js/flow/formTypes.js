@@ -1,16 +1,16 @@
 //@flow
 
-import type { Action, ActionCreator } from '../flow/reduxTypes'
 
 export type FormValue = {
-  value: ?Object,
-  //errors: ValidationErrors
+  value: Object,
+  errors: Object,
 }
 
-export type FormActions = {
-  create: ActionCreator,
-  update: ActionCreator,
-  reset: ActionCreator,
+export type FormsState = {
+  [string]: FormValue,
 }
 
-export type FormReducer = (FormValue,  Action<any, null>) => FormValue
+export type FormActionPayload = {
+  key: string,
+  value?: Object
+}

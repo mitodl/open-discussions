@@ -5,17 +5,17 @@ import sinon from "sinon"
 import { shallow } from "enzyme"
 
 import ChannelEditForm from "./ChannelEditForm"
-import { CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_PRIVATE, newChannel } from "../../lib/channels"
+import { CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_PRIVATE, newChannelForm } from "../../lib/channels"
 
-import type { Channel } from "../../flow/discussionTypes"
+import type { ChannelForm } from "../../flow/discussionTypes"
 
 describe("ChannelEditForm", () => {
-  const renderForm = (channel: ?Channel, { onSubmit, onUpdate } = { onSubmit: () => {}, onUpdate: () => {} }) =>
-    shallow(<ChannelEditForm channel={channel} onSubmit={onSubmit} onUpdate={onUpdate} />)
-  let sandbox, channel
+  const renderForm = (form: ChannelForm, { onSubmit, onUpdate } = { onSubmit: () => {}, onUpdate: () => {} }) =>
+    shallow(<ChannelEditForm form={form} onSubmit={onSubmit} onUpdate={onUpdate} />)
+  let sandbox, form
 
   beforeEach(() => {
-    channel = newChannel()
+    form = newChannelForm()
     sandbox = sinon.sandbox.create()
   })
 
@@ -23,12 +23,8 @@ describe("ChannelEditForm", () => {
     sandbox.restore()
   })
 
-  it("should render nothing if no channel", () => {
-    assert.equal(renderForm(null).html(), null)
-  })
-
   it("should render a blank form", () => {
-    let wrapper = renderForm(channel)
+    let wrapper = renderForm(form)
     let [title, name] = wrapper.find('input[type="text"]')
     let [description] = wrapper.find("textarea")
     let [radioPublic, radioPrivate] = wrapper.find('input[type="radio"]')
@@ -45,7 +41,7 @@ describe("ChannelEditForm", () => {
     let wrapper, onSubmit, onUpdate
     beforeEach(() => {
       [onSubmit, onUpdate] = [sandbox.stub(), sandbox.stub()]
-      wrapper = renderForm(channel, { onSubmit, onUpdate })
+      wrapper = renderForm(form, { onSubmit, onUpdate })
     })
 
     describe("onSubmit", () => {

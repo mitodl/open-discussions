@@ -3,7 +3,7 @@ import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 
-import { newPostURL } from '../lib/url'
+import { newPostURL } from "../lib/url"
 import { makeChannel } from "../factories/channels"
 import ChannelSidebar from "./ChannelSidebar"
 

@@ -5,6 +5,7 @@ import R from "ramda"
 
 import CreatePostForm from "../components/CreatePostForm"
 import { actions } from "../actions"
+import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
 import { getChannelName } from "../lib/util"
 
@@ -17,11 +18,15 @@ import type { Match } from "react-router"
 type CreatePostPageProps = {
   match: Match,
   dispatch: Dispatch,
-  postForm: FormValue,
+  postForm: ?FormValue,
   channel: Channel,
   channels: RestState<Array<Channel>>,
   history: Object
 }
+
+const CREATE_POST_KEY = "post:new"
+const CREATE_POST_PAYLOAD = { key: CREATE_POST_KEY }
+const getForm = R.prop(CREATE_POST_KEY)
 
 class CreatePostPage extends React.Component {
   props: CreatePostPageProps
@@ -32,14 +37,27 @@ class CreatePostPage extends React.Component {
     if (!channels.loaded && !channels.processing) {
       dispatch(actions.channels.get(channelName))
     }
-    dispatch(actions.forms.post.create())
+    dispatch(
+      actions.forms.formBeginEdit({
+        ...CREATE_POST_PAYLOAD,
+        value: newPostForm()
+      })
+    )
+  }
+
+  componentWillUnmount() {
+    const { dispatch } = this.props
+    dispatch(actions.forms.formEndEdit(CREATE_POST_PAYLOAD))
   }
 
   onUpdate = (e: Object) => {
     const { dispatch } = this.props
     dispatch(
-      actions.forms.post.update({
-        [e.target.name]: e.target.value
+      actions.forms.formUpdate({
+        ...CREATE_POST_PAYLOAD,
+        value: {
+          [e.target.name]: e.target.value
+        }
       })
     )
   }
@@ -47,8 +65,9 @@ class CreatePostPage extends React.Component {
   updateIsText = (isText: boolean) => {
     const { dispatch } = this.props
     dispatch(
-      actions.forms.post.update({
-        isText
+      actions.forms.formUpdate({
+        ...CREATE_POST_PAYLOAD,
+        value: { isText }
       })
     )
   }
@@ -58,7 +77,7 @@ class CreatePostPage extends React.Component {
 
     e.preventDefault()
 
-    if (!postForm.value || !channel) {
+    if (!postForm || !channel) {
       return
     }
 
@@ -73,7 +92,7 @@ class CreatePostPage extends React.Component {
   render() {
     const { channel, postForm, history } = this.props
 
-    if (R.isNil(channel)) {
+    if (!postForm || R.isNil(channel)) {
       return null
     }
 
@@ -98,7 +117,7 @@ const mapStateToProps = (state, props) => {
   return {
     channel:  channel,
     channels: channels,
-    postForm: state.postForm
+    postForm: getForm(state.forms)
   }
 }
 

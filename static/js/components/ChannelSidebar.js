@@ -2,7 +2,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import { newPostURL } from '../lib/url'
+import { newPostURL } from "../lib/url"
 import type { Channel } from "../flow/discussionTypes"
 
 export default class ChannelSidebar extends React.Component {

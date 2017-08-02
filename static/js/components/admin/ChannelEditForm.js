@@ -3,33 +3,30 @@ import React from "react"
 
 import { CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_PRIVATE } from "../../lib/channels"
 
-import type { Channel } from "../../flow/discussionTypes"
+import type { ChannelForm } from "../../flow/discussionTypes"
 
 export default class ChannelEditForm extends React.Component {
   props: {
     onSubmit: Function,
     onUpdate: Function,
-    channel: ?Channel
+    form: ChannelForm
   }
 
   render() {
-    const { onSubmit, onUpdate, channel } = this.props
-    if (channel === null || channel === undefined) {
-      return null
-    }
+    const { onSubmit, onUpdate, form } = this.props
     return (
       <form onSubmit={onSubmit} className="form">
         <div className="form-item">
           <label htmlFor="title" className="label">
             Title
           </label>
-          <input name="title" type="text" className="input" value={channel.title} onChange={onUpdate} />
+          <input name="title" type="text" className="input" value={form.title} onChange={onUpdate} />
         </div>
         <div className="form-item">
           <label htmlFor="name" className="label">
             Name
           </label>
-          <input name="name" type="text" className="input" value={channel.name} onChange={onUpdate} />
+          <input name="name" type="text" className="input" value={form.name} onChange={onUpdate} />
         </div>
         <div className="form-item">
           <label htmlFor="public_description" className="label">
@@ -39,7 +36,7 @@ export default class ChannelEditForm extends React.Component {
             name="public_description"
             type="text"
             className="input"
-            value={channel.public_description}
+            value={form.public_description}
             onChange={onUpdate}
           />
         </div>
@@ -51,7 +48,7 @@ export default class ChannelEditForm extends React.Component {
               type="radio"
               name="channel_type"
               value={CHANNEL_TYPE_PUBLIC}
-              checked={channel.channel_type === CHANNEL_TYPE_PUBLIC}
+              checked={form.channel_type === CHANNEL_TYPE_PUBLIC}
               onChange={onUpdate}
             />
             <label htmlFor="channel_public">Public</label>
@@ -60,7 +57,7 @@ export default class ChannelEditForm extends React.Component {
               type="radio"
               name="channel_type"
               value={CHANNEL_TYPE_PRIVATE}
-              checked={channel.channel_type === CHANNEL_TYPE_PRIVATE}
+              checked={form.channel_type === CHANNEL_TYPE_PRIVATE}
               onChange={onUpdate}
             />
             <label htmlFor="channel_private">Private</label>

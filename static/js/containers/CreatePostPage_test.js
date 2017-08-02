@@ -4,7 +4,7 @@ import sinon from "sinon"
 
 import { makeChannel } from "../factories/channels"
 import { makePost } from "../factories/posts"
-import { newPostURL } from '../lib/url'
+import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import type { CreatePostPayload } from "../flow/discussionTypes"
@@ -26,7 +26,7 @@ describe("CreatePostPage", () => {
 
   const renderPage = () => {
     return renderComponent(newPostURL(channel.name), [
-      String(actions.forms.post.create),
+      actions.forms.FORM_BEGIN_EDIT,
       actions.channels.get.requestType,
       actions.channels.get.successType
     ])
@@ -61,10 +61,7 @@ describe("CreatePostPage", () => {
           wrapper.find(".url input").simulate("change", makeEvent("url", url))
         }
 
-        return listenForActions([
-          actions.posts.post.requestType,
-          actions.posts.post.successType,
-        ], () => {
+        return listenForActions([actions.posts.post.requestType, actions.posts.post.successType], () => {
           wrapper.find(".submit-post").simulate("submit")
         }).then(() => {
           const payload: CreatePostPayload = { title }
