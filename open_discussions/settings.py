@@ -9,49 +9,21 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 
 """
-import ast
 import logging
 import os
 import platform
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
-import yaml
+
+from open_discussions.envs import (
+    get_any,
+    get_bool,
+    get_int,
+    get_string,
+)
 
 VERSION = "0.0.0"
-
-CONFIG_PATHS = [
-    os.environ.get('OPEN_DISCUSSIONS_CONFIG', ''),
-    os.path.join(os.getcwd(), 'open_discussions.yml'),
-    os.path.join(os.path.expanduser('~'), 'open_discussions.yml'),
-    '/etc/open_discussions.yml',
-]
-
-
-def load_fallback():
-    """Load optional yaml config"""
-    fallback_config = {}
-    config_file_path = None
-    for config_path in CONFIG_PATHS:
-        if os.path.isfile(config_path):
-            config_file_path = config_path
-            break
-    if config_file_path is not None:
-        with open(config_file_path) as config_file:
-            fallback_config = yaml.safe_load(config_file)
-    return fallback_config
-
-FALLBACK_CONFIG = load_fallback()
-
-
-def get_var(name, default):
-    """Return the settings in a precedence way with default."""
-    try:
-        value = os.environ.get(name, FALLBACK_CONFIG.get(name, default))
-        return ast.literal_eval(value)
-    except (SyntaxError, ValueError):
-        return value
-
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -59,17 +31,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_var(
+SECRET_KEY = get_string(
     'SECRET_KEY',
     'terribly_unsafe_default_secret_key'
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_var('DEBUG', False)
+DEBUG = get_bool('DEBUG', False)
 
 ALLOWED_HOSTS = ['*']
 
-SECURE_SSL_REDIRECT = get_var('OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT', True)
+SECURE_SSL_REDIRECT = get_bool('OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT', True)
 
 
 WEBPACK_LOADER = {
@@ -103,7 +75,7 @@ INSTALLED_APPS = (
     'open_discussions',
 )
 
-DISABLE_WEBPACK_LOADER_STATS = get_var("DISABLE_WEBPACK_LOADER_STATS", False)
+DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
 if not DISABLE_WEBPACK_LOADER_STATS:
     INSTALLED_APPS += ('webpack_loader',)
 
@@ -163,14 +135,14 @@ WSGI_APPLICATION = 'open_discussions.wsgi.application'
 # For URL structure:
 # https://github.com/kennethreitz/dj-database-url
 DEFAULT_DATABASE_CONFIG = dj_database_url.parse(
-    get_var(
+    get_string(
         'DATABASE_URL',
         'sqlite:///{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
     )
 )
-DEFAULT_DATABASE_CONFIG['CONN_MAX_AGE'] = int(get_var('OPEN_DISCUSSIONS_DB_CONN_MAX_AGE', 0))
+DEFAULT_DATABASE_CONFIG['CONN_MAX_AGE'] = get_int('OPEN_DISCUSSIONS_DB_CONN_MAX_AGE', 0)
 
-if get_var('OPEN_DISCUSSIONS_DB_DISABLE_SSL', False):
+if get_bool('OPEN_DISCUSSIONS_DB_DISABLE_SSL', False):
     DEFAULT_DATABASE_CONFIG['OPTIONS'] = {}
 else:
     DEFAULT_DATABASE_CONFIG['OPTIONS'] = {'sslmode': 'require'}
@@ -204,45 +176,45 @@ STATICFILES_DIRS = (
 )
 
 # Request files from the webpack dev server
-USE_WEBPACK_DEV_SERVER = get_var('OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER', False)
-WEBPACK_DEV_SERVER_HOST = get_var('WEBPACK_DEV_SERVER_HOST', '')
-WEBPACK_DEV_SERVER_PORT = get_var('WEBPACK_DEV_SERVER_PORT', '8062')
+USE_WEBPACK_DEV_SERVER = get_bool('OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER', False)
+WEBPACK_DEV_SERVER_HOST = get_string('WEBPACK_DEV_SERVER_HOST', '')
+WEBPACK_DEV_SERVER_PORT = get_int('WEBPACK_DEV_SERVER_PORT', 8062)
 
 # Important to define this so DEBUG works properly
-INTERNAL_IPS = (get_var('HOST_IP', '127.0.0.1'), )
+INTERNAL_IPS = (get_string('HOST_IP', '127.0.0.1'), )
 
 # Configure e-mail settings
-EMAIL_BACKEND = get_var('OPEN_DISCUSSIONS_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = get_var('OPEN_DISCUSSIONS_EMAIL_HOST', 'localhost')
-EMAIL_PORT = get_var('OPEN_DISCUSSIONS_EMAIL_PORT', 25)
-EMAIL_HOST_USER = get_var('OPEN_DISCUSSIONS_EMAIL_USER', '')
-EMAIL_HOST_PASSWORD = get_var('OPEN_DISCUSSIONS_EMAIL_PASSWORD', '')
-EMAIL_USE_TLS = get_var('OPEN_DISCUSSIONS_EMAIL_TLS', False)
-EMAIL_SUPPORT = get_var('OPEN_DISCUSSIONS_SUPPORT_EMAIL', 'support@example.com')
-DEFAULT_FROM_EMAIL = get_var('OPEN_DISCUSSIONS_FROM_EMAIL', 'webmaster@localhost')
+EMAIL_BACKEND = get_string('OPEN_DISCUSSIONS_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = get_string('OPEN_DISCUSSIONS_EMAIL_HOST', 'localhost')
+EMAIL_PORT = get_int('OPEN_DISCUSSIONS_EMAIL_PORT', 25)
+EMAIL_HOST_USER = get_string('OPEN_DISCUSSIONS_EMAIL_USER', '')
+EMAIL_HOST_PASSWORD = get_string('OPEN_DISCUSSIONS_EMAIL_PASSWORD', '')
+EMAIL_USE_TLS = get_bool('OPEN_DISCUSSIONS_EMAIL_TLS', False)
+EMAIL_SUPPORT = get_string('OPEN_DISCUSSIONS_SUPPORT_EMAIL', 'support@example.com')
+DEFAULT_FROM_EMAIL = get_string('OPEN_DISCUSSIONS_FROM_EMAIL', 'webmaster@localhost')
 
-MAILGUN_URL = get_var('MAILGUN_URL', '')
-MAILGUN_KEY = get_var('MAILGUN_KEY', None)
-MAILGUN_BATCH_CHUNK_SIZE = get_var('MAILGUN_BATCH_CHUNK_SIZE', 1000)
-MAILGUN_RECIPIENT_OVERRIDE = get_var('MAILGUN_RECIPIENT_OVERRIDE', None)
-MAILGUN_FROM_EMAIL = get_var('MAILGUN_FROM_EMAIL', 'no-reply@example.com')
-MAILGUN_BCC_TO_EMAIL = get_var('MAILGUN_BCC_TO_EMAIL', 'no-reply@example.com')
+MAILGUN_URL = get_string('MAILGUN_URL', '')
+MAILGUN_KEY = get_string('MAILGUN_KEY', None)
+MAILGUN_BATCH_CHUNK_SIZE = get_int('MAILGUN_BATCH_CHUNK_SIZE', 1000)
+MAILGUN_RECIPIENT_OVERRIDE = get_string('MAILGUN_RECIPIENT_OVERRIDE', None)
+MAILGUN_FROM_EMAIL = get_string('MAILGUN_FROM_EMAIL', 'no-reply@example.com')
+MAILGUN_BCC_TO_EMAIL = get_string('MAILGUN_BCC_TO_EMAIL', 'no-reply@example.com')
 
 
 # e-mail configurable admins
-ADMIN_EMAIL = get_var('OPEN_DISCUSSIONS_ADMIN_EMAIL', '')
+ADMIN_EMAIL = get_string('OPEN_DISCUSSIONS_ADMIN_EMAIL', '')
 if ADMIN_EMAIL != '':
     ADMINS = (('Admins', ADMIN_EMAIL),)
 else:
     ADMINS = ()
 
 # Logging configuration
-LOG_LEVEL = get_var('OPEN_DISCUSSIONS_LOG_LEVEL', 'INFO')
-DJANGO_LOG_LEVEL = get_var('DJANGO_LOG_LEVEL', 'INFO')
+LOG_LEVEL = get_string('OPEN_DISCUSSIONS_LOG_LEVEL', 'INFO')
+DJANGO_LOG_LEVEL = get_string('DJANGO_LOG_LEVEL', 'INFO')
 
 # For logging to a remote syslog host
-LOG_HOST = get_var('OPEN_DISCUSSIONS_LOG_HOST', 'localhost')
-LOG_HOST_PORT = get_var('OPEN_DISCUSSIONS_LOG_HOST_PORT', 514)
+LOG_HOST = get_string('OPEN_DISCUSSIONS_LOG_HOST', 'localhost')
+LOG_HOST_PORT = get_int('OPEN_DISCUSSIONS_LOG_HOST_PORT', 514)
 
 HOSTNAME = platform.node().split('.')[0]
 DEFAULT_LOG_STANZA = {
@@ -324,35 +296,35 @@ LOGGING = {
 }
 
 # Sentry
-ENVIRONMENT = get_var('OPEN_DISCUSSIONS_ENVIRONMENT', 'dev')
+ENVIRONMENT = get_string('OPEN_DISCUSSIONS_ENVIRONMENT', 'dev')
 SENTRY_CLIENT = 'raven.contrib.django.raven_compat.DjangoClient'
 RAVEN_CONFIG = {
-    'dsn': get_var('SENTRY_DSN', ''),
+    'dsn': get_string('SENTRY_DSN', ''),
     'environment': ENVIRONMENT,
     'release': VERSION
 }
 
 # to run the app locally on mac you need to bypass syslog
-if get_var('OPEN_DISCUSSIONS_BYPASS_SYSLOG', False):
+if get_bool('OPEN_DISCUSSIONS_BYPASS_SYSLOG', False):
     LOGGING['handlers'].pop('syslog')
     LOGGING['loggers']['root']['handlers'] = ['console']
     LOGGING['loggers']['ui']['handlers'] = ['console']
     LOGGING['loggers']['django']['handlers'] = ['console']
 
 # server-status
-STATUS_TOKEN = get_var("STATUS_TOKEN", "")
+STATUS_TOKEN = get_string("STATUS_TOKEN", "")
 HEALTH_CHECK = ['CELERY', 'REDIS', 'POSTGRES']
 
-GA_TRACKING_ID = get_var("GA_TRACKING_ID", "")
-REACT_GA_DEBUG = get_var("REACT_GA_DEBUG", False)
+GA_TRACKING_ID = get_string("GA_TRACKING_ID", "")
+REACT_GA_DEBUG = get_bool("REACT_GA_DEBUG", False)
 
-MEDIA_ROOT = get_var('MEDIA_ROOT', '/var/media/')
+MEDIA_ROOT = get_string('MEDIA_ROOT', '/var/media/')
 MEDIA_URL = '/media/'
-OPEN_DISCUSSIONS_USE_S3 = get_var('OPEN_DISCUSSIONS_USE_S3', False)
-AWS_ACCESS_KEY_ID = get_var('AWS_ACCESS_KEY_ID', False)
-AWS_SECRET_ACCESS_KEY = get_var('AWS_SECRET_ACCESS_KEY', False)
-AWS_STORAGE_BUCKET_NAME = get_var('AWS_STORAGE_BUCKET_NAME', False)
-AWS_QUERYSTRING_AUTH = get_var('AWS_QUERYSTRING_AUTH', False)
+OPEN_DISCUSSIONS_USE_S3 = get_bool('OPEN_DISCUSSIONS_USE_S3', False)
+AWS_ACCESS_KEY_ID = get_string('AWS_ACCESS_KEY_ID', False)
+AWS_SECRET_ACCESS_KEY = get_string('AWS_SECRET_ACCESS_KEY', False)
+AWS_STORAGE_BUCKET_NAME = get_string('AWS_STORAGE_BUCKET_NAME', False)
+AWS_QUERYSTRING_AUTH = get_string('AWS_QUERYSTRING_AUTH', False)
 # Provide nice validation of the configuration
 if (
         OPEN_DISCUSSIONS_USE_S3 and
@@ -374,12 +346,12 @@ else:
 
 # Celery
 USE_CELERY = True
-CELERY_BROKER_URL = get_var("CELERY_BROKER_URL", get_var("REDISCLOUD_URL", None))
-CELERY_RESULT_BACKEND = get_var(
-    "CELERY_RESULT_BACKEND", get_var("REDISCLOUD_URL", None)
+CELERY_BROKER_URL = get_string("CELERY_BROKER_URL", get_string("REDISCLOUD_URL", None))
+CELERY_RESULT_BACKEND = get_string(
+    "CELERY_RESULT_BACKEND", get_string("REDISCLOUD_URL", None)
 )
-CELERY_TASK_ALWAYS_EAGER = get_var("CELERY_TASK_ALWAYS_EAGER", False)
-CELERY_TASK_EAGER_PROPAGATES = get_var("CELERY_TASK_EAGER_PROPAGATES", True)
+CELERY_TASK_ALWAYS_EAGER = get_bool("CELERY_TASK_ALWAYS_EAGER", False)
+CELERY_TASK_EAGER_PROPAGATES = get_bool("CELERY_TASK_EAGER_PROPAGATES", True)
 
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -403,26 +375,30 @@ CACHES = {
 }
 
 # reddit-specific settings
-OPEN_DISCUSSIONS_REDDIT_CLIENT_ID = get_var('OPEN_DISCUSSIONS_REDDIT_CLIENT_ID', None)
-OPEN_DISCUSSIONS_REDDIT_SECRET = get_var('OPEN_DISCUSSIONS_REDDIT_SECRET', None)
-OPEN_DISCUSSIONS_REDDIT_URL = get_var('OPEN_DISCUSSIONS_REDDIT_URL', '')
-OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL = get_var('OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL', True)
+OPEN_DISCUSSIONS_REDDIT_CLIENT_ID = get_string('OPEN_DISCUSSIONS_REDDIT_CLIENT_ID', None)
+OPEN_DISCUSSIONS_REDDIT_SECRET = get_string('OPEN_DISCUSSIONS_REDDIT_SECRET', None)
+OPEN_DISCUSSIONS_REDDIT_URL = get_string('OPEN_DISCUSSIONS_REDDIT_URL', '')
+OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL = get_bool('OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL', True)
 
 
 # features flags
 def get_all_config_keys():
     """Returns all the configuration keys from both environment and configuration files"""
-    return list(set(os.environ.keys()).union(set(FALLBACK_CONFIG.keys())))
+    return list(os.environ.keys())
 
-OPEN_DISCUSSIONS_FEATURES_PREFIX = get_var('OPEN_DISCUSSIONS_FEATURES_PREFIX', 'FEATURE_')
+OPEN_DISCUSSIONS_FEATURES_PREFIX = get_string('OPEN_DISCUSSIONS_FEATURES_PREFIX', 'FEATURE_')
 FEATURES = {
-    key[len(OPEN_DISCUSSIONS_FEATURES_PREFIX):]: get_var(key, None) for key
+    key[len(OPEN_DISCUSSIONS_FEATURES_PREFIX):]: get_any(key, None) for key
     in get_all_config_keys() if key.startswith(OPEN_DISCUSSIONS_FEATURES_PREFIX)
 }
 
-MIDDLEWARE_FEATURE_FLAG_QS_PREFIX = get_var("MIDDLEWARE_FEATURE_FLAG_QS_PREFIX", None)
-MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME = get_var('MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME', 'OPEN_DISCUSSIONS_FEATURE_FLAGS')
-MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS = get_var('MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS', 60 * 60)
+MIDDLEWARE_FEATURE_FLAG_QS_PREFIX = get_string("MIDDLEWARE_FEATURE_FLAG_QS_PREFIX", None)
+MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME = get_string(
+    'MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME', 'OPEN_DISCUSSIONS_FEATURE_FLAGS'
+)
+MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS = get_int(
+    'MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS', 60 * 60
+)
 
 if MIDDLEWARE_FEATURE_FLAG_QS_PREFIX:
     MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (

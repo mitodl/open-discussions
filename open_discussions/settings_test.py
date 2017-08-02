@@ -1,11 +1,9 @@
 """
-Validate that our settings functions work, and we can create yaml files
+Validate that our settings functions work
 """
 
 import importlib
-import os
 import sys
-import tempfile
 from unittest import mock
 
 from django.conf import settings
@@ -13,9 +11,6 @@ from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 import semantic_version
-import yaml
-
-from open_discussions.settings import load_fallback, get_var
 
 
 class TestSettings(TestCase):
@@ -32,55 +27,6 @@ class TestSettings(TestCase):
         # Restore settings to original settings after test
         self.addCleanup(importlib.reload, sys.modules['open_discussions.settings'])
         return vars(sys.modules['open_discussions.settings'])
-
-    def test_load_fallback(self):
-        """Verify our YAML load works as expected."""
-        config_settings = {'TEST_KEY': 'yessir'}
-        _, temp_config_path = tempfile.mkstemp()
-        self.addCleanup(os.remove, temp_config_path)
-        with open(temp_config_path, 'w') as temp_config:
-            temp_config.write(yaml.dump(config_settings))
-
-        with mock.patch('open_discussions.settings.CONFIG_PATHS') as config_paths:
-            config_paths.__iter__.return_value = [temp_config_path]
-            fallback_config = load_fallback()
-            self.assertDictEqual(fallback_config, config_settings)
-
-    def test_get_var(self):
-        """Verify that get_var does the right thing with precedence"""
-        with mock.patch.dict(
-            'open_discussions.settings.FALLBACK_CONFIG',
-            {'FOO': 'bar'}
-        ):
-            # Verify fallback
-            self.assertEqual(get_var('FOO', 'notbar'), 'bar')
-
-        # Verify default value
-        self.assertEqual(get_var('NOTATHING', 'foobar'), 'foobar')
-
-        # Verify environment variable wins:
-        with mock.patch.dict(
-            'os.environ', {'FOO': 'notbar'}, clear=True
-        ):
-            self.assertEqual(get_var('FOO', 'lemon'), 'notbar')
-
-        # Verify that types work:
-        with mock.patch.dict(
-            'os.environ',
-            {
-                'FOO': 'False',
-                'BAR': '[1,2,3]',
-            },
-            clear=True
-        ):
-            self.assertFalse(get_var('FOO', True))
-            self.assertEqual(get_var('BAR', []), [1, 2, 3])
-        # Make sure real types still work too (i.e. from yaml load)
-        with mock.patch.dict(
-            'open_discussions.settings.FALLBACK_CONFIG',
-            {'BLAH': True}
-        ):
-            self.assertEqual(get_var('BLAH', False), True)
 
     def test_s3_settings(self):
         """Verify that we enable and configure S3 with a variable"""
@@ -141,9 +87,7 @@ class TestSettings(TestCase):
         """Verify that we can enable/disable database SSL with a var"""
 
         # Check default state is SSL on
-        with mock.patch.dict('os.environ', {
-            'OPEN_DISCUSSIONS_DB_DISABLE_SSL': ''
-        }, clear=True):
+        with mock.patch.dict('os.environ', {}, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(
                 settings_vars['DATABASES']['default']['OPTIONS'],
