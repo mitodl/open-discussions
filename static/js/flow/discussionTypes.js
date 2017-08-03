@@ -53,3 +53,9 @@ export type Comment = {
   replies:   Array<Comment>,
   author_id: string,
 }
+
+export type CommentForm = {
+  post_id:      string,
+  comment_id?:  string,
+  text:         string,
+}

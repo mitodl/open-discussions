@@ -40,6 +40,8 @@ export default class IntegrationTestHelper {
     this.getChannelStub.throws(new Error("not implemented"))
     this.createPostStub = this.sandbox.stub(api, "createPost")
     this.createPostStub.throws(new Error("not implemented"))
+    this.createCommentStub = this.sandbox.stub(api, "createComment")
+    this.createCommentStub.throws(new Error("not implemented"))
     this.scrollIntoViewStub = this.sandbox.stub()
     window.HTMLDivElement.prototype.scrollIntoView = this.scrollIntoViewStub
     window.HTMLFieldSetElement.prototype.scrollIntoView = this.scrollIntoViewStub

@@ -22,3 +22,23 @@
     }
   }
 }
+
+.reply-button {
+  font-size: 0.8em;
+  padding: 10px 0;
+}
+
+.reply-form {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 0;
+
+  textarea {
+    width: 100%;
+  }
+
+  .cancel-button {
+    float: right;
+    font-size: 0.8em;
+  }
+}

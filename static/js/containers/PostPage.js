@@ -8,12 +8,14 @@ import Loading from "../components/Loading"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import PostDisplay from "../components/PostDisplay"
 import CommentTree from "../components/CommentTree"
+import { ReplyToPostForm } from "../components/CreateCommentForm"
 
 import { actions } from "../actions"
 import { anyProcessing, allLoaded } from "../util/rest"
 
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
+import type { FormsState } from "../flow/formTypes"
 
 class PostPage extends React.Component {
   props: {
@@ -21,7 +23,8 @@ class PostPage extends React.Component {
     dispatch: Dispatch,
     posts: Object,
     channels: Object,
-    comments: Object
+    comments: Object,
+    forms: FormsState
   }
 
   getMatchParams = () => {
@@ -57,7 +60,7 @@ class PostPage extends React.Component {
     }
   }
 
-  renderContents(postID, posts, channelName, channels, comments) {
+  renderContents(postID, posts, channelName, channels, comments, forms) {
     const post = posts.get(postID)
     const channel = channels.get(channelName)
     const commentTreeData = comments.get(postID)
@@ -71,21 +74,22 @@ class PostPage extends React.Component {
         <div className="first-column">
           <Card>
             <PostDisplay post={post} expanded />
+            <ReplyToPostForm forms={forms} post={post} />
           </Card>
-          <CommentTree comments={commentTreeData} />
+          <CommentTree comments={commentTreeData} forms={forms} />
         </div>
       </div>
     )
   }
 
   render() {
-    const { posts, channels, comments } = this.props
+    const { posts, channels, comments, forms } = this.props
     const [postId, channelName] = this.getMatchParams()
 
     return (
       <Loading
         restStates={[posts, channels, comments]}
-        renderContents={() => this.renderContents(postId, posts.data, channelName, channels.data, comments.data)}
+        renderContents={() => this.renderContents(postId, posts.data, channelName, channels.data, comments.data, forms)}
       />
     )
   }
@@ -94,7 +98,8 @@ class PostPage extends React.Component {
 const mapStateToProps = state => ({
   posts:    state.posts,
   channels: state.channels,
-  comments: state.comments
+  comments: state.comments,
+  forms:    state.forms
 })
 
 export default connect(mapStateToProps)(PostPage)

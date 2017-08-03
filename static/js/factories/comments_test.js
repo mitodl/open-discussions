@@ -9,7 +9,7 @@ describe("comment factories", () => {
   it("should make a tree of comments", () => {
     let post = makePost()
     makeCommentTree(post).forEach(comment => {
-      assert.isNumber(comment.id)
+      assert.isString(comment.id)
       assert.equal(comment.post_id, post.id)
       assert.isString(comment.text)
       assert.isString(comment.author_id)

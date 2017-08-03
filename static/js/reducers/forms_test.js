@@ -7,11 +7,11 @@ import rootReducer from "../reducers"
 import { actions } from "../actions"
 
 describe("forms reducer", () => {
-  const key = "mykey"
+  const formKey = "mykey"
   const value = {
     prop: "prop1"
   }
-  const payload = { key, value }
+  const payload = { formKey, value }
   let sandbox, store, dispatchThen
 
   beforeEach(() => {
@@ -31,7 +31,7 @@ describe("forms reducer", () => {
   it("should intialize the form", () => {
     return dispatchThen(actions.forms.formBeginEdit(payload), [actions.forms.FORM_BEGIN_EDIT]).then(forms => {
       assert.deepEqual(forms, {
-        [key]: {
+        [formKey]: {
           value:  value,
           errors: {}
         }
@@ -45,13 +45,13 @@ describe("forms reducer", () => {
       actions.forms.FORM_UPDATE
     ]).then(forms => {
       assert.deepEqual(forms, {
-        [key]: {
+        [formKey]: {
           value:  { prop: "prop2" },
           errors: {}
         }
       })
     })
-    store.dispatch(actions.forms.formUpdate({ key, value: { prop: "prop2" } }))
+    store.dispatch(actions.forms.formUpdate({ formKey, value: { prop: "prop2" } }))
     return prom
   })
 
@@ -68,8 +68,8 @@ describe("forms reducer", () => {
         }
       })
     })
-    store.dispatch(actions.forms.formBeginEdit({ key: "otherkey", value }))
-    store.dispatch(actions.forms.formEndEdit({ key }))
+    store.dispatch(actions.forms.formBeginEdit({ formKey: "otherkey", value }))
+    store.dispatch(actions.forms.formEndEdit({ formKey }))
     return prom
   })
 })

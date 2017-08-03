@@ -2,7 +2,7 @@
 import { assert } from "chai"
 import sinon from "sinon"
 import configureTestStore from "redux-asserts"
-import { INITIAL_STATE, FETCH_SUCCESS } from "redux-hammock/constants"
+import { INITIAL_STATE } from "redux-hammock/constants"
 
 import rootReducer from "../reducers"
 import { actions } from "../actions"
@@ -11,7 +11,6 @@ import { setPostData } from "../actions/post"
 
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { makeChannel } from "../factories/channels"
-import { makeCommentTree } from "../factories/comments"
 
 describe("reducers", () => {
   let sandbox, store, dispatchThen
@@ -168,64 +167,6 @@ describe("reducers", () => {
       const { requestType, successType } = actions.frontpage.get
       return dispatchThen(actions.frontpage.get(), [requestType, successType]).then(({ data }) => {
         assert.lengthOf(data, 20)
-      })
-    })
-  })
-
-  describe("comments reducer", () => {
-    let getCommentsStub, postCommentsStub, post, tree
-
-    beforeEach(() => {
-      post = makePost()
-      tree = makeCommentTree(post)
-      dispatchThen = store.createDispatchThen(state => state.comments)
-      getCommentsStub = sandbox.stub(api, "getComments")
-      getCommentsStub.returns(Promise.resolve({ data: tree, postID: post.id }))
-      postCommentsStub = sandbox.stub(api, "createComment")
-      postCommentsStub.returns(Promise.resolve())
-    })
-
-    it("should have some initial state", () => {
-      assert.deepEqual(store.getState().comments, { ...INITIAL_STATE, data: new Map() })
-    })
-
-    it("should let you get the comments for a Post", () => {
-      const { requestType, successType } = actions.comments.get
-      return dispatchThen(actions.comments.get(post), [requestType, successType]).then(({ data }) => {
-        let comments = data.get(post.id)
-        assert.isArray(comments)
-        assert.isNotEmpty(comments[0].replies)
-      })
-    })
-
-    it("should handle an empty response ok", () => {
-      const { requestType, successType } = actions.comments.get
-      getCommentsStub.returns(Promise.resolve({ data: [], postID: post.id }))
-      return dispatchThen(actions.comments.get(post), [requestType, successType]).then(({ data }) => {
-        assert.deepEqual([], data.get(post.id))
-      })
-    })
-
-    it("should let you reply to a post", () => {
-      const { requestType, successType } = actions.comments.post
-      return dispatchThen(actions.comments.post(post.id, "comment text"), [requestType, successType]).then(state => {
-        assert.isTrue(state.loaded)
-        assert.deepEqual(state.data, new Map())
-        assert.equal(state.postStatus, FETCH_SUCCESS)
-        assert.ok(postCommentsStub.calledWith(post.id, "comment text"))
-      })
-    })
-
-    it("should let you reply to a comment", () => {
-      const { requestType, successType } = actions.comments.post
-      return dispatchThen(actions.comments.post(post.id, "comment text", tree[0].id), [
-        requestType,
-        successType
-      ]).then(state => {
-        assert.isTrue(state.loaded)
-        assert.equal(state.postStatus, FETCH_SUCCESS)
-        assert.deepEqual(state.data, new Map())
-        assert.ok(postCommentsStub.calledWith(post.id, "comment text", tree[0].id))
       })
     })
   })

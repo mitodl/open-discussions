@@ -7,8 +7,8 @@ import type { Post, Comment } from "../flow/discussionTypes"
 
 const incr = incrementer()
 
-const makeComment = (post: Post) => ({
-  id:        incr.next().value,
+export const makeComment = (post: Post): Comment => ({
+  id:        String(incr.next().value),
   post_id:   post.id,
   text:      casual.text,
   author_id: casual.username,

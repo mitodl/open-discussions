@@ -18,7 +18,7 @@ describe("CommentTree", () => {
     comments = makeCommentTree(post)
   })
 
-  const renderCommentTree = comments => shallow(<CommentTree comments={comments} />)
+  const renderCommentTree = comments => shallow(<CommentTree comments={comments} forms={{}} />)
 
   it("should render all top-level comments as separate cards", () => {
     let wrapper = renderCommentTree(comments)

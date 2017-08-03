@@ -11,19 +11,19 @@ export const forms = (state: Object = {}, action: Action<FormActionPayload, null
   case FORM_BEGIN_EDIT:
     return {
       ...state,
-      [action.payload.key]: {
+      [action.payload.formKey]: {
         value:  action.payload.value,
         errors: {}
       }
     }
   case FORM_UPDATE:
     return R.mergeDeepRight(state, {
-      [action.payload.key]: {
+      [action.payload.formKey]: {
         value: action.payload.value
       }
     })
   case FORM_END_EDIT:
-    return R.omit(action.payload.key, state)
+    return R.omit(action.payload.formKey, state)
   }
   return state
 }

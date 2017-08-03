@@ -12,7 +12,7 @@ import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
 
 const CREATE_CHANNEL_KEY = "channel:new"
-const CREATE_CHANNEL_PAYLOAD = { key: CREATE_CHANNEL_KEY }
+const CREATE_CHANNEL_PAYLOAD = { formKey: CREATE_CHANNEL_KEY }
 const getForm = R.prop(CREATE_CHANNEL_KEY)
 
 class CreateChannelPage extends React.Component {
