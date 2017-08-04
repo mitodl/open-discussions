@@ -298,6 +298,7 @@ def test_list_comments(client, use_betamax, praw_settings):
             "author_id": "george",
             "score": 1,
             "upvoted": False,
+            "downvoted": False,
             "created": "2017-07-25T17:09:45+00:00",
             "replies": [
                 {
@@ -307,6 +308,7 @@ def test_list_comments(client, use_betamax, praw_settings):
                     "author_id": "george",
                     "score": 1,
                     "upvoted": True,
+                    "downvoted": False,
                     "created": "2017-07-25T17:15:57+00:00",
                     "replies": []
                 },
@@ -317,6 +319,7 @@ def test_list_comments(client, use_betamax, praw_settings):
                     "author_id": "george",
                     "score": 1,
                     "upvoted": True,
+                    "downvoted": False,
                     "created": "2017-07-25T17:16:10+00:00",
                     "replies": []
                 }
@@ -338,6 +341,7 @@ def test_get_comment(client, use_betamax, praw_settings):
         "author_id": "george",
         "score": 1,
         "upvoted": True,
+        "downvoted": False,
         "created": "2017-07-25T21:18:47+00:00",
         "replies": []
     }
@@ -361,6 +365,7 @@ def test_create_comment(client, use_betamax, praw_settings):
         'score': 1,
         'text': 'reply_to_post 2',
         'upvoted': True,
+        "downvoted": False,
     }
 
 
@@ -383,6 +388,30 @@ def test_create_comment_no_upvote(client, use_betamax, praw_settings):
         'score': 1,
         'text': 'no upvoted',
         'upvoted': False,
+        "downvoted": False,
+    }
+
+
+def test_create_comment_downvote(client, use_betamax, praw_settings):
+    """Create a comment with a downvote"""
+    client.force_login(UserFactory.create(username='george'))
+    post_id = '2'
+    url = reverse('comment-list', kwargs={'post_id': post_id})
+    resp = client.post(url, data={
+        "text": "downvoted",
+        "downvoted": True,
+    })
+    assert resp.status_code == 201
+    assert resp.json() == {
+        'author_id': 'george',
+        'created': '2017-08-04T19:22:02+00:00',
+        'id': 'l',
+        'post_id': post_id,
+        'replies': [],
+        'score': 1,
+        'text': 'downvoted',
+        'upvoted': False,
+        'downvoted': True,
     }
 
 
@@ -405,6 +434,7 @@ def test_create_comment_reply_to_comment(client, use_betamax, praw_settings):
         'score': 1,
         'text': 'reply_to_comment 3',
         'upvoted': True,
+        "downvoted": False,
     }
 
 
@@ -425,10 +455,55 @@ def test_update_comment_text(client, use_betamax, praw_settings):
         'score': 1,
         'text': 'updated text',
         'upvoted': False,
+        'downvoted': False,
     }
 
 
-def test_update_comment_clear_vote(client, use_betamax, praw_settings):
+def test_update_comment_upvote(client, use_betamax, praw_settings):
+    """Update a comment to upvote it"""
+    client.force_login(UserFactory.create(username='george'))
+    comment_id = 'l'
+    url = reverse('comment-detail', kwargs={'comment_id': comment_id})
+    resp = client.patch(url, type='json', data={
+        "upvoted": True,
+    })
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'author_id': 'george',
+        'created': '2017-08-04T19:22:02+00:00',
+        'id': comment_id,
+        'post_id': '2',
+        'replies': [],
+        'score': 1,
+        'text': 'downvoted',
+        'upvoted': True,
+        'downvoted': False,
+    }
+
+
+def test_update_comment_downvote(client, use_betamax, praw_settings):
+    """Update a comment to downvote it"""
+    client.force_login(UserFactory.create(username='george'))
+    comment_id = 'l'
+    url = reverse('comment-detail', kwargs={'comment_id': comment_id})
+    resp = client.patch(url, type='json', data={
+        "downvoted": True,
+    })
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'author_id': 'george',
+        'created': '2017-08-04T19:22:02+00:00',
+        'id': comment_id,
+        'post_id': '2',
+        'replies': [],
+        'score': 1,
+        'text': 'downvoted',
+        'upvoted': False,
+        'downvoted': True,
+    }
+
+
+def test_update_comment_clear_upvote(client, use_betamax, praw_settings):
     """Update a comment to clear its upvote"""
     client.force_login(UserFactory.create(username='george'))
     url = reverse('comment-detail', kwargs={'comment_id': '6'})
@@ -445,6 +520,29 @@ def test_update_comment_clear_vote(client, use_betamax, praw_settings):
         'score': 1,
         'text': 'reply_to_comment 3',
         'upvoted': False,
+        'downvoted': False,
+    }
+
+
+def test_update_comment_clear_downvote(client, use_betamax, praw_settings):
+    """Update a comment to clear its downvote"""
+    client.force_login(UserFactory.create(username='george'))
+    comment_id = 'l'
+    url = reverse('comment-detail', kwargs={'comment_id': comment_id})
+    resp = client.patch(url, type='json', data={
+        "downvoted": False,
+    })
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'author_id': 'george',
+        'created': '2017-08-04T19:22:02+00:00',
+        'id': comment_id,
+        'post_id': '2',
+        'replies': [],
+        'score': 1,
+        'text': 'downvoted',
+        'upvoted': False,
+        'downvoted': False,
     }
 
 
