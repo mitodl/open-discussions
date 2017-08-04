@@ -1,6 +1,6 @@
 // @flow
 import R from "ramda"
-import { GET, POST, INITIAL_STATE } from "redux-hammock/constants"
+import { GET, PATCH, POST, INITIAL_STATE } from "redux-hammock/constants"
 
 import * as api from "../lib/api"
 
@@ -31,9 +31,23 @@ const appendCommentToTree = (tree: Array<Comment>, comment: Comment, commentId?:
     : R.prepend(comment, tree)
 }
 
+const updateCommentTree = (tree: Array<Comment>, updatedComment: Comment): Array<Comment> => {
+  return R.map((treeComment: Comment) => {
+    return updatedComment.id === treeComment.id
+      ? {
+        ...updatedComment,
+        replies: treeComment.replies
+      }
+      : {
+        ...treeComment,
+        replies: updateCommentTree(treeComment.replies, updatedComment)
+      }
+  }, tree)
+}
+
 export const commentsEndpoint = {
   name:              "comments",
-  verbs:             [GET, POST],
+  verbs:             [GET, PATCH, POST],
   getFunc:           (postID: string) => api.getComments(postID),
   initialState:      { ...INITIAL_STATE, data: new Map() },
   getSuccessHandler: (response: CommentResponse, data: Map<string, Array<Comment>>) => {
@@ -49,6 +63,14 @@ export const commentsEndpoint = {
     let update = new Map()
     data.forEach((tree, key) => {
       update.set(key, key === postId ? appendCommentToTree(tree, comment, commentId) : tree)
+    })
+    return update
+  },
+  patchFunc:           (commentId: string, payload: Object) => api.updateComment(commentId, payload),
+  patchSuccessHandler: (response: Comment, data: Map<string, Array<Comment>>) => {
+    let update = new Map()
+    data.forEach((tree, key) => {
+      update.set(key, key === response.post_id ? updateCommentTree(tree, response) : tree)
     })
     return update
   }

@@ -19,8 +19,8 @@ const store = configureStore()
 
 const rootEl = document.getElementById("container")
 
+const history = createBrowserHistory()
 const renderApp = Component => {
-  const history = createBrowserHistory()
   ReactDOM.render(
     <AppContainer>
       <Component store={store} history={history}>

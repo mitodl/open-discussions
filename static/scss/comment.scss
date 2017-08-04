@@ -6,6 +6,33 @@
   .comment {
     margin: 5px 0;
 
+    .row {
+      display: flex;
+      flex-direction: row;
+
+      .votes-form {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .votes {
+          margin-right: 10px;
+
+          .vote {
+            display: block;
+          }
+
+          .upvoted, .downvoted {
+            border: 2px solid black;
+          }
+        }
+
+        .score {
+          margin-right: 10px;
+        }
+      }
+    }
+
     .author-info {
       display: flex;
       flex-direction: row;

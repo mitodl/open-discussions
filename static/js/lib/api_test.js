@@ -1,7 +1,7 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
-import { POST } from "redux-hammock/constants"
+import { PATCH, POST } from "redux-hammock/constants"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
 import {
@@ -13,7 +13,8 @@ import {
   getPostsForChannel,
   getComments,
   createComment,
-  createPost
+  createPost,
+  updateComment
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -155,7 +156,7 @@ describe("api", function() {
       })
     })
 
-    it("creates commments replying to comments", () => {
+    it("creates comments replying to comments", () => {
       const post = makePost()
       const tree = makeCommentTree(post)
       fetchStub.returns(Promise.resolve())
@@ -168,6 +169,28 @@ describe("api", function() {
             text:       "my new comment",
             comment_id: tree[0].id
           })
+        })
+      })
+    })
+
+    it("updates a comment", () => {
+      const post = makePost()
+      const tree = makeCommentTree(post)
+      const comment = tree[0]
+      const commentResponse = { ...comment, replies: undefined, text: "edited" }
+
+      fetchStub.returns(Promise.resolve(commentResponse))
+
+      const payload = {
+        text:      "edited",
+        downvoted: true
+      }
+      return updateComment(comment.id, payload).then(updated => {
+        assert.ok(fetchStub.calledWith(`/api/v0/comments/${comment.id}/`))
+        assert.deepEqual(updated, commentResponse)
+        assert.deepEqual(fetchStub.args[0][1], {
+          method: PATCH,
+          body:   JSON.stringify(payload)
         })
       })
     })

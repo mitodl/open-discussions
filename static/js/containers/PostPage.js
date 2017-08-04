@@ -17,14 +17,16 @@ import { anyProcessing, allLoaded } from "../util/rest"
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
 import type { FormsState } from "../flow/formTypes"
+import type { Channel, Comment, Post } from "../flow/discussionTypes"
+import type { RestState } from "../flow/restTypes"
 
 class PostPage extends React.Component {
   props: {
     match: Match,
     dispatch: Dispatch,
-    posts: Object,
-    channels: Object,
-    comments: Object,
+    posts: RestState<Map<string, Post>>,
+    channels: RestState<Map<string, Channel>>,
+    comments: RestState<Map<string, Array<Comment>>>,
     forms: FormsState
   }
 
@@ -37,13 +39,18 @@ class PostPage extends React.Component {
     const { dispatch, channels, posts, comments } = this.props
     const [postID, channelName] = this.getMatchParams()
 
-    if (R.isNil(posts.data.get(postID)) && R.isNil(posts.error)) {
+    if (!postID || !channelName) {
+      // should not happen, this should be guaranteed by react-router
+      throw "Match error"
+    }
+
+    if (!posts.data || (R.isNil(posts.data.get(postID)) && R.isNil(posts.error))) {
       dispatch(actions.posts.get(postID))
     }
-    if (R.isNil(comments.data.get(postID)) && R.isNil(comments.error)) {
+    if (!comments.data || (R.isNil(comments.data.get(postID)) && R.isNil(comments.error))) {
       dispatch(actions.comments.get(postID))
     }
-    if (R.isNil(channels.data.get(channelName)) && R.isNil(channels.error)) {
+    if (!channels.data || (R.isNil(channels.data.get(channelName)) && R.isNil(channels.error))) {
       dispatch(actions.channels.get(channelName))
     }
   }
@@ -61,14 +68,35 @@ class PostPage extends React.Component {
     }
   }
 
+  downvote = (comment: Comment) => {
+    const { dispatch } = this.props
+    dispatch(
+      actions.comments.patch(comment.id, {
+        downvoted: !comment.downvoted
+      })
+    )
+  }
+
+  upvote = (comment: Comment) => {
+    const { dispatch } = this.props
+    dispatch(
+      actions.comments.patch(comment.id, {
+        upvoted: !comment.upvoted
+      })
+    )
+  }
+
   renderContents = () => {
     const { posts, channels, comments, forms, dispatch } = this.props
     const [postId, channelName] = this.getMatchParams()
+    // $FlowFixMe: undefined check should already be done
     const post = posts.data.get(postId)
+    // $FlowFixMe: undefined check should already be done
     const channel = channels.data.get(channelName)
+    // $FlowFixMe: undefined check should already be done
     const commentTreeData = comments.data.get(postId)
 
-    if (R.isNil(channel) || R.isNil(post) || R.isNil(commentTreeData)) {
+    if (!channel || !post || !commentTreeData) {
       return null
     }
     return (
@@ -79,7 +107,7 @@ class PostPage extends React.Component {
             <PostDisplay post={post} toggleUpvote={toggleUpvote(dispatch)} expanded />
             <ReplyToPostForm forms={forms} post={post} />
           </Card>
-          <CommentTree comments={commentTreeData} forms={forms} />
+          <CommentTree comments={commentTreeData} forms={forms} upvote={this.upvote} downvote={this.downvote} />
         </div>
       </div>
     )
