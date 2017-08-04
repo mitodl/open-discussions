@@ -8,10 +8,8 @@ import { postDetailURL } from "../lib/url"
 import type { Post } from "../flow/discussionTypes"
 
 const textContent = post =>
-  <div className="text-content-border">
-    <div className="text-content">
-      {post.text}
-    </div>
+  <div className="text-content">
+    {post.text}
   </div>
 
 const postTitle = (post: Post) =>
@@ -52,13 +50,17 @@ export default class PostDisplay extends React.Component {
           </span>
         </div>
         <div className="summary">
-          {postTitle(post)}
-          <div className="authored-by">
-            by <a>{post.author_id || "someone"}</a>, {formattedDate} {this.showChannelLink()}
+          <div className="post-title">
+            {postTitle(post)}
           </div>
-          <Link className="num-comments" to={postDetailURL(post.channel_name, post.id)}>
-            {post.num_comments || 0} Comments
-          </Link>
+          <div className="authored-by">
+            <a>{post.author_id || "someone"}</a>, {formattedDate} {this.showChannelLink()}
+          </div>
+          <div className="num-comments">
+            <Link to={postDetailURL(post.channel_name, post.id)}>
+              {post.num_comments || 0} Comments
+            </Link>
+          </div>
         </div>
         {expanded && post.text ? textContent(post) : null}
       </div>

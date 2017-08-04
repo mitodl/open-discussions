@@ -16,11 +16,10 @@ describe("PostDisplay", () => {
     const summary = wrapper.find(".summary")
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
     assert.equal(summary.find(Link).at(0).props().children, post.title)
-    assert.deepEqual(wrapper.find(".num-comments").props().children, [post.num_comments, " Comments"])
+    assert.deepEqual(wrapper.find(".num-comments").find(Link).props().children, [post.num_comments, " Comments"])
     const authoredBy = wrapper.find(".authored-by").text()
-    const expectedPrefix = `by ${post.author_id}, `
-    assert(authoredBy.startsWith(expectedPrefix))
-    assert.isNotEmpty(authoredBy.substring(expectedPrefix.length))
+    assert(authoredBy.startsWith(post.author_id))
+    assert.isNotEmpty(authoredBy.substring(post.author_id.length))
   })
 
   it("should link to the subreddit, if told to", () => {

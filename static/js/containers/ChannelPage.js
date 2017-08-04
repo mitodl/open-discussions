@@ -46,7 +46,7 @@ class ChannelPage extends React.Component {
         <div className="double-column">
           <ChannelBreadcrumbs channel={channel} />
           <div className="first-column">
-            <Card>
+            <Card title={channel.title}>
               <PostList channel={channel} posts={safeBulkGet(postIds, posts.data)} />
             </Card>
           </div>
@@ -55,6 +55,7 @@ class ChannelPage extends React.Component {
               <ChannelSidebar channel={channel} />
             </Card>
           </div>
+          <br className="clear" />
         </div>
       )
     }

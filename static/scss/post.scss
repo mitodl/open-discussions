@@ -1,46 +1,50 @@
 .post-summary {
-  padding: 15px 0;
+  padding: 22px 0;
 
   &:not(:last-child) {
     border-bottom: 1px solid $border-grey;
   }
 
   .upvotes {
-    width: 5em;
-    padding-top: 1.5em;
     float: left;
+    width: 60px;
     text-align: center;
 
-    button, span {
+    img.upvote-arrow {
+      width: 20px;
+    }
+
+    span.votes {
       display: block;
-      margin: 0 auto;
+      color: #6f99be;
+      font-weight: 500;
+      font-size: 14px;
+      margin: 5px 0 0;
     }
   }
 
-  .text-content-border {
-    margin: 20px;
-    border: 1px solid $border-grey;
-    background-color: $bg-blue;
-    border-radius: 7px;
-
-    .text-content {
-      padding: 20px;
-    }
+  .text-content {
+    padding: 0;
+    margin-top: 15px;
   }
 
   .post-title {
-    font-size: 18px;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 0 7px;
+  }
+
+  .authored-by {
+    font-size: 14px;
+    color: $font-grey;
+    margin: 0 0 8px;
   }
 
   .num-comments {
     display: block;
-  }
-
-  .authored-by {
-    display: block;
-    padding-bottom: 5px;
-    font-weight: 300;
-    color: $font-grey;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 400;
   }
 
   .summary {

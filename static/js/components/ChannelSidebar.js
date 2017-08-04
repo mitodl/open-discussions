@@ -15,7 +15,7 @@ export default class ChannelSidebar extends React.Component {
 
     return (
       <div className="sidebar">
-        <Link to={newPostURL(channel.name)} className="new-post">
+        <Link to={newPostURL(channel.name)} className="new-post button">
           Submit a New Post
         </Link>
         <h3 className="title">

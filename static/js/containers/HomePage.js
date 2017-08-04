@@ -27,13 +27,13 @@ class HomePage extends React.Component {
 
     return (
       <div className="double-column">
-        <div>Home page</div>
         <div className="first-column">
-          <Card>
+          <Card title="Home Page">
             <PostList posts={safeBulkGet(frontpage.data, posts.data)} showChannelLinks={true} />
           </Card>
         </div>
         <div className="second-column" />
+        <br className="clear" />
       </div>
     )
   }

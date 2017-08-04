@@ -1,6 +1,6 @@
-// Layout goes here
-
 @import "variables";
+@import "basic";
+@import "breadcrumbs";
 @import "form";
 @import "post";
 @import "card";
@@ -11,23 +11,29 @@
 body {
   font-family: 'Roboto', helvetica, arial, sans-serif !important;
   background-color: $app-background;
+  margin: 0;
+  padding: 0;
+  color: $font-black;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 .app {
   width: 100%;
-
-  a {
-    color: $link-blue;
-  }
+  margin-top: 20px;
 
   .single-column {
     margin: auto;
-    width: 700px;  // arbitrarily chosen
+    width: 90%;  // arbitrarily chosen
+    max-width: 700px;
   }
 
   .double-column {
     margin: auto;
-    width: 1100px;
+    width: 90%;
+    max-width: 1100px;
 
     .first-column {
       width: 70%;
@@ -37,10 +43,12 @@ body {
     .second-column {
       width: 30%;
       float: left;
-
-      .card {
-        margin-left: 10px;
-      }
+      padding-left: 15px;
     }
   }
+}
+
+.clear {
+  clear: both;
+  line-height: 0;
 }

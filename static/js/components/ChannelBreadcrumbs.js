@@ -12,7 +12,7 @@ const ChannelBreadcrumbs = (props: BreadCrumbProps) => {
   const { channel } = props
 
   return (
-    <div>
+    <div className="breadcrumbs">
       <Link to="/">Discussions</Link>&nbsp;
       <span>&gt;</span>&nbsp;
       <Link to={`/channel/${channel.name}`}>{channel.title}</Link>
