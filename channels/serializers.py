@@ -63,25 +63,33 @@ class WriteableSerializerMethodField(serializers.SerializerMethodField):
         return data
 
 
-def _apply_vote(instance, validated_data):
+def _apply_vote(instance, validated_data, allow_downvote):
     """
     Apply a vote provided by the user to a comment or post, if it's different than before.
 
     Args:
         instance (Comment or Post): A comment or post
         validated_data (dict): validated data which contains the new vote from the user
+        allow_downvote (bool): If false, ignore downvotes
 
     Returns:
         bool:
             True if a change was made, False otherwise
     """
     upvote = validated_data.get('upvoted')
+    if allow_downvote:
+        downvote = validated_data.get('downvoted')
+    else:
+        downvote = None
 
     is_upvoted = instance.likes is True
+    is_downvoted = instance.likes is False
 
     if upvote and not is_upvoted:
         instance.upvote()
-    elif upvote is False and is_upvoted:
+    elif downvote and not is_downvoted:
+        instance.downvote()
+    elif (upvote is False and is_upvoted) or (downvote is False and is_downvoted):
         instance.clear_vote()
     else:
         return False
@@ -170,7 +178,7 @@ class PostSerializer(serializers.Serializer):
             title=title,
             **kwargs
         )
-        changed = _apply_vote(post, validated_data)
+        changed = _apply_vote(post, validated_data, False)
         if not changed:
             return post
         else:
@@ -186,7 +194,7 @@ class PostSerializer(serializers.Serializer):
         if "text" in validated_data:
             instance = api.update_post(post_id=post_id, text=validated_data['text'])
 
-        _apply_vote(instance, validated_data)
+        _apply_vote(instance, validated_data, False)
         return api.get_post(post_id=post_id)
 
 
@@ -199,6 +207,7 @@ class CommentSerializer(serializers.Serializer):
     author_id = serializers.CharField(read_only=True, source='author')
     score = serializers.IntegerField(read_only=True)
     upvoted = WriteableSerializerMethodField()
+    downvoted = WriteableSerializerMethodField()
     created = serializers.SerializerMethodField()
     replies = serializers.SerializerMethodField()
 
@@ -220,6 +229,10 @@ class CommentSerializer(serializers.Serializer):
         """Is a comment upvoted?"""
         return instance.likes is True
 
+    def get_downvoted(self, instance):
+        """Is a comment downvoted?"""
+        return instance.likes is False
+
     def get_replies(self, instance):
         """List of replies to this comment"""
         return [CommentSerializer(reply, context=self.context).data for reply in instance.replies]
@@ -231,6 +244,16 @@ class CommentSerializer(serializers.Serializer):
     def validate_upvoted(self, value):
         """Validate that upvoted is a bool"""
         return {'upvoted': _parse_bool(value, 'upvoted')}
+
+    def validate_downvoted(self, value):
+        """Validate that downvoted is a bool"""
+        return {'downvoted': _parse_bool(value, 'downvoted')}
+
+    def validate(self, attrs):
+        """Validate that the the combination of fields makes sense"""
+        if attrs.get('upvoted') and attrs.get('downvoted'):
+            raise ValidationError("upvoted and downvoted cannot both be true")
+        return attrs
 
     def create(self, validated_data):
         api = Api(user=self.context['request'].user)
@@ -247,7 +270,7 @@ class CommentSerializer(serializers.Serializer):
             **kwargs
         )
 
-        changed = _apply_vote(comment, validated_data)
+        changed = _apply_vote(comment, validated_data, True)
         if changed:
             return api.get_comment(comment.id)
         else:
@@ -260,6 +283,6 @@ class CommentSerializer(serializers.Serializer):
         if 'body' in validated_data:
             api.update_comment(comment_id=instance.id, text=validated_data['body'])
 
-        _apply_vote(instance, validated_data)
+        _apply_vote(instance, validated_data, True)
 
         return api.get_comment(comment_id=instance.id)
