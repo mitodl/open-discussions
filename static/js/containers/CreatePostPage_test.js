@@ -3,7 +3,7 @@ import { assert } from "chai"
 import sinon from "sinon"
 
 import { makeChannel } from "../factories/channels"
-import { makePost } from "../factories/posts"
+import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
@@ -16,6 +16,7 @@ describe("CreatePostPage", () => {
     channel = makeChannel()
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(channel))
+    helper.getFrontpageStub.returns(Promise.resolve(makeChannelPostList()))
     listenForActions = helper.listenForActions.bind(helper)
     renderComponent = helper.renderComponent.bind(helper)
   })
