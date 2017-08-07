@@ -36,21 +36,17 @@ export default class IntegrationTestHelper {
     this.listenForActions = this.store.createListenForActions()
     this.dispatchThen = this.store.createDispatchThen()
 
-    this.getChannelStub = this.sandbox.stub(api, "getChannel")
-    this.getChannelStub.throws(new Error("not implemented"))
-    this.createPostStub = this.sandbox.stub(api, "createPost")
-    this.createPostStub.throws(new Error("not implemented"))
-    this.createCommentStub = this.sandbox.stub(api, "createComment")
-    this.createCommentStub.throws(new Error("not implemented"))
+    // stub all the api functions
+    // NOTE: due to a regression in sinon 2.x, if you use `callsFake` you must
+    //       call `resetBehavior()` on the stub first or the error still raises
+    for (let methodName in api) {
+      if (typeof api[methodName] === "function") {
+        let stubName = `${methodName}Stub`
+        this[stubName] = this.sandbox.stub(api, methodName).throws(new Error(`${stubName} not implemented`))
+      }
+    }
+
     this.scrollIntoViewStub = this.sandbox.stub()
-    this.getPostsForChannelStub = this.sandbox.stub(api, "getPostsForChannel")
-    this.getPostsForChannelStub.throws(new Error("not implemented"))
-    this.getPostStub = this.sandbox.stub(api, "getPost")
-    this.getPostStub.throws(new Error("not implemented"))
-    this.getFrontpageStub = this.sandbox.stub(api, "getFrontpage")
-    this.getFrontpageStub.throws(new Error("not implemented"))
-    this.getCommentsStub = this.sandbox.stub(api, "getComments")
-    this.getCommentsStub.throws(new Error("not implemented"))
     window.HTMLDivElement.prototype.scrollIntoView = this.scrollIntoViewStub
     window.HTMLFieldSetElement.prototype.scrollIntoView = this.scrollIntoViewStub
     this.browserHistory = createMemoryHistory()

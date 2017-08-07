@@ -79,6 +79,7 @@ describe("CreatePostPage", () => {
   }
 
   it("goes back when cancel is clicked", () => {
+    helper.getFrontpageStub.returns(Promise.resolve([]))
     return renderPage().then(([wrapper]) => {
       assert.equal(helper.currentLocation.pathname, newPostURL(channel.name))
       wrapper.find(".cancel").simulate("click")

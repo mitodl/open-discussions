@@ -1,30 +1,26 @@
 // @flow
 import { assert } from "chai"
-import sinon from "sinon"
-import configureTestStore from "redux-asserts"
 import { INITIAL_STATE, FETCH_SUCCESS } from "redux-hammock/constants"
 
-import rootReducer from "../reducers"
 import { actions } from "../actions"
-import * as api from "../lib/api"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 import { makePost } from "../factories/posts"
 import { makeCommentTree } from "../factories/comments"
 
 describe("comments reducers", () => {
-  let sandbox, store, dispatchThen, listenForActions, getCommentsStub, postCommentsStub, post, tree
+  let helper, store, dispatchThen, listenForActions, post, tree
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
-    store = configureTestStore(rootReducer)
+    helper = new IntegrationTestHelper()
+    store = helper.store
     post = makePost()
     tree = makeCommentTree(post)
-    dispatchThen = store.createDispatchThen(state => state.comments)
-    listenForActions = store.createListenForActions(state => state.comments)
-    getCommentsStub = sandbox.stub(api, "getComments")
-    getCommentsStub.returns(Promise.resolve({ data: tree, postID: post.id }))
-    postCommentsStub = sandbox.stub(api, "createComment")
-    postCommentsStub.callsFake((postId, text) =>
+    dispatchThen = helper.store.createDispatchThen(state => state.comments)
+    listenForActions = helper.store.createListenForActions(state => state.comments)
+    helper.getCommentsStub.returns(Promise.resolve({ data: tree, postID: post.id }))
+    helper.createCommentStub.resetBehavior()
+    helper.createCommentStub.callsFake((postId, text) =>
       Promise.resolve({
         post_id: postId,
         text
@@ -33,7 +29,7 @@ describe("comments reducers", () => {
   })
 
   afterEach(() => {
-    sandbox.restore()
+    helper.cleanup()
   })
 
   it("should have some initial state", () => {
@@ -51,7 +47,7 @@ describe("comments reducers", () => {
 
   it("should handle an empty response ok", () => {
     const { requestType, successType } = actions.comments.get
-    getCommentsStub.returns(Promise.resolve({ data: [], postID: post.id }))
+    helper.getCommentsStub.returns(Promise.resolve({ data: [], postID: post.id }))
     return dispatchThen(actions.comments.get(post), [requestType, successType]).then(({ data }) => {
       assert.deepEqual([], data.get(post.id))
     })
@@ -72,7 +68,7 @@ describe("comments reducers", () => {
         text:    "comment text"
       })
       assert.equal(state.postStatus, FETCH_SUCCESS)
-      assert.ok(postCommentsStub.calledWith(post.id, "comment text"))
+      assert.ok(helper.createCommentStub.calledWith(post.id, "comment text"))
     })
   })
 
@@ -91,7 +87,7 @@ describe("comments reducers", () => {
         text:    "comment text"
       })
       assert.equal(state.postStatus, FETCH_SUCCESS)
-      assert.ok(postCommentsStub.calledWith(post.id, "comment text", tree[0].id))
+      assert.ok(helper.createCommentStub.calledWith(post.id, "comment text", tree[0].id))
     })
   })
 })

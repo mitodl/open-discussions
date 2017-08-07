@@ -1,35 +1,31 @@
 // @flow
 import { assert } from "chai"
-import sinon from "sinon"
-import configureTestStore from "redux-asserts"
 import { INITIAL_STATE } from "redux-hammock/constants"
 
-import rootReducer from "../reducers"
 import { actions } from "../actions"
-import * as api from "../lib/api"
 import { setPostData } from "../actions/post"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { makeChannel } from "../factories/channels"
 
 describe("reducers", () => {
-  let sandbox, store, dispatchThen
+  let helper, store, dispatchThen
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
-    store = configureTestStore(rootReducer)
+    helper = new IntegrationTestHelper()
+    store = helper.store
   })
 
   afterEach(() => {
-    sandbox.restore()
+    helper.cleanup()
   })
 
   describe("posts reducer", () => {
-    let getPostStub
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.posts)
-      getPostStub = sandbox.stub(api, "getPost")
-      getPostStub.callsFake(async id => {
+      helper.getPostStub.resetBehavior() // needed because ``callsFake`` doesn't override the ``throws``
+      helper.getPostStub.callsFake(async id => {
         let post = makePost()
         post.id = id
         return post
@@ -79,11 +75,10 @@ describe("reducers", () => {
   })
 
   describe("channels reducer", () => {
-    let getChannelStub
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.channels)
-      getChannelStub = sandbox.stub(api, "getChannel")
-      getChannelStub.callsFake(async name => {
+      helper.getChannelStub.resetBehavior() // needed because ``callsFake`` doesn't override the ``throws``
+      helper.getChannelStub.callsFake(async name => {
         let channel = makeChannel()
         channel.name = name
         return channel
@@ -117,11 +112,9 @@ describe("reducers", () => {
   })
 
   describe("postsForChannel reducer", () => {
-    let getPostsForChannelStub
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.postsForChannel)
-      getPostsForChannelStub = sandbox.stub(api, "getPostsForChannel")
-      getPostsForChannelStub.returns(Promise.resolve(makeChannelPostList()))
+      helper.getPostsForChannelStub.returns(Promise.resolve(makeChannelPostList()))
     })
 
     it("should have some initial state", () => {
@@ -151,12 +144,9 @@ describe("reducers", () => {
   })
 
   describe("frontpage reducer", () => {
-    let frontpageStub
-
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.frontpage)
-      frontpageStub = sandbox.stub(api, "getFrontpage")
-      frontpageStub.returns(Promise.resolve(makeChannelPostList()))
+      helper.getFrontpageStub.returns(Promise.resolve(makeChannelPostList()))
     })
 
     it("should have some initial state", () => {
