@@ -83,6 +83,8 @@ describe("reducers", () => {
         channel.name = name
         return channel
       })
+      helper.createChannelStub.resetBehavior()
+      helper.createChannelStub.callsFake(async channel => channel)
     })
 
     it("should have some initial state", () => {
@@ -108,6 +110,13 @@ describe("reducers", () => {
         assert.equal(data.get("second").name, "second")
         assert.equal(data.size, 2)
       })
+    })
+
+    it("should let you create a channel", async () => {
+      const { requestType, successType } = actions.channels.post
+      let channel = makeChannel()
+      let channels = await dispatchThen(actions.channels.post(channel), [requestType, successType])
+      assert.deepEqual(channel, channels.data.get(channel.name))
     })
   })
 
