@@ -50,18 +50,18 @@ describe("CommentTree", () => {
   })
 
   it("should let the user click on the upvote button", () => {
-    let wrapper = renderCommentTree()
-    let firstComment = wrapper.find(".top-level-comment").at(0)
     let firstCommentObj = comments[0]
-    firstComment.find(`.upvote`).simulate('click')
+    let wrapper = renderCommentTree()
+    let firstComment = wrapper.find("CommentVoteForm").first()
+    firstComment.find('.upvote').simulate('click')
     sinon.assert.calledWith(upvoteStub, firstCommentObj)
   })
 
   it("should let the user click on the downvote button", () => {
-    let wrapper = renderCommentTree()
-    let firstComment = wrapper.find(".top-level-comment").at(0)
     let firstCommentObj = comments[0]
-    firstComment.find(`.downvote`).simulate('click')
+    let wrapper = renderCommentTree()
+    let firstComment = wrapper.find("CommentVoteForm").first()
+    firstComment.find('.downvote').simulate('click')
     sinon.assert.calledWith(downvoteStub, firstCommentObj)
   })
 })
