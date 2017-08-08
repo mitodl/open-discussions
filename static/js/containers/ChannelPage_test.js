@@ -42,6 +42,7 @@ describe("ChannelPage", () => {
 
   it("should handle missing data gracefully", async () => {
     let otherChannel = makeChannel()
+    otherChannel.name = 'somenamethatshouldnevercollidebecauseitsaridiculouslylongvalue'
     let [wrapper] = await renderPage(otherChannel)
     assert.equal(wrapper.text(), "")
   })
