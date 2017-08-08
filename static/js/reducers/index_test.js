@@ -3,11 +3,12 @@ import { assert } from "chai"
 import { INITIAL_STATE } from "redux-hammock/constants"
 
 import { actions } from "../actions"
+import { setChannelData } from "../actions/channel"
 import { setPostData } from "../actions/post"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 import { makePost, makeChannelPostList } from "../factories/posts"
-import { makeChannel } from "../factories/channels"
+import { makeChannel, makeChannelList } from "../factories/channels"
 
 describe("reducers", () => {
   let helper, store, dispatchThen
@@ -117,6 +118,32 @@ describe("reducers", () => {
       let channel = makeChannel()
       let channels = await dispatchThen(actions.channels.post(channel), [requestType, successType])
       assert.deepEqual(channel, channels.data.get(channel.name))
+    })
+
+    it("should let you set a list of channels separately", () => {
+      const numChannels = 9
+      let channels = makeChannelList(numChannels)
+      store.dispatch(setChannelData(channels))
+      let data = store.getState().channels.data
+      assert.equal(data.size, numChannels)
+      for (const channel of channels) {
+        assert.deepEqual(data.get(channel.name), channel)
+      }
+
+      // it should also let you overwrite a channel
+      const newChannel = makeChannel()
+      const oldChannel = channels[1]
+      newChannel.name = oldChannel.name
+      assert.notEqual(newChannel.title, oldChannel.title)
+      store.dispatch(setChannelData([newChannel]))
+      data = store.getState().channels.data
+      for (const channel of channels) {
+        if (channel.name === newChannel.name) {
+          assert.deepEqual(data.get(channel.name), newChannel)
+        } else {
+          assert.deepEqual(data.get(channel.name), channel)
+        }
+      }
     })
   })
 

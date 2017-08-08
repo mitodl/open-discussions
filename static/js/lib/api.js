@@ -17,6 +17,10 @@ export function getChannel(channelName: string): Promise<Channel> {
   return fetchJSONWithCSRF(`/api/v0/channels/${channelName}/`)
 }
 
+export function getChannels(): Promise<Array<Channel>> {
+  return fetchJSONWithCSRF("/api/v0/channels/")
+}
+
 export function createChannel(channel: Channel): Promise<Channel> {
   return fetchJSONWithCSRF(`/api/v0/channels/`, {
     method: POST,

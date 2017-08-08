@@ -8,13 +8,9 @@ import configureTestStore from "redux-asserts"
 import Router, { routes } from "../Router"
 import * as api from "../lib/api"
 import rootReducer from "../reducers"
-import type { Action } from "../flow/reduxTypes"
-import type { TestStore } from "../flow/reduxTypes"
 import type { Sandbox } from "../flow/sinonTypes"
 
 export default class IntegrationTestHelper {
-  listenForActions: (a: Array<string>, f: Function) => Promise<*>
-  dispatchThen: (a: Action) => Promise<*>
   sandbox: Sandbox
   store: TestStore
   browserHistory: History

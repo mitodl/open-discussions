@@ -2,7 +2,7 @@
 import { assert } from "chai"
 import sinon from "sinon"
 
-import { makeChannel } from "../factories/channels"
+import { makeChannelList } from "../factories/channels"
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
@@ -10,12 +10,13 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import type { CreatePostPayload } from "../flow/discussionTypes"
 
 describe("CreatePostPage", () => {
-  let helper, listenForActions, renderComponent, channel
+  let helper, listenForActions, renderComponent, currentChannel, channels
 
   beforeEach(() => {
-    channel = makeChannel()
+    channels = makeChannelList(10)
+    currentChannel = channels[5]
     helper = new IntegrationTestHelper()
-    helper.getChannelStub.returns(Promise.resolve(channel))
+    helper.getChannelStub.returns(Promise.resolve(currentChannel))
     helper.getFrontpageStub.returns(Promise.resolve(makeChannelPostList()))
     listenForActions = helper.listenForActions.bind(helper)
     renderComponent = helper.renderComponent.bind(helper)
@@ -26,16 +27,16 @@ describe("CreatePostPage", () => {
   })
 
   const renderPage = () => {
-    return renderComponent(newPostURL(channel.name), [
+    return renderComponent(newPostURL(currentChannel.name), [
       actions.forms.FORM_BEGIN_EDIT,
       actions.channels.get.requestType,
-      actions.channels.get.successType
+      actions.channels.get.successType,
     ])
   }
 
   it("attempts to clear form and load channels on mount", () => {
     return renderPage().then(([wrapper]) => {
-      assert.include(wrapper.text(), channel.title)
+      assert.include(wrapper.text(), currentChannel.title)
       sinon.assert.calledOnce(helper.getChannelStub)
     })
   })
@@ -71,17 +72,21 @@ describe("CreatePostPage", () => {
           } else {
             payload.url = url
           }
-          sinon.assert.calledWith(helper.createPostStub, channel.name, payload)
-          assert.equal(helper.currentLocation.pathname, newPostURL(channel.name))
+          sinon.assert.calledWith(helper.createPostStub, currentChannel.name, payload)
+          assert.equal(helper.currentLocation.pathname, newPostURL(currentChannel.name))
         })
       })
     })
   }
 
   it("goes back when cancel is clicked", () => {
-    helper.getFrontpageStub.returns(Promise.resolve([]))
     return renderPage().then(([wrapper]) => {
-      assert.equal(helper.currentLocation.pathname, newPostURL(channel.name))
+      assert.equal(helper.currentLocation.pathname, newPostURL(currentChannel.name))
+
+      // mock out front page APIs which we don't care about for this test
+      helper.getFrontpageStub.returns(Promise.resolve([]))
+      helper.getChannelsStub.returns(Promise.resolve([]))
+
       wrapper.find(".cancel").simulate("click")
       assert.equal(helper.currentLocation.pathname, "/")
     })

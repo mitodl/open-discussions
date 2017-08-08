@@ -1,7 +1,12 @@
 // @flow
 import { assert } from "chai"
 
-import { channelURL, newPostURL, postDetailURL } from "./url"
+import {
+  channelURL,
+  frontPageURL,
+  newPostURL,
+  postDetailURL,
+} from "./url"
 
 describe("url helper functions", () => {
   describe("channelURL", () => {
@@ -19,6 +24,12 @@ describe("url helper functions", () => {
   describe("newPostURL", () => {
     it("should return a url for creating a new post", () => {
       assert.equal(newPostURL("channel_name"), "/create_post/channel_name")
+    })
+  })
+
+  describe("frontPageURL", () => {
+    it("should return a url for the front page", () => {
+      assert.equal(frontPageURL(), "/")
     })
   })
 })

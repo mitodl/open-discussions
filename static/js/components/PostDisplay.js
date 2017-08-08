@@ -4,7 +4,7 @@ import moment from "moment"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 
-import { postDetailURL } from "../lib/url"
+import { channelURL, postDetailURL } from "../lib/url"
 
 import type { Post } from "../flow/discussionTypes"
 
@@ -45,7 +45,7 @@ class PostDisplay extends React.Component {
     const { post, showChannelLink } = this.props
 
     return showChannelLink && post.channel_name
-      ? <Link to={`/channel/${post.channel_name}`}>
+      ? <Link to={channelURL(post.channel_name)}>
           on {post.channel_name}
       </Link>
       : null
