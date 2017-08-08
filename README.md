@@ -50,14 +50,14 @@ installation steps should be completed before the following steps, which are spe
 
 #### Create your docker container:
 
-The following commands create a Docker machine named ``open_discussions``, start the
+The following commands create a Docker machine named ``opendiscussions``, start the
 container, and configure environment variables to facilitate communication
 with the edX instance.
 
-    docker-machine create --driver virtualbox open_discussions
-    docker-machine start open_discussions
+    docker-machine create --driver virtualbox opendiscussions
+    docker-machine start opendiscussions
     # 'docker-machine env (machine)' prints export commands for important environment variables
-    eval "$(docker-machine env open_discussions)"
+    eval "$(docker-machine env opendiscussions)"
 
 
 ## Docker Container Configuration and Start-up
@@ -119,6 +119,31 @@ and add a superuser in the now-running Docker container:
 You should now be able to do visit open_discussions in your browser on port `8063`. _(OSX Only)_ Docker auto-assigns
  the container IP. Run ``docker-machine ip`` to see it. Your open_discussions URL will
  be something like this: ``192.168.99.100:8063``.
+ 
+#### 5a) Log in
+
+There is no official login page yet, so in order to use the site as a logged in user, you'll need to login 
+via Django admin first (`http://<open_discussions_url>:8063/admin`). Use the credentials for the superuser you created
+in the step above.
+
+#### 5b) Set up initial channel/post data
+
+The app UI is not currently usable until a channel exists and the logged-in user has a post associated with the channel. 
+The following curl commands will create a channel and a post (replace `USERNAME` and `PASSWORD` with the credentials for the
+superuser you created):
+ 
+ ```bash
+ # Create a channel
+ curl -X POST -u USERNAME:PASSWORD "http://<open_discussions_url>:8063/api/v0/channels/" \
+   -H "Content-Type: application/json" \
+   -d '{"title": "Test Channel", "name": "test_channel", "public_description": "This is a test channel", "channel_type": "public"}'
+ 
+ # Create a post for the channel
+ curl -X POST -u USERNAME:PASSWORD "http://<open_discussions_url>:8063/api/v0/channels/test_channel/posts/" \
+   -H "Content-Type: application/json" \
+   -d '{"text": "This is a text post in the test channel", "title": "Test Post", "channel_name": "test_channel"}'
+ ```
+
 
 ## Running Commands and Testing
 
