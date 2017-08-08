@@ -111,17 +111,4 @@ describe("PostPage", function() {
       assert.equal(fromProps.upvote, commentTreeProps.upvote)
     }
   })
-
-  for (const votetype of ["upvote", "downvote"]) {
-    it(`uses the ${votetype} function when clicking on the ${votetype} button`, async () => {
-      const commentCopy = {...comments[0]}
-      const [wrapper] = await renderPage()
-      const form = wrapper.find("CommentVoteForm").first()
-      helper.updateCommentStub.returns(Promise.resolve(commentCopy))
-      form.find(`.${votetype}`).simulate("click")
-      sinon.assert.calledWith(helper.updateCommentStub, commentCopy.id, {
-        [`${votetype}d`]: !commentCopy[votetype]
-      })
-    })
-  }
 })
