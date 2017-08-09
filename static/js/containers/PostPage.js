@@ -68,18 +68,18 @@ class PostPage extends React.Component {
     }
   }
 
-  downvote = (comment: Comment) => {
+  downvote = async (comment: Comment) => {
     const { dispatch } = this.props
-    dispatch(
+    await dispatch(
       actions.comments.patch(comment.id, {
         downvoted: !comment.downvoted
       })
     )
   }
 
-  upvote = (comment: Comment) => {
+  upvote = async (comment: Comment) => {
     const { dispatch } = this.props
-    dispatch(
+    await dispatch(
       actions.comments.patch(comment.id, {
         upvoted: !comment.upvoted
       })
@@ -107,15 +107,16 @@ class PostPage extends React.Component {
             <PostDisplay post={post} toggleUpvote={toggleUpvote(dispatch)} expanded />
             <ReplyToPostForm forms={forms} post={post} />
           </Card>
-          <CommentTree comments={commentTreeData} forms={forms} upvote={this.upvote} downvote={this.downvote} />
+          <CommentTree
+            comments={commentTreeData} forms={forms} upvote={this.upvote} downvote={this.downvote} />
         </div>
       </div>
     )
   }
 
   render() {
-    const { posts, channels, comments } = this.props
-    return <Loading restStates={[posts, channels, comments]} renderContents={this.renderContents} />
+    const { posts, channels } = this.props
+    return <Loading restStates={[posts, channels]} renderContents={this.renderContents} />
   }
 }
 
