@@ -48,20 +48,4 @@ describe("CommentTree", () => {
     assert.equal(firstComment.find(".comment").at(0).props().className, "comment")
     assert.ok(firstComment.find(".replies > .comment").at(0))
   })
-
-  it("should let the user click on the upvote button", () => {
-    let firstCommentObj = comments[0]
-    let wrapper = renderCommentTree()
-    let firstComment = wrapper.find("CommentVoteForm").first()
-    firstComment.find('.upvote').simulate('click')
-    sinon.assert.calledWith(upvoteStub, firstCommentObj)
-  })
-
-  it("should let the user click on the downvote button", () => {
-    let firstCommentObj = comments[0]
-    let wrapper = renderCommentTree()
-    let firstComment = wrapper.find("CommentVoteForm").first()
-    firstComment.find('.downvote').simulate('click')
-    sinon.assert.calledWith(downvoteStub, firstCommentObj)
-  })
 })
