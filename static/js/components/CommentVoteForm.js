@@ -14,14 +14,14 @@ type CommentVoteFormProps = {
 export default class CommentVoteForm extends React.Component {
   props: CommentVoteFormProps
   state: {
-    voting: boolean,
+    voting: boolean
   }
 
   constructor() {
     super()
 
     this.state = {
-      voting: false,
+      voting: false
     }
   }
 
@@ -59,11 +59,7 @@ export default class CommentVoteForm extends React.Component {
           {comment.score}
         </div>
         <div className="votes">
-          <button
-            className={`vote upvote ${comment.upvoted ? "upvoted" : ""}`}
-            onClick={this.upvote}
-            disabled={voting}
-          >
+          <button className={`vote upvote ${comment.upvoted ? "upvoted" : ""}`} onClick={this.upvote} disabled={voting}>
             ⇑
           </button>
           <button

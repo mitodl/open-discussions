@@ -107,8 +107,7 @@ class PostPage extends React.Component {
             <PostDisplay post={post} toggleUpvote={toggleUpvote(dispatch)} expanded />
             <ReplyToPostForm forms={forms} post={post} />
           </Card>
-          <CommentTree
-            comments={commentTreeData} forms={forms} upvote={this.upvote} downvote={this.downvote} />
+          <CommentTree comments={commentTreeData} forms={forms} upvote={this.upvote} downvote={this.downvote} />
         </div>
       </div>
     )

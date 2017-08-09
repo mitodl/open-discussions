@@ -51,55 +51,52 @@ describe("PostPage", function() {
     assert.deepEqual(wrapper.find(CommentTree).props().comments, comments)
   })
 
-  for (const isUpvote of [true, false]) {
-    for (const isClear of [true, false]) {
-      let verb = ""
-      if (isClear) {
-        verb += "clear a "
+  ;[
+    [true, true, 'should upvote a comment'],
+    [true, false, 'should clear an upvote'],
+    [false, true, 'should downvote a comment'],
+    [false, false, 'should clear a downvote'],
+  ].forEach(([isUpvote, wasClear, testName]) => {
+    it(testName, async () => {
+      const comment = comments[0].replies[2]
+      assert(comment, "comment not found")
+      // set initial state for upvoted or downvoted so we can flip it the other way
+      let expectedPayload = {}
+      if (isUpvote) {
+        comment.upvoted = wasClear
+        expectedPayload.upvoted = !wasClear
+      } else {
+        comment.downvoted = wasClear
+        expectedPayload.downvoted = !wasClear
       }
-      verb += isUpvote ? "upvote" : "downvote"
+      const [wrapper] = await renderPage()
 
-      it(`should ${verb} for a comment`, async () => {
-        const comment = comments[0].replies[2]
-        assert(comment, "comment not found")
-        // set initial state for upvoted or downvoted so we can flip it the other way
-        let expectedPayload = {}
-        if (isUpvote) {
-          comment.upvoted = isClear
-          expectedPayload.upvoted = !isClear
-        } else {
-          comment.downvoted = isClear
-          expectedPayload.downvoted = !isClear
+      const expectedComment = {
+        ...comment,
+        ...expectedPayload
+      }
+      helper.updateCommentStub.returns(Promise.resolve(expectedComment))
+
+      let newState = await listenForActions(
+        [actions.comments.patch.requestType, actions.comments.patch.successType],
+        () => {
+          let props = wrapper.find("CommentTree").props()
+          let voteFunc = isUpvote ? props.upvote : props.downvote
+          voteFunc(comment)
         }
-        const [wrapper] = await renderPage()
+      )
 
-        const expectedComment = {
-          ...comment,
-          ...expectedPayload
-        }
-        helper.updateCommentStub.returns(Promise.resolve(expectedComment))
+      let updatedComment = findComment(newState.comments.data, comment.id)
+      if (isUpvote) {
+        assert.equal(comment.upvoted, !updatedComment.upvoted)
+      } else {
+        assert.equal(comment.downvoted, !updatedComment.downvoted)
+      }
+      assert.deepEqual(updatedComment, expectedComment)
 
-        let newState = await listenForActions(
-          [actions.comments.patch.requestType, actions.comments.patch.successType],
-          () => {
-            let props = wrapper.find("CommentTree").props()
-            let voteFunc = isUpvote ? props.upvote : props.downvote
-            voteFunc(comment)
-          }
-        )
-
-        let updatedComment = findComment(newState.comments.data, comment.id)
-        if (isUpvote) {
-          assert.equal(comment.upvoted, !updatedComment.upvoted)
-        } else {
-          assert.equal(comment.downvoted, !updatedComment.downvoted)
-        }
-        assert.deepEqual(updatedComment, expectedComment)
-
-        sinon.assert.calledWith(helper.updateCommentStub, comment.id, expectedPayload)
-      })
-    }
-  }
+      sinon.assert.calledWith(helper.updateCommentStub, comment.id, expectedPayload)
+    })
+  })
 
   it("passed props to each CommentVoteForm", async () => {
     const [wrapper] = await renderPage()
