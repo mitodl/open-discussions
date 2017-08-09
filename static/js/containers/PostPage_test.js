@@ -50,12 +50,11 @@ describe("PostPage", function() {
     let [wrapper] = await renderPage()
     assert.deepEqual(wrapper.find(CommentTree).props().comments, comments)
   })
-
   ;[
-    [true, true, 'should upvote a comment'],
-    [true, false, 'should clear an upvote'],
-    [false, true, 'should downvote a comment'],
-    [false, false, 'should clear a downvote'],
+    [true, true, "should upvote a comment"],
+    [true, false, "should clear an upvote"],
+    [false, true, "should downvote a comment"],
+    [false, false, "should clear a downvote"]
   ].forEach(([isUpvote, wasClear, testName]) => {
     it(testName, async () => {
       const comment = comments[0].replies[2]
