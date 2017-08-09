@@ -49,7 +49,6 @@ class HomePage extends React.Component {
 
     return (
       <div className="triple-column">
-        <div>Home page</div>
         <div className="first-column">
           <SubscriptionsSidebar
             // $FlowFixMe: flow thinks these might be undefined
