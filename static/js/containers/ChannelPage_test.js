@@ -1,6 +1,6 @@
 // @flow
 import { assert } from "chai"
-import sinon from 'sinon'
+import sinon from "sinon"
 
 import PostList from "../components/PostList"
 
@@ -41,7 +41,7 @@ describe("ChannelPage", () => {
       actions.subscribedChannels.get.requestType,
       actions.subscribedChannels.get.successType,
       SET_POST_DATA,
-      SET_CHANNEL_DATA,
+      SET_CHANNEL_DATA
     ])
 
   it("should fetch postsForChannel, set post data, and render", async () => {
@@ -56,7 +56,7 @@ describe("ChannelPage", () => {
     assert.equal(wrapper.text(), "")
   })
 
-  it('lists subscriptions', () => {
+  it("lists subscriptions", () => {
     return renderPage(currentChannel).then(([wrapper]) => {
       sinon.assert.calledOnce(helper.getChannelsStub)
 
@@ -64,17 +64,20 @@ describe("ChannelPage", () => {
     })
   })
 
-  it('updates requirements when channel name changes', () => {
+  it("updates requirements when channel name changes", () => {
     return renderPage(currentChannel).then(() => {
       sinon.assert.neverCalledWith(helper.getChannelStub, otherChannel.name)
-      return listenForActions([
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        actions.postsForChannel.get.requestType,
-        actions.postsForChannel.get.successType,
-      ], () => {
-        helper.browserHistory.push(channelURL(otherChannel.name))
-      }).then(() => {
+      return listenForActions(
+        [
+          actions.channels.get.requestType,
+          actions.channels.get.successType,
+          actions.postsForChannel.get.requestType,
+          actions.postsForChannel.get.successType
+        ],
+        () => {
+          helper.browserHistory.push(channelURL(otherChannel.name))
+        }
+      ).then(() => {
         sinon.assert.calledWith(helper.getChannelStub, otherChannel.name)
       })
     })

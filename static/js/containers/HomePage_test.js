@@ -3,10 +3,10 @@ import { assert } from "chai"
 
 import PostList from "../components/PostList"
 
-import { makeChannelList } from '../factories/channels'
+import { makeChannelList } from "../factories/channels"
 import { makeChannelPostList } from "../factories/posts"
 import { actions } from "../actions"
-import { SET_CHANNEL_DATA } from '../actions/channel'
+import { SET_CHANNEL_DATA } from "../actions/channel"
 import { SET_POST_DATA } from "../actions/post"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
@@ -33,7 +33,7 @@ describe("HomePage", () => {
       actions.subscribedChannels.get.requestType,
       actions.subscribedChannels.get.successType,
       SET_POST_DATA,
-      SET_CHANNEL_DATA,
+      SET_CHANNEL_DATA
     ])
 
   it("should fetch frontpage, set post data, render", async () => {
@@ -41,7 +41,7 @@ describe("HomePage", () => {
     assert.deepEqual(wrapper.find(PostList).props().posts, postList)
   })
 
-  it('lists subscriptions', () => {
+  it("lists subscriptions", () => {
     return renderPage().then(([wrapper]) => {
       assert.deepEqual(wrapper.find("SubscriptionsSidebar").props().subscribedChannels, channels)
     })

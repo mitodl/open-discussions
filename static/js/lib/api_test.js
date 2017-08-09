@@ -66,7 +66,7 @@ describe("api", function() {
       fetchStub.returns(Promise.resolve(channelList))
 
       return getChannels().then(result => {
-        assert.ok(fetchStub.calledWith(("/api/v0/channels/")))
+        assert.ok(fetchStub.calledWith("/api/v0/channels/"))
         assert.deepEqual(result, channelList)
       })
     })

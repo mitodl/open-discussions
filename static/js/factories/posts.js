@@ -21,8 +21,7 @@ export const makePost = (isURLPost: boolean = false, channelName: string = casua
   channel_name: channelName
 })
 
-export const makeChannelPostList = (channelName: string = casual.word) => R.range(0, 20).map(
-  () => makePost(Math.random() > 0.5, channelName)
-)
+export const makeChannelPostList = (channelName: string = casual.word) =>
+  R.range(0, 20).map(() => makePost(Math.random() > 0.5, channelName))
 
 export const makeFrontPageList = () => R.range(0, 30).map(() => makePost(Math.random() > 0.5))

@@ -22,7 +22,7 @@ class HomePage extends React.Component {
     frontpage: RestState<Array<string>>,
     posts: RestState<Map<string, Post>>,
     subscribedChannels: RestState<Array<string>>,
-    channels: RestState<Map<string, Channel>>,
+    channels: RestState<Map<string, Channel>>
   }
 
   componentWillMount() {
@@ -77,7 +77,7 @@ const mapStateToProps = state => {
     posts:              state.posts,
     frontpage:          state.frontpage,
     subscribedChannels: state.subscribedChannels,
-    channels:           state.channels,
+    channels:           state.channels
   }
 }
 

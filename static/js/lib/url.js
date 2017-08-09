@@ -6,4 +6,4 @@ export const postDetailURL = (channelName: string, postID: string) => `/channel/
 
 export const newPostURL = (channelName: string) => `/create_post/${channelName}`
 
-export const frontPageURL = () => '/'
+export const frontPageURL = () => "/"

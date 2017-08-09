@@ -28,7 +28,7 @@ class ChannelPage extends React.Component {
     channels: RestState<Map<string, Channel>>,
     postsForChannel: RestState<Map<string, Array<string>>>,
     posts: RestState<Map<string, Post>>,
-    subscribedChannels: RestState<Array<string>>,
+    subscribedChannels: RestState<Array<string>>
   }
 
   componentWillMount() {
@@ -113,7 +113,7 @@ const mapStateToProps = state => {
     channels:           state.channels,
     postsForChannel:    state.postsForChannel,
     posts:              state.posts,
-    subscribedChannels:   state.subscribedChannels,
+    subscribedChannels: state.subscribedChannels
   }
 }
 

@@ -30,7 +30,7 @@ describe("CreatePostPage", () => {
     return renderComponent(newPostURL(currentChannel.name), [
       actions.forms.FORM_BEGIN_EDIT,
       actions.channels.get.requestType,
-      actions.channels.get.successType,
+      actions.channels.get.successType
     ])
   }
 

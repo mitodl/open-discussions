@@ -14,5 +14,5 @@ export const endpoints = [
   postsForChannelEndpoint,
   frontPageEndpoint,
   commentsEndpoint,
-  postUpvotesEndpoint,
+  postUpvotesEndpoint
 ]

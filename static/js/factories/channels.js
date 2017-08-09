@@ -1,6 +1,6 @@
 // @flow
 import casual from "casual-browserify"
-import R from 'ramda'
+import R from "ramda"
 
 import { incrementer } from "../factories/util"
 

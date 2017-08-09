@@ -1,12 +1,7 @@
 // @flow
 import { assert } from "chai"
 
-import {
-  channelURL,
-  frontPageURL,
-  newPostURL,
-  postDetailURL,
-} from "./url"
+import { channelURL, frontPageURL, newPostURL, postDetailURL } from "./url"
 
 describe("url helper functions", () => {
   describe("channelURL", () => {
