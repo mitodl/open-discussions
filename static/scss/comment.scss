@@ -23,7 +23,9 @@
           }
 
           .upvoted, .downvoted {
-            color: $voted-blue;
+            &:not(:disabled) {
+              color: $voted-blue;
+            }
           }
         }
 
