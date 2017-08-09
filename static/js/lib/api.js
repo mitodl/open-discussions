@@ -65,7 +65,7 @@ export function createComment(postId: string, comment: string, commentId: ?strin
 export function updateUpvote(postId: string, upvoted: boolean): Promise<Post> {
   return fetchJSONWithCSRF(`/api/v0/posts/${postId}/`, {
     method: "PATCH",
-    body:   JSON.stringify({upvoted})
+    body:   JSON.stringify({ upvoted })
   })
 }
 
