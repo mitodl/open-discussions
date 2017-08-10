@@ -60,7 +60,6 @@ describe("PostPage", function() {
   ].forEach(([isUpvote, wasClear, testName]) => {
     it(testName, async () => {
       const comment = comments[0].replies[2]
-      console.log("z")
       assert(comment, "comment not found")
       // set initial state for upvoted or downvoted so we can flip it the other way
       let expectedPayload = {}
@@ -71,16 +70,13 @@ describe("PostPage", function() {
         comment.downvoted = wasClear
         expectedPayload.downvoted = !wasClear
       }
-      console.log("z2")
       const [wrapper] = await renderPage()
-      console.log("z3")
 
       const expectedComment = {
         ...comment,
         ...expectedPayload
       }
       helper.updateCommentStub.returns(Promise.resolve(expectedComment))
-      console.log("z4")
 
       let newState = await listenForActions(
         [actions.comments.patch.requestType, actions.comments.patch.successType],
@@ -91,13 +87,9 @@ describe("PostPage", function() {
         }
       )
 
-      console.log("a")
       let commentTree = newState.comments.data.get(post.id)
-      console.log("b")
       let lens = findComment(commentTree, comment.id)
-      console.log("c")
       let updatedComment = R.view(lens, commentTree)
-      console.log("d")
       if (isUpvote) {
         assert.equal(comment.upvoted, !updatedComment.upvoted)
       } else {

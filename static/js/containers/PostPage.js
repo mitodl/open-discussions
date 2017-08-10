@@ -63,7 +63,7 @@ class PostPage extends React.Component {
     const { channels, posts, comments } = this.props
     let restStates = [channels, posts, comments]
 
-    if (!anyProcessing(restStates)) {
+    if (!anyProcessing(restStates) || allLoaded(restStates)) {
       this.updateRequirements()
     }
   }
