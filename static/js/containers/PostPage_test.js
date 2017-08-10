@@ -52,7 +52,6 @@ describe("PostPage", function() {
     let [wrapper] = await renderPage()
     assert.deepEqual(wrapper.find(CommentTree).props().comments, comments)
   })
-
   ;[
     [true, true, "should upvote a comment"],
     [true, false, "should clear an upvote"],
