@@ -2,6 +2,7 @@
 import R from "ramda"
 import { GET, PATCH, POST, INITIAL_STATE } from "redux-hammock/constants"
 
+import { findComment } from "../lib/comments"
 import * as api from "../lib/api"
 
 import type { Comment } from "../flow/discussionTypes.js"
@@ -32,17 +33,18 @@ const appendCommentToTree = (tree: Array<Comment>, comment: Comment, commentId?:
 }
 
 const updateCommentTree = (tree: Array<Comment>, updatedComment: Comment): Array<Comment> => {
-  return R.map((treeComment: Comment) => {
-    return updatedComment.id === treeComment.id
-      ? {
-        ...updatedComment,
-        replies: treeComment.replies
-      }
-      : {
-        ...treeComment,
-        replies: updateCommentTree(treeComment.replies, updatedComment)
-      }
-  }, tree)
+  let lens = findComment(tree, updatedComment.id)
+  if (lens === null) {
+    return tree
+  }
+
+  let original = R.view(lens, tree)
+  let replies = original.replies
+  updatedComment = {...updatedComment, replies }
+
+  let ret = R.set(lens, updatedComment, tree)
+  console.log("ret", ret)
+  return ret
 }
 
 export const commentsEndpoint = {

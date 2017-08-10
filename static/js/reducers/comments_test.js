@@ -1,10 +1,10 @@
 // @flow
 import { assert } from "chai"
+import sinon from 'sinon'
 import { INITIAL_STATE, FETCH_SUCCESS } from "redux-hammock/constants"
 
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
-
 import { makePost } from "../factories/posts"
 import { makeCommentTree } from "../factories/comments"
 
@@ -88,6 +88,38 @@ describe("comments reducers", () => {
       })
       assert.equal(state.postStatus, FETCH_SUCCESS)
       assert.ok(helper.createCommentStub.calledWith(post.id, "comment text", tree[0].id))
+    })
+  })
+
+  it("should let you update a comment", async () => {
+    let comment = tree[0].replies[0]
+    comment.upvoted = false
+    helper.updateCommentStub.returns(Promise.resolve({
+      ...comment,
+      upvoted: true
+    }))
+    let state = await listenForActions(
+      [
+        actions.comments.get.requestType,
+        actions.comments.get.successType,
+        actions.comments.patch.requestType,
+        actions.comments.patch.successType,
+      ],
+      () => {
+        store.dispatch(actions.comments.get(post.id))
+        store.dispatch(actions.comments.patch(comment.id, {
+          upvoted: true,
+        }))
+      }
+    )
+    assert.isTrue(state.loaded)
+    assert.deepEqual(state.data.get(post.id)[0].replies[0], {
+      ...comment,
+      upvoted: true
+    })
+    assert.equal(state.patchStatus, FETCH_SUCCESS)
+    sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
+      upvoted: true
     })
   })
 })

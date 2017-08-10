@@ -1,27 +1,37 @@
 // @flow
+import R from 'ramda'
+import { enumerate } from '../lib/util'
+
 import type { Comment } from "../flow/discussionTypes"
 
-export const findComment = (commentState: Map<string, Array<Comment>>, commentId: string): Comment => {
-  for (const commentTree of commentState.values()) {
-    const comment = _findComment(commentTree, commentId)
-    if (comment) {
-      return comment
-    }
-  }
-
-  throw new Error(`Unable to find comment ${commentId}`)
-}
-
-const _findComment = (commentTree: Array<Comment>, commentId: string): Comment | null => {
-  for (const comment of commentTree) {
+/**
+ * Returns a Ramda lens to the comment like
+ * [grandparentIndex, 'replies', parentIndex, 'replies', childIndex]
+ * or null if none is found
+ */
+export const findComment = (
+  commentTree: Array<Comment>, commentId: string, parentIndexes: Array<number> = []
+): Object | null => {
+  for (const [index, comment] of enumerate(commentTree)) {
     if (comment.id === commentId) {
-      return comment
+      const path = []
+      for (const parentIndex of parentIndexes) {
+        path.push(parentIndex)
+        path.push('replies')
+      }
+      path.push(index)
+
+      return R.lensPath(path)
     }
 
-    const innerComment = _findComment(comment.replies, commentId)
-    if (innerComment) {
-      return innerComment
+    // parents is shared between calls but this won't cause a problem because
+    // once we find the comment we can stop searching and construct the return list
+    parentIndexes.push(index)
+    const innerChain = findComment(comment.replies, commentId, parentIndexes)
+    if (innerChain !== null) {
+      return innerChain
     }
+    parentIndexes.pop()
   }
 
   return null

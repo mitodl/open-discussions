@@ -34,7 +34,7 @@ export const makeCommentTree = (post: Post, minComments: number = 1): Array<Comm
       comment.replies = arrayN(minComments, 5).map(() => makeComment(post))
 
       comment.replies.forEach(reply => {
-        if (casual.coin_flip) {
+        if (casual.coin_flip || index === 0) {
           reply.replies = arrayN(minComments, 5).map(() => makeComment(post))
         }
       })
