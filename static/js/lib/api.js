@@ -4,9 +4,9 @@
 import R from "ramda"
 import "isomorphic-fetch"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
-import { POST } from "redux-hammock/constants"
+import { PATCH, POST } from "redux-hammock/constants"
 
-import type { Channel, CreatePostPayload, Post } from "../flow/discussionTypes"
+import type { Channel, Comment, CreatePostPayload, Post } from "../flow/discussionTypes"
 import type { CommentResponse } from "../reducers/comments"
 
 export function getFrontpage(): Promise<Post> {
@@ -66,5 +66,12 @@ export function updateUpvote(postId: string, upvoted: boolean): Promise<Post> {
   return fetchJSONWithCSRF(`/api/v0/posts/${postId}/`, {
     method: "PATCH",
     body:   JSON.stringify({ upvoted })
+  })
+}
+
+export function updateComment(commentId: string, commentPayload: Object): Promise<Comment> {
+  return fetchJSONWithCSRF(`/api/v0/comments/${commentId}/`, {
+    method: PATCH,
+    body:   JSON.stringify(commentPayload)
   })
 }

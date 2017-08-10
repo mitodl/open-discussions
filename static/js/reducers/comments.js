@@ -1,7 +1,8 @@
 // @flow
 import R from "ramda"
-import { GET, POST, INITIAL_STATE } from "redux-hammock/constants"
+import { GET, PATCH, POST, INITIAL_STATE } from "redux-hammock/constants"
 
+import { findComment } from "../lib/comments"
 import * as api from "../lib/api"
 
 import type { Comment } from "../flow/discussionTypes.js"
@@ -18,22 +19,39 @@ type CommentPayload = {
 }
 
 const appendCommentToTree = (tree: Array<Comment>, comment: Comment, commentId?: string): Array<Comment> => {
-  return commentId
-    ? R.map((treeComment: Comment) => {
-      return {
-        ...treeComment,
-        replies:
-            treeComment.id === commentId
-              ? [...treeComment.replies, comment]
-              : appendCommentToTree(treeComment.replies, comment, commentId)
-      }
-    }, tree)
-    : R.prepend(comment, tree)
+  if (!commentId) {
+    return R.prepend(comment, tree)
+  }
+
+  let lens = findComment(tree, commentId)
+  if (!lens) {
+    // should probably not get to this point, the original comment should still be present
+    // if the API returned a message saying that the reply was successful
+    return tree
+  }
+
+  let treeComment = R.view(lens, tree)
+  let replies = [...treeComment.replies, comment]
+  treeComment = { ...treeComment, replies }
+  return R.set(lens, treeComment, tree)
+}
+
+const updateCommentTree = (tree: Array<Comment>, updatedComment: Comment): Array<Comment> => {
+  let lens = findComment(tree, updatedComment.id)
+  if (lens === null) {
+    return tree
+  }
+
+  let original = R.view(lens, tree)
+  let replies = original.replies
+  updatedComment = { ...updatedComment, replies }
+
+  return R.set(lens, updatedComment, tree)
 }
 
 export const commentsEndpoint = {
   name:              "comments",
-  verbs:             [GET, POST],
+  verbs:             [GET, PATCH, POST],
   getFunc:           (postID: string) => api.getComments(postID),
   initialState:      { ...INITIAL_STATE, data: new Map() },
   getSuccessHandler: (response: CommentResponse, data: Map<string, Array<Comment>>) => {
@@ -46,10 +64,21 @@ export const commentsEndpoint = {
     return { postId, commentId, comment }
   },
   postSuccessHandler: ({ commentId, postId, comment }: CommentPayload, data: Map<string, Array<Comment>>) => {
-    let update = new Map()
-    data.forEach((tree, key) => {
-      update.set(key, key === postId ? appendCommentToTree(tree, comment, commentId) : tree)
-    })
+    let update = new Map(data)
+    let oldTree = data.get(postId)
+    if (oldTree) {
+      update.set(postId, appendCommentToTree(oldTree, comment, commentId))
+    }
+    return update
+  },
+  patchFunc:           (commentId: string, payload: Object) => api.updateComment(commentId, payload),
+  patchSuccessHandler: (response: Comment, data: Map<string, Array<Comment>>) => {
+    let update = new Map(data)
+    let postId = response.post_id
+    let oldTree = data.get(postId)
+    if (oldTree) {
+      update.set(postId, updateCommentTree(oldTree, response))
+    }
     return update
   }
 }

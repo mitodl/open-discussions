@@ -23,10 +23,15 @@ afterEach(function() {
   window.location = "http://fake/"
 
   // Uncomment this to diagnose stray API calls
-  // This adds a 200 ms delay between tests. Since fetchMock is still enabled at this point the next unmatched
-  // fetch attempt which occurs within 200 ms after the test finishes will cause a warning.
+  // This adds a 200 ms delay between tests. This helps diagnose errors where
+  // we undo the mock for an API function before the test completes.
   // return require('./lib/util').wait(200)
 })
+
+// rethrow all unhandled promise errors
+//process.on("unhandledRejection", reason => {
+//   throw reason // uncomment to show promise-related errors
+//})
 
 // enable chai-as-promised
 import chai from "chai"

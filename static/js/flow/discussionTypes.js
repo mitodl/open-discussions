@@ -49,6 +49,7 @@ export type Comment = {
   text:      string,
   score:     number,
   upvoted:   boolean,
+  downvoted: boolean,
   created:   string,
   replies:   Array<Comment>,
   author_id: string,
