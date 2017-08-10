@@ -19,17 +19,21 @@ type CommentPayload = {
 }
 
 const appendCommentToTree = (tree: Array<Comment>, comment: Comment, commentId?: string): Array<Comment> => {
-  return commentId
-    ? R.map((treeComment: Comment) => {
-      return {
-        ...treeComment,
-        replies:
-            treeComment.id === commentId
-              ? [...treeComment.replies, comment]
-              : appendCommentToTree(treeComment.replies, comment, commentId)
-      }
-    }, tree)
-    : R.prepend(comment, tree)
+  if (!commentId) {
+    return R.prepend(comment, tree)
+  }
+
+  let lens = findComment(tree, commentId)
+  if (!lens) {
+    // should probably not get to this point, the original comment should still be present
+    // if the API returned a message saying that the reply was successful
+    return tree
+  }
+
+  let treeComment = R.view(lens, tree)
+  let replies = [...treeComment.replies, comment]
+  treeComment = {...treeComment, replies }
+  return R.set(lens, treeComment, tree)
 }
 
 const updateCommentTree = (tree: Array<Comment>, updatedComment: Comment): Array<Comment> => {
