@@ -5,9 +5,7 @@ import { enumerate } from "../lib/util"
 import type { Comment } from "../flow/discussionTypes"
 
 /**
- * Returns a Ramda lens to the comment like
- * [grandparentIndex, 'replies', parentIndex, 'replies', childIndex]
- * or null if none is found
+ * Returns a Ramda lens to the comment or null if none is found
  */
 export const findComment = (
   commentTree: Array<Comment>,
