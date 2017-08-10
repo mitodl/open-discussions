@@ -1,6 +1,6 @@
 // @flow
 import { assert } from "chai"
-import sinon from 'sinon'
+import sinon from "sinon"
 import { INITIAL_STATE, FETCH_SUCCESS } from "redux-hammock/constants"
 
 import { actions } from "../actions"
@@ -94,22 +94,26 @@ describe("comments reducers", () => {
   it("should let you update a comment", async () => {
     let comment = tree[0].replies[0]
     comment.upvoted = false
-    helper.updateCommentStub.returns(Promise.resolve({
-      ...comment,
-      upvoted: true
-    }))
+    helper.updateCommentStub.returns(
+      Promise.resolve({
+        ...comment,
+        upvoted: true
+      })
+    )
     let state = await listenForActions(
       [
         actions.comments.get.requestType,
         actions.comments.get.successType,
         actions.comments.patch.requestType,
-        actions.comments.patch.successType,
+        actions.comments.patch.successType
       ],
       () => {
         store.dispatch(actions.comments.get(post.id))
-        store.dispatch(actions.comments.patch(comment.id, {
-          upvoted: true,
-        }))
+        store.dispatch(
+          actions.comments.patch(comment.id, {
+            upvoted: true
+          })
+        )
       }
     )
     assert.isTrue(state.loaded)

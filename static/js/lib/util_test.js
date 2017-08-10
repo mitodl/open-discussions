@@ -1,10 +1,7 @@
 // @flow
 import { assert } from "chai"
 
-import {
-  wait,
-  enumerate,
-} from "./util"
+import { wait, enumerate } from "./util"
 
 describe("utility functions", () => {
   it("waits some milliseconds", done => {
@@ -26,7 +23,7 @@ describe("utility functions", () => {
 
   it("enumerates an iterable", () => {
     const someNums = function*() {
-      yield* [6,7,8,9,10]
+      yield* [6, 7, 8, 9, 10]
     }
 
     let list = []
@@ -34,12 +31,6 @@ describe("utility functions", () => {
       list.push(item)
     }
 
-    assert.deepEqual(list, [
-      [0, 6],
-      [1, 7],
-      [2, 8],
-      [3, 9],
-      [4, 10],
-    ])
+    assert.deepEqual(list, [[0, 6], [1, 7], [2, 8], [3, 9], [4, 10]])
   })
 })

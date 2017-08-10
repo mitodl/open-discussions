@@ -1,7 +1,7 @@
 // @flow
 import { assert } from "chai"
 import sinon from "sinon"
-import R from 'ramda'
+import R from "ramda"
 
 import CommentTree from "../components/CommentTree"
 
@@ -11,7 +11,7 @@ import { makeChannel } from "../factories/channels"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
-import { postDetailURL } from '../lib/url'
+import { postDetailURL } from "../lib/url"
 
 describe("PostPage", function() {
   let helper, renderComponent, listenForActions, post, comments, channel

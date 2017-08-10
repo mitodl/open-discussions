@@ -40,7 +40,7 @@ const updateCommentTree = (tree: Array<Comment>, updatedComment: Comment): Array
 
   let original = R.view(lens, tree)
   let replies = original.replies
-  updatedComment = {...updatedComment, replies }
+  updatedComment = { ...updatedComment, replies }
 
   return R.set(lens, updatedComment, tree)
 }

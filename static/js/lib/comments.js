@@ -1,6 +1,6 @@
 // @flow
-import R from 'ramda'
-import { enumerate } from '../lib/util'
+import R from "ramda"
+import { enumerate } from "../lib/util"
 
 import type { Comment } from "../flow/discussionTypes"
 
@@ -10,14 +10,16 @@ import type { Comment } from "../flow/discussionTypes"
  * or null if none is found
  */
 export const findComment = (
-  commentTree: Array<Comment>, commentId: string, parentIndexes: Array<number> = []
+  commentTree: Array<Comment>,
+  commentId: string,
+  parentIndexes: Array<number> = []
 ): Object | null => {
   for (const [index, comment] of enumerate(commentTree)) {
     if (comment.id === commentId) {
       const path = []
       for (const parentIndex of parentIndexes) {
         path.push(parentIndex)
-        path.push('replies')
+        path.push("replies")
       }
       path.push(index)
 
