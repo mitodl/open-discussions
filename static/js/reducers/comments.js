@@ -64,18 +64,21 @@ export const commentsEndpoint = {
     return { postId, commentId, comment }
   },
   postSuccessHandler: ({ commentId, postId, comment }: CommentPayload, data: Map<string, Array<Comment>>) => {
-    let update = new Map()
-    data.forEach((tree, key) => {
-      update.set(key, key === postId ? appendCommentToTree(tree, comment, commentId) : tree)
-    })
+    let update = new Map(data)
+    let oldTree = data.get(postId)
+    if (oldTree) {
+      update.set(postId, appendCommentToTree(oldTree, comment, commentId))
+    }
     return update
   },
   patchFunc:           (commentId: string, payload: Object) => api.updateComment(commentId, payload),
   patchSuccessHandler: (response: Comment, data: Map<string, Array<Comment>>) => {
-    let update = new Map()
-    data.forEach((tree, key) => {
-      update.set(key, key === response.post_id ? updateCommentTree(tree, response) : tree)
-    })
+    let update = new Map(data)
+    let postId = response.post_id
+    let oldTree = data.get(postId)
+    if (oldTree) {
+      update.set(postId, updateCommentTree(oldTree, response))
+    }
     return update
   }
 }
