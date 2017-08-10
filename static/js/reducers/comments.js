@@ -42,9 +42,7 @@ const updateCommentTree = (tree: Array<Comment>, updatedComment: Comment): Array
   let replies = original.replies
   updatedComment = {...updatedComment, replies }
 
-  let ret = R.set(lens, updatedComment, tree)
-  console.log("ret", ret)
-  return ret
+  return R.set(lens, updatedComment, tree)
 }
 
 export const commentsEndpoint = {
