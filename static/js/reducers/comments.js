@@ -32,7 +32,7 @@ const appendCommentToTree = (tree: Array<Comment>, comment: Comment, commentId?:
 
   let treeComment = R.view(lens, tree)
   let replies = [...treeComment.replies, comment]
-  treeComment = {...treeComment, replies }
+  treeComment = { ...treeComment, replies }
   return R.set(lens, treeComment, tree)
 }
 
