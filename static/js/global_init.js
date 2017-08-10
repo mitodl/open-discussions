@@ -30,7 +30,7 @@ afterEach(function() {
 
 // rethrow all unhandled promise errors
 process.on('unhandledRejection', reason => { // eslint-disable-line no-unused-vars
-  throw reason // uncomment to show promise-related errors
+  // throw reason // uncomment to show promise-related errors
 })
 
 // enable chai-as-promised
