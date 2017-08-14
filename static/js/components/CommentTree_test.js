@@ -5,6 +5,8 @@ import R from "ramda"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 
+import ReactMarkdown from "react-markdown"
+
 import Card from "../components/Card"
 import CommentTree from "./CommentTree"
 
@@ -40,6 +42,14 @@ describe("CommentTree", () => {
     let replies = firstComment.find(".comment")
     const countReplies = R.compose(R.reduce((acc, val) => acc + countReplies(val), 1), R.prop("replies"))
     assert.equal(replies.length, countReplies(comments[0]))
+  })
+
+  it("should use markdown to render comments, should skip images", () => {
+    comments[0].text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
+    let wrapper = renderCommentTree()
+    let firstComment = wrapper.find(".top-level-comment").at(0)
+    assert.equal(firstComment.find(ReactMarkdown).first().props().source, comments[0].text)
+    assert.lengthOf(firstComment.find("img"), 0)
   })
 
   it("should put a className on replies, to allow for indentation", () => {

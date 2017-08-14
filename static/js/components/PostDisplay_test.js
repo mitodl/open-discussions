@@ -3,6 +3,7 @@ import React from "react"
 import { assert } from "chai"
 import { mount } from "enzyme"
 import { Link } from "react-router-dom"
+import ReactMarkdown from "react-markdown"
 
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
@@ -55,7 +56,15 @@ describe("PostDisplay", () => {
     let string = "JUST SOME GREAT TEXT!"
     post.text = string
     const wrapper = renderPostDisplay({ post: post, expanded: true })
-    assert.include(wrapper.text(), string)
+    assert.equal(wrapper.find(ReactMarkdown).props().source, string)
+  })
+
+  it("should not display images from markdown", () => {
+    const post = makePost()
+    post.text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
+    const wrapper = renderPostDisplay({ post: post, expanded: true })
+    assert.equal(wrapper.find(ReactMarkdown).props().source, post.text)
+    assert.lengthOf(wrapper.find("img"), 0)
   })
 
   it("should not display text, if given a text post but lacking the 'expanded' flag", () => {

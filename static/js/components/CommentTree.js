@@ -3,6 +3,8 @@ import React from "react"
 import R from "ramda"
 import moment from "moment"
 
+import ReactMarkdown from "react-markdown"
+
 import Card from "./Card"
 import { ReplyToCommentForm } from "./CreateCommentForm"
 import CommentVoteForm from "./CommentVoteForm"
@@ -33,9 +35,7 @@ const renderComment = R.curry(
       </div>
       <div className="row">
         <CommentVoteForm comment={comment} upvote={upvote} downvote={downvote} />
-        <div>
-          {comment.text}
-        </div>
+        <ReactMarkdown disallowedTypes={["Image"]} source={comment.text} escapeHtml />
       </div>
       <div>
         <ReplyToCommentForm forms={forms} comment={comment} />

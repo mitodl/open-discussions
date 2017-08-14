@@ -3,15 +3,14 @@ import React from "react"
 import moment from "moment"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
+import ReactMarkdown from "react-markdown"
 
 import { channelURL, postDetailURL } from "../lib/url"
 
 import type { Post } from "../flow/discussionTypes"
 
 const textContent = post =>
-  <div className="text-content">
-    {post.text}
-  </div>
+  <ReactMarkdown disallowedTypes={["Image"]} source={post.text} escapeHtml className="text-content" />
 
 const postTitle = (post: Post) =>
   post.text
