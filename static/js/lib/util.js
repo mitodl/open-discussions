@@ -2,6 +2,7 @@
 import type { Match } from "react-router"
 
 export const getChannelName = (props: { match: Match }): string => props.match.params.channelName || ""
+export const getPostID = (props: { match: Match }): string => props.match.params.postID || ""
 
 /**
  * Returns a promise which resolves after a number of milliseconds have elapsed

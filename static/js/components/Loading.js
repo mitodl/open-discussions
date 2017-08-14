@@ -1,27 +1,33 @@
 // @flow
 import React from "react"
 
-import { anyProcessing, anyError, allLoaded } from "../util/rest"
+type LoadingProps = {
+  loaded: boolean,
+  errored: boolean
+}
 
-import type { RestState } from "../flow/restTypes"
+const withLoading = (LoadedComponent: Class<React.Component<*, *, *>>) => {
+  return class extends LoadedComponent {
+    props: LoadingProps
 
-export default class Loading extends React.Component {
-  props: {
-    restStates: Array<RestState<*>>,
-    renderContents: Function
-  }
+    render() {
+      const { loaded, errored } = this.props
 
-  render() {
-    const { restStates, renderContents } = this.props
+      if (errored) {
+        return <div className="errored">Error loading page</div>
+      }
 
-    if (anyProcessing(restStates) || !allLoaded(restStates)) {
-      return <div>Loading</div>
+      if (!loaded) {
+        return <div className="loading">Loading</div>
+      }
+
+      return (
+        <div className="loaded">
+          {super.render()}
+        </div>
+      )
     }
-
-    if (anyError(restStates)) {
-      return <div>Error loading page</div>
-    }
-
-    return renderContents()
   }
 }
+
+export default withLoading

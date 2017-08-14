@@ -53,7 +53,7 @@ describe("ChannelPage", () => {
     let otherChannel = makeChannel()
     otherChannel.name = "somenamethatshouldnevercollidebecauseitsaridiculouslylongvalue"
     let [wrapper] = await renderPage(otherChannel)
-    assert.equal(wrapper.text(), "")
+    assert.equal(wrapper.text(), "Loading")
   })
 
   it("lists subscriptions", () => {

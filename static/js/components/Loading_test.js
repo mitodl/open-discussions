@@ -1,135 +1,40 @@
 // @flow
 import React from "react"
 import { assert } from "chai"
-import { shallow } from "enzyme"
+import { mount } from "enzyme"
 
-import Loading from "./Loading"
+import withLoading from "./Loading"
+
+class Content extends React.Component {
+  render() {
+    return <div>CONTENT</div>
+  }
+}
+
+const LoadingContent = withLoading(Content)
 
 describe("Loading", () => {
-  const renderLoading = restStates =>
-    shallow(<Loading restStates={restStates} renderContents={() => <div>CONTENT</div>} />)
+  const renderLoading = (loaded: boolean, errored: boolean) => {
+    return mount(<LoadingContent loaded={loaded} errored={errored} />)
+  }
 
-  describe("should render loading correctly", () => {
-    it("single state with loaded:false", () => {
-      const wrapper = renderLoading([
-        {
-          loaded:     false,
-          processing: false
-        }
-      ])
-      assert.equal(wrapper.text(), "Loading")
-    })
-
-    it("multiple states with one loaded:false", () => {
-      const wrapper = renderLoading([
-        {
-          loaded:     true,
-          processing: false
-        },
-        {
-          loaded:     false,
-          processing: false
-        }
-      ])
-      assert.equal(wrapper.text(), "Loading")
-    })
-
-    it("single state with processing:true", () => {
-      const wrapper = renderLoading([
-        {
-          loaded:     false,
-          processing: true
-        }
-      ])
-      assert.equal(wrapper.text(), "Loading")
-    })
-
-    it("multiple states with one processing:true", () => {
-      const wrapper = renderLoading([
-        {
-          loaded:     false,
-          processing: false
-        },
-        {
-          loaded:     false,
-          processing: true
-        }
-      ])
-      assert.equal(wrapper.text(), "Loading")
-    })
+  it("render loading if not loaded and not errored", () => {
+    const wrapper = renderLoading(false, false)
+    assert.equal(wrapper.text(), "Loading")
   })
 
-  describe("should render errors correctly", () => {
-    it("single state with error", () => {
-      const wrapper = renderLoading([
-        {
-          loaded:     true,
-          processing: false,
-          error:      "bad things"
-        }
-      ])
-      assert.equal(wrapper.text(), "Error loading page")
-    })
-
-    it("multiple states all with errors", () => {
-      const wrapper = renderLoading([
-        {
-          loaded:     true,
-          processing: false,
-          error:      "bad things"
-        },
-        {
-          loaded:     true,
-          processing: false,
-          error:      "bad things"
-        }
-      ])
-      assert.equal(wrapper.text(), "Error loading page")
-    })
-
-    it("multiple states with one error", () => {
-      const wrapper = renderLoading([
-        {
-          loaded:     true,
-          processing: false,
-          error:      undefined
-        },
-        {
-          loaded:     true,
-          processing: false,
-          error:      "bad things"
-        }
-      ])
-      assert.equal(wrapper.text(), "Error loading page")
-    })
+  it("should render errors correctly if not loaded", () => {
+    const wrapper = renderLoading(false, true)
+    assert.equal(wrapper.text(), "Error loading page")
   })
 
-  describe("should the contents if no errors", () => {
-    it("single state", () => {
-      const wrapper = renderLoading([
-        {
-          loaded:     true,
-          processing: false,
-          error:      undefined
-        }
-      ])
-      assert.equal(wrapper.text(), "CONTENT")
-    })
+  it("should render errors correctly if loaded", () => {
+    const wrapper = renderLoading(true, true)
+    assert.equal(wrapper.text(), "Error loading page")
+  })
 
-    it("multiple states", () => {
-      const wrapper = renderLoading([
-        {
-          loaded:     true,
-          processing: false,
-          error:      undefined
-        },
-        {
-          loaded:     true,
-          processing: false,
-          error:      undefined
-        }
-      ])
-      assert.equal(wrapper.text(), "CONTENT")
-    })
+  it("should the contents if no errors and loaded", () => {
+    const wrapper = renderLoading(true, false)
+    assert.equal(wrapper.text(), "CONTENT")
   })
 })

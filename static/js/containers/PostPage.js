@@ -4,7 +4,7 @@ import { connect } from "react-redux"
 import R from "ramda"
 
 import Card from "../components/Card"
-import Loading from "../components/Loading"
+import withLoading from "../components/Loading"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import PostDisplay from "../components/PostDisplay"
 import CommentTree from "../components/CommentTree"
@@ -12,59 +12,39 @@ import { ReplyToPostForm } from "../components/CreateCommentForm"
 
 import { actions } from "../actions"
 import { toggleUpvote } from "../util/api_actions"
-import { anyProcessing, allLoaded } from "../util/rest"
+import { getChannelName, getPostID } from "../lib/util"
+import { anyError } from "../util/rest"
 
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
 import type { FormsState } from "../flow/formTypes"
 import type { Channel, Comment, Post } from "../flow/discussionTypes"
-import type { RestState } from "../flow/restTypes"
+
+type PostPageProps = {
+  match: Match,
+  dispatch: Dispatch,
+  post: Post,
+  channel: Channel,
+  commentsTree: Array<Comment>,
+  forms: FormsState,
+  // from the router match
+  channelName: string,
+  postID: string
+}
+
+// if either postId or channelName don't match
+const shouldLoadData = R.complement(R.allPass([R.eqProps("postID"), R.eqProps("channelName")]))
 
 class PostPage extends React.Component {
-  props: {
-    match: Match,
-    dispatch: Dispatch,
-    posts: RestState<Map<string, Post>>,
-    channels: RestState<Map<string, Channel>>,
-    comments: RestState<Map<string, Array<Comment>>>,
-    forms: FormsState
-  }
-
-  getMatchParams = () => {
-    const { match: { params } } = this.props
-    return [params.postID, params.channelName]
-  }
-
-  updateRequirements = () => {
-    const { dispatch, channels, posts, comments } = this.props
-    const [postID, channelName] = this.getMatchParams()
-
-    if (!postID || !channelName) {
-      // should not happen, this should be guaranteed by react-router
-      throw "Match error"
-    }
-
-    if (!posts.data || (R.isNil(posts.data.get(postID)) && R.isNil(posts.error))) {
-      dispatch(actions.posts.get(postID))
-    }
-    if (!comments.data || (R.isNil(comments.data.get(postID)) && R.isNil(comments.error))) {
-      dispatch(actions.comments.get(postID))
-    }
-    if (!channels.data || (R.isNil(channels.data.get(channelName)) && R.isNil(channels.error))) {
-      dispatch(actions.channels.get(channelName))
-    }
-  }
+  props: PostPageProps
 
   componentWillMount() {
-    this.updateRequirements()
+    this.loadData()
   }
 
-  componentDidUpdate() {
-    const { channels, posts, comments } = this.props
-    let restStates = [channels, posts, comments]
-
-    if (!anyProcessing(restStates) || allLoaded(restStates)) {
-      this.updateRequirements()
+  componentDidUpdate(prevProps) {
+    if (shouldLoadData(prevProps, this.props)) {
+      this.loadData()
     }
   }
 
@@ -77,6 +57,20 @@ class PostPage extends React.Component {
     )
   }
 
+  loadData = () => {
+    const { dispatch, channelName, postID, channel } = this.props
+    if (!postID || !channelName) {
+      // should not happen, this should be guaranteed by react-router
+      throw Error("Match error")
+    }
+
+    Promise.all([
+      dispatch(actions.posts.get(postID)),
+      dispatch(actions.comments.get(postID)),
+      channel || dispatch(actions.channels.get(channelName))
+    ])
+  }
+
   upvote = async (comment: Comment) => {
     const { dispatch } = this.props
     await dispatch(
@@ -86,17 +80,9 @@ class PostPage extends React.Component {
     )
   }
 
-  renderContents = () => {
-    const { posts, channels, comments, forms, dispatch } = this.props
-    const [postId, channelName] = this.getMatchParams()
-    // $FlowFixMe: undefined check should already be done
-    const post = posts.data.get(postId)
-    // $FlowFixMe: undefined check should already be done
-    const channel = channels.data.get(channelName)
-    // $FlowFixMe: undefined check should already be done
-    const commentTreeData = comments.data.get(postId)
-
-    if (!channel || !post || !commentTreeData) {
+  render() {
+    const { dispatch, post, channel, commentsTree, forms } = this.props
+    if (!channel || !post || !commentsTree) {
       return null
     }
     return (
@@ -107,23 +93,30 @@ class PostPage extends React.Component {
             <PostDisplay post={post} toggleUpvote={toggleUpvote(dispatch)} expanded />
             <ReplyToPostForm forms={forms} post={post} />
           </Card>
-          <CommentTree comments={commentTreeData} forms={forms} upvote={this.upvote} downvote={this.downvote} />
+          <CommentTree comments={commentsTree} forms={forms} upvote={this.upvote} downvote={this.downvote} />
         </div>
       </div>
     )
   }
+}
 
-  render() {
-    const { posts, channels } = this.props
-    return <Loading restStates={[posts, channels]} renderContents={this.renderContents} />
+const mapStateToProps = (state, ownProps) => {
+  const { posts, channels, comments, forms } = state
+  const postID = getPostID(ownProps)
+  const channelName = getChannelName(ownProps)
+  const post = posts.data.get(postID)
+  const channel = channels.data.get(channelName)
+  const commentsTree = comments.data.get(postID)
+  return {
+    postID,
+    channelName,
+    forms,
+    post,
+    channel,
+    commentsTree,
+    loaded:  R.none(R.isNil, [post, channel, commentsTree]),
+    errored: anyError([posts, channels, comments])
   }
 }
 
-const mapStateToProps = state => ({
-  posts:    state.posts,
-  channels: state.channels,
-  comments: state.comments,
-  forms:    state.forms
-})
-
-export default connect(mapStateToProps)(PostPage)
+export default R.compose(connect(mapStateToProps), withLoading)(PostPage)
