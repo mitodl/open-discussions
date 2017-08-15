@@ -24,6 +24,7 @@ describe("PostPage", function() {
     helper = new IntegrationTestHelper()
     helper.getPostStub.returns(Promise.resolve(post))
     helper.getChannelStub.returns(Promise.resolve(channel))
+    helper.getChannelsStub.returns(Promise.resolve([]))
     helper.getCommentsStub.returns(
       Promise.resolve({
         postID: post.id,
@@ -44,6 +45,8 @@ describe("PostPage", function() {
       actions.posts.get.successType,
       actions.comments.get.requestType,
       actions.comments.get.successType,
+      actions.subscribedChannels.get.requestType,
+      actions.subscribedChannels.get.successType,
       actions.channels.get.requestType,
       actions.channels.get.successType
     ])

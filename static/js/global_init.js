@@ -1,6 +1,9 @@
 // Define globals we would usually get from Django
 import ReactDOM from "react-dom"
 
+global.cancelAnimationFrame = () => {}
+global.requestAnimationFrame = () => {}
+
 const _createSettings = () => ({})
 
 global.SETTINGS = _createSettings()

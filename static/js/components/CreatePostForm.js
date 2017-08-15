@@ -26,7 +26,7 @@ export default class CreatePostForm extends React.Component {
     const { isText, text, url, title } = postForm
 
     return (
-      <div className="single-column">
+      <div>
         <ChannelBreadcrumbs channel={channel} />
         <Card className="new-post-card">
           <form onSubmit={onSubmit}>

@@ -1,3 +1,8 @@
+@import "node_modules/@material/drawer/dist/mdc.drawer";
+@import "node_modules/@material/toolbar/dist/mdc.toolbar";
+@import "node_modules/@material/list/dist/mdc.list";
+@import "node_modules/@material/button/dist/mdc.button";
+@import "breakpoints";
 @import "variables";
 @import "basic";
 @import "breadcrumbs";
@@ -8,6 +13,8 @@
 @import "sidebar";
 @import "comment";
 @import "subscriptions";
+@import "button";
+@import "navigation";
 
 body {
   font-family: 'Roboto', helvetica, arial, sans-serif !important;
@@ -17,63 +24,42 @@ body {
   color: $font-black;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 .app {
   width: 100%;
-  margin-top: 20px;
 
-  .single-column {
-    margin: auto;
-    width: 90%;  // arbitrarily chosen
-    max-width: 700px;
-  }
-
-  .double-column {
-    margin: auto;
-    width: 90%;
-    max-width: 1100px;
-
-    .first-column {
-      width: 70%;
-      float: left;
+  .content {
+    @include breakpoint(desktop) {
+      display: flex;
+      flex-direction: row;
+      margin: auto;
+      max-width: 1100px;
     }
 
-    .second-column {
-      width: 30%;
-      float: left;
-      padding-left: 15px;
-    }
-  }
+    .sidebar {
+      @include breakpoint(desktop) {
+        margin-top: 35px;
+        max-width: 300px;
+        margin-right: 20px;
+        width: 24%;
+      }
 
-  .triple-column {
-    margin: auto;
-    width: 1300px;
-
-    .first-column {
-      width: 15%;
-      float: left;
-    }
-
-    .second-column {
-      width: 70%;
-      float: left;
-
-      .card {
-        margin-left: 10px;
+      @include breakpoint(mobile) {
+        display: none;
       }
     }
 
-    .third-column {
-      width: 15%;
-      float: left;
+    .main-content {
+      margin-top: 20px;
+
+      @include breakpoint(desktop) {
+        width: 72%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      @include breakpoint(mobile) {
+        margin: 10px;
+      }
     }
   }
-}
-
-.clear {
-  clear: both;
-  line-height: 0;
 }

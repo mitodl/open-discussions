@@ -7,6 +7,13 @@
     "url": "https://github.com/mitodl/mit-open.git"
   },
   "dependencies": {
+    "@material/base": "^0.2.3",
+    "@material/button": "^0.3.11",
+    "@material/drawer": "^0.5.4",
+    "@material/list": "^0.2.14",
+    "@material/menu": "^0.4.3",
+    "@material/rtl": "^0.1.7",
+    "@material/toolbar": "^0.4.4",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.25.0",
     "babel-eslint": "^7.2.3",

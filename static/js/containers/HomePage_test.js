@@ -2,6 +2,7 @@
 import { assert } from "chai"
 
 import PostList from "../components/PostList"
+import SubscriptionsList from "../components/SubscriptionsList"
 
 import { makeChannelList } from "../factories/channels"
 import { makeChannelPostList } from "../factories/posts"
@@ -41,9 +42,10 @@ describe("HomePage", () => {
     assert.deepEqual(wrapper.find(PostList).props().posts, postList)
   })
 
-  it("lists subscriptions", () => {
-    return renderPage().then(([wrapper]) => {
-      assert.deepEqual(wrapper.find("SubscriptionsSidebar").props().subscribedChannels, channels)
+  it("lists subscriptions", async () => {
+    const [wrapper] = await renderPage()
+    wrapper.find(SubscriptionsList).forEach(component => {
+      assert.deepEqual(component.props().subscribedChannels, channels)
     })
   })
 })

@@ -5,12 +5,12 @@ import { Link } from "react-router-dom"
 import { channelURL } from "../lib/url"
 import type { Channel } from "../flow/discussionTypes"
 
-type SubscriptionsSidebarProps = {
+type SubscriptionsListProps = {
   subscribedChannels: Array<Channel>
 }
 
-export default class SubscriptionsSidebar extends React.Component {
-  props: SubscriptionsSidebarProps
+export default class SubscriptionsList extends React.Component {
+  props: SubscriptionsListProps
 
   render() {
     const { subscribedChannels } = this.props

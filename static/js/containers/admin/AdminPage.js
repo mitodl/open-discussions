@@ -15,11 +15,13 @@ export default class AdminPage extends React.Component {
   render() {
     const { match } = this.props
     return (
-      <div className="admin double-column">
-        <Card>
-          <h1>Admin</h1>
-          <Route path={`${match.url}/channel/new`} component={CreateChannelPage} />
-        </Card>
+      <div className="content">
+        <div className="main-content">
+          <Card>
+            <h1>Admin</h1>
+            <Route path={`${match.url}/channel/new`} component={CreateChannelPage} />
+          </Card>
+        </div>
       </div>
     )
   }

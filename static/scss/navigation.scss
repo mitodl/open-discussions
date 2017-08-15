@@ -1,0 +1,17 @@
+.navbar {
+  .mdc-toolbar {
+    background-color: $brand-bg;
+  }
+
+  @include breakpoint(desktop) {
+    .mdc-toolbar__icon--menu {
+      display: none;
+    }
+  }
+}
+
+.navigation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

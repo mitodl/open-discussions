@@ -86,9 +86,9 @@ class PostPage extends React.Component {
       return null
     }
     return (
-      <div className="double-column">
-        <ChannelBreadcrumbs channel={channel} />
-        <div className="first-column">
+      <div className="content">
+        <div className="main-content">
+          <ChannelBreadcrumbs channel={channel} />
           <Card>
             <PostDisplay post={post} toggleUpvote={toggleUpvote(dispatch)} expanded />
             <ReplyToPostForm forms={forms} post={post} />

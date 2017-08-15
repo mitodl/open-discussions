@@ -18,6 +18,7 @@ describe("CreatePostPage", () => {
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(currentChannel))
     helper.getFrontpageStub.returns(Promise.resolve(makeChannelPostList()))
+    helper.getChannelsStub.returns(Promise.resolve([]))
     listenForActions = helper.listenForActions.bind(helper)
     renderComponent = helper.renderComponent.bind(helper)
   })
@@ -30,15 +31,15 @@ describe("CreatePostPage", () => {
     return renderComponent(newPostURL(currentChannel.name), [
       actions.forms.FORM_BEGIN_EDIT,
       actions.channels.get.requestType,
-      actions.channels.get.successType
+      actions.channels.get.successType,
+      actions.subscribedChannels.get.requestType
     ])
   }
 
-  it("attempts to clear form and load channels on mount", () => {
-    return renderPage().then(([wrapper]) => {
-      assert.include(wrapper.text(), currentChannel.title)
-      sinon.assert.calledOnce(helper.getChannelStub)
-    })
+  it("attempts to clear form and load channels on mount", async () => {
+    const [wrapper] = await renderPage()
+    assert.include(wrapper.text(), currentChannel.title)
+    sinon.assert.calledOnce(helper.getChannelStub)
   })
 
   for (const isText of [true, false]) {
@@ -79,16 +80,15 @@ describe("CreatePostPage", () => {
     })
   }
 
-  it("goes back when cancel is clicked", () => {
-    return renderPage().then(([wrapper]) => {
-      assert.equal(helper.currentLocation.pathname, newPostURL(currentChannel.name))
+  it("goes back when cancel is clicked", async () => {
+    const [wrapper] = await renderPage()
+    assert.equal(helper.currentLocation.pathname, newPostURL(currentChannel.name))
 
-      // mock out front page APIs which we don't care about for this test
-      helper.getFrontpageStub.returns(Promise.resolve([]))
-      helper.getChannelsStub.returns(Promise.resolve([]))
+    // mock out front page APIs which we don't care about for this test
+    helper.getFrontpageStub.returns(Promise.resolve([]))
+    helper.getChannelsStub.returns(Promise.resolve([]))
 
-      wrapper.find(".cancel").simulate("click")
-      assert.equal(helper.currentLocation.pathname, "/")
-    })
+    wrapper.find(".cancel").simulate("click")
+    assert.equal(helper.currentLocation.pathname, "/")
   })
 })

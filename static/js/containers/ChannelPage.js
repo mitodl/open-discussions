@@ -3,20 +3,19 @@ import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
 
-import SubscriptionsSidebar from "../components/SubscriptionsSidebar"
 import Card from "../components/Card"
-import ChannelSidebar from "../components/ChannelSidebar"
 import PostList from "../components/PostList"
 import withLoading from "../components/Loading"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
+import withNavSidebar from "../hoc/withNavSidebar"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
-import { setChannelData } from "../actions/channel"
 import { safeBulkGet } from "../lib/maps"
 import { getChannelName } from "../lib/util"
 import { toggleUpvote } from "../util/api_actions"
 import { anyError } from "../util/rest"
+import { getSubscribedChannels } from "../lib/redux_selectors"
 
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -49,16 +48,12 @@ class ChannelPage extends React.Component {
   }
 
   loadData = () => {
-    const { dispatch, subscribedChannels, channelName } = this.props
+    const { dispatch, channelName } = this.props
     Promise.all([
       dispatch(actions.channels.get(channelName)),
       dispatch(actions.postsForChannel.get(channelName)).then(({ posts }) => {
         dispatch(setPostData(posts))
-      }),
-      subscribedChannels ||
-        dispatch(actions.subscribedChannels.get()).then(channels => {
-          dispatch(setChannelData(channels))
-        })
+      })
     ])
   }
 
@@ -68,22 +63,11 @@ class ChannelPage extends React.Component {
       return null
     } else {
       return (
-        <div className="triple-column">
+        <div>
           <ChannelBreadcrumbs channel={channel} />
-          <div className="first-column">
-            <SubscriptionsSidebar subscribedChannels={subscribedChannels} />
-          </div>
-          <div className="second-column">
-            <Card title={channel.title}>
-              <PostList channel={channel} posts={posts} toggleUpvote={toggleUpvote(dispatch)} />
-            </Card>
-          </div>
-          <div className="third-column">
-            <Card>
-              <ChannelSidebar channel={channel} />
-            </Card>
-          </div>
-          <br className="clear" />
+          <Card title={channel.title}>
+            <PostList channel={channel} posts={posts} toggleUpvote={toggleUpvote(dispatch)} />
+          </Card>
         </div>
       )
     }
@@ -98,12 +82,10 @@ const mapStateToProps = (state, ownProps) => {
     channelName,
     channel,
     posts:              safeBulkGet(postIds || [], state.posts.data),
-    subscribedChannels: state.subscribedChannels.loaded
-      ? safeBulkGet(state.subscribedChannels.data, state.channels.data)
-      : null,
-    loaded:  R.none(R.isNil, [channel, postIds]),
-    errored: anyError([state.channels, state.posts, state.subscribedChannels])
+    subscribedChannels: getSubscribedChannels(state),
+    loaded:             R.none(R.isNil, [channel, postIds]),
+    errored:            anyError([state.channels, state.posts, state.subscribedChannels])
   }
 }
 
-export default R.compose(connect(mapStateToProps), withLoading)(ChannelPage)
+export default R.compose(connect(mapStateToProps), withNavSidebar, withLoading)(ChannelPage)

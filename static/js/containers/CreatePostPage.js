@@ -97,14 +97,18 @@ class CreatePostPage extends React.Component {
     }
 
     return (
-      <CreatePostForm
-        onSubmit={this.onSubmit}
-        onUpdate={this.onUpdate}
-        updateIsText={this.updateIsText}
-        postForm={postForm.value}
-        channel={channel}
-        history={history}
-      />
+      <div className="content">
+        <div className="main-content">
+          <CreatePostForm
+            onSubmit={this.onSubmit}
+            onUpdate={this.onUpdate}
+            updateIsText={this.updateIsText}
+            postForm={postForm.value}
+            channel={channel}
+            history={history}
+          />
+        </div>
+      </div>
     )
   }
 }

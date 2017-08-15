@@ -3,6 +3,7 @@ import { assert } from "chai"
 import sinon from "sinon"
 
 import PostList from "../components/PostList"
+import SubscriptionsList from "../components/SubscriptionsList"
 
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList } from "../factories/posts"
@@ -53,33 +54,31 @@ describe("ChannelPage", () => {
     let otherChannel = makeChannel()
     otherChannel.name = "somenamethatshouldnevercollidebecauseitsaridiculouslylongvalue"
     let [wrapper] = await renderPage(otherChannel)
-    assert.equal(wrapper.text(), "Loading")
+    assert.include(wrapper.text(), "Loading")
   })
 
-  it("lists subscriptions", () => {
-    return renderPage(currentChannel).then(([wrapper]) => {
-      sinon.assert.calledOnce(helper.getChannelsStub)
-
-      assert.deepEqual(wrapper.find("SubscriptionsSidebar").props().subscribedChannels, channels)
+  it("lists subscriptions", async () => {
+    const [wrapper] = await renderPage(currentChannel)
+    sinon.assert.calledOnce(helper.getChannelsStub)
+    wrapper.find(SubscriptionsList).forEach(component => {
+      assert.deepEqual(component.props().subscribedChannels, channels)
     })
   })
 
-  it("updates requirements when channel name changes", () => {
-    return renderPage(currentChannel).then(() => {
-      sinon.assert.neverCalledWith(helper.getChannelStub, otherChannel.name)
-      return listenForActions(
-        [
-          actions.channels.get.requestType,
-          actions.channels.get.successType,
-          actions.postsForChannel.get.requestType,
-          actions.postsForChannel.get.successType
-        ],
-        () => {
-          helper.browserHistory.push(channelURL(otherChannel.name))
-        }
-      ).then(() => {
-        sinon.assert.calledWith(helper.getChannelStub, otherChannel.name)
-      })
-    })
+  it("updates requirements when channel name changes", async () => {
+    await renderPage(currentChannel)
+    sinon.assert.neverCalledWith(helper.getChannelStub, otherChannel.name)
+    await listenForActions(
+      [
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
+        actions.postsForChannel.get.requestType,
+        actions.postsForChannel.get.successType
+      ],
+      () => {
+        helper.browserHistory.push(channelURL(otherChannel.name))
+      }
+    )
+    sinon.assert.calledWith(helper.getChannelStub, otherChannel.name)
   })
 })

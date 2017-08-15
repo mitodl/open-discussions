@@ -9,7 +9,7 @@ type CardProps = {
 
 const Card = ({ children, className, title }: CardProps) =>
   <div className={className ? `card ${className}` : "card"}>
-    <div className="content">
+    <div className="card-contents">
       {title
         ? <div className="title">
           {title}

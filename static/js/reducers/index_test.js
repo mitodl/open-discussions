@@ -1,11 +1,15 @@
 // @flow
 import { assert } from "chai"
 import { INITIAL_STATE } from "redux-hammock/constants"
+import R from "ramda"
 
 import { actions } from "../actions"
 import { setChannelData } from "../actions/channel"
 import { setPostData } from "../actions/post"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import { INITIAL_UI_STATE } from "./ui"
+import { SET_SHOW_DRAWER, setShowDrawer } from "../actions/ui"
+import { getSubscribedChannels } from "../lib/redux_selectors"
 
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { makeChannel, makeChannelList } from "../factories/channels"
@@ -157,25 +161,23 @@ describe("reducers", () => {
       assert.deepEqual(store.getState().postsForChannel, { ...INITIAL_STATE, data: new Map() })
     })
 
-    it("should let you get the posts for a channel", () => {
+    it("should let you get the posts for a channel", async () => {
       const { requestType, successType } = actions.postsForChannel.get
-      return dispatchThen(actions.postsForChannel.get("channel"), [requestType, successType]).then(({ data }) => {
-        let channel = data.get("channel")
-        assert.isArray(channel)
-        assert.lengthOf(channel, 20)
-      })
+      const { data } = await dispatchThen(actions.postsForChannel.get("channel"), [requestType, successType])
+      let channel = data.get("channel")
+      assert.isArray(channel)
+      assert.lengthOf(channel, 20)
     })
 
-    it("should support multiple channels", () => {
-      return Promise.all([
+    it("should support multiple channels", async () => {
+      await Promise.all([
         store.dispatch(actions.postsForChannel.get("first")),
         store.dispatch(actions.postsForChannel.get("second"))
-      ]).then(() => {
-        let { postsForChannel: { data } } = store.getState()
-        assert.isArray(data.get("first"))
-        assert.isArray(data.get("second"))
-        assert.equal(data.size, 2)
-      })
+      ])
+      let { postsForChannel: { data } } = store.getState()
+      assert.isArray(data.get("first"))
+      assert.isArray(data.get("second"))
+      assert.equal(data.size, 2)
     })
   })
 
@@ -189,11 +191,58 @@ describe("reducers", () => {
       assert.deepEqual(store.getState().frontpage, { ...INITIAL_STATE, data: [] })
     })
 
-    it("should let you get the frontpage", () => {
+    it("should let you get the frontpage", async () => {
       const { requestType, successType } = actions.frontpage.get
-      return dispatchThen(actions.frontpage.get(), [requestType, successType]).then(({ data }) => {
-        assert.lengthOf(data, 20)
-      })
+      const { data } = await dispatchThen(actions.frontpage.get(), [requestType, successType])
+      assert.lengthOf(data, 20)
+    })
+  })
+
+  describe("ui reducer", () => {
+    beforeEach(() => {
+      dispatchThen = store.createDispatchThen(state => state.ui)
+    })
+
+    it("should have some default state", () => {
+      assert.deepEqual(store.getState().ui, INITIAL_UI_STATE)
+    })
+
+    it("should let you toggle sidebar visibility", async () => {
+      let state = await dispatchThen(setShowDrawer(true), [SET_SHOW_DRAWER])
+      assert.isTrue(state.showDrawer)
+      state = await dispatchThen(setShowDrawer(false), [SET_SHOW_DRAWER])
+      assert.isFalse(state.showDrawer)
+    })
+  })
+
+  describe("subsribed channels (getChannels) reducer", () => {
+    let channels
+
+    beforeEach(() => {
+      channels = makeChannelList()
+      dispatchThen = store.createDispatchThen(state => state.subscribedChannels)
+      helper.getChannelsStub.returns(Promise.resolve(channels))
+    })
+
+    it("should have some default state", () => {
+      assert.deepEqual(store.getState().subscribedChannels, { ...INITIAL_STATE, data: [] })
+    })
+
+    it("should let you get subscribed channels", async () => {
+      const { requestType, successType } = actions.subscribedChannels.get
+      const { data } = await dispatchThen(actions.subscribedChannels.get(), [requestType, successType])
+      assert.deepEqual(data, channels.map(R.prop("name")))
+    })
+
+    it("should be possible to pull out relevant info using the selector", async () => {
+      const { requestType, successType } = actions.subscribedChannels.get
+      await dispatchThen(actions.subscribedChannels.get(), [requestType, successType])
+      store.dispatch(setChannelData(channels))
+      assert.deepEqual(getSubscribedChannels(store.getState()), channels)
+    })
+
+    it("selector should return [] if empty", () => {
+      assert.deepEqual(getSubscribedChannels(store.getState()), [])
     })
   })
 })
