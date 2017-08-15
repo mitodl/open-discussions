@@ -25,7 +25,6 @@
     "babel-preset-latest": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "babel-register": "^6.24.1",
-    "bulma": "^0.5.1",
     "casual-browserify": "^1.5.12",
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
