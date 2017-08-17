@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^status/', include('server_status.urls')),
     url(r'', include('channels.urls')),
+    url(r'', include('profiles.urls')),
 
     # React App
     url(r'^$', index, name='open_discussions-index'),

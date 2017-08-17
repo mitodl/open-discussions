@@ -49,6 +49,7 @@ simplegeneric==0.8.1      # via ipython
 six==1.10.0               # via django-server-status, faker, html5lib, prompt-toolkit, python-dateutil, traitlets
 static3==0.5.1
 traitlets==4.3.2          # via ipython
+ulid-py==0.0.3
 update-checker==0.16      # via praw
 urllib3==1.21.1           # via elasticsearch, requests
 uwsgi==2.0.15

@@ -5,7 +5,6 @@ import pytest
 from rest_framework.test import APIClient
 
 from open_discussions.betamax_config import setup_betamax
-from open_discussions.factories import UserFactory
 
 
 @pytest.fixture
@@ -40,9 +39,3 @@ def use_betamax(mocker, configure_betamax, betamax_recorder, praw_settings):
 def client():
     """Similar to the builtin client but this provides the DRF client instead of the Django test client."""
     return APIClient()
-
-
-@pytest.fixture
-def user(db):
-    """Create a user"""
-    return UserFactory.create()
