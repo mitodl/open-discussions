@@ -71,6 +71,7 @@ INSTALLED_APPS = (
     'server_status',
     'raven.contrib.django.raven_compat',
     'rest_framework',
+    'rest_framework.authtoken',
     # Put our apps after this point
     'open_discussions',
     'profiles'
