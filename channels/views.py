@@ -6,6 +6,7 @@ from rest_framework.generics import (
     RetrieveUpdateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
+from rest_framework.permissions import IsAuthenticated
 
 from channels.api import Api
 from channels.serializers import (
@@ -13,12 +14,14 @@ from channels.serializers import (
     CommentSerializer,
     PostSerializer,
 )
+from open_discussions.permissions import JwtIsStaffOrReadonlyPermission
 
 
 class ChannelListView(ListCreateAPIView):
     """
     View for listing and creating channels
     """
+    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
     serializer_class = ChannelSerializer
 
     def get_queryset(self):
@@ -31,6 +34,7 @@ class ChannelDetailView(RetrieveUpdateAPIView):
     """
     View for getting information about or updating a specific channel
     """
+    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
     serializer_class = ChannelSerializer
 
     def get_object(self):

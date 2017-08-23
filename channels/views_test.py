@@ -27,7 +27,7 @@ def test_list_channels(client, use_betamax, praw_settings):
     ]
 
 
-def test_create_channel(client, use_betamax, praw_settings):
+def test_create_channel(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Create a channel and assert the response
     """
@@ -39,9 +39,39 @@ def test_create_channel(client, use_betamax, praw_settings):
         'title': 'Channel title',
         'public_description': 'public',
     }
-    resp = client.post(url, data=payload)
+    resp = client.post(url, data=payload, **staff_jwt_header)
     assert resp.status_code == 201
     assert resp.json() == payload
+
+
+def test_create_channel_nonstaff(client, praw_settings, jwt_header):
+    """
+    Try to create a channel with nonstaff auth and assert a failure
+    """
+    url = reverse('channel-list')
+    payload = {
+        'channel_type': 'private',
+        'name': 'a_channel',
+        'title': 'Channel title',
+        'public_description': 'public',
+    }
+    resp = client.post(url, data=payload, **jwt_header)
+    assert resp.status_code == 403
+
+
+def test_create_channel_noauth(client, praw_settings):
+    """
+    Try to create a channel with no auth and assert a failure
+    """
+    url = reverse('channel-list')
+    payload = {
+        'channel_type': 'private',
+        'name': 'a_channel',
+        'title': 'Channel title',
+        'public_description': 'public',
+    }
+    resp = client.post(url, data=payload)
+    assert resp.status_code == 401
 
 
 def test_get_channel(client, use_betamax, praw_settings):
@@ -60,15 +90,14 @@ def test_get_channel(client, use_betamax, praw_settings):
     }
 
 
-def test_patch_channel(client, use_betamax, praw_settings):
+def test_patch_channel(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Update a channel's settings
     """
-    client.force_login(UserFactory.create())
     url = reverse('channel-detail', kwargs={'channel_name': 'subreddit_for_testing'})
     resp = client.patch(url, {
         'channel_type': 'public',
-    }, format='json')
+    }, format='json', **staff_jwt_header)
     assert resp.status_code == 200
     assert resp.json() == {
         'channel_type': 'public',
@@ -76,6 +105,28 @@ def test_patch_channel(client, use_betamax, praw_settings):
         'title': 'subreddit for tests',
         'public_description': 'a public description goes here',
     }
+
+
+def test_patch_channel_nonstaff(client, praw_settings, jwt_header):
+    """
+    Fail to update a channel's settings if nonstaff user
+    """
+    url = reverse('channel-detail', kwargs={'channel_name': 'subreddit_for_testing'})
+    resp = client.patch(url, {
+        'channel_type': 'public',
+    }, format='json', **jwt_header)
+    assert resp.status_code == 403
+
+
+def test_patch_channel_noauth(client, praw_settings):
+    """
+    Fail to update a channel's settings if no auth
+    """
+    url = reverse('channel-detail', kwargs={'channel_name': 'subreddit_for_testing'})
+    resp = client.patch(url, {
+        'channel_type': 'public',
+    }, format='json')
+    assert resp.status_code == 401
 
 
 def test_create_url_post(client, use_betamax, praw_settings):

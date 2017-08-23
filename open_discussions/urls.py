@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
+from rest_framework_jwt.views import refresh_jwt_token
 
 from open_discussions.views import index
 
@@ -25,6 +26,7 @@ urlpatterns = [
     url(r'^status/', include('server_status.urls')),
     url(r'', include('channels.urls')),
     url(r'', include('profiles.urls')),
+    url(r'^api/token/refresh/', refresh_jwt_token),
 
     # React App
     url(r'^$', index, name='open_discussions-index'),

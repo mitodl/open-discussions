@@ -9,6 +9,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 
 """
+import datetime
 import logging
 import os
 import platform
@@ -71,7 +72,6 @@ INSTALLED_APPS = (
     'server_status',
     'raven.contrib.django.raven_compat',
     'rest_framework',
-    'rest_framework.authtoken',
     # Put our apps after this point
     'open_discussions',
     'profiles'
@@ -382,6 +382,23 @@ OPEN_DISCUSSIONS_REDDIT_SECRET = get_string('OPEN_DISCUSSIONS_REDDIT_SECRET', No
 OPEN_DISCUSSIONS_REDDIT_URL = get_string('OPEN_DISCUSSIONS_REDDIT_URL', '')
 OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL = get_bool('OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL', True)
 
+# JWT authentication settings
+OPEN_DISCUSSIONS_JWT_SECRET = get_string(
+    'OPEN_DISCUSSIONS_JWT_SECRET',
+    'terribly_unsafe_default_jwt_secret_key'
+)
+
+JWT_AUTH = {
+    'JWT_SECRET_KEY': OPEN_DISCUSSIONS_JWT_SECRET,
+    'JWT_VERIFY': True,
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60*60),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_AUTH_COOKIE': 'open_discussions_jwt',
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+}
+
 
 # features flags
 def get_all_config_keys():
@@ -421,5 +438,9 @@ if DEBUG:
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
 }
