@@ -9,7 +9,8 @@ import ChannelBreadcrumbs from "./ChannelBreadcrumbs"
 import { makeChannel } from "../factories/channels"
 
 describe("ChannelBreadcrumbs", () => {
-  const renderBreadcrumbs = channel => shallow(<ChannelBreadcrumbs channel={channel} />)
+  const renderBreadcrumbs = channel =>
+    shallow(<ChannelBreadcrumbs channel={channel} />)
 
   it("should render breadcrumbs", () => {
     let channel = makeChannel()

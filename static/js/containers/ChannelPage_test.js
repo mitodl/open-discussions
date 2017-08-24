@@ -14,7 +14,13 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import { channelURL } from "../lib/url"
 
 describe("ChannelPage", () => {
-  let helper, renderComponent, listenForActions, channels, currentChannel, otherChannel, postList
+  let helper,
+    renderComponent,
+    listenForActions,
+    channels,
+    currentChannel,
+    otherChannel,
+    postList
 
   beforeEach(() => {
     channels = makeChannelList(10)
@@ -52,7 +58,8 @@ describe("ChannelPage", () => {
 
   it("should handle missing data gracefully", async () => {
     let otherChannel = makeChannel()
-    otherChannel.name = "somenamethatshouldnevercollidebecauseitsaridiculouslylongvalue"
+    otherChannel.name =
+      "somenamethatshouldnevercollidebecauseitsaridiculouslylongvalue"
     let [wrapper] = await renderPage(otherChannel)
     assert.include(wrapper.text(), "Loading")
   })

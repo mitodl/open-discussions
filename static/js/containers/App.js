@@ -47,10 +47,20 @@ class App extends React.Component {
         <Toolbar toggleShowSidebar={this.toggleShowSidebar} />
         <Drawer />
         <Route exact path={match.url} component={HomePage} />
-        <Route exact path={`${match.url}channel/:channelName`} component={ChannelPage} />
-        <Route path={`${match.url}channel/:channelName/:postID`} component={PostPage} />
+        <Route
+          exact
+          path={`${match.url}channel/:channelName`}
+          component={ChannelPage}
+        />
+        <Route
+          path={`${match.url}channel/:channelName/:postID`}
+          component={PostPage}
+        />
         <Route path={`${match.url}manage/`} component={AdminPage} />
-        <Route path={`${match.url}create_post/:channelName`} component={CreatePostPage} />
+        <Route
+          path={`${match.url}create_post/:channelName`}
+          component={CreatePostPage}
+        />
       </div>
     )
   }

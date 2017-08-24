@@ -11,7 +11,10 @@ export const INITIAL_UI_STATE: UIState = {
   showDrawer: false
 }
 
-export const ui = (state: Object = INITIAL_UI_STATE, action: Action<boolean, null>): UIState => {
+export const ui = (
+  state: Object = INITIAL_UI_STATE,
+  action: Action<boolean, null>
+): UIState => {
   switch (action.type) {
   case SET_SHOW_DRAWER:
     return { ...state, showDrawer: action.payload }

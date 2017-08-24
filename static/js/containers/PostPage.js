@@ -33,7 +33,9 @@ type PostPageProps = {
 }
 
 // if either postId or channelName don't match
-const shouldLoadData = R.complement(R.allPass([R.eqProps("postID"), R.eqProps("channelName")]))
+const shouldLoadData = R.complement(
+  R.allPass([R.eqProps("postID"), R.eqProps("channelName")])
+)
 
 class PostPage extends React.Component {
   props: PostPageProps
@@ -90,10 +92,19 @@ class PostPage extends React.Component {
         <div className="main-content">
           <ChannelBreadcrumbs channel={channel} />
           <Card>
-            <PostDisplay post={post} toggleUpvote={toggleUpvote(dispatch)} expanded />
+            <PostDisplay
+              post={post}
+              toggleUpvote={toggleUpvote(dispatch)}
+              expanded
+            />
             <ReplyToPostForm forms={forms} post={post} />
           </Card>
-          <CommentTree comments={commentsTree} forms={forms} upvote={this.upvote} downvote={this.downvote} />
+          <CommentTree
+            comments={commentsTree}
+            forms={forms}
+            upvote={this.upvote}
+            downvote={this.downvote}
+          />
         </div>
       </div>
     )

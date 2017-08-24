@@ -9,7 +9,10 @@ import { newPostURL, getChannelNameFromPathname } from "../lib/url"
 import type { Channel } from "../flow/discussionTypes"
 
 const submitPostButton = channelName =>
-  <Link className="mdc-button mdc-button--raised blue-button" to={newPostURL(channelName)}>
+  <Link
+    className="mdc-button mdc-button--raised blue-button"
+    to={newPostURL(channelName)}
+  >
     Submit Post
   </Link>
 

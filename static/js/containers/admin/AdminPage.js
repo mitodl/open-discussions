@@ -19,7 +19,10 @@ export default class AdminPage extends React.Component {
         <div className="main-content">
           <Card>
             <h1>Admin</h1>
-            <Route path={`${match.url}/channel/new`} component={CreateChannelPage} />
+            <Route
+              path={`${match.url}/channel/new`}
+              component={CreateChannelPage}
+            />
           </Card>
         </div>
       </div>

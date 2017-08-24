@@ -6,7 +6,12 @@ import "isomorphic-fetch"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 import { PATCH, POST } from "redux-hammock/constants"
 
-import type { Channel, Comment, CreatePostPayload, Post } from "../flow/discussionTypes"
+import type {
+  Channel,
+  Comment,
+  CreatePostPayload,
+  Post
+} from "../flow/discussionTypes"
 import type { CommentResponse } from "../reducers/comments"
 
 export function getFrontpage(): Promise<Post> {
@@ -24,7 +29,12 @@ export function getChannels(): Promise<Array<Channel>> {
 export function createChannel(channel: Channel): Promise<Channel> {
   return fetchJSONWithCSRF(`/api/v0/channels/`, {
     method: POST,
-    body:   JSON.stringify(R.pickAll(["name", "title", "public_description", "channel_type"], channel))
+    body:   JSON.stringify(
+      R.pickAll(
+        ["name", "title", "public_description", "channel_type"],
+        channel
+      )
+    )
   })
 }
 
@@ -32,7 +42,10 @@ export function getPostsForChannel(channelName: string): Promise<Array<Post>> {
   return fetchJSONWithCSRF(`/api/v0/channels/${channelName}/posts/`)
 }
 
-export function createPost(channelName: string, payload: CreatePostPayload): Promise<Post> {
+export function createPost(
+  channelName: string,
+  payload: CreatePostPayload
+): Promise<Post> {
   const { text, url, title } = payload
   return fetchJSONWithCSRF(`/api/v0/channels/${channelName}/posts/`, {
     method: "POST",
@@ -53,8 +66,15 @@ export async function getComments(postID: string): Promise<CommentResponse> {
   return { postID, data: response }
 }
 
-export function createComment(postId: string, comment: string, commentId: ?string) {
-  let body = commentId === undefined ? { text: comment } : { text: comment, comment_id: commentId }
+export function createComment(
+  postId: string,
+  comment: string,
+  commentId: ?string
+) {
+  let body =
+    commentId === undefined
+      ? { text: comment }
+      : { text: comment, comment_id: commentId }
 
   return fetchJSONWithCSRF(`/api/v0/posts/${postId}/comments/`, {
     method: POST,
@@ -69,7 +89,10 @@ export function updateUpvote(postId: string, upvoted: boolean): Promise<Post> {
   })
 }
 
-export function updateComment(commentId: string, commentPayload: Object): Promise<Comment> {
+export function updateComment(
+  commentId: string,
+  commentPayload: Object
+): Promise<Comment> {
   return fetchJSONWithCSRF(`/api/v0/comments/${commentId}/`, {
     method: PATCH,
     body:   JSON.stringify(commentPayload)

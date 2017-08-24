@@ -18,7 +18,11 @@ type CommentPayload = {
   comment: Comment
 }
 
-const appendCommentToTree = (tree: Array<Comment>, comment: Comment, commentId?: string): Array<Comment> => {
+const appendCommentToTree = (
+  tree: Array<Comment>,
+  comment: Comment,
+  commentId?: string
+): Array<Comment> => {
   if (!commentId) {
     return R.prepend(comment, tree)
   }
@@ -36,7 +40,10 @@ const appendCommentToTree = (tree: Array<Comment>, comment: Comment, commentId?:
   return R.set(lens, treeComment, tree)
 }
 
-const updateCommentTree = (tree: Array<Comment>, updatedComment: Comment): Array<Comment> => {
+const updateCommentTree = (
+  tree: Array<Comment>,
+  updatedComment: Comment
+): Array<Comment> => {
   let lens = findComment(tree, updatedComment.id)
   if (lens === null) {
     return tree
@@ -54,7 +61,10 @@ export const commentsEndpoint = {
   verbs:             [GET, PATCH, POST],
   getFunc:           (postID: string) => api.getComments(postID),
   initialState:      { ...INITIAL_STATE, data: new Map() },
-  getSuccessHandler: (response: CommentResponse, data: Map<string, Array<Comment>>) => {
+  getSuccessHandler: (
+    response: CommentResponse,
+    data: Map<string, Array<Comment>>
+  ) => {
     let update = new Map(data)
     update.set(response.postID, response.data)
     return update
@@ -63,7 +73,10 @@ export const commentsEndpoint = {
     const comment = await api.createComment(postId, text, commentId)
     return { postId, commentId, comment }
   },
-  postSuccessHandler: ({ commentId, postId, comment }: CommentPayload, data: Map<string, Array<Comment>>) => {
+  postSuccessHandler: (
+    { commentId, postId, comment }: CommentPayload,
+    data: Map<string, Array<Comment>>
+  ) => {
     let update = new Map(data)
     let oldTree = data.get(postId)
     if (oldTree) {
@@ -71,8 +84,12 @@ export const commentsEndpoint = {
     }
     return update
   },
-  patchFunc:           (commentId: string, payload: Object) => api.updateComment(commentId, payload),
-  patchSuccessHandler: (response: Comment, data: Map<string, Array<Comment>>) => {
+  patchFunc: (commentId: string, payload: Object) =>
+    api.updateComment(commentId, payload),
+  patchSuccessHandler: (
+    response: Comment,
+    data: Map<string, Array<Comment>>
+  ) => {
     let update = new Map(data)
     let postId = response.post_id
     let oldTree = data.get(postId)

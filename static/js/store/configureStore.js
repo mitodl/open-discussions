@@ -12,7 +12,9 @@ if (process.env.NODE_ENV !== "production") {
     window.devToolsExtension ? window.devToolsExtension() : f => f
   )(createStore)
 } else {
-  createStoreWithMiddleware = compose(applyMiddleware(thunkMiddleware))(createStore)
+  createStoreWithMiddleware = compose(applyMiddleware(thunkMiddleware))(
+    createStore
+  )
 }
 
 export default function configureStore(initialState: Object) {

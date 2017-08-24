@@ -17,7 +17,10 @@ export const postsForChannelEndpoint = {
     return { channelName, posts }
   },
   initialState:      { ...INITIAL_STATE, data: new Map() },
-  getSuccessHandler: (payload: ChannelEndpointResponse, data: Map<string, Array<string>>) => {
+  getSuccessHandler: (
+    payload: ChannelEndpointResponse,
+    data: Map<string, Array<string>>
+  ) => {
     const { channelName, posts } = payload
     let update = new Map(data)
     update.set(channelName, posts.map(post => post.id))

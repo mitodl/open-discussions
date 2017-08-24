@@ -8,6 +8,8 @@ import type { Post } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
 
 export const toggleUpvote = R.curry(async (dispatch: Dispatch, post: Post) => {
-  const result = await dispatch(actions.postUpvotes.patch(post.id, !post.upvoted))
+  const result = await dispatch(
+    actions.postUpvotes.patch(post.id, !post.upvoted)
+  )
   return dispatch(setPostData(result))
 })

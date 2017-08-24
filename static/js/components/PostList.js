@@ -7,7 +7,12 @@ import type { Post } from "../flow/discussionTypes"
 
 const renderPosts = (posts, showChannelLinks, toggleUpvote) =>
   posts.map((post, index) =>
-    <PostDisplay post={post} key={index} showChannelLink={showChannelLinks} toggleUpvote={toggleUpvote} />
+    <PostDisplay
+      post={post}
+      key={index}
+      showChannelLink={showChannelLinks}
+      toggleUpvote={toggleUpvote}
+    />
   )
 
 type PostListProps = {

@@ -18,7 +18,14 @@ export default class CreatePostForm extends React.Component {
   props: CreatePostFormProps
 
   render() {
-    const { channel, postForm, onUpdate, onSubmit, updateIsText, history } = this.props
+    const {
+      channel,
+      postForm,
+      onUpdate,
+      onSubmit,
+      updateIsText,
+      history
+    } = this.props
     if (!postForm) {
       return null
     }
@@ -31,29 +38,54 @@ export default class CreatePostForm extends React.Component {
         <Card className="new-post-card">
           <form onSubmit={onSubmit}>
             <div className="post-types row">
-              <div className={`new-text-post ${isText ? "active" : ""}`} onClick={() => updateIsText(true)}>
+              <div
+                className={`new-text-post ${isText ? "active" : ""}`}
+                onClick={() => updateIsText(true)}
+              >
                 New text post
               </div>
-              <div className={`new-link-post ${isText ? "" : "active"}`} onClick={() => updateIsText(false)}>
+              <div
+                className={`new-link-post ${isText ? "" : "active"}`}
+                onClick={() => updateIsText(false)}
+              >
                 New link post
               </div>
             </div>
             <div className="title row">
-              <input type="text" placeholder="Title" name="title" value={title} onChange={onUpdate} />
+              <input
+                type="text"
+                placeholder="Title"
+                name="title"
+                value={title}
+                onChange={onUpdate}
+              />
             </div>
             {isText
               ? <div className="text row">
-                <textarea placeholder="Type your post here..." name="text" value={text} onChange={onUpdate} />
+                <textarea
+                  placeholder="Type your post here..."
+                  name="text"
+                  value={text}
+                  onChange={onUpdate}
+                />
               </div>
               : <div className="url row">
-                <input type="url" placeholder="URL" name="url" value={url} onChange={onUpdate} />
+                <input
+                  type="url"
+                  placeholder="URL"
+                  name="url"
+                  value={url}
+                  onChange={onUpdate}
+                />
               </div>}
             <div className="channel row">
               Posting to {channel.title}
             </div>
             <div className="row">
               <span>
-                Please be mindful of <a href="#">MIT Discussion content policy</a> and practice good online etiquette.
+                Please be mindful of{" "}
+                <a href="#">MIT Discussion content policy</a> and practice good
+                online etiquette.
               </span>
             </div>
             <div className="actions row">

@@ -59,7 +59,11 @@ export default class CommentVoteForm extends React.Component {
           {comment.score}
         </div>
         <div className="votes">
-          <button className={`vote upvote ${comment.upvoted ? "upvoted" : ""}`} onClick={this.upvote} disabled={voting}>
+          <button
+            className={`vote upvote ${comment.upvoted ? "upvoted" : ""}`}
+            onClick={this.upvote}
+            disabled={voting}
+          >
             ⇑
           </button>
           <button

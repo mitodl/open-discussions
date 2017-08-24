@@ -13,7 +13,8 @@ import { makeChannelList } from "../factories/channels"
 describe("Navigation", () => {
   describe("component", () => {
     const defaultProps = { pathname: "/", subscribedChannels: [] }
-    const renderComponent = (props = defaultProps) => shallow(<Navigation {...props} />)
+    const renderComponent = (props = defaultProps) =>
+      shallow(<Navigation {...props} />)
 
     it("should not show a create post link if channelName is not in URL", () => {
       let wrapper = renderComponent()
@@ -21,7 +22,10 @@ describe("Navigation", () => {
     })
 
     it("should show create post link if channelName is in URL", () => {
-      let wrapper = renderComponent({ ...defaultProps, pathname: "/channel/foobar" })
+      let wrapper = renderComponent({
+        ...defaultProps,
+        pathname: "/channel/foobar"
+      })
       let link = wrapper.find(Link)
       assert.equal(link.props().to, newPostURL("foobar"))
       assert.equal(link.props().children, "Submit Post")
@@ -29,8 +33,14 @@ describe("Navigation", () => {
 
     it("should show a SubscriptionsList", () => {
       let channels = makeChannelList(10)
-      let wrapper = renderComponent({ ...defaultProps, subscribedChannels: channels })
-      assert.equal(wrapper.find(SubscriptionsList).props().subscribedChannels, channels)
+      let wrapper = renderComponent({
+        ...defaultProps,
+        subscribedChannels: channels
+      })
+      assert.equal(
+        wrapper.find(SubscriptionsList).props().subscribedChannels,
+        channels
+      )
     })
   })
 })

@@ -105,10 +105,14 @@ describe("api", function() {
       const url = "URL"
       return createPost("channelname", { text, title, url }).then(result => {
         const body = JSON.stringify({ url, text, title })
-        sinon.assert.calledWith(fetchStub, "/api/v0/channels/channelname/posts/", {
-          body,
-          method: POST
-        })
+        sinon.assert.calledWith(
+          fetchStub,
+          "/api/v0/channels/channelname/posts/",
+          {
+            body,
+            method: POST
+          }
+        )
         assert.deepEqual(result, post)
       })
     })

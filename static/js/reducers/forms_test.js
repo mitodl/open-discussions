@@ -29,7 +29,9 @@ describe("forms reducer", () => {
   })
 
   it("should intialize the form", () => {
-    return dispatchThen(actions.forms.formBeginEdit(payload), [actions.forms.FORM_BEGIN_EDIT]).then(forms => {
+    return dispatchThen(actions.forms.formBeginEdit(payload), [
+      actions.forms.FORM_BEGIN_EDIT
+    ]).then(forms => {
       assert.deepEqual(forms, {
         [formKey]: {
           value:  value,
@@ -51,7 +53,9 @@ describe("forms reducer", () => {
         }
       })
     })
-    store.dispatch(actions.forms.formUpdate({ formKey, value: { prop: "prop2" } }))
+    store.dispatch(
+      actions.forms.formUpdate({ formKey, value: { prop: "prop2" } })
+    )
     return prom
   })
 

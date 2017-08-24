@@ -57,13 +57,21 @@ class Drawer extends React.Component {
     const { subscribedChannels, location: { pathname } } = this.props
 
     return (
-      <aside className="mdc-temporary-drawer mdc-typography" ref={div => (this.drawerRoot = div)}>
+      <aside
+        className="mdc-temporary-drawer mdc-typography"
+        ref={div => (this.drawerRoot = div)}
+      >
         <nav className="mdc-temporary-drawer__drawer">
           <header className="mdc-temporary-drawer__header">
-            <div className="mdc-temporary-drawer__header-content">Open Discussions</div>
+            <div className="mdc-temporary-drawer__header-content">
+              Open Discussions
+            </div>
           </header>
           <nav className="mdc-temporary-drawer__content mdc-list">
-            <Navigation subscribedChannels={subscribedChannels} pathname={pathname} />
+            <Navigation
+              subscribedChannels={subscribedChannels}
+              pathname={pathname}
+            />
           </nav>
         </nav>
       </aside>

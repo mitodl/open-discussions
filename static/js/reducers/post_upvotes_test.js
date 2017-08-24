@@ -19,9 +19,14 @@ describe("post_upvotes reducer", () => {
   for (const value of [true, false]) {
     it(`should let you update the post upvote value with ${value.toString()}`, () => {
       const { requestType, successType } = actions.postUpvotes.patch
-      return helper.dispatchThen(actions.postUpvotes.patch("id", value), [requestType, successType]).then(() => {
-        assert.isOk(helper.updateUpvoteStub.calledWith("id", value))
-      })
+      return helper
+        .dispatchThen(actions.postUpvotes.patch("id", value), [
+          requestType,
+          successType
+        ])
+        .then(() => {
+          assert.isOk(helper.updateUpvoteStub.calledWith("id", value))
+        })
     })
   }
 })

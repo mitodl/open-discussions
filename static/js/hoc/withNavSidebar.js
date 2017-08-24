@@ -12,7 +12,10 @@ const withNavSidebar = (WrappedComponent: Class<React.Component<*, *, *>>) => {
       return (
         <div className="content">
           <Sidebar>
-            <Navigation subscribedChannels={subscribedChannels} pathname={pathname} />
+            <Navigation
+              subscribedChannels={subscribedChannels}
+              pathname={pathname}
+            />
           </Sidebar>
           <div className="main-content">
             <WrappedComponent {...this.props} />

@@ -38,7 +38,10 @@ describe("PostDisplay", () => {
     const summary = wrapper.find(".summary")
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
     assert.equal(summary.find(Link).at(0).props().children, post.title)
-    assert.deepEqual(wrapper.find(".num-comments").find(Link).props().children, [post.num_comments, " Comments"])
+    assert.deepEqual(
+      wrapper.find(".num-comments").find(Link).props().children,
+      [post.num_comments, " Comments"]
+    )
     const authoredBy = wrapper.find(".authored-by").text()
     assert(authoredBy.startsWith(post.author_id))
     assert.isNotEmpty(authoredBy.substring(post.author_id.length))
@@ -95,7 +98,10 @@ describe("PostDisplay", () => {
   it("should call the toggleUpvote function when it is clicked", () => {
     let post = makePost()
     const toggleUpvote = helper.sandbox.stub()
-    const wrapper = renderPostDisplay({ post: post, toggleUpvote: toggleUpvote })
+    const wrapper = renderPostDisplay({
+      post:         post,
+      toggleUpvote: toggleUpvote
+    })
     wrapper.find(".upvote-button").simulate("click")
     assert.isOk(toggleUpvote.calledOnce)
   })

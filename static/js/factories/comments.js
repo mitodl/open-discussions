@@ -26,7 +26,10 @@ export const makeComment = (post: Post): Comment => {
   return comment
 }
 
-export const makeCommentTree = (post: Post, minComments: number = 1): Array<Comment> => {
+export const makeCommentTree = (
+  post: Post,
+  minComments: number = 1
+): Array<Comment> => {
   let topLevelComments = arrayN(minComments, 10).map(() => makeComment(post))
 
   topLevelComments.forEach((comment, index) => {

@@ -1,7 +1,13 @@
 // @flow
 import { assert } from "chai"
 
-import { channelURL, frontPageURL, newPostURL, postDetailURL, getChannelNameFromPathname } from "./url"
+import {
+  channelURL,
+  frontPageURL,
+  newPostURL,
+  postDetailURL,
+  getChannelNameFromPathname
+} from "./url"
 
 describe("url helper functions", () => {
   describe("channelURL", () => {
@@ -12,7 +18,10 @@ describe("url helper functions", () => {
 
   describe("postDetailURL", () => {
     it("should return a good URL", () => {
-      assert.equal(postDetailURL("foobar", "23434j3j3"), "/channel/foobar/23434j3j3")
+      assert.equal(
+        postDetailURL("foobar", "23434j3j3"),
+        "/channel/foobar/23434j3j3"
+      )
     })
   })
 
@@ -30,7 +39,11 @@ describe("url helper functions", () => {
 
   describe("getChannelNameFromPathname", () => {
     it("should return a channel", () => {
-      ["/channel/foobar/", "/channel/foobar", "/channel/foobar/baz/"].forEach(channel => {
+      [
+        "/channel/foobar/",
+        "/channel/foobar",
+        "/channel/foobar/baz/"
+      ].forEach(channel => {
         assert.equal("foobar", getChannelNameFromPathname(channel))
       })
     })

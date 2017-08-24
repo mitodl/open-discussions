@@ -7,7 +7,9 @@ export const S = create({ checkTypes: false, env: env })
 /*
  * returns Just(items) if all items are Just, else Nothing
  */
-export const allJust = R.curry((items: S.Maybe[]) => (R.all(S.isJust)(items) ? S.Just(items) : S.Nothing))
+export const allJust = R.curry(
+  (items: S.Maybe[]) => (R.all(S.isJust)(items) ? S.Just(items) : S.Nothing)
+)
 
 /*
  * converts a Maybe<String> to a string
@@ -53,7 +55,11 @@ export const parseJSON = S.encaseEither(() => ({}), JSON.parse)
 // if the f(v) === true, it returns, E. Else,
 // if returns Left(v).
 export const filterE = R.curry((predicate, either) =>
-  S.either(S.Left, right => (predicate(right) ? S.Right(right) : S.Left(right)), either)
+  S.either(
+    S.Left,
+    right => (predicate(right) ? S.Right(right) : S.Left(right)),
+    either
+  )
 )
 
 // reduceM :: forall a b. b -> (a -> b) -> Maybe a -> b
@@ -61,4 +67,6 @@ export const filterE = R.curry((predicate, either) =>
 // pass a default value, a function, and a maybe
 // if Nothing, return the function called with the default value
 // if Just, return the function called with the value in the Just
-export const reduceM = R.curry((def, fn, maybe) => S.maybe_(() => fn(def), fn, maybe))
+export const reduceM = R.curry((def, fn, maybe) =>
+  S.maybe_(() => fn(def), fn, maybe)
+)

@@ -26,7 +26,8 @@ type ReplyToPostFormProps = {
   post: Post
 }
 
-const replyToCommentKey = (comment: Comment) => `post:${comment.post_id}:comment:${comment.id}:comment:new`
+const replyToCommentKey = (comment: Comment) =>
+  `post:${comment.post_id}:comment:${comment.id}:comment:new`
 const replyToPostKey = (post: Post) => `post:${post.id}:comment:new`
 
 const getCommentReplyInitialValue = (parent: Comment) => ({
@@ -39,7 +40,13 @@ const getPostReplyInitialValue = (parent: Post) => ({
   text:    ""
 })
 
-const CreateCommentForm = ({ dispatch, forms, formKey, initialValue, post }: CreateCommentFormProps) => {
+const CreateCommentForm = ({
+  dispatch,
+  forms,
+  formKey,
+  initialValue,
+  post
+  }: CreateCommentFormProps) => {
   const beginReply = e => {
     e.preventDefault()
     dispatch(
@@ -81,7 +88,13 @@ const CreateCommentForm = ({ dispatch, forms, formKey, initialValue, post }: Cre
             <label htmlFor="public_description" className="label">
               Comment
             </label>
-            <textarea name="text" type="text" className="input" value={text} onChange={onUpdate} />
+            <textarea
+              name="text"
+              type="text"
+              className="input"
+              value={text}
+              onChange={onUpdate}
+            />
           </div>
           <button type="submit">Save</button>
           <a href="#" onClick={cancelReply} className="cancel-button">
@@ -111,12 +124,16 @@ export const ReplyToCommentForm = ({ comment }: ReplyToCommentFormProps) => {
   const formKey = replyToCommentKey(comment)
   const initialValue = getCommentReplyInitialValue(comment)
 
-  return <ConnectedCreateCommentForm formKey={formKey} initialValue={initialValue} />
+  return (
+    <ConnectedCreateCommentForm formKey={formKey} initialValue={initialValue} />
+  )
 }
 
 export const ReplyToPostForm = ({ post }: ReplyToPostFormProps) => {
   const formKey = replyToPostKey(post)
   const initialValue = getPostReplyInitialValue(post)
 
-  return <ConnectedCreateCommentForm formKey={formKey} initialValue={initialValue} />
+  return (
+    <ConnectedCreateCommentForm formKey={formKey} initialValue={initialValue} />
+  )
 }

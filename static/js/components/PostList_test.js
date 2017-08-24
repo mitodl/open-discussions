@@ -22,7 +22,10 @@ describe("PostList", () => {
   })
 
   it("should pass the showChannelLinks prop to PostDisplay", () => {
-    let wrapper = renderPostList({ posts: makeChannelPostList(), showChannelLinks: true })
+    let wrapper = renderPostList({
+      posts:            makeChannelPostList(),
+      showChannelLinks: true
+    })
     wrapper.find(PostDisplay).forEach(postSummary => {
       assert.isTrue(postSummary.props().showChannelLink)
     })

@@ -38,12 +38,18 @@ describe("reducers", () => {
     })
 
     it("should have some initial state", () => {
-      assert.deepEqual(store.getState().posts, { ...INITIAL_STATE, data: new Map() })
+      assert.deepEqual(store.getState().posts, {
+        ...INITIAL_STATE,
+        data: new Map()
+      })
     })
 
     it("should let you fetch a post", () => {
       const { requestType, successType } = actions.posts.get
-      return dispatchThen(actions.posts.get("mypostid"), [requestType, successType]).then(posts => {
+      return dispatchThen(actions.posts.get("mypostid"), [
+        requestType,
+        successType
+      ]).then(posts => {
         let post = posts.data.get("mypostid")
         assert.equal(post.id, "mypostid")
         assert.isString(post.title)
@@ -93,12 +99,18 @@ describe("reducers", () => {
     })
 
     it("should have some initial state", () => {
-      assert.deepEqual(store.getState().channels, { ...INITIAL_STATE, data: new Map() })
+      assert.deepEqual(store.getState().channels, {
+        ...INITIAL_STATE,
+        data: new Map()
+      })
     })
 
     it("should let you get a channel", () => {
       const { requestType, successType } = actions.channels.get
-      return dispatchThen(actions.channels.get("wowowowow"), [requestType, successType]).then(channels => {
+      return dispatchThen(actions.channels.get("wowowowow"), [
+        requestType,
+        successType
+      ]).then(channels => {
         let channel = channels.data.get("wowowowow")
         assert.isString(channel.name)
         assert.equal(channel.channel_type, "public")
@@ -120,7 +132,10 @@ describe("reducers", () => {
     it("should let you create a channel", async () => {
       const { requestType, successType } = actions.channels.post
       let channel = makeChannel()
-      let channels = await dispatchThen(actions.channels.post(channel), [requestType, successType])
+      let channels = await dispatchThen(actions.channels.post(channel), [
+        requestType,
+        successType
+      ])
       assert.deepEqual(channel, channels.data.get(channel.name))
     })
 
@@ -154,16 +169,24 @@ describe("reducers", () => {
   describe("postsForChannel reducer", () => {
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.postsForChannel)
-      helper.getPostsForChannelStub.returns(Promise.resolve(makeChannelPostList()))
+      helper.getPostsForChannelStub.returns(
+        Promise.resolve(makeChannelPostList())
+      )
     })
 
     it("should have some initial state", () => {
-      assert.deepEqual(store.getState().postsForChannel, { ...INITIAL_STATE, data: new Map() })
+      assert.deepEqual(store.getState().postsForChannel, {
+        ...INITIAL_STATE,
+        data: new Map()
+      })
     })
 
     it("should let you get the posts for a channel", async () => {
       const { requestType, successType } = actions.postsForChannel.get
-      const { data } = await dispatchThen(actions.postsForChannel.get("channel"), [requestType, successType])
+      const { data } = await dispatchThen(
+        actions.postsForChannel.get("channel"),
+        [requestType, successType]
+      )
       let channel = data.get("channel")
       assert.isArray(channel)
       assert.lengthOf(channel, 20)
@@ -188,12 +211,18 @@ describe("reducers", () => {
     })
 
     it("should have some initial state", () => {
-      assert.deepEqual(store.getState().frontpage, { ...INITIAL_STATE, data: [] })
+      assert.deepEqual(store.getState().frontpage, {
+        ...INITIAL_STATE,
+        data: []
+      })
     })
 
     it("should let you get the frontpage", async () => {
       const { requestType, successType } = actions.frontpage.get
-      const { data } = await dispatchThen(actions.frontpage.get(), [requestType, successType])
+      const { data } = await dispatchThen(actions.frontpage.get(), [
+        requestType,
+        successType
+      ])
       assert.lengthOf(data, 20)
     })
   })
@@ -225,18 +254,27 @@ describe("reducers", () => {
     })
 
     it("should have some default state", () => {
-      assert.deepEqual(store.getState().subscribedChannels, { ...INITIAL_STATE, data: [] })
+      assert.deepEqual(store.getState().subscribedChannels, {
+        ...INITIAL_STATE,
+        data: []
+      })
     })
 
     it("should let you get subscribed channels", async () => {
       const { requestType, successType } = actions.subscribedChannels.get
-      const { data } = await dispatchThen(actions.subscribedChannels.get(), [requestType, successType])
+      const { data } = await dispatchThen(actions.subscribedChannels.get(), [
+        requestType,
+        successType
+      ])
       assert.deepEqual(data, channels.map(R.prop("name")))
     })
 
     it("should be possible to pull out relevant info using the selector", async () => {
       const { requestType, successType } = actions.subscribedChannels.get
-      await dispatchThen(actions.subscribedChannels.get(), [requestType, successType])
+      await dispatchThen(actions.subscribedChannels.get(), [
+        requestType,
+        successType
+      ])
       store.dispatch(setChannelData(channels))
       assert.deepEqual(getSubscribedChannels(store.getState()), channels)
     })

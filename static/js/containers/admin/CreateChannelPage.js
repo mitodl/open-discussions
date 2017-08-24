@@ -70,7 +70,11 @@ class CreateChannelPage extends React.Component {
 
     return (
       <div>
-        <ChannelEditForm onSubmit={this.onSubmit} onUpdate={this.onUpdate} form={channelForm.value} />
+        <ChannelEditForm
+          onSubmit={this.onSubmit}
+          onUpdate={this.onUpdate}
+          form={channelForm.value}
+        />
       </div>
     )
   }

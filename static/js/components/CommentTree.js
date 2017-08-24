@@ -14,7 +14,13 @@ import type { FormsState } from "../flow/formTypes"
 import type { CommentVoteFunc } from "./CommentVoteForm"
 
 const renderTopLevelComment = R.curry(
-  (forms: FormsState, upvote: CommentVoteFunc, downvote: CommentVoteFunc, comment: Comment, idx: number) =>
+  (
+    forms: FormsState,
+    upvote: CommentVoteFunc,
+    downvote: CommentVoteFunc,
+    comment: Comment,
+    idx: number
+  ) =>
     <Card key={idx}>
       <div className="top-level-comment">
         {renderComment(forms, upvote, downvote, 0, comment)}
@@ -23,7 +29,13 @@ const renderTopLevelComment = R.curry(
 )
 
 const renderComment = R.curry(
-  (forms: FormsState, upvote: CommentVoteFunc, downvote: CommentVoteFunc, depth: number, comment: Comment) =>
+  (
+    forms: FormsState,
+    upvote: CommentVoteFunc,
+    downvote: CommentVoteFunc,
+    depth: number,
+    comment: Comment
+  ) =>
     <div className="comment" key={comment.id}>
       <div className="author-info">
         <a className="author-name">
@@ -34,14 +46,25 @@ const renderComment = R.curry(
         </div>
       </div>
       <div className="row">
-        <CommentVoteForm comment={comment} upvote={upvote} downvote={downvote} />
-        <ReactMarkdown disallowedTypes={["Image"]} source={comment.text} escapeHtml />
+        <CommentVoteForm
+          comment={comment}
+          upvote={upvote}
+          downvote={downvote}
+        />
+        <ReactMarkdown
+          disallowedTypes={["Image"]}
+          source={comment.text}
+          escapeHtml
+        />
       </div>
       <div>
         <ReplyToCommentForm forms={forms} comment={comment} />
       </div>
       <div className="replies">
-        {R.map(renderComment(forms, upvote, downvote, depth + 1), comment.replies)}
+        {R.map(
+          renderComment(forms, upvote, downvote, depth + 1),
+          comment.replies
+        )}
       </div>
     </div>
 )
@@ -55,7 +78,10 @@ type CommentTreeProps = {
 
 const CommentTree = ({ comments, forms, upvote, downvote }: CommentTreeProps) =>
   <div className="comments">
-    {R.addIndex(R.map)(renderTopLevelComment(forms, upvote, downvote), comments)}
+    {R.addIndex(R.map)(
+      renderTopLevelComment(forms, upvote, downvote),
+      comments
+    )}
   </div>
 
 export default CommentTree

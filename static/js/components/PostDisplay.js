@@ -10,11 +10,19 @@ import { channelURL, postDetailURL } from "../lib/url"
 import type { Post } from "../flow/discussionTypes"
 
 const textContent = post =>
-  <ReactMarkdown disallowedTypes={["Image"]} source={post.text} escapeHtml className="text-content" />
+  <ReactMarkdown
+    disallowedTypes={["Image"]}
+    source={post.text}
+    escapeHtml
+    className="text-content"
+  />
 
 const postTitle = (post: Post) =>
   post.text
-    ? <Link className="post-title" to={postDetailURL(post.channel_name, post.id)}>
+    ? <Link
+      className="post-title"
+      to={postDetailURL(post.channel_name, post.id)}
+    >
       {post.title}
     </Link>
     : <a className="post-title" href={post.url} target="_blank">
@@ -69,7 +77,11 @@ class PostDisplay extends React.Component {
     return (
       <div className="post-summary">
         <div className={`upvotes ${upvoteClass}`}>
-          <button className="upvote-button" onClick={this.onToggleUpvote} disabled={upvoting}>
+          <button
+            className="upvote-button"
+            onClick={this.onToggleUpvote}
+            disabled={upvoting}
+          >
             {" "}&uArr;
           </button>
           <span className="votes">
@@ -81,7 +93,8 @@ class PostDisplay extends React.Component {
             {postTitle(post)}
           </div>
           <div className="authored-by">
-            <a>{post.author_id || "someone"}</a>, {formattedDate} {this.showChannelLink()}
+            <a>{post.author_id || "someone"}</a>, {formattedDate}{" "}
+            {this.showChannelLink()}
           </div>
           <div className="num-comments">
             <Link to={postDetailURL(post.channel_name, post.id)}>

@@ -7,7 +7,10 @@ type ButtonProps = {
 }
 
 const Button = ({ children, onClick }: ButtonProps) =>
-  <button className="mdc-button mdc-button--raised blue-button" onClick={onClick}>
+  <button
+    className="mdc-button mdc-button--raised blue-button"
+    onClick={onClick}
+  >
     {children}
   </button>
 

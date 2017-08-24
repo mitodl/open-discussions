@@ -66,7 +66,11 @@ class ChannelPage extends React.Component {
         <div>
           <ChannelBreadcrumbs channel={channel} />
           <Card title={channel.title}>
-            <PostList channel={channel} posts={posts} toggleUpvote={toggleUpvote(dispatch)} />
+            <PostList
+              channel={channel}
+              posts={posts}
+              toggleUpvote={toggleUpvote(dispatch)}
+            />
           </Card>
         </div>
       )
@@ -88,4 +92,6 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default R.compose(connect(mapStateToProps), withNavSidebar, withLoading)(ChannelPage)
+export default R.compose(connect(mapStateToProps), withNavSidebar, withLoading)(
+  ChannelPage
+)

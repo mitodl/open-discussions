@@ -20,13 +20,25 @@ export default class ChannelEditForm extends React.Component {
           <label htmlFor="title" className="label">
             Title
           </label>
-          <input name="title" type="text" className="input" value={form.title} onChange={onUpdate} />
+          <input
+            name="title"
+            type="text"
+            className="input"
+            value={form.title}
+            onChange={onUpdate}
+          />
         </div>
         <div className="form-item">
           <label htmlFor="name" className="label">
             Name
           </label>
-          <input name="name" type="text" className="input" value={form.name} onChange={onUpdate} />
+          <input
+            name="name"
+            type="text"
+            className="input"
+            value={form.name}
+            onChange={onUpdate}
+          />
         </div>
         <div className="form-item">
           <label htmlFor="public_description" className="label">

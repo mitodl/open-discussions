@@ -38,7 +38,9 @@ export default class IntegrationTestHelper {
     for (let methodName in api) {
       if (typeof api[methodName] === "function") {
         let stubName = `${methodName}Stub`
-        this[stubName] = this.sandbox.stub(api, methodName).throws(new Error(`${stubName} not implemented`))
+        this[stubName] = this.sandbox
+          .stub(api, methodName)
+          .throws(new Error(`${stubName} not implemented`))
       }
     }
 
@@ -63,7 +65,10 @@ export default class IntegrationTestHelper {
    * If null, actions types for the success case is assumed.
    * @returns {Promise<*>} A promise which provides [wrapper, div] on success
    */
-  renderComponent(url: string = "/", typesToAssert: Array<string> | null = null): Promise<*> {
+  renderComponent(
+    url: string = "/",
+    typesToAssert: Array<string> | null = null
+  ): Promise<*> {
     let expectedTypes = []
     if (typesToAssert === null) {
       expectedTypes = []

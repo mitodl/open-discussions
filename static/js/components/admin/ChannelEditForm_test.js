@@ -5,13 +5,22 @@ import sinon from "sinon"
 import { shallow } from "enzyme"
 
 import ChannelEditForm from "./ChannelEditForm"
-import { CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_PRIVATE, newChannelForm } from "../../lib/channels"
+import {
+  CHANNEL_TYPE_PUBLIC,
+  CHANNEL_TYPE_PRIVATE,
+  newChannelForm
+} from "../../lib/channels"
 
 import type { ChannelForm } from "../../flow/discussionTypes"
 
 describe("ChannelEditForm", () => {
-  const renderForm = (form: ChannelForm, { onSubmit, onUpdate } = { onSubmit: () => {}, onUpdate: () => {} }) =>
-    shallow(<ChannelEditForm form={form} onSubmit={onSubmit} onUpdate={onUpdate} />)
+  const renderForm = (
+    form: ChannelForm,
+    { onSubmit, onUpdate } = { onSubmit: () => {}, onUpdate: () => {} }
+  ) =>
+    shallow(
+      <ChannelEditForm form={form} onSubmit={onSubmit} onUpdate={onUpdate} />
+    )
   let sandbox, form
 
   beforeEach(() => {

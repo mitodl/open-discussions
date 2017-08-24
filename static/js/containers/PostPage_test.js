@@ -82,7 +82,10 @@ describe("PostPage", function() {
       helper.updateCommentStub.returns(Promise.resolve(expectedComment))
 
       let newState = await listenForActions(
-        [actions.comments.patch.requestType, actions.comments.patch.successType],
+        [
+          actions.comments.patch.requestType,
+          actions.comments.patch.successType
+        ],
         () => {
           let props = wrapper.find("CommentTree").props()
           let voteFunc = isUpvote ? props.upvote : props.downvote
@@ -100,7 +103,11 @@ describe("PostPage", function() {
       }
       assert.deepEqual(updatedComment, expectedComment)
 
-      sinon.assert.calledWith(helper.updateCommentStub, comment.id, expectedPayload)
+      sinon.assert.calledWith(
+        helper.updateCommentStub,
+        comment.id,
+        expectedPayload
+      )
     })
   })
 

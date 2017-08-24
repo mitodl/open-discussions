@@ -7,7 +7,10 @@ import type { Post } from "../flow/discussionTypes"
 
 const incr = incrementer()
 
-export const makePost = (isURLPost: boolean = false, channelName: string = casual.word): Post => ({
+export const makePost = (
+  isURLPost: boolean = false,
+  channelName: string = casual.word
+): Post => ({
   // $FlowFixMe: incr.next().value is never undefined but Flow thinks it may be
   id:           `post${incr.next().value}`,
   title:        casual.sentence,
@@ -24,4 +27,5 @@ export const makePost = (isURLPost: boolean = false, channelName: string = casua
 export const makeChannelPostList = (channelName: string = casual.word) =>
   R.range(0, 20).map(() => makePost(Math.random() > 0.5, channelName))
 
-export const makeFrontPageList = () => R.range(0, 30).map(() => makePost(Math.random() > 0.5))
+export const makeFrontPageList = () =>
+  R.range(0, 30).map(() => makePost(Math.random() > 0.5))

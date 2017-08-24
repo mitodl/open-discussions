@@ -2,9 +2,23 @@
 import { assert } from "chai"
 import R from "ramda"
 
-import { S, allJust, mstr, ifNil, guard, getm, parseJSON, filterE, reduceM } from "./sanctuary"
+import {
+  S,
+  allJust,
+  mstr,
+  ifNil,
+  guard,
+  getm,
+  parseJSON,
+  filterE,
+  reduceM
+} from "./sanctuary"
 const { Just, Nothing } = S
-import { assertMaybeEquality, assertIsNothing, assertIsJust } from "./test_utils"
+import {
+  assertMaybeEquality,
+  assertIsNothing,
+  assertIsJust
+} from "./test_utils"
 
 const assertIsLeft = (e, val) => {
   assert(e.isLeft, "should be left")
@@ -141,11 +155,17 @@ describe("sanctuary util functions", () => {
 
   describe("reduceM", () => {
     it("returns fn(val) where maybe is Just(val)", () => {
-      assert.equal(reduceM("default", str => `${str} value`, S.Just("maybe")), "maybe value")
+      assert.equal(
+        reduceM("default", str => `${str} value`, S.Just("maybe")),
+        "maybe value"
+      )
     })
 
     it("returns fn(default) where maybe is Nothing", () => {
-      assert.equal(reduceM("default", str => `${str} value`, S.Nothing), "default value")
+      assert.equal(
+        reduceM("default", str => `${str} value`, S.Nothing),
+        "default value"
+      )
     })
   })
 })

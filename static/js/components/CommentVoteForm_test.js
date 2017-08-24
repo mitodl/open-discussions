@@ -22,7 +22,14 @@ describe("CommentVoteForm", () => {
   })
 
   let renderForm = (props = {}) =>
-    mount(<CommentVoteForm comment={comment} upvote={upvoteStub} downvote={downvoteStub} {...props} />)
+    mount(
+      <CommentVoteForm
+        comment={comment}
+        upvote={upvoteStub}
+        downvote={downvoteStub}
+        {...props}
+      />
+    )
 
   it("should let the user click on the upvote button", () => {
     let wrapper = renderForm()

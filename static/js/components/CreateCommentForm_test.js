@@ -136,13 +136,26 @@ describe("CreateCommentForm", () => {
               })
               .then(() =>
                 helper
-                  .listenForActions([requestType, successType, SET_POST_DATA, forms.FORM_END_EDIT], () => {
-                    wrapper.find("form").simulate("submit")
-                  })
+                  .listenForActions(
+                    [
+                      requestType,
+                      successType,
+                      SET_POST_DATA,
+                      forms.FORM_END_EDIT
+                    ],
+                    () => {
+                      wrapper.find("form").simulate("submit")
+                    }
+                  )
                   .then(state => {
                     assert.deepEqual(state.forms, {})
-                    assert.equal(state.posts.data.get(post.id).num_comments, post.num_comments + 1)
-                    assert.isNotOk(wrapper.find("textarea[name='text']").exists())
+                    assert.equal(
+                      state.posts.data.get(post.id).num_comments,
+                      post.num_comments + 1
+                    )
+                    assert.isNotOk(
+                      wrapper.find("textarea[name='text']").exists()
+                    )
                     assert.isOk(
                       helper.createCommentStub.calledWith(
                         expectedKeys.post_id,
