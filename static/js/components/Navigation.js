@@ -13,7 +13,7 @@ const submitPostButton = channelName =>
     className="mdc-button mdc-button--raised blue-button"
     to={newPostURL(channelName)}
   >
-    Submit Post
+    Submit a New Post
   </Link>
 
 type NavigationProps = {

@@ -85,18 +85,16 @@ const CreateCommentForm = ({
       <div className="reply-form">
         <form onSubmit={onSubmit} className="form">
           <div className="form-item">
-            <label htmlFor="public_description" className="label">
-              Comment
-            </label>
             <textarea
               name="text"
               type="text"
               className="input"
+              placeholder="Write a reply here..."
               value={text}
               onChange={onUpdate}
             />
           </div>
-          <button type="submit">Save</button>
+          <button type="submit">Submit</button>
           <a href="#" onClick={cancelReply} className="cancel-button">
             Cancel
           </a>

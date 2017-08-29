@@ -12,7 +12,6 @@
 @import "createPost";
 @import "sidebar";
 @import "comment";
-@import "subscriptions";
 @import "button";
 @import "navigation";
 
@@ -32,15 +31,15 @@ body {
       display: flex;
       flex-direction: row;
       margin: auto;
-      max-width: 1100px;
+      max-width: 1400px;
     }
 
     .sidebar {
       @include breakpoint(desktop) {
         margin-top: 35px;
         max-width: 300px;
-        margin-right: 20px;
-        width: 24%;
+        margin-right: 0;
+        width: 23%;
       }
 
       @include breakpoint(mobile) {
@@ -58,7 +57,7 @@ body {
       }
 
       @include breakpoint(mobile) {
-        margin: 10px;
+        margin: 10px 12px;
       }
     }
   }
