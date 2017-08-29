@@ -28,7 +28,7 @@ describe("Navigation", () => {
       })
       let link = wrapper.find(Link)
       assert.equal(link.props().to, newPostURL("foobar"))
-      assert.equal(link.props().children, "Submit Post")
+      assert.equal(link.props().children, "Submit a New Post")
     })
 
     it("should show a SubscriptionsList", () => {

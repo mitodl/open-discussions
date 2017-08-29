@@ -34,14 +34,14 @@ describe("CommentVoteForm", () => {
   it("should let the user click on the upvote button", () => {
     let wrapper = renderForm()
     let firstComment = wrapper.find("CommentVoteForm").first()
-    firstComment.find(".upvote").simulate("click")
+    firstComment.find(".upvote-button").simulate("click")
     sinon.assert.calledWith(upvoteStub, comment)
   })
 
   it("should let the user click on the downvote button", () => {
     let wrapper = renderForm()
     let firstComment = wrapper.find("CommentVoteForm").first()
-    firstComment.find(".downvote").simulate("click")
+    firstComment.find(".downvote-button").simulate("click")
     sinon.assert.calledWith(downvoteStub, comment)
   })
 })
