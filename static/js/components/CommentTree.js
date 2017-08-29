@@ -46,17 +46,13 @@ const renderComment = R.curry(
         </div>
       </div>
       <div className="row">
-        <CommentVoteForm
-          comment={comment}
-          upvote={upvote}
-          downvote={downvote}
-        />
         <ReactMarkdown
           disallowedTypes={["Image"]}
           source={comment.text}
           escapeHtml
         />
       </div>
+      <CommentVoteForm comment={comment} upvote={upvote} downvote={downvote} />
       <div>
         <ReplyToCommentForm forms={forms} comment={comment} />
       </div>

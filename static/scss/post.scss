@@ -5,44 +5,13 @@
     border-bottom: 1px solid $border-grey;
   }
 
-  .upvotes {
-    float: left;
-    width: 60px;
-    text-align: center;
-
-    img.upvote-arrow {
-      width: 20px;
-    }
-
-    span.votes {
-      display: block;
-      color: #6f99be;
-      font-weight: 500;
-      font-size: 14px;
-      margin: 5px 0 0;
-    }
-
-    &.upvoted {
-      .upvote-button {
-        &:disabled {
-          color: $border-grey;
-        }
-      }
-
-      .votes, .upvote-button {
-        color: $voted-blue;
-      }
-    }
-  }
-
   .text-content {
-    padding: 0;
-    margin-top: 15px;
+    padding: 10px 23px;
   }
 
   .post-title {
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 400;
     margin: 0 0 7px;
   }
 
@@ -62,4 +31,50 @@
   .summary {
     overflow: hidden;
   }
+}
+
+.upvotes {
+  float: left;
+  width: 60px;
+  text-align: center;
+
+  span.votes {
+    display: block;
+    color: #6f99be;
+    font-weight: 500;
+    font-size: 14px;
+    margin: 5px 0 0;
+  }
+}
+
+img.upvote-arrow {
+  width: 18px;
+}
+
+.upvote-button, .downvote-button {
+  background: none;
+  border: none;
+  position: relative;
+  padding: 0 10px;
+
+  &:disabled {
+    color: $border-grey;
+  }
+
+  .votes, .upvote-button {
+    color: $voted-blue;
+  }
+}
+
+.upvote-button {
+  bottom: 2px;
+}
+
+.downvote-button {
+  top: -1px;
+}
+
+div.score {
+  float: left;
+  margin-right: 10px;
 }

@@ -67,7 +67,7 @@ describe("PostDisplay", () => {
     post.text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
     const wrapper = renderPostDisplay({ post: post, expanded: true })
     assert.equal(wrapper.find(ReactMarkdown).props().source, post.text)
-    assert.lengthOf(wrapper.find("img"), 0)
+    assert.lengthOf(wrapper.find(ReactMarkdown).find("img"), 0)
   })
 
   it("should not display text, if given a text post but lacking the 'expanded' flag", () => {

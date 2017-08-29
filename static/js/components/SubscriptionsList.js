@@ -18,7 +18,7 @@ export default class SubscriptionsList extends React.Component {
     return (
       <div className="subscriptions">
         {subscribedChannels.map(channel =>
-          <div key={channel.name}>
+          <div className="channelname" key={channel.name}>
             <Link to={channelURL(channel.name)}>
               {channel.title}
             </Link>

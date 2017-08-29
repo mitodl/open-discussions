@@ -82,7 +82,10 @@ class PostDisplay extends React.Component {
             onClick={this.onToggleUpvote}
             disabled={upvoting}
           >
-            {" "}&uArr;
+            <img
+              className="upvote-arrow"
+              src="/static/images/upvote_arrow.png"
+            />
           </button>
           <span className="votes">
             {post.score}

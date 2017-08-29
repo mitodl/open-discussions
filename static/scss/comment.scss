@@ -1,6 +1,6 @@
 .comments {
   .top-level-comment {
-    padding-top: 5px;
+    padding: 10px 15px 10px 23px;
   }
 
   .comment {
@@ -10,16 +10,20 @@
       display: flex;
       flex-direction: row;
 
+      p {
+        margin: 0 0 15px 0;
+      }
+
       .votes-form {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
 
         .votes {
           margin-right: 10px;
 
           .vote {
-            display: block;
+            display: inline-block;
           }
 
           .upvoted, .downvoted {
@@ -31,6 +35,7 @@
 
         .score {
           margin-right: 10px;
+          display: inline-block;
         }
       }
     }
@@ -38,8 +43,9 @@
     .author-info {
       display: flex;
       flex-direction: row;
-      font-size: 13px;
-      padding-bottom: 8px;
+      font-size: 14px;
+      color: $font-grey;
+      margin: 0 0 12px;
 
       .author-name {
         padding-right: 4px;
@@ -47,27 +53,39 @@
     }
 
     .replies > .comment {
-      margin-left: 25px;
+      padding-left: 25px;
+      border-left: 1px solid #e0e0e0;
+    }
+
+    .upvote-button, .downvote-button {
+      border-right: 1px solid #ccc;
     }
   }
-}
 
-.reply-button {
-  font-size: 0.8em;
-  padding: 10px 0;
+  .reply-button {
+    font-size: 0.8em;
+    padding: 10px 0;
+  }
 }
 
 .reply-form {
   width: 100%;
-  max-width: 400px;
   padding: 10px 0;
 
-  textarea {
-    width: 100%;
+  .form-item {
+    margin: 0 0 12px 0;
   }
 
   .cancel-button {
-    float: right;
+    display: inline-block;
     font-size: 0.8em;
+    margin-left: 15px;
+  }
+
+  button[type=submit] {
+    padding: 7px 14px;
+    font-size: 14px;
   }
 }
+
+

@@ -31,6 +31,9 @@ export default class Toolbar extends React.Component {
               >
                 menu
               </a>
+              <a href="" className="mitlogo">
+                <img src="/static/images/mit-logo-transparent.svg" />
+              </a>
               <span className="mdc-toolbar__title">Open Discussions</span>
             </section>
           </div>

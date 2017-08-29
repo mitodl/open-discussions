@@ -3,9 +3,10 @@
   background-color: $card-background;
   box-shadow: 0 0 5px $card-shadow;
   border-radius: 2px;
+  margin: 0 0 20px 0;
 
   .card-contents {
-    margin: 15px;
+    margin: 0;
     padding: 15px;
   }
 
