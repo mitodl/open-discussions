@@ -13,29 +13,18 @@
       p {
         margin: 0 0 15px 0;
       }
+    }
 
-      .votes-form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+    .votes-form {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      width: 65px;
 
-        .votes {
-          margin-right: 10px;
-
-          .vote {
-            display: inline-block;
-          }
-
-          .upvoted, .downvoted {
-            &:not(:disabled) {
-              color: $voted-blue;
-            }
-          }
-        }
-
-        .score {
-          margin-right: 10px;
-          display: inline-block;
+      .upvoted, .downvoted {
+        &:not(:disabled) {
+          color: $voted-blue;
         }
       }
     }
@@ -52,13 +41,12 @@
       }
     }
 
-    .replies > .comment {
-      padding-left: 25px;
+    .replies {
       border-left: 1px solid #e0e0e0;
     }
 
-    .upvote-button, .downvote-button {
-      border-right: 1px solid #ccc;
+    .replies > .comment {
+      padding-left: 25px;
     }
   }
 

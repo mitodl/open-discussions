@@ -6,6 +6,7 @@ import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 
 import { channelURL, postDetailURL } from "../lib/url"
+import { formatCommentsCount } from "../lib/posts"
 
 import type { Post } from "../flow/discussionTypes"
 
@@ -69,28 +70,33 @@ class PostDisplay extends React.Component {
     })
   }
 
-  render() {
+  upvoteDisplay = () => {
     const { post, expanded } = this.props
     const { upvoting } = this.state
-    const formattedDate = moment(post.created).fromNow()
     const upvoteClass = post.upvoted ? "upvoted" : ""
+
     return (
-      <div className="post-summary">
-        <div className={`upvotes ${upvoteClass}`}>
-          <button
-            className="upvote-button"
-            onClick={this.onToggleUpvote}
-            disabled={upvoting}
-          >
-            <img
-              className="upvote-arrow"
-              src="/static/images/upvote_arrow.png"
-            />
-          </button>
-          <span className="votes">
-            {post.score}
-          </span>
-        </div>
+      <div className={`upvotes ${upvoteClass} ${expanded ? "expanded" : ""}`}>
+        <button
+          className="upvote-button"
+          onClick={this.onToggleUpvote}
+          disabled={upvoting}
+        >
+          <img className="vote-arrow" src="/static/images/upvote_arrow.png" />
+        </button>
+        <span className="votes">
+          {post.score}
+        </span>
+      </div>
+    )
+  }
+
+  render() {
+    const { post, expanded } = this.props
+    const formattedDate = moment(post.created).fromNow()
+    return (
+      <div className={`post-summary ${expanded ? "expanded" : ""}`}>
+        {expanded ? null : this.upvoteDisplay()}
         <div className="summary">
           <div className="post-title">
             {postTitle(post)}
@@ -100,12 +106,15 @@ class PostDisplay extends React.Component {
             {this.showChannelLink()}
           </div>
           <div className="num-comments">
-            <Link to={postDetailURL(post.channel_name, post.id)}>
-              {post.num_comments || 0} Comments
-            </Link>
+            {expanded
+              ? null
+              : <Link to={postDetailURL(post.channel_name, post.id)}>
+                {formatCommentsCount(post)}
+              </Link>}
           </div>
         </div>
         {expanded && post.text ? textContent(post) : null}
+        {expanded ? this.upvoteDisplay() : null}
       </div>
     )
   }

@@ -5,10 +5,12 @@ import { mount } from "enzyme"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 
-import { makePost } from "../factories/posts"
-import IntegrationTestHelper from "../util/integration_test_helper"
 import PostDisplay from "./PostDisplay"
 import Router from "../Router"
+
+import { formatCommentsCount } from "../lib/posts"
+import { makePost } from "../factories/posts"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("PostDisplay", () => {
   let helper
@@ -40,7 +42,7 @@ describe("PostDisplay", () => {
     assert.equal(summary.find(Link).at(0).props().children, post.title)
     assert.deepEqual(
       wrapper.find(".num-comments").find(Link).props().children,
-      [post.num_comments, " Comments"]
+      formatCommentsCount(post)
     )
     const authoredBy = wrapper.find(".authored-by").text()
     assert(authoredBy.startsWith(post.author_id))

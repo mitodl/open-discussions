@@ -1,12 +1,18 @@
-.post-summary {
-  padding: 22px 0;
+.post-card {
+  padding: 22px 22px 0 22px;
+}
 
-  &:not(:last-child) {
+.post-summary {
+  display: flex;
+  flex-direction: column;
+
+  &:not(:last-child):not(.expanded) {
     border-bottom: 1px solid $border-grey;
   }
 
-  .text-content {
-    padding: 10px 23px;
+  &:not(.expanded) {
+    flex-direction: row;
+    padding: 22px 0;
   }
 
   .post-title {
@@ -34,28 +40,33 @@
 }
 
 .upvotes {
-  float: left;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 60px;
-  text-align: center;
+
+  &.expanded {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 35px;
+  }
 
   span.votes {
     display: block;
     color: #6f99be;
     font-weight: 500;
     font-size: 14px;
-    margin: 5px 0 0;
   }
 }
 
-img.upvote-arrow {
+img.vote-arrow {
   width: 18px;
 }
 
 .upvote-button, .downvote-button {
   background: none;
   border: none;
-  position: relative;
-  padding: 0 10px;
+  padding: 0;
 
   &:disabled {
     color: $border-grey;
@@ -66,15 +77,7 @@ img.upvote-arrow {
   }
 }
 
-.upvote-button {
-  bottom: 2px;
-}
-
-.downvote-button {
-  top: -1px;
-}
-
-div.score {
-  float: left;
-  margin-right: 10px;
+.comments-count {
+  margin: 0 0 18px 22px;
+  font-size: 15px;
 }

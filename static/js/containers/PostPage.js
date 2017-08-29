@@ -9,11 +9,14 @@ import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import PostDisplay from "../components/PostDisplay"
 import CommentTree from "../components/CommentTree"
 import { ReplyToPostForm } from "../components/CreateCommentForm"
+import withNavSidebar from "../hoc/withNavSidebar"
 
+import { formatCommentsCount } from "../lib/posts"
 import { actions } from "../actions"
 import { toggleUpvote } from "../util/api_actions"
 import { getChannelName, getPostID } from "../lib/util"
 import { anyError } from "../util/rest"
+import { getSubscribedChannels } from "../lib/redux_selectors"
 
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -87,25 +90,29 @@ class PostPage extends React.Component {
     if (!channel || !post || !commentsTree) {
       return null
     }
+
     return (
-      <div className="content">
-        <div className="main-content">
-          <ChannelBreadcrumbs channel={channel} />
-          <Card>
+      <div>
+        <ChannelBreadcrumbs channel={channel} />
+        <Card>
+          <div className="post-card">
             <PostDisplay
               post={post}
               toggleUpvote={toggleUpvote(dispatch)}
               expanded
             />
             <ReplyToPostForm forms={forms} post={post} />
-          </Card>
-          <CommentTree
-            comments={commentsTree}
-            forms={forms}
-            upvote={this.upvote}
-            downvote={this.downvote}
-          />
+          </div>
+        </Card>
+        <div className="comments-count">
+          {formatCommentsCount(post)}
         </div>
+        <CommentTree
+          comments={commentsTree}
+          forms={forms}
+          upvote={this.upvote}
+          downvote={this.downvote}
+        />
       </div>
     )
   }
@@ -125,9 +132,12 @@ const mapStateToProps = (state, ownProps) => {
     post,
     channel,
     commentsTree,
-    loaded:  R.none(R.isNil, [post, channel, commentsTree]),
-    errored: anyError([posts, channels, comments])
+    loaded:             R.none(R.isNil, [post, channel, commentsTree]),
+    errored:            anyError([posts, channels, comments]),
+    subscribedChannels: getSubscribedChannels(state)
   }
 }
 
-export default R.compose(connect(mapStateToProps), withLoading)(PostPage)
+export default R.compose(connect(mapStateToProps), withNavSidebar, withLoading)(
+  PostPage
+)

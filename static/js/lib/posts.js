@@ -1,6 +1,6 @@
 // @flow
 
-import type { PostForm } from "../flow/discussionTypes"
+import type { PostForm, Post } from "../flow/discussionTypes"
 
 export const newPostForm = (): PostForm => ({
   isText: true,
@@ -8,3 +8,6 @@ export const newPostForm = (): PostForm => ({
   url:    "",
   title:  ""
 })
+
+export const formatCommentsCount = (post: Post): string =>
+  post.num_comments === 1 ? "1 Comment" : `${post.num_comments || 0} Comments`
