@@ -87,19 +87,7 @@ select {
   width: 100%;
 }
 
-::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  color: #bbb;
-}
-
-::-moz-placeholder { /* Firefox 19+ */
-  color: #bbb;
-}
-
-:-ms-input-placeholder { /* IE 10+ */
-  color: #bbb;
-}
-
-:-moz-placeholder { /* Firefox 18- */
+input::placeholder, textarea::placeholder {
   color: #bbb;
 }
 
