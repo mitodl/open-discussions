@@ -38,7 +38,6 @@ class JwtIsStaffOrReadonlyPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or if the request is readonly"""
-        print(request.method)
         if request.method in permissions.SAFE_METHODS:
             return True
 
