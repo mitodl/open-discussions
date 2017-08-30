@@ -5,7 +5,12 @@ import { Provider } from "react-redux"
 import { assert } from "chai"
 import { mount } from "enzyme"
 
-import { ReplyToCommentForm, ReplyToPostForm } from "./CreateCommentForm"
+import {
+  ReplyToCommentForm,
+  ReplyToPostForm,
+  replyToPostKey
+} from "./CreateCommentForm"
+
 import * as forms from "../actions/forms"
 import { actions } from "../actions"
 import { SET_POST_DATA, setPostData } from "../actions/post"
@@ -17,12 +22,14 @@ import type { Comment, Post } from "../flow/discussionTypes"
 
 describe("CreateCommentForm", () => {
   let helper, post, comment, postKeys, commentKeys
+
   const renderPostForm = (post: Post) =>
     mount(
       <Provider store={helper.store}>
         <ReplyToPostForm post={post} />
       </Provider>
     )
+
   const renderCommentForm = (comment: Comment) =>
     mount(
       <Provider store={helper.store}>
@@ -49,124 +56,197 @@ describe("CreateCommentForm", () => {
     helper.cleanup()
   })
 
-  for (const [name, render, getExpectedKeys] of [
-    ["ReplyToCommentForm", () => renderCommentForm(comment), () => commentKeys],
-    ["ReplyToPostForm", () => renderPostForm(post), () => postKeys]
-  ]) {
-    describe(name, () => {
-      let expectedKeys, wrapper
-      beforeEach(() => {
-        wrapper = render()
-        expectedKeys = getExpectedKeys()
-      })
-      it("should render a reply button", () => {
-        assert.equal(wrapper.find("a").text(), "Reply")
-      })
+  describe("ReplyToPostForm", () => {
+    let expectedKeys, wrapper, emptyFormState
 
-      it("should show an empty form when reply is clicked", () => {
-        return helper
-          .listenForActions([forms.FORM_BEGIN_EDIT], () => {
-            wrapper.find("a").simulate("click")
-          })
-          .then(() => {
-            const [textarea] = wrapper.find("textarea[name='text']")
-            assert.equal(textarea.value, "")
-          })
-      })
+    beforeEach(() => {
+      wrapper = renderPostForm(post)
+      expectedKeys = postKeys
+      emptyFormState = {
+        errors: {},
+        value:  {
+          post_id: post.id,
+          text:    ""
+        }
+      }
+    })
 
-      it("should trigger an update in state when text is input", () => {
-        return helper
-          .listenForActions([forms.FORM_BEGIN_EDIT], () => {
-            wrapper.find("a").simulate("click")
-          })
-          .then(() =>
-            helper
-              .listenForActions([forms.FORM_UPDATE], () => {
-                wrapper.find("textarea[name='text']").simulate("change", {
-                  target: {
-                    name:  "text",
-                    value: expectedKeys.text
-                  }
-                })
-              })
-              .then(state => {
-                assert.equal(R.keys(state.forms).length, 1)
-                assert.deepInclude(state.forms[R.keys(state.forms)[0]], {
-                  value:  expectedKeys,
-                  errors: {}
-                })
-              })
-          )
-      })
+    it("should not render a reply button", () => {
+      assert.notInclude(wrapper.find("a").text(), "Reply")
+    })
 
-      it("should cancel and hide the form", () => {
-        return helper
-          .listenForActions([forms.FORM_BEGIN_EDIT], () => {
-            wrapper.find("a").simulate("click")
-          })
-          .then(() =>
-            helper
-              .listenForActions([forms.FORM_END_EDIT], () => {
-                wrapper.find(".cancel-button").simulate("click")
-              })
-              .then(state => {
-                assert.deepEqual(state.forms, {})
-                assert.isNotOk(wrapper.find("textarea[name='text']").exists())
-              })
-          )
-      })
+    it("should begin form editing on load", async () => {
+      wrapper = await renderPostForm(post)
+      const [textarea] = wrapper.find("textarea[name='text']")
+      assert.equal(textarea.value, "")
+      assert.deepEqual(
+        helper.store.getState().forms[replyToPostKey(post)],
+        emptyFormState
+      )
+    })
 
-      it("should submit the form", () => {
-        const { requestType, successType } = actions.comments.post
-        helper.createCommentStub.returns(Promise.resolve(makeComment(post)))
-        return helper
-          .listenForActions([SET_POST_DATA, forms.FORM_BEGIN_EDIT], () => {
-            helper.store.dispatch(setPostData(post))
-            wrapper.find("a").simulate("click")
-          })
-          .then(() =>
-            helper
-              .listenForActions([forms.FORM_UPDATE], () => {
-                wrapper.find("textarea[name='text']").simulate("change", {
-                  target: {
-                    name:  "text",
-                    value: expectedKeys.text
-                  }
-                })
-              })
-              .then(() =>
-                helper
-                  .listenForActions(
-                    [
-                      requestType,
-                      successType,
-                      SET_POST_DATA,
-                      forms.FORM_END_EDIT
-                    ],
-                    () => {
-                      wrapper.find("form").simulate("submit")
-                    }
-                  )
-                  .then(state => {
-                    assert.deepEqual(state.forms, {})
-                    assert.equal(
-                      state.posts.data.get(post.id).num_comments,
-                      post.num_comments + 1
-                    )
-                    assert.isNotOk(
-                      wrapper.find("textarea[name='text']").exists()
-                    )
-                    assert.isOk(
-                      helper.createCommentStub.calledWith(
-                        expectedKeys.post_id,
-                        expectedKeys.text,
-                        expectedKeys.comment_id || undefined
-                      )
-                    )
-                  })
-              )
-          )
+    it("should trigger an update in state when text is input", async () => {
+      let state = await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      assert.equal(R.keys(state.forms).length, 1)
+      assert.deepInclude(state.forms[R.keys(state.forms)[0]], {
+        value:  expectedKeys,
+        errors: {}
       })
     })
-  }
+
+    it("should cancel and delete unsaved input the form", async () => {
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      await helper.listenForActions(
+        [forms.FORM_BEGIN_EDIT, forms.FORM_END_EDIT],
+        () => {
+          wrapper.find(".cancel-button").simulate("click")
+        }
+      )
+      assert.deepEqual(
+        helper.store.getState().forms[replyToPostKey(post)],
+        emptyFormState
+      )
+    })
+
+    it("should submit the form", async () => {
+      const { requestType, successType } = actions.comments.post
+      helper.createCommentStub.returns(Promise.resolve(makeComment(post)))
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+
+      let state = await helper.listenForActions(
+        [
+          requestType,
+          successType,
+          SET_POST_DATA,
+          forms.FORM_END_EDIT,
+          forms.FORM_BEGIN_EDIT
+        ],
+        () => {
+          wrapper.find("form").simulate("submit")
+        }
+      )
+      assert.deepEqual(state.forms[replyToPostKey(post)], emptyFormState)
+      assert.equal(
+        state.posts.data.get(post.id).num_comments,
+        post.num_comments + 1
+      )
+      assert.isOk(
+        helper.createCommentStub.calledWith(
+          expectedKeys.post_id,
+          expectedKeys.text,
+          expectedKeys.comment_id || undefined
+        )
+      )
+    })
+  })
+
+  describe("ReplyToCommentForm", () => {
+    let expectedKeys, wrapper
+
+    beforeEach(() => {
+      (wrapper = renderCommentForm(comment)), (expectedKeys = commentKeys)
+    })
+
+    it("should render a reply button", () => {
+      assert.equal(wrapper.find("a").text(), "Reply")
+    })
+
+    it("should show an empty form when reply is clicked", async () => {
+      await helper.listenForActions([forms.FORM_BEGIN_EDIT], () => {
+        wrapper.find("a").simulate("click")
+      })
+      const [textarea] = wrapper.find("textarea[name='text']")
+      assert.equal(textarea.value, "")
+    })
+
+    it("should trigger an update in state when text is input", async () => {
+      await helper.listenForActions([forms.FORM_BEGIN_EDIT], () => {
+        wrapper.find("a").simulate("click")
+      })
+      const state = await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      assert.equal(R.keys(state.forms).length, 1)
+      assert.deepInclude(state.forms[R.keys(state.forms)[0]], {
+        value:  expectedKeys,
+        errors: {}
+      })
+    })
+
+    it("should cancel and hide the form", async () => {
+      await helper.listenForActions([forms.FORM_BEGIN_EDIT], () => {
+        wrapper.find("a").simulate("click")
+      })
+      const state = await helper.listenForActions([forms.FORM_END_EDIT], () => {
+        wrapper.find(".cancel-button").simulate("click")
+      })
+      assert.deepEqual(state.forms, {})
+      assert.isNotOk(wrapper.find("textarea[name='text']").exists())
+    })
+
+    it("should submit the form", async () => {
+      const { requestType, successType } = actions.comments.post
+      helper.createCommentStub.returns(Promise.resolve(makeComment(post)))
+      await helper.listenForActions(
+        [SET_POST_DATA, forms.FORM_BEGIN_EDIT],
+        () => {
+          helper.store.dispatch(setPostData(post))
+          wrapper.find("a").simulate("click")
+        }
+      )
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      const state = await helper.listenForActions(
+        [requestType, successType, SET_POST_DATA, forms.FORM_END_EDIT],
+        () => {
+          wrapper.find("form").simulate("submit")
+        }
+      )
+      assert.deepEqual(state.forms, {})
+      assert.equal(
+        state.posts.data.get(post.id).num_comments,
+        post.num_comments + 1
+      )
+      assert.isNotOk(wrapper.find("textarea[name='text']").exists())
+      assert.isOk(
+        helper.createCommentStub.calledWith(
+          expectedKeys.post_id,
+          expectedKeys.text,
+          expectedKeys.comment_id || undefined
+        )
+      )
+    })
+  })
 })

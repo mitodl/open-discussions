@@ -15,123 +15,199 @@ type CreateCommentFormProps = {
   forms: FormsState,
   post: Post,
   initialValue: CommentForm,
-  formKey: string
+  formKey: string,
+  beginReply: (initialValue: Object, e: ?Object) => void,
+  onSubmit: (p: string, t: string, c: string, p: Post) => string,
+  onUpdate: (e: Object) => void,
+  cancelReply: () => void,
+  formDataLens: (s: string) => Object
 }
 
-type ReplyToCommentFormProps = {
-  comment: Comment
-}
-
-type ReplyToPostFormProps = {
-  post: Post
-}
-
-const replyToCommentKey = (comment: Comment) =>
+export const replyToCommentKey = (comment: Comment) =>
   `post:${comment.post_id}:comment:${comment.id}:comment:new`
-const replyToPostKey = (post: Post) => `post:${post.id}:comment:new`
+
+export const replyToPostKey = (post: Post) => `post:${post.id}:comment:new`
 
 const getCommentReplyInitialValue = (parent: Comment) => ({
   post_id:    parent.post_id,
   comment_id: parent.id,
   text:       ""
 })
+
 const getPostReplyInitialValue = (parent: Post) => ({
   post_id: parent.id,
   text:    ""
 })
 
-const CreateCommentForm = ({
-  dispatch,
-  forms,
-  formKey,
-  initialValue,
-  post
-  }: CreateCommentFormProps) => {
-  const beginReply = e => {
-    e.preventDefault()
-    dispatch(
-      actions.forms.formBeginEdit({
-        formKey,
-        value: R.clone(initialValue)
-      })
-    )
-  }
-  const onUpdate = e => {
-    dispatch(
-      actions.forms.formUpdate({
-        formKey,
-        value: { [e.target.name]: e.target.value }
-      })
-    )
-  }
-  const cancelReply = () => dispatch(actions.forms.formEndEdit({ formKey }))
+const commentForm = (onSubmit, text, onUpdate, cancelReply) =>
+  <div className="reply-form">
+    <form onSubmit={onSubmit} className="form">
+      <div className="form-item">
+        <textarea
+          name="text"
+          type="text"
+          className="input"
+          placeholder="Write a reply here..."
+          value={text || ""}
+          onChange={onUpdate}
+        />
+      </div>
+      <button type="submit">Submit</button>
+      <a href="#" onClick={cancelReply} className="cancel-button">
+        Cancel
+      </a>
+    </form>
+  </div>
 
-  if (R.has(formKey, forms)) {
-    const { post_id, text, comment_id } = R.prop(formKey, forms).value
-    const onSubmit = e => {
+const getFormKeyFromOwnProps = ownProps =>
+  ownProps.comment
+    ? replyToCommentKey(ownProps.comment)
+    : replyToPostKey(ownProps.post)
+
+const mapStateToProps = (state, ownProps) => {
+  const initialValue = ownProps.comment
+    ? getCommentReplyInitialValue(ownProps.comment)
+    : getPostReplyInitialValue(ownProps.post)
+
+  return {
+    initialValue,
+    post:    ownProps.post || state.posts.data.get(initialValue.post_id),
+    forms:   state.forms,
+    formKey: getFormKeyFromOwnProps(ownProps)
+  }
+}
+
+const cancelReply = R.curry((dispatch, formKey) => () =>
+  dispatch(actions.forms.formEndEdit({ formKey }))
+)
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  const formKey = getFormKeyFromOwnProps(ownProps)
+
+  return {
+    onUpdate: e => {
+      const { target: { name, value } } = e
+      dispatch(
+        actions.forms.formUpdate({
+          formKey,
+          value: { [name]: value }
+        })
+      )
+    },
+    cancelReply: cancelReply(dispatch, formKey),
+    beginReply:  R.curry((initialValue, e) => {
+      if (e) {
+        e.preventDefault()
+      }
+      dispatch(
+        actions.forms.formBeginEdit({
+          formKey,
+          value: R.clone(initialValue)
+        })
+      )
+    }),
+    onSubmit: R.curry((postID, text, commentID, post, e) => {
       e.preventDefault()
-      dispatch(actions.comments.post(post_id, text, comment_id)).then(() => {
+      dispatch(actions.comments.post(postID, text, commentID)).then(() => {
         dispatch(
           setPostData({
             ...post,
             num_comments: post.num_comments + 1
           })
         )
-        cancelReply()
+        cancelReply(dispatch, formKey)()
       })
+    }),
+    formDataLens: formDataLens(formKey)
+  }
+}
+
+export const ReplyToCommentForm = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(
+  ({
+    forms,
+    formKey,
+    initialValue,
+    post,
+    onSubmit,
+    beginReply,
+    onUpdate,
+    cancelReply
+    }: CreateCommentFormProps) => {
+    if (R.has(formKey, forms)) {
+      const { post_id, text, comment_id } = R.prop(formKey, forms).value
+
+      return commentForm(
+        onSubmit(post_id, text, comment_id, post),
+        text,
+        onUpdate,
+        cancelReply
+      )
     }
 
     return (
-      <div className="reply-form">
-        <form onSubmit={onSubmit} className="form">
-          <div className="form-item">
-            <textarea
-              name="text"
-              type="text"
-              className="input"
-              placeholder="Write a reply here..."
-              value={text}
-              onChange={onUpdate}
-            />
-          </div>
-          <button type="submit">Submit</button>
-          <a href="#" onClick={cancelReply} className="cancel-button">
-            Cancel
-          </a>
-        </form>
+      <div className="reply-button">
+        <a href="#" onClick={beginReply(initialValue)}>
+          Reply
+        </a>
       </div>
     )
   }
-  return (
-    <div className="reply-button">
-      <a href="#" onClick={beginReply}>
-        Reply
-      </a>
-    </div>
-  )
-}
+)
 
-const ConnectedCreateCommentForm = connect((state, otherProps) => {
-  return {
-    forms: state.forms,
-    post:  state.posts.data.get(otherProps.initialValue.post_id)
+const formDataLens = R.curry((formKey, prop) =>
+  R.lensPath([formKey, "value", prop])
+)
+
+const getFormData = (lensFunc, forms) => ({
+  text:       R.view(lensFunc("text"), forms),
+  post_id:    R.view(lensFunc("post_id"), forms),
+  comment_id: R.view(lensFunc("comment_id"), forms)
+})
+
+export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
+  class ReplyPostForm extends React.Component {
+    props: CreateCommentFormProps
+
+    // since this form is always open (unlike the comment-reply forms)
+    // we have to be sure it's always ready for the user to start entering
+    // a new comment
+    ensureInitialState = () => {
+      const { beginReply, initialValue, formDataLens, forms } = this.props
+      const { post_id } = getFormData(formDataLens, forms)
+      // eslint-disable-next-line camelcase
+      if (!post_id) {
+        beginReply(initialValue, undefined)
+      }
+    }
+
+    componentDidMount() {
+      this.ensureInitialState()
+    }
+
+    componentDidUpdate() {
+      this.ensureInitialState()
+    }
+
+    render() {
+      const {
+        forms,
+        post,
+        onSubmit,
+        onUpdate,
+        cancelReply,
+        formDataLens
+      } = this.props
+      const { post_id, text, comment_id } = getFormData(formDataLens, forms)
+
+      return commentForm(
+        onSubmit(post_id, text, comment_id, post),
+        text,
+        onUpdate,
+        cancelReply
+      )
+    }
   }
-})(CreateCommentForm)
-
-export const ReplyToCommentForm = ({ comment }: ReplyToCommentFormProps) => {
-  const formKey = replyToCommentKey(comment)
-  const initialValue = getCommentReplyInitialValue(comment)
-
-  return (
-    <ConnectedCreateCommentForm formKey={formKey} initialValue={initialValue} />
-  )
-}
-
-export const ReplyToPostForm = ({ post }: ReplyToPostFormProps) => {
-  const formKey = replyToPostKey(post)
-  const initialValue = getPostReplyInitialValue(post)
-
-  return (
-    <ConnectedCreateCommentForm formKey={formKey} initialValue={initialValue} />
-  )
-}
+)
