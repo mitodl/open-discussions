@@ -53,7 +53,11 @@ const commentForm = (onSubmit, text, onUpdate, cancelReply) =>
         />
       </div>
       <button type="submit">Submit</button>
-      <a href="#" onClick={cancelReply} className="cancel-button">
+      <a
+        href="#"
+        onClick={R.compose(cancelReply, e => e.preventDefault())}
+        className="cancel-button"
+      >
         Cancel
       </a>
     </form>

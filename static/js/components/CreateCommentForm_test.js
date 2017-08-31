@@ -4,6 +4,7 @@ import R from "ramda"
 import { Provider } from "react-redux"
 import { assert } from "chai"
 import { mount } from "enzyme"
+import sinon from "sinon"
 
 import {
   ReplyToCommentForm,
@@ -200,14 +201,18 @@ describe("CreateCommentForm", () => {
     })
 
     it("should cancel and hide the form", async () => {
+      let mockPreventDefault = helper.sandbox.stub()
       await helper.listenForActions([forms.FORM_BEGIN_EDIT], () => {
         wrapper.find("a").simulate("click")
       })
       const state = await helper.listenForActions([forms.FORM_END_EDIT], () => {
-        wrapper.find(".cancel-button").simulate("click")
+        wrapper.find(".cancel-button").simulate("click", {
+          preventDefault: mockPreventDefault,
+        })
       })
       assert.deepEqual(state.forms, {})
       assert.isNotOk(wrapper.find("textarea[name='text']").exists())
+      sinon.assert.calledWith(mockPreventDefault)
     })
 
     it("should submit the form", async () => {
