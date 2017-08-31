@@ -19,6 +19,7 @@ describe("PostList", () => {
   it("should behave well if handed an empty list", () => {
     let wrapper = renderPostList({ posts: [] })
     assert.lengthOf(wrapper.find(PostDisplay), 0)
+    assert.equal(wrapper.text(), "There are no posts to display.")
   })
 
   it("should pass the showChannelLinks prop to PostDisplay", () => {

@@ -26,7 +26,9 @@ const PostList = (props: PostListProps) => {
 
   return (
     <div className="post-list">
-      {renderPosts(posts, showChannelLinks, toggleUpvote)}
+      {posts.length > 0
+        ? renderPosts(posts, showChannelLinks, toggleUpvote)
+        : <div className="empty-list-msg">There are no posts to display.</div>}
     </div>
   )
 }
