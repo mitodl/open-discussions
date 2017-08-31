@@ -18,9 +18,9 @@ describe("Loading", () => {
     return mount(<LoadingContent loaded={loaded} errored={errored} />)
   }
 
-  it("render loading if not loaded and not errored", () => {
+  it("should show a spinner if not loaded and not errored", () => {
     const wrapper = renderLoading(false, false)
-    assert.equal(wrapper.text(), "Loading")
+    assert.lengthOf(wrapper.find(".loading").find(".sk-three-bounce"), 1)
   })
 
   it("should render errors correctly if not loaded", () => {

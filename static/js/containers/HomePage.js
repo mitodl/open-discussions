@@ -6,6 +6,7 @@ import R from "ramda"
 import PostList from "../components/PostList"
 import Card from "../components/Card"
 
+import withLoading from "../components/Loading"
 import withNavSidebar from "../hoc/withNavSidebar"
 
 import { actions } from "../actions"
@@ -48,7 +49,7 @@ class HomePage extends React.Component {
       <Card title="Home Page">
         <PostList
           // $FlowFixMe: flow thinks these might be undefined
-          posts={safeBulkGet(frontpage.data, posts.data)}
+          posts={safeBulkGet(frontpage, posts.data)}
           toggleUpvote={dispatchableToggleUpvote}
           showChannelLinks={true}
         />
@@ -60,11 +61,14 @@ class HomePage extends React.Component {
 const mapStateToProps = state => {
   return {
     posts:              state.posts,
-    frontpage:          state.frontpage,
+    frontpage:          state.frontpage.data,
     subscribedChannels: getSubscribedChannels(state),
     channels:           state.channels,
-    showSidebar:        state.ui.showSidebar
+    showSidebar:        state.ui.showSidebar,
+    loaded:             state.frontpage.loaded
   }
 }
 
-export default R.compose(connect(mapStateToProps), withNavSidebar)(HomePage)
+export default R.compose(connect(mapStateToProps), withNavSidebar, withLoading)(
+  HomePage
+)

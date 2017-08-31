@@ -61,7 +61,7 @@ describe("ChannelPage", () => {
     otherChannel.name =
       "somenamethatshouldnevercollidebecauseitsaridiculouslylongvalue"
     let [wrapper] = await renderPage(otherChannel)
-    assert.include(wrapper.text(), "Loading")
+    assert.lengthOf(wrapper.find(".loading").find(".sk-three-bounce"), 1)
   })
 
   it("lists subscriptions", async () => {

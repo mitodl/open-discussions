@@ -2,6 +2,7 @@
 @import "node_modules/@material/toolbar/dist/mdc.toolbar";
 @import "node_modules/@material/list/dist/mdc.list";
 @import "node_modules/@material/button/dist/mdc.button";
+@import "node_modules/spinkit/scss/spinners/7-three-bounce";
 @import "breakpoints";
 @import "variables";
 @import "basic";
@@ -14,6 +15,7 @@
 @import "comment";
 @import "button";
 @import "navigation";
+@import "loader";
 
 body {
   font-family: 'Roboto', helvetica, arial, sans-serif !important;
