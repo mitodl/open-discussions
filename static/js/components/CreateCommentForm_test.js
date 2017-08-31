@@ -72,8 +72,8 @@ describe("CreateCommentForm", () => {
       }
     })
 
-    it("should not render a reply button", () => {
-      assert.notInclude(wrapper.find("a").text(), "Reply")
+    it("should not render a reply or cancel button", () => {
+      assert.lengthOf(wrapper.find("a"), 0)
     })
 
     it("should begin form editing on load", async () => {
@@ -100,27 +100,6 @@ describe("CreateCommentForm", () => {
         value:  expectedKeys,
         errors: {}
       })
-    })
-
-    it("should cancel and delete unsaved input the form", async () => {
-      await helper.listenForActions([forms.FORM_UPDATE], () => {
-        wrapper.find("textarea[name='text']").simulate("change", {
-          target: {
-            name:  "text",
-            value: expectedKeys.text
-          }
-        })
-      })
-      await helper.listenForActions(
-        [forms.FORM_BEGIN_EDIT, forms.FORM_END_EDIT],
-        () => {
-          wrapper.find(".cancel-button").simulate("click")
-        }
-      )
-      assert.deepEqual(
-        helper.store.getState().forms[replyToPostKey(post)],
-        emptyFormState
-      )
     })
 
     it("should submit the form", async () => {
@@ -207,7 +186,7 @@ describe("CreateCommentForm", () => {
       })
       const state = await helper.listenForActions([forms.FORM_END_EDIT], () => {
         wrapper.find(".cancel-button").simulate("click", {
-          preventDefault: mockPreventDefault,
+          preventDefault: mockPreventDefault
         })
       })
       assert.deepEqual(state.forms, {})
