@@ -17,7 +17,7 @@ type CreateCommentFormProps = {
   initialValue: CommentForm,
   formKey: string,
   beginReply: (initialValue: Object, e: ?Object) => void,
-  onSubmit: (p: string, t: string, c: string, p: Post) => string,
+  onSubmit: (p: string, t: string, c: string, p: Post) => () => void,
   onUpdate: (e: Object) => void,
   cancelReply: () => void,
   formDataLens: (s: string) => Object
@@ -39,7 +39,13 @@ const getPostReplyInitialValue = (parent: Post) => ({
   text:    ""
 })
 
-const commentForm = (onSubmit, text, onUpdate, cancelReply) =>
+const commentForm = (
+  onSubmit: () => void,
+  text: string,
+  onUpdate: (e: any) => void,
+  cancelReply: () => void,
+  isComment: boolean
+) =>
   <div className="reply-form">
     <form onSubmit={onSubmit} className="form">
       <div className="form-item">
@@ -53,9 +59,15 @@ const commentForm = (onSubmit, text, onUpdate, cancelReply) =>
         />
       </div>
       <button type="submit">Submit</button>
-      <a href="#" onClick={cancelReply} className="cancel-button">
-        Cancel
-      </a>
+      {isComment
+        ? <a
+          href="#"
+          onClick={R.compose(cancelReply, e => e.preventDefault())}
+          className="cancel-button"
+        >
+            Cancel
+        </a>
+        : null}
     </form>
   </div>
 
@@ -143,7 +155,8 @@ export const ReplyToCommentForm = connect(
         onSubmit(post_id, text, comment_id, post),
         text,
         onUpdate,
-        cancelReply
+        cancelReply,
+        true
       )
     }
 
@@ -206,7 +219,8 @@ export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
         onSubmit(post_id, text, comment_id, post),
         text,
         onUpdate,
-        cancelReply
+        cancelReply,
+        false
       )
     }
   }
