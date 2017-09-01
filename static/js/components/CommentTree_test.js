@@ -12,9 +12,10 @@ import CommentTree from "./CommentTree"
 
 import { makeCommentTree } from "../factories/comments"
 import { makePost } from "../factories/posts"
+import { replyToCommentKey } from "../components/CreateCommentForm"
 
 describe("CommentTree", () => {
-  let comments, post, sandbox, upvoteStub, downvoteStub
+  let comments, post, sandbox, upvoteStub, downvoteStub, beginReplyStub
 
   beforeEach(() => {
     post = makePost()
@@ -22,6 +23,7 @@ describe("CommentTree", () => {
     sandbox = sinon.sandbox.create()
     upvoteStub = sandbox.stub()
     downvoteStub = sandbox.stub()
+    beginReplyStub = sandbox.stub()
   })
 
   afterEach(() => {
@@ -35,6 +37,9 @@ describe("CommentTree", () => {
         forms={{}}
         upvote={upvoteStub}
         downvote={downvoteStub}
+        beginReply={R.curry((formKey, initialValue, e) => {
+          beginReplyStub(formKey, initialValue, e)
+        })}
         {...props}
       />
     )
@@ -74,5 +79,12 @@ describe("CommentTree", () => {
       "comment"
     )
     assert.ok(firstComment.find(".replies > .comment").at(0))
+  })
+
+  it('should include a "reply" button', () => {
+    let wrapper = renderCommentTree()
+    wrapper.find(".reply-button").at(0).simulate("click")
+    assert.ok(beginReplyStub.called)
+    assert.ok(beginReplyStub.calledWith(replyToCommentKey(comments[0])))
   })
 })

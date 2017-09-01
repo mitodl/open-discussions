@@ -17,6 +17,7 @@ import { toggleUpvote } from "../util/api_actions"
 import { getChannelName, getPostID } from "../lib/util"
 import { anyError } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
+import { beginReply } from "../components/CreateCommentForm"
 
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -112,6 +113,7 @@ class PostPage extends React.Component {
           forms={forms}
           upvote={this.upvote}
           downvote={this.downvote}
+          beginReply={beginReply(dispatch)}
         />
       </div>
     )

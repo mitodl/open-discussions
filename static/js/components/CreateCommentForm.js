@@ -28,7 +28,7 @@ export const replyToCommentKey = (comment: Comment) =>
 
 export const replyToPostKey = (post: Post) => `post:${post.id}:comment:new`
 
-const getCommentReplyInitialValue = (parent: Comment) => ({
+export const getCommentReplyInitialValue = (parent: Comment) => ({
   post_id:    parent.post_id,
   comment_id: parent.id,
   text:       ""
@@ -93,6 +93,18 @@ const cancelReply = R.curry((dispatch, formKey) => () =>
   dispatch(actions.forms.formEndEdit({ formKey }))
 )
 
+export const beginReply = R.curry((dispatch, formKey, initialValue, e) => {
+  if (e) {
+    e.preventDefault()
+  }
+  dispatch(
+    actions.forms.formBeginEdit({
+      formKey,
+      value: R.clone(initialValue)
+    })
+  )
+})
+
 const mapDispatchToProps = (dispatch, ownProps) => {
   const formKey = getFormKeyFromOwnProps(ownProps)
 
@@ -107,18 +119,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       )
     },
     cancelReply: cancelReply(dispatch, formKey),
-    beginReply:  R.curry((initialValue, e) => {
-      if (e) {
-        e.preventDefault()
-      }
-      dispatch(
-        actions.forms.formBeginEdit({
-          formKey,
-          value: R.clone(initialValue)
-        })
-      )
-    }),
-    onSubmit: R.curry((postID, text, commentID, post, e) => {
+    beginReply:  beginReply(dispatch, formKey),
+    onSubmit:    R.curry((postID, text, commentID, post, e) => {
       e.preventDefault()
       dispatch(actions.comments.post(postID, text, commentID)).then(() => {
         dispatch(
@@ -141,10 +143,8 @@ export const ReplyToCommentForm = connect(
   ({
     forms,
     formKey,
-    initialValue,
     post,
     onSubmit,
-    beginReply,
     onUpdate,
     cancelReply
     }: CreateCommentFormProps) => {
@@ -159,14 +159,7 @@ export const ReplyToCommentForm = connect(
         true
       )
     }
-
-    return (
-      <div className="reply-button">
-        <a href="#" onClick={beginReply(initialValue)}>
-          Reply
-        </a>
-      </div>
-    )
+    return null
   }
 )
 

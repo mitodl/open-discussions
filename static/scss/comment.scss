@@ -1,14 +1,20 @@
 .comments {
   .top-level-comment {
-    padding: 10px 15px 10px 23px;
+    padding: 0 15px 0 23px;
   }
 
   .comment {
-    margin: 5px 0;
+    margin: 10px 0;
 
     .row {
       display: flex;
       flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      &.vote-reply {
+        width: 110px;
+      }
 
       p {
         margin: 0 0 15px 0;
@@ -52,13 +58,12 @@
 
   .reply-button {
     font-size: 0.8em;
-    padding: 10px 0;
   }
 }
 
 .reply-form {
   width: 100%;
-  padding: 10px 0;
+  padding-top: 10px;
 
   .form-item {
     margin: 0 0 12px 0;

@@ -9,7 +9,10 @@ import sinon from "sinon"
 import {
   ReplyToCommentForm,
   ReplyToPostForm,
-  replyToPostKey
+  replyToPostKey,
+  replyToCommentKey,
+  beginReply,
+  getCommentReplyInitialValue
 } from "./CreateCommentForm"
 
 import * as forms from "../actions/forms"
@@ -145,25 +148,23 @@ describe("CreateCommentForm", () => {
     let expectedKeys, wrapper
 
     beforeEach(() => {
-      (wrapper = renderCommentForm(comment)), (expectedKeys = commentKeys)
+      wrapper = renderCommentForm(comment)
+      expectedKeys = commentKeys
+
+      beginReply(
+        helper.store.dispatch,
+        replyToCommentKey(comment),
+        getCommentReplyInitialValue(comment),
+        undefined
+      )
     })
 
-    it("should render a reply button", () => {
-      assert.equal(wrapper.find("a").text(), "Reply")
-    })
-
-    it("should show an empty form when reply is clicked", async () => {
-      await helper.listenForActions([forms.FORM_BEGIN_EDIT], () => {
-        wrapper.find("a").simulate("click")
-      })
+    it("should show an empty form when reply has been started", async () => {
       const [textarea] = wrapper.find("textarea[name='text']")
       assert.equal(textarea.value, "")
     })
 
     it("should trigger an update in state when text is input", async () => {
-      await helper.listenForActions([forms.FORM_BEGIN_EDIT], () => {
-        wrapper.find("a").simulate("click")
-      })
       const state = await helper.listenForActions([forms.FORM_UPDATE], () => {
         wrapper.find("textarea[name='text']").simulate("change", {
           target: {
@@ -181,9 +182,6 @@ describe("CreateCommentForm", () => {
 
     it("should cancel and hide the form", async () => {
       let mockPreventDefault = helper.sandbox.stub()
-      await helper.listenForActions([forms.FORM_BEGIN_EDIT], () => {
-        wrapper.find("a").simulate("click")
-      })
       const state = await helper.listenForActions([forms.FORM_END_EDIT], () => {
         wrapper.find(".cancel-button").simulate("click", {
           preventDefault: mockPreventDefault
@@ -197,13 +195,9 @@ describe("CreateCommentForm", () => {
     it("should submit the form", async () => {
       const { requestType, successType } = actions.comments.post
       helper.createCommentStub.returns(Promise.resolve(makeComment(post)))
-      await helper.listenForActions(
-        [SET_POST_DATA, forms.FORM_BEGIN_EDIT],
-        () => {
-          helper.store.dispatch(setPostData(post))
-          wrapper.find("a").simulate("click")
-        }
-      )
+      await helper.listenForActions([SET_POST_DATA], () => {
+        helper.store.dispatch(setPostData(post))
+      })
       await helper.listenForActions([forms.FORM_UPDATE], () => {
         wrapper.find("textarea[name='text']").simulate("change", {
           target: {
