@@ -73,7 +73,8 @@ class PostDisplay extends React.Component {
   upvoteDisplay = () => {
     const { post, expanded } = this.props
     const { upvoting } = this.state
-    const upvoteClass = post.upvoted ? "upvoted" : ""
+    const upvoted = post.upvoted !== upvoting
+    const upvoteClass = upvoted ? "upvoted" : ""
 
     return (
       <div className={`upvotes ${upvoteClass} ${expanded ? "expanded" : ""}`}>

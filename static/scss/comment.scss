@@ -23,9 +23,8 @@
       width: 65px;
 
       .upvoted, .downvoted {
-        &:not(:disabled) {
-          color: $voted-blue;
-        }
+        // TODO: change this
+        border: 1px solid $voted-blue;
       }
     }
 

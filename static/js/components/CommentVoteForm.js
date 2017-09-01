@@ -14,14 +14,16 @@ type CommentVoteFormProps = {
 export default class CommentVoteForm extends React.Component {
   props: CommentVoteFormProps
   state: {
-    voting: boolean
+    downvoting: boolean,
+    upvoting: boolean
   }
 
   constructor() {
     super()
 
     this.state = {
-      voting: false
+      downvoting: false,
+      upvoting:   false
     }
   }
 
@@ -29,11 +31,11 @@ export default class CommentVoteForm extends React.Component {
     const { upvote, comment } = this.props
 
     this.setState({
-      voting: true
+      upvoting: true
     })
     await upvote(comment)
     this.setState({
-      voting: false
+      upvoting: false
     })
   }
 
@@ -41,17 +43,24 @@ export default class CommentVoteForm extends React.Component {
     const { downvote, comment } = this.props
 
     this.setState({
-      voting: true
+      downvoting: true
     })
     await downvote(comment)
     this.setState({
-      voting: false
+      downvoting: false
     })
   }
 
   render() {
     const { comment } = this.props
-    const { voting } = this.state
+    const { upvoting, downvoting } = this.state
+
+    const disabled = upvoting || downvoting
+
+    // Use comment downvoted arrow, or if there's a downvote happening, show it as already downvoted.
+    // Also make sure the upvote arrow is turned off if the downvote arrow is on.
+    const downvoted = comment.downvoted !== downvoting && !upvoting
+    const upvoted = comment.upvoted !== upvoting && !downvoting
 
     return (
       <div className="votes-form">
@@ -59,18 +68,16 @@ export default class CommentVoteForm extends React.Component {
           {comment.score}
         </div>
         <button
-          className={`vote upvote-button ${comment.upvoted ? "upvoted" : ""}`}
+          className={`vote upvote-button ${upvoted ? "upvoted" : ""}`}
           onClick={this.upvote}
-          disabled={voting}
+          disabled={disabled}
         >
           <img className="vote-arrow" src="/static/images/upvote_arrow.png" />
         </button>
         <button
-          className={`vote downvote-button ${comment.downvoted
-            ? "downvoted"
-            : ""}`}
+          className={`vote downvote-button ${downvoted ? "downvoted" : ""}`}
           onClick={this.downvote}
-          disabled={voting}
+          disabled={disabled}
         >
           <img className="vote-arrow" src="/static/images/downvote_arrow.png" />
         </button>

@@ -51,6 +51,12 @@
     width: 35px;
   }
 
+  &.upvoted {
+    .upvote-button {
+      border: 1px solid blue;
+    }
+  }
+
   span.votes {
     display: block;
     color: #6f99be;
@@ -67,14 +73,8 @@ img.vote-arrow {
   background: none;
   border: none;
   padding: 0;
-
-  &:disabled {
-    color: $border-grey;
-  }
-
-  .votes, .upvote-button {
-    color: $voted-blue;
-  }
+  cursor: pointer;
+  outline: none;
 }
 
 .comments-count {
