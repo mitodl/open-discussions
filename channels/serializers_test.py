@@ -7,13 +7,19 @@ from unittest.mock import (
 )
 
 import pytest
+from praw.models.reddit.redditor import Redditor
 from rest_framework.exceptions import ValidationError
 
 from channels.serializers import (
     ChannelSerializer,
     CommentSerializer,
+    ContributorSerializer,
     PostSerializer,
 )
+from open_discussions.factories import UserFactory
+
+
+pytestmark = pytest.mark.django_db
 
 
 def test_serialize_channel(user):
@@ -177,3 +183,47 @@ def test_comment_only_one_downvote_or_upvote():
             "downvoted": True,
         })
     assert ex.value.args[0] == 'upvoted and downvoted cannot both be true'
+
+
+def test_contributor():
+    """Serialize of a redditor-like object"""
+    redditor = Mock(spec=Redditor)
+    # the `name` attribute cannot be configured during the mock object creation
+    redditor.name = 'fooo_username'
+    assert ContributorSerializer(redditor).data == {'contributor_name': 'fooo_username'}
+
+
+def test_contributor_validate_name_no_string():
+    """validate the input in case the value is not a string"""
+    with pytest.raises(ValidationError) as ex:
+        ContributorSerializer().validate_contributor_name(None)
+    assert ex.value.args[0] == 'contributor name must be a string'
+
+
+def test_contributor_validate_name_no_valid_user():
+    """validate the input in case the user does not exists in the DB"""
+    with pytest.raises(ValidationError) as ex:
+        ContributorSerializer().validate_contributor_name('foo_user')
+    assert ex.value.args[0] == 'contributor name is not a valid user'
+
+
+def test_contributor_validate_name():
+    """validate the input"""
+    user = UserFactory.create()
+    assert ContributorSerializer().validate_contributor_name(user.username) == {'contributor_name': user.username}
+
+
+def test_contributor_create():
+    """Adds a contributor"""
+    user = UserFactory.create()
+    contributor_user = UserFactory.create()
+    contributor_redditor = Mock(spec=Redditor)
+    contributor_redditor.name = contributor_user.username
+    with patch('channels.serializers.Api', autospec=True) as api:
+        api.return_value.add_contributor.return_value = contributor_redditor
+        contributor = ContributorSerializer(context={
+            "request": Mock(user=user),
+            "view": Mock(kwargs={'channel_name': 'foo_channel'})
+        }).create({'contributor_name': contributor_user.username})
+        assert contributor is contributor_redditor
+        api.return_value.add_contributor.assert_called_once_with(contributor_user.username, 'foo_channel')

@@ -1,9 +1,14 @@
 """API tests"""
 # pylint: disable=redefined-outer-name
 import pytest
+from praw.models.reddit.redditor import Redditor
+from rest_framework.exceptions import NotFound
 
 from open_discussions.factories import UserFactory
-from channels import api
+from channels import (
+    api,
+    exceptions,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -261,3 +266,56 @@ def test_frontpage(mock_client):
     posts = client.front_page()
     assert posts == mock_client.front.hot.return_value
     mock_client.front.hot.assert_called_once_with()
+
+
+def test_add_contributor(mock_client):
+    """Test add contributor"""
+    client_user = UserFactory.create()
+    contributor = UserFactory.create()
+    client = api.Api(client_user)
+    redditor = client.add_contributor(contributor.username, 'foo_channel_name')
+    mock_client.subreddit.return_value.contributor.add.assert_called_once_with(contributor)
+    assert isinstance(redditor, Redditor)
+    assert redditor.name == contributor.username
+
+
+def test_add_remove_contributor_no_user(mock_client):
+    """Test add and remove contributor in case the user does not exist"""
+    client_user = UserFactory.create()
+    client = api.Api(client_user)
+    with pytest.raises(NotFound):
+        client.add_contributor('fooooooo', 'foo_channel_name')
+    assert mock_client.subreddit.return_value.contributor.add.call_count == 0
+
+    with pytest.raises(NotFound):
+        client.remove_contributor('fooooooo', 'foo_channel_name')
+    assert mock_client.subreddit.return_value.contributor.remove.call_count == 0
+
+
+def test_remove_contributor_moderator(mock_client):
+    """Test remove contributor in case the user does is a moderator"""
+    client_user = UserFactory.create()
+    contributor = UserFactory.create()
+    client = api.Api(client_user)
+    mock_client.subreddit.return_value.moderator.return_value = [contributor.username]
+    with pytest.raises(exceptions.RemoveUserException):
+        client.remove_contributor(contributor.username, 'foo_channel_name')
+    assert mock_client.subreddit.return_value.contributor.remove.call_count == 0
+
+
+def test_remove_contributor(mock_client):
+    """Test remove contributor"""
+    client_user = UserFactory.create()
+    contributor = UserFactory.create()
+    client = api.Api(client_user)
+    client.remove_contributor(contributor.username, 'foo_channel_name')
+    mock_client.subreddit.return_value.contributor.remove.assert_called_once_with(contributor)
+
+
+def test_list_contributors(mock_client):
+    """Test list contributor"""
+    client_user = UserFactory.create()
+    client = api.Api(client_user)
+    contributors = client.list_contributors('foo_channel_name')
+    mock_client.subreddit.return_value.contributor.assert_called_once_with()
+    assert mock_client.subreddit.return_value.contributor.return_value == contributors

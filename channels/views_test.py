@@ -1,6 +1,7 @@
 """Tests for views for REST APIs for channels"""
-from django.core.urlresolvers import reverse
 import pytest
+from django.core.urlresolvers import reverse
+from rest_framework import status
 
 from open_discussions.factories import UserFactory
 
@@ -673,3 +674,75 @@ def test_frontpage(client, use_betamax, praw_settings):
             "channel_name": "subreddit_for_testing"
         }
     ]
+
+
+def test_list_contributors(client, use_betamax, praw_settings):
+    """
+    List contributors in a channel
+    """
+    client.force_login(UserFactory.create(username='fooadmin'))
+    url = reverse('contributor-list', kwargs={'channel_name': 'test_channel'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [{'contributor_name': 'othercontributor'}, {'contributor_name': 'fooadmin'}]
+
+
+def test_add_contributor(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Adds a contributor to a channel
+    """
+    client.force_login(UserFactory.create(username='fooadmin'))
+    contributor = UserFactory.create(username='othercontributor')
+    url = reverse('contributor-list', kwargs={'channel_name': 'test_channel'})
+    resp = client.post(url, data={'contributor_name': contributor.username}, format='json', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json() == {'contributor_name': 'othercontributor'}
+
+
+def test_detail_contributor_error(client, use_betamax, praw_settings):
+    """
+    Detail of a contributor in a channel in case the user is not a contributor
+    """
+    client.force_login(UserFactory.create(username='fooadmin'))
+    nocontributor = UserFactory.create(username='nocontributor')
+    url = reverse(
+        'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': nocontributor.username})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_detail_contributor(client, use_betamax, praw_settings):
+    """
+    Detail of a contributor in a channel
+    """
+    client.force_login(UserFactory.create(username='fooadmin'))
+    contributor = UserFactory.create(username='othercontributor')
+    url = reverse(
+        'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': contributor.username})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {'contributor_name': 'othercontributor'}
+
+
+def test_remove_contributor(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Removes a contributor from a channel
+    """
+    client.force_login(UserFactory.create(username='fooadmin'))
+    contributor = UserFactory.create(username='othercontributor')
+    url = reverse(
+        'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': contributor.username})
+    resp = client.delete(url, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+def test_remove_contributor_moderator(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Removes a contributor from a channel but fails because the contributor is a moderator
+    """
+    client.force_login(UserFactory.create(username='fooadmin'))
+    contributor = UserFactory.create(username='othercontributor')
+    url = reverse(
+        'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': contributor.username})
+    resp = client.delete(url, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_409_CONFLICT

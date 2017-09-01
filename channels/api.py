@@ -2,10 +2,14 @@
 from urllib.parse import urljoin
 
 import requests
+from django.conf import settings
+from django.contrib.auth import get_user_model
 import praw
 from praw.models.reddit import more
+from praw.models.reddit.redditor import Redditor
+from rest_framework.exceptions import NotFound
 
-from django.conf import settings
+from channels import exceptions
 
 CHANNEL_TYPE_PUBLIC = 'public'
 CHANNEL_TYPE_PRIVATE = 'private'
@@ -25,6 +29,7 @@ CHANNEL_SETTINGS = (
     'submit_text',
     'submit_text_label',
 )
+User = get_user_model()
 
 
 def _get_user_credentials(user):
@@ -361,3 +366,52 @@ class Api:
         more_comments.submission = self.reddit.submission(submission_id)
         more_comments.comments()  # load the comments
         return more_comments
+
+    def add_contributor(self, contributor_name, channel_name):
+        """
+        Adds a user to the contributors of a channel
+
+        Args:
+            contributor_name(str): the username for the user to be added as contributor
+            channel_name(str): the channel name identifier
+
+        Returns:
+            praw.models.Redditor: the reddit representation of the user
+        """
+        try:
+            user = User.objects.get(username=contributor_name)
+        except User.DoesNotExist:
+            raise NotFound("User {} does not exist".format(contributor_name))
+        self.get_channel(channel_name).contributor.add(user)
+        return Redditor(self.reddit, name=contributor_name)
+
+    def remove_contributor(self, contributor_name, channel_name):
+        """
+        Removes a user from the contributors of a channel
+
+        Args:
+            contributor_name(str): the username for the user to be added as contributor
+            channel_name(str): the channel name identifier
+
+        """
+        try:
+            user = User.objects.get(username=contributor_name)
+        except User.DoesNotExist:
+            raise NotFound("User {} does not exist".format(contributor_name))
+        channel = self.get_channel(channel_name)
+        if contributor_name in channel.moderator():
+            raise exceptions.RemoveUserException(
+                "User {} is a moderator of the channel {}".format(contributor_name, channel_name))
+        channel.contributor.remove(user)
+
+    def list_contributors(self, channel_name):
+        """
+        Returns a list of contributors in a channel
+
+        Args:
+            channel_name(str): the channel name identifier
+
+        Returns:
+            praw.models.listing.generator.ListingGenerator: a generator representing the contributors in the channel
+        """
+        return self.get_channel(channel_name).contributor()
