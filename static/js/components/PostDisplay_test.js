@@ -107,10 +107,12 @@ describe("PostDisplay", () => {
     }
   }
   ;[true, false].forEach(prevUpvote => {
-    it(`should show the correct UI when the upvote button is clicked when prev state was ${prevUpvote}`, async () => {
+    it(`should show the correct UI when the upvote 
+    button is clicked when prev state was ${String(prevUpvote)}`, async () => {
       let post = makePost()
       post.upvoted = prevUpvote
-      let resolveUpvote
+      // setting to a function so Flow doesn't complain
+      let resolveUpvote = () => null
       const toggleUpvote = helper.sandbox.stub().returns(
         new Promise(resolve => {
           resolveUpvote = resolve
