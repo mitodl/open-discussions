@@ -6,6 +6,8 @@ from channels.views import (
     ChannelListView,
     CommentDetailView,
     CommentListView,
+    ContributorListView,
+    ContributorDetailView,
     FrontPageView,
     PostDetailView,
     PostListView,
@@ -18,6 +20,16 @@ urlpatterns = [
         r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/posts/$',
         PostListView.as_view(),
         name='post-list',
+    ),
+    url(
+        r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/contributors/$',
+        ContributorListView.as_view(),
+        name='contributor-list',
+    ),
+    url(
+        r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/contributors/(?P<contributor_name>[A-Za-z0-9_]+)/$',
+        ContributorDetailView.as_view(),
+        name='contributor-detail',
     ),
     url(
         r'api/v0/posts/(?P<post_id>[A-Za-z0-9_]+)/$',

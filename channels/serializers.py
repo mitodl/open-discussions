@@ -6,6 +6,7 @@ from datetime import (
     timezone,
 )
 
+from django.contrib.auth import get_user_model
 from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -14,6 +15,9 @@ from channels.api import (
     Api,
     VALID_CHANNEL_TYPES,
 )
+
+
+User = get_user_model()
 
 
 class ChannelSerializer(serializers.Serializer):
@@ -286,3 +290,25 @@ class CommentSerializer(serializers.Serializer):
         _apply_vote(instance, validated_data, True)
 
         return api.get_comment(comment_id=instance.id)
+
+
+class ContributorSerializer(serializers.Serializer):
+    """Serializer for contributors"""
+    contributor_name = WriteableSerializerMethodField()
+
+    def get_contributor_name(self, instance):
+        """Returns the name for the contributor"""
+        return instance.name
+
+    def validate_contributor_name(self, value):
+        """Validates the contributor name"""
+        if not isinstance(value, str):
+            raise ValidationError("contributor name must be a string")
+        if not User.objects.filter(username=value).exists():
+            raise ValidationError("contributor name is not a valid user")
+        return {'contributor_name': value}
+
+    def create(self, validated_data):
+        api = Api(user=self.context['request'].user)
+        channel_name = self.context['view'].kwargs['channel_name']
+        return api.add_contributor(validated_data['contributor_name'], channel_name)
