@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 
 import SubscriptionsList from "./SubscriptionsList"
 
-import { newPostURL, getChannelNameFromPathname } from "../lib/url"
+import { newPostURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -17,14 +17,12 @@ const submitPostButton = channelName =>
   </Link>
 
 type NavigationProps = {
-  pathname: string,
+  channelName?: string,
   subscribedChannels: Array<Channel>
 }
 
 const Navigation = (props: NavigationProps) => {
-  const { subscribedChannels, pathname } = props
-
-  const channelName = getChannelNameFromPathname(pathname)
+  const { subscribedChannels, channelName } = props
 
   return (
     <div className="navigation">
