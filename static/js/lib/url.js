@@ -1,6 +1,4 @@
 // @flow
-import R from "ramda"
-
 export const channelURL = (channelName: string) => `/channel/${channelName}`
 
 export const postDetailURL = (channelName: string, postID: string) =>
