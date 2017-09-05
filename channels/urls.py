@@ -9,6 +9,8 @@ from channels.views import (
     FrontPageView,
     PostDetailView,
     PostListView,
+    SubscribeView,
+    UnSubscribView
 )
 
 urlpatterns = [
@@ -35,4 +37,16 @@ urlpatterns = [
         name='comment-detail',
     ),
     url(r'api/v0/frontpage/$', FrontPageView.as_view(), name='frontpage'),
+
+    url(
+         r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/subscribe/$',
+         SubscribeView.as_view(),
+         name='subscribe',
+     ),
+
+    url(
+        r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/unsubscribe/$',
+        UnSubscribView.as_view(),
+        name='unsubscribe',
+    ),
 ]

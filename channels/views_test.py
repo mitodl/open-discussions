@@ -673,3 +673,23 @@ def test_frontpage(client, use_betamax, praw_settings):
             "channel_name": "subreddit_for_testing"
         }
     ]
+
+
+def test_channel_subscription(client, use_betamax, praw_settings):
+    """
+    List channels the user is subscribed to
+    """
+    client.force_login(UserFactory.create(username='george'))
+    url = reverse('unsubscribe', kwargs={'channel_name': 'subreddit_for_testing'})
+    resp = client.get(url)
+    assert resp.status_code == 200
+    assert resp.json() == {
+        "is_subscribed": False
+    }
+
+    url = reverse('subscribe', kwargs={'channel_name': 'subreddit_for_testing'})
+    resp = client.get(url)
+    assert resp.status_code == 200
+    assert resp.json() == {
+        "is_subscribed": True
+    }

@@ -74,7 +74,8 @@ INSTALLED_APPS = (
     'rest_framework',
     # Put our apps after this point
     'open_discussions',
-    'profiles'
+    'profiles',
+    'channels'
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)

@@ -6,6 +6,8 @@ import praw
 from praw.models.reddit import more
 
 from django.conf import settings
+from channels.models import UnSubscribeStatus
+
 
 CHANNEL_TYPE_PUBLIC = 'public'
 CHANNEL_TYPE_PRIVATE = 'private'
@@ -361,3 +363,52 @@ class Api:
         more_comments.submission = self.reddit.submission(submission_id)
         more_comments.comments()  # load the comments
         return more_comments
+
+    def is_subscribe(self, channel_name):
+        is_subscribed = False
+        list = self.list_channels()
+        for reddit in list:
+            if reddit.display_name == channel_name:
+                is_subscribed = True
+                break
+        return is_subscribed
+
+    def subscribe(self, channel_name):
+        """
+        Subscribe a user to a channel
+
+        Args:
+            channel_name(str): the channel name identifier
+
+        Returns:
+            channels.models.UnSubscribeStatus: the subscription status of user
+        """
+        status, __ = UnSubscribeStatus.objects.get_or_create(user=self.user, channel_name=channel_name)
+        if not self.is_subscribe(channel_name):
+            self.get_channel(channel_name).subscribe()
+            status.is_unsubscribe = False
+            status.save()
+
+        return {
+            'is_subscribed': self.is_subscribe(channel_name)
+        }
+
+    def unsubscribe(self, channel_name):
+        """
+        Unsubscribe a user to a channel
+
+        Args:
+            channel_name(str): the channel name identifier
+
+        Returns:
+            channels.models.UnSubscribeStatus: the subscription status of user
+        """
+        status, __ = UnSubscribeStatus.objects.get_or_create(user=self.user, channel_name=channel_name)
+        if not status.is_unsubscribe:
+            self.get_channel(channel_name).unsubscribe()
+            status.is_unsubscribe = True
+            status.save()
+
+        return {
+            'is_subscribed': self.is_subscribe(channel_name)
+        }

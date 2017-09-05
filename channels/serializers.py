@@ -14,6 +14,7 @@ from channels.api import (
     Api,
     VALID_CHANNEL_TYPES,
 )
+from channels.models import UnSubscribeStatus
 
 
 class ChannelSerializer(serializers.Serializer):
@@ -286,3 +287,8 @@ class CommentSerializer(serializers.Serializer):
         _apply_vote(instance, validated_data, True)
 
         return api.get_comment(comment_id=instance.id)
+
+
+class SubscriberSerializer(serializers.Serializer):
+    """Serializer for subscribers"""
+    is_subscribed = serializers.BooleanField()
