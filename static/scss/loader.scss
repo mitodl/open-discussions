@@ -2,4 +2,15 @@
   height: 90vh;
   display: flex;
   align-items: center;
+
+  .sk-three-bounce {
+  	width: 105px;
+
+  	.sk-child {
+  	  width: 15px;
+      margin-right: 8px;
+      height: 15px;
+      background-color: $font-grey;
+  	}
+  }
 }

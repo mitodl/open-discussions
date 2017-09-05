@@ -59,7 +59,7 @@ label.radiolabel {
 }
 
 input[type=submit], button[type=submit] {
-  background-color: #2c95c7;
+  background-color: $button-blue;
   border: none;
   color: white;
   padding: 10px 18px;
@@ -68,6 +68,7 @@ input[type=submit], button[type=submit] {
   cursor: pointer;
   font-size: 16px;
   border-radius: 2px;
+  font-weight: 400;
 }
 
 input[type=checkbox], input[type=radio] {
