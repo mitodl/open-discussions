@@ -51,6 +51,7 @@ describe("CommentVoteForm", () => {
     const clickedVoteClass = isUpvote ? "upvoted" : "downvoted"
     const otherButtonSelector = isUpvote ? ".downvote-button" : ".upvote-button"
     const otherVoteClass = isUpvote ? "downvoted" : "upvoted"
+    const imgPrefix = isUpvote ? "/static/images/upvote_arrow" : "/static/images/downvote_arrow"
 
     assert.equal(wrapper.find(clickedButtonSelector).props().disabled, isVoting)
     assert.equal(wrapper.find(otherButtonSelector).props().disabled, isVoting)
@@ -59,11 +60,13 @@ describe("CommentVoteForm", () => {
         wrapper.find(clickedButtonSelector).props().className,
         clickedVoteClass
       )
+      assert.equal(wrapper.find(clickedButtonSelector).find("img").props().src, `${imgPrefix}.png`)
     } else {
       assert.include(
         wrapper.find(clickedButtonSelector).props().className,
         clickedVoteClass
       )
+      assert.equal(wrapper.find(clickedButtonSelector).find("img").props().src, `${imgPrefix}_on.png`)
     }
     assert.notInclude(
       wrapper.find(otherButtonSelector).props().className,
