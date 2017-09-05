@@ -102,10 +102,16 @@ describe("PostDisplay", () => {
     assert.equal(wrapper.find(".upvote-button").props().disabled, isVoting)
     if (isUpvote) {
       assert.include(wrapper.find(".upvotes").props().className, "upvoted")
-      assert.equal(wrapper.find(".upvotes img").props().src, "/static/images/upvote_arrow_on.png")
+      assert.equal(
+        wrapper.find(".upvotes img").props().src,
+        "/static/images/upvote_arrow_on.png"
+      )
     } else {
       assert.notInclude(wrapper.find(".upvotes").props().className, "upvoted")
-      assert.equal(wrapper.find(".upvotes img").props().src, "/static/images/upvote_arrow.png")
+      assert.equal(
+        wrapper.find(".upvotes img").props().src,
+        "/static/images/upvote_arrow.png"
+      )
     }
   }
   ;[true, false].forEach(prevUpvote => {

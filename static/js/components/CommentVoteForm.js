@@ -72,18 +72,32 @@ export default class CommentVoteForm extends React.Component {
           onClick={this.upvote}
           disabled={disabled}
         >
-          <img className="vote-arrow" src={
-            upvoted ? "/static/images/upvote_arrow_on.png" : "/static/images/upvote_arrow.png"
-          } height="16" width="16" />
+          <img
+            className="vote-arrow"
+            src={
+              upvoted
+                ? "/static/images/upvote_arrow_on.png"
+                : "/static/images/upvote_arrow.png"
+            }
+            height="16"
+            width="16"
+          />
         </button>
         <button
           className={`vote downvote-button ${downvoted ? "downvoted" : ""}`}
           onClick={this.downvote}
           disabled={disabled}
         >
-          <img className="vote-arrow" src={
-            downvoted ? "/static/images/downvote_arrow_on.png" : "/static/images/downvote_arrow.png"
-          } height="16" width="16" />
+          <img
+            className="vote-arrow"
+            src={
+              downvoted
+                ? "/static/images/downvote_arrow_on.png"
+                : "/static/images/downvote_arrow.png"
+            }
+            height="16"
+            width="16"
+          />
         </button>
       </div>
     )
