@@ -27,12 +27,6 @@
       align-items: center;
       justify-content: space-between;
       width: 65px;
-
-      .upvoted, .downvoted {
-        &:not(:disabled) {
-          color: $voted-blue;
-        }
-      }
     }
 
     .author-info {

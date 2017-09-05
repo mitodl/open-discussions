@@ -8,6 +8,7 @@ import ReactMarkdown from "react-markdown"
 import PostDisplay from "./PostDisplay"
 import Router from "../Router"
 
+import { wait } from "../lib/util"
 import { formatCommentsCount } from "../lib/posts"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
@@ -97,14 +98,49 @@ describe("PostDisplay", () => {
     assert.equal(to, `/channel/${post.channel_name}/${post.id}`)
   })
 
-  it("should call the toggleUpvote function when it is clicked", () => {
-    let post = makePost()
-    const toggleUpvote = helper.sandbox.stub()
-    const wrapper = renderPostDisplay({
-      post:         post,
-      toggleUpvote: toggleUpvote
+  const assertButton = (wrapper, isUpvote, isVoting) => {
+    assert.equal(wrapper.find(".upvote-button").props().disabled, isVoting)
+    if (isUpvote) {
+      assert.include(wrapper.find(".upvotes").props().className, "upvoted")
+      assert.equal(
+        wrapper.find(".upvotes img").props().src,
+        "/static/images/upvote_arrow_on.png"
+      )
+    } else {
+      assert.notInclude(wrapper.find(".upvotes").props().className, "upvoted")
+      assert.equal(
+        wrapper.find(".upvotes img").props().src,
+        "/static/images/upvote_arrow.png"
+      )
+    }
+  }
+  ;[true, false].forEach(prevUpvote => {
+    it(`should show the correct UI when the upvote 
+    button is clicked when prev state was ${String(prevUpvote)}`, async () => {
+      let post = makePost()
+      post.upvoted = prevUpvote
+      // setting to a function so Flow doesn't complain
+      let resolveUpvote = () => null
+      const toggleUpvote = helper.sandbox.stub().returns(
+        new Promise(resolve => {
+          resolveUpvote = resolve
+        })
+      )
+      const wrapper = renderPostDisplay({
+        post:         post,
+        toggleUpvote: toggleUpvote
+      })
+      assertButton(wrapper, prevUpvote, false)
+      wrapper.find(".upvote-button").simulate("click")
+      assert.isOk(toggleUpvote.calledOnce)
+
+      assertButton(wrapper, !prevUpvote, true)
+      resolveUpvote()
+      post.upvoted = !prevUpvote
+      wrapper.setProps({ post })
+      // wait for promise resolve to trigger state changes
+      await wait(10)
+      assertButton(wrapper, !prevUpvote, false)
     })
-    wrapper.find(".upvote-button").simulate("click")
-    assert.isOk(toggleUpvote.calledOnce)
   })
 })

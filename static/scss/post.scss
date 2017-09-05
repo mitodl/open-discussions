@@ -59,22 +59,12 @@
   }
 }
 
-img.vote-arrow {
-  width: 18px;
-}
-
 .upvote-button, .downvote-button {
   background: none;
   border: none;
   padding: 0;
-
-  &:disabled {
-    color: $border-grey;
-  }
-
-  .votes, .upvote-button {
-    color: $voted-blue;
-  }
+  cursor: pointer;
+  outline: none;
 }
 
 .comments-count {

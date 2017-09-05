@@ -73,7 +73,8 @@ class PostDisplay extends React.Component {
   upvoteDisplay = () => {
     const { post, expanded } = this.props
     const { upvoting } = this.state
-    const upvoteClass = post.upvoted ? "upvoted" : ""
+    const upvoted = post.upvoted !== upvoting
+    const upvoteClass = upvoted ? "upvoted" : ""
 
     return (
       <div className={`upvotes ${upvoteClass} ${expanded ? "expanded" : ""}`}>
@@ -82,7 +83,16 @@ class PostDisplay extends React.Component {
           onClick={this.onToggleUpvote}
           disabled={upvoting}
         >
-          <img className="vote-arrow" src="/static/images/upvote_arrow.png" />
+          <img
+            className="vote-arrow"
+            src={
+              upvoted
+                ? "/static/images/upvote_arrow_on.png"
+                : "/static/images/upvote_arrow.png"
+            }
+            height="16"
+            width="16"
+          />
         </button>
         <span className="votes">
           {post.score}
