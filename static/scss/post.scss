@@ -51,22 +51,12 @@
     width: 35px;
   }
 
-  &.upvoted {
-    .upvote-button {
-      border: 1px solid blue;
-    }
-  }
-
   span.votes {
     display: block;
     color: #6f99be;
     font-weight: 500;
     font-size: 14px;
   }
-}
-
-img.vote-arrow {
-  width: 18px;
 }
 
 .upvote-button, .downvote-button {
