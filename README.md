@@ -129,17 +129,31 @@ in the step above.
 #### 5b) Set up initial channel/post data
 
 The app UI is not currently usable until a channel exists and the logged-in user has a post associated with the channel. 
-The following curl commands will create a channel and a post (replace `USERNAME` and `PASSWORD` with the credentials for the
-superuser you created):
- 
+The following commands will create a channel and a post:
+
+First, create an authentication token (good for one hour) in a django shell.
+ ```python
+from django.contrib.auth.models import User
+from rest_framework_jwt.settings import api_settings
+user = User.objects.get(username=<superuser username>)
+jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+payload = jwt_payload_handler(user)
+payload['roles'] = ['staff']
+token = jwt_encode_handler(payload)
+print(token)
+```
+
+Then use these bash commands with the above token to create a channel and post:
  ```bash
+ TOKEN=<token>
  # Create a channel
- curl -X POST -u USERNAME:PASSWORD "http://<open_discussions_url>:8063/api/v0/channels/" \
+ curl -X POST -H "Authorization: Bearer $TOKEN" "http://<open_discussions_url>:8063/api/v0/channels/" \
    -H "Content-Type: application/json" \
    -d '{"title": "Test Channel", "name": "test_channel", "public_description": "This is a test channel", "channel_type": "public"}'
  
  # Create a post for the channel
- curl -X POST -u USERNAME:PASSWORD "http://<open_discussions_url>:8063/api/v0/channels/test_channel/posts/" \
+ curl -X POST -H "Authorization: Bearer $TOKEN" "http://<open_discussions_url>:8063/api/v0/channels/test_channel/posts/" \
    -H "Content-Type: application/json" \
    -d '{"text": "This is a text post in the test channel", "title": "Test Post", "channel_name": "test_channel"}'
  ```
