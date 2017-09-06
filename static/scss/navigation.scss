@@ -53,15 +53,11 @@
 
 .subscriptions {
   margin: 30px 0;
-  width: 85%;
+  width: 100%;
   padding: 20px 0 20px 0;
   box-sizing: border-box;
   border: 1px solid #cecece;
   border-width: 1px 0;
-
-  @include breakpoint(desktop) {
-    width: 100%;
-  }
 
   .channelname {
     margin: 0 0 0 0;
@@ -70,7 +66,7 @@
       color: rgba(0,0,0,.77);
       display: block;
       font-size: 15px;
-      padding: 13px 20px 13px 14px;
+      padding: 13px 20px 13px 34px;
     }
 
     a:hover {
