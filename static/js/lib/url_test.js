@@ -1,13 +1,7 @@
 // @flow
 import { assert } from "chai"
 
-import {
-  channelURL,
-  frontPageURL,
-  newPostURL,
-  postDetailURL,
-  getChannelNameFromPathname
-} from "./url"
+import { channelURL, frontPageURL, newPostURL, postDetailURL } from "./url"
 
 describe("url helper functions", () => {
   describe("channelURL", () => {
@@ -34,22 +28,6 @@ describe("url helper functions", () => {
   describe("frontPageURL", () => {
     it("should return a url for the front page", () => {
       assert.equal(frontPageURL(), "/")
-    })
-  })
-
-  describe("getChannelNameFromPathname", () => {
-    it("should return a channel", () => {
-      [
-        "/channel/foobar/",
-        "/channel/foobar",
-        "/channel/foobar/baz/"
-      ].forEach(channel => {
-        assert.equal("foobar", getChannelNameFromPathname(channel))
-      })
-    })
-
-    it("should return null otherwise", () => {
-      assert.equal(null, getChannelNameFromPathname(""))
     })
   })
 })

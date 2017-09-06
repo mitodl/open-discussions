@@ -24,7 +24,7 @@ describe("Navigation", () => {
     it("should show create post link if channelName is in URL", () => {
       let wrapper = renderComponent({
         ...defaultProps,
-        pathname: "/channel/foobar"
+        channelName: "foobar"
       })
       let link = wrapper.find(Link)
       assert.equal(link.props().to, newPostURL("foobar"))
