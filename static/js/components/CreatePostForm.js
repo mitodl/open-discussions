@@ -52,7 +52,7 @@ export default class CreatePostForm extends React.Component {
               </div>
             </div>
             <div className="row">
-            <label>Title</label>
+              <label>Title</label>
               <input
                 type="text"
                 placeholder=""
