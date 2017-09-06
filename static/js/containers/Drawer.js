@@ -63,11 +63,6 @@ class Drawer extends React.Component {
         ref={div => (this.drawerRoot = div)}
       >
         <nav className="mdc-temporary-drawer__drawer">
-          <header className="mdc-temporary-drawer__header">
-            <div className="mdc-temporary-drawer__header-content">
-              Open Discussions
-            </div>
-          </header>
           <nav className="mdc-temporary-drawer__content mdc-list">
             <Navigation
               subscribedChannels={subscribedChannels}

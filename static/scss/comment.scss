@@ -14,10 +14,13 @@
 
       &.vote-reply {
         width: 110px;
+        margin-top: -2px;
       }
 
       p {
         margin: 0 0 15px 0;
+        color: rgba(0,0,0,.77);
+        line-height: 1.4;
       }
     }
 
@@ -27,6 +30,12 @@
       align-items: center;
       justify-content: space-between;
       width: 65px;
+
+      .score {
+        font-weight: 500;
+        font-size: 16px;
+        color: #555;
+      }
     }
 
     .author-info {
@@ -38,11 +47,14 @@
 
       .author-name {
         padding-right: 4px;
+        font-weight: 500;
+        font-size: 15px;
       }
     }
 
     .replies {
       border-left: 1px solid #e0e0e0;
+      margin-top: 28px;
     }
 
     .replies > .comment {
@@ -51,13 +63,14 @@
   }
 
   .reply-button {
-    font-size: 0.8em;
+    font-size: .9em;
+    font-weight: 500;
   }
 }
 
 .reply-form {
   width: 100%;
-  padding-top: 10px;
+  padding: 10px 0;
 
   .form-item {
     margin: 0 0 12px 0;

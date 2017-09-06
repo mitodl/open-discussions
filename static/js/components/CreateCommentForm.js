@@ -58,7 +58,9 @@ const commentForm = (
           onChange={onUpdate}
         />
       </div>
-      <button type="submit">Submit</button>
+      <button type="submit" className="blue-button">
+        Submit
+      </button>
       {isComment
         ? <a
           href="#"

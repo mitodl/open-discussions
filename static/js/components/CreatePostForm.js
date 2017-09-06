@@ -51,10 +51,11 @@ export default class CreatePostForm extends React.Component {
                 New link post
               </div>
             </div>
-            <div className="title row">
+            <div className="titlefield row">
+              <label>Title</label>
               <input
                 type="text"
-                placeholder="Title"
+                placeholder=""
                 name="title"
                 value={title}
                 onChange={onUpdate}
@@ -62,26 +63,28 @@ export default class CreatePostForm extends React.Component {
             </div>
             {isText
               ? <div className="text row">
+                <label>Type Your Post Here</label>
                 <textarea
-                  placeholder="Type your post here..."
+                  placeholder=""
                   name="text"
                   value={text}
                   onChange={onUpdate}
                 />
               </div>
               : <div className="url row">
+                <label>Link URL</label>
                 <input
                   type="url"
-                  placeholder="URL"
+                  placeholder="www.example.com"
                   name="url"
                   value={url}
                   onChange={onUpdate}
                 />
               </div>}
-            <div className="channel row">
-              Posting to {channel.title}
+            <div className="posting-to-channel row">
+              You are posting to {channel.title}
             </div>
-            <div className="row">
+            <div className="posting-policy row">
               <span>
                 Please be mindful of{" "}
                 <a href="#">MIT Discussion content policy</a> and practice good

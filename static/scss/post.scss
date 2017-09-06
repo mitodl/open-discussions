@@ -25,6 +25,11 @@
     font-size: 14px;
     color: $font-grey;
     margin: 0 0 8px;
+
+    a {
+      font-weight: 500;
+      font-size: 15px;
+    }
   }
 
   .num-comments {
@@ -37,13 +42,32 @@
   .summary {
     overflow: hidden;
   }
+
+  .text-content {
+    color: rgba(0,0,0,.77);
+    line-height: 1.4;
+
+  }
+}
+
+.expanded {
+
+  .post-title {
+    font-size: 20px;
+    font-weight: 400;
+    margin: 7px 0 9px;
+
+    a {
+      color: rgba(0,0,0,.87);
+    }
+  }
 }
 
 .upvotes {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 60px;
+  min-width: 50px;
 
   &.expanded {
     flex-direction: row;
@@ -53,9 +77,9 @@
 
   span.votes {
     display: block;
-    color: #6f99be;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 16px;
+    color: #555;
   }
 }
 
