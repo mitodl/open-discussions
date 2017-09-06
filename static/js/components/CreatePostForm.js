@@ -51,7 +51,7 @@ export default class CreatePostForm extends React.Component {
                 New link post
               </div>
             </div>
-            <div className="row">
+            <div className="titlefield row">
               <label>Title</label>
               <input
                 type="text"

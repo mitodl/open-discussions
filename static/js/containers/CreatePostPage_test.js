@@ -54,7 +54,7 @@ describe("CreatePostPage", () => {
         const text = "Text"
         const url = "http://url.example.com"
         wrapper
-          .find(".title input")
+          .find(".titlefield input")
           .simulate("change", makeEvent("title", title))
 
         if (!isText) {
