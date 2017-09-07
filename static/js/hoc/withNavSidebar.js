@@ -7,14 +7,14 @@ import Navigation from "../components/Navigation"
 const withNavSidebar = (WrappedComponent: Class<React.Component<*, *, *>>) => {
   class WithNavSidebar extends React.Component {
     render() {
-      const { subscribedChannels, channelName } = this.props
+      const { subscribedChannels, location: { pathname } } = this.props
 
       return (
         <div className="content">
           <Sidebar>
             <Navigation
               subscribedChannels={subscribedChannels}
-              channelName={channelName}
+              pathname={pathname}
             />
           </Sidebar>
           <div className="main-content">

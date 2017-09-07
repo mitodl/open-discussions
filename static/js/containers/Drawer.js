@@ -24,8 +24,7 @@ class Drawer extends React.Component {
     location: Location,
     dispatch: Dispatch,
     showDrawer: boolean,
-    subscribedChannels: Array<Channel>,
-    channelName?: string
+    subscribedChannels: Array<Channel>
   }
 
   componentDidMount() {
@@ -55,7 +54,7 @@ class Drawer extends React.Component {
   }
 
   render() {
-    const { subscribedChannels, channelName } = this.props
+    const { subscribedChannels, location: { pathname } } = this.props
 
     return (
       <aside
@@ -66,7 +65,7 @@ class Drawer extends React.Component {
           <nav className="mdc-temporary-drawer__content mdc-list">
             <Navigation
               subscribedChannels={subscribedChannels}
-              channelName={channelName}
+              pathname={pathname}
             />
           </nav>
         </nav>
