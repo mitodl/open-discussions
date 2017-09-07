@@ -3,6 +3,7 @@
 from rest_framework.generics import (
     ListAPIView,
     ListCreateAPIView,
+    RetrieveDestroyAPIView,
     RetrieveUpdateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
@@ -13,6 +14,7 @@ from channels.serializers import (
     ChannelSerializer,
     CommentSerializer,
     PostSerializer,
+    SubscriberSerializer,
 )
 from open_discussions.permissions import JwtIsStaffOrReadonlyPermission
 
@@ -105,3 +107,29 @@ class FrontPageView(ListAPIView):
         """Get generator for front page posts"""
         api = Api(user=self.request.user)
         return api.front_page()
+
+
+class SubscribeView(RetrieveUpdateAPIView):
+    """
+    View to retrieve and remove subscriber in channels
+    """
+    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
+    serializer_class = SubscriberSerializer
+
+    def get_object(self):
+        """subscribe user"""
+        api = Api(user=self.request.user)
+        return api.subscribe(self.kwargs['channel_name'])
+
+
+class UnSubscribView(RetrieveUpdateAPIView):
+    """
+    View to retrieve and remove subscriber in channels
+    """
+    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
+    serializer_class = SubscriberSerializer
+
+    def get_object(self):
+        """unsub user"""
+        api = Api(user=self.request.user)
+        return api.unsubscribe(self.kwargs['channel_name'])
