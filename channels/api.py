@@ -415,3 +415,30 @@ class Api:
             praw.models.listing.generator.ListingGenerator: a generator representing the contributors in the channel
         """
         return self.get_channel(channel_name).contributor()
+
+    def add_moderator(self, moderator_name, channel_name):
+        """
+
+        :param moderator_name:
+        :param channel_name:
+        :return:
+        """
+        try:
+            user = User.objects.get(username=moderator_name)
+        except User.DoesNotExist:
+            raise Exception("User {} does not exist".format(moderator_name))
+
+        self.get_channel(channel_name).moderator.add(user)
+
+        return Redditor(self.reddit, name=moderator_name)
+
+    def remove_moderator(self, moderator_name, channel_name):
+        try:
+            user = User.objects.get(username=moderator_name)
+        except User.DoesNotExist:
+            raise Exception("User {} does not exist".format(moderator_name))
+
+        self.get_channel(channel_name).moderator.remove(user)
+
+    def list_moderators(self, channel_name):
+        self.get_channel(channel_name).moderator()

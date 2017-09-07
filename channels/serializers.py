@@ -16,6 +16,7 @@ from channels.api import (
     VALID_CHANNEL_TYPES,
 )
 
+User = get_user_model()
 
 User = get_user_model()
 
@@ -52,6 +53,18 @@ class ChannelSerializer(serializers.Serializer):
             kwargs['public_description'] = validated_data['public_description']
 
         return api.update_channel(name=name, **kwargs)
+
+
+class ModeratorSerializer(serializers.Serializer):
+    """Serializer for Moderators"""
+    name = serializers.CharField()
+
+    def create(self, validated_data):
+        api = Api(user=self.context['request'].user)
+        channel_name = self.context['view'].kwargs['channel_name']
+        moderator_name = self.context['view'].kwargs['moderator_name']
+
+        return api.add_moderator(moderator_name, channel_name)
 
 
 class WriteableSerializerMethodField(serializers.SerializerMethodField):

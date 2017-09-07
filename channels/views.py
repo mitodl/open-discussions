@@ -7,6 +7,7 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveDestroyAPIView,
     RetrieveUpdateAPIView,
+    RetrieveDestroyAPIView,
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.exceptions import NotFound
@@ -20,6 +21,7 @@ from channels.serializers import (
     CommentSerializer,
     ContributorSerializer,
     PostSerializer,
+    ModeratorSerializer,
 )
 from open_discussions.permissions import JwtIsStaffOrReadonlyPermission
 
@@ -48,6 +50,37 @@ class ChannelDetailView(RetrieveUpdateAPIView):
         """Get channel referenced by API"""
         api = Api(user=self.request.user)
         return api.get_channel(self.kwargs['channel_name'])
+
+
+class ModeratorListView(ListCreateAPIView):
+    """
+    View for listing and adding moderators
+    """
+    serializer_class = ModeratorSerializer
+
+    def get_queryset(self):
+        """Get """
+        api = Api(user=self.request.user)
+        channel_name = self.kwargs['channel_name']
+        return api.list_moderators(channel_name)
+
+
+class ModeratorDetailView(RetrieveDestroyAPIView):
+    """
+    View to retrieve and remove moderators
+    """
+    def get_object(self):
+        """Get moderator for the channel"""
+        api = Api(user=self.request.user)
+        contributor_name = self.kwargs['contributor_name']
+
+        return Redditor(api.reddit, name=contributor_name)
+
+    def perform_destroy(self, moderator):
+        """Remove moderator in a channel"""
+        api = Api(user=self.request.user)
+        channel_name = self.kwargs['channel_name']
+        api.remove_moderator(moderator.name, channel_name)
 
 
 class PostListView(ListCreateAPIView):

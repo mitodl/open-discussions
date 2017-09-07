@@ -9,6 +9,8 @@ from channels.views import (
     ContributorListView,
     ContributorDetailView,
     FrontPageView,
+    ModeratorDetailView,
+    ModeratorListView,
     PostDetailView,
     PostListView,
 )
@@ -30,6 +32,16 @@ urlpatterns = [
         r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/contributors/(?P<contributor_name>[A-Za-z0-9_]+)/$',
         ContributorDetailView.as_view(),
         name='contributor-detail',
+    ),
+    url(
+        r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/moderators/$',
+        ModeratorListView.as_view(),
+        name='moderator-list',
+    ),
+    url(
+        r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/moderators/(?P<moderator_name>[A-Za-z0-9_]+)/$',
+        ModeratorDetailView.as_view(),
+        name='moderator-detail',
     ),
     url(
         r'api/v0/posts/(?P<post_id>[A-Za-z0-9_]+)/$',
