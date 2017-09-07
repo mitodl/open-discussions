@@ -81,9 +81,6 @@ export default class CreatePostForm extends React.Component {
                   onChange={onUpdate}
                 />
               </div>}
-            <div className="posting-to-channel row">
-              You are posting to {channel.title}
-            </div>
             <div className="posting-policy row">
               <span>
                 Please be mindful of{" "}

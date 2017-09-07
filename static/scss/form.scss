@@ -46,9 +46,9 @@ label {
   display: block;
   margin: 0 0 6px 0;
   font-family: roboto, helvetica, arial, sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   font-size: 15px;
-  color: #666;
+  color: #777;
 }
 
 label.radiolabel {
@@ -63,13 +63,18 @@ input[type=submit], button[type=submit], button.cancel {
   background-color: $button-blue;
   border: none;
   color: white;
-  padding: 10px 18px;
   text-decoration: none;
   margin: 0 10px 5px 0;
   cursor: pointer;
-  font-size: 16px;
   border-radius: 2px;
   font-weight: 400;
+  padding: 9px 16px;
+  font-size: 14px;
+
+  &:hover {
+    box-shadow: 2px 3px 5px 0px rgba(0, 0, 0, 0.2);
+    transition: none;
+  }
 }
 
 button.cancel {

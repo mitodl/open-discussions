@@ -31,10 +31,10 @@ export default class Toolbar extends React.Component {
               >
                 menu
               </a>
-              <a href="/" className="mitlogo">
+              <a href="http://www.mit.edu" target="_blank" className="mitlogo">
                 <img src="/static/images/mit-logo-transparent3.svg" />
               </a>
-              <span className="mdc-toolbar__title">Open Discussions</span>
+              <a href="/" className="mdc-toolbar__title">Open Discussions</a>
             </section>
           </div>
         </header>

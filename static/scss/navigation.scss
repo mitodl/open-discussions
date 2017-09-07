@@ -43,11 +43,16 @@
     width: 87%;
     height: 48px;
     line-height: 48px;
-    font-size: 15px;
+    font-size: 16px;
     text-transform: none;
     font-weight: 500;
     padding: 0 5px;
+    box-shadow: none;
+  }
 
+  .mdc-button:hover {
+    box-shadow: 2px 3px 5px 0px rgba(0, 0, 0, 0.2);
+    transition: none;
   }
 }
 
