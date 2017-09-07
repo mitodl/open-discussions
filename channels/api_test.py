@@ -319,3 +319,12 @@ def test_list_contributors(mock_client):
     contributors = client.list_contributors('foo_channel_name')
     mock_client.subreddit.return_value.contributor.assert_called_once_with()
     assert mock_client.subreddit.return_value.contributor.return_value == contributors
+
+
+def test_add_moderator(mock_client):
+    """Test add moderator"""
+    client = api.Api(UserFactory.create())
+    moderator = UserFactory.create()
+    redditor = client.add_moderator(moderator.username, 'channel_test_name')
+    mock_client.subreddit.return_value.moderator.add.assert_called_once_with(moderator)
+    assert redditor.name == moderator.username

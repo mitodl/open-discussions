@@ -18,8 +18,6 @@ from channels.api import (
 
 User = get_user_model()
 
-User = get_user_model()
-
 
 class ChannelSerializer(serializers.Serializer):
     """Serializer for channels"""

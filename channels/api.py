@@ -418,10 +418,14 @@ class Api:
 
     def add_moderator(self, moderator_name, channel_name):
         """
+        Add a user to moderators for the channel
 
-        :param moderator_name:
-        :param channel_name:
-        :return:
+        Args:
+            moderator_name(str): username of the user
+            channel_name(str): name of the channel
+
+        Returns:
+            praw.models.Redditor: the reddit representation of the user
         """
         try:
             user = User.objects.get(username=moderator_name)
@@ -433,6 +437,13 @@ class Api:
         return Redditor(self.reddit, name=moderator_name)
 
     def remove_moderator(self, moderator_name, channel_name):
+        """
+        Remove moderator from a channel
+
+        Args:
+            moderator_name(str): username of the user
+            channel_name(str): name of the channel
+        """
         try:
             user = User.objects.get(username=moderator_name)
         except User.DoesNotExist:
@@ -441,4 +452,13 @@ class Api:
         self.get_channel(channel_name).moderator.remove(user)
 
     def list_moderators(self, channel_name):
+        """
+        Returns a list of moderators for the channel
+
+        Args:
+            channel_name(str): name of the channel
+
+        Returns:
+            praw.models.listing.generator.ListingGenerator: a generator representing the contributors in the channel
+        """
         self.get_channel(channel_name).moderator()
