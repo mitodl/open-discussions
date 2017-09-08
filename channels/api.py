@@ -1,4 +1,5 @@
 """Channels APIs"""
+# pylint: disable=R0904
 from urllib.parse import urljoin
 
 import requests

@@ -7,7 +7,6 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveDestroyAPIView,
     RetrieveUpdateAPIView,
-    RetrieveDestroyAPIView,
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.exceptions import NotFound

@@ -332,7 +332,6 @@ def test_add_moderator(mock_client):
 
 def test_add_moderator_no_user(mock_client):
     """Test add moderator where user does not exist"""
-
     client = api.Api(UserFactory.create())
     with pytest.raises(NotFound):
         client.add_moderator('foo_username', 'foo_channel_name')
