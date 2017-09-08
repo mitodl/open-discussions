@@ -430,7 +430,7 @@ class Api:
         try:
             user = User.objects.get(username=moderator_name)
         except User.DoesNotExist:
-            raise Exception("User {} does not exist".format(moderator_name))
+            raise NotFound("User {} does not exist".format(moderator_name))
 
         self.get_channel(channel_name).moderator.add(user)
 
@@ -447,7 +447,7 @@ class Api:
         try:
             user = User.objects.get(username=moderator_name)
         except User.DoesNotExist:
-            raise Exception("User {} does not exist".format(moderator_name))
+            raise NotFound("User {} does not exist".format(moderator_name))
 
         self.get_channel(channel_name).moderator.remove(user)
 
@@ -461,4 +461,4 @@ class Api:
         Returns:
             praw.models.listing.generator.ListingGenerator: a generator representing the contributors in the channel
         """
-        self.get_channel(channel_name).moderator()
+        return self.get_channel(channel_name).moderator()
