@@ -328,3 +328,21 @@ def test_add_moderator(mock_client):
     redditor = client.add_moderator(moderator.username, 'channel_test_name')
     mock_client.subreddit.return_value.moderator.add.assert_called_once_with(moderator)
     assert redditor.name == moderator.username
+
+
+def test_remove_moderator(mock_client):
+    """Test remove moderator"""
+    client = api.Api(UserFactory.create())
+    moderator = UserFactory.create()
+    client.remove_moderator(moderator.username, 'channel_test_name')
+    mock_client.subreddit.return_value.moderator.remove.assert_called_once_with(moderator)
+    assert mock_client.subreddit.return_value.moderator.return_value is None
+
+
+def test_list_moderator(mock_client):
+    """Test list moderator"""
+    client = api.Api(UserFactory.create())
+    moderators = client.list_moderators('channel_test_name')
+
+    mock_client.subreddit.return_value.moderator.assert_called_once_with()
+    assert mock_client.subreddit.return_value.moderator.return_value == moderators
