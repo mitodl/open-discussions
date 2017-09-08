@@ -16,6 +16,7 @@ describe("posts factories", () => {
       assert.isNull(post.url)
       assert.isString(post.created)
       assert.isNumber(post.num_comments)
+      assert.isString(post.profile_image)
     })
 
     it("should make a URL post", () => {

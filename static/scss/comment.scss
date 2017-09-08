@@ -1,10 +1,17 @@
 .comments {
   .top-level-comment {
-    padding: 0 15px 0 23px;
+    padding: 0 15px 0 4px;
   }
 
   .comment {
     margin: 10px 0;
+    display: flex;
+    flex-direction: row;
+
+    .comment-contents {
+      padding-left: 17px;
+      width: 100%;
+    }
 
     .row {
       display: flex;
@@ -54,11 +61,10 @@
 
     .replies {
       border-left: 1px solid #e0e0e0;
-      margin-top: 28px;
     }
 
     .replies > .comment {
-      padding-left: 25px;
+      padding-left: 15px;
     }
   }
 

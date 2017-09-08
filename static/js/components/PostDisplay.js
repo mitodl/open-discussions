@@ -108,6 +108,9 @@ class PostDisplay extends React.Component {
       <div className={`post-summary ${expanded ? "expanded" : ""}`}>
         {expanded ? null : this.upvoteDisplay()}
         <div className="summary">
+          {expanded
+            ? <img className="profile-image" src={post.profile_image} />
+            : null}
           <div className="post-title">
             {postTitle(post)}
           </div>

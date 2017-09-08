@@ -68,7 +68,13 @@ describe("CommentTree", () => {
       firstComment.find(ReactMarkdown).first().props().source,
       comments[0].text
     )
-    assert.lengthOf(firstComment.find("img"), 0)
+    assert.lengthOf(firstComment.find(".row img"), 0)
+  })
+
+  it("should render a profile image", () => {
+    let wrapper = renderCommentTree()
+    let { src } = wrapper.find(".profile-image").at(0).props()
+    assert.equal(src, comments[0].profile_image)
   })
 
   it("should put a className on replies, to allow for indentation", () => {

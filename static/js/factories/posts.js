@@ -12,16 +12,17 @@ export const makePost = (
   channelName: string = casual.word
 ): Post => ({
   // $FlowFixMe: incr.next().value is never undefined but Flow thinks it may be
-  id:           `post${incr.next().value}`,
-  title:        casual.sentence,
-  score:        Math.round(Math.random() * 15),
-  upvoted:      Math.random() < 0.5,
-  author_id:    `justareddituser${String(Math.random())}`,
-  text:         isURLPost ? null : casual.text,
-  url:          isURLPost ? casual.url : null,
-  created:      casual.moment.format(),
-  num_comments: Math.round(Math.random() * 10),
-  channel_name: channelName
+  id:            `post${incr.next().value}`,
+  title:         casual.sentence,
+  score:         Math.round(Math.random() * 15),
+  upvoted:       Math.random() < 0.5,
+  author_id:     `justareddituser${String(Math.random())}`,
+  text:          isURLPost ? null : casual.text,
+  url:           isURLPost ? casual.url : null,
+  created:       casual.moment.format(),
+  num_comments:  Math.round(Math.random() * 10),
+  channel_name:  channelName,
+  profile_image: casual.url
 })
 
 export const makeChannelPostList = (channelName: string = casual.word) =>

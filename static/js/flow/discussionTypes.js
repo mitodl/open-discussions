@@ -28,6 +28,7 @@ export type Post = {
   created:       string,
   num_comments:  number,
   channel_name:  string,
+  profile_image: string,
 }
 
 export type PostForm = {
@@ -44,15 +45,16 @@ export type CreatePostPayload = {
 };
 
 export type Comment = {
-  id:        string,
-  post_id:   string,
-  text:      string,
-  score:     number,
-  upvoted:   boolean,
-  downvoted: boolean,
-  created:   string,
-  replies:   Array<Comment>,
-  author_id: string,
+  id:            string,
+  post_id:       string,
+  text:          string,
+  score:         number,
+  upvoted:       boolean,
+  downvoted:     boolean,
+  created:       string,
+  replies:       Array<Comment>,
+  author_id:     string,
+  profile_image: string,
 }
 
 export type CommentForm = {

@@ -9,15 +9,16 @@ const incr = incrementer()
 
 export const makeComment = (post: Post): Comment => {
   const comment = {
-    id:        String(incr.next().value),
-    post_id:   post.id,
-    text:      casual.text,
-    author_id: casual.username,
-    score:     casual.integer(-50, 100),
-    upvoted:   casual.coin_flip,
-    downvoted: casual.coin_flip,
-    created:   casual.moment.format(),
-    replies:   []
+    id:            String(incr.next().value),
+    post_id:       post.id,
+    text:          casual.text,
+    author_id:     casual.username,
+    score:         casual.integer(-50, 100),
+    upvoted:       casual.coin_flip,
+    downvoted:     casual.coin_flip,
+    created:       casual.moment.format(),
+    replies:       [],
+    profile_image: casual.url
   }
 
   if (comment.upvoted && comment.downvoted) {

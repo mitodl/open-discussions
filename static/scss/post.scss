@@ -41,6 +41,11 @@
 
   .summary {
     overflow: hidden;
+
+    img {
+      float: left;
+      margin-right: 15px;
+    }
   }
 
   .text-content {

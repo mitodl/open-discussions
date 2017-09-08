@@ -48,44 +48,47 @@ const renderComment = R.curry(
 
     return (
       <div className="comment" key={comment.id}>
-        <div className="author-info">
-          <a className="author-name">
-            {comment.author_id}
-          </a>
+        <img className="profile-image" src={comment.profile_image} />
+        <div className="comment-contents">
+          <div className="author-info">
+            <a className="author-name">
+              {comment.author_id}
+            </a>
+            <div>
+              {moment(comment.created).fromNow()}
+            </div>
+          </div>
+          <div className="row">
+            <ReactMarkdown
+              disallowedTypes={["Image"]}
+              source={comment.text}
+              escapeHtml
+            />
+          </div>
+          <div className="row vote-reply">
+            <CommentVoteForm
+              comment={comment}
+              upvote={upvote}
+              downvote={downvote}
+            />
+            <div
+              className="reply-button"
+              onClick={e => {
+                beginReply(formKey, initialValue, e)
+              }}
+            >
+              <a href="#">Reply</a>
+            </div>
+          </div>
           <div>
-            {moment(comment.created).fromNow()}
+            <ReplyToCommentForm forms={forms} comment={comment} />
           </div>
-        </div>
-        <div className="row">
-          <ReactMarkdown
-            disallowedTypes={["Image"]}
-            source={comment.text}
-            escapeHtml
-          />
-        </div>
-        <div className="row vote-reply">
-          <CommentVoteForm
-            comment={comment}
-            upvote={upvote}
-            downvote={downvote}
-          />
-          <div
-            className="reply-button"
-            onClick={e => {
-              beginReply(formKey, initialValue, e)
-            }}
-          >
-            <a href="#">Reply</a>
+          <div className="replies">
+            {R.map(
+              renderComment(forms, upvote, downvote, beginReply, depth + 1),
+              comment.replies
+            )}
           </div>
-        </div>
-        <div>
-          <ReplyToCommentForm forms={forms} comment={comment} />
-        </div>
-        <div className="replies">
-          {R.map(
-            renderComment(forms, upvote, downvote, beginReply, depth + 1),
-            comment.replies
-          )}
         </div>
       </div>
     )

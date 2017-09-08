@@ -1,5 +1,7 @@
 """Views for REST APIs for channels"""
 
+from functools import lru_cache
+from django.contrib.auth import get_user_model
 from praw.models.reddit.redditor import Redditor
 from rest_framework import status
 from rest_framework.generics import (
@@ -23,6 +25,8 @@ from channels.serializers import (
     ModeratorSerializer,
 )
 from open_discussions.permissions import JwtIsStaffOrReadonlyPermission
+
+User = get_user_model()
 
 
 class ChannelListView(ListCreateAPIView):
@@ -116,10 +120,25 @@ class CommentListView(ListCreateAPIView):
     """
     serializer_class = CommentSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+
+        if self.request.method == 'GET':
+            comments = self.get_queryset()
+            comment_users = User.objects.filter(
+                username__in=[comment.author.name for comment in comments]
+            ).select_related('profile')
+
+            context["profile_images"] = {
+                user.username: user.profile.image_small for user in comment_users
+            }
+        return context
+
+    @lru_cache(maxsize=1)
     def get_queryset(self):
         """Get generator for comments"""
         api = Api(user=self.request.user)
-        return api.list_comments(self.kwargs['post_id'])
+        return list(api.list_comments(self.kwargs['post_id']))
 
 
 class CommentDetailView(RetrieveUpdateDestroyAPIView):

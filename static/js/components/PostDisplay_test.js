@@ -65,6 +65,13 @@ describe("PostDisplay", () => {
     assert.equal(wrapper.find(ReactMarkdown).props().source, string)
   })
 
+  it("should display profile image, if expanded", () => {
+    const post = makePost()
+    const wrapper = renderPostDisplay({ post: post, expanded: true })
+    const { src } = wrapper.find(".summary img").props()
+    assert.equal(src, post.profile_image)
+  })
+
   it("should not display images from markdown", () => {
     const post = makePost()
     post.text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
