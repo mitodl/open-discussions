@@ -30,4 +30,6 @@ class ViewsTest(TestCase):
         assert js_settings == {
             'gaTrackingID': 'fake',
             'public_path': '/static/bundles/',
+            'auth_url': None,
+            'session_url': None,
         }

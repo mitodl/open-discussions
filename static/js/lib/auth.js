@@ -1,0 +1,42 @@
+// @flow
+/* global SETTINGS:false, fetch: false */
+// For mocking purposes we need to use "fetch" defined as a global instead of importing as a local.
+import "isomorphic-fetch"
+import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
+
+const renewSession = async () => {
+  if (SETTINGS.session_url) {
+    return fetch(SETTINGS.session_url, {
+      credentials: "include" // must be "include" for CORS fetch
+    })
+  }
+  return Promise.reject("Session renew url not provided")
+}
+
+const redirectAndReject = async (reason: string) => {
+  // redirect to the authenticating app
+  if (SETTINGS.auth_url) {
+    window.location = SETTINGS.auth_url
+    return Promise.reject(reason)
+  }
+  return Promise.reject("Unable to redirect to authenticating app")
+}
+
+export const fetchWithAuthFailure = async (...args: any) => {
+  try {
+    return await fetchJSONWithCSRF(...args)
+  } catch (_) {
+    try {
+      // renew the session
+      const session = await renewSession()
+      const json = await session.json()
+      if (!json.has_token) {
+        return redirectAndReject("New token was not created")
+      }
+    } catch (_) {
+      return redirectAndReject("Could not renew session")
+    }
+    // try again now that we have a proper auth
+    return fetchJSONWithCSRF(...args)
+  }
+}

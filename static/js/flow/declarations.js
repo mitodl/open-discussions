@@ -4,6 +4,8 @@ declare var SETTINGS: {
   gaTrackingID: string,
   reactGaDebug: boolean,
   public_path: string,
+  auth_url: string|null,
+  session_url: string|null,
   FEATURES: {
     [key: string]: boolean,
   },
