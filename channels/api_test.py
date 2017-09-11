@@ -1,5 +1,7 @@
 """API tests"""
 # pylint: disable=redefined-outer-name
+from urllib.parse import urljoin
+
 import pytest
 from praw.models.reddit.redditor import Redditor
 from rest_framework.exceptions import NotFound
@@ -384,3 +386,19 @@ def test_api_constructor(mocker, settings, verify_ssl):
     assert config.client_id == settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID
     assert config.client_secret == settings.OPEN_DISCUSSIONS_REDDIT_SECRET
     assert config.refresh_token == refresh_token
+
+
+def test_get_or_create_user(mocker, settings):
+    """
+    get_or_create_user will contact our plugin's API to get a refresh token for a user, or to create one
+    """
+    settings.OPEN_DISCUSSIONS_REDDIT_URL = 'http://fake'
+    refresh_token_url = urljoin(settings.OPEN_DISCUSSIONS_REDDIT_URL, '/api/v1/generate_refresh_token')
+    get_session_stub = mocker.patch('channels.api._get_session', autospec=True)
+    expected_token = 'token'
+    get_session_stub.return_value.get.return_value.json.return_value = {'refresh_token': expected_token}
+    username = 'test_user'
+    token = api.get_or_create_user(username)
+    assert token == expected_token
+    get_session_stub.return_value.get.assert_called_once_with(refresh_token_url, params={'username': username})
+    get_session_stub.return_value.get.return_value.json.assert_called_once_with()

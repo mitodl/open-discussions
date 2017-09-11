@@ -33,6 +33,23 @@ CHANNEL_SETTINGS = (
 User = get_user_model()
 
 
+def get_or_create_user(username):
+    """
+    Get or create a user on reddit using our refresh_token plugin
+
+    Args:
+        username (str): The reddit username
+
+    Returns:
+        str: A refresh token for use with praw to authenticate
+    """
+    refresh_token_url = urljoin(settings.OPEN_DISCUSSIONS_REDDIT_URL, '/api/v1/generate_refresh_token')
+
+    session = _get_session()
+    resp = session.get(refresh_token_url, params={'username': username}).json()
+    return resp['refresh_token']
+
+
 def _get_user_credentials(user):
     """
     Get credentials for authenticated user
@@ -43,11 +60,7 @@ def _get_user_credentials(user):
     Returns:
         dict: set of configuration credentials for the user
     """
-    refresh_token_url = urljoin(settings.OPEN_DISCUSSIONS_REDDIT_URL, '/api/v1/generate_refresh_token')
-
-    session = _get_session()
-    resp = session.get(refresh_token_url, params={'username': user.username}).json()
-    refresh_token = resp['refresh_token']
+    refresh_token = get_or_create_user(user.username)
 
     return {
         'client_id': settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID,

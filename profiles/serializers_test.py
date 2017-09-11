@@ -27,7 +27,7 @@ def test_serialize_user(user):
     }
 
 
-def test_serialize_create_user(db):
+def test_serialize_create_user(db, mocker):
     """
     Test creating a user
     """
@@ -38,9 +38,11 @@ def test_serialize_create_user(db):
         'image_medium': 'image_medium',
     }
 
+    get_or_create_user_stub = mocker.patch('profiles.serializers.get_or_create_user')
     user = UserSerializer().create({
         'profile': profile
     })
+    get_or_create_user_stub.assert_called_once_with(user.username)
 
     assert UserSerializer(user).data == {
         'id': user.id,

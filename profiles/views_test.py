@@ -35,7 +35,7 @@ def test_list_users(client, admin_user, staff_jwt_header):
     ]
 
 
-def test_create_user(client, staff_jwt_header):
+def test_create_user(client, staff_jwt_header, mocker):
     """
     Create a user and assert the response
     """
@@ -48,9 +48,11 @@ def test_create_user(client, staff_jwt_header):
             'image_medium': 'image_medium',
         }
     }
+    get_or_create_user_stub = mocker.patch('profiles.serializers.get_or_create_user')
     resp = client.post(url, data=json.dumps(payload), **API_KWARGS, **staff_jwt_header)
     assert resp.status_code == 201
     assert resp.json()['profile'] == payload['profile']
+    get_or_create_user_stub.assert_called_once_with(resp.json()['username'])
 
 
 def test_get_user(client, user, staff_jwt_header):
