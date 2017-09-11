@@ -687,6 +687,17 @@ def test_list_contributors(client, use_betamax, praw_settings):
     assert resp.json() == [{'contributor_name': 'othercontributor'}, {'contributor_name': 'fooadmin'}]
 
 
+def test_list_moderators(client, use_betamax, praw_settings):
+    """
+    List moderators in a channel
+    """
+    client.force_login(UserFactory.create(username='fooadmin'))
+    url = reverse('moderator-list', kwargs={'channel_name': 'test_channel'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [{'moderator_name': 'fooadmin'}]
+
+
 def test_add_contributor(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Adds a contributor to a channel
