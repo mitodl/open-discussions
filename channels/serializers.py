@@ -53,18 +53,6 @@ class ChannelSerializer(serializers.Serializer):
         return api.update_channel(name=name, **kwargs)
 
 
-class ModeratorSerializer(serializers.Serializer):
-    """Serializer for Moderators"""
-    name = serializers.CharField()
-
-    def create(self, validated_data):
-        api = Api(user=self.context['request'].user)
-        channel_name = self.context['view'].kwargs['channel_name']
-        moderator_name = self.context['view'].kwargs['moderator_name']
-
-        return api.add_moderator(moderator_name, channel_name)
-
-
 class WriteableSerializerMethodField(serializers.SerializerMethodField):
     """
     A SerializerMethodField which has been marked as not read_only so that submitted data passed validation.
@@ -323,3 +311,26 @@ class ContributorSerializer(serializers.Serializer):
         api = Api(user=self.context['request'].user)
         channel_name = self.context['view'].kwargs['channel_name']
         return api.add_contributor(validated_data['contributor_name'], channel_name)
+
+
+class ModeratorSerializer(serializers.Serializer):
+    """Serializer for Moderators"""
+    moderator_name = WriteableSerializerMethodField()
+
+    def get_moderator_name(self, instance):
+        """Returns the name for the moderator"""
+        return instance.name
+
+    def validate_moderator_name(self, value):
+        """Validates the moderator name"""
+        if not isinstance(value, str):
+            raise ValidationError("contributor name must be a string")
+        if not User.objects.filter(username=value).exists():
+            raise ValidationError("contributor name is not a valid user")
+        return {'moderator_name': value}
+
+    def create(self, validated_data):
+        api = Api(user=self.context['request'].user)
+        channel_name = self.context['view'].kwargs['channel_name']
+
+        return api.add_moderator(validated_data['moderator_name'], channel_name)
