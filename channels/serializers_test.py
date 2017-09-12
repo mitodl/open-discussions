@@ -14,6 +14,7 @@ from channels.serializers import (
     ChannelSerializer,
     CommentSerializer,
     ContributorSerializer,
+    ModeratorSerializer,
     PostSerializer,
 )
 from open_discussions.factories import UserFactory
@@ -227,3 +228,47 @@ def test_contributor_create():
         }).create({'contributor_name': contributor_user.username})
         assert contributor is contributor_redditor
         api.return_value.add_contributor.assert_called_once_with(contributor_user.username, 'foo_channel')
+
+
+def test_moderator():
+    """Serialize of a redditor-like object"""
+    redditor = Mock(spec=Redditor)
+    # the `name` attribute cannot be configured during the mock object creation
+    redditor.name = 'fooo_username'
+    assert ModeratorSerializer(redditor).data == {'moderator_name': 'fooo_username'}
+
+
+def test_moderator_validate_name_no_string():
+    """validate the input in case the value is not a string"""
+    with pytest.raises(ValidationError) as ex:
+        ModeratorSerializer().validate_moderator_name(None)
+    assert ex.value.args[0] == 'moderator name must be a string'
+
+
+def test_moderator_validate_name_no_valid_user():
+    """validate the input in case the user does not exists in the DB"""
+    with pytest.raises(ValidationError) as ex:
+        ModeratorSerializer().validate_moderator_name('foo_user')
+    assert ex.value.args[0] == 'moderator name is not a valid user'
+
+
+def test_moderator_validate_name():
+    """validate the input"""
+    user = UserFactory.create()
+    assert ModeratorSerializer().validate_moderator_name(user.username) == {'moderator_name': user.username}
+
+
+def test_moderator_create():
+    """Adds a moderator"""
+    user = UserFactory.create()
+    moderator_user = UserFactory.create()
+    moderator_redditor = Mock(spec=Redditor)
+    moderator_redditor.name = moderator_user.username
+    with patch('channels.serializers.Api', autospec=True) as api:
+        api.return_value.add_moderator.return_value = moderator_redditor
+        contributor = ModeratorSerializer(context={
+            "request": Mock(user=user),
+            "view": Mock(kwargs={'channel_name': 'foo_channel'})
+        }).create({'moderator_name': moderator_user.username})
+        assert contributor is moderator_redditor
+        api.return_value.add_moderator.assert_called_once_with(moderator_user.username, 'foo_channel')

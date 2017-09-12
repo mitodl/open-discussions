@@ -324,9 +324,9 @@ class ModeratorSerializer(serializers.Serializer):
     def validate_moderator_name(self, value):
         """Validates the moderator name"""
         if not isinstance(value, str):
-            raise ValidationError("contributor name must be a string")
+            raise ValidationError("moderator name must be a string")
         if not User.objects.filter(username=value).exists():
-            raise ValidationError("contributor name is not a valid user")
+            raise ValidationError("moderator name is not a valid user")
         return {'moderator_name': value}
 
     def create(self, validated_data):
