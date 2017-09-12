@@ -43,6 +43,10 @@ def get_or_create_user(username):
     Returns:
         str: A refresh token for use with praw to authenticate
     """
+    # This is using our custom refresh_token plugin which is installed against
+    # a modified instance of reddit. It registers a new user with a random password if
+    # one does not exist, then obtains an OAuth refresh token for that user. This is then used
+    # with praw to authenticate.
     refresh_token_url = urljoin(settings.OPEN_DISCUSSIONS_REDDIT_URL, '/api/v1/generate_refresh_token')
 
     session = _get_session()
