@@ -434,9 +434,7 @@ class Api:
             raise NotFound("User {} does not exist".format(moderator_name))
 
         self.get_channel(channel_name).moderator.add(user)
-        new_moderator = Api(user)
-        new_moderator.accept_invite(channel_name)
-        del new_moderator
+        Api(user).accept_invite(channel_name)
         return Redditor(self.reddit, name=moderator_name)
 
     def accept_invite(self, channel_name):
