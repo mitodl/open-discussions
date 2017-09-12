@@ -55,7 +55,7 @@ class ModeratorListView(ListCreateAPIView):
     """
     View for listing and adding moderators
     """
-    permission_classes = (IsAuthenticated,  JwtIsStaffOrReadonlyPermission, )
+    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
     serializer_class = ModeratorSerializer
 
     def get_queryset(self):
@@ -69,7 +69,7 @@ class ModeratorDetailView(RetrieveDestroyAPIView):
     """
     View to retrieve and remove moderators
     """
-    permission_classes = (IsAuthenticated,  JwtIsStaffOrReadonlyPermission,)
+    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
     serializer_class = ModeratorSerializer
 
     def get_object(self):

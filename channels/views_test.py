@@ -710,6 +710,18 @@ def test_add_contributor(client, use_betamax, praw_settings, staff_jwt_header):
     assert resp.json() == {'contributor_name': 'othercontributor'}
 
 
+def test_add_moderator(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Adds a moderator to a channel
+    """
+    client.force_login(UserFactory.create(username='fooadmin'))
+    moderator = UserFactory.create(username='othermoderator')
+    url = reverse('moderator-list', kwargs={'channel_name': 'test_channel'})
+    resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json() == {'moderator_name': 'othermoderator'}
+
+
 def test_detail_contributor_error(client, use_betamax, praw_settings):
     """
     Detail of a contributor in a channel in case the user is not a contributor
@@ -743,6 +755,18 @@ def test_remove_contributor(client, use_betamax, praw_settings, staff_jwt_header
     contributor = UserFactory.create(username='othercontributor')
     url = reverse(
         'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': contributor.username})
+    resp = client.delete(url, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+def test_remove_moderator(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Removes a moderator from a channel
+    """
+    client.force_login(UserFactory.create(username='fooadmin'))
+    moderator = UserFactory.create(username='othermoderator')
+    url = reverse(
+        'moderator-detail', kwargs={'channel_name': 'test_channel', 'moderator_name': moderator.username})
     resp = client.delete(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 

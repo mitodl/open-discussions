@@ -1,0 +1,628 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2017-09-12T15:23:01",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=fooadmin"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDLUzU/zdEzJ88kssfSv8HEq9fY2Lo/0iA9MCwvzVdJRUEqtKMgsSi2OzwQpNzYzMACKgXXHl1QWpIKMSEpNLEotAqktTs6HCGmBeEWpaUCNGch2mQalOKY5eSRFBCRWmppFRfkFBZhZWuYG5OeVg3SkpJZlJqfGZ6aAjIVwlGoB7dWWULQAAAA=",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 12 Sep 2017 15:23:02 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=kYlq4xEKXfW7BZ2HFK; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 12-Sep-2019 15:23:02 GMT",
+            "loidcreated=2017-09-12T15%3A23%3A02.828Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 12-Sep-2019 15:23:02 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=fooadmin"
+      }
+    },
+    {
+      "recorded_at": "2017-09-12T15:23:01",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=kYlq4xEKXfW7BZ2HFK; loidcreated=2017-09-12T15%3A23%3A02.828Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=fooadmin"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDLUjcp1MnOKMMtKdjIy0vXQzXLNTCrw9MhILwuPVNJRUEqtKMgsSi2OzwQpNzYzMACKgXXHl1QWpIKMSEpNLEotAqktTs6HCGmBeEWpaUCNGch2GXo4e/vEe1gW5qcF5IVH+OWFlxj7FbuluJYWg3SkpJZlJqfGZ6aAjIVwlGoBMBQ6/bQAAAA=",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 12 Sep 2017 15:23:02 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=fooadmin"
+      }
+    },
+    {
+      "recorded_at": "2017-09-12T15:23:01",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "grant_type=refresh_token&refresh_token=1-1HCKL_H9qofPnWXNnWt3NsFdEus"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "Basic bDlkME1LUGpKcEtLWVE6bW9tcDgtZkJ6elpES3I0dEFNNllSc3dxa09F"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "68"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=kYlq4xEKXfW7BZ2HFK; loidcreated=2017-09-12T15%3A23%3A02.828Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/v1/access_token"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"access_token\": \"1--0i2PvM2mYldv5JgEHfe2kIZ-Ss\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "107"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 12 Sep 2017 15:23:02 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299"
+          ],
+          "x-ratelimit-reset": [
+            "418"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/access_token"
+      }
+    },
+    {
+      "recorded_at": "2017-09-12T15:23:01",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&name=othermoderator&permissions=%2Ball&type=moderator"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 1--0i2PvM2mYldv5JgEHfe2kIZ-Ss"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "67"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=kYlq4xEKXfW7BZ2HFK; loidcreated=2017-09-12T15%3A23%3A02.828Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/r/test_channel/api/friend/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "ISO-8859-1",
+          "string": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n<head>\n <title>Server Error</title>\n\n<script type=\"text/javascript\">\n  debug_base = 'http://reddit.local/_debug';\n  debug_count = 1505141274;\n</script>\n\n<!-- CSS Imports -->\n<link rel=\"stylesheet\" href=\"http://reddit.local/_debug/media/traceback.css\" type=\"text/css\" media=\"screen\" />\n<!-- Pygments highlighting -->\n<style type=\"text/css\">\n.highlight .hll { background-color: #ffffcc }\n.highlight  { background: #f8f8f8; }\n.highlight .c { color: #408080; font-style: italic } /* Comment */\n.highlight .err { border: 1px solid #FF0000 } /* Error */\n.highlight .k { color: #008000; font-weight: bold } /* Keyword */\n.highlight .o { color: #666666 } /* Operator */\n.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */\n.highlight .cp { color: #BC7A00 } /* Comment.Preproc */\n.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */\n.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */\n.highlight .gd { color: #A00000 } /* Generic.Deleted */\n.highlight .ge { font-style: italic } /* Generic.Emph */\n.highlight .gr { color: #FF0000 } /* Generic.Error */\n.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */\n.highlight .gi { color: #00A000 } /* Generic.Inserted */\n.highlight .go { color: #888888 } /* Generic.Output */\n.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */\n.highlight .gs { font-weight: bold } /* Generic.Strong */\n.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */\n.highlight .gt { color: #0044DD } /* Generic.Traceback */\n.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */\n.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */\n.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */\n.highlight .kp { color: #008000 } /* Keyword.Pseudo */\n.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */\n.highlight .kt { color: #B00040 } /* Keyword.Type */\n.highlight .m { color: #666666 } /* Literal.Number */\n.highlight .s { color: #BA2121 } /* Literal.String */\n.highlight .na { color: #7D9029 } /* Name.Attribute */\n.highlight .nb { color: #008000 } /* Name.Builtin */\n.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */\n.highlight .no { color: #880000 } /* Name.Constant */\n.highlight .nd { color: #AA22FF } /* Name.Decorator */\n.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */\n.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */\n.highlight .nf { color: #0000FF } /* Name.Function */\n.highlight .nl { color: #A0A000 } /* Name.Label */\n.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */\n.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */\n.highlight .nv { color: #19177C } /* Name.Variable */\n.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */\n.highlight .w { color: #bbbbbb } /* Text.Whitespace */\n.highlight .mf { color: #666666 } /* Literal.Number.Float */\n.highlight .mh { color: #666666 } /* Literal.Number.Hex */\n.highlight .mi { color: #666666 } /* Literal.Number.Integer */\n.highlight .mo { color: #666666 } /* Literal.Number.Oct */\n.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */\n.highlight .sc { color: #BA2121 } /* Literal.String.Char */\n.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */\n.highlight .s2 { color: #BA2121 } /* Literal.String.Double */\n.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */\n.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */\n.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */\n.highlight .sx { color: #008000 } /* Literal.String.Other */\n.highlight .sr { color: #BB6688 } /* Literal.String.Regex */\n.highlight .s1 { color: #BA2121 } /* Literal.String.Single */\n.highlight .ss { color: #19177C } /* Literal.String.Symbol */\n.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */\n.highlight .vc { color: #19177C } /* Name.Variable.Class */\n.highlight .vg { color: #19177C } /* Name.Variable.Global */\n.highlight .vi { color: #19177C } /* Name.Variable.Instance */\n.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */\n</style>\n\n<link rel=\"stylesheet\" href=\"http://reddit.local/_debug/media/pylons/style/itraceback.css\" type=\"text/css\" media=\"screen\" />\n\n</head>\n\n<body id=\"documentation\" onload=\"switch_display('traceback_data')\">\n<!-- We are only using a table to ensure old browsers see the message correctly -->\n\n<noscript>\n<div style=\"border-bottom: 1px solid #808080\">\n<div style=\"border-bottom: 1px solid #404040\">\n<table width=\"100%\" border=\"0\" cellpadding=\"0\" bgcolor=\"#FFFFE1\"><tr><td>&nbsp;</td><td><span style=\"padding: 0px; margin: 0px; font-family: Tahoma, sans-serif; font-size: 11px\">Warning, your browser does not support JavaScript so you will not be able to use the interactive debugging on this page.</span></td></tr></table>\n</div>\n</div>\n</noscript>\n\n    <!-- Top anchor -->\n    <a name=\"top\"></a>\n\n    <!-- Main Content -->\n    <div id=\"nav-bar\">\n\n        <!-- Section Navigation -->\n        <h4 class=\"invisible\">Section Links</h4>\n\n            <ul id=\"navlist\">\n               <!--   -->\n               <li id=\"source_data_tab\"><a href=\"#source_data\" onclick=\"javascript:return switch_display('source_data');\" accesskey=\"4\" id=\"source_data_link\">Source</a></li>\n               <li id=\"template_data_tab\"><a href=\"#template_data\" onclick=\"javascript:return switch_display('template_data');\" accesskey=\"3\" id=\"template_data_link\">Template</a></li>\n               <li id=\"extra_data_tab\"><a href=\"#extra_data\" onclick=\"javascript:return switch_display('extra_data');\" id=\"extra_data_link\" accesskey=\"2\" >Extra Data</a></li>\n               <li id=\"traceback_data_tab\" class=\"active\"><a href=\"#traceback_data\" onclick=\"javascript:return switch_display('traceback_data');\" id=\"traceback_data_link\" class=\"active\" accesskey=\"1\">Traceback</a></li>\n            </ul>\n    </div>\n    <div id=\"main-content\">\n        <div class=\"hr\"><hr class=\"hr\" /></div>\n        <div class=\"content-padding\">\n            <div id=\"source_data\" class=\"hidden-data\">\n              There is no source code to display. Click a 'view' link in the <a href=\"#traceback_data\" onclick=\"javascript:switch_display('traceback_data')\" id=\"traceback_data_link\" class=\"active\" accesskey=\"1\">Traceback</a> tab to load source code.\n            </div>\n            <div id=\"extra_data\" class=\"hidden-data\">\n                <h1 class=\"first\"><a name=\"content\"></a>Extra Data</h1>\n                <table class=\"variables\">\n<tr class=\"header\"><th colspan=\"2\">CGI Variables</th></tr>\n<tr class=\"odd\"><td>CONTENT_TYPE</td>\n<td><tt>'application/x-www-form-urlencoded'</tt></td></tr>\n<tr class=\"even\"><td>FULLPATH</td>\n<td><tt>'/r/test_channel/api/friend/?raw_json=1'</tt></td></tr>\n<tr class=\"odd\"><td>HTTP_ACCEPT</td>\n<td><tt>'*/*'</tt></td></tr>\n<tr class=\"even\"><td>HTTP_ACCEPT_ENCODING</td>\n<td><tt>'gzip, deflate'</tt></td></tr>\n<tr class=\"odd\"><td>HTTP_AUTHORIZATION</td>\n<td><tt>'bearer 1--0i2PvM2mYldv5JgEHfe2kIZ-Ss'</tt></td></tr>\n<tr class=\"even\"><td>HTTP_CONNECTION</td>\n<td><tt>'close'</tt></td></tr>\n<tr class=\"odd\"><td>HTTP_COOKIE</td>\n<td><tt>'loid=kYlq4xEKXfW7BZ2HFK; loidcreated=2017-09-12T15%3A23%3A02.828Z'</tt></td></tr>\n<tr class=\"even\"><td>HTTP_HOST</td>\n<td><tt>'reddit.local'</tt></td></tr>\n<tr class=\"odd\"><td>HTTP_USER_AGENT</td>\n<td><tt>'MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1'</tt></td></tr>\n<tr class=\"even\"><td>HTTP_X_FORWARDED_FOR</td>\n<td><tt>'192.168.56.1'</tt></td></tr>\n<tr class=\"odd\"><td>HTTP_X_FORWARDED_PROTO</td>\n<td><tt>'https'</tt></td></tr>\n<tr class=\"even\"><td>PATH_INFO</td>\n<td><tt>'/api/friend/'</tt></td></tr>\n<tr class=\"odd\"><td>QUERY_STRING</td>\n<td><tt>'raw_json=1'</tt></td></tr>\n<tr class=\"even\"><td>REDDIT_NAME</td>\n<td><tt>'test_channel'</tt></td></tr>\n<tr class=\"odd\"><td>REMOTE_ADDR</td>\n<td><tt>'127.0.0.1'</tt></td></tr>\n<tr class=\"even\"><td>REQUEST_METHOD</td>\n<td><tt>'POST'</tt></td></tr>\n<tr class=\"odd\"><td>SERVER_NAME</td>\n<td><tt>'0.0.0.0'</tt></td></tr>\n<tr class=\"even\"><td>SERVER_PORT</td>\n<td><tt>'8001'</tt></td></tr>\n<tr class=\"odd\"><td>SERVER_PROTOCOL</td>\n<td><tt>'HTTP/1.1'</tt></td></tr>\n<tr class=\"even\"><td>WANT_RAW_JSON</td>\n<td><tt>True</tt></td></tr>\n</table>\n                <h1 class=\"first\"><a name=\"content\"></a>Extra Data</h1>\n                <table class=\"variables\">\n<tr class=\"header\"><th colspan=\"2\">WSGI Variables</th></tr>\n<tr class=\"odd\"><td>application</td>\n<td><tt>&lt;r2.config.middleware.DomainMiddleware object at 0x7fd4a00e6c50&gt;</tt></td></tr>\n<tr class=\"even\"><td>content_type</td>\n<td><tt>'application/json; charset=UTF-8'</tt></td></tr>\n<tr class=\"odd\"><td>extension</td>\n<td><tt>'json'</tt></td></tr>\n<tr class=\"even\"><td>paste.evalexception</td>\n<td><tt>&lt;weberror.evalexception.EvalException object at 0x7fd4a00e6b10&gt;</tt></td></tr>\n<tr class=\"odd\"><td>paste.evalexception.debug_count</td>\n<td><tt>1505141274</tt></td></tr>\n<tr class=\"even\"><td>paste.httpserver.thread_pool</td>\n<td><tt>&lt;paste.httpserver.ThreadPool object at 0x7fd4cfc73050&gt;</tt></td></tr>\n<tr class=\"odd\"><td>paste.recursive.forward</td>\n<td><tt>&lt;paste.recursive.Forwarder from /&gt;</tt></td></tr>\n<tr class=\"even\"><td>paste.recursive.include</td>\n<td><tt>&lt;paste.recursive.Includer from /&gt;</tt></td></tr>\n<tr class=\"odd\"><td>paste.recursive.include_app_iter</td>\n<td><tt>&lt;paste.recursive.IncluderAppIter from /&gt;</tt></td></tr>\n<tr class=\"even\"><td>paste.recursive.script_name</td>\n<td><tt>''</tt></td></tr>\n<tr class=\"odd\"><td>paste.registry</td>\n<td><tt>&lt;paste.registry.Registry object at 0x7fd47a7ced90&gt;</tt></td></tr>\n<tr class=\"even\"><td>paste.throw_errors</td>\n<td><tt>True</tt></td></tr>\n<tr class=\"odd\"><td>pylons.action_method</td>\n<td><tt>&lt;bound method ApiController.POST_friend of &lt;r2.controllers.api.ApiController object at 0x7fd47a9165d0&gt;&gt;</tt></td></tr>\n<tr class=\"even\"><td>pylons.controller</td>\n<td><tt>&lt;r2.controllers.api.ApiController object at 0x7fd47a9165d0&gt;</tt></td></tr>\n<tr class=\"odd\"><td>pylons.environ_config</td>\n<td><tt>{'session': 'beaker.session', 'cache': 'beaker.cache'}</tt></td></tr>\n<tr class=\"even\"><td>pylons.error_call</td>\n<td><tt>True</tt></td></tr>\n<tr class=\"odd\"><td>pylons.log_debug</td>\n<td><tt>False</tt></td></tr>\n<tr class=\"even\"><td>pylons.pylons</td>\n<td><tt>&lt;pylons.util.PylonsContext object at 0x7fd47a916690&gt;</tt></td></tr>\n<tr class=\"odd\"><td>pylons.routes_dict</td>\n<td><tt>{'action': u'POST_friend', 'controller': u'api', 'action_name': u'friend'}</tt></td></tr>\n<tr class=\"even\"><td>render_style</td>\n<td><tt>'api'</tt></td></tr>\n<tr class=\"odd\"><td>routes.route</td>\n<td><tt>&lt;routes.route.Route object at 0x7fd4a0143cd0&gt;</tt></td></tr>\n<tr class=\"even\"><td>routes.url</td>\n<td><tt>&lt;routes.util.URLGenerator object at 0x7fd479f41a10&gt;</tt></td></tr>\n<tr class=\"odd\"><td>subreddit</td>\n<td><tt>'test_channel'</tt></td></tr>\n<tr class=\"even\"><td>weberror.evalexception</td>\n<td><tt>&lt;weberror.evalexception.EvalException object at 0x7fd4a00e6b10&gt;</tt></td></tr>\n<tr class=\"odd\"><td>webob._body_file</td>\n<td><tt>(&lt;_io.BufferedReader&gt;, &lt;cStringIO.StringI object at 0x7fd479ce6e00&gt;)</tt></td></tr>\n<tr class=\"even\"><td>webob._parsed_cookies</td>\n<td><tt>({u'loid': u'kYlq4xEKXfW7BZ2HFK', u'loidcreated': u'2017-09-12T15%3A23%3A02.828Z'}, 'loid=kYlq4xEKXfW7BZ2HFK; loidcreated=2017-09-12T15%3A23%3A02.828Z')</tt></td></tr>\n<tr class=\"odd\"><td>webob._parsed_post_vars</td>\n<td><tt>(MultiDict([('api_type', u'json'), ('name', u'othermoderator'), ('permissions', u'+all'), ('type', u'moderator')]), &lt;_io.BufferedReader&gt;)</tt></td></tr>\n<tr class=\"even\"><td>webob._parsed_query_vars</td>\n<td><tt>(GET([(u'raw_json', u'1')]), 'raw_json=1')</tt></td></tr>\n<tr class=\"odd\"><td>webob.adhoc_attrs</td>\n<td><tt>{'errors': 'ignore'}</tt></td></tr>\n<tr class=\"even\"><td>webob.is_body_readable</td>\n<td><tt>True</tt></td></tr>\n<tr class=\"odd\"><td>webob.is_body_seekable</td>\n<td><tt>False</tt></td></tr>\n<tr class=\"even\"><td>wsgi process</td>\n<td><tt>'Multithreaded'</tt></td></tr>\n<tr class=\"odd\"><td>wsgiorg.routing_args</td>\n<td><tt>(&lt;routes.util.URLGenerator object at 0x7fd479f41a10&gt;, {'action': u'POST_friend', 'controller': u'api', 'action_name': u'friend'})</tt></td></tr>\n</table>\n            </div>\n            <div id=\"template_data\" class=\"hidden-data\">\n                <p>No Template information available.</p>\n            </div>\n            <div id=\"traceback_data\">\n<div style=\"float: left; width: 100%; padding-bottom: 20px;\">\n<h1 class=\"first\"><a name=\"content\"></a>WebError Traceback:</h1>\n<div class=\"main-exception-bar\">\n  <span class=\"main-exception\" style=\"color: #f00;\">&#8669;</span>\n  <code class=\"main-exception\">AttributeError: 'NoneType' object has no attribute '_id'</code>\n</div>\n<div id=\"formats\">\n   <span class=\"title\">View as: &nbsp;</span> <a id=\"view_short_html\" class=\"active\" href=\"#\">Interactive</a> \n   <a id=\"view_long_html\" href=\"#\">(full)</a> &nbsp;|&nbsp; <a id=\"view_short_text\" href=\"#\">Text</a>  \n   <a id=\"view_long_text\" href=\"#\">(full)</a> &nbsp;|&nbsp; <a id=\"view_short_xml\" href=\"#\">XML</a> \n   <a id=\"view_long_xml\" href=\"#\">(full)</a>\n</div>  \n<div style=\"clear: both;\">\n<div id=\"error-area\" style=\"display: none; background-color: #600; color: #fff; border: 2px solid black\">\n<button onclick=\"return clearError()\">clear this</button>\n<div id=\"error-container\"></div>\n<button onclick=\"return clearError()\">clear this</button>\n</div>\n\n    <div id=\"short_traceback\">\n    <div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py\">r2.lib.validator.validator</span>:<b>253</b> in <code>newfn</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564713104\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.lib.validator.validator:253\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">kw</span> <span class=\"o\">=</span> <span class=\"n\">_make_validated_kw</span><span class=\"p\">(</span><span class=\"n\">fn</span><span class=\"p\">,</span> <span class=\"n\">simple_vals</span><span class=\"p\">,</span> <span class=\"n\">param_vals</span><span class=\"p\">,</span> <span class=\"n\">env</span><span class=\"p\">)</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"n\">response_function</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">fn</span><span class=\"p\">,</span> <span class=\"n\">responder</span><span class=\"p\">,</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">simple_vals</span><span class=\"p\">,</span> <span class=\"n\">param_vals</span><span class=\"p\">,</span> <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">except</span> <span class=\"n\">UserRequiredException</span><span class=\"p\">:</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">responder</span><span class=\"o\">.</span><span class=\"n\">send_failure</span><span class=\"p\">(</span><span class=\"n\">errors</span><span class=\"o\">.</span><span class=\"n\">USER_REQUIRED</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">simple_vals</span><span class=\"p\">,</span> <span class=\"n\">param_vals</span><span class=\"p\">,</span> <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py\">r2.lib.validator.validator</span>:<b>324</b> in <code>validatedForm</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564713392\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.lib.validator.validator:324\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">):</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"n\">_validatedForm</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">self_method</span><span class=\"p\">,</span> <span class=\"n\">responder</span><span class=\"p\">,</span> <span class=\"n\">simple_vals</span><span class=\"p\">,</span> <span class=\"n\">param_vals</span><span class=\"p\">,</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"nd\">@api_validate</span><span class=\"p\">(</span><span class=\"s\">&quot;html&quot;</span><span class=\"p\">,</span> <span class=\"n\">add_api_type_doc</span><span class=\"o\">=</span><span class=\"bp\">True</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py\">r2.lib.validator.validator</span>:<b>304</b> in <code>_validatedForm</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564713464\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.lib.validator.validator:304\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp; <span class=\"c\"># do the actual work</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">val</span> <span class=\"o\">=</span> <span class=\"n\">self_method</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">form</span><span class=\"p\">,</span> <span class=\"n\">responder</span><span class=\"p\">,</span> <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"c\"># add data to the output on some errors</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">val</span> <span class=\"o\">=</span> <span class=\"n\">self_method</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">form</span><span class=\"p\">,</span> <span class=\"n\">responder</span><span class=\"p\">,</span> <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/controllers/api.py\">r2.controllers.api</span>:<b>1177</b> in <code>POST_friend</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564714616\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.controllers.api:1177\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">ban_message</span><span class=\"p\">,</span> <span class=\"n\">duration</span><span class=\"p\">,</span> <span class=\"n\">new</span><span class=\"p\">)</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">elif</span> <span class=\"n\">new</span><span class=\"p\">:</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">notify_user_added</span><span class=\"p\">(</span><span class=\"nb\">type</span><span class=\"p\">,</span> <span class=\"n\">c</span><span class=\"o\">.</span><span class=\"n\">user</span><span class=\"p\">,</span> <span class=\"n\">friend</span><span class=\"p\">,</span> <span class=\"n\">container</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"nd\">@validatedForm</span><span class=\"p\">(</span><span class=\"n\">VGold</span><span class=\"p\">(),</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">notify_user_added</span><span class=\"p\">(</span><span class=\"nb\">type</span><span class=\"p\">,</span> <span class=\"n\">c</span><span class=\"o\">.</span><span class=\"n\">user</span><span class=\"p\">,</span> <span class=\"n\">friend</span><span class=\"p\">,</span> <span class=\"n\">container</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/lib/system_messages.py\">r2.lib.system_messages</span>:<b>109</b> in <code>notify_user_added</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564715480\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.lib.system_messages:109\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">item</span><span class=\"p\">,</span> <span class=\"n\">inbox_rel</span> <span class=\"o\">=</span> <span class=\"n\">Message</span><span class=\"o\">.</span><span class=\"n\">_new</span><span class=\"p\">(</span><span class=\"n\">modmail_author</span><span class=\"p\">,</span> <span class=\"n\">target</span><span class=\"p\">,</span> <span class=\"n\">subject</span><span class=\"p\">,</span> <span class=\"n\">msg</span><span class=\"p\">,</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">request</span><span class=\"o\">.</span><span class=\"n\">ip</span><span class=\"p\">,</span> <span class=\"n\">sr</span><span class=\"o\">=</span><span class=\"n\">target</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">queries</span><span class=\"o\">.</span><span class=\"n\">new_message</span><span class=\"p\">(</span><span class=\"n\">item</span><span class=\"p\">,</span> <span class=\"n\">inbox_rel</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">request</span><span class=\"o\">.</span><span class=\"n\">ip</span><span class=\"p\">,</span> <span class=\"n\">sr</span><span class=\"o\">=</span><span class=\"n\">target</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/models/link.py\">r2.models.link</span>:<b>2057</b> in <code>_new</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564712816\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.models.link:2057\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"kn\">from</span> <span class=\"nn\">r2.lib.message_to_email</span> <span class=\"kn\">import</span> <span class=\"n\">queue_modmail_email</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">m</span> <span class=\"o\">=</span> <span class=\"n\">Message</span><span class=\"p\">(</span><span class=\"n\">subject</span><span class=\"o\">=</span><span class=\"n\">subject</span><span class=\"p\">,</span> <span class=\"n\">body</span><span class=\"o\">=</span><span class=\"n\">body</span><span class=\"p\">,</span> <span class=\"n\">author_id</span><span class=\"o\">=</span><span class=\"n\">author</span><span class=\"o\">.</span><span class=\"n\">_id</span><span class=\"p\">,</span> <span class=\"n\">new</span><span class=\"o\">=</span><span class=\"bp\">True</span><span class=\"p\">,</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">ip</span><span class=\"o\">=</span><span class=\"n\">ip</span><span class=\"p\">,</span> <span class=\"n\">from_sr</span><span class=\"o\">=</span><span class=\"n\">from_sr</span><span class=\"p\">,</span> <span class=\"n\">sent_via_email</span><span class=\"o\">=</span><span class=\"n\">sent_via_email</span><span class=\"p\">,</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">email_id</span><span class=\"o\">=</span><span class=\"n\">email_id</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">m</span> <span class=\"o\">=</span> <span class=\"n\">Message</span><span class=\"p\">(</span><span class=\"n\">subject</span><span class=\"o\">=</span><span class=\"n\">subject</span><span class=\"p\">,</span> <span class=\"n\">body</span><span class=\"o\">=</span><span class=\"n\">body</span><span class=\"p\">,</span> <span class=\"n\">author_id</span><span class=\"o\">=</span><span class=\"n\">author</span><span class=\"o\">.</span><span class=\"n\">_id</span><span class=\"p\">,</span> <span class=\"n\">new</span><span class=\"o\">=</span><span class=\"bp\">True</span><span class=\"p\">,</span></div>\n</div>\n<b>AttributeError: 'NoneType' object has no attribute '_id'</b><br>\n    </div>\n    <div id=\"short_text_version\" class=\"hidden-data\">\n    <textarea style=\"width: 100%\" rows=13 cols=60>File '/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py', line 253 in newfn\n  simple_vals, param_vals, *a, **kw)\nFile '/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py', line 324 in validatedForm\n  *a, **kw)\nFile '/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py', line 304 in _validatedForm\n  val = self_method(self, form, responder, *a, **kw)\nFile '/home/vagrant/src/reddit/r2/r2/controllers/api.py', line 1177 in POST_friend\n  notify_user_added(type, c.user, friend, container)\nFile '/home/vagrant/src/reddit/r2/r2/lib/system_messages.py', line 109 in notify_user_added\n  request.ip, sr=target)\nFile '/home/vagrant/src/reddit/r2/r2/models/link.py', line 2057 in _new\n  m = Message(subject=subject, body=body, author_id=author._id, new=True,\nAttributeError: 'NoneType' object has no attribute '_id'</textarea>\n    </div>\n    <div id=\"long_xml_version\" class=\"hidden-data\">\n    <textarea style=\"width: 100%\" rows=50 cols=60>&lt;?xml version=\"1.0\" ?&gt;&lt;traceback&gt;&lt;sysinfo&gt;&lt;language full_version=\"2.7.6 (default, Oct 26 2016, 20:30:19) \n[GCC 4.8.4]\" platform=\"linux2\" version=\"2.7.6\"&gt;Python&lt;/language&gt;&lt;libraries&gt;&lt;library name=\"repoze.lru\" version=\"0.6\"/&gt;&lt;library name=\"mako\" version=\"0.9.1\"/&gt;&lt;library name=\"webhelpers\" version=\"1.3\"/&gt;&lt;library name=\"pylons\" version=\"1.0.1\"/&gt;&lt;library name=\"simplejson\" version=\"3.3.1\"/&gt;&lt;library name=\"weberror\" version=\"0.10.3\"/&gt;&lt;library name=\"webtest\" version=\"2.0.14\"/&gt;&lt;library name=\"markupsafe\" version=\"0.18\"/&gt;&lt;library name=\"pygments\" version=\"1.6\"/&gt;&lt;library name=\"beautifulsoup4\" version=\"4.2.1\"/&gt;&lt;library name=\"paste\" version=\"1.7.5.1\"/&gt;&lt;library name=\"six\" version=\"1.5.2\"/&gt;&lt;library name=\"decorator\" version=\"3.4.0\"/&gt;&lt;library name=\"beaker\" version=\"1.6.3\"/&gt;&lt;library name=\"formencode\" version=\"1.2.6\"/&gt;&lt;library name=\"pastedeploy\" version=\"1.5.2\"/&gt;&lt;library name=\"sqlalchemy\" version=\"0.8.4\"/&gt;&lt;library name=\"tempita\" version=\"0.5.2\"/&gt;&lt;library name=\"nose\" version=\"1.3.4\"/&gt;&lt;library name=\"routes\" version=\"2.1dev\"/&gt;&lt;library name=\"webob\" version=\"1.3.1\"/&gt;&lt;library name=\"waitress\" version=\"0.8.8\"/&gt;&lt;library name=\"pastescript\" version=\"1.7.5\"/&gt;&lt;/libraries&gt;&lt;/sysinfo&gt;&lt;stack&gt;&lt;frame&gt;&lt;module&gt;weberror.evalexception&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.7/dist-packages/weberror/evalexception.py&lt;/filename&gt;&lt;line&gt;431&lt;/line&gt;&lt;function&gt;respond&lt;/function&gt;&lt;operation&gt;app_iter = self.application(environ, detect_start_response)&lt;/operation&gt;&lt;operation_context&gt;        try:\n            __traceback_supplement__ = errormiddleware.Supplement, self, environ\n            app_iter = self.application(environ, detect_start_response)\n            \n            # Don't create a list from a paste.fileapp object \n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.config.middleware&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/config/middleware.py&lt;/filename&gt;&lt;line&gt;228&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;return self.app(environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;            return [&amp;quot;&amp;quot;]\n\n        return self.app(environ, start_response)\n\n\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.config.middleware&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/config/middleware.py&lt;/filename&gt;&lt;line&gt;286&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;return self.app(environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;            environ['content_type'] = 'text/html; charset=UTF-8'\n\n        return self.app(environ, start_response)\n\nclass FullPathMiddleware(object):\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.config.middleware&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/config/middleware.py&lt;/filename&gt;&lt;line&gt;243&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;return self.app(environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;            environ['subreddit'] = sr.groups()[0]\n            environ['PATH_INFO'] = self.sr_pattern.sub('', path) or '/'\n        return self.app(environ, start_response)\n\n\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.config.middleware&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/config/middleware.py&lt;/filename&gt;&lt;line&gt;258&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;return self.app(environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;                environ['domain'] = domain\n                environ['PATH_INFO'] = rest or '/'\n        return self.app(environ, start_response)\n\n\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.config.middleware&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/config/middleware.py&lt;/filename&gt;&lt;line&gt;379&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;return self.app(environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;                            &amp;quot;&amp;lt;/script&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;you shouldn\\'t be here&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;&amp;quot;]\n\n        return self.app(environ, start_response)\n\n# TODO CleanupMiddleware seems to exist because cookie headers are being duplicated\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.config.middleware&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/config/middleware.py&lt;/filename&gt;&lt;line&gt;405&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;return self.app(environ, custom_start_response)&lt;/operation&gt;&lt;operation_context&gt;                    seen.add(key)\n            return start_response(status, fixed, exc_info)\n        return self.app(environ, custom_start_response)\n\n\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;routes.middleware&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.7/dist-packages/routes/middleware.py&lt;/filename&gt;&lt;line&gt;136&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;response = self.app(environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;                r'^(.*?)/' + re.escape(newpath) + '$', r'\\1', oldpath)\n\n        response = self.app(environ, start_response)\n\n        # Wrapped in try as in rare cases the attribute will be gone already\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.wsgiapp&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.7/dist-packages/pylons/wsgiapp.py&lt;/filename&gt;&lt;line&gt;103&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;response = self.dispatch(controller, environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;\n        controller = self.resolve(environ, start_response)\n        response = self.dispatch(controller, environ, start_response)\n\n        response_obj = callable(response)\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.wsgiapp&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.7/dist-packages/pylons/wsgiapp.py&lt;/filename&gt;&lt;line&gt;313&lt;/line&gt;&lt;function&gt;dispatch&lt;/function&gt;&lt;operation&gt;return controller(environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;        if log_debug:\n            log.debug(&amp;quot;Calling controller class with WSGI interface&amp;quot;)\n        return controller(environ, start_response)\n\n    def load_test_env(self, environ):\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.lib.base&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/lib/base.py&lt;/filename&gt;&lt;line&gt;156&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;return WSGIController.__call__(self, environ, start_response)&lt;/operation&gt;&lt;operation_context&gt;        # WSGIController.__call__ will run __before__() and then execute the\n        # controller method via environ['pylons.routes_dict']['action']\n        return WSGIController.__call__(self, environ, start_response)\n\n    def pre(self): pass\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.controllers.core&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.7/dist-packages/pylons/controllers/core.py&lt;/filename&gt;&lt;line&gt;214&lt;/line&gt;&lt;function&gt;__call__&lt;/function&gt;&lt;operation&gt;response = self._dispatch_call()&lt;/operation&gt;&lt;operation_context&gt;                return response(environ, self.start_response)\n\n        response = self._dispatch_call()\n        if not start_response_called:\n            self.start_response = start_response\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.controllers.core&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.7/dist-packages/pylons/controllers/core.py&lt;/filename&gt;&lt;line&gt;164&lt;/line&gt;&lt;function&gt;_dispatch_call&lt;/function&gt;&lt;operation&gt;response = self._inspect_call(func)&lt;/operation&gt;&lt;operation_context&gt;            req.environ['pylons.action_method'] = func\n\n            response = self._inspect_call(func)\n        else:\n            if log_debug:\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.controllers.core&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.7/dist-packages/pylons/controllers/core.py&lt;/filename&gt;&lt;line&gt;107&lt;/line&gt;&lt;function&gt;_inspect_call&lt;/function&gt;&lt;operation&gt;result = self._perform_call(func, args)&lt;/operation&gt;&lt;operation_context&gt;                      func.__name__, args)\n        try:\n            result = self._perform_call(func, args)\n        except HTTPException, httpe:\n            if log_debug:\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;pylons.controllers.core&lt;/module&gt;&lt;filename&gt;/usr/lib/python2.7/dist-packages/pylons/controllers/core.py&lt;/filename&gt;&lt;line&gt;57&lt;/line&gt;&lt;function&gt;_perform_call&lt;/function&gt;&lt;operation&gt;return func(**args)&lt;/operation&gt;&lt;operation_context&gt;        &amp;quot;&amp;quot;&amp;quot;Hide the traceback for everything above this method&amp;quot;&amp;quot;&amp;quot;\n        __traceback_hide__ = 'before_and_this'\n        return func(**args)\n\n    def _inspect_call(self, func):\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.lib.validator.validator&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py&lt;/filename&gt;&lt;line&gt;253&lt;/line&gt;&lt;function&gt;newfn&lt;/function&gt;&lt;operation&gt;simple_vals, param_vals, *a, **kw)&lt;/operation&gt;&lt;operation_context&gt;                        kw = _make_validated_kw(fn, simple_vals, param_vals, env)\n                        return response_function(self, fn, responder,\n                                                 simple_vals, param_vals, *a, **kw)\n                    except UserRequiredException:\n                        responder.send_failure(errors.USER_REQUIRED)\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.lib.validator.validator&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py&lt;/filename&gt;&lt;line&gt;324&lt;/line&gt;&lt;function&gt;validatedForm&lt;/function&gt;&lt;operation&gt;*a, **kw)&lt;/operation&gt;&lt;operation_context&gt;                  *a, **kw):\n    return _validatedForm(self, self_method, responder, simple_vals, param_vals,\n                          *a, **kw)\n\n@api_validate(&amp;quot;html&amp;quot;, add_api_type_doc=True)\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.lib.validator.validator&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py&lt;/filename&gt;&lt;line&gt;304&lt;/line&gt;&lt;function&gt;_validatedForm&lt;/function&gt;&lt;operation&gt;val = self_method(self, form, responder, *a, **kw)&lt;/operation&gt;&lt;operation_context&gt;\n    # do the actual work\n    val = self_method(self, form, responder, *a, **kw)\n\n    # add data to the output on some errors\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.controllers.api&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/controllers/api.py&lt;/filename&gt;&lt;line&gt;1177&lt;/line&gt;&lt;function&gt;POST_friend&lt;/function&gt;&lt;operation&gt;notify_user_added(type, c.user, friend, container)&lt;/operation&gt;&lt;operation_context&gt;                    ban_message, duration, new)\n        elif new:\n            notify_user_added(type, c.user, friend, container)\n\n    @validatedForm(VGold(),\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.lib.system_messages&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/lib/system_messages.py&lt;/filename&gt;&lt;line&gt;109&lt;/line&gt;&lt;function&gt;notify_user_added&lt;/function&gt;&lt;operation&gt;request.ip, sr=target)&lt;/operation&gt;&lt;operation_context&gt;\n        item, inbox_rel = Message._new(modmail_author, target, subject, msg,\n                                       request.ip, sr=target)\n        queries.new_message(item, inbox_rel)\n\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.models.link&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/models/link.py&lt;/filename&gt;&lt;line&gt;2057&lt;/line&gt;&lt;function&gt;_new&lt;/function&gt;&lt;operation&gt;m = Message(subject=subject, body=body, author_id=author._id, new=True,&lt;/operation&gt;&lt;operation_context&gt;        from r2.lib.message_to_email import queue_modmail_email\n\n        m = Message(subject=subject, body=body, author_id=author._id, new=True,\n                    ip=ip, from_sr=from_sr, sent_via_email=sent_via_email,\n                    email_id=email_id)\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;/stack&gt;&lt;exception&gt;&lt;type&gt;AttributeError&lt;/type&gt;&lt;value&gt;'NoneType' object has no attribute '_id'&lt;/value&gt;&lt;/exception&gt;&lt;/traceback&gt;</textarea>\n    </div>\n    <div id=\"short_xml_version\" class=\"hidden-data\">\n    <textarea style=\"width: 100%\" rows=32 cols=60>&lt;?xml version=\"1.0\" ?&gt;&lt;traceback&gt;&lt;sysinfo&gt;&lt;language full_version=\"2.7.6 (default, Oct 26 2016, 20:30:19) \n[GCC 4.8.4]\" platform=\"linux2\" version=\"2.7.6\"&gt;Python&lt;/language&gt;&lt;libraries&gt;&lt;library name=\"repoze.lru\" version=\"0.6\"/&gt;&lt;library name=\"mako\" version=\"0.9.1\"/&gt;&lt;library name=\"webhelpers\" version=\"1.3\"/&gt;&lt;library name=\"pylons\" version=\"1.0.1\"/&gt;&lt;library name=\"simplejson\" version=\"3.3.1\"/&gt;&lt;library name=\"weberror\" version=\"0.10.3\"/&gt;&lt;library name=\"webtest\" version=\"2.0.14\"/&gt;&lt;library name=\"markupsafe\" version=\"0.18\"/&gt;&lt;library name=\"pygments\" version=\"1.6\"/&gt;&lt;library name=\"beautifulsoup4\" version=\"4.2.1\"/&gt;&lt;library name=\"paste\" version=\"1.7.5.1\"/&gt;&lt;library name=\"six\" version=\"1.5.2\"/&gt;&lt;library name=\"decorator\" version=\"3.4.0\"/&gt;&lt;library name=\"beaker\" version=\"1.6.3\"/&gt;&lt;library name=\"formencode\" version=\"1.2.6\"/&gt;&lt;library name=\"pastedeploy\" version=\"1.5.2\"/&gt;&lt;library name=\"sqlalchemy\" version=\"0.8.4\"/&gt;&lt;library name=\"tempita\" version=\"0.5.2\"/&gt;&lt;library name=\"nose\" version=\"1.3.4\"/&gt;&lt;library name=\"routes\" version=\"2.1dev\"/&gt;&lt;library name=\"webob\" version=\"1.3.1\"/&gt;&lt;library name=\"waitress\" version=\"0.8.8\"/&gt;&lt;library name=\"pastescript\" version=\"1.7.5\"/&gt;&lt;/libraries&gt;&lt;/sysinfo&gt;&lt;stack&gt;&lt;frame&gt;&lt;module&gt;r2.lib.validator.validator&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py&lt;/filename&gt;&lt;line&gt;253&lt;/line&gt;&lt;function&gt;newfn&lt;/function&gt;&lt;operation&gt;simple_vals, param_vals, *a, **kw)&lt;/operation&gt;&lt;operation_context&gt;                        kw = _make_validated_kw(fn, simple_vals, param_vals, env)\n                        return response_function(self, fn, responder,\n                                                 simple_vals, param_vals, *a, **kw)\n                    except UserRequiredException:\n                        responder.send_failure(errors.USER_REQUIRED)\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.lib.validator.validator&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py&lt;/filename&gt;&lt;line&gt;324&lt;/line&gt;&lt;function&gt;validatedForm&lt;/function&gt;&lt;operation&gt;*a, **kw)&lt;/operation&gt;&lt;operation_context&gt;                  *a, **kw):\n    return _validatedForm(self, self_method, responder, simple_vals, param_vals,\n                          *a, **kw)\n\n@api_validate(&amp;quot;html&amp;quot;, add_api_type_doc=True)\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.lib.validator.validator&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py&lt;/filename&gt;&lt;line&gt;304&lt;/line&gt;&lt;function&gt;_validatedForm&lt;/function&gt;&lt;operation&gt;val = self_method(self, form, responder, *a, **kw)&lt;/operation&gt;&lt;operation_context&gt;\n    # do the actual work\n    val = self_method(self, form, responder, *a, **kw)\n\n    # add data to the output on some errors\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.controllers.api&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/controllers/api.py&lt;/filename&gt;&lt;line&gt;1177&lt;/line&gt;&lt;function&gt;POST_friend&lt;/function&gt;&lt;operation&gt;notify_user_added(type, c.user, friend, container)&lt;/operation&gt;&lt;operation_context&gt;                    ban_message, duration, new)\n        elif new:\n            notify_user_added(type, c.user, friend, container)\n\n    @validatedForm(VGold(),\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.lib.system_messages&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/lib/system_messages.py&lt;/filename&gt;&lt;line&gt;109&lt;/line&gt;&lt;function&gt;notify_user_added&lt;/function&gt;&lt;operation&gt;request.ip, sr=target)&lt;/operation&gt;&lt;operation_context&gt;\n        item, inbox_rel = Message._new(modmail_author, target, subject, msg,\n                                       request.ip, sr=target)\n        queries.new_message(item, inbox_rel)\n\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;frame&gt;&lt;module&gt;r2.models.link&lt;/module&gt;&lt;filename&gt;/home/vagrant/src/reddit/r2/r2/models/link.py&lt;/filename&gt;&lt;line&gt;2057&lt;/line&gt;&lt;function&gt;_new&lt;/function&gt;&lt;operation&gt;m = Message(subject=subject, body=body, author_id=author._id, new=True,&lt;/operation&gt;&lt;operation_context&gt;        from r2.lib.message_to_email import queue_modmail_email\n\n        m = Message(subject=subject, body=body, author_id=author._id, new=True,\n                    ip=ip, from_sr=from_sr, sent_via_email=sent_via_email,\n                    email_id=email_id)\n&lt;/operation_context&gt;&lt;/frame&gt;&lt;/stack&gt;&lt;exception&gt;&lt;type&gt;AttributeError&lt;/type&gt;&lt;value&gt;'NoneType' object has no attribute '_id'&lt;/value&gt;&lt;/exception&gt;&lt;/traceback&gt;</textarea>\n    </div>\n    \n        <div id=\"full_traceback\" class=\"hidden-data\">\n        URL: <a href=\"https://reddit.local/api/friend/?raw_json=1\">https://reddit.local/api/friend/?raw_json=1</a><br>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/usr/lib/python2.7/dist-packages/weberror/evalexception.py\">weberror.evalexception</span>:<b>431</b> in <code>respond</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550553515144\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"weberror.evalexception:431\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">try</span><span class=\"p\">:</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">__traceback_supplement__</span> <span class=\"o\">=</span> <span class=\"n\">errormiddleware</span><span class=\"o\">.</span><span class=\"n\">Supplement</span><span class=\"p\">,</span> <span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">environ</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">app_iter</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">application</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">detect_start_response</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"c\"># Don&#39;t create a list from a paste.fileapp object </span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">app_iter</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">application</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">detect_start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/config/middleware.py\">r2.config.middleware</span>:<b>228</b> in <code>__call__</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564716416\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.config.middleware:228\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"p\">[</span><span class=\"s\">&quot;&quot;</span><span class=\"p\">]</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/config/middleware.py\">r2.config.middleware</span>:<b>286</b> in <code>__call__</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564714328\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.config.middleware:286\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">environ</span><span class=\"p\">[</span><span class=\"s\">&#39;content_type&#39;</span><span class=\"p\">]</span> <span class=\"o\">=</span> <span class=\"s\">&#39;text/html; charset=UTF-8&#39;</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">class</span> <span class=\"nc\">FullPathMiddleware</span><span class=\"p\">(</span><span class=\"nb\">object</span><span class=\"p\">):</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/config/middleware.py\">r2.config.middleware</span>:<b>243</b> in <code>__call__</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564715120\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.config.middleware:243\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">environ</span><span class=\"p\">[</span><span class=\"s\">&#39;subreddit&#39;</span><span class=\"p\">]</span> <span class=\"o\">=</span> <span class=\"n\">sr</span><span class=\"o\">.</span><span class=\"n\">groups</span><span class=\"p\">()[</span><span class=\"mi\">0</span><span class=\"p\">]</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">environ</span><span class=\"p\">[</span><span class=\"s\">&#39;PATH_INFO&#39;</span><span class=\"p\">]</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">sr_pattern</span><span class=\"o\">.</span><span class=\"n\">sub</span><span class=\"p\">(</span><span class=\"s\">&#39;&#39;</span><span class=\"p\">,</span> <span class=\"n\">path</span><span class=\"p\">)</span> <span class=\"ow\">or</span> <span class=\"s\">&#39;/&#39;</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/config/middleware.py\">r2.config.middleware</span>:<b>258</b> in <code>__call__</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564715408\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.config.middleware:258\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">environ</span><span class=\"p\">[</span><span class=\"s\">&#39;domain&#39;</span><span class=\"p\">]</span> <span class=\"o\">=</span> <span class=\"n\">domain</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">environ</span><span class=\"p\">[</span><span class=\"s\">&#39;PATH_INFO&#39;</span><span class=\"p\">]</span> <span class=\"o\">=</span> <span class=\"n\">rest</span> <span class=\"ow\">or</span> <span class=\"s\">&#39;/&#39;</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/config/middleware.py\">r2.config.middleware</span>:<b>379</b> in <code>__call__</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564713752\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.config.middleware:379\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"s\">&quot;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;you shouldn</span><span class=\"se\">\\&#39;</span><span class=\"s\">t be here&lt;/body&gt;&lt;/html&gt;&quot;</span><span class=\"p\">]</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"c\"># TODO CleanupMiddleware seems to exist because cookie headers are being duplicated</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/config/middleware.py\">r2.config.middleware</span>:<b>405</b> in <code>__call__</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564715696\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.config.middleware:405\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">seen</span><span class=\"o\">.</span><span class=\"n\">add</span><span class=\"p\">(</span><span class=\"n\">key</span><span class=\"p\">)</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"n\">start_response</span><span class=\"p\">(</span><span class=\"n\">status</span><span class=\"p\">,</span> <span class=\"n\">fixed</span><span class=\"p\">,</span> <span class=\"n\">exc_info</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">custom_start_response</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"k\">return</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">custom_start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/usr/lib/python2.7/dist-packages/routes/middleware.py\">routes.middleware</span>:<b>136</b> in <code>__call__</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564714112\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"routes.middleware:136\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"s\">r&#39;^(.*?)/&#39;</span> <span class=\"o\">+</span> <span class=\"n\">re</span><span class=\"o\">.</span><span class=\"n\">escape</span><span class=\"p\">(</span><span class=\"n\">newpath</span><span class=\"p\">)</span> <span class=\"o\">+</span> <span class=\"s\">&#39;$&#39;</span><span class=\"p\">,</span> <span class=\"s\">r&#39;\\1&#39;</span><span class=\"p\">,</span> <span class=\"n\">oldpath</span><span class=\"p\">)</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">response</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"c\"># Wrapped in try as in rare cases the attribute will be gone already</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">response</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">app</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/usr/lib/python2.7/dist-packages/pylons/wsgiapp.py\">pylons.wsgiapp</span>:<b>103</b> in <code>__call__</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564714904\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"pylons.wsgiapp:103\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">controller</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">resolve</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">response</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">dispatch</span><span class=\"p\">(</span><span class=\"n\">controller</span><span class=\"p\">,</span> <span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">response_obj</span> <span class=\"o\">=</span> <span class=\"nb\">callable</span><span class=\"p\">(</span><span class=\"n\">response</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">response</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">dispatch</span><span class=\"p\">(</span><span class=\"n\">controller</span><span class=\"p\">,</span> <span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/usr/lib/python2.7/dist-packages/pylons/wsgiapp.py\">pylons.wsgiapp</span>:<b>313</b> in <code>dispatch</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564714472\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"pylons.wsgiapp:313\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">if</span> <span class=\"n\">log_debug</span><span class=\"p\">:</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">log</span><span class=\"o\">.</span><span class=\"n\">debug</span><span class=\"p\">(</span><span class=\"s\">&quot;Calling controller class with WSGI interface&quot;</span><span class=\"p\">)</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"n\">controller</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">def</span> <span class=\"nf\">load_test_env</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">environ</span><span class=\"p\">):</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"k\">return</span> <span class=\"n\">controller</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/lib/base.py\">r2.lib.base</span>:<b>156</b> in <code>__call__</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564713968\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.lib.base:156\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"c\"># WSGIController.__call__ will run __before__() and then execute the</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"c\"># controller method via environ[&#39;pylons.routes_dict&#39;][&#39;action&#39;]</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"n\">WSGIController</span><span class=\"o\">.</span><span class=\"n\">__call__</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">def</span> <span class=\"nf\">pre</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">):</span> <span class=\"k\">pass</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"k\">return</span> <span class=\"n\">WSGIController</span><span class=\"o\">.</span><span class=\"n\">__call__</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"n\">start_response</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/usr/lib/python2.7/dist-packages/pylons/controllers/core.py\">pylons.controllers.core</span>:<b>214</b> in <code>__call__</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564713176\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"pylons.controllers.core:214\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"n\">response</span><span class=\"p\">(</span><span class=\"n\">environ</span><span class=\"p\">,</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">start_response</span><span class=\"p\">)</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">response</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">_dispatch_call</span><span class=\"p\">()</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">if</span> <span class=\"ow\">not</span> <span class=\"n\">start_response_called</span><span class=\"p\">:</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">start_response</span> <span class=\"o\">=</span> <span class=\"n\">start_response</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">response</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">_dispatch_call</span><span class=\"p\">()</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/usr/lib/python2.7/dist-packages/pylons/controllers/core.py\">pylons.controllers.core</span>:<b>164</b> in <code>_dispatch_call</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564713896\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"pylons.controllers.core:164\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">req</span><span class=\"o\">.</span><span class=\"n\">environ</span><span class=\"p\">[</span><span class=\"s\">&#39;pylons.action_method&#39;</span><span class=\"p\">]</span> <span class=\"o\">=</span> <span class=\"n\">func</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">response</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">_inspect_call</span><span class=\"p\">(</span><span class=\"n\">func</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">else</span><span class=\"p\">:</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">if</span> <span class=\"n\">log_debug</span><span class=\"p\">:</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">response</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">_inspect_call</span><span class=\"p\">(</span><span class=\"n\">func</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/usr/lib/python2.7/dist-packages/pylons/controllers/core.py\">pylons.controllers.core</span>:<b>107</b> in <code>_inspect_call</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564716056\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"pylons.controllers.core:107\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">func</span><span class=\"o\">.</span><span class=\"n\">__name__</span><span class=\"p\">,</span> <span class=\"n\">args</span><span class=\"p\">)</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">try</span><span class=\"p\">:</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">result</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">_perform_call</span><span class=\"p\">(</span><span class=\"n\">func</span><span class=\"p\">,</span> <span class=\"n\">args</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">except</span> <span class=\"n\">HTTPException</span><span class=\"p\">,</span> <span class=\"n\">httpe</span><span class=\"p\">:</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">if</span> <span class=\"n\">log_debug</span><span class=\"p\">:</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">result</span> <span class=\"o\">=</span> <span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">_perform_call</span><span class=\"p\">(</span><span class=\"n\">func</span><span class=\"p\">,</span> <span class=\"n\">args</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/usr/lib/python2.7/dist-packages/pylons/controllers/core.py\">pylons.controllers.core</span>:<b>57</b> in <code>_perform_call</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564715192\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"pylons.controllers.core:57\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"sd\">&quot;&quot;&quot;Hide the traceback for everything above this method&quot;&quot;&quot;</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">__traceback_hide__</span> <span class=\"o\">=</span> <span class=\"s\">&#39;before_and_this&#39;</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"n\">func</span><span class=\"p\">(</span><span class=\"o\">**</span><span class=\"n\">args</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">def</span> <span class=\"nf\">_inspect_call</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">func</span><span class=\"p\">):</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"k\">return</span> <span class=\"n\">func</span><span class=\"p\">(</span><span class=\"o\">**</span><span class=\"n\">args</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py\">r2.lib.validator.validator</span>:<b>253</b> in <code>newfn</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564713104\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.lib.validator.validator:253\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">kw</span> <span class=\"o\">=</span> <span class=\"n\">_make_validated_kw</span><span class=\"p\">(</span><span class=\"n\">fn</span><span class=\"p\">,</span> <span class=\"n\">simple_vals</span><span class=\"p\">,</span> <span class=\"n\">param_vals</span><span class=\"p\">,</span> <span class=\"n\">env</span><span class=\"p\">)</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"n\">response_function</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">fn</span><span class=\"p\">,</span> <span class=\"n\">responder</span><span class=\"p\">,</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">simple_vals</span><span class=\"p\">,</span> <span class=\"n\">param_vals</span><span class=\"p\">,</span> <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">except</span> <span class=\"n\">UserRequiredException</span><span class=\"p\">:</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">responder</span><span class=\"o\">.</span><span class=\"n\">send_failure</span><span class=\"p\">(</span><span class=\"n\">errors</span><span class=\"o\">.</span><span class=\"n\">USER_REQUIRED</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">simple_vals</span><span class=\"p\">,</span> <span class=\"n\">param_vals</span><span class=\"p\">,</span> <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py\">r2.lib.validator.validator</span>:<b>324</b> in <code>validatedForm</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564713392\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.lib.validator.validator:324\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">):</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">return</span> <span class=\"n\">_validatedForm</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">self_method</span><span class=\"p\">,</span> <span class=\"n\">responder</span><span class=\"p\">,</span> <span class=\"n\">simple_vals</span><span class=\"p\">,</span> <span class=\"n\">param_vals</span><span class=\"p\">,</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"nd\">@api_validate</span><span class=\"p\">(</span><span class=\"s\">&quot;html&quot;</span><span class=\"p\">,</span> <span class=\"n\">add_api_type_doc</span><span class=\"o\">=</span><span class=\"bp\">True</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py\">r2.lib.validator.validator</span>:<b>304</b> in <code>_validatedForm</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564713464\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.lib.validator.validator:304\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp; <span class=\"c\"># do the actual work</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">val</span> <span class=\"o\">=</span> <span class=\"n\">self_method</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">form</span><span class=\"p\">,</span> <span class=\"n\">responder</span><span class=\"p\">,</span> <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"c\"># add data to the output on some errors</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">val</span> <span class=\"o\">=</span> <span class=\"n\">self_method</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">form</span><span class=\"p\">,</span> <span class=\"n\">responder</span><span class=\"p\">,</span> <span class=\"o\">*</span><span class=\"n\">a</span><span class=\"p\">,</span> <span class=\"o\">**</span><span class=\"n\">kw</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/controllers/api.py\">r2.controllers.api</span>:<b>1177</b> in <code>POST_friend</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564714616\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.controllers.api:1177\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">ban_message</span><span class=\"p\">,</span> <span class=\"n\">duration</span><span class=\"p\">,</span> <span class=\"n\">new</span><span class=\"p\">)</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"k\">elif</span> <span class=\"n\">new</span><span class=\"p\">:</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">notify_user_added</span><span class=\"p\">(</span><span class=\"nb\">type</span><span class=\"p\">,</span> <span class=\"n\">c</span><span class=\"o\">.</span><span class=\"n\">user</span><span class=\"p\">,</span> <span class=\"n\">friend</span><span class=\"p\">,</span> <span class=\"n\">container</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"nd\">@validatedForm</span><span class=\"p\">(</span><span class=\"n\">VGold</span><span class=\"p\">(),</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">notify_user_added</span><span class=\"p\">(</span><span class=\"nb\">type</span><span class=\"p\">,</span> <span class=\"n\">c</span><span class=\"o\">.</span><span class=\"n\">user</span><span class=\"p\">,</span> <span class=\"n\">friend</span><span class=\"p\">,</span> <span class=\"n\">container</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/lib/system_messages.py\">r2.lib.system_messages</span>:<b>109</b> in <code>notify_user_added</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564715480\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.lib.system_messages:109\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">item</span><span class=\"p\">,</span> <span class=\"n\">inbox_rel</span> <span class=\"o\">=</span> <span class=\"n\">Message</span><span class=\"o\">.</span><span class=\"n\">_new</span><span class=\"p\">(</span><span class=\"n\">modmail_author</span><span class=\"p\">,</span> <span class=\"n\">target</span><span class=\"p\">,</span> <span class=\"n\">subject</span><span class=\"p\">,</span> <span class=\"n\">msg</span><span class=\"p\">,</span><br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">request</span><span class=\"o\">.</span><span class=\"n\">ip</span><span class=\"p\">,</span> <span class=\"n\">sr</span><span class=\"o\">=</span><span class=\"n\">target</span><span class=\"p\">)</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">queries</span><span class=\"o\">.</span><span class=\"n\">new_message</span><span class=\"p\">(</span><span class=\"n\">item</span><span class=\"p\">,</span> <span class=\"n\">inbox_rel</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">request</span><span class=\"o\">.</span><span class=\"n\">ip</span><span class=\"p\">,</span> <span class=\"n\">sr</span><span class=\"o\">=</span><span class=\"n\">target</span><span class=\"p\">)</span></div>\n</div>\n<div class=\"frame\">\nModule <span class=\"module\" title=\"/home/vagrant/src/reddit/r2/r2/models/link.py\">r2.models.link</span>:<b>2057</b> in <code>_new</code>  <a href=\"#\" class=\"show_locals\" tbid=\"140550564712816\" onClick=\"return showFrame(this)\">&nbsp; &nbsp; <img src=\"http://reddit.local/_debug/media/plus.jpg\" border=0 width=9 height=9> &nbsp; &nbsp;</a> <a href=\"#\" class=\"\" location=\"r2.models.link:2057\" onClick=\"return showSource(this)\">view</a><br>\n<div style=\"display: none\" class=\"source highlight\" source-type=\"long\"><a class=\"switch_source\" onclick=\"return switch_source(this, 'long')\" href=\"#\">&lt;&lt;&nbsp; </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"kn\">from</span> <span class=\"nn\">r2.lib.message_to_email</span> <span class=\"kn\">import</span> <span class=\"n\">queue_modmail_email</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>\n<span class=\"source-highlight\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">m</span> <span class=\"o\">=</span> <span class=\"n\">Message</span><span class=\"p\">(</span><span class=\"n\">subject</span><span class=\"o\">=</span><span class=\"n\">subject</span><span class=\"p\">,</span> <span class=\"n\">body</span><span class=\"o\">=</span><span class=\"n\">body</span><span class=\"p\">,</span> <span class=\"n\">author_id</span><span class=\"o\">=</span><span class=\"n\">author</span><span class=\"o\">.</span><span class=\"n\">_id</span><span class=\"p\">,</span> <span class=\"n\">new</span><span class=\"o\">=</span><span class=\"bp\">True</span><span class=\"p\">,</span></span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">ip</span><span class=\"o\">=</span><span class=\"n\">ip</span><span class=\"p\">,</span> <span class=\"n\">from_sr</span><span class=\"o\">=</span><span class=\"n\">from_sr</span><span class=\"p\">,</span> <span class=\"n\">sent_via_email</span><span class=\"o\">=</span><span class=\"n\">sent_via_email</span><span class=\"p\">,</span><br>\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class=\"n\">email_id</span><span class=\"o\">=</span><span class=\"n\">email_id</span><span class=\"p\">)</span></div><div class=\"source highlight\" source-type=\"short\"><a onclick=\"return switch_source(this, 'short')\" class=\"switch_source\" href=\"#\">&gt;&gt;&nbsp; </a><span class=\"n\">m</span> <span class=\"o\">=</span> <span class=\"n\">Message</span><span class=\"p\">(</span><span class=\"n\">subject</span><span class=\"o\">=</span><span class=\"n\">subject</span><span class=\"p\">,</span> <span class=\"n\">body</span><span class=\"o\">=</span><span class=\"n\">body</span><span class=\"p\">,</span> <span class=\"n\">author_id</span><span class=\"o\">=</span><span class=\"n\">author</span><span class=\"o\">.</span><span class=\"n\">_id</span><span class=\"p\">,</span> <span class=\"n\">new</span><span class=\"o\">=</span><span class=\"bp\">True</span><span class=\"p\">,</span></div>\n</div>\n<b>AttributeError: 'NoneType' object has no attribute '_id'</b><br>\n        </div>\n        <div id=\"long_text_version\" class=\"hidden-data\">\n        <textarea style=\"width: 100%\" rows=44 cols=60>URL: https://reddit.local/api/friend/?raw_json=1\nFile '/usr/lib/python2.7/dist-packages/weberror/evalexception.py', line 431 in respond\n  app_iter = self.application(environ, detect_start_response)\nFile '/home/vagrant/src/reddit/r2/r2/config/middleware.py', line 228 in __call__\n  return self.app(environ, start_response)\nFile '/home/vagrant/src/reddit/r2/r2/config/middleware.py', line 286 in __call__\n  return self.app(environ, start_response)\nFile '/home/vagrant/src/reddit/r2/r2/config/middleware.py', line 243 in __call__\n  return self.app(environ, start_response)\nFile '/home/vagrant/src/reddit/r2/r2/config/middleware.py', line 258 in __call__\n  return self.app(environ, start_response)\nFile '/home/vagrant/src/reddit/r2/r2/config/middleware.py', line 379 in __call__\n  return self.app(environ, start_response)\nFile '/home/vagrant/src/reddit/r2/r2/config/middleware.py', line 405 in __call__\n  return self.app(environ, custom_start_response)\nFile '/usr/lib/python2.7/dist-packages/routes/middleware.py', line 136 in __call__\n  response = self.app(environ, start_response)\nFile '/usr/lib/python2.7/dist-packages/pylons/wsgiapp.py', line 103 in __call__\n  response = self.dispatch(controller, environ, start_response)\nFile '/usr/lib/python2.7/dist-packages/pylons/wsgiapp.py', line 313 in dispatch\n  return controller(environ, start_response)\nFile '/home/vagrant/src/reddit/r2/r2/lib/base.py', line 156 in __call__\n  return WSGIController.__call__(self, environ, start_response)\nFile '/usr/lib/python2.7/dist-packages/pylons/controllers/core.py', line 214 in __call__\n  response = self._dispatch_call()\nFile '/usr/lib/python2.7/dist-packages/pylons/controllers/core.py', line 164 in _dispatch_call\n  response = self._inspect_call(func)\nFile '/usr/lib/python2.7/dist-packages/pylons/controllers/core.py', line 107 in _inspect_call\n  result = self._perform_call(func, args)\nFile '/usr/lib/python2.7/dist-packages/pylons/controllers/core.py', line 57 in _perform_call\n  return func(**args)\nFile '/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py', line 253 in newfn\n  simple_vals, param_vals, *a, **kw)\nFile '/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py', line 324 in validatedForm\n  *a, **kw)\nFile '/home/vagrant/src/reddit/r2/r2/lib/validator/validator.py', line 304 in _validatedForm\n  val = self_method(self, form, responder, *a, **kw)\nFile '/home/vagrant/src/reddit/r2/r2/controllers/api.py', line 1177 in POST_friend\n  notify_user_added(type, c.user, friend, container)\nFile '/home/vagrant/src/reddit/r2/r2/lib/system_messages.py', line 109 in notify_user_added\n  request.ip, sr=target)\nFile '/home/vagrant/src/reddit/r2/r2/models/link.py', line 2057 in _new\n  m = Message(subject=subject, body=body, author_id=author._id, new=True,\nAttributeError: 'NoneType' object has no attribute '_id'</textarea>\n        </div>\n        \n    \n<div class=\"feature-highlight\">\n<b>Extra Features</b>\n<table border=\"0\">\n<tr><td><a href=\"#\" onclick=\"return false\" class=\"switch_source\" style=\"cursor: default\">&gt;&gt;</a></td><td>Display the lines of code near each part of the traceback</td></tr>\n<tr><td><img src=\"http://reddit.local/_debug/media/plus.jpg\" /></td><td>Show a debug prompt to allow you to directly debug the code at the traceback</td></tr>\n</table>\n</div>\n\n            </div>\n        </div>\n        <br class=\"clear\" />\n        <div class=\"hr\"><hr class=\"clear\" /></div>\n    </div>\n    <!-- Footer -->\n    <script type=\"text/javascript\" src=\"http://reddit.local/_debug/media/jquery-1.2.3.pack.js\"></script>\n    <script type=\"text/javascript\" src=\"http://reddit.local/_debug/media/debug.js\"></script>\n    <div id=\"footer\"><script src=\"http://reddit.local/_debug/media/pylons/javascripts/traceback.js\"></script>\n<script>\nvar TRACEBACK = {\n    uri: \"http://reddit.local/_debug\",\n    host: \"pylonshq.com\",\n    traceback: \"/tracebacks\"\n}\n</script>\n<div id=\"service_widget\">\n<h2 class=\"assistance\">Online Assistance</h2>\n<div id=\"nv\">\n<ul id=\"supportnav\">\n    <li class=\"nav active\"><a class=\"overview\" href=\"#\">Overview</a></li>\n    <li class=\"nav\"><a class=\"search\" href=\"#\">Search Mail Lists</a></li>\n    <li class=\"nav\"><a class=\"posttraceback\" href=\"#\">Post Traceback</a></li>\n</ul>\n</div>\n<div class=\"clearfix\">&nbsp;</div>\n<div class=\"overviewtab\">\n<b>Looking for help?</b>\n\n<p>Here are a few tips for troubleshooting if the above traceback isn't\nhelping out.</p>\n\n<ol>\n<li>Search the mail list</li>\n<li>Post the traceback, and ask for help on IRC</li>\n<li>Post a message to the mail list, referring to the posted traceback</li>\n\n</div>\n<div class=\"posttracebacktab\">\n<p><b>Note:</b> Clicking this button will post your traceback to the PylonsHQ website.\nThe traceback includes the module names, Python version, and lines of code that you\ncan see above. All tracebacks are posted anonymously unless you're logged into the\nPylonsHQ website in this browser.</p>\n<input type=\"button\" href=\"#\" class=\"submit_traceback\" value=\"Send TraceBack to PylonsHQ\" style=\"text-align: center;\"/>\n</div>\n\n<div class=\"searchtab\">\n<p>The following mail lists will be searched:<br />\n<input type=\"checkbox\" name=\"lists\" value=\"pylons\" checked=\"checked\" /> Pylons<br />\n<input type=\"checkbox\" name=\"lists\" value=\"python\" /> Python<br />\n<input type=\"checkbox\" name=\"lists\" value=\"mako\" /> Mako<br />\n<input type=\"checkbox\" name=\"lists\" value=\"sqlalchemy\" /> SQLAlchemy</p>\n<p class=\"query\">for: <input type=\"text\" name=\"query\" class=\"query\" /></p>\n\n<p><input type=\"submit\" value=\"Search\" /></p>\n<div class=\"searchresults\">\n\n</div>\n</div>\n\n</div>\n<div id=\"pylons_logo\"><img src=\"http://reddit.local/_debug/media/pylons/img/pylons-powered-02.png\" /></div>\n<div class=\"credits\">Pylons version 1.0.1</div></div>\n</body>\n</html>\n"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Type": [
+            "text/html"
+          ],
+          "Date": [
+            "Tue, 12 Sep 2017 15:23:03 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "X-Debug-URL": [
+            "http://reddit.local/_debug/view/1505141274"
+          ]
+        },
+        "status": {
+          "code": 500,
+          "message": "Internal Server Error"
+        },
+        "url": "https://reddit.local/r/test_channel/api/friend/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-09-12T15:23:03",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&name=othermoderator&permissions=%2Ball&type=moderator"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 1--0i2PvM2mYldv5JgEHfe2kIZ-Ss"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "67"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=kYlq4xEKXfW7BZ2HFK; loidcreated=2017-09-12T15%3A23%3A02.828Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/r/test_channel/api/friend/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 12 Sep 2017 15:23:04 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "416"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/test_channel/api/friend/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-09-12T15:23:03",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=kYlq4xEKXfW7BZ2HFK; loidcreated=2017-09-12T15%3A23%3A02.828Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=othermoderator"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDLRrTI1cvc3r6wqysx0CS4uMTMqKSk1KyjwsAh0VNJRUEqtKMgsSi2OzwQpNzYzMACKgXXHl1QWpIKMSEpNLEotAqktTs6HCGmBeEWpaUCNGch2GeYZesUHhRe5mrs5lRkVpOS6G4QZJTkW5JSFgnSkpJZlJqfGZ6aAjIVwlGoBcjmVLLQAAAA=",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 12 Sep 2017 15:23:04 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=othermoderator"
+      }
+    },
+    {
+      "recorded_at": "2017-09-12T15:23:03",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "grant_type=refresh_token&refresh_token=4-1n1J_RWrE7FBv2pdmG0V2bAplvU"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "Basic bDlkME1LUGpKcEtLWVE6bW9tcDgtZkJ6elpES3I0dEFNNllSc3dxa09F"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "68"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=kYlq4xEKXfW7BZ2HFK; loidcreated=2017-09-12T15%3A23%3A02.828Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/v1/access_token"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"access_token\": \"4-yLXNtS_VdVM0QOC8dDlt8Di8xs4\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "107"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 12 Sep 2017 15:23:04 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298"
+          ],
+          "x-ratelimit-reset": [
+            "416"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/access_token"
+      }
+    },
+    {
+      "recorded_at": "2017-09-12T15:23:03",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 4-yLXNtS_VdVM0QOC8dDlt8Di8xs4"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "13"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=kYlq4xEKXfW7BZ2HFK; loidcreated=2017-09-12T15%3A23%3A02.828Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/r/test_channel/api/accept_moderator_invite?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 12 Sep 2017 15:23:04 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "416"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/test_channel/api/accept_moderator_invite?raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
