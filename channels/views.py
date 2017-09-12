@@ -20,6 +20,7 @@ from channels.serializers import (
     CommentSerializer,
     ContributorSerializer,
     PostSerializer,
+    ModeratorSerializer,
 )
 from open_discussions.permissions import JwtIsStaffOrReadonlyPermission
 
@@ -48,6 +49,41 @@ class ChannelDetailView(RetrieveUpdateAPIView):
         """Get channel referenced by API"""
         api = Api(user=self.request.user)
         return api.get_channel(self.kwargs['channel_name'])
+
+
+class ModeratorListView(ListCreateAPIView):
+    """
+    View for listing and adding moderators
+    """
+    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
+    serializer_class = ModeratorSerializer
+
+    def get_queryset(self):
+        """Get a list of moderators for channel"""
+        api = Api(user=self.request.user)
+        channel_name = self.kwargs['channel_name']
+        return api.list_moderators(channel_name)
+
+
+class ModeratorDetailView(RetrieveDestroyAPIView):
+    """
+    View to retrieve and remove moderators
+    """
+    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
+    serializer_class = ModeratorSerializer
+
+    def get_object(self):
+        """Get moderator for the channel"""
+        api = Api(user=self.request.user)
+        moderator_name = self.kwargs['moderator_name']
+
+        return Redditor(api.reddit, name=moderator_name)
+
+    def perform_destroy(self, moderator):
+        """Remove moderator in a channel"""
+        api = Api(user=self.request.user)
+        channel_name = self.kwargs['channel_name']
+        api.remove_moderator(moderator.name, channel_name)
 
 
 class PostListView(ListCreateAPIView):

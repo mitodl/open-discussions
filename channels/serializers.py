@@ -16,7 +16,6 @@ from channels.api import (
     VALID_CHANNEL_TYPES,
 )
 
-
 User = get_user_model()
 
 
@@ -312,3 +311,26 @@ class ContributorSerializer(serializers.Serializer):
         api = Api(user=self.context['request'].user)
         channel_name = self.context['view'].kwargs['channel_name']
         return api.add_contributor(validated_data['contributor_name'], channel_name)
+
+
+class ModeratorSerializer(serializers.Serializer):
+    """Serializer for Moderators"""
+    moderator_name = WriteableSerializerMethodField()
+
+    def get_moderator_name(self, instance):
+        """Returns the name for the moderator"""
+        return instance.name
+
+    def validate_moderator_name(self, value):
+        """Validates the moderator name"""
+        if not isinstance(value, str):
+            raise ValidationError("moderator name must be a string")
+        if not User.objects.filter(username=value).exists():
+            raise ValidationError("moderator name is not a valid user")
+        return {'moderator_name': value}
+
+    def create(self, validated_data):
+        api = Api(user=self.context['request'].user)
+        channel_name = self.context['view'].kwargs['channel_name']
+
+        return api.add_moderator(validated_data['moderator_name'], channel_name)

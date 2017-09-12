@@ -319,3 +319,40 @@ def test_list_contributors(mock_client):
     contributors = client.list_contributors('foo_channel_name')
     mock_client.subreddit.return_value.contributor.assert_called_once_with()
     assert mock_client.subreddit.return_value.contributor.return_value == contributors
+
+
+def test_add_moderator(mock_client):
+    """Test add moderator"""
+    client = api.Api(UserFactory.create())
+    moderator = UserFactory.create()
+    redditor = client.add_moderator(moderator.username, 'channel_test_name')
+    mock_client.subreddit.return_value.moderator.add.assert_called_once_with(moderator)
+    assert redditor.name == moderator.username
+
+
+def test_add_moderator_no_user(mock_client):
+    """Test add moderator where user does not exist"""
+    client = api.Api(UserFactory.create())
+    with pytest.raises(NotFound):
+        client.add_moderator('foo_username', 'foo_channel_name')
+    assert mock_client.subreddit.return_value.moderator.add.call_count == 0
+
+    with pytest.raises(NotFound):
+        client.remove_moderator('foo_username', 'foo_channel_name')
+    assert mock_client.subreddit.return_value.moderator.remove.call_count == 0
+
+
+def test_remove_moderator(mock_client):
+    """Test remove moderator"""
+    client = api.Api(UserFactory.create())
+    moderator = UserFactory.create()
+    client.remove_moderator(moderator.username, 'channel_test_name')
+    mock_client.subreddit.return_value.moderator.remove.assert_called_once_with(moderator)
+
+
+def test_list_moderator(mock_client):
+    """Test list moderator"""
+    client = api.Api(UserFactory.create())
+    moderators = client.list_moderators('channel_test_name')
+    mock_client.subreddit.return_value.moderator.assert_called_once_with()
+    assert mock_client.subreddit.return_value.moderator.return_value == moderators

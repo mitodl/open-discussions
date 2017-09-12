@@ -1,4 +1,5 @@
 """Channels APIs"""
+# pylint: disable=too-many-public-methods
 from urllib.parse import urljoin
 
 import requests
@@ -415,3 +416,60 @@ class Api:
             praw.models.listing.generator.ListingGenerator: a generator representing the contributors in the channel
         """
         return self.get_channel(channel_name).contributor()
+
+    def add_moderator(self, moderator_name, channel_name):
+        """
+        Add a user to moderators for the channel
+
+        Args:
+            moderator_name(str): username of the user
+            channel_name(str): name of the channel
+
+        Returns:
+            praw.models.Redditor: the reddit representation of the user
+        """
+        try:
+            user = User.objects.get(username=moderator_name)
+        except User.DoesNotExist:
+            raise NotFound("User {} does not exist".format(moderator_name))
+        channel = self.get_channel(channel_name)
+        if moderator_name not in channel.moderator():
+            channel.moderator.add(user)
+            Api(user).accept_invite(channel_name)
+        return Redditor(self.reddit, name=moderator_name)
+
+    def accept_invite(self, channel_name):
+        """
+        Accept invitation as a subreddit moderator
+
+        Args:
+            channel_name(str): name of the channel
+        """
+        self.get_channel(channel_name).mod.accept_invite()
+
+    def remove_moderator(self, moderator_name, channel_name):
+        """
+        Remove moderator from a channel
+
+        Args:
+            moderator_name(str): username of the user
+            channel_name(str): name of the channel
+        """
+        try:
+            user = User.objects.get(username=moderator_name)
+        except User.DoesNotExist:
+            raise NotFound("User {} does not exist".format(moderator_name))
+
+        self.get_channel(channel_name).moderator.remove(user)
+
+    def list_moderators(self, channel_name):
+        """
+        Returns a list of moderators for the channel
+
+        Args:
+            channel_name(str): name of the channel
+
+        Returns:
+            praw.models.listing.generator.ListingGenerator: a generator representing the contributors in the channel
+        """
+        return self.get_channel(channel_name).moderator()
