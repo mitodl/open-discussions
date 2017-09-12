@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from praw.models.reddit.redditor import Redditor
 from rest_framework import status
 from rest_framework.generics import (
+    CreateAPIView,
     ListAPIView,
     ListCreateAPIView,
     RetrieveDestroyAPIView,
@@ -21,6 +22,7 @@ from channels.serializers import (
     ChannelSerializer,
     CommentSerializer,
     ContributorSerializer,
+    SubscriberSerializer,
     PostSerializer,
     ModeratorSerializer,
 )
@@ -214,3 +216,36 @@ class ContributorDetailView(RetrieveDestroyAPIView):
                 data={'error': str(exc)},
                 status=status.HTTP_409_CONFLICT
             )
+
+
+class SubscriberListView(CreateAPIView):
+    """
+    View to add subscribers in channels
+    """
+    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
+    serializer_class = SubscriberSerializer
+
+
+class SubscriberDetailView(RetrieveDestroyAPIView):
+    """
+    View to retrieve and remove subscribers in channels
+    """
+    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
+    serializer_class = SubscriberSerializer
+
+    def get_object(self):
+        """Get subscriber in channel"""
+        api = Api(user=self.request.user)
+        subscriber_name = self.kwargs['subscriber_name']
+        channel_name = self.kwargs['channel_name']
+        if not api.is_subscriber(subscriber_name, channel_name):
+            raise NotFound('User {} is not a subscriber of {}'.format(subscriber_name, channel_name))
+        return Redditor(api.reddit, name=subscriber_name)
+
+    def perform_destroy(self, subscriber):
+        """
+        Removes a subscriber from a channel
+        """
+        api = Api(user=self.request.user)
+        channel_name = self.kwargs['channel_name']
+        api.remove_subscriber(subscriber.name, channel_name)

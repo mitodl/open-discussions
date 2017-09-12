@@ -16,6 +16,7 @@ from channels.serializers import (
     ContributorSerializer,
     ModeratorSerializer,
     PostSerializer,
+    SubscriberSerializer,
 )
 from open_discussions.factories import UserFactory
 
@@ -272,3 +273,47 @@ def test_moderator_create():
         }).create({'moderator_name': moderator_user.username})
         assert contributor is moderator_redditor
         api.return_value.add_moderator.assert_called_once_with(moderator_user.username, 'foo_channel')
+
+
+def test_subscriber():
+    """Serialize of a redditor-like object"""
+    redditor = Mock(spec=Redditor)
+    # the `name` attribute cannot be configured during the mock object creation
+    redditor.name = 'fooo_username'
+    assert SubscriberSerializer(redditor).data == {'subscriber_name': 'fooo_username'}
+
+
+def test_subscriber_validate_name_no_string():
+    """validate the input in case the value is not a string"""
+    with pytest.raises(ValidationError) as ex:
+        SubscriberSerializer().validate_subscriber_name(None)
+    assert ex.value.args[0] == 'subscriber name must be a string'
+
+
+def test_subscriber_validate_name_no_valid_user():
+    """validate the input in case the user does not exists in the DB"""
+    with pytest.raises(ValidationError) as ex:
+        SubscriberSerializer().validate_subscriber_name('foo_user')
+    assert ex.value.args[0] == 'subscriber name is not a valid user'
+
+
+def test_subscriber_validate_name():
+    """validate the input"""
+    user = UserFactory.create()
+    assert SubscriberSerializer().validate_subscriber_name(user.username) == {'subscriber_name': user.username}
+
+
+def test_subscriber_create():
+    """Adds a subscriber"""
+    user = UserFactory.create()
+    subscriber_user = UserFactory.create()
+    subscriber_redditor = Mock(spec=Redditor)
+    subscriber_redditor.name = subscriber_user.username
+    with patch('channels.serializers.Api', autospec=True) as api:
+        api.return_value.add_subscriber.return_value = subscriber_redditor
+        subscriber = SubscriberSerializer(context={
+            "request": Mock(user=user),
+            "view": Mock(kwargs={'channel_name': 'foo_channel'})
+        }).create({'subscriber_name': subscriber_user.username})
+        assert subscriber is subscriber_redditor
+        api.return_value.add_subscriber.assert_called_once_with(subscriber_user.username, 'foo_channel')
