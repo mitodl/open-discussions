@@ -698,6 +698,14 @@ def test_list_moderators(client, use_betamax, praw_settings):
     assert resp.json() == [{'moderator_name': 'fooadmin'}]
 
 
+def test_list_subscribers_not_allowed(client, staff_jwt_header):
+    """
+    Get method not allowed on the list of subscribers
+    """
+    url = reverse('subscriber-list', kwargs={'channel_name': 'test_channel'})
+    assert client.get(url, **staff_jwt_header).status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+
 def test_add_contributor(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Adds a contributor to a channel
@@ -720,6 +728,17 @@ def test_add_moderator(client, use_betamax, praw_settings, staff_jwt_header):
     resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {'moderator_name': 'othermoderator'}
+
+
+def test_add_subscriber(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Adds a subscriber to a channel
+    """
+    subscriber = UserFactory.create(username='othersubscriber')
+    url = reverse('subscriber-list', kwargs={'channel_name': 'test_channel'})
+    resp = client.post(url, data={'subscriber_name': subscriber.username}, format='json', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json() == {'subscriber_name': 'othersubscriber'}
 
 
 def test_detail_contributor_error(client, use_betamax, praw_settings):
@@ -745,6 +764,18 @@ def test_detail_contributor(client, use_betamax, praw_settings):
     resp = client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {'contributor_name': 'othercontributor'}
+
+
+def test_detail_subscriber(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Detail of a subscriber in a channel
+    """
+    subscriber = UserFactory.create(username='othersubscriber')
+    url = reverse(
+        'subscriber-detail', kwargs={'channel_name': 'test_channel', 'subscriber_name': subscriber.username})
+    resp = client.get(url, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {'subscriber_name': 'othersubscriber'}
 
 
 def test_remove_contributor(client, use_betamax, praw_settings, staff_jwt_header):
@@ -781,3 +812,14 @@ def test_remove_contributor_moderator(client, use_betamax, praw_settings, staff_
         'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': contributor.username})
     resp = client.delete(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_409_CONFLICT
+
+
+def test_remove_subscriber(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Removes a subscriber from a channel
+    """
+    subscriber = UserFactory.create(username='othersubscriber')
+    url = reverse(
+        'subscriber-detail', kwargs={'channel_name': 'test_channel', 'subscriber_name': subscriber.username})
+    resp = client.delete(url, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_204_NO_CONTENT

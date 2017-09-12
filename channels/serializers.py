@@ -334,3 +334,25 @@ class ModeratorSerializer(serializers.Serializer):
         channel_name = self.context['view'].kwargs['channel_name']
 
         return api.add_moderator(validated_data['moderator_name'], channel_name)
+
+
+class SubscriberSerializer(serializers.Serializer):
+    """Serializer for subscriber"""
+    subscriber_name = WriteableSerializerMethodField()
+
+    def get_subscriber_name(self, instance):
+        """Returns the name for the subscriber"""
+        return instance.name
+
+    def validate_subscriber_name(self, value):
+        """Validates the subscriber name"""
+        if not isinstance(value, str):
+            raise ValidationError("subscriber name must be a string")
+        if not User.objects.filter(username=value).exists():
+            raise ValidationError("subscriber name is not a valid user")
+        return {'subscriber_name': value}
+
+    def create(self, validated_data):
+        api = Api(user=self.context['request'].user)
+        channel_name = self.context['view'].kwargs['channel_name']
+        return api.add_subscriber(validated_data['subscriber_name'], channel_name)

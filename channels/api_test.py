@@ -402,3 +402,41 @@ def test_get_or_create_user(mocker, settings):
     assert token == expected_token
     get_session_stub.return_value.get.assert_called_once_with(refresh_token_url, params={'username': username})
     get_session_stub.return_value.get.return_value.json.assert_called_once_with()
+
+
+def test_add_subscriber(mock_client):
+    """Test add subscriber"""
+    client = api.Api(UserFactory.create())
+    subscriber = UserFactory.create()
+    redditor = client.add_subscriber(subscriber.username, 'channel_test_name')
+    mock_client.subreddit.return_value.subscribe.assert_called_once_with()
+    assert redditor.name == subscriber.username
+
+
+def test_add_remove_subscriber_no_user(mock_client):
+    """Test add and remove subscriber in case the user does not exist"""
+    client_user = UserFactory.create()
+    client = api.Api(client_user)
+    with pytest.raises(NotFound):
+        client.add_subscriber('fooooooo', 'foo_channel_name')
+    assert mock_client.subreddit.return_value.subscribe.call_count == 0
+
+    with pytest.raises(NotFound):
+        client.remove_contributor('fooooooo', 'foo_channel_name')
+    assert mock_client.subreddit.return_value.unsubscribe.call_count == 0
+
+
+def test_remove_subscriber(mock_client):
+    """Test remove subscriber"""
+    client = api.Api(UserFactory.create())
+    subscriber = UserFactory.create()
+    client.remove_subscriber(subscriber.username, 'channel_test_name')
+    mock_client.subreddit.return_value.unsubscribe.assert_called_once_with()
+
+
+def test_is_subscriber(mock_client):
+    """Test is subscriber"""
+    client = api.Api(UserFactory.create())
+    subscriber = UserFactory.create()
+    ret = client.is_subscriber(subscriber.username, 'channel_test_name')
+    assert ret == mock_client.subreddit.return_value.user_is_subscriber

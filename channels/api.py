@@ -490,3 +490,62 @@ class Api:
             praw.models.listing.generator.ListingGenerator: a generator representing the contributors in the channel
         """
         return self.get_channel(channel_name).moderator()
+
+    def add_subscriber(self, subscriber_name, channel_name):
+        """
+        Adds an user to the subscribers of a channel
+
+        Args:
+            subscriber_name(str): the username for the user to be added as subscriber
+            channel_name(str): the channel name identifier
+
+        Returns:
+            praw.models.Redditor: the reddit representation of the user
+        """
+        if subscriber_name == self.user.username:
+            self.get_channel(channel_name).subscribe()
+        else:
+            try:
+                user = User.objects.get(username=subscriber_name)
+            except User.DoesNotExist:
+                raise NotFound("User {} does not exist".format(subscriber_name))
+            Api(user).get_channel(channel_name).subscribe()
+        return Redditor(self.reddit, name=subscriber_name)
+
+    def remove_subscriber(self, subscriber_name, channel_name):
+        """
+        Removes an user from the subscribers of a channel
+
+        Args:
+            subscriber_name(str): the username for the user to be added as subscriber
+            channel_name(str): the channel name identifier
+
+        """
+        if subscriber_name == self.user.username:
+            self.get_channel(channel_name).unsubscribe()
+        else:
+            try:
+                user = User.objects.get(username=subscriber_name)
+            except User.DoesNotExist:
+                raise NotFound("User {} does not exist".format(subscriber_name))
+            Api(user).get_channel(channel_name).unsubscribe()
+
+    def is_subscriber(self, subscriber_name, channel_name):
+        """
+        Checks if an user is subscriber a channel
+
+        Args:
+            subscriber_name(str): the username for the user to be added as subscriber
+            channel_name(str): the channel name identifier
+
+        Returns:
+            bool: whether the user has subscribed to the channel
+        """
+        if subscriber_name == self.user.username:
+            return self.get_channel(channel_name).user_is_subscriber
+        else:
+            try:
+                user = User.objects.get(username=subscriber_name)
+            except User.DoesNotExist:
+                raise NotFound("User {} does not exist".format(subscriber_name))
+            return Api(user).get_channel(channel_name).user_is_subscriber
