@@ -432,9 +432,10 @@ class Api:
             user = User.objects.get(username=moderator_name)
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
-
-        self.get_channel(channel_name).moderator.add(user)
-        Api(user).accept_invite(channel_name)
+        channel = self.get_channel(channel_name)
+        if moderator_name not in channel.moderator():
+            channel.moderator.add(user)
+            Api(user).accept_invite(channel_name)
         return Redditor(self.reddit, name=moderator_name)
 
     def accept_invite(self, channel_name):
