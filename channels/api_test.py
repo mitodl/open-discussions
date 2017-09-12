@@ -356,3 +356,31 @@ def test_list_moderator(mock_client):
     moderators = client.list_moderators('channel_test_name')
     mock_client.subreddit.return_value.moderator.assert_called_once_with()
     assert mock_client.subreddit.return_value.moderator.return_value == moderators
+
+
+@pytest.mark.parametrize('verify_ssl', [True, False])
+def test_api_constructor(mocker, settings, verify_ssl):
+    """
+    Api() should have a client which uses certain settings to configure its request session
+    """
+    client_user = UserFactory.create()
+    session_stub = mocker.patch('channels.api.requests.Session', autospec=True)
+    refresh_token = 'token'
+    session_stub.return_value.get.return_value.json.return_value = {'refresh_token': refresh_token}
+    session_stub.return_value.headers = {}
+
+    settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID = 'client_id'
+    settings.OPEN_DISCUSSIONS_REDDIT_SECRET = 'secret'
+    settings.OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL = verify_ssl
+    settings.OPEN_DISCUSSIONS_REDDIT_URL = 'http://fake_url'
+    settings.VERSION = '1.2.3'
+
+    client = api.Api(client_user)
+    config = client.reddit.config
+    assert config.short_url == settings.OPEN_DISCUSSIONS_REDDIT_URL
+    assert config.reddit_url == settings.OPEN_DISCUSSIONS_REDDIT_URL
+    assert config.oauth_url == settings.OPEN_DISCUSSIONS_REDDIT_URL
+    assert config.user_agent == "MIT-Open: {}".format(settings.VERSION)
+    assert config.client_id == settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID
+    assert config.client_secret == settings.OPEN_DISCUSSIONS_REDDIT_SECRET
+    assert config.refresh_token == refresh_token
