@@ -1,5 +1,5 @@
 """Channels APIs"""
-# pylint: disable=R0904
+# pylint: disable=too-many-public-methods
 from urllib.parse import urljoin
 
 import requests
