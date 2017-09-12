@@ -81,11 +81,24 @@
     "OPEN_DISCUSSIONS_FROM_EMAIL": {
       "description": "E-mail to use for the from field"
     },
+    "OPEN_DISCUSSIONS_JWT_SECRET": {
+      "description": "Shared secret for JWT auth tokens",
+      "required": true
+    },
     "OPEN_DISCUSSIONS_REDDIT_CLIENT_ID": {
-      "description": "OAuth client ID for authentication with reddit"
+      "description": "OAuth client ID for authentication with reddit",
+      "required": true
     },
     "OPEN_DISCUSSIONS_REDDIT_SECRET": {
-      "description": "OAuth secret for authentication with reddit"
+      "description": "OAuth secret for authentication with reddit",
+      "required": true
+    },
+    "OPEN_DISCUSSIONS_REDDIT_URL": {
+      "description": "URL including protocol to reddit host (e.g. https://reddit.local)",
+      "required": true
+    },
+    "OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL": {
+      "description": "If false, disables validation of Reddit's SSL certificate"
     },
     "OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT": {
       "description": "Application-level SSL redirect setting.",
