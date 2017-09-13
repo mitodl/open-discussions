@@ -1,5 +1,6 @@
 // @flow
 import React from "react"
+import R from "ramda"
 
 import Card from "../components/Card"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
@@ -13,6 +14,11 @@ type CreatePostFormProps = {
   channel: Channel,
   history: Object
 }
+
+const goBackAndHandleEvent = R.curry((history, e) => {
+  e.preventDefault()
+  history.goBack()
+})
 
 export default class CreatePostForm extends React.Component {
   props: CreatePostFormProps
@@ -92,7 +98,10 @@ export default class CreatePostForm extends React.Component {
               <button className="submit-post" type="submit">
                 Submit Post
               </button>
-              <button className="cancel" onClick={() => history.goBack()}>
+              <button
+                className="cancel"
+                onClick={goBackAndHandleEvent(history)}
+              >
                 Cancel
               </button>
             </div>

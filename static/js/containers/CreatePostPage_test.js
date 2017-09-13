@@ -108,4 +108,12 @@ describe("CreatePostPage", () => {
     wrapper.find(".cancel").simulate("click")
     assert.equal(helper.currentLocation.pathname, "/")
   })
+
+  it("cancel button onClick handler should preventDefault", async () => {
+    const [wrapper] = await renderPage()
+    const event = { preventDefault: helper.sandbox.stub() }
+    const cancelBtn = wrapper.find(".cancel")
+    cancelBtn.props().onClick(event)
+    sinon.assert.called(event.preventDefault)
+  })
 })
