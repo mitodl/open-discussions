@@ -7,6 +7,7 @@ from django.db import transaction
 import ulid
 from rest_framework import serializers
 
+from channels.api import get_or_create_user
 from profiles.models import Profile
 
 
@@ -31,6 +32,8 @@ class UserSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             user = get_user_model().objects.create(**validated_data)
             Profile.objects.create(user=user, **profile_data)
+
+        get_or_create_user(user.username)
         return user
 
     def update(self, instance, validated_data):
