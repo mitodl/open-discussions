@@ -2,8 +2,7 @@
 from django.db import models
 from django.conf import settings
 
-# This matches ImageField.max_length
-MAX_IMAGE_FIELD_LENGTH = 100
+MAX_IMAGE_FIELD_LENGTH = 1024
 
 
 class Profile(models.Model):
