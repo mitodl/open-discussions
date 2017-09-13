@@ -20,7 +20,8 @@ type CreateCommentFormProps = {
   onSubmit: (p: string, t: string, c: string, p: Post) => () => void,
   onUpdate: (e: Object) => void,
   cancelReply: () => void,
-  formDataLens: (s: string) => Object
+  formDataLens: (s: string) => Object,
+  processing: boolean
 }
 
 export const replyToCommentKey = (comment: Comment) =>
@@ -39,12 +40,15 @@ const getPostReplyInitialValue = (parent: Post) => ({
   text:    ""
 })
 
+const isEmptyCommentBody = R.compose(R.isEmpty, R.trim, R.defaultTo(""))
+
 const commentForm = (
   onSubmit: () => void,
   text: string,
   onUpdate: (e: any) => void,
   cancelReply: () => void,
-  isComment: boolean
+  isComment: boolean,
+  disabled: boolean
 ) =>
   <div className="reply-form">
     <form onSubmit={onSubmit} className="form">
@@ -58,7 +62,11 @@ const commentForm = (
           onChange={onUpdate}
         />
       </div>
-      <button type="submit" className="blue-button">
+      <button
+        type="submit"
+        className={`blue-button ${disabled ? "disabled" : ""}`}
+        disabled={disabled || isEmptyCommentBody(text)}
+      >
         Submit
       </button>
       {isComment
@@ -148,7 +156,8 @@ export const ReplyToCommentForm = connect(
     post,
     onSubmit,
     onUpdate,
-    cancelReply
+    cancelReply,
+    processing
     }: CreateCommentFormProps) => {
     if (R.has(formKey, forms)) {
       const { post_id, text, comment_id } = R.prop(formKey, forms).value
@@ -158,7 +167,8 @@ export const ReplyToCommentForm = connect(
         text,
         onUpdate,
         cancelReply,
-        true
+        true,
+        processing
       )
     }
     return null
@@ -206,7 +216,8 @@ export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
         onSubmit,
         onUpdate,
         cancelReply,
-        formDataLens
+        formDataLens,
+        processing
       } = this.props
       const { post_id, text, comment_id } = getFormData(formDataLens, forms)
 
@@ -215,7 +226,8 @@ export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
         text,
         onUpdate,
         cancelReply,
-        false
+        false,
+        processing
       )
     }
   }

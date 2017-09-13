@@ -31,6 +31,7 @@ type PostPageProps = {
   channel: Channel,
   commentsTree: Array<Comment>,
   forms: FormsState,
+  commentInFlight: boolean,
   // from the router match
   channelName: string,
   postID: string
@@ -87,7 +88,14 @@ class PostPage extends React.Component {
   }
 
   render() {
-    const { dispatch, post, channel, commentsTree, forms } = this.props
+    const {
+      dispatch,
+      post,
+      channel,
+      commentsTree,
+      forms,
+      commentInFlight
+    } = this.props
     if (!channel || !post || !commentsTree) {
       return null
     }
@@ -102,7 +110,11 @@ class PostPage extends React.Component {
               toggleUpvote={toggleUpvote(dispatch)}
               expanded
             />
-            <ReplyToPostForm forms={forms} post={post} />
+            <ReplyToPostForm
+              forms={forms}
+              post={post}
+              processing={commentInFlight}
+            />
           </div>
         </Card>
         <div className="comments-count">
@@ -114,6 +126,7 @@ class PostPage extends React.Component {
           upvote={this.upvote}
           downvote={this.downvote}
           beginReply={beginReply(dispatch)}
+          processing={commentInFlight}
         />
       </div>
     )
@@ -136,7 +149,8 @@ const mapStateToProps = (state, ownProps) => {
     commentsTree,
     loaded:             R.none(R.isNil, [post, channel, commentsTree]),
     errored:            anyError([posts, channels, comments]),
-    subscribedChannels: getSubscribedChannels(state)
+    subscribedChannels: getSubscribedChannels(state),
+    commentInFlight:    comments.processing
   }
 }
 

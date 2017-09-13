@@ -94,6 +94,16 @@ describe("CreatePostPage", () => {
     })
   }
 
+  it("should disable the submit button when processing", async () => {
+    helper.store.dispatch({
+      type: actions.posts.post.requestType
+    })
+    const [wrapper] = await renderPage()
+    const btnProps = wrapper.find(".submit-post").props()
+    assert.isTrue(btnProps.disabled)
+    assert.equal(btnProps.className, "submit-post disabled")
+  })
+
   it("goes back when cancel is clicked", async () => {
     const [wrapper] = await renderPage()
     assert.equal(

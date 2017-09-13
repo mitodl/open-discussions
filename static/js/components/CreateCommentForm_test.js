@@ -22,22 +22,20 @@ import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
-import type { Comment, Post } from "../flow/discussionTypes"
-
 describe("CreateCommentForm", () => {
   let helper, post, comment, postKeys, commentKeys
 
-  const renderPostForm = (post: Post) =>
+  const renderPostForm = (props = {}) =>
     mount(
       <Provider store={helper.store}>
-        <ReplyToPostForm post={post} />
+        <ReplyToPostForm post={post} {...props} />
       </Provider>
     )
 
-  const renderCommentForm = (comment: Comment) =>
+  const renderCommentForm = (props = {}) =>
     mount(
       <Provider store={helper.store}>
-        <ReplyToCommentForm comment={comment} />
+        <ReplyToCommentForm comment={comment} {...props} />
       </Provider>
     )
 
@@ -64,7 +62,7 @@ describe("CreateCommentForm", () => {
     let expectedKeys, wrapper, emptyFormState
 
     beforeEach(() => {
-      wrapper = renderPostForm(post)
+      wrapper = renderPostForm()
       expectedKeys = postKeys
       emptyFormState = {
         errors: {},
@@ -75,12 +73,43 @@ describe("CreateCommentForm", () => {
       }
     })
 
+    it("should disable submit button when passed empty comment", () => {
+      assert.isTrue(wrapper.find("button").props().disabled)
+    })
+
+    it("should enable submit button when text in form", async () => {
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      assert.isFalse(wrapper.find("button").props().disabled)
+    })
+
+    it('should disable submit button when passed the "processing" prop', async () => {
+      wrapper = await renderPostForm({ processing: true })
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      let btnProps = wrapper.find("button").props()
+      assert.isTrue(btnProps.disabled)
+      assert.equal(btnProps.className, "blue-button disabled")
+    })
+
     it("should not render a reply or cancel button", () => {
       assert.lengthOf(wrapper.find("a"), 0)
     })
 
     it("should begin form editing on load", async () => {
-      wrapper = await renderPostForm(post)
+      wrapper = await renderPostForm()
       const [textarea] = wrapper.find("textarea[name='text']")
       assert.equal(textarea.value, "")
       assert.deepEqual(
@@ -148,7 +177,7 @@ describe("CreateCommentForm", () => {
     let expectedKeys, wrapper
 
     beforeEach(() => {
-      wrapper = renderCommentForm(comment)
+      wrapper = renderCommentForm()
       expectedKeys = commentKeys
 
       beginReply(
@@ -157,6 +186,38 @@ describe("CreateCommentForm", () => {
         getCommentReplyInitialValue(comment),
         undefined
       )
+    })
+
+    it("should disable submit button when passed empty comment", () => {
+      assert.isTrue(wrapper.find("button").props().disabled)
+    })
+
+    it("should enable submit button when text in form", async () => {
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      wrapper = renderCommentForm()
+      assert.isFalse(wrapper.find("button").props().disabled)
+    })
+
+    it('should disable submit button when passed the "processing" prop', async () => {
+      wrapper = renderCommentForm({ processing: true })
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      let btnProps = wrapper.find("button").props()
+      assert.isTrue(btnProps.disabled)
+      assert.equal(btnProps.className, "blue-button disabled")
     })
 
     it("should show an empty form when reply has been started", async () => {

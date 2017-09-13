@@ -40,6 +40,7 @@ describe("CommentTree", () => {
         beginReply={R.curry((formKey, initialValue, e) => {
           beginReplyStub(formKey, initialValue, e)
         })}
+        processing={false}
         {...props}
       />
     )

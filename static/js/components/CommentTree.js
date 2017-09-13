@@ -24,12 +24,21 @@ const renderTopLevelComment = R.curry(
     upvote: CommentVoteFunc,
     downvote: CommentVoteFunc,
     beginReply,
+    processing: boolean,
     comment: Comment,
     idx: number
   ) =>
     <Card key={idx}>
       <div className="top-level-comment">
-        {renderComment(forms, upvote, downvote, beginReply, 0, comment)}
+        {renderComment(
+          forms,
+          upvote,
+          downvote,
+          beginReply,
+          processing,
+          0,
+          comment
+        )}
       </div>
     </Card>
 )
@@ -40,6 +49,7 @@ const renderComment = R.curry(
     upvote: CommentVoteFunc,
     downvote: CommentVoteFunc,
     beginReply: (fk: string, iv: Object, e: ?Object) => void,
+    processing: boolean,
     depth: number,
     comment: Comment
   ) => {
@@ -81,11 +91,22 @@ const renderComment = R.curry(
             </div>
           </div>
           <div>
-            <ReplyToCommentForm forms={forms} comment={comment} />
+            <ReplyToCommentForm
+              forms={forms}
+              comment={comment}
+              processing={processing}
+            />
           </div>
           <div className="replies">
             {R.map(
-              renderComment(forms, upvote, downvote, beginReply, depth + 1),
+              renderComment(
+                forms,
+                upvote,
+                downvote,
+                beginReply,
+                processing,
+                depth + 1
+              ),
               comment.replies
             )}
           </div>
@@ -100,7 +121,8 @@ type CommentTreeProps = {
   forms: FormsState,
   upvote: CommentVoteFunc,
   downvote: CommentVoteFunc,
-  beginReply: (fk: string, iv: Object, e: ?Object) => void
+  beginReply: (fk: string, iv: Object, e: ?Object) => void,
+  processing: boolean
 }
 
 const CommentTree = ({
@@ -108,11 +130,12 @@ const CommentTree = ({
   forms,
   upvote,
   downvote,
-  beginReply
+  beginReply,
+  processing
   }: CommentTreeProps) =>
   <div className="comments">
     {R.addIndex(R.map)(
-      renderTopLevelComment(forms, upvote, downvote, beginReply),
+      renderTopLevelComment(forms, upvote, downvote, beginReply, processing),
       comments
     )}
   </div>

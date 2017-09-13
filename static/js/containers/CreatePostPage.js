@@ -21,7 +21,8 @@ type CreatePostPageProps = {
   postForm: ?FormValue,
   channel: Channel,
   channels: RestState<Array<Channel>>,
-  history: Object
+  history: Object,
+  processing: boolean
 }
 
 const CREATE_POST_KEY = "post:new"
@@ -90,7 +91,7 @@ class CreatePostPage extends React.Component {
   }
 
   render() {
-    const { channel, postForm, history } = this.props
+    const { channel, postForm, history, processing } = this.props
 
     if (!postForm || R.isNil(channel)) {
       return null
@@ -106,6 +107,7 @@ class CreatePostPage extends React.Component {
             postForm={postForm.value}
             channel={channel}
             history={history}
+            processing={processing}
           />
         </div>
       </div>
@@ -117,11 +119,13 @@ const mapStateToProps = (state, props) => {
   const channelName = getChannelName(props)
   const channels = state.channels
   const channel = channels.data.get(channelName)
+  const processing = state.posts.processing
 
   return {
-    channel:  channel,
-    channels: channels,
-    postForm: getForm(state.forms)
+    postForm: getForm(state.forms),
+    channel,
+    channels,
+    processing
   }
 }
 

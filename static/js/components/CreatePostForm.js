@@ -12,7 +12,8 @@ type CreatePostFormProps = {
   updateIsText: (isText: boolean) => void,
   postForm: ?PostForm,
   channel: Channel,
-  history: Object
+  history: Object,
+  processing: boolean
 }
 
 const goBackAndHandleEvent = R.curry((history, e) => {
@@ -30,7 +31,8 @@ export default class CreatePostForm extends React.Component {
       onUpdate,
       onSubmit,
       updateIsText,
-      history
+      history,
+      processing
     } = this.props
     if (!postForm) {
       return null
@@ -95,12 +97,17 @@ export default class CreatePostForm extends React.Component {
               </span>
             </div>
             <div className="actions row">
-              <button className="submit-post" type="submit">
+              <button
+                className={`submit-post ${processing ? "disabled" : ""}`}
+                type="submit"
+                disabled={processing}
+              >
                 Submit Post
               </button>
               <button
                 className="cancel"
                 onClick={goBackAndHandleEvent(history)}
+                disabled={processing}
               >
                 Cancel
               </button>
