@@ -109,7 +109,7 @@
     },
     "OPEN_DISCUSSIONS_USE_S3": {
       "description": "Use S3 for storage backend (required on Heroku)",
-      "value": "True"
+      "value": "False"
     },
     "NEW_RELIC_APP_NAME": {
       "description": "Application identifier in New Relic."
