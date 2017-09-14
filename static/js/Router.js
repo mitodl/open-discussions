@@ -1,14 +1,19 @@
+// @flow
 import React from "react"
 import { Provider } from "react-redux"
 import { Route, Router as ReactRouter } from "react-router-dom"
 
 import App from "./containers/App"
 import withTracker from "./util/withTracker"
+import ScrollToTop from "./components/ScrollToTop"
+
+import type { Store } from "redux"
 
 export default class Router extends React.Component {
   props: {
     store: Store,
-    history: Object
+    history: Object,
+    children: React$Element<*>
   }
 
   render() {
@@ -18,7 +23,9 @@ export default class Router extends React.Component {
       <div>
         <Provider store={store}>
           <ReactRouter history={history}>
-            {children}
+            <ScrollToTop>
+              {children}
+            </ScrollToTop>
           </ReactRouter>
         </Provider>
       </div>
