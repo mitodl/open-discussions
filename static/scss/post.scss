@@ -1,5 +1,9 @@
 .post-card {
   padding: 6px 22px 0 22px;
+
+  @include breakpoint(phone) {
+    padding: 4px 9px 0;
+  }
 }
 
 .post-summary {
@@ -45,6 +49,8 @@
     img {
       float: left;
       margin-right: 15px;
+      position: relative;
+      top: 6px;
     }
   }
 
