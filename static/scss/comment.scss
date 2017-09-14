@@ -1,10 +1,18 @@
 .comments {
+  .card-contents {
+    padding: 30px 15px 35px;
+  }
+
   .top-level-comment {
     padding: 0 15px 0 4px;
   }
 
+  .top-level-comment>.comment {
+    margin-top: 0;
+  }
+
   .comment {
-    margin: 10px 0;
+    margin: 38px 0 0;
     display: flex;
     flex-direction: row;
 
@@ -37,7 +45,7 @@
 
       &.vote-reply {
         width: 110px;
-        margin: -6px 0 33px;
+        margin: -6px 0 5px;
         display: flex;
       }
 
