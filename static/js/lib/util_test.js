@@ -1,7 +1,7 @@
 // @flow
 import { assert } from "chai"
 
-import { wait, enumerate } from "./util"
+import { wait, enumerate, isEmptyText } from "./util"
 
 describe("utility functions", () => {
   it("waits some milliseconds", done => {
@@ -32,5 +32,19 @@ describe("utility functions", () => {
     }
 
     assert.deepEqual(list, [[0, 6], [1, 7], [2, 8], [3, 9], [4, 10]])
+  })
+
+  it("isEmptyText works as expected", () => {
+    [
+      [" ", true],
+      ["", true],
+      ["\n\t   ", true],
+      ["                   \t ", true],
+      ["foo \n", false],
+      ["foo", false],
+      ["   \n\tfoo", false]
+    ].forEach(([text, exp]) => {
+      assert.equal(isEmptyText(text), exp)
+    })
   })
 })

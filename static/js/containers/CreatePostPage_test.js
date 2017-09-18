@@ -12,6 +12,22 @@ import type { CreatePostPayload } from "../flow/discussionTypes"
 describe("CreatePostPage", () => {
   let helper, listenForActions, renderComponent, currentChannel, channels
 
+  const makeEvent = (name, value) => ({ target: { value, name } })
+
+  const setTitle = (wrapper, title) =>
+    wrapper
+      .find(".titlefield input")
+      .simulate("change", makeEvent("title", title))
+
+  const setText = (wrapper, text) =>
+    wrapper.find(".text textarea").simulate("change", makeEvent("text", text))
+
+  const setUrl = (wrapper, url) =>
+    wrapper.find(".url input").simulate("change", makeEvent("url", url))
+
+  const setLinkPost = wrapper =>
+    wrapper.find(".new-link-post").simulate("click")
+
   beforeEach(() => {
     channels = makeChannelList(10)
     currentChannel = channels[5]
@@ -47,25 +63,19 @@ describe("CreatePostPage", () => {
       const post = makePost(!isText)
       helper.createPostStub.returns(Promise.resolve(post))
 
-      const makeEvent = (name, value) => ({ target: { value, name } })
-
       return renderPage().then(([wrapper]) => {
         const title = "Title"
         const text = "Text"
         const url = "http://url.example.com"
-        wrapper
-          .find(".titlefield input")
-          .simulate("change", makeEvent("title", title))
+        setTitle(wrapper, title)
 
         if (!isText) {
-          wrapper.find(".new-link-post").simulate("click")
+          setLinkPost(wrapper)
         }
         if (isText) {
-          wrapper
-            .find(".text textarea")
-            .simulate("change", makeEvent("text", text))
+          setText(wrapper, text)
         } else {
-          wrapper.find(".url input").simulate("change", makeEvent("url", url))
+          setUrl(wrapper, url)
         }
 
         return listenForActions(
@@ -102,6 +112,35 @@ describe("CreatePostPage", () => {
     const btnProps = wrapper.find(".submit-post").props()
     assert.isTrue(btnProps.disabled)
     assert.equal(btnProps.className, "submit-post disabled")
+  })
+
+  it("should disable the submit button when title or body of text post is empty", async () => {
+    const [wrapper] = await renderPage()
+    ;[
+      ["title", "", true],
+      ["", "text", true],
+      ["", "", true],
+      ["title", "text", false]
+    ].forEach(([title, text, disabled]) => {
+      setTitle(wrapper, title)
+      setText(wrapper, text)
+      assert.equal(disabled, wrapper.find(".submit-post").props().disabled)
+    })
+  })
+
+  it("should disable the submit button when url post is empty", async () => {
+    const [wrapper] = await renderPage()
+    wrapper.find(".new-link-post").simulate("click")
+    ;[
+      ["title", "", true],
+      ["", "url", true],
+      ["", "", true],
+      ["title", "url", false]
+    ].forEach(([title, url, disabled]) => {
+      setTitle(wrapper, title)
+      setUrl(wrapper, url)
+      assert.equal(disabled, wrapper.find(".submit-post").props().disabled)
+    })
   })
 
   it("goes back when cancel is clicked", async () => {

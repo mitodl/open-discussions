@@ -1,4 +1,6 @@
 // @flow
+import R from "ramda"
+
 import type { Match } from "react-router"
 
 export const getChannelName = (props: { match: Match }): string =>
@@ -25,3 +27,5 @@ export function* enumerate<T>(
     ++i
   }
 }
+
+export const isEmptyText = R.compose(R.isEmpty, R.trim, R.defaultTo(""))

@@ -4,6 +4,9 @@ import R from "ramda"
 
 import Card from "../components/Card"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
+
+import { isEmptyText } from "../lib/util"
+
 import type { Channel, PostForm } from "../flow/discussionTypes"
 
 type CreatePostFormProps = {
@@ -39,6 +42,10 @@ export default class CreatePostForm extends React.Component {
     }
 
     const { isText, text, url, title } = postForm
+
+    const shouldDisableSubmit = isText
+      ? isEmptyText(text) || isEmptyText(title)
+      : isEmptyText(url) || isEmptyText(title)
 
     return (
       <div>
@@ -100,7 +107,7 @@ export default class CreatePostForm extends React.Component {
               <button
                 className={`submit-post ${processing ? "disabled" : ""}`}
                 type="submit"
-                disabled={processing}
+                disabled={processing || shouldDisableSubmit}
               >
                 Submit Post
               </button>

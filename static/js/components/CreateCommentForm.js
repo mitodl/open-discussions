@@ -5,6 +5,7 @@ import { connect } from "react-redux"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
+import { isEmptyText } from "../lib/util"
 
 import type { Comment, Post, CommentForm } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
@@ -40,8 +41,6 @@ const getPostReplyInitialValue = (parent: Post) => ({
   text:    ""
 })
 
-const isEmptyCommentBody = R.compose(R.isEmpty, R.trim, R.defaultTo(""))
-
 const commentForm = (
   onSubmit: () => void,
   text: string,
@@ -65,7 +64,7 @@ const commentForm = (
       <button
         type="submit"
         className={`blue-button ${disabled ? "disabled" : ""}`}
-        disabled={disabled || isEmptyCommentBody(text)}
+        disabled={disabled || isEmptyText(text)}
       >
         Submit
       </button>
