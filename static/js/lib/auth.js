@@ -25,7 +25,12 @@ const redirectAndReject = async (reason: string) => {
 export const fetchWithAuthFailure = async (...args: any) => {
   try {
     return await fetchJSONWithCSRF(...args)
-  } catch (_) {
+  } catch (fetchError) {
+    if (!fetchError || fetchError.errorStatusCode !== 401) {
+      // not an authentication failure, rethrow
+      throw fetchError
+    }
+
     try {
       // renew the session
       const session = await renewSession()

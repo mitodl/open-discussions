@@ -8,6 +8,10 @@ import * as auth from "./auth"
 describe("auth", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
 
+  const error500 = { errorStatusCode: 500 }
+  const error401 = { errorStatusCode: 401 }
+  const typeError = new TypeError()
+
   let sandbox, fetchStub
   beforeEach(() => {
     sandbox = sinon.sandbox.create()
@@ -34,8 +38,23 @@ describe("auth", function() {
     assert.equal(window.location.pathname, "/") // no redirect happened
   })
 
+  for (let [message, error] of [
+    ['a 500 error', error500],
+    ['an unexpected exception', typeError],
+  ]) {
+    it(`does not renew auth for ${message}`, async () => {
+      fetchStub.returns(Promise.reject(error))
+
+      let response = await assert.isRejected(auth.fetchWithAuthFailure("/url"))
+
+      sinon.assert.calledWith(fetchStub, "/url")
+      assert.equal(fetchStub.callCount, 1)
+      assert.deepEqual(response, error)
+    })
+  }
+
   it("renews and retries if the request failed", async () => {
-    fetchStub.onFirstCall().returns(Promise.reject()) // original api call
+    fetchStub.onFirstCall().returns(Promise.reject(error401)) // original api call
     fetchStub.onSecondCall().returns(Promise.resolve()) // original api call again
     fetchMock.mock(SETTINGS.session_url, {
       has_token: true
@@ -51,7 +70,7 @@ describe("auth", function() {
   })
 
   it("redirects and rejects if no token", async () => {
-    fetchStub.onFirstCall().returns(Promise.reject()) // original api call
+    fetchStub.onFirstCall().returns(Promise.reject(error401)) // original api call
     fetchMock.mock(SETTINGS.session_url, {
       has_token: false
     })
@@ -65,7 +84,7 @@ describe("auth", function() {
   })
 
   it("renews and redirect to auth_url if renew fails", async () => {
-    fetchStub.returns(Promise.reject()) // original api call
+    fetchStub.returns(Promise.reject(error401)) // original api call
     fetchMock.mock(SETTINGS.session_url, 401)
 
     await assert.isRejected(auth.fetchWithAuthFailure("/url"))
