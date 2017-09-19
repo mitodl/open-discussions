@@ -39,8 +39,8 @@ describe("auth", function() {
   })
 
   for (let [message, error] of [
-    ['a 500 error', error500],
-    ['an unexpected exception', typeError],
+    ["a 500 error", error500],
+    ["an unexpected exception", typeError]
   ]) {
     it(`does not renew auth for ${message}`, async () => {
       fetchStub.returns(Promise.reject(error))
