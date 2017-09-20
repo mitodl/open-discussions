@@ -22,6 +22,7 @@ from open_discussions.envs import (
     get_bool,
     get_int,
     get_string,
+    get_list_of_str,
 )
 
 VERSION = "0.0.0"
@@ -72,6 +73,7 @@ INSTALLED_APPS = (
     'server_status',
     'raven.contrib.django.raven_compat',
     'rest_framework',
+    'corsheaders',
     # Put our apps after this point
     'open_discussions',
     'profiles'
@@ -91,7 +93,12 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 )
+
+# CORS
+CORS_ORIGIN_WHITELIST = get_list_of_str("OPEN_DISCUSSIONS_CORS_ORIGIN_WHITELIST", [])
+CORS_ALLOW_CREDENTIALS = True
 
 # enable the nplusone profiler only in debug mode
 if DEBUG:

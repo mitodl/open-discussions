@@ -16,6 +16,7 @@ contextlib2==0.5.5        # via raven
 decorator==4.0.11         # via ipython, traitlets
 dj-database-url==0.3.0
 dj-static==0.0.6
+django-cors-headers==2.1.0
 django-redis==4.7.0
 django-server-status==0.3.2
 django-webpack-loader==0.4.1
