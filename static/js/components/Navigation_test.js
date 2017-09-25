@@ -16,24 +16,27 @@ describe("Navigation", () => {
     const renderComponent = (props = defaultProps) =>
       shallow(<Navigation {...props} />)
 
-    it("should not show a create post link if channelName is not in URL", () => {
-      let wrapper = renderComponent()
-      assert.lengthOf(wrapper.find(Link), 0)
+    it("create post link should not have channel name if channelName is not in URL", () => {
+      const wrapper = renderComponent()
+      assert.lengthOf(wrapper.find(Link), 1)
+      const props = wrapper.find(Link).props()
+      assert.equal(props.to, "/create_post/")
+      assert.equal(props.children, "Submit a New Post")
     })
 
-    it("should show create post link if channelName is in URL", () => {
-      let wrapper = renderComponent({
+    it("create post link should have channel name if channelName is in URL", () => {
+      const wrapper = renderComponent({
         ...defaultProps,
         pathname: "/channel/foobar"
       })
-      let link = wrapper.find(Link)
+      const link = wrapper.find(Link)
       assert.equal(link.props().to, newPostURL("foobar"))
       assert.equal(link.props().children, "Submit a New Post")
     })
 
     it("should show a SubscriptionsList", () => {
-      let channels = makeChannelList(10)
-      let wrapper = renderComponent({
+      const channels = makeChannelList(10)
+      const wrapper = renderComponent({
         ...defaultProps,
         subscribedChannels: channels
       })

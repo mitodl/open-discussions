@@ -4,6 +4,7 @@ import { connect } from "react-redux"
 import R from "ramda"
 
 import CreatePostForm from "../components/CreatePostForm"
+
 import { actions } from "../actions"
 import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
@@ -20,7 +21,7 @@ type CreatePostPageProps = {
   dispatch: Dispatch,
   postForm: ?FormValue,
   channel: Channel,
-  channels: RestState<Array<Channel>>,
+  channels: RestState<Map<string, Channel>>,
   history: Object,
   processing: boolean
 }
@@ -35,7 +36,7 @@ class CreatePostPage extends React.Component {
   componentWillMount() {
     const { dispatch, channels } = this.props
     const channelName = getChannelName(this.props)
-    if (!channels.loaded && !channels.processing) {
+    if (!channels.loaded && !channels.processing && channelName) {
       dispatch(actions.channels.get(channelName))
     }
     dispatch(
@@ -90,10 +91,19 @@ class CreatePostPage extends React.Component {
     })
   }
 
-  render() {
-    const { channel, postForm, history, processing } = this.props
+  updateChannelSelection = (e: Object) => {
+    const { history } = this.props
 
-    if (!postForm || R.isNil(channel)) {
+    e.preventDefault()
+    if (e.target.value) {
+      history.push(e.target.value)
+    }
+  }
+
+  render() {
+    const { channel, channels, postForm, history, processing } = this.props
+
+    if (!postForm) {
       return null
     }
 
@@ -104,10 +114,12 @@ class CreatePostPage extends React.Component {
             onSubmit={this.onSubmit}
             onUpdate={this.onUpdate}
             updateIsText={this.updateIsText}
+            updateChannelSelection={this.updateChannelSelection}
             postForm={postForm.value}
             channel={channel}
             history={history}
             processing={processing}
+            channels={channels.data}
           />
         </div>
       </div>

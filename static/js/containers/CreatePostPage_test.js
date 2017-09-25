@@ -7,6 +7,7 @@ import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
+
 import type { CreatePostPayload } from "../flow/discussionTypes"
 
 describe("CreatePostPage", () => {
@@ -30,11 +31,11 @@ describe("CreatePostPage", () => {
 
   beforeEach(() => {
     channels = makeChannelList(10)
-    currentChannel = channels[5]
+    currentChannel = channels[0]
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(currentChannel))
     helper.getFrontpageStub.returns(Promise.resolve(makeChannelPostList()))
-    helper.getChannelsStub.returns(Promise.resolve([]))
+    helper.getChannelsStub.returns(Promise.resolve(channels))
     listenForActions = helper.listenForActions.bind(helper)
     renderComponent = helper.renderComponent.bind(helper)
   })
@@ -43,13 +44,22 @@ describe("CreatePostPage", () => {
     helper.cleanup()
   })
 
-  const renderPage = () => {
-    return renderComponent(newPostURL(currentChannel.name), [
-      actions.forms.FORM_BEGIN_EDIT,
-      actions.channels.get.requestType,
-      actions.channels.get.successType,
-      actions.subscribedChannels.get.requestType
-    ])
+  const renderPage = (url = null) => {
+    return renderComponent(
+      url || newPostURL(currentChannel.name),
+      url
+        ? [
+          actions.forms.FORM_BEGIN_EDIT,
+          actions.subscribedChannels.get.requestType,
+          actions.subscribedChannels.get.successType
+        ]
+        : [
+          actions.forms.FORM_BEGIN_EDIT,
+          actions.channels.get.requestType,
+          actions.channels.get.successType,
+          actions.subscribedChannels.get.requestType
+        ]
+    )
   }
 
   it("attempts to clear form and load channels on mount", async () => {
@@ -164,5 +174,71 @@ describe("CreatePostPage", () => {
     const cancelBtn = wrapper.find(".cancel")
     cancelBtn.props().onClick(event)
     sinon.assert.called(event.preventDefault)
+  })
+
+  it("should render a select with all subreddits", async () => {
+    const [wrapper] = await renderPage()
+    const select = wrapper.find("select")
+    assert.lengthOf(select.find("option"), channels.length + 1)
+    assert.deepEqual(
+      select.find("option").map(option => {
+        const props = option.props()
+        return [props.value, props.label]
+      }),
+      [
+        ["", "Select a channel"],
+        ...channels.map(channel => [channel.name, channel.title])
+      ]
+    )
+  })
+
+  it("should have the subreddit for the current URL selected", async () => {
+    const [wrapper] = await renderPage()
+    const select = wrapper.find("select")
+    assert.equal(select.props().value, currentChannel.name)
+  })
+
+  it("should change the URL when you select a new subreddit", async () => {
+    const [wrapper] = await renderPage()
+    const select = wrapper.find("select")
+    select.simulate("change", { target: { value: channels[6].name } })
+    assert.equal(
+      helper.currentLocation.pathname,
+      `/create_post/${channels[6].name}`
+    )
+    assert.equal(select.props().value, channels[6].name)
+  })
+
+  it("should not change URL if you select the placeholder entry", async () => {
+    const [wrapper] = await renderPage()
+    const select = wrapper.find("select")
+    assert.equal(
+      helper.currentLocation.pathname,
+      `/create_post/${currentChannel.name}`
+    )
+    // this simulates what happens when you select the placeholder
+    select.simulate("change", { target: { value: undefined } })
+    assert.equal(
+      helper.currentLocation.pathname,
+      `/create_post/${currentChannel.name}`
+    )
+    assert.equal(select.props().value, currentChannel.name)
+  })
+
+  it("should render the form without a subreddit selected if URL param is absent", async () => {
+    const [wrapper] = await renderPage("/create_post/")
+    const select = wrapper.find("select")
+    assert.equal(select.props().value, "")
+  })
+
+  it("should change URL when you select a new subreddit if URL param is absent", async () => {
+    const [wrapper] = await renderPage("/create_post/")
+    const select = wrapper.find("select")
+    select.simulate("change", { target: { value: channels[6].name } })
+    assert.equal(
+      helper.currentLocation.pathname,
+      `/create_post/${channels[6].name}`
+    )
+    assert.equal(select.props().value, channels[6].name)
   })
 })

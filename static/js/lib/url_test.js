@@ -29,6 +29,10 @@ describe("url helper functions", () => {
     it("should return a url for creating a new post", () => {
       assert.equal(newPostURL("channel_name"), "/create_post/channel_name")
     })
+
+    it("should return a non-specific URL if not passed a channel name", () => {
+      assert.equal(newPostURL(undefined), "/create_post/")
+    })
   })
 
   describe("frontPageURL", () => {

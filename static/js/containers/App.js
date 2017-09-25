@@ -58,7 +58,7 @@ class App extends React.Component {
         />
         <Route path={`${match.url}manage/`} component={AdminPage} />
         <Route
-          path={`${match.url}create_post/:channelName`}
+          path={`${match.url}create_post/:channelName?`}
           component={CreatePostPage}
         />
       </div>

@@ -16,13 +16,20 @@ type CreatePostFormProps = {
   postForm: ?PostForm,
   channel: Channel,
   history: Object,
-  processing: boolean
+  processing: boolean,
+  channels: Map<string, Channel>,
+  updateChannelSelection: Function
 }
 
 const goBackAndHandleEvent = R.curry((history, e) => {
   e.preventDefault()
   history.goBack()
 })
+
+const channelOptions = (channels: Map<string, Channel>) =>
+  Array.from(channels).map(([key, value], index) =>
+    <option label={value.title} value={key} key={index} />
+  )
 
 export default class CreatePostForm extends React.Component {
   props: CreatePostFormProps
@@ -35,7 +42,9 @@ export default class CreatePostForm extends React.Component {
       onSubmit,
       updateIsText,
       history,
-      processing
+      processing,
+      channels,
+      updateChannelSelection
     } = this.props
     if (!postForm) {
       return null
@@ -49,7 +58,7 @@ export default class CreatePostForm extends React.Component {
 
     return (
       <div>
-        <ChannelBreadcrumbs channel={channel} />
+        {channel ? <ChannelBreadcrumbs channel={channel} /> : null}
         <Card className="new-post-card">
           <form onSubmit={onSubmit}>
             <div className="post-types row">
@@ -96,6 +105,17 @@ export default class CreatePostForm extends React.Component {
                   onChange={onUpdate}
                 />
               </div>}
+            <div className="row channel-select">
+              <label>Channel</label>
+              <select
+                onChange={updateChannelSelection}
+                name="channel"
+                value={channel ? channel.name : ""}
+              >
+                <option label="Select a channel" value="" />
+                {channelOptions(channels)}
+              </select>
+            </div>
             <div className="posting-policy row">
               <span>
                 Please be mindful of{" "}
