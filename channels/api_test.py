@@ -1,5 +1,6 @@
 """API tests"""
 # pylint: disable=redefined-outer-name
+from unittest.mock import Mock
 from urllib.parse import urljoin
 
 import pytest
@@ -7,10 +8,7 @@ from praw.models.reddit.redditor import Redditor
 from rest_framework.exceptions import NotFound
 
 from open_discussions.factories import UserFactory
-from channels import (
-    api,
-    exceptions,
-)
+from channels import api
 
 pytestmark = pytest.mark.django_db
 
@@ -294,17 +292,6 @@ def test_add_remove_contributor_no_user(mock_client):
     assert mock_client.subreddit.return_value.contributor.remove.call_count == 0
 
 
-def test_remove_contributor_moderator(mock_client):
-    """Test remove contributor in case the user does is a moderator"""
-    client_user = UserFactory.create()
-    contributor = UserFactory.create()
-    client = api.Api(client_user)
-    mock_client.subreddit.return_value.moderator.return_value = [contributor.username]
-    with pytest.raises(exceptions.RemoveUserException):
-        client.remove_contributor(contributor.username, 'foo_channel_name')
-    assert mock_client.subreddit.return_value.contributor.remove.call_count == 0
-
-
 def test_remove_contributor(mock_client):
     """Test remove contributor"""
     client_user = UserFactory.create()
@@ -428,15 +415,22 @@ def test_add_remove_subscriber_no_user(mock_client):
 
 def test_remove_subscriber(mock_client):
     """Test remove subscriber"""
-    client = api.Api(UserFactory.create())
-    subscriber = UserFactory.create()
-    client.remove_subscriber(subscriber.username, 'channel_test_name')
-    mock_client.subreddit.return_value.unsubscribe.assert_called_once_with()
+    from .test_utils import no_ssl_verification
+    with no_ssl_verification():
+        client = api.Api(UserFactory.create(username='mitodl'))
+        subscriber = UserFactory.create(username='01BTN7HY2SGT9677JXGNDDW859')
+        client.remove_subscriber(subscriber.username, 'testchannel5')
+        mock_client.subreddit.return_value.unsubscribe.assert_called_once_with()
 
 
 def test_is_subscriber(mock_client):
     """Test is subscriber"""
-    client = api.Api(UserFactory.create())
-    subscriber = UserFactory.create()
-    ret = client.is_subscriber(subscriber.username, 'channel_test_name')
-    assert ret == mock_client.subreddit.return_value.user_is_subscriber
+    from .test_utils import no_ssl_verification
+
+    with no_ssl_verification():
+        client = api.Api(UserFactory.create(username='mitodl'))
+        subscriber = UserFactory.create()
+        mock_client.user.subreddits.return_value = [Mock(display_name='sub1'), Mock(display_name='sub2')]
+        assert client.is_subscriber(subscriber.username, 'channel_test_name') is False
+        assert client.is_subscriber(subscriber.username, 'sub2') is True
+        assert mock_client.user.subreddits.call_count == 2

@@ -8,9 +8,14 @@ from django.contrib.auth import get_user_model
 import praw
 from praw.models.reddit import more
 from praw.models.reddit.redditor import Redditor
-from rest_framework.exceptions import NotFound
-
-from channels import exceptions
+from prawcore.exceptions import (
+    Forbidden as PrawForbidden,
+    NotFound as PrawNotFound,
+)
+from rest_framework.exceptions import (
+    PermissionDenied,
+    NotFound,
+)
 
 CHANNEL_TYPE_PUBLIC = 'public'
 CHANNEL_TYPE_PRIVATE = 'private'
@@ -169,9 +174,6 @@ class Api:
             if key not in CHANNEL_SETTINGS:
                 raise ValueError('Invalid argument {}={}'.format(key, value))
 
-        # pylint: disable=fixme
-        # TODO: verify user is authorized to do this
-
         return self.reddit.subreddit.create(
             name,
             title=title,
@@ -198,9 +200,6 @@ class Api:
         for key, value in other_settings.items():
             if key not in CHANNEL_SETTINGS:
                 raise ValueError('Invalid argument {}={}'.format(key, value))
-
-        # pylint: disable=fixme
-        # TODO: verify user is authorized to do this
 
         values = other_settings.copy()
         if title is not None:
@@ -416,11 +415,9 @@ class Api:
             user = User.objects.get(username=contributor_name)
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(contributor_name))
-        channel = self.get_channel(channel_name)
-        if contributor_name in channel.moderator():
-            raise exceptions.RemoveUserException(
-                "User {} is a moderator of the channel {}".format(contributor_name, channel_name))
-        channel.contributor.remove(user)
+        # This doesn't check if a user is a moderator because they should have access to the channel
+        # regardless of their contributor status
+        self.get_channel(channel_name).contributor.remove(user)
 
     def list_contributors(self, channel_name):
         """
@@ -477,7 +474,13 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
 
-        self.get_channel(channel_name).moderator.remove(user)
+        try:
+            self.get_channel(channel_name).moderator.remove(user)
+        except PrawForbidden:
+            # User is already not a moderator,
+            # or maybe there's another unrelated 403 error from reddit, but we can't tell the difference,
+            # and the double removal case is probably more common.
+            pass
 
     def list_moderators(self, channel_name):
         """
@@ -502,14 +505,15 @@ class Api:
         Returns:
             praw.models.Redditor: the reddit representation of the user
         """
-        if subscriber_name == self.user.username:
-            self.get_channel(channel_name).subscribe()
-        else:
-            try:
-                user = User.objects.get(username=subscriber_name)
-            except User.DoesNotExist:
-                raise NotFound("User {} does not exist".format(subscriber_name))
-            Api(user).get_channel(channel_name).subscribe()
+        try:
+            user = User.objects.get(username=subscriber_name)
+        except User.DoesNotExist:
+            raise NotFound("User {} does not exist".format(subscriber_name))
+        channel = Api(user).get_channel(channel_name)
+        try:
+            channel.subscribe()
+        except PrawForbidden as ex:
+            raise PermissionDenied() from ex
         return Redditor(self.reddit, name=subscriber_name)
 
     def remove_subscriber(self, subscriber_name, channel_name):
@@ -521,14 +525,18 @@ class Api:
             channel_name(str): the channel name identifier
 
         """
-        if subscriber_name == self.user.username:
-            self.get_channel(channel_name).unsubscribe()
-        else:
-            try:
-                user = User.objects.get(username=subscriber_name)
-            except User.DoesNotExist:
-                raise NotFound("User {} does not exist".format(subscriber_name))
-            Api(user).get_channel(channel_name).unsubscribe()
+        try:
+            user = User.objects.get(username=subscriber_name)
+        except User.DoesNotExist:
+            raise NotFound("User {} does not exist".format(subscriber_name))
+        channel = Api(user).get_channel(channel_name)
+        try:
+            channel.unsubscribe()
+        except PrawNotFound:
+            # User is already unsubscribed,
+            # or maybe there's another unrelated 403 error from reddit, but we can't tell the difference,
+            # and the double removal case is probably more common.
+            pass
 
     def is_subscriber(self, subscriber_name, channel_name):
         """
@@ -541,11 +549,10 @@ class Api:
         Returns:
             bool: whether the user has subscribed to the channel
         """
-        if subscriber_name == self.user.username:
-            return self.get_channel(channel_name).user_is_subscriber
-        else:
-            try:
-                user = User.objects.get(username=subscriber_name)
-            except User.DoesNotExist:
-                raise NotFound("User {} does not exist".format(subscriber_name))
-            return Api(user).get_channel(channel_name).user_is_subscriber
+        try:
+            user = User.objects.get(username=subscriber_name)
+        except User.DoesNotExist:
+            raise NotFound("User {} does not exist".format(subscriber_name))
+
+        api = Api(user)
+        return channel_name in (channel.display_name for channel in api.list_channels())
