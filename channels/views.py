@@ -91,7 +91,7 @@ class ModeratorDetailView(APIView):
 
     def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """
-        Removes a contributor from a channel
+        Removes a moderator from a channel
         """
         api = Api(user=request.user)
         channel_name = self.kwargs['channel_name']
@@ -239,7 +239,7 @@ class SubscriberDetailView(APIView):
     permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
 
     def get(self, request, *args, **kwargs):
-        """Get moderator for the channel"""
+        """Get subscriber for the channel"""
         api = Api(user=request.user)
         subscriber_name = self.kwargs['subscriber_name']
         channel_name = self.kwargs['channel_name']
@@ -253,7 +253,7 @@ class SubscriberDetailView(APIView):
 
     def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """
-        Removes a contributor from a channel
+        Removes a subscriber from a channel
         """
         api = Api(user=request.user)
         channel_name = self.kwargs['channel_name']
