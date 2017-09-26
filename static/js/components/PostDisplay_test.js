@@ -46,8 +46,8 @@ describe("PostDisplay", () => {
       formatCommentsCount(post)
     )
     const authoredBy = wrapper.find(".authored-by").text()
-    assert(authoredBy.startsWith(post.author_id))
-    assert.isNotEmpty(authoredBy.substring(post.author_id.length))
+    assert(authoredBy.startsWith(post.author_name))
+    assert.isNotEmpty(authoredBy.substring(post.author_name.length))
   })
 
   it("should link to the subreddit, if told to", () => {

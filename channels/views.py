@@ -110,7 +110,7 @@ def _lookup_users_for_posts(posts):
         username__in=[
             post.author.name for post in posts if post.author
         ]
-    )
+    ).select_related('profile')
     return {user.username: user for user in users}
 
 
@@ -236,7 +236,7 @@ def _lookup_users_for_comments(comments):
     author_set = set()
     _populate_authors_for_comments(comments, author_set)
 
-    users = User.objects.filter(username__in=author_set)
+    users = User.objects.filter(username__in=author_set).select_related('profile')
     return {user.username: user for user in users}
 
 

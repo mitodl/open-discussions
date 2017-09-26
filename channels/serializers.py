@@ -124,6 +124,7 @@ class PostSerializer(serializers.Serializer):
     num_comments = serializers.IntegerField(read_only=True)
     channel_name = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
+    author_name = serializers.SerializerMethodField()
 
     def _get_user(self, instance):
         """
@@ -143,6 +144,13 @@ class PostSerializer(serializers.Serializer):
     def get_url(self, instance):
         """Returns a url or null depending on if it's a self post"""
         return instance.url if not instance.is_self else None
+
+    def get_author_name(self, instance):
+        """get the authors name"""
+        user = self._get_user(instance)
+        if user and user.profile.name:
+            return user.profile.name
+        return "[deleted]"
 
     def get_profile_image(self, instance):
         """Find the Profile for the comment author"""
@@ -240,6 +248,7 @@ class CommentSerializer(serializers.Serializer):
     created = serializers.SerializerMethodField()
     replies = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
+    author_name = serializers.SerializerMethodField()
 
     def _get_user(self, instance):
         """
@@ -289,6 +298,15 @@ class CommentSerializer(serializers.Serializer):
         if user and user.profile.image_small:
             return user.profile.image_small
         return default_profile_image
+
+    def get_author_name(self, instance):
+        """get the author name"""
+        # this is a similar setup to the get_profile_image thingy above
+        user = self._get_user(instance)
+
+        if user and user.profile.name:
+            return user.profile.name
+        return "[deleted]"
 
     def get_downvoted(self, instance):
         """Is a comment downvoted?"""

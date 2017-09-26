@@ -94,4 +94,15 @@ describe("CommentTree", () => {
     assert.ok(beginReplyStub.called)
     assert.ok(beginReplyStub.calledWith(replyToCommentKey(comments[0])))
   })
+
+  it("should show the author name", () => {
+    const wrapper = renderCommentTree()
+    const authorName = wrapper
+      .find(".comment")
+      .at(0)
+      .find(".author-name")
+      .at(0)
+      .text()
+    assert.equal(authorName, comments[0].author_name)
+  })
 })

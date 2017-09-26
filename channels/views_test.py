@@ -1,4 +1,5 @@
 """Tests for views for REST APIs for channels"""
+# pylint: disable=too-many-lines
 import pytest
 from django.core.urlresolvers import reverse
 from rest_framework import status
@@ -7,7 +8,7 @@ from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
 from profiles.factories import ProfileFactory
 
-# pylint: disable=redefined-outer-name, unused-argument
+# pylint: disable=redefined-outer-name, unused-argument, too-many-lines
 pytestmark = pytest.mark.django_db
 
 
@@ -153,7 +154,8 @@ def test_create_url_post(client, logged_in_profile, use_betamax, praw_settings):
         'num_comments': 0,
         'score': 1,
         'channel_name': 'unit_tests',
-        "profile_image": logged_in_profile.image_small
+        "profile_image": logged_in_profile.image_small,
+        "author_name": logged_in_profile.name,
     }
 
 
@@ -178,7 +180,8 @@ def test_create_text_post(client, logged_in_profile, use_betamax, praw_settings)
         'num_comments': 0,
         'score': 1,
         'channel_name': 'unit_tests',
-        'profile_image': logged_in_profile.image_small
+        'profile_image': logged_in_profile.image_small,
+        "author_name": logged_in_profile.name,
     }
 
 
@@ -233,7 +236,8 @@ def test_get_post(client, logged_in_profile, use_betamax, praw_settings, missing
             'num_comments': 2,
             'score': 1,
             'channel_name': 'macromasters',
-            'profile_image': profile_image
+            'profile_image': profile_image,
+            "author_name": profile.name,
         }
 
 
@@ -244,8 +248,10 @@ def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missi
         logged_in_profile.user.username = 'renamed'
         logged_in_profile.user.save()
         profile_image = default_profile_image
+        name = "[deleted]"
     else:
         profile_image = logged_in_profile.image_small
+        name = logged_in_profile.name
 
     url = reverse('post-list', kwargs={'channel_name': 'two_posts'})
     resp = client.get(url)
@@ -273,7 +279,8 @@ def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missi
                 'created': '2017-07-21T19:10:26+00:00',
                 'num_comments': 0,
                 'channel_name': 'two_posts',
-                "profile_image": profile_image
+                "profile_image": profile_image,
+                "author_name": name
             },
             {
                 'url': 'http://micromasters.mit.edu',
@@ -286,7 +293,8 @@ def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missi
                 'created': '2017-07-21T19:09:37+00:00',
                 'num_comments': 0,
                 'channel_name': 'two_posts',
-                "profile_image": profile_image
+                "profile_image": profile_image,
+                "author_name": name
             }
         ]
 
@@ -308,7 +316,8 @@ def test_update_post_text(client, logged_in_profile, use_betamax, praw_settings)
         'created': '2017-07-21T19:10:26+00:00',
         'num_comments': 0,
         'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small
+        "profile_image": logged_in_profile.image_small,
+        "author_name": logged_in_profile.name,
     }
 
 
@@ -330,6 +339,7 @@ def test_update_post_clear_vote(client, logged_in_profile, use_betamax, praw_set
         'num_comments': 0,
         'channel_name': 'two_posts',
         "profile_image": logged_in_profile.image_small,
+        "author_name": logged_in_profile.name,
     }
 
 
@@ -350,7 +360,8 @@ def test_update_post_upvote(client, logged_in_profile, use_betamax, praw_setting
         'created': '2017-07-21T19:10:26+00:00',
         'num_comments': 0,
         'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small
+        "profile_image": logged_in_profile.image_small,
+        "author_name": logged_in_profile.name,
     }
 
 
@@ -374,7 +385,8 @@ def test_create_post_without_upvote(client, logged_in_profile, use_betamax, praw
         'num_comments': 0,
         'score': 1,
         'channel_name': 'subreddit_for_testing',
-        "profile_image": logged_in_profile.image_small
+        "profile_image": logged_in_profile.image_small,
+        "author_name": logged_in_profile.name
     }
 
 
@@ -385,10 +397,12 @@ def test_list_comments(client, logged_in_profile, use_betamax, praw_settings, mi
         logged_in_profile.user.username = 'renamed'
         logged_in_profile.user.save()
         profile_image = default_profile_image
+        name = "[deleted]"
         author_id = '[deleted]'
     else:
         profile_image = logged_in_profile.image_small
         author_id = logged_in_profile.user.username
+        name = logged_in_profile.name
 
     url = reverse('comment-list', kwargs={'post_id': '2'})
     resp = client.get(url)
@@ -404,6 +418,7 @@ def test_list_comments(client, logged_in_profile, use_betamax, praw_settings, mi
             "downvoted": False,
             "created": "2017-07-25T17:09:45+00:00",
             'profile_image': profile_image,
+            'author_name': name,
             "replies": [
                 {
                     "id": "2",
@@ -416,6 +431,7 @@ def test_list_comments(client, logged_in_profile, use_betamax, praw_settings, mi
                     "created": "2017-07-25T17:15:57+00:00",
                     "replies": [],
                     'profile_image': profile_image,
+                    'author_name': name,
                 },
                 {
                     "id": "3",
@@ -428,6 +444,7 @@ def test_list_comments(client, logged_in_profile, use_betamax, praw_settings, mi
                     "created": "2017-07-25T17:16:10+00:00",
                     "replies": [],
                     'profile_image': profile_image,
+                    'author_name': name,
                 }
             ]
         }
@@ -458,12 +475,14 @@ def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_sett
                 'replies': [],
                 'score': 1,
                 'text': 'reply to parent which is not deleted',
-                'upvoted': False
+                'upvoted': False,
+                "author_name": user.profile.name
             }],
             'score': 1,
             'text': '[deleted]',
             'upvoted': False,
             'id': '1s',
+            "author_name": "[deleted]"
         }]
 
 
@@ -490,7 +509,8 @@ def test_get_comment(client, logged_in_profile, use_betamax, praw_settings, miss
             "downvoted": False,
             "created": "2017-07-25T21:18:47+00:00",
             "replies": [],
-            'profile_image': logged_in_profile.image_small
+            'profile_image': logged_in_profile.image_small,
+            'author_name': logged_in_profile.name,
         }
 
 
@@ -511,7 +531,8 @@ def test_get_comment_no_image(client, logged_in_profile, use_betamax, praw_setti
         "downvoted": False,
         "created": "2017-07-25T21:18:47+00:00",
         "replies": [],
-        'profile_image': default_profile_image
+        'profile_image': default_profile_image,
+        'author_name': logged_in_profile.name,
     }
 
 
@@ -542,7 +563,8 @@ def test_create_comment(client, logged_in_profile, use_betamax, praw_settings):
         'text': 'reply_to_post 2',
         'upvoted': True,
         "downvoted": False,
-        'profile_image': logged_in_profile.image_small
+        'profile_image': logged_in_profile.image_small,
+        'author_name': logged_in_profile.name,
     }
 
 
@@ -565,7 +587,8 @@ def test_create_comment_no_upvote(client, logged_in_profile, use_betamax, praw_s
         'text': 'no upvoted',
         'upvoted': False,
         "downvoted": False,
-        'profile_image': logged_in_profile.image_small
+        'profile_image': logged_in_profile.image_small,
+        'author_name': logged_in_profile.name,
     }
 
 
@@ -588,7 +611,8 @@ def test_create_comment_downvote(client, logged_in_profile, use_betamax, praw_se
         'text': 'downvoted',
         'upvoted': False,
         'downvoted': True,
-        'profile_image': logged_in_profile.image_small
+        'profile_image': logged_in_profile.image_small,
+        'author_name': logged_in_profile.name,
     }
 
 
@@ -611,7 +635,8 @@ def test_create_comment_reply_to_comment(client, logged_in_profile, use_betamax,
         'text': 'reply_to_comment 3',
         'upvoted': True,
         "downvoted": False,
-        'profile_image': logged_in_profile.image_small
+        'profile_image': logged_in_profile.image_small,
+        'author_name': logged_in_profile.name,
     }
 
 
@@ -632,7 +657,8 @@ def test_update_comment_text(client, logged_in_profile, use_betamax, praw_settin
         'text': 'updated text',
         'upvoted': False,
         'downvoted': False,
-        'profile_image': logged_in_profile.image_small
+        'profile_image': logged_in_profile.image_small,
+        'author_name': logged_in_profile.name,
     }
 
 
@@ -654,7 +680,8 @@ def test_update_comment_upvote(client, logged_in_profile, use_betamax, praw_sett
         'text': 'downvoted',
         'upvoted': True,
         'downvoted': False,
-        'profile_image': logged_in_profile.image_small
+        'profile_image': logged_in_profile.image_small,
+        'author_name': logged_in_profile.name,
     }
 
 
@@ -676,7 +703,8 @@ def test_update_comment_downvote(client, logged_in_profile, use_betamax, praw_se
         'text': 'downvoted',
         'upvoted': False,
         'downvoted': True,
-        'profile_image': logged_in_profile.image_small
+        'profile_image': logged_in_profile.image_small,
+        'author_name': logged_in_profile.name,
     }
 
 
@@ -697,7 +725,8 @@ def test_update_comment_clear_upvote(client, logged_in_profile, use_betamax, pra
         'text': 'reply_to_comment 3',
         'upvoted': False,
         'downvoted': False,
-        'profile_image': logged_in_profile.image_small
+        'profile_image': logged_in_profile.image_small,
+        'author_name': logged_in_profile.name,
     }
 
 
@@ -719,7 +748,8 @@ def test_update_comment_clear_downvote(client, logged_in_profile, use_betamax, p
         'text': 'downvoted',
         'upvoted': False,
         'downvoted': False,
-        'profile_image': logged_in_profile.image_small
+        'profile_image': logged_in_profile.image_small,
+        'author_name': logged_in_profile.name,
     }
 
 
@@ -755,6 +785,7 @@ def test_frontpage(client, logged_in_profile, use_betamax, praw_settings, missin
                 "created": "2017-07-25T22:05:44+00:00",
                 "num_comments": 0,
                 "channel_name": "subreddit_for_testing",
+                'author_name': logged_in_profile.name,
                 "profile_image": logged_in_profile.image_small
             },
             {
@@ -768,6 +799,7 @@ def test_frontpage(client, logged_in_profile, use_betamax, praw_settings, missin
                 "created": "2017-07-25T17:57:07+00:00",
                 "num_comments": 0,
                 "channel_name": "a_channel",
+                'author_name': logged_in_profile.name,
                 "profile_image": logged_in_profile.image_small
             },
             {
@@ -781,6 +813,7 @@ def test_frontpage(client, logged_in_profile, use_betamax, praw_settings, missin
                 "created": "2017-07-25T22:02:40+00:00",
                 "num_comments": 0,
                 "channel_name": "subreddit_for_testing",
+                'author_name': logged_in_profile.name,
                 "profile_image": logged_in_profile.image_small
             },
             {
@@ -794,6 +827,7 @@ def test_frontpage(client, logged_in_profile, use_betamax, praw_settings, missin
                 "created": "2017-07-25T15:31:44+00:00",
                 "num_comments": 6,
                 "channel_name": "subreddit_for_testing",
+                'author_name': logged_in_profile.name,
                 "profile_image": logged_in_profile.image_small
             },
             {
@@ -807,6 +841,7 @@ def test_frontpage(client, logged_in_profile, use_betamax, praw_settings, missin
                 "created": "2017-07-25T15:07:30+00:00",
                 "num_comments": 0,
                 "channel_name": "subreddit_for_testing",
+                'author_name': logged_in_profile.name,
                 "profile_image": logged_in_profile.image_small
             }
         ]

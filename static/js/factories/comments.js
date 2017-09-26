@@ -18,7 +18,8 @@ export const makeComment = (post: Post): Comment => {
     downvoted:     casual.coin_flip,
     created:       casual.moment.format(),
     replies:       [],
-    profile_image: casual.url
+    profile_image: casual.url,
+    author_name:   casual.name
   }
 
   if (comment.upvoted && comment.downvoted) {

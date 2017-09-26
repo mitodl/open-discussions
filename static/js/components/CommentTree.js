@@ -62,7 +62,7 @@ const renderComment = R.curry(
         <div className="comment-contents">
           <div className="author-info">
             <a className="author-name">
-              {comment.author_id}
+              {comment.author_name}
             </a>
             <div>
               {moment(comment.created).fromNow()}

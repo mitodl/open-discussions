@@ -29,6 +29,7 @@ export type Post = {
   num_comments:  number,
   channel_name:  string,
   profile_image: string,
+  author_name:   string,
 }
 
 export type PostForm = {
@@ -55,6 +56,7 @@ export type Comment = {
   replies:       Array<Comment>,
   author_id:     string,
   profile_image: string,
+  author_name:   string,
 }
 
 export type CommentForm = {

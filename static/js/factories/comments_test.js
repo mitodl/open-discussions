@@ -19,6 +19,7 @@ describe("comment factories", () => {
       assert(moment(comment.created).isValid())
       assert.isArray(comment.replies)
       assert.isString(comment.profile_image)
+      assert.isString(comment.author_name)
     })
   })
 
