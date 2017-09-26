@@ -25,15 +25,15 @@ def configure_betamax():
 
 
 @pytest.fixture
-def use_betamax(mocker, configure_betamax, betamax_recorder, praw_settings):
+def use_betamax(mocker, configure_betamax, betamax_parametrized_recorder, praw_settings):
     """Attach the betamax session to the Api client"""
-    mocker.patch('channels.api._get_session', return_value=betamax_recorder.session)
+    mocker.patch('channels.api._get_session', return_value=betamax_parametrized_recorder.session)
     mocker.patch('channels.api._get_user_credentials', return_value={
         'client_id': praw_settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID,
         'client_secret': praw_settings.OPEN_DISCUSSIONS_REDDIT_SECRET,
         'refresh_token': 'fake',
     })
-    return betamax_recorder
+    return betamax_parametrized_recorder
 
 
 @pytest.fixture()

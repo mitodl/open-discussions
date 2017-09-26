@@ -1,20 +1,18 @@
 """Views for REST APIs for channels"""
 
-from functools import lru_cache
 from django.contrib.auth import get_user_model
 from praw.models.reddit.redditor import Redditor
 from rest_framework import status
 from rest_framework.generics import (
     CreateAPIView,
-    ListAPIView,
     ListCreateAPIView,
     RetrieveDestroyAPIView,
     RetrieveUpdateAPIView,
-    RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from channels.api import Api
 from channels.exceptions import RemoveUserException
@@ -92,83 +90,275 @@ class ModeratorDetailView(RetrieveDestroyAPIView):
         api.remove_moderator(moderator.name, channel_name)
 
 
-class PostListView(ListCreateAPIView):
+def _lookup_users_for_posts(posts):
+    """
+    Helper function to look up user for each instance and attach it to instance.user
+
+    Args:
+        posts (list of praw.models.Submission):
+            A list of submissions
+    """
+    users = User.objects.filter(
+        username__in=[
+            post.author.name for post in posts if post.author
+        ]
+    )
+    return {user.username: user for user in users}
+
+
+class PostListView(APIView):
     """
     View for listing and creating posts
     """
     serializer_class = PostSerializer
 
-    def get_queryset(self):
-        """Get generator for posts list"""
-        api = Api(user=self.request.user)
-        return api.list_posts(self.kwargs['channel_name'])
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'request': self.request,
+            'view': self,
+        }
+
+    def get(self, request, *args, **kwargs):
+        """Get list for posts and attach User objects to them"""
+        api = Api(user=request.user)
+        posts = list(api.list_posts(self.kwargs['channel_name']))
+        users = _lookup_users_for_posts(posts)
+        posts = [post for post in posts if post.author and post.author.name in users]
+        return Response(
+            PostSerializer(posts, many=True, context={
+                **self.get_serializer_context(),
+                'users': users,
+            }).data
+        )
+
+    def post(self, request, *args, **kwargs):
+        """Create a new post"""
+        serializer = PostSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
-class PostDetailView(RetrieveUpdateDestroyAPIView):
+class PostDetailView(APIView):
     """
     View for retrieving, updating or destroying posts
     """
     serializer_class = PostSerializer
+
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'request': self.request,
+            'view': self,
+        }
 
     def get_object(self):
         """Get post"""
         api = Api(user=self.request.user)
         return api.get_post(self.kwargs['post_id'])
 
+    def get(self, request, *args, **kwargs):
+        """Get post"""
+        post = self.get_object()
+        users = _lookup_users_for_posts([post])
+        if not post.author or post.author.name not in users:
+            raise NotFound()
+        return Response(
+            PostSerializer(
+                instance=post,
+                context={
+                    **self.get_serializer_context(),
+                    'users': users,
+                },
+            ).data,
+        )
 
-class CommentListView(ListCreateAPIView):
+    def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """Delete a post"""
+        self.get_object().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def patch(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """Update a post"""
+        post = self.get_object()
+        serializer = PostSerializer(
+            instance=post,
+            data=request.data,
+            context=self.get_serializer_context(),
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.data,
+        )
+
+
+def _populate_authors_for_comments(comments, author_set):
+    """
+    Helper function to look up user for each instance and attach it to instance.user
+
+    Args:
+        comments (list of praw.models.Comment):
+            A list of comments
+        author_set (set): This is modified to populate with the authors found in comments
+    """
+    for comment in comments:
+        if comment.author:
+            author_set.add(comment.author.name)
+
+        _populate_authors_for_comments(comment.replies, author_set)
+
+
+def _lookup_users_for_comments(comments):
+    """
+    Helper function to look up user for each instance and attach it to instance.user
+
+    Args:
+        comments (list of praw.models.Comment):
+            A list of comments
+
+    Returns:
+        dict: A map of username to User
+    """
+    author_set = set()
+    _populate_authors_for_comments(comments, author_set)
+
+    users = User.objects.filter(username__in=author_set)
+    return {user.username: user for user in users}
+
+
+class CommentListView(APIView):
     """
     View for listing and creating comments
     """
     serializer_class = CommentSerializer
 
     def get_serializer_context(self):
-        context = super().get_serializer_context()
+        """Context for the request and view"""
+        return {
+            'request': self.request,
+            'view': self,
+        }
 
-        if self.request.method == 'GET':
-            comments = self.get_queryset()
-            comment_users = User.objects.filter(
-                username__in=[comment.author.name for comment in comments]
-            ).select_related('profile')
-
-            context["profile_images"] = {
-                user.username: user.profile.image_small for user in comment_users
-            }
-        return context
-
-    @lru_cache(maxsize=1)
-    def get_queryset(self):
-        """Get generator for comments"""
+    def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """Get list for comments and attach User objects to them"""
         api = Api(user=self.request.user)
-        return list(api.list_comments(self.kwargs['post_id']))
+        comments = list(api.list_comments(self.kwargs['post_id']))
+        users = _lookup_users_for_comments(comments)
+        return Response(
+            CommentSerializer(
+                comments,
+                context={
+                    **self.get_serializer_context(),
+                    'users': users,
+                },
+                many=True,
+            ).data,
+        )
+
+    def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """Create a new comment"""
+        serializer = CommentSerializer(
+            data=request.data,
+            context=self.get_serializer_context(),
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
-class CommentDetailView(RetrieveUpdateDestroyAPIView):
+class CommentDetailView(APIView):
     """
     View for retrieving, updating or destroying comments
     """
     serializer_class = CommentSerializer
 
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'request': self.request,
+            'view': self,
+        }
+
     def get_object(self):
-        """Get comment"""
+        """Get the comment object"""
         api = Api(user=self.request.user)
         return api.get_comment(self.kwargs['comment_id'])
 
-    def perform_destroy(self, instance):
-        """Delete a comment"""
-        instance.delete()
+    def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """Get comment"""
+        comment = self.get_object()
+        users = _lookup_users_for_comments([comment])
+        if not comment.author or comment.author.name not in users:
+            raise NotFound()
+        return Response(
+            CommentSerializer(
+                comment,
+                context={
+                    **self.get_serializer_context(),
+                    'users': users,
+                }
+            ).data
+        )
+
+    def patch(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """Update a comment"""
+        comment = self.get_object()
+        serializer = CommentSerializer(
+            instance=comment,
+            data=request.data,
+            context=self.get_serializer_context(),
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.data,
+        )
+
+    def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """Delete the comment"""
+        self.get_object().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class FrontPageView(ListAPIView):
+class FrontPageView(APIView):
     """
     View for listing posts
     """
-    serializer_class = PostSerializer
 
-    def get_queryset(self):
-        """Get generator for front page posts"""
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'request': self.request,
+            'view': self,
+        }
+
+    def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """Get front page posts"""
         api = Api(user=self.request.user)
-        return api.front_page()
+        posts = list(api.front_page())
+        users = _lookup_users_for_posts(posts)
+        posts = [post for post in posts if post.author and post.author.name in users]
+
+        return Response(
+            PostSerializer(
+                posts,
+                context={
+                    **self.get_serializer_context(),
+                    'users': users,
+                },
+                many=True,
+            ).data
+        )
 
 
 class ContributorListView(ListCreateAPIView):

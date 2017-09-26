@@ -1,0 +1,246 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2017-09-27T16:23:14",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDLUdS7K90uKygwoCioMNvBINXcNzsg0TCuvtAgzUdJRUEqtKMgsSi2OzwQpNzYzMACKgXXHl1QWpIKMSEpNLEotAqktTs6HCGmBeEWpaUCNGch2JbmUZJYXupj5lGbkRxlZpBsGZwf5lgR5Z1gmg3SkpJZlJqfGZ6aAjIVwlGoBXoPPebQAAAA=",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 27 Sep 2017 16:23:04 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=GYxWDXc5ej5XsNmjUn; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Fri, 27-Sep-2019 16:23:04 GMT",
+            "loidcreated=2017-09-27T16%3A23%3A04.715Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Fri, 27-Sep-2019 16:23:04 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+      }
+    },
+    {
+      "recorded_at": "2017-09-27T16:23:15",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "grant_type=refresh_token&refresh_token=1-bDtiwqD6LuhoZ28g1SkRMtRKh9c"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "Basic MW1pM3JwTTZ4SjN0RlE6LTNmQkxfZDk2R2o5d20tQU01TTRSOHpFajA0"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "68"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=GYxWDXc5ej5XsNmjUn; loidcreated=2017-09-27T16%3A23%3A04.715Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/v1/access_token"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"access_token\": \"1-9bNnDzgE6rbUa3niTdghvktPqmY\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "107"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 27 Sep 2017 16:23:04 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298"
+          ],
+          "x-ratelimit-reset": [
+            "416"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/access_token"
+      }
+    },
+    {
+      "recorded_at": "2017-09-27T16:23:15",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 1-9bNnDzgE6rbUa3niTdghvktPqmY"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=GYxWDXc5ej5XsNmjUn; loidcreated=2017-09-27T16%3A23%3A04.715Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/comments/p/?limit=2048&sort=best&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"testchannel5\", \"selftext_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003Ehi\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"selftext\": \"hi\", \"likes\": null, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"p\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01BTN7HY2SGT9677JXGNDDW859\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.testchannel5\", \"hidden\": false, \"num_comments\": 1, \"thumbnail\": \"\", \"subreddit_id\": \"t5_v\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/testchannel5/comments/p/hey_everyone/\", \"locked\": false, \"name\": \"t3_p\", \"created\": 1506103730.0, \"url\": \"http://reddit.local/r/testchannel5/comments/p/hey_everyone/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"hey everyone\", \"created_utc\": 1506103730.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t1\", \"data\": {\"subreddit_id\": \"t5_v\", \"banned_by\": null, \"removal_reason\": null, \"link_id\": \"t3_p\", \"likes\": null, \"replies\": {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t1\", \"data\": {\"subreddit_id\": \"t5_v\", \"banned_by\": null, \"removal_reason\": null, \"link_id\": \"t3_p\", \"likes\": null, \"replies\": \"\", \"user_reports\": [], \"saved\": false, \"id\": \"1t\", \"gilded\": 0, \"archived\": false, \"report_reasons\": null, \"author\": \"admin\", \"parent_id\": \"t1_1s\", \"score\": 1, \"approved_by\": null, \"controversiality\": 0, \"body\": \"reply to parent which is not deleted\", \"edited\": false, \"author_flair_css_class\": null, \"downs\": 0, \"body_html\": \"\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003Ereply to parent which is not deleted\\u003C/p\\u003E\\n\\u003C/div\\u003E\", \"subreddit\": \"testchannel5\", \"score_hidden\": false, \"name\": \"t1_1t\", \"created\": 1506528231.0, \"author_flair_text\": null, \"created_utc\": 1506528231.0, \"ups\": 1, \"mod_reports\": [], \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, \"user_reports\": [], \"saved\": false, \"id\": \"1s\", \"gilded\": 0, \"archived\": false, \"report_reasons\": null, \"author\": \"[deleted]\", \"parent_id\": \"t3_p\", \"score\": 1, \"approved_by\": null, \"controversiality\": 0, \"body\": \"[deleted]\", \"edited\": false, \"author_flair_css_class\": null, \"downs\": 0, \"body_html\": \"\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003E[deleted]\\u003C/p\\u003E\\n\\u003C/div\\u003E\", \"subreddit\": \"testchannel5\", \"score_hidden\": false, \"name\": \"t1_1s\", \"created\": 1506528222.0, \"author_flair_text\": null, \"created_utc\": 1506528222.0, \"ups\": 1, \"mod_reports\": [], \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}]"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "3123"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 27 Sep 2017 16:23:04 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "416"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=uTFK42o%2FwRiwzonpXbCOwFYDL%2F5On%2FgVzpkFEhgHCAPzfBr%2FMnZ1EbUVvOw4QZH6udvc2z34nILEkkfI5DeMcQtr5lzBiayl"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/comments/p/?limit=2048&sort=best&raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
