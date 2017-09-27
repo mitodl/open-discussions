@@ -7,7 +7,7 @@ import { makeCommentTree } from "./comments"
 
 describe("comment factories", () => {
   it("should make a tree of comments", () => {
-    let post = makePost()
+    const post = makePost()
     makeCommentTree(post).forEach(comment => {
       assert.isString(comment.id)
       assert.equal(comment.post_id, post.id)
@@ -23,12 +23,12 @@ describe("comment factories", () => {
   })
 
   it("should always put replies on the first comment", () => {
-    let [firstComment] = makeCommentTree(makePost())
+    const [firstComment] = makeCommentTree(makePost())
     assert.isNotEmpty(firstComment.replies)
   })
 
   it("should have unique IDs", () => {
-    let ids = makeCommentTree(makePost()).map(comment => comment.id)
+    const ids = makeCommentTree(makePost()).map(comment => comment.id)
     assert.equal(ids.length, new Set(ids).size)
   })
 })

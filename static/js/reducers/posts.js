@@ -10,7 +10,7 @@ const mergePostData = (
   post: Post,
   data: Map<string, Post>
 ): Map<string, Post> => {
-  let update = new Map(data)
+  const update = new Map(data)
   update.set(post.id, post)
   return update
 }
@@ -19,7 +19,7 @@ const mergeMultiplePosts = (
   posts: Array<Post>,
   data: Map<string, Post>
 ): Map<string, Post> => {
-  let update = new Map(data)
+  const update = new Map(data)
   posts.forEach(post => {
     update.set(post.id, post)
   })
@@ -37,7 +37,7 @@ export const postsEndpoint = {
   getSuccessHandler:  mergePostData,
   extraActions:       {
     [SET_POST_DATA]: (state, action) => {
-      let update =
+      const update =
         action.payload instanceof Array
           ? mergeMultiplePosts(action.payload, state.data)
           : mergePostData(action.payload, state.data)

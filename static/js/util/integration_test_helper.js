@@ -35,9 +35,9 @@ export default class IntegrationTestHelper {
     // stub all the api functions
     // NOTE: due to a regression in sinon 2.x, if you use `callsFake` you must
     //       call `resetBehavior()` on the stub first or the error still raises
-    for (let methodName in api) {
+    for (const methodName in api) {
       if (typeof api[methodName] === "function") {
-        let stubName = `${methodName}Stub`
+        const stubName = `${methodName}Stub`
         this[stubName] = this.sandbox
           .stub(api, methodName)
           .throws(new Error(`${stubName} not implemented`))

@@ -23,8 +23,8 @@ describe("auth", function() {
   afterEach(function() {
     sandbox.restore()
     fetchMock.restore()
-    for (let cookie of document.cookie.split(";")) {
-      let key = cookie.split("=")[0].trim()
+    for (const cookie of document.cookie.split(";")) {
+      const key = cookie.split("=")[0].trim()
       document.cookie = `${key}=`
     }
   })
@@ -38,14 +38,14 @@ describe("auth", function() {
     assert.equal(window.location.pathname, "/") // no redirect happened
   })
 
-  for (let [message, error] of [
+  for (const [message, error] of [
     ["a 500 error", error500],
     ["an unexpected exception", typeError]
   ]) {
     it(`does not renew auth for ${message}`, async () => {
       fetchStub.returns(Promise.reject(error))
 
-      let response = await assert.isRejected(auth.fetchWithAuthFailure("/url"))
+      const response = await assert.isRejected(auth.fetchWithAuthFailure("/url"))
 
       sinon.assert.calledWith(fetchStub, "/url")
       assert.equal(fetchStub.callCount, 1)

@@ -31,7 +31,7 @@ describe("reducers", () => {
       dispatchThen = store.createDispatchThen(state => state.posts)
       helper.getPostStub.resetBehavior() // needed because ``callsFake`` doesn't override the ``throws``
       helper.getPostStub.callsFake(async id => {
-        let post = makePost()
+        const post = makePost()
         post.id = id
         return post
       })
@@ -50,7 +50,7 @@ describe("reducers", () => {
         requestType,
         successType
       ]).then(posts => {
-        let post = posts.data.get("mypostid")
+        const post = posts.data.get("mypostid")
         assert.equal(post.id, "mypostid")
         assert.isString(post.title)
       })
@@ -61,7 +61,7 @@ describe("reducers", () => {
         store.dispatch(actions.posts.get("first")),
         store.dispatch(actions.posts.get("second"))
       ]).then(() => {
-        let { posts: { data } } = store.getState()
+        const { posts: { data } } = store.getState()
         assert.equal(data.get("first").id, "first")
         assert.equal(data.get("second").id, "second")
         assert.equal(data.size, 2)
@@ -69,7 +69,7 @@ describe("reducers", () => {
     })
 
     it("should allow setting a post record separately", () => {
-      let post = makePost()
+      const post = makePost()
       post.id = "my great post wow"
       store.dispatch(setPostData(post))
       const { posts } = store.getState()
@@ -78,7 +78,7 @@ describe("reducers", () => {
     })
 
     it("should let you set a list of posts separately", () => {
-      let posts = makeChannelPostList()
+      const posts = makeChannelPostList()
       store.dispatch(setPostData(posts))
       const { posts: { data } } = store.getState()
       assert.equal(data.size, 20)
@@ -90,7 +90,7 @@ describe("reducers", () => {
       dispatchThen = store.createDispatchThen(state => state.channels)
       helper.getChannelStub.resetBehavior() // needed because ``callsFake`` doesn't override the ``throws``
       helper.getChannelStub.callsFake(async name => {
-        let channel = makeChannel()
+        const channel = makeChannel()
         channel.name = name
         return channel
       })
@@ -111,7 +111,7 @@ describe("reducers", () => {
         requestType,
         successType
       ]).then(channels => {
-        let channel = channels.data.get("wowowowow")
+        const channel = channels.data.get("wowowowow")
         assert.isString(channel.name)
         assert.equal(channel.channel_type, "public")
       })
@@ -122,7 +122,7 @@ describe("reducers", () => {
         store.dispatch(actions.channels.get("first")),
         store.dispatch(actions.channels.get("second"))
       ]).then(() => {
-        let { channels: { data } } = store.getState()
+        const { channels: { data } } = store.getState()
         assert.equal(data.get("first").name, "first")
         assert.equal(data.get("second").name, "second")
         assert.equal(data.size, 2)
@@ -131,8 +131,8 @@ describe("reducers", () => {
 
     it("should let you create a channel", async () => {
       const { requestType, successType } = actions.channels.post
-      let channel = makeChannel()
-      let channels = await dispatchThen(actions.channels.post(channel), [
+      const channel = makeChannel()
+      const channels = await dispatchThen(actions.channels.post(channel), [
         requestType,
         successType
       ])
@@ -141,7 +141,7 @@ describe("reducers", () => {
 
     it("should let you set a list of channels separately", () => {
       const numChannels = 9
-      let channels = makeChannelList(numChannels)
+      const channels = makeChannelList(numChannels)
       store.dispatch(setChannelData(channels))
       let data = store.getState().channels.data
       assert.equal(data.size, numChannels)
@@ -187,7 +187,7 @@ describe("reducers", () => {
         actions.postsForChannel.get("channel"),
         [requestType, successType]
       )
-      let channel = data.get("channel")
+      const channel = data.get("channel")
       assert.isArray(channel)
       assert.lengthOf(channel, 20)
     })
@@ -197,7 +197,7 @@ describe("reducers", () => {
         store.dispatch(actions.postsForChannel.get("first")),
         store.dispatch(actions.postsForChannel.get("second"))
       ])
-      let { postsForChannel: { data } } = store.getState()
+      const { postsForChannel: { data } } = store.getState()
       assert.isArray(data.get("first"))
       assert.isArray(data.get("second"))
       assert.equal(data.size, 2)

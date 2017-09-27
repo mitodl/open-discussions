@@ -27,7 +27,7 @@ const appendCommentToTree = (
     return R.prepend(comment, tree)
   }
 
-  let lens = findComment(tree, commentId)
+  const lens = findComment(tree, commentId)
   if (!lens) {
     // should probably not get to this point, the original comment should still be present
     // if the API returned a message saying that the reply was successful
@@ -35,7 +35,7 @@ const appendCommentToTree = (
   }
 
   let treeComment = R.view(lens, tree)
-  let replies = [...treeComment.replies, comment]
+  const replies = [...treeComment.replies, comment]
   treeComment = { ...treeComment, replies }
   return R.set(lens, treeComment, tree)
 }
@@ -44,13 +44,13 @@ const updateCommentTree = (
   tree: Array<Comment>,
   updatedComment: Comment
 ): Array<Comment> => {
-  let lens = findComment(tree, updatedComment.id)
+  const lens = findComment(tree, updatedComment.id)
   if (lens === null) {
     return tree
   }
 
-  let original = R.view(lens, tree)
-  let replies = original.replies
+  const original = R.view(lens, tree)
+  const replies = original.replies
   updatedComment = { ...updatedComment, replies }
 
   return R.set(lens, updatedComment, tree)
@@ -65,7 +65,7 @@ export const commentsEndpoint = {
     response: CommentResponse,
     data: Map<string, Array<Comment>>
   ) => {
-    let update = new Map(data)
+    const update = new Map(data)
     update.set(response.postID, response.data)
     return update
   },
@@ -77,8 +77,8 @@ export const commentsEndpoint = {
     { commentId, postId, comment }: CommentPayload,
     data: Map<string, Array<Comment>>
   ) => {
-    let update = new Map(data)
-    let oldTree = data.get(postId)
+    const update = new Map(data)
+    const oldTree = data.get(postId)
     if (oldTree) {
       update.set(postId, appendCommentToTree(oldTree, comment, commentId))
     }
@@ -90,9 +90,9 @@ export const commentsEndpoint = {
     response: Comment,
     data: Map<string, Array<Comment>>
   ) => {
-    let update = new Map(data)
-    let postId = response.post_id
-    let oldTree = data.get(postId)
+    const update = new Map(data)
+    const postId = response.post_id
+    const oldTree = data.get(postId)
     if (oldTree) {
       update.set(postId, updateCommentTree(oldTree, response))
     }

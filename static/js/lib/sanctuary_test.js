@@ -32,10 +32,10 @@ const assertIsRight = (e, val) => {
 
 describe("sanctuary util functions", () => {
   describe("allJust", () => {
-    let maybes = [Just(2), Just("maybe?")]
+    const maybes = [Just(2), Just("maybe?")]
 
     it("should return Just(values) if passed an array of Just values", () => {
-      let checked = allJust(maybes)
+      const checked = allJust(maybes)
       assert(S.isJust(checked))
       checked.value.forEach((m, i) => assertMaybeEquality(m, maybes[i]))
     })
@@ -66,14 +66,14 @@ describe("sanctuary util functions", () => {
     })
 
     it("return func(input) if the input is not nil", () => {
-      let result = ifNil(x => x)("test input")
+      const result = ifNil(x => x)("test input")
       assert.equal("test input", result)
     })
   })
 
   describe("guard", () => {
-    let wrappedFunc = guard(x => x + 2)
-    let wrappedRestFunc = guard((x, y, z) => [x, y, z])
+    const wrappedFunc = guard(x => x + 2)
+    const wrappedRestFunc = guard((x, y, z) => [x, y, z])
 
     it("takes a function and returns a function", () => {
       assert.isFunction(wrappedFunc)
@@ -94,7 +94,7 @@ describe("sanctuary util functions", () => {
     })
 
     it("returns Nothing if any rest parameter arg is undefined", () => {
-      let args = [1, 2, 3]
+      const args = [1, 2, 3]
       ;[null, undefined].forEach(nilVal => {
         for (let i = 0; i < 3; i++) {
           assertIsNothing(wrappedRestFunc(...R.update(i, nilVal, args)))
@@ -127,7 +127,7 @@ describe("sanctuary util functions", () => {
     })
 
     it("returns Right(Object) if handed good JSON", () => {
-      let testObj = {
+      const testObj = {
         foo: ["bar", "baz"]
       }
       assertIsRight(parseJSON(JSON.stringify(testObj)), testObj)
@@ -135,8 +135,8 @@ describe("sanctuary util functions", () => {
   })
 
   describe("filterE", () => {
-    let left = S.Left(2)
-    let right = S.Right(4)
+    const left = S.Left(2)
+    const right = S.Right(4)
     it("returns a Left if passed one, regardless of predicate", () => {
       assertIsLeft(filterE(x => x === 2, left), 2)
       assertIsLeft(filterE(x => x !== 2, left), 2)

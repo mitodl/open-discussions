@@ -26,7 +26,7 @@ describe("utility functions", () => {
       yield* [6, 7, 8, 9, 10]
     }
 
-    let list = []
+    const list = []
     for (const item of enumerate(someNums())) {
       list.push(item)
     }

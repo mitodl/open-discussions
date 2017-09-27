@@ -15,7 +15,7 @@ describe("Post utils", () => {
   })
 
   it("should correctly format comments", () => {
-    let post = makePost()
+    const post = makePost()
     ;[
       [0, "0 Comments"],
       [1, "1 Comment"],

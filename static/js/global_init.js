@@ -17,7 +17,7 @@ if (!Object.entries) {
 // cleanup after each test run
 // eslint-disable-next-line mocha/no-top-level-hooks
 afterEach(function() {
-  let node = document.querySelector("#integration_test_div")
+  const node = document.querySelector("#integration_test_div")
   if (node) {
     ReactDOM.unmountComponentAtNode(node)
   }

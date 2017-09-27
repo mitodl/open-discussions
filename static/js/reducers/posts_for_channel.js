@@ -22,7 +22,7 @@ export const postsForChannelEndpoint = {
     data: Map<string, Array<string>>
   ) => {
     const { channelName, posts } = payload
-    let update = new Map(data)
+    const update = new Map(data)
     update.set(channelName, posts.map(post => post.id))
     return update
   }

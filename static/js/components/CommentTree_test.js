@@ -46,14 +46,14 @@ describe("CommentTree", () => {
     )
 
   it("should render all top-level comments as separate cards", () => {
-    let wrapper = renderCommentTree()
+    const wrapper = renderCommentTree()
     assert.equal(wrapper.find(Card).length, comments.length)
   })
 
   it("should render all replies to a top-level comment", () => {
-    let wrapper = renderCommentTree()
-    let firstComment = wrapper.find(".top-level-comment").at(0)
-    let replies = firstComment.find(".comment")
+    const wrapper = renderCommentTree()
+    const firstComment = wrapper.find(".top-level-comment").at(0)
+    const replies = firstComment.find(".comment")
     const countReplies = R.compose(
       R.reduce((acc, val) => acc + countReplies(val), 1),
       R.prop("replies")
@@ -63,8 +63,8 @@ describe("CommentTree", () => {
 
   it("should use markdown to render comments, should skip images", () => {
     comments[0].text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
-    let wrapper = renderCommentTree()
-    let firstComment = wrapper.find(".top-level-comment").at(0)
+    const wrapper = renderCommentTree()
+    const firstComment = wrapper.find(".top-level-comment").at(0)
     assert.equal(
       firstComment.find(ReactMarkdown).first().props().source,
       comments[0].text
@@ -73,14 +73,14 @@ describe("CommentTree", () => {
   })
 
   it("should render a profile image", () => {
-    let wrapper = renderCommentTree()
-    let { src } = wrapper.find(".profile-image").at(0).props()
+    const wrapper = renderCommentTree()
+    const { src } = wrapper.find(".profile-image").at(0).props()
     assert.equal(src, comments[0].profile_image)
   })
 
   it("should put a className on replies, to allow for indentation", () => {
-    let wrapper = renderCommentTree()
-    let firstComment = wrapper.find(".top-level-comment").at(0)
+    const wrapper = renderCommentTree()
+    const firstComment = wrapper.find(".top-level-comment").at(0)
     assert.equal(
       firstComment.find(".comment").at(0).props().className,
       "comment"
@@ -89,7 +89,7 @@ describe("CommentTree", () => {
   })
 
   it('should include a "reply" button', () => {
-    let wrapper = renderCommentTree()
+    const wrapper = renderCommentTree()
     wrapper.find(".reply-button").at(0).simulate("click")
     assert.ok(beginReplyStub.called)
     assert.ok(beginReplyStub.calledWith(replyToCommentKey(comments[0])))

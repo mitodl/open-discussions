@@ -30,8 +30,8 @@ describe("api", function() {
   afterEach(function() {
     sandbox.restore()
 
-    for (let cookie of document.cookie.split(";")) {
-      let key = cookie.split("=")[0].trim()
+    for (const cookie of document.cookie.split(";")) {
+      const key = cookie.split("=")[0].trim()
       document.cookie = `${key}=`
     }
   })

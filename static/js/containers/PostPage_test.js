@@ -52,7 +52,7 @@ describe("PostPage", function() {
     ])
 
   it("should fetch post, comments, channel, and render", async () => {
-    let [wrapper] = await renderPage()
+    const [wrapper] = await renderPage()
     assert.deepEqual(wrapper.find(CommentTree).props().comments, comments)
   })
   ;[
@@ -65,7 +65,7 @@ describe("PostPage", function() {
       const comment = comments[0].replies[2]
       assert(comment, "comment not found")
       // set initial state for upvoted or downvoted so we can flip it the other way
-      let expectedPayload = {}
+      const expectedPayload = {}
       if (isUpvote) {
         comment.upvoted = wasClear
         expectedPayload.upvoted = !wasClear
@@ -81,21 +81,21 @@ describe("PostPage", function() {
       }
       helper.updateCommentStub.returns(Promise.resolve(expectedComment))
 
-      let newState = await listenForActions(
+      const newState = await listenForActions(
         [
           actions.comments.patch.requestType,
           actions.comments.patch.successType
         ],
         () => {
-          let props = wrapper.find("CommentTree").props()
-          let voteFunc = isUpvote ? props.upvote : props.downvote
+          const props = wrapper.find("CommentTree").props()
+          const voteFunc = isUpvote ? props.upvote : props.downvote
           voteFunc(comment)
         }
       )
 
-      let commentTree = newState.comments.data.get(post.id)
-      let lens = findComment(commentTree, comment.id)
-      let updatedComment = R.view(lens, commentTree)
+      const commentTree = newState.comments.data.get(post.id)
+      const lens = findComment(commentTree, comment.id)
+      const updatedComment = R.view(lens, commentTree)
       if (isUpvote) {
         assert.equal(comment.upvoted, !updatedComment.upvoted)
       } else {
@@ -113,8 +113,8 @@ describe("PostPage", function() {
 
   it("passed props to each CommentVoteForm", async () => {
     const [wrapper] = await renderPage()
-    let commentTree = wrapper.find("CommentTree")
-    let commentTreeProps = commentTree.props()
+    const commentTree = wrapper.find("CommentTree")
+    const commentTreeProps = commentTree.props()
     for (const form of wrapper.find("CommentVoteForm")) {
       const fromProps = form.props
       assert.equal(fromProps.downvote, commentTreeProps.downvote)

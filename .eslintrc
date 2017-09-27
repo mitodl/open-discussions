@@ -6,6 +6,7 @@
       "plugin:react/recommended"
   ],
   "rules": {
+    "prefer-const": [2],
     "key-spacing": [2, {
       "beforeColon": false,
       "afterColon": true,

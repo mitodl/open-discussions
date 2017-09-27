@@ -99,7 +99,7 @@ describe("CreateCommentForm", () => {
           }
         })
       })
-      let btnProps = wrapper.find("button").props()
+      const btnProps = wrapper.find("button").props()
       assert.isTrue(btnProps.disabled)
       assert.equal(btnProps.className, "blue-button disabled")
     })
@@ -119,7 +119,7 @@ describe("CreateCommentForm", () => {
     })
 
     it("should trigger an update in state when text is input", async () => {
-      let state = await helper.listenForActions([forms.FORM_UPDATE], () => {
+      const state = await helper.listenForActions([forms.FORM_UPDATE], () => {
         wrapper.find("textarea[name='text']").simulate("change", {
           target: {
             name:  "text",
@@ -146,7 +146,7 @@ describe("CreateCommentForm", () => {
         })
       })
 
-      let state = await helper.listenForActions(
+      const state = await helper.listenForActions(
         [
           requestType,
           successType,
@@ -215,7 +215,7 @@ describe("CreateCommentForm", () => {
           }
         })
       })
-      let btnProps = wrapper.find("button").props()
+      const btnProps = wrapper.find("button").props()
       assert.isTrue(btnProps.disabled)
       assert.equal(btnProps.className, "blue-button disabled")
     })
@@ -242,7 +242,7 @@ describe("CreateCommentForm", () => {
     })
 
     it("should cancel and hide the form", async () => {
-      let mockPreventDefault = helper.sandbox.stub()
+      const mockPreventDefault = helper.sandbox.stub()
       const state = await helper.listenForActions([forms.FORM_END_EDIT], () => {
         wrapper.find(".cancel-button").simulate("click", {
           preventDefault: mockPreventDefault

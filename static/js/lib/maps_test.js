@@ -6,10 +6,10 @@ import { safeBulkGet } from "./maps"
 
 describe("Map helper utils", () => {
   describe("safeBulkGet", () => {
-    let keys = ["just", "write", "more", "tests"]
+    const keys = ["just", "write", "more", "tests"]
 
     it("should accept a list of IDs and a Map, and return the right entries", () => {
-      let map = new Map()
+      const map = new Map()
       keys.forEach(key => {
         map.set(key, R.toUpper(key))
       })
@@ -21,7 +21,7 @@ describe("Map helper utils", () => {
     })
 
     it("should return an empty list, given no keys", () => {
-      let map = new Map()
+      const map = new Map()
       keys.forEach(key => {
         map.set(key, R.toUpper(key))
       })

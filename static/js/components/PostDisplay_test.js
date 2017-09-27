@@ -59,7 +59,7 @@ describe("PostDisplay", () => {
 
   it("should display text, if given a text post and the 'expanded' flag", () => {
     const post = makePost()
-    let string = "JUST SOME GREAT TEXT!"
+    const string = "JUST SOME GREAT TEXT!"
     post.text = string
     const wrapper = renderPostDisplay({ post: post, expanded: true })
     assert.equal(wrapper.find(ReactMarkdown).props().source, string)
@@ -82,14 +82,14 @@ describe("PostDisplay", () => {
 
   it("should not display text, if given a text post but lacking the 'expanded' flag", () => {
     const post = makePost()
-    let string = "JUST SOME GREAT TEXT!"
+    const string = "JUST SOME GREAT TEXT!"
     post.text = string
     const wrapper = renderPostDisplay({ post: post })
     assert.notInclude(wrapper.text(), string)
   })
 
   it("should include an external link, if a url post", () => {
-    let post = makePost(true)
+    const post = makePost(true)
     const wrapper = renderPostDisplay({ post: post })
     const { href, target, children } = wrapper.find("a").at(0).props()
     assert.equal(href, post.url)
@@ -98,7 +98,7 @@ describe("PostDisplay", () => {
   })
 
   it("should link to the detail view, if a text post", () => {
-    let post = makePost()
+    const post = makePost()
     const wrapper = renderPostDisplay({ post: post })
     const { to, children } = wrapper.find(Link).at(0).props()
     assert.equal(children, post.title)
@@ -124,7 +124,7 @@ describe("PostDisplay", () => {
   ;[true, false].forEach(prevUpvote => {
     it(`should show the correct UI when the upvote 
     button is clicked when prev state was ${String(prevUpvote)}`, async () => {
-      let post = makePost()
+      const post = makePost()
       post.upvoted = prevUpvote
       // setting to a function so Flow doesn't complain
       let resolveUpvote = () => null

@@ -52,15 +52,15 @@ describe("ChannelPage", () => {
     ])
 
   it("should fetch postsForChannel, set post data, and render", async () => {
-    let [wrapper] = await renderPage(currentChannel)
+    const [wrapper] = await renderPage(currentChannel)
     assert.deepEqual(wrapper.find(PostList).props().posts, postList)
   })
 
   it("should handle missing data gracefully", async () => {
-    let otherChannel = makeChannel()
+    const otherChannel = makeChannel()
     otherChannel.name =
       "somenamethatshouldnevercollidebecauseitsaridiculouslylongvalue"
-    let [wrapper] = await renderPage(otherChannel)
+    const [wrapper] = await renderPage(otherChannel)
     assert.lengthOf(wrapper.find(".loading").find(".sk-three-bounce"), 1)
   })
 

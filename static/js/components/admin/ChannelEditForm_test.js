@@ -33,10 +33,10 @@ describe("ChannelEditForm", () => {
   })
 
   it("should render a blank form", () => {
-    let wrapper = renderForm(form)
-    let [title, name] = wrapper.find('input[type="text"]')
-    let [description] = wrapper.find("textarea")
-    let [radioPublic, radioPrivate] = wrapper.find('input[type="radio"]')
+    const wrapper = renderForm(form)
+    const [title, name] = wrapper.find('input[type="text"]')
+    const [description] = wrapper.find("textarea")
+    const [radioPublic, radioPrivate] = wrapper.find('input[type="radio"]')
     assert.equal(title.props.value, "")
     assert.equal(name.props.value, "")
     assert.equal(description.props.value, "")
@@ -63,18 +63,18 @@ describe("ChannelEditForm", () => {
     })
 
     describe("onUpdate", () => {
-      for (let inputName of ["title", "name", "public_description"]) {
+      for (const inputName of ["title", "name", "public_description"]) {
         it(`should be called when ${inputName} input is modified`, () => {
-          let event = { target: { value: "text" } }
+          const event = { target: { value: "text" } }
           assert.isNotOk(onSubmit.called)
           wrapper.find(`[name="${inputName}"]`).simulate("change", event)
           assert.isOk(onUpdate.calledWith(event))
         })
       }
 
-      for (let channelType of [CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC]) {
+      for (const channelType of [CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC]) {
         it(`should be called when ${channelType} channel_type is clicked`, () => {
-          let event = { target: { value: channelType } }
+          const event = { target: { value: channelType } }
           assert.isNotOk(onSubmit.called)
           wrapper.find(`#channel_${channelType}`).simulate("change", event)
           assert.isOk(onUpdate.calledWith(event))

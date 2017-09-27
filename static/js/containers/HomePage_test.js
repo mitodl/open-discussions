@@ -38,7 +38,7 @@ describe("HomePage", () => {
     ])
 
   it("should fetch frontpage, set post data, render", async () => {
-    let [wrapper] = await renderPage()
+    const [wrapper] = await renderPage()
     assert.deepEqual(wrapper.find(PostList).props().posts, postList)
   })
 

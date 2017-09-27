@@ -6,7 +6,7 @@ import { assert } from "chai"
 import Card from "./Card"
 
 describe("Card component", () => {
-  let mountCard = (children, props = {}) =>
+  const mountCard = (children, props = {}) =>
     shallow(
       <Card {...props}>
         {children}
@@ -14,18 +14,18 @@ describe("Card component", () => {
     )
 
   it("should render children", () => {
-    let wrapper = mountCard(<div className="child">HEY</div>)
+    const wrapper = mountCard(<div className="child">HEY</div>)
     assert.lengthOf(wrapper.find(".child"), 1)
     assert.equal(wrapper.text(), "HEY")
   })
 
   it("should put className, if passed one", () => {
-    let wrapper = mountCard(<div />, { className: "HEY THERE" })
+    const wrapper = mountCard(<div />, { className: "HEY THERE" })
     assert.equal(wrapper.props().className, "card HEY THERE")
   })
 
   it("should display a title, if passed one", () => {
-    let wrapper = mountCard(<div />, { title: "HEY THERE" })
+    const wrapper = mountCard(<div />, { title: "HEY THERE" })
     assert.equal(wrapper.text(), "HEY THERE")
   })
 })

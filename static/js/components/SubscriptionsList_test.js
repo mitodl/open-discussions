@@ -19,7 +19,7 @@ describe("SubscriptionsList", function() {
   })
 
   it("should show each channel", () => {
-    let wrapper = renderSubscriptionsList()
+    const wrapper = renderSubscriptionsList()
     assert.equal(wrapper.find(Link).length, channels.length)
     wrapper.find(Link).forEach((link, index) => {
       assert.equal(link.props().to, channelURL(channels[index].name))

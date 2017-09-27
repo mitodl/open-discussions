@@ -5,7 +5,7 @@ import { makeChannel } from "./channels"
 
 describe("channels factory", () => {
   it("should make a channel", () => {
-    let channel = makeChannel()
+    const channel = makeChannel()
     assert.isString(channel.name)
     assert.isString(channel.title)
     assert.equal(channel.channel_type, "public")

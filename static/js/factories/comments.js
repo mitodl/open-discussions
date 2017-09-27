@@ -31,7 +31,7 @@ export const makeCommentTree = (
   post: Post,
   minComments: number = 1
 ): Array<Comment> => {
-  let topLevelComments = arrayN(minComments, 10).map(() => makeComment(post))
+  const topLevelComments = arrayN(minComments, 10).map(() => makeComment(post))
 
   topLevelComments.forEach((comment, index) => {
     if (casual.coin_flip || index === 0) {

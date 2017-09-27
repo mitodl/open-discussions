@@ -7,7 +7,7 @@ import { makePost, makeChannelPostList } from "./posts"
 describe("posts factories", () => {
   describe("makePost", () => {
     it("should make a text post", () => {
-      let post = makePost()
+      const post = makePost()
       assert.isString(post.id)
       assert.isString(post.title)
       assert.isBoolean(post.upvoted)
@@ -20,19 +20,19 @@ describe("posts factories", () => {
     })
 
     it("should make a URL post", () => {
-      let post = makePost(true)
+      const post = makePost(true)
       assert.isNull(post.text)
       assert.isString(post.url)
     })
 
     it("should randomly generate username", () => {
-      let firstPost = makePost()
-      let secondPost = makePost()
+      const firstPost = makePost()
+      const secondPost = makePost()
       assert.notEqual(firstPost.author_id, secondPost.author_id)
     })
 
     it("should randomly generate upvotes", () => {
-      let upvoteScores = R.range(1, 20).map(makePost).map(R.prop("score"))
+      const upvoteScores = R.range(1, 20).map(makePost).map(R.prop("score"))
       assert.isAbove(new Set(upvoteScores).size, 1)
     })
   })

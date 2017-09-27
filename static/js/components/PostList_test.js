@@ -12,18 +12,18 @@ describe("PostList", () => {
     shallow(<PostList toggleUpvote={() => {}} {...props} />)
 
   it("should render a list of posts", () => {
-    let wrapper = renderPostList()
+    const wrapper = renderPostList()
     assert.lengthOf(wrapper.find(PostDisplay), 20)
   })
 
   it("should behave well if handed an empty list", () => {
-    let wrapper = renderPostList({ posts: [] })
+    const wrapper = renderPostList({ posts: [] })
     assert.lengthOf(wrapper.find(PostDisplay), 0)
     assert.equal(wrapper.text(), "There are no posts to display.")
   })
 
   it("should pass the showChannelLinks prop to PostDisplay", () => {
-    let wrapper = renderPostList({
+    const wrapper = renderPostList({
       posts:            makeChannelPostList(),
       showChannelLinks: true
     })

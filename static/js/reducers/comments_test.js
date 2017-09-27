@@ -49,7 +49,7 @@ describe("comments reducers", () => {
       requestType,
       successType
     ]).then(({ data }) => {
-      let comments = data.get(post.id)
+      const comments = data.get(post.id)
       assert.isArray(comments)
       assert.isNotEmpty(comments[0].replies)
     })
@@ -121,7 +121,7 @@ describe("comments reducers", () => {
   })
 
   it("should let you update a comment", async () => {
-    let comment = tree[0].replies[0]
+    const comment = tree[0].replies[0]
     comment.upvoted = false
     helper.updateCommentStub.returns(
       Promise.resolve({
@@ -129,7 +129,7 @@ describe("comments reducers", () => {
         upvoted: true
       })
     )
-    let state = await listenForActions(
+    const state = await listenForActions(
       [
         actions.comments.get.requestType,
         actions.comments.get.successType,

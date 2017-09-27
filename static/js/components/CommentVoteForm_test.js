@@ -34,7 +34,7 @@ describe("CommentVoteForm", () => {
     sandbox.restore()
   })
 
-  let renderForm = (props = {}) =>
+  const renderForm = (props = {}) =>
     mount(
       <CommentVoteForm
         comment={comment}
@@ -84,7 +84,7 @@ describe("CommentVoteForm", () => {
   ;[true, false].forEach(isUpvote => {
     describe(`clicks the ${isUpvote ? "upvote" : "downvote"} button`, () => {
       it("when the previous state was clear", async () => {
-        let wrapper = renderForm()
+        const wrapper = renderForm()
         const voteStub = isUpvote ? upvoteStub : downvoteStub
 
         wrapper
@@ -119,7 +119,7 @@ describe("CommentVoteForm", () => {
           } else {
             comment.downvoted = true
           }
-          let wrapper = renderForm()
+          const wrapper = renderForm()
 
           assertButtons(wrapper, wasUpvote, false, false)
 

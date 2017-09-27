@@ -63,7 +63,7 @@ export function getPost(postId: string): Promise<Post> {
 }
 
 export async function getComments(postID: string): Promise<CommentResponse> {
-  let response = await fetchWithAuthFailure(`/api/v0/posts/${postID}/comments/`)
+  const response = await fetchWithAuthFailure(`/api/v0/posts/${postID}/comments/`)
   return { postID, data: response }
 }
 
@@ -72,7 +72,7 @@ export function createComment(
   comment: string,
   commentId: ?string
 ) {
-  let body =
+  const body =
     commentId === undefined
       ? { text: comment }
       : { text: comment, comment_id: commentId }

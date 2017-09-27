@@ -14,23 +14,23 @@ describe("comments lib functions", () => {
   })
 
   it("finds a root comment", () => {
-    let root = comments[1]
+    const root = comments[1]
     assert(root, "missing comment")
-    let lens = findComment(comments, root.id)
+    const lens = findComment(comments, root.id)
     assert.deepEqual(R.view(lens, comments), root)
   })
 
   it("finds a nested comment", () => {
-    let root = comments[0]
-    let firstChild = root.replies[0]
-    let secondChild = firstChild.replies[2]
+    const root = comments[0]
+    const firstChild = root.replies[0]
+    const secondChild = firstChild.replies[2]
     assert(secondChild, "missing comment")
-    let lens = findComment(comments, secondChild.id)
+    const lens = findComment(comments, secondChild.id)
     assert.deepEqual(R.view(lens, comments), secondChild)
   })
 
   it("can't find the comment", () => {
-    let lens = findComment(comments, "not_a_comment_id")
+    const lens = findComment(comments, "not_a_comment_id")
     assert.isNull(lens)
   })
 })

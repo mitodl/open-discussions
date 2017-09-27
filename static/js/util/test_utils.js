@@ -19,7 +19,7 @@ export function createAssertReducerResultState<State>(
     const getState = () => stateLookup(getReducerState(store.getState()))
 
     assert.deepEqual(defaultValue, getState())
-    for (let value of [
+    for (const value of [
       true,
       null,
       false,
