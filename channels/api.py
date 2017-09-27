@@ -21,6 +21,7 @@ VALID_CHANNEL_TYPES = (
 )
 
 USER_AGENT = 'MIT-Open: {version}'
+ACCESS_TOKEN_HEADER_NAME = 'X-Access-Token'
 
 CHANNEL_SETTINGS = (
     'header_title',
@@ -82,6 +83,9 @@ def _get_session():
     """
     session = requests.Session()
     session.verify = settings.OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL
+    session.headers.update({
+        ACCESS_TOKEN_HEADER_NAME: settings.OPEN_DISCUSSIONS_REDDIT_ACCESS_TOKEN,
+    })
     return session
 
 

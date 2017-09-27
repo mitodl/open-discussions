@@ -85,6 +85,10 @@
       "description": "Shared secret for JWT auth tokens",
       "required": true
     },
+    "OPEN_DISCUSSIONS_REDDIT_ACCESS_TOKEN": {
+      "description": "Access token for securing trusted APIs to reddit",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_REDDIT_CLIENT_ID": {
       "description": "OAuth client ID for authentication with reddit",
       "required": true

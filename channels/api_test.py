@@ -27,6 +27,13 @@ def mock_client(mock_get_client):
     return mock_get_client.return_value
 
 
+def test_get_session(settings):
+    """Test that _get_session uses the access token from settings"""
+    settings.OPEN_DISCUSSIONS_REDDIT_ACCESS_TOKEN = 'ACCESS_TOKEN'
+    # pylint: disable=protected-access
+    assert api._get_session().headers[api.ACCESS_TOKEN_HEADER_NAME] == 'ACCESS_TOKEN'
+
+
 def test_get_channel_user(mock_get_client):
     """Test get_channels for logged-in user"""
     user = UserFactory.create()
