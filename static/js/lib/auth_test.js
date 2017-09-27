@@ -45,7 +45,9 @@ describe("auth", function() {
     it(`does not renew auth for ${message}`, async () => {
       fetchStub.returns(Promise.reject(error))
 
-      const response = await assert.isRejected(auth.fetchWithAuthFailure("/url"))
+      const response = await assert.isRejected(
+        auth.fetchWithAuthFailure("/url")
+      )
 
       sinon.assert.calledWith(fetchStub, "/url")
       assert.equal(fetchStub.callCount, 1)

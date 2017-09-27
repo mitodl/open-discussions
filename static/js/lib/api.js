@@ -63,7 +63,9 @@ export function getPost(postId: string): Promise<Post> {
 }
 
 export async function getComments(postID: string): Promise<CommentResponse> {
-  const response = await fetchWithAuthFailure(`/api/v0/posts/${postID}/comments/`)
+  const response = await fetchWithAuthFailure(
+    `/api/v0/posts/${postID}/comments/`
+  )
   return { postID, data: response }
 }
 
