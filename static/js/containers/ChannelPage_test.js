@@ -12,6 +12,7 @@ import { SET_POST_DATA } from "../actions/post"
 import { SET_CHANNEL_DATA } from "../actions/channel"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { channelURL } from "../lib/url"
+import { formatTitle } from "../lib/title"
 
 describe("ChannelPage", () => {
   let helper,
@@ -50,6 +51,11 @@ describe("ChannelPage", () => {
       SET_POST_DATA,
       SET_CHANNEL_DATA
     ])
+
+  it("should set the document title", async () => {
+    await renderPage(currentChannel)
+    assert.equal(document.title, formatTitle(currentChannel.title))
+  })
 
   it("should fetch postsForChannel, set post data, and render", async () => {
     const [wrapper] = await renderPage(currentChannel)

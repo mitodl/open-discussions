@@ -7,6 +7,7 @@ import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import { formatTitle } from "../lib/title"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
 
@@ -61,6 +62,11 @@ describe("CreatePostPage", () => {
         ]
     )
   }
+
+  it("should set the document title", async () => {
+    await renderPage()
+    assert.equal(document.title, formatTitle("Submit a Post"))
+  })
 
   it("attempts to clear form and load channels on mount", async () => {
     const [wrapper] = await renderPage()

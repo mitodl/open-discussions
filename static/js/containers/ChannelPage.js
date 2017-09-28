@@ -2,6 +2,7 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
+import DocumentTitle from "react-document-title"
 
 import Card from "../components/Card"
 import PostList from "../components/PostList"
@@ -16,6 +17,7 @@ import { getChannelName } from "../lib/util"
 import { toggleUpvote } from "../util/api_actions"
 import { anyError } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
+import { formatTitle } from "../lib/title"
 
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -64,6 +66,7 @@ class ChannelPage extends React.Component {
     } else {
       return (
         <div>
+          <DocumentTitle title={formatTitle(channel.title)} />
           <ChannelBreadcrumbs channel={channel} />
           <Card title={channel.title}>
             <PostList

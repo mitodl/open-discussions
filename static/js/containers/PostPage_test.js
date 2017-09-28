@@ -12,6 +12,7 @@ import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
 import { postDetailURL } from "../lib/url"
+import { formatTitle } from "../lib/title"
 
 describe("PostPage", function() {
   let helper, renderComponent, listenForActions, post, comments, channel
@@ -50,6 +51,11 @@ describe("PostPage", function() {
       actions.channels.get.requestType,
       actions.channels.get.successType
     ])
+
+  it("should set the document title", async () => {
+    await renderPage()
+    assert.equal(document.title, formatTitle(post.title))
+  })
 
   it("should fetch post, comments, channel, and render", async () => {
     const [wrapper] = await renderPage()

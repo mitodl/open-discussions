@@ -2,11 +2,13 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
+import DocumentTitle from "react-document-title"
 
 import ChannelEditForm from "../../components/admin/ChannelEditForm"
 import { actions } from "../../actions"
 import { channelURL } from "../../lib/url"
 import { newChannelForm } from "../../lib/channels"
+import { formatTitle } from "../../lib/title"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
@@ -70,6 +72,7 @@ class CreateChannelPage extends React.Component {
 
     return (
       <div>
+        <DocumentTitle title={formatTitle("Create a Channel")} />
         <ChannelEditForm
           onSubmit={this.onSubmit}
           onUpdate={this.onUpdate}

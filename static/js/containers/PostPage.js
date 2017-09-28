@@ -2,6 +2,7 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
+import DocumentTitle from "react-document-title"
 
 import Card from "../components/Card"
 import withLoading from "../components/Loading"
@@ -18,6 +19,7 @@ import { getChannelName, getPostID } from "../lib/util"
 import { anyError } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginReply } from "../components/CreateCommentForm"
+import { formatTitle } from "../lib/title"
 
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -103,6 +105,7 @@ class PostPage extends React.Component {
     return (
       <div>
         <ChannelBreadcrumbs channel={channel} />
+        <DocumentTitle title={formatTitle(post.title)} />
         <Card>
           <div className="post-card">
             <PostDisplay

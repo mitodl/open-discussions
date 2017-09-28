@@ -2,6 +2,7 @@
 import React from "react"
 import { Route } from "react-router-dom"
 import { connect } from "react-redux"
+import DocumentTitle from "react-document-title"
 
 import HomePage from "./HomePage"
 import ChannelPage from "./ChannelPage"
@@ -44,6 +45,7 @@ class App extends React.Component {
     const { match } = this.props
     return (
       <div className="app">
+        <DocumentTitle title="MIT Open Discussions" />
         <Toolbar toggleShowSidebar={this.toggleShowSidebar} />
         <Drawer />
         <Route exact path={match.url} component={HomePage} />

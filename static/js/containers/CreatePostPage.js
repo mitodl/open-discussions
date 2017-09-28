@@ -2,6 +2,7 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
+import DocumentTitle from "react-document-title"
 
 import CreatePostForm from "../components/CreatePostForm"
 
@@ -9,6 +10,7 @@ import { actions } from "../actions"
 import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
 import { getChannelName } from "../lib/util"
+import { formatTitle } from "../lib/title"
 
 import type { FormValue } from "../flow/formTypes"
 import type { Channel, CreatePostPayload } from "../flow/discussionTypes"
@@ -109,6 +111,7 @@ class CreatePostPage extends React.Component {
 
     return (
       <div className="content">
+        <DocumentTitle title={formatTitle("Submit a Post")} />
         <div className="main-content">
           <CreatePostForm
             onSubmit={this.onSubmit}
