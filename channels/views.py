@@ -22,6 +22,7 @@ from channels.serializers import (
     PostSerializer,
     ModeratorSerializer,
 )
+from channels.utils import get_pagination_and_posts, get_pagination_params
 from open_discussions.permissions import JwtIsStaffOrReadonlyPermission
 
 User = get_user_model()
@@ -129,16 +130,20 @@ class PostListView(APIView):
 
     def get(self, request, *args, **kwargs):
         """Get list for posts and attach User objects to them"""
+        before, after, count = get_pagination_params(self.request)
         api = Api(user=request.user)
-        posts = list(api.list_posts(self.kwargs['channel_name']))
+        paginated_posts = api.list_posts(self.kwargs['channel_name'], before=before, after=after, count=count)
+        pagination, posts = get_pagination_and_posts(paginated_posts, before=before, count=count)
         users = _lookup_users_for_posts(posts)
         posts = [post for post in posts if post.author and post.author.name in users]
-        return Response(
-            PostSerializer(posts, many=True, context={
+
+        return Response({
+            'posts': PostSerializer(posts, many=True, context={
                 **self.get_serializer_context(),
                 'users': users,
-            }).data
-        )
+            }).data,
+            'pagination': pagination,
+        })
 
     def post(self, request, *args, **kwargs):
         """Create a new post"""
@@ -352,21 +357,24 @@ class FrontPageView(APIView):
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Get front page posts"""
+        before, after, count = get_pagination_params(self.request)
         api = Api(user=self.request.user)
-        posts = list(api.front_page())
+        paginated_posts = api.front_page(before=before, after=after, count=count)
+        pagination, posts = get_pagination_and_posts(paginated_posts, before=before, count=count)
         users = _lookup_users_for_posts(posts)
         posts = [post for post in posts if post.author and post.author.name in users]
 
-        return Response(
-            PostSerializer(
+        return Response({
+            'posts': PostSerializer(
                 posts,
                 context={
                     **self.get_serializer_context(),
                     'users': users,
                 },
                 many=True,
-            ).data
-        )
+            ).data,
+            'pagination': pagination,
+        })
 
 
 class ContributorListView(ListCreateAPIView):

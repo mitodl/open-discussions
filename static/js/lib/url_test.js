@@ -7,7 +7,8 @@ import {
   FRONTPAGE_URL,
   newPostURL,
   postDetailURL,
-  getChannelNameFromPathname
+  getChannelNameFromPathname,
+  toQueryString
 } from "./url"
 
 describe("url helper functions", () => {
@@ -60,6 +61,22 @@ describe("url helper functions", () => {
     it("should have appropriate values for each constant", () => {
       assert.equal(AUTH_REQUIRED_URL, "/auth_required/")
       assert.equal(FRONTPAGE_URL, "/")
+    })
+  })
+
+  describe("toQueryString", () => {
+    it("should return an empty string for empty params", () => {
+      assert.equal(toQueryString({}), "")
+    })
+
+    it("should return a query string with params sorted lexicographically", () => {
+      assert.equal(
+        toQueryString({
+          def: 1,
+          abc: 10
+        }),
+        "?abc=10&def=1"
+      )
     })
   })
 })

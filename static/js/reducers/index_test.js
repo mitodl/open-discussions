@@ -170,7 +170,7 @@ describe("reducers", () => {
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.postsForChannel)
       helper.getPostsForChannelStub.returns(
-        Promise.resolve(makeChannelPostList())
+        Promise.resolve({ posts: makeChannelPostList() })
       )
     })
 
@@ -187,7 +187,7 @@ describe("reducers", () => {
         actions.postsForChannel.get("channel"),
         [requestType, successType]
       )
-      const channel = data.get("channel")
+      const channel = data.get("channel").postIds
       assert.isArray(channel)
       assert.lengthOf(channel, 20)
     })
@@ -198,8 +198,8 @@ describe("reducers", () => {
         store.dispatch(actions.postsForChannel.get("second"))
       ])
       const { postsForChannel: { data } } = store.getState()
-      assert.isArray(data.get("first"))
-      assert.isArray(data.get("second"))
+      assert.isArray(data.get("first").postIds)
+      assert.isArray(data.get("second").postIds)
       assert.equal(data.size, 2)
     })
   })
@@ -207,7 +207,9 @@ describe("reducers", () => {
   describe("frontpage reducer", () => {
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.frontpage)
-      helper.getFrontpageStub.returns(Promise.resolve(makeChannelPostList()))
+      helper.getFrontpageStub.returns(
+        Promise.resolve({ posts: makeChannelPostList() })
+      )
     })
 
     it("should have some initial state", () => {
@@ -223,7 +225,7 @@ describe("reducers", () => {
         requestType,
         successType
       ])
-      assert.lengthOf(data, 20)
+      assert.lengthOf(data.postIds, 20)
     })
   })
 

@@ -31,7 +31,7 @@ describe("ChannelPage", () => {
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(currentChannel))
     helper.getChannelsStub.returns(Promise.resolve(channels))
-    helper.getPostsForChannelStub.returns(Promise.resolve(postList))
+    helper.getPostsForChannelStub.returns(Promise.resolve({ posts: postList }))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
   })

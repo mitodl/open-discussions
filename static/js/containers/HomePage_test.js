@@ -18,7 +18,7 @@ describe("HomePage", () => {
     channels = makeChannelList()
     postList = makeChannelPostList()
     helper = new IntegrationTestHelper()
-    helper.getFrontpageStub.returns(Promise.resolve(postList))
+    helper.getFrontpageStub.returns(Promise.resolve({ posts: postList }))
     helper.getChannelsStub.returns(Promise.resolve(channels))
     renderComponent = helper.renderComponent.bind(helper)
   })

@@ -235,28 +235,51 @@ class Api:
             raise ValueError('Exactly one of text and url must be provided')
         return self.get_channel(channel_name).submit(title, selftext=text, url=url)
 
-    def front_page(self):
+    def front_page(self, before=None, after=None, count=None):
         """
         List posts on front page using 'hot' algorithm
+
+        Args:
+            before (str): fullname of the first post on the next page
+            after (str): fullname of the last post on the previous page
+            count (int): number of posts seen so far
 
         Returns:
             praw.models.listing.generator.ListingGenerator:
                 A generator of posts for a subreddit
         """
-        return self.reddit.front.hot()
+        params = {}
+        if before is not None:
+            params['before'] = before
+        if after is not None:
+            params['after'] = after
+        if count is not None:
+            params['count'] = count
 
-    def list_posts(self, channel_name):
+        return self.reddit.front.hot(limit=settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT, params=params)
+
+    def list_posts(self, channel_name, before=None, after=None, count=None):
         """
         List posts using the 'hot' algorithm
 
         Args:
             channel_name(str): the channel name identifier
+            before (str): fullname of the first post on the next page
+            after (str): fullname of the last post on the previous page
+            count (int): number of posts seen so far
 
         Returns:
             praw.models.listing.generator.ListingGenerator:
                 A generator of posts for a subreddit
         """
-        return self.get_channel(channel_name).hot()
+        params = {}
+        if before is not None:
+            params['before'] = before
+        if after is not None:
+            params['after'] = after
+        if count is not None:
+            params['count'] = count
+        return self.get_channel(channel_name).hot(limit=settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT, params=params)
 
     def get_post(self, post_id):
         """

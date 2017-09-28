@@ -6,17 +6,26 @@ import "isomorphic-fetch"
 import { PATCH, POST } from "redux-hammock/constants"
 
 import { fetchWithAuthFailure } from "./auth"
+import { toQueryString } from "../lib/url"
+import { getPaginationParams } from "../lib/posts"
 
 import type {
   Channel,
   Comment,
   CreatePostPayload,
+  PostListPaginationParams,
   Post
 } from "../flow/discussionTypes"
 import type { CommentResponse } from "../reducers/comments"
 
-export function getFrontpage(): Promise<Post> {
-  return fetchWithAuthFailure(`/api/v0/frontpage/`)
+const getPaginationQS = R.compose(
+  toQueryString,
+  R.reject(R.isNil),
+  getPaginationParams
+)
+
+export function getFrontpage(params: PostListPaginationParams): Promise<Post> {
+  return fetchWithAuthFailure(`/api/v0/frontpage/${getPaginationQS(params)}`)
 }
 
 export function getChannel(channelName: string): Promise<Channel> {
@@ -39,8 +48,13 @@ export function createChannel(channel: Channel): Promise<Channel> {
   })
 }
 
-export function getPostsForChannel(channelName: string): Promise<Array<Post>> {
-  return fetchWithAuthFailure(`/api/v0/channels/${channelName}/posts/`)
+export function getPostsForChannel(
+  channelName: string,
+  params: PostListPaginationParams
+): Promise<Array<Post>> {
+  return fetchWithAuthFailure(
+    `/api/v0/channels/${channelName}/posts/${getPaginationQS(params)}`
+  )
 }
 
 export function createPost(

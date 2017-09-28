@@ -48,6 +48,29 @@ export type CreatePostPayload = {
   title: string,
 };
 
+export type PostListPagination = {
+  after: ?string,
+  after_count: ?number,
+  before: ?string,
+  before_count: ?number,
+}
+
+export type PostListPaginationParams = {
+  before: ?string,
+  after: ?string,
+  count: ?number,
+}
+
+export type PostListData = {
+  pagination: PostListPagination,
+  postIds: Array<string>
+}
+
+export type PostListResponse = {
+  pagination: PostListPagination,
+  posts: Array<Post>,
+}
+
 export type Comment = AuthoredContent & {
   post_id:       string,
   text:          string,

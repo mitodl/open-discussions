@@ -150,7 +150,7 @@ def test_list_posts(mock_client):
     client = api.Api(UserFactory.create())
     posts = client.list_posts('channel')
     assert posts == mock_client.subreddit.return_value.hot.return_value
-    mock_client.subreddit.return_value.hot.assert_called_once_with()
+    mock_client.subreddit.return_value.hot.assert_called_once_with(limit=25, params={})
     mock_client.subreddit.assert_called_once_with('channel')
 
 
@@ -272,7 +272,7 @@ def test_frontpage(mock_client):
     client = api.Api(UserFactory.create())
     posts = client.front_page()
     assert posts == mock_client.front.hot.return_value
-    mock_client.front.hot.assert_called_once_with()
+    mock_client.front.hot.assert_called_once_with(limit=25, params={})
 
 
 def test_add_contributor(mock_client):

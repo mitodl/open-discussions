@@ -259,44 +259,65 @@ def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missi
 
     if missing_user:
         # all posts should be filtered out
-        assert resp.json() == []
+        assert resp.json() == {
+            'posts': [],
+            'pagination': {}
+        }
     else:
-        assert resp.json() == [
-            {
-                'url': None,
-                'text': '🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐽 🐸 🐵 🙊 🙉 🙊 🐒 🐔 🐧 🐦 🐤 🐣 🐥 '
-                        '🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🐛 🦋 🐌 🐚 🐞 🐜 🕷 🕸 🐢 🐍 🦎 🦂 🦀 🦑 🐙 🦐 '
-                        '🐠 🐟 🐡 🐬 🦈 🐳 🐋 🐊 🐆 🐅 🐃 🐂 🐄 🦌 🐪 🐫 🐘 🦏 🦍 🐎 🐖 🐐 🐏 🐑 🐕 '
-                        '🐩 🐈 🐓 🦃 🕊 🐇 🐁 🐀 🐿 🐾 🐉 🐲 🌵 🎄 🌲 🌳 🌴 🌱 🌿 ☘️ 🍀 🎍 🎋 🍃 🍂 🍁 '
-                        '🍄 🌾 💐 🌷 🌹 🥀 🌻 🌼 🌸 🌺 🌎 🌍 🌏 🌕 🌖 🌗 🌘 🌑 🌒 🌓 🌔 🌚 🌝 🌞 🌛 '
-                        '🌜 🌙 💫 ⭐️ 🌟 ✨ ⚡️ 🔥 💥 ☄️ ☀️ 🌤 ⛅️ 🌥 🌦 🌈 ☁️ 🌧 ⛈ 🌩 🌨 ☃️ ⛄️ '
-                        '❄️ 🌬 💨 🌪 🌫 🌊 💧 💦 ☔️',
-                'title': 'Text post',
-                'upvoted': True,
-                'score': 1,
-                'author_id': "george",
-                'id': '30',
-                'created': '2017-07-21T19:10:26+00:00',
-                'num_comments': 0,
-                'channel_name': 'two_posts',
-                "profile_image": profile_image,
-                "author_name": name
-            },
-            {
-                'url': 'http://micromasters.mit.edu',
-                'text': None,
-                'title': 'Link post',
-                'upvoted': True,
-                'score': 1,
-                'author_id': 'george',
-                'id': '2z',
-                'created': '2017-07-21T19:09:37+00:00',
-                'num_comments': 0,
-                'channel_name': 'two_posts',
-                "profile_image": profile_image,
-                "author_name": name
-            }
-        ]
+        assert resp.json() == {
+            'posts': [
+                {
+                    'url': None,
+                    'text': '🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐽 🐸 🐵 🙊 🙉 🙊 🐒 🐔 🐧 🐦 🐤 🐣 🐥 '
+                            '🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🐛 🦋 🐌 🐚 🐞 🐜 🕷 🕸 🐢 🐍 🦎 🦂 🦀 🦑 🐙 🦐 '
+                            '🐠 🐟 🐡 🐬 🦈 🐳 🐋 🐊 🐆 🐅 🐃 🐂 🐄 🦌 🐪 🐫 🐘 🦏 🦍 🐎 🐖 🐐 🐏 🐑 🐕 '
+                            '🐩 🐈 🐓 🦃 🕊 🐇 🐁 🐀 🐿 🐾 🐉 🐲 🌵 🎄 🌲 🌳 🌴 🌱 🌿 ☘️ 🍀 🎍 🎋 🍃 🍂 🍁 '
+                            '🍄 🌾 💐 🌷 🌹 🥀 🌻 🌼 🌸 🌺 🌎 🌍 🌏 🌕 🌖 🌗 🌘 🌑 🌒 🌓 🌔 🌚 🌝 🌞 🌛 '
+                            '🌜 🌙 💫 ⭐️ 🌟 ✨ ⚡️ 🔥 💥 ☄️ ☀️ 🌤 ⛅️ 🌥 🌦 🌈 ☁️ 🌧 ⛈ 🌩 🌨 ☃️ ⛄️ '
+                            '❄️ 🌬 💨 🌪 🌫 🌊 💧 💦 ☔️',
+                    'title': 'Text post',
+                    'upvoted': True,
+                    'score': 1,
+                    'author_id': "george",
+                    'id': '30',
+                    'created': '2017-07-21T19:10:26+00:00',
+                    'num_comments': 0,
+                    'channel_name': 'two_posts',
+                    "profile_image": profile_image,
+                    "author_name": name
+                },
+                {
+                    'url': 'http://micromasters.mit.edu',
+                    'text': None,
+                    'title': 'Link post',
+                    'upvoted': True,
+                    'score': 1,
+                    'author_id': 'george',
+                    'id': '2z',
+                    'created': '2017-07-21T19:09:37+00:00',
+                    'num_comments': 0,
+                    'channel_name': 'two_posts',
+                    "profile_image": profile_image,
+                    "author_name": name
+                }
+            ],
+            'pagination': {}
+        }
+
+
+@pytest.mark.parametrize('params,expected', [
+    ({}, {'after': 't3_q', 'after_count': 5}),
+    ({'after': 't3_q', 'count': '5'}, {'after': 't3_l', 'after_count': 10, 'before': 't3_p', 'before_count': 6}),
+    ({'after': 't3_s', 'count': '3'}, {'after': 't3_n', 'after_count': 8, 'before': 't3_r', 'before_count': 4}),
+    ({'before': 't3_r', 'count': '6'}, {'after': 't3_s', 'after_count': 5}),
+])
+def test_list_posts_pagination(client, logged_in_profile, use_betamax, praw_settings, settings, params, expected):
+    """Test that post pagination works"""
+    settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
+    url = reverse('post-list', kwargs={'channel_name': 'ten_posts'})
+    resp = client.get(url, params)
+    assert resp.status_code == 200
+    assert resp.json()['pagination'] == expected
 
 
 def test_update_post_text(client, logged_in_profile, use_betamax, praw_settings):
@@ -771,80 +792,101 @@ def test_frontpage(client, logged_in_profile, use_betamax, praw_settings, missin
     resp = client.get(url)
     assert resp.status_code == 200
     if missing_user:
-        assert resp.json() == []
+        assert resp.json() == {
+            'posts': [],
+            'pagination': {},
+        }
     else:
-        assert resp.json() == [
-            {
-                "url": None,
-                "text": "y",
-                "title": "x",
-                "upvoted": False,
-                "score": 1,
-                "author_id": "george",
-                "id": "5",
-                "created": "2017-07-25T22:05:44+00:00",
-                "num_comments": 0,
-                "channel_name": "subreddit_for_testing",
-                'author_name': logged_in_profile.name,
-                "profile_image": logged_in_profile.image_small
-            },
-            {
-                "url": None,
-                "text": "post for testing clear_vote",
-                "title": "new post without upvote",
-                "upvoted": False,
-                "score": 1,
-                "author_id": "george",
-                "id": "3",
-                "created": "2017-07-25T17:57:07+00:00",
-                "num_comments": 0,
-                "channel_name": "a_channel",
-                'author_name': logged_in_profile.name,
-                "profile_image": logged_in_profile.image_small
-            },
-            {
-                "url": None,
-                "text": "y",
-                "title": "x",
-                "upvoted": False,
-                "score": 1,
-                "author_id": "george",
-                "id": "4",
-                "created": "2017-07-25T22:02:40+00:00",
-                "num_comments": 0,
-                "channel_name": "subreddit_for_testing",
-                'author_name': logged_in_profile.name,
-                "profile_image": logged_in_profile.image_small
-            },
-            {
-                "url": None,
-                "text": "some text for the post",
-                "title": "new post",
-                "upvoted": False,
-                "score": 1,
-                "author_id": "george",
-                "id": "2",
-                "created": "2017-07-25T15:31:44+00:00",
-                "num_comments": 6,
-                "channel_name": "subreddit_for_testing",
-                'author_name': logged_in_profile.name,
-                "profile_image": logged_in_profile.image_small
-            },
-            {
-                "url": None,
-                "text": "some text for the post",
-                "title": "new post",
-                "upvoted": False,
-                "score": 1,
-                "author_id": "george",
-                "id": "1",
-                "created": "2017-07-25T15:07:30+00:00",
-                "num_comments": 0,
-                "channel_name": "subreddit_for_testing",
-                'author_name': logged_in_profile.name,
-                "profile_image": logged_in_profile.image_small
-            }
-        ]
+        assert resp.json() == {
+            'posts': [
+                {
+                    "url": None,
+                    "text": "y",
+                    "title": "x",
+                    "upvoted": False,
+                    "score": 1,
+                    "author_id": "george",
+                    "id": "5",
+                    "created": "2017-07-25T22:05:44+00:00",
+                    "num_comments": 0,
+                    "channel_name": "subreddit_for_testing",
+                    'author_name': logged_in_profile.name,
+                    "profile_image": logged_in_profile.image_small
+                },
+                {
+                    "url": None,
+                    "text": "post for testing clear_vote",
+                    "title": "new post without upvote",
+                    "upvoted": False,
+                    "score": 1,
+                    "author_id": "george",
+                    "id": "3",
+                    "created": "2017-07-25T17:57:07+00:00",
+                    "num_comments": 0,
+                    "channel_name": "a_channel",
+                    'author_name': logged_in_profile.name,
+                    "profile_image": logged_in_profile.image_small
+                },
+                {
+                    "url": None,
+                    "text": "y",
+                    "title": "x",
+                    "upvoted": False,
+                    "score": 1,
+                    "author_id": "george",
+                    "id": "4",
+                    "created": "2017-07-25T22:02:40+00:00",
+                    "num_comments": 0,
+                    "channel_name": "subreddit_for_testing",
+                    'author_name': logged_in_profile.name,
+                    "profile_image": logged_in_profile.image_small
+                },
+                {
+                    "url": None,
+                    "text": "some text for the post",
+                    "title": "new post",
+                    "upvoted": False,
+                    "score": 1,
+                    "author_id": "george",
+                    "id": "2",
+                    "created": "2017-07-25T15:31:44+00:00",
+                    "num_comments": 6,
+                    "channel_name": "subreddit_for_testing",
+                    'author_name': logged_in_profile.name,
+                    "profile_image": logged_in_profile.image_small
+                },
+                {
+                    "url": None,
+                    "text": "some text for the post",
+                    "title": "new post",
+                    "upvoted": False,
+                    "score": 1,
+                    "author_id": "george",
+                    "id": "1",
+                    "created": "2017-07-25T15:07:30+00:00",
+                    "num_comments": 0,
+                    "channel_name": "subreddit_for_testing",
+                    'author_name': logged_in_profile.name,
+                    "profile_image": logged_in_profile.image_small
+                }
+            ],
+            'pagination': {},
+        }
+
+
+@pytest.mark.parametrize('params,expected', [
+    ({}, {'after': 't3_3', 'after_count': 5}),
+    ({'after': 't3_3', 'count': '5'}, {'after': 't3_7', 'after_count': 10, 'before': 't3_e', 'before_count': 6}),
+    ({'after': 't3_a', 'count': '3'}, {'after': 't3_b', 'after_count': 8, 'before': 't3_9', 'before_count': 4}),
+    ({'before': 't3_e', 'count': '6'}, {'after': 't3_3', 'after_count': 5}),
+])
+def test_frontpage_pagination(client, logged_in_profile, use_betamax, praw_settings, settings, params, expected):
+    """Test that post pagination works"""
+    settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
+    url = reverse('frontpage')
+    resp = client.get(url, params)
+    assert resp.status_code == 200
+    assert resp.json()['pagination'] == expected
 
 
 def test_list_contributors(client, logged_in_profile, use_betamax, praw_settings):

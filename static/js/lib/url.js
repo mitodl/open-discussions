@@ -1,5 +1,6 @@
 // @flow
 import R from "ramda"
+import qs from "query-string"
 
 export const channelURL = (channelName: string) => `/channel/${channelName}`
 
@@ -20,3 +21,10 @@ export const getChannelNameFromPathname = R.compose(
 
 export const FRONTPAGE_URL = "/"
 export const AUTH_REQUIRED_URL = "/auth_required/"
+
+// sort params lexicographically so the order is deterministic (mostly for testing purposes)
+const QS_OPTIONS = {
+  sort: (a, b) => a.localeCompare(b)
+}
+export const toQueryString = (params: Object) =>
+  R.isEmpty(params || {}) ? "" : `?${qs.stringify(params, QS_OPTIONS)}`

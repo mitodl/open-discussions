@@ -44,11 +44,29 @@ describe("api", function() {
 
     it("gets channel posts", () => {
       const posts = makeChannelPostList()
-      fetchStub.returns(Promise.resolve(posts))
+      fetchStub.returns(Promise.resolve({ posts }))
 
-      return getPostsForChannel("channelone").then(result => {
+      return getPostsForChannel("channelone", {}).then(result => {
         assert.ok(fetchStub.calledWith("/api/v0/channels/channelone/posts/"))
-        assert.deepEqual(result, posts)
+        assert.deepEqual(result.posts, posts)
+      })
+    })
+
+    it("gets channel posts with pagination params", () => {
+      const posts = makeChannelPostList()
+      fetchStub.returns(Promise.resolve({ posts }))
+
+      return getPostsForChannel("channelone", {
+        before: "abc",
+        after:  "def",
+        count:  5
+      }).then(result => {
+        assert.ok(
+          fetchStub.calledWith(
+            `/api/v0/channels/channelone/posts/?after=def&before=abc&count=5`
+          )
+        )
+        assert.deepEqual(result.posts, posts)
       })
     })
 
@@ -129,11 +147,29 @@ describe("api", function() {
 
     it("gets the frontpage", () => {
       const posts = makeChannelPostList()
-      fetchStub.returns(Promise.resolve(posts))
+      fetchStub.returns(Promise.resolve({ posts }))
 
-      return getFrontpage().then(result => {
+      return getFrontpage({}).then(result => {
         assert.ok(fetchStub.calledWith(`/api/v0/frontpage/`))
-        assert.deepEqual(result, posts)
+        assert.deepEqual(result.posts, posts)
+      })
+    })
+
+    it("gets the frontpage with pagination params", () => {
+      const posts = makeChannelPostList()
+      fetchStub.returns(Promise.resolve({ posts }))
+
+      return getFrontpage({
+        before: "abc",
+        after:  "def",
+        count:  5
+      }).then(result => {
+        assert.ok(
+          fetchStub.calledWith(
+            `/api/v0/frontpage/?after=def&before=abc&count=5`
+          )
+        )
+        assert.deepEqual(result.posts, posts)
       })
     })
 

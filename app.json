@@ -55,6 +55,10 @@
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
     },
+    "OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT": {
+      "description": "Number of posts to display on the forntpage and channels",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_DB_CONN_MAX_AGE": {
       "value": "0"
     },

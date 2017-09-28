@@ -15,6 +15,7 @@ def praw_settings(settings):
     settings.OPEN_DISCUSSIONS_REDDIT_SECRET = 'secret'
     settings.OPEN_DISCUSSIONS_REDDIT_URL = 'https://reddit.local'
     settings.OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL = False
+    settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 25
     return settings
 
 
