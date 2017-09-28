@@ -28,7 +28,9 @@ const goBackAndHandleEvent = R.curry((history, e) => {
 
 const channelOptions = (channels: Map<string, Channel>) =>
   Array.from(channels).map(([key, value], index) =>
-    <option label={value.title} value={key} key={index} />
+    <option label={value.title} value={key} key={index}>
+      {value.title}
+    </option>
   )
 
 export default class CreatePostForm extends React.Component {
@@ -112,7 +114,9 @@ export default class CreatePostForm extends React.Component {
                 name="channel"
                 value={channel ? channel.name : ""}
               >
-                <option label="Select a channel" value="" />
+                <option label="Select a channel" value="">
+                  Select a channel
+                </option>
                 {channelOptions(channels)}
               </select>
             </div>
