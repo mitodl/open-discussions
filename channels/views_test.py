@@ -3,9 +3,9 @@ import pytest
 from django.core.urlresolvers import reverse
 from rest_framework import status
 
+from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
 from profiles.factories import ProfileFactory
-from channels.serializers import default_profile_image
 
 # pylint: disable=redefined-outer-name, unused-argument
 pytestmark = pytest.mark.django_db
@@ -751,36 +751,78 @@ def test_add_contributor(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Adds a contributor to a channel
     """
-    admin = ProfileFactory.create(user__username='fooadmin')
-    client.force_login(admin.user)
-    contributor = ProfileFactory.create(user__username='othercontributor')
-    url = reverse('contributor-list', kwargs={'channel_name': 'test_channel'})
+    contributor = ProfileFactory.create(user__username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse('contributor-list', kwargs={'channel_name': 'admin_channel'})
     resp = client.post(url, data={'contributor_name': contributor.user.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {'contributor_name': 'othercontributor'}
+    assert resp.json() == {'contributor_name': contributor.user.username}
+
+
+def test_add_contributor_again(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    If the user is already a contributor a 201 status should be returned
+    """
+    contributor = ProfileFactory.create(user__username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse('contributor-list', kwargs={'channel_name': 'admin_channel'})
+    resp = client.post(url, data={'contributor_name': contributor.user.username}, format='json', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json() == {'contributor_name': contributor.user.username}
 
 
 def test_add_moderator(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Adds a moderator to a channel
     """
-    client.force_login(UserFactory.create(username='fooadmin'))
-    moderator = UserFactory.create(username='othermoderator')
-    url = reverse('moderator-list', kwargs={'channel_name': 'test_channel'})
+    moderator = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse('moderator-list', kwargs={'channel_name': 'admin_channel'})
     resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {'moderator_name': 'othermoderator'}
+    assert resp.json() == {'moderator_name': moderator.username}
+
+
+def test_add_moderator_again(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    If a user is already a moderator we should return 201 without making any changes
+    """
+    moderator = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse('moderator-list', kwargs={'channel_name': 'admin_channel'})
+    resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json() == {'moderator_name': moderator.username}
 
 
 def test_add_subscriber(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Adds a subscriber to a channel
     """
-    subscriber = UserFactory.create(username='othersubscriber')
-    url = reverse('subscriber-list', kwargs={'channel_name': 'test_channel'})
+    from channels.test_utils import no_ssl_verification
+    with no_ssl_verification():
+        subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+        url = reverse('subscriber-list', kwargs={'channel_name': 'admin_channel'})
+        resp = client.post(url, data={'subscriber_name': subscriber.username}, format='json', **staff_jwt_header)
+        assert resp.status_code == status.HTTP_201_CREATED
+        assert resp.json() == {'subscriber_name': subscriber.username}
+
+
+def test_add_subscriber_again(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    If a user is already part of a channel we should return a 201 status
+    """
+    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse('subscriber-list', kwargs={'channel_name': 'admin_channel'})
     resp = client.post(url, data={'subscriber_name': subscriber.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {'subscriber_name': 'othersubscriber'}
+    assert resp.json() == {'subscriber_name': subscriber.username}
+
+
+def test_add_subscriber_forbidden(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    If a user gets a 403 from praw we should return a 403 status
+    """
+    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse('subscriber-list', kwargs={'channel_name': 'admin_channel'})
+    resp = client.post(url, data={'subscriber_name': subscriber.username}, format='json', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_detail_contributor_error(client, use_betamax, praw_settings):
@@ -814,22 +856,49 @@ def test_detail_subscriber(client, use_betamax, praw_settings, staff_jwt_header)
     """
     Detail of a subscriber in a channel
     """
-    subscriber = UserFactory.create(username='othersubscriber')
-    url = reverse(
-        'subscriber-detail', kwargs={'channel_name': 'test_channel', 'subscriber_name': subscriber.username})
-    resp = client.get(url, **staff_jwt_header)
-    assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {'subscriber_name': 'othersubscriber'}
+    from channels.test_utils import no_ssl_verification
+    with no_ssl_verification():
+        subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+        url = reverse(
+            'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
+        resp = client.get(url, **staff_jwt_header)
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.json() == {'subscriber_name': subscriber.username}
+
+
+def test_detail_subscriber_missing(client, use_betamax, praw_settings):
+    """
+    A missing subscriber should generate a 404
+    """
+    from channels.test_utils import no_ssl_verification
+    with no_ssl_verification():
+        subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+        client.force_login(subscriber)
+        url = reverse(
+            'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username}
+        )
+        resp = client.get(url)
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
 def test_remove_contributor(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Removes a contributor from a channel
     """
-    client.force_login(UserFactory.create(username='fooadmin'))
-    contributor = UserFactory.create(username='othercontributor')
+    contributor = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse(
-        'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': contributor.username})
+        'contributor-detail', kwargs={'channel_name': 'admin_channel', 'contributor_name': contributor.username})
+    resp = client.delete(url, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+def test_remove_contributor_again(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Removes a contributor from a channel
+    """
+    contributor = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse(
+        'contributor-detail', kwargs={'channel_name': 'admin_channel', 'contributor_name': contributor.username})
     resp = client.delete(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
@@ -838,32 +907,41 @@ def test_remove_moderator(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Removes a moderator from a channel
     """
-    client.force_login(UserFactory.create(username='fooadmin'))
-    moderator = UserFactory.create(username='othermoderator')
+    moderator = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse(
-        'moderator-detail', kwargs={'channel_name': 'test_channel', 'moderator_name': moderator.username})
+        'moderator-detail', kwargs={'channel_name': 'admin_channel', 'moderator_name': moderator.username})
     resp = client.delete(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_remove_contributor_moderator(client, use_betamax, praw_settings, staff_jwt_header):
+def test_remove_moderator_again(client, use_betamax, praw_settings, staff_jwt_header):
     """
-    Removes a contributor from a channel but fails because the contributor is a moderator
+    If a user is already not a moderator for a channel we should still return a 204
     """
-    client.force_login(UserFactory.create(username='fooadmin'))
-    contributor = UserFactory.create(username='othercontributor')
+    moderator = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse(
-        'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': contributor.username})
+        'moderator-detail', kwargs={'channel_name': 'admin_channel', 'moderator_name': moderator.username})
     resp = client.delete(url, **staff_jwt_header)
-    assert resp.status_code == status.HTTP_409_CONFLICT
+    assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
 def test_remove_subscriber(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Removes a subscriber from a channel
     """
-    subscriber = UserFactory.create(username='othersubscriber')
+    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse(
-        'subscriber-detail', kwargs={'channel_name': 'test_channel', 'subscriber_name': subscriber.username})
+        'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
+    resp = client.delete(url, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+def test_remove_subscriber_again(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    The API should return a 204 even if the user isn't there
+    """
+    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse(
+        'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
     resp = client.delete(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_204_NO_CONTENT

@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2017-09-25T16:24:57",
+      "recorded_at": "2017-09-25T16:28:01",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -26,7 +26,7 @@
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA1WNwQqCQBRFf0VmGQmaEto2JSNCosChzWMcX/iQUmamVKJ/z8lVy3u45943E1Ki1mDaBh9s47BV5LuwK7Ktmwc83AvO66aPDUFSjNnYs6XDcOhIoQayQrD2vIn9fDBjh3akRKFQ2a6W7YwWNim8TWL9/3ZNtM5973CRwzM830UJ8YmoiY5Vap0KXyQRqLLDc2CfL0UXGxW4AAAA",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDKyMNT1yTT3ydTNNAwJN44sinJ3KozId88yD3dJDU9X0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLZFxReEeoanG6camCS5WzhmuUaGGuQ4pwcZB4BtS0kty0xOjc9MARkM4SjVAgBeoI+HuAAAAA==",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 25 Sep 2017 16:24:57 GMT"
+            "Mon, 25 Sep 2017 16:28:01 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=zDebhPFlG58vMUwJDu; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 25-Sep-2019 16:24:57 GMT",
-            "loidcreated=2017-09-25T16%3A24%3A57.328Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 25-Sep-2019 16:24:57 GMT"
+            "loid=76r9WkWMrO2C97laDl; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 25-Sep-2019 16:28:01 GMT",
+            "loidcreated=2017-09-25T16%3A28%3A01.944Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 25-Sep-2019 16:28:01 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -70,11 +70,11 @@
       }
     },
     {
-      "recorded_at": "2017-09-25T16:24:57",
+      "recorded_at": "2017-09-25T16:28:02",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "grant_type=refresh_token&refresh_token=281-ZDssO10KTcxu4Smab_9Qiik8MdE"
+          "string": "grant_type=refresh_token&refresh_token=281-Z_pUIWg3e04bG8AjEYU0lCgR3Pg"
         },
         "headers": {
           "Accept": [
@@ -96,7 +96,7 @@
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=zDebhPFlG58vMUwJDu; loidcreated=2017-09-25T16%3A24%3A57.328Z"
+            "loid=76r9WkWMrO2C97laDl; loidcreated=2017-09-25T16%3A28%3A01.944Z"
           ],
           "User-Agent": [
             "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
@@ -108,7 +108,7 @@
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"access_token\": \"281-_KwRGQqk74zJ0jah2lupY0TSIT8\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
+          "string": "{\"access_token\": \"281-l618lRnuH07AaTltBAGDLMBd-YI\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
         },
         "headers": {
           "Connection": [
@@ -121,7 +121,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 25 Sep 2017 16:24:57 GMT"
+            "Mon, 25 Sep 2017 16:28:02 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -133,13 +133,13 @@
             "SAMEORIGIN"
           ],
           "x-ratelimit-remaining": [
-            "291"
+            "287"
           ],
           "x-ratelimit-reset": [
-            "303"
+            "118"
           ],
           "x-ratelimit-used": [
-            "9"
+            "13"
           ],
           "x-xss-protection": [
             "1; mode=block"
@@ -153,11 +153,11 @@
       }
     },
     {
-      "recorded_at": "2017-09-25T16:24:57",
+      "recorded_at": "2017-09-25T16:28:02",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "api_type=json&name=01BTN6G82RKTS3WF61Q33AA0ND&type=moderator"
+          "string": "api_type=json&name=01BTN6G82RKTS3WF61Q33AA0ND&type=contributor"
         },
         "headers": {
           "Accept": [
@@ -167,44 +167,44 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 281-_KwRGQqk74zJ0jah2lupY0TSIT8"
+            "bearer 281-l618lRnuH07AaTltBAGDLMBd-YI"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "60"
+            "62"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=zDebhPFlG58vMUwJDu; loidcreated=2017-09-25T16%3A24%3A57.328Z"
+            "loid=76r9WkWMrO2C97laDl; loidcreated=2017-09-25T16%3A28%3A01.944Z"
           ],
           "User-Agent": [
             "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
-        "uri": "https://reddit.local/r/admin_channel/api/unfriend/?raw_json=1"
+        "uri": "https://reddit.local/r/admin_channel/api/friend/?raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{}"
+          "string": "{\"json\": {\"errors\": []}}"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "2"
+            "24"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 25 Sep 2017 16:24:57 GMT"
+            "Mon, 25 Sep 2017 16:28:02 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -222,13 +222,13 @@
             "SAMEORIGIN"
           ],
           "x-ratelimit-remaining": [
-            "295.0"
+            "291.0"
           ],
           "x-ratelimit-reset": [
-            "303"
+            "118"
           ],
           "x-ratelimit-used": [
-            "5"
+            "9"
           ],
           "x-ua-compatible": [
             "IE=edge"
@@ -241,7 +241,7 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/r/admin_channel/api/unfriend/?raw_json=1"
+        "url": "https://reddit.local/r/admin_channel/api/friend/?raw_json=1"
       }
     }
   ],

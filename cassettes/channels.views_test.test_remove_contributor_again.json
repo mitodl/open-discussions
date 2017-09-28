@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2017-09-25T16:24:57",
+      "recorded_at": "2017-09-25T16:29:39",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -26,7 +26,7 @@
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA1WNwQqCQBRFf0VmGQmaEto2JSNCosChzWMcX/iQUmamVKJ/z8lVy3u45943E1Ki1mDaBh9s47BV5LuwK7Ktmwc83AvO66aPDUFSjNnYs6XDcOhIoQayQrD2vIn9fDBjh3akRKFQ2a6W7YwWNim8TWL9/3ZNtM5973CRwzM830UJ8YmoiY5Vap0KXyQRqLLDc2CfL0UXGxW4AAAA",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDKyMNQNLA1OTS9OT/OpdClO8zR0Sg8OTw3Wza9wNvJU0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLYVZxgalVmGFBub5lsk+4eVZpREOUfkB6V5GIeC9KSklmUmp8ZnpoAMhnCUagFVUyOruAAAAA==",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 25 Sep 2017 16:24:57 GMT"
+            "Mon, 25 Sep 2017 16:29:39 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=zDebhPFlG58vMUwJDu; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 25-Sep-2019 16:24:57 GMT",
-            "loidcreated=2017-09-25T16%3A24%3A57.328Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 25-Sep-2019 16:24:57 GMT"
+            "loid=uob9e4in6zOLjFWPUN; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 25-Sep-2019 16:29:39 GMT",
+            "loidcreated=2017-09-25T16%3A29%3A39.078Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 25-Sep-2019 16:29:39 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -70,11 +70,11 @@
       }
     },
     {
-      "recorded_at": "2017-09-25T16:24:57",
+      "recorded_at": "2017-09-25T16:29:39",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "grant_type=refresh_token&refresh_token=281-ZDssO10KTcxu4Smab_9Qiik8MdE"
+          "string": "grant_type=refresh_token&refresh_token=281-sh12v9Ts35o8cOVuhtZCXoRfH3U"
         },
         "headers": {
           "Accept": [
@@ -96,7 +96,7 @@
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=zDebhPFlG58vMUwJDu; loidcreated=2017-09-25T16%3A24%3A57.328Z"
+            "loid=uob9e4in6zOLjFWPUN; loidcreated=2017-09-25T16%3A29%3A39.078Z"
           ],
           "User-Agent": [
             "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
@@ -108,7 +108,7 @@
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"access_token\": \"281-_KwRGQqk74zJ0jah2lupY0TSIT8\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
+          "string": "{\"access_token\": \"281-PQ8MO-HwPPZapJLDmysfdP1Nh-o\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
         },
         "headers": {
           "Connection": [
@@ -121,7 +121,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 25 Sep 2017 16:24:57 GMT"
+            "Mon, 25 Sep 2017 16:29:39 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -133,13 +133,13 @@
             "SAMEORIGIN"
           ],
           "x-ratelimit-remaining": [
-            "291"
+            "285"
           ],
           "x-ratelimit-reset": [
-            "303"
+            "21"
           ],
           "x-ratelimit-used": [
-            "9"
+            "15"
           ],
           "x-xss-protection": [
             "1; mode=block"
@@ -153,11 +153,11 @@
       }
     },
     {
-      "recorded_at": "2017-09-25T16:24:57",
+      "recorded_at": "2017-09-25T16:29:39",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "api_type=json&name=01BTN6G82RKTS3WF61Q33AA0ND&type=moderator"
+          "string": "api_type=json&name=01BTN6G82RKTS3WF61Q33AA0ND&type=contributor"
         },
         "headers": {
           "Accept": [
@@ -167,19 +167,19 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 281-_KwRGQqk74zJ0jah2lupY0TSIT8"
+            "bearer 281-PQ8MO-HwPPZapJLDmysfdP1Nh-o"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "60"
+            "62"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=zDebhPFlG58vMUwJDu; loidcreated=2017-09-25T16%3A24%3A57.328Z"
+            "loid=uob9e4in6zOLjFWPUN; loidcreated=2017-09-25T16%3A29%3A39.078Z"
           ],
           "User-Agent": [
             "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
@@ -204,7 +204,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 25 Sep 2017 16:24:57 GMT"
+            "Mon, 25 Sep 2017 16:29:39 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -222,13 +222,13 @@
             "SAMEORIGIN"
           ],
           "x-ratelimit-remaining": [
-            "295.0"
+            "289.0"
           ],
           "x-ratelimit-reset": [
-            "303"
+            "21"
           ],
           "x-ratelimit-used": [
-            "5"
+            "11"
           ],
           "x-ua-compatible": [
             "IE=edge"

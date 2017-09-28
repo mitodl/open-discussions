@@ -4,11 +4,11 @@ from functools import lru_cache
 from django.contrib.auth import get_user_model
 from praw.models.reddit.redditor import Redditor
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
     ListCreateAPIView,
-    RetrieveDestroyAPIView,
     RetrieveUpdateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
@@ -17,7 +17,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from channels.api import Api
-from channels.exceptions import RemoveUserException
 from channels.serializers import (
     ChannelSerializer,
     CommentSerializer,
@@ -71,25 +70,35 @@ class ModeratorListView(ListCreateAPIView):
         return api.list_moderators(channel_name)
 
 
-class ModeratorDetailView(RetrieveDestroyAPIView):
+class ModeratorDetailView(APIView):
     """
     View to retrieve and remove moderators
     """
     permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
-    serializer_class = ModeratorSerializer
 
-    def get_object(self):
+    def get(self, request, *args, **kwargs):
         """Get moderator for the channel"""
-        api = Api(user=self.request.user)
+        api = Api(user=request.user)
+        moderator_name = self.kwargs['moderator_name']
+        channel_name = self.kwargs['channel_name']
+        if moderator_name not in api.list_moderators(channel_name):
+            raise NotFound('User {} is not a moderator of {}'.format(moderator_name, channel_name))
+        return Response(
+            ModeratorSerializer(
+                Redditor(api.reddit, name=moderator_name)
+            ).data
+        )
+
+    def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """
+        Removes a moderator from a channel
+        """
+        api = Api(user=request.user)
+        channel_name = self.kwargs['channel_name']
         moderator_name = self.kwargs['moderator_name']
 
-        return Redditor(api.reddit, name=moderator_name)
-
-    def perform_destroy(self, moderator):
-        """Remove moderator in a channel"""
-        api = Api(user=self.request.user)
-        channel_name = self.kwargs['channel_name']
-        api.remove_moderator(moderator.name, channel_name)
+        api.remove_moderator(moderator_name, channel_name)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PostListView(ListCreateAPIView):
@@ -184,38 +193,35 @@ class ContributorListView(ListCreateAPIView):
         return api.list_contributors(self.kwargs['channel_name'])
 
 
-class ContributorDetailView(RetrieveDestroyAPIView):
+class ContributorDetailView(APIView):
     """
     View to retrieve and remove contributors in channels
     """
     permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
-    serializer_class = ContributorSerializer
 
-    def get_object(self):
+    def get(self, request, *args, **kwargs):
         """Get contributor in channel"""
-        api = Api(user=self.request.user)
+        api = Api(user=request.user)
         contributor_name = self.kwargs['contributor_name']
         channel_name = self.kwargs['channel_name']
         if contributor_name not in api.list_contributors(channel_name):
             raise NotFound('User {} is not a contributor of {}'.format(contributor_name, channel_name))
-        return Redditor(api.reddit, name=contributor_name)
+        return Response(
+            ContributorSerializer(
+                Redditor(api.reddit, name=contributor_name)
+            ).data
+        )
 
-    def perform_destroy(self, contributor):
+    def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """
         Removes a contributor from a channel
         """
-        api = Api(user=self.request.user)
+        api = Api(user=request.user)
         channel_name = self.kwargs['channel_name']
-        api.remove_contributor(contributor.name, channel_name)
+        contributor_name = self.kwargs['contributor_name']
 
-    def delete(self, request, *args, **kwargs):
-        try:
-            return super().delete(self, request, *args, **kwargs)
-        except RemoveUserException as exc:
-            return Response(
-                data={'error': str(exc)},
-                status=status.HTTP_409_CONFLICT
-            )
+        api.remove_contributor(contributor_name, channel_name)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SubscriberListView(CreateAPIView):
@@ -226,26 +232,32 @@ class SubscriberListView(CreateAPIView):
     serializer_class = SubscriberSerializer
 
 
-class SubscriberDetailView(RetrieveDestroyAPIView):
+class SubscriberDetailView(APIView):
     """
     View to retrieve and remove subscribers in channels
     """
     permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
-    serializer_class = SubscriberSerializer
 
-    def get_object(self):
-        """Get subscriber in channel"""
-        api = Api(user=self.request.user)
+    def get(self, request, *args, **kwargs):
+        """Get subscriber for the channel"""
+        api = Api(user=request.user)
         subscriber_name = self.kwargs['subscriber_name']
         channel_name = self.kwargs['channel_name']
         if not api.is_subscriber(subscriber_name, channel_name):
             raise NotFound('User {} is not a subscriber of {}'.format(subscriber_name, channel_name))
-        return Redditor(api.reddit, name=subscriber_name)
+        return Response(
+            SubscriberSerializer(
+                Redditor(api.reddit, name=subscriber_name)
+            ).data
+        )
 
-    def perform_destroy(self, subscriber):
+    def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """
         Removes a subscriber from a channel
         """
-        api = Api(user=self.request.user)
+        api = Api(user=request.user)
         channel_name = self.kwargs['channel_name']
-        api.remove_subscriber(subscriber.name, channel_name)
+        subscriber_name = self.kwargs['subscriber_name']
+
+        api.remove_subscriber(subscriber_name, channel_name)
+        return Response(status=status.HTTP_204_NO_CONTENT)
