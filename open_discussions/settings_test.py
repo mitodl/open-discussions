@@ -13,6 +13,11 @@ from django.test import TestCase
 import semantic_version
 
 
+REQUIRED_SETTINGS = {
+    'OPEN_DISCUSSIONS_EXTERNAL_LOGIN_URL': 'http://fake/',
+}
+
+
 class TestSettings(TestCase):
     """Validate that settings work as expected."""
 
@@ -32,6 +37,7 @@ class TestSettings(TestCase):
         """Verify that we enable and configure S3 with a variable"""
         # Unset, we don't do S3
         with mock.patch.dict('os.environ', {
+            **REQUIRED_SETTINGS,
             'OPEN_DISCUSSIONS_USE_S3': 'False'
         }, clear=True):
             settings_vars = self.reload_settings()
@@ -48,6 +54,7 @@ class TestSettings(TestCase):
 
         # Verify it all works with it enabled and configured 'properly'
         with mock.patch.dict('os.environ', {
+            **REQUIRED_SETTINGS,
             'OPEN_DISCUSSIONS_USE_S3': 'True',
             'AWS_ACCESS_KEY_ID': '1',
             'AWS_SECRET_ACCESS_KEY': '2',
@@ -63,13 +70,15 @@ class TestSettings(TestCase):
         """Verify that we configure email with environment variable"""
 
         with mock.patch.dict('os.environ', {
-            'OPEN_DISCUSSIONS_ADMIN_EMAIL': ''
+            **REQUIRED_SETTINGS,
+            'OPEN_DISCUSSIONS_ADMIN_EMAIL': '',
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertFalse(settings_vars.get('ADMINS', False))
 
         test_admin_email = 'cuddle_bunnies@example.com'
         with mock.patch.dict('os.environ', {
+            **REQUIRED_SETTINGS,
             'OPEN_DISCUSSIONS_ADMIN_EMAIL': test_admin_email,
         }, clear=True):
             settings_vars = self.reload_settings()
@@ -87,7 +96,7 @@ class TestSettings(TestCase):
         """Verify that we can enable/disable database SSL with a var"""
 
         # Check default state is SSL on
-        with mock.patch.dict('os.environ', {}, clear=True):
+        with mock.patch.dict('os.environ', REQUIRED_SETTINGS, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(
                 settings_vars['DATABASES']['default']['OPTIONS'],
@@ -96,6 +105,7 @@ class TestSettings(TestCase):
 
         # Check enabling the setting explicitly
         with mock.patch.dict('os.environ', {
+            **REQUIRED_SETTINGS,
             'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'True'
         }, clear=True):
             settings_vars = self.reload_settings()
@@ -106,6 +116,7 @@ class TestSettings(TestCase):
 
         # Disable it
         with mock.patch.dict('os.environ', {
+            **REQUIRED_SETTINGS,
             'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'False'
         }, clear=True):
             settings_vars = self.reload_settings()

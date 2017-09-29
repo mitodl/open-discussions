@@ -8,6 +8,7 @@ import HomePage from "./HomePage"
 import ChannelPage from "./ChannelPage"
 import PostPage from "./PostPage"
 import AdminPage from "./admin/AdminPage"
+import AuthRequiredPage from "./AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
 import Toolbar from "../components/Toolbar"
 import Drawer from "../containers/Drawer"
@@ -16,12 +17,13 @@ import { actions } from "../actions"
 import { setShowDrawer } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
 
-import type { Match } from "react-router"
+import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 
 class App extends React.Component {
   props: {
     match: Match,
+    location: Location,
     showDrawer: boolean,
     dispatch: Dispatch
   }
@@ -36,7 +38,12 @@ class App extends React.Component {
   }
 
   loadData = async () => {
-    const { dispatch } = this.props
+    const { dispatch, location: { pathname } } = this.props
+
+    if (pathname === "/auth_required/") {
+      return
+    }
+
     const channels = await dispatch(actions.subscribedChannels.get())
     dispatch(setChannelData(channels))
   }
@@ -62,6 +69,10 @@ class App extends React.Component {
         <Route
           path={`${match.url}create_post/:channelName?`}
           component={CreatePostPage}
+        />
+        <Route
+          path={`${match.url}auth_required/`}
+          component={AuthRequiredPage}
         />
       </div>
     )
