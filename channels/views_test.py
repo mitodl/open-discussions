@@ -11,6 +11,7 @@ from profiles.factories import ProfileFactory
 pytestmark = pytest.mark.django_db
 
 
+# pylint: disable=too-many-lines
 def test_list_channels(client, use_betamax, praw_settings):
     """
     List channels the user is subscribed to
