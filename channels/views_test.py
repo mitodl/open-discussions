@@ -181,88 +181,113 @@ def test_create_text_post(client, logged_in_profile, use_betamax, praw_settings)
     }
 
 
-def test_get_post(client, logged_in_profile, use_betamax, praw_settings):
+@pytest.mark.parametrize("missing_user", [True, False])
+def test_get_deleted_post(client, logged_in_profile, use_betamax, praw_settings, missing_user):
     """Get an existing post"""
+    if missing_user:
+        logged_in_profile.user.username = 'renamed'
+        logged_in_profile.user.save()
+
     post_id = '29'
     url = reverse('post-detail', kwargs={'post_id': post_id})
     resp = client.get(url)
-    assert resp.status_code == 200
-    assert resp.json() == {
-        'title': 'post 3',
-        'text': '[deleted]',
-        'url': None,
-        'author_id': None,
-        'created': '2017-07-20T19:58:23+00:00',
-        'upvoted': False,
-        'id': post_id,
-        'num_comments': 6,
-        'score': 0,
-        'channel_name': 'george',
-        'profile_image': default_profile_image
-    }
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_get_post_no_image(client, logged_in_profile, use_betamax, praw_settings):
-    """Get an existing post"""
-    ProfileFactory(user__username='alice', image_small=None)
+# pylint: disable=too-many-arguments
+@pytest.mark.parametrize("missing_user,missing_image", [
+    [True, True],
+    [True, False],
+    [False, True],
+    [False, False],
+])
+def test_get_post(client, logged_in_profile, use_betamax, praw_settings, missing_user, missing_image):
+    """Get an existing post with no image"""
+    profile_image = default_profile_image
+    if not missing_user:
+        profile = ProfileFactory(user__username='alice')
+        if missing_image:
+            profile.image_small = None
+            profile.save()
+        else:
+            profile_image = profile.image_small
+    else:
+        profile = None
+
     post_id = 'b'
     url = reverse('post-detail', kwargs={'post_id': post_id})
     resp = client.get(url)
-    assert resp.status_code == 200
-    assert resp.json() == {
-        'title': 'fasdf',
-        'text': 'fff',
-        'url': None,
-        'author_id': 'alice',
-        'created': '2017-09-07T14:47:34+00:00',
-        'upvoted': True,
-        'id': post_id,
-        'num_comments': 2,
-        'score': 1,
-        'channel_name': 'macromasters',
-        'profile_image': default_profile_image
-    }
+    if missing_user:
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+    else:
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.json() == {
+            'title': 'fasdf',
+            'text': 'fff',
+            'url': None,
+            'author_id': profile.user.username,
+            'created': '2017-09-07T14:47:34+00:00',
+            'upvoted': True,
+            'id': post_id,
+            'num_comments': 2,
+            'score': 1,
+            'channel_name': 'macromasters',
+            'profile_image': profile_image
+        }
 
 
-def test_list_posts(client, logged_in_profile, use_betamax, praw_settings):
+@pytest.mark.parametrize("missing_user", [True, False])
+def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missing_user):
     """List posts in a channel"""
+    if missing_user:
+        logged_in_profile.user.username = 'renamed'
+        logged_in_profile.user.save()
+        profile_image = default_profile_image
+    else:
+        profile_image = logged_in_profile.image_small
+
     url = reverse('post-list', kwargs={'channel_name': 'two_posts'})
     resp = client.get(url)
     assert resp.status_code == 200
-    assert resp.json() == [
-        {
-            'url': None,
-            'text': '🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐽 🐸 🐵 🙊 🙉 🙊 🐒 🐔 🐧 🐦 🐤 🐣 🐥 '
-                    '🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🐛 🦋 🐌 🐚 🐞 🐜 🕷 🕸 🐢 🐍 🦎 🦂 🦀 🦑 🐙 🦐 '
-                    '🐠 🐟 🐡 🐬 🦈 🐳 🐋 🐊 🐆 🐅 🐃 🐂 🐄 🦌 🐪 🐫 🐘 🦏 🦍 🐎 🐖 🐐 🐏 🐑 🐕 '
-                    '🐩 🐈 🐓 🦃 🕊 🐇 🐁 🐀 🐿 🐾 🐉 🐲 🌵 🎄 🌲 🌳 🌴 🌱 🌿 ☘️ 🍀 🎍 🎋 🍃 🍂 🍁 '
-                    '🍄 🌾 💐 🌷 🌹 🥀 🌻 🌼 🌸 🌺 🌎 🌍 🌏 🌕 🌖 🌗 🌘 🌑 🌒 🌓 🌔 🌚 🌝 🌞 🌛 '
-                    '🌜 🌙 💫 ⭐️ 🌟 ✨ ⚡️ 🔥 💥 ☄️ ☀️ 🌤 ⛅️ 🌥 🌦 🌈 ☁️ 🌧 ⛈ 🌩 🌨 ☃️ ⛄️ '
-                    '❄️ 🌬 💨 🌪 🌫 🌊 💧 💦 ☔️',
-            'title': 'Text post',
-            'upvoted': True,
-            'score': 1,
-            'author_id': logged_in_profile.user.username,
-            'id': '30',
-            'created': '2017-07-21T19:10:26+00:00',
-            'num_comments': 0,
-            'channel_name': 'two_posts',
-            "profile_image": logged_in_profile.image_small
-        },
-        {
-            'url': 'http://micromasters.mit.edu',
-            'text': None,
-            'title': 'Link post',
-            'upvoted': True,
-            'score': 1,
-            'author_id': 'george',
-            'id': '2z',
-            'created': '2017-07-21T19:09:37+00:00',
-            'num_comments': 0,
-            'channel_name': 'two_posts',
-            "profile_image": logged_in_profile.image_small
-        }
-    ]
+
+    if missing_user:
+        # all posts should be filtered out
+        assert resp.json() == []
+    else:
+        assert resp.json() == [
+            {
+                'url': None,
+                'text': '🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐽 🐸 🐵 🙊 🙉 🙊 🐒 🐔 🐧 🐦 🐤 🐣 🐥 '
+                        '🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🐛 🦋 🐌 🐚 🐞 🐜 🕷 🕸 🐢 🐍 🦎 🦂 🦀 🦑 🐙 🦐 '
+                        '🐠 🐟 🐡 🐬 🦈 🐳 🐋 🐊 🐆 🐅 🐃 🐂 🐄 🦌 🐪 🐫 🐘 🦏 🦍 🐎 🐖 🐐 🐏 🐑 🐕 '
+                        '🐩 🐈 🐓 🦃 🕊 🐇 🐁 🐀 🐿 🐾 🐉 🐲 🌵 🎄 🌲 🌳 🌴 🌱 🌿 ☘️ 🍀 🎍 🎋 🍃 🍂 🍁 '
+                        '🍄 🌾 💐 🌷 🌹 🥀 🌻 🌼 🌸 🌺 🌎 🌍 🌏 🌕 🌖 🌗 🌘 🌑 🌒 🌓 🌔 🌚 🌝 🌞 🌛 '
+                        '🌜 🌙 💫 ⭐️ 🌟 ✨ ⚡️ 🔥 💥 ☄️ ☀️ 🌤 ⛅️ 🌥 🌦 🌈 ☁️ 🌧 ⛈ 🌩 🌨 ☃️ ⛄️ '
+                        '❄️ 🌬 💨 🌪 🌫 🌊 💧 💦 ☔️',
+                'title': 'Text post',
+                'upvoted': True,
+                'score': 1,
+                'author_id': "george",
+                'id': '30',
+                'created': '2017-07-21T19:10:26+00:00',
+                'num_comments': 0,
+                'channel_name': 'two_posts',
+                "profile_image": profile_image
+            },
+            {
+                'url': 'http://micromasters.mit.edu',
+                'text': None,
+                'title': 'Link post',
+                'upvoted': True,
+                'score': 1,
+                'author_id': 'george',
+                'id': '2z',
+                'created': '2017-07-21T19:09:37+00:00',
+                'num_comments': 0,
+                'channel_name': 'two_posts',
+                "profile_image": profile_image
+            }
+        ]
 
 
 def test_update_post_text(client, logged_in_profile, use_betamax, praw_settings):
@@ -352,8 +377,18 @@ def test_create_post_without_upvote(client, logged_in_profile, use_betamax, praw
     }
 
 
-def test_list_comments(client, logged_in_profile, use_betamax, praw_settings):
+@pytest.mark.parametrize("missing_user", [True, False])
+def test_list_comments(client, logged_in_profile, use_betamax, praw_settings, missing_user):
     """List all comments in the comment tree"""
+    if missing_user:
+        logged_in_profile.user.username = 'renamed'
+        logged_in_profile.user.save()
+        profile_image = default_profile_image
+        author_id = '[deleted]'
+    else:
+        profile_image = logged_in_profile.image_small
+        author_id = logged_in_profile.user.username
+
     url = reverse('comment-list', kwargs={'post_id': '2'})
     resp = client.get(url)
     assert resp.status_code == 200
@@ -362,59 +397,100 @@ def test_list_comments(client, logged_in_profile, use_betamax, praw_settings):
             "id": "1",
             "post_id": "2",
             "text": "hello world",
-            "author_id": "george",
+            "author_id": author_id,
             "score": 1,
             "upvoted": False,
             "downvoted": False,
             "created": "2017-07-25T17:09:45+00:00",
-            'profile_image': logged_in_profile.image_small,
+            'profile_image': profile_image,
             "replies": [
                 {
                     "id": "2",
                     "post_id": "2",
                     "text": "texty text text",
-                    "author_id": "george",
+                    "author_id": author_id,
                     "score": 1,
                     "upvoted": True,
                     "downvoted": False,
                     "created": "2017-07-25T17:15:57+00:00",
                     "replies": [],
-                    'profile_image': logged_in_profile.image_small,
+                    'profile_image': profile_image,
                 },
                 {
                     "id": "3",
                     "post_id": "2",
                     "text": "reply2",
-                    "author_id": "george",
+                    "author_id": author_id,
                     "score": 1,
                     "upvoted": True,
                     "downvoted": False,
                     "created": "2017-07-25T17:16:10+00:00",
                     "replies": [],
-                    'profile_image': logged_in_profile.image_small,
+                    'profile_image': profile_image,
                 }
             ]
         }
     ]
 
 
-def test_get_comment(client, logged_in_profile, use_betamax, praw_settings):
-    """View a comment's detail view"""
-    url = reverse('comment-detail', kwargs={'comment_id': '6'})
+def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_settings):
+    """List comments which are deleted according to reddit"""
+    user = ProfileFactory.create(user__username='admin').user
+
+    url = reverse('comment-list', kwargs={'post_id': 'p'})
     resp = client.get(url)
     assert resp.status_code == 200
-    assert resp.json() == {
-        "id": "6",
-        "post_id": "2",
-        "text": "reply_to_comment 3",
-        "author_id": "george",
-        "score": 1,
-        "upvoted": True,
-        "downvoted": False,
-        "created": "2017-07-25T21:18:47+00:00",
-        "replies": [],
-        'profile_image': logged_in_profile.image_small
-    }
+    assert resp.json() == [
+        {
+            'author_id': '[deleted]',
+            'created': '2017-09-27T16:03:42+00:00',
+            'downvoted': False,
+            'post_id': 'p',
+            'profile_image': default_profile_image,
+            'replies': [{
+                'author_id': user.username,
+                'created': '2017-09-27T16:03:51+00:00',
+                'downvoted': False,
+                'id': '1t',
+                'post_id': 'p',
+                'profile_image': user.profile.image_small,
+                'replies': [],
+                'score': 1,
+                'text': 'reply to parent which is not deleted',
+                'upvoted': False
+            }],
+            'score': 1,
+            'text': '[deleted]',
+            'upvoted': False,
+            'id': '1s',
+        }]
+
+
+@pytest.mark.parametrize("missing_user", [True, False])
+def test_get_comment(client, logged_in_profile, use_betamax, praw_settings, missing_user):
+    """View a comment's detail view"""
+    if missing_user:
+        logged_in_profile.user.username = 'missing'
+        logged_in_profile.user.save()
+
+    url = reverse('comment-detail', kwargs={'comment_id': '6'})
+    resp = client.get(url)
+    if missing_user:
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+    else:
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.json() == {
+            "id": "6",
+            "post_id": "2",
+            "text": "reply_to_comment 3",
+            "author_id": "george",
+            "score": 1,
+            "upvoted": True,
+            "downvoted": False,
+            "created": "2017-07-25T21:18:47+00:00",
+            "replies": [],
+            'profile_image': logged_in_profile.image_small
+        }
 
 
 def test_get_comment_no_image(client, logged_in_profile, use_betamax, praw_settings):
@@ -436,6 +512,15 @@ def test_get_comment_no_image(client, logged_in_profile, use_betamax, praw_setti
         "replies": [],
         'profile_image': default_profile_image
     }
+
+
+def test_get_deleted_comment(client, logged_in_profile, use_betamax, praw_settings):
+    """View a comment's detail view"""
+    # make sure reddit user exists on system
+    UserFactory.create(username='admin')
+    url = reverse('comment-detail', kwargs={'comment_id': '1s'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
 def test_create_comment(client, logged_in_profile, use_betamax, praw_settings):
@@ -644,78 +729,86 @@ def test_delete_comment(client, logged_in_profile, use_betamax, praw_settings):
     assert resp.status_code == 204
 
 
-def test_frontpage(client, logged_in_profile, use_betamax, praw_settings):
+@pytest.mark.parametrize("missing_user", [True, False])
+def test_frontpage(client, logged_in_profile, use_betamax, praw_settings, missing_user):
     """View the front page"""
+    if missing_user:
+        logged_in_profile.user.username = 'renamed'
+        logged_in_profile.user.save()
+
     url = reverse('frontpage')
     resp = client.get(url)
     assert resp.status_code == 200
-    assert resp.json() == [
-        {
-            "url": None,
-            "text": "y",
-            "title": "x",
-            "upvoted": False,
-            "score": 1,
-            "author_id": "george",
-            "id": "5",
-            "created": "2017-07-25T22:05:44+00:00",
-            "num_comments": 0,
-            "channel_name": "subreddit_for_testing",
-            "profile_image": logged_in_profile.image_small
-        },
-        {
-            "url": None,
-            "text": "post for testing clear_vote",
-            "title": "new post without upvote",
-            "upvoted": False,
-            "score": 1,
-            "author_id": "george",
-            "id": "3",
-            "created": "2017-07-25T17:57:07+00:00",
-            "num_comments": 0,
-            "channel_name": "a_channel",
-            "profile_image": logged_in_profile.image_small
-        },
-        {
-            "url": None,
-            "text": "y",
-            "title": "x",
-            "upvoted": False,
-            "score": 1,
-            "author_id": "george",
-            "id": "4",
-            "created": "2017-07-25T22:02:40+00:00",
-            "num_comments": 0,
-            "channel_name": "subreddit_for_testing",
-            "profile_image": logged_in_profile.image_small
-        },
-        {
-            "url": None,
-            "text": "some text for the post",
-            "title": "new post",
-            "upvoted": False,
-            "score": 1,
-            "author_id": "george",
-            "id": "2",
-            "created": "2017-07-25T15:31:44+00:00",
-            "num_comments": 6,
-            "channel_name": "subreddit_for_testing",
-            "profile_image": logged_in_profile.image_small
-        },
-        {
-            "url": None,
-            "text": "some text for the post",
-            "title": "new post",
-            "upvoted": False,
-            "score": 1,
-            "author_id": "george",
-            "id": "1",
-            "created": "2017-07-25T15:07:30+00:00",
-            "num_comments": 0,
-            "channel_name": "subreddit_for_testing",
-            "profile_image": logged_in_profile.image_small
-        }
-    ]
+    if missing_user:
+        assert resp.json() == []
+    else:
+        assert resp.json() == [
+            {
+                "url": None,
+                "text": "y",
+                "title": "x",
+                "upvoted": False,
+                "score": 1,
+                "author_id": "george",
+                "id": "5",
+                "created": "2017-07-25T22:05:44+00:00",
+                "num_comments": 0,
+                "channel_name": "subreddit_for_testing",
+                "profile_image": logged_in_profile.image_small
+            },
+            {
+                "url": None,
+                "text": "post for testing clear_vote",
+                "title": "new post without upvote",
+                "upvoted": False,
+                "score": 1,
+                "author_id": "george",
+                "id": "3",
+                "created": "2017-07-25T17:57:07+00:00",
+                "num_comments": 0,
+                "channel_name": "a_channel",
+                "profile_image": logged_in_profile.image_small
+            },
+            {
+                "url": None,
+                "text": "y",
+                "title": "x",
+                "upvoted": False,
+                "score": 1,
+                "author_id": "george",
+                "id": "4",
+                "created": "2017-07-25T22:02:40+00:00",
+                "num_comments": 0,
+                "channel_name": "subreddit_for_testing",
+                "profile_image": logged_in_profile.image_small
+            },
+            {
+                "url": None,
+                "text": "some text for the post",
+                "title": "new post",
+                "upvoted": False,
+                "score": 1,
+                "author_id": "george",
+                "id": "2",
+                "created": "2017-07-25T15:31:44+00:00",
+                "num_comments": 6,
+                "channel_name": "subreddit_for_testing",
+                "profile_image": logged_in_profile.image_small
+            },
+            {
+                "url": None,
+                "text": "some text for the post",
+                "title": "new post",
+                "upvoted": False,
+                "score": 1,
+                "author_id": "george",
+                "id": "1",
+                "created": "2017-07-25T15:07:30+00:00",
+                "num_comments": 0,
+                "channel_name": "subreddit_for_testing",
+                "profile_image": logged_in_profile.image_small
+            }
+        ]
 
 
 def test_list_contributors(client, logged_in_profile, use_betamax, praw_settings):

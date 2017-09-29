@@ -125,20 +125,31 @@ class PostSerializer(serializers.Serializer):
     channel_name = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
 
+    def _get_user(self, instance):
+        """
+        Look up user in the context from the post author
+
+        Args:
+            instance (praw.models.Submission):
+                The post to look up the user for
+        """
+        if instance.author is None:
+            return None
+        if 'users' in self.context:
+            return self.context['users'].get(instance.author.name)
+        else:
+            return User.objects.filter(username=instance.author.name).first()
+
     def get_url(self, instance):
         """Returns a url or null depending on if it's a self post"""
         return instance.url if not instance.is_self else None
 
     def get_profile_image(self, instance):
         """Find the Profile for the comment author"""
-        if instance.author is None:
-            return default_profile_image
-
-        profile = User.objects.get(username=instance.author.name).profile
-        if profile.image_small:
-            return profile.image_small
-        else:
-            return default_profile_image
+        user = self._get_user(instance)
+        if user and user.profile.image_small:
+            return user.profile.image_small
+        return default_profile_image
 
     def get_text(self, instance):
         """Returns text or null depending on if it's a self post"""
@@ -222,13 +233,29 @@ class CommentSerializer(serializers.Serializer):
     post_id = serializers.SerializerMethodField()
     comment_id = serializers.CharField(write_only=True, allow_blank=True, required=False)
     text = serializers.CharField(source='body')
-    author_id = serializers.CharField(read_only=True, source='author')
+    author_id = serializers.SerializerMethodField()
     score = serializers.IntegerField(read_only=True)
     upvoted = WriteableSerializerMethodField()
     downvoted = WriteableSerializerMethodField()
     created = serializers.SerializerMethodField()
     replies = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
+
+    def _get_user(self, instance):
+        """
+        Look up user in the context from the comment author
+
+        Args:
+            instance (praw.models.Comment):
+                The comment to look up the user for
+        """
+
+        if instance.author is None:
+            return None
+        if 'users' in self.context:
+            return self.context['users'].get(instance.author.name)
+        else:
+            return User.objects.filter(username=instance.author.name).first()
 
     def get_post_id(self, instance):
         """The post id for this comment"""
@@ -244,24 +271,24 @@ class CommentSerializer(serializers.Serializer):
                 parent = parent.parent()
             return parent.id
 
+    def get_author_id(self, instance):
+        """Get the author username or else [deleted]"""
+        user = self._get_user(instance)
+        if not user:
+            return "[deleted]"
+        return user.username
+
     def get_upvoted(self, instance):
         """Is a comment upvoted?"""
         return instance.likes is True
 
     def get_profile_image(self, instance):
         """Find the Profile for the comment author"""
-        # context["profile_images"] is set only when doing GET
-        # on comment list view. else we're dealing with one record,
-        # so we can get the profile image from instance.author
-        if "profile_images" in self.context:
-            image = self.context["profile_images"].get(instance.author.name)
-        else:
-            image = User.objects.get(username=instance.author.name).profile.image_small
+        user = self._get_user(instance)
 
-        if image:
-            return image
-        else:
-            return default_profile_image
+        if user and user.profile.image_small:
+            return user.profile.image_small
+        return default_profile_image
 
     def get_downvoted(self, instance):
         """Is a comment downvoted?"""
