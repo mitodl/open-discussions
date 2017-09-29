@@ -215,6 +215,14 @@ describe("CreatePostPage", () => {
     assert.equal(select.props().value, channels[6].name)
   })
 
+  it("should not add to history when the new subreddit is selected", async () => {
+    const [wrapper] = await renderPage()
+    const select = wrapper.find("select")
+    assert.equal(helper.browserHistory.entries.length, 2)
+    select.simulate("change", { target: { value: channels[6].name } })
+    assert.equal(helper.browserHistory.entries.length, 2)
+  })
+
   it("should not change URL if you select the placeholder entry", async () => {
     const [wrapper] = await renderPage()
     const select = wrapper.find("select")
