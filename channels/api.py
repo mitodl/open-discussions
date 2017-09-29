@@ -124,6 +124,7 @@ def _get_client(user):
         short_url=settings.OPEN_DISCUSSIONS_REDDIT_URL,
         user_agent=_get_user_agent(),
         requestor_kwargs=_get_requester_kwargs(),
+        check_for_updates=False,
         **credentials
     )
 
