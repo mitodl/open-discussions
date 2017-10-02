@@ -18,7 +18,6 @@ describe("auth", function() {
     fetchStub = sandbox.stub(fetchFuncs, "fetchJSONWithCSRF")
 
     SETTINGS.session_url = "/session/url"
-    SETTINGS.auth_url = "/auth/url"
   })
   afterEach(function() {
     sandbox.restore()
@@ -82,10 +81,10 @@ describe("auth", function() {
     assert.ok(fetchMock.called)
     assert.ok(fetchStub.calledOnce)
     assert.ok(fetchStub.calledWith("/url"))
-    assert.equal(window.location.pathname, SETTINGS.auth_url)
+    assert.equal(window.location.pathname, '/auth_required/')
   })
 
-  it("renews and redirect to auth_url if renew fails", async () => {
+  it("renews and redirect to /auth_required/ if renew fails", async () => {
     fetchStub.returns(Promise.reject(error401)) // original api call
     fetchMock.mock(SETTINGS.session_url, 401)
 
@@ -94,6 +93,6 @@ describe("auth", function() {
     assert.ok(fetchMock.called)
     assert.ok(fetchStub.calledOnce)
     assert.ok(fetchStub.calledWith("/url"))
-    assert.equal(window.location.pathname, SETTINGS.auth_url)
+    assert.equal(window.location.pathname, '/auth_required/')
   })
 })

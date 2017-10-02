@@ -1,6 +1,7 @@
+/* global SETTINGS: false */
 // @flow
 import React from "react"
-import { Route } from "react-router-dom"
+import { Route, Redirect } from "react-router-dom"
 import { connect } from "react-redux"
 import DocumentTitle from "react-document-title"
 
@@ -34,22 +35,30 @@ class App extends React.Component {
   }
 
   componentWillMount() {
+    const { location: { pathname } } = this.props
+    if (pathname === "/auth_required/") {
+      return
+    }
+
     this.loadData()
   }
 
   loadData = async () => {
-    const { dispatch, location: { pathname } } = this.props
-
-    if (pathname === "/auth_required/") {
-      return
-    }
+    const { dispatch } = this.props
 
     const channels = await dispatch(actions.subscribedChannels.get())
     dispatch(setChannelData(channels))
   }
 
   render() {
-    const { match } = this.props
+    const { match, location: { pathname } } = this.props
+
+    const authRequiredEndpoint = "/auth_required/"
+    if (!SETTINGS.session_url && pathname !== authRequiredEndpoint) {
+      // user does not have the jwt cookie, they must go through login workflow first
+      return <Redirect to={authRequiredEndpoint} />
+    }
+
     return (
       <div className="app">
         <DocumentTitle title="MIT Open Discussions" />

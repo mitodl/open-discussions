@@ -20,32 +20,23 @@ const store = configureStore()
 
 const rootEl = document.getElementById("container")
 
-const authRequiredEndpoint = "/auth_required/"
-if (
-  !SETTINGS.session_url &&
-  window.location.pathname !== authRequiredEndpoint
-) {
-  // user does not have the jwt cookie, they must go through login workflow first
-  window.location = authRequiredEndpoint
-} else {
-  const history = createBrowserHistory()
-  const renderApp = Component => {
-    ReactDOM.render(
-      <AppContainer>
-        <Component store={store} history={history}>
-          {routes}
-        </Component>
-      </AppContainer>,
-      rootEl
-    )
-  }
+const history = createBrowserHistory()
+const renderApp = Component => {
+  ReactDOM.render(
+    <AppContainer>
+      <Component store={store} history={history}>
+        {routes}
+      </Component>
+    </AppContainer>,
+    rootEl
+  )
+}
 
-  renderApp(Router)
+renderApp(Router)
 
-  if (module.hot) {
-    module.hot.accept("../Router", () => {
-      const RouterNext = require("../Router").default
-      renderApp(RouterNext)
-    })
-  }
+if (module.hot) {
+  module.hot.accept("../Router", () => {
+    const RouterNext = require("../Router").default
+    renderApp(RouterNext)
+  })
 }
