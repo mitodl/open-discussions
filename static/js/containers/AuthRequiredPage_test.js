@@ -9,6 +9,9 @@ import AuthRequiredPage from "./AuthRequiredPage"
 describe("AuthRequiredPage", () => {
   it("uses the external login url", () => {
     const wrapper = shallow(<AuthRequiredPage />)
-    assert.equal(wrapper.find("a").props().href, SETTINGS.micromasters_external_login_url)
+    assert.equal(
+      wrapper.find("a").props().href,
+      SETTINGS.micromasters_external_login_url
+    )
   })
 })

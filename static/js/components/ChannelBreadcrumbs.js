@@ -2,7 +2,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import { channelURL } from "../lib/url"
+import { FRONTPAGE_URL, channelURL } from "../lib/url"
 import type { Channel } from "../flow/discussionTypes"
 
 type BreadCrumbProps = {
@@ -14,7 +14,7 @@ const ChannelBreadcrumbs = (props: BreadCrumbProps) => {
 
   return (
     <div className="breadcrumbs">
-      <Link to="/">Discussions</Link>&nbsp;
+      <Link to={FRONTPAGE_URL}>Discussions</Link>&nbsp;
       <span>&gt;</span>&nbsp;
       <Link to={channelURL(channel.name)}>{channel.title}</Link>
     </div>
