@@ -13,6 +13,7 @@ import AuthRequiredPage from "./AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
 import Toolbar from "../components/Toolbar"
 import Drawer from "../containers/Drawer"
+import Analytics from "../components/Analytics"
 
 import { actions } from "../actions"
 import { setShowDrawer } from "../actions/ui"
@@ -63,6 +64,7 @@ class App extends React.Component {
 
     return (
       <div className="app">
+        <Analytics />
         <DocumentTitle title="MIT Open Discussions" />
         <Toolbar toggleShowSidebar={this.toggleShowSidebar} />
         <Drawer />
