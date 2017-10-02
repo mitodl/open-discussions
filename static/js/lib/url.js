@@ -19,3 +19,5 @@ export const getChannelNameFromPathname = R.compose(
   R.view(R.lensIndex(1)),
   R.match(/^\/channel\/([^/]+)\/?/)
 )
+
+export const authRequiredURL = () => "/auth_required/"

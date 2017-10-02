@@ -17,6 +17,7 @@ import Drawer from "../containers/Drawer"
 import { actions } from "../actions"
 import { setShowDrawer } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
+import { authRequiredURL } from "../lib/url"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -36,7 +37,9 @@ class App extends React.Component {
 
   componentWillMount() {
     const { location: { pathname } } = this.props
-    if (pathname === "/auth_required/") {
+    if (pathname === authRequiredURL() || !SETTINGS.session_url) {
+      // either user is at auth required page
+      // or they will be soon redirected there due to missing session_url
       return
     }
 
@@ -53,10 +56,10 @@ class App extends React.Component {
   render() {
     const { match, location: { pathname } } = this.props
 
-    const authRequiredEndpoint = "/auth_required/"
-    if (!SETTINGS.session_url && pathname !== authRequiredEndpoint) {
+    const authPageUrl = authRequiredURL();
+    if (!SETTINGS.session_url && pathname !== authPageUrl) {
       // user does not have the jwt cookie, they must go through login workflow first
-      return <Redirect to={authRequiredEndpoint} />
+      return <Redirect to={authPageUrl} />
     }
 
     return (
