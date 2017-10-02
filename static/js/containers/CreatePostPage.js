@@ -98,7 +98,7 @@ class CreatePostPage extends React.Component {
 
     e.preventDefault()
     if (e.target.value) {
-      history.push(e.target.value)
+      history.replace(e.target.value)
     }
   }
 
