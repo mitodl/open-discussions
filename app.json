@@ -49,6 +49,9 @@
     "MAILGUN_BCC_TO_EMAIL": {
       "description": "Email address used with bcc email"
     },
+    "MICROMASTERS_EXTERNAL_LOGIN_URL": {
+      "description": "URL displayed to users so they can login to micromasters"
+    },
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
     },
@@ -77,9 +80,6 @@
     },
     "OPEN_DISCUSSIONS_ENVIRONMENT": {
       "description": "The execution environment that the app is in (e.g. dev, staging, prod)"
-    },
-    "OPEN_DISCUSSIONS_EXTERNAL_LOGIN_URL": {
-      "description": "URL displayed to users so they can login to the service providing access to open-discussions"
     },
     "OPEN_DISCUSSIONS_FROM_EMAIL": {
       "description": "E-mail to use for the from field"

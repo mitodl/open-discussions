@@ -407,9 +407,9 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
 
-EXTERNAL_LOGIN_URL = get_string('OPEN_DISCUSSIONS_EXTERNAL_LOGIN_URL', None)
+EXTERNAL_LOGIN_URL = get_string('MICROMASTERS_EXTERNAL_LOGIN_URL', None)
 if not EXTERNAL_LOGIN_URL:
-    raise ImproperlyConfigured("OPEN_DISCUSSIONS_EXTERNAL_LOGIN_URL is not set")
+    raise ImproperlyConfigured("MICROMASTERS_EXTERNAL_LOGIN_URL is not set")
 
 
 # features flags
