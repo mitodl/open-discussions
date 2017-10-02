@@ -38,7 +38,7 @@ def index(request):
         "public_path": public_path(request),
         "auth_url": auth_url,
         "session_url": session_url,
-        "external_login_url": settings.EXTERNAL_LOGIN_URL,
+        "micromasters_external_login_url": settings.MICROMASTERS_EXTERNAL_LOGIN_URL,
     }
 
     return render(request, "index.html", context={

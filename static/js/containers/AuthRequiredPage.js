@@ -21,7 +21,7 @@ export default class AuthRequiredPage extends React.Component {
               account.
             </div>
             <div className="login">
-              <a href={SETTINGS.external_login_url}>Log In to MicroMasters</a>
+              <a href={SETTINGS.micromasters_external_login_url}>Log In to MicroMasters</a>
             </div>
           </Card>
         </div>
