@@ -29,9 +29,8 @@ describe("App", () => {
   })
 
   it("doesn't load requirements for auth_required", () => {
-    helper.browserHistory.push("/auth_required/")
     assert.isRejected(
-      renderComponent("/missing", [
+      renderComponent("/auth_required/", [
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType
       ])
