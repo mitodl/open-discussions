@@ -4,7 +4,7 @@
 import "isomorphic-fetch"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 
-import { authRequiredURL } from "./url"
+import { AUTH_REQUIRED_URL } from "./url"
 
 const renewSession = async () => {
   if (SETTINGS.session_url) {
@@ -17,7 +17,7 @@ const renewSession = async () => {
 
 const redirectAndReject = async (reason: string) => {
   // redirect to the authenticating app
-  window.location = authRequiredURL()
+  window.location = AUTH_REQUIRED_URL
   return Promise.reject(reason)
 }
 
