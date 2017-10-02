@@ -53,9 +53,9 @@ class PostDisplay extends React.Component {
     const { post, showChannelLink } = this.props
 
     return showChannelLink && post.channel_name
-      ? <Link to={channelURL(post.channel_name)}>
-          on {post.channel_name}
-      </Link>
+      ? <span>
+          in <Link to={channelURL(post.channel_name)}>{post.channel_name}</Link>
+      </span>
       : null
   }
 
@@ -115,7 +115,8 @@ class PostDisplay extends React.Component {
             {postTitle(post)}
           </div>
           <div className="authored-by">
-            <a>{post.author_name}</a> {formattedDate} {this.showChannelLink()}
+            by <a>{post.author_name}</a>, {formattedDate}{" "}
+            {this.showChannelLink()}
           </div>
           <div className="num-comments">
             {expanded

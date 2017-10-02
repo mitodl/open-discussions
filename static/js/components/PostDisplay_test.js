@@ -46,7 +46,7 @@ describe("PostDisplay", () => {
       formatCommentsCount(post)
     )
     const authoredBy = wrapper.find(".authored-by").text()
-    assert(authoredBy.startsWith(post.author_name))
+    assert(authoredBy.startsWith(`by ${post.author_name}`))
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
   })
 
