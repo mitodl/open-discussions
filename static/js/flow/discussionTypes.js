@@ -17,19 +17,22 @@ export type ChannelForm = {
   channel_type:       ChannelType,
 }
 
-export type Post = {
+export type AuthoredContent = {
   id:            string,
-  title:         string,
-  author_id:     string,  // username
+  author_id:     string,
   score:         number,
   upvoted:       boolean,
-  url:           ?string,
-  text:          ?string,
   created:       string,
-  num_comments:  number,
-  channel_name:  string,
   profile_image: string,
   author_name:   string,
+};
+
+export type Post = AuthoredContent & {
+  title:         string,
+  url:           ?string,
+  text:          ?string,
+  num_comments:  number,
+  channel_name:  string,
 }
 
 export type PostForm = {
@@ -45,18 +48,11 @@ export type CreatePostPayload = {
   title: string,
 };
 
-export type Comment = {
-  id:            string,
+export type Comment = AuthoredContent & {
   post_id:       string,
   text:          string,
-  score:         number,
-  upvoted:       boolean,
   downvoted:     boolean,
-  created:       string,
   replies:       Array<Comment>,
-  author_id:     string,
-  profile_image: string,
-  author_name:   string,
 }
 
 export type CommentForm = {
