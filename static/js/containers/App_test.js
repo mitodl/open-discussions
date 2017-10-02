@@ -1,13 +1,11 @@
 // @flow
 import React from "react"
-import { mount } from "enzyme"
 import sinon from "sinon"
+import { assert } from 'chai'
 
-import Router, { routes } from "../Router"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeChannelList } from "../factories/channels"
 import { actions } from "../actions"
-import { wait } from "../lib/util"
 
 describe("App", () => {
   let helper, renderComponent, channels
@@ -31,17 +29,11 @@ describe("App", () => {
     sinon.assert.calledWith(helper.getChannelsStub)
   })
 
-  it("doesn't load requirements for auth_required", async () => {
+  it("doesn't load requirements for auth_required", () => {
     helper.browserHistory.push("/auth_required/")
-    mount(
-      <div>
-        <Router history={helper.browserHistory} store={helper.store}>
-          {routes}
-        </Router>
-      </div>
-    )
-    await wait(200)
-
-    sinon.assert.notCalled(helper.getChannelsStub)
+    assert.isRejected(renderComponent("/missing", [
+      actions.subscribedChannels.get.requestType,
+      actions.subscribedChannels.get.successType
+    ]))
   })
 })
