@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 import sinon from "sinon"
-import { assert } from 'chai'
+import { assert } from "chai"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeChannelList } from "../factories/channels"
@@ -31,9 +31,11 @@ describe("App", () => {
 
   it("doesn't load requirements for auth_required", () => {
     helper.browserHistory.push("/auth_required/")
-    assert.isRejected(renderComponent("/missing", [
-      actions.subscribedChannels.get.requestType,
-      actions.subscribedChannels.get.successType
-    ]))
+    assert.isRejected(
+      renderComponent("/missing", [
+        actions.subscribedChannels.get.requestType,
+        actions.subscribedChannels.get.successType
+      ])
+    )
   })
 })

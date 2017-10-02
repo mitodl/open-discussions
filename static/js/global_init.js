@@ -6,7 +6,7 @@ global.requestAnimationFrame = () => {}
 
 const _createSettings = () => ({
   external_login_url: "http://fake.external.login.url/",
-  session_url:        "http://fake.session.url",
+  session_url:        "http://fake.session.url"
 })
 
 global.SETTINGS = _createSettings()
