@@ -56,7 +56,7 @@ class App extends React.Component {
   render() {
     const { match, location: { pathname } } = this.props
 
-    const authPageUrl = authRequiredURL();
+    const authPageUrl = authRequiredURL()
     if (!SETTINGS.session_url && pathname !== authPageUrl) {
       // user does not have the jwt cookie, they must go through login workflow first
       return <Redirect to={authPageUrl} />

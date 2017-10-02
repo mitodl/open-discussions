@@ -81,7 +81,7 @@ describe("auth", function() {
     assert.ok(fetchMock.called)
     assert.ok(fetchStub.calledOnce)
     assert.ok(fetchStub.calledWith("/url"))
-    assert.equal(window.location.pathname, '/auth_required/')
+    assert.equal(window.location.pathname, "/auth_required/")
   })
 
   it("renews and redirect to /auth_required/ if renew fails", async () => {
@@ -93,6 +93,6 @@ describe("auth", function() {
     assert.ok(fetchMock.called)
     assert.ok(fetchStub.calledOnce)
     assert.ok(fetchStub.calledWith("/url"))
-    assert.equal(window.location.pathname, '/auth_required/')
+    assert.equal(window.location.pathname, "/auth_required/")
   })
 })
