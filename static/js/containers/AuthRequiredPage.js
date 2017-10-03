@@ -16,9 +16,7 @@ export default class AuthRequiredPage extends React.Component {
           <Card className="auth-required">
             <div className="explanation">
               <i className="material-icons forum">forum</i>
-              MIT Open Discussions is a forum for MIT students and global
-              learners. To use this site you need to log in with a MicroMasters
-              account.
+              To use this site you need to log in with a MicroMasters account.
             </div>
             <div className="login">
               <a href={SETTINGS.micromasters_external_login_url}>
