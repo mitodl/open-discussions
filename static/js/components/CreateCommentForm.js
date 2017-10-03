@@ -17,9 +17,9 @@ type CreateCommentFormProps = {
   post: Post,
   initialValue: CommentForm,
   formKey: string,
-  beginReply: (initialValue: Object, e: ?Object) => void,
-  onSubmit: (p: string, t: string, c: string, p: Post) => () => void,
-  onUpdate: (e: Object) => void,
+  beginReply: (initialValue: Object, e: ?Event) => void,
+  onSubmit: (p: string, t: string, c: string, p: Post, e: Event) => Promise<*>,
+  onUpdate: (e: Event) => void,
   cancelReply: () => void,
   formDataLens: (s: string) => Object,
   processing: boolean
@@ -42,7 +42,7 @@ const getPostReplyInitialValue = (parent: Post) => ({
 })
 
 const commentForm = (
-  onSubmit: () => void,
+  onSubmit: (e: Event) => Promise<*>,
   text: string,
   onUpdate: (e: any) => void,
   cancelReply: () => void,
@@ -131,7 +131,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     beginReply:  beginReply(dispatch, formKey),
     onSubmit:    R.curry((postID, text, commentID, post, e) => {
       e.preventDefault()
-      dispatch(actions.comments.post(postID, text, commentID)).then(() => {
+      return dispatch(
+        actions.comments.post(postID, text, commentID)
+      ).then(() => {
         dispatch(
           setPostData({
             ...post,
@@ -145,32 +147,46 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 }
 
-export const ReplyToCommentForm = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(
-  ({
-    forms,
-    formKey,
-    post,
-    onSubmit,
-    onUpdate,
-    cancelReply,
-    processing
-    }: CreateCommentFormProps) => {
-    if (R.has(formKey, forms)) {
+export const ReplyToCommentForm = connect(mapStateToProps, mapDispatchToProps)(
+  class ReplyCommentForm extends React.Component {
+    props: CreateCommentFormProps
+
+    state: {
+      replying: boolean
+    }
+
+    constructor(props) {
+      super(props)
+      this.state = {
+        replying: false
+      }
+    }
+
+    onSubmit = async (event: Event) => {
+      const { formKey, forms, post, onSubmit } = this.props
       const { post_id, text, comment_id } = R.prop(formKey, forms).value
 
-      return commentForm(
-        onSubmit(post_id, text, comment_id, post),
-        text,
-        onUpdate,
-        cancelReply,
-        true,
-        processing
-      )
+      this.setState({ replying: true })
+      await onSubmit(post_id, text, comment_id, post, event)
+      this.setState({ replying: false })
     }
-    return null
+
+    render() {
+      const { forms, formKey, onUpdate, cancelReply } = this.props
+      const { replying } = this.state
+      const text = R.pathOr("", [formKey, "value", "text"], forms)
+
+      return R.has(formKey, forms)
+        ? commentForm(
+          this.onSubmit,
+          text,
+          onUpdate,
+          cancelReply,
+          true,
+          replying
+        )
+        : null
+    }
   }
 )
 
@@ -187,6 +203,17 @@ const getFormData = (lensFunc, forms) => ({
 export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
   class ReplyPostForm extends React.Component {
     props: CreateCommentFormProps
+
+    state: {
+      replying: boolean
+    }
+
+    constructor(props) {
+      super(props)
+      this.state = {
+        replying: false
+      }
+    }
 
     // since this form is always open (unlike the comment-reply forms)
     // we have to be sure it's always ready for the user to start entering
@@ -208,25 +235,27 @@ export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
       this.ensureInitialState()
     }
 
-    render() {
-      const {
-        forms,
-        post,
-        onSubmit,
-        onUpdate,
-        cancelReply,
-        formDataLens,
-        processing
-      } = this.props
+    onSubmit = async (event: Event) => {
+      const { onSubmit, formDataLens, forms, post } = this.props
       const { post_id, text, comment_id } = getFormData(formDataLens, forms)
 
+      this.setState({ replying: true })
+      await onSubmit(post_id, text, comment_id, post, event)
+      this.setState({ replying: false })
+    }
+
+    render() {
+      const { forms, onUpdate, cancelReply, formDataLens } = this.props
+      const { replying } = this.state
+      const { text } = getFormData(formDataLens, forms)
+
       return commentForm(
-        onSubmit(post_id, text, comment_id, post),
+        this.onSubmit,
         text,
         onUpdate,
         cancelReply,
         false,
-        processing
+        replying
       )
     }
   }
