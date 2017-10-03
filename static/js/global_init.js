@@ -4,7 +4,10 @@ import ReactDOM from "react-dom"
 global.cancelAnimationFrame = () => {}
 global.requestAnimationFrame = () => {}
 
-const _createSettings = () => ({})
+const _createSettings = () => ({
+  micromasters_external_login_url: "http://fake.external.login.url/",
+  session_url:                     "http://fake.session.url"
+})
 
 global.SETTINGS = _createSettings()
 

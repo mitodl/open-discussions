@@ -407,6 +407,10 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
 
+MICROMASTERS_EXTERNAL_LOGIN_URL = get_string('MICROMASTERS_EXTERNAL_LOGIN_URL', None)
+if not MICROMASTERS_EXTERNAL_LOGIN_URL:
+    raise ImproperlyConfigured("MICROMASTERS_EXTERNAL_LOGIN_URL is not set")
+
 
 # features flags
 def get_all_config_keys():

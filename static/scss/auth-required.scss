@@ -1,0 +1,35 @@
+$forum-padding: 30px;
+$forum-width: 48px;
+
+.auth-required {
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .explanation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 18px;
+    line-height: 28px;
+    font-weight: 400;
+    padding-bottom: 20px;
+    padding-right: $forum-padding + $forum-width; // balance forum on left
+
+    .forum {
+      font-size: $forum-width !important;
+      color: #b1b1b1;
+      padding: 0 $forum-padding;
+    }
+  }
+
+  .login {
+    text-align: center;
+
+    a {
+      font-size: 20px;
+      font-weight: 500;
+    }
+  }
+}

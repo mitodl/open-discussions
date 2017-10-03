@@ -49,6 +49,9 @@
     "MAILGUN_BCC_TO_EMAIL": {
       "description": "Email address used with bcc email"
     },
+    "MICROMASTERS_EXTERNAL_LOGIN_URL": {
+      "description": "URL displayed to users so they can login to micromasters"
+    },
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
     },

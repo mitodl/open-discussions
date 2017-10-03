@@ -32,4 +32,5 @@ class ViewsTest(TestCase):
             'public_path': '/static/bundles/',
             'auth_url': None,
             'session_url': None,
+            'micromasters_external_login_url': 'http://other.fake.site/'
         }

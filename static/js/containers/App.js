@@ -1,6 +1,7 @@
+/* global SETTINGS: false */
 // @flow
 import React from "react"
-import { Route } from "react-router-dom"
+import { Route, Redirect } from "react-router-dom"
 import { connect } from "react-redux"
 import DocumentTitle from "react-document-title"
 
@@ -8,6 +9,7 @@ import HomePage from "./HomePage"
 import ChannelPage from "./ChannelPage"
 import PostPage from "./PostPage"
 import AdminPage from "./admin/AdminPage"
+import AuthRequiredPage from "./AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
 import Toolbar from "../components/Toolbar"
 import Drawer from "../containers/Drawer"
@@ -15,13 +17,15 @@ import Drawer from "../containers/Drawer"
 import { actions } from "../actions"
 import { setShowDrawer } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
+import { AUTH_REQUIRED_URL } from "../lib/url"
 
-import type { Match } from "react-router"
+import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 
 class App extends React.Component {
   props: {
     match: Match,
+    location: Location,
     showDrawer: boolean,
     dispatch: Dispatch
   }
@@ -32,17 +36,31 @@ class App extends React.Component {
   }
 
   componentWillMount() {
+    const { location: { pathname } } = this.props
+    if (pathname === AUTH_REQUIRED_URL || !SETTINGS.session_url) {
+      // either user is at auth required page
+      // or they will be soon redirected there due to missing session_url
+      return
+    }
+
     this.loadData()
   }
 
   loadData = async () => {
     const { dispatch } = this.props
+
     const channels = await dispatch(actions.subscribedChannels.get())
     dispatch(setChannelData(channels))
   }
 
   render() {
-    const { match } = this.props
+    const { match, location: { pathname } } = this.props
+
+    if (!SETTINGS.session_url && pathname !== AUTH_REQUIRED_URL) {
+      // user does not have the jwt cookie, they must go through login workflow first
+      return <Redirect to={AUTH_REQUIRED_URL} />
+    }
+
     return (
       <div className="app">
         <DocumentTitle title="MIT Open Discussions" />
@@ -62,6 +80,10 @@ class App extends React.Component {
         <Route
           path={`${match.url}create_post/:channelName?`}
           component={CreatePostPage}
+        />
+        <Route
+          path={`${match.url}auth_required/`}
+          component={AuthRequiredPage}
         />
       </div>
     )

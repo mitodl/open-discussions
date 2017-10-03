@@ -2,8 +2,9 @@
 import { assert } from "chai"
 
 import {
+  AUTH_REQUIRED_URL,
   channelURL,
-  frontPageURL,
+  FRONTPAGE_URL,
   newPostURL,
   postDetailURL,
   getChannelNameFromPathname
@@ -35,12 +36,6 @@ describe("url helper functions", () => {
     })
   })
 
-  describe("frontPageURL", () => {
-    it("should return a url for the front page", () => {
-      assert.equal(frontPageURL(), "/")
-    })
-  })
-
   describe("getChannelNameFromPathname", () => {
     it("should return a channel", () => {
       [
@@ -58,6 +53,13 @@ describe("url helper functions", () => {
 
     it("should return null otherwise", () => {
       assert.equal(null, getChannelNameFromPathname(""))
+    })
+  })
+
+  describe("constants", () => {
+    it("should have appropriate values for each constant", () => {
+      assert.equal(AUTH_REQUIRED_URL, "/auth_required/")
+      assert.equal(FRONTPAGE_URL, "/")
     })
   })
 })
