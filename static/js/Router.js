@@ -6,7 +6,6 @@ import { Route, Router as ReactRouter } from "react-router-dom"
 import App from "./containers/App"
 import withTracker from "./util/withTracker"
 import ScrollToTop from "./components/ScrollToTop"
-import Analytics from "./components/Analytics"
 
 import type { Store } from "redux"
 
