@@ -2,7 +2,7 @@
 
 
 export type FormValue = {
-  value: Object,
+  value:  Object,
   errors: Object,
 }
 
@@ -12,5 +12,6 @@ export type FormsState = {
 
 export type FormActionPayload = {
   formKey: string,
-  value?: Object
+  value?:  Object,
+  errors?: Object,
 }

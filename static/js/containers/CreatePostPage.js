@@ -11,6 +11,7 @@ import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
 import { getChannelName } from "../lib/util"
 import { formatTitle } from "../lib/title"
+import { validatePostCreateForm } from "../lib/validation"
 
 import type { FormValue } from "../flow/formTypes"
 import type { Channel, CreatePostPayload } from "../flow/discussionTypes"
@@ -74,6 +75,13 @@ class CreatePostPage extends React.Component {
         value: { isText }
       })
     )
+
+    dispatch(
+      actions.forms.formValidate({
+        ...CREATE_POST_PAYLOAD,
+        errors: {}
+      })
+    )
   }
 
   onSubmit = (e: Object) => {
@@ -81,16 +89,29 @@ class CreatePostPage extends React.Component {
 
     e.preventDefault()
 
-    if (!postForm || !channel) {
-      return
-    }
+    const validation = R.isNil(channel)
+      ? R.set(
+        R.lensPath(["value", "channel"]),
+        "You need to select a channel",
+        validatePostCreateForm(postForm)
+      )
+      : validatePostCreateForm(postForm)
 
-    const channelName = channel.name
-    const { isText, title, url, text } = postForm.value
-    const data: CreatePostPayload = isText ? { title, text } : { title, url }
-    dispatch(actions.posts.post(channelName, data)).then(post => {
-      history.push(postDetailURL(channelName, post.id))
-    })
+    if (!postForm || !R.isEmpty(validation)) {
+      dispatch(
+        actions.forms.formValidate({
+          ...CREATE_POST_PAYLOAD,
+          errors: validation.value
+        })
+      )
+    } else {
+      const channelName = channel.name
+      const { isText, title, url, text } = postForm.value
+      const data: CreatePostPayload = isText ? { title, text } : { title, url }
+      dispatch(actions.posts.post(channelName, data)).then(post => {
+        history.push(postDetailURL(channelName, post.id))
+      })
+    }
   }
 
   updateChannelSelection = (e: Object) => {
@@ -119,6 +140,7 @@ class CreatePostPage extends React.Component {
             updateIsText={this.updateIsText}
             updateChannelSelection={this.updateChannelSelection}
             postForm={postForm.value}
+            validation={postForm.errors}
             channel={channel}
             history={history}
             processing={processing}

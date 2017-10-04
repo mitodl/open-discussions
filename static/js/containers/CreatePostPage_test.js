@@ -18,7 +18,7 @@ describe("CreatePostPage", () => {
 
   const setTitle = (wrapper, title) =>
     wrapper
-      .find(".titlefield input")
+      .find(".titlefield textarea")
       .simulate("change", makeEvent("title", title))
 
   const setText = (wrapper, text) =>
@@ -29,6 +29,8 @@ describe("CreatePostPage", () => {
 
   const setLinkPost = wrapper =>
     wrapper.find(".new-link-post").simulate("click")
+
+  const submitPost = wrapper => wrapper.find(".submit-post").simulate("submit")
 
   beforeEach(() => {
     channels = makeChannelList(10)
@@ -97,7 +99,7 @@ describe("CreatePostPage", () => {
         return listenForActions(
           [actions.posts.post.requestType, actions.posts.post.successType],
           () => {
-            wrapper.find(".submit-post").simulate("submit")
+            submitPost(wrapper)
           }
         ).then(() => {
           const payload: CreatePostPayload = { title }
@@ -120,43 +122,54 @@ describe("CreatePostPage", () => {
     })
   }
 
-  it("should disable the submit button when processing", async () => {
-    helper.store.dispatch({
-      type: actions.posts.post.requestType
-    })
+  it("should show validation errors when title of post is empty", async () => {
     const [wrapper] = await renderPage()
-    const btnProps = wrapper.find(".submit-post").props()
-    assert.isTrue(btnProps.disabled)
-    assert.equal(btnProps.className, "submit-post disabled")
+    submitPost(wrapper)
+    assert.equal(
+      wrapper.find(".titlefield .validation-message").text(),
+      "Title is required"
+    )
+    setTitle(wrapper, "title")
+    submitPost(wrapper)
+    assert.lengthOf(wrapper.find(".titlefield .validation-message"), 0)
   })
 
-  it("should disable the submit button when title or body of text post is empty", async () => {
+  it("should show validation errors when body of text post is empty", async () => {
     const [wrapper] = await renderPage()
-    ;[
-      ["title", "", true],
-      ["", "text", true],
-      ["", "", true],
-      ["title", "text", false]
-    ].forEach(([title, text, disabled]) => {
-      setTitle(wrapper, title)
-      setText(wrapper, text)
-      assert.equal(disabled, wrapper.find(".submit-post").props().disabled)
-    })
+    submitPost(wrapper)
+    assert.equal(
+      wrapper.find(".text .validation-message").text(),
+      "Post text cannot be empty"
+    )
+    setText(wrapper, "text")
+    submitPost(wrapper)
+    assert.lengthOf(wrapper.find(".text .validation-message"), 0)
   })
 
-  it("should disable the submit button when url post is empty", async () => {
+  it("should show validation errors when the url post is empty", async () => {
     const [wrapper] = await renderPage()
-    wrapper.find(".new-link-post").simulate("click")
-    ;[
-      ["title", "", true],
-      ["", "url", true],
-      ["", "", true],
-      ["title", "url", false]
-    ].forEach(([title, url, disabled]) => {
-      setTitle(wrapper, title)
-      setUrl(wrapper, url)
-      assert.equal(disabled, wrapper.find(".submit-post").props().disabled)
-    })
+    setLinkPost(wrapper)
+    submitPost(wrapper)
+    assert.equal(
+      wrapper.find(".url .validation-message").text(),
+      "Post url cannot be empty"
+    )
+    setUrl(wrapper, "http://foo.bar")
+    submitPost(wrapper)
+    assert.lengthOf(wrapper.find(".url .validation-message"), 0)
+  })
+
+  it("should show validation errors when no channel is selected", async () => {
+    const [wrapper] = await renderPage("/create_post/")
+    submitPost(wrapper)
+    assert.equal(
+      wrapper.find(".channel-select .validation-message").text(),
+      "You need to select a channel"
+    )
+    const select = wrapper.find("select")
+    select.simulate("change", { target: { value: channels[6].name } })
+    submitPost(wrapper)
+    assert.lengthOf(wrapper.find(".channel-select .validation-message"), 0)
   })
 
   it("goes back when cancel is clicked", async () => {

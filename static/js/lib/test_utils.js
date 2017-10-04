@@ -16,3 +16,7 @@ export const assertIsJust = (m: Maybe, val: any) => {
   assert(m.isJust, `should be Just(${val}), is ${m}`)
   assert.deepEqual(m.value, val)
 }
+
+export const assertIsJustNoVal = (m: Maybe) => {
+  assert(m.isJust, "should be a Just")
+}

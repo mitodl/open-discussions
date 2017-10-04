@@ -40,6 +40,10 @@ textarea {
   resize: auto;
   font-size: 15px;
   font-family: inherit;
+
+  &.no-height {
+    height: auto;
+  }
 }
 
 label {

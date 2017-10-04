@@ -6,6 +6,13 @@
       &.post-types>div {
         cursor: pointer;
       }
+
+      .validation-message {
+        background-color: $validation-bg;
+        color: $validation-text;
+        font-size: 14px;
+        padding: 5px;
+      }
     }
 
     .post-types {
