@@ -61,12 +61,12 @@ const renderComment = R.curry(
         <img className="profile-image" src={comment.profile_image} />
         <div className="comment-contents">
           <div className="author-info">
-            <a className="author-name">
+            <span className="author-name">
               {comment.author_name}
-            </a>
-            <div>
+            </span>
+            <span>
               {moment(comment.created).fromNow()}
-            </div>
+            </span>
           </div>
           <div className="row">
             <ReactMarkdown

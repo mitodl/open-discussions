@@ -46,7 +46,7 @@ class HomePage extends React.Component {
     const dispatchableToggleUpvote = toggleUpvote(dispatch)
 
     return (
-      <Card title="Home Page">
+      <Card title="Home">
         <PostList
           // $FlowFixMe: flow thinks these might be undefined
           posts={safeBulkGet(frontpage, posts.data)}

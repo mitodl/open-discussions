@@ -90,8 +90,7 @@ class PostDisplay extends React.Component {
                 ? "/static/images/upvote_arrow_on.png"
                 : "/static/images/upvote_arrow.png"
             }
-            height="16"
-            width="16"
+            width="13"
           />
         </button>
         <span className="votes">
@@ -115,7 +114,7 @@ class PostDisplay extends React.Component {
             {postTitle(post)}
           </div>
           <div className="authored-by">
-            by <a>{post.author_name}</a>, {formattedDate}{" "}
+            by <span className="author-name">{post.author_name}</span>, {formattedDate}{" "}
             {this.showChannelLink()}
           </div>
           <div className="num-comments">

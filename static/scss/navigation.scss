@@ -11,9 +11,9 @@
       }
     }
 
-    .mdc-toolbar__title {
+    .mdc-toolbar__title, .mdc-toolbar__title a {
       color: #5d5d5d;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
   }
 
@@ -41,13 +41,14 @@
 
   .mdc-button {
     width: 87%;
-    height: 48px;
-    line-height: 48px;
-    font-size: 16px;
+    height: 43px;
+    line-height: 43px;
+    font-size: 15px;
     text-transform: none;
     font-weight: 500;
     padding: 0 5px;
     box-shadow: none;
+    margin-left: 14px;
   }
 
   .mdc-button:hover {
@@ -59,7 +60,7 @@
 .subscriptions {
   margin: 30px 0;
   width: 100%;
-  padding: 20px 0 20px 0;
+  padding: 16px 0 18px 0;
   box-sizing: border-box;
   border: 1px solid #cecece;
   border-width: 1px 0;
@@ -71,7 +72,7 @@
       color: rgba(0,0,0,.77);
       display: block;
       font-size: 15px;
-      padding: 13px 20px 13px 34px;
+      padding: 11px 20px 11px 34px;
     }
 
     a:hover {

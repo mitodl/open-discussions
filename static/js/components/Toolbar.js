@@ -1,5 +1,7 @@
 // @flow
 import React from "react"
+import { FRONTPAGE_URL } from "../lib/url"
+import { Link } from "react-router-dom"
 import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
 
 export default class Toolbar extends React.Component {
@@ -35,7 +37,7 @@ export default class Toolbar extends React.Component {
                 <img src="/static/images/mit-logo-transparent3.svg" />
               </a>
               <a href="/" className="mdc-toolbar__title">
-                Open Discussions
+                MicroMasters > <Link to={FRONTPAGE_URL}>Discussions</Link>
               </a>
             </section>
           </div>

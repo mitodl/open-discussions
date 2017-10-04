@@ -26,20 +26,19 @@
   }
 
   .authored-by {
-    font-size: 14px;
+    font-size: 13px;
     color: $font-grey;
     margin: 0 0 8px;
 
-    a {
-      font-weight: 500;
-      font-size: 15px;
+    span.author-name {
+      color: $font-black;
     }
   }
 
   .num-comments {
     display: block;
     margin: 0;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 400;
   }
 
@@ -72,6 +71,15 @@
       color: rgba(0,0,0,.87);
     }
   }
+
+  .authored-by {
+    font-size: 14px;
+    color: black;
+
+    span.author-name {
+      font-weight: 500;
+    }
+  }
 }
 
 .upvotes {
@@ -79,11 +87,18 @@
   flex-direction: column;
   align-items: center;
   min-width: 50px;
+  padding-top: 1px;
 
   &.expanded {
     flex-direction: row;
     justify-content: space-between;
     width: 35px;
+    min-width: 10px;
+    padding-top: 0px;
+
+    span.votes {
+      margin-top: 0;
+    }
   }
 
   span.votes {
@@ -91,6 +106,7 @@
     font-weight: 500;
     font-size: 16px;
     color: #555;
+    margin-top: 5px;
   }
 }
 
