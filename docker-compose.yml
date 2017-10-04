@@ -19,7 +19,6 @@ services:
       - "8063:8063"
     links:
       - web
-      - watch
 
   python:
     build: .
@@ -54,6 +53,7 @@ services:
     command: >
       /bin/bash -c '
       sleep 3 &&
+      python3 manage.py collectstatic --noinput &&
       python3 manage.py migrate --no-input &&
       uwsgi uwsgi.ini'
     ports:

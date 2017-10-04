@@ -151,7 +151,7 @@
   "name": "open_discussions",
   "repository": "https://github.com/mitodl/mit-open",
   "scripts": {
-    "postdeploy": "./manage.py migrate"
+    "postdeploy": "./manage.py migrate --noinput"
   },
   "success_url": "/",
   "website": "https://github.com/mitodl/mit-open"
