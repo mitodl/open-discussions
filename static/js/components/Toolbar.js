@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { FRONTPAGE_URL } from "../lib/url"
 import { Link } from "react-router-dom"
@@ -37,7 +38,8 @@ export default class Toolbar extends React.Component {
                 <img src="/static/images/mit-logo-transparent3.svg" />
               </a>
               <span className="mdc-toolbar__title">
-                MicroMasters > <Link to={FRONTPAGE_URL}>Discussion</Link>
+                <a href={SETTINGS.micromasters_base_url}>MicroMasters</a> >{" "}
+                <Link to={FRONTPAGE_URL}>Discussion</Link>
               </span>
             </section>
           </div>

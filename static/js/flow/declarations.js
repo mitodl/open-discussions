@@ -7,6 +7,7 @@ declare var SETTINGS: {
   auth_url: string|null,
   session_url: string|null,
   micromasters_external_login_url: string,
+  micromasters_base_url: string,
   FEATURES: {
     [key: string]: boolean,
   },

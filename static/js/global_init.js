@@ -5,7 +5,8 @@ global.cancelAnimationFrame = () => {}
 global.requestAnimationFrame = () => {}
 
 const _createSettings = () => ({
-  micromasters_external_login_url: "http://fake.external.login.url/",
+  micromasters_external_login_url: "http://fake.micromasters.url/discussions",
+  micromasters_base_url:           "http://fake.micromasters.url/",
   session_url:                     "http://fake.session.url"
 })
 

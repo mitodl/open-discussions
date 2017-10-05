@@ -410,6 +410,10 @@ MICROMASTERS_EXTERNAL_LOGIN_URL = get_string('MICROMASTERS_EXTERNAL_LOGIN_URL', 
 if not MICROMASTERS_EXTERNAL_LOGIN_URL:
     raise ImproperlyConfigured("MICROMASTERS_EXTERNAL_LOGIN_URL is not set")
 
+MICROMASTERS_BASE_URL = get_string("MICROMASTERS_BASE_URL", None)
+if not MICROMASTERS_BASE_URL:
+    raise ImproperlyConfigured("MICROMASTERS_BASE_URL is not set")
+
 
 # features flags
 def get_all_config_keys():

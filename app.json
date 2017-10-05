@@ -50,7 +50,10 @@
       "description": "Email address used with bcc email"
     },
     "MICROMASTERS_EXTERNAL_LOGIN_URL": {
-      "description": "URL displayed to users so they can login to micromasters"
+      "description": "URL displayed to users so they can login to MicroMasters"
+    },
+    "MICROMASTERS_BASE_URL": {
+      "description": "URL used to link to MicroMasters"
     },
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
