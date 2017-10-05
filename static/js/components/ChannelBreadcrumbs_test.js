@@ -17,7 +17,7 @@ describe("ChannelBreadcrumbs", () => {
     const wrapper = renderBreadcrumbs(channel)
     const [first, second] = wrapper.find(Link)
     assert.equal(first.props.to, "/")
-    assert.equal(first.props.children, "Discussions")
+    assert.equal(first.props.children, "Home")
     assert.equal(second.props.to, `/channel/${channel.name}`)
     assert.equal(second.props.children, channel.title)
   })

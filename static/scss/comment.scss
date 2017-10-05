@@ -22,7 +22,7 @@
 
     img.profile-image {
       @include breakpoint(phone) {
-        display: none
+        display: none;
       }
     }
 
