@@ -114,8 +114,8 @@ class PostDisplay extends React.Component {
             {postTitle(post)}
           </div>
           <div className="authored-by">
-            by <span className="author-name">{post.author_name}</span>, {formattedDate}{" "}
-            {this.showChannelLink()}
+            by <span className="author-name">{post.author_name}</span>,{" "}
+            {formattedDate} {this.showChannelLink()}
           </div>
           <div className="num-comments">
             {expanded
