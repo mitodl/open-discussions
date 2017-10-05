@@ -4,6 +4,10 @@
   color: $font-grey;
   margin: 5px 0 21px;
 
+  @include breakpoint(mobile) {
+  	margin: 17px 0 19px 6px;
+  }
+
   a {
     color: $font-grey;
   }
