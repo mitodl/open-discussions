@@ -2,7 +2,7 @@
 // @flow
 import React from "react"
 import { withRouter } from "react-router"
-import ReactGA from 'react-ga'
+import ReactGA from "react-ga"
 
 const debug = SETTINGS.reactGaDebug === "true"
 if (SETTINGS.gaTrackingID) {
