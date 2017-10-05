@@ -14,8 +14,8 @@ const ChannelBreadcrumbs = (props: BreadCrumbProps) => {
 
   return (
     <div className="breadcrumbs">
-      <Link to={FRONTPAGE_URL}>Discussions</Link>&nbsp;
-      <span>&gt;</span>&nbsp;
+      <Link to={FRONTPAGE_URL}>Home</Link>&nbsp;&nbsp;
+      <span>&gt;</span>&nbsp;&nbsp;
       <Link to={channelURL(channel.name)}>{channel.title}</Link>
     </div>
   )

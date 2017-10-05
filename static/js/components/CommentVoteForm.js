@@ -79,10 +79,10 @@ export default class CommentVoteForm extends React.Component {
                 ? "/static/images/upvote_arrow_on.png"
                 : "/static/images/upvote_arrow.png"
             }
-            height="16"
-            width="16"
+            width="13"
           />
         </button>
+        <span className="pipe">|</span>
         <button
           className={`vote downvote-button ${downvoted ? "downvoted" : ""}`}
           onClick={this.downvote}
@@ -95,8 +95,7 @@ export default class CommentVoteForm extends React.Component {
                 ? "/static/images/downvote_arrow_on.png"
                 : "/static/images/downvote_arrow.png"
             }
-            height="16"
-            width="16"
+            width="13"
           />
         </button>
       </div>
