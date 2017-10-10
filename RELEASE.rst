@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.2.0
+-------------
+
+- Added pagination for frontpage (#199)
+- Add check for presence of mailgun variables (#249)
+
 Version 0.1.0
 -------------
 
