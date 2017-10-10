@@ -1,0 +1,42 @@
+Release Notes
+=============
+
+Version 0.1.0
+-------------
+
+- Fixing problems for realease
+- Make public_description not required when creating a channel (#254)
+- Numerous small tweaks to UI (#252)
+- Upgrade eslint config (#260)
+- Move collectstatic into docker-compose to match cookiecutter (#250)
+- Fix issue w/ comment submit button being disabled during upvoting
+- Fix logging configuration (#242)
+- Added page for users who aren&#39;t logged in (#225)
+- Tweaks to post display byline
+- Small refactor to discussion flow types
+- Add profile name to comment, post APIs
+- Update URL in place instead of adding a new URL when new channel is selected (#224)
+- Fix the channel select when creating posts in firefox
+- Added flag to not check for praw updates
+- Set document title
+- Fix linting erros (#217)
+- Mark posts and comments with missing users as deleted (#198)
+- Change is_subscriber to return correct result if the user is a subscriber but not a contributor to a private channel (#189)
+- Add script to import models for Django shell (#205)
+- switch to using common eslint package
+- Added access token header and settings (#164)
+- Fix a little `npm run fmt` error
+- set eslint `prefer-const` rule and fix violations
+- Change create post form to have a channel select dropdown
+- Add CORS whitelist
+- Only redirect to auth on a 401 response (#182)
+- Added add/remove subscriber
+- Prevent submission of empty posts
+- Disable submit buttons when requests are in flight
+- Get scroll behavior on page transitions to work in the normal way
+- Responsive tweaks to Profile image and comment layout (#173)
+- Remove error when clicking &#39;cancel&#39; on create post page
+- Add profile image to post + comment serializers and to UI
+- Added JWT session renewal
+- Fixed app.json to not require S3
+
