@@ -1,6 +1,10 @@
 .comments {
+  .card {
+    margin-bottom: 14px;
+  }
+
   .card-contents {
-    padding: 30px 15px 35px;
+    padding: 30px 14px 35px;
 
     @include breakpoint(phone) {
       padding: 22px 13px 25px;
@@ -8,7 +12,11 @@
   }
 
   .top-level-comment {
-    padding: 0 15px 0 4px;
+    padding: 0 15px 0 0;
+
+    @include breakpoint(phone) {
+      padding: 0;
+    }
   }
 
   .top-level-comment>.comment {
@@ -21,18 +29,21 @@
     flex-direction: row;
 
     img.profile-image {
+      width: 30px;
+      height: 30px;
+
       @include breakpoint(phone) {
         display: none;
       }
     }
 
     .comment-contents {
-      padding-left: 12px;
+      padding-left: 8px;
       width: 100%;
 
       @include breakpoint(phone) {
         width: auto;
-        padding-left: 6px;
+        padding-left: 12px;
       }
     }
 
@@ -99,7 +110,7 @@
 
     .replies {
       border-left: 1px solid #e6e6e6;
-      margin-left: -44px;
+      margin-left: 0;
 
       @include breakpoint(phone) {
         margin-left: 0px;
@@ -107,7 +118,7 @@
     }
 
     .replies > .comment {
-      padding-left: 5px;
+      padding-left: 8px;
     }
   }
 
