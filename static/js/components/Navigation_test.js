@@ -45,5 +45,16 @@ describe("Navigation", () => {
         channels
       )
     })
+
+    it("should pass the current channel down to the SubscriptionsList", () => {
+      const wrapper = renderComponent({
+        ...defaultProps,
+        pathname: "/channel/foobar"
+      })
+      assert.equal(
+        wrapper.find(SubscriptionsList).props().currentChannel,
+        "foobar"
+      )
+    })
   })
 })

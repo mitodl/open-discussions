@@ -6,19 +6,28 @@ import { channelURL } from "../lib/url"
 import type { Channel } from "../flow/discussionTypes"
 
 type SubscriptionsListProps = {
-  subscribedChannels: Array<Channel>
+  subscribedChannels: Array<Channel>,
+  currentChannel: ?string
 }
+
+const channelClassName = (channelName, currentChannel) =>
+  currentChannel === channelName
+    ? "channelname current-location"
+    : "channelname"
 
 export default class SubscriptionsList extends React.Component {
   props: SubscriptionsListProps
 
   render() {
-    const { subscribedChannels } = this.props
+    const { subscribedChannels, currentChannel } = this.props
 
     return (
       <div className="subscriptions">
         {subscribedChannels.map(channel =>
-          <div className="channelname" key={channel.name}>
+          <div
+            className={channelClassName(channel.name, currentChannel)}
+            key={channel.name}
+          >
             <Link to={channelURL(channel.name)}>
               {channel.title}
             </Link>

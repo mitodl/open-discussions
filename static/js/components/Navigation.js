@@ -26,7 +26,10 @@ const Navigation = (props: NavigationProps) => {
       >
         Submit a New Post
       </Link>
-      <SubscriptionsList subscribedChannels={subscribedChannels} />
+      <SubscriptionsList
+        currentChannel={channelName}
+        subscribedChannels={subscribedChannels}
+      />
     </div>
   )
 }

@@ -11,8 +11,9 @@ import { makeChannelList } from "../factories/channels"
 
 describe("SubscriptionsList", function() {
   let channels
-  const renderSubscriptionsList = (props = { subscribedChannels: channels }) =>
-    shallow(<SubscriptionsList {...props} />)
+  const renderSubscriptionsList = (
+    props = { subscribedChannels: channels, currentChannel: channels[0].name }
+  ) => shallow(<SubscriptionsList {...props} />)
 
   beforeEach(() => {
     channels = makeChannelList()
@@ -25,5 +26,20 @@ describe("SubscriptionsList", function() {
       assert.equal(link.props().to, channelURL(channels[index].name))
       assert.equal(link.props().children, channels[index].title)
     })
+  })
+
+  it("should highlight the current channel", () => {
+    const wrapper = renderSubscriptionsList()
+    const currentLocation = wrapper.find(".current-location")
+    assert.lengthOf(currentLocation, 1)
+    assert.equal(
+      currentLocation.props().className,
+      "channelname current-location"
+    )
+    assert.equal(currentLocation.children().props().children, channels[0].title)
+    assert.equal(
+      currentLocation.children().props().to,
+      channelURL(channels[0].name)
+    )
   })
 })
