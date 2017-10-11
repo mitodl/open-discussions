@@ -34,4 +34,5 @@ class ViewsTest(TestCase):
             'session_url': None,
             'micromasters_external_login_url': 'http://other.fake.site/discussions/',
             'micromasters_base_url': 'http://other.fake.site/',
+            'max_comment_depth': 6,
         }

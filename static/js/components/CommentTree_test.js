@@ -108,7 +108,7 @@ describe("CommentTree", () => {
     assert.equal(authorName, comments[0].author_name)
   })
 
-  it('should limit replies to the max comment depth', () => {
+  it("should limit replies to the max comment depth", () => {
     SETTINGS.max_comment_depth = 2
 
     // assert that there are at least three comments deep at index 0 for each one
@@ -118,7 +118,9 @@ describe("CommentTree", () => {
 
     const wrapper = renderCommentTree()
     const topCommentWrapper = wrapper.find(".comment").first()
-    const nextCommentWrapper = topCommentWrapper.find(".replies .comment").first()
+    const nextCommentWrapper = topCommentWrapper
+      .find(".replies .comment")
+      .first()
 
     assert.lengthOf(topCommentWrapper.find(".reply-button"), 1)
     assert.lengthOf(nextCommentWrapper.find(".reply-button"), 0)
