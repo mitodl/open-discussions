@@ -95,6 +95,10 @@
       "description": "Shared secret for JWT auth tokens",
       "required": true
     },
+    "OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH": {
+      "description": "Maximum depth of a comment",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_REDDIT_ACCESS_TOKEN": {
       "description": "Access token for securing trusted APIs to reddit",
       "required": false

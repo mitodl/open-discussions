@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import R from "ramda"
 import moment from "moment"
@@ -56,6 +57,7 @@ const renderComment = R.curry(
     const formKey = replyToCommentKey(comment)
     const initialValue = getCommentReplyInitialValue(comment)
 
+    const atMaxDepth = depth + 1 >= SETTINGS.max_comment_depth
     return (
       <div className="comment" key={comment.id}>
         <img className="profile-image" src={comment.profile_image} />
@@ -81,35 +83,41 @@ const renderComment = R.curry(
               upvote={upvote}
               downvote={downvote}
             />
-            <div
-              className="reply-button"
-              onClick={e => {
-                beginReply(formKey, initialValue, e)
-              }}
-            >
-              <a href="#">Reply</a>
-            </div>
+            {atMaxDepth
+              ? null
+              : <div
+                className="reply-button"
+                onClick={e => {
+                  beginReply(formKey, initialValue, e)
+                }}
+              >
+                <a href="#">Reply</a>
+              </div>}
           </div>
-          <div>
-            <ReplyToCommentForm
-              forms={forms}
-              comment={comment}
-              processing={processing}
-            />
-          </div>
-          <div className="replies">
-            {R.map(
-              renderComment(
-                forms,
-                upvote,
-                downvote,
-                beginReply,
-                processing,
-                depth + 1
-              ),
-              comment.replies
-            )}
-          </div>
+          {atMaxDepth
+            ? null
+            : <div>
+              <ReplyToCommentForm
+                forms={forms}
+                comment={comment}
+                processing={processing}
+              />
+            </div>}
+          {atMaxDepth
+            ? null
+            : <div className="replies">
+              {R.map(
+                renderComment(
+                  forms,
+                  upvote,
+                  downvote,
+                  beginReply,
+                  processing,
+                  depth + 1
+                ),
+                comment.replies
+              )}
+            </div>}
         </div>
       </div>
     )

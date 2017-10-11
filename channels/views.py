@@ -119,7 +119,6 @@ class PostListView(APIView):
     """
     View for listing and creating posts
     """
-    serializer_class = PostSerializer
 
     def get_serializer_context(self):
         """Context for the request and view"""
@@ -160,7 +159,6 @@ class PostDetailView(APIView):
     """
     View for retrieving, updating or destroying posts
     """
-    serializer_class = PostSerializer
 
     def get_serializer_context(self):
         """Context for the request and view"""
@@ -249,7 +247,6 @@ class CommentListView(APIView):
     """
     View for listing and creating comments
     """
-    serializer_class = CommentSerializer
 
     def get_serializer_context(self):
         """Context for the request and view"""
@@ -261,7 +258,12 @@ class CommentListView(APIView):
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Get list for comments and attach User objects to them"""
         api = Api(user=self.request.user)
-        comments = list(api.list_comments(self.kwargs['post_id']))
+        comment_tree = api.list_comments(self.kwargs['post_id'])
+
+        # Don't resolve any extra comments
+        comment_tree.replace_more(limit=0)
+        comments = list(comment_tree)
+
         users = _lookup_users_for_comments(comments)
         return Response(
             CommentSerializer(
@@ -292,7 +294,6 @@ class CommentDetailView(APIView):
     """
     View for retrieving, updating or destroying comments
     """
-    serializer_class = CommentSerializer
 
     def get_serializer_context(self):
         """Context for the request and view"""
@@ -305,22 +306,6 @@ class CommentDetailView(APIView):
         """Get the comment object"""
         api = Api(user=self.request.user)
         return api.get_comment(self.kwargs['comment_id'])
-
-    def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
-        """Get comment"""
-        comment = self.get_object()
-        users = _lookup_users_for_comments([comment])
-        if not comment.author or comment.author.name not in users:
-            raise NotFound()
-        return Response(
-            CommentSerializer(
-                comment,
-                context={
-                    **self.get_serializer_context(),
-                    'users': users,
-                }
-            ).data
-        )
 
     def patch(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Update a comment"""

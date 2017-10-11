@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS */
 import React from "react"
 import sinon from "sinon"
 import R from "ramda"
@@ -9,6 +10,7 @@ import ReactMarkdown from "react-markdown"
 
 import Card from "../components/Card"
 import CommentTree from "./CommentTree"
+import { ReplyToCommentForm } from "./CreateCommentForm"
 
 import { makeCommentTree } from "../factories/comments"
 import { makePost } from "../factories/posts"
@@ -104,5 +106,27 @@ describe("CommentTree", () => {
       .at(0)
       .text()
     assert.equal(authorName, comments[0].author_name)
+  })
+
+  it('should limit replies to the max comment depth', () => {
+    SETTINGS.max_comment_depth = 2
+
+    // assert that there are at least three comments deep at index 0 for each one
+    assert.ok(comments[0])
+    assert.ok(comments[0].replies[0])
+    assert.ok(comments[0].replies[0].replies[0])
+
+    const wrapper = renderCommentTree()
+    const topCommentWrapper = wrapper.find(".comment").first()
+    const nextCommentWrapper = topCommentWrapper.find(".replies .comment").first()
+
+    assert.lengthOf(topCommentWrapper.find(".reply-button"), 1)
+    assert.lengthOf(nextCommentWrapper.find(".reply-button"), 0)
+
+    assert.lengthOf(topCommentWrapper.find(ReplyToCommentForm), 1)
+    assert.lengthOf(nextCommentWrapper.find(ReplyToCommentForm), 0)
+
+    assert.lengthOf(topCommentWrapper.find(".replies"), 1)
+    assert.lengthOf(nextCommentWrapper.find(".replies"), 0)
   })
 })

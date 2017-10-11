@@ -507,65 +507,6 @@ def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_sett
         }]
 
 
-@pytest.mark.parametrize("missing_user", [True, False])
-def test_get_comment(client, logged_in_profile, use_betamax, praw_settings, missing_user):
-    """View a comment's detail view"""
-    if missing_user:
-        logged_in_profile.user.username = 'missing'
-        logged_in_profile.user.save()
-
-    url = reverse('comment-detail', kwargs={'comment_id': '6'})
-    resp = client.get(url)
-    if missing_user:
-        assert resp.status_code == status.HTTP_404_NOT_FOUND
-    else:
-        assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == {
-            "id": "6",
-            "post_id": "2",
-            "text": "reply_to_comment 3",
-            "author_id": "george",
-            "score": 1,
-            "upvoted": True,
-            "downvoted": False,
-            "created": "2017-07-25T21:18:47+00:00",
-            "replies": [],
-            'profile_image': logged_in_profile.image_small,
-            'author_name': logged_in_profile.name,
-        }
-
-
-def test_get_comment_no_image(client, logged_in_profile, use_betamax, praw_settings):
-    """View a comment's detail view"""
-    logged_in_profile.image_small = None
-    logged_in_profile.save()
-    url = reverse('comment-detail', kwargs={'comment_id': '6'})
-    resp = client.get(url)
-    assert resp.status_code == 200
-    assert resp.json() == {
-        "id": "6",
-        "post_id": "2",
-        "text": "reply_to_comment 3",
-        "author_id": "george",
-        "score": 1,
-        "upvoted": True,
-        "downvoted": False,
-        "created": "2017-07-25T21:18:47+00:00",
-        "replies": [],
-        'profile_image': default_profile_image,
-        'author_name': logged_in_profile.name,
-    }
-
-
-def test_get_deleted_comment(client, logged_in_profile, use_betamax, praw_settings):
-    """View a comment's detail view"""
-    # make sure reddit user exists on system
-    UserFactory.create(username='admin')
-    url = reverse('comment-detail', kwargs={'comment_id': '1s'})
-    resp = client.get(url)
-    assert resp.status_code == status.HTTP_404_NOT_FOUND
-
-
 def test_create_comment(client, logged_in_profile, use_betamax, praw_settings):
     """Create a comment"""
     post_id = '2'

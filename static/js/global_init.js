@@ -7,7 +7,8 @@ global.requestAnimationFrame = () => {}
 const _createSettings = () => ({
   micromasters_external_login_url: "http://fake.micromasters.url/discussions",
   micromasters_base_url:           "http://fake.micromasters.url/",
-  session_url:                     "http://fake.session.url"
+  session_url:                     "http://fake.session.url",
+  max_comment_depth:               6
 })
 
 global.SETTINGS = _createSettings()

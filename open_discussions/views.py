@@ -38,6 +38,7 @@ def index(request):
         "public_path": public_path(request),
         "auth_url": auth_url,
         "session_url": session_url,
+        "max_comment_depth": settings.OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH,
         "micromasters_external_login_url": settings.MICROMASTERS_EXTERNAL_LOGIN_URL,
         "micromasters_base_url": settings.MICROMASTERS_BASE_URL,
     }
