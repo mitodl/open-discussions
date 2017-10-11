@@ -39,6 +39,7 @@ def index(request):
         "auth_url": auth_url,
         "session_url": session_url,
         "micromasters_external_login_url": settings.MICROMASTERS_EXTERNAL_LOGIN_URL,
+        "micromasters_base_url": settings.MICROMASTERS_BASE_URL,
     }
 
     return render(request, "index.html", context={
