@@ -1,0 +1,42 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510678051_sequi",
+      "public_description": "Nulla molestias tenetur totam iure molestiae. Minima veniam delectus fuga deleniti ullam quidem.",
+      "title": "Corrupti veniam ratione cum natus similique amet."
+    }
+  },
+  "posts": {
+    "link_post": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510678051_sequi",
+        "public_description": "Nulla molestias tenetur totam iure molestiae. Minima veniam delectus fuga deleniti ullam quidem.",
+        "title": "Corrupti veniam ratione cum natus similique amet."
+      },
+      "id": "4v",
+      "title": "Consectetur fugiat error sunt.",
+      "url": "https://www.santos.info/posts/tags/homepage/"
+    },
+    "text_post": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510678051_sequi",
+        "public_description": "Nulla molestias tenetur totam iure molestiae. Minima veniam delectus fuga deleniti ullam quidem.",
+        "title": "Corrupti veniam ratione cum natus similique amet."
+      },
+      "id": "4u",
+      "text": "Ipsum id culpa laboriosam odio. Quae incidunt unde accusantium vitae assumenda atque.",
+      "title": "Odit perferendis dolorem ea."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYXPVHH5X1CWH2S2DN0VEK7G"
+    },
+    "staff_user": {
+      "username": "01BYXPVB781EJHBCJQD9SKWTXB"
+    }
+  }
+}

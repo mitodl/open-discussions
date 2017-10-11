@@ -1,6 +1,7 @@
 """Factories for making test data"""
 import json
 import os
+import time
 from datetime import datetime
 
 import pytz
@@ -171,6 +172,7 @@ class FactoryStore:
             result = factory_cls.create(**kwargs)
             instances[ident] = serialize_factory_result(result)
             self._dirty = True
+            time.sleep(3)  # arbitrary sleep to let reddit async computations catch up
             return result
         else:
             kwargs.update(instances[ident])

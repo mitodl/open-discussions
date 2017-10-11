@@ -235,6 +235,36 @@ class PostSerializer(serializers.Serializer):
         return api.get_post(post_id=post_id)
 
 
+class PostModeratorSerializer(PostSerializer):
+    """Post serializer for moderators"""
+    removed = serializers.SerializerMethodField()
+
+    def get_removed(self, instance):
+        """Returns True if the post was removed"""
+        return instance.banned_by is not None
+
+    # def validate_removed(self, value):
+    #     """Validate that upvoted is a bool"""
+    #     print(value)
+    #     return {'removed': _parse_bool(value, 'removed')}
+
+    def update(self, instance, validated_data):
+        post_id = self.context['view'].kwargs['post_id']
+
+        api = Api(user=self.context['request'].user)
+
+        # moderator actions take precedence over other updates
+        if "removed" in validated_data:
+            if validated_data["removed"]:
+                api.remove_post(post_id)
+            else:
+                api.approve_post(post_id)
+        else:
+            super().update(instance, validated_data)
+
+        return api.get_post(post_id=post_id)
+
+
 class CommentSerializer(serializers.Serializer):
     """Serializer for comments"""
     id = serializers.CharField(read_only=True)

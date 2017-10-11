@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510605188_occaecati",
+      "public_description": "Ipsam magnam minus doloribus. Id maiores ratione veritatis libero corporis.",
+      "title": "Quibusdam architecto non pariatur."
+    }
+  },
+  "posts": {
+    "missing_image": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510605188_occaecati",
+        "public_description": "Ipsam magnam minus doloribus. Id maiores ratione veritatis libero corporis.",
+        "title": "Quibusdam architecto non pariatur."
+      },
+      "id": "3k",
+      "text": "Animi quo in reprehenderit. Consectetur nemo excepturi nihil dignissimos a ab occaecati.",
+      "title": "Quo ea id quasi vel sed fugit ipsam."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYVHBVC2NFXVWX7GGN6ANEKF"
+    },
+    "staff_user": {
+      "username": "01BYVHBVC8X6B7K9WWQPPZ7XPP"
+    }
+  }
+}

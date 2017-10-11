@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2017-11-06T15:31:50",
+      "recorded_at": "2017-11-09T15:48:06",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -26,7 +26,7 @@
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDI0NddNNM9KcjHJqQpKLE8pikxyCspx8UrJTHO1DMtW0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLZZJBYWRWXnuRWam5tmWxrpxjv5RzjrBqcnBziC9KSklmUmp8ZnpoAMhnCUagE3+3tAuAAAAA==",
+          "base64_string": "H4sIAAAAAAAAA1WNTQuCQBRF/4rMMhIULaJdmEgQtCtyM+jM0xkrdT6QGaL/ni9XLe/hnnvfpGIMjKF2eEBP9gGJd6Foy0ncs7y73jaZtX46vs5OSZ5BStYBATdKDYZK7CfbKJrZT6fWj4AbNVQaNHYNGxa0wqShmUXxd+aLJD0Vl7705dMqHuYKVFcPTewOqHCYJAMqOe4ugXy+/qh2q7YAAAA=",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 06 Nov 2017 15:31:52 GMT"
+            "Thu, 09 Nov 2017 15:48:06 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=6TbC9xp5ztbcd54Pfe; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 06-Nov-2019 15:31:52 GMT",
-            "loidcreated=2017-11-06T15%3A31%3A52.585Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 06-Nov-2019 15:31:52 GMT"
+            "loid=IuCsDlNzlx6HbITeFI; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 09-Nov-2019 15:48:06 GMT",
+            "loidcreated=2017-11-09T15%3A48%3A06.651Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 09-Nov-2019 15:48:06 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -70,11 +70,11 @@
       }
     },
     {
-      "recorded_at": "2017-11-06T15:31:50",
+      "recorded_at": "2017-11-09T15:48:06",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "api_type=json&kind=self&resubmit=True&sendreplies=True&sr=doesnt_exist&text=tests+are+great&title=parameterized+testing"
+          "string": ""
         },
         "headers": {
           "Accept": [
@@ -84,81 +84,51 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 157-a7jbD4lzRawdrYbBRlDJdifE9Vk"
+            "bearer 18-hgZvhYCEjVW5CttyvDmLxqidCe4"
           ],
           "Connection": [
             "keep-alive"
           ],
-          "Content-Length": [
-            "119"
-          ],
-          "Content-Type": [
-            "application/x-www-form-urlencoded"
-          ],
           "Cookie": [
-            "loid=6TbC9xp5ztbcd54Pfe; loidcreated=2017-11-06T15%3A31%3A52.585Z"
+            "loid=IuCsDlNzlx6HbITeFI; loidcreated=2017-11-09T15%3A48%3A06.651Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.3.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.3.3 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
-        "method": "POST",
-        "uri": "https://reddit.local/api/submit/?raw_json=1"
+        "method": "GET",
+        "uri": "https://reddit.local/r/doesnt_exist/about/moderators/?user=george&raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"json\": {\"errors\": [[\"SUBREDDIT_NOEXIST\", \"that subreddit doesn't exist\", \"sr\"]]}}"
+          "string": "<html>\n <head>\n  <title>302 Found</title>\n </head>\n <body>\n  <h1>302 Found</h1>\n  The resource was found at <a href=\"https://reddit.local/subreddits/search?q=doesnt_exist\">https://reddit.local/subreddits/search?q=doesnt_exist</a>;\nyou should be redirected automatically.\n\n\n </body>\n</html>"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "83"
+            "289"
           ],
           "Content-Type": [
-            "application/json; charset=UTF-8"
+            "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 06 Nov 2017 15:31:52 GMT"
+            "Thu, 09 Nov 2017 15:48:06 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
           ],
-          "cache-control": [
-            "private, s-maxage=0, max-age=0, must-revalidate"
-          ],
-          "expires": [
-            "-1"
-          ],
-          "x-content-type-options": [
-            "nosniff"
-          ],
-          "x-frame-options": [
-            "SAMEORIGIN"
-          ],
-          "x-ratelimit-remaining": [
-            "298.0"
-          ],
-          "x-ratelimit-reset": [
-            "488"
-          ],
-          "x-ratelimit-used": [
-            "2"
-          ],
-          "x-ua-compatible": [
-            "IE=edge"
-          ],
-          "x-xss-protection": [
-            "1; mode=block"
+          "location": [
+            "https://reddit.local/subreddits/search?q=doesnt_exist"
           ]
         },
         "status": {
-          "code": 200,
-          "message": "OK"
+          "code": 302,
+          "message": "Found"
         },
-        "url": "https://reddit.local/api/submit/?raw_json=1"
+        "url": "https://reddit.local/r/doesnt_exist/about/moderators/?user=george&raw_json=1"
       }
     }
   ],

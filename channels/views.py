@@ -20,6 +20,7 @@ from channels.serializers import (
     ContributorSerializer,
     SubscriberSerializer,
     PostSerializer,
+    PostModeratorSerializer,
     ModeratorSerializer,
 )
 from channels.utils import (
@@ -131,6 +132,24 @@ def _lookup_users_for_posts(posts):
     return {user.username: user for user in users}
 
 
+def _get_post_serializer_class(user, channel_name):
+    """
+    Serializer class for this user
+
+    Args:
+        user (User): user performing the request
+        channel_name (str): name of the channel
+
+    Returns:
+        cls: serializer class to use
+    """
+    api = Api(user=user)
+    print(channel_name)
+    if api.list_moderators(channel_name, moderator_name=user.username):
+        return PostModeratorSerializer
+    return PostSerializer
+
+
 class PostListView(APIView):
     """
     View for listing and creating posts
@@ -153,8 +172,9 @@ class PostListView(APIView):
             users = _lookup_users_for_posts(posts)
             posts = [post for post in posts if post.author and post.author.name in users]
 
+            serializer_cls = _get_post_serializer_class(request.user, self.kwargs['channel_name'])
             return Response({
-                'posts': PostSerializer(posts, many=True, context={
+                'posts': serializer_cls(posts, many=True, context={
                     **self.get_serializer_context(),
                     'users': users,
                 }).data,
@@ -164,7 +184,8 @@ class PostListView(APIView):
     def post(self, request, *args, **kwargs):
         """Create a new post"""
         with translate_praw_exceptions():
-            serializer = PostSerializer(data=request.data, context=self.get_serializer_context())
+            serializer_cls = _get_post_serializer_class(request.user, self.kwargs['channel_name'])
+            serializer = serializer_cls(data=request.data, context=self.get_serializer_context())
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(
@@ -194,11 +215,12 @@ class PostDetailView(APIView):
         """Get post"""
         with translate_praw_exceptions():
             post = self.get_object()
+            serializer_cls = _get_post_serializer_class(request.user, post.subreddit.display_name)
             users = _lookup_users_for_posts([post])
             if not post.author or post.author.name not in users:
                 raise NotFound()
             return Response(
-                PostSerializer(
+                serializer_cls(
                     instance=post,
                     context={
                         **self.get_serializer_context(),
@@ -216,7 +238,8 @@ class PostDetailView(APIView):
         """Update a post"""
         with translate_praw_exceptions():
             post = self.get_object()
-            serializer = PostSerializer(
+            serializer_cls = _get_post_serializer_class(request.user, post.subreddit.display_name)
+            serializer = serializer_cls(
                 instance=post,
                 data=request.data,
                 context=self.get_serializer_context(),

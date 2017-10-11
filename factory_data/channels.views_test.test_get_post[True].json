@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510605187_saepe",
+      "public_description": "Debitis est aliquid natus occaecati natus. Totam aperiam ex perferendis eos aut.",
+      "title": "Nulla modi nam autem quis repudiandae nihil."
+    }
+  },
+  "posts": {
+    "missing_image": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510605187_saepe",
+        "public_description": "Debitis est aliquid natus occaecati natus. Totam aperiam ex perferendis eos aut.",
+        "title": "Nulla modi nam autem quis repudiandae nihil."
+      },
+      "id": "3j",
+      "text": "Delectus occaecati qui quas sapiente deleniti eum. Dolorum alias fugit cum omnis ab doloremque.",
+      "title": "At officia eum soluta."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYVHBTE0DPRTQVYV43HGCFY5"
+    },
+    "staff_user": {
+      "username": "01BYVHBTE71WEZ9ZTMWT7CQGC6"
+    }
+  }
+}

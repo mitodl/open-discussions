@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510605086_sequi",
+      "public_description": "Aliquid aperiam repellat incidunt praesentium. Tenetur fuga totam pariatur culpa vel facilis.",
+      "title": "Commodi recusandae quam amet tempora."
+    }
+  },
+  "posts": {
+    "deleted": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510605086_sequi",
+        "public_description": "Aliquid aperiam repellat incidunt praesentium. Tenetur fuga totam pariatur culpa vel facilis.",
+        "title": "Commodi recusandae quam amet tempora."
+      },
+      "id": "3h",
+      "text": "Unde laudantium dolor porro maiores. Laborum error commodi rem.",
+      "title": "Harum ex at cumque minima."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYVH8R1HMGAQZSWZGMV5SQ95"
+    },
+    "staff_user": {
+      "username": "01BYVH8QM49NDTRK4S76GMM3AK"
+    }
+  }
+}

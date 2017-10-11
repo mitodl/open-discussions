@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510605087_blanditiis",
+      "public_description": "Quidem nostrum voluptatum nihil velit dignissimos maiores minus. Eveniet maxime culpa magnam.",
+      "title": "Quas soluta velit rem adipisci."
+    }
+  },
+  "posts": {
+    "deleted": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510605087_blanditiis",
+        "public_description": "Quidem nostrum voluptatum nihil velit dignissimos maiores minus. Eveniet maxime culpa magnam.",
+        "title": "Quas soluta velit rem adipisci."
+      },
+      "id": "3i",
+      "text": "Maxime eius harum cupiditate doloribus ex. Ratione reiciendis similique blanditiis.",
+      "title": "Voluptatem numquam ad placeat rerum vero in."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYVH8S1QP07BADE5ZARMW6GG"
+    },
+    "staff_user": {
+      "username": "01BYVH8RMP50YCT7SSSWX449TY"
+    }
+  }
+}

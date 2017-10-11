@@ -407,6 +407,26 @@ class Api:
 
         return post.edit(text)
 
+    def remove_post(self, post_id):
+        """
+        Removes the post, opposite of approve_post
+
+        Args:
+            post_id(str): the base36 id for the post
+        """
+        post = self.get_post(post_id)
+        post.mod.remove()
+
+    def approve_post(self, post_id):
+        """
+        Approves the post, oppsite of remove_post
+
+        Args:
+            post_id(str): the base36 id for the post
+        """
+        post = self.get_post(post_id)
+        post.mod.approve()
+
     def create_comment(self, text, post_id=None, comment_id=None):
         """
         Create a new comment in reply to a post or comment
@@ -606,17 +626,18 @@ class Api:
             # and the double removal case is probably more common.
             pass
 
-    def list_moderators(self, channel_name):
+    def list_moderators(self, channel_name, moderator_name=None):
         """
         Returns a list of moderators for the channel
 
         Args:
             channel_name(str): name of the channel
+            moderator_name(str): username of the user
 
         Returns:
             praw.models.listing.generator.ListingGenerator: a generator representing the contributors in the channel
         """
-        return self.get_channel(channel_name).moderator()
+        return self.get_channel(channel_name).moderator(redditor=moderator_name)
 
     def add_subscriber(self, subscriber_name, channel_name):
         """

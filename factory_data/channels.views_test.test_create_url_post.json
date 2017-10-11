@@ -1,0 +1,18 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510242483_tenetur",
+      "public_description": "Nisi eius enim nemo adipisci tempora ipsum quas. Autem rem reprehenderit ea culpa.",
+      "title": "Non fugit dolorum cumque culpa."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYGQEZ7J1DN9NV1ET5GCS2BE"
+    },
+    "staff_user": {
+      "username": "01BYGQEZ7SKEQMATJE41EWSXBC"
+    }
+  }
+}
