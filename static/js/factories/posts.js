@@ -22,6 +22,7 @@ export const makePost = (
   created:       casual.moment.format(),
   num_comments:  Math.round(Math.random() * 10),
   channel_name:  channelName,
+  channel_title: casual.string,
   profile_image: casual.url,
   author_name:   casual.name
 })

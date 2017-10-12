@@ -1,0 +1,25 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510761854_minus",
+      "public_description": "Nulla qui magnam ipsa rerum. Tenetur sapiente consequatur tenetur eveniet optio pariatur.",
+      "title": "Tenetur dignissimos deserunt repellendus."
+    }
+  },
+  "posts": {
+    "my geat post": {
+      "id": "2j",
+      "text": "Qui ex vel omnis excepturi sunt vero. Fuga incidunt cupiditate ipsam nam.",
+      "title": "Quos aliquid sint labore magnam."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZ06RXN6WJV94GCT1176D96T"
+    },
+    "staff_user": {
+      "username": "01BZ06RX3Z44K6B7H9ZK2DAS4Q"
+    }
+  }
+}

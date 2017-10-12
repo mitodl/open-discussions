@@ -54,7 +54,9 @@ describe("CompactPostDisplay", () => {
   it("should link to the subreddit, if told to", () => {
     post.channel_name = "channel_name"
     const wrapper = renderPostDisplay({ post: post, showChannelLink: true })
-    assert.equal(wrapper.find(Link).at(1).props().to, "/channel/channel_name")
+    const linkProps = wrapper.find(Link).at(1).props()
+    assert.equal(linkProps.to, "/channel/channel_name")
+    assert.equal(linkProps.children, post.channel_title)
   })
 
   it("should include an external link, if a url post", () => {

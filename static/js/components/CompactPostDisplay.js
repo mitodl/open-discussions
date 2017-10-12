@@ -25,7 +25,8 @@ class CompactPostDisplay extends React.Component {
 
     return showChannelLink && post.channel_name
       ? <span>
-          in <Link to={channelURL(post.channel_name)}>{post.channel_name}</Link>
+          in{" "}
+        <Link to={channelURL(post.channel_name)}>{post.channel_title}</Link>
       </span>
       : null
   }

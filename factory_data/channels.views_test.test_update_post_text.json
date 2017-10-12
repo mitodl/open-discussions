@@ -1,0 +1,25 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510686591_voluptatem",
+      "public_description": "Corporis voluptas repellat rerum assumenda nam fuga. Error nobis omnis voluptatum magnam ullam.",
+      "title": "Ducimus animi rem ducimus."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "1f",
+      "text": "Consequatur omnis nihil architecto ducimus quo. Numquam autem nesciunt corrupti quae voluptatem.",
+      "title": "Deleniti earum alias commodi."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYXZ026AD4RT0G90VDEQQQEZ"
+    },
+    "staff_user": {
+      "username": "01BYXZ01PZYKE91RT4TYJ6NRZ4"
+    }
+  }
+}

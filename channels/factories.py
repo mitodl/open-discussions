@@ -83,14 +83,12 @@ def serialize_factory_result(obj):
                 "id": obj.id,
                 "title": obj.title,
                 "url": obj.url,
-                "channel": serialize_factory_result(obj.channel),
             }
         elif obj.text is not None:
             return {
                 "id": obj.id,
                 "title": obj.title,
                 "text": obj.text,
-                "channel": serialize_factory_result(obj.channel),
             }
     elif isinstance(obj, Channel):
         return {

@@ -1,0 +1,40 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510680838_sint",
+      "public_description": "Magnam consequatur molestias eos nemo doloremque natus expedita. Natus et numquam sequi suscipit.",
+      "title": "Ratione quos nostrum occaecati dolor aliquid."
+    }
+  },
+  "posts": {
+    "my 2nd post": {
+      "id": "15",
+      "text": "Facilis temporibus excepturi amet ea unde ex facilis. Quam culpa amet eum ut. Aliquid eum quae ad.",
+      "title": "Nam amet alias quaerat enim."
+    },
+    "my 3rd post": {
+      "id": "16",
+      "text": "Ea laudantium est laborum rem repellendus harum beatae. Fuga itaque quia sed unde officiis fuga.",
+      "title": "Impedit natus cum odio quia itaque."
+    },
+    "my 4th post": {
+      "id": "17",
+      "text": "Amet odio maiores ratione. Ullam ab ex temporibus nulla assumenda molestias.",
+      "title": "Saepe corporis quod enim modi porro."
+    },
+    "my post": {
+      "id": "14",
+      "text": "Laboriosam quibusdam molestias corrupti id. Beatae natus modi odio.",
+      "title": "Quas hic modi fuga molestiae."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYXSGH044G1GEMQ9R6EVSX91"
+    },
+    "staff_user": {
+      "username": "01BYXSGGENFKK3FQET4PYVY11W"
+    }
+  }
+}

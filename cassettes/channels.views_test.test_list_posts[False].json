@@ -1,245 +1,1046 @@
 {
   "http_interactions": [
     {
+      "recorded_at": "2017-11-15T16:25:27",
       "request": {
         "body": {
           "encoding": "utf-8",
           "string": ""
         },
         "headers": {
-          "User-Agent": [
-            "python-requests/2.18.1"
+          "Accept": [
+            "*/*"
           ],
           "Accept-Encoding": [
             "gzip, deflate"
           ],
-          "Accept": [
-            "*/*"
-          ],
           "Connection": [
             "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01BZ07ZR4AN7N1EX11RXKQEE1D"
       },
       "response": {
         "body": {
-          "encoding": "UTF-8",
-          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDLWtbDwycv0Nq/IcU32M8hz90kxCwy2MDF0NktyVNJRUEqtKMgsSi2OzwQpNzYzMACKgXXHl1QWpIKMSEpNLEotAqktTs6HCGmBeEWpaUCNGch2hYY7xpfphhcaFSW6F2aEVWQVemaHGEWWZVa5gnSkpJZlJqfGZ6aAjIVwlGoBj0HGm7QAAAA="
+          "base64_string": "H4sIAAAAAAAAA1WNwQqCQBRFf0XeMgpGKou2IQgujEKMNoMzPmtUnPGNaBH9e06uWt7DPfe+IZcSreW9rrGFgwf+ZruKssbeDQ2pKq4nlrJO4C3BHdtnIyw9wKdRhJYrJ6wDxib283n/MuhGBOaE5LpW6hktXCIsJ/Hx/xZGZUKjiru20b2IjtU5EJec/LiqnVPgoCRyVbjhOcDnC12cTvu4AAAA",
+          "encoding": "UTF-8"
         },
         "headers": {
-          "Date": [
-            "Fri, 21 Jul 2017 19:10:40 GMT"
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
           ],
           "Content-Type": [
             "text/html; charset=UTF-8"
           ],
-          "Transfer-Encoding": [
-            "chunked"
-          ],
-          "Connection": [
-            "keep-alive"
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:27 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
           ],
-          "x-frame-options": [
-            "SAMEORIGIN"
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=oRxU5hVulfedbhCp2A; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Fri, 15-Nov-2019 16:25:27 GMT",
+            "loidcreated=2017-11-15T16%3A25%3A27.008Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Fri, 15-Nov-2019 16:25:27 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
           ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
           "x-xss-protection": [
             "1; mode=block"
-          ],
-          "set-cookie": [
-            "loid=NE5e2SGM7RUxTYnL6G; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 21-Jul-2019 19:10:40 GMT",
-            "loidcreated=2017-07-21T19%3A10%3A40.278Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 21-Jul-2019 19:10:40 GMT"
-          ],
-          "Content-Encoding": [
-            "gzip"
           ]
         },
         "status": {
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=george"
-      },
-      "recorded_at": "2017-07-21T19:10:40"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01BZ07ZR4AN7N1EX11RXKQEE1D"
+      }
     },
     {
+      "recorded_at": "2017-11-15T16:25:27",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "grant_type=refresh_token&refresh_token=3-UWA_v-Wq2raGqhVxjqIkT2YvizE"
+          "string": "api_type=json&link_type=any&name=1510763127_magnam&public_description=Doloribus+quam+blanditiis+quod+soluta+cumque.+Laudantium+quis+delectus+ipsam+delectus.&title=Tenetur+non+excepturi+error.&type=private&wikimode=disabled"
         },
         "headers": {
-          "User-Agent": [
-            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          "Accept": [
+            "*/*"
           ],
           "Accept-Encoding": [
             "gzip, deflate"
           ],
-          "Accept": [
-            "*/*"
+          "Authorization": [
+            "bearer 145-HWlsgprvUidXP0U0qbeZOe708Ww"
           ],
           "Connection": [
             "keep-alive"
           ],
-          "Cookie": [
-            "loid=NE5e2SGM7RUxTYnL6G; loidcreated=2017-07-21T19%3A10%3A40.278Z"
-          ],
           "Content-Length": [
-            "68"
+            "222"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
-          "Authorization": [
-            "Basic QndDWlpETWd2NWVacnc6dXBQZE9Sb3VyUmQtMVFoNy1yMUptRENxOWxn"
+          "Cookie": [
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
-        "uri": "https://reddit.local/api/v1/access_token"
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"access_token\": \"3-h3rDQYK3byM8bGtzTlwb3zUOO24\", \"token_type\": \"bearer\", \"expires_in\": 3600, \"scope\": \"*\"}"
+          "string": "{\"json\": {\"errors\": []}}"
         },
         "headers": {
-          "Date": [
-            "Fri, 21 Jul 2017 19:10:40 GMT"
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
-          "Content-Length": [
-            "107"
-          ],
-          "Connection": [
-            "keep-alive"
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:27 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
           ],
-          "x-frame-options": [
-            "SAMEORIGIN"
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
           ],
           "x-content-type-options": [
             "nosniff"
           ],
-          "x-xss-protection": [
-            "1; mode=block"
+          "x-frame-options": [
+            "SAMEORIGIN"
           ],
           "x-ratelimit-remaining": [
-            "299"
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "273"
           ],
           "x-ratelimit-used": [
             "1"
           ],
-          "x-ratelimit-reset": [
-            "560"
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
           ]
         },
         "status": {
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/access_token"
-      },
-      "recorded_at": "2017-07-21T19:10:40"
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
     },
     {
+      "recorded_at": "2017-11-15T16:25:27",
       "request": {
         "body": {
           "encoding": "utf-8",
           "string": ""
         },
         "headers": {
-          "User-Agent": [
-            "MIT-Open: 0.0.0 PRAW/4.5.1 prawcore/0.10.1"
+          "Accept": [
+            "*/*"
           ],
           "Accept-Encoding": [
             "gzip, deflate"
           ],
-          "Accept": [
-            "*/*"
-          ],
           "Connection": [
             "keep-alive"
           ],
-          "Authorization": [
-            "bearer 3-h3rDQYK3byM8bGtzTlwb3zUOO24"
-          ],
           "Cookie": [
-            "loid=NE5e2SGM7RUxTYnL6G; loidcreated=2017-07-21T19%3A10%3A40.278Z"
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/r/two_posts/hot?count=0&limit=25&raw_json=1"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01BZ07ZRKHE3VHNC2F4PJV03E7"
       },
       "response": {
         "body": {
-          "encoding": "UTF-8",
-          "string": "{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"domain\": \"self.two_posts\", \"subreddit\": \"two_posts\", \"selftext_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003E\\ud83d\\udc36 \\ud83d\\udc31 \\ud83d\\udc2d \\ud83d\\udc39 \\ud83d\\udc30 \\ud83e\\udd8a \\ud83d\\udc3b \\ud83d\\udc3c \\ud83d\\udc28 \\ud83d\\udc2f \\ud83e\\udd81 \\ud83d\\udc2e \\ud83d\\udc37 \\ud83d\\udc3d \\ud83d\\udc38 \\ud83d\\udc35 \\ud83d\\ude4a \\ud83d\\ude49 \\ud83d\\ude4a \\ud83d\\udc12 \\ud83d\\udc14 \\ud83d\\udc27 \\ud83d\\udc26 \\ud83d\\udc24 \\ud83d\\udc23 \\ud83d\\udc25 \\ud83e\\udd86 \\ud83e\\udd85 \\ud83e\\udd89 \\ud83e\\udd87 \\ud83d\\udc3a \\ud83d\\udc17 \\ud83d\\udc34 \\ud83e\\udd84 \\ud83d\\udc1d \\ud83d\\udc1b \\ud83e\\udd8b \\ud83d\\udc0c \\ud83d\\udc1a \\ud83d\\udc1e \\ud83d\\udc1c \\ud83d\\udd77 \\ud83d\\udd78 \\ud83d\\udc22 \\ud83d\\udc0d \\ud83e\\udd8e \\ud83e\\udd82 \\ud83e\\udd80 \\ud83e\\udd91 \\ud83d\\udc19 \\ud83e\\udd90 \\ud83d\\udc20 \\ud83d\\udc1f \\ud83d\\udc21 \\ud83d\\udc2c \\ud83e\\udd88 \\ud83d\\udc33 \\ud83d\\udc0b \\ud83d\\udc0a \\ud83d\\udc06 \\ud83d\\udc05 \\ud83d\\udc03 \\ud83d\\udc02 \\ud83d\\udc04 \\ud83e\\udd8c \\ud83d\\udc2a \\ud83d\\udc2b \\ud83d\\udc18 \\ud83e\\udd8f \\ud83e\\udd8d \\ud83d\\udc0e \\ud83d\\udc16 \\ud83d\\udc10 \\ud83d\\udc0f \\ud83d\\udc11 \\ud83d\\udc15 \\ud83d\\udc29 \\ud83d\\udc08 \\ud83d\\udc13 \\ud83e\\udd83 \\ud83d\\udd4a \\ud83d\\udc07 \\ud83d\\udc01 \\ud83d\\udc00 \\ud83d\\udc3f \\ud83d\\udc3e \\ud83d\\udc09 \\ud83d\\udc32 \\ud83c\\udf35 \\ud83c\\udf84 \\ud83c\\udf32 \\ud83c\\udf33 \\ud83c\\udf34 \\ud83c\\udf31 \\ud83c\\udf3f \\u2618\\ufe0f \\ud83c\\udf40 \\ud83c\\udf8d \\ud83c\\udf8b \\ud83c\\udf43 \\ud83c\\udf42 \\ud83c\\udf41 \\ud83c\\udf44 \\ud83c\\udf3e \\ud83d\\udc90 \\ud83c\\udf37 \\ud83c\\udf39 \\ud83e\\udd40 \\ud83c\\udf3b \\ud83c\\udf3c \\ud83c\\udf38 \\ud83c\\udf3a \\ud83c\\udf0e \\ud83c\\udf0d \\ud83c\\udf0f \\ud83c\\udf15 \\ud83c\\udf16 \\ud83c\\udf17 \\ud83c\\udf18 \\ud83c\\udf11 \\ud83c\\udf12 \\ud83c\\udf13 \\ud83c\\udf14 \\ud83c\\udf1a \\ud83c\\udf1d \\ud83c\\udf1e \\ud83c\\udf1b \\ud83c\\udf1c \\ud83c\\udf19 \\ud83d\\udcab \\u2b50\\ufe0f \\ud83c\\udf1f \\u2728 \\u26a1\\ufe0f \\ud83d\\udd25 \\ud83d\\udca5 \\u2604\\ufe0f \\u2600\\ufe0f \\ud83c\\udf24 \\u26c5\\ufe0f \\ud83c\\udf25 \\ud83c\\udf26 \\ud83c\\udf08 \\u2601\\ufe0f \\ud83c\\udf27 \\u26c8 \\ud83c\\udf29 \\ud83c\\udf28 \\u2603\\ufe0f \\u26c4\\ufe0f \\u2744\\ufe0f \\ud83c\\udf2c \\ud83d\\udca8 \\ud83c\\udf2a \\ud83c\\udf2b \\ud83c\\udf0a \\ud83d\\udca7 \\ud83d\\udca6 \\u2614\\ufe0f\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"selftext\": \"\\ud83d\\udc36 \\ud83d\\udc31 \\ud83d\\udc2d \\ud83d\\udc39 \\ud83d\\udc30 \\ud83e\\udd8a \\ud83d\\udc3b \\ud83d\\udc3c \\ud83d\\udc28 \\ud83d\\udc2f \\ud83e\\udd81 \\ud83d\\udc2e \\ud83d\\udc37 \\ud83d\\udc3d \\ud83d\\udc38 \\ud83d\\udc35 \\ud83d\\ude4a \\ud83d\\ude49 \\ud83d\\ude4a \\ud83d\\udc12 \\ud83d\\udc14 \\ud83d\\udc27 \\ud83d\\udc26 \\ud83d\\udc24 \\ud83d\\udc23 \\ud83d\\udc25 \\ud83e\\udd86 \\ud83e\\udd85 \\ud83e\\udd89 \\ud83e\\udd87 \\ud83d\\udc3a \\ud83d\\udc17 \\ud83d\\udc34 \\ud83e\\udd84 \\ud83d\\udc1d \\ud83d\\udc1b \\ud83e\\udd8b \\ud83d\\udc0c \\ud83d\\udc1a \\ud83d\\udc1e \\ud83d\\udc1c \\ud83d\\udd77 \\ud83d\\udd78 \\ud83d\\udc22 \\ud83d\\udc0d \\ud83e\\udd8e \\ud83e\\udd82 \\ud83e\\udd80 \\ud83e\\udd91 \\ud83d\\udc19 \\ud83e\\udd90 \\ud83d\\udc20 \\ud83d\\udc1f \\ud83d\\udc21 \\ud83d\\udc2c \\ud83e\\udd88 \\ud83d\\udc33 \\ud83d\\udc0b \\ud83d\\udc0a \\ud83d\\udc06 \\ud83d\\udc05 \\ud83d\\udc03 \\ud83d\\udc02 \\ud83d\\udc04 \\ud83e\\udd8c \\ud83d\\udc2a \\ud83d\\udc2b \\ud83d\\udc18 \\ud83e\\udd8f \\ud83e\\udd8d \\ud83d\\udc0e \\ud83d\\udc16 \\ud83d\\udc10 \\ud83d\\udc0f \\ud83d\\udc11 \\ud83d\\udc15 \\ud83d\\udc29 \\ud83d\\udc08 \\ud83d\\udc13 \\ud83e\\udd83 \\ud83d\\udd4a \\ud83d\\udc07 \\ud83d\\udc01 \\ud83d\\udc00 \\ud83d\\udc3f \\ud83d\\udc3e \\ud83d\\udc09 \\ud83d\\udc32 \\ud83c\\udf35 \\ud83c\\udf84 \\ud83c\\udf32 \\ud83c\\udf33 \\ud83c\\udf34 \\ud83c\\udf31 \\ud83c\\udf3f \\u2618\\ufe0f \\ud83c\\udf40 \\ud83c\\udf8d \\ud83c\\udf8b \\ud83c\\udf43 \\ud83c\\udf42 \\ud83c\\udf41 \\ud83c\\udf44 \\ud83c\\udf3e \\ud83d\\udc90 \\ud83c\\udf37 \\ud83c\\udf39 \\ud83e\\udd40 \\ud83c\\udf3b \\ud83c\\udf3c \\ud83c\\udf38 \\ud83c\\udf3a \\ud83c\\udf0e \\ud83c\\udf0d \\ud83c\\udf0f \\ud83c\\udf15 \\ud83c\\udf16 \\ud83c\\udf17 \\ud83c\\udf18 \\ud83c\\udf11 \\ud83c\\udf12 \\ud83c\\udf13 \\ud83c\\udf14 \\ud83c\\udf1a \\ud83c\\udf1d \\ud83c\\udf1e \\ud83c\\udf1b \\ud83c\\udf1c \\ud83c\\udf19 \\ud83d\\udcab \\u2b50\\ufe0f \\ud83c\\udf1f \\u2728 \\u26a1\\ufe0f \\ud83d\\udd25 \\ud83d\\udca5 \\u2604\\ufe0f \\u2600\\ufe0f \\ud83c\\udf24 \\u26c5\\ufe0f \\ud83c\\udf25 \\ud83c\\udf26 \\ud83c\\udf08 \\u2601\\ufe0f \\ud83c\\udf27 \\u26c8 \\ud83c\\udf29 \\ud83c\\udf28 \\u2603\\ufe0f \\u26c4\\ufe0f \\u2744\\ufe0f \\ud83c\\udf2c \\ud83d\\udca8 \\ud83c\\udf2a \\ud83c\\udf2b \\ud83c\\udf0a \\ud83d\\udca7 \\ud83d\\udca6 \\u2614\\ufe0f\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"30\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": [], \"author\": \"george\", \"media\": null, \"name\": \"t3_30\", \"score\": 1, \"approved_by\": null, \"over_18\": false, \"removal_reason\": null, \"hidden\": false, \"thumbnail\": \"\", \"subreddit_id\": \"t5_f\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"mod_reports\": [], \"archived\": false, \"media_embed\": {}, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/two_posts/comments/30/text_post/\", \"locked\": false, \"stickied\": false, \"created\": 1500664226.0, \"url\": \"http://reddit.local/r/two_posts/comments/30/text_post/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Text post\", \"created_utc\": 1500664226.0, \"link_flair_text\": null, \"distinguished\": null, \"num_comments\": 0, \"visited\": false, \"num_reports\": 0, \"ups\": 1}}, {\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"domain\": \"micromasters.mit.edu\", \"subreddit\": \"two_posts\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"2z\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": [], \"author\": \"george\", \"media\": null, \"name\": \"t3_2z\", \"score\": 1, \"approved_by\": null, \"over_18\": false, \"removal_reason\": null, \"hidden\": false, \"thumbnail\": \"\", \"subreddit_id\": \"t5_f\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"mod_reports\": [], \"archived\": false, \"media_embed\": {}, \"is_self\": false, \"hide_score\": false, \"permalink\": \"/r/two_posts/comments/2z/link_post/\", \"locked\": false, \"stickied\": false, \"created\": 1500664177.0, \"url\": \"http://micromasters.mit.edu\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Link post\", \"created_utc\": 1500664177.0, \"link_flair_text\": null, \"distinguished\": null, \"num_comments\": 0, \"visited\": false, \"num_reports\": 0, \"ups\": 1}}], \"after\": null, \"before\": null}}"
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDI0MdMNcy+oyo5MCs4wcS4MDPYPSo1ySk73MLH0iyhX0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLYVR2S7exe65Ya7ubmYRRp5ZFRZ+BqkG4VEROSD9KSklmUmp8ZnpoAMhnCUagFWDObLuAAAAA==",
+          "encoding": "UTF-8"
         },
         "headers": {
-          "Date": [
-            "Fri, 21 Jul 2017 19:10:40 GMT"
-          ],
-          "Content-Type": [
-            "application/json; charset=UTF-8"
-          ],
-          "Content-Length": [
-            "6519"
-          ],
           "Connection": [
             "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:27 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
           ],
-          "x-ua-compatible": [
-            "IE=edge"
-          ],
-          "x-frame-options": [
-            "SAMEORIGIN"
+          "Transfer-Encoding": [
+            "chunked"
           ],
           "x-content-type-options": [
             "nosniff"
           ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
           "x-xss-protection": [
             "1; mode=block"
-          ],
-          "expires": [
-            "-1"
-          ],
-          "cache-control": [
-            "private, s-maxage=0, max-age=0, must-revalidate"
-          ],
-          "x-ratelimit-remaining": [
-            "299.0"
-          ],
-          "x-ratelimit-used": [
-            "1"
-          ],
-          "x-ratelimit-reset": [
-            "560"
-          ],
-          "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=bTu9brOrnlZnPN%2FesENSDAFr%2BhqKgc910w4%2BaHlCj1GQaX6LpSMNCFbf%2Bt2RLBxoME2ghsK55KPRGgj1hVLQ9YO%2BYuBfv34n"
           ]
         },
         "status": {
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/r/two_posts/hot?count=0&limit=25&raw_json=1"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01BZ07ZRKHE3VHNC2F4PJV03E7"
+      }
+    },
+    {
+      "recorded_at": "2017-11-15T16:25:27",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&name=01BZ07ZRKHE3VHNC2F4PJV03E7&type=contributor"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 145-HWlsgprvUidXP0U0qbeZOe708Ww"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "62"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/r/1510763127_magnam/api/friend/?raw_json=1"
       },
-      "recorded_at": "2017-07-21T19:10:40"
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:27 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "273"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1510763127_magnam/api/friend/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-11-15T16:25:27",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "action=sub&api_type=json&skip_inital_defaults=True&sr_name=1510763127_magnam"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 146-VGpzkYbSh4CqQSOReZBcgH49NXw"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "76"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/subscribe/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "2"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:27 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "273"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/subscribe/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-11-15T16:25:28",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&kind=self&resubmit=True&sendreplies=True&sr=1510763127_magnam&text=Voluptate+porro+corrupti+iusto+modi+corporis+qui.+Nemo+facere+libero+tempore+animi+rerum+sed.&title=Laborum+qui+nobis+odio+qui+enim."
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 146-VGpzkYbSh4CqQSOReZBcgH49NXw"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "213"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/submit/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": [], \"data\": {\"url\": \"https://reddit.local/r/1510763127_magnam/comments/2p/laborum_qui_nobis_odio_qui_enim/\", \"id\": \"2p\", \"name\": \"t3_2p\"}}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "159"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:28 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "273"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/submit/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-11-15T16:25:28",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 146-VGpzkYbSh4CqQSOReZBcgH49NXw"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/comments/2p/?limit=2048&sort=best&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1510763127_magnam\", \"selftext_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EVoluptate porro corrupti iusto modi corporis qui. Nemo facere libero tempore animi rerum sed.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"selftext\": \"Voluptate porro corrupti iusto modi corporis qui. Nemo facere libero tempore animi rerum sed.\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"2p\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01BZ07ZRKHE3VHNC2F4PJV03E7\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1510763127_magnam\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_25\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1510763127_magnam/comments/2p/laborum_qui_nobis_odio_qui_enim/\", \"locked\": false, \"name\": \"t3_2p\", \"created\": 1510763127.0, \"url\": \"http://reddit.local/r/1510763127_magnam/comments/2p/laborum_qui_nobis_odio_qui_enim/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Laborum qui nobis odio qui enim.\", \"created_utc\": 1510763127.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "1750"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:28 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "297.0"
+          ],
+          "x-ratelimit-reset": [
+            "272"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=Lk%2F0shyS864D2FDj5yofOegPvfwE3ffdOxLv1jhgeRugIrRlziJ%2BQTQApv1QALlepKWW71WpA1LYcdeZqEDlQ9ttmEf37QFd"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/comments/2p/?limit=2048&sort=best&raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-11-15T16:25:28",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&kind=self&resubmit=True&sendreplies=True&sr=1510763127_magnam&text=Blanditiis+mollitia+ipsum+quod+nostrum+quidem+et.+Veniam+sunt+officiis+et+maiores.&title=Amet+quos+enim+commodi+doloribus+ad+incidunt."
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 146-VGpzkYbSh4CqQSOReZBcgH49NXw"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "215"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/submit/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": [], \"data\": {\"url\": \"https://reddit.local/r/1510763127_magnam/comments/2q/amet_quos_enim_commodi_doloribus_ad_incidunt/\", \"id\": \"2q\", \"name\": \"t3_2q\"}}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "172"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:28 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "296.0"
+          ],
+          "x-ratelimit-reset": [
+            "272"
+          ],
+          "x-ratelimit-used": [
+            "4"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/submit/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-11-15T16:25:28",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 146-VGpzkYbSh4CqQSOReZBcgH49NXw"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/comments/2q/?limit=2048&sort=best&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1510763127_magnam\", \"selftext_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EBlanditiis mollitia ipsum quod nostrum quidem et. Veniam sunt officiis et maiores.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"selftext\": \"Blanditiis mollitia ipsum quod nostrum quidem et. Veniam sunt officiis et maiores.\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"2q\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01BZ07ZRKHE3VHNC2F4PJV03E7\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1510763127_magnam\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_25\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1510763127_magnam/comments/2q/amet_quos_enim_commodi_doloribus_ad_incidunt/\", \"locked\": false, \"name\": \"t3_2q\", \"created\": 1510763128.0, \"url\": \"http://reddit.local/r/1510763127_magnam/comments/2q/amet_quos_enim_commodi_doloribus_ad_incidunt/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Amet quos enim commodi doloribus ad incidunt.\", \"created_utc\": 1510763128.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "1767"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:28 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "295.0"
+          ],
+          "x-ratelimit-reset": [
+            "272"
+          ],
+          "x-ratelimit-used": [
+            "5"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=iSrnVgprJCIGo%2F8bBeMrQNqqdHWCK01EpYfAFO8MmrWNXQgTwH9s5Eo4sL5S2nrHMydRh5fc5ZkYwRFk5ewQPrk0fSrtYAim"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/comments/2q/?limit=2048&sort=best&raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-11-15T16:25:31",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 146-VGpzkYbSh4CqQSOReZBcgH49NXw"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1510763127_magnam/hot?count=0&limit=25&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"domain\": \"self.1510763127_magnam\", \"subreddit\": \"1510763127_magnam\", \"selftext_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EBlanditiis mollitia ipsum quod nostrum quidem et. Veniam sunt officiis et maiores.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"selftext\": \"Blanditiis mollitia ipsum quod nostrum quidem et. Veniam sunt officiis et maiores.\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"2q\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01BZ07ZRKHE3VHNC2F4PJV03E7\", \"media\": null, \"name\": \"t3_2q\", \"score\": 1, \"approved_by\": null, \"over_18\": false, \"removal_reason\": null, \"hidden\": false, \"thumbnail\": \"\", \"subreddit_id\": \"t5_25\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"mod_reports\": [], \"archived\": false, \"media_embed\": {}, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1510763127_magnam/comments/2q/amet_quos_enim_commodi_doloribus_ad_incidunt/\", \"locked\": false, \"stickied\": false, \"created\": 1510763128.0, \"url\": \"http://reddit.local/r/1510763127_magnam/comments/2q/amet_quos_enim_commodi_doloribus_ad_incidunt/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Amet quos enim commodi doloribus ad incidunt.\", \"created_utc\": 1510763128.0, \"link_flair_text\": null, \"distinguished\": null, \"num_comments\": 0, \"visited\": false, \"num_reports\": null, \"ups\": 1}}, {\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"domain\": \"self.1510763127_magnam\", \"subreddit\": \"1510763127_magnam\", \"selftext_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EVoluptate porro corrupti iusto modi corporis qui. Nemo facere libero tempore animi rerum sed.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"selftext\": \"Voluptate porro corrupti iusto modi corporis qui. Nemo facere libero tempore animi rerum sed.\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"2p\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01BZ07ZRKHE3VHNC2F4PJV03E7\", \"media\": null, \"name\": \"t3_2p\", \"score\": 1, \"approved_by\": null, \"over_18\": false, \"removal_reason\": null, \"hidden\": false, \"thumbnail\": \"\", \"subreddit_id\": \"t5_25\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"mod_reports\": [], \"archived\": false, \"media_embed\": {}, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1510763127_magnam/comments/2p/laborum_qui_nobis_odio_qui_enim/\", \"locked\": false, \"stickied\": false, \"created\": 1510763127.0, \"url\": \"http://reddit.local/r/1510763127_magnam/comments/2p/laborum_qui_nobis_odio_qui_enim/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Laborum qui nobis odio qui enim.\", \"created_utc\": 1510763127.0, \"link_flair_text\": null, \"distinguished\": null, \"num_comments\": 0, \"visited\": false, \"num_reports\": null, \"ups\": 1}}], \"after\": null, \"before\": null}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "3190"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:31 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "294.0"
+          ],
+          "x-ratelimit-reset": [
+            "269"
+          ],
+          "x-ratelimit-used": [
+            "6"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=FsQqHGatcviu69Ys0ZqSD6eW6t4nQyRTIpsiSiyvaxsKw0h3IpTTZpNwT3y6y32u1xIU1vHdksbMYOjy9zgj7Cij08KxAddv"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1510763127_magnam/hot?count=0&limit=25&raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-11-15T16:25:31",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 146-VGpzkYbSh4CqQSOReZBcgH49NXw"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1510763127_magnam/about/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"25\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"1510763127_magnam\", \"header_img\": null, \"description_html\": null, \"title\": \"Tenetur non excepturi error.\", \"collapse_deleted_comments\": false, \"public_description\": \"Doloribus quam blanditiis quod soluta cumque. Laudantium quis delectus ipsam delectus.\", \"over18\": false, \"public_description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EDoloribus quam blanditiis quod soluta cumque. Laudantium quis delectus ipsam delectus.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 4, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 2, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_25\", \"created\": 1510763127.0, \"url\": \"/r/1510763127_magnam/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1510763127.0, \"banner_size\": null, \"user_is_moderator\": false, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"private\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "1398"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:31 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "293.0"
+          ],
+          "x-ratelimit-reset": [
+            "269"
+          ],
+          "x-ratelimit-used": [
+            "7"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=1arYkUdtKjW%2BSBAx2Q6OWH6%2BcGnN8wDRKneO9t834vz8pYL7GtiH27VPMxQzWtMQys6fIcdTPXGWfCJ1ITb36%2BMNW6GIsLXn"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1510763127_magnam/about/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-11-15T16:25:31",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 146-VGpzkYbSh4CqQSOReZBcgH49NXw"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=oRxU5hVulfedbhCp2A; loidcreated=2017-11-15T16%3A25%3A27.008Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1510763127_magnam/about/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"25\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"1510763127_magnam\", \"header_img\": null, \"description_html\": null, \"title\": \"Tenetur non excepturi error.\", \"collapse_deleted_comments\": false, \"public_description\": \"Doloribus quam blanditiis quod soluta cumque. Laudantium quis delectus ipsam delectus.\", \"over18\": false, \"public_description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EDoloribus quam blanditiis quod soluta cumque. Laudantium quis delectus ipsam delectus.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 4, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 2, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_25\", \"created\": 1510763127.0, \"url\": \"/r/1510763127_magnam/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1510763127.0, \"banner_size\": null, \"user_is_moderator\": false, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"private\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "1398"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 15 Nov 2017 16:25:31 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "292.0"
+          ],
+          "x-ratelimit-reset": [
+            "269"
+          ],
+          "x-ratelimit-used": [
+            "8"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=HgkLhVXEc8jooU1x%2BGzgVSvfYi2enaByA5Te3wVOTFL276UgfTOTaES2irDYB1Z%2B%2Bs2GUuNbwji6oQ%2FllQB%2BU1fJG9ecE1yZ"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1510763127_magnam/about/?raw_json=1"
+      }
     }
   ],
   "recorded_with": "betamax/0.8.0"

@@ -1,0 +1,25 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510761852_error",
+      "public_description": "Nam autem minus placeat hic placeat rem quaerat. Corporis similique at non pariatur.",
+      "title": "Earum tenetur placeat error unde incidunt vel."
+    }
+  },
+  "posts": {
+    "my geat post": {
+      "id": "2i",
+      "text": "In veritatis quasi cumque molestiae non. Deleniti dolorem est sint ipsum.",
+      "title": "Fuga eos earum numquam sed."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZ06RW4RETZM9EK4PZS5APE5"
+    },
+    "staff_user": {
+      "username": "01BZ06RVMGZ09Q25ETZCKVC3M2"
+    }
+  }
+}

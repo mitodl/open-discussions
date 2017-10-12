@@ -1,0 +1,30 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510763127_magnam",
+      "public_description": "Doloribus quam blanditiis quod soluta cumque. Laudantium quis delectus ipsam delectus.",
+      "title": "Tenetur non excepturi error."
+    }
+  },
+  "posts": {
+    "my 2nd post": {
+      "id": "2q",
+      "text": "Blanditiis mollitia ipsum quod nostrum quidem et. Veniam sunt officiis et maiores.",
+      "title": "Amet quos enim commodi doloribus ad incidunt."
+    },
+    "my post": {
+      "id": "2p",
+      "text": "Voluptate porro corrupti iusto modi corporis qui. Nemo facere libero tempore animi rerum sed.",
+      "title": "Laborum qui nobis odio qui enim."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZ07ZRKHE3VHNC2F4PJV03E7"
+    },
+    "staff_user": {
+      "username": "01BZ07ZR4AN7N1EX11RXKQEE1D"
+    }
+  }
+}

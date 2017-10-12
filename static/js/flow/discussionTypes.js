@@ -33,6 +33,7 @@ export type Post = AuthoredContent & {
   text:          ?string,
   num_comments:  number,
   channel_name:  string,
+  channel_title: string,
 }
 
 export type PostForm = {

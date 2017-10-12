@@ -1,0 +1,25 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510686431_asperiores",
+      "public_description": "Cum excepturi veritatis eaque deleniti in odio laborum architecto. Labore repellat velit totam sit.",
+      "title": "Iure iure sint ex veniam possimus dolore."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "1d",
+      "text": "Doloremque a ipsa eveniet rem ipsam qui. A veritatis cumque quidem saepe.",
+      "title": "Ipsum totam autem dolores necessitatibus quia."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYXYV6F3CANNT4FMM3EAJT0Z"
+    },
+    "staff_user": {
+      "username": "01BYXYV5ZA3GBD8Z3M19ZC403D"
+    }
+  }
+}

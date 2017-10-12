@@ -1,5 +1,6 @@
 """Tests for views for REST APIs for channels"""
 # pylint: disable=too-many-lines
+import time
 import pytest
 from betamax.fixtures.pytest import _casette_name
 from django.core.urlresolvers import reverse
@@ -238,11 +239,13 @@ def test_patch_channel_noauth(client, praw_settings):
     assert resp.status_code == 401
 
 
-def test_create_url_post(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_url_post(client, use_betamax, praw_settings, private_channel_and_contributor, reddit_factories):
     """
     Create a new url post
     """
-    url = reverse('post-list', kwargs={'channel_name': 'unit_tests'})
+    channel, user = private_channel_and_contributor
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    client.force_login(user)
     resp = client.post(url, {
         'title': 'url title 🐨',
         'url': 'http://micromasters.mit.edu/🐨',
@@ -252,23 +255,26 @@ def test_create_url_post(client, logged_in_profile, use_betamax, praw_settings):
         'title': 'url title 🐨',
         'url': 'http://micromasters.mit.edu/🐨',
         'text': None,
-        'author_id': logged_in_profile.user.username,
-        'created': '2017-07-21T18:13:18+00:00',
+        'author_id': user.username,
+        'created': '2017-11-15T16:18:05+00:00',
         'upvoted': True,
-        'id': '2x',
+        'id': '2m',
         'num_comments': 0,
         'score': 1,
-        'channel_name': 'unit_tests',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
     }
 
 
-def test_create_text_post(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_text_post(client, use_betamax, praw_settings, private_channel_and_contributor, reddit_factories):
     """
     Create a new text post
     """
-    url = reverse('post-list', kwargs={'channel_name': 'unit_tests'})
+    channel, user = private_channel_and_contributor
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    client.force_login(user)
     resp = client.post(url, {
         'title': 'parameterized testing',
         'text': 'tests are great',
@@ -278,15 +284,16 @@ def test_create_text_post(client, logged_in_profile, use_betamax, praw_settings)
         'title': 'parameterized testing',
         'text': 'tests are great',
         'url': None,
-        'author_id': logged_in_profile.user.username,
-        'created': '2017-07-21T18:51:15+00:00',
+        'author_id': user.username,
+        'created': '2017-11-15T16:14:52+00:00',
         'upvoted': True,
-        'id': '2y',
+        'id': '2l',
         'num_comments': 0,
         'score': 1,
-        'channel_name': 'unit_tests',
-        'profile_image': logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        'profile_image': user.profile.image_small,
+        "author_name": user.profile.name,
     }
 
 
@@ -328,46 +335,47 @@ def test_get_deleted_post(client, logged_in_profile, use_betamax, praw_settings,
 
 
 # pylint: disable=too-many-arguments
-@pytest.mark.parametrize("missing_user,missing_image", [
-    [True, True],
-    [True, False],
-    [False, True],
-    [False, False],
-])
-def test_get_post(client, logged_in_profile, use_betamax, praw_settings, missing_user, missing_image):
+@pytest.mark.parametrize("missing_image", [True, False])
+def test_get_post(
+        client,
+        use_betamax,
+        praw_settings,
+        private_channel_and_contributor,
+        reddit_factories,
+        missing_image
+):
     """Get an existing post with no image"""
-    profile_image = default_profile_image
-    if not missing_user:
-        profile = UserFactory.create(username='alice').profile
-        if missing_image:
-            profile.image_small = None
-            profile.save()
-        else:
-            profile_image = profile.image_small
-    else:
-        profile = None
+    channel, user = private_channel_and_contributor
 
-    post_id = 'b'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.get(url)
-    if missing_user:
-        assert resp.status_code == status.HTTP_404_NOT_FOUND
+    if missing_image:
+        user.profile.image_small = None
     else:
-        assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == {
-            'title': 'fasdf',
-            'text': 'fff',
-            'url': None,
-            'author_id': profile.user.username,
-            'created': '2017-09-07T14:47:34+00:00',
-            'upvoted': True,
-            'id': post_id,
-            'num_comments': 2,
-            'score': 1,
-            'channel_name': 'macromasters',
-            'profile_image': profile_image,
-            "author_name": profile.name,
-        }
+        user.profile.image_small = '/just/a/great/image.png.jpg.gif'
+    user.profile.save()
+
+    profile_image = default_profile_image if missing_image else user.profile.image_small
+
+    post = reddit_factories.text_post('my geat post', user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    client.force_login(user)
+    resp = client.get(url)
+
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        "url": None,
+        "text": post.text,
+        "title": post.title,
+        "upvoted": True,
+        "score": 1,
+        "author_id": user.username,
+        "id": post.id,
+        "created": post.created,
+        "num_comments": 0,
+        "channel_name": channel.name,
+        "channel_title": channel.title,
+        'author_name': user.profile.name,
+        "profile_image": profile_image
+    }
 
 
 def test_get_post_forbidden(client, logged_in_profile, use_betamax, praw_settings):
@@ -387,18 +395,30 @@ def test_get_post_not_found(client, logged_in_profile, use_betamax, praw_setting
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
-def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missing_user):
+def test_list_posts(
+        client,
+        use_betamax,
+        praw_settings,
+        private_channel_and_contributor,
+        reddit_factories,
+        missing_user
+):
     """List posts in a channel"""
-    if missing_user:
-        logged_in_profile.user.username = 'renamed'
-        logged_in_profile.user.save()
-        profile_image = default_profile_image
-        name = "[deleted]"
-    else:
-        profile_image = logged_in_profile.image_small
-        name = logged_in_profile.name
+    channel, user = private_channel_and_contributor
 
-    url = reverse('post-list', kwargs={'channel_name': 'two_posts'})
+    first_post = reddit_factories.text_post('my post', user, channel=channel)
+    second_post = reddit_factories.text_post('my 2nd post', user, channel=channel)
+
+    time.sleep(3)
+
+    if missing_user:
+        user.username = 'renamed'
+        user.save()
+
+    client.force_login(user)
+
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+
     resp = client.get(url)
     assert resp.status_code == 200
 
@@ -412,39 +432,35 @@ def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missi
         assert resp.json() == {
             'posts': [
                 {
-                    'url': None,
-                    'text': '🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐽 🐸 🐵 🙊 🙉 🙊 🐒 🐔 🐧 🐦 🐤 🐣 🐥 '
-                            '🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🐛 🦋 🐌 🐚 🐞 🐜 🕷 🕸 🐢 🐍 🦎 🦂 🦀 🦑 🐙 🦐 '
-                            '🐠 🐟 🐡 🐬 🦈 🐳 🐋 🐊 🐆 🐅 🐃 🐂 🐄 🦌 🐪 🐫 🐘 🦏 🦍 🐎 🐖 🐐 🐏 🐑 🐕 '
-                            '🐩 🐈 🐓 🦃 🕊 🐇 🐁 🐀 🐿 🐾 🐉 🐲 🌵 🎄 🌲 🌳 🌴 🌱 🌿 ☘️ 🍀 🎍 🎋 🍃 🍂 🍁 '
-                            '🍄 🌾 💐 🌷 🌹 🥀 🌻 🌼 🌸 🌺 🌎 🌍 🌏 🌕 🌖 🌗 🌘 🌑 🌒 🌓 🌔 🌚 🌝 🌞 🌛 '
-                            '🌜 🌙 💫 ⭐️ 🌟 ✨ ⚡️ 🔥 💥 ☄️ ☀️ 🌤 ⛅️ 🌥 🌦 🌈 ☁️ 🌧 ⛈ 🌩 🌨 ☃️ ⛄️ '
-                            '❄️ 🌬 💨 🌪 🌫 🌊 💧 💦 ☔️',
-                    'title': 'Text post',
-                    'upvoted': True,
-                    'score': 1,
-                    'author_id': "george",
-                    'id': '30',
-                    'created': '2017-07-21T19:10:26+00:00',
-                    'num_comments': 0,
-                    'channel_name': 'two_posts',
-                    "profile_image": profile_image,
-                    "author_name": name
+                    "url": None,
+                    "text": second_post.text,
+                    "title": second_post.title,
+                    "upvoted": True,
+                    "score": 1,
+                    "author_id": user.username,
+                    "id": second_post.id,
+                    "created": second_post.created,
+                    "num_comments": 0,
+                    "channel_name": channel.name,
+                    "channel_title": channel.title,
+                    'author_name': user.profile.name,
+                    "profile_image": user.profile.image_small
                 },
                 {
-                    'url': 'http://micromasters.mit.edu',
-                    'text': None,
-                    'title': 'Link post',
-                    'upvoted': True,
-                    'score': 1,
-                    'author_id': 'george',
-                    'id': '2z',
-                    'created': '2017-07-21T19:09:37+00:00',
-                    'num_comments': 0,
-                    'channel_name': 'two_posts',
-                    "profile_image": profile_image,
-                    "author_name": name
-                }
+                    "url": None,
+                    "text": first_post.text,
+                    "title": first_post.title,
+                    "upvoted": True,
+                    "score": 1,
+                    "author_id": user.username,
+                    "id": first_post.id,
+                    "created": first_post.created,
+                    "num_comments": 0,
+                    "channel_name": channel.name,
+                    "channel_title": channel.title,
+                    'author_name': user.profile.name,
+                    "profile_image": user.profile.image_small
+                },
             ],
             'pagination': {}
         }
@@ -479,69 +495,78 @@ def test_list_posts_pagination(client, logged_in_profile, use_betamax, praw_sett
     assert resp.json()['pagination'] == expected
 
 
-def test_update_post_text(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_post_text(client, use_betamax, praw_settings, private_channel_and_contributor, reddit_factories):
     """Test updating just the text of a post"""
-    post_id = '30'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    client.force_login(user)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
     resp = client.patch(url, format='json', data={"text": "overwrite"})
     assert resp.status_code == 200
     assert resp.json() == {
         'url': None,
         'text': 'overwrite',
-        'title': 'Text post',
-        'upvoted': False,
+        'title': post.title,
+        'upvoted': True,
         'score': 1,
-        'author_id': logged_in_profile.user.username,
-        'id': post_id,
-        'created': '2017-07-21T19:10:26+00:00',
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
         'num_comments': 0,
-        'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
     }
 
 
-def test_update_post_clear_vote(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_post_clear_vote(client, use_betamax, praw_settings, private_channel_and_contributor, reddit_factories):
     """Test updating a post to clear the user's vote"""
-    post_id = '30'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    client.force_login(user)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
     resp = client.patch(url, format='json', data={"upvoted": False})
     assert resp.status_code == 200
     assert resp.json() == {
         'url': None,
-        'text': 'overwrite',
-        'title': 'Text post',
+        'text': post.text,
+        'title': post.title,
         'upvoted': False,
         'score': 1,
-        'author_id': logged_in_profile.user.username,
-        'id': post_id,
-        'created': '2017-07-21T19:10:26+00:00',
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
         'num_comments': 0,
-        'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
     }
 
 
-def test_update_post_upvote(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_post_upvote(client, use_betamax, praw_settings, private_channel_and_contributor, reddit_factories):
     """Test updating a post to upvote it"""
-    post_id = '30'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    client.force_login(user)
     resp = client.patch(url, format='json', data={"upvoted": True})
     assert resp.status_code == 200
     assert resp.json() == {
         'url': None,
-        'text': 'overwrite',
-        'title': 'Text post',
+        'text': post.text,
+        'title': post.title,
         'upvoted': True,
         'score': 1,
-        'author_id': logged_in_profile.user.username,
-        'id': post_id,
-        'created': '2017-07-21T19:10:26+00:00',
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
         'num_comments': 0,
-        'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
     }
 
 
@@ -561,9 +586,17 @@ def test_update_post_not_found(client, logged_in_profile, use_betamax, praw_sett
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_create_post_without_upvote(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_post_without_upvote(
+        client,
+        use_betamax,
+        praw_settings,
+        private_channel_and_contributor,
+        reddit_factories
+):
     """Test creating a post without an upvote in the body"""
-    url = reverse('post-list', kwargs={'channel_name': 'subreddit_for_testing'})
+    channel, user = private_channel_and_contributor
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    client.force_login(user)
     resp = client.post(url, {
         'title': 'x',
         'text': 'y',
@@ -574,15 +607,16 @@ def test_create_post_without_upvote(client, logged_in_profile, use_betamax, praw
         'title': 'x',
         'text': 'y',
         'url': None,
-        'author_id': logged_in_profile.user.username,
-        'created': '2017-07-25T22:05:44+00:00',
+        'author_id': user.username,
+        'created': '2017-11-14T17:42:44+00:00',
         'upvoted': False,
-        'id': '5',
+        'id': '18',
         'num_comments': 0,
         'score': 1,
-        'channel_name': 'subreddit_for_testing',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name
     }
 
 
@@ -951,97 +985,102 @@ def test_delete_comment(client, logged_in_profile, use_betamax, praw_settings):
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.parametrize("missing_user", [True, False])
-def test_frontpage(client, logged_in_profile, use_betamax, praw_settings, missing_user):
+def test_frontpage_empty(client, logged_in_profile, use_betamax, praw_settings):
+    """test that frontpage is empty with no subscriptions"""
+    url = reverse('frontpage')
+    resp = client.get(url)
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'posts': [],
+        'pagination': {},
+    }
+
+
+def test_frontpage(
+        client,
+        use_betamax,
+        praw_settings,
+        staff_jwt_header,
+        private_channel_and_contributor,
+        reddit_factories
+):
     """View the front page"""
-    if missing_user:
-        logged_in_profile.user.username = 'renamed'
-        logged_in_profile.user.save()
+    channel, user = private_channel_and_contributor
+    first_post = reddit_factories.text_post('my post', user, channel=channel)
+    second_post = reddit_factories.text_post('my 2nd post', user, channel=channel)
+    third_post = reddit_factories.text_post('my 3rd post', user, channel=channel)
+    fourth_post = reddit_factories.text_post('my 4th post', user, channel=channel)
+
+    client.force_login(user)
 
     url = reverse('frontpage')
     resp = client.get(url)
     assert resp.status_code == 200
-    if missing_user:
-        assert resp.json() == {
-            'posts': [],
-            'pagination': {},
-        }
-    else:
-        assert resp.json() == {
-            'posts': [
-                {
-                    "url": None,
-                    "text": "y",
-                    "title": "x",
-                    "upvoted": False,
-                    "score": 1,
-                    "author_id": "george",
-                    "id": "5",
-                    "created": "2017-07-25T22:05:44+00:00",
-                    "num_comments": 0,
-                    "channel_name": "subreddit_for_testing",
-                    'author_name': logged_in_profile.name,
-                    "profile_image": logged_in_profile.image_small
-                },
-                {
-                    "url": None,
-                    "text": "post for testing clear_vote",
-                    "title": "new post without upvote",
-                    "upvoted": False,
-                    "score": 1,
-                    "author_id": "george",
-                    "id": "3",
-                    "created": "2017-07-25T17:57:07+00:00",
-                    "num_comments": 0,
-                    "channel_name": "a_channel",
-                    'author_name': logged_in_profile.name,
-                    "profile_image": logged_in_profile.image_small
-                },
-                {
-                    "url": None,
-                    "text": "y",
-                    "title": "x",
-                    "upvoted": False,
-                    "score": 1,
-                    "author_id": "george",
-                    "id": "4",
-                    "created": "2017-07-25T22:02:40+00:00",
-                    "num_comments": 0,
-                    "channel_name": "subreddit_for_testing",
-                    'author_name': logged_in_profile.name,
-                    "profile_image": logged_in_profile.image_small
-                },
-                {
-                    "url": None,
-                    "text": "some text for the post",
-                    "title": "new post",
-                    "upvoted": False,
-                    "score": 1,
-                    "author_id": "george",
-                    "id": "2",
-                    "created": "2017-07-25T15:31:44+00:00",
-                    "num_comments": 6,
-                    "channel_name": "subreddit_for_testing",
-                    'author_name': logged_in_profile.name,
-                    "profile_image": logged_in_profile.image_small
-                },
-                {
-                    "url": None,
-                    "text": "some text for the post",
-                    "title": "new post",
-                    "upvoted": False,
-                    "score": 1,
-                    "author_id": "george",
-                    "id": "1",
-                    "created": "2017-07-25T15:07:30+00:00",
-                    "num_comments": 0,
-                    "channel_name": "subreddit_for_testing",
-                    'author_name': logged_in_profile.name,
-                    "profile_image": logged_in_profile.image_small
-                }
-            ],
-            'pagination': {},
-        }
+    assert resp.json() == {
+        'posts': [
+            {
+                "url": None,
+                "text": fourth_post.text,
+                "title": fourth_post.title,
+                "upvoted": True,
+                "score": 1,
+                "author_id": user.username,
+                "id": fourth_post.id,
+                "created": fourth_post.created,
+                "num_comments": 0,
+                "channel_name": channel.name,
+                "channel_title": channel.title,
+                'author_name': user.profile.name,
+                "profile_image": user.profile.image_small
+            },
+            {
+                "url": None,
+                "text": third_post.text,
+                "title": third_post.title,
+                "upvoted": True,
+                "score": 1,
+                "author_id": user.username,
+                "id": third_post.id,
+                "created": third_post.created,
+                "num_comments": 0,
+                "channel_name": channel.name,
+                "channel_title": channel.title,
+                'author_name': user.profile.name,
+                "profile_image": user.profile.image_small
+            },
+            {
+                "url": None,
+                "text": second_post.text,
+                "title": second_post.title,
+                "upvoted": True,
+                "score": 1,
+                "author_id": user.username,
+                "id": second_post.id,
+                "created": second_post.created,
+                "num_comments": 0,
+                "channel_name": channel.name,
+                "channel_title": channel.title,
+                'author_name': user.profile.name,
+                "profile_image": user.profile.image_small
+            },
+            {
+                "url": None,
+                "text": first_post.text,
+                "title": first_post.title,
+                "upvoted": True,
+                "score": 1,
+                "author_id": user.username,
+                "id": first_post.id,
+                "created": first_post.created,
+                "num_comments": 0,
+                "channel_name": channel.name,
+                "channel_title": channel.title,
+                'author_name': user.profile.name,
+                "profile_image": user.profile.image_small
+            },
+        ],
+        'pagination': {},
+    }
 
 
 @pytest.mark.parametrize('params,expected', [

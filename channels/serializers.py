@@ -123,6 +123,7 @@ class PostSerializer(serializers.Serializer):
     created = serializers.SerializerMethodField()
     num_comments = serializers.IntegerField(read_only=True)
     channel_name = serializers.SerializerMethodField()
+    channel_title = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
 
@@ -174,6 +175,10 @@ class PostSerializer(serializers.Serializer):
     def get_channel_name(self, instance):
         """The channel which contains the post"""
         return instance.subreddit.display_name
+
+    def get_channel_title(self, instance):
+        """The title of the channel"""
+        return instance.subreddit.title
 
     def validate_upvoted(self, value):
         """Validate that upvoted is a bool"""

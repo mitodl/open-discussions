@@ -1,0 +1,25 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510686066_qui",
+      "public_description": "Dicta facilis omnis laudantium illum. Nisi ab officiis voluptatem eaque ipsum eum aliquid.",
+      "title": "Excepturi error iste omnis eos exercitationem."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "1b",
+      "text": "Minus nobis dolorem quaerat est. Vitae a repellendus voluptas.",
+      "title": "Ea at esse rerum maxime eum a."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYXYG1YTX839YCHQTZJ14H1Q"
+    },
+    "staff_user": {
+      "username": "01BYXYG1EK02S71XAN3WTBE2X5"
+    }
+  }
+}
