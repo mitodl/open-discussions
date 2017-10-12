@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.2.1
+-------------
+
+- Added a setting for the JWT cookie name
+- Highlight current channel in the nav sidebar
+- Add validation when creating a post and make &#39;title&#39; field a textarea
+- Limit max depth of comments (#284)
+- Add MicroMasters link to toolbar (#259)
+- Smaller avatars in comments section (#277)
+- Fix root logger location (#266)
+
 Version 0.2.0
 -------------
 
