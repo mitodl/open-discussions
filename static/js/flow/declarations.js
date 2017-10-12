@@ -8,6 +8,7 @@ declare var SETTINGS: {
   session_url: string|null,
   micromasters_external_login_url: string,
   micromasters_base_url: string,
+  max_comment_depth: number,
   FEATURES: {
     [key: string]: boolean,
   },
