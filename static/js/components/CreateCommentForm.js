@@ -47,10 +47,19 @@ const commentForm = (
   onUpdate: (e: any) => void,
   cancelReply: () => void,
   isComment: boolean,
-  disabled: boolean
+  disabled: boolean,
+  autoFocus: boolean
 ) =>
   <div className="reply-form">
-    <form onSubmit={onSubmit} className="form">
+    <form
+      onSubmit={onSubmit}
+      className="form"
+      onKeyDown={e => {
+        if (e.key === "Enter" && e.ctrlKey && !disabled && !isEmptyText(text)) {
+          onSubmit(e)
+        }
+      }}
+    >
       <div className="form-item">
         <textarea
           name="text"
@@ -59,6 +68,7 @@ const commentForm = (
           placeholder="Write a reply here..."
           value={text || ""}
           onChange={onUpdate}
+          autoFocus={autoFocus}
         />
       </div>
       <button
@@ -183,7 +193,8 @@ export const ReplyToCommentForm = connect(mapStateToProps, mapDispatchToProps)(
           onUpdate,
           cancelReply,
           true,
-          replying
+          replying,
+          true
         )
         : null
     }
@@ -255,7 +266,8 @@ export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
         onUpdate,
         cancelReply,
         false,
-        replying
+        replying,
+        false
       )
     }
   }

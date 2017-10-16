@@ -77,6 +77,10 @@ describe("CreateCommentForm", () => {
       assert.isTrue(wrapper.find("button").props().disabled)
     })
 
+    it("should not have the autoFocus prop", () => {
+      assert.isFalse(wrapper.find("textarea").props().autoFocus)
+    })
+
     it("should enable submit button when text in form", async () => {
       await helper.listenForActions([forms.FORM_UPDATE], () => {
         wrapper.find("textarea[name='text']").simulate("change", {
@@ -183,6 +187,35 @@ describe("CreateCommentForm", () => {
       )
       assert.isTrue(wrapper.find("button").props().disabled)
     })
+
+    it("should submit the form with ctrl-enter", async () => {
+      const { requestType, successType } = actions.comments.post
+      helper.createCommentStub.returns(Promise.resolve(makeComment(post)))
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+
+      await helper.listenForActions(
+        [
+          requestType,
+          successType,
+          SET_POST_DATA,
+          forms.FORM_END_EDIT,
+          forms.FORM_BEGIN_EDIT
+        ],
+        () => {
+          wrapper
+            .find("form")
+            .simulate("keyDown", { ctrlKey: true, key: "Enter" })
+        }
+      )
+      assert(helper.createCommentStub.calledOnce)
+    })
   })
 
   describe("ReplyToCommentForm", () => {
@@ -198,6 +231,10 @@ describe("CreateCommentForm", () => {
         getCommentReplyInitialValue(comment),
         undefined
       )
+    })
+
+    it("should have the autoFocus prop", () => {
+      assert.isTrue(wrapper.find("textarea").props().autoFocus)
     })
 
     it("should disable submit button when passed empty comment", () => {
@@ -310,6 +347,53 @@ describe("CreateCommentForm", () => {
       })
       const btnProps = wrapper.find("button").props()
       assert.isTrue(btnProps.disabled)
+    })
+
+    it("should submit the form with ctrl-enter", async () => {
+      const { requestType } = actions.comments.post
+      helper.createCommentStub.returns(Promise.resolve(makeComment(post)))
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      await helper.listenForActions([requestType], () => {
+        wrapper
+          .find("form")
+          .simulate("keyDown", { ctrlKey: true, key: "Enter" })
+      })
+      assert(helper.createCommentStub.calledOnce)
+    })
+
+    it("should not submit on ctrl-enter when request is in flight", async () => {
+      helper.createCommentStub.reset()
+      // this is to ensure we can check that the key combo doesn't submit before
+      // the request resolves (which will set the prop back to false)
+      helper.createCommentStub.callsFake(() => {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            resolve(makeComment(post))
+          }, 100)
+        })
+      })
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      wrapper.find("form").simulate("keyDown", { ctrlKey: true, key: "Enter" })
+      assert.isTrue(helper.createCommentStub.calledOnce)
+    })
+
+    it("should not submit on ctrl-enter when text is empty", () => {
+      wrapper.find("form").simulate("keyDown", { ctrlKey: true, key: "Enter" })
+      assert.isFalse(helper.createCommentStub.called)
     })
   })
 })
