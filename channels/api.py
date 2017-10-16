@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 import praw
+from praw.exceptions import APIException
 from praw.models.reddit import more
 from praw.models.reddit.redditor import Redditor
 from prawcore.exceptions import (
@@ -563,9 +564,12 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
         channel = self.get_channel(channel_name)
-        if moderator_name not in channel.moderator():
+        try:
             channel.moderator.add(user)
             Api(user).accept_invite(channel_name)
+        except APIException as ex:
+            if ex.error_type != "ALREADY_MODERATOR":
+                raise
         return Redditor(self.reddit, name=moderator_name)
 
     def accept_invite(self, channel_name):

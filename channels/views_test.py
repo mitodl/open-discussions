@@ -896,8 +896,8 @@ def test_add_moderator_again(client, use_betamax, praw_settings, staff_jwt_heade
     """
     If a user is already a moderator we should return 201 without making any changes
     """
-    moderator = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
-    url = reverse('moderator-list', kwargs={'channel_name': 'admin_channel'})
+    moderator = UserFactory.create(username='already_mod')
+    url = reverse('moderator-list', kwargs={'channel_name': 'a_channel'})
     resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {'moderator_name': moderator.username}
