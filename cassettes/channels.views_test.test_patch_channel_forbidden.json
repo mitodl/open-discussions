@@ -1,0 +1,151 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2017-11-06T17:02:27",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=admin"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDK0MNfNyfVNSk2OLDA1jvDx8Ygvyvb2SYsPLjNxLAtU0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLa5exd4Zlf5GGYWW/gGVYWXB8cnueebZ5pnhxmA9KSklmUmp8ZnpoAMhnCUagGV3Xv6uAAAAA==",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Mon, 06 Nov 2017 17:02:27 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=oyWucpNcyHuGPkXSDG; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 06-Nov-2019 17:02:27 GMT",
+            "loidcreated=2017-11-06T17%3A02%3A27.094Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 06-Nov-2019 17:02:27 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=admin"
+      }
+    },
+    {
+      "recorded_at": "2017-11-06T17:02:27",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 187-lmMbecYp53XLLH_rkKLf_Sv4AvQ"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=oyWucpNcyHuGPkXSDG; loidcreated=2017-11-06T17%3A02%3A27.094Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.0 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/dedp2/about/edit/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"message\": \"Forbidden\", \"error\": 403}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "38"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Mon, 06 Nov 2017 17:02:27 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "access-control-allow-origin": [
+            "*"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=nP17LWXh883tUtF5%2B90PU%2FK9BOt4%2Fi6JEc7Ffqvj3naHib9VYU7AgrWnhdJANvaBe6%2FgnRzE1QQ%3D"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 403,
+          "message": "Forbidden"
+        },
+        "url": "https://reddit.local/r/dedp2/about/edit/?raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

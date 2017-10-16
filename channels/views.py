@@ -22,7 +22,11 @@ from channels.serializers import (
     PostSerializer,
     ModeratorSerializer,
 )
-from channels.utils import get_pagination_and_posts, get_pagination_params
+from channels.utils import (
+    get_pagination_and_posts,
+    get_pagination_params,
+    translate_praw_exceptions,
+)
 from open_discussions.permissions import JwtIsStaffOrReadonlyPermission
 
 User = get_user_model()
@@ -40,6 +44,10 @@ class ChannelListView(ListCreateAPIView):
         api = Api(user=self.request.user)
         return api.list_channels()
 
+    def post(self, request, *args, **kwargs):
+        with translate_praw_exceptions():
+            return super().post(request, *args, **kwargs)
+
 
 class ChannelDetailView(RetrieveUpdateAPIView):
     """
@@ -52,6 +60,14 @@ class ChannelDetailView(RetrieveUpdateAPIView):
         """Get channel referenced by API"""
         api = Api(user=self.request.user)
         return api.get_channel(self.kwargs['channel_name'])
+
+    def get(self, request, *args, **kwargs):
+        with translate_praw_exceptions():
+            return super().get(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        with translate_praw_exceptions():
+            return super().patch(request, *args, **kwargs)
 
 
 class ModeratorListView(ListCreateAPIView):
@@ -129,30 +145,32 @@ class PostListView(APIView):
 
     def get(self, request, *args, **kwargs):
         """Get list for posts and attach User objects to them"""
-        before, after, count = get_pagination_params(self.request)
-        api = Api(user=request.user)
-        paginated_posts = api.list_posts(self.kwargs['channel_name'], before=before, after=after, count=count)
-        pagination, posts = get_pagination_and_posts(paginated_posts, before=before, count=count)
-        users = _lookup_users_for_posts(posts)
-        posts = [post for post in posts if post.author and post.author.name in users]
+        with translate_praw_exceptions():
+            before, after, count = get_pagination_params(self.request)
+            api = Api(user=request.user)
+            paginated_posts = api.list_posts(self.kwargs['channel_name'], before=before, after=after, count=count)
+            pagination, posts = get_pagination_and_posts(paginated_posts, before=before, count=count)
+            users = _lookup_users_for_posts(posts)
+            posts = [post for post in posts if post.author and post.author.name in users]
 
-        return Response({
-            'posts': PostSerializer(posts, many=True, context={
-                **self.get_serializer_context(),
-                'users': users,
-            }).data,
-            'pagination': pagination,
-        })
+            return Response({
+                'posts': PostSerializer(posts, many=True, context={
+                    **self.get_serializer_context(),
+                    'users': users,
+                }).data,
+                'pagination': pagination,
+            })
 
     def post(self, request, *args, **kwargs):
         """Create a new post"""
-        serializer = PostSerializer(data=request.data, context=self.get_serializer_context())
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(
-            serializer.data,
-            status=status.HTTP_201_CREATED,
-        )
+        with translate_praw_exceptions():
+            serializer = PostSerializer(data=request.data, context=self.get_serializer_context())
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED,
+            )
 
 
 class PostDetailView(APIView):
@@ -174,19 +192,20 @@ class PostDetailView(APIView):
 
     def get(self, request, *args, **kwargs):
         """Get post"""
-        post = self.get_object()
-        users = _lookup_users_for_posts([post])
-        if not post.author or post.author.name not in users:
-            raise NotFound()
-        return Response(
-            PostSerializer(
-                instance=post,
-                context={
-                    **self.get_serializer_context(),
-                    'users': users,
-                },
-            ).data,
-        )
+        with translate_praw_exceptions():
+            post = self.get_object()
+            users = _lookup_users_for_posts([post])
+            if not post.author or post.author.name not in users:
+                raise NotFound()
+            return Response(
+                PostSerializer(
+                    instance=post,
+                    context={
+                        **self.get_serializer_context(),
+                        'users': users,
+                    },
+                ).data,
+            )
 
     def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Delete a post"""
@@ -195,18 +214,19 @@ class PostDetailView(APIView):
 
     def patch(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Update a post"""
-        post = self.get_object()
-        serializer = PostSerializer(
-            instance=post,
-            data=request.data,
-            context=self.get_serializer_context(),
-            partial=True,
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(
-            serializer.data,
-        )
+        with translate_praw_exceptions():
+            post = self.get_object()
+            serializer = PostSerializer(
+                instance=post,
+                data=request.data,
+                context=self.get_serializer_context(),
+                partial=True,
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(
+                serializer.data,
+            )
 
 
 def _populate_authors_for_comments(comments, author_set):
@@ -257,37 +277,39 @@ class CommentListView(APIView):
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Get list for comments and attach User objects to them"""
-        api = Api(user=self.request.user)
-        comment_tree = api.list_comments(self.kwargs['post_id'])
+        with translate_praw_exceptions():
+            api = Api(user=self.request.user)
+            comment_tree = api.list_comments(self.kwargs['post_id'])
 
-        # Don't resolve any extra comments
-        comment_tree.replace_more(limit=0)
-        comments = list(comment_tree)
+            # Don't resolve any extra comments
+            comment_tree.replace_more(limit=0)
+            comments = list(comment_tree)
 
-        users = _lookup_users_for_comments(comments)
-        return Response(
-            CommentSerializer(
-                comments,
-                context={
-                    **self.get_serializer_context(),
-                    'users': users,
-                },
-                many=True,
-            ).data,
-        )
+            users = _lookup_users_for_comments(comments)
+            return Response(
+                CommentSerializer(
+                    comments,
+                    context={
+                        **self.get_serializer_context(),
+                        'users': users,
+                    },
+                    many=True,
+                ).data,
+            )
 
     def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Create a new comment"""
-        serializer = CommentSerializer(
-            data=request.data,
-            context=self.get_serializer_context(),
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(
-            serializer.data,
-            status=status.HTTP_201_CREATED,
-        )
+        with translate_praw_exceptions():
+            serializer = CommentSerializer(
+                data=request.data,
+                context=self.get_serializer_context(),
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED,
+            )
 
 
 class CommentDetailView(APIView):
@@ -309,18 +331,19 @@ class CommentDetailView(APIView):
 
     def patch(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Update a comment"""
-        comment = self.get_object()
-        serializer = CommentSerializer(
-            instance=comment,
-            data=request.data,
-            context=self.get_serializer_context(),
-            partial=True,
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(
-            serializer.data,
-        )
+        with translate_praw_exceptions():
+            comment = self.get_object()
+            serializer = CommentSerializer(
+                instance=comment,
+                data=request.data,
+                context=self.get_serializer_context(),
+                partial=True,
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(
+                serializer.data,
+            )
 
     def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Delete the comment"""

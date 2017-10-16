@@ -7,8 +7,8 @@ from betamax.fixtures.pytest import _casette_name as cassette_name
 from rest_framework.test import APIClient
 
 from channels.test_utils import no_ssl_verification
-from profiles.factories import ProfileFactory
 from open_discussions.betamax_config import setup_betamax
+from profiles.factories import ProfileFactory
 
 
 @pytest.fixture
@@ -46,7 +46,7 @@ def use_betamax(mocker, cassette_exists, praw_settings, configure_betamax, betam
         mocker.patch('channels.api._get_refresh_token', return_value={
             'refresh_token': 'fake',
             'access_token': 'fake',
-            'expires_in': 123,
+            'expires_in': 1234,
         })
 
     # always ignore SSL verification

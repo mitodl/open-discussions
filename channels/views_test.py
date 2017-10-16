@@ -2,6 +2,7 @@
 # pylint: disable=too-many-lines
 import pytest
 from django.core.urlresolvers import reverse
+from praw.exceptions import APIException
 from rest_framework import status
 
 from channels.serializers import default_profile_image
@@ -48,6 +49,22 @@ def test_create_channel(client, use_betamax, praw_settings, staff_jwt_header):
     assert resp.json() == payload
 
 
+def test_create_channel_already_exists(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Create a channel which already exists
+    """
+    client.force_login(UserFactory.create())
+    url = reverse('channel-list')
+    payload = {
+        'channel_type': 'private',
+        'name': 'a_channel',
+        'title': 'Channel title',
+        'public_description': 'public',
+    }
+    resp = client.post(url, data=payload, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_409_CONFLICT
+
+
 def test_create_channel_nonstaff(client, praw_settings, jwt_header):
     """
     Try to create a channel with nonstaff auth and assert a failure
@@ -85,13 +102,33 @@ def test_get_channel(client, use_betamax, praw_settings):
     client.force_login(UserFactory.create())
     url = reverse('channel-detail', kwargs={'channel_name': 'subreddit_for_testing'})
     resp = client.get(url)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'channel_type': 'private',
         'name': 'subreddit_for_testing',
         'title': 'subreddit for tests',
         'public_description': 'a public description goes here',
     }
+
+
+def test_get_channel_forbidden(client, use_betamax, praw_settings):
+    """
+    If PRAW returns a 403 error we should also return a 403 error
+    """
+    client.force_login(UserFactory.create())
+    url = reverse('channel-detail', kwargs={'channel_name': 'xavier2'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_get_channel_not_found(client, use_betamax, praw_settings):
+    """
+    If PRAW returns a 404 error we should also return a 404 error
+    """
+    client.force_login(UserFactory.create())
+    url = reverse('channel-detail', kwargs={'channel_name': 'not_a_real_channel_name'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
 def test_patch_channel(client, use_betamax, praw_settings, staff_jwt_header):
@@ -109,6 +146,28 @@ def test_patch_channel(client, use_betamax, praw_settings, staff_jwt_header):
         'title': 'subreddit for tests',
         'public_description': 'a public description goes here',
     }
+
+
+def test_patch_channel_forbidden(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Update a channel's settings for a channel the user doesn't have permission to
+    """
+    url = reverse('channel-detail', kwargs={'channel_name': 'dedp2'})
+    resp = client.patch(url, {
+        'channel_type': 'public',
+    }, format='json', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_patch_channel_not_found(client, use_betamax, praw_settings, staff_jwt_header):
+    """
+    Update a channel's settings for a missing channel
+    """
+    url = reverse('channel-detail', kwargs={'channel_name': 'missing'})
+    resp = client.patch(url, {
+        'channel_type': 'public',
+    }, format='json', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
 def test_patch_channel_nonstaff(client, praw_settings, jwt_header):
@@ -185,6 +244,30 @@ def test_create_text_post(client, logged_in_profile, use_betamax, praw_settings)
     }
 
 
+def test_create_post_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+    """
+    Create a new text post for a channel the user doesn't have permission to
+    """
+    url = reverse('post-list', kwargs={'channel_name': 'my_channel2'})
+    resp = client.post(url, {
+        'title': 'parameterized testing',
+        'text': 'tests are great',
+    })
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_create_post_not_found(client, logged_in_profile, use_betamax, praw_settings):
+    """
+    Create a new text post for a channel that doesn't exist
+    """
+    url = reverse('post-list', kwargs={'channel_name': 'doesnt_exist'})
+    resp = client.post(url, {
+        'title': 'parameterized testing',
+        'text': 'tests are great',
+    })
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+
 @pytest.mark.parametrize("missing_user", [True, False])
 def test_get_deleted_post(client, logged_in_profile, use_betamax, praw_settings, missing_user):
     """Get an existing post"""
@@ -239,6 +322,22 @@ def test_get_post(client, logged_in_profile, use_betamax, praw_settings, missing
             'profile_image': profile_image,
             "author_name": profile.name,
         }
+
+
+def test_get_post_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+    """Get a post the user doesn't have permission to"""
+    post_id = 'adc'
+    url = reverse('post-detail', kwargs={'post_id': post_id})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_get_post_not_found(client, logged_in_profile, use_betamax, praw_settings):
+    """Get a post the user doesn't have permission to"""
+    post_id = 'missing'
+    url = reverse('post-detail', kwargs={'post_id': post_id})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
@@ -303,6 +402,20 @@ def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missi
             ],
             'pagination': {}
         }
+
+
+def test_list_posts_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+    """List posts in a channel the user doesn't have access to"""
+    url = reverse('post-list', kwargs={'channel_name': 'my_channel2'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_list_posts_not_found(client, logged_in_profile, use_betamax, praw_settings):
+    """List posts in a channel the user doesn't have access to"""
+    url = reverse('post-list', kwargs={'channel_name': 'missing'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.parametrize('params,expected', [
@@ -386,6 +499,22 @@ def test_update_post_upvote(client, logged_in_profile, use_betamax, praw_setting
     }
 
 
+def test_update_post_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+    """Test updating a post the user isn't the owner of"""
+    post_id = 'acd'
+    url = reverse('post-detail', kwargs={'post_id': post_id})
+    resp = client.patch(url, format='json', data={"text": "overwrite"})
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_update_post_not_found(client, logged_in_profile, use_betamax, praw_settings):
+    """Test updating a post that doesn't exist"""
+    post_id = 'missing'
+    url = reverse('post-detail', kwargs={'post_id': post_id})
+    resp = client.patch(url, format='json', data={"text": "overwrite"})
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+
 def test_create_post_without_upvote(client, logged_in_profile, use_betamax, praw_settings):
     """Test creating a post without an upvote in the body"""
     url = reverse('post-list', kwargs={'channel_name': 'subreddit_for_testing'})
@@ -409,6 +538,14 @@ def test_create_post_without_upvote(client, logged_in_profile, use_betamax, praw
         "profile_image": logged_in_profile.image_small,
         "author_name": logged_in_profile.name
     }
+
+
+# Reddit doesn't indicate if a post deletion failed so we don't have tests for that
+def test_delete_post(client, logged_in_profile, use_betamax, praw_settings):
+    """Delete a post in a channel"""
+    url = reverse('post-detail', kwargs={'post_id': '2'})
+    resp = client.delete(url)
+    assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
@@ -472,6 +609,20 @@ def test_list_comments(client, logged_in_profile, use_betamax, praw_settings, mi
     ]
 
 
+def test_list_comments_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+    """List all comments in the comment tree for a post the user doesn't have access to"""
+    url = reverse('comment-list', kwargs={'post_id': 'adc'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_list_comments_not_found(client, logged_in_profile, use_betamax, praw_settings):
+    """List all comments in the comment tree for a post that doesn't exist"""
+    url = reverse('comment-list', kwargs={'post_id': 'missing'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+
 def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_settings):
     """List comments which are deleted according to reddit"""
     user = ProfileFactory.create(user__username='admin').user
@@ -514,7 +665,7 @@ def test_create_comment(client, logged_in_profile, use_betamax, praw_settings):
     resp = client.post(url, data={
         "text": "reply_to_post 2",
     })
-    assert resp.status_code == 201
+    assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'author_id': 'george',
         'created': '2017-07-25T21:20:35+00:00',
@@ -528,6 +679,26 @@ def test_create_comment(client, logged_in_profile, use_betamax, praw_settings):
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
     }
+
+
+def test_create_comment_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+    """Create a comment for a post the user doesn't have access to"""
+    post_id = 'adc'
+    url = reverse('comment-list', kwargs={'post_id': post_id})
+    resp = client.post(url, data={
+        "text": "reply_to_post 2",
+    })
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_create_comment_not_found(client, logged_in_profile, use_betamax, praw_settings):
+    """Create a comment for a post that doesn't exist"""
+    post_id = 'missing'
+    url = reverse('comment-list', kwargs={'post_id': post_id})
+    resp = client.post(url, data={
+        "text": "reply_to_post 2",
+    })
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_create_comment_no_upvote(client, logged_in_profile, use_betamax, praw_settings):
@@ -624,6 +795,17 @@ def test_update_comment_text(client, logged_in_profile, use_betamax, praw_settin
     }
 
 
+# Reddit returns the same result for updating a missing comment
+# as it does for updating a comment the user doesn't own.
+def test_update_comment_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+    """Update a comment's text for a comment the user doesn't own"""
+    url = reverse('comment-detail', kwargs={'comment_id': 'e8h'})
+    resp = client.patch(url, type='json', data={
+        "text": "updated text",
+    })
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
 def test_update_comment_upvote(client, logged_in_profile, use_betamax, praw_settings):
     """Update a comment to upvote it"""
     comment_id = 'l'
@@ -715,11 +897,12 @@ def test_update_comment_clear_downvote(client, logged_in_profile, use_betamax, p
     }
 
 
+# Reddit doesn't indicate if a comment deletion failed so we don't have tests that
 def test_delete_comment(client, logged_in_profile, use_betamax, praw_settings):
     """Delete a comment"""
     url = reverse('comment-detail', kwargs={'comment_id': '6'})
     resp = client.delete(url)
-    assert resp.status_code == 204
+    assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
@@ -1051,3 +1234,18 @@ def test_remove_subscriber_again(client, use_betamax, praw_settings, staff_jwt_h
         'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
     resp = client.delete(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+def test_api_exception(client, logged_in_profile, use_betamax, praw_settings, mocker):
+    """Make sure APIExceptions which aren't recognized become 500 errors"""
+    exception = APIException('bizarre', 'A bizarre exception', 'bizarre_field')
+    mocker.patch(
+        'channels.serializers.CommentSerializer.update',
+        side_effect=exception
+    )
+    url = reverse('comment-detail', kwargs={'comment_id': 'e8h'})
+    with pytest.raises(APIException) as ex:
+        client.patch(url, type='json', data={
+            "text": "updated text",
+        })
+    assert ex.value == exception
