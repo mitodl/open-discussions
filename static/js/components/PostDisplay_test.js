@@ -9,12 +9,14 @@ import PostDisplay from "./PostDisplay"
 import Router from "../Router"
 
 import { wait } from "../lib/util"
+import { urlHostname } from "../lib/url"
 import { formatCommentsCount } from "../lib/posts"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("PostDisplay", () => {
-  let helper
+  let helper, post
+
   const renderPostDisplay = props => {
     props = {
       toggleUpvote: () => {},
@@ -29,6 +31,7 @@ describe("PostDisplay", () => {
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
+    post = makePost()
   })
 
   afterEach(() => {
@@ -36,7 +39,6 @@ describe("PostDisplay", () => {
   })
 
   it("should render a post correctly", () => {
-    const post = makePost()
     const wrapper = renderPostDisplay({ post })
     const summary = wrapper.find(".summary")
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
@@ -51,14 +53,12 @@ describe("PostDisplay", () => {
   })
 
   it("should link to the subreddit, if told to", () => {
-    const post = makePost()
     post.channel_name = "channel_name"
     const wrapper = renderPostDisplay({ post: post, showChannelLink: true })
     assert.equal(wrapper.find(Link).at(1).props().to, "/channel/channel_name")
   })
 
   it("should display text, if given a text post and the 'expanded' flag", () => {
-    const post = makePost()
     const string = "JUST SOME GREAT TEXT!"
     post.text = string
     const wrapper = renderPostDisplay({ post: post, expanded: true })
@@ -66,14 +66,12 @@ describe("PostDisplay", () => {
   })
 
   it("should display profile image, if expanded", () => {
-    const post = makePost()
     const wrapper = renderPostDisplay({ post: post, expanded: true })
     const { src } = wrapper.find(".summary img").props()
     assert.equal(src, post.profile_image)
   })
 
   it("should not display images from markdown", () => {
-    const post = makePost()
     post.text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
     const wrapper = renderPostDisplay({ post: post, expanded: true })
     assert.equal(wrapper.find(ReactMarkdown).props().source, post.text)
@@ -81,7 +79,6 @@ describe("PostDisplay", () => {
   })
 
   it("should not display text, if given a text post but lacking the 'expanded' flag", () => {
-    const post = makePost()
     const string = "JUST SOME GREAT TEXT!"
     post.text = string
     const wrapper = renderPostDisplay({ post: post })
@@ -97,8 +94,13 @@ describe("PostDisplay", () => {
     assert.equal(children, post.title)
   })
 
+  it("should display the domain, for a url post", () => {
+    const post = makePost(true)
+    const wrapper = renderPostDisplay({ post: post })
+    assert.include(wrapper.find(".url-hostname").text(), urlHostname(post.url))
+  })
+
   it("should link to the detail view, if a text post", () => {
-    const post = makePost()
     const wrapper = renderPostDisplay({ post: post })
     const { to, children } = wrapper.find(Link).at(0).props()
     assert.equal(children, post.title)
@@ -124,7 +126,6 @@ describe("PostDisplay", () => {
   ;[true, false].forEach(prevUpvote => {
     it(`should show the correct UI when the upvote 
     button is clicked when prev state was ${String(prevUpvote)}`, async () => {
-      const post = makePost()
       post.upvoted = prevUpvote
       // setting to a function so Flow doesn't complain
       let resolveUpvote = () => null

@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 
-import { channelURL, postDetailURL } from "../lib/url"
+import { channelURL, postDetailURL, urlHostname } from "../lib/url"
 import { formatCommentsCount } from "../lib/posts"
 
 import type { Post } from "../flow/discussionTypes"
@@ -26,9 +26,19 @@ const postTitle = (post: Post) =>
     >
       {post.title}
     </Link>
-    : <a className="post-title" href={post.url} target="_blank">
-      {post.title}
-    </a>
+    : <div>
+      <a
+        className="post-title"
+        href={post.url}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {post.title}
+      </a>
+      <span className="url-hostname">
+        {`(${urlHostname(post.url)})`}
+      </span>
+    </div>
 
 class PostDisplay extends React.Component {
   props: {

@@ -8,7 +8,8 @@ import {
   newPostURL,
   postDetailURL,
   getChannelNameFromPathname,
-  toQueryString
+  toQueryString,
+  urlHostname
 } from "./url"
 
 describe("url helper functions", () => {
@@ -77,6 +78,29 @@ describe("url helper functions", () => {
         }),
         "?abc=10&def=1"
       )
+    })
+  })
+
+  describe("urlHostname", () => {
+    it("should pull out the hostname", () => {
+      [
+        [
+          "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+          "developer.mozilla.org"
+        ],
+        ["https://github.com/mitodl/open-discussions", "github.com"],
+        [
+          "https://mobile.github.com/mitodl/open-discussions",
+          "mobile.github.com"
+        ],
+        ["https://mail.google.com/", "mail.google.com"],
+        [
+          "https://www.nytimes.com/2017/10/16/us/politics/trump-mcconnell-bannon.html",
+          "www.nytimes.com"
+        ]
+      ].forEach(([url, expectation]) => {
+        assert.equal(urlHostname(url), expectation)
+      })
     })
   })
 })

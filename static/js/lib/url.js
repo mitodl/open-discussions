@@ -26,5 +26,8 @@ export const AUTH_REQUIRED_URL = "/auth_required/"
 const QS_OPTIONS = {
   sort: (a, b) => a.localeCompare(b)
 }
+
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params, QS_OPTIONS)}`
+
+export const urlHostname = (url: ?string) => (url ? new URL(url).hostname : "")
