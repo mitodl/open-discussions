@@ -14,6 +14,22 @@ import type { Dispatch } from "redux"
 import type { Channel } from "../flow/discussionTypes"
 import type { Location } from "react-router"
 
+// see https://github.com/mitodl/open-discussions/issues/295
+if (!MDCTemporaryDrawer.prototype.getDefaultFoundation_) {
+  MDCTemporaryDrawer.prototype.getDefaultFoundation_ =
+    MDCTemporaryDrawer.prototype.getDefaultFoundation
+  MDCTemporaryDrawer.prototype.getDefaultFoundation = function() {
+    const foundation = this.getDefaultFoundation_()
+
+    foundation.drawerClickHandler_ = e => {
+      if (e.target.tagName !== "A") {
+        e.stopPropagation()
+      }
+    }
+    return foundation
+  }
+}
+
 class Drawer extends React.Component {
   // the ref for the rendered DOM element, which MDCTemporaryDrawer needs
   // access to in order to manage it's animations and so on
