@@ -37,7 +37,17 @@ const devConfig = Object.assign({}, config, {
 });
 
 devConfig.module.rules = [
-  babelSharedLoader, ...config.module.rules
+  babelSharedLoader,
+  ...config.module.rules,
+  {
+    test: /\.css$|\.scss$/,
+    use: [
+      { loader: 'style-loader' },
+      { loader: 'css-loader' },
+      { loader: 'postcss-loader' },
+      { loader: 'sass-loader' },
+    ]
+  },
 ];
 
 const makeDevConfig = (host, port) => (
