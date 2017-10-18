@@ -4,36 +4,13 @@ This provides a discussion forum for use with other MIT applications.
 ## Installation specific to this app
 
 This app uses a similar stack to other mitodl apps (Docker/Django/Webpack). Installation steps that are common to
-all of these apps can be found below, beginning with the [Major Dependencies](#major-dependencies) section. **Those 
+all of these apps can be found below, beginning with the [Major Dependencies](#major-dependencies) section. **Those
 installation steps should be completed before the following steps, which are specific to this app.**
 
  1. Set up a reddit instance for use as a backing store. See the README
  at https://github.com/mitodl/reddit-config for instructions on how
  to set up reddit to work with open_discussions.
- 1. With reddit running in the Vagrant VM, log in and create a `script` application to fill in your `.env` vars.
-    - Navigate to `http://reddit.local/` and click the "Log in or sign up" link on the right side of the screen.
-      - If necessary, create a new account using any credentials (no email needed).
-    - Once logged in, click the "preferences" link on the right side of the screen, then click the "apps" tab.
-    - Click the button to create an app. This will reveal a form.
-    - Select the "script" option for this app. "Name" and "Redirect URL" are required, but the values don't matter. Click
-      "create app" when ready. 
-    - You should see a card with information about the created app. The secret and client id can be copied from here:
-      - Under the app name and "personal use script" subheading is the value for `OPEN_DISCUSSIONS_REDDIT_CLIENT_ID`.
-      - Next to the "secret" label is the value for `OPEN_DISCUSSIONS_REDDIT_SECRET`.
-    - Copy the secret/client id to `OPEN_DISCUSSIONS_REDDIT_CLIENT_ID` and `OPEN_DISCUSSIONS_REDDIT_SECRET` in your 
-      open_discussions `.env` file.
- 1. Base64-encode the client ID and update reddit-config:
-    - Use `printf` to encode the client ID instead of `echo` to avoid encoding the newline (e.g.: `printf "KEY" | base64`)
-    - Add the following lines to `reddit-config/r2/local.update` (create it if it doesn't exist):
-    
-        ```
-        [secrets]
-        generate_refresh_token_client_id = <base64 encoded value here>
-        ```
- 
- 1. cd to `reddit-config` and reload/re-provision the Vagrant VM to update the config with your client ID: 
-    `vagrant reload && vagrant provision`.
- 1. Run the open_discussions container and navigate to the running site in your browser 
+ 1. Run the containers for open_discussions and navigate to the running site in your browser
     ([outlined here](#5-run-the-container)).
 
 ## Major Dependencies
@@ -119,16 +96,16 @@ and add a superuser in the now-running Docker container:
 You should now be able to do visit open_discussions in your browser on port `8063`. _(OSX Only)_ Docker auto-assigns
  the container IP. Run ``docker-machine ip`` to see it. Your open_discussions URL will
  be something like this: ``192.168.99.100:8063``.
- 
+
 #### 5a) Log in
 
-There is no official login page yet, so in order to use the site as a logged in user, you'll need to login 
+There is no official login page yet, so in order to use the site as a logged in user, you'll need to login
 via Django admin first (`http://<open_discussions_url>:8063/admin`). Use the credentials for the superuser you created
 in the step above.
 
 #### 5b) Set up initial channel/post data
 
-The app UI is not currently usable until a channel exists and the logged-in user has a post associated with the channel. 
+The app UI is not currently usable until a channel exists and the logged-in user has a post associated with the channel.
 The following commands will create a channel and a post:
 
 First, create an authentication token (good for one hour) in a django shell.
@@ -151,7 +128,7 @@ Then use these bash commands with the above token to create a channel and post:
  curl -X POST -H "Authorization: Bearer $TOKEN" "http://<open_discussions_url>:8063/api/v0/channels/" \
    -H "Content-Type: application/json" \
    -d '{"title": "Test Channel", "name": "test_channel", "public_description": "This is a test channel", "channel_type": "public"}'
- 
+
  # Create a post for the channel
  curl -X POST -H "Authorization: Bearer $TOKEN" "http://<open_discussions_url>:8063/api/v0/channels/test_channel/posts/" \
    -H "Content-Type: application/json" \
