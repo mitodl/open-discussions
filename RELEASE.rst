@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.2.2
+-------------
+
+- Switched to static reddit OAuth for local
+- Add the domain after the tile for URL posts
+- Fix a bug with the MDC Drawer component
+- Added docs with gh-pages style.
+
 Version 0.2.1
 -------------
 
