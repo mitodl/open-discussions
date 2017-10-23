@@ -108,7 +108,7 @@ export default class CreatePostForm extends React.Component {
                 <label>Link URL</label>
                 <input
                   type="url"
-                  placeholder="www.example.com"
+                  placeholder="https://www.example.com"
                   name="url"
                   value={url}
                   onChange={onUpdate}
