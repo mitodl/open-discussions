@@ -23,7 +23,7 @@ class CustomBodyMatcher(BodyMatcher):
         return recorded_body == request_body
 
 
-def setup_betamax():
+def setup_betamax(record_mode='none'):
     """Do global configuration for betamax. This function is idempotent."""
     Betamax.register_request_matcher(CustomBodyMatcher)
     Betamax.register_serializer(PrettyJSONSerializer)
@@ -32,3 +32,4 @@ def setup_betamax():
     config.cassette_library_dir = "cassettes"
     config.default_cassette_options['match_requests_on'] = ['uri', 'method', 'custom-body']
     config.default_cassette_options['serialize_with'] = 'prettyjson'
+    config.default_cassette_options['record_mode'] = record_mode
