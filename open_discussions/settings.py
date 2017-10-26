@@ -15,6 +15,7 @@ import os
 import platform
 
 import dj_database_url
+from celery.schedules import crontab
 from django.core.exceptions import ImproperlyConfigured
 
 from open_discussions.envs import (
@@ -76,7 +77,8 @@ INSTALLED_APPS = (
     'corsheaders',
     # Put our apps after this point
     'open_discussions',
-    'profiles'
+    'channels',
+    'profiles',
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -360,6 +362,13 @@ CELERY_RESULT_BACKEND = get_string(
 )
 CELERY_TASK_ALWAYS_EAGER = get_bool("CELERY_TASK_ALWAYS_EAGER", False)
 CELERY_TASK_EAGER_PROPAGATES = get_bool("CELERY_TASK_EAGER_PROPAGATES", True)
+
+CELERY_BEAT_SCHEDULE = {
+    'evict-expired-access-tokens-every-1-hrs': {
+        'task': 'channels.tasks.evict_expired_access_tokens',
+        'schedule': crontab(minute=0, hour='*')
+    },
+}
 
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

@@ -1,10 +1,12 @@
 """open_discussions utilities"""
+import datetime
 from enum import (
     auto,
     Flag,
 )
 import logging
 
+import pytz
 from django.conf import settings
 
 
@@ -33,3 +35,27 @@ def webpack_dev_server_url(request):
     Get the full URL where the webpack dev server should be running
     """
     return 'http://{}:{}'.format(webpack_dev_server_host(request), settings.WEBPACK_DEV_SERVER_PORT)
+
+
+def is_near_now(time):
+    """
+    Returns true if time is within five seconds or so of now
+    Args:
+        time (datetime.datetime):
+            The time to test
+    Returns:
+        bool:
+            True if near now, false otherwise
+    """
+    now = datetime.datetime.now(tz=pytz.UTC)
+    five_seconds = datetime.timedelta(0, 5)
+    return now - five_seconds < time < now + five_seconds
+
+
+def now_in_utc():
+    """
+    Get the current time in UTC
+    Returns:
+        datetime.datetime: A datetime object for the current time
+    """
+    return datetime.datetime.now(tz=pytz.UTC)

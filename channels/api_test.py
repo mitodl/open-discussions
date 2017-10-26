@@ -9,6 +9,10 @@ from rest_framework.exceptions import NotFound
 
 from open_discussions.factories import UserFactory
 from channels import api
+from channels.models import (
+    RedditAccessToken,
+    RedditRefreshToken,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -362,7 +366,11 @@ def test_api_constructor(mocker, settings, verify_ssl):
     client_user = UserFactory.create()
     session_stub = mocker.patch('channels.api.requests.Session', autospec=True)
     refresh_token = 'token'
-    session_stub.return_value.get.return_value.json.return_value = {'refresh_token': refresh_token}
+    session_stub.return_value.get.return_value.json.return_value = {
+        'refresh_token': refresh_token,
+        'access_token': 'access_token',
+        'expires_in': 123,
+    }
     session_stub.return_value.headers = {}
 
     settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID = 'client_id'
@@ -382,20 +390,29 @@ def test_api_constructor(mocker, settings, verify_ssl):
     assert config.refresh_token == refresh_token
 
 
-def test_get_or_create_user(mocker, settings):
+def test_get_or_create_auth_tokens(mocker, settings, user):
     """
-    get_or_create_user will contact our plugin's API to get a refresh token for a user, or to create one
+    get_or_create_auth_tokens will contact our plugin's API to get a refresh token for a user, or to create one
     """
     settings.OPEN_DISCUSSIONS_REDDIT_URL = 'http://fake'
     refresh_token_url = urljoin(settings.OPEN_DISCUSSIONS_REDDIT_URL, '/api/v1/generate_refresh_token')
     get_session_stub = mocker.patch('channels.api._get_session', autospec=True)
-    expected_token = 'token'
-    get_session_stub.return_value.get.return_value.json.return_value = {'refresh_token': expected_token}
-    username = 'test_user'
-    token = api.get_or_create_user(username)
-    assert token == expected_token
-    get_session_stub.return_value.get.assert_called_once_with(refresh_token_url, params={'username': username})
+    refresh_token_value = 'refresh_token'
+    access_token_value = 'access_token'
+    get_session_stub.return_value.get.return_value.json.return_value = {
+        'refresh_token': refresh_token_value,
+        'access_token': access_token_value,
+        'expires_in': 123,
+    }
+    assert RedditAccessToken.objects.filter(user=user).count() == 0
+    assert RedditRefreshToken.objects.filter(user=user).count() == 0
+    refresh_token, access_token = api.get_or_create_auth_tokens(user)
+    assert refresh_token.token_value == refresh_token_value
+    assert access_token.token_value == access_token_value
+    get_session_stub.return_value.get.assert_called_once_with(refresh_token_url, params={'username': user.username})
     get_session_stub.return_value.get.return_value.json.assert_called_once_with()
+    assert RedditAccessToken.objects.filter(user=user).count() == 1
+    assert RedditRefreshToken.objects.filter(user=user).count() == 1
 
 
 def test_add_subscriber(mock_client):

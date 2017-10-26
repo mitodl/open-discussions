@@ -1,10 +1,13 @@
 """Channels APIs"""
 # pylint: disable=too-many-public-methods
+from datetime import datetime, timedelta
 from urllib.parse import urljoin
 
+import pytz
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db import transaction
 import praw
 from praw.models.reddit import more
 from praw.models.reddit.redditor import Redditor
@@ -16,6 +19,13 @@ from rest_framework.exceptions import (
     PermissionDenied,
     NotFound,
 )
+
+from channels.models import (
+    RedditAccessToken,
+    RedditRefreshToken,
+)
+
+from open_discussions.utils import now_in_utc
 
 CHANNEL_TYPE_PUBLIC = 'public'
 CHANNEL_TYPE_PRIVATE = 'private'
@@ -36,10 +46,15 @@ CHANNEL_SETTINGS = (
     'submit_text',
     'submit_text_label',
 )
+
+# this comes from https://github.com/mitodl/reddit/blob/master/r2/r2/models/token.py#L270
+FULL_ACCESS_SCOPE = '*'
+EXPIRES_IN_OFFSET = 30  # offsets the reddit refresh_token expirations by 30 seconds
+
 User = get_user_model()
 
 
-def get_or_create_user(username):
+def _get_refresh_token(username):
     """
     Get or create a user on reddit using our refresh_token plugin
 
@@ -47,7 +62,7 @@ def get_or_create_user(username):
         username (str): The reddit username
 
     Returns:
-        str: A refresh token for use with praw to authenticate
+        dict: parsed json response for refresh token
     """
     # This is using our custom refresh_token plugin which is installed against
     # a modified instance of reddit. It registers a new user with a random password if
@@ -56,26 +71,97 @@ def get_or_create_user(username):
     refresh_token_url = urljoin(settings.OPEN_DISCUSSIONS_REDDIT_URL, '/api/v1/generate_refresh_token')
 
     session = _get_session()
-    resp = session.get(refresh_token_url, params={'username': username}).json()
-    return resp['refresh_token']
+    return session.get(refresh_token_url, params={'username': username}).json()
 
 
-def _get_user_credentials(user):
+def get_or_create_auth_tokens(user):
     """
-    Get credentials for authenticated user
+    Gets the stored refresh token or generates a new one
 
     Args:
         user (User): the authenticated user
 
     Returns:
-        dict: set of configuration credentials for the user
+        (channels.models.RedditRefreshToken, channels.models.RedditAccessToken): the stored tokens
     """
-    refresh_token = get_or_create_user(user.username)
+    threshold_date = now_in_utc() + timedelta(minutes=2)
+    refresh_token, _ = RedditRefreshToken.objects.get_or_create(user=user)
+    access_token = None
 
+    # if we created this token just now, atomically generate one
+    if not refresh_token.token_value:
+        with transaction.atomic():
+            refresh_token = RedditRefreshToken.objects.filter(user=user).select_for_update()[0]
+            if not refresh_token.token_value:
+                response = _get_refresh_token(user.username)
+                refresh_token.token_value = response['refresh_token']
+                refresh_token.save()
+
+                # the response also returns a valid access_token, so we might as well store that for use
+                # offset it negatively a bit to account for response time
+                expires_at = now_in_utc() + timedelta(seconds=response['expires_in'] - EXPIRES_IN_OFFSET)
+                access_token = RedditAccessToken.objects.create(
+                    user=user,
+                    token_value=response['access_token'],
+                    token_expires_at=expires_at
+                )
+
+    # return the refresh token and access_token
+    return refresh_token, (access_token or RedditAccessToken.valid_tokens_for_user(user, threshold_date).first())
+
+
+def _configure_access_token(client, access_token, user):
+    """
+    Configure or fetch a new access_token for the client
+
+    Args:
+        client (praw.Reddit): the client needing access_token configuration
+        access_token (channels.models.RedditAccessToken): an access token to try
+        user (User): the authenticated user
+
+    Returns:
+        client (praw.Reddit): the configured client
+    """
+    # pylint: disable=protected-access
+
+    # if we have a valid access token, use it
+    # otherwise force a fetch for a new one and persist it
+    authorizer = client._core._authorizer
+
+    if access_token:
+        # "hydrate" the authorizer from our stored access token
+        authorizer.access_token = access_token.token_value
+        authorizer._expiration_timestamp = access_token.token_expires_at.timestamp()
+        authorizer.scopes = set([FULL_ACCESS_SCOPE])
+    else:
+        authorizer = client._core._authorizer
+        authorizer.refresh()
+        expires_at = datetime.fromtimestamp(authorizer._expiration_timestamp)
+        RedditAccessToken.objects.create(
+            user=user,
+            token_value=authorizer.access_token,
+            token_expires_at=expires_at.replace(tzinfo=pytz.utc)
+        )
+
+    return client
+
+
+def _get_client_base_kwargs():
+    """
+    Returns common kwargs passed to praw.Redditor
+
+    Returns:
+        dict: set of client kwargs
+    """
     return {
+        'reddit_url': settings.OPEN_DISCUSSIONS_REDDIT_URL,
+        'oauth_url': settings.OPEN_DISCUSSIONS_REDDIT_URL,
+        'short_url': settings.OPEN_DISCUSSIONS_REDDIT_URL,
+        'user_agent': _get_user_agent(),
+        'requestor_kwargs': _get_requester_kwargs(),
+        'check_for_updates': False,
         'client_id': settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID,
         'client_secret': settings.OPEN_DISCUSSIONS_REDDIT_SECRET,
-        'refresh_token': refresh_token,
     }
 
 
@@ -116,22 +202,24 @@ def _get_client(user):
     Returns:
         praw.Reddit: configured reddit client
     """
-    credentials = _get_user_credentials(user=user)
+    refresh_token, access_token = get_or_create_auth_tokens(user)
 
-    return praw.Reddit(
-        reddit_url=settings.OPEN_DISCUSSIONS_REDDIT_URL,
-        oauth_url=settings.OPEN_DISCUSSIONS_REDDIT_URL,
-        short_url=settings.OPEN_DISCUSSIONS_REDDIT_URL,
-        user_agent=_get_user_agent(),
-        requestor_kwargs=_get_requester_kwargs(),
-        check_for_updates=False,
-        **credentials
-    )
+    return _configure_access_token(praw.Reddit(
+        refresh_token=refresh_token.token_value,
+        **_get_client_base_kwargs(),
+    ), access_token, user)
 
 
 def _get_user_agent():
     """Gets the user agent"""
     return USER_AGENT.format(version=settings.VERSION)
+
+
+def evict_expired_access_tokens():
+    """Evicts expired access tokens"""
+    # give a 5-minute buffer
+    now = now_in_utc() - timedelta(minutes=5)
+    RedditAccessToken.objects.filter(token_expires_at__lt=now).delete()
 
 
 class Api:

@@ -1,6 +1,7 @@
 """Tests for views for REST APIs for users"""
 import json
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import pytest
 
@@ -48,11 +49,11 @@ def test_create_user(client, staff_jwt_header, mocker):
             'image_medium': 'image_medium',
         }
     }
-    get_or_create_user_stub = mocker.patch('profiles.serializers.get_or_create_user')
+    get_or_create_auth_tokens_stub = mocker.patch('profiles.serializers.get_or_create_auth_tokens')
     resp = client.post(url, data=json.dumps(payload), **API_KWARGS, **staff_jwt_header)
     assert resp.status_code == 201
     assert resp.json()['profile'] == payload['profile']
-    get_or_create_user_stub.assert_called_once_with(resp.json()['username'])
+    get_or_create_auth_tokens_stub.assert_called_once_with(User.objects.get(username=resp.json()['username']))
 
 
 def test_get_user(client, user, staff_jwt_header):
