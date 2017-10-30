@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.3.0
+-------------
+
+- Added caching for refresh and access tokens
+
 Version 0.2.2
 -------------
 
