@@ -62,7 +62,7 @@
       "description": "E-mail to send 500 reports to."
     },
     "OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT": {
-      "description": "Number of posts to display on the forntpage and channels",
+      "description": "Number of posts to display on the frontpage and channels",
       "required": false
     },
     "OPEN_DISCUSSIONS_COOKIE_NAME": {
