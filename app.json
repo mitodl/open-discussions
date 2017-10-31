@@ -21,13 +21,16 @@
   "description": "open-discussions",
   "env": {
     "AWS_ACCESS_KEY_ID": {
-      "description": "AWS Access Key for S3 storage."
+      "description": "AWS Access Key for S3 storage.",
+      "required": false
     },
     "AWS_SECRET_ACCESS_KEY": {
-      "description": "AWS Secret Key for S3 storage."
+      "description": "AWS Secret Key for S3 storage.",
+      "required": false
     },
     "AWS_STORAGE_BUCKET_NAME": {
-      "description": "S3 Bucket name."
+      "description": "S3 Bucket name.",
+      "required": false
     },
     "GA_TRACKING_ID": {
       "description": "Google analytics tracking ID",
