@@ -907,13 +907,11 @@ def test_add_subscriber(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Adds a subscriber to a channel
     """
-    from channels.test_utils import no_ssl_verification
-    with no_ssl_verification():
-        subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
-        url = reverse('subscriber-list', kwargs={'channel_name': 'admin_channel'})
-        resp = client.post(url, data={'subscriber_name': subscriber.username}, format='json', **staff_jwt_header)
-        assert resp.status_code == status.HTTP_201_CREATED
-        assert resp.json() == {'subscriber_name': subscriber.username}
+    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse('subscriber-list', kwargs={'channel_name': 'admin_channel'})
+    resp = client.post(url, data={'subscriber_name': subscriber.username}, format='json', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json() == {'subscriber_name': subscriber.username}
 
 
 def test_add_subscriber_again(client, use_betamax, praw_settings, staff_jwt_header):
@@ -968,29 +966,25 @@ def test_detail_subscriber(client, use_betamax, praw_settings, staff_jwt_header)
     """
     Detail of a subscriber in a channel
     """
-    from channels.test_utils import no_ssl_verification
-    with no_ssl_verification():
-        subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
-        url = reverse(
-            'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
-        resp = client.get(url, **staff_jwt_header)
-        assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == {'subscriber_name': subscriber.username}
+    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse(
+        'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
+    resp = client.get(url, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {'subscriber_name': subscriber.username}
 
 
 def test_detail_subscriber_missing(client, use_betamax, praw_settings):
     """
     A missing subscriber should generate a 404
     """
-    from channels.test_utils import no_ssl_verification
-    with no_ssl_verification():
-        subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
-        client.force_login(subscriber)
-        url = reverse(
-            'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username}
-        )
-        resp = client.get(url)
-        assert resp.status_code == status.HTTP_404_NOT_FOUND
+    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    client.force_login(subscriber)
+    url = reverse(
+        'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username}
+    )
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
 def test_remove_contributor(client, use_betamax, praw_settings, staff_jwt_header):

@@ -439,22 +439,17 @@ def test_add_remove_subscriber_no_user(mock_client):
 
 def test_remove_subscriber(mock_client):
     """Test remove subscriber"""
-    from .test_utils import no_ssl_verification
-    with no_ssl_verification():
-        client = api.Api(UserFactory.create(username='mitodl'))
-        subscriber = UserFactory.create(username='01BTN7HY2SGT9677JXGNDDW859')
-        client.remove_subscriber(subscriber.username, 'testchannel5')
-        mock_client.subreddit.return_value.unsubscribe.assert_called_once_with()
+    client = api.Api(UserFactory.create(username='mitodl'))
+    subscriber = UserFactory.create(username='01BTN7HY2SGT9677JXGNDDW859')
+    client.remove_subscriber(subscriber.username, 'testchannel5')
+    mock_client.subreddit.return_value.unsubscribe.assert_called_once_with()
 
 
 def test_is_subscriber(mock_client):
     """Test is subscriber"""
-    from .test_utils import no_ssl_verification
-
-    with no_ssl_verification():
-        client = api.Api(UserFactory.create(username='mitodl'))
-        subscriber = UserFactory.create()
-        mock_client.user.subreddits.return_value = [Mock(display_name='sub1'), Mock(display_name='sub2')]
-        assert client.is_subscriber(subscriber.username, 'channel_test_name') is False
-        assert client.is_subscriber(subscriber.username, 'sub2') is True
-        assert mock_client.user.subreddits.call_count == 2
+    client = api.Api(UserFactory.create(username='mitodl'))
+    subscriber = UserFactory.create()
+    mock_client.user.subreddits.return_value = [Mock(display_name='sub1'), Mock(display_name='sub2')]
+    assert client.is_subscriber(subscriber.username, 'channel_test_name') is False
+    assert client.is_subscriber(subscriber.username, 'sub2') is True
+    assert mock_client.user.subreddits.call_count == 2
