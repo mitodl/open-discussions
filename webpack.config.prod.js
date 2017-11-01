@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 var path = require("path");
 var BundleTracker = require('webpack-bundle-tracker');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const { config, babelSharedLoader } = require(path.resolve("./webpack.config.shared.js"));
 
 const prodBabelConfig = Object.assign({}, babelSharedLoader);
@@ -11,14 +12,24 @@ prodBabelConfig.query.plugins.push(
 );
 
 const prodConfig = Object.assign({}, config);
-prodConfig.module.rules = [prodBabelConfig, ...config.module.rules];
+prodConfig.module.rules = [
+  prodBabelConfig,
+  ...config.module.rules,
+  {
+    test: /\.css$|\.scss$/,
+    use:  ExtractTextPlugin.extract({
+      fallback: 'style-loader',
+      use:      ['css-loader', 'postcss-loader', 'sass-loader'],
+    })
+  }
+];
 
 module.exports = Object.assign(prodConfig, {
   context: __dirname,
-  output: {
-    path: path.resolve('./static/bundles/'),
-    filename: "[name]-[chunkhash].js",
-    chunkFilename: "[id]-[chunkhash].js",
+  output:  {
+    path:               path.resolve('./static/bundles/'),
+    filename:           "[name]-[chunkhash].js",
+    chunkFilename:      "[id]-[chunkhash].js",
     crossOriginLoading: "anonymous",
   },
 
@@ -35,7 +46,7 @@ module.exports = Object.assign(prodConfig, {
       sourceMap: true,
     }),
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'common',
+      name:      'common',
       minChunks: 2,
     }),
     new BundleTracker({
@@ -45,6 +56,11 @@ module.exports = Object.assign(prodConfig, {
       minimize: true
     }),
     new webpack.optimize.AggressiveMergingPlugin(),
+    new ExtractTextPlugin({
+      filename:    "[name]-[contenthash].css",
+      allChunks:   true,
+      ignoreOrder: false,
+    })
   ],
   devtool: 'source-map'
 });
