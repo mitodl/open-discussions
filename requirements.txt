@@ -38,7 +38,7 @@ pickleshare==0.7.4        # via ipython
 praw==4.5.1
 prawcore==0.10.1          # via praw
 prompt-toolkit==1.0.14    # via ipython
-psycopg2==2.6
+psycopg2==2.7
 ptyprocess==0.5.1         # via pexpect
 pygments==2.2.0           # via ipython
 pyjwt==1.5.2              # via djangorestframework-jwt
