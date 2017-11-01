@@ -5,6 +5,8 @@ from django.core.urlresolvers import reverse
 from praw.exceptions import APIException
 from rest_framework import status
 
+from channels.api import Api
+from channels.factories import RedditFactories
 from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
 from profiles.factories import ProfileFactory
@@ -13,21 +15,33 @@ from profiles.factories import ProfileFactory
 pytestmark = pytest.mark.django_db
 
 
+@pytest.fixture()
+def reddit_factories(request, cassette_exists, staff_user):
+    """RedditFactories fixture"""
+    name = "{}.{}".format(request.module.__name__, request.function.__name__)
+    ctx = RedditFactories(name, api=Api(staff_user))
+    if cassette_exists:
+        ctx.load()
+    yield ctx
+    if not cassette_exists:
+        ctx.write()
+
+
 # pylint: disable=too-many-lines
-def test_list_channels(client, use_betamax, praw_settings):
+def test_list_channels(client, use_betamax, praw_settings, staff_jwt_header, reddit_factories):
     """
     List channels the user is subscribed to
     """
-    client.force_login(UserFactory.create())
+    channel = reddit_factories.channel('one')
     url = reverse('channel-list')
-    resp = client.get(url)
+    resp = client.get(url, **staff_jwt_header)
     assert resp.status_code == 200
     assert resp.json() == [
         {
-            'title': 'subreddit for tests',
-            'name': 'subreddit_for_testing',
-            'public_description': 'a public description goes here',
-            'channel_type': 'private',
+            'title': channel.title,
+            'name': channel.name,
+            'public_description': channel.public_description,
+            'channel_type': channel.channel_type,
         }
     ]
 
@@ -95,19 +109,21 @@ def test_create_channel_noauth(client, praw_settings):
     assert resp.status_code == 401
 
 
-def test_get_channel(client, use_betamax, praw_settings):
+def test_get_channel(
+        client, use_betamax, praw_settings, staff_user, staff_jwt_header, reddit_factories
+):  # pylint: disable=too-many-arguments
     """
     Get a channel
     """
-    client.force_login(UserFactory.create())
-    url = reverse('channel-detail', kwargs={'channel_name': 'subreddit_for_testing'})
-    resp = client.get(url)
+    channel = reddit_factories.channel('one')
+    url = reverse('channel-detail', kwargs={'channel_name': channel.name})
+    resp = client.get(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
-        'channel_type': 'private',
-        'name': 'subreddit_for_testing',
-        'title': 'subreddit for tests',
-        'public_description': 'a public description goes here',
+        'channel_type': channel.channel_type,
+        'name': channel.name,
+        'title': channel.title,
+        'public_description': channel.public_description,
     }
 
 

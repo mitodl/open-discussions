@@ -1,15 +1,16 @@
 """
 Factory for Users
 """
+import ulid
 from django.contrib.auth.models import User
-from factory import Sequence
+from factory import LazyFunction
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyText
 
 
 class UserFactory(DjangoModelFactory):
     """Factory for Users"""
-    username = Sequence(lambda n: "user_%d" % n)
+    username = LazyFunction(lambda: ulid.new().str)
     email = FuzzyText(suffix='@example.com')
 
     class Meta:

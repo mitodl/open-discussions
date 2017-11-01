@@ -14,3 +14,6 @@ class Profile(models.Model):
     image = models.CharField(null=True, max_length=MAX_IMAGE_FIELD_LENGTH)
     image_small = models.CharField(null=True, max_length=MAX_IMAGE_FIELD_LENGTH)
     image_medium = models.CharField(null=True, max_length=MAX_IMAGE_FIELD_LENGTH)
+
+    def __str__(self):
+        return "{}".format(self.name)

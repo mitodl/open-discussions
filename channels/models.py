@@ -12,7 +12,7 @@ class RedditRefreshToken(models.Model):
     token_value = models.CharField(null=True, max_length=255)
 
     def __str__(self):
-        return self.token_value
+        return "{}".format(self.token_value)
 
 
 class RedditAccessToken(models.Model):

@@ -14,18 +14,18 @@ pytestmark = pytest.mark.django_db
 API_KWARGS = dict(content_type='application/json', format='json')
 
 
-def test_list_users(client, admin_user, staff_jwt_header):
+def test_list_users(client, staff_user, staff_jwt_header):
     """
     List users
     """
-    profile = ProfileFactory.create(user=admin_user)
+    profile = ProfileFactory.create(user=staff_user)
     url = reverse('user_api-list')
     resp = client.get(url, **staff_jwt_header)
     assert resp.status_code == 200
     assert resp.json() == [
         {
-            'id': admin_user.id,
-            'username': admin_user.username,
+            'id': staff_user.id,
+            'username': staff_user.username,
             'profile': {
                 'name': profile.name,
                 'image': profile.image,

@@ -1,9 +1,16 @@
 """Configuration for pytest fixtures"""
 # pylint: disable=unused-argument, redefined-outer-name
+import factory
 import pytest
 from rest_framework_jwt.settings import api_settings
 
 from open_discussions.factories import UserFactory
+
+
+@pytest.fixture(scope="function")
+def randomness():
+    """Ensure a fixed seed for factoryboy"""
+    factory.fuzzy.reseed_random("happy little clouds")
 
 
 @pytest.fixture
@@ -13,12 +20,18 @@ def user(db):
 
 
 @pytest.fixture
-def staff_jwt_token(admin_user):
+def staff_user(db):
+    """Create a staff user"""
+    return UserFactory.create()
+
+
+@pytest.fixture
+def staff_jwt_token(staff_user):
     """Creates a JWT token for a staff user"""
     jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
     jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
-    payload = jwt_payload_handler(admin_user)
+    payload = jwt_payload_handler(staff_user)
     payload['roles'] = ['staff']
     return jwt_encode_handler(payload)
 
