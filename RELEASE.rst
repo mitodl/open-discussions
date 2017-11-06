@@ -1,6 +1,19 @@
 Release Notes
 =============
 
+Version 0.3.1
+-------------
+
+- Handle ALREADY_MODERATOR error (#292)
+- Use ExtractTextPlugin to split CSS into separate file (#300)
+- Mark AWS environment variables as not required (#312)
+- Use try/finally in context managers (#311)
+- Add https to placeholder
+- Set focus on comment reply forms, add key combo to submit
+- Bump psycopg version to 2.7
+- Refactor betamax cassette code to automatically create cassettes (#305)
+- Use yarn install --frozen-lockfile (#303)
+
 Version 0.3.0
 -------------
 
