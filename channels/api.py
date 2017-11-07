@@ -12,6 +12,7 @@ import praw
 from praw.exceptions import APIException
 from praw.models.reddit import more
 from praw.models.reddit.redditor import Redditor
+import prawcore
 from prawcore.exceptions import (
     Forbidden as PrawForbidden,
     NotFound as PrawNotFound,
@@ -53,6 +54,9 @@ FULL_ACCESS_SCOPE = '*'
 EXPIRES_IN_OFFSET = 30  # offsets the reddit refresh_token expirations by 30 seconds
 
 User = get_user_model()
+
+# monkey patch praw's rate limiter to not limit us
+prawcore.rate_limit.RateLimiter.delay = lambda *args: None
 
 
 def _get_refresh_token(username):
