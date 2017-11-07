@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.3.2
+-------------
+
+- Monkey patch prawcore&#39;s rate limit to not limit
+- Use application log level for Celery (#313)
+
 Version 0.3.1
 -------------
 
