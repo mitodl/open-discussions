@@ -16,6 +16,7 @@ import { formatTitle } from "../lib/title"
 
 describe("PostPage", function() {
   let helper, renderComponent, listenForActions, post, comments, channel
+  this.timeout(5000)
 
   beforeEach(() => {
     post = makePost()
