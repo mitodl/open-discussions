@@ -1,0 +1,45 @@
+version: '2.1'
+services:
+  python:
+    volumes:
+      - .:/src
+      - django_media:/var/media
+    environment:
+      DEBUG: 'True'
+      NODE_ENV: 'development'
+      OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER: 'True'
+
+  web:
+    volumes:
+      - .:/src
+      - django_media:/var/media
+    environment:
+      DEBUG: 'True'
+      NODE_ENV: 'development'
+      OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER: 'True'
+
+  celery:
+    volumes:
+      - .:/src
+      - django_media:/var/media
+    environment:
+      DEBUG: 'True'
+      NODE_ENV: 'development'
+      OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER: 'True'
+
+  nginx:
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/web.conf
+      - ./:/src
+
+  watch:
+    environment:
+      NODE_ENV: 'development'
+    volumes:
+      - .:/src
+      - yarn-cache:/home/mitodl/.cache/yarn
+
+
+volumes:
+  django_media: {}
+  yarn-cache: {}

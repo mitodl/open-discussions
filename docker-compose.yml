@@ -12,28 +12,23 @@ services:
 
   nginx:
     image: nginx
-    volumes:
-      - ./config/nginx.conf:/etc/nginx/conf.d/web.conf
-      - ./:/src
     ports:
       - "8063:8063"
     links:
       - web
 
   python:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: /bin/true
-    volumes:
-      - .:/src
-      - django_media:/var/media
     environment:
-      DEBUG: 'True'
-      DEV_ENV: 'True'
-      NODE_ENV: 'development'
+      DEBUG: 'False'
+      DEV_ENV: 'True'  # necessary to have nginx connect to web container
+      NODE_ENV: 'production'
       PORT: 8061
       COVERAGE_DIR: htmlcov
       DATABASE_URL: postgres://postgres@db:5432/postgres
-      OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER: 'True'
       OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
       OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
       OPEN_DISCUSSIONS_REDDIT_URL: https://reddit.local
@@ -76,11 +71,8 @@ services:
       /bin/bash -c './webpack_dev_server.sh --install'
     ports:
       - "8062:8062"
-    volumes:
-      - .:/src
-      - yarn-cache:/home/mitodl/.cache/yarn
     environment:
-      NODE_ENV: 'development'
+      NODE_ENV: 'production'
       DOCKER_HOST: ${DOCKER_HOST:-missing}
       CONTAINER_NAME: 'watch'
     env_file: .env
@@ -96,7 +88,3 @@ services:
     links:
       - db
       - redis
-
-volumes:
-  django_media: {}
-  yarn-cache: {}
