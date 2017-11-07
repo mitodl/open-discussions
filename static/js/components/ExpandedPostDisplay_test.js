@@ -5,16 +5,15 @@ import { mount } from "enzyme"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 
-import PostDisplay from "./PostDisplay"
+import ExpandedPostDisplay from "./ExpandedPostDisplay"
 import Router from "../Router"
 
 import { wait } from "../lib/util"
 import { urlHostname } from "../lib/url"
-import { formatCommentsCount } from "../lib/posts"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
-describe("PostDisplay", () => {
+describe("ExpandedPostDisplay", () => {
   let helper, post
 
   const renderPostDisplay = props => {
@@ -24,7 +23,7 @@ describe("PostDisplay", () => {
     }
     return mount(
       <Router store={helper.store} history={helper.browserHistory}>
-        <PostDisplay {...props} />
+        <ExpandedPostDisplay {...props} />
       </Router>
     )
   }
@@ -43,46 +42,29 @@ describe("PostDisplay", () => {
     const summary = wrapper.find(".summary")
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
     assert.equal(summary.find(Link).at(0).props().children, post.title)
-    assert.deepEqual(
-      wrapper.find(".num-comments").find(Link).props().children,
-      formatCommentsCount(post)
-    )
     const authoredBy = wrapper.find(".authored-by").text()
     assert(authoredBy.startsWith(`by ${post.author_name}`))
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
   })
 
-  it("should link to the subreddit, if told to", () => {
-    post.channel_name = "channel_name"
-    const wrapper = renderPostDisplay({ post: post, showChannelLink: true })
-    assert.equal(wrapper.find(Link).at(1).props().to, "/channel/channel_name")
-  })
-
-  it("should display text, if given a text post and the 'expanded' flag", () => {
+  it("should display post text", () => {
     const string = "JUST SOME GREAT TEXT!"
     post.text = string
-    const wrapper = renderPostDisplay({ post: post, expanded: true })
+    const wrapper = renderPostDisplay({ post: post })
     assert.equal(wrapper.find(ReactMarkdown).props().source, string)
   })
 
-  it("should display profile image, if expanded", () => {
-    const wrapper = renderPostDisplay({ post: post, expanded: true })
+  it("should display profile image", () => {
+    const wrapper = renderPostDisplay({ post: post })
     const { src } = wrapper.find(".summary img").props()
     assert.equal(src, post.profile_image)
   })
 
   it("should not display images from markdown", () => {
     post.text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
-    const wrapper = renderPostDisplay({ post: post, expanded: true })
+    const wrapper = renderPostDisplay({ post: post })
     assert.equal(wrapper.find(ReactMarkdown).props().source, post.text)
     assert.lengthOf(wrapper.find(ReactMarkdown).find("img"), 0)
-  })
-
-  it("should not display text, if given a text post but lacking the 'expanded' flag", () => {
-    const string = "JUST SOME GREAT TEXT!"
-    post.text = string
-    const wrapper = renderPostDisplay({ post: post })
-    assert.notInclude(wrapper.text(), string)
   })
 
   it("should include an external link, if a url post", () => {

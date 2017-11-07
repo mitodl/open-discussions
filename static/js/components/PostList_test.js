@@ -4,7 +4,7 @@ import { assert } from "chai"
 import { shallow } from "enzyme"
 
 import PostList from "./PostList"
-import PostDisplay from "./PostDisplay"
+import CompactPostDisplay from "./CompactPostDisplay"
 import { makeChannelPostList } from "../factories/posts"
 
 describe("PostList", () => {
@@ -13,21 +13,21 @@ describe("PostList", () => {
 
   it("should render a list of posts", () => {
     const wrapper = renderPostList()
-    assert.lengthOf(wrapper.find(PostDisplay), 20)
+    assert.lengthOf(wrapper.find(CompactPostDisplay), 20)
   })
 
   it("should behave well if handed an empty list", () => {
     const wrapper = renderPostList({ posts: [] })
-    assert.lengthOf(wrapper.find(PostDisplay), 0)
+    assert.lengthOf(wrapper.find(CompactPostDisplay), 0)
     assert.equal(wrapper.text(), "There are no posts to display.")
   })
 
-  it("should pass the showChannelLinks prop to PostDisplay", () => {
+  it("should pass the showChannelLinks prop to CompactPostDisplay", () => {
     const wrapper = renderPostList({
       posts:            makeChannelPostList(),
       showChannelLinks: true
     })
-    wrapper.find(PostDisplay).forEach(postSummary => {
+    wrapper.find(CompactPostDisplay).forEach(postSummary => {
       assert.isTrue(postSummary.props().showChannelLink)
     })
   })

@@ -1,13 +1,13 @@
 // @flow
 import React from "react"
 
-import PostDisplay from "./PostDisplay"
+import CompactPostDisplay from "./CompactPostDisplay"
 
 import type { Post } from "../flow/discussionTypes"
 
 const renderPosts = (posts, showChannelLinks, toggleUpvote) =>
   posts.map((post, index) =>
-    <PostDisplay
+    <CompactPostDisplay
       post={post}
       key={index}
       showChannelLink={showChannelLinks}

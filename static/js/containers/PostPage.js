@@ -7,7 +7,7 @@ import DocumentTitle from "react-document-title"
 import Card from "../components/Card"
 import withLoading from "../components/Loading"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
-import PostDisplay from "../components/PostDisplay"
+import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"
 import { ReplyToPostForm } from "../components/CreateCommentForm"
 import withNavSidebar from "../hoc/withNavSidebar"
@@ -108,10 +108,9 @@ class PostPage extends React.Component {
         <DocumentTitle title={formatTitle(post.title)} />
         <Card>
           <div className="post-card">
-            <PostDisplay
+            <ExpandedPostDisplay
               post={post}
               toggleUpvote={toggleUpvote(dispatch)}
-              expanded
             />
             <ReplyToPostForm
               forms={forms}
