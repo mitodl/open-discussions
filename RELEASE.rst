@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.3.3
+-------------
+
+- Added factories for reddit objects
+- Handle Forbidden exception (#293)
+- Refactor docker-compose layout (#324)
+
 Version 0.3.2
 -------------
 
