@@ -97,6 +97,11 @@
     "OPEN_DISCUSSIONS_FROM_EMAIL": {
       "description": "E-mail to use for the from field"
     },
+    "OPEN_DISCUSSIONS_LOG_LEVEL": {
+      "description": "The log level for the application",
+      "required": true,
+      "value": "INFO"
+    },
     "OPEN_DISCUSSIONS_JWT_SECRET": {
       "description": "Shared secret for JWT auth tokens",
       "required": true
