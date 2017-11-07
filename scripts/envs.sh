@@ -66,6 +66,20 @@ else
         # Linux host
         CONTAINER_NAME="$(docker-compose ps -q watch)"
         WEBPACK_SELENIUM_DEV_SERVER_HOST="$(docker exec "$CONTAINER_NAME" ip route | grep default | awk '{ print $3 }')"
+        if [[ -z "$CONTAINER_NAME" ]]
+        then
+            echo "Missing container watch"
+            exit 1
+        fi
+
+{% raw %}
+        CONTAINER_STATUS="$(docker inspect "$CONTAINER_NAME" -f '{{.State.Status}}')"
+{% endraw %}
+        if [[ "$CONTAINER_STATUS" != "running" ]]
+        then
+            echo "watch container status for $CONTAINER_NAME was expected to be running but is $CONTAINER_STATUS"
+            exit 1
+        fi
     fi
 fi
 

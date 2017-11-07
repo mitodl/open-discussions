@@ -1,0 +1,20 @@
+version: '2.1'
+services:
+  python:
+    build:
+      context: .
+      dockerfile: ./travis/Dockerfile-travis-web
+
+  web:
+    build:
+      context: .
+      dockerfile: ./travis/Dockerfile-travis-web
+
+  celery:
+    build:
+      context: .
+      dockerfile: ./travis/Dockerfile-travis-web
+    environment:
+      # for celery, to avoid ImproperlyConfigured
+      MAILGUN_URL: 'http://fake.example.com'
+      MAILGUN_KEY: 'fake'
