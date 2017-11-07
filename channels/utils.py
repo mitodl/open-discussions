@@ -1,5 +1,16 @@
 """Utils for channels"""
+from contextlib import contextmanager
+
 from django.conf import settings
+from praw.exceptions import APIException
+from prawcore.exceptions import (
+    Forbidden,
+    NotFound as PrawNotFound,
+    Redirect,
+)
+from rest_framework.exceptions import PermissionDenied, NotFound
+
+from channels.exceptions import ConflictException
 
 
 def get_pagination_params(request):
@@ -60,3 +71,26 @@ def get_pagination_and_posts(posts, before=None, count=None):
 
     # NOTE: list(posts) can return duplicates, so we use the internal listing instead
     return pagination, list(listing)
+
+
+@contextmanager
+def translate_praw_exceptions():
+    """Convert PRAW exceptions to DRF ones"""
+    try:
+        yield
+    except Forbidden as exc:
+        raise PermissionDenied() from exc
+    except PrawNotFound as exc:
+        raise NotFound() from exc
+    except Redirect as exc:
+        # This assumes all redirects are due to missing subreddits,
+        # but I haven't seen any other causes for redirects
+        raise NotFound() from exc
+    except APIException as exc:
+        if exc.error_type in ('SUBREDDIT_NOTALLOWED', 'NOT_AUTHOR'):
+            raise PermissionDenied() from exc
+        elif exc.error_type == 'SUBREDDIT_NOEXIST':
+            raise NotFound() from exc
+        elif exc.error_type == 'SUBREDDIT_EXISTS':
+            raise ConflictException() from exc
+        raise
