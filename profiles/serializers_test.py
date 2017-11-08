@@ -4,7 +4,6 @@ Tests for serializers for profiles REST APIS
 """
 import pytest
 
-from profiles.factories import ProfileFactory
 from profiles.models import Profile
 from profiles.serializers import UserSerializer
 
@@ -13,7 +12,7 @@ def test_serialize_user(user):
     """
     Test serializing a user
     """
-    profile = ProfileFactory.create(user=user)
+    profile = user.profile
 
     assert UserSerializer(user).data == {
         'id': user.id,
@@ -61,7 +60,7 @@ def test_update_user_profile(user, key, value):
     """
     Test creating a user
     """
-    profile = ProfileFactory.create(user=user)
+    profile = user.profile
     expected_profile = {
         'name': profile.name,
         'image': profile.image,

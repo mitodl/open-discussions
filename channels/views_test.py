@@ -9,7 +9,6 @@ from channels.api import Api
 from channels.factories import RedditFactories
 from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
-from profiles.factories import ProfileFactory
 
 # pylint: disable=redefined-outer-name, unused-argument, too-many-lines
 pytestmark = pytest.mark.django_db
@@ -308,7 +307,7 @@ def test_get_post(client, logged_in_profile, use_betamax, praw_settings, missing
     """Get an existing post with no image"""
     profile_image = default_profile_image
     if not missing_user:
-        profile = ProfileFactory(user__username='alice')
+        profile = UserFactory.create(username='alice').profile
         if missing_image:
             profile.image_small = None
             profile.save()
@@ -641,7 +640,7 @@ def test_list_comments_not_found(client, logged_in_profile, use_betamax, praw_se
 
 def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_settings):
     """List comments which are deleted according to reddit"""
-    user = ProfileFactory.create(user__username='admin').user
+    user = UserFactory.create(username='admin')
 
     url = reverse('comment-list', kwargs={'post_id': 'p'})
     resp = client.get(url)
@@ -1062,22 +1061,22 @@ def test_add_contributor(client, use_betamax, praw_settings, staff_jwt_header):
     """
     Adds a contributor to a channel
     """
-    contributor = ProfileFactory.create(user__username='01BTN6G82RKTS3WF61Q33AA0ND')
+    contributor = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse('contributor-list', kwargs={'channel_name': 'admin_channel'})
-    resp = client.post(url, data={'contributor_name': contributor.user.username}, format='json', **staff_jwt_header)
+    resp = client.post(url, data={'contributor_name': contributor.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {'contributor_name': contributor.user.username}
+    assert resp.json() == {'contributor_name': contributor.username}
 
 
 def test_add_contributor_again(client, use_betamax, praw_settings, staff_jwt_header):
     """
     If the user is already a contributor a 201 status should be returned
     """
-    contributor = ProfileFactory.create(user__username='01BTN6G82RKTS3WF61Q33AA0ND')
+    contributor = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse('contributor-list', kwargs={'channel_name': 'admin_channel'})
-    resp = client.post(url, data={'contributor_name': contributor.user.username}, format='json', **staff_jwt_header)
+    resp = client.post(url, data={'contributor_name': contributor.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {'contributor_name': contributor.user.username}
+    assert resp.json() == {'contributor_name': contributor.username}
 
 
 def test_add_moderator(client, use_betamax, praw_settings, staff_jwt_header):
@@ -1138,12 +1137,11 @@ def test_detail_contributor_error(client, use_betamax, praw_settings):
     """
     Detail of a contributor in a channel in case the user is not a contributor
     """
-    admin = ProfileFactory.create(user__username='fooadmin')
-    client.force_login(admin.user)
-    nocontributor = ProfileFactory.create()
-    nocontributor.user.username = 'nocontributor'
+    admin = UserFactory.create(username='fooadmin')
+    client.force_login(admin)
+    nocontributor = UserFactory.create(username='nocontributor')
     url = reverse(
-        'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': nocontributor.user.username})
+        'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': nocontributor.username})
     resp = client.get(url)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 

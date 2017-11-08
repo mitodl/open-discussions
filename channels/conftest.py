@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 
 from channels.test_utils import no_ssl_verification
 from open_discussions.betamax_config import setup_betamax
-from profiles.factories import ProfileFactory
+from open_discussions.factories import UserFactory
 
 
 @pytest.fixture
@@ -63,6 +63,6 @@ def client():
 @pytest.fixture()
 def logged_in_profile(client):
     """Add a Profile and logged-in User"""
-    profile = ProfileFactory.create(user__username='george')
-    client.force_login(profile.user)
-    return profile
+    user = UserFactory.create(username='george')
+    client.force_login(user)
+    return user.profile

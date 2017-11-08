@@ -5,8 +5,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import pytest
 
-from profiles.factories import ProfileFactory
-
 
 # pylint: disable=redefined-outer-name, unused-argument
 pytestmark = pytest.mark.django_db
@@ -18,7 +16,7 @@ def test_list_users(client, staff_user, staff_jwt_header):
     """
     List users
     """
-    profile = ProfileFactory.create(user=staff_user)
+    profile = staff_user.profile
     url = reverse('user_api-list')
     resp = client.get(url, **staff_jwt_header)
     assert resp.status_code == 200
@@ -60,7 +58,7 @@ def test_get_user(client, user, staff_jwt_header):
     """
     Get a user
     """
-    profile = ProfileFactory.create(user=user)
+    profile = user.profile
     url = reverse('user_api-detail', kwargs={'username': user.username})
     resp = client.get(url, **staff_jwt_header)
     assert resp.status_code == 200
@@ -80,7 +78,7 @@ def test_patch_user(client, user, staff_jwt_header):
     """
     Update a users' profile
     """
-    profile = ProfileFactory.create(user=user)
+    profile = user.profile
     url = reverse('user_api-detail', kwargs={'username': user.username})
     resp = client.patch(url, data=json.dumps({
         'profile': {
@@ -104,7 +102,6 @@ def test_patch_username(client, user, staff_jwt_header):
     """
     Trying to update a users's username does not change anything
     """
-    ProfileFactory.create(user=user)
     url = reverse('user_api-detail', kwargs={'username': user.username})
     resp = client.patch(url, data=json.dumps({
         'username': 'notallowed'
