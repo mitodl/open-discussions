@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.3.4
+-------------
+
+- Refactored User/Profile factories to be UserFactory-centric
+
 Version 0.3.3
 -------------
 
