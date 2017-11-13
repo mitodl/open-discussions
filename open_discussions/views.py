@@ -29,9 +29,11 @@ def index(request):
         )
         auth_url = payload.get("auth_url", None)
         session_url = payload.get("session_url", None)
+        username = payload.get("username", None)
     except jwt.InvalidTokenError:
         auth_url = None
         session_url = None
+        username = None
 
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
@@ -41,6 +43,7 @@ def index(request):
         "max_comment_depth": settings.OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH,
         "micromasters_external_login_url": settings.MICROMASTERS_EXTERNAL_LOGIN_URL,
         "micromasters_base_url": settings.MICROMASTERS_BASE_URL,
+        "username": username,
     }
 
     return render(request, "index.html", context={

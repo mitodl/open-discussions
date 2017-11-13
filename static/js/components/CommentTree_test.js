@@ -10,14 +10,14 @@ import ReactMarkdown from "react-markdown"
 
 import Card from "../components/Card"
 import CommentTree from "./CommentTree"
-import { ReplyToCommentForm } from "./CreateCommentForm"
+import { ReplyToCommentForm } from "./CommentForms"
 
 import { makeCommentTree } from "../factories/comments"
 import { makePost } from "../factories/posts"
-import { replyToCommentKey } from "../components/CreateCommentForm"
+import { replyToCommentKey, editCommentKey } from "../components/CommentForms"
 
 describe("CommentTree", () => {
-  let comments, post, sandbox, upvoteStub, downvoteStub, beginReplyStub
+  let comments, post, sandbox, upvoteStub, downvoteStub, beginEditingStub
 
   beforeEach(() => {
     post = makePost()
@@ -25,7 +25,7 @@ describe("CommentTree", () => {
     sandbox = sinon.sandbox.create()
     upvoteStub = sandbox.stub()
     downvoteStub = sandbox.stub()
-    beginReplyStub = sandbox.stub()
+    beginEditingStub = sandbox.stub()
   })
 
   afterEach(() => {
@@ -39,9 +39,7 @@ describe("CommentTree", () => {
         forms={{}}
         upvote={upvoteStub}
         downvote={downvoteStub}
-        beginReply={R.curry((formKey, initialValue, e) => {
-          beginReplyStub(formKey, initialValue, e)
-        })}
+        beginEditing={R.curry(beginEditingStub)}
         processing={false}
         {...props}
       />
@@ -92,9 +90,19 @@ describe("CommentTree", () => {
 
   it('should include a "reply" button', () => {
     const wrapper = renderCommentTree()
-    wrapper.find(".reply-button").at(0).simulate("click")
-    assert.ok(beginReplyStub.called)
-    assert.ok(beginReplyStub.calledWith(replyToCommentKey(comments[0])))
+    wrapper.find(".comment-action-button").at(0).simulate("click")
+    assert.ok(beginEditingStub.called)
+    assert.ok(beginEditingStub.calledWith(replyToCommentKey(comments[0])))
+  })
+
+  it('should include an "Edit" button, if the user wrote the comment', () => {
+    comments[0].author_id = "username"
+    SETTINGS.username = "username"
+    const wrapper = renderCommentTree()
+    wrapper.find(".comment-action-button").at(1).simulate("click")
+    assert.ok(beginEditingStub.called)
+    assert.ok(beginEditingStub.calledWith(editCommentKey(comments[0])))
+    assert.deepEqual(beginEditingStub.args[0][1], comments[0])
   })
 
   it("should show the author name", () => {
@@ -122,8 +130,14 @@ describe("CommentTree", () => {
       .find(".replies .comment")
       .first()
 
-    assert.lengthOf(topCommentWrapper.find(".reply-button"), 1)
-    assert.lengthOf(nextCommentWrapper.find(".reply-button"), 0)
+    assert.lengthOf(
+      topCommentWrapper
+        .find(".comment-actions")
+        .at(0)
+        .find(".comment-action-button"),
+      1
+    )
+    assert.lengthOf(nextCommentWrapper.find(".comment-action-button"), 0)
 
     assert.lengthOf(topCommentWrapper.find(ReplyToCommentForm), 1)
     assert.lengthOf(nextCommentWrapper.find(ReplyToCommentForm), 0)

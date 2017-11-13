@@ -7,13 +7,14 @@ import moment from "moment"
 import ReactMarkdown from "react-markdown"
 
 import Card from "./Card"
-import { ReplyToCommentForm } from "./CreateCommentForm"
+import { ReplyToCommentForm, EditCommentForm } from "./CommentForms"
 import CommentVoteForm from "./CommentVoteForm"
 
 import {
   replyToCommentKey,
+  editCommentKey,
   getCommentReplyInitialValue
-} from "../components/CreateCommentForm"
+} from "../components/CommentForms"
 
 import type { Comment } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
@@ -24,7 +25,7 @@ const renderTopLevelComment = R.curry(
     forms: FormsState,
     upvote: CommentVoteFunc,
     downvote: CommentVoteFunc,
-    beginReply: (fk: string, iv: Object, e: ?Object) => void,
+    beginEditing: (fk: string, iv: Object, e: ?Object) => void,
     processing: boolean,
     comment: Comment,
     idx: number
@@ -35,7 +36,7 @@ const renderTopLevelComment = R.curry(
           forms,
           upvote,
           downvote,
-          beginReply,
+          beginEditing,
           processing,
           0,
           comment
@@ -49,12 +50,13 @@ const renderComment = R.curry(
     forms: FormsState,
     upvote: CommentVoteFunc,
     downvote: CommentVoteFunc,
-    beginReply: (fk: string, iv: Object, e: ?Object) => void,
+    beginEditing: (fk: string, iv: Object, e: ?Object) => void,
     processing: boolean,
     depth: number,
     comment: Comment
   ) => {
     const formKey = replyToCommentKey(comment)
+    const editFormKey = editCommentKey(comment)
     const initialValue = getCommentReplyInitialValue(comment)
 
     const atMaxDepth = depth + 1 >= SETTINGS.max_comment_depth
@@ -71,13 +73,20 @@ const renderComment = R.curry(
             </span>
           </div>
           <div className="row">
-            <ReactMarkdown
-              disallowedTypes={["Image"]}
-              source={comment.text}
-              escapeHtml
-            />
+            {R.has(editFormKey, forms)
+              ? <EditCommentForm
+                forms={forms}
+                comment={comment}
+                processing={processing}
+                editing
+              />
+              : <ReactMarkdown
+                disallowedTypes={["Image"]}
+                source={comment.text}
+                escapeHtml
+              />}
           </div>
-          <div className="row vote-reply">
+          <div className="row comment-actions">
             <CommentVoteForm
               comment={comment}
               upvote={upvote}
@@ -86,13 +95,23 @@ const renderComment = R.curry(
             {atMaxDepth
               ? null
               : <div
-                className="reply-button"
+                className="comment-action-button"
                 onClick={e => {
-                  beginReply(formKey, initialValue, e)
+                  beginEditing(formKey, initialValue, e)
                 }}
               >
                 <a href="#">Reply</a>
               </div>}
+            {SETTINGS.username === comment.author_id
+              ? <div
+                className="comment-action-button"
+                onClick={e => {
+                  beginEditing(editFormKey, comment, e)
+                }}
+              >
+                <a href="#">Edit</a>
+              </div>
+              : null}
           </div>
           {atMaxDepth
             ? null
@@ -111,7 +130,7 @@ const renderComment = R.curry(
                   forms,
                   upvote,
                   downvote,
-                  beginReply,
+                  beginEditing,
                   processing,
                   depth + 1
                 ),
@@ -129,7 +148,7 @@ type CommentTreeProps = {
   forms: FormsState,
   upvote: CommentVoteFunc,
   downvote: CommentVoteFunc,
-  beginReply: (fk: string, iv: Object, e: ?Object) => void,
+  beginEditing: (fk: string, iv: Object, e: ?Object) => void,
   processing: boolean
 }
 
@@ -138,12 +157,12 @@ const CommentTree = ({
   forms,
   upvote,
   downvote,
-  beginReply,
+  beginEditing,
   processing
   }: CommentTreeProps) =>
   <div className="comments">
     {R.addIndex(R.map)(
-      renderTopLevelComment(forms, upvote, downvote, beginReply, processing),
+      renderTopLevelComment(forms, upvote, downvote, beginEditing, processing),
       comments
     )}
   </div>

@@ -11,24 +11,31 @@ import type { Comment, Post, CommentForm } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 import type { Dispatch } from "redux"
 
-type CreateCommentFormProps = {
+type CommentFormProps = {
   dispatch: Dispatch,
   forms: FormsState,
   post: Post,
   initialValue: CommentForm,
   formKey: string,
-  beginReply: (initialValue: Object, e: ?Event) => void,
+  beginEditing: (initialValue: Object, e: ?Event) => void,
   onSubmit: (p: string, t: string, c: string, p: Post, e: Event) => Promise<*>,
   onUpdate: (e: Event) => void,
   cancelReply: () => void,
   formDataLens: (s: string) => Object,
-  processing: boolean
+  processing: boolean,
+  patchComment: (c: Comment) => void,
+  comment: Comment
 }
 
 export const replyToCommentKey = (comment: Comment) =>
   `post:${comment.post_id}:comment:${comment.id}:comment:new`
 
 export const replyToPostKey = (post: Post) => `post:${post.id}:comment:new`
+
+export const editCommentKey = (comment: Comment) =>
+  `post:${comment.post_id}:comment:${comment.id}:edit`
+
+export const editPostKey = (post: Post) => `post:${post.id}:edit`
 
 export const getCommentReplyInitialValue = (parent: Comment) => ({
   post_id:    parent.post_id,
@@ -95,6 +102,11 @@ const getFormKeyFromOwnProps = ownProps =>
     ? replyToCommentKey(ownProps.comment)
     : replyToPostKey(ownProps.post)
 
+const getEditFormKeyFromOwnProps = ownProps =>
+  ownProps.comment
+    ? editCommentKey(ownProps.comment)
+    : editPostKey(ownProps.post)
+
 const mapStateToProps = (state, ownProps) => {
   const initialValue = ownProps.comment
     ? getCommentReplyInitialValue(ownProps.comment)
@@ -104,7 +116,9 @@ const mapStateToProps = (state, ownProps) => {
     initialValue,
     post:    ownProps.post || state.posts.data.get(initialValue.post_id),
     forms:   state.forms,
-    formKey: getFormKeyFromOwnProps(ownProps)
+    formKey: ownProps.editing
+      ? getEditFormKeyFromOwnProps(ownProps)
+      : getFormKeyFromOwnProps(ownProps)
   }
 }
 
@@ -112,7 +126,7 @@ const cancelReply = R.curry((dispatch, formKey) => () =>
   dispatch(actions.forms.formEndEdit({ formKey }))
 )
 
-export const beginReply = R.curry((dispatch, formKey, initialValue, e) => {
+export const beginEditing = R.curry((dispatch, formKey, initialValue, e) => {
   if (e) {
     e.preventDefault()
   }
@@ -125,7 +139,9 @@ export const beginReply = R.curry((dispatch, formKey, initialValue, e) => {
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const formKey = getFormKeyFromOwnProps(ownProps)
+  const formKey = ownProps.editing
+    ? getEditFormKeyFromOwnProps(ownProps)
+    : getFormKeyFromOwnProps(ownProps)
 
   return {
     onUpdate: e => {
@@ -137,9 +153,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         })
       )
     },
-    cancelReply: cancelReply(dispatch, formKey),
-    beginReply:  beginReply(dispatch, formKey),
-    onSubmit:    R.curry((postID, text, commentID, post, e) => {
+    cancelReply:  cancelReply(dispatch, formKey),
+    beginEditing: beginEditing(dispatch, formKey),
+    onSubmit:     R.curry((postID, text, commentID, post, e) => {
       e.preventDefault()
       return dispatch(
         actions.comments.post(postID, text, commentID)
@@ -153,13 +169,18 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         cancelReply(dispatch, formKey)()
       })
     }),
+    patchComment: comment => {
+      return dispatch(actions.comments.patch(comment.id, comment)).then(() => {
+        cancelReply(dispatch, formKey)()
+      })
+    },
     formDataLens: formDataLens(formKey)
   }
 }
 
 export const ReplyToCommentForm = connect(mapStateToProps, mapDispatchToProps)(
   class ReplyCommentForm extends React.Component<*, *> {
-    props: CreateCommentFormProps
+    props: CommentFormProps
 
     state: {
       replying: boolean
@@ -201,6 +222,51 @@ export const ReplyToCommentForm = connect(mapStateToProps, mapDispatchToProps)(
   }
 )
 
+export const EditCommentForm = connect(mapStateToProps, mapDispatchToProps)(
+  class EditCommentForm extends React.Component<*, *> {
+    constructor(props) {
+      super(props)
+      this.state = {
+        patching: false
+      }
+    }
+
+    props: CommentFormProps
+
+    state: {
+      patching: boolean
+    }
+
+    onSubmit = async e => {
+      const { formKey, forms, patchComment, comment } = this.props
+      const { text } = R.prop(formKey, forms).value
+
+      e.preventDefault()
+
+      const updatedComment = { ...comment, text: text }
+      this.setState({ patching: true })
+      await patchComment(updatedComment)
+      this.setState({ patching: false })
+    }
+
+    render() {
+      const { forms, formKey, onUpdate, cancelReply } = this.props
+      const { patching } = this.state
+      const text = R.pathOr("", [formKey, "value", "text"], forms)
+
+      return commentForm(
+        this.onSubmit,
+        text,
+        onUpdate,
+        cancelReply,
+        true,
+        patching,
+        true
+      )
+    }
+  }
+)
+
 const formDataLens = R.curry((formKey, prop) =>
   R.lensPath([formKey, "value", prop])
 )
@@ -213,7 +279,7 @@ const getFormData = (lensFunc, forms) => ({
 
 export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
   class ReplyPostForm extends React.Component<*, *> {
-    props: CreateCommentFormProps
+    props: CommentFormProps
 
     state: {
       replying: boolean
@@ -230,11 +296,11 @@ export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
     // we have to be sure it's always ready for the user to start entering
     // a new comment
     ensureInitialState = () => {
-      const { beginReply, initialValue, formDataLens, forms } = this.props
+      const { beginEditing, initialValue, formDataLens, forms } = this.props
       const { post_id } = getFormData(formDataLens, forms)
       // eslint-disable-next-line camelcase
       if (!post_id) {
-        beginReply(initialValue, undefined)
+        beginEditing(initialValue, undefined)
       }
     }
 

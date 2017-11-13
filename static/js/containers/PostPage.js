@@ -9,7 +9,7 @@ import withLoading from "../components/Loading"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"
-import { ReplyToPostForm } from "../components/CreateCommentForm"
+import { ReplyToPostForm } from "../components/CommentForms"
 import withNavSidebar from "../hoc/withNavSidebar"
 
 import { formatCommentsCount } from "../lib/posts"
@@ -18,7 +18,7 @@ import { toggleUpvote } from "../util/api_actions"
 import { getChannelName, getPostID } from "../lib/util"
 import { anyError } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
-import { beginReply } from "../components/CreateCommentForm"
+import { beginEditing } from "../components/CommentForms"
 import { formatTitle } from "../lib/title"
 
 import type { Dispatch } from "redux"
@@ -127,7 +127,7 @@ class PostPage extends React.Component<*, void> {
           forms={forms}
           upvote={this.upvote}
           downvote={this.downvote}
-          beginReply={beginReply(dispatch)}
+          beginEditing={beginEditing(dispatch)}
           processing={commentInFlight}
         />
       </div>

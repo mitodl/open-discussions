@@ -12,6 +12,7 @@ declare var SETTINGS: {
   FEATURES: {
     [key: string]: boolean,
   },
+  username: string,
 }
 
 // mocha

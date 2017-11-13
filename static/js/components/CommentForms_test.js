@@ -9,11 +9,12 @@ import sinon from "sinon"
 import {
   ReplyToCommentForm,
   ReplyToPostForm,
+  EditCommentForm,
   replyToPostKey,
   replyToCommentKey,
-  beginReply,
+  beginEditing,
   getCommentReplyInitialValue
-} from "./CreateCommentForm"
+} from "./CommentForms"
 
 import * as forms from "../actions/forms"
 import { actions } from "../actions"
@@ -22,7 +23,7 @@ import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
-describe("CreateCommentForm", () => {
+describe("CommentForms", () => {
   let helper, post, comment, postKeys, commentKeys
 
   const renderPostForm = (props = {}) =>
@@ -36,6 +37,13 @@ describe("CreateCommentForm", () => {
     mount(
       <Provider store={helper.store}>
         <ReplyToCommentForm comment={comment} {...props} />
+      </Provider>
+    )
+
+  const renderEditCommentForm = (props = {}) =>
+    mount(
+      <Provider store={helper.store}>
+        <EditCommentForm comment={comment} {...props} />
       </Provider>
     )
 
@@ -226,7 +234,7 @@ describe("CreateCommentForm", () => {
       wrapper = renderCommentForm()
       expectedKeys = commentKeys
 
-      beginReply(
+      beginEditing(
         helper.store.dispatch,
         replyToCommentKey(comment),
         getCommentReplyInitialValue(comment),
@@ -396,6 +404,45 @@ describe("CreateCommentForm", () => {
     it("should not submit on ctrl-enter when text is empty", () => {
       wrapper.find("form").simulate("keyDown", { ctrlKey: true, key: "Enter" })
       assert.isFalse(helper.createCommentStub.called)
+    })
+  })
+
+  describe("EditCommentForm", () => {
+    let wrapper, expectedKeys
+
+    beforeEach(() => {
+      wrapper = renderEditCommentForm()
+      expectedKeys = commentKeys
+    })
+
+    it("should have the autofocus prop", () => {
+      assert.isTrue(wrapper.find("textarea").props().autoFocus)
+    })
+
+    it("should trigger an update when text is input", async () => {
+      const state = await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: expectedKeys.text
+          }
+        })
+      })
+      assert.equal(R.keys(state.forms).length, 1)
+      assert.deepInclude(state.forms[R.keys(state.forms)[0]], {
+        value: { text: "comment text" }
+      })
+    })
+
+    it("should cancel and go away", async () => {
+      const mockPreventDefault = helper.sandbox.stub()
+      const state = await helper.listenForActions([forms.FORM_END_EDIT], () => {
+        wrapper.find(".cancel-button").simulate("click", {
+          preventDefault: mockPreventDefault
+        })
+      })
+      assert.deepEqual(state.forms, {})
+      sinon.assert.calledWith(mockPreventDefault)
     })
   })
 })
