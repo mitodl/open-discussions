@@ -4,6 +4,7 @@ import os
 from collections import namedtuple
 
 import pytz
+from django.contrib.auth import get_user_model
 import faker
 import factory
 from factory.django import DjangoModelFactory
@@ -11,7 +12,7 @@ from factory.fuzzy import FuzzyChoice
 
 from open_discussions.factories import UserFactory
 from open_discussions.utils import now_in_utc
-from channels.api import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_PRIVATE
+from channels.api import Api, CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_PRIVATE
 from channels.models import RedditAccessToken, RedditRefreshToken
 
 FAKE = faker.Factory.create()
@@ -24,32 +25,65 @@ LinkPost = namedtuple('LinkPost', ['id', 'title', 'url', 'channel', 'api'])
 
 Comment = namedtuple('Comment', ['id', 'text', 'comment_id', 'children', 'post_id', 'api'])
 
+User = get_user_model()
 
-def _serialize_named_tuple(obj):
+SERIALIZABLE_KEYS = ('comments', 'posts', 'channels', 'users')
+
+
+def serialize_factory_result(obj):
     """
-    Serializes a named tuple to a dict
+    Serializes a factory object for JSON storage
 
     Args:
-        obj (namedtuple): the named tuple to serialize
+        obj: the object to serialize
 
     Returns:
-        dict: the serialized form of the tuple
+        dict: serialized form of the object
     """
-    data = obj._asdict()
-    del data["api"]
-    return data
+    if isinstance(obj, User):
+        return {
+            "username": obj.username,
+        }
+    elif isinstance(obj, Comment):
+        return {
+            "id": obj.id,
+            "text": obj.text,
+            "comment_id": obj.comment_id,
+            "post_id": obj.post_id,
+            "children": [serialize_factory_result(child) for child in obj.children],
+        }
+    elif isinstance(obj, TextPost):
+        return {
+            "id": obj.id,
+            "title": obj.title,
+            "text": obj.text,
+            "channel": serialize_factory_result(obj.channel),
+        }
+    elif isinstance(obj, LinkPost):
+        return {
+            "id": obj.id,
+            "title": obj.title,
+            "url": obj.url,
+            "channel": serialize_factory_result(obj.channel),
+        }
+    elif isinstance(obj, Channel):
+        return {
+            "name": obj.name,
+            "title": obj.title,
+            "channel_type": obj.channel_type,
+            "public_description": obj.public_description,
+        }
+
+    raise Exception("Unexpected type to serialize")
 
 
-class RedditFactories:
+class FactoryStore:
     """
-    Factory for channels and posts
+    Handles storage of factory data to/from disk
     """
-    def __init__(self, name, api):
+    def __init__(self, name):
         self.filename = "factory_data/{}.json".format(name)
-        self.channels = {}
-        self.posts = {}
-        self.comments = {}
-        self.api = api
+        self.data = {}
         self._dirty = False
 
     def load(self):
@@ -58,25 +92,81 @@ class RedditFactories:
             return
 
         with open(self.filename, "r") as f:
-            data = json.loads(f.read())
-        self.channels = data["channels"]
-        self.posts = data["posts"]
-        self.comments = data["comments"]
+            self.data = json.loads(f.read())
 
     def write(self):
         """Saves the accumulated factory data to disk"""
         if not self._dirty:
             return
+
         with open(self.filename, "w") as f:
-            json.dump({
-                "channels": self.channels,
-                "posts":  self.posts,
-                "comments":  self.comments,
-            }, f, indent=2, sort_keys=True)
+            json.dump(self.data, f, indent=2, sort_keys=True)
 
         self._dirty = False
 
-    def channel(self, ident, **kwargs):
+    def get_instances(self, factory_type):
+        """
+        Gets the dict of instances for the factory type
+
+        Args:
+            factory_type (str): class of the factory to generate the post
+
+        Returns:
+            dict: dictionary to store instances in
+        """
+        if factory_type not in self.data:
+            self.data[factory_type] = {}
+
+        return self.data[factory_type]
+
+    def get_or_create(self, factory_cls, factory_type, ident, **kwargs):
+        """
+        Creates a new named post from the provided factory
+
+        Args:
+            factory_cls (cls): class of the factory to generate the post
+            factory_type (str): class of the factory to generate the post
+            ident (str): the logical name of the post within the test
+
+        Returns:
+            Post: the created post
+        """
+        instances = self.get_instances(factory_type)
+        if ident not in instances:
+            result = factory_cls.create(**kwargs)
+            instances[ident] = serialize_factory_result(result)
+            self._dirty = True
+            return result
+        else:
+            kwargs.update(instances[ident])
+            return factory_cls.create(**kwargs)
+
+
+class RedditFactories:
+    """
+    Factory for users, channels, posts, and comments
+    """
+    def __init__(self, store):
+        self.store = store
+
+    def user(self, ident, **kwargs):
+        """
+        Creates a new named user
+
+        Args:
+            ident (str): the logical name of the user within the test
+
+        Returns:
+            User: the created user
+        """
+        return self.store.get_or_create(
+            UserFactory,
+            "users",
+            ident,
+            **kwargs
+        )
+
+    def channel(self, ident, user, **kwargs):
         """
         Creates a new named channel
 
@@ -86,18 +176,17 @@ class RedditFactories:
         Returns:
             Channel: the created channel
         """
-        if ident not in self.channels:
-            channel = ChannelFactory.create(api=self.api, **kwargs)
-            self.channels[ident] = _serialize_named_tuple(channel)
-            self._dirty = True
-        else:
-            channel = ChannelFactory.create(api=self.api, **self.channels[ident])
+        return self.store.get_or_create(
+            ChannelFactory,
+            "channels",
+            ident,
+            api=Api(user),
+            **kwargs
+        )
 
-        return channel
-
-    def post(self, ident, **kwargs):
+    def text_post(self, ident, user, **kwargs):
         """
-        Creates a new named post
+        Creates a new named text post
 
         Args:
             ident (str): the logical name of the post within the test
@@ -105,16 +194,33 @@ class RedditFactories:
         Returns:
             Post: the created post
         """
-        if ident not in self.posts:
-            post = PostFactory.create(api=self.api, **kwargs)
-            self.posts[ident] = _serialize_named_tuple(post)
-            self._dirty = True
-        else:
-            post = PostFactory.create(api=self.api, **self.posts[ident])
+        return self.store.get_or_create(
+            TextPostFactory,
+            "posts",
+            ident,
+            api=Api(user),
+            **kwargs
+        )
 
-        return post
+    def link_post(self, ident, user, **kwargs):
+        """
+        Creates a new named url post
 
-    def comment(self, ident, **kwargs):
+        Args:
+            ident (str): the logical name of the post within the test
+
+        Returns:
+            Post: the created post
+        """
+        return self.store.get_or_create(
+            LinkPostFactory,
+            "posts",
+            ident,
+            api=Api(user),
+            **kwargs
+        )
+
+    def comment(self, ident, user, **kwargs):
         """
         Creates a new named comment
 
@@ -124,14 +230,13 @@ class RedditFactories:
         Returns:
             Comment: the created comment
         """
-        if ident not in self.comments:
-            comment = CommentFactory.create(api=self.api, **kwargs)
-            self.comments[ident] = _serialize_named_tuple(comment)
-            self._dirty = True
-        else:
-            comment = CommentFactory.create(api=self.api, **self.comments[ident])
-
-        return comment
+        return self.store.get_or_create(
+            CommentFactory,
+            "comments",
+            ident,
+            api=Api(user),
+            **kwargs
+        )
 
 
 class RedditRefreshTokenFactory(DjangoModelFactory):

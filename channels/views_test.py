@@ -1,12 +1,13 @@
 """Tests for views for REST APIs for channels"""
 # pylint: disable=too-many-lines
 import pytest
+from betamax.fixtures.pytest import _casette_name
 from django.core.urlresolvers import reverse
 from praw.exceptions import APIException
 from rest_framework import status
 
-from channels.api import Api
-from channels.factories import RedditFactories
+from channels.api import Api, CHANNEL_TYPE_PRIVATE, get_or_create_auth_tokens
+from channels.factories import RedditFactories, FactoryStore
 from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
 
@@ -15,25 +16,59 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture()
-def reddit_factories(request, cassette_exists, staff_user):
+def reddit_factories(request, cassette_exists):
     """RedditFactories fixture"""
-    name = "{}.{}".format(request.module.__name__, request.function.__name__)
-    ctx = RedditFactories(name, api=Api(staff_user))
+    # use betamax's _casette_name to determine filename
+    store = FactoryStore(_casette_name(request, parametrized=True))
+    ctx = RedditFactories(store)
     if cassette_exists:
-        ctx.load()
+        store.load()
     yield ctx
     if not cassette_exists:
-        ctx.write()
+        store.write()
+
+
+@pytest.fixture()
+def user(db, reddit_factories):
+    """Override the user fixture to use reddit_factories"""
+    return reddit_factories.user("contributor")
+
+
+@pytest.fixture()
+def staff_user(db, reddit_factories):
+    """Override the staff_user fixture to use reddit_factories"""
+    return reddit_factories.user("staff_user")
+
+
+@pytest.fixture()
+def private_channel(reddit_factories, staff_user):
+    """Returns a standard channel for tests"""
+    return reddit_factories.channel("private_channel", staff_user, channel_type=CHANNEL_TYPE_PRIVATE)
+
+
+@pytest.fixture()
+def staff_api(staff_user):
+    """A fixture for an Api instance configured with the staff user"""
+    return Api(staff_user)
+
+
+@pytest.fixture()
+def private_channel_and_contributor(private_channel, staff_api, user):
+    """Fixture for a channel and a user who is a contributor"""
+    get_or_create_auth_tokens(user)
+    staff_api.add_contributor(user.username, private_channel.name)
+    staff_api.add_subscriber(user.username, private_channel.name)
+    return (private_channel, user)
 
 
 # pylint: disable=too-many-lines
-def test_list_channels(client, use_betamax, praw_settings, staff_jwt_header, reddit_factories):
+def test_list_channels(client, use_betamax, praw_settings, jwt_header, private_channel_and_contributor):
     """
     List channels the user is subscribed to
     """
-    channel = reddit_factories.channel('one')
+    channel, _ = private_channel_and_contributor
     url = reverse('channel-list')
-    resp = client.get(url, **staff_jwt_header)
+    resp = client.get(url, **jwt_header)
     assert resp.status_code == 200
     assert resp.json() == [
         {
@@ -108,15 +143,13 @@ def test_create_channel_noauth(client, praw_settings):
     assert resp.status_code == 401
 
 
-def test_get_channel(
-        client, use_betamax, praw_settings, staff_user, staff_jwt_header, reddit_factories
-):  # pylint: disable=too-many-arguments
+def test_get_channel(client, use_betamax, praw_settings, jwt_header, private_channel_and_contributor):
     """
     Get a channel
     """
-    channel = reddit_factories.channel('one')
+    channel, _ = private_channel_and_contributor
     url = reverse('channel-detail', kwargs={'channel_name': channel.name})
-    resp = client.get(url, **staff_jwt_header)
+    resp = client.get(url, **jwt_header)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'channel_type': channel.channel_type,

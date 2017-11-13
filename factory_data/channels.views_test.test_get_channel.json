@@ -1,12 +1,18 @@
 {
   "channels": {
-    "one": {
-      "channel_type": "public",
-      "name": "1509997635_minima",
-      "public_description": "Magni officia suscipit corporis quisquam. Occaecati nesciunt repellendus nam inventore omnis.",
-      "title": "In sed repudiandae deserunt."
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510594879_maiores",
+      "public_description": "Nam nihil expedita dolorum. Possimus architecto nemo eaque occaecati.",
+      "title": "Animi magni magni illum ipsum beatae."
     }
   },
-  "comments": {},
-  "posts": {}
+  "users": {
+    "contributor": {
+      "username": "01BYV7H7VD9K4K05HWWEBVSRMN"
+    },
+    "staff_user": {
+      "username": "01BYV7H7VK9RF5PK4RDK2X32VX"
+    }
+  }
 }

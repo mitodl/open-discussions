@@ -1,12 +1,18 @@
 {
   "channels": {
-    "one": {
-      "channel_type": "public",
-      "name": "1509989314_consectetu",
-      "public_description": "Porro dolore labore vitae dolor repellat. Adipisci ipsa nobis perferendis nisi atque atque aliquam.",
-      "title": "Rerum omnis laudantium architecto."
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510594878_sequi",
+      "public_description": "Similique quam dicta provident modi. Quasi molestias omnis illum fugiat natus alias numquam.",
+      "title": "Totam exercitationem tenetur minus odit."
     }
   },
-  "comments": {},
-  "posts": {}
+  "users": {
+    "contributor": {
+      "username": "01BYV7H6K8J78DKXYRZ4M01Z39"
+    },
+    "staff_user": {
+      "username": "01BYV7H6M0416T2A5A50Y5VYE5"
+    }
+  }
 }
