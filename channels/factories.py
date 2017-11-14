@@ -1,7 +1,7 @@
 """Factories for making test data"""
 import json
 import os
-from collections import namedtuple
+from datetime import datetime
 
 import pytz
 from django.contrib.auth import get_user_model
@@ -17,13 +17,38 @@ from channels.models import RedditAccessToken, RedditRefreshToken
 
 FAKE = faker.Factory.create()
 
-Channel = namedtuple('Channel', ['name', 'title', 'channel_type', 'public_description', 'api'])
 
-TextPost = namedtuple('TextPost', ['id', 'title', 'text', 'channel', 'api'])
+class Channel:
+    """Simple factory representation for a channel"""
+    def __init__(self, **kwargs):
+        self.name = kwargs.get('name', None)
+        self.title = kwargs.get('title', None)
+        self.channel_type = kwargs.get('channel_type', None)
+        self.public_description = kwargs.get('public_description', None)
+        self.api = kwargs.get('api', None)
 
-LinkPost = namedtuple('LinkPost', ['id', 'title', 'url', 'channel', 'api'])
 
-Comment = namedtuple('Comment', ['id', 'text', 'comment_id', 'children', 'post_id', 'api'])
+class Post:
+    """Simple factory representation for a post"""
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id', None)
+        self.title = kwargs.get('title', None)
+        self.text = kwargs.get('text', None)
+        self.url = kwargs.get('url', None)
+        self.channel = kwargs.get('channel', None)
+        self.created = kwargs.get('created', None)
+        self.api = kwargs.get('api', None)
+
+
+class Comment:
+    """Simple factory representation for a comment"""
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id', None)
+        self.text = kwargs.get('text', None)
+        self.comment_id = kwargs.get('comment_id', None)
+        self.post_id = kwargs.get('post_id', None)
+        self.children = kwargs.get('children', [])
+        self.api = kwargs.get('api', None)
 
 User = get_user_model()
 
@@ -52,20 +77,21 @@ def serialize_factory_result(obj):
             "post_id": obj.post_id,
             "children": [serialize_factory_result(child) for child in obj.children],
         }
-    elif isinstance(obj, TextPost):
-        return {
-            "id": obj.id,
-            "title": obj.title,
-            "text": obj.text,
-            "channel": serialize_factory_result(obj.channel),
-        }
-    elif isinstance(obj, LinkPost):
-        return {
-            "id": obj.id,
-            "title": obj.title,
-            "url": obj.url,
-            "channel": serialize_factory_result(obj.channel),
-        }
+    elif isinstance(obj, Post):
+        if obj.url is not None:
+            return {
+                "id": obj.id,
+                "title": obj.title,
+                "url": obj.url,
+                "channel": serialize_factory_result(obj.channel),
+            }
+        elif obj.text is not None:
+            return {
+                "id": obj.id,
+                "title": obj.title,
+                "text": obj.text,
+                "channel": serialize_factory_result(obj.channel),
+            }
     elif isinstance(obj, Channel):
         return {
             "name": obj.name,
@@ -74,7 +100,7 @@ def serialize_factory_result(obj):
             "public_description": obj.public_description,
         }
 
-    raise Exception("Unexpected type to serialize")
+    raise Exception("Unable to serialize: {}".format(obj))
 
 
 class FactoryStore:
@@ -88,11 +114,20 @@ class FactoryStore:
 
     def load(self):
         """Loads the factory data from disk"""
-        if not os.path.exists(self.filename):
+        if not self.exists():
             return
 
         with open(self.filename, "r") as f:
             self.data = json.loads(f.read())
+
+    def exists(self):
+        """
+        Returns True if the factory file exists
+
+        Returns:
+            bool: True if the file exists
+        """
+        return os.path.exists(self.filename)
 
     def write(self):
         """Saves the accumulated factory data to disk"""
@@ -283,7 +318,7 @@ class ChannelFactory(factory.Factory):
         return "{}_{}".format(int(now), FAKE.word())[:21]  # maximum of 21-char channel names
 
     @factory.post_generation
-    def _api(self, *args, **kwargs):  # pylint: disable=unused-argument
+    def _create_in_reddit(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Lazily create the channel"""
         if not self.api:
             raise ValueError("ChannelFactory requires an api instance")
@@ -302,6 +337,8 @@ class ChannelFactory(factory.Factory):
 class PostFactory(factory.Factory):
     """Abstract factory for posts"""
     api = None
+    id = None
+    created = None
     title = factory.Faker('text', max_nb_chars=50)
 
     @factory.lazy_attribute
@@ -320,32 +357,38 @@ class TextPostFactory(PostFactory):
     """Factory for text posts"""
     text = factory.Faker('text', max_nb_chars=100)
 
-    @factory.lazy_attribute
-    def id(self):
-        """Lazily create the post"""
+    @factory.post_generation
+    def _create_in_reddit(self, *args, **kwargs):  # pylint: disable=unused-argument
+        """Create the post"""
         if not self.api:
             raise ValueError("TextPostFactory requires an api instance")
 
-        return self.api.create_post(self.channel.name, self.title, text=self.text).id
+        reddit_post = self.api.create_post(self.channel.name, self.title, text=self.text)
+
+        self.id = reddit_post.id
+        self.created = datetime.fromtimestamp(reddit_post.created).replace(tzinfo=pytz.utc).isoformat()
 
     class Meta:
-        model = TextPost
+        model = Post
 
 
 class LinkPostFactory(PostFactory):
     """Factory for link posts"""
     url = factory.Faker('uri')
 
-    @factory.lazy_attribute
-    def id(self):
-        """Lazily create the post"""
+    @factory.post_generation
+    def _create_in_reddit(self, *args, **kwargs):  # pylint: disable=unused-argument
+        """Create the post"""
         if not self.api:
-            raise ValueError("LinkPostFactory requires an api instance")
+            raise ValueError("TextPostFactory requires an api instance")
 
-        return self.api.create_post(self.channel.name, self.title, url=self.url).id
+        reddit_post = self.api.create_post(self.channel.name, self.title, url=self.url)
+
+        self.id = reddit_post.id
+        self.created = datetime.fromtimestamp(reddit_post.created).replace(tzinfo=pytz.utc).isoformat()
 
     class Meta:
-        model = LinkPost
+        model = Post
 
 
 class CommentFactory(factory.Factory):

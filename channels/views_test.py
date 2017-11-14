@@ -16,16 +16,14 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture()
-def reddit_factories(request, cassette_exists):
+def reddit_factories(request):
     """RedditFactories fixture"""
     # use betamax's _casette_name to determine filename
     store = FactoryStore(_casette_name(request, parametrized=True))
     ctx = RedditFactories(store)
-    if cassette_exists:
-        store.load()
+    store.load()
     yield ctx
-    if not cassette_exists:
-        store.write()
+    store.write()
 
 
 @pytest.fixture()
