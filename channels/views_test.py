@@ -361,12 +361,12 @@ def test_get_post(client, missing_image, jwt_header, private_channel_and_contrib
 
     assert resp.status_code == status.HTTP_200_OK
     data = resp.json()
-    del data['created']
     assert data == {
         'title': post.title,
         'text': post.text,
         'url': None,
         'author_id': user.username,
+        'created': post.created,
         'upvoted': True,
         'id': post.id,
         'num_comments': 0,
@@ -430,7 +430,7 @@ def test_list_posts(client, missing_user, staff_jwt_header, private_channel_and_
                     'score': 1,
                     'author_id': contributor.username,
                     'id': text_post.id,
-                    'created': '2017-07-21T19:10:26+00:00',
+                    'created': text_post.created,
                     'num_comments': 0,
                     'channel_name': channel.name,
                     "profile_image": profile_image,
@@ -444,7 +444,7 @@ def test_list_posts(client, missing_user, staff_jwt_header, private_channel_and_
                     'score': 1,
                     'author_id': contributor.username,
                     'id': link_post.id,
-                    'created': '2017-07-21T19:09:37+00:00',
+                    'created': link_post.created,
                     'num_comments': 0,
                     'channel_name': channel.name,
                     "profile_image": profile_image,
