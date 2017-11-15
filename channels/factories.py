@@ -111,6 +111,17 @@ def serialize_factory_result(obj):
 
 
 def transform_to_factory_kwargs(data, original_kwargs=None, prefix=''):
+    """
+    Transforms factory data into the correct kwargs to pass to the factory
+
+    Args:
+        data (dict): dictionary of data from the factory_data file
+        original_kwargs (dict): kwargs passed into the factory function from code
+        prefix (str): argument prefix string
+
+    Returns:
+        dict: the generate kwargs to call the factory with
+    """
     kwargs = {key: value for key, value in original_kwargs.items() if key not in data.keys()}
 
     for key, value in data.items():
@@ -430,7 +441,7 @@ class CommentFactory(factory.Factory):
         return TextPostFactory.create(api=self.api).id
 
     @factory.post_generation
-    def create_in_reddit(self, *args, ):
+    def create_in_reddit(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Lazily create the comment"""
         if not self.api:
             raise ValueError("CommentFactory requires an api instance")
@@ -442,10 +453,10 @@ class CommentFactory(factory.Factory):
         ).id
 
     @factory.post_generation
-    def children(self, create, extracted, **kwargs):  # pylint: disable=unused-argument
+    def _children(self, create, extracted, **kwargs):  # pylint: disable=unused-argument
         """Create nested comments"""
         if extracted:
-            for child in children:
+            for child in self.children:
                 self.children.append(CommentFactory.create(**child))
             return
 
