@@ -144,7 +144,6 @@ def _get_post_serializer_class(user, channel_name):
         cls: serializer class to use
     """
     api = Api(user=user)
-    print(channel_name)
     if api.list_moderators(channel_name, moderator_name=user.username):
         return PostModeratorSerializer
     return PostSerializer

@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510762458_at",
+      "public_description": "Iusto soluta quis impedit molestiae ratione ab. Molestias assumenda velit quae.",
+      "title": "Sapiente vitae omnis accusamus maiores."
+    }
+  },
+  "posts": {
+    "text": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510762458_at",
+        "public_description": "Iusto soluta quis impedit molestiae ratione ab. Molestias assumenda velit quae.",
+        "title": "Sapiente vitae omnis accusamus maiores."
+      },
+      "id": "71",
+      "text": "In ratione architecto dolor maiores reprehenderit. Autem commodi similique labore nobis.",
+      "title": "Vitae aliquid temporibus numquam delectus."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZ07B4MPSWTBSYXKXY7R2N2B"
+    },
+    "staff_user": {
+      "username": "01BZ07B7JRPNZ8FHASBV1040GR"
+    }
+  }
+}

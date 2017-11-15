@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510763316_dolores",
+      "public_description": "Omnis sunt dignissimos ipsum et a accusantium. Temporibus perspiciatis necessitatibus fugiat harum.",
+      "title": "Eos numquam et excepturi deleniti nisi."
+    }
+  },
+  "posts": {
+    "text": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510763316_dolores",
+        "public_description": "Omnis sunt dignissimos ipsum et a accusantium. Temporibus perspiciatis necessitatibus fugiat harum.",
+        "title": "Eos numquam et excepturi deleniti nisi."
+      },
+      "id": "76",
+      "text": "Culpa quisquam temporibus esse corporis. Accusantium est error quam ipsum veritatis fuga.",
+      "title": "Quam vel adipisci maxime veniam ut."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZ085KWGFHBBJ94B6NZE23NK"
+    },
+    "staff_user": {
+      "username": "01BZ085DGWN6A5W6KRYKZ65R4C"
+    }
+  }
+}

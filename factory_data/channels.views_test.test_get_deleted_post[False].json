@@ -2,30 +2,30 @@
   "channels": {
     "private_channel": {
       "channel_type": "private",
-      "name": "1510605087_blanditiis",
-      "public_description": "Quidem nostrum voluptatum nihil velit dignissimos maiores minus. Eveniet maxime culpa magnam.",
-      "title": "Quas soluta velit rem adipisci."
+      "name": "1510750950_ad",
+      "public_description": "Eius quidem aut expedita alias. Iure ea quaerat ex rem numquam.",
+      "title": "Qui qui odio minima cupiditate."
     }
   },
   "posts": {
     "deleted": {
       "channel": {
         "channel_type": "private",
-        "name": "1510605087_blanditiis",
-        "public_description": "Quidem nostrum voluptatum nihil velit dignissimos maiores minus. Eveniet maxime culpa magnam.",
-        "title": "Quas soluta velit rem adipisci."
+        "name": "1510750950_ad",
+        "public_description": "Eius quidem aut expedita alias. Iure ea quaerat ex rem numquam.",
+        "title": "Qui qui odio minima cupiditate."
       },
-      "id": "3i",
-      "text": "Maxime eius harum cupiditate doloribus ex. Ratione reiciendis similique blanditiis.",
-      "title": "Voluptatem numquam ad placeat rerum vero in."
+      "id": "52",
+      "text": "Odit et repudiandae facere odit. Rerum asperiores distinctio reiciendis occaecati ad.",
+      "title": "Vero porro tempore quidem modi vitae eveniet."
     }
   },
   "users": {
     "contributor": {
-      "username": "01BYVH8S1QP07BADE5ZARMW6GG"
+      "username": "01BYZWC89F2SBH9452594B3Y0T"
     },
     "staff_user": {
-      "username": "01BYVH8RMP50YCT7SSSWX449TY"
+      "username": "01BYZWC1X0JK052A1Z0Z2NR3WP"
     }
   }
 }

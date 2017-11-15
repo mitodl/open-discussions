@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from praw.exceptions import APIException
 from rest_framework import status
 
-from channels.api import Api, CHANNEL_TYPE_PRIVATE, get_or_create_auth_tokens
+from channels.api import Api, CHANNEL_TYPE_PRIVATE
 from channels.factories import RedditFactories, FactoryStore
 from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
@@ -18,14 +18,16 @@ pytestmark = [
 
 
 @pytest.fixture()
-def reddit_factories(request):
+def reddit_factories(request, cassette_exists):
     """RedditFactories fixture"""
     # use betamax's _casette_name to determine filename
     store = FactoryStore(_casette_name(request, parametrized=True))
     ctx = RedditFactories(store)
-    store.load()
+    if cassette_exists:
+        store.load()
     yield ctx
-    store.write()
+    if not cassette_exists:
+        store.write()
 
 
 @pytest.fixture()
@@ -55,7 +57,6 @@ def staff_api(staff_user):
 @pytest.fixture()
 def private_channel_and_contributor(private_channel, staff_api, user):
     """Fixture for a channel and a user who is a contributor"""
-    get_or_create_auth_tokens(user)
     staff_api.add_contributor(user.username, private_channel.name)
     staff_api.add_subscriber(user.username, private_channel.name)
     return (private_channel, user)
@@ -397,8 +398,8 @@ def test_get_post_not_found(client, logged_in_profile):
 def test_list_posts(client, missing_user, staff_jwt_header, private_channel_and_contributor, reddit_factories):
     """List posts in a channel"""
     channel, contributor = private_channel_and_contributor
-    text_post = reddit_factories.text_post("text_post", contributor, channel=channel)
     link_post = reddit_factories.link_post("link_post", contributor, channel=channel)
+    text_post = reddit_factories.text_post("text_post", contributor, channel=channel)
 
     if missing_user:
         contributor.username = 'renamed'
@@ -426,10 +427,11 @@ def test_list_posts(client, missing_user, staff_jwt_header, private_channel_and_
                     'url': None,
                     'text': text_post.text,
                     'title': text_post.title,
-                    'upvoted': True,
+                    'upvoted': False,
                     'score': 1,
                     'author_id': contributor.username,
                     'id': text_post.id,
+                    'removed': False,
                     'created': text_post.created,
                     'num_comments': 0,
                     'channel_name': channel.name,
@@ -440,12 +442,13 @@ def test_list_posts(client, missing_user, staff_jwt_header, private_channel_and_
                     'url': link_post.url,
                     'text': None,
                     'title': link_post.title,
-                    'upvoted': True,
+                    'upvoted': False,
                     'score': 1,
                     'author_id': contributor.username,
                     'id': link_post.id,
                     'created': link_post.created,
                     'num_comments': 0,
+                    'removed': False,
                     'channel_name': channel.name,
                     "profile_image": profile_image,
                     "author_name": name
@@ -469,125 +472,191 @@ def test_list_posts_not_found(client, logged_in_profile):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.parametrize('params,expected', [
-    ({}, {'after': 't3_q', 'after_count': 5}),
-    ({'after': 't3_q', 'count': '5'}, {'after': 't3_l', 'after_count': 10, 'before': 't3_p', 'before_count': 6}),
-    ({'after': 't3_s', 'count': '3'}, {'after': 't3_n', 'after_count': 8, 'before': 't3_r', 'before_count': 4}),
-    ({'before': 't3_r', 'count': '6'}, {'after': 't3_s', 'after_count': 5}),
-])
-def test_list_posts_pagination(client, logged_in_profile, settings, params, expected):
-    """Test that post pagination works"""
+def test_list_posts_pagination_first_page_no_params(
+        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+):
+    """Test that post pagination works for the first page if no params"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
-    url = reverse('post-list', kwargs={'channel_name': 'ten_posts'})
-    resp = client.get(url, params)
+    channel, user = private_channel_and_contributor
+    posts = list(reversed([reddit_factories.text_post(idx, user=user, channel=channel) for idx in range(15)]))
+    params = {}
+    expected = {'after': 't3_{}'.format(posts[4].id), 'after_count': 5}
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, params, **jwt_header)
     assert resp.status_code == 200
     assert resp.json()['pagination'] == expected
 
 
-def test_update_post_text(client, logged_in_profile):
+def test_list_posts_pagination_first_page_with_params(
+        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+):
+    """Test that post pagination works for the first page with params"""
+    settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
+    channel, user = private_channel_and_contributor
+    posts = list(reversed([reddit_factories.text_post(idx, user=user, channel=channel) for idx in range(15)]))
+    params = {'before': 't3_{}'.format(posts[5].id), 'count': 6}
+    expected = {'after': 't3_{}'.format(posts[4].id), 'after_count': 5}
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, params, **jwt_header)
+    assert resp.status_code == 200
+    assert resp.json()['pagination'] == expected
+
+
+def test_list_posts_pagination_non_first_page(
+        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+):
+    """Test that post pagination works for a page that's not the first one"""
+    settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
+    channel, user = private_channel_and_contributor
+    posts = list(reversed([reddit_factories.text_post(idx, user=user, channel=channel) for idx in range(15)]))
+    params = {'after': 't3_{}'.format(posts[4].id), 'count': 5}
+    expected = {
+        'before': 't3_{}'.format(posts[5].id),
+        'before_count': 6,
+        'after': 't3_{}'.format(posts[9].id),
+        'after_count': 10
+    }
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, params, **jwt_header)
+    assert resp.status_code == 200
+    assert resp.json()['pagination'] == expected
+
+
+def test_list_posts_pagination_non_offset_page(
+        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+):
+    """Test that post pagination works for a page that doesn't align to the number of results"""
+    settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
+    channel, user = private_channel_and_contributor
+    posts = list(reversed([reddit_factories.text_post(idx, user=user, channel=channel) for idx in range(15)]))
+    params = {'after': 't3_{}'.format(posts[5].id), 'count': 5}
+    expected = {
+        'before': 't3_{}'.format(posts[6].id),
+        'before_count': 6,
+        'after': 't3_{}'.format(posts[10].id),
+        'after_count': 10
+    }
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, params, **jwt_header)
+    assert resp.status_code == 200
+    assert resp.json()['pagination'] == expected
+
+
+def test_update_post_text(client, jwt_header, private_channel_and_contributor, reddit_factories):
     """Test updating just the text of a post"""
-    post_id = '30'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"text": "overwrite"})
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("text", user=user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"text": "overwrite"}, **jwt_header)
     assert resp.status_code == 200
     assert resp.json() == {
         'url': None,
         'text': 'overwrite',
-        'title': 'Text post',
-        'upvoted': False,
-        'score': 1,
-        'author_id': logged_in_profile.user.username,
-        'id': post_id,
-        'created': '2017-07-21T19:10:26+00:00',
-        'num_comments': 0,
-        'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
-    }
-
-
-def test_update_post_clear_vote(client, logged_in_profile):
-    """Test updating a post to clear the user's vote"""
-    post_id = '30'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"upvoted": False})
-    assert resp.status_code == 200
-    assert resp.json() == {
-        'url': None,
-        'text': 'overwrite',
-        'title': 'Text post',
-        'upvoted': False,
-        'score': 1,
-        'author_id': logged_in_profile.user.username,
-        'id': post_id,
-        'created': '2017-07-21T19:10:26+00:00',
-        'num_comments': 0,
-        'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
-    }
-
-
-def test_update_post_upvote(client, logged_in_profile):
-    """Test updating a post to upvote it"""
-    post_id = '30'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"upvoted": True})
-    assert resp.status_code == 200
-    assert resp.json() == {
-        'url': None,
-        'text': 'overwrite',
-        'title': 'Text post',
+        'title': post.title,
         'upvoted': True,
         'score': 1,
-        'author_id': logged_in_profile.user.username,
-        'id': post_id,
-        'created': '2017-07-21T19:10:26+00:00',
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
         'num_comments': 0,
-        'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
+        'channel_name': channel.name,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
     }
 
 
-def test_update_post_forbidden(client, logged_in_profile):
+def test_update_post_clear_vote(client, jwt_header, private_channel_and_contributor, reddit_factories):
+    """Test updating a post to clear the user's vote"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("text", user=user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"upvoted": False}, **jwt_header)
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'url': None,
+        'text': post.text,
+        'title': post.title,
+        'upvoted': False,
+        'score': 1,
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
+        'num_comments': 0,
+        'channel_name': channel.name,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
+    }
+
+
+def test_update_post_upvote(client, jwt_header, private_channel_and_contributor, reddit_factories, staff_api):
+    """Test updating a post to upvote it"""
+    channel, _ = private_channel_and_contributor
+    user = reddit_factories.user("second")
+    staff_api.add_contributor(user.username, channel.name)
+    staff_api.add_subscriber(user.username, channel.name)
+    post = reddit_factories.text_post("text", user=user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"upvoted": True}, **jwt_header)
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'url': None,
+        'text': post.text,
+        'title': post.title,
+        'upvoted': True,
+        'score': 2,
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
+        'num_comments': 0,
+        'channel_name': channel.name,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
+    }
+
+
+def test_update_post_forbidden(client, staff_jwt_header, private_channel_and_contributor, reddit_factories):
     """Test updating a post the user isn't the owner of"""
-    post_id = 'acd'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"text": "overwrite"})
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("text", user=user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"text": "overwrite"}, **staff_jwt_header)
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_update_post_not_found(client, logged_in_profile):
+def test_update_post_not_found(client, jwt_header):
     """Test updating a post that doesn't exist"""
     post_id = 'missing'
     url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"text": "overwrite"})
+    resp = client.patch(url, format='json', data={"text": "overwrite"}, **jwt_header)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_create_post_without_upvote(client, logged_in_profile):
+def test_create_post_without_upvote(client, jwt_header, private_channel_and_contributor):
     """Test creating a post without an upvote in the body"""
-    url = reverse('post-list', kwargs={'channel_name': 'subreddit_for_testing'})
+    channel, user = private_channel_and_contributor
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.post(url, {
         'title': 'x',
         'text': 'y',
         'upvoted': False,
-    })
+    }, **jwt_header)
     assert resp.status_code == 201
-    assert resp.json() == {
+    data = resp.json()
+    assert isinstance(data['created'], str)
+    assert isinstance(data['id'], str)
+    del data['id']
+    del data['created']
+    assert data == {
         'title': 'x',
         'text': 'y',
         'url': None,
-        'author_id': logged_in_profile.user.username,
-        'created': '2017-07-25T22:05:44+00:00',
+        'author_id': user.username,
         'upvoted': False,
-        'id': '5',
         'num_comments': 0,
         'score': 1,
-        'channel_name': 'subreddit_for_testing',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name
+        'channel_name': channel.name,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name
     }
 
 
@@ -1074,15 +1143,15 @@ def test_list_contributors(client, logged_in_profile):
     assert resp.json() == [{'contributor_name': 'othercontributor'}, {'contributor_name': 'fooadmin'}]
 
 
-def test_list_moderators(client, jwt_header, private_channel_and_contributor):
+def test_list_moderators(client, jwt_header, private_channel_and_contributor, staff_user):
     """
     List moderators in a channel
     """
-    channel, user = private_channel_and_contributor
+    channel, _ = private_channel_and_contributor
     url = reverse('moderator-list', kwargs={'channel_name': channel.name})
     resp = client.get(url, **jwt_header)
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == [{'moderator_name': user.username}]
+    assert resp.json() == [{'moderator_name': staff_user.username}]
 
 
 def test_list_subscribers_not_allowed(client, staff_jwt_header):

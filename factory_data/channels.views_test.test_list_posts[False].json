@@ -2,41 +2,41 @@
   "channels": {
     "private_channel": {
       "channel_type": "private",
-      "name": "1510678067_repellat",
-      "public_description": "Laboriosam nemo animi iste asperiores. Fuga dicta excepturi aut officiis.",
-      "title": "Ullam ea voluptates id illo alias minima cum."
+      "name": "1510760489_facilis",
+      "public_description": "Laboriosam sed incidunt a veritatis eius voluptatum. Est fugiat delectus qui id.",
+      "title": "Temporibus quas maxime velit commodi ea."
     }
   },
   "posts": {
     "link_post": {
       "channel": {
         "channel_type": "private",
-        "name": "1510678067_repellat",
-        "public_description": "Laboriosam nemo animi iste asperiores. Fuga dicta excepturi aut officiis.",
-        "title": "Ullam ea voluptates id illo alias minima cum."
+        "name": "1510760489_facilis",
+        "public_description": "Laboriosam sed incidunt a veritatis eius voluptatum. Est fugiat delectus qui id.",
+        "title": "Temporibus quas maxime velit commodi ea."
       },
-      "id": "4x",
-      "title": "Natus ipsam porro veritatis placeat.",
-      "url": "http://powell-cervantes.biz/"
+      "id": "5b",
+      "title": "Eaque officiis consequatur atque ratione.",
+      "url": "http://moore.com/"
     },
     "text_post": {
       "channel": {
         "channel_type": "private",
-        "name": "1510678067_repellat",
-        "public_description": "Laboriosam nemo animi iste asperiores. Fuga dicta excepturi aut officiis.",
-        "title": "Ullam ea voluptates id illo alias minima cum."
+        "name": "1510760489_facilis",
+        "public_description": "Laboriosam sed incidunt a veritatis eius voluptatum. Est fugiat delectus qui id.",
+        "title": "Temporibus quas maxime velit commodi ea."
       },
-      "id": "4w",
-      "text": "Ex earum assumenda nam. Ipsam quae expedita aliquid inventore maxime.",
-      "title": "Itaque minima voluptatibus temporibus ipsum."
+      "id": "5c",
+      "text": "Culpa blanditiis explicabo ratione pariatur fugit consequuntur. Fugit vitae ea iste assumenda.",
+      "title": "Blanditiis autem quia exercitationem sit vitae."
     }
   },
   "users": {
     "contributor": {
-      "username": "01BYXPW1CWF9VR6Y5YHX9H23JZ"
+      "username": "01BZ05FBW9BG2ETPYMVFJRZAPC"
     },
     "staff_user": {
-      "username": "01BYXPVV27XZQEBY9QAV2N56GM"
+      "username": "01BZ05F5JFG2X5EDH87RVYMG98"
     }
   }
 }
