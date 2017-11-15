@@ -7,7 +7,7 @@ import Card from "../../components/Card"
 
 import type { Match } from "react-router"
 
-export default class AdminPage extends React.Component {
+export default class AdminPage extends React.Component<*, void> {
   props: {
     match: Match
   }

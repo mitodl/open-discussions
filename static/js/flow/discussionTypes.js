@@ -17,7 +17,7 @@ export type ChannelForm = {
   channel_type:       ChannelType,
 }
 
-export type AuthoredContent = {
+export type Post = {
   id:            string,
   author_id:     string,
   score:         number,
@@ -25,9 +25,6 @@ export type AuthoredContent = {
   created:       string,
   profile_image: string,
   author_name:   string,
-};
-
-export type Post = AuthoredContent & {
   title:         string,
   url:           ?string,
   text:          ?string,
@@ -79,7 +76,14 @@ export type PostListResponse = {
   posts: Array<Post>,
 }
 
-export type Comment = AuthoredContent & {
+export type Comment = {
+  id:            string,
+  author_id:     string,
+  score:         number,
+  upvoted:       boolean,
+  created:       string,
+  profile_image: string,
+  author_name:   string,
   post_id:       string,
   text:          string,
   downvoted:     boolean,

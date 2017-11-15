@@ -7,7 +7,7 @@ import Card from "../components/Card"
 
 import { formatTitle } from "../lib/title"
 
-export default class AuthRequiredPage extends React.Component {
+export default class AuthRequiredPage extends React.Component<*, void> {
   render() {
     return (
       <div className="content">

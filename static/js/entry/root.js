@@ -19,6 +19,9 @@ if (!Object.entries) {
 const store = configureStore()
 
 const rootEl = document.getElementById("container")
+if (!rootEl) {
+  throw new Error("container div doesn't exist")
+}
 
 const history = createBrowserHistory()
 const renderApp = Component => {

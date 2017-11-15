@@ -16,7 +16,7 @@ const textContent = post =>
     className="text-content"
   />
 
-class ExpandedPostDisplay extends React.Component {
+class ExpandedPostDisplay extends React.Component<*, void> {
   props: {
     post: Post,
     toggleUpvote: Post => void

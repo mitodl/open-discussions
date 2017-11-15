@@ -2,7 +2,7 @@
 import React from "react"
 
 type ButtonProps = {
-  children: React$Element<*, *, *>,
+  children: React$Element<*>,
   onClick: Function
 }
 

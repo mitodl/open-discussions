@@ -10,13 +10,19 @@ export const channelsEndpoint = {
   verbs:             [GET, POST],
   initialState:      { ...INITIAL_STATE, data: new Map() },
   getFunc:           (name: string) => api.getChannel(name),
-  getSuccessHandler: (payload: Channel, data: Map<string, Channel>) => {
+  getSuccessHandler: (
+    payload: Channel,
+    data: Map<string, Channel>
+  ): Map<string, Channel> => {
     const update = new Map(data)
     update.set(payload.name, payload)
     return update
   },
   postFunc:           (channel: Channel) => api.createChannel(channel),
-  postSuccessHandler: (payload: Channel, data: Map<string, Channel>) => {
+  postSuccessHandler: (
+    payload: Channel,
+    data: Map<string, Channel>
+  ): Map<string, Channel> => {
     const update = new Map(data)
     update.set(payload.name, payload)
     return update

@@ -17,7 +17,7 @@ const CREATE_CHANNEL_KEY = "channel:new"
 const CREATE_CHANNEL_PAYLOAD = { formKey: CREATE_CHANNEL_KEY }
 const getForm = R.prop(CREATE_CHANNEL_KEY)
 
-class CreateChannelPage extends React.Component {
+class CreateChannelPage extends React.Component<*, void> {
   props: {
     dispatch: Dispatch,
     history: Object,

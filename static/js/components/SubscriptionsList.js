@@ -15,7 +15,7 @@ const channelClassName = (channelName, currentChannel) =>
     ? "channelname current-location"
     : "channelname"
 
-export default class SubscriptionsList extends React.Component {
+export default class SubscriptionsList extends React.Component<*, void> {
   props: SubscriptionsListProps
 
   render() {

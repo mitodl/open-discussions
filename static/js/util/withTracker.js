@@ -5,7 +5,7 @@
 import React from "react"
 import ga from "react-ga"
 
-const withTracker = (WrappedComponent: Class<React.Component<*, *, *>>) => {
+const withTracker = (WrappedComponent: Class<React.Component<*, *>>) => {
   const debug = SETTINGS.reactGaDebug === "true"
 
   if (SETTINGS.gaTrackingID) {

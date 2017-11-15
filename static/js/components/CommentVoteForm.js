@@ -11,7 +11,7 @@ type CommentVoteFormProps = {
   downvote: CommentVoteFunc
 }
 
-export default class CommentVoteForm extends React.Component {
+export default class CommentVoteForm extends React.Component<*, *> {
   props: CommentVoteFormProps
   state: {
     downvoting: boolean,

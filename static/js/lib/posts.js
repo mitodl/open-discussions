@@ -61,7 +61,7 @@ type PostVotingProps = {
   toggleUpvote: Function
 }
 
-export class PostVotingButtons extends React.Component {
+export class PostVotingButtons extends React.Component<*, *> {
   props: PostVotingProps
 
   state: {

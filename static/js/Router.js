@@ -9,9 +9,9 @@ import ScrollToTop from "./components/ScrollToTop"
 
 import type { Store } from "redux"
 
-export default class Router extends React.Component {
+export default class Router extends React.Component<*, void> {
   props: {
-    store: Store,
+    store: Store<*, *>,
     history: Object,
     children: React$Element<*>
   }
@@ -33,4 +33,4 @@ export default class Router extends React.Component {
   }
 }
 
-export const routes = <Route url="/" component={withTracker(App)} />
+export const routes = <Route component={withTracker(App)} />

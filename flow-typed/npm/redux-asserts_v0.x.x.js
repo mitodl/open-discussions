@@ -1,9 +1,12 @@
+// Not flow-typed, this was created manually
+import type { Action, Dispatch, Reducer } from 'redux';
+
 declare module 'redux-asserts' {
   declare type State = any;
   declare type StateFunc = ((state: State) => State);
 
   declare type TestStore = {
-    dispatch: Dispatch,
+    dispatch: Dispatch<*>,
     getState: () => State,
     subscribe: (listener: () => void) => () => void,
     replaceReducer: (reducer: Reducer<any, any>) => void,

@@ -39,7 +39,7 @@ const validationMessage = message =>
       {message}
     </div>
 
-export default class CreatePostForm extends React.Component {
+export default class CreatePostForm extends React.Component<*, void> {
   props: CreatePostFormProps
 
   render() {

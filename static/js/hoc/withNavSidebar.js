@@ -4,8 +4,8 @@ import React from "react"
 import Sidebar from "../components/Sidebar"
 import Navigation from "../components/Navigation"
 
-const withNavSidebar = (WrappedComponent: Class<React.Component<*, *, *>>) => {
-  class WithNavSidebar extends React.Component {
+const withNavSidebar = (WrappedComponent: Class<React.Component<*, *>>) => {
+  class WithNavSidebar extends React.Component<*, *> {
     render() {
       const { subscribedChannels, location: { pathname } } = this.props
 
