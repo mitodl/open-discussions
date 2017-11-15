@@ -1,0 +1,18 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510763696_sit",
+      "public_description": "Possimus magnam amet porro eligendi amet. Tempore voluptatum harum voluptatibus eaque.",
+      "title": "Quo aliquam explicabo accusantium commodi."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZ08GY3TRYS7GMZPHR5QKARC"
+    },
+    "staff_user": {
+      "username": "01BZ08H1CKJ69SH754HFM0MX8N"
+    }
+  }
+}

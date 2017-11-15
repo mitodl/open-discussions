@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510750937_rerum",
+      "public_description": "Quas animi veritatis autem ab error eveniet facere. Hic tempora et ducimus et ullam.",
+      "title": "Ipsam occaecati vero et doloremque."
+    }
+  },
+  "posts": {
+    "deleted": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510750937_rerum",
+        "public_description": "Quas animi veritatis autem ab error eveniet facere. Hic tempora et ducimus et ullam.",
+        "title": "Ipsam occaecati vero et doloremque."
+      },
+      "id": "51",
+      "text": "Perspiciatis eveniet velit non eaque dolorum. In placeat veritatis ab aperiam.",
+      "title": "Exercitationem exercitationem consequuntur enim."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYZWBVCETYVKE5GXTM4RMEWA"
+    },
+    "staff_user": {
+      "username": "01BYZWBN3BXB5XCCKNYBSC4W2M"
+    }
+  }
+}

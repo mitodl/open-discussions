@@ -1,0 +1,42 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510760473_officia",
+      "public_description": "Ut quibusdam autem a. Optio ex ut at nisi molestiae. Error impedit voluptas consequuntur eos at.",
+      "title": "Vel minus nam unde culpa tempore ratione facere."
+    }
+  },
+  "posts": {
+    "link_post": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510760473_officia",
+        "public_description": "Ut quibusdam autem a. Optio ex ut at nisi molestiae. Error impedit voluptas consequuntur eos at.",
+        "title": "Vel minus nam unde culpa tempore ratione facere."
+      },
+      "id": "59",
+      "title": "At itaque iste laboriosam.",
+      "url": "http://www.rojas-reyes.net/login/"
+    },
+    "text_post": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510760473_officia",
+        "public_description": "Ut quibusdam autem a. Optio ex ut at nisi molestiae. Error impedit voluptas consequuntur eos at.",
+        "title": "Vel minus nam unde culpa tempore ratione facere."
+      },
+      "id": "5a",
+      "text": "Adipisci magnam ipsam consequatur repellendus perspiciatis. Explicabo iste nam consequatur.",
+      "title": "Accusamus deserunt nisi accusantium a."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZ05EVTS7R8GANHTBWP36D8G"
+    },
+    "staff_user": {
+      "username": "01BZ05ENFCEJCY81YC9PVC58HK"
+    }
+  }
+}

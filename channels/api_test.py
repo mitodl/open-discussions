@@ -354,7 +354,7 @@ def test_list_moderator(mock_client):
     """Test list moderator"""
     client = api.Api(UserFactory.create())
     moderators = client.list_moderators('channel_test_name')
-    mock_client.subreddit.return_value.moderator.assert_called_once_with()
+    mock_client.subreddit.return_value.moderator.assert_called_once_with(redditor=None)
     assert mock_client.subreddit.return_value.moderator.return_value == moderators
 
 

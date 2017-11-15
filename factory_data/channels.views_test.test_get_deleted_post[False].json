@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510750950_ad",
+      "public_description": "Eius quidem aut expedita alias. Iure ea quaerat ex rem numquam.",
+      "title": "Qui qui odio minima cupiditate."
+    }
+  },
+  "posts": {
+    "deleted": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510750950_ad",
+        "public_description": "Eius quidem aut expedita alias. Iure ea quaerat ex rem numquam.",
+        "title": "Qui qui odio minima cupiditate."
+      },
+      "id": "52",
+      "text": "Odit et repudiandae facere odit. Rerum asperiores distinctio reiciendis occaecati ad.",
+      "title": "Vero porro tempore quidem modi vitae eveniet."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYZWC89F2SBH9452594B3Y0T"
+    },
+    "staff_user": {
+      "username": "01BYZWC1X0JK052A1Z0Z2NR3WP"
+    }
+  }
+}

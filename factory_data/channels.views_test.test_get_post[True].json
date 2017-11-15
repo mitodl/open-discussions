@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510750966_nulla",
+      "public_description": "Aliquid ratione temporibus ut debitis sapiente dicta facilis. Temporibus ratione nostrum ex.",
+      "title": "Dolore laboriosam dolorum quidem impedit eos."
+    }
+  },
+  "posts": {
+    "missing_image": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510750966_nulla",
+        "public_description": "Aliquid ratione temporibus ut debitis sapiente dicta facilis. Temporibus ratione nostrum ex.",
+        "title": "Dolore laboriosam dolorum quidem impedit eos."
+      },
+      "id": "53",
+      "text": "Minima praesentium libero deserunt. Itaque voluptas nostrum nesciunt fugit nulla culpa.",
+      "title": "Porro at autem repudiandae placeat quae eos."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYZWCETMX31Y59MP89PVTSHQ"
+    },
+    "staff_user": {
+      "username": "01BYZWCHRP78WXY24B9F0YMQJR"
+    }
+  }
+}

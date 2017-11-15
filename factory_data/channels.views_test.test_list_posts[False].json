@@ -1,0 +1,42 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510760489_facilis",
+      "public_description": "Laboriosam sed incidunt a veritatis eius voluptatum. Est fugiat delectus qui id.",
+      "title": "Temporibus quas maxime velit commodi ea."
+    }
+  },
+  "posts": {
+    "link_post": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510760489_facilis",
+        "public_description": "Laboriosam sed incidunt a veritatis eius voluptatum. Est fugiat delectus qui id.",
+        "title": "Temporibus quas maxime velit commodi ea."
+      },
+      "id": "5b",
+      "title": "Eaque officiis consequatur atque ratione.",
+      "url": "http://moore.com/"
+    },
+    "text_post": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510760489_facilis",
+        "public_description": "Laboriosam sed incidunt a veritatis eius voluptatum. Est fugiat delectus qui id.",
+        "title": "Temporibus quas maxime velit commodi ea."
+      },
+      "id": "5c",
+      "text": "Culpa blanditiis explicabo ratione pariatur fugit consequuntur. Fugit vitae ea iste assumenda.",
+      "title": "Blanditiis autem quia exercitationem sit vitae."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZ05FBW9BG2ETPYMVFJRZAPC"
+    },
+    "staff_user": {
+      "username": "01BZ05F5JFG2X5EDH87RVYMG98"
+    }
+  }
+}

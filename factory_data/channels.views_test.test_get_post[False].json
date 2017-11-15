@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510750979_ducimus",
+      "public_description": "Illum dolorum nesciunt harum suscipit. Culpa libero eos fuga. Necessitatibus veniam debitis minima.",
+      "title": "Pariatur sed dolores consequuntur eius."
+    }
+  },
+  "posts": {
+    "missing_image": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510750979_ducimus",
+        "public_description": "Illum dolorum nesciunt harum suscipit. Culpa libero eos fuga. Necessitatibus veniam debitis minima.",
+        "title": "Pariatur sed dolores consequuntur eius."
+      },
+      "id": "54",
+      "text": "Repellendus accusantium saepe enim earum. Provident facilis deleniti tempora error.",
+      "title": "At eos a eveniet sint earum omnis ad."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BYZWCVM20ADPBN605J3GY5K8"
+    },
+    "staff_user": {
+      "username": "01BYZWCYJ3M1VSYKCJCR3JXSRM"
+    }
+  }
+}

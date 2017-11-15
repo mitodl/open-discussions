@@ -1,0 +1,31 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510762883_culpa",
+      "public_description": "Nulla ex optio accusantium debitis iusto similique qui. Est nemo minus labore.",
+      "title": "Repellat commodi exercitationem nobis."
+    }
+  },
+  "posts": {
+    "text": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510762883_culpa",
+        "public_description": "Nulla ex optio accusantium debitis iusto similique qui. Est nemo minus labore.",
+        "title": "Repellat commodi exercitationem nobis."
+      },
+      "id": "72",
+      "text": "Eius illum blanditiis blanditiis aperiam porro. Id modi praesentium quasi nam.",
+      "title": "Quasi inventore iure porro hic quasi corrupti."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZ07R4EKRJ3V7NRRKXERJMPC"
+    },
+    "staff_user": {
+      "username": "01BZ07R7CTVF2QE9XZ2CDDADZC"
+    }
+  }
+}

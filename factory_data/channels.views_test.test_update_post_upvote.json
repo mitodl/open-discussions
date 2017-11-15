@@ -1,0 +1,34 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "name": "1510763302_veniam",
+      "public_description": "Commodi culpa delectus assumenda natus modi. Assumenda nihil ad repellat unde ullam delectus.",
+      "title": "Minima officiis libero explicabo saepe enim."
+    }
+  },
+  "posts": {
+    "text": {
+      "channel": {
+        "channel_type": "private",
+        "name": "1510763302_veniam",
+        "public_description": "Commodi culpa delectus assumenda natus modi. Assumenda nihil ad repellat unde ullam delectus.",
+        "title": "Minima officiis libero explicabo saepe enim."
+      },
+      "id": "75",
+      "text": "Laudantium ea aut laborum rem quas fugiat accusamus odio. Ipsa dignissimos possimus facilis ex.",
+      "title": "Libero nulla magnam ut blanditiis."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZ084WZ8H4Y633ZVBSS59KD7"
+    },
+    "second": {
+      "username": "01BZ0856RST6DKM51C8TPRC0A9"
+    },
+    "staff_user": {
+      "username": "01BZ085096JGFNM2N7FJX6EAWV"
+    }
+  }
+}

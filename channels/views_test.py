@@ -1,29 +1,33 @@
 """Tests for views for REST APIs for channels"""
-# pylint: disable=too-many-lines
 import pytest
 from betamax.fixtures.pytest import _casette_name
 from django.core.urlresolvers import reverse
 from praw.exceptions import APIException
 from rest_framework import status
 
-from channels.api import Api, CHANNEL_TYPE_PRIVATE, get_or_create_auth_tokens
+from channels.api import Api, CHANNEL_TYPE_PRIVATE
 from channels.factories import RedditFactories, FactoryStore
 from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
 
 # pylint: disable=redefined-outer-name, unused-argument, too-many-lines
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    pytest.mark.usefixtures("use_betamax", "praw_settings"),
+]
 
 
 @pytest.fixture()
-def reddit_factories(request):
+def reddit_factories(request, cassette_exists):
     """RedditFactories fixture"""
     # use betamax's _casette_name to determine filename
     store = FactoryStore(_casette_name(request, parametrized=True))
     ctx = RedditFactories(store)
-    store.load()
+    if cassette_exists:
+        store.load()
     yield ctx
-    store.write()
+    if not cassette_exists:
+        store.write()
 
 
 @pytest.fixture()
@@ -53,14 +57,13 @@ def staff_api(staff_user):
 @pytest.fixture()
 def private_channel_and_contributor(private_channel, staff_api, user):
     """Fixture for a channel and a user who is a contributor"""
-    get_or_create_auth_tokens(user)
     staff_api.add_contributor(user.username, private_channel.name)
     staff_api.add_subscriber(user.username, private_channel.name)
     return (private_channel, user)
 
 
 # pylint: disable=too-many-lines
-def test_list_channels(client, use_betamax, praw_settings, jwt_header, private_channel_and_contributor):
+def test_list_channels(client, jwt_header, private_channel_and_contributor):
     """
     List channels the user is subscribed to
     """
@@ -78,7 +81,7 @@ def test_list_channels(client, use_betamax, praw_settings, jwt_header, private_c
     ]
 
 
-def test_create_channel(client, use_betamax, praw_settings, staff_jwt_header):
+def test_create_channel(client, staff_jwt_header):
     """
     Create a channel and assert the response
     """
@@ -95,7 +98,7 @@ def test_create_channel(client, use_betamax, praw_settings, staff_jwt_header):
     assert resp.json() == payload
 
 
-def test_create_channel_already_exists(client, use_betamax, praw_settings, staff_jwt_header):
+def test_create_channel_already_exists(client, staff_jwt_header):
     """
     Create a channel which already exists
     """
@@ -111,7 +114,7 @@ def test_create_channel_already_exists(client, use_betamax, praw_settings, staff
     assert resp.status_code == status.HTTP_409_CONFLICT
 
 
-def test_create_channel_nonstaff(client, praw_settings, jwt_header):
+def test_create_channel_nonstaff(client, jwt_header):
     """
     Try to create a channel with nonstaff auth and assert a failure
     """
@@ -126,7 +129,7 @@ def test_create_channel_nonstaff(client, praw_settings, jwt_header):
     assert resp.status_code == 403
 
 
-def test_create_channel_noauth(client, praw_settings):
+def test_create_channel_noauth(client):
     """
     Try to create a channel with no auth and assert a failure
     """
@@ -141,7 +144,7 @@ def test_create_channel_noauth(client, praw_settings):
     assert resp.status_code == 401
 
 
-def test_get_channel(client, use_betamax, praw_settings, jwt_header, private_channel_and_contributor):
+def test_get_channel(client, jwt_header, private_channel_and_contributor):
     """
     Get a channel
     """
@@ -157,7 +160,7 @@ def test_get_channel(client, use_betamax, praw_settings, jwt_header, private_cha
     }
 
 
-def test_get_channel_forbidden(client, use_betamax, praw_settings):
+def test_get_channel_forbidden(client):
     """
     If PRAW returns a 403 error we should also return a 403 error
     """
@@ -167,7 +170,7 @@ def test_get_channel_forbidden(client, use_betamax, praw_settings):
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_get_channel_not_found(client, use_betamax, praw_settings):
+def test_get_channel_not_found(client):
     """
     If PRAW returns a 404 error we should also return a 404 error
     """
@@ -177,7 +180,7 @@ def test_get_channel_not_found(client, use_betamax, praw_settings):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_patch_channel(client, use_betamax, praw_settings, staff_jwt_header):
+def test_patch_channel(client, staff_jwt_header):
     """
     Update a channel's settings
     """
@@ -194,7 +197,7 @@ def test_patch_channel(client, use_betamax, praw_settings, staff_jwt_header):
     }
 
 
-def test_patch_channel_forbidden(client, use_betamax, praw_settings, staff_jwt_header):
+def test_patch_channel_forbidden(client, staff_jwt_header):
     """
     Update a channel's settings for a channel the user doesn't have permission to
     """
@@ -205,7 +208,7 @@ def test_patch_channel_forbidden(client, use_betamax, praw_settings, staff_jwt_h
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_patch_channel_not_found(client, use_betamax, praw_settings, staff_jwt_header):
+def test_patch_channel_not_found(client, staff_jwt_header):
     """
     Update a channel's settings for a missing channel
     """
@@ -216,7 +219,7 @@ def test_patch_channel_not_found(client, use_betamax, praw_settings, staff_jwt_h
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_patch_channel_nonstaff(client, praw_settings, jwt_header):
+def test_patch_channel_nonstaff(client, jwt_header):
     """
     Fail to update a channel's settings if nonstaff user
     """
@@ -227,7 +230,7 @@ def test_patch_channel_nonstaff(client, praw_settings, jwt_header):
     assert resp.status_code == 403
 
 
-def test_patch_channel_noauth(client, praw_settings):
+def test_patch_channel_noauth(client):
     """
     Fail to update a channel's settings if no auth
     """
@@ -238,71 +241,79 @@ def test_patch_channel_noauth(client, praw_settings):
     assert resp.status_code == 401
 
 
-def test_create_url_post(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_url_post(client, jwt_header, private_channel_and_contributor):
     """
     Create a new url post
     """
-    url = reverse('post-list', kwargs={'channel_name': 'unit_tests'})
+    channel, user = private_channel_and_contributor
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.post(url, {
         'title': 'url title 🐨',
         'url': 'http://micromasters.mit.edu/🐨',
-    })
+    }, **jwt_header)
     assert resp.status_code == 201
-    assert resp.json() == {
+    data = resp.json()
+    assert isinstance(data['id'], str)
+    assert isinstance(data['created'], str)
+    del data['id']
+    del data['created']
+    assert data == {
         'title': 'url title 🐨',
         'url': 'http://micromasters.mit.edu/🐨',
         'text': None,
-        'author_id': logged_in_profile.user.username,
-        'created': '2017-07-21T18:13:18+00:00',
+        'author_id': user.username,
         'upvoted': True,
-        'id': '2x',
         'num_comments': 0,
         'score': 1,
-        'channel_name': 'unit_tests',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
+        'channel_name': channel.name,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
     }
 
 
-def test_create_text_post(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_text_post(client, jwt_header, private_channel_and_contributor):
     """
     Create a new text post
     """
-    url = reverse('post-list', kwargs={'channel_name': 'unit_tests'})
+    channel, user = private_channel_and_contributor
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.post(url, {
         'title': 'parameterized testing',
         'text': 'tests are great',
-    })
+    }, **jwt_header)
     assert resp.status_code == 201
-    assert resp.json() == {
+    data = resp.json()
+    assert isinstance(data['id'], str)
+    assert isinstance(data['created'], str)
+    del data['id']
+    del data['created']
+    assert data == {
         'title': 'parameterized testing',
         'text': 'tests are great',
         'url': None,
-        'author_id': logged_in_profile.user.username,
-        'created': '2017-07-21T18:51:15+00:00',
+        'author_id': user.username,
         'upvoted': True,
-        'id': '2y',
         'num_comments': 0,
         'score': 1,
-        'channel_name': 'unit_tests',
-        'profile_image': logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
+        'channel_name': channel.name,
+        'profile_image': user.profile.image_small,
+        "author_name": user.profile.name,
     }
 
 
-def test_create_post_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_post_forbidden(client, private_channel, jwt_header):
     """
     Create a new text post for a channel the user doesn't have permission to
     """
-    url = reverse('post-list', kwargs={'channel_name': 'my_channel2'})
+    url = reverse('post-list', kwargs={'channel_name': private_channel.name})
     resp = client.post(url, {
         'title': 'parameterized testing',
         'text': 'tests are great',
-    })
+    }, **jwt_header)
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_create_post_not_found(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_post_not_found(client, logged_in_profile):
     """
     Create a new text post for a channel that doesn't exist
     """
@@ -315,62 +326,59 @@ def test_create_post_not_found(client, logged_in_profile, use_betamax, praw_sett
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
-def test_get_deleted_post(client, logged_in_profile, use_betamax, praw_settings, missing_user):
-    """Get an existing post"""
+def test_get_deleted_post(client, missing_user, staff_jwt_header, private_channel_and_contributor, reddit_factories):
+    """Get an existing post for a deleted user"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("deleted", user, channel=channel)
+
     if missing_user:
-        logged_in_profile.user.username = 'renamed'
-        logged_in_profile.user.save()
+        user.username = 'renamed'
+        user.save()
 
-    post_id = '29'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.get(url)
-    assert resp.status_code == status.HTTP_404_NOT_FOUND
-
-
-# pylint: disable=too-many-arguments
-@pytest.mark.parametrize("missing_user,missing_image", [
-    [True, True],
-    [True, False],
-    [False, True],
-    [False, False],
-])
-def test_get_post(client, logged_in_profile, use_betamax, praw_settings, missing_user, missing_image):
-    """Get an existing post with no image"""
-    profile_image = default_profile_image
-    if not missing_user:
-        profile = UserFactory.create(username='alice').profile
-        if missing_image:
-            profile.image_small = None
-            profile.save()
-        else:
-            profile_image = profile.image_small
-    else:
-        profile = None
-
-    post_id = 'b'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.get(url)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.get(url, **staff_jwt_header)
     if missing_user:
         assert resp.status_code == status.HTTP_404_NOT_FOUND
     else:
         assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == {
-            'title': 'fasdf',
-            'text': 'fff',
-            'url': None,
-            'author_id': profile.user.username,
-            'created': '2017-09-07T14:47:34+00:00',
-            'upvoted': True,
-            'id': post_id,
-            'num_comments': 2,
-            'score': 1,
-            'channel_name': 'macromasters',
-            'profile_image': profile_image,
-            "author_name": profile.name,
-        }
 
 
-def test_get_post_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+@pytest.mark.parametrize("missing_image", [True, False])
+def test_get_post(client, missing_image, jwt_header, private_channel_and_contributor, reddit_factories):
+    """Get an existing post with no image"""
+    profile_image = default_profile_image
+    channel, user = private_channel_and_contributor
+    profile = user.profile
+
+    if missing_image:
+        profile.image_small = None
+        profile.save()
+    else:
+        profile_image = profile.image_small
+
+    post = reddit_factories.text_post("missing_image", user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.get(url, **jwt_header)
+
+    assert resp.status_code == status.HTTP_200_OK
+    data = resp.json()
+    assert data == {
+        'title': post.title,
+        'text': post.text,
+        'url': None,
+        'author_id': user.username,
+        'created': post.created,
+        'upvoted': True,
+        'id': post.id,
+        'num_comments': 0,
+        'score': 1,
+        'channel_name': channel.name,
+        'profile_image': profile_image,
+        "author_name": profile.name,
+    }
+
+
+def test_get_post_forbidden(client, logged_in_profile):
     """Get a post the user doesn't have permission to"""
     post_id = 'adc'
     url = reverse('post-detail', kwargs={'post_id': post_id})
@@ -378,7 +386,7 @@ def test_get_post_forbidden(client, logged_in_profile, use_betamax, praw_setting
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_get_post_not_found(client, logged_in_profile, use_betamax, praw_settings):
+def test_get_post_not_found(client, logged_in_profile):
     """Get a post the user doesn't have permission to"""
     post_id = 'missing'
     url = reverse('post-detail', kwargs={'post_id': post_id})
@@ -387,19 +395,23 @@ def test_get_post_not_found(client, logged_in_profile, use_betamax, praw_setting
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
-def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missing_user):
+def test_list_posts(client, missing_user, staff_jwt_header, private_channel_and_contributor, reddit_factories):
     """List posts in a channel"""
+    channel, contributor = private_channel_and_contributor
+    link_post = reddit_factories.link_post("link_post", contributor, channel=channel)
+    text_post = reddit_factories.text_post("text_post", contributor, channel=channel)
+
     if missing_user:
-        logged_in_profile.user.username = 'renamed'
-        logged_in_profile.user.save()
+        contributor.username = 'renamed'
+        contributor.save()
         profile_image = default_profile_image
         name = "[deleted]"
     else:
-        profile_image = logged_in_profile.image_small
-        name = logged_in_profile.name
+        profile_image = contributor.profile.image_small
+        name = contributor.profile.name
 
-    url = reverse('post-list', kwargs={'channel_name': 'two_posts'})
-    resp = client.get(url)
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, **staff_jwt_header)
     assert resp.status_code == 200
 
     if missing_user:
@@ -413,35 +425,31 @@ def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missi
             'posts': [
                 {
                     'url': None,
-                    'text': '🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐽 🐸 🐵 🙊 🙉 🙊 🐒 🐔 🐧 🐦 🐤 🐣 🐥 '
-                            '🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🐛 🦋 🐌 🐚 🐞 🐜 🕷 🕸 🐢 🐍 🦎 🦂 🦀 🦑 🐙 🦐 '
-                            '🐠 🐟 🐡 🐬 🦈 🐳 🐋 🐊 🐆 🐅 🐃 🐂 🐄 🦌 🐪 🐫 🐘 🦏 🦍 🐎 🐖 🐐 🐏 🐑 🐕 '
-                            '🐩 🐈 🐓 🦃 🕊 🐇 🐁 🐀 🐿 🐾 🐉 🐲 🌵 🎄 🌲 🌳 🌴 🌱 🌿 ☘️ 🍀 🎍 🎋 🍃 🍂 🍁 '
-                            '🍄 🌾 💐 🌷 🌹 🥀 🌻 🌼 🌸 🌺 🌎 🌍 🌏 🌕 🌖 🌗 🌘 🌑 🌒 🌓 🌔 🌚 🌝 🌞 🌛 '
-                            '🌜 🌙 💫 ⭐️ 🌟 ✨ ⚡️ 🔥 💥 ☄️ ☀️ 🌤 ⛅️ 🌥 🌦 🌈 ☁️ 🌧 ⛈ 🌩 🌨 ☃️ ⛄️ '
-                            '❄️ 🌬 💨 🌪 🌫 🌊 💧 💦 ☔️',
-                    'title': 'Text post',
-                    'upvoted': True,
+                    'text': text_post.text,
+                    'title': text_post.title,
+                    'upvoted': False,
                     'score': 1,
-                    'author_id': "george",
-                    'id': '30',
-                    'created': '2017-07-21T19:10:26+00:00',
+                    'author_id': contributor.username,
+                    'id': text_post.id,
+                    'removed': False,
+                    'created': text_post.created,
                     'num_comments': 0,
-                    'channel_name': 'two_posts',
+                    'channel_name': channel.name,
                     "profile_image": profile_image,
                     "author_name": name
                 },
                 {
-                    'url': 'http://micromasters.mit.edu',
+                    'url': link_post.url,
                     'text': None,
-                    'title': 'Link post',
-                    'upvoted': True,
+                    'title': link_post.title,
+                    'upvoted': False,
                     'score': 1,
-                    'author_id': 'george',
-                    'id': '2z',
-                    'created': '2017-07-21T19:09:37+00:00',
+                    'author_id': contributor.username,
+                    'id': link_post.id,
+                    'created': link_post.created,
                     'num_comments': 0,
-                    'channel_name': 'two_posts',
+                    'removed': False,
+                    'channel_name': channel.name,
                     "profile_image": profile_image,
                     "author_name": name
                 }
@@ -450,144 +458,210 @@ def test_list_posts(client, logged_in_profile, use_betamax, praw_settings, missi
         }
 
 
-def test_list_posts_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+def test_list_posts_forbidden(client, logged_in_profile):
     """List posts in a channel the user doesn't have access to"""
     url = reverse('post-list', kwargs={'channel_name': 'my_channel2'})
     resp = client.get(url)
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_list_posts_not_found(client, logged_in_profile, use_betamax, praw_settings):
+def test_list_posts_not_found(client, logged_in_profile):
     """List posts in a channel the user doesn't have access to"""
     url = reverse('post-list', kwargs={'channel_name': 'missing'})
     resp = client.get(url)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.parametrize('params,expected', [
-    ({}, {'after': 't3_q', 'after_count': 5}),
-    ({'after': 't3_q', 'count': '5'}, {'after': 't3_l', 'after_count': 10, 'before': 't3_p', 'before_count': 6}),
-    ({'after': 't3_s', 'count': '3'}, {'after': 't3_n', 'after_count': 8, 'before': 't3_r', 'before_count': 4}),
-    ({'before': 't3_r', 'count': '6'}, {'after': 't3_s', 'after_count': 5}),
-])
-def test_list_posts_pagination(client, logged_in_profile, use_betamax, praw_settings, settings, params, expected):
-    """Test that post pagination works"""
+def test_list_posts_pagination_first_page_no_params(
+        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+):
+    """Test that post pagination works for the first page if no params"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
-    url = reverse('post-list', kwargs={'channel_name': 'ten_posts'})
-    resp = client.get(url, params)
+    channel, user = private_channel_and_contributor
+    posts = list(reversed([reddit_factories.text_post(idx, user=user, channel=channel) for idx in range(15)]))
+    params = {}
+    expected = {'after': 't3_{}'.format(posts[4].id), 'after_count': 5}
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, params, **jwt_header)
     assert resp.status_code == 200
     assert resp.json()['pagination'] == expected
 
 
-def test_update_post_text(client, logged_in_profile, use_betamax, praw_settings):
+def test_list_posts_pagination_first_page_with_params(
+        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+):
+    """Test that post pagination works for the first page with params"""
+    settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
+    channel, user = private_channel_and_contributor
+    posts = list(reversed([reddit_factories.text_post(idx, user=user, channel=channel) for idx in range(15)]))
+    params = {'before': 't3_{}'.format(posts[5].id), 'count': 6}
+    expected = {'after': 't3_{}'.format(posts[4].id), 'after_count': 5}
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, params, **jwt_header)
+    assert resp.status_code == 200
+    assert resp.json()['pagination'] == expected
+
+
+def test_list_posts_pagination_non_first_page(
+        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+):
+    """Test that post pagination works for a page that's not the first one"""
+    settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
+    channel, user = private_channel_and_contributor
+    posts = list(reversed([reddit_factories.text_post(idx, user=user, channel=channel) for idx in range(15)]))
+    params = {'after': 't3_{}'.format(posts[4].id), 'count': 5}
+    expected = {
+        'before': 't3_{}'.format(posts[5].id),
+        'before_count': 6,
+        'after': 't3_{}'.format(posts[9].id),
+        'after_count': 10
+    }
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, params, **jwt_header)
+    assert resp.status_code == 200
+    assert resp.json()['pagination'] == expected
+
+
+def test_list_posts_pagination_non_offset_page(
+        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+):
+    """Test that post pagination works for a page that doesn't align to the number of results"""
+    settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
+    channel, user = private_channel_and_contributor
+    posts = list(reversed([reddit_factories.text_post(idx, user=user, channel=channel) for idx in range(15)]))
+    params = {'after': 't3_{}'.format(posts[5].id), 'count': 5}
+    expected = {
+        'before': 't3_{}'.format(posts[6].id),
+        'before_count': 6,
+        'after': 't3_{}'.format(posts[10].id),
+        'after_count': 10
+    }
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, params, **jwt_header)
+    assert resp.status_code == 200
+    assert resp.json()['pagination'] == expected
+
+
+def test_update_post_text(client, jwt_header, private_channel_and_contributor, reddit_factories):
     """Test updating just the text of a post"""
-    post_id = '30'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"text": "overwrite"})
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("text", user=user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"text": "overwrite"}, **jwt_header)
     assert resp.status_code == 200
     assert resp.json() == {
         'url': None,
         'text': 'overwrite',
-        'title': 'Text post',
-        'upvoted': False,
-        'score': 1,
-        'author_id': logged_in_profile.user.username,
-        'id': post_id,
-        'created': '2017-07-21T19:10:26+00:00',
-        'num_comments': 0,
-        'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
-    }
-
-
-def test_update_post_clear_vote(client, logged_in_profile, use_betamax, praw_settings):
-    """Test updating a post to clear the user's vote"""
-    post_id = '30'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"upvoted": False})
-    assert resp.status_code == 200
-    assert resp.json() == {
-        'url': None,
-        'text': 'overwrite',
-        'title': 'Text post',
-        'upvoted': False,
-        'score': 1,
-        'author_id': logged_in_profile.user.username,
-        'id': post_id,
-        'created': '2017-07-21T19:10:26+00:00',
-        'num_comments': 0,
-        'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
-    }
-
-
-def test_update_post_upvote(client, logged_in_profile, use_betamax, praw_settings):
-    """Test updating a post to upvote it"""
-    post_id = '30'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"upvoted": True})
-    assert resp.status_code == 200
-    assert resp.json() == {
-        'url': None,
-        'text': 'overwrite',
-        'title': 'Text post',
+        'title': post.title,
         'upvoted': True,
         'score': 1,
-        'author_id': logged_in_profile.user.username,
-        'id': post_id,
-        'created': '2017-07-21T19:10:26+00:00',
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
         'num_comments': 0,
-        'channel_name': 'two_posts',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name,
+        'channel_name': channel.name,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
     }
 
 
-def test_update_post_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_post_clear_vote(client, jwt_header, private_channel_and_contributor, reddit_factories):
+    """Test updating a post to clear the user's vote"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("text", user=user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"upvoted": False}, **jwt_header)
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'url': None,
+        'text': post.text,
+        'title': post.title,
+        'upvoted': False,
+        'score': 1,
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
+        'num_comments': 0,
+        'channel_name': channel.name,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
+    }
+
+
+def test_update_post_upvote(client, jwt_header, private_channel_and_contributor, reddit_factories, staff_api):
+    """Test updating a post to upvote it"""
+    channel, _ = private_channel_and_contributor
+    user = reddit_factories.user("second")
+    staff_api.add_contributor(user.username, channel.name)
+    staff_api.add_subscriber(user.username, channel.name)
+    post = reddit_factories.text_post("text", user=user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"upvoted": True}, **jwt_header)
+    assert resp.status_code == 200
+    assert resp.json() == {
+        'url': None,
+        'text': post.text,
+        'title': post.title,
+        'upvoted': True,
+        'score': 2,
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
+        'num_comments': 0,
+        'channel_name': channel.name,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
+    }
+
+
+def test_update_post_forbidden(client, staff_jwt_header, private_channel_and_contributor, reddit_factories):
     """Test updating a post the user isn't the owner of"""
-    post_id = 'acd'
-    url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"text": "overwrite"})
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("text", user=user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"text": "overwrite"}, **staff_jwt_header)
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_update_post_not_found(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_post_not_found(client, jwt_header):
     """Test updating a post that doesn't exist"""
     post_id = 'missing'
     url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"text": "overwrite"})
+    resp = client.patch(url, format='json', data={"text": "overwrite"}, **jwt_header)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_create_post_without_upvote(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_post_without_upvote(client, jwt_header, private_channel_and_contributor):
     """Test creating a post without an upvote in the body"""
-    url = reverse('post-list', kwargs={'channel_name': 'subreddit_for_testing'})
+    channel, user = private_channel_and_contributor
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.post(url, {
         'title': 'x',
         'text': 'y',
         'upvoted': False,
-    })
+    }, **jwt_header)
     assert resp.status_code == 201
-    assert resp.json() == {
+    data = resp.json()
+    assert isinstance(data['created'], str)
+    assert isinstance(data['id'], str)
+    del data['id']
+    del data['created']
+    assert data == {
         'title': 'x',
         'text': 'y',
         'url': None,
-        'author_id': logged_in_profile.user.username,
-        'created': '2017-07-25T22:05:44+00:00',
+        'author_id': user.username,
         'upvoted': False,
-        'id': '5',
         'num_comments': 0,
         'score': 1,
-        'channel_name': 'subreddit_for_testing',
-        "profile_image": logged_in_profile.image_small,
-        "author_name": logged_in_profile.name
+        'channel_name': channel.name,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name
     }
 
 
 # Reddit doesn't indicate if a post deletion failed so we don't have tests for that
-def test_delete_post(client, logged_in_profile, use_betamax, praw_settings):
+def test_delete_post(client, logged_in_profile):
     """Delete a post in a channel"""
     url = reverse('post-detail', kwargs={'post_id': '2'})
     resp = client.delete(url)
@@ -595,7 +669,7 @@ def test_delete_post(client, logged_in_profile, use_betamax, praw_settings):
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
-def test_list_comments(client, logged_in_profile, use_betamax, praw_settings, missing_user):
+def test_list_comments(client, logged_in_profile, missing_user):
     """List all comments in the comment tree"""
     if missing_user:
         logged_in_profile.user.username = 'renamed'
@@ -655,21 +729,21 @@ def test_list_comments(client, logged_in_profile, use_betamax, praw_settings, mi
     ]
 
 
-def test_list_comments_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+def test_list_comments_forbidden(client, logged_in_profile):
     """List all comments in the comment tree for a post the user doesn't have access to"""
     url = reverse('comment-list', kwargs={'post_id': 'adc'})
     resp = client.get(url)
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_list_comments_not_found(client, logged_in_profile, use_betamax, praw_settings):
+def test_list_comments_not_found(client, logged_in_profile):
     """List all comments in the comment tree for a post that doesn't exist"""
     url = reverse('comment-list', kwargs={'post_id': 'missing'})
     resp = client.get(url)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_settings):
+def test_list_deleted_comments(client, logged_in_profile):
     """List comments which are deleted according to reddit"""
     user = UserFactory.create(username='admin')
 
@@ -704,7 +778,7 @@ def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_sett
         }]
 
 
-def test_create_comment(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_comment(client, logged_in_profile):
     """Create a comment"""
     post_id = '2'
     url = reverse('comment-list', kwargs={'post_id': post_id})
@@ -727,7 +801,7 @@ def test_create_comment(client, logged_in_profile, use_betamax, praw_settings):
     }
 
 
-def test_create_comment_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_comment_forbidden(client, logged_in_profile):
     """Create a comment for a post the user doesn't have access to"""
     post_id = 'adc'
     url = reverse('comment-list', kwargs={'post_id': post_id})
@@ -737,7 +811,7 @@ def test_create_comment_forbidden(client, logged_in_profile, use_betamax, praw_s
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_create_comment_not_found(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_comment_not_found(client, logged_in_profile):
     """Create a comment for a post that doesn't exist"""
     post_id = 'missing'
     url = reverse('comment-list', kwargs={'post_id': post_id})
@@ -747,7 +821,7 @@ def test_create_comment_not_found(client, logged_in_profile, use_betamax, praw_s
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_create_comment_no_upvote(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_comment_no_upvote(client, logged_in_profile):
     """Create a comment without an upvote"""
     post_id = '2'
     url = reverse('comment-list', kwargs={'post_id': post_id})
@@ -771,7 +845,7 @@ def test_create_comment_no_upvote(client, logged_in_profile, use_betamax, praw_s
     }
 
 
-def test_create_comment_downvote(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_comment_downvote(client, logged_in_profile):
     """Create a comment with a downvote"""
     post_id = '2'
     url = reverse('comment-list', kwargs={'post_id': post_id})
@@ -795,7 +869,7 @@ def test_create_comment_downvote(client, logged_in_profile, use_betamax, praw_se
     }
 
 
-def test_create_comment_reply_to_comment(client, logged_in_profile, use_betamax, praw_settings):
+def test_create_comment_reply_to_comment(client, logged_in_profile):
     """Create a comment that's a reply to another comment"""
     post_id = '2'
     url = reverse('comment-list', kwargs={'post_id': post_id})
@@ -819,7 +893,7 @@ def test_create_comment_reply_to_comment(client, logged_in_profile, use_betamax,
     }
 
 
-def test_update_comment_text(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_comment_text(client, logged_in_profile):
     """Update a comment's text"""
     url = reverse('comment-detail', kwargs={'comment_id': '6'})
     resp = client.patch(url, type='json', data={
@@ -843,7 +917,7 @@ def test_update_comment_text(client, logged_in_profile, use_betamax, praw_settin
 
 # Reddit returns the same result for updating a missing comment
 # as it does for updating a comment the user doesn't own.
-def test_update_comment_forbidden(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_comment_forbidden(client, logged_in_profile):
     """Update a comment's text for a comment the user doesn't own"""
     url = reverse('comment-detail', kwargs={'comment_id': 'e8h'})
     resp = client.patch(url, type='json', data={
@@ -852,7 +926,7 @@ def test_update_comment_forbidden(client, logged_in_profile, use_betamax, praw_s
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_update_comment_upvote(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_comment_upvote(client, logged_in_profile):
     """Update a comment to upvote it"""
     comment_id = 'l'
     url = reverse('comment-detail', kwargs={'comment_id': comment_id})
@@ -875,7 +949,7 @@ def test_update_comment_upvote(client, logged_in_profile, use_betamax, praw_sett
     }
 
 
-def test_update_comment_downvote(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_comment_downvote(client, logged_in_profile):
     """Update a comment to downvote it"""
     comment_id = 'l'
     url = reverse('comment-detail', kwargs={'comment_id': comment_id})
@@ -898,7 +972,7 @@ def test_update_comment_downvote(client, logged_in_profile, use_betamax, praw_se
     }
 
 
-def test_update_comment_clear_upvote(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_comment_clear_upvote(client, logged_in_profile):
     """Update a comment to clear its upvote"""
     url = reverse('comment-detail', kwargs={'comment_id': '6'})
     resp = client.patch(url, type='json', data={
@@ -920,7 +994,7 @@ def test_update_comment_clear_upvote(client, logged_in_profile, use_betamax, pra
     }
 
 
-def test_update_comment_clear_downvote(client, logged_in_profile, use_betamax, praw_settings):
+def test_update_comment_clear_downvote(client, logged_in_profile):
     """Update a comment to clear its downvote"""
     comment_id = 'l'
     url = reverse('comment-detail', kwargs={'comment_id': comment_id})
@@ -944,7 +1018,7 @@ def test_update_comment_clear_downvote(client, logged_in_profile, use_betamax, p
 
 
 # Reddit doesn't indicate if a comment deletion failed so we don't have tests that
-def test_delete_comment(client, logged_in_profile, use_betamax, praw_settings):
+def test_delete_comment(client, logged_in_profile):
     """Delete a comment"""
     url = reverse('comment-detail', kwargs={'comment_id': '6'})
     resp = client.delete(url)
@@ -952,7 +1026,7 @@ def test_delete_comment(client, logged_in_profile, use_betamax, praw_settings):
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
-def test_frontpage(client, logged_in_profile, use_betamax, praw_settings, missing_user):
+def test_frontpage(client, logged_in_profile, missing_user):
     """View the front page"""
     if missing_user:
         logged_in_profile.user.username = 'renamed'
@@ -1050,7 +1124,7 @@ def test_frontpage(client, logged_in_profile, use_betamax, praw_settings, missin
     ({'after': 't3_a', 'count': '3'}, {'after': 't3_b', 'after_count': 8, 'before': 't3_9', 'before_count': 4}),
     ({'before': 't3_e', 'count': '6'}, {'after': 't3_3', 'after_count': 5}),
 ])
-def test_frontpage_pagination(client, logged_in_profile, use_betamax, praw_settings, settings, params, expected):
+def test_frontpage_pagination(client, logged_in_profile, settings, params, expected):
     """Test that post pagination works"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
     url = reverse('frontpage')
@@ -1059,7 +1133,7 @@ def test_frontpage_pagination(client, logged_in_profile, use_betamax, praw_setti
     assert resp.json()['pagination'] == expected
 
 
-def test_list_contributors(client, logged_in_profile, use_betamax, praw_settings):
+def test_list_contributors(client, logged_in_profile):
     """
     List contributors in a channel
     """
@@ -1069,15 +1143,15 @@ def test_list_contributors(client, logged_in_profile, use_betamax, praw_settings
     assert resp.json() == [{'contributor_name': 'othercontributor'}, {'contributor_name': 'fooadmin'}]
 
 
-def test_list_moderators(client, use_betamax, praw_settings):
+def test_list_moderators(client, jwt_header, private_channel_and_contributor, staff_user):
     """
     List moderators in a channel
     """
-    client.force_login(UserFactory.create(username='fooadmin'))
-    url = reverse('moderator-list', kwargs={'channel_name': 'test_channel'})
-    resp = client.get(url)
+    channel, _ = private_channel_and_contributor
+    url = reverse('moderator-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, **jwt_header)
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == [{'moderator_name': 'fooadmin'}]
+    assert resp.json() == [{'moderator_name': staff_user.username}]
 
 
 def test_list_subscribers_not_allowed(client, staff_jwt_header):
@@ -1088,7 +1162,7 @@ def test_list_subscribers_not_allowed(client, staff_jwt_header):
     assert client.get(url, **staff_jwt_header).status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
-def test_add_contributor(client, use_betamax, praw_settings, staff_jwt_header):
+def test_add_contributor(client, staff_jwt_header):
     """
     Adds a contributor to a channel
     """
@@ -1099,7 +1173,7 @@ def test_add_contributor(client, use_betamax, praw_settings, staff_jwt_header):
     assert resp.json() == {'contributor_name': contributor.username}
 
 
-def test_add_contributor_again(client, use_betamax, praw_settings, staff_jwt_header):
+def test_add_contributor_again(client, staff_jwt_header):
     """
     If the user is already a contributor a 201 status should be returned
     """
@@ -1110,7 +1184,7 @@ def test_add_contributor_again(client, use_betamax, praw_settings, staff_jwt_hea
     assert resp.json() == {'contributor_name': contributor.username}
 
 
-def test_add_moderator(client, use_betamax, praw_settings, staff_jwt_header):
+def test_add_moderator(client, staff_jwt_header):
     """
     Adds a moderator to a channel
     """
@@ -1121,7 +1195,7 @@ def test_add_moderator(client, use_betamax, praw_settings, staff_jwt_header):
     assert resp.json() == {'moderator_name': moderator.username}
 
 
-def test_add_moderator_again(client, use_betamax, praw_settings, staff_jwt_header):
+def test_add_moderator_again(client, staff_jwt_header):
     """
     If a user is already a moderator we should return 201 without making any changes
     """
@@ -1132,7 +1206,7 @@ def test_add_moderator_again(client, use_betamax, praw_settings, staff_jwt_heade
     assert resp.json() == {'moderator_name': moderator.username}
 
 
-def test_add_subscriber(client, use_betamax, praw_settings, staff_jwt_header):
+def test_add_subscriber(client, staff_jwt_header):
     """
     Adds a subscriber to a channel
     """
@@ -1143,7 +1217,7 @@ def test_add_subscriber(client, use_betamax, praw_settings, staff_jwt_header):
     assert resp.json() == {'subscriber_name': subscriber.username}
 
 
-def test_add_subscriber_again(client, use_betamax, praw_settings, staff_jwt_header):
+def test_add_subscriber_again(client, staff_jwt_header):
     """
     If a user is already part of a channel we should return a 201 status
     """
@@ -1154,7 +1228,7 @@ def test_add_subscriber_again(client, use_betamax, praw_settings, staff_jwt_head
     assert resp.json() == {'subscriber_name': subscriber.username}
 
 
-def test_add_subscriber_forbidden(client, use_betamax, praw_settings, staff_jwt_header):
+def test_add_subscriber_forbidden(client, staff_jwt_header):
     """
     If a user gets a 403 from praw we should return a 403 status
     """
@@ -1164,7 +1238,7 @@ def test_add_subscriber_forbidden(client, use_betamax, praw_settings, staff_jwt_
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_detail_contributor_error(client, use_betamax, praw_settings):
+def test_detail_contributor_error(client):
     """
     Detail of a contributor in a channel in case the user is not a contributor
     """
@@ -1177,7 +1251,7 @@ def test_detail_contributor_error(client, use_betamax, praw_settings):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_detail_contributor(client, use_betamax, praw_settings):
+def test_detail_contributor(client):
     """
     Detail of a contributor in a channel
     """
@@ -1190,7 +1264,7 @@ def test_detail_contributor(client, use_betamax, praw_settings):
     assert resp.json() == {'contributor_name': 'othercontributor'}
 
 
-def test_detail_subscriber(client, use_betamax, praw_settings, staff_jwt_header):
+def test_detail_subscriber(client, staff_jwt_header):
     """
     Detail of a subscriber in a channel
     """
@@ -1202,7 +1276,7 @@ def test_detail_subscriber(client, use_betamax, praw_settings, staff_jwt_header)
     assert resp.json() == {'subscriber_name': subscriber.username}
 
 
-def test_detail_subscriber_missing(client, use_betamax, praw_settings):
+def test_detail_subscriber_missing(client):
     """
     A missing subscriber should generate a 404
     """
@@ -1215,7 +1289,7 @@ def test_detail_subscriber_missing(client, use_betamax, praw_settings):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_remove_contributor(client, use_betamax, praw_settings, staff_jwt_header):
+def test_remove_contributor(client, staff_jwt_header):
     """
     Removes a contributor from a channel
     """
@@ -1226,7 +1300,7 @@ def test_remove_contributor(client, use_betamax, praw_settings, staff_jwt_header
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_remove_contributor_again(client, use_betamax, praw_settings, staff_jwt_header):
+def test_remove_contributor_again(client, staff_jwt_header):
     """
     Removes a contributor from a channel
     """
@@ -1237,7 +1311,7 @@ def test_remove_contributor_again(client, use_betamax, praw_settings, staff_jwt_
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_remove_moderator(client, use_betamax, praw_settings, staff_jwt_header):
+def test_remove_moderator(client, staff_jwt_header):
     """
     Removes a moderator from a channel
     """
@@ -1248,7 +1322,7 @@ def test_remove_moderator(client, use_betamax, praw_settings, staff_jwt_header):
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_remove_moderator_again(client, use_betamax, praw_settings, staff_jwt_header):
+def test_remove_moderator_again(client, staff_jwt_header):
     """
     If a user is already not a moderator for a channel we should still return a 204
     """
@@ -1259,7 +1333,7 @@ def test_remove_moderator_again(client, use_betamax, praw_settings, staff_jwt_he
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_remove_subscriber(client, use_betamax, praw_settings, staff_jwt_header):
+def test_remove_subscriber(client, staff_jwt_header):
     """
     Removes a subscriber from a channel
     """
@@ -1270,7 +1344,7 @@ def test_remove_subscriber(client, use_betamax, praw_settings, staff_jwt_header)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_remove_subscriber_again(client, use_betamax, praw_settings, staff_jwt_header):
+def test_remove_subscriber_again(client, staff_jwt_header):
     """
     The API should return a 204 even if the user isn't there
     """
@@ -1281,7 +1355,7 @@ def test_remove_subscriber_again(client, use_betamax, praw_settings, staff_jwt_h
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_api_exception(client, logged_in_profile, use_betamax, praw_settings, mocker):
+def test_api_exception(client, logged_in_profile, mocker):
     """Make sure APIExceptions which aren't recognized become 500 errors"""
     exception = APIException('bizarre', 'A bizarre exception', 'bizarre_field')
     mocker.patch(
