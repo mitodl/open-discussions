@@ -5,7 +5,7 @@ import { mount } from "enzyme"
 
 import withLoading from "./Loading"
 
-class Content extends React.Component {
+class Content extends React.Component<*, void> {
   render() {
     return <div>CONTENT</div>
   }

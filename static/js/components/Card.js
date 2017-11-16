@@ -1,8 +1,9 @@
 // @flow
+// using the 'import * as' syntax to include types
 import React from "react"
 
 type CardProps = {
-  children: React$Element<*>,
+  children: any,
   className?: string,
   title?: string
 }

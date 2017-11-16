@@ -158,7 +158,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 }
 
 export const ReplyToCommentForm = connect(mapStateToProps, mapDispatchToProps)(
-  class ReplyCommentForm extends React.Component {
+  class ReplyCommentForm extends React.Component<*, *> {
     props: CreateCommentFormProps
 
     state: {
@@ -212,7 +212,7 @@ const getFormData = (lensFunc, forms) => ({
 })
 
 export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
-  class ReplyPostForm extends React.Component {
+  class ReplyPostForm extends React.Component<*, *> {
     props: CreateCommentFormProps
 
     state: {

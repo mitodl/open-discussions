@@ -98,7 +98,8 @@ describe("CreateCommentForm", () => {
     })
 
     it("should begin form editing on load", async () => {
-      wrapper = await renderPostForm()
+      wrapper = renderPostForm()
+      // $FlowFixMe: Flow doesn't know that we can index into wrapper objects
       const [textarea] = wrapper.find("textarea[name='text']")
       assert.equal(textarea.value, "")
       assert.deepEqual(
@@ -255,6 +256,7 @@ describe("CreateCommentForm", () => {
     })
 
     it("should show an empty form when reply has been started", async () => {
+      // $FlowFixMe: Flow doesn't know that we can index into wrapper objects
       const [textarea] = wrapper.find("textarea[name='text']")
       assert.equal(textarea.value, "")
     })

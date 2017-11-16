@@ -30,15 +30,15 @@ if (!MDCTemporaryDrawer.prototype.getDefaultFoundation_) {
   }
 }
 
-class Drawer extends React.Component {
+class Drawer extends React.Component<*, void> {
   // the ref for the rendered DOM element, which MDCTemporaryDrawer needs
   // access to in order to manage it's animations and so on
-  drawerRoot: React$Element<*, *, *>
+  drawerRoot: HTMLElement | null
   mdcDrawer: Object
 
   props: {
     location: Location,
-    dispatch: Dispatch,
+    dispatch: Dispatch<*>,
     showDrawer: boolean,
     subscribedChannels: Array<Channel>
   }

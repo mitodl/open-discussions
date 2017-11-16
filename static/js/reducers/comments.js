@@ -64,7 +64,7 @@ export const commentsEndpoint = {
   getSuccessHandler: (
     response: CommentResponse,
     data: Map<string, Array<Comment>>
-  ) => {
+  ): Map<string, Array<Comment>> => {
     const update = new Map(data)
     update.set(response.postID, response.data)
     return update
@@ -76,7 +76,7 @@ export const commentsEndpoint = {
   postSuccessHandler: (
     { commentId, postId, comment }: CommentPayload,
     data: Map<string, Array<Comment>>
-  ) => {
+  ): Map<string, Array<Comment>> => {
     const update = new Map(data)
     const oldTree = data.get(postId)
     if (oldTree) {
@@ -89,7 +89,7 @@ export const commentsEndpoint = {
   patchSuccessHandler: (
     response: Comment,
     data: Map<string, Array<Comment>>
-  ) => {
+  ): Map<string, Array<Comment>> => {
     const update = new Map(data)
     const postId = response.post_id
     const oldTree = data.get(postId)

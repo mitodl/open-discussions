@@ -24,7 +24,7 @@ const renderTopLevelComment = R.curry(
     forms: FormsState,
     upvote: CommentVoteFunc,
     downvote: CommentVoteFunc,
-    beginReply,
+    beginReply: (fk: string, iv: Object, e: ?Object) => void,
     processing: boolean,
     comment: Comment,
     idx: number

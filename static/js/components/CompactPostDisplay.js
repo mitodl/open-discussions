@@ -13,7 +13,7 @@ import {
 
 import type { Post } from "../flow/discussionTypes"
 
-class CompactPostDisplay extends React.Component {
+class CompactPostDisplay extends React.Component<*, void> {
   props: {
     post: Post,
     showChannelLink: boolean,

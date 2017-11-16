@@ -22,7 +22,7 @@ import { AUTH_REQUIRED_URL } from "../lib/url"
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 
-class App extends React.Component {
+class App extends React.Component<*, void> {
   props: {
     match: Match,
     location: Location,

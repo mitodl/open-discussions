@@ -33,7 +33,7 @@ const CREATE_POST_KEY = "post:new"
 const CREATE_POST_PAYLOAD = { formKey: CREATE_POST_KEY }
 const getForm = R.prop(CREATE_POST_KEY)
 
-class CreatePostPage extends React.Component {
+class CreatePostPage extends React.Component<*, void> {
   props: CreatePostPageProps
 
   componentWillMount() {

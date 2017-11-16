@@ -5,8 +5,8 @@ import { FRONTPAGE_URL } from "../lib/url"
 import { Link } from "react-router-dom"
 import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
 
-export default class Toolbar extends React.Component {
-  toolbarRoot: React$Element<*, *, *>
+export default class Toolbar extends React.Component<*, void> {
+  toolbarRoot: HTMLElement | null
   toolbar: Object
 
   componentDidMount() {

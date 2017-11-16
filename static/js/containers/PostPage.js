@@ -44,7 +44,7 @@ const shouldLoadData = R.complement(
   R.allPass([R.eqProps("postID"), R.eqProps("channelName")])
 )
 
-class PostPage extends React.Component {
+class PostPage extends React.Component<*, void> {
   props: PostPageProps
 
   componentWillMount() {

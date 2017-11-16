@@ -5,7 +5,7 @@ import { CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_PRIVATE } from "../../lib/channels"
 
 import type { ChannelForm } from "../../flow/discussionTypes"
 
-export default class ChannelEditForm extends React.Component {
+export default class ChannelEditForm extends React.Component<*, void> {
   props: {
     onSubmit: Function,
     onUpdate: Function,

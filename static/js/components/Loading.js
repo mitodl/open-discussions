@@ -6,7 +6,7 @@ type LoadingProps = {
   errored: boolean
 }
 
-const withLoading = (LoadedComponent: Class<React.Component<*, *, *>>) => {
+const withLoading = (LoadedComponent: Class<React.Component<*, *>>) => {
   return class extends LoadedComponent {
     props: LoadingProps
 
