@@ -1,9 +1,10 @@
 // @flow
 // using the 'import * as' syntax to include types
-import * as React from "react"
+import React from "react"
+import type { ChildrenArray } from "react"
 
 type SidebarProps = {
-  children: React.ChildrenArray<any>
+  children: ChildrenArray<any>
 }
 
 const Sidebar = ({ children }: SidebarProps) =>

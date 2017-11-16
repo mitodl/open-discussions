@@ -1,6 +1,6 @@
 // @flow
 // using the 'import * as' syntax to include types
-import * as React from "react"
+import React from "react"
 
 type CardProps = {
   children: any,
