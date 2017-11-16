@@ -209,7 +209,6 @@ describe("CreateCommentForm", () => {
           forms.FORM_END_EDIT,
           forms.FORM_BEGIN_EDIT
         ],
-
         () => {
           wrapper
             .find("form")
