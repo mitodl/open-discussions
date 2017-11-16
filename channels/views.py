@@ -1,14 +1,14 @@
 """Views for REST APIs for channels"""
 
 from django.contrib.auth import get_user_model
-from praw.models.reddit.redditor import Redditor
+from praw.models import MoreComments, Redditor
 from rest_framework import status
 from rest_framework.generics import (
     CreateAPIView,
     ListCreateAPIView,
     RetrieveUpdateAPIView,
 )
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,6 +17,7 @@ from channels.api import Api
 from channels.serializers import (
     ChannelSerializer,
     CommentSerializer,
+    GenericCommentSerializer,
     ContributorSerializer,
     SubscriberSerializer,
     PostSerializer,
@@ -239,6 +240,8 @@ def _populate_authors_for_comments(comments, author_set):
         author_set (set): This is modified to populate with the authors found in comments
     """
     for comment in comments:
+        if isinstance(comment, MoreComments):
+            continue
         if comment.author:
             author_set.add(comment.author.name)
 
@@ -279,23 +282,19 @@ class CommentListView(APIView):
         """Get list for comments and attach User objects to them"""
         with translate_praw_exceptions():
             api = Api(user=self.request.user)
-            comment_tree = api.list_comments(self.kwargs['post_id'])
-
-            # Don't resolve any extra comments
-            comment_tree.replace_more(limit=0)
-            comments = list(comment_tree)
-
+            comments = api.list_comments(self.kwargs['post_id']).list()
             users = _lookup_users_for_comments(comments)
-            return Response(
-                CommentSerializer(
-                    comments,
-                    context={
-                        **self.get_serializer_context(),
-                        'users': users,
-                    },
-                    many=True,
-                ).data,
-            )
+
+            serialized_comments_list = GenericCommentSerializer(
+                comments,
+                context={
+                    **self.get_serializer_context(),
+                    'users': users,
+                },
+                many=True,
+            ).data
+
+            return Response(serialized_comments_list)
 
     def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Create a new comment"""
@@ -312,9 +311,54 @@ class CommentListView(APIView):
             )
 
 
+class MoreCommentsView(APIView):
+    """
+    View for expanding a MoreComments object
+    """
+
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'request': self.request,
+            'view': self,
+        }
+
+    def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """Get list for comments and attach User objects to them"""
+        with translate_praw_exceptions():
+            children = request.query_params.getlist('children')
+
+            # validate the request parameters: each are required
+            try:
+                post_id = request.query_params['post_id']
+                parent_id = request.query_params['parent_id'] or None
+            except KeyError as ex:
+                raise ValidationError("Missing parameter {}".format(ex.args[0]))
+
+            api = Api(user=self.request.user)
+            comments = api.more_comments(
+                parent_id=parent_id,
+                post_id=post_id,
+                children=children,
+            )
+
+            users = _lookup_users_for_comments(comments)
+
+            serialized_comments_list = GenericCommentSerializer(
+                comments,
+                context={
+                    **self.get_serializer_context(),
+                    'users': users,
+                },
+                many=True,
+            ).data
+
+            return Response(serialized_comments_list)
+
+
 class CommentDetailView(APIView):
     """
-    View for retrieving, updating or destroying comments
+    View for updating or destroying comments
     """
 
     def get_serializer_context(self):

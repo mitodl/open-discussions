@@ -8,8 +8,11 @@ import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.http.response import Http404
 import praw
+from praw.config import Config
 from praw.exceptions import APIException
+from praw.models.comment_forest import CommentForest
 from praw.models.reddit import more
 from praw.models.reddit.redditor import Redditor
 import prawcore
@@ -214,6 +217,16 @@ def _get_client(user):
         refresh_token=refresh_token.token_value,
         **_get_client_base_kwargs(),
     ), access_token, user)
+
+
+def get_kind_mapping():
+    """
+    Get a mapping of kinds
+
+    Returns:
+        dict: A map of the kind name to the kind prefix (ie t1)
+    """
+    return Config('DEFAULT').kinds
 
 
 def _get_user_agent():
@@ -497,32 +510,93 @@ class Api:
         Returns:
             praw.models.CommentForest: the base of the comment tree
         """
-        return self.get_post(post_id).comments
+        post = self.get_post(post_id)
+        post.comment_limit = settings.OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT
+        return post.comments
 
-    def more_comments(self, comment_fullname, parent_fullname, count, children=None):
+    def more_comments(self, parent_id, post_id, children):
+        """
+        Fetches data for a comment and its children and returns a list of comments
+        (which might include another MoreComment)
+
+        Args:
+            parent_id (str): the fullname for the comment
+            post_id (str): the id of the post
+            children (list(str)):
+                a list of comment ids
+
+        Returns:
+            list: A list of comments, might include a MoreComment at the end if more fetching required
+        """
+        more_comments = self.init_more_comments(
+            parent_id=parent_id,
+            post_id=post_id,
+            children=children,
+        )
+
+        # more_comments.comments() can return either a list of comments or a CommentForest object
+        comments = more_comments.comments()
+        if isinstance(comments, CommentForest):
+            comments = comments.list()
+
+        # if the number of comments is less than the number of children, it means that the morecomments
+        # object did not return all the comments, so we need to manually add another morecomments
+        # object with the remaining children; not sure why praw does not do it automatically
+        # anyway this seems to happen only with objects that do NOT look like this one:
+        # <MoreComments count=0, children=[]>
+        if len(comments) < len(children):
+            remaining_morecomments = self.init_more_comments(
+                parent_id=parent_id,
+                post_id=post_id,
+                children=children[len(comments):],
+            )
+            comments.append(remaining_morecomments)
+        return comments
+
+    def init_more_comments(self, parent_id, post_id, children):
         """
         Initializes a MoreComments instance from the passed data and fetches channel
 
         Args:
-            comment_fullname(str): the fullname for the comment
-            parent_fullname(str): the fullname of the post
-            count(int): the count of comments
-            children(list(str)): the list of more comments (leave empty continue page links)
+            parent_id (str): the fullname for the comment
+            post_id (str): the id of the post
+            children(list(str)):
+                a list of comment ids
 
         Returns:
             praw.models.MoreComments: the set of more comments
         """
-        submission_id = parent_fullname.split('_', 1)[1]
-        comment_id = comment_fullname.split('_', 1)[1]
-        data = {
-            'id': comment_id,
-            'name': comment_fullname,
-            'parent_id': parent_fullname,
-            'children': children or [],
-            'count': count,
-        }
-        more_comments = more.MoreComments(self.reddit, data)
-        more_comments.submission = self.reddit.submission(submission_id)
+        if parent_id is not None:
+            qualified_parent_id = '{kind}_{parent_id}'.format(
+                kind=get_kind_mapping()['comment'],
+                parent_id=parent_id,
+            )
+        else:
+            qualified_parent_id = '{kind}_{parent_id}'.format(
+                kind=get_kind_mapping()['submission'],
+                parent_id=post_id,
+            )
+
+        more_comments = more.MoreComments(self.reddit, {
+            'children': children,
+            'count': len(children),
+            'parent_id': qualified_parent_id
+        })
+        more_comments.submission = self.reddit.submission(post_id)
+        more_comments.submission.comment_limit = settings.OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT
+
+        original_load_comment = more_comments._load_comment  # pylint: disable=protected-access
+
+        def replacement_load_comment(*args, **kwargs):
+            """Patch function to handle AssertionError"""
+            try:
+                return original_load_comment(*args, **kwargs)
+            except AssertionError:
+                # If the parent doesn't exist the code will receive no children which will as
+                # an AssertionError
+                raise Http404
+
+        more_comments._load_comment = replacement_load_comment  # pylint: disable=protected-access
         more_comments.comments()  # load the comments
         return more_comments
 

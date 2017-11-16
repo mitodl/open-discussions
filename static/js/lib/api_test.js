@@ -1,6 +1,7 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
+import qs from "query-string"
 import { PATCH, POST } from "redux-hammock/constants"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 import R from "ramda"
@@ -16,11 +17,15 @@ import {
   createComment,
   createPost,
   updateComment,
-  editPost
+  editPost,
+  getMoreComments,
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
-import { makeCommentTree } from "../factories/comments"
+import {
+  makeCommentsResponse,
+  makeMoreCommentsResponse
+} from "../factories/comments"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
@@ -177,11 +182,11 @@ describe("api", function() {
 
     it("gets comments for a post", () => {
       const post = makePost()
-      const tree = makeCommentTree(post)
-      fetchStub.returns(Promise.resolve(tree))
+      const response = makeCommentsResponse(post)
+      fetchStub.returns(Promise.resolve(response))
 
       return getComments(post.id).then(resp => {
-        assert.deepEqual(resp.data, tree)
+        assert.deepEqual(resp, response)
       })
     })
 
@@ -200,7 +205,7 @@ describe("api", function() {
 
     it("creates comments replying to comments", () => {
       const post = makePost()
-      const tree = makeCommentTree(post)
+      const tree = makeCommentsResponse(post)
       fetchStub.returns(Promise.resolve())
 
       return createComment(post.id, "my new comment", tree[0].id).then(() => {
@@ -217,7 +222,7 @@ describe("api", function() {
 
     it("updates a comment", () => {
       const post = makePost()
-      const tree = makeCommentTree(post)
+      const tree = makeCommentsResponse(post)
       const comment = tree[0]
       const commentResponse = { ...comment, replies: undefined, text: "edited" }
 
@@ -250,6 +255,48 @@ describe("api", function() {
       assert.deepEqual(fetchStub.args[0][1], {
         method: PATCH,
         body:   JSON.stringify(R.dissoc("url", post))
+      })
+    })
+
+    describe("retrieves more comments", () => {
+      it("at the root level", async () => {
+        const post = makePost()
+        const moreComments = makeMoreCommentsResponse(post)
+        const children = ["some", "child", "ren"]
+
+        fetchStub.returns(Promise.resolve(moreComments))
+
+        const response = await getMoreComments(post.id, null, children)
+        const payload = {
+          post_id:   post.id,
+          parent_id: "",
+          children:  children
+        }
+        assert.ok(
+          fetchStub.calledWith(`/api/v0/morecomments/?${qs.stringify(payload)}`)
+        )
+        assert.deepEqual(response, moreComments)
+      })
+
+      it("replying to a parent", async () => {
+        const post = makePost()
+        const commentsResponse = makeCommentsResponse(post)
+        const parent = commentsResponse[0]
+        const moreComments = makeMoreCommentsResponse(post, parent.id)
+        const children = ["some", "child", "ren"]
+
+        fetchStub.returns(Promise.resolve(moreComments))
+
+        const response = await getMoreComments(post.id, parent.id, children)
+        const payload = {
+          post_id:   post.id,
+          parent_id: parent.id,
+          children:  children
+        }
+        assert.ok(
+          fetchStub.calledWith(`/api/v0/morecomments/?${qs.stringify(payload)}`)
+        )
+        assert.deepEqual(response, moreComments)
       })
     })
   })

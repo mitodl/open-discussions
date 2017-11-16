@@ -14,6 +14,7 @@ import withNavSidebar from "../hoc/withNavSidebar"
 
 import { formatCommentsCount } from "../lib/posts"
 import { actions } from "../actions"
+import { replaceMoreComments } from "../actions/comment"
 import { toggleUpvote } from "../util/api_actions"
 import { getChannelName, getPostID } from "../lib/util"
 import { anyError } from "../util/rest"
@@ -27,7 +28,9 @@ import type { FormsState } from "../flow/formTypes"
 import type {
   Channel,
   ChannelModerators,
-  Comment,
+  CommentInTree,
+  GenericComment,
+  MoreCommentsInTree,
   Post
 } from "../flow/discussionTypes"
 
@@ -37,7 +40,7 @@ type PostPageProps = {
   post: Post,
   channel: Channel,
   moderators: ChannelModerators,
-  commentsTree: Array<Comment>,
+  commentsTree: Array<GenericComment>,
   forms: FormsState,
   commentInFlight: boolean,
   // from the router match
@@ -63,7 +66,7 @@ class PostPage extends React.Component<*, void> {
     }
   }
 
-  downvote = async (comment: Comment) => {
+  downvote = async (comment: CommentInTree) => {
     const { dispatch } = this.props
     await dispatch(
       actions.comments.patch(comment.id, {
@@ -87,11 +90,26 @@ class PostPage extends React.Component<*, void> {
     ])
   }
 
-  upvote = async (comment: Comment) => {
+  upvote = async (comment: CommentInTree) => {
     const { dispatch } = this.props
     await dispatch(
       actions.comments.patch(comment.id, {
         upvoted: !comment.upvoted
+      })
+    )
+  }
+
+  loadMoreComments = async (comment: MoreCommentsInTree) => {
+    const { dispatch } = this.props
+    const { post_id: postId, parent_id: parentId, children } = comment
+    const comments = await dispatch(
+      actions.morecomments.get(postId, parentId, children)
+    )
+    dispatch(
+      replaceMoreComments({
+        postId,
+        parentId,
+        comments
       })
     )
   }
@@ -136,6 +154,7 @@ class PostPage extends React.Component<*, void> {
           forms={forms}
           upvote={this.upvote}
           downvote={this.downvote}
+          loadMoreComments={this.loadMoreComments}
           beginEditing={beginEditing(dispatch)}
           processing={commentInFlight}
         />

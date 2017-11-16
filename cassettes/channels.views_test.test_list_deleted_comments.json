@@ -180,7 +180,7 @@
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/comments/p/?limit=2048&sort=best&raw_json=1"
+        "uri": "https://reddit.local/comments/p/?limit=50&sort=best&raw_json=1"
       },
       "response": {
         "body": {
@@ -238,7 +238,7 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/comments/p/?limit=2048&sort=best&raw_json=1"
+        "url": "https://reddit.local/comments/p/?limit=50&sort=best&raw_json=1"
       }
     }
   ],

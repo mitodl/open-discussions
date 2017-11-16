@@ -1,4 +1,7 @@
 """Tests for views for REST APIs for channels"""
+# pylint: disable=too-many-lines
+from itertools import product
+
 import pytest
 from betamax.fixtures.pytest import _casette_name
 from django.core.urlresolvers import reverse
@@ -8,6 +11,7 @@ from rest_framework import status
 from channels.api import Api, CHANNEL_TYPE_PRIVATE
 from channels.factories import RedditFactories, FactoryStore, STRATEGY_BUILD
 from channels.serializers import default_profile_image
+from channels.test_constants import LIST_MORE_COMMENTS_RESPONSE
 from open_discussions.factories import UserFactory
 
 # pylint: disable=redefined-outer-name, unused-argument, too-many-lines
@@ -762,6 +766,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
     assert resp.json() == [
         {
             "id": "1",
+            'parent_id': None,
             "post_id": "2",
             "text": "hello world",
             "author_id": author_id,
@@ -772,37 +777,38 @@ def test_list_comments(client, logged_in_profile, missing_user):
             'profile_image': profile_image,
             'author_name': name,
             'edited': False,
-            "replies": [
-                {
-                    "id": "2",
-                    "post_id": "2",
-                    "text": "texty text text",
-                    "author_id": author_id,
-                    "score": 1,
-                    "upvoted": True,
-                    "downvoted": False,
-                    "created": "2017-07-25T17:15:57+00:00",
-                    "replies": [],
-                    'profile_image': profile_image,
-                    'author_name': name,
-                    'edited': True,
-                },
-                {
-                    "id": "3",
-                    "post_id": "2",
-                    "text": "reply2",
-                    "author_id": author_id,
-                    "score": 1,
-                    "upvoted": True,
-                    "downvoted": False,
-                    "created": "2017-07-25T17:16:10+00:00",
-                    "replies": [],
-                    'profile_image': profile_image,
-                    'author_name': name,
-                    'edited': False,
-                }
-            ]
-        }
+            'comment_type': 'comment',
+        },
+        {
+            "id": "2",
+            'parent_id': '1',
+            "post_id": "2",
+            "text": "texty text text",
+            "author_id": author_id,
+            "score": 1,
+            "upvoted": True,
+            "downvoted": False,
+            "created": "2017-07-25T17:15:57+00:00",
+            'profile_image': profile_image,
+            'author_name': name,
+            'edited': True,
+            'comment_type': 'comment',
+        },
+        {
+            "id": "3",
+            'parent_id': '1',
+            "post_id": "2",
+            "text": "reply2",
+            "author_id": author_id,
+            "score": 1,
+            "upvoted": True,
+            "downvoted": False,
+            "created": "2017-07-25T17:16:10+00:00",
+            'profile_image': profile_image,
+            'author_name': name,
+            'edited': False,
+            'comment_type': 'comment',
+        },
     ]
 
 
@@ -820,7 +826,177 @@ def test_list_comments_not_found(client, logged_in_profile):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_list_deleted_comments(client, logged_in_profile):
+def test_list_comments_more(client, logged_in_profile, use_betamax, praw_settings):
+    """List comments for a post which has more comments"""
+    logged_in_profile.image_small = '/deserunt/consequatur.jpg'
+    logged_in_profile.name = 'Brooke Robles'
+    logged_in_profile.save()
+
+    url = reverse('comment-list', kwargs={'post_id': '1'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == LIST_MORE_COMMENTS_RESPONSE
+
+
+@pytest.mark.parametrize("is_root_comment", [True, False])
+def test_more_comments(client, logged_in_profile, use_betamax, praw_settings, is_root_comment):
+    """Retrieve more comments"""
+    image_url = '/deserunt/consequatur.jpg'
+    name = 'Brooke Robles'
+    username = '01BWRGE5JQK4E8B0H90K9RM4WF'
+    UserFactory.create(
+        username=username,
+        profile__image_small=image_url,
+        profile__name=name,
+    )
+
+    post_id = "1"
+    root_comment, middle_comment, edge_comment = [
+        {
+            "id": "m",
+            "parent_id": "1",
+            "post_id": post_id,
+            "text": "m",
+            "author_id": username,
+            "score": 1,
+            "upvoted": False,
+            "downvoted": False,
+            "created": "2017-10-19T19:47:22+00:00",
+            "profile_image": image_url,
+            "author_name": name,
+            "edited": False,
+            "comment_type": "comment"
+        },
+        {
+            "id": "n",
+            "parent_id": "m",
+            "post_id": post_id,
+            "text": "oasd",
+            "author_id": username,
+            "score": 1,
+            "upvoted": False,
+            "downvoted": False,
+            "created": "2017-10-23T17:45:14+00:00",
+            "profile_image": image_url,
+            "author_name": name,
+            "edited": False,
+            "comment_type": "comment"
+        },
+        {
+            "id": "o",
+            "parent_id": "n",
+            "post_id": post_id,
+            "text": "k;lkl;",
+            "author_id": username,
+            "score": 1,
+            "upvoted": False,
+            "downvoted": False,
+            "created": "2017-10-23T17:45:25+00:00",
+            "profile_image": image_url,
+            "author_name": name,
+            "edited": False,
+            "comment_type": "comment"
+        }
+    ]
+
+    url = "{base}?post_id={post_id}&parent_id={parent_id}".format(
+        base=reverse('morecomments-detail'),
+        post_id=post_id,
+        parent_id='' if is_root_comment else middle_comment["id"]
+    )
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    if is_root_comment:
+        assert resp.json() == [root_comment, middle_comment, edge_comment]
+    else:
+        assert resp.json() == [edge_comment]
+
+
+def test_more_comments_children(client, logged_in_profile, use_betamax, praw_settings):
+    """Retrieve more comments specifying child elements"""
+    image_url = '/deserunt/consequatur.jpg'
+    name = 'Brooke Robles'
+    username = 'george'
+
+    logged_in_profile.image_small = image_url
+    logged_in_profile.name = name
+    logged_in_profile.save()
+
+    post_id = "1"
+    url = "{base}?post_id={post_id}&parent_id=&children=e9l&children=e9m".format(
+        base=reverse('morecomments-detail'),
+        post_id=post_id,
+    )
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [
+        {
+            "id": "e9l",
+            "parent_id": None,
+            "post_id": "1",
+            "text": "shallow comment 25",
+            "author_id": username,
+            "score": 1,
+            "upvoted": True,
+            "downvoted": False,
+            "created": "2017-11-09T16:35:55+00:00",
+            "profile_image": image_url,
+            "author_name": name,
+            "edited": False,
+            "comment_type": "comment"
+        },
+        {
+            "id": "e9m",
+            "parent_id": None,
+            "post_id": "1",
+            "text": "shallow comment 26",
+            "author_id": username,
+            "score": 1,
+            "upvoted": True,
+            "downvoted": False,
+            "created": "2017-11-09T16:36:00+00:00",
+            "profile_image": image_url,
+            "author_name": name,
+            "edited": False,
+            "comment_type": "comment"
+        }
+    ]
+
+
+@pytest.mark.parametrize("missing_post,missing_parent", product([True, False], repeat=2))
+def test_more_comments_404(client, logged_in_profile, use_betamax, praw_settings, missing_post, missing_parent):
+    """If the post id or comment id is wrong, we should return a 404"""
+    post_id = "1"
+    url = "{base}?post_id={post_id}&parent_id={parent_id}".format(
+        base=reverse('morecomments-detail'),
+        post_id=post_id if not missing_post else 'missing_post',
+        parent_id='' if not missing_parent else 'missing_parent',
+    )
+    resp = client.get(url)
+    expected_status = status.HTTP_404_NOT_FOUND if missing_post or missing_parent else status.HTTP_200_OK
+    assert resp.status_code == expected_status
+
+
+@pytest.mark.parametrize("missing_param", ["post_id", "parent_id"])
+def test_more_comments_missing_param(client, logged_in_profile, use_betamax, praw_settings, missing_param):
+    """If a parameter is missing a 400 error should be returned"""
+    params = {
+        "post_id": "post_id",
+        "parent_id": "parent_id",
+    }
+    del params[missing_param]
+
+    params_string = "&".join("{}={}".format(key, value) for key, value in params.items())
+
+    url = "{base}?{params_string}".format(
+        base=reverse('morecomments-detail'),
+        params_string=params_string,
+    )
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_400_BAD_REQUEST
+
+
+def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_settings):
     """List comments which are deleted according to reddit"""
     user = UserFactory.create(username='admin')
 
@@ -830,31 +1006,35 @@ def test_list_deleted_comments(client, logged_in_profile):
     assert resp.json() == [
         {
             'author_id': '[deleted]',
+            'comment_type': 'comment',
             'created': '2017-09-27T16:03:42+00:00',
             'downvoted': False,
+            'parent_id': None,
             'post_id': 'p',
             'profile_image': default_profile_image,
-            'replies': [{
-                'author_id': user.username,
-                'created': '2017-09-27T16:03:51+00:00',
-                'downvoted': False,
-                'id': '1t',
-                'post_id': 'p',
-                'profile_image': user.profile.image_small,
-                'replies': [],
-                'score': 1,
-                'text': 'reply to parent which is not deleted',
-                'upvoted': False,
-                "author_name": user.profile.name,
-                'edited': False,
-            }],
             'score': 1,
             'text': '[deleted]',
             'upvoted': False,
             'id': '1s',
-            "author_name": "[deleted]",
             'edited': False,
-        }]
+            "author_name": "[deleted]",
+        },
+        {
+            'author_id': user.username,
+            'created': '2017-09-27T16:03:51+00:00',
+            'comment_type': 'comment',
+            'downvoted': False,
+            'id': '1t',
+            'parent_id': '1s',
+            'post_id': 'p',
+            'profile_image': user.profile.image_small,
+            'score': 1,
+            'text': 'reply to parent which is not deleted',
+            'upvoted': False,
+            'edited': False,
+            "author_name": user.profile.name,
+        }
+    ]
 
 
 def test_create_comment(client, logged_in_profile):
@@ -869,8 +1049,8 @@ def test_create_comment(client, logged_in_profile):
         'author_id': 'george',
         'created': '2017-07-25T21:20:35+00:00',
         'id': '7',
+        'parent_id': None,
         'post_id': post_id,
-        'replies': [],
         'score': 1,
         'text': 'reply_to_post 2',
         'upvoted': True,
@@ -878,6 +1058,7 @@ def test_create_comment(client, logged_in_profile):
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
+        'comment_type': 'comment',
     }
 
 
@@ -914,15 +1095,16 @@ def test_create_comment_no_upvote(client, logged_in_profile):
         'author_id': 'george',
         'created': '2017-07-25T21:21:48+00:00',
         'id': '9',
+        'parent_id': None,
         'post_id': post_id,
-        'replies': [],
         'score': 1,
         'text': 'no upvoted',
         'upvoted': False,
         "downvoted": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
-        'edited': False
+        'edited': False,
+        'comment_type': 'comment',
     }
 
 
@@ -939,8 +1121,8 @@ def test_create_comment_downvote(client, logged_in_profile):
         'author_id': 'george',
         'created': '2017-08-04T19:22:02+00:00',
         'id': 'l',
+        'parent_id': None,
         'post_id': post_id,
-        'replies': [],
         'score': 1,
         'text': 'downvoted',
         'upvoted': False,
@@ -948,31 +1130,34 @@ def test_create_comment_downvote(client, logged_in_profile):
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
+        'comment_type': 'comment',
     }
 
 
 def test_create_comment_reply_to_comment(client, logged_in_profile):
     """Create a comment that's a reply to another comment"""
     post_id = '2'
+    parent_comment_id = '3'
     url = reverse('comment-list', kwargs={'post_id': post_id})
     resp = client.post(url, data={
         "text": "reply_to_comment 3",
-        "comment_id": "3",
+        "comment_id": parent_comment_id,
     })
     assert resp.status_code == 201
     assert resp.json() == {
         'author_id': 'george',
         'created': '2017-07-25T21:18:47+00:00',
         'id': '6',
+        'parent_id': parent_comment_id,
         'post_id': post_id,
-        'replies': [],
         'score': 1,
         'text': 'reply_to_comment 3',
         'upvoted': True,
         "downvoted": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
-        'edited': False
+        'edited': False,
+        'comment_type': 'comment',
     }
 
 
@@ -987,15 +1172,16 @@ def test_update_comment_text(client, logged_in_profile):
         'author_id': 'george',
         'created': '2017-07-25T21:18:47+00:00',
         'id': '6',
+        'parent_id': '3',
         'post_id': '2',
-        'replies': [],
         'score': 1,
         'text': 'updated text',
         'upvoted': False,
         'downvoted': False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
-        'edited': True
+        'edited': True,
+        'comment_type': 'comment',
     }
 
 
@@ -1022,8 +1208,8 @@ def test_update_comment_upvote(client, logged_in_profile):
         'author_id': 'george',
         'created': '2017-08-04T19:22:02+00:00',
         'id': comment_id,
+        'parent_id': None,
         'post_id': '2',
-        'replies': [],
         'score': 1,
         'text': 'downvoted',
         'upvoted': True,
@@ -1031,6 +1217,7 @@ def test_update_comment_upvote(client, logged_in_profile):
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
+        'comment_type': 'comment',
     }
 
 
@@ -1046,8 +1233,8 @@ def test_update_comment_downvote(client, logged_in_profile):
         'author_id': 'george',
         'created': '2017-08-04T19:22:02+00:00',
         'id': comment_id,
+        'parent_id': None,
         'post_id': '2',
-        'replies': [],
         'score': 1,
         'text': 'downvoted',
         'upvoted': False,
@@ -1055,6 +1242,7 @@ def test_update_comment_downvote(client, logged_in_profile):
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
+        'comment_type': 'comment',
     }
 
 
@@ -1069,8 +1257,8 @@ def test_update_comment_clear_upvote(client, logged_in_profile):
         'author_id': 'george',
         'created': '2017-07-25T21:18:47+00:00',
         'id': '6',
+        'parent_id': '3',
         'post_id': '2',
-        'replies': [],
         'score': 1,
         'text': 'reply_to_comment 3',
         'upvoted': False,
@@ -1078,6 +1266,7 @@ def test_update_comment_clear_upvote(client, logged_in_profile):
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
+        'comment_type': 'comment',
     }
 
 
@@ -1093,8 +1282,8 @@ def test_update_comment_clear_downvote(client, logged_in_profile):
         'author_id': 'george',
         'created': '2017-08-04T19:22:02+00:00',
         'id': comment_id,
+        'parent_id': None,
         'post_id': '2',
-        'replies': [],
         'score': 1,
         'text': 'downvoted',
         'upvoted': False,
@@ -1102,6 +1291,7 @@ def test_update_comment_clear_downvote(client, logged_in_profile):
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
+        'comment_type': 'comment',
     }
 
 

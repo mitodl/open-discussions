@@ -7,6 +7,7 @@ from datetime import (
 )
 
 from django.contrib.auth import get_user_model
+from praw.models import Comment, MoreComments
 from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -14,6 +15,7 @@ from rest_framework.exceptions import ValidationError
 from channels.api import (
     Api,
     VALID_CHANNEL_TYPES,
+    get_kind_mapping,
 )
 
 
@@ -269,6 +271,7 @@ class PostSerializer(serializers.Serializer):
 class CommentSerializer(serializers.Serializer):
     """Serializer for comments"""
     id = serializers.CharField(read_only=True)
+    parent_id = serializers.SerializerMethodField()
     post_id = serializers.SerializerMethodField()
     comment_id = serializers.CharField(write_only=True, allow_blank=True, required=False)
     text = serializers.CharField(source='body')
@@ -277,10 +280,10 @@ class CommentSerializer(serializers.Serializer):
     upvoted = WriteableSerializerMethodField()
     downvoted = WriteableSerializerMethodField()
     created = serializers.SerializerMethodField()
-    replies = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
     edited = serializers.SerializerMethodField()
+    comment_type = serializers.SerializerMethodField()
 
     def _get_user(self, instance):
         """
@@ -300,16 +303,15 @@ class CommentSerializer(serializers.Serializer):
 
     def get_post_id(self, instance):
         """The post id for this comment"""
-        try:
-            # This is also available from instance.parent() but this avoids the recursive lookup
-            # which isn't necessary since we only view this from the list view, which has the
-            # post_id parameter.
-            return self.context['view'].kwargs['post_id']
-        except KeyError:
-            # This happens if we don't have the post id in the URL, for example the comment detail view
-            parent = instance.parent()
-            while not isinstance(parent, Submission):
-                parent = parent.parent()
+        return instance.submission.id
+
+    def get_parent_id(self, instance):
+        """The parent id for this comment"""
+        parent = instance.parent()
+
+        if isinstance(parent, Submission):
+            return None
+        else:
             return parent.id
 
     def get_author_id(self, instance):
@@ -344,10 +346,6 @@ class CommentSerializer(serializers.Serializer):
         """Is a comment downvoted?"""
         return instance.likes is False
 
-    def get_replies(self, instance):
-        """List of replies to this comment"""
-        return [CommentSerializer(reply, context=self.context).data for reply in instance.replies]
-
     def get_created(self, instance):
         """The ISO-8601 formatted datetime for the creation time"""
         return datetime.fromtimestamp(instance.created, tz=timezone.utc).isoformat()
@@ -355,6 +353,10 @@ class CommentSerializer(serializers.Serializer):
     def get_edited(self, instance):
         """Return a Boolean signifying if the comment has been edited or not"""
         return instance.edited if instance.edited is False else True
+
+    def get_comment_type(self, instance):  # pylint: disable=unused-argument
+        """Let the frontend know which type this is"""
+        return "comment"
 
     def validate_upvoted(self, value):
         """Validate that upvoted is a bool"""
@@ -401,6 +403,51 @@ class CommentSerializer(serializers.Serializer):
         _apply_vote(instance, validated_data, True)
 
         return api.get_comment(comment_id=instance.id)
+
+
+class MoreCommentsSerializer(serializers.Serializer):
+    """
+    Serializer for MoreComments objects
+    """
+    parent_id = serializers.SerializerMethodField()
+    post_id = serializers.SerializerMethodField()
+    children = serializers.SerializerMethodField()
+    comment_type = serializers.SerializerMethodField()
+
+    def get_parent_id(self, instance):
+        """Returns the comment id for the parent comment, or None if the parent is a post"""
+        kind, _id = instance.parent_id.split("_", 1)
+        if kind == get_kind_mapping()['comment']:
+            return _id
+        return None
+
+    def get_post_id(self, instance):
+        """Returns the post id the comment belongs to"""
+        return instance.submission.id
+
+    def get_children(self, instance):
+        """A list of comment ids for child comments that can be loaded"""
+        return instance.children
+
+    def get_comment_type(self, instance):  # pylint: disable=unused-argument
+        """Let the frontend know which type this is"""
+        return "more_comments"
+
+
+class GenericCommentSerializer(serializers.Serializer):
+    """
+    Hack to serialize different types with only one entrypoint
+    """
+
+    def to_representation(self, instance):
+        """
+        Overrides the class method to add an extra field
+        """
+        if isinstance(instance, MoreComments):
+            return MoreCommentsSerializer(instance, context=self.context).data
+        elif isinstance(instance, Comment):
+            return CommentSerializer(instance, context=self.context).data
+        raise ValueError('Unknown type {} in the comments list'.format(type(instance)))
 
 
 class ContributorSerializer(serializers.Serializer):

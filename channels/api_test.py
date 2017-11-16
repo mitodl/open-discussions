@@ -4,6 +4,8 @@ from unittest.mock import Mock
 from urllib.parse import urljoin
 
 import pytest
+from praw.models import Comment
+from praw.models.comment_forest import CommentForest
 from praw.models.reddit.redditor import Redditor
 from rest_framework.exceptions import NotFound
 
@@ -268,25 +270,112 @@ def test_update_comment(mock_client):
     mock_client.comment.return_value.edit.assert_called_once_with('Text')
 
 
-def test_more_comments(mock_client, mocker):
-    """Test more_comments"""
+def test_init_more_comments(mock_client, mocker):
+    """Test init_more_comments"""
     client = api.Api(UserFactory.create())
     children = ['t1_itmt', 't1_it56t']
 
     more_patch = mocker.patch('praw.models.reddit.more.MoreComments')
-    result = client.more_comments('t1_gh_3i', 't3_iru_i2', 5, children=children)
+    result = client.init_more_comments('parent_3i', 'post_i2', children)
 
     more_patch.assert_called_once_with(client.reddit, {
-        'id': 'gh_3i',
-        'name': 't1_gh_3i',
-        'parent_id': 't3_iru_i2',
+        'parent_id': 't1_parent_3i',
         'children': children,
-        'count': 5,
+        'count': len(children),
     })
     assert result == more_patch.return_value
-    mock_client.submission.assert_called_once_with('iru_i2')
+    mock_client.submission.assert_called_once_with('post_i2')
     assert result.submission == mock_client.submission.return_value
     result.comments.assert_called_once_with()
+
+
+def test_init_more_comments_no_parents(mock_client, mocker):
+    """If no parent id is present the post id should be used"""
+    client = api.Api(UserFactory.create())
+    children = ['t1_itmt', 't1_it56t']
+
+    more_patch = mocker.patch('praw.models.reddit.more.MoreComments')
+    result = client.init_more_comments(None, 'post_i2', children)
+
+    more_patch.assert_called_once_with(client.reddit, {
+        'parent_id': 't3_post_i2',
+        'children': children,
+        'count': len(children),
+    })
+    assert result == more_patch.return_value
+    mock_client.submission.assert_called_once_with('post_i2')
+    assert result.submission == mock_client.submission.return_value
+    result.comments.assert_called_once_with()
+
+
+def test_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
+    """Test more_comments without any extra comments"""
+    client = api.Api(UserFactory.create())
+    children = ['t1_itmt', 't1_it56t']
+
+    init_more_mock = mocker.patch('channels.api.Api.init_more_comments')
+    post_id = 'post_i2'
+
+    def _make_comment(comment_id):
+        """Helper to make a comment with a valid list of replies"""
+        comment = Comment(client.reddit, id=comment_id)
+        comment.replies = []
+        return comment
+
+    comments = [_make_comment(child) for child in children]
+    init_more_mock.return_value.comments.return_value = CommentForest(post_id, comments=comments)
+
+    result = client.more_comments('parent_3i', post_id, children)
+    init_more_mock.assert_called_once_with(
+        parent_id='parent_3i',
+        post_id='post_i2',
+        children=children,
+    )
+    assert result == comments
+
+
+def test_more_comments_with_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
+    """Test more_comments with an extra MoreComments"""
+    client = api.Api(UserFactory.create())
+    children = ['1', '2', '3']
+    extra_children = ['4', '5', '6']
+
+    init_more_mock = mocker.patch('channels.api.Api.init_more_comments')
+    post_id = 'post_i2'
+
+    def _make_comment(comment_id):
+        """Helper to make a comment with a valid list of replies"""
+        comment = Comment(client.reddit, id=comment_id)
+        comment.replies = []
+        return comment
+
+    first_comments = [_make_comment(child) for child in children]
+    side_effects = [
+        Mock(
+            comments=Mock(
+                return_value=CommentForest(post_id, comments=first_comments)
+            )
+        ),
+        Mock()  # only used for identity comparison
+    ]
+    init_more_mock.side_effect = side_effects
+
+    result = client.more_comments('parent_3i', post_id, children + extra_children)
+    assert init_more_mock.call_count == 2
+    init_more_mock.assert_any_call(
+        parent_id='parent_3i',
+        post_id='post_i2',
+        children=children + extra_children,
+    )
+    init_more_mock.assert_any_call(
+        parent_id='parent_3i',
+        post_id='post_i2',
+        children=extra_children,
+    )
+
+    assert result[:-1] == first_comments
+    more_comments = result[-1]
+    assert side_effects[1] == more_comments
 
 
 def test_frontpage(mock_client):

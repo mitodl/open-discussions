@@ -1,4 +1,3 @@
-// @flow
 import { assert } from "chai"
 import sinon from "sinon"
 import R from "ramda"
@@ -6,14 +5,19 @@ import R from "ramda"
 import CommentTree from "../components/CommentTree"
 
 import { makePost } from "../factories/posts"
-import { makeCommentTree } from "../factories/comments"
+import {
+  makeComment,
+  makeCommentsResponse,
+  makeMoreComments
+} from "../factories/comments"
 import { makeChannel, makeModerators } from "../factories/channels"
 import { actions } from "../actions"
-import { FORM_BEGIN_EDIT } from "../actions/forms"
+import { FORM_BEGIN_EDIT, REPLACE_MORE_COMMENTS } from "../actions/comment"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
 import { postDetailURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
+import { createCommentTree } from "../reducers/comments"
 
 describe("PostPage", function() {
   let helper,
@@ -27,7 +31,8 @@ describe("PostPage", function() {
 
   beforeEach(() => {
     post = makePost()
-    comments = makeCommentTree(post, 3)
+    const commentsResponse = makeCommentsResponse(post, 3)
+    comments = createCommentTree(commentsResponse)
     channel = makeChannel()
     moderators = makeModerators()
 
@@ -35,12 +40,7 @@ describe("PostPage", function() {
     helper.getPostStub.returns(Promise.resolve(post))
     helper.getChannelStub.returns(Promise.resolve(channel))
     helper.getChannelsStub.returns(Promise.resolve([]))
-    helper.getCommentsStub.returns(
-      Promise.resolve({
-        postID: post.id,
-        data:   comments
-      })
-    )
+    helper.getCommentsStub.returns(Promise.resolve(commentsResponse))
     helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
@@ -139,5 +139,38 @@ describe("PostPage", function() {
       assert.equal(fromProps.downvote, commentTreeProps.downvote)
       assert.equal(fromProps.upvote, commentTreeProps.upvote)
     }
+  })
+
+  it("loads more comments when the function is called", async () => {
+    const [wrapper] = await renderPage()
+    const commentTree = wrapper.find("CommentTree")
+    const commentTreeProps = commentTree.props()
+    const parent = comments[0]
+    const moreComments = makeMoreComments(post, parent.id)
+    const newComment = makeComment(post, parent.id)
+    const newComments = [newComment]
+
+    helper.getMoreCommentsStub.returns(Promise.resolve(newComments))
+    await listenForActions(
+      [
+        actions.morecomments.get.requestType,
+        actions.morecomments.get.successType,
+        REPLACE_MORE_COMMENTS
+      ],
+      () => {
+        commentTreeProps.loadMoreComments(moreComments)
+      }
+    )
+
+    sinon.assert.calledWith(
+      helper.getMoreCommentsStub,
+      post.id,
+      parent.id,
+      moreComments.children
+    )
+    const reducerTree = helper.store.getState().comments.data.get(post.id)
+    const newCommentInTree =
+      reducerTree[0].replies[reducerTree[0].replies.length - 1]
+    assert.deepEqual(newCommentInTree, newComment)
   })
 })
