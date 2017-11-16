@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Sequi perferendis et ut maiores omnis. Mollitia totam recusandae deleniti sunt modi odit voluptates. Sint nesciunt eum delectus aspernatur tempora expedita placeat.\nHic exercitationem architecto eaque perspiciatis ipsam ea debitis. Sit quisquam dolores ipsam. Fugit in earum blanditiis eum.\nAutem possimus ratione dicta ad eum laudantium. Ad aliquid eius laboriosam nulla est voluptate.",
+      "name": "1511381877_omnis",
+      "public_description": "Veritatis accusamus quasi minima sint. Ipsa est animi ad dolor.",
+      "title": "Maiores omnis ut qui modi."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "gb",
+      "text": "Nemo eum quo voluptas aliquid enim et vitae culpa. Aspernatur dignissimos repudiandae soluta.",
+      "title": "Consequuntur optio officia a magnam facere."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZJP2M2MGS4S3N2743V2RBF9"
+    },
+    "staff_user": {
+      "username": "01BZJP2DR7NTTNY3ZKC90KZHKS"
+    }
+  }
+}

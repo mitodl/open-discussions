@@ -1,0 +1,41 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Saepe corrupti numquam consequuntur temporibus omnis laudantium commodi alias. Voluptatem qui nemo libero est. Non autem facilis excepturi sit.\nIncidunt perferendis possimus pariatur aspernatur. Quasi officiis iusto architecto. Dolor corporis deleniti soluta possimus similique. At atque assumenda recusandae eveniet voluptates.",
+      "name": "1511382190_pariatur",
+      "public_description": "Deleniti quos deleniti rerum nihil impedit. Quos libero odit dolores at.",
+      "title": "Libero quaerat voluptatum quam adipisci."
+    }
+  },
+  "posts": {
+    "my 2nd post": {
+      "id": "gj",
+      "text": "Quia delectus officiis sunt expedita. Fugiat animi sunt in distinctio veniam cupiditate in.",
+      "title": "Architecto praesentium sapiente nulla molestiae."
+    },
+    "my 3rd post": {
+      "id": "gk",
+      "text": "Ullam asperiores voluptatibus explicabo. Quam beatae ratione illum.",
+      "title": "Tenetur occaecati est atque officia earum vitae."
+    },
+    "my 4th post": {
+      "id": "gl",
+      "text": "Molestiae cum odit vel sed. Veniam a nisi libero. Commodi ducimus optio cumque.",
+      "title": "Fuga harum beatae ducimus."
+    },
+    "my post": {
+      "id": "gi",
+      "text": "Quas veritatis repellat quisquam. Nihil nemo ducimus optio a.",
+      "title": "Provident omnis impedit assumenda tenetur."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZJPC5EVED2SYYJD20S4WZ43"
+    },
+    "staff_user": {
+      "username": "01BZJPBYYSB0WSEX2526FYVV9G"
+    }
+  }
+}

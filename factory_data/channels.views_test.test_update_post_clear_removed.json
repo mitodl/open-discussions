@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Ipsum quam temporibus molestias officiis perspiciatis aspernatur illo. Veniam ea libero explicabo nemo sed occaecati maiores asperiores. Nemo provident totam consequatur aut.\nNostrum at delectus explicabo officia. Porro sequi perspiciatis ratione inventore perferendis ipsa minima. Officiis voluptates reprehenderit dolorem dolore tempore minima eaque. Reiciendis voluptatum hic ad.",
+      "name": "1511381683_soluta",
+      "public_description": "Quisquam nemo corrupti voluptate. Fuga deserunt dolorem recusandae impedit.",
+      "title": "Esse eaque repellendus possimus dolores quod."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "ga",
+      "text": "Voluptate quo cum eaque in labore. Ullam officia cumque at qui porro placeat eum delectus.",
+      "title": "Corporis saepe itaque ratione."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZJNWPGBQ7GTMV4222BKKKHH"
+    },
+    "staff_user": {
+      "username": "01BZJNWFZKX02WH0BQTBX5G7YD"
+    }
+  }
+}

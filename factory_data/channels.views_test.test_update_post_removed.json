@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Non minima sequi rerum nulla voluptates porro. Explicabo nostrum optio cumque consequuntur. Consequatur aliquam qui dignissimos mollitia ea aut animi.\nQuo dolorem quam aperiam consequatur nostrum. Praesentium quidem porro consequatur enim rem minima quia. Quasi aliquam laborum itaque enim dolorem.\nRecusandae odit eligendi temporibus tempore sunt fugiat libero. Fugiat alias possimus at iure. Laboriosam fuga illo beatae rerum similique sequi. Repellendus dolorem in fugit vitae veniam iste sequi.",
+      "name": "1511381409_impedit",
+      "public_description": "Nostrum mollitia reiciendis sapiente ab. Provident libero voluptatum quam laboriosam.",
+      "title": "Quos sunt aliquid autem."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "g9",
+      "text": "Quidem cumque beatae commodi. Laudantium id sit eius suscipit illum.",
+      "title": "Expedita nihil dolorem omnis odio."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZJNMBB155VC4RT6487SF8SM"
+    },
+    "staff_user": {
+      "username": "01BZJNM4D646C4T6Q84V7F5PEX"
+    }
+  }
+}

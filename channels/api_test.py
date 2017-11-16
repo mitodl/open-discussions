@@ -186,6 +186,24 @@ def test_update_post_invalid(mock_client):
     assert mock_client.submission.return_value.edit.call_count == 0
 
 
+def test_approve_post(mock_client):
+    """Test approve_post passes"""
+    mock_client.submission.return_value.selftext = 'text'
+    client = api.Api(UserFactory.create())
+    client.approve_post('id')
+    mock_client.submission.assert_called_once_with(id='id')
+    mock_client.submission.return_value.mod.approve.assert_called_once_with()
+
+
+def test_remove_post(mock_client):
+    """Test remove_post passes"""
+    mock_client.submission.return_value.selftext = 'text'
+    client = api.Api(UserFactory.create())
+    client.remove_post('id')
+    mock_client.submission.assert_called_once_with(id='id')
+    mock_client.submission.return_value.mod.remove.assert_called_once_with()
+
+
 def test_create_comment_on_post(mock_client):
     """Makes correct calls for comment on post"""
     client = api.Api(UserFactory.create())
