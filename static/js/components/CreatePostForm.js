@@ -1,9 +1,12 @@
 // @flow
 import React from "react"
 import R from "ramda"
+import { Link } from "react-router-dom"
 
 import Card from "../components/Card"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
+
+import { CONTENT_POLICY_URL } from "../lib/url"
 
 import type { Channel, PostForm, PostValidation } from "../flow/discussionTypes"
 
@@ -132,8 +135,10 @@ export default class CreatePostForm extends React.Component<*, void> {
             <div className="posting-policy row">
               <span>
                 Please be mindful of{" "}
-                <a href="#">MIT Discussion content policy</a> and practice good
-                online etiquette.
+                <Link to={CONTENT_POLICY_URL}>
+                  MIT Discussion content policy
+                </Link>{" "}
+                and practice good online etiquette.
               </span>
             </div>
             <div className="actions row">

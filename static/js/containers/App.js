@@ -8,6 +8,7 @@ import DocumentTitle from "react-document-title"
 import HomePage from "./HomePage"
 import ChannelPage from "./ChannelPage"
 import PostPage from "./PostPage"
+import ContentPolicyPage from "./ContentPolicyPage"
 import AdminPage from "./admin/AdminPage"
 import AuthRequiredPage from "./AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
@@ -84,6 +85,10 @@ class App extends React.Component<*, void> {
         <Route
           path={`${match.url}auth_required/`}
           component={AuthRequiredPage}
+        />
+        <Route
+          path={`${match.url}content_policy/`}
+          component={ContentPolicyPage}
         />
       </div>
     )

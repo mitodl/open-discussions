@@ -31,6 +31,7 @@ urlpatterns = [
     # React App
     url(r'^$', index, name='open_discussions-index'),
     url(r'^auth_required/$', index),
+    url(r'^content_policy/$', index),
     url(r'^channel/', index),
     url(r'^manage/', index),
     url(r'^create_post/', index),
