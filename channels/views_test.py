@@ -275,6 +275,7 @@ def test_create_url_post(client, private_channel_and_contributor):
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
+        'edited': False,
     }
 
 
@@ -305,6 +306,7 @@ def test_create_text_post(client, private_channel_and_contributor):
         'channel_title': channel.title,
         'profile_image': user.profile.image_small,
         "author_name": user.profile.name,
+        'edited': False,
     }
 
 
@@ -384,7 +386,8 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
         "channel_name": channel.name,
         "channel_title": channel.title,
         'author_name': user.profile.name,
-        "profile_image": profile_image
+        "profile_image": profile_image,
+        'edited': False,
     }
 
 
@@ -446,7 +449,8 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
                     "channel_name": channel.name,
                     "channel_title": channel.title,
                     'author_name': user.profile.name,
-                    "profile_image": user.profile.image_small
+                    "profile_image": user.profile.image_small,
+                    "edited": False,
                 } for post in posts
             ],
             'pagination': {}
@@ -560,6 +564,7 @@ def test_update_post_text(client, private_channel_and_contributor, reddit_factor
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
+        'edited': False
     }
 
 
@@ -586,6 +591,7 @@ def test_update_post_clear_vote(client, private_channel_and_contributor, reddit_
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
+        'edited': False
     }
 
 
@@ -612,6 +618,7 @@ def test_update_post_upvote(client, private_channel_and_contributor, reddit_fact
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
+        "edited": False,
     }
 
 
@@ -638,6 +645,7 @@ def test_update_post_removed(client, staff_user, private_channel_and_contributor
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
+        "edited": False,
     }
 
 
@@ -665,6 +673,7 @@ def test_update_post_clear_removed(client, staff_user, staff_api, private_channe
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
+        'edited': False
     }
 
 
@@ -720,7 +729,8 @@ def test_create_post_without_upvote(client, private_channel_and_contributor):
         'channel_name': channel.name,
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
-        "author_name": user.profile.name
+        "author_name": user.profile.name,
+        'edited': False
     }
 
 
@@ -761,6 +771,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "created": "2017-07-25T17:09:45+00:00",
             'profile_image': profile_image,
             'author_name': name,
+            'edited': False,
             "replies": [
                 {
                     "id": "2",
@@ -774,6 +785,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
                     "replies": [],
                     'profile_image': profile_image,
                     'author_name': name,
+                    'edited': True,
                 },
                 {
                     "id": "3",
@@ -787,6 +799,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
                     "replies": [],
                     'profile_image': profile_image,
                     'author_name': name,
+                    'edited': False,
                 }
             ]
         }
@@ -832,13 +845,15 @@ def test_list_deleted_comments(client, logged_in_profile):
                 'score': 1,
                 'text': 'reply to parent which is not deleted',
                 'upvoted': False,
-                "author_name": user.profile.name
+                "author_name": user.profile.name,
+                'edited': False,
             }],
             'score': 1,
             'text': '[deleted]',
             'upvoted': False,
             'id': '1s',
-            "author_name": "[deleted]"
+            "author_name": "[deleted]",
+            'edited': False,
         }]
 
 
@@ -862,6 +877,7 @@ def test_create_comment(client, logged_in_profile):
         "downvoted": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
+        'edited': False,
     }
 
 
@@ -906,6 +922,7 @@ def test_create_comment_no_upvote(client, logged_in_profile):
         "downvoted": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
+        'edited': False
     }
 
 
@@ -930,6 +947,7 @@ def test_create_comment_downvote(client, logged_in_profile):
         'downvoted': True,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
+        'edited': False,
     }
 
 
@@ -954,6 +972,7 @@ def test_create_comment_reply_to_comment(client, logged_in_profile):
         "downvoted": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
+        'edited': False
     }
 
 
@@ -976,6 +995,7 @@ def test_update_comment_text(client, logged_in_profile):
         'downvoted': False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
+        'edited': True
     }
 
 
@@ -1010,6 +1030,7 @@ def test_update_comment_upvote(client, logged_in_profile):
         'downvoted': False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
+        'edited': False,
     }
 
 
@@ -1033,6 +1054,7 @@ def test_update_comment_downvote(client, logged_in_profile):
         'downvoted': True,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
+        'edited': False,
     }
 
 
@@ -1055,6 +1077,7 @@ def test_update_comment_clear_upvote(client, logged_in_profile):
         'downvoted': False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
+        'edited': False,
     }
 
 
@@ -1078,6 +1101,7 @@ def test_update_comment_clear_downvote(client, logged_in_profile):
         'downvoted': False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
+        'edited': False,
     }
 
 
@@ -1130,7 +1154,8 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
                 "channel_name": channel.name,
                 "channel_title": channel.title,
                 'author_name': user.profile.name,
-                "profile_image": user.profile.image_small
+                "profile_image": user.profile.image_small,
+                "edited": False,
             },
             {
                 "url": None,
@@ -1146,7 +1171,8 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
                 "channel_name": channel.name,
                 "channel_title": channel.title,
                 'author_name': user.profile.name,
-                "profile_image": user.profile.image_small
+                "profile_image": user.profile.image_small,
+                "edited": False,
             },
             {
                 "url": None,
@@ -1162,7 +1188,8 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
                 "channel_name": channel.name,
                 "channel_title": channel.title,
                 'author_name': user.profile.name,
-                "profile_image": user.profile.image_small
+                "profile_image": user.profile.image_small,
+                "edited": False,
             },
             {
                 "url": None,
@@ -1178,7 +1205,8 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
                 "channel_name": channel.name,
                 "channel_title": channel.title,
                 'author_name': user.profile.name,
-                "profile_image": user.profile.image_small
+                "profile_image": user.profile.image_small,
+                "edited": False,
             },
         ],
         'pagination': {},

@@ -131,6 +131,7 @@ class PostSerializer(serializers.Serializer):
     channel_title = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
+    edited = serializers.SerializerMethodField()
 
     def _get_user(self, instance):
         """
@@ -184,6 +185,10 @@ class PostSerializer(serializers.Serializer):
     def get_channel_title(self, instance):
         """The title of the channel"""
         return instance.subreddit.title
+
+    def get_edited(self, instance):
+        """Return a Boolean signifying if the post has been edited or not"""
+        return instance.edited if instance.edited is False else True
 
     def validate_upvoted(self, value):
         """Validate that upvoted is a bool"""
@@ -275,6 +280,7 @@ class CommentSerializer(serializers.Serializer):
     replies = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
+    edited = serializers.SerializerMethodField()
 
     def _get_user(self, instance):
         """
@@ -345,6 +351,10 @@ class CommentSerializer(serializers.Serializer):
     def get_created(self, instance):
         """The ISO-8601 formatted datetime for the creation time"""
         return datetime.fromtimestamp(instance.created, tz=timezone.utc).isoformat()
+
+    def get_edited(self, instance):
+        """Return a Boolean signifying if the comment has been edited or not"""
+        return instance.edited if instance.edited is False else True
 
     def validate_upvoted(self, value):
         """Validate that upvoted is a bool"""

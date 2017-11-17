@@ -38,6 +38,7 @@ describe("ExpandedPostDisplay", () => {
   })
 
   it("should render a post correctly", () => {
+    post.edited = false
     const wrapper = renderPostDisplay({ post })
     const summary = wrapper.find(".summary")
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
@@ -50,6 +51,7 @@ describe("ExpandedPostDisplay", () => {
   it("should display post text", () => {
     const string = "JUST SOME GREAT TEXT!"
     post.text = string
+    post.edited = false
     const wrapper = renderPostDisplay({ post: post })
     assert.equal(wrapper.find(ReactMarkdown).props().source, string)
   })
@@ -61,6 +63,7 @@ describe("ExpandedPostDisplay", () => {
   })
 
   it("should not display images from markdown", () => {
+    post.edited = false
     post.text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
     const wrapper = renderPostDisplay({ post: post })
     assert.equal(wrapper.find(ReactMarkdown).props().source, post.text)
