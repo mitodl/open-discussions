@@ -62,7 +62,14 @@
   .text-content {
     color: rgba(0,0,0,.77);
     line-height: 1.4;
+  }
 
+  .post-actions {
+    display: flex;
+
+    a {
+      margin-left: 10px;
+    }
   }
 }
 

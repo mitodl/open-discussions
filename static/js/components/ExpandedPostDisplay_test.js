@@ -1,9 +1,12 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { assert } from "chai"
 import { mount } from "enzyme"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
+import R from "ramda"
+import sinon from "sinon"
 
 import ExpandedPostDisplay from "./ExpandedPostDisplay"
 import Router from "../Router"
@@ -12,13 +15,19 @@ import { wait } from "../lib/util"
 import { urlHostname } from "../lib/url"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import { actions } from "../actions"
+import { editPostKey } from "../components/CommentForms"
 
 describe("ExpandedPostDisplay", () => {
-  let helper, post
+  let helper, post, beginEditingStub
 
   const renderPostDisplay = props => {
     props = {
       toggleUpvote: () => {},
+      beginEditing: R.curry((key, post, e) => {
+        beginEditingStub(key, post, e)
+      }),
+      forms: {},
       ...props
     }
     return mount(
@@ -31,6 +40,7 @@ describe("ExpandedPostDisplay", () => {
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     post = makePost()
+    beginEditingStub = sinon.stub()
   })
 
   afterEach(() => {
@@ -90,6 +100,50 @@ describe("ExpandedPostDisplay", () => {
     const { to, children } = wrapper.find(Link).at(0).props()
     assert.equal(children, post.title)
     assert.equal(to, `/channel/${post.channel_name}/${post.id}`)
+  })
+
+  it("should only show an edit link if a text post and authored by the user", () => {
+    [
+      [false, true, true],
+      [false, false, false],
+      [true, true, false],
+      [true, false, false]
+    ].forEach(([urlPost, userAuthor, shouldShowLink]) => {
+      const post = makePost(urlPost)
+      if (userAuthor) {
+        SETTINGS.username = post.author_id
+      }
+      const wrapper = renderPostDisplay({ post: post })
+      if (shouldShowLink) {
+        const div = wrapper.find(".comment-action-button")
+        assert.equal(div.text(), "edit")
+      } else {
+        assert.lengthOf(wrapper.find(".comment-action-button"), 0)
+      }
+    })
+  })
+
+  it('should call beginEditing when user clicks "edit"', () => {
+    const post = makePost(false)
+    SETTINGS.username = post.author_id
+    const wrapper = renderPostDisplay({ post })
+    wrapper.find(".comment-action-button").simulate("click")
+    assert.ok(beginEditingStub.called)
+  })
+
+  it("should hide post action buttons when editing", () => {
+    const post = makePost(false)
+    helper.store.dispatch(
+      actions.forms.formBeginEdit({
+        formKey: editPostKey(post),
+        value:   post
+      })
+    )
+    const wrapper = renderPostDisplay({
+      post,
+      forms: helper.store.getState().forms
+    })
+    assert.lengthOf(wrapper.find(".post-actions"), 0)
   })
 
   const assertButton = (wrapper, isUpvote, isVoting) => {

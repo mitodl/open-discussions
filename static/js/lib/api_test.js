@@ -3,6 +3,7 @@ import { assert } from "chai"
 import sinon from "sinon"
 import { PATCH, POST } from "redux-hammock/constants"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
+import R from "ramda"
 
 import {
   createChannel,
@@ -14,7 +15,8 @@ import {
   getComments,
   createComment,
   createPost,
-  updateComment
+  updateComment,
+  editPost
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -232,6 +234,22 @@ describe("api", function() {
           method: PATCH,
           body:   JSON.stringify(payload)
         })
+      })
+    })
+
+    it("updates a post", async () => {
+      const post = makePost()
+
+      fetchStub.returns(Promise.resolve())
+
+      post.text = "updated!"
+
+      await editPost(post.id, post)
+
+      assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/`))
+      assert.deepEqual(fetchStub.args[0][1], {
+        method: PATCH,
+        body:   JSON.stringify(R.dissoc("url", post))
       })
     })
   })

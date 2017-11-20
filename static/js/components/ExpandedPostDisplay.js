@@ -1,13 +1,18 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import moment from "moment"
-import { connect } from "react-redux"
 import ReactMarkdown from "react-markdown"
+import R from "ramda"
+
+import { EditPostForm } from "../components/CommentForms"
 
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
 import { addEditedMarker } from "../lib/reddit_objects"
+import { editPostKey } from "../components/CommentForms"
 
 import type { Post } from "../flow/discussionTypes"
+import type { FormsState } from "../flow/formTypes"
 
 const textContent = post =>
   <ReactMarkdown
@@ -17,14 +22,46 @@ const textContent = post =>
     className="text-content"
   />
 
-class ExpandedPostDisplay extends React.Component<*, void> {
+export default class ExpandedPostDisplay extends React.Component<*, void> {
   props: {
     post: Post,
-    toggleUpvote: Post => void
+    toggleUpvote: Post => void,
+    forms: FormsState,
+    beginEditing: (key: string, initialValue: Object, e: ?Event) => void
+  }
+
+  renderTextContent = () => {
+    const { forms, post } = this.props
+
+    return R.has(editPostKey(post), forms)
+      ? <EditPostForm post={post} editing />
+      : textContent(post)
+  }
+
+  postActionButtons = () => {
+    const { toggleUpvote, post, beginEditing } = this.props
+
+    return (
+      <div className="post-actions">
+        <PostVotingButtons
+          post={post}
+          className="expanded"
+          toggleUpvote={toggleUpvote}
+        />
+        {SETTINGS.username === post.author_id && post.text
+          ? <div
+            className="comment-action-button"
+            onClick={beginEditing(editPostKey(post), post)}
+          >
+            <a href="#">edit</a>
+          </div>
+          : null}
+      </div>
+    )
   }
 
   render() {
-    const { post, toggleUpvote } = this.props
+    const { post, forms } = this.props
     const formattedDate = moment(post.created).fromNow()
 
     return (
@@ -39,19 +76,9 @@ class ExpandedPostDisplay extends React.Component<*, void> {
             {formattedDate}
           </div>
         </div>
-        {post.text ? textContent(post) : null}
-        <PostVotingButtons
-          post={post}
-          className="expanded"
-          toggleUpvote={toggleUpvote}
-        />
+        {post.text ? this.renderTextContent() : null}
+        {R.has(editPostKey(post), forms) ? null : this.postActionButtons()}
       </div>
     )
   }
 }
-
-const mapStateToProps = state => ({
-  posts: state.posts
-})
-
-export default connect(mapStateToProps)(ExpandedPostDisplay)

@@ -111,6 +111,8 @@ class PostPage extends React.Component<*, void> {
             <ExpandedPostDisplay
               post={post}
               toggleUpvote={toggleUpvote(dispatch)}
+              forms={forms}
+              beginEditing={beginEditing(dispatch)}
             />
             <ReplyToPostForm
               forms={forms}

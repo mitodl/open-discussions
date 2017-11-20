@@ -24,6 +24,7 @@ type CommentFormProps = {
   formDataLens: (s: string) => Object,
   processing: boolean,
   patchComment: (c: Comment) => void,
+  patchPost: (p: Post) => void,
   comment: Comment
 }
 
@@ -169,11 +170,14 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         cancelReply(dispatch, formKey)()
       })
     }),
-    patchComment: comment => {
-      return dispatch(actions.comments.patch(comment.id, comment)).then(() => {
+    patchComment: comment =>
+      dispatch(actions.comments.patch(comment.id, comment)).then(() => {
         cancelReply(dispatch, formKey)()
-      })
-    },
+      }),
+    patchPost: post =>
+      dispatch(actions.posts.patch(post.id, post)).then(() => {
+        cancelReply(dispatch, formKey)()
+      }),
     formDataLens: formDataLens(formKey)
   }
 }
@@ -247,6 +251,54 @@ export const EditCommentForm = connect(mapStateToProps, mapDispatchToProps)(
       this.setState({ patching: true })
       await patchComment(updatedComment)
       this.setState({ patching: false })
+    }
+
+    render() {
+      const { forms, formKey, onUpdate, cancelReply } = this.props
+      const { patching } = this.state
+      const text = R.pathOr("", [formKey, "value", "text"], forms)
+
+      return commentForm(
+        this.onSubmit,
+        text,
+        onUpdate,
+        cancelReply,
+        true,
+        patching,
+        true
+      )
+    }
+  }
+)
+
+export const EditPostForm = connect(mapStateToProps, mapDispatchToProps)(
+  class EditPostForm extends React.Component<*, *> {
+    constructor(props) {
+      super(props)
+      this.state = {
+        patching: false
+      }
+    }
+
+    props: CommentFormProps
+
+    state: {
+      patching: boolean
+    }
+
+    onSubmit = async e => {
+      const { formKey, forms, patchPost, post } = this.props
+      const { text } = R.prop(formKey, forms).value
+
+      e.preventDefault()
+
+      const updatedPost = { ...post, text: text }
+      this.setState({ patching: true })
+      try {
+        await patchPost(updatedPost)
+      } catch (_) {
+        this.setState({ patching: false })
+      }
     }
 
     render() {

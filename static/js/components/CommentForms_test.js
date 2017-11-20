@@ -10,6 +10,7 @@ import {
   ReplyToCommentForm,
   ReplyToPostForm,
   EditCommentForm,
+  EditPostForm,
   replyToPostKey,
   replyToCommentKey,
   beginEditing,
@@ -44,6 +45,13 @@ describe("CommentForms", () => {
     mount(
       <Provider store={helper.store}>
         <EditCommentForm comment={comment} {...props} />
+      </Provider>
+    )
+
+  const renderEditPostForm = (props = {}) =>
+    mount(
+      <Provider store={helper.store}>
+        <EditPostForm comment={post} {...props} />
       </Provider>
     )
 
@@ -431,6 +439,44 @@ describe("CommentForms", () => {
       assert.equal(R.keys(state.forms).length, 1)
       assert.deepInclude(state.forms[R.keys(state.forms)[0]], {
         value: { text: "comment text" }
+      })
+    })
+
+    it("should cancel and go away", async () => {
+      const mockPreventDefault = helper.sandbox.stub()
+      const state = await helper.listenForActions([forms.FORM_END_EDIT], () => {
+        wrapper.find(".cancel-button").simulate("click", {
+          preventDefault: mockPreventDefault
+        })
+      })
+      assert.deepEqual(state.forms, {})
+      sinon.assert.calledWith(mockPreventDefault)
+    })
+  })
+
+  describe("EditPostForm", () => {
+    let wrapper
+
+    beforeEach(() => {
+      wrapper = renderEditPostForm()
+    })
+
+    it("should have the autofocus prop", () => {
+      assert.isTrue(wrapper.find("textarea").props().autoFocus)
+    })
+
+    it("should trigger an update when text is input", async () => {
+      const state = await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: "new post text"
+          }
+        })
+      })
+      assert.equal(R.keys(state.forms).length, 1)
+      assert.deepInclude(state.forms[R.keys(state.forms)[0]], {
+        value: { text: "new post text" }
       })
     })
 

@@ -106,6 +106,13 @@ export function updateUpvote(postId: string, upvoted: boolean): Promise<Post> {
   })
 }
 
+export function editPost(postId: string, post: Post): Promise<Post> {
+  return fetchWithAuthFailure(`/api/v0/posts/${postId}/`, {
+    method: "PATCH",
+    body:   JSON.stringify(R.dissoc("url", post))
+  })
+}
+
 export function updateComment(
   commentId: string,
   commentPayload: Object
