@@ -13,6 +13,7 @@
 @import "card";
 @import "createPost";
 @import "sidebar";
+@import "channel";
 @import "comment";
 @import "button";
 @import "navigation";
@@ -49,7 +50,14 @@ body {
       }
 
       @include breakpoint(mobile) {
-        display: none;
+        margin: 5px 12px;
+      }
+
+      // left sidebar is always navigation, so hide it in mobile
+      &.sidebar-left {
+        @include breakpoint(mobile) {
+          display: none;
+        }
       }
     }
 
@@ -57,13 +65,30 @@ body {
       margin-top: 20px;
 
       @include breakpoint(desktop) {
-        width: 72%;
-        margin-left: auto;
-        margin-right: auto;
+        margin-left: 40px;
+        margin-right: 40px;
       }
 
       @include breakpoint(mobile) {
         margin: 10px 12px;
+      }
+    }
+
+    // styles for only one sidebar being present
+    &.has-left-sidebar, &.has-right-sidebar {
+      .main-content {
+        @include breakpoint(desktop) {
+          width: 72%;
+        }
+      }
+    }
+
+    // styles for both sidebars being present
+    &.has-left-sidebar.has-right-sidebar {
+      .main-content {
+        @include breakpoint(desktop) {
+          width: 48%;
+        }
       }
     }
   }

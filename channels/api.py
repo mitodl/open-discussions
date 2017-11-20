@@ -43,6 +43,7 @@ ACCESS_TOKEN_HEADER_NAME = 'X-Access-Token'
 CHANNEL_SETTINGS = (
     'header_title',
     'link_type',
+    'description',
     'public_description',
     'submit_link_label',
     'submit_text',

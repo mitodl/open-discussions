@@ -8,23 +8,28 @@ from praw.exceptions import APIException
 from rest_framework import status
 
 from channels.api import Api, CHANNEL_TYPE_PRIVATE, get_or_create_auth_tokens
-from channels.factories import RedditFactories, FactoryStore
+from channels.factories import RedditFactories, FactoryStore, STRATEGY_BUILD
 from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
 
 # pylint: disable=redefined-outer-name, unused-argument, too-many-lines
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    pytest.mark.usefixtures('use_betamax'),
+]
 
 
 @pytest.fixture()
-def reddit_factories(request):
+def reddit_factories(request, cassette_exists):
     """RedditFactories fixture"""
     # use betamax's _casette_name to determine filename
     store = FactoryStore(_casette_name(request, parametrized=True))
     ctx = RedditFactories(store)
-    store.load()
+    if cassette_exists:
+        store.load()
     yield ctx
-    store.write()
+    if not cassette_exists:
+        store.write()
 
 
 @pytest.fixture()
@@ -73,30 +78,34 @@ def test_list_channels(client, use_betamax, praw_settings, jwt_header, private_c
         {
             'title': channel.title,
             'name': channel.name,
+            'description': channel.description,
             'public_description': channel.public_description,
             'channel_type': channel.channel_type,
         }
     ]
 
 
-def test_create_channel(client, use_betamax, praw_settings, staff_jwt_header):
+def test_create_channel(
+        client, use_betamax, praw_settings, staff_user, staff_jwt_header, reddit_factories
+):  # pylint: disable=too-many-arguments
     """
     Create a channel and assert the response
     """
-    client.force_login(UserFactory.create())
     url = reverse('channel-list')
+    channel = reddit_factories.channel("private", user=staff_user, strategy=STRATEGY_BUILD)
     payload = {
-        'channel_type': 'private',
-        'name': 'a_channel',
-        'title': 'Channel title',
-        'public_description': 'public',
+        'channel_type': channel.channel_type,
+        'name': channel.name,
+        'title': channel.title,
+        'description': channel.description,
+        'public_description': channel.public_description,
     }
     resp = client.post(url, data=payload, **staff_jwt_header)
     assert resp.status_code == 201
     assert resp.json() == payload
 
 
-def test_create_channel_already_exists(client, use_betamax, praw_settings, staff_jwt_header):
+def test_create_channel_already_exists(client, use_betamax, praw_settings, staff_jwt_header, private_channel):
     """
     Create a channel which already exists
     """
@@ -104,8 +113,9 @@ def test_create_channel_already_exists(client, use_betamax, praw_settings, staff
     url = reverse('channel-list')
     payload = {
         'channel_type': 'private',
-        'name': 'a_channel',
+        'name': private_channel.name,
         'title': 'Channel title',
+        'description': 'a description of the channel',
         'public_description': 'public',
     }
     resp = client.post(url, data=payload, **staff_jwt_header)
@@ -121,6 +131,7 @@ def test_create_channel_nonstaff(client, praw_settings, jwt_header):
         'channel_type': 'private',
         'name': 'a_channel',
         'title': 'Channel title',
+        'description': 'a description of the channel',
         'public_description': 'public',
     }
     resp = client.post(url, data=payload, **jwt_header)
@@ -136,6 +147,7 @@ def test_create_channel_noauth(client, praw_settings):
         'channel_type': 'private',
         'name': 'a_channel',
         'title': 'Channel title',
+        'description': 'a description of the channel',
         'public_description': 'public',
     }
     resp = client.post(url, data=payload)
@@ -154,6 +166,7 @@ def test_get_channel(client, use_betamax, praw_settings, jwt_header, private_cha
         'channel_type': channel.channel_type,
         'name': channel.name,
         'title': channel.title,
+        'description': channel.description,
         'public_description': channel.public_description,
     }
 
@@ -178,20 +191,21 @@ def test_get_channel_not_found(client, use_betamax, praw_settings):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_patch_channel(client, use_betamax, praw_settings, staff_jwt_header):
+def test_patch_channel(client, use_betamax, praw_settings, private_channel, staff_jwt_header):
     """
     Update a channel's settings
     """
-    url = reverse('channel-detail', kwargs={'channel_name': 'subreddit_for_testing'})
+    url = reverse('channel-detail', kwargs={'channel_name': private_channel.name})
     resp = client.patch(url, {
         'channel_type': 'public',
     }, format='json', **staff_jwt_header)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'channel_type': 'public',
-        'name': 'subreddit_for_testing',
-        'title': 'subreddit for tests',
-        'public_description': 'a public description goes here',
+        'name': private_channel.name,
+        'title': private_channel.title,
+        'description': private_channel.description,
+        'public_description': private_channel.public_description,
     }
 
 
@@ -256,9 +270,9 @@ def test_create_url_post(client, use_betamax, praw_settings, private_channel_and
         'url': 'http://micromasters.mit.edu/🐨',
         'text': None,
         'author_id': user.username,
-        'created': '2017-11-15T16:18:05+00:00',
+        'created': '2017-11-17T18:26:49+00:00',
         'upvoted': True,
-        'id': '2m',
+        'id': 'di',
         'num_comments': 0,
         'score': 1,
         'channel_name': channel.name,
@@ -285,9 +299,9 @@ def test_create_text_post(client, use_betamax, praw_settings, private_channel_an
         'text': 'tests are great',
         'url': None,
         'author_id': user.username,
-        'created': '2017-11-15T16:14:52+00:00',
+        'created': '2017-11-17T18:29:39+00:00',
         'upvoted': True,
-        'id': '2l',
+        'id': 'dj',
         'num_comments': 0,
         'score': 1,
         'channel_name': channel.name,
@@ -608,9 +622,9 @@ def test_create_post_without_upvote(
         'text': 'y',
         'url': None,
         'author_id': user.username,
-        'created': '2017-11-14T17:42:44+00:00',
+        'created': '2017-11-17T19:02:53+00:00',
         'upvoted': False,
-        'id': '18',
+        'id': 'dt',
         'num_comments': 0,
         'score': 1,
         'channel_name': channel.name,

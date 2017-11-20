@@ -27,6 +27,7 @@ class ChannelSerializer(serializers.Serializer):
 
     title = serializers.CharField()
     name = serializers.CharField(source='display_name')
+    description = serializers.CharField(required=False, allow_blank=True)
     public_description = serializers.CharField(required=False, allow_blank=True)
     channel_type = serializers.ChoiceField(
         source="subreddit_type",
@@ -39,6 +40,7 @@ class ChannelSerializer(serializers.Serializer):
             name=validated_data['display_name'],
             title=validated_data['title'],
             channel_type=validated_data['subreddit_type'],
+            description=validated_data['description'],
             public_description=validated_data['public_description'],
         )
 
@@ -50,6 +52,8 @@ class ChannelSerializer(serializers.Serializer):
             kwargs['title'] = validated_data['title']
         if 'subreddit_type' in validated_data:
             kwargs['channel_type'] = validated_data['subreddit_type']
+        if 'description' in validated_data:
+            kwargs['description'] = validated_data['description']
         if 'public_description' in validated_data:
             kwargs['public_description'] = validated_data['public_description']
 

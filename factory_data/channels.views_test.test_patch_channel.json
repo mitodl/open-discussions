@@ -1,7 +1,16 @@
 {
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Dolor beatae qui quo quasi beatae perspiciatis totam neque. Sed sint occaecati ratione incidunt dolorem commodi. Dolor facere perspiciatis nostrum laboriosam quo amet autem voluptas. Error in doloremque eum temporibus.\nQuibusdam repudiandae delectus aliquid maiores deleniti tempora. Rerum harum eligendi deleniti facilis aperiam molestias ducimus odio. Consequatur minima dolorem itaque quisquam impedit aliquid.",
+      "name": "1510943149_ab",
+      "public_description": "Repudiandae aut beatae reiciendis quos odio doloremque. Voluptate incidunt amet iure.",
+      "title": "Amet impedit ipsum eligendi reprehenderit."
+    }
+  },
   "users": {
     "staff_user": {
-      "username": "01BYXNKSYHPZR0AXZDP3W237JT"
+      "username": "01BZ5KNKDFGTE4HSFYP4GNYP25"
     }
   }
 }

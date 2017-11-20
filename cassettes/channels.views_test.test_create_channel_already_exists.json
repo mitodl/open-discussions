@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2017-11-06T15:35:52",
+      "recorded_at": "2017-11-17T17:33:22",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -22,11 +22,11 @@
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=admin"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01BZ5GNHMW019A88YHHYRRWJP1"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDK0MNd19c0qcjXODg0w9HDyN8ipcilLdi+KN3RJCQxU0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLZFmIelhbslhhaE++WVZHu5J6d5lYaWZjk7B0eC9KSklmUmp8ZnpoAMhnCUagHtVU1nuAAAAA==",
+          "base64_string": "H4sIAAAAAAAAA1WN0QqCMBiFX0V2GQVG4EZ33aWtEjEqb4Zu/2oIKftNXNG75/Kqy/NxvnPepJQSEEXX1PAg64BEjC3yRB9cV/CrpDpWjDuKQ3p7bfNLTeYBgaE1FlAYL6yiMBzZzxeda8GPVFBasL6LspnQzCcLehTv/29Hu8wYnquUC6T9M92r4sR3mY7pxjsKeiNBGOWHp0A+X8RJGIK4AAAA",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 06 Nov 2017 15:35:53 GMT"
+            "Fri, 17 Nov 2017 17:33:22 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=PXrRkXBU3o3Viz60HB; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 06-Nov-2019 15:35:53 GMT",
-            "loidcreated=2017-11-06T15%3A35%3A53.731Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 06-Nov-2019 15:35:53 GMT"
+            "loid=PZgIuTlEonTq6nA8QS; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 17-Nov-2019 17:33:22 GMT",
+            "loidcreated=2017-11-17T17%3A33%3A22.004Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 17-Nov-2019 17:33:22 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -66,15 +66,15 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=admin"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01BZ5GNHMW019A88YHHYRRWJP1"
       }
     },
     {
-      "recorded_at": "2017-11-06T15:35:52",
+      "recorded_at": "2017-11-17T17:33:22",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "api_type=json&link_type=any&name=a_channel&public_description=public&title=Channel+title&type=private&wikimode=disabled"
+          "string": "api_type=json&description=Distinctio+ipsa+iusto+temporibus+facilis+aliquid+eaque+asperiores.+Hic+dolor+harum+consequuntur+enim.+Aut+dolores+suscipit+voluptate+deserunt+eos+iste.+Molestiae+quam+hic+fugiat+incidunt+itaque+a.%0AEveniet+beatae+laboriosam+magnam+dolores.+Itaque+laudantium+facilis+nemo+quaerat+minima.+Odit+vitae+ea+alias+quia+dolor+similique.+Totam+iure+nemo+ad+corrupti+totam+iste.+Molestiae+commodi+quos+magni+quis+officia+at+a+beatae.&link_type=any&name=1510940002_nam&public_description=Deleniti+laborum+necessitatibus+iure+id+quis.+Ipsa+temporibus+tempora+consequatur+officia+esse+qui.&title=Perspiciatis+nisi+error+repellendus.&type=private&wikimode=disabled"
         },
         "headers": {
           "Accept": [
@@ -84,22 +84,114 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 187-EMjrE3kUP1HBO0lzDvcGr_1DdQQ"
+            "bearer 688-TJfNytZLYc7fId8Ly7sxPgzHTXk"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "119"
+            "677"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=PXrRkXBU3o3Viz60HB; loidcreated=2017-11-06T15%3A35%3A53.731Z"
+            "loid=PZgIuTlEonTq6nA8QS; loidcreated=2017-11-17T17%3A33%3A22.004Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.3.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 17 Nov 2017 17:33:22 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "398"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2017-11-17T17:33:22",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&description=a+description+of+the+channel&link_type=any&name=1510940002_nam&public_description=public&title=Channel+title&type=private&wikimode=disabled"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 688-TJfNytZLYc7fId8Ly7sxPgzHTXk"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "165"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=PZgIuTlEonTq6nA8QS; loidcreated=2017-11-17T17%3A33%3A22.004Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -121,7 +213,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 06 Nov 2017 15:35:53 GMT"
+            "Fri, 17 Nov 2017 17:33:22 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -139,13 +231,13 @@
             "SAMEORIGIN"
           ],
           "x-ratelimit-remaining": [
-            "299.0"
+            "298.0"
           ],
           "x-ratelimit-reset": [
-            "247"
+            "398"
           ],
           "x-ratelimit-used": [
-            "1"
+            "2"
           ],
           "x-ua-compatible": [
             "IE=edge"

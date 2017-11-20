@@ -2,24 +2,25 @@
   "channels": {
     "private_channel": {
       "channel_type": "private",
-      "name": "1510686066_qui",
-      "public_description": "Dicta facilis omnis laudantium illum. Nisi ab officiis voluptatem eaque ipsum eum aliquid.",
-      "title": "Excepturi error iste omnis eos exercitationem."
+      "description": "Dolore hic nemo aspernatur eos dolorem sequi animi. Provident repellendus vitae nobis exercitationem id iusto. Sed nobis autem corrupti pariatur. Architecto eius dolorem nam.\nPariatur a non repellat nostrum. Recusandae eveniet facere saepe maxime cumque corporis soluta ad. Nisi explicabo odit totam blanditiis nam expedita.\nNostrum reiciendis doloremque quos cumque harum nesciunt vitae. Labore quae eum ab cupiditate neque. Quam eligendi ut mollitia sed neque eum autem.",
+      "name": "1510945328_id",
+      "public_description": "Veritatis commodi voluptatem tempora molestiae nisi. Quibusdam facere dignissimos cum at cumque.",
+      "title": "At quam unde eos exercitationem dolore quibusdam."
     }
   },
   "posts": {
     "just a post": {
-      "id": "1b",
-      "text": "Minus nobis dolorem quaerat est. Vitae a repellendus voluptas.",
-      "title": "Ea at esse rerum maxime eum a."
+      "id": "ds",
+      "text": "Est reiciendis omnis ipsa possimus repudiandae quas. Blanditiis cupiditate deserunt similique.",
+      "title": "Magnam id laborum autem ex debitis dignissimos."
     }
   },
   "users": {
     "contributor": {
-      "username": "01BYXYG1YTX839YCHQTZJ14H1Q"
+      "username": "01BZ5NR322SG4BBAQ8B8BCG7F8"
     },
     "staff_user": {
-      "username": "01BYXYG1EK02S71XAN3WTBE2X5"
+      "username": "01BZ5NR2KKTX66CD7ZCZZWGR0N"
     }
   }
 }

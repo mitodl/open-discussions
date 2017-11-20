@@ -1,0 +1,21 @@
+.channel-about {
+  position: relative;
+
+  @include breakpoint(desktop) {
+    margin-top: 52px; // margin to align with top of main-content card on desktop
+  }
+
+  .title {
+    margin-left: 0;
+  }
+
+  .description {
+    font-size: 14px;
+  }
+
+  .edit-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+  }
+}

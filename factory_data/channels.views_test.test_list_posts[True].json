@@ -2,29 +2,30 @@
   "channels": {
     "private_channel": {
       "channel_type": "private",
-      "name": "1510763122_veniam",
-      "public_description": "Deserunt fuga quos porro officia eos. Aut velit dolores explicabo quod ducimus cumque aliquid.",
-      "title": "Suscipit veniam ex sequi perferendis doloremque."
+      "description": "Quis nihil soluta ad incidunt porro reiciendis repudiandae. Dicta recusandae aut ea quo velit ipsa. Molestias iste nihil quae voluptatum magni.\nPraesentium at aperiam tenetur magnam reiciendis vero nesciunt. Mollitia aperiam dignissimos quam et est provident. Quisquam ad harum ullam voluptate.",
+      "name": "1510945086_debitis",
+      "public_description": "Nobis veritatis impedit ea nemo ducimus non. Exercitationem quaerat neque amet autem.",
+      "title": "Distinctio at numquam odit."
     }
   },
   "posts": {
     "my 2nd post": {
-      "id": "2o",
-      "text": "Sed ut quis et minima. Ducimus quasi tempora ea quod. Quam excepturi error delectus sint.",
-      "title": "Doloremque nemo dolore veniam ullam."
+      "id": "dn",
+      "text": "Error possimus sequi minus nostrum. Similique vel saepe dolore dolorem rerum.",
+      "title": "Rem quam beatae fuga facere."
     },
     "my post": {
-      "id": "2n",
-      "text": "Voluptatum vero impedit reprehenderit consectetur. Expedita ut qui reprehenderit quis.",
-      "title": "Debitis in quam quibusdam."
+      "id": "dm",
+      "text": "Adipisci in deserunt veniam consectetur earum minus dolorum. Neque nobis id quo est.",
+      "title": "Earum minus quas cupiditate libero."
     }
   },
   "users": {
     "contributor": {
-      "username": "01BZ07ZM4E3EWSZS6CY98GY22P"
+      "username": "01BZ5NGQ4K7BDAFAWSMCHD4GBE"
     },
     "staff_user": {
-      "username": "01BZ07ZKKHNH7ED69PYZQ2E4WT"
+      "username": "01BZ5NGPPF0EPPR2YA9MHKVSDW"
     }
   }
 }

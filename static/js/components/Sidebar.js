@@ -4,11 +4,12 @@ import React from "react"
 import type { ChildrenArray } from "react"
 
 type SidebarProps = {
-  children: ChildrenArray<any>
+  children: ChildrenArray<any>,
+  className: string
 }
 
-const Sidebar = ({ children }: SidebarProps) =>
-  <div className="sidebar">
+const Sidebar = ({ children, className }: SidebarProps) =>
+  <div className={`sidebar ${className}`}>
     {children}
   </div>
 

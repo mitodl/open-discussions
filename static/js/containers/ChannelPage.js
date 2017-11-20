@@ -10,7 +10,7 @@ import PostList from "../components/PostList"
 import withLoading from "../components/Loading"
 import PostListNavigation from "../components/PostListNavigation"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
-import withNavSidebar from "../hoc/withNavSidebar"
+import withNavAndChannelSidebars from "../hoc/withNavAndChannelSidebars"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
@@ -125,6 +125,8 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default R.compose(connect(mapStateToProps), withNavSidebar, withLoading)(
-  ChannelPage
-)
+export default R.compose(
+  connect(mapStateToProps),
+  withNavAndChannelSidebars,
+  withLoading
+)(ChannelPage)

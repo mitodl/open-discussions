@@ -2,24 +2,25 @@
   "channels": {
     "private_channel": {
       "channel_type": "private",
-      "name": "1510686431_asperiores",
-      "public_description": "Cum excepturi veritatis eaque deleniti in odio laborum architecto. Labore repellat velit totam sit.",
-      "title": "Iure iure sint ex veniam possimus dolore."
+      "description": "Ratione voluptatum veniam ut. Minima laboriosam ratione voluptate vero a. Deleniti eos sequi nesciunt beatae ullam.\nInventore corporis commodi enim fugit delectus. Odit tenetur quis est saepe unde dolor. Alias ratione excepturi dignissimos facilis repudiandae eveniet. Molestias officia est illum minima.\nDolorum provident nulla quidem. Similique nulla alias suscipit veritatis. Dolores doloribus sapiente atque quaerat et eius labore.",
+      "name": "1510945290_quisquam",
+      "public_description": "Magni cum cum laboriosam sint hic. Consequuntur soluta animi similique accusantium iusto enim.",
+      "title": "Maxime molestiae similique rerum est."
     }
   },
   "posts": {
     "just a post": {
-      "id": "1d",
-      "text": "Doloremque a ipsa eveniet rem ipsam qui. A veritatis cumque quidem saepe.",
-      "title": "Ipsum totam autem dolores necessitatibus quia."
+      "id": "dr",
+      "text": "Quod sunt veniam explicabo consectetur aliquam neque distinctio. Maiores omnis eos neque odio.",
+      "title": "Cumque delectus modi est consequuntur."
     }
   },
   "users": {
     "contributor": {
-      "username": "01BYXYV6F3CANNT4FMM3EAJT0Z"
+      "username": "01BZ5NPYQSRV8P3GFW09SJMA3D"
     },
     "staff_user": {
-      "username": "01BYXYV5ZA3GBD8Z3M19ZC403D"
+      "username": "01BZ5NPY8XHF9AGA9CCE4GKMBS"
     }
   }
 }

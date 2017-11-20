@@ -32,6 +32,7 @@ def test_serialize_channel(user):
         display_name='name',
         title='title',
         subreddit_type='public',
+        description='description',
         public_description='public_description',
     )
     request = Mock(user=user)
@@ -41,6 +42,7 @@ def test_serialize_channel(user):
         'name': 'name',
         'title': 'title',
         'channel_type': 'public',
+        'description': 'description',
         'public_description': 'public_description',
     }
 
@@ -53,6 +55,7 @@ def test_create_channel(user):
         'display_name': 'name',
         'title': 'title',
         'subreddit_type': 'public',
+        'description': 'description',
         'public_description': 'public_description',
     }
     request = Mock(user=user)
@@ -64,6 +67,7 @@ def test_create_channel(user):
         name=validated_data['display_name'],
         title=validated_data['title'],
         channel_type=validated_data['subreddit_type'],
+        description=validated_data['description'],
         public_description=validated_data['public_description'],
     )
     assert channel == api.return_value.create_channel.return_value
@@ -78,6 +82,7 @@ def test_update_channel(user, is_empty):
     validated_data = {} if is_empty else {
         'title': 'title',
         'subreddit_type': 'public',
+        'description': 'description',
         'public_description': 'public_description',
     }
     display_name = 'subreddit'
@@ -91,6 +96,7 @@ def test_update_channel(user, is_empty):
     kwargs = {} if is_empty else {
         "title": validated_data['title'],
         "channel_type": validated_data['subreddit_type'],
+        "description": validated_data['description'],
         "public_description": validated_data['public_description'],
     }
     api.return_value.update_channel.assert_called_once_with(

@@ -1,7 +1,16 @@
 {
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Distinctio ipsa iusto temporibus facilis aliquid eaque asperiores. Hic dolor harum consequuntur enim. Aut dolores suscipit voluptate deserunt eos iste. Molestiae quam hic fugiat incidunt itaque a.\nEveniet beatae laboriosam magnam dolores. Itaque laudantium facilis nemo quaerat minima. Odit vitae ea alias quia dolor similique. Totam iure nemo ad corrupti totam iste. Molestiae commodi quos magni quis officia at a beatae.",
+      "name": "1510940002_nam",
+      "public_description": "Deleniti laborum necessitatibus iure id quis. Ipsa temporibus tempora consequatur officia esse qui.",
+      "title": "Perspiciatis nisi error repellendus."
+    }
+  },
   "users": {
     "staff_user": {
-      "username": "01BYXNKSS5RB5PRAZE81PKMH56"
+      "username": "01BZ5GNHMW019A88YHHYRRWJP1"
     }
   }
 }
