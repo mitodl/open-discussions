@@ -40,7 +40,7 @@ class ChannelSerializer(serializers.Serializer):
             name=validated_data['display_name'],
             title=validated_data['title'],
             channel_type=validated_data['subreddit_type'],
-            description=validated_data['description'],
+            description=validated_data.get('description', ''),
             public_description=validated_data['public_description'],
         )
 
