@@ -65,8 +65,8 @@ body {
       margin-top: 20px;
 
       @include breakpoint(desktop) {
-        margin-left: 40px;
-        margin-right: 40px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       @include breakpoint(mobile) {
@@ -78,6 +78,8 @@ body {
     &.has-left-sidebar, &.has-right-sidebar {
       .main-content {
         @include breakpoint(desktop) {
+          margin-left: 40px;
+          margin-right: 40px;
           width: 72%;
         }
       }
