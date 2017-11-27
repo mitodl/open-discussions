@@ -136,7 +136,7 @@ export default class CreatePostForm extends React.Component<*, void> {
               <span>
                 Please be mindful of{" "}
                 <Link to={CONTENT_POLICY_URL}>
-                  MIT Discussion content policy
+                  MicroMasters Discussions Community Guidelines
                 </Link>{" "}
                 and practice good online etiquette.
               </span>

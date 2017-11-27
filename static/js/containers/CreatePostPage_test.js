@@ -60,7 +60,8 @@ describe("CreatePostPage", () => {
           actions.forms.FORM_BEGIN_EDIT,
           actions.channels.get.requestType,
           actions.channels.get.successType,
-          actions.subscribedChannels.get.requestType
+          actions.subscribedChannels.get.requestType,
+          actions.subscribedChannels.get.successType
         ]
     )
   }
