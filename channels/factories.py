@@ -1,6 +1,8 @@
 """Factories for making test data"""
+import copy
 import json
 import os
+import time
 from datetime import datetime
 
 import pytz
@@ -12,7 +14,12 @@ from factory.fuzzy import FuzzyChoice
 
 from open_discussions.factories import UserFactory
 from open_discussions.utils import now_in_utc
-from channels.api import Api, CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_PRIVATE
+from channels.api import (
+    Api,
+    CHANNEL_TYPE_PUBLIC,
+    CHANNEL_TYPE_PRIVATE,
+    get_or_create_auth_tokens,
+)
 from channels.models import RedditAccessToken, RedditRefreshToken
 
 FAKE = faker.Factory.create()
@@ -106,6 +113,35 @@ def serialize_factory_result(obj):
     raise Exception("Unable to serialize: {}".format(obj))
 
 
+def transform_to_factory_kwargs(data, original_kwargs=None, prefix=''):
+    """
+    Transforms factory data into the correct kwargs to pass to the factory
+
+    Args:
+        data (dict): dictionary of data from the factory_data file
+        original_kwargs (dict): kwargs passed into the factory function from code
+        prefix (str): argument prefix string
+
+    Returns:
+        dict: the generate kwargs to call the factory with
+    """
+    kwargs = {key: value for key, value in original_kwargs.items() if key not in data.keys()}
+
+    for key, value in data.items():
+        prefixed_key = '{}__{}'.format(prefix, key) if prefix else key
+
+        if original_kwargs is not None and prefixed_key in original_kwargs:
+            kwargs[prefixed_key] = original_kwargs[prefixed_key]
+        elif isinstance(value, dict):
+            kwargs.update(transform_to_factory_kwargs(value, prefix=prefixed_key))
+        elif isinstance(value, list):
+            kwargs[prefixed_key] = [transform_to_factory_kwargs(item, prefix=prefixed_key) for item in value]
+        else:
+            kwargs[prefixed_key] = value
+
+    return kwargs
+
+
 class FactoryStore:
     """
     Handles storage of factory data to/from disk
@@ -189,15 +225,17 @@ class FactoryStore:
         Returns:
             object: the created object
         """
+        ident = str(ident)
         instances = self.get_instances(factory_type)
         if ident not in instances:
             result = self.build_or_create(factory_cls, strategy, kwargs)
             instances[ident] = serialize_factory_result(result)
             self._dirty = True
+            time.sleep(3)  # arbitrary sleep to let reddit async computations catch up
             return result
         else:
-            kwargs.update(instances[ident])
-            return self.build_or_create(factory_cls, strategy, kwargs)
+            factory_kwargs = transform_to_factory_kwargs(copy.deepcopy(instances[ident]), original_kwargs=kwargs)
+            return self.build_or_create(factory_cls, strategy, factory_kwargs)
 
 
 class RedditFactories:
@@ -218,13 +256,15 @@ class RedditFactories:
         Returns:
             User: the created user
         """
-        return self.store.get_or_make(
+        user = self.store.get_or_make(
             UserFactory,
             "users",
             ident,
             strategy=strategy,
             **kwargs
         )
+        get_or_create_auth_tokens(user)
+        return user
 
     def channel(self, ident, user, strategy=STRATEGY_CREATE, **kwargs):
         """
@@ -377,14 +417,7 @@ class PostFactory(factory.Factory):
     id = None
     created = None
     title = factory.Faker('text', max_nb_chars=50)
-
-    @factory.lazy_attribute
-    def channel(self):
-        """Lazily create a channel"""
-        if not self.api:
-            raise ValueError("PostFactory requires an api instance")
-
-        return ChannelFactory.create(api=self.api)
+    channel = factory.SubFactory(ChannelFactory, api=factory.SelfAttribute('..api'))
 
     class Meta:
         abstract = True
@@ -430,10 +463,11 @@ class LinkPostFactory(PostFactory):
 
 class CommentFactory(factory.Factory):
     """Factory for comments"""
+    id = None
     api = None
     comment_id = None
-    text = factory.Faker('text', max_nb_chars=100)
     children = factory.LazyFunction(lambda: [])
+    text = factory.Faker('text', max_nb_chars=100)
 
     @factory.lazy_attribute
     def post_id(self):
@@ -443,21 +477,26 @@ class CommentFactory(factory.Factory):
 
         return TextPostFactory.create(api=self.api).id
 
-    @factory.lazy_attribute
-    def id(self):
+    @factory.post_generation
+    def create_in_reddit(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Lazily create the comment"""
         if not self.api:
             raise ValueError("CommentFactory requires an api instance")
 
-        return self.api.create_comment(
+        self.id = self.api.create_comment(
             self.text,
             post_id=self.post_id if not self.comment_id else None,  # only use post_id if top-level comment
             comment_id=self.comment_id
         ).id
 
     @factory.post_generation
-    def comment_tree(self, *args, **kwargs):  # pylint: disable=unused-argument
+    def _children(self, create, extracted, **kwargs):  # pylint: disable=unused-argument
         """Create nested comments"""
+        if extracted:
+            for child in self.children:
+                self.children.append(CommentFactory.create(**child))
+            return
+
         # NOTE: we need to do this in post_generation because we need to parent comment to be created first
         max_children = kwargs.get('max', 3)
 
@@ -469,15 +508,13 @@ class CommentFactory(factory.Factory):
         else:
             count = factory.fuzzy.random.randrange(1, max_children + 1, 1)
 
-        for _ in range(count):
-            self.children.append(
-                CommentFactory.create(
-                    api=self.api,
-                    post_id=self.post_id,
-                    comment_id=self.id,
-                    comment_tree__max=count - 1,
-                )
-            )
+        self.children = CommentFactory.create_batch(
+            count,
+            api=self.api,
+            post_id=self.post_id,
+            comment_id=self.id,
+            comment_tree__max=count - 1,
+        )
 
     class Meta:
         model = Comment

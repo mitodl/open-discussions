@@ -121,6 +121,7 @@ class PostSerializer(serializers.Serializer):
     text = WriteableSerializerMethodField(allow_null=True)
     title = serializers.CharField()
     upvoted = WriteableSerializerMethodField()
+    removed = WriteableSerializerMethodField()
     score = serializers.IntegerField(source='ups', read_only=True)
     author_id = serializers.CharField(read_only=True, source='author')
     id = serializers.CharField(read_only=True)
@@ -188,6 +189,14 @@ class PostSerializer(serializers.Serializer):
         """Validate that upvoted is a bool"""
         return {'upvoted': _parse_bool(value, 'upvoted')}
 
+    def get_removed(self, instance):
+        """Returns True if the post was removed"""
+        return instance.banned_by is not None
+
+    def validate_removed(self, value):
+        """Validate that removed is a bool"""
+        return {'removed': _parse_bool(value, 'removed')}
+
     def validate_text(self, value):
         """Validate that text is a string or null"""
         if value is not None and not isinstance(value, str):
@@ -237,6 +246,14 @@ class PostSerializer(serializers.Serializer):
             raise ValidationError("Cannot edit url for a post")
 
         api = Api(user=self.context['request'].user)
+
+        if "removed" in validated_data:
+            removed = validated_data["removed"]
+            if removed is True:
+                api.remove_post(post_id)
+            elif removed is False:
+                api.approve_post(post_id)
+
         if "text" in validated_data:
             instance = api.update_post(post_id=post_id, text=validated_data['text'])
 

@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.22.1
+--------------
+
+- Updated posts API to handle remove moderation
+- Default to empty description for new channel if not provided (#349)
+- Fixed regression in CSS for new post page (#346)
+
 Version 0.4.0
 -------------
 

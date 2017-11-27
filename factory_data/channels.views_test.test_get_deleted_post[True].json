@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Illo ut molestiae earum fugiat sint eos. Tempore labore molestiae dolores sit odit fugiat. Blanditiis maxime ratione illo minus. Libero corrupti iusto quas sit.\nOmnis ratione nulla id porro aperiam. Ullam inventore voluptatem quisquam nisi. Alias expedita quidem odit consectetur hic voluptatem voluptatum dolorem. Minima soluta rerum nesciunt soluta provident.",
+      "name": "1511373363_dolorem",
+      "public_description": "Non quia ut repudiandae est nihil debitis. Quasi quos sed quaerat pariatur vitae assumenda.",
+      "title": "Officiis quos neque autem aspernatur expedita."
+    }
+  },
+  "posts": {
+    "deleted": {
+      "id": "e8",
+      "text": "Esse unde et voluptatum voluptate quae. Esse dicta blanditiis minima optio commodi.",
+      "title": "Repellendus expedita id sint nihil qui quisquam."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZJDYSRFCPCK70K5G4BPJCF2"
+    },
+    "staff_user": {
+      "username": "01BZJDYJYQ4X5GKXV740RH1REA"
+    }
+  }
+}

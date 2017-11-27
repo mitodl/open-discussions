@@ -1,0 +1,96 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Dolorum architecto nihil ipsa autem voluptas incidunt. Pariatur quis beatae aliquam in ipsa adipisci blanditiis quae. Qui amet sed qui ipsam pariatur natus.\nOdit laborum molestiae non. Nesciunt voluptate officia officia soluta provident. Dolor dolore optio ipsa assumenda praesentium totam.",
+      "name": "1511378476_iste",
+      "public_description": "Laboriosam quia iure eius pariatur quis. Illum est quos tempora. Tempora quia ut nemo.",
+      "title": "Consectetur vero inventore ad eveniet."
+    }
+  },
+  "posts": {
+    "0": {
+      "id": "fr",
+      "text": "Soluta quo odio voluptatum voluptates laborum. Inventore repudiandae doloribus natus excepturi cum.",
+      "title": "Possimus nulla earum aut ab."
+    },
+    "1": {
+      "id": "fs",
+      "text": "Ex cupiditate fugit facilis. Magnam eligendi totam dicta ipsum laboriosam temporibus expedita.",
+      "title": "Debitis impedit beatae omnis consequuntur."
+    },
+    "10": {
+      "id": "g1",
+      "text": "Unde quae tenetur minus totam doloremque. Tempora dolorum exercitationem earum at.",
+      "title": "Iusto fugiat facilis quia."
+    },
+    "11": {
+      "id": "g2",
+      "text": "Quia earum doloribus sequi qui. Architecto fugiat blanditiis mollitia dolores.",
+      "title": "Itaque doloremque dolorum atque doloremque."
+    },
+    "12": {
+      "id": "g3",
+      "text": "Molestiae exercitationem placeat delectus aut. Atque repudiandae saepe nam quas nisi nulla minus.",
+      "title": "Sit assumenda sed eaque doloribus tempora."
+    },
+    "13": {
+      "id": "g4",
+      "text": "Ipsa corrupti earum ad corporis. Possimus quaerat distinctio esse facere.",
+      "title": "Quibusdam nemo distinctio nisi nobis magnam."
+    },
+    "14": {
+      "id": "g5",
+      "text": "Iste iste esse perferendis placeat assumenda. Officiis recusandae dolor culpa vitae quibusdam.",
+      "title": "Non facilis quo nihil id."
+    },
+    "2": {
+      "id": "ft",
+      "text": "Perferendis esse voluptas perferendis adipisci. Enim corporis repudiandae earum dignissimos.",
+      "title": "Voluptatem eum rerum eum cupiditate."
+    },
+    "3": {
+      "id": "fu",
+      "text": "Ipsam rerum aspernatur consectetur doloremque neque ipsam. Unde nobis beatae tempora incidunt iure.",
+      "title": "Ipsum fugiat facere nostrum blanditiis."
+    },
+    "4": {
+      "id": "fv",
+      "text": "Atque voluptatum exercitationem illum. Dolor sit inventore optio odio quis laboriosam perferendis.",
+      "title": "Dolores quaerat qui maxime voluptate aut."
+    },
+    "5": {
+      "id": "fw",
+      "text": "Facere praesentium at quam maxime. Ad perspiciatis dicta nisi doloribus veritatis pariatur.",
+      "title": "Nisi laudantium asperiores vero nisi."
+    },
+    "6": {
+      "id": "fx",
+      "text": "Perferendis fuga illo id at perferendis qui. Itaque possimus in distinctio doloribus.",
+      "title": "Vel nisi fuga at excepturi ipsa earum."
+    },
+    "7": {
+      "id": "fy",
+      "text": "Natus expedita quaerat labore natus. Veniam non error culpa aut. Modi quod ex nam qui magni.",
+      "title": "Odit soluta dolorum delectus tempore."
+    },
+    "8": {
+      "id": "fz",
+      "text": "Nostrum nemo facilis maxime animi vero. Distinctio pariatur natus praesentium iusto quam vel.",
+      "title": "Illo quibusdam illum odio."
+    },
+    "9": {
+      "id": "g0",
+      "text": "Distinctio tenetur vitae minima doloribus. Qui praesentium alias placeat nesciunt.",
+      "title": "Tempora alias recusandae maiores."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01BZJJTTHM54A8B3R2N44Z622M"
+    },
+    "staff_user": {
+      "username": "01BZJJTKZQKP8GFZEDKB6HM924"
+    }
+  }
+}
