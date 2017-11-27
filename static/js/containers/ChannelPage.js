@@ -69,6 +69,7 @@ class ChannelPage extends React.Component<*, void> {
       dispatch(clearChannelError())
     }
     dispatch(actions.channels.get(channelName))
+    dispatch(actions.channelModerators.get(channelName))
     dispatch(
       actions.postsForChannel.get(channelName, qs.parse(search))
     ).then(({ response }) => {

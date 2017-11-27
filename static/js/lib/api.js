@@ -11,6 +11,7 @@ import { getPaginationParams } from "../lib/posts"
 
 import type {
   Channel,
+  ChannelModerators,
   Comment,
   CreatePostPayload,
   PostListPaginationParams,
@@ -34,6 +35,12 @@ export function getChannel(channelName: string): Promise<Channel> {
 
 export function getChannels(): Promise<Array<Channel>> {
   return fetchWithAuthFailure("/api/v0/channels/")
+}
+
+export function getChannelModerators(
+  channelName: string
+): Promise<ChannelModerators> {
+  return fetchWithAuthFailure(`/api/v0/channels/${channelName}/moderators/`)
 }
 
 export function createChannel(channel: Channel): Promise<Channel> {

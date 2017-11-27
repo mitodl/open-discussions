@@ -7,21 +7,29 @@ import CommentTree from "../components/CommentTree"
 
 import { makePost } from "../factories/posts"
 import { makeCommentTree } from "../factories/comments"
-import { makeChannel } from "../factories/channels"
+import { makeChannel, makeModerators } from "../factories/channels"
 import { actions } from "../actions"
+import { FORM_BEGIN_EDIT } from "../actions/forms"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
 import { postDetailURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
 
 describe("PostPage", function() {
-  let helper, renderComponent, listenForActions, post, comments, channel
+  let helper,
+    renderComponent,
+    listenForActions,
+    post,
+    comments,
+    channel,
+    moderators
   this.timeout(5000)
 
   beforeEach(() => {
     post = makePost()
     comments = makeCommentTree(post, 3)
     channel = makeChannel()
+    moderators = makeModerators()
 
     helper = new IntegrationTestHelper()
     helper.getPostStub.returns(Promise.resolve(post))
@@ -33,6 +41,7 @@ describe("PostPage", function() {
         data:   comments
       })
     )
+    helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
   })
@@ -50,7 +59,10 @@ describe("PostPage", function() {
       actions.subscribedChannels.get.requestType,
       actions.subscribedChannels.get.successType,
       actions.channels.get.requestType,
-      actions.channels.get.successType
+      actions.channels.get.successType,
+      actions.channelModerators.get.requestType,
+      actions.channelModerators.get.successType,
+      FORM_BEGIN_EDIT
     ])
 
   it("should set the document title", async () => {

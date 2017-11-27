@@ -19,3 +19,12 @@ export const makeChannel = (privateChannel: boolean = false) => ({
 export const makeChannelList = (numChannels: number = 20) => {
   return R.range(0, numChannels).map(() => makeChannel(Math.random() > 0.5))
 }
+
+export const makeModerators = (username: ?string = null) =>
+  username
+    ? [
+      {
+        moderator_name: username
+      }
+    ]
+    : []

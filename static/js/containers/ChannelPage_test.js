@@ -5,7 +5,11 @@ import sinon from "sinon"
 import PostList from "../components/PostList"
 import SubscriptionsList from "../components/SubscriptionsList"
 
-import { makeChannel, makeChannelList } from "../factories/channels"
+import {
+  makeChannel,
+  makeChannelList,
+  makeModerators
+} from "../factories/channels"
 import { makeChannelPostList } from "../factories/posts"
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
@@ -21,16 +25,19 @@ describe("ChannelPage", () => {
     channels,
     currentChannel,
     otherChannel,
-    postList
+    postList,
+    moderators
 
   beforeEach(() => {
     channels = makeChannelList(10)
     currentChannel = channels[3]
     otherChannel = channels[4]
+    moderators = makeModerators()
     postList = makeChannelPostList()
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(currentChannel))
     helper.getChannelsStub.returns(Promise.resolve(channels))
+    helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
     helper.getPostsForChannelStub.returns(Promise.resolve({ posts: postList }))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
@@ -48,6 +55,8 @@ describe("ChannelPage", () => {
       actions.postsForChannel.get.successType,
       actions.subscribedChannels.get.requestType,
       actions.subscribedChannels.get.successType,
+      actions.channelModerators.get.requestType,
+      actions.channelModerators.get.successType,
       SET_POST_DATA,
       SET_CHANNEL_DATA
     ])
@@ -86,7 +95,9 @@ describe("ChannelPage", () => {
         actions.channels.get.requestType,
         actions.channels.get.successType,
         actions.postsForChannel.get.requestType,
-        actions.postsForChannel.get.successType
+        actions.postsForChannel.get.successType,
+        actions.channelModerators.get.requestType,
+        actions.channelModerators.get.successType
       ],
       () => {
         helper.browserHistory.push(channelURL(otherChannel.name))
@@ -108,6 +119,8 @@ describe("ChannelPage", () => {
       actions.postsForChannel.get.successType,
       actions.subscribedChannels.get.requestType,
       actions.subscribedChannels.get.successType,
+      actions.channelModerators.get.requestType,
+      actions.channelModerators.get.successType,
       SET_POST_DATA,
       SET_CHANNEL_DATA,
       CLEAR_CHANNEL_ERROR

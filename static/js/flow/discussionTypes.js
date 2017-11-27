@@ -97,3 +97,9 @@ export type CommentForm = {
   comment_id?:  string,
   text:         string,
 }
+
+export type Moderator = {
+  moderator_name: string,
+}
+
+export type ChannelModerators = Array<Moderator>

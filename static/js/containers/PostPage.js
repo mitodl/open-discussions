@@ -24,13 +24,19 @@ import { formatTitle } from "../lib/title"
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
 import type { FormsState } from "../flow/formTypes"
-import type { Channel, Comment, Post } from "../flow/discussionTypes"
+import type {
+  Channel,
+  ChannelModerators,
+  Comment,
+  Post
+} from "../flow/discussionTypes"
 
 type PostPageProps = {
   match: Match,
   dispatch: Dispatch,
   post: Post,
   channel: Channel,
+  moderators: ChannelModerators,
   commentsTree: Array<Comment>,
   forms: FormsState,
   commentInFlight: boolean,
@@ -67,7 +73,7 @@ class PostPage extends React.Component<*, void> {
   }
 
   loadData = () => {
-    const { dispatch, channelName, postID, channel } = this.props
+    const { dispatch, channelName, postID, channel, moderators } = this.props
     if (!postID || !channelName) {
       // should not happen, this should be guaranteed by react-router
       throw Error("Match error")
@@ -76,7 +82,8 @@ class PostPage extends React.Component<*, void> {
     Promise.all([
       dispatch(actions.posts.get(postID)),
       dispatch(actions.comments.get(postID)),
-      channel || dispatch(actions.channels.get(channelName))
+      channel || dispatch(actions.channels.get(channelName)),
+      moderators || dispatch(actions.channelModerators.get(channelName))
     ])
   }
 
@@ -138,12 +145,13 @@ class PostPage extends React.Component<*, void> {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { posts, channels, comments, forms } = state
+  const { posts, channels, comments, forms, channelModerators } = state
   const postID = getPostID(ownProps)
   const channelName = getChannelName(ownProps)
   const post = posts.data.get(postID)
   const channel = channels.data.get(channelName)
   const commentsTree = comments.data.get(postID)
+  const moderators = channelModerators.data.get(channelName)
   return {
     postID,
     channelName,
@@ -151,6 +159,7 @@ const mapStateToProps = (state, ownProps) => {
     post,
     channel,
     commentsTree,
+    moderators,
     loaded:             R.none(R.isNil, [post, channel, commentsTree]),
     errored:            anyError([posts, channels, comments]),
     subscribedChannels: getSubscribedChannels(state),
