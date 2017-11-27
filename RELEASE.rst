@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.4.0
+-------------
+
+- Added channel description to API and UI
+- Add comment editing UI
+- Added content policy page (#314)
+- Remove iflow-lodash, add flow-typed (#339)
+- Add subreddit title to the API and frontend
+- Split the PostDisplay component into two separate components
+- Switched factories to class-based model and added created field
+- Stabilized factory serialization
+
 Version 0.3.4
 -------------
 
