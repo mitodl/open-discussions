@@ -1,7 +1,8 @@
 // @flow
 import { GET, POST, INITIAL_STATE } from "redux-hammock/constants"
+import R from "ramda"
 
-import { SET_CHANNEL_DATA } from "../actions/channel"
+import { SET_CHANNEL_DATA, CLEAR_CHANNEL_ERROR } from "../actions/channel"
 import type { Channel } from "../flow/discussionTypes"
 import * as api from "../lib/api"
 
@@ -38,6 +39,7 @@ export const channelsEndpoint = {
         ...state,
         data: updatedData
       }
-    }
+    },
+    [CLEAR_CHANNEL_ERROR]: R.dissoc("error")
   }
 }

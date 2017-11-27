@@ -22,6 +22,7 @@ import { toggleUpvote } from "../util/api_actions"
 import { anyError } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { formatTitle } from "../lib/title"
+import { clearChannelError } from "../actions/channel"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -36,7 +37,8 @@ type ChannelPageProps = {
   postsForChannel: ?Array<string>,
   posts: ?Array<Post>,
   subscribedChannels: ?Array<Channel>,
-  pagination: PostListPagination
+  pagination: PostListPagination,
+  errored: boolean
 }
 
 const shouldLoadData = R.complement(
@@ -62,7 +64,10 @@ class ChannelPage extends React.Component<*, void> {
   }
 
   loadData = () => {
-    const { dispatch, channelName, location: { search } } = this.props
+    const { dispatch, errored, channelName, location: { search } } = this.props
+    if (errored) {
+      dispatch(clearChannelError())
+    }
     dispatch(actions.channels.get(channelName))
     dispatch(
       actions.postsForChannel.get(channelName, qs.parse(search))
