@@ -11,10 +11,12 @@ export default class ContentPolicyPage extends React.Component<*, void> {
   render() {
     return (
       <div className="content">
-        <DocumentTitle title={formatTitle("Content Policy")} />
+        <DocumentTitle
+          title={formatTitle("MicroMasters Discussions Community Guidelines")}
+        />
         <div className="main-content">
           <Card className="content-policy">
-            <h1>MicroMasters Discussion Guidelines</h1>
+            <h1>MicroMasters Discussions Community Guidelines</h1>
             <p>
               MITx offers these discussion forums as a place for you to grow
               your understanding of learning topics and your connection with

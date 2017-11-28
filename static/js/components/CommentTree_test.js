@@ -63,6 +63,7 @@ describe("CommentTree", () => {
 
   it("should use markdown to render comments, should skip images", () => {
     comments[0].text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
+    comments[0].edited = false
     const wrapper = renderCommentTree()
     const firstComment = wrapper.find(".top-level-comment").at(0)
     assert.equal(

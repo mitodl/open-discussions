@@ -5,13 +5,14 @@ import { connect } from "react-redux"
 import ReactMarkdown from "react-markdown"
 
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
+import { addEditedMarker } from "../lib/reddit_objects"
 
 import type { Post } from "../flow/discussionTypes"
 
 const textContent = post =>
   <ReactMarkdown
     disallowedTypes={["Image"]}
-    source={post.text}
+    source={addEditedMarker(post)}
     escapeHtml
     className="text-content"
   />

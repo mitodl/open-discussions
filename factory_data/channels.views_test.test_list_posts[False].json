@@ -2,30 +2,30 @@
   "channels": {
     "private_channel": {
       "channel_type": "private",
-      "description": "Quae alias ipsum aliquid itaque occaecati vitae in. Rem qui dolores optio delectus debitis distinctio dolore corporis. Saepe natus repudiandae hic. Cupiditate neque aliquam praesentium quisquam deleniti totam consectetur. Sequi blanditiis velit maiores.\nQuia doloribus maxime exercitationem ea. Iure cupiditate quisquam occaecati ratione nulla. Ipsa occaecati itaque dignissimos ipsum quos veritatis. Accusantium dolorum minus nesciunt laborum reiciendis laborum ab.",
-      "name": "1510945090_quae",
-      "public_description": "Similique dolorem animi deserunt excepturi. Iusto modi recusandae totam corrupti quas ullam.",
-      "title": "Porro unde fugiat nisi eum."
+      "description": "Adipisci inventore nihil veritatis molestias totam odit architecto. Delectus debitis asperiores unde vel eligendi enim voluptatibus animi. Reiciendis ut nemo mollitia quos. Voluptates praesentium assumenda facilis pariatur ipsam.\nQuaerat eligendi exercitationem non eaque provident facilis. Voluptatibus aut accusamus perferendis quo aut ex praesentium veniam. Sequi accusantium eius at repellat reprehenderit. Laboriosam cum cumque sit animi.",
+      "name": "1511377935_quisquam",
+      "public_description": "Enim laborum accusantium qui atque. Quisquam iusto nihil autem explicabo cumque harum.",
+      "title": "Aut veritatis ut corrupti fugit."
     }
   },
   "posts": {
-    "my 2nd post": {
-      "id": "dp",
-      "text": "Ex eaque maxime dolores optio porro molestias labore. Minima quam dicta rem quia nemo eum beatae.",
-      "title": "Adipisci vel aliquid vitae quaerat magnam magni."
+    "link_post": {
+      "id": "eg",
+      "title": "Qui et consectetur magni asperiores.",
+      "url": "https://allen.com/category/posts/post/"
     },
-    "my post": {
-      "id": "do",
-      "text": "Tempora ipsam temporibus modi. Enim earum cum totam cum reprehenderit. Libero enim fuga distinctio.",
-      "title": "Nemo cumque occaecati eveniet nostrum eveniet id."
+    "text_post": {
+      "id": "eh",
+      "text": "Quos nihil eos animi eius quae libero magni. At at quaerat ipsum maiores sequi nulla.",
+      "title": "Quis quos vitae deserunt error natus."
     }
   },
   "users": {
     "contributor": {
-      "username": "01BZ5NGVD47RRNTNVCCX90S6A3"
+      "username": "01BZJJAA0EJZVD33NMY0N51T7E"
     },
     "staff_user": {
-      "username": "01BZ5NGTXVZNCCJ9FV91DNQHHB"
+      "username": "01BZJJA38RDD5BEN7QH0QH6CE0"
     }
   }
 }

@@ -9,7 +9,7 @@ import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList } from "../factories/posts"
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
-import { SET_CHANNEL_DATA } from "../actions/channel"
+import { SET_CHANNEL_DATA, CLEAR_CHANNEL_ERROR } from "../actions/channel"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { channelURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
@@ -93,5 +93,25 @@ describe("ChannelPage", () => {
       }
     )
     sinon.assert.calledWith(helper.getChannelStub, otherChannel.name)
+  })
+
+  it("should clear the error if present on load", async () => {
+    helper.store.dispatch({
+      type:    actions.channels.get.failureType,
+      payload: { error: "some error" }
+    })
+
+    await renderComponent(channelURL(currentChannel.name), [
+      actions.channels.get.requestType,
+      actions.channels.get.successType,
+      actions.postsForChannel.get.requestType,
+      actions.postsForChannel.get.successType,
+      actions.subscribedChannels.get.requestType,
+      actions.subscribedChannels.get.successType,
+      SET_POST_DATA,
+      SET_CHANNEL_DATA,
+      CLEAR_CHANNEL_ERROR
+    ])
+    assert.isUndefined(helper.store.getState().channels.error)
   })
 })

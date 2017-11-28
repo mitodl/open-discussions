@@ -19,7 +19,8 @@ export const makeComment = (post: Post): Comment => {
     created:       casual.moment.format(),
     replies:       [],
     profile_image: casual.url,
-    author_name:   casual.name
+    author_name:   casual.name,
+    edited:        casual.boolean
   }
 
   if (comment.upvoted && comment.downvoted) {

@@ -15,6 +15,7 @@ import {
   editCommentKey,
   getCommentReplyInitialValue
 } from "../components/CommentForms"
+import { addEditedMarker } from "../lib/reddit_objects"
 
 import type { Comment } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
@@ -82,7 +83,7 @@ const renderComment = R.curry(
               />
               : <ReactMarkdown
                 disallowedTypes={["Image"]}
-                source={comment.text}
+                source={addEditedMarker(comment)}
                 escapeHtml
               />}
           </div>

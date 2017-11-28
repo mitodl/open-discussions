@@ -408,6 +408,26 @@ class Api:
 
         return post.edit(text)
 
+    def remove_post(self, post_id):
+        """
+        Removes the post, opposite of approve_post
+
+        Args:
+            post_id(str): the base36 id for the post
+        """
+        post = self.get_post(post_id)
+        post.mod.remove()
+
+    def approve_post(self, post_id):
+        """
+        Approves the post, oppsite of remove_post
+
+        Args:
+            post_id(str): the base36 id for the post
+        """
+        post = self.get_post(post_id)
+        post.mod.approve()
+
     def create_comment(self, text, post_id=None, comment_id=None):
         """
         Create a new comment in reply to a post or comment

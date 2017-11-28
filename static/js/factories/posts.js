@@ -24,7 +24,8 @@ export const makePost = (
   channel_name:  channelName,
   channel_title: casual.string,
   profile_image: casual.url,
-  author_name:   casual.name
+  author_name:   casual.name,
+  edited:        casual.boolean
 })
 
 export const makeChannelPostList = (channelName: string = casual.word) =>

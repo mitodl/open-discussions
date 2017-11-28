@@ -20,6 +20,7 @@ describe("comment factories", () => {
       assert.isArray(comment.replies)
       assert.isString(comment.profile_image)
       assert.isString(comment.author_name)
+      assert.isBoolean(comment.edited)
     })
   })
 

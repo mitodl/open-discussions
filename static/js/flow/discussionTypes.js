@@ -31,6 +31,7 @@ export type Post = {
   num_comments:  number,
   channel_name:  string,
   channel_title: string,
+  edited:        boolean,
 }
 
 export type PostForm = {
@@ -88,6 +89,7 @@ export type Comment = {
   text:          string,
   downvoted:     boolean,
   replies:       Array<Comment>,
+  edited:        boolean,
 }
 
 export type CommentForm = {

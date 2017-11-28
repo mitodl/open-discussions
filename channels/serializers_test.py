@@ -160,6 +160,13 @@ def test_post_edit_url():
     assert ex.value.args[0] == 'Cannot edit url for a post'
 
 
+def test_post_validate_removed():
+    """removed must be a bool"""
+    with pytest.raises(ValidationError) as ex:
+        PostSerializer().validate_removed("not a bool")
+    assert ex.value.args[0] == 'removed must be a bool'
+
+
 def test_comment_update_with_comment_id():
     """Cannot pass comment_id to a comment, this is provided in the URL"""
     with pytest.raises(ValidationError) as ex:

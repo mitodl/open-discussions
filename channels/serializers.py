@@ -121,6 +121,7 @@ class PostSerializer(serializers.Serializer):
     text = WriteableSerializerMethodField(allow_null=True)
     title = serializers.CharField()
     upvoted = WriteableSerializerMethodField()
+    removed = WriteableSerializerMethodField()
     score = serializers.IntegerField(source='ups', read_only=True)
     author_id = serializers.CharField(read_only=True, source='author')
     id = serializers.CharField(read_only=True)
@@ -130,6 +131,7 @@ class PostSerializer(serializers.Serializer):
     channel_title = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
+    edited = serializers.SerializerMethodField()
 
     def _get_user(self, instance):
         """
@@ -184,9 +186,21 @@ class PostSerializer(serializers.Serializer):
         """The title of the channel"""
         return instance.subreddit.title
 
+    def get_edited(self, instance):
+        """Return a Boolean signifying if the post has been edited or not"""
+        return instance.edited if instance.edited is False else True
+
     def validate_upvoted(self, value):
         """Validate that upvoted is a bool"""
         return {'upvoted': _parse_bool(value, 'upvoted')}
+
+    def get_removed(self, instance):
+        """Returns True if the post was removed"""
+        return instance.banned_by is not None
+
+    def validate_removed(self, value):
+        """Validate that removed is a bool"""
+        return {'removed': _parse_bool(value, 'removed')}
 
     def validate_text(self, value):
         """Validate that text is a string or null"""
@@ -237,6 +251,14 @@ class PostSerializer(serializers.Serializer):
             raise ValidationError("Cannot edit url for a post")
 
         api = Api(user=self.context['request'].user)
+
+        if "removed" in validated_data:
+            removed = validated_data["removed"]
+            if removed is True:
+                api.remove_post(post_id)
+            elif removed is False:
+                api.approve_post(post_id)
+
         if "text" in validated_data:
             instance = api.update_post(post_id=post_id, text=validated_data['text'])
 
@@ -258,6 +280,7 @@ class CommentSerializer(serializers.Serializer):
     replies = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
+    edited = serializers.SerializerMethodField()
 
     def _get_user(self, instance):
         """
@@ -328,6 +351,10 @@ class CommentSerializer(serializers.Serializer):
     def get_created(self, instance):
         """The ISO-8601 formatted datetime for the creation time"""
         return datetime.fromtimestamp(instance.created, tz=timezone.utc).isoformat()
+
+    def get_edited(self, instance):
+        """Return a Boolean signifying if the comment has been edited or not"""
+        return instance.edited if instance.edited is False else True
 
     def validate_upvoted(self, value):
         """Validate that upvoted is a bool"""
