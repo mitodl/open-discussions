@@ -241,6 +241,28 @@ def evict_expired_access_tokens():
     RedditAccessToken.objects.filter(token_expires_at__lt=now).delete()
 
 
+def replace_load_comment(original_load_comment):
+    """
+    Return patched version of MoreComments._load_comment which handles the case where the parent id is missing
+
+    Args:
+        original_load_comment (callable): The original MoreComments._load_comment method
+
+    Returns:
+        callable: A function wrapping original_load_comment
+    """
+
+    def replacement_load_comment(*args, **kwargs):
+        """Patch function to handle AssertionError"""
+        try:
+            return original_load_comment(*args, **kwargs)
+        except AssertionError:
+            # If the parent doesn't exist the code will receive no children which will error as
+            # an AssertionError
+            raise Http404
+    return replacement_load_comment
+
+
 class Api:
     """Channel API"""
     def __init__(self, user):
@@ -585,18 +607,9 @@ class Api:
         more_comments.submission = self.reddit.submission(post_id)
         more_comments.submission.comment_limit = settings.OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT
 
-        original_load_comment = more_comments._load_comment  # pylint: disable=protected-access
-
-        def replacement_load_comment(*args, **kwargs):
-            """Patch function to handle AssertionError"""
-            try:
-                return original_load_comment(*args, **kwargs)
-            except AssertionError:
-                # If the parent doesn't exist the code will receive no children which will as
-                # an AssertionError
-                raise Http404
-
-        more_comments._load_comment = replacement_load_comment  # pylint: disable=protected-access
+        more_comments._load_comment = replace_load_comment(  # pylint: disable=protected-access
+            more_comments._load_comment  # pylint: disable=protected-access
+        )
         more_comments.comments()  # load the comments
         return more_comments
 
