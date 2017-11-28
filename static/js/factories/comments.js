@@ -32,7 +32,7 @@ export const makeComment = (
     profile_image: casual.url,
     author_name:   casual.name,
     edited:        casual.boolean,
-    comment_type:  "comment",
+    comment_type:  "comment"
   }
 
   if (comment.upvoted && comment.downvoted) {
