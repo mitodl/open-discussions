@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS */
 import React from "react"
 import R from "ramda"
 import qs from "query-string"
@@ -16,6 +17,7 @@ import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 import { safeBulkGet } from "../lib/maps"
 import { getChannelName } from "../lib/util"
+import { isModerator } from "../lib/channels"
 import { getPostIds } from "../lib/posts"
 import { channelURL } from "../lib/url"
 import { toggleUpvote } from "../util/api_actions"
@@ -38,7 +40,8 @@ type ChannelPageProps = {
   posts: ?Array<Post>,
   subscribedChannels: ?Array<Channel>,
   pagination: PostListPagination,
-  errored: boolean
+  errored: boolean,
+  isModerator: boolean
 }
 
 const shouldLoadData = R.complement(
@@ -120,9 +123,11 @@ const mapStateToProps = (state, ownProps) => {
   const postsForChannel = state.postsForChannel.data.get(channelName) || {}
   const channel = state.channels.data.get(channelName)
   const postIds = getPostIds(postsForChannel)
+  const channelModerators = state.channelModerators.data.get(channelName) || []
   return {
     channelName,
     channel,
+    isModerator:        isModerator(channelModerators, SETTINGS.username),
     pagination:         postsForChannel.pagination,
     posts:              safeBulkGet(postIds, state.posts.data),
     subscribedChannels: getSubscribedChannels(state),

@@ -1,10 +1,11 @@
 // @flow
+import React from "react"
 import R from "ramda"
 
 import { S } from "./sanctuary"
 import type { PostForm } from "../flow/discussionTypes"
 
-// this function checks that a given object passes or fails validation.
+// this function checks that a given object fails validation (validator function returns true)
 // if it fails, it returns a setter (R.set) which which set the appropirate
 // validation message in an object. Else, it returns nothing.
 //
@@ -58,10 +59,25 @@ export const postUrlOrTextPresent = (postForm: { value: PostForm }) => {
 
 export const validatePostCreateForm = validate([
   validation(
-    R.compose(R.lte(300), R.length),
+    R.compose(R.gt(R.__, 300), R.length),
     R.lensPath(["value", "title"]),
     "Title length is limited to 300 characters"
   ),
   validation(emptyOrNil, R.lensPath(["value", "title"]), "Title is required"),
   postUrlOrTextPresent
 ])
+
+export const validateChannelEditForm = validate([
+  validation(
+    R.compose(R.gt(R.__, 5120), R.length),
+    R.lensPath(["value", "description"]),
+    "Description length is limited to 5120 characters"
+  )
+])
+
+export const validationMessage = (message: string) =>
+  R.isEmpty(message) || R.isNil(message)
+    ? null
+    : <div className="validation-message">
+      {message}
+    </div>

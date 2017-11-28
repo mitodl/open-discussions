@@ -725,17 +725,32 @@ class Api:
             # and the double removal case is probably more common.
             pass
 
-    def list_moderators(self, channel_name):
+    def list_moderators(self, channel_name, moderator_name=None):
         """
         Returns a list of moderators for the channel
 
         Args:
             channel_name(str): name of the channel
+            moderator_name(str): optional moderator username to filter list to
 
         Returns:
             praw.models.listing.generator.ListingGenerator: a generator representing the contributors in the channel
         """
-        return self.get_channel(channel_name).moderator()
+        return self.get_channel(channel_name).moderator(redditor=moderator_name)
+
+    def is_moderator(self, channel_name, moderator_name):
+        """
+        Returns True if the given username is a moderator on the channel
+
+        Args:
+            channel_name(str): name of the channel
+            moderator_name(str): moderator username
+
+        Returns:
+            bool: True if the given username is a moderator on the channel
+        """
+        # generators always eval True, so eval as list first and then as bool
+        return bool(list(self.list_moderators(channel_name, moderator_name=moderator_name)))
 
     def add_subscriber(self, subscriber_name, channel_name):
         """

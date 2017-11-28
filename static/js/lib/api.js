@@ -50,7 +50,19 @@ export function createChannel(channel: Channel): Promise<Channel> {
     method: POST,
     body:   JSON.stringify(
       R.pickAll(
-        ["name", "title", "public_description", "channel_type"],
+        ["name", "title", "description", "public_description", "channel_type"],
+        channel
+      )
+    )
+  })
+}
+
+export function updateChannel(channel: Channel): Promise<Channel> {
+  return fetchWithAuthFailure(`/api/v0/channels/${channel.name}/`, {
+    method: PATCH,
+    body:   JSON.stringify(
+      R.pickAll(
+        ["title", "description", "public_description", "channel_type"],
         channel
       )
     )

@@ -96,6 +96,8 @@ describe("reducers", () => {
       })
       helper.createChannelStub.resetBehavior()
       helper.createChannelStub.callsFake(async channel => channel)
+      helper.updateChannelStub.resetBehavior()
+      helper.updateChannelStub.callsFake(async channel => channel)
     })
 
     it("should have some initial state", () => {
@@ -163,6 +165,16 @@ describe("reducers", () => {
           assert.deepEqual(data.get(channel.name), channel)
         }
       }
+    })
+
+    it("should let you update a channel", async () => {
+      const { requestType, successType } = actions.channels.patch
+      const channel = makeChannel()
+      const channels = await dispatchThen(actions.channels.patch(channel), [
+        requestType,
+        successType
+      ])
+      assert.deepEqual(channel, channels.data.get(channel.name))
     })
   })
 

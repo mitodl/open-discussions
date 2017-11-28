@@ -4,8 +4,8 @@ export type ChannelType = "private" | "public";
 export type Channel = {
   name:               string,
   title:              string,
-  public_description: ?string,
-  description:        ?string,
+  description:        string,
+  public_description: string,
   channel_type:       ChannelType,
   num_users:          number,
 }
@@ -13,8 +13,16 @@ export type Channel = {
 export type ChannelForm = {
   name:               string,
   title:              string,
+  description:        string,
   public_description: string,
   channel_type:       ChannelType,
+}
+
+export type ChannelEditValidation = {
+  title:              string,
+  description:        string,
+  public_description: string,
+  channel_type:       string,
 }
 
 export type AuthoredContent = {

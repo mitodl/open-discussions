@@ -3,7 +3,12 @@ import { assert } from "chai"
 import R from "ramda"
 
 import { assertIsNothing, assertIsJustNoVal } from "./test_utils"
-import { validation, validate, validatePostCreateForm } from "./validation"
+import {
+  validation,
+  validate,
+  validatePostCreateForm,
+  validateChannelEditForm
+} from "./validation"
 
 describe("validation library", () => {
   describe("validation", () => {
@@ -121,7 +126,7 @@ describe("validation library", () => {
       const post = {
         value: {
           isText: true,
-          title:  "a".repeat(300),
+          title:  "a".repeat(301),
           text:   "a great post! really"
         }
       }
@@ -130,8 +135,25 @@ describe("validation library", () => {
           title: "Title length is limited to 300 characters"
         }
       })
-      post.value.title = "a".repeat(299)
+      post.value.title = "a".repeat(300)
       assert.deepEqual(validatePostCreateForm(post), {})
+    })
+  })
+
+  describe("validateChannelEditForm", () => {
+    it("should complain about too long of a description", () => {
+      const channel = {
+        value: {
+          description: "a".repeat(5121)
+        }
+      }
+      assert.deepEqual(validateChannelEditForm(channel), {
+        value: {
+          description: "Description length is limited to 5120 characters"
+        }
+      })
+      channel.value.description = "a".repeat(5120)
+      assert.deepEqual(validateChannelEditForm(channel), {})
     })
   })
 })

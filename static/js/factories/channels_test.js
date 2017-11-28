@@ -9,6 +9,7 @@ describe("channels factory", () => {
     assert.isString(channel.name)
     assert.isString(channel.title)
     assert.equal(channel.channel_type, "public")
+    assert.isString(channel.description)
     assert.isString(channel.public_description)
     assert.isNumber(channel.num_users)
   })

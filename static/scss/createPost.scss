@@ -1,19 +1,5 @@
 .new-post-card {
   .card-contents {
-    .row {
-      margin: 10px 10px 24px 15px;
-
-      &.post-types>div {
-        cursor: pointer;
-      }
-
-      .validation-message {
-        background-color: $validation-bg;
-        color: $validation-text;
-        font-size: 14px;
-        padding: 5px;
-      }
-    }
 
     .post-types {
       display: flex;
@@ -32,6 +18,10 @@
         @include breakpoint(phone) {
           padding: 10px 15px 17px;
         }
+      }
+
+      & > div {
+        cursor: pointer;
       }
 
       .active {

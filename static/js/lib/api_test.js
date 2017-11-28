@@ -18,7 +18,8 @@ import {
   createPost,
   updateComment,
   editPost,
-  getMoreComments
+  getMoreComments,
+  updateChannel
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -104,6 +105,7 @@ describe("api", function() {
       const input = {
         name:               "name",
         title:              "title",
+        description:        "description",
         public_description: "public_description",
         channel_type:       "public"
       }
@@ -114,6 +116,34 @@ describe("api", function() {
             method: POST,
             body:   JSON.stringify({
               ...input
+            })
+          })
+        )
+        assert.deepEqual(result, channel)
+      })
+    })
+
+    it("updates a channel", () => {
+      const channel = makeChannel()
+      fetchStub.returns(Promise.resolve(channel))
+
+      const input = {
+        name:               "name",
+        title:              "title",
+        description:        "description",
+        public_description: "public_description",
+        channel_type:       "public"
+      }
+
+      return updateChannel(input).then(result => {
+        assert.ok(
+          fetchStub.calledWith(`/api/v0/channels/${input.name}/`, {
+            method: PATCH,
+            body:   JSON.stringify({
+              title:              input.title,
+              description:        input.description,
+              public_description: input.public_description,
+              channel_type:       input.channel_type
             })
           })
         )

@@ -208,6 +208,26 @@ def test_patch_channel(client, staff_jwt_header, private_channel):
     }
 
 
+def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_and_contributor):
+    """
+    Update a channel's settings with a moderator user
+    """
+    private_channel, user = private_channel_and_contributor
+    url = reverse('channel-detail', kwargs={'channel_name': private_channel.name})
+    staff_api.add_moderator(user.username, private_channel.name)
+    resp = client.patch(url, {
+        'channel_type': 'public',
+    }, format='json', **jwt_header)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'channel_type': 'public',
+        'name': private_channel.name,
+        'title': private_channel.title,
+        'description': private_channel.description,
+        'public_description': private_channel.public_description,
+    }
+
+
 def test_patch_channel_forbidden(client, staff_jwt_header):
     """
     Update a channel's settings for a channel the user doesn't have permission to

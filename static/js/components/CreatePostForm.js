@@ -1,12 +1,13 @@
 // @flow
 import React from "react"
-import R from "ramda"
 import { Link } from "react-router-dom"
 
 import Card from "../components/Card"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 
 import { CONTENT_POLICY_URL } from "../lib/url"
+import { goBackAndHandleEvent } from "../lib/util"
+import { validationMessage } from "../lib/validation"
 
 import type { Channel, PostForm, PostValidation } from "../flow/discussionTypes"
 
@@ -23,24 +24,12 @@ type CreatePostFormProps = {
   updateChannelSelection: Function
 }
 
-const goBackAndHandleEvent = R.curry((history, e) => {
-  e.preventDefault()
-  history.goBack()
-})
-
 const channelOptions = (channels: Map<string, Channel>) =>
   Array.from(channels).map(([key, value], index) =>
     <option label={value.title} value={key} key={index}>
       {value.title}
     </option>
   )
-
-const validationMessage = message =>
-  R.isEmpty(message) || R.isNil(message)
-    ? null
-    : <div className="validation-message">
-      {message}
-    </div>
 
 export default class CreatePostForm extends React.Component<*, void> {
   props: CreatePostFormProps
@@ -68,7 +57,7 @@ export default class CreatePostForm extends React.Component<*, void> {
       <div>
         {channel ? <ChannelBreadcrumbs channel={channel} /> : null}
         <Card className="new-post-card">
-          <form onSubmit={onSubmit}>
+          <form onSubmit={onSubmit} className="form">
             <div className="post-types row">
               <div
                 className={`new-text-post ${isText ? "active" : ""}`}

@@ -4,7 +4,8 @@ import R from "ramda"
 import { connect } from "react-redux"
 import DocumentTitle from "react-document-title"
 
-import ChannelEditForm from "../../components/admin/ChannelEditForm"
+import Card from "../../components/Card"
+import ChannelCreateForm from "../../components/admin/ChannelCreateForm"
 import { actions } from "../../actions"
 import { channelURL } from "../../lib/url"
 import { newChannelForm } from "../../lib/channels"
@@ -71,13 +72,17 @@ class CreateChannelPage extends React.Component<*, void> {
     }
 
     return (
-      <div>
+      <div className="content">
         <DocumentTitle title={formatTitle("Create a Channel")} />
-        <ChannelEditForm
-          onSubmit={this.onSubmit}
-          onUpdate={this.onUpdate}
-          form={channelForm.value}
-        />
+        <div className="main-content">
+          <Card title="Create a Channel">
+            <ChannelCreateForm
+              onSubmit={this.onSubmit}
+              onUpdate={this.onUpdate}
+              form={channelForm.value}
+            />
+          </Card>
+        </div>
       </div>
     )
   }

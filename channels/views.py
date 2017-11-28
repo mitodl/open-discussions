@@ -28,7 +28,10 @@ from channels.utils import (
     get_pagination_params,
     translate_praw_exceptions,
 )
-from open_discussions.permissions import JwtIsStaffOrReadonlyPermission
+from open_discussions.permissions import (
+    JwtIsStaffOrReadonlyPermission,
+    JwtIsStaffModeratorOrReadonlyPermission,
+)
 
 User = get_user_model()
 
@@ -54,7 +57,7 @@ class ChannelDetailView(RetrieveUpdateAPIView):
     """
     View for getting information about or updating a specific channel
     """
-    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
+    permission_classes = (IsAuthenticated, JwtIsStaffModeratorOrReadonlyPermission,)
     serializer_class = ChannelSerializer
 
     def get_object(self):

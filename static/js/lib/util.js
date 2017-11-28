@@ -29,3 +29,8 @@ export function* enumerate<T>(
 }
 
 export const isEmptyText = R.compose(R.isEmpty, R.trim, R.defaultTo(""))
+
+export const goBackAndHandleEvent = R.curry((history, e) => {
+  e.preventDefault()
+  history.goBack()
+})

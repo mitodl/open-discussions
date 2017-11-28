@@ -4,6 +4,9 @@ import qs from "query-string"
 
 export const channelURL = (channelName: string) => `/channel/${channelName}`
 
+export const editChannelURL = (channelName: string) =>
+  `/manage/channel/edit/${channelName}/`
+
 export const postDetailURL = (channelName: string, postID: string) =>
   `/channel/${channelName}/${postID}`
 
