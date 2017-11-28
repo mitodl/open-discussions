@@ -137,9 +137,12 @@ export function getMoreComments(
   children: Array<string>
 ): Promise<Array<CommentFromAPI | MoreCommentsFromAPI>> {
   const payload = {
-    post_id:   postId,
-    parent_id: parentId || "",
-    children:  children
+    post_id:  postId,
+    children: children
+  }
+  if (!R.isNil(parentId)) {
+    // $FlowFixMe: Flow doesn't know that we're still constructing payload
+    payload.parent_id = parentId
   }
   return fetchWithAuthFailure(`/api/v0/morecomments/?${qs.stringify(payload)}`)
 }

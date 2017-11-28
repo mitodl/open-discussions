@@ -268,9 +268,8 @@ describe("api", function() {
 
         const response = await getMoreComments(post.id, null, children)
         const payload = {
-          post_id:   post.id,
-          parent_id: "",
-          children:  children
+          post_id:  post.id,
+          children: children
         }
         assert.ok(
           fetchStub.calledWith(`/api/v0/morecomments/?${qs.stringify(payload)}`)

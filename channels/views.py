@@ -331,9 +331,10 @@ class MoreCommentsView(APIView):
             # validate the request parameters: each are required
             try:
                 post_id = request.query_params['post_id']
-                parent_id = request.query_params['parent_id'] or None
-            except KeyError as ex:
-                raise ValidationError("Missing parameter {}".format(ex.args[0]))
+            except KeyError:
+                raise ValidationError("Missing parameter post_id")
+
+            parent_id = request.query_params.get('parent_id')
 
             api = Api(user=self.request.user)
             comments = api.more_comments(

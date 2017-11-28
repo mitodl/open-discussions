@@ -899,10 +899,10 @@ def test_more_comments(client, logged_in_profile, use_betamax, praw_settings, is
         }
     ]
 
-    url = "{base}?post_id={post_id}&parent_id={parent_id}".format(
+    url = "{base}?post_id={post_id}{parent_query}".format(
         base=reverse('morecomments-detail'),
         post_id=post_id,
-        parent_id='' if is_root_comment else middle_comment["id"]
+        parent_query='' if is_root_comment else '&parent_id={}'.format(middle_comment["id"])
     )
     resp = client.get(url)
     assert resp.status_code == status.HTTP_200_OK
@@ -967,17 +967,17 @@ def test_more_comments_children(client, logged_in_profile, use_betamax, praw_set
 def test_more_comments_404(client, logged_in_profile, use_betamax, praw_settings, missing_post, missing_parent):
     """If the post id or comment id is wrong, we should return a 404"""
     post_id = "1"
-    url = "{base}?post_id={post_id}&parent_id={parent_id}".format(
+    url = "{base}?post_id={post_id}{parent_query}".format(
         base=reverse('morecomments-detail'),
         post_id=post_id if not missing_post else 'missing_post',
-        parent_id='' if not missing_parent else 'missing_parent',
+        parent_query='' if not missing_parent else '&parent_id=missing_parent',
     )
     resp = client.get(url)
     expected_status = status.HTTP_404_NOT_FOUND if missing_post or missing_parent else status.HTTP_200_OK
     assert resp.status_code == expected_status
 
 
-@pytest.mark.parametrize("missing_param", ["post_id", "parent_id"])
+@pytest.mark.parametrize("missing_param", ["post_id"])
 def test_more_comments_missing_param(client, logged_in_profile, use_betamax, praw_settings, missing_param):
     """If a parameter is missing a 400 error should be returned"""
     params = {

@@ -67,7 +67,16 @@ const renderGenericComment = R.curry(
     comment: GenericComment
   ) => {
     if (comment.comment_type === "comment") {
-      return renderComment(forms, upvote, downvote, loadMoreComments, beginEditing, processing, depth, comment)
+      return renderComment(
+        forms,
+        upvote,
+        downvote,
+        loadMoreComments,
+        beginEditing,
+        processing,
+        depth,
+        comment
+      )
     } else if (comment.comment_type === "more_comments") {
       return renderMoreComments(loadMoreComments, comment)
     } else {
@@ -84,7 +93,7 @@ const renderComment = (
   beginEditing: (fk: string, iv: Object, e: ?Object) => void,
   processing: boolean,
   depth: number,
-  comment: CommentInTree,
+  comment: CommentInTree
 ) => {
   const formKey = replyToCommentKey(comment)
   const editFormKey = editCommentKey(comment)
@@ -174,15 +183,16 @@ const renderComment = (
   )
 }
 
-const renderMoreComments = (loadMoreComments: LoadMoreCommentsFunc, comment: MoreCommentsInTree) => {
+const renderMoreComments = (
+  loadMoreComments: LoadMoreCommentsFunc,
+  comment: MoreCommentsInTree
+) => {
   return (
     <div
       className="more-comments"
       key={`more-comments-${comment.parent_id || "null"}`} // will be null if parent_id is null, indicating root level
     >
-      <a onClick={() => loadMoreComments(comment)}>
-        Load More Comments
-      </a>
+      <a onClick={() => loadMoreComments(comment)}>Load More Comments</a>
     </div>
   )
 }
