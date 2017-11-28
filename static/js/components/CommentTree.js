@@ -19,12 +19,14 @@ import { addEditedMarker } from "../lib/reddit_objects"
 
 import type {
   GenericComment,
+  CommentInTree,
   MoreCommentsInTree
 } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 import type { CommentVoteFunc } from "./CommentVoteForm"
 
 type LoadMoreCommentsFunc = (comment: MoreCommentsInTree) => Promise<*>
+type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
 
 const renderTopLevelComment = R.curry(
   (
@@ -39,7 +41,7 @@ const renderTopLevelComment = R.curry(
   ) =>
     <Card key={idx}>
       <div className="top-level-comment">
-        {renderComment(
+        {renderGenericComment(
           forms,
           upvote,
           downvote,
@@ -53,121 +55,137 @@ const renderTopLevelComment = R.curry(
     </Card>
 )
 
-const renderComment = R.curry(
+const renderGenericComment = R.curry(
   (
     forms: FormsState,
     upvote: CommentVoteFunc,
     downvote: CommentVoteFunc,
     loadMoreComments: LoadMoreCommentsFunc,
-    beginEditing: (fk: string, iv: Object, e: ?Object) => void,
+    beginEditing: BeginEditingFunc,
     processing: boolean,
     depth: number,
     comment: GenericComment
   ) => {
     if (comment.comment_type === "comment") {
-      const formKey = replyToCommentKey(comment)
-      const editFormKey = editCommentKey(comment)
-      const initialValue = getCommentReplyInitialValue(comment)
-
-      const atMaxDepth = depth + 1 >= SETTINGS.max_comment_depth
-      return (
-        <div className="comment" key={`comment-${comment.id}`}>
-          <img className="profile-image" src={comment.profile_image} />
-          <div className="comment-contents">
-            <div className="author-info">
-              <span className="author-name">
-                {comment.author_name}
-              </span>
-              <span>
-                {moment(comment.created).fromNow()}
-              </span>
-            </div>
-            <div className="row">
-              {R.has(editFormKey, forms)
-                ? <EditCommentForm
-                  forms={forms}
-                  comment={comment}
-                  processing={processing}
-                  editing
-                />
-                : <ReactMarkdown
-                  disallowedTypes={["Image"]}
-                  source={addEditedMarker(comment)}
-                  escapeHtml
-                />}
-            </div>
-            <div className="row comment-actions">
-              <CommentVoteForm
-                comment={comment}
-                upvote={upvote}
-                downvote={downvote}
-              />
-              {atMaxDepth
-                ? null
-                : <div
-                  className="comment-action-button"
-                  onClick={e => {
-                    beginEditing(formKey, initialValue, e)
-                  }}
-                >
-                  <a href="#">Reply</a>
-                </div>}
-              {SETTINGS.username === comment.author_id
-                ? <div
-                  className="comment-action-button"
-                  onClick={e => {
-                    beginEditing(editFormKey, comment, e)
-                  }}
-                >
-                  <a href="#">Edit</a>
-                </div>
-                : null}
-            </div>
-            {atMaxDepth
-              ? null
-              : <div>
-                <ReplyToCommentForm
-                  forms={forms}
-                  comment={comment}
-                  processing={processing}
-                />
-              </div>}
-            {atMaxDepth
-              ? null
-              : <div className="replies">
-                {R.map(
-                  renderComment(
-                    forms,
-                    upvote,
-                    downvote,
-                    loadMoreComments,
-                    beginEditing,
-                    processing,
-                    depth + 1
-                  ),
-                  comment.replies
-                )}
-              </div>}
-          </div>
-        </div>
-      )
+      return renderComment(forms, upvote, downvote, loadMoreComments, beginEditing, processing, depth, comment)
     } else if (comment.comment_type === "more_comments") {
-      const moreComments: MoreCommentsInTree = comment
-      return (
-        <div
-          className="more-comments"
-          key={`more-comments-${comment.parent_id || "null"}`} // should never be null but there to make flow happy
-        >
-          <a onClick={() => loadMoreComments(moreComments)}>
-            Load More Comments
-          </a>
-        </div>
-      )
+      return renderMoreComments(loadMoreComments, comment)
     } else {
       throw new Error("Unexpected comment_type")
     }
   }
 )
+
+const renderComment = (
+  forms: FormsState,
+  upvote: CommentVoteFunc,
+  downvote: CommentVoteFunc,
+  loadMoreComments: LoadMoreCommentsFunc,
+  beginEditing: (fk: string, iv: Object, e: ?Object) => void,
+  processing: boolean,
+  depth: number,
+  comment: CommentInTree,
+) => {
+  const formKey = replyToCommentKey(comment)
+  const editFormKey = editCommentKey(comment)
+  const initialValue = getCommentReplyInitialValue(comment)
+
+  const atMaxDepth = depth + 1 >= SETTINGS.max_comment_depth
+  return (
+    <div className="comment" key={`comment-${comment.id}`}>
+      <img className="profile-image" src={comment.profile_image} />
+      <div className="comment-contents">
+        <div className="author-info">
+          <span className="author-name">
+            {comment.author_name}
+          </span>
+          <span>
+            {moment(comment.created).fromNow()}
+          </span>
+        </div>
+        <div className="row">
+          {R.has(editFormKey, forms)
+            ? <EditCommentForm
+              forms={forms}
+              comment={comment}
+              processing={processing}
+              editing
+            />
+            : <ReactMarkdown
+              disallowedTypes={["Image"]}
+              source={addEditedMarker(comment)}
+              escapeHtml
+            />}
+        </div>
+        <div className="row comment-actions">
+          <CommentVoteForm
+            comment={comment}
+            upvote={upvote}
+            downvote={downvote}
+          />
+          {atMaxDepth
+            ? null
+            : <div
+              className="comment-action-button"
+              onClick={e => {
+                beginEditing(formKey, initialValue, e)
+              }}
+            >
+              <a href="#">Reply</a>
+            </div>}
+          {SETTINGS.username === comment.author_id
+            ? <div
+              className="comment-action-button"
+              onClick={e => {
+                beginEditing(editFormKey, comment, e)
+              }}
+            >
+              <a href="#">Edit</a>
+            </div>
+            : null}
+        </div>
+        {atMaxDepth
+          ? null
+          : <div>
+            <ReplyToCommentForm
+              forms={forms}
+              comment={comment}
+              processing={processing}
+            />
+          </div>}
+        {atMaxDepth
+          ? null
+          : <div className="replies">
+            {R.map(
+              renderGenericComment(
+                forms,
+                upvote,
+                downvote,
+                loadMoreComments,
+                beginEditing,
+                processing,
+                depth + 1
+              ),
+              comment.replies
+            )}
+          </div>}
+      </div>
+    </div>
+  )
+}
+
+const renderMoreComments = (loadMoreComments: LoadMoreCommentsFunc, comment: MoreCommentsInTree) => {
+  return (
+    <div
+      className="more-comments"
+      key={`more-comments-${comment.parent_id || "null"}`} // will be null if parent_id is null, indicating root level
+    >
+      <a onClick={() => loadMoreComments(comment)}>
+        Load More Comments
+      </a>
+    </div>
+  )
+}
 
 type CommentTreeProps = {
   comments: Array<GenericComment>,
