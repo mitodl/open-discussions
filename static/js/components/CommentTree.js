@@ -34,7 +34,7 @@ const renderTopLevelComment = R.curry(
     upvote: CommentVoteFunc,
     downvote: CommentVoteFunc,
     loadMoreComments: LoadMoreCommentsFunc,
-    beginEditing: (fk: string, iv: Object, e: ?Object) => void,
+    beginEditing: BeginEditingFunc,
     processing: boolean,
     comment: GenericComment,
     idx: number
@@ -90,7 +90,7 @@ const renderComment = (
   upvote: CommentVoteFunc,
   downvote: CommentVoteFunc,
   loadMoreComments: LoadMoreCommentsFunc,
-  beginEditing: (fk: string, iv: Object, e: ?Object) => void,
+  beginEditing: BeginEditingFunc,
   processing: boolean,
   depth: number,
   comment: CommentInTree
@@ -203,7 +203,7 @@ type CommentTreeProps = {
   upvote: CommentVoteFunc,
   downvote: CommentVoteFunc,
   loadMoreComments: LoadMoreCommentsFunc,
-  beginEditing: (fk: string, iv: Object, e: ?Object) => void,
+  beginEditing: BeginEditingFunc,
   processing: boolean
 }
 
