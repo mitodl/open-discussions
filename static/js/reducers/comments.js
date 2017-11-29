@@ -265,11 +265,8 @@ export const commentsEndpoint = {
 export const moreCommentsEndpoint = {
   name:    "morecomments",
   verbs:   [GET],
-  getFunc: (
-    postId: string,
-    parentId: string | null,
-    children: Array<string>
-  ) => api.getMoreComments(postId, parentId, children),
+  getFunc: (postId: string, parentId: string | null, children: Array<string>) =>
+    api.getMoreComments(postId, parentId, children),
   initialState:      { ...INITIAL_STATE },
   getSuccessHandler: (
     response: Array<CommentFromAPI | MoreCommentsFromAPI>,

@@ -97,9 +97,7 @@ export const createComment = (
   commentId: ?string
 ): Promise<CommentFromAPI> => {
   const body =
-    commentId === undefined
-      ? { text }
-      : { text, comment_id: commentId }
+    commentId === undefined ? { text } : { text, comment_id: commentId }
 
   return fetchWithAuthFailure(`/api/v0/posts/${postId}/comments/`, {
     method: POST,
