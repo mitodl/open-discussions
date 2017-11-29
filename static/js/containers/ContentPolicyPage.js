@@ -67,7 +67,7 @@ export default class ContentPolicyPage extends React.Component<*, void> {
               <li>
                 Read over your submission for mistakes before submitting,
                 especially the title of the submission. Comments and the content
-                of self posts can be edited after being submitted, however, the
+                of text posts can be edited after being submitted, however, the
                 title of a post can't be. Make sure the facts you provide are
                 accurate to avoid any confusion down the line.
               </li>
