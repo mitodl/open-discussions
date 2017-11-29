@@ -159,7 +159,7 @@ describe("CommentTree", () => {
   })
 
   describe("more_comments", () => {
-    it("should render a moreComments object at root level", () => {
+    it("should render a moreComments object at root level", async () => {
       const moreComments = makeMoreComments(post.id, null)
       comments.push(moreComments)
       const wrapper = renderCommentTree()
@@ -169,11 +169,11 @@ describe("CommentTree", () => {
       )
       assert.lengthOf(moreCommentsDiv, 1)
 
-      moreCommentsDiv.find("a").simulate("click")
+      await moreCommentsDiv.find("SpinnerButton").props().onClickPromise()
       sinon.assert.calledWith(loadMoreCommentsStub, moreComments)
     })
 
-    it("should render under a parent comment", () => {
+    it("should render under a parent comment", async () => {
       const moreComments = makeMoreComments(post.id, comments[0].id)
       comments[0].replies.push(moreComments)
       const wrapper = renderCommentTree()
@@ -181,7 +181,7 @@ describe("CommentTree", () => {
       const moreCommentsDiv = wrapper.find(".replies > .more-comments")
       assert.lengthOf(moreCommentsDiv, 1)
 
-      moreCommentsDiv.find("a").simulate("click")
+      await moreCommentsDiv.find("SpinnerButton").props().onClickPromise()
       sinon.assert.calledWith(loadMoreCommentsStub, moreComments)
     })
   })

@@ -10,6 +10,9 @@ import { createBrowserHistory } from "history"
 import configureStore from "../store/configureStore"
 import Router, { routes } from "../Router"
 
+// requirements for react-mdl which uses a modified version of material-design-lite
+import "react-mdl/extra/material.js"
+
 // Object.entries polyfill
 import entries from "object.entries"
 if (!Object.entries) {
