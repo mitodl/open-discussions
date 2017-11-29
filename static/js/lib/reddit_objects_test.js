@@ -1,17 +1,17 @@
-// @flow
 /* global SETTINGS */
 import { assert } from "chai"
 
 import { addEditedMarker } from "./reddit_objects"
-import { makeCommentTree } from "../factories/comments"
+import { makeCommentsResponse } from "../factories/comments"
 import { makePost } from "../factories/posts"
+import { createCommentTree } from "../reducers/comments"
 
 describe("addEditedMarker", () => {
   let comment, post
 
   beforeEach(() => {
     post = makePost()
-    comment = makeCommentTree(post)[0]
+    comment = createCommentTree(makeCommentsResponse(post))[0]
   })
 
   it("should leave things alone if not edited", () => {

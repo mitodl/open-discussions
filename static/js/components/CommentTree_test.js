@@ -1,4 +1,3 @@
-// @flow
 /* global SETTINGS */
 import React from "react"
 import sinon from "sinon"
@@ -10,22 +9,33 @@ import ReactMarkdown from "react-markdown"
 
 import Card from "../components/Card"
 import CommentTree from "./CommentTree"
-import { ReplyToCommentForm } from "./CommentForms"
+import {
+  ReplyToCommentForm,
+  replyToCommentKey,
+  editCommentKey
+} from "./CommentForms"
 
-import { makeCommentTree } from "../factories/comments"
+import { makeCommentsResponse, makeMoreComments } from "../factories/comments"
 import { makePost } from "../factories/posts"
-import { replyToCommentKey, editCommentKey } from "../components/CommentForms"
+import { createCommentTree } from "../reducers/comments"
 
 describe("CommentTree", () => {
-  let comments, post, sandbox, upvoteStub, downvoteStub, beginEditingStub
+  let comments,
+    post,
+    sandbox,
+    upvoteStub,
+    downvoteStub,
+    beginEditingStub,
+    loadMoreCommentsStub
 
   beforeEach(() => {
     post = makePost()
-    comments = makeCommentTree(post)
+    comments = createCommentTree(makeCommentsResponse(post))
     sandbox = sinon.sandbox.create()
     upvoteStub = sandbox.stub()
     downvoteStub = sandbox.stub()
     beginEditingStub = sandbox.stub()
+    loadMoreCommentsStub = sandbox.stub()
   })
 
   afterEach(() => {
@@ -41,6 +51,7 @@ describe("CommentTree", () => {
         downvote={downvoteStub}
         beginEditing={R.curry(beginEditingStub)}
         processing={false}
+        loadMoreComments={loadMoreCommentsStub}
         {...props}
       />
     )
@@ -145,5 +156,33 @@ describe("CommentTree", () => {
 
     assert.lengthOf(topCommentWrapper.find(".replies"), 1)
     assert.lengthOf(nextCommentWrapper.find(".replies"), 0)
+  })
+
+  describe("more_comments", () => {
+    it("should render a moreComments object at root level", () => {
+      const moreComments = makeMoreComments(post.id, null)
+      comments.push(moreComments)
+      const wrapper = renderCommentTree()
+
+      const moreCommentsDiv = wrapper.find(
+        ".top-level-comment > .more-comments"
+      )
+      assert.lengthOf(moreCommentsDiv, 1)
+
+      moreCommentsDiv.find("a").simulate("click")
+      sinon.assert.calledWith(loadMoreCommentsStub, moreComments)
+    })
+
+    it("should render under a parent comment", () => {
+      const moreComments = makeMoreComments(post.id, comments[0].id)
+      comments[0].replies.push(moreComments)
+      const wrapper = renderCommentTree()
+
+      const moreCommentsDiv = wrapper.find(".replies > .more-comments")
+      assert.lengthOf(moreCommentsDiv, 1)
+
+      moreCommentsDiv.find("a").simulate("click")
+      sinon.assert.calledWith(loadMoreCommentsStub, moreComments)
+    })
   })
 })

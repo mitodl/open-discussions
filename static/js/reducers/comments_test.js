@@ -1,35 +1,50 @@
-// @flow
 import { assert } from "chai"
 import sinon from "sinon"
+import R from "ramda"
 import { INITIAL_STATE, FETCH_SUCCESS } from "redux-hammock/constants"
 
 import { actions } from "../actions"
+import { replaceMoreComments } from "../actions/comment"
+import { createCommentTree } from "../reducers/comments"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"
-import { makeCommentTree } from "../factories/comments"
+import {
+  makeComment,
+  makeCommentsResponse,
+  makeMoreComments,
+  makeMoreCommentsResponse
+} from "../factories/comments"
+import { findComment } from "../lib/comments"
 
 describe("comments reducers", () => {
-  let helper, store, dispatchThen, listenForActions, post, tree
+  let helper,
+    store,
+    dispatchThen,
+    listenForActions,
+    post,
+    response,
+    newCommentResponse
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     store = helper.store
     post = makePost()
-    tree = makeCommentTree(post)
+    response = makeCommentsResponse(post)
+    newCommentResponse = null
     dispatchThen = helper.store.createDispatchThen(state => state.comments)
     listenForActions = helper.store.createListenForActions(
       state => state.comments
     )
-    helper.getCommentsStub.returns(
-      Promise.resolve({ data: tree, postID: post.id })
-    )
+    helper.getCommentsStub.returns(Promise.resolve(response))
     helper.createCommentStub.resetBehavior()
-    helper.createCommentStub.callsFake((postId, text) =>
-      Promise.resolve({
-        post_id: postId,
+    helper.createCommentStub.callsFake((_, text) => {
+      newCommentResponse = {
+        ...makeComment(post),
         text
-      })
-    )
+      }
+      return Promise.resolve(newCommentResponse)
+    })
   })
 
   afterEach(() => {
@@ -43,24 +58,22 @@ describe("comments reducers", () => {
     })
   })
 
-  it("should let you get the comments for a Post", () => {
+  it("should let you get the comments for a Post", async () => {
     const { requestType, successType } = actions.comments.get
-    return dispatchThen(actions.comments.get(post), [
+    const { data } = await dispatchThen(actions.comments.get(post.id), [
       requestType,
       successType
-    ]).then(({ data }) => {
-      const comments = data.get(post.id)
-      assert.isArray(comments)
-      assert.isNotEmpty(comments[0].replies)
-    })
+    ])
+
+    const comments = data.get(post.id)
+    assert.isArray(comments)
+    assert.isNotEmpty(comments[0].replies)
   })
 
   it("should handle an empty response ok", () => {
     const { requestType, successType } = actions.comments.get
-    helper.getCommentsStub.returns(
-      Promise.resolve({ data: [], postID: post.id })
-    )
-    return dispatchThen(actions.comments.get(post), [
+    helper.getCommentsStub.returns([])
+    return dispatchThen(actions.comments.get(post.id), [
       requestType,
       successType
     ]).then(({ data }) => {
@@ -83,10 +96,13 @@ describe("comments reducers", () => {
       }
     ).then(state => {
       assert.isTrue(state.loaded)
-      assert.deepInclude(state.data.get(post.id), {
-        post_id: post.id,
-        text:    "comment text"
-      })
+      const stateTree = state.data.get(post.id)
+      const comment = R.view(
+        findComment(stateTree, newCommentResponse.id),
+        stateTree
+      )
+      assert.equal(comment.post_id, post.id)
+      assert.equal(comment.text, "comment text")
       assert.equal(state.postStatus, FETCH_SUCCESS)
       assert.ok(helper.createCommentStub.calledWith(post.id, "comment text"))
     })
@@ -104,24 +120,32 @@ describe("comments reducers", () => {
       () => {
         store.dispatch(actions.comments.get(post.id))
         store.dispatch(
-          actions.comments.post(post.id, "comment text", tree[0].id)
+          actions.comments.post(post.id, "comment text", response[0].id)
         )
       }
     ).then(state => {
       assert.isTrue(state.loaded)
-      assert.deepInclude(state.data.get(post.id)[0].replies, {
-        post_id: post.id,
-        text:    "comment text"
-      })
+      const stateTree = state.data.get(post.id)
+      const comment = R.view(
+        findComment(stateTree, newCommentResponse.id),
+        stateTree
+      )
+      assert.equal(comment.post_id, post.id)
+      assert.equal(comment.text, "comment text")
       assert.equal(state.postStatus, FETCH_SUCCESS)
       assert.ok(
-        helper.createCommentStub.calledWith(post.id, "comment text", tree[0].id)
+        helper.createCommentStub.calledWith(
+          post.id,
+          "comment text",
+          response[0].id
+        )
       )
     })
   })
 
   it("should let you update a comment", async () => {
-    const comment = tree[0].replies[0]
+    const parent = response[0]
+    const comment = response.find(comment => comment.id === parent.id)
     comment.upvoted = false
     helper.updateCommentStub.returns(
       Promise.resolve({
@@ -136,9 +160,9 @@ describe("comments reducers", () => {
         actions.comments.patch.requestType,
         actions.comments.patch.successType
       ],
-      () => {
-        store.dispatch(actions.comments.get(post.id))
-        store.dispatch(
+      async () => {
+        await store.dispatch(actions.comments.get(post.id))
+        await store.dispatch(
           actions.comments.patch(comment.id, {
             upvoted: true
           })
@@ -146,13 +170,183 @@ describe("comments reducers", () => {
       }
     )
     assert.isTrue(state.loaded)
-    assert.deepEqual(state.data.get(post.id)[0].replies[0], {
-      ...comment,
-      upvoted: true
-    })
+
+    const tree = createCommentTree(response)
+    const commentInTree = R.view(findComment(tree, comment.id), tree)
+    const stateTree = state.data.get(post.id)
+    const commentInState = R.view(findComment(stateTree, comment.id), stateTree)
+    assert.deepEqual(commentInState, { ...commentInTree, upvoted: true })
     assert.equal(state.patchStatus, FETCH_SUCCESS)
     sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
       upvoted: true
+    })
+  })
+
+  describe("more_comments", () => {
+    it("creates a comment tree from a response which also contains more_comments", () => {
+      const parent = makeComment(post)
+      const reply = makeComment(post, parent.id)
+      const moreCommentsRoot = makeMoreComments(post, null)
+      const moreCommentsReply = makeMoreComments(post, parent.id)
+      const comments = [parent, reply, moreCommentsRoot, moreCommentsReply]
+
+      assert.deepEqual(createCommentTree(comments), [
+        {
+          ...parent,
+          replies: [
+            {
+              ...reply,
+              replies: []
+            },
+            moreCommentsReply
+          ]
+        },
+        moreCommentsRoot
+      ])
+    })
+
+    it("swaps a more_comments object with some comments at the root level", async () => {
+      const parent = makeComment(post)
+      const reply = makeComment(post, parent.id)
+      const moreCommentsRoot = makeMoreComments(post, null)
+      const moreCommentsReply = makeMoreComments(post, parent.id)
+      const comments = [parent, reply, moreCommentsRoot, moreCommentsReply]
+      helper.getCommentsStub.returns(Promise.resolve(comments))
+
+      await listenForActions(
+        [actions.comments.get.requestType, actions.comments.get.successType],
+        () => {
+          store.dispatch(actions.comments.get(post.id))
+        }
+      )
+
+      const firstNewComment = makeComment(post)
+      const firstNewCommentReply = makeComment(post, firstNewComment.id)
+      const secondNewComment = makeComment(post)
+      const newMoreComments = makeMoreComments(post, null)
+      const newComments = [
+        firstNewComment,
+        firstNewCommentReply,
+        secondNewComment,
+        newMoreComments
+      ]
+      store.dispatch(
+        replaceMoreComments({
+          postId:   post.id,
+          parentId: null,
+          comments: newComments
+        })
+      )
+
+      assert.deepEqual(store.getState().comments.data.get(post.id), [
+        {
+          ...parent,
+          replies: [
+            {
+              ...reply,
+              replies: []
+            },
+            moreCommentsReply
+          ]
+        },
+        {
+          ...firstNewComment,
+          replies: [
+            {
+              ...firstNewCommentReply,
+              replies: []
+            }
+          ]
+        },
+        {
+          ...secondNewComment,
+          replies: []
+        },
+        newMoreComments
+      ])
+    })
+
+    it("swaps a more_comments object with some comments for a reply", async () => {
+      const parent = makeComment(post)
+      const reply = makeComment(post, parent.id)
+      const moreCommentsRoot = makeMoreComments(post, null)
+      const moreCommentsReply = makeMoreComments(post, parent.id)
+      const comments = [parent, reply, moreCommentsRoot, moreCommentsReply]
+      helper.getCommentsStub.returns(Promise.resolve(comments))
+
+      await listenForActions(
+        [actions.comments.get.requestType, actions.comments.get.successType],
+        () => {
+          store.dispatch(actions.comments.get(post.id))
+        }
+      )
+
+      const firstNewComment = makeComment(post, parent.id)
+      const firstNewCommentReply = makeComment(post, firstNewComment.id)
+      const secondNewComment = makeComment(post, parent.id)
+      const newMoreComments = makeMoreComments(post, parent.id)
+      const newComments = [
+        firstNewComment,
+        firstNewCommentReply,
+        secondNewComment,
+        newMoreComments
+      ]
+      store.dispatch(
+        replaceMoreComments({
+          postId:   post.id,
+          parentId: parent.id,
+          comments: newComments
+        })
+      )
+
+      assert.deepEqual(store.getState().comments.data.get(post.id), [
+        {
+          ...parent,
+          replies: [
+            {
+              ...reply,
+              replies: []
+            },
+            {
+              ...firstNewComment,
+              replies: [
+                {
+                  ...firstNewCommentReply,
+                  replies: []
+                }
+              ]
+            },
+            {
+              ...secondNewComment,
+              replies: []
+            },
+            newMoreComments
+          ]
+        },
+        moreCommentsRoot
+      ])
+    })
+
+    it("does not update the state when fetching more comments, except to mark it as loaded", async () => {
+      const parent = response[0]
+      const moreComments = makeMoreCommentsResponse(post, parent)
+      helper.getMoreCommentsStub.returns(Promise.resolve(moreComments))
+      let resp
+      await listenForActions(
+        [
+          actions.morecomments.get.requestType,
+          actions.morecomments.get.successType
+        ],
+        async () => {
+          resp = await store.dispatch(actions.morecomments.get(post.id))
+        }
+      )
+
+      const state = helper.store.getState().morecomments
+      assert.isTrue(state.loaded)
+      assert.equal(state.data, undefined)
+      await wait(0) // go through a loop and let resp get assigned to
+      assert.deepEqual(resp, moreComments)
     })
   })
 })

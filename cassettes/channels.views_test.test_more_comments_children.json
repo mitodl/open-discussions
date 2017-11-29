@@ -1,0 +1,166 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2017-11-14T17:28:18",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDI0Ndf1zcpIy7fw1Y1wM8txLsj2zQ21dKlK9kguMylX0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLbp+jlmeFm6mBbkl5eGRsZbRLoWpXgmloX6+xeD9KSklmUmp8ZnpoAMhnCUagFg1vGyuAAAAA==",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 14 Nov 2017 17:28:18 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=S5x6Mk8jQsaZPaWA3m; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 14-Nov-2019 17:28:18 GMT",
+            "loidcreated=2017-11-14T17%3A28%3A18.828Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 14-Nov-2019 17:28:18 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+      }
+    },
+    {
+      "recorded_at": "2017-11-14T17:28:18",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&children=e9l%2Ce9m&link_id=t3_1&sort=best"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 157-Mjhfo8M-XF6lCpkMmU9DzcHcv4w"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "55"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=S5x6Mk8jQsaZPaWA3m; loidcreated=2017-11-14T17%3A28%3A18.828Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/morechildren/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": [], \"data\": {\"things\": [{\"kind\": \"t1\", \"data\": {\"subreddit_id\": \"t5_4\", \"banned_by\": null, \"removal_reason\": null, \"link_id\": \"t3_1\", \"likes\": true, \"replies\": \"\", \"user_reports\": [], \"saved\": false, \"id\": \"e9l\", \"gilded\": 0, \"archived\": false, \"report_reasons\": null, \"author\": \"george\", \"parent_id\": \"t3_1\", \"score\": 1, \"approved_by\": null, \"controversiality\": 0, \"body\": \"shallow comment 25\", \"edited\": false, \"author_flair_css_class\": null, \"downs\": 0, \"body_html\": \"\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003Eshallow comment 25\\u003C/p\\u003E\\n\\u003C/div\\u003E\", \"subreddit\": \"dedp2\", \"score_hidden\": false, \"name\": \"t1_e9l\", \"created\": 1510245355.0, \"author_flair_text\": null, \"created_utc\": 1510245355.0, \"distinguished\": null, \"mod_reports\": [], \"num_reports\": null, \"ups\": 1}}, {\"kind\": \"t1\", \"data\": {\"subreddit_id\": \"t5_4\", \"banned_by\": null, \"removal_reason\": null, \"link_id\": \"t3_1\", \"likes\": true, \"replies\": \"\", \"user_reports\": [], \"saved\": false, \"id\": \"e9m\", \"gilded\": 0, \"archived\": false, \"report_reasons\": null, \"author\": \"george\", \"parent_id\": \"t3_1\", \"score\": 1, \"approved_by\": null, \"controversiality\": 0, \"body\": \"shallow comment 26\", \"edited\": false, \"author_flair_css_class\": null, \"downs\": 0, \"body_html\": \"\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003Eshallow comment 26\\u003C/p\\u003E\\n\\u003C/div\\u003E\", \"subreddit\": \"dedp2\", \"score_hidden\": false, \"name\": \"t1_e9m\", \"created\": 1510245360.0, \"author_flair_text\": null, \"created_utc\": 1510245360.0, \"distinguished\": null, \"mod_reports\": [], \"num_reports\": null, \"ups\": 1}}]}}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "1566"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 14 Nov 2017 17:28:18 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "297.0"
+          ],
+          "x-ratelimit-reset": [
+            "102"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/morechildren/?raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

@@ -7,7 +7,7 @@ import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 import { isEmptyText } from "../lib/util"
 
-import type { Comment, Post, CommentForm } from "../flow/discussionTypes"
+import type { CommentForm, CommentInTree, Post } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 import type { Dispatch } from "redux"
 
@@ -23,22 +23,22 @@ type CommentFormProps = {
   cancelReply: () => void,
   formDataLens: (s: string) => Object,
   processing: boolean,
-  patchComment: (c: Comment) => void,
+  patchComment: (c: CommentInTree) => void,
   patchPost: (p: Post) => void,
-  comment: Comment
+  comment: CommentInTree
 }
 
-export const replyToCommentKey = (comment: Comment) =>
+export const replyToCommentKey = (comment: CommentInTree) =>
   `post:${comment.post_id}:comment:${comment.id}:comment:new`
 
 export const replyToPostKey = (post: Post) => `post:${post.id}:comment:new`
 
-export const editCommentKey = (comment: Comment) =>
+export const editCommentKey = (comment: CommentInTree) =>
   `post:${comment.post_id}:comment:${comment.id}:edit`
 
 export const editPostKey = (post: Post) => `post:${post.id}:edit`
 
-export const getCommentReplyInitialValue = (parent: Comment) => ({
+export const getCommentReplyInitialValue = (parent: CommentInTree) => ({
   post_id:    parent.post_id,
   comment_id: parent.id,
   text:       ""
@@ -247,7 +247,7 @@ export const EditCommentForm = connect(mapStateToProps, mapDispatchToProps)(
 
       e.preventDefault()
 
-      const updatedComment = { ...comment, text: text }
+      const updatedComment: CommentInTree = { ...comment, text: text }
       this.setState({ patching: true })
       await patchComment(updatedComment)
       this.setState({ patching: false })

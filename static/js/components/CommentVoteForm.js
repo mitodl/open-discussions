@@ -1,12 +1,12 @@
 // @flow
 import React from "react"
 
-import type { Comment } from "../flow/discussionTypes"
+import type { CommentInTree } from "../flow/discussionTypes"
 
-export type CommentVoteFunc = (comment: Comment) => Promise<*>
+export type CommentVoteFunc = (comment: CommentInTree) => Promise<*>
 
 type CommentVoteFormProps = {
-  comment: Comment,
+  comment: CommentInTree,
   upvote: CommentVoteFunc,
   downvote: CommentVoteFunc
 }

@@ -3,6 +3,7 @@
 // For mocking purposes we need to use "fetch" defined as a global instead of importing as a local.
 import R from "ramda"
 import "isomorphic-fetch"
+import qs from "query-string"
 import { PATCH, POST } from "redux-hammock/constants"
 
 import { fetchWithAuthFailure } from "./auth"
@@ -12,12 +13,13 @@ import { getPaginationParams } from "../lib/posts"
 import type {
   Channel,
   ChannelModerators,
-  Comment,
+  GenericComment,
   CreatePostPayload,
   PostListPaginationParams,
-  Post
+  Post,
+  CommentFromAPI,
+  MoreCommentsFromAPI
 } from "../flow/discussionTypes"
-import type { CommentResponse } from "../reducers/comments"
 
 const getPaginationQS = R.compose(
   toQueryString,
@@ -83,22 +85,19 @@ export function getPost(postId: string): Promise<Post> {
   return fetchWithAuthFailure(`/api/v0/posts/${postId}/`)
 }
 
-export async function getComments(postID: string): Promise<CommentResponse> {
-  const response = await fetchWithAuthFailure(
-    `/api/v0/posts/${postID}/comments/`
-  )
-  return { postID, data: response }
+export function getComments(
+  postID: string
+): Promise<Array<CommentFromAPI | MoreCommentsFromAPI>> {
+  return fetchWithAuthFailure(`/api/v0/posts/${postID}/comments/`)
 }
 
-export function createComment(
+export const createComment = (
   postId: string,
-  comment: string,
+  text: string,
   commentId: ?string
-) {
+): Promise<CommentFromAPI> => {
   const body =
-    commentId === undefined
-      ? { text: comment }
-      : { text: comment, comment_id: commentId }
+    commentId === undefined ? { text } : { text, comment_id: commentId }
 
   return fetchWithAuthFailure(`/api/v0/posts/${postId}/comments/`, {
     method: POST,
@@ -123,9 +122,25 @@ export function editPost(postId: string, post: Post): Promise<Post> {
 export function updateComment(
   commentId: string,
   commentPayload: Object
-): Promise<Comment> {
+): Promise<GenericComment> {
   return fetchWithAuthFailure(`/api/v0/comments/${commentId}/`, {
     method: PATCH,
     body:   JSON.stringify(commentPayload)
   })
+}
+
+export function getMoreComments(
+  postId: string,
+  parentId: string | null,
+  children: Array<string>
+): Promise<Array<CommentFromAPI | MoreCommentsFromAPI>> {
+  const payload = {
+    post_id:  postId,
+    children: children
+  }
+  if (!R.isNil(parentId)) {
+    // $FlowFixMe: Flow doesn't know that we're still constructing payload
+    payload.parent_id = parentId
+  }
+  return fetchWithAuthFailure(`/api/v0/morecomments/?${qs.stringify(payload)}`)
 }

@@ -1,16 +1,16 @@
-// @flow
 import R from "ramda"
 import { assert } from "chai"
 
 import { findComment } from "./comments"
 import { makePost } from "../factories/posts"
-import { makeCommentTree } from "../factories/comments"
+import { makeCommentsResponse } from "../factories/comments"
+import { createCommentTree } from "../reducers/comments"
 
 describe("comments lib functions", () => {
   let comments, post
   beforeEach(() => {
     post = makePost()
-    comments = makeCommentTree(post, 3)
+    comments = createCommentTree(makeCommentsResponse(post, 3))
   })
 
   it("finds a root comment", () => {

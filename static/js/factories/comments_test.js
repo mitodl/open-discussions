@@ -1,14 +1,13 @@
-// @flow
 import { assert } from "chai"
 import moment from "moment"
 
 import { makePost } from "./posts"
-import { makeCommentTree } from "./comments"
+import { makeCommentsResponse } from "./comments"
 
 describe("comment factories", () => {
   it("should make a tree of comments", () => {
     const post = makePost()
-    makeCommentTree(post).forEach(comment => {
+    makeCommentsResponse(post).forEach(comment => {
       assert.isString(comment.id)
       assert.equal(comment.post_id, post.id)
       assert.isString(comment.text)
@@ -25,12 +24,13 @@ describe("comment factories", () => {
   })
 
   it("should always put replies on the first comment", () => {
-    const [firstComment] = makeCommentTree(makePost())
-    assert.isNotEmpty(firstComment.replies)
+    const comments = makeCommentsResponse(makePost())
+    const firstComment = comments[0]
+    assert.isOk(comments.find(comment => firstComment.id === comment.parent_id))
   })
 
   it("should have unique IDs", () => {
-    const ids = makeCommentTree(makePost()).map(comment => comment.id)
+    const ids = makeCommentsResponse(makePost()).map(comment => comment.id)
     assert.equal(ids.length, new Set(ids).size)
   })
 })

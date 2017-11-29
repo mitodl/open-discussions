@@ -1,3 +1,10 @@
+$profileImageWidth: 30px;
+$profileImageHeight: $profileImageWidth;
+$commentTopMargin: 19px;
+$commentPaddingLeftDesktop: 12px;
+$commentPaddingLeftPhone: 12px;
+$replyPaddingLeft: 8px;
+
 .comments {
   .card {
     margin-bottom: 14px;
@@ -24,13 +31,13 @@
   }
 
   .comment {
-    margin: 19px 0 0;
+    margin: $commentTopMargin 0 0;
     display: flex;
     flex-direction: row;
 
     img.profile-image {
-      width: 30px;
-      height: 30px;
+      width: $profileImageWidth;
+      height: $profileImageHeight;
 
       @include breakpoint(phone) {
         display: none;
@@ -38,12 +45,12 @@
     }
 
     .comment-contents {
-      padding-left: 8px;
+      padding-left: $commentPaddingLeftDesktop;
       width: 100%;
 
       @include breakpoint(phone) {
         width: auto;
-        padding-left: 12px;
+        padding-left: $commentPaddingLeftPhone;
       }
     }
 
@@ -122,7 +129,25 @@
     }
 
     .replies > .comment {
-      padding-left: 8px;
+      padding-left: $replyPaddingLeft;
+    }
+  }
+
+  .more-comments {
+    margin: $commentTopMargin 0 0;
+    padding-left: $profileImageWidth + $commentPaddingLeftDesktop;
+
+    .replies > .more-comments {
+      padding-left: $replyPaddingLeft;
+    }
+
+    @include breakpoint(phone) {
+      width: auto;
+      padding-left: $commentPaddingLeftPhone;
+    }
+
+    a {
+      cursor: pointer;
     }
   }
 

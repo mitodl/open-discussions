@@ -59,5 +59,10 @@ urlpatterns = [
         views.CommentDetailView.as_view(),
         name='comment-detail',
     ),
+    url(
+        r'api/v0/morecomments/$',
+        views.MoreCommentsView.as_view(),
+        name='morecomments-detail',
+    ),
     url(r'api/v0/frontpage/$', views.FrontPageView.as_view(), name='frontpage'),
 ]

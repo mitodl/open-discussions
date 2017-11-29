@@ -1,5 +1,4 @@
 // @flow
-
 export type ChannelType = "private" | "public";
 
 export type Channel = {
@@ -18,7 +17,7 @@ export type ChannelForm = {
   channel_type:       ChannelType,
 }
 
-export type Post = {
+export type AuthoredContent = {
   id:            string,
   author_id:     string,
   score:         number,
@@ -26,6 +25,9 @@ export type Post = {
   created:       string,
   profile_image: string,
   author_name:   string,
+}
+
+export type Post = AuthoredContent & {
   title:         string,
   url:           ?string,
   text:          ?string,
@@ -78,25 +80,45 @@ export type PostListResponse = {
   posts: Array<Post>,
 }
 
-export type Comment = {
-  id:            string,
-  author_id:     string,
-  score:         number,
-  upvoted:       boolean,
-  created:       string,
-  profile_image: string,
-  author_name:   string,
+type HasParentId = {
+  parent_id:    ?string,
+}
+
+export type MoreCommentsFromAPI = HasParentId & {
+  post_id:      string,
+  children:     Array<string>,
+  comment_type: "more_comments",
+}
+
+export type CommentFromAPI = AuthoredContent & HasParentId & {
   post_id:       string,
   text:          string,
   downvoted:     boolean,
-  replies:       Array<Comment>,
   edited:        boolean,
+  comment_type:  "comment",
 }
+
+export type CommentInTree = CommentFromAPI & {
+  replies: Array<GenericComment>,
+}
+
+export type MoreCommentsInTree = MoreCommentsFromAPI
 
 export type CommentForm = {
   post_id:      string,
   comment_id?:  string,
   text:         string,
+}
+
+// If you're looking for a 'Comment' type this is probably what you want.
+// It represents any element in the comment tree stored in the reducer
+export type GenericComment = CommentInTree | MoreCommentsInTree
+
+// This is not a data structure from the API, this is for the payload of the action updating the tree in the reducer
+export type ReplaceMoreCommentsPayload = {
+  comments: Array<CommentFromAPI|MoreCommentsFromAPI>,
+  parentId: string,
+  postId: string,
 }
 
 export type Moderator = {
