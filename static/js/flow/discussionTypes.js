@@ -6,6 +6,7 @@ export type Channel = {
   name:               string,
   title:              string,
   public_description: ?string,
+  description:        ?string,
   channel_type:       ChannelType,
   num_users:          number,
 }

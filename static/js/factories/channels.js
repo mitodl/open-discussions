@@ -12,6 +12,7 @@ export const makeChannel = (privateChannel: boolean = false): Channel => ({
   name:               `channel_${incr.next().value}`,
   title:              casual.title,
   channel_type:       privateChannel ? "private" : "public",
+  description:        casual.description,
   public_description: casual.description,
   num_users:          casual.integer(0, 500)
 })

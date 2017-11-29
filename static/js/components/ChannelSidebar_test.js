@@ -15,12 +15,12 @@ describe("ChannelSidebar", () => {
     const channel = makeChannel()
     const wrapper = renderSidebar(channel)
     const description = wrapper.find(ReactMarkdown)
-    assert.equal(description.props().source, channel.public_description)
+    assert.equal(description.props().source, channel.description)
   })
 
   it("should render a description if it's present", () => {
     const channel = makeChannel()
-    channel.public_description = null
+    channel.description = null
     const wrapper = renderSidebar(channel)
     const description = wrapper.find(ReactMarkdown)
     assert.equal(

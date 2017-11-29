@@ -19,8 +19,7 @@ const ChannelSidebar = ({ channel }: ChannelSidebarProps) => {
       <ReactMarkdown
         disallowedTypes={["Image"]}
         source={
-          channel.public_description ||
-          "(There is no description of this channel)"
+          channel.description || "(There is no description of this channel)"
         }
         escapeHtml
         className="description"
