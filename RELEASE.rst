@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.5.0
+-------------
+
+- Fix channel navigation error
+- Add &#39;edited&#39; boolean to Post and Comment APIs
+- Change copy for content guideline rules
+- Updated posts API to handle remove moderation
+- Default to empty description for new channel if not provided (#349)
+- Fixed regression in CSS for new post page (#346)
+
 Version 0.4.0
 -------------
 
