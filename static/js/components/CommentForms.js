@@ -25,7 +25,7 @@ type CommentFormProps = {
   processing: boolean,
   patchComment: (c: CommentInTree) => void,
   patchPost: (p: Post) => void,
-  comment: CommentInTree,
+  comment: CommentInTree
 }
 
 export const replyToCommentKey = (comment: CommentInTree) =>

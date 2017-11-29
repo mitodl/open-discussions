@@ -18,7 +18,7 @@ import {
   createPost,
   updateComment,
   editPost,
-  getMoreComments,
+  getMoreComments
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
