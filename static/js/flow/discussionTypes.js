@@ -112,7 +112,7 @@ export type CommentForm = {
 
 // If you're looking for a 'Comment' type this is probably what you want.
 // It represents any element in the comment tree stored in the reducer
-export type GenericComment = CommentInTree|MoreCommentsInTree
+export type GenericComment = CommentInTree | MoreCommentsInTree
 
 // This is not a data structure from the API, this is for the payload of the action updating the tree in the reducer
 export type ReplaceMoreCommentsPayload = {
