@@ -128,7 +128,7 @@ $replyPaddingLeft: 8px;
       }
     }
 
-    .replies > & {
+    .replies > .comment {
       padding-left: $replyPaddingLeft;
     }
   }
@@ -137,7 +137,7 @@ $replyPaddingLeft: 8px;
     margin: $commentTopMargin 0 0;
     padding-left: $profileImageWidth + $commentPaddingLeftDesktop;
 
-    .replies > & {
+    .replies > .more-comments {
       padding-left: $replyPaddingLeft;
     }
 
