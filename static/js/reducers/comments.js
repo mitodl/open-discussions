@@ -265,11 +265,11 @@ export const commentsEndpoint = {
 export const moreCommentsEndpoint = {
   name:    "morecomments",
   verbs:   [GET],
-  getFunc: async (
+  getFunc: (
     postId: string,
     parentId: string | null,
     children: Array<string>
-  ) => await api.getMoreComments(postId, parentId, children),
+  ) => api.getMoreComments(postId, parentId, children),
   initialState:      { ...INITIAL_STATE },
   getSuccessHandler: (
     response: Array<CommentFromAPI | MoreCommentsFromAPI>,
