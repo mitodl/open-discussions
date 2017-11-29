@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Ratione provident delectus optio maiores dolorum aliquid. Laudantium aut reiciendis eveniet dolorem officia maiores cumque. Recusandae possimus accusamus veritatis soluta officiis labore.\nPerferendis atque enim voluptas explicabo eius rem molestiae atque. Assumenda iusto quia iure consectetur at.\nAutem veniam inventore occaecati veniam eius dolore. Asperiores voluptatem non dolorum quo aut. Debitis vel illo molestias incidunt.",
+      "name": "1512063109_tempora",
+      "public_description": "Ut porro facilis nemo. Repellendus sunt qui error quos.",
+      "title": "Animi sed autem dolorum."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "4o",
+      "text": "Sunt ea quis non esse ipsam distinctio. At modi perferendis nesciunt fugit.",
+      "title": "Accusamus fuga similique possimus ullam quod ut."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C06ZR5X0TW164JT70S8K1CKW"
+    },
+    "staff_user": {
+      "username": "01C06ZQZBTXT8RQVCRBBT1TDWK"
+    }
+  }
+}

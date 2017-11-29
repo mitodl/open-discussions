@@ -443,6 +443,17 @@ class Api:
 
         return post.edit(text)
 
+    def pin_post(self, post_id, pinned):
+        """
+        Pin the Post!
+
+        Args:
+            post_id(str): the base36 id for the post
+            pinned(bool): the value for the 'stickied' field
+        """
+        post = self.get_post(post_id)
+        post.mod.sticky(pinned)
+
     def remove_post(self, post_id):
         """
         Removes the post, opposite of approve_post

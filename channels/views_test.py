@@ -74,7 +74,7 @@ def test_list_channels(client, jwt_header, private_channel_and_contributor):
     channel, _ = private_channel_and_contributor
     url = reverse('channel-list')
     resp = client.get(url, **jwt_header)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [
         {
             'title': channel.title,
@@ -100,7 +100,7 @@ def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
         'public_description': channel.public_description,
     }
     resp = client.post(url, data=payload, **staff_jwt_header)
-    assert resp.status_code == 201
+    assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == payload
 
 
@@ -134,7 +134,7 @@ def test_create_channel_nonstaff(client, jwt_header):
         'public_description': 'public',
     }
     resp = client.post(url, data=payload, **jwt_header)
-    assert resp.status_code == 403
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_create_channel_noauth(client):
@@ -150,7 +150,7 @@ def test_create_channel_noauth(client):
         'public_description': 'public',
     }
     resp = client.post(url, data=payload)
-    assert resp.status_code == 401
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_get_channel(client, jwt_header, private_channel_and_contributor):
@@ -238,7 +238,7 @@ def test_patch_channel_nonstaff(client, jwt_header):
     resp = client.patch(url, {
         'channel_type': 'public',
     }, format='json', **jwt_header)
-    assert resp.status_code == 403
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_patch_channel_noauth(client):
@@ -249,7 +249,7 @@ def test_patch_channel_noauth(client):
     resp = client.patch(url, {
         'channel_type': 'public',
     }, format='json')
-    assert resp.status_code == 401
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_create_url_post(client, private_channel_and_contributor):
@@ -263,7 +263,7 @@ def test_create_url_post(client, private_channel_and_contributor):
         'title': 'url title 🐨',
         'url': 'http://micromasters.mit.edu/🐨',
     })
-    assert resp.status_code == 201
+    assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'title': 'url title 🐨',
         'url': 'http://micromasters.mit.edu/🐨',
@@ -280,6 +280,7 @@ def test_create_url_post(client, private_channel_and_contributor):
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
         'edited': False,
+        "stickied": False,
     }
 
 
@@ -294,7 +295,7 @@ def test_create_text_post(client, private_channel_and_contributor):
         'title': 'parameterized testing',
         'text': 'tests are great',
     })
-    assert resp.status_code == 201
+    assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'title': 'parameterized testing',
         'text': 'tests are great',
@@ -311,6 +312,7 @@ def test_create_text_post(client, private_channel_and_contributor):
         'profile_image': user.profile.image_small,
         "author_name": user.profile.name,
         'edited': False,
+        "stickied": False,
     }
 
 
@@ -392,6 +394,7 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
         'author_name': user.profile.name,
         "profile_image": profile_image,
         'edited': False,
+        "stickied": False,
     }
 
 
@@ -411,6 +414,35 @@ def test_get_post_not_found(client, logged_in_profile):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
+def test_get_post_stickied(client, private_channel_and_contributor, reddit_factories, staff_api):
+    """test that stickied posts come back that way"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    staff_api.pin_post(post.id, True)
+    client.force_login(user)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    get_resp = client.get(url)
+    assert get_resp.status_code == status.HTTP_200_OK
+    assert get_resp.json() == {
+        "url": None,
+        "text": post.text,
+        "title": post.title,
+        "upvoted": True,
+        'removed': False,
+        "score": 1,
+        "author_id": user.username,
+        "id": post.id,
+        "created": post.created,
+        "num_comments": 0,
+        "channel_name": channel.name,
+        "channel_title": channel.title,
+        'author_name': user.profile.name,
+        "profile_image": user.profile.image_small,
+        "edited": False,
+        "stickied": True,
+    }
+
+
 @pytest.mark.parametrize("missing_user", [True, False])
 def test_list_posts(client, missing_user, private_channel_and_contributor, reddit_factories):
     """List posts in a channel"""
@@ -428,7 +460,7 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
 
     url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.get(url)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
 
     if missing_user:
         # all posts should be filtered out
@@ -455,10 +487,43 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
                     'author_name': user.profile.name,
                     "profile_image": user.profile.image_small,
                     "edited": False,
+                    "stickied": False,
                 } for post in posts
             ],
             'pagination': {}
         }
+
+
+def test_list_posts_stickied(client, private_channel_and_contributor, reddit_factories, staff_api):
+    """test that the stickied post is first"""
+    channel, user = private_channel_and_contributor
+    posts = [
+        reddit_factories.text_post("great post!{}".format(i), user, channel=channel)
+        for i in range(4)
+    ]
+    staff_api.pin_post(posts[2].id, True)
+    client.force_login(user)
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json()["posts"][0] == {
+        "url": posts[2].url,
+        "text": posts[2].text,
+        "title": posts[2].title,
+        "upvoted": True,
+        "removed": False,
+        "score": 1,
+        "author_id": user.username,
+        "id": posts[2].id,
+        "created": posts[2].created,
+        "num_comments": 0,
+        "channel_name": channel.name,
+        "channel_title": channel.title,
+        'author_name': user.profile.name,
+        "profile_image": user.profile.image_small,
+        "edited": False,
+        "stickied": True
+    }
 
 
 def test_list_posts_forbidden(client, logged_in_profile):
@@ -486,7 +551,7 @@ def test_list_posts_pagination_first_page_no_params(
     expected = {'after': 't3_{}'.format(posts[4].id), 'after_count': 5}
     url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.get(url, params, **jwt_header)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected
 
 
@@ -501,7 +566,7 @@ def test_list_posts_pagination_first_page_with_params(
     expected = {'after': 't3_{}'.format(posts[4].id), 'after_count': 5}
     url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.get(url, params, **jwt_header)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected
 
 
@@ -521,7 +586,7 @@ def test_list_posts_pagination_non_first_page(
     }
     url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.get(url, params, **jwt_header)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected
 
 
@@ -541,7 +606,7 @@ def test_list_posts_pagination_non_offset_page(
     }
     url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.get(url, params, **jwt_header)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected
 
 
@@ -552,7 +617,7 @@ def test_update_post_text(client, private_channel_and_contributor, reddit_factor
     client.force_login(user)
     url = reverse('post-detail', kwargs={'post_id': post.id})
     resp = client.patch(url, format='json', data={"text": "overwrite"})
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
         'text': 'overwrite',
@@ -568,18 +633,19 @@ def test_update_post_text(client, private_channel_and_contributor, reddit_factor
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
-        'edited': False
+        'edited': False,
+        "stickied": False,
     }
 
 
-def test_update_post_clear_vote(client, private_channel_and_contributor, reddit_factories):
-    """Test updating a post to clear the user's vote"""
+def test_update_post_stickied(client, private_channel_and_contributor, reddit_factories, staff_user):
+    """Test updating just the stickied boolean on a post"""
     channel, user = private_channel_and_contributor
-    post = reddit_factories.text_post("just a post", user, channel=channel)
-    client.force_login(user)
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    client.force_login(staff_user)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    resp = client.patch(url, format='json', data={"upvoted": False})
-    assert resp.status_code == 200
+    resp = client.patch(url, format='json', data={"stickied": True})
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
         'text': post.text,
@@ -595,7 +661,58 @@ def test_update_post_clear_vote(client, private_channel_and_contributor, reddit_
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
-        'edited': False
+        'edited': False,
+        "stickied": True,
+    }
+
+
+def test_update_post_unsticky(client, private_channel_and_contributor, reddit_factories, staff_api, staff_user):
+    """Test updating just the stickied boolean on a post"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    staff_api.pin_post(post.id, True)
+    client.force_login(staff_user)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"stickied": False})
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json()['stickied'] is False
+
+
+def test_update_post_nonmoderator_cant_sticky(client, private_channel_and_contributor, reddit_factories):
+    """Test that a normal user cant sticky posts"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    client.force_login(user)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"stickied": True})
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_update_post_clear_vote(client, private_channel_and_contributor, reddit_factories):
+    """Test updating a post to clear the user's vote"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("just a post", user, channel=channel)
+    client.force_login(user)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = client.patch(url, format='json', data={"upvoted": False})
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'url': None,
+        'text': post.text,
+        'title': post.title,
+        'upvoted': False,
+        'removed': False,
+        'score': 1,
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
+        'num_comments': 0,
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
+        'edited': False,
+        "stickied": False,
     }
 
 
@@ -606,7 +723,7 @@ def test_update_post_upvote(client, private_channel_and_contributor, reddit_fact
     url = reverse('post-detail', kwargs={'post_id': post.id})
     client.force_login(user)
     resp = client.patch(url, format='json', data={"upvoted": True})
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
         'text': post.text,
@@ -623,6 +740,7 @@ def test_update_post_upvote(client, private_channel_and_contributor, reddit_fact
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
         "edited": False,
+        "stickied": False,
     }
 
 
@@ -633,7 +751,7 @@ def test_update_post_removed(client, staff_user, private_channel_and_contributor
     url = reverse('post-detail', kwargs={'post_id': post.id})
     client.force_login(staff_user)
     resp = client.patch(url, format='json', data={"removed": True})
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
         'text': post.text,
@@ -650,6 +768,7 @@ def test_update_post_removed(client, staff_user, private_channel_and_contributor
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
         "edited": False,
+        "stickied": False,
     }
 
 
@@ -661,7 +780,7 @@ def test_update_post_clear_removed(client, staff_user, staff_api, private_channe
     url = reverse('post-detail', kwargs={'post_id': post.id})
     client.force_login(staff_user)
     resp = client.patch(url, format='json', data={"removed": False})
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
         'text': post.text,
@@ -677,7 +796,8 @@ def test_update_post_clear_removed(client, staff_user, staff_api, private_channe
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
-        'edited': False
+        'edited': False,
+        "stickied": False,
     }
 
 
@@ -718,7 +838,7 @@ def test_create_post_without_upvote(client, private_channel_and_contributor):
         'text': 'y',
         'upvoted': False,
     })
-    assert resp.status_code == 201
+    assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'title': 'x',
         'text': 'y',
@@ -734,7 +854,8 @@ def test_create_post_without_upvote(client, private_channel_and_contributor):
         'channel_title': channel.title,
         "profile_image": user.profile.image_small,
         "author_name": user.profile.name,
-        'edited': False
+        'edited': False,
+        "stickied": False,
     }
 
 
@@ -762,7 +883,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
 
     url = reverse('comment-list', kwargs={'post_id': '2'})
     resp = client.get(url)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [
         {
             "id": "1",
@@ -1002,7 +1123,7 @@ def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_sett
 
     url = reverse('comment-list', kwargs={'post_id': 'p'})
     resp = client.get(url)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [
         {
             'author_id': '[deleted]',
@@ -1090,7 +1211,7 @@ def test_create_comment_no_upvote(client, logged_in_profile):
         "text": "no upvoted",
         "upvoted": False,
     })
-    assert resp.status_code == 201
+    assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'author_id': 'george',
         'created': '2017-07-25T21:21:48+00:00',
@@ -1116,7 +1237,7 @@ def test_create_comment_downvote(client, logged_in_profile):
         "text": "downvoted",
         "downvoted": True,
     })
-    assert resp.status_code == 201
+    assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'author_id': 'george',
         'created': '2017-08-04T19:22:02+00:00',
@@ -1143,7 +1264,7 @@ def test_create_comment_reply_to_comment(client, logged_in_profile):
         "text": "reply_to_comment 3",
         "comment_id": parent_comment_id,
     })
-    assert resp.status_code == 201
+    assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'author_id': 'george',
         'created': '2017-07-25T21:18:47+00:00',
@@ -1167,7 +1288,7 @@ def test_update_comment_text(client, logged_in_profile):
     resp = client.patch(url, type='json', data={
         "text": "updated text",
     })
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'author_id': 'george',
         'created': '2017-07-25T21:18:47+00:00',
@@ -1203,7 +1324,7 @@ def test_update_comment_upvote(client, logged_in_profile):
     resp = client.patch(url, type='json', data={
         "upvoted": True,
     })
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'author_id': 'george',
         'created': '2017-08-04T19:22:02+00:00',
@@ -1228,7 +1349,7 @@ def test_update_comment_downvote(client, logged_in_profile):
     resp = client.patch(url, type='json', data={
         "downvoted": True,
     })
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'author_id': 'george',
         'created': '2017-08-04T19:22:02+00:00',
@@ -1252,7 +1373,7 @@ def test_update_comment_clear_upvote(client, logged_in_profile):
     resp = client.patch(url, type='json', data={
         "upvoted": False,
     })
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'author_id': 'george',
         'created': '2017-07-25T21:18:47+00:00',
@@ -1277,7 +1398,7 @@ def test_update_comment_clear_downvote(client, logged_in_profile):
     resp = client.patch(url, type='json', data={
         "downvoted": False,
     })
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'author_id': 'george',
         'created': '2017-08-04T19:22:02+00:00',
@@ -1307,7 +1428,7 @@ def test_frontpage_empty(client, logged_in_profile):
     """test that frontpage is empty with no subscriptions"""
     url = reverse('frontpage')
     resp = client.get(url)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'posts': [],
         'pagination': {},
@@ -1327,7 +1448,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
 
     url = reverse('frontpage')
     resp = client.get(url)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'posts': [
             {
@@ -1346,6 +1467,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
                 'author_name': user.profile.name,
                 "profile_image": user.profile.image_small,
                 "edited": False,
+                "stickied": False,
             },
             {
                 "url": None,
@@ -1363,6 +1485,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
                 'author_name': user.profile.name,
                 "profile_image": user.profile.image_small,
                 "edited": False,
+                "stickied": False,
             },
             {
                 "url": None,
@@ -1380,6 +1503,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
                 'author_name': user.profile.name,
                 "profile_image": user.profile.image_small,
                 "edited": False,
+                "stickied": False,
             },
             {
                 "url": None,
@@ -1397,6 +1521,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
                 'author_name': user.profile.name,
                 "profile_image": user.profile.image_small,
                 "edited": False,
+                "stickied": False,
             },
         ],
         'pagination': {},
@@ -1414,7 +1539,7 @@ def test_frontpage_pagination(client, logged_in_profile, settings, params, expec
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
     url = reverse('frontpage')
     resp = client.get(url, params)
-    assert resp.status_code == 200
+    assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected
 
 

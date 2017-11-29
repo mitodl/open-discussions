@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Quis cum quia corporis praesentium. Deserunt odio soluta distinctio totam voluptates. Sit qui occaecati incidunt id.\nAccusamus esse velit illum nam totam illum. Eaque laborum illum alias at. Facilis distinctio et eligendi atque eveniet. Aliquid dolores tempora molestias reiciendis architecto cupiditate.\nConsectetur sunt quaerat atque ducimus porro a. Voluptate modi commodi sapiente eligendi alias nulla. Rem libero rem nostrum voluptas earum quam ea. Placeat ex corporis distinctio quisquam quam.",
+      "name": "1512059870_suscipit",
+      "public_description": "Velit quod error labore. Quas quam rem illo eos necessitatibus consequatur.",
+      "title": "Ipsa id at eveniet doloremque aperiam."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "4g",
+      "text": "Placeat doloremque nisi amet quo eaque. Atque laborum enim corporis accusamus deserunt.",
+      "title": "Unde nisi ipsum veniam molestias unde facilis."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C06WNAMD3EX5R82W25MWP7XM"
+    },
+    "staff_user": {
+      "username": "01C06WN463F529CZXV3QMRDNC9"
+    }
+  }
+}

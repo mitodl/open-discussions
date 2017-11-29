@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Neque id mollitia iusto commodi. Libero nisi consectetur illum quidem odit at incidunt. Vitae expedita distinctio id fugiat. Sequi esse sapiente culpa repudiandae.\nNihil in modi omnis fugiat aut odio. Soluta earum recusandae culpa accusantium minima. Repellat sequi inventore vero accusantium explicabo eaque.\nSoluta consequatur eligendi consequuntur veritatis quisquam facere illo. Ipsam dolor sit ullam nam dicta. A sint quae atque facilis exercitationem at.",
+      "name": "1512064377_repellat",
+      "public_description": "Velit maiores adipisci autem delectus id maxime. Suscipit est in explicabo.",
+      "title": "Exercitationem voluptatibus fugiat ratione."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "4u",
+      "text": "Aspernatur tenetur numquam qui vel. Totam minima earum atque. Earum eum distinctio optio quo iste.",
+      "title": "Dolor iusto quasi iusto ad."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C070YW6Z31ZS69DC1MJKWGKY"
+    },
+    "staff_user": {
+      "username": "01C070YNE6DFN2ZMFTT9ZEJFTH"
+    }
+  }
+}

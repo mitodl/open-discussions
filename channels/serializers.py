@@ -124,6 +124,7 @@ class PostSerializer(serializers.Serializer):
     title = serializers.CharField()
     upvoted = WriteableSerializerMethodField()
     removed = WriteableSerializerMethodField()
+    stickied = serializers.BooleanField()
     score = serializers.IntegerField(source='ups', read_only=True)
     author_id = serializers.CharField(read_only=True, source='author')
     id = serializers.CharField(read_only=True)
@@ -263,6 +264,10 @@ class PostSerializer(serializers.Serializer):
 
         if "text" in validated_data:
             instance = api.update_post(post_id=post_id, text=validated_data['text'])
+
+        if "stickied" in validated_data:
+            sticky = validated_data["stickied"]
+            api.pin_post(post_id, sticky)
 
         _apply_vote(instance, validated_data, False)
         return api.get_post(post_id=post_id)

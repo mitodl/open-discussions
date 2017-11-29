@@ -25,6 +25,7 @@ export type AuthoredContent = {
   created:       string,
   profile_image: string,
   author_name:   string,
+  edited:        boolean,
 }
 
 export type Post = AuthoredContent & {
@@ -34,7 +35,7 @@ export type Post = AuthoredContent & {
   num_comments:  number,
   channel_name:  string,
   channel_title: string,
-  edited:        boolean,
+  stickied:      boolean,
 }
 
 export type PostForm = {
@@ -94,7 +95,6 @@ export type CommentFromAPI = AuthoredContent & HasParentId & {
   post_id:       string,
   text:          string,
   downvoted:     boolean,
-  edited:        boolean,
   comment_type:  "comment",
 }
 

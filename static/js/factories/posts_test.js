@@ -19,6 +19,7 @@ describe("posts factories", () => {
       assert.isString(post.profile_image)
       assert.isString(post.author_name)
       assert.isBoolean(post.edited)
+      assert.isBoolean(post.stickied)
     })
 
     it("should make a URL post", () => {

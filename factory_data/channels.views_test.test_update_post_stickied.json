@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Eligendi earum odio veritatis animi ipsam illum error saepe. Eum iste adipisci modi facilis incidunt labore. Facilis necessitatibus ducimus facilis inventore assumenda at. Veritatis necessitatibus iusto quidem et enim nostrum.\nIpsa sit perspiciatis fugiat consectetur modi aliquam possimus. Saepe quos earum reprehenderit quia ex expedita. Quis fugiat vel quo ex. Amet mollitia et voluptatem. Natus molestias magnam sequi eveniet earum.",
+      "name": "1511987278_quasi",
+      "public_description": "Et occaecati error adipisci accusamus sapiente natus unde. A aperiam ex cumque harum itaque ullam.",
+      "title": "Ipsa nisi blanditiis consequuntur consequatur."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "49",
+      "text": "Nisi recusandae deleniti eaque magnam quaerat eaque voluptate. Vitae doloremque voluptatem ducimus.",
+      "title": "Aliquid velit nostrum ducimus."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C04QDZRWSYDCZ7HEFRHJMTKK"
+    },
+    "staff_user": {
+      "username": "01C04QDSA01V17M2RW96VF1WKM"
+    }
+  }
+}
