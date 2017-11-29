@@ -18,7 +18,7 @@ describe("ChannelSidebar", () => {
     assert.equal(description.props().source, channel.description)
   })
 
-  it("should render a description if it's present", () => {
+  it("should render a default description", () => {
     const channel = makeChannel()
     channel.description = null
     const wrapper = renderSidebar(channel)
