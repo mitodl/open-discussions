@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.5.1
+-------------
+
+- Comments pagination (#298)
+- Fix field name for channel description (#366)
+- Added requests for channel moderators
+- s/self/text/ on guidelines page
+- Add post editing
+
 Version 0.5.0
 -------------
 
