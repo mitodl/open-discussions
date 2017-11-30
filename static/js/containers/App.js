@@ -13,6 +13,7 @@ import AdminPage from "./admin/AdminPage"
 import AuthRequiredPage from "./AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
 import Toolbar from "../components/Toolbar"
+import Snackbar from "../components/material/Snackbar"
 import Drawer from "../containers/Drawer"
 
 import { actions } from "../actions"
@@ -22,12 +23,14 @@ import { AUTH_REQUIRED_URL } from "../lib/url"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
+import type { SnackbarState } from "../reducers/ui"
 
 class App extends React.Component<*, void> {
   props: {
     match: Match,
     location: Location,
     showDrawer: boolean,
+    snackbar: SnackbarState,
     dispatch: Dispatch
   }
 
@@ -55,7 +58,7 @@ class App extends React.Component<*, void> {
   }
 
   render() {
-    const { match, location: { pathname } } = this.props
+    const { match, location: { pathname }, snackbar } = this.props
 
     if (!SETTINGS.session_url && pathname !== AUTH_REQUIRED_URL) {
       // user does not have the jwt cookie, they must go through login workflow first
@@ -65,6 +68,7 @@ class App extends React.Component<*, void> {
     return (
       <div className="app">
         <DocumentTitle title="MIT Open Discussions" />
+        <Snackbar snackbar={snackbar} />
         <Toolbar toggleShowSidebar={this.toggleShowSidebar} />
         <Drawer />
         <Route exact path={match.url} component={HomePage} />
@@ -96,6 +100,6 @@ class App extends React.Component<*, void> {
 }
 
 export default connect(state => {
-  const { ui: { showDrawer } } = state
-  return { showDrawer }
+  const { ui: { showDrawer, snackbar } } = state
+  return { showDrawer, snackbar }
 })(App)

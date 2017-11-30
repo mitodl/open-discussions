@@ -6,7 +6,6 @@ import { mount } from "enzyme"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import R from "ramda"
-import sinon from "sinon"
 
 import ExpandedPostDisplay from "./ExpandedPostDisplay"
 import Router from "../Router"
@@ -19,7 +18,7 @@ import { actions } from "../actions"
 import { editPostKey } from "../components/CommentForms"
 
 describe("ExpandedPostDisplay", () => {
-  let helper, post, beginEditingStub
+  let helper, post, beginEditingStub, approvePostStub, removePostStub
 
   const renderPostDisplay = props => {
     props = {
@@ -27,7 +26,9 @@ describe("ExpandedPostDisplay", () => {
       beginEditing: R.curry((key, post, e) => {
         beginEditingStub(key, post, e)
       }),
-      forms: {},
+      approvePost: approvePostStub,
+      removePost:  removePostStub,
+      forms:       {},
       ...props
     }
     return mount(
@@ -40,7 +41,9 @@ describe("ExpandedPostDisplay", () => {
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     post = makePost()
-    beginEditingStub = sinon.stub()
+    beginEditingStub = helper.sandbox.stub()
+    approvePostStub = helper.sandbox.stub()
+    removePostStub = helper.sandbox.stub()
   })
 
   afterEach(() => {
@@ -127,7 +130,7 @@ describe("ExpandedPostDisplay", () => {
     const post = makePost(false)
     SETTINGS.username = post.author_id
     const wrapper = renderPostDisplay({ post })
-    wrapper.find(".comment-action-button").simulate("click")
+    wrapper.find(".edit-post").simulate("click")
     assert.ok(beginEditingStub.called)
   })
 
@@ -163,7 +166,7 @@ describe("ExpandedPostDisplay", () => {
     }
   }
   ;[true, false].forEach(prevUpvote => {
-    it(`should show the correct UI when the upvote 
+    it(`should show the correct UI when the upvote
     button is clicked when prev state was ${String(prevUpvote)}`, async () => {
       post.upvoted = prevUpvote
       // setting to a function so Flow doesn't complain
@@ -189,5 +192,39 @@ describe("ExpandedPostDisplay", () => {
       await wait(10)
       assertButton(wrapper, !prevUpvote, false)
     })
+  })
+
+  it("should display approve and remove links only if user is a moderator", () => {
+    [
+      [true, false],
+      [true, true],
+      [false, false],
+      [false, true]
+    ].forEach(([isModerator, removed]) => {
+      post.removed = removed
+      const wrapper = renderPostDisplay({ post, isModerator })
+      assert.equal(
+        wrapper.find(".approve-post").exists(),
+        isModerator && removed
+      )
+      assert.equal(
+        wrapper.find(".remove-post").exists(),
+        isModerator && !removed
+      )
+    })
+  })
+
+  it('should call approvePost when user clicks "approve"', () => {
+    post.removed = true
+    const wrapper = renderPostDisplay({ post, isModerator: true })
+    wrapper.find(".approve-post").simulate("click")
+    assert.ok(approvePostStub.called)
+  })
+
+  it('should call removePost when user clicks "remove"', () => {
+    post.removed = false
+    const wrapper = renderPostDisplay({ post, isModerator: true })
+    wrapper.find(".remove-post").simulate("click")
+    assert.ok(removePostStub.called)
   })
 })

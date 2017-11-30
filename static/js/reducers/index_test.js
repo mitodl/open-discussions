@@ -8,7 +8,12 @@ import { setChannelData } from "../actions/channel"
 import { setPostData } from "../actions/post"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { INITIAL_UI_STATE } from "./ui"
-import { SET_SHOW_DRAWER, setShowDrawer } from "../actions/ui"
+import {
+  SET_SHOW_DRAWER,
+  SET_SNACKBAR_MESSAGE,
+  setShowDrawer,
+  setSnackbarMessage
+} from "../actions/ui"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 
 import { makePost, makeChannelPostList } from "../factories/posts"
@@ -256,9 +261,32 @@ describe("reducers", () => {
       state = await dispatchThen(setShowDrawer(false), [SET_SHOW_DRAWER])
       assert.isFalse(state.showDrawer)
     })
+
+    it("should set snackbar message", async () => {
+      const payload = {
+        message: "hey there!"
+      }
+      let state = await dispatchThen(setSnackbarMessage(payload), [
+        SET_SNACKBAR_MESSAGE
+      ])
+
+      assert.deepEqual(state.snackbar, {
+        id: 0,
+        ...payload
+      })
+
+      state = await dispatchThen(setSnackbarMessage(payload), [
+        SET_SNACKBAR_MESSAGE
+      ])
+
+      assert.deepEqual(state.snackbar, {
+        id: 1,
+        ...payload
+      })
+    })
   })
 
-  describe("subsribed channels (getChannels) reducer", () => {
+  describe("subscribed channels (getChannels) reducer", () => {
     let channels
 
     beforeEach(() => {

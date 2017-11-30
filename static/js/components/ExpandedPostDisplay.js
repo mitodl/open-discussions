@@ -26,7 +26,10 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
   props: {
     post: Post,
     toggleUpvote: Post => void,
+    approvePost: Post => void,
+    removePost: Post => void,
     forms: FormsState,
+    isModerator: boolean,
     beginEditing: (key: string, initialValue: Object, e: ?Event) => void
   }
 
@@ -38,8 +41,24 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
       : textContent(post)
   }
 
+  approvePost = (e: Event) => {
+    const { post, approvePost } = this.props
+
+    e.preventDefault()
+
+    approvePost(post)
+  }
+
+  removePost = (e: Event) => {
+    const { post, removePost } = this.props
+
+    e.preventDefault()
+
+    removePost(post)
+  }
+
   postActionButtons = () => {
-    const { toggleUpvote, post, beginEditing } = this.props
+    const { toggleUpvote, post, beginEditing, isModerator } = this.props
 
     return (
       <div className="post-actions">
@@ -50,10 +69,26 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
         />
         {SETTINGS.username === post.author_id && post.text
           ? <div
-            className="comment-action-button"
+            className="comment-action-button edit-post"
             onClick={beginEditing(editPostKey(post), post)}
           >
             <a href="#">edit</a>
+          </div>
+          : null}
+        {isModerator && !post.removed
+          ? <div
+            className="comment-action-button remove-post"
+            onClick={this.removePost.bind(this)}
+          >
+            <a href="#">remove</a>
+          </div>
+          : null}
+        {isModerator && post.removed
+          ? <div
+            className="comment-action-button approve-post"
+            onClick={this.approvePost.bind(this)}
+          >
+            <a href="#">approve</a>
           </div>
           : null}
       </div>

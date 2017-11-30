@@ -19,7 +19,8 @@ import {
   updateComment,
   editPost,
   getMoreComments,
-  updateChannel
+  updateChannel,
+  updateRemoved
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -285,6 +286,23 @@ describe("api", function() {
       assert.deepEqual(fetchStub.args[0][1], {
         method: PATCH,
         body:   JSON.stringify(R.dissoc("url", post))
+      })
+    })
+    ;[true, false].forEach(status => {
+      it(`updates post removed: ${status}`, async () => {
+        const post = makePost()
+
+        fetchStub.returns(Promise.resolve())
+
+        await updateRemoved(post.id, status)
+
+        assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/`))
+        assert.deepEqual(fetchStub.args[0][1], {
+          method: PATCH,
+          body:   JSON.stringify({
+            removed: status
+          })
+        })
       })
     })
 

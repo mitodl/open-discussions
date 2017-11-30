@@ -7,6 +7,7 @@ import { frontPageEndpoint } from "../reducers/frontpage"
 import { commentsEndpoint, moreCommentsEndpoint } from "../reducers/comments"
 import { postUpvotesEndpoint } from "../reducers/post_upvotes"
 import { channelModeratorsEndpoint } from "../reducers/channel_moderators"
+import { postRemoved } from "../reducers/post_removed"
 
 export const endpoints = [
   postsEndpoint,
@@ -17,5 +18,6 @@ export const endpoints = [
   frontPageEndpoint,
   commentsEndpoint,
   moreCommentsEndpoint,
-  postUpvotesEndpoint
+  postUpvotesEndpoint,
+  postRemoved
 ]

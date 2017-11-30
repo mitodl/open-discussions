@@ -124,6 +124,13 @@ export function updateUpvote(postId: string, upvoted: boolean): Promise<Post> {
   })
 }
 
+export function updateRemoved(postId: string, removed: boolean): Promise<Post> {
+  return fetchWithAuthFailure(`/api/v0/posts/${postId}/`, {
+    method: "PATCH",
+    body:   JSON.stringify({ removed })
+  })
+}
+
 export function editPost(postId: string, post: Post): Promise<Post> {
   return fetchWithAuthFailure(`/api/v0/posts/${postId}/`, {
     method: "PATCH",

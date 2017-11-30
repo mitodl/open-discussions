@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@material/animation@^0.25.0":
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/@material/animation/-/animation-0.25.0.tgz#b252ac3d0b628e79a79f0c406d7470fb56352a80"
+
 "@material/animation@^0.3.1":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@material/animation/-/animation-0.3.1.tgz#229de6927d0590d6d6b20157d778d264ef02229a"
@@ -9,6 +13,10 @@
 "@material/base@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@material/base/-/base-0.2.3.tgz#c4eb26b6d6e5840c254ad487588dc4f69b971f3e"
+
+"@material/base@^0.24.0":
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/@material/base/-/base-0.24.0.tgz#888a61e5b6580e35a66384a9f8823091b4fe7c55"
 
 "@material/button@^0.3.11":
   version "0.3.11"
@@ -66,9 +74,27 @@
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@material/rtl/-/rtl-0.1.7.tgz#b38b771af183bcf34d643f600f17fc433698535a"
 
+"@material/rtl@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@material/rtl/-/rtl-0.1.8.tgz#2462db15e2d4e041666485559c028382872b01fb"
+
+"@material/snackbar@^0.25.0":
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/@material/snackbar/-/snackbar-0.25.0.tgz#73169dbf51d6c3f23b7c84654a540e1b3c5a88a6"
+  dependencies:
+    "@material/animation" "^0.25.0"
+    "@material/base" "^0.24.0"
+    "@material/rtl" "^0.1.8"
+    "@material/theme" "^0.25.0"
+    "@material/typography" "^0.3.0"
+
 "@material/theme@^0.1.7":
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@material/theme/-/theme-0.1.7.tgz#d94a7c5099feae9dc318c639802327c7ae82e872"
+
+"@material/theme@^0.25.0":
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/@material/theme/-/theme-0.25.0.tgz#707b4c61ebc62e662d36164c8dd45fcf98bb1444"
 
 "@material/toolbar@^0.4.4":
   version "0.4.4"

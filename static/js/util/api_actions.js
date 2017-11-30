@@ -13,3 +13,13 @@ export const toggleUpvote = R.curry(async (dispatch: Dispatch, post: Post) => {
   )
   return dispatch(setPostData(result))
 })
+
+export const approvePost = R.curry(async (dispatch: Dispatch, post: Post) => {
+  const result = await dispatch(actions.postRemoved.patch(post.id, false))
+  return dispatch(setPostData(result))
+})
+
+export const removePost = R.curry(async (dispatch: Dispatch, post: Post) => {
+  const result = await dispatch(actions.postRemoved.patch(post.id, true))
+  return dispatch(setPostData(result))
+})

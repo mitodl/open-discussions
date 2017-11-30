@@ -1,3 +1,4 @@
+/* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
 import R from "ramda"
@@ -12,8 +13,10 @@ import {
 } from "../factories/comments"
 import { makeChannel, makeModerators } from "../factories/channels"
 import { actions } from "../actions"
+import { SET_POST_DATA } from "../actions/post"
 import { REPLACE_MORE_COMMENTS } from "../actions/comment"
 import { FORM_BEGIN_EDIT } from "../actions/forms"
+import { SET_SNACKBAR_MESSAGE } from "../actions/ui"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
 import { postDetailURL } from "../lib/url"
@@ -173,5 +176,75 @@ describe("PostPage", function() {
     const newCommentInTree =
       reducerTree[0].replies[reducerTree[0].replies.length - 1]
     assert.deepEqual(newCommentInTree, newComment)
+  })
+
+  describe("as a moderator user", () => {
+    beforeEach(() => {
+      helper.getChannelModeratorsStub.returns(
+        Promise.resolve(makeModerators(SETTINGS.username))
+      )
+    })
+
+    it("should remove the post", async () => {
+      post.removed = false
+      const [wrapper] = await renderPage()
+      const expected = {
+        ...post,
+        removed: true
+      }
+      helper.updateRemovedStub.returns(Promise.resolve(expected))
+
+      const newState = await listenForActions(
+        [
+          actions.postRemoved.patch.requestType,
+          actions.postRemoved.patch.successType,
+          SET_POST_DATA,
+          SET_SNACKBAR_MESSAGE
+        ],
+        () => {
+          const props = wrapper.find("ExpandedPostDisplay").props()
+          props.removePost(post)
+        }
+      )
+
+      assert.deepEqual(newState.posts.data.get(post.id), expected)
+      assert.deepEqual(newState.ui.snackbar, {
+        id:      0,
+        message: "Post has been removed"
+      })
+
+      sinon.assert.calledWith(helper.updateRemovedStub, post.id, true)
+    })
+
+    it("should approve the post", async () => {
+      post.removed = true
+      const [wrapper] = await renderPage()
+      const expected = {
+        ...post,
+        removed: false
+      }
+      helper.updateRemovedStub.returns(Promise.resolve(expected))
+
+      const newState = await listenForActions(
+        [
+          actions.postRemoved.patch.requestType,
+          actions.postRemoved.patch.successType,
+          SET_POST_DATA,
+          SET_SNACKBAR_MESSAGE
+        ],
+        () => {
+          const props = wrapper.find("ExpandedPostDisplay").props()
+          props.approvePost(post)
+        }
+      )
+
+      assert.deepEqual(newState.posts.data.get(post.id), expected)
+      assert.deepEqual(newState.ui.snackbar, {
+        id:      0,
+        message: "Post has been approved"
+      })
+
+      sinon.assert.calledWith(helper.updateRemovedStub, post.id, false)
+    })
   })
 })

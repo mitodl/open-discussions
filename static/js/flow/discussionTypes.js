@@ -44,6 +44,7 @@ export type Post = AuthoredContent & {
   channel_name:  string,
   channel_title: string,
   stickied:      boolean,
+  removed:       boolean
 }
 
 export type PostForm = {

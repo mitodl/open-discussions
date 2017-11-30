@@ -13,6 +13,7 @@
     "@material/list": "^0.2.14",
     "@material/menu": "^0.4.3",
     "@material/rtl": "^0.1.7",
+    "@material/snackbar": "^0.25.0",
     "@material/toolbar": "^0.4.4",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.25.0",

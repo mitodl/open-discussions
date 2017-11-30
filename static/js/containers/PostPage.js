@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
@@ -15,8 +16,10 @@ import withNavSidebar from "../hoc/withNavSidebar"
 import { formatCommentsCount } from "../lib/posts"
 import { actions } from "../actions"
 import { replaceMoreComments } from "../actions/comment"
-import { toggleUpvote } from "../util/api_actions"
+import { setSnackbarMessage } from "../actions/ui"
+import { toggleUpvote, approvePost, removePost } from "../util/api_actions"
 import { getChannelName, getPostID } from "../lib/util"
+import { isModerator } from "../lib/channels"
 import { anyError } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginEditing } from "../components/CommentForms"
@@ -40,6 +43,7 @@ type PostPageProps = {
   post: Post,
   channel: Channel,
   moderators: ChannelModerators,
+  isModerator: boolean,
   commentsTree: Array<GenericComment>,
   forms: FormsState,
   commentInFlight: boolean,
@@ -82,12 +86,14 @@ class PostPage extends React.Component<*, void> {
       throw Error("Match error")
     }
 
-    Promise.all([
-      dispatch(actions.posts.get(postID)),
-      dispatch(actions.comments.get(postID)),
-      channel || dispatch(actions.channels.get(channelName)),
-      moderators || dispatch(actions.channelModerators.get(channelName))
-    ])
+    dispatch(actions.posts.get(postID))
+    dispatch(actions.comments.get(postID))
+    if (!channel) {
+      dispatch(actions.channels.get(channelName))
+    }
+    if (!moderators) {
+      dispatch(actions.channelModerators.get(channelName))
+    }
   }
 
   upvote = async (comment: CommentInTree) => {
@@ -114,6 +120,26 @@ class PostPage extends React.Component<*, void> {
     )
   }
 
+  removePost = async (post: Post) => {
+    const { dispatch } = this.props
+    await removePost(dispatch, post)
+    dispatch(
+      setSnackbarMessage({
+        message: "Post has been removed"
+      })
+    )
+  }
+
+  approvePost = async (post: Post) => {
+    const { dispatch } = this.props
+    await approvePost(dispatch, post)
+    dispatch(
+      setSnackbarMessage({
+        message: "Post has been approved"
+      })
+    )
+  }
+
   render() {
     const {
       dispatch,
@@ -121,7 +147,8 @@ class PostPage extends React.Component<*, void> {
       channel,
       commentsTree,
       forms,
-      commentInFlight
+      commentInFlight,
+      isModerator
     } = this.props
     if (!channel || !post || !commentsTree) {
       return null
@@ -135,7 +162,10 @@ class PostPage extends React.Component<*, void> {
           <div className="post-card">
             <ExpandedPostDisplay
               post={post}
+              isModerator={isModerator}
               toggleUpvote={toggleUpvote(dispatch)}
+              approvePost={this.approvePost.bind(this)}
+              removePost={this.removePost.bind(this)}
               forms={forms}
               beginEditing={beginEditing(dispatch)}
             />
@@ -179,6 +209,7 @@ const mapStateToProps = (state, ownProps) => {
     channel,
     commentsTree,
     moderators,
+    isModerator:        isModerator(moderators, SETTINGS.username),
     loaded:             R.none(R.isNil, [post, channel, commentsTree]),
     errored:            anyError([posts, channels, comments]),
     subscribedChannels: getSubscribedChannels(state),
