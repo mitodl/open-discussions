@@ -3,11 +3,10 @@ import React from "react"
 import { shallow } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
-import Button from "react-mdl/lib/Button"
 
 import SpinnerButton from "./SpinnerButton"
 
-describe.only("SpinnerButton", () => {
+describe("SpinnerButton", () => {
   let sandbox
   beforeEach(() => {
     sandbox = sinon.sandbox.create()
