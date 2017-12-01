@@ -1,3 +1,4 @@
+// @flow
 import React from "react"
 
 import type { ChildrenArray } from "react"
@@ -5,15 +6,15 @@ import type { ChildrenArray } from "react"
 type SpinnerButtonProps = {
   component: React.Component<*, *>,
   className?: string,
-  onClickPromise?: () => Promise<*>,
-  children?: ChildrenArray
+  onClickPromise: () => Promise<*>,
+  children?: ChildrenArray<*>
 }
 
-export default class SpinnerButton extends React.Component {
+export default class SpinnerButton extends React.Component<*, *> {
   props: SpinnerButtonProps
   _mounted: boolean
 
-  constructor(props) {
+  constructor(props: SpinnerButtonProps) {
     super(props)
     this.state = {
       processing: false
