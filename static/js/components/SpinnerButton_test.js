@@ -74,6 +74,6 @@ describe("SpinnerButton", () => {
     assert.equal(buttonProps.className, "class1 class2 disabled-with-spinner")
     assert.equal(buttonProps["data-x"], "y")
     assert.isTrue(buttonProps.disabled)
-    assert.equal(button.children().text(), "<Spinner />")
+    assert(button.children().find(".sk-fading-circle"), "Unable to find spinner")
   })
 })
