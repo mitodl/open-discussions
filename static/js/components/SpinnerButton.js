@@ -46,45 +46,39 @@ export default class SpinnerButton extends React.Component<*, *> {
   }
 
   render() {
-    let {
+    const {
       className,
       children,
-      onClickPromise, // eslint-disable-line no-unused-vars, prefer-const
-      ...otherProps // eslint-disable-line prefer-const
+      onClickPromise, // eslint-disable-line no-unused-vars
+      ...otherProps
     } = this.props
     const { processing } = this.state
 
-    if (processing) {
-      if (!className) {
-        className = ""
-      }
-      className = `${className} disabled-with-spinner`
-      children = (
-        <div className="sk-fading-circle">
-          <div className="sk-circle1 sk-circle" />
-          <div className="sk-circle2 sk-circle" />
-          <div className="sk-circle3 sk-circle" />
-          <div className="sk-circle4 sk-circle" />
-          <div className="sk-circle5 sk-circle" />
-          <div className="sk-circle6 sk-circle" />
-          <div className="sk-circle7 sk-circle" />
-          <div className="sk-circle8 sk-circle" />
-          <div className="sk-circle9 sk-circle" />
-          <div className="sk-circle10 sk-circle" />
-          <div className="sk-circle11 sk-circle" />
-          <div className="sk-circle12 sk-circle" />
-        </div>
-      )
-    }
-
     return (
       <button
-        className={className}
+        className={`${className || ""} ${processing
+          ? "disabled-with-spinner"
+          : ""}`}
         disabled={processing}
         {...otherProps}
         onClick={this.onClick}
       >
-        {children}
+        {processing
+          ? <div className="sk-fading-circle">
+            <div className="sk-circle1 sk-circle" />
+            <div className="sk-circle2 sk-circle" />
+            <div className="sk-circle3 sk-circle" />
+            <div className="sk-circle4 sk-circle" />
+            <div className="sk-circle5 sk-circle" />
+            <div className="sk-circle6 sk-circle" />
+            <div className="sk-circle7 sk-circle" />
+            <div className="sk-circle8 sk-circle" />
+            <div className="sk-circle9 sk-circle" />
+            <div className="sk-circle10 sk-circle" />
+            <div className="sk-circle11 sk-circle" />
+            <div className="sk-circle12 sk-circle" />
+          </div>
+          : children}
       </button>
     )
   }
