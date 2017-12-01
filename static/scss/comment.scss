@@ -155,6 +155,12 @@ $replyPaddingLeft: 8px;
       font: inherit;
       cursor: pointer;
     }
+
+    .disabled-with-spinner {
+      .sk-fading-circle {
+        margin: 0;
+      }
+    }
   }
 
   .comment-action-button {
