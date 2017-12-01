@@ -38,7 +38,7 @@ describe("SpinnerButton", () => {
 
       for (const key of Object.keys(props)) {
         if (key !== "onClickPromise") {
-          assert.deepEqual(buttonProps[key], props[key])
+          assert.deepEqual(buttonProps[key].trim(), props[key])
         }
       }
       assert.equal(button.children().text(), "childText")
