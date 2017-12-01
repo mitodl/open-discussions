@@ -5,12 +5,18 @@
     margin-top: 52px; // margin to align with top of main-content card on desktop
   }
 
+  .card-contents {
+    padding: 15px 26px;
+  }
+
   .title {
     margin-left: 0;
   }
 
   .description {
-    font-size: 14px;
+    font-size: 15px;
+    line-height: 1.4;
+    color: $font-darkgrey;
   }
 
   .edit-button {

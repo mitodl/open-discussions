@@ -78,9 +78,9 @@ body {
     &.has-left-sidebar, &.has-right-sidebar {
       .main-content {
         @include breakpoint(desktop) {
-          margin-left: 40px;
-          margin-right: 40px;
-          width: 72%;
+          margin-left: 1.5%;
+          margin-right: 1.5%;
+          width: 70%;
         }
       }
     }
@@ -89,7 +89,7 @@ body {
     &.has-left-sidebar.has-right-sidebar {
       .main-content {
         @include breakpoint(desktop) {
-          width: 48%;
+          width: 49.5%;
         }
       }
     }
