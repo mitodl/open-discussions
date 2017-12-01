@@ -20,7 +20,7 @@ export const newPostForm = (): PostForm => ({
 })
 
 export const formatCommentsCount = (post: Post): string =>
-  post.num_comments === 1 ? "1 Comment" : `${post.num_comments || 0} Comments`
+  post.num_comments === 1 ? "1 comment" : `${post.num_comments || 0} comments`
 
 export const mapPostListResponse = (
   response: PostListResponse

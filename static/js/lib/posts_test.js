@@ -17,9 +17,9 @@ describe("Post utils", () => {
   it("should correctly format comments", () => {
     const post = makePost()
     ;[
-      [0, "0 Comments"],
-      [1, "1 Comment"],
-      [10, "10 Comments"]
+      [0, "0 comments"],
+      [1, "1 comment"],
+      [10, "10 comments"]
     ].forEach(([num, expectation]) => {
       post.num_comments = num
       assert.equal(formatCommentsCount(post), expectation)

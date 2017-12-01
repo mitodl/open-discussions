@@ -10,13 +10,17 @@
   display: flex;
   flex-direction: column;
 
-  &:not(:last-child):not(.expanded) {
+  &:not(:last-child):not(.expanded):not(.sticky) {
     border-bottom: 1px solid $border-grey;
   }
 
   &:not(.expanded) {
     flex-direction: row;
     padding: 22px 0;
+  }
+
+  &.sticky {
+    background-color: $bg-blue;
   }
 
   .post-title {
@@ -41,11 +45,17 @@
     }
   }
 
-  .num-comments {
-    display: block;
-    margin: 0;
-    font-size: 13px;
-    font-weight: 400;
+  .post-links {
+    display: flex;
+
+    a {
+      cursor: pointer;
+      display: block;
+      margin: 0;
+      font-size: 13px;
+      font-weight: 400;
+      margin-right: 10px;
+    }
   }
 
   .summary {

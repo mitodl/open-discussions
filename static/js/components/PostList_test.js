@@ -2,6 +2,7 @@
 import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
+import sinon from "sinon"
 
 import PostList from "./PostList"
 import CompactPostDisplay from "./CompactPostDisplay"
@@ -29,6 +30,41 @@ describe("PostList", () => {
     })
     wrapper.find(CompactPostDisplay).forEach(postSummary => {
       assert.isTrue(postSummary.props().showChannelLink)
+    })
+  })
+
+  it("should pass the showPinUI prop to CompactPostDisplay", () => {
+    [true, false].forEach(showPinUI => {
+      const wrapper = renderPostList({
+        posts: makeChannelPostList(),
+        showPinUI
+      })
+      wrapper.find(CompactPostDisplay).forEach(postSummary => {
+        assert.equal(postSummary.props().showPinUI, showPinUI)
+      })
+    })
+  })
+
+  it("should pass the isModerator prop to CompactPostDisplay", () => {
+    [true, false].forEach(isModerator => {
+      const wrapper = renderPostList({
+        posts: makeChannelPostList(),
+        isModerator
+      })
+      wrapper.find(CompactPostDisplay).forEach(postSummary => {
+        assert.equal(postSummary.props().isModerator, isModerator)
+      })
+    })
+  })
+
+  it("should pass thesinon.stub() showChannelLinks prop to CompactPostDisplay", () => {
+    const pinStub = sinon.stub()
+    const wrapper = renderPostList({
+      posts:         makeChannelPostList(),
+      togglePinPost: pinStub
+    })
+    wrapper.find(CompactPostDisplay).forEach(postSummary => {
+      assert.equal(postSummary.props().togglePinPost, pinStub)
     })
   })
 })

@@ -43,7 +43,7 @@ describe("CompactPostDisplay", () => {
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
     assert.equal(summary.find(Link).at(0).props().children, post.title)
     assert.deepEqual(
-      wrapper.find(".num-comments").find(Link).props().children,
+      wrapper.find(".post-links").find(Link).props().children,
       formatCommentsCount(post)
     )
     const authoredBy = wrapper.find(".authored-by").text()
@@ -66,6 +66,56 @@ describe("CompactPostDisplay", () => {
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
     assert.equal(children, post.title)
+  })
+
+  it('should include a "pinning" link, if isModerator and showPinUI', () => {
+    [[true, "unpin"], [false, "pin"]].forEach(([pinned, linkText]) => {
+      const post = makePost()
+      post.stickied = pinned
+      const wrapper = renderPostDisplay({
+        post:        post,
+        showPinUI:   true,
+        isModerator: true
+      })
+      assert.equal(linkText, wrapper.find("a").at(2).text())
+    })
+  })
+
+  it("should not show a pin link otherwise", () => {
+    [true, false].forEach(showPinUI => {
+      const wrapper = renderPostDisplay({ post, showPinUI })
+      assert.lengthOf(wrapper.find(".post-links").find("a"), 1)
+    })
+  })
+
+  it("should set a class if stickied and showing pin ui", () => {
+    [
+      [true, true],
+      [true, false],
+      [false, true],
+      [false, false]
+    ].forEach(([showPinUI, stickied]) => {
+      post.stickied = stickied
+      const wrapper = renderPostDisplay({ post, showPinUI })
+      assert.equal(
+        wrapper.find(".post-summary").props().className,
+        showPinUI && stickied ? "post-summary sticky" : "post-summary "
+      )
+    })
+  })
+
+  it("pin link should call togglePinPost", () => {
+    const togglePinPostStub = helper.sandbox.stub()
+    const post = makePost()
+    post.stickied = true
+    const wrapper = renderPostDisplay({
+      post:          post,
+      showPinUI:     true,
+      isModerator:   true,
+      togglePinPost: togglePinPostStub
+    })
+    wrapper.find("a").at(2).simulate("click")
+    assert.ok(togglePinPostStub.calledWith(post))
   })
 
   it("should display the domain, for a url post", () => {
