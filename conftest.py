@@ -2,6 +2,7 @@
 # pylint: disable=unused-argument, redefined-outer-name
 import factory
 import pytest
+from rest_framework.test import APIClient
 from rest_framework_jwt.settings import api_settings
 
 from open_discussions.factories import UserFactory
@@ -56,3 +57,11 @@ def staff_jwt_header(staff_jwt_token):
 def jwt_header(jwt_token):
     """Generate a nonstaff Authorization HTTP header"""
     return dict(HTTP_AUTHORIZATION='Bearer {}'.format(jwt_token))
+
+
+@pytest.fixture
+def client():
+    """
+    Similar to the builtin client but this provides the DRF client instead of the Django test client.
+    """
+    return APIClient()

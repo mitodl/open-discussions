@@ -1,6 +1,4 @@
 """Tests for views for REST APIs for users"""
-import json
-
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import pytest
@@ -8,8 +6,6 @@ import pytest
 
 # pylint: disable=redefined-outer-name, unused-argument
 pytestmark = pytest.mark.django_db
-
-API_KWARGS = dict(content_type='application/json', format='json')
 
 
 def test_list_users(client, staff_user, staff_jwt_header):
@@ -48,7 +44,7 @@ def test_create_user(client, staff_jwt_header, mocker):
         }
     }
     get_or_create_auth_tokens_stub = mocker.patch('profiles.serializers.get_or_create_auth_tokens')
-    resp = client.post(url, data=json.dumps(payload), **API_KWARGS, **staff_jwt_header)
+    resp = client.post(url, data=payload, **staff_jwt_header)
     assert resp.status_code == 201
     assert resp.json()['profile'] == payload['profile']
     get_or_create_auth_tokens_stub.assert_called_once_with(User.objects.get(username=resp.json()['username']))
@@ -80,11 +76,11 @@ def test_patch_user(client, user, staff_jwt_header):
     """
     profile = user.profile
     url = reverse('user_api-detail', kwargs={'username': user.username})
-    resp = client.patch(url, data=json.dumps({
+    resp = client.patch(url, data={
         'profile': {
             'name': 'othername',
         }
-    }), **API_KWARGS, **staff_jwt_header)
+    }, **staff_jwt_header)
     assert resp.status_code == 200
     assert resp.json() == {
         'id': user.id,
@@ -103,8 +99,8 @@ def test_patch_username(client, user, staff_jwt_header):
     Trying to update a users's username does not change anything
     """
     url = reverse('user_api-detail', kwargs={'username': user.username})
-    resp = client.patch(url, data=json.dumps({
+    resp = client.patch(url, data={
         'username': 'notallowed'
-    }), **API_KWARGS, **staff_jwt_header)
+    }, **staff_jwt_header)
     assert resp.status_code == 200
     assert resp.json()['username'] == user.username
