@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.5.2
+-------------
+
+- fixed styling of channel page (#360)
+- Add pinning support to post API
+
 Version 0.5.1
 -------------
 
