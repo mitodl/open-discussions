@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.6.0
+-------------
+
+- Make stickied not required (#378)
+- Add spinner for Load more comments link (#371)
+- Added editing of channel description
+
 Version 0.5.2
 -------------
 
