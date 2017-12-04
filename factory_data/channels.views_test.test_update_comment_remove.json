@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "In aliquam autem illum ipsa debitis. Beatae praesentium eligendi repudiandae incidunt.\nFuga reprehenderit nihil placeat. Cumque optio eligendi molestiae deserunt dolorum. Eius minima qui saepe ipsa odio dicta tempore veniam. Sit ut natus fugiat voluptatum ea similique.\nOfficiis repellendus itaque quos recusandae voluptas numquam ad. Corrupti vero atque facilis adipisci architecto consectetur animi aperiam. Doloremque ex illum consectetur amet.",
+      "name": "1512511921_expedita",
+      "public_description": "Dolorum iure saepe totam architecto. Vitae laboriosam molestias quasi laborum consequatur.",
+      "title": "Quia excepturi incidunt accusantium porro."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "3y",
+      "post_id": "gx",
+      "text": "Deleniti impedit aut quasi similique adipisci magni. Velit eligendi delectus earum cumque totam."
+    }
+  },
+  "posts": {
+    "post": {
+      "id": "gx",
+      "text": "Qui omnis qui accusamus dolor voluptatibus. Illum ea hic asperiores.",
+      "title": "Nemo possimus nobis est doloribus ipsam ex vel."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C0MBRTHJ6Z8KQGWPE29C1SWW"
+    },
+    "staff_user": {
+      "username": "01C0MBRM55K1WHK6NQ83538QA2"
+    }
+  }
+}

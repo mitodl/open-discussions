@@ -270,6 +270,24 @@ def test_update_comment(mock_client):
     mock_client.comment.return_value.edit.assert_called_once_with('Text')
 
 
+def test_approve_comment(mock_client):
+    """Test approve_post passes"""
+    mock_client.submission.return_value.selftext = 'text'
+    client = api.Api(UserFactory.create())
+    client.approve_comment('id')
+    mock_client.comment.assert_called_once_with('id')
+    mock_client.comment.return_value.mod.approve.assert_called_once_with()
+
+
+def test_remove_comment(mock_client):
+    """Test remove_comment passes"""
+    mock_client.submission.return_value.selftext = 'text'
+    client = api.Api(UserFactory.create())
+    client.remove_comment('id')
+    mock_client.comment.assert_called_once_with('id')
+    mock_client.comment.return_value.mod.remove.assert_called_once_with()
+
+
 def test_init_more_comments(mock_client, mocker):
     """Test init_more_comments"""
     client = api.Api(UserFactory.create())

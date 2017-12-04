@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Necessitatibus sunt provident perferendis laudantium debitis. Perferendis sit quidem molestiae. Aliquid vero esse fugiat facilis sit sed. Blanditiis rem quas ipsa dolore quam porro impedit rerum.\nNobis dolorum nisi at temporibus illum velit. Sequi deleniti repudiandae sapiente excepturi est officia explicabo. Officiis eos eveniet necessitatibus illo aliquid error optio.\nRatione facere omnis saepe corporis nihil. Ad beatae enim ea eligendi assumenda. Sapiente et non sed placeat.",
+      "name": "1512514989_dolorum",
+      "public_description": "Aut nam similique fugit. Mollitia quas debitis sint corrupti praesentium cum.",
+      "title": "Incidunt sequi dolor est repudiandae illum."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "42",
+      "post_id": "h1",
+      "text": "Incidunt inventore voluptatem iusto voluptatum eaque fugiat. Odit quasi veniam ad ullam."
+    }
+  },
+  "posts": {
+    "post": {
+      "id": "h1",
+      "text": "Praesentium laboriosam itaque adipisci. Aperiam autem exercitationem fugiat dolorum fuga odio nam.",
+      "title": "Eveniet itaque cumque quam non a."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C0MEPEB7JB8H346984YQ7TBS"
+    },
+    "staff_user": {
+      "username": "01C0MEP7N4AWHXJJJTVXR8JGN9"
+    }
+  }
+}

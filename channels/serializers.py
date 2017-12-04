@@ -283,6 +283,7 @@ class CommentSerializer(serializers.Serializer):
     author_id = serializers.SerializerMethodField()
     score = serializers.IntegerField(read_only=True)
     upvoted = WriteableSerializerMethodField()
+    removed = WriteableSerializerMethodField()
     downvoted = WriteableSerializerMethodField()
     created = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
@@ -371,6 +372,14 @@ class CommentSerializer(serializers.Serializer):
         """Validate that downvoted is a bool"""
         return {'downvoted': _parse_bool(value, 'downvoted')}
 
+    def get_removed(self, instance):
+        """Returns True if the comment was removed"""
+        return instance.banned_by is not None
+
+    def validate_removed(self, value):
+        """Validate that removed is a bool"""
+        return {'removed': _parse_bool(value, 'removed')}
+
     def validate(self, attrs):
         """Validate that the the combination of fields makes sense"""
         if attrs.get('upvoted') and attrs.get('downvoted'):
@@ -401,9 +410,16 @@ class CommentSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         if validated_data.get('comment_id'):
             raise ValidationError("comment_id must be provided via URL")
+
         api = Api(user=self.context['request'].user)
         if 'body' in validated_data:
             api.update_comment(comment_id=instance.id, text=validated_data['body'])
+
+        if 'removed' in validated_data:
+            if validated_data['removed'] is True:
+                api.remove_comment(comment_id=instance.id)
+            else:
+                api.approve_comment(comment_id=instance.id)
 
         _apply_vote(instance, validated_data, True)
 

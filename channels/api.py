@@ -508,8 +508,25 @@ class Api:
         Returns:
             praw.models.Comment: the updated comment
         """
-
         return self.get_comment(comment_id).edit(text)
+
+    def remove_comment(self, comment_id):
+        """
+        Removes a comment
+
+        Args:
+            comment_id(str): the id of the comment
+        """
+        self.get_comment(comment_id).mod.remove()
+
+    def approve_comment(self, comment_id):
+        """
+        Approves a comment
+
+        Args:
+            comment_id(str): the id of the comment
+        """
+        self.get_comment(comment_id).mod.approve()
 
     def delete_comment(self, comment_id):
         """

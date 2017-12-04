@@ -914,6 +914,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "score": 1,
             "upvoted": False,
             "downvoted": False,
+            "removed": False,
             "created": "2017-07-25T17:09:45+00:00",
             'profile_image': profile_image,
             'author_name': name,
@@ -929,6 +930,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "score": 1,
             "upvoted": True,
             "downvoted": False,
+            "removed": False,
             "created": "2017-07-25T17:15:57+00:00",
             'profile_image': profile_image,
             'author_name': name,
@@ -944,6 +946,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "score": 1,
             "upvoted": True,
             "downvoted": False,
+            "removed": False,
             "created": "2017-07-25T17:16:10+00:00",
             'profile_image': profile_image,
             'author_name': name,
@@ -1002,6 +1005,7 @@ def test_more_comments(client, logged_in_profile, use_betamax, praw_settings, is
             "score": 1,
             "upvoted": False,
             "downvoted": False,
+            "removed": False,
             "created": "2017-10-19T19:47:22+00:00",
             "profile_image": image_url,
             "author_name": name,
@@ -1017,6 +1021,7 @@ def test_more_comments(client, logged_in_profile, use_betamax, praw_settings, is
             "score": 1,
             "upvoted": False,
             "downvoted": False,
+            "removed": False,
             "created": "2017-10-23T17:45:14+00:00",
             "profile_image": image_url,
             "author_name": name,
@@ -1032,6 +1037,7 @@ def test_more_comments(client, logged_in_profile, use_betamax, praw_settings, is
             "score": 1,
             "upvoted": False,
             "downvoted": False,
+            "removed": False,
             "created": "2017-10-23T17:45:25+00:00",
             "profile_image": image_url,
             "author_name": name,
@@ -1080,6 +1086,7 @@ def test_more_comments_children(client, logged_in_profile, use_betamax, praw_set
             "score": 1,
             "upvoted": True,
             "downvoted": False,
+            "removed": False,
             "created": "2017-11-09T16:35:55+00:00",
             "profile_image": image_url,
             "author_name": name,
@@ -1095,6 +1102,7 @@ def test_more_comments_children(client, logged_in_profile, use_betamax, praw_set
             "score": 1,
             "upvoted": True,
             "downvoted": False,
+            "removed": False,
             "created": "2017-11-09T16:36:00+00:00",
             "profile_image": image_url,
             "author_name": name,
@@ -1156,6 +1164,7 @@ def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_sett
             'score': 1,
             'text': '[deleted]',
             'upvoted': False,
+            "removed": False,
             'id': '1s',
             'edited': False,
             "author_name": "[deleted]",
@@ -1172,6 +1181,7 @@ def test_list_deleted_comments(client, logged_in_profile, use_betamax, praw_sett
             'score': 1,
             'text': 'reply to parent which is not deleted',
             'upvoted': False,
+            "removed": False,
             'edited': False,
             "author_name": user.profile.name,
         }
@@ -1196,6 +1206,7 @@ def test_create_comment(client, logged_in_profile):
         'text': 'reply_to_post 2',
         'upvoted': True,
         "downvoted": False,
+        "removed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -1242,6 +1253,7 @@ def test_create_comment_no_upvote(client, logged_in_profile):
         'text': 'no upvoted',
         'upvoted': False,
         "downvoted": False,
+        "removed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -1268,6 +1280,7 @@ def test_create_comment_downvote(client, logged_in_profile):
         'text': 'downvoted',
         'upvoted': False,
         'downvoted': True,
+        "removed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -1295,6 +1308,7 @@ def test_create_comment_reply_to_comment(client, logged_in_profile):
         'text': 'reply_to_comment 3',
         'upvoted': True,
         "downvoted": False,
+        "removed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -1319,6 +1333,7 @@ def test_update_comment_text(client, logged_in_profile):
         'text': 'updated text',
         'upvoted': False,
         'downvoted': False,
+        "removed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': True,
@@ -1355,6 +1370,7 @@ def test_update_comment_upvote(client, logged_in_profile):
         'text': 'downvoted',
         'upvoted': True,
         'downvoted': False,
+        "removed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -1380,6 +1396,7 @@ def test_update_comment_downvote(client, logged_in_profile):
         'text': 'downvoted',
         'upvoted': False,
         'downvoted': True,
+        "removed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -1404,6 +1421,7 @@ def test_update_comment_clear_upvote(client, logged_in_profile):
         'text': 'reply_to_comment 3',
         'upvoted': False,
         'downvoted': False,
+        "removed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -1429,8 +1447,72 @@ def test_update_comment_clear_downvote(client, logged_in_profile):
         'text': 'downvoted',
         'upvoted': False,
         'downvoted': False,
+        "removed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
+        'edited': False,
+        'comment_type': 'comment',
+    }
+
+
+def test_update_comment_remove(
+        client, staff_user, private_channel_and_contributor, reddit_factories, staff_api
+):
+    """Update a comment to remove it as a moderator"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("post", user, channel=channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+    client.force_login(staff_user)
+    url = reverse('comment-detail', kwargs={'comment_id': comment.id})
+    resp = client.patch(url, type='json', data={
+        "removed": True,
+    })
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'author_id': user.username,
+        'created': comment.created,
+        'id': comment.id,
+        'parent_id': None,
+        'post_id': post.id,
+        'score': 1,
+        'text': comment.text,
+        'upvoted': False,
+        'downvoted': False,
+        "removed": True,
+        'profile_image': user.profile.image_small,
+        'author_name': user.profile.name,
+        'edited': False,
+        'comment_type': 'comment',
+    }
+
+
+def test_update_comment_approve(
+        client, staff_user, private_channel_and_contributor, reddit_factories, staff_api
+):
+    """Update a comment to approve it as a moderator"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("post", user, channel=channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+    staff_api.remove_comment(comment.id)
+    client.force_login(staff_user)
+    url = reverse('comment-detail', kwargs={'comment_id': comment.id})
+    resp = client.patch(url, type='json', data={
+        "removed": False,
+    })
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'author_id': user.username,
+        'created': comment.created,
+        'id': comment.id,
+        'parent_id': None,
+        'post_id': post.id,
+        'score': 1,
+        'text': comment.text,
+        'upvoted': False,
+        'downvoted': False,
+        "removed": False,
+        'profile_image': user.profile.image_small,
+        'author_name': user.profile.name,
         'edited': False,
         'comment_type': 'comment',
     }

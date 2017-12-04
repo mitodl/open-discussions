@@ -59,6 +59,7 @@ class Comment:
         self.comment_id = kwargs.get('comment_id', None)
         self.post_id = kwargs.get('post_id', None)
         self.children = kwargs.get('children', [])
+        self.created = kwargs.get('created', None)
         self.api = kwargs.get('api', None)
 
 User = get_user_model()
@@ -377,6 +378,19 @@ class RedditAccessTokenFactory(DjangoModelFactory):
         )
 
 
+def _timestamp_to_iso_str(timestamp):
+    """
+    Converts the timestamp value into a iso str
+
+    Args:
+        timestamp(float): the timestamp to convert
+
+    Returns:
+        str: converted timestamp
+    """
+    return datetime.fromtimestamp(timestamp).replace(tzinfo=pytz.utc).isoformat()
+
+
 class ChannelFactory(factory.Factory):
     """Factory for channels"""
     api = None
@@ -436,7 +450,7 @@ class TextPostFactory(PostFactory):
         reddit_post = self.api.create_post(self.channel.name, self.title, text=self.text)
 
         self.id = reddit_post.id
-        self.created = datetime.fromtimestamp(reddit_post.created).replace(tzinfo=pytz.utc).isoformat()
+        self.created = _timestamp_to_iso_str(reddit_post.created)
 
     class Meta:
         model = Post
@@ -455,7 +469,7 @@ class LinkPostFactory(PostFactory):
         reddit_post = self.api.create_post(self.channel.name, self.title, url=self.url)
 
         self.id = reddit_post.id
-        self.created = datetime.fromtimestamp(reddit_post.created).replace(tzinfo=pytz.utc).isoformat()
+        self.created = _timestamp_to_iso_str(reddit_post.created)
 
     class Meta:
         model = Post
@@ -466,6 +480,7 @@ class CommentFactory(factory.Factory):
     id = None
     api = None
     comment_id = None
+    created = None
     children = factory.LazyFunction(lambda: [])
     text = factory.Faker('text', max_nb_chars=100)
 
@@ -483,38 +498,14 @@ class CommentFactory(factory.Factory):
         if not self.api:
             raise ValueError("CommentFactory requires an api instance")
 
-        self.id = self.api.create_comment(
+        comment = self.api.create_comment(
             self.text,
             post_id=self.post_id if not self.comment_id else None,  # only use post_id if top-level comment
             comment_id=self.comment_id
-        ).id
-
-    @factory.post_generation
-    def _children(self, create, extracted, **kwargs):  # pylint: disable=unused-argument
-        """Create nested comments"""
-        if extracted:
-            for child in self.children:
-                self.children.append(CommentFactory.create(**child))
-            return
-
-        # NOTE: we need to do this in post_generation because we need to parent comment to be created first
-        max_children = kwargs.get('max', 3)
-
-        if max_children == 0:
-            return
-
-        if 'count' in kwargs:
-            count = kwargs['count']
-        else:
-            count = factory.fuzzy.random.randrange(1, max_children + 1, 1)
-
-        self.children = CommentFactory.create_batch(
-            count,
-            api=self.api,
-            post_id=self.post_id,
-            comment_id=self.id,
-            comment_tree__max=count - 1,
         )
+
+        self.id = comment.id
+        self.created = _timestamp_to_iso_str(comment.created)
 
     class Meta:
         model = Comment

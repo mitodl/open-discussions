@@ -200,6 +200,13 @@ def test_comment_only_one_downvote_or_upvote():
     assert ex.value.args[0] == 'upvoted and downvoted cannot both be true'
 
 
+def test_comment_validate_removed():
+    """removed must be a bool"""
+    with pytest.raises(ValidationError) as ex:
+        CommentSerializer().validate_removed("not a bool")
+    assert ex.value.args[0] == 'removed must be a bool'
+
+
 def test_contributor():
     """Serialize of a redditor-like object"""
     redditor = Mock(spec=Redditor)
