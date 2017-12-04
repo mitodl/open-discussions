@@ -146,8 +146,18 @@ $replyPaddingLeft: 8px;
       padding-left: $commentPaddingLeftPhone;
     }
 
-    a {
+    .load-more-comments {
+      // style button as a link
+      background: none !important;
+      color: $link-blue;
+      border: none;
+      padding: 0 !important;
+      font: inherit;
       cursor: pointer;
+
+      .sk-fading-circle {
+        margin: 0;
+      }
     }
   }
 

@@ -7,6 +7,7 @@ import moment from "moment"
 import ReactMarkdown from "react-markdown"
 
 import Card from "./Card"
+import SpinnerButton from "./SpinnerButton"
 import { ReplyToCommentForm, EditCommentForm } from "./CommentForms"
 import CommentVoteForm from "./CommentVoteForm"
 
@@ -192,7 +193,12 @@ const renderMoreComments = (
       className="more-comments"
       key={`more-comments-${comment.parent_id || "null"}`} // will be null if parent_id is null, indicating root level
     >
-      <a onClick={() => loadMoreComments(comment)}>Load More Comments</a>
+      <SpinnerButton
+        className="load-more-comments"
+        onClickPromise={() => loadMoreComments(comment)}
+      >
+        Load More Comments
+      </SpinnerButton>
     </div>
   )
 }
