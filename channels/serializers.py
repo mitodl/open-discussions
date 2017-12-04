@@ -124,7 +124,7 @@ class PostSerializer(serializers.Serializer):
     title = serializers.CharField()
     upvoted = WriteableSerializerMethodField()
     removed = WriteableSerializerMethodField()
-    stickied = serializers.BooleanField()
+    stickied = serializers.BooleanField(required=False)
     score = serializers.IntegerField(source='ups', read_only=True)
     author_id = serializers.CharField(read_only=True, source='author')
     id = serializers.CharField(read_only=True)

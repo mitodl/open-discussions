@@ -4,7 +4,6 @@ import os
 import pytest
 
 from betamax.fixtures.pytest import _casette_name as cassette_name
-from rest_framework.test import APIClient
 
 from channels.test_utils import no_ssl_verification
 from open_discussions.betamax_config import setup_betamax
@@ -52,12 +51,6 @@ def use_betamax(mocker, cassette_exists, praw_settings, configure_betamax, betam
     # always ignore SSL verification
     with no_ssl_verification():
         yield betamax_parametrized_recorder
-
-
-@pytest.fixture()
-def client():
-    """Similar to the builtin client but this provides the DRF client instead of the Django test client."""
-    return APIClient()
 
 
 @pytest.fixture()
