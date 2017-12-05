@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.6.1
+-------------
+
+- Added UI to remove posts as a moderator
+
 Version 0.6.0
 -------------
 
