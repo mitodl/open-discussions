@@ -4,6 +4,7 @@ import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
 import DocumentTitle from "react-document-title"
+import { Dialog } from "@mitodl/mdl-react-components"
 
 import Card from "../components/Card"
 import withLoading from "../components/Loading"
@@ -16,8 +17,18 @@ import withNavSidebar from "../hoc/withNavSidebar"
 import { formatCommentsCount } from "../lib/posts"
 import { actions } from "../actions"
 import { replaceMoreComments } from "../actions/comment"
-import { setSnackbarMessage } from "../actions/ui"
-import { toggleUpvote, approvePost, removePost } from "../util/api_actions"
+import {
+  setModeratingComment,
+  clearModeratingComment
+} from "../actions/moderation"
+import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
+import {
+  toggleUpvote,
+  approvePost,
+  removePost,
+  removeComment,
+  approveComment
+} from "../util/api_actions"
 import { getChannelName, getPostID } from "../lib/util"
 import { isModerator } from "../lib/channels"
 import { anyError } from "../util/rest"
@@ -44,6 +55,8 @@ type PostPageProps = {
   channel: Channel,
   moderators: ChannelModerators,
   isModerator: boolean,
+  commentToRemove: ?CommentInTree,
+  showRemoveCommentDialog: boolean,
   commentsTree: Array<GenericComment>,
   forms: FormsState,
   commentInFlight: boolean,
@@ -51,6 +64,8 @@ type PostPageProps = {
   channelName: string,
   postID: string
 }
+
+const DIALOG_REMOVE_COMMENT = "DIALOG_REMOVE_COMMENT"
 
 // if either postId or channelName don't match
 const shouldLoadData = R.complement(
@@ -140,6 +155,48 @@ class PostPage extends React.Component<*, void> {
     )
   }
 
+  showRemoveCommentDialog = (comment: CommentInTree) => {
+    const { dispatch } = this.props
+    dispatch(setModeratingComment(comment))
+    dispatch(showDialog(DIALOG_REMOVE_COMMENT))
+  }
+
+  hideRemoveCommentDialog = () => {
+    const { dispatch } = this.props
+    dispatch(clearModeratingComment())
+    dispatch(hideDialog(DIALOG_REMOVE_COMMENT))
+  }
+
+  removeComment = async () => {
+    const { dispatch, commentToRemove } = this.props
+
+    if (!commentToRemove) {
+      // we are getting double events for this, so this is a hack to avoid dispatching
+      // a removeComment with a null comment
+      return
+    }
+
+    await removeComment(dispatch, commentToRemove)
+
+    dispatch(
+      setSnackbarMessage({
+        message: "Comment has been removed"
+      })
+    )
+  }
+
+  approveComment = async (comment: CommentInTree) => {
+    const { dispatch } = this.props
+
+    await approveComment(dispatch, comment)
+
+    dispatch(
+      setSnackbarMessage({
+        message: "Comment has been approved"
+      })
+    )
+  }
+
   render() {
     const {
       dispatch,
@@ -148,6 +205,7 @@ class PostPage extends React.Component<*, void> {
       commentsTree,
       forms,
       commentInFlight,
+      showRemoveCommentDialog,
       isModerator
     } = this.props
     if (!channel || !post || !commentsTree) {
@@ -158,6 +216,19 @@ class PostPage extends React.Component<*, void> {
       <div>
         <ChannelBreadcrumbs channel={channel} />
         <DocumentTitle title={formatTitle(post.title)} />
+        <Dialog
+          id="remove-comment-dialog"
+          open={showRemoveCommentDialog}
+          onAccept={this.removeComment}
+          hideDialog={this.hideRemoveCommentDialog}
+          submitText="Yes, remove"
+        >
+          <p>
+            Are you sure? You will still be able to see the comment, but it will
+            be deleted for normal users. You can undo this later by clicking
+            "approve".
+          </p>
+        </Dialog>
         <Card>
           <div className="post-card">
             <ExpandedPostDisplay
@@ -184,6 +255,9 @@ class PostPage extends React.Component<*, void> {
           forms={forms}
           upvote={this.upvote}
           downvote={this.downvote}
+          approve={this.approveComment}
+          remove={this.showRemoveCommentDialog}
+          isModerator={isModerator}
           loadMoreComments={this.loadMoreComments}
           beginEditing={beginEditing(dispatch)}
           processing={commentInFlight}
@@ -194,7 +268,15 @@ class PostPage extends React.Component<*, void> {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { posts, channels, comments, forms, channelModerators } = state
+  const {
+    posts,
+    channels,
+    comments,
+    forms,
+    channelModerators,
+    ui,
+    moderation
+  } = state
   const postID = getPostID(ownProps)
   const channelName = getChannelName(ownProps)
   const post = posts.data.get(postID)
@@ -202,6 +284,7 @@ const mapStateToProps = (state, ownProps) => {
   const commentsTree = comments.data.get(postID)
   const moderators = channelModerators.data.get(channelName)
   return {
+    ui,
     postID,
     channelName,
     forms,
@@ -209,11 +292,13 @@ const mapStateToProps = (state, ownProps) => {
     channel,
     commentsTree,
     moderators,
-    isModerator:        isModerator(moderators, SETTINGS.username),
-    loaded:             R.none(R.isNil, [post, channel, commentsTree]),
-    errored:            anyError([posts, channels, comments]),
-    subscribedChannels: getSubscribedChannels(state),
-    commentInFlight:    comments.processing
+    commentToRemove:         moderation.comment,
+    isModerator:             isModerator(moderators, SETTINGS.username),
+    loaded:                  R.none(R.isNil, [post, channel, commentsTree]),
+    errored:                 anyError([posts, channels, comments]),
+    subscribedChannels:      getSubscribedChannels(state),
+    commentInFlight:         comments.processing,
+    showRemoveCommentDialog: ui.dialogs.has(DIALOG_REMOVE_COMMENT)
   }
 }
 

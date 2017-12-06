@@ -34,3 +34,10 @@ export const goBackAndHandleEvent = R.curry((history, e) => {
   e.preventDefault()
   history.goBack()
 })
+
+export const preventDefaultAndInvoke = R.curry(
+  (invokee: Function, e: Event) => {
+    e.preventDefault()
+    invokee()
+  }
+)

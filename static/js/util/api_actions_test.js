@@ -1,12 +1,21 @@
 // @flow
+import R from "ramda"
 import { assert } from "chai"
 
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
-import { toggleUpvote, approvePost, removePost } from "../util/api_actions"
+import {
+  toggleUpvote,
+  approvePost,
+  removePost,
+  approveComment,
+  removeComment
+} from "../util/api_actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 import { makePost } from "../factories/posts"
+import { makeCommentsResponse } from "../factories/comments"
+import { findComment } from "../lib/comments"
 
 describe("api_actions util", () => {
   let helper
@@ -80,6 +89,96 @@ describe("api_actions util", () => {
 
       assert.deepEqual(state.posts.data.get(post.id), post)
       assert.isOk(helper.updateRemovedStub.calledWith(post.id, true))
+    })
+  })
+
+  describe("approveComment", () => {
+    let post, response
+    beforeEach(() => {
+      post = makePost()
+      response = makeCommentsResponse(post)
+      helper.getCommentsStub.returns(Promise.resolve(response))
+    })
+
+    it("should patch the comment and set the updated value", async () => {
+      const comment = response[0]
+      // $FlowFixMe: flow can't reason about comment.id properly
+      comment.removed = true
+      helper.updateCommentStub.returns(
+        Promise.resolve({
+          ...comment,
+          removed: false
+        })
+      )
+      const state = await helper.listenForActions(
+        [
+          actions.comments.get.requestType,
+          actions.comments.get.successType,
+          actions.comments.patch.requestType,
+          actions.comments.patch.successType
+        ],
+        async () => {
+          await helper.store.dispatch(actions.comments.get(post.id))
+          await approveComment(helper.store.dispatch, comment)
+        }
+      )
+      const stateTree = state.comments.data.get(post.id)
+      const resultComment = R.view(
+        // $FlowFixMe: flow can't reason about comment.id properly
+        findComment(stateTree, comment.id),
+        stateTree
+      )
+
+      assert.isOk(
+        // $FlowFixMe: flow can't reason about comment.id properly
+        helper.updateCommentStub.calledWith(comment.id, { removed: false })
+      )
+      assert.equal(resultComment.removed, false)
+    })
+  })
+
+  describe("removeComment", () => {
+    let post, response
+    beforeEach(() => {
+      post = makePost()
+      response = makeCommentsResponse(post)
+      helper.getCommentsStub.returns(Promise.resolve(response))
+    })
+
+    it("should patch the comment and set the updated value", async () => {
+      const comment = response[0]
+      // $FlowFixMe: flow can't reason about comment.id properly
+      comment.removed = false
+      helper.updateCommentStub.returns(
+        Promise.resolve({
+          ...comment,
+          removed: true
+        })
+      )
+      const state = await helper.listenForActions(
+        [
+          actions.comments.get.requestType,
+          actions.comments.get.successType,
+          actions.comments.patch.requestType,
+          actions.comments.patch.successType
+        ],
+        async () => {
+          await helper.store.dispatch(actions.comments.get(post.id))
+          await removeComment(helper.store.dispatch, comment)
+        }
+      )
+      const stateTree = state.comments.data.get(post.id)
+      const resultComment = R.view(
+        // $FlowFixMe: flow can't reason about comment.id properly
+        findComment(stateTree, comment.id),
+        stateTree
+      )
+
+      assert.isOk(
+        // $FlowFixMe: flow can't reason about comment.id properly
+        helper.updateCommentStub.calledWith(comment.id, { removed: true })
+      )
+      assert.equal(resultComment.removed, true)
     })
   })
 })

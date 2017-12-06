@@ -16,7 +16,8 @@ import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
 import { REPLACE_MORE_COMMENTS } from "../actions/comment"
 import { FORM_BEGIN_EDIT } from "../actions/forms"
-import { SET_SNACKBAR_MESSAGE } from "../actions/ui"
+import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG } from "../actions/ui"
+import { SET_MODERATING_COMMENT } from "../actions/moderation"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
 import { postDetailURL } from "../lib/url"
@@ -145,6 +146,17 @@ describe("PostPage", function() {
     }
   })
 
+  it("passed props to each CommentRemovalForm", async () => {
+    const [wrapper] = await renderPage()
+    const commentTree = wrapper.find("CommentTree")
+    const commentTreeProps = commentTree.props()
+    for (const form of wrapper.find("CommentRemovalForm")) {
+      const fromProps = form.props
+      assert.equal(fromProps.approve, commentTreeProps.approve)
+      assert.equal(fromProps.remove, commentTreeProps.remove)
+    }
+  })
+
   it("loads more comments when the function is called", async () => {
     const [wrapper] = await renderPage()
     const commentTree = wrapper.find("CommentTree")
@@ -245,6 +257,63 @@ describe("PostPage", function() {
       })
 
       sinon.assert.calledWith(helper.updateRemovedStub, post.id, false)
+    })
+    ;[
+      [false, "should remove a comment"],
+      [true, "should approve an comment"]
+    ].forEach(([isRemoved, testName]) => {
+      it(testName, async () => {
+        const comment = comments[0].replies[2]
+        assert(comment, "comment not found")
+        // set initial state for removed so we can flip it the other way
+        const expectedPayload = { removed: !isRemoved }
+        comment.removed = isRemoved
+
+        const [wrapper] = await renderPage()
+
+        const expectedComment = {
+          ...comment,
+          ...expectedPayload
+        }
+        helper.updateCommentStub.returns(Promise.resolve(expectedComment))
+
+        const patchActions = [
+          actions.comments.patch.requestType,
+          actions.comments.patch.successType
+        ]
+        let expectedActions = []
+        if (isRemoved) {
+          // if we're approving it, the patch actions fire immediately
+          expectedActions = patchActions
+        } else {
+          // otherwise a confirmation dialog shows
+          expectedActions = [SHOW_DIALOG, SET_MODERATING_COMMENT]
+        }
+
+        let newState = await listenForActions(expectedActions, () => {
+          const props = wrapper.find("CommentTree").props()
+          const modFunc = isRemoved ? props.approve : props.remove
+          modFunc(comment)
+        })
+
+        if (!isRemoved) {
+          // if we are removing the comment, handle the confirmation dialog
+          newState = await listenForActions(patchActions, () => {
+            wrapper.find("Dialog").at(0).props().onAccept()
+          })
+        }
+
+        const commentTree = newState.comments.data.get(post.id)
+        const lens = findComment(commentTree, comment.id)
+        const updatedComment = R.view(lens, commentTree)
+        assert.deepEqual(updatedComment, expectedComment)
+
+        sinon.assert.calledWith(
+          helper.updateCommentStub,
+          comment.id,
+          expectedPayload
+        )
+      })
     })
   })
 })

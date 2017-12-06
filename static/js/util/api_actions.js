@@ -4,7 +4,7 @@ import R from "ramda"
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 
-import type { Post } from "../flow/discussionTypes"
+import type { Post, CommentInTree } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
 
 export const toggleUpvote = R.curry(async (dispatch: Dispatch, post: Post) => {
@@ -23,3 +23,21 @@ export const removePost = R.curry(async (dispatch: Dispatch, post: Post) => {
   const result = await dispatch(actions.postRemoved.patch(post.id, true))
   return dispatch(setPostData(result))
 })
+
+export const approveComment = R.curry(
+  async (dispatch: Dispatch, comment: CommentInTree) =>
+    dispatch(
+      actions.comments.patch(comment.id, {
+        removed: false
+      })
+    )
+)
+
+export const removeComment = R.curry(
+  async (dispatch: Dispatch, comment: CommentInTree) =>
+    dispatch(
+      actions.comments.patch(comment.id, {
+        removed: true
+      })
+    )
+)

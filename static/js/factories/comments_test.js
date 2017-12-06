@@ -14,6 +14,7 @@ describe("comment factories", () => {
       assert.isString(comment.author_id)
       assert.isNumber(comment.score)
       assert.isBoolean(comment.upvoted)
+      assert.isBoolean(comment.removed)
       assert.isString(comment.created)
       assert(moment(comment.created).isValid())
       assert.isArray(comment.replies)

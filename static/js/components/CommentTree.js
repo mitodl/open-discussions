@@ -10,6 +10,7 @@ import Card from "./Card"
 import SpinnerButton from "./SpinnerButton"
 import { ReplyToCommentForm, EditCommentForm } from "./CommentForms"
 import CommentVoteForm from "./CommentVoteForm"
+import CommentRemovalForm from "./CommentRemovalForm"
 
 import {
   replyToCommentKey,
@@ -24,6 +25,7 @@ import type {
   MoreCommentsInTree
 } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
+import type { CommentRemoveFunc } from "./CommentRemovalForm"
 import type { CommentVoteFunc } from "./CommentVoteForm"
 
 type LoadMoreCommentsFunc = (comment: MoreCommentsInTree) => Promise<*>
@@ -34,8 +36,11 @@ type CommentTreeProps = {
   forms: FormsState,
   upvote: CommentVoteFunc,
   downvote: CommentVoteFunc,
+  remove: CommentRemoveFunc,
+  approve: CommentRemoveFunc,
   loadMoreComments: LoadMoreCommentsFunc,
   beginEditing: BeginEditingFunc,
+  isModerator: boolean,
   processing: boolean
 }
 
@@ -43,7 +48,16 @@ export default class CommentTree extends React.Component<*, *> {
   props: CommentTreeProps
 
   renderComment = (depth: number, comment: CommentInTree) => {
-    const { forms, upvote, downvote, beginEditing, processing } = this.props
+    const {
+      forms,
+      upvote,
+      downvote,
+      approve,
+      remove,
+      beginEditing,
+      processing,
+      isModerator
+    } = this.props
     const formKey = replyToCommentKey(comment)
     const editFormKey = editCommentKey(comment)
     const initialValue = getCommentReplyInitialValue(comment)
@@ -54,18 +68,26 @@ export default class CommentTree extends React.Component<*, *> {
 
     const atMaxDepth = depth + 1 >= SETTINGS.max_comment_depth
     return (
-      <div className="comment" key={`comment-${comment.id}`}>
+      <div
+        className={`comment ${comment.removed ? "removed" : ""}`}
+        key={`comment-${comment.id}`}
+      >
         <img className="profile-image" src={comment.profile_image} />
         <div className="comment-contents">
           <div className="author-info">
             <span className="author-name">
               {comment.author_name}
             </span>
-            <span>
+            <span className="authored-date">
               {moment(comment.created).fromNow()}
             </span>
+            <span className="removed-note">
+              {comment.removed
+                ? <span>[comment removed by moderator]</span>
+                : null}
+            </span>
           </div>
-          <div className="row">
+          <div className="row text">
             {R.has(editFormKey, forms)
               ? <EditCommentForm
                 forms={forms}
@@ -88,23 +110,29 @@ export default class CommentTree extends React.Component<*, *> {
             {atMaxDepth
               ? null
               : <div
-                className="comment-action-button"
+                className="comment-action-button reply-button"
                 onClick={e => {
                   beginEditing(formKey, initialValue, e)
                 }}
               >
-                <a href="#">Reply</a>
+                <a href="#">reply</a>
               </div>}
             {SETTINGS.username === comment.author_id
               ? <div
-                className="comment-action-button"
+                className="comment-action-button edit-button"
                 onClick={e => {
                   beginEditing(editFormKey, comment, e)
                 }}
               >
-                <a href="#">Edit</a>
+                <a href="#">edit</a>
               </div>
               : null}
+            <CommentRemovalForm
+              comment={comment}
+              remove={remove}
+              approve={approve}
+              isModerator={isModerator}
+            />
           </div>
           {atMaxDepth
             ? null

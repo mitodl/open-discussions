@@ -6,6 +6,7 @@ import { actions } from "../actions"
 import { endpoints } from "../lib/redux_rest"
 import * as formReducers from "./forms"
 import { ui } from "./ui"
+import { moderation } from "./moderation"
 
 const reducers: Object = {}
 endpoints.forEach(endpoint => {
@@ -15,5 +16,6 @@ endpoints.forEach(endpoint => {
 export default combineReducers({
   ...reducers,
   ...formReducers,
-  ui
+  ui,
+  moderation
 })

@@ -54,6 +54,23 @@ $replyPaddingLeft: 8px;
       }
     }
 
+    &.removed {
+      > .profile-image  {
+        opacity: 0.5;
+      }
+
+      > .comment-contents {
+        > .row.text,
+        > .comment-actions .votes-form,
+        > .author-info .author-name,
+        > .author-info .authored-date,
+        > .comment-actions .reply-button,
+        > .comment-actions .edit-button {
+          opacity: 0.5;
+        }
+      }
+    }
+
     .row {
       display: flex;
       flex-direction: row;
@@ -120,6 +137,12 @@ $replyPaddingLeft: 8px;
         font-weight: 500;
         font-size: 15px;
         color: $font-black;
+      }
+
+      .removed-note {
+        font-style: italic;
+        color: $font-black;
+        padding-left: 6px;
       }
     }
 

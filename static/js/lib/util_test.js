@@ -1,7 +1,8 @@
 // @flow
+import sinon from "sinon"
 import { assert } from "chai"
 
-import { wait, enumerate, isEmptyText } from "./util"
+import { wait, enumerate, isEmptyText, preventDefaultAndInvoke } from "./util"
 
 describe("utility functions", () => {
   it("waits some milliseconds", done => {
@@ -46,5 +47,17 @@ describe("utility functions", () => {
     ].forEach(([text, exp]) => {
       assert.equal(isEmptyText(text), exp)
     })
+  })
+
+  it("preventDefaultAndInvoke works as expected", () => {
+    const invokee = sinon.stub()
+    const event = {
+      preventDefault: sinon.stub()
+    }
+
+    preventDefaultAndInvoke(invokee, event)
+
+    sinon.assert.calledWith(invokee)
+    sinon.assert.calledWith(event.preventDefault)
   })
 })

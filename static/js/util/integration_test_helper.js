@@ -19,7 +19,7 @@ export default class IntegrationTestHelper {
     this.sandbox = sinon.sandbox.create()
     this.store = configureTestStore((...args) => {
       // uncomment to listen on dispatched actions
-      // console.log(args);
+      // console.log(args)
       return rootReducer(...args)
     })
 

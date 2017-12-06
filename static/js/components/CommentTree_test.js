@@ -25,6 +25,8 @@ describe("CommentTree", () => {
     sandbox,
     upvoteStub,
     downvoteStub,
+    removeStub,
+    approveStub,
     beginEditingStub,
     loadMoreCommentsStub
 
@@ -34,6 +36,8 @@ describe("CommentTree", () => {
     sandbox = sinon.sandbox.create()
     upvoteStub = sandbox.stub()
     downvoteStub = sandbox.stub()
+    removeStub = sandbox.stub()
+    approveStub = sandbox.stub()
     beginEditingStub = sandbox.stub()
     loadMoreCommentsStub = sandbox.stub()
   })
@@ -49,6 +53,8 @@ describe("CommentTree", () => {
         forms={{}}
         upvote={upvoteStub}
         downvote={downvoteStub}
+        approveStub={approveStub}
+        removeStub={removeStub}
         beginEditing={R.curry(beginEditingStub)}
         processing={false}
         loadMoreComments={loadMoreCommentsStub}
@@ -93,10 +99,7 @@ describe("CommentTree", () => {
   it("should put a className on replies, to allow for indentation", () => {
     const wrapper = renderCommentTree()
     const firstComment = wrapper.find(".top-level-comment").at(0)
-    assert.equal(
-      firstComment.find(".comment").at(0).props().className,
-      "comment"
-    )
+    assert.ok(firstComment.find(".comment").at(0).hasClass("comment"))
     assert.ok(firstComment.find(".replies > .comment").at(0))
   })
 

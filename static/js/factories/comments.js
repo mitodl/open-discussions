@@ -27,6 +27,7 @@ export const makeComment = (
     score:         casual.integer(-50, 100),
     upvoted:       casual.coin_flip,
     downvoted:     casual.coin_flip,
+    removed:       casual.coin_flip,
     created:       casual.moment.format(),
     replies:       [],
     profile_image: casual.url,
