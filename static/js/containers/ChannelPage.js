@@ -66,18 +66,32 @@ class ChannelPage extends React.Component<*, void> {
     }
   }
 
+  togglePinPost = async (post: Post) => {
+    const { dispatch } = this.props
+
+    await dispatch(
+      actions.posts.patch(post.id, R.evolve({ stickied: R.not }, post))
+    )
+    this.fetchPostsForChannel()
+  }
+
   loadData = () => {
-    const { dispatch, errored, channelName, location: { search } } = this.props
+    const { dispatch, errored, channelName } = this.props
     if (errored) {
       dispatch(clearChannelError())
     }
     dispatch(actions.channels.get(channelName))
     dispatch(actions.channelModerators.get(channelName))
-    dispatch(
+    this.fetchPostsForChannel()
+  }
+
+  fetchPostsForChannel = async () => {
+    const { dispatch, channelName, location: { search } } = this.props
+
+    const { response: { posts } } = await dispatch(
       actions.postsForChannel.get(channelName, qs.parse(search))
-    ).then(({ response }) => {
-      dispatch(setPostData(response.posts))
-    })
+    )
+    dispatch(setPostData(posts))
   }
 
   render() {
@@ -87,7 +101,8 @@ class ChannelPage extends React.Component<*, void> {
       subscribedChannels,
       posts,
       pagination,
-      channelName
+      channelName,
+      isModerator
     } = this.props
     if (!channel || !subscribedChannels || !posts) {
       return null
@@ -101,6 +116,9 @@ class ChannelPage extends React.Component<*, void> {
               channel={channel}
               posts={posts}
               toggleUpvote={toggleUpvote(dispatch)}
+              isModerator={isModerator}
+              togglePinPost={this.togglePinPost}
+              showPinUI
             />
             {pagination
               ? <PostListNavigation
