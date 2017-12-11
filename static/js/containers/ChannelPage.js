@@ -69,9 +69,7 @@ class ChannelPage extends React.Component<*, void> {
   togglePinPost = async (post: Post) => {
     const { dispatch } = this.props
 
-    await dispatch(
-      actions.posts.patch(post.id, R.evolve({ stickied: R.not }, post))
-    )
+    await dispatch(actions.posts.patch(post.id, { stickied: !post.stickied }))
     this.fetchPostsForChannel()
   }
 

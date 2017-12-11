@@ -1,16 +1,18 @@
 // @flow
+/* global SETTINGS */
 import { assert } from "chai"
 import sinon from "sinon"
 
 import PostList from "../components/PostList"
 import SubscriptionsList from "../components/SubscriptionsList"
+import CompactPostDisplay from "../components/CompactPostDisplay"
 
 import {
   makeChannel,
   makeChannelList,
   makeModerators
 } from "../factories/channels"
-import { makeChannelPostList } from "../factories/posts"
+import { makeChannelPostList, makePost } from "../factories/posts"
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
 import { SET_CHANNEL_DATA, CLEAR_CHANNEL_ERROR } from "../actions/channel"
@@ -64,6 +66,27 @@ describe("ChannelPage", () => {
   it("should set the document title", async () => {
     await renderPage(currentChannel)
     assert.equal(document.title, formatTitle(currentChannel.title))
+  })
+
+  it("pin post link should just post what's necessary", async () => {
+    SETTINGS.username = "username"
+    helper.getChannelModeratorsStub.returns(
+      Promise.resolve(makeModerators(SETTINGS.username))
+    )
+    const post = makePost()
+    postList[0] = post
+    const [wrapper] = await renderPage(currentChannel)
+    wrapper
+      .find(CompactPostDisplay)
+      .at(0)
+      .find(".post-links")
+      .find("a")
+      .at(1)
+      .simulate("click")
+
+    sinon.assert.calledWith(helper.editPostStub, postList[0].id, {
+      stickied: !post.stickied
+    })
   })
 
   it("should fetch postsForChannel, set post data, and render", async () => {
