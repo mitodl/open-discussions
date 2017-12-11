@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.7.0
+-------------
+
+- Fix post pinning issue
+- Add UI for pinning posts
+- Refactored CommentTree to make it classy
+
 Version 0.6.1
 -------------
 
