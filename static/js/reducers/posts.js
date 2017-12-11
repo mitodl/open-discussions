@@ -1,6 +1,12 @@
 // @flow
 import * as api from "../lib/api"
-import { GET, POST, PATCH, INITIAL_STATE } from "redux-hammock/constants"
+import {
+  GET,
+  POST,
+  PATCH,
+  DELETE,
+  INITIAL_STATE
+} from "redux-hammock/constants"
 
 import { SET_POST_DATA } from "../actions/post"
 
@@ -28,16 +34,18 @@ const mergeMultiplePosts = (
 
 export const postsEndpoint = {
   name:     "posts",
-  verbs:    [GET, POST, PATCH],
+  verbs:    [GET, POST, PATCH, DELETE],
   getFunc:  (id: string) => api.getPost(id),
   postFunc: (name: string, payload: CreatePostPayload) =>
     api.createPost(name, payload),
-  patchFunc:           (id: string, post: Post) => api.editPost(id, post),
-  postSuccessHandler:  mergePostData,
-  initialState:        { ...INITIAL_STATE, data: new Map() },
-  getSuccessHandler:   mergePostData,
-  patchSuccessHandler: mergePostData,
-  extraActions:        {
+  patchFunc:            (id: string, post: Post) => api.editPost(id, post),
+  deleteFunc:           (id: string) => api.deletePost(id),
+  postSuccessHandler:   mergePostData,
+  initialState:         { ...INITIAL_STATE, data: new Map() },
+  getSuccessHandler:    mergePostData,
+  patchSuccessHandler:  mergePostData,
+  deleteSuccessHandler: (_: any, data: Map<string, Post>) => data,
+  extraActions:         {
     [SET_POST_DATA]: (state, action) => {
       const update =
         action.payload instanceof Array

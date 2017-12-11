@@ -20,7 +20,8 @@ import {
   editPost,
   getMoreComments,
   updateChannel,
-  updateRemoved
+  updateRemoved,
+  deletePost
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -46,62 +47,59 @@ describe("api", function() {
   })
 
   describe("REST functions", () => {
-    let fetchStub
+    let fetchJSONStub, fetchStub
     beforeEach(() => {
-      fetchStub = sandbox.stub(fetchFuncs, "fetchJSONWithCSRF")
+      fetchJSONStub = sandbox.stub(fetchFuncs, "fetchJSONWithCSRF")
+      fetchStub = sandbox.stub(fetchFuncs, "fetchWithCSRF")
     })
 
-    it("gets channel posts", () => {
+    it("gets channel posts", async () => {
       const posts = makeChannelPostList()
-      fetchStub.returns(Promise.resolve({ posts }))
+      fetchJSONStub.returns(Promise.resolve({ posts }))
 
-      return getPostsForChannel("channelone", {}).then(result => {
-        assert.ok(fetchStub.calledWith("/api/v0/channels/channelone/posts/"))
-        assert.deepEqual(result.posts, posts)
-      })
+      const result = await getPostsForChannel("channelone", {})
+      assert.ok(fetchJSONStub.calledWith("/api/v0/channels/channelone/posts/"))
+      assert.deepEqual(result.posts, posts)
     })
 
-    it("gets channel posts with pagination params", () => {
+    it("gets channel posts with pagination params", async () => {
       const posts = makeChannelPostList()
-      fetchStub.returns(Promise.resolve({ posts }))
+      fetchJSONStub.returns(Promise.resolve({ posts }))
 
-      return getPostsForChannel("channelone", {
+      const result = await getPostsForChannel("channelone", {
         before: "abc",
         after:  "def",
         count:  5
-      }).then(result => {
-        assert.ok(
-          fetchStub.calledWith(
-            `/api/v0/channels/channelone/posts/?after=def&before=abc&count=5`
-          )
+      })
+      assert.ok(
+        fetchJSONStub.calledWith(
+          `/api/v0/channels/channelone/posts/?after=def&before=abc&count=5`
         )
-        assert.deepEqual(result.posts, posts)
-      })
+      )
+      assert.deepEqual(result.posts, posts)
     })
 
-    it("gets channel", () => {
+    it("gets channel", async () => {
       const channel = makeChannel()
-      fetchStub.returns(Promise.resolve(channel))
+      fetchJSONStub.returns(Promise.resolve(channel))
 
-      return getChannel("channelone").then(result => {
-        assert.ok(fetchStub.calledWith("/api/v0/channels/channelone/"))
-        assert.deepEqual(result, channel)
-      })
+      const result = await getChannel("channelone")
+      assert.ok(fetchJSONStub.calledWith("/api/v0/channels/channelone/"))
+      assert.deepEqual(result, channel)
     })
 
-    it("gets a list of channels", () => {
+    it("gets a list of channels", async () => {
       const channelList = makeChannelList()
-      fetchStub.returns(Promise.resolve(channelList))
+      fetchJSONStub.returns(Promise.resolve(channelList))
 
-      return getChannels().then(result => {
-        assert.ok(fetchStub.calledWith("/api/v0/channels/"))
-        assert.deepEqual(result, channelList)
-      })
+      const result = await getChannels()
+      assert.ok(fetchJSONStub.calledWith("/api/v0/channels/"))
+      assert.deepEqual(result, channelList)
     })
 
-    it("creates a channel", () => {
+    it("creates a channel", async () => {
       const channel = makeChannel()
-      fetchStub.returns(Promise.resolve(channel))
+      fetchJSONStub.returns(Promise.resolve(channel))
 
       const input = {
         name:               "name",
@@ -111,22 +109,21 @@ describe("api", function() {
         channel_type:       "public"
       }
 
-      return createChannel(input).then(result => {
-        assert.ok(
-          fetchStub.calledWith(`/api/v0/channels/`, {
-            method: POST,
-            body:   JSON.stringify({
-              ...input
-            })
+      const result = await createChannel(input)
+      assert.ok(
+        fetchJSONStub.calledWith(`/api/v0/channels/`, {
+          method: POST,
+          body:   JSON.stringify({
+            ...input
           })
-        )
-        assert.deepEqual(result, channel)
-      })
+        })
+      )
+      assert.deepEqual(result, channel)
     })
 
-    it("updates a channel", () => {
+    it("updates a channel", async () => {
       const channel = makeChannel()
-      fetchStub.returns(Promise.resolve(channel))
+      fetchJSONStub.returns(Promise.resolve(channel))
 
       const input = {
         name:               "name",
@@ -136,154 +133,153 @@ describe("api", function() {
         channel_type:       "public"
       }
 
-      return updateChannel(input).then(result => {
-        assert.ok(
-          fetchStub.calledWith(`/api/v0/channels/${input.name}/`, {
-            method: PATCH,
-            body:   JSON.stringify({
-              title:              input.title,
-              description:        input.description,
-              public_description: input.public_description,
-              channel_type:       input.channel_type
-            })
+      const result = await updateChannel(input)
+      assert.ok(
+        fetchJSONStub.calledWith(`/api/v0/channels/${input.name}/`, {
+          method: PATCH,
+          body:   JSON.stringify({
+            title:              input.title,
+            description:        input.description,
+            public_description: input.public_description,
+            channel_type:       input.channel_type
           })
-        )
-        assert.deepEqual(result, channel)
-      })
+        })
+      )
+      assert.deepEqual(result, channel)
     })
 
-    it("creates a post", () => {
+    it("creates a post", async () => {
       const post = makePost()
-      fetchStub.returns(Promise.resolve(post))
+      fetchJSONStub.returns(Promise.resolve(post))
 
       const text = "Text"
       const title = "Title"
       const url = "URL"
-      return createPost("channelname", { text, title, url }).then(result => {
-        const body = JSON.stringify({ url, text, title })
-        sinon.assert.calledWith(
-          fetchStub,
-          "/api/v0/channels/channelname/posts/",
-          {
-            body,
-            method: POST
-          }
-        )
-        assert.deepEqual(result, post)
-      })
+      const result = await createPost("channelname", { text, title, url })
+      const body = JSON.stringify({ url, text, title })
+      sinon.assert.calledWith(
+        fetchJSONStub,
+        "/api/v0/channels/channelname/posts/",
+        {
+          body,
+          method: POST
+        }
+      )
+      assert.deepEqual(result, post)
     })
 
-    it("gets post", () => {
+    it("gets post", async () => {
       const post = makePost()
-      fetchStub.returns(Promise.resolve(post))
+      fetchJSONStub.returns(Promise.resolve(post))
 
-      return getPost("1").then(result => {
-        assert.ok(fetchStub.calledWith(`/api/v0/posts/1/`))
-        assert.deepEqual(result, post)
-      })
+      const result = await getPost("1")
+      assert.ok(fetchJSONStub.calledWith(`/api/v0/posts/1/`))
+      assert.deepEqual(result, post)
     })
 
-    it("gets the frontpage", () => {
-      const posts = makeChannelPostList()
-      fetchStub.returns(Promise.resolve({ posts }))
+    it("deletes a post", async () => {
+      const post = makePost()
+      fetchStub.returns(Promise.resolve())
 
-      return getFrontpage({}).then(result => {
-        assert.ok(fetchStub.calledWith(`/api/v0/frontpage/`))
-        assert.deepEqual(result.posts, posts)
-      })
+      await deletePost(post.id)
+      assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/`))
     })
 
-    it("gets the frontpage with pagination params", () => {
+    it("gets the frontpage", async () => {
       const posts = makeChannelPostList()
-      fetchStub.returns(Promise.resolve({ posts }))
+      fetchJSONStub.returns(Promise.resolve({ posts }))
 
-      return getFrontpage({
+      const result = await getFrontpage({})
+      assert.ok(fetchJSONStub.calledWith(`/api/v0/frontpage/`))
+      assert.deepEqual(result.posts, posts)
+    })
+
+    it("gets the frontpage with pagination params", async () => {
+      const posts = makeChannelPostList()
+      fetchJSONStub.returns(Promise.resolve({ posts }))
+
+      const result = await getFrontpage({
         before: "abc",
         after:  "def",
         count:  5
-      }).then(result => {
-        assert.ok(
-          fetchStub.calledWith(
-            `/api/v0/frontpage/?after=def&before=abc&count=5`
-          )
-        )
-        assert.deepEqual(result.posts, posts)
       })
+      assert.ok(
+        fetchJSONStub.calledWith(
+          `/api/v0/frontpage/?after=def&before=abc&count=5`
+        )
+      )
+      assert.deepEqual(result.posts, posts)
     })
 
-    it("gets comments for a post", () => {
+    it("gets comments for a post", async () => {
       const post = makePost()
       const response = makeCommentsResponse(post)
-      fetchStub.returns(Promise.resolve(response))
+      fetchJSONStub.returns(Promise.resolve(response))
 
-      return getComments(post.id).then(resp => {
-        assert.deepEqual(resp, response)
-      })
+      const resp = await getComments(post.id)
+      assert.deepEqual(resp, response)
     })
 
-    it("creates comments for a post", () => {
+    it("creates comments for a post", async () => {
       const post = makePost()
-      fetchStub.returns(Promise.resolve())
+      fetchJSONStub.returns(Promise.resolve())
 
-      return createComment(post.id, "my new comment").then(() => {
-        assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/comments/`))
-        assert.deepEqual(fetchStub.args[0][1], {
-          method: POST,
-          body:   JSON.stringify({ text: "my new comment" })
-        })
+      await createComment(post.id, "my new comment")
+      assert.ok(fetchJSONStub.calledWith(`/api/v0/posts/${post.id}/comments/`))
+      assert.deepEqual(fetchJSONStub.args[0][1], {
+        method: POST,
+        body:   JSON.stringify({ text: "my new comment" })
       })
     })
 
-    it("creates comments replying to comments", () => {
+    it("creates comments replying to comments", async () => {
       const post = makePost()
       const tree = makeCommentsResponse(post)
-      fetchStub.returns(Promise.resolve())
+      fetchJSONStub.returns(Promise.resolve())
 
-      return createComment(post.id, "my new comment", tree[0].id).then(() => {
-        assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/comments/`))
-        assert.deepEqual(fetchStub.args[0][1], {
-          method: POST,
-          body:   JSON.stringify({
-            text:       "my new comment",
-            comment_id: tree[0].id
-          })
+      await createComment(post.id, "my new comment", tree[0].id)
+      assert.ok(fetchJSONStub.calledWith(`/api/v0/posts/${post.id}/comments/`))
+      assert.deepEqual(fetchJSONStub.args[0][1], {
+        method: POST,
+        body:   JSON.stringify({
+          text:       "my new comment",
+          comment_id: tree[0].id
         })
       })
     })
 
-    it("updates a comment", () => {
+    it("updates a comment", async () => {
       const post = makePost()
       const tree = makeCommentsResponse(post)
       const comment = tree[0]
       const commentResponse = { ...comment, replies: undefined, text: "edited" }
 
-      fetchStub.returns(Promise.resolve(commentResponse))
+      fetchJSONStub.returns(Promise.resolve(commentResponse))
 
       const payload = {
         text:      "edited",
         downvoted: true
       }
-      return updateComment(comment.id, payload).then(updated => {
-        assert.ok(fetchStub.calledWith(`/api/v0/comments/${comment.id}/`))
-        assert.deepEqual(updated, commentResponse)
-        assert.deepEqual(fetchStub.args[0][1], {
-          method: PATCH,
-          body:   JSON.stringify(payload)
-        })
+      const updated = await updateComment(comment.id, payload)
+      assert.ok(fetchJSONStub.calledWith(`/api/v0/comments/${comment.id}/`))
+      assert.deepEqual(updated, commentResponse)
+      assert.deepEqual(fetchJSONStub.args[0][1], {
+        method: PATCH,
+        body:   JSON.stringify(payload)
       })
     })
 
     it("updates a post", async () => {
       const post = makePost()
 
-      fetchStub.returns(Promise.resolve())
+      fetchJSONStub.returns(Promise.resolve())
 
       post.text = "updated!"
 
       await editPost(post.id, post)
 
-      assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/`))
-      assert.deepEqual(fetchStub.args[0][1], {
+      assert.ok(fetchJSONStub.calledWith(`/api/v0/posts/${post.id}/`))
+      assert.deepEqual(fetchJSONStub.args[0][1], {
         method: PATCH,
         body:   JSON.stringify(R.dissoc("url", post))
       })
@@ -292,12 +288,12 @@ describe("api", function() {
       it(`updates post removed: ${status}`, async () => {
         const post = makePost()
 
-        fetchStub.returns(Promise.resolve())
+        fetchJSONStub.returns(Promise.resolve())
 
         await updateRemoved(post.id, status)
 
-        assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/`))
-        assert.deepEqual(fetchStub.args[0][1], {
+        assert.ok(fetchJSONStub.calledWith(`/api/v0/posts/${post.id}/`))
+        assert.deepEqual(fetchJSONStub.args[0][1], {
           method: PATCH,
           body:   JSON.stringify({
             removed: status
@@ -312,7 +308,7 @@ describe("api", function() {
         const moreComments = makeMoreCommentsResponse(post)
         const children = ["some", "child", "ren"]
 
-        fetchStub.returns(Promise.resolve(moreComments))
+        fetchJSONStub.returns(Promise.resolve(moreComments))
 
         const response = await getMoreComments(post.id, null, children)
         const payload = {
@@ -320,7 +316,9 @@ describe("api", function() {
           children: children
         }
         assert.ok(
-          fetchStub.calledWith(`/api/v0/morecomments/?${qs.stringify(payload)}`)
+          fetchJSONStub.calledWith(
+            `/api/v0/morecomments/?${qs.stringify(payload)}`
+          )
         )
         assert.deepEqual(response, moreComments)
       })
@@ -332,7 +330,7 @@ describe("api", function() {
         const moreComments = makeMoreCommentsResponse(post, parent.id)
         const children = ["some", "child", "ren"]
 
-        fetchStub.returns(Promise.resolve(moreComments))
+        fetchJSONStub.returns(Promise.resolve(moreComments))
 
         const response = await getMoreComments(post.id, parent.id, children)
         const payload = {
@@ -341,7 +339,9 @@ describe("api", function() {
           children:  children
         }
         assert.ok(
-          fetchStub.calledWith(`/api/v0/morecomments/?${qs.stringify(payload)}`)
+          fetchJSONStub.calledWith(
+            `/api/v0/morecomments/?${qs.stringify(payload)}`
+          )
         )
         assert.deepEqual(response, moreComments)
       })

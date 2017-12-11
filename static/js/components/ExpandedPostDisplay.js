@@ -30,7 +30,8 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     removePost: Post => void,
     forms: FormsState,
     isModerator: boolean,
-    beginEditing: (key: string, initialValue: Object, e: ?Event) => void
+    beginEditing: (key: string, initialValue: Object, e: ?Event) => void,
+    showPostDeleteDialog: () => void
   }
 
   renderTextContent = () => {
@@ -58,7 +59,13 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
   }
 
   postActionButtons = () => {
-    const { toggleUpvote, post, beginEditing, isModerator } = this.props
+    const {
+      toggleUpvote,
+      post,
+      beginEditing,
+      isModerator,
+      showPostDeleteDialog
+    } = this.props
 
     return (
       <div className="post-actions">
@@ -73,6 +80,14 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
             onClick={beginEditing(editPostKey(post), post)}
           >
             <a href="#">edit</a>
+          </div>
+          : null}
+        {SETTINGS.username === post.author_id
+          ? <div
+            className="comment-action-button delete-post"
+            onClick={showPostDeleteDialog}
+          >
+            <a href="#">delete</a>
           </div>
           : null}
         {isModerator && !post.removed

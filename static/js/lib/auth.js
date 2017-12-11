@@ -2,7 +2,10 @@
 /* global SETTINGS:false, fetch: false */
 // For mocking purposes we need to use "fetch" defined as a global instead of importing as a local.
 import "isomorphic-fetch"
-import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
+import {
+  fetchJSONWithCSRF,
+  fetchWithCSRF
+} from "redux-hammock/django_csrf_fetch"
 
 import { AUTH_REQUIRED_URL } from "./url"
 
@@ -21,9 +24,11 @@ const redirectAndReject = async (reason: string) => {
   return Promise.reject(reason)
 }
 
-export const fetchWithAuthFailure = async (...args: any) => {
+export const withAuthFailure = (fetchFunc: Function) => async (
+  ...args: any
+) => {
   try {
-    return await fetchJSONWithCSRF(...args)
+    return await fetchFunc(...args)
   } catch (fetchError) {
     if (!fetchError || fetchError.errorStatusCode !== 401) {
       // not an authentication failure, rethrow
@@ -41,6 +46,14 @@ export const fetchWithAuthFailure = async (...args: any) => {
       return redirectAndReject("Could not renew session")
     }
     // try again now that we have a proper auth
-    return fetchJSONWithCSRF(...args)
+    return fetchFunc(...args)
   }
 }
+
+export const fetchJSONWithAuthFailure = withAuthFailure((...args) =>
+  fetchJSONWithCSRF(...args)
+)
+
+export const fetchWithAuthFailure = withAuthFailure((...args) =>
+  fetchWithCSRF(...args)
+)

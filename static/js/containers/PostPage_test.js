@@ -2,6 +2,7 @@
 import { assert } from "chai"
 import sinon from "sinon"
 import R from "ramda"
+import { Dialog } from "@mitodl/mdl-react-components"
 
 import CommentTree from "../components/CommentTree"
 
@@ -20,7 +21,7 @@ import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG } from "../actions/ui"
 import { SET_MODERATING_COMMENT } from "../actions/moderation"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
-import { postDetailURL } from "../lib/url"
+import { postDetailURL, channelURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
 import { createCommentTree } from "../reducers/comments"
 
@@ -47,6 +48,7 @@ describe("PostPage", function() {
     helper.getChannelsStub.returns(Promise.resolve([]))
     helper.getCommentsStub.returns(Promise.resolve(commentsResponse))
     helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
+    helper.deletePostStub.returns(Promise.resolve())
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
   })
@@ -188,6 +190,27 @@ describe("PostPage", function() {
     const newCommentInTree =
       reducerTree[0].replies[reducerTree[0].replies.length - 1]
     assert.deepEqual(newCommentInTree, newComment)
+  })
+
+  it("should let a user delete their own post, then redirect to channel page", async () => {
+    SETTINGS.username = post.author_id
+    const [wrapper] = await renderPage()
+    await listenForActions(
+      [
+        actions.posts["delete"].requestType,
+        actions.posts["delete"].successType,
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
+        actions.postsForChannel.get.requestType,
+        actions.channelModerators.get.requestType,
+        SET_SNACKBAR_MESSAGE
+      ],
+      () => {
+        wrapper.find(Dialog).at(1).props().onAccept()
+      }
+    )
+    const { location: { pathname } } = helper.browserHistory
+    assert.equal(pathname, channelURL(channel.name))
   })
 
   describe("as a moderator user", () => {

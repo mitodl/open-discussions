@@ -4,9 +4,9 @@
 import R from "ramda"
 import "isomorphic-fetch"
 import qs from "query-string"
-import { PATCH, POST } from "redux-hammock/constants"
+import { PATCH, POST, DELETE } from "redux-hammock/constants"
 
-import { fetchWithAuthFailure } from "./auth"
+import { fetchJSONWithAuthFailure, fetchWithAuthFailure } from "./auth"
 import { toQueryString } from "../lib/url"
 import { getPaginationParams } from "../lib/posts"
 
@@ -28,25 +28,27 @@ const getPaginationQS = R.compose(
 )
 
 export function getFrontpage(params: PostListPaginationParams): Promise<Post> {
-  return fetchWithAuthFailure(`/api/v0/frontpage/${getPaginationQS(params)}`)
+  return fetchJSONWithAuthFailure(
+    `/api/v0/frontpage/${getPaginationQS(params)}`
+  )
 }
 
 export function getChannel(channelName: string): Promise<Channel> {
-  return fetchWithAuthFailure(`/api/v0/channels/${channelName}/`)
+  return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/`)
 }
 
 export function getChannels(): Promise<Array<Channel>> {
-  return fetchWithAuthFailure("/api/v0/channels/")
+  return fetchJSONWithAuthFailure("/api/v0/channels/")
 }
 
 export function getChannelModerators(
   channelName: string
 ): Promise<ChannelModerators> {
-  return fetchWithAuthFailure(`/api/v0/channels/${channelName}/moderators/`)
+  return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/moderators/`)
 }
 
 export function createChannel(channel: Channel): Promise<Channel> {
-  return fetchWithAuthFailure(`/api/v0/channels/`, {
+  return fetchJSONWithAuthFailure(`/api/v0/channels/`, {
     method: POST,
     body:   JSON.stringify(
       R.pickAll(
@@ -58,7 +60,7 @@ export function createChannel(channel: Channel): Promise<Channel> {
 }
 
 export function updateChannel(channel: Channel): Promise<Channel> {
-  return fetchWithAuthFailure(`/api/v0/channels/${channel.name}/`, {
+  return fetchJSONWithAuthFailure(`/api/v0/channels/${channel.name}/`, {
     method: PATCH,
     body:   JSON.stringify(
       R.pickAll(
@@ -73,7 +75,7 @@ export function getPostsForChannel(
   channelName: string,
   params: PostListPaginationParams
 ): Promise<Array<Post>> {
-  return fetchWithAuthFailure(
+  return fetchJSONWithAuthFailure(
     `/api/v0/channels/${channelName}/posts/${getPaginationQS(params)}`
   )
 }
@@ -83,7 +85,7 @@ export function createPost(
   payload: CreatePostPayload
 ): Promise<Post> {
   const { text, url, title } = payload
-  return fetchWithAuthFailure(`/api/v0/channels/${channelName}/posts/`, {
+  return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/posts/`, {
     method: "POST",
     body:   JSON.stringify({
       url:   url,
@@ -94,13 +96,13 @@ export function createPost(
 }
 
 export function getPost(postId: string): Promise<Post> {
-  return fetchWithAuthFailure(`/api/v0/posts/${postId}/`)
+  return fetchJSONWithAuthFailure(`/api/v0/posts/${postId}/`)
 }
 
 export function getComments(
   postID: string
 ): Promise<Array<CommentFromAPI | MoreCommentsFromAPI>> {
-  return fetchWithAuthFailure(`/api/v0/posts/${postID}/comments/`)
+  return fetchJSONWithAuthFailure(`/api/v0/posts/${postID}/comments/`)
 }
 
 export const createComment = (
@@ -111,30 +113,36 @@ export const createComment = (
   const body =
     commentId === undefined ? { text } : { text, comment_id: commentId }
 
-  return fetchWithAuthFailure(`/api/v0/posts/${postId}/comments/`, {
+  return fetchJSONWithAuthFailure(`/api/v0/posts/${postId}/comments/`, {
     method: POST,
     body:   JSON.stringify(body)
   })
 }
 
 export function updateUpvote(postId: string, upvoted: boolean): Promise<Post> {
-  return fetchWithAuthFailure(`/api/v0/posts/${postId}/`, {
-    method: "PATCH",
+  return fetchJSONWithAuthFailure(`/api/v0/posts/${postId}/`, {
+    method: PATCH,
     body:   JSON.stringify({ upvoted })
   })
 }
 
 export function updateRemoved(postId: string, removed: boolean): Promise<Post> {
-  return fetchWithAuthFailure(`/api/v0/posts/${postId}/`, {
-    method: "PATCH",
+  return fetchJSONWithAuthFailure(`/api/v0/posts/${postId}/`, {
+    method: PATCH,
     body:   JSON.stringify({ removed })
   })
 }
 
 export function editPost(postId: string, post: Post): Promise<Post> {
-  return fetchWithAuthFailure(`/api/v0/posts/${postId}/`, {
-    method: "PATCH",
+  return fetchJSONWithAuthFailure(`/api/v0/posts/${postId}/`, {
+    method: PATCH,
     body:   JSON.stringify(R.dissoc("url", post))
+  })
+}
+
+export function deletePost(postId: string): Promise<Post> {
+  return fetchWithAuthFailure(`/api/v0/posts/${postId}/`, {
+    method: DELETE
   })
 }
 
@@ -142,7 +150,7 @@ export function updateComment(
   commentId: string,
   commentPayload: Object
 ): Promise<GenericComment> {
-  return fetchWithAuthFailure(`/api/v0/comments/${commentId}/`, {
+  return fetchJSONWithAuthFailure(`/api/v0/comments/${commentId}/`, {
     method: PATCH,
     body:   JSON.stringify(commentPayload)
   })
@@ -161,5 +169,7 @@ export function getMoreComments(
     // $FlowFixMe: Flow doesn't know that we're still constructing payload
     payload.parent_id = parentId
   }
-  return fetchWithAuthFailure(`/api/v0/morecomments/?${qs.stringify(payload)}`)
+  return fetchJSONWithAuthFailure(
+    `/api/v0/morecomments/?${qs.stringify(payload)}`
+  )
 }

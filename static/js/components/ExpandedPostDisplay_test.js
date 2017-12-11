@@ -18,7 +18,12 @@ import { actions } from "../actions"
 import { editPostKey } from "../components/CommentForms"
 
 describe("ExpandedPostDisplay", () => {
-  let helper, post, beginEditingStub, approvePostStub, removePostStub
+  let helper,
+    post,
+    beginEditingStub,
+    approvePostStub,
+    removePostStub,
+    showPostDeleteDialogStub
 
   const renderPostDisplay = props => {
     props = {
@@ -26,9 +31,10 @@ describe("ExpandedPostDisplay", () => {
       beginEditing: R.curry((key, post, e) => {
         beginEditingStub(key, post, e)
       }),
-      approvePost: approvePostStub,
-      removePost:  removePostStub,
-      forms:       {},
+      approvePost:          approvePostStub,
+      removePost:           removePostStub,
+      showPostDeleteDialog: showPostDeleteDialogStub,
+      forms:                {},
       ...props
     }
     return mount(
@@ -44,6 +50,7 @@ describe("ExpandedPostDisplay", () => {
     beginEditingStub = helper.sandbox.stub()
     approvePostStub = helper.sandbox.stub()
     removePostStub = helper.sandbox.stub()
+    showPostDeleteDialogStub = helper.sandbox.stub()
   })
 
   afterEach(() => {
@@ -94,12 +101,12 @@ describe("ExpandedPostDisplay", () => {
 
   it("should display the domain, for a url post", () => {
     const post = makePost(true)
-    const wrapper = renderPostDisplay({ post: post })
+    const wrapper = renderPostDisplay({ post })
     assert.include(wrapper.find(".url-hostname").text(), urlHostname(post.url))
   })
 
   it("should link to the detail view, if a text post", () => {
-    const wrapper = renderPostDisplay({ post: post })
+    const wrapper = renderPostDisplay({ post })
     const { to, children } = wrapper.find(Link).at(0).props()
     assert.equal(children, post.title)
     assert.equal(to, `/channel/${post.channel_name}/${post.id}`)
@@ -116,21 +123,35 @@ describe("ExpandedPostDisplay", () => {
       if (userAuthor) {
         SETTINGS.username = post.author_id
       }
-      const wrapper = renderPostDisplay({ post: post })
-      if (shouldShowLink) {
-        const div = wrapper.find(".comment-action-button")
-        assert.equal(div.text(), "edit")
-      } else {
-        assert.lengthOf(wrapper.find(".comment-action-button"), 0)
-      }
+      const wrapper = renderPostDisplay({ post })
+      assert.equal(wrapper.find(".edit-post").exists(), shouldShowLink)
     })
+  })
+
+  it("should show a delete button if authored by the user", () => {
+    [true, false].forEach(userAuthor => {
+      const post = makePost()
+      if (userAuthor) {
+        SETTINGS.username = post.author_id
+      }
+      const wrapper = renderPostDisplay({ post })
+      assert.equal(wrapper.find(".delete-post").exists(), userAuthor)
+    })
+  })
+
+  it("should call showPostDeleteDialog when user clicks 'delete'", () => {
+    const post = makePost()
+    SETTINGS.username = post.author_id
+    const wrapper = renderPostDisplay({ post })
+    wrapper.find(".delete-post").simulate("click")
+    assert.ok(showPostDeleteDialogStub.called)
   })
 
   it('should call beginEditing when user clicks "edit"', () => {
     const post = makePost(false)
     SETTINGS.username = post.author_id
     const wrapper = renderPostDisplay({ post })
-    wrapper.find(".edit-post").simulate("click")
+    wrapper.find(".edit-post").at(0).simulate("click")
     assert.ok(beginEditingStub.called)
   })
 

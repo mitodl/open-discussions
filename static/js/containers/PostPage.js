@@ -35,6 +35,7 @@ import { anyError } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginEditing } from "../components/CommentForms"
 import { formatTitle } from "../lib/title"
+import { channelURL } from "../lib/url"
 
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -62,7 +63,9 @@ type PostPageProps = {
   commentInFlight: boolean,
   // from the router match
   channelName: string,
-  postID: string
+  postID: string,
+  postDeleteDialogVisible: boolean,
+  history: Object
 }
 
 const DIALOG_REMOVE_COMMENT = "DIALOG_REMOVE_COMMENT"
@@ -71,6 +74,8 @@ const DIALOG_REMOVE_COMMENT = "DIALOG_REMOVE_COMMENT"
 const shouldLoadData = R.complement(
   R.allPass([R.eqProps("postID"), R.eqProps("channelName")])
 )
+
+const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
 
 class PostPage extends React.Component<*, void> {
   props: PostPageProps
@@ -197,6 +202,27 @@ class PostPage extends React.Component<*, void> {
     )
   }
 
+  setShowDeletePostDialog = (visible: boolean) => {
+    const { dispatch } = this.props
+    if (visible) {
+      dispatch(showDialog(DELETE_POST_DIALOG))
+    } else {
+      dispatch(hideDialog(DELETE_POST_DIALOG))
+    }
+  }
+
+  deletePost = async (post: Post) => {
+    // ⚠️  this is a destructive action! ⚠️
+    const { dispatch, history, channelName } = this.props
+    await dispatch(actions.posts["delete"](post.id))
+    history.push(channelURL(channelName))
+    dispatch(
+      setSnackbarMessage({
+        message: "Post has been deleted"
+      })
+    )
+  }
+
   render() {
     const {
       dispatch,
@@ -206,7 +232,8 @@ class PostPage extends React.Component<*, void> {
       forms,
       commentInFlight,
       showRemoveCommentDialog,
-      isModerator
+      isModerator,
+      postDeleteDialogVisible
     } = this.props
     if (!channel || !post || !commentsTree) {
       return null
@@ -229,6 +256,15 @@ class PostPage extends React.Component<*, void> {
             "approve".
           </p>
         </Dialog>
+        <Dialog
+          open={postDeleteDialogVisible}
+          hideDialog={() => this.setShowDeletePostDialog(false)}
+          onAccept={() => this.deletePost(post)}
+          title="Delete Post"
+          submitText="Yes, Delete"
+        >
+          Are you sure you want to delete this post?
+        </Dialog>
         <Card>
           <div className="post-card">
             <ExpandedPostDisplay
@@ -239,6 +275,7 @@ class PostPage extends React.Component<*, void> {
               removePost={this.removePost.bind(this)}
               forms={forms}
               beginEditing={beginEditing(dispatch)}
+              showPostDeleteDialog={() => this.setShowDeletePostDialog(true)}
             />
             <ReplyToPostForm
               forms={forms}
@@ -298,7 +335,8 @@ const mapStateToProps = (state, ownProps) => {
     errored:                 anyError([posts, channels, comments]),
     subscribedChannels:      getSubscribedChannels(state),
     commentInFlight:         comments.processing,
-    showRemoveCommentDialog: ui.dialogs.has(DIALOG_REMOVE_COMMENT)
+    showRemoveCommentDialog: ui.dialogs.has(DIALOG_REMOVE_COMMENT),
+    postDeleteDialogVisible: state.ui.dialogs.has(DELETE_POST_DIALOG)
   }
 }
 
