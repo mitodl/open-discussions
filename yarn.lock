@@ -5468,9 +5468,9 @@ redux-asserts@^0.0.10:
     redux "^3.3.1"
     redux-thunk "^2.0.1"
 
-redux-hammock@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/redux-hammock/-/redux-hammock-0.2.1.tgz#6c5fe3d221c3b2eb9817477d422926579cefd75e"
+redux-hammock@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/redux-hammock/-/redux-hammock-0.2.3.tgz#0235e8657d4808c6a9c9d25bdf367b2e3f0714f2"
   dependencies:
     babel-polyfill "^6.23.0"
     babel-runtime "^6.23.0"
@@ -5479,7 +5479,6 @@ redux-hammock@^0.2.1:
     lodash.snakecase "^4.1.1"
     ramda "^0.24.1"
     redux-actions "^2.0.3"
-    sanctuary "^0.13.2"
 
 redux-logger@^3.0.6:
   version "3.0.6"
