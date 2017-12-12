@@ -1,6 +1,12 @@
 // @flow
 import R from "ramda"
-import { GET, PATCH, POST, INITIAL_STATE } from "redux-hammock/constants"
+import {
+  GET,
+  PATCH,
+  POST,
+  DELETE,
+  INITIAL_STATE
+} from "redux-hammock/constants"
 
 import { REPLACE_MORE_COMMENTS } from "../actions/comment"
 import { findComment } from "../lib/comments"
@@ -39,6 +45,19 @@ const removeMoreComments = (
     return oldTree.filter(comment => comment.comment_type === "comment")
   }
 }
+
+const deleted = R.always("[deleted]")
+
+const deleteComment = (oldTree: Array<GenericComment>, commentId: string) =>
+  R.over(
+    findComment(oldTree, commentId),
+    R.evolve({
+      author_name: deleted,
+      text:        deleted,
+      author_id:   deleted
+    }),
+    oldTree
+  )
 
 /**
  * Replace an instance of MoreComments with some series of comments from the morecomments API
@@ -183,14 +202,22 @@ type CreateCommentPayload = {
   postId: string,
   comment: CommentFromAPI
 }
+
 type GetCommentsPayload = {
   comments: Array<CommentFromAPI | MoreCommentsFromAPI>,
   postId: string
 }
 
+type DeleteCommentPayload = {
+  commentId: string,
+  postId: string
+}
+
+type CommentData = Map<string, Array<GenericComment>>
+
 export const commentsEndpoint = {
   name:    "comments",
-  verbs:   [GET, PATCH, POST],
+  verbs:   [GET, PATCH, POST, DELETE],
   getFunc: async (postId: string): Promise<GetCommentsPayload> => {
     const comments = await api.getComments(postId)
     return {
@@ -198,11 +225,26 @@ export const commentsEndpoint = {
       comments: comments
     }
   },
+  deleteFunc: async (postId: string, commentId: string): Promise<*> => {
+    await api.deleteComment(commentId)
+    return { postId, commentId }
+  },
+  deleteSuccessHandler: (
+    { commentId, postId }: DeleteCommentPayload,
+    data: CommentData
+  ): CommentData => {
+    const update = new Map(data)
+    const tree = data.get(postId)
+    if (tree) {
+      update.set(postId, deleteComment(tree, commentId))
+    }
+    return update
+  },
   initialState:      { ...INITIAL_STATE, data: new Map() },
   getSuccessHandler: (
     response: GetCommentsPayload,
-    data: Map<string, Array<GenericComment>>
-  ): Map<string, Array<GenericComment>> => {
+    data: CommentData
+  ): CommentData => {
     const update = new Map(data)
     update.set(response.postId, createCommentTree(response.comments))
     return update
@@ -217,8 +259,8 @@ export const commentsEndpoint = {
   },
   postSuccessHandler: (
     { commentId, postId, comment }: CreateCommentPayload,
-    data: Map<string, Array<GenericComment>>
-  ): Map<string, Array<GenericComment>> => {
+    data: CommentData
+  ): CommentData => {
     const update = new Map(data)
     const oldTree = data.get(postId)
     if (oldTree) {
@@ -233,8 +275,8 @@ export const commentsEndpoint = {
     api.updateComment(commentId, payload),
   patchSuccessHandler: (
     response: CommentFromAPI,
-    data: Map<string, Array<GenericComment>>
-  ): Map<string, Array<GenericComment>> => {
+    data: CommentData
+  ): CommentData => {
     const update = new Map(data)
     const postId = response.post_id
     const oldTree = data.get(postId)

@@ -12,6 +12,7 @@ import { ReplyToCommentForm, EditCommentForm } from "./CommentForms"
 import CommentVoteForm from "./CommentVoteForm"
 import CommentRemovalForm from "./CommentRemovalForm"
 
+import { preventDefaultAndInvoke } from "../lib/util"
 import {
   replyToCommentKey,
   editCommentKey,
@@ -41,7 +42,8 @@ type CommentTreeProps = {
   loadMoreComments: LoadMoreCommentsFunc,
   beginEditing: BeginEditingFunc,
   isModerator: boolean,
-  processing: boolean
+  processing: boolean,
+  deleteComment: CommentRemoveFunc
 }
 
 export default class CommentTree extends React.Component<*, *> {
@@ -54,6 +56,7 @@ export default class CommentTree extends React.Component<*, *> {
       downvote,
       approve,
       remove,
+      deleteComment,
       beginEditing,
       processing,
       isModerator
@@ -125,6 +128,16 @@ export default class CommentTree extends React.Component<*, *> {
                 }}
               >
                 <a href="#">edit</a>
+              </div>
+              : null}
+            {SETTINGS.username === comment.author_id
+              ? <div
+                className="comment-action-button delete-button"
+                onClick={preventDefaultAndInvoke(() =>
+                  deleteComment(comment)
+                )}
+              >
+                <a href="#">delete</a>
               </div>
               : null}
             <CommentRemovalForm

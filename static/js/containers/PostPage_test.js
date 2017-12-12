@@ -18,7 +18,7 @@ import { SET_POST_DATA } from "../actions/post"
 import { REPLACE_MORE_COMMENTS } from "../actions/comment"
 import { FORM_BEGIN_EDIT } from "../actions/forms"
 import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG } from "../actions/ui"
-import { SET_MODERATING_COMMENT } from "../actions/moderation"
+import { SET_FOCUSED_COMMENT } from "../actions/focus"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
 import { postDetailURL, channelURL } from "../lib/url"
@@ -206,7 +206,7 @@ describe("PostPage", function() {
         SET_SNACKBAR_MESSAGE
       ],
       () => {
-        wrapper.find(Dialog).at(1).props().onAccept()
+        wrapper.find(Dialog).at(2).props().onAccept()
       }
     )
     const { location: { pathname } } = helper.browserHistory
@@ -310,7 +310,7 @@ describe("PostPage", function() {
           expectedActions = patchActions
         } else {
           // otherwise a confirmation dialog shows
-          expectedActions = [SHOW_DIALOG, SET_MODERATING_COMMENT]
+          expectedActions = [SHOW_DIALOG, SET_FOCUSED_COMMENT]
         }
 
         let newState = await listenForActions(expectedActions, () => {

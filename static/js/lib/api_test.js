@@ -2,7 +2,7 @@
 import { assert } from "chai"
 import sinon from "sinon"
 import qs from "query-string"
-import { PATCH, POST } from "redux-hammock/constants"
+import { PATCH, POST, DELETE } from "redux-hammock/constants"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 import R from "ramda"
 
@@ -21,7 +21,8 @@ import {
   getMoreComments,
   updateChannel,
   updateRemoved,
-  deletePost
+  deletePost,
+  deleteComment
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -267,6 +268,18 @@ describe("api", function() {
         method: PATCH,
         body:   JSON.stringify(payload)
       })
+    })
+
+    it("deletes a comment", async () => {
+      const comment = makeCommentsResponse(makePost())[0]
+      fetchStub.returns(Promise.resolve())
+
+      await deleteComment(comment.id)
+      assert.ok(
+        fetchStub.calledWith(`/api/v0/comments/${comment.id}/`, {
+          method: DELETE
+        })
+      )
     })
 
     it("updates a post", async () => {

@@ -182,6 +182,58 @@ describe("comments reducers", () => {
     })
   })
 
+  it("should let you delete a comment", async () => {
+    const [comment] = response
+    helper.deleteCommentStub.returns(
+      Promise.resolve({
+        commentId: comment.id,
+        postId:    post.id
+      })
+    )
+    const state = await listenForActions(
+      [
+        actions.comments.get.requestType,
+        actions.comments.get.successType,
+        actions.comments["delete"].requestType,
+        actions.comments["delete"].successType
+      ],
+      async () => {
+        await store.dispatch(actions.comments.get(post.id))
+        await store.dispatch(actions.comments["delete"](post.id, comment.id))
+      }
+    )
+    const [updatedComment] = state.data.get(post.id)
+    assert.equal(updatedComment.author_name, "[deleted]")
+    assert.equal(updatedComment.text, "[deleted]")
+    assert.equal(updatedComment.author_id, "[deleted]")
+  })
+
+  it("should let you delete a nested comment with replies", async () => {
+    const tree = createCommentTree(response)
+    const [{ replies: [reply] }] = tree
+    helper.deleteCommentStub.returns(
+      Promise.resolve({
+        commentId: reply.id,
+        postId:    post.id
+      })
+    )
+    const state = await listenForActions(
+      [
+        actions.comments.get.requestType,
+        actions.comments.get.successType,
+        actions.comments["delete"].requestType,
+        actions.comments["delete"].successType
+      ],
+      async () => {
+        await store.dispatch(actions.comments.get(post.id))
+        await store.dispatch(actions.comments["delete"](post.id, reply.id))
+      }
+    )
+    const [{ replies: [updatedReply] }] = state.data.get(post.id)
+    assert.equal(updatedReply.author_name, "[deleted]")
+    assert.equal(updatedReply.text, "[deleted]")
+  })
+
   describe("more_comments", () => {
     it("creates a comment tree from a response which also contains more_comments", () => {
       const parent = makeComment(post)

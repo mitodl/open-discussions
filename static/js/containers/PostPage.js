@@ -17,10 +17,7 @@ import withNavSidebar from "../hoc/withNavSidebar"
 import { formatCommentsCount } from "../lib/posts"
 import { actions } from "../actions"
 import { replaceMoreComments } from "../actions/comment"
-import {
-  setModeratingComment,
-  clearModeratingComment
-} from "../actions/moderation"
+import { setFocusedComment, clearFocusedComment } from "../actions/focus"
 import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
 import {
   toggleUpvote,
@@ -56,7 +53,7 @@ type PostPageProps = {
   channel: Channel,
   moderators: ChannelModerators,
   isModerator: boolean,
-  commentToRemove: ?CommentInTree,
+  focusedComment: ?CommentInTree,
   showRemoveCommentDialog: boolean,
   commentsTree: Array<GenericComment>,
   forms: FormsState,
@@ -65,17 +62,20 @@ type PostPageProps = {
   channelName: string,
   postID: string,
   postDeleteDialogVisible: boolean,
-  history: Object
+  history: Object,
+  commentDeleteDialogVisible: boolean
 }
 
 const DIALOG_REMOVE_COMMENT = "DIALOG_REMOVE_COMMENT"
+
+const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
+
+const DELETE_COMMENT_DIALOG = "DELETE_COMMENT_DIALOG"
 
 // if either postId or channelName don't match
 const shouldLoadData = R.complement(
   R.allPass([R.eqProps("postID"), R.eqProps("channelName")])
 )
-
-const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
 
 class PostPage extends React.Component<*, void> {
   props: PostPageProps
@@ -160,28 +160,28 @@ class PostPage extends React.Component<*, void> {
     )
   }
 
-  showRemoveCommentDialog = (comment: CommentInTree) => {
+  showCommentDialog = R.curry((dialogKey: string, comment: CommentInTree) => {
     const { dispatch } = this.props
-    dispatch(setModeratingComment(comment))
-    dispatch(showDialog(DIALOG_REMOVE_COMMENT))
-  }
+    dispatch(setFocusedComment(comment))
+    dispatch(showDialog(dialogKey))
+  })
 
-  hideRemoveCommentDialog = () => {
+  hideCommentDialog = (dialogKey: string) => () => {
     const { dispatch } = this.props
-    dispatch(clearModeratingComment())
-    dispatch(hideDialog(DIALOG_REMOVE_COMMENT))
+    dispatch(clearFocusedComment())
+    dispatch(hideDialog(dialogKey))
   }
 
   removeComment = async () => {
-    const { dispatch, commentToRemove } = this.props
+    const { dispatch, focusedComment } = this.props
 
-    if (!commentToRemove) {
+    if (!focusedComment) {
       // we are getting double events for this, so this is a hack to avoid dispatching
       // a removeComment with a null comment
       return
     }
 
-    await removeComment(dispatch, commentToRemove)
+    await removeComment(dispatch, focusedComment)
 
     dispatch(
       setSnackbarMessage({
@@ -200,6 +200,19 @@ class PostPage extends React.Component<*, void> {
         message: "Comment has been approved"
       })
     )
+  }
+
+  deleteComment = async () => {
+    // ⚠️  this is a destructive action! ⚠️
+    const { dispatch, focusedComment, post } = this.props
+    if (focusedComment) {
+      await dispatch(actions.comments["delete"](post.id, focusedComment.id))
+      dispatch(
+        setSnackbarMessage({
+          message: "Comment has been deleted"
+        })
+      )
+    }
   }
 
   setShowDeletePostDialog = (visible: boolean) => {
@@ -233,7 +246,8 @@ class PostPage extends React.Component<*, void> {
       commentInFlight,
       showRemoveCommentDialog,
       isModerator,
-      postDeleteDialogVisible
+      postDeleteDialogVisible,
+      commentDeleteDialogVisible
     } = this.props
     if (!channel || !post || !commentsTree) {
       return null
@@ -247,7 +261,7 @@ class PostPage extends React.Component<*, void> {
           id="remove-comment-dialog"
           open={showRemoveCommentDialog}
           onAccept={this.removeComment}
-          hideDialog={this.hideRemoveCommentDialog}
+          hideDialog={this.hideCommentDialog(DIALOG_REMOVE_COMMENT)}
           submitText="Yes, remove"
         >
           <p>
@@ -255,6 +269,15 @@ class PostPage extends React.Component<*, void> {
             be deleted for normal users. You can undo this later by clicking
             "approve".
           </p>
+        </Dialog>
+        <Dialog
+          open={commentDeleteDialogVisible}
+          hideDialog={this.hideCommentDialog(DELETE_COMMENT_DIALOG)}
+          onAccept={this.deleteComment}
+          title="Delete Comment"
+          submitText="Yes, Delete"
+        >
+          Are you sure you want to delete this comment?
         </Dialog>
         <Dialog
           open={postDeleteDialogVisible}
@@ -293,7 +316,8 @@ class PostPage extends React.Component<*, void> {
           upvote={this.upvote}
           downvote={this.downvote}
           approve={this.approveComment}
-          remove={this.showRemoveCommentDialog}
+          remove={this.showCommentDialog(DIALOG_REMOVE_COMMENT)}
+          deleteComment={this.showCommentDialog(DELETE_COMMENT_DIALOG)}
           isModerator={isModerator}
           loadMoreComments={this.loadMoreComments}
           beginEditing={beginEditing(dispatch)}
@@ -312,7 +336,7 @@ const mapStateToProps = (state, ownProps) => {
     forms,
     channelModerators,
     ui,
-    moderation
+    focus
   } = state
   const postID = getPostID(ownProps)
   const channelName = getChannelName(ownProps)
@@ -329,14 +353,15 @@ const mapStateToProps = (state, ownProps) => {
     channel,
     commentsTree,
     moderators,
-    commentToRemove:         moderation.comment,
-    isModerator:             isModerator(moderators, SETTINGS.username),
-    loaded:                  R.none(R.isNil, [post, channel, commentsTree]),
-    errored:                 anyError([posts, channels, comments]),
-    subscribedChannels:      getSubscribedChannels(state),
-    commentInFlight:         comments.processing,
-    showRemoveCommentDialog: ui.dialogs.has(DIALOG_REMOVE_COMMENT),
-    postDeleteDialogVisible: state.ui.dialogs.has(DELETE_POST_DIALOG)
+    focusedComment:             focus.comment,
+    isModerator:                isModerator(moderators, SETTINGS.username),
+    loaded:                     R.none(R.isNil, [post, channel, commentsTree]),
+    errored:                    anyError([posts, channels, comments]),
+    subscribedChannels:         getSubscribedChannels(state),
+    commentInFlight:            comments.processing,
+    showRemoveCommentDialog:    ui.dialogs.has(DIALOG_REMOVE_COMMENT),
+    postDeleteDialogVisible:    ui.dialogs.has(DELETE_POST_DIALOG),
+    commentDeleteDialogVisible: ui.dialogs.has(DELETE_COMMENT_DIALOG)
   }
 }
 

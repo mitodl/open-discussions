@@ -156,6 +156,12 @@ export function updateComment(
   })
 }
 
+export function deleteComment(commentId: string): Promise<GenericComment> {
+  return fetchWithAuthFailure(`/api/v0/comments/${commentId}/`, {
+    method: DELETE
+  })
+}
+
 export function getMoreComments(
   postId: string,
   parentId: string | null,

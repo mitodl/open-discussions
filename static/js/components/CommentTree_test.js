@@ -28,7 +28,8 @@ describe("CommentTree", () => {
     removeStub,
     approveStub,
     beginEditingStub,
-    loadMoreCommentsStub
+    loadMoreCommentsStub,
+    deleteCommentStub
 
   beforeEach(() => {
     post = makePost()
@@ -40,6 +41,7 @@ describe("CommentTree", () => {
     approveStub = sandbox.stub()
     beginEditingStub = sandbox.stub()
     loadMoreCommentsStub = sandbox.stub()
+    deleteCommentStub = sandbox.stub()
   })
 
   afterEach(() => {
@@ -58,6 +60,7 @@ describe("CommentTree", () => {
         beginEditing={R.curry(beginEditingStub)}
         processing={false}
         loadMoreComments={loadMoreCommentsStub}
+        deleteComment={deleteCommentStub}
         {...props}
       />
     )
@@ -111,13 +114,31 @@ describe("CommentTree", () => {
   })
 
   it('should include an "Edit" button, if the user wrote the comment', () => {
-    comments[0].author_id = "username"
-    SETTINGS.username = "username"
+    SETTINGS.username = comments[0].author_id
     const wrapper = renderCommentTree()
     wrapper.find(".comment-action-button").at(1).simulate("click")
     assert.ok(beginEditingStub.called)
     assert.ok(beginEditingStub.calledWith(editCommentKey(comments[0])))
     assert.deepEqual(beginEditingStub.args[0][1], comments[0])
+  })
+
+  it("should include a 'delete' button, if the user wrote the comment", () => {
+    SETTINGS.username = comments[0].author_id
+    const wrapper = renderCommentTree()
+    const eventStub = {
+      preventDefault: sandbox.stub()
+    }
+    wrapper
+      .find(".comment-action-button.delete-button")
+      .props()
+      .onClick(eventStub)
+    assert.ok(deleteCommentStub.called)
+    assert.ok(deleteCommentStub.calledWith(comments[0]))
+    assert.ok(eventStub.preventDefault.called)
+  })
+
+  it("should not show a delete button, otherwise", () => {
+    assert.isNotOk(renderCommentTree().find(".delete-button").exists())
   })
 
   it("should show the author name", () => {
