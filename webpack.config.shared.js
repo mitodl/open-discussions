@@ -33,7 +33,6 @@ module.exports = {
     query: {
       "presets": [
         ["env", { "modules": false }],
-        "latest",
         "react",
       ],
       "ignore": [

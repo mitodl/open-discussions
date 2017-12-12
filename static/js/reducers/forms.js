@@ -40,7 +40,7 @@ export const forms = (
       }
     )
   case FORM_END_EDIT:
-    return R.omit(action.payload.formKey, state)
+    return R.omit([action.payload.formKey], state)
   }
   return state
 }

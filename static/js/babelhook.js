@@ -1,4 +1,7 @@
 const { babelSharedLoader } = require("../../webpack.config.shared")
+
+babelSharedLoader.query.presets = ["env", "react"]
+
 require("babel-polyfill")
 
 // window and global must be defined here before React is imported
