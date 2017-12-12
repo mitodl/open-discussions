@@ -16,7 +16,7 @@
 
   &:not(.expanded) {
     flex-direction: row;
-    padding: 22px 0;
+    padding: 16px 0;
   }
 
   &.sticky {
@@ -24,7 +24,7 @@
   }
 
   .post-title {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 400;
     margin: 0 0 7px;
   }
@@ -72,6 +72,11 @@
   .text-content {
     color: rgba(0,0,0,.77);
     line-height: 1.4;
+    font-size: 15px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
   }
 
   .post-actions {
