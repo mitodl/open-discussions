@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.7.1
+-------------
+
+- Added comment removal API
+
 Version 0.7.0
 -------------
 
