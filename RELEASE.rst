@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.7.2
+-------------
+
+- Add support for dealing with dialogs in the UI reducer
+- install the mdl-react-components package
+- fix for url breaking layout problem (#394)
+- upgrade the hammock package
+
 Version 0.7.1
 -------------
 
