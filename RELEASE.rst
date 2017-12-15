@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.7.3
+-------------
+
+- Add user post deletion
+- Added comment removal UI
+
 Version 0.7.2
 -------------
 
