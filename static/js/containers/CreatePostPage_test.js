@@ -2,7 +2,8 @@
 import { assert } from "chai"
 import sinon from "sinon"
 
-import { makeChannelList } from "../factories/channels"
+import { makeModerators, makeChannelList } from "../factories/channels"
+import { makeCommentsResponse } from "../factories/comments"
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
@@ -12,7 +13,13 @@ import { formatTitle } from "../lib/title"
 import type { CreatePostPayload } from "../flow/discussionTypes"
 
 describe("CreatePostPage", () => {
-  let helper, listenForActions, renderComponent, currentChannel, channels
+  let helper,
+    listenForActions,
+    renderComponent,
+    currentChannel,
+    channels,
+    post,
+    commentsResponse
 
   const makeEvent = (name, value) => ({ target: { value, name } })
 
@@ -35,10 +42,17 @@ describe("CreatePostPage", () => {
   beforeEach(() => {
     channels = makeChannelList(10)
     currentChannel = channels[0]
+    post = makePost()
+    commentsResponse = makeCommentsResponse(post, 3)
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(currentChannel))
-    helper.getFrontpageStub.returns(Promise.resolve(makeChannelPostList()))
+    helper.getFrontpageStub.returns(
+      Promise.resolve({ posts: makeChannelPostList() })
+    )
     helper.getChannelsStub.returns(Promise.resolve(channels))
+    helper.getPostStub.returns(Promise.resolve(post))
+    helper.getChannelModeratorsStub.returns(Promise.resolve(makeModerators()))
+    helper.getCommentsStub.returns(Promise.resolve(commentsResponse))
     listenForActions = helper.listenForActions.bind(helper)
     renderComponent = helper.renderComponent.bind(helper)
   })
@@ -179,11 +193,6 @@ describe("CreatePostPage", () => {
       helper.currentLocation.pathname,
       newPostURL(currentChannel.name)
     )
-
-    // mock out front page APIs which we don't care about for this test
-    helper.getFrontpageStub.returns(Promise.resolve([]))
-    helper.getChannelsStub.returns(Promise.resolve([]))
-
     wrapper.find(".cancel").simulate("click")
     assert.equal(helper.currentLocation.pathname, "/")
   })

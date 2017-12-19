@@ -1,21 +1,15 @@
-FROM mitodl/open_discussions_watch_travis
+FROM mitodl/open_discussions_watch_travis_next
 
 WORKDIR /src
 
-COPY package.json /src
-
-COPY yarn.lock /src
-
-ADD ./webpack_if_prod.sh /src
-
-USER mitodl
-
-RUN yarn install --frozen-lockfile
-
-COPY . /src
+COPY package.json yarn.lock webpack_if_prod.sh /src/
 
 USER root
 
-RUN chown -R mitodl:mitodl /src
+COPY . /src
 
-USER mitodl
+RUN chown -R node:node /src
+
+USER node
+
+RUN yarn install --frozen-lockfile --ignore-engines

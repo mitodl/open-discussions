@@ -13,6 +13,8 @@ const _createSettings = () => ({
 
 global.SETTINGS = _createSettings()
 
+window.scrollTo = () => "scroll!"
+
 // polyfill for Object.entries
 import entries from "object.entries"
 if (!Object.entries) {

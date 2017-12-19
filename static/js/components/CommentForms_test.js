@@ -58,6 +58,8 @@ describe("CommentForms", () => {
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     post = makePost()
+    helper.getPostStub.returns(Promise.resolve(post))
+    helper.store.dispatch(actions.posts.get(post.id))
     comment = makeComment(post)
     postKeys = {
       post_id: post.id,

@@ -2,6 +2,7 @@
 /* global SETTINGS */
 import { assert } from "chai"
 import sinon from "sinon"
+import R from "ramda"
 
 import PostList from "../components/PostList"
 import SubscriptionsList from "../components/SubscriptionsList"
@@ -74,6 +75,16 @@ describe("ChannelPage", () => {
       Promise.resolve(makeModerators(SETTINGS.username))
     )
     const post = makePost()
+    helper.editPostStub.returns(
+      Promise.resolve(
+        R.evolve(
+          {
+            stickied: R.not
+          },
+          post
+        )
+      )
+    )
     postList[0] = post
     const [wrapper] = await renderPage(currentChannel)
     wrapper

@@ -17,32 +17,39 @@ describe("SpinnerButton", () => {
   })
 
   for (const promiseState of ["not_clicked", "rejected", "resolved"]) {
-    it(`passes through all props when promise state is ${promiseState}`, async () => {
-      const promise =
-        promiseState === "rejected" ? Promise.reject() : Promise.resolve()
-      const onClickPromise = () => promise
-      const props = {
-        "data-x":       "y",
-        onClickPromise: onClickPromise,
-        className:      "class1 class2"
-      }
-      const wrapper = shallow(
-        <SpinnerButton {...props}>childText</SpinnerButton>
-      )
-      const button = wrapper.find("button")
-      const buttonProps = button.props()
-
-      if (promiseState !== "not_clicked") {
-        buttonProps.onClick()
-      }
-
-      for (const key of Object.keys(props)) {
-        if (key !== "onClickPromise") {
-          assert.deepEqual(buttonProps[key].trim(), props[key])
+    it(`passes through all props when promise state is ${promiseState}`, () => {
+      return new Promise((resolve, reject) => {
+        const onClickPromise = () =>
+          promiseState === "rejected" ? reject() : resolve()
+        const props = {
+          "data-x":       "y",
+          onClickPromise: onClickPromise,
+          className:      "class1 class2"
         }
-      }
-      assert.equal(button.children().text(), "childText")
-      assert.isFalse(buttonProps.disabled)
+        const wrapper = shallow(
+          <SpinnerButton {...props}>childText</SpinnerButton>
+        )
+        const button = wrapper.find("button")
+        const buttonProps = button.props()
+
+        if (promiseState !== "not_clicked") {
+          buttonProps.onClick()
+        }
+
+        for (const key of Object.keys(props)) {
+          if (key !== "onClickPromise") {
+            assert.deepEqual(buttonProps[key].trim(), props[key])
+          }
+        }
+        assert.equal(button.children().text(), "childText")
+        assert.isFalse(buttonProps.disabled)
+
+        if (promiseState === "not_clicked") {
+          resolve()
+        }
+      }).catch(err => {
+        assert.isNotOk(err)
+      })
     })
   }
 

@@ -24,6 +24,12 @@ describe("EditChannelPage", () => {
         posts:      []
       })
     )
+    helper.getFrontpageStub.returns(
+      Promise.resolve({
+        pagination: {},
+        posts:      []
+      })
+    )
     helper.updateChannelStub.returns(Promise.resolve(channel))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
@@ -90,8 +96,6 @@ describe("EditChannelPage", () => {
   })
 
   it("cancel and navigate to previous page", async () => {
-    helper.getFrontpageStub.returns(Promise.resolve([]))
-
     const [wrapper] = await renderPage()
 
     wrapper.find(".cancel").simulate("click")

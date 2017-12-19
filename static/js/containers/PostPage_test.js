@@ -6,7 +6,7 @@ import { Dialog } from "@mitodl/mdl-react-components"
 
 import CommentTree from "../components/CommentTree"
 
-import { makePost } from "../factories/posts"
+import { makePost, makeChannelPostList } from "../factories/posts"
 import {
   makeComment,
   makeCommentsResponse,
@@ -48,6 +48,11 @@ describe("PostPage", function() {
     helper.getChannelsStub.returns(Promise.resolve([]))
     helper.getCommentsStub.returns(Promise.resolve(commentsResponse))
     helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
+    helper.getPostsForChannelStub.returns(
+      Promise.resolve({
+        posts: makeChannelPostList()
+      })
+    )
     helper.deletePostStub.returns(Promise.resolve())
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
