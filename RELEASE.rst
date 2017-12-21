@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.8.0
+-------------
+
+- Upgrade node.js version to 9.3 ⬆️
+- Added user comment deletion
+- Pin astroid to fix pylint issue (#406)
+- Some dependency upgrades
+
 Version 0.7.3
 -------------
 
