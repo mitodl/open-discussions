@@ -104,6 +104,23 @@ def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
     assert resp.json() == payload
 
 
+def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, reddit_factories):
+    """
+    Create a channel and assert the response for no descriptions
+    """
+    url = reverse('channel-list')
+    channel = reddit_factories.channel("private", user=staff_user, strategy=STRATEGY_BUILD)
+    payload = {
+        'channel_type': channel.channel_type,
+        'name': channel.name,
+        'title': channel.title,
+    }
+    resp = client.post(url, data=payload, **staff_jwt_header)
+    expected = dict(payload, description='', public_description='')
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json() == expected
+
+
 def test_create_channel_already_exists(client, staff_jwt_header, private_channel):
     """
     Create a channel which already exists

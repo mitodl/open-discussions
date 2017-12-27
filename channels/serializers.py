@@ -43,7 +43,7 @@ class ChannelSerializer(serializers.Serializer):
             title=validated_data['title'],
             channel_type=validated_data['subreddit_type'],
             description=validated_data.get('description', ''),
-            public_description=validated_data['public_description'],
+            public_description=validated_data.get('public_description', ''),
         )
 
     def update(self, instance, validated_data):
