@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.8.1
+-------------
+
+- Changed public_description to be optional on channel creation
+- Css tweaks to community guidelines page (#409)
+
 Version 0.8.0
 -------------
 
