@@ -25,6 +25,7 @@ import { anyError } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { formatTitle } from "../lib/title"
 import { clearChannelError } from "../actions/channel"
+import { evictPostsForChannel } from "../actions/posts_for_channel"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -60,8 +61,13 @@ class ChannelPage extends React.Component<*, void> {
     this.loadData()
   }
 
+  componentWillUnmount() {
+    this.clearData(this.props.channelName)
+  }
+
   componentDidUpdate(prevProps) {
     if (shouldLoadData(prevProps, this.props)) {
+      this.clearData(prevProps.channelName)
       this.loadData()
     }
   }
@@ -71,6 +77,11 @@ class ChannelPage extends React.Component<*, void> {
 
     await dispatch(actions.posts.patch(post.id, { stickied: !post.stickied }))
     this.fetchPostsForChannel()
+  }
+
+  clearData = (channelName: string) => {
+    const { dispatch } = this.props
+    dispatch(evictPostsForChannel(channelName))
   }
 
   loadData = () => {
@@ -147,7 +158,8 @@ const mapStateToProps = (state, ownProps) => {
     pagination:         postsForChannel.pagination,
     posts:              safeBulkGet(postIds, state.posts.data),
     subscribedChannels: getSubscribedChannels(state),
-    loaded:             R.none(R.isNil, [channel, postIds]),
+    // NOTE: this cannot be `postIds` because that never evals to a Nil value
+    loaded:             R.none(R.isNil, [channel, postsForChannel.postIds]),
     errored:            anyError([state.channels, state.posts, state.subscribedChannels])
   }
 }

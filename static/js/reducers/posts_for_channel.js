@@ -3,6 +3,7 @@ import { GET, INITIAL_STATE } from "redux-hammock/constants"
 
 import * as api from "../lib/api"
 import { mapPostListResponse } from "../lib/posts"
+import { EVICT_POSTS_FOR_CHANNEL } from "../actions/posts_for_channel"
 
 import type {
   PostListResponse,
@@ -31,5 +32,16 @@ export const postsForChannelEndpoint = {
     const update = new Map(data)
     update.set(channelName, mapPostListResponse(response))
     return update
+  },
+  extraActions: {
+    [EVICT_POSTS_FOR_CHANNEL]: (state, action: Action<string, *>) => {
+      const update = new Map(state.data)
+      const channelName = action.payload
+      update.delete(channelName)
+      return {
+        ...state,
+        data: update
+      }
+    }
   }
 }

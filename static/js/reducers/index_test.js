@@ -176,44 +176,6 @@ describe("reducers", () => {
     })
   })
 
-  describe("postsForChannel reducer", () => {
-    beforeEach(() => {
-      dispatchThen = store.createDispatchThen(state => state.postsForChannel)
-      helper.getPostsForChannelStub.returns(
-        Promise.resolve({ posts: makeChannelPostList() })
-      )
-    })
-
-    it("should have some initial state", () => {
-      assert.deepEqual(store.getState().postsForChannel, {
-        ...INITIAL_STATE,
-        data: new Map()
-      })
-    })
-
-    it("should let you get the posts for a channel", async () => {
-      const { requestType, successType } = actions.postsForChannel.get
-      const { data } = await dispatchThen(
-        actions.postsForChannel.get("channel"),
-        [requestType, successType]
-      )
-      const channel = data.get("channel").postIds
-      assert.isArray(channel)
-      assert.lengthOf(channel, 20)
-    })
-
-    it("should support multiple channels", async () => {
-      await Promise.all([
-        store.dispatch(actions.postsForChannel.get("first")),
-        store.dispatch(actions.postsForChannel.get("second"))
-      ])
-      const { postsForChannel: { data } } = store.getState()
-      assert.isArray(data.get("first").postIds)
-      assert.isArray(data.get("second").postIds)
-      assert.equal(data.size, 2)
-    })
-  })
-
   describe("frontpage reducer", () => {
     beforeEach(() => {
       dispatchThen = store.createDispatchThen(state => state.frontpage)

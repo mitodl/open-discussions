@@ -17,6 +17,7 @@ import { makeChannelPostList, makePost } from "../factories/posts"
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
 import { SET_CHANNEL_DATA, CLEAR_CHANNEL_ERROR } from "../actions/channel"
+import { EVICT_POSTS_FOR_CHANNEL } from "../actions/posts_for_channel"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { channelURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
@@ -131,7 +132,8 @@ describe("ChannelPage", () => {
         actions.postsForChannel.get.requestType,
         actions.postsForChannel.get.successType,
         actions.channelModerators.get.requestType,
-        actions.channelModerators.get.successType
+        actions.channelModerators.get.successType,
+        EVICT_POSTS_FOR_CHANNEL
       ],
       () => {
         helper.browserHistory.push(channelURL(otherChannel.name))
