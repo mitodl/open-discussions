@@ -2,6 +2,7 @@
 from contextlib import contextmanager
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from praw.exceptions import APIException
 from prawcore.exceptions import (
     Forbidden,
@@ -11,6 +12,8 @@ from prawcore.exceptions import (
 from rest_framework.exceptions import PermissionDenied, NotFound
 
 from channels.exceptions import ConflictException
+
+User = get_user_model()
 
 
 def get_pagination_params(request):
@@ -94,3 +97,19 @@ def translate_praw_exceptions():
         elif exc.error_type == 'SUBREDDIT_EXISTS':
             raise ConflictException() from exc
         raise
+
+
+def lookup_users_for_posts(posts):
+    """
+    Helper function to look up user for each instance and attach it to instance.user
+
+    Args:
+        posts (list of praw.models.Submission):
+            A list of submissions
+    """
+    users = User.objects.filter(
+        username__in=[
+            post.author.name for post in posts if post.author
+        ]
+    ).select_related('profile')
+    return {user.username: user for user in users}
