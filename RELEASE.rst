@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.8.2
+-------------
+
+- Refactored channels/views*.py into separate modules
+- Fixed loading spinner on channel page
+
 Version 0.8.1
 -------------
 
