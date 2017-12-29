@@ -597,3 +597,19 @@ def test_is_subscriber(mock_client):
     assert client.is_subscriber(subscriber.username, 'channel_test_name') is False
     assert client.is_subscriber(subscriber.username, 'sub2') is True
     assert mock_client.user.subreddits.call_count == 2
+
+
+def test_report_comment(mock_client):
+    """Test report_comment"""
+    client = api.Api(UserFactory.create())
+    client.report_comment('id', 'reason')
+    mock_client.comment.assert_called_once_with('id')
+    mock_client.comment.return_value.report.assert_called_once_with('reason')
+
+
+def test_report_post(mock_client):
+    """Test report_post"""
+    client = api.Api(UserFactory.create())
+    client.report_post('id', 'reason')
+    mock_client.submission.assert_called_once_with(id='id')
+    mock_client.submission.return_value.report.assert_called_once_with('reason')

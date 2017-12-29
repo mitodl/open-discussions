@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Eum officia tempore delectus ut id. Occaecati voluptatibus culpa fugiat quasi. Non id eveniet non sunt alias iusto temporibus.\nRerum quia magni omnis error quo non. Sunt beatae fugiat laboriosam cum illo accusantium possimus.\nRepudiandae animi qui ut corporis amet dolor. A asperiores delectus ut laudantium. Voluptatibus nobis recusandae laboriosam beatae exercitationem at commodi.",
+      "name": "1514581705_doloremque",
+      "public_description": "Possimus totam libero tempora asperiores voluptatem. Ea a magnam at.",
+      "title": "Odit animi unde eius nihil veniam."
+    }
+  },
+  "posts": {
+    "post": {
+      "id": "hb",
+      "text": "Consequuntur placeat consequatur illum excepturi. Facere ducimus tempore eveniet amet.",
+      "title": "Corrupti quam ipsam explicabo eligendi aliquid."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C2J1NMB8WAZX6WKPN39TAGPS"
+    },
+    "staff_user": {
+      "username": "01C2J1NDZDHFTKR6F2K76DEHZW"
+    }
+  }
+}

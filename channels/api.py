@@ -831,3 +831,23 @@ class Api:
 
         api = Api(user)
         return channel_name in (channel.display_name for channel in api.list_channels())
+
+    def report_post(self, post_id, reason):
+        """
+        Reports a post to moderators
+
+        Args:
+            post_id(str): the id of the post to report
+            reason(str): the reason why the post is being reported
+        """
+        self.get_post(post_id).report(reason)
+
+    def report_comment(self, comment_id, reason):
+        """
+        Reports a comment to moderators
+
+        Args:
+            comment_id(str): the id of the comment to report
+            reason(str): the reason why the comment is being reported
+        """
+        self.get_comment(comment_id).report(reason)

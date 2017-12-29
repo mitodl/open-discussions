@@ -8,6 +8,7 @@ from channels.views import (
     frontpage,
     moderators,
     posts,
+    reports,
     subscribers,
 )
 
@@ -73,4 +74,9 @@ urlpatterns = [
         name='morecomments-detail',
     ),
     url(r'api/v0/frontpage/$', frontpage.FrontPageView.as_view(), name='frontpage'),
+    url(
+        r'api/v0/reports/$',
+        reports.ReportContentView.as_view(),
+        name='report-content',
+    ),
 ]

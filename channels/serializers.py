@@ -536,3 +536,34 @@ class SubscriberSerializer(serializers.Serializer):
         api = Api(user=self.context['request'].user)
         channel_name = self.context['view'].kwargs['channel_name']
         return api.add_subscriber(validated_data['subscriber_name'], channel_name)
+
+
+class ReportSerializer(serializers.Serializer):
+    """Serializer for reporting posts and comments"""
+    post_id = serializers.CharField(required=False)
+    comment_id = serializers.CharField(required=False)
+    reason = serializers.CharField(max_length=100)
+
+    def validate(self, attrs):
+        """Validate data"""
+        if 'post_id' not in attrs and 'comment_id' not in attrs:
+            raise ValidationError("You must provide one of either 'post_id' or 'comment_id'")
+        elif 'post_id' in attrs and 'comment_id' in attrs:
+            raise ValidationError("You must provide only one of either 'post_id' or 'comment_id', not both")
+
+        return attrs
+
+    def create(self, validated_data):
+        """Create a new report"""
+        api = Api(user=self.context['request'].user)
+        post_id = validated_data.get('post_id', None)
+        comment_id = validated_data.get('comment_id', None)
+        reason = validated_data['reason']
+        result = {'reason': reason}
+        if post_id:
+            api.report_post(post_id, reason)
+            result['post_id'] = post_id
+        else:
+            api.report_comment(comment_id, reason)
+            result['comment_id'] = comment_id
+        return result
