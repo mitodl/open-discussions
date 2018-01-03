@@ -18,9 +18,9 @@ import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
 import { SET_CHANNEL_DATA } from "../actions/channel"
 import { REPLACE_MORE_COMMENTS } from "../actions/comment"
-import { FORM_BEGIN_EDIT } from "../actions/forms"
-import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG } from "../actions/ui"
-import { SET_FOCUSED_COMMENT } from "../actions/focus"
+import { FORM_BEGIN_EDIT, FORM_END_EDIT, FORM_VALIDATE } from "../actions/forms"
+import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG, HIDE_DIALOG } from "../actions/ui"
+import { SET_FOCUSED_COMMENT, CLEAR_FOCUSED_COMMENT } from "../actions/focus"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
 import { postDetailURL, channelURL } from "../lib/url"
@@ -345,6 +345,129 @@ describe("PostPage", function() {
           expectedPayload
         )
       })
+    })
+
+    it("should report a comment", async () => {
+      const comment = comments[0].replies[2]
+      assert(comment, "comment not found")
+
+      const [wrapper] = await renderPage()
+
+      helper.reportContentStub.returns(Promise.resolve())
+
+      await listenForActions(
+        [SHOW_DIALOG, SET_FOCUSED_COMMENT, FORM_BEGIN_EDIT],
+        () => {
+          const reportFunc = wrapper.find("CommentTree").props().reportComment
+          reportFunc(comment)
+        }
+      )
+
+      const dialog = wrapper.find("Dialog").at(4)
+      dialog.find("input").simulate("change", {
+        target: {
+          name:  "reason",
+          value: "spam"
+        }
+      })
+
+      await listenForActions(
+        [
+          actions.reports.post.requestType,
+          actions.reports.post.successType,
+          CLEAR_FOCUSED_COMMENT,
+          HIDE_DIALOG,
+          FORM_END_EDIT
+        ],
+        () => {
+          dialog.props().onAccept()
+        }
+      )
+      sinon.assert.calledWith(helper.reportContentStub, {
+        comment_id: comment.id,
+        reason:     "spam"
+      })
+    })
+  })
+
+  it("should report a post", async () => {
+    const [wrapper] = await renderPage()
+
+    helper.reportContentStub.returns(Promise.resolve())
+
+    await listenForActions([SHOW_DIALOG, FORM_BEGIN_EDIT], () => {
+      const reportPostFunc = wrapper.find("ExpandedPostDisplay").props()
+        .showPostReportDialog
+      reportPostFunc()
+    })
+
+    const dialog = wrapper.find("Dialog").at(3)
+    dialog.find("input").simulate("change", {
+      target: {
+        name:  "reason",
+        value: "spam"
+      }
+    })
+
+    await listenForActions(
+      [
+        actions.reports.post.requestType,
+        actions.reports.post.successType,
+        HIDE_DIALOG,
+        FORM_END_EDIT
+      ],
+      () => {
+        dialog.props().onAccept()
+      }
+    )
+    sinon.assert.calledWith(helper.reportContentStub, {
+      post_id: post.id,
+      reason:  "spam"
+    })
+  })
+  ;[
+    ["should render validation for a comment report", 4, true],
+    ["should render validation for a post report", 3, false]
+  ].forEach(([testName, dialogIndex, isComment]) => {
+    it(testName, async () => {
+      const [wrapper] = await renderPage()
+
+      helper.reportContentStub.returns(Promise.resolve())
+
+      const expectedActions = [SHOW_DIALOG, FORM_BEGIN_EDIT]
+
+      if (isComment) {
+        expectedActions.push(SET_FOCUSED_COMMENT)
+      }
+
+      await listenForActions(expectedActions, () => {
+        if (isComment) {
+          const comment = comments[0].replies[2]
+          assert(comment, "comment not found")
+          const reportFunc = wrapper.find("CommentTree").props().reportComment
+          reportFunc(comment)
+        } else {
+          const reportPostFunc = wrapper.find("ExpandedPostDisplay").props()
+            .showPostReportDialog
+          reportPostFunc()
+        }
+      })
+
+      const dialog = wrapper.find("Dialog").at(dialogIndex)
+      dialog.find("input").simulate("change", {
+        target: {
+          name:  "reason",
+          value: "sp"
+        }
+      })
+
+      await listenForActions([FORM_VALIDATE], () => {
+        dialog.props().onAccept()
+      })
+      assert.equal(
+        dialog.find(".reason .validation-message").text(),
+        "Reason must be at least 3 characters"
+      )
     })
   })
 

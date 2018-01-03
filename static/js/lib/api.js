@@ -18,7 +18,8 @@ import type {
   PostListPaginationParams,
   Post,
   CommentFromAPI,
-  MoreCommentsFromAPI
+  MoreCommentsFromAPI,
+  GenericReport
 } from "../flow/discussionTypes"
 
 const getPaginationQS = R.compose(
@@ -178,4 +179,11 @@ export function getMoreComments(
   return fetchJSONWithAuthFailure(
     `/api/v0/morecomments/?${qs.stringify(payload)}`
   )
+}
+
+export function reportContent(payload: GenericReport): Promise<GenericReport> {
+  return fetchJSONWithAuthFailure(`/api/v0/reports/`, {
+    method: POST,
+    body:   JSON.stringify(payload)
+  })
 }

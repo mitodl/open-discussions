@@ -136,3 +136,23 @@ export type Moderator = {
 }
 
 export type ChannelModerators = Array<Moderator>
+
+export type Report = {
+  reason: string,
+}
+
+export type CommentReport = Report & {
+  reportType:  "comment",
+  commentId:    string,
+}
+
+export type PostReport = Report & {
+  reportType:  "post",
+  postId:       string,
+}
+
+export type GenericReport = PostReport | CommentReport
+
+export type ReportValidation = {
+  reason: string
+}

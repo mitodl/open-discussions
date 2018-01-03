@@ -22,7 +22,8 @@ import {
   updateChannel,
   updateRemoved,
   deletePost,
-  deleteComment
+  deleteComment,
+  reportContent
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -358,6 +359,38 @@ describe("api", function() {
         )
         assert.deepEqual(response, moreComments)
       })
+    })
+
+    it("reports a comment", async () => {
+      const payload = {
+        comment_id: 1,
+        reason:     "spam"
+      }
+      fetchJSONStub.returns(Promise.resolve())
+
+      await reportContent(payload)
+      assert.ok(
+        fetchJSONStub.calledWith(`/api/v0/reports/`, {
+          method: POST,
+          body:   JSON.stringify(payload)
+        })
+      )
+    })
+
+    it("reports a post", async () => {
+      const payload = {
+        post_id: 1,
+        reason:  "spam"
+      }
+      fetchJSONStub.returns(Promise.resolve())
+
+      await reportContent(payload)
+      assert.ok(
+        fetchJSONStub.calledWith(`/api/v0/reports/`, {
+          method: POST,
+          body:   JSON.stringify(payload)
+        })
+      )
     })
   })
 })

@@ -31,7 +31,8 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     forms: FormsState,
     isModerator: boolean,
     beginEditing: (key: string, initialValue: Object, e: ?Event) => void,
-    showPostDeleteDialog: () => void
+    showPostDeleteDialog: () => void,
+    showPostReportDialog: () => void
   }
 
   renderTextContent = () => {
@@ -64,7 +65,8 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
       post,
       beginEditing,
       isModerator,
-      showPostDeleteDialog
+      showPostDeleteDialog,
+      showPostReportDialog
     } = this.props
 
     return (
@@ -106,6 +108,12 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
             <a href="#">approve</a>
           </div>
           : null}
+        <div
+          className="comment-action-button report-post"
+          onClick={showPostReportDialog}
+        >
+          <a href="#">report</a>
+        </div>
       </div>
     )
   }

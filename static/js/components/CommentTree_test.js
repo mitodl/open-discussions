@@ -29,7 +29,8 @@ describe("CommentTree", () => {
     approveStub,
     beginEditingStub,
     loadMoreCommentsStub,
-    deleteCommentStub
+    deleteCommentStub,
+    reportCommentStub
 
   beforeEach(() => {
     post = makePost()
@@ -42,6 +43,7 @@ describe("CommentTree", () => {
     beginEditingStub = sandbox.stub()
     loadMoreCommentsStub = sandbox.stub()
     deleteCommentStub = sandbox.stub()
+    reportCommentStub = sandbox.stub()
   })
 
   afterEach(() => {
@@ -61,6 +63,7 @@ describe("CommentTree", () => {
         processing={false}
         loadMoreComments={loadMoreCommentsStub}
         deleteComment={deleteCommentStub}
+        reportComment={reportCommentStub}
         {...props}
       />
     )
@@ -111,6 +114,16 @@ describe("CommentTree", () => {
     wrapper.find(".comment-action-button").at(0).simulate("click")
     assert.ok(beginEditingStub.called)
     assert.ok(beginEditingStub.calledWith(replyToCommentKey(comments[0])))
+  })
+
+  it('should include a "report" button', () => {
+    const wrapper = renderCommentTree()
+    wrapper
+      .find(".comment-action-button.report-button")
+      .at(0)
+      .simulate("click", null)
+    assert.ok(reportCommentStub.called)
+    assert.ok(reportCommentStub.calledWith(comments[0]))
   })
 
   it('should include an "Edit" button, if the user wrote the comment', () => {
@@ -171,9 +184,9 @@ describe("CommentTree", () => {
         .find(".comment-actions")
         .at(0)
         .find(".comment-action-button"),
-      1
+      2
     )
-    assert.lengthOf(nextCommentWrapper.find(".comment-action-button"), 0)
+    assert.lengthOf(nextCommentWrapper.find(".comment-action-button"), 1)
 
     assert.lengthOf(topCommentWrapper.find(ReplyToCommentForm), 1)
     assert.lengthOf(nextCommentWrapper.find(ReplyToCommentForm), 0)

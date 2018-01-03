@@ -7,7 +7,8 @@ import {
   validation,
   validate,
   validatePostCreateForm,
-  validateChannelEditForm
+  validateChannelEditForm,
+  validateContentReportForm
 } from "./validation"
 
 describe("validation library", () => {
@@ -154,6 +155,31 @@ describe("validation library", () => {
       })
       channel.value.description = "a".repeat(5120)
       assert.deepEqual(validateChannelEditForm(channel), {})
+    })
+  })
+
+  describe("validateContentReportForm", () => {
+    it("should complain about too long of a description", () => {
+      const report = {
+        value: {
+          reason: "a".repeat(101)
+        }
+      }
+      assert.deepEqual(validateContentReportForm(report), {
+        value: {
+          reason: "Reason length is limited to 100 characters"
+        }
+      })
+      report.value.reason = "a".repeat(2)
+      assert.deepEqual(validateContentReportForm(report), {
+        value: {
+          reason: "Reason must be at least 3 characters"
+        }
+      })
+      report.value.reason = "a".repeat(100)
+      assert.deepEqual(validateContentReportForm(report), {})
+      report.value.reason = "a".repeat(3)
+      assert.deepEqual(validateContentReportForm(report), {})
     })
   })
 })

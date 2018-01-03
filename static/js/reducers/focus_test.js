@@ -13,10 +13,11 @@ import { makeComment } from "../factories/comments"
 import { makePost } from "../factories/posts"
 
 describe("focus reducer", () => {
-  let helper, store, dispatchThen, comment
+  let helper, store, dispatchThen, comment, post
 
   beforeEach(() => {
-    comment = makeComment(makePost())
+    post = makePost()
+    comment = makeComment(post)
     helper = new IntegrationTestHelper()
     store = helper.store
     dispatchThen = store.createDispatchThen(state => state.focus)
@@ -30,7 +31,7 @@ describe("focus reducer", () => {
     assert.deepEqual(store.getState().focus, INITIAL_FOCUS_STATE)
   })
 
-  it("should let you set and clear the moderation comment", async () => {
+  it("should let you set and clear the focused comment", async () => {
     let state = await dispatchThen(setFocusedComment(comment), [
       SET_FOCUSED_COMMENT
     ])

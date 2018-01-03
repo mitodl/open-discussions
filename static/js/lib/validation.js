@@ -75,6 +75,19 @@ export const validateChannelEditForm = validate([
   )
 ])
 
+export const validateContentReportForm = validate([
+  validation(
+    R.compose(R.lt(100), R.length),
+    R.lensPath(["value", "reason"]),
+    "Reason length is limited to 100 characters"
+  ),
+  validation(
+    R.compose(R.gt(3), R.length),
+    R.lensPath(["value", "reason"]),
+    "Reason must be at least 3 characters"
+  )
+])
+
 export const validationMessage = (message: string) =>
   R.isEmpty(message) || R.isNil(message)
     ? null

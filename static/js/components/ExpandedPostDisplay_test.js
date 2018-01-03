@@ -23,7 +23,8 @@ describe("ExpandedPostDisplay", () => {
     beginEditingStub,
     approvePostStub,
     removePostStub,
-    showPostDeleteDialogStub
+    showPostDeleteDialogStub,
+    showPostReportDialogStub
 
   const renderPostDisplay = props => {
     props = {
@@ -34,6 +35,7 @@ describe("ExpandedPostDisplay", () => {
       approvePost:          approvePostStub,
       removePost:           removePostStub,
       showPostDeleteDialog: showPostDeleteDialogStub,
+      showPostReportDialog: showPostReportDialogStub,
       forms:                {},
       ...props
     }
@@ -51,6 +53,7 @@ describe("ExpandedPostDisplay", () => {
     approvePostStub = helper.sandbox.stub()
     removePostStub = helper.sandbox.stub()
     showPostDeleteDialogStub = helper.sandbox.stub()
+    showPostReportDialogStub = helper.sandbox.stub()
   })
 
   afterEach(() => {
@@ -145,6 +148,13 @@ describe("ExpandedPostDisplay", () => {
     const wrapper = renderPostDisplay({ post })
     wrapper.find(".delete-post").simulate("click")
     assert.ok(showPostDeleteDialogStub.called)
+  })
+
+  it("should call showPostReportDialog when user clicks 'report'", () => {
+    const post = makePost()
+    const wrapper = renderPostDisplay({ post })
+    wrapper.find(".report-post").simulate("click")
+    assert.ok(showPostReportDialogStub.called)
   })
 
   it('should call beginEditing when user clicks "edit"', () => {

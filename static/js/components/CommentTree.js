@@ -31,6 +31,7 @@ import type { CommentVoteFunc } from "./CommentVoteForm"
 
 type LoadMoreCommentsFunc = (comment: MoreCommentsInTree) => Promise<*>
 type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
+type ReportCommentFunc = (comment: CommentInTree) => void
 
 type CommentTreeProps = {
   comments: Array<GenericComment>,
@@ -43,7 +44,8 @@ type CommentTreeProps = {
   beginEditing: BeginEditingFunc,
   isModerator: boolean,
   processing: boolean,
-  deleteComment: CommentRemoveFunc
+  deleteComment: CommentRemoveFunc,
+  reportComment: ReportCommentFunc
 }
 
 export default class CommentTree extends React.Component<*, *> {
@@ -59,7 +61,8 @@ export default class CommentTree extends React.Component<*, *> {
       deleteComment,
       beginEditing,
       processing,
-      isModerator
+      isModerator,
+      reportComment
     } = this.props
     const formKey = replyToCommentKey(comment)
     const editFormKey = editCommentKey(comment)
@@ -146,6 +149,12 @@ export default class CommentTree extends React.Component<*, *> {
               approve={approve}
               isModerator={isModerator}
             />
+            <div
+              className="comment-action-button report-button"
+              onClick={preventDefaultAndInvoke(() => reportComment(comment))}
+            >
+              <a href="#">report</a>
+            </div>
           </div>
           {atMaxDepth
             ? null
