@@ -13,6 +13,7 @@ import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"
 import { ReplyToPostForm } from "../components/CommentForms"
 import withNavSidebar from "../hoc/withNavSidebar"
+import NotFound from "../components/404"
 
 import { formatCommentsCount } from "../lib/posts"
 import { actions } from "../actions"
@@ -28,7 +29,7 @@ import {
 } from "../util/api_actions"
 import { getChannelName, getPostID } from "../lib/util"
 import { isModerator } from "../lib/channels"
-import { anyError } from "../util/rest"
+import { anyErrorExcept404 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginEditing } from "../components/CommentForms"
 import { formatTitle } from "../lib/title"
@@ -63,7 +64,8 @@ type PostPageProps = {
   postID: string,
   postDeleteDialogVisible: boolean,
   history: Object,
-  commentDeleteDialogVisible: boolean
+  commentDeleteDialogVisible: boolean,
+  notFound: boolean
 }
 
 const DIALOG_REMOVE_COMMENT = "DIALOG_REMOVE_COMMENT"
@@ -99,15 +101,20 @@ class PostPage extends React.Component<*, void> {
     )
   }
 
-  loadData = () => {
+  loadData = async () => {
     const { dispatch, channelName, postID, channel, moderators } = this.props
     if (!postID || !channelName) {
       // should not happen, this should be guaranteed by react-router
       throw Error("Match error")
     }
 
-    dispatch(actions.posts.get(postID))
-    dispatch(actions.comments.get(postID))
+    try {
+      await Promise.all([
+        dispatch(actions.posts.get(postID)),
+        dispatch(actions.comments.get(postID))
+      ])
+    } catch (_) {} // eslint-disable-line no-empty
+
     if (!channel) {
       dispatch(actions.channels.get(channelName))
     }
@@ -247,14 +254,17 @@ class PostPage extends React.Component<*, void> {
       showRemoveCommentDialog,
       isModerator,
       postDeleteDialogVisible,
-      commentDeleteDialogVisible
+      commentDeleteDialogVisible,
+      notFound
     } = this.props
-    if (!channel || !post || !commentsTree) {
+
+    if (!channel) {
       return null
     }
 
-    return (
-      <div>
+    return notFound
+      ? <NotFound />
+      : <div>
         <ChannelBreadcrumbs channel={channel} />
         <DocumentTitle title={formatTitle(post.title)} />
         <Dialog
@@ -265,9 +275,9 @@ class PostPage extends React.Component<*, void> {
           submitText="Yes, remove"
         >
           <p>
-            Are you sure? You will still be able to see the comment, but it will
-            be deleted for normal users. You can undo this later by clicking
-            "approve".
+              Are you sure? You will still be able to see the comment, but it
+              will be deleted for normal users. You can undo this later by
+              clicking "approve".
           </p>
         </Dialog>
         <Dialog
@@ -277,7 +287,7 @@ class PostPage extends React.Component<*, void> {
           title="Delete Comment"
           submitText="Yes, Delete"
         >
-          Are you sure you want to delete this comment?
+            Are you sure you want to delete this comment?
         </Dialog>
         <Dialog
           open={postDeleteDialogVisible}
@@ -286,7 +296,7 @@ class PostPage extends React.Component<*, void> {
           title="Delete Post"
           submitText="Yes, Delete"
         >
-          Are you sure you want to delete this post?
+            Are you sure you want to delete this post?
         </Dialog>
         <Card>
           <div className="post-card">
@@ -324,7 +334,6 @@ class PostPage extends React.Component<*, void> {
           processing={commentInFlight}
         />
       </div>
-    )
   }
 }
 
@@ -344,6 +353,13 @@ const mapStateToProps = (state, ownProps) => {
   const channel = channels.data.get(channelName)
   const commentsTree = comments.data.get(postID)
   const moderators = channelModerators.data.get(channelName)
+  const loaded = posts.error
+    ? true
+    : R.none(R.isNil, [post, channel, commentsTree])
+  const notFound = loaded
+    ? posts.error && posts.error.errorStatusCode === 404
+    : false
+
   return {
     ui,
     postID,
@@ -353,10 +369,11 @@ const mapStateToProps = (state, ownProps) => {
     channel,
     commentsTree,
     moderators,
+    loaded,
+    notFound,
     focusedComment:             focus.comment,
     isModerator:                isModerator(moderators, SETTINGS.username),
-    loaded:                     R.none(R.isNil, [post, channel, commentsTree]),
-    errored:                    anyError([posts, channels, comments]),
+    errored:                    anyErrorExcept404([posts, channels, comments]),
     subscribedChannels:         getSubscribedChannels(state),
     commentInFlight:            comments.processing,
     showRemoveCommentDialog:    ui.dialogs.has(DIALOG_REMOVE_COMMENT),

@@ -5,6 +5,7 @@ import R from "ramda"
 import { Dialog } from "@mitodl/mdl-react-components"
 
 import CommentTree from "../components/CommentTree"
+import NotFound from "../components/404"
 
 import { makePost, makeChannelPostList } from "../factories/posts"
 import {
@@ -15,6 +16,7 @@ import {
 import { makeChannel, makeModerators } from "../factories/channels"
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
+import { SET_CHANNEL_DATA } from "../actions/channel"
 import { REPLACE_MORE_COMMENTS } from "../actions/comment"
 import { FORM_BEGIN_EDIT } from "../actions/forms"
 import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG } from "../actions/ui"
@@ -74,7 +76,8 @@ describe("PostPage", function() {
       actions.channels.get.successType,
       actions.channelModerators.get.requestType,
       actions.channelModerators.get.successType,
-      FORM_BEGIN_EDIT
+      FORM_BEGIN_EDIT,
+      SET_CHANNEL_DATA
     ])
 
   it("should set the document title", async () => {
@@ -288,7 +291,7 @@ describe("PostPage", function() {
     })
     ;[
       [false, "should remove a comment"],
-      [true, "should approve an comment"]
+      [true, "should approve a comment"]
     ].forEach(([isRemoved, testName]) => {
       it(testName, async () => {
         const comment = comments[0].replies[2]
@@ -343,5 +346,48 @@ describe("PostPage", function() {
         )
       })
     })
+  })
+
+  it("should show a 404 page", async () => {
+    helper.getPostStub.returns(Promise.reject({ errorStatusCode: 404 }))
+    const [wrapper] = await renderComponent(
+      postDetailURL(channel.name, post.id),
+      [
+        actions.posts.get.requestType,
+        actions.posts.get.failureType,
+        actions.comments.get.requestType,
+        actions.comments.get.successType,
+        actions.subscribedChannels.get.requestType,
+        actions.subscribedChannels.get.successType,
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
+        actions.channelModerators.get.requestType,
+        actions.channelModerators.get.successType,
+        SET_CHANNEL_DATA
+      ]
+    )
+    assert(wrapper.find(NotFound).exists())
+  })
+
+  it("should show the normal error page for non 404 errors", async () => {
+    helper.getPostStub.returns(Promise.reject({ errorStatusCode: 401 }))
+    const [wrapper] = await renderComponent(
+      postDetailURL(channel.name, post.id),
+      [
+        actions.posts.get.requestType,
+        actions.posts.get.failureType,
+        actions.comments.get.requestType,
+        actions.comments.get.successType,
+        actions.subscribedChannels.get.requestType,
+        actions.subscribedChannels.get.successType,
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
+        actions.channelModerators.get.requestType,
+        actions.channelModerators.get.successType,
+        SET_CHANNEL_DATA
+      ]
+    )
+    assert.equal(wrapper.find(".main-content").text(), "Error loading page")
+    assert.isFalse(wrapper.find(NotFound).exists())
   })
 })
