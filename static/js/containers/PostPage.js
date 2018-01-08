@@ -37,6 +37,8 @@ import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginEditing } from "../components/CommentForms"
 import { formatTitle } from "../lib/title"
 import { channelURL } from "../lib/url"
+import { clearPostError } from "../actions/post"
+
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
 import type { FormsState } from "../flow/formTypes"
@@ -69,7 +71,8 @@ type PostPageProps = {
   commentDeleteDialogVisible: boolean,
   postReportDialogVisible: boolean,
   commentReportDialogVisible: boolean,
-  notFound: boolean
+  notFound: boolean,
+  errored: boolean
 }
 
 const DIALOG_REMOVE_COMMENT = "DIALOG_REMOVE_COMMENT"
@@ -103,6 +106,14 @@ class PostPage extends React.Component<*, void> {
 
   componentWillMount() {
     this.loadData()
+  }
+
+  componentWillUnmount() {
+    const { dispatch, errored, notFound } = this.props
+
+    if (errored || notFound) {
+      dispatch(clearPostError())
+    }
   }
 
   componentDidUpdate(prevProps) {

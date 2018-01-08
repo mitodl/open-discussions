@@ -7,8 +7,9 @@ import {
   DELETE,
   INITIAL_STATE
 } from "redux-hammock/constants"
+import R from "ramda"
 
-import { SET_POST_DATA } from "../actions/post"
+import { SET_POST_DATA, CLEAR_POST_ERROR } from "../actions/post"
 
 import type { CreatePostPayload, Post } from "../flow/discussionTypes"
 
@@ -52,6 +53,7 @@ export const postsEndpoint = {
           ? mergeMultiplePosts(action.payload, state.data)
           : mergePostData(action.payload, state.data)
       return Object.assign({}, state, { data: update, loaded: true })
-    }
+    },
+    [CLEAR_POST_ERROR]: R.dissoc("error")
   }
 }

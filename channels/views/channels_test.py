@@ -133,6 +133,15 @@ def test_get_channel(client, jwt_header, private_channel_and_contributor):
     }
 
 
+def test_get_short_channel(client, jwt_header):
+    """
+    test getting a one-character channel name
+    """
+    url = reverse('channel-detail', kwargs={'channel_name': 'a'})
+    resp = client.get(url, **jwt_header)
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+
 def test_get_channel_forbidden(client):
     """
     If PRAW returns a 403 error we should also return a 403 error

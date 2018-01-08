@@ -12,16 +12,17 @@ import withLoading from "../components/Loading"
 import PostListNavigation from "../components/PostListNavigation"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import withNavAndChannelSidebars from "../hoc/withNavAndChannelSidebars"
+import NotFound from "../components/404"
 
 import { actions } from "../actions"
-import { setPostData } from "../actions/post"
+import { setPostData, clearPostError } from "../actions/post"
 import { safeBulkGet } from "../lib/maps"
 import { getChannelName } from "../lib/util"
 import { isModerator } from "../lib/channels"
 import { getPostIds } from "../lib/posts"
 import { channelURL } from "../lib/url"
 import { toggleUpvote } from "../util/api_actions"
-import { anyError } from "../util/rest"
+import { anyErrorExcept404 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { formatTitle } from "../lib/title"
 import { clearChannelError } from "../actions/channel"
@@ -42,7 +43,8 @@ type ChannelPageProps = {
   subscribedChannels: ?Array<Channel>,
   pagination: PostListPagination,
   errored: boolean,
-  isModerator: boolean
+  isModerator: boolean,
+  notFound: boolean
 }
 
 const shouldLoadData = R.complement(
@@ -84,14 +86,18 @@ class ChannelPage extends React.Component<*, void> {
     dispatch(evictPostsForChannel(channelName))
   }
 
-  loadData = () => {
-    const { dispatch, errored, channelName } = this.props
-    if (errored) {
+  loadData = async () => {
+    const { dispatch, errored, notFound, channelName } = this.props
+    if (errored || notFound) {
       dispatch(clearChannelError())
+      dispatch(clearPostError())
     }
-    dispatch(actions.channels.get(channelName))
-    dispatch(actions.channelModerators.get(channelName))
-    this.fetchPostsForChannel()
+
+    try {
+      await dispatch(actions.channels.get(channelName))
+      await dispatch(actions.channelModerators.get(channelName))
+      this.fetchPostsForChannel()
+    } catch (_) {} // eslint-disable-line no-empty
   }
 
   fetchPostsForChannel = async () => {
@@ -111,8 +117,14 @@ class ChannelPage extends React.Component<*, void> {
       posts,
       pagination,
       channelName,
-      isModerator
+      isModerator,
+      notFound
     } = this.props
+
+    if (notFound) {
+      return <NotFound />
+    }
+
     if (!channel || !subscribedChannels || !posts) {
       return null
     } else {
@@ -146,21 +158,34 @@ class ChannelPage extends React.Component<*, void> {
 }
 
 const mapStateToProps = (state, ownProps) => {
+  const { channels } = state
   const channelName = getChannelName(ownProps)
   const postsForChannel = state.postsForChannel.data.get(channelName) || {}
-  const channel = state.channels.data.get(channelName)
+  const channel = channels.data.get(channelName)
   const postIds = getPostIds(postsForChannel)
   const channelModerators = state.channelModerators.data.get(channelName) || []
+  // NOTE: postsForChannel.postIds cannot be `postIds` because that never evals to a Nil value
+  const loaded = channels.error
+    ? true
+    : R.none(R.isNil, [channel, postsForChannel.postIds])
+  const notFound = loaded
+    ? channels.error && channels.error.errorStatusCode === 404
+    : false
+
   return {
     channelName,
     channel,
+    loaded,
+    notFound,
     isModerator:        isModerator(channelModerators, SETTINGS.username),
     pagination:         postsForChannel.pagination,
     posts:              safeBulkGet(postIds, state.posts.data),
     subscribedChannels: getSubscribedChannels(state),
-    // NOTE: this cannot be `postIds` because that never evals to a Nil value
-    loaded:             R.none(R.isNil, [channel, postsForChannel.postIds]),
-    errored:            anyError([state.channels, state.posts, state.subscribedChannels])
+    errored:            anyErrorExcept404([
+      channels,
+      state.posts,
+      state.subscribedChannels
+    ])
   }
 }
 

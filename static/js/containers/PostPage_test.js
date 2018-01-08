@@ -211,6 +211,7 @@ describe("PostPage", function() {
         actions.channels.get.successType,
         actions.postsForChannel.get.requestType,
         actions.channelModerators.get.requestType,
+        actions.channelModerators.get.successType,
         SET_SNACKBAR_MESSAGE
       ],
       () => {

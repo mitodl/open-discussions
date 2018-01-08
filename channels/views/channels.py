@@ -5,6 +5,8 @@ from rest_framework.generics import (
     RetrieveUpdateAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
 from channels.api import Api
 from channels.serializers import ChannelSerializer
@@ -45,6 +47,10 @@ class ChannelDetailView(RetrieveUpdateAPIView):
         return api.get_channel(self.kwargs['channel_name'])
 
     def get(self, request, *args, **kwargs):
+        # we don't want to let this through to Reddit, because it blows up :/
+        if len(kwargs['channel_name']) == 1:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
         with translate_praw_exceptions():
             return super().get(request, *args, **kwargs)
 

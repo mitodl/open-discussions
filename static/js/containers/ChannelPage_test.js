@@ -7,6 +7,7 @@ import R from "ramda"
 import PostList from "../components/PostList"
 import SubscriptionsList from "../components/SubscriptionsList"
 import CompactPostDisplay from "../components/CompactPostDisplay"
+import NotFound from "../components/404"
 
 import {
   makeChannel,
@@ -15,7 +16,7 @@ import {
 } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import { actions } from "../actions"
-import { SET_POST_DATA } from "../actions/post"
+import { SET_POST_DATA, CLEAR_POST_ERROR } from "../actions/post"
 import { SET_CHANNEL_DATA, CLEAR_CHANNEL_ERROR } from "../actions/channel"
 import { EVICT_POSTS_FOR_CHANNEL } from "../actions/posts_for_channel"
 import IntegrationTestHelper from "../util/integration_test_helper"
@@ -159,8 +160,36 @@ describe("ChannelPage", () => {
       actions.channelModerators.get.successType,
       SET_POST_DATA,
       SET_CHANNEL_DATA,
-      CLEAR_CHANNEL_ERROR
+      CLEAR_CHANNEL_ERROR,
+      CLEAR_POST_ERROR
     ])
     assert.isUndefined(helper.store.getState().channels.error)
+  })
+
+  it("should show a 404 if the channel is not found", async () => {
+    helper.getChannelStub.returns(Promise.reject({ errorStatusCode: 404 }))
+
+    const [wrapper] = await renderComponent(channelURL(currentChannel.name), [
+      actions.channels.get.requestType,
+      actions.channels.get.failureType,
+      actions.subscribedChannels.get.requestType,
+      actions.subscribedChannels.get.successType,
+      SET_CHANNEL_DATA
+    ])
+    assert(wrapper.find(NotFound).exists())
+  })
+
+  it("should show a normal error for other error codes", async () => {
+    helper.getChannelStub.returns(Promise.reject({ errorStatusCode: 403 }))
+
+    const [wrapper] = await renderComponent(channelURL(currentChannel.name), [
+      actions.channels.get.requestType,
+      actions.channels.get.failureType,
+      actions.subscribedChannels.get.requestType,
+      actions.subscribedChannels.get.successType,
+      SET_CHANNEL_DATA
+    ])
+    assert.isFalse(wrapper.find(NotFound).exists())
+    assert.equal(wrapper.find(".main-content").text(), "Error loading page")
   })
 })
