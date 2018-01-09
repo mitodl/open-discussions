@@ -54,6 +54,11 @@ urlpatterns = [
         name='subscriber-detail',
     ),
     url(
+        r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/reports/$',
+        reports.ChannelReportListView.as_view(),
+        name='channel-reports',
+    ),
+    url(
         r'api/v0/posts/(?P<post_id>[A-Za-z0-9_]+)/$',
         posts.PostDetailView.as_view(),
         name='post-detail',

@@ -17,6 +17,7 @@ from channels.serializers import (
     ModeratorSerializer,
     PostSerializer,
     ReportSerializer,
+    ReportedContentSerializer,
     SubscriberSerializer,
 )
 from open_discussions.factories import UserFactory
@@ -388,3 +389,11 @@ def test_report_post_create():
             "view": Mock()
         }).create(payload) == payload
         api.return_value.report_post.assert_called_once_with('abc', 'reason')
+
+
+def test_reported_comment():
+    """Serialize of a reported content object"""
+    reported_content = Mock()
+    reported_content.user_reports = [['spam', 1]]
+    reported_content.mod_reports = [['spam', 'jane'], ['junk', 'jow']]
+    assert ReportedContentSerializer().get_reasons(reported_content) == sorted(['spam', 'junk'])

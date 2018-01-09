@@ -1,10 +1,13 @@
 """Custom permissions"""
 import jwt
-import prawcore
+from prawcore.exceptions import (
+    Forbidden as PrawForbidden,
+    Redirect as PrawRedirect,
+)
 from rest_framework import permissions
 from rest_framework_jwt.settings import api_settings
 
-from channels.api import Api
+from channels import api
 
 
 def _is_staff_jwt(request):
@@ -37,11 +40,14 @@ def _is_moderator(request, view):
     Returns:
         bool: True if user is moderator on the channel
     """
-    api = Api(request.user)
+    user_api = api.Api(request.user)
     channel_name = view.kwargs.get('channel_name', None)
     try:
-        return channel_name and api.is_moderator(channel_name, request.user.username)
-    except prawcore.exceptions.Redirect:
+        return channel_name and user_api.is_moderator(channel_name, request.user.username)
+    except PrawForbidden:
+        # User was forbidden to list moderators so they are most certainly not one
+        return False
+    except PrawRedirect:
         # if a redirect occurred, that means the user doesn't have any permissions
         # for the subreddit and most definitely is not a moderator
         return False
@@ -55,7 +61,7 @@ class JwtIsStaffPermission(permissions.BasePermission):
         return _is_staff_jwt(request)
 
 
-class JwtIsStaffOrReadonlyPermission(permissions.BasePermission):
+class JwtIsStaffOrReadonlyPermission(JwtIsStaffPermission):
     """Checks the JWT payload for the staff permission"""
 
     def has_permission(self, request, view):
@@ -63,10 +69,18 @@ class JwtIsStaffOrReadonlyPermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        return _is_staff_jwt(request)
+        return super().has_permission(request, view)
 
 
-class JwtIsStaffModeratorOrReadonlyPermission(permissions.BasePermission):
+class JwtIsStaffOrModeratorPermission(JwtIsStaffPermission):
+    """Checks that the user is either staff or a moderator"""
+
+    def has_permission(self, request, view):
+        """Returns True if the user has the staff role or is a moderator"""
+        return super().has_permission(request, view) or _is_moderator(request, view)
+
+
+class JwtIsStaffModeratorOrReadonlyPermission(JwtIsStaffOrModeratorPermission):
     """Checks that the user is either staff, a moderator, or performing a readonly operation"""
 
     def has_permission(self, request, view):
@@ -74,4 +88,4 @@ class JwtIsStaffModeratorOrReadonlyPermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        return _is_staff_jwt(request) or _is_moderator(request, view)
+        return super().has_permission(request, view)

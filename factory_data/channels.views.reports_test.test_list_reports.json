@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Vero culpa maiores magnam libero. Pariatur tempora nostrum ducimus aut veritatis distinctio ab. Tempore esse atque nam at sed. Maiores dolor aspernatur minima.\nLaborum sapiente modi voluptas saepe nesciunt aut. Aspernatur saepe nesciunt recusandae alias. Consequuntur aut quis quis quae quia ratione.",
+      "name": "1515685578_fugit",
+      "public_description": "Consectetur vitae facilis asperiores hic sit. Vel minus perspiciatis maiores officia cupiditate.",
+      "title": "Id sed voluptatem vero incidunt."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "4e",
+      "post_id": "hr",
+      "text": "Consequatur possimus dolorem quos porro. Quisquam facilis dolorum rerum natus culpa inventore."
+    }
+  },
+  "posts": {
+    "post": {
+      "id": "hr",
+      "text": "Sit ipsa soluta atque ipsam. Natus nam rerum nam. Omnis odio delectus fugit ipsam similique.",
+      "title": "Eos inventore accusantium hic."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C3JYD4WWEX8AJS8STZ3N4SW5"
+    },
+    "staff_user": {
+      "username": "01C3JYCYG7N4GTJ7PSNXF639Y5"
+    }
+  }
+}

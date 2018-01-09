@@ -5,7 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from channels.serializers import ReportSerializer
+from open_discussions.permissions import JwtIsStaffOrModeratorPermission
+from channels.api import Api
+from channels.serializers import ReportSerializer, ReportedContentSerializer
 from channels.utils import translate_praw_exceptions
 
 
@@ -34,3 +36,20 @@ class ReportContentView(APIView):
                 serializer.data,
                 status=status.HTTP_201_CREATED,
             )
+
+
+class ChannelReportListView(APIView):
+    """
+    Moderator view for reported comments and posts in a channels
+    """
+
+    permission_classes = (IsAuthenticated, JwtIsStaffOrModeratorPermission)
+
+    def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        """List of reports"""
+        with translate_praw_exceptions():
+            api = Api(user=request.user)
+            reports = api.list_reports(self.kwargs['channel_name'])
+            serializer = ReportedContentSerializer(reports, many=True)
+
+            return Response(serializer.data)

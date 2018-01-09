@@ -613,3 +613,11 @@ def test_report_post(mock_client):
     client.report_post('id', 'reason')
     mock_client.submission.assert_called_once_with(id='id')
     mock_client.submission.return_value.report.assert_called_once_with('reason')
+
+
+def test_list_reports(mock_client):
+    """Test list_reports"""
+    client = api.Api(UserFactory.create())
+    assert client.list_reports('channel') == mock_client.subreddit.return_value.mod.reports.return_value
+    mock_client.subreddit.assert_called_once_with('channel')
+    mock_client.subreddit.return_value.mod.reports.assert_called_once_with()

@@ -567,3 +567,35 @@ class ReportSerializer(serializers.Serializer):
             api.report_comment(comment_id, reason)
             result['comment_id'] = comment_id
         return result
+
+
+class ReportedContentSerializer(serializers.Serializer):
+    """
+    Serializer for reported content
+    """
+    comment = serializers.SerializerMethodField()
+    post = serializers.SerializerMethodField()
+    reasons = serializers.SerializerMethodField()
+
+    def get_comment(self, instance):
+        """Returns the comment if this report was for one"""
+        if isinstance(instance, Comment):
+            return CommentSerializer(instance, context=self.context).data
+
+        return None
+
+    def get_post(self, instance):
+        """Returns the post if this report was for one"""
+        if isinstance(instance, Submission):
+            return PostSerializer(instance, context=self.context).data
+
+        return None
+
+    def get_reasons(self, instance):
+        """
+        Returns the reasons that have been reported so far
+
+        Returns:
+            list of str: list of reasons a post/comment has been reported for
+        """
+        return sorted(list(set([report[0] for report in instance.user_reports + instance.mod_reports])))

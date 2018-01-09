@@ -851,3 +851,15 @@ class Api:
             reason(str): the reason why the comment is being reported
         """
         self.get_comment(comment_id).report(reason)
+
+    def list_reports(self, channel_name):
+        """
+        Lists reported content in a channel
+
+        Args:
+            channel_name(str): the channel name identifier
+
+        Returns:
+            praw.models.listing.generator.ListingGenerator: a generator representing the reports in the channel
+        """
+        return self.get_channel(channel_name).mod.reports()

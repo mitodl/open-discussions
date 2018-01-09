@@ -1,0 +1,344 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2018-01-11T15:54:13",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01C3JYVE0BPG7N1MKBT6PE8ZAP"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSULIwsdANzrGs9AmoqCyNSHH3d89NTqtMLy+zTHPyLwxV0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLY5lgUmh3u4hSUFBpd5ZFc55ZfnF1UlZ2Qkp3mC9KSklmUmp8ZnpoAMhnCUagEAO1N9uAAAAA==",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 11 Jan 2018 15:54:13 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=dks0qTQ4yohiVvtqU2; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 11-Jan-2020 15:54:13 GMT",
+            "loidcreated=2018-01-11T15%3A54%3A12.937Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 11-Jan-2020 15:54:13 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01C3JYVE0BPG7N1MKBT6PE8ZAP"
+      }
+    },
+    {
+      "recorded_at": "2018-01-11T15:54:13",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&description=Quis+cupiditate+dolorum+neque.+Blanditiis+quas+pariatur+eligendi+cumque+blanditiis+nemo+facilis.+Illo+ratione+labore+similique+quaerat.%0ADolores+nihil+nesciunt+ipsam+architecto+minima.+Illo+quod+qui+non+dignissimos.+Repellendus+velit+officiis+deserunt+cum+eos+perspiciatis.&link_type=any&name=1515686053_cupiditate&public_description=Porro+error+nisi+fuga+incidunt+incidunt+sed.+Quas+aliquam+perferendis+quibusdam+omnis.&title=Dolore+porro+perferendis+excepturi+nisi.&type=private&wikimode=disabled"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 848-Sl9yLPxyuXdGOGmcfygwv9fBOqU"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "525"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=dks0qTQ4yohiVvtqU2; loidcreated=2018-01-11T15%3A54%3A12.937Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.8.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 11 Jan 2018 15:54:13 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "347"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-01-11T15:54:16",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 848-Sl9yLPxyuXdGOGmcfygwv9fBOqU"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=dks0qTQ4yohiVvtqU2; loidcreated=2018-01-11T15%3A54%3A12.937Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.8.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1515686053_cupiditate/about/moderators/?user=01C3JYVE0BPG7N1MKBT6PE8ZAP&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"UserList\", \"data\": {\"children\": [{\"date\": 1515686053.0, \"mod_permissions\": [\"all\"], \"name\": \"01C3JYVE0BPG7N1MKBT6PE8ZAP\", \"id\": \"t2_nk\"}]}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "149"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 11 Jan 2018 15:54:16 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "344"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=9KguhF57Ch0DU6fKuhq2s2PLnOhPp3LIfrfubhmQV2zs0oBjfzRpVlSjrenQC8zdv5xx5G0kfp8c9bW24mLnOMFGtiEcJs94"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1515686053_cupiditate/about/moderators/?user=01C3JYVE0BPG7N1MKBT6PE8ZAP&raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-01-11T15:54:16",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 848-Sl9yLPxyuXdGOGmcfygwv9fBOqU"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=dks0qTQ4yohiVvtqU2; loidcreated=2018-01-11T15%3A54%3A12.937Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.8.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1515686053_cupiditate/about/reports/?limit=100&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "93"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 11 Jan 2018 15:54:16 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "297.0"
+          ],
+          "x-ratelimit-reset": [
+            "344"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=dqQCEwr1DUBF6ISpKgzyKLW6Hbm1GFNbwRaqK9LUzSO7foMwRfcqtISYKmV3hnLt3YbT5O87JmoDpilzj87qqjVzHQzg6hQ%2FuZg5pJn6EaES1G%2BOp%2BBM%2Bw%3D%3D"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1515686053_cupiditate/about/reports/?limit=100&raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
