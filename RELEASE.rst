@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.9.0
+-------------
+
+- Add check_pip.sh (#419)
+- Add a 404 page for Posts
+- Added api to report posts and comments (#197)
+- Have update-docker-hub update local dockerfiles (#418)
+
 Version 0.8.2
 -------------
 
