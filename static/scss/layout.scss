@@ -26,6 +26,7 @@
 @import "content-policy";
 @import "admin";
 @import "not-found";
+@import "footer";
 
 body {
   font-family: 'Roboto', helvetica, arial, sans-serif !important;
@@ -37,6 +38,7 @@ body {
 
 .app {
   width: 100%;
+  min-height: 100vh;
 
   .content {
     @include breakpoint(desktop) {

@@ -1,0 +1,51 @@
+.footer {
+  background-color: black;
+  font-size: 13px;
+
+  .give-link {
+    background-color: $footer-button-blue;
+    color: white;
+    padding: 9px 70px 0 70px;
+    margin-left: 50px;
+    border-radius: 1px;
+
+    @include breakpoint(phone) {
+      margin-left: 0;
+      padding: 9px 70px 9px 70px;
+      margin-top: 25px;
+    }
+  }
+
+  .row {
+    margin: 35px 70px;
+    display: flex;
+
+    @include breakpoint(phone) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+
+    &:first-child {
+      padding-top: 50px;
+      margin-top: 0;
+    }
+
+    &:last-child {
+      padding-bottom: 50px;
+      margin-bottom: 0;
+    }
+
+    &.links {
+      a {
+        padding-right: 25px;
+        color: $footer-link-color;
+      }
+    }
+
+    &.legal {
+      color: $font-grey;
+      justify-content: space-between;
+    }
+  }
+}

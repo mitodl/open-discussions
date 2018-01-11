@@ -15,6 +15,7 @@ import CreatePostPage from "./CreatePostPage"
 import Toolbar from "../components/Toolbar"
 import Snackbar from "../components/material/Snackbar"
 import Drawer from "../containers/Drawer"
+import Footer from "../components/Footer"
 
 import { actions } from "../actions"
 import { setShowDrawer } from "../actions/ui"
@@ -66,34 +67,37 @@ class App extends React.Component<*, void> {
     }
 
     return (
-      <div className="app">
-        <DocumentTitle title="MIT Open Discussions" />
-        <Snackbar snackbar={snackbar} />
-        <Toolbar toggleShowSidebar={this.toggleShowSidebar} />
-        <Drawer />
-        <Route exact path={match.url} component={HomePage} />
-        <Route
-          exact
-          path={`${match.url}channel/:channelName`}
-          component={ChannelPage}
-        />
-        <Route
-          path={`${match.url}channel/:channelName/:postID`}
-          component={PostPage}
-        />
-        <Route path={`${match.url}manage/`} component={AdminPage} />
-        <Route
-          path={`${match.url}create_post/:channelName?`}
-          component={CreatePostPage}
-        />
-        <Route
-          path={`${match.url}auth_required/`}
-          component={AuthRequiredPage}
-        />
-        <Route
-          path={`${match.url}content_policy/`}
-          component={ContentPolicyPage}
-        />
+      <div>
+        <div className="app">
+          <DocumentTitle title="MIT Open Discussions" />
+          <Snackbar snackbar={snackbar} />
+          <Toolbar toggleShowSidebar={this.toggleShowSidebar} />
+          <Drawer />
+          <Route exact path={match.url} component={HomePage} />
+          <Route
+            exact
+            path={`${match.url}channel/:channelName`}
+            component={ChannelPage}
+          />
+          <Route
+            path={`${match.url}channel/:channelName/:postID`}
+            component={PostPage}
+          />
+          <Route path={`${match.url}manage/`} component={AdminPage} />
+          <Route
+            path={`${match.url}create_post/:channelName?`}
+            component={CreatePostPage}
+          />
+          <Route
+            path={`${match.url}auth_required/`}
+            component={AuthRequiredPage}
+          />
+          <Route
+            path={`${match.url}content_policy/`}
+            component={ContentPolicyPage}
+          />
+        </div>
+        <Footer />
       </div>
     )
   }
