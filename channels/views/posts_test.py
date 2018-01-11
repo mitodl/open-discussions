@@ -5,6 +5,10 @@ from django.core.urlresolvers import reverse
 from rest_framework import status
 
 from channels.serializers import default_profile_image
+from channels.constants import (
+    VALID_POST_SORT_TYPES,
+    POSTS_SORT_HOT,
+)
 
 pytestmark = [
     pytest.mark.django_db,
@@ -226,7 +230,9 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
         # all posts should be filtered out
         assert resp.json() == {
             'posts': [],
-            'pagination': {}
+            'pagination': {
+                'sort': POSTS_SORT_HOT,
+            }
         }
     else:
         assert resp.json() == {
@@ -250,8 +256,51 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
                     "stickied": False,
                 } for post in posts
             ],
-            'pagination': {}
+            'pagination': {
+                'sort': POSTS_SORT_HOT,
+            }
         }
+
+
+@pytest.mark.parametrize("sort", VALID_POST_SORT_TYPES)
+def test_list_posts_sorted(client, private_channel_and_contributor, reddit_factories, sort):
+    """View the channel listing with sorted options"""
+    # note: these sort types are difficult to reproduce unique sort orders in the span of a test,
+    #       so we're just checking that the APIs don't error
+    channel, user = private_channel_and_contributor
+    first_post = reddit_factories.text_post('my post', user, channel=channel)
+    second_post = reddit_factories.text_post('my 2nd post', user, channel=channel)
+    third_post = reddit_factories.text_post('my 3rd post', user, channel=channel)
+    fourth_post = reddit_factories.text_post('my 4th post', user, channel=channel)
+
+    client.force_login(user)
+
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, {'sort': sort})
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'posts': [{
+            "url": None,
+            "text": post.text,
+            "title": post.title,
+            "upvoted": True,
+            "removed": False,
+            "score": 1,
+            "author_id": user.username,
+            "id": post.id,
+            "created": post.created,
+            "num_comments": 0,
+            "channel_name": channel.name,
+            "channel_title": channel.title,
+            'author_name': user.profile.name,
+            "profile_image": user.profile.image_small,
+            "edited": False,
+            "stickied": False,
+        } for post in [fourth_post, third_post, second_post, first_post]],
+        'pagination': {
+            'sort': sort,
+        },
+    }
 
 
 def test_list_posts_stickied(client, private_channel_and_contributor, reddit_factories, staff_api):
@@ -308,7 +357,11 @@ def test_list_posts_pagination_first_page_no_params(
     channel, user = private_channel_and_contributor
     posts = list(reversed([reddit_factories.text_post(idx, user=user, channel=channel) for idx in range(15)]))
     params = {}
-    expected = {'after': 't3_{}'.format(posts[4].id), 'after_count': 5}
+    expected = {
+        'after': 't3_{}'.format(posts[4].id),
+        'after_count': 5,
+        'sort': POSTS_SORT_HOT,
+    }
     url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.get(url, params, **jwt_header)
     assert resp.status_code == status.HTTP_200_OK
@@ -323,7 +376,11 @@ def test_list_posts_pagination_first_page_with_params(
     channel, user = private_channel_and_contributor
     posts = list(reversed([reddit_factories.text_post(idx, user=user, channel=channel) for idx in range(15)]))
     params = {'before': 't3_{}'.format(posts[5].id), 'count': 6}
-    expected = {'after': 't3_{}'.format(posts[4].id), 'after_count': 5}
+    expected = {
+        'after': 't3_{}'.format(posts[4].id),
+        'after_count': 5,
+        'sort': POSTS_SORT_HOT,
+    }
     url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.get(url, params, **jwt_header)
     assert resp.status_code == status.HTTP_200_OK
@@ -342,7 +399,8 @@ def test_list_posts_pagination_non_first_page(
         'before': 't3_{}'.format(posts[5].id),
         'before_count': 6,
         'after': 't3_{}'.format(posts[9].id),
-        'after_count': 10
+        'after_count': 10,
+        'sort': POSTS_SORT_HOT,
     }
     url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.get(url, params, **jwt_header)
@@ -362,7 +420,8 @@ def test_list_posts_pagination_non_offset_page(
         'before': 't3_{}'.format(posts[6].id),
         'before_count': 6,
         'after': 't3_{}'.format(posts[10].id),
-        'after_count': 10
+        'after_count': 10,
+        'sort': POSTS_SORT_HOT,
     }
     url = reverse('post-list', kwargs={'channel_name': channel.name})
     resp = client.get(url, params, **jwt_header)

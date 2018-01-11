@@ -11,9 +11,14 @@ from rest_framework.exceptions import NotFound
 
 from open_discussions.factories import UserFactory
 from channels import api
+from channels.constants import VALID_CHANNEL_TYPES
 from channels.models import (
     RedditAccessToken,
     RedditRefreshToken,
+)
+from channels.utils import (
+    DEFAULT_LISTING_PARAMS,
+    ListingParams,
 )
 
 pytestmark = pytest.mark.django_db
@@ -56,7 +61,7 @@ def test_list_channels_user(mock_get_client):
     mock_get_client.return_value.user.subreddits.assert_called_once_with()
 
 
-@pytest.mark.parametrize('channel_type', api.VALID_CHANNEL_TYPES)
+@pytest.mark.parametrize('channel_type', VALID_CHANNEL_TYPES)
 def test_create_channel_user(mock_get_client, channel_type):
     """Test create_channel for logged-in user"""
     user = UserFactory.create()
@@ -98,7 +103,7 @@ def test_create_channel_user_invalid_type(mock_client):
     assert mock_client.subreddit.create.call_count == 0
 
 
-@pytest.mark.parametrize('channel_type', api.VALID_CHANNEL_TYPES)
+@pytest.mark.parametrize('channel_type', VALID_CHANNEL_TYPES)
 def test_update_channel_type(mock_client, channel_type):
     """Test create_channel for channel_type"""
     user = UserFactory.create()
@@ -154,10 +159,18 @@ def test_create_post_url_and_text(mock_client):
 def test_list_posts(mock_client):
     """list_posts should return a generator of posts"""
     client = api.Api(UserFactory.create())
-    posts = client.list_posts('channel')
+    posts = client.list_posts('channel', DEFAULT_LISTING_PARAMS)
     assert posts == mock_client.subreddit.return_value.hot.return_value
-    mock_client.subreddit.return_value.hot.assert_called_once_with(limit=25, params={})
+    mock_client.subreddit.return_value.hot.assert_called_once_with(limit=25, params={'count': 0})
     mock_client.subreddit.assert_called_once_with('channel')
+
+
+def test_list_posts_invalid_sort(mock_client):
+    """list_posts should raise an error is sort is invalid"""
+    client = api.Api(UserFactory.create())
+    with pytest.raises(ValueError):
+        client.list_posts('channel', ListingParams(None, None, 0, 'bad'))
+        mock_client.subreddit.assert_called_once_with('channel')
 
 
 def test_get_post(mock_client):
@@ -399,9 +412,9 @@ def test_more_comments_with_more_comments(mock_client, mocker):  # pylint: disab
 def test_frontpage(mock_client):
     """Test front page"""
     client = api.Api(UserFactory.create())
-    posts = client.front_page()
+    posts = client.front_page(DEFAULT_LISTING_PARAMS)
     assert posts == mock_client.front.hot.return_value
-    mock_client.front.hot.assert_called_once_with(limit=25, params={})
+    mock_client.front.hot.assert_called_once_with(limit=25, params={'count': 0})
 
 
 def test_add_contributor(mock_client):

@@ -4,6 +4,11 @@ import pytest
 from django.core.urlresolvers import reverse
 from rest_framework import status
 
+from channels.constants import (
+    POSTS_SORT_HOT,
+    VALID_POST_SORT_TYPES,
+)
+
 pytestmark = [
     pytest.mark.django_db,
     pytest.mark.usefixtures("use_betamax", "praw_settings"),
@@ -36,81 +41,68 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
     resp = client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
-        'posts': [
-            {
-                "url": None,
-                "text": fourth_post.text,
-                "title": fourth_post.title,
-                "upvoted": True,
-                "removed": False,
-                "score": 1,
-                "author_id": user.username,
-                "id": fourth_post.id,
-                "created": fourth_post.created,
-                "num_comments": 0,
-                "channel_name": channel.name,
-                "channel_title": channel.title,
-                'author_name': user.profile.name,
-                "profile_image": user.profile.image_small,
-                "edited": False,
-                "stickied": False,
-            },
-            {
-                "url": None,
-                "text": third_post.text,
-                "title": third_post.title,
-                "upvoted": True,
-                "removed": False,
-                "score": 1,
-                "author_id": user.username,
-                "id": third_post.id,
-                "created": third_post.created,
-                "num_comments": 0,
-                "channel_name": channel.name,
-                "channel_title": channel.title,
-                'author_name': user.profile.name,
-                "profile_image": user.profile.image_small,
-                "edited": False,
-                "stickied": False,
-            },
-            {
-                "url": None,
-                "text": second_post.text,
-                "title": second_post.title,
-                "upvoted": True,
-                "removed": False,
-                "score": 1,
-                "author_id": user.username,
-                "id": second_post.id,
-                "created": second_post.created,
-                "num_comments": 0,
-                "channel_name": channel.name,
-                "channel_title": channel.title,
-                'author_name': user.profile.name,
-                "profile_image": user.profile.image_small,
-                "edited": False,
-                "stickied": False,
-            },
-            {
-                "url": None,
-                "text": first_post.text,
-                "title": first_post.title,
-                "upvoted": True,
-                "removed": False,
-                "score": 1,
-                "author_id": user.username,
-                "id": first_post.id,
-                "created": first_post.created,
-                "num_comments": 0,
-                "channel_name": channel.name,
-                "channel_title": channel.title,
-                'author_name': user.profile.name,
-                "profile_image": user.profile.image_small,
-                "edited": False,
-                "stickied": False,
-            },
-        ],
-        'pagination': {},
+        'posts': [{
+            "url": None,
+            "text": post.text,
+            "title": post.title,
+            "upvoted": True,
+            "removed": False,
+            "score": 1,
+            "author_id": user.username,
+            "id": post.id,
+            "created": post.created,
+            "num_comments": 0,
+            "channel_name": channel.name,
+            "channel_title": channel.title,
+            'author_name': user.profile.name,
+            "profile_image": user.profile.image_small,
+            "edited": False,
+            "stickied": False,
+        } for post in [fourth_post, third_post, second_post, first_post]],
+        'pagination': {
+            'sort': POSTS_SORT_HOT,
+        },
+    }
+
+
+@pytest.mark.parametrize("sort", VALID_POST_SORT_TYPES)
+def test_frontpage_sorted(client, private_channel_and_contributor, reddit_factories, sort):
+    """View the front page with sorted options"""
+    # note: these sort types are difficult to reproduce unique sort orders in the span of a test,
+    #       so we're just checking that the APIs don't error
+    channel, user = private_channel_and_contributor
+    first_post = reddit_factories.text_post('my post', user, channel=channel)
+    second_post = reddit_factories.text_post('my 2nd post', user, channel=channel)
+    third_post = reddit_factories.text_post('my 3rd post', user, channel=channel)
+    fourth_post = reddit_factories.text_post('my 4th post', user, channel=channel)
+
+    client.force_login(user)
+
+    url = reverse('frontpage')
+    resp = client.get(url, {'sort': sort})
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'posts': [{
+            "url": None,
+            "text": post.text,
+            "title": post.title,
+            "upvoted": True,
+            "removed": False,
+            "score": 1,
+            "author_id": user.username,
+            "id": post.id,
+            "created": post.created,
+            "num_comments": 0,
+            "channel_name": channel.name,
+            "channel_title": channel.title,
+            'author_name': user.profile.name,
+            "profile_image": user.profile.image_small,
+            "edited": False,
+            "stickied": False,
+        } for post in [fourth_post, third_post, second_post, first_post]],
+        'pagination': {
+            'sort': sort,
+        },
     }
 
 
@@ -125,5 +117,6 @@ def test_frontpage_pagination(client, logged_in_profile, settings, params, expec
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
     url = reverse('frontpage')
     resp = client.get(url, params)
+    expected['sort'] = POSTS_SORT_HOT
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected

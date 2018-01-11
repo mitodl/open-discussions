@@ -1,0 +1,41 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Ipsum aspernatur iste necessitatibus. Molestiae repudiandae maiores maiores. Quod natus debitis suscipit pariatur similique.\nRerum corporis ipsam numquam saepe illo inventore. Reprehenderit repellendus nisi sunt cum deserunt inventore quia. Tenetur voluptatibus asperiores nulla sapiente commodi.\nAnimi ipsam fugiat odit voluptatibus autem. Provident perspiciatis provident est.",
+      "name": "1515706693_sed",
+      "public_description": "Quisquam unde optio sequi similique. Nostrum natus beatae quos voluptatum quasi itaque blanditiis.",
+      "title": "Quo maiores laborum veniam nihil."
+    }
+  },
+  "posts": {
+    "my 2nd post": {
+      "id": "i9",
+      "text": "Voluptate placeat nisi omnis aliquam maiores delectus. Beatae deserunt exercitationem incidunt.",
+      "title": "Incidunt corrupti aut similique."
+    },
+    "my 3rd post": {
+      "id": "ia",
+      "text": "Vel asperiores officiis nostrum dolor incidunt in. Quia nobis blanditiis autem omnis.",
+      "title": "Quos nesciunt temporibus ducimus odio vero."
+    },
+    "my 4th post": {
+      "id": "ib",
+      "text": "Sed quo tempore aperiam quam dolorem. Enim hic molestias quas perferendis.",
+      "title": "Velit quia excepturi sunt error impedit ea."
+    },
+    "my post": {
+      "id": "i8",
+      "text": "Rem est minima nesciunt recusandae ratione quae. Amet eos nemo molestias expedita.",
+      "title": "Omnis veniam laborum illo reiciendis eaque at."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C3KJHH0QQDCT0DQCF6504Y78"
+    },
+    "staff_user": {
+      "username": "01C3KJHAK3CR266FSRY9H41RZ5"
+    }
+  }
+}

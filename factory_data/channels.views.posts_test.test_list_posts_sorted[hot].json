@@ -1,0 +1,41 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Error natus dolores praesentium sunt inventore. Corporis et perspiciatis sint error quod. Labore possimus amet voluptatibus excepturi necessitatibus nulla similique deserunt.\nEt dolor eos quae earum excepturi. Soluta aut in sint aspernatur. Atque rem corporis maxime optio voluptates natus consequatur.\nDolor temporibus sunt quasi nihil totam. Ducimus nihil itaque et soluta. Optio libero quidem aspernatur adipisci reprehenderit. Earum sint modi maiores voluptatum aut quam.",
+      "name": "1515706670_sint",
+      "public_description": "Praesentium molestias culpa aut qui. Alias reiciendis dolor nihil fugit saepe.",
+      "title": "Ipsam assumenda ea dolore quaerat ipsam."
+    }
+  },
+  "posts": {
+    "my 2nd post": {
+      "id": "i5",
+      "text": "Ipsam eos consequuntur quibusdam necessitatibus. Itaque a corrupti odit at eligendi.",
+      "title": "Assumenda harum itaque modi non magni eaque."
+    },
+    "my 3rd post": {
+      "id": "i6",
+      "text": "Corrupti quas corrupti commodi. Iusto ipsum expedita ratione. Labore explicabo ullam nesciunt eos.",
+      "title": "Architecto iure iste impedit placeat totam velit."
+    },
+    "my 4th post": {
+      "id": "i7",
+      "text": "Sunt officiis repellat odio quia amet. Illo unde atque neque modi.",
+      "title": "Nihil minus nulla sequi repudiandae expedita."
+    },
+    "my post": {
+      "id": "i4",
+      "text": "Tempore veritatis porro alias perferendis aliquam esse animi. Est in occaecati nobis.",
+      "title": "Nobis exercitationem qui corporis."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C3KJGTKFKGB33R87PCMC5F3X"
+    },
+    "staff_user": {
+      "username": "01C3KJGM8BN3J404NN2NYNQKHS"
+    }
+  }
+}

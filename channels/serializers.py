@@ -14,10 +14,9 @@ from rest_framework.exceptions import ValidationError
 
 from channels.api import (
     Api,
-    VALID_CHANNEL_TYPES,
     get_kind_mapping,
 )
-
+from channels.constants import VALID_CHANNEL_TYPES
 
 default_profile_image = "/static/images/avatar_default.png"
 

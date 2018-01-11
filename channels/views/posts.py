@@ -9,7 +9,7 @@ from channels.api import Api
 from channels.serializers import PostSerializer
 from channels.utils import (
     get_pagination_and_posts,
-    get_pagination_params,
+    get_listing_params,
     lookup_users_for_posts,
     translate_praw_exceptions,
 )
@@ -30,10 +30,10 @@ class PostListView(APIView):
     def get(self, request, *args, **kwargs):
         """Get list for posts and attach User objects to them"""
         with translate_praw_exceptions():
-            before, after, count = get_pagination_params(self.request)
+            listing_params = get_listing_params(self.request)
             api = Api(user=request.user)
-            paginated_posts = api.list_posts(self.kwargs['channel_name'], before=before, after=after, count=count)
-            pagination, posts = get_pagination_and_posts(paginated_posts, before=before, count=count)
+            paginated_posts = api.list_posts(self.kwargs['channel_name'], listing_params)
+            pagination, posts = get_pagination_and_posts(paginated_posts, listing_params)
             users = lookup_users_for_posts(posts)
             posts = [post for post in posts if post.author and post.author.name in users]
 

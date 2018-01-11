@@ -3,7 +3,8 @@
 import pytest
 from betamax.fixtures.pytest import _casette_name
 
-from channels.api import Api, CHANNEL_TYPE_PRIVATE
+from channels.api import Api
+from channels.constants import CHANNEL_TYPE_PRIVATE
 from channels.factories import RedditFactories, FactoryStore
 
 

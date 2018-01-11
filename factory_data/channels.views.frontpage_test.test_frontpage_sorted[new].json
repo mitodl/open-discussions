@@ -1,0 +1,41 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Amet suscipit eveniet facere praesentium consectetur. Nostrum ad placeat explicabo eos. Incidunt quaerat quia esse.\nIpsam ab voluptatum velit vero nobis rem sed. Quaerat quo eaque deleniti commodi repellendus inventore perspiciatis. Maxime asperiores illum corporis explicabo at saepe.",
+      "name": "1515706400_aut",
+      "public_description": "Illo facere nihil non. Facilis molestias illo laboriosam voluptatem excepturi minus.",
+      "title": "Cum expedita ullam vel esse laudantium."
+    }
+  },
+  "posts": {
+    "my 2nd post": {
+      "id": "i1",
+      "text": "Minus repellendus sequi ipsa. Ad ex quisquam corrupti dignissimos repellendus ab a.",
+      "title": "Rem aliquid accusantium reiciendis."
+    },
+    "my 3rd post": {
+      "id": "i2",
+      "text": "Voluptas ratione eligendi officiis fuga cumque dolor sunt. Illo voluptatem ut reprehenderit quos.",
+      "title": "Doloribus aperiam in illo aliquam dolorum optio."
+    },
+    "my 4th post": {
+      "id": "i3",
+      "text": "Molestiae reprehenderit earum illo. At praesentium fuga maxime totam.",
+      "title": "Recusandae dicta quos iste."
+    },
+    "my post": {
+      "id": "i0",
+      "text": "Consequuntur cumque iusto accusamus esse. Saepe ea ducimus esse. Unde odio atque eum odio.",
+      "title": "Consectetur minus animi vel a itaque."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C3KJ8JQS5D3TNEQGN5DX6EWN"
+    },
+    "staff_user": {
+      "username": "01C3KJ8CDN4Y6EHJDY3SP1C4NW"
+    }
+  }
+}

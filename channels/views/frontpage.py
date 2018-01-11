@@ -6,7 +6,7 @@ from channels.api import Api
 from channels.serializers import PostSerializer
 from channels.utils import (
     get_pagination_and_posts,
-    get_pagination_params,
+    get_listing_params,
     lookup_users_for_posts,
 )
 
@@ -25,10 +25,10 @@ class FrontPageView(APIView):
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Get front page posts"""
-        before, after, count = get_pagination_params(self.request)
+        listing_params = get_listing_params(self.request)
         api = Api(user=self.request.user)
-        paginated_posts = api.front_page(before=before, after=after, count=count)
-        pagination, posts = get_pagination_and_posts(paginated_posts, before=before, count=count)
+        paginated_posts = api.front_page(listing_params)
+        pagination, posts = get_pagination_and_posts(paginated_posts, listing_params)
         users = lookup_users_for_posts(posts)
         posts = [post for post in posts if post.author and post.author.name in users]
 

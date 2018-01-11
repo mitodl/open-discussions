@@ -16,9 +16,11 @@ from open_discussions.factories import UserFactory
 from open_discussions.utils import now_in_utc
 from channels.api import (
     Api,
+    get_or_create_auth_tokens,
+)
+from channels.constants import (
     CHANNEL_TYPE_PUBLIC,
     CHANNEL_TYPE_PRIVATE,
-    get_or_create_auth_tokens,
 )
 from channels.models import RedditAccessToken, RedditRefreshToken
 

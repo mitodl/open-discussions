@@ -1,0 +1,41 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Id quia doloremque incidunt quod molestiae. Voluptatibus voluptatem labore distinctio ea molestias perferendis. Perferendis recusandae architecto pariatur dolor culpa dolores. Ipsa accusantium iste unde suscipit eveniet.\nConsequatur esse nesciunt rem nostrum. Necessitatibus aliquam quos iure suscipit consequatur esse nisi. Veritatis occaecati tempora molestias esse laudantium neque. Vitae sapiente eaque beatae laborum.",
+      "name": "1515706377_cumque",
+      "public_description": "Inventore tempora suscipit aperiam voluptate aliquid. Amet vitae voluptates nulla eveniet.",
+      "title": "Maxime quis ut quod voluptas sunt rerum."
+    }
+  },
+  "posts": {
+    "my 2nd post": {
+      "id": "hx",
+      "text": "Ratione ipsa libero optio atque aut rem quod. Consectetur placeat quae laborum quis illo.",
+      "title": "Excepturi assumenda commodi amet."
+    },
+    "my 3rd post": {
+      "id": "hy",
+      "text": "Animi magni maxime fugiat harum ex. Eaque voluptates consectetur molestiae odit alias sit vel.",
+      "title": "Quos rerum at repudiandae similique."
+    },
+    "my 4th post": {
+      "id": "hz",
+      "text": "Accusantium illum voluptatibus sint consequuntur modi sit. Sed ex hic natus dolorum.",
+      "title": "Eveniet provident dolor modi sit magni nihil."
+    },
+    "my post": {
+      "id": "hw",
+      "text": "Rerum similique ratione pariatur consequatur inventore. Fugit totam facilis aliquam consequuntur.",
+      "title": "Labore iste optio iste quasi officiis occaecati."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C3KJ7WFAARP30QECD92JBE30"
+    },
+    "staff_user": {
+      "username": "01C3KJ7P3ZNTRG97C8ZGGGPWCK"
+    }
+  }
+}

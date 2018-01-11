@@ -1,0 +1,19 @@
+"""Constants for channels"""
+
+CHANNEL_TYPE_PUBLIC = 'public'
+CHANNEL_TYPE_PRIVATE = 'private'
+
+VALID_CHANNEL_TYPES = (
+    CHANNEL_TYPE_PRIVATE,
+    CHANNEL_TYPE_PUBLIC,
+)
+
+POSTS_SORT_HOT = 'hot'
+POSTS_SORT_TOP = 'top'
+POSTS_SORT_NEW = 'new'
+
+VALID_POST_SORT_TYPES = (
+    POSTS_SORT_HOT,
+    POSTS_SORT_TOP,
+    POSTS_SORT_NEW,
+)

@@ -1,4 +1,5 @@
 """Utils for channels"""
+from collections import namedtuple
 from contextlib import contextmanager
 
 from django.conf import settings
@@ -11,40 +12,48 @@ from prawcore.exceptions import (
 )
 from rest_framework.exceptions import PermissionDenied, NotFound
 
+from channels.constants import POSTS_SORT_HOT
 from channels.exceptions import ConflictException
 
 User = get_user_model()
 
+ListingParams = namedtuple('ListingParams', ['before', 'after', 'count', 'sort'])
 
-def get_pagination_params(request):
+DEFAULT_LISTING_PARAMS = ListingParams(None, None, 0, POSTS_SORT_HOT)
+
+
+def get_listing_params(request):
     """
-    Extracts pagination params from a request
+    Extracts listing params from a request
 
     Args:
         request: API request object
 
     Returns:
-        (before, after, count): pagination params
+        (ListingParams): pagination params
     """
-    after = request.query_params.get('after', None)
     before = request.query_params.get('before', None)
+    after = request.query_params.get('after', None)
     count = int(request.query_params.get('count', 0))
-    return before, after, count
+    sort = request.query_params.get('sort', POSTS_SORT_HOT)
+    return ListingParams(before, after, count, sort)
 
 
-def get_pagination_and_posts(posts, before=None, count=None):
+def get_pagination_and_posts(posts, listing_params):
     """
     Creates pagination data
 
     Args:
         posts (praw.models.listing.generator.ListingGenerator): listing generator for posts
-        before (str): fullname of the first post on the next page
-        count (int): number of posts seen so far
+        listing_params (ListingParams): listing params for this page
 
     Returns:
         (dict, list of praw.models.Submission): pagination and post data
     """
-    pagination = {}
+    before, _, count, _ = listing_params
+    pagination = {
+        'sort': listing_params.sort,
+    }
 
     # call _next_batch() so it pulls data
     # pylint: disable=protected-access

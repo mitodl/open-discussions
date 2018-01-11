@@ -1,0 +1,41 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Repudiandae adipisci alias ullam. Quaerat soluta temporibus dolor explicabo in harum. Quae libero dignissimos nulla est quae sunt. Perferendis quasi praesentium reprehenderit minus neque tempora quibusdam.\nFugiat recusandae cupiditate cum dolore officia tempora. Ab tempora voluptatibus doloribus reprehenderit dolorem eius. Debitis non distinctio culpa provident dicta soluta. Repellendus est ad sint.",
+      "name": "1515706354_aspernatur",
+      "public_description": "Nihil et cumque ipsam recusandae aut praesentium cupiditate. Perferendis autem sit at accusamus.",
+      "title": "Unde tempora animi non alias officia corporis."
+    }
+  },
+  "posts": {
+    "my 2nd post": {
+      "id": "ht",
+      "text": "Ad sed soluta dicta dolor. Numquam nostrum eveniet doloremque autem. Doloribus iure placeat culpa.",
+      "title": "Officiis in necessitatibus veniam accusantium."
+    },
+    "my 3rd post": {
+      "id": "hu",
+      "text": "Rem quasi dignissimos reprehenderit sunt odit. Cupiditate corporis tempora dolores animi illum.",
+      "title": "Quidem corrupti rem ad perspiciatis enim."
+    },
+    "my 4th post": {
+      "id": "hv",
+      "text": "In unde quisquam tempore adipisci laborum nisi molestias. Animi beatae ipsam aspernatur.",
+      "title": "Fuga veritatis eligendi rerum eaque minus unde."
+    },
+    "my post": {
+      "id": "hs",
+      "text": "Recusandae quis modi rem autem earum. Ratione omnis quidem voluptatibus possimus eum dolorum totam.",
+      "title": "Non in veniam molestias molestias."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C3KJ7684TWQ4S32XS6P8GH2E"
+    },
+    "staff_user": {
+      "username": "01C3KJ6ZTVSR9FJJNCBYBM3BFK"
+    }
+  }
+}

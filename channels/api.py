@@ -25,20 +25,20 @@ from rest_framework.exceptions import (
     NotFound,
 )
 
+from channels.constants import (
+    CHANNEL_TYPE_PUBLIC,
+    POSTS_SORT_HOT,
+    POSTS_SORT_NEW,
+    POSTS_SORT_TOP,
+    VALID_CHANNEL_TYPES,
+    VALID_POST_SORT_TYPES,
+)
 from channels.models import (
     RedditAccessToken,
     RedditRefreshToken,
 )
 
 from open_discussions.utils import now_in_utc
-
-CHANNEL_TYPE_PUBLIC = 'public'
-CHANNEL_TYPE_PRIVATE = 'private'
-
-VALID_CHANNEL_TYPES = (
-    CHANNEL_TYPE_PRIVATE,
-    CHANNEL_TYPE_PUBLIC,
-)
 
 USER_AGENT = 'MIT-Open: {version}'
 ACCESS_TOKEN_HEADER_NAME = 'X-Access-Token'
@@ -364,43 +364,50 @@ class Api:
             raise ValueError('Exactly one of text and url must be provided')
         return self.get_channel(channel_name).submit(title, selftext=text, url=url)
 
-    def front_page(self, before=None, after=None, count=None):
+    def front_page(self, listing_params):
         """
-        List posts on front page using 'hot' algorithm
+        List posts on front page
 
         Args:
-            before (str): fullname of the first post on the next page
-            after (str): fullname of the last post on the previous page
-            count (int): number of posts seen so far
+            listing_params (channels.utils.ListingParams): the pagination/sorting params requested for the listing
 
         Returns:
             praw.models.listing.generator.ListingGenerator:
                 A generator of posts for a subreddit
         """
-        params = {}
-        if before is not None:
-            params['before'] = before
-        if after is not None:
-            params['after'] = after
-        if count is not None:
-            params['count'] = count
+        return self._get_listing(self.reddit.front, listing_params)
 
-        return self.reddit.front.hot(limit=settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT, params=params)
+    def list_posts(self, channel_name, listing_params):
+        """
+        List posts for a channel
 
-    def list_posts(self, channel_name, before=None, after=None, count=None):
+        Args:
+            channel_name(str): the channel name identifier
+            listing_params (channels.utils.ListingParams): the pagination/sorting params requested for the listing
+
+        Returns:
+            praw.models.listing.generator.ListingGenerator:
+                A generator of posts for a subreddit
+        """
+        channel = self.get_channel(channel_name)
+        return self._get_listing(channel, listing_params)
+
+    def _get_listing(self, listing, listing_params):
         """
         List posts using the 'hot' algorithm
 
         Args:
-            channel_name(str): the channel name identifier
-            before (str): fullname of the first post on the next page
-            after (str): fullname of the last post on the previous page
-            count (int): number of posts seen so far
+            listing(praw.models.listing.BaseListingMixin): the listing to returna  generator for
+            listing_params (channels.utils.ListingParams): the pagination/sorting params requested for the listing
 
         Returns:
             praw.models.listing.generator.ListingGenerator:
                 A generator of posts for a subreddit
         """
+        before, after, count, sort = listing_params
+        if sort not in VALID_POST_SORT_TYPES:
+            raise ValueError("Sort method '{}' is not supported".format(sort))
+
         params = {}
         if before is not None:
             params['before'] = before
@@ -408,7 +415,20 @@ class Api:
             params['after'] = after
         if count is not None:
             params['count'] = count
-        return self.get_channel(channel_name).hot(limit=settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT, params=params)
+
+        kwargs = {
+            'limit': settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT,
+            'params': params,
+        }
+
+        if sort == POSTS_SORT_HOT:
+            return listing.hot(**kwargs)
+        elif sort == POSTS_SORT_NEW:
+            return listing.new(**kwargs)
+        elif sort == POSTS_SORT_TOP:
+            return listing.top(**kwargs)
+        else:
+            raise Exception("Sort method '{}' is in VALID_POST_SORT_TYPES but not actually supported".format(sort))
 
     def get_post(self, post_id):
         """
