@@ -32,6 +32,7 @@ from channels.constants import (
     POSTS_SORT_TOP,
     VALID_CHANNEL_TYPES,
     VALID_POST_SORT_TYPES,
+    VALID_COMMENT_SORT_TYPES,
 )
 from channels.models import (
     RedditAccessToken,
@@ -570,21 +571,26 @@ class Api:
         """
         return self.reddit.comment(comment_id)
 
-    def list_comments(self, post_id):
+    def list_comments(self, post_id, sort):
         """
         Lists the comments of a post_id
 
         Args:
             post_id(str): the base36 id for the post
+            sort(str): the sort method for comments
 
         Returns:
             praw.models.CommentForest: the base of the comment tree
         """
+        if sort not in VALID_COMMENT_SORT_TYPES:
+            raise ValueError("Sort method '{}' is not supported for comments".format(sort))
+
         post = self.get_post(post_id)
+        post.comment_sort = sort
         post.comment_limit = settings.OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT
         return post.comments
 
-    def more_comments(self, parent_id, post_id, children):
+    def more_comments(self, parent_id, post_id, children, sort):
         """
         Fetches data for a comment and its children and returns a list of comments
         (which might include another MoreComment)
@@ -594,6 +600,7 @@ class Api:
             post_id (str): the id of the post
             children (list(str)):
                 a list of comment ids
+            sort(str): the sort method for comments
 
         Returns:
             list: A list of comments, might include a MoreComment at the end if more fetching required
@@ -602,6 +609,7 @@ class Api:
             parent_id=parent_id,
             post_id=post_id,
             children=children,
+            sort=sort,
         )
 
         # more_comments.comments() can return either a list of comments or a CommentForest object
@@ -619,11 +627,12 @@ class Api:
                 parent_id=parent_id,
                 post_id=post_id,
                 children=children[len(comments):],
+                sort=sort
             )
             comments.append(remaining_morecomments)
         return comments
 
-    def init_more_comments(self, parent_id, post_id, children):
+    def init_more_comments(self, parent_id, post_id, children, sort):
         """
         Initializes a MoreComments instance from the passed data and fetches channel
 
@@ -632,6 +641,7 @@ class Api:
             post_id (str): the id of the post
             children(list(str)):
                 a list of comment ids
+            sort(str): the sort method for comments
 
         Returns:
             praw.models.MoreComments: the set of more comments
@@ -647,6 +657,9 @@ class Api:
                 parent_id=post_id,
             )
 
+        if sort not in VALID_COMMENT_SORT_TYPES:
+            raise ValueError("Sort method '{}' is not supported for comments".format(sort))
+
         more_comments = more.MoreComments(self.reddit, {
             'children': children,
             'count': len(children),
@@ -654,6 +667,7 @@ class Api:
         })
         more_comments.submission = self.reddit.submission(post_id)
         more_comments.submission.comment_limit = settings.OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT
+        more_comments.submission.comment_sort = sort
 
         more_comments._load_comment = replace_load_comment(  # pylint: disable=protected-access
             more_comments._load_comment  # pylint: disable=protected-access

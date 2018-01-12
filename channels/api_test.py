@@ -11,7 +11,10 @@ from rest_framework.exceptions import NotFound
 
 from open_discussions.factories import UserFactory
 from channels import api
-from channels.constants import VALID_CHANNEL_TYPES
+from channels.constants import (
+    COMMENTS_SORT_BEST,
+    VALID_CHANNEL_TYPES,
+)
 from channels.models import (
     RedditAccessToken,
     RedditRefreshToken,
@@ -253,9 +256,18 @@ def test_create_comment_args_error(mock_client):
 def test_list_comments(mock_client):
     """Test list_comments"""
     client = api.Api(UserFactory.create())
-    result = client.list_comments('id')
+    result = client.list_comments('id', COMMENTS_SORT_BEST)
     mock_client.submission.assert_called_once_with(id='id')
+    assert mock_client.submission.return_value.comment_sort == COMMENTS_SORT_BEST
     assert result == mock_client.submission.return_value.comments
+
+
+def test_list_comments_invalid_sort(mock_client):
+    """Test list_comments with invalid sort raises error"""
+    client = api.Api(UserFactory.create())
+    with pytest.raises(ValueError):
+        client.list_comments('id', 'invalid')
+    assert mock_client.submission.call_count == 0
 
 
 def test_get_comment(mock_client):
@@ -307,7 +319,7 @@ def test_init_more_comments(mock_client, mocker):
     children = ['t1_itmt', 't1_it56t']
 
     more_patch = mocker.patch('praw.models.reddit.more.MoreComments')
-    result = client.init_more_comments('parent_3i', 'post_i2', children)
+    result = client.init_more_comments('parent_3i', 'post_i2', children, COMMENTS_SORT_BEST)
 
     more_patch.assert_called_once_with(client.reddit, {
         'parent_id': 't1_parent_3i',
@@ -317,6 +329,7 @@ def test_init_more_comments(mock_client, mocker):
     assert result == more_patch.return_value
     mock_client.submission.assert_called_once_with('post_i2')
     assert result.submission == mock_client.submission.return_value
+    assert result.submission.comment_sort == COMMENTS_SORT_BEST
     result.comments.assert_called_once_with()
 
 
@@ -326,7 +339,7 @@ def test_init_more_comments_no_parents(mock_client, mocker):
     children = ['t1_itmt', 't1_it56t']
 
     more_patch = mocker.patch('praw.models.reddit.more.MoreComments')
-    result = client.init_more_comments(None, 'post_i2', children)
+    result = client.init_more_comments(None, 'post_i2', children, COMMENTS_SORT_BEST)
 
     more_patch.assert_called_once_with(client.reddit, {
         'parent_id': 't3_post_i2',
@@ -337,6 +350,18 @@ def test_init_more_comments_no_parents(mock_client, mocker):
     mock_client.submission.assert_called_once_with('post_i2')
     assert result.submission == mock_client.submission.return_value
     result.comments.assert_called_once_with()
+
+
+def test_init_more_comments_invalid_sort(mock_client, mocker):  # pylint: disable=unused-argument
+    """If no parent id is present the post id should be used"""
+    client = api.Api(UserFactory.create())
+    children = ['t1_itmt', 't1_it56t']
+
+    more_patch = mocker.patch('praw.models.reddit.more.MoreComments')
+    with pytest.raises(ValueError):
+        client.init_more_comments(None, 'post_i2', children, 'invalid_sort')
+
+    assert more_patch.call_count == 0
 
 
 def test_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
@@ -356,11 +381,12 @@ def test_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
     comments = [_make_comment(child) for child in children]
     init_more_mock.return_value.comments.return_value = CommentForest(post_id, comments=comments)
 
-    result = client.more_comments('parent_3i', post_id, children)
+    result = client.more_comments('parent_3i', post_id, children, COMMENTS_SORT_BEST)
     init_more_mock.assert_called_once_with(
         parent_id='parent_3i',
         post_id='post_i2',
         children=children,
+        sort=COMMENTS_SORT_BEST,
     )
     assert result == comments
 
@@ -391,17 +417,19 @@ def test_more_comments_with_more_comments(mock_client, mocker):  # pylint: disab
     ]
     init_more_mock.side_effect = side_effects
 
-    result = client.more_comments('parent_3i', post_id, children + extra_children)
+    result = client.more_comments('parent_3i', post_id, children + extra_children, COMMENTS_SORT_BEST)
     assert init_more_mock.call_count == 2
     init_more_mock.assert_any_call(
         parent_id='parent_3i',
         post_id='post_i2',
         children=children + extra_children,
+        sort=COMMENTS_SORT_BEST,
     )
     init_more_mock.assert_any_call(
         parent_id='parent_3i',
         post_id='post_i2',
         children=extra_children,
+        sort=COMMENTS_SORT_BEST,
     )
 
     assert result[:-1] == first_comments

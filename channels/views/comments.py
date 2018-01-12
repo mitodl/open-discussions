@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from channels.api import Api
+from channels.constants import COMMENTS_SORT_BEST
 from channels.serializers import (
     CommentSerializer,
     GenericCommentSerializer,
@@ -69,7 +70,8 @@ class CommentListView(APIView):
         """Get list for comments and attach User objects to them"""
         with translate_praw_exceptions():
             api = Api(user=self.request.user)
-            comments = api.list_comments(self.kwargs['post_id']).list()
+            sort = request.query_params.get('sort', COMMENTS_SORT_BEST)
+            comments = api.list_comments(self.kwargs['post_id'], sort).list()
             users = _lookup_users_for_comments(comments)
 
             serialized_comments_list = GenericCommentSerializer(
@@ -114,6 +116,7 @@ class MoreCommentsView(APIView):
         """Get list for comments and attach User objects to them"""
         with translate_praw_exceptions():
             children = request.query_params.getlist('children')
+            sort = request.query_params.get('sort', COMMENTS_SORT_BEST)
 
             # validate the request parameters: each are required
             try:
@@ -124,11 +127,7 @@ class MoreCommentsView(APIView):
             parent_id = request.query_params.get('parent_id')
 
             api = Api(user=self.request.user)
-            comments = api.more_comments(
-                parent_id=parent_id,
-                post_id=post_id,
-                children=children,
-            )
+            comments = api.more_comments(parent_id, post_id, children, sort)
 
             users = _lookup_users_for_comments(comments)
 
