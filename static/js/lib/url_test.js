@@ -8,6 +8,7 @@ import {
   newPostURL,
   postDetailURL,
   getChannelNameFromPathname,
+  commentPermalink,
   toQueryString,
   urlHostname
 } from "./url"
@@ -55,6 +56,15 @@ describe("url helper functions", () => {
 
     it("should return null otherwise", () => {
       assert.equal(null, getChannelNameFromPathname(""))
+    })
+  })
+
+  describe("commentPermalink", () => {
+    it("should return a comment permalink", () => {
+      assert.equal(
+        "/channel/channel_name/post_id/comment/comment_id/",
+        commentPermalink("channel_name", "post_id", "comment_id")
+      )
     })
   })
 

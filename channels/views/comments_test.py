@@ -327,6 +327,47 @@ def test_list_deleted_comments(client, logged_in_profile):
     ]
 
 
+def test_get_comment(client, jwt_header, private_channel_and_contributor, reddit_factories):
+    """
+    should be able to GET a comment
+    """
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('my geat post', user, channel=channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+    client.force_login(user)
+    url = reverse('comment-detail', kwargs={'comment_id': comment.id})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [{
+        'author_id': user.username,
+        'created': comment.created,
+        'id': comment.id,
+        'parent_id': None,
+        'post_id': post.id,
+        'score': 1,
+        'text': comment.text,
+        'upvoted': True,
+        'downvoted': False,
+        "removed": False,
+        'profile_image': user.profile.image_small,
+        'author_name': user.profile.name,
+        'edited': False,
+        'comment_type': 'comment',
+        'num_reports': 0,
+    }]
+
+
+def test_get_comment_404(client, jwt_header, private_channel_and_contributor, reddit_factories):
+    """
+    test that we get a 404 for a missing comment
+    """
+    _, user = private_channel_and_contributor
+    client.force_login(user)
+    url = reverse('comment-detail', kwargs={'comment_id': '23432'})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+
 def test_create_comment(client, logged_in_profile):
     """Create a comment"""
     post_id = '2'

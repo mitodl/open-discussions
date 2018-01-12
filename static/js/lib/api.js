@@ -106,6 +106,11 @@ export function getComments(
   return fetchJSONWithAuthFailure(`/api/v0/posts/${postID}/comments/`)
 }
 
+export const getComment = (
+  commentID: string
+): Promise<Array<CommentFromAPI | MoreCommentsFromAPI>> =>
+  fetchJSONWithAuthFailure(`/api/v0/comments/${commentID}`)
+
 export const createComment = (
   postId: string,
   text: string,

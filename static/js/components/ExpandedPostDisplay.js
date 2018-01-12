@@ -32,7 +32,8 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     isModerator: boolean,
     beginEditing: (key: string, initialValue: Object, e: ?Event) => void,
     showPostDeleteDialog: () => void,
-    showPostReportDialog: () => void
+    showPostReportDialog: () => void,
+    showPermalinkUI: boolean
   }
 
   renderTextContent = () => {
@@ -119,7 +120,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
   }
 
   render() {
-    const { post, forms } = this.props
+    const { post, forms, showPermalinkUI } = this.props
     const formattedDate = moment(post.created).fromNow()
 
     return (
@@ -134,7 +135,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
             {formattedDate}
           </div>
         </div>
-        {post.text ? this.renderTextContent() : null}
+        {!showPermalinkUI && post.text ? this.renderTextContent() : null}
         {R.has(editPostKey(post), forms) ? null : this.postActionButtons()}
       </div>
     )

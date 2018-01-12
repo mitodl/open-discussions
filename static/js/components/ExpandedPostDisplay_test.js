@@ -71,6 +71,11 @@ describe("ExpandedPostDisplay", () => {
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
   })
 
+  it("should hide text content if passed showPermalinkUI", () => {
+    const wrapper = renderPostDisplay({ post, showPermalinkUI: true })
+    assert.isFalse(wrapper.find(ReactMarkdown).exists())
+  })
+
   it("should display post text", () => {
     const string = "JUST SOME GREAT TEXT!"
     post.text = string

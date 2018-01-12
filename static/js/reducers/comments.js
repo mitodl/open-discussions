@@ -181,16 +181,11 @@ export const createCommentTree = (
     }
 
     const parentId = commentResponse.parent_id
-    if (!parentId) {
-      tree.push(copy)
-    } else {
-      const parent = lookup[parentId]
-      if (parent === undefined) {
-        // I don't think this will happen, I think PRAW returns the comments in order of traversal
-        throw new Error("Unable to find parent for comment")
-      }
 
-      parent.replies.push(copy)
+    if (parentId && lookup[parentId]) {
+      lookup[parentId].replies.push(copy)
+    } else {
+      tree.push(copy)
     }
   }
 
@@ -218,8 +213,14 @@ type CommentData = Map<string, Array<GenericComment>>
 export const commentsEndpoint = {
   name:    "comments",
   verbs:   [GET, PATCH, POST, DELETE],
-  getFunc: async (postId: string): Promise<GetCommentsPayload> => {
-    const comments = await api.getComments(postId)
+  getFunc: async (
+    postId: string,
+    commentId?: string
+  ): Promise<GetCommentsPayload> => {
+    const comments = commentId
+      ? await api.getComment(commentId)
+      : await api.getComments(postId)
+
     return {
       postId:   postId,
       comments: comments

@@ -80,7 +80,13 @@ class App extends React.Component<*, void> {
             component={ChannelPage}
           />
           <Route
+            exact
             path={`${match.url}channel/:channelName/:postID`}
+            component={PostPage}
+          />
+          <Route
+            exact
+            path={`${match.url}channel/:channelName/:postID/comment/:commentID`}
             component={PostPage}
           />
           <Route path={`${match.url}manage/`} component={AdminPage} />

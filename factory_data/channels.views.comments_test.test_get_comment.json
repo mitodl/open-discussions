@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Aliquid fuga consectetur illum nam voluptatibus nobis atque deserunt. Temporibus deleniti eaque atque quis suscipit sit praesentium dolores. Animi eum ipsum eveniet qui aliquam quam. Modi saepe perspiciatis id.\nNemo exercitationem molestiae unde corrupti at repudiandae harum. Cumque libero incidunt dicta odio. Voluptatem asperiores distinctio aliquid. Temporibus quo laboriosam placeat quam.",
+      "name": "1516208101_placeat",
+      "public_description": "Eius fugiat molestiae delectus ducimus aut. Eius quo laboriosam atque sit.",
+      "title": "Ab corporis unde laudantium magni."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "1m",
+      "post_id": "b",
+      "text": "Id rem cupiditate officia explicabo perspiciatis. Consectetur earum voluptatibus deserunt tempora."
+    }
+  },
+  "posts": {
+    "my geat post": {
+      "id": "b",
+      "text": "Dolorum veritatis aliquid accusantium voluptatum. Id dignissimos facilis ut repellat placeat.",
+      "title": "Minus id fuga dignissimos nisi tenetur."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C42GPZ8J1YPMNEAAVQ1X83CT"
+    },
+    "staff_user": {
+      "username": "01C42GQ2J40SZ565ZCVNXFS17J"
+    }
+  }
+}

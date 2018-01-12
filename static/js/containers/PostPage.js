@@ -5,6 +5,7 @@ import { connect } from "react-redux"
 import R from "ramda"
 import DocumentTitle from "react-document-title"
 import { Dialog } from "@mitodl/mdl-react-components"
+import { Link } from "react-router-dom"
 
 import Card from "../components/Card"
 import withLoading from "../components/Loading"
@@ -30,13 +31,13 @@ import {
   removeComment,
   approveComment
 } from "../util/api_actions"
-import { getChannelName, getPostID } from "../lib/util"
+import { getChannelName, getPostID, getCommentID } from "../lib/util"
 import { isModerator } from "../lib/channels"
 import { anyErrorExcept404 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginEditing } from "../components/CommentForms"
 import { formatTitle } from "../lib/title"
-import { channelURL } from "../lib/url"
+import { channelURL, postDetailURL, commentPermalink } from "../lib/url"
 import { clearPostError } from "../actions/post"
 
 import type { Dispatch } from "redux"
@@ -66,6 +67,7 @@ type PostPageProps = {
   // from the router match
   channelName: string,
   postID: string,
+  commentID?: string,
   history: Object,
   postDeleteDialogVisible: boolean,
   commentDeleteDialogVisible: boolean,
@@ -96,9 +98,13 @@ const REPORT_CONTENT_NEW_FORM = {
 
 const getReportForm = R.prop(REPORT_FORM_KEY)
 
-// if either postId or channelName don't match
+// if postId, channelName, or commentID don't match
 const shouldLoadData = R.complement(
-  R.allPass([R.eqProps("postID"), R.eqProps("channelName")])
+  R.allPass([
+    R.eqProps("postID"),
+    R.eqProps("channelName"),
+    R.eqProps("commentID")
+  ])
 )
 
 class PostPage extends React.Component<*, void> {
@@ -132,7 +138,14 @@ class PostPage extends React.Component<*, void> {
   }
 
   loadData = async () => {
-    const { dispatch, channelName, postID, channel, moderators } = this.props
+    const {
+      dispatch,
+      channelName,
+      postID,
+      commentID,
+      channel,
+      moderators
+    } = this.props
     if (!postID || !channelName) {
       // should not happen, this should be guaranteed by react-router
       throw Error("Match error")
@@ -141,7 +154,7 @@ class PostPage extends React.Component<*, void> {
     try {
       await Promise.all([
         dispatch(actions.posts.get(postID)),
-        dispatch(actions.comments.get(postID))
+        dispatch(actions.comments.get(postID, commentID))
       ])
     } catch (_) {} // eslint-disable-line no-empty
 
@@ -384,7 +397,8 @@ class PostPage extends React.Component<*, void> {
       commentDeleteDialogVisible,
       postReportDialogVisible,
       commentReportDialogVisible,
-      notFound
+      notFound,
+      commentID
     } = this.props
 
     if (!channel) {
@@ -392,6 +406,7 @@ class PostPage extends React.Component<*, void> {
     }
 
     const reportForm = getReportForm(forms)
+    const showPermalinkUI = R.not(R.isNil(commentID))
 
     return notFound
       ? <NotFound />
@@ -479,17 +494,27 @@ class PostPage extends React.Component<*, void> {
               beginEditing={beginEditing(dispatch)}
               showPostDeleteDialog={this.showPostDialog(DELETE_POST_DIALOG)}
               showPostReportDialog={this.showReportPostDialog}
+              showPermalinkUI={showPermalinkUI}
             />
-            <ReplyToPostForm
-              forms={forms}
-              post={post}
-              processing={commentInFlight}
-            />
+            {showPermalinkUI
+              ? null
+              : <ReplyToPostForm
+                forms={forms}
+                post={post}
+                processing={commentInFlight}
+              />}
           </div>
         </Card>
-        <div className="comments-count">
-          {formatCommentsCount(post)}
-        </div>
+        {commentID
+          ? <Card className="comment-detail-card">
+            <div>You are viewing a single comment's thread.</div>
+            <Link to={postDetailURL(channel.name, post.id)}>
+                  View the rest of the comments
+            </Link>
+          </Card>
+          : <div className="comments-count">
+            {formatCommentsCount(post)}
+          </div>}
         <CommentTree
           comments={commentsTree}
           forms={forms}
@@ -503,6 +528,7 @@ class PostPage extends React.Component<*, void> {
           loadMoreComments={this.loadMoreComments}
           beginEditing={beginEditing(dispatch)}
           processing={commentInFlight}
+          commentPermalink={commentPermalink(channel.name, post.id)}
         />
       </div>
   }
@@ -520,6 +546,7 @@ const mapStateToProps = (state, ownProps) => {
   } = state
   const postID = getPostID(ownProps)
   const channelName = getChannelName(ownProps)
+  const commentID = getCommentID(ownProps)
   const post = posts.data.get(postID)
   const channel = channels.data.get(channelName)
   const commentsTree = comments.data.get(postID)
@@ -535,6 +562,7 @@ const mapStateToProps = (state, ownProps) => {
     ui,
     postID,
     channelName,
+    commentID,
     forms,
     post,
     channel,

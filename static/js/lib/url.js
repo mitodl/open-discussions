@@ -13,6 +13,11 @@ export const postDetailURL = (channelName: string, postID: string) =>
 export const newPostURL = (channelName: ?string) =>
   channelName ? `/create_post/${channelName}` : "/create_post/"
 
+export const commentPermalink = R.curry(
+  (channelName: string, postID: string, commentID: string) =>
+    `${postDetailURL(channelName, postID)}/comment/${commentID}/`
+)
+
 // pull the channel name out of location.pathname
 // see here for why this hackish approach was necessary:
 // https://github.com/mitodl/open-discussions/pull/118#discussion_r135284591

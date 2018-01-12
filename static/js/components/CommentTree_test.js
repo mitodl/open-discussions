@@ -4,6 +4,7 @@ import sinon from "sinon"
 import R from "ramda"
 import { assert } from "chai"
 import { shallow } from "enzyme"
+import { Link } from "react-router-dom"
 
 import ReactMarkdown from "react-markdown"
 
@@ -14,6 +15,7 @@ import {
   replyToCommentKey,
   editCommentKey
 } from "./CommentForms"
+import { commentPermalink } from "../lib/url"
 
 import { makeCommentsResponse, makeMoreComments } from "../factories/comments"
 import { makePost } from "../factories/posts"
@@ -30,7 +32,8 @@ describe("CommentTree", () => {
     beginEditingStub,
     loadMoreCommentsStub,
     deleteCommentStub,
-    reportCommentStub
+    reportCommentStub,
+    permalinkFunc
 
   beforeEach(() => {
     post = makePost()
@@ -44,6 +47,7 @@ describe("CommentTree", () => {
     loadMoreCommentsStub = sandbox.stub()
     deleteCommentStub = sandbox.stub()
     reportCommentStub = sandbox.stub()
+    permalinkFunc = commentPermalink("channel", post.id)
   })
 
   afterEach(() => {
@@ -64,6 +68,7 @@ describe("CommentTree", () => {
         loadMoreComments={loadMoreCommentsStub}
         deleteComment={deleteCommentStub}
         reportComment={reportCommentStub}
+        commentPermalink={permalinkFunc}
         {...props}
       />
     )
@@ -154,6 +159,15 @@ describe("CommentTree", () => {
     assert.isNotOk(renderCommentTree().find(".delete-button").exists())
   })
 
+  it("should include a permalink", () => {
+    const button = renderCommentTree().find(".permalink-button")
+    assert(button.exists())
+    assert.equal(
+      button.find(Link).at(0).props().to,
+      permalinkFunc(comments[0].id)
+    )
+  })
+
   it("should show the author name", () => {
     const wrapper = renderCommentTree()
     const authorName = wrapper
@@ -184,9 +198,9 @@ describe("CommentTree", () => {
         .find(".comment-actions")
         .at(0)
         .find(".comment-action-button"),
-      2
+      3
     )
-    assert.lengthOf(nextCommentWrapper.find(".comment-action-button"), 1)
+    assert.lengthOf(nextCommentWrapper.find(".comment-action-button"), 2)
 
     assert.lengthOf(topCommentWrapper.find(ReplyToCommentForm), 1)
     assert.lengthOf(nextCommentWrapper.find(ReplyToCommentForm), 0)

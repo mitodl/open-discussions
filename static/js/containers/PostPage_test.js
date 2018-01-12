@@ -3,9 +3,11 @@ import { assert } from "chai"
 import sinon from "sinon"
 import R from "ramda"
 import { Dialog } from "@mitodl/mdl-react-components"
+import { Link } from "react-router-dom"
 
 import CommentTree from "../components/CommentTree"
 import NotFound from "../components/404"
+import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 
 import { makePost, makeChannelPostList } from "../factories/posts"
 import {
@@ -23,7 +25,7 @@ import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG, HIDE_DIALOG } from "../actions/ui"
 import { SET_FOCUSED_COMMENT, CLEAR_FOCUSED_COMMENT } from "../actions/focus"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
-import { postDetailURL, channelURL } from "../lib/url"
+import { postDetailURL, channelURL, commentPermalink } from "../lib/url"
 import { formatTitle } from "../lib/title"
 import { createCommentTree } from "../reducers/comments"
 
@@ -49,6 +51,9 @@ describe("PostPage", function() {
     helper.getChannelStub.returns(Promise.resolve(channel))
     helper.getChannelsStub.returns(Promise.resolve([]))
     helper.getCommentsStub.returns(Promise.resolve(commentsResponse))
+    helper.getCommentStub.returns(
+      Promise.resolve(R.slice(0, 1, commentsResponse))
+    )
     helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
     helper.getPostsForChannelStub.returns(
       Promise.resolve({
@@ -143,6 +148,40 @@ describe("PostPage", function() {
         expectedPayload
       )
     })
+  })
+
+  it("should show a comment permalink UI if at the right URL", async () => {
+    const [wrapper] = await renderComponent(
+      commentPermalink(channel.name, post.id, comments[0].id),
+      [
+        actions.posts.get.requestType,
+        actions.posts.get.successType,
+        actions.comments.get.requestType,
+        actions.comments.get.successType,
+        actions.subscribedChannels.get.requestType,
+        actions.subscribedChannels.get.successType,
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
+        actions.channelModerators.get.requestType,
+        actions.channelModerators.get.successType,
+        SET_CHANNEL_DATA
+      ]
+    )
+    const card = wrapper.find(".comment-detail-card")
+    assert(card.exists())
+    assert.equal(
+      card.find("div").at(2).text(),
+      "You are viewing a single comment's thread."
+    )
+    assert.equal(
+      card.find(Link).props().to,
+      postDetailURL(channel.name, post.id)
+    )
+    assert.equal(
+      card.find(Link).props().children,
+      "View the rest of the comments"
+    )
+    assert.isTrue(wrapper.find(ExpandedPostDisplay).props().showPermalinkUI)
   })
 
   it("passed props to each CommentVoteForm", async () => {

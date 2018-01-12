@@ -70,6 +70,20 @@ describe("comments reducers", () => {
     assert.isNotEmpty(comments[0].replies)
   })
 
+  it("should handle a comment whose parent we don't have", async () => {
+    // this can happen when we're looking at a permalink for a nested comment
+    const first = makeComment(post)
+    const response = [makeComment(post, first.id), makeComment(post, first.id)]
+    helper.getCommentStub.returns(Promise.resolve(response))
+    const { requestType, successType } = actions.comments.get
+    const { data } = await dispatchThen(
+      actions.comments.get(post.id, response[0].id),
+      [requestType, successType]
+    )
+    const comments = data.get(post.id)
+    assert.deepEqual(comments, response)
+  })
+
   it("should handle an empty response ok", () => {
     const { requestType, successType } = actions.comments.get
     helper.getCommentsStub.returns([])

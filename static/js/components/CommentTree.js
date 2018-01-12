@@ -3,6 +3,7 @@
 import React from "react"
 import R from "ramda"
 import moment from "moment"
+import { Link } from "react-router-dom"
 
 import ReactMarkdown from "react-markdown"
 
@@ -45,7 +46,8 @@ type CommentTreeProps = {
   isModerator: boolean,
   processing: boolean,
   deleteComment: CommentRemoveFunc,
-  reportComment: ReportCommentFunc
+  reportComment: ReportCommentFunc,
+  commentPermalink: (commentID: string) => string
 }
 
 export default class CommentTree extends React.Component<*, *> {
@@ -62,7 +64,8 @@ export default class CommentTree extends React.Component<*, *> {
       beginEditing,
       processing,
       isModerator,
-      reportComment
+      reportComment,
+      commentPermalink
     } = this.props
     const formKey = replyToCommentKey(comment)
     const editFormKey = editCommentKey(comment)
@@ -143,6 +146,9 @@ export default class CommentTree extends React.Component<*, *> {
                 <a href="#">delete</a>
               </div>
               : null}
+            <div className="comment-action-button permalink-button">
+              <Link to={commentPermalink(comment.id)}>permalink</Link>
+            </div>
             <CommentRemovalForm
               comment={comment}
               remove={remove}

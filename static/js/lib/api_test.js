@@ -14,6 +14,7 @@ import {
   getPost,
   getPostsForChannel,
   getComments,
+  getComment,
   createComment,
   createPost,
   updateComment,
@@ -219,6 +220,15 @@ describe("api", function() {
       fetchJSONStub.returns(Promise.resolve(response))
 
       const resp = await getComments(post.id)
+      assert.deepEqual(resp, response)
+    })
+
+    it("gets a single comment", async () => {
+      const post = makePost()
+      const response = R.slice(0, 1, makeCommentsResponse(post))
+      fetchJSONStub.returns(response)
+
+      const resp = await getComment(post.id)
       assert.deepEqual(resp, response)
     })
 

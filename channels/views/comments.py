@@ -2,8 +2,9 @@
 
 from django.contrib.auth import get_user_model
 from praw.models import MoreComments
+from praw.exceptions import PRAWException
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -159,6 +160,29 @@ class CommentDetailView(APIView):
         """Get the comment object"""
         api = Api(user=self.request.user)
         return api.get_comment(self.kwargs['comment_id'])
+
+    def get(self, request, *args, **kwargs):
+        """GET a single comment and it's children"""
+        with translate_praw_exceptions():
+            comment = self.get_object()
+
+            # comment.refresh() raises if the comment
+            # isn't found
+            try:
+                comment.refresh()
+            except PRAWException:
+                raise NotFound()
+
+            users = _lookup_users_for_comments([comment])
+            serialized_comment_tree = GenericCommentSerializer(
+                [comment] + comment.replies.list(),
+                context={
+                    **self.get_serializer_context(),
+                    'users': users,
+                },
+                many=True
+            ).data
+            return Response(serialized_comment_tree)
 
     def patch(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Update a comment"""
