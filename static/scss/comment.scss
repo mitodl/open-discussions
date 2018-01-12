@@ -78,9 +78,8 @@ $replyPaddingLeft: 8px;
       align-items: center;
 
       &.comment-actions {
-        width: 110px;
         margin: 4px 0 5px;
-        display: flex;
+        display: inline-block;
 
         > div {
           margin-right: 10px;
@@ -108,16 +107,17 @@ $replyPaddingLeft: 8px;
     }
 
     .votes-form {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      width: 65px;
+      display: inline-block;
 
       .score {
+        display: inline-block;
         font-weight: 500;
         font-size: 16px;
         color: #555;
+      }
+
+      .upvote-button, .downvote-button {
+        margin: 0 10px;
       }
 
       .pipe {
@@ -191,6 +191,7 @@ $replyPaddingLeft: 8px;
   .comment-action-button {
     font-size: .9em;
     font-weight: 400;
+    display: inline-block;
   }
 }
 
