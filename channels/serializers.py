@@ -123,6 +123,7 @@ class PostSerializer(serializers.Serializer):
     title = serializers.CharField()
     upvoted = WriteableSerializerMethodField()
     removed = WriteableSerializerMethodField()
+    ignore_reports = serializers.BooleanField(required=False, write_only=True)
     stickied = serializers.BooleanField(required=False)
     score = serializers.IntegerField(source='ups', read_only=True)
     author_id = serializers.CharField(read_only=True, source='author')
@@ -267,6 +268,12 @@ class PostSerializer(serializers.Serializer):
             elif removed is False:
                 api.approve_post(post_id)
 
+        if "ignore_reports" in validated_data:
+            ignore_reports = validated_data["ignore_reports"]
+            if ignore_reports is True:
+                api.approve_post(post_id)
+                api.ignore_post_reports(post_id)
+
         if "text" in validated_data:
             instance = api.update_post(post_id=post_id, text=validated_data['text'])
 
@@ -289,6 +296,7 @@ class CommentSerializer(serializers.Serializer):
     score = serializers.IntegerField(read_only=True)
     upvoted = WriteableSerializerMethodField()
     removed = WriteableSerializerMethodField()
+    ignore_reports = serializers.BooleanField(required=False, write_only=True)
     downvoted = WriteableSerializerMethodField()
     created = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
@@ -431,6 +439,12 @@ class CommentSerializer(serializers.Serializer):
                 api.remove_comment(comment_id=instance.id)
             else:
                 api.approve_comment(comment_id=instance.id)
+
+        if "ignore_reports" in validated_data:
+            ignore_reports = validated_data["ignore_reports"]
+            if ignore_reports is True:
+                api.approve_comment(comment_id=instance.id)
+                api.ignore_comment_reports(instance.id)
 
         _apply_vote(instance, validated_data, True)
 

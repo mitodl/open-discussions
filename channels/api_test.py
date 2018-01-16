@@ -662,3 +662,19 @@ def test_list_reports(mock_client):
     assert client.list_reports('channel') == mock_client.subreddit.return_value.mod.reports.return_value
     mock_client.subreddit.assert_called_once_with('channel')
     mock_client.subreddit.return_value.mod.reports.assert_called_once_with()
+
+
+def test_ignore_comment_resports(mock_client):
+    """Test ignore_comment_reports"""
+    client = api.Api(UserFactory.create())
+    client.ignore_comment_reports('id')
+    mock_client.comment.assert_called_once_with('id')
+    mock_client.comment.return_value.mod.ignore_reports.assert_called_once_with()
+
+
+def test_ignore_post_resports(mock_client):
+    """Test ignore_post_reports"""
+    client = api.Api(UserFactory.create())
+    client.ignore_post_reports('id')
+    mock_client.submission.assert_called_once_with(id='id')
+    mock_client.submission.return_value.mod.ignore_reports.assert_called_once_with()

@@ -709,6 +709,49 @@ def test_update_comment_approve(
     }
 
 
+def test_update_comment_ignore_reports(
+        client, staff_user, private_channel_and_contributor, reddit_factories
+):
+    """Update a comment to ignore reports as a moderator"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("post", user, channel=channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+    client.force_login(staff_user)
+    url = reverse('comment-detail', kwargs={'comment_id': comment.id})
+    resp = client.patch(url, type='json', data={
+        "ignore_reports": True,
+    })
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'author_id': user.username,
+        'created': comment.created,
+        'id': comment.id,
+        'parent_id': None,
+        'post_id': post.id,
+        'score': 1,
+        'text': comment.text,
+        'upvoted': False,
+        'downvoted': False,
+        "removed": False,
+        'profile_image': user.profile.image_small,
+        'author_name': user.profile.name,
+        'edited': False,
+        'comment_type': 'comment',
+        'num_reports': 0,
+    }
+
+
+def test_update_comment_ignore_reports_forbidden(client, private_channel_and_contributor, reddit_factories):
+    """Test updating a comment to ignore reports with a nonstaff user"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("post", user, channel=channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+    client.force_login(user)
+    url = reverse('comment-detail', kwargs={'comment_id': comment.id})
+    resp = client.patch(url, type='json', data={"ignore_reports": True})
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
 # Reddit doesn't indicate if a comment deletion failed so we don't have tests that
 def test_delete_comment(client, logged_in_profile):
     """Delete a comment"""

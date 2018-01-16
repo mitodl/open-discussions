@@ -633,6 +633,45 @@ def test_update_post_clear_removed(client, staff_user, staff_api, private_channe
     }
 
 
+def test_update_post_ignore_reports(client, staff_user, staff_api, private_channel_and_contributor, reddit_factories):
+    """Test updating a post to ignore reports"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    client.force_login(staff_user)
+    resp = client.patch(url, format='json', data={"ignore_reports": True})
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'url': None,
+        'text': post.text,
+        'title': post.title,
+        'upvoted': False,
+        'score': 1,
+        'removed': False,
+        'author_id': user.username,
+        'id': post.id,
+        'created': post.created,
+        'num_comments': 0,
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
+        'edited': False,
+        "stickied": False,
+        'num_reports': 0,
+    }
+
+
+def test_update_post_ignore_reports_forbidden(client, private_channel_and_contributor, reddit_factories):
+    """Test updating a post to ignore reports with a nonstaff user"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    client.force_login(user)
+    resp = client.patch(url, format='json', data={"ignore_reports": True})
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
 def test_update_post_removed_forbidden(client, private_channel_and_contributor, reddit_factories):
     """Test updating a post to remove with a nonstaff user"""
     channel, user = private_channel_and_contributor

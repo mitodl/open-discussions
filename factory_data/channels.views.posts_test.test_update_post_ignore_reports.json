@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Porro dicta cum laudantium minima qui necessitatibus ipsum. Doloremque laborum sed qui quasi ut accusamus voluptate. Quaerat dolorem perferendis ut deleniti ullam ab rerum deserunt. Excepturi quibusdam reiciendis eos voluptas aut exercitationem. Est perspiciatis ducimus excepturi maxime id saepe aliquam.\nRatione iusto aliquam nisi. Facilis deleniti delectus ea eius minima molestias. Ipsa mollitia voluptas aspernatur reprehenderit.",
+      "name": "1516131443_laudantium",
+      "public_description": "Quia quo dicta qui culpa. Optio ex eos corrupti mollitia dolor laboriosam. Facere illum eos unde.",
+      "title": "Nesciunt vero dignissimos eum."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "im",
+      "text": "Facilis excepturi debitis ea velit corrupti. Voluptatem doloribus possimus error saepe.",
+      "title": "Magnam architecto esse dicta."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C407KVRKK48XX8ZKVFN0QNTK"
+    },
+    "staff_user": {
+      "username": "01C407KN9DD61656RYH8040BXF"
+    }
+  }
+}

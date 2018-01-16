@@ -897,3 +897,21 @@ class Api:
             praw.models.listing.generator.ListingGenerator: a generator representing the reports in the channel
         """
         return self.get_channel(channel_name).mod.reports()
+
+    def ignore_comment_reports(self, comment_id):
+        """
+        Ignore further reports on this comment
+
+        Args:
+            comment_id(str): the id of the comment to report
+        """
+        self.get_comment(comment_id).mod.ignore_reports()
+
+    def ignore_post_reports(self, post_id):
+        """
+        Ignore further reports on this post
+
+        Args:
+            post_id(str): the id of the post to report
+        """
+        self.get_post(post_id).mod.ignore_reports()

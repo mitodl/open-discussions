@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Molestias sapiente minus dicta id repellendus repudiandae dolorem. Non amet enim debitis id. Voluptatem sapiente at neque amet. Rem reiciendis rerum facilis quia cumque veritatis reprehenderit.\nVoluptas possimus accusamus culpa dolorem blanditiis porro. Architecto dolorem expedita tempore consequuntur recusandae dignissimos. Fugiat unde dignissimos ipsa dolor.",
+      "name": "1516132012_similique",
+      "public_description": "Adipisci est aliquid pariatur praesentium repellat. Sapiente quia delectus optio dolores.",
+      "title": "Nam atque et excepturi consequuntur commodi."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "io",
+      "text": "Nemo magnam enim saepe fugit beatae nisi. Iure eligendi odit eveniet cum fugiat ea.",
+      "title": "Neque nihil odit provident omnis."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C40857Y2QKZBV6F6G43Z2JZB"
+    },
+    "staff_user": {
+      "username": "01C40851JP3DHQSV4J0CWKX5HH"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Distinctio voluptatibus laudantium accusantium quod. Esse ipsa est facilis. Velit alias dolores delectus praesentium rerum. Deleniti consectetur ut ullam earum nemo. Ex vel fugit provident consequatur iusto pariatur corrupti.\nHarum vel nemo provident ullam vero saepe quidem. Accusantium accusamus aliquid ab eius aspernatur. Sunt eos ea ut praesentium amet neque nulla.",
+      "name": "1516131419_dicta",
+      "public_description": "Facilis accusamus nemo maiores. Explicabo vel atque hic commodi.",
+      "title": "Officia id deleniti temporibus magni."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "4j",
+      "post_id": "il",
+      "text": "Repellat ullam placeat a eaque ut. Perspiciatis harum fuga quae dolores itaque voluptas."
+    }
+  },
+  "posts": {
+    "post": {
+      "id": "il",
+      "text": "Deleniti fugit et hic quae a dolore exercitationem. Magnam reprehenderit esse voluptates numquam.",
+      "title": "Alias ullam quidem incidunt culpa quas."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C407K4P5YC8WB7H8C3PF37NB"
+    },
+    "staff_user": {
+      "username": "01C407JY9W953SEX5YGNCT2HB0"
+    }
+  }
+}
