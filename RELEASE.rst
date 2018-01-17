@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.10.0
+--------------
+
+- Add a footer
+- Added API for listing reported content (#398)
+- Fixes spacing with upvote arrows being too close together (#428)
+- Add a 404 message to the channel page
+- Added post/comment reporting UI (#235)
+
 Version 0.9.0
 -------------
 
