@@ -58,6 +58,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
             "profile_image": user.profile.image_small,
             "edited": False,
             "stickied": False,
+            'num_reports': 0,
         } for post in [fourth_post, third_post, second_post, first_post]],
         'pagination': {
             'sort': POSTS_SORT_HOT,
@@ -99,6 +100,7 @@ def test_frontpage_sorted(client, private_channel_and_contributor, reddit_factor
             "profile_image": user.profile.image_small,
             "edited": False,
             "stickied": False,
+            'num_reports': 0,
         } for post in [fourth_post, third_post, second_post, first_post]],
         'pagination': {
             'sort': sort,

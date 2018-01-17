@@ -49,6 +49,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             'author_name': name,
             'edited': False,
             'comment_type': 'comment',
+            'num_reports': 0,
         },
         {
             "id": "2",
@@ -65,6 +66,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             'author_name': name,
             'edited': True,
             'comment_type': 'comment',
+            'num_reports': 0,
         },
         {
             "id": "3",
@@ -81,6 +83,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             'author_name': name,
             'edited': False,
             'comment_type': 'comment',
+            'num_reports': 0,
         },
     ]
 
@@ -139,7 +142,8 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "profile_image": image_url,
             "author_name": name,
             "edited": False,
-            "comment_type": "comment"
+            "comment_type": "comment",
+            'num_reports': 0,
         },
         {
             "id": "n",
@@ -155,7 +159,8 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "profile_image": image_url,
             "author_name": name,
             "edited": False,
-            "comment_type": "comment"
+            "comment_type": "comment",
+            'num_reports': 0,
         },
         {
             "id": "o",
@@ -171,7 +176,8 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "profile_image": image_url,
             "author_name": name,
             "edited": False,
-            "comment_type": "comment"
+            "comment_type": "comment",
+            'num_reports': 0,
         }
     ]
 
@@ -220,7 +226,8 @@ def test_more_comments_children(client, logged_in_profile):
             "profile_image": image_url,
             "author_name": name,
             "edited": False,
-            "comment_type": "comment"
+            "comment_type": "comment",
+            'num_reports': 0,
         },
         {
             "id": "e9m",
@@ -236,7 +243,8 @@ def test_more_comments_children(client, logged_in_profile):
             "profile_image": image_url,
             "author_name": name,
             "edited": False,
-            "comment_type": "comment"
+            "comment_type": "comment",
+            'num_reports': 0,
         }
     ]
 
@@ -297,6 +305,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             'id': '1s',
             'edited': False,
             "author_name": "[deleted]",
+            'num_reports': 0,
         },
         {
             'author_id': user.username,
@@ -313,6 +322,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             "removed": False,
             'edited': False,
             "author_name": user.profile.name,
+            'num_reports': 0,
         }
     ]
 
@@ -340,6 +350,7 @@ def test_create_comment(client, logged_in_profile):
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 
@@ -387,6 +398,7 @@ def test_create_comment_no_upvote(client, logged_in_profile):
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 
@@ -414,6 +426,7 @@ def test_create_comment_downvote(client, logged_in_profile):
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 
@@ -442,6 +455,7 @@ def test_create_comment_reply_to_comment(client, logged_in_profile):
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 
@@ -467,6 +481,7 @@ def test_update_comment_text(client, logged_in_profile):
         'author_name': logged_in_profile.name,
         'edited': True,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 
@@ -504,6 +519,7 @@ def test_update_comment_upvote(client, logged_in_profile):
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 
@@ -530,6 +546,7 @@ def test_update_comment_downvote(client, logged_in_profile):
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 
@@ -555,6 +572,7 @@ def test_update_comment_clear_upvote(client, logged_in_profile):
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 
@@ -581,6 +599,7 @@ def test_update_comment_clear_downvote(client, logged_in_profile):
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 
@@ -612,6 +631,7 @@ def test_update_comment_remove(
         'author_name': user.profile.name,
         'edited': False,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 
@@ -644,6 +664,7 @@ def test_update_comment_approve(
         'author_name': user.profile.name,
         'edited': False,
         'comment_type': 'comment',
+        'num_reports': 0,
     }
 
 

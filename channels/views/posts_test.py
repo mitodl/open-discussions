@@ -45,6 +45,7 @@ def test_create_url_post(client, private_channel_and_contributor):
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
+        'num_reports': 0,
     }
 
 
@@ -77,6 +78,7 @@ def test_create_text_post(client, private_channel_and_contributor):
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
+        'num_reports': 0,
     }
 
 
@@ -159,6 +161,7 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
         "profile_image": profile_image,
         'edited': False,
         "stickied": False,
+        'num_reports': 0,
     }
 
 
@@ -204,6 +207,7 @@ def test_get_post_stickied(client, private_channel_and_contributor, reddit_facto
         "profile_image": user.profile.image_small,
         "edited": False,
         "stickied": True,
+        'num_reports': 0,
     }
 
 
@@ -254,6 +258,7 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
                     "profile_image": user.profile.image_small,
                     "edited": False,
                     "stickied": False,
+                    'num_reports': 0,
                 } for post in posts
             ],
             'pagination': {
@@ -296,6 +301,7 @@ def test_list_posts_sorted(client, private_channel_and_contributor, reddit_facto
             "profile_image": user.profile.image_small,
             "edited": False,
             "stickied": False,
+            'num_reports': 0,
         } for post in [fourth_post, third_post, second_post, first_post]],
         'pagination': {
             'sort': sort,
@@ -331,7 +337,8 @@ def test_list_posts_stickied(client, private_channel_and_contributor, reddit_fac
         'author_name': user.profile.name,
         "profile_image": user.profile.image_small,
         "edited": False,
-        "stickied": True
+        "stickied": True,
+        'num_reports': 0,
     }
 
 
@@ -454,6 +461,7 @@ def test_update_post_text(client, private_channel_and_contributor, reddit_factor
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
+        'num_reports': 0,
     }
 
 
@@ -482,6 +490,7 @@ def test_update_post_stickied(client, private_channel_and_contributor, reddit_fa
         "author_name": user.profile.name,
         'edited': False,
         "stickied": True,
+        'num_reports': 0,
     }
 
 
@@ -532,6 +541,7 @@ def test_update_post_clear_vote(client, private_channel_and_contributor, reddit_
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
+        'num_reports': 0,
     }
 
 
@@ -560,6 +570,7 @@ def test_update_post_upvote(client, private_channel_and_contributor, reddit_fact
         "author_name": user.profile.name,
         "edited": False,
         "stickied": False,
+        'num_reports': 0,
     }
 
 
@@ -588,6 +599,7 @@ def test_update_post_removed(client, staff_user, private_channel_and_contributor
         "author_name": user.profile.name,
         "edited": False,
         "stickied": False,
+        'num_reports': 0,
     }
 
 
@@ -617,6 +629,7 @@ def test_update_post_clear_removed(client, staff_user, staff_api, private_channe
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
+        'num_reports': 0,
     }
 
 
@@ -675,6 +688,7 @@ def test_create_post_without_upvote(client, private_channel_and_contributor):
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
+        'num_reports': 0,
     }
 
 

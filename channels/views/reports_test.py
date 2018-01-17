@@ -74,6 +74,7 @@ def test_list_reports(staff_client, private_channel_and_contributor, reddit_fact
             'author_name': user.profile.name,
             'edited': False,
             'comment_type': 'comment',
+            'num_reports': 2,
         },
         "reasons": ["spam"],
     }, {
@@ -94,6 +95,7 @@ def test_list_reports(staff_client, private_channel_and_contributor, reddit_fact
             'profile_image': user.profile.image_small,
             'edited': False,
             "stickied": False,
+            'num_reports': 2,
         },
         "comment": None,
         "reasons": ["bad", "junk"],
