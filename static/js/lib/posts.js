@@ -31,7 +31,12 @@ export const mapPostListResponse = (
 
 export const getPostIds = R.propOr([], "postIds")
 
-export const getPaginationParams = R.pickAll(["count", "after", "before"])
+export const getPaginationSortParams = R.pickAll([
+  "count",
+  "after",
+  "before",
+  "sort"
+])
 
 export const formatPostTitle = (post: Post) =>
   post.text

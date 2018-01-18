@@ -5,7 +5,7 @@ import React from "react"
 type CardProps = {
   children: any,
   className?: string,
-  title?: string
+  title?: any
 }
 
 const Card = ({ children, className, title }: CardProps) =>

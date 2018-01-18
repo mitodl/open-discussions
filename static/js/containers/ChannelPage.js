@@ -13,6 +13,7 @@ import PostListNavigation from "../components/PostListNavigation"
 import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import withNavAndChannelSidebars from "../hoc/withNavAndChannelSidebars"
 import NotFound from "../components/404"
+import PostSortPicker from "../components/PostSortPicker"
 
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
@@ -27,6 +28,7 @@ import { getSubscribedChannels } from "../lib/redux_selectors"
 import { formatTitle } from "../lib/title"
 import { clearChannelError } from "../actions/channel"
 import { evictPostsForChannel } from "../actions/posts_for_channel"
+import { updateSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -118,7 +120,8 @@ class ChannelPage extends React.Component<*, void> {
       pagination,
       channelName,
       isModerator,
-      notFound
+      notFound,
+      location: { search }
     } = this.props
 
     if (notFound) {
@@ -132,7 +135,19 @@ class ChannelPage extends React.Component<*, void> {
         <div>
           <DocumentTitle title={formatTitle(channel.title)} />
           <ChannelBreadcrumbs channel={channel} />
-          <Card title={channel.title}>
+          <Card
+            title={
+              <div className="post-list-title">
+                <div>
+                  {channel.title}
+                </div>
+                <PostSortPicker
+                  updateSortParam={updateSortParam(this.props)}
+                  value={qs.parse(search).sort || POSTS_SORT_HOT}
+                />
+              </div>
+            }
+          >
             <PostList
               channel={channel}
               posts={posts}

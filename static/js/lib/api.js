@@ -8,7 +8,7 @@ import { PATCH, POST, DELETE } from "redux-hammock/constants"
 
 import { fetchJSONWithAuthFailure, fetchWithAuthFailure } from "./auth"
 import { toQueryString } from "../lib/url"
-import { getPaginationParams } from "../lib/posts"
+import { getPaginationSortParams } from "../lib/posts"
 
 import type {
   Channel,
@@ -22,15 +22,15 @@ import type {
   GenericReport
 } from "../flow/discussionTypes"
 
-const getPaginationQS = R.compose(
+const getPaginationSortQS = R.compose(
   toQueryString,
   R.reject(R.isNil),
-  getPaginationParams
+  getPaginationSortParams
 )
 
 export function getFrontpage(params: PostListPaginationParams): Promise<Post> {
   return fetchJSONWithAuthFailure(
-    `/api/v0/frontpage/${getPaginationQS(params)}`
+    `/api/v0/frontpage/${getPaginationSortQS(params)}`
   )
 }
 
@@ -77,7 +77,7 @@ export function getPostsForChannel(
   params: PostListPaginationParams
 ): Promise<Array<Post>> {
   return fetchJSONWithAuthFailure(
-    `/api/v0/channels/${channelName}/posts/${getPaginationQS(params)}`
+    `/api/v0/channels/${channelName}/posts/${getPaginationSortQS(params)}`
   )
 }
 

@@ -6,10 +6,10 @@ import qs from "query-string"
 
 import PostList from "../components/PostList"
 import Card from "../components/Card"
-
 import withLoading from "../components/Loading"
 import withNavSidebar from "../hoc/withNavSidebar"
 import PostListNavigation from "../components/PostListNavigation"
+import PostSortPicker from "../components/PostSortPicker"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
@@ -18,6 +18,7 @@ import { getPostIds } from "../lib/posts"
 import { FRONTPAGE_URL } from "../lib/url"
 import { toggleUpvote } from "../util/api_actions"
 import { getSubscribedChannels } from "../lib/redux_selectors"
+import { updateSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 
 import type { Dispatch } from "redux"
 import type { Location } from "react-router"
@@ -57,11 +58,21 @@ class HomePage extends React.Component<*, void> {
   }
 
   render() {
-    const { posts, pagination, dispatch } = this.props
+    const { posts, pagination, dispatch, location: { search } } = this.props
     const dispatchableToggleUpvote = toggleUpvote(dispatch)
 
     return (
-      <Card title="Home">
+      <Card
+        title={
+          <div className="post-list-title">
+            <div>Home</div>
+            <PostSortPicker
+              updateSortParam={updateSortParam(this.props)}
+              value={qs.parse(search).sort || POSTS_SORT_HOT}
+            />
+          </div>
+        }
+      >
         <PostList
           posts={posts}
           toggleUpvote={dispatchableToggleUpvote}

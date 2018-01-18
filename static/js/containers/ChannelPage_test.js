@@ -8,6 +8,7 @@ import PostList from "../components/PostList"
 import SubscriptionsList from "../components/SubscriptionsList"
 import CompactPostDisplay from "../components/CompactPostDisplay"
 import NotFound from "../components/404"
+import ChannelPage from "./ChannelPage"
 
 import {
   makeChannel,
@@ -22,6 +23,7 @@ import { EVICT_POSTS_FOR_CHANNEL } from "../actions/posts_for_channel"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { channelURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
+import { VALID_POST_SORT_TYPES } from "../lib/sorting"
 
 describe("ChannelPage", () => {
   let helper,
@@ -100,6 +102,34 @@ describe("ChannelPage", () => {
     sinon.assert.calledWith(helper.editPostStub, postList[0].id, {
       stickied: !post.stickied
     })
+  })
+
+  it("should switch the sorting method when an option is selected", async () => {
+    const [wrapper] = await renderPage(currentChannel)
+
+    for (const sortType of VALID_POST_SORT_TYPES) {
+      await listenForActions(
+        [
+          EVICT_POSTS_FOR_CHANNEL,
+          actions.channels.get.requestType,
+          actions.channels.get.successType,
+          actions.postsForChannel.get.requestType,
+          actions.postsForChannel.get.successType,
+          actions.channelModerators.get.requestType,
+          actions.channelModerators.get.successType,
+          SET_POST_DATA
+        ],
+        () => {
+          const select = wrapper.find(".post-list-title").find("select")
+          select.simulate("change", { target: { value: sortType } })
+        }
+      )
+
+      assert.equal(
+        wrapper.find(ChannelPage).props().location.search,
+        `?sort=${sortType}`
+      )
+    }
   })
 
   it("should fetch postsForChannel, set post data, and render", async () => {
