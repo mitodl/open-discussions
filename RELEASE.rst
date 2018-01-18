@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.10.1
+--------------
+
+- Added Comment sort api
+- Added report counts to post/comment serializers (#432)
+- Added sorting to posts and frontpage APIs (#192)
+
 Version 0.10.0
 --------------
 
