@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.11.0
+--------------
+
+- add UI for choosing post sort method
+- Updated post/comment APIs to enable ignoring future reports (#427)
+- Add comment permalinks
+
 Version 0.10.1
 --------------
 
