@@ -52,8 +52,9 @@
 
   .post-links {
     display: flex;
+    align-items: center;
 
-    a {
+    a, div {
       cursor: pointer;
       display: block;
       margin: 0;
@@ -88,6 +89,10 @@
     display: flex;
 
     a {
+      margin-left: 10px;
+    }
+
+    .report-count {
       margin-left: 10px;
     }
   }

@@ -5,7 +5,6 @@ import R from "ramda"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 import { Link } from "react-router-dom"
-
 import ReactMarkdown from "react-markdown"
 
 import Card from "../components/Card"
@@ -20,6 +19,7 @@ import { commentPermalink } from "../lib/url"
 import { makeCommentsResponse, makeMoreComments } from "../factories/comments"
 import { makePost } from "../factories/posts"
 import { createCommentTree } from "../reducers/comments"
+import { makeCommentReport } from "../factories/reports"
 
 describe("CommentTree", () => {
   let comments,
@@ -69,6 +69,7 @@ describe("CommentTree", () => {
         deleteComment={deleteCommentStub}
         reportComment={reportCommentStub}
         commentPermalink={permalinkFunc}
+        commentReports={new Map()}
         {...props}
       />
     )
@@ -207,6 +208,60 @@ describe("CommentTree", () => {
 
     assert.lengthOf(topCommentWrapper.find(".replies"), 1)
     assert.lengthOf(nextCommentWrapper.find(".replies"), 0)
+  })
+
+  describe("moderation UI", () => {
+    const moderationUI = true
+    const isModerator = true
+    let report, commentReports
+    beforeEach(() => {
+      report = makeCommentReport(makePost())
+      commentReports = new Map()
+      commentReports.set(report.comment.id, report)
+    })
+
+    it("should hide the reply button", () => {
+      const wrapper = renderCommentTree({ moderationUI })
+      assert.isNotOk(wrapper.find(".reply-button").exists())
+    })
+
+    it("should hide the report button", () => {
+      const wrapper = renderCommentTree({ moderationUI })
+      assert.isNotOk(wrapper.find(".report-button").exists())
+    })
+
+    it("should not render top level comments as cards with moderationUI", () => {
+      const wrapper = renderCommentTree({ moderationUI })
+      assert.isNotOk(wrapper.find(Card).exists())
+    })
+
+    it("should include the report count if the user is a moderator", () => {
+      const wrapper = renderCommentTree({
+        isModerator,
+        commentReports,
+        comments: [report.comment]
+      })
+      assert.ok(wrapper.find(".report-count").exists())
+      assert.equal(wrapper.find(".report-count").text(), "Reports: 2")
+    })
+
+    it("should include an ignoreCommentReports button if report and moderator", () => {
+      const ignoreCommentReportsStub = sandbox.stub()
+      const wrapper = renderCommentTree({
+        commentReports,
+        isModerator,
+        ignoreCommentReports: ignoreCommentReportsStub,
+        comments:             [report.comment]
+      })
+      const ignoreButton = wrapper.find(".ignore-button")
+      assert.equal(ignoreButton.text(), "ignore all reports")
+      const eventStub = {
+        preventDefault: sandbox.stub()
+      }
+      ignoreButton.props().onClick(eventStub)
+      assert.ok(eventStub.preventDefault.called)
+      assert.ok(ignoreCommentReportsStub.calledWith(report.comment))
+    })
   })
 
   describe("more_comments", () => {

@@ -10,13 +10,23 @@ import {
   getChannelNameFromPathname,
   commentPermalink,
   toQueryString,
-  urlHostname
+  urlHostname,
+  channelModerationURL
 } from "./url"
 
 describe("url helper functions", () => {
   describe("channelURL", () => {
     it("should return a good URL", () => {
       assert.equal(channelURL("foobar"), "/channel/foobar")
+    })
+  })
+
+  describe("channelModerationURL", () => {
+    it("should return a good URL", () => {
+      assert.equal(
+        channelModerationURL("foochannel"),
+        "/moderation/channel/foochannel"
+      )
     })
   })
 
@@ -48,7 +58,9 @@ describe("url helper functions", () => {
         ["/channel/foobar_baz/boz", "foobar_baz"],
         ["/channel/foobarbaz9/boz", "foobarbaz9"],
         ["/channel/Foobarbaz9/boz", "Foobarbaz9"],
-        ["/channel/fOObar_Baz9/boz", "fOObar_Baz9"]
+        ["/channel/fOObar_Baz9/boz", "fOObar_Baz9"],
+        ["/moderation/channel/foobar", "foobar"],
+        ["/moderation/channel/bippity/boppity", "bippity"]
       ].forEach(([url, expectation]) => {
         assert.equal(expectation, getChannelNameFromPathname(url))
       })
@@ -56,6 +68,8 @@ describe("url helper functions", () => {
 
     it("should return null otherwise", () => {
       assert.equal(null, getChannelNameFromPathname(""))
+      assert.equal(null, getChannelNameFromPathname("/moderation/channel"))
+      assert.equal(null, getChannelNameFromPathname("/moderation/channel/"))
     })
   })
 

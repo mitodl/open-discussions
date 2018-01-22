@@ -3,7 +3,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 
 import Card from "../components/Card"
-import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
+import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 
 import { CONTENT_POLICY_URL } from "../lib/url"
 import { goBackAndHandleEvent } from "../lib/util"

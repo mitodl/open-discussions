@@ -1,0 +1,21 @@
+.report-count {
+  background-color: $report-count-red;
+  color: white;
+  padding: 2px 5px;
+}
+
+.channel-moderation {
+  .comments {
+    padding: 16px 0;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #d3d3d3;
+    }
+  }
+
+  .empty-message {
+    width: fit-content;
+    margin: 50px auto;
+    color: $font-grey;
+  }
+}

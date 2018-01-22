@@ -7,7 +7,11 @@ import {
   SET_FOCUSED_COMMENT,
   CLEAR_FOCUSED_COMMENT,
   setFocusedComment,
-  clearFocusedComment
+  clearFocusedComment,
+  SET_FOCUSED_POST,
+  CLEAR_FOCUSED_POST,
+  setFocusedPost,
+  clearFocusedPost
 } from "../actions/focus"
 import { makeComment } from "../factories/comments"
 import { makePost } from "../factories/posts"
@@ -38,5 +42,12 @@ describe("focus reducer", () => {
     assert.deepEqual(state.comment, comment)
     state = await dispatchThen(clearFocusedComment(), [CLEAR_FOCUSED_COMMENT])
     assert.isNull(state.comment)
+  })
+
+  it("should let you set and clear the focused post", async () => {
+    let state = await dispatchThen(setFocusedPost(post), [SET_FOCUSED_POST])
+    assert.deepEqual(state.post, post)
+    state = await dispatchThen(clearFocusedPost(), [CLEAR_FOCUSED_POST])
+    assert.isNull(state.post)
   })
 })

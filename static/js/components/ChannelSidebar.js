@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 
 import Card from "./Card"
 
-import { editChannelURL } from "../lib/url"
+import { editChannelURL, channelModerationURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -19,23 +19,34 @@ const ChannelSidebar = ({ channel, isModerator }: ChannelSidebarProps) => {
     return null
   }
   return (
-    <Card title="About this channel" className="channel-about">
+    <div>
+      <Card title="About this channel" className="channel-about">
+        {isModerator
+          ? <div className="edit-button">
+            <Link to={editChannelURL(channel.name)}>
+              <i className="material-icons edit">edit</i>
+            </Link>
+          </div>
+          : null}
+        <ReactMarkdown
+          disallowedTypes={["Image"]}
+          source={
+            channel.description || "(There is no description of this channel)"
+          }
+          escapeHtml
+          className="description"
+        />
+      </Card>
       {isModerator
-        ? <div className="edit-button">
-          <Link to={editChannelURL(channel.name)}>
-            <i className="material-icons edit">edit</i>
-          </Link>
-        </div>
+        ? <Card title="Moderation Tools" className="channel-about">
+          <div className="mod-link-wrapper">
+            <Link to={channelModerationURL(channel.name)}>
+                View reported posts & comments
+            </Link>
+          </div>
+        </Card>
         : null}
-      <ReactMarkdown
-        disallowedTypes={["Image"]}
-        source={
-          channel.description || "(There is no description of this channel)"
-        }
-        escapeHtml
-        className="description"
-      />
-    </Card>
+    </div>
   )
 }
 

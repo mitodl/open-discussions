@@ -22,12 +22,17 @@ import { SET_CHANNEL_DATA } from "../actions/channel"
 import { REPLACE_MORE_COMMENTS } from "../actions/comment"
 import { FORM_BEGIN_EDIT, FORM_END_EDIT, FORM_VALIDATE } from "../actions/forms"
 import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG, HIDE_DIALOG } from "../actions/ui"
-import { SET_FOCUSED_COMMENT, CLEAR_FOCUSED_COMMENT } from "../actions/focus"
+import {
+  SET_FOCUSED_POST,
+  SET_FOCUSED_COMMENT,
+  CLEAR_FOCUSED_COMMENT
+} from "../actions/focus"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { findComment } from "../lib/comments"
 import { postDetailURL, channelURL, commentPermalink } from "../lib/url"
 import { formatTitle } from "../lib/title"
 import { createCommentTree } from "../reducers/comments"
+import { makeReportRecord } from "../factories/reports"
 
 describe("PostPage", function() {
   let helper,
@@ -61,6 +66,7 @@ describe("PostPage", function() {
       })
     )
     helper.deletePostStub.returns(Promise.resolve())
+    helper.getReportsStub.returns(Promise.resolve(R.times(makeReportRecord, 4)))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
   })
@@ -254,7 +260,7 @@ describe("PostPage", function() {
         SET_SNACKBAR_MESSAGE
       ],
       () => {
-        wrapper.find(Dialog).at(2).props().onAccept()
+        wrapper.find(Dialog).at(3).props().onAccept()
       }
     )
     const { location: { pathname } } = helper.browserHistory
@@ -279,14 +285,19 @@ describe("PostPage", function() {
 
       const newState = await listenForActions(
         [
+          SHOW_DIALOG,
+          SET_FOCUSED_POST,
           actions.postRemoved.patch.requestType,
           actions.postRemoved.patch.successType,
+          actions.reports.get.requestType,
+          actions.reports.get.successType,
           SET_POST_DATA,
           SET_SNACKBAR_MESSAGE
         ],
         () => {
           const props = wrapper.find("ExpandedPostDisplay").props()
           props.removePost(post)
+          wrapper.find("Dialog").at(0).props().onAccept()
         }
       )
 
@@ -370,7 +381,7 @@ describe("PostPage", function() {
         if (!isRemoved) {
           // if we are removing the comment, handle the confirmation dialog
           newState = await listenForActions(patchActions, () => {
-            wrapper.find("Dialog").at(0).props().onAccept()
+            wrapper.find("Dialog").at(1).props().onAccept()
           })
         }
 
@@ -403,7 +414,7 @@ describe("PostPage", function() {
         }
       )
 
-      const dialog = wrapper.find("Dialog").at(4)
+      const dialog = wrapper.find("Dialog").at(5)
       dialog.find("input").simulate("change", {
         target: {
           name:  "reason",
@@ -441,7 +452,7 @@ describe("PostPage", function() {
       reportPostFunc()
     })
 
-    const dialog = wrapper.find("Dialog").at(3)
+    const dialog = wrapper.find("Dialog").at(4)
     dialog.find("input").simulate("change", {
       target: {
         name:  "reason",
@@ -466,9 +477,9 @@ describe("PostPage", function() {
     })
   })
   ;[
-    ["should render validation for a comment report", 4, true],
-    ["should render validation for a post report", 3, false]
-  ].forEach(([testName, dialogIndex, isComment]) => {
+    ["should render validation for a comment report", true],
+    ["should render validation for a post report", false]
+  ].forEach(([testName, isComment]) => {
     it(testName, async () => {
       const [wrapper] = await renderPage()
 
@@ -493,7 +504,7 @@ describe("PostPage", function() {
         }
       })
 
-      const dialog = wrapper.find("Dialog").at(dialogIndex)
+      const dialog = wrapper.find("Dialog").at(4)
       dialog.find("input").simulate("change", {
         target: {
           name:  "reason",

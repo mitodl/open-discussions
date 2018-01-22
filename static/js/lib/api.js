@@ -19,7 +19,8 @@ import type {
   Post,
   CommentFromAPI,
   MoreCommentsFromAPI,
-  GenericReport
+  GenericReport,
+  ReportRecord
 } from "../flow/discussionTypes"
 
 const getPaginationSortQS = R.compose(
@@ -192,3 +193,6 @@ export function reportContent(payload: GenericReport): Promise<GenericReport> {
     body:   JSON.stringify(payload)
   })
 }
+
+export const getReports = (channelName: string): Promise<Array<ReportRecord>> =>
+  fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/reports/`)

@@ -10,10 +10,10 @@ import Card from "../components/Card"
 import PostList from "../components/PostList"
 import withLoading from "../components/Loading"
 import PostListNavigation from "../components/PostListNavigation"
-import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import withNavAndChannelSidebars from "../hoc/withNavAndChannelSidebars"
 import NotFound from "../components/404"
 import PostSortPicker from "../components/PostSortPicker"
+import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
@@ -32,7 +32,12 @@ import { updateSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
-import type { Channel, Post, PostListPagination } from "../flow/discussionTypes"
+import type {
+  Channel,
+  Post,
+  PostListPagination,
+  PostReportRecord
+} from "../flow/discussionTypes"
 
 type ChannelPageProps = {
   match: Match,
@@ -46,7 +51,8 @@ type ChannelPageProps = {
   pagination: PostListPagination,
   errored: boolean,
   isModerator: boolean,
-  notFound: boolean
+  notFound: boolean,
+  postReports: Map<string, PostReportRecord>
 }
 
 const shouldLoadData = R.complement(
@@ -97,7 +103,14 @@ class ChannelPage extends React.Component<*, void> {
 
     try {
       await dispatch(actions.channels.get(channelName))
-      await dispatch(actions.channelModerators.get(channelName))
+      const { response } = await dispatch(
+        actions.channelModerators.get(channelName)
+      )
+
+      if (isModerator(response, SETTINGS.username)) {
+        await dispatch(actions.reports.get(channelName))
+      }
+
       this.fetchPostsForChannel()
     } catch (_) {} // eslint-disable-line no-empty
   }
@@ -121,7 +134,8 @@ class ChannelPage extends React.Component<*, void> {
       channelName,
       isModerator,
       notFound,
-      location: { search }
+      location: { search },
+      postReports
     } = this.props
 
     if (notFound) {
@@ -154,6 +168,7 @@ class ChannelPage extends React.Component<*, void> {
               toggleUpvote={toggleUpvote(dispatch)}
               isModerator={isModerator}
               togglePinPost={this.togglePinPost}
+              postReports={postReports}
               showPinUI
             />
             {pagination
@@ -187,15 +202,18 @@ const mapStateToProps = (state, ownProps) => {
     ? channels.error && channels.error.errorStatusCode === 404
     : false
 
+  const userIsModerator = isModerator(channelModerators, SETTINGS.username)
+
   return {
     channelName,
     channel,
     loaded,
     notFound,
-    isModerator:        isModerator(channelModerators, SETTINGS.username),
+    isModerator:        userIsModerator,
     pagination:         postsForChannel.pagination,
     posts:              safeBulkGet(postIds, state.posts.data),
     subscribedChannels: getSubscribedChannels(state),
+    postReports:        state.reports.data.posts,
     errored:            anyErrorExcept404([
       channels,
       state.posts,

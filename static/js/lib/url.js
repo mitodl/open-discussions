@@ -4,6 +4,9 @@ import qs from "query-string"
 
 export const channelURL = (channelName: string) => `/channel/${channelName}`
 
+export const channelModerationURL = (channelName: string) =>
+  `/moderation/channel/${channelName}`
+
 export const editChannelURL = (channelName: string) =>
   `/manage/channel/edit/${channelName}/`
 
@@ -24,7 +27,7 @@ export const commentPermalink = R.curry(
 export const getChannelNameFromPathname = R.compose(
   R.defaultTo(null),
   R.view(R.lensIndex(1)),
-  R.match(/^\/channel\/([^/]+)\/?/)
+  R.match(/channel\/([^/]+)\/?/)
 )
 
 export const FRONTPAGE_URL = "/"

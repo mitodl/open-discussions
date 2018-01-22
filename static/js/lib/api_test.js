@@ -24,7 +24,8 @@ import {
   updateRemoved,
   deletePost,
   deleteComment,
-  reportContent
+  reportContent,
+  getReports
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -32,6 +33,7 @@ import {
   makeCommentsResponse,
   makeMoreCommentsResponse
 } from "../factories/comments"
+import { makeReportRecord } from "../factories/reports"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
@@ -400,6 +402,16 @@ describe("api", function() {
           method: POST,
           body:   JSON.stringify(payload)
         })
+      )
+    })
+
+    it("gets reports", async () => {
+      const reports = R.times(makeReportRecord, 5)
+      fetchJSONStub.returns(Promise.resolve(reports))
+
+      await getReports("channelName")
+      assert.ok(
+        fetchJSONStub.calledWith(`/api/v0/channels/channelName/reports/`)
       )
     })
   })

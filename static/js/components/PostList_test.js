@@ -6,7 +6,9 @@ import sinon from "sinon"
 
 import PostList from "./PostList"
 import CompactPostDisplay from "./CompactPostDisplay"
-import { makeChannelPostList } from "../factories/posts"
+
+import { makeChannelPostList, makePost } from "../factories/posts"
+import { makePostReport } from "../factories/reports"
 
 describe("PostList", () => {
   const renderPostList = (props = { posts: makeChannelPostList() }) =>
@@ -66,5 +68,16 @@ describe("PostList", () => {
     wrapper.find(CompactPostDisplay).forEach(postSummary => {
       assert.equal(postSummary.props().togglePinPost, pinStub)
     })
+  })
+
+  it("should pass a report down to CompactPostDisplay", () => {
+    const post = makePost()
+    const report = makePostReport(post)
+    const postReports = new Map([[post.id, report]])
+    const wrapper = renderPostList({
+      posts: [post],
+      postReports
+    })
+    assert.deepEqual(wrapper.find(CompactPostDisplay).props().report, report)
   })
 })

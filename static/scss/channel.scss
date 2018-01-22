@@ -2,7 +2,13 @@
   position: relative;
 
   @include breakpoint(desktop) {
-    margin-top: 52px; // margin to align with top of main-content card on desktop
+    &:first-child {
+      margin-top: 52px; // margin to align with top of main-content card on desktop
+    }
+  }
+
+  .mod-link-wrapper {
+    margin: 15px 0;
   }
 
   .card-contents {

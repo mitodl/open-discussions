@@ -24,6 +24,7 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import { channelURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
 import { VALID_POST_SORT_TYPES } from "../lib/sorting"
+import { makeReportRecord } from "../factories/reports"
 
 describe("ChannelPage", () => {
   let helper,
@@ -46,6 +47,7 @@ describe("ChannelPage", () => {
     helper.getChannelsStub.returns(Promise.resolve(channels))
     helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
     helper.getPostsForChannelStub.returns(Promise.resolve({ posts: postList }))
+    helper.getReportsStub.returns(Promise.resolve(R.times(makeReportRecord, 4)))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
   })
@@ -90,7 +92,22 @@ describe("ChannelPage", () => {
       )
     )
     postList[0] = post
-    const [wrapper] = await renderPage(currentChannel)
+
+    const [wrapper] = await renderComponent(channelURL(currentChannel.name), [
+      actions.channels.get.requestType,
+      actions.channels.get.successType,
+      actions.postsForChannel.get.requestType,
+      actions.postsForChannel.get.successType,
+      actions.subscribedChannels.get.requestType,
+      actions.subscribedChannels.get.successType,
+      actions.channelModerators.get.requestType,
+      actions.channelModerators.get.successType,
+      actions.reports.get.requestType,
+      actions.reports.get.successType,
+      SET_POST_DATA,
+      SET_CHANNEL_DATA
+    ])
+
     wrapper
       .find(CompactPostDisplay)
       .at(0)

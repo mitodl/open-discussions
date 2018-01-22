@@ -12,6 +12,7 @@ import ContentPolicyPage from "./ContentPolicyPage"
 import AdminPage from "./admin/AdminPage"
 import AuthRequiredPage from "./AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
+import ChannelModerationPage from "./ChannelModerationPage"
 import Toolbar from "../components/Toolbar"
 import Snackbar from "../components/material/Snackbar"
 import Drawer from "../containers/Drawer"
@@ -74,6 +75,10 @@ class App extends React.Component<*, void> {
           <Toolbar toggleShowSidebar={this.toggleShowSidebar} />
           <Drawer />
           <Route exact path={match.url} component={HomePage} />
+          <Route
+            path={`${match.url}moderation/channel/:channelName`}
+            component={ChannelModerationPage}
+          />
           <Route
             exact
             path={`${match.url}channel/:channelName`}

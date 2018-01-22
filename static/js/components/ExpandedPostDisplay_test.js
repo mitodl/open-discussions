@@ -16,6 +16,7 @@ import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
 import { editPostKey } from "../components/CommentForms"
+import { makePostReport } from "../factories/reports"
 
 describe("ExpandedPostDisplay", () => {
   let helper,
@@ -262,5 +263,13 @@ describe("ExpandedPostDisplay", () => {
     const wrapper = renderPostDisplay({ post, isModerator: true })
     wrapper.find(".remove-post").simulate("click")
     assert.ok(removePostStub.called)
+  })
+
+  it("should display a report count, if passed a report and isModerator", () => {
+    const report = makePostReport(post)
+    const wrapper = renderPostDisplay({ post, report, isModerator: true })
+    const count = wrapper.find(".report-count")
+    assert.ok(count.exists())
+    assert.equal(count.text(), `Reports: ${report.post.num_reports}`)
   })
 })

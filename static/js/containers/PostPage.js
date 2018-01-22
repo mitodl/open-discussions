@@ -9,13 +9,21 @@ import { Link } from "react-router-dom"
 
 import Card from "../components/Card"
 import withLoading from "../components/Loading"
-import ChannelBreadcrumbs from "../components/ChannelBreadcrumbs"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"
 import ReportForm from "../components/ReportForm"
 import { ReplyToPostForm } from "../components/CommentForms"
 import withNavSidebar from "../hoc/withNavSidebar"
 import NotFound from "../components/404"
+import {
+  withPostModeration,
+  postModerationSelector
+} from "../hoc/withPostModeration"
+import {
+  withCommentModeration,
+  commentModerationSelector
+} from "../hoc/withCommentModeration"
+import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 
 import { formatCommentsCount } from "../lib/posts"
 import { validateContentReportForm } from "../lib/validation"
@@ -24,13 +32,7 @@ import { replaceMoreComments } from "../actions/comment"
 import { setFocusedComment, clearFocusedComment } from "../actions/focus"
 import { formBeginEdit, formEndEdit } from "../actions/forms"
 import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
-import {
-  toggleUpvote,
-  approvePost,
-  removePost,
-  removeComment,
-  approveComment
-} from "../util/api_actions"
+import { toggleUpvote } from "../util/api_actions"
 import { getChannelName, getPostID, getCommentID } from "../lib/util"
 import { isModerator } from "../lib/channels"
 import { anyErrorExcept404 } from "../util/rest"
@@ -49,7 +51,9 @@ import type {
   CommentInTree,
   GenericComment,
   MoreCommentsInTree,
-  Post
+  Post,
+  CommentReportRecord,
+  PostReportRecord
 } from "../flow/discussionTypes"
 
 type PostPageProps = {
@@ -74,10 +78,14 @@ type PostPageProps = {
   postReportDialogVisible: boolean,
   commentReportDialogVisible: boolean,
   notFound: boolean,
-  errored: boolean
+  errored: boolean,
+  commentReports: Map<string, CommentReportRecord>,
+  approvePost: (p: Post) => void,
+  removePost: (p: Post) => void,
+  approveComment: (c: Comment) => void,
+  removeComment: (c: Comment) => void,
+  postReports: Map<string, PostReportRecord>
 }
-
-const DIALOG_REMOVE_COMMENT = "DIALOG_REMOVE_COMMENT"
 
 const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
 const DELETE_COMMENT_DIALOG = "DELETE_COMMENT_DIALOG"
@@ -138,14 +146,9 @@ class PostPage extends React.Component<*, void> {
   }
 
   loadData = async () => {
-    const {
-      dispatch,
-      channelName,
-      postID,
-      commentID,
-      channel,
-      moderators
-    } = this.props
+    const { dispatch, channelName, postID, commentID, channel } = this.props
+    let { moderators } = this.props
+
     if (!postID || !channelName) {
       // should not happen, this should be guaranteed by react-router
       throw Error("Match error")
@@ -161,8 +164,16 @@ class PostPage extends React.Component<*, void> {
     if (!channel) {
       dispatch(actions.channels.get(channelName))
     }
+
     if (!moderators) {
-      dispatch(actions.channelModerators.get(channelName))
+      const { response } = await dispatch(
+        actions.channelModerators.get(channelName)
+      )
+      moderators = response
+    }
+
+    if (isModerator(moderators, SETTINGS.username)) {
+      await dispatch(actions.reports.get(channelName))
     }
   }
 
@@ -186,26 +197,6 @@ class PostPage extends React.Component<*, void> {
         postId,
         parentId,
         comments
-      })
-    )
-  }
-
-  removePost = async (post: Post) => {
-    const { dispatch } = this.props
-    await removePost(dispatch, post)
-    dispatch(
-      setSnackbarMessage({
-        message: "Post has been removed"
-      })
-    )
-  }
-
-  approvePost = async (post: Post) => {
-    const { dispatch } = this.props
-    await approvePost(dispatch, post)
-    dispatch(
-      setSnackbarMessage({
-        message: "Post has been approved"
       })
     )
   }
@@ -254,36 +245,6 @@ class PostPage extends React.Component<*, void> {
   hidePostDialog = (dialogKey: string) => () => {
     const { dispatch } = this.props
     dispatch(hideDialog(dialogKey))
-  }
-
-  removeComment = async () => {
-    const { dispatch, focusedComment } = this.props
-
-    if (!focusedComment) {
-      // we are getting double events for this, so this is a hack to avoid dispatching
-      // a removeComment with a null comment
-      return
-    }
-
-    await removeComment(dispatch, focusedComment)
-
-    dispatch(
-      setSnackbarMessage({
-        message: "Comment has been removed"
-      })
-    )
-  }
-
-  approveComment = async (comment: CommentInTree) => {
-    const { dispatch } = this.props
-
-    await approveComment(dispatch, comment)
-
-    dispatch(
-      setSnackbarMessage({
-        message: "Comment has been approved"
-      })
-    )
   }
 
   deleteComment = async () => {
@@ -343,7 +304,7 @@ class PostPage extends React.Component<*, void> {
   }
 
   reportPost = async () => {
-    const { dispatch, post, forms } = this.props
+    const { dispatch, post, forms, isModerator, channelName } = this.props
     const form = getReportForm(forms)
     const { reason } = form.value
     const validation = validateContentReportForm(form)
@@ -362,6 +323,11 @@ class PostPage extends React.Component<*, void> {
           reason:  reason
         })
       )
+
+      if (isModerator) {
+        await dispatch(actions.reports.get(channelName))
+      }
+
       this.hideReportPostDialog()
       dispatch(
         setSnackbarMessage({
@@ -391,14 +357,20 @@ class PostPage extends React.Component<*, void> {
       commentsTree,
       forms,
       commentInFlight,
-      showRemoveCommentDialog,
       isModerator,
       postDeleteDialogVisible,
       commentDeleteDialogVisible,
       postReportDialogVisible,
       commentReportDialogVisible,
       notFound,
-      commentID
+      commentID,
+      commentReports,
+      postReports,
+      removePost,
+      approvePost,
+      removeComment,
+      approveComment,
+      postID
     } = this.props
 
     if (!channel) {
@@ -407,25 +379,13 @@ class PostPage extends React.Component<*, void> {
 
     const reportForm = getReportForm(forms)
     const showPermalinkUI = R.not(R.isNil(commentID))
+    const postReport = postReports.get(postID)
 
     return notFound
       ? <NotFound />
       : <div>
         <ChannelBreadcrumbs channel={channel} />
         <DocumentTitle title={formatTitle(post.title)} />
-        <Dialog
-          id="remove-comment-dialog"
-          open={showRemoveCommentDialog}
-          onAccept={this.removeComment}
-          hideDialog={this.hideCommentDialog(DIALOG_REMOVE_COMMENT)}
-          submitText="Yes, remove"
-        >
-          <p>
-              Are you sure? You will still be able to see the comment, but it
-              will be deleted for normal users. You can undo this later by
-              clicking "approve".
-          </p>
-        </Dialog>
         <Dialog
           open={commentDeleteDialogVisible}
           hideDialog={this.hideCommentDialog(DELETE_COMMENT_DIALOG)}
@@ -488,13 +448,14 @@ class PostPage extends React.Component<*, void> {
               post={post}
               isModerator={isModerator}
               toggleUpvote={toggleUpvote(dispatch)}
-              approvePost={this.approvePost.bind(this)}
-              removePost={this.removePost.bind(this)}
+              approvePost={approvePost.bind(this)}
+              removePost={removePost.bind(this)}
               forms={forms}
               beginEditing={beginEditing(dispatch)}
               showPostDeleteDialog={this.showPostDialog(DELETE_POST_DIALOG)}
               showPostReportDialog={this.showReportPostDialog}
               showPermalinkUI={showPermalinkUI}
+              report={postReport}
             />
             {showPermalinkUI
               ? null
@@ -520,8 +481,8 @@ class PostPage extends React.Component<*, void> {
           forms={forms}
           upvote={this.upvote}
           downvote={this.downvote}
-          approve={this.approveComment}
-          remove={this.showCommentDialog(DIALOG_REMOVE_COMMENT)}
+          approve={approveComment}
+          remove={removeComment}
           deleteComment={this.showCommentDialog(DELETE_COMMENT_DIALOG)}
           reportComment={this.showReportCommentDialog}
           isModerator={isModerator}
@@ -529,21 +490,14 @@ class PostPage extends React.Component<*, void> {
           beginEditing={beginEditing(dispatch)}
           processing={commentInFlight}
           commentPermalink={commentPermalink(channel.name, post.id)}
+          commentReports={commentReports}
         />
       </div>
   }
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const {
-    posts,
-    channels,
-    comments,
-    forms,
-    channelModerators,
-    ui,
-    focus
-  } = state
+  const { posts, channels, comments, forms, channelModerators, ui } = state
   const postID = getPostID(ownProps)
   const channelName = getChannelName(ownProps)
   const commentID = getCommentID(ownProps)
@@ -559,6 +513,8 @@ const mapStateToProps = (state, ownProps) => {
     : false
 
   return {
+    ...postModerationSelector(state, ownProps),
+    ...commentModerationSelector(state, ownProps),
     ui,
     postID,
     channelName,
@@ -570,12 +526,10 @@ const mapStateToProps = (state, ownProps) => {
     moderators,
     loaded,
     notFound,
-    focusedComment:             focus.comment,
     isModerator:                isModerator(moderators, SETTINGS.username),
     errored:                    anyErrorExcept404([posts, channels, comments]),
     subscribedChannels:         getSubscribedChannels(state),
     commentInFlight:            comments.processing,
-    showRemoveCommentDialog:    ui.dialogs.has(DIALOG_REMOVE_COMMENT),
     postDeleteDialogVisible:    ui.dialogs.has(DELETE_POST_DIALOG),
     commentDeleteDialogVisible: ui.dialogs.has(DELETE_COMMENT_DIALOG),
     postReportDialogVisible:    ui.dialogs.has(REPORT_POST_DIALOG),
@@ -583,6 +537,10 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default R.compose(connect(mapStateToProps), withNavSidebar, withLoading)(
-  PostPage
-)
+export default R.compose(
+  connect(mapStateToProps),
+  withPostModeration,
+  withCommentModeration,
+  withNavSidebar,
+  withLoading
+)(PostPage)

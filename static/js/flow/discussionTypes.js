@@ -26,14 +26,16 @@ export type ChannelEditValidation = {
 }
 
 export type AuthoredContent = {
-  id:            string,
-  author_id:     string,
-  score:         number,
-  upvoted:       boolean,
-  created:       string,
-  profile_image: string,
-  author_name:   string,
-  edited:        boolean,
+  id:              string,
+  author_id:       string,
+  score:           number,
+  upvoted:         boolean,
+  created:         string,
+  profile_image:   string,
+  author_name:     string,
+  edited:          boolean,
+  num_reports:     number,
+  ignore_reports?: boolean,
 }
 
 export type Post = AuthoredContent & {
@@ -44,7 +46,7 @@ export type Post = AuthoredContent & {
   channel_name:  string,
   channel_title: string,
   stickied:      boolean,
-  removed:       boolean
+  removed:       boolean,
 }
 
 export type PostForm = {
@@ -156,3 +158,17 @@ export type GenericReport = PostReport | CommentReport
 export type ReportValidation = {
   reason: string
 }
+
+export type PostReportRecord = {
+  post: Post,
+  comment: null,
+  reasons: Array<string>
+}
+
+export type CommentReportRecord = {
+  comment: CommentFromAPI,
+  post: null,
+  reasons: Array<string>
+}
+
+export type ReportRecord = PostReportRecord | CommentReportRecord

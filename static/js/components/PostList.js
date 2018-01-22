@@ -3,7 +3,7 @@ import React from "react"
 
 import CompactPostDisplay from "./CompactPostDisplay"
 
-import type { Post } from "../flow/discussionTypes"
+import type { Post, PostReportRecord } from "../flow/discussionTypes"
 
 type PostListProps = {
   posts: Array<Post>,
@@ -11,7 +11,8 @@ type PostListProps = {
   showPinUI?: boolean,
   toggleUpvote: Post => void,
   togglePinPost?: Post => Promise<*>,
-  isModerator?: boolean
+  isModerator?: boolean,
+  postReports?: Map<string, PostReportRecord>
 }
 
 const PostList = (props: PostListProps) => {
@@ -21,7 +22,8 @@ const PostList = (props: PostListProps) => {
     showPinUI,
     isModerator,
     toggleUpvote,
-    togglePinPost
+    togglePinPost,
+    postReports
   } = props
 
   return (
@@ -36,6 +38,7 @@ const PostList = (props: PostListProps) => {
             showPinUI={showPinUI}
             isModerator={isModerator}
             togglePinPost={togglePinPost}
+            report={postReports ? postReports.get(post.id) : undefined}
           />
         )
         : <div className="empty-list-msg">There are no posts to display.</div>}

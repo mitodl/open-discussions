@@ -11,7 +11,7 @@ import {
   PostVotingButtons
 } from "../lib/posts"
 
-import type { Post } from "../flow/discussionTypes"
+import type { Post, PostReportRecord } from "../flow/discussionTypes"
 
 class CompactPostDisplay extends React.Component<*, void> {
   props: {
@@ -20,7 +20,10 @@ class CompactPostDisplay extends React.Component<*, void> {
     toggleUpvote: Post => void,
     togglePinPost: Post => void,
     showPinUI: boolean,
-    isModerator: boolean
+    isModerator: boolean,
+    report?: PostReportRecord,
+    removePost?: (p: Post) => void,
+    ignorePostReports?: (p: Post) => void
   }
 
   showChannelLink = () => {
@@ -40,7 +43,10 @@ class CompactPostDisplay extends React.Component<*, void> {
       toggleUpvote,
       showPinUI,
       togglePinPost,
-      isModerator
+      isModerator,
+      report,
+      removePost,
+      ignorePostReports
     } = this.props
     const formattedDate = moment(post.created).fromNow()
 
@@ -61,9 +67,22 @@ class CompactPostDisplay extends React.Component<*, void> {
             <Link to={postDetailURL(post.channel_name, post.id)}>
               {formatCommentsCount(post)}
             </Link>
+            {isModerator && report
+              ? <div className="report-count">
+                  Reports: {report.post.num_reports}
+              </div>
+              : null}
             {showPinUI && post.text && isModerator
               ? <a onClick={() => togglePinPost(post)}>
                 {post.stickied ? "unpin" : "pin"}
+              </a>
+              : null}
+            {isModerator && removePost
+              ? <a onClick={() => removePost(post)}>remove</a>
+              : null}
+            {isModerator && ignorePostReports
+              ? <a onClick={() => ignorePostReports(post)}>
+                  ignore all reports
               </a>
               : null}
           </div>

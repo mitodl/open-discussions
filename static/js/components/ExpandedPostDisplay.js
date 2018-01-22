@@ -11,7 +11,7 @@ import { formatPostTitle, PostVotingButtons } from "../lib/posts"
 import { addEditedMarker } from "../lib/reddit_objects"
 import { editPostKey } from "../components/CommentForms"
 
-import type { Post } from "../flow/discussionTypes"
+import type { Post, PostReportRecord } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 
 const textContent = post =>
@@ -33,7 +33,8 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     beginEditing: (key: string, initialValue: Object, e: ?Event) => void,
     showPostDeleteDialog: () => void,
     showPostReportDialog: () => void,
-    showPermalinkUI: boolean
+    showPermalinkUI: boolean,
+    report?: PostReportRecord
   }
 
   renderTextContent = () => {
@@ -67,7 +68,8 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
       beginEditing,
       isModerator,
       showPostDeleteDialog,
-      showPostReportDialog
+      showPostReportDialog,
+      report
     } = this.props
 
     return (
@@ -83,6 +85,11 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
             onClick={beginEditing(editPostKey(post), post)}
           >
             <a href="#">edit</a>
+          </div>
+          : null}
+        {isModerator && report
+          ? <div className="report-count">
+              Reports: {report.post.num_reports}
           </div>
           : null}
         {SETTINGS.username === post.author_id

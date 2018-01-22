@@ -12,6 +12,7 @@ import { urlHostname } from "../lib/url"
 import { formatCommentsCount } from "../lib/posts"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import { makePostReport } from "../factories/reports"
 
 describe("CompactPostDisplay", () => {
   let helper, post
@@ -53,7 +54,7 @@ describe("CompactPostDisplay", () => {
 
   it("should link to the subreddit, if told to", () => {
     post.channel_name = "channel_name"
-    const wrapper = renderPostDisplay({ post: post, showChannelLink: true })
+    const wrapper = renderPostDisplay({ post, showChannelLink: true })
     const linkProps = wrapper.find(Link).at(1).props()
     assert.equal(linkProps.to, "/channel/channel_name")
     assert.equal(linkProps.children, post.channel_title)
@@ -61,7 +62,7 @@ describe("CompactPostDisplay", () => {
 
   it("should include an external link, if a url post", () => {
     const post = makePost(true)
-    const wrapper = renderPostDisplay({ post: post })
+    const wrapper = renderPostDisplay({ post })
     const { href, target, children } = wrapper.find("a").at(0).props()
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
@@ -73,7 +74,7 @@ describe("CompactPostDisplay", () => {
       const post = makePost()
       post.stickied = pinned
       const wrapper = renderPostDisplay({
-        post:        post,
+        post,
         showPinUI:   true,
         isModerator: true
       })
@@ -109,7 +110,7 @@ describe("CompactPostDisplay", () => {
     const post = makePost()
     post.stickied = true
     const wrapper = renderPostDisplay({
-      post:          post,
+      post,
       showPinUI:     true,
       isModerator:   true,
       togglePinPost: togglePinPostStub
@@ -120,12 +121,12 @@ describe("CompactPostDisplay", () => {
 
   it("should display the domain, for a url post", () => {
     const post = makePost(true)
-    const wrapper = renderPostDisplay({ post: post })
+    const wrapper = renderPostDisplay({ post })
     assert.include(wrapper.find(".url-hostname").text(), urlHostname(post.url))
   })
 
   it("should link to the detail view, if a text post", () => {
-    const wrapper = renderPostDisplay({ post: post })
+    const wrapper = renderPostDisplay({ post })
     const { to, children } = wrapper.find(Link).at(0).props()
     assert.equal(children, post.title)
     assert.equal(to, `/channel/${post.channel_name}/${post.id}`)
@@ -159,8 +160,8 @@ describe("CompactPostDisplay", () => {
         })
       )
       const wrapper = renderPostDisplay({
-        post:         post,
-        toggleUpvote: toggleUpvote
+        post,
+        toggleUpvote
       })
       assertButton(wrapper, prevUpvote, false)
       wrapper.find(".upvote-button").simulate("click")
@@ -174,5 +175,39 @@ describe("CompactPostDisplay", () => {
       await wait(10)
       assertButton(wrapper, !prevUpvote, false)
     })
+  })
+
+  it("should render a report count, if passed a report and moderator", () => {
+    const report = makePostReport(post)
+    const wrapper = renderPostDisplay({ post, report, isModerator: true })
+    const count = wrapper.find(".report-count")
+    assert.ok(count.exists())
+    assert.equal(count.text(), `Reports: ${report.post.num_reports}`)
+  })
+
+  it("should put a remove button, if it gets the right props", () => {
+    const removePostStub = helper.sandbox.stub()
+    const wrapper = renderPostDisplay({
+      post,
+      isModerator: true,
+      removePost:  removePostStub
+    })
+    const link = wrapper.find("a").at(2)
+    assert.equal(link.text(), "remove")
+    link.simulate("click")
+    assert.ok(removePostStub.calledWith(post))
+  })
+
+  it("should put an ignore button, if it gets the right props", () => {
+    const ignorePostStub = helper.sandbox.stub()
+    const wrapper = renderPostDisplay({
+      post,
+      isModerator:       true,
+      ignorePostReports: ignorePostStub
+    })
+    const link = wrapper.find("a").at(2)
+    assert.equal(link.text(), "ignore all reports")
+    link.simulate("click")
+    assert.ok(ignorePostStub.calledWith(post))
   })
 })
