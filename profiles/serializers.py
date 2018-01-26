@@ -8,14 +8,16 @@ import ulid
 from rest_framework import serializers
 
 from channels.api import get_or_create_auth_tokens
-from profiles.models import Profile
+from profiles.models import Profile, PROFILE_PROPS
 
 
 class ProfileSerializer(serializers.ModelSerializer):
     """Serializer for Profile"""
+    email_optin = serializers.BooleanField(write_only=True, required=False)
+
     class Meta:
         model = Profile
-        fields = ('name', 'image', 'image_small', 'image_medium')
+        fields = ('name', 'image', 'image_small', 'image_medium', 'email_optin')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -25,6 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CreateOnlyDefault(ulid.new)
     )
+    email = serializers.CharField(write_only=True, required=False)
     profile = ProfileSerializer()
 
     def create(self, validated_data):
@@ -39,17 +42,20 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', None)
 
-        if profile_data:
-            profile = instance.profile
-            profile.name = profile_data.get('name', profile.name)
-            profile.image = profile_data.get('image', profile.image)
-            profile.image_small = profile_data.get('image_small', profile.image_small)
-            profile.image_medium = profile_data.get('image_medium', profile.image_medium)
-            profile.save()
+        with transaction.atomic():
+
+            instance.email = validated_data.pop('email', instance.email)
+            instance.save()
+
+            if profile_data:
+                profile = instance.profile
+                for prop_name in PROFILE_PROPS:
+                    setattr(profile, prop_name, profile_data.get(prop_name, getattr(profile, prop_name)))
+                profile.save()
 
         return instance
 
     class Meta:
         model = get_user_model()
-        fields = ('id', 'username', 'profile')
+        fields = ('id', 'username', 'profile', 'email')
         read_only_fields = ('id',)

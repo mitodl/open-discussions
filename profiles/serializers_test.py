@@ -35,6 +35,7 @@ def test_serialize_create_user(db, mocker):
         'image': 'image',
         'image_small': 'image_small',
         'image_medium': 'image_medium',
+        'email_optin': True,
     }
 
     get_or_create_auth_tokens_stub = mocker.patch('profiles.serializers.get_or_create_auth_tokens')
@@ -42,6 +43,8 @@ def test_serialize_create_user(db, mocker):
         'profile': profile
     })
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
+
+    del profile['email_optin']  # is write-only
 
     assert UserSerializer(user).data == {
         'id': user.id,
@@ -55,6 +58,8 @@ def test_serialize_create_user(db, mocker):
     ('image', 'image_value'),
     ('image_small', 'image_small_value'),
     ('image_medium', 'image_medium_value'),
+    ('email_optin', True),
+    ('email_optin', False),
 ])
 def test_update_user_profile(user, key, value):
     """
@@ -66,6 +71,7 @@ def test_update_user_profile(user, key, value):
         'image': profile.image,
         'image_small': profile.image_small,
         'image_medium': profile.image_medium,
+        'email_optin': None,
     }
 
     expected_profile[key] = value
@@ -80,8 +86,11 @@ def test_update_user_profile(user, key, value):
 
     profile2 = Profile.objects.first()
 
-    for prop in ('name', 'image', 'image_small', 'image_medium'):
+    for prop in ('name', 'image', 'image_small', 'image_medium', 'email_optin'):
         if prop == key:
-            assert getattr(profile2, prop) == value
+            if isinstance(value, bool):
+                assert getattr(profile2, prop) is value
+            else:
+                assert getattr(profile2, prop) == value
         else:
             assert getattr(profile2, prop) == getattr(profile, prop)

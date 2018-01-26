@@ -30,10 +30,17 @@ def test_list_users(client, staff_user, staff_jwt_header):
     ]
 
 
-def test_create_user(client, staff_jwt_header, mocker):
+# These can be removed once all clients have been updated and are sending both these fields
+@pytest.mark.parametrize('email', ['', 'test.email@example.com'])
+@pytest.mark.parametrize('optin', [None, True, False])
+def test_create_user(
+        client, staff_user, staff_jwt_header, mocker, email, optin
+):  # pylint: disable=too-many-arguments
     """
     Create a user and assert the response
     """
+    staff_user.email = ''
+    staff_user.save()
     url = reverse('user_api-list')
     payload = {
         'profile': {
@@ -43,11 +50,20 @@ def test_create_user(client, staff_jwt_header, mocker):
             'image_medium': 'image_medium',
         }
     }
+    if email:
+        payload['email'] = email
+    if optin is not None:
+        payload['profile']['email_optin'] = optin
     get_or_create_auth_tokens_stub = mocker.patch('profiles.serializers.get_or_create_auth_tokens')
     resp = client.post(url, data=payload, **staff_jwt_header)
     assert resp.status_code == 201
+    if 'email_optin' in payload['profile']:
+        del payload['profile']['email_optin']
     assert resp.json()['profile'] == payload['profile']
-    get_or_create_auth_tokens_stub.assert_called_once_with(User.objects.get(username=resp.json()['username']))
+    user = User.objects.get(username=resp.json()['username'])
+    get_or_create_auth_tokens_stub.assert_called_once_with(user)
+    assert user.email == email
+    assert user.profile.email_optin is optin
 
 
 def test_get_user(client, user, staff_jwt_header):
@@ -70,17 +86,27 @@ def test_get_user(client, user, staff_jwt_header):
     }
 
 
-def test_patch_user(client, user, staff_jwt_header):
+# These can be removed once all clients have been updated and are sending both these fields
+@pytest.mark.parametrize('email', ['', 'test.email@example.com'])
+@pytest.mark.parametrize('optin', [None, True, False])
+def test_patch_user(client, user, staff_jwt_header, email, optin):
     """
     Update a users' profile
     """
+    user.email = ''
+    user.save()
     profile = user.profile
-    url = reverse('user_api-detail', kwargs={'username': user.username})
-    resp = client.patch(url, data={
+    payload = {
         'profile': {
             'name': 'othername',
         }
-    }, **staff_jwt_header)
+    }
+    if email:
+        payload['email'] = email
+    if optin is not None:
+        payload['profile']['email_optin'] = optin
+    url = reverse('user_api-detail', kwargs={'username': user.username})
+    resp = client.patch(url, data=payload, **staff_jwt_header)
     assert resp.status_code == 200
     assert resp.json() == {
         'id': user.id,
@@ -92,6 +118,10 @@ def test_patch_user(client, user, staff_jwt_header):
             'image_medium': profile.image_medium,
         }
     }
+    user.refresh_from_db()
+    profile.refresh_from_db()
+    assert user.email == email
+    assert profile.email_optin is optin
 
 
 def test_patch_username(client, user, staff_jwt_header):
