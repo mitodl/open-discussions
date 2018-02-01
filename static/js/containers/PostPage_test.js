@@ -8,6 +8,7 @@ import { Link } from "react-router-dom"
 import CommentTree from "../components/CommentTree"
 import NotFound from "../components/404"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
+import PostPage from "./PostPage"
 
 import { makePost, makeChannelPostList } from "../factories/posts"
 import {
@@ -33,6 +34,7 @@ import { postDetailURL, channelURL, commentPermalink } from "../lib/url"
 import { formatTitle } from "../lib/title"
 import { createCommentTree } from "../reducers/comments"
 import { makeReportRecord } from "../factories/reports"
+import { VALID_COMMENT_SORT_TYPES } from "../lib/sorting"
 
 describe("PostPage", function() {
   let helper,
@@ -563,5 +565,29 @@ describe("PostPage", function() {
     )
     assert.equal(wrapper.find(".main-content").text(), "Error loading page")
     assert.isFalse(wrapper.find(NotFound).exists())
+  })
+
+  it("should switch the sorting method when an option is selected", async () => {
+    const [wrapper] = await renderPage()
+
+    for (const sortType of VALID_COMMENT_SORT_TYPES) {
+      await listenForActions(
+        [
+          actions.posts.get.requestType,
+          actions.posts.get.successType,
+          actions.comments.get.requestType,
+          actions.comments.get.successType
+        ],
+        () => {
+          const select = wrapper.find(".sorter").find("select")
+          select.simulate("change", { target: { value: sortType } })
+        }
+      )
+
+      assert.equal(
+        wrapper.find(PostPage).props().location.search,
+        `?sort=${sortType}`
+      )
+    }
   })
 })

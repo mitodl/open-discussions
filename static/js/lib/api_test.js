@@ -34,6 +34,7 @@ import {
   makeMoreCommentsResponse
 } from "../factories/comments"
 import { makeReportRecord } from "../factories/reports"
+import { COMMENT_SORT_NEW } from "../lib/sorting"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
@@ -216,13 +217,29 @@ describe("api", function() {
       assert.deepEqual(result.posts, posts)
     })
 
-    it("gets comments for a post", async () => {
-      const post = makePost()
-      const response = makeCommentsResponse(post)
-      fetchJSONStub.returns(Promise.resolve(response))
+    describe("getComments", () => {
+      let post, response
 
-      const resp = await getComments(post.id)
-      assert.deepEqual(resp, response)
+      beforeEach(() => {
+        post = makePost()
+        response = makeCommentsResponse(post)
+        fetchJSONStub.returns(Promise.resolve(response))
+      })
+
+      it("gets comments for a post", async () => {
+        const resp = await getComments(post.id, {})
+        assert.deepEqual(resp, response)
+      })
+
+      it("includes the sort parameter when getting comments", async () => {
+        const resp = await getComments(post.id, { sort: COMMENT_SORT_NEW })
+        assert.deepEqual(resp, response)
+        assert.ok(
+          fetchJSONStub.calledWith(
+            `/api/v0/posts/${post.id}/comments/?sort=new`
+          )
+        )
+      })
     })
 
     it("gets a single comment", async () => {

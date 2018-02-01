@@ -12,7 +12,7 @@ import withLoading from "../components/Loading"
 import PostListNavigation from "../components/PostListNavigation"
 import withNavAndChannelSidebars from "../hoc/withNavAndChannelSidebars"
 import NotFound from "../components/404"
-import PostSortPicker from "../components/PostSortPicker"
+import { PostSortPicker } from "../components/SortPicker"
 import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 
 import { actions } from "../actions"
@@ -28,7 +28,7 @@ import { getSubscribedChannels } from "../lib/redux_selectors"
 import { formatTitle } from "../lib/title"
 import { clearChannelError } from "../actions/channel"
 import { evictPostsForChannel } from "../actions/posts_for_channel"
-import { updateSortParam, POSTS_SORT_HOT } from "../lib/sorting"
+import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -156,7 +156,7 @@ class ChannelPage extends React.Component<*, void> {
                   {channel.title}
                 </div>
                 <PostSortPicker
-                  updateSortParam={updateSortParam(this.props)}
+                  updateSortParam={updatePostSortParam(this.props)}
                   value={qs.parse(search).sort || POSTS_SORT_HOT}
                 />
               </div>

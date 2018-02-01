@@ -6,6 +6,7 @@ import R from "ramda"
 import DocumentTitle from "react-document-title"
 import { Dialog } from "@mitodl/mdl-react-components"
 import { Link } from "react-router-dom"
+import qs from "query-string"
 
 import Card from "../components/Card"
 import withLoading from "../components/Loading"
@@ -24,6 +25,8 @@ import {
   commentModerationSelector
 } from "../hoc/withCommentModeration"
 import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
+import { CommentSortPicker } from "../components/SortPicker"
+import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/sorting"
 
 import { formatCommentsCount } from "../lib/posts"
 import { validateContentReportForm } from "../lib/validation"
@@ -43,7 +46,7 @@ import { channelURL, postDetailURL, commentPermalink } from "../lib/url"
 import { clearPostError } from "../actions/post"
 
 import type { Dispatch } from "redux"
-import type { Match } from "react-router"
+import type { Match, Location } from "react-router"
 import type { FormsState } from "../flow/formTypes"
 import type {
   Channel,
@@ -84,7 +87,8 @@ type PostPageProps = {
   removePost: (p: Post) => void,
   approveComment: (c: Comment) => void,
   removeComment: (c: Comment) => void,
-  postReports: Map<string, PostReportRecord>
+  postReports: Map<string, PostReportRecord>,
+  location: Location
 }
 
 const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
@@ -111,7 +115,8 @@ const shouldLoadData = R.complement(
   R.allPass([
     R.eqProps("postID"),
     R.eqProps("channelName"),
-    R.eqProps("commentID")
+    R.eqProps("commentID"),
+    R.eqBy(R.path(["location", "search"]))
   ])
 )
 
@@ -146,7 +151,14 @@ class PostPage extends React.Component<*, void> {
   }
 
   loadData = async () => {
-    const { dispatch, channelName, postID, commentID, channel } = this.props
+    const {
+      dispatch,
+      channelName,
+      postID,
+      commentID,
+      channel,
+      location: { search }
+    } = this.props
     let { moderators } = this.props
 
     if (!postID || !channelName) {
@@ -157,7 +169,7 @@ class PostPage extends React.Component<*, void> {
     try {
       await Promise.all([
         dispatch(actions.posts.get(postID)),
-        dispatch(actions.comments.get(postID, commentID))
+        dispatch(actions.comments.get(postID, commentID, qs.parse(search)))
       ])
     } catch (_) {} // eslint-disable-line no-empty
 
@@ -370,7 +382,8 @@ class PostPage extends React.Component<*, void> {
       approvePost,
       removeComment,
       approveComment,
-      postID
+      postID,
+      location: { search }
     } = this.props
 
     if (!channel) {
@@ -473,8 +486,14 @@ class PostPage extends React.Component<*, void> {
                   View the rest of the comments
             </Link>
           </Card>
-          : <div className="comments-count">
-            {formatCommentsCount(post)}
+          : <div className="count-and-sort">
+            <div className="comments-count">
+              {formatCommentsCount(post)}
+            </div>
+            <CommentSortPicker
+              updateSortParam={updateCommentSortParam(this.props)}
+              value={qs.parse(search).sort || COMMENT_SORT_BEST}
+            />
           </div>}
         <CommentTree
           comments={commentsTree}

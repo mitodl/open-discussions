@@ -156,7 +156,13 @@
   outline: none;
 }
 
-.comments-count {
-  margin: 0 0 18px 22px;
-  font-size: 15px;
+.count-and-sort {
+  margin: 20px 0 20px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .comments-count {
+    font-size: 15px;
+  }
 }

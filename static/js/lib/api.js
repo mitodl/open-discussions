@@ -23,11 +23,12 @@ import type {
   ReportRecord
 } from "../flow/discussionTypes"
 
-const getPaginationSortQS = R.compose(
-  toQueryString,
-  R.reject(R.isNil),
-  getPaginationSortParams
-)
+const paramsToQueryString = paramSelector =>
+  R.compose(toQueryString, R.reject(R.isNil), paramSelector)
+
+const getPaginationSortQS = paramsToQueryString(getPaginationSortParams)
+
+const getCommentSortQS = paramsToQueryString(R.pickAll(["sort"]))
 
 export function getFrontpage(params: PostListPaginationParams): Promise<Post> {
   return fetchJSONWithAuthFailure(
@@ -102,9 +103,12 @@ export function getPost(postId: string): Promise<Post> {
 }
 
 export function getComments(
-  postID: string
+  postID: string,
+  params: Object
 ): Promise<Array<CommentFromAPI | MoreCommentsFromAPI>> {
-  return fetchJSONWithAuthFailure(`/api/v0/posts/${postID}/comments/`)
+  return fetchJSONWithAuthFailure(
+    `/api/v0/posts/${postID}/comments/${getCommentSortQS(params)}`
+  )
 }
 
 export const getComment = (

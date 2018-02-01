@@ -215,11 +215,12 @@ export const commentsEndpoint = {
   verbs:   [GET, PATCH, POST, DELETE],
   getFunc: async (
     postId: string,
-    commentId?: string
+    commentId?: string,
+    params?: Object
   ): Promise<GetCommentsPayload> => {
     const comments = commentId
       ? await api.getComment(commentId)
-      : await api.getComments(postId)
+      : await api.getComments(postId, params || {})
 
     return {
       postId:   postId,
