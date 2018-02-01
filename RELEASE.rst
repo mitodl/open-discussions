@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.12.0
+--------------
+
+- Added email and email_optin fields to user API (#447)
+
 Version 0.11.0
 --------------
 
