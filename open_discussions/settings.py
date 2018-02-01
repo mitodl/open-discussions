@@ -75,11 +75,13 @@ INSTALLED_APPS = (
     'raven.contrib.django.raven_compat',
     'rest_framework',
     'corsheaders',
+    "anymail",
     # Put our apps after this point
     'open_discussions',
     'channels',
     'profiles',
     'sites',
+    'mail',
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -205,17 +207,25 @@ EMAIL_USE_TLS = get_bool('OPEN_DISCUSSIONS_EMAIL_TLS', False)
 EMAIL_SUPPORT = get_string('OPEN_DISCUSSIONS_SUPPORT_EMAIL', 'support@example.com')
 DEFAULT_FROM_EMAIL = get_string('OPEN_DISCUSSIONS_FROM_EMAIL', 'webmaster@localhost')
 
-MAILGUN_URL = get_string('MAILGUN_URL', None)
-if not MAILGUN_URL:
-    raise ImproperlyConfigured("MAILGUN_URL not set")
+NOTIFICATION_EMAIL_BACKEND = get_string(
+    'OPEN_DISCUSSIONS_NOTIFICATION_EMAIL_BACKEND',
+    'anymail.backends.mailgun.EmailBackend'
+)
+
+MAILGUN_SENDER_DOMAIN = get_string('MAILGUN_SENDER_DOMAIN', None)
+if not MAILGUN_SENDER_DOMAIN:
+    raise ImproperlyConfigured("MAILGUN_SENDER_DOMAIN not set")
 MAILGUN_KEY = get_string('MAILGUN_KEY', None)
 if not MAILGUN_KEY:
     raise ImproperlyConfigured("MAILGUN_KEY not set")
-MAILGUN_BATCH_CHUNK_SIZE = get_int('MAILGUN_BATCH_CHUNK_SIZE', 1000)
 MAILGUN_RECIPIENT_OVERRIDE = get_string('MAILGUN_RECIPIENT_OVERRIDE', None)
 MAILGUN_FROM_EMAIL = get_string('MAILGUN_FROM_EMAIL', 'no-reply@example.com')
-MAILGUN_BCC_TO_EMAIL = get_string('MAILGUN_BCC_TO_EMAIL', 'no-reply@example.com')
+MAILGUN_BCC_TO_EMAIL = get_string('MAILGUN_BCC_TO_EMAIL', None)
 
+ANYMAIL = {
+    "MAILGUN_API_KEY": MAILGUN_KEY,
+    "MAILGUN_SENDER_DOMAIN": MAILGUN_SENDER_DOMAIN,
+}
 
 # e-mail configurable admins
 ADMIN_EMAIL = get_string('OPEN_DISCUSSIONS_ADMIN_EMAIL', '')

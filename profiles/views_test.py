@@ -40,6 +40,8 @@ def test_create_user(
     Create a user and assert the response
     """
     staff_user.email = ''
+    staff_user.profile.email_optin = None
+    staff_user.profile.save()
     staff_user.save()
     url = reverse('user_api-list')
     payload = {
@@ -96,6 +98,8 @@ def test_patch_user(client, user, staff_jwt_header, email, optin):
     user.email = ''
     user.save()
     profile = user.profile
+    profile.email_optin = None
+    profile.save()
     payload = {
         'profile': {
             'name': 'othername',

@@ -13,5 +13,7 @@ class ProfileFactory(DjangoModelFactory):
     image_small = Faker('file_path', extension='jpg')
     image_medium = Faker('file_path', extension='jpg')
 
+    email_optin = Faker('boolean')
+
     class Meta:
         model = Profile

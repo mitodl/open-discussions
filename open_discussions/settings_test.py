@@ -16,7 +16,7 @@ import semantic_version
 REQUIRED_SETTINGS = {
     'MICROMASTERS_BASE_URL': 'http://fake/',
     'MICROMASTERS_EXTERNAL_LOGIN_URL': 'http://fake/',
-    'MAILGUN_URL': 'http://mailgun.url',
+    'MAILGUN_SENDER_DOMAIN': 'mailgun.fake.domain',
     'MAILGUN_KEY': 'fake_mailgun_key',
     'OPEN_DISCUSSIONS_COOKIE_NAME': 'cookie_monster',
 }

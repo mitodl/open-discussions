@@ -42,15 +42,12 @@
     "MAILGUN_KEY": {
       "description": "The token for authenticating against the Mailgun API"
     },
-    "MAILGUN_BATCH_CHUNK_SIZE": {
-      "description": "Maximum number of emails to send in a batch",
-      "required": false
-    },
     "MAILGUN_FROM_EMAIL": {
       "description": "Email which mail comes from"
     },
     "MAILGUN_BCC_TO_EMAIL": {
-      "description": "Email address used with bcc email"
+      "description": "Email address used with bcc email",
+      "required": false
     },
     "MICROMASTERS_EXTERNAL_LOGIN_URL": {
       "description": "URL displayed to users so they can login to MicroMasters"

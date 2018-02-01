@@ -10,6 +10,7 @@ dj-static==0.0.6
 django-redis==4.7.0
 django-server-status==0.3.2
 django-webpack-loader==0.4.1
+django-anymail[mailgun]
 djangorestframework==3.5.2
 djangorestframework-jwt==1.11.0
 factory_boy
