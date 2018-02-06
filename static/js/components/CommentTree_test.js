@@ -3,7 +3,7 @@ import React from "react"
 import sinon from "sinon"
 import R from "ramda"
 import { assert } from "chai"
-import { shallow } from "enzyme"
+import { mount } from "enzyme"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 
@@ -15,7 +15,9 @@ import {
   editCommentKey
 } from "./CommentForms"
 import { commentPermalink } from "../lib/url"
+import Router from "../Router"
 
+import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeCommentsResponse, makeMoreComments } from "../factories/comments"
 import { makePost } from "../factories/posts"
 import { createCommentTree } from "../reducers/comments"
@@ -24,7 +26,6 @@ import { makeCommentReport } from "../factories/reports"
 describe("CommentTree", () => {
   let comments,
     post,
-    sandbox,
     upvoteStub,
     downvoteStub,
     removeStub,
@@ -33,45 +34,48 @@ describe("CommentTree", () => {
     loadMoreCommentsStub,
     deleteCommentStub,
     reportCommentStub,
-    permalinkFunc
+    permalinkFunc,
+    helper
 
   beforeEach(() => {
     post = makePost()
+    helper = new IntegrationTestHelper()
     comments = createCommentTree(makeCommentsResponse(post))
-    sandbox = sinon.sandbox.create()
-    upvoteStub = sandbox.stub()
-    downvoteStub = sandbox.stub()
-    removeStub = sandbox.stub()
-    approveStub = sandbox.stub()
-    beginEditingStub = sandbox.stub()
-    loadMoreCommentsStub = sandbox.stub()
-    deleteCommentStub = sandbox.stub()
-    reportCommentStub = sandbox.stub()
+    upvoteStub = helper.sandbox.stub()
+    downvoteStub = helper.sandbox.stub()
+    removeStub = helper.sandbox.stub()
+    approveStub = helper.sandbox.stub()
+    beginEditingStub = helper.sandbox.stub()
+    loadMoreCommentsStub = helper.sandbox.stub()
+    deleteCommentStub = helper.sandbox.stub()
+    reportCommentStub = helper.sandbox.stub()
     permalinkFunc = commentPermalink("channel", post.id)
   })
 
   afterEach(() => {
-    sandbox.restore()
+    helper.cleanup()
   })
 
   const renderCommentTree = (props = {}) =>
-    shallow(
-      <CommentTree
-        comments={comments}
-        forms={{}}
-        upvote={upvoteStub}
-        downvote={downvoteStub}
-        approveStub={approveStub}
-        removeStub={removeStub}
-        beginEditing={R.curry(beginEditingStub)}
-        processing={false}
-        loadMoreComments={loadMoreCommentsStub}
-        deleteComment={deleteCommentStub}
-        reportComment={reportCommentStub}
-        commentPermalink={permalinkFunc}
-        commentReports={new Map()}
-        {...props}
-      />
+    mount(
+      <Router store={helper.store} history={helper.browserHistory}>
+        <CommentTree
+          comments={comments}
+          forms={{}}
+          upvote={upvoteStub}
+          downvote={downvoteStub}
+          approveStub={approveStub}
+          removeStub={removeStub}
+          beginEditing={R.curry(beginEditingStub)}
+          processing={false}
+          loadMoreComments={loadMoreCommentsStub}
+          deleteComment={deleteCommentStub}
+          reportComment={reportCommentStub}
+          commentPermalink={permalinkFunc}
+          commentReports={new Map()}
+          {...props}
+        />
+      </Router>
     )
 
   it("should render all top-level comments as separate cards", () => {
@@ -94,12 +98,16 @@ describe("CommentTree", () => {
     comments[0].text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
     comments[0].edited = false
     const wrapper = renderCommentTree()
-    const firstComment = wrapper.find(".top-level-comment").at(0)
+    const firstComment = wrapper
+      .find(".top-level-comment")
+      .at(0)
+      .find(ReactMarkdown)
+
     assert.equal(
       firstComment.find(ReactMarkdown).first().props().source,
       comments[0].text
     )
-    assert.lengthOf(firstComment.find(".row img"), 0)
+    assert.lengthOf(firstComment.find("img"), 0)
   })
 
   it("should render a profile image", () => {
@@ -145,7 +153,7 @@ describe("CommentTree", () => {
     SETTINGS.username = comments[0].author_id
     const wrapper = renderCommentTree()
     const eventStub = {
-      preventDefault: sandbox.stub()
+      preventDefault: helper.sandbox.stub()
     }
     wrapper
       .find(".comment-action-button.delete-button")
@@ -246,7 +254,7 @@ describe("CommentTree", () => {
     })
 
     it("should include an ignoreCommentReports button if report and moderator", () => {
-      const ignoreCommentReportsStub = sandbox.stub()
+      const ignoreCommentReportsStub = helper.sandbox.stub()
       const wrapper = renderCommentTree({
         commentReports,
         isModerator,
@@ -256,7 +264,7 @@ describe("CommentTree", () => {
       const ignoreButton = wrapper.find(".ignore-button")
       assert.equal(ignoreButton.text(), "ignore all reports")
       const eventStub = {
-        preventDefault: sandbox.stub()
+        preventDefault: helper.sandbox.stub()
       }
       ignoreButton.props().onClick(eventStub)
       assert.ok(eventStub.preventDefault.called)

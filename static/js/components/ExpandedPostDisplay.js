@@ -2,25 +2,16 @@
 /* global SETTINGS: false */
 import React from "react"
 import moment from "moment"
-import ReactMarkdown from "react-markdown"
 import R from "ramda"
 
 import { EditPostForm } from "../components/CommentForms"
+import { renderTextContent } from "./Markdown"
 
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
-import { addEditedMarker } from "../lib/reddit_objects"
 import { editPostKey } from "../components/CommentForms"
 
 import type { Post, PostReportRecord } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
-
-const textContent = post =>
-  <ReactMarkdown
-    disallowedTypes={["Image"]}
-    source={addEditedMarker(post)}
-    escapeHtml
-    className="text-content"
-  />
 
 export default class ExpandedPostDisplay extends React.Component<*, void> {
   props: {
@@ -42,7 +33,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
 
     return R.has(editPostKey(post), forms)
       ? <EditPostForm post={post} editing />
-      : textContent(post)
+      : renderTextContent(post)
   }
 
   approvePost = (e: Event) => {

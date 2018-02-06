@@ -1,9 +1,9 @@
 // @flow
 import React from "react"
-import ReactMarkdown from "react-markdown"
 import { Link } from "react-router-dom"
 
 import Card from "./Card"
+import { Markdown } from "./Markdown"
 
 import { editChannelURL, channelModerationURL } from "../lib/url"
 
@@ -28,12 +28,10 @@ const ChannelSidebar = ({ channel, isModerator }: ChannelSidebarProps) => {
             </Link>
           </div>
           : null}
-        <ReactMarkdown
-          disallowedTypes={["Image"]}
+        <Markdown
           source={
             channel.description || "(There is no description of this channel)"
           }
-          escapeHtml
           className="description"
         />
       </Card>

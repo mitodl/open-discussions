@@ -5,13 +5,12 @@ import R from "ramda"
 import moment from "moment"
 import { Link } from "react-router-dom"
 
-import ReactMarkdown from "react-markdown"
-
 import Card from "./Card"
 import SpinnerButton from "./SpinnerButton"
 import { ReplyToCommentForm, EditCommentForm } from "./CommentForms"
 import CommentVoteForm from "./CommentVoteForm"
 import CommentRemovalForm from "./CommentRemovalForm"
+import { renderTextContent } from "./Markdown"
 
 import { preventDefaultAndInvoke } from "../lib/util"
 import {
@@ -19,7 +18,6 @@ import {
   editCommentKey,
   getCommentReplyInitialValue
 } from "../components/CommentForms"
-import { addEditedMarker } from "../lib/reddit_objects"
 
 import type {
   GenericComment,
@@ -114,11 +112,7 @@ export default class CommentTree extends React.Component<*, *> {
                 processing={processing}
                 editing
               />
-              : <ReactMarkdown
-                disallowedTypes={["Image"]}
-                source={addEditedMarker(comment)}
-                escapeHtml
-              />}
+              : renderTextContent(comment)}
           </div>
           <div className="row comment-actions">
             <CommentVoteForm
