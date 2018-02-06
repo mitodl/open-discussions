@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.13.0
+--------------
+
+- Add channel moderation page
+
 Version 0.12.0
 --------------
 
