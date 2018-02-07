@@ -13,6 +13,7 @@ import {
   EditPostForm,
   replyToPostKey,
   replyToCommentKey,
+  editCommentKey,
   beginEditing,
   getCommentReplyInitialValue
 } from "./CommentForms"
@@ -44,7 +45,7 @@ describe("CommentForms", () => {
   const renderEditCommentForm = (props = {}) =>
     mount(
       <Provider store={helper.store}>
-        <EditCommentForm comment={comment} {...props} />
+        <EditCommentForm comment={comment} editing {...props} />
       </Provider>
     )
 
@@ -453,6 +454,40 @@ describe("CommentForms", () => {
       })
       assert.deepEqual(state.forms, {})
       sinon.assert.calledWith(mockPreventDefault)
+    })
+
+    it("should submit the form and only submit the text field", async () => {
+      const { requestType, successType } = actions.comments.patch
+      helper.updateCommentStub.returns(Promise.resolve(comment))
+
+      beginEditing(
+        helper.store.dispatch,
+        editCommentKey(comment),
+        comment,
+        undefined
+      )
+
+      await helper.listenForActions([forms.FORM_UPDATE], () => {
+        wrapper.find("textarea[name='text']").simulate("change", {
+          target: {
+            name:  "text",
+            value: "edited text"
+          }
+        })
+      })
+
+      const state = await helper.listenForActions(
+        [requestType, successType, forms.FORM_END_EDIT],
+        () => {
+          wrapper.find("form").simulate("submit")
+        }
+      )
+
+      assert.deepEqual(state.forms, {})
+      assert.deepEqual(helper.updateCommentStub.args[0], [
+        comment.id,
+        { text: "edited text", id: comment.id }
+      ])
     })
   })
 
