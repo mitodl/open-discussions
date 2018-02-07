@@ -1,12 +1,11 @@
 """Common open_discussions middleware"""
 from django.conf import settings
 from django import shortcuts
-from django.utils.deprecation import MiddlewareMixin
 
 from open_discussions.utils import FeatureFlag
 
 
-class QueryStringFeatureFlagMiddleware(MiddlewareMixin):
+class QueryStringFeatureFlagMiddleware:
     """
     Extracts feature flags from the query string
     """
@@ -47,7 +46,11 @@ class QueryStringFeatureFlagMiddleware(MiddlewareMixin):
                 mask = mask | member.value
         return str(mask)
 
-    def process_request(self, request):
+    def __init__(self, get_response):
+        """One-time configuration"""
+        self.get_response = get_response
+
+    def __call__(self, request):
         """
         Processes an individual request for the feature flag query parameters
 
@@ -68,10 +71,10 @@ class QueryStringFeatureFlagMiddleware(MiddlewareMixin):
                 )
             return response
 
-        return None
+        return self.get_response(request)
 
 
-class CookieFeatureFlagMiddleware(MiddlewareMixin):
+class CookieFeatureFlagMiddleware:
     """
     Extracts feature flags from a cookie
     """
@@ -109,7 +112,11 @@ class CookieFeatureFlagMiddleware(MiddlewareMixin):
         else:
             return set()
 
-    def process_request(self, request):
+    def __init__(self, get_response):
+        """One-time configuration"""
+        self.get_response = get_response
+
+    def __call__(self, request):
         """
         Processes an individual request for the feature flag cookie
 
@@ -117,4 +124,5 @@ class CookieFeatureFlagMiddleware(MiddlewareMixin):
             request (django.http.request.Request): the request to inspect
         """
         request.open_discussions_feature_flags = self.get_feature_flags(request)
-        return None
+
+        return self.get_response(request)

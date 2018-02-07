@@ -17,6 +17,7 @@ REQUIRED_SETTINGS = {
     'MAILGUN_SENDER_DOMAIN': 'mailgun.fake.domain',
     'MAILGUN_KEY': 'fake_mailgun_key',
     'OPEN_DISCUSSIONS_COOKIE_NAME': 'cookie_monster',
+    'OPEN_DISCUSSIONS_COOKIE_DOMAIN': 'od.fake.domain',
     'OPEN_DISCUSSIONS_DEFAULT_SITE_KEY': 'mm_test',
     'OPEN_DISCUSSIONS_BASE_URL': 'http:localhost:8063/',
 }

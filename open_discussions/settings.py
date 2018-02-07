@@ -93,7 +93,7 @@ DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
 if not DISABLE_WEBPACK_LOADER_STATS:
     INSTALLED_APPS += ('webpack_loader',)
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -104,6 +104,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'open_discussions.middleware.user_activity.UserActivityMiddleware',
 )
 
 # CORS
@@ -115,7 +116,7 @@ if DEBUG:
     INSTALLED_APPS += (
         'nplusone.ext.django',
     )
-    MIDDLEWARE_CLASSES += (
+    MIDDLEWARE += (
         'nplusone.ext.django.NPlusOneMiddleware',
     )
 
@@ -428,6 +429,10 @@ OPEN_DISCUSSIONS_COOKIE_NAME = get_string('OPEN_DISCUSSIONS_COOKIE_NAME', None)
 if not OPEN_DISCUSSIONS_COOKIE_NAME:
     raise ImproperlyConfigured("OPEN_DISCUSSIONS_COOKIE_NAME is not set")
 
+OPEN_DISCUSSIONS_COOKIE_DOMAIN = get_string('OPEN_DISCUSSIONS_COOKIE_DOMAIN', None)
+if not OPEN_DISCUSSIONS_COOKIE_DOMAIN:
+    raise ImproperlyConfigured("OPEN_DISCUSSIONS_COOKIE_DOMAIN is not set")
+
 OPEN_DISCUSSIONS_DEFAULT_SITE_KEY = get_string('OPEN_DISCUSSIONS_DEFAULT_SITE_KEY', None)
 
 if not OPEN_DISCUSSIONS_DEFAULT_SITE_KEY:
@@ -476,9 +481,9 @@ MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS = get_int(
 )
 
 if MIDDLEWARE_FEATURE_FLAG_QS_PREFIX:
-    MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
-        'open_discussions.middleware.QueryStringFeatureFlagMiddleware',
-        'open_discussions.middleware.CookieFeatureFlagMiddleware',
+    MIDDLEWARE = MIDDLEWARE + (
+        'open_discussions.middleware.feature_flags.QueryStringFeatureFlagMiddleware',
+        'open_discussions.middleware.feature_flags.CookieFeatureFlagMiddleware',
     )
 
 
@@ -486,9 +491,9 @@ if MIDDLEWARE_FEATURE_FLAG_QS_PREFIX:
 if DEBUG:
     INSTALLED_APPS += ('debug_toolbar', )
     # it needs to be enabled before other middlewares
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE = (
         'debug_toolbar.middleware.DebugToolbarMiddleware',
-    ) + MIDDLEWARE_CLASSES
+    ) + MIDDLEWARE
 
 
 REST_FRAMEWORK = {

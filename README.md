@@ -206,7 +206,7 @@ The following variable should also be set in your MicroMasters ``.env`` file:
 
   - ``OPEN_DISCUSSIONS_JWT_SECRET``: same value as in the open-discussions ``.env`` file
   - ``OPEN_DISCUSSIONS_COOKIE_NAME``: same value as in the open-discussions ``.env`` file
-  - ``OPEN_DISCUSSIONS_COOKIE_DOMAIN``: the root domain, for example ``odl.local``
+  - ``OPEN_DISCUSSIONS_COOKIE_DOMAIN``: the root domain, for example ``odl.local``, should match correspding variable in Ope-Discussions
   - ``OPEN_DISCUSSIONS_REDIRECT_URL``: the domain-based URL for open-discussions,
     for example ``http://od.odl.local:8063/``
   - ``OPEN_DISCUSSIONS_BASE_URL``: the base internal URL for open-discussions,

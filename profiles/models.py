@@ -24,5 +24,7 @@ class Profile(models.Model):
 
     email_optin = models.NullBooleanField()
 
+    last_active_on = models.DateTimeField(null=True)
+
     def __str__(self):
         return "{}".format(self.name)
