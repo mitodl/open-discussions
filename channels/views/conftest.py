@@ -46,6 +46,12 @@ def staff_api(staff_user):
 
 
 @pytest.fixture()
+def contributor_api(user):
+    """A fixture for an Api instance configured with the contributor user"""
+    return Api(user)
+
+
+@pytest.fixture()
 def private_channel_and_contributor(private_channel, staff_api, user):
     """Fixture for a channel and a user who is a contributor"""
     staff_api.add_contributor(user.username, private_channel.name)

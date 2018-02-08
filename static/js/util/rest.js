@@ -12,13 +12,20 @@ const hasError = R.propSatisfies(R.complement(R.isNil), "error")
 
 export const anyError = R.any(hasError)
 
-export const anyErrorExcept404 = R.compose(
-  R.any(
-    R.either(
-      R.propSatisfies(R.isNil, "errorStatusCode"),
-      R.propSatisfies(R.complement(R.equals(404)), "errorStatusCode")
-    )
-  ),
-  R.map(R.prop("error")),
-  R.filter(hasError)
-)
+export const anyErrorExcept = (codes: Array<number>) =>
+  R.compose(
+    R.any(
+      R.either(
+        R.propSatisfies(R.isNil, "errorStatusCode"),
+        R.propSatisfies(
+          R.complement(R.contains(R.__, codes)),
+          "errorStatusCode"
+        )
+      )
+    ),
+    R.map(R.prop("error")),
+    R.filter(hasError)
+  )
+
+export const anyErrorExcept404 = anyErrorExcept([404])
+export const anyErrorExcept404or410 = anyErrorExcept([404, 410])

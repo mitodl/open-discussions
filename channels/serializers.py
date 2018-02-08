@@ -304,6 +304,7 @@ class CommentSerializer(serializers.Serializer):
     edited = serializers.SerializerMethodField()
     comment_type = serializers.SerializerMethodField()
     num_reports = serializers.SerializerMethodField()
+    deleted = serializers.SerializerMethodField()
 
     def _get_user(self, instance):
         """
@@ -398,6 +399,10 @@ class CommentSerializer(serializers.Serializer):
     def validate_removed(self, value):
         """Validate that removed is a bool"""
         return {'removed': _parse_bool(value, 'removed')}
+
+    def get_deleted(self, instance):
+        """Returns True if the comment was deleted"""
+        return instance.body == "[deleted]"  # only way to tell
 
     def validate(self, attrs):
         """Validate that the the combination of fields makes sense"""

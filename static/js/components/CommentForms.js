@@ -5,6 +5,7 @@ import { connect } from "react-redux"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
+import { setSnackbarMessage } from "../actions/ui"
 import { isEmptyText } from "../lib/util"
 
 import type { CommentForm, CommentInTree, Post } from "../flow/discussionTypes"
@@ -158,17 +159,34 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     beginEditing: beginEditing(dispatch, formKey),
     onSubmit:     R.curry((postID, text, commentID, post, e) => {
       e.preventDefault()
-      return dispatch(
-        actions.comments.post(postID, text, commentID)
-      ).then(() => {
-        dispatch(
-          setPostData({
-            ...post,
-            num_comments: post.num_comments + 1
-          })
-        )
-        cancelReply(dispatch, formKey)()
-      })
+      return dispatch(actions.comments.post(postID, text, commentID))
+        .then(() => {
+          dispatch(
+            setPostData({
+              ...post,
+              num_comments: post.num_comments + 1
+            })
+          )
+          cancelReply(dispatch, formKey)()
+        })
+        .catch(err => {
+          if (err.errorStatusCode === 410) {
+            // Comment was deleted
+            dispatch(
+              setSnackbarMessage({
+                message:
+                  "This comment has been deleted and cannot be replied to"
+              })
+            )
+          } else {
+            // Unknown errors
+            dispatch(
+              setSnackbarMessage({
+                message: "Unknown error replying to comment"
+              })
+            )
+          }
+        })
     }),
     patchComment: comment =>
       dispatch(actions.comments.patch(comment.id, comment)).then(() => {

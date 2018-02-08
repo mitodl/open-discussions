@@ -120,7 +120,7 @@ export default class CommentTree extends React.Component<*, *> {
               upvote={upvote}
               downvote={downvote}
             />
-            {atMaxDepth || moderationUI
+            {atMaxDepth || moderationUI || comment.deleted
               ? null
               : <div
                 className="comment-action-button reply-button"

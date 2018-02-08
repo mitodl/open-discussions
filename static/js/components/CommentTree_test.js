@@ -125,9 +125,21 @@ describe("CommentTree", () => {
 
   it('should include a "reply" button', () => {
     const wrapper = renderCommentTree()
-    wrapper.find(".comment-action-button").at(0).simulate("click")
+    wrapper.find(".comment-action-button.reply-button").at(0).simulate("click")
     assert.ok(beginEditingStub.called)
     assert.ok(beginEditingStub.calledWith(replyToCommentKey(comments[0])))
+  })
+
+  it('should not include a "reply" button for deleted posts', () => {
+    comments[0].deleted = true
+    const wrapper = renderCommentTree()
+    assert.notOk(
+      wrapper
+        .find(".top-level-comment .comment-actions")
+        .at(0)
+        .find(".comment-action-button.reply-button")
+        .exists()
+    )
   })
 
   it('should include a "report" button', () => {

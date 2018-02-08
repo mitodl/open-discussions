@@ -107,6 +107,7 @@ export type CommentFromAPI = AuthoredContent & HasParentId & {
   text:          string,
   downvoted:     boolean,
   removed:       boolean,
+  deleted:       boolean,
   comment_type:  "comment",
 }
 

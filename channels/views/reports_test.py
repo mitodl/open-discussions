@@ -70,6 +70,7 @@ def test_list_reports(staff_client, private_channel_and_contributor, reddit_fact
             'upvoted': False,
             'downvoted': False,
             "removed": False,
+            "deleted": False,
             'profile_image': user.profile.image_small,
             'author_name': user.profile.name,
             'edited': False,

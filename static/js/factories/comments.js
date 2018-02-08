@@ -28,6 +28,7 @@ export const makeComment = (
     upvoted:       casual.coin_flip,
     downvoted:     casual.coin_flip,
     removed:       casual.coin_flip,
+    deleted:       false, // we want this the majority of the time
     created:       casual.moment.format(),
     replies:       [],
     profile_image: casual.url,

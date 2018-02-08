@@ -54,7 +54,8 @@ const deleteComment = (oldTree: Array<GenericComment>, commentId: string) =>
     R.evolve({
       author_name: deleted,
       text:        deleted,
-      author_id:   deleted
+      author_id:   deleted,
+      deleted:     true
     }),
     oldTree
   )

@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Qui necessitatibus voluptate illum fugiat perspiciatis mollitia culpa. Vero laudantium delectus maiores itaque. Minus aut eveniet et occaecati expedita assumenda eaque.\nPlaceat quaerat quis qui tempore. Atque ducimus aliquam tenetur. Id dolores esse nihil nulla.\nVoluptatibus iure id ratione provident. Labore nostrum saepe inventore tempora quasi ipsum. Amet officia pariatur earum tempore nam ea fugiat maiores.",
+      "name": "1518101812_alias",
+      "public_description": "Aperiam est quaerat reiciendis. Amet quo vel voluptatem esse ut.",
+      "title": "Laborum sed dicta sint dicta unde."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "r",
+      "post_id": "i",
+      "text": "Ea eaque saepe a. Iure porro quisquam debitis ad. Odit iusto laudantium est aperiam eveniet."
+    }
+  },
+  "posts": {
+    "post": {
+      "id": "i",
+      "text": "Ipsum at minima voluptate sit. Eum minus eaque ducimus.",
+      "title": "Quos ipsam nobis suscipit rem."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C5TYPRVM8X5MPG4Y9M9Z1GD7"
+    },
+    "staff_user": {
+      "username": "01C5TYPJDR1GBK2CNWDTSRRMZ2"
+    }
+  }
+}

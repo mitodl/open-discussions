@@ -38,7 +38,7 @@ import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
 import { toggleUpvote } from "../util/api_actions"
 import { getChannelName, getPostID, getCommentID } from "../lib/util"
 import { isModerator } from "../lib/channels"
-import { anyErrorExcept404 } from "../util/rest"
+import { anyErrorExcept404, anyErrorExcept404or410 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginEditing } from "../components/CommentForms"
 import { formatTitle } from "../lib/title"
@@ -545,8 +545,10 @@ const mapStateToProps = (state, ownProps) => {
     moderators,
     loaded,
     notFound,
-    isModerator:                isModerator(moderators, SETTINGS.username),
-    errored:                    anyErrorExcept404([posts, channels, comments]),
+    isModerator: isModerator(moderators, SETTINGS.username),
+    errored:
+      anyErrorExcept404([posts, channels]) ||
+      anyErrorExcept404or410([comments]),
     subscribedChannels:         getSubscribedChannels(state),
     commentInFlight:            comments.processing,
     postDeleteDialogVisible:    ui.dialogs.has(DELETE_POST_DIALOG),

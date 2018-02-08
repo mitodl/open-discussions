@@ -21,6 +21,7 @@ import {
 import * as forms from "../actions/forms"
 import { actions } from "../actions"
 import { SET_POST_DATA, setPostData } from "../actions/post"
+import { SET_SNACKBAR_MESSAGE } from "../actions/ui"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
 import IntegrationTestHelper from "../util/integration_test_helper"
@@ -415,6 +416,45 @@ describe("CommentForms", () => {
     it("should not submit on ctrl-enter when text is empty", () => {
       wrapper.find("form").simulate("keyDown", { ctrlKey: true, key: "Enter" })
       assert.isFalse(helper.createCommentStub.called)
+    })
+    ;[
+      [410, "This comment has been deleted and cannot be replied to"],
+      [500, "Unknown error replying to comment"]
+    ].forEach(([errorStatusCode, message]) => {
+      it(`should display a toast message if ${errorStatusCode} error on form submit`, async () => {
+        const { requestType, failureType } = actions.comments.post
+        helper.createCommentStub.returns(Promise.reject({ errorStatusCode }))
+        await helper.listenForActions([SET_POST_DATA], () => {
+          helper.store.dispatch(setPostData(post))
+        })
+        await helper.listenForActions([forms.FORM_UPDATE], () => {
+          wrapper.find("textarea[name='text']").simulate("change", {
+            target: {
+              name:  "text",
+              value: expectedKeys.text
+            }
+          })
+        })
+        const state = await helper.listenForActions(
+          [requestType, failureType, SET_SNACKBAR_MESSAGE],
+          () => {
+            wrapper.find("form").simulate("submit")
+          }
+        )
+        assert.equal(state.ui.snackbar.message, message)
+        assert.equal(
+          state.posts.data.get(post.id).num_comments,
+          post.num_comments
+        )
+        assert.isOk(wrapper.find("textarea[name='text']").exists())
+        assert.isOk(
+          helper.createCommentStub.calledWith(
+            expectedKeys.post_id,
+            expectedKeys.text,
+            expectedKeys.comment_id || undefined
+          )
+        )
+      })
     })
   })
 

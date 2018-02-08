@@ -13,7 +13,7 @@ from prawcore.exceptions import (
 from rest_framework.exceptions import PermissionDenied, NotFound
 
 from channels.constants import POSTS_SORT_HOT
-from channels.exceptions import ConflictException
+from channels.exceptions import ConflictException, GoneException
 
 User = get_user_model()
 
@@ -105,6 +105,8 @@ def translate_praw_exceptions():
             raise NotFound() from exc
         elif exc.error_type == 'SUBREDDIT_EXISTS':
             raise ConflictException() from exc
+        elif exc.error_type == 'DELETED_COMMENT':
+            raise GoneException() from exc
         raise
 
 
