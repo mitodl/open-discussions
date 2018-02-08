@@ -25,7 +25,7 @@ type CommentFormProps = {
   formDataLens: (s: string) => Object,
   processing: boolean,
   patchComment: (c: Object) => void,
-  patchPost: (p: Post) => void,
+  patchPost: (p: Object) => void,
   comment: CommentInTree
 }
 
@@ -311,10 +311,10 @@ export const EditPostForm = connect(mapStateToProps, mapDispatchToProps)(
 
       e.preventDefault()
 
-      const updatedPost = { ...post, text: text }
+      const { id } = post
       this.setState({ patching: true })
       try {
-        await patchPost(updatedPost)
+        await patchPost({ id, text })
       } catch (_) {
         this.setState({ patching: false })
       }
