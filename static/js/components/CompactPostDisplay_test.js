@@ -50,6 +50,10 @@ describe("CompactPostDisplay", () => {
     const authoredBy = wrapper.find(".authored-by").text()
     assert(authoredBy.startsWith(`by ${post.author_name}`))
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
+    const img = wrapper.find(".profile-image")
+    assert.ok(img.exists())
+    const { src } = img.props()
+    assert.equal(src, post.profile_image)
   })
 
   it("should link to the subreddit, if told to", () => {

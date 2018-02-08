@@ -55,6 +55,7 @@ class CompactPostDisplay extends React.Component<*, void> {
         className={`post-summary ${post.stickied && showPinUI ? "sticky" : ""}`}
       >
         <PostVotingButtons post={post} toggleUpvote={toggleUpvote} />
+        <img className="profile-image" src={post.profile_image} />
         <div className="summary">
           <div className="post-title">
             {formatPostTitle(post)}

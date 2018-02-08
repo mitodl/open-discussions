@@ -64,12 +64,15 @@
     }
   }
 
+  .profile-image {
+    margin-right: 15px;
+  }
+
   .summary {
     overflow: hidden;
 
     img {
       float: left;
-      margin-right: 15px;
       position: relative;
       top: 6px;
     }
