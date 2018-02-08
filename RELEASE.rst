@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.13.1
+--------------
+
+- Omit status check for code coverage to prevent blocking of deploys (#479)
+- Automatically render plain URLs in Markdown as &lt;a&gt; tags
+- Add comment sorting UI
+
 Version 0.13.0
 --------------
 
