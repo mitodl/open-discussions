@@ -44,6 +44,7 @@ import { beginEditing } from "../components/CommentForms"
 import { formatTitle } from "../lib/title"
 import { channelURL, postDetailURL, commentPermalink } from "../lib/url"
 import { clearPostError } from "../actions/post"
+import { preventDefaultAndInvoke } from "../lib/util"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -419,7 +420,7 @@ class PostPage extends React.Component<*, void> {
         </Dialog>
         <Dialog
           open={postReportDialogVisible}
-          hideDialog={this.hideReportPostDialog}
+          hideDialog={preventDefaultAndInvoke(this.hideReportPostDialog)}
           onCancel={this.hideReportPostDialog}
           onAccept={this.reportPost}
           validateOnClick={true}
@@ -466,7 +467,9 @@ class PostPage extends React.Component<*, void> {
               forms={forms}
               beginEditing={beginEditing(dispatch)}
               showPostDeleteDialog={this.showPostDialog(DELETE_POST_DIALOG)}
-              showPostReportDialog={this.showReportPostDialog}
+              showPostReportDialog={preventDefaultAndInvoke(
+                this.showReportPostDialog
+              )}
               showPermalinkUI={showPermalinkUI}
               report={postReport}
             />

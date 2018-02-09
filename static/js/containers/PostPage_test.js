@@ -448,11 +448,13 @@ describe("PostPage", function() {
 
     helper.reportContentStub.returns(Promise.resolve())
 
+    const preventDefaultStub = helper.sandbox.stub()
     await listenForActions([SHOW_DIALOG, FORM_BEGIN_EDIT], () => {
       const reportPostFunc = wrapper.find("ExpandedPostDisplay").props()
         .showPostReportDialog
-      reportPostFunc()
+      reportPostFunc({ preventDefault: preventDefaultStub })
     })
+    assert.ok(preventDefaultStub.called)
 
     const dialog = wrapper.find("Dialog").at(4)
     dialog.find("input").simulate("change", {
@@ -493,6 +495,8 @@ describe("PostPage", function() {
         expectedActions.push(SET_FOCUSED_COMMENT)
       }
 
+      const preventDefaultStub = helper.sandbox.stub()
+
       await listenForActions(expectedActions, () => {
         if (isComment) {
           const comment = comments[0].replies[2]
@@ -502,7 +506,8 @@ describe("PostPage", function() {
         } else {
           const reportPostFunc = wrapper.find("ExpandedPostDisplay").props()
             .showPostReportDialog
-          reportPostFunc()
+          reportPostFunc({ preventDefault: preventDefaultStub })
+          assert.ok(preventDefaultStub.called)
         }
       })
 
