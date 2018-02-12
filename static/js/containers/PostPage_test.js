@@ -540,10 +540,6 @@ describe("PostPage", function() {
         actions.comments.get.successType,
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        actions.channelModerators.get.requestType,
-        actions.channelModerators.get.successType,
         SET_CHANNEL_DATA
       ]
     )
@@ -562,10 +558,6 @@ describe("PostPage", function() {
         actions.comments.get.failureType,
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        actions.channelModerators.get.requestType,
-        actions.channelModerators.get.successType,
         SET_CHANNEL_DATA
       ]
     )
@@ -583,10 +575,6 @@ describe("PostPage", function() {
         actions.comments.get.successType,
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        actions.channelModerators.get.requestType,
-        actions.channelModerators.get.successType,
         SET_CHANNEL_DATA
       ]
     )

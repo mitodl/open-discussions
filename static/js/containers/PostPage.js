@@ -172,22 +172,22 @@ class PostPage extends React.Component<*, void> {
         dispatch(actions.posts.get(postID)),
         dispatch(actions.comments.get(postID, commentID, qs.parse(search)))
       ])
+
+      if (!channel) {
+        dispatch(actions.channels.get(channelName))
+      }
+
+      if (!moderators) {
+        const { response } = await dispatch(
+          actions.channelModerators.get(channelName)
+        )
+        moderators = response
+      }
+
+      if (isModerator(moderators, SETTINGS.username)) {
+        await dispatch(actions.reports.get(channelName))
+      }
     } catch (_) {} // eslint-disable-line no-empty
-
-    if (!channel) {
-      dispatch(actions.channels.get(channelName))
-    }
-
-    if (!moderators) {
-      const { response } = await dispatch(
-        actions.channelModerators.get(channelName)
-      )
-      moderators = response
-    }
-
-    if (isModerator(moderators, SETTINGS.username)) {
-      await dispatch(actions.reports.get(channelName))
-    }
   }
 
   upvote = async (comment: CommentInTree) => {
@@ -387,6 +387,10 @@ class PostPage extends React.Component<*, void> {
       location: { search }
     } = this.props
 
+    if (notFound) {
+      return <NotFound />
+    }
+
     if (!channel) {
       return null
     }
@@ -395,9 +399,8 @@ class PostPage extends React.Component<*, void> {
     const showPermalinkUI = R.not(R.isNil(commentID))
     const postReport = postReports.get(postID)
 
-    return notFound
-      ? <NotFound />
-      : <div>
+    return (
+      <div>
         <ChannelBreadcrumbs channel={channel} />
         <DocumentTitle title={formatTitle(post.title)} />
         <Dialog
@@ -407,7 +410,7 @@ class PostPage extends React.Component<*, void> {
           title="Delete Comment"
           submitText="Yes, Delete"
         >
-            Are you sure you want to delete this comment?
+          Are you sure you want to delete this comment?
         </Dialog>
         <Dialog
           open={postDeleteDialogVisible}
@@ -416,7 +419,7 @@ class PostPage extends React.Component<*, void> {
           title="Delete Post"
           submitText="Yes, Delete"
         >
-            Are you sure you want to delete this post?
+          Are you sure you want to delete this post?
         </Dialog>
         <Dialog
           open={postReportDialogVisible}
@@ -486,7 +489,7 @@ class PostPage extends React.Component<*, void> {
           ? <Card className="comment-detail-card">
             <div>You are viewing a single comment's thread.</div>
             <Link to={postDetailURL(channel.name, post.id)}>
-                  View the rest of the comments
+                View the rest of the comments
             </Link>
           </Card>
           : <div className="count-and-sort">
@@ -515,6 +518,7 @@ class PostPage extends React.Component<*, void> {
           commentReports={commentReports}
         />
       </div>
+    )
   }
 }
 
