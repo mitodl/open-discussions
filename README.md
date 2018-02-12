@@ -140,6 +140,19 @@ Then use these bash commands with the above token to create a channel and post:
    -d '{"text": "This is a text post in the test channel", "title": "Test Post", "channel_name": "test_channel"}'
  ```
 
+#### 5c) Configure a site
+
+Login to the admin ui and create a new site. Some example values for MicroMasters:
+
+ - `key` -  `micromasters`
+ - `title` - `MicroMasters`
+ - `base_url` - `http://localhost:8079/`
+ - `login_url` - `http://localhost:8079/discussions/`
+ - `session_url` - `http://localhost:8079/api/v0/discussions_token/`
+ - `tos_url` - `http://localhost:8079/terms-of-service`
+
+In your `.env` file, set `OPEN_DISCUSSIONS_DEFAULT_SITE_KEY` to the `key` value from your record
+
 
 ## Running Commands and Testing
 

@@ -10,8 +10,8 @@ import {
 import { AUTH_REQUIRED_URL } from "./url"
 
 const renewSession = async () => {
-  if (SETTINGS.session_url) {
-    return fetch(SETTINGS.session_url, {
+  if (SETTINGS.authenticated_site.session_url) {
+    return fetch(SETTINGS.authenticated_site.session_url, {
       credentials: "include" // must be "include" for CORS fetch
     })
   }

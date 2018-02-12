@@ -2,38 +2,37 @@
 Test end to end django views.
 """
 import json
-from unittest.mock import patch
 
-from django.test import TestCase
+import pytest
 from django.core.urlresolvers import reverse
 
+pytestmark = pytest.mark.django_db
 
-class ViewsTest(TestCase):
-    """
-    Test that the views work as expected.
-    """
 
-    def test_webpack_url(self):
-        """Verify that webpack bundle src shows up in production"""
-        with self.settings(
-            GA_TRACKING_ID='fake',
-        ), patch('open_discussions.templatetags.render_bundle._get_bundle') as get_bundle:
-            response = self.client.get(reverse('open_discussions-index'))
+def test_webpack_url(settings, staff_client, mocker, authenticated_site):
+    """Verify that webpack bundle src shows up in production"""
+    settings.GA_TRACKING_ID = 'fake'
+    get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
 
-        bundles = [bundle[0][1] for bundle in get_bundle.call_args_list]
-        assert set(bundles) == {
-            'common',
-            'root',
-            'style',
+    response = staff_client.get(reverse('open_discussions-index'))
+
+    bundles = [bundle[0][1] for bundle in get_bundle_mock.call_args_list]
+    assert set(bundles) == {
+        'common',
+        'root',
+        'style',
+    }
+    js_settings = json.loads(response.context['js_settings_json'])
+    assert js_settings == {
+        'gaTrackingID': 'fake',
+        'public_path': '/static/bundles/',
+        'max_comment_depth': 6,
+        'username': None,
+        'authenticated_site': {
+            'title': authenticated_site.title,
+            'login_url': authenticated_site.login_url,
+            'session_url': authenticated_site.session_url,
+            'base_url': authenticated_site.base_url,
+            'tos_url': authenticated_site.tos_url,
         }
-        js_settings = json.loads(response.context['js_settings_json'])
-        assert js_settings == {
-            'gaTrackingID': 'fake',
-            'public_path': '/static/bundles/',
-            'auth_url': None,
-            'session_url': None,
-            'micromasters_external_login_url': 'http://other.fake.site/discussions/',
-            'micromasters_base_url': 'http://other.fake.site/',
-            'max_comment_depth': 6,
-            'username': None,
-        }
+    }

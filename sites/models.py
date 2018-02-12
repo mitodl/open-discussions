@@ -9,6 +9,7 @@ class AuthenticatedSite(TimestampedModel):
     key = models.CharField(
         max_length=20,
         help_text='Key to lookup site in JWT token, must match exactly the key set by the authenticating site',
+        unique=True,
     )
     title = models.CharField(
         max_length=50,

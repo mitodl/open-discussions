@@ -4,15 +4,18 @@ declare var SETTINGS: {
   gaTrackingID: string,
   reactGaDebug: boolean,
   public_path: string,
-  auth_url: string|null,
-  session_url: string|null,
-  micromasters_external_login_url: string,
-  micromasters_base_url: string,
   max_comment_depth: number,
   FEATURES: {
     [key: string]: boolean,
   },
   username: string,
+  authenticated_site: {
+    title: string,
+    login_url: string,
+    session_url: string,
+    base_url: string,
+    tos_url: string
+  }
 }
 
 // mocha

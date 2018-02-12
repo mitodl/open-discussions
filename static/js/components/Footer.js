@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { Link } from "react-router-dom"
 
@@ -16,8 +17,8 @@ const Footer = () =>
     <div className="row links">
       <a href="https://www.edx.org/">edX</a>
       <a href="https://openlearning.mit.edu/">Office of Digital Learning</a>
-      <a href="https://micromasters.mit.edu/terms_of_service/">
-        MicroMasters Terms of Service
+      <a href={SETTINGS.authenticated_site.tos_url}>
+        {SETTINGS.authenticated_site.title} Terms of Service
       </a>
       <Link to="/content_policy">Discussions Community Guidelines</Link>
     </div>

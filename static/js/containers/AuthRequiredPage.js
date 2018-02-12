@@ -19,7 +19,7 @@ export default class AuthRequiredPage extends React.Component<*, void> {
               To use this site you need to log in with a MicroMasters account.
             </div>
             <div className="login">
-              <a href={SETTINGS.micromasters_external_login_url}>
+              <a href={SETTINGS.authenticated_site.login_url}>
                 Log In to MicroMasters
               </a>
             </div>

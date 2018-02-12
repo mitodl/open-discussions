@@ -23,7 +23,7 @@ describe("auth", function() {
         sandbox = sinon.sandbox.create()
         fetchStub = sandbox.stub(fetchFuncs, djangoCSRFFunc)
 
-        SETTINGS.session_url = "/session/url"
+        SETTINGS.authenticated_site.session_url = "/session/url"
       })
       afterEach(function() {
         sandbox.restore()
@@ -60,7 +60,7 @@ describe("auth", function() {
       it("renews and retries if the request failed", async () => {
         fetchStub.onFirstCall().returns(Promise.reject(error401)) // original api call
         fetchStub.onSecondCall().returns(Promise.resolve()) // original api call again
-        fetchMock.mock(SETTINGS.session_url, {
+        fetchMock.mock(SETTINGS.authenticated_site.session_url, {
           has_token: true
         })
 
@@ -75,7 +75,7 @@ describe("auth", function() {
 
       it("redirects and rejects if no token", async () => {
         fetchStub.onFirstCall().returns(Promise.reject(error401)) // original api call
-        fetchMock.mock(SETTINGS.session_url, {
+        fetchMock.mock(SETTINGS.authenticated_site.session_url, {
           has_token: false
         })
 
@@ -89,7 +89,7 @@ describe("auth", function() {
 
       it("renews and redirect to /auth_required/ if renew fails", async () => {
         fetchStub.returns(Promise.reject(error401)) // original api call
-        fetchMock.mock(SETTINGS.session_url, 401)
+        fetchMock.mock(SETTINGS.authenticated_site.session_url, 401)
 
         await assert.isRejected(authFunc("/url"))
 

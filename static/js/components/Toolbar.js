@@ -38,8 +38,10 @@ export default class Toolbar extends React.Component<*, void> {
                 <img src="/static/images/mit-logo-transparent3.svg" />
               </a>
               <span className="mdc-toolbar__title">
-                <a href={SETTINGS.micromasters_base_url}>MicroMasters</a> >{" "}
-                <Link to={FRONTPAGE_URL}>Discussion</Link>
+                <a href={SETTINGS.authenticated_site.base_url}>
+                  {SETTINGS.authenticated_site.title}
+                </a>{" "}
+                > <Link to={FRONTPAGE_URL}>Discussion</Link>
               </span>
             </section>
           </div>

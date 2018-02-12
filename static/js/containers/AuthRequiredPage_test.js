@@ -11,7 +11,7 @@ describe("AuthRequiredPage", () => {
     const wrapper = shallow(<AuthRequiredPage />)
     assert.equal(
       wrapper.find("a").props().href,
-      SETTINGS.micromasters_external_login_url
+      SETTINGS.authenticated_site.login_url
     )
   })
 })

@@ -49,12 +49,6 @@
       "description": "Email address used with bcc email",
       "required": false
     },
-    "MICROMASTERS_EXTERNAL_LOGIN_URL": {
-      "description": "URL displayed to users so they can login to MicroMasters"
-    },
-    "MICROMASTERS_BASE_URL": {
-      "description": "URL used to link to MicroMasters"
-    },
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
     },
@@ -64,6 +58,9 @@
     },
     "OPEN_DISCUSSIONS_COOKIE_NAME": {
       "description": "Name of the cookie for the JWT auth token"
+    },
+    "OPEN_DISCUSSIONS_DEFAULT_SITE_KEY": {
+      "description": "The default site key to use for JWT tokens missing one"
     },
     "OPEN_DISCUSSIONS_DB_CONN_MAX_AGE": {
       "value": "0"
