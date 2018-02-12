@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.13.2
+--------------
+
+- Fixed error page on comment error (#477)
+- Fix non-moderator comment editing
+- Add profile image to CompactPostDisplay
+
 Version 0.13.1
 --------------
 
