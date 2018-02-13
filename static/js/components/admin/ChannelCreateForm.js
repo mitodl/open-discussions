@@ -14,6 +14,7 @@ export default class ChannelCreateForm extends React.Component<*, void> {
 
   render() {
     const { onSubmit, onUpdate, form } = this.props
+
     return (
       <form onSubmit={onSubmit} className="form">
         <div className="form-item">
