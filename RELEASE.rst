@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.14.0
+--------------
+
+- Add preventDefault wrapper to report post dialog
+- Fix error with non-moderators editing posts
+- Added Site models (#444)
+
 Version 0.13.2
 --------------
 
