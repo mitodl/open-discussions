@@ -82,6 +82,7 @@ INSTALLED_APPS = (
     'profiles',
     'sites',
     'mail',
+    'notifications',
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)

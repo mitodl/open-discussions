@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^status/', include('server_status.urls')),
     url(r'', include('channels.urls')),
     url(r'', include('profiles.urls')),
+    url(r'', include('notifications.urls')),
     url(r'^api/token/refresh/', refresh_jwt_token),
 
     # React App
