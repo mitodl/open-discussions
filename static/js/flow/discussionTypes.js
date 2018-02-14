@@ -34,7 +34,7 @@ export type AuthoredContent = {
   profile_image:   string,
   author_name:     string,
   edited:          boolean,
-  num_reports:     number,
+  num_reports:     ?number,
   ignore_reports?: boolean,
 }
 

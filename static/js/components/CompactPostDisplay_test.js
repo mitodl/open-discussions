@@ -12,7 +12,6 @@ import { urlHostname } from "../lib/url"
 import { formatCommentsCount } from "../lib/posts"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { makePostReport } from "../factories/reports"
 
 describe("CompactPostDisplay", () => {
   let helper, post
@@ -153,7 +152,7 @@ describe("CompactPostDisplay", () => {
     }
   }
   ;[true, false].forEach(prevUpvote => {
-    it(`should show the correct UI when the upvote 
+    it(`should show the correct UI when the upvote
     button is clicked when prev state was ${String(prevUpvote)}`, async () => {
       post.upvoted = prevUpvote
       // setting to a function so Flow doesn't complain
@@ -181,12 +180,19 @@ describe("CompactPostDisplay", () => {
     })
   })
 
-  it("should render a report count, if passed a report and moderator", () => {
-    const report = makePostReport(post)
-    const wrapper = renderPostDisplay({ post, report, isModerator: true })
+  it("should render a report count, if post is reported", () => {
+    post.num_reports = 2
+    const wrapper = renderPostDisplay({ post })
     const count = wrapper.find(".report-count")
     assert.ok(count.exists())
-    assert.equal(count.text(), `Reports: ${report.post.num_reports}`)
+    // $FlowFixMe: thinks this doesn't exist
+    assert.equal(count.text(), `Reports: ${post.num_reports}`)
+  })
+
+  it("should not render a report count, if post has no report data", () => {
+    const wrapper = renderPostDisplay({ post })
+    const count = wrapper.find(".report-count")
+    assert.isNotOk(count.exists())
   })
 
   it("should put a remove button, if it gets the right props", () => {

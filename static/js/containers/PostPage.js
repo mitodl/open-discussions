@@ -55,9 +55,7 @@ import type {
   CommentInTree,
   GenericComment,
   MoreCommentsInTree,
-  Post,
-  CommentReportRecord,
-  PostReportRecord
+  Post
 } from "../flow/discussionTypes"
 
 type PostPageProps = {
@@ -83,12 +81,10 @@ type PostPageProps = {
   commentReportDialogVisible: boolean,
   notFound: boolean,
   errored: boolean,
-  commentReports: Map<string, CommentReportRecord>,
   approvePost: (p: Post) => void,
   removePost: (p: Post) => void,
   approveComment: (c: Comment) => void,
   removeComment: (c: Comment) => void,
-  postReports: Map<string, PostReportRecord>,
   location: Location
 }
 
@@ -160,7 +156,7 @@ class PostPage extends React.Component<*, void> {
       channel,
       location: { search }
     } = this.props
-    let { moderators } = this.props
+    const { moderators } = this.props
 
     if (!postID || !channelName) {
       // should not happen, this should be guaranteed by react-router
@@ -178,14 +174,7 @@ class PostPage extends React.Component<*, void> {
       }
 
       if (!moderators) {
-        const { response } = await dispatch(
-          actions.channelModerators.get(channelName)
-        )
-        moderators = response
-      }
-
-      if (isModerator(moderators, SETTINGS.username)) {
-        await dispatch(actions.reports.get(channelName))
+        await dispatch(actions.channelModerators.get(channelName))
       }
     } catch (_) {} // eslint-disable-line no-empty
   }
@@ -317,7 +306,7 @@ class PostPage extends React.Component<*, void> {
   }
 
   reportPost = async () => {
-    const { dispatch, post, forms, isModerator, channelName } = this.props
+    const { dispatch, post, forms } = this.props
     const form = getReportForm(forms)
     const { reason } = form.value
     const validation = validateContentReportForm(form)
@@ -336,10 +325,6 @@ class PostPage extends React.Component<*, void> {
           reason:  reason
         })
       )
-
-      if (isModerator) {
-        await dispatch(actions.reports.get(channelName))
-      }
 
       this.hideReportPostDialog()
       dispatch(
@@ -377,13 +362,10 @@ class PostPage extends React.Component<*, void> {
       commentReportDialogVisible,
       notFound,
       commentID,
-      commentReports,
-      postReports,
       removePost,
       approvePost,
       removeComment,
       approveComment,
-      postID,
       location: { search }
     } = this.props
 
@@ -397,7 +379,6 @@ class PostPage extends React.Component<*, void> {
 
     const reportForm = getReportForm(forms)
     const showPermalinkUI = R.not(R.isNil(commentID))
-    const postReport = postReports.get(postID)
 
     return (
       <div>
@@ -474,7 +455,6 @@ class PostPage extends React.Component<*, void> {
                 this.showReportPostDialog
               )}
               showPermalinkUI={showPermalinkUI}
-              report={postReport}
             />
             {showPermalinkUI
               ? null
@@ -515,7 +495,6 @@ class PostPage extends React.Component<*, void> {
           beginEditing={beginEditing(dispatch)}
           processing={commentInFlight}
           commentPermalink={commentPermalink(channel.name, post.id)}
-          commentReports={commentReports}
         />
       </div>
     )

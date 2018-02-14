@@ -38,9 +38,16 @@ export const withPostModeration = (
     }
 
     removePost = async () => {
-      const { dispatch, focusedPost, channelName } = this.props
+      const {
+        dispatch,
+        focusedPost,
+        channelName,
+        shouldGetReports
+      } = this.props
       await removePost(dispatch, focusedPost)
-      await dispatch(actions.reports.get(channelName))
+      if (shouldGetReports) {
+        await dispatch(actions.reports.get(channelName))
+      }
       dispatch(
         setSnackbarMessage({
           message: "Post has been removed"
@@ -59,10 +66,12 @@ export const withPostModeration = (
     }
 
     ignoreReports = async (post: Post) => {
-      const { dispatch, channelName } = this.props
+      const { dispatch, channelName, shouldGetReports } = this.props
 
       await dispatch(actions.posts.patch(post.id, { ignore_reports: true }))
-      await dispatch(actions.reports.get(channelName))
+      if (shouldGetReports) {
+        await dispatch(actions.reports.get(channelName))
+      }
     }
 
     render() {
@@ -116,10 +125,10 @@ export const postModerationSelector = (state: Object, ownProps: Object) => {
     channel,
     loaded,
     notFound,
+    shouldGetReports:     false, // by default, we won't fetch these
     isModerator:          userIsModerator,
     subscribedChannels:   getSubscribedChannels(state),
     reports:              reports.data.reports,
-    postReports:          state.reports.data.posts,
     showRemovePostDialog: ui.dialogs.has(DIALOG_REMOVE_POST),
     focusedPost:          focus.post,
     errored:              anyErrorExcept404([

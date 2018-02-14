@@ -11,7 +11,7 @@ import {
   PostVotingButtons
 } from "../lib/posts"
 
-import type { Post, PostReportRecord } from "../flow/discussionTypes"
+import type { Post } from "../flow/discussionTypes"
 
 class CompactPostDisplay extends React.Component<*, void> {
   props: {
@@ -21,7 +21,6 @@ class CompactPostDisplay extends React.Component<*, void> {
     togglePinPost: Post => void,
     showPinUI: boolean,
     isModerator: boolean,
-    report?: PostReportRecord,
     removePost?: (p: Post) => void,
     ignorePostReports?: (p: Post) => void
   }
@@ -44,7 +43,6 @@ class CompactPostDisplay extends React.Component<*, void> {
       showPinUI,
       togglePinPost,
       isModerator,
-      report,
       removePost,
       ignorePostReports
     } = this.props
@@ -68,9 +66,9 @@ class CompactPostDisplay extends React.Component<*, void> {
             <Link to={postDetailURL(post.channel_name, post.id)}>
               {formatCommentsCount(post)}
             </Link>
-            {isModerator && report
+            {post.num_reports
               ? <div className="report-count">
-                  Reports: {report.post.num_reports}
+                  Reports: {post.num_reports}
               </div>
               : null}
             {showPinUI && post.text && isModerator

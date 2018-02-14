@@ -16,7 +16,6 @@ import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
 import { editPostKey } from "../components/CommentForms"
-import { makePostReport } from "../factories/reports"
 
 describe("ExpandedPostDisplay", () => {
   let helper,
@@ -265,11 +264,18 @@ describe("ExpandedPostDisplay", () => {
     assert.ok(removePostStub.called)
   })
 
-  it("should display a report count, if passed a report and isModerator", () => {
-    const report = makePostReport(post)
-    const wrapper = renderPostDisplay({ post, report, isModerator: true })
+  it("should display a report count, if num_reports has a value", () => {
+    post.num_reports = 2
+    const wrapper = renderPostDisplay({ post })
     const count = wrapper.find(".report-count")
     assert.ok(count.exists())
-    assert.equal(count.text(), `Reports: ${report.post.num_reports}`)
+    // $FlowFixMe: thinks this doesn't exist
+    assert.equal(count.text(), `Reports: ${post.num_reports}`)
+  })
+
+  it("should not render a report count, if post has no report data", () => {
+    const wrapper = renderPostDisplay({ post })
+    const count = wrapper.find(".report-count")
+    assert.isNotOk(count.exists())
   })
 })

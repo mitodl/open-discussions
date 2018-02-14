@@ -32,12 +32,7 @@ import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
-import type {
-  Channel,
-  Post,
-  PostListPagination,
-  PostReportRecord
-} from "../flow/discussionTypes"
+import type { Channel, Post, PostListPagination } from "../flow/discussionTypes"
 
 type ChannelPageProps = {
   match: Match,
@@ -51,8 +46,7 @@ type ChannelPageProps = {
   pagination: PostListPagination,
   errored: boolean,
   isModerator: boolean,
-  notFound: boolean,
-  postReports: Map<string, PostReportRecord>
+  notFound: boolean
 }
 
 const shouldLoadData = R.complement(
@@ -103,13 +97,7 @@ class ChannelPage extends React.Component<*, void> {
 
     try {
       await dispatch(actions.channels.get(channelName))
-      const { response } = await dispatch(
-        actions.channelModerators.get(channelName)
-      )
-
-      if (isModerator(response, SETTINGS.username)) {
-        await dispatch(actions.reports.get(channelName))
-      }
+      await dispatch(actions.channelModerators.get(channelName))
 
       this.fetchPostsForChannel()
     } catch (_) {} // eslint-disable-line no-empty
@@ -134,8 +122,7 @@ class ChannelPage extends React.Component<*, void> {
       channelName,
       isModerator,
       notFound,
-      location: { search },
-      postReports
+      location: { search }
     } = this.props
 
     if (notFound) {
@@ -168,7 +155,6 @@ class ChannelPage extends React.Component<*, void> {
               toggleUpvote={toggleUpvote(dispatch)}
               isModerator={isModerator}
               togglePinPost={this.togglePinPost}
-              postReports={postReports}
               showPinUI
             />
             {pagination
@@ -213,7 +199,6 @@ const mapStateToProps = (state, ownProps) => {
     pagination:         postsForChannel.pagination,
     posts:              safeBulkGet(postIds, state.posts.data),
     subscribedChannels: getSubscribedChannels(state),
-    postReports:        state.reports.data.posts,
     errored:            anyErrorExcept404([
       channels,
       state.posts,

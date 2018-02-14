@@ -110,7 +110,8 @@ class ChannelModerationPage extends React.Component<*, *> {
 const mapStateToProps = (state, ownProps) => {
   return {
     ...postModerationSelector(state, ownProps),
-    ...commentModerationSelector(state, ownProps)
+    ...commentModerationSelector(state, ownProps),
+    shouldGetReports: true
   }
 }
 

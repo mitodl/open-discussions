@@ -102,8 +102,6 @@ describe("ChannelPage", () => {
       actions.subscribedChannels.get.successType,
       actions.channelModerators.get.requestType,
       actions.channelModerators.get.successType,
-      actions.reports.get.requestType,
-      actions.reports.get.successType,
       SET_POST_DATA,
       SET_CHANNEL_DATA
     ])

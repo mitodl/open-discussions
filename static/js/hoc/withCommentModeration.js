@@ -34,10 +34,12 @@ export const withCommentModeration = (
     }
 
     approveComment = async (comment: CommentInTree) => {
-      const { dispatch, channelName } = this.props
+      const { dispatch, channelName, shouldGetReports } = this.props
 
       await approveComment(dispatch, comment)
-      await dispatch(actions.reports.get(channelName))
+      if (shouldGetReports) {
+        await dispatch(actions.reports.get(channelName))
+      }
       dispatch(
         setSnackbarMessage({
           message: "Comment has been approved"
@@ -46,7 +48,12 @@ export const withCommentModeration = (
     }
 
     removeComment = async () => {
-      const { dispatch, focusedComment, channelName } = this.props
+      const {
+        dispatch,
+        focusedComment,
+        channelName,
+        shouldGetReports
+      } = this.props
 
       if (!focusedComment) {
         // we are getting double events for this, so this is a hack to avoid dispatching
@@ -55,7 +62,9 @@ export const withCommentModeration = (
       }
 
       await removeComment(dispatch, focusedComment)
-      await dispatch(actions.reports.get(channelName))
+      if (shouldGetReports) {
+        await dispatch(actions.reports.get(channelName))
+      }
 
       dispatch(
         setSnackbarMessage({
@@ -65,12 +74,14 @@ export const withCommentModeration = (
     }
 
     ignoreReports = async (comment: CommentInTree) => {
-      const { dispatch, channelName } = this.props
+      const { dispatch, channelName, shouldGetReports } = this.props
 
       await dispatch(
         actions.comments.patch(comment.id, { ignore_reports: true })
       )
-      await dispatch(actions.reports.get(channelName))
+      if (shouldGetReports) {
+        await dispatch(actions.reports.get(channelName))
+      }
     }
 
     render() {
@@ -105,12 +116,11 @@ export const withCommentModeration = (
 }
 
 export const commentModerationSelector = (state: Object, ownProps: Object) => {
-  const { ui, focus, reports } = state
+  const { ui, focus } = state
 
   return {
     showRemoveCommentDialog: ui.dialogs.has(DIALOG_REMOVE_COMMENT),
     focusedComment:          focus.comment,
-    channelName:             getChannelName(ownProps),
-    commentReports:          reports.data.comments
+    channelName:             getChannelName(ownProps)
   }
 }

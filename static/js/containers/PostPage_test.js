@@ -291,8 +291,6 @@ describe("PostPage", function() {
           SET_FOCUSED_POST,
           actions.postRemoved.patch.requestType,
           actions.postRemoved.patch.successType,
-          actions.reports.get.requestType,
-          actions.reports.get.successType,
           SET_POST_DATA,
           SET_SNACKBAR_MESSAGE
         ],

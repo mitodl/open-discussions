@@ -22,8 +22,7 @@ import {
 import type {
   GenericComment,
   CommentInTree,
-  MoreCommentsInTree,
-  CommentReportRecord
+  MoreCommentsInTree
 } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 import type { CommentRemoveFunc } from "./CommentRemovalForm"
@@ -47,7 +46,6 @@ type CommentTreeProps = {
   deleteComment: CommentRemoveFunc,
   reportComment: ReportCommentFunc,
   commentPermalink: (commentID: string) => string,
-  commentReports: Map<string, CommentReportRecord>,
   moderationUI: boolean,
   ignoreCommentReports: (c: CommentInTree) => void
 }
@@ -68,7 +66,6 @@ export default class CommentTree extends React.Component<*, *> {
       isModerator,
       reportComment,
       commentPermalink,
-      commentReports,
       moderationUI,
       ignoreCommentReports
     } = this.props
@@ -81,8 +78,6 @@ export default class CommentTree extends React.Component<*, *> {
     )
 
     const atMaxDepth = depth + 1 >= SETTINGS.max_comment_depth
-
-    const report = commentReports.get(comment.id)
 
     return (
       <div
@@ -130,9 +125,9 @@ export default class CommentTree extends React.Component<*, *> {
               >
                 <a href="#">reply</a>
               </div>}
-            {isModerator && report !== undefined
+            {comment.num_reports
               ? <div className="comment-action-button report-count">
-                  Reports: {report.comment.num_reports}
+                  Reports: {comment.num_reports}
               </div>
               : null}
             {SETTINGS.username === comment.author_id && !moderationUI
@@ -155,7 +150,7 @@ export default class CommentTree extends React.Component<*, *> {
                 <a href="#">delete</a>
               </div>
               : null}
-            {isModerator && report && ignoreCommentReports
+            {comment.num_reports && ignoreCommentReports
               ? <div
                 className="comment-action-button ignore-button"
                 onClick={preventDefaultAndInvoke(() =>

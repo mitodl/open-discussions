@@ -10,7 +10,7 @@ import { renderTextContent } from "./Markdown"
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
 import { editPostKey } from "../components/CommentForms"
 
-import type { Post, PostReportRecord } from "../flow/discussionTypes"
+import type { Post } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 
 export default class ExpandedPostDisplay extends React.Component<*, void> {
@@ -24,8 +24,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     beginEditing: (key: string, initialValue: Object, e: ?Event) => void,
     showPostDeleteDialog: () => void,
     showPostReportDialog: () => void,
-    showPermalinkUI: boolean,
-    report?: PostReportRecord
+    showPermalinkUI: boolean
   }
 
   renderTextContent = () => {
@@ -59,8 +58,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
       beginEditing,
       isModerator,
       showPostDeleteDialog,
-      showPostReportDialog,
-      report
+      showPostReportDialog
     } = this.props
 
     return (
@@ -78,9 +76,9 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
             <a href="#">edit</a>
           </div>
           : null}
-        {isModerator && report
+        {post.num_reports
           ? <div className="report-count">
-              Reports: {report.post.num_reports}
+              Reports: {post.num_reports}
           </div>
           : null}
         {SETTINGS.username === post.author_id

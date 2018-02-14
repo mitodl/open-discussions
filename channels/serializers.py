@@ -135,7 +135,7 @@ class PostSerializer(serializers.Serializer):
     profile_image = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
     edited = serializers.SerializerMethodField()
-    num_reports = serializers.SerializerMethodField()
+    num_reports = serializers.IntegerField(read_only=True)
 
     def _get_user(self, instance):
         """
@@ -189,11 +189,6 @@ class PostSerializer(serializers.Serializer):
     def get_channel_title(self, instance):
         """The title of the channel"""
         return instance.subreddit.title
-
-    def get_num_reports(self, instance):
-        """The number of reports for this post"""
-        # user_reports is a list of (str, int), so we want to sum the counts
-        return len(instance.mod_reports) + sum(report[1] for report in instance.user_reports)
 
     def get_edited(self, instance):
         """Return a Boolean signifying if the post has been edited or not"""
@@ -303,7 +298,7 @@ class CommentSerializer(serializers.Serializer):
     author_name = serializers.SerializerMethodField()
     edited = serializers.SerializerMethodField()
     comment_type = serializers.SerializerMethodField()
-    num_reports = serializers.SerializerMethodField()
+    num_reports = serializers.IntegerField(read_only=True)
     deleted = serializers.SerializerMethodField()
 
     def _get_user(self, instance):
@@ -374,11 +369,6 @@ class CommentSerializer(serializers.Serializer):
     def get_edited(self, instance):
         """Return a Boolean signifying if the comment has been edited or not"""
         return instance.edited if instance.edited is False else True
-
-    def get_num_reports(self, instance):
-        """The number of reports for this comment"""
-        # user_reports is a list of (str, int), so we want to sum the counts
-        return len(instance.mod_reports) + sum(report[1] for report in instance.user_reports)
 
     def get_comment_type(self, instance):  # pylint: disable=unused-argument
         """Let the frontend know which type this is"""

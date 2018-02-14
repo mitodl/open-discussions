@@ -17,7 +17,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'edited': False,
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': '2',
@@ -35,7 +35,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'edited': False,
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': '3',
@@ -53,7 +53,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'edited': False,
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': '4',
@@ -71,7 +71,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'edited': False,
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': '5',
@@ -89,7 +89,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'edited': False,
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'l',
@@ -107,7 +107,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'edited': False,
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'p',
@@ -125,7 +125,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e8x',
@@ -143,7 +143,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e8y',
@@ -161,7 +161,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e8z',
@@ -179,7 +179,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e90',
@@ -197,7 +197,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e91',
@@ -215,7 +215,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e92',
@@ -233,7 +233,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e93',
@@ -251,7 +251,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e94',
@@ -269,7 +269,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e95',
@@ -287,7 +287,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e96',
@@ -305,7 +305,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e97',
@@ -323,7 +323,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e99',
@@ -341,7 +341,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e9b',
@@ -359,7 +359,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e9c',
@@ -377,7 +377,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e9d',
@@ -395,7 +395,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e9f',
@@ -413,7 +413,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e9g',
@@ -431,7 +431,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e9h',
@@ -449,7 +449,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e9i',
@@ -467,7 +467,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e9j',
@@ -485,7 +485,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e9k',
@@ -503,7 +503,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'parent_id': None,
@@ -530,7 +530,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'author_name': '[deleted]',
         'edited': False,
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': '6',
@@ -548,7 +548,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'edited': False,
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': '7',
@@ -566,7 +566,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'edited': False,
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': '8',
@@ -584,7 +584,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'edited': False,
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'n',
@@ -602,7 +602,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': '9',
@@ -620,7 +620,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'c',
@@ -638,7 +638,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'o',
@@ -656,7 +656,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'a',
@@ -674,7 +674,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'b',
@@ -692,7 +692,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'f',
@@ -710,7 +710,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'g',
@@ -728,7 +728,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'h',
@@ -746,7 +746,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'i',
@@ -764,7 +764,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'd',
@@ -782,7 +782,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e',
@@ -800,7 +800,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'j',
@@ -818,7 +818,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'k',
@@ -836,7 +836,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/static/images/avatar_default.png',
         'author_name': '[deleted]',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e8s',
@@ -854,7 +854,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e8t',
@@ -872,7 +872,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e8u',
@@ -890,7 +890,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'id': 'e8v',
@@ -908,7 +908,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
         'profile_image': '/deserunt/consequatur.jpg',
         'author_name': 'Brooke Robles',
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     },
     {
         'parent_id': 'e8v',

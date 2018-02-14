@@ -72,7 +72,6 @@ describe("CommentTree", () => {
           deleteComment={deleteCommentStub}
           reportComment={reportCommentStub}
           commentPermalink={permalinkFunc}
-          commentReports={new Map()}
           {...props}
         />
       </Router>
@@ -233,11 +232,9 @@ describe("CommentTree", () => {
   describe("moderation UI", () => {
     const moderationUI = true
     const isModerator = true
-    let report, commentReports
+    let report
     beforeEach(() => {
       report = makeCommentReport(makePost())
-      commentReports = new Map()
-      commentReports.set(report.comment.id, report)
     })
 
     it("should hide the reply button", () => {
@@ -258,17 +255,21 @@ describe("CommentTree", () => {
     it("should include the report count if the user is a moderator", () => {
       const wrapper = renderCommentTree({
         isModerator,
-        commentReports,
         comments: [report.comment]
       })
       assert.ok(wrapper.find(".report-count").exists())
       assert.equal(wrapper.find(".report-count").text(), "Reports: 2")
     })
 
+    it("should not render a report count, if comment has no report data", () => {
+      const wrapper = renderCommentTree({ moderationUI })
+      const count = wrapper.find(".report-count")
+      assert.isNotOk(count.exists())
+    })
+
     it("should include an ignoreCommentReports button if report and moderator", () => {
       const ignoreCommentReportsStub = helper.sandbox.stub()
       const wrapper = renderCommentTree({
-        commentReports,
         isModerator,
         ignoreCommentReports: ignoreCommentReportsStub,
         comments:             [report.comment]

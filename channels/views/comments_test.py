@@ -147,7 +147,7 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "author_name": name,
             "edited": False,
             "comment_type": "comment",
-            'num_reports': 0,
+            'num_reports': None,
         },
         {
             "id": "n",
@@ -165,7 +165,7 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "author_name": name,
             "edited": False,
             "comment_type": "comment",
-            'num_reports': 0,
+            'num_reports': None,
         },
         {
             "id": "o",
@@ -183,7 +183,7 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "author_name": name,
             "edited": False,
             "comment_type": "comment",
-            'num_reports': 0,
+            'num_reports': None,
         }
     ]
 
@@ -234,7 +234,7 @@ def test_more_comments_children(client, logged_in_profile):
             "author_name": name,
             "edited": False,
             "comment_type": "comment",
-            'num_reports': 0,
+            'num_reports': None,
         },
         {
             "id": "e9m",
@@ -252,7 +252,7 @@ def test_more_comments_children(client, logged_in_profile):
             "author_name": name,
             "edited": False,
             "comment_type": "comment",
-            'num_reports': 0,
+            'num_reports': None,
         }
     ]
 
@@ -314,7 +314,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             'id': '1s',
             'edited': False,
             "author_name": "[deleted]",
-            'num_reports': 0,
+            'num_reports': None,
         },
         {
             'author_id': user.username,
@@ -332,7 +332,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             'edited': False,
             "deleted": False,
             "author_name": user.profile.name,
-            'num_reports': 0,
+            'num_reports': None,
         }
     ]
 
@@ -364,7 +364,7 @@ def test_get_comment(client, jwt_header, private_channel_and_contributor, reddit
         'author_name': user.profile.name,
         'edited': False,
         'comment_type': 'comment',
-        'num_reports': 0,
+        'num_reports': None,
     }]
 
 
