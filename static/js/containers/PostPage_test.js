@@ -544,6 +544,23 @@ describe("PostPage", function() {
     assert(wrapper.find(NotFound).exists())
   })
 
+  it("should show a 404 page for a comment 404", async () => {
+    helper.getCommentsStub.returns(Promise.reject({ errorStatusCode: 404 }))
+    const [wrapper] = await renderComponent(
+      postDetailURL(channel.name, post.id),
+      [
+        actions.posts.get.requestType,
+        actions.posts.get.successType,
+        actions.comments.get.requestType,
+        actions.comments.get.failureType,
+        actions.subscribedChannels.get.requestType,
+        actions.subscribedChannels.get.successType,
+        SET_CHANNEL_DATA
+      ]
+    )
+    assert(wrapper.find(NotFound).exists())
+  })
+
   it("should show the PostPage if a 410 happens on comments", async () => {
     // really this only happens on comments.post, but we don't have per-verb status codes so this is close enough
     helper.getCommentsStub.returns(Promise.reject({ errorStatusCode: 410 }))

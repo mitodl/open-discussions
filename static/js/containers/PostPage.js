@@ -38,7 +38,11 @@ import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
 import { toggleUpvote } from "../util/api_actions"
 import { getChannelName, getPostID, getCommentID } from "../lib/util"
 import { isModerator } from "../lib/channels"
-import { anyErrorExcept404, anyErrorExcept404or410 } from "../util/rest"
+import {
+  anyErrorExcept404,
+  anyErrorExcept404or410,
+  any404Error
+} from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginEditing } from "../components/CommentForms"
 import { formatTitle } from "../lib/title"
@@ -502,7 +506,15 @@ class PostPage extends React.Component<*, void> {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { posts, channels, comments, forms, channelModerators, ui } = state
+  const {
+    posts,
+    channels,
+    comments,
+    forms,
+    channelModerators,
+    subscribedChannels,
+    ui
+  } = state
   const postID = getPostID(ownProps)
   const channelName = getChannelName(ownProps)
   const commentID = getCommentID(ownProps)
@@ -510,12 +522,10 @@ const mapStateToProps = (state, ownProps) => {
   const channel = channels.data.get(channelName)
   const commentsTree = comments.data.get(postID)
   const moderators = channelModerators.data.get(channelName)
-  const loaded = posts.error
-    ? true
-    : R.none(R.isNil, [post, channel, commentsTree])
-  const notFound = loaded
-    ? posts.error && posts.error.errorStatusCode === 404
-    : false
+
+  const loaded = posts.loaded && subscribedChannels.loaded && comments.loaded
+
+  const notFound = loaded && any404Error([posts, comments])
 
   return {
     ...postModerationSelector(state, ownProps),

@@ -1,7 +1,15 @@
 // @flow
 import { assert } from "chai"
 
-import { anyProcessing, allLoaded, anyError, anyErrorExcept404 } from "./rest"
+import {
+  anyProcessing,
+  allLoaded,
+  anyError,
+  anyErrorExcept404,
+  any404Error
+} from "./rest"
+
+const makeError = n => ({ error: { errorStatusCode: n } })
 
 describe("rest utils", () => {
   describe("anyProcessing", () => {
@@ -77,26 +85,38 @@ describe("rest utils", () => {
     })
 
     it("should return true if some or all codes are not 404", () => {
-      assert.isTrue(
-        anyErrorExcept404([
-          { error: { errorStatusCode: 401 } },
-          { error: { errorStatusCode: 404 } }
-        ])
-      )
-      assert.isTrue(
-        anyErrorExcept404([
-          { error: { errorStatusCode: 401 } },
-          { error: { errorStatusCode: 500 } }
+      assert.isTrue(anyErrorExcept404([makeError(401), makeError(404)]))
+      assert.isTrue(anyErrorExcept404([makeError(401), makeError(500)]))
+    })
+
+    it("should return false if all codes are 404", () => {
+      assert.isFalse(anyErrorExcept404([makeError(404), makeError(404)]))
+    })
+  })
+
+  describe("any404Error", () => {
+    it("should return false for empty array", () => {
+      assert.isFalse(any404Error([]))
+    })
+
+    it("should return false if all codes are not 404", () => {
+      assert.isFalse(
+        any404Error([
+          makeError(303),
+          makeError(400),
+          makeError(500),
+          { error: {} }
         ])
       )
     })
 
-    it("should return false if all codes are 404", () => {
-      assert.isFalse(
-        anyErrorExcept404([
-          { error: { errorStatusCode: 404 } },
-          { error: { errorStatusCode: 404 } }
-        ])
+    it("should return true if some or all codes are 404", () => {
+      assert.isTrue(
+        any404Error([makeError(404), makeError(500), makeError(4932)])
+      )
+
+      assert.isTrue(
+        any404Error([makeError(404), makeError(404), makeError(404)])
       )
     })
   })
