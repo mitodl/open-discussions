@@ -33,6 +33,16 @@ urlpatterns = [
     url(r'^$', index, name='open_discussions-index'),
     url(r'^auth_required/$', index),
     url(r'^content_policy/$', index),
+    url(  # so that we can use reverse() to link to this
+        r'^channel/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/$',
+        index,
+        name='channel-post',
+    ),
+    url(  # so that we can use reverse() to link to this
+        r'^channel/(?P<channel_name>[A-Za-z0-9_]+)/$',
+        index,
+        name='channel',
+    ),
     url(r'^channel/', index),
     url(r'^manage/', index),
     url(r'^create_post/', index),

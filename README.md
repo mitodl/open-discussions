@@ -47,8 +47,10 @@ This file should be copied from the example in the codebase:
 
 All the  variables in the ``.env``` file should then be manually populated with values.
 
-The default values for ``OPEN_DISCUSSIONS_REDDIT_CLIENT_ID`` and ``OPEN_DISCUSSIONS_REDDIT_SECRET`` 
+The default values for ``OPEN_DISCUSSIONS_REDDIT_CLIENT_ID`` and ``OPEN_DISCUSSIONS_REDDIT_SECRET``
 can be found in the reddit-config repo's Vagrantfile.
+
+Set ``OPEN_DISCUSSIONS_BASE_URL`` to the ``protocol://host:port`` where open-discussions is reachable locally (e.g. http://localhost:8063).
 
 #### 2) _(OSX only)_ Set up and run the webpack dev server on your host machine
 
@@ -205,9 +207,9 @@ The following variable should also be set in your MicroMasters ``.env`` file:
   - ``OPEN_DISCUSSIONS_JWT_SECRET``: same value as in the open-discussions ``.env`` file
   - ``OPEN_DISCUSSIONS_COOKIE_NAME``: same value as in the open-discussions ``.env`` file
   - ``OPEN_DISCUSSIONS_COOKIE_DOMAIN``: the root domain, for example ``odl.local``
-  - ``OPEN_DISCUSSIONS_REDIRECT_URL``: the domain-based URL for open-discussions, 
+  - ``OPEN_DISCUSSIONS_REDIRECT_URL``: the domain-based URL for open-discussions,
     for example ``http://od.odl.local:8063/``
-  - ``OPEN_DISCUSSIONS_BASE_URL``: the base internal URL for open-discussions, 
+  - ``OPEN_DISCUSSIONS_BASE_URL``: the base internal URL for open-discussions,
     i.e. ``http://192.168.99.101:8063`` or ``http://localhost:8063/``
   - ``FEATURE_OPEN_DISCUSSIONS_POST_UI=True``
   - ``FEATURE_OPEN_DISCUSSIONS_CREATE_CHANNEL_UI=True``

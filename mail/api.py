@@ -131,7 +131,6 @@ def messages_for_recipients(recipients_and_contexts, template_name):
                 subject=subject,
                 body=text_body,
                 to=[recipient],
-                bcc=[settings.MAILGUN_BCC_TO_EMAIL] if settings.MAILGUN_BCC_TO_EMAIL else [],
                 from_email=settings.MAILGUN_FROM_EMAIL,
                 connection=connection,
             )

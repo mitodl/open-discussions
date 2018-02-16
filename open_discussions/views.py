@@ -14,7 +14,7 @@ from open_discussions.templatetags.render_bundle import public_path
 from sites.models import AuthenticatedSite
 
 
-def index(request):
+def index(request, **kwargs):  # pylint: disable=unused-argument
     """
     The index view.
     """

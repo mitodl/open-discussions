@@ -4,6 +4,7 @@ from enum import (
     auto,
     Flag,
 )
+from itertools import islice
 import logging
 
 import pytz
@@ -59,3 +60,36 @@ def now_in_utc():
         datetime.datetime: A datetime object for the current time
     """
     return datetime.datetime.now(tz=pytz.UTC)
+
+
+def normalize_to_start_of_day(dt):
+    """
+    Normalizes a datetime value to the start of it's day
+
+    Args:
+        dt (datetime.datetime): the datetime to normalize
+
+    Returns:
+        datetime.datetime: the normalized datetime
+    """
+    return dt.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def chunks(iterable, chunk_size=20):
+    """
+    Yields chunks of an iterable as sub lists each of max size chunk_size.
+
+    Args:
+        iterable (iterable): iterable of elements to chunk
+        chunk_size (int): Max size of each sublist
+
+    Yields:
+        list: List containing a slice of list_to_chunk
+    """
+    chunk_size = max(1, chunk_size)
+    iterable = iter(iterable)
+    chunk = list(islice(iterable, chunk_size))
+
+    while len(chunk) > 0:
+        yield chunk
+        chunk = list(islice(iterable, chunk_size))

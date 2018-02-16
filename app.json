@@ -52,6 +52,9 @@
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
     },
+    "OPEN_DISCUSSIONS_BASE_URL": {
+      "description": "Base url to link users to in emails"
+    },
     "OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT": {
       "description": "Number of posts to display on the frontpage and channels",
       "required": false

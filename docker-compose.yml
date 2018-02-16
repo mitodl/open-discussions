@@ -42,6 +42,9 @@ services:
       DOCKER_HOST: ${DOCKER_HOST:-missing}
       WEBPACK_DEV_SERVER_HOST: ${WEBPACK_DEV_SERVER_HOST:-localhost}
     env_file: .env
+    # set reddit.local in /etc/hosts
+    extra_hosts:
+      - "reddit.local:192.168.56.111"
 
   web:
     image: open_discussions_python
@@ -58,9 +61,6 @@ services:
     links:
       - db
       - redis
-    # set reddit.local in /etc/hosts
-    extra_hosts:
-      - "reddit.local:192.168.56.111"
 
   watch:
     build:

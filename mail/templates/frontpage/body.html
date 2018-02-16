@@ -1,0 +1,12 @@
+Recent Posts:
+
+{% for post in posts %}
+<a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">
+    {{ post.title }}
+</a>
+in
+<a href="{{ base_url }}{% url 'channel' channel_name=post.channel_name %}">
+  {{ post.channel_title }}
+</a>
+<br/><br/>
+{% endfor %}
