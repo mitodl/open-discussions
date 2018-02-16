@@ -45,6 +45,11 @@ This file should be copied from the example in the codebase:
 
     cp .env.example .env
 
+All the  variables in the ``.env``` file should then be manually populated with values.
+
+The default values for ``OPEN_DISCUSSIONS_REDDIT_CLIENT_ID`` and ``OPEN_DISCUSSIONS_REDDIT_SECRET`` 
+can be found in the reddit-config repo's Vagrantfile.
+
 #### 2) _(OSX only)_ Set up and run the webpack dev server on your host machine
 
 In the development environment, our static assets are served from the webpack
@@ -170,3 +175,26 @@ host machine isn't running Linux. If you are using a Mac, you'll need to run
 
     yarn install --frozen-lockfile
     npm run-script flow
+
+
+#### 6) Integration with MicroMasters
+
+MicroMasters and Open-Discussions share a cookie, which means that they need to be running on the same domain.
+This can be emulated by modifying your hosts file, for example:
+
+ ```
+192.168.99.100  micromasters.odl.local
+192.168.99.101  od.odl.local
+ ```
+
+The following variable should also be set in your MicroMasters ``.env`` file:
+
+  - ``OPEN_DISCUSSIONS_JWT_SECRET``: same value as in the open-discussions ``.env`` file
+  - ``OPEN_DISCUSSIONS_COOKIE_NAME``: same value as in the open-discussions ``.env`` file
+  - ``OPEN_DISCUSSIONS_COOKIE_DOMAIN``: the root domain, for example ``odl.local``
+  - ``OPEN_DISCUSSIONS_REDIRECT_URL``: the domain-based URL for open-discussions, 
+    for example ``http://od.odl.local:8063/``
+  - ``OPEN_DISCUSSIONS_BASE_URL``: the base internal URL for open-discussions, 
+    i.e. ``http://192.168.99.101:8063`` or ``http://localhost:8063/``
+  - ``FEATURE_OPEN_DISCUSSIONS_POST_UI=True``
+  - ``FEATURE_OPEN_DISCUSSIONS_CREATE_CHANNEL_UI=True``
