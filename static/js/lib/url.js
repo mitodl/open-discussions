@@ -33,6 +33,7 @@ export const getChannelNameFromPathname = R.compose(
 export const FRONTPAGE_URL = "/"
 export const AUTH_REQUIRED_URL = "/auth_required/"
 export const CONTENT_POLICY_URL = "/content_policy/"
+export const SETTINGS_URL = "/settings/"
 
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`

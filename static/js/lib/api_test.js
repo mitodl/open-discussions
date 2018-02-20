@@ -25,7 +25,9 @@ import {
   deletePost,
   deleteComment,
   reportContent,
-  getReports
+  getReports,
+  getSettings,
+  patchFrontpageSetting
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -35,6 +37,7 @@ import {
 } from "../factories/comments"
 import { makeReportRecord } from "../factories/reports"
 import { COMMENT_SORT_NEW } from "../lib/sorting"
+import * as authFuncs from "./auth"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
@@ -43,6 +46,7 @@ describe("api", function() {
   beforeEach(() => {
     sandbox = sinon.sandbox.create()
   })
+
   afterEach(function() {
     sandbox.restore()
 
@@ -430,6 +434,70 @@ describe("api", function() {
       assert.ok(
         fetchJSONStub.calledWith(`/api/v0/channels/channelName/reports/`)
       )
+    })
+  })
+
+  describe("settings functions", () => {
+    let fetchTokenStub, fetchAuthFailureStub
+    const setting = { settings: "are great" }
+
+    beforeEach(() => {
+      fetchTokenStub = sandbox.stub(authFuncs, "fetchJSONWithToken")
+      fetchAuthFailureStub = sandbox.stub(authFuncs, "fetchJSONWithAuthFailure")
+      fetchTokenStub.returns(Promise.resolve())
+      fetchAuthFailureStub.returns(Promise.resolve())
+    })
+
+    describe("getSettings", () => {
+      it("calls fetchJSONWithToken when passed a token", async () => {
+        await getSettings("mygreattoken")
+        assert.isNotOk(fetchAuthFailureStub.called)
+        assert.ok(
+          fetchTokenStub.calledWith(
+            "/api/v0/notification_settings/",
+            "mygreattoken"
+          )
+        )
+      })
+
+      it("calls fetchJSONWithAuthFailure when not passed a token", async () => {
+        await getSettings()
+        assert.isNotOk(fetchTokenStub.called)
+        assert.ok(
+          fetchAuthFailureStub.calledWith("/api/v0/notification_settings/")
+        )
+      })
+    })
+
+    describe("patchFrontpageSetting", () => {
+      it("should call fetchJSONWithToken when passed a token", async () => {
+        await patchFrontpageSetting(setting, "great token")
+        assert.isNotOk(fetchAuthFailureStub.called)
+        assert.ok(
+          fetchTokenStub.calledWith(
+            "/api/v0/notification_settings/frontpage/",
+            "great token",
+            {
+              method: PATCH,
+              body:   JSON.stringify(setting)
+            }
+          )
+        )
+      })
+
+      it("calls fetchJSONWithAuthFailure when not passed a token", async () => {
+        await patchFrontpageSetting(setting)
+        assert.isNotOk(fetchTokenStub.called)
+        assert.ok(
+          fetchAuthFailureStub.calledWith(
+            "/api/v0/notification_settings/frontpage/",
+            {
+              method: PATCH,
+              body:   JSON.stringify(setting)
+            }
+          )
+        )
+      })
     })
   })
 })

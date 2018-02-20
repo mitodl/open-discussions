@@ -13,6 +13,7 @@ import AdminPage from "./admin/AdminPage"
 import AuthRequiredPage from "./AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
 import ChannelModerationPage from "./ChannelModerationPage"
+import SettingsPage from "./SettingsPage"
 import Toolbar from "../components/Toolbar"
 import Snackbar from "../components/material/Snackbar"
 import Drawer from "../containers/Drawer"
@@ -21,7 +22,7 @@ import Footer from "../components/Footer"
 import { actions } from "../actions"
 import { setShowDrawer } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
-import { AUTH_REQUIRED_URL } from "../lib/url"
+import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -45,7 +46,8 @@ class App extends React.Component<*, void> {
     const { location: { pathname } } = this.props
     if (
       pathname === AUTH_REQUIRED_URL ||
-      !SETTINGS.authenticated_site.session_url
+      !SETTINGS.authenticated_site.session_url ||
+      pathname.startsWith(SETTINGS_URL)
     ) {
       // either user is at auth required page
       // or they will be soon redirected there due to missing session_url
@@ -67,7 +69,8 @@ class App extends React.Component<*, void> {
 
     if (
       !SETTINGS.authenticated_site.session_url &&
-      pathname !== AUTH_REQUIRED_URL
+      pathname !== AUTH_REQUIRED_URL &&
+      !pathname.startsWith(SETTINGS_URL)
     ) {
       // user does not have the jwt cookie, they must go through login workflow first
       return <Redirect to={AUTH_REQUIRED_URL} />
@@ -112,6 +115,11 @@ class App extends React.Component<*, void> {
           <Route
             path={`${match.url}content_policy/`}
             component={ContentPolicyPage}
+          />
+          <Route
+            exact
+            path={`${match.url}settings/:token?`}
+            component={SettingsPage}
           />
         </div>
         <Footer />

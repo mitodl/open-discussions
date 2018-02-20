@@ -6,7 +6,11 @@ import "isomorphic-fetch"
 import qs from "query-string"
 import { PATCH, POST, DELETE } from "redux-hammock/constants"
 
-import { fetchJSONWithAuthFailure, fetchWithAuthFailure } from "./auth"
+import {
+  fetchJSONWithAuthFailure,
+  fetchWithAuthFailure,
+  fetchJSONWithToken
+} from "./auth"
 import { toQueryString } from "../lib/url"
 import { getPaginationSortParams } from "../lib/posts"
 
@@ -22,6 +26,7 @@ import type {
   GenericReport,
   ReportRecord
 } from "../flow/discussionTypes"
+import type { NotificationSetting } from "../flow/settingsTypes"
 
 const paramsToQueryString = paramSelector =>
   R.compose(toQueryString, R.reject(R.isNil), paramSelector)
@@ -200,3 +205,22 @@ export function reportContent(payload: GenericReport): Promise<GenericReport> {
 
 export const getReports = (channelName: string): Promise<Array<ReportRecord>> =>
   fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/reports/`)
+
+export const getSettings = (token: ?string = undefined) =>
+  token
+    ? fetchJSONWithToken("/api/v0/notification_settings/", token)
+    : fetchJSONWithAuthFailure("/api/v0/notification_settings/")
+
+export const patchFrontpageSetting = (
+  setting: NotificationSetting,
+  token: ?string = undefined
+) =>
+  token
+    ? fetchJSONWithToken("/api/v0/notification_settings/frontpage/", token, {
+      method: PATCH,
+      body:   JSON.stringify(setting)
+    })
+    : fetchJSONWithAuthFailure("/api/v0/notification_settings/frontpage/", {
+      method: PATCH,
+      body:   JSON.stringify(setting)
+    })

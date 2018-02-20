@@ -57,3 +57,25 @@ export const fetchJSONWithAuthFailure = withAuthFailure((...args) =>
 export const fetchWithAuthFailure = withAuthFailure((...args) =>
   fetchWithCSRF(...args)
 )
+
+export const fetchJSONWithToken = async (
+  url: string,
+  token: string,
+  body: ?Object = {}
+) => {
+  try {
+    return await fetchJSONWithCSRF(url, {
+      headers: {
+        Authorization:  `Token ${token}`,
+        "content-type": "application/json"
+      },
+      ...body
+    })
+  } catch (fetchError) {
+    if (fetchError.errorStatusCode !== 401) {
+      // not an authentication failure, rethrow
+      throw fetchError
+    }
+    return redirectAndReject("invalid token")
+  }
+}

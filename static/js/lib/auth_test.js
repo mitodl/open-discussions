@@ -6,6 +6,8 @@ import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
 import * as auth from "./auth"
 
+import { AUTH_REQUIRED_URL } from "./url"
+
 describe("auth", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
 
@@ -14,20 +16,26 @@ describe("auth", function() {
   const typeError = new TypeError()
 
   let sandbox, fetchStub
+
+  beforeEach(() => {
+    sandbox = sinon.sandbox.create()
+  })
+
+  afterEach(() => {
+    sandbox.restore()
+    fetchMock.restore()
+  })
   ;[
     [auth.fetchJSONWithAuthFailure, "fetchJSONWithCSRF"],
     [auth.fetchWithAuthFailure, "fetchWithCSRF"]
   ].forEach(([authFunc, djangoCSRFFunc]) => {
     describe(authFunc.name, () => {
       beforeEach(() => {
-        sandbox = sinon.sandbox.create()
         fetchStub = sandbox.stub(fetchFuncs, djangoCSRFFunc)
 
         SETTINGS.authenticated_site.session_url = "/session/url"
       })
       afterEach(function() {
-        sandbox.restore()
-        fetchMock.restore()
         for (const cookie of document.cookie.split(";")) {
           const key = cookie.split("=")[0].trim()
           document.cookie = `${key}=`
@@ -98,6 +106,42 @@ describe("auth", function() {
         assert.ok(fetchStub.calledWith("/url"))
         assert.equal(window.location.pathname, "/auth_required/")
       })
+    })
+  })
+
+  describe("fetchJSONWithToken", () => {
+    beforeEach(() => {
+      fetchStub = sandbox.stub(fetchFuncs, "fetchJSONWithCSRF")
+    })
+
+    it("should include the token!", async () => {
+      fetchStub.returns(Promise.resolve())
+      await auth.fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
+
+      assert.ok(fetchStub.calledWith, "/beep/boop/", {
+        headers: {
+          Authorization: "Token mygreatsecuretoken=="
+        }
+      })
+    })
+
+    it("should return and redirect if 401 error", async () => {
+      fetchStub.returns(Promise.reject(error401))
+
+      const err = await assert.isRejected(
+        auth.fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
+      )
+      assert.equal(err, "invalid token")
+      assert.equal(window.location.pathname, AUTH_REQUIRED_URL)
+    })
+
+    it("should just reject if not 401 error", async () => {
+      fetchStub.returns(Promise.reject(error500))
+      const err = await assert.isRejected(
+        auth.fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
+      )
+      assert.deepEqual(err, error500)
+      assert.equal(window.location.pathname, "/")
     })
   })
 })

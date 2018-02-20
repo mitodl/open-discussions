@@ -47,6 +47,7 @@ urlpatterns = [
     url(r'^manage/', index),
     url(r'^create_post/', index),
     url(r'^moderation/', index),
+    url(r'^settings/', index),
 ]
 
 if settings.DEBUG:

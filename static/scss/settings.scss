@@ -1,0 +1,16 @@
+.settings-page {
+  button {
+    margin-left: 15px;
+  }
+
+  .settings-radio {
+    & > div {
+      display: flex;
+      align-items: center;
+
+      label {
+        margin: 0;
+      }
+    }
+  }
+}

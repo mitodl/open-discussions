@@ -6,7 +6,9 @@ export const arrayN = (min: number, max: number) =>
   R.range(0, casual.integer(min, max))
 
 export const randomSelection = (n: number, xs: Array<any>) =>
-  R.times(() => xs[casual.integer(0, xs.length - 1)], n)
+  R.times(() => draw(xs), n)
+
+export const draw = (xs: Array<any>) => xs[casual.integer(0, xs.length - 1)]
 
 export function* incrementer(): Generator<number, *, *> {
   let int = 1
