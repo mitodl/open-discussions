@@ -133,6 +133,10 @@
     "OPEN_DISCUSSIONS_SUPPORT_EMAIL": {
       "description": "Email address listed for customer support"
     },
+    "OPEN_DISCUSSIONS_UNSUBSCRIBE_TOKEN_MAX_AGE_SECONDS": {
+      "description": "Maximum age of unsubscribe tokens in seconds",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_USE_S3": {
       "description": "Use S3 for storage backend (required on Heroku)",
       "value": "False"

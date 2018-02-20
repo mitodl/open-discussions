@@ -1,4 +1,5 @@
 """Notification views"""
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import (
     ListModelMixin,
@@ -6,13 +7,20 @@ from rest_framework.mixins import (
     RetrieveModelMixin,
 )
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from notifications.serializers import NotificationSettingsSerializer
+from open_discussions.authentication import StatelessTokenAuthentication
 
 
 class NotificationSettingsViewSet(ListModelMixin, UpdateModelMixin, RetrieveModelMixin, GenericViewSet):
     """View for notification settings"""
     serializer_class = NotificationSettingsSerializer
+    authentication_classes = (
+        JSONWebTokenAuthentication,
+        SessionAuthentication,
+        StatelessTokenAuthentication,
+    )
     permission_classes = (IsAuthenticated,)
     lookup_field = 'notification_type'
 
