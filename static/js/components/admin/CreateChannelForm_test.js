@@ -3,7 +3,7 @@ import { assert } from "chai"
 import sinon from "sinon"
 import { shallow } from "enzyme"
 
-import ChannelCreateForm from "./ChannelCreateForm"
+import CreateChannelForm from "./CreateChannelForm"
 import {
   CHANNEL_TYPE_PUBLIC,
   CHANNEL_TYPE_PRIVATE,
@@ -12,13 +12,13 @@ import {
 
 import type { ChannelForm } from "../../flow/discussionTypes"
 
-describe("ChannelCreateForm", () => {
+describe("CreateChannelForm", () => {
   const renderForm = (
     form: ChannelForm,
     { onSubmit, onUpdate } = { onSubmit: () => {}, onUpdate: () => {} }
   ) =>
     shallow(
-      <ChannelCreateForm form={form} onSubmit={onSubmit} onUpdate={onUpdate} />
+      <CreateChannelForm form={form} onSubmit={onSubmit} onUpdate={onUpdate} />
     )
   let sandbox, form
 

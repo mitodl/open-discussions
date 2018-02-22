@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import DocumentTitle from "react-document-title"
 
 import Card from "../../components/Card"
-import ChannelCreateForm from "../../components/admin/ChannelCreateForm"
+import CreateChannelForm from "../../components/admin/CreateChannelForm"
 import { actions } from "../../actions"
 import { channelURL } from "../../lib/url"
 import { newChannelForm } from "../../lib/channels"
@@ -76,7 +76,7 @@ class CreateChannelPage extends React.Component<*, void> {
         <DocumentTitle title={formatTitle("Create a Channel")} />
         <div className="main-content">
           <Card title="Create a Channel">
-            <ChannelCreateForm
+            <CreateChannelForm
               onSubmit={this.onSubmit}
               onUpdate={this.onUpdate}
               form={channelForm.value}

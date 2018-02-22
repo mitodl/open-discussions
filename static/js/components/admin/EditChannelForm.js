@@ -9,7 +9,7 @@ import type {
   ChannelEditValidation
 } from "../../flow/discussionTypes"
 
-export default class ChannelEditForm extends React.Component<*, void> {
+export default class EditChannelForm extends React.Component<*, void> {
   props: {
     onSubmit: Function,
     onUpdate: Function,

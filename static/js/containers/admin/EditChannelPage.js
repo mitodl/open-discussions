@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import DocumentTitle from "react-document-title"
 
 import Card from "../../components/Card"
-import ChannelEditForm from "../../components/admin/ChannelEditForm"
+import EditChannelForm from "../../components/admin/EditChannelForm"
 import { actions } from "../../actions"
 import { editChannelForm } from "../../lib/channels"
 import { channelURL } from "../../lib/url"
@@ -118,7 +118,7 @@ class EditChannelPage extends React.Component<*, void> {
         <div className="main-content">
           <ChannelBreadcrumbs channel={channel} />
           <Card title="Edit Channel">
-            <ChannelEditForm
+            <EditChannelForm
               onSubmit={this.onSubmit}
               onUpdate={this.onUpdate}
               form={channelForm.value}
