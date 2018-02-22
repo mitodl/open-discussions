@@ -1,6 +1,19 @@
 Release Notes
 =============
 
+Version 0.15.0
+--------------
+
+- Added stateless token auth to notification settings api
+- Add the material radio component
+- Proposed design for email notifications
+- Added notifications settings (#459)
+- Add more details to the README on env. settings and integration with MicroMasters
+- fix comment permalink 404 issue
+- Added report counts to report page (#495)
+- Fix 403 error on post page (from moderator API)
+- Added mail app supporting sending of emails (#449)
+
 Version 0.14.0
 --------------
 
