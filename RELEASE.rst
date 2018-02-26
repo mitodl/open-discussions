@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.16.0
+--------------
+
+- Updated UI and views to use AuthenticatedSite (#444)
+- A little renaming
+
 Version 0.15.0
 --------------
 
