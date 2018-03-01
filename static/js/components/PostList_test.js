@@ -58,7 +58,7 @@ describe("PostList", () => {
     })
   })
 
-  it("should pass thesinon.stub() showChannelLinks prop to CompactPostDisplay", () => {
+  it("should pass the togglePinPost prop to CompactPostDisplay", () => {
     const pinStub = sinon.stub()
     const wrapper = renderPostList({
       posts:         makeChannelPostList(),
@@ -67,5 +67,15 @@ describe("PostList", () => {
     wrapper.find(CompactPostDisplay).forEach(postSummary => {
       assert.equal(postSummary.props().togglePinPost, pinStub)
     })
+  })
+
+  it("should pass the reportPost prop to CompactPostDisplay", () => {
+    const reportStub = sinon.stub()
+    const wrapper = renderPostList({
+      posts:      makeChannelPostList(),
+      reportPost: reportStub
+    })
+    wrapper.find(CompactPostDisplay).first().props().reportPost()
+    assert.ok(reportStub.called)
   })
 })

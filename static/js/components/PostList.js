@@ -11,7 +11,8 @@ type PostListProps = {
   showPinUI?: boolean,
   toggleUpvote: Post => void,
   togglePinPost?: Post => Promise<*>,
-  isModerator?: boolean
+  isModerator?: boolean,
+  reportPost: (p: Post) => void
 }
 
 const PostList = (props: PostListProps) => {
@@ -21,7 +22,8 @@ const PostList = (props: PostListProps) => {
     showPinUI,
     isModerator,
     toggleUpvote,
-    togglePinPost
+    togglePinPost,
+    reportPost
   } = props
 
   return (
@@ -36,6 +38,7 @@ const PostList = (props: PostListProps) => {
             showPinUI={showPinUI}
             isModerator={isModerator}
             togglePinPost={togglePinPost}
+            reportPost={reportPost}
           />
         )
         : <div className="empty-list-msg">There are no posts to display.</div>}

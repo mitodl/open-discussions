@@ -262,7 +262,7 @@ describe("PostPage", function() {
         SET_SNACKBAR_MESSAGE
       ],
       () => {
-        wrapper.find(Dialog).at(3).props().onAccept()
+        wrapper.find(Dialog).at(4).props().onAccept()
       }
     )
     const { location: { pathname } } = helper.browserHistory
@@ -297,7 +297,7 @@ describe("PostPage", function() {
         () => {
           const props = wrapper.find("ExpandedPostDisplay").props()
           props.removePost(post)
-          wrapper.find("Dialog").at(0).props().onAccept()
+          wrapper.find("Dialog").at(1).props().onAccept()
         }
       )
 
@@ -381,7 +381,7 @@ describe("PostPage", function() {
         if (!isRemoved) {
           // if we are removing the comment, handle the confirmation dialog
           newState = await listenForActions(patchActions, () => {
-            wrapper.find("Dialog").at(1).props().onAccept()
+            wrapper.find("Dialog").at(2).props().onAccept()
           })
         }
 
@@ -447,14 +447,17 @@ describe("PostPage", function() {
     helper.reportContentStub.returns(Promise.resolve())
 
     const preventDefaultStub = helper.sandbox.stub()
-    await listenForActions([SHOW_DIALOG, FORM_BEGIN_EDIT], () => {
-      const reportPostFunc = wrapper.find("ExpandedPostDisplay").props()
-        .showPostReportDialog
-      reportPostFunc({ preventDefault: preventDefaultStub })
-    })
+    await listenForActions(
+      [SHOW_DIALOG, FORM_BEGIN_EDIT, SET_FOCUSED_POST],
+      () => {
+        const reportPostFunc = wrapper.find("ExpandedPostDisplay").props()
+          .showPostReportDialog
+        reportPostFunc({ preventDefault: preventDefaultStub })
+      }
+    )
     assert.ok(preventDefaultStub.called)
 
-    const dialog = wrapper.find("Dialog").at(4)
+    const dialog = wrapper.find("Dialog").at(0)
     dialog.find("input").simulate("change", {
       target: {
         name:  "reason",
@@ -491,6 +494,8 @@ describe("PostPage", function() {
 
       if (isComment) {
         expectedActions.push(SET_FOCUSED_COMMENT)
+      } else {
+        expectedActions.push(SET_FOCUSED_POST)
       }
 
       const preventDefaultStub = helper.sandbox.stub()
@@ -509,7 +514,8 @@ describe("PostPage", function() {
         }
       })
 
-      const dialog = wrapper.find("Dialog").at(4)
+      const dialog = wrapper.find(Dialog).at(isComment ? 5 : 0)
+
       dialog.find("input").simulate("change", {
         target: {
           name:  "reason",

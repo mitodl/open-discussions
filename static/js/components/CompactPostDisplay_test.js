@@ -88,8 +88,16 @@ describe("CompactPostDisplay", () => {
   it("should not show a pin link otherwise", () => {
     [true, false].forEach(showPinUI => {
       const wrapper = renderPostDisplay({ post, showPinUI })
-      assert.lengthOf(wrapper.find(".post-links").find("a"), 1)
+      assert.lengthOf(wrapper.find(".post-links").find("a"), 2)
     })
+  })
+
+  it("should show a report link", () => {
+    const reportPost = helper.sandbox.stub()
+    const wrapper = renderPostDisplay({ post, reportPost })
+    const link = wrapper.find({ children: "report" })
+    link.props().onClick()
+    assert.ok(reportPost.called)
   })
 
   it("should set a class if stickied and showing pin ui", () => {

@@ -49,6 +49,12 @@ import { formatTitle } from "../lib/title"
 import { channelURL, postDetailURL, commentPermalink } from "../lib/url"
 import { clearPostError } from "../actions/post"
 import { preventDefaultAndInvoke } from "../lib/util"
+import {
+  getReportForm,
+  onReportUpdate,
+  REPORT_CONTENT_NEW_FORM,
+  REPORT_CONTENT_PAYLOAD
+} from "../lib/reports"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -89,7 +95,8 @@ type PostPageProps = {
   removePost: (p: Post) => void,
   approveComment: (c: Comment) => void,
   removeComment: (c: Comment) => void,
-  location: Location
+  location: Location,
+  reportPost: (p: Post) => void
 }
 
 const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
@@ -97,19 +104,6 @@ const DELETE_COMMENT_DIALOG = "DELETE_COMMENT_DIALOG"
 
 const REPORT_POST_DIALOG = "REPORT_POST_DIALOG"
 const REPORT_COMMENT_DIALOG = "REPORT_COMMENT_DIALOG"
-
-const REPORT_FORM_KEY = "report:content"
-const REPORT_CONTENT_PAYLOAD = {
-  formKey: REPORT_FORM_KEY
-}
-const REPORT_CONTENT_NEW_FORM = {
-  ...REPORT_CONTENT_PAYLOAD,
-  value: {
-    reason: ""
-  }
-}
-
-const getReportForm = R.prop(REPORT_FORM_KEY)
 
 // if postId, channelName, or commentID don't match
 const shouldLoadData = R.complement(
@@ -231,18 +225,6 @@ class PostPage extends React.Component<*, void> {
     this.hideCommentDialog(REPORT_COMMENT_DIALOG)()
   }
 
-  showReportPostDialog = () => {
-    const { dispatch } = this.props
-    dispatch(formBeginEdit({ ...REPORT_CONTENT_NEW_FORM }))
-    this.showPostDialog(REPORT_POST_DIALOG)()
-  }
-
-  hideReportPostDialog = () => {
-    const { dispatch } = this.props
-    dispatch(formEndEdit({ ...REPORT_CONTENT_PAYLOAD }))
-    this.hidePostDialog(REPORT_POST_DIALOG)()
-  }
-
   showPostDialog = (dialogKey: string) => () => {
     const { dispatch } = this.props
     dispatch(showDialog(dialogKey))
@@ -309,48 +291,6 @@ class PostPage extends React.Component<*, void> {
     }
   }
 
-  reportPost = async () => {
-    const { dispatch, post, forms } = this.props
-    const form = getReportForm(forms)
-    const { reason } = form.value
-    const validation = validateContentReportForm(form)
-
-    if (!R.isEmpty(validation)) {
-      dispatch(
-        actions.forms.formValidate({
-          ...REPORT_CONTENT_PAYLOAD,
-          errors: validation.value
-        })
-      )
-    } else {
-      await dispatch(
-        actions.reports.post({
-          post_id: post.id,
-          reason:  reason
-        })
-      )
-
-      this.hideReportPostDialog()
-      dispatch(
-        setSnackbarMessage({
-          message: "Post has been reported"
-        })
-      )
-    }
-  }
-
-  onReportUpdate = (e: Object) => {
-    const { dispatch } = this.props
-    dispatch(
-      actions.forms.formUpdate({
-        ...REPORT_CONTENT_PAYLOAD,
-        value: {
-          [e.target.name]: e.target.value
-        }
-      })
-    )
-  }
-
   render() {
     const {
       dispatch,
@@ -362,7 +302,6 @@ class PostPage extends React.Component<*, void> {
       isModerator,
       postDeleteDialogVisible,
       commentDeleteDialogVisible,
-      postReportDialogVisible,
       commentReportDialogVisible,
       notFound,
       commentID,
@@ -370,7 +309,8 @@ class PostPage extends React.Component<*, void> {
       approvePost,
       removeComment,
       approveComment,
-      location: { search }
+      location: { search },
+      reportPost
     } = this.props
 
     if (notFound) {
@@ -407,25 +347,6 @@ class PostPage extends React.Component<*, void> {
           Are you sure you want to delete this post?
         </Dialog>
         <Dialog
-          open={postReportDialogVisible}
-          hideDialog={preventDefaultAndInvoke(this.hideReportPostDialog)}
-          onCancel={this.hideReportPostDialog}
-          onAccept={this.reportPost}
-          validateOnClick={true}
-          title="Report Post"
-          submitText="Yes, Report"
-        >
-          {reportForm
-            ? <ReportForm
-              reportForm={reportForm.value}
-              validation={reportForm.errors}
-              onUpdate={this.onReportUpdate}
-              description="Are you sure you want to report this post for violating the rules of MIT Open Discussions?"
-              label="Why are you reporting this post?"
-            />
-            : null}
-        </Dialog>
-        <Dialog
           open={commentReportDialogVisible}
           hideDialog={this.hideReportCommentDialog}
           onCancel={this.hideReportCommentDialog}
@@ -433,12 +354,13 @@ class PostPage extends React.Component<*, void> {
           validateOnClick={true}
           title="Report Comment"
           submitText="Yes, Report"
+          id="report-comment-dialog"
         >
           {reportForm
             ? <ReportForm
               reportForm={reportForm.value}
               validation={reportForm.errors}
-              onUpdate={this.onReportUpdate}
+              onUpdate={onReportUpdate(dispatch)}
               description="Are you sure you want to report this comment for violating the rules of MIT Open Discussions?"
               label="Why are you reporting this comment?"
             />
@@ -455,8 +377,8 @@ class PostPage extends React.Component<*, void> {
               forms={forms}
               beginEditing={beginEditing(dispatch)}
               showPostDeleteDialog={this.showPostDialog(DELETE_POST_DIALOG)}
-              showPostReportDialog={preventDefaultAndInvoke(
-                this.showReportPostDialog
+              showPostReportDialog={preventDefaultAndInvoke(() =>
+                reportPost(post)
               )}
               showPermalinkUI={showPermalinkUI}
             />

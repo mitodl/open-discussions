@@ -10,6 +10,10 @@ import withLoading from "../components/Loading"
 import withNavSidebar from "../hoc/withNavSidebar"
 import PostListNavigation from "../components/PostListNavigation"
 import { PostSortPicker } from "../components/SortPicker"
+import {
+  withPostModeration,
+  postModerationSelector
+} from "../hoc/withPostModeration"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
@@ -36,7 +40,8 @@ class HomePage extends React.Component<*, void> {
     subscribedChannels: RestState<Array<string>>,
     channels: RestState<Map<string, Channel>>,
     showSidebar: boolean,
-    pagination: PostListPagination
+    pagination: PostListPagination,
+    reportPost: (p: Post) => void
   }
 
   componentWillMount() {
@@ -58,8 +63,13 @@ class HomePage extends React.Component<*, void> {
   }
 
   render() {
-    const { posts, pagination, dispatch, location: { search } } = this.props
-    const dispatchableToggleUpvote = toggleUpvote(dispatch)
+    const {
+      posts,
+      pagination,
+      dispatch,
+      location: { search },
+      reportPost
+    } = this.props
 
     return (
       <Card
@@ -75,8 +85,9 @@ class HomePage extends React.Component<*, void> {
       >
         <PostList
           posts={posts}
-          toggleUpvote={dispatchableToggleUpvote}
+          toggleUpvote={toggleUpvote(dispatch)}
           showChannelLinks={true}
+          reportPost={reportPost}
         />
         {pagination
           ? <PostListNavigation
@@ -92,10 +103,11 @@ class HomePage extends React.Component<*, void> {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   const frontpage = state.frontpage.data
   const posts = state.posts.data
   return {
+    ...postModerationSelector(state, ownProps),
     posts:              safeBulkGet(getPostIds(frontpage), posts),
     subscribedChannels: getSubscribedChannels(state),
     pagination:         frontpage.pagination,
@@ -105,6 +117,9 @@ const mapStateToProps = state => {
   }
 }
 
-export default R.compose(connect(mapStateToProps), withNavSidebar, withLoading)(
-  HomePage
-)
+export default R.compose(
+  connect(mapStateToProps),
+  withPostModeration,
+  withNavSidebar,
+  withLoading
+)(HomePage)

@@ -22,7 +22,8 @@ class CompactPostDisplay extends React.Component<*, void> {
     showPinUI: boolean,
     isModerator: boolean,
     removePost?: (p: Post) => void,
-    ignorePostReports?: (p: Post) => void
+    ignorePostReports?: (p: Post) => void,
+    reportPost: (p: Post) => void
   }
 
   showChannelLink = () => {
@@ -44,7 +45,8 @@ class CompactPostDisplay extends React.Component<*, void> {
       togglePinPost,
       isModerator,
       removePost,
-      ignorePostReports
+      ignorePostReports,
+      reportPost
     } = this.props
     const formattedDate = moment(post.created).fromNow()
 
@@ -84,6 +86,7 @@ class CompactPostDisplay extends React.Component<*, void> {
                   ignore all reports
               </a>
               : null}
+            <a onClick={() => reportPost(post)}>report</a>
           </div>
         </div>
       </div>

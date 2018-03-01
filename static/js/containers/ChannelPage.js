@@ -14,6 +14,10 @@ import withNavAndChannelSidebars from "../hoc/withNavAndChannelSidebars"
 import NotFound from "../components/404"
 import { PostSortPicker } from "../components/SortPicker"
 import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
+import {
+  withPostModeration,
+  postModerationSelector
+} from "../hoc/withPostModeration"
 
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
@@ -46,7 +50,8 @@ type ChannelPageProps = {
   pagination: PostListPagination,
   errored: boolean,
   isModerator: boolean,
-  notFound: boolean
+  notFound: boolean,
+  reportPost: (p: Post) => void
 }
 
 const shouldLoadData = R.complement(
@@ -122,7 +127,8 @@ class ChannelPage extends React.Component<*, void> {
       channelName,
       isModerator,
       notFound,
-      location: { search }
+      location: { search },
+      reportPost
     } = this.props
 
     if (notFound) {
@@ -155,6 +161,7 @@ class ChannelPage extends React.Component<*, void> {
               toggleUpvote={toggleUpvote(dispatch)}
               isModerator={isModerator}
               togglePinPost={this.togglePinPost}
+              reportPost={reportPost}
               showPinUI
             />
             {pagination
@@ -191,6 +198,7 @@ const mapStateToProps = (state, ownProps) => {
   const userIsModerator = isModerator(channelModerators, SETTINGS.username)
 
   return {
+    ...postModerationSelector(state, ownProps),
     channelName,
     channel,
     loaded,
@@ -209,6 +217,7 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
+  withPostModeration,
   withNavAndChannelSidebars,
   withLoading
 )(ChannelPage)

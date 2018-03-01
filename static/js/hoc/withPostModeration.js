@@ -1,8 +1,10 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-
 import { Dialog } from "@mitodl/mdl-react-components"
+import R from "ramda"
+
+import ReportForm from "../components/ReportForm"
 
 import { actions } from "../actions"
 import { approvePost, removePost } from "../util/api_actions"
@@ -17,8 +19,19 @@ import { getChannelName } from "../lib/util"
 import { isModerator } from "../lib/channels"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { anyErrorExcept404 } from "../util/rest"
+import {
+  getReportForm,
+  onReportUpdate,
+  REPORT_CONTENT_PAYLOAD,
+  REPORT_CONTENT_NEW_FORM
+} from "../lib/reports"
+import { preventDefaultAndInvoke } from "../lib/util"
+import { formBeginEdit, formEndEdit } from "../actions/forms"
+import { validateContentReportForm } from "../lib/validation"
 
 import type { Post } from "../flow/discussionTypes"
+
+const REPORT_POST_DIALOG = "REPORT_POST_DIALOG"
 
 export const withPostModeration = (
   WrappedComponent: Class<React.Component<*, *>>
@@ -31,7 +44,15 @@ export const withPostModeration = (
       dispatch(showDialog(DIALOG_REMOVE_POST))
     }
 
-    hideDialog = () => {
+    openReportPostDialog = (post: Post) => {
+      const { dispatch } = this.props
+
+      dispatch(setFocusedPost(post))
+      dispatch(formBeginEdit({ ...REPORT_CONTENT_NEW_FORM }))
+      dispatch(showDialog(REPORT_POST_DIALOG))
+    }
+
+    hideRemoveDialog = () => {
       const { dispatch } = this.props
       dispatch(clearFocusedPost())
       dispatch(hideDialog(DIALOG_REMOVE_POST))
@@ -74,16 +95,80 @@ export const withPostModeration = (
       }
     }
 
+    hideReportPostDialog = () => {
+      const { dispatch } = this.props
+      dispatch(formEndEdit({ ...REPORT_CONTENT_PAYLOAD }))
+      dispatch(hideDialog(REPORT_POST_DIALOG))
+      dispatch(clearFocusedPost())
+    }
+
+    reportPost = async () => {
+      const { dispatch, focusedPost, forms } = this.props
+      const form = getReportForm(forms)
+      const { reason } = form.value
+      const validation = validateContentReportForm(form)
+
+      if (!R.isEmpty(validation)) {
+        dispatch(
+          actions.forms.formValidate({
+            ...REPORT_CONTENT_PAYLOAD,
+            errors: validation.value
+          })
+        )
+      } else {
+        await dispatch(
+          actions.reports.post({
+            post_id: focusedPost.id,
+            reason:  reason
+          })
+        )
+
+        this.hideReportPostDialog()
+        dispatch(
+          setSnackbarMessage({
+            message: "Post has been reported"
+          })
+        )
+      }
+    }
+
     render() {
-      const { showRemovePostDialog } = this.props
+      const {
+        showRemovePostDialog,
+        reportPostDialogVisible,
+        forms,
+        dispatch
+      } = this.props
+
+      const reportForm = getReportForm(forms)
 
       return (
         <div>
           <Dialog
+            open={reportPostDialogVisible}
+            hideDialog={preventDefaultAndInvoke(this.hideReportPostDialog)}
+            onCancel={this.hideReportPostDialog}
+            onAccept={this.reportPost}
+            validateOnClick={true}
+            title="Report Post"
+            submitText="Yes, Report"
+            id="report-post-dialog"
+          >
+            {reportForm
+              ? <ReportForm
+                reportForm={reportForm.value}
+                validation={reportForm.errors}
+                onUpdate={onReportUpdate(dispatch)}
+                description="Are you sure you want to report this post for violating the rules of MIT Open Discussions?"
+                label="Why are you reporting this post?"
+              />
+              : null}
+          </Dialog>
+          <Dialog
             id="remove-post-dialog"
             open={showRemovePostDialog}
             onAccept={this.removePost}
-            hideDialog={this.hideDialog}
+            hideDialog={this.hideRemoveDialog}
             submitText="Yes, remove"
           >
             <p>
@@ -97,6 +182,7 @@ export const withPostModeration = (
             removePost={this.openRemovePostDialog}
             approvePost={this.approvePost}
             ignorePostReports={this.ignoreReports}
+            reportPost={this.openReportPostDialog}
           />
         </div>
       )
@@ -106,7 +192,7 @@ export const withPostModeration = (
 }
 
 export const postModerationSelector = (state: Object, ownProps: Object) => {
-  const { channels, reports, ui, focus } = state
+  const { channels, reports, ui, focus, forms } = state
   const channelName = getChannelName(ownProps)
   const channel = channels.data.get(channelName)
   const channelModerators = state.channelModerators.data.get(channelName) || []
@@ -121,17 +207,19 @@ export const postModerationSelector = (state: Object, ownProps: Object) => {
     : false
 
   return {
+    forms,
     channelName,
     channel,
     loaded,
     notFound,
-    shouldGetReports:     false, // by default, we won't fetch these
-    isModerator:          userIsModerator,
-    subscribedChannels:   getSubscribedChannels(state),
-    reports:              reports.data.reports,
-    showRemovePostDialog: ui.dialogs.has(DIALOG_REMOVE_POST),
-    focusedPost:          focus.post,
-    errored:              anyErrorExcept404([
+    shouldGetReports:        false, // by default, we won't fetch these
+    isModerator:             userIsModerator,
+    subscribedChannels:      getSubscribedChannels(state),
+    reports:                 reports.data.reports,
+    showRemovePostDialog:    ui.dialogs.has(DIALOG_REMOVE_POST),
+    reportPostDialogVisible: ui.dialogs.has(REPORT_POST_DIALOG),
+    focusedPost:             focus.post,
+    errored:                 anyErrorExcept404([
       channels,
       state.posts,
       state.subscribedChannels
