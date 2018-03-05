@@ -428,15 +428,7 @@ class PostPage extends React.Component<*, void> {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const {
-    posts,
-    channels,
-    comments,
-    forms,
-    channelModerators,
-    subscribedChannels,
-    ui
-  } = state
+  const { posts, channels, comments, forms, channelModerators, ui } = state
   const postID = getPostID(ownProps)
   const channelName = getChannelName(ownProps)
   const commentID = getCommentID(ownProps)
@@ -445,9 +437,11 @@ const mapStateToProps = (state, ownProps) => {
   const commentsTree = comments.data.get(postID)
   const moderators = channelModerators.data.get(channelName)
 
-  const loaded = posts.loaded && subscribedChannels.loaded && comments.loaded
+  const notFound = any404Error([posts, comments])
 
-  const notFound = loaded && any404Error([posts, comments])
+  const loaded = notFound
+    ? true
+    : R.none(R.isNil, [post, channel, commentsTree])
 
   return {
     ...postModerationSelector(state, ownProps),
