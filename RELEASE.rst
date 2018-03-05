@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.17.0
+--------------
+
+- Add report links to frontpage and channel page
+
 Version 0.16.0
 --------------
 
