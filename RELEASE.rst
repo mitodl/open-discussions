@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.17.1
+--------------
+
+- Fix calculation of loaded and notFound on the post page
+
 Version 0.17.0
 --------------
 
