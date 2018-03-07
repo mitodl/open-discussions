@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.17.2
+--------------
+
+- Add settings page for adjusting notification prefs
+- Added frontpage digest email tasks (#460, #461)
+
 Version 0.17.1
 --------------
 
