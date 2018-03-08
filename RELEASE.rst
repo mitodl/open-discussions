@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.17.3
+--------------
+
+- Refactored and added user_activity middleware
+
 Version 0.17.2
 --------------
 
