@@ -161,6 +161,10 @@
     "SENTRY_DSN": {
       "description": "The connection settings for Sentry"
     },
+    "SENTRY_LOG_LEVEL": {
+      "description": "The log level for Sentry",
+      "required": false
+    },
     "STATUS_TOKEN": {
       "description": "Token to access the status API."
     }

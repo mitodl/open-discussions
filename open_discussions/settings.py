@@ -243,6 +243,7 @@ else:
 # Logging configuration
 LOG_LEVEL = get_string('OPEN_DISCUSSIONS_LOG_LEVEL', 'INFO')
 DJANGO_LOG_LEVEL = get_string('DJANGO_LOG_LEVEL', 'INFO')
+SENTRY_LOG_LEVEL = get_string('SENTRY_LOG_LEVEL', 'ERROR')
 
 # For logging to a remote syslog host
 LOG_HOST = get_string('OPEN_DISCUSSIONS_LOG_HOST', 'localhost')
@@ -291,7 +292,7 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'sentry': {
-            'level': 'ERROR',
+            'level': SENTRY_LOG_LEVEL,
             'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
             'formatter': 'verbose'
         },
@@ -308,7 +309,7 @@ LOGGING = {
             'propagate': True,
         },
         'raven': {
-            'level': 'DEBUG',
+            'level': SENTRY_LOG_LEVEL,
             'handlers': []
         },
         'nplusone': {
