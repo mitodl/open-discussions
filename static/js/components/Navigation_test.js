@@ -6,6 +6,7 @@ import { Link } from "react-router-dom"
 
 import Navigation from "./Navigation"
 import SubscriptionsList from "./SubscriptionsList"
+import UserInfo from "./UserInfo"
 
 import { newPostURL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
@@ -44,6 +45,11 @@ describe("Navigation", () => {
         wrapper.find(SubscriptionsList).props().subscribedChannels,
         channels
       )
+    })
+
+    it("should show UserInfo", () => {
+      const wrapper = renderComponent()
+      assert.ok(wrapper.find(UserInfo).exists())
     })
 
     it("should pass the current channel down to the SubscriptionsList", () => {

@@ -9,6 +9,8 @@ declare var SETTINGS: {
     [key: string]: boolean,
   },
   username: string,
+  user_full_name: ?string,
+  profile_image_small: ?string,
   authenticated_site: {
     title: string,
     login_url: string,

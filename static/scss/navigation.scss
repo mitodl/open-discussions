@@ -62,14 +62,14 @@
   width: 100%;
   padding: 16px 0 18px 0;
   box-sizing: border-box;
-  border: 1px solid #cecece;
+  border: 1px solid $border-grey-alt;
   border-width: 1px 0;
 
   .channelname {
     margin: 0 0 0 0;
 
     a {
-      color: rgba(0,0,0,.77);
+      color: $navigation-text;
       display: block;
       font-size: 15px;
       padding: 11px 20px 11px 34px;

@@ -28,6 +28,8 @@ def test_webpack_url(settings, staff_client, mocker, authenticated_site):
         'public_path': '/static/bundles/',
         'max_comment_depth': 6,
         'username': None,
+        'profile_image_small': None,
+        'user_full_name': None,
         'authenticated_site': {
             'title': authenticated_site.title,
             'login_url': authenticated_site.login_url,

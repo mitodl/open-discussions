@@ -6,12 +6,16 @@ from datetime import timedelta
 
 import jwt
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import render
 from rest_framework_jwt.settings import api_settings
 
 from open_discussions.templatetags.render_bundle import public_path
 from sites.models import AuthenticatedSite
+
+
+User = get_user_model()
 
 
 def index(request, **kwargs):  # pylint: disable=unused-argument
@@ -41,11 +45,21 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
     if site is None:
         raise ImproperlyConfigured("Unable to find site for site key: '{}'".format(site_key))
 
+    user_full_name = None
+    profile_image_small = None
+
+    if username is not None:
+        user = User.objects.get(username=username)
+        user_full_name = user.profile.name
+        profile_image_small = user.profile.image_small
+
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
         "public_path": public_path(request),
         "max_comment_depth": settings.OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH,
         "username": username,
+        "user_full_name": user_full_name,
+        "profile_image_small": profile_image_small,
         "authenticated_site": {
             "title": site.title,
             "base_url": site.base_url,

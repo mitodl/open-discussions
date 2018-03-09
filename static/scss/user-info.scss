@@ -1,0 +1,11 @@
+.user-info {
+  display: flex;
+  align-items: center;
+  margin: 0 0 15px 53px;
+  width: 100%;
+  color: $navigation-text;
+
+  img {
+    margin-right: 15px;
+  }
+}

@@ -3,6 +3,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 
 import SubscriptionsList from "./SubscriptionsList"
+import UserInfo from "./UserInfo"
 
 import { newPostURL, getChannelNameFromPathname } from "../lib/url"
 
@@ -20,6 +21,7 @@ const Navigation = (props: NavigationProps) => {
 
   return (
     <div className="navigation">
+      <UserInfo />
       <Link
         className="mdc-button mdc-button--raised blue-button"
         to={newPostURL(channelName)}
