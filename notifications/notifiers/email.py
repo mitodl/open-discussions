@@ -2,7 +2,7 @@
 import logging
 
 from mail import api
-from mail.exceptions import SendEmailsException
+from notifications.notifiers.exceptions import CancelNotificationError
 from notifications.notifiers.base import BaseNotifier
 from notifications.models import (
     NotificationSettings,
@@ -38,6 +38,7 @@ class EmailNotifier(BaseNotifier):
         return (
             features.is_enabled(features.EMAIL_NOTIFICATIONS) and
             notification_settings.via_email and
+            api.can_email_user(notification_settings.user) and
             super().can_notify(notification_settings, last_notification)
         )
 
@@ -54,22 +55,30 @@ class EmailNotifier(BaseNotifier):
         Args:
             email_notification (EmailNotification): the notification to be sent
         """
+        messages = None
         user = email_notification.user
         notification_settings = NotificationSettings.objects.get(
             user=user,
             notification_type=email_notification.notification_type,
         )
-        last_notification = self._get_most_recent_notification(notification_settings, before=email_notification)
 
-        data = self._get_notification_data(notification_settings, last_notification)
+        with utils.mark_as_sent_or_canceled(email_notification) as will_send:
+            if not will_send:
+                return
 
-        # generate the message (there's only 1)
-        messages = list(api.messages_for_recipients([
-            (recipient, user, data) for recipient, user in api.safe_format_recipients([user])
-        ], self._template_name))
+            last_notification = self._get_most_recent_notification(notification_settings, before=email_notification)
 
-        for message in messages:
-            try:
-                utils.send_at_most_once(email_notification, message)
-            except SendEmailsException:
-                log.exception("Error sending email")
+            data = self._get_notification_data(notification_settings, last_notification)
+
+            # generate the message (there's only 1)
+            messages = list(api.messages_for_recipients([
+                (recipient, user, data) for recipient, user in api.safe_format_recipients([user])
+            ], self._template_name))
+
+            if not messages:
+                raise CancelNotificationError()
+
+        # we don't want an error sending to cause a resend, because it could cause us to actually send it twice
+        if messages:
+            # if we got this far and have messages, send them
+            api.send_messages(messages)

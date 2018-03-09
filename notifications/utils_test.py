@@ -2,47 +2,56 @@
 import pytest
 
 from notifications import utils
+from notifications.notifiers.exceptions import CancelNotificationError
 from notifications.factories import EmailNotificationFactory
 from notifications.models import EmailNotification
 
 pytestmark = pytest.mark.django_db
 
 
-def test_send_at_most_once_sending(mocker):
-    """Verify send_at_most_once sends a message"""
+def test_mark_as_sent_or_canceled():
+    """Verify mark_as_sent_or_canceled marks the notification sent if no errors"""
     notification = EmailNotificationFactory.create(sending=True)
-    send_messages_mock = mocker.patch('mail.api.send_messages')
-    message = mocker.Mock()
 
-    utils.send_at_most_once(notification, message)
-
-    send_messages_mock.assert_called_once_with([message])
+    with utils.mark_as_sent_or_canceled(notification) as will_send:
+        assert will_send is True
 
     notification.refresh_from_db()
     assert notification.state == EmailNotification.STATE_SENT
     assert notification.sent_at is not None
 
 
-def test_send_at_most_once_sent(mocker):
-    """Verify send_at_most_once does not sent an already sent message"""
+def test_mark_as_sent_or_canceled_already_sent():
+    """Verify mark_as_sent_or_canceled doesn't try to send if it is already sent"""
     notification = EmailNotificationFactory.create(sent=True)
-    send_messages_mock = mocker.patch('mail.api.send_messages')
-    message = mocker.Mock()
 
-    utils.send_at_most_once(notification, message)
+    with utils.mark_as_sent_or_canceled(notification) as will_send:
+        assert will_send is False
 
-    send_messages_mock.assert_not_called()
+    notification.refresh_from_db()
+    assert notification.state == EmailNotification.STATE_SENT
 
 
-def test_send_at_most_once_pending(mocker):
-    """Verify send_at_most_once does not sent a pending message"""
-    notification = EmailNotificationFactory.create()
-    send_messages_mock = mocker.patch('mail.api.send_messages')
-    message = mocker.Mock()
+def test_mark_as_sent_or_canceled_cancel_error():
+    """Verify mark_as_sent_or_canceled marks the task as canceled"""
+    notification = EmailNotificationFactory.create(sending=True)
 
-    utils.send_at_most_once(notification, message)
+    with utils.mark_as_sent_or_canceled(notification) as will_send:
+        assert will_send is True
+        raise CancelNotificationError()
 
-    send_messages_mock.assert_not_called()
+    notification.refresh_from_db()
+    assert notification.state == EmailNotification.STATE_CANCELED
+    assert notification.sent_at is None
+
+
+def test_mark_as_sent_or_canceled_misc_error():
+    """Verify mark_as_sent_or_canceled marks the task as pending if a non-send related error occurs"""
+    notification = EmailNotificationFactory.create(sending=True)
+
+    with utils.mark_as_sent_or_canceled(notification) as will_send:
+        assert will_send is True
+        raise Exception('some random error')
 
     notification.refresh_from_db()
     assert notification.state == EmailNotification.STATE_PENDING

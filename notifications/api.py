@@ -1,4 +1,5 @@
 """Notifications API"""
+import logging
 
 from notifications.notifiers.exceptions import UnsupportedNotificationTypeError
 from notifications.models import (
@@ -11,6 +12,8 @@ from notifications.models import (
 from notifications.notifiers import frontpage
 from notifications import tasks
 from open_discussions.utils import chunks
+
+log = logging.getLogger()
 
 
 def ensure_notification_settings(user):
@@ -98,5 +101,8 @@ def send_email_notification_batch(notification_ids):
         notification_ids (list of int): notification ids to send
     """
     for notification in EmailNotification.objects.filter(id__in=notification_ids):
-        notifier = _get_notifier_for_notification(notification)
-        notifier.send_notification(notification)
+        try:
+            notifier = _get_notifier_for_notification(notification)
+            notifier.send_notification(notification)
+        except:  # pylint: disable=bare-except
+            log.exception('Error sending notification')

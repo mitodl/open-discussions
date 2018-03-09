@@ -7,6 +7,7 @@ from notifications.factories import (
     EmailNotificationFactory,
     NotificationSettingsFactory,
 )
+from notifications.models import EmailNotification
 from notifications.notifiers import email
 from open_discussions import features
 from open_discussions.test_utils import any_instance_of
@@ -53,8 +54,8 @@ def test_can_notify(settings, mocker, is_enabled, can_notify, via_email):
 
 def test_send_notification(notifier, mocker):
     """Tests send_notification"""
-    send_once_mock = mocker.patch('notifications.utils.send_at_most_once')
-    ns = NotificationSettingsFactory.create(user__profile__email_optin=True)
+    send_messages_mock = mocker.patch('mail.api.send_messages')
+    ns = NotificationSettingsFactory.create()
     note = EmailNotificationFactory.create(
         user=ns.user,
         notification_type=ns.notification_type,
@@ -63,4 +64,38 @@ def test_send_notification(notifier, mocker):
 
     notifier.send_notification(note)
 
-    send_once_mock.assert_called_once_with(note, any_instance_of(EmailMessage))
+    send_messages_mock.assert_called_once_with([any_instance_of(EmailMessage)])
+
+
+def test_send_notification_already_sent(notifier, mocker):
+    """Tests send_notification that it doesn't send a notification that has already been sent"""
+    send_messages_mock = mocker.patch('mail.api.send_messages')
+    ns = NotificationSettingsFactory.create()
+    note = EmailNotificationFactory.create(
+        user=ns.user,
+        notification_type=ns.notification_type,
+        sent=True,
+    )
+
+    notifier.send_notification(note)
+
+    send_messages_mock.assert_not_called()
+
+
+def test_send_notification_no_messages(notifier, mocker):
+    """Tests send_notification that it cancels the notification if a message can't be sent"""
+    send_messages_mock = mocker.patch('mail.api.send_messages')
+    mocker.patch('mail.api.messages_for_recipients', return_value=[])
+    ns = NotificationSettingsFactory.create()
+    note = EmailNotificationFactory.create(
+        user=ns.user,
+        notification_type=ns.notification_type,
+        sending=True,
+    )
+
+    notifier.send_notification(note)
+
+    note.refresh_from_db()
+    assert note.state == EmailNotification.STATE_CANCELED
+
+    send_messages_mock.assert_not_called()

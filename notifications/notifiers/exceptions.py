@@ -13,5 +13,5 @@ class UnsupportedNotificationTypeError(NotifierException):
     """The notification type was invalid"""
 
 
-class MissingNotificationDataError(NotifierException):
-    """Required data was missing"""
+class CancelNotificationError(NotifierException):
+    """The notification should be canceled"""

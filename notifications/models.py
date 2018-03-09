@@ -99,10 +99,12 @@ class EmailNotification(NotificationBase):
     STATE_PENDING = 'pending'
     STATE_SENDING = 'sending'
     STATE_SENT = 'sent'
+    STATE_CANCELED = 'canceled'
     STATE_CHOICES = (
         (STATE_PENDING, 'Pending'),
         (STATE_SENDING, 'Sending'),
         (STATE_SENT, 'Sent'),
+        (STATE_CANCELED, 'Canceled')
     )
 
     state = models.CharField(choices=STATE_CHOICES, max_length=10, default=STATE_PENDING)

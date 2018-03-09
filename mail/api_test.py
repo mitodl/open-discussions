@@ -23,12 +23,11 @@ def email_settings(settings):
 
 def test_safe_format_recipients():
     """Test that we get a list of emailable recipients"""
-    user = UserFactory.create(profile__email_optin=True)
-    user_no_email = UserFactory.create(email='', profile__email_optin=True)
-    user_opt_out = UserFactory.create(profile__email_optin=False)
-    user_no_name = UserFactory.create(profile__email_optin=True, profile__name='')
+    user = UserFactory.create()
+    user_no_email = UserFactory.create(email='')
+    user_no_name = UserFactory.create(profile__name='')
     assert safe_format_recipients([
-        user, user_no_email, user_opt_out, user_no_name
+        user, user_no_email, user_no_name
     ]) == [
         ("{} <{}>".format(user.profile.name, user.email), user),
         (user_no_name.email, user_no_name),
@@ -56,18 +55,17 @@ def test_render_email_templates(user):
 def test_messages_for_recipients():
     """Tests that messages_for_recipients works as expected"""
 
-    optin_users = UserFactory.create_batch(5, profile__email_optin=True)
-    optout_users = UserFactory.create_batch(5, profile__email_optin=False)
+    users = UserFactory.create_batch(5)
 
     messages = list(messages_for_recipients([
         (recipient, user, {
             'url': 'https://example.com',
-        }) for recipient, user in safe_format_recipients(optin_users + optout_users)
+        }) for recipient, user in safe_format_recipients(users)
     ], 'sample'))
 
-    assert len(messages) == len(optin_users)
+    assert len(messages) == len(users)
 
-    for user, msg in zip(optin_users, messages):
+    for user, msg in zip(users, messages):
         assert user.email in msg.to[0]
         assert msg.subject == "Welcome {}".format(user.profile.name)
 

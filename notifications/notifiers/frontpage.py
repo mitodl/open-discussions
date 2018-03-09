@@ -13,7 +13,7 @@ from notifications.models import (
 from notifications.notifiers.email import EmailNotifier
 from notifications.notifiers.exceptions import (
     InvalidTriggerFrequencyError,
-    MissingNotificationDataError,
+    CancelNotificationError,
 )
 from open_discussions import features
 
@@ -134,7 +134,7 @@ class FrontpageDigestNotifier(EmailNotifier):
 
         if not posts:
             # edge case, nothing new to send even though we expected some
-            raise MissingNotificationDataError("No new posts for frontpage notification")
+            raise CancelNotificationError()
 
         return {
             'posts': [

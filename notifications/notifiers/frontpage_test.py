@@ -9,16 +9,14 @@ from notifications.factories import (
     EmailNotificationFactory,
 )
 from notifications.models import (
+    EmailNotification,
     FREQUENCY_DAILY,
     FREQUENCY_WEEKLY,
     FREQUENCY_NEVER,
     FREQUENCY_IMMEDIATE,
 )
 from notifications.notifiers import frontpage
-from notifications.notifiers.exceptions import (
-    InvalidTriggerFrequencyError,
-    MissingNotificationDataError,
-)
+from notifications.notifiers.exceptions import InvalidTriggerFrequencyError
 from open_discussions import features
 from open_discussions.utils import now_in_utc
 from open_discussions.test_utils import any_instance_of
@@ -86,7 +84,6 @@ def test_can_notify(
 def test_can_notify_invalid_frequency(trigger_frequency):
     """Verify it raises an error for an invalid frequency"""
     notification_settings = NotificationSettingsFactory.create(
-        user__profile__email_optin=True,
         trigger_frequency=trigger_frequency,
         via_email=True,
     )
@@ -98,7 +95,7 @@ def test_can_notify_invalid_frequency(trigger_frequency):
 def test_send_notification(mocker):
     """Tests send_notification"""
     notifier = frontpage.FrontpageDigestNotifier()
-    send_once_mock = mocker.patch('notifications.utils.send_at_most_once')
+    send_messages_mock = mocker.patch('mail.api.send_messages')
     serializer_mock = mocker.patch('channels.serializers.PostSerializer')
     serializer_mock.return_value.data = {
         'id': 1,
@@ -113,7 +110,6 @@ def test_send_notification(mocker):
     api_mock = mocker.patch('channels.api.Api')
     api_mock.return_value.front_page.return_value = [post]
     ns = NotificationSettingsFactory.create(
-        user__profile__email_optin=True,
         via_email=True,
         weekly=True,
     )
@@ -127,18 +123,17 @@ def test_send_notification(mocker):
 
     serializer_mock.assert_called_once_with(post)
 
-    send_once_mock.assert_called_once_with(note, any_instance_of(EmailMessage))
+    send_messages_mock.assert_called_once_with([any_instance_of(EmailMessage)])
 
 
 def test_send_notification_no_posts(mocker):
     """Tests send_notification if there are somehow no posts"""
     notifier = frontpage.FrontpageDigestNotifier()
-    send_once_mock = mocker.patch('notifications.utils.send_at_most_once')
+    send_messages_mock = mocker.patch('mail.api.send_messages')
     serializer_mock = mocker.patch('channels.serializers.PostSerializer')
     api_mock = mocker.patch('channels.api.Api')
     api_mock.return_value.front_page.return_value = []
     ns = NotificationSettingsFactory.create(
-        user__profile__email_optin=True,
         via_email=True,
         weekly=True,
     )
@@ -148,8 +143,10 @@ def test_send_notification_no_posts(mocker):
         sending=True,
     )
 
-    with pytest.raises(MissingNotificationDataError):
-        notifier.send_notification(note)
+    notifier.send_notification(note)
 
     serializer_mock.assert_not_called()
-    send_once_mock.assert_not_called()
+    send_messages_mock.assert_not_called()
+
+    note.refresh_from_db()
+    assert note.state == EmailNotification.STATE_CANCELED

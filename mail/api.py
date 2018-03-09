@@ -50,11 +50,11 @@ def safe_format_recipients(recipients):
     return [
         (_format_recipient(user.email, name=user.profile.name), user)
         for user in recipients
-        if _can_email_user(user)
+        if can_email_user(user)
     ]
 
 
-def _can_email_user(user):
+def can_email_user(user):
     """
     Returns True if the user has an email and hasn't opted out
 
@@ -64,7 +64,7 @@ def _can_email_user(user):
     Returns:
         bool: True if we can email this user
     """
-    return user.email and user.profile.email_optin
+    return bool(user.email)
 
 
 def _format_recipient(email, *, name=None):
