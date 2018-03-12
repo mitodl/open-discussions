@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.18.0
+--------------
+
+- Fixed celery log levels with sentry
+- Fix travis errors
+- Add the current user&#39;s name and profile image
+
 Version 0.17.3
 --------------
 
