@@ -1,7 +1,7 @@
 """Tests for authentication"""
 from open_discussions.authentication import (
     get_encoded_and_signed_subscription_token,
-    decode_and_verify_username_from_token,
+    unsign_and_verify_username_from_token,
     StatelessTokenAuthentication,
 )
 
@@ -11,10 +11,10 @@ def test_get_encoded_and_signed_subscription_token(user):
     assert get_encoded_and_signed_subscription_token(user) is not None
 
 
-def test_decode_and_verify_username_from_token(user):
-    """Tests that decode_and_verify_username_from_token returns the encoded username"""
+def test_unsign_and_verify_username_from_token(user):
+    """Tests that unsign_and_verify_username_from_token returns the encoded username"""
     token = get_encoded_and_signed_subscription_token(user)
-    assert decode_and_verify_username_from_token(token) == user.username
+    assert unsign_and_verify_username_from_token(token) == user.username
 
 
 def test_stateless_token_authentication_expired(rf):

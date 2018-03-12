@@ -62,7 +62,7 @@ def test_can_notify(
     api_mock = mocker.patch('channels.api.Api')
     api_mock.return_value.front_page.return_value = [
         mocker.Mock(
-            created=(created_on + timedelta(days=10 if has_posts_after else -10)).timestamp(),
+            created=int((created_on + timedelta(days=10 if has_posts_after else -10)).timestamp()),
             stickied=False,
         ),
     ] if has_posts else []
@@ -102,9 +102,10 @@ def test_send_notification(mocker):
         'title': 'post title',
         'channel_name': 'micromasters',
         'channel_title': 'MicroMasters',
+        'created': now_in_utc().isoformat(),
     }
     post = mocker.Mock(
-        created=now_in_utc().timestamp(),
+        created=int(now_in_utc().timestamp()),
         stickied=False,
     )
     api_mock = mocker.patch('channels.api.Api')

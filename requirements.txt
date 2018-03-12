@@ -5,6 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 amqp==2.1.4               # via kombu
+beautifulsoup4==4.6.0
 betamax-serializers==0.2.0
 betamax==0.8.0
 billiard==3.5.0.2         # via celery
@@ -13,6 +14,8 @@ celery==4.0.2
 certifi==2017.4.17        # via requests
 chardet==3.0.4            # via requests
 contextlib2==0.5.5        # via raven
+cssselect==1.0.3          # via premailer
+cssutils==1.0.2           # via premailer
 decorator==4.0.11         # via ipython, traitlets
 dj-database-url==0.3.0
 dj-static==0.0.6
@@ -33,17 +36,19 @@ ipython-genutils==0.2.0   # via traitlets
 ipython==6.1.0
 jedi==0.10.2              # via ipython
 kombu==4.0.2              # via celery, django-server-status
+lxml==4.1.1               # via premailer
 newrelic==2.86.3.70
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 praw==4.5.1
 prawcore==0.10.1          # via praw
+premailer==3.1.1
 prompt-toolkit==1.0.14    # via ipython
 psycopg2==2.7
 ptyprocess==0.5.1         # via pexpect
 pygments==2.2.0           # via ipython
 pyjwt==1.5.2              # via djangorestframework-jwt
-python-dateutil==2.6.0    # via faker
+python-dateutil==2.6.0
 pytz==2017.2              # via celery, django
 pyyaml==3.11
 raven==6.1.0

@@ -141,5 +141,4 @@ class FrontpageDigestNotifier(EmailNotifier):
                 serializers.PostSerializer(post).data
                 for post in posts
             ],
-            'base_url': settings.SITE_BASE_URL,
         }

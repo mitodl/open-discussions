@@ -21,12 +21,17 @@ try:
 except SendEmailsException as exc:
     pass  # handle failed emails
 """
+import re
+
 from anymail.message import AnymailMessage
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core import mail
 from django.template.loader import render_to_string
+from premailer import transform
 
 from mail.exceptions import SendEmailsException
+from open_discussions.authentication import get_encoded_and_signed_subscription_token
 
 
 def safe_format_recipients(recipients):
@@ -100,17 +105,37 @@ def render_email_templates(template_name, user, context=None):
         (str, str, str): tuple of the templates for subject, text_body, html_body
     """
     ctx = {
+        'anon_token': get_encoded_and_signed_subscription_token(user),
+        'base_url': settings.SITE_BASE_URL,
         'user': user,
     }
 
     if context is not None:
         ctx.update(context)
 
-    return (
-        render_to_string('{}/subject.txt'.format(template_name), ctx).rstrip(),
-        render_to_string('{}/body.txt'.format(template_name), ctx),
-        render_to_string('{}/body.html'.format(template_name), ctx),
-    )
+    subject_text = render_to_string('{}/subject.txt'.format(template_name), ctx).rstrip()
+    html_text = render_to_string('{}/body.html'.format(template_name), ctx)
+
+    # inline the css
+    html_text = transform(html_text)
+
+    # pynliner internally uses bs4, which we can now modify the inlined version into a plaintext version
+    # this avoids parsing the body twice in bs4
+    soup = BeautifulSoup(html_text, 'html5lib')
+    for link in soup.find_all('a'):
+        link.replace_with("{} ({})".format(link.string, link.attrs['href']))
+
+    # clear any surviving style and title tags, so their contents don't get printed
+    for style in soup.find_all(['style', 'title']):
+        style.clear()  # clear contents, just removing the tag isn't enough
+
+    fallback_text = soup.get_text().strip()
+    # remove more than 3 consecutive newlines
+    fallback_text = re.sub(r'\n\s*\n', '\n\n\n', fallback_text)
+    # ltrim the left side of all lines
+    fallback_text = re.sub(r'^\s+', '', fallback_text, flags=re.MULTILINE)
+
+    return subject_text, fallback_text, html_text
 
 
 def messages_for_recipients(recipients_and_contexts, template_name):

@@ -48,8 +48,13 @@ def test_render_email_templates(user):
     }
     subject, text_body, html_body = render_email_templates('sample', user, context=context)
     assert subject == "Welcome Jane Smith"
-    assert text_body == "plaintext link: http://example.com\n"
-    assert html_body == '<a href="http://example.com">html link</a>\n'
+    assert text_body == "html link (http://example.com)"
+    assert html_body == (
+        '<html>\n'
+        '<head></head>\n'
+        '<body><a href="http://example.com" style="color:red">html link</a></body>\n'
+        '</html>\n'
+    )
 
 
 def test_messages_for_recipients():

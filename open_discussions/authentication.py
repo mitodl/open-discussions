@@ -1,6 +1,5 @@
 """Custom authentication for DRF"""
 import logging
-from base64 import b64decode, b64encode
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -23,16 +22,15 @@ def get_encoded_and_signed_subscription_token(user):
         user (User): user to generate the token for
 
     Returns:
-        str: a signed and encoded token for subscription authentication_classes
+        str: a signed token for subscription authentication_classes
     """
     signer = signing.TimestampSigner()
-    signed_value = signer.sign(user.username)
-    return b64encode(signed_value.encode('utf-8')).decode('utf-8')
+    return signer.sign(user.username)
 
 
-def decode_and_verify_username_from_token(token):
+def unsign_and_verify_username_from_token(token):
     """
-    Returns the decoded username from a subscription token
+    Returns the unsigned username from a subscription token
 
     Args:
         token (str): the encoded token
@@ -41,16 +39,10 @@ def decode_and_verify_username_from_token(token):
         str: the decoded username
     """
 
-    # we base64 encode this so it is urlsafe
-    try:
-        signed_value = b64decode(token)
-    except:  # pylint: disable=bare-except
-        return None
-
     signer = signing.TimestampSigner()
     try:
         return signer.unsign(
-            signed_value,
+            token,
             max_age=settings.OPEN_DISCUSSIONS_UNSUBSCRIBE_TOKEN_MAX_AGE_SECONDS
         )
     except:  # pylint: disable=bare-except
@@ -76,7 +68,7 @@ class StatelessTokenAuthentication(BaseAuthentication):
 
             token = header_value[HEADER_PREFIX_LENGTH:]
 
-            username = decode_and_verify_username_from_token(token)
+            username = unsign_and_verify_username_from_token(token)
 
             if not username:
                 return None

@@ -43,6 +43,7 @@ urlpatterns = [
         index,
         name='channel',
     ),
+    url(r'^settings/(?P<token>[^/]+)/$', index, name='settings-anon'),
     url(r'^channel/', index),
     url(r'^manage/', index),
     url(r'^create_post/', index),

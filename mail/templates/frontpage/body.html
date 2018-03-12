@@ -1,12 +1,57 @@
-Recent Posts:
+{% extends "email_base.html" %}
+{% load humanize %}
+{% load timeago %}
 
-{% for post in posts %}
-<a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">
-    {{ post.title }}
-</a>
-in
-<a href="{{ base_url }}{% url 'channel' channel_name=post.channel_name %}">
-  {{ post.channel_title }}
-</a>
-<br/><br/>
-{% endfor %}
+{% block title %}Open Discussions - Recent Popular Posts{% endblock %}
+{% block styles %}
+<style type="test/css">
+/* -------------------------------------
+    DISCUSSION POSTS TABLE
+------------------------------------- */
+p.lead-in {
+  text-align: center;
+  color: #666666;
+}
+img.user-photo {
+  width: 72px;
+  min-width: 72px;
+  border-radius: 100%;
+}
+h3.post-title {
+  margin: 0 0 5px;
+  font-weight: 600;
+}
+p.by-line {
+  margin: 0;
+}
+p.comments {
+  margin: 0;
+}
+.recent-posts-table td {
+  border-bottom: 1px solid #ddd;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="section">
+	<p class="lead-in">Here are some recent posts you might be interested in</p>
+</div>
+<table class="recent-posts-table" width="100%" cellpadding="13" cellspacing="0" border="0">
+	<tbody>
+    {% for post in posts %}
+    <tr>
+      <td><img src="{{ post.profile_image }}" class="user-photo" /></td>
+      <td><div>
+    		<h3 class="post-title">
+          <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">{{ post.title }}</a>
+        </h3>
+    		<p class="by-line">by {{ post.author_name }}, {{ post.created|parse_iso|naturaltime }} in <a href="{{ base_url }}{% url 'channel' channel_name=post.channel_name %}">{{ post.channel_title }}</a></p>
+    		<p class="comments">{{ post.num_comments }} comment{% if post.num_comments != 1 %}s{% endif %}</p>
+    	</div></td>
+    </tr>
+    {% endfor %}
+	</tbody>
+</table>
+{% endblock %}
