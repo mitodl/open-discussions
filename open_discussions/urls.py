@@ -22,7 +22,7 @@ from open_discussions.views import index
 
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
     url(r'^status/', include('server_status.urls')),
     url(r'', include('channels.urls')),
     url(r'', include('profiles.urls')),
