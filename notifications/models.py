@@ -19,7 +19,6 @@ FREQUENCY_NEVER = 'never'
 FREQUENCY_CHOICES = (
     (FREQUENCY_NEVER, 'Never'),
     (FREQUENCY_IMMEDIATE, 'Immediate'),
-    # These we won't officially support until much later, but putting them in here as placeholders
     (FREQUENCY_DAILY, 'Daily'),
     (FREQUENCY_WEEKLY, 'Weekly'),
 )

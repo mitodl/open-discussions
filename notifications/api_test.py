@@ -9,6 +9,9 @@ from notifications.models import (
     NotificationSettings,
     EmailNotification,
     NOTIFICATION_TYPE_FRONTPAGE,
+    NOTIFICATION_TYPE_COMMENTS,
+    FREQUENCY_NEVER,
+    FREQUENCY_IMMEDIATE,
     FREQUENCY_DAILY,
     FREQUENCY_WEEKLY,
 )
@@ -17,15 +20,24 @@ from notifications import api
 pytestmark = pytest.mark.django_db
 
 
-def test_ensure_notification_settings(user):
+@pytest.mark.parametrize('email_optin', [None, True, False])
+def test_ensure_notification_settings(user, email_optin):
     """Assert that notification settings are created"""
+    profile = user.profile
+    profile.email_optin = email_optin
+    profile.save()
     assert NotificationSettings.objects.filter(user=user).count() == 0
     api.ensure_notification_settings(user)
-    assert NotificationSettings.objects.filter(user=user).count() == 1
+    assert NotificationSettings.objects.filter(user=user).count() == 2
     ns = NotificationSettings.objects.get(user=user, notification_type=NOTIFICATION_TYPE_FRONTPAGE)
     assert ns.via_app is False
     assert ns.via_email is True
-    assert ns.trigger_frequency == FREQUENCY_DAILY
+    assert ns.trigger_frequency == FREQUENCY_DAILY if email_optin else FREQUENCY_NEVER
+
+    ns = NotificationSettings.objects.get(user=user, notification_type=NOTIFICATION_TYPE_COMMENTS)
+    assert ns.via_app is False
+    assert ns.via_email is True
+    assert ns.trigger_frequency == FREQUENCY_IMMEDIATE if email_optin else FREQUENCY_NEVER
 
 
 def test_ensure_notification_settings_existing(user):
@@ -34,12 +46,16 @@ def test_ensure_notification_settings_existing(user):
     assert settings_for_user.count() == 0
     api.ensure_notification_settings(user)
     settings = list(settings_for_user)
-    assert settings_for_user.count() == 1
+    assert settings_for_user.count() == 2
     frontpage_setting = settings[0]
     frontpage_setting.trigger_frequency = FREQUENCY_WEEKLY
     frontpage_setting.save()
+    comments_settings = settings[1]
+    comments_settings.trigger_frequency = FREQUENCY_NEVER
+    comments_settings.save()
     api.ensure_notification_settings(user)
-    assert frontpage_setting.trigger_frequency == settings_for_user.first().trigger_frequency
+    assert frontpage_setting.trigger_frequency == settings_for_user[0].trigger_frequency
+    assert comments_settings.trigger_frequency == settings_for_user[1].trigger_frequency
 
 
 def test_send_daily_frontpage_digests(mocker):

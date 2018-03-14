@@ -6,8 +6,11 @@ from notifications.models import (
     EmailNotification,
     NotificationSettings,
     NOTIFICATION_TYPE_FRONTPAGE,
+    NOTIFICATION_TYPE_COMMENTS,
+    FREQUENCY_IMMEDIATE,
     FREQUENCY_DAILY,
     FREQUENCY_WEEKLY,
+    FREQUENCY_NEVER,
 )
 from notifications.notifiers import frontpage
 from notifications import tasks
@@ -32,7 +35,16 @@ def ensure_notification_settings(user):
             user=user,
             notification_type=NOTIFICATION_TYPE_FRONTPAGE,
             defaults={
-                'trigger_frequency': FREQUENCY_DAILY,
+                'trigger_frequency': FREQUENCY_DAILY if user.profile.email_optin else FREQUENCY_NEVER,
+            }
+        )
+
+    if NOTIFICATION_TYPE_COMMENTS not in existing_notification_types:
+        NotificationSettings.objects.get_or_create(
+            user=user,
+            notification_type=NOTIFICATION_TYPE_COMMENTS,
+            defaults={
+                'trigger_frequency': FREQUENCY_IMMEDIATE if user.profile.email_optin else FREQUENCY_NEVER,
             }
         )
 
