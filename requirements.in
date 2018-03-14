@@ -1,5 +1,5 @@
 django-cors-headers==2.1.0
-Django==1.10.5
+Django==1.11.10
 PyYAML==3.11
 betamax
 betamax_serializers
@@ -8,10 +8,10 @@ celery==4.0.2
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-redis==4.7.0
-django-server-status==0.3.2
-django-webpack-loader==0.4.1
+django-server-status==0.5.0
+django-webpack-loader==0.5.0
 django-anymail[mailgun]
-djangorestframework==3.5.2
+djangorestframework==3.7.7
 djangorestframework-jwt==1.11.0
 factory_boy
 faker

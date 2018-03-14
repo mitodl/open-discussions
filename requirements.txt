@@ -19,11 +19,11 @@ dj-static==0.0.6
 django-anymail[mailgun]==1.2
 django-cors-headers==2.1.0
 django-redis==4.7.0
-django-server-status==0.3.2
-django-webpack-loader==0.4.1
-django==1.10.5
+django-server-status==0.5.0
+django-webpack-loader==0.5.0
+django==1.11.10
 djangorestframework-jwt==1.11.0
-djangorestframework==3.5.2
+djangorestframework==3.7.7
 elasticsearch==5.4.0      # via django-server-status
 factory-boy==2.8.1
 faker==0.7.17
@@ -44,7 +44,7 @@ ptyprocess==0.5.1         # via pexpect
 pygments==2.2.0           # via ipython
 pyjwt==1.5.2              # via djangorestframework-jwt
 python-dateutil==2.6.0    # via faker
-pytz==2017.2              # via celery
+pytz==2017.2              # via celery, django
 pyyaml==3.11
 raven==6.1.0
 redis==2.10.5
