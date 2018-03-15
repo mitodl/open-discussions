@@ -385,7 +385,19 @@ CELERY_TASK_EAGER_PROPAGATES = get_bool("CELERY_TASK_EAGER_PROPAGATES", True)
 CELERY_BEAT_SCHEDULE = {
     'evict-expired-access-tokens-every-1-hrs': {
         'task': 'channels.tasks.evict_expired_access_tokens',
-        'schedule': crontab(minute=0, hour='*')
+        'schedule': crontab(minute=0, hour='*'),
+    },
+    'send-unsent-emails-every-1-mins': {
+        'task': 'notifications.tasks.send_unsent_email_notifications',
+        'schedule': crontab(minute='*'),
+    },
+    'send-frontpage-digests-every-1-days': {
+        'task': 'notifications.tasks.send_daily_frontpage_digests',
+        'schedule': crontab(minute=0, hour=14),  # 10am EST
+    },
+    'send-frontpage-digests-every-1-weeks': {
+        'task': 'notifications.tasks.send_weekly_frontpage_digests',
+        'schedule': crontab(minute=0, hour=14, day_of_week=2),  # 10am EST on tuesdays
     },
 }
 
