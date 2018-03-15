@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.18.1
+--------------
+
+- Added cancelation and better error handling to email sending
+- Upgrade Django to 1.11, other upgrades (#530)
+
 Version 0.18.0
 --------------
 
