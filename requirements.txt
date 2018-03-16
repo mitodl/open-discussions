@@ -5,6 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 amqp==2.1.4               # via kombu
+base36==0.1.1
 beautifulsoup4==4.6.0
 betamax-serializers==0.2.0
 betamax==0.8.0

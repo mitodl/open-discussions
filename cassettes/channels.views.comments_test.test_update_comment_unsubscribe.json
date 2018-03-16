@@ -1,0 +1,869 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2018-03-16T19:53:16",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01C8R5Z52K19JN66Q0VVWGRE01"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA1WNwQqCQBRFf0VmGQVGVNRSXBTGWJSGq2F8PmkwmmneKEn07zm5ankP99z7ZhIAiYTTDT7YNmDz5XqmWp13Tpy4oBpSvUko3x95G++gYdOA4csoiySUFxarMBzYzxeuN+hHSpQWre8S6BFNfLJYD+Lt/63nRXzB+7NWUZpdzyYpNGSSooMm71TYKUChKj88Bvb5Apfj89K4AAAA",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 16 Mar 2018 19:43:50 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=2yQjE0XF1VFfqYUrBl; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 15-Mar-2020 19:43:50 GMT",
+            "loidcreated=2018-03-16T19%3A43%3A50.081Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 15-Mar-2020 19:43:50 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01C8R5Z52K19JN66Q0VVWGRE01"
+      }
+    },
+    {
+      "recorded_at": "2018-03-16T19:53:16",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&description=Iure+recusandae+mollitia+vel+quam+laboriosam+assumenda+exercitationem.+Doloremque+occaecati+labore+illum+necessitatibus+dolorem+voluptatem+cum+iusto.+Neque+sint+officia+quam+inventore+sequi+hic+reiciendis.%0ADeleniti+pariatur+quibusdam+fugit+error.+Ullam+impedit+illo+maxime+exercitationem.+Veniam+fuga+dolor+nulla+dicta+rem.+Dolore+sit+officiis+quos+voluptates+non+similique+totam.&link_type=any&name=1521229996_ea&public_description=Ex+aperiam+quaerat+officiis+dolor+eaque+quos.+Magni+ab+eius+dolorum+earum+eveniet+eveniet.&title=Quos+rem+recusandae+blanditiis+velit.&type=private&wikimode=disabled"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 157-iuoVvt_QN_sfcOo9KsVIPNuDHck"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "626"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=2yQjE0XF1VFfqYUrBl; loidcreated=2018-03-16T19%3A43%3A50.081Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.18.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 16 Mar 2018 19:43:50 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "370"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-03-16T19:53:22",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=2yQjE0XF1VFfqYUrBl; loidcreated=2018-03-16T19%3A43%3A50.081Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.18.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01C8R5ZBDECN9Q1ZN1FBWG9CDC"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDI0tdAtzDIOSfE3DPHJLHS0zDZOLSkMTHLz9010CrBQ0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLaFVpnkZeaaGfsUW0S4uDsZehbnu5qGZoYF5iWD9KSklmUmp8ZnpoAMhnCUagHyXXw/uAAAAA==",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 16 Mar 2018 19:43:56 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01C8R5ZBDECN9Q1ZN1FBWG9CDC"
+      }
+    },
+    {
+      "recorded_at": "2018-03-16T19:53:23",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&name=01C8R5ZBDECN9Q1ZN1FBWG9CDC&type=contributor"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 157-iuoVvt_QN_sfcOo9KsVIPNuDHck"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "62"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=2yQjE0XF1VFfqYUrBl; loidcreated=2018-03-16T19%3A43%3A50.081Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.18.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/r/1521229996_ea/api/friend/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 16 Mar 2018 19:43:57 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "364"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1521229996_ea/api/friend/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-03-16T19:53:23",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "action=sub&api_type=json&skip_inital_defaults=True&sr_name=1521229996_ea"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 158-qj3TdO1TLiqA9k3etqQbFOMaBP8"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "72"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=2yQjE0XF1VFfqYUrBl; loidcreated=2018-03-16T19%3A43%3A50.081Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.18.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/subscribe/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "2"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 16 Mar 2018 19:43:57 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "363"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/subscribe/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-03-16T19:53:23",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&kind=self&resubmit=True&sendreplies=True&sr=1521229996_ea&text=Velit+possimus+iure+ducimus+ipsum.+Ipsa+at+sapiente+libero+vero+officiis.&title=A+possimus+reiciendis+id.+In+adipisci+earum+quas."
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 158-qj3TdO1TLiqA9k3etqQbFOMaBP8"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "206"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=2yQjE0XF1VFfqYUrBl; loidcreated=2018-03-16T19%3A43%3A50.081Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.18.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/submit/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": [], \"data\": {\"url\": \"https://reddit.local/r/1521229996_ea/comments/t/a_possimus_reiciendis_id_in_adipisci_earum_quas/\", \"id\": \"t\", \"name\": \"t3_t\"}}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "168"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 16 Mar 2018 19:43:57 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "363"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/submit/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-03-16T19:53:23",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 158-qj3TdO1TLiqA9k3etqQbFOMaBP8"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=2yQjE0XF1VFfqYUrBl; loidcreated=2018-03-16T19%3A43%3A50.081Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.18.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/comments/t/?limit=2048&sort=best&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1521229996_ea\", \"selftext_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EVelit possimus iure ducimus ipsum. Ipsa at sapiente libero vero officiis.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"selftext\": \"Velit possimus iure ducimus ipsum. Ipsa at sapiente libero vero officiis.\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"t\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01C8R5ZBDECN9Q1ZN1FBWG9CDC\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1521229996_ea\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_k\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1521229996_ea/comments/t/a_possimus_reiciendis_id_in_adipisci_earum_quas/\", \"locked\": false, \"name\": \"t3_t\", \"created\": 1521229437.0, \"url\": \"http://reddit.local/r/1521229996_ea/comments/t/a_possimus_reiciendis_id_in_adipisci_earum_quas/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"A possimus reiciendis id. In adipisci earum quas.\", \"created_utc\": 1521229437.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "1738"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 16 Mar 2018 19:43:57 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "297.0"
+          ],
+          "x-ratelimit-reset": [
+            "363"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=wn953ddyHzOAzlabBOJtuyTJP9pSyIbRf85iWUn3Mk7rhJBEF%2B0m8Sv6SWGA8FSlkcaOjOw%2B1l%2FWkuUxYnVtVoTqwivjhQf7"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/comments/t/?limit=2048&sort=best&raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-03-16T19:53:26",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&text=Pariatur+corporis+illo+ea+ea+dolore+aliquam.+Dicta+ullam+atque+totam.&thing_id=t3_t"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 158-qj3TdO1TLiqA9k3etqQbFOMaBP8"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "102"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=2yQjE0XF1VFfqYUrBl; loidcreated=2018-03-16T19%3A43%3A50.081Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.18.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/comment/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": [], \"data\": {\"things\": [{\"kind\": \"t1\", \"data\": {\"subreddit_id\": \"t5_k\", \"banned_by\": null, \"removal_reason\": null, \"link_id\": \"t3_t\", \"likes\": true, \"replies\": \"\", \"user_reports\": [], \"saved\": false, \"id\": \"1d\", \"gilded\": 0, \"archived\": false, \"report_reasons\": null, \"author\": \"01C8R5ZBDECN9Q1ZN1FBWG9CDC\", \"parent_id\": \"t3_t\", \"score\": 1, \"approved_by\": null, \"controversiality\": 0, \"body\": \"Pariatur corporis illo ea ea dolore aliquam. Dicta ullam atque totam.\", \"edited\": false, \"author_flair_css_class\": null, \"downs\": 0, \"body_html\": \"\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EPariatur corporis illo ea ea dolore aliquam. Dicta ullam atque totam.\\u003C/p\\u003E\\n\\u003C/div\\u003E\", \"subreddit\": \"1521229996_ea\", \"score_hidden\": false, \"name\": \"t1_1d\", \"created\": 1521229440.0, \"author_flair_text\": null, \"created_utc\": 1521229440.0, \"distinguished\": null, \"mod_reports\": [], \"num_reports\": null, \"ups\": 1}}]}}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "934"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 16 Mar 2018 19:44:00 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "296.0"
+          ],
+          "x-ratelimit-reset": [
+            "360"
+          ],
+          "x-ratelimit-used": [
+            "4"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/comment/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-03-16T19:53:29",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 157-iuoVvt_QN_sfcOo9KsVIPNuDHck"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=2yQjE0XF1VFfqYUrBl; loidcreated=2018-03-16T19%3A43%3A50.081Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.18.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/info/?id=t1_1d&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t1\", \"data\": {\"subreddit_id\": \"t5_k\", \"banned_by\": null, \"removal_reason\": null, \"link_id\": \"t3_t\", \"likes\": null, \"replies\": \"\", \"user_reports\": [], \"saved\": false, \"id\": \"1d\", \"gilded\": 0, \"archived\": false, \"report_reasons\": [], \"author\": \"01C8R5ZBDECN9Q1ZN1FBWG9CDC\", \"parent_id\": \"t3_t\", \"score\": 1, \"approved_by\": null, \"controversiality\": 0, \"body\": \"Pariatur corporis illo ea ea dolore aliquam. Dicta ullam atque totam.\", \"edited\": false, \"author_flair_css_class\": null, \"downs\": 0, \"body_html\": \"\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EPariatur corporis illo ea ea dolore aliquam. Dicta ullam atque totam.\\u003C/p\\u003E\\n\\u003C/div\\u003E\", \"subreddit\": \"1521229996_ea\", \"score_hidden\": false, \"name\": \"t1_1d\", \"created\": 1521229440.0, \"author_flair_text\": null, \"created_utc\": 1521229440.0, \"distinguished\": null, \"mod_reports\": [], \"num_reports\": 0, \"ups\": 1}}], \"after\": null, \"before\": null}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "974"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 16 Mar 2018 19:44:03 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "297.0"
+          ],
+          "x-ratelimit-reset": [
+            "357"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=n%2BDrEdw7RRK5Bulg0Zx0tR5RRx7TwaR2zOGx1A8%2FC4C8lkaeu8AYjlfd8UhL%2BMjfrq3Ujbwpatc%3D"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/info/?id=t1_1d&raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-03-16T19:53:29",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 157-iuoVvt_QN_sfcOo9KsVIPNuDHck"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=2yQjE0XF1VFfqYUrBl; loidcreated=2018-03-16T19%3A43%3A50.081Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.18.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/info/?id=t1_1d&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t1\", \"data\": {\"subreddit_id\": \"t5_k\", \"banned_by\": null, \"removal_reason\": null, \"link_id\": \"t3_t\", \"likes\": null, \"replies\": \"\", \"user_reports\": [], \"saved\": false, \"id\": \"1d\", \"gilded\": 0, \"archived\": false, \"report_reasons\": [], \"author\": \"01C8R5ZBDECN9Q1ZN1FBWG9CDC\", \"parent_id\": \"t3_t\", \"score\": 1, \"approved_by\": null, \"controversiality\": 0, \"body\": \"Pariatur corporis illo ea ea dolore aliquam. Dicta ullam atque totam.\", \"edited\": false, \"author_flair_css_class\": null, \"downs\": 0, \"body_html\": \"\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EPariatur corporis illo ea ea dolore aliquam. Dicta ullam atque totam.\\u003C/p\\u003E\\n\\u003C/div\\u003E\", \"subreddit\": \"1521229996_ea\", \"score_hidden\": false, \"name\": \"t1_1d\", \"created\": 1521229440.0, \"author_flair_text\": null, \"created_utc\": 1521229440.0, \"distinguished\": null, \"mod_reports\": [], \"num_reports\": 0, \"ups\": 1}}], \"after\": null, \"before\": null}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "974"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 16 Mar 2018 19:44:03 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "296.0"
+          ],
+          "x-ratelimit-reset": [
+            "357"
+          ],
+          "x-ratelimit-used": [
+            "4"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=4Sqlo5jWu6rCtuZFKUedNVHLE%2F%2BZQ93ao98yxsxDPqfu4hUAOd0gJEAuKXkz%2B5yUtMsyI7ZkVgo%3D"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/info/?id=t1_1d&raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

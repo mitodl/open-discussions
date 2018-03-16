@@ -4,7 +4,9 @@ from contextlib import contextmanager
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.utils.functional import SimpleLazyObject
 from praw.exceptions import APIException
+from praw.models import Comment
 from prawcore.exceptions import (
     Forbidden,
     NotFound as PrawNotFound,
@@ -14,6 +16,7 @@ from rest_framework.exceptions import PermissionDenied, NotFound
 
 from channels.constants import POSTS_SORT_HOT
 from channels.exceptions import ConflictException, GoneException
+from channels.models import Subscription
 
 User = get_user_model()
 
@@ -61,7 +64,7 @@ def get_pagination_and_posts(posts, listing_params):
         posts._next_batch()
     except StopIteration:
         # empty page
-        return {}, []
+        return pagination, []
 
     # pylint: disable=protected-access
     listing = posts._listing
@@ -124,3 +127,85 @@ def lookup_users_for_posts(posts):
         ]
     ).select_related('profile')
     return {user.username: user for user in users}
+
+
+def _lookup_subscriptions_for_posts(posts, user):
+    """
+    Helper function to look up the user's subscriptions among a set of posts
+
+    Args:
+        posts (list of praw.models.Submission):
+            A list of posts
+        user (User):
+            The user to find post subscriptions for
+
+    Return:
+        list of str: list of base36 ids of posts the user is subscribed to
+    """
+    if not posts:
+        return []
+
+    return Subscription.objects.filter(
+        user=user,
+        post_id__in=[post.id for post in posts],
+        comment_id__isnull=True,
+    ).values_list('post_id', flat=True)
+
+
+def lookup_subscriptions_for_posts(posts, user):
+    """
+    Helper function to look up the user's subscriptions among a set of posts
+
+    Args:
+        posts (list of praw.models.Submission):
+            A list of posts
+        user (User):
+            The user to find post subscriptions for
+
+    Return:
+        list of str: list of base36 ids of posts the user is subscribed to
+    """
+    return SimpleLazyObject(lambda: _lookup_subscriptions_for_posts(posts, user))
+
+
+def _lookup_subscriptions_for_comments(comments, user):
+    """
+    Helper function to look up the user's subscriptions among a set of comments
+
+    Args:
+        comments (list of praw.models.Comment):
+            A list of comments
+        user (User):
+            The user to find comments for
+
+    Return:
+        list of int: list of integer ids of comments the user is subscribed to
+    """
+    if not comments:
+        return []
+
+    post_id = comments[0]._extract_submission_id()  # pylint: disable=protected-access
+
+    comment_ids = [comment.id for comment in comments if isinstance(comment, Comment)]
+
+    return Subscription.objects.filter(
+        user=user,
+        post_id=post_id,
+        comment_id__in=comment_ids,
+    ).values_list('comment_id', flat=True)
+
+
+def lookup_subscriptions_for_comments(comments, user):
+    """
+    Helper function to look up the user's subscriptions among a set of comments
+
+    Args:
+        comments (list of praw.models.Comment):
+            A list of comments
+        user (User):
+            The user to find comments for
+
+    Return:
+        list of int: list of integer ids of comments the user is subscribed to
+    """
+    return SimpleLazyObject(lambda: _lookup_subscriptions_for_comments(comments, user))

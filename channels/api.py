@@ -37,6 +37,7 @@ from channels.constants import (
 from channels.models import (
     RedditAccessToken,
     RedditRefreshToken,
+    Subscription,
 )
 
 from open_discussions.utils import now_in_utc
@@ -915,3 +916,65 @@ class Api:
             post_id(str): the id of the post to report
         """
         self.get_post(post_id).mod.ignore_reports()
+
+    def add_post_subscription(self, post_id):
+        """
+        Adds a subscription to a post
+
+        Args:
+            post_id(str): the id of the post to subscribe to
+
+        Returns:
+            Subscription: the subscription
+        """
+        subscription, _ = Subscription.objects.get_or_create(
+            user=self.user,
+            post_id=post_id,
+            comment_id=None,  # must be explicit about this
+        )
+        return subscription
+
+    def remove_post_subscription(self, post_id):
+        """
+        Remove a subscription to a post
+
+        Args:
+            post_id(str): the id of the post to unsubscribe from
+        """
+        Subscription.objects.filter(
+            user=self.user,
+            post_id=post_id,
+            comment_id__isnull=True,
+        ).delete()
+
+    def add_comment_subscription(self, post_id, comment_id):
+        """
+        Adds a subscription to a comment
+
+        Args:
+            post_id(str): the id of the post to subscribe to
+            comment_id(str): the id of the comment to subscribe to
+
+        Returns:
+            Subscription: the subscription
+        """
+        subscription, _ = Subscription.objects.get_or_create(
+            user=self.user,
+            post_id=post_id,
+            comment_id=comment_id,
+        )
+        return subscription
+
+    def remove_comment_subscription(self, post_id, comment_id):
+        """
+        Remove a subscription to a comment
+
+        Args:
+            post_id(str): the id of the post to unsubscribe from
+            comment_id(str): the id of the comment to unsubscribe from
+        """
+        Subscription.objects.filter(
+            user=self.user,
+            post_id=post_id,
+            comment_id=comment_id,
+        ).delete()

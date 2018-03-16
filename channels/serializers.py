@@ -17,6 +17,7 @@ from channels.api import (
     get_kind_mapping,
 )
 from channels.constants import VALID_CHANNEL_TYPES
+from channels.models import Subscription
 
 default_profile_image = "/static/images/avatar_default.png"
 
@@ -136,6 +137,7 @@ class PostSerializer(serializers.Serializer):
     author_name = serializers.SerializerMethodField()
     edited = serializers.SerializerMethodField()
     num_reports = serializers.IntegerField(read_only=True)
+    subscribed = WriteableSerializerMethodField()
 
     def _get_user(self, instance):
         """
@@ -218,6 +220,21 @@ class PostSerializer(serializers.Serializer):
             raise ValidationError("url must be a string")
         return {"url": value}
 
+    def validate_subscribed(self, value):
+        """Validate that subscribed is a bool"""
+        return {'subscribed': _parse_bool(value, 'subscribed')}
+
+    def get_subscribed(self, instance):
+        """Returns True if user is subscribed to the post"""
+        if 'post_subscriptions' not in self.context:
+            # this code is run if a post was just created
+            return Subscription.objects.filter(
+                user=self.context['request'].user,
+                post_id=instance.id,
+                comment_id__isnull=True,
+            ).exists()
+        return instance.id in self.context['post_subscriptions']
+
     def create(self, validated_data):
         title = validated_data['title']
         text = validated_data.get('text')
@@ -242,6 +259,9 @@ class PostSerializer(serializers.Serializer):
             title=title,
             **kwargs
         )
+
+        api.add_post_subscription(post.id)
+
         changed = _apply_vote(post, validated_data, False)
         if not changed:
             return post
@@ -276,6 +296,12 @@ class PostSerializer(serializers.Serializer):
             sticky = validated_data["stickied"]
             api.pin_post(post_id, sticky)
 
+        if "subscribed" in validated_data:
+            if validated_data['subscribed'] is True:
+                api.add_post_subscription(post_id)
+            elif validated_data['subscribed'] is False:
+                api.remove_post_subscription(post_id)
+
         _apply_vote(instance, validated_data, False)
         return api.get_post(post_id=post_id)
 
@@ -300,6 +326,7 @@ class CommentSerializer(serializers.Serializer):
     comment_type = serializers.SerializerMethodField()
     num_reports = serializers.IntegerField(read_only=True)
     deleted = serializers.SerializerMethodField()
+    subscribed = WriteableSerializerMethodField()
 
     def _get_user(self, instance):
         """
@@ -394,6 +421,21 @@ class CommentSerializer(serializers.Serializer):
         """Returns True if the comment was deleted"""
         return instance.body == "[deleted]"  # only way to tell
 
+    def validate_subscribed(self, value):
+        """Validate that subscribed is a bool"""
+        return {'subscribed': _parse_bool(value, 'subscribed')}
+
+    def get_subscribed(self, instance):
+        """Returns True if user is subscribed to the comment"""
+        if 'comment_subscriptions' not in self.context:
+            # this code is run if a comment was just created
+            return Subscription.objects.filter(
+                user=self.context['request'].user,
+                post_id=instance.submission.id,
+                comment_id=instance.id,
+            ).exists()
+        return instance.id in self.context.get('comment_subscriptions', [])
+
     def validate(self, attrs):
         """Validate that the the combination of fields makes sense"""
         if attrs.get('upvoted') and attrs.get('downvoted'):
@@ -414,6 +456,8 @@ class CommentSerializer(serializers.Serializer):
             text=validated_data['body'],
             **kwargs
         )
+
+        api.add_comment_subscription(post_id, comment.id)
 
         changed = _apply_vote(comment, validated_data, True)
         if changed:
@@ -440,6 +484,13 @@ class CommentSerializer(serializers.Serializer):
             if ignore_reports is True:
                 api.approve_comment(comment_id=instance.id)
                 api.ignore_comment_reports(instance.id)
+
+        if "subscribed" in validated_data:
+            post_id = instance.submission.id
+            if validated_data['subscribed'] is True:
+                api.add_comment_subscription(post_id, instance.id)
+            elif validated_data['subscribed'] is False:
+                api.remove_comment_subscription(post_id, instance.id)
 
         _apply_vote(instance, validated_data, True)
 

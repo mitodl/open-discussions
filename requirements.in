@@ -1,6 +1,7 @@
 django-cors-headers==2.1.0
 Django==1.11.10
 PyYAML==3.11
+base36
 beautifulsoup4==4.6.0
 betamax
 betamax_serializers

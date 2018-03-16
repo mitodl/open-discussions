@@ -45,6 +45,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "downvoted": False,
             "removed": False,
             "deleted": False,
+            "subscribed": False,
             "created": "2017-07-25T17:09:45+00:00",
             'profile_image': profile_image,
             'author_name': name,
@@ -63,6 +64,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "downvoted": False,
             "removed": False,
             "deleted": False,
+            "subscribed": False,
             "created": "2017-07-25T17:15:57+00:00",
             'profile_image': profile_image,
             'author_name': name,
@@ -81,6 +83,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "downvoted": False,
             "removed": False,
             "deleted": False,
+            "subscribed": False,
             "created": "2017-07-25T17:16:10+00:00",
             'profile_image': profile_image,
             'author_name': name,
@@ -89,6 +92,17 @@ def test_list_comments(client, logged_in_profile, missing_user):
             'num_reports': 0,
         },
     ]
+
+
+def test_list_comments_none(client, private_channel_and_contributor, reddit_factories):
+    """List for no comments on a post"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('one post', user, channel=channel)
+    client.force_login(user)
+    url = reverse('comment-list', kwargs={'post_id': post.id})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == []
 
 
 def test_list_comments_forbidden(client, logged_in_profile):
@@ -142,6 +156,7 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "downvoted": False,
             "removed": False,
             "deleted": False,
+            "subscribed": False,
             "created": "2017-10-19T19:47:22+00:00",
             "profile_image": image_url,
             "author_name": name,
@@ -160,6 +175,7 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "downvoted": False,
             "removed": False,
             "deleted": False,
+            "subscribed": False,
             "created": "2017-10-23T17:45:14+00:00",
             "profile_image": image_url,
             "author_name": name,
@@ -178,6 +194,7 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "downvoted": False,
             "removed": False,
             "deleted": False,
+            "subscribed": False,
             "created": "2017-10-23T17:45:25+00:00",
             "profile_image": image_url,
             "author_name": name,
@@ -229,6 +246,7 @@ def test_more_comments_children(client, logged_in_profile):
             "downvoted": False,
             "removed": False,
             "deleted": False,
+            "subscribed": False,
             "created": "2017-11-09T16:35:55+00:00",
             "profile_image": image_url,
             "author_name": name,
@@ -247,6 +265,7 @@ def test_more_comments_children(client, logged_in_profile):
             "downvoted": False,
             "removed": False,
             "deleted": False,
+            "subscribed": False,
             "created": "2017-11-09T16:36:00+00:00",
             "profile_image": image_url,
             "author_name": name,
@@ -311,6 +330,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             'upvoted': False,
             "removed": False,
             "deleted": True,
+            "subscribed": False,
             'id': '1s',
             'edited': False,
             "author_name": "[deleted]",
@@ -331,6 +351,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             "removed": False,
             'edited': False,
             "deleted": False,
+            "subscribed": False,
             "author_name": user.profile.name,
             'num_reports': None,
         }
@@ -360,6 +381,7 @@ def test_get_comment(client, jwt_header, private_channel_and_contributor, reddit
         'downvoted': False,
         "removed": False,
         "deleted": False,
+        "subscribed": False,
         'profile_image': user.profile.image_small,
         'author_name': user.profile.name,
         'edited': False,
@@ -399,6 +421,7 @@ def test_create_comment(client, logged_in_profile):
         "downvoted": False,
         "removed": False,
         "deleted": False,
+        "subscribed": True,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -448,6 +471,7 @@ def test_create_comment_no_upvote(client, logged_in_profile):
         "downvoted": False,
         "removed": False,
         "deleted": False,
+        "subscribed": True,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -477,6 +501,7 @@ def test_create_comment_downvote(client, logged_in_profile):
         'downvoted': True,
         "removed": False,
         "deleted": False,
+        "subscribed": True,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -507,6 +532,7 @@ def test_create_comment_reply_to_comment(client, logged_in_profile):
         "downvoted": False,
         "removed": False,
         "deleted": False,
+        "subscribed": True,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -553,6 +579,7 @@ def test_update_comment_text(client, logged_in_profile):
         'downvoted': False,
         "removed": False,
         "deleted": False,
+        "subscribed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': True,
@@ -592,6 +619,7 @@ def test_update_comment_upvote(client, logged_in_profile):
         'downvoted': False,
         "removed": False,
         "deleted": False,
+        "subscribed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -620,6 +648,7 @@ def test_update_comment_downvote(client, logged_in_profile):
         'downvoted': True,
         "removed": False,
         "deleted": False,
+        "subscribed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -647,6 +676,7 @@ def test_update_comment_clear_upvote(client, logged_in_profile):
         'downvoted': False,
         "removed": False,
         "deleted": False,
+        "subscribed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -675,6 +705,7 @@ def test_update_comment_clear_downvote(client, logged_in_profile):
         'downvoted': False,
         "removed": False,
         "deleted": False,
+        "subscribed": False,
         'profile_image': logged_in_profile.image_small,
         'author_name': logged_in_profile.name,
         'edited': False,
@@ -708,6 +739,7 @@ def test_update_comment_remove(
         'downvoted': False,
         "removed": True,
         "deleted": False,
+        "subscribed": False,
         'profile_image': user.profile.image_small,
         'author_name': user.profile.name,
         'edited': False,
@@ -742,6 +774,7 @@ def test_update_comment_approve(
         'downvoted': False,
         "removed": False,
         "deleted": False,
+        "subscribed": False,
         'profile_image': user.profile.image_small,
         'author_name': user.profile.name,
         'edited': False,
@@ -775,6 +808,7 @@ def test_update_comment_ignore_reports(
         'downvoted': False,
         "removed": False,
         "deleted": False,
+        "subscribed": False,
         'profile_image': user.profile.image_small,
         'author_name': user.profile.name,
         'edited': False,
@@ -800,3 +834,68 @@ def test_delete_comment(client, logged_in_profile):
     url = reverse('comment-detail', kwargs={'comment_id': '6'})
     resp = client.delete(url)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+def test_update_comment_subscribe(client, staff_user, private_channel_and_contributor, reddit_factories):
+    """Update a comment to subscribe to it"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("post", user, channel=channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+    client.force_login(staff_user)
+    url = reverse('comment-detail', kwargs={'comment_id': comment.id})
+    resp = client.patch(url, type='json', data={
+        "subscribed": True,
+    })
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'author_id': user.username,
+        'created': comment.created,
+        'id': comment.id,
+        'parent_id': None,
+        'post_id': post.id,
+        'score': 1,
+        'text': comment.text,
+        'upvoted': False,
+        'downvoted': False,
+        "removed": False,
+        "deleted": False,
+        "subscribed": True,
+        'profile_image': user.profile.image_small,
+        'author_name': user.profile.name,
+        'edited': False,
+        'comment_type': 'comment',
+        'num_reports': 0,
+    }
+
+
+def test_update_comment_unsubscribe(client, staff_user, staff_api, private_channel_and_contributor, reddit_factories):
+    """Update a comment to unsubscribe from it"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("post", user, channel=channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+    staff_api.add_comment_subscription(post.id, comment.id)
+    client.force_login(staff_user)
+    url = reverse('comment-detail', kwargs={'comment_id': comment.id})
+    resp = client.patch(url, type='json', data={
+        "subscribed": False,
+    })
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'author_id': user.username,
+        'created': comment.created,
+        'id': comment.id,
+        'parent_id': None,
+        'post_id': post.id,
+        'score': 1,
+        'text': comment.text,
+        'upvoted': False,
+        'downvoted': False,
+        "removed": False,
+        "deleted": False,
+        "subscribed": False,
+        'profile_image': user.profile.image_small,
+        'author_name': user.profile.name,
+        'edited': False,
+        'comment_type': 'comment',
+        'num_reports': 0,
+    }

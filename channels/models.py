@@ -1,6 +1,32 @@
 """Channels models"""
+import base36
 from django.conf import settings
 from django.db import models
+
+from open_discussions.models import TimestampedModel
+
+
+class Base36IntegerField(models.BigIntegerField):
+    """Handles a Reddit base36 encoded string id which is stored as a base10 integer"""
+
+    def get_prep_value(self, value):
+        """Converts from base36 to base10 for the DB"""
+        if value is not None:
+            return base36.loads(value)
+        return value
+
+    def from_db_value(self, value, expression, connection, context):  # pylint: disable=unused-argument
+        """Converts from base10 to base36 for application"""
+        if value is None:
+            return value
+        return base36.dumps(value)
+
+    def to_python(self, value):
+        """Converts from base10 to base36 for application"""
+        if not value:
+            return value
+
+        return base36.dumps(value)
 
 
 class RedditRefreshToken(models.Model):
@@ -42,3 +68,20 @@ class RedditAccessToken(models.Model):
 
     def __str__(self):
         return "{} expires: {}".format(self.token_value, self.token_expires_at)
+
+
+class Subscription(TimestampedModel):
+    """
+    Tracks user subscriptions to a post or a comment
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    post_id = Base36IntegerField()
+    comment_id = Base36IntegerField(null=True)
+
+    def __str__(self):
+        """Prints the subscription as a str"""
+        return "{} is subscribed to post_id: {}, comment_id: {}".format(self.user, self.post_id, self.comment_id)
+
+    class Meta:
+        unique_together = (('user', 'post_id', 'comment_id'),)
+        index_together = (('post_id', 'comment_id'),)

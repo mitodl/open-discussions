@@ -22,7 +22,9 @@ def test_frontpage_empty(client, logged_in_profile):
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'posts': [],
-        'pagination': {},
+        'pagination': {
+            'sort': POSTS_SORT_HOT,
+        },
     }
 
 
@@ -47,6 +49,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
             "title": post.title,
             "upvoted": True,
             "removed": False,
+            'subscribed': False,
             "score": 1,
             "author_id": user.username,
             "id": post.id,
@@ -89,6 +92,7 @@ def test_frontpage_sorted(client, private_channel_and_contributor, reddit_factor
             "title": post.title,
             "upvoted": True,
             "removed": False,
+            'subscribed': False,
             "score": 1,
             "author_id": user.username,
             "id": post.id,

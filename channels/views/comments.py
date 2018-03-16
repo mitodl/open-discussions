@@ -14,7 +14,10 @@ from channels.serializers import (
     CommentSerializer,
     GenericCommentSerializer,
 )
-from channels.utils import translate_praw_exceptions
+from channels.utils import (
+    translate_praw_exceptions,
+    lookup_subscriptions_for_comments,
+)
 
 User = get_user_model()
 
@@ -70,16 +73,19 @@ class CommentListView(APIView):
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Get list for comments and attach User objects to them"""
         with translate_praw_exceptions():
+            post_id = self.kwargs['post_id']
             api = Api(user=self.request.user)
             sort = request.query_params.get('sort', COMMENTS_SORT_BEST)
-            comments = api.list_comments(self.kwargs['post_id'], sort).list()
+            comments = api.list_comments(post_id, sort).list()
             users = _lookup_users_for_comments(comments)
+            subscriptions = lookup_subscriptions_for_comments(comments, self.request.user)
 
             serialized_comments_list = GenericCommentSerializer(
                 comments,
                 context={
                     **self.get_serializer_context(),
                     'users': users,
+                    'comment_subscriptions': subscriptions,
                 },
                 many=True,
             ).data
@@ -131,12 +137,14 @@ class MoreCommentsView(APIView):
             comments = api.more_comments(parent_id, post_id, children, sort)
 
             users = _lookup_users_for_comments(comments)
+            subscriptions = lookup_subscriptions_for_comments(comments, self.request.user)
 
             serialized_comments_list = GenericCommentSerializer(
                 comments,
                 context={
                     **self.get_serializer_context(),
                     'users': users,
+                    'comment_subscriptions': subscriptions,
                 },
                 many=True,
             ).data
@@ -174,11 +182,13 @@ class CommentDetailView(APIView):
                 raise NotFound()
 
             users = _lookup_users_for_comments([comment])
+            subscriptions = lookup_subscriptions_for_comments([comment], self.request.user)
             serialized_comment_tree = GenericCommentSerializer(
                 [comment] + comment.replies.list(),
                 context={
                     **self.get_serializer_context(),
                     'users': users,
+                    'comment_subscriptions': subscriptions,
                 },
                 many=True
             ).data
@@ -188,10 +198,14 @@ class CommentDetailView(APIView):
         """Update a comment"""
         with translate_praw_exceptions():
             comment = self.get_object()
+            subscriptions = lookup_subscriptions_for_comments([comment], self.request.user)
             serializer = CommentSerializer(
                 instance=comment,
                 data=request.data,
-                context=self.get_serializer_context(),
+                context={
+                    **self.get_serializer_context(),
+                    'comment_subscriptions': subscriptions,
+                },
                 partial=True,
             )
             serializer.is_valid(raise_exception=True)

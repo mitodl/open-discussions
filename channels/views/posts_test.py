@@ -4,11 +4,13 @@ import pytest
 from django.core.urlresolvers import reverse
 from rest_framework import status
 
+from channels.api import Api
 from channels.serializers import default_profile_image
 from channels.constants import (
     VALID_POST_SORT_TYPES,
     POSTS_SORT_HOT,
 )
+from channels.models import Subscription
 
 pytestmark = [
     pytest.mark.django_db,
@@ -38,6 +40,7 @@ def test_create_url_post(client, private_channel_and_contributor):
         'id': 'e6',
         'num_comments': 0,
         'removed': False,
+        'subscribed': True,
         'score': 1,
         'channel_name': channel.name,
         'channel_title': channel.title,
@@ -69,6 +72,7 @@ def test_create_text_post(client, private_channel_and_contributor):
         'created': '2017-11-22T17:29:51+00:00',
         'upvoted': True,
         'removed': False,
+        'subscribed': True,
         'id': 'e7',
         'num_comments': 0,
         'score': 1,
@@ -150,6 +154,7 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
         "title": post.title,
         "upvoted": True,
         'removed': False,
+        'subscribed': False,
         "score": 1,
         "author_id": user.username,
         "id": post.id,
@@ -196,6 +201,7 @@ def test_get_post_stickied(client, private_channel_and_contributor, reddit_facto
         "title": post.title,
         "upvoted": True,
         'removed': False,
+        'subscribed': False,
         "score": 1,
         "author_id": user.username,
         "id": post.id,
@@ -247,6 +253,7 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
                     "title": post.title,
                     "upvoted": True,
                     "removed": False,
+                    "subscribed": False,
                     "score": 1,
                     "author_id": user.username,
                     "id": post.id,
@@ -265,6 +272,21 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
                 'sort': POSTS_SORT_HOT,
             }
         }
+
+
+def test_list_posts_none(client, private_channel_and_contributor):
+    """List posts in a channel"""
+    channel, user = private_channel_and_contributor
+    client.force_login(user)
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'posts': [],
+        'pagination': {
+            'sort': POSTS_SORT_HOT,
+        }
+    }
 
 
 @pytest.mark.parametrize("sort", VALID_POST_SORT_TYPES)
@@ -290,6 +312,7 @@ def test_list_posts_sorted(client, private_channel_and_contributor, reddit_facto
             "title": post.title,
             "upvoted": True,
             "removed": False,
+            "subscribed": False,
             "score": 1,
             "author_id": user.username,
             "id": post.id,
@@ -327,6 +350,7 @@ def test_list_posts_stickied(client, private_channel_and_contributor, reddit_fac
         "title": posts[2].title,
         "upvoted": True,
         "removed": False,
+        "subscribed": False,
         "score": 1,
         "author_id": user.username,
         "id": posts[2].id,
@@ -450,6 +474,7 @@ def test_update_post_text(client, private_channel_and_contributor, reddit_factor
         'title': post.title,
         'upvoted': True,
         'removed': False,
+        'subscribed': False,
         'score': 1,
         'author_id': user.username,
         'id': post.id,
@@ -479,6 +504,7 @@ def test_update_post_stickied(client, private_channel_and_contributor, reddit_fa
         'title': post.title,
         'upvoted': False,
         'removed': False,
+        'subscribed': False,
         'score': 1,
         'author_id': user.username,
         'id': post.id,
@@ -530,6 +556,7 @@ def test_update_post_clear_vote(client, private_channel_and_contributor, reddit_
         'title': post.title,
         'upvoted': False,
         'removed': False,
+        'subscribed': False,
         'score': 1,
         'author_id': user.username,
         'id': post.id,
@@ -559,6 +586,7 @@ def test_update_post_upvote(client, private_channel_and_contributor, reddit_fact
         'title': post.title,
         'upvoted': True,
         'removed': False,
+        'subscribed': False,
         'score': 1,
         'author_id': user.username,
         'id': post.id,
@@ -589,6 +617,7 @@ def test_update_post_removed(client, staff_user, private_channel_and_contributor
         'upvoted': False,
         'score': 1,
         'removed': True,
+        'subscribed': False,
         'author_id': user.username,
         'id': post.id,
         'created': post.created,
@@ -619,6 +648,7 @@ def test_update_post_clear_removed(client, staff_user, staff_api, private_channe
         'upvoted': False,
         'score': 1,
         'removed': False,
+        'subscribed': False,
         'author_id': user.username,
         'id': post.id,
         'created': post.created,
@@ -648,6 +678,7 @@ def test_update_post_ignore_reports(client, staff_user, staff_api, private_chann
         'upvoted': False,
         'score': 1,
         'removed': False,
+        'subscribed': False,
         'author_id': user.username,
         'id': post.id,
         'created': post.created,
@@ -718,6 +749,7 @@ def test_create_post_without_upvote(client, private_channel_and_contributor):
         'created': '2017-11-22T20:19:53+00:00',
         'upvoted': False,
         'removed': False,
+        'subscribed': True,
         'id': 'gd',
         'num_comments': 0,
         'score': 1,
@@ -737,3 +769,86 @@ def test_delete_post(client, logged_in_profile):
     url = reverse('post-detail', kwargs={'post_id': '2'})
     resp = client.delete(url)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.parametrize('has_post_subscription,has_comment_subscription,expected_before,expected_after', [
+    (True, False, 1, 1),
+    (True, True, 2, 2),
+    (False, True, 1, 2),
+    (False, False, 0, 1),
+])
+def test_subscribe_post(
+        client, private_channel_and_contributor, reddit_factories, staff_user,
+        has_post_subscription, has_comment_subscription, expected_before, expected_after
+):  # pylint: disable=too-many-arguments
+    """Test subscribing to a post"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    comment = reddit_factories.comment('just a comment', user, post_id=post.id)
+    api = Api(staff_user)
+    if has_post_subscription:
+        api.add_post_subscription(post.id)
+    if has_comment_subscription:
+        api.add_comment_subscription(post.id, comment.id)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    client.force_login(staff_user)
+    assert Subscription.objects.count() == expected_before
+    resp = client.patch(url, {
+        'subscribed': True,
+    })
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'title': post.title,
+        'text': post.text,
+        'url': None,
+        'author_id': user.username,
+        'created': post.created,
+        'upvoted': False,
+        'removed': False,
+        'subscribed': True,
+        'id': post.id,
+        'num_comments': 1,
+        'score': 1,
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
+        'edited': False,
+        "stickied": False,
+        'num_reports': 0,
+    }
+    assert Subscription.objects.count() == expected_after
+
+
+def test_unsubscribe_post(client, private_channel_and_contributor, reddit_factories):
+    """Test unsubscribing to a post"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    api = Api(user)
+    api.add_post_subscription(post.id)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    client.force_login(user)
+    resp = client.patch(url, {
+        'subscribed': False,
+    })
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        'title': post.title,
+        'text': post.text,
+        'url': None,
+        'author_id': user.username,
+        'created': post.created,
+        'upvoted': True,
+        'removed': False,
+        'subscribed': False,
+        'id': post.id,
+        'num_comments': 0,
+        'score': 1,
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        "profile_image": user.profile.image_small,
+        "author_name": user.profile.name,
+        'edited': False,
+        "stickied": False,
+        'num_reports': None,
+    }

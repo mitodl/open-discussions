@@ -11,6 +11,7 @@ from channels.utils import (
     get_pagination_and_posts,
     get_listing_params,
     lookup_users_for_posts,
+    lookup_subscriptions_for_posts,
     translate_praw_exceptions,
 )
 
@@ -36,11 +37,13 @@ class PostListView(APIView):
             pagination, posts = get_pagination_and_posts(paginated_posts, listing_params)
             users = lookup_users_for_posts(posts)
             posts = [post for post in posts if post.author and post.author.name in users]
+            subscriptions = lookup_subscriptions_for_posts(posts, request.user)
 
             return Response({
                 'posts': PostSerializer(posts, many=True, context={
                     **self.get_serializer_context(),
                     'users': users,
+                    'post_subscriptions': subscriptions,
                 }).data,
                 'pagination': pagination,
             })
@@ -81,12 +84,14 @@ class PostDetailView(APIView):
             users = lookup_users_for_posts([post])
             if not post.author or post.author.name not in users:
                 raise NotFound()
+            subscriptions = lookup_subscriptions_for_posts([post], request.user)
             return Response(
                 PostSerializer(
                     instance=post,
                     context={
                         **self.get_serializer_context(),
                         'users': users,
+                        'post_subscriptions': subscriptions,
                     },
                 ).data,
             )

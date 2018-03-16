@@ -8,6 +8,7 @@ from channels.utils import (
     get_pagination_and_posts,
     get_listing_params,
     lookup_users_for_posts,
+    lookup_subscriptions_for_posts,
 )
 
 
@@ -31,6 +32,7 @@ class FrontPageView(APIView):
         pagination, posts = get_pagination_and_posts(paginated_posts, listing_params)
         users = lookup_users_for_posts(posts)
         posts = [post for post in posts if post.author and post.author.name in users]
+        subscriptions = lookup_subscriptions_for_posts(posts, self.request.user)
 
         return Response({
             'posts': PostSerializer(
@@ -38,6 +40,7 @@ class FrontPageView(APIView):
                 context={
                     **self.get_serializer_context(),
                     'users': users,
+                    'post_subscriptions': subscriptions,
                 },
                 many=True,
             ).data,

@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Maiores inventore ipsum animi rem veniam. Aspernatur ratione ad provident unde ratione. Eligendi consectetur pariatur molestias ex illo ratione. Quo reiciendis animi recusandae impedit ab rerum.\nVel aspernatur necessitatibus repudiandae saepe magnam doloremque maxime. Eius natus eius dignissimos sed unde aperiam ipsa dignissimos. Modi dicta eos expedita quos laborum.",
+      "name": "1521229492_nulla",
+      "public_description": "Illo doloribus eum doloribus culpa laboriosam quia. Itaque dolor corporis quaerat doloribus dolor.",
+      "title": "Cum autem similique nam harum."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "r",
+      "text": "Eum esse illo nulla porro. Autem sed ad quo illum.",
+      "title": "Iusto nulla nulla placeat in culpa."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C8R5FZ7B6ZRKNWNC9AMN0XR5"
+    },
+    "staff_user": {
+      "username": "01C8R5FRTNDM8SGQ1VB8YSDHA2"
+    }
+  }
+}

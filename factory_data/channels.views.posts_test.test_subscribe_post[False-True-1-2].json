@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Reprehenderit omnis numquam suscipit sapiente natus ipsam impedit. Numquam est deserunt distinctio.\nQuasi corporis alias veniam possimus. Quasi minus eius odio tempora. At aut quis esse ipsum doloribus sequi neque quia.\nAutem unde eaque quibusdam ad. Ipsum reiciendis sint quibusdam quaerat eveniet distinctio. Fuga excepturi nobis reprehenderit nobis fuga quidem sint. Explicabo sequi dolores magnam eveniet.",
+      "name": "1521481492_modi",
+      "public_description": "Aut similique qui hic officiis. Ut itaque debitis vero cupiditate nihil vel.",
+      "title": "Assumenda quos nihil eligendi illo."
+    }
+  },
+  "comments": {
+    "just a comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "1h",
+      "post_id": "y",
+      "text": "Id neque distinctio nisi repellendus eum quae. Repellat aut architecto ea minus vel atque nam."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "y",
+      "text": "Itaque tenetur praesentium vero sapiente. Veniam ut quasi rem ab commodi nesciunt sapiente.",
+      "title": "Quaerat in sit nisi ratione minus iure repellat."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C8ZNTDCM4WSNVCPX1QBE44JX"
+    },
+    "staff_user": {
+      "username": "01C8ZNT71EKFK6KCD3PR2420MA"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Fugit odit libero assumenda velit cumque nihil. Quae asperiores voluptates repellendus fugit. Beatae ex magni ex deleniti veritatis.\nDoloribus eius dicta sunt veritatis tenetur qui. Quis nihil animi saepe fugit. Nisi eum quis ipsam repellendus magni. Impedit eum nostrum eveniet tenetur. Quasi quisquam saepe corporis vitae veritatis eos assumenda minima.\nNon perspiciatis iste eum veniam magni. Voluptas ipsum quisquam ullam. Illo rerum sunt voluptates eum. Earum velit eaque ab sequi ex facere.",
+      "name": "1521229980_iure",
+      "public_description": "Vitae numquam quia alias. Error qui at aperiam.",
+      "title": "Nostrum soluta tenetur inventore temporibus."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "1c",
+      "post_id": "s",
+      "text": "Incidunt explicabo quia voluptatem. Totam quas quidem ab doloribus perspiciatis facere."
+    }
+  },
+  "posts": {
+    "post": {
+      "id": "s",
+      "text": "Numquam eius voluptate amet tenetur officia corporis. Labore quis minus totam numquam velit.",
+      "title": "Inventore nesciunt dicta ullam eligendi nisi."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C8R5YVFMDGN775WD2BJ5MX28"
+    },
+    "staff_user": {
+      "username": "01C8R5YN3AB64C4A6JWMX7D3XJ"
+    }
+  }
+}

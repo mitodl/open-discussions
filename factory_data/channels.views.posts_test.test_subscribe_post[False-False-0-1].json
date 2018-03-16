@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Ratione recusandae earum laudantium sint accusamus cumque. Corporis voluptate hic odit ratione et odit voluptatem rem. Voluptatem quis expedita deserunt consequuntur eos tempora.\nQuae dignissimos consequatur qui consequatur consequatur hic eius. Quod occaecati aliquid veniam aut iste. Consequatur quo vitae distinctio nihil. Reiciendis ad quasi aliquam nostrum ab officia porro. Temporibus nulla ipsum explicabo tenetur sit debitis doloremque.",
+      "name": "1521481509_possimus",
+      "public_description": "Qui magni libero esse accusantium deleniti cum impedit. Illum saepe rerum tempora modi laudantium.",
+      "title": "Deleniti totam distinctio rerum."
+    }
+  },
+  "comments": {
+    "just a comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "1i",
+      "post_id": "z",
+      "text": "Aliquam dolores rem sequi. Enim nostrum explicabo atque dolore itaque eius saepe."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "z",
+      "text": "Minus fugiat molestias itaque at fugiat minus esse. Numquam placeat ut soluta minima quaerat.",
+      "title": "Mollitia explicabo deleniti ut doloribus."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01C8ZNTXEES768F4PKAS43FRVN"
+    },
+    "staff_user": {
+      "username": "01C8ZNTQ4HB7NJZQX3E8R3XPJR"
+    }
+  }
+}

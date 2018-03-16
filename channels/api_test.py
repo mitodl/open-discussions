@@ -18,6 +18,7 @@ from channels.constants import (
 from channels.models import (
     RedditAccessToken,
     RedditRefreshToken,
+    Subscription,
 )
 from channels.utils import (
     DEFAULT_LISTING_PARAMS,
@@ -664,7 +665,7 @@ def test_list_reports(mock_client):
     mock_client.subreddit.return_value.mod.reports.assert_called_once_with()
 
 
-def test_ignore_comment_resports(mock_client):
+def test_ignore_comment_reports(mock_client):
     """Test ignore_comment_reports"""
     client = api.Api(UserFactory.create())
     client.ignore_comment_reports('id')
@@ -672,9 +673,43 @@ def test_ignore_comment_resports(mock_client):
     mock_client.comment.return_value.mod.ignore_reports.assert_called_once_with()
 
 
-def test_ignore_post_resports(mock_client):
+def test_ignore_post_reports(mock_client):
     """Test ignore_post_reports"""
     client = api.Api(UserFactory.create())
     client.ignore_post_reports('id')
     mock_client.submission.assert_called_once_with(id='id')
     mock_client.submission.return_value.mod.ignore_reports.assert_called_once_with()
+
+
+def test_add_post_subscription(mock_client, user):  # pylint: disable=unused-argument
+    """Test add_post_subscription"""
+    client = api.Api(user)
+    assert not Subscription.objects.filter(user=user, post_id='abc').exists()
+    client.add_post_subscription('abc')
+    assert Subscription.objects.filter(user=user, post_id='abc').exists()
+
+
+def test_remove_post_subscription(mock_client, user):  # pylint: disable=unused-argument
+    """Test remove_post_subscription"""
+    client = api.Api(user)
+    client.add_post_subscription('abc')
+    assert Subscription.objects.filter(user=user, post_id='abc').exists()
+    client.remove_post_subscription('abc')
+    assert not Subscription.objects.filter(user=user, post_id='abc').exists()
+
+
+def test_add_comment_subscription(mock_client, user):  # pylint: disable=unused-argument
+    """Test add_comment_subscription"""
+    client = api.Api(user)
+    assert not Subscription.objects.filter(user=user, post_id='abc', comment_id='def').exists()
+    client.add_comment_subscription('abc', 'def')
+    assert Subscription.objects.filter(user=user, post_id='abc', comment_id='def').exists()
+
+
+def test_remove_comment_subscription(mock_client, user):  # pylint: disable=unused-argument
+    """Test remove_comment_subscription"""
+    client = api.Api(user)
+    client.add_comment_subscription('abc', 'def')
+    assert Subscription.objects.filter(user=user, post_id='abc', comment_id='def').exists()
+    client.remove_comment_subscription('abc', 'def')
+    assert not Subscription.objects.filter(user=user, post_id='abc', comment_id='def').exists()

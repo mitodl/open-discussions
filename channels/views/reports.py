@@ -45,11 +45,21 @@ class ChannelReportListView(APIView):
 
     permission_classes = (IsAuthenticated, JwtIsStaffOrModeratorPermission)
 
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'request': self.request,
+        }
+
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """List of reports"""
         with translate_praw_exceptions():
             api = Api(user=request.user)
             reports = api.list_reports(self.kwargs['channel_name'])
-            serializer = ReportedContentSerializer(reports, many=True)
+            serializer = ReportedContentSerializer(
+                reports,
+                many=True,
+                context=self.get_serializer_context(),
+            )
 
             return Response(serializer.data)

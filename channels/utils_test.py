@@ -54,7 +54,9 @@ def test_get_pagination_and_posts_empty_page(mocker):
     posts = mocker.Mock()
     # pylint: disable=protected-access
     posts._next_batch.side_effect = StopIteration()
-    assert get_pagination_and_posts(posts, DEFAULT_LISTING_PARAMS) == ({}, [])
+    assert get_pagination_and_posts(posts, DEFAULT_LISTING_PARAMS) == ({
+        'sort': POSTS_SORT_HOT,
+    }, [])
 
 
 def test_get_pagination_and_posts_small_page(mocker):
