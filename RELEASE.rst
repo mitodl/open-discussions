@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.19.0
+--------------
+
+- Updated populate_notification_settings to add for comments and respect email_optin
+- Added responsive frontpage email
+
 Version 0.18.1
 --------------
 
