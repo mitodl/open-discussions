@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
         if not options['inactive']:
             # unless the --inactive flag is specified, default to the safer subset of active users
-            users = users.filter(profile__last_active_on=True)
+            users = users.filter(profile__last_active_on__isnull=False)
 
         if options['username']:
             users = users.filter(username__in=options['username'])
