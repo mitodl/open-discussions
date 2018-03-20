@@ -2,8 +2,6 @@
 import * as api from "../lib/api"
 import { GET, PATCH } from "redux-hammock/constants"
 
-import type { NotificationSetting } from "../flow/settingsTypes"
-
 export const FREQUENCY_IMMEDIATE = "immediate"
 export const FREQUENCY_DAILY = "daily"
 export const FREQUENCY_WEEKLY = "weekly"
@@ -22,6 +20,20 @@ export const settingsEndpoint = {
   name:      "settings",
   verbs:     [GET, PATCH],
   getFunc:   (token: ?string) => api.getSettings(token),
-  patchFunc: (object: NotificationSetting, token: ?string) =>
-    api.patchFrontpageSetting(object, token)
+  patchFunc: async (object: Object, token: ?string) => {
+    await api.patchFrontpageSetting(
+      {
+        notification_type: FRONTPAGE_NOTIFICATION,
+        trigger_frequency: object[FRONTPAGE_NOTIFICATION]
+      },
+      token
+    )
+    await api.patchCommentSetting(
+      {
+        notification_type: COMMENT_NOTIFICATION,
+        trigger_frequency: object[COMMENT_NOTIFICATION]
+      },
+      token
+    )
+  }
 }

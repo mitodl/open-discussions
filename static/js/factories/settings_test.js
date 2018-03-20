@@ -5,7 +5,9 @@ import R from "ramda"
 import {
   FRONTPAGE_NOTIFICATION,
   COMMENT_NOTIFICATION,
-  FRONTPAGE_FREQUENCY_CHOICES
+  FRONTPAGE_FREQUENCY_CHOICES,
+  FREQUENCY_IMMEDIATE,
+  FREQUENCY_NEVER
 } from "../reducers/settings"
 import { makeFrontpageSetting, makeCommentSetting } from "./settings"
 
@@ -23,7 +25,7 @@ describe("settings factory", () => {
     const setting = makeCommentSetting()
     assert.equal(setting.notification_type, COMMENT_NOTIFICATION)
     assert.include(
-      R.pluck("value", FRONTPAGE_FREQUENCY_CHOICES),
+      [FREQUENCY_IMMEDIATE, FREQUENCY_NEVER],
       setting.trigger_frequency
     )
   })

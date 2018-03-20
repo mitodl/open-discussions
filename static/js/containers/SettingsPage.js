@@ -4,6 +4,7 @@ import R from "ramda"
 import { connect } from "react-redux"
 import DocumentTitle from "react-document-title"
 import { Radio } from "@mitodl/mdl-react-components"
+import Checkbox from "rmwc/Checkbox"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import Card from "../components/Card"
@@ -13,17 +14,26 @@ import { actions } from "../actions"
 import {
   FRONTPAGE_FREQUENCY_CHOICES,
   FREQUENCY_DAILY,
-  FRONTPAGE_NOTIFICATION
+  FREQUENCY_NEVER,
+  FREQUENCY_IMMEDIATE,
+  FRONTPAGE_NOTIFICATION,
+  COMMENT_NOTIFICATION
 } from "../reducers/settings"
 import { setSnackbarMessage } from "../actions/ui"
 
 export const SETTINGS_FORM_KEY = "SETTINGS_FORM_KEY"
 
-const FREQUENCY_INPUT_NAME = "trigger_frequency"
+const FRONTPAGE_INPUT_NAME = "frontpage"
+const COMMENTS_INPUT_NAME = "comments"
 
 const getFrontpageFrequency = R.compose(
   R.prop("trigger_frequency"),
   R.find(R.propEq("notification_type", FRONTPAGE_NOTIFICATION))
+)
+
+const getCommentFrequency = R.compose(
+  R.prop("trigger_frequency"),
+  R.find(R.propEq("notification_type", COMMENT_NOTIFICATION))
 )
 
 class SettingsPage extends React.Component<*, *> {
@@ -40,7 +50,8 @@ class SettingsPage extends React.Component<*, *> {
       actions.forms.formBeginEdit({
         formKey: SETTINGS_FORM_KEY,
         value:   {
-          [FREQUENCY_INPUT_NAME]: getFrontpageFrequency(settings)
+          [FRONTPAGE_INPUT_NAME]: getFrontpageFrequency(settings),
+          [COMMENTS_INPUT_NAME]:  getCommentFrequency(settings)
         }
       })
     )
@@ -59,13 +70,30 @@ class SettingsPage extends React.Component<*, *> {
     )
   }
 
-  onChange = (e: Object) => {
-    const { dispatch } = this.props
+  onFrontpageChange = (e: Object) => {
+    const { dispatch, form } = this.props
     dispatch(
       actions.forms.formUpdate({
         formKey: SETTINGS_FORM_KEY,
         value:   {
-          [e.target.name]: e.target.value
+          ...form.value,
+          [FRONTPAGE_INPUT_NAME]: e.target.value
+        }
+      })
+    )
+  }
+
+  onCommentsChange = () => {
+    const { dispatch, form } = this.props
+    dispatch(
+      actions.forms.formUpdate({
+        formKey: SETTINGS_FORM_KEY,
+        value:   {
+          ...form.value,
+          [COMMENTS_INPUT_NAME]:
+          form.value[COMMENTS_INPUT_NAME] === FREQUENCY_IMMEDIATE
+            ? FREQUENCY_NEVER
+            : FREQUENCY_IMMEDIATE
         }
       })
     )
@@ -86,11 +114,26 @@ class SettingsPage extends React.Component<*, *> {
               </label>
               <Radio
                 className="settings-radio"
-                name={FREQUENCY_INPUT_NAME}
-                value={form.value[FREQUENCY_INPUT_NAME] || FREQUENCY_DAILY}
-                onChange={this.onChange}
+                name={FRONTPAGE_INPUT_NAME}
+                value={form.value[FRONTPAGE_INPUT_NAME] || FREQUENCY_DAILY}
+                onChange={this.onFrontpageChange}
                 options={FRONTPAGE_FREQUENCY_CHOICES}
               />
+            </Card>
+            <Card>
+              <label htmlFor="notifications" className="label">
+                  When do you want to receive an email notification?
+              </label>
+              <Checkbox
+                checked={
+                  form.value[COMMENTS_INPUT_NAME] === FREQUENCY_IMMEDIATE
+                }
+                className="settings-checkbox"
+                name="notifications"
+                onChange={this.onCommentsChange}
+              >
+                  When someone responds to one of my posts or comments
+              </Checkbox>
             </Card>
             <button
               type="submit"

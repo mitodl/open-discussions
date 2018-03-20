@@ -7,7 +7,7 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeChannelList } from "../factories/channels"
 import { actions } from "../actions"
 import { SETTINGS_URL } from "../lib/url"
-import { makeFrontpageSetting } from "../factories/settings"
+import { makeFrontpageSetting, makeCommentSetting } from "../factories/settings"
 
 describe("App", () => {
   let helper, renderComponent, channels
@@ -48,7 +48,9 @@ describe("App", () => {
 
   it("doesnt redirect if you have no session url but are on the settings page", async () => {
     delete SETTINGS.authenticated_site.session_url
-    helper.getSettingsStub.returns(Promise.resolve([makeFrontpageSetting()]))
+    helper.getSettingsStub.returns(
+      Promise.resolve([makeFrontpageSetting(), makeCommentSetting()])
+    )
     await renderComponent(SETTINGS_URL, [
       actions.settings.get.requestType,
       actions.settings.get.successType

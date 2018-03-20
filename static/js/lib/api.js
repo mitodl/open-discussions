@@ -224,3 +224,17 @@ export const patchFrontpageSetting = (
       method: PATCH,
       body:   JSON.stringify(setting)
     })
+
+export const patchCommentSetting = (
+  setting: NotificationSetting,
+  token: ?string = undefined
+) =>
+  token
+    ? fetchJSONWithToken("/api/v0/notification_settings/comments/", token, {
+      method: PATCH,
+      body:   JSON.stringify(setting)
+    })
+    : fetchJSONWithAuthFailure("/api/v0/notification_settings/comments/", {
+      method: PATCH,
+      body:   JSON.stringify(setting)
+    })

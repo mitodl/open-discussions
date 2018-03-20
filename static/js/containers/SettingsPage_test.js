@@ -1,10 +1,12 @@
 import { assert } from "chai"
 import { Radio } from "@mitodl/mdl-react-components"
+import Checkbox from "rmwc/Checkbox"
 
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { FORM_BEGIN_EDIT } from "../actions/forms"
 import { makeFrontpageSetting, makeCommentSetting } from "../factories/settings"
+import { FREQUENCY_IMMEDIATE } from "../reducers/settings"
 
 describe("SettingsPage", () => {
   let helper, renderComponent
@@ -33,6 +35,10 @@ describe("SettingsPage", () => {
       wrapper.find(Radio).props().value,
       settings[0].trigger_frequency
     )
+    assert.equal(
+      wrapper.find(Checkbox).props().checked,
+      settings[1].trigger_frequency === FREQUENCY_IMMEDIATE
+    )
   })
 
   it("should work ok if the frontpage setting doesnt come back first", async () => {
@@ -42,6 +48,10 @@ describe("SettingsPage", () => {
     assert.equal(
       wrapper.find(Radio).props().value,
       settings[1].trigger_frequency
+    )
+    assert.equal(
+      wrapper.find(Checkbox).props().checked,
+      settings[0].trigger_frequency === FREQUENCY_IMMEDIATE
     )
   })
 })

@@ -27,7 +27,8 @@ import {
   reportContent,
   getReports,
   getSettings,
-  patchFrontpageSetting
+  patchFrontpageSetting,
+  patchCommentSetting
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -491,6 +492,37 @@ describe("api", function() {
         assert.ok(
           fetchAuthFailureStub.calledWith(
             "/api/v0/notification_settings/frontpage/",
+            {
+              method: PATCH,
+              body:   JSON.stringify(setting)
+            }
+          )
+        )
+      })
+    })
+
+    describe("patchCommentSetting", () => {
+      it("should call fetchJSONWithToken when passed a token", async () => {
+        await patchCommentSetting(setting, "great token")
+        assert.isNotOk(fetchAuthFailureStub.called)
+        assert.ok(
+          fetchTokenStub.calledWith(
+            "/api/v0/notification_settings/comments/",
+            "great token",
+            {
+              method: PATCH,
+              body:   JSON.stringify(setting)
+            }
+          )
+        )
+      })
+
+      it("calls fetchJSONWithAuthFailure when not passed a token", async () => {
+        await patchCommentSetting(setting)
+        assert.isNotOk(fetchTokenStub.called)
+        assert.ok(
+          fetchAuthFailureStub.calledWith(
+            "/api/v0/notification_settings/comments/",
             {
               method: PATCH,
               body:   JSON.stringify(setting)

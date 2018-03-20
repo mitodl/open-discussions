@@ -13,4 +13,13 @@
       }
     }
   }
+
+  .mdc-form-field {
+    display: flex;
+    align-items: center;
+
+    label {
+      margin: 0;
+    }
+  }
 }
