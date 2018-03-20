@@ -8,6 +8,7 @@ import ulid
 from rest_framework import serializers
 
 from channels.api import get_or_create_auth_tokens
+from notifications.api import ensure_notification_settings
 from profiles.models import Profile, PROFILE_PROPS
 
 
@@ -35,6 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             user = get_user_model().objects.create(**validated_data)
             Profile.objects.create(user=user, **profile_data)
+            ensure_notification_settings(user)
 
         get_or_create_auth_tokens(user)
         return user

@@ -57,6 +57,7 @@ def test_create_user(
     if optin is not None:
         payload['profile']['email_optin'] = optin
     get_or_create_auth_tokens_stub = mocker.patch('profiles.serializers.get_or_create_auth_tokens')
+    ensure_notifications_stub = mocker.patch('profiles.serializers.ensure_notification_settings')
     resp = client.post(url, data=payload, **staff_jwt_header)
     assert resp.status_code == 201
     if 'email_optin' in payload['profile']:
@@ -64,6 +65,7 @@ def test_create_user(
     assert resp.json()['profile'] == payload['profile']
     user = User.objects.get(username=resp.json()['username'])
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
+    ensure_notifications_stub.assert_called_once_with(user)
     assert user.email == email
     assert user.profile.email_optin is optin
 
