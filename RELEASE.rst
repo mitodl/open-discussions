@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.19.1
+--------------
+
+- Fixed query error on populate command
+- Added model and API to subscribe to comments and posts
+
 Version 0.19.0
 --------------
 
