@@ -138,7 +138,12 @@ class FrontpageDigestNotifier(EmailNotifier):
 
         return {
             'posts': [
-                serializers.PostSerializer(post).data
+                serializers.PostSerializer(
+                    post,
+                    context={
+                        'current_user': notification_settings.user,
+                    },
+                ).data
                 for post in posts
             ],
         }

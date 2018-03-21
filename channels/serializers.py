@@ -139,6 +139,11 @@ class PostSerializer(serializers.Serializer):
     num_reports = serializers.IntegerField(read_only=True)
     subscribed = WriteableSerializerMethodField()
 
+    @property
+    def _current_user(self):
+        """Get the current user"""
+        return self.context['current_user']
+
     def _get_user(self, instance):
         """
         Look up user in the context from the post author
@@ -229,7 +234,7 @@ class PostSerializer(serializers.Serializer):
         if 'post_subscriptions' not in self.context:
             # this code is run if a post was just created
             return Subscription.objects.filter(
-                user=self.context['request'].user,
+                user=self._current_user,
                 post_id=instance.id,
                 comment_id__isnull=True,
             ).exists()
@@ -252,7 +257,7 @@ class PostSerializer(serializers.Serializer):
         else:
             kwargs['url'] = url
 
-        api = Api(user=self.context['request'].user)
+        api = Api(user=self._current_user)
         channel_name = self.context['view'].kwargs['channel_name']
         post = api.create_post(
             channel_name,
@@ -274,7 +279,7 @@ class PostSerializer(serializers.Serializer):
         if "url" in validated_data:
             raise ValidationError("Cannot edit url for a post")
 
-        api = Api(user=self.context['request'].user)
+        api = Api(user=self._current_user)
 
         if "removed" in validated_data:
             removed = validated_data["removed"]

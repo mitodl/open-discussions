@@ -122,7 +122,9 @@ def test_send_notification(mocker):
 
     notifier.send_notification(note)
 
-    serializer_mock.assert_called_once_with(post)
+    serializer_mock.assert_called_once_with(post, context={
+        'current_user': note.user,
+    })
 
     send_messages_mock.assert_called_once_with([any_instance_of(EmailMessage)])
 

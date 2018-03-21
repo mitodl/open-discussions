@@ -24,6 +24,7 @@ class PostListView(APIView):
     def get_serializer_context(self):
         """Context for the request and view"""
         return {
+            'current_user': self.request.user,
             'request': self.request,
             'view': self,
         }
@@ -68,6 +69,7 @@ class PostDetailView(APIView):
     def get_serializer_context(self):
         """Context for the request and view"""
         return {
+            'current_user': self.request.user,
             'request': self.request,
             'view': self,
         }
