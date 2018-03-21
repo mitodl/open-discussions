@@ -21,6 +21,7 @@ describe("posts factories", () => {
       assert.isBoolean(post.edited)
       assert.isBoolean(post.stickied)
       assert.isBoolean(post.removed)
+      assert.isBoolean(post.subscribed)
     })
 
     it("should make a URL post", () => {

@@ -34,7 +34,11 @@ import { replaceMoreComments } from "../actions/comment"
 import { setFocusedComment, clearFocusedComment } from "../actions/focus"
 import { formBeginEdit, formEndEdit } from "../actions/forms"
 import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
-import { toggleUpvote } from "../util/api_actions"
+import {
+  toggleUpvote,
+  toggleFollowPost,
+  toggleFollowComment
+} from "../util/api_actions"
 import { getChannelName, getPostID, getCommentID } from "../lib/util"
 import { isModerator } from "../lib/channels"
 import {
@@ -376,6 +380,7 @@ class PostPage extends React.Component<*, void> {
                 reportPost(post)
               )}
               showPermalinkUI={showPermalinkUI}
+              toggleFollowPost={toggleFollowPost(dispatch)}
             />
             {showPermalinkUI
               ? null
@@ -416,6 +421,7 @@ class PostPage extends React.Component<*, void> {
           beginEditing={beginEditing(dispatch)}
           processing={commentInFlight}
           commentPermalink={commentPermalink(channel.name, post.id)}
+          toggleFollowComment={toggleFollowComment(dispatch)}
         />
       </div>
     )

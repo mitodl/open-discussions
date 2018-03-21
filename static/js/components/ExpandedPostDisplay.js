@@ -8,6 +8,7 @@ import { EditPostForm } from "../components/CommentForms"
 import { renderTextContent } from "./Markdown"
 
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
+import { preventDefaultAndInvoke } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
 
 import type { Post } from "../flow/discussionTypes"
@@ -24,7 +25,8 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     beginEditing: (key: string, initialValue: Object, e: ?Event) => void,
     showPostDeleteDialog: () => void,
     showPostReportDialog: () => void,
-    showPermalinkUI: boolean
+    showPermalinkUI: boolean,
+    toggleFollowPost: Post => void
   }
 
   renderTextContent = () => {
@@ -54,6 +56,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
   postActionButtons = () => {
     const {
       toggleUpvote,
+      toggleFollowPost,
       post,
       beginEditing,
       isModerator,
@@ -89,6 +92,23 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
             <a href="#">delete</a>
           </div>
           : null}
+        {post.subscribed
+          ? <div
+            className="comment-action-button subscribe-post subscribed"
+            onClick={preventDefaultAndInvoke(() => {
+              toggleFollowPost(post)
+            })}
+          >
+            <a href="#">unfollow</a>
+          </div>
+          : <div
+            className="comment-action-button subscribe-post unsubscribed"
+            onClick={preventDefaultAndInvoke(() => {
+              toggleFollowPost(post)
+            })}
+          >
+            <a href="#">follow</a>
+          </div>}
         {isModerator && !post.removed
           ? <div
             className="comment-action-button remove-post"

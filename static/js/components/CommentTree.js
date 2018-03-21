@@ -47,7 +47,8 @@ type CommentTreeProps = {
   reportComment: ReportCommentFunc,
   commentPermalink: (commentID: string) => string,
   moderationUI: boolean,
-  ignoreCommentReports: (c: CommentInTree) => void
+  ignoreCommentReports: (c: CommentInTree) => void,
+  toggleFollowComment: Function
 }
 
 export default class CommentTree extends React.Component<*, *> {
@@ -67,7 +68,8 @@ export default class CommentTree extends React.Component<*, *> {
       reportComment,
       commentPermalink,
       moderationUI,
-      ignoreCommentReports
+      ignoreCommentReports,
+      toggleFollowComment
     } = this.props
     const formKey = replyToCommentKey(comment)
     const editFormKey = editCommentKey(comment)
@@ -124,6 +126,23 @@ export default class CommentTree extends React.Component<*, *> {
                 }}
               >
                 <a href="#">reply</a>
+              </div>}
+            {comment.subscribed
+              ? <div
+                className="comment-action-button subscribe-comment subscribed"
+                onClick={preventDefaultAndInvoke(() => {
+                  toggleFollowComment(comment)
+                })}
+              >
+                <a href="#">unfollow</a>
+              </div>
+              : <div
+                className="comment-action-button subscribe-comment unsubscribed"
+                onClick={preventDefaultAndInvoke(() => {
+                  toggleFollowComment(comment)
+                })}
+              >
+                <a href="#">follow</a>
               </div>}
             {comment.num_reports
               ? <div className="comment-action-button report-count">

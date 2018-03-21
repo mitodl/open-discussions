@@ -1,4 +1,3 @@
-// @flow
 import R from "ramda"
 import { assert } from "chai"
 
@@ -9,12 +8,14 @@ import {
   approvePost,
   removePost,
   approveComment,
-  removeComment
+  removeComment,
+  toggleFollowComment,
+  toggleFollowPost
 } from "../util/api_actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 import { makePost } from "../factories/posts"
-import { makeCommentsResponse } from "../factories/comments"
+import { makeCommentsResponse, makeComment } from "../factories/comments"
 import { findComment } from "../lib/comments"
 
 describe("api_actions util", () => {
@@ -45,6 +46,42 @@ describe("api_actions util", () => {
         assert.isOk(helper.updateUpvoteStub.calledWith(post.id, !value))
       })
     }
+  })
+
+  describe("toggleFollowPost", () => {
+    beforeEach(() => {
+      helper.editPostStub.returns(Promise.resolve(makePost))
+    })
+    ;[true, false].forEach(subscribed => {
+      it(`should let you toggle subscribed from ${subscribed} to ${!subscribed}`, async () => {
+        const post = makePost()
+        post.subscribed = subscribed
+
+        const { requestType, successType } = actions.posts.patch
+
+        await helper.listenForActions([requestType, successType], () => {
+          toggleFollowPost(helper.store.dispatch, post)
+        })
+      })
+    })
+  })
+
+  describe("toggleFollowComment", () => {
+    beforeEach(() => {
+      helper.updateCommentStub.returns(Promise.resolve(makePost))
+    })
+    ;[true, false].forEach(subscribed => {
+      it(`should let you toggle subscribed from ${subscribed} to ${!subscribed}`, async () => {
+        const comment = makeComment(makePost())
+        comment.subscribed = subscribed
+
+        const { requestType, successType } = actions.comments.patch
+
+        await helper.listenForActions([requestType, successType], () => {
+          toggleFollowComment(helper.store.dispatch, comment)
+        })
+      })
+    })
   })
 
   describe("approvePost", () => {

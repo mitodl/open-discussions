@@ -36,6 +36,7 @@ export type AuthoredContent = {
   edited:          boolean,
   num_reports:     ?number,
   ignore_reports?: boolean,
+  subscribed:      boolean,
 }
 
 export type Post = AuthoredContent & {

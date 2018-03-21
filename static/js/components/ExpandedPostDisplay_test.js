@@ -1,4 +1,3 @@
-// @flow
 /* global SETTINGS: false */
 import React from "react"
 import { assert } from "chai"
@@ -24,7 +23,8 @@ describe("ExpandedPostDisplay", () => {
     approvePostStub,
     removePostStub,
     showPostDeleteDialogStub,
-    showPostReportDialogStub
+    showPostReportDialogStub,
+    toggleFollowPostStub
 
   const renderPostDisplay = props => {
     props = {
@@ -36,6 +36,7 @@ describe("ExpandedPostDisplay", () => {
       removePost:           removePostStub,
       showPostDeleteDialog: showPostDeleteDialogStub,
       showPostReportDialog: showPostReportDialogStub,
+      toggleFollowPost:     toggleFollowPostStub,
       forms:                {},
       ...props
     }
@@ -54,6 +55,7 @@ describe("ExpandedPostDisplay", () => {
     removePostStub = helper.sandbox.stub()
     showPostDeleteDialogStub = helper.sandbox.stub()
     showPostReportDialogStub = helper.sandbox.stub()
+    toggleFollowPostStub = helper.sandbox.stub()
   })
 
   afterEach(() => {
@@ -133,6 +135,22 @@ describe("ExpandedPostDisplay", () => {
       }
       const wrapper = renderPostDisplay({ post })
       assert.equal(wrapper.find(".edit-post").exists(), shouldShowLink)
+    })
+  })
+
+  //
+  ;[
+    [true, "unfollow"],
+    [false, "follow"]
+  ].forEach(([subscribed, buttonText]) => {
+    it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
+      const post = makePost()
+      post.subscribed = subscribed
+      const wrapper = renderPostDisplay({ post })
+      const button = wrapper.find(".subscribe-post")
+      assert.equal(button.text(), buttonText)
+      button.simulate("click")
+      assert.ok(toggleFollowPostStub.called)
     })
   })
 

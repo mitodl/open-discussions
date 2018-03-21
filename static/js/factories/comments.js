@@ -35,7 +35,8 @@ export const makeComment = (
     author_name:   casual.name,
     edited:        casual.boolean,
     comment_type:  "comment",
-    num_reports:   0
+    num_reports:   0,
+    subscribed:    casual.boolean
   }
 
   if (comment.upvoted && comment.downvoted) {

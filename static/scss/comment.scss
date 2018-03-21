@@ -82,8 +82,12 @@ $replyPaddingLeft: 8px;
         margin: 4px 0 5px;
         display: inline-block;
 
-        > div {
-          margin-right: 10px;
+        .votes-form {
+          margin-right: 5px;
+        }
+
+        a {
+          margin: 0 5px;
         }
       }
 
@@ -193,6 +197,12 @@ $replyPaddingLeft: 8px;
     font-size: .9em;
     font-weight: 400;
     display: inline-block;
+  }
+}
+
+.comment-action-button {
+  &.subscribed {
+    background-color: $subscribed-yellow;
   }
 }
 

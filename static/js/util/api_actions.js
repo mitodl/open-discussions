@@ -41,3 +41,14 @@ export const removeComment = R.curry(
       })
     )
 )
+
+export const toggleFollowPost = R.curry((dispatch: Dispatch, post: Post) =>
+  dispatch(actions.posts.patch(post.id, { subscribed: !post.subscribed }))
+)
+
+export const toggleFollowComment = R.curry(
+  (dispatch: Dispatch, comment: CommentInTree) =>
+    dispatch(
+      actions.comments.patch(comment.id, { subscribed: !comment.subscribed })
+    )
+)

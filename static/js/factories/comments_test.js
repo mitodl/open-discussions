@@ -21,6 +21,7 @@ describe("comment factories", () => {
       assert.isString(comment.profile_image)
       assert.isString(comment.author_name)
       assert.isBoolean(comment.edited)
+      assert.isBoolean(comment.subscribed)
     })
   })
 

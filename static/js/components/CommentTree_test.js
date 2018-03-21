@@ -34,6 +34,7 @@ describe("CommentTree", () => {
     loadMoreCommentsStub,
     deleteCommentStub,
     reportCommentStub,
+    toggleFollowCommentStub,
     permalinkFunc,
     helper
 
@@ -49,6 +50,7 @@ describe("CommentTree", () => {
     loadMoreCommentsStub = helper.sandbox.stub()
     deleteCommentStub = helper.sandbox.stub()
     reportCommentStub = helper.sandbox.stub()
+    toggleFollowCommentStub = helper.sandbox.stub()
     permalinkFunc = commentPermalink("channel", post.id)
   })
 
@@ -72,6 +74,7 @@ describe("CommentTree", () => {
           deleteComment={deleteCommentStub}
           reportComment={reportCommentStub}
           commentPermalink={permalinkFunc}
+          toggleFollowComment={toggleFollowCommentStub}
           {...props}
         />
       </Router>
@@ -154,10 +157,25 @@ describe("CommentTree", () => {
   it('should include an "Edit" button, if the user wrote the comment', () => {
     SETTINGS.username = comments[0].author_id
     const wrapper = renderCommentTree()
-    wrapper.find(".comment-action-button").at(1).simulate("click")
+    wrapper.find(".comment-action-button").at(2).simulate("click")
     assert.ok(beginEditingStub.called)
     assert.ok(beginEditingStub.calledWith(editCommentKey(comments[0])))
     assert.deepEqual(beginEditingStub.args[0][1], comments[0])
+  })
+
+  //
+  ;[
+    [true, "unfollow"],
+    [false, "follow"]
+  ].forEach(([subscribed, buttonText]) => {
+    it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
+      comments[0].subscribed = subscribed
+      const wrapper = renderCommentTree()
+      const button = wrapper.find(".subscribe-comment").at(0)
+      assert.equal(button.text(), buttonText)
+      button.simulate("click")
+      assert.ok(toggleFollowCommentStub.called)
+    })
   })
 
   it("should include a 'delete' button, if the user wrote the comment", () => {
@@ -218,9 +236,9 @@ describe("CommentTree", () => {
         .find(".comment-actions")
         .at(0)
         .find(".comment-action-button"),
-      3
+      4
     )
-    assert.lengthOf(nextCommentWrapper.find(".comment-action-button"), 2)
+    assert.lengthOf(nextCommentWrapper.find(".comment-action-button"), 3)
 
     assert.lengthOf(topCommentWrapper.find(ReplyToCommentForm), 1)
     assert.lengthOf(nextCommentWrapper.find(ReplyToCommentForm), 0)
