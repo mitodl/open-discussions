@@ -32,6 +32,9 @@ const Navigation = (props: NavigationProps) => {
         currentChannel={channelName}
         subscribedChannels={subscribedChannels}
       />
+      <Link className="settings-link" to="/settings">
+        Settings
+      </Link>
     </div>
   )
 }
