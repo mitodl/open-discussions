@@ -1,5 +1,6 @@
 // @flow
 import React from "react"
+import R from "ramda"
 import { connect } from "react-redux"
 import DocumentTitle from "react-document-title"
 import { Radio } from "@mitodl/mdl-react-components"
@@ -11,12 +12,19 @@ import { formatTitle } from "../lib/title"
 import { actions } from "../actions"
 import {
   FRONTPAGE_FREQUENCY_CHOICES,
-  FREQUENCY_DAILY
+  FREQUENCY_DAILY,
+  FRONTPAGE_NOTIFICATION
 } from "../reducers/settings"
 import { setSnackbarMessage } from "../actions/ui"
 
 export const SETTINGS_FORM_KEY = "SETTINGS_FORM_KEY"
+
 const FREQUENCY_INPUT_NAME = "trigger_frequency"
+
+const getFrontpageFrequency = R.compose(
+  R.prop("trigger_frequency"),
+  R.find(R.propEq("notification_type", FRONTPAGE_NOTIFICATION))
+)
 
 class SettingsPage extends React.Component<*, *> {
   componentWillMount() {
@@ -26,13 +34,13 @@ class SettingsPage extends React.Component<*, *> {
   loadData = async () => {
     const { dispatch, token } = this.props
 
-    const [{ trigger_frequency }] = await dispatch(actions.settings.get(token))
+    const settings = await dispatch(actions.settings.get(token))
 
     dispatch(
       actions.forms.formBeginEdit({
         formKey: SETTINGS_FORM_KEY,
         value:   {
-          [FREQUENCY_INPUT_NAME]: trigger_frequency
+          [FREQUENCY_INPUT_NAME]: getFrontpageFrequency(settings)
         }
       })
     )

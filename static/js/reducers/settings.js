@@ -10,6 +10,7 @@ export const FREQUENCY_WEEKLY = "weekly"
 export const FREQUENCY_NEVER = "never"
 
 export const FRONTPAGE_NOTIFICATION = "frontpage"
+export const COMMENT_NOTIFICATION = "comments"
 
 export const FRONTPAGE_FREQUENCY_CHOICES = [
   { value: FREQUENCY_NEVER, label: "Never" },
