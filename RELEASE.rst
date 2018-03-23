@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.19.3
+--------------
+
+- Fix settings page
+- Added email tasks to crontab
+
 Version 0.19.2
 --------------
 
