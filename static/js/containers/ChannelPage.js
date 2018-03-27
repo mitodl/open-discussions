@@ -51,7 +51,8 @@ type ChannelPageProps = {
   errored: boolean,
   isModerator: boolean,
   notFound: boolean,
-  reportPost: (p: Post) => void
+  reportPost: (p: Post) => void,
+  removePost: (p: Post) => void
 }
 
 const shouldLoadData = R.complement(
@@ -128,7 +129,8 @@ class ChannelPage extends React.Component<*, void> {
       isModerator,
       notFound,
       location: { search },
-      reportPost
+      reportPost,
+      removePost
     } = this.props
 
     if (notFound) {
@@ -162,6 +164,7 @@ class ChannelPage extends React.Component<*, void> {
               isModerator={isModerator}
               togglePinPost={this.togglePinPost}
               reportPost={reportPost}
+              removePost={removePost}
               showPinUI
             />
             {pagination

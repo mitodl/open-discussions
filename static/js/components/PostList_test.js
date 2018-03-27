@@ -78,4 +78,14 @@ describe("PostList", () => {
     wrapper.find(CompactPostDisplay).first().props().reportPost()
     assert.ok(reportStub.called)
   })
+
+  it("should pass the removePost prop to CompactPostDisplay", () => {
+    const removeStub = sinon.stub()
+    const wrapper = renderPostList({
+      posts:      makeChannelPostList(),
+      removePost: removeStub
+    })
+    wrapper.find(CompactPostDisplay).first().props().removePost()
+    assert.ok(removeStub.called)
+  })
 })
