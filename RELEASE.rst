@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.20.0
+--------------
+
+- Ensure new users get the default NotificationSettings
+
 Version 0.19.3
 --------------
 
