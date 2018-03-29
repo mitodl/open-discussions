@@ -1,12 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta name="viewport" content="width=device-width">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width">
 
-	<title>{% block title %}{% endblock %}</title>
-	<style type="text/css">
-	/* -------------------------------------
+  <title>{% block title %}{% endblock %}</title>
+  <style type="text/css">
+  /* -------------------------------------
     GLOBAL
 ------------------------------------- */
 * {
@@ -23,6 +23,8 @@ body {
   width: 100% !important;
   height: 100%;
   line-height: 1.4;
+  margin: 0;
+  padding: 0;
 }
 
 /* Let's make sure all tables have defaults */
@@ -33,12 +35,7 @@ table td {
 /* -------------------------------------
     BODY & CONTAINER
 ------------------------------------- */
-body {
-  background-color: #f2f2f2;
-}
-
 .body-wrap {
-  background-color: #f2f2f2;
   width: 100%;
 }
 
@@ -54,7 +51,7 @@ body {
   max-width: 700px;
   margin: 0 auto;
   display: block;
-  padding: 30px;
+  padding: 0;
 }
 
 /* -------------------------------------
@@ -62,12 +59,10 @@ body {
 ------------------------------------- */
 .main {
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 3px;
 }
 
 .content-wrap {
-  padding: 40px 25px 20px;
+  padding: 30px 15px 20px;
 }
 
 .content-block {
@@ -87,7 +82,6 @@ body {
 }
 
 .footer {
-  width: 100%;
   clear: both;
   color: #777;
   padding: 20px;
@@ -133,7 +127,7 @@ h2 {
 }
 
 h3 {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 h4 {
@@ -260,56 +254,53 @@ a {
     width: 100% !important;
   }
 
-  .content, .content-wrapper {
-    padding: 10px !important;
-  }
-
 }
 
-	</style>
-	{% block styles %}{% endblock %}
+  </style>
+  {% block styles %}{% endblock %}
 </head>
 <body>
-<table class="body-wrap">
-	<tbody>
-		<tr>
-		<td></td>
-			<td class="container" width="700">
-				<div class="content">
-					<table class="main" width="100%" cellpadding="0" cellspacing="0">
-						<tbody>
-							<tr>
-								<td class="content-wrap">
-									<div class="aligncenter">
-										<img src="{{ base_url }}/static/images/mit-logo.jpg" width="90" />
-										<h3>Open Discussions</h3>
-									</div>
+<table class="body-wrap" width="100%">
+  <tbody>
+    <tr>
+    <td width="1%" style="width: 1%"></td>
+      <td class="container" width="98%" style="width: 98%">
+        <div class="content">
+          <table class="main" width="100%" cellpadding="0" cellspacing="0">
+            <tbody>
+              <tr>
+                <td class="content-wrap">
+                  <div class="aligncenter">
+                    <img src="{{ base_url }}/static/images/mit-logo.jpg" width="90" />
+                    <h3>Open Discussions</h3>
+                  </div>
 
-					        {% block content %}{% endblock %}
-								</td>
-							</tr>
-						</tbody>
-					</table>
-					<div class="footer aligncenter">
-						<p>
-							You are receiving this email because you signed up for Open Discussions.
-							<br/>
-							If you don't want to receive these emails in the future, you can
-							<a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">edit your settings</a>
-							or
-							<a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">unsubscribe</a>.
-						</p>
-						<p>
-							MIT Office of Digital Learning
-							<br/>
-							600 Technology Square, 2nd Floor, Cambridge, MA 02139
-						</p>
-					</div>
-				</div>
-			</td>
-			<td></td>
-		</tr>
-	</tbody>
+                  {% block content %}{% endblock %}
+
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="footer aligncenter">
+            <p>
+              You are receiving this email because you signed up for Open Discussions.
+              <br/>
+              If you don't want to receive these emails in the future, you can
+              <a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">edit your settings</a>
+              or
+              <a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">unsubscribe</a>.
+            </p>
+            <p>
+              MIT Office of Digital Learning
+              <br/>
+              600 Technology Square, 2nd Floor, Cambridge, MA 02139
+            </p>
+          </div>
+        </div>
+      </td>
+      <td width="1%" style="width: 1%"></td>
+    </tr>
+  </tbody>
 </table>
 </body>
 </html>

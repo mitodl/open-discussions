@@ -42,7 +42,7 @@ p.comments {
 	<tbody>
     {% for post in posts %}
     <tr>
-      <td><img src="{{ post.profile_image }}" class="user-photo" /></td>
+      <td width="72" style="width: 72px"><img src="{{ post.profile_image }}" class="user-photo" /></td>
       <td><div>
     		<h3 class="post-title">
           <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">{{ post.title }}</a>
