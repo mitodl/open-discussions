@@ -38,6 +38,7 @@ $replyPaddingLeft: 8px;
     img.profile-image {
       width: $profileImageWidth;
       height: $profileImageHeight;
+      flex-shrink: 0;
 
       @include breakpoint(phone) {
         display: none;
