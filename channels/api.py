@@ -19,6 +19,7 @@ import prawcore
 from prawcore.exceptions import (
     Forbidden as PrawForbidden,
     NotFound as PrawNotFound,
+    ResponseException,
 )
 from rest_framework.exceptions import (
     PermissionDenied,
@@ -270,7 +271,16 @@ class Api:
     def __init__(self, user):
         """Constructor"""
         self.user = user
-        self.reddit = _get_client(user=user)
+        try:
+            self.reddit = _get_client(user=user)
+        except ResponseException as ex:
+            if ex.response.status_code == 401:
+                RedditAccessToken.objects.filter(user=user).delete()
+                RedditRefreshToken.objects.filter(user=user).delete()
+
+                self.reddit = _get_client(user=user)
+            else:
+                raise
 
     def list_channels(self):
         """
