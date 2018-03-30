@@ -75,6 +75,7 @@ body {
 
     .main-content {
       margin-top: 20px;
+      margin-bottom: 50px;
 
       @include breakpoint(desktop) {
         margin-left: auto;
