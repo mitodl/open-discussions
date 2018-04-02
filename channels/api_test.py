@@ -579,8 +579,8 @@ def test_api_constructor(mocker, settings, verify_ssl):
 
 def test_api_constructor_error(mocker):
     """
-    If a non-401 response is received during Api() initialization, we should delete the refresh
-    and access tokens and try once more. The second time should succeed
+    If a non-401 response is received during Api() initialization, we should not delete the refresh
+    and access tokens.
     """
     client_user = UserFactory.create()
 
