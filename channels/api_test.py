@@ -7,6 +7,7 @@ import pytest
 from praw.models import Comment
 from praw.models.comment_forest import CommentForest
 from praw.models.reddit.redditor import Redditor
+from prawcore.exceptions import ResponseException
 from rest_framework.exceptions import NotFound
 
 from open_discussions.factories import UserFactory
@@ -574,6 +575,73 @@ def test_api_constructor(mocker, settings, verify_ssl):
     assert config.client_id == settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID
     assert config.client_secret == settings.OPEN_DISCUSSIONS_REDDIT_SECRET
     assert config.refresh_token == refresh_token
+
+
+def test_api_constructor_error(mocker):
+    """
+    If a non-401 response is received during Api() initialization, we should not delete the refresh
+    and access tokens.
+    """
+    client_user = UserFactory.create()
+
+    error = ResponseException(response=Mock(status_code=400))
+    mocker.patch('channels.api._get_client', autospec=True, side_effect=error)
+
+    RedditAccessToken.objects.create(user=client_user, token_value='token')
+    RedditRefreshToken.objects.create(user=client_user, token_value='token')
+
+    with pytest.raises(ResponseException):
+        api.Api(client_user)
+
+    # No attempt to clear tokens was made
+    assert RedditAccessToken.objects.count() == 1
+    assert RedditRefreshToken.objects.count() == 1
+
+
+def test_api_constructor_401_once(mocker):
+    """
+    If a 401 response is received during Api() initialization, we should delete the refresh
+    and access tokens and try once more. The second time should succeed
+    """
+    client_user = UserFactory.create()
+
+    mocked_client = Mock()
+    effect = [
+        ResponseException(response=Mock(status_code=401)),
+        mocked_client,
+    ]
+    mocker.patch('channels.api._get_client', autospec=True, side_effect=effect)
+
+    RedditAccessToken.objects.create(user=client_user, token_value='token')
+    RedditRefreshToken.objects.create(user=client_user, token_value='token')
+
+    assert api.Api(client_user).reddit == mocked_client
+
+    assert RedditAccessToken.objects.count() == 0
+    assert RedditRefreshToken.objects.count() == 0
+
+
+def test_api_constructor_401_twice(mocker):
+    """
+    If a 401 response is received during Api() initialization, we should delete the refresh
+    and access tokens and try once more. The second time should raise the error
+    """
+    client_user = UserFactory.create()
+
+    effect = [
+        ResponseException(response=Mock(status_code=401)),
+        ResponseException(response=Mock(status_code=401)),
+    ]
+    mocker.patch('channels.api._get_client', autospec=True, side_effect=effect)
+
+    RedditAccessToken.objects.create(user=client_user, token_value='token')
+    RedditRefreshToken.objects.create(user=client_user, token_value='token')
+
+    with pytest.raises(ResponseException):
+        api.Api(client_user)
+
+    assert RedditAccessToken.objects.count() == 0
+    assert RedditRefreshToken.objects.count() == 0
 
 
 def test_get_or_create_auth_tokens(mocker, settings, user):
