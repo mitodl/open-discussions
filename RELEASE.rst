@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.21.0
+--------------
+
+- Some small font, margin, and profile image size tweaks (#580)
+- Changed digest email subject line and other small changes (#578)
+- Fixes some layout issues with the email template (#574)
+- Fixed shrinking profile images in discussions (#571)
+- Add the &#39;remove post&#39; button to the channel view
+
 Version 0.20.0
 --------------
 
