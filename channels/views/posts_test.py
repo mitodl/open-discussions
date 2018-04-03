@@ -1,5 +1,6 @@
 """Tests for views for REST APIs for posts"""
 # pylint: disable=unused-argument
+from urllib.parse import urljoin
 import pytest
 from django.core.urlresolvers import reverse
 from rest_framework import status
@@ -11,6 +12,7 @@ from channels.constants import (
     POSTS_SORT_HOT,
 )
 from channels.models import Subscription
+from open_discussions.settings import SITE_BASE_URL
 
 pytestmark = [
     pytest.mark.django_db,
@@ -140,7 +142,7 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
         user.profile.image_small = '/just/a/great/image.png.jpg.gif'
     user.profile.save()
 
-    profile_image = default_profile_image if missing_image else user.profile.image_small
+    profile_image = urljoin(SITE_BASE_URL, default_profile_image) if missing_image else user.profile.image_small
 
     post = reddit_factories.text_post('my geat post', user, channel=channel)
     url = reverse('post-detail', kwargs={'post_id': post.id})

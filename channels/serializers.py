@@ -1,6 +1,7 @@
 """
 Serializers for channel REST APIs
 """
+from urllib.parse import urljoin
 from datetime import (
     datetime,
     timezone,
@@ -18,6 +19,7 @@ from channels.api import (
 )
 from channels.constants import VALID_CHANNEL_TYPES
 from channels.models import Subscription
+from open_discussions import settings
 
 default_profile_image = "/static/images/avatar_default.png"
 
@@ -171,11 +173,11 @@ class PostSerializer(serializers.Serializer):
         return "[deleted]"
 
     def get_profile_image(self, instance):
-        """Find the Profile for the comment author"""
+        """Find the profile image for the post author"""
         user = self._get_user(instance)
         if user and user.profile.image_small:
             return user.profile.image_small
-        return default_profile_image
+        return urljoin(settings.SITE_BASE_URL, default_profile_image)
 
     def get_text(self, instance):
         """Returns text or null depending on if it's a self post"""
