@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.21.1
+--------------
+
+- Fix 401 auth errors (#579)
+
 Version 0.21.0
 --------------
 
