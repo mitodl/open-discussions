@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.21.2
+--------------
+
+- Fix missing profile picture in email
+
 Version 0.21.1
 --------------
 
