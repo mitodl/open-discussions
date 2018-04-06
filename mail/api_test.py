@@ -1,4 +1,5 @@
 """API tests"""
+from email.utils import formataddr
 import pytest
 
 from mail.api import (
@@ -29,8 +30,8 @@ def test_safe_format_recipients():
     assert safe_format_recipients([
         user, user_no_email, user_no_name
     ]) == [
-        ("{} <{}>".format(user.profile.name, user.email), user),
-        (user_no_name.email, user_no_name),
+        (formataddr((user.profile.name, user.email)), user),
+        (formataddr((None, user_no_name.email)), user_no_name),
     ]
 
 
@@ -71,7 +72,7 @@ def test_messages_for_recipients():
     assert len(messages) == len(users)
 
     for user, msg in zip(users, messages):
-        assert user.email in msg.to[0]
+        assert user.email in str(msg.to[0])
         assert msg.subject == "Welcome {}".format(user.profile.name)
 
 

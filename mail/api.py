@@ -21,6 +21,7 @@ try:
 except SendEmailsException as exc:
     pass  # handle failed emails
 """
+from email.utils import formataddr
 import re
 
 from anymail.message import AnymailMessage
@@ -52,11 +53,10 @@ def safe_format_recipients(recipients):
     if settings.MAILGUN_RECIPIENT_OVERRIDE is not None:
         return [(settings.MAILGUN_RECIPIENT_OVERRIDE, recipients[0])]
 
-    return [
-        (_format_recipient(user.email, name=user.profile.name), user)
-        for user in recipients
-        if can_email_user(user)
-    ]
+    return [(
+        formataddr((user.profile.name, user.email)),
+        user,
+    ) for user in recipients if can_email_user(user)]
 
 
 def can_email_user(user):
@@ -70,26 +70,6 @@ def can_email_user(user):
         bool: True if we can email this user
     """
     return bool(user.email)
-
-
-def _format_recipient(email, *, name=None):
-    """
-    Formats a recipient's email address using an optional name
-
-    Args:
-        email (str): email address of the recipients
-        name (str): name of the recipient
-
-    Returns:
-        str: formatted email address
-    """
-    if name:
-        return "{name} <{email}>".format(
-            name=name,
-            email=email,
-        )
-    else:
-        return email
 
 
 def render_email_templates(template_name, user, context=None):
