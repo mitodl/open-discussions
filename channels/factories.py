@@ -5,6 +5,7 @@ import os
 import time
 from datetime import datetime
 
+import base36
 import pytz
 from django.contrib.auth import get_user_model
 import faker
@@ -14,15 +15,16 @@ from factory.fuzzy import FuzzyChoice
 
 from open_discussions.factories import UserFactory
 from open_discussions.utils import now_in_utc
-from channels.api import (
-    Api,
-    get_or_create_auth_tokens,
-)
+from channels import api
 from channels.constants import (
     CHANNEL_TYPE_PUBLIC,
     CHANNEL_TYPE_PRIVATE,
 )
-from channels.models import RedditAccessToken, RedditRefreshToken
+from channels.models import (
+    RedditAccessToken,
+    RedditRefreshToken,
+    Subscription,
+)
 
 FAKE = faker.Factory.create()
 
@@ -266,7 +268,7 @@ class RedditFactories:
             strategy=strategy,
             **kwargs
         )
-        get_or_create_auth_tokens(user)
+        api.get_or_create_auth_tokens(user)
         return user
 
     def channel(self, ident, user, strategy=STRATEGY_CREATE, **kwargs):
@@ -285,7 +287,7 @@ class RedditFactories:
             "channels",
             ident,
             strategy=strategy,
-            api=Api(user),
+            api=api.Api(user),
             **kwargs
         )
 
@@ -305,7 +307,7 @@ class RedditFactories:
             "posts",
             ident,
             strategy=strategy,
-            api=Api(user),
+            api=api.Api(user),
             **kwargs
         )
 
@@ -325,7 +327,7 @@ class RedditFactories:
             "posts",
             ident,
             strategy=strategy,
-            api=Api(user),
+            api=api.Api(user),
             **kwargs
         )
 
@@ -345,7 +347,7 @@ class RedditFactories:
             "comments",
             ident,
             strategy=strategy,
-            api=Api(user),
+            api=api.Api(user),
             **kwargs
         )
 
@@ -492,6 +494,9 @@ class CommentFactory(factory.Factory):
         if not self.api:
             raise ValueError("CommentFactory requires an api instance")
 
+        if self.comment_id:
+            return None
+
         return TextPostFactory.create(api=self.api).id
 
     @factory.post_generation
@@ -511,3 +516,20 @@ class CommentFactory(factory.Factory):
 
     class Meta:
         model = Comment
+
+
+class SubscriptionFactory(DjangoModelFactory):
+    """Factory for Subscription"""
+    user = factory.SubFactory(UserFactory)
+    post_id = factory.Sequence(base36.dumps)
+    comment_id = factory.Maybe(
+        'is_comment',
+        yes_declaration=factory.Sequence(base36.dumps),
+        no_declaration=None,
+    )
+
+    class Meta:
+        model = Subscription
+
+    class Params:
+        is_comment = False

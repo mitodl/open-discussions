@@ -1,19 +1,16 @@
 """Tests for views for REST APIs for channels"""
 # pylint: disable=unused-argument
 import pytest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework import status
 
 from channels.factories import STRATEGY_BUILD
 from open_discussions.factories import UserFactory
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("use_betamax", "praw_settings"),
-]
+pytestmark = pytest.mark.betamax
 
 
-def test_list_channels(client, jwt_header, private_channel_and_contributor):
+def test_list_channels(client, jwt_header, private_channel_and_contributor, request):
     """
     List channels the user is subscribed to
     """

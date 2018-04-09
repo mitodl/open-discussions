@@ -1,18 +1,28 @@
-"""Configure common fixtures for views tests"""
-# pylint: disable=redefined-outer-name,unused-argument
+"""Reddit fixtures"""
+# pylint: disable=redefined-outer-name, unused-argument
 import pytest
-from betamax.fixtures.pytest import _casette_name
 
-from channels.api import Api
+from channels import api
 from channels.constants import CHANNEL_TYPE_PRIVATE
 from channels.factories import RedditFactories, FactoryStore
 
 
+@pytest.fixture
+def praw_settings(settings, cassette_exists):
+    """Settings needed to use Api client"""
+    if cassette_exists:
+        settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID = 'client_id'
+        settings.OPEN_DISCUSSIONS_REDDIT_SECRET = 'secret'
+        settings.OPEN_DISCUSSIONS_REDDIT_URL = 'https://reddit.local'
+    settings.OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL = False
+    settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 25
+    return settings
+
+
 @pytest.fixture()
-def reddit_factories(request, cassette_exists):
+def reddit_factories(use_betamax, cassette_name, cassette_exists):
     """RedditFactories fixture"""
-    # use betamax's _casette_name to determine filename
-    store = FactoryStore(_casette_name(request, parametrized=True))
+    store = FactoryStore(cassette_name)
     ctx = RedditFactories(store)
     if cassette_exists:
         store.load()
@@ -22,15 +32,17 @@ def reddit_factories(request, cassette_exists):
 
 
 @pytest.fixture()
-def user(db, reddit_factories):
+def reddit_user(reddit_factories):
     """Override the user fixture to use reddit_factories"""
     return reddit_factories.user("contributor")
 
 
 @pytest.fixture()
-def staff_user(db, reddit_factories):
+def reddit_staff_user(reddit_factories):
     """Override the staff_user fixture to use reddit_factories"""
-    return reddit_factories.user("staff_user")
+    from channels.test_utils import no_ssl_verification
+    with no_ssl_verification():
+        return reddit_factories.user("staff_user")
 
 
 @pytest.fixture()
@@ -42,13 +54,13 @@ def private_channel(reddit_factories, staff_user):
 @pytest.fixture()
 def staff_api(staff_user):
     """A fixture for an Api instance configured with the staff user"""
-    return Api(staff_user)
+    return api.Api(staff_user)
 
 
 @pytest.fixture()
 def contributor_api(user):
     """A fixture for an Api instance configured with the contributor user"""
-    return Api(user)
+    return api.Api(user)
 
 
 @pytest.fixture()

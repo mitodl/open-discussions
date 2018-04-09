@@ -4,7 +4,7 @@
 
 {% block title %}Open Discussions - Recent Popular Posts{% endblock %}
 {% block styles %}
-<style type="test/css">
+<style type="text/css">
 /* -------------------------------------
     DISCUSSION POSTS TABLE
 ------------------------------------- */
@@ -32,33 +32,29 @@ p.comments {
 .recent-posts-table td {
   border-bottom: 1px solid #ddd;
 }
-div.read-more {
-  text-align: center;
-  margin: 30px 0;
-}
 </style>
 {% endblock %}
 
 {% block content %}
 
 <div class="section">
-	<p class="lead-in">Here are some recent posts you might have missed</p>
+  <p class="lead-in">Here are some recent posts you might have missed</p>
 </div>
 <table class="recent-posts-table" width="100%" cellpadding="13" cellspacing="0" border="0">
-	<tbody>
+  <tbody>
     {% for post in posts %}
     <tr>
       <td width="72" style="width: 72px"><img src="{{ post.profile_image }}" class="user-photo" width="72" height="72"/></td>
       <td><div>
-    		<h3 class="post-title">
+        <h3 class="post-title">
           <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">{{ post.title }}</a>
         </h3>
-    		<p class="by-line">by {{ post.author_name }}, {{ post.created|parse_iso|naturaltime }} in <a href="{{ base_url }}{% url 'channel' channel_name=post.channel_name %}">{{ post.channel_title }}</a></p>
-    		<p class="comments">{{ post.num_comments }} comment{% if post.num_comments != 1 %}s{% endif %}</p>
-    	</div></td>
+        <p class="by-line">by {{ post.author_name }}, {{ post.created|parse_iso|naturaltime }} in <a href="{{ base_url }}{% url 'channel' channel_name=post.channel_name %}">{{ post.channel_title }}</a></p>
+        <p class="comments">{{ post.num_comments }} comment{% if post.num_comments != 1 %}s{% endif %}</p>
+      </div></td>
     </tr>
     {% endfor %}
-	</tbody>
+  </tbody>
 </table>
 <div class="read-more">
   <a href="{{ base_url }}" class="ghost-button">Read More</a>

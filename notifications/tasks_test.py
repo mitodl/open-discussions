@@ -33,3 +33,11 @@ def test_send_email_notification_batch(mocker):
     ids = [1, 2, 3]
     tasks.send_email_notification_batch.delay(ids)
     api_mock.assert_called_once_with(ids)
+
+
+def test_notify_subscribed_users(mocker):
+    """Tests that notify_subscribed_users calls the API method"""
+    api_mock = mocker.patch('notifications.api.send_comment_notifications')
+
+    tasks.notify_subscribed_users.delay(1, 2, 3)
+    api_mock.assert_called_once_with(1, 2, 3)

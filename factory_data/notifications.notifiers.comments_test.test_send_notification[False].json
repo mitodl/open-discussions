@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Optio recusandae assumenda voluptatem impedit labore voluptatum saepe. Natus quod labore ea saepe molestias dolores numquam.\nAd ab nobis placeat debitis. Molestias iste eligendi amet voluptate rerum sequi iure. Sit facilis cumque accusantium beatae saepe enim. Fuga molestias quod impedit rem.\nVitae ut repellat nostrum assumenda ipsam quisquam. Sequi hic commodi optio rerum beatae. At consequuntur quisquam ex aliquid modi.",
+      "name": "1523306023_inventore",
+      "public_description": "Ipsam placeat assumenda amet dolore reiciendis soluta quaerat. Neque beatae ab eligendi minus.",
+      "title": "Cumque accusantium quod ducimus."
+    }
+  },
+  "comments": {
+    "just a comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "e",
+      "post_id": "a",
+      "text": "Consectetur quibusdam illo blanditiis ipsam eum sequi neque eum. Aut at recusandae sit cum."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "a",
+      "text": "Corporis in ut repellendus provident. Voluptatum quae aliquid exercitationem.",
+      "title": "Facere adipisci voluptates eius ipsa."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CAP1TNQSAG93HCDXYCAM384X"
+    },
+    "staff_user": {
+      "username": "01CAP1TFBRQYW05X8JZK13Y2CJ"
+    }
+  }
+}

@@ -4,10 +4,7 @@ import logging
 from mail import api
 from notifications.notifiers.exceptions import CancelNotificationError
 from notifications.notifiers.base import BaseNotifier
-from notifications.models import (
-    NotificationSettings,
-    EmailNotification,
-)
+from notifications.models import EmailNotification
 from notifications import utils
 from open_discussions import features
 
@@ -16,17 +13,16 @@ log = logging.getLogger()
 
 class EmailNotifier(BaseNotifier):
     """Notifier for email notifications"""
-    def __init__(self, template_name):
+    def __init__(self, template_name, notification_settings):
         # sets notification_cls
-        super().__init__(EmailNotification)
+        super().__init__(EmailNotification, notification_settings)
         self._template_name = template_name
 
-    def can_notify(self, notification_settings, last_notification):
+    def can_notify(self, last_notification):
         """
         Returns true if we can notify this user based on their settings and when the last notification occurred
 
         Args:
-            notification_settings (NotificationSettings): settings for this user and notification_type
             last_notification (NotificationBase): last notification that was triggered for this NotificationSettings
 
         Raises:
@@ -37,14 +33,23 @@ class EmailNotifier(BaseNotifier):
         """
         return (
             features.is_enabled(features.EMAIL_NOTIFICATIONS) and
-            notification_settings.via_email and
-            api.can_email_user(notification_settings.user) and
-            super().can_notify(notification_settings, last_notification)
+            self.notification_settings.via_email and
+            api.can_email_user(self.user) and
+            super().can_notify(last_notification)
         )
 
-    def _get_notification_data(self, notification_settings, last_notification):  # pylint: disable=unused-argument
+    def _get_notification_data(
+            self, current_notification, last_notification
+    ):  # pylint: disable=unused-argument
         """
-        Returns data for this notification
+        Gets the data for this notification
+
+        Args:
+            current_notification (NotificationBase): current notification we're sending for
+            last_notification (NotificationBase): last notification that was triggered for this NotificationSettings
+
+        Raises:
+            InvalidTriggerFrequencyError: if the frequency is invalid for the frontpage digest
         """
         return {}
 
@@ -57,18 +62,17 @@ class EmailNotifier(BaseNotifier):
         """
         messages = None
         user = email_notification.user
-        notification_settings = NotificationSettings.objects.get(
-            user=user,
-            notification_type=email_notification.notification_type,
-        )
 
         with utils.mark_as_sent_or_canceled(email_notification) as will_send:
+            if user != self.user:
+                raise Exception("Notification user doesn't match settings user")
+
             if not will_send:
                 return
 
-            last_notification = self._get_most_recent_notification(notification_settings, before=email_notification)
+            last_notification = self._get_most_recent_notification(before=email_notification)
 
-            data = self._get_notification_data(notification_settings, last_notification)
+            data = self._get_notification_data(email_notification, last_notification)
 
             # generate the message (there's only 1)
             messages = list(api.messages_for_recipients([

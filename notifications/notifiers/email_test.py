@@ -27,7 +27,7 @@ def notifier_settings(settings):
 @pytest.fixture
 def notifier():
     """Fixture for EmailNotifier"""
-    return email.EmailNotifier('frontpage')
+    return email.EmailNotifier('frontpage', NotificationSettingsFactory.create())
 
 
 @pytest.mark.parametrize('is_enabled', [True, False])
@@ -39,26 +39,24 @@ def test_can_notify(settings, mocker, is_enabled, can_notify, via_email):
         'notifications.notifiers.base.BaseNotifier.can_notify',
         return_value=can_notify,
     )
-    notifier = email.EmailNotifier('frontpage')
-    ns_mock = mocker.Mock()
-    ns_mock.via_email = via_email
+    ns = NotificationSettingsFactory.create(via_email=via_email)
+    notifier = email.EmailNotifier('frontpage', ns)
     note_mock = mocker.Mock()
     settings.FEATURES[features.EMAIL_NOTIFICATIONS] = is_enabled
 
     expected = is_enabled and can_notify and via_email
-    assert notifier.can_notify(ns_mock, note_mock) is expected
+    assert notifier.can_notify(note_mock) is expected
 
     if is_enabled and via_email:
-        can_notify_mock.assert_called_once_with(ns_mock, note_mock)
+        can_notify_mock.assert_called_once_with(note_mock)
 
 
 def test_send_notification(notifier, mocker):
     """Tests send_notification"""
     send_messages_mock = mocker.patch('mail.api.send_messages')
-    ns = NotificationSettingsFactory.create()
     note = EmailNotificationFactory.create(
-        user=ns.user,
-        notification_type=ns.notification_type,
+        user=notifier.user,
+        notification_type=notifier.notification_settings.notification_type,
         sending=True,
     )
 
@@ -70,10 +68,9 @@ def test_send_notification(notifier, mocker):
 def test_send_notification_already_sent(notifier, mocker):
     """Tests send_notification that it doesn't send a notification that has already been sent"""
     send_messages_mock = mocker.patch('mail.api.send_messages')
-    ns = NotificationSettingsFactory.create()
     note = EmailNotificationFactory.create(
-        user=ns.user,
-        notification_type=ns.notification_type,
+        user=notifier.user,
+        notification_type=notifier.notification_settings.notification_type,
         sent=True,
     )
 
@@ -86,10 +83,9 @@ def test_send_notification_no_messages(notifier, mocker):
     """Tests send_notification that it cancels the notification if a message can't be sent"""
     send_messages_mock = mocker.patch('mail.api.send_messages')
     mocker.patch('mail.api.messages_for_recipients', return_value=[])
-    ns = NotificationSettingsFactory.create()
     note = EmailNotificationFactory.create(
-        user=ns.user,
-        notification_type=ns.notification_type,
+        user=notifier.user,
+        notification_type=notifier.notification_settings.notification_type,
         sending=True,
     )
 
@@ -97,5 +93,22 @@ def test_send_notification_no_messages(notifier, mocker):
 
     note.refresh_from_db()
     assert note.state == EmailNotification.STATE_CANCELED
+
+    send_messages_mock.assert_not_called()
+
+
+def test_send_notification_no_user_mismatch(notifier, mocker):
+    """Tests send_notification that it raises an error if the user mismatches"""
+    send_messages_mock = mocker.patch('mail.api.send_messages')
+    mocker.patch('mail.api.messages_for_recipients', return_value=[])
+    note = EmailNotificationFactory.create(
+        notification_type=notifier.notification_settings.notification_type,
+        sending=True,
+    )
+
+    notifier.send_notification(note)
+
+    note.refresh_from_db()
+    assert note.state == EmailNotification.STATE_PENDING
 
     send_messages_mock.assert_not_called()

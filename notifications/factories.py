@@ -19,6 +19,7 @@ from notifications.models import (
     FREQUENCY_NEVER,
     NOTIFICATION_TYPES,
     NOTIFICATION_TYPE_FRONTPAGE,
+    NOTIFICATION_TYPE_COMMENTS,
 )
 
 
@@ -38,6 +39,9 @@ class NotificationSettingsFactory(DjangoModelFactory):
     class Params:
         frontpage_type = factory.Trait(
             notification_type=NOTIFICATION_TYPE_FRONTPAGE,
+        )
+        comments_type = factory.Trait(
+            notification_type=NOTIFICATION_TYPE_COMMENTS,
         )
 
         immediate = factory.Trait(trigger_frequency=FREQUENCY_IMMEDIATE)
@@ -60,6 +64,9 @@ class EmailNotificationFactory(DjangoModelFactory):
     class Params:
         frontpage_type = factory.Trait(
             notification_type=NOTIFICATION_TYPE_FRONTPAGE,
+        )
+        comments_type = factory.Trait(
+            notification_type=NOTIFICATION_TYPE_COMMENTS,
         )
 
         sent = factory.Trait(

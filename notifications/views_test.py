@@ -2,7 +2,7 @@
 from operator import itemgetter
 
 import pytest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework import status
 
 from notifications.factories import NotificationSettingsFactory

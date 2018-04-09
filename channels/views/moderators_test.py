@@ -1,15 +1,12 @@
 """Tests for views for REST APIs for moderators"""
 # pylint: disable=unused-argument
 import pytest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework import status
 
 from open_discussions.factories import UserFactory
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("use_betamax", "praw_settings"),
-]
+pytestmark = pytest.mark.betamax
 
 
 def test_list_moderators(client, private_channel_and_contributor, staff_user):

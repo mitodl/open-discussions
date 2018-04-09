@@ -2,11 +2,12 @@
 # pylint: disable=unused-argument
 from urllib.parse import urljoin
 import pytest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework import status
 
 from channels.api import Api
 from channels.serializers import default_profile_image
+
 from channels.constants import (
     VALID_POST_SORT_TYPES,
     POSTS_SORT_HOT,
@@ -14,10 +15,7 @@ from channels.constants import (
 from channels.models import Subscription
 from open_discussions.settings import SITE_BASE_URL
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("use_betamax", "praw_settings"),
-]
+pytestmark = pytest.mark.betamax
 
 
 def test_create_url_post(client, private_channel_and_contributor):
@@ -634,7 +632,9 @@ def test_update_post_removed(client, staff_user, private_channel_and_contributor
     }
 
 
-def test_update_post_clear_removed(client, staff_user, staff_api, private_channel_and_contributor, reddit_factories):
+def test_update_post_clear_removed(
+        client, staff_user, staff_api, private_channel_and_contributor, reddit_factories
+):
     """Test updating a post to re-approve it"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('just a post', user, channel=channel)
@@ -665,7 +665,9 @@ def test_update_post_clear_removed(client, staff_user, staff_api, private_channe
     }
 
 
-def test_update_post_ignore_reports(client, staff_user, staff_api, private_channel_and_contributor, reddit_factories):
+def test_update_post_ignore_reports(
+        client, staff_user, staff_api, private_channel_and_contributor, reddit_factories
+):
     """Test updating a post to ignore reports"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('just a post', user, channel=channel)

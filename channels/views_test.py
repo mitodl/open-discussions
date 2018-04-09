@@ -2,13 +2,10 @@
 # pylint: disable=unused-argument
 import pytest
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from praw.exceptions import APIException
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("use_betamax", "praw_settings"),
-]
+pytestmark = pytest.mark.betamax
 
 
 def test_api_exception(client, logged_in_profile, mocker):

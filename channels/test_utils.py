@@ -13,6 +13,7 @@ def no_ssl_verification():
         requests.Session.request = partialmethod(old_request, verify=False)
 
         warnings.filterwarnings('ignore', 'Unverified HTTPS request')
+
         yield
     finally:
         warnings.resetwarnings()

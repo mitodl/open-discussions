@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.db import models
 
+from channels.models import Base36IntegerField
 from open_discussions.models import TimestampedModel
 
 NOTIFICATION_TYPE_FRONTPAGE = "frontpage"
@@ -59,6 +60,26 @@ class NotificationSettings(TimestampedModel):
         """Returns a QuerySet filtered to frontpage notification settings"""
         return cls.objects.filter(notification_type=NOTIFICATION_TYPE_FRONTPAGE)
 
+    @property
+    def is_triggered_daily(self):
+        """Returns True if the trigger_frequency is daily"""
+        return self.trigger_frequency == FREQUENCY_DAILY
+
+    @property
+    def is_triggered_weekly(self):
+        """Returns True if the trigger_frequency is weekly"""
+        return self.trigger_frequency == FREQUENCY_WEEKLY
+
+    @property
+    def is_triggered_immediate(self):
+        """Returns True if the trigger_frequency is immediate"""
+        return self.trigger_frequency == FREQUENCY_IMMEDIATE
+
+    @property
+    def is_triggered_never(self):
+        """Returns True if the trigger_frequency is never"""
+        return self.trigger_frequency == FREQUENCY_NEVER
+
     class Meta:
         unique_together = (
             ('user', 'notification_type'),
@@ -113,3 +134,18 @@ class EmailNotification(NotificationBase):
         index_together = (
             ('state', 'updated_on'),
         ) + NotificationBase.Meta.index_together
+
+
+class CommentEvent(TimestampedModel):
+    """Represents a new comment on a subscribed object"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    post_id = Base36IntegerField()
+    comment_id = Base36IntegerField(null=True)
+    email_notification = models.ForeignKey(
+        EmailNotification,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+
+    class Meta:
+        unique_together = (('user', 'post_id', 'comment_id'),)

@@ -1,6 +1,9 @@
 """Notifications API"""
 import logging
 
+from django.db.models import Q
+
+from channels.models import Subscription
 from notifications.notifiers.exceptions import UnsupportedNotificationTypeError
 from notifications.models import (
     EmailNotification,
@@ -12,7 +15,7 @@ from notifications.models import (
     FREQUENCY_WEEKLY,
     FREQUENCY_NEVER,
 )
-from notifications.notifiers import frontpage
+from notifications.notifiers import comments, frontpage
 from notifications import tasks
 from open_discussions.utils import chunks
 
@@ -56,10 +59,9 @@ def _send_frontpage_digests(notification_settings):
     Args:
         notification_settings (QuerySet of NotificationSettings): a QuerySet for the settings to send
     """
-    notifer = frontpage.FrontpageDigestNotifier()
-
     for notification_setting in notification_settings.iterator():
-        notifer.attempt_notify(notification_setting)
+        notifier = frontpage.FrontpageDigestNotifier(notification_setting)
+        notifier.attempt_notify()
 
 
 def send_daily_frontpage_digests():
@@ -86,8 +88,15 @@ def _get_notifier_for_notification(notification):
     Returns:
         Notifier: instance of the notifier to use
     """
+    notification_settings = NotificationSettings.objects.get(
+        user=notification.user,
+        notification_type=notification.notification_type,
+    )
+
     if notification.notification_type == NOTIFICATION_TYPE_FRONTPAGE:
-        return frontpage.FrontpageDigestNotifier()
+        return frontpage.FrontpageDigestNotifier(notification_settings)
+    elif notification.notification_type == NOTIFICATION_TYPE_COMMENTS:
+        return comments.CommentNotifier(notification_settings)
     else:
         raise UnsupportedNotificationTypeError(
             "Notification type '{}' is unsupported".format(notification.notification_type)
@@ -118,3 +127,28 @@ def send_email_notification_batch(notification_ids):
             notifier.send_notification(notification)
         except:  # pylint: disable=bare-except
             log.exception('Error sending notification')
+
+
+def send_comment_notifications(post_id, comment_id, new_comment_id):
+    """
+    Sends notifications for a reply to a given post notification
+
+    Args:
+        post_id (str): base36 post id
+        comment_id (str): base36 comment id
+        new_comment_id (str): base36 comment id of the new comment
+    """
+    for subscription in Subscription.objects.filter(post_id=post_id).filter(
+            Q(comment_id=comment_id) | Q(comment_id=None)
+    ).distinct('user').iterator():
+        try:
+            notification_settings = NotificationSettings.objects.get(
+                user_id=subscription.user_id,
+                notification_type=NOTIFICATION_TYPE_COMMENTS,
+            )
+        except NotificationSettings.DoesNotExist:
+            log.exception("NotificationSettings didn't exist for subscription %s", subscription.id)
+            continue
+
+        notifier = comments.CommentNotifier(notification_settings)
+        notifier.create_comment_event(subscription, new_comment_id)

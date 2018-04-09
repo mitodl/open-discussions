@@ -1,19 +1,22 @@
 """Tests for views for REST APIs for comments"""
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,redefined-outer-name
 from itertools import product
 
 import pytest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework import status
 
 from channels.test_constants import LIST_MORE_COMMENTS_RESPONSE
 from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("use_betamax", "praw_settings"),
-]
+pytestmark = pytest.mark.betamax
+
+
+@pytest.fixture(autouse=True)
+def mock_notify_subscribed_users(mocker):
+    """Returns a mocked version of notify_subscribed_users"""
+    return mocker.patch('notifications.tasks.notify_subscribed_users').delay
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
@@ -401,7 +404,7 @@ def test_get_comment_404(client, jwt_header, private_channel_and_contributor, re
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_create_comment(client, logged_in_profile):
+def test_create_comment(client, logged_in_profile, mock_notify_subscribed_users):
     """Create a comment"""
     post_id = '2'
     url = reverse('comment-list', kwargs={'post_id': post_id})
@@ -429,6 +432,8 @@ def test_create_comment(client, logged_in_profile):
         'num_reports': 0,
     }
 
+    mock_notify_subscribed_users.assert_called_once_with(post_id, None, '7')
+
 
 def test_create_comment_forbidden(client, logged_in_profile):
     """Create a comment for a post the user doesn't have access to"""
@@ -450,7 +455,7 @@ def test_create_comment_not_found(client, logged_in_profile):
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_create_comment_no_upvote(client, logged_in_profile):
+def test_create_comment_no_upvote(client, logged_in_profile, mock_notify_subscribed_users):
     """Create a comment without an upvote"""
     post_id = '2'
     url = reverse('comment-list', kwargs={'post_id': post_id})
@@ -478,9 +483,10 @@ def test_create_comment_no_upvote(client, logged_in_profile):
         'comment_type': 'comment',
         'num_reports': 0,
     }
+    mock_notify_subscribed_users.assert_called_once_with(post_id, None, '9')
 
 
-def test_create_comment_downvote(client, logged_in_profile):
+def test_create_comment_downvote(client, logged_in_profile, mock_notify_subscribed_users):
     """Create a comment with a downvote"""
     post_id = '2'
     url = reverse('comment-list', kwargs={'post_id': post_id})
@@ -508,9 +514,10 @@ def test_create_comment_downvote(client, logged_in_profile):
         'comment_type': 'comment',
         'num_reports': 0,
     }
+    mock_notify_subscribed_users.assert_called_once_with(post_id, None, 'l')
 
 
-def test_create_comment_reply_to_comment(client, logged_in_profile):
+def test_create_comment_reply_to_comment(client, logged_in_profile, mock_notify_subscribed_users):
     """Create a comment that's a reply to another comment"""
     post_id = '2'
     parent_comment_id = '3'
@@ -539,6 +546,7 @@ def test_create_comment_reply_to_comment(client, logged_in_profile):
         'comment_type': 'comment',
         'num_reports': 0,
     }
+    mock_notify_subscribed_users.assert_called_once_with(post_id, parent_comment_id, '6')
 
 
 def test_create_comment_reply_to_deleted_comment(

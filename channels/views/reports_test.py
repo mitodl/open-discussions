@@ -1,14 +1,11 @@
 """Tests for views for REST APIs for reports"""
 import pytest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework import status
 
 from channels.api import Api
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("use_betamax", "praw_settings"),
-]
+pytestmark = pytest.mark.betamax
 
 
 def test_report_post(client, private_channel_and_contributor, reddit_factories):

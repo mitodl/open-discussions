@@ -20,7 +20,7 @@ pytestmark = pytest.mark.django_db
 def notifier(mocker):
     """BaseNotifier fixture"""
     # bypass the typecheck here
-    notifier = BaseNotifier(NotificationBase)
+    notifier = BaseNotifier(NotificationBase, None)
     notifier.notification_cls = mocker.Mock(spec=NotificationBase)
     return notifier
 
@@ -32,13 +32,13 @@ def test_invalid_notification_cls():
         pass
 
     with pytest.raises(AttributeError):
-        BaseNotifier(_NotANotification)
+        BaseNotifier(_NotANotification, None)
 
 
 def test_can_notify_immediate(notifier, mocker):
     """Tests that if the settings are for immediate the notification triggers"""
-    ns = NotificationSettingsFactory.create(immediate=True)
-    assert notifier.can_notify(ns, mocker.Mock()) is True
+    notifier.notification_settings = NotificationSettingsFactory.create(immediate=True)
+    assert notifier.can_notify(mocker.Mock()) is True
 
 
 @pytest.mark.parametrize('frequency,offset_hours,expected', [
@@ -49,28 +49,29 @@ def test_can_notify_immediate(notifier, mocker):
 ])
 def test_can_notify(notifier, mocker, frequency, offset_hours, expected):
     """Tests that it triggers correctly given the last notification"""
-    ns = NotificationSettingsFactory.create(trigger_frequency=frequency)
+    notifier.notification_settings = NotificationSettingsFactory.create(trigger_frequency=frequency)
     notification = mocker.Mock()
     notification.created_on = now_in_utc() - timedelta(hours=offset_hours)
-    assert notifier.can_notify(ns, notification) is expected
+    assert notifier.can_notify(notification) is expected
 
 
 def test_can_notify_invalid_frequency(notifier, mocker):
     """Tests that this raises an error if an unsupported trigger_frequency is used"""
-    ns = NotificationSettingsFactory.create(trigger_frequency='bananas')
+    notifier.notification_settings = NotificationSettingsFactory.create(trigger_frequency='bananas')
     notification = mocker.Mock()
     notification.created_on = now_in_utc()
     with pytest.raises(InvalidTriggerFrequencyError):
-        notifier.can_notify(ns, notification)
+        notifier.can_notify(notification)
 
 
 @pytest.mark.parametrize('can_notify', [True, False])
 def test_attempt_notify(notifier, mocker, can_notify):
     """Tests that this creates a new notification in pending status"""
     ns = NotificationSettingsFactory.create(immediate=True)
+    notifier.notification_settings = ns
     mocker.patch.object(notifier, 'can_notify', return_value=can_notify)
 
-    notifier.attempt_notify(ns)
+    notifier.attempt_notify()
 
     if can_notify:
         notifier.notification_cls.objects.create.assert_called_once_with(

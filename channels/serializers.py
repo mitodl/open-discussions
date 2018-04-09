@@ -335,6 +335,11 @@ class CommentSerializer(serializers.Serializer):
     deleted = serializers.SerializerMethodField()
     subscribed = WriteableSerializerMethodField()
 
+    @property
+    def _current_user(self):
+        """Get the current user"""
+        return self.context['current_user']
+
     def _get_user(self, instance):
         """
         Look up user in the context from the comment author
@@ -437,7 +442,7 @@ class CommentSerializer(serializers.Serializer):
         if 'comment_subscriptions' not in self.context:
             # this code is run if a comment was just created
             return Subscription.objects.filter(
-                user=self.context['request'].user,
+                user=self._current_user,
                 post_id=instance.submission.id,
                 comment_id=instance.id,
             ).exists()
@@ -450,7 +455,7 @@ class CommentSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        api = Api(user=self.context['request'].user)
+        api = Api(user=self._current_user)
         post_id = self.context['view'].kwargs['post_id']
 
         kwargs = {}
@@ -467,6 +472,10 @@ class CommentSerializer(serializers.Serializer):
         api.add_comment_subscription(post_id, comment.id)
 
         changed = _apply_vote(comment, validated_data, True)
+
+        from notifications.tasks import notify_subscribed_users
+        notify_subscribed_users.delay(post_id, validated_data.get('comment_id', None), comment.id)
+
         if changed:
             return api.get_comment(comment.id)
         else:
@@ -476,7 +485,7 @@ class CommentSerializer(serializers.Serializer):
         if validated_data.get('comment_id'):
             raise ValidationError("comment_id must be provided via URL")
 
-        api = Api(user=self.context['request'].user)
+        api = Api(user=self._current_user)
         if 'body' in validated_data:
             api.update_comment(comment_id=instance.id, text=validated_data['body'])
 

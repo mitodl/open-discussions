@@ -94,15 +94,14 @@ def _posts_since_notification(notification_settings, notification):
 
 class FrontpageDigestNotifier(EmailNotifier):
     """Notifier for frontpage digests"""
-    def __init__(self):
-        super().__init__('frontpage')
+    def __init__(self, notification_settings):
+        super().__init__('frontpage', notification_settings)
 
-    def can_notify(self, notification_settings, last_notification):
+    def can_notify(self, last_notification):
         """
         Returns true if we can notify this user based on their settings and when the last notification occurred
 
         Args:
-            notification_settings (NotificationSettings): settings for this user and notification_type
             last_notification (NotificationBase): last notification that was triggered for this NotificationSettings
 
         Raises:
@@ -113,24 +112,26 @@ class FrontpageDigestNotifier(EmailNotifier):
         """
         return (
             features.is_enabled(features.FRONTPAGE_EMAIL_DIGESTS) and
-            super().can_notify(notification_settings, last_notification) and
+            super().can_notify(last_notification) and
             # do this last as it's expensive if the others are False anyway
             # check if we have posts since the last notification
-            bool(_posts_since_notification(notification_settings, last_notification))
+            bool(_posts_since_notification(self.notification_settings, last_notification))
         )
 
-    def _get_notification_data(self, notification_settings, last_notification):
+    def _get_notification_data(
+            self, current_notification, last_notification
+    ):  # pylint: disable=unused-argument
         """
         Gets the data for this notification
 
         Args:
-            notification_settings (NotificationSettings): settings for this user and notification_type
+            current_notification (NotificationBase): current notification we're sending for
             last_notification (NotificationBase): last notification that was triggered for this NotificationSettings
 
         Raises:
             InvalidTriggerFrequencyError: if the frequency is invalid for the frontpage digest
         """
-        posts = _posts_since_notification(notification_settings, last_notification)
+        posts = _posts_since_notification(self.notification_settings, last_notification)
 
         if not posts:
             # edge case, nothing new to send even though we expected some
@@ -141,7 +142,7 @@ class FrontpageDigestNotifier(EmailNotifier):
                 serializers.PostSerializer(
                     post,
                     context={
-                        'current_user': notification_settings.user,
+                        'current_user': self.user,
                     },
                 ).data
                 for post in posts

@@ -44,7 +44,7 @@ def safe_format_recipients(recipients):
         recipients (iterable of User): recipient users
 
     Returns:
-        list of str: list of recipient emails to send to
+        list of (str, User): list of recipient emails to send to
     """
     if not recipients:
         return []
@@ -123,7 +123,7 @@ def messages_for_recipients(recipients_and_contexts, template_name):
     Creates the messages to the recipients using the templates
 
     Args:
-        recipients_and_contexts (list of (User, dict)): list of users and their contexts as a dict
+        recipients_and_contexts (list of (str, User, dict)): list of users and their contexts as a dict
         template_name (str): name of the template, this should match a directory in mail/templates
 
     Yields:

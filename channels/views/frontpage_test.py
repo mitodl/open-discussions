@@ -1,7 +1,7 @@
 """Tests for views for REST APIs for frontpage"""
 # pylint: disable=unused-argument
 import pytest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework import status
 
 from channels.constants import (
@@ -9,10 +9,7 @@ from channels.constants import (
     VALID_POST_SORT_TYPES,
 )
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("use_betamax", "praw_settings"),
-]
+pytestmark = pytest.mark.betamax
 
 
 def test_frontpage_empty(client, logged_in_profile):

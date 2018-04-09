@@ -1,6 +1,7 @@
 """Tests for notification apis"""
 import pytest
 
+from channels.factories import SubscriptionFactory
 from notifications.factories import (
     EmailNotificationFactory,
     NotificationSettingsFactory,
@@ -8,6 +9,7 @@ from notifications.factories import (
 from notifications.models import (
     NotificationSettings,
     EmailNotification,
+    CommentEvent,
     NOTIFICATION_TYPE_FRONTPAGE,
     NOTIFICATION_TYPE_COMMENTS,
     FREQUENCY_NEVER,
@@ -16,6 +18,7 @@ from notifications.models import (
     FREQUENCY_WEEKLY,
 )
 from notifications import api
+from open_discussions.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -63,13 +66,14 @@ def test_send_daily_frontpage_digests(mocker):
     notification_settings = NotificationSettingsFactory.create_batch(50, daily=True, frontpage_type=True)
     NotificationSettingsFactory.create_batch(50, weekly=True, frontpage_type=True)
 
-    mock_notifier = mocker.patch('notifications.notifiers.frontpage.FrontpageDigestNotifier').return_value
+    mock_notifier_cls = mocker.patch('notifications.notifiers.frontpage.FrontpageDigestNotifier')
 
     api.send_daily_frontpage_digests()
 
-    assert mock_notifier.attempt_notify.call_count == len(notification_settings)
+    assert mock_notifier_cls.return_value.attempt_notify.call_count == len(notification_settings)
     for setting in notification_settings:
-        mock_notifier.attempt_notify.assert_any_call(setting)
+        mock_notifier_cls.assert_any_call(setting)
+        mock_notifier_cls.return_value.attempt_notify.assert_any_call()
 
 
 def test_send_weekly_frontpage_digests(mocker):
@@ -77,13 +81,14 @@ def test_send_weekly_frontpage_digests(mocker):
     notification_settings = NotificationSettingsFactory.create_batch(50, weekly=True, frontpage_type=True)
     NotificationSettingsFactory.create_batch(50, daily=True, frontpage_type=True)
 
-    mock_notifier = mocker.patch('notifications.notifiers.frontpage.FrontpageDigestNotifier').return_value
+    mock_notifier_cls = mocker.patch('notifications.notifiers.frontpage.FrontpageDigestNotifier')
 
     api.send_weekly_frontpage_digests()
 
-    assert mock_notifier.attempt_notify.call_count == len(notification_settings)
+    assert mock_notifier_cls.return_value.attempt_notify.call_count == len(notification_settings)
     for setting in notification_settings:
-        mock_notifier.attempt_notify.assert_any_call(setting)
+        mock_notifier_cls.assert_any_call(setting)
+        mock_notifier_cls.return_value.attempt_notify.assert_any_call()
 
 
 def test_send_unsent_email_notifications(mocker):
@@ -104,14 +109,58 @@ def test_send_unsent_email_notifications(mocker):
 
 def test_send_email_notification_batch(mocker):
     """Verify send_email_notification_batch calls the notifier for each of the notifications it is given"""
-    # note: only frontpage is supported at the moment so we force that type
-    notifications = EmailNotificationFactory.create_batch(50, frontpage_type=True)
+    frontpage_notifications = EmailNotificationFactory.create_batch(50, frontpage_type=True)
+    comment_notifications = EmailNotificationFactory.create_batch(50, comments_type=True)
+    notifications = comment_notifications + frontpage_notifications
     notifications_ids = [note.id for note in notifications]
+    for notification in notifications:
+        NotificationSettingsFactory.create(user=notification.user, notification_type=notification.notification_type)
 
-    mock_notifier = mocker.patch('notifications.notifiers.frontpage.FrontpageDigestNotifier').return_value
+    mock_frontpage_notifier = mocker.patch('notifications.notifiers.frontpage.FrontpageDigestNotifier').return_value
+    mock_comment_notifier = mocker.patch('notifications.notifiers.comments.CommentNotifier').return_value
 
     api.send_email_notification_batch(notifications_ids)
 
-    assert mock_notifier.send_notification.call_count == len(notifications)
-    for notification in notifications:
-        mock_notifier.send_notification.assert_any_call(notification)
+    assert mock_comment_notifier.send_notification.call_count == len(comment_notifications)
+    assert mock_frontpage_notifier.send_notification.call_count == len(frontpage_notifications)
+
+    for notification in frontpage_notifications:
+        mock_frontpage_notifier.send_notification.assert_any_call(notification)
+
+    for notification in comment_notifications:
+        mock_comment_notifier.send_notification.assert_any_call(notification)
+
+
+@pytest.mark.parametrize('post_id,comment_id', [
+    ('1', '4'),
+    ('1', None)
+])
+def test_send_comment_notifications(post_id, comment_id):
+    """Tests that send_comment_notifications works correctly"""
+    comment_users = UserFactory.create_batch(5)
+    for user in comment_users:
+        NotificationSettingsFactory.create(user=user, comments_type=True)
+        # create both so we cover the notifiication deduplication
+        SubscriptionFactory.create(user=user, post_id=post_id, comment_id=comment_id)
+        SubscriptionFactory.create(user=user, post_id=post_id, comment_id=None)
+
+    post_users = UserFactory.create_batch(5)
+    for user in post_users:
+        NotificationSettingsFactory.create(user=user, comments_type=True)
+        SubscriptionFactory.create(user=user, post_id=post_id, comment_id=None)
+
+    # create just a subscription for a user so we can test no settings scenario
+    SubscriptionFactory.create(post_id=post_id, comment_id=comment_id)
+
+    # create a bunch on other subscriptions
+    SubscriptionFactory.create_batch(10)
+
+    api.send_comment_notifications(post_id, comment_id, 'abc')
+
+    users = post_users + comment_users
+
+    assert CommentEvent.objects.count() == len(users)
+    for event in CommentEvent.objects.all():
+        assert event.post_id == post_id
+        assert event.comment_id == 'abc'
+        assert event.user in users

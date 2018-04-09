@@ -1,0 +1,50 @@
+{% extends "email_base.html" %}
+{% load humanize %}
+{% load timeago %}
+
+{% block title %}Open Discussions - New Comment{% endblock %}
+{% block styles %}
+<style type="text/css">
+</style>
+{% endblock %}
+
+{% block content %}
+
+<table width="100%" cellpadding="13" cellspacing="0" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <div>
+          <h3>{{ comment.author_name }}:</h3>
+          <p class="comment-content">
+            {{ comment.text|truncatewords:100 }}
+            {% if is_comment_reply %}
+              <a href="{{ base_url }}{% url 'channel-post-comment' channel_name=post.channel_name post_id=post.id comment_id=comment.id %}">(read more)</a>
+            {% else %}
+              <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">(read more)</a>
+            {% endif %}
+          </p>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="read-more">
+  {% if is_comment_reply %}
+  <a href="{{ base_url }}{% url 'channel-post-comment' channel_name=post.channel_name post_id=post.id comment_id=comment.id %}" class="btn-primary ghost-button">View on Open Discussions</a>
+  {% else %}
+  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}" class="btn-primary ghost-button">View on Open Discussions</a>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block footer %}
+<p>
+  You are receiving this email because you are following a post on Open Discussions.
+  <br/>
+  If you don't want to receive these emails in the future, you can
+  <a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">edit your settings</a>
+  or
+  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">unfollow from this post</a>.
+</p>
+{% endblock %}

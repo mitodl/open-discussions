@@ -1,6 +1,6 @@
 """Tests for views for REST APIs for users"""
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import pytest
 
 
