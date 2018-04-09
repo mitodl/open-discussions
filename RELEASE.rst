@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.22.0
+--------------
+
+- changing logo in micromasters digest emails (#591)
+- Add a link, in the sidebar, to the Settings page
+
 Version 0.21.2
 --------------
 
