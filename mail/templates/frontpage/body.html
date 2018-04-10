@@ -32,6 +32,10 @@ p.comments {
 .recent-posts-table td {
   border-bottom: 1px solid #ddd;
 }
+div.read-more {
+  text-align: center;
+  margin: 30px 0;
+}
 </style>
 {% endblock %}
 
@@ -56,4 +60,7 @@ p.comments {
     {% endfor %}
 	</tbody>
 </table>
+<div class="read-more">
+  <a href="{{ base_url }}" class="btn-primary ghost-button">Read More</a>
+</div>
 {% endblock %}
