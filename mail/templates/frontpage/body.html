@@ -48,7 +48,7 @@ div.read-more {
 	<tbody>
     {% for post in posts %}
     <tr>
-      <td width="72" style="width: 72px"><img src="{{ post.profile_image }}" class="user-photo" /></td>
+      <td width="72" style="width: 72px"><img src="{{ post.profile_image }}" class="user-photo" width="72" height="72"/></td>
       <td><div>
     		<h3 class="post-title">
           <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">{{ post.title }}</a>
@@ -61,6 +61,6 @@ div.read-more {
 	</tbody>
 </table>
 <div class="read-more">
-  <a href="{{ base_url }}" class="btn-primary ghost-button">Read More</a>
+  <a href="{{ base_url }}" class="ghost-button">Read More</a>
 </div>
 {% endblock %}
