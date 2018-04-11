@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.22.1
+--------------
+
+- Fixed safe_format_recipients to quote display name
+- Adds a read more button to digest email (#594)
+
 Version 0.22.0
 --------------
 
