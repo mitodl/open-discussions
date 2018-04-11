@@ -28,7 +28,8 @@ import {
   getReports,
   getSettings,
   patchFrontpageSetting,
-  patchCommentSetting
+  patchCommentSetting,
+  getEmbedly
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -435,6 +436,17 @@ describe("api", function() {
       assert.ok(
         fetchJSONStub.calledWith(`/api/v0/channels/channelName/reports/`)
       )
+    })
+
+    describe("getEmbedly", () => {
+      it("issues a request with an escaped URL param", async () => {
+        await getEmbedly("https://en.wikipedia.org/wiki/Giant_panda")
+        assert.ok(
+          fetchJSONStub.calledWith(
+            "/api/v0/embedly/https%253A%252F%252Fen.wikipedia.org%252Fwiki%252FGiant_panda/"
+          )
+        )
+      })
     })
   })
 

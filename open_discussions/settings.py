@@ -246,6 +246,10 @@ if ADMIN_EMAIL != '':
 else:
     ADMINS = ()
 
+# embed.ly configuration
+EMBEDLY_KEY = get_string('EMBEDLY_KEY', None)
+EMBEDLY_EMBED_URL = get_string('EMBEDLY_EMBED_URL', "https://api.embed.ly/1/oembed")
+
 # Logging configuration
 LOG_LEVEL = get_string('OPEN_DISCUSSIONS_LOG_LEVEL', 'INFO')
 DJANGO_LOG_LEVEL = get_string('DJANGO_LOG_LEVEL', 'INFO')

@@ -238,3 +238,8 @@ export const patchCommentSetting = (
       method: PATCH,
       body:   JSON.stringify(setting)
     })
+
+export const getEmbedly = (url: string): Promise<Object> =>
+  fetchJSONWithAuthFailure(
+    `/api/v0/embedly/${encodeURIComponent(encodeURIComponent(url))}/`
+  )
