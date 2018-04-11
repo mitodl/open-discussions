@@ -11,7 +11,6 @@ import PostList from "../components/PostList"
 import withLoading from "../components/Loading"
 import PostListNavigation from "../components/PostListNavigation"
 import withNavAndChannelSidebars from "../hoc/withNavAndChannelSidebars"
-import NotFound from "../components/404"
 import { PostSortPicker } from "../components/SortPicker"
 import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import {
@@ -127,15 +126,10 @@ class ChannelPage extends React.Component<*, void> {
       pagination,
       channelName,
       isModerator,
-      notFound,
       location: { search },
       reportPost,
       removePost
     } = this.props
-
-    if (notFound) {
-      return <NotFound />
-    }
 
     if (!channel || !subscribedChannels || !posts) {
       return null
@@ -197,6 +191,9 @@ const mapStateToProps = (state, ownProps) => {
   const notFound = loaded
     ? channels.error && channels.error.errorStatusCode === 404
     : false
+  const notAuthorized = loaded
+    ? channels.error && channels.error.errorStatusCode === 403
+    : false
 
   const userIsModerator = isModerator(channelModerators, SETTINGS.username)
 
@@ -206,6 +203,7 @@ const mapStateToProps = (state, ownProps) => {
     channel,
     loaded,
     notFound,
+    notAuthorized,
     isModerator:        userIsModerator,
     pagination:         postsForChannel.pagination,
     posts:              safeBulkGet(postIds, state.posts.data),

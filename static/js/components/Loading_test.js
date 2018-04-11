@@ -4,6 +4,7 @@ import { assert } from "chai"
 import { mount } from "enzyme"
 
 import withLoading from "./Loading"
+import { NotFound, NotAuthorized } from "../components/ErrorPages"
 
 class Content extends React.Component<*, void> {
   render() {
@@ -14,27 +15,55 @@ class Content extends React.Component<*, void> {
 const LoadingContent = withLoading(Content)
 
 describe("Loading", () => {
-  const renderLoading = (loaded: boolean, errored: boolean) => {
-    return mount(<LoadingContent loaded={loaded} errored={errored} />)
+  let props
+
+  beforeEach(() => {
+    props = {
+      loaded:        true,
+      errored:       false,
+      notFound:      false,
+      notAuthorized: false
+    }
+  })
+
+  const renderLoading = () => {
+    return mount(<LoadingContent {...props} />)
   }
 
   it("should show a spinner if not loaded and not errored", () => {
-    const wrapper = renderLoading(false, false)
+    props.loaded = false
+    const wrapper = renderLoading()
     assert.lengthOf(wrapper.find(".loading").find(".sk-three-bounce"), 1)
   })
 
   it("should render errors correctly if not loaded", () => {
-    const wrapper = renderLoading(false, true)
+    props.loaded = false
+    props.errored = true
+    const wrapper = renderLoading()
     assert.equal(wrapper.text(), "Error loading page")
   })
 
   it("should render errors correctly if loaded", () => {
-    const wrapper = renderLoading(true, true)
+    props.loaded = true
+    props.errored = true
+    const wrapper = renderLoading()
     assert.equal(wrapper.text(), "Error loading page")
   })
 
+  it("should show NotFound if notFound", () => {
+    props.notFound = true
+    const wrapper = renderLoading()
+    assert.ok(wrapper.find(NotFound).exists())
+  })
+
+  it("should show NotAuthorized if notAuthorized", () => {
+    props.notAuthorized = true
+    const wrapper = renderLoading()
+    assert.ok(wrapper.find(NotAuthorized).exists())
+  })
+
   it("should the contents if no errors and loaded", () => {
-    const wrapper = renderLoading(true, false)
+    const wrapper = renderLoading()
     assert.equal(wrapper.text(), "CONTENT")
   })
 })

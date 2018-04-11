@@ -15,7 +15,6 @@ import CommentTree from "../components/CommentTree"
 import ReportForm from "../components/ReportForm"
 import { ReplyToPostForm } from "../components/CommentForms"
 import withNavSidebar from "../hoc/withNavSidebar"
-import NotFound from "../components/404"
 import {
   withPostModeration,
   postModerationSelector
@@ -41,7 +40,8 @@ import { isModerator } from "../lib/channels"
 import {
   anyErrorExcept404,
   anyErrorExcept404or410,
-  any404Error
+  any404Error,
+  any403Error
 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginEditing } from "../components/CommentForms"
@@ -303,7 +303,6 @@ class PostPage extends React.Component<*, void> {
       postDeleteDialogVisible,
       commentDeleteDialogVisible,
       commentReportDialogVisible,
-      notFound,
       commentID,
       removePost,
       approvePost,
@@ -312,10 +311,6 @@ class PostPage extends React.Component<*, void> {
       location: { search },
       reportPost
     } = this.props
-
-    if (notFound) {
-      return <NotFound />
-    }
 
     if (!channel) {
       return null
@@ -438,6 +433,7 @@ const mapStateToProps = (state, ownProps) => {
   const moderators = channelModerators.data.get(channelName)
 
   const notFound = any404Error([posts, comments])
+  const notAuthorized = any403Error([posts, comments])
 
   const loaded = notFound
     ? true
@@ -457,6 +453,7 @@ const mapStateToProps = (state, ownProps) => {
     moderators,
     loaded,
     notFound,
+    notAuthorized,
     isModerator: isModerator(moderators, SETTINGS.username),
     errored:
       anyErrorExcept404([posts, channels]) ||

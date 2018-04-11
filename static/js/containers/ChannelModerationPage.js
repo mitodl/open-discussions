@@ -20,7 +20,6 @@ import withNavAndChannelSidebars from "../hoc/withNavAndChannelSidebars"
 import CompactPostDisplay from "../components/CompactPostDisplay"
 import CommentTree from "../components/CommentTree"
 import { ChannelModerationBreadcrumbs } from "../components/ChannelBreadcrumbs"
-import NotFound from "../components/404"
 
 import { commentPermalink, channelURL } from "../lib/url"
 import { actions } from "../actions"
@@ -87,11 +86,7 @@ class ChannelModerationPage extends React.Component<*, *> {
   }
 
   render() {
-    const { channel, reports, isModerator, notFound } = this.props
-
-    if (notFound) {
-      return <NotFound />
-    }
+    const { channel, reports, isModerator } = this.props
 
     return isModerator
       ? <div className="channel-moderation">

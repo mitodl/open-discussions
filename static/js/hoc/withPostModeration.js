@@ -206,12 +206,17 @@ export const postModerationSelector = (state: Object, ownProps: Object) => {
     ? channels.error && channels.error.errorStatusCode === 404
     : false
 
+  const notAuthorized = loaded
+    ? channels.error && channels.error.errorStatusCode === 403
+    : false
+
   return {
     forms,
     channelName,
     channel,
     loaded,
     notFound,
+    notAuthorized,
     shouldGetReports:        false, // by default, we won't fetch these
     isModerator:             userIsModerator,
     subscribedChannels:      getSubscribedChannels(state),

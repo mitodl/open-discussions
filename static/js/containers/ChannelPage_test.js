@@ -7,7 +7,7 @@ import R from "ramda"
 import PostList from "../components/PostList"
 import SubscriptionsList from "../components/SubscriptionsList"
 import CompactPostDisplay from "../components/CompactPostDisplay"
-import NotFound from "../components/404"
+import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ChannelPage from "./ChannelPage"
 
 import {
@@ -224,8 +224,21 @@ describe("ChannelPage", () => {
     assert(wrapper.find(NotFound).exists())
   })
 
-  it("should show a normal error for other error codes", async () => {
+  it("should show an 'unauthorized' if the user is not authorized", async () => {
     helper.getChannelStub.returns(Promise.reject({ errorStatusCode: 403 }))
+
+    const [wrapper] = await renderComponent(channelURL(currentChannel.name), [
+      actions.channels.get.requestType,
+      actions.channels.get.failureType,
+      actions.subscribedChannels.get.requestType,
+      actions.subscribedChannels.get.successType,
+      SET_CHANNEL_DATA
+    ])
+    assert(wrapper.find(NotAuthorized).exists())
+  })
+
+  it("should show a normal error for other error codes", async () => {
+    helper.getChannelStub.returns(Promise.reject({ errorStatusCode: 500 }))
 
     const [wrapper] = await renderComponent(channelURL(currentChannel.name), [
       actions.channels.get.requestType,

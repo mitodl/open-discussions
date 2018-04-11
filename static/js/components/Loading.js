@@ -1,9 +1,13 @@
 // @flow
 import React from "react"
 
+import { NotFound, NotAuthorized } from "../components/ErrorPages"
+
 type LoadingProps = {
   loaded: boolean,
-  errored: boolean
+  errored: boolean,
+  notFound: boolean,
+  notAuthorized: boolean
 }
 
 const withLoading = (LoadedComponent: Class<React.Component<*, *>>) => {
@@ -11,7 +15,15 @@ const withLoading = (LoadedComponent: Class<React.Component<*, *>>) => {
     props: LoadingProps
 
     render() {
-      const { loaded, errored } = this.props
+      const { loaded, errored, notAuthorized, notFound } = this.props
+
+      if (notFound) {
+        return <NotFound />
+      }
+
+      if (notAuthorized) {
+        return <NotAuthorized />
+      }
 
       if (errored) {
         return <div className="errored">Error loading page</div>

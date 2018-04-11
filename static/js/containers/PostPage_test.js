@@ -6,7 +6,7 @@ import { Dialog } from "@mitodl/mdl-react-components"
 import { Link } from "react-router-dom"
 
 import CommentTree from "../components/CommentTree"
-import NotFound from "../components/404"
+import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import PostPage from "./PostPage"
 
@@ -548,6 +548,23 @@ describe("PostPage", function() {
       ]
     )
     assert(wrapper.find(NotFound).exists())
+  })
+
+  it("should show a 403 page", async () => {
+    helper.getPostStub.returns(Promise.reject({ errorStatusCode: 403 }))
+    const [wrapper] = await renderComponent(
+      postDetailURL(channel.name, post.id),
+      [
+        actions.posts.get.requestType,
+        actions.posts.get.failureType,
+        actions.comments.get.requestType,
+        actions.comments.get.successType,
+        actions.subscribedChannels.get.requestType,
+        actions.subscribedChannels.get.successType,
+        SET_CHANNEL_DATA
+      ]
+    )
+    assert(wrapper.find(NotAuthorized).exists())
   })
 
   it("should show a 404 page for a comment 404", async () => {
