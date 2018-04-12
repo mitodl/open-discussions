@@ -3,6 +3,7 @@ from email.utils import formataddr
 import pytest
 
 from mail.api import (
+    context_for_user,
     safe_format_recipients,
     render_email_templates,
     send_messages,
@@ -44,10 +45,10 @@ def test_safe_format_recipients_override(user, settings):
 def test_render_email_templates(user):
     """Test render_email_templates"""
     user.profile.name = 'Jane Smith'
-    context = {
+    context = context_for_user(user, {
         'url': 'http://example.com'
-    }
-    subject, text_body, html_body = render_email_templates('sample', user, context=context)
+    })
+    subject, text_body, html_body = render_email_templates('sample', context)
     assert subject == "Welcome Jane Smith"
     assert text_body == "html link (http://example.com)"
     assert html_body == (
@@ -64,9 +65,9 @@ def test_messages_for_recipients():
     users = UserFactory.create_batch(5)
 
     messages = list(messages_for_recipients([
-        (recipient, user, {
+        (recipient, context_for_user(user, {
             'url': 'https://example.com',
-        }) for recipient, user in safe_format_recipients(users)
+        })) for recipient, user in safe_format_recipients(users)
     ], 'sample'))
 
     assert len(messages) == len(users)
@@ -81,9 +82,9 @@ def test_send_message(mailoutbox):
     users = UserFactory.create_batch(5)
 
     messages = list(messages_for_recipients([
-        (recipient, user, {
+        (recipient, context_for_user(user, {
             'url': 'https://example.com',
-        }) for recipient, user in safe_format_recipients(users)
+        })) for recipient, user in safe_format_recipients(users)
     ], 'sample'))
 
     send_messages(messages)

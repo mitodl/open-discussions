@@ -8,9 +8,9 @@ recipients = User.objects.all()[:10]
 
 # generator for recipient emails
 messages = messages_for_recipients([
-    (recipient, user, {
+    (recipient, context_for_user(user, {
         # per-recipient context here
-    }) for recipient, user in safe_format_recipients(recipients)
+    })) for recipient, user in safe_format_recipients(recipients)
 ], 'sample')
 
 # optional: anything else to `messages` beyond what `messages_for_recipients` does
@@ -72,29 +72,43 @@ def can_email_user(user):
     return bool(user.email)
 
 
-def render_email_templates(template_name, user, context=None):
+def context_for_user(user, extra_context=None):
     """
-    Renders the email templates for the email
+    Returns an email context for the given user
 
     Args:
-        template_name (str): name of the template, this should match a directory in mail/templates
-        user (User): user this email is being sent
-        context (dict): additional context data for the email
+        user (User): user this email is being sent to
+        extra_context (dict): additional per-user context
 
     Returns:
-        (str, str, str): tuple of the templates for subject, text_body, html_body
+        dict: the context for this user
     """
-    ctx = {
+
+    context = {
         'anon_token': get_encoded_and_signed_subscription_token(user),
         'base_url': settings.SITE_BASE_URL,
         'user': user,
     }
 
-    if context is not None:
-        ctx.update(context)
+    if extra_context is not None:
+        context.update(extra_context)
 
-    subject_text = render_to_string('{}/subject.txt'.format(template_name), ctx).rstrip()
-    html_text = render_to_string('{}/body.html'.format(template_name), ctx)
+    return context
+
+
+def render_email_templates(template_name, context):
+    """
+    Renders the email templates for the email
+
+    Args:
+        template_name (str): name of the template, this should match a directory in mail/templates
+        context (dict): context data for the email
+
+    Returns:
+        (str, str, str): tuple of the templates for subject, text_body, html_body
+    """
+    subject_text = render_to_string('{}/subject.txt'.format(template_name), context).rstrip()
+    html_text = render_to_string('{}/body.html'.format(template_name), context)
 
     # inline the css
     html_text = transform(html_text)
@@ -123,15 +137,15 @@ def messages_for_recipients(recipients_and_contexts, template_name):
     Creates the messages to the recipients using the templates
 
     Args:
-        recipients_and_contexts (list of (str, User, dict)): list of users and their contexts as a dict
+        recipients_and_contexts (list of (str, dict)): list of users and their contexts as a dict
         template_name (str): name of the template, this should match a directory in mail/templates
 
     Yields:
         EmailMultiAlternatives: email message with rendered content
     """
     with mail.get_connection(settings.NOTIFICATION_EMAIL_BACKEND) as connection:
-        for recipient, user, context in recipients_and_contexts:
-            subject, text_body, html_body = render_email_templates(template_name, user, context=context)
+        for recipient, context in recipients_and_contexts:
+            subject, text_body, html_body = render_email_templates(template_name, context)
             msg = AnymailMessage(
                 subject=subject,
                 body=text_body,

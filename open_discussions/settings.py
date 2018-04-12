@@ -77,6 +77,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'social_django',
     'server_status',
     'raven.contrib.django.raven_compat',
     'rest_framework',
@@ -108,6 +109,7 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'open_discussions.middleware.user_activity.UserActivityMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 )
 
 # CORS
@@ -126,8 +128,10 @@ if DEBUG:
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/'
-LOGIN_ERROR_URL = '/'
+LOGIN_URL = '/login'
+LOGIN_ERROR_URL = '/login'
+LOGOUT_URL = '/logout'
+LOGOUT_REDIRECT_URL = '/'
 
 ROOT_URLCONF = 'open_discussions.urls'
 
@@ -144,6 +148,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -187,6 +193,81 @@ USE_L10N = True
 
 USE_TZ = True
 
+# social auth
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.email.EmailAuth',
+    # the following needs to stay here to allow login of local users
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_EMAIL_FORM_URL = 'login'
+SOCIAL_AUTH_EMAIL_FORM_HTML = 'login.html'
+
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+
+SOCIAL_AUTH_LOGIN_ERROR_URL = 'login'
+
+# only validate emails for the email backend
+SOCIAL_AUTH_EMAIL_FORCE_EMAIL_VALIDATION = True
+SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = 'mail.verification_api.send_verification_email'
+SOCIAL_AUTH_EMAIL_VALIDATION_URL = 'confirmation-sent'
+
+SOCIAL_AUTH_PIPELINE = (
+
+    # Get the information we can about the user and return it in a simple
+    # format to create the user instance later. On some cases the details are
+    # already part of the auth response from the provider, but sometimes this
+    # could hit a provider API.
+    'social_core.pipeline.social_auth.social_details',
+
+    # Get the social uid from whichever service we're authing thru. The uid is
+    # the unique identifier of the given user in the provider.
+    'social_core.pipeline.social_auth.social_uid',
+
+    # Verifies that the current auth process is valid within the current
+    # project, this is where emails and domains whitelists are applied (if
+    # defined).
+    'social_core.pipeline.social_auth.auth_allowed',
+
+    # Checks if the current social-account is already associated in the site.
+    'social_core.pipeline.social_auth.social_user',
+
+    # Associates the current social details with another user account with the same email address.
+    'social_core.pipeline.social_auth.associate_by_email',
+
+    # validate an incoming email auth request
+    'open_discussions.pipeline.user.validate_email_auth_request',
+
+    # require a password and profile if they're not set
+    'open_discussions.pipeline.user.validate_password',
+
+    # Send a validation email to the user to verify its email address.
+    # Disabled by default.
+    'social_core.pipeline.mail.mail_validation',
+
+    # Generate a username for the user
+    # NOTE: needs to be right before create_user so nothing overrides the username
+    'open_discussions.pipeline.user.get_username',
+
+    # Create a user account if we haven't found one yet.
+    'social_core.pipeline.user.create_user',
+
+    # require a password and profile if they're not set
+    'open_discussions.pipeline.user.require_password_and_profile',
+
+    # initialize the user, must happen after we're sure who the user is
+    'open_discussions.pipeline.user.initialize_user',
+
+    # Create the record that associates the social account with the user.
+    'social_core.pipeline.social_auth.associate_user',
+
+    # Populate the extra_data field in the social record with the values
+    # specified by settings (and the default ones like access_token, etc).
+    'social_core.pipeline.social_auth.load_extra_data',
+
+    # Update the user record with any changed info from the auth service.
+    'social_core.pipeline.user.user_details',
+)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/

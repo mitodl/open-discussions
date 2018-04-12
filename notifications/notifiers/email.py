@@ -81,7 +81,7 @@ class EmailNotifier(BaseNotifier):
 
             # generate the message (there's only 1)
             messages = list(api.messages_for_recipients([
-                (recipient, user, data) for recipient, user in api.safe_format_recipients([user])
+                (recipient, api.context_for_user(user, data)) for recipient, user in api.safe_format_recipients([user])
             ], self._template_name))
 
             if not messages:

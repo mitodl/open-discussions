@@ -300,11 +300,11 @@ a {
                   {% block footer %}<p>
                   You are receiving this email because you signed up for Open Discussions.
                   <br/>
-                  If you don't want to receive these emails in the future, you can
+                  {% if anon_token %}If you don't want to receive these emails in the future, you can
                   <a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">edit your settings</a>
                   or
                   <a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">unsubscribe</a>.
-                  </p>{% endblock %}
+                  </p>{% endif %}{% endblock %}
                   <p>
                   MIT Office of Digital Learning
                   <br/>

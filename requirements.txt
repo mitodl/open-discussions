@@ -18,6 +18,7 @@ contextlib2==0.5.5        # via raven
 cssselect==1.0.3          # via premailer
 cssutils==1.0.2           # via premailer
 decorator==4.0.11         # via ipython, traitlets
+defusedxml==0.5.0         # via python3-openid, social-auth-core
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-anymail[mailgun]==1.2
@@ -42,6 +43,7 @@ kombu==4.0.2              # via celery, django-server-status
 lxml==4.1.1               # via premailer
 markdown2==2.3.5
 newrelic==2.86.3.70
+oauthlib==2.0.7           # via requests-oauthlib, social-auth-core
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 praw==4.5.1
@@ -51,15 +53,19 @@ prompt-toolkit==1.0.14    # via ipython
 psycopg2==2.7
 ptyprocess==0.5.1         # via pexpect
 pygments==2.2.0           # via ipython
-pyjwt==1.5.2              # via djangorestframework-jwt
+pyjwt==1.5.2              # via djangorestframework-jwt, social-auth-core
 python-dateutil==2.6.0
+python3-openid==3.1.0     # via social-auth-core
 pytz==2017.2              # via celery, django
 pyyaml==3.11
 raven==6.1.0
 redis==2.10.5
+requests-oauthlib==0.8.0  # via social-auth-core
 requests==2.18.1
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via django-anymail, django-server-status, elasticsearch-dsl, faker, html5lib, prompt-toolkit, python-dateutil, traitlets
+six==1.10.0               # via django-anymail, django-server-status, elasticsearch-dsl, faker, html5lib, prompt-toolkit, python-dateutil, social-auth-app-django, social-auth-core, traitlets
+social-auth-app-django==2.1.0
+social-auth-core==1.7.0   # via social-auth-app-django
 static3==0.5.1
 traitlets==4.3.2          # via ipython
 ulid-py==0.0.3

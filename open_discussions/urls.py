@@ -16,14 +16,20 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from rest_framework_jwt.views import refresh_jwt_token
 
-from open_discussions.views import index
+from open_discussions.views import index, login, register, confirmation_sent
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^status/', include('server_status.urls')),
+    url(r'^login/$', login, name='login'),
+    url(r'^register/$', register, name='register'),
+    url(r'^register/confirmation_sent/$', confirmation_sent, name='confirmation-sent'),
+    url(r'^logout/$', auth_views.logout, name='logout'),
+    url(r'', include('social_django.urls', namespace='social')),
     url(r'', include('channels.urls')),
     url(r'', include('profiles.urls')),
     url(r'', include('notifications.urls')),

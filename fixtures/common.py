@@ -6,8 +6,10 @@ from functools import wraps
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
+from django.utils.deprecation import RemovedInDjango20Warning
 import factory
 import pytest
+from urllib3.exceptions import InsecureRequestWarning
 
 import channels.api
 import channels.factories
@@ -27,6 +29,10 @@ def warnings_as_errors():
         warnings.simplefilter('ignore', category=ImportWarning)
         warnings.filterwarnings(
             "ignore",
+            category=InsecureRequestWarning,
+        )
+        warnings.filterwarnings(
+            "ignore",
             message="'async' and 'await' will become reserved keywords in Python 3.7",
             category=DeprecationWarning,
         )
@@ -35,6 +41,12 @@ def warnings_as_errors():
             "ignore",
             module=".*(api_jwt|api_jws|rest_framework_jwt|betamax).*",
             category=DeprecationWarning,
+        )
+        # Ignore warnings for social_django compatability code
+        warnings.filterwarnings(
+            "ignore",
+            module="(social_django|social_core).*",
+            category=RemovedInDjango20Warning,
         )
 
         yield

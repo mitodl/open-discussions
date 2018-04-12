@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     {% spaceless %}
-    {% load static %}
+    {% load i18n static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% load raven %}
@@ -15,7 +15,7 @@
     {% load render_bundle %}
     {% render_bundle 'common' %}
     {% render_bundle 'style' %}
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}{% trans "Open Discussions" %}{% endblock %}</title>
     <meta name="description" content="{% block description %}{% endblock %}">
     <meta name="keywords" content="{% block keywords %}{% endblock %}">
     {% block extrahead %}

@@ -1,0 +1,11 @@
+{% extends "email_base.html" %}
+
+{% block title %}Confirm your email address{% endblock %}
+
+{% block content %}
+<div class="section">
+  <p>Someone (hopefully you) attempted to register on Open Discussions with this email address.</p>
+  <p>To confirm, <a href="{{ confirmation_url }}">click here to verify your email address</a>.</p>
+  <p>Otherwise, you may safely ignore this email.</p>
+</div>
+{% endblock %}
