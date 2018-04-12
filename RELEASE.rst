@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.22.2
+--------------
+
+- Fix some style issues with outlook
+- Add error page for 403 error
+- Setup Cloudfront for serving static assets
+
 Version 0.22.1
 --------------
 
