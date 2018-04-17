@@ -1,0 +1,32 @@
+{
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Repellat optio odio quos inventore eum provident placeat. Illo omnis at exercitationem ratione explicabo labore. Amet facere soluta laboriosam inventore iure cumque.\nEum porro quasi veritatis exercitationem facilis. Tempore corrupti quia fugiat temporibus tempore. Hic accusamus esse nemo libero quaerat voluptas maxime. Consequuntur explicabo nihil rerum quo veritatis rem.",
+      "name": "1524152625_tenetur",
+      "public_description": "Nisi tenetur quia laborum possimus. Sunt est suscipit nihil porro.",
+      "title": "At assumenda soluta ipsum corporis minima."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "eyn",
+      "post_id": "ajt",
+      "text": "Esse porro ipsam rerum atque accusantium labore explicabo. Et accusantium rerum ipsam."
+    }
+  },
+  "posts": {
+    "a post with comments": {
+      "id": "ajt",
+      "text": "Illum cum adipisci modi esse. Culpa inventore incidunt aliquam sit vel debitis quia.",
+      "title": "Similique perspiciatis eaque ipsum assumenda."
+    }
+  },
+  "users": {
+    "staff_user": {
+      "username": "01CBF96Q6EKB285S1FTJ8S7AB3"
+    }
+  }
+}

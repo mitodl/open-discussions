@@ -181,7 +181,7 @@ def _lookup_subscriptions_for_comments(comments, user):
     Return:
         list of int: list of integer ids of comments the user is subscribed to
     """
-    if not comments:
+    if not comments or user.is_anonymous:
         return []
 
     post_id = comments[0]._extract_submission_id()  # pylint: disable=protected-access

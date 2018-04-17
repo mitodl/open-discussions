@@ -18,6 +18,7 @@ from channels.utils import (
     translate_praw_exceptions,
     lookup_subscriptions_for_comments,
 )
+from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 User = get_user_model()
 
@@ -62,6 +63,7 @@ class CommentListView(APIView):
     """
     View for listing and creating comments
     """
+    permission_classes = (AnonymousAccessReadonlyPermission,)
 
     def get_serializer_context(self):
         """Context for the request and view"""
@@ -112,6 +114,7 @@ class MoreCommentsView(APIView):
     """
     View for expanding a MoreComments object
     """
+    permission_classes = (AnonymousAccessReadonlyPermission,)
 
     def get_serializer_context(self):
         """Context for the request and view"""
@@ -158,6 +161,7 @@ class CommentDetailView(APIView):
     """
     View for updating or destroying comments
     """
+    permission_classes = (AnonymousAccessReadonlyPermission,)
 
     def get_serializer_context(self):
         """Context for the request and view"""

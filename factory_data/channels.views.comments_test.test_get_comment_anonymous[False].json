@@ -1,0 +1,32 @@
+{
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Vero iste quaerat quod eum repellendus modi quo. Illo nam ipsa itaque magnam quia ad. Ab hic eaque error dolor culpa porro rem. Eum officia modi incidunt modi recusandae ea cupiditate. Maxime unde ipsa accusantium repellendus.\nDignissimos quas quam temporibus vitae magni enim rem. Eveniet at totam consequatur est. Cum sint quos fuga praesentium rem quam.",
+      "name": "1524151353_error",
+      "public_description": "Modi nisi at modi reiciendis adipisci. Non ipsum iure porro autem saepe.",
+      "title": "Id nihil quidem quaerat."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "evs",
+      "post_id": "ajq",
+      "text": "Facilis incidunt cum iure iusto perspiciatis. Unde ex quas neque ratione laboriosam."
+    }
+  },
+  "posts": {
+    "a post with a comment": {
+      "id": "ajq",
+      "text": "Natus omnis consectetur voluptatum facilis doloribus. Nemo voluptatem deleniti quisquam velit.",
+      "title": "Veniam cum est omnis debitis."
+    }
+  },
+  "users": {
+    "staff_user": {
+      "username": "01CBF7ZWZ0BKYSB8XWTW7TT022"
+    }
+  }
+}

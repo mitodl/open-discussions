@@ -1,0 +1,32 @@
+{
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Consectetur ut quasi illum fugit. Molestiae eveniet blanditiis culpa tempora dolor. Architecto enim non numquam rem. Ad expedita ex labore voluptatum suscipit.\nMagnam optio dolorum illo alias optio facilis. Libero voluptas autem dignissimos ea. Aut rerum vitae officiis tenetur possimus porro odio.\nAsperiores in enim eius quis error. Sed praesentium deserunt excepturi explicabo quidem doloribus iure. Ducimus odit dolor necessitatibus. Blanditiis accusamus eos nihil voluptates magnam.",
+      "name": "1524083363_explicabo",
+      "public_description": "Suscipit quod nihil nobis aspernatur officia est molestias. Molestias fugit autem numquam iste.",
+      "title": "Vero sint blanditiis illum ipsa nam."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "ear",
+      "post_id": "ajd",
+      "text": "Ut distinctio omnis consequuntur numquam. Velit aspernatur voluptate sint."
+    }
+  },
+  "posts": {
+    "a post with comments": {
+      "id": "ajd",
+      "text": "Earum quasi corrupti unde illum eum nam. Cum occaecati vitae blanditiis ad dignissimos.",
+      "title": "Omnis aliquam iste beatae voluptas quia rem."
+    }
+  },
+  "users": {
+    "staff_user": {
+      "username": "01CBD75059XNSAESQA52P805KX"
+    }
+  }
+}
