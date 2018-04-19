@@ -1,0 +1,166 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2018-04-19T18:58:48",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CBFMBVW23KJWBYMVHZS2233C"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA12NTQuCQBRF/4rMMhqQGi1aBoZQkMHY1+ahzxdNgsobkTL67zm5a3kv95z7FhkiWQttXVIlVp5Qs2AhNUYMKuUjrXda7QOVxCgPm/4cR2LqCXo2hsmCccQ89P2h+wmgfTXkLDllTOy2FuuxmrjEdBvA+98d6kfScZ9fyJ7SRicgt5UqZXiFpYMK6gwSmMKZxyA+X9OQeYu6AAAA",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 19 Apr 2018 18:58:48 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=d4vUzPaCQw1dreivM4; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 18-Apr-2020 18:58:48 GMT",
+            "loidcreated=2018-04-19T18%3A58%3A48.291Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 18-Apr-2020 18:58:48 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CBFMBVW23KJWBYMVHZS2233C"
+      }
+    },
+    {
+      "recorded_at": "2018-04-19T18:58:48",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&description=Reiciendis+voluptatum+aliquam+omnis+repudiandae+magni.+Assumenda+exercitationem+vero+sint+officiis+facilis+temporibus.+Quaerat+dicta+explicabo+quidem+optio.+Perferendis+doloremque+illo+dolore+ad+nostrum+ipsum.%0AVoluptates+eos+sunt+totam+aspernatur.+Voluptatum+rem+impedit+aliquam+cupiditate.+Iure+voluptate+ut+et+itaque+exercitationem.+Officia+dignissimos+quo+expedita+similique+doloribus.&link_type=any&name=1524164328_quo&public_description=Nisi+est+ut+eaque+consequuntur.+Fuga+suscipit+officia+quaerat+ducimus.&title=Aut+sequi+quis+doloribus+adipisci+dolor+ea+esse.&type=public&wikimode=disabled"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 4257-TcEr_4UrVeBLT4O54PHc-QFzXHE"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "625"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=d4vUzPaCQw1dreivM4; loidcreated=2018-04-19T18%3A58%3A48.291Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.22.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 19 Apr 2018 18:58:48 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "72"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

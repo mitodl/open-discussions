@@ -8,6 +8,7 @@ from channels.constants import (
     POSTS_SORT_HOT,
     VALID_POST_SORT_TYPES,
 )
+from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = pytest.mark.betamax
 
@@ -123,3 +124,21 @@ def test_frontpage_pagination(client, logged_in_profile, settings, params, expec
     expected['sort'] = POSTS_SORT_HOT
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected
+
+
+@pytest.mark.parametrize('allow_anonymous', [True, False])
+def test_frontpage_anonymous(client, public_channel, settings, allow_anonymous):
+    """Anonymous users should be able to see the front page"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+
+    url = reverse('frontpage')
+    resp = client.get(url)
+    if allow_anonymous:
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.json()['pagination'] == {
+            'sort': POSTS_SORT_HOT,
+        }
+        # Since the front page is shared between all channels it's hard to assert reproduceable results
+        assert isinstance(resp.json()['posts'], list) is True
+    else:
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED

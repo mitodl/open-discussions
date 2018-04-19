@@ -10,12 +10,14 @@ from channels.utils import (
     lookup_users_for_posts,
     lookup_subscriptions_for_posts,
 )
+from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 
 class FrontPageView(APIView):
     """
     View for listing posts for frontpage
     """
+    permission_classes = (AnonymousAccessReadonlyPermission,)
 
     def get_serializer_context(self):
         """Context for the request and view"""
