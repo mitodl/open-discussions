@@ -1,7 +1,9 @@
 """Tests for BaseNotifier"""
 # pylint: disable=redefined-outer-name
-from datetime import timedelta
+from datetime import datetime, timedelta
+
 import pytest
+import pytz
 
 from notifications.factories import NotificationSettingsFactory
 from notifications.models import (
@@ -9,7 +11,11 @@ from notifications.models import (
     FREQUENCY_DAILY,
     FREQUENCY_WEEKLY,
 )
-from notifications.notifiers.base import BaseNotifier
+from notifications.notifiers.base import (
+    BaseNotifier,
+    DELTA_ONE_WEEK,
+    DELTA_ONE_DAY,
+)
 from notifications.notifiers.exceptions import InvalidTriggerFrequencyError
 from open_discussions.utils import now_in_utc
 
@@ -41,17 +47,22 @@ def test_can_notify_immediate(notifier, mocker):
     assert notifier.can_notify(mocker.Mock()) is True
 
 
-@pytest.mark.parametrize('frequency,offset_hours,expected', [
-    (FREQUENCY_DAILY, int(24*1.5), True),
-    (FREQUENCY_DAILY, int(24*0.5), False),
-    (FREQUENCY_WEEKLY, int(24*7.5), True),
-    (FREQUENCY_WEEKLY, int(24*6.5), False),
-])
-def test_can_notify(notifier, mocker, frequency, offset_hours, expected):
+@pytest.mark.parametrize('expected', [True, False])
+@pytest.mark.parametrize('frequency', [FREQUENCY_DAILY, FREQUENCY_WEEKLY])
+@pytest.mark.parametrize('hour_of_day', range(23))
+def test_can_notify(
+        notifier, mocker, frequency, expected, hour_of_day
+):
     """Tests that it triggers correctly given the last notification"""
+    now = datetime(2018, 4, 18, hour_of_day, 0, 0, tzinfo=pytz.utc)
+    if expected is False:
+        offset = timedelta(0)
+    else:
+        offset = DELTA_ONE_DAY if frequency == FREQUENCY_DAILY else DELTA_ONE_WEEK
+    mocker.patch('notifications.notifiers.base.now_in_utc', return_value=now)
     notifier.notification_settings = NotificationSettingsFactory.create(trigger_frequency=frequency)
     notification = mocker.Mock()
-    notification.created_on = now_in_utc() - timedelta(hours=offset_hours)
+    notification.created_on = datetime(2018, 4, 18, 0, 0, 0, tzinfo=pytz.utc) - offset
     assert notifier.can_notify(notification) is expected
 
 
