@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.23.0
+--------------
+
+- Post / Comment follow settings UI
+- Add post and comment follow buttons
+- Fix failing test
+- Add missing environment variable for Travis (#622)
+- Added comment notifications
+
 Version 0.22.2
 --------------
 
