@@ -8,6 +8,7 @@ from rest_framework import permissions
 from rest_framework_jwt.settings import api_settings
 
 from channels import api
+from open_discussions import features
 
 
 def _is_staff_jwt(request):
@@ -89,3 +90,17 @@ class JwtIsStaffModeratorOrReadonlyPermission(JwtIsStaffOrModeratorPermission):
             return True
 
         return super().has_permission(request, view)
+
+
+class AnonymousAccessReadonlyPermission(permissions.BasePermission):
+    """Checks that the user is authenticated or is allowed anonymous access"""
+
+    def has_permission(self, request, view):
+        """Is the user authenticated or allowed anonymous access?"""
+        if not request.user.is_anonymous:
+            return True
+
+        if request.method not in permissions.SAFE_METHODS:
+            return False
+
+        return features.is_enabled(features.ANONYMOUS_ACCESS)

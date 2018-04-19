@@ -6,6 +6,7 @@ from rest_framework import status
 
 from channels.factories import STRATEGY_BUILD
 from open_discussions.factories import UserFactory
+from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = pytest.mark.betamax
 
@@ -27,6 +28,22 @@ def test_list_channels(client, jwt_header, private_channel_and_contributor, requ
             'channel_type': channel.channel_type,
         }
     ]
+
+
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_list_channels_anonymous(client, settings, allow_anonymous):
+    """
+    List anonymous channels
+    """
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    url = reverse('channel-list')
+    resp = client.get(url)
+    if allow_anonymous:
+        assert resp.status_code == status.HTTP_200_OK
+        # Until we decide otherwise this should always be an empty list.
+        assert resp.json() == []
+    else:
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
@@ -128,6 +145,27 @@ def test_get_channel(client, jwt_header, private_channel_and_contributor):
         'description': channel.description,
         'public_description': channel.public_description,
     }
+
+
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous):
+    """
+    An anonymous user should be able to see a public channel
+    """
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    url = reverse('channel-detail', kwargs={'channel_name': public_channel.name})
+    resp = client.get(url)
+    if allow_anonymous:
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.json() == {
+            'channel_type': public_channel.channel_type,
+            'name': public_channel.name,
+            'title': public_channel.title,
+            'description': public_channel.description,
+            'public_description': public_channel.public_description,
+        }
+    else:
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_get_short_channel(client, jwt_header):

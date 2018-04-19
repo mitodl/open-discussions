@@ -1,11 +1,14 @@
 """Tests for permissions"""
+from django.contrib.auth.models import AnonymousUser
 import pytest
 from prawcore.exceptions import (
     Forbidden as PrawForbidden,
     Redirect as PrawRedirect,
 )
 
+from open_discussions import features
 from open_discussions.permissions import (
+    AnonymousAccessReadonlyPermission,
     JwtIsStaffPermission,
     JwtIsStaffOrModeratorPermission,
     JwtIsStaffOrReadonlyPermission,
@@ -93,3 +96,41 @@ def test_readonly(mocker, jwt_token, method, result):
     perm = JwtIsStaffOrReadonlyPermission()
     request = mocker.Mock(auth=jwt_token, method=method)
     assert perm.has_permission(request, mocker.Mock()) is result
+
+
+@pytest.mark.parametrize('method', ['GET', 'HEAD', 'OPTIONS', "POST", 'PUT'])
+def test_anonymous_without_feature_flag(method, settings, mocker):
+    """
+    Test that anonymous users are rejected if the feature flag is off
+    """
+    settings.FEATURES[features.ANONYMOUS_ACCESS] = False
+    perm = AnonymousAccessReadonlyPermission()
+    request = mocker.Mock(user=AnonymousUser(), method=method)
+    assert perm.has_permission(request, mocker.Mock()) is False
+
+
+@pytest.mark.parametrize('method,result', [
+    ('GET', True),
+    ('HEAD', True),
+    ('OPTIONS', True),
+    ('POST', False),
+    ('PUT', False),
+])
+def test_anonymous_readonly(method, result, settings, mocker):
+    """
+    Test that anonymous users are allowed for readonly verbs
+    """
+    settings.FEATURES[features.ANONYMOUS_ACCESS] = True
+    perm = AnonymousAccessReadonlyPermission()
+    request = mocker.Mock(user=AnonymousUser(), method=method)
+    assert perm.has_permission(request, mocker.Mock()) is result
+
+
+@pytest.mark.parametrize('method', ['GET', 'HEAD', 'OPTIONS', "POST", 'PUT'])
+def test_not_anonymous(method, mocker):
+    """
+    Authenticated users are always allowed by this permission class
+    """
+    perm = AnonymousAccessReadonlyPermission()
+    request = mocker.Mock(user=mocker.Mock(is_anonymous=False), method=method)
+    assert perm.has_permission(request, mocker.Mock()) is True

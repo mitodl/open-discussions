@@ -3,7 +3,10 @@
 import pytest
 
 from channels import api
-from channels.constants import CHANNEL_TYPE_PRIVATE
+from channels.constants import (
+    CHANNEL_TYPE_PRIVATE,
+    CHANNEL_TYPE_PUBLIC,
+)
 from channels.factories import RedditFactories, FactoryStore
 
 
@@ -47,8 +50,14 @@ def reddit_staff_user(reddit_factories):
 
 @pytest.fixture()
 def private_channel(reddit_factories, staff_user):
-    """Returns a standard channel for tests"""
+    """Returns a standard private channel for tests"""
     return reddit_factories.channel("private_channel", staff_user, channel_type=CHANNEL_TYPE_PRIVATE)
+
+
+@pytest.fixture
+def public_channel(reddit_factories, staff_user):
+    """Returns a standard public channel for tests"""
+    return reddit_factories.channel("public_channel", staff_user, channel_type=CHANNEL_TYPE_PUBLIC)
 
 
 @pytest.fixture()

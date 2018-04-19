@@ -1,5 +1,5 @@
 """Channels APIs"""
-# pylint: disable=too-many-public-methods
+# pylint: disable=too-many-public-methods, too-many-lines
 from datetime import datetime, timedelta
 from urllib.parse import urljoin
 
@@ -7,6 +7,7 @@ import pytz
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.db import transaction
 from django.http.response import Http404
 import praw
@@ -41,6 +42,7 @@ from channels.models import (
     Subscription,
 )
 
+from open_discussions import features
 from open_discussions.utils import now_in_utc
 
 USER_AGENT = 'MIT-Open: {version}'
@@ -209,11 +211,16 @@ def _get_client(user):
     Get a configured Reddit client_id
 
     Args:
-        user (User): the authenticated user
+        user (User): the authenticated user, or None for anonymous user
 
     Returns:
         praw.Reddit: configured reddit client
     """
+    if user.is_anonymous:
+        return praw.Reddit(
+            **_get_client_base_kwargs(),
+        )
+
     refresh_token, access_token = get_or_create_auth_tokens(user)
 
     return _configure_access_token(praw.Reddit(
@@ -270,11 +277,18 @@ class Api:
     """Channel API"""
     def __init__(self, user):
         """Constructor"""
+        if user is None:
+            user = AnonymousUser()
+
+        if user.is_anonymous and not features.is_enabled(features.ANONYMOUS_ACCESS):
+            # This feature flag is also checked in the permissions layer, but just in case
+            raise Exception("Anonymous access is not allowed")
+
         self.user = user
         try:
             self.reddit = _get_client(user=user)
         except ResponseException as ex:
-            if ex.response.status_code == 401:
+            if not user.is_anonymous and ex.response.status_code == 401:
                 RedditAccessToken.objects.filter(user=user).delete()
                 RedditRefreshToken.objects.filter(user=user).delete()
 
@@ -289,7 +303,8 @@ class Api:
         Returns:
             ListingGenerator(praw.models.Subreddit): a generator over channel listings
         """
-        return self.reddit.user.subreddits()
+        # Until we decide otherwise anonymous users should not see any channels in the list
+        return self.reddit.user.subreddits() if not self.user.is_anonymous else []
 
     def get_channel(self, name):
         """

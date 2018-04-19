@@ -4,7 +4,6 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
 )
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -12,6 +11,7 @@ from channels.api import Api
 from channels.serializers import ChannelSerializer
 from channels.utils import translate_praw_exceptions
 from open_discussions.permissions import (
+    AnonymousAccessReadonlyPermission,
     JwtIsStaffOrReadonlyPermission,
     JwtIsStaffModeratorOrReadonlyPermission,
 )
@@ -21,7 +21,7 @@ class ChannelListView(ListCreateAPIView):
     """
     View for listing and creating channels
     """
-    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
+    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffOrReadonlyPermission,)
     serializer_class = ChannelSerializer
 
     def get_queryset(self):
@@ -38,7 +38,7 @@ class ChannelDetailView(RetrieveUpdateAPIView):
     """
     View for getting information about or updating a specific channel
     """
-    permission_classes = (IsAuthenticated, JwtIsStaffModeratorOrReadonlyPermission,)
+    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffModeratorOrReadonlyPermission,)
     serializer_class = ChannelSerializer
 
     def get_object(self):

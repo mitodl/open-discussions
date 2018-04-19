@@ -3,6 +3,7 @@
 from unittest.mock import Mock
 from urllib.parse import urljoin
 
+from django.contrib.auth.models import AnonymousUser
 import pytest
 from praw.models import Comment
 from praw.models.comment_forest import CommentForest
@@ -10,7 +11,6 @@ from praw.models.reddit.redditor import Redditor
 from prawcore.exceptions import ResponseException
 from rest_framework.exceptions import NotFound
 
-from open_discussions.factories import UserFactory
 from channels import api
 from channels.constants import (
     COMMENTS_SORT_BEST,
@@ -25,6 +25,8 @@ from channels.utils import (
     DEFAULT_LISTING_PARAMS,
     ListingParams,
 )
+from open_discussions.factories import UserFactory
+from open_discussions import features
 
 pytestmark = pytest.mark.django_db
 
@@ -598,6 +600,21 @@ def test_api_constructor_error(mocker):
     assert RedditRefreshToken.objects.count() == 1
 
 
+def test_api_constructor_anonymous_error(mocker, settings):
+    """
+    If a 401 error is raised and the user is anonymous we should just raise the exception instead of trying again
+    """
+    settings.FEATURES[features.ANONYMOUS_ACCESS] = True
+
+    error = ResponseException(response=Mock(status_code=401))
+    get_client_mock = mocker.patch('channels.api._get_client', autospec=True, side_effect=error)
+
+    with pytest.raises(ResponseException):
+        api.Api(None)
+
+    assert get_client_mock.call_count == 1
+
+
 def test_api_constructor_401_once(mocker):
     """
     If a 401 response is received during Api() initialization, we should delete the refresh
@@ -642,6 +659,23 @@ def test_api_constructor_401_twice(mocker):
 
     assert RedditAccessToken.objects.count() == 0
     assert RedditRefreshToken.objects.count() == 0
+
+
+@pytest.mark.parametrize("is_none", [True, False])
+def test_api_constructor_none(settings, is_none):
+    """Api(None) should initialize for an anonymous user"""
+    settings.FEATURES[features.ANONYMOUS_ACCESS] = True
+    client = api.Api(None if is_none else AnonymousUser())
+    assert bool(client.user.is_anonymous) is True
+
+
+def test_api_constructor_anonymous_forbidden(settings):
+    """Anonymous access should cause an exception to be raised if the feature flag is not set"""
+    settings.FEATURES[features.ANONYMOUS_ACCESS] = False
+    with pytest.raises(Exception) as ex:
+        api.Api(None)
+
+    assert ex.value.args[0] == 'Anonymous access is not allowed'
 
 
 def test_get_or_create_auth_tokens(mocker, settings, user):
