@@ -17,7 +17,8 @@ declare var SETTINGS: {
     session_url: string,
     base_url: string,
     tos_url: string
-  }
+  },
+  allow_anonymous: boolean,
 }
 
 // mocha
