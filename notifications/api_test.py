@@ -23,24 +23,20 @@ from open_discussions.factories import UserFactory
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize('email_optin', [None, True, False])
-def test_ensure_notification_settings(user, email_optin):
+def test_ensure_notification_settings(user):
     """Assert that notification settings are created"""
-    profile = user.profile
-    profile.email_optin = email_optin
-    profile.save()
     assert NotificationSettings.objects.filter(user=user).count() == 0
     api.ensure_notification_settings(user)
     assert NotificationSettings.objects.filter(user=user).count() == 2
     ns = NotificationSettings.objects.get(user=user, notification_type=NOTIFICATION_TYPE_FRONTPAGE)
     assert ns.via_app is False
     assert ns.via_email is True
-    assert ns.trigger_frequency == FREQUENCY_DAILY if email_optin else FREQUENCY_NEVER
+    assert ns.trigger_frequency == FREQUENCY_DAILY
 
     ns = NotificationSettings.objects.get(user=user, notification_type=NOTIFICATION_TYPE_COMMENTS)
     assert ns.via_app is False
     assert ns.via_email is True
-    assert ns.trigger_frequency == FREQUENCY_IMMEDIATE if email_optin else FREQUENCY_NEVER
+    assert ns.trigger_frequency == FREQUENCY_IMMEDIATE
 
 
 def test_ensure_notification_settings_existing(user):
