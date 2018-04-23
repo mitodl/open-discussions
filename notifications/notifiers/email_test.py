@@ -7,7 +7,10 @@ from notifications.factories import (
     EmailNotificationFactory,
     NotificationSettingsFactory,
 )
-from notifications.models import EmailNotification
+from notifications.models import (
+    EmailNotification,
+    FREQUENCY_NEVER,
+)
 from notifications.notifiers import email
 from open_discussions import features
 from open_discussions.test_utils import any_instance_of
@@ -27,7 +30,7 @@ def notifier_settings(settings):
 @pytest.fixture
 def notifier():
     """Fixture for EmailNotifier"""
-    return email.EmailNotifier('frontpage', NotificationSettingsFactory.create())
+    return email.EmailNotifier('frontpage', NotificationSettingsFactory.create(daily=True))
 
 
 @pytest.mark.parametrize('is_enabled', [True, False])
@@ -110,5 +113,22 @@ def test_send_notification_no_user_mismatch(notifier, mocker):
 
     note.refresh_from_db()
     assert note.state == EmailNotification.STATE_PENDING
+
+    send_messages_mock.assert_not_called()
+
+
+def test_send_notification_never(notifier, mocker):
+    """Tests send_notification if trigger_frequency is never"""
+    send_messages_mock = mocker.patch('mail.api.send_messages')
+    notifier.notification_settings.trigger_frequency = FREQUENCY_NEVER
+    note = EmailNotificationFactory.create(
+        user=notifier.user,
+        notification_type=notifier.notification_settings.notification_type,
+        sending=True,
+    )
+
+    notifier.send_notification(note)
+    note.refresh_from_db()
+    assert note.state == EmailNotification.STATE_CANCELED
 
     send_messages_mock.assert_not_called()

@@ -64,8 +64,13 @@ class EmailNotifier(BaseNotifier):
         user = email_notification.user
 
         with utils.mark_as_sent_or_canceled(email_notification) as will_send:
+            # check against programmer error
             if user != self.user:
                 raise Exception("Notification user doesn't match settings user")
+
+            # if we're trying to send an email, but the preference is never, we should just cancel it
+            if self.notification_settings.is_triggered_never:
+                raise CancelNotificationError()
 
             if not will_send:
                 return
