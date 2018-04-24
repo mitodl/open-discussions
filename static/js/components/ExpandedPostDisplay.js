@@ -4,8 +4,9 @@ import React from "react"
 import moment from "moment"
 import R from "ramda"
 
-import { EditPostForm } from "../components/CommentForms"
+import { EditPostForm } from "./CommentForms"
 import { renderTextContent } from "./Markdown"
+import Embedly from "./Embedly"
 
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
 import { preventDefaultAndInvoke } from "../lib/util"
@@ -26,7 +27,8 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     showPostDeleteDialog: () => void,
     showPostReportDialog: () => void,
     showPermalinkUI: boolean,
-    toggleFollowPost: Post => void
+    toggleFollowPost: Post => void,
+    embedly: Object
   }
 
   renderTextContent = () => {
@@ -136,7 +138,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
   }
 
   render() {
-    const { post, forms, showPermalinkUI } = this.props
+    const { post, forms, showPermalinkUI, embedly } = this.props
     const formattedDate = moment(post.created).fromNow()
 
     return (
@@ -150,6 +152,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
             by <span className="author-name">{post.author_name}</span>,{" "}
             {formattedDate}
           </div>
+          <Embedly embedly={embedly} />
         </div>
         {!showPermalinkUI && post.text ? this.renderTextContent() : null}
         {R.has(editPostKey(post), forms) ? null : this.postActionButtons()}

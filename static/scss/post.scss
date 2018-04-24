@@ -74,11 +74,12 @@
   .summary {
     overflow: hidden;
 
-    img {
+    .profile-image {
       float: left;
       position: relative;
       top: 6px;
     }
+
   }
 
   .text-content {

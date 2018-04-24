@@ -25,8 +25,8 @@ import {
 } from "../hoc/withCommentModeration"
 import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import { CommentSortPicker } from "../components/SortPicker"
-import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/sorting"
 
+import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/sorting"
 import { formatCommentsCount } from "../lib/posts"
 import { validateContentReportForm } from "../lib/validation"
 import { actions } from "../actions"
@@ -100,7 +100,8 @@ type PostPageProps = {
   approveComment: (c: Comment) => void,
   removeComment: (c: Comment) => void,
   location: Location,
-  reportPost: (p: Post) => void
+  reportPost: (p: Post) => void,
+  embedly: Object
 }
 
 const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
@@ -166,10 +167,14 @@ class PostPage extends React.Component<*, void> {
     }
 
     try {
-      await Promise.all([
+      const [post] = await Promise.all([
         dispatch(actions.posts.get(postID)),
         dispatch(actions.comments.get(postID, commentID, qs.parse(search)))
       ])
+
+      if (post.url) {
+        await dispatch(actions.embedly.get(post.url))
+      }
 
       if (!channel) {
         dispatch(actions.channels.get(channelName))
@@ -313,6 +318,7 @@ class PostPage extends React.Component<*, void> {
       removeComment,
       approveComment,
       location: { search },
+      embedly,
       reportPost
     } = this.props
 
@@ -381,6 +387,7 @@ class PostPage extends React.Component<*, void> {
               )}
               showPermalinkUI={showPermalinkUI}
               toggleFollowPost={toggleFollowPost(dispatch)}
+              embedly={embedly}
             />
             {showPermalinkUI
               ? null
@@ -429,7 +436,15 @@ class PostPage extends React.Component<*, void> {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { posts, channels, comments, forms, channelModerators, ui } = state
+  const {
+    posts,
+    channels,
+    comments,
+    forms,
+    channelModerators,
+    ui,
+    embedly
+  } = state
   const postID = getPostID(ownProps)
   const channelName = getChannelName(ownProps)
   const commentID = getCommentID(ownProps)
@@ -437,6 +452,8 @@ const mapStateToProps = (state, ownProps) => {
   const channel = channels.data.get(channelName)
   const commentsTree = comments.data.get(postID)
   const moderators = channelModerators.data.get(channelName)
+  const embedlyResponse =
+    post && post.url ? embedly.data.get(post.url) : undefined
 
   const notFound = any404Error([posts, comments])
   const notAuthorized = any403Error([posts, comments])
@@ -469,7 +486,8 @@ const mapStateToProps = (state, ownProps) => {
     postDeleteDialogVisible:    ui.dialogs.has(DELETE_POST_DIALOG),
     commentDeleteDialogVisible: ui.dialogs.has(DELETE_COMMENT_DIALOG),
     postReportDialogVisible:    ui.dialogs.has(REPORT_POST_DIALOG),
-    commentReportDialogVisible: ui.dialogs.has(REPORT_COMMENT_DIALOG)
+    commentReportDialogVisible: ui.dialogs.has(REPORT_COMMENT_DIALOG),
+    embedly:                    embedlyResponse
   }
 }
 

@@ -35,6 +35,7 @@ import { formatTitle } from "../lib/title"
 import { createCommentTree } from "../reducers/comments"
 import { makeReportRecord } from "../factories/reports"
 import { VALID_COMMENT_SORT_TYPES } from "../lib/sorting"
+import { makeArticle } from "../factories/embedly"
 
 describe("PostPage", function() {
   let helper,
@@ -55,6 +56,7 @@ describe("PostPage", function() {
 
     helper = new IntegrationTestHelper()
     helper.getPostStub.returns(Promise.resolve(post))
+    helper.getEmbedlyStub.returns(Promise.resolve(makeArticle()))
     helper.getChannelStub.returns(Promise.resolve(channel))
     helper.getChannelsStub.returns(Promise.resolve([]))
     helper.getCommentsStub.returns(Promise.resolve(commentsResponse))

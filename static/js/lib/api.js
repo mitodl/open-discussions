@@ -27,6 +27,7 @@ import type {
   ReportRecord
 } from "../flow/discussionTypes"
 import type { NotificationSetting } from "../flow/settingsTypes"
+import type { EmbedlyResponse } from "../reducers/embedly"
 
 const paramsToQueryString = paramSelector =>
   R.compose(toQueryString, R.reject(R.isNil), paramSelector)
@@ -239,7 +240,10 @@ export const patchCommentSetting = (
       body:   JSON.stringify(setting)
     })
 
-export const getEmbedly = (url: string): Promise<Object> =>
-  fetchJSONWithAuthFailure(
+export const getEmbedly = async (url: string): Promise<EmbedlyResponse> => {
+  const response = await fetchJSONWithAuthFailure(
     `/api/v0/embedly/${encodeURIComponent(encodeURIComponent(url))}/`
   )
+
+  return { url, response }
+}
