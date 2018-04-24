@@ -49,10 +49,12 @@ def test_add_subscriber_forbidden(client, staff_jwt_header):
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_add_subscriber_anonymous(client):
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_add_subscriber_anonymous(client, settings, allow_anonymous):
     """
     Anonymous users can't add subscribers
     """
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse('subscriber-list', kwargs={'channel_name': 'admin_channel'})
     resp = client.post(url, data={'subscriber_name': subscriber.username}, format='json')
@@ -84,8 +86,10 @@ def test_detail_subscriber_missing(client):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_detail_subscriber_anonymous(client):
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_detail_subscriber_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't see subscriber information"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse(
         'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
@@ -115,8 +119,10 @@ def test_remove_subscriber_again(client, staff_jwt_header):
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_remove_subscriber_anonymous(client):
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_remove_subscriber_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't remove subscribers"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse(
         'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})

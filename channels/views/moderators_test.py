@@ -57,8 +57,10 @@ def test_add_moderator_again(client, staff_jwt_header):
     assert resp.json() == {'moderator_name': moderator.username}
 
 
-def test_add_moderator_anonymous(client):
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_add_moderator_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't add moderators"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('moderator-list', kwargs={'channel_name': 'a_channel'})
     resp = client.post(url, data={'moderator_name': 'some_moderator'}, format='json')
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
@@ -86,8 +88,10 @@ def test_remove_moderator_again(client, staff_jwt_header):
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_remove_moderator_anonymous(client):
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_remove_moderator_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't add moderators"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('moderator-detail', kwargs={'channel_name': 'a_channel', 'moderator_name': 'doesnt_matter'})
     resp = client.delete(url, data={'moderator_name': 'some_moderator'}, format='json')
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
