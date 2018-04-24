@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.24.0
+--------------
+
+- Allow anonymous access for channels (#626)
+
 Version 0.23.0
 --------------
 
