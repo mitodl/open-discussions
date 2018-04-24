@@ -112,11 +112,12 @@ def test_create_post_not_found(client, logged_in_profile):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_create_post_anonymous(client, settings):
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_create_post_anonymous(client, settings, allow_anonymous):
     """
     Anonymous users can't create posts
     """
-    settings.FEATURES[ANONYMOUS_ACCESS] = True
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('post-list', kwargs={'channel_name': 'doesnt_matter'})
     resp = client.post(url, {
         'title': 'parameterized testing',
@@ -822,9 +823,10 @@ def test_update_post_not_found(client, jwt_header):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_update_post_anonymous(client, settings):
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_update_post_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't update posts"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = True
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('post-detail', kwargs={'post_id': 'doesntmatter'})
     resp = client.patch(url, format='json', data={'text': 'overwrite'})
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
@@ -871,9 +873,10 @@ def test_delete_post(client, logged_in_profile):
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_delete_post_anonymous(client, settings):
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_delete_post_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't delete posts"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = True
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('post-detail', kwargs={'post_id': 'doesnt_matter'})
     resp = client.delete(url)
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
