@@ -570,7 +570,7 @@ def test_create_comment_forbidden(client, logged_in_profile):
 @pytest.mark.parametrize("allow_anonymous", [True, False])
 def test_create_comment_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't create comments"""
-    settings[ANONYMOUS_ACCESS] = allow_anonymous
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('comment-list', kwargs={'post_id': 'doesntmatter'})
     resp = client.post(url, data={
         "text": "reply_to_post 2",
@@ -743,7 +743,7 @@ def test_update_comment_forbidden(client, logged_in_profile):
 @pytest.mark.parametrize("allow_anonymous", [True, False])
 def test_update_comment_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't update comments"""
-    settings[ANONYMOUS_ACCESS] = allow_anonymous
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('comment-detail', kwargs={'comment_id': 'doesntmatter'})
     resp = client.patch(url, type='json', data={
         "text": "missing",
@@ -991,7 +991,7 @@ def test_delete_comment(client, logged_in_profile):
 @pytest.mark.parametrize("allow_anonymous", [True, False])
 def test_delete_comment_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't delete comments"""
-    settings[ANONYMOUS_ACCESS] = allow_anonymous
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('comment-detail', kwargs={'comment_id': 'doesntmatter'})
     resp = client.delete(url)
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
