@@ -1,0 +1,32 @@
+{
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Quaerat occaecati minus doloribus quo animi consequuntur. Qui sint magnam maiores praesentium. Odio iusto in hic velit sit. Deleniti possimus nam soluta voluptatum.\nUllam quisquam explicabo alias mollitia eligendi. Explicabo ut voluptas unde incidunt laudantium totam nihil. Rem nam ullam voluptatibus similique atque voluptatem quia.",
+      "name": "1524088113_voluptates",
+      "public_description": "Sit ut iste consectetur. Adipisci dignissimos veniam doloribus quidem non ad optio.",
+      "title": "Unde similique aperiam explicabo."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "evq",
+      "post_id": "ajo",
+      "text": "Occaecati dolores excepturi nisi dolor sed. Repudiandae ut natus culpa quae voluptates."
+    }
+  },
+  "posts": {
+    "a post with a comment": {
+      "id": "ajo",
+      "text": "Sapiente corrupti modi nemo. Magni eveniet tempora deleniti atque a praesentium.",
+      "title": "Molestiae ut excepturi velit ullam nobis."
+    }
+  },
+  "users": {
+    "staff_user": {
+      "username": "01CBDBNZ2HZPWZ0VJ5CPMMVFBD"
+    }
+  }
+}

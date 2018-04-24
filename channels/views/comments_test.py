@@ -1,5 +1,5 @@
 """Tests for views for REST APIs for comments"""
-# pylint: disable=unused-argument,redefined-outer-name
+# pylint: disable=unused-argument,redefined-outer-name,too-many-lines
 from itertools import product
 
 import pytest
@@ -9,6 +9,7 @@ from rest_framework import status
 from channels.test_constants import LIST_MORE_COMMENTS_RESPONSE
 from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
+from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = pytest.mark.betamax
 
@@ -95,6 +96,43 @@ def test_list_comments(client, logged_in_profile, missing_user):
             'num_reports': 0,
         },
     ]
+
+
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_list_comments_anonymous(client, public_channel, reddit_factories, settings, allow_anonymous):
+    """List comments as an anonymous user"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    user = UserFactory.create(username='01CBD756K3RS4Z59TCJ46QCHZJ')
+    post = reddit_factories.text_post('a post with comments', user, channel=public_channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+
+    url = reverse('comment-list', kwargs={'post_id': post.id})
+    resp = client.get(url)
+    if allow_anonymous:
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.json() == [
+            {
+                "id": comment.id,
+                'parent_id': None,
+                "post_id": post.id,
+                "text": 'Ut distinctio omnis consequuntur numquam. Velit aspernatur voluptate sint.',
+                "author_id": user.username,
+                "score": 1,
+                "upvoted": False,
+                "downvoted": False,
+                "removed": False,
+                "deleted": False,
+                "subscribed": False,
+                "created": comment.created,
+                'profile_image': user.profile.image_small,
+                'author_name': user.profile.name,
+                'edited': False,
+                'comment_type': 'comment',
+                'num_reports': None,
+            },
+        ]
+    else:
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_list_comments_none(client, private_channel_and_contributor, reddit_factories):
@@ -279,6 +317,53 @@ def test_more_comments_children(client, logged_in_profile):
     ]
 
 
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_more_comments_anonymous(client, public_channel, reddit_factories, settings, allow_anonymous):
+    """List more comments as an anonymous user"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    user = UserFactory.create(username='01CBDB4ZD2QXBM0ERGB3C5GEA5')
+    post = reddit_factories.text_post('a post with comments', user, channel=public_channel)
+    # 51 to show a morecomments link
+    comments = [
+        reddit_factories.comment("comment{}".format(number), user, post_id=post.id)
+        for number in range(51)
+    ]
+    last_comment = comments[-1]
+
+    url = "{base}?post_id={post_id}&children={comment_id}".format(
+        base=reverse('morecomments-detail'),
+        post_id=post.id,
+        comment_id=last_comment.id,
+    )
+    resp = client.get(url)
+    if allow_anonymous:
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.json() == [
+            {
+                'author_id': user.username,
+                'author_name': user.profile.name,
+                'comment_type': 'comment',
+                'created': last_comment.created,
+                'deleted': False,
+                'downvoted': False,
+                'edited': False,
+                'id': last_comment.id,
+                'num_reports': None,
+                'parent_id': None,
+                'post_id': post.id,
+                'profile_image': user.profile.image_small,
+                'removed': False,
+                'score': 1,
+                'subscribed': False,
+                'text': 'Facilis velit magni autem neque velit vitae. '
+                        'Ipsam inventore nobis molestiae corrupti molestias.',
+                'upvoted': False,
+            },
+        ]
+    else:
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+
+
 @pytest.mark.parametrize("missing_post,missing_parent", product([True, False], repeat=2))
 def test_more_comments_404(client, logged_in_profile, missing_post, missing_parent):
     """If the post id or comment id is wrong, we should return a 404"""
@@ -404,6 +489,43 @@ def test_get_comment_404(client, jwt_header, private_channel_and_contributor, re
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_get_comment_anonymous(client, public_channel, reddit_factories, settings, allow_anonymous):
+    """Get a comment as an anonymous user"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    user = UserFactory.create(username='01CBDBP5F8XRQ1T5GATHDWA99Z')
+    post = reddit_factories.text_post('a post with a comment', user, channel=public_channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+
+    url = reverse('comment-detail', kwargs={'comment_id': comment.id})
+    resp = client.get(url)
+    if allow_anonymous:
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.json() == [
+            {
+                'author_id': user.username,
+                'author_name': user.profile.name,
+                'comment_type': 'comment',
+                'created': comment.created,
+                'deleted': False,
+                'downvoted': False,
+                'edited': False,
+                'id': comment.id,
+                'num_reports': None,
+                'parent_id': None,
+                'post_id': post.id,
+                'profile_image': user.profile.image_small,
+                'removed': False,
+                'score': 1,
+                'subscribed': False,
+                'text': 'Occaecati dolores excepturi nisi dolor sed. Repudiandae ut natus culpa quae voluptates.',
+                'upvoted': False,
+            },
+        ]
+    else:
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+
+
 def test_create_comment(client, logged_in_profile, mock_notify_subscribed_users):
     """Create a comment"""
     post_id = '2'
@@ -443,6 +565,17 @@ def test_create_comment_forbidden(client, logged_in_profile):
         "text": "reply_to_post 2",
     })
     assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_create_comment_anonymous(client, settings, allow_anonymous):
+    """Anonymous users can't create comments"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    url = reverse('comment-list', kwargs={'post_id': 'doesntmatter'})
+    resp = client.post(url, data={
+        "text": "reply_to_post 2",
+    })
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_create_comment_not_found(client, logged_in_profile):
@@ -605,6 +738,17 @@ def test_update_comment_forbidden(client, logged_in_profile):
         "text": "updated text",
     })
     assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_update_comment_anonymous(client, settings, allow_anonymous):
+    """Anonymous users can't update comments"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    url = reverse('comment-detail', kwargs={'comment_id': 'doesntmatter'})
+    resp = client.patch(url, type='json', data={
+        "text": "missing",
+    })
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_update_comment_upvote(client, logged_in_profile):
@@ -842,6 +986,15 @@ def test_delete_comment(client, logged_in_profile):
     url = reverse('comment-detail', kwargs={'comment_id': '6'})
     resp = client.delete(url)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_delete_comment_anonymous(client, settings, allow_anonymous):
+    """Anonymous users can't delete comments"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    url = reverse('comment-detail', kwargs={'comment_id': 'doesntmatter'})
+    resp = client.delete(url)
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_update_comment_subscribe(client, staff_user, private_channel_and_contributor, reddit_factories):
