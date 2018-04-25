@@ -28,11 +28,13 @@ django-webpack-loader==0.5.0
 django==1.11.10
 djangorestframework-jwt==1.11.0
 djangorestframework==3.7.7
-elasticsearch==5.4.0      # via django-server-status
+elasticsearch-dsl==6.1.0
+elasticsearch==6.2.0
 factory-boy==2.10.0
 faker==0.7.17
 html5lib==0.999999999
 idna==2.5                 # via requests
+ipaddress==1.0.22         # via elasticsearch-dsl
 ipython-genutils==0.2.0   # via traitlets
 ipython==6.1.0
 jedi==0.10.2              # via ipython
@@ -57,7 +59,7 @@ raven==6.1.0
 redis==2.10.5
 requests==2.18.1
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via django-anymail, django-server-status, faker, html5lib, prompt-toolkit, python-dateutil, traitlets
+six==1.10.0               # via django-anymail, django-server-status, elasticsearch-dsl, faker, html5lib, prompt-toolkit, python-dateutil, traitlets
 static3==0.5.1
 traitlets==4.3.2          # via ipython
 ulid-py==0.0.3

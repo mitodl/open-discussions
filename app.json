@@ -32,6 +32,15 @@
       "description": "S3 Bucket name.",
       "required": false
     },
+    "ELASTICSEARCH_HTTP_AUTH": {
+      "description": "Basic auth settings for connecting to Elasticsearch"
+    },
+    "ELASTICSEARCH_INDEX": {
+      "description": "Index to use on Elasticsearch"
+    },
+    "ELASTICSEARCH_URL": {
+      "description": "URL for connecting to Elasticsearch cluster"
+    },
     "GA_TRACKING_ID": {
       "description": "Google analytics tracking ID",
       "required": false
