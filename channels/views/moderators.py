@@ -4,20 +4,22 @@ from praw.models import Redditor
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListCreateAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from channels.api import Api
 from channels.serializers import ModeratorSerializer
-from open_discussions.permissions import JwtIsStaffOrReadonlyPermission
+from open_discussions.permissions import (
+    AnonymousAccessReadonlyPermission,
+    JwtIsStaffOrReadonlyPermission,
+)
 
 
 class ModeratorListView(ListCreateAPIView):
     """
     View for listing and adding moderators
     """
-    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
+    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffOrReadonlyPermission,)
     serializer_class = ModeratorSerializer
 
     def get_queryset(self):
@@ -31,7 +33,7 @@ class ModeratorDetailView(APIView):
     """
     View to retrieve and remove moderators
     """
-    permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission,)
+    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffOrReadonlyPermission,)
 
     def get(self, request, *args, **kwargs):
         """Get moderator for the channel"""

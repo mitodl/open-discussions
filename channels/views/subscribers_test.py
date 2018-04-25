@@ -5,6 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from open_discussions.factories import UserFactory
+from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = pytest.mark.betamax
 
@@ -49,6 +50,18 @@ def test_add_subscriber_forbidden(client, staff_jwt_header):
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_add_subscriber_anonymous(client, settings, allow_anonymous):
+    """
+    Anonymous users can't add subscribers
+    """
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse('subscriber-list', kwargs={'channel_name': 'admin_channel'})
+    resp = client.post(url, data={'subscriber_name': subscriber.username}, format='json')
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+
+
 def test_detail_subscriber(client, staff_jwt_header):
     """
     Detail of a subscriber in a channel
@@ -74,6 +87,17 @@ def test_detail_subscriber_missing(client):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_detail_subscriber_anonymous(client, settings, allow_anonymous):
+    """Anonymous users can't see subscriber information"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse(
+        'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+
+
 def test_remove_subscriber(client, staff_jwt_header):
     """
     Removes a subscriber from a channel
@@ -94,3 +118,14 @@ def test_remove_subscriber_again(client, staff_jwt_header):
         'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
     resp = client.delete(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_remove_subscriber_anonymous(client, settings, allow_anonymous):
+    """Anonymous users can't remove subscribers"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    url = reverse(
+        'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
+    resp = client.delete(url)
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED

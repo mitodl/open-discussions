@@ -4,6 +4,8 @@ from django.urls import reverse
 from rest_framework import status
 
 from channels.api import Api
+from open_discussions.factories import UserFactory
+from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = pytest.mark.betamax
 
@@ -37,6 +39,30 @@ def test_report_comment(client, private_channel_and_contributor, reddit_factorie
     resp = client.post(url, data=payload)
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == payload
+
+
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_report_anonymous(client, public_channel, reddit_factories, settings, allow_anonymous):
+    """Anonymous users can't report posts or comments"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    user = UserFactory.create()
+    post = reddit_factories.text_post('post', user, channel=public_channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+    url = reverse('report-content')
+
+    # Post
+    resp = client.post(url, data={
+        'post_id': post.id,
+        'reason': 'spam',
+    })
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+
+    # Comment
+    resp = client.post(url, data={
+        'comment_id': comment.id,
+        'reason': 'spam',
+    })
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_list_reports(staff_client, private_channel_and_contributor, reddit_factories, staff_api):

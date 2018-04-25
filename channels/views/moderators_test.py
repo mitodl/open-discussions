@@ -5,6 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from open_discussions.factories import UserFactory
+from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = pytest.mark.betamax
 
@@ -19,6 +20,19 @@ def test_list_moderators(client, private_channel_and_contributor, staff_user):
     resp = client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [{'moderator_name': staff_user.username}]
+
+
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_list_moderators_anonymous(client, public_channel, staff_user, settings, allow_anonymous):
+    """Anonymous users should see the moderator list"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    url = reverse('moderator-list', kwargs={'channel_name': public_channel.name})
+    resp = client.get(url)
+    if allow_anonymous:
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.json() == [{'moderator_name': staff_user.username}]
+    else:
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_add_moderator(client, staff_jwt_header):
@@ -43,6 +57,15 @@ def test_add_moderator_again(client, staff_jwt_header):
     assert resp.json() == {'moderator_name': moderator.username}
 
 
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_add_moderator_anonymous(client, settings, allow_anonymous):
+    """Anonymous users can't add moderators"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    url = reverse('moderator-list', kwargs={'channel_name': 'a_channel'})
+    resp = client.post(url, data={'moderator_name': 'some_moderator'}, format='json')
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+
+
 def test_remove_moderator(client, staff_jwt_header):
     """
     Removes a moderator from a channel
@@ -63,3 +86,12 @@ def test_remove_moderator_again(client, staff_jwt_header):
         'moderator-detail', kwargs={'channel_name': 'admin_channel', 'moderator_name': moderator.username})
     resp = client.delete(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.parametrize("allow_anonymous", [True, False])
+def test_remove_moderator_anonymous(client, settings, allow_anonymous):
+    """Anonymous users can't add moderators"""
+    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
+    url = reverse('moderator-detail', kwargs={'channel_name': 'a_channel', 'moderator_name': 'doesnt_matter'})
+    resp = client.delete(url, data={'moderator_name': 'some_moderator'}, format='json')
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
