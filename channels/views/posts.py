@@ -33,7 +33,7 @@ class PostListView(APIView):
 
     def get(self, request, *args, **kwargs):
         """Get list for posts and attach User objects to them"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             listing_params = get_listing_params(self.request)
             api = Api(user=request.user)
             paginated_posts = api.list_posts(self.kwargs['channel_name'], listing_params)
@@ -53,7 +53,7 @@ class PostListView(APIView):
 
     def post(self, request, *args, **kwargs):
         """Create a new post"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             serializer = PostSerializer(data=request.data, context=self.get_serializer_context())
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -84,7 +84,7 @@ class PostDetailView(APIView):
 
     def get(self, request, *args, **kwargs):
         """Get post"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             post = self.get_object()
             users = lookup_users_for_posts([post])
             if not post.author or post.author.name not in users:
@@ -108,7 +108,7 @@ class PostDetailView(APIView):
 
     def patch(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Update a post"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             post = self.get_object()
             serializer = PostSerializer(
                 instance=post,
