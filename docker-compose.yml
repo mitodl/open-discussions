@@ -10,6 +10,17 @@ services:
     ports:
       - "6379"
 
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
+    environment:
+      - network.host=0.0.0.0
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      - rest.action.multi.allow_explicit_index=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9101:9200"
+
   nginx:
     image: nginx
     ports:

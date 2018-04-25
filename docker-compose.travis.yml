@@ -16,6 +16,7 @@ services:
       dockerfile: ./travis/Dockerfile-travis-web
     environment:
       # for celery, to avoid ImproperlyConfigured
+      ELASTICSEARCH_INDEX: 'testindex'
       MAILGUN_URL: 'http://fake.example.com'
       MAILGUN_KEY: 'fake'
       MAILGUN_SENDER_DOMAIN: 'fake.example.com'

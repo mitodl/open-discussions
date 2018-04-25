@@ -89,6 +89,7 @@ INSTALLED_APPS = (
     'sites',
     'mail',
     'notifications',
+    'search',
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -253,6 +254,7 @@ EMBEDLY_EMBED_URL = get_string('EMBEDLY_EMBED_URL', "https://api.embed.ly/1/oemb
 # Logging configuration
 LOG_LEVEL = get_string('OPEN_DISCUSSIONS_LOG_LEVEL', 'INFO')
 DJANGO_LOG_LEVEL = get_string('DJANGO_LOG_LEVEL', 'INFO')
+ES_LOG_LEVEL = get_string('ES_LOG_LEVEL', 'INFO')
 SENTRY_LOG_LEVEL = get_string('SENTRY_LOG_LEVEL', 'ERROR')
 
 # For logging to a remote syslog host
@@ -318,6 +320,9 @@ LOGGING = {
             'level': DJANGO_LOG_LEVEL,
             'propagate': True,
         },
+        'elasticsearch': {
+            'level': ES_LOG_LEVEL,
+        },
         'raven': {
             'level': SENTRY_LOG_LEVEL,
             'handlers': []
@@ -351,7 +356,7 @@ if get_bool('OPEN_DISCUSSIONS_BYPASS_SYSLOG', False):
 
 # server-status
 STATUS_TOKEN = get_string("STATUS_TOKEN", "")
-HEALTH_CHECK = ['CELERY', 'REDIS', 'POSTGRES']
+HEALTH_CHECK = ['CELERY', 'REDIS', 'POSTGRES', 'ELASTIC_SEARCH']
 
 GA_TRACKING_ID = get_string("GA_TRACKING_ID", "")
 REACT_GA_DEBUG = get_bool("REACT_GA_DEBUG", False)
@@ -430,6 +435,18 @@ CACHES = {
         },
     },
 }
+
+# Elasticsearch
+ELASTICSEARCH_DEFAULT_PAGE_SIZE = get_int('ELASTICSEARCH_DEFAULT_PAGE_SIZE', 50)
+ELASTICSEARCH_URL = get_string("ELASTICSEARCH_URL", None)
+if get_string("HEROKU_PARENT_APP_NAME", None) is not None:
+    ELASTICSEARCH_INDEX = get_string('HEROKU_APP_NAME', None)
+else:
+    ELASTICSEARCH_INDEX = get_string('ELASTICSEARCH_INDEX', None)
+if not ELASTICSEARCH_INDEX:
+    raise ImproperlyConfigured("Missing ELASTICSEARCH_INDEX")
+ELASTICSEARCH_HTTP_AUTH = get_string("ELASTICSEARCH_HTTP_AUTH", None)
+
 
 # reddit-specific settings
 OPEN_DISCUSSIONS_REDDIT_CLIENT_ID = get_string('OPEN_DISCUSSIONS_REDDIT_CLIENT_ID', None)
