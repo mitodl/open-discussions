@@ -14,12 +14,14 @@ from channels.utils import (
     lookup_subscriptions_for_posts,
     translate_praw_exceptions,
 )
+from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 
 class PostListView(APIView):
     """
     View for listing and creating posts
     """
+    permission_classes = (AnonymousAccessReadonlyPermission, )
 
     def get_serializer_context(self):
         """Context for the request and view"""
@@ -65,6 +67,7 @@ class PostDetailView(APIView):
     """
     View for retrieving, updating or destroying posts
     """
+    permission_classes = (AnonymousAccessReadonlyPermission, )
 
     def get_serializer_context(self):
         """Context for the request and view"""

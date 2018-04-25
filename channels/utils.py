@@ -142,7 +142,7 @@ def _lookup_subscriptions_for_posts(posts, user):
     Return:
         list of str: list of base36 ids of posts the user is subscribed to
     """
-    if not posts:
+    if not posts or user.is_anonymous:
         return []
 
     return Subscription.objects.filter(

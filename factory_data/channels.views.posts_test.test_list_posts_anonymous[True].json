@@ -1,0 +1,23 @@
+{
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Voluptas qui nesciunt ea reiciendis esse excepturi dolores nobis. Officiis ea harum consequuntur itaque earum. Sed ipsa quam nemo deserunt eaque fuga fugit. Nesciunt dicta quam dolor ipsum modi.\nSapiente veniam ea ratione dolore. Sint tempore magni quasi officiis. Ex labore sapiente modi vitae dolore.\nTenetur voluptas voluptatem neque. Perferendis sit repudiandae quo distinctio sunt. Nihil facilis sed eos eaque eius. Id quas quaerat molestias eius.",
+      "name": "1524162802_labore",
+      "public_description": "Laborum officia odit laboriosam quo illo magni qui. Sequi beatae reprehenderit error quisquam unde.",
+      "title": "Totam maxime libero pariatur facere dolore ab."
+    }
+  },
+  "posts": {
+    "link_post": {
+      "id": "ajy",
+      "title": "Quaerat alias illo alias quo.",
+      "url": "http://greene-lee.com/"
+    }
+  },
+  "users": {
+    "staff_user": {
+      "username": "01CBFJX91KG68DNR0F6TG4W2JE"
+    }
+  }
+}
