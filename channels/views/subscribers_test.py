@@ -5,6 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from open_discussions.factories import UserFactory
+from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = pytest.mark.betamax
 
