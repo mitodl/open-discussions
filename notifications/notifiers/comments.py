@@ -9,6 +9,7 @@ from channels.serializers import (
 )
 from notifications.models import CommentEvent
 from notifications.notifiers.email import EmailNotifier
+from notifications.utils import praw_error_to_cancelled
 from open_discussions import features
 
 
@@ -35,6 +36,7 @@ class CommentNotifier(EmailNotifier):
             super().can_notify(last_notification)
         )
 
+    @praw_error_to_cancelled()
     def _get_notification_data(
             self, current_notification, last_notification
     ):  # pylint: disable=unused-argument
