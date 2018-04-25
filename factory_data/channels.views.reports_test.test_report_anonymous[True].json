@@ -1,0 +1,32 @@
+{
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Perspiciatis dolorum quos ab deserunt. Magni exercitationem dolorum nostrum.\nPariatur recusandae voluptas quia maxime quo dolores. Animi nemo totam vitae unde ratione nam. Aut sapiente excepturi ad consectetur sint.\nNihil asperiores facilis autem ratione voluptatibus. Qui rerum qui minima architecto aperiam officia.",
+      "name": "1524166762_et",
+      "public_description": "Non atque soluta ipsum cupiditate. Ullam natus ea quia blanditiis quia repellendus.",
+      "title": "Ipsam maiores doloribus minus eum."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "eyo",
+      "post_id": "ak8",
+      "text": "Non totam enim veritatis et aut. Eum aliquam quibusdam mollitia vitae fugit doloremque."
+    }
+  },
+  "posts": {
+    "post": {
+      "id": "ak8",
+      "text": "Esse vero deserunt porro ab. Eaque nisi voluptates animi ut. Nihil amet id recusandae.",
+      "title": "Ullam optio accusantium iusto."
+    }
+  },
+  "users": {
+    "staff_user": {
+      "username": "01CBFPP4AMHSRFT9K1K63994FK"
+    }
+  }
+}
