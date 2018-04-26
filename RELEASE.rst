@@ -1,6 +1,20 @@
 Release Notes
 =============
 
+Version 0.24.1
+--------------
+
+- Added handling for praw errors in email notifications
+- Update frontend to allow anonymous access (#629)
+- Don&#39;t run celery on Travis (#648)
+- Add empty search Django app and elasticsearch Docker container (#645)
+- Allow access for anonymous users to see moderator list (#627)
+- Handle anonymous access for frontpage and posts (#628)
+- Add API for embedly
+- Fixed race condition with NotificationSettings trigger_frequency
+- Handle anonymous users for comments (#621)
+- Remove email_optin logic (#631)
+
 Version 0.24.0
 --------------
 
