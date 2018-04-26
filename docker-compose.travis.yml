@@ -9,18 +9,3 @@ services:
     build:
       context: .
       dockerfile: ./travis/Dockerfile-travis-web
-
-  celery:
-    build:
-      context: .
-      dockerfile: ./travis/Dockerfile-travis-web
-    environment:
-      # for celery, to avoid ImproperlyConfigured
-      ELASTICSEARCH_INDEX: 'testindex'
-      MAILGUN_URL: 'http://fake.example.com'
-      MAILGUN_KEY: 'fake'
-      MAILGUN_SENDER_DOMAIN: 'fake.example.com'
-      OPEN_DISCUSSIONS_COOKIE_DOMAIN: 'fake.example.com'
-      OPEN_DISCUSSIONS_COOKIE_NAME: 'fake'
-      OPEN_DISCUSSIONS_BASE_URL: 'http://localhost'
-      OPEN_DISCUSSIONS_DEFAULT_SITE_KEY: 'fake'
