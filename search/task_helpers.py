@@ -13,6 +13,7 @@ from channels.constants import (
     VoteActions,
 )
 from search.indexing_api import gen_post_id
+from search.serializers import serialize_post
 from search.tasks import (
     create_document,
     update_document_with_partial,
@@ -49,17 +50,7 @@ def index_full_post(post_obj):
     Args:
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
-    data = {
-        'object_type': POST_TYPE,
-        'author': post_obj.author.name,
-        'channel_title': post_obj.subreddit.display_name,
-        'text': post_obj.selftext,
-        'score': post_obj.score,
-        'created': post_obj.created,
-        'post_id': post_obj.id,
-        'post_title': post_obj.title,
-        'num_comments': post_obj.num_comments,
-    }
+    data = serialize_post(post_obj)
     return create_document.delay(
         gen_post_id(post_obj.id),
         data

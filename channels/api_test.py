@@ -102,7 +102,7 @@ def test_list_channels_user(mock_get_client):
     channels = api.Api(user=user).list_channels()
     assert channels == mock_get_client.return_value.user.subreddits.return_value
     mock_get_client.assert_called_once_with(user=user)
-    mock_get_client.return_value.user.subreddits.assert_called_once_with()
+    mock_get_client.return_value.user.subreddits.assert_called_once_with(limit=None)
 
 
 @pytest.mark.parametrize('channel_type', VALID_CHANNEL_TYPES)

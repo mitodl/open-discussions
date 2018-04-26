@@ -372,7 +372,7 @@ class Api:
             ListingGenerator(praw.models.Subreddit): a generator over channel listings
         """
         # Until we decide otherwise anonymous users should not see any channels in the list
-        return self.reddit.user.subreddits() if not self.user.is_anonymous else []
+        return self.reddit.user.subreddits(limit=None) if not self.user.is_anonymous else []
 
     def get_channel(self, name):
         """

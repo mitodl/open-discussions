@@ -2,9 +2,23 @@
 Functions and constants for Elasticsearch indexing
 """
 from functools import partial
-from django.conf import settings
+import logging
 
-from search.connection import get_conn
+from elasticsearch.helpers import bulk
+from django.contrib.auth import get_user_model
+
+from search.connection import (
+    get_active_aliases,
+    get_conn,
+)
+from search.exceptions import ReindexException
+from search.serializers import (
+    serialize_post_and_comments,
+)
+
+
+log = logging.getLogger(__name__)
+User = get_user_model()
 
 
 GLOBAL_DOC_TYPE = '_doc'
@@ -31,15 +45,15 @@ def gen_post_id(reddit_obj_id):
     return 'p_{}'.format(reddit_obj_id)
 
 
-def clear_and_create_index(skip_mapping=False):
+def clear_and_create_index(*, index_name=None, skip_mapping=False):
     """
     Wipe and recreate index and mapping. No indexing is done.
 
     Args:
+        index_name (str): The name of the index to clear
         skip_mapping (bool): If true, don't set any mapping
     """
     conn = get_conn(verify=False)
-    index_name = settings.ELASTICSEARCH_INDEX
     if conn.indices.exists(index_name):
         conn.indices.delete(index_name)
     index_create_data = {
@@ -77,12 +91,13 @@ def create_document(doc_id, data):
         data (dict): Full ES document data
     """
     conn = get_conn(verify=True)
-    return conn.create(
-        index=settings.ELASTICSEARCH_INDEX,
-        doc_type=GLOBAL_DOC_TYPE,
-        body=data,
-        id=doc_id,
-    )
+    for alias in get_active_aliases():
+        return conn.create(
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            body=data,
+            id=doc_id,
+        )
 
 
 def _update_document(doc_id, data, update_key=None):
@@ -94,12 +109,13 @@ def _update_document(doc_id, data, update_key=None):
         data (dict): Full ES document data
     """
     conn = get_conn(verify=True)
-    return conn.update(
-        index=settings.ELASTICSEARCH_INDEX,
-        doc_type=GLOBAL_DOC_TYPE,
-        body={update_key: data},
-        id=doc_id,
-    )
+    for alias in get_active_aliases():
+        return conn.update(
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            body={update_key: data},
+            id=doc_id,
+        )
 
 
 update_document_with_partial = partial(_update_document, update_key='doc')
@@ -122,3 +138,44 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
         },
         update_key='script'
     )
+
+
+def refresh_index(index):
+    """
+    Refresh the elasticsearch index
+
+    Args:
+        index (str): The elasticsearch index to refresh
+    """
+    get_conn().indices.refresh(index)
+
+
+def index_post(api_username, post_id):
+    """
+    Index a post and its comments
+
+    Args:
+        api_username (str): The API username
+        post_id (str): The post string
+    """
+    from channels.api import Api
+
+    conn = get_conn()
+    client = Api(User.objects.get(username=api_username))
+    post = client.get_post(post_id)
+    comments = post.comments
+    comments.replace_more(limit=None)
+
+    for alias in get_active_aliases():
+        _, errors = bulk(
+            conn,
+            serialize_post_and_comments(post),
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            # Lower chunk size from default 500 to try to manage memory use
+            chunk_size=100,
+        )
+        if len(errors) > 0:
+            raise ReindexException("Error during bulk insert: {errors}".format(
+                errors=errors
+            ))
