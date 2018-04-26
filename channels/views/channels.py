@@ -30,7 +30,7 @@ class ChannelListView(ListCreateAPIView):
         return api.list_channels()
 
     def post(self, request, *args, **kwargs):
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             return super().post(request, *args, **kwargs)
 
 
@@ -51,9 +51,9 @@ class ChannelDetailView(RetrieveUpdateAPIView):
         if len(kwargs['channel_name']) == 1:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             return super().get(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             return super().patch(request, *args, **kwargs)

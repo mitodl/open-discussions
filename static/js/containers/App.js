@@ -44,13 +44,14 @@ class App extends React.Component<*, void> {
 
   componentWillMount() {
     const { location: { pathname } } = this.props
-    if (
-      pathname === AUTH_REQUIRED_URL ||
-      !SETTINGS.authenticated_site.session_url ||
-      pathname.startsWith(SETTINGS_URL)
-    ) {
-      // either user is at auth required page
-      // or they will be soon redirected there due to missing session_url
+    if (pathname === AUTH_REQUIRED_URL || pathname.startsWith(SETTINGS_URL)) {
+      // user is at auth required page or settings page
+      return
+    }
+
+    if (!SETTINGS.authenticated_site.session_url && !SETTINGS.allow_anonymous) {
+      // user will be redirected to login required page due to missing session_url
+      // if anonymous access is not allowed
       return
     }
 
@@ -70,7 +71,8 @@ class App extends React.Component<*, void> {
     if (
       !SETTINGS.authenticated_site.session_url &&
       pathname !== AUTH_REQUIRED_URL &&
-      !pathname.startsWith(SETTINGS_URL)
+      !pathname.startsWith(SETTINGS_URL) &&
+      !SETTINGS.allow_anonymous
     ) {
       // user does not have the jwt cookie, they must go through login workflow first
       return <Redirect to={AUTH_REQUIRED_URL} />

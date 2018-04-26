@@ -26,7 +26,7 @@ class ReportContentView(APIView):
 
     def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Create a report"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             serializer = ReportSerializer(
                 data=request.data,
                 context=self.get_serializer_context(),
@@ -55,7 +55,7 @@ class ChannelReportListView(APIView):
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """List of reports"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             api = Api(user=request.user)
             reports = api.list_reports(self.kwargs['channel_name'])
             serializer = ReportedContentSerializer(

@@ -11,6 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import render
 from rest_framework_jwt.settings import api_settings
 
+from open_discussions import features
 from open_discussions.templatetags.render_bundle import public_path
 from sites.models import AuthenticatedSite
 
@@ -67,6 +68,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
             "session_url": site.session_url,
             "tos_url": site.tos_url,
         },
+        "allow_anonymous": features.is_enabled(features.ANONYMOUS_ACCESS),
     }
 
     return render(request, "index.html", context={

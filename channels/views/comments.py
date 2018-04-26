@@ -75,7 +75,7 @@ class CommentListView(APIView):
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Get list for comments and attach User objects to them"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             post_id = self.kwargs['post_id']
             api = Api(user=self.request.user)
             sort = request.query_params.get('sort', COMMENTS_SORT_BEST)
@@ -97,7 +97,7 @@ class CommentListView(APIView):
 
     def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Create a new comment"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             serializer = CommentSerializer(
                 data=request.data,
                 context=self.get_serializer_context(),
@@ -126,7 +126,7 @@ class MoreCommentsView(APIView):
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Get list for comments and attach User objects to them"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             children = request.query_params.getlist('children')
             sort = request.query_params.get('sort', COMMENTS_SORT_BEST)
 
@@ -178,7 +178,7 @@ class CommentDetailView(APIView):
 
     def get(self, request, *args, **kwargs):
         """GET a single comment and it's children"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             comment = self.get_object()
 
             # comment.refresh() raises if the comment
@@ -203,7 +203,7 @@ class CommentDetailView(APIView):
 
     def patch(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Update a comment"""
-        with translate_praw_exceptions():
+        with translate_praw_exceptions(request.user):
             comment = self.get_object()
             subscriptions = lookup_subscriptions_for_comments([comment], self.request.user)
             serializer = CommentSerializer(

@@ -12,7 +12,8 @@ const _createSettings = () => ({
     base_url:    "http://fake.micromasters.url/",
     session_url: "http://fake.session.url",
     tos_url:     "http://fake.tos.url/"
-  }
+  },
+  allow_anonymous: false
 })
 
 global.SETTINGS = _createSettings()

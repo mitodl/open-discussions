@@ -1,16 +1,31 @@
 """Tests for utils"""
 # pylint: disable=protected-access
+from unittest.mock import Mock
+
 import pytest
+from praw.exceptions import APIException
+from prawcore.exceptions import (
+    Forbidden,
+    NotFound as PrawNotFound,
+    Redirect,
+)
+from rest_framework.exceptions import (
+    NotAuthenticated,
+    NotFound,
+    PermissionDenied,
+)
 
 from channels.constants import (
     POSTS_SORT_HOT,
     VALID_POST_SORT_TYPES,
 )
+from channels.exceptions import ConflictException, GoneException
 from channels.utils import (
     ListingParams,
     DEFAULT_LISTING_PARAMS,
     get_listing_params,
     get_pagination_and_posts,
+    translate_praw_exceptions,
 )
 
 
@@ -144,3 +159,32 @@ def test_get_pagination_and_posts_before_and_after(mocker):
         'sort': POSTS_SORT_HOT,
     }, list(items))
     posts._next_batch.assert_called_once_with()
+
+
+@pytest.mark.parametrize("raised_exception,is_anonymous,expected_exception", [
+    [None, False, None],
+    [Forbidden(Mock(status_code=403)), True, NotAuthenticated],
+    [Forbidden(Mock(status_code=403)), False, PermissionDenied],
+    [PrawNotFound(Mock()), False, NotFound],
+    [Redirect(Mock(headers={'location': 'http://example.com'})), False, NotFound],
+    [APIException('SUBREDDIT_NOTALLOWED', 'msg', 'field'), False, PermissionDenied],
+    [APIException('NOT_AUTHOR', 'msg', 'field'), False, PermissionDenied],
+    [APIException('SUBREDDIT_NOEXIST', 'msg', 'field'), False, NotFound],
+    [APIException('SUBREDDIT_EXISTS', 'msg', 'field'), False, ConflictException],
+    [APIException('DELETED_COMMENT', 'msg', 'field'), False, GoneException],
+    [KeyError(), False, KeyError],
+])
+def test_translate_praw_exceptions(raised_exception, is_anonymous, expected_exception):
+    """Test that exceptions are translated correctly"""
+    user = Mock(is_anonymous=is_anonymous)
+
+    if expected_exception is None:
+        with translate_praw_exceptions(user):
+            if raised_exception is not None:
+                raise raised_exception
+
+    else:
+        with pytest.raises(expected_exception):
+            with translate_praw_exceptions(user):
+                if raised_exception is not None:
+                    raise raised_exception

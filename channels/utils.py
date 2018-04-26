@@ -12,7 +12,11 @@ from prawcore.exceptions import (
     NotFound as PrawNotFound,
     Redirect,
 )
-from rest_framework.exceptions import PermissionDenied, NotFound
+from rest_framework.exceptions import (
+    NotAuthenticated,
+    NotFound,
+    PermissionDenied,
+)
 
 from channels.constants import POSTS_SORT_HOT
 from channels.exceptions import ConflictException, GoneException
@@ -89,11 +93,18 @@ def get_pagination_and_posts(posts, listing_params):
 
 
 @contextmanager
-def translate_praw_exceptions():
-    """Convert PRAW exceptions to DRF ones"""
+def translate_praw_exceptions(user):
+    """
+    Convert PRAW exceptions to DRF exceptions.
+
+    Args:
+        user (User): The request user
+    """
     try:
         yield
     except Forbidden as exc:
+        if user.is_anonymous:
+            raise NotAuthenticated() from exc
         raise PermissionDenied() from exc
     except PrawNotFound as exc:
         raise NotFound() from exc
