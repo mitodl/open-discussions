@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.25.0
+--------------
+
+- Upgrade celery (#652)
+
 Version 0.24.1
 --------------
 
