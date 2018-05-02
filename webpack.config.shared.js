@@ -5,6 +5,7 @@ module.exports = {
   config: {
     entry: {
       'root': ['babel-polyfill', './static/js/entry/root'],
+      'zendesk': './static/js/entry/zendesk',
       'style': './static/js/entry/style',
     },
     module: {

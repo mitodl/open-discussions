@@ -47,12 +47,14 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         raise ImproperlyConfigured("Unable to find site for site key: '{}'".format(site_key))
 
     user_full_name = None
+    user_email = None
     profile_image_small = None
 
     if username is not None:
         user = User.objects.get(username=username)
         user_full_name = user.profile.name
         profile_image_small = user.profile.image_small
+        user_email = user.email
 
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
@@ -60,6 +62,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "max_comment_depth": settings.OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH,
         "username": username,
         "user_full_name": user_full_name,
+        "user_email": user_email,
         "profile_image_small": profile_image_small,
         "authenticated_site": {
             "title": site.title,

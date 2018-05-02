@@ -24,6 +24,7 @@ def test_webpack_url(settings, staff_client, mocker, authenticated_site):
         'common',
         'root',
         'style',
+        'zendesk',
     }
     js_settings = json.loads(response.context['js_settings_json'])
     assert js_settings == {
@@ -31,6 +32,7 @@ def test_webpack_url(settings, staff_client, mocker, authenticated_site):
         'public_path': '/static/bundles/',
         'max_comment_depth': 6,
         'username': None,
+        'user_email': None,
         'profile_image_small': None,
         'user_full_name': None,
         'authenticated_site': {
