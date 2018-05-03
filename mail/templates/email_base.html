@@ -12,7 +12,7 @@
 * {
   font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
   box-sizing: border-box;
-  font-size: 16px;
+  font-size: 16px !important;
 }
 
 img {
@@ -136,6 +136,7 @@ h4 {
 p, ul, ol {
   margin: 15px 0 15px;
   font-weight: normal;
+  font-size: 15px;
 }
 p li, ul li, ol li {
   margin-left: 5px;
@@ -161,9 +162,11 @@ a {
   background-color: #348eda;
   border: solid #348eda;
   border-width: 10px 20px;
-  line-height: 2;
-  font-weight: bold;
+  line-height: 1;
+  font-weight: 500;
+  font-size: 15px;
   text-align: center;
+  padding: 8px 4px;
   cursor: pointer;
   display: inline-block;
   border-radius: 5px;
@@ -173,23 +176,23 @@ a {
 
 .ghost-button {
   background: none;
-  border-width: 3px;
+  border-width: 2px;
   color: #348eda;
-  padding: 2px 20px;
+  padding: 6px 20px;
   text-decoration: none;
   border: solid #348eda;
   line-height: 2;
-  font-weight: bold;
   text-align: center;
   cursor: pointer;
   display: inline-block;
   border-radius: 5px;
   text-transform: capitalize;
   margin: 15px 0 15px;
+  font-weight: 500;
+  font-size: 15px;
 }
 
 .read-more {
-  text-align: center;
   margin: 30px 0;
 }
 
@@ -284,39 +287,37 @@ a {
   <tbody>
     <tr>
     <td width="1%" style="width: 1%"></td>
-      <td class="container" width="98%" style="width: 98%">
-        <div class="content">
-          <table class="main" width="100%" cellpadding="0" cellspacing="0">
-            <tbody>
-              <tr>
-                <td class="content-wrap">
-                  {% block logo %}<div class="aligncenter">
-                    <img src="{{ base_url }}/static/images/mit-logo-micromasters.jpg" width="241" style="margin-bottom: 27px" />
-                  </div>{% endblock %}
+    <td class="container" width="98%" style="width: 98%">
+      <div class="content">
+        <table class="main" width="100%" cellpadding="0" cellspacing="0">
+          <tbody>
+            <tr>
+              <td class="content-wrap">
 
-                  {% block content %}{% endblock %}
+                {% block content %}{% endblock %}
 
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="footer aligncenter">
-            {% block footer %}<p>
-              You are receiving this email because you signed up for Open Discussions.
-              <br/>
-              If you don't want to receive these emails in the future, you can
-              <a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">edit your settings</a>
-              or
-              <a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">unsubscribe</a>.
-            </p>{% endblock %}
-            <p>
-              MIT Office of Digital Learning
-              <br/>
-              600 Technology Square, 2nd Floor, Cambridge, MA 02139
-            </p>
-          </div>
+                        <div class="footer">
+          {% block footer %}<p>
+            You are receiving this email because you signed up for Open Discussions.
+            <br/>
+            If you don't want to receive these emails in the future, you can
+            <a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">edit your settings</a>
+            or
+            <a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">unsubscribe</a>.
+          </p>{% endblock %}
+          <p>
+             MIT Office of Digital Learning
+            <br/>
+            600 Technology Square, 2nd Floor, Cambridge, MA 02139
+          </p>
         </div>
-      </td>
+
+              </td>
+            </tr>
+          </tbody
+        </table>
+      </div>
+    </td>
       <td width="1%" style="width: 1%"></td>
     </tr>
   </tbody>
