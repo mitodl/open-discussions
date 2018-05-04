@@ -15,7 +15,7 @@
     <tr>
       <td>
         <div>
-          <h3>{{ comment.author_name }}:</h3>
+          <p>From {{ comment.author_name }}:</p>
           <p class="comment-content">
             {{ comment.text|truncatewords:100 }}
             {% if is_comment_reply %}
@@ -29,11 +29,11 @@
     </tr>
   </tbody>
 </table>
-<div class="read-more">
+<div class="read-more alignleft" style="margin-left: 13px; margin-top: 13px;">
   {% if is_comment_reply %}
-  <a href="{{ base_url }}{% url 'channel-post-comment' channel_name=post.channel_name post_id=post.id comment_id=comment.id %}" class="btn-primary ghost-button">View on Open Discussions</a>
+  <a href="{{ base_url }}{% url 'channel-post-comment' channel_name=post.channel_name post_id=post.id comment_id=comment.id %}" class="btn-primary">View on Open Discussions</a>
   {% else %}
-  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}" class="btn-primary ghost-button">View on Open Discussions</a>
+  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}" class="btn-primary">View on Open Discussions</a>
   {% endif %}
 </div>
 {% endblock %}
@@ -43,8 +43,6 @@
   You are receiving this email because you are following a post on Open Discussions.
   <br/>
   If you don't want to receive these emails in the future, you can
-  <a href="{{ base_url }}{% url 'settings-anon' token=anon_token %}">edit your settings</a>
-  or
-  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">unfollow from this post</a>.
+  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">unfollow this post</a>.
 </p>
 {% endblock %}

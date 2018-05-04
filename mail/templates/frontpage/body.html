@@ -37,6 +37,9 @@ p.comments {
 
 {% block content %}
 
+{% block logo %}<div class="aligncenter">
+  <img src="{{ base_url }}/static/images/mit-logo-micromasters.jpg" width="241" style="margin-bottom: 27px" />
+</div>{% endblock %}
 <div class="section">
   <p class="lead-in">Here are some recent posts you might have missed</p>
 </div>
@@ -56,7 +59,7 @@ p.comments {
     {% endfor %}
   </tbody>
 </table>
-<div class="read-more">
+<div class="read-more aligncenter">
   <a href="{{ base_url }}" class="ghost-button">Read More</a>
 </div>
 {% endblock %}

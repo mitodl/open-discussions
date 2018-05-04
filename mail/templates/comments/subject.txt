@@ -1,1 +1,1 @@
-[{{ post.channel_title }}] {% if is_comment_reply %}Reply to your comment "{{ parent.text|truncatechars:20 }}"{% else %} Re: {{ post.title }}{% endif %}
+[{{ post.channel_title }}] {% if is_comment_reply %}Reply to your comment "{{ parent.text|truncatechars:20 }}"{% else %} Reply to {{ post.title }}{% endif %}
