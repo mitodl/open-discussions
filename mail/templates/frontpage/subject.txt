@@ -1,1 +1,1 @@
-{{ posts.0.title }}
+{{ posts.0.title|safe }}

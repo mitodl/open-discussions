@@ -103,7 +103,7 @@ def test_send_notification(mocker):
     serializer_mock = mocker.patch('channels.serializers.PostSerializer')
     serializer_mock.return_value.data = {
         'id': 1,
-        'title': 'post title',
+        'title': 'post\'s title',
         'channel_name': 'micromasters',
         'channel_title': 'MicroMasters',
         'created': now_in_utc().isoformat(),
@@ -127,6 +127,7 @@ def test_send_notification(mocker):
     })
 
     send_messages_mock.assert_called_once_with([any_instance_of(EmailMessage)])
+    assert send_messages_mock.call_args[0][0][0].subject == 'post\'s title'
 
 
 def test_send_notification_no_posts(mocker):
