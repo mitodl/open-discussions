@@ -1,5 +1,19 @@
 .new-post-card {
   .card-contents {
+    .embedly-preview {
+      max-width: 770px;
+
+      .preview-header {
+        font-size: 14px;
+        font-style: italic;
+        color: $font-grey;
+        padding-bottom: 10px;
+
+        @include breakpoint(desktopwide) {
+          padding-bottom: 0;
+        }
+      }
+    }
 
     .post-types {
       display: flex;

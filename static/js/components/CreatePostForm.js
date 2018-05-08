@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 
 import Card from "../components/Card"
 import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
+import Embedly from "./Embedly"
 
 import { CONTENT_POLICY_URL } from "../lib/url"
 import { goBackAndHandleEvent } from "../lib/util"
@@ -21,7 +22,8 @@ type CreatePostFormProps = {
   history: Object,
   processing: boolean,
   channels: Map<string, Channel>,
-  updateChannelSelection: Function
+  updateChannelSelection: Function,
+  embedly: Object
 }
 
 const channelOptions = (channels: Map<string, Channel>) =>
@@ -45,7 +47,8 @@ export default class CreatePostForm extends React.Component<*, void> {
       processing,
       channels,
       updateChannelSelection,
-      validation
+      validation,
+      embedly
     } = this.props
     if (!postForm) {
       return null
@@ -107,6 +110,14 @@ export default class CreatePostForm extends React.Component<*, void> {
                 />
                 {validationMessage(validation.url)}
               </div>}
+            {!isText && embedly
+              ? <div className="embedly-preview row">
+                <div className="preview-header">
+                    this is a preview of your post
+                </div>
+                <Embedly embedly={embedly} />
+              </div>
+              : null}
             <div className="row channel-select">
               <label>Channel</label>
               <select

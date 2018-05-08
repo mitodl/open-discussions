@@ -6060,6 +6060,10 @@ redux-asserts@^0.0.10:
     redux "^3.3.1"
     redux-thunk "^2.0.1"
 
+redux-debounced@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/redux-debounced/-/redux-debounced-0.5.0.tgz#4dde27a3e66ea428afe78215f30a27f22714605b"
+
 redux-hammock@^0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/redux-hammock/-/redux-hammock-0.2.3.tgz#0235e8657d4808c6a9c9d25bdf367b2e3f0714f2"

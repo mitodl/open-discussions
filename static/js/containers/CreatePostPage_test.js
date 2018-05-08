@@ -9,6 +9,7 @@ import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { formatTitle } from "../lib/title"
+import { makeArticle } from "../factories/embedly"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
 
@@ -19,7 +20,8 @@ describe("CreatePostPage", () => {
     currentChannel,
     channels,
     post,
-    commentsResponse
+    commentsResponse,
+    article
 
   const makeEvent = (name, value) => ({ target: { value, name } })
 
@@ -44,6 +46,7 @@ describe("CreatePostPage", () => {
     currentChannel = channels[0]
     post = makePost()
     commentsResponse = makeCommentsResponse(post, 3)
+    article = makeArticle()
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(currentChannel))
     helper.getFrontpageStub.returns(
@@ -53,6 +56,9 @@ describe("CreatePostPage", () => {
     helper.getPostStub.returns(Promise.resolve(post))
     helper.getChannelModeratorsStub.returns(Promise.resolve(makeModerators()))
     helper.getCommentsStub.returns(Promise.resolve(commentsResponse))
+    helper.getEmbedlyStub.returns(
+      Promise.resolve({ url: post.url, response: article })
+    )
     listenForActions = helper.listenForActions.bind(helper)
     renderComponent = helper.renderComponent.bind(helper)
   })
@@ -96,7 +102,7 @@ describe("CreatePostPage", () => {
       const post = makePost(!isText)
       helper.createPostStub.returns(Promise.resolve(post))
 
-      return renderPage().then(([wrapper]) => {
+      return renderPage().then(async ([wrapper]) => {
         const title = "Title"
         const text = "Text"
         const url = "http://url.example.com"
@@ -108,7 +114,16 @@ describe("CreatePostPage", () => {
         if (isText) {
           setText(wrapper, text)
         } else {
-          setUrl(wrapper, url)
+          await listenForActions(
+            [
+              actions.forms.FORM_UPDATE,
+              actions.embedly.get.requestType,
+              actions.embedly.get.successType
+            ],
+            () => {
+              setUrl(wrapper, url)
+            }
+          )
         }
 
         return listenForActions(

@@ -12,7 +12,7 @@ type EmbedlyData = Map<string, Object>
 export const embedlyEndpoint = {
   name:              "embedly",
   verbs:             [GET],
-  getFunc:           api.getEmbedly,
+  getFunc:           (url: string) => api.getEmbedly(url),
   getSuccessHandler: (
     payload: EmbedlyResponse,
     data: EmbedlyData

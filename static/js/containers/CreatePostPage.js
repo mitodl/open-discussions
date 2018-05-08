@@ -26,7 +26,8 @@ type CreatePostPageProps = {
   channel: Channel,
   channels: RestState<Map<string, Channel>>,
   history: Object,
-  processing: boolean
+  processing: boolean,
+  embedly: Object
 }
 
 const CREATE_POST_KEY = "post:new"
@@ -57,14 +58,26 @@ class CreatePostPage extends React.Component<*, void> {
 
   onUpdate = (e: Object) => {
     const { dispatch } = this.props
+    const { name, value } = e.target
+
     dispatch(
       actions.forms.formUpdate({
         ...CREATE_POST_PAYLOAD,
         value: {
-          [e.target.name]: e.target.value
+          [name]: value
         }
       })
     )
+    if (name === "url" && value !== "") {
+      const embedlyGetFunc = actions.embedly.get(value)
+      embedlyGetFunc.meta = {
+        debounce: {
+          time: 1000,
+          key:  actions.embedly.get.requestType
+        }
+      }
+      dispatch(embedlyGetFunc)
+    }
   }
 
   updateIsText = (isText: boolean) => {
@@ -124,7 +137,14 @@ class CreatePostPage extends React.Component<*, void> {
   }
 
   render() {
-    const { channel, channels, postForm, history, processing } = this.props
+    const {
+      channel,
+      channels,
+      postForm,
+      history,
+      processing,
+      embedly
+    } = this.props
 
     if (!postForm) {
       return null
@@ -145,6 +165,7 @@ class CreatePostPage extends React.Component<*, void> {
             history={history}
             processing={processing}
             channels={channels.data}
+            embedly={embedly}
           />
         </div>
       </div>
@@ -157,12 +178,18 @@ const mapStateToProps = (state, props) => {
   const channels = state.channels
   const channel = channels.data.get(channelName)
   const processing = state.posts.processing
+  const postForm = getForm(state.forms)
+  const embedly =
+    postForm && postForm.value.url
+      ? state.embedly.data.get(postForm.value.url)
+      : undefined
 
   return {
-    postForm: getForm(state.forms),
+    postForm,
     channel,
     channels,
-    processing
+    processing,
+    embedly
   }
 }
 
