@@ -26,5 +26,5 @@ export const editChannelForm = (channel: Channel): ChannelForm =>
 
 export const isModerator = (
   moderators: ChannelModerators,
-  username: string
+  username: ?string
 ): boolean => R.any(R.propEq("moderator_name", username), moderators || [])

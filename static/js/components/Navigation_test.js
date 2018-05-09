@@ -3,6 +3,7 @@ import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 import { Link } from "react-router-dom"
+import sinon from "sinon"
 
 import Navigation from "./Navigation"
 import SubscriptionsList from "./SubscriptionsList"
@@ -10,8 +11,21 @@ import UserInfo from "./UserInfo"
 
 import { newPostURL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
+import * as util from "../lib/util"
 
 describe("Navigation", () => {
+  let sandbox, userIsAnonymousStub
+
+  beforeEach(() => {
+    sandbox = sinon.sandbox.create()
+    userIsAnonymousStub = sandbox.stub(util, "userIsAnonymous")
+    userIsAnonymousStub.returns(false)
+  })
+
+  afterEach(() => {
+    sandbox.restore()
+  })
+
   const defaultProps = { pathname: "/", subscribedChannels: [] }
   const renderComponent = (props = defaultProps) =>
     shallow(<Navigation {...props} />)
@@ -32,6 +46,12 @@ describe("Navigation", () => {
     const link = wrapper.find(Link).first()
     assert.equal(link.props().to, newPostURL("foobar"))
     assert.equal(link.props().children, "Submit a New Post")
+  })
+
+  it("should not show the create post link if an anonymous user", () => {
+    userIsAnonymousStub.returns(true)
+    const wrapper = renderComponent()
+    assert.isNotOk(wrapper.find(".mdc-button").exists())
   })
 
   it("should show a SubscriptionsList", () => {
@@ -68,5 +88,11 @@ describe("Navigation", () => {
     assert.equal(children, "Settings")
     assert.equal(className, "settings-link")
     assert.equal(to, "/settings")
+  })
+
+  it("should hide the link to settings, if the user is anonymous", () => {
+    userIsAnonymousStub.returns(true)
+    const wrapper = renderComponent()
+    assert.isNotOk(wrapper.find(".settings-link").exists())
   })
 })

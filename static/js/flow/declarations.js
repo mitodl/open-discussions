@@ -8,7 +8,7 @@ declare var SETTINGS: {
   FEATURES: {
     [key: string]: boolean,
   },
-  username: string,
+  username: ?string,
   user_full_name: ?string,
   profile_image_small: ?string,
   authenticated_site: {

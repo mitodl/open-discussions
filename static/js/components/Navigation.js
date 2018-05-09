@@ -6,6 +6,7 @@ import SubscriptionsList from "./SubscriptionsList"
 import UserInfo from "./UserInfo"
 
 import { newPostURL, getChannelNameFromPathname } from "../lib/url"
+import { userIsAnonymous } from "../lib/util"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -22,19 +23,23 @@ const Navigation = (props: NavigationProps) => {
   return (
     <div className="navigation">
       <UserInfo />
-      <Link
-        className="mdc-button mdc-button--raised blue-button"
-        to={newPostURL(channelName)}
-      >
-        Submit a New Post
-      </Link>
+      {userIsAnonymous()
+        ? null
+        : <Link
+          className="mdc-button mdc-button--raised blue-button"
+          to={newPostURL(channelName)}
+        >
+            Submit a New Post
+        </Link>}
       <SubscriptionsList
         currentChannel={channelName}
         subscribedChannels={subscribedChannels}
       />
-      <Link className="settings-link" to="/settings">
-        Settings
-      </Link>
+      {userIsAnonymous()
+        ? null
+        : <Link className="settings-link" to="/settings">
+            Settings
+        </Link>}
     </div>
   )
 }

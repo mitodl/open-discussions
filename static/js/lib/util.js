@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import R from "ramda"
 
 import type { Match } from "react-router"
@@ -46,3 +47,5 @@ export const preventDefaultAndInvoke = R.curry(
     invokee()
   }
 )
+
+export const userIsAnonymous = () => R.isNil(SETTINGS.username)

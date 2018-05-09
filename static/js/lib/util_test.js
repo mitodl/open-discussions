@@ -1,8 +1,15 @@
 // @flow
+/* global SETTINGS:false */
 import sinon from "sinon"
 import { assert } from "chai"
 
-import { wait, enumerate, isEmptyText, preventDefaultAndInvoke } from "./util"
+import {
+  wait,
+  enumerate,
+  isEmptyText,
+  preventDefaultAndInvoke,
+  userIsAnonymous
+} from "./util"
 
 describe("utility functions", () => {
   it("waits some milliseconds", done => {
@@ -59,5 +66,12 @@ describe("utility functions", () => {
 
     sinon.assert.calledWith(invokee)
     sinon.assert.calledWith(event.preventDefault)
+  })
+
+  it("should check if SETTINGS.username is nil", () => {
+    [[null, true], ["username", false]].forEach(([username, expectation]) => {
+      SETTINGS.username = username
+      assert.equal(userIsAnonymous(), expectation)
+    })
   })
 })
