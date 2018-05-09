@@ -15,10 +15,11 @@ from profiles.models import Profile, PROFILE_PROPS
 class ProfileSerializer(serializers.ModelSerializer):
     """Serializer for Profile"""
     email_optin = serializers.BooleanField(write_only=True, required=False)
+    toc_optin = serializers.BooleanField(write_only=True, required=False)
 
     class Meta:
         model = Profile
-        fields = ('name', 'image', 'image_small', 'image_medium', 'email_optin')
+        fields = ('name', 'image', 'image_small', 'image_medium', 'email_optin', 'toc_optin', 'bio', 'headline')
 
 
 class UserSerializer(serializers.ModelSerializer):

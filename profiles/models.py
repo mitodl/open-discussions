@@ -9,6 +9,9 @@ PROFILE_PROPS = (
     'image_small',
     'image_medium',
     'email_optin',
+    'toc_optin',
+    'headline',
+    'bio',
 )
 
 
@@ -23,8 +26,12 @@ class Profile(models.Model):
     image_medium = models.CharField(null=True, max_length=MAX_IMAGE_FIELD_LENGTH)
 
     email_optin = models.NullBooleanField()
+    toc_optin = models.NullBooleanField()
 
     last_active_on = models.DateTimeField(null=True)
+
+    headline = models.TextField(blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return "{}".format(self.name)

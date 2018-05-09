@@ -22,6 +22,8 @@ def test_serialize_user(user):
             'image': profile.image,
             'image_small': profile.image_small,
             'image_medium': profile.image_medium,
+            'bio': profile.bio,
+            'headline': profile.headline
         }
     }
 
@@ -36,6 +38,9 @@ def test_serialize_create_user(db, mocker):
         'image_small': 'image_small',
         'image_medium': 'image_medium',
         'email_optin': True,
+        'toc_optin': True,
+        'bio': 'bio',
+        'headline': 'headline',
     }
 
     get_or_create_auth_tokens_stub = mocker.patch('profiles.serializers.get_or_create_auth_tokens')
@@ -45,6 +50,7 @@ def test_serialize_create_user(db, mocker):
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
 
     del profile['email_optin']  # is write-only
+    del profile['toc_optin']  # is write-only
 
     assert UserSerializer(user).data == {
         'id': user.id,
@@ -60,6 +66,10 @@ def test_serialize_create_user(db, mocker):
     ('image_medium', 'image_medium_value'),
     ('email_optin', True),
     ('email_optin', False),
+    ('bio', 'bio_value'),
+    ('headline', 'headline_value'),
+    ('toc_optin', True),
+    ('toc_optin', False),
 ])
 def test_update_user_profile(user, key, value):
     """
@@ -72,6 +82,9 @@ def test_update_user_profile(user, key, value):
         'image_small': profile.image_small,
         'image_medium': profile.image_medium,
         'email_optin': None,
+        'toc_optoin': profile.toc_optin,
+        'bio': profile.bio,
+        'headline': profile.headline
     }
 
     expected_profile[key] = value
@@ -86,7 +99,7 @@ def test_update_user_profile(user, key, value):
 
     profile2 = Profile.objects.first()
 
-    for prop in ('name', 'image', 'image_small', 'image_medium', 'email_optin'):
+    for prop in ('name', 'image', 'image_small', 'image_medium', 'email_optin', 'toc_optin', 'bio', 'headline'):
         if prop == key:
             if isinstance(value, bool):
                 assert getattr(profile2, prop) is value

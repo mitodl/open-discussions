@@ -4,7 +4,7 @@ from django.urls import reverse
 import pytest
 
 
-# pylint: disable=redefined-outer-name, unused-argument
+# pylint: disable=redefined-outer-name, unused-argument, too-many-arguments
 pytestmark = pytest.mark.django_db
 
 
@@ -25,6 +25,8 @@ def test_list_users(client, staff_user, staff_jwt_header):
                 'image': profile.image,
                 'image_small': profile.image_small,
                 'image_medium': profile.image_medium,
+                'bio': profile.bio,
+                'headline': profile.headline
             }
         }
     ]
@@ -32,9 +34,10 @@ def test_list_users(client, staff_user, staff_jwt_header):
 
 # These can be removed once all clients have been updated and are sending both these fields
 @pytest.mark.parametrize('email', ['', 'test.email@example.com'])
-@pytest.mark.parametrize('optin', [None, True, False])
+@pytest.mark.parametrize('email_optin', [None, True, False])
+@pytest.mark.parametrize('toc_optin', [None, True, False])
 def test_create_user(
-        client, staff_user, staff_jwt_header, mocker, email, optin
+        client, staff_user, staff_jwt_header, mocker, email, email_optin, toc_optin
 ):  # pylint: disable=too-many-arguments
     """
     Create a user and assert the response
@@ -50,24 +53,31 @@ def test_create_user(
             'image': 'image',
             'image_small': 'image_small',
             'image_medium': 'image_medium',
+            'bio': 'bio',
+            'headline': 'headline'
         }
     }
     if email:
         payload['email'] = email
-    if optin is not None:
-        payload['profile']['email_optin'] = optin
+    if email_optin is not None:
+        payload['profile']['email_optin'] = email_optin
+    if toc_optin is not None:
+        payload['profile']['toc_optin'] = toc_optin
     get_or_create_auth_tokens_stub = mocker.patch('profiles.serializers.get_or_create_auth_tokens')
     ensure_notifications_stub = mocker.patch('profiles.serializers.ensure_notification_settings')
     resp = client.post(url, data=payload, **staff_jwt_header)
     assert resp.status_code == 201
-    if 'email_optin' in payload['profile']:
-        del payload['profile']['email_optin']
+    for optin in ('email_optin', 'toc_optin'):
+        if optin in payload['profile']:
+            del payload['profile'][optin]
+
     assert resp.json()['profile'] == payload['profile']
     user = User.objects.get(username=resp.json()['username'])
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
     ensure_notifications_stub.assert_called_once_with(user)
     assert user.email == email
-    assert user.profile.email_optin is optin
+    assert user.profile.email_optin is email_optin
+    assert user.profile.toc_optin is toc_optin
 
 
 def test_get_user(client, user, staff_jwt_header):
@@ -86,14 +96,17 @@ def test_get_user(client, user, staff_jwt_header):
             'image': profile.image,
             'image_small': profile.image_small,
             'image_medium': profile.image_medium,
+            'bio': profile.bio,
+            'headline': profile.headline,
         }
     }
 
 
 # These can be removed once all clients have been updated and are sending both these fields
 @pytest.mark.parametrize('email', ['', 'test.email@example.com'])
-@pytest.mark.parametrize('optin', [None, True, False])
-def test_patch_user(client, user, staff_jwt_header, email, optin):
+@pytest.mark.parametrize('email_optin', [None, True, False])
+@pytest.mark.parametrize('toc_optin', [None, True, False])
+def test_patch_user(client, user, staff_jwt_header, email, email_optin, toc_optin):
     """
     Update a users' profile
     """
@@ -109,8 +122,10 @@ def test_patch_user(client, user, staff_jwt_header, email, optin):
     }
     if email:
         payload['email'] = email
-    if optin is not None:
-        payload['profile']['email_optin'] = optin
+    if email_optin is not None:
+        payload['profile']['email_optin'] = email_optin
+    if toc_optin is not None:
+        payload['profile']['toc_optin'] = toc_optin
     url = reverse('user_api-detail', kwargs={'username': user.username})
     resp = client.patch(url, data=payload, **staff_jwt_header)
     assert resp.status_code == 200
@@ -122,12 +137,15 @@ def test_patch_user(client, user, staff_jwt_header, email, optin):
             'image': profile.image,
             'image_small': profile.image_small,
             'image_medium': profile.image_medium,
+            'bio': profile.bio,
+            'headline': profile.headline,
         }
     }
     user.refresh_from_db()
     profile.refresh_from_db()
     assert user.email == email
-    assert profile.email_optin is optin
+    assert profile.email_optin is email_optin
+    assert profile.toc_optin is toc_optin
 
 
 def test_patch_username(client, user, staff_jwt_header):
@@ -140,3 +158,15 @@ def test_patch_username(client, user, staff_jwt_header):
     }, **staff_jwt_header)
     assert resp.status_code == 200
     assert resp.json()['username'] == user.username
+
+
+def test_patch_profile_by_user(client, logged_in_profile):
+    """
+    Test that users can update their profiles
+    """
+    url = reverse('profile_api-detail', kwargs={'user__username': logged_in_profile.user.username})
+    resp = client.patch(url, data={
+        'bio': 'updated_bio_value'
+    })
+    assert resp.status_code == 200
+    assert resp.json()['bio'] == 'updated_bio_value'
