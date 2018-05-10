@@ -25,7 +25,7 @@ def test_can_edit_profile_staff(mocker, staff_jwt_token, user):
 @pytest.mark.parametrize('is_super', [True, False])  # pylint: disable=too-many-arguments
 def test_can_edit_other_profile(mocker, method, result, jwt_token, user, is_super):
     """
-    Test that staff users are not allowed to edit another user's profile
+    Test that non-staff users are not allowed to edit another user's profile
     """
     request = mocker.Mock(auth=jwt_token, user=user, method=method)
     profile = UserFactory.create(is_superuser=is_super).profile
