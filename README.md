@@ -185,7 +185,7 @@ OPEN_DISCUSSIONS_SITE_KEY
 These variables should also be added to the MicroMasters .env file:
 
 ```
-OPEN_DISCUSSIONS_API_USERNAME=<your_micromasters_superuser_username>
+OPEN_DISCUSSIONS_API_USERNAME=<your_micromasters_username>
 OPEN_DISCUSSIONS_REDIRECT_URL=http://od.odl.local:8063/
 ### Linux users should use this value...
 OPEN_DISCUSSIONS_BASE_URL=http://od.odl.local:8063/
