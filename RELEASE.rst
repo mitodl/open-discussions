@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.26.0
+--------------
+
+- Add Zendesk widget
+- Add embedly frontend code
+- Don&#39;t HTML escape subject lines for frontpage emails
+- Simplified layout for notification email (#661)
+
 Version 0.25.0
 --------------
 
