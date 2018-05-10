@@ -165,7 +165,7 @@ This can be emulated by modifying your hosts file, for example:
 The following variables should also be set in your Open-Discussions `.env` file, assuming you have modified your `hosts` file using `mm.odl.local` for Micromasters and `od.odl.local` for Open-Discussions:
 
   - `MICROMASTERS_EXTERNAL_LOGIN_URL=http://mm.odl.local:8079/discussions/`
-  - `MICROMASTERS_BASE_URL=http://docker.for.mac.host.internal:8079/` (OSX)
+  - `MICROMASTERS_BASE_URL=http://docker.for.mac.localhost:8079/` (OSX)
   - `MICROMASTERS_BASE_URL=http://<docker-accessible-internal-ip>:8079/` (non-OSX)
   - `OPEN_DISCUSSIONS_COOKIE_DOMAIN=odl.local`
 
@@ -175,7 +175,7 @@ The following variables should also be set in your MicroMasters `.env` file:
   - `OPEN_DISCUSSIONS_COOKIE_NAME`: same value as in the open-discussions ``.env`` file
   - `OPEN_DISCUSSIONS_COOKIE_DOMAIN=odl.local`
   - `OPEN_DISCUSSIONS_REDIRECT_URL=http://od.odl.local:8063/`
-  - `OPEN_DISCUSSIONS_BASE_URL=http://docker.for.mac.host.internal:8063/` (OSX)
+  - `OPEN_DISCUSSIONS_BASE_URL=http://docker.for.mac.localhost:8063/` (OSX)
   - `OPEN_DISCUSSIONS_BASE_URL=<docker-accessible-internal-ip>:8063/` (non-OSX)
   - `OPEN_DISCUSSIONS_SITE_KEY=mm-local`
   - `OPEN_DISCUSSIONS_COOKIE_DOMAIN=odl.local`  
