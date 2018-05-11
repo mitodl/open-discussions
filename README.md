@@ -23,20 +23,6 @@ installation steps should be completed before the following steps, which are spe
   - OSX recommended install method: [Installer on Node website](https://nodejs.org/en/download/)
   - No specific version has been chosen yet.
 
-## (OSX only) Getting your machine Docker-ready
-
-#### Create your docker container:
-
-The following commands create a Docker machine named ``opendiscussions``, start the
-container, and configure environment variables to facilitate communication
-with the edX instance.
-
-    docker-machine create --driver virtualbox opendiscussions
-    docker-machine start opendiscussions
-    # 'docker-machine env (machine)' prints export commands for important environment variables
-    eval "$(docker-machine env opendiscussions)"
-
-
 ## Docker Container Configuration and Start-up
 
 #### 1) Create your ``.env`` file
@@ -51,32 +37,6 @@ The default values for ``OPEN_DISCUSSIONS_REDDIT_CLIENT_ID`` and ``OPEN_DISCUSSI
 can be found in the reddit-config repo's Vagrantfile.
 
 Set ``OPEN_DISCUSSIONS_BASE_URL`` to the ``protocol://host:port`` where open-discussions is reachable locally (e.g. http://localhost:8063).
-
-#### 2) _(OSX only)_ Set up and run the webpack dev server on your host machine
-
-In the development environment, our static assets are served from the webpack
-dev server. When this environment variable is set, the script sources will
-look for the webpack server at that host instead of the host where Docker is running.
-
-You'll need to install the [yarn](https://yarnpkg.com/en/docs/cli/)
-package manager. You can do:
-
-    sudo node ./scripts/install_yarn.js
-
-To install it. Nice! You can check which version is installed in
-`package.json` to be make you're getting the version we are
-standardized on.
-
-Now, in a separate terminal tab, use the webpack helper script to install npm modules and run the dev server:
-
-    ./webpack_dev_server.sh --install
-
-The ``--install`` flag is only needed if you're starting up for the first time, or if updates have been made
-to the packages in ``./package.json``. If you've installed those packages and there are no ``./package.json``
-updates, you can run this without the ``--install`` flag: ``./webpack_dev_server.sh``
-
-**DEBUGGING NOTE:** If you see an error related to node-sass when you run this script, try running
-``yarn install`` again.
 
 #### 3) Build the containers
 Run this command:
@@ -198,18 +158,40 @@ MicroMasters and Open-Discussions share a cookie, which means that they need to 
 This can be emulated by modifying your hosts file, for example:
 
  ```
-192.168.99.100  micromasters.odl.local
-192.168.99.101  od.odl.local
+127.0.0.1  mm.odl.local
+127.0.0.1  od.odl.local
  ```
 
-The following variable should also be set in your MicroMasters ``.env`` file:
+The following variables should also be set in your Open-Discussions `.env` file, assuming you have modified your `hosts` file using `mm.odl.local` for Micromasters and `od.odl.local` for Open-Discussions:
 
-  - ``OPEN_DISCUSSIONS_JWT_SECRET``: same value as in the open-discussions ``.env`` file
-  - ``OPEN_DISCUSSIONS_COOKIE_NAME``: same value as in the open-discussions ``.env`` file
-  - ``OPEN_DISCUSSIONS_COOKIE_DOMAIN``: the root domain, for example ``odl.local``, should match correspding variable in Ope-Discussions
-  - ``OPEN_DISCUSSIONS_REDIRECT_URL``: the domain-based URL for open-discussions,
-    for example ``http://od.odl.local:8063/``
-  - ``OPEN_DISCUSSIONS_BASE_URL``: the base internal URL for open-discussions,
-    i.e. ``http://192.168.99.101:8063`` or ``http://localhost:8063/``
-  - ``FEATURE_OPEN_DISCUSSIONS_POST_UI=True``
-  - ``FEATURE_OPEN_DISCUSSIONS_CREATE_CHANNEL_UI=True``
+```
+OPEN_DISCUSSIONS_COOKIE_DOMAIN=odl.local
+MICROMASTERS_EXTERNAL_LOGIN_URL=http://mm.odl.local:8079/discussions/
+### Linux users should use this value...
+MICROMASTERS_BASE_URL=http://mm.odl.local:8079/
+### OSX users should use this value...
+MICROMASTERS_BASE_URL=http://docker.for.mac.localhost:8079/   
+```
+
+The following variables and their values should copied directly from this .env file to the MicroMasters .env file:
+
+```
+OPEN_DISCUSSIONS_JWT_SECRET
+OPEN_DISCUSSIONS_COOKIE_NAME
+OPEN_DISCUSSIONS_COOKIE_DOMAIN
+OPEN_DISCUSSIONS_SITE_KEY
+```
+
+These variables should also be added to the MicroMasters .env file:
+
+```
+FEATURE_OPEN_DISCUSSIONS_POST_UI=True
+FEATURE_OPEN_DISCUSSIONS_CREATE_CHANNEL_UI=True
+
+OPEN_DISCUSSIONS_API_USERNAME=<your_micromasters_username>
+OPEN_DISCUSSIONS_REDIRECT_URL=http://od.odl.local:8063/
+### Linux users should use this value...
+OPEN_DISCUSSIONS_BASE_URL=http://od.odl.local:8063/
+### OSX users should use this value...
+OPEN_DISCUSSIONS_BASE_URL=http://docker.for.mac.localhost:8063/
+```
