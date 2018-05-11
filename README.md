@@ -165,12 +165,12 @@ This can be emulated by modifying your hosts file, for example:
 The following variables should also be set in your Open-Discussions `.env` file, assuming you have modified your `hosts` file using `mm.odl.local` for Micromasters and `od.odl.local` for Open-Discussions:
 
 ```
+OPEN_DISCUSSIONS_COOKIE_DOMAIN=odl.local
 MICROMASTERS_EXTERNAL_LOGIN_URL=http://mm.odl.local:8079/discussions/
 ### Linux users should use this value...
 MICROMASTERS_BASE_URL=http://mm.odl.local:8079/
 ### OSX users should use this value...
 MICROMASTERS_BASE_URL=http://docker.for.mac.localhost:8079/   
-OPEN_DISCUSSIONS_COOKIE_DOMAIN=odl.local
 ```
 
 The following variables and their values should copied directly from this .env file to the MicroMasters .env file:
@@ -185,13 +185,13 @@ OPEN_DISCUSSIONS_SITE_KEY
 These variables should also be added to the MicroMasters .env file:
 
 ```
+FEATURE_OPEN_DISCUSSIONS_POST_UI=True
+FEATURE_OPEN_DISCUSSIONS_CREATE_CHANNEL_UI=True
+
 OPEN_DISCUSSIONS_API_USERNAME=<your_micromasters_username>
 OPEN_DISCUSSIONS_REDIRECT_URL=http://od.odl.local:8063/
 ### Linux users should use this value...
 OPEN_DISCUSSIONS_BASE_URL=http://od.odl.local:8063/
 ### OSX users should use this value...
 OPEN_DISCUSSIONS_BASE_URL=http://docker.for.mac.localhost:8063/
-
-FEATURE_OPEN_DISCUSSIONS_POST_UI=True
-FEATURE_OPEN_DISCUSSIONS_CREATE_CHANNEL_UI=True
 ```
