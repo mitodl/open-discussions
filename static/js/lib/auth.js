@@ -10,6 +10,9 @@ import {
 import { AUTH_REQUIRED_URL } from "./url"
 
 const renewSession = async () => {
+  if (SETTINGS.is_authenticated) {
+    return Promise.reject("Not using a JWT token")
+  }
   if (SETTINGS.authenticated_site.session_url) {
     return fetch(SETTINGS.authenticated_site.session_url, {
       credentials: "include" // must be "include" for CORS fetch

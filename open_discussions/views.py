@@ -82,6 +82,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
             "session_url": site.session_url,
             "tos_url": site.tos_url,
         },
+        "is_authenticated": bool(request.user.is_authenticated),
         "allow_anonymous": features.is_enabled(features.ANONYMOUS_ACCESS),
     }
 
@@ -116,6 +117,21 @@ def register(request, **kwargs):  # pylint: disable=unused-argument
         "form": EmailForm(),
         "js_settings_json": '{}',
     })
+
+
+def jwt_login_complete(request, **kwargs):  # pylint: disable=unused-argument
+    """View that complete the jwt-based login by clearing the cookie"""
+    # redirect to what python-social-auth normally would have
+    response = redirect(settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL)
+    # to clear a cookie, it's most reliable to set it to expire immediately
+    response.set_cookie(
+        api_settings.JWT_AUTH_COOKIE,
+        domain=settings.OPEN_DISCUSSIONS_COOKIE_DOMAIN,
+        httponly=True,
+        max_age=0,
+    )
+
+    return response
 
 
 def confirmation_sent(request, **kwargs):  # pylint: disable=unused-argument

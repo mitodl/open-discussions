@@ -32,7 +32,7 @@ describe("auth", function() {
     describe(authFunc.name, () => {
       beforeEach(() => {
         fetchStub = sandbox.stub(fetchFuncs, djangoCSRFFunc)
-
+        SETTINGS.is_authenticated = false
         SETTINGS.authenticated_site.session_url = "/session/url"
       })
       afterEach(function() {
@@ -74,7 +74,7 @@ describe("auth", function() {
 
         await assert.isFulfilled(authFunc("/url"))
 
-        assert.ok(fetchMock.called)
+        assert.ok(fetchMock.called())
         assert.ok(fetchStub.calledTwice)
         assert.ok(fetchStub.firstCall.calledWith("/url"))
         assert.ok(fetchStub.secondCall.calledWith("/url"))
@@ -89,7 +89,7 @@ describe("auth", function() {
 
         await assert.isRejected(authFunc("/url"))
 
-        assert.ok(fetchMock.called)
+        assert.ok(fetchMock.called())
         assert.ok(fetchStub.calledOnce)
         assert.ok(fetchStub.calledWith("/url"))
         assert.equal(window.location.pathname, "/auth_required/")
@@ -101,7 +101,20 @@ describe("auth", function() {
 
         await assert.isRejected(authFunc("/url"))
 
-        assert.ok(fetchMock.called)
+        assert.ok(fetchMock.called())
+        assert.ok(fetchStub.calledOnce)
+        assert.ok(fetchStub.calledWith("/url"))
+        assert.equal(window.location.pathname, "/auth_required/")
+      })
+
+      it("renews and redirect to /auth_required/ if is_authenticated is true", async () => {
+        SETTINGS.is_authenticated = true
+        fetchStub.returns(Promise.reject(error401)) // original api call
+        fetchMock.mock(SETTINGS.authenticated_site.session_url, 401)
+
+        await assert.isRejected(authFunc("/url"))
+
+        assert.isNotOk(fetchMock.called())
         assert.ok(fetchStub.calledOnce)
         assert.ok(fetchStub.calledWith("/url"))
         assert.equal(window.location.pathname, "/auth_required/")

@@ -48,6 +48,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
             'base_url': authenticated_site.base_url,
             'tos_url': authenticated_site.tos_url,
         },
+        'is_authenticated': True,
         'allow_anonymous': 'access',
     }
 
@@ -86,8 +87,21 @@ def test_webpack_url_jwt(
             'base_url': authenticated_site.base_url,
             'tos_url': authenticated_site.tos_url,
         },
+        'is_authenticated': False,
         'allow_anonymous': 'access',
     }
+
+
+def test_login_jwt_complete(settings, client, user, jwt_token):
+    """Verify that the jwt-complete view invalidates the JWT auth cookie"""
+    client.cookies[api_settings.JWT_AUTH_COOKIE] = jwt_token
+    client.force_login(user)
+
+    response = client.get(reverse('jwt-complete'))
+
+    cookie = response.cookies['cookie_monster']
+    assert cookie['max-age'] == 0
+    assert cookie['domain'] == settings.OPEN_DISCUSSIONS_COOKIE_DOMAIN
 
 
 def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
@@ -121,6 +135,7 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
             'base_url': authenticated_site.base_url,
             'tos_url': authenticated_site.tos_url,
         },
+        'is_authenticated': False,
         'allow_anonymous': 'access',
     }
 

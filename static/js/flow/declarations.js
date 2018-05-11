@@ -18,6 +18,7 @@ declare var SETTINGS: {
     base_url: string,
     tos_url: string
   },
+  is_authenticated: boolean,
   allow_anonymous: boolean,
 }
 

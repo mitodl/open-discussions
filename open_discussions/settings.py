@@ -195,25 +195,31 @@ USE_TZ = True
 
 # social auth
 AUTHENTICATION_BACKENDS = (
+    'open_discussions.backends.micromasters.MicroMastersAuth',
     'social_core.backends.email.EmailAuth',
     # the following needs to stay here to allow login of local users
     'django.contrib.auth.backends.ModelBackend',
 )
 
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+SOCIAL_AUTH_LOGIN_ERROR_URL = 'login'
+
+# Micromasters backend settings
+SOCIAL_AUTH_MICROMASTERS_LOGIN_URL = get_string('SOCIAL_AUTH_MICROMASTERS_LOGIN_URL', None)
+SOCIAL_AUTH_MICROMASTERS_LOGIN_REDIRECT_URL = 'jwt-complete'
+
+# Email backend settings
 SOCIAL_AUTH_EMAIL_FORM_URL = 'login'
 SOCIAL_AUTH_EMAIL_FORM_HTML = 'login.html'
 
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
-
-SOCIAL_AUTH_LOGIN_ERROR_URL = 'login'
-
-# only validate emails for the email backend
+# Only validate emails for the email backend
 SOCIAL_AUTH_EMAIL_FORCE_EMAIL_VALIDATION = True
+
+# Configure social_core.pipeline.mail.mail_validation
 SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = 'mail.verification_api.send_verification_email'
 SOCIAL_AUTH_EMAIL_VALIDATION_URL = 'confirmation-sent'
 
 SOCIAL_AUTH_PIPELINE = (
-
     # Get the information we can about the user and return it in a simple
     # format to create the user instance later. On some cases the details are
     # already part of the auth response from the provider, but sometimes this

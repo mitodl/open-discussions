@@ -20,13 +20,20 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from rest_framework_jwt.views import refresh_jwt_token
 
-from open_discussions.views import index, login, register, confirmation_sent
+from open_discussions.views import (
+    index,
+    login,
+    register,
+    confirmation_sent,
+    jwt_login_complete,
+)
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^status/', include('server_status.urls')),
     url(r'^login/$', login, name='login'),
+    url(r'^login/micromasters/complete', jwt_login_complete, name='jwt-complete'),
     url(r'^register/$', register, name='register'),
     url(r'^register/confirmation_sent/$', confirmation_sent, name='confirmation-sent'),
     url(r'^logout/$', auth_views.logout, name='logout'),

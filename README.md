@@ -189,7 +189,7 @@ FEATURE_OPEN_DISCUSSIONS_POST_UI=True
 FEATURE_OPEN_DISCUSSIONS_CREATE_CHANNEL_UI=True
 
 OPEN_DISCUSSIONS_API_USERNAME=<your_micromasters_username>
-OPEN_DISCUSSIONS_REDIRECT_URL=http://od.odl.local:8063/
+OPEN_DISCUSSIONS_REDIRECT_URL=http://od.odl.local:8063/complete/micromasters/
 ### Linux users should use this value...
 OPEN_DISCUSSIONS_BASE_URL=http://od.odl.local:8063/
 ### OSX users should use this value...
