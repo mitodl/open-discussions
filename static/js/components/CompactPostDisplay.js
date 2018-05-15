@@ -10,6 +10,7 @@ import {
   formatPostTitle,
   PostVotingButtons
 } from "../lib/posts"
+import { userIsAnonymous } from "../lib/util"
 
 import type { Post } from "../flow/discussionTypes"
 
@@ -86,7 +87,9 @@ class CompactPostDisplay extends React.Component<*, void> {
                   ignore all reports
               </a>
               : null}
-            <a onClick={() => reportPost(post)}>report</a>
+            {!userIsAnonymous()
+              ? <a onClick={() => reportPost(post)}>report</a>
+              : null}
           </div>
         </div>
       </div>

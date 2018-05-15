@@ -9,7 +9,7 @@ import { renderTextContent } from "./Markdown"
 import Embedly from "./Embedly"
 
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
-import { preventDefaultAndInvoke } from "../lib/util"
+import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
 
 import type { Post } from "../flow/discussionTypes"
@@ -127,12 +127,14 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
             <a href="#">approve</a>
           </div>
           : null}
-        <div
-          className="comment-action-button report-post"
-          onClick={showPostReportDialog}
-        >
-          <a href="#">report</a>
-        </div>
+        {!userIsAnonymous()
+          ? <div
+            className="comment-action-button report-post"
+            onClick={showPostReportDialog}
+          >
+            <a href="#">report</a>
+          </div>
+          : null}
       </div>
     )
   }

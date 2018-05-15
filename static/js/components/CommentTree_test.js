@@ -154,6 +154,13 @@ describe("CommentTree", () => {
     assert.ok(reportCommentStub.calledWith(comments[0]))
   })
 
+  it('should hide the "report" button for anons', () => {
+    SETTINGS.username = null
+    assert.isNotOk(
+      renderCommentTree().find(".comment-action-button.report-button").exists()
+    )
+  })
+
   it('should include an "Edit" button, if the user wrote the comment', () => {
     SETTINGS.username = comments[0].author_id
     const wrapper = renderCommentTree()

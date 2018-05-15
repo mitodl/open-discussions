@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { assert } from "chai"
 import { mount } from "enzyme"
@@ -98,6 +99,13 @@ describe("CompactPostDisplay", () => {
     const link = wrapper.find({ children: "report" })
     link.props().onClick()
     assert.ok(reportPost.called)
+  })
+
+  it("should hide the report link for anon users", () => {
+    SETTINGS.username = null
+    const wrapper = renderPostDisplay({ post })
+    const link = wrapper.find({ children: "report" })
+    assert.isNotOk(link.exists())
   })
 
   it("should set a class if stickied and showing pin ui", () => {

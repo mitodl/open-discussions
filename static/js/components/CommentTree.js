@@ -12,7 +12,7 @@ import CommentVoteForm from "./CommentVoteForm"
 import CommentRemovalForm from "./CommentRemovalForm"
 import { renderTextContent } from "./Markdown"
 
-import { preventDefaultAndInvoke } from "../lib/util"
+import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 import {
   replyToCommentKey,
   editCommentKey,
@@ -188,7 +188,7 @@ export default class CommentTree extends React.Component<*, *> {
               approve={approve}
               isModerator={isModerator}
             />
-            {moderationUI
+            {moderationUI || userIsAnonymous()
               ? null
               : <div
                 className="comment-action-button report-button"
