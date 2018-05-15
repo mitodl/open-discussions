@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.27.0
+--------------
+
+- Hide the report button for anonymous users
+- Additions to Profile model and DRF API (#695)
+- Hide settings and post link for anons
+- Add a link preview to the link post creation screen
+- README for OSX without docker-machine (#698)
+
 Version 0.26.0
 --------------
 
