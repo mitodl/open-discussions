@@ -15,6 +15,7 @@ import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
 import { editPostKey } from "../components/CommentForms"
+import * as utilFuncs from "../lib/util"
 
 describe("ExpandedPostDisplay", () => {
   let helper,
@@ -186,6 +187,22 @@ describe("ExpandedPostDisplay", () => {
     const wrapper = renderPostDisplay({ post })
     wrapper.find(".edit-post").at(0).simulate("click")
     assert.ok(beginEditingStub.called)
+  })
+
+  it("should hide the report link for anonymous users", () => {
+    const post = makePost()
+    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+    const wrapper = renderPostDisplay({ post })
+    assert.isNotOk(wrapper.find(".comment-action-button.report-post").exists())
+  })
+
+  it("should hide the follow link for anonymous users", () => {
+    const post = makePost()
+    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+    const wrapper = renderPostDisplay({ post })
+    assert.isNotOk(
+      wrapper.find(".comment-action-button.subscribe-post").exists()
+    )
   })
 
   it("should hide post action buttons when editing", () => {

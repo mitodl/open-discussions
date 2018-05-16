@@ -55,10 +55,30 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     removePost(post)
   }
 
+  postSubscriptionButton = () => {
+    const { toggleFollowPost, post } = this.props
+    return post.subscribed
+      ? <div
+        className="comment-action-button subscribe-post subscribed"
+        onClick={preventDefaultAndInvoke(() => {
+          toggleFollowPost(post)
+        })}
+      >
+        <a href="#">unfollow</a>
+      </div>
+      : <div
+        className="comment-action-button subscribe-post unsubscribed"
+        onClick={preventDefaultAndInvoke(() => {
+          toggleFollowPost(post)
+        })}
+      >
+        <a href="#">follow</a>
+      </div>
+  }
+
   postActionButtons = () => {
     const {
       toggleUpvote,
-      toggleFollowPost,
       post,
       beginEditing,
       isModerator,
@@ -94,23 +114,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
             <a href="#">delete</a>
           </div>
           : null}
-        {post.subscribed
-          ? <div
-            className="comment-action-button subscribe-post subscribed"
-            onClick={preventDefaultAndInvoke(() => {
-              toggleFollowPost(post)
-            })}
-          >
-            <a href="#">unfollow</a>
-          </div>
-          : <div
-            className="comment-action-button subscribe-post unsubscribed"
-            onClick={preventDefaultAndInvoke(() => {
-              toggleFollowPost(post)
-            })}
-          >
-            <a href="#">follow</a>
-          </div>}
+        {userIsAnonymous() ? null : this.postSubscriptionButton()}
         {isModerator && !post.removed
           ? <div
             className="comment-action-button remove-post"

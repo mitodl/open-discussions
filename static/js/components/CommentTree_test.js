@@ -22,6 +22,7 @@ import { makeCommentsResponse, makeMoreComments } from "../factories/comments"
 import { makePost } from "../factories/posts"
 import { createCommentTree } from "../reducers/comments"
 import { makeCommentReport } from "../factories/reports"
+import * as utilFuncs from "../lib/util"
 
 describe("CommentTree", () => {
   let comments,
@@ -154,10 +155,24 @@ describe("CommentTree", () => {
     assert.ok(reportCommentStub.calledWith(comments[0]))
   })
 
+  it("should hide the report button if userIsAnonymous", () => {
+    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+    assert.isNotOk(renderCommentTree().find(".report-button").exists())
+  })
+
   it('should hide the "report" button for anons', () => {
-    SETTINGS.username = null
+    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
     assert.isNotOk(
       renderCommentTree().find(".comment-action-button.report-button").exists()
+    )
+  })
+
+  it("should hide the 'follow' button for anons", () => {
+    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+    assert.isNotOk(
+      renderCommentTree()
+        .find(".comment-action-button.subscribe-comment")
+        .exists()
     )
   })
 

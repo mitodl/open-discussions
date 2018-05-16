@@ -54,6 +54,27 @@ type CommentTreeProps = {
 export default class CommentTree extends React.Component<*, *> {
   props: CommentTreeProps
 
+  renderFollowButton = (comment: CommentInTree) => {
+    const { toggleFollowComment } = this.props
+    return comment.subscribed
+      ? <div
+        className="comment-action-button subscribe-comment subscribed"
+        onClick={preventDefaultAndInvoke(() => {
+          toggleFollowComment(comment)
+        })}
+      >
+        <a href="#">unfollow</a>
+      </div>
+      : <div
+        className="comment-action-button subscribe-comment unsubscribed"
+        onClick={preventDefaultAndInvoke(() => {
+          toggleFollowComment(comment)
+        })}
+      >
+        <a href="#">follow</a>
+      </div>
+  }
+
   renderComment = (depth: number, comment: CommentInTree) => {
     const {
       forms,
@@ -68,8 +89,7 @@ export default class CommentTree extends React.Component<*, *> {
       reportComment,
       commentPermalink,
       moderationUI,
-      ignoreCommentReports,
-      toggleFollowComment
+      ignoreCommentReports
     } = this.props
     const formKey = replyToCommentKey(comment)
     const editFormKey = editCommentKey(comment)
@@ -117,7 +137,7 @@ export default class CommentTree extends React.Component<*, *> {
               upvote={upvote}
               downvote={downvote}
             />
-            {atMaxDepth || moderationUI || comment.deleted
+            {atMaxDepth || moderationUI || comment.deleted || userIsAnonymous()
               ? null
               : <div
                 className="comment-action-button reply-button"
@@ -127,23 +147,7 @@ export default class CommentTree extends React.Component<*, *> {
               >
                 <a href="#">reply</a>
               </div>}
-            {comment.subscribed
-              ? <div
-                className="comment-action-button subscribe-comment subscribed"
-                onClick={preventDefaultAndInvoke(() => {
-                  toggleFollowComment(comment)
-                })}
-              >
-                <a href="#">unfollow</a>
-              </div>
-              : <div
-                className="comment-action-button subscribe-comment unsubscribed"
-                onClick={preventDefaultAndInvoke(() => {
-                  toggleFollowComment(comment)
-                })}
-              >
-                <a href="#">follow</a>
-              </div>}
+            {userIsAnonymous() ? null : this.renderFollowButton(comment)}
             {comment.num_reports
               ? <div className="comment-action-button report-count">
                   Reports: {comment.num_reports}
