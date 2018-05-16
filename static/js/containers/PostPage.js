@@ -39,7 +39,12 @@ import {
   toggleFollowPost,
   toggleFollowComment
 } from "../util/api_actions"
-import { getChannelName, getPostID, getCommentID } from "../lib/util"
+import {
+  getChannelName,
+  getPostID,
+  getCommentID,
+  userIsAnonymous
+} from "../lib/util"
 import { isModerator } from "../lib/channels"
 import {
   anyErrorExcept404,
@@ -389,7 +394,7 @@ class PostPage extends React.Component<*, void> {
               toggleFollowPost={toggleFollowPost(dispatch)}
               embedly={embedly}
             />
-            {showPermalinkUI
+            {showPermalinkUI || userIsAnonymous()
               ? null
               : <ReplyToPostForm
                 forms={forms}

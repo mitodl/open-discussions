@@ -9,6 +9,7 @@ import CommentTree from "../components/CommentTree"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import PostPage from "./PostPage"
+import { ReplyToPostForm } from "../components/CommentForms"
 
 import { makePost, makeChannelPostList } from "../factories/posts"
 import {
@@ -36,6 +37,7 @@ import { createCommentTree } from "../reducers/comments"
 import { makeReportRecord } from "../factories/reports"
 import { VALID_COMMENT_SORT_TYPES } from "../lib/sorting"
 import { makeArticle } from "../factories/embedly"
+import * as utilFuncs from "../lib/util"
 
 describe("PostPage", function() {
   let helper,
@@ -79,21 +81,25 @@ describe("PostPage", function() {
     helper.cleanup()
   })
 
+  const basicPostPageActions = [
+    actions.posts.get.requestType,
+    actions.posts.get.successType,
+    actions.comments.get.requestType,
+    actions.comments.get.successType,
+    actions.subscribedChannels.get.requestType,
+    actions.subscribedChannels.get.successType,
+    actions.channels.get.requestType,
+    actions.channels.get.successType,
+    actions.channelModerators.get.requestType,
+    actions.channelModerators.get.successType,
+    SET_CHANNEL_DATA
+  ]
+
   const renderPage = () =>
-    renderComponent(postDetailURL(channel.name, post.id), [
-      actions.posts.get.requestType,
-      actions.posts.get.successType,
-      actions.comments.get.requestType,
-      actions.comments.get.successType,
-      actions.subscribedChannels.get.requestType,
-      actions.subscribedChannels.get.successType,
-      actions.channels.get.requestType,
-      actions.channels.get.successType,
-      actions.channelModerators.get.requestType,
-      actions.channelModerators.get.successType,
-      FORM_BEGIN_EDIT,
-      SET_CHANNEL_DATA
-    ])
+    renderComponent(
+      postDetailURL(channel.name, post.id),
+      basicPostPageActions.concat(FORM_BEGIN_EDIT)
+    )
 
   it("should set the document title", async () => {
     await renderPage()
@@ -163,19 +169,7 @@ describe("PostPage", function() {
   it("should show a comment permalink UI if at the right URL", async () => {
     const [wrapper] = await renderComponent(
       commentPermalink(channel.name, post.id, comments[0].id),
-      [
-        actions.posts.get.requestType,
-        actions.posts.get.successType,
-        actions.comments.get.requestType,
-        actions.comments.get.successType,
-        actions.subscribedChannels.get.requestType,
-        actions.subscribedChannels.get.successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        actions.channelModerators.get.requestType,
-        actions.channelModerators.get.successType,
-        SET_CHANNEL_DATA
-      ]
+      basicPostPageActions
     )
     const card = wrapper.find(".comment-detail-card")
     assert(card.exists())
@@ -192,6 +186,23 @@ describe("PostPage", function() {
       "View the rest of the comments"
     )
     assert.isTrue(wrapper.find(ExpandedPostDisplay).props().showPermalinkUI)
+  })
+
+  //
+  ;[true, false].forEach(userIsAnon => {
+    it(`should not show a ReplyToPostForm when userIsAnonymous() === ${userIsAnon}`, async () => {
+      const anonStub = helper.sandbox.stub(utilFuncs, "userIsAnonymous")
+      anonStub.returns(userIsAnon)
+
+      const [wrapper] = await renderComponent(
+        postDetailURL(channel.name, post.id),
+        userIsAnon
+          ? basicPostPageActions
+          : basicPostPageActions.concat(FORM_BEGIN_EDIT)
+      )
+
+      assert.equal(wrapper.find(ReplyToPostForm).exists(), !userIsAnon)
+    })
   })
 
   it("passed props to each CommentVoteForm", async () => {
