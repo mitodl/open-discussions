@@ -119,6 +119,7 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
         'user_email': None,
         'username': None,
         'profile_image_small': None,
+        'profile_complete': True,
         'user_full_name': None,
         'authenticated_site': {
             'title': authenticated_site.title,

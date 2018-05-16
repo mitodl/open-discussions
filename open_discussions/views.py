@@ -60,10 +60,12 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
     user_full_name = None
     user_email = None
     profile_image_small = None
+    profile_complete = True
 
     if user:
         user_full_name = user.profile.name
         profile_image_small = image_uri(user)
+        profile_complete = user.profile.is_complete
         user_email = user.email
 
     js_settings = {
@@ -74,6 +76,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "user_full_name": user_full_name,
         "user_email": user_email,
         "profile_image_small": profile_image_small,
+        "profile_complete": profile_complete,
         "authenticated_site": {
             "title": site.title,
             "base_url": site.base_url,

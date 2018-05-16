@@ -9,6 +9,7 @@ from profiles.utils import (
 )
 
 MAX_IMAGE_FIELD_LENGTH = 1024
+
 PROFILE_PROPS = (
     'name',
     'image',
@@ -16,6 +17,12 @@ PROFILE_PROPS = (
     'image_medium',
     'email_optin',
     'toc_optin',
+    'headline',
+    'bio',
+)
+
+COMPLETE_PROPS = (
+    'name',
     'headline',
     'bio',
 )
@@ -42,6 +49,22 @@ class Profile(models.Model):
 
     headline = models.TextField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
+
+    @property
+    def is_complete(self):
+        """
+        Checks if the profile is complete or not
+
+        Returns:
+             (bool): True if the profile is complete, False otherwise
+        """
+        # TODO: replace with `if image_uri(self) == default_profile_image` after ImageField PR merge
+        if not self.image_small:
+            return False
+        for prop in COMPLETE_PROPS:
+            if not getattr(self, prop):
+                return False
+        return True
 
     def __str__(self):
         return "{}".format(self.name)
