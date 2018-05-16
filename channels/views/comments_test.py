@@ -7,9 +7,9 @@ from django.urls import reverse
 from rest_framework import status
 
 from channels.test_constants import LIST_MORE_COMMENTS_RESPONSE
-from channels.serializers import default_profile_image
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
+from profiles.utils import image_uri, default_profile_image
 
 pytestmark = pytest.mark.betamax
 
@@ -30,13 +30,14 @@ def test_list_comments(client, logged_in_profile, missing_user):
         name = "[deleted]"
         author_id = '[deleted]'
     else:
-        profile_image = logged_in_profile.image_small
+        profile_image = image_uri(logged_in_profile)
         author_id = logged_in_profile.user.username
         name = logged_in_profile.name
 
     url = reverse('comment-list', kwargs={'post_id': '2'})
     resp = client.get(url)
     assert resp.status_code == status.HTTP_200_OK
+    assert resp.json()[0]['profile_image'] == profile_image
     assert resp.json() == [
         {
             "id": "1",
@@ -124,7 +125,7 @@ def test_list_comments_anonymous(client, public_channel, reddit_factories, setti
                 "deleted": False,
                 "subscribed": False,
                 "created": comment.created,
-                'profile_image': user.profile.image_small,
+                'profile_image': image_uri(user.profile),
                 'author_name': user.profile.name,
                 'edited': False,
                 'comment_type': 'comment',
@@ -163,6 +164,7 @@ def test_list_comments_not_found(client, logged_in_profile):
 def test_list_comments_more(client, logged_in_profile):
     """List comments for a post which has more comments"""
     logged_in_profile.image_small = '/deserunt/consequatur.jpg'
+    logged_in_profile.image_small_file = None
     logged_in_profile.name = 'Brooke Robles'
     logged_in_profile.save()
 
@@ -181,6 +183,7 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
     UserFactory.create(
         username=username,
         profile__image_small=image_url,
+        profile__image_small_file=None,
         profile__name=name,
     )
 
@@ -265,6 +268,7 @@ def test_more_comments_children(client, logged_in_profile):
     username = 'george'
 
     logged_in_profile.image_small = image_url
+    logged_in_profile.image_file_small = None
     logged_in_profile.name = name
     logged_in_profile.save()
 
@@ -289,7 +293,7 @@ def test_more_comments_children(client, logged_in_profile):
             "deleted": False,
             "subscribed": False,
             "created": "2017-11-09T16:35:55+00:00",
-            "profile_image": image_url,
+            "profile_image": image_uri(logged_in_profile),
             "author_name": name,
             "edited": False,
             "comment_type": "comment",
@@ -308,7 +312,7 @@ def test_more_comments_children(client, logged_in_profile):
             "deleted": False,
             "subscribed": False,
             "created": "2017-11-09T16:36:00+00:00",
-            "profile_image": image_url,
+            "profile_image": image_uri(logged_in_profile),
             "author_name": name,
             "edited": False,
             "comment_type": "comment",
@@ -351,7 +355,7 @@ def test_more_comments_anonymous(client, public_channel, reddit_factories, setti
                 'num_reports': None,
                 'parent_id': None,
                 'post_id': post.id,
-                'profile_image': user.profile.image_small,
+                'profile_image': image_uri(user.profile),
                 'removed': False,
                 'score': 1,
                 'subscribed': False,
@@ -432,7 +436,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             'id': '1t',
             'parent_id': '1s',
             'post_id': 'p',
-            'profile_image': user.profile.image_small,
+            'profile_image': image_uri(user.profile),
             'score': 1,
             'text': 'reply to parent which is not deleted',
             'upvoted': False,
@@ -470,7 +474,7 @@ def test_get_comment(client, jwt_header, private_channel_and_contributor, reddit
         "removed": False,
         "deleted": False,
         "subscribed": False,
-        'profile_image': user.profile.image_small,
+        'profile_image': image_uri(user.profile),
         'author_name': user.profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -514,7 +518,7 @@ def test_get_comment_anonymous(client, public_channel, reddit_factories, setting
                 'num_reports': None,
                 'parent_id': None,
                 'post_id': post.id,
-                'profile_image': user.profile.image_small,
+                'profile_image': image_uri(user.profile),
                 'removed': False,
                 'score': 1,
                 'subscribed': False,
@@ -547,7 +551,7 @@ def test_create_comment(client, logged_in_profile, mock_notify_subscribed_users)
         "removed": False,
         "deleted": False,
         "subscribed": True,
-        'profile_image': logged_in_profile.image_small,
+        'profile_image': image_uri(logged_in_profile),
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -610,7 +614,7 @@ def test_create_comment_no_upvote(client, logged_in_profile, mock_notify_subscri
         "removed": False,
         "deleted": False,
         "subscribed": True,
-        'profile_image': logged_in_profile.image_small,
+        'profile_image': image_uri(logged_in_profile),
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -641,7 +645,7 @@ def test_create_comment_downvote(client, logged_in_profile, mock_notify_subscrib
         "removed": False,
         "deleted": False,
         "subscribed": True,
-        'profile_image': logged_in_profile.image_small,
+        'profile_image': image_uri(logged_in_profile),
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -673,7 +677,7 @@ def test_create_comment_reply_to_comment(client, logged_in_profile, mock_notify_
         "removed": False,
         "deleted": False,
         "subscribed": True,
-        'profile_image': logged_in_profile.image_small,
+        'profile_image': image_uri(logged_in_profile),
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -721,7 +725,7 @@ def test_update_comment_text(client, logged_in_profile):
         "removed": False,
         "deleted": False,
         "subscribed": False,
-        'profile_image': logged_in_profile.image_small,
+        'profile_image': image_uri(logged_in_profile),
         'author_name': logged_in_profile.name,
         'edited': True,
         'comment_type': 'comment',
@@ -772,7 +776,7 @@ def test_update_comment_upvote(client, logged_in_profile):
         "removed": False,
         "deleted": False,
         "subscribed": False,
-        'profile_image': logged_in_profile.image_small,
+        'profile_image': image_uri(logged_in_profile),
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -801,7 +805,7 @@ def test_update_comment_downvote(client, logged_in_profile):
         "removed": False,
         "deleted": False,
         "subscribed": False,
-        'profile_image': logged_in_profile.image_small,
+        'profile_image': image_uri(logged_in_profile),
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -829,7 +833,7 @@ def test_update_comment_clear_upvote(client, logged_in_profile):
         "removed": False,
         "deleted": False,
         "subscribed": False,
-        'profile_image': logged_in_profile.image_small,
+        'profile_image': image_uri(logged_in_profile),
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -858,7 +862,7 @@ def test_update_comment_clear_downvote(client, logged_in_profile):
         "removed": False,
         "deleted": False,
         "subscribed": False,
-        'profile_image': logged_in_profile.image_small,
+        'profile_image': image_uri(logged_in_profile),
         'author_name': logged_in_profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -892,7 +896,7 @@ def test_update_comment_remove(
         "removed": True,
         "deleted": False,
         "subscribed": False,
-        'profile_image': user.profile.image_small,
+        'profile_image': image_uri(user.profile),
         'author_name': user.profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -927,7 +931,7 @@ def test_update_comment_approve(
         "removed": False,
         "deleted": False,
         "subscribed": False,
-        'profile_image': user.profile.image_small,
+        'profile_image': image_uri(user.profile),
         'author_name': user.profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -961,7 +965,7 @@ def test_update_comment_ignore_reports(
         "removed": False,
         "deleted": False,
         "subscribed": False,
-        'profile_image': user.profile.image_small,
+        'profile_image': image_uri(user.profile),
         'author_name': user.profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -1021,7 +1025,7 @@ def test_update_comment_subscribe(client, staff_user, private_channel_and_contri
         "removed": False,
         "deleted": False,
         "subscribed": True,
-        'profile_image': user.profile.image_small,
+        'profile_image': image_uri(user.profile),
         'author_name': user.profile.name,
         'edited': False,
         'comment_type': 'comment',
@@ -1054,7 +1058,7 @@ def test_update_comment_unsubscribe(client, staff_user, staff_api, private_chann
         "removed": False,
         "deleted": False,
         "subscribed": False,
-        'profile_image': user.profile.image_small,
+        'profile_image': image_uri(user.profile),
         'author_name': user.profile.name,
         'edited': False,
         'comment_type': 'comment',

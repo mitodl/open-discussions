@@ -9,6 +9,7 @@ from channels.constants import (
     VALID_POST_SORT_TYPES,
 )
 from open_discussions.features import ANONYMOUS_ACCESS
+from profiles.utils import image_uri
 
 pytestmark = pytest.mark.betamax
 
@@ -56,7 +57,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
             "channel_name": channel.name,
             "channel_title": channel.title,
             'author_name': user.profile.name,
-            "profile_image": user.profile.image_small,
+            "profile_image": image_uri(user.profile),
             "edited": False,
             "stickied": False,
             "num_reports": None,
@@ -99,7 +100,7 @@ def test_frontpage_sorted(client, private_channel_and_contributor, reddit_factor
             "channel_name": channel.name,
             "channel_title": channel.title,
             'author_name': user.profile.name,
-            "profile_image": user.profile.image_small,
+            "profile_image": image_uri(user.profile),
             "edited": False,
             "stickied": False,
             'num_reports': None,

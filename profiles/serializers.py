@@ -19,7 +19,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('name', 'image', 'image_small', 'image_medium', 'email_optin', 'toc_optin', 'bio', 'headline')
+        fields = ('name', 'image', 'image_small', 'image_medium',
+                  'image_file', 'image_small_file', 'image_medium_file',
+                  'email_optin', 'toc_optin', 'bio', 'headline')
 
 
 class UserSerializer(serializers.ModelSerializer):

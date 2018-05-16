@@ -1,13 +1,11 @@
 """Tests for views for REST APIs for posts"""
 # pylint: disable=unused-argument
-from urllib.parse import urljoin
 import pytest
 from django.urls import reverse
 from rest_framework import status
 
+from profiles.utils import image_uri
 from channels.api import Api
-from channels.serializers import default_profile_image
-
 from channels.constants import (
     VALID_POST_SORT_TYPES,
     POSTS_SORT_HOT,
@@ -15,7 +13,6 @@ from channels.constants import (
 from channels.models import Subscription
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
-from open_discussions.settings import SITE_BASE_URL
 
 pytestmark = pytest.mark.betamax
 
@@ -46,7 +43,7 @@ def test_create_url_post(client, private_channel_and_contributor):
         'score': 1,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
@@ -80,7 +77,7 @@ def test_create_text_post(client, private_channel_and_contributor):
         'score': 1,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        'profile_image': user.profile.image_small,
+        'profile_image': image_uri(user.profile),
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
@@ -156,8 +153,6 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
         user.profile.image_small = '/just/a/great/image.png.jpg.gif'
     user.profile.save()
 
-    profile_image = urljoin(SITE_BASE_URL, default_profile_image) if missing_image else user.profile.image_small
-
     post = reddit_factories.text_post('my geat post', user, channel=channel)
     url = reverse('post-detail', kwargs={'post_id': post.id})
     client.force_login(user)
@@ -179,7 +174,7 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
         "channel_name": channel.name,
         "channel_title": channel.title,
         'author_name': user.profile.name,
-        "profile_image": profile_image,
+        "profile_image": image_uri(user.profile),
         'edited': False,
         "stickied": False,
         'num_reports': None,
@@ -226,7 +221,7 @@ def test_get_post_stickied(client, private_channel_and_contributor, reddit_facto
         "channel_name": channel.name,
         "channel_title": channel.title,
         'author_name': user.profile.name,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "edited": False,
         "stickied": True,
         'num_reports': None,
@@ -254,7 +249,7 @@ def test_get_post_anonymous(client, public_channel, reddit_factories, settings, 
             'id': post.id,
             'num_comments': 0,
             'num_reports': None,
-            'profile_image': user.profile.image_small,
+            'profile_image': image_uri(user.profile),
             'removed': False,
             'score': 1,
             'stickied': False,
@@ -313,7 +308,7 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
                     "channel_name": channel.name,
                     "channel_title": channel.title,
                     'author_name': user.profile.name,
-                    "profile_image": user.profile.image_small,
+                    "profile_image": image_uri(user.profile),
                     "edited": False,
                     "stickied": False,
                     'num_reports': None,
@@ -372,7 +367,7 @@ def test_list_posts_sorted(client, private_channel_and_contributor, reddit_facto
             "channel_name": channel.name,
             "channel_title": channel.title,
             'author_name': user.profile.name,
-            "profile_image": user.profile.image_small,
+            "profile_image": image_uri(user.profile),
             "edited": False,
             "stickied": False,
             'num_reports': None,
@@ -410,7 +405,7 @@ def test_list_posts_stickied(client, private_channel_and_contributor, reddit_fac
         "channel_name": channel.name,
         "channel_title": channel.title,
         'author_name': user.profile.name,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "edited": False,
         "stickied": True,
         'num_reports': None,
@@ -534,7 +529,7 @@ def test_list_posts_anonymous(client, public_channel, reddit_factories, settings
                 'id': post.id,
                 'num_comments': 0,
                 'num_reports': None,
-                'profile_image': user.profile.image_small,
+                'profile_image': image_uri(user.profile),
                 'removed': False,
                 'score': 1,
                 'stickied': False,
@@ -571,7 +566,7 @@ def test_update_post_text(client, private_channel_and_contributor, reddit_factor
         'num_comments': 0,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
@@ -601,7 +596,7 @@ def test_update_post_stickied(client, private_channel_and_contributor, reddit_fa
         'num_comments': 0,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         'edited': False,
         "stickied": True,
@@ -653,7 +648,7 @@ def test_update_post_clear_vote(client, private_channel_and_contributor, reddit_
         'num_comments': 0,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
@@ -683,7 +678,7 @@ def test_update_post_upvote(client, private_channel_and_contributor, reddit_fact
         'num_comments': 0,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         "edited": False,
         "stickied": False,
@@ -713,7 +708,7 @@ def test_update_post_removed(client, staff_user, private_channel_and_contributor
         'num_comments': 0,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         "edited": False,
         "stickied": False,
@@ -746,7 +741,7 @@ def test_update_post_clear_removed(
         'num_comments': 0,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
@@ -778,7 +773,7 @@ def test_update_post_ignore_reports(
         'num_comments': 0,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
@@ -857,7 +852,7 @@ def test_create_post_without_upvote(client, private_channel_and_contributor):
         'score': 1,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
@@ -922,7 +917,7 @@ def test_subscribe_post(
         'score': 1,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,
@@ -957,7 +952,7 @@ def test_unsubscribe_post(client, private_channel_and_contributor, reddit_factor
         'score': 1,
         'channel_name': channel.name,
         'channel_title': channel.title,
-        "profile_image": user.profile.image_small,
+        "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         'edited': False,
         "stickied": False,

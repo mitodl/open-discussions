@@ -22,6 +22,9 @@ def test_serialize_user(user):
             'image': profile.image,
             'image_small': profile.image_small,
             'image_medium': profile.image_medium,
+            'image_file': profile.image_file.url,
+            'image_small_file': profile.image_small_file.url,
+            'image_medium_file': profile.image_medium_file.url,
             'bio': profile.bio,
             'headline': profile.headline
         }
@@ -51,7 +54,11 @@ def test_serialize_create_user(db, mocker):
 
     del profile['email_optin']  # is write-only
     del profile['toc_optin']  # is write-only
-
+    profile.update({
+        'image_file': None,
+        'image_small_file': None,
+        'image_medium_file': None
+    })
     assert UserSerializer(user).data == {
         'id': user.id,
         'username': user.username,
@@ -81,6 +88,9 @@ def test_update_user_profile(user, key, value):
         'image': profile.image,
         'image_small': profile.image_small,
         'image_medium': profile.image_medium,
+        'image_file': profile.image_file.url,
+        'image_small_file': profile.image_small_file.url,
+        'image_medium_file': profile.image_medium_file.url,
         'email_optin': None,
         'toc_optoin': profile.toc_optin,
         'bio': profile.bio,
