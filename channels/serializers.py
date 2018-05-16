@@ -16,6 +16,8 @@ from rest_framework.exceptions import ValidationError
 from channels.api import (
     Api,
     get_kind_mapping,
+    apply_post_vote,
+    apply_comment_vote,
 )
 from channels.constants import VALID_CHANNEL_TYPES
 from channels.models import Subscription
@@ -75,39 +77,6 @@ class WriteableSerializerMethodField(serializers.SerializerMethodField):
 
     def to_internal_value(self, data):
         return data
-
-
-def _apply_vote(instance, validated_data, allow_downvote):
-    """
-    Apply a vote provided by the user to a comment or post, if it's different than before.
-
-    Args:
-        instance (Comment or Post): A comment or post
-        validated_data (dict): validated data which contains the new vote from the user
-        allow_downvote (bool): If false, ignore downvotes
-
-    Returns:
-        bool:
-            True if a change was made, False otherwise
-    """
-    upvote = validated_data.get('upvoted')
-    if allow_downvote:
-        downvote = validated_data.get('downvoted')
-    else:
-        downvote = None
-
-    is_upvoted = instance.likes is True
-    is_downvoted = instance.likes is False
-
-    if upvote and not is_upvoted:
-        instance.upvote()
-    elif downvote and not is_downvoted:
-        instance.downvote()
-    elif (upvote is False and is_upvoted) or (downvote is False and is_downvoted):
-        instance.clear_vote()
-    else:
-        return False
-    return True
 
 
 def _parse_bool(value, field_name):
@@ -269,7 +238,7 @@ class PostSerializer(serializers.Serializer):
 
         api.add_post_subscription(post.id)
 
-        changed = _apply_vote(post, validated_data, False)
+        changed = apply_post_vote(post, validated_data)
         if not changed:
             return post
         else:
@@ -309,7 +278,7 @@ class PostSerializer(serializers.Serializer):
             elif validated_data['subscribed'] is False:
                 api.remove_post_subscription(post_id)
 
-        _apply_vote(instance, validated_data, False)
+        apply_post_vote(instance, validated_data)
         return api.get_post(post_id=post_id)
 
 
@@ -471,7 +440,7 @@ class CommentSerializer(serializers.Serializer):
 
         api.add_comment_subscription(post_id, comment.id)
 
-        changed = _apply_vote(comment, validated_data, True)
+        changed = apply_comment_vote(comment, validated_data)
 
         from notifications.tasks import notify_subscribed_users
         notify_subscribed_users.delay(post_id, validated_data.get('comment_id', None), comment.id)
@@ -508,7 +477,7 @@ class CommentSerializer(serializers.Serializer):
             elif validated_data['subscribed'] is False:
                 api.remove_comment_subscription(post_id, instance.id)
 
-        _apply_vote(instance, validated_data, True)
+        apply_comment_vote(instance, validated_data)
 
         return api.get_comment(comment_id=instance.id)
 

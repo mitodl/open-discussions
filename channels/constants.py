@@ -1,4 +1,6 @@
 """Constants for channels"""
+from enum import Enum, auto
+
 
 CHANNEL_TYPE_PUBLIC = 'public'
 CHANNEL_TYPE_PRIVATE = 'private'
@@ -27,3 +29,14 @@ VALID_COMMENT_SORT_TYPES = (
     COMMENTS_SORT_NEW,
     COMMENTS_SORT_OLD,
 )
+
+POST_TYPE = 'post'
+COMMENT_TYPE = 'comment'
+
+
+class VoteActions(Enum):
+    """An enum indicating the valid vote actions that can be taken for a post or comment"""
+    UPVOTE = auto()
+    DOWNVOTE = auto()
+    CLEAR_UPVOTE = auto()
+    CLEAR_DOWNVOTE = auto()

@@ -15,6 +15,9 @@ from channels import api
 from channels.constants import (
     COMMENTS_SORT_BEST,
     VALID_CHANNEL_TYPES,
+    POST_TYPE,
+    COMMENT_TYPE,
+    VoteActions,
 )
 from channels.models import (
     RedditAccessToken,
@@ -41,6 +44,40 @@ def mock_get_client(mocker):
 def mock_client(mock_get_client):
     """Mock reddit client"""
     return mock_get_client.return_value
+
+
+@pytest.mark.parametrize('vote_func,expected_allowed_downvote,expected_instance_type', [
+    (api.apply_post_vote, False, POST_TYPE),
+    (api.apply_comment_vote, True, COMMENT_TYPE),
+])
+def test_vote_indexing(mocker, vote_func, expected_allowed_downvote, expected_instance_type):
+    """Test that an upvote/downvote calls a function to update the index"""
+    patched_vote_indexer = mocker.patch('channels.api.update_indexed_score')
+    # Test upvote
+    mock_reddit_obj = Mock()
+    mock_reddit_obj.likes = False
+    vote_func(mock_reddit_obj, {'upvoted': True})
+    patched_vote_indexer.assert_called_once_with(
+        mock_reddit_obj,
+        expected_instance_type,
+        VoteActions.UPVOTE
+    )
+    # Test downvote (which may not be allowed)
+    patched_vote_indexer.reset_mock()
+    mock_reddit_obj.likes = True
+    vote_func(mock_reddit_obj, {'downvoted': True})
+    assert patched_vote_indexer.called is expected_allowed_downvote
+    if patched_vote_indexer.called:
+        patched_vote_indexer.assert_called_once_with(
+            mock_reddit_obj,
+            expected_instance_type,
+            VoteActions.DOWNVOTE
+        )
+    # Test unchanged vote
+    patched_vote_indexer.reset_mock()
+    mock_reddit_obj.likes = True
+    vote_func(mock_reddit_obj, {'upvoted': True})
+    assert not patched_vote_indexer.called
 
 
 def test_get_session(settings):
@@ -133,13 +170,15 @@ def test_update_channel_setting(mock_client, channel_setting):
     mock_client.subreddit.return_value.mod.update.assert_called_once_with(**kwargs)
 
 
-def test_create_post_text(mock_client):
+def test_create_post_text(mock_client, indexing_decorator):
     """Test create_post with text"""
     client = api.Api(UserFactory.create())
     post = client.create_post('channel', 'Title', text='Text')
     assert post == mock_client.subreddit.return_value.submit.return_value
     mock_client.subreddit.assert_called_once_with('channel')
     mock_client.subreddit.return_value.submit.assert_called_once_with('Title', selftext='Text', url=None)
+    # This API function should be wrapped with the indexing decorator
+    assert indexing_decorator.mock_indexing_func.call_count == 1
 
 
 def test_create_post_url(mock_client):
@@ -188,7 +227,7 @@ def test_get_post(mock_client):
     mock_client.submission.assert_called_once_with(id='id')
 
 
-def test_update_post_valid(mock_client):
+def test_update_post_valid(mock_client, indexing_decorator):
     """Test update_post passes"""
     mock_client.submission.return_value.selftext = 'text'
     client = api.Api(UserFactory.create())
@@ -196,6 +235,8 @@ def test_update_post_valid(mock_client):
     assert post == mock_client.submission.return_value.edit.return_value
     mock_client.submission.assert_called_once_with(id='id')
     mock_client.submission.return_value.edit.assert_called_once_with('Text')
+    # This API function should be wrapped with the indexing decorator
+    assert indexing_decorator.mock_indexing_func.call_count == 1
 
 
 def test_update_post_invalid(mock_client):
@@ -208,25 +249,29 @@ def test_update_post_invalid(mock_client):
     assert mock_client.submission.return_value.edit.call_count == 0
 
 
-def test_approve_post(mock_client):
+def test_approve_post(mock_client, indexing_decorator):
     """Test approve_post passes"""
     mock_client.submission.return_value.selftext = 'text'
     client = api.Api(UserFactory.create())
     client.approve_post('id')
     mock_client.submission.assert_called_once_with(id='id')
     mock_client.submission.return_value.mod.approve.assert_called_once_with()
+    # This API function should be wrapped with the indexing decorator
+    assert indexing_decorator.mock_indexing_func.call_count == 1
 
 
-def test_remove_post(mock_client):
+def test_remove_post(mock_client, indexing_decorator):
     """Test remove_post passes"""
     mock_client.submission.return_value.selftext = 'text'
     client = api.Api(UserFactory.create())
     client.remove_post('id')
     mock_client.submission.assert_called_once_with(id='id')
     mock_client.submission.return_value.mod.remove.assert_called_once_with()
+    # This API function should be wrapped with the indexing decorator
+    assert indexing_decorator.mock_indexing_func.call_count == 1
 
 
-def test_create_comment_on_post(mock_client):
+def test_create_comment_on_post(mock_client, indexing_decorator):
     """Makes correct calls for comment on post"""
     client = api.Api(UserFactory.create())
     comment = client.create_comment('text', post_id='id1')
@@ -234,6 +279,8 @@ def test_create_comment_on_post(mock_client):
     assert mock_client.comment.call_count == 0
     mock_client.submission.assert_called_once_with(id='id1')
     mock_client.submission.return_value.reply.assert_called_once_with('text')
+    # This API function should be wrapped with the indexing decorator
+    assert indexing_decorator.mock_indexing_func.call_count == 1
 
 
 def test_create_comment_on_comment(mock_client):
@@ -282,12 +329,14 @@ def test_get_comment(mock_client):
     mock_client.comment.assert_called_once_with('id')
 
 
-def test_delete_comment(mock_client):
+def test_delete_comment(mock_client, indexing_decorator):
     """Test delete_comment"""
     client = api.Api(UserFactory.create())
     client.delete_comment('id')
     mock_client.comment.assert_called_once_with('id')
     mock_client.comment.return_value.delete.assert_called_once_with()
+    # This API function should be wrapped with the indexing decorator
+    assert indexing_decorator.mock_indexing_func.call_count == 1
 
 
 def test_update_comment(mock_client):

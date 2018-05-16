@@ -71,6 +71,7 @@ services:
       - "8061:8061"
     links:
       - db
+      - elastic
       - redis
 
   watch:

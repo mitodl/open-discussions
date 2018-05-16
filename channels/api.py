@@ -1,8 +1,10 @@
 """Channels APIs"""
 # pylint: disable=too-many-public-methods, too-many-lines
+import logging
 from datetime import datetime, timedelta
 from urllib.parse import urljoin
 
+from functools import partial
 import pytz
 import requests
 from django.conf import settings
@@ -35,6 +37,9 @@ from channels.constants import (
     VALID_CHANNEL_TYPES,
     VALID_POST_SORT_TYPES,
     VALID_COMMENT_SORT_TYPES,
+    POST_TYPE,
+    COMMENT_TYPE,
+    VoteActions,
 )
 from channels.models import (
     RedditAccessToken,
@@ -44,6 +49,15 @@ from channels.models import (
 
 from open_discussions import features
 from open_discussions.utils import now_in_utc
+from search.task_helpers import (
+    reddit_object_indexer,
+    index_full_post,
+    update_post_text,
+    update_post_removal_status,
+    increment_post_comment_count,
+    decrement_post_comment_count,
+    update_indexed_score,
+)
 
 USER_AGENT = 'MIT-Open: {version}'
 ACCESS_TOKEN_HEADER_NAME = 'X-Access-Token'
@@ -66,6 +80,8 @@ User = get_user_model()
 
 # monkey patch praw's rate limiter to not limit us
 prawcore.rate_limit.RateLimiter.delay = lambda *args: None
+
+log = logging.getLogger()
 
 
 def _get_refresh_token(username):
@@ -273,6 +289,58 @@ def replace_load_comment(original_load_comment):
     return replacement_load_comment
 
 
+def _apply_vote(instance, validated_data, allow_downvote=False, instance_type=None):
+    """
+    Apply a vote provided by the user to a comment or post, if it's different than before.
+
+    Args:
+        instance (Comment or Post): A comment or post
+        validated_data (dict): validated data which contains the new vote from the user
+        allow_downvote (bool): If false, ignore downvotes
+        instance_type (str): A string indicating the reddit object type (comment, post/submission)
+    Returns:
+        bool:
+            True if a change was made, False otherwise
+    """
+    upvote = validated_data.get('upvoted')
+    if allow_downvote:
+        downvote = validated_data.get('downvoted')
+    else:
+        downvote = None
+
+    is_upvoted = instance.likes is True
+    is_downvoted = instance.likes is False
+
+    # Determine vote action to take based on the request and any already-applied votes
+    if upvote and not is_upvoted:
+        vote_action = VoteActions.UPVOTE
+    elif downvote and not is_downvoted:
+        vote_action = VoteActions.DOWNVOTE
+    elif upvote is False and is_upvoted:
+        vote_action = VoteActions.CLEAR_UPVOTE
+    elif downvote is False and is_downvoted:
+        vote_action = VoteActions.CLEAR_DOWNVOTE
+    else:
+        return False
+
+    if vote_action == VoteActions.UPVOTE:
+        instance.upvote()
+    elif vote_action == VoteActions.UPVOTE:
+        instance.downvote()
+    elif vote_action in (VoteActions.CLEAR_UPVOTE, VoteActions.CLEAR_DOWNVOTE):
+        instance.clear_vote()
+
+    try:
+        update_indexed_score(instance, instance_type, vote_action)
+    except Exception:  # pylint: disable=broad-except
+        log.exception('Error occurred while trying to index [%s] object score', instance_type)
+    return True
+
+
+apply_post_vote = partial(_apply_vote, allow_downvote=False, instance_type=POST_TYPE)
+apply_comment_vote = partial(_apply_vote, allow_downvote=True, instance_type=COMMENT_TYPE)
+
+
 class Api:
     """Channel API"""
     def __init__(self, user):
@@ -371,6 +439,7 @@ class Api:
         self.get_channel(name).mod.update(**values)
         return self.get_channel(name)
 
+    @reddit_object_indexer(indexing_func=index_full_post)
     def create_post(self, channel_name, title, text=None, url=None):
         """
         Create a new post in a channel
@@ -469,6 +538,7 @@ class Api:
         """
         return self.reddit.submission(id=post_id)
 
+    @reddit_object_indexer(indexing_func=update_post_text)
     def update_post(self, post_id, text):
         """
         Updates the post
@@ -501,6 +571,7 @@ class Api:
         post = self.get_post(post_id)
         post.mod.sticky(pinned)
 
+    @reddit_object_indexer(indexing_func=update_post_removal_status)
     def remove_post(self, post_id):
         """
         Removes the post, opposite of approve_post
@@ -510,17 +581,21 @@ class Api:
         """
         post = self.get_post(post_id)
         post.mod.remove()
+        return post
 
+    @reddit_object_indexer(indexing_func=update_post_removal_status)
     def approve_post(self, post_id):
         """
-        Approves the post, oppsite of remove_post
+        Approves the post, opposite of remove_post
 
         Args:
             post_id(str): the base36 id for the post
         """
         post = self.get_post(post_id)
         post.mod.approve()
+        return post
 
+    @reddit_object_indexer(indexing_func=increment_post_comment_count)
     def create_comment(self, text, post_id=None, comment_id=None):
         """
         Create a new comment in reply to a post or comment
@@ -564,7 +639,9 @@ class Api:
         Args:
             comment_id(str): the id of the comment
         """
-        self.get_comment(comment_id).mod.remove()
+        comment = self.get_comment(comment_id)
+        comment.mod.remove()
+        return comment
 
     def approve_comment(self, comment_id):
         """
@@ -575,6 +652,7 @@ class Api:
         """
         self.get_comment(comment_id).mod.approve()
 
+    @reddit_object_indexer(indexing_func=decrement_post_comment_count)
     def delete_comment(self, comment_id):
         """
         Deletes the comment
@@ -583,7 +661,9 @@ class Api:
             comment_id(str): the id of the comment to delete
 
         """
-        self.get_comment(comment_id).delete()
+        comment = self.get_comment(comment_id)
+        comment.delete()
+        return comment
 
     def get_comment(self, comment_id):
         """
