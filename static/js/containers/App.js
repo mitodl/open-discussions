@@ -58,6 +58,17 @@ class App extends React.Component<*, void> {
     this.loadData()
   }
 
+  componentDidUpdate(prevProps) {
+    const { location: { pathname } } = this.props
+
+    if (
+      !pathname.startsWith(SETTINGS_URL) &&
+      prevProps.location.pathname.startsWith(SETTINGS_URL)
+    ) {
+      this.loadData()
+    }
+  }
+
   loadData = async () => {
     const { dispatch } = this.props
 

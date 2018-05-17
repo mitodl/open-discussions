@@ -3,22 +3,27 @@
 import sinon from "sinon"
 import { assert } from "chai"
 
+import App from "./App"
+
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeChannelList } from "../factories/channels"
 import { actions } from "../actions"
 import { SETTINGS_URL } from "../lib/url"
 import { makeFrontpageSetting, makeCommentSetting } from "../factories/settings"
+import { makeChannelPostList } from "../factories/posts"
 
 describe("App", () => {
-  let helper, renderComponent, channels
+  let helper, renderComponent, channels, postList
 
   beforeEach(() => {
     channels = makeChannelList(10)
+    postList = makeChannelPostList()
     helper = new IntegrationTestHelper()
     helper.getChannelsStub.returns(Promise.resolve(channels))
     helper.getSettingsStub.returns(
       Promise.resolve([makeFrontpageSetting(), makeCommentSetting()])
     )
+    helper.getFrontpageStub.returns(Promise.resolve({ posts: postList }))
     renderComponent = helper.renderComponent.bind(helper)
   })
 
@@ -39,6 +44,30 @@ describe("App", () => {
   it("doesn't load requirements for settings", async () => {
     await renderComponent("/settings/a_setting", [])
     sinon.assert.notCalled(helper.getChannelsStub)
+  })
+
+  //
+  ;[SETTINGS_URL, `${SETTINGS_URL}tokenbasedauthtokentoken`].forEach(url => {
+    it("loads requirements after navigating away from settings", async () => {
+      const [wrapper] = await renderComponent(url, [
+        actions.settings.get.requestType,
+        actions.settings.get.successType
+      ])
+      sinon.assert.notCalled(helper.getChannelsStub)
+
+      await helper.listenForActions(
+        [
+          actions.subscribedChannels.get.requestType,
+          actions.subscribedChannels.get.successType,
+          actions.frontpage.get.requestType,
+          actions.frontpage.get.successType
+        ],
+        () => {
+          const { history } = wrapper.find(App).props()
+          history.push({ pathname: "/" })
+        }
+      )
+    })
   })
 
   it("doesn't load requirements for anonymous users if allow_anonymous is false", async () => {
