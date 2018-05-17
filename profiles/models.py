@@ -1,12 +1,12 @@
 """Profile models"""
-import logging
 from django.db import models
 from django.conf import settings
 
 from profiles.utils import (
     profile_image_upload_uri,
     profile_image_upload_uri_medium,
-    profile_image_upload_uri_small)
+    profile_image_upload_uri_small
+)
 
 MAX_IMAGE_FIELD_LENGTH = 1024
 PROFILE_PROPS = (
@@ -19,15 +19,6 @@ PROFILE_PROPS = (
     'headline',
     'bio',
 )
-
-PROFILE_IMAGE_PROPS = (
-    'image',
-    'image_small',
-    'image_medium',
-
-)
-
-logger = logging.getLogger()
 
 
 class Profile(models.Model):

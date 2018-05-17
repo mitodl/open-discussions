@@ -64,7 +64,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
 
     if user:
         user_full_name = user.profile.name
-        profile_image_small = image_uri(user.profile)
+        profile_image_small = image_uri(user)
         user_email = user.email
 
     js_settings = {

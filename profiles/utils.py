@@ -23,15 +23,17 @@ IMAGE_PATH_PREFIX = 'profile'
 default_profile_image = urljoin(settings.STATIC_URL, "images/avatar_default.png")
 
 
-def image_uri(profile, image_field='image_small'):
-    """ Return the correctly formatted image URI """
-    image_file = getattr(profile, '{}_file'.format(image_field))
-    if not image_file.name:
-        return getattr(profile, image_field) or default_profile_image
-    return image_file.url
+def image_uri(user, image_field='image_small'):
+    """ Return the correctly formatted profile image URI for a user """
+    if user and user.profile:
+        image_file = getattr(user.profile, '{}_file'.format(image_field))
+        if not image_file.name:
+            return getattr(user.profile, image_field) or default_profile_image
+        return image_file.url
+    return default_profile_image
 
 
-def generate_filepath(filename, suffix=''):
+def generate_filepath(filename, username, suffix=''):
     """
     Generate and return the filepath for an uploaded image
 
@@ -44,11 +46,12 @@ def generate_filepath(filename, suffix=''):
     """
     name, ext = path.splitext(filename)
     timestamp = now_in_utc().replace(microsecond=0)
-    path_format = "{prefix}/{name}-{timestamp}{suffix}{ext}"
+    path_format = "{prefix}/{username}/{name}-{timestamp}{suffix}{ext}"
 
     path_without_name = path_format.format(
         timestamp=timestamp.strftime("%Y-%m-%dT%H%M%S"),
         prefix=IMAGE_PATH_PREFIX,
+        username=username,
         suffix=suffix,
         ext=ext,
         name='',
@@ -61,6 +64,7 @@ def generate_filepath(filename, suffix=''):
         name=name[:max_name_length],
         timestamp=timestamp.strftime("%Y-%m-%dT%H%M%S"),
         prefix=IMAGE_PATH_PREFIX,
+        username=username,
         suffix=suffix,
         ext=ext,
     )
@@ -80,9 +84,9 @@ def _generate_upload_to_uri(suffix=""):
             A function to use with upload_to to specify an upload directory and filename
     """
 
-    def _upload_to(_, filename):
+    def _upload_to(instance, filename):
         """Function passed to upload_to on an ImageField"""
-        return generate_filepath(filename, suffix)
+        return generate_filepath(filename, instance.user.username, suffix)
 
     return _upload_to
 

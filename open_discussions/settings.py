@@ -466,10 +466,6 @@ if OPEN_DISCUSSIONS_USE_S3:
     if CLOUDFRONT_DIST:
         AWS_S3_CUSTOM_DOMAIN = '{dist}.cloudfront.net'.format(dist=CLOUDFRONT_DIST)
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-else:
-    # by default use django.core.files.storage.FileSystemStorage with
-    # overwrite feature
-    DEFAULT_FILE_STORAGE = 'storages.backends.overwrite.OverwriteStorage'
 
 # Celery
 USE_CELERY = True
