@@ -1,5 +1,7 @@
 .embedly {
+
   .video-container {
+    padding: 15px 0;
     position: relative;
     width: 100%;
     height: 0;
@@ -16,9 +18,8 @@
 
   .photo {
     img {
-      max-height: 400px;
+      max-height: 600px;
       object-fit: scale-down;
-      width: 100%;
     }
   }
 
@@ -32,33 +33,32 @@
       flex-direction: row;
     }
 
-
     .thumbnail {
-      display: flex;
-      overflow: hidden;
-      flex-direction: column;
-      max-height: 300px;
       width: 100%;
-      justify-content: center;
+
+      img {
+        max-height: 600px;
+        object-fit: scale-down;
+        width: 100%;
+      }
 
       @include breakpoint(desktopwide) {
         height: 200px;
         width: 300px;
         flex: none;
       }
-
-
-      img {
-        width: 100%;
-        height: auto;
-      }
     }
 
     .link-summary {
       @include breakpoint(desktopwide) {
-        margin-left: 15px;
+        margin-left: 22px;
       }
 
+      h2 {
+        margin: 10px 0 15px 0;
+        font-size: 21px;
+        font-weight: 500;
+      }
 
       .description {
         font-size: 15px;
