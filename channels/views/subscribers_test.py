@@ -62,28 +62,33 @@ def test_add_subscriber_anonymous(client, settings, allow_anonymous):
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_detail_subscriber(client, staff_jwt_header):
+def test_detail_subscriber(client, jwt_header, private_channel_and_contributor):
     """
     Detail of a subscriber in a channel
     """
-    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    channel, contributor = private_channel_and_contributor
     url = reverse(
-        'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username})
-    resp = client.get(url, **staff_jwt_header)
+        'subscriber-detail', kwargs={
+            'channel_name': channel.name,
+            'subscriber_name': contributor.username,
+        }
+    )
+    resp = client.get(url, **jwt_header)
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {'subscriber_name': subscriber.username}
+    assert resp.json() == {'subscriber_name': contributor.username}
 
 
-def test_detail_subscriber_missing(client):
+def test_detail_subscriber_missing(client, jwt_header, private_channel, user):
     """
     A missing subscriber should generate a 404
     """
-    subscriber = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
-    client.force_login(subscriber)
     url = reverse(
-        'subscriber-detail', kwargs={'channel_name': 'admin_channel', 'subscriber_name': subscriber.username}
+        'subscriber-detail', kwargs={
+            'channel_name': private_channel.name,
+            'subscriber_name': user.username,
+        }
     )
-    resp = client.get(url)
+    resp = client.get(url, **jwt_header)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
