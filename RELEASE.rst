@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.27.1
+--------------
+
+- Enable anonymous acces to the embedly API
+- Added login/register via email
+- Added Elasticsearch document and added indexing handlers for posts
+- Increased uwsgi buffer size
+
 Version 0.27.0
 --------------
 
