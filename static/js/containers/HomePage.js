@@ -120,6 +120,6 @@ const mapStateToProps = (state, ownProps) => {
 export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
-  withNavSidebar,
+  withNavSidebar("home-page"),
   withLoading
 )(HomePage)

@@ -10,7 +10,7 @@ import { formatTitle } from "../lib/title"
 export default class ContentPolicyPage extends React.Component<*, void> {
   render() {
     return (
-      <div className="content">
+      <div className="content content-policy-page">
         <DocumentTitle
           title={formatTitle("MicroMasters Discussions Community Guidelines")}
         />

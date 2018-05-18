@@ -114,6 +114,6 @@ export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
   withCommentModeration,
-  withNavAndChannelSidebars,
+  withNavAndChannelSidebars("channel-moderation-page"),
   withLoading
 )(ChannelModerationPage)

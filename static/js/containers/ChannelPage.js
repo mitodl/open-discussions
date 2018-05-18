@@ -219,6 +219,6 @@ const mapStateToProps = (state, ownProps) => {
 export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
-  withNavAndChannelSidebars,
+  withNavAndChannelSidebars("channel-page"),
   withLoading
 )(ChannelPage)

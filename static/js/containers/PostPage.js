@@ -500,6 +500,6 @@ export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
   withCommentModeration,
-  withNavSidebar,
+  withNavSidebar("post-page"),
   withLoading
 )(PostPage)

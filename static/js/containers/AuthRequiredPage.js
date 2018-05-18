@@ -10,7 +10,7 @@ import { formatTitle } from "../lib/title"
 export default class AuthRequiredPage extends React.Component<*, void> {
   render() {
     return (
-      <div className="content">
+      <div className="content auth-required-page">
         <DocumentTitle title={formatTitle("Login Required")} />
         <div className="main-content">
           <Card className="auth-required">

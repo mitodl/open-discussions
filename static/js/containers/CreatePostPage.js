@@ -151,7 +151,7 @@ class CreatePostPage extends React.Component<*, void> {
     }
 
     return (
-      <div className="content">
+      <div className="content create-post-page">
         <DocumentTitle title={formatTitle("Submit a Post")} />
         <div className="main-content">
           <CreatePostForm
