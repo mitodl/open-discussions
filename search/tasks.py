@@ -15,8 +15,8 @@ from open_discussions.celery import app
 from search import indexing_api as api
 from search.connection import (
     get_conn,
-    get_default_alias,
-    get_reindexing_alias,
+    get_default_alias_name,
+    get_reindexing_alias_name,
     make_backing_index_name,
 )
 from search.exceptions import RetryException
@@ -130,7 +130,7 @@ def start_recreate_index(self, api_username):
 
     # Clear away temp alias so we can reuse it, and create mappings
     clear_and_create_index(index_name=new_backing_index)
-    temp_alias = get_reindexing_alias()
+    temp_alias = get_reindexing_alias_name()
     if conn.indices.exists_alias(name=temp_alias):
         # Deletes both alias and backing indexes
         conn.indices.delete_alias(index="_all", name=temp_alias)
@@ -170,7 +170,7 @@ def finish_recreate_index(backing_index):
     conn = get_conn(verify=False)
     actions = []
     old_backing_indexes = []
-    default_alias = get_default_alias()
+    default_alias = get_default_alias_name()
     if conn.indices.exists_alias(name=default_alias):
         # Should only be one backing index in normal circumstances
         old_backing_indexes = list(conn.indices.get_alias(name=default_alias).keys())
@@ -195,6 +195,6 @@ def finish_recreate_index(backing_index):
         conn.indices.delete(index)
 
     # Finally, remove the link to the reindexing alias
-    conn.indices.delete_alias(name=get_reindexing_alias(), index=backing_index)
+    conn.indices.delete_alias(name=get_reindexing_alias_name(), index=backing_index)
 
     log.info("recreate_index has finished successfully!")

@@ -6,8 +6,8 @@ import pytest
 
 from open_discussions.factories import UserFactory
 from search.connection import (
-    get_default_alias,
-    get_reindexing_alias,
+    get_default_alias_name,
+    get_reindexing_alias_name,
 )
 from search.exceptions import RetryException
 from search.tasks import (
@@ -156,7 +156,7 @@ def test_start_recreate_index(mocker, temp_alias_exists):
     with pytest.raises(TabError):
         start_recreate_index.delay(user.username)
 
-    reindexing_alias = get_reindexing_alias()
+    reindexing_alias = get_reindexing_alias_name()
     get_conn_mock.assert_called_once_with(verify=False)
     assert clear_and_create_mock.call_count == 1
     backing_index = clear_and_create_mock.call_args[1]['index_name']
@@ -200,10 +200,10 @@ def test_finish_recreate_index(mocker, default_exists):
     finish_recreate_index.delay(backing_index)
 
     conn_mock.indices.delete_alias.assert_any_call(
-        name=get_reindexing_alias(),
+        name=get_reindexing_alias_name(),
         index=backing_index,
     )
-    default_alias = get_default_alias()
+    default_alias = get_default_alias_name()
     conn_mock.indices.exists_alias.assert_called_once_with(name=default_alias)
 
     actions = []
@@ -230,6 +230,6 @@ def test_finish_recreate_index(mocker, default_exists):
         assert conn_mock.indices.delete.called is False
 
     conn_mock.indices.delete_alias.assert_called_once_with(
-        name=get_reindexing_alias(),
+        name=get_reindexing_alias_name(),
         index=backing_index,
     )

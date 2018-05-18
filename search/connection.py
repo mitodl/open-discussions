@@ -87,7 +87,7 @@ def make_alias_name(*, is_reindexing):
     )
 
 
-def get_default_alias():
+def get_default_alias_name():
     """
     Return the default alias
 
@@ -97,7 +97,7 @@ def get_default_alias():
     return make_alias_name(is_reindexing=False)
 
 
-def get_reindexing_alias():
+def get_reindexing_alias_name():
     """
     Returns the reindexing alias
 
@@ -116,6 +116,6 @@ def get_active_aliases():
     """
     conn = get_conn(verify=False)
     return [
-        alias for alias in [get_default_alias(), get_reindexing_alias()]
+        alias for alias in [get_default_alias_name(), get_reindexing_alias_name()]
         if conn.indices.exists(alias)
     ]

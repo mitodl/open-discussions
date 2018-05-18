@@ -10,7 +10,7 @@ from channels.constants import (
     POST_TYPE,
 )
 from open_discussions.factories import UserFactory
-from search.connection import get_default_alias
+from search.connection import get_default_alias_name
 from search.indexing_api import (
     clear_and_create_index,
     create_document,
@@ -44,7 +44,7 @@ def test_create_document(mocked_es):
     create_document(doc_id, data)
     mocked_es.get_conn.assert_called_once_with(verify=True)
     mocked_es.conn.create.assert_called_once_with(
-        index=get_default_alias(),
+        index=get_default_alias_name(),
         doc_type=GLOBAL_DOC_TYPE,
         body=data,
         id=doc_id,
@@ -59,7 +59,7 @@ def test_partially_update_document(mocked_es):
     update_document_with_partial(doc_id, data)
     mocked_es.get_conn.assert_called_once_with(verify=True)
     mocked_es.conn.update.assert_called_once_with(
-        index=get_default_alias(),
+        index=get_default_alias_name(),
         doc_type=GLOBAL_DOC_TYPE,
         body={'doc': data},
         id=doc_id,
@@ -75,7 +75,7 @@ def test_increment_document_integer_field(mocked_es):
     increment_document_integer_field(doc_id, field_name, incr_amount)
     mocked_es.get_conn.assert_called_once_with(verify=True)
     mocked_es.conn.update.assert_called_once_with(
-        index=get_default_alias(),
+        index=get_default_alias_name(),
         doc_type=GLOBAL_DOC_TYPE,
         body={
             "script": {
