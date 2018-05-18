@@ -1,6 +1,7 @@
 """
 Elasticsearch connection functionality
 """
+from functools import partial
 import uuid
 
 from django.conf import settings
@@ -87,24 +88,8 @@ def make_alias_name(*, is_reindexing):
     )
 
 
-def get_default_alias_name():
-    """
-    Return the default alias
-
-    Returns:
-        str: The default alias
-    """
-    return make_alias_name(is_reindexing=False)
-
-
-def get_reindexing_alias_name():
-    """
-    Returns the reindexing alias
-
-    Returns:
-        str: The reindexing alias
-    """
-    return make_alias_name(is_reindexing=True)
+get_default_alias_name = partial(make_alias_name, is_reindexing=False)
+get_reindexing_alias_name = partial(make_alias_name, is_reindexing=True)
 
 
 def get_active_aliases():
