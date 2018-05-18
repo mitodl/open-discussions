@@ -13,6 +13,7 @@ describe("Embedly", () => {
   it("should render the returned HTML for a video", () => {
     const wrapper = renderEmbedly(makeYoutubeVideo())
     assert.equal(wrapper.text(), "dummy html")
+    assert.ok(wrapper.find(".video-container").exists())
   })
 
   it("should render an image sensibly", () => {
@@ -36,6 +37,14 @@ describe("Embedly", () => {
       wrapper.find(".link-summary .description").text(),
       article.description
     )
+  })
+
+  it("should render a link which returns HTML sensibly", () => {
+    const article = makeArticle()
+    article.html = "<span>beep boop beepity boop</span>"
+    const wrapper = renderEmbedly(article)
+    assert.ok(wrapper.find(".rich").exists())
+    assert.equal(wrapper.text(), "beep boop beepity boop")
   })
 
   it("shouldnt render anything if embedly had some kind of error", () => {

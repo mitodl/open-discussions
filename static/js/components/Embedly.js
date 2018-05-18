@@ -7,10 +7,19 @@ export default class Embedly extends React.Component<*> {
 
     // the response includes HTML which can be used to load a rich embed
     // (either a video or the 'rich' type)
-    if (embedly.html) {
+    if (embedly.type === "video") {
       return (
         <div
-          className="embed-container"
+          className="video-container"
+          dangerouslySetInnerHTML={{ __html: embedly.html }}
+        />
+      )
+    }
+
+    if (embedly.type === "rich" || embedly.html) {
+      return (
+        <div
+          className="rich"
           dangerouslySetInnerHTML={{ __html: embedly.html }}
         />
       )
