@@ -50,5 +50,4 @@ describe("UserInfo", () => {
     const wrapper = renderUserInfo()
     assert.isOk(wrapper.find(".profile-incomplete").exists())
   })
-
 })
