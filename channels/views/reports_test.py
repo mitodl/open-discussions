@@ -6,6 +6,7 @@ from rest_framework import status
 from channels.api import Api
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
+from profiles.utils import image_uri
 
 pytestmark = pytest.mark.betamax
 
@@ -95,7 +96,7 @@ def test_list_reports(staff_client, private_channel_and_contributor, reddit_fact
             "removed": False,
             "deleted": False,
             "subscribed": False,
-            'profile_image': user.profile.image_small,
+            'profile_image': image_uri(user),
             'author_name': user.profile.name,
             'edited': False,
             'comment_type': 'comment',
@@ -118,7 +119,7 @@ def test_list_reports(staff_client, private_channel_and_contributor, reddit_fact
             "channel_name": channel.name,
             "channel_title": channel.title,
             'author_name': user.profile.name,
-            'profile_image': user.profile.image_small,
+            'profile_image': image_uri(user),
             'edited': False,
             "stickied": False,
             'num_reports': 2,

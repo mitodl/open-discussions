@@ -1,10 +1,14 @@
 """Tests for views for REST APIs for users"""
+from os.path import splitext, basename
+
 from django.contrib.auth.models import User
 from django.urls import reverse
 import pytest
 
 
 # pylint: disable=redefined-outer-name, unused-argument, too-many-arguments
+from profiles.utils import make_temp_image_file
+
 pytestmark = pytest.mark.django_db
 
 
@@ -25,6 +29,9 @@ def test_list_users(client, staff_user, staff_jwt_header):
                 'image': profile.image,
                 'image_small': profile.image_small,
                 'image_medium': profile.image_medium,
+                'image_file': 'http://testserver{}'.format(profile.image_file.url),
+                'image_small_file': 'http://testserver{}'.format(profile.image_small_file.url),
+                'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
                 'bio': profile.bio,
                 'headline': profile.headline
             }
@@ -70,7 +77,11 @@ def test_create_user(
     for optin in ('email_optin', 'toc_optin'):
         if optin in payload['profile']:
             del payload['profile'][optin]
-
+    payload['profile'].update({
+        'image_file': None,
+        'image_small_file': None,
+        'image_medium_file': None
+    })
     assert resp.json()['profile'] == payload['profile']
     user = User.objects.get(username=resp.json()['username'])
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
@@ -96,6 +107,9 @@ def test_get_user(client, user, staff_jwt_header):
             'image': profile.image,
             'image_small': profile.image_small,
             'image_medium': profile.image_medium,
+            'image_file': 'http://testserver{}'.format(profile.image_file.url),
+            'image_small_file': 'http://testserver{}'.format(profile.image_small_file.url),
+            'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
             'bio': profile.bio,
             'headline': profile.headline,
         }
@@ -137,6 +151,9 @@ def test_patch_user(client, user, staff_jwt_header, email, email_optin, toc_opti
             'image': profile.image,
             'image_small': profile.image_small,
             'image_medium': profile.image_medium,
+            'image_file': 'http://testserver{}'.format(profile.image_file.url),
+            'image_small_file': 'http://testserver{}'.format(profile.image_small_file.url),
+            'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
             'bio': profile.bio,
             'headline': profile.headline,
         }
@@ -162,11 +179,18 @@ def test_patch_username(client, user, staff_jwt_header):
 
 def test_patch_profile_by_user(client, logged_in_profile):
     """
-    Test that users can update their profiles
+    Test that users can update their profiles, including profile images
     """
     url = reverse('profile_api-detail', kwargs={'user__username': logged_in_profile.user.username})
-    resp = client.patch(url, data={
-        'bio': 'updated_bio_value'
-    })
+    # create a dummy image file in memory for upload
+    with make_temp_image_file(width=50, height=50) as image_file:
+        # format patch using multipart upload
+        resp = client.patch(url, data={
+            'bio': 'updated_bio_value',
+            'image_small_file': image_file
+        }, format='multipart')
+    filename, ext = splitext(image_file.name)
     assert resp.status_code == 200
     assert resp.json()['bio'] == 'updated_bio_value'
+    assert basename(filename) in resp.json()['image_small_file']
+    assert resp.json()['image_small_file'].endswith(ext)

@@ -18,6 +18,7 @@ from open_discussions.forms import (
     EmailForm,
 )
 from open_discussions.templatetags.render_bundle import public_path
+from profiles.utils import image_uri
 from sites.models import AuthenticatedSite
 
 
@@ -63,7 +64,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
 
     if user:
         user_full_name = user.profile.name
-        profile_image_small = user.profile.image_small
+        profile_image_small = image_uri(user)
         user_email = user.email
 
     js_settings = {

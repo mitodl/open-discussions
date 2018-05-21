@@ -2,6 +2,12 @@
 from django.db import models
 from django.conf import settings
 
+from profiles.utils import (
+    profile_image_upload_uri,
+    profile_image_upload_uri_medium,
+    profile_image_upload_uri_small
+)
+
 MAX_IMAGE_FIELD_LENGTH = 1024
 PROFILE_PROPS = (
     'name',
@@ -24,6 +30,10 @@ class Profile(models.Model):
     image = models.CharField(null=True, max_length=MAX_IMAGE_FIELD_LENGTH)
     image_small = models.CharField(null=True, max_length=MAX_IMAGE_FIELD_LENGTH)
     image_medium = models.CharField(null=True, max_length=MAX_IMAGE_FIELD_LENGTH)
+
+    image_file = models.ImageField(null=True, max_length=2083, upload_to=profile_image_upload_uri)
+    image_small_file = models.ImageField(null=True, max_length=2083, upload_to=profile_image_upload_uri_small)
+    image_medium_file = models.ImageField(null=True, max_length=2083, upload_to=profile_image_upload_uri_medium)
 
     email_optin = models.NullBooleanField()
     toc_optin = models.NullBooleanField()
