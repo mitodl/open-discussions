@@ -2,8 +2,10 @@
 import React from "react"
 import R from "ramda"
 import { Link } from "react-router-dom"
+import ReactTooltip from "react-tooltip"
 
-import { postDetailURL, urlHostname } from "../lib/url"
+import { postDetailURL, urlHostname } from "./url"
+import { userIsAnonymous, votingTooltipText } from "./util"
 
 import type {
   PostForm,
@@ -99,10 +101,17 @@ export class PostVotingButtons extends React.Component<*, *> {
 
     return (
       <div className={`upvotes ${className || ""} ${upvoteClass}`}>
+        {userIsAnonymous()
+          ? <ReactTooltip id="post-upvote-button">
+            {votingTooltipText}
+          </ReactTooltip>
+          : null}
         <button
           className="upvote-button"
-          onClick={this.onToggleUpvote}
+          onClick={userIsAnonymous() ? null : this.onToggleUpvote}
           disabled={upvoting}
+          data-tip
+          data-for="post-upvote-button"
         >
           <img
             className="vote-arrow"

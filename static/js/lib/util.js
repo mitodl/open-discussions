@@ -49,3 +49,5 @@ export const preventDefaultAndInvoke = R.curry(
 )
 
 export const userIsAnonymous = () => R.isNil(SETTINGS.username)
+
+export const votingTooltipText = "Sign Up or Login to vote"

@@ -1,5 +1,8 @@
 // @flow
 import React from "react"
+import ReactTooltip from "react-tooltip"
+
+import { userIsAnonymous, votingTooltipText } from "../lib/util"
 
 import type { CommentInTree } from "../flow/discussionTypes"
 
@@ -67,10 +70,17 @@ export default class CommentVoteForm extends React.Component<*, *> {
         <div className="score">
           {comment.score}
         </div>
+        {userIsAnonymous()
+          ? <ReactTooltip id="comment-upvote-button">
+            {votingTooltipText}
+          </ReactTooltip>
+          : null}
         <button
           className={`vote upvote-button ${upvoted ? "upvoted" : ""}`}
-          onClick={this.upvote}
+          onClick={userIsAnonymous() ? null : this.upvote}
           disabled={disabled}
+          data-tip
+          data-for="comment-upvote-button"
         >
           <img
             className="vote-arrow"
@@ -83,10 +93,17 @@ export default class CommentVoteForm extends React.Component<*, *> {
           />
         </button>
         <span className="pipe">|</span>
+        {userIsAnonymous()
+          ? <ReactTooltip id="comment-downvote-button">
+            {votingTooltipText}
+          </ReactTooltip>
+          : null}
         <button
           className={`vote downvote-button ${downvoted ? "downvoted" : ""}`}
-          onClick={this.downvote}
+          onClick={userIsAnonymous() ? null : this.downvote}
           disabled={disabled}
+          data-tip
+          data-for="comment-downvote-button"
         >
           <img
             className="vote-arrow"
