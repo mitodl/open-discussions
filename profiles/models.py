@@ -5,8 +5,8 @@ from django.conf import settings
 from profiles.utils import (
     profile_image_upload_uri,
     profile_image_upload_uri_medium,
-    profile_image_upload_uri_small
-)
+    profile_image_upload_uri_small,
+    default_profile_image, image_uri)
 
 MAX_IMAGE_FIELD_LENGTH = 1024
 
@@ -58,8 +58,7 @@ class Profile(models.Model):
         Returns:
              (bool): True if the profile is complete, False otherwise
         """
-        # TODO: replace with `if image_uri(self) == default_profile_image` after ImageField PR merge
-        if not self.image_small:
+        if image_uri(self.user) == default_profile_image:
             return False
         for prop in COMPLETE_PROPS:
             if not getattr(self, prop):

@@ -42,6 +42,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
         'user_email': user.email,
         'username': user.username,
         'profile_image_small': image_uri(user),
+        'profile_complete': False,
         'user_full_name': user.profile.name,
         'authenticated_site': {
             'title': authenticated_site.title,
@@ -82,6 +83,7 @@ def test_webpack_url_jwt(
         'user_email': user.email,
         'username': user.username,
         'profile_image_small': image_uri(user),
+        'profile_complete': False,
         'user_full_name': user.profile.name,
         'authenticated_site': {
             'title': authenticated_site.title,
