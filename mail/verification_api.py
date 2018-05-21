@@ -5,7 +5,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from mail import api
-from open_discussions.forms import AUTH_TYPE_REGISTER
+from authentication.forms import AUTH_TYPE_REGISTER
 
 VERIFICATION_TEMPLATE_NAME = 'verification'
 

@@ -1,5 +1,5 @@
 """Tests for MicroMastersAuth"""
-from open_discussions.backends.micromasters import MicroMastersAuth
+from authentication.backends.micromasters import MicroMastersAuth
 
 
 def test_auth_url(mocker):

@@ -10,8 +10,8 @@ from rest_framework import status
 from channels.models import RedditAccessToken, RedditRefreshToken
 from notifications.models import NotificationSettings
 from open_discussions.factories import UserFactory
-from open_discussions.forms import AUTH_TYPE_LOGIN, AUTH_TYPE_REGISTER
-from open_discussions.pipeline import user as user_actions
+from authentication.constants import AUTH_TYPE_LOGIN, AUTH_TYPE_REGISTER
+from authentication.pipeline import user as user_actions
 
 
 def _validate_email_auth_request_not_email_backend(mocker):

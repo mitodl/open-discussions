@@ -5,7 +5,7 @@ import pytest
 from rest_framework_jwt.settings import api_settings
 from social_core.exceptions import AuthException
 
-from open_discussions.backends.base_jwt import BaseJwtAuth
+from authentication.backends.base_jwt import BaseJwtAuth
 
 
 @pytest.fixture

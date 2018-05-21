@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2018-04-30T13:34:58",
+      "recorded_at": "2018-05-21T16:10:33",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -22,11 +22,11 @@
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CCBC6X19ZRFT23B442FDM9EZ"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CE1QETSF4Q52SX69SKMDD58F"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIyMNP1cy7w8vbIj4wIyM11LgsK9A4v9PUNTSzwd05W0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLb5VhmUlPoXpLoEekQm+wdkBWRZ5iYn55r4m5eD9KSklmUmp8ZnpoAMhnCUagH2i8K0uAAAAA==",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIyMtDN9MlLTnb3trDIcQ5zsoisKjarskzzdUn1NDNR0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLYVeiXmBQe5RhSZevuEBplbRKTlF3mkmBskRySD9KSklmUmp8ZnpoAMhnCUagFQVQaouAAAAA==",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 30 Apr 2018 13:34:58 GMT"
+            "Mon, 21 May 2018 16:10:33 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=bIrJIGe8KbxatfCx03; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 29-Apr-2020 13:34:58 GMT",
-            "loidcreated=2018-04-30T13%3A34%3A58.157Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 29-Apr-2020 13:34:58 GMT"
+            "loid=sYphQsUuN2pAcdk1yA; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 20-May-2020 16:10:33 GMT",
+            "loidcreated=2018-05-21T16%3A10%3A32.738Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 20-May-2020 16:10:33 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -66,7 +66,7 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CCBC6X19ZRFT23B442FDM9EZ"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CE1QETSF4Q52SX69SKMDD58F"
       }
     }
   ],

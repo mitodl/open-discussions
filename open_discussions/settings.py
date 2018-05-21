@@ -85,6 +85,7 @@ INSTALLED_APPS = (
     "anymail",
     # Put our apps after this point
     'open_discussions',
+    'authentication',
     'channels',
     'profiles',
     'sites',
@@ -195,7 +196,7 @@ USE_TZ = True
 
 # social auth
 AUTHENTICATION_BACKENDS = (
-    'open_discussions.backends.micromasters.MicroMastersAuth',
+    'authentication.backends.micromasters.MicroMastersAuth',
     'social_core.backends.email.EmailAuth',
     # the following needs to stay here to allow login of local users
     'django.contrib.auth.backends.ModelBackend',
@@ -242,10 +243,10 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.associate_by_email',
 
     # validate an incoming email auth request
-    'open_discussions.pipeline.user.validate_email_auth_request',
+    'authentication.pipeline.user.validate_email_auth_request',
 
     # require a password and profile if they're not set
-    'open_discussions.pipeline.user.validate_password',
+    'authentication.pipeline.user.validate_password',
 
     # Send a validation email to the user to verify its email address.
     # Disabled by default.
@@ -253,16 +254,16 @@ SOCIAL_AUTH_PIPELINE = (
 
     # Generate a username for the user
     # NOTE: needs to be right before create_user so nothing overrides the username
-    'open_discussions.pipeline.user.get_username',
+    'authentication.pipeline.user.get_username',
 
     # Create a user account if we haven't found one yet.
     'social_core.pipeline.user.create_user',
 
     # require a password and profile if they're not set
-    'open_discussions.pipeline.user.require_password_and_profile',
+    'authentication.pipeline.user.require_password_and_profile',
 
     # initialize the user, must happen after we're sure who the user is
-    'open_discussions.pipeline.user.initialize_user',
+    'authentication.pipeline.user.initialize_user',
 
     # Create the record that associates the social account with the user.
     'social_core.pipeline.social_auth.associate_user',

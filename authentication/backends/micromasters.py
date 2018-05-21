@@ -1,6 +1,6 @@
 """Backend for micromasters JWT token auth"""
 
-from open_discussions.backends.base_jwt import BaseJwtAuth
+from authentication.backends.base_jwt import BaseJwtAuth
 
 
 class MicroMastersAuth(BaseJwtAuth):

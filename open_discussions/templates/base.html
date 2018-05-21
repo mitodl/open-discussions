@@ -9,9 +9,11 @@
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,400i,500,700" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+    {% if js_settings_json %}
     <script type="text/javascript">
     var SETTINGS = {{ js_settings_json|safe }};
     </script>
+    {% endif %}
     {% load render_bundle %}
     {% render_bundle 'common' %}
     {% render_bundle 'style' %}

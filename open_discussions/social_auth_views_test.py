@@ -7,7 +7,7 @@ from django.test.client import MULTIPART_CONTENT
 import pytest
 from rest_framework import status
 
-from open_discussions.forms import AUTH_TYPE_REGISTER
+from authentication.constants import AUTH_TYPE_REGISTER
 
 pytestmark = pytest.mark.django_db
 

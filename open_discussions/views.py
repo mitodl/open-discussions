@@ -8,15 +8,11 @@ import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
-from django.http import Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from rest_framework_jwt.settings import api_settings
 
 from open_discussions import features
-from open_discussions.forms import (
-    LoginForm,
-    EmailForm,
-)
+
 from open_discussions.templatetags.render_bundle import public_path
 from profiles.utils import image_uri
 from sites.models import AuthenticatedSite
@@ -88,54 +84,4 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
 
     return render(request, "index.html", context={
         "js_settings_json": json.dumps(js_settings),
-    })
-
-
-def login(request, **kwargs):  # pylint: disable=unused-argument
-    """The login view"""
-    if not features.is_enabled(features.EMAIL_AUTH):
-        raise Http404("Page not found")
-
-    if not request.user.is_anonymous:
-        return redirect('/')
-
-    return render(request, "registration/login.html", context={
-        "form": LoginForm(),
-        "js_settings_json": '{}',
-    })
-
-
-def register(request, **kwargs):  # pylint: disable=unused-argument
-    """The register view"""
-    if not features.is_enabled(features.EMAIL_AUTH):
-        raise Http404("Page not found")
-
-    if not request.user.is_anonymous:
-        return redirect('/')
-
-    return render(request, "registration/register.html", context={
-        "form": EmailForm(),
-        "js_settings_json": '{}',
-    })
-
-
-def jwt_login_complete(request, **kwargs):  # pylint: disable=unused-argument
-    """View that complete the jwt-based login by clearing the cookie"""
-    # redirect to what python-social-auth normally would have
-    response = redirect(settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL)
-    # to clear a cookie, it's most reliable to set it to expire immediately
-    response.set_cookie(
-        api_settings.JWT_AUTH_COOKIE,
-        domain=settings.OPEN_DISCUSSIONS_COOKIE_DOMAIN,
-        httponly=True,
-        max_age=0,
-    )
-
-    return response
-
-
-def confirmation_sent(request, **kwargs):  # pylint: disable=unused-argument
-    """The confirmation of an email being sent"""
-    return render(request, "registration/confirmation_sent.html", context={
-        "js_settings_json": '{}',
     })

@@ -1,8 +1,10 @@
 """open_discussions forms"""
 from django import forms
 
-AUTH_TYPE_REGISTER = 'register'
-AUTH_TYPE_LOGIN = 'login'
+from authentication.constants import (
+    AUTH_TYPE_LOGIN,
+    AUTH_TYPE_REGISTER,
+)
 
 
 class LoginForm(forms.Form):

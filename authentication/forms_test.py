@@ -1,5 +1,5 @@
 """Form tests"""
-from open_discussions.forms import PasswordAndProfileForm
+from authentication.forms import PasswordAndProfileForm
 
 
 def test_password_and_profile_form_clean():

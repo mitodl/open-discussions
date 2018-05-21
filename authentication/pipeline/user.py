@@ -7,7 +7,7 @@ from social_core.pipeline.partial import partial
 
 from channels import api as channel_api
 from notifications import api as notifications_api
-from open_discussions.forms import (
+from authentication.forms import (
     AUTH_TYPE_LOGIN,
     AUTH_TYPE_REGISTER,
     LoginForm,
@@ -102,7 +102,7 @@ def require_password_and_profile(
     else:
         form = PasswordAndProfileForm()
 
-    return render(strategy.request, 'registration/profile.html', {
+    return render(strategy.request, 'profile.html', {
         'form': form,
         'partial_token': current_partial.token,
     })
@@ -128,7 +128,7 @@ def validate_password(
     form = LoginForm(data)
 
     if not form.is_valid():
-        return render(strategy.request, 'registration/login.html', context={
+        return render(strategy.request, 'login.html', context={
             'form': form,
         })
 
