@@ -17,11 +17,24 @@ class ProfileSerializer(serializers.ModelSerializer):
     email_optin = serializers.BooleanField(write_only=True, required=False)
     toc_optin = serializers.BooleanField(write_only=True, required=False)
 
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+
+            update_image = 'image_file' in validated_data
+            instance.save(update_image=update_image)
+            return instance
+
     class Meta:
         model = Profile
         fields = ('name', 'image', 'image_small', 'image_medium',
                   'image_file', 'image_small_file', 'image_medium_file',
                   'email_optin', 'toc_optin', 'bio', 'headline')
+        read_only_fields = (
+            'image_file_small',
+            'image_file_medium'
+        )
 
 
 class UserSerializer(serializers.ModelSerializer):

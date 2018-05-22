@@ -183,14 +183,23 @@ def test_patch_profile_by_user(client, logged_in_profile):
     """
     url = reverse('profile_api-detail', kwargs={'user__username': logged_in_profile.user.username})
     # create a dummy image file in memory for upload
-    with make_temp_image_file(width=50, height=50) as image_file:
+    with make_temp_image_file(width=250, height=250) as image_file:
         # format patch using multipart upload
         resp = client.patch(url, data={
             'bio': 'updated_bio_value',
-            'image_small_file': image_file
+            'image_file': image_file
         }, format='multipart')
     filename, ext = splitext(image_file.name)
     assert resp.status_code == 200
     assert resp.json()['bio'] == 'updated_bio_value'
-    assert basename(filename) in resp.json()['image_small_file']
-    assert resp.json()['image_small_file'].endswith(ext)
+    assert basename(filename) in resp.json()['image_file']
+    assert resp.json()['image_file'].endswith(ext)
+    assert resp.json()['image_small_file'].endswith('.jpg')
+
+    logged_in_profile.refresh_from_db()
+    assert logged_in_profile.image_file.height == 250
+    assert logged_in_profile.image_file.width == 250
+    assert logged_in_profile.image_small_file.height == 64
+    assert logged_in_profile.image_small_file.width == 64
+    assert logged_in_profile.image_medium_file.height == 128
+    assert logged_in_profile.image_medium_file.width == 128

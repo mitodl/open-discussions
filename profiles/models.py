@@ -1,5 +1,7 @@
 """Profile models"""
-from django.db import models
+from uuid import uuid4
+
+from django.db import models, transaction
 from django.conf import settings
 
 from open_discussions import features
@@ -8,6 +10,11 @@ from profiles.utils import (
     profile_image_upload_uri_medium,
     profile_image_upload_uri_small,
     default_profile_image, image_uri)
+    make_thumbnail)
+
+# Max dimension of either height or width for small and medium images
+IMAGE_SMALL_MAX_DIMENSION = 64
+IMAGE_MEDIUM_MAX_DIMENSION = 128
 
 MAX_IMAGE_FIELD_LENGTH = 1024
 
@@ -67,6 +74,23 @@ class Profile(models.Model):
             if not getattr(self, prop):
                 return False
         return True
+
+    @transaction.atomic
+    def save(self, *args, update_image=False, **kwargs):  # pylint: disable=arguments-differ
+        """Update thumbnails if necessary"""
+        if update_image:
+            if self.image_file:
+                small_thumbnail = make_thumbnail(self.image_file.file, IMAGE_SMALL_MAX_DIMENSION)
+                medium_thumbnail = make_thumbnail(self.image_file, IMAGE_MEDIUM_MAX_DIMENSION)
+
+                # name doesn't matter here, we use upload_to to produce that
+                self.image_small_file.save("{}.jpg".format(uuid4().hex), small_thumbnail)
+                self.image_medium_file.save("{}.jpg".format(uuid4().hex), medium_thumbnail)
+            else:
+                self.image_small_file = None
+                self.image_medium_file = None
+
+        super(Profile, self).save(*args, **kwargs)
 
     def __str__(self):
         return "{}".format(self.name)

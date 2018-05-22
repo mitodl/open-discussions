@@ -1,4 +1,5 @@
 """ Utils for profiles """
+from io import BytesIO
 from os import path
 from urllib.parse import urljoin
 
@@ -123,3 +124,42 @@ def make_temp_image_file(*, width=500, height=500):
         image.save(image_file, 'png')
         image_file.seek(0)
         yield image_file
+
+
+def shrink_dimensions(width, height, max_dimension):
+    """
+    Resize dimensions so max dimension is max_dimension. If dimensions are too small no resizing is done
+    Args:
+        width (int): The width
+        height (int): The height
+        max_dimension (int): The maximum size of a dimension
+    Returns:
+        tuple of (small_width, small_height): A resized set of dimensions, as integers
+    """
+    max_width_height = max(width, height)
+    if max_width_height < max_dimension:
+        return width, height
+    ratio = max_width_height / max_dimension
+
+    return int(width / ratio), int(height / ratio)
+
+
+def make_thumbnail(full_size_image, max_dimension):
+    """
+    Make a thumbnail of the image
+
+    Args:
+        full_size_image (file):
+            A file-like object containing an image. This file will seek back to the beginning after being read.
+        max_dimension (int):
+            The max size of a dimension for the thumbnail
+    Returns:
+        BytesIO:
+            A jpeg image which is a thumbnail of full_size_image
+    """
+    pil_image = Image.open(full_size_image)
+    pil_image.thumbnail(shrink_dimensions(pil_image.width, pil_image.height, max_dimension), Image.ANTIALIAS)
+    buffer = BytesIO()
+    pil_image.convert('RGB').save(buffer, "JPEG", quality=90)
+    buffer.seek(0)
+    return buffer
