@@ -89,17 +89,17 @@ def test_index_post_with_comments(mocker):
     """index_post should call the api function of the same name"""
     index_post_mock = mocker.patch('search.indexing_api.index_post_with_comments')
     wrap_mock = mocker.patch('search.tasks.wrap_retry_exception')
-    api_username = 'username'
     post_id = 'post_id'
-    index_post_with_comments.delay(api_username, post_id)
+    index_post_with_comments.delay(post_id)
 
-    index_post_mock.assert_called_once_with(api_username, post_id)
+    index_post_mock.assert_called_once_with(post_id)
     wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
 
 
-def test_index_channel(mocker):
+def test_index_channel(mocker, settings):
     """index_channel should all posts of a channel"""
     user = UserFactory.create()
+    settings.INDEXING_API_USERNAME = user.username
     index_post_mock = mocker.patch('search.tasks.index_post_with_comments', autospec=True)
     api_mock = mocker.patch('channels.api.Api', autospec=True)
 
@@ -117,7 +117,7 @@ def test_index_channel(mocker):
     wrap_mock = mocker.patch('search.tasks.wrap_retry_exception')
     channel_name = 'channel'
     with pytest.raises(expected_exception):
-        index_channel.delay(user.username, channel_name)
+        index_channel.delay(channel_name)
 
     api_mock.assert_called_once_with(user)
     get_channel_mock.assert_called_once_with(channel_name)
@@ -125,18 +125,19 @@ def test_index_channel(mocker):
     wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
     assert group_mock.call_count == 1
     list(group_mock.call_args[0][0])  # iterate through generator
-    index_post_mock.si.assert_any_call(api_username=user.username, post_id=post1.id)
-    index_post_mock.si.assert_any_call(api_username=user.username, post_id=post2.id)
+    index_post_mock.si.assert_any_call(post1.id)
+    index_post_mock.si.assert_any_call(post2.id)
     replace_mock.assert_called_once_with(group_mock.return_value)
 
 
 # pylint: disable=too-many-locals
 @pytest.mark.parametrize("temp_alias_exists", [True, False])
-def test_start_recreate_index(mocker, temp_alias_exists):
+def test_start_recreate_index(mocker, temp_alias_exists, settings):
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
     """
     user = UserFactory.create()
+    settings.INDEXING_API_USERNAME = user.username
     client_mock = mocker.patch('channels.api.Api', autospec=True)
     channel_names = ['a', 'b', 'c']
     client_mock.return_value.list_channels.return_value = [
@@ -154,7 +155,7 @@ def test_start_recreate_index(mocker, temp_alias_exists):
     finish_recreate_index_mock = mocker.patch('search.tasks.finish_recreate_index', autospec=True)
 
     with pytest.raises(TabError):
-        start_recreate_index.delay(user.username)
+        start_recreate_index.delay()
 
     reindexing_alias = get_reindexing_alias_name()
     get_conn_mock.assert_called_once_with(verify=False)
@@ -175,7 +176,7 @@ def test_start_recreate_index(mocker, temp_alias_exists):
     assert group_mock.call_count == 1
     list(group_mock.call_args[0][0])  # iterate through generator
     for name in channel_names:
-        index_channel_mock.si.assert_any_call(api_username=user.username, channel_name=name)
+        index_channel_mock.si.assert_any_call(name)
     chain_mock.assert_called_once_with(
         group_mock.return_value,
         finish_recreate_index_mock.si.return_value,

@@ -5,6 +5,7 @@ from functools import partial
 import logging
 
 from elasticsearch.helpers import bulk
+from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from search.connection import (
@@ -140,20 +141,21 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
     )
 
 
-def index_post_with_comments(api_username, post_id):
+def index_post_with_comments(post_id):
     """
     Index a post and its comments
 
     Args:
-        api_username (str): The API username
         post_id (str): The post string
     """
     from channels.api import Api
 
     conn = get_conn()
+    api_username = settings.INDEXING_API_USERNAME
     client = Api(User.objects.get(username=api_username))
     post = client.get_post(post_id)
     comments = post.comments
+    # Make sure all morecomments are replaced before serializing
     comments.replace_more(limit=None)
 
     for alias in get_active_aliases():

@@ -4,7 +4,6 @@ Tests for the indexing API
 # pylint: disable=redefined-outer-name
 from types import SimpleNamespace
 
-from django.conf import settings
 import pytest
 
 from channels.constants import (
@@ -120,7 +119,7 @@ def test_clear_and_create_index(mocked_es, skip_mapping, already_exists):
     assert 'mappings' not in body if skip_mapping else 'mappings' in body
 
 
-def test_index_post_with_comments(mocked_es, mocker):
+def test_index_post_with_comments(mocked_es, mocker, settings):
     """
     index_post should index the post and all comments recursively
     """
@@ -146,8 +145,9 @@ def test_index_post_with_comments(mocked_es, mocker):
     )
 
     user = UserFactory.create()
+    settings.INDEXING_API_USERNAME = user.username
     post_id = 'post_id'
-    index_post_with_comments(user.username, post_id)
+    index_post_with_comments(post_id)
 
     get_alias_mock.assert_called_once_with()
     api_mock.assert_called_once_with(user)

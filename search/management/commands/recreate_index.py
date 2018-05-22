@@ -14,11 +14,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Index the comments and posts for the channels the user is subscribed to"""
-        username = options['username']
-        task = start_recreate_index.delay(username)
-        self.stdout.write("Started celery task {task} to indexing content for user {user}".format(
+        task = start_recreate_index.delay()
+        self.stdout.write("Started celery task {task} to index content".format(
             task=task,
-            user=username,
         ))
         self.stdout.write("Waiting on task...")
         start = now_in_utc()

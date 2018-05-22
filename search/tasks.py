@@ -6,6 +6,7 @@ from celery import (
     group,
 )
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
@@ -75,43 +76,41 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
 
 
 @app.task(autoretry_for=(RetryException, ), retry_backoff=True, rate_limit='600/m')
-def index_post_with_comments(api_username, post_id):
+def index_post_with_comments(post_id):
     """
     Index a post and its comments
 
     Args:
-        api_username (str): The API username
         post_id (str): The post string
     """
     with wrap_retry_exception(PrawcoreException, PRAWException):
-        api.index_post_with_comments(api_username, post_id)
+        api.index_post_with_comments(post_id)
 
 
 @app.task(bind=True, autoretry_for=(RetryException, ), retry_backoff=True, rate_limit='600/m')
-def index_channel(self, api_username, channel_name):
+def index_channel(self, channel_name):
     """
     Index the channel
 
     Args:
-        api_username (str): API username
         channel_name (str): The name of the channel
     """
     with wrap_retry_exception(PrawcoreException, PRAWException):
         from channels.api import Api
 
-        client = Api(User.objects.get(username=api_username))
+        client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
         channel = client.get_channel(channel_name)
         post_ids = [post.id for post in channel.new()]
 
     raise self.replace(
         group(
-            index_post_with_comments.si(api_username=api_username, post_id=post_id) for post_id in post_ids
+            index_post_with_comments.si(post_id) for post_id in post_ids
         )
     )
 
 
 @app.task(bind=True)
-def start_recreate_index(self, api_username):
+def start_recreate_index(self):
     """
     Wipe and recreate index and mapping, and index all items.
 
@@ -120,7 +119,7 @@ def start_recreate_index(self, api_username):
     """
     from channels.api import Api
 
-    user = User.objects.get(username=api_username)
+    user = User.objects.get(username=settings.INDEXING_API_USERNAME)
     conn = get_conn(verify=False)
 
     # Create new backing index for reindex
@@ -142,8 +141,7 @@ def start_recreate_index(self, api_username):
     client = Api(user)
     channel_names = [channel.display_name for channel in client.list_channels()]
     index_channels = group(
-        index_channel.si(api_username=api_username, channel_name=channel_name)
-        for channel_name in channel_names
+        index_channel.si(channel_name) for channel_name in channel_names
     )
 
     # Use self.replace so that code waiting on this task will also wait on the indexing and finish tasks
