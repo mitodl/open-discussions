@@ -155,7 +155,6 @@ def test_index_post_with_comments(mocked_es, mocker):
     client.get_post.assert_called_once_with(post_id)
     post = client.get_post.return_value
 
-    assert serialize_mock.call_count == len(aliases)
     serialize_mock.assert_any_call(post)
 
     post.comments.replace_more.assert_called_once_with(limit=None)
