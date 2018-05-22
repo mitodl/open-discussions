@@ -75,7 +75,7 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
 
 
 @app.task(autoretry_for=(RetryException, ), retry_backoff=True, rate_limit='600/m')
-def index_post(api_username, post_id):
+def index_post_with_comments(api_username, post_id):
     """
     Index a post and its comments
 
@@ -84,7 +84,7 @@ def index_post(api_username, post_id):
         post_id (str): The post string
     """
     with wrap_retry_exception(PrawcoreException, PRAWException):
-        api.index_post(api_username, post_id)
+        api.index_post_with_comments(api_username, post_id)
 
 
 @app.task(bind=True, autoretry_for=(RetryException, ), retry_backoff=True, rate_limit='600/m')
@@ -105,7 +105,7 @@ def index_channel(self, api_username, channel_name):
 
     raise self.replace(
         group(
-            index_post.si(api_username=api_username, post_id=post_id) for post_id in post_ids
+            index_post_with_comments.si(api_username=api_username, post_id=post_id) for post_id in post_ids
         )
     )
 

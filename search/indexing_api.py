@@ -140,7 +140,7 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
     )
 
 
-def index_post(api_username, post_id):
+def index_post_with_comments(api_username, post_id):
     """
     Index a post and its comments
 

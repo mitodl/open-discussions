@@ -16,7 +16,7 @@ from search.tasks import (
     finish_recreate_index,
     increment_document_integer_field,
     index_channel,
-    index_post,
+    index_post_with_comments,
     start_recreate_index,
     wrap_retry_exception,
 )
@@ -85,13 +85,13 @@ def test_wrap_retry_exception_matching(matching):
             raise_thing()
 
 
-def test_index_post(mocker):
+def test_index_post_with_comments(mocker):
     """index_post should call the api function of the same name"""
-    index_post_mock = mocker.patch('search.indexing_api.index_post')
+    index_post_mock = mocker.patch('search.indexing_api.index_post_with_comments')
     wrap_mock = mocker.patch('search.tasks.wrap_retry_exception')
     api_username = 'username'
     post_id = 'post_id'
-    index_post.delay(api_username, post_id)
+    index_post_with_comments.delay(api_username, post_id)
 
     index_post_mock.assert_called_once_with(api_username, post_id)
     wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
@@ -100,7 +100,7 @@ def test_index_post(mocker):
 def test_index_channel(mocker):
     """index_channel should all posts of a channel"""
     user = UserFactory.create()
-    index_post_mock = mocker.patch('search.tasks.index_post', autospec=True)
+    index_post_mock = mocker.patch('search.tasks.index_post_with_comments', autospec=True)
     api_mock = mocker.patch('channels.api.Api', autospec=True)
 
     expected_exception = ZeroDivisionError

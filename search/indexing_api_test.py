@@ -19,7 +19,7 @@ from search.indexing_api import (
     update_document_with_partial,
     increment_document_integer_field,
     GLOBAL_DOC_TYPE,
-    index_post,
+    index_post_with_comments,
 )
 
 
@@ -120,7 +120,7 @@ def test_clear_and_create_index(mocked_es, skip_mapping, already_exists):
     assert 'mappings' not in body if skip_mapping else 'mappings' in body
 
 
-def test_index_post(mocked_es, mocker):
+def test_index_post_with_comments(mocked_es, mocker):
     """
     index_post should index the post and all comments recursively
     """
@@ -147,7 +147,7 @@ def test_index_post(mocked_es, mocker):
 
     user = UserFactory.create()
     post_id = 'post_id'
-    index_post(user.username, post_id)
+    index_post_with_comments(user.username, post_id)
 
     get_alias_mock.assert_called_once_with()
     api_mock.assert_called_once_with(user)
