@@ -533,6 +533,7 @@ else:
 if not ELASTICSEARCH_INDEX:
     raise ImproperlyConfigured("Missing ELASTICSEARCH_INDEX")
 ELASTICSEARCH_HTTP_AUTH = get_string("ELASTICSEARCH_HTTP_AUTH", None)
+ELASTICSEARCH_INDEXING_CHUNK_SIZE = get_int("ELASTICSEARCH_INDEXING_CHUNK_SIZE", 100)
 
 
 # reddit-specific settings

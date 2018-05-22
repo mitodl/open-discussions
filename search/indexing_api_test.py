@@ -3,6 +3,8 @@ Tests for the indexing API
 """
 # pylint: disable=redefined-outer-name
 from types import SimpleNamespace
+
+from django.conf import settings
 import pytest
 
 from channels.constants import (
@@ -158,5 +160,5 @@ def test_index_post(mocked_es, mocker):
             serialized_data,
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
-            chunk_size=100,
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )
