@@ -165,7 +165,7 @@ def index_post_with_comments(post_id):
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Lower chunk size from default 500 to try to manage memory use
-            chunk_size=100,
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )
         if len(errors) > 0:
             raise ReindexException("Error during bulk insert: {errors}".format(
