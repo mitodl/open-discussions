@@ -140,16 +140,6 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
     )
 
 
-def refresh_index(index):
-    """
-    Refresh the elasticsearch index
-
-    Args:
-        index (str): The elasticsearch index to refresh
-    """
-    get_conn().indices.refresh(index)
-
-
 def index_post(api_username, post_id):
     """
     Index a post and its comments

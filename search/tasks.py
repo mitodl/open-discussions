@@ -18,12 +18,10 @@ from search.connection import (
     get_default_alias_name,
     get_reindexing_alias_name,
     make_backing_index_name,
-)
-from search.exceptions import RetryException
-from search.indexing_api import (
-    clear_and_create_index,
     refresh_index,
 )
+from search.exceptions import RetryException
+from search.indexing_api import clear_and_create_index
 
 
 User = get_user_model()

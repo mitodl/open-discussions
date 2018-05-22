@@ -104,3 +104,13 @@ def get_active_aliases():
         alias for alias in [get_default_alias_name(), get_reindexing_alias_name()]
         if conn.indices.exists(alias)
     ]
+
+
+def refresh_index(index):
+    """
+    Refresh the elasticsearch index
+
+    Args:
+        index (str): The elasticsearch index to refresh
+    """
+    get_conn().indices.refresh(index)
