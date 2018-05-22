@@ -5,7 +5,6 @@ from django.conf import settings
 from django.urls import reverse
 
 from mail import api
-from authentication.forms import AUTH_TYPE_REGISTER
 
 VERIFICATION_TEMPLATE_NAME = 'verification'
 
@@ -20,12 +19,11 @@ def send_verification_email(strategy, backend, code, partial_token):  # pylint: 
         code (social_django.models.Code): the confirmation code used to confirm the email address
         partial_token (str): token used to resume a halted pipeline
     """
-    url = '{}?verification_code={}&auth_type={}'.format(
+    url = '{}?verification_code={}'.format(
         strategy.build_absolute_uri(
             reverse('social:complete', args=(backend.name,))
         ),
         quote_plus(code.code),
-        quote_plus(AUTH_TYPE_REGISTER),
     )
 
     api.send_messages(list(api.messages_for_recipients([

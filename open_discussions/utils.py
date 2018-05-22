@@ -2,6 +2,7 @@
 import datetime
 from enum import (
     auto,
+    Enum,
     Flag,
 )
 from itertools import islice
@@ -124,3 +125,10 @@ def _merge_strings(list_or_str, list_to_return):
             _merge_strings(item, list_to_return)
     elif list_or_str is not None:
         list_to_return.append(list_or_str)
+
+
+class AutoName(Enum):
+    """"Generates enum values using the name"""
+    def _generate_next_value_(self, name, *args):  # pylint: disable=unused-argument
+        """"Generates enum values using the name"""
+        return name

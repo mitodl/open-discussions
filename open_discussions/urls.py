@@ -58,6 +58,8 @@ urlpatterns = [
     url(r'^moderation/', index),
     url(r'^settings/', index),
     url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
+    url(r'^login/', index),
+    url(r'^register/', index),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

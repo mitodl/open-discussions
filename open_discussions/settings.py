@@ -203,12 +203,11 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'login-complete'
 SOCIAL_AUTH_LOGIN_ERROR_URL = 'login'
 
 # Micromasters backend settings
 SOCIAL_AUTH_MICROMASTERS_LOGIN_URL = get_string('SOCIAL_AUTH_MICROMASTERS_LOGIN_URL', None)
-SOCIAL_AUTH_MICROMASTERS_LOGIN_REDIRECT_URL = 'jwt-complete'
 
 # Email backend settings
 SOCIAL_AUTH_EMAIL_FORM_URL = 'login'

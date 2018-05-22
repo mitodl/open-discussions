@@ -10,10 +10,13 @@ import ChannelPage from "./ChannelPage"
 import PostPage from "./PostPage"
 import ContentPolicyPage from "./ContentPolicyPage"
 import AdminPage from "./admin/AdminPage"
-import AuthRequiredPage from "./AuthRequiredPage"
+import AuthRequiredPage from "./auth/AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
 import ChannelModerationPage from "./ChannelModerationPage"
 import SettingsPage from "./SettingsPage"
+import LoginPage from "./auth/LoginPage"
+import LoginPasswordPage from "./auth/LoginPasswordPage"
+import InactiveUserPage from "./auth/InactiveUserPage"
 import Toolbar from "../components/Toolbar"
 import Snackbar from "../components/material/Snackbar"
 import Drawer from "../containers/Drawer"
@@ -152,6 +155,17 @@ class App extends React.Component<*, void> {
             exact
             path={`${match.url}settings/:token?`}
             component={SettingsPage}
+          />
+          <Route exact path={`${match.url}login/`} component={LoginPage} />
+          <Route
+            exact
+            path={`${match.url}login/password/`}
+            component={LoginPasswordPage}
+          />
+          <Route
+            exact
+            path={`${match.url}account/inactive/`}
+            component={InactiveUserPage}
           />
         </div>
         <Footer />

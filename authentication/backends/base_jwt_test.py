@@ -1,7 +1,6 @@
 """Tests for BaseJwtAuth"""
 # pylint: disable=redefined-outer-name
 import pytest
-# from django.contrib.auth.models import User
 from rest_framework_jwt.settings import api_settings
 from social_core.exceptions import AuthException
 
