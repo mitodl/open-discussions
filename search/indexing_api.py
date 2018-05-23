@@ -11,6 +11,10 @@ from django.contrib.auth import get_user_model
 from search.connection import (
     get_active_aliases,
     get_conn,
+    get_default_alias_name,
+    get_reindexing_alias_name,
+    make_backing_index_name,
+    refresh_index,
 )
 from search.exceptions import ReindexException
 from search.serializers import (
@@ -171,3 +175,66 @@ def index_post_with_comments(post_id):
             raise ReindexException("Error during bulk insert: {errors}".format(
                 errors=errors
             ))
+
+
+def create_backing_index():
+    """
+    Start the reindexing process by creating a new backing index and pointing the reindex alias toward it
+
+    Returns:
+        str: The new backing index
+    """
+    conn = get_conn(verify=False)
+
+    # Create new backing index for reindex
+    new_backing_index = make_backing_index_name()
+
+    # Clear away temp alias so we can reuse it, and create mappings
+    clear_and_create_index(index_name=new_backing_index)
+    temp_alias = get_reindexing_alias_name()
+    if conn.indices.exists_alias(name=temp_alias):
+        # Deletes both alias and backing indexes
+        conn.indices.delete_alias(index="_all", name=temp_alias)
+
+    # Point temp_alias toward new backing index
+    conn.indices.put_alias(index=new_backing_index, name=temp_alias)
+
+    return new_backing_index
+
+
+def switch_indices(backing_index):
+    """
+    Switch the default index to point to the backing index, and delete the reindex alias
+
+    Args:
+        backing_index (str): The backing index of the reindex alias
+    """
+    conn = get_conn(verify=False)
+    actions = []
+    old_backing_indexes = []
+    default_alias = get_default_alias_name()
+    if conn.indices.exists_alias(name=default_alias):
+        # Should only be one backing index in normal circumstances
+        old_backing_indexes = list(conn.indices.get_alias(name=default_alias).keys())
+        for index in old_backing_indexes:
+            actions.append({
+                "remove": {
+                    "index": index,
+                    "alias": default_alias,
+                }
+            })
+    actions.append({
+        "add": {
+            "index": backing_index,
+            "alias": default_alias,
+        },
+    })
+    conn.indices.update_aliases({
+        "actions": actions
+    })
+    refresh_index(backing_index)
+    for index in old_backing_indexes:
+        conn.indices.delete(index)
+
+    # Finally, remove the link to the reindexing alias
+    conn.indices.delete_alias(name=get_reindexing_alias_name(), index=backing_index)

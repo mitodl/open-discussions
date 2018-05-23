@@ -5,10 +5,6 @@ from prawcore.exceptions import PrawcoreException
 import pytest
 
 from open_discussions.factories import UserFactory
-from search.connection import (
-    get_default_alias_name,
-    get_reindexing_alias_name,
-)
 from search.exceptions import RetryException
 from search.tasks import (
     create_document,
@@ -130,9 +126,7 @@ def test_index_channel(mocker, settings):
     replace_mock.assert_called_once_with(group_mock.return_value)
 
 
-# pylint: disable=too-many-locals
-@pytest.mark.parametrize("temp_alias_exists", [True, False])
-def test_start_recreate_index(mocker, temp_alias_exists, settings):
+def test_start_recreate_index(mocker, settings):
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
     """
@@ -143,35 +137,22 @@ def test_start_recreate_index(mocker, temp_alias_exists, settings):
     client_mock.return_value.list_channels.return_value = [
         mocker.Mock(display_name=name) for name in channel_names
     ]
-    mocker.patch('search.indexing_api.get_conn', autospec=True)
-    get_conn_mock = mocker.patch('search.tasks.get_conn', autospec=True)
     index_channel_mock = mocker.patch('search.tasks.index_channel', autospec=True)
-    conn_mock = get_conn_mock.return_value
-    conn_mock.indices.exists_alias.return_value = temp_alias_exists
     replace_mock = mocker.patch('celery.app.task.Task.replace', autospec=True, side_effect=TabError)
     group_mock = mocker.patch('search.tasks.group', autospec=True)
     chain_mock = mocker.patch('search.tasks.chain', autospec=True)
-    clear_and_create_mock = mocker.patch('search.tasks.clear_and_create_index', autospec=True)
+    backing_index = 'backing'
+    create_backing_index_mock = mocker.patch(
+        'search.indexing_api.create_backing_index',
+        autospec=True,
+        return_value=backing_index,
+    )
     finish_recreate_index_mock = mocker.patch('search.tasks.finish_recreate_index', autospec=True)
 
     with pytest.raises(TabError):
         start_recreate_index.delay()
 
-    reindexing_alias = get_reindexing_alias_name()
-    get_conn_mock.assert_called_once_with(verify=False)
-    assert clear_and_create_mock.call_count == 1
-    backing_index = clear_and_create_mock.call_args[1]['index_name']
-
-    conn_mock.indices.exists_alias.assert_called_once_with(name=reindexing_alias)
-    if temp_alias_exists:
-        conn_mock.indices.delete_alias.assert_any_call(
-            index="_all", name=reindexing_alias,
-        )
-    assert conn_mock.indices.delete_alias.called is temp_alias_exists
-
-    conn_mock.indices.put_alias.assert_called_once_with(
-        index=backing_index, name=reindexing_alias,
-    )
+    create_backing_index_mock.assert_called_once_with()
     finish_recreate_index_mock.si.assert_called_once_with(backing_index)
     assert group_mock.call_count == 1
     list(group_mock.call_args[0][0])  # iterate through generator
@@ -185,52 +166,12 @@ def test_start_recreate_index(mocker, temp_alias_exists, settings):
     assert replace_mock.call_args[0][1] == chain_mock.return_value
 
 
-@pytest.mark.parametrize("default_exists", [True, False])
-def test_finish_recreate_index(mocker, default_exists):
+def test_finish_recreate_index(mocker):
     """
     finish_recreate_index should attach the backing index to the default alias
     """
-    refresh_mock = mocker.patch('search.tasks.refresh_index', autospec=True)
-    get_conn_mock = mocker.patch('search.tasks.get_conn', autospec=True)
-    conn_mock = get_conn_mock.return_value
-    conn_mock.indices.exists_alias.return_value = default_exists
-    old_backing_index = 'old_backing'
-    conn_mock.indices.get_alias.return_value.keys.return_value = [old_backing_index]
-
     backing_index = 'backing'
+    switch_indices_mock = mocker.patch('search.indexing_api.switch_indices', autospec=True)
     finish_recreate_index.delay(backing_index)
 
-    conn_mock.indices.delete_alias.assert_any_call(
-        name=get_reindexing_alias_name(),
-        index=backing_index,
-    )
-    default_alias = get_default_alias_name()
-    conn_mock.indices.exists_alias.assert_called_once_with(name=default_alias)
-
-    actions = []
-    if default_exists:
-        actions.append({
-            "remove": {
-                "index": old_backing_index,
-                "alias": default_alias,
-            },
-        })
-    actions.append({
-        "add": {
-            "index": backing_index,
-            "alias": default_alias,
-        }
-    })
-    conn_mock.indices.update_aliases.assert_called_once_with({
-        "actions": actions,
-    })
-    refresh_mock.assert_called_once_with(backing_index)
-    if default_exists:
-        conn_mock.indices.delete.assert_called_once_with(old_backing_index)
-    else:
-        assert conn_mock.indices.delete.called is False
-
-    conn_mock.indices.delete_alias.assert_called_once_with(
-        name=get_reindexing_alias_name(),
-        index=backing_index,
-    )
+    switch_indices_mock.assert_called_once_with(backing_index)
