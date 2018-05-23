@@ -5,6 +5,7 @@ from prawcore.exceptions import PrawcoreException
 import pytest
 
 from open_discussions.factories import UserFactory
+from open_discussions.utils import assert_not_raises
 from search.exceptions import RetryException
 from search.tasks import (
     create_document,
@@ -56,9 +57,10 @@ def test_increment_document_integer_field_task(mocked_api):
 
 def test_wrap_retry_exception():
     """wrap_retry_exception should raise RetryException when other exceptions are raised"""
-    with wrap_retry_exception(KeyError):
-        # Should not raise an exception
-        pass
+    with assert_not_raises():
+        with wrap_retry_exception(KeyError):
+            # Should not raise an exception
+            pass
 
 
 @pytest.mark.parametrize("matching", [True, False])
