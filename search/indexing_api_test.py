@@ -10,7 +10,6 @@ from channels.constants import (
     COMMENT_TYPE,
     POST_TYPE,
 )
-from open_discussions.factories import UserFactory
 from search.connection import get_default_alias_name
 from search.indexing_api import (
     clear_and_create_index,
@@ -122,7 +121,7 @@ def test_clear_and_create_index(mocked_es, skip_mapping, already_exists):
     assert 'mappings' not in body if skip_mapping else 'mappings' in body
 
 
-def test_index_post_with_comments(mocked_es, mocker, settings):
+def test_index_post_with_comments(mocked_es, mocker, settings, user):
     """
     index_post should index the post and all comments recursively
     """
@@ -147,7 +146,6 @@ def test_index_post_with_comments(mocked_es, mocker, settings):
         'search.indexing_api.bulk', autospec=True, return_value=(0, []),
     )
 
-    user = UserFactory.create()
     settings.INDEXING_API_USERNAME = user.username
     post_id = 'post_id'
     index_post_with_comments(post_id)

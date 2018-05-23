@@ -4,7 +4,6 @@ from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException
 import pytest
 
-from open_discussions.factories import UserFactory
 from open_discussions.utils import assert_not_raises
 from search.exceptions import RetryException
 from search.tasks import (
@@ -94,9 +93,8 @@ def test_index_post_with_comments(mocker):
     wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
 
 
-def test_index_channel(mocker, settings):
+def test_index_channel(mocker, settings, user):
     """index_channel should index all posts of a channel"""
-    user = UserFactory.create()
     settings.INDEXING_API_USERNAME = user.username
     index_post_mock = mocker.patch('search.tasks.index_post_with_comments', autospec=True)
     api_mock = mocker.patch('channels.api.Api', autospec=True)
@@ -128,11 +126,10 @@ def test_index_channel(mocker, settings):
     replace_mock.assert_called_once_with(group_mock.return_value)
 
 
-def test_start_recreate_index(mocker, settings):
+def test_start_recreate_index(mocker, settings, user):
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
     """
-    user = UserFactory.create()
     settings.INDEXING_API_USERNAME = user.username
     client_mock = mocker.patch('channels.api.Api', autospec=True)
     channel_names = ['a', 'b', 'c']
