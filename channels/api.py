@@ -378,6 +378,9 @@ class Api:
         """
         Get the channel
 
+        Args:
+            name (str): The channel name
+
         Returns:
             praw.models.Subreddit: the specified channel
         """
