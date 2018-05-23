@@ -95,7 +95,7 @@ def test_index_post_with_comments(mocker):
 
 
 def test_index_channel(mocker, settings):
-    """index_channel should all posts of a channel"""
+    """index_channel should index all posts of a channel"""
     user = UserFactory.create()
     settings.INDEXING_API_USERNAME = user.username
     index_post_mock = mocker.patch('search.tasks.index_post_with_comments', autospec=True)
