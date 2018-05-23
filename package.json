@@ -75,6 +75,7 @@
     "react-ga": "^2.2.0",
     "react-hot-loader": "next",
     "react-markdown": "^3.1.5",
+    "react-onclickoutside": "^6.7.1",
     "react-redux": "^5.0.5",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",

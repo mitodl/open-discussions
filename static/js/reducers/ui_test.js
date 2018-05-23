@@ -8,10 +8,12 @@ import {
   SET_SNACKBAR_MESSAGE,
   SHOW_DIALOG,
   HIDE_DIALOG,
+  SET_SHOW_USER_MENU,
   setShowDrawer,
   setSnackbarMessage,
   showDialog,
-  hideDialog
+  hideDialog,
+  setShowUserMenu
 } from "../actions/ui"
 
 describe("ui reducer", () => {
@@ -76,5 +78,14 @@ describe("ui reducer", () => {
     })
     const dialogs = store.getState().ui.dialogs
     assert.deepEqual(keys, [...dialogs.keys()])
+  })
+
+  it("should let you toggle show user menu", async () => {
+    for (const open of [true, false]) {
+      const state = await dispatchThen(setShowUserMenu(open), [
+        SET_SHOW_USER_MENU
+      ])
+      assert.equal(state.showUserMenu, open)
+    }
   })
 })

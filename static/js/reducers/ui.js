@@ -5,7 +5,8 @@ import {
   SET_SHOW_DRAWER,
   SET_SNACKBAR_MESSAGE,
   SHOW_DIALOG,
-  HIDE_DIALOG
+  HIDE_DIALOG,
+  SET_SHOW_USER_MENU
 } from "../actions/ui"
 
 import type { Action } from "../flow/reduxTypes"
@@ -20,13 +21,15 @@ export type SnackbarState = {
 export type UIState = {
   showDrawer: boolean,
   snackbar: ?SnackbarState,
-  dialogs: Set<string>
+  dialogs: Set<string>,
+  showUserMenu: boolean
 }
 
 export const INITIAL_UI_STATE: UIState = {
-  showDrawer: false,
-  snackbar:   null,
-  dialogs:    new Set()
+  showDrawer:   false,
+  snackbar:     null,
+  dialogs:      new Set(),
+  showUserMenu: false
 }
 
 // this generates a new sequential id for each snackbar state that is pushed
@@ -64,6 +67,8 @@ export const ui = (
       ...state,
       dialogs: updateDialog(state.dialogs, action.payload, false)
     }
+  case SET_SHOW_USER_MENU:
+    return { ...state, showUserMenu: action.payload }
   }
   return state
 }

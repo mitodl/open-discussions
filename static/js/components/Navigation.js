@@ -5,7 +5,11 @@ import { Link } from "react-router-dom"
 import SubscriptionsList from "./SubscriptionsList"
 import UserInfo from "./UserInfo"
 
-import { newPostURL, getChannelNameFromPathname } from "../lib/url"
+import {
+  newPostURL,
+  getChannelNameFromPathname,
+  FRONTPAGE_URL
+} from "../lib/url"
 import { userIsAnonymous } from "../lib/util"
 
 import type { Channel } from "../flow/discussionTypes"
@@ -31,6 +35,10 @@ const Navigation = (props: NavigationProps) => {
         >
             Submit a New Post
         </Link>}
+      <Link className="home-link" to={FRONTPAGE_URL}>
+        <i className="material-icons home">home</i>
+        Home
+      </Link>
       <SubscriptionsList
         currentChannel={channelName}
         subscribedChannels={subscribedChannels}

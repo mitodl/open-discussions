@@ -9,7 +9,7 @@ import Navigation from "./Navigation"
 import SubscriptionsList from "./SubscriptionsList"
 import UserInfo from "./UserInfo"
 
-import { newPostURL } from "../lib/url"
+import { newPostURL, FRONTPAGE_URL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
 import * as util from "../lib/util"
 
@@ -32,7 +32,7 @@ describe("Navigation", () => {
 
   it("create post link should not have channel name if channelName is not in URL", () => {
     const wrapper = renderComponent()
-    assert.lengthOf(wrapper.find(Link), 2)
+    assert.lengthOf(wrapper.find(Link), 3)
     const props = wrapper.find(Link).at(0).props()
     assert.equal(props.to, "/create_post/")
     assert.equal(props.children, "Submit a New Post")
@@ -84,10 +84,20 @@ describe("Navigation", () => {
 
   it("should have a link to the settings", () => {
     const wrapper = renderComponent()
-    const { children, to, className } = wrapper.find(Link).at(1).props()
+    const { children, to, className } = wrapper.find(Link).at(2).props()
     assert.equal(children, "Settings")
     assert.equal(className, "settings-link")
     assert.equal(to, "/settings")
+  })
+
+  it("should have to link to home", () => {
+    const { to, className, children } = renderComponent()
+      .find(Link)
+      .at(1)
+      .props()
+    assert.equal(children[1], "Home")
+    assert.equal(className, "home-link")
+    assert.equal(to, FRONTPAGE_URL)
   })
 
   it("should hide the link to settings, if the user is anonymous", () => {
