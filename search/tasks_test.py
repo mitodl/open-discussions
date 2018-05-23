@@ -104,12 +104,8 @@ def test_index_channel(mocker, settings, user):
     replace_mock = mocker.patch('celery.app.task.Task.replace', return_value=expected_exception)
     group_mock = mocker.patch('search.tasks.group', autospec=True)
     get_channel_mock = api_mock.return_value.get_channel
-    post1 = mocker.Mock(id=1)
-    post2 = mocker.Mock(id=2)
-    get_channel_mock.return_value.new.return_value = [
-        post1,
-        post2,
-    ]
+    posts = [mocker.Mock(id=num) for num in (1, 2)]
+    get_channel_mock.return_value.new.return_value = posts
     wrap_mock = mocker.patch('search.tasks.wrap_retry_exception')
     channel_name = 'channel'
     with pytest.raises(expected_exception):
@@ -121,8 +117,8 @@ def test_index_channel(mocker, settings, user):
     wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
     assert group_mock.call_count == 1
     list(group_mock.call_args[0][0])  # iterate through generator
-    index_post_mock.si.assert_any_call(post1.id)
-    index_post_mock.si.assert_any_call(post2.id)
+    for post in posts:
+        index_post_mock.si.assert_any_call(post.id)
     replace_mock.assert_called_once_with(group_mock.return_value)
 
 
