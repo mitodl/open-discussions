@@ -139,7 +139,5 @@ def finish_recreate_index(backing_index):
         backing_index (str): The backing elasticsearch index
     """
     log.info("Done with temporary index. Pointing default aliases to newly created backing indexes...")
-
     api.switch_indices(backing_index)
-
     log.info("recreate_index has finished successfully!")
