@@ -152,7 +152,10 @@ def test_start_recreate_index(mocker, settings, user):
     create_backing_index_mock.assert_called_once_with()
     finish_recreate_index_mock.si.assert_called_once_with(backing_index)
     assert group_mock.call_count == 1
-    list(group_mock.call_args[0][0])  # iterate through generator
+
+    # Celery's 'group' function takes a generator as an argument. In order to make assertions about the items
+    # in that generator, 'list' is being called to force iteration through all of those items.
+    list(group_mock.call_args[0][0])
     for name in channel_names:
         index_channel_mock.si.assert_any_call(name)
     chain_mock.assert_called_once_with(
