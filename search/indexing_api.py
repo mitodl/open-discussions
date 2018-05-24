@@ -168,7 +168,7 @@ def index_post_with_comments(post_id):
             serialize_post_and_comments(post),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
-            # Lower chunk size from default 500 to try to manage memory use
+            # Adjust chunk size from 500 depending on environment variable
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )
         if len(errors) > 0:
