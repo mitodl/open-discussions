@@ -19,7 +19,7 @@ COMBINED_MAPPING = {
     'removed': {'type': 'boolean'},
     'post_id': {'type': 'keyword'},
     'post_title': {'type': 'text'},
-    'post_link_url': {'type': 'text'},
+    'post_link_url': {'type': 'keyword'},
     'num_comments': {'type': 'long'},
     'comment_id': {'type': 'keyword'},
     'parent_comment_id': {'type': 'keyword'},
