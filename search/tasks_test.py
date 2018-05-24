@@ -4,6 +4,8 @@ from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException
 import pytest
 
+from channels.constants import POSTS_SORT_NEW
+from channels.utils import ListingParams
 from open_discussions.utils import assert_not_raises
 from search.exceptions import RetryException
 from search.tasks import (
@@ -103,16 +105,16 @@ def test_index_channel(mocker, settings, user):
 
     replace_mock = mocker.patch('celery.app.task.Task.replace', return_value=expected_exception)
     group_mock = mocker.patch('search.tasks.group', autospec=True)
-    get_channel_mock = api_mock.return_value.get_channel
+    list_posts_mock = api_mock.return_value.list_posts
     posts = [mocker.Mock(id=num) for num in (1, 2)]
-    get_channel_mock.return_value.new.return_value = posts
+    list_posts_mock.return_value = posts
     wrap_mock = mocker.patch('search.tasks.wrap_retry_exception')
     channel_name = 'channel'
     with pytest.raises(expected_exception):
         index_channel.delay(channel_name)
 
     api_mock.assert_called_once_with(user)
-    get_channel_mock.assert_called_once_with(channel_name)
+    list_posts_mock.assert_called_once_with(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
 
     wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
     assert group_mock.call_count == 1

@@ -12,6 +12,8 @@ from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException
 
+from channels.constants import POSTS_SORT_NEW
+from channels.utils import ListingParams
 from open_discussions.celery import app
 from search import indexing_api as api
 from search.exceptions import RetryException
@@ -91,14 +93,13 @@ def index_channel(self, channel_name):
         from channels.api import Api
 
         client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
-        channel = client.get_channel(channel_name)
-        post_ids = [post.id for post in channel.new()]
+        posts = client.list_posts(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
 
-    raise self.replace(
-        group(
-            index_post_with_comments.si(post_id) for post_id in post_ids
+        raise self.replace(
+            group(
+                index_post_with_comments.si(post.id) for post in posts
+            )
         )
-    )
 
 
 @app.task(bind=True)
