@@ -1,10 +1,7 @@
 """Indexing tasks"""
 from contextlib import contextmanager
 
-from celery import (
-    chain,
-    group,
-)
+import celery
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -96,7 +93,7 @@ def index_channel(self, channel_name):
         posts = client.list_posts(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
 
         raise self.replace(
-            group(
+            celery.group(
                 index_post_with_comments.si(post.id) for post in posts
             )
         )
@@ -117,13 +114,13 @@ def start_recreate_index(self):
 
     client = Api(user)
     channel_names = [channel.display_name for channel in client.list_channels()]
-    index_channels = group(
+    index_channels = celery.group(
         index_channel.si(channel_name) for channel_name in channel_names
     )
 
     # Use self.replace so that code waiting on this task will also wait on the indexing and finish tasks
     raise self.replace(
-        chain(
+        celery.chain(
             index_channels,
             finish_recreate_index.si(new_backing_index),
         )

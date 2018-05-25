@@ -41,7 +41,6 @@ def mocked_es(mocker, settings):
         index_name=index_name,
         default_alias=get_default_alias_name(),
     )
-    get_conn_patch.reset_mock()
 
 
 def test_create_document(mocked_es):

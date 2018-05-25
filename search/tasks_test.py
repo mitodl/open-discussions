@@ -1,5 +1,7 @@
 """Search task tests"""
 # pylint: disable=redefined-outer-name
+from types import SimpleNamespace
+
 from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException
 import pytest
@@ -21,6 +23,33 @@ from search.tasks import (
 
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture()
+def wrap_retry_mock(mocker):
+    """
+    Patches the wrap_retry_exception context manager and asserts that it was
+    called by any test that uses it
+    """
+    wrap_mock = mocker.patch('search.tasks.wrap_retry_exception')
+    yield
+    wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
+
+
+@pytest.fixture()
+def mocked_celery(mocker):
+    """Mock object that patches certain celery functions"""
+    exception_class = TabError
+    replace_mock = mocker.patch('celery.app.task.Task.replace', autospec=True, side_effect=exception_class)
+    group_mock = mocker.patch('celery.group', autospec=True)
+    chain_mock = mocker.patch('celery.chain', autospec=True)
+
+    yield SimpleNamespace(
+        replace=replace_mock,
+        group=group_mock,
+        chain=chain_mock,
+        replace_exception_class=exception_class,
+    )
 
 
 @pytest.fixture()
@@ -95,36 +124,33 @@ def test_index_post_with_comments(mocker):
     wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
 
 
-def test_index_channel(mocker, settings, user):
+def test_index_channel(mocker, mocked_celery, settings, user):
     """index_channel should index all posts of a channel"""
     settings.INDEXING_API_USERNAME = user.username
     index_post_mock = mocker.patch('search.tasks.index_post_with_comments', autospec=True)
     api_mock = mocker.patch('channels.api.Api', autospec=True)
 
-    expected_exception = ZeroDivisionError
-
-    replace_mock = mocker.patch('celery.app.task.Task.replace', return_value=expected_exception)
-    group_mock = mocker.patch('search.tasks.group', autospec=True)
     list_posts_mock = api_mock.return_value.list_posts
     posts = [mocker.Mock(id=num) for num in (1, 2)]
     list_posts_mock.return_value = posts
     wrap_mock = mocker.patch('search.tasks.wrap_retry_exception')
     channel_name = 'channel'
-    with pytest.raises(expected_exception):
+    with pytest.raises(mocked_celery.replace_exception_class):
         index_channel.delay(channel_name)
 
     api_mock.assert_called_once_with(user)
     list_posts_mock.assert_called_once_with(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
 
     wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
-    assert group_mock.call_count == 1
-    list(group_mock.call_args[0][0])  # iterate through generator
+    assert mocked_celery.group.call_count == 1
+    list(mocked_celery.group.call_args[0][0])  # iterate through generator
     for post in posts:
         index_post_mock.si.assert_any_call(post.id)
-    replace_mock.assert_called_once_with(group_mock.return_value)
+    assert mocked_celery.replace.call_count == 1
+    assert mocked_celery.replace.call_args[0][1] == mocked_celery.group.return_value
 
 
-def test_start_recreate_index(mocker, settings, user):
+def test_start_recreate_index(mocker, mocked_celery, settings, user):
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
     """
@@ -135,9 +161,6 @@ def test_start_recreate_index(mocker, settings, user):
         mocker.Mock(display_name=name) for name in channel_names
     ]
     index_channel_mock = mocker.patch('search.tasks.index_channel', autospec=True)
-    replace_mock = mocker.patch('celery.app.task.Task.replace', autospec=True, side_effect=TabError)
-    group_mock = mocker.patch('search.tasks.group', autospec=True)
-    chain_mock = mocker.patch('search.tasks.chain', autospec=True)
     backing_index = 'backing'
     create_backing_index_mock = mocker.patch(
         'search.indexing_api.create_backing_index',
@@ -146,24 +169,24 @@ def test_start_recreate_index(mocker, settings, user):
     )
     finish_recreate_index_mock = mocker.patch('search.tasks.finish_recreate_index', autospec=True)
 
-    with pytest.raises(TabError):
+    with pytest.raises(mocked_celery.replace_exception_class):
         start_recreate_index.delay()
 
     create_backing_index_mock.assert_called_once_with()
     finish_recreate_index_mock.si.assert_called_once_with(backing_index)
-    assert group_mock.call_count == 1
+    assert mocked_celery.group.call_count == 1
 
     # Celery's 'group' function takes a generator as an argument. In order to make assertions about the items
     # in that generator, 'list' is being called to force iteration through all of those items.
-    list(group_mock.call_args[0][0])
+    list(mocked_celery.group.call_args[0][0])
     for name in channel_names:
         index_channel_mock.si.assert_any_call(name)
-    chain_mock.assert_called_once_with(
-        group_mock.return_value,
-        finish_recreate_index_mock.si.return_value,
-    )
-    assert replace_mock.call_count == 1
-    assert replace_mock.call_args[0][1] == chain_mock.return_value
+        mocked_celery.chain.assert_called_once_with(
+            mocked_celery.group.return_value,
+            finish_recreate_index_mock.si.return_value,
+        )
+    assert mocked_celery.replace.call_count == 1
+    assert mocked_celery.replace.call_args[0][1] == mocked_celery.chain.return_value
 
 
 def test_finish_recreate_index(mocker):
