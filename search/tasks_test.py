@@ -113,18 +113,16 @@ def test_wrap_retry_exception_matching(matching):
             raise_thing()
 
 
-def test_index_post_with_comments(mocker):
+def test_index_post_with_comments(mocker, wrap_retry_mock):  # pylint: disable=unused-argument
     """index_post should call the api function of the same name"""
     index_post_mock = mocker.patch('search.indexing_api.index_post_with_comments')
-    wrap_mock = mocker.patch('search.tasks.wrap_retry_exception')
     post_id = 'post_id'
     index_post_with_comments.delay(post_id)
 
     index_post_mock.assert_called_once_with(post_id)
-    wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
 
 
-def test_index_channel(mocker, mocked_celery, settings, user):
+def test_index_channel(mocker, mocked_celery, wrap_retry_mock, settings, user):  # pylint: disable=unused-argument
     """index_channel should index all posts of a channel"""
     settings.INDEXING_API_USERNAME = user.username
     index_post_mock = mocker.patch('search.tasks.index_post_with_comments', autospec=True)
@@ -133,7 +131,6 @@ def test_index_channel(mocker, mocked_celery, settings, user):
     list_posts_mock = api_mock.return_value.list_posts
     posts = [mocker.Mock(id=num) for num in (1, 2)]
     list_posts_mock.return_value = posts
-    wrap_mock = mocker.patch('search.tasks.wrap_retry_exception')
     channel_name = 'channel'
     with pytest.raises(mocked_celery.replace_exception_class):
         index_channel.delay(channel_name)
@@ -141,7 +138,6 @@ def test_index_channel(mocker, mocked_celery, settings, user):
     api_mock.assert_called_once_with(user)
     list_posts_mock.assert_called_once_with(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
 
-    wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
     assert mocked_celery.group.call_count == 1
     list(mocked_celery.group.call_args[0][0])  # iterate through generator
     for post in posts:
