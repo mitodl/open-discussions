@@ -27,6 +27,23 @@ export const makeImage = () => ({
   type:          "photo"
 })
 
+export const makeTweet = () => ({
+  provider_url:    "http://twitter.com",
+  description:     "just setting up my twttr",
+  title:           "jack on Twitter",
+  author_name:     "jack",
+  thumbnail_width: 400,
+  html:
+    '<blockquote class="twitter-tweet"><a href="https://twitter.com/jack/status/20?ref_src=embedly"></a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>',
+  author_url:    "http://twitter.com/jack",
+  version:       "1.0",
+  provider_name: "Twitter",
+  thumbnail_url:
+    "https://pbs.twimg.com/profile_images/839863609345794048/mkpdB9Tf_400x400.jpg",
+  type:             "rich",
+  thumbnail_height: 400
+})
+
 export const makeYoutubeVideo = () => ({
   provider_url: "https://www.youtube.com/",
   description:

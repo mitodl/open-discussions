@@ -64,6 +64,7 @@ import {
   REPORT_CONTENT_NEW_FORM,
   REPORT_CONTENT_PAYLOAD
 } from "../lib/reports"
+import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -130,6 +131,8 @@ class PostPage extends React.Component<*, void> {
 
   componentWillMount() {
     this.loadData()
+
+    ensureTwitterEmbedJS()
   }
 
   componentWillUnmount() {
@@ -178,7 +181,8 @@ class PostPage extends React.Component<*, void> {
       ])
 
       if (post.url) {
-        await dispatch(actions.embedly.get(post.url))
+        const embedlyResponse = await dispatch(actions.embedly.get(post.url))
+        handleTwitterWidgets(embedlyResponse)
       }
 
       if (!channel) {

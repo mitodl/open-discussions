@@ -12,6 +12,7 @@ import { postDetailURL } from "../lib/url"
 import { getChannelName } from "../lib/util"
 import { formatTitle } from "../lib/title"
 import { validatePostCreateForm } from "../lib/validation"
+import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 
 import type { FormValue } from "../flow/formTypes"
 import type { Channel, CreatePostPayload } from "../flow/discussionTypes"
@@ -49,6 +50,7 @@ class CreatePostPage extends React.Component<*, void> {
         value: newPostForm()
       })
     )
+    ensureTwitterEmbedJS()
   }
 
   componentWillUnmount() {
@@ -56,7 +58,7 @@ class CreatePostPage extends React.Component<*, void> {
     dispatch(actions.forms.formEndEdit(CREATE_POST_PAYLOAD))
   }
 
-  onUpdate = (e: Object) => {
+  onUpdate = async (e: Object) => {
     const { dispatch } = this.props
     const { name, value } = e.target
 
@@ -76,7 +78,8 @@ class CreatePostPage extends React.Component<*, void> {
           key:  actions.embedly.get.requestType
         }
       }
-      dispatch(embedlyGetFunc)
+      const embedlyResponse = await dispatch(embedlyGetFunc)
+      handleTwitterWidgets(embedlyResponse)
     }
   }
 

@@ -9,7 +9,9 @@ import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { formatTitle } from "../lib/title"
-import { makeArticle } from "../factories/embedly"
+import { makeArticle, makeTweet } from "../factories/embedly"
+import { wait } from "../lib/util"
+import * as embedUtil from "../lib/embed"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
 
@@ -21,7 +23,8 @@ describe("CreatePostPage", () => {
     channels,
     post,
     commentsResponse,
-    article
+    article,
+    twitterEmbedStub
 
   const makeEvent = (name, value) => ({ target: { value, name } })
 
@@ -61,6 +64,10 @@ describe("CreatePostPage", () => {
     )
     listenForActions = helper.listenForActions.bind(helper)
     renderComponent = helper.renderComponent.bind(helper)
+    twitterEmbedStub = helper.sandbox.stub(embedUtil, "ensureTwitterEmbedJS")
+    window.twttr = {
+      widgets: { load: helper.sandbox.stub() }
+    }
   })
 
   afterEach(() => {
@@ -151,6 +158,34 @@ describe("CreatePostPage", () => {
       })
     })
   }
+
+  it("should load twitter JS on page load", async () => {
+    await renderPage()
+    assert.ok(twitterEmbedStub.called)
+  })
+
+  it("should initialize twitter embed if its a twitter link", async () => {
+    helper.getEmbedlyStub.returns(
+      Promise.resolve({ url: post.url, response: makeTweet() })
+    )
+
+    const [wrapper] = await renderPage()
+    setLinkPost(wrapper)
+
+    await listenForActions(
+      [
+        actions.forms.FORM_UPDATE,
+        actions.embedly.get.requestType,
+        actions.embedly.get.successType
+      ],
+      () => {
+        setUrl(wrapper, "http://en.foo.bar")
+      }
+    )
+
+    await wait(100) // 🙃
+    assert.ok(window.twttr.widgets.load.called)
+  })
 
   it("should show validation errors when title of post is empty", async () => {
     const [wrapper] = await renderPage()

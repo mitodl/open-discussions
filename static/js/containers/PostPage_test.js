@@ -36,8 +36,9 @@ import { formatTitle } from "../lib/title"
 import { createCommentTree } from "../reducers/comments"
 import { makeReportRecord } from "../factories/reports"
 import { VALID_COMMENT_SORT_TYPES } from "../lib/sorting"
-import { makeArticle } from "../factories/embedly"
+import { makeArticle, makeTweet } from "../factories/embedly"
 import * as utilFuncs from "../lib/util"
+import * as embedUtil from "../lib/embed"
 
 describe("PostPage", function() {
   let helper,
@@ -46,7 +47,9 @@ describe("PostPage", function() {
     post,
     comments,
     channel,
-    moderators
+    moderators,
+    twitterEmbedStub
+
   this.timeout(5000)
 
   beforeEach(() => {
@@ -75,6 +78,7 @@ describe("PostPage", function() {
     helper.getReportsStub.returns(Promise.resolve(R.times(makeReportRecord, 4)))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
+    twitterEmbedStub = helper.sandbox.stub(embedUtil, "ensureTwitterEmbedJS")
   })
 
   afterEach(() => {
@@ -164,6 +168,31 @@ describe("PostPage", function() {
         expectedPayload
       )
     })
+  })
+
+  it("should load twitter JS on page load", async () => {
+    await renderPage()
+    assert.ok(twitterEmbedStub.called)
+  })
+
+  it("should call window.twttr.widgets.load() if a twitter embed", async () => {
+    post.url = "http://foo.bar.example.com/baz"
+    post.text = null
+    helper.getEmbedlyStub.returns(Promise.resolve({ response: makeTweet() }))
+
+    window.twttr = {
+      widgets: { load: helper.sandbox.stub() }
+    }
+
+    await renderComponent(
+      postDetailURL(channel.name, post.id),
+      basicPostPageActions.concat([
+        FORM_BEGIN_EDIT,
+        actions.embedly.get.requestType,
+        actions.embedly.get.successType
+      ])
+    )
+    assert.ok(window.twttr.widgets.load.called)
   })
 
   it("should show a comment permalink UI if at the right URL", async () => {
