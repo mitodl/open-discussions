@@ -85,3 +85,36 @@ class Subscription(TimestampedModel):
     class Meta:
         unique_together = (('user', 'post_id', 'comment_id'),)
         index_together = (('post_id', 'comment_id'),)
+
+
+class Channel(TimestampedModel):
+    """
+    Keep track of channels which are stored in reddit
+    """
+    name = models.CharField(unique=True, max_length=100)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Post(TimestampedModel):
+    """
+    Keep track of post ids so that we can index all posts
+    """
+    channel = models.ForeignKey(Channel)
+    post_id = Base36IntegerField(unique=True)
+
+    def __str__(self):
+        return f"{self.post_id} on channel {self.channel}"
+
+
+class Comment(TimestampedModel):
+    """
+    Keep track of comment ids so that we can index all comments efficiently
+    """
+    post = models.ForeignKey(Post)
+    comment_id = Base36IntegerField(unique=True)
+    parent_id = Base36IntegerField(null=True)
+
+    def __str__(self):
+        return f"{self.comment_id} on post {self.post}"

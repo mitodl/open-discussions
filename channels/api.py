@@ -41,12 +41,16 @@ from channels.constants import (
     VoteActions,
 )
 from channels.models import (
+    Channel,
+    Comment,
+    Post,
     RedditAccessToken,
     RedditRefreshToken,
     Subscription,
 )
 from channels.utils import get_kind_mapping
 
+from channels import tasks
 from open_discussions import features
 from open_discussions.utils import now_in_utc
 from search.task_helpers import (
@@ -282,6 +286,73 @@ def replace_load_comment(original_load_comment):
     return replacement_load_comment
 
 
+@features.if_feature_enabled(features.KEEP_LOCAL_COPY)
+def sync_channel_model(name):
+    """
+    Create the channel in our database if it doesn't already exist
+
+    Args:
+        name (str): The name of the channel
+
+    Returns:
+        Channel: The channel object
+    """
+    return Channel.objects.get_or_create(name=name)[0]
+
+
+@features.if_feature_enabled(features.KEEP_LOCAL_COPY)
+def sync_post_model(*, channel_name, post_id):
+    """
+    Create a new Post if it doesn't exist already. Also create a new Channel if necessary
+
+    Args:
+        channel_name (str): The name of the channel
+        post_id (str): The id of the post
+
+    Returns:
+        Post: The post object
+    """
+    with transaction.atomic():
+        post = Post.objects.filter(post_id=post_id).first()
+        if post is not None:
+            return post
+
+        channel = sync_channel_model(channel_name)
+        return Post.objects.get_or_create(
+            post_id=post_id,
+            defaults={'channel': channel},
+        )[0]
+
+
+@features.if_feature_enabled(features.KEEP_LOCAL_COPY)
+def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):
+    """
+    Create a new Comment if it doesn't already exist. Also create a new Post and Channel if necessary
+
+    Args:
+        channel_name (str): The name of the channel
+        post_id (str): The id of the post
+        comment_id (str): The id of the comment
+        parent_id (str): The id of the reply comment. If None the parent is the post
+
+    Returns:
+        Comment: The comment object
+    """
+    with transaction.atomic():
+        comment = Comment.objects.filter(comment_id=comment_id).first()
+        if comment is not None:
+            return comment
+
+        post = sync_post_model(channel_name=channel_name, post_id=post_id)
+        return Comment.objects.get_or_create(
+            comment_id=comment_id,
+            defaults={
+                'post': post,
+                'parent_id': parent_id,
+            }
+        )[0]
+
+
 class Api:
     """Channel API"""
     def __init__(self, user):
@@ -347,12 +418,14 @@ class Api:
             if key not in CHANNEL_SETTINGS:
                 raise ValueError('Invalid argument {}={}'.format(key, value))
 
-        return self.reddit.subreddit.create(
+        channel = self.reddit.subreddit.create(
             name,
             title=title,
             subreddit_type=channel_type,
             **other_settings
         )
+        tasks.sync_channel_model(name)
+        return channel
 
     def update_channel(self, name, title=None, channel_type=None, **other_settings):
         """
@@ -453,7 +526,12 @@ class Api:
         """
         if len(list(filter(lambda val: val is not None, [text, url]))) != 1:
             raise ValueError('Exactly one of text and url must be provided')
-        return self.get_channel(channel_name).submit(title, selftext=text, url=url)
+        post = self.get_channel(channel_name).submit(title, selftext=text, url=url)
+        tasks.sync_post_model(
+            channel_name=channel_name,
+            post_id=post.id,
+        )
+        return post
 
     def front_page(self, listing_params):
         """
@@ -623,9 +701,19 @@ class Api:
             raise ValueError('Exactly one of post_id and comment_id must be provided')
 
         if post_id is not None:
-            return self.get_post(post_id).reply(text)
+            reply = self.get_post(post_id).reply(text)
+            parent_id = None
+        else:
+            reply = self.get_comment(comment_id).reply(text)
+            parent_id = comment_id
 
-        return self.get_comment(comment_id).reply(text)
+        tasks.sync_comment_model(
+            channel_name=reply.subreddit.display_name,
+            post_id=reply.submission.id,
+            comment_id=reply.id,
+            parent_id=parent_id,
+        )
+        return reply
 
     @reddit_object_indexer(indexing_func=update_comment_text)
     def update_comment(self, comment_id, text):
@@ -639,7 +727,8 @@ class Api:
         Returns:
             praw.models.Comment: the updated comment
         """
-        return self.get_comment(comment_id).edit(text)
+        comment = self.get_comment(comment_id).edit(text)
+        return comment
 
     @reddit_object_indexer(indexing_func=update_comment_removal_status)
     def remove_comment(self, comment_id):

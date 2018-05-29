@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 
 from django.contrib.auth.models import AnonymousUser
 import pytest
-from praw.models import Comment
+from praw.models import Comment as RedditComment
 from praw.models.comment_forest import CommentForest
 from praw.models.reddit.redditor import Redditor
 from prawcore.exceptions import ResponseException
@@ -20,6 +20,9 @@ from channels.constants import (
     VoteActions,
 )
 from channels.models import (
+    Channel,
+    Comment,
+    Post,
     RedditAccessToken,
     RedditRefreshToken,
     Subscription,
@@ -38,7 +41,15 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture()
 def mock_get_client(mocker):
     """Mock reddit get_client"""
-    return mocker.patch('channels.api._get_client', autospec=True)
+    mocked = mocker.patch('channels.api._get_client', autospec=True)
+    mocked.return_value.subreddit.return_value.submit.return_value.id = 'abc'
+    mocked.return_value.submission.return_value.reply.return_value.id = '456'
+    mocked.return_value.submission.return_value.reply.return_value.submission.id = '123'
+    mocked.return_value.submission.return_value.reply.return_value.subreddit.display_name = 'subreddit'
+    mocked.return_value.comment.return_value.reply.return_value.id = '789'
+    mocked.return_value.comment.return_value.reply.return_value.submission.id = '687'
+    mocked.return_value.comment.return_value.reply.return_value.subreddit.display_name = 'other_subreddit'
+    return mocked
 
 
 @pytest.fixture()
@@ -137,6 +148,7 @@ def test_list_channels_user(mock_get_client):
 @pytest.mark.parametrize('channel_type', VALID_CHANNEL_TYPES)
 def test_create_channel_user(mock_get_client, channel_type):
     """Test create_channel for logged-in user"""
+    assert Channel.objects.count() == 0
     user = UserFactory.create()
     channel = api.Api(user=user).create_channel('name', 'Title', channel_type=channel_type)
     assert channel == mock_get_client.return_value.subreddit.create.return_value
@@ -144,6 +156,9 @@ def test_create_channel_user(mock_get_client, channel_type):
     mock_get_client.return_value.subreddit.create.assert_called_once_with(
         'name', title='Title', subreddit_type=channel_type
     )
+    assert Channel.objects.count() == 1
+    channel_obj = Channel.objects.first()
+    assert channel_obj.name == 'name'
 
 
 @pytest.mark.parametrize('channel_setting', api.CHANNEL_SETTINGS)
@@ -201,14 +216,20 @@ def test_update_channel_setting(mock_client, channel_setting):
 
 def test_create_post_text(mock_client, indexing_decorator):
     """Test create_post with text"""
+    assert Post.objects.count() == 0
     client = api.Api(UserFactory.create())
     post = client.create_post('channel', 'Title', text='Text')
     assert post == mock_client.subreddit.return_value.submit.return_value
     mock_client.subreddit.assert_called_once_with('channel')
     mock_client.subreddit.return_value.submit.assert_called_once_with('Title', selftext='Text', url=None)
+    # This API function should be wrapped with the indexing decorator
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 1
     assert indexing_decorator.mock_indexer_func.original == task_helpers.index_new_post
+    assert Post.objects.count() == 1
+    post_obj = Post.objects.first()
+    assert post_obj.channel.name == 'channel'
+    assert post_obj.post_id == post.id
 
 
 def test_create_post_url(mock_client, indexing_decorator):
@@ -309,6 +330,7 @@ def test_remove_post(mock_client, indexing_decorator):
 
 def test_create_comment_on_post(mock_client, indexing_decorator):
     """Makes correct calls for comment on post"""
+    assert Comment.objects.count() == 0
     client = api.Api(UserFactory.create())
     comment = client.create_comment('text', post_id='id1')
     assert comment == mock_client.submission.return_value.reply.return_value
@@ -318,10 +340,17 @@ def test_create_comment_on_post(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 1
     assert indexing_decorator.mock_indexer_func.original == task_helpers.index_new_comment
+    assert Comment.objects.count() == 1
+    comment_obj = Comment.objects.first()
+    assert comment_obj.post.channel.name == comment.subreddit.display_name
+    assert comment_obj.post.post_id == '123'
+    assert comment_obj.comment_id == comment.id
+    assert comment_obj.parent_id is None
 
 
 def test_create_comment_on_comment(mock_client, indexing_decorator):
     """Makes correct calls for comment on comment"""
+    assert Comment.objects.count() == 0
     client = api.Api(UserFactory.create())
     comment = client.create_comment('text', comment_id='id2')
     assert comment == mock_client.comment.return_value.reply.return_value
@@ -331,6 +360,12 @@ def test_create_comment_on_comment(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 1
     assert indexing_decorator.mock_indexer_func.original == task_helpers.index_new_comment
+    assert Comment.objects.count() == 1
+    comment_obj = Comment.objects.first()
+    assert comment_obj.post.channel.name == comment.subreddit.display_name
+    assert comment_obj.post.post_id == '687'
+    assert comment_obj.comment_id == comment.id
+    assert comment_obj.parent_id == 'id2'
 
 
 def test_create_comment_args_error(mock_client):
@@ -477,7 +512,7 @@ def test_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
 
     def _make_comment(comment_id):
         """Helper to make a comment with a valid list of replies"""
-        comment = Comment(client.reddit, id=comment_id)
+        comment = RedditComment(client.reddit, id=comment_id)
         comment.replies = []
         return comment
 
@@ -505,7 +540,7 @@ def test_more_comments_with_more_comments(mock_client, mocker):  # pylint: disab
 
     def _make_comment(comment_id):
         """Helper to make a comment with a valid list of replies"""
-        comment = Comment(client.reddit, id=comment_id)
+        comment = RedditComment(client.reddit, id=comment_id)
         comment.replies = []
         return comment
 

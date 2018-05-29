@@ -190,14 +190,18 @@ def test_index_post_with_comments(mocked_es, mocker, settings, user):
     api_mock = mocker.patch('channels.api.Api', autospec=True)
     serialized_data = [
         {
-            'type': POST_TYPE,
+            'object_type': POST_TYPE,
         },
         {
-            'type': COMMENT_TYPE,
+            'object_type': COMMENT_TYPE,
         },
     ]
     serialize_mock = mocker.patch(
         'search.indexing_api.serialize_bulk_post_and_comments',
+        autospec=True,
+    )
+    sync_mock = mocker.patch(
+        'search.indexing_api.sync_post_and_comments',
         autospec=True,
         return_value=serialized_data,
     )
@@ -216,6 +220,7 @@ def test_index_post_with_comments(mocked_es, mocker, settings, user):
     post = client.get_post.return_value
 
     serialize_mock.assert_any_call(post)
+    sync_mock.assert_any_call(serialize_mock.return_value)
 
     post.comments.replace_more.assert_called_once_with(limit=None)
     for alias in aliases:
