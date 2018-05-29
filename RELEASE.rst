@@ -1,6 +1,19 @@
 Release Notes
 =============
 
+Version 0.28.0
+--------------
+
+- Add tooltip for anonymous users for the voting buttons
+- embedly styling (#715)
+- Added jwt/micromasters python-social-auth backends
+- Profile ImageFields (#708)
+- Add a unique CSS class for every page in the app
+- Fix issues with html returned from Embed.ly link type
+- Hide the comment reply form if the user is anonymous
+- Fix bug related to fetching subscriptions in App.js
+- Hide the reply and follow buttons if the user is anonymous
+
 Version 0.27.1
 --------------
 
