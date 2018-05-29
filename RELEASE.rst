@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.29.0
+--------------
+
+- Use keyword so post_link_url won&#39;t be tokenized (#737)
+- Refactored authentication code to its own app
+
 Version 0.28.0
 --------------
 
