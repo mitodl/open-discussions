@@ -135,7 +135,7 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
         field_name (str): The name of the field to increment
         incr_amount (int): The amount to increment by
     """
-    return _update_document(
+    _update_document(
         doc_id,
         {
             "source": "ctx._source.{} += {}".format(field_name, incr_amount),
