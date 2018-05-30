@@ -97,7 +97,7 @@ def create_document(doc_id, data):
     """
     conn = get_conn(verify=True)
     for alias in get_active_aliases():
-        return conn.create(
+        conn.create(
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             body=data,
@@ -115,7 +115,7 @@ def _update_document(doc_id, data, update_key=None):
     """
     conn = get_conn(verify=True)
     for alias in get_active_aliases():
-        return conn.update(
+        conn.update(
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             body={update_key: data},
