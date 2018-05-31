@@ -109,9 +109,15 @@ class ChannelPage extends React.Component<*, void> {
   }
 
   fetchPostsForChannel = async () => {
-    const { dispatch, channelName, location: { search } } = this.props
+    const {
+      dispatch,
+      channelName,
+      location: { search }
+    } = this.props
 
-    const { response: { posts } } = await dispatch(
+    const {
+      response: { posts }
+    } = await dispatch(
       actions.postsForChannel.get(channelName, qs.parse(search))
     )
     dispatch(setPostData(posts))
@@ -141,9 +147,7 @@ class ChannelPage extends React.Component<*, void> {
           <Card
             title={
               <div className="post-list-title">
-                <div>
-                  {channel.title}
-                </div>
+                <div>{channel.title}</div>
                 <PostSortPicker
                   updateSortParam={updatePostSortParam(this.props)}
                   value={qs.parse(search).sort || POSTS_SORT_HOT}
@@ -161,15 +165,15 @@ class ChannelPage extends React.Component<*, void> {
               removePost={removePost}
               showPinUI
             />
-            {pagination
-              ? <PostListNavigation
+            {pagination ? (
+              <PostListNavigation
                 after={pagination.after}
                 afterCount={pagination.after_count}
                 before={pagination.before}
                 beforeCount={pagination.before_count}
                 pathname={channelURL(channelName)}
               />
-              : null}
+            ) : null}
           </Card>
         </div>
       )

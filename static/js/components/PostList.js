@@ -30,8 +30,8 @@ const PostList = (props: PostListProps) => {
 
   return (
     <div className="post-list">
-      {posts.length > 0
-        ? posts.map((post, index) =>
+      {posts.length > 0 ? (
+        posts.map((post, index) => (
           <CompactPostDisplay
             post={post}
             key={index}
@@ -43,8 +43,10 @@ const PostList = (props: PostListProps) => {
             reportPost={reportPost}
             removePost={removePost}
           />
-        )
-        : <div className="empty-list-msg">There are no posts to display.</div>}
+        ))
+      ) : (
+        <div className="empty-list-msg">There are no posts to display.</div>
+      )}
     </div>
   )
 }

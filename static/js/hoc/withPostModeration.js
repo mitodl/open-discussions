@@ -154,15 +154,15 @@ export const withPostModeration = (
             submitText="Yes, Report"
             id="report-post-dialog"
           >
-            {reportForm
-              ? <ReportForm
+            {reportForm ? (
+              <ReportForm
                 reportForm={reportForm.value}
                 validation={reportForm.errors}
                 onUpdate={onReportUpdate(dispatch)}
                 description="Are you sure you want to report this post for violating the rules of MIT Open Discussions?"
                 label="Why are you reporting this post?"
               />
-              : null}
+            ) : null}
           </Dialog>
           <Dialog
             id="remove-post-dialog"

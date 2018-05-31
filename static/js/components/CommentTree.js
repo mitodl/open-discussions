@@ -56,8 +56,8 @@ export default class CommentTree extends React.Component<*, *> {
 
   renderFollowButton = (comment: CommentInTree) => {
     const { toggleFollowComment } = this.props
-    return comment.subscribed
-      ? <div
+    return comment.subscribed ? (
+      <div
         className="comment-action-button subscribe-comment subscribed"
         onClick={preventDefaultAndInvoke(() => {
           toggleFollowComment(comment)
@@ -65,7 +65,8 @@ export default class CommentTree extends React.Component<*, *> {
       >
         <a href="#">unfollow</a>
       </div>
-      : <div
+    ) : (
+      <div
         className="comment-action-button subscribe-comment unsubscribed"
         onClick={preventDefaultAndInvoke(() => {
           toggleFollowComment(comment)
@@ -73,6 +74,7 @@ export default class CommentTree extends React.Component<*, *> {
       >
         <a href="#">follow</a>
       </div>
+    )
   }
 
   renderComment = (depth: number, comment: CommentInTree) => {
@@ -109,27 +111,27 @@ export default class CommentTree extends React.Component<*, *> {
         <img className="profile-image" src={comment.profile_image} />
         <div className="comment-contents">
           <div className="author-info">
-            <span className="author-name">
-              {comment.author_name}
-            </span>
+            <span className="author-name">{comment.author_name}</span>
             <span className="authored-date">
               {moment(comment.created).fromNow()}
             </span>
             <span className="removed-note">
-              {comment.removed
-                ? <span>[comment removed by moderator]</span>
-                : null}
+              {comment.removed ? (
+                <span>[comment removed by moderator]</span>
+              ) : null}
             </span>
           </div>
           <div className="row text">
-            {forms && R.has(editFormKey, forms)
-              ? <EditCommentForm
+            {forms && R.has(editFormKey, forms) ? (
+              <EditCommentForm
                 forms={forms}
                 comment={comment}
                 processing={processing}
                 editing
               />
-              : renderTextContent(comment)}
+            ) : (
+              renderTextContent(comment)
+            )}
           </div>
           <div className="row comment-actions">
             <CommentVoteForm
@@ -137,24 +139,27 @@ export default class CommentTree extends React.Component<*, *> {
               upvote={upvote}
               downvote={downvote}
             />
-            {atMaxDepth || moderationUI || comment.deleted || userIsAnonymous()
-              ? null
-              : <div
-                className="comment-action-button reply-button"
-                onClick={e => {
-                  beginEditing(formKey, initialValue, e)
-                }}
-              >
-                <a href="#">reply</a>
-              </div>}
+            {atMaxDepth ||
+            moderationUI ||
+            comment.deleted ||
+            userIsAnonymous() ? null : (
+                <div
+                  className="comment-action-button reply-button"
+                  onClick={e => {
+                    beginEditing(formKey, initialValue, e)
+                  }}
+                >
+                  <a href="#">reply</a>
+                </div>
+              )}
             {userIsAnonymous() ? null : this.renderFollowButton(comment)}
-            {comment.num_reports
-              ? <div className="comment-action-button report-count">
-                  Reports: {comment.num_reports}
+            {comment.num_reports ? (
+              <div className="comment-action-button report-count">
+                Reports: {comment.num_reports}
               </div>
-              : null}
-            {SETTINGS.username === comment.author_id && !moderationUI
-              ? <div
+            ) : null}
+            {SETTINGS.username === comment.author_id && !moderationUI ? (
+              <div
                 className="comment-action-button edit-button"
                 onClick={e => {
                   beginEditing(editFormKey, comment, e)
@@ -162,19 +167,17 @@ export default class CommentTree extends React.Component<*, *> {
               >
                 <a href="#">edit</a>
               </div>
-              : null}
-            {SETTINGS.username === comment.author_id
-              ? <div
+            ) : null}
+            {SETTINGS.username === comment.author_id ? (
+              <div
                 className="comment-action-button delete-button"
-                onClick={preventDefaultAndInvoke(() =>
-                  deleteComment(comment)
-                )}
+                onClick={preventDefaultAndInvoke(() => deleteComment(comment))}
               >
                 <a href="#">delete</a>
               </div>
-              : null}
-            {comment.num_reports && ignoreCommentReports
-              ? <div
+            ) : null}
+            {comment.num_reports && ignoreCommentReports ? (
+              <div
                 className="comment-action-button ignore-button"
                 onClick={preventDefaultAndInvoke(() =>
                   ignoreCommentReports(comment)
@@ -182,7 +185,7 @@ export default class CommentTree extends React.Component<*, *> {
               >
                 <a href="#">ignore all reports</a>
               </div>
-              : null}
+            ) : null}
             <div className="comment-action-button permalink-button">
               <Link to={commentPermalink(comment.id)}>permalink</Link>
             </div>
@@ -192,31 +195,29 @@ export default class CommentTree extends React.Component<*, *> {
               approve={approve}
               isModerator={isModerator}
             />
-            {moderationUI || userIsAnonymous()
-              ? null
-              : <div
+            {moderationUI || userIsAnonymous() ? null : (
+              <div
                 className="comment-action-button report-button"
-                onClick={preventDefaultAndInvoke(() =>
-                  reportComment(comment)
-                )}
+                onClick={preventDefaultAndInvoke(() => reportComment(comment))}
               >
                 <a href="#">report</a>
-              </div>}
+              </div>
+            )}
           </div>
-          {atMaxDepth
-            ? null
-            : <div>
+          {atMaxDepth ? null : (
+            <div>
               <ReplyToCommentForm
                 forms={forms}
                 comment={comment}
                 processing={processing}
               />
-            </div>}
-          {atMaxDepth
-            ? null
-            : <div className="replies">
+            </div>
+          )}
+          {atMaxDepth ? null : (
+            <div className="replies">
               {R.map(renderGenericComment, comment.replies)}
-            </div>}
+            </div>
+          )}
         </div>
       </div>
     )
@@ -251,15 +252,17 @@ export default class CommentTree extends React.Component<*, *> {
 
   renderTopLevelComment = (comment: GenericComment, idx: number) => {
     const { moderationUI } = this.props
-    return moderationUI
-      ? <div className="top-level-comment" key={idx}>
+    return moderationUI ? (
+      <div className="top-level-comment" key={idx}>
         {this.renderGenericComment(0, comment)}
       </div>
-      : <Card key={idx}>
+    ) : (
+      <Card key={idx}>
         <div className="top-level-comment">
           {this.renderGenericComment(0, comment)}
         </div>
       </Card>
+    )
   }
 
   render() {

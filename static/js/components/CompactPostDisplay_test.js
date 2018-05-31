@@ -42,9 +42,18 @@ describe("CompactPostDisplay", () => {
     const wrapper = renderPostDisplay({ post })
     const summary = wrapper.find(".summary")
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
-    assert.equal(summary.find(Link).at(0).props().children, post.title)
+    assert.equal(
+      summary
+        .find(Link)
+        .at(0)
+        .props().children,
+      post.title
+    )
     assert.deepEqual(
-      wrapper.find(".post-links").find(Link).props().children,
+      wrapper
+        .find(".post-links")
+        .find(Link)
+        .props().children,
       formatCommentsCount(post)
     )
     const authoredBy = wrapper.find(".authored-by").text()
@@ -59,7 +68,10 @@ describe("CompactPostDisplay", () => {
   it("should link to the subreddit, if told to", () => {
     post.channel_name = "channel_name"
     const wrapper = renderPostDisplay({ post, showChannelLink: true })
-    const linkProps = wrapper.find(Link).at(1).props()
+    const linkProps = wrapper
+      .find(Link)
+      .at(1)
+      .props()
     assert.equal(linkProps.to, "/channel/channel_name")
     assert.equal(linkProps.children, post.channel_title)
   })
@@ -67,7 +79,10 @@ describe("CompactPostDisplay", () => {
   it("should include an external link, if a url post", () => {
     const post = makePost(true)
     const wrapper = renderPostDisplay({ post })
-    const { href, target, children } = wrapper.find("a").at(0).props()
+    const { href, target, children } = wrapper
+      .find("a")
+      .at(0)
+      .props()
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
     assert.equal(children, post.title)
@@ -82,7 +97,13 @@ describe("CompactPostDisplay", () => {
         showPinUI:   true,
         isModerator: true
       })
-      assert.equal(linkText, wrapper.find("a").at(2).text())
+      assert.equal(
+        linkText,
+        wrapper
+          .find("a")
+          .at(2)
+          .text()
+      )
     })
   })
 
@@ -109,19 +130,16 @@ describe("CompactPostDisplay", () => {
   })
 
   it("should set a class if stickied and showing pin ui", () => {
-    [
-      [true, true],
-      [true, false],
-      [false, true],
-      [false, false]
-    ].forEach(([showPinUI, stickied]) => {
-      post.stickied = stickied
-      const wrapper = renderPostDisplay({ post, showPinUI })
-      assert.equal(
-        wrapper.find(".post-summary").props().className,
-        showPinUI && stickied ? "post-summary sticky" : "post-summary "
-      )
-    })
+    [[true, true], [true, false], [false, true], [false, false]].forEach(
+      ([showPinUI, stickied]) => {
+        post.stickied = stickied
+        const wrapper = renderPostDisplay({ post, showPinUI })
+        assert.equal(
+          wrapper.find(".post-summary").props().className,
+          showPinUI && stickied ? "post-summary sticky" : "post-summary "
+        )
+      }
+    )
   })
 
   it("pin link should call togglePinPost", () => {
@@ -134,7 +152,10 @@ describe("CompactPostDisplay", () => {
       isModerator:   true,
       togglePinPost: togglePinPostStub
     })
-    wrapper.find("a").at(2).simulate("click")
+    wrapper
+      .find("a")
+      .at(2)
+      .simulate("click")
     assert.ok(togglePinPostStub.calledWith(post))
   })
 
@@ -146,7 +167,10 @@ describe("CompactPostDisplay", () => {
 
   it("should link to the detail view, if a text post", () => {
     const wrapper = renderPostDisplay({ post })
-    const { to, children } = wrapper.find(Link).at(0).props()
+    const { to, children } = wrapper
+      .find(Link)
+      .at(0)
+      .props()
     assert.equal(children, post.title)
     assert.equal(to, `/channel/${post.channel_name}/${post.id}`)
   })

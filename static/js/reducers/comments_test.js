@@ -224,7 +224,11 @@ describe("comments reducers", () => {
 
   it("should let you delete a nested comment with replies", async () => {
     const tree = createCommentTree(response)
-    const [{ replies: [reply] }] = tree
+    const [
+      {
+        replies: [reply]
+      }
+    ] = tree
     helper.deleteCommentStub.returns(
       Promise.resolve({
         commentId: reply.id,
@@ -243,7 +247,11 @@ describe("comments reducers", () => {
         await store.dispatch(actions.comments["delete"](post.id, reply.id))
       }
     )
-    const [{ replies: [updatedReply] }] = state.data.get(post.id)
+    const [
+      {
+        replies: [updatedReply]
+      }
+    ] = state.data.get(post.id)
     assert.equal(updatedReply.author_name, "[deleted]")
     assert.equal(updatedReply.text, "[deleted]")
   })

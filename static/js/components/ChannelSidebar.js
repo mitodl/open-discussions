@@ -21,13 +21,13 @@ const ChannelSidebar = ({ channel, isModerator }: ChannelSidebarProps) => {
   return (
     <div>
       <Card title="About this channel" className="channel-about">
-        {isModerator
-          ? <div className="edit-button">
+        {isModerator ? (
+          <div className="edit-button">
             <Link to={editChannelURL(channel.name)}>
               <i className="material-icons edit">edit</i>
             </Link>
           </div>
-          : null}
+        ) : null}
         <Markdown
           source={
             channel.description || "(There is no description of this channel)"
@@ -35,15 +35,15 @@ const ChannelSidebar = ({ channel, isModerator }: ChannelSidebarProps) => {
           className="description"
         />
       </Card>
-      {isModerator
-        ? <Card title="Moderation Tools" className="channel-about">
+      {isModerator ? (
+        <Card title="Moderation Tools" className="channel-about">
           <div className="mod-link-wrapper">
             <Link to={channelModerationURL(channel.name)}>
-                View reported posts & comments
+              View reported posts & comments
             </Link>
           </div>
         </Card>
-        : null}
+      ) : null}
     </div>
   )
 }

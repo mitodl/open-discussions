@@ -27,7 +27,13 @@ describe("UserInfo", () => {
     SETTINGS.user_full_name = "Full Name"
     SETTINGS.profile_image_small = "http://example.com/profile_image"
     const wrapper = renderUserInfo()
-    assert.equal(wrapper.find("span").text().trim(), "Full Name")
+    assert.equal(
+      wrapper
+        .find("span")
+        .text()
+        .trim(),
+      "Full Name"
+    )
     const img = wrapper.find("img")
     assert.deepEqual(img.props(), {
       className: "profile-image",

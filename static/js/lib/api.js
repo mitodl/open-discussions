@@ -30,7 +30,11 @@ import type { NotificationSetting } from "../flow/settingsTypes"
 import type { EmbedlyResponse } from "../reducers/embedly"
 
 const paramsToQueryString = paramSelector =>
-  R.compose(toQueryString, R.reject(R.isNil), paramSelector)
+  R.compose(
+    toQueryString,
+    R.reject(R.isNil),
+    paramSelector
+  )
 
 const getPaginationSortQS = paramsToQueryString(getPaginationSortParams)
 

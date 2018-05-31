@@ -49,7 +49,9 @@ class App extends React.Component<*, void> {
   }
 
   componentWillMount() {
-    const { location: { pathname } } = this.props
+    const {
+      location: { pathname }
+    } = this.props
     if (pathname === AUTH_REQUIRED_URL || pathname.startsWith(SETTINGS_URL)) {
       // user is at auth required page or settings page
       return
@@ -65,7 +67,9 @@ class App extends React.Component<*, void> {
   }
 
   componentDidUpdate(prevProps) {
-    const { location: { pathname } } = this.props
+    const {
+      location: { pathname }
+    } = this.props
 
     if (
       !pathname.startsWith(SETTINGS_URL) &&
@@ -83,7 +87,12 @@ class App extends React.Component<*, void> {
   }
 
   render() {
-    const { match, location: { pathname }, snackbar, showUserMenu } = this.props
+    const {
+      match,
+      location: { pathname },
+      snackbar,
+      showUserMenu
+    } = this.props
 
     if (
       !SETTINGS.authenticated_site.session_url &&
@@ -152,6 +161,8 @@ class App extends React.Component<*, void> {
 }
 
 export default connect(state => {
-  const { ui: { showDrawer, snackbar, showUserMenu } } = state
+  const {
+    ui: { showDrawer, snackbar, showUserMenu }
+  } = state
   return { showDrawer, snackbar, showUserMenu }
 })(App)

@@ -27,7 +27,11 @@ export const validation = R.curry(
 // wrapped in a Just will do.
 export const validate = R.curry((validations, toValidate) =>
   R.converge(
-    R.compose(R.reduce((acc, setter) => setter(acc), {}), S.justs, Array),
+    R.compose(
+      R.reduce((acc, setter) => setter(acc), {}),
+      S.justs,
+      Array
+    ),
     validations
   )(toValidate)
 )
@@ -59,7 +63,10 @@ export const postUrlOrTextPresent = (postForm: { value: PostForm }) => {
 
 export const validatePostCreateForm = validate([
   validation(
-    R.compose(R.gt(R.__, 300), R.length),
+    R.compose(
+      R.gt(R.__, 300),
+      R.length
+    ),
     R.lensPath(["value", "title"]),
     "Title length is limited to 300 characters"
   ),
@@ -69,7 +76,10 @@ export const validatePostCreateForm = validate([
 
 export const validateChannelEditForm = validate([
   validation(
-    R.compose(R.gt(R.__, 5120), R.length),
+    R.compose(
+      R.gt(R.__, 5120),
+      R.length
+    ),
     R.lensPath(["value", "description"]),
     "Description length is limited to 5120 characters"
   )
@@ -77,20 +87,24 @@ export const validateChannelEditForm = validate([
 
 export const validateContentReportForm = validate([
   validation(
-    R.compose(R.lt(100), R.length),
+    R.compose(
+      R.lt(100),
+      R.length
+    ),
     R.lensPath(["value", "reason"]),
     "Reason length is limited to 100 characters"
   ),
   validation(
-    R.compose(R.gt(3), R.length),
+    R.compose(
+      R.gt(3),
+      R.length
+    ),
     R.lensPath(["value", "reason"]),
     "Reason must be at least 3 characters"
   )
 ])
 
 export const validationMessage = (message: string) =>
-  R.isEmpty(message) || R.isNil(message)
-    ? null
-    : <div className="validation-message">
-      {message}
-    </div>
+  R.isEmpty(message) || R.isNil(message) ? null : (
+    <div className="validation-message">{message}</div>
+  )

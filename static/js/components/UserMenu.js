@@ -23,11 +23,11 @@ export class Dropdown extends React.Component<*, *> {
             Settings
           </Link>
         </li>
-        {SETTINGS.allow_email_auth
-          ? <li>
+        {SETTINGS.allow_email_auth ? (
+          <li>
             <a href="/logout">Sign Out</a>
           </li>
-          : null}
+        ) : null}
       </ul>
     )
   }
@@ -46,9 +46,9 @@ export default class UserMenu extends React.Component<*, *> {
           className="profile-image"
           src={SETTINGS.profile_image_small}
         />
-        {showUserMenu
-          ? <DropdownWithClickOutside toggleShowUserMenu={toggleShowUserMenu} />
-          : null}
+        {showUserMenu ? (
+          <DropdownWithClickOutside toggleShowUserMenu={toggleShowUserMenu} />
+        ) : null}
       </div>
     )
   }

@@ -19,17 +19,13 @@ const ReportForm = ({
   onUpdate,
   description,
   label
-  }: ReportFormProps) => {
+}: ReportFormProps) => {
   const { reason } = reportForm
   return (
     <div className="form">
-      <p>
-        {description}
-      </p>
+      <p>{description}</p>
       <div className="reason row">
-        <label>
-          {label}
-        </label>
+        <label>{label}</label>
         <input
           type="text"
           placeholder="e.g. this is spam, abusive, etc"

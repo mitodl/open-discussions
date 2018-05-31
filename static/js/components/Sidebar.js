@@ -8,9 +8,8 @@ type SidebarProps = {
   className: string
 }
 
-const Sidebar = ({ children, className }: SidebarProps) =>
-  <div className={`sidebar ${className}`}>
-    {children}
-  </div>
+const Sidebar = ({ children, className }: SidebarProps) => (
+  <div className={`sidebar ${className}`}>{children}</div>
+)
 
 export default Sidebar

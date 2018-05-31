@@ -33,7 +33,10 @@ describe("Navigation", () => {
   it("create post link should not have channel name if channelName is not in URL", () => {
     const wrapper = renderComponent()
     assert.lengthOf(wrapper.find(Link), 3)
-    const props = wrapper.find(Link).at(0).props()
+    const props = wrapper
+      .find(Link)
+      .at(0)
+      .props()
     assert.equal(props.to, "/create_post/")
     assert.equal(props.children, "Submit a New Post")
   })
@@ -84,7 +87,10 @@ describe("Navigation", () => {
 
   it("should have a link to the settings", () => {
     const wrapper = renderComponent()
-    const { children, to, className } = wrapper.find(Link).at(2).props()
+    const { children, to, className } = wrapper
+      .find(Link)
+      .at(2)
+      .props()
     assert.equal(children, "Settings")
     assert.equal(className, "settings-link")
     assert.equal(to, "/settings")

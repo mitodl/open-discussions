@@ -91,9 +91,9 @@ class SettingsPage extends React.Component<*, *> {
         value:   {
           ...form.value,
           [COMMENTS_INPUT_NAME]:
-          form.value[COMMENTS_INPUT_NAME] === FREQUENCY_IMMEDIATE
-            ? FREQUENCY_NEVER
-            : FREQUENCY_IMMEDIATE
+            form.value[COMMENTS_INPUT_NAME] === FREQUENCY_IMMEDIATE
+              ? FREQUENCY_NEVER
+              : FREQUENCY_IMMEDIATE
         }
       })
     )
@@ -102,15 +102,15 @@ class SettingsPage extends React.Component<*, *> {
   render() {
     const { form, saving } = this.props
 
-    return form
-      ? <div className="content">
+    return form ? (
+      <div className="content">
         <DocumentTitle title={formatTitle("Settings")} />
         <div className="main-content settings-page">
           <div className="breadcrumbs">Email Settings</div>
           <form onSubmit={this.onSubmit} className="form">
             <Card>
               <label htmlFor="frequency" className="label">
-                  How often do you want to receive discussion digest emails?
+                How often do you want to receive discussion digest emails?
               </label>
               <Radio
                 className="settings-radio"
@@ -122,7 +122,7 @@ class SettingsPage extends React.Component<*, *> {
             </Card>
             <Card>
               <label htmlFor="notifications" className="label">
-                  When do you want to receive an email notification?
+                When do you want to receive an email notification?
               </label>
               <Checkbox
                 checked={
@@ -132,7 +132,7 @@ class SettingsPage extends React.Component<*, *> {
                 name="notifications"
                 onChange={this.onCommentsChange}
               >
-                  When someone responds to one of my posts or comments
+                When someone responds to one of my posts or comments
               </Checkbox>
             </Card>
             <button
@@ -140,12 +140,12 @@ class SettingsPage extends React.Component<*, *> {
               disabled={saving}
               className={`blue-button ${saving ? "disabled" : ""}`}
             >
-                Save
+              Save
             </button>
           </form>
         </div>
       </div>
-      : null
+    ) : null
   }
 }
 

@@ -30,22 +30,22 @@ const PostListNavigation = (props: PostListNavigationProps) => {
   }
   return (
     <div className="post-list-navigation">
-      {before
-        ? <Link
+      {before ? (
+        <Link
           className="mdc-button mdc-button--raised blue-button"
           to={toBefore}
         >
-            &lt; previous
+          &lt; previous
         </Link>
-        : null}
-      {after
-        ? <Link
+      ) : null}
+      {after ? (
+        <Link
           className="mdc-button mdc-button--raised blue-button"
           to={toAfter}
         >
-            next &gt;
+          next &gt;
         </Link>
-        : null}
+      ) : null}
     </div>
   )
 }

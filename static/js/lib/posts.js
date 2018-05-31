@@ -41,14 +41,12 @@ export const getPaginationSortParams = R.pickAll([
 ])
 
 export const formatPostTitle = (post: Post) =>
-  post.text
-    ? <Link
-      className="post-title"
-      to={postDetailURL(post.channel_name, post.id)}
-    >
+  post.text ? (
+    <Link className="post-title" to={postDetailURL(post.channel_name, post.id)}>
       {post.title}
     </Link>
-    : <div>
+  ) : (
+    <div>
       <a
         className="post-title"
         href={post.url}
@@ -57,10 +55,9 @@ export const formatPostTitle = (post: Post) =>
       >
         {post.title}
       </a>
-      <span className="url-hostname">
-        {`(${urlHostname(post.url)})`}
-      </span>
+      <span className="url-hostname">{`(${urlHostname(post.url)})`}</span>
     </div>
+  )
 
 type PostVotingProps = {
   post: Post,
@@ -101,11 +98,11 @@ export class PostVotingButtons extends React.Component<*, *> {
 
     return (
       <div className={`upvotes ${className || ""} ${upvoteClass}`}>
-        {userIsAnonymous()
-          ? <ReactTooltip id="post-upvote-button">
+        {userIsAnonymous() ? (
+          <ReactTooltip id="post-upvote-button">
             {votingTooltipText}
           </ReactTooltip>
-          : null}
+        ) : null}
         <button
           className="upvote-button"
           onClick={userIsAnonymous() ? null : this.onToggleUpvote}
@@ -123,9 +120,7 @@ export class PostVotingButtons extends React.Component<*, *> {
             width="13"
           />
         </button>
-        <span className="votes">
-          {post.score}
-        </span>
+        <span className="votes">{post.score}</span>
       </div>
     )
   }

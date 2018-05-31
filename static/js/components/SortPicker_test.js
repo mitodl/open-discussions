@@ -18,16 +18,15 @@ describe("PostSortPicker", () => {
       [VALID_COMMENT_SORT_LABELS, CommentSortPicker]
     ].forEach(([labels, Component]) => {
       const wrapper = shallow(<Component />)
-      R.zip(
-        [...wrapper.find("option")],
-        labels
-      ).forEach(([optionWrapper, [postSortType, postSortLabel]]) => {
-        const props = optionWrapper.props
-        assert.equal(props.label, postSortLabel)
-        assert.equal(props.value, postSortType)
-        assert.equal(props.children, postSortLabel)
-        assert.equal(optionWrapper.key, postSortType)
-      })
+      R.zip([...wrapper.find("option")], labels).forEach(
+        ([optionWrapper, [postSortType, postSortLabel]]) => {
+          const props = optionWrapper.props
+          assert.equal(props.label, postSortLabel)
+          assert.equal(props.value, postSortType)
+          assert.equal(props.children, postSortLabel)
+          assert.equal(optionWrapper.key, postSortType)
+        }
+      )
     })
   })
 
@@ -38,7 +37,10 @@ describe("PostSortPicker", () => {
         <Component updateSortParam={updateSortStub} value={"a great value"} />
       )
       assert.equal(wrapper.find("select").props().value, "a great value")
-      wrapper.find("select").props().onChange()
+      wrapper
+        .find("select")
+        .props()
+        .onChange()
       assert(updateSortStub.called)
     })
   })

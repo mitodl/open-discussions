@@ -27,14 +27,14 @@ const Navigation = (props: NavigationProps) => {
   return (
     <div className="navigation">
       <UserInfo />
-      {userIsAnonymous()
-        ? null
-        : <Link
+      {userIsAnonymous() ? null : (
+        <Link
           className="mdc-button mdc-button--raised blue-button"
           to={newPostURL(channelName)}
         >
-            Submit a New Post
-        </Link>}
+          Submit a New Post
+        </Link>
+      )}
       <Link className="home-link" to={FRONTPAGE_URL}>
         <i className="material-icons home">home</i>
         Home
@@ -43,11 +43,11 @@ const Navigation = (props: NavigationProps) => {
         currentChannel={channelName}
         subscribedChannels={subscribedChannels}
       />
-      {userIsAnonymous()
-        ? null
-        : <Link className="settings-link" to="/settings">
-            Settings
-        </Link>}
+      {userIsAnonymous() ? null : (
+        <Link className="settings-link" to="/settings">
+          Settings
+        </Link>
+      )}
     </div>
   )
 }

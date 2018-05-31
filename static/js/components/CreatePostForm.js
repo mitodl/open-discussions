@@ -27,11 +27,11 @@ type CreatePostFormProps = {
 }
 
 const channelOptions = (channels: Map<string, Channel>) =>
-  Array.from(channels).map(([key, value], index) =>
+  Array.from(channels).map(([key, value], index) => (
     <option label={value.title} value={key} key={index}>
       {value.title}
     </option>
-  )
+  ))
 
 export default class CreatePostForm extends React.Component<*, void> {
   props: CreatePostFormProps
@@ -88,8 +88,8 @@ export default class CreatePostForm extends React.Component<*, void> {
               />
               {validationMessage(validation.title)}
             </div>
-            {isText
-              ? <div className="text row">
+            {isText ? (
+              <div className="text row">
                 <label>Type Your Post Here</label>
                 <textarea
                   placeholder=""
@@ -99,7 +99,8 @@ export default class CreatePostForm extends React.Component<*, void> {
                 />
                 {validationMessage(validation.text)}
               </div>
-              : <div className="url row">
+            ) : (
+              <div className="url row">
                 <label>Link URL</label>
                 <input
                   type="url"
@@ -109,15 +110,16 @@ export default class CreatePostForm extends React.Component<*, void> {
                   onChange={onUpdate}
                 />
                 {validationMessage(validation.url)}
-              </div>}
-            {!isText && embedly
-              ? <div className="embedly-preview row">
+              </div>
+            )}
+            {!isText && embedly ? (
+              <div className="embedly-preview row">
                 <div className="preview-header">
-                    this is a preview of your post
+                  this is a preview of your post
                 </div>
                 <Embedly embedly={embedly} />
               </div>
-              : null}
+            ) : null}
             <div className="row channel-select">
               <label>Channel</label>
               <select

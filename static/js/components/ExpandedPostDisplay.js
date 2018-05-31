@@ -34,9 +34,11 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
   renderTextContent = () => {
     const { forms, post } = this.props
 
-    return R.has(editPostKey(post), forms)
-      ? <EditPostForm post={post} editing />
-      : renderTextContent(post)
+    return R.has(editPostKey(post), forms) ? (
+      <EditPostForm post={post} editing />
+    ) : (
+      renderTextContent(post)
+    )
   }
 
   approvePost = (e: Event) => {
@@ -57,8 +59,8 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
 
   postSubscriptionButton = () => {
     const { toggleFollowPost, post } = this.props
-    return post.subscribed
-      ? <div
+    return post.subscribed ? (
+      <div
         className="comment-action-button subscribe-post subscribed"
         onClick={preventDefaultAndInvoke(() => {
           toggleFollowPost(post)
@@ -66,7 +68,8 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
       >
         <a href="#">unfollow</a>
       </div>
-      : <div
+    ) : (
+      <div
         className="comment-action-button subscribe-post unsubscribed"
         onClick={preventDefaultAndInvoke(() => {
           toggleFollowPost(post)
@@ -74,6 +77,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
       >
         <a href="#">follow</a>
       </div>
+    )
   }
 
   postActionButtons = () => {
@@ -93,52 +97,50 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
           className="expanded"
           toggleUpvote={toggleUpvote}
         />
-        {SETTINGS.username === post.author_id && post.text
-          ? <div
+        {SETTINGS.username === post.author_id && post.text ? (
+          <div
             className="comment-action-button edit-post"
             onClick={beginEditing(editPostKey(post), post)}
           >
             <a href="#">edit</a>
           </div>
-          : null}
-        {post.num_reports
-          ? <div className="report-count">
-              Reports: {post.num_reports}
-          </div>
-          : null}
-        {SETTINGS.username === post.author_id
-          ? <div
+        ) : null}
+        {post.num_reports ? (
+          <div className="report-count">Reports: {post.num_reports}</div>
+        ) : null}
+        {SETTINGS.username === post.author_id ? (
+          <div
             className="comment-action-button delete-post"
             onClick={showPostDeleteDialog}
           >
             <a href="#">delete</a>
           </div>
-          : null}
+        ) : null}
         {userIsAnonymous() ? null : this.postSubscriptionButton()}
-        {isModerator && !post.removed
-          ? <div
+        {isModerator && !post.removed ? (
+          <div
             className="comment-action-button remove-post"
             onClick={this.removePost.bind(this)}
           >
             <a href="#">remove</a>
           </div>
-          : null}
-        {isModerator && post.removed
-          ? <div
+        ) : null}
+        {isModerator && post.removed ? (
+          <div
             className="comment-action-button approve-post"
             onClick={this.approvePost.bind(this)}
           >
             <a href="#">approve</a>
           </div>
-          : null}
-        {!userIsAnonymous()
-          ? <div
+        ) : null}
+        {!userIsAnonymous() ? (
+          <div
             className="comment-action-button report-post"
             onClick={showPostReportDialog}
           >
             <a href="#">report</a>
           </div>
-          : null}
+        ) : null}
       </div>
     )
   }
@@ -151,9 +153,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
       <div className="post-summary expanded">
         <div className="summary">
           <img className="profile-image" src={post.profile_image} />
-          <div className="post-title">
-            {formatPostTitle(post)}
-          </div>
+          <div className="post-title">{formatPostTitle(post)}</div>
           <div className="authored-by">
             by <span className="author-name">{post.author_name}</span>,{" "}
             {formattedDate}

@@ -59,7 +59,9 @@ describe("reducers", () => {
         store.dispatch(actions.posts.get("first")),
         store.dispatch(actions.posts.get("second"))
       ]).then(() => {
-        const { posts: { data } } = store.getState()
+        const {
+          posts: { data }
+        } = store.getState()
         assert.equal(data.get("first").id, "first")
         assert.equal(data.get("second").id, "second")
         assert.equal(data.size, 2)
@@ -78,7 +80,9 @@ describe("reducers", () => {
     it("should let you set a list of posts separately", () => {
       const posts = makeChannelPostList()
       store.dispatch(setPostData(posts))
-      const { posts: { data } } = store.getState()
+      const {
+        posts: { data }
+      } = store.getState()
       assert.equal(data.size, 20)
     })
   })
@@ -122,7 +126,9 @@ describe("reducers", () => {
         store.dispatch(actions.channels.get("first")),
         store.dispatch(actions.channels.get("second"))
       ]).then(() => {
-        const { channels: { data } } = store.getState()
+        const {
+          channels: { data }
+        } = store.getState()
         assert.equal(data.get("first").name, "first")
         assert.equal(data.get("second").name, "second")
         assert.equal(data.size, 2)

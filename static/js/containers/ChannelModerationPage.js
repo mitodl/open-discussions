@@ -88,17 +88,21 @@ class ChannelModerationPage extends React.Component<*, *> {
   render() {
     const { channel, reports, isModerator } = this.props
 
-    return isModerator
-      ? <div className="channel-moderation">
+    return isModerator ? (
+      <div className="channel-moderation">
         <DocumentTitle title={formatTitle(`${channel.title} moderation`)} />
         <ChannelModerationBreadcrumbs channel={channel} />
         <Card title="Reported Posts & Comments">
-          {reports.length === 0
-            ? <div className="empty-message">No outstanding reports</div>
-            : reports.map(this.renderReport)}
+          {reports.length === 0 ? (
+            <div className="empty-message">No outstanding reports</div>
+          ) : (
+            reports.map(this.renderReport)
+          )}
         </Card>
       </div>
-      : <Redirect to={channelURL(channel.name)} />
+    ) : (
+      <Redirect to={channelURL(channel.name)} />
+    )
   }
 }
 

@@ -68,7 +68,13 @@ describe("ExpandedPostDisplay", () => {
     const wrapper = renderPostDisplay({ post })
     const summary = wrapper.find(".summary")
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
-    assert.equal(summary.find(Link).at(0).props().children, post.title)
+    assert.equal(
+      summary
+        .find(Link)
+        .at(0)
+        .props().children,
+      post.title
+    )
     const authoredBy = wrapper.find(".authored-by").text()
     assert(authoredBy.startsWith(`by ${post.author_name}`))
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
@@ -104,7 +110,10 @@ describe("ExpandedPostDisplay", () => {
   it("should include an external link, if a url post", () => {
     const post = makePost(true)
     const wrapper = renderPostDisplay({ post: post })
-    const { href, target, children } = wrapper.find("a").at(0).props()
+    const { href, target, children } = wrapper
+      .find("a")
+      .at(0)
+      .props()
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
     assert.equal(children, post.title)
@@ -118,7 +127,10 @@ describe("ExpandedPostDisplay", () => {
 
   it("should link to the detail view, if a text post", () => {
     const wrapper = renderPostDisplay({ post })
-    const { to, children } = wrapper.find(Link).at(0).props()
+    const { to, children } = wrapper
+      .find(Link)
+      .at(0)
+      .props()
     assert.equal(children, post.title)
     assert.equal(to, `/channel/${post.channel_name}/${post.id}`)
   })
@@ -140,20 +152,19 @@ describe("ExpandedPostDisplay", () => {
   })
 
   //
-  ;[
-    [true, "unfollow"],
-    [false, "follow"]
-  ].forEach(([subscribed, buttonText]) => {
-    it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
-      const post = makePost()
-      post.subscribed = subscribed
-      const wrapper = renderPostDisplay({ post })
-      const button = wrapper.find(".subscribe-post")
-      assert.equal(button.text(), buttonText)
-      button.simulate("click")
-      assert.ok(toggleFollowPostStub.called)
-    })
-  })
+  ;[[true, "unfollow"], [false, "follow"]].forEach(
+    ([subscribed, buttonText]) => {
+      it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
+        const post = makePost()
+        post.subscribed = subscribed
+        const wrapper = renderPostDisplay({ post })
+        const button = wrapper.find(".subscribe-post")
+        assert.equal(button.text(), buttonText)
+        button.simulate("click")
+        assert.ok(toggleFollowPostStub.called)
+      })
+    }
+  )
 
   it("should show a delete button if authored by the user", () => {
     [true, false].forEach(userAuthor => {
@@ -185,7 +196,10 @@ describe("ExpandedPostDisplay", () => {
     const post = makePost(false)
     SETTINGS.username = post.author_id
     const wrapper = renderPostDisplay({ post })
-    wrapper.find(".edit-post").at(0).simulate("click")
+    wrapper
+      .find(".edit-post")
+      .at(0)
+      .simulate("click")
     assert.ok(beginEditingStub.called)
   })
 
@@ -266,23 +280,20 @@ describe("ExpandedPostDisplay", () => {
   })
 
   it("should display approve and remove links only if user is a moderator", () => {
-    [
-      [true, false],
-      [true, true],
-      [false, false],
-      [false, true]
-    ].forEach(([isModerator, removed]) => {
-      post.removed = removed
-      const wrapper = renderPostDisplay({ post, isModerator })
-      assert.equal(
-        wrapper.find(".approve-post").exists(),
-        isModerator && removed
-      )
-      assert.equal(
-        wrapper.find(".remove-post").exists(),
-        isModerator && !removed
-      )
-    })
+    [[true, false], [true, true], [false, false], [false, true]].forEach(
+      ([isModerator, removed]) => {
+        post.removed = removed
+        const wrapper = renderPostDisplay({ post, isModerator })
+        assert.equal(
+          wrapper.find(".approve-post").exists(),
+          isModerator && removed
+        )
+        assert.equal(
+          wrapper.find(".remove-post").exists(),
+          isModerator && !removed
+        )
+      }
+    )
   })
 
   it('should call approvePost when user clicks "approve"', () => {

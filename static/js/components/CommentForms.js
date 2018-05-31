@@ -58,7 +58,7 @@ const commentForm = (
   isComment: boolean,
   disabled: boolean,
   autoFocus: boolean
-) =>
+) => (
   <div className="reply-form">
     <form
       onSubmit={onSubmit}
@@ -87,17 +87,21 @@ const commentForm = (
       >
         Submit
       </button>
-      {isComment
-        ? <a
+      {isComment ? (
+        <a
           href="#"
-          onClick={R.compose(cancelReply, e => e.preventDefault())}
+          onClick={R.compose(
+            cancelReply,
+            e => e.preventDefault()
+          )}
           className="cancel-button"
         >
-            Cancel
+          Cancel
         </a>
-        : null}
+      ) : null}
     </form>
   </div>
+)
 
 const getFormKeyFromOwnProps = ownProps =>
   ownProps.comment
@@ -147,7 +151,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 
   return {
     onUpdate: e => {
-      const { target: { name, value } } = e
+      const {
+        target: { name, value }
+      } = e
       dispatch(
         actions.forms.formUpdate({
           formKey,
@@ -200,7 +206,10 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 }
 
-export const ReplyToCommentForm = connect(mapStateToProps, mapDispatchToProps)(
+export const ReplyToCommentForm = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(
   class ReplyCommentForm extends React.Component<*, *> {
     props: CommentFormProps
 
@@ -217,7 +226,7 @@ export const ReplyToCommentForm = connect(mapStateToProps, mapDispatchToProps)(
 
     onSubmit = async (event: Event) => {
       const { formKey, forms, post, onSubmit } = this.props
-      const { post_id, text, comment_id } = R.prop(formKey, forms).value
+      const { post_id, text, comment_id } = R.prop(formKey, forms).value // eslint-disable-line camelcase
 
       this.setState({ replying: true })
       await onSubmit(post_id, text, comment_id, post, event)
@@ -244,7 +253,10 @@ export const ReplyToCommentForm = connect(mapStateToProps, mapDispatchToProps)(
   }
 )
 
-export const EditCommentForm = connect(mapStateToProps, mapDispatchToProps)(
+export const EditCommentForm = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(
   class EditCommentForm extends React.Component<*, *> {
     constructor(props) {
       super(props)
@@ -290,7 +302,10 @@ export const EditCommentForm = connect(mapStateToProps, mapDispatchToProps)(
   }
 )
 
-export const EditPostForm = connect(mapStateToProps, mapDispatchToProps)(
+export const EditPostForm = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(
   class EditPostForm extends React.Component<*, *> {
     constructor(props) {
       super(props)
@@ -348,7 +363,10 @@ const getFormData = (lensFunc, forms) => ({
   comment_id: R.view(lensFunc("comment_id"), forms)
 })
 
-export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
+export const ReplyToPostForm = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(
   class ReplyPostForm extends React.Component<*, *> {
     props: CommentFormProps
 
@@ -368,7 +386,7 @@ export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
     // a new comment
     ensureInitialState = () => {
       const { beginEditing, initialValue, formDataLens, forms } = this.props
-      const { post_id } = getFormData(formDataLens, forms)
+      const { post_id } = getFormData(formDataLens, forms) // eslint-disable-line camelcase
       // eslint-disable-next-line camelcase
       if (!post_id) {
         beginEditing(initialValue, undefined)
@@ -385,7 +403,7 @@ export const ReplyToPostForm = connect(mapStateToProps, mapDispatchToProps)(
 
     onSubmit = async (event: Event) => {
       const { onSubmit, formDataLens, forms, post } = this.props
-      const { post_id, text, comment_id } = getFormData(formDataLens, forms)
+      const { post_id, text, comment_id } = getFormData(formDataLens, forms) // eslint-disable-line camelcase
 
       this.setState({ replying: true })
       await onSubmit(post_id, text, comment_id, post, event)

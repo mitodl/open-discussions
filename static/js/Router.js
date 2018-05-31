@@ -23,9 +23,7 @@ export default class Router extends React.Component<*, void> {
       <div>
         <Provider store={store}>
           <ReactRouter history={history}>
-            <ScrollToTop>
-              {children}
-            </ScrollToTop>
+            <ScrollToTop>{children}</ScrollToTop>
           </ReactRouter>
         </Provider>
       </div>
