@@ -1,6 +1,9 @@
 """
 Elasticsearch connection functionality
 """
+from functools import partial
+import uuid
+
 from django.conf import settings
 from elasticsearch_dsl.connections import connections
 
@@ -49,11 +52,65 @@ def get_conn(*, verify=True):
             _CONN_VERIFIED = False
         return _CONN
 
-    index_to_verify = settings.ELASTICSEARCH_INDEX
-    if not _CONN.indices.exists(index_to_verify):
-        raise Exception("Unable to find index {index_name}".format(
-            index_name=index_to_verify
-        ))
+    if len(get_active_aliases()) == 0:
+        raise Exception("Unable to find any active indices to update")
 
     _CONN_VERIFIED = True
     return _CONN
+
+
+def make_backing_index_name():
+    """
+    Make a unique name for use for a backing index
+
+    Returns:
+        str: A new name for a backing index
+    """
+    return "{prefix}_{hash}".format(
+        prefix=settings.ELASTICSEARCH_INDEX,
+        hash=uuid.uuid4().hex,
+    )
+
+
+def make_alias_name(*, is_reindexing):
+    """
+    Make the name used for the Elasticsearch alias
+
+    Args:
+        is_reindexing (bool): If true, use the alias name meant for reindexing
+
+    Returns:
+        str: The name of the alias
+    """
+    return "{prefix}_{suffix}".format(
+        prefix=settings.ELASTICSEARCH_INDEX,
+        suffix='reindexing' if is_reindexing else 'default'
+    )
+
+
+get_default_alias_name = partial(make_alias_name, is_reindexing=False)
+get_reindexing_alias_name = partial(make_alias_name, is_reindexing=True)
+
+
+def get_active_aliases():
+    """
+    Returns aliases which exist
+
+    Returns:
+        list of str: Aliases which exist
+    """
+    conn = get_conn(verify=False)
+    return [
+        alias for alias in [get_default_alias_name(), get_reindexing_alias_name()]
+        if conn.indices.exists(alias)
+    ]
+
+
+def refresh_index(index):
+    """
+    Refresh the elasticsearch index
+
+    Args:
+        index (str): The elasticsearch index to refresh
+    """
+    get_conn().indices.refresh(index)
