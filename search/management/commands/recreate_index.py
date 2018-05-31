@@ -9,9 +9,6 @@ class Command(BaseCommand):
     """Indexes reddit content"""
     help = 'Add content to elasticsearch index'
 
-    def add_arguments(self, parser):
-        parser.add_argument("username", help='Index the posts and comments for channels this user is subscribed to')
-
     def handle(self, *args, **options):
         """Index the comments and posts for the channels the user is subscribed to"""
         task = start_recreate_index.delay()
