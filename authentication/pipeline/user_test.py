@@ -12,6 +12,7 @@ from notifications.models import NotificationSettings
 from open_discussions.factories import UserFactory
 from authentication.constants import AUTH_TYPE_LOGIN, AUTH_TYPE_REGISTER
 from authentication.pipeline import user as user_actions
+from authentication.pipeline.user import update_full_name
 
 
 def _validate_email_auth_request_not_email_backend(mocker):
@@ -163,13 +164,55 @@ def test_user_password_not_exists(rf):
     ('email', False),
 ])
 def test_validate_require_password_and_profile_not_email_backend(mocker, backend_name, is_login):
-    """Tests that require_password_and_profile returns if not using the email backend"""
+    """Tests that require_password_and_profile_via_email returns {} if not using the email backend"""
     mock_strategy = mocker.Mock()
     mock_backend = mocker.Mock()
     mock_backend.name = backend_name
-    assert user_actions.require_password_and_profile(
+    assert user_actions.require_password_and_profile_via_email(
         mock_strategy, mock_backend, 0, is_login=is_login
     ) == {}
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('backend_name,is_new', [
+    ('notsaml', False),
+    ('notsaml', True),
+    ('saml', False),
+    ('saml', True),
+])
+def test_validate_require_profile_update_user_via_saml(mocker, backend_name, is_new):
+    """Tests that require_profile_update_user_via_saml returns {} if not using the saml backend"""
+    user = UserFactory(first_name='Jane', last_name='Doe', profile=None)
+    mock_strategy = mocker.Mock()
+    mock_backend = mocker.Mock()
+    mock_backend.name = backend_name
+    response = user_actions.require_profile_update_user_via_saml(  # pylint:disable=redundant-keyword-arg
+        mock_strategy, mock_backend, 0, user=user, is_new=is_new
+    )
+    if not is_new or backend_name != 'saml':
+        expected = {}
+    else:
+        expected = {
+            'user': user,
+            'profile': user.profile
+        }
+    assert response == expected
+    if 'user' in expected:
+        assert expected['profile'].name == 'Jane Doe'
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('first_name, last_name', [
+    ['Keihanaikukauakahihuliheekahaunaele', 'van der Graaf'],
+    ['Jane', ''],
+    ['Joe', 'FakeName10' * 16]
+])
+def test_update_full_name(first_name, last_name):
+    """ Tests that user names are updated correctly """
+    user = UserFactory.create()
+    update_full_name(user, ' '.join([first_name, last_name]))
+    assert user.first_name == first_name[:30]
+    assert user.last_name == last_name[:30]
 
 
 @pytest.mark.django_db

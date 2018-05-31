@@ -1,4 +1,4 @@
-FROM mitodl/open_discussions_web_travis_next
+FROM mitodl/open_discussions_web_travis_2e9ad2
 
 WORKDIR /tmp
 
@@ -17,5 +17,6 @@ WORKDIR /src
 COPY . /src
 
 RUN chown -R mitodl:mitodl /src
+RUN chown -R mitodl:mitodl /tmp/.cache
 
 USER mitodl

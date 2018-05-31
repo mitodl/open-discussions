@@ -8,8 +8,11 @@ import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
+from django.http import Http404, HttpResponse
 from django.shortcuts import render
+from django.urls import reverse
 from rest_framework_jwt.settings import api_settings
+from social_django.utils import load_strategy, load_backend
 
 from open_discussions import features
 
@@ -86,3 +89,17 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
     return render(request, "index.html", context={
         "js_settings_json": json.dumps(js_settings),
     })
+
+
+def saml_metadata(request):
+    """ Display SAML configuration metadata as XML """
+    if not request.user.is_superuser or not features.is_enabled(features.SAML_AUTH):
+        raise Http404("Page not found")
+    complete_url = reverse('social:complete', args=("saml", ))
+    saml_backend = load_backend(
+        load_strategy(request),
+        "saml",
+        redirect_uri=complete_url,
+    )
+    metadata, _ = saml_backend.generate_metadata_xml()
+    return HttpResponse(content=metadata, content_type='text/xml')

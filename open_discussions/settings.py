@@ -13,7 +13,7 @@ import datetime
 import logging
 import os
 import platform
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import dj_database_url
 from celery.schedules import crontab
@@ -198,6 +198,7 @@ USE_TZ = True
 AUTHENTICATION_BACKENDS = (
     'authentication.backends.micromasters.MicroMastersAuth',
     'social_core.backends.email.EmailAuth',
+    'social_core.backends.saml.SAMLAuth',
     # the following needs to stay here to allow login of local users
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -212,6 +213,10 @@ SOCIAL_AUTH_MICROMASTERS_LOGIN_REDIRECT_URL = 'jwt-complete'
 # Email backend settings
 SOCIAL_AUTH_EMAIL_FORM_URL = 'login'
 SOCIAL_AUTH_EMAIL_FORM_HTML = 'login.html'
+
+
+# SAML backend settings
+SOCIAL_AUTH_SAML_LOGIN_URL = get_string('SOCIAL_AUTH_SAML_LOGIN_URL', None)
 
 # Only validate emails for the email backend
 SOCIAL_AUTH_EMAIL_FORCE_EMAIL_VALIDATION = True
@@ -259,8 +264,11 @@ SOCIAL_AUTH_PIPELINE = (
     # Create a user account if we haven't found one yet.
     'social_core.pipeline.user.create_user',
 
-    # require a password and profile if they're not set
-    'authentication.pipeline.user.require_password_and_profile',
+    # require a password and profile if they're not set via Email
+    'authentication.pipeline.user.require_password_and_profile_via_email',
+
+    # require a profile if they're not set via SAML
+    'authentication.pipeline.user.require_profile_update_user_via_saml',
 
     # initialize the user, must happen after we're sure who the user is
     'authentication.pipeline.user.initialize_user',
@@ -275,6 +283,7 @@ SOCIAL_AUTH_PIPELINE = (
     # Update the user record with any changed info from the auth service.
     'social_core.pipeline.user.user_details',
 )
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
@@ -334,6 +343,43 @@ if ADMIN_EMAIL != '':
     ADMINS = (('Admins', ADMIN_EMAIL),)
 else:
     ADMINS = ()
+
+# SAML settings
+SOCIAL_AUTH_SAML_SP_ENTITY_ID = SITE_BASE_URL
+SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = get_string('SOCIAL_AUTH_SAML_SP_PUBLIC_CERT', None)
+SOCIAL_AUTH_SAML_SP_PRIVATE_KEY = get_string('SOCIAL_AUTH_SAML_SP_PRIVATE_KEY', None)
+SOCIAL_AUTH_SAML_ORG_DISPLAYNAME = get_string('SOCIAL_AUTH_SAML_ORG_DISPLAYNAME', 'Open Discussions')
+SOCIAL_AUTH_SAML_CONTACT_NAME = get_string('SOCIAL_AUTH_SAML_CONTACT_NAME', 'Open Discussions Support')
+SOCIAL_AUTH_SAML_IDP_ENTITY_ID = get_string('SOCIAL_AUTH_SAML_IDP_ENTITY_ID', None)
+SOCIAL_AUTH_SAML_IDP_URL = get_string('SOCIAL_AUTH_SAML_IDP_URL', None)
+SOCIAL_AUTH_SAML_IDP_X509 = get_string('SOCIAL_AUTH_SAML_IDP_X509', False)
+SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_PERM_ID = get_string('SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_PERM_ID', None)
+SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME = get_string('SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME', None)
+SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_EMAIL = get_string('SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_EMAIL', None)
+
+
+SOCIAL_AUTH_SAML_ORG_INFO = {
+    "en-US": {
+        "name": urlparse(SITE_BASE_URL).netloc,
+        "displayname": SOCIAL_AUTH_SAML_ORG_DISPLAYNAME,
+        "url": SITE_BASE_URL
+    }
+}
+SOCIAL_AUTH_SAML_TECHNICAL_CONTACT = {
+    "givenName": SOCIAL_AUTH_SAML_CONTACT_NAME,
+    "emailAddress": EMAIL_SUPPORT
+}
+SOCIAL_AUTH_SAML_SUPPORT_CONTACT = SOCIAL_AUTH_SAML_TECHNICAL_CONTACT
+SOCIAL_AUTH_SAML_ENABLED_IDPS = {
+    "default": {
+        "entity_id": SOCIAL_AUTH_SAML_IDP_ENTITY_ID,
+        "url": SOCIAL_AUTH_SAML_IDP_URL,
+        "attr_user_permanent_id": SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_PERM_ID,
+        "attr_username": SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_PERM_ID,
+        "attr_email": SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_EMAIL,
+        "x509cert": SOCIAL_AUTH_SAML_IDP_X509,
+    }
+}
 
 # embed.ly configuration
 EMBEDLY_KEY = get_string('EMBEDLY_KEY', None)

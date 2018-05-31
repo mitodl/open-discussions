@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework_jwt.views import refresh_jwt_token
 
-from open_discussions.views import index
+from open_discussions.views import index, saml_metadata
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -57,6 +57,7 @@ urlpatterns = [
     url(r'^create_post/', index),
     url(r'^moderation/', index),
     url(r'^settings/', index),
+    url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

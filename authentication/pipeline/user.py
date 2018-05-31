@@ -2,6 +2,7 @@
 from django.shortcuts import render
 import ulid
 from social_core.backends.email import EmailAuth
+from social_core.backends.saml import SAMLAuth
 from social_core.exceptions import AuthForbidden
 from social_core.pipeline.partial import partial
 
@@ -13,6 +14,7 @@ from authentication.forms import (
     LoginForm,
     PasswordAndProfileForm,
 )
+from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles.models import Profile
 
 
@@ -65,7 +67,7 @@ def get_username(strategy, backend, user=None, *args, **kwargs):  # pylint: disa
 
 
 @partial
-def require_password_and_profile(
+def require_password_and_profile_via_email(
         strategy, backend, user=None, is_register=False, current_partial=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
     """
@@ -106,6 +108,43 @@ def require_password_and_profile(
         'form': form,
         'partial_token': current_partial.token,
     })
+
+
+@partial
+def require_profile_update_user_via_saml(
+        strategy, backend, user=None, is_new=False, *args, **kwargs
+):  # pylint: disable=unused-argument
+    """
+    Sets a new user's password and profile, and updates the user first and last names.
+    Touchstone only returns DisplayName, which is the full name, and that is what the
+    user first_name is initially set to.
+
+    Args:
+        strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
+        backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
+        user (User): the current user
+        is_register (bool): True if the user just got registered
+    """
+    if backend.name != SAMLAuth.name or not is_new:
+        return
+
+    try:
+        update_full_name(user, kwargs['response']['attributes'][SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME][0])
+    except (KeyError, IndexError):
+        # No name information passed, skipping
+        pass
+
+    profile, _ = Profile.objects.update_or_create(
+        user=user,
+        defaults={
+            'name': user.get_full_name()
+        },
+    )
+
+    return {
+        'user': user,
+        'profile': profile,
+    }
 
 
 def validate_password(
@@ -151,3 +190,18 @@ def initialize_user(user, is_new=False, *args, **kwargs):  # pylint: disable=unu
     notifications_api.ensure_notification_settings(user)
 
     channel_api.get_or_create_auth_tokens(user)
+
+
+def update_full_name(user, name):
+    """
+    Update the first and last names of a user.
+
+    Args:
+        user(User): The user to modify.
+        name(str): The full name of the user.
+    """
+    name_parts = name.split(' ')
+    user.first_name = name_parts[0][:30]
+    if len(name_parts) > 1:
+        user.last_name = ' '.join(name_parts[1:])[:30]
+    user.save()
