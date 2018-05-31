@@ -112,7 +112,7 @@ export default class CreatePostForm extends React.Component<*, void> {
                 {validationMessage(validation.url)}
               </div>
             )}
-            {!isText && embedly ? (
+            {!isText && embedly && embedly.type !== "error" ? (
               <div className="embedly-preview row">
                 <div className="preview-header">
                   this is a preview of your post

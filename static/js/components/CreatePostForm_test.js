@@ -9,10 +9,13 @@ import Embedly from "./Embedly"
 import { makeArticle } from "../factories/embedly"
 
 describe("CreatePostForm", () => {
-  it("should show an embedly preview when link post and passed an embedly object", () => {
-    [
+  it("should show an embedly preview when link post and non-error embedly object", () => {
+    const errorArticle = makeArticle()
+    errorArticle.type = "error"
+    ;[
       [true, true, makeArticle()],
       [false, false, makeArticle()],
+      [true, false, errorArticle],
       [true, false, undefined],
       [false, false, undefined]
     ].forEach(([linkPost, shouldShowEmbed, embedlyResponse]) => {
