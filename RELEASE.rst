@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.29.1
+--------------
+
+- Update some JS linting and code formatting dependencies
+- Add management command to index comments and posts (#651)
+- Add a user menu in the upper right
+
 Version 0.29.0
 --------------
 
