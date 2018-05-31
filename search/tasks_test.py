@@ -8,7 +8,7 @@ import pytest
 
 from channels.constants import POSTS_SORT_NEW
 from channels.utils import ListingParams
-from open_discussions.utils import assert_not_raises
+from open_discussions.test_utils import assert_not_raises
 from search.exceptions import RetryException
 from search.tasks import (
     create_document,

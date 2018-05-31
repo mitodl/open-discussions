@@ -1,5 +1,9 @@
 """Testing utils"""
 import abc
+from contextlib import contextmanager
+import traceback
+
+import pytest
 
 
 def any_instance_of(*cls):
@@ -19,3 +23,14 @@ def any_instance_of(*cls):
     for c in cls:
         AnyInstanceOf.register(c)
     return AnyInstanceOf()
+
+
+@contextmanager
+def assert_not_raises():
+    """Used to assert that the context does not raise an exception"""
+    try:
+        yield
+    except AssertionError:
+        raise
+    except:  # pylint: disable=bare-except
+        pytest.fail(f'An exception was not raised: {traceback.format_exc()}')

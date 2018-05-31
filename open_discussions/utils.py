@@ -1,5 +1,4 @@
 """open_discussions utilities"""
-from contextlib import contextmanager
 import datetime
 from enum import (
     auto,
@@ -7,11 +6,9 @@ from enum import (
 )
 from itertools import islice
 import logging
-import traceback
 
 import pytz
 from django.conf import settings
-import pytest
 
 
 log = logging.getLogger(__name__)
@@ -96,14 +93,3 @@ def chunks(iterable, chunk_size=20):
     while len(chunk) > 0:
         yield chunk
         chunk = list(islice(iterable, chunk_size))
-
-
-@contextmanager
-def assert_not_raises():
-    """Used to assert that the context does not raise an exception"""
-    try:
-        yield
-    except AssertionError:
-        raise
-    except:  # pylint: disable=bare-except
-        pytest.fail(f'An exception was not raised: {traceback.format_exc()}')
