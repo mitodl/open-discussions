@@ -106,6 +106,16 @@ $replyPaddingLeft: 8px;
         }
       }
 
+      tt, code, kbd, samp {
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;
+        -webkit-hyphens: auto;
+        -ms-hyphens: auto;
+        hyphens: auto;
+      }
+
       @include breakpoint(phone) {
         display: block;
       }
