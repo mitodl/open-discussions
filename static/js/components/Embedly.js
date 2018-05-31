@@ -35,18 +35,14 @@ export default class Embedly extends React.Component<*> {
 
     return (
       <a href={embedly.url} target="_blank" className="link">
-        {embedly.thumbnail_url
-          ? <div className="thumbnail">
+        {embedly.thumbnail_url ? (
+          <div className="thumbnail">
             <img src={embedly.thumbnail_url} />
           </div>
-          : null}
+        ) : null}
         <div className="link-summary">
-          <h2>
-            {embedly.title}
-          </h2>
-          <div className="description">
-            {embedly.description}
-          </div>
+          <h2>{embedly.title}</h2>
+          <div className="description">{embedly.description}</div>
         </div>
       </a>
     )

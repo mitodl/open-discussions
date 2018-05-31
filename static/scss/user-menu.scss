@@ -1,0 +1,39 @@
+.user-menu {
+  position: relative;
+  cursor: pointer;
+
+  @include breakpoint(mobile) {
+    margin-right: 15px;
+  }
+
+
+  @include breakpoint(desktop) {
+    margin-right: 150px;
+  }
+
+
+  ul.user-menu-dropdown {
+    margin: 0;
+    padding: 10px;
+    position: absolute;
+    top: 46px;
+    right: 24px;
+    background-color: $card-background;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    list-style: none;
+
+    a {
+      text-decoration: none;
+      color: $navigation-text;
+      white-space: nowrap;
+    }
+
+    li {
+      margin-bottom: 14px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

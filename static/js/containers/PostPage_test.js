@@ -174,7 +174,10 @@ describe("PostPage", function() {
     const card = wrapper.find(".comment-detail-card")
     assert(card.exists())
     assert.equal(
-      card.find("div").at(2).text(),
+      card
+        .find("div")
+        .at(2)
+        .text(),
       "You are viewing a single comment's thread."
     )
     assert.equal(
@@ -275,10 +278,16 @@ describe("PostPage", function() {
         SET_SNACKBAR_MESSAGE
       ],
       () => {
-        wrapper.find(Dialog).at(4).props().onAccept()
+        wrapper
+          .find(Dialog)
+          .at(4)
+          .props()
+          .onAccept()
       }
     )
-    const { location: { pathname } } = helper.browserHistory
+    const {
+      location: { pathname }
+    } = helper.browserHistory
     assert.equal(pathname, channelURL(channel.name))
   })
 
@@ -310,7 +319,11 @@ describe("PostPage", function() {
         () => {
           const props = wrapper.find("ExpandedPostDisplay").props()
           props.removePost(post)
-          wrapper.find("Dialog").at(1).props().onAccept()
+          wrapper
+            .find("Dialog")
+            .at(1)
+            .props()
+            .onAccept()
         }
       )
 
@@ -394,7 +407,11 @@ describe("PostPage", function() {
         if (!isRemoved) {
           // if we are removing the comment, handle the confirmation dialog
           newState = await listenForActions(patchActions, () => {
-            wrapper.find("Dialog").at(2).props().onAccept()
+            wrapper
+              .find("Dialog")
+              .at(2)
+              .props()
+              .onAccept()
           })
         }
 

@@ -47,7 +47,9 @@ describe("postsForChannel reducer", () => {
       store.dispatch(actions.postsForChannel.get("first")),
       store.dispatch(actions.postsForChannel.get("second"))
     ])
-    const { postsForChannel: { data } } = store.getState()
+    const {
+      postsForChannel: { data }
+    } = store.getState()
     assert.isArray(data.get("first").postIds)
     assert.isArray(data.get("second").postIds)
     assert.equal(data.size, 2)
@@ -59,7 +61,9 @@ describe("postsForChannel reducer", () => {
       store.dispatch(actions.postsForChannel.get("second"))
     ])
     await store.dispatch(evictPostsForChannel("second"))
-    const { postsForChannel: { data } } = store.getState()
+    const {
+      postsForChannel: { data }
+    } = store.getState()
     assert.equal(data.size, 1)
     assert.isArray(data.get("first").postIds)
     assert.isUndefined(data.get("second"))

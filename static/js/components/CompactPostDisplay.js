@@ -30,12 +30,11 @@ class CompactPostDisplay extends React.Component<*, void> {
   showChannelLink = () => {
     const { post, showChannelLink } = this.props
 
-    return showChannelLink && post.channel_name
-      ? <span>
-          in{" "}
-        <Link to={channelURL(post.channel_name)}>{post.channel_title}</Link>
+    return showChannelLink && post.channel_name ? (
+      <span>
+        in <Link to={channelURL(post.channel_name)}>{post.channel_title}</Link>
       </span>
-      : null
+    ) : null
   }
 
   render() {
@@ -58,9 +57,7 @@ class CompactPostDisplay extends React.Component<*, void> {
         <PostVotingButtons post={post} toggleUpvote={toggleUpvote} />
         <img className="profile-image" src={post.profile_image} />
         <div className="summary">
-          <div className="post-title">
-            {formatPostTitle(post)}
-          </div>
+          <div className="post-title">{formatPostTitle(post)}</div>
           <div className="authored-by">
             by <span className="author-name">{post.author_name}</span>,{" "}
             {formattedDate} {this.showChannelLink()}
@@ -69,27 +66,23 @@ class CompactPostDisplay extends React.Component<*, void> {
             <Link to={postDetailURL(post.channel_name, post.id)}>
               {formatCommentsCount(post)}
             </Link>
-            {post.num_reports
-              ? <div className="report-count">
-                  Reports: {post.num_reports}
-              </div>
-              : null}
-            {showPinUI && post.text && isModerator
-              ? <a onClick={() => togglePinPost(post)}>
+            {post.num_reports ? (
+              <div className="report-count">Reports: {post.num_reports}</div>
+            ) : null}
+            {showPinUI && post.text && isModerator ? (
+              <a onClick={() => togglePinPost(post)}>
                 {post.stickied ? "unpin" : "pin"}
               </a>
-              : null}
-            {isModerator && removePost
-              ? <a onClick={() => removePost(post)}>remove</a>
-              : null}
-            {isModerator && ignorePostReports
-              ? <a onClick={() => ignorePostReports(post)}>
-                  ignore all reports
-              </a>
-              : null}
-            {!userIsAnonymous()
-              ? <a onClick={() => reportPost(post)}>report</a>
-              : null}
+            ) : null}
+            {isModerator && removePost ? (
+              <a onClick={() => removePost(post)}>remove</a>
+            ) : null}
+            {isModerator && ignorePostReports ? (
+              <a onClick={() => ignorePostReports(post)}>ignore all reports</a>
+            ) : null}
+            {!userIsAnonymous() ? (
+              <a onClick={() => reportPost(post)}>report</a>
+            ) : null}
           </div>
         </div>
       </div>

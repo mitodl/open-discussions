@@ -35,8 +35,13 @@ export const VALID_COMMENT_SORT_LABELS = [
 ]
 
 const updateSortParam = R.curry((validSortTypes, props, e) => {
-  const { history, location: { pathname, search } } = props
-  const { target: { value } } = e
+  const {
+    history,
+    location: { pathname, search }
+  } = props
+  const {
+    target: { value }
+  } = e
 
   e.preventDefault()
 

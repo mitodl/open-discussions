@@ -80,6 +80,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         },
         "is_authenticated": bool(request.user.is_authenticated),
         "allow_anonymous": features.is_enabled(features.ANONYMOUS_ACCESS),
+        "allow_email_auth": features.is_enabled(features.EMAIL_AUTH),
     }
 
     return render(request, "index.html", context={

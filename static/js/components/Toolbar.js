@@ -1,13 +1,19 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import { FRONTPAGE_URL } from "../lib/url"
-import { Link } from "react-router-dom"
 import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
+
+import UserMenu from "./UserMenu"
 
 export default class Toolbar extends React.Component<*, void> {
   toolbarRoot: HTMLElement | null
   toolbar: Object
+
+  props: {
+    toggleShowSidebar: Function,
+    toggleShowUserMenu: Function,
+    showUserMenu: boolean
+  }
 
   componentDidMount() {
     this.toolbar = new MDCToolbar(this.toolbarRoot)
@@ -20,7 +26,7 @@ export default class Toolbar extends React.Component<*, void> {
   }
 
   render() {
-    const { toggleShowSidebar } = this.props
+    const { toggleShowSidebar, toggleShowUserMenu, showUserMenu } = this.props
 
     return (
       <div className="navbar">
@@ -41,8 +47,13 @@ export default class Toolbar extends React.Component<*, void> {
                 <a href={SETTINGS.authenticated_site.base_url}>
                   {SETTINGS.authenticated_site.title}
                 </a>{" "}
-                > <Link to={FRONTPAGE_URL}>Discussion</Link>
               </span>
+            </section>
+            <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
+              <UserMenu
+                toggleShowUserMenu={toggleShowUserMenu}
+                showUserMenu={showUserMenu}
+              />
             </section>
           </div>
         </header>

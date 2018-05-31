@@ -5,7 +5,11 @@ import { Link } from "react-router-dom"
 import SubscriptionsList from "./SubscriptionsList"
 import UserInfo from "./UserInfo"
 
-import { newPostURL, getChannelNameFromPathname } from "../lib/url"
+import {
+  newPostURL,
+  getChannelNameFromPathname,
+  FRONTPAGE_URL
+} from "../lib/url"
 import { userIsAnonymous } from "../lib/util"
 
 import type { Channel } from "../flow/discussionTypes"
@@ -23,23 +27,27 @@ const Navigation = (props: NavigationProps) => {
   return (
     <div className="navigation">
       <UserInfo />
-      {userIsAnonymous()
-        ? null
-        : <Link
+      {userIsAnonymous() ? null : (
+        <Link
           className="mdc-button mdc-button--raised blue-button"
           to={newPostURL(channelName)}
         >
-            Submit a New Post
-        </Link>}
+          Submit a New Post
+        </Link>
+      )}
+      <Link className="home-link" to={FRONTPAGE_URL}>
+        <i className="material-icons home">home</i>
+        Home
+      </Link>
       <SubscriptionsList
         currentChannel={channelName}
         subscribedChannels={subscribedChannels}
       />
-      {userIsAnonymous()
-        ? null
-        : <Link className="settings-link" to="/settings">
-            Settings
-        </Link>}
+      {userIsAnonymous() ? null : (
+        <Link className="settings-link" to="/settings">
+          Settings
+        </Link>
+      )}
     </div>
   )
 }

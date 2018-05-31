@@ -366,15 +366,15 @@ class PostPage extends React.Component<*, void> {
           submitText="Yes, Report"
           id="report-comment-dialog"
         >
-          {reportForm
-            ? <ReportForm
+          {reportForm ? (
+            <ReportForm
               reportForm={reportForm.value}
               validation={reportForm.errors}
               onUpdate={onReportUpdate(dispatch)}
               description="Are you sure you want to report this comment for violating the rules of MIT Open Discussions?"
               label="Why are you reporting this comment?"
             />
-            : null}
+          ) : null}
         </Dialog>
         <Card>
           <div className="post-card">
@@ -394,31 +394,31 @@ class PostPage extends React.Component<*, void> {
               toggleFollowPost={toggleFollowPost(dispatch)}
               embedly={embedly}
             />
-            {showPermalinkUI || userIsAnonymous()
-              ? null
-              : <ReplyToPostForm
+            {showPermalinkUI || userIsAnonymous() ? null : (
+              <ReplyToPostForm
                 forms={forms}
                 post={post}
                 processing={commentInFlight}
-              />}
+              />
+            )}
           </div>
         </Card>
-        {commentID
-          ? <Card className="comment-detail-card">
+        {commentID ? (
+          <Card className="comment-detail-card">
             <div>You are viewing a single comment's thread.</div>
             <Link to={postDetailURL(channel.name, post.id)}>
-                View the rest of the comments
+              View the rest of the comments
             </Link>
           </Card>
-          : <div className="count-and-sort">
-            <div className="comments-count">
-              {formatCommentsCount(post)}
-            </div>
+        ) : (
+          <div className="count-and-sort">
+            <div className="comments-count">{formatCommentsCount(post)}</div>
             <CommentSortPicker
               updateSortParam={updateCommentSortParam(this.props)}
               value={qs.parse(search).sort || COMMENT_SORT_BEST}
             />
-          </div>}
+          </div>
+        )}
         <CommentTree
           comments={commentsTree}
           forms={forms}

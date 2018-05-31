@@ -50,6 +50,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
         },
         'is_authenticated': True,
         'allow_anonymous': 'access',
+        'allow_email_auth': False,
     }
 
 
@@ -89,6 +90,7 @@ def test_webpack_url_jwt(
         },
         'is_authenticated': False,
         'allow_anonymous': 'access',
+        'allow_email_auth': False,
     }
 
 
@@ -125,4 +127,5 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
         },
         'is_authenticated': False,
         'allow_anonymous': 'access',
+        'allow_email_auth': False,
     }

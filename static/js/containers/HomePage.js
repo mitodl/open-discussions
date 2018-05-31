@@ -55,7 +55,10 @@ class HomePage extends React.Component<*, void> {
   }
 
   loadData = () => {
-    const { dispatch, location: { search } } = this.props
+    const {
+      dispatch,
+      location: { search }
+    } = this.props
 
     dispatch(actions.frontpage.get(qs.parse(search))).then(response => {
       dispatch(setPostData(response.posts))
@@ -89,15 +92,15 @@ class HomePage extends React.Component<*, void> {
           showChannelLinks={true}
           reportPost={reportPost}
         />
-        {pagination
-          ? <PostListNavigation
+        {pagination ? (
+          <PostListNavigation
             after={pagination.after}
             afterCount={pagination.after_count}
             before={pagination.before}
             beforeCount={pagination.before_count}
             pathname={FRONTPAGE_URL}
           />
-          : null}
+        ) : null}
       </Card>
     )
   }

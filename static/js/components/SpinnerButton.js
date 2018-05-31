@@ -56,15 +56,15 @@ export default class SpinnerButton extends React.Component<*, *> {
 
     return (
       <button
-        className={`${className || ""} ${processing
-          ? "disabled-with-spinner"
-          : ""}`}
+        className={`${className || ""} ${
+          processing ? "disabled-with-spinner" : ""
+        }`}
         disabled={processing}
         {...otherProps}
         onClick={this.onClick}
       >
-        {processing
-          ? <div className="sk-fading-circle">
+        {processing ? (
+          <div className="sk-fading-circle">
             <div className="sk-circle1 sk-circle" />
             <div className="sk-circle2 sk-circle" />
             <div className="sk-circle3 sk-circle" />
@@ -78,7 +78,9 @@ export default class SpinnerButton extends React.Component<*, *> {
             <div className="sk-circle11 sk-circle" />
             <div className="sk-circle12 sk-circle" />
           </div>
-          : children}
+        ) : (
+          children
+        )}
       </button>
     )
   }

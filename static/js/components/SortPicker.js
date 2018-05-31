@@ -13,17 +13,18 @@ type PostSortProps = {
 }
 
 const SortPicker = R.curry(
-  (labels, { updateSortParam, value }: PostSortProps) =>
+  (labels, { updateSortParam, value }: PostSortProps) => (
     <div className="sorter">
       <div className="sort-label">Sort:</div>
       <select onChange={updateSortParam} value={value}>
-        {labels.map(([type, label]) =>
+        {labels.map(([type, label]) => (
           <option label={label} value={type} key={type}>
             {label}
           </option>
-        )}
+        ))}
       </select>
     </div>
+  )
 )
 
 export const PostSortPicker = SortPicker(VALID_POST_SORT_LABELS)

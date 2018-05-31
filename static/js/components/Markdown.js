@@ -16,22 +16,22 @@ type MarkdownProps = {
   className?: string
 }
 
-export const Markdown = (props: MarkdownProps) =>
+export const Markdown = (props: MarkdownProps) => (
   <ReactMarkdown
     disallowedTypes={["image"]}
     escapeHtml
     renderers={{
       linkReference: reference =>
-        reference.href
-          ? <a href={reference.$ref}>
-            {reference.children}
-          </a>
-          : <span>
-              [{reference.children[0]}]
-          </span>
+        reference.href ? (
+          <a href={reference.$ref}>{reference.children}</a>
+        ) : (
+          <span>[{reference.children[0]}]</span>
+        )
     }}
     {...props}
   />
+)
 
-export const renderTextContent = (content: Post | CommentInTree) =>
+export const renderTextContent = (content: Post | CommentInTree) => (
   <Markdown source={addEditedMarker(content)} />
+)

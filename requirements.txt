@@ -12,7 +12,7 @@ betamax-serializers==0.2.0
 betamax==0.8.0
 billiard==3.5.0.2         # via celery
 boto==2.39.0
-celery==4.1.0
+celery==4.2.0rc2
 certifi==2017.4.17        # via requests
 chardet==3.0.4            # via requests
 contextlib2==0.5.5        # via raven

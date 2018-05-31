@@ -19,7 +19,7 @@ const CommentRemovalForm = ({
   remove,
   isModerator,
   comment
-  }: CommentRemovalFormProps) => {
+}: CommentRemovalFormProps) => {
   if (!isModerator) {
     return null
   }
@@ -28,14 +28,12 @@ const CommentRemovalForm = ({
 
   return (
     <div
-      className={`comment-action-button ${comment.removed
-        ? "approve"
-        : "remove"}-button`}
+      className={`comment-action-button ${
+        comment.removed ? "approve" : "remove"
+      }-button`}
       onClick={preventDefaultAndInvoke(() => commentAction(comment))}
     >
-      <a href="#">
-        {comment.removed ? "approve" : "remove"}
-      </a>
+      <a href="#">{comment.removed ? "approve" : "remove"}</a>
     </div>
   )
 }

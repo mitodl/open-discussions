@@ -75,7 +75,11 @@ describe("PostList", () => {
       posts:      makeChannelPostList(),
       reportPost: reportStub
     })
-    wrapper.find(CompactPostDisplay).first().props().reportPost()
+    wrapper
+      .find(CompactPostDisplay)
+      .first()
+      .props()
+      .reportPost()
     assert.ok(reportStub.called)
   })
 
@@ -85,7 +89,11 @@ describe("PostList", () => {
       posts:      makeChannelPostList(),
       removePost: removeStub
     })
-    wrapper.find(CompactPostDisplay).first().props().removePost()
+    wrapper
+      .find(CompactPostDisplay)
+      .first()
+      .props()
+      .removePost()
     assert.ok(removeStub.called)
   })
 })

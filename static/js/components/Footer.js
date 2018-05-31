@@ -3,7 +3,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-const Footer = () =>
+const Footer = () => (
   <div className="footer">
     <div className="row">
       <img src="/static/images/mit-logo-ltgray-white@72x38.svg" />
@@ -31,5 +31,6 @@ const Footer = () =>
       </div>
     </div>
   </div>
+)
 
 export default Footer

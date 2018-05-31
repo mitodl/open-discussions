@@ -27,7 +27,7 @@ from open_discussions.envs import (
     get_list_of_str,
 )
 
-VERSION = "0.29.0"
+VERSION = "0.29.1"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -533,7 +533,10 @@ else:
 if not ELASTICSEARCH_INDEX:
     raise ImproperlyConfigured("Missing ELASTICSEARCH_INDEX")
 ELASTICSEARCH_HTTP_AUTH = get_string("ELASTICSEARCH_HTTP_AUTH", None)
-
+ELASTICSEARCH_INDEXING_CHUNK_SIZE = get_int("ELASTICSEARCH_INDEXING_CHUNK_SIZE", 100)
+INDEXING_API_USERNAME = get_string('INDEXING_API_USERNAME', None)
+if not INDEXING_API_USERNAME:
+    raise ImproperlyConfigured("Missing setting INDEXING_API_USERNAME")
 
 # reddit-specific settings
 OPEN_DISCUSSIONS_REDDIT_CLIENT_ID = get_string('OPEN_DISCUSSIONS_REDDIT_CLIENT_ID', None)

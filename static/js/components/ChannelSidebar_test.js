@@ -38,7 +38,10 @@ describe("ChannelSidebar", () => {
     assert.equal(description.props().source, channel.description)
     assert.isTrue(wrapper.find(".edit-button").exists())
     assert.equal(
-      wrapper.find(".edit-button").find(Link).props().to,
+      wrapper
+        .find(".edit-button")
+        .find(Link)
+        .props().to,
       editChannelURL(channel.name)
     )
   })

@@ -67,14 +67,12 @@ export default class CommentVoteForm extends React.Component<*, *> {
 
     return (
       <div className="votes-form">
-        <div className="score">
-          {comment.score}
-        </div>
-        {userIsAnonymous()
-          ? <ReactTooltip id="comment-upvote-button">
+        <div className="score">{comment.score}</div>
+        {userIsAnonymous() ? (
+          <ReactTooltip id="comment-upvote-button">
             {votingTooltipText}
           </ReactTooltip>
-          : null}
+        ) : null}
         <button
           className={`vote upvote-button ${upvoted ? "upvoted" : ""}`}
           onClick={userIsAnonymous() ? null : this.upvote}
@@ -93,11 +91,11 @@ export default class CommentVoteForm extends React.Component<*, *> {
           />
         </button>
         <span className="pipe">|</span>
-        {userIsAnonymous()
-          ? <ReactTooltip id="comment-downvote-button">
+        {userIsAnonymous() ? (
+          <ReactTooltip id="comment-downvote-button">
             {votingTooltipText}
           </ReactTooltip>
-          : null}
+        ) : null}
         <button
           className={`vote downvote-button ${downvoted ? "downvoted" : ""}`}
           onClick={userIsAnonymous() ? null : this.downvote}

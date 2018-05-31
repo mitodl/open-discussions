@@ -7,11 +7,7 @@ import Card from "./Card"
 
 describe("Card component", () => {
   const mountCard = (children, props = {}) =>
-    shallow(
-      <Card {...props}>
-        {children}
-      </Card>
-    )
+    shallow(<Card {...props}>{children}</Card>)
 
   it("should render children", () => {
     const wrapper = mountCard(<div className="child">HEY</div>)

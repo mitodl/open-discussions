@@ -70,7 +70,10 @@ class Drawer extends React.Component<*, void> {
   }
 
   render() {
-    const { subscribedChannels, location: { pathname } } = this.props
+    const {
+      subscribedChannels,
+      location: { pathname }
+    } = this.props
 
     return (
       <aside
@@ -96,4 +99,7 @@ const mapStateToProps = state => ({
   showDrawer:         state.ui.showDrawer
 })
 
-export default R.compose(connect(mapStateToProps), withRouter)(Drawer)
+export default R.compose(
+  connect(mapStateToProps),
+  withRouter
+)(Drawer)

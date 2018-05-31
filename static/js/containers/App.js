@@ -20,7 +20,7 @@ import Drawer from "../containers/Drawer"
 import Footer from "../components/Footer"
 
 import { actions } from "../actions"
-import { setShowDrawer } from "../actions/ui"
+import { setShowDrawer, setShowUserMenu } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
 import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
 
@@ -34,7 +34,8 @@ class App extends React.Component<*, void> {
     location: Location,
     showDrawer: boolean,
     snackbar: SnackbarState,
-    dispatch: Dispatch
+    dispatch: Dispatch,
+    showUserMenu: boolean
   }
 
   toggleShowSidebar = () => {
@@ -42,8 +43,15 @@ class App extends React.Component<*, void> {
     dispatch(setShowDrawer(!showDrawer))
   }
 
+  toggleShowUserMenu = () => {
+    const { dispatch, showUserMenu } = this.props
+    dispatch(setShowUserMenu(!showUserMenu))
+  }
+
   componentWillMount() {
-    const { location: { pathname } } = this.props
+    const {
+      location: { pathname }
+    } = this.props
     if (pathname === AUTH_REQUIRED_URL || pathname.startsWith(SETTINGS_URL)) {
       // user is at auth required page or settings page
       return
@@ -59,7 +67,9 @@ class App extends React.Component<*, void> {
   }
 
   componentDidUpdate(prevProps) {
-    const { location: { pathname } } = this.props
+    const {
+      location: { pathname }
+    } = this.props
 
     if (
       !pathname.startsWith(SETTINGS_URL) &&
@@ -77,7 +87,12 @@ class App extends React.Component<*, void> {
   }
 
   render() {
-    const { match, location: { pathname }, snackbar } = this.props
+    const {
+      match,
+      location: { pathname },
+      snackbar,
+      showUserMenu
+    } = this.props
 
     if (
       !SETTINGS.authenticated_site.session_url &&
@@ -94,7 +109,11 @@ class App extends React.Component<*, void> {
         <div className="app">
           <DocumentTitle title="MIT Open Discussions" />
           <Snackbar snackbar={snackbar} />
-          <Toolbar toggleShowSidebar={this.toggleShowSidebar} />
+          <Toolbar
+            toggleShowSidebar={this.toggleShowSidebar}
+            toggleShowUserMenu={this.toggleShowUserMenu}
+            showUserMenu={showUserMenu}
+          />
           <Drawer />
           <Route exact path={match.url} component={HomePage} />
           <Route
@@ -142,6 +161,8 @@ class App extends React.Component<*, void> {
 }
 
 export default connect(state => {
-  const { ui: { showDrawer, snackbar } } = state
-  return { showDrawer, snackbar }
+  const {
+    ui: { showDrawer, snackbar, showUserMenu }
+  } = state
+  return { showDrawer, snackbar, showUserMenu }
 })(App)

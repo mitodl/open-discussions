@@ -107,7 +107,10 @@ describe("CommentTree", () => {
       .find(ReactMarkdown)
 
     assert.equal(
-      firstComment.find(ReactMarkdown).first().props().source,
+      firstComment
+        .find(ReactMarkdown)
+        .first()
+        .props().source,
       comments[0].text
     )
     assert.lengthOf(firstComment.find("img"), 0)
@@ -115,20 +118,31 @@ describe("CommentTree", () => {
 
   it("should render a profile image", () => {
     const wrapper = renderCommentTree()
-    const { src } = wrapper.find(".profile-image").at(0).props()
+    const { src } = wrapper
+      .find(".profile-image")
+      .at(0)
+      .props()
     assert.equal(src, comments[0].profile_image)
   })
 
   it("should put a className on replies, to allow for indentation", () => {
     const wrapper = renderCommentTree()
     const firstComment = wrapper.find(".top-level-comment").at(0)
-    assert.ok(firstComment.find(".comment").at(0).hasClass("comment"))
+    assert.ok(
+      firstComment
+        .find(".comment")
+        .at(0)
+        .hasClass("comment")
+    )
     assert.ok(firstComment.find(".replies > .comment").at(0))
   })
 
   it('should include a "reply" button', () => {
     const wrapper = renderCommentTree()
-    wrapper.find(".comment-action-button.reply-button").at(0).simulate("click")
+    wrapper
+      .find(".comment-action-button.reply-button")
+      .at(0)
+      .simulate("click")
     assert.ok(beginEditingStub.called)
     assert.ok(beginEditingStub.calledWith(replyToCommentKey(comments[0])))
   })
@@ -157,13 +171,19 @@ describe("CommentTree", () => {
 
   it("should hide the report button if userIsAnonymous", () => {
     helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-    assert.isNotOk(renderCommentTree().find(".report-button").exists())
+    assert.isNotOk(
+      renderCommentTree()
+        .find(".report-button")
+        .exists()
+    )
   })
 
   it('should hide the "report" button for anons', () => {
     helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
     assert.isNotOk(
-      renderCommentTree().find(".comment-action-button.report-button").exists()
+      renderCommentTree()
+        .find(".comment-action-button.report-button")
+        .exists()
     )
   })
 
@@ -179,26 +199,28 @@ describe("CommentTree", () => {
   it('should include an "Edit" button, if the user wrote the comment', () => {
     SETTINGS.username = comments[0].author_id
     const wrapper = renderCommentTree()
-    wrapper.find(".comment-action-button").at(2).simulate("click")
+    wrapper
+      .find(".comment-action-button")
+      .at(2)
+      .simulate("click")
     assert.ok(beginEditingStub.called)
     assert.ok(beginEditingStub.calledWith(editCommentKey(comments[0])))
     assert.deepEqual(beginEditingStub.args[0][1], comments[0])
   })
 
   //
-  ;[
-    [true, "unfollow"],
-    [false, "follow"]
-  ].forEach(([subscribed, buttonText]) => {
-    it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
-      comments[0].subscribed = subscribed
-      const wrapper = renderCommentTree()
-      const button = wrapper.find(".subscribe-comment").at(0)
-      assert.equal(button.text(), buttonText)
-      button.simulate("click")
-      assert.ok(toggleFollowCommentStub.called)
-    })
-  })
+  ;[[true, "unfollow"], [false, "follow"]].forEach(
+    ([subscribed, buttonText]) => {
+      it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
+        comments[0].subscribed = subscribed
+        const wrapper = renderCommentTree()
+        const button = wrapper.find(".subscribe-comment").at(0)
+        assert.equal(button.text(), buttonText)
+        button.simulate("click")
+        assert.ok(toggleFollowCommentStub.called)
+      })
+    }
+  )
 
   it("should include a 'delete' button, if the user wrote the comment", () => {
     SETTINGS.username = comments[0].author_id
@@ -216,14 +238,21 @@ describe("CommentTree", () => {
   })
 
   it("should not show a delete button, otherwise", () => {
-    assert.isNotOk(renderCommentTree().find(".delete-button").exists())
+    assert.isNotOk(
+      renderCommentTree()
+        .find(".delete-button")
+        .exists()
+    )
   })
 
   it("should include a permalink", () => {
     const button = renderCommentTree().find(".permalink-button")
     assert(button.exists())
     assert.equal(
-      button.find(Link).at(0).props().to,
+      button
+        .find(Link)
+        .at(0)
+        .props().to,
       permalinkFunc(comments[0].id)
     )
   })
@@ -336,7 +365,10 @@ describe("CommentTree", () => {
       )
       assert.lengthOf(moreCommentsDiv, 1)
 
-      await moreCommentsDiv.find("SpinnerButton").props().onClickPromise()
+      await moreCommentsDiv
+        .find("SpinnerButton")
+        .props()
+        .onClickPromise()
       sinon.assert.calledWith(loadMoreCommentsStub, moreComments)
     })
 
@@ -348,7 +380,10 @@ describe("CommentTree", () => {
       const moreCommentsDiv = wrapper.find(".replies > .more-comments")
       assert.lengthOf(moreCommentsDiv, 1)
 
-      await moreCommentsDiv.find("SpinnerButton").props().onClickPromise()
+      await moreCommentsDiv
+        .find("SpinnerButton")
+        .props()
+        .onClickPromise()
       sinon.assert.calledWith(loadMoreCommentsStub, moreComments)
     })
   })

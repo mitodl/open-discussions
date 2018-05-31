@@ -66,7 +66,10 @@ describe("CommentVoteForm", () => {
         clickedVoteClass
       )
       assert.equal(
-        wrapper.find(clickedButtonSelector).find("img").props().src,
+        wrapper
+          .find(clickedButtonSelector)
+          .find("img")
+          .props().src,
         `${imgPrefix}.png`
       )
     } else {
@@ -75,7 +78,10 @@ describe("CommentVoteForm", () => {
         clickedVoteClass
       )
       assert.equal(
-        wrapper.find(clickedButtonSelector).find("img").props().src,
+        wrapper
+          .find(clickedButtonSelector)
+          .find("img")
+          .props().src,
         `${imgPrefix}_on.png`
       )
     }
@@ -95,7 +101,11 @@ describe("CommentVoteForm", () => {
 
   it("should not have any tooltips, if the user is not anonymous", () => {
     sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
-    assert.isNotOk(renderForm().find(ReactTooltip).exists())
+    assert.isNotOk(
+      renderForm()
+        .find(ReactTooltip)
+        .exists()
+    )
   })
 
   //
@@ -131,9 +141,9 @@ describe("CommentVoteForm", () => {
 
       //
       ;[true, false].forEach(wasUpvote => {
-        it(`when the previous state was ${wasUpvote
-          ? "upvote"
-          : "downvote"}`, () => {
+        it(`when the previous state was ${
+          wasUpvote ? "upvote" : "downvote"
+        }`, () => {
           if (wasUpvote) {
             comment.upvoted = true
           } else {

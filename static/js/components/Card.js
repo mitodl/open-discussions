@@ -8,16 +8,13 @@ type CardProps = {
   title?: any
 }
 
-const Card = ({ children, className, title }: CardProps) =>
+const Card = ({ children, className, title }: CardProps) => (
   <div className={className ? `card ${className}` : "card"}>
     <div className="card-contents">
-      {title
-        ? <div className="title">
-          {title}
-        </div>
-        : null}
+      {title ? <div className="title">{title}</div> : null}
       {children}
     </div>
   </div>
+)
 
 export default Card

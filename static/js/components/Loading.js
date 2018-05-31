@@ -41,11 +41,7 @@ const withLoading = (LoadedComponent: Class<React.Component<*, *>>) => {
         )
       }
 
-      return (
-        <div className="loaded">
-          {super.render()}
-        </div>
-      )
+      return <div className="loaded">{super.render()}</div>
     }
   }
 }

@@ -13,9 +13,10 @@ const _createSettings = () => ({
     session_url: "http://fake.session.url",
     tos_url:     "http://fake.tos.url/"
   },
-  allow_anonymous:  false,
-  is_authenticated: true,
-  username:         "greatusername"
+  allow_anonymous:     false,
+  is_authenticated:    true,
+  username:            "greatusername",
+  profile_image_small: "https://example.com/my/profile/image"
 })
 
 global.SETTINGS = _createSettings()
