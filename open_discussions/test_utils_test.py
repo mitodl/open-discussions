@@ -1,4 +1,6 @@
 """Tests for test utils"""
+import pytest
+
 from open_discussions.test_utils import any_instance_of, assert_not_raises
 
 

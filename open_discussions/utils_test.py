@@ -2,7 +2,6 @@
 import datetime
 from math import ceil
 
-import pytest
 import pytz
 
 from open_discussions.utils import (
