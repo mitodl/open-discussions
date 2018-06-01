@@ -2,6 +2,7 @@
 from django.db import models
 from django.conf import settings
 
+from open_discussions import features
 from profiles.utils import (
     profile_image_upload_uri,
     profile_image_upload_uri_medium,
@@ -58,6 +59,8 @@ class Profile(models.Model):
         Returns:
              (bool): True if the profile is complete, False otherwise
         """
+        if not features.is_enabled(features.PROFILE_UI):
+            return True
         if image_uri(self.user) == default_profile_image:
             return False
         for prop in COMPLETE_PROPS:
