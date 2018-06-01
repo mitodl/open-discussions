@@ -2,12 +2,14 @@
 Test end to end django views.
 """
 import json
+import xml.etree.ElementTree as etree
 
 import pytest
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework_jwt.settings import api_settings
 
-from open_discussions.features import ANONYMOUS_ACCESS
+from open_discussions.features import ANONYMOUS_ACCESS, SAML_AUTH
 from profiles.utils import image_uri
 
 pytestmark = [
@@ -129,3 +131,29 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
         'allow_anonymous': 'access',
         'allow_email_auth': False,
     }
+
+
+@pytest.mark.parametrize('is_enabled', [True, False])
+@pytest.mark.parametrize('is_superuser', [True, False])
+def test_saml_metadata(settings, client, is_enabled, is_superuser):
+    """Test that SAML metadata page renders or returns a 404"""
+    settings.FEATURES[SAML_AUTH] = is_enabled
+    if is_enabled:
+        settings.SOCIAL_AUTH_SAML_SP_ENTITY_ID = "http://mit.edu"
+        settings.SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = ""
+        settings.SOCIAL_AUTH_SAML_SP_PRIVATE_KEY = ""
+        settings.SOCIAL_AUTH_SAML_ORG_INFO = {"en-US": {"name": "MIT", "displayname": "MIT", "url": "http://mit.edu"}}
+        settings.SOCIAL_AUTH_SAML_TECHNICAL_CONTACT = {"givenName": "TestName", "emailAddress": "test@example.com"}
+        settings.SOCIAL_AUTH_SAML_SUPPORT_CONTACT = {"givenName": "TestName", "emailAddress": "test@example.com"}
+        settings.SOCIAL_AUTH_SAML_SP_EXTRA = {"assertionConsumerService": {"url": "http://mit.edu"}}
+
+    user = User.objects.create(is_superuser=is_superuser)
+    client.force_login(user)
+    response = client.get(reverse("saml-metadata"))
+
+    if is_enabled and is_superuser:
+        root = etree.fromstring(response.content)
+        assert root.tag == '{urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor'
+        assert response.status_code == 200
+    else:
+        assert response.status_code == 404

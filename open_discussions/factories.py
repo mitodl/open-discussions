@@ -12,6 +12,8 @@ class UserFactory(DjangoModelFactory):
     """Factory for Users"""
     username = LazyFunction(lambda: ulid.new().str)
     email = FuzzyText(suffix='@example.com')
+    first_name = FuzzyText()
+    last_name = FuzzyText()
 
     profile = RelatedFactory('profiles.factories.ProfileFactory', 'user')
 

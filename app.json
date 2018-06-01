@@ -167,6 +167,54 @@
     "PGBOUNCER_MIN_POOL_SIZE": {
       "value": "5"
     },
+    "SOCIAL_AUTH_SAML_LOGIN_URL": {
+      "description": "Custom login url for SAML",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_SP_ENTITY_ID" : {
+      "description": "SAML Service Provider Entity ID",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_SP_PUBLIC_CERT": {
+      "description": "SAML Service Provider x509 public certificate string",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_SP_PRIVATE_KEY": {
+      "description": "SAML Service Provider x509 private key",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_ORG_DISPLAYNAME": {
+      "description": "SAML Service Provider organization display name",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_CONTACT_NAME": {
+      "description": "SAML Service Provider technical/support contact name",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_IDP_ENTITY_ID": {
+      "description": "SAML Identity Provider EntityID",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_IDP_URL": {
+      "description": "SAML Identity Provider Http-Redirect URL",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_IDP_X509": {
+      "description": "SAML Identity Provider X509 certificate string",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_PERM_ID": {
+      "description": "SAML Identity Provider attribute for user permanent id",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME": {
+      "description": "SAML Identity Provider attribute for user name",
+      "required": false
+    },
+    "SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_EMAIL": {
+      "description": "SAML Identity Provider attribute for user email",
+      "required": false
+    },
     "SECRET_KEY": {
       "description": "Django secret key.",
       "generator": "secret"
