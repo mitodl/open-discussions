@@ -52,6 +52,14 @@
     }
   }
 
+  tt, code, kbd, samp {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
   .post-links {
     display: flex;
     align-items: center;
