@@ -2,13 +2,15 @@
 from django.db import models
 from django.conf import settings
 
+from open_discussions import features
 from profiles.utils import (
     profile_image_upload_uri,
     profile_image_upload_uri_medium,
-    profile_image_upload_uri_small
-)
+    profile_image_upload_uri_small,
+    default_profile_image, image_uri)
 
 MAX_IMAGE_FIELD_LENGTH = 1024
+
 PROFILE_PROPS = (
     'name',
     'image',
@@ -16,6 +18,12 @@ PROFILE_PROPS = (
     'image_medium',
     'email_optin',
     'toc_optin',
+    'headline',
+    'bio',
+)
+
+COMPLETE_PROPS = (
+    'name',
     'headline',
     'bio',
 )
@@ -42,6 +50,23 @@ class Profile(models.Model):
 
     headline = models.TextField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
+
+    @property
+    def is_complete(self):
+        """
+        Checks if the profile is complete or not
+
+        Returns:
+             (bool): True if the profile is complete, False otherwise
+        """
+        if not features.is_enabled(features.PROFILE_UI):
+            return True
+        if image_uri(self.user) == default_profile_image:
+            return False
+        for prop in COMPLETE_PROPS:
+            if not getattr(self, prop):
+                return False
+        return True
 
     def __str__(self):
         return "{}".format(self.name)
