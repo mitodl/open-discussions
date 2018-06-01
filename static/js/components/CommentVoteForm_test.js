@@ -136,6 +136,7 @@ describe("CommentVoteForm", () => {
         wrapper.setProps({ comment })
         // wait for event loop to handle resolved promise
         await wait(10)
+        wrapper.update()
         assertButtons(wrapper, isUpvote, false, false)
       })
 

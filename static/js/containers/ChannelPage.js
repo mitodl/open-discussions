@@ -66,7 +66,7 @@ const shouldLoadData = R.complement(
 class ChannelPage extends React.Component<*, void> {
   props: ChannelPageProps
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
   }
 

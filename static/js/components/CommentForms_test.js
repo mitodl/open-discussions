@@ -122,7 +122,7 @@ describe("CommentForms", () => {
       wrapper = renderPostForm()
       // $FlowFixMe: Flow doesn't know that we can index into wrapper objects
       const [textarea] = wrapper.find("textarea[name='text']")
-      assert.equal(textarea.value, "")
+      assert.equal(textarea.props.value, "")
       assert.deepEqual(
         helper.store.getState().forms[replyToPostKey(post)],
         emptyFormState
@@ -253,6 +253,7 @@ describe("CommentForms", () => {
         getCommentReplyInitialValue(comment),
         undefined
       )
+      wrapper.update()
     })
 
     it("should have the autoFocus prop", () => {
@@ -279,7 +280,7 @@ describe("CommentForms", () => {
     it("should show an empty form when reply has been started", async () => {
       // $FlowFixMe: Flow doesn't know that we can index into wrapper objects
       const [textarea] = wrapper.find("textarea[name='text']")
-      assert.equal(textarea.value, "")
+      assert.equal(textarea.props.value, "")
     })
 
     it("should trigger an update in state when text is input", async () => {
@@ -335,6 +336,7 @@ describe("CommentForms", () => {
         state.posts.data.get(post.id).num_comments,
         post.num_comments + 1
       )
+      wrapper.update()
       assert.isNotOk(wrapper.find("textarea[name='text']").exists())
       assert.isOk(
         helper.createCommentStub.calledWith(

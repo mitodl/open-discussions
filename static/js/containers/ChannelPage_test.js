@@ -56,8 +56,8 @@ describe("ChannelPage", () => {
     helper.cleanup()
   })
 
-  const renderPage = channel =>
-    renderComponent(channelURL(channel.name), [
+  const renderPage = async channel => {
+    const [wrapper] = await renderComponent(channelURL(channel.name), [
       actions.channels.get.requestType,
       actions.channels.get.successType,
       actions.postsForChannel.get.requestType,
@@ -69,6 +69,8 @@ describe("ChannelPage", () => {
       SET_POST_DATA,
       SET_CHANNEL_DATA
     ])
+    return wrapper.update()
+  }
 
   it("should set the document title", async () => {
     await renderPage(currentChannel)
@@ -105,6 +107,7 @@ describe("ChannelPage", () => {
       SET_POST_DATA,
       SET_CHANNEL_DATA
     ])
+    wrapper.update()
 
     wrapper
       .find(CompactPostDisplay)
@@ -120,9 +123,10 @@ describe("ChannelPage", () => {
   })
 
   it("should switch the sorting method when an option is selected", async () => {
-    const [wrapper] = await renderPage(currentChannel)
+    const wrapper = await renderPage(currentChannel)
 
     for (const sortType of VALID_POST_SORT_TYPES) {
+      wrapper.update()
       await listenForActions(
         [
           EVICT_POSTS_FOR_CHANNEL,
@@ -148,7 +152,7 @@ describe("ChannelPage", () => {
   })
 
   it("should fetch postsForChannel, set post data, and render", async () => {
-    const [wrapper] = await renderPage(currentChannel)
+    const wrapper = await renderPage(currentChannel)
     assert.deepEqual(wrapper.find(PostList).props().posts, postList)
   })
 
@@ -156,12 +160,12 @@ describe("ChannelPage", () => {
     const otherChannel = makeChannel()
     otherChannel.name =
       "somenamethatshouldnevercollidebecauseitsaridiculouslylongvalue"
-    const [wrapper] = await renderPage(otherChannel)
+    const wrapper = await renderPage(otherChannel)
     assert.lengthOf(wrapper.find(".loading").find(".sk-three-bounce"), 1)
   })
 
   it("lists subscriptions", async () => {
-    const [wrapper] = await renderPage(currentChannel)
+    const wrapper = await renderPage(currentChannel)
     sinon.assert.calledOnce(helper.getChannelsStub)
     wrapper.find(SubscriptionsList).forEach(component => {
       assert.deepEqual(component.props().subscribedChannels, channels)
@@ -221,6 +225,7 @@ describe("ChannelPage", () => {
       actions.subscribedChannels.get.successType,
       SET_CHANNEL_DATA
     ])
+    wrapper.update()
     assert(wrapper.find(NotFound).exists())
   })
 
@@ -234,6 +239,7 @@ describe("ChannelPage", () => {
       actions.subscribedChannels.get.successType,
       SET_CHANNEL_DATA
     ])
+    wrapper.update()
     assert(wrapper.find(NotAuthorized).exists())
   })
 

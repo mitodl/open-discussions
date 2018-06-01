@@ -37,7 +37,7 @@ const getCommentFrequency = R.compose(
 )
 
 class SettingsPage extends React.Component<*, *> {
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
   }
 

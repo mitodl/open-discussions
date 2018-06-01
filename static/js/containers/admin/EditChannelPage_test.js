@@ -49,8 +49,8 @@ describe("EditChannelPage", () => {
 
   const submit = wrapper => wrapper.find(".save-changes").simulate("submit")
 
-  const renderPage = () =>
-    renderComponent(editChannelURL(channel.name), [
+  const renderPage = async () => {
+    const [wrapper] = await renderComponent(editChannelURL(channel.name), [
       actions.subscribedChannels.get.requestType,
       actions.subscribedChannels.get.successType,
       actions.channels.get.requestType,
@@ -58,6 +58,8 @@ describe("EditChannelPage", () => {
       SET_CHANNEL_DATA,
       FORM_BEGIN_EDIT
     ])
+    return wrapper.update()
+  }
 
   it("should set the document title", async () => {
     await renderPage()
@@ -65,7 +67,7 @@ describe("EditChannelPage", () => {
   })
 
   it("should set the description, submit, and navigate back to the channel page", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     const expected = {
       ...channel,
       description: "description"
@@ -96,8 +98,7 @@ describe("EditChannelPage", () => {
   })
 
   it("cancel and navigate to previous page", async () => {
-    const [wrapper] = await renderPage()
-
+    const wrapper = await renderPage()
     wrapper.find(".cancel").simulate("click")
     assert.equal(helper.currentLocation.pathname, "/")
   })

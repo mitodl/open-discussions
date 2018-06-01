@@ -38,7 +38,7 @@ const getForm = R.prop(CREATE_POST_KEY)
 class CreatePostPage extends React.Component<*, void> {
   props: CreatePostPageProps
 
-  componentWillMount() {
+  componentDidMount() {
     const { dispatch, channels } = this.props
     const channelName = getChannelName(this.props)
     if (!channels.loaded && !channels.processing && channelName) {

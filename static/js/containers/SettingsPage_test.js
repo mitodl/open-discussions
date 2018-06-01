@@ -11,12 +11,14 @@ import { FREQUENCY_IMMEDIATE } from "../reducers/settings"
 describe("SettingsPage", () => {
   let helper, renderComponent
 
-  const renderPage = () =>
-    renderComponent("/settings/", [
+  const renderPage = async () => {
+    const [wrapper] = await renderComponent("/settings/", [
       actions.settings.get.requestType,
       actions.settings.get.successType,
       FORM_BEGIN_EDIT
     ])
+    return wrapper.update()
+  }
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
@@ -30,7 +32,7 @@ describe("SettingsPage", () => {
   it("should work ok when the frontpage setting comes back first", async () => {
     const settings = [makeFrontpageSetting(), makeCommentSetting()]
     helper.getSettingsStub.returns(Promise.resolve(settings))
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     assert.equal(
       wrapper.find(Radio).props().value,
       settings[0].trigger_frequency
@@ -44,7 +46,7 @@ describe("SettingsPage", () => {
   it("should work ok if the frontpage setting doesnt come back first", async () => {
     const settings = [makeCommentSetting(), makeFrontpageSetting()]
     helper.getSettingsStub.returns(Promise.resolve(settings))
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     assert.equal(
       wrapper.find(Radio).props().value,
       settings[1].trigger_frequency

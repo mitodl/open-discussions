@@ -20,7 +20,10 @@ export default class Snackbar extends React.Component<*, *> {
     this.snackbar = new MDCSnackbar(this.snackbarRoot)
   }
 
-  componentWillReceiveProps(nextProps: SnackbarProps) {
+  // see here: https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops
+  // this method will be deprecated soon, so we need to refactor away from it somehow
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps: SnackbarProps) {
     if (!R.equals(this.props.snackbar, nextProps.snackbar)) {
       this.showSnackbar(nextProps.snackbar)
     }

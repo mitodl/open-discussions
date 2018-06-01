@@ -74,8 +74,8 @@ describe("CreatePostPage", () => {
     helper.cleanup()
   })
 
-  const renderPage = (url = null) => {
-    return renderComponent(
+  const renderPage = async (url = null) => {
+    const [wrapper] = await renderComponent(
       url || newPostURL(currentChannel.name),
       url
         ? [
@@ -91,6 +91,7 @@ describe("CreatePostPage", () => {
           actions.subscribedChannels.get.successType
         ]
     )
+    return wrapper.update()
   }
 
   it("should set the document title", async () => {
@@ -99,63 +100,61 @@ describe("CreatePostPage", () => {
   })
 
   it("attempts to clear form and load channels on mount", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     assert.include(wrapper.text(), currentChannel.title)
     sinon.assert.calledOnce(helper.getChannelStub)
   })
 
   for (const isText of [true, false]) {
-    it(`submits a ${isText ? "text" : "url"} post`, () => {
+    it(`submits a ${isText ? "text" : "url"} post`, async () => {
       const post = makePost(!isText)
       helper.createPostStub.returns(Promise.resolve(post))
 
-      return renderPage().then(async ([wrapper]) => {
-        const title = "Title"
-        const text = "Text"
-        const url = "http://url.example.com"
-        setTitle(wrapper, title)
+      const wrapper = await renderPage()
+      const title = "Title"
+      const text = "Text"
+      const url = "http://url.example.com"
+      setTitle(wrapper, title)
 
-        if (!isText) {
-          setLinkPost(wrapper)
-        }
-        if (isText) {
-          setText(wrapper, text)
-        } else {
-          await listenForActions(
-            [
-              actions.forms.FORM_UPDATE,
-              actions.embedly.get.requestType,
-              actions.embedly.get.successType
-            ],
-            () => {
-              setUrl(wrapper, url)
-            }
-          )
-        }
-
-        return listenForActions(
-          [actions.posts.post.requestType, actions.posts.post.successType],
+      if (!isText) {
+        setLinkPost(wrapper)
+      }
+      if (isText) {
+        setText(wrapper, text)
+      } else {
+        await listenForActions(
+          [
+            actions.forms.FORM_UPDATE,
+            actions.embedly.get.requestType,
+            actions.embedly.get.successType
+          ],
           () => {
-            submitPost(wrapper)
+            setUrl(wrapper, url)
           }
-        ).then(() => {
-          const payload: CreatePostPayload = { title }
-          if (isText) {
-            payload.text = text
-          } else {
-            payload.url = url
-          }
-          sinon.assert.calledWith(
-            helper.createPostStub,
-            currentChannel.name,
-            payload
-          )
-          assert.equal(
-            helper.currentLocation.pathname,
-            newPostURL(currentChannel.name)
-          )
-        })
-      })
+        )
+      }
+
+      await listenForActions(
+        [actions.posts.post.requestType, actions.posts.post.successType],
+        () => {
+          submitPost(wrapper)
+        }
+      )
+      const payload: CreatePostPayload = { title }
+      if (isText) {
+        payload.text = text
+      } else {
+        payload.url = url
+      }
+      sinon.assert.calledWith(
+        helper.createPostStub,
+        currentChannel.name,
+        payload
+      )
+      assert.equal(
+        helper.currentLocation.pathname,
+        newPostURL(currentChannel.name)
+      )
     })
   }
 
@@ -169,7 +168,7 @@ describe("CreatePostPage", () => {
       Promise.resolve({ url: post.url, response: makeTweet() })
     )
 
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     setLinkPost(wrapper)
 
     await listenForActions(
@@ -188,7 +187,7 @@ describe("CreatePostPage", () => {
   })
 
   it("should show validation errors when title of post is empty", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     submitPost(wrapper)
     assert.equal(
       wrapper.find(".titlefield .validation-message").text(),
@@ -200,7 +199,7 @@ describe("CreatePostPage", () => {
   })
 
   it("should show validation errors when body of text post is empty", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     submitPost(wrapper)
     assert.equal(
       wrapper.find(".text .validation-message").text(),
@@ -212,7 +211,7 @@ describe("CreatePostPage", () => {
   })
 
   it("should show validation errors when the url post is empty", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     setLinkPost(wrapper)
     submitPost(wrapper)
     assert.equal(
@@ -225,7 +224,7 @@ describe("CreatePostPage", () => {
   })
 
   it("should show validation errors when no channel is selected", async () => {
-    const [wrapper] = await renderPage("/create_post/")
+    const wrapper = await renderPage("/create_post/")
     submitPost(wrapper)
     assert.equal(
       wrapper.find(".channel-select .validation-message").text(),
@@ -238,7 +237,7 @@ describe("CreatePostPage", () => {
   })
 
   it("goes back when cancel is clicked", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     assert.equal(
       helper.currentLocation.pathname,
       newPostURL(currentChannel.name)
@@ -248,7 +247,7 @@ describe("CreatePostPage", () => {
   })
 
   it("cancel button onClick handler should preventDefault", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     const event = { preventDefault: helper.sandbox.stub() }
     const cancelBtn = wrapper.find(".cancel")
     cancelBtn.props().onClick(event)
@@ -256,7 +255,7 @@ describe("CreatePostPage", () => {
   })
 
   it("should render a select with all subreddits", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     const select = wrapper.find("select")
     assert.lengthOf(select.find("option"), channels.length + 1)
     assert.deepEqual(
@@ -276,24 +275,25 @@ describe("CreatePostPage", () => {
   })
 
   it("should have the subreddit for the current URL selected", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     const select = wrapper.find("select")
     assert.equal(select.props().value, currentChannel.name)
   })
 
   it("should change the URL when you select a new subreddit", async () => {
-    const [wrapper] = await renderPage()
-    const select = wrapper.find("select")
+    const wrapper = await renderPage()
+    let select = wrapper.find("select")
     select.simulate("change", { target: { value: channels[6].name } })
     assert.equal(
       helper.currentLocation.pathname,
       `/create_post/${channels[6].name}`
     )
+    select = wrapper.find("select")
     assert.equal(select.props().value, channels[6].name)
   })
 
   it("should not add to history when the new subreddit is selected", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     const select = wrapper.find("select")
     assert.equal(helper.browserHistory.entries.length, 2)
     select.simulate("change", { target: { value: channels[6].name } })
@@ -301,7 +301,7 @@ describe("CreatePostPage", () => {
   })
 
   it("should not change URL if you select the placeholder entry", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     const select = wrapper.find("select")
     assert.equal(
       helper.currentLocation.pathname,
@@ -317,19 +317,21 @@ describe("CreatePostPage", () => {
   })
 
   it("should render the form without a subreddit selected if URL param is absent", async () => {
-    const [wrapper] = await renderPage("/create_post/")
+    const wrapper = await renderPage("/create_post/")
     const select = wrapper.find("select")
     assert.equal(select.props().value, "")
   })
 
   it("should change URL when you select a new subreddit if URL param is absent", async () => {
-    const [wrapper] = await renderPage("/create_post/")
-    const select = wrapper.find("select")
+    const wrapper = await renderPage("/create_post/")
+    let select = wrapper.find("select")
     select.simulate("change", { target: { value: channels[6].name } })
     assert.equal(
       helper.currentLocation.pathname,
       `/create_post/${channels[6].name}`
     )
+    wrapper.update()
+    select = wrapper.find("select")
     assert.equal(select.props().value, channels[6].name)
   })
 })

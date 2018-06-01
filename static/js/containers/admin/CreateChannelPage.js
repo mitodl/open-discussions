@@ -25,7 +25,7 @@ class CreateChannelPage extends React.Component<*, void> {
     channelForm: FormValue
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { dispatch } = this.props
     dispatch(
       actions.forms.formBeginEdit(

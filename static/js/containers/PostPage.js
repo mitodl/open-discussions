@@ -129,7 +129,7 @@ const shouldLoadData = R.complement(
 class PostPage extends React.Component<*, void> {
   props: PostPageProps
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
 
     ensureTwitterEmbedJS()

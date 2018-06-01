@@ -51,6 +51,6 @@ describe("Embedly", () => {
     const article = makeArticle()
     article.type = "error"
     const wrapper = renderEmbedly(article)
-    assert.lengthOf(wrapper.children(), 0)
+    assert.lengthOf(wrapper.children().at(1), 0)
   })
 })

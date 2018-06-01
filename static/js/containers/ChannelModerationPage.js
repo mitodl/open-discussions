@@ -28,7 +28,7 @@ import { formatTitle } from "../lib/title"
 const addDummyReplies = R.over(R.lensPath(["replies"]), () => [])
 
 class ChannelModerationPage extends React.Component<*, *> {
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
   }
 

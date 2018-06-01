@@ -76,6 +76,7 @@ describe("SpinnerButton", () => {
 
     // refresh after state update
     button = wrapper.find("button")
+    wrapper.update()
     buttonProps = wrapper.find("button").props()
 
     assert.equal(buttonProps.className, "class1 class2 disabled-with-spinner")

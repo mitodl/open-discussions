@@ -48,7 +48,7 @@ class App extends React.Component<*, void> {
     dispatch(setShowUserMenu(!showUserMenu))
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const {
       location: { pathname }
     } = this.props

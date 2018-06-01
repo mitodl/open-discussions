@@ -99,11 +99,13 @@ describe("PostPage", function() {
     SET_CHANNEL_DATA
   ]
 
-  const renderPage = () =>
-    renderComponent(
+  const renderPage = async () => {
+    const [wrapper] = await renderComponent(
       postDetailURL(channel.name, post.id),
       basicPostPageActions.concat(FORM_BEGIN_EDIT)
     )
+    return wrapper.update()
+  }
 
   it("should set the document title", async () => {
     await renderPage()
@@ -111,7 +113,7 @@ describe("PostPage", function() {
   })
 
   it("should fetch post, comments, channel, and render", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     assert.deepEqual(wrapper.find(CommentTree).props().comments, comments)
   })
   ;[
@@ -132,7 +134,7 @@ describe("PostPage", function() {
         comment.downvoted = wasClear
         expectedPayload.downvoted = !wasClear
       }
-      const [wrapper] = await renderPage()
+      const wrapper = await renderPage()
 
       const expectedComment = {
         ...comment,
@@ -200,6 +202,7 @@ describe("PostPage", function() {
       commentPermalink(channel.name, post.id, comments[0].id),
       basicPostPageActions
     )
+    wrapper.update()
     const card = wrapper.find(".comment-detail-card")
     assert(card.exists())
     assert.equal(
@@ -232,13 +235,14 @@ describe("PostPage", function() {
           ? basicPostPageActions
           : basicPostPageActions.concat(FORM_BEGIN_EDIT)
       )
+      wrapper.update()
 
       assert.equal(wrapper.find(ReplyToPostForm).exists(), !userIsAnon)
     })
   })
 
   it("passed props to each CommentVoteForm", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     const commentTree = wrapper.find("CommentTree")
     const commentTreeProps = commentTree.props()
     for (const form of wrapper.find("CommentVoteForm")) {
@@ -249,7 +253,7 @@ describe("PostPage", function() {
   })
 
   it("passed props to each CommentRemovalForm", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     const commentTree = wrapper.find("CommentTree")
     const commentTreeProps = commentTree.props()
     for (const form of wrapper.find("CommentRemovalForm")) {
@@ -260,7 +264,7 @@ describe("PostPage", function() {
   })
 
   it("loads more comments when the function is called", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     const commentTree = wrapper.find("CommentTree")
     const commentTreeProps = commentTree.props()
     const parent = comments[0]
@@ -294,7 +298,7 @@ describe("PostPage", function() {
 
   it("should let a user delete their own post, then redirect to channel page", async () => {
     SETTINGS.username = post.author_id
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     await listenForActions(
       [
         actions.posts["delete"].requestType,
@@ -329,7 +333,7 @@ describe("PostPage", function() {
 
     it("should remove the post", async () => {
       post.removed = false
-      const [wrapper] = await renderPage()
+      const wrapper = await renderPage()
       const expected = {
         ...post,
         removed: true
@@ -367,7 +371,7 @@ describe("PostPage", function() {
 
     it("should approve the post", async () => {
       post.removed = true
-      const [wrapper] = await renderPage()
+      const wrapper = await renderPage()
       const expected = {
         ...post,
         removed: false
@@ -406,7 +410,7 @@ describe("PostPage", function() {
         const expectedPayload = { removed: !isRemoved }
         comment.removed = isRemoved
 
-        const [wrapper] = await renderPage()
+        const wrapper = await renderPage()
 
         const expectedComment = {
           ...comment,
@@ -461,7 +465,7 @@ describe("PostPage", function() {
       const comment = comments[0].replies[2]
       assert(comment, "comment not found")
 
-      const [wrapper] = await renderPage()
+      const wrapper = await renderPage()
 
       helper.reportContentStub.returns(Promise.resolve())
 
@@ -473,6 +477,7 @@ describe("PostPage", function() {
         }
       )
 
+      wrapper.update()
       const dialog = wrapper.find("Dialog").at(5)
       dialog.find("input").simulate("change", {
         target: {
@@ -501,7 +506,7 @@ describe("PostPage", function() {
   })
 
   it("should report a post", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
 
     helper.reportContentStub.returns(Promise.resolve())
 
@@ -515,6 +520,7 @@ describe("PostPage", function() {
       }
     )
     assert.ok(preventDefaultStub.called)
+    wrapper.update()
 
     const dialog = wrapper.find("Dialog").at(0)
     dialog.find("input").simulate("change", {
@@ -540,12 +546,14 @@ describe("PostPage", function() {
       reason:  "spam"
     })
   })
+
+  //
   ;[
     ["should render validation for a comment report", true],
     ["should render validation for a post report", false]
   ].forEach(([testName, isComment]) => {
     it(testName, async () => {
-      const [wrapper] = await renderPage()
+      const wrapper = await renderPage()
 
       helper.reportContentStub.returns(Promise.resolve())
 
@@ -572,6 +580,7 @@ describe("PostPage", function() {
           assert.ok(preventDefaultStub.called)
         }
       })
+      wrapper.update()
 
       const dialog = wrapper.find(Dialog).at(isComment ? 5 : 0)
 
@@ -585,10 +594,8 @@ describe("PostPage", function() {
       await listenForActions([FORM_VALIDATE], () => {
         dialog.props().onAccept()
       })
-      assert.equal(
-        dialog.find(".reason .validation-message").text(),
-        "Reason must be at least 3 characters"
-      )
+      wrapper.update()
+      assert.include(dialog.text(), "Reason must be at least 3 characters")
     })
   })
 
@@ -606,6 +613,7 @@ describe("PostPage", function() {
         SET_CHANNEL_DATA
       ]
     )
+    wrapper.update()
     assert(wrapper.find(NotFound).exists())
   })
 
@@ -623,6 +631,7 @@ describe("PostPage", function() {
         SET_CHANNEL_DATA
       ]
     )
+    wrapper.update()
     assert(wrapper.find(NotAuthorized).exists())
   })
 
@@ -640,6 +649,7 @@ describe("PostPage", function() {
         SET_CHANNEL_DATA
       ]
     )
+    wrapper.update()
     assert(wrapper.find(NotFound).exists())
   })
 
@@ -680,7 +690,7 @@ describe("PostPage", function() {
   })
 
   it("should switch the sorting method when an option is selected", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
 
     for (const sortType of VALID_COMMENT_SORT_TYPES) {
       await listenForActions(

@@ -44,7 +44,7 @@ class HomePage extends React.Component<*, void> {
     reportPost: (p: Post) => void
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
   }
 

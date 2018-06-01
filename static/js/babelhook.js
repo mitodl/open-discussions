@@ -9,6 +9,12 @@ require("jsdom-global")(undefined, {
   url: "http://fake/"
 })
 
+// react got a little more picky about the polyfill for
+// requestAnimaltionFrame, see:
+// https://reactjs.org/docs/javascript-environment-requirements.html
+const { polyfill } = require("raf")
+polyfill(global)
+
 // We need to explicitly change the URL when window.location is used
 const changeURL = require("jsdom/lib/old-api").changeURL
 Object.defineProperty(window, "location", {

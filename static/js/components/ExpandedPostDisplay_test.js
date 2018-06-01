@@ -250,6 +250,8 @@ describe("ExpandedPostDisplay", () => {
       )
     }
   }
+
+  //
   ;[true, false].forEach(prevUpvote => {
     it(`should show the correct UI when the upvote
     button is clicked when prev state was ${String(prevUpvote)}`, async () => {
@@ -275,6 +277,7 @@ describe("ExpandedPostDisplay", () => {
       wrapper.setProps({ post })
       // wait for promise resolve to trigger state changes
       await wait(10)
+      wrapper.update()
       assertButton(wrapper, !prevUpvote, false)
     })
   })

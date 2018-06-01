@@ -34,7 +34,7 @@ class EditChannelPage extends React.Component<*, void> {
     processing: boolean
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.loadData()
   }
 

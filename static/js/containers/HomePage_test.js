@@ -30,8 +30,8 @@ describe("HomePage", () => {
     helper.cleanup()
   })
 
-  const renderPage = () =>
-    renderComponent("/", [
+  const renderPage = async () => {
+    const [wrapper] = await renderComponent("/", [
       actions.frontpage.get.requestType,
       actions.frontpage.get.successType,
       actions.subscribedChannels.get.requestType,
@@ -39,21 +39,23 @@ describe("HomePage", () => {
       SET_POST_DATA,
       SET_CHANNEL_DATA
     ])
+    return wrapper.update()
+  }
 
   it("should fetch frontpage, set post data, render", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     assert.deepEqual(wrapper.find(PostList).props().posts, postList)
   })
 
   it("lists subscriptions", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
     wrapper.find(SubscriptionsList).forEach(component => {
       assert.deepEqual(component.props().subscribedChannels, channels)
     })
   })
 
   it("should switch the sorting method when an option is selected", async () => {
-    const [wrapper] = await renderPage()
+    const wrapper = await renderPage()
 
     for (const sortType of VALID_POST_SORT_TYPES) {
       await listenForActions(
@@ -68,6 +70,7 @@ describe("HomePage", () => {
         }
       )
 
+      wrapper.update()
       assert.equal(
         wrapper.find(HomePage).props().location.search,
         `?sort=${sortType}`

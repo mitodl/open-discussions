@@ -1,8 +1,12 @@
 // Define globals we would usually get from Django
 import ReactDOM from "react-dom"
 
-global.cancelAnimationFrame = () => {}
-global.requestAnimationFrame = () => {}
+// setup adaptor for enzyme
+// see http://airbnb.io/enzyme/docs/installation/index.html
+import { configure } from "enzyme"
+import Adapter from "enzyme-adapter-react-16"
+
+configure({ adapter: new Adapter() })
 
 const _createSettings = () => ({
   max_comment_depth:  6,
