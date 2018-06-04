@@ -3,7 +3,6 @@ import React from "react"
 import { Link } from "react-router-dom"
 
 import SubscriptionsList from "./SubscriptionsList"
-import UserInfo from "./UserInfo"
 
 import {
   newPostURL,
@@ -26,7 +25,6 @@ const Navigation = (props: NavigationProps) => {
 
   return (
     <div className="navigation">
-      <UserInfo />
       {userIsAnonymous() ? null : (
         <Link
           className="mdc-button mdc-button--raised blue-button"
@@ -43,11 +41,6 @@ const Navigation = (props: NavigationProps) => {
         currentChannel={channelName}
         subscribedChannels={subscribedChannels}
       />
-      {userIsAnonymous() ? null : (
-        <Link className="settings-link" to="/settings">
-          Settings
-        </Link>
-      )}
     </div>
   )
 }

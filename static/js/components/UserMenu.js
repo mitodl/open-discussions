@@ -46,6 +46,9 @@ export default class UserMenu extends React.Component<*, *> {
           className="profile-image"
           src={SETTINGS.profile_image_small}
         />
+        {!SETTINGS.profile_complete ? (
+          <div className="profile-incomplete" />
+        ) : null}
         {showUserMenu ? (
           <DropdownWithClickOutside toggleShowUserMenu={toggleShowUserMenu} />
         ) : null}

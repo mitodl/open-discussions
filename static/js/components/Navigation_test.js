@@ -7,7 +7,6 @@ import sinon from "sinon"
 
 import Navigation from "./Navigation"
 import SubscriptionsList from "./SubscriptionsList"
-import UserInfo from "./UserInfo"
 
 import { newPostURL, FRONTPAGE_URL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
@@ -32,7 +31,7 @@ describe("Navigation", () => {
 
   it("create post link should not have channel name if channelName is not in URL", () => {
     const wrapper = renderComponent()
-    assert.lengthOf(wrapper.find(Link), 3)
+    assert.lengthOf(wrapper.find(Link), 2)
     const props = wrapper
       .find(Link)
       .at(0)
@@ -69,11 +68,6 @@ describe("Navigation", () => {
     )
   })
 
-  it("should show UserInfo", () => {
-    const wrapper = renderComponent()
-    assert.ok(wrapper.find(UserInfo).exists())
-  })
-
   it("should pass the current channel down to the SubscriptionsList", () => {
     const wrapper = renderComponent({
       ...defaultProps,
@@ -83,17 +77,6 @@ describe("Navigation", () => {
       wrapper.find(SubscriptionsList).props().currentChannel,
       "foobar"
     )
-  })
-
-  it("should have a link to the settings", () => {
-    const wrapper = renderComponent()
-    const { children, to, className } = wrapper
-      .find(Link)
-      .at(2)
-      .props()
-    assert.equal(children, "Settings")
-    assert.equal(className, "settings-link")
-    assert.equal(to, "/settings")
   })
 
   it("should have to link to home", () => {

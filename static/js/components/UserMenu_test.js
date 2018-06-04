@@ -51,6 +51,12 @@ describe("UserMenu", () => {
     })
   })
 
+  it("should include a red dot if profile is incomplete", () => {
+    SETTINGS.profile_complete = false
+    const wrapper = renderUserMenu()
+    assert.isOk(wrapper.find(".profile-incomplete").exists())
+  })
+
   it("dropdown menu should have a settings link", () => {
     const wrapper = renderDropdown()
     const { onClick, to, children } = wrapper.find(Link).props()
