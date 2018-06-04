@@ -13,7 +13,8 @@ import {
   notNil,
   truncate,
   getTokenFromUrl,
-  defaultProfileImageUrl
+  defaultProfileImageUrl,
+  makeUUID
 } from "./util"
 
 describe("utility functions", () => {
@@ -148,6 +149,23 @@ describe("utility functions", () => {
       }
       const token = getTokenFromUrl(props)
       assert.equal(token, exp)
+    })
+  })
+
+  describe("makeUUID", () => {
+    it("should return a string", () => {
+      const uuid = makeUUID(10)
+      assert.isString(uuid)
+    })
+
+    it("should be as long as you specify", () => {
+      [10, 11, 12, 20, 3].forEach(len => {
+        assert.equal(makeUUID(len).length, len)
+      })
+    })
+
+    it("it uhh shouldnt return the same thing twice :D", () => {
+      assert.notEqual(makeUUID(10), makeUUID(10))
     })
   })
 })

@@ -1,0 +1,31 @@
+.add-link-menu {
+  position: absolute;
+  display: flex;
+  background-color: white;
+  padding: 5px;
+  border: 1px solid $border-grey;
+  bottom: 44px;
+  left: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .link-menu-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &:first-child {
+      margin-bottom: 5px;
+    }
+  }
+
+  label {
+    margin-right: 5px;
+    min-width: 29px;
+  }
+
+  button {
+    white-space: nowrap;
+    margin: 0 5px;
+  }
+}

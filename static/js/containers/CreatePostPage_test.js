@@ -47,8 +47,12 @@ describe("CreatePostPage", () => {
       .find(".titlefield textarea")
       .simulate("change", makeEvent("title", title))
 
-  const setText = (wrapper, text) =>
-    wrapper.find(".text textarea").simulate("change", makeEvent("text", text))
+  const setText = (wrapper, text) => {
+    wrapper
+      .find("Editor")
+      .props()
+      .onChange(text)
+  }
 
   const setUrl = (wrapper, url) =>
     wrapper.find(".url input").simulate("change", makeEvent("url", url))

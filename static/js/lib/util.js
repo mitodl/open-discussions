@@ -104,3 +104,9 @@ export const getTokenFromUrl = (props: Object): string => {
   token = parsedQuerystring.token
   return token || ""
 }
+
+export const makeUUID = (len: number) =>
+  Array.from(window.crypto.getRandomValues(new Uint8Array(len)))
+    .map(int => int.toString(16))
+    .join("")
+    .slice(0, len)

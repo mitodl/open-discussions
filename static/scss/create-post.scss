@@ -3,6 +3,10 @@
     max-width: 300px;
   }
 
+  textarea {
+    resize: none;
+  }
+
   .post-types {
     display: flex;
     flex-direction: row;
@@ -44,23 +48,8 @@
   .post-content {
     position: relative;
 
-    .close-button {
-      background: white;
-      border-radius: 50%;
-      position: absolute;
-      top: -11px;
-      right: -11px;
-      border: 1px solid $border-grey;
-      height: 24px;
-      width: 24px;
-      display: flex;
-      cursor: pointer;
-
-      i {
-        font-size: 21px;
-        color: $font-grey;
-        margin: auto;
-      }
+    .editor {
+      min-height: 300px;
     }
   }
 

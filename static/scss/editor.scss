@@ -1,0 +1,64 @@
+.editor-wrapper {
+  position: relative;
+
+  .editor {
+    background: white;
+    color: black;
+    background-clip: padding-box;
+    border-radius: 4px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    padding: 5px 0;
+    margin-bottom: 23px;
+    cursor: text;
+
+    .ProseMirror {
+      padding-bottom: 25px;
+      margin-left: 8px;
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+
+  .menu-bar {
+    display: flex;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+
+    .button-group {
+      display: flex;
+      border: 1px solid $border-grey;
+      border-radius: 2px;
+      margin-right: 2px;
+
+      .menu-button {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        i {
+          color: $font-darkgrey;
+          font-size: 22px;
+          margin: 2px;
+        }
+
+        &.disabled {
+          cursor: not-allowed;
+
+          i {
+            color: $font-grey-light;
+          }
+        }
+
+        &.active {
+          i {
+            color: $font-black;
+            background: $bg-grey;
+          }
+        }
+      }
+    }
+  }
+}

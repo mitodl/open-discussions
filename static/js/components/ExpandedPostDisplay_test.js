@@ -6,6 +6,7 @@ import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import R from "ramda"
 import moment from "moment"
+import { EditorView } from "prosemirror-view"
 
 import ExpandedPostDisplay from "./ExpandedPostDisplay"
 import Router from "../Router"
@@ -68,6 +69,7 @@ describe("ExpandedPostDisplay", () => {
     showPostDeleteDialogStub = helper.sandbox.stub()
     showPostReportDialogStub = helper.sandbox.stub()
     toggleFollowPostStub = helper.sandbox.stub()
+    helper.sandbox.stub(EditorView.prototype, "focus")
   })
 
   afterEach(() => {

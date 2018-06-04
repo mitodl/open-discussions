@@ -87,7 +87,7 @@ describe("CreatePostForm", () => {
       const channel = makeChannel()
       channel.link_type = channelType
       const wrapper = renderPostForm({ postForm, channel })
-      assert.equal(wrapper.find(".close-button").exists(), showClosebutton)
+      assert.equal(wrapper.find("CloseButton").exists(), showClosebutton)
     })
   })
 
@@ -96,7 +96,7 @@ describe("CreatePostForm", () => {
     it(`should show close button when channel is not present and ${linkType} is selected`, () => {
       const postForm = { ...newPostForm(), postType: linkType }
       const wrapper = renderPostForm({ channel: undefined, postForm })
-      assert.isOk(wrapper.find(".close-button").exists())
+      assert.isOk(wrapper.find("CloseButton").exists())
     })
   })
 

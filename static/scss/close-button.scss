@@ -1,0 +1,19 @@
+.close-button {
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: -11px;
+  right: -11px;
+  border: 1px solid $border-grey;
+  height: 24px;
+  width: 24px;
+  display: flex;
+  cursor: pointer;
+  z-index: 10;
+
+  i {
+    font-size: 21px;
+    color: $font-grey;
+    margin: auto;
+  }
+}

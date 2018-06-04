@@ -1,4 +1,3 @@
-// Define globals we would usually get from Django
 import ReactDOM from "react-dom"
 
 // setup adaptor for enzyme
@@ -8,6 +7,7 @@ import Adapter from "enzyme-adapter-react-16"
 
 configure({ adapter: new Adapter() })
 
+// Define globals we would usually get from Django
 const _createSettings = () => ({
   max_comment_depth:  6,
   authenticated_site: {

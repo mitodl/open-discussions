@@ -2,6 +2,8 @@
 import React from "react"
 
 import Embedly, { EmbedlyLoader } from "./Embedly"
+import Editor, { editorUpdateFormShim } from "./Editor"
+import CloseButton from "./CloseButton"
 
 import {
   isLinkTypeAllowed,
@@ -84,9 +86,7 @@ export default class CreatePostForm extends React.Component<Props> {
     const { updatePostType, channel } = this.props
 
     return !channel || channel.link_type === LINK_TYPE_ANY ? (
-      <div className="close-button" onClick={() => updatePostType(null)}>
-        <i className="material-icons clear">clear</i>
-      </div>
+      <CloseButton onClick={() => updatePostType(null)} />
     ) : null
   }
 
@@ -102,11 +102,14 @@ export default class CreatePostForm extends React.Component<Props> {
       return null
     }
 
-    const { postType, text, url } = postForm
+    const { postType, url } = postForm
 
     return postType === LINK_TYPE_TEXT ? (
       <div className="text row post-content">
-        <textarea placeholder="" name="text" value={text} onChange={onUpdate} />
+        <Editor
+          onChange={editorUpdateFormShim("text", onUpdate)}
+          placeHolder="Tell your story..."
+        />
         {this.clearInputButton()}
         {validationMessage(validation.text)}
       </div>
