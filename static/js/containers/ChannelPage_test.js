@@ -9,6 +9,7 @@ import SubscriptionsList from "../components/SubscriptionsList"
 import CompactPostDisplay from "../components/CompactPostDisplay"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ChannelPage from "./ChannelPage"
+import DropdownMenu from "../components/DropdownMenu"
 
 import {
   makeChannel,
@@ -29,6 +30,8 @@ import {
   RECEIVE_GET_PROFILES_SUCCESS,
   REQUEST_GET_PROFILES
 } from "../actions/profile"
+import { showDropdown } from "../actions/ui"
+import { getPostDropdownMenuKey } from "../lib/posts"
 
 describe("ChannelPage", () => {
   let helper,
@@ -116,14 +119,15 @@ describe("ChannelPage", () => {
       SET_POST_DATA,
       SET_CHANNEL_DATA
     ])
+    helper.store.dispatch(showDropdown(getPostDropdownMenuKey(post)))
     wrapper.update()
 
     wrapper
       .find(CompactPostDisplay)
       .at(0)
-      .find(".post-links")
+      .find(DropdownMenu)
       .find("a")
-      .at(1)
+      .at(0)
       .simulate("click")
 
     sinon.assert.calledWith(helper.editPostStub, postList[0].id, {

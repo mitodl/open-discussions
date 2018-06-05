@@ -7,19 +7,23 @@ import { Link } from "react-router-dom"
 
 import CompactPostDisplay from "./CompactPostDisplay"
 import Router from "../Router"
+import DropdownMenu from "./DropdownMenu"
 
+import IntegrationTestHelper from "../util/integration_test_helper"
 import { wait } from "../lib/util"
 import { urlHostname } from "../lib/url"
-import { formatCommentsCount } from "../lib/posts"
+import { PostTitleAndHostname, getPostDropdownMenuKey } from "../lib/posts"
 import { makePost } from "../factories/posts"
-import IntegrationTestHelper from "../util/integration_test_helper"
+import { showDropdown } from "../actions/ui"
+import * as utilFuncs from "../lib/util"
 
 describe("CompactPostDisplay", () => {
-  let helper, post
+  let helper, post, openMenu
 
   const renderPostDisplay = props => {
     props = {
       toggleUpvote: () => {},
+      menuOpen:     false,
       ...props
     }
     return mount(
@@ -32,6 +36,8 @@ describe("CompactPostDisplay", () => {
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     post = makePost()
+    openMenu = () =>
+      helper.store.dispatch(showDropdown(getPostDropdownMenuKey(post)))
   })
 
   afterEach(() => {
@@ -40,29 +46,23 @@ describe("CompactPostDisplay", () => {
 
   it("should render a post correctly", () => {
     const wrapper = renderPostDisplay({ post })
-    const summary = wrapper.find(".summary")
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
-    assert.equal(
-      summary
-        .find(Link)
-        .at(0)
-        .props().children,
-      post.title
-    )
-    assert.deepEqual(
+
+    const titleDisplay = wrapper.find(PostTitleAndHostname)
+    assert.ok(titleDisplay.exists())
+    assert.deepEqual(titleDisplay.props().post, post)
+
+    assert.include(
       wrapper
-        .find(".post-links")
-        .find(Link)
-        .props().children,
-      formatCommentsCount(post)
+        .find(".comment-link")
+        .at(0)
+        .text(),
+      `${post.num_comments}`
     )
+
     const authoredBy = wrapper.find(".authored-by").text()
-    assert(authoredBy.startsWith(`by ${post.author_name}`))
+    assert(authoredBy.startsWith(post.author_name))
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
-    const img = wrapper.find(".profile-image")
-    assert.ok(img.exists())
-    const { src } = img.props()
-    assert.equal(src, post.profile_image)
   })
 
   it("should link to the subreddit, if told to", () => {
@@ -79,54 +79,12 @@ describe("CompactPostDisplay", () => {
   it("should include an external link, if a url post", () => {
     const post = makePost(true)
     const wrapper = renderPostDisplay({ post })
-    const { href, target, children } = wrapper
+    const { href, target } = wrapper
       .find("a")
-      .at(0)
+      .at(1)
       .props()
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
-    assert.equal(children, post.title)
-  })
-
-  it('should include a "pinning" link, if isModerator and showPinUI', () => {
-    [[true, "unpin"], [false, "pin"]].forEach(([pinned, linkText]) => {
-      const post = makePost()
-      post.stickied = pinned
-      const wrapper = renderPostDisplay({
-        post,
-        showPinUI:   true,
-        isModerator: true
-      })
-      assert.equal(
-        linkText,
-        wrapper
-          .find("a")
-          .at(2)
-          .text()
-      )
-    })
-  })
-
-  it("should not show a pin link otherwise", () => {
-    [true, false].forEach(showPinUI => {
-      const wrapper = renderPostDisplay({ post, showPinUI })
-      assert.lengthOf(wrapper.find(".post-links").find("a"), 2)
-    })
-  })
-
-  it("should show a report link", () => {
-    const reportPost = helper.sandbox.stub()
-    const wrapper = renderPostDisplay({ post, reportPost })
-    const link = wrapper.find({ children: "report" })
-    link.props().onClick()
-    assert.ok(reportPost.called)
-  })
-
-  it("should hide the report link for anon users", () => {
-    SETTINGS.username = null
-    const wrapper = renderPostDisplay({ post })
-    const link = wrapper.find({ children: "report" })
-    assert.isNotOk(link.exists())
   })
 
   it("should set a class if stickied and showing pin ui", () => {
@@ -135,28 +93,16 @@ describe("CompactPostDisplay", () => {
         post.stickied = stickied
         const wrapper = renderPostDisplay({ post, showPinUI })
         assert.equal(
-          wrapper.find(".post-summary").props().className,
-          showPinUI && stickied ? "post-summary sticky" : "post-summary "
+          wrapper
+            .find(".compact-post-summary")
+            .at(0)
+            .props().className,
+          showPinUI && stickied
+            ? "compact-post-summary sticky"
+            : "compact-post-summary "
         )
       }
     )
-  })
-
-  it("pin link should call togglePinPost", () => {
-    const togglePinPostStub = helper.sandbox.stub()
-    const post = makePost()
-    post.stickied = true
-    const wrapper = renderPostDisplay({
-      post,
-      showPinUI:     true,
-      isModerator:   true,
-      togglePinPost: togglePinPostStub
-    })
-    wrapper
-      .find("a")
-      .at(2)
-      .simulate("click")
-    assert.ok(togglePinPostStub.calledWith(post))
   })
 
   it("should display the domain, for a url post", () => {
@@ -165,14 +111,13 @@ describe("CompactPostDisplay", () => {
     assert.include(wrapper.find(".url-hostname").text(), urlHostname(post.url))
   })
 
-  it("should link to the detail view, if a text post", () => {
-    const wrapper = renderPostDisplay({ post })
-    const { to, children } = wrapper
+  it("should link to the detail view", () => {
+    const detailLink = renderPostDisplay({ post })
       .find(Link)
       .at(0)
-      .props()
-    assert.equal(children, post.title)
+    const { to } = detailLink.props()
     assert.equal(to, `/channel/${post.channel_name}/${post.id}`)
+    assert.ok(detailLink.find(PostTitleAndHostname).exists())
   })
 
   const assertButton = (wrapper, isUpvote, isVoting) => {
@@ -223,44 +168,127 @@ describe("CompactPostDisplay", () => {
     })
   })
 
-  it("should render a report count, if post is reported", () => {
-    post.num_reports = 2
-    const wrapper = renderPostDisplay({ post })
-    const count = wrapper.find(".report-count")
-    assert.ok(count.exists())
-    // $FlowFixMe: thinks this doesn't exist
-    assert.equal(count.text(), `Reports: ${post.num_reports}`)
-  })
-
-  it("should not render a report count, if post has no report data", () => {
-    const wrapper = renderPostDisplay({ post })
-    const count = wrapper.find(".report-count")
-    assert.isNotOk(count.exists())
-  })
-
-  it("should put a remove button, if it gets the right props", () => {
-    const removePostStub = helper.sandbox.stub()
-    const wrapper = renderPostDisplay({
-      post,
-      isModerator: true,
-      removePost:  removePostStub
+  describe("Dropdown menu tests", () => {
+    beforeEach(() => {
+      openMenu()
     })
-    const link = wrapper.find("a").at(2)
-    assert.equal(link.text(), "remove")
-    link.simulate("click")
-    assert.ok(removePostStub.calledWith(post))
+
+    it("should show a report link", () => {
+      const reportPost = helper.sandbox.stub()
+      const wrapper = renderPostDisplay({ post, reportPost })
+      const link = wrapper.find({ children: "report" })
+      link.props().onClick()
+      assert.ok(reportPost.called)
+    })
+
+    it("should hide the report link for anon users", () => {
+      SETTINGS.username = null
+      const wrapper = renderPostDisplay({ post })
+      const link = wrapper.find({ children: "report" })
+      assert.isNotOk(link.exists())
+    })
+
+    it("should not show a pin link otherwise", () => {
+      [true, false].forEach(showPinUI => {
+        const wrapper = renderPostDisplay({ post, showPinUI })
+        assert.lengthOf(wrapper.find(DropdownMenu).find("a"), 1)
+      })
+    })
+
+    it("pin link should call togglePinPost", () => {
+      const togglePinPostStub = helper.sandbox.stub()
+      post.stickied = true
+      const wrapper = renderPostDisplay({
+        post,
+        showPinUI:     true,
+        isModerator:   true,
+        togglePinPost: togglePinPostStub
+      })
+
+      wrapper
+        .find(DropdownMenu)
+        .find("a")
+        .at(0)
+        .simulate("click")
+      assert.ok(togglePinPostStub.calledWith(post))
+    })
+
+    it('should include a "pinning" link, if isModerator and showPinUI', () => {
+      [[true, "unpin"], [false, "pin"]].forEach(([pinned, linkText]) => {
+        post.stickied = pinned
+        const wrapper = renderPostDisplay({
+          post,
+          showPinUI:   true,
+          isModerator: true,
+          menuOpen:    true
+        })
+        assert.equal(
+          linkText,
+          wrapper
+            .find(DropdownMenu)
+            .find("a")
+            .at(0)
+            .text()
+        )
+      })
+    })
+
+    it("should render a report count, if post is reported", () => {
+      post.num_reports = 2
+      const wrapper = renderPostDisplay({ post })
+      const count = wrapper.find(".report-count")
+      assert.ok(count.exists())
+      // $FlowFixMe: thinks this doesn't exist
+      assert.equal(count.text(), `Reports: ${post.num_reports}`)
+    })
+
+    it("should not render a report count, if post has no report data", () => {
+      const wrapper = renderPostDisplay({ post })
+      const count = wrapper.find(".report-count")
+      assert.isNotOk(count.exists())
+    })
+
+    it("should put a remove button, if it gets the right props", () => {
+      const removePostStub = helper.sandbox.stub()
+      const wrapper = renderPostDisplay({
+        post,
+        isModerator: true,
+        removePost:  removePostStub
+      })
+      const link = wrapper.find("a").at(2)
+      assert.equal(link.text(), "remove")
+      link.simulate("click")
+      assert.ok(removePostStub.calledWith(post))
+    })
+
+    it("should put an ignore button, if it gets the right props", () => {
+      const ignorePostStub = helper.sandbox.stub()
+      const wrapper = renderPostDisplay({
+        post,
+        isModerator:       true,
+        ignorePostReports: ignorePostStub
+      })
+      const link = wrapper.find("a").at(2)
+      assert.equal(link.text(), "ignore all reports")
+      link.simulate("click")
+      assert.ok(ignorePostStub.calledWith(post))
+    })
   })
 
-  it("should put an ignore button, if it gets the right props", () => {
-    const ignorePostStub = helper.sandbox.stub()
-    const wrapper = renderPostDisplay({
-      post,
-      isModerator:       true,
-      ignorePostReports: ignorePostStub
-    })
-    const link = wrapper.find("a").at(2)
-    assert.equal(link.text(), "ignore all reports")
-    link.simulate("click")
-    assert.ok(ignorePostStub.calledWith(post))
+  it("should include a button to open the menu", () => {
+    const wrapper = renderPostDisplay({ post })
+    const openMenuButton = wrapper.find("i.more_vert")
+
+    assert.ok(openMenuButton.exists())
+    openMenuButton.simulate("click")
+    assert.ok(
+      helper.store.getState().ui.dropdownMenus.has(getPostDropdownMenuKey(post))
+    )
+  })
+
+  it("should hide the menu open button when anonymous", () => {
+    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+    const wrapper = renderPostDisplay({ post })
+    assert.isNotOk(wrapper.find("i.more_vert").exists())
   })
 })

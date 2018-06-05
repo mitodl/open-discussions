@@ -40,6 +40,17 @@ export const getPaginationSortParams = R.pickAll([
   "sort"
 ])
 
+export const PostTitleAndHostname = ({ post }: { post: Post }) => (
+  <React.Fragment>
+    <span className="post-title">{post.title}</span>
+    {post.url ? (
+      <span className="url-hostname">{`(${urlHostname(post.url)})`}</span>
+    ) : null}
+  </React.Fragment>
+)
+
+export const getPostDropdownMenuKey = (post: Post) => `POST_DROPDOWN_${post.id}`
+
 export const formatPostTitle = (post: Post) =>
   post.text ? (
     <Link className="post-title" to={postDetailURL(post.channel_name, post.id)}>

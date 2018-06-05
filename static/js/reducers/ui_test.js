@@ -9,14 +9,17 @@ import {
   SET_SNACKBAR_MESSAGE,
   SHOW_DIALOG,
   HIDE_DIALOG,
-  SET_SHOW_USER_MENU,
+  SHOW_DROPDOWN,
+  HIDE_DROPDOWN,
   setShowDrawerDesktop,
   setShowDrawerMobile,
   setSnackbarMessage,
   showDialog,
   hideDialog,
-  setShowUserMenu
+  showDropdown,
+  hideDropdown
 } from "../actions/ui"
+import { USER_MENU_DROPDOWN } from "../containers/App"
 
 describe("ui reducer", () => {
   let helper, store, dispatchThen
@@ -98,11 +101,13 @@ describe("ui reducer", () => {
   })
 
   it("should let you toggle show user menu", async () => {
-    for (const open of [true, false]) {
-      const state = await dispatchThen(setShowUserMenu(open), [
-        SET_SHOW_USER_MENU
-      ])
-      assert.equal(state.showUserMenu, open)
-    }
+    let state = await dispatchThen(showDropdown(USER_MENU_DROPDOWN), [
+      SHOW_DROPDOWN
+    ])
+    assert.equal(state.dropdownMenus.has(USER_MENU_DROPDOWN), true)
+    state = await dispatchThen(hideDropdown(USER_MENU_DROPDOWN), [
+      HIDE_DROPDOWN
+    ])
+    assert.equal(state.dropdownMenus.has(USER_MENU_DROPDOWN), false)
   })
 })

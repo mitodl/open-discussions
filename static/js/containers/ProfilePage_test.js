@@ -1,9 +1,11 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
+
+import ProfileImage from "./ProfileImage"
+
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { profileURL } from "../lib/url"
 import { makeProfile } from "../factories/profiles"
-import ProfileImage from "./ProfileImage"
 import { actions } from "../actions"
 import { initials } from "../lib/profile"
 import { formatTitle } from "../lib/title"

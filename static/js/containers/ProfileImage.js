@@ -3,9 +3,8 @@
 import React from "react"
 import { connect } from "react-redux"
 
-import { defaultProfileImageUrl, makeProfileImageUrl } from "../lib/util"
-import type { Profile } from "../flow/discussionTypes"
 import ProfileImageUploader from "../components/ProfileImageUploader"
+
 import { createActionHelper } from "../lib/redux_rest"
 import {
   startPhotoEdit,
@@ -13,12 +12,13 @@ import {
   updatePhotoEdit,
   setPhotoError
 } from "../actions/image_upload"
-
+import { defaultProfileImageUrl, makeProfileImageUrl } from "../lib/util"
 import { showDialog, hideDialog, DIALOG_PROFILE_IMAGE } from "../actions/ui"
 import { actions } from "../actions"
 import { updateProfilePhoto } from "../reducers/image_upload"
 import { initials } from "../lib/profile"
 
+import type { Profile } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
 
 const formatPhotoName = photo => `${photo.name.replace(/\.\w*$/, "")}.jpg`

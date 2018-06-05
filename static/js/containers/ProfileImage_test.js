@@ -4,9 +4,10 @@ import { mount } from "enzyme"
 import { assert } from "chai"
 import { Provider } from "react-redux"
 
+import ProfileImage from "./ProfileImage"
+
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { startPhotoEdit } from "../actions/image_upload"
-import ProfileImage from "./ProfileImage"
 
 describe("ProfileImage", () => {
   let helper, div

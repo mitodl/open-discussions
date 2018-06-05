@@ -20,5 +20,17 @@ export const showDialog = createAction(SHOW_DIALOG)
 export const HIDE_DIALOG = "HIDE_DIALOG"
 export const hideDialog = createAction(HIDE_DIALOG)
 
-export const SET_SHOW_USER_MENU = "SET_SHOW_USER_MENU"
-export const setShowUserMenu = createAction(SET_SHOW_USER_MENU)
+export const SHOW_DROPDOWN = "SHOW_DROPDOWN"
+export const showDropdown = createAction(SHOW_DROPDOWN)
+
+export const HIDE_DROPDOWN = "HIDE_DROPDOWN"
+export const hideDropdown = createAction(HIDE_DROPDOWN)
+
+// this is a hack :/
+// needed to debounce just a little bit to get around a race
+// condition with the post dropdown menu
+export const hideDropdownDebounced = createAction(
+  HIDE_DROPDOWN,
+  i => i,
+  () => ({ debounce: { time: 100 } })
+)

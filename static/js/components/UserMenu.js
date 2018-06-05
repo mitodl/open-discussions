@@ -2,49 +2,14 @@
 /* global SETTINGS:false */
 import React from "react"
 import { Link } from "react-router-dom"
-import onClickOutside from "react-onclickoutside"
+
+import DropdownMenu from "./DropdownMenu"
+import ProfileImage from "../containers/ProfileImage"
 
 import { isProfileComplete } from "../lib/util"
 import { profileURL, SETTINGS_URL } from "../lib/url"
+
 import type { Profile } from "../flow/discussionTypes"
-import ProfileImage from "../containers/ProfileImage"
-export class Dropdown extends React.Component<*, *> {
-  handleClickOutside = () => {
-    const { toggleShowUserMenu } = this.props
-
-    toggleShowUserMenu()
-  }
-
-  render() {
-    const { toggleShowUserMenu } = this.props
-    return (
-      <ul className="user-menu-dropdown">
-        <li>
-          <Link onClick={toggleShowUserMenu} to={SETTINGS_URL}>
-            Settings
-          </Link>
-        </li>
-        {SETTINGS.profile_ui_enabled && SETTINGS.username ? (
-          <li>
-            <Link
-              onClick={toggleShowUserMenu}
-              to={profileURL(SETTINGS.username)}
-            >
-              View Profile
-            </Link>
-          </li>
-        ) : null}
-        {SETTINGS.allow_email_auth ? (
-          <li>
-            <a href="/logout">Sign Out</a>
-          </li>
-        ) : null}
-      </ul>
-    )
-  }
-}
-
-export const DropdownWithClickOutside = onClickOutside(Dropdown)
 
 export default class UserMenu extends React.Component<*, *> {
   props: {
@@ -69,7 +34,21 @@ export default class UserMenu extends React.Component<*, *> {
           <div className="profile-incomplete" />
         ) : null}
         {showUserMenu ? (
-          <DropdownWithClickOutside toggleShowUserMenu={toggleShowUserMenu} />
+          <DropdownMenu closeMenu={toggleShowUserMenu}>
+            <li>
+              <Link to={SETTINGS_URL}>Settings</Link>
+            </li>
+            {SETTINGS.profile_ui_enabled && SETTINGS.username ? (
+              <li>
+                <Link to={profileURL(SETTINGS.username)}>View Profile</Link>
+              </li>
+            ) : null}
+            {SETTINGS.allow_email_auth ? (
+              <li>
+                <a href="/logout">Sign Out</a>
+              </li>
+            ) : null}
+          </DropdownMenu>
         ) : null}
       </div>
     )

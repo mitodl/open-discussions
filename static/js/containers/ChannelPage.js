@@ -6,7 +6,6 @@ import qs from "query-string"
 import { connect } from "react-redux"
 import DocumentTitle from "react-document-title"
 
-import Card from "../components/Card"
 import PostList from "../components/PostList"
 import withLoading from "../components/Loading"
 import PostListNavigation from "../components/PostListNavigation"
@@ -141,41 +140,36 @@ class ChannelPage extends React.Component<*, void> {
       return null
     } else {
       return (
-        <div>
+        <React.Fragment>
           <DocumentTitle title={formatTitle(channel.title)} />
           <ChannelBreadcrumbs channel={channel} />
-          <Card
-            title={
-              <div className="post-list-title">
-                <div>{channel.title}</div>
-                <PostSortPicker
-                  updateSortParam={updatePostSortParam(this.props)}
-                  value={qs.parse(search).sort || POSTS_SORT_HOT}
-                />
-              </div>
-            }
-          >
-            <PostList
-              channel={channel}
-              posts={posts}
-              toggleUpvote={toggleUpvote(dispatch)}
-              isModerator={isModerator}
-              togglePinPost={this.togglePinPost}
-              reportPost={reportPost}
-              removePost={removePost}
-              showPinUI
+          <div className="post-list-title">
+            <div>{channel.title}</div>
+            <PostSortPicker
+              updateSortParam={updatePostSortParam(this.props)}
+              value={qs.parse(search).sort || POSTS_SORT_HOT}
             />
-            {pagination ? (
-              <PostListNavigation
-                after={pagination.after}
-                afterCount={pagination.after_count}
-                before={pagination.before}
-                beforeCount={pagination.before_count}
-                pathname={channelURL(channelName)}
-              />
-            ) : null}
-          </Card>
-        </div>
+          </div>
+          <PostList
+            channel={channel}
+            posts={posts}
+            toggleUpvote={toggleUpvote(dispatch)}
+            isModerator={isModerator}
+            togglePinPost={this.togglePinPost}
+            reportPost={reportPost}
+            removePost={removePost}
+            showPinUI
+          />
+          {pagination ? (
+            <PostListNavigation
+              after={pagination.after}
+              afterCount={pagination.after_count}
+              before={pagination.before}
+              beforeCount={pagination.before_count}
+              pathname={channelURL(channelName)}
+            />
+          ) : null}
+        </React.Fragment>
       )
     }
   }

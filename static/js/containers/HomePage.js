@@ -5,7 +5,6 @@ import R from "ramda"
 import qs from "query-string"
 
 import PostList from "../components/PostList"
-import Card from "../components/Card"
 import withLoading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 import PostListNavigation from "../components/PostListNavigation"
@@ -74,17 +73,14 @@ class HomePage extends React.Component<*, void> {
     } = this.props
 
     return (
-      <Card
-        title={
-          <div className="post-list-title">
-            <div>Home</div>
-            <PostSortPicker
-              updateSortParam={updatePostSortParam(this.props)}
-              value={qs.parse(search).sort || POSTS_SORT_HOT}
-            />
-          </div>
-        }
-      >
+      <React.Fragment>
+        <div className="post-list-title">
+          <div>Home</div>
+          <PostSortPicker
+            updateSortParam={updatePostSortParam(this.props)}
+            value={qs.parse(search).sort || POSTS_SORT_HOT}
+          />
+        </div>
         <PostList
           posts={posts}
           toggleUpvote={toggleUpvote(dispatch)}
@@ -100,7 +96,7 @@ class HomePage extends React.Component<*, void> {
             pathname={FRONTPAGE_URL}
           />
         ) : null}
-      </Card>
+      </React.Fragment>
     )
   }
 }

@@ -7,7 +7,7 @@ import sinon from "sinon"
 import { Link } from "react-router-dom"
 
 import UserMenu from "./UserMenu"
-import { DropdownWithClickOutside, Dropdown } from "./UserMenu"
+import DropdownMenu from "./DropdownMenu"
 
 import { profileURL, SETTINGS_URL } from "../lib/url"
 import * as utilFuncs from "../lib/util"
@@ -47,10 +47,7 @@ describe("UserMenu", () => {
       />
     )
 
-  const renderDropdown = () =>
-    shallow(<Dropdown toggleShowUserMenu={toggleShowUserMenuStub} />)
-
-  it("should include the ProfileImage with onclick handler", () => {
+  it("should include the profile image with onclick handler", () => {
     const wrapper = renderUserMenu()
     const { onClick } = wrapper.find(ProfileImage).props()
     onClick()
@@ -62,12 +59,14 @@ describe("UserMenu", () => {
       showUserMenu = showUserMenuValue
       const wrapper = renderUserMenu()
       if (showUserMenu) {
-        assert.isOk(wrapper.find(DropdownWithClickOutside).exists())
+        assert.isOk(wrapper.find(DropdownMenu).exists())
       } else {
-        assert.isNotOk(wrapper.find(DropdownWithClickOutside).exists())
+        assert.isNotOk(wrapper.find(DropdownMenu).exists())
       }
     })
   })
+
+  //
   ;[
     [true, true, false],
     [true, false, true],
@@ -76,8 +75,9 @@ describe("UserMenu", () => {
   ].forEach(([featureFlagEnabled, complete, shouldShowDot]) => {
     it(`should ${
       shouldShowDot ? "" : "not "
-    }include a red dot since the feature flag
-     is ${featureFlagEnabled ? "enabled" : "disabled"} and the profile is
+    }include a red dot since the feature flag is ${
+      featureFlagEnabled ? "enabled" : "disabled"
+    } and the profile is
       ${complete ? "complete" : "incomplete"}`, () => {
       SETTINGS.profile_ui_enabled = featureFlagEnabled
       sandbox.stub(utilFuncs, "isProfileComplete").returns(complete)
@@ -93,6 +93,8 @@ describe("UserMenu", () => {
     const wrapper = renderUserMenu()
     assert.isNotOk(wrapper.find(".profile-incomplete").exists())
   })
+
+  //
   ;[true, false].forEach(uiEnabled => {
     it(`dropdown menu should ${
       uiEnabled ? "" : "not"
@@ -101,7 +103,8 @@ describe("UserMenu", () => {
     } enabled`, async () => {
       SETTINGS.profile_ui_enabled = uiEnabled
       SETTINGS.username = profile.username
-      const wrapper = renderDropdown()
+      showUserMenu = true
+      const wrapper = renderUserMenu()
       assert.equal(
         wrapper
           .find(Link)
@@ -113,17 +116,17 @@ describe("UserMenu", () => {
   })
 
   it("dropdown menu should have a settings link", () => {
-    const wrapper = renderDropdown()
-    const { onClick, to, children } = wrapper.find(Link).props()
-    onClick()
-    assert.isOk(toggleShowUserMenuStub.called)
+    showUserMenu = true
+    const wrapper = renderUserMenu()
+    const { to, children } = wrapper.find(Link).props()
     assert.equal(to, SETTINGS_URL)
     assert.equal(children, "Settings")
   })
 
   it("should include a logout link, if feature is enabled", () => {
     SETTINGS.allow_email_auth = true
-    const wrapper = renderDropdown()
+    showUserMenu = true
+    const wrapper = renderUserMenu()
     const { href, children } = wrapper.find("a").props()
     assert.equal(href, "/logout")
     assert.equal(children, "Sign Out")

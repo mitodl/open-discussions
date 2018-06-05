@@ -1,6 +1,7 @@
 .sorter {
   display: flex;
   align-items: center;
+  height: 30px;
 
   .sort-label {
     color: $font-grey;
@@ -10,10 +11,12 @@
 
   select {
     width: 90px;
-    height: 30px;
+    height: 20px;
     padding: 0 0;
     text-align: center;
     text-align-last: center;
+    border: none;
+    background-color: $app-background;
   }
 }
 

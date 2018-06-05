@@ -67,20 +67,22 @@ class ChannelModerationPage extends React.Component<*, *> {
       )
     } else {
       return (
-        <CommentTree
-          comments={[addDummyReplies(report.comment)]}
-          commentReports={commentReports}
-          commentPermalink={commentPermalink(
-            channelName,
-            report.comment.post_id
-          )}
-          approve={approveComment}
-          remove={removeComment}
-          ignoreCommentReports={ignoreCommentReports}
-          key={`${report.comment.id}-${report.comment.post_id}`}
-          moderationUI
-          isModerator={isModerator}
-        />
+        <Card>
+          <CommentTree
+            comments={[addDummyReplies(report.comment)]}
+            commentReports={commentReports}
+            commentPermalink={commentPermalink(
+              channelName,
+              report.comment.post_id
+            )}
+            approve={approveComment}
+            remove={removeComment}
+            ignoreCommentReports={ignoreCommentReports}
+            key={`${report.comment.id}-${report.comment.post_id}`}
+            moderationUI
+            isModerator={isModerator}
+          />
+        </Card>
       )
     }
   }
@@ -92,13 +94,13 @@ class ChannelModerationPage extends React.Component<*, *> {
       <div className="channel-moderation">
         <DocumentTitle title={formatTitle(`${channel.title} moderation`)} />
         <ChannelModerationBreadcrumbs channel={channel} />
-        <Card title="Reported Posts & Comments">
-          {reports.length === 0 ? (
+        {reports.length === 0 ? (
+          <Card title="Reported Posts & Comments">
             <div className="empty-message">No outstanding reports</div>
-          ) : (
-            reports.map(this.renderReport)
-          )}
-        </Card>
+          </Card>
+        ) : (
+          reports.map(this.renderReport)
+        )}
       </div>
     ) : (
       <Redirect to={channelURL(channel.name)} />

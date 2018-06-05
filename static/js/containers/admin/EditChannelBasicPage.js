@@ -6,6 +6,7 @@ import DocumentTitle from "react-document-title"
 
 import EditChannelBasicForm from "../../components/admin/EditChannelBasicForm"
 import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
+import withSingleColumn from "../../hoc/withSingleColumn"
 
 import { actions } from "../../actions"
 import { editChannelForm } from "../../lib/channels"
@@ -13,7 +14,6 @@ import { channelURL } from "../../lib/url"
 import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
 import { validateChannelEditForm } from "../../lib/validation"
-import withSingleColumn from "../../hoc/withSingleColumn"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"

@@ -1,12 +1,14 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
+import sinon from "sinon"
+
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { editProfileURL } from "../lib/url"
 import { makeProfile } from "../factories/profiles"
 import { actions } from "../actions"
-import type { ProfilePayload } from "../flow/discussionTypes"
-import * as sinon from "sinon"
 import { makeChannelPostList } from "../factories/posts"
+
+import type { ProfilePayload } from "../flow/discussionTypes"
 
 describe("ProfileEditPage", function() {
   let helper, listenForActions, renderComponent, profile

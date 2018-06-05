@@ -5,22 +5,23 @@ import { connect } from "react-redux"
 import R from "ramda"
 import DocumentTitle from "react-document-title"
 
+import ProfileForm from "../components/ProfileForm"
+import Card from "../components/Card"
+import withLoading from "../components/Loading"
+import withSingleColumn from "../hoc/withSingleColumn"
+
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
-
-import type { Dispatch } from "redux"
 import { getUserName } from "../lib/util"
-import ProfileForm from "../components/ProfileForm"
-import type { Profile } from "../flow/discussionTypes"
-import type { FormValue } from "../flow/formTypes"
-import type { ProfilePayload } from "../flow/discussionTypes"
-import Card from "../components/Card"
 import { profileURL } from "../lib/url"
 import { Redirect } from "react-router"
 import { validateProfileForm } from "../lib/validation"
 import { any404Error, anyErrorExcept404 } from "../util/rest"
-import withLoading from "../components/Loading"
-import withSingleColumn from "../hoc/withSingleColumn"
+
+import type { Profile } from "../flow/discussionTypes"
+import type { FormValue } from "../flow/formTypes"
+import type { ProfilePayload } from "../flow/discussionTypes"
+import type { Dispatch } from "redux"
 
 type ProfileEditPageProps = {
   dispatch: Dispatch<*>,

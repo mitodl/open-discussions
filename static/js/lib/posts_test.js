@@ -4,10 +4,17 @@ import { assert } from "chai"
 import { mount } from "enzyme"
 import sinon from "sinon"
 import ReactTooltip from "react-tooltip"
+import { shallow } from "enzyme"
 
-import { newPostForm, formatCommentsCount, PostVotingButtons } from "./posts"
+import {
+  newPostForm,
+  formatCommentsCount,
+  PostVotingButtons,
+  PostTitleAndHostname
+} from "./posts"
 import { makePost } from "../factories/posts"
 import { votingTooltipText } from "./util"
+import { urlHostname } from "./url"
 import * as utilFuncs from "./util"
 
 describe("Post utils", () => {
@@ -54,6 +61,28 @@ describe("Post utils", () => {
       sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
       const tooltip = renderButtons().find(ReactTooltip)
       assert.isNotOk(tooltip.exists())
+    })
+  })
+
+  describe("postTitleAndHostname", () => {
+    const renderPostTitle = post =>
+      shallow(<PostTitleAndHostname post={post} />)
+
+    it("should return just a title for a text post", () => {
+      const post = makePost()
+      const wrapper = renderPostTitle(post)
+      assert.lengthOf(wrapper.find("span"), 1)
+      assert.equal(wrapper.find(".post-title").text(), post.title)
+    })
+
+    it("should return a hostname too for a url post", () => {
+      const post = makePost(true)
+      const wrapper = renderPostTitle(post)
+      assert.lengthOf(wrapper.find("span"), 2)
+      assert.include(
+        wrapper.find(".url-hostname").text(),
+        urlHostname(post.url)
+      )
     })
   })
 })

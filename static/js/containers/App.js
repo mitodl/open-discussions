@@ -25,7 +25,8 @@ import { actions } from "../actions"
 import {
   setShowDrawerMobile,
   setShowDrawerDesktop,
-  setShowUserMenu
+  showDropdown,
+  hideDropdown
 } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
 import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
@@ -35,6 +36,8 @@ import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { SnackbarState } from "../reducers/ui"
 import type { Profile } from "../flow/discussionTypes"
+
+export const USER_MENU_DROPDOWN = "USER_MENU_DROPDOWN"
 
 class App extends React.Component<*, void> {
   props: {
@@ -59,7 +62,12 @@ class App extends React.Component<*, void> {
 
   toggleShowUserMenu = () => {
     const { dispatch, showUserMenu } = this.props
-    dispatch(setShowUserMenu(!showUserMenu))
+
+    dispatch(
+      showUserMenu
+        ? hideDropdown(USER_MENU_DROPDOWN)
+        : showDropdown(USER_MENU_DROPDOWN)
+    )
   }
 
   componentDidMount() {
@@ -201,11 +209,14 @@ class App extends React.Component<*, void> {
 export default connect(state => {
   const {
     profiles,
-    ui: { showDrawerMobile, showDrawerDesktop, snackbar, showUserMenu }
+    ui: { showDrawerMobile, showDrawerDesktop, snackbar, dropdownMenus }
   } = state
+
   const profile = SETTINGS.username
     ? profiles.data.get(SETTINGS.username)
     : null
+  const showUserMenu = dropdownMenus.has(USER_MENU_DROPDOWN)
+
   return {
     showDrawerMobile,
     showDrawerDesktop,

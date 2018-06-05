@@ -5,18 +5,19 @@ import { connect } from "react-redux"
 import R from "ramda"
 import DocumentTitle from "react-document-title"
 
-import { actions } from "../actions"
-import { formatTitle } from "../lib/title"
-
-import type { Dispatch } from "redux"
-import { getUserName } from "../lib/util"
-import type { Profile } from "../flow/discussionTypes"
 import Card from "../components/Card"
 import ProfileImage from "./ProfileImage"
-import { any404Error, anyErrorExcept404 } from "../util/rest"
-import { clearPostError } from "../actions/post"
 import withLoading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
+
+import { actions } from "../actions"
+import { formatTitle } from "../lib/title"
+import { getUserName } from "../lib/util"
+import { any404Error, anyErrorExcept404 } from "../util/rest"
+import { clearPostError } from "../actions/post"
+
+import type { Profile } from "../flow/discussionTypes"
+import type { Dispatch } from "redux"
 
 type ProfilePageProps = {
   dispatch: Dispatch<*>,

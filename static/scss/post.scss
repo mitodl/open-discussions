@@ -11,6 +11,89 @@
   font-size: 15px;
 }
 
+.compact-post-summary {
+  a {
+    color: $font-black;
+  }
+
+  .post-title {
+    font-size: 17px;
+    font-weight: 400;
+    margin: 0 0 20px;
+  }
+
+  .authored-by {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+
+    div {
+      padding-bottom: 2px;
+    }
+
+    .author-name {
+      color: $font-darkgrey;
+    }
+
+    .date {
+      color: $font-grey-light;
+    }
+  }
+
+  .title-row {
+    i {
+      color: $font-grey-light;
+    }
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .upvotes {
+      margin-top: 5px;
+    }
+
+    .comments-and-menu {
+      display: flex;
+      align-items: center;
+
+      // to make the user-menu live in it correctly
+      position: relative;
+
+      > * {
+        color: $font-grey-light;
+      }
+
+      i {
+        cursor: pointer;
+      }
+
+      .comment-link {
+        display: flex;
+        align-items: center;
+        margin-right: 8px;
+
+        i {
+          margin-right: 11px;
+        }
+      }
+
+      .dropdown-menu {
+        top: 22px;
+        right: 11px;
+      }
+    }
+  }
+}
+
+.url-hostname {
+  color: $font-grey;
+  font-size: 13px;
+  margin-left: 4px;
+}
+
 .post-summary {
   display: flex;
   flex-direction: column;
@@ -28,18 +111,6 @@
 
   &.sticky {
     background-color: $bg-blue;
-  }
-
-  .post-title {
-    font-size: 17px;
-    font-weight: 400;
-    margin: 0 0 7px;
-  }
-
-  .url-hostname {
-    color: $font-grey;
-    font-size: 13px;
-    margin-left: 4px;
   }
 
   .authored-by {
@@ -87,11 +158,10 @@
       position: relative;
       top: 6px;
     }
-
   }
 
   .text-content {
-    color: rgba(0,0,0,.77);
+    color: rgba(0, 0, 0, 0.77);
     line-height: 1.4;
     font-size: 15px;
     overflow-wrap: break-word;
@@ -115,14 +185,13 @@
 }
 
 .expanded {
-
   .post-title {
     font-size: 20px;
     font-weight: 400;
     margin: 7px 0 9px;
 
     a {
-      color: rgba(0,0,0,.87);
+      color: rgba(0, 0, 0, 0.87);
     }
   }
 
@@ -138,29 +207,19 @@
 
 .upvotes {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  min-width: 50px;
-  padding-top: 1px;
-
-  &.expanded {
-    flex-direction: row;
-    justify-content: space-between;
-    width: 35px;
-    min-width: 10px;
-    padding-top: 0px;
-
-    span.votes {
-      margin-top: 0;
-    }
-  }
+  flex-direction: row;
+  justify-content: space-between;
+  width: 35px;
+  min-width: 10px;
+  padding-top: 0px;
 
   span.votes {
     display: block;
     font-weight: 500;
     font-size: 16px;
     color: #555;
-    margin-top: 5px;
+    margin-top: 0;
   }
 }
 
