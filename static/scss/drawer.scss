@@ -1,0 +1,38 @@
+.mdc-drawer--persistent {
+  position: fixed;
+  left: 0;
+  height: calc(100vh - #{$toolbar-height-desktop});
+  top: $toolbar-height-desktop;
+
+  @include breakpoint(materialmobile) {
+    height: calc(100vh - #{$toolbar-height-mobile});
+    top: $toolbar-height-mobile;
+  }
+}
+
+.drawer-mobile-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 60px;
+
+  @include breakpoint(materialmobile) {
+    height: 45px;
+  }
+
+  a {
+    padding-left: 35px;
+
+    @include breakpoint(materialmobile) {
+      padding-left: 20px;
+    }
+  }
+
+  a.material-icons {
+    color: $brand-bg;
+  }
+
+  .mitlogo {
+    margin: 10px 0 0 7px;
+  }
+}

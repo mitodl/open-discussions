@@ -6,6 +6,7 @@
 @import "node_modules/@material/dialog/dist/mdc.dialog";
 @import "node_modules/@material/radio/dist/mdc.radio";
 @import "node_modules/@material/checkbox/dist/mdc.checkbox";
+@import "node_modules/material-components-web/dist/material-components-web";
 @import "node_modules/spinkit/scss/spinners/7-three-bounce";
 @import "node_modules/spinkit/scss/spinners/10-fading-circle";
 @import "breakpoints";
@@ -36,6 +37,7 @@
 @import "embedly";
 @import "user-menu";
 @import "cropper";
+@import "drawer";
 
 body {
   font-family: 'Roboto', helvetica, arial, sans-serif !important;
@@ -49,64 +51,64 @@ body {
   width: 100%;
   min-height: 100vh;
 
+  .persistent-drawer-open + .content {
+    padding-left: 240px;
+  }
+
   .content {
-    @include breakpoint(desktop) {
-      display: flex;
-      flex-direction: row;
-      margin: auto;
-      max-width: 1400px;
-    }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: $toolbar-height-desktop;
 
-    .sidebar {
-      @include breakpoint(desktop) {
-        margin-top: 13px;
-        max-width: 300px;
-        margin-right: 0;
-        width: 23%;
-      }
-
-      @include breakpoint(mobile) {
-        margin: 5px 12px;
-      }
-
-      // left sidebar is always navigation, so hide it in mobile
-      &.sidebar-left {
-        @include breakpoint(mobile) {
-          display: none;
-        }
-      }
+    @include breakpoint(materialmobile) {
+      padding-top: $toolbar-height-mobile;
     }
 
     .main-content {
       margin-top: 20px;
       margin-bottom: 50px;
+      min-height: calc(100vh - #{$toolbar-height-desktop});
 
-      @include breakpoint(desktop) {
-        margin-left: auto;
-        margin-right: auto;
+      @include breakpoint(materialmobile) {
+        min-height: calc(100vh - #{$toolbar-height-mobile});
       }
 
-      @include breakpoint(mobile) {
-        margin: 10px 12px;
-      }
-    }
+      &.one-column {
+        width: 80%;
+        max-width: 950px;
 
-    // styles for only one sidebar being present
-    &.has-left-sidebar, &.has-right-sidebar {
-      .main-content {
-        @include breakpoint(desktop) {
-          margin-left: 1.5%;
-          margin-right: 1.5%;
-          width: 70%;
+        @include breakpoint(mobile) {
+          width: 90%;
+        }
+
+        @include breakpoint(phone) {
+          width: 95%;
         }
       }
-    }
 
-    // styles for both sidebars being present
-    &.has-left-sidebar.has-right-sidebar {
-      .main-content {
+      &.two-column {
+        display: flex;
+        width: 90%;
+
         @include breakpoint(desktop) {
-          width: 49.5%;
+          flex-direction: row;
+          justify-content: center;
+          margin-left: auto;
+          margin-right: auto;
+          max-width: 1300px;
+
+          > :first-child {
+            width: 66%;
+            margin-right: 20px;
+          }
+        }
+
+        @include breakpoint(mobile) {
+          flex-direction: column;
+        }
+        @include breakpoint(phone) {
+          width: 95%;
         }
       }
     }

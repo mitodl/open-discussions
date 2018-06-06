@@ -15,5 +15,9 @@
     @media (max-width: 580px) {
       @content;
     }
+  } @else if $name == materialmobile {
+    @media (max-width: 599px) {
+      @content;
+    }
   }
 }

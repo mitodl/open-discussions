@@ -4,12 +4,14 @@ import { assert } from "chai"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { INITIAL_UI_STATE } from "./ui"
 import {
-  SET_SHOW_DRAWER,
+  SET_SHOW_DRAWER_DESKTOP,
+  SET_SHOW_DRAWER_MOBILE,
   SET_SNACKBAR_MESSAGE,
   SHOW_DIALOG,
   HIDE_DIALOG,
   SET_SHOW_USER_MENU,
-  setShowDrawer,
+  setShowDrawerDesktop,
+  setShowDrawerMobile,
   setSnackbarMessage,
   showDialog,
   hideDialog,
@@ -33,11 +35,26 @@ describe("ui reducer", () => {
     assert.deepEqual(store.getState().ui, INITIAL_UI_STATE)
   })
 
-  it("should let you toggle sidebar visibility", async () => {
-    let state = await dispatchThen(setShowDrawer(true), [SET_SHOW_DRAWER])
-    assert.isTrue(state.showDrawer)
-    state = await dispatchThen(setShowDrawer(false), [SET_SHOW_DRAWER])
-    assert.isFalse(state.showDrawer)
+  it("should let you toggle desktop drawer visibility", async () => {
+    let state = await dispatchThen(setShowDrawerDesktop(true), [
+      SET_SHOW_DRAWER_DESKTOP
+    ])
+    assert.isTrue(state.showDrawerDesktop)
+    state = await dispatchThen(setShowDrawerDesktop(false), [
+      SET_SHOW_DRAWER_DESKTOP
+    ])
+    assert.isFalse(state.showDrawerDesktop)
+  })
+
+  it("should let you toggle mobile drawer visibility", async () => {
+    let state = await dispatchThen(setShowDrawerMobile(true), [
+      SET_SHOW_DRAWER_MOBILE
+    ])
+    assert.isTrue(state.showDrawerMobile)
+    state = await dispatchThen(setShowDrawerMobile(false), [
+      SET_SHOW_DRAWER_MOBILE
+    ])
+    assert.isFalse(state.showDrawerMobile)
   })
 
   it("should set snackbar message", async () => {

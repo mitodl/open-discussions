@@ -11,7 +11,7 @@ export default class Toolbar extends React.Component<*, void> {
   toolbar: Object
 
   props: {
-    toggleShowSidebar: Function,
+    toggleShowDrawer: (b: boolean) => void,
     toggleShowUserMenu: Function,
     showUserMenu: boolean,
     profile: Profile
@@ -29,7 +29,7 @@ export default class Toolbar extends React.Component<*, void> {
 
   render() {
     const {
-      toggleShowSidebar,
+      toggleShowDrawer,
       toggleShowUserMenu,
       showUserMenu,
       profile
@@ -43,7 +43,7 @@ export default class Toolbar extends React.Component<*, void> {
               <a
                 href="#"
                 className="material-icons mdc-toolbar__icon--menu"
-                onClick={toggleShowSidebar}
+                onClick={toggleShowDrawer}
               >
                 menu
               </a>

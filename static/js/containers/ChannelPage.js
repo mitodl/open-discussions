@@ -10,7 +10,7 @@ import Card from "../components/Card"
 import PostList from "../components/PostList"
 import withLoading from "../components/Loading"
 import PostListNavigation from "../components/PostListNavigation"
-import withNavAndChannelSidebars from "../hoc/withNavAndChannelSidebars"
+import withChannelSidebar from "../hoc/withChannelSidebar"
 import { PostSortPicker } from "../components/SortPicker"
 import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import {
@@ -223,6 +223,6 @@ const mapStateToProps = (state, ownProps) => {
 export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
-  withNavAndChannelSidebars("channel-page"),
+  withChannelSidebar("channel-page"),
   withLoading
 )(ChannelPage)

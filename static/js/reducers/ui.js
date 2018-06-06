@@ -2,7 +2,8 @@
 import R from "ramda"
 
 import {
-  SET_SHOW_DRAWER,
+  SET_SHOW_DRAWER_DESKTOP,
+  SET_SHOW_DRAWER_MOBILE,
   SET_SNACKBAR_MESSAGE,
   SHOW_DIALOG,
   HIDE_DIALOG,
@@ -19,17 +20,19 @@ export type SnackbarState = {
 }
 
 export type UIState = {
-  showDrawer: boolean,
+  showDrawerDesktop: boolean,
+  showDrawerMobile: boolean,
   snackbar: ?SnackbarState,
   dialogs: Set<string>,
   showUserMenu: boolean
 }
 
 export const INITIAL_UI_STATE: UIState = {
-  showDrawer:   false,
-  snackbar:     null,
-  dialogs:      new Set(),
-  showUserMenu: false
+  showDrawerDesktop: true,
+  showDrawerMobile:  false,
+  snackbar:          null,
+  dialogs:           new Set(),
+  showUserMenu:      false
 }
 
 // this generates a new sequential id for each snackbar state that is pushed
@@ -47,8 +50,10 @@ export const ui = (
   action: Action<any, null>
 ): UIState => {
   switch (action.type) {
-  case SET_SHOW_DRAWER:
-    return { ...state, showDrawer: action.payload }
+  case SET_SHOW_DRAWER_DESKTOP:
+    return { ...state, showDrawerDesktop: action.payload }
+  case SET_SHOW_DRAWER_MOBILE:
+    return { ...state, showDrawerMobile: action.payload }
   case SET_SNACKBAR_MESSAGE:
     return {
       ...state,

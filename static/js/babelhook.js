@@ -14,6 +14,7 @@ require("jsdom-global")(undefined, {
 // https://reactjs.org/docs/javascript-environment-requirements.html
 const { polyfill } = require("raf")
 polyfill(global)
+polyfill(window)
 
 // We need to explicitly change the URL when window.location is used
 const changeURL = require("jsdom/lib/old-api").changeURL

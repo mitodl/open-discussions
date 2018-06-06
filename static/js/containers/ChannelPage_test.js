@@ -265,6 +265,6 @@ describe("ChannelPage", () => {
       SET_CHANNEL_DATA
     ])
     assert.isFalse(wrapper.find(NotFound).exists())
-    assert.equal(wrapper.find(".main-content").text(), "Error loading page")
+    assert.include(wrapper.find(".main-content").text(), "Error loading page")
   })
 })

@@ -7,7 +7,7 @@ import qs from "query-string"
 import PostList from "../components/PostList"
 import Card from "../components/Card"
 import withLoading from "../components/Loading"
-import withNavSidebar from "../hoc/withNavSidebar"
+import withSingleColumn from "../hoc/withSingleColumn"
 import PostListNavigation from "../components/PostListNavigation"
 import { PostSortPicker } from "../components/SortPicker"
 import {
@@ -123,6 +123,6 @@ const mapStateToProps = (state, ownProps) => {
 export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
-  withNavSidebar("home-page"),
+  withSingleColumn("home-page"),
   withLoading
 )(HomePage)

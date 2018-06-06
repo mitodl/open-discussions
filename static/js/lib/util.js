@@ -93,3 +93,9 @@ export function isProfileComplete(profile: Profile): boolean {
   }
   return false
 }
+
+export const getViewportWidth = () => window.innerWidth
+
+export const DRAWER_BREAKPOINT = 950
+
+export const isMobileWidth = () => getViewportWidth() < DRAWER_BREAKPOINT

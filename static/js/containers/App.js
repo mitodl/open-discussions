@@ -21,9 +21,14 @@ import Toolbar from "../components/Toolbar"
 import Footer from "../components/Footer"
 
 import { actions } from "../actions"
-import { setShowDrawer, setShowUserMenu } from "../actions/ui"
+import {
+  setShowDrawerMobile,
+  setShowDrawerDesktop,
+  setShowUserMenu
+} from "../actions/ui"
 import { setChannelData } from "../actions/channel"
 import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
+import { isMobileWidth } from "../lib/util"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -34,16 +39,21 @@ class App extends React.Component<*, void> {
   props: {
     match: Match,
     location: Location,
-    showDrawer: boolean,
+    showDrawerDesktop: boolean,
+    showDrawerMobile: boolean,
     snackbar: SnackbarState,
     dispatch: Dispatch,
     showUserMenu: boolean,
     profile: Profile
   }
 
-  toggleShowSidebar = () => {
-    const { dispatch, showDrawer } = this.props
-    dispatch(setShowDrawer(!showDrawer))
+  toggleShowDrawer = () => {
+    const { dispatch, showDrawerMobile, showDrawerDesktop } = this.props
+    dispatch(
+      isMobileWidth()
+        ? setShowDrawerMobile(!showDrawerMobile)
+        : setShowDrawerDesktop(!showDrawerDesktop)
+    )
   }
 
   toggleShowUserMenu = () => {
@@ -71,7 +81,8 @@ class App extends React.Component<*, void> {
 
   componentDidUpdate(prevProps) {
     const {
-      location: { pathname }
+      location: { pathname },
+      showDrawerMobile
     } = this.props
 
     if (
@@ -79,6 +90,14 @@ class App extends React.Component<*, void> {
       prevProps.location.pathname.startsWith(SETTINGS_URL)
     ) {
       this.loadData()
+    }
+
+    if (
+      pathname !== prevProps.location.pathname &&
+      showDrawerMobile &&
+      isMobileWidth()
+    ) {
+      this.toggleShowDrawer()
     }
   }
 
@@ -112,17 +131,17 @@ class App extends React.Component<*, void> {
     }
 
     return (
-      <div>
-        <div className="app">
-          <DocumentTitle title="MIT Open Discussions" />
-          <Snackbar snackbar={snackbar} />
-          <Toolbar
-            toggleShowSidebar={this.toggleShowSidebar}
-            toggleShowUserMenu={this.toggleShowUserMenu}
-            showUserMenu={showUserMenu}
-            profile={profile}
-          />
-          <Drawer />
+      <div className="app">
+        <DocumentTitle title="MIT Open Discussions" />
+        <Snackbar snackbar={snackbar} />
+        <Toolbar
+          toggleShowDrawer={this.toggleShowDrawer}
+          toggleShowUserMenu={this.toggleShowUserMenu}
+          showUserMenu={showUserMenu}
+          profile={profile}
+        />
+        <Drawer />
+        <div className="content">
           <Route exact path={match.url} component={HomePage} />
           <Route
             path={`${match.url}moderation/channel/:channelName`}
@@ -166,8 +185,8 @@ class App extends React.Component<*, void> {
             path={`${match.url}profile/:userName/`}
             component={ProfilePage}
           />
+          <Footer />
         </div>
-        <Footer />
       </div>
     )
   }
@@ -176,10 +195,16 @@ class App extends React.Component<*, void> {
 export default connect(state => {
   const {
     profiles,
-    ui: { showDrawer, snackbar, showUserMenu }
+    ui: { showDrawerMobile, showDrawerDesktop, snackbar, showUserMenu }
   } = state
   const profile = SETTINGS.username
     ? profiles.data.get(SETTINGS.username)
     : null
-  return { showDrawer, snackbar, showUserMenu, profile }
+  return {
+    showDrawerMobile,
+    showDrawerDesktop,
+    snackbar,
+    showUserMenu,
+    profile
+  }
 })(App)

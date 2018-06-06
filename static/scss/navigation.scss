@@ -1,14 +1,18 @@
+a.mitlogo {
+  img {
+    width: 46px;
+  }
+}
+
 .navbar {
   .mdc-toolbar {
     background-color: #fff;
     box-shadow: 0px 4px 6px -3px rgba(0, 0, 0, 0.2);
+    z-index: 4;
+    position: fixed;
 
     a.mitlogo {
       padding: 16px 0 16px 12px;
-
-      img {
-        width: 46px;
-      }
     }
 
     .mdc-toolbar__title, .mdc-toolbar__title a {
@@ -18,22 +22,12 @@
   }
 
   .mdc-toolbar__icon--menu {
-    color: #a31f34;
+    color: $brand-bg;
   }
 
   .user-menu-section {
     flex-grow: unset;
     height: 49px;
-  }
-
-  @include breakpoint(desktop) {
-    .mdc-toolbar__icon--menu {
-      display: none;
-    }
-
-    .mdc-toolbar a.mitlogo {
-      padding-left: 32px;
-    }
   }
 }
 

@@ -6,8 +6,11 @@ import { createMemoryHistory } from "history"
 import configureTestStore from "redux-asserts"
 
 import Router, { routes } from "../Router"
+
 import * as api from "../lib/api"
 import rootReducer from "../reducers"
+import * as utilFuncs from "../lib/util"
+
 import type { Sandbox } from "../flow/sinonTypes"
 
 export default class IntegrationTestHelper {
@@ -46,6 +49,9 @@ export default class IntegrationTestHelper {
     this.browserHistory.listen(url => {
       this.currentLocation = url
     })
+    this.getViewportWidthStub = this.sandbox
+      .stub(utilFuncs, "getViewportWidth")
+      .returns(700)
   }
 
   cleanup() {

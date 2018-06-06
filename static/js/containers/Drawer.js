@@ -1,105 +1,129 @@
 // @flow
 import React from "react"
-import { connect } from "react-redux"
-import { MDCTemporaryDrawer } from "@material/drawer/dist/mdc.drawer"
-import { withRouter } from "react-router"
 import R from "ramda"
+import { connect } from "react-redux"
+import { withRouter } from "react-router"
+import { Drawer, DrawerContent } from "rmwc/Drawer"
+import { Theme } from "rmwc/Theme"
 
 import Navigation from "../components/Navigation"
 
-import { setShowDrawer } from "../actions/ui"
+import { setShowDrawerMobile, setShowDrawerDesktop } from "../actions/ui"
 import { getSubscribedChannels } from "../lib/redux_selectors"
+import { getViewportWidth, isMobileWidth, DRAWER_BREAKPOINT } from "../lib/util"
 
 import type { Dispatch } from "redux"
 import type { Channel } from "../flow/discussionTypes"
 import type { Location } from "react-router"
 
-// see https://github.com/mitodl/open-discussions/issues/295
-if (!MDCTemporaryDrawer.prototype.getDefaultFoundation_) {
-  MDCTemporaryDrawer.prototype.getDefaultFoundation_ =
-    MDCTemporaryDrawer.prototype.getDefaultFoundation
-  MDCTemporaryDrawer.prototype.getDefaultFoundation = function() {
-    const foundation = this.getDefaultFoundation_()
-
-    foundation.drawerClickHandler_ = e => {
-      if (e.target.tagName !== "A") {
-        e.stopPropagation()
-      }
-    }
-    return foundation
-  }
+type DrawerPropsFromState = {
+  showDrawerDesktop: boolean,
+  showDrawerMobile: boolean,
+  subscribedChannels: Array<Channel>
 }
 
-class Drawer extends React.Component<*, void> {
-  // the ref for the rendered DOM element, which MDCTemporaryDrawer needs
-  // access to in order to manage it's animations and so on
-  drawerRoot: HTMLElement | null
-  mdcDrawer: Object
+type DrawerProps = DrawerPropsFromState & {
+  location: Location,
+  dispatch: Dispatch<*>
+}
 
-  props: {
-    location: Location,
-    dispatch: Dispatch<*>,
-    showDrawer: boolean,
-    subscribedChannels: Array<Channel>
+export class ResponsiveDrawer extends React.Component<DrawerProps, *> {
+  width: number
+
+  constructor(props: DrawerProps) {
+    super(props)
+    this.width = getViewportWidth()
   }
 
   componentDidMount() {
-    this.mdcDrawer = new MDCTemporaryDrawer(this.drawerRoot)
-    this.mdcDrawer.listen("MDCTemporaryDrawer:close", this.onDrawerClose)
+    window.addEventListener("resize", () => this.onResize())
+  }
+
+  onResize() {
+    const { showDrawerMobile, dispatch } = this.props
+    const newWidth = getViewportWidth()
+
+    if (
+      newWidth > this.width &&
+      newWidth > DRAWER_BREAKPOINT &&
+      this.width < DRAWER_BREAKPOINT &&
+      showDrawerMobile
+    ) {
+      dispatch(setShowDrawerMobile(false))
+    }
+
+    this.width = newWidth
+
+    // this setState call forces a re-render of the component
+    // to ensure that the drawer is responsive
+    this.setState({})
   }
 
   onDrawerClose = () => {
-    const { dispatch, showDrawer } = this.props
+    const { dispatch } = this.props
 
-    // two MDCTemporaryDrawer:close events seem to fire when the drawer
-    // closes, so this is a little hack to debounce that.
-    if (showDrawer) {
-      dispatch(setShowDrawer(false))
+    if (isMobileWidth()) {
+      dispatch(setShowDrawerMobile(false))
+    } else {
+      dispatch(setShowDrawerDesktop(false))
     }
-  }
-
-  componentWillUnmount() {
-    if (this.mdcDrawer) {
-      this.mdcDrawer.destroy()
-    }
-  }
-
-  componentDidUpdate() {
-    const { showDrawer } = this.props
-    this.mdcDrawer.open = showDrawer
   }
 
   render() {
     const {
+      showDrawerDesktop,
+      showDrawerMobile,
       subscribedChannels,
       location: { pathname }
     } = this.props
+    const isMobile = isMobileWidth()
+
+    const wrappingClass =
+      !isMobile && showDrawerDesktop ? "persistent-drawer-open" : ""
 
     return (
-      <aside
-        className="mdc-temporary-drawer mdc-typography"
-        ref={div => (this.drawerRoot = div)}
-      >
-        <nav className="mdc-temporary-drawer__drawer">
-          <nav className="mdc-temporary-drawer__content mdc-list">
-            <Navigation
-              subscribedChannels={subscribedChannels}
-              pathname={pathname}
-            />
-          </nav>
-        </nav>
-      </aside>
+      <div className={wrappingClass}>
+        <Theme>
+          <Drawer
+            persistent={!isMobile}
+            temporary={isMobile}
+            open={isMobile ? showDrawerMobile : showDrawerDesktop}
+            onClose={this.onDrawerClose}
+          >
+            <DrawerContent>
+              {isMobile ? (
+                <div className="drawer-mobile-header">
+                  <a
+                    href="#"
+                    className="material-icons"
+                    onClick={this.onDrawerClose}
+                  >
+                    menu
+                  </a>
+                  <a href="http://www.mit.edu" className="mitlogo">
+                    <img src="/static/images/mit-logo-transparent3.svg" />
+                  </a>
+                </div>
+              ) : null}
+              <Navigation
+                subscribedChannels={subscribedChannels}
+                pathname={pathname}
+              />
+            </DrawerContent>
+          </Drawer>
+        </Theme>
+      </div>
     )
   }
 }
 
-const mapStateToProps = state => ({
+export const mapStateToProps = (state: Object): DrawerPropsFromState => ({
   subscribedChannels: getSubscribedChannels(state),
-  channels:           state.channels,
-  showDrawer:         state.ui.showDrawer
+  showDrawerDesktop:  state.ui.showDrawerDesktop,
+  showDrawerMobile:   state.ui.showDrawerMobile
 })
 
 export default R.compose(
   connect(mapStateToProps),
   withRouter
-)(Drawer)
+)(ResponsiveDrawer)

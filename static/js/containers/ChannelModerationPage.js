@@ -16,7 +16,7 @@ import {
   commentModerationSelector
 } from "../hoc/withCommentModeration"
 import withLoading from "../components/Loading"
-import withNavAndChannelSidebars from "../hoc/withNavAndChannelSidebars"
+import withChannelSidebar from "../hoc/withChannelSidebar"
 import CompactPostDisplay from "../components/CompactPostDisplay"
 import CommentTree from "../components/CommentTree"
 import { ChannelModerationBreadcrumbs } from "../components/ChannelBreadcrumbs"
@@ -118,6 +118,6 @@ export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
   withCommentModeration,
-  withNavAndChannelSidebars("channel-moderation-page"),
+  withChannelSidebar("channel-moderation-page"),
   withLoading
 )(ChannelModerationPage)

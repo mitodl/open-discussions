@@ -14,7 +14,7 @@ import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"
 import ReportForm from "../components/ReportForm"
 import { ReplyToPostForm } from "../components/CommentForms"
-import withNavSidebar from "../hoc/withNavSidebar"
+import withSingleColumn from "../hoc/withSingleColumn"
 import {
   withPostModeration,
   postModerationSelector
@@ -504,6 +504,6 @@ export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
   withCommentModeration,
-  withNavSidebar("post-page"),
+  withSingleColumn("post-page"),
   withLoading
 )(PostPage)
