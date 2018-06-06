@@ -9,7 +9,7 @@ from profiles.utils import (
     profile_image_upload_uri,
     profile_image_upload_uri_medium,
     profile_image_upload_uri_small,
-    default_profile_image, image_uri)
+    default_profile_image, image_uri,
     make_thumbnail)
 
 # Max dimension of either height or width for small and medium images
