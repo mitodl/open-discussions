@@ -17,7 +17,7 @@ from search.task_helpers import (
     decrement_post_comment_count,
     update_indexed_score,
 )
-from search.indexing_api import gen_post_id
+from search.api import gen_post_id
 
 
 @pytest.fixture(autouse=True)
@@ -76,6 +76,7 @@ def test_index_full_post(mocker, reddit_submission_obj):
     assert patched_task.delay.call_args[0] == (
         gen_post_id(reddit_submission_obj.id),
         {
+            '_id': gen_post_id(reddit_submission_obj.id),
             'object_type': POST_TYPE,
             'post_id': reddit_submission_obj.id,
             'author': reddit_submission_obj.author.name,

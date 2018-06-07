@@ -12,7 +12,7 @@ from channels.constants import (
     POST_TYPE,
     VoteActions,
 )
-from search.indexing_api import gen_post_id
+from search.api import gen_post_id
 from search.serializers import serialize_post
 from search.tasks import (
     create_document,

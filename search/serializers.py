@@ -3,6 +3,11 @@ from channels.constants import (
     POST_TYPE,
     COMMENT_TYPE,
 )
+from search.api import (
+    get_reddit_object_type,
+    gen_post_id,
+    gen_comment_id,
+)
 
 
 def _serialize_comment_tree(comments):
@@ -39,6 +44,7 @@ def serialize_post(post_obj):
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
     return {
+        '_id': gen_post_id(post_obj.id),
         'object_type': POST_TYPE,
         'author': post_obj.author.name,
         'channel_title': post_obj.subreddit.display_name,
@@ -49,11 +55,6 @@ def serialize_post(post_obj):
         'post_title': post_obj.title,
         'num_comments': post_obj.num_comments,
     }
-
-
-def get_reddit_object_type(reddit_obj):
-    """Return the type of the given reddit object"""
-    return COMMENT_TYPE if hasattr(reddit_obj, 'submission') else POST_TYPE
 
 
 def serialize_comment(comment_obj):
@@ -68,6 +69,7 @@ def serialize_comment(comment_obj):
     parent_comment_id = None if get_reddit_object_type(parent_comment) != COMMENT_TYPE else parent_comment.id
 
     return {
+        '_id': gen_comment_id(comment_obj.id),
         'object_type': COMMENT_TYPE,
         'author': comment_obj.author.name,
         'channel_title': comment_obj.subreddit.display_name,
