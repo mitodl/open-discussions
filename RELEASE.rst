@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.30.0
+--------------
+
+- Remove redundant profile image and move &#39;incomplete&#39; dot
+- Fix iframe styling issue
+- Fix link post creation preview message bug
+- Red dot next to incomplete profiles (#712)
+- Fix for non-breaking code text in discussions (#753)
+- Aptfile for heroku (#756)
+- SAML login support (#735)
+
 Version 0.29.1
 --------------
 
