@@ -39,7 +39,7 @@ import {
 } from "../factories/comments"
 import { makeReportRecord } from "../factories/reports"
 import { COMMENT_SORT_NEW } from "../lib/sorting"
-import * as authFuncs from "./auth"
+import * as authFuncs from "./fetch_auth"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this

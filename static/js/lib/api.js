@@ -10,7 +10,7 @@ import {
   fetchJSONWithAuthFailure,
   fetchWithAuthFailure,
   fetchJSONWithToken
-} from "./auth"
+} from "./fetch_auth"
 import { toQueryString } from "../lib/url"
 import { getPaginationSortParams } from "../lib/posts"
 

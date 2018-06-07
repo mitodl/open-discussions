@@ -4,7 +4,7 @@ import sinon from "sinon"
 import fetchMock from "fetch-mock/src/server"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
-import * as auth from "./auth"
+import * as auth from "./fetch_auth"
 
 import { AUTH_REQUIRED_URL } from "./url"
 
