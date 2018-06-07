@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.30.1
+--------------
+
+- Refactored lib/auth*.js files
+- Update to latest version of React and a few other packages
+- Remove authentication requirement for viewing SAML metadata (#773)
+
 Version 0.30.0
 --------------
 
