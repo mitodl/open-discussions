@@ -96,7 +96,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
 
 def saml_metadata(request):
     """ Display SAML configuration metadata as XML """
-    if not request.user.is_superuser or not features.is_enabled(features.SAML_AUTH):
+    if not features.is_enabled(features.SAML_AUTH):
         raise Http404("Page not found")
     complete_url = reverse('social:complete', args=("saml", ))
     saml_backend = load_backend(

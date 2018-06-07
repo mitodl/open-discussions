@@ -5,7 +5,6 @@ import json
 import xml.etree.ElementTree as etree
 
 import pytest
-from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework_jwt.settings import api_settings
 
@@ -137,8 +136,7 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
 
 
 @pytest.mark.parametrize('is_enabled', [True, False])
-@pytest.mark.parametrize('is_superuser', [True, False])
-def test_saml_metadata(settings, client, is_enabled, is_superuser):
+def test_saml_metadata(settings, client, user, is_enabled):
     """Test that SAML metadata page renders or returns a 404"""
     settings.FEATURES[SAML_AUTH] = is_enabled
     if is_enabled:
@@ -150,11 +148,10 @@ def test_saml_metadata(settings, client, is_enabled, is_superuser):
         settings.SOCIAL_AUTH_SAML_SUPPORT_CONTACT = {"givenName": "TestName", "emailAddress": "test@example.com"}
         settings.SOCIAL_AUTH_SAML_SP_EXTRA = {"assertionConsumerService": {"url": "http://mit.edu"}}
 
-    user = User.objects.create(is_superuser=is_superuser)
     client.force_login(user)
     response = client.get(reverse("saml-metadata"))
 
-    if is_enabled and is_superuser:
+    if is_enabled:
         root = etree.fromstring(response.content)
         assert root.tag == '{urn:oasis:names:tc:SAML:2.0:metadata}EntityDescriptor'
         assert response.status_code == 200
