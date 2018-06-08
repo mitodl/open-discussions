@@ -80,7 +80,7 @@ class Profile(models.Model):
         """Update thumbnails if necessary"""
         if update_image:
             if self.image_file:
-                small_thumbnail = make_thumbnail(self.image_file.file, IMAGE_SMALL_MAX_DIMENSION)
+                small_thumbnail = make_thumbnail(self.image_file, IMAGE_SMALL_MAX_DIMENSION)
                 medium_thumbnail = make_thumbnail(self.image_file, IMAGE_MEDIUM_MAX_DIMENSION)
 
                 # name doesn't matter here, we use upload_to to produce that
