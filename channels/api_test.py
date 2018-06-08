@@ -46,6 +46,34 @@ def mock_client(mock_get_client):
     return mock_get_client.return_value
 
 
+@pytest.mark.parametrize('vote_func', [api.apply_post_vote, api.apply_comment_vote])
+@pytest.mark.parametrize('request_data,likes_value,expected_instance_vote_func', [
+    ({'upvoted': True}, None, 'upvote'),
+    ({'upvoted': True}, False, 'upvote'),
+    ({'downvoted': True}, None, 'downvote'),
+    ({'downvoted': True}, True, 'downvote'),
+    ({'upvoted': False}, True, 'clear_vote'),
+    ({'downvoted': False}, False, 'clear_vote'),
+    ({'upvoted': True}, True, None),
+    ({'upvoted': False}, False, None),
+    ({'downvoted': True}, False, None),
+    ({'downvoted': False}, True, None),
+])
+def test_apply_vote(mocker, vote_func, request_data, likes_value, expected_instance_vote_func):
+    """
+    Tests that the functions to apply an upvote/downvote behave appropriately given
+    the voting request and the current state of upvotes/downvotes for the user.
+    """
+    mocker.patch('channels.api.update_indexed_score')
+    mock_instance = mocker.Mock(likes=likes_value)
+    vote_result = vote_func(mock_instance, request_data, allow_downvote=True)
+    expected_vote_success = expected_instance_vote_func is not None
+    assert vote_result is expected_vote_success
+    if expected_vote_success:
+        expected_vote_func = getattr(mock_instance, expected_instance_vote_func)
+        assert expected_vote_func.call_count == 1
+
+
 @pytest.mark.parametrize('vote_func,expected_allowed_downvote,expected_instance_type', [
     (api.apply_post_vote, False, POST_TYPE),
     (api.apply_comment_vote, True, COMMENT_TYPE),
