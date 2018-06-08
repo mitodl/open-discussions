@@ -1,6 +1,9 @@
 """User fixtures"""
 # pylint: disable=unused-argument, redefined-outer-name
+from io import BytesIO
+
 import pytest
+from PIL import Image
 from rest_framework.test import APIClient
 from rest_framework_jwt.settings import api_settings
 
@@ -85,3 +88,13 @@ def staff_client(client, staff_user):
 def authenticated_site(db, settings):
     """The authenticated site"""
     return AuthenticatedSiteFactory.create(key=settings.OPEN_DISCUSSIONS_DEFAULT_SITE_KEY)
+
+
+@pytest.fixture
+def profile_image():
+    """ Create a PNG image """
+    image_file = BytesIO()
+    image = Image.new('RGBA', size=(250, 250), color=(256, 0, 0))
+    image.save(image_file, 'png')
+    image_file.seek(0)
+    return image_file
