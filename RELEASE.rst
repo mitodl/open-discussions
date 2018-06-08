@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.30.2
+--------------
+
+- Fixed faulty downvote logic and added tests
+
 Version 0.30.1
 --------------
 
