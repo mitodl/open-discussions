@@ -9,7 +9,10 @@ import pytest
 from channels.constants import POSTS_SORT_NEW
 from channels.utils import ListingParams
 from open_discussions.test_utils import assert_not_raises
-from search.exceptions import RetryException
+from search.exceptions import (
+    ReindexException,
+    RetryException,
+)
 from search.tasks import (
     create_document,
     update_document_with_partial,
@@ -113,16 +116,23 @@ def test_wrap_retry_exception_matching(matching):
             raise_thing()
 
 
-def test_index_post_with_comments(mocker, wrap_retry_mock):  # pylint: disable=unused-argument
+@pytest.mark.parametrize("with_error", [True, False])
+def test_index_post_with_comments(mocker, wrap_retry_mock, with_error):  # pylint: disable=unused-argument
     """index_post should call the api function of the same name"""
     index_post_mock = mocker.patch('search.indexing_api.index_post_with_comments')
+    if with_error:
+        index_post_mock.side_effect = TabError
     post_id = 'post_id'
-    index_post_with_comments.delay(post_id)
+    result = index_post_with_comments.delay(post_id).get()
+    assert result == ('index_post_with_comments threw an error on post post_id' if with_error else None)
 
     index_post_mock.assert_called_once_with(post_id)
 
 
-def test_index_channel(mocker, mocked_celery, wrap_retry_mock, settings, user):  # pylint: disable=unused-argument
+@pytest.mark.parametrize("with_error", [True, False])
+def test_index_channel(
+        mocker, mocked_celery, wrap_retry_mock, settings, user, with_error,
+):  # pylint: disable=unused-argument,too-many-arguments
     """index_channel should index all posts of a channel"""
     settings.INDEXING_API_USERNAME = user.username
     index_post_mock = mocker.patch('search.tasks.index_post_with_comments', autospec=True)
@@ -132,8 +142,7 @@ def test_index_channel(mocker, mocked_celery, wrap_retry_mock, settings, user): 
     posts = [mocker.Mock(id=num) for num in (1, 2)]
     list_posts_mock.return_value = posts
     channel_name = 'channel'
-    with pytest.raises(mocked_celery.replace_exception_class):
-        index_channel.delay(channel_name)
+    assert index_channel.delay(channel_name).get() == f'index_channel threw an error on channel {channel_name}'
 
     api_mock.assert_called_once_with(user)
     list_posts_mock.assert_called_once_with(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
@@ -169,7 +178,7 @@ def test_start_recreate_index(mocker, mocked_celery, settings, user):
         start_recreate_index.delay()
 
     create_backing_index_mock.assert_called_once_with()
-    finish_recreate_index_mock.si.assert_called_once_with(backing_index)
+    finish_recreate_index_mock.s.assert_called_once_with(backing_index)
     assert mocked_celery.group.call_count == 1
 
     # Celery's 'group' function takes a generator as an argument. In order to make assertions about the items
@@ -179,18 +188,25 @@ def test_start_recreate_index(mocker, mocked_celery, settings, user):
         index_channel_mock.si.assert_any_call(name)
         mocked_celery.chain.assert_called_once_with(
             mocked_celery.group.return_value,
-            finish_recreate_index_mock.si.return_value,
+            finish_recreate_index_mock.s.return_value,
         )
     assert mocked_celery.replace.call_count == 1
     assert mocked_celery.replace.call_args[0][1] == mocked_celery.chain.return_value
 
 
-def test_finish_recreate_index(mocker):
+@pytest.mark.parametrize('with_error', [True, False])
+def test_finish_recreate_index(mocker, with_error):
     """
     finish_recreate_index should attach the backing index to the default alias
     """
     backing_index = 'backing'
+    results = ['error'] if with_error else []
     switch_indices_mock = mocker.patch('search.indexing_api.switch_indices', autospec=True)
-    finish_recreate_index.delay(backing_index)
 
-    switch_indices_mock.assert_called_once_with(backing_index)
+    if with_error:
+        with pytest.raises(ReindexException):
+            finish_recreate_index.delay(results, backing_index)
+        assert switch_indices_mock.call_count == 0
+    else:
+        finish_recreate_index.delay(results, backing_index)
+        switch_indices_mock.assert_called_once_with(backing_index)

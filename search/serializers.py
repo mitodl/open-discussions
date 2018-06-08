@@ -46,7 +46,7 @@ def serialize_post(post_obj):
     return {
         '_id': gen_post_id(post_obj.id),
         'object_type': POST_TYPE,
-        'author': post_obj.author.name,
+        'author': post_obj.author.name if post_obj.author else None,
         'channel_title': post_obj.subreddit.display_name,
         'text': post_obj.selftext,
         'score': post_obj.score,
@@ -71,7 +71,7 @@ def serialize_comment(comment_obj):
     return {
         '_id': gen_comment_id(comment_obj.id),
         'object_type': COMMENT_TYPE,
-        'author': comment_obj.author.name,
+        'author': comment_obj.author.name if comment_obj.author else None,
         'channel_title': comment_obj.subreddit.display_name,
         'text': comment_obj.body,
         'score': comment_obj.score,

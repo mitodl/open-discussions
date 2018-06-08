@@ -2,6 +2,7 @@
 from contextlib import contextmanager
 
 import celery
+from celery.exceptions import Ignore
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -12,8 +13,12 @@ from prawcore.exceptions import PrawcoreException
 from channels.constants import POSTS_SORT_NEW
 from channels.utils import ListingParams
 from open_discussions.celery import app
+from open_discussions.utils import merge_strings
 from search import indexing_api as api
-from search.exceptions import RetryException
+from search.exceptions import (
+    RetryException,
+    ReindexException,
+)
 
 
 User = get_user_model()
@@ -74,8 +79,17 @@ def index_post_with_comments(post_id):
     Args:
         post_id (str): The post string
     """
-    with wrap_retry_exception(PrawcoreException, PRAWException):
-        api.index_post_with_comments(post_id)
+    try:
+        with wrap_retry_exception(PrawcoreException, PRAWException):
+            api.index_post_with_comments(post_id)
+    except RetryException:
+        raise
+    except Ignore:
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_post_with_comments threw an error on post {post_id}"
+        log.exception(error)
+        return error
 
 
 @app.task(bind=True, autoretry_for=(RetryException, ), retry_backoff=True, rate_limit='600/m')
@@ -86,17 +100,26 @@ def index_channel(self, channel_name):
     Args:
         channel_name (str): The name of the channel
     """
-    with wrap_retry_exception(PrawcoreException, PRAWException):
-        from channels.api import Api
+    try:
+        with wrap_retry_exception(PrawcoreException, PRAWException):
+            from channels.api import Api
 
-        client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
-        posts = client.list_posts(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
+            client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
+            posts = client.list_posts(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
 
         raise self.replace(
             celery.group(
                 index_post_with_comments.si(post.id) for post in posts
             )
         )
+    except RetryException:
+        raise
+    except Ignore:
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_channel threw an error on channel {channel_name}"
+        log.exception(error)
+        return error
 
 
 @app.task(bind=True)
@@ -104,37 +127,47 @@ def start_recreate_index(self):
     """
     Wipe and recreate index and mapping, and index all items.
     """
-    from channels.api import Api
-    user = User.objects.get(username=settings.INDEXING_API_USERNAME)
+    try:
+        from channels.api import Api
+        user = User.objects.get(username=settings.INDEXING_API_USERNAME)
 
-    new_backing_index = api.create_backing_index()
+        new_backing_index = api.create_backing_index()
 
-    # Do the indexing on the temp index
-    log.info("starting to index all channels, posts and comments...")
+        # Do the indexing on the temp index
+        log.info("starting to index all channels, posts and comments...")
 
-    client = Api(user)
-    channel_names = [channel.display_name for channel in client.list_channels()]
-    index_channels = celery.group(
-        index_channel.si(channel_name) for channel_name in channel_names
-    )
+        client = Api(user)
+        channel_names = [channel.display_name for channel in client.list_channels()]
+        index_channels = celery.group(
+            index_channel.si(channel_name) for channel_name in channel_names
+        )
+    except:  # pylint: disable=bare-except
+        error = "start_recreate_index threw an error"
+        log.exception(error)
+        return error
 
     # Use self.replace so that code waiting on this task will also wait on the indexing and finish tasks
     raise self.replace(
         celery.chain(
             index_channels,
-            finish_recreate_index.si(new_backing_index),
+            finish_recreate_index.s(new_backing_index),
         )
     )
 
 
 @app.task
-def finish_recreate_index(backing_index):
+def finish_recreate_index(results, backing_index):
     """
     Swap reindex backing index with default backing index
 
     Args:
+        results (list or bool): Results saying whether the error exists
         backing_index (str): The backing elasticsearch index
     """
+    errors = merge_strings(results)
+    if errors:
+        raise ReindexException(f"Errors occurred during recreate_index: {errors}")
+
     log.info("Done with temporary index. Pointing default aliases to newly created backing indexes...")
     api.switch_indices(backing_index)
     log.info("recreate_index has finished successfully!")

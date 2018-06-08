@@ -93,3 +93,34 @@ def chunks(iterable, chunk_size=20):
     while len(chunk) > 0:
         yield chunk
         chunk = list(islice(iterable, chunk_size))
+
+
+def merge_strings(list_or_str):
+    """
+    Recursively go through through nested lists of strings and merge into a flattened list.
+
+    Args:
+        list_or_str (any): A list of strings or a string
+
+    Returns:
+        list of str: A list of strings
+    """
+
+    list_to_return = []
+    _merge_strings(list_or_str, list_to_return)
+    return list_to_return
+
+
+def _merge_strings(list_or_str, list_to_return):
+    """
+    Recursively go through through nested lists of strings and merge into a flattened list.
+
+    Args:
+        list_or_str (any): A list of strings or a string
+        list_to_return (list of str): The list the strings will be added to
+    """
+    if isinstance(list_or_str, list):
+        for item in list_or_str:
+            _merge_strings(item, list_to_return)
+    elif list_or_str is not None:
+        list_to_return.append(list_or_str)

@@ -2,6 +2,7 @@
 import datetime
 from math import ceil
 
+import pytest
 import pytz
 
 from open_discussions.utils import (
@@ -9,6 +10,7 @@ from open_discussions.utils import (
     is_near_now,
     normalize_to_start_of_day,
     chunks,
+    merge_strings,
 )
 
 
@@ -74,3 +76,15 @@ def test_chunks_iterable():
     for chunk in chunk_output:
         range_list += chunk
     assert range_list == list(range(count))
+
+
+@pytest.mark.parametrize("list_or_string,output", [
+    ['str', ['str']],
+    [['str', None, [None]], ['str']],
+    [[['a'], 'b', ['c', 'd'], 'e'], ['a', 'b', 'c', 'd', 'e']],
+])
+def test_merge_strings(list_or_string, output):
+    """
+    merge_strings should flatten a nested list of strings
+    """
+    assert merge_strings(list_or_string) == output
