@@ -325,7 +325,7 @@ def _apply_vote(instance, validated_data, allow_downvote=False, instance_type=No
 
     if vote_action == VoteActions.UPVOTE:
         instance.upvote()
-    elif vote_action == VoteActions.UPVOTE:
+    elif vote_action == VoteActions.DOWNVOTE:
         instance.downvote()
     elif vote_action in (VoteActions.CLEAR_UPVOTE, VoteActions.CLEAR_DOWNVOTE):
         instance.clear_vote()
