@@ -194,6 +194,10 @@
       "description": "SAML Service Provider technical/support contact name",
       "required": false
     },
+    "SOCIAL_AUTH_SAML_SECURITY_ENCRYPTED": {
+      "description": "Require encrypted assertions for SAML Service Provider",
+      "required": false
+    },
     "SOCIAL_AUTH_SAML_IDP_ENTITY_ID": {
       "description": "SAML Identity Provider EntityID",
       "required": false
