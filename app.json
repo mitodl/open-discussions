@@ -65,6 +65,9 @@
       "description": "Email address used with bcc email",
       "required": false
     },
+    "MAILGUN_SENDER_DOMAIN": {
+      "description": "Domain used for emails sent via mailgun"
+    },
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
     },
