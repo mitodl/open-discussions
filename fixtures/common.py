@@ -69,14 +69,15 @@ def session_indexing_decorator():
     when a module is loaded. To get around this, we patch the decorator function then
     reload the relevant modules via importlib.
     """
-    mock_func = Mock()
+    mock_indexer_func = Mock()
 
-    def dummy_decorator(**kwargs):  # pylint: disable=unused-argument
+    def dummy_decorator(indexing_func=None):  # pylint: disable=unused-argument
         """A decorator that calls a mock before calling the wrapped function"""
         def dummy_decorator_inner(func):  # pylint: disable=missing-docstring
             @wraps(func)
             def wrapped_api_func(*args, **kwargs):  # pylint: disable=missing-docstring
-                mock_func(*args, **kwargs)
+                mock_indexer_func.original = indexing_func
+                mock_indexer_func(*args, **kwargs)
                 return func(*args, **kwargs)
             return wrapped_api_func
         return dummy_decorator_inner
@@ -88,7 +89,7 @@ def session_indexing_decorator():
     importlib.reload(channels.factories)
     importlib.reload(channels.api)
     importlib.reload(channels.serializers)
-    yield SimpleNamespace(patch=patched_decorator, mock_indexing_func=mock_func)
+    yield SimpleNamespace(patch=patched_decorator, mock_indexer_func=mock_indexer_func)
 
 
 @pytest.fixture()
@@ -98,5 +99,5 @@ def indexing_decorator(session_indexing_decorator):
     This can be used if there is a need to test whether or not a function is wrapped in the
     indexing decorator.
     """
-    session_indexing_decorator.mock_indexing_func.reset_mock()
+    session_indexing_decorator.mock_indexer_func.reset_mock()
     yield session_indexing_decorator

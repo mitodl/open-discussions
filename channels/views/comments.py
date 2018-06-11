@@ -171,10 +171,14 @@ class CommentDetailView(APIView):
             'view': self,
         }
 
+    @property
+    def api(self):
+        """Returns a Channel API object"""
+        return Api(user=self.request.user)
+
     def get_object(self):
         """Get the comment object"""
-        api = Api(user=self.request.user)
-        return api.get_comment(self.kwargs['comment_id'])
+        return self.api.get_comment(self.kwargs['comment_id'])
 
     def get(self, request, *args, **kwargs):
         """GET a single comment and it's children"""
@@ -223,5 +227,5 @@ class CommentDetailView(APIView):
 
     def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Delete the comment"""
-        self.get_object().delete()
+        self.api.delete_comment(self.kwargs['comment_id'])
         return Response(status=status.HTTP_204_NO_CONTENT)

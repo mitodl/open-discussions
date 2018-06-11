@@ -56,19 +56,27 @@ def wrap_retry_exception(*exception_classes):
 @app.task
 def create_document(doc_id, data):
     """Task that makes a request to create an ES document"""
-    api.create_document(doc_id, data)
+    return api.create_document(doc_id, data)
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
 def update_document_with_partial(doc_id, partial_data):
     """Task that makes a request to update an ES document with a partial document"""
-    api.update_document_with_partial(doc_id, partial_data)
+    return api.update_document_with_partial(doc_id, partial_data)
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
 def increment_document_integer_field(doc_id, field_name, incr_amount):
     """Task that makes a request to increment some integer field in an ES document"""
     api.increment_document_integer_field(doc_id, field_name, incr_amount)
+
+
+@app.task
+def update_field_values_by_query(query, field_name, field_value):
+    """
+    Task that makes a request to update a field value for all ES documents that match some query.
+    """
+    return api.update_field_values_by_query(query, field_name, field_value)
 
 
 @app.task(autoretry_for=(RetryException, ), retry_backoff=True, rate_limit='600/m')

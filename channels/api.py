@@ -51,12 +51,15 @@ from open_discussions import features
 from open_discussions.utils import now_in_utc
 from search.task_helpers import (
     reddit_object_indexer,
-    index_full_post,
+    index_new_post,
+    index_new_comment,
     update_post_text,
     update_post_removal_status,
-    increment_post_comment_count,
-    decrement_post_comment_count,
+    update_comment_text,
     update_indexed_score,
+    update_comment_removal_status,
+    set_comment_to_deleted,
+    set_post_to_deleted,
 )
 
 USER_AGENT = 'MIT-Open: {version}'
@@ -442,7 +445,7 @@ class Api:
         self.get_channel(name).mod.update(**values)
         return self.get_channel(name)
 
-    @reddit_object_indexer(indexing_func=index_full_post)
+    @reddit_object_indexer(indexing_func=index_new_post)
     def create_post(self, channel_name, title, text=None, url=None):
         """
         Create a new post in a channel
@@ -598,7 +601,20 @@ class Api:
         post.mod.approve()
         return post
 
-    @reddit_object_indexer(indexing_func=increment_post_comment_count)
+    @reddit_object_indexer(indexing_func=set_post_to_deleted)
+    def delete_post(self, post_id):
+        """
+        Deletes the post
+
+        Args:
+            post_id(str): the id of the post to delete
+
+        """
+        post = self.get_post(post_id)
+        post.delete()
+        return post
+
+    @reddit_object_indexer(indexing_func=index_new_comment)
     def create_comment(self, text, post_id=None, comment_id=None):
         """
         Create a new comment in reply to a post or comment
@@ -622,6 +638,7 @@ class Api:
 
         return self.get_comment(comment_id).reply(text)
 
+    @reddit_object_indexer(indexing_func=update_comment_text)
     def update_comment(self, comment_id, text):
         """
         Updates a existing comment
@@ -635,6 +652,7 @@ class Api:
         """
         return self.get_comment(comment_id).edit(text)
 
+    @reddit_object_indexer(indexing_func=update_comment_removal_status)
     def remove_comment(self, comment_id):
         """
         Removes a comment
@@ -646,6 +664,7 @@ class Api:
         comment.mod.remove()
         return comment
 
+    @reddit_object_indexer(indexing_func=update_comment_removal_status)
     def approve_comment(self, comment_id):
         """
         Approves a comment
@@ -653,9 +672,11 @@ class Api:
         Args:
             comment_id(str): the id of the comment
         """
-        self.get_comment(comment_id).mod.approve()
+        comment = self.get_comment(comment_id)
+        comment.mod.approve()
+        return comment
 
-    @reddit_object_indexer(indexing_func=decrement_post_comment_count)
+    @reddit_object_indexer(indexing_func=set_comment_to_deleted)
     def delete_comment(self, comment_id):
         """
         Deletes the comment

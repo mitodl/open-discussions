@@ -1,5 +1,6 @@
 """Reddit fixtures"""
 # pylint: disable=redefined-outer-name, unused-argument
+from types import SimpleNamespace
 import pytest
 
 from channels import api
@@ -78,3 +79,33 @@ def private_channel_and_contributor(private_channel, staff_api, user):
     staff_api.add_contributor(user.username, private_channel.name)
     staff_api.add_subscriber(user.username, private_channel.name)
     return (private_channel, user)
+
+
+@pytest.fixture()
+def reddit_submission_obj():
+    """A dummy Post object"""
+    return SimpleNamespace(
+        author=SimpleNamespace(name='Test User'),
+        subreddit=SimpleNamespace(display_name='channel_1'),
+        selftext='Body text',
+        score=1,
+        created=12345,
+        id='a',
+        title='Post Title',
+        num_comments=1
+    )
+
+
+@pytest.fixture()
+def reddit_comment_obj(mocker, reddit_submission_obj):
+    """A dummy Comment object"""
+    return SimpleNamespace(
+        parent=mocker.Mock(return_value=reddit_submission_obj),
+        submission=reddit_submission_obj,
+        author=SimpleNamespace(name='Some Name'),
+        subreddit=reddit_submission_obj.subreddit,
+        body='Comment text',
+        id='b',
+        score=1,
+        created=12345,
+    )
