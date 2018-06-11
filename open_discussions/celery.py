@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 
 client = Client(**settings.RAVEN_CONFIG)
 
+raise Exception(f"{settings.SENTRY_LOG_LEVEL}")
 register_logger_signal(client, loglevel=settings.SENTRY_LOG_LEVEL)
 
 # The register_signal function can also take an optional argument
