@@ -52,6 +52,9 @@
       "description": "Google analytics tracking ID",
       "required": false
     },
+    "INDEXING_API_USERNAME": {
+      "description": "Reddit username used for indexing"
+    },
     "MAILGUN_URL": {
       "description": "The URL for communicating with Mailgun"
     },
@@ -80,6 +83,9 @@
     },
     "OPEN_DISCUSSIONS_COOKIE_NAME": {
       "description": "Name of the cookie for the JWT auth token"
+    },
+    "OPEN_DISCUSSIONS_COOKIE_DOMAIN": {
+      "description": "Domain for the cookie for the JWT auth token"
     },
     "OPEN_DISCUSSIONS_DEFAULT_SITE_KEY": {
       "description": "The default site key to use for JWT tokens missing one"
