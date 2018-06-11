@@ -453,7 +453,7 @@ LOGGING = {
         'django': {
             'propagate': True,
             'level': DJANGO_LOG_LEVEL,
-            'handlers': ['console', 'syslog'],
+            'handlers': ['console', 'syslog', 'sentry'],
         },
         'django.request': {
             'handlers': ['mail_admins'],
@@ -473,7 +473,7 @@ LOGGING = {
         }
     },
     'root': {
-        'handlers': ['console', 'syslog'],
+        'handlers': ['console', 'syslog', 'sentry'],
         'level': LOG_LEVEL,
     },
 }
