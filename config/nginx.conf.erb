@@ -75,6 +75,10 @@ http {
             uwsgi_param SERVER_ADDR $server_addr;
             uwsgi_param SERVER_PORT $server_port;
             uwsgi_param SERVER_NAME $server_name;
+            uwsgi_param X-Forwarded-For $proxy_add_x_forwarded_for;
+            uwsgi_param X-Forwarded-Proto $http_x_forwarded_proto;
+            uwsgi_param X-Forwarded-Port $http_x_forwarded_port;
+            uwsgi_param X-Forwarded-Host $http_x_forwarded_host;
             uwsgi_pass unix:/tmp/nginx.socket;
             uwsgi_pass_request_headers on;
             uwsgi_pass_request_body on;
