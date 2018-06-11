@@ -384,6 +384,7 @@ SOCIAL_AUTH_SAML_ENABLED_IDPS = {
 
 SOCIAL_AUTH_SAML_SECURITY_CONFIG = {
     "wantAssertionsEncrypted": SOCIAL_AUTH_SAML_SECURITY_ENCRYPTED,
+    "requestedAuthnContext": False
 }
 
 
