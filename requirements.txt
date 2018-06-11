@@ -64,7 +64,7 @@ python3-openid==3.1.0     # via social-auth-core
 python3-saml==1.4.1
 pytz==2017.2              # via celery, django
 pyyaml==3.11
-raven==6.1.0
+raven==6.6.0
 redis==2.10.5
 requests-oauthlib==0.8.0  # via social-auth-core
 requests==2.18.1
