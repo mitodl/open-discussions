@@ -10,14 +10,23 @@ from open_discussions.features import (
 )
 from channels.constants import (
     POST_TYPE,
+    COMMENT_TYPE,
     VoteActions,
 )
-from search.api import gen_post_id
-from search.serializers import serialize_post
+from search.api import (
+    gen_post_id,
+    gen_comment_id,
+    is_reddit_object_removed,
+)
+from search.serializers import (
+    serialize_post,
+    serialize_comment,
+)
 from search.tasks import (
     create_document,
     update_document_with_partial,
     increment_document_integer_field,
+    update_field_values_by_query,
 )
 
 log = logging.getLogger()
@@ -43,7 +52,7 @@ def reddit_object_indexer(indexing_func=None):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_full_post(post_obj):
+def index_new_post(post_obj):
     """
     Serializes a post object and runs a task to create an ES document for it.
 
@@ -51,10 +60,26 @@ def index_full_post(post_obj):
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
     data = serialize_post(post_obj)
-    return create_document.delay(
+    create_document.delay(
         gen_post_id(post_obj.id),
         data
     )
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def index_new_comment(comment_obj):
+    """
+    Serializes a comment object and runs a task to create an ES document for it.
+
+    Args:
+        comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
+    """
+    data = serialize_comment(comment_obj)
+    create_document.delay(
+        gen_comment_id(comment_obj.id),
+        data
+    )
+    increment_parent_post_comment_count(comment_obj)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -65,9 +90,46 @@ def update_post_text(post_obj):
     Args:
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
-    return update_document_with_partial.delay(
+    update_document_with_partial.delay(
         gen_post_id(post_obj.id),
         {'text': post_obj.selftext}
+    )
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def update_comment_text(comment_obj):
+    """
+    Serializes comment object text and runs a task to update the text for the associated ES document.
+
+    Args:
+        comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
+    """
+    update_document_with_partial.delay(
+        gen_comment_id(comment_obj.id),
+        {'text': comment_obj.body}
+    )
+
+
+def update_field_for_all_post_comments(post_obj, field_name, field_value):
+    """
+    Runs a task to update a field value for all comments associated with a given post.
+
+    Args:
+        post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
+    """
+    update_field_values_by_query.delay(
+        query={
+            "query": {
+                "bool": {
+                    "must": [
+                        {"match": {"object_type": COMMENT_TYPE}},
+                        {"match": {"post_id": post_obj.id}}
+                    ]
+                }
+            }
+        },
+        field_name=field_name,
+        field_value=field_value
     )
 
 
@@ -80,14 +142,34 @@ def update_post_removal_status(post_obj):
     Args:
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
-    return update_document_with_partial.delay(
+    update_document_with_partial.delay(
         gen_post_id(post_obj.id),
-        {'removed': bool(post_obj.banned_by) and not post_obj.approved_by}
+        {'removed': is_reddit_object_removed(post_obj)}
+    )
+    update_field_for_all_post_comments(
+        post_obj,
+        field_name='parent_post_removed',
+        field_value=is_reddit_object_removed(post_obj)
     )
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def _update_post_comment_count(comment_obj, incr_amount=1):
+def update_comment_removal_status(comment_obj):
+    """
+    Serializes the removal status for a comment object and runs a task to update that status
+    for the associated ES document.
+
+    Args:
+        comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
+    """
+    update_document_with_partial.delay(
+        gen_comment_id(comment_obj.id),
+        {'removed': is_reddit_object_removed(comment_obj)}
+    )
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def _update_parent_post_comment_count(comment_obj, incr_amount=1):
     """
     Updates the comment count for a post object (retrieved via a comment object)
     and runs a task to update that count for the associated ES document.
@@ -97,22 +179,51 @@ def _update_post_comment_count(comment_obj, incr_amount=1):
         incr_amount (int): The amount to increment to count
     """
     post_obj = comment_obj.submission
-    return increment_document_integer_field.delay(
+    increment_document_integer_field.delay(
         gen_post_id(post_obj.id),
         field_name='num_comments',
         incr_amount=incr_amount
     )
 
 
-increment_post_comment_count = partial(_update_post_comment_count, incr_amount=1)
-decrement_post_comment_count = partial(_update_post_comment_count, incr_amount=-1)
+increment_parent_post_comment_count = partial(_update_parent_post_comment_count, incr_amount=1)
+decrement_parent_post_comment_count = partial(_update_parent_post_comment_count, incr_amount=-1)
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_indexed_score(instance, instance_type, vote_action):
+def set_post_to_deleted(post_obj):
     """
-    Serializes the score for a PRAW object (comment or post) and runs a task to update
-    that score for the associated ES document.
+    Sets a post to deleted and updates child comments to be deleted as well.
+
+    Args:
+        post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
+    """
+    update_document_with_partial.delay(
+        gen_post_id(post_obj.id),
+        {'deleted': True}
+    )
+    update_field_for_all_post_comments(post_obj, field_name='deleted', field_value=True)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def set_comment_to_deleted(comment_obj):
+    """
+    Sets a comment to deleted and updates the parent post's comment count.
+
+    Args:
+        comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
+    """
+    update_document_with_partial.delay(
+        gen_comment_id(comment_obj.id),
+        {'deleted': True}
+    )
+    decrement_parent_post_comment_count(comment_obj)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def update_indexed_score(instance, instance_type, vote_action=None):
+    """
+    Runs a task to update the score for a post/comment document in ES.
 
     Args:
         instance: A PRAW Comment or Submission (a.k.a. post) object
@@ -128,7 +239,7 @@ def update_indexed_score(instance, instance_type, vote_action):
 
     if instance_type != POST_TYPE:
         return
-    return increment_document_integer_field.delay(
+    increment_document_integer_field.delay(
         gen_post_id(instance.id),
         field_name='score',
         incr_amount=vote_increment

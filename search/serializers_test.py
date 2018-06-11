@@ -1,18 +1,21 @@
 """Tests for elasticsearch serializers"""
+# pylint: disable=redefined-outer-name
 import pytest
 
 from channels.constants import (
-    COMMENT_TYPE,
     POST_TYPE,
+    COMMENT_TYPE,
 )
 from search.serializers import (
     serialize_comment,
     serialize_post,
-    serialize_post_and_comments,
+    serialize_bulk_post_and_comments,
+    serialize_post_for_bulk,
+    serialize_comment_for_bulk,
 )
 
 
-def test_serialize_post_and_comments(mocker):
+def test_serialize_bulk_post_and_comments(mocker):
     """index_comments should index comments and then call itself recursively to index more comments"""
     inner_comment_mock = mocker.Mock(
         id='comment_2',
@@ -23,10 +26,10 @@ def test_serialize_post_and_comments(mocker):
         replies=[inner_comment_mock]
     )
     post_mock = mocker.MagicMock(comments=[outer_comment_mock])
-    assert list(serialize_post_and_comments(post_mock)) == [
-        serialize_post(post_mock),
-        serialize_comment(outer_comment_mock),
-        serialize_comment(inner_comment_mock),
+    assert list(serialize_bulk_post_and_comments(post_mock)) == [
+        serialize_post_for_bulk(post_mock),
+        serialize_comment_for_bulk(outer_comment_mock),
+        serialize_comment_for_bulk(inner_comment_mock),
     ]
 
 
@@ -111,4 +114,34 @@ def test_serialize_post(mocker, missing_author):
         'post_title': post_title,
         'score': score,
         'text': text,
+    }
+
+
+def test_serialize_post_for_bulk(mocker, reddit_submission_obj):
+    """
+    Test that serialize_post_for_bulk correctly serializes a post/submission object
+    """
+    post_id = 'post1'
+    base_serialized_post = {'serialized': 'post'}
+    mocker.patch('search.serializers.serialize_post', return_value=base_serialized_post)
+    mocker.patch('search.serializers.gen_post_id', return_value=post_id)
+    serialized = serialize_post_for_bulk(reddit_submission_obj)
+    assert serialized == {
+        '_id': post_id,
+        **base_serialized_post,
+    }
+
+
+def test_serialize_comment_for_bulk(mocker, reddit_comment_obj):
+    """
+    Test that serialize_comment_for_bulk correctly serializes a comment object
+    """
+    comment_id = 'comment1'
+    base_serialized_comment = {'serialized': 'comment'}
+    mocker.patch('search.serializers.serialize_comment', return_value=base_serialized_comment)
+    mocker.patch('search.serializers.gen_comment_id', return_value=comment_id)
+    serialized = serialize_comment_for_bulk(reddit_comment_obj)
+    assert serialized == {
+        '_id': comment_id,
+        **base_serialized_comment,
     }

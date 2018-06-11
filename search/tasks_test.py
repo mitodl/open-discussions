@@ -18,6 +18,7 @@ from search.tasks import (
     update_document_with_partial,
     finish_recreate_index,
     increment_document_integer_field,
+    update_field_values_by_query,
     index_channel,
     index_post_with_comments,
     start_recreate_index,
@@ -86,6 +87,17 @@ def test_increment_document_integer_field_task(mocked_api):
     increment_document_integer_field(*indexing_api_args)
     assert mocked_api.increment_document_integer_field.call_count == 1
     assert mocked_api.increment_document_integer_field.call_args[0] == indexing_api_args
+
+
+def test_update_field_values_by_query(mocked_api):
+    """
+    Test that the update_field_values_by_query task calls the indexing
+    API function with the right args
+    """
+    indexing_api_args = ({'query': {}}, 'field1', 'value1')
+    update_field_values_by_query(*indexing_api_args)
+    assert mocked_api.update_field_values_by_query.call_count == 1
+    assert mocked_api.update_field_values_by_query.call_args[0] == indexing_api_args
 
 
 def test_wrap_retry_exception():

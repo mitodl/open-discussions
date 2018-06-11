@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from elasticsearch.exceptions import ConflictError
 from channels.constants import (
     COMMENT_TYPE,
     POST_TYPE,
@@ -15,12 +16,15 @@ from search.indexing_api import (
     clear_and_create_index,
     create_backing_index,
     create_document,
+    update_field_values_by_query,
     get_reindexing_alias_name,
     update_document_with_partial,
     increment_document_integer_field,
-    GLOBAL_DOC_TYPE,
     index_post_with_comments,
     switch_indices,
+    GLOBAL_DOC_TYPE,
+    SCRIPTING_LANG,
+    UPDATE_CONFLICT_SETTING,
 )
 
 
@@ -35,12 +39,15 @@ def mocked_es(mocker, settings):
     conn = mocker.Mock()
     get_conn_patch = mocker.patch('search.indexing_api.get_conn', autospec=True, return_value=conn)
     mocker.patch('search.connection.get_conn', autospec=True)
+    default_alias = get_default_alias_name()
+    reindex_alias = get_reindexing_alias_name()
     yield SimpleNamespace(
         get_conn=get_conn_patch,
         conn=conn,
         index_name=index_name,
-        default_alias=get_default_alias_name(),
-        reindex_alias=get_reindexing_alias_name(),
+        default_alias=default_alias,
+        reindex_alias=reindex_alias,
+        active_aliases=[default_alias, reindex_alias],
     )
 
 
@@ -51,7 +58,7 @@ def test_create_document(mocked_es):
     doc_id, data = ('doc_id', {'key1': 'value1'})
     create_document(doc_id, data)
     mocked_es.get_conn.assert_called_once_with(verify=True)
-    for alias in mocked_es.default_alias, mocked_es.reindex_alias:
+    for alias in mocked_es.active_aliases:
         mocked_es.conn.create.assert_any_call(
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
@@ -60,20 +67,65 @@ def test_create_document(mocked_es):
         )
 
 
-def test_partially_update_document(mocked_es):
+@pytest.mark.parametrize('version_conflicts,expected_error_logged', [
+    (0, False),
+    (1, True),
+])
+def test_update_field_values_by_query(mocker, mocked_es, version_conflicts, expected_error_logged):
     """
-    Test that partially_update_document gets a connection and calls the correct elasticsearch-dsl function
+    Tests that update_field_values_by_query gets a connection, calls the correct elasticsearch-dsl function,
+    and logs an error if the results indicate version conflicts
+    """
+    patched_logger = mocker.patch('search.indexing_api.log')
+    query, field_name, field_value = ({"query": None}, 'field1', 'value1')
+    mocked_es.conn.update_by_query.return_value = {'version_conflicts': version_conflicts}
+    update_field_values_by_query(query, field_name, field_value)
+
+    mocked_es.get_conn.assert_called_once_with(verify=True)
+    for alias in mocked_es.active_aliases:
+        mocked_es.conn.update_by_query.assert_any_call(
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            conflicts=UPDATE_CONFLICT_SETTING,
+            body={
+                "script": {
+                    "source": "ctx._source.{} = params.new_value".format(field_name),
+                    "lang": SCRIPTING_LANG,
+                    "params": {
+                        "new_value": field_value
+                    },
+                },
+                **query
+            },
+        )
+    assert patched_logger.error.called is expected_error_logged
+
+
+def test_update_document_with_partial(mocked_es):
+    """
+    Test that update_document_with_partial gets a connection and calls the correct elasticsearch-dsl function
     """
     doc_id, data = ('doc_id', {'key1': 'value1'})
     update_document_with_partial(doc_id, data)
     mocked_es.get_conn.assert_called_once_with(verify=True)
-    for alias in mocked_es.default_alias, mocked_es.reindex_alias:
+    for alias in mocked_es.active_aliases:
         mocked_es.conn.update.assert_any_call(
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             body={'doc': data},
             id=doc_id,
         )
+
+
+def test_update_partial_conflict_logging(mocker, mocked_es):
+    """
+    Test that update_document_with_partial logs an error if a version conflict occurs
+    """
+    patched_logger = mocker.patch('search.indexing_api.log')
+    doc_id, data = ('doc_id', {'key1': 'value1'})
+    mocked_es.conn.update.side_effect = ConflictError
+    update_document_with_partial(doc_id, data)
+    assert patched_logger.error.called is True
 
 
 def test_increment_document_integer_field(mocked_es):
@@ -85,14 +137,17 @@ def test_increment_document_integer_field(mocked_es):
     increment_document_integer_field(doc_id, field_name, incr_amount)
     mocked_es.get_conn.assert_called_once_with(verify=True)
 
-    for alias in mocked_es.default_alias, mocked_es.reindex_alias:
+    for alias in mocked_es.active_aliases:
         mocked_es.conn.update.assert_any_call(
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             body={
                 "script": {
-                    "source": "ctx._source.{} += {}".format(field_name, incr_amount),
-                    "lang": "painless",
+                    "source": "ctx._source.{} += params.incr_amount".format(field_name),
+                    "lang": SCRIPTING_LANG,
+                    "params": {
+                        "incr_amount": incr_amount
+                    }
                 }
             },
             id=doc_id,
@@ -142,7 +197,7 @@ def test_index_post_with_comments(mocked_es, mocker, settings, user):
         },
     ]
     serialize_mock = mocker.patch(
-        'search.indexing_api.serialize_post_and_comments',
+        'search.indexing_api.serialize_bulk_post_and_comments',
         autospec=True,
         return_value=serialized_data,
     )
@@ -192,7 +247,7 @@ def test_switch_indices(mocked_es, mocker, default_exists):
         name=get_reindexing_alias_name(),
         index=backing_index,
     )
-    default_alias = get_default_alias_name()
+    default_alias = mocked_es.default_alias
     conn_mock.indices.exists_alias.assert_called_once_with(name=default_alias)
 
     actions = []

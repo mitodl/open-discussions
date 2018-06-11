@@ -1,50 +1,38 @@
 """Task helper tests"""
 # pylint: disable=redefined-outer-name
-from types import SimpleNamespace
 import pytest
 
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import (
     POST_TYPE,
+    COMMENT_TYPE,
     VoteActions,
+)
+from search.serializers import (
+    serialize_post,
+    serialize_comment,
 )
 from search.task_helpers import (
     reddit_object_indexer,
-    index_full_post,
+    index_new_post,
+    index_new_comment,
     update_post_text,
+    update_comment_text,
     update_post_removal_status,
-    increment_post_comment_count,
-    decrement_post_comment_count,
+    update_field_for_all_post_comments,
+    update_comment_removal_status,
+    increment_parent_post_comment_count,
+    decrement_parent_post_comment_count,
+    set_comment_to_deleted,
     update_indexed_score,
 )
-from search.api import gen_post_id
+from search.api import gen_post_id, gen_comment_id
 
 
 @pytest.fixture(autouse=True)
 def enable_index_update_feature(settings):
     """Enables the INDEX_UPDATES feature by default"""
     settings.FEATURES[INDEX_UPDATES] = True
-
-
-@pytest.fixture()
-def reddit_submission_obj():  # pylint: disable=missing-docstring
-    return SimpleNamespace(
-        author=SimpleNamespace(name='Test User'),
-        subreddit=SimpleNamespace(display_name='channel_1'),
-        selftext='Body text',
-        score=1,
-        created=12345,
-        id='a',
-        title='Post Title',
-        num_comments=1
-    )
-
-
-@pytest.fixture()
-def reddit_comment_obj():  # pylint: disable=missing-docstring
-    return SimpleNamespace(
-        submission=SimpleNamespace(id=1)
-    )
 
 
 def test_reddit_object_indexer(mocker):
@@ -66,28 +54,37 @@ def test_reddit_object_indexer(mocker):
     assert reddit_obj == mock_reddit_obj
 
 
-def test_index_full_post(mocker, reddit_submission_obj):
+def test_index_new_post(mocker, reddit_submission_obj):
     """
-    Test that index_full_post calls the indexing task with the right parameters
+    Test that index_new_post calls the indexing task with the right parameters
     """
     patched_task = mocker.patch('search.task_helpers.create_document')
-    index_full_post(reddit_submission_obj)
+    index_new_post(reddit_submission_obj)
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
         gen_post_id(reddit_submission_obj.id),
-        {
-            '_id': gen_post_id(reddit_submission_obj.id),
-            'object_type': POST_TYPE,
-            'post_id': reddit_submission_obj.id,
-            'author': reddit_submission_obj.author.name,
-            'channel_title': reddit_submission_obj.subreddit.display_name,
-            'text': reddit_submission_obj.selftext,
-            'score': reddit_submission_obj.score,
-            'created': reddit_submission_obj.created,
-            'post_title': reddit_submission_obj.title,
-            'num_comments': reddit_submission_obj.num_comments,
-        }
+        serialize_post(reddit_submission_obj)
     )
+
+
+def test_index_new_comment(mocker, reddit_comment_obj):
+    """
+    Test that index_new_comment calls indexing tasks with the right parameters
+    """
+    patched_create_task = mocker.patch('search.task_helpers.create_document')
+    patched_increment_task = mocker.patch('search.task_helpers.increment_document_integer_field')
+    index_new_comment(reddit_comment_obj)
+    assert patched_create_task.delay.called is True
+    assert patched_create_task.delay.call_args[0] == (
+        gen_comment_id(reddit_comment_obj.id),
+        serialize_comment(reddit_comment_obj)
+    )
+    assert patched_increment_task.delay.called is True
+    assert patched_increment_task.delay.call_args[0] == (gen_post_id(reddit_comment_obj.submission.id),)
+    assert patched_increment_task.delay.call_args[1] == {
+        'field_name': 'num_comments',
+        'incr_amount': 1
+    }
 
 
 def test_update_post_text(mocker, reddit_submission_obj):
@@ -103,29 +100,92 @@ def test_update_post_text(mocker, reddit_submission_obj):
     )
 
 
-@pytest.mark.parametrize('banned_by,approved_by,expected_removed', [
-    ('some_username', None, True),
-    (None, 'some_username', False),
-    ('some_username', 'some_username', False),
-])
-def test_update_post_removal_status(mocker, reddit_submission_obj, banned_by, approved_by, expected_removed):
+def test_update_comment_text(mocker, reddit_comment_obj):
     """
-    Test that update_post_removal_status calls the indexing task with the right parameters
+    Test that update_post_text calls the indexing task with the right parameters
     """
     patched_task = mocker.patch('search.task_helpers.update_document_with_partial')
-    reddit_submission_obj.banned_by = banned_by
-    reddit_submission_obj.approved_by = approved_by
+    update_comment_text(reddit_comment_obj)
+    assert patched_task.delay.called is True
+    assert patched_task.delay.call_args[0] == (
+        gen_comment_id(reddit_comment_obj.id),
+        {'text': reddit_comment_obj.body}
+    )
+
+
+@pytest.mark.parametrize('removal_status,expected_removed_arg', [
+    (True, True),
+    (False, False),
+])
+def test_update_post_removal_status(mocker, reddit_submission_obj, removal_status, expected_removed_arg):
+    """
+    Test that update_post_removal_status calls the indexing task with the right parameters and
+    calls an additional task to update child comment removal status
+    """
+    patched_task = mocker.patch('search.task_helpers.update_document_with_partial')
+    patched_comment_update_func = mocker.patch('search.task_helpers.update_field_for_all_post_comments')
+    patched_reddit_object_removed = mocker.patch('search.task_helpers.is_reddit_object_removed')
+    patched_reddit_object_removed.return_value = removal_status
     update_post_removal_status(reddit_submission_obj)
+    assert patched_reddit_object_removed.called is True
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
         gen_post_id(reddit_submission_obj.id),
-        {'removed': expected_removed}
+        {'removed': expected_removed_arg}
+    )
+    patched_comment_update_func.assert_called_with(
+        reddit_submission_obj,
+        field_name='parent_post_removed',
+        field_value=expected_removed_arg
+    )
+
+
+@pytest.mark.parametrize('removal_status,expected_removed_arg', [
+    (True, True),
+    (False, False),
+])
+def test_update_comment_removal_status(mocker, reddit_comment_obj, removal_status, expected_removed_arg):
+    """
+    Test that update_comment_removal_status calls the indexing task with the right parameters
+    """
+    patched_task = mocker.patch('search.task_helpers.update_document_with_partial')
+    patched_reddit_object_removed = mocker.patch('search.task_helpers.is_reddit_object_removed')
+    patched_reddit_object_removed.return_value = removal_status
+    update_comment_removal_status(reddit_comment_obj)
+    assert patched_task.delay.called is True
+    assert patched_task.delay.call_args[0] == (
+        gen_comment_id(reddit_comment_obj.id),
+        {'removed': expected_removed_arg}
+    )
+
+
+def test_update_post_removal_for_comments(mocker, reddit_submission_obj):
+    """
+    Test that update_post_removal_for_comments calls the indexing task with the right parameters
+    """
+    patched_task = mocker.patch('search.task_helpers.update_field_values_by_query')
+    field_name, field_value = ('field1', 'value1')
+    update_field_for_all_post_comments(reddit_submission_obj, field_name=field_name, field_value=field_value)
+    assert patched_task.delay.called is True
+    assert patched_task.delay.call_args[1] == dict(
+        query={
+            "query": {
+                "bool": {
+                    "must": [
+                        {"match": {"object_type": COMMENT_TYPE}},
+                        {"match": {"post_id": reddit_submission_obj.id}}
+                    ]
+                }
+            }
+        },
+        field_name=field_name,
+        field_value=field_value
     )
 
 
 @pytest.mark.parametrize('update_comment_count_func,expected_increment', [
-    (increment_post_comment_count, 1),
-    (decrement_post_comment_count, -1),
+    (increment_parent_post_comment_count, 1),
+    (decrement_parent_post_comment_count, -1),
 ])
 def test_update_post_comment_count(mocker, reddit_comment_obj, update_comment_count_func, expected_increment):
     """
@@ -138,6 +198,27 @@ def test_update_post_comment_count(mocker, reddit_comment_obj, update_comment_co
     assert patched_task.delay.call_args[1] == {
         'field_name': 'num_comments',
         'incr_amount': expected_increment
+    }
+
+
+def test_set_comment_to_deleted(mocker, reddit_comment_obj):
+    """
+    Test that set_comment_to_deleted calls the indexing task to update a comment's deleted property
+    and calls another task to decrement the parent post's comment count
+    """
+    patched_partial_update_task = mocker.patch('search.task_helpers.update_document_with_partial')
+    patched_increment_task = mocker.patch('search.task_helpers.increment_document_integer_field')
+    set_comment_to_deleted(reddit_comment_obj)
+    assert patched_partial_update_task.delay.called is True
+    assert patched_partial_update_task.delay.call_args[0] == (
+        gen_comment_id(reddit_comment_obj.id),
+        {'deleted': True}
+    )
+    assert patched_increment_task.delay.called is True
+    assert patched_increment_task.delay.call_args[0] == (gen_post_id(reddit_comment_obj.submission.id),)
+    assert patched_increment_task.delay.call_args[1] == {
+        'field_name': 'num_comments',
+        'incr_amount': -1
     }
 
 

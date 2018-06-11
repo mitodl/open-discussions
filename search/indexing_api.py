@@ -5,6 +5,7 @@ from functools import partial
 import logging
 
 from elasticsearch.helpers import bulk
+from elasticsearch.exceptions import ConflictError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
@@ -18,7 +19,7 @@ from search.connection import (
 )
 from search.exceptions import ReindexException
 from search.serializers import (
-    serialize_post_and_comments,
+    serialize_bulk_post_and_comments,
 )
 
 
@@ -27,6 +28,8 @@ User = get_user_model()
 
 
 GLOBAL_DOC_TYPE = '_doc'
+SCRIPTING_LANG = 'painless'
+UPDATE_CONFLICT_SETTING = 'proceed'
 COMBINED_MAPPING = {
     'object_type': {'type': 'keyword'},
     'author': {'type': 'keyword'},
@@ -36,6 +39,7 @@ COMBINED_MAPPING = {
     'created': {'type': 'date'},
     'deleted': {'type': 'boolean'},
     'removed': {'type': 'boolean'},
+    'parent_post_removed': {'type': 'boolean'},
     'post_id': {'type': 'keyword'},
     'post_title': {'type': 'text'},
     'post_link_url': {'type': 'keyword'},
@@ -43,11 +47,6 @@ COMBINED_MAPPING = {
     'comment_id': {'type': 'keyword'},
     'parent_comment_id': {'type': 'keyword'},
 }
-
-
-def gen_post_id(reddit_obj_id):
-    """Generates the Elasticsearch document id for a post"""
-    return 'p_{}'.format(reddit_obj_id)
 
 
 def clear_and_create_index(*, index_name=None, skip_mapping=False):
@@ -105,25 +104,75 @@ def create_document(doc_id, data):
         )
 
 
-def _update_document(doc_id, data, update_key=None):
+def update_field_values_by_query(query, field_name, field_value):
+    """
+    Makes a request to ES to use the update_by_query API to update a single field
+    value for all documents that match the given query.
+
+    Args:
+        query (dict): A dict representing an ES query
+        field_name (str): The name of the field that will be update
+        field_value: The field value to set for all matching documents
+    """
+    conn = get_conn(verify=True)
+    for alias in get_active_aliases():
+        es_response = conn.update_by_query(
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            conflicts=UPDATE_CONFLICT_SETTING,
+            body={
+                "script": {
+                    "source": "ctx._source.{} = params.new_value".format(field_name),
+                    "lang": SCRIPTING_LANG,
+                    "params": {
+                        "new_value": field_value
+                    },
+                },
+                **query
+            },
+        )
+        # Our policy for document update-related version conflicts right now is to log them
+        # and allow the app to continue as normal.
+        num_version_conflicts = es_response.get('version_conflicts', 0)
+        if num_version_conflicts > 0:
+            log.error(
+                'Update By Query API request resulted in %s verson conflict(s) (alias: %s, query: %s)',
+                num_version_conflicts,
+                alias,
+                query
+            )
+
+
+def _update_document_by_id(doc_id, data, update_key=None):
     """
     Makes a request to ES to update an existing document
 
     Args:
         doc_id (str): The ES document id
         data (dict): Full ES document data
+        update_key (str): A key indicating the type of update request to Elasticsearch
+            (e.g.: 'script', 'doc')
     """
     conn = get_conn(verify=True)
     for alias in get_active_aliases():
-        conn.update(
-            index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
-            body={update_key: data},
-            id=doc_id,
-        )
+        try:
+            conn.update(
+                index=alias,
+                doc_type=GLOBAL_DOC_TYPE,
+                body={update_key: data},
+                id=doc_id,
+            )
+        # Our policy for document update-related version conflicts right now is to log them
+        # and allow the app to continue as normal.
+        except ConflictError:
+            log.error(
+                'Update API request resulted in a version conflict (alias: %s, doc id: %s)',
+                alias,
+                doc_id
+            )
 
 
-update_document_with_partial = partial(_update_document, update_key='doc')
+update_document_with_partial = partial(_update_document_by_id, update_key='doc')
 
 
 def increment_document_integer_field(doc_id, field_name, incr_amount):
@@ -135,11 +184,14 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
         field_name (str): The name of the field to increment
         incr_amount (int): The amount to increment by
     """
-    _update_document(
+    _update_document_by_id(
         doc_id,
         {
-            "source": "ctx._source.{} += {}".format(field_name, incr_amount),
-            "lang": "painless",
+            "source": "ctx._source.{} += params.incr_amount".format(field_name),
+            "lang": SCRIPTING_LANG,
+            "params": {
+                "incr_amount": incr_amount
+            }
         },
         update_key='script'
     )
@@ -165,7 +217,7 @@ def index_post_with_comments(post_id):
     for alias in get_active_aliases():
         _, errors = bulk(
             conn,
-            serialize_post_and_comments(post),
+            serialize_bulk_post_and_comments(post),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable
