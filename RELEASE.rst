@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.31.0
+--------------
+
+- Added ES comment document indexing
+- Backend modifications for resizing an uploaded image (#729)
+- Fix comment serialization error, Celery error handling (#782)
+- apt buildpack should be first (#800)
+- Add security config and entityID setting (#797)
+- Fixed id assignment during indexing
+
 Version 0.30.2
 --------------
 
