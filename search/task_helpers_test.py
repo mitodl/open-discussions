@@ -8,10 +8,6 @@ from channels.constants import (
     COMMENT_TYPE,
     VoteActions,
 )
-from search.serializers import (
-    serialize_post,
-    serialize_comment,
-)
 from search.task_helpers import (
     reddit_object_indexer,
     index_new_post,
@@ -58,12 +54,15 @@ def test_index_new_post(mocker, reddit_submission_obj):
     """
     Test that index_new_post calls the indexing task with the right parameters
     """
+    fake_serialized_data = {'serialized': 'post'}
+    patched_serializer = mocker.patch('search.task_helpers.serialize_post', return_value=fake_serialized_data)
     patched_task = mocker.patch('search.task_helpers.create_document')
     index_new_post(reddit_submission_obj)
+    patched_serializer.assert_called_once_with(reddit_submission_obj)
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
         gen_post_id(reddit_submission_obj.id),
-        serialize_post(reddit_submission_obj)
+        fake_serialized_data
     )
 
 
@@ -71,13 +70,16 @@ def test_index_new_comment(mocker, reddit_comment_obj):
     """
     Test that index_new_comment calls indexing tasks with the right parameters
     """
+    fake_serialized_data = {'serialized': 'comment'}
+    patched_serializer = mocker.patch('search.task_helpers.serialize_comment', return_value=fake_serialized_data)
     patched_create_task = mocker.patch('search.task_helpers.create_document')
     patched_increment_task = mocker.patch('search.task_helpers.increment_document_integer_field')
     index_new_comment(reddit_comment_obj)
+    patched_serializer.assert_called_once_with(reddit_comment_obj)
     assert patched_create_task.delay.called is True
     assert patched_create_task.delay.call_args[0] == (
         gen_comment_id(reddit_comment_obj.id),
-        serialize_comment(reddit_comment_obj)
+        fake_serialized_data
     )
     assert patched_increment_task.delay.called is True
     assert patched_increment_task.delay.call_args[0] == (gen_post_id(reddit_comment_obj.submission.id),)
