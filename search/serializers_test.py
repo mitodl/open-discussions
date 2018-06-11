@@ -33,88 +33,57 @@ def test_serialize_bulk_post_and_comments(mocker):
     ]
 
 
-@pytest.mark.parametrize("missing_author", [True, False])
-def test_serialize_comment(mocker, missing_author):
-    """serialize_comment should create a dict representation of a reddit comment to put in elasticsearch"""
-    author_name = 'author'
-    channel = 'channel'
-    comment_id = 'comment'
-    created = 'created'
-    parent = 'parent'
-    post_id = 'post id'
-    post_title = 'post title'
-    score = 'score'
-    text = 'text'
-
-    if missing_author:
-        author_obj = None
-    else:
-        author_obj = mocker.Mock()
-        author_obj.name = author_name
-
-    comment = mocker.Mock(
-        author=author_obj,
-        subreddit=mocker.Mock(display_name=channel),
-        id=comment_id,
-        created=created,
-        submission=mocker.Mock(id=post_id, title=post_title),
-        score=score,
-        body=text,
-    )
-    comment.parent = mocker.Mock(return_value=mocker.Mock(id=parent))
-    assert serialize_comment(comment) == {
-        'author': author_name if not missing_author else None,
-        'channel_title': channel,
-        'comment_id': comment_id,
-        'created': created,
-        'object_type': COMMENT_TYPE,
-        'parent_comment_id': parent,
-        'post_id': post_id,
-        'post_title': post_title,
-        'score': score,
-        'text': text,
-    }
-
-
-@pytest.mark.parametrize("missing_author", [True, False])
-def test_serialize_post(mocker, missing_author):
-    """serialize_post should create a dict representation of a post to put in elasticsearch"""
-    author_name = 'author_name'
-    channel_name = 'channel'
-    created = 'created'
-    num_comments = 'comments'
-    text = 'selftext'
-    score = 'score'
-    post_id = 'post_id'
-    post_title = 'post_title'
-
-    if missing_author:
-        author_obj = None
-    else:
-        author_obj = mocker.Mock()
-        author_obj.name = author_name
-
-    post = mocker.Mock(
-        author=author_obj,
-        subreddit=mocker.Mock(display_name=channel_name),
-        created=created,
-        num_comments=num_comments,
-        selftext=text,
-        score=score,
-        title=post_title,
-        id=post_id,
-    )
-    assert serialize_post(post) == {
-        'author': author_name if not missing_author else None,
-        'channel_title': channel_name,
-        'created': created,
-        'num_comments': num_comments,
+def test_serialize_post(reddit_submission_obj):
+    """
+    Test that serialize_post correctly serializes a post/submission object
+    """
+    serialized = serialize_post(reddit_submission_obj)
+    assert serialized == {
         'object_type': POST_TYPE,
-        'post_id': post_id,
-        'post_title': post_title,
-        'score': score,
-        'text': text,
+        'author': reddit_submission_obj.author.name,
+        'channel_title': reddit_submission_obj.subreddit.display_name,
+        'text': reddit_submission_obj.selftext,
+        'score': reddit_submission_obj.score,
+        'created': reddit_submission_obj.created,
+        'post_id': reddit_submission_obj.id,
+        'post_title': reddit_submission_obj.title,
+        'num_comments': reddit_submission_obj.num_comments,
     }
+
+
+@pytest.mark.parametrize('parent_type,parent_id,expected_parent_comment_id', [
+    (COMMENT_TYPE, 1, 1),
+    (POST_TYPE, 1, None),
+])
+def test_serialize_comment(mocker, reddit_comment_obj, parent_type, parent_id, expected_parent_comment_id):
+    """
+    Test that serialize_comment correctly serializes a comment object
+    """
+    patched_type_func = mocker.patch('search.serializers.get_reddit_object_type', return_value=parent_type)
+    mock_parent_obj = mocker.Mock(id=parent_id)
+    reddit_comment_obj.parent.return_value = mock_parent_obj
+    serialized = serialize_comment(reddit_comment_obj)
+    patched_type_func.assert_called_once()
+    assert serialized == {
+        'object_type': COMMENT_TYPE,
+        'author': reddit_comment_obj.author.name,
+        'channel_title': reddit_comment_obj.subreddit.display_name,
+        'text': reddit_comment_obj.body,
+        'score': reddit_comment_obj.score,
+        'created': reddit_comment_obj.created,
+        'post_id': reddit_comment_obj.submission.id,
+        'post_title': reddit_comment_obj.submission.title,
+        'comment_id': reddit_comment_obj.id,
+        'parent_comment_id': expected_parent_comment_id,
+    }
+
+
+def test_serialize_missing_author(reddit_submission_obj, reddit_comment_obj):
+    """Test that objects with missing author information can still be serialized"""
+    reddit_submission_obj.author = None
+    reddit_comment_obj.author = None
+    assert serialize_post(reddit_submission_obj)['author'] is None
+    assert serialize_comment(reddit_comment_obj)['author'] is None
 
 
 def test_serialize_post_for_bulk(mocker, reddit_submission_obj):
