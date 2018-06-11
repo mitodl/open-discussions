@@ -85,7 +85,7 @@ def private_channel_and_contributor(private_channel, staff_api, user):
 def reddit_submission_obj():
     """A dummy Post object"""
     return SimpleNamespace(
-        author=SimpleNamespace(name='Test User'),
+        author=SimpleNamespace(name='testuser'),
         subreddit=SimpleNamespace(display_name='channel_1'),
         selftext='Body text',
         score=1,
@@ -102,7 +102,7 @@ def reddit_comment_obj(mocker, reddit_submission_obj):
     return SimpleNamespace(
         parent=mocker.Mock(return_value=reddit_submission_obj),
         submission=reddit_submission_obj,
-        author=SimpleNamespace(name='Some Name'),
+        author=SimpleNamespace(name='testuser'),
         subreddit=reddit_submission_obj.subreddit,
         body='Comment text',
         id='b',
