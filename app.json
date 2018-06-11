@@ -235,6 +235,14 @@
     },
     "STATUS_TOKEN": {
       "description": "Token to access the status API."
+    },
+    "USE_X_FORWARDED_PORT": {
+      "description": "Use the X-Forwarded-Port",
+      "required": false
+    },
+    "USE_X_FORWARDED_HOST": {
+      "description": "Use the X-Forwarded-Host",
+      "required": false
     }
   },
   "keywords": [
