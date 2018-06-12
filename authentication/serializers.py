@@ -1,4 +1,7 @@
 """Authentication serializers"""
+import logging
+
+from django.http import HttpResponseRedirect
 from social_django.views import _do_login as login
 from social_core.utils import (
     user_is_authenticated,
@@ -14,6 +17,8 @@ from authentication.exceptions import (
 )
 from authentication.utils import SocialAuthState
 from open_discussions.validators import is_true
+
+log = logging.getLogger()
 
 
 class SocialAuthSerializer(serializers.Serializer):
@@ -121,8 +126,12 @@ class RegisterEmailSerializer(SocialAuthSerializer):
         """Try to 'save' the request"""
         try:
             result = super()._authenticate(is_login=False)
-            if not isinstance(result, SocialAuthState):
+            if isinstance(result, HttpResponseRedirect):
+                # a redirect here means confirmation email sent
+                result = SocialAuthState(SocialAuthState.STATE_REGISTER_CONFIRM_SENT)
+            elif not isinstance(result, SocialAuthState):
                 # if we got here, we saw an unexpected result
+                log.error("Received unexpected result: ", result)
                 result = SocialAuthState(SocialAuthState.STATE_ERROR)
         except RequirePasswordException as exc:
             result = SocialAuthState(SocialAuthState.STATE_ERROR, partial=exc.partial)
@@ -132,13 +141,16 @@ class RegisterEmailSerializer(SocialAuthSerializer):
 class RegisterConfirmSerializer(SocialAuthSerializer):
     """Serializer for email confirmation"""
     partial_token = serializers.CharField(source='partial.token', read_only=True, default=None)
+    verification_code = serializers.CharField(write_only=True)
 
     def create(self, validated_data):
         """Try to 'save' the request"""
         try:
             result = super()._authenticate(is_login=False)
+
             if not isinstance(result, SocialAuthState):
                 # if we got here, we saw an unexpected result
+                log.error("Received unexpected result: ", result)
                 result = SocialAuthState(SocialAuthState.STATE_ERROR)
         except RequirePasswordAndProfileException as exc:
             result = SocialAuthState(SocialAuthState.STATE_ERROR, partial=exc.partial)
@@ -157,6 +169,7 @@ class RegisterDetailsSerializer(SocialAuthSerializer):
             result = super()._authenticate(is_login=False)
             if not isinstance(result, SocialAuthState):
                 # if we got here, we saw an unexpected result
+                log.error("Received unexpected result: ", result)
                 result = SocialAuthState(SocialAuthState.STATE_ERROR)
         except RequirePasswordAndProfileException as exc:
             result = SocialAuthState(SocialAuthState.STATE_ERROR, partial=exc.partial)

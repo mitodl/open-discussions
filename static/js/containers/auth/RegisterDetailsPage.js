@@ -65,7 +65,7 @@ const mapStateToProps = state => {
 
 const mergeProps = mergeAndInjectProps(
   ({ partialToken }, dispatchProps, { history }) => ({
-    onSubmitResult: onSubmitResult(history),
+    onSubmitResult: onSubmitResult(history, null),
     onSubmit:       onSubmit(partialToken)
   })
 )

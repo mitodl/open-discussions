@@ -3,9 +3,12 @@ import * as api from "../lib/api"
 import { POST, INITIAL_STATE } from "redux-hammock/constants"
 
 export const registerEmailEndpoint = {
-  name:         "registerEmail",
-  verbs:        [POST],
-  postFunc:     (email: string) => api.postEmailRegister(email),
+  name:     "registerEmail",
+  verbs:    [POST],
+  postFunc: async (email: string) => {
+    const response = await api.postEmailRegister(email)
+    return { response, email }
+  },
   initialState: { ...INITIAL_STATE }
 }
 

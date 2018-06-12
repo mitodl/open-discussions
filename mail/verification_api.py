@@ -20,9 +20,7 @@ def send_verification_email(strategy, backend, code, partial_token):  # pylint: 
         partial_token (str): token used to resume a halted pipeline
     """
     url = '{}?verification_code={}'.format(
-        strategy.build_absolute_uri(
-            reverse('social:complete', args=(backend.name,))
-        ),
+        strategy.build_absolute_uri(reverse('register-confirm')),
         quote_plus(code.code),
     )
 

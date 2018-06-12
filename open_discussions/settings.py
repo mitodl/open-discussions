@@ -222,7 +222,7 @@ SOCIAL_AUTH_EMAIL_FORCE_EMAIL_VALIDATION = True
 
 # Configure social_core.pipeline.mail.mail_validation
 SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = 'mail.verification_api.send_verification_email'
-SOCIAL_AUTH_EMAIL_VALIDATION_URL = 'confirmation-sent'
+SOCIAL_AUTH_EMAIL_VALIDATION_URL = '/'
 
 SOCIAL_AUTH_PIPELINE = (
     # Get the information we can about the user and return it in a simple

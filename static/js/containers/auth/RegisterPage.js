@@ -9,6 +9,7 @@ import AuthEmailForm from "../../components/auth/AuthEmailForm"
 import withForm from "../../hoc/withForm"
 
 import { actions } from "../../actions"
+import { setSnackbarMessage } from "../../actions/ui"
 import { processRegisterResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
@@ -23,11 +24,11 @@ type RegisterPageProps = {
 } & WithFormProps
 
 const RegisterPage = ({ renderForm }: RegisterPageProps) => (
-  <div className="content auth-page login-page">
+  <div className="content auth-page register-page">
     <div className="main-content">
-      <Card className="login-card">
-        <h3>Log In</h3>
-        <DocumentTitle title={formatTitle("Log In")} />
+      <Card className="register-card">
+        <h3>Register</h3>
+        <DocumentTitle title={formatTitle("Register")} />
         {renderForm()}
         <hr />
       </Card>
@@ -42,9 +43,7 @@ const { getForm, actionCreators } = configureForm(
   newEmailForm
 )
 
-const onSubmit = (form: EmailForm) => actions.loginEmail.post(form.email)
-
-const onSubmitResult = R.curry(processRegisterResponse)
+const onSubmit = (form: EmailForm) => actions.registerEmail.post(form.email)
 
 const mapStateToProps = state => {
   const form = getForm(state)
@@ -58,8 +57,13 @@ const mapStateToProps = state => {
 }
 
 const mergeProps = mergeAndInjectProps(
-  (stateProps, dispatchProps, { history }) => ({
-    onSubmitResult: onSubmitResult(history)
+  (stateProps, { setSnackbarMessage }, { history }) => ({
+    onSubmitResult: ({ email, response }) => {
+      processRegisterResponse(history, response)
+      setSnackbarMessage({
+        message: `We sent an email to <${email}>, please validate to continue`
+      })
+    }
   })
 )
 
@@ -67,6 +71,7 @@ export default R.compose(
   connect(
     mapStateToProps,
     {
+      setSnackbarMessage,
       onSubmit,
       ...actionCreators
     },

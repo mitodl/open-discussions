@@ -281,7 +281,7 @@ export const postEmailRegister = (email: string): Promise<RegisterResponse> =>
 export const postConfirmRegister = (code: string): Promise<RegisterResponse> =>
   fetchJSONWithCSRF("/api/v0/register/confirm/", {
     method: POST,
-    body:   JSON.stringify({ code })
+    body:   JSON.stringify({ verification_code: code })
   })
 
 export const postDetailsRegister = (

@@ -3,7 +3,6 @@ import {
   LOGIN_URL,
   LOGIN_PASSWORD_URL,
   REGISTER_URL,
-  REGISTER_CONFIRM_SENT_URL,
   REGISTER_CONFIRM_URL,
   REGISTER_DETAILS_URL,
   INACTIVE_USER_URL,
@@ -33,7 +32,7 @@ export const processLoginResponse = (
     history.push(LOGIN_URL)
   } else if (response.state === STATE_LOGIN_PASSWORD) {
     history.push(LOGIN_PASSWORD_URL)
-  } else if (STATE_SUCCESS) {
+  } else if (response.state === STATE_SUCCESS) {
     history.push(FRONTPAGE_URL)
   } else if (response.state === STATE_INACTIVE) {
     history.push(INACTIVE_USER_URL)
@@ -47,11 +46,11 @@ export const processRegisterResponse = (
   if (response.state === STATE_REGISTER_EMAIL) {
     history.push(REGISTER_URL)
   } else if (response.state === STATE_REGISTER_CONFIRM_SENT) {
-    history.push(REGISTER_CONFIRM_SENT_URL)
+    history.push(FRONTPAGE_URL)
   } else if (response.state === STATE_REGISTER_CONFIRM) {
     history.push(REGISTER_CONFIRM_URL)
   } else if (response.state === STATE_REGISTER_DETAILS) {
-    history.push(REGISTER_DETAILS_URL)
+    history.push(response.state === REGISTER_DETAILS_URL)
   } else if (STATE_SUCCESS) {
     history.push(FRONTPAGE_URL)
   } else if (response.state === STATE_INACTIVE) {
