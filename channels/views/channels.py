@@ -21,13 +21,24 @@ class ChannelListView(ListCreateAPIView):
     """
     View for listing and creating channels
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffOrReadonlyPermission,)
+    permission_classes = ()
     serializer_class = ChannelSerializer
 
     def get_queryset(self):
         """Get generator for channels list"""
-        api = Api(user=self.request.user)
-        return api.list_channels()
+        import logging
+        log = logging.getLogger(__name__)
+        try:
+            raise KeyError
+        except:
+            log.exception("Testing a web request exception")
+
+        from channels.tasks import log_test
+        log_test.delay()
+
+        #api = Api(user=self.request.user)
+        #return api.list_channels()
+        return []
 
     def post(self, request, *args, **kwargs):
         with translate_praw_exceptions(request.user):

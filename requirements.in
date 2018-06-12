@@ -6,7 +6,7 @@ beautifulsoup4==4.6.0
 betamax
 betamax_serializers
 boto==2.39.0
-celery==4.2.0rc2
+celery==4.2.0
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-redis==4.7.0
@@ -30,7 +30,7 @@ praw==4.5.1
 premailer==3.1.1
 python-dateutil
 python3-saml==1.4.1
-raven
+raven==6.9.0
 redis==2.10.5
 requests
 social-auth-app-django==2.1.0

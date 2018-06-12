@@ -28,4 +28,4 @@ register_signal(client, ignore_expected=True)
 
 app = Celery('open_discussions')
 app.config_from_object('django.conf:settings', namespace='CELERY')
-app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)  # pragma: no cover
+app.autodiscover_tasks()  # pragma: no cover
