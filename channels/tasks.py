@@ -1,10 +1,11 @@
 """Channels tasks"""
+import logging
+
 from channels import api
 from open_discussions.celery import app
 
 
-from celery.utils.log import get_task_logger
-log = get_task_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 @app.task()
@@ -19,4 +20,4 @@ def log_test():
     try:
         raise TabError
     except:
-        log.exception("Testing celery logging")
+        log.exception(f"Testing celery logging {log.handlers}")
