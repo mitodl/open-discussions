@@ -29,7 +29,7 @@ class ChannelListView(ListCreateAPIView):
         import logging
         log = logging.getLogger(__name__)
         try:
-            1 / 0
+            raise KeyError
         except:
             log.exception("Testing a web request exception")
 
