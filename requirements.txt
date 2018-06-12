@@ -5,17 +5,15 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 amqp==2.1.4               # via kombu
-appnope==0.1.0            # via ipython
 base36==0.1.1
 beautifulsoup4==4.6.0
 betamax-serializers==0.2.0
 betamax==0.8.0
 billiard==3.5.0.2         # via celery
 boto==2.39.0
-celery==4.2.0rc2
+celery==4.2.0
 certifi==2017.4.17        # via requests
 chardet==3.0.4            # via requests
-contextlib2==0.5.5        # via raven
 cssselect==1.0.3          # via premailer
 cssutils==1.0.2           # via premailer
 decorator==4.0.11         # via ipython, traitlets
@@ -42,7 +40,7 @@ ipython-genutils==0.2.0   # via traitlets
 ipython==6.1.0
 isodate==0.6.0            # via python3-saml
 jedi==0.10.2              # via ipython
-kombu==4.0.2              # via celery, django-server-status
+kombu==4.2.1              # via celery, django-server-status
 lxml==4.1.1               # via premailer, xmlsec
 markdown2==2.3.5
 newrelic==2.86.3.70
