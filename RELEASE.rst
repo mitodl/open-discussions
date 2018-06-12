@@ -1,6 +1,19 @@
 Release Notes
 =============
 
+Version 0.31.1
+--------------
+
+- Fixed locally failing lint
+- Set requestedAuthnContext to False (#810)
+- Add required environment variables to app.json (#808)
+- Added user full name to ES document
+- Add MAILGUN_SENDER_DOMAIN to app.json so it gets used by review apps (#807)
+- Form utilities
+- X-Forward settings (#804)
+- Nginx headers for Touchstone (#803)
+- Minor serializer test refactor
+
 Version 0.31.0
 --------------
 
