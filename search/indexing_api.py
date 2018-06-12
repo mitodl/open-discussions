@@ -32,7 +32,8 @@ SCRIPTING_LANG = 'painless'
 UPDATE_CONFLICT_SETTING = 'proceed'
 COMBINED_MAPPING = {
     'object_type': {'type': 'keyword'},
-    'author': {'type': 'keyword'},
+    'author_id': {'type': 'keyword'},
+    'author_name': {'type': 'keyword'},
     'channel_title': {'type': 'keyword'},
     'text': {'type': 'text'},
     'score': {'type': 'long'},
