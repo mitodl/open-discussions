@@ -73,7 +73,7 @@ def require_password_and_profile_via_email(
     if backend.name != EmailAuth.name or not is_register:
         return {}
 
-    if not user.password or not user.profile.name:
+    if not user.password or not hasattr(user, 'profile') or not user.profile.name:
         raise RequirePasswordAndProfileException(backend, current_partial)
 
     return {}

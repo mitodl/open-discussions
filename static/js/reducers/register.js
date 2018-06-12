@@ -13,14 +13,14 @@ export const registerEmailEndpoint = {
 }
 
 export const registerConfirmEndpoint = {
-  name:         "registerEmailmConfirm",
+  name:         "registerConfirm",
   verbs:        [POST],
   postFunc:     (code: string) => api.postConfirmRegister(code),
   initialState: { ...INITIAL_STATE }
 }
 
 export const registerDetailsEndpoint = {
-  name:     "registerEmailmConfir",
+  name:     "registerDetails",
   verbs:    [POST],
   postFunc: (
     partialToken: string,

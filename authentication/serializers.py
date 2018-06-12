@@ -3,6 +3,7 @@ import logging
 
 from django.http import HttpResponseRedirect
 from social_django.views import _do_login as login
+from social_core.exceptions import InvalidEmail
 from social_core.utils import (
     user_is_authenticated,
     user_is_active,
@@ -131,7 +132,7 @@ class RegisterEmailSerializer(SocialAuthSerializer):
                 result = SocialAuthState(SocialAuthState.STATE_REGISTER_CONFIRM_SENT)
             elif not isinstance(result, SocialAuthState):
                 # if we got here, we saw an unexpected result
-                log.error("Received unexpected result: ", result)
+                log.error("Received unexpected result: %s", result)
                 result = SocialAuthState(SocialAuthState.STATE_ERROR)
         except RequirePasswordException as exc:
             result = SocialAuthState(SocialAuthState.STATE_ERROR, partial=exc.partial)
@@ -150,8 +151,10 @@ class RegisterConfirmSerializer(SocialAuthSerializer):
 
             if not isinstance(result, SocialAuthState):
                 # if we got here, we saw an unexpected result
-                log.error("Received unexpected result: ", result)
+                log.error("Received unexpected result: %s", result)
                 result = SocialAuthState(SocialAuthState.STATE_ERROR)
+        except InvalidEmail:
+            result = SocialAuthState(SocialAuthState.STATE_INVALID_EMAIL)
         except RequirePasswordAndProfileException as exc:
             result = SocialAuthState(SocialAuthState.STATE_ERROR, partial=exc.partial)
         return result
@@ -169,7 +172,7 @@ class RegisterDetailsSerializer(SocialAuthSerializer):
             result = super()._authenticate(is_login=False)
             if not isinstance(result, SocialAuthState):
                 # if we got here, we saw an unexpected result
-                log.error("Received unexpected result: ", result)
+                log.error("Received unexpected result: %sS", result)
                 result = SocialAuthState(SocialAuthState.STATE_ERROR)
         except RequirePasswordAndProfileException as exc:
             result = SocialAuthState(SocialAuthState.STATE_ERROR, partial=exc.partial)

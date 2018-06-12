@@ -20,6 +20,7 @@ class SocialAuthState:
     STATE_SUCCESS = "success"
     STATE_ERROR = "error"
     STATE_INACTIVE = "inactive"
+    STATE_INVALID_EMAIL = "invalid-email"
 
     def __init__(self, state, partial=None, errors=None):
         self.state = state

@@ -17,6 +17,7 @@ import SettingsPage from "./SettingsPage"
 import LoginPage from "./auth/LoginPage"
 import LoginPasswordPage from "./auth/LoginPasswordPage"
 import RegisterPage from "./auth/RegisterPage"
+import RegisterConfirmPage from "./auth/RegisterConfirmPage"
 import RegisterDetailsPage from "./auth/RegisterDetailsPage"
 import InactiveUserPage from "./auth/InactiveUserPage"
 import Toolbar from "../components/Toolbar"
@@ -169,11 +170,11 @@ class App extends React.Component<*, void> {
             path={`${match.url}register/`}
             component={RegisterPage}
           />
-          {/* <Route
+          <Route
             exact
             path={`${match.url}register/confirm/`}
             component={RegisterConfirmPage}
-          /> */}
+          />
           <Route
             exact
             path={`${match.url}register/details/`}

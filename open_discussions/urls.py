@@ -60,7 +60,7 @@ urlpatterns = [
     url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
     url(r'^login/', index),
     url(r'^register/', index),
-    url(r'^register/confirm', index, name='register-confirm'),
+    url(r'^register/confirm/$', index, name='register-confirm'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
