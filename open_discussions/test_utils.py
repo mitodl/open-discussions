@@ -32,5 +32,5 @@ def assert_not_raises():
         yield
     except AssertionError:
         raise
-    except:  # pylint: disable=bare-except
+    except Exception:  # pylint: disable=broad-except
         pytest.fail(f'An exception was not raised: {traceback.format_exc()}')
