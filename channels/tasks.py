@@ -17,6 +17,6 @@ def evict_expired_access_tokens():
 def log_test():
     """Test logging error messages"""
     try:
-        1/0
+        raise TabError
     except:
         log.exception("Testing celery logging")
