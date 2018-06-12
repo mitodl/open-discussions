@@ -1,9 +1,9 @@
 """Indexing tasks"""
 from contextlib import contextmanager
+import logging
 
 import celery
 from celery.exceptions import Ignore
-from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from elasticsearch.exceptions import NotFoundError
@@ -22,7 +22,7 @@ from search.exceptions import (
 
 
 User = get_user_model()
-log = get_task_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 # For our tasks that attempt to partially update a document, there's a chance that
