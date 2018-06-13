@@ -1,6 +1,8 @@
 // @flow
 import React from "react"
 
+import ContentLoader from "react-content-loader"
+
 export default class Embedly extends React.Component<*> {
   renderEmbed() {
     const { embedly } = this.props
@@ -48,13 +50,32 @@ export default class Embedly extends React.Component<*> {
     )
   }
 
+  renderContentLoader() {
+    return (
+      <div className="content-loader">
+        <ContentLoader
+          speed={2}
+          style={{ width: "100%", height: "300px" }}
+          width="100%"
+          height={300}
+        >
+          <rect x="0" y="0" rx="5" ry="5" width="100%" height="200" />
+          <rect x="0" y="220" rx="5" ry="5" width="65%" height="15" />
+          <rect x="0" y="250" rx="5" ry="5" width="93%" height="10" />
+          <rect x="0" y="265" rx="5" ry="5" width="95%" height="10" />
+          <rect x="0" y="280" rx="5" ry="5" width="90%" height="10" />
+        </ContentLoader>
+      </div>
+    )
+  }
+
   render() {
     const { embedly } = this.props
 
-    return (
-      <div className="embedly">
-        {embedly && embedly.type !== "error" ? this.renderEmbed() : null}
-      </div>
+    return embedly && embedly.type !== "error" ? (
+      <div className="embedly">{this.renderEmbed()}</div>
+    ) : (
+      this.renderContentLoader()
     )
   }
 }

@@ -1,6 +1,7 @@
 import React from "react"
 import { mount } from "enzyme"
 import { assert } from "chai"
+import ContentLoader from "react-content-loader"
 
 import Embedly from "./Embedly"
 
@@ -52,5 +53,11 @@ describe("Embedly", () => {
     article.type = "error"
     const wrapper = renderEmbedly(article)
     assert.lengthOf(wrapper.children().at(1), 0)
+  })
+
+  it("should show a loading animation thing if embedly response hasn't come back yet", () => {
+    const wrapper = renderEmbedly()
+    assert.isOk(wrapper.find(".content-loader"))
+    assert.isOk(wrapper.find(ContentLoader))
   })
 })
