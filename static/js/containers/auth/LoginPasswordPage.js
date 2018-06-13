@@ -19,7 +19,7 @@ import { mergeAndInjectProps } from "../../lib/redux_props"
 import type { PasswordForm } from "../../flow/authTypes"
 import type { WithFormProps } from "../../hoc/withForm"
 
-const getPartialToken = R.path(["data", "partial_token"])
+const getPartialToken = R.path(["auth", "data", "partial_token"])
 
 type LoginPasswordPageProps = {
   history: Object,
@@ -46,7 +46,7 @@ const { getForm, actionCreators } = configureForm(
 )
 
 const onSubmit = (partialToken: string, form: PasswordForm) =>
-  actions.loginPassword.post(partialToken, form.password)
+  actions.auth.loginPassword(partialToken, form.password)
 
 const onSubmitResult = R.curry(processLoginResponse)
 
@@ -72,8 +72,8 @@ const mergeProps = mergeAndInjectProps(
 
 const mapStateToProps = state => {
   const form = getForm(state)
-  const partialToken = getPartialToken(state.loginEmail)
-  const processing = state.loginEmail.processing
+  const partialToken = getPartialToken(state)
+  const processing = state.auth.processing
 
   return {
     form,

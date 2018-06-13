@@ -44,7 +44,6 @@ export const processRegisterResponse = (
   history: Object,
   response: RegisterResponse
 ) => {
-  debugger;
   if (response.state === STATE_REGISTER_EMAIL) {
     history.push(REGISTER_URL)
   } else if (response.state === STATE_REGISTER_CONFIRM_SENT) {

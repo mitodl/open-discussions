@@ -37,7 +37,7 @@ const LoginPage = ({ renderForm }: LoginPageProps) => (
 
 const newEmailForm = () => ({ email: "" })
 
-const onSubmit = ({ email }: EmailForm) => actions.loginEmail.post(email)
+const onSubmit = ({ email }: EmailForm) => actions.auth.loginEmail(email)
 
 const onSubmitResult = R.curry(processLoginResponse)
 
@@ -45,7 +45,7 @@ const { getForm, actionCreators } = configureForm("login:email", newEmailForm)
 
 const mapStateToProps = state => {
   const form = getForm(state)
-  const processing = state.loginEmail.processing
+  const processing = state.auth.processing
 
   return {
     form,

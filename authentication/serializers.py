@@ -135,7 +135,7 @@ class RegisterEmailSerializer(SocialAuthSerializer):
                 log.error("Received unexpected result: %s", result)
                 result = SocialAuthState(SocialAuthState.STATE_ERROR)
         except RequirePasswordException as exc:
-            result = SocialAuthState(SocialAuthState.STATE_ERROR, partial=exc.partial)
+            result = SocialAuthState(SocialAuthState.STATE_LOGIN_PASSWORD, partial=exc.partial)
         return result
 
 
@@ -156,7 +156,7 @@ class RegisterConfirmSerializer(SocialAuthSerializer):
         except InvalidEmail:
             result = SocialAuthState(SocialAuthState.STATE_INVALID_EMAIL)
         except RequirePasswordAndProfileException as exc:
-            result = SocialAuthState(SocialAuthState.STATE_ERROR, partial=exc.partial)
+            result = SocialAuthState(SocialAuthState.STATE_REGISTER_DETAILS, partial=exc.partial)
         return result
 
 
@@ -175,5 +175,5 @@ class RegisterDetailsSerializer(SocialAuthSerializer):
                 log.error("Received unexpected result: %sS", result)
                 result = SocialAuthState(SocialAuthState.STATE_ERROR)
         except RequirePasswordAndProfileException as exc:
-            result = SocialAuthState(SocialAuthState.STATE_ERROR, partial=exc.partial)
+            result = SocialAuthState(SocialAuthState.STATE_REGISTER_DETAILS, partial=exc.partial)
         return result

@@ -43,11 +43,11 @@ const { getForm, actionCreators } = configureForm(
   newEmailForm
 )
 
-const onSubmit = (form: EmailForm) => actions.registerEmail.post(form.email)
+const onSubmit = (form: EmailForm) => actions.auth.registerEmail(form.email)
 
 const mapStateToProps = state => {
   const form = getForm(state)
-  const processing = state.registerEmail.processing
+  const processing = state.auth.processing
 
   return {
     form,

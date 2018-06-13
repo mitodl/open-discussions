@@ -42,7 +42,7 @@ const RegisterDetailsPage = ({ renderForm }: RegisterDetailsPageProps) => (
 const newDetailsForm = () => ({ name: "", password: "", tos: false })
 
 const onSubmit = R.curry((partialToken: string, form: DetailsForm) =>
-  actions.registerDetails.post(partialToken, form.name, form.password, form.tos)
+  actions.auth.registerDetails(partialToken, form.name, form.password, form.tos)
 )
 
 const onSubmitResult = R.curry(processRegisterResponse)
@@ -53,7 +53,7 @@ const { getForm, actionCreators } = configureForm(
 )
 
 const mapStateToProps = state => {
-  const processing = state.registerDetails.processing
+  const processing = state.auth.processing
   const form = getForm(state)
 
   return {
