@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.31.2
+--------------
+
+- Add a fancy loading animation to link posts
+- Require uwsgi to honour stdin locally for debugging
+
 Version 0.31.1
 --------------
 
