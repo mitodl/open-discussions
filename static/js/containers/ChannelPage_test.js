@@ -25,6 +25,10 @@ import { channelURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
 import { VALID_POST_SORT_TYPES } from "../lib/sorting"
 import { makeReportRecord } from "../factories/reports"
+import {
+  RECEIVE_GET_PROFILES_SUCCESS,
+  REQUEST_GET_PROFILES
+} from "../actions/profile"
 
 describe("ChannelPage", () => {
   let helper,
@@ -48,6 +52,7 @@ describe("ChannelPage", () => {
     helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
     helper.getPostsForChannelStub.returns(Promise.resolve({ posts: postList }))
     helper.getReportsStub.returns(Promise.resolve(R.times(makeReportRecord, 4)))
+    helper.getProfileStub.returns(Promise.resolve(""))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
   })
@@ -58,6 +63,8 @@ describe("ChannelPage", () => {
 
   const renderPage = async channel => {
     const [wrapper] = await renderComponent(channelURL(channel.name), [
+      REQUEST_GET_PROFILES,
+      RECEIVE_GET_PROFILES_SUCCESS,
       actions.channels.get.requestType,
       actions.channels.get.successType,
       actions.postsForChannel.get.requestType,
@@ -96,6 +103,8 @@ describe("ChannelPage", () => {
     postList[0] = post
 
     const [wrapper] = await renderComponent(channelURL(currentChannel.name), [
+      REQUEST_GET_PROFILES,
+      RECEIVE_GET_PROFILES_SUCCESS,
       actions.channels.get.requestType,
       actions.channels.get.successType,
       actions.postsForChannel.get.requestType,
@@ -199,6 +208,8 @@ describe("ChannelPage", () => {
     })
 
     await renderComponent(channelURL(currentChannel.name), [
+      REQUEST_GET_PROFILES,
+      RECEIVE_GET_PROFILES_SUCCESS,
       actions.channels.get.requestType,
       actions.channels.get.successType,
       actions.postsForChannel.get.requestType,

@@ -28,6 +28,7 @@ import type {
 } from "../flow/discussionTypes"
 import type { NotificationSetting } from "../flow/settingsTypes"
 import type { EmbedlyResponse } from "../reducers/embedly"
+import type { Profile } from "../flow/discussionTypes"
 
 const paramsToQueryString = paramSelector =>
   R.compose(
@@ -250,4 +251,24 @@ export const getEmbedly = async (url: string): Promise<EmbedlyResponse> => {
   )
 
   return { url, response }
+}
+
+export function updateProfileImage(
+  username: string,
+  image: Blob,
+  name: string
+): Promise<string> {
+  const formData = new FormData()
+  formData.append("image_file", image, name)
+  return fetchWithAuthFailure(`/api/v0/profiles/${username}/`, {
+    headers: {
+      Accept: "text/html"
+    },
+    method: "PATCH",
+    body:   formData
+  })
+}
+
+export function getProfile(username: string): Promise<Profile> {
+  return fetchJSONWithAuthFailure(`/api/v0/profiles/${username}/`)
 }

@@ -39,6 +39,10 @@ import { VALID_COMMENT_SORT_TYPES } from "../lib/sorting"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import * as utilFuncs from "../lib/util"
 import * as embedUtil from "../lib/embed"
+import {
+  RECEIVE_GET_PROFILES_SUCCESS,
+  REQUEST_GET_PROFILES
+} from "../actions/profile"
 
 describe("PostPage", function() {
   let helper,
@@ -76,6 +80,7 @@ describe("PostPage", function() {
     )
     helper.deletePostStub.returns(Promise.resolve())
     helper.getReportsStub.returns(Promise.resolve(R.times(makeReportRecord, 4)))
+    helper.getProfileStub.returns(Promise.resolve(""))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
     twitterEmbedStub = helper.sandbox.stub(embedUtil, "ensureTwitterEmbedJS")
@@ -86,6 +91,8 @@ describe("PostPage", function() {
   })
 
   const basicPostPageActions = [
+    REQUEST_GET_PROFILES,
+    RECEIVE_GET_PROFILES_SUCCESS,
     actions.posts.get.requestType,
     actions.posts.get.successType,
     actions.comments.get.requestType,

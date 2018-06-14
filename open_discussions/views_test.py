@@ -9,7 +9,6 @@ from django.urls import reverse
 from rest_framework_jwt.settings import api_settings
 
 from open_discussions.features import ANONYMOUS_ACCESS, SAML_AUTH
-from profiles.utils import image_uri
 
 pytestmark = [
     pytest.mark.django_db,
@@ -40,8 +39,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
         'max_comment_depth': 6,
         'user_email': user.email,
         'username': user.username,
-        'profile_image_small': image_uri(user),
-        'profile_complete': True,
+        'profile_ui_enabled': False,
         'user_full_name': user.profile.name,
         'authenticated_site': {
             'title': authenticated_site.title,
@@ -81,8 +79,7 @@ def test_webpack_url_jwt(
         'max_comment_depth': 6,
         'user_email': user.email,
         'username': user.username,
-        'profile_image_small': image_uri(user),
-        'profile_complete': True,
+        'profile_ui_enabled': False,
         'user_full_name': user.profile.name,
         'authenticated_site': {
             'title': authenticated_site.title,
@@ -119,8 +116,7 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
         'max_comment_depth': 6,
         'user_email': None,
         'username': None,
-        'profile_image_small': None,
-        'profile_complete': True,
+        'profile_ui_enabled': False,
         'user_full_name': None,
         'authenticated_site': {
             'title': authenticated_site.title,

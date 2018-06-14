@@ -14,9 +14,10 @@ import AuthRequiredPage from "./AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
 import ChannelModerationPage from "./ChannelModerationPage"
 import SettingsPage from "./SettingsPage"
-import Toolbar from "../components/Toolbar"
+import ProfilePage from "./ProfilePage"
 import Snackbar from "../components/material/Snackbar"
 import Drawer from "../containers/Drawer"
+import Toolbar from "../components/Toolbar"
 import Footer from "../components/Footer"
 
 import { actions } from "../actions"
@@ -27,6 +28,7 @@ import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { SnackbarState } from "../reducers/ui"
+import type { Profile } from "../flow/discussionTypes"
 
 class App extends React.Component<*, void> {
   props: {
@@ -35,7 +37,8 @@ class App extends React.Component<*, void> {
     showDrawer: boolean,
     snackbar: SnackbarState,
     dispatch: Dispatch,
-    showUserMenu: boolean
+    showUserMenu: boolean,
+    profile: Profile
   }
 
   toggleShowSidebar = () => {
@@ -84,6 +87,7 @@ class App extends React.Component<*, void> {
 
     const channels = await dispatch(actions.subscribedChannels.get())
     dispatch(setChannelData(channels))
+    await dispatch(actions.profiles.get(SETTINGS.username || ""))
   }
 
   render() {
@@ -91,7 +95,8 @@ class App extends React.Component<*, void> {
       match,
       location: { pathname },
       snackbar,
-      showUserMenu
+      showUserMenu,
+      profile
     } = this.props
 
     if (
@@ -113,6 +118,7 @@ class App extends React.Component<*, void> {
             toggleShowSidebar={this.toggleShowSidebar}
             toggleShowUserMenu={this.toggleShowUserMenu}
             showUserMenu={showUserMenu}
+            profile={profile}
           />
           <Drawer />
           <Route exact path={match.url} component={HomePage} />
@@ -153,6 +159,11 @@ class App extends React.Component<*, void> {
             path={`${match.url}settings/:token?`}
             component={SettingsPage}
           />
+          <Route
+            exact
+            path={`${match.url}profile/:userName/`}
+            component={ProfilePage}
+          />
         </div>
         <Footer />
       </div>
@@ -162,7 +173,9 @@ class App extends React.Component<*, void> {
 
 export default connect(state => {
   const {
+    profiles,
     ui: { showDrawer, snackbar, showUserMenu }
   } = state
-  return { showDrawer, snackbar, showUserMenu }
+  const profile = profiles.data.get(SETTINGS.username || "")
+  return { showDrawer, snackbar, showUserMenu, profile }
 })(App)

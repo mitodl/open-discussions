@@ -11,6 +11,7 @@ import { postRemovedEndpoint } from "../reducers/post_removed"
 import { reportsEndpoint } from "../reducers/reports"
 import { settingsEndpoint } from "../reducers/settings"
 import { embedlyEndpoint } from "../reducers/embedly"
+import { profilesEndpoint } from "../reducers/profiles"
 
 export const endpoints = [
   postsEndpoint,
@@ -25,5 +26,17 @@ export const endpoints = [
   postRemovedEndpoint,
   reportsEndpoint,
   settingsEndpoint,
-  embedlyEndpoint
+  embedlyEndpoint,
+  profilesEndpoint
 ]
+
+/**
+ * takes an actionCreator and dispatch and returns a function that
+ * dispatches the action created by that actionCreator to the store
+ */
+export function createActionHelper(
+  dispatch: Dispatch,
+  actionCreator: Function
+): (...args: any) => void {
+  return (...args) => dispatch(actionCreator(...args))
+}

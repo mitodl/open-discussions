@@ -31,6 +31,7 @@ describe("EditChannelPage", () => {
       })
     )
     helper.updateChannelStub.returns(Promise.resolve(channel))
+    helper.getProfileStub.returns(Promise.resolve(""))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
     window.scrollTo = helper.sandbox.stub()

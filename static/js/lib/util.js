@@ -13,6 +13,9 @@ export const getPostID = (props: { match: Match }): string =>
 export const getCommentID = (props: { match: Match }): string | void =>
   props.match.params.commentID || undefined
 
+export const getUserName = (props: { match: Match }): string =>
+  props.match.params.userName || ""
+
 /**
  * Returns a promise which resolves after a number of milliseconds have elapsed
  */

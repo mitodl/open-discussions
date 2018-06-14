@@ -10,13 +10,26 @@ import UserMenu from "./UserMenu"
 import { DropdownWithClickOutside, Dropdown } from "./UserMenu"
 
 import { SETTINGS_URL } from "../lib/url"
+import { defaultProfileImageUrl } from "../util/util"
 
 describe("UserMenu", () => {
-  let toggleShowUserMenuStub, showUserMenu
+  let toggleShowUserMenuStub, showUserMenu, profile
 
   beforeEach(() => {
     toggleShowUserMenuStub = sinon.stub()
     showUserMenu = false
+    profile = {
+      name:              "Test User",
+      username:          "AHJS123123FHG",
+      image:             null,
+      image_small:       null,
+      image_medium:      null,
+      image_file:        null,
+      image_small_file:  null,
+      image_medium_file: null,
+      bio:               null,
+      headline:          null
+    }
   })
 
   const renderUserMenu = () =>
@@ -24,6 +37,7 @@ describe("UserMenu", () => {
       <UserMenu
         toggleShowUserMenu={toggleShowUserMenuStub}
         showUserMenu={showUserMenu}
+        profile={profile}
       />
     )
 
@@ -36,7 +50,7 @@ describe("UserMenu", () => {
     assert.equal(className, "profile-image")
     onClick()
     assert.isOk(toggleShowUserMenuStub.called)
-    assert.equal(src, SETTINGS.profile_image_small)
+    assert.equal(src, defaultProfileImageUrl)
   })
 
   it("should render the dropdown if showUserMenu", () => {
@@ -52,7 +66,7 @@ describe("UserMenu", () => {
   })
 
   it("should include a red dot if profile is incomplete", () => {
-    SETTINGS.profile_complete = false
+    SETTINGS.profile_ui_enabled = true
     const wrapper = renderUserMenu()
     assert.isOk(wrapper.find(".profile-incomplete").exists())
   })

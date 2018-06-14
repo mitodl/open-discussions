@@ -4,6 +4,7 @@ import React from "react"
 import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
 
 import UserMenu from "./UserMenu"
+import type { Profile } from "../flow/discussionTypes"
 
 export default class Toolbar extends React.Component<*, void> {
   toolbarRoot: HTMLElement | null
@@ -12,7 +13,8 @@ export default class Toolbar extends React.Component<*, void> {
   props: {
     toggleShowSidebar: Function,
     toggleShowUserMenu: Function,
-    showUserMenu: boolean
+    showUserMenu: boolean,
+    profile: Profile
   }
 
   componentDidMount() {
@@ -26,7 +28,12 @@ export default class Toolbar extends React.Component<*, void> {
   }
 
   render() {
-    const { toggleShowSidebar, toggleShowUserMenu, showUserMenu } = this.props
+    const {
+      toggleShowSidebar,
+      toggleShowUserMenu,
+      showUserMenu,
+      profile
+    } = this.props
 
     return (
       <div className="navbar">
@@ -53,6 +60,7 @@ export default class Toolbar extends React.Component<*, void> {
               <UserMenu
                 toggleShowUserMenu={toggleShowUserMenu}
                 showUserMenu={showUserMenu}
+                profile={profile}
               />
             </section>
           </div>

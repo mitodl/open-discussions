@@ -174,3 +174,24 @@ export type CommentReportRecord = {
 }
 
 export type ReportRecord = PostReportRecord | CommentReportRecord
+
+export type Profile = {
+  name:                        string,
+  image:                       ?string,
+  image_small:                 ?string,
+  image_medium:                ?string,
+  image_file:                  ?string,
+  image_small_file:            ?string,
+  image_medium_file:           ?string,
+  bio:                         ?string,
+  headline:                    ?string,
+  username:                    string
+}
+
+
+export type ProfileForm = {
+  name:                        string,
+  image_file:                  ?string,
+  bio:                         ?string,
+  headline:                    ?string,
+}

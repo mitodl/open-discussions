@@ -62,6 +62,7 @@ describe("CreatePostPage", () => {
     helper.getEmbedlyStub.returns(
       Promise.resolve({ url: post.url, response: article })
     )
+    helper.getProfileStub.returns(Promise.resolve(""))
     listenForActions = helper.listenForActions.bind(helper)
     renderComponent = helper.renderComponent.bind(helper)
     twitterEmbedStub = helper.sandbox.stub(embedUtil, "ensureTwitterEmbedJS")
