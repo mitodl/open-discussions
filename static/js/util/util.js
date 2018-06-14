@@ -26,11 +26,11 @@ export function makeProfileImageUrl(
 
 export function isProfileComplete(profile: Profile): boolean {
   if (
-    profile &&
-    profile.name &&
-    profile.bio &&
-    profile.headline &&
-    makeProfileImageUrl(profile) !== defaultProfileImageUrl
+    !profile ||
+    (profile.name &&
+      profile.bio &&
+      profile.headline &&
+      makeProfileImageUrl(profile) !== defaultProfileImageUrl)
   ) {
     return true
   }

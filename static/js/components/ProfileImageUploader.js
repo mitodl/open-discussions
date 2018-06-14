@@ -5,7 +5,6 @@ import R from "ramda"
 import Dropzone from "react-dropzone"
 
 import CropperWrapper from "./CropperWrapper"
-import SpinnerButton from "../components/SpinnerButton"
 import { FETCH_PROCESSING } from "../actions"
 import type { ImageUploadState } from "../reducers/image_upload"
 
@@ -14,21 +13,38 @@ const onDrop = R.curry((startPhotoEdit, files) => startPhotoEdit(...files))
 const dropZone = (startPhotoEdit, setPhotoError) => (
   <Dropzone
     onDrop={onDrop(startPhotoEdit)}
-    style={{ height: uploaderBodyHeight() }}
     className="photo-upload-dialog photo-active-item photo-dropzone dashed-border"
+    style={{ height: uploaderBodyHeight() }}
     accept="image/*"
     onDropRejected={() => setPhotoError("Please select a valid photo")}
   >
-    <div
-      className="photo-upload-dialog photo-active-item photo-dropzone dashed-border"
-      style={{ height: uploaderBodyHeight() }}
-    >
-      <div className="desktop-upload-message">
-        Drag a photo here or click to select a photo.
-      </div>
-      <div className="mobile-upload-message">Click to select a photo.</div>
+    <div className="desktop-upload-message">
+      Drag a photo here or click to select a photo.
     </div>
+    <div className="mobile-upload-message">Click to select a photo.</div>
   </Dropzone>
+)
+
+const spinner = () => (
+  <div
+    className="photo-upload-dialog photo-active-item photo-dropzone dashed-border"
+    style={{ height: uploaderBodyHeight() }}
+  >
+    <div className="sk-fading-circle">
+      <div className="sk-circle1 sk-circle" />
+      <div className="sk-circle2 sk-circle" />
+      <div className="sk-circle3 sk-circle" />
+      <div className="sk-circle4 sk-circle" />
+      <div className="sk-circle5 sk-circle" />
+      <div className="sk-circle6 sk-circle" />
+      <div className="sk-circle7 sk-circle" />
+      <div className="sk-circle8 sk-circle" />
+      <div className="sk-circle9 sk-circle" />
+      <div className="sk-circle10 sk-circle" />
+      <div className="sk-circle11 sk-circle" />
+      <div className="sk-circle12 sk-circle" />
+    </div>
+  </div>
 )
 
 const uploaderBodyHeight = (): number => R.min(500, window.innerHeight * 0.44)
@@ -43,14 +59,7 @@ const dialogContents = (
   inFlight
 ) => {
   if (inFlight) {
-    return (
-      <div
-        className="photo-active-item dashed-border spinner"
-        style={{ height: uploaderBodyHeight() }}
-      >
-        <SpinnerButton />
-      </div>
-    )
+    return spinner()
   } else if (photo) {
     return (
       <CropperWrapper
@@ -86,24 +95,18 @@ const ProfileImageUploader = ({
   setPhotoError
 }: ImageUploadProps) => {
   const inFlight = patchStatus === FETCH_PROCESSING
-  const disabled = patchStatus === FETCH_PROCESSING || !photo
 
   return (
     <Dialog
       title="Upload a Profile Photo"
-      onRequestClose={() => setDialogVisibility(false)}
       autoScrollBodyContent={true}
       contentStyle={{ maxWidth: "620px" }}
       open={photoDialogOpen}
-      onAccept={updateUserPhoto}
+      onAccept={photo || inFlight ? updateUserPhoto : null}
+      onCancel={clearPhotoEdit}
       hideDialog={() => {
-        clearPhotoEdit()
         setDialogVisibility(false)
       }}
-      onCancel={() => {
-        clearPhotoEdit()
-      }}
-      disabled={disabled}
     >
       {imageError(error)}
       {dialogContents(

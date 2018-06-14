@@ -17,7 +17,7 @@ import {
 
 import { showDialog, hideDialog, DIALOG_PROFILE_IMAGE } from "../actions/ui"
 import { actions } from "../actions"
-import { updateProfilePhoto } from "../reducers/profiles"
+import { updateProfilePhoto } from "../reducers/image_upload"
 
 const formatPhotoName = photo => `${photo.name.replace(/\.\w*$/, "")}.jpg`
 
@@ -40,7 +40,7 @@ class ProfileImage extends React.Component<*> {
     editable: false
   }
 
-  updateUserPhoto = () => {
+  saveProfilePhoto = () => {
     const {
       imageUpload: { edit, photo },
       dispatch,
@@ -84,7 +84,7 @@ class ProfileImage extends React.Component<*> {
             <span>
               <ProfileImageUploader
                 {...this.props}
-                updateUserPhoto={this.updateUserPhoto}
+                updateUserPhoto={this.saveProfilePhoto}
                 setDialogVisibility={this.setDialogVisibility}
               />
               <button
@@ -93,8 +93,8 @@ class ProfileImage extends React.Component<*> {
                   this.setDialogVisibility(true)
                 }}
               >
-                <i name="camera_alt" className="material-icons camera">
-                  camera_alt
+                <i name="camera_alt" className="material-icons edit">
+                  edit
                 </i>
               </button>
             </span>

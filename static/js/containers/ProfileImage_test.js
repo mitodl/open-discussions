@@ -4,10 +4,9 @@ import { mount } from "enzyme"
 import { assert } from "chai"
 import { Provider } from "react-redux"
 
-import ProfileImage, { DIALOG_PROFILE_IMAGE } from "./ProfileImage"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { showDialog } from "../actions/ui"
 import { startPhotoEdit } from "../actions/image_upload"
+import ProfileImage from "./ProfileImage"
 
 describe("ProfileImage", () => {
   let helper, div
@@ -41,7 +40,7 @@ describe("ProfileImage", () => {
     helper = new IntegrationTestHelper()
     // thatProfile is the logged in user
     SETTINGS.username = thatProfile.username
-    helper.updateProfileImageStub.returns(Promise.resolve(""))
+    helper.patchProfileImageStub.returns(Promise.resolve(""))
     helper.getProfileStub.returns(Promise.resolve(thatProfile))
   })
 
@@ -67,7 +66,21 @@ describe("ProfileImage", () => {
     })
 
     describe("save button", () => {
-      it("should call updateProfileImageStub when the save button is pressed", () => {
+      it("should call patchProfileImageStub when the save button is pressed", () => {
+        const image = renderProfileImage({
+          editable: true
+        })
+        helper.store.dispatch(startPhotoEdit({ name: "a name" }))
+        image
+          .find(".open-photo-dialog")
+          .at(0)
+          .simulate("click")
+        const dialog = image.find("ProfileImageUploader").find("Dialog")
+        const saveButton = dialog.find(".edit-button").at(0)
+        saveButton.simulate("click")
+        assert.isTrue(helper.patchProfileImageStub.called)
+      })
+      it("should not be visible if no photo is selected", () => {
         const image = renderProfileImage({
           editable: true
         })
@@ -75,12 +88,8 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        helper.store.dispatch(showDialog(DIALOG_PROFILE_IMAGE))
-        helper.store.dispatch(startPhotoEdit({ name: "a name" }))
         const dialog = image.find("ProfileImageUploader").find("Dialog")
-        const saveButton = dialog.find(".edit-button").at(0)
-        saveButton.simulate("click")
-        assert.isTrue(helper.updateProfileImageStub.called)
+        assert.equal(dialog.find(".edit-button").length, 0)
       })
     })
   })

@@ -253,7 +253,7 @@ export const getEmbedly = async (url: string): Promise<EmbedlyResponse> => {
   return { url, response }
 }
 
-export function updateProfileImage(
+export function patchProfileImage(
   username: string,
   image: Blob,
   name: string

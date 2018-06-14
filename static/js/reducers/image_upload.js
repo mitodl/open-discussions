@@ -4,12 +4,17 @@ import {
   CLEAR_PHOTO_EDIT,
   UPDATE_PHOTO_EDIT,
   SET_PHOTO_ERROR,
-  REQUEST_PATCH_USER_PHOTO,
-  RECEIVE_PATCH_USER_PHOTO_FAILURE,
-  RECEIVE_PATCH_USER_PHOTO_SUCCESS
+  REQUEST_PATCH_PHOTO,
+  RECEIVE_PATCH_PHOTO_FAILURE,
+  RECEIVE_PATCH_PHOTO_SUCCESS,
+  receivePatchPhotoFailure,
+  receivePatchPhotoSuccess,
+  requestPatchPhoto
 } from "../actions/image_upload"
 import { FETCH_FAILURE, FETCH_PROCESSING, FETCH_SUCCESS } from "../actions"
-import type { Action } from "../flow/reduxTypes"
+import type { Action, Dispatcher } from "../flow/reduxTypes"
+import { patchProfileImage } from "../lib/api"
+import { Dispatch } from "redux"
 
 export const INITIAL_IMAGE_UPLOAD_STATE = {
   edit:        null,
@@ -50,13 +55,31 @@ export const imageUpload = (
     return { ...state, edit: action.payload }
   case SET_PHOTO_ERROR:
     return { ...state, error: action.payload }
-  case REQUEST_PATCH_USER_PHOTO:
+  case REQUEST_PATCH_PHOTO:
     return { ...state, patchStatus: FETCH_PROCESSING }
-  case RECEIVE_PATCH_USER_PHOTO_SUCCESS:
+  case RECEIVE_PATCH_PHOTO_SUCCESS:
     return { ...state, patchStatus: FETCH_SUCCESS }
-  case RECEIVE_PATCH_USER_PHOTO_FAILURE:
+  case RECEIVE_PATCH_PHOTO_FAILURE:
     return { ...state, patchStatus: FETCH_FAILURE }
   default:
     return state
+  }
+}
+
+export function updateProfilePhoto(
+  username: string,
+  image: Blob,
+  name: string
+): Dispatcher<string | void> {
+  return (dispatch: Dispatch) => {
+    dispatch(requestPatchPhoto(username))
+    return patchProfileImage(username, image, name).then(
+      () => {
+        dispatch(receivePatchPhotoSuccess())
+      },
+      error => {
+        dispatch(receivePatchPhotoFailure(error))
+      }
+    )
   }
 }
