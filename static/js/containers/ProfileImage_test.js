@@ -13,16 +13,16 @@ describe("ProfileImage", () => {
   let helper, div
 
   const thatProfile = {
-    name:               "test_name",
-    bio:                "test_bio",
-    headline:           "test_headline",
-    image_file:         null,
-    image_small_file:   null,
-    image_medium_file:  null,
-    image:              null,
-    image_small:        null,
-    image_medium:       null,
-    username:           "test_username"
+    name:              "test_name",
+    bio:               "test_bio",
+    headline:          "test_headline",
+    image_file:        null,
+    image_small_file:  null,
+    image_medium_file: null,
+    image:             null,
+    image_small:       null,
+    image_medium:      null,
+    username:          "test_username"
   }
 
   const renderProfileImage = (props = {}) => {
@@ -41,10 +41,8 @@ describe("ProfileImage", () => {
     helper = new IntegrationTestHelper()
     // thatProfile is the logged in user
     SETTINGS.username = thatProfile.username
-    helper.updateProfileImageStub
-      .returns(Promise.resolve(''))
-    helper.getProfileStub
-      .returns(Promise.resolve(thatProfile))
+    helper.updateProfileImageStub.returns(Promise.resolve(""))
+    helper.getProfileStub.returns(Promise.resolve(thatProfile))
   })
 
   afterEach(() => {
@@ -73,10 +71,13 @@ describe("ProfileImage", () => {
         const image = renderProfileImage({
           editable: true
         })
-        image.find(".open-photo-dialog").at(0).simulate("click")
+        image
+          .find(".open-photo-dialog")
+          .at(0)
+          .simulate("click")
         helper.store.dispatch(showDialog(DIALOG_PROFILE_IMAGE))
         helper.store.dispatch(startPhotoEdit({ name: "a name" }))
-        const dialog = image.find("ProfileImageUploader").find('Dialog')
+        const dialog = image.find("ProfileImageUploader").find("Dialog")
         const saveButton = dialog.find(".edit-button").at(0)
         saveButton.simulate("click")
         assert.isTrue(helper.updateProfileImageStub.called)
@@ -84,4 +85,3 @@ describe("ProfileImage", () => {
     })
   })
 })
-
