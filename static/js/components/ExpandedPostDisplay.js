@@ -158,7 +158,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
             by <span className="author-name">{post.author_name}</span>,{" "}
             {formattedDate}
           </div>
-          <Embedly embedly={embedly} />
+          {post && post.url ? <Embedly embedly={embedly} /> : null}
         </div>
         {!showPermalinkUI && post.text ? this.renderTextContent() : null}
         {R.has(editPostKey(post), forms) ? null : this.postActionButtons()}

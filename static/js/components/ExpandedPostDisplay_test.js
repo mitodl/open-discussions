@@ -8,6 +8,7 @@ import R from "ramda"
 
 import ExpandedPostDisplay from "./ExpandedPostDisplay"
 import Router from "../Router"
+import Embedly from "./Embedly"
 
 import { wait } from "../lib/util"
 import { urlHostname } from "../lib/url"
@@ -83,6 +84,14 @@ describe("ExpandedPostDisplay", () => {
   it("should hide text content if passed showPermalinkUI", () => {
     const wrapper = renderPostDisplay({ post, showPermalinkUI: true })
     assert.isFalse(wrapper.find(ReactMarkdown).exists())
+  })
+
+  it("should show an embedly component, if a link post", () => {
+    [true, false].forEach(isLinkPost => {
+      post = makePost(isLinkPost)
+      const wrapper = renderPostDisplay({ post })
+      assert.equal(isLinkPost, wrapper.find(Embedly).exists())
+    })
   })
 
   it("should display post text", () => {
