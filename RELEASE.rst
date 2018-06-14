@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.31.2
+--------------
+
+- Fix silly bug with embedly display
+- Fix logging of errors and exceptions to sentry (#813)
+- Add a fancy loading animation to link posts
+- Require uwsgi to honour stdin locally for debugging
+
 Version 0.31.1
 --------------
 
