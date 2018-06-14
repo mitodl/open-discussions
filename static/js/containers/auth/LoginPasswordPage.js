@@ -15,11 +15,10 @@ import { formatTitle } from "../../lib/title"
 import { LOGIN_URL } from "../../lib/url"
 import { validatePasswordForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
+import { getPartialToken } from "../../reducers/auth"
 
 import type { PasswordForm } from "../../flow/authTypes"
 import type { WithFormProps } from "../../hoc/withForm"
-
-const getPartialToken = R.path(["auth", "data", "partial_token"])
 
 type LoginPasswordPageProps = {
   history: Object,

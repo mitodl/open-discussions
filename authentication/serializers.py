@@ -162,9 +162,9 @@ class RegisterConfirmSerializer(SocialAuthSerializer):
 
 class RegisterDetailsSerializer(SocialAuthSerializer):
     """Serializer for registration details"""
-    password = serializers.CharField()
-    name = serializers.CharField()
-    tos = serializers.BooleanField(validators=[is_true])
+    password = serializers.CharField(min_length=8, write_only=True)
+    name = serializers.CharField(write_only=True)
+    tos = serializers.BooleanField(write_only=True, validators=[is_true])
 
     def create(self, validated_data):
         """Try to 'save' the request"""

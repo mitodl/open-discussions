@@ -45,6 +45,7 @@ export class RegisterConfirmPage extends React.Component<*, *> {
     const { location, invalid } = this.props
 
     const code = confirmationCodeFromLocation(location)
+    const showLoading = code && !invalid
 
     return (
       <div className="content auth-page register-confirm-page">
@@ -52,7 +53,7 @@ export class RegisterConfirmPage extends React.Component<*, *> {
           <Card className="register-confirm-card">
             <h3>Confirming Email</h3>
             <DocumentTitle title={formatTitle("Confirming Email")} />
-            {code && !invalid ? (
+            {showLoading ? (
               <Loading />
             ) : (
               <div>

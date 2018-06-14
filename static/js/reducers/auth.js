@@ -1,7 +1,10 @@
 // @flow
+import R from "ramda"
 import * as api from "../lib/api"
 import { INITIAL_STATE } from "redux-hammock/constants"
 import { deriveVerbFuncs } from "redux-hammock/hammock"
+
+export const getPartialToken = R.path(["auth", "data", "partial_token"])
 
 export const authEndpoint = {
   name:         "auth",
@@ -13,7 +16,7 @@ export const authEndpoint = {
     // register functions
     registerEmail: async (email: string) => {
       const response = await api.postEmailRegister(email)
-      return { response, email }
+      return { email, ...response }
     },
     registerConfirm: (code: string) => api.postConfirmRegister(code),
     registerDetails: (

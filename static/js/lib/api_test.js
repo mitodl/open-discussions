@@ -501,7 +501,7 @@ describe("api", function() {
         assert.ok(
           fetchJSONStub.calledWith("/api/v0/register/confirm/", {
             method: POST,
-            body:   JSON.stringify({ code })
+            body:   JSON.stringify({ verification_code: code })
           })
         )
       })

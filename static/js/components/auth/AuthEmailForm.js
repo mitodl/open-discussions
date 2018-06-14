@@ -24,7 +24,7 @@ export default class AuthEmailForm extends React.Component<*, void> {
     const suggestion = validEmail(form.email) ? suggestEmail(form.email) : null
 
     return (
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} className="form">
         <div className="emailfield row">
           <label>Email</label>
           <input

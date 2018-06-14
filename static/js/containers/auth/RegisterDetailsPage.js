@@ -14,12 +14,14 @@ import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { validateRegisterDetailsForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
+import { getPartialToken } from "../../reducers/auth"
 
 import type { DetailsForm } from "../../flow/authTypes"
 import type { WithFormProps } from "../../hoc/withForm"
 
 type RegisterDetailsPageProps = {
-  history: Object
+  history: Object,
+  partialToken: string
 } & WithFormProps
 
 const RegisterDetailsPage = ({ renderForm }: RegisterDetailsPageProps) => (
@@ -41,7 +43,7 @@ const RegisterDetailsPage = ({ renderForm }: RegisterDetailsPageProps) => (
 
 const newDetailsForm = () => ({ name: "", password: "", tos: false })
 
-const onSubmit = R.curry((partialToken: string, form: DetailsForm) =>
+const onSubmit = (partialToken: string, form: DetailsForm) => (
   actions.auth.registerDetails(partialToken, form.name, form.password, form.tos)
 )
 
@@ -55,18 +57,20 @@ const { getForm, actionCreators } = configureForm(
 const mapStateToProps = state => {
   const processing = state.auth.processing
   const form = getForm(state)
+  const partialToken = getPartialToken(state)
 
   return {
     processing,
     form,
-    validateForm
+    validateForm,
+    partialToken
   }
 }
 
 const mergeProps = mergeAndInjectProps(
-  ({ partialToken }, dispatchProps, { history }) => ({
-    onSubmitResult: onSubmitResult(history, null),
-    onSubmit:       onSubmit(partialToken)
+  ({ partialToken }, { onSubmit }, { history }) => ({
+    onSubmitResult: onSubmitResult(history),
+    onSubmit:       (form: DetailsForm) => onSubmit(partialToken, form)
   })
 )
 

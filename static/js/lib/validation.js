@@ -140,7 +140,7 @@ export const validateRegisterDetailsForm = validate([
   ),
   validation(
     R.compose(
-      R.lt(8),
+      R.gt(8),
       R.length
     ),
     R.lensPath(["value", "password"]),

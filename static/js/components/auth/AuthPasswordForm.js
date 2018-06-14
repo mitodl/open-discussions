@@ -20,7 +20,7 @@ export default class AuthPasswordForm extends React.Component<*, void> {
     const { form, validation, onSubmit, onUpdate, processing } = this.props
 
     return (
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} className="form">
         <div className="passwordfield row">
           <label>Password</label>
           <input

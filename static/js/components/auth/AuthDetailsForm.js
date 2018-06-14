@@ -22,13 +22,13 @@ export default class AuthDetailsForm extends React.Component<*, void> {
     const { form, validation, onSubmit, onUpdate, processing } = this.props
 
     return (
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} className="form">
         <div className="namefield row">
           <label>Full name</label>
           <input
             type="text"
             name="name"
-            value={form.name}
+            value={form.name || ""}
             onChange={onUpdate}
           />
           {validationMessage(validation.name)}
@@ -38,13 +38,13 @@ export default class AuthDetailsForm extends React.Component<*, void> {
           <input
             type="password"
             name="password"
-            value={form.password}
+            value={form.password || ""}
             onChange={onUpdate}
           />
           {validationMessage(validation.password)}
         </div>
         <div className="passwordfield row">
-          <Checkbox checked={form.tos} name="tos" onChange={onUpdate}>
+          <Checkbox checked={form.tos || false} name="tos" onChange={onUpdate}>
             I agree to the{" "}
             <a href={SETTINGS.authenticated_site.tos_url}>terms & conditions</a>{" "}
             and the <a href="">privacy policy</a>

@@ -51,8 +51,8 @@ export const processRegisterResponse = (
   } else if (response.state === STATE_REGISTER_CONFIRM) {
     history.push(REGISTER_CONFIRM_URL)
   } else if (response.state === STATE_REGISTER_DETAILS) {
-    history.push(response.state === REGISTER_DETAILS_URL)
-  } else if (STATE_SUCCESS) {
+    history.push(REGISTER_DETAILS_URL)
+  } else if (response.state === STATE_SUCCESS) {
     history.push(FRONTPAGE_URL)
   } else if (response.state === STATE_INACTIVE) {
     history.push(INACTIVE_USER_URL)
