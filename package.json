@@ -74,6 +74,7 @@
     "react": "^16.4.0",
     "react-addons-shallow-compare": "^15.6.0",
     "react-content-loader": "^3.1.2",
+    "react-cropper": "^1.0.1",
     "react-document-title": "^2.0.3",
     "react-dom": "^16.4.0",
     "react-dropzone": "^4.2.5",

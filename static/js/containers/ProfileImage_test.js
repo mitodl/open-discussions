@@ -1,6 +1,5 @@
 /* global SETTINGS: false */
 import React from "react"
-import ReactTestUtils from "react-dom/test-utils"
 import { mount } from "enzyme"
 import { assert } from "chai"
 import { Provider } from "react-redux"
@@ -11,7 +10,7 @@ import { showDialog } from "../actions/ui"
 import { startPhotoEdit } from "../actions/image_upload"
 
 describe("ProfileImage", () => {
-  let helper, updateProfileImageStub, div
+  let helper, div
 
   const thatProfile = {
     name:               "test_name",
@@ -54,40 +53,12 @@ describe("ProfileImage", () => {
 
   describe("upload button", () => {
     it("should be hidden if not editable", () => {
-      const image = renderProfileImage({
-        editable: false
-      })
-
-      assert.lengthOf(
-        image.find(".open-photo-dialog"),
-        0,
-        "image should contain a button to upload a profile photo"
-      )
-    })
-
-    it("should be visible if editable and is users own profile", () => {
-      const image = renderProfileImage({
-        editable: true
-      })
-
-      assert.lengthOf(
-        image.find(".open-photo-dialog"),
-        1,
-        "image should contain a button to upload a profile photo"
-      )
-    })
-
-    it("should be hidden if not editable", () => {
-      SETTINGS.username = "other"
-      const image = renderProfileImage({
-        editable: false
-      })
-
-      assert.lengthOf(
-        image.find(".open-photo-dialog"),
-        0,
-        "image should not contain a button to upload a profile photo"
-      )
+      for (const editable of [true, false]) {
+        const image = renderProfileImage({
+          editable: editable
+        })
+        assert.equal(image.find(".open-photo-dialog").length === 1, editable)
+      }
     })
 
     it("should have a ProfileImageUploader only if editable === true", () => {
@@ -113,3 +84,4 @@ describe("ProfileImage", () => {
     })
   })
 })
+
