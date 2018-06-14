@@ -64,7 +64,6 @@ export const formatPostTitle = (post: Post) =>
       >
         {post.title}
       </a>
-      <span className="url-hostname">{`(${urlHostname(post.url)})`}</span>
     </div>
   ) : (
     <Link

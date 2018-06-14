@@ -3,6 +3,8 @@ import React from "react"
 
 import ContentLoader from "react-content-loader"
 
+import { urlHostname } from "../lib/url"
+
 export const EmbedlyLoader = (props: Object = {}) => (
   <div className="content-loader">
     <ContentLoader
@@ -57,23 +59,37 @@ export default class Embedly extends React.Component<Props> {
       )
     }
 
+    const compactView =
+      embedly.thumbnail_url &&
+      (embedly.thumbnail_height < 400 || embedly.thumbnail_width < 400)
+
     return (
-      <a
-        href={embedly.url}
-        target="_blank"
-        className="link"
-        rel="noopener noreferrer"
-      >
-        {embedly.thumbnail_url ? (
-          <div className="thumbnail">
-            <img src={embedly.thumbnail_url} />
+      <React.Fragment>
+        <a
+          href={embedly.url}
+          target="_blank"
+          className={compactView ? "link compact" : "link"}
+          rel="noopener noreferrer"
+        >
+          {embedly.thumbnail_url ? (
+            <div className={compactView ? "thumbnail compact" : "thumbnail"}>
+              <img src={embedly.thumbnail_url} />
+            </div>
+          ) : null}
+          <div className="link-summary">
+            <h2>{embedly.title}</h2>
+            <div className="description">{embedly.description}</div>
           </div>
-        ) : null}
-        <div className="link-summary">
-          <h2>{embedly.title}</h2>
-          <div className="description">{embedly.description}</div>
-        </div>
-      </a>
+        </a>
+        <a
+          href={embedly.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="read-more-link"
+        >
+          Read this on {urlHostname(embedly.url)}
+        </a>
+      </React.Fragment>
     )
   }
 

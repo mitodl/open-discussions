@@ -5,6 +5,7 @@ import ContentLoader from "react-content-loader"
 
 import Embedly from "./Embedly"
 
+import { urlHostname } from "../lib/url"
 import { makeArticle, makeYoutubeVideo, makeImage } from "../factories/embedly"
 
 const renderEmbedly = embedlyResponse =>
@@ -28,7 +29,13 @@ describe("Embedly", () => {
   it("should render generic article-type content sensibly", () => {
     const article = makeArticle()
     const wrapper = renderEmbedly(article)
-    assert.equal(wrapper.find("a").props().href, article.url)
+    assert.equal(
+      wrapper
+        .find("a")
+        .at(0)
+        .props().href,
+      article.url
+    )
     assert.equal(
       wrapper.find(".thumbnail img").props().src,
       article.thumbnail_url
@@ -38,6 +45,9 @@ describe("Embedly", () => {
       wrapper.find(".link-summary .description").text(),
       article.description
     )
+    const link = wrapper.find(".read-more-link")
+    assert.equal(link.props().href, article.url)
+    assert.equal(link.text(), `Read this on ${urlHostname(article.url)}`)
   })
 
   it("should render a link which returns HTML sensibly", () => {

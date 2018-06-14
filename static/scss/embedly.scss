@@ -27,14 +27,21 @@
     }
   }
 
+  .read-more-link {
+    padding-top: 5px;
+  }
+
   .link {
     display: flex;
     flex-direction: column;
     color: $font-black;
     font-weight: 400;
+    margin-bottom: 5px;
 
     @include breakpoint(desktopwide) {
-      flex-direction: row;
+      &.compact {
+        flex-direction: row;
+      }
     }
 
     .thumbnail {
@@ -49,9 +56,21 @@
       }
 
       @include breakpoint(desktopwide) {
-        height: 200px;
-        width: 300px;
-        flex: none;
+        img {
+          max-height: 400px;
+          width: 100%;
+          object-fit: cover;
+        }
+      }
+
+      &.compact {
+        margin-right: 5px;
+
+        @include breakpoint(desktopwide) {
+          height: 200px;
+          width: 300px;
+          flex: none;
+        }
 
         img {
           max-height: 200px;
@@ -60,10 +79,6 @@
     }
 
     .link-summary {
-      @include breakpoint(desktopwide) {
-        margin-left: 22px;
-      }
-
       h2 {
         margin: 0 0 15px 0;
         font-size: 21px;

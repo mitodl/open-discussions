@@ -213,6 +213,9 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
             </div>
             <div className="right">{formattedDate}</div>
           </div>
+          {embedly && embedly.provider_name ? (
+            <div className="provider-name">{embedly.provider_name}</div>
+          ) : null}
           {post && post.url ? <Embedly embedly={embedly} /> : null}
         </div>
         {!showPermalinkUI && post.text ? this.renderTextContent() : null}

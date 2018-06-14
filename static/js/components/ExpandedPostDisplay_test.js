@@ -14,7 +14,7 @@ import ProfileImage from "../containers/ProfileImage"
 import SharePopup from "./SharePopup"
 
 import { wait } from "../lib/util"
-import { urlHostname, postPermalink, postDetailURL } from "../lib/url"
+import { postPermalink, postDetailURL } from "../lib/url"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
@@ -137,8 +137,10 @@ describe("ExpandedPostDisplay", () => {
 
   it("should display the domain, for a url post", () => {
     post = makePost(true)
-    const wrapper = renderPostDisplay()
-    assert.include(wrapper.find(".url-hostname").text(), urlHostname(post.url))
+    const wrapper = renderPostDisplay({
+      embedly: { provider_name: "Great Website" }
+    })
+    assert.include(wrapper.find(".provider-name").text(), "Great Website")
   })
 
   it("should link to the detail view, if a text post", () => {
