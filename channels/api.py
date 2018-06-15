@@ -4,7 +4,7 @@ import logging
 from datetime import datetime, timedelta
 from urllib.parse import urljoin
 
-from functools import partial
+from functools import partialmethod
 import pytz
 import requests
 from django.conf import settings
@@ -13,7 +13,6 @@ from django.contrib.auth.models import AnonymousUser
 from django.db import transaction
 from django.http.response import Http404
 import praw
-from praw.config import Config
 from praw.exceptions import APIException
 from praw.models.comment_forest import CommentForest
 from praw.models.reddit import more
@@ -46,6 +45,7 @@ from channels.models import (
     RedditRefreshToken,
     Subscription,
 )
+from channels.utils import get_kind_mapping
 
 from open_discussions import features
 from open_discussions.utils import now_in_utc
@@ -248,16 +248,6 @@ def _get_client(user):
     ), access_token, user)
 
 
-def get_kind_mapping():
-    """
-    Get a mapping of kinds
-
-    Returns:
-        dict: A map of the kind name to the kind prefix (ie t1)
-    """
-    return Config('DEFAULT').kinds
-
-
 def _get_user_agent():
     """Gets the user agent"""
     return USER_AGENT.format(version=settings.VERSION)
@@ -290,58 +280,6 @@ def replace_load_comment(original_load_comment):
             # an AssertionError
             raise Http404
     return replacement_load_comment
-
-
-def _apply_vote(instance, validated_data, allow_downvote=False, instance_type=None):
-    """
-    Apply a vote provided by the user to a comment or post, if it's different than before.
-
-    Args:
-        instance (Comment or Post): A comment or post
-        validated_data (dict): validated data which contains the new vote from the user
-        allow_downvote (bool): If false, ignore downvotes
-        instance_type (str): A string indicating the reddit object type (comment, post/submission)
-    Returns:
-        bool:
-            True if a change was made, False otherwise
-    """
-    upvote = validated_data.get('upvoted')
-    if allow_downvote:
-        downvote = validated_data.get('downvoted')
-    else:
-        downvote = None
-
-    is_upvoted = instance.likes is True
-    is_downvoted = instance.likes is False
-
-    # Determine vote action to take based on the request and any already-applied votes
-    if upvote and not is_upvoted:
-        vote_action = VoteActions.UPVOTE
-    elif downvote and not is_downvoted:
-        vote_action = VoteActions.DOWNVOTE
-    elif upvote is False and is_upvoted:
-        vote_action = VoteActions.CLEAR_UPVOTE
-    elif downvote is False and is_downvoted:
-        vote_action = VoteActions.CLEAR_DOWNVOTE
-    else:
-        return False
-
-    if vote_action == VoteActions.UPVOTE:
-        instance.upvote()
-    elif vote_action == VoteActions.DOWNVOTE:
-        instance.downvote()
-    elif vote_action in (VoteActions.CLEAR_UPVOTE, VoteActions.CLEAR_DOWNVOTE):
-        instance.clear_vote()
-
-    try:
-        update_indexed_score(instance, instance_type, vote_action)
-    except Exception:  # pylint: disable=broad-except
-        log.exception('Error occurred while trying to index [%s] object score', instance_type)
-    return True
-
-
-apply_post_vote = partial(_apply_vote, allow_downvote=False, instance_type=POST_TYPE)
-apply_comment_vote = partial(_apply_vote, allow_downvote=True, instance_type=COMMENT_TYPE)
 
 
 class Api:
@@ -444,6 +382,57 @@ class Api:
 
         self.get_channel(name).mod.update(**values)
         return self.get_channel(name)
+
+    @staticmethod
+    def _apply_vote(instance, validated_data, allow_downvote=False, instance_type=None):
+        """
+        Apply a vote provided by the user to a comment or post, if it's different than before.
+
+        Args:
+            instance (Comment or Post): A comment or post
+            validated_data (dict): validated data which contains the new vote from the user
+            allow_downvote (bool): If false, ignore downvotes
+            instance_type (str): A string indicating the reddit object type (comment, post/submission)
+        Returns:
+            bool:
+                True if a change was made, False otherwise
+        """
+        upvote = validated_data.get('upvoted')
+        if allow_downvote:
+            downvote = validated_data.get('downvoted')
+        else:
+            downvote = None
+
+        is_upvoted = instance.likes is True
+        is_downvoted = instance.likes is False
+
+        # Determine vote action to take based on the request and any already-applied votes
+        if upvote and not is_upvoted:
+            vote_action = VoteActions.UPVOTE
+        elif downvote and not is_downvoted:
+            vote_action = VoteActions.DOWNVOTE
+        elif upvote is False and is_upvoted:
+            vote_action = VoteActions.CLEAR_UPVOTE
+        elif downvote is False and is_downvoted:
+            vote_action = VoteActions.CLEAR_DOWNVOTE
+        else:
+            return False
+
+        if vote_action == VoteActions.UPVOTE:
+            instance.upvote()
+        elif vote_action == VoteActions.DOWNVOTE:
+            instance.downvote()
+        elif vote_action in (VoteActions.CLEAR_UPVOTE, VoteActions.CLEAR_DOWNVOTE):
+            instance.clear_vote()
+
+        try:
+            update_indexed_score(instance, instance_type, vote_action)
+        except Exception:  # pylint: disable=broad-except
+            log.exception('Error occurred while trying to index [%s] object score', instance_type)
+        return True
+
+    apply_post_vote = partialmethod(_apply_vote, allow_downvote=False, instance_type=POST_TYPE)
+    apply_comment_vote = partialmethod(_apply_vote, allow_downvote=True, instance_type=COMMENT_TYPE)
 
     @reddit_object_indexer(indexing_func=index_new_post)
     def create_post(self, channel_name, title, text=None, url=None):

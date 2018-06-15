@@ -20,12 +20,26 @@ class SubscriberListView(CreateAPIView):
     permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
     serializer_class = SubscriberSerializer
 
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'channel_api': self.request.channel_api,
+            'view': self,
+        }
+
 
 class SubscriberDetailView(APIView):
     """
     View to retrieve and remove subscribers in channels
     """
     permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
+
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'channel_api': self.request.channel_api,
+            'view': self,
+        }
 
     def get(self, request, *args, **kwargs):
         """Get subscriber for the channel"""

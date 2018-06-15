@@ -12,12 +12,7 @@ from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from channels.api import (
-    Api,
-    get_kind_mapping,
-    apply_post_vote,
-    apply_comment_vote,
-)
+from channels.utils import get_kind_mapping
 from channels.constants import VALID_CHANNEL_TYPES
 from channels.models import Subscription
 from profiles.utils import image_uri
@@ -38,7 +33,7 @@ class ChannelSerializer(serializers.Serializer):
     )
 
     def create(self, validated_data):
-        api = Api(user=self.context['request'].user)
+        api = self.context['channel_api']
         return api.create_channel(
             name=validated_data['display_name'],
             title=validated_data['title'],
@@ -48,7 +43,7 @@ class ChannelSerializer(serializers.Serializer):
         )
 
     def update(self, instance, validated_data):
-        api = Api(user=self.context['request'].user)
+        api = self.context['channel_api']
         name = instance.display_name
         kwargs = {}
         if 'title' in validated_data:
@@ -222,7 +217,7 @@ class PostSerializer(serializers.Serializer):
         else:
             kwargs['url'] = url
 
-        api = Api(user=self._current_user)
+        api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
         post = api.create_post(
             channel_name,
@@ -232,7 +227,7 @@ class PostSerializer(serializers.Serializer):
 
         api.add_post_subscription(post.id)
 
-        changed = apply_post_vote(post, validated_data)
+        changed = api.apply_post_vote(post, validated_data)
         if not changed:
             return post
         else:
@@ -244,7 +239,7 @@ class PostSerializer(serializers.Serializer):
         if "url" in validated_data:
             raise ValidationError("Cannot edit url for a post")
 
-        api = Api(user=self._current_user)
+        api = self.context['channel_api']
 
         if "removed" in validated_data:
             removed = validated_data["removed"]
@@ -272,7 +267,7 @@ class PostSerializer(serializers.Serializer):
             elif validated_data['subscribed'] is False:
                 api.remove_post_subscription(post_id)
 
-        apply_post_vote(instance, validated_data)
+        api.apply_post_vote(instance, validated_data)
         return api.get_post(post_id=post_id)
 
 
@@ -414,7 +409,7 @@ class CommentSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        api = Api(user=self._current_user)
+        api = self.context['channel_api']
         post_id = self.context['view'].kwargs['post_id']
 
         kwargs = {}
@@ -430,7 +425,7 @@ class CommentSerializer(serializers.Serializer):
 
         api.add_comment_subscription(post_id, comment.id)
 
-        changed = apply_comment_vote(comment, validated_data)
+        changed = api.apply_comment_vote(comment, validated_data)
 
         from notifications.tasks import notify_subscribed_users
         notify_subscribed_users.delay(post_id, validated_data.get('comment_id', None), comment.id)
@@ -444,7 +439,7 @@ class CommentSerializer(serializers.Serializer):
         if validated_data.get('comment_id'):
             raise ValidationError("comment_id must be provided via URL")
 
-        api = Api(user=self._current_user)
+        api = self.context['channel_api']
         if 'body' in validated_data:
             api.update_comment(comment_id=instance.id, text=validated_data['body'])
 
@@ -467,7 +462,7 @@ class CommentSerializer(serializers.Serializer):
             elif validated_data['subscribed'] is False:
                 api.remove_comment_subscription(post_id, instance.id)
 
-        apply_comment_vote(instance, validated_data)
+        api.apply_comment_vote(instance, validated_data)
 
         return api.get_comment(comment_id=instance.id)
 
@@ -534,7 +529,7 @@ class ContributorSerializer(serializers.Serializer):
         return {'contributor_name': value}
 
     def create(self, validated_data):
-        api = Api(user=self.context['request'].user)
+        api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
         return api.add_contributor(validated_data['contributor_name'], channel_name)
 
@@ -556,7 +551,7 @@ class ModeratorSerializer(serializers.Serializer):
         return {'moderator_name': value}
 
     def create(self, validated_data):
-        api = Api(user=self.context['request'].user)
+        api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
 
         return api.add_moderator(validated_data['moderator_name'], channel_name)
@@ -579,7 +574,7 @@ class SubscriberSerializer(serializers.Serializer):
         return {'subscriber_name': value}
 
     def create(self, validated_data):
-        api = Api(user=self.context['request'].user)
+        api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
         return api.add_subscriber(validated_data['subscriber_name'], channel_name)
 
@@ -601,7 +596,7 @@ class ReportSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         """Create a new report"""
-        api = Api(user=self.context['request'].user)
+        api = self.context['channel_api']
         post_id = validated_data.get('post_id', None)
         comment_id = validated_data.get('comment_id', None)
         reason = validated_data['reason']

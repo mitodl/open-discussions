@@ -68,6 +68,7 @@ class CommentListView(APIView):
     def get_serializer_context(self):
         """Context for the request and view"""
         return {
+            'channel_api': self.request.channel_api,
             'current_user': self.request.user,
             'request': self.request,
             'view': self,
@@ -119,6 +120,7 @@ class MoreCommentsView(APIView):
     def get_serializer_context(self):
         """Context for the request and view"""
         return {
+            'channel_api': self.request.channel_api,
             'current_user': self.request.user,
             'request': self.request,
             'view': self,
@@ -166,6 +168,7 @@ class CommentDetailView(APIView):
     def get_serializer_context(self):
         """Context for the request and view"""
         return {
+            'channel_api': self.request.channel_api,
             'current_user': self.request.user,
             'request': self.request,
             'view': self,

@@ -1,10 +1,7 @@
 """
 Tests for serializers for channel REST APIS
 """
-from unittest.mock import (
-    Mock,
-    patch,
-)
+from unittest.mock import Mock
 
 import pytest
 from praw.models.reddit.redditor import Redditor
@@ -61,19 +58,19 @@ def test_create_channel(user):
         'public_description': 'public_description',
     }
     request = Mock(user=user)
-    with patch('channels.serializers.Api', autospec=True) as api:
-        channel = ChannelSerializer(context={
-            "request": request,
-        }).create(validated_data)
-    api.return_value.create_channel.assert_called_once_with(
+    api_mock = Mock()
+    channel = ChannelSerializer(context={
+        "channel_api": api_mock,
+        "request": request,
+    }).create(validated_data)
+    api_mock.create_channel.assert_called_once_with(
         name=validated_data['display_name'],
         title=validated_data['title'],
         channel_type=validated_data['subreddit_type'],
         description=validated_data['description'],
         public_description=validated_data['public_description'],
     )
-    assert channel == api.return_value.create_channel.return_value
-    api.assert_called_once_with(user=user)
+    assert channel == api_mock.create_channel.return_value
 
 
 @pytest.mark.parametrize("is_empty", [True, False])
@@ -90,10 +87,11 @@ def test_update_channel(user, is_empty):
     display_name = 'subreddit'
     instance = Mock(display_name=display_name)
     request = Mock(user=user)
-    with patch('channels.serializers.Api', autospec=True) as api:
-        channel = ChannelSerializer(context={
-            "request": request,
-        }).update(instance, validated_data)
+    api_mock = Mock()
+    channel = ChannelSerializer(context={
+        "channel_api": api_mock,
+        "request": request,
+    }).update(instance, validated_data)
 
     kwargs = {} if is_empty else {
         "title": validated_data['title'],
@@ -101,12 +99,11 @@ def test_update_channel(user, is_empty):
         "description": validated_data['description'],
         "public_description": validated_data['public_description'],
     }
-    api.return_value.update_channel.assert_called_once_with(
+    api_mock.update_channel.assert_called_once_with(
         name=display_name,
         **kwargs
     )
-    assert channel == api.return_value.update_channel.return_value
-    api.assert_called_once_with(user=user)
+    assert channel == api_mock.update_channel.return_value
 
 
 def test_post_validate_upvoted():
@@ -243,14 +240,14 @@ def test_contributor_create():
     contributor_user = UserFactory.create()
     contributor_redditor = Mock(spec=Redditor)
     contributor_redditor.name = contributor_user.username
-    with patch('channels.serializers.Api', autospec=True) as api:
-        api.return_value.add_contributor.return_value = contributor_redditor
-        contributor = ContributorSerializer(context={
-            "request": Mock(user=user),
-            "view": Mock(kwargs={'channel_name': 'foo_channel'})
-        }).create({'contributor_name': contributor_user.username})
-        assert contributor is contributor_redditor
-        api.return_value.add_contributor.assert_called_once_with(contributor_user.username, 'foo_channel')
+    api_mock = Mock(add_contributor=Mock(return_value=contributor_redditor))
+    contributor = ContributorSerializer(context={
+        "channel_api": api_mock,
+        "request": Mock(user=user),
+        "view": Mock(kwargs={'channel_name': 'foo_channel'})
+    }).create({'contributor_name': contributor_user.username})
+    assert contributor is contributor_redditor
+    api_mock.add_contributor.assert_called_once_with(contributor_user.username, 'foo_channel')
 
 
 def test_moderator():
@@ -287,14 +284,15 @@ def test_moderator_create():
     moderator_user = UserFactory.create()
     moderator_redditor = Mock(spec=Redditor)
     moderator_redditor.name = moderator_user.username
-    with patch('channels.serializers.Api', autospec=True) as api:
-        api.return_value.add_moderator.return_value = moderator_redditor
-        contributor = ModeratorSerializer(context={
-            "request": Mock(user=user),
-            "view": Mock(kwargs={'channel_name': 'foo_channel'})
-        }).create({'moderator_name': moderator_user.username})
-        assert contributor is moderator_redditor
-        api.return_value.add_moderator.assert_called_once_with(moderator_user.username, 'foo_channel')
+
+    api_mock = Mock(add_moderator=Mock(return_value=moderator_redditor))
+    contributor = ModeratorSerializer(context={
+        "channel_api": api_mock,
+        "request": Mock(user=user),
+        "view": Mock(kwargs={'channel_name': 'foo_channel'})
+    }).create({'moderator_name': moderator_user.username})
+    assert contributor is moderator_redditor
+    api_mock.add_moderator.assert_called_once_with(moderator_user.username, 'foo_channel')
 
 
 def test_subscriber():
@@ -331,14 +329,14 @@ def test_subscriber_create():
     subscriber_user = UserFactory.create()
     subscriber_redditor = Mock(spec=Redditor)
     subscriber_redditor.name = subscriber_user.username
-    with patch('channels.serializers.Api', autospec=True) as api:
-        api.return_value.add_subscriber.return_value = subscriber_redditor
-        subscriber = SubscriberSerializer(context={
-            "request": Mock(user=user),
-            "view": Mock(kwargs={'channel_name': 'foo_channel'})
-        }).create({'subscriber_name': subscriber_user.username})
-        assert subscriber is subscriber_redditor
-        api.return_value.add_subscriber.assert_called_once_with(subscriber_user.username, 'foo_channel')
+    api_mock = Mock(add_subscriber=Mock(return_value=subscriber_redditor))
+    subscriber = SubscriberSerializer(context={
+        "channel_api": api_mock,
+        "request": Mock(user=user),
+        "view": Mock(kwargs={'channel_name': 'foo_channel'})
+    }).create({'subscriber_name': subscriber_user.username})
+    assert subscriber is subscriber_redditor
+    api_mock.add_subscriber.assert_called_once_with(subscriber_user.username, 'foo_channel')
 
 
 def test_report_validate_no_ids():
@@ -372,23 +370,25 @@ def test_report_validate_one_id():
 def test_report_comment_create():
     """Adds a comment report"""
     payload = {'comment_id': 'abc', 'reason': 'reason'}
-    with patch('channels.serializers.Api', autospec=True) as api:
-        assert ReportSerializer(context={
-            "request": Mock(),
-            "view": Mock()
-        }).create(payload) == payload
-        api.return_value.report_comment.assert_called_once_with('abc', 'reason')
+    api_mock = Mock()
+    assert ReportSerializer(context={
+        "channel_api": api_mock,
+        "request": Mock(),
+        "view": Mock()
+    }).create(payload) == payload
+    api_mock.report_comment.assert_called_once_with('abc', 'reason')
 
 
 def test_report_post_create():
     """Adds a post report"""
     payload = {'post_id': 'abc', 'reason': 'reason'}
-    with patch('channels.serializers.Api', autospec=True) as api:
-        assert ReportSerializer(context={
-            "request": Mock(),
-            "view": Mock()
-        }).create(payload) == payload
-        api.return_value.report_post.assert_called_once_with('abc', 'reason')
+    api_mock = Mock()
+    assert ReportSerializer(context={
+        "channel_api": api_mock,
+        "request": Mock(),
+        "view": Mock()
+    }).create(payload) == payload
+    api_mock.report_post.assert_called_once_with('abc', 'reason')
 
 
 def test_reported_comment():

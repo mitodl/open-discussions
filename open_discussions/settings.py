@@ -110,6 +110,7 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'open_discussions.middleware.user_activity.UserActivityMiddleware',
+    'open_discussions.middleware.channel_api.ChannelApiMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
 )
 
