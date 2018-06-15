@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.functional import SimpleLazyObject
+from praw.config import Config
 from praw.exceptions import APIException
 from praw.models import Comment
 from prawcore.exceptions import (
@@ -220,3 +221,13 @@ def lookup_subscriptions_for_comments(comments, user):
         list of int: list of integer ids of comments the user is subscribed to
     """
     return SimpleLazyObject(lambda: _lookup_subscriptions_for_comments(comments, user))
+
+
+def get_kind_mapping():
+    """
+    Get a mapping of kinds
+
+    Returns:
+        dict: A map of the kind name to the kind prefix (ie t1)
+    """
+    return Config('DEFAULT').kinds

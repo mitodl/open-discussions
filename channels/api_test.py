@@ -47,7 +47,7 @@ def mock_client(mock_get_client):
     return mock_get_client.return_value
 
 
-@pytest.mark.parametrize('vote_func', [api.apply_post_vote, api.apply_comment_vote])
+@pytest.mark.parametrize('vote_func', [api.Api.apply_post_vote, api.Api.apply_comment_vote])
 @pytest.mark.parametrize('request_data,likes_value,expected_instance_vote_func', [
     ({'upvoted': True}, None, 'upvote'),
     ({'upvoted': True}, False, 'upvote'),
@@ -76,8 +76,8 @@ def test_apply_vote(mocker, vote_func, request_data, likes_value, expected_insta
 
 
 @pytest.mark.parametrize('vote_func,expected_allowed_downvote,expected_instance_type', [
-    (api.apply_post_vote, False, POST_TYPE),
-    (api.apply_comment_vote, True, COMMENT_TYPE),
+    (api.Api.apply_post_vote, False, POST_TYPE),
+    (api.Api.apply_comment_vote, True, COMMENT_TYPE),
 ])
 def test_vote_indexing(mocker, vote_func, expected_allowed_downvote, expected_instance_type):
     """Test that an upvote/downvote calls a function to update the index"""
