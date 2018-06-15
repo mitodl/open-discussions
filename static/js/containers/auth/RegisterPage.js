@@ -58,10 +58,12 @@ const mapStateToProps = state => {
 
 const mergeProps = mergeAndInjectProps(
   (stateProps, { setSnackbarMessage }, { history }) => ({
-    onSubmitResult: (response) => {
+    onSubmitResult: response => {
       processRegisterResponse(history, response)
       setSnackbarMessage({
-        message: `We sent an email to <${response.email}>, please validate to continue`
+        message: `We sent an email to <${
+          response.email
+        }>, please validate to continue`
       })
     }
   })

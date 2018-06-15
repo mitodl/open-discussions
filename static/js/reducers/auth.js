@@ -12,7 +12,8 @@ export const authEndpoint = {
   ...deriveVerbFuncs({
     // login functions
     loginEmail:    (email: string) => api.postEmailLogin(email),
-    loginPassword: (partialToken: string, password: string) => api.postPasswordLogin(partialToken, password),
+    loginPassword: (partialToken: string, password: string) =>
+      api.postPasswordLogin(partialToken, password),
     // register functions
     registerEmail: async (email: string) => {
       const response = await api.postEmailRegister(email)

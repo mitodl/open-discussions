@@ -11,14 +11,20 @@ class PartialException(AuthException):
 
 class InvalidPasswordException(PartialException):
     """Provided password was invalid"""
+    def __str__(self):
+        return "Unable to login with that email and password combination"
 
 
 class RequireEmailException(PartialException):
     """Authentication requires an email"""
+    def __str__(self):
+        return "Email is required to login"
 
 
 class RequirePasswordException(PartialException):
     """Authentication requires a password"""
+    def __str__(self):
+        return "Password is required to login"
 
 
 class RequirePasswordAndProfileException(PartialException):

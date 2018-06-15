@@ -65,13 +65,27 @@ def require_password_and_profile_via_email(
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
-        is_new (bool): True if the user just got created
+        is_register (bool): True if the user is registering
 
     Raises:
         RequirePasswordAndProfileException: if the user hasn't set password or name
     """
     if backend.name != EmailAuth.name or not is_register:
         return {}
+
+    data = strategy.request_data()
+
+    if 'name' in data:
+        Profile.objects.update_or_create(
+            user=user,
+            defaults={
+                'name': data['name'],
+                'toc_optin': data.get('tos', False)  # practically this will always be True
+            },
+        )
+
+    if 'password' in data:
+        user.set_password(data['password'])
 
     if not user.password or not hasattr(user, 'profile') or not user.profile.name:
         raise RequirePasswordAndProfileException(backend, current_partial)
@@ -92,7 +106,7 @@ def require_profile_update_user_via_saml(
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
-        is_register (bool): True if the user just got registered
+        is_new (bool): True if the user just got created
     """
     if backend.name != SAMLAuth.name or not is_new:
         return {}
