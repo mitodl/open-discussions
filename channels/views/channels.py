@@ -24,6 +24,13 @@ class ChannelListView(ListCreateAPIView):
     permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffOrReadonlyPermission,)
     serializer_class = ChannelSerializer
 
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'channel_api': self.request.channel_api,
+            'view': self,
+        }
+
     def get_queryset(self):
         """Get generator for channels list"""
         api = Api(user=self.request.user)
@@ -40,6 +47,13 @@ class ChannelDetailView(RetrieveUpdateAPIView):
     """
     permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffModeratorOrReadonlyPermission,)
     serializer_class = ChannelSerializer
+
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'channel_api': self.request.channel_api,
+            'view': self,
+        }
 
     def get_object(self):
         """Get channel referenced by API"""

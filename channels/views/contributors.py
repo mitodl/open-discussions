@@ -20,6 +20,13 @@ class ContributorListView(ListCreateAPIView):
     permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
     serializer_class = ContributorSerializer
 
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'channel_api': self.request.channel_api,
+            'view': self,
+        }
+
     def get_queryset(self):
         """Get generator for contributors in channel"""
         api = Api(user=self.request.user)
@@ -31,6 +38,13 @@ class ContributorDetailView(APIView):
     View to retrieve and remove contributors in channels
     """
     permission_classes = (IsAuthenticated, JwtIsStaffOrReadonlyPermission, )
+
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'channel_api': self.request.channel_api,
+            'view': self,
+        }
 
     def get(self, request, *args, **kwargs):
         """Get contributor in channel"""

@@ -22,6 +22,13 @@ class ModeratorListView(ListCreateAPIView):
     permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffOrReadonlyPermission,)
     serializer_class = ModeratorSerializer
 
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'channel_api': self.request.channel_api,
+            'view': self,
+        }
+
     def get_queryset(self):
         """Get a list of moderators for channel"""
         api = Api(user=self.request.user)
@@ -34,6 +41,13 @@ class ModeratorDetailView(APIView):
     View to retrieve and remove moderators
     """
     permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffOrReadonlyPermission,)
+
+    def get_serializer_context(self):
+        """Context for the request and view"""
+        return {
+            'channel_api': self.request.channel_api,
+            'view': self,
+        }
 
     def get(self, request, *args, **kwargs):
         """Get moderator for the channel"""

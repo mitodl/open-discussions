@@ -27,7 +27,7 @@ from open_discussions.envs import (
     get_list_of_str,
 )
 
-VERSION = "0.31.2"
+VERSION = "0.31.3"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -110,6 +110,7 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'open_discussions.middleware.user_activity.UserActivityMiddleware',
+    'open_discussions.middleware.channel_api.ChannelApiMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
 )
 
