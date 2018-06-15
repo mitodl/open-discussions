@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.31.3
+--------------
+
+- Added channel API middleware and moved channel API imports out of serializers
+
 Version 0.31.2
 --------------
 
