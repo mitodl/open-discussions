@@ -37,7 +37,7 @@ export default class CropperWrapper extends React.Component<*> {
         className="photo-upload-dialog photo-active-item cropper"
         src={photo.preview}
         aspectRatio={1 / 1}
-        guides={false}
+        guides={true}
         cropend={this.cropperHelper}
         ready={this.cropperHelper}
       />

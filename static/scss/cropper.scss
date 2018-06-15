@@ -37,6 +37,10 @@
   left: 0;
 }
 
+.cropper-crop-box {
+  border: 1px dashed #fff;
+}
+
 .cropper-wrap-box {
   overflow: hidden;
 }
@@ -60,6 +64,8 @@
 
   outline: 1px solid var(--blue);
   outline-color: color(var(--blue) alpha(75%));
+
+  border-radius: 50%;
 }
 
 .cropper-dashed {
@@ -339,3 +345,8 @@
   cursor: not-allowed;
 }
 
+.cropper-text {
+  padding-top: 25px;
+  position: absolute;
+  color: $font-grey;
+}

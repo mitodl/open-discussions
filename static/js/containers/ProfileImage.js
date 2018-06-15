@@ -4,7 +4,7 @@ import React from "react"
 import { connect } from "react-redux"
 import type { Dispatch } from "redux"
 
-import { makeProfileImageUrl } from "../util/util"
+import { makeProfileImageUrl } from "../lib/util"
 import type { Profile } from "../flow/discussionTypes"
 import ProfileImageUploader from "../components/ProfileImageUploader"
 import { createActionHelper } from "../lib/redux_rest"

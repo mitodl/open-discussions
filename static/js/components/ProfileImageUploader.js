@@ -62,11 +62,15 @@ const dialogContents = (
     return spinner()
   } else if (photo) {
     return (
-      <CropperWrapper
-        updatePhotoEdit={updatePhotoEdit}
-        photo={photo}
-        uploaderBodyHeight={uploaderBodyHeight}
-      />
+      <span>
+        <CropperWrapper
+          updatePhotoEdit={updatePhotoEdit}
+          photo={photo}
+          guides={true}
+          uploaderBodyHeight={uploaderBodyHeight}
+        />
+        <span className="cropper-text">Crop your image</span>
+      </span>
     )
   } else {
     return dropZone(startPhotoEdit, setPhotoError)

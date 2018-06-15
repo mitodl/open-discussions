@@ -8,7 +8,8 @@ import {
   enumerate,
   isEmptyText,
   preventDefaultAndInvoke,
-  userIsAnonymous
+  userIsAnonymous,
+  isProfileComplete
 } from "./util"
 
 describe("utility functions", () => {
@@ -73,5 +74,28 @@ describe("utility functions", () => {
       SETTINGS.username = username
       assert.equal(userIsAnonymous(), expectation)
     })
+  })
+
+  it("isProfileComplete returns false if any required fields are missing", () => {
+    [[null, "bio"], [null, "headline"], [null, "image"]].forEach(
+      ([bio, headline, image]) => {
+        const profile = {
+          name:              "Test User",
+          username:          "AHJS123123FHG",
+          image:             image,
+          image_small:       image,
+          image_medium:      image,
+          image_file:        image,
+          image_small_file:  image,
+          image_medium_file: image,
+          bio:               bio,
+          headline:          headline
+        }
+        assert.equal(
+          isProfileComplete(profile),
+          bio !== null && headline !== null && image !== null
+        )
+      }
+    )
   })
 })

@@ -10,13 +10,15 @@ import UserMenu from "./UserMenu"
 import { DropdownWithClickOutside, Dropdown } from "./UserMenu"
 
 import { SETTINGS_URL } from "../lib/url"
-import { defaultProfileImageUrl } from "../util/util"
+import { defaultProfileImageUrl } from "../lib/util"
+import * as utilFuncs from "../lib/util"
 
 describe("UserMenu", () => {
-  let toggleShowUserMenuStub, showUserMenu, profile
+  let toggleShowUserMenuStub, showUserMenu, profile, sandbox
 
   beforeEach(() => {
     toggleShowUserMenuStub = sinon.stub()
+    sandbox = sinon.sandbox.create()
     showUserMenu = false
     profile = {
       name:              "Test User",
@@ -30,6 +32,10 @@ describe("UserMenu", () => {
       bio:               null,
       headline:          null
     }
+  })
+
+  afterEach(() => {
+    sandbox.restore()
   })
 
   const renderUserMenu = () =>
@@ -67,8 +73,16 @@ describe("UserMenu", () => {
 
   it("should include a red dot if profile is incomplete", () => {
     SETTINGS.profile_ui_enabled = true
+    sandbox.stub(utilFuncs, "isProfileComplete").returns(false)
     const wrapper = renderUserMenu()
     assert.isOk(wrapper.find(".profile-incomplete").exists())
+  })
+
+  it("should not include a red dot if profile is complete", () => {
+    SETTINGS.profile_ui_enabled = true
+    sandbox.stub(utilFuncs, "isProfileComplete").returns(true)
+    const wrapper = renderUserMenu()
+    assert.isNotOk(wrapper.find(".profile-incomplete").exists())
   })
 
   it("dropdown menu should have a settings link", () => {

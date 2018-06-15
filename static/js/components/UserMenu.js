@@ -4,7 +4,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 import onClickOutside from "react-onclickoutside"
 
-import { isProfileComplete, makeProfileImageUrl } from "../util/util"
+import { isProfileComplete, makeProfileImageUrl } from "../lib/util"
 import { SETTINGS_URL } from "../lib/url"
 import type { Profile } from "../flow/discussionTypes"
 export class Dropdown extends React.Component<*, *> {
