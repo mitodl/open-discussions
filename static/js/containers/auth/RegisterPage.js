@@ -10,7 +10,7 @@ import withForm from "../../hoc/withForm"
 
 import { actions } from "../../actions"
 import { setSnackbarMessage } from "../../actions/ui"
-import { processRegisterResponse } from "../../lib/auth"
+import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { validateEmailForm as validateForm } from "../../lib/validation"
@@ -59,7 +59,7 @@ const mapStateToProps = state => {
 const mergeProps = mergeAndInjectProps(
   (stateProps, { setSnackbarMessage }, { history }) => ({
     onSubmitResult: response => {
-      processRegisterResponse(history, response)
+      processAuthResponse(history, response)
       setSnackbarMessage({
         message: `We sent an email to <${
           response.email

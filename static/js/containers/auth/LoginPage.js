@@ -9,7 +9,7 @@ import AuthEmailForm from "../../components/auth/AuthEmailForm"
 import withForm from "../../hoc/withForm"
 
 import { actions } from "../../actions"
-import { processLoginResponse } from "../../lib/auth"
+import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { validateEmailForm as validateForm } from "../../lib/validation"
@@ -39,7 +39,7 @@ const newEmailForm = () => ({ email: "" })
 
 const onSubmit = ({ email }: EmailForm) => actions.auth.loginEmail(email)
 
-const onSubmitResult = R.curry(processLoginResponse)
+const onSubmitResult = R.curry(processAuthResponse)
 
 const { getForm, actionCreators } = configureForm("login:email", newEmailForm)
 

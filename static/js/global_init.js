@@ -28,6 +28,11 @@ global.SETTINGS = _createSettings()
 
 window.scrollTo = () => "scroll!"
 
+// required for react 16+
+window.requestAnimationFrame = function(callback) {
+  setTimeout(callback, 0)
+}
+
 // polyfill for Object.entries
 import entries from "object.entries"
 if (!Object.entries) {

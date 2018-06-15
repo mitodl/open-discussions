@@ -10,7 +10,7 @@ import Card from "../../components/Card"
 import { Loading } from "../../components/Loading"
 
 import { actions } from "../../actions"
-import { processRegisterResponse, STATE_INVALID_EMAIL } from "../../lib/auth"
+import { processAuthResponse, STATE_INVALID_EMAIL } from "../../lib/auth"
 import { formatTitle } from "../../lib/title"
 import { REGISTER_URL } from "../../lib/url"
 
@@ -21,7 +21,7 @@ type RegisterConfirmPageProps = {
   invalid: boolean
 }
 
-const onResult = R.curry(processRegisterResponse)
+const onResult = R.curry(processAuthResponse)
 
 const confirmationCodeFromLocation = R.compose(
   R.propOr(null, "verification_code"),

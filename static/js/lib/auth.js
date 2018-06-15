@@ -25,26 +25,15 @@ export const STATE_REGISTER_CONFIRM_SENT = "register/confirm-sent"
 export const STATE_REGISTER_CONFIRM = "register/confirm"
 export const STATE_REGISTER_DETAILS = "register/details"
 
-export const processLoginResponse = (
+export const processAuthResponse = (
   history: Object,
-  response: LoginResponse
+  response: LoginResponse|RegisterResponse
 ) => {
   if (response.state === STATE_LOGIN_EMAIL) {
     history.push(LOGIN_URL)
   } else if (response.state === STATE_LOGIN_PASSWORD) {
     history.push(LOGIN_PASSWORD_URL)
-  } else if (response.state === STATE_SUCCESS) {
-    history.push(FRONTPAGE_URL)
-  } else if (response.state === STATE_INACTIVE) {
-    history.push(INACTIVE_USER_URL)
-  }
-}
-
-export const processRegisterResponse = (
-  history: Object,
-  response: RegisterResponse
-) => {
-  if (response.state === STATE_REGISTER_EMAIL) {
+  } else if (response.state === STATE_REGISTER_EMAIL) {
     history.push(REGISTER_URL)
   } else if (response.state === STATE_REGISTER_CONFIRM_SENT) {
     history.push(FRONTPAGE_URL)
@@ -53,7 +42,8 @@ export const processRegisterResponse = (
   } else if (response.state === STATE_REGISTER_DETAILS) {
     history.push(REGISTER_DETAILS_URL)
   } else if (response.state === STATE_SUCCESS) {
-    history.push(FRONTPAGE_URL)
+    // We now have a session, so force a redirect (we want the app to reinitialize)
+    window.location.href = FRONTPAGE_URL
   } else if (response.state === STATE_INACTIVE) {
     history.push(INACTIVE_USER_URL)
   }

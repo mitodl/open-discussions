@@ -9,7 +9,7 @@ import AuthPasswordForm from "../../components/auth/AuthPasswordForm"
 import withForm from "../../hoc/withForm"
 
 import { actions } from "../../actions"
-import { processLoginResponse } from "../../lib/auth"
+import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { LOGIN_URL } from "../../lib/url"
@@ -47,7 +47,7 @@ const { getForm, actionCreators } = configureForm(
 const onSubmit = (partialToken: string, form: PasswordForm) =>
   actions.auth.loginPassword(partialToken, form.password)
 
-const onSubmitResult = R.curry(processLoginResponse)
+const onSubmitResult = R.curry(processAuthResponse)
 
 const formBeginEditIfPartial = (
   formBeginEdit: Function,

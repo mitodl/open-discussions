@@ -9,7 +9,7 @@ import AuthDetailsForm from "../../components/auth/AuthDetailsForm"
 import withForm from "../../hoc/withForm"
 
 import { actions } from "../../actions"
-import { processRegisterResponse } from "../../lib/auth"
+import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { validateRegisterDetailsForm as validateForm } from "../../lib/validation"
@@ -35,7 +35,6 @@ const RegisterDetailsPage = ({ renderForm }: RegisterDetailsPageProps) => (
         </h3>
         <DocumentTitle title={formatTitle("Thanks for confirming!")} />
         {renderForm()}
-        <hr />
       </Card>
     </div>
   </div>
@@ -46,7 +45,7 @@ const newDetailsForm = () => ({ name: "", password: "", tos: false })
 const onSubmit = (partialToken: string, form: DetailsForm) =>
   actions.auth.registerDetails(partialToken, form.name, form.password, form.tos)
 
-const onSubmitResult = R.curry(processRegisterResponse)
+const onSubmitResult = R.curry(processAuthResponse)
 
 const { getForm, actionCreators } = configureForm(
   "register:details",
