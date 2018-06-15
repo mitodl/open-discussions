@@ -9,7 +9,7 @@ from channels.constants import (
     VoteActions,
 )
 from search.task_helpers import (
-    reddit_object_indexer,
+    reddit_object_persist,
     index_new_post,
     index_new_comment,
     update_post_text,
@@ -40,7 +40,7 @@ def test_reddit_object_indexer(mocker):
     def mock_indexer(reddit_obj):  # pylint: disable=missing-docstring
         reddit_obj.changed = True
 
-    @reddit_object_indexer(indexing_func=mock_indexer)
+    @reddit_object_persist(persistence_func=mock_indexer)
     def decorated_api_func(mock_reddit_obj):  # pylint: disable=missing-docstring
         return mock_reddit_obj
 

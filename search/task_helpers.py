@@ -32,7 +32,7 @@ from search.tasks import (
 log = logging.getLogger()
 
 
-def reddit_object_indexer(indexing_func=None):
+def reddit_object_persist(persistence_func=None):
     """
     Decorator that passes a PRAW object to a function that will perform some indexing action.
     The decorated function must return a PRAW object
@@ -43,7 +43,7 @@ def reddit_object_indexer(indexing_func=None):
         def wrapped_api_func(*args, **kwargs):  # pylint: disable=missing-docstring
             reddit_obj = func(*args, **kwargs)
             try:
-                indexing_func(reddit_obj)
+                persistence_func(reddit_obj)
             except Exception:  # pylint: disable=broad-except
                 log.exception('Error occurred while trying to serialize and index PRAW object')
             return reddit_obj
