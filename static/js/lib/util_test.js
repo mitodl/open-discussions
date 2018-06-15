@@ -9,7 +9,9 @@ import {
   isEmptyText,
   preventDefaultAndInvoke,
   userIsAnonymous,
-  isProfileComplete
+  isProfileComplete,
+  defaultProfileImageUrl,
+  makeProfileImageUrl
 } from "./util"
 
 describe("utility functions", () => {
@@ -97,5 +99,43 @@ describe("utility functions", () => {
         )
       }
     )
+  })
+
+  it("makeProfileImageUrl returns the correct value depending on existing profile values", () => {
+    [true, false].forEach(isSmall => {
+      [
+        [null, "image_small"],
+        [null, "image_small_file"],
+        [null, "image_medium"],
+        [null, "image_medium_file"]
+      ].forEach(
+        ([imageSmall, imageSmallFile, imageMedium, imageMediumFile]) => {
+          const profile = {
+            name:              "Test User",
+            username:          "AHJS123123FHG",
+            image:             null,
+            image_small:       imageSmall,
+            image_medium:      imageMedium,
+            image_file:        null,
+            image_small_file:  imageSmallFile,
+            image_medium_file: imageMediumFile,
+            bio:               null,
+            headline:          null
+          }
+          const expectedImageUrl = isSmall
+            ? imageSmallFile
+              ? imageSmallFile
+              : imageSmall
+                ? imageSmall
+                : defaultProfileImageUrl
+            : imageMediumFile
+              ? imageMediumFile
+              : imageMedium
+                ? imageMedium
+                : defaultProfileImageUrl
+          assert.equal(makeProfileImageUrl(profile, isSmall), expectedImageUrl)
+        }
+      )
+    })
   })
 })

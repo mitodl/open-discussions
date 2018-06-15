@@ -29,7 +29,9 @@ import {
   getSettings,
   patchFrontpageSetting,
   patchCommentSetting,
-  getEmbedly
+  getEmbedly,
+  getProfile,
+  patchProfileImage
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -40,6 +42,7 @@ import {
 import { makeReportRecord } from "../factories/reports"
 import { COMMENT_SORT_NEW } from "../lib/sorting"
 import * as authFuncs from "./fetch_auth"
+import { makeProfile } from "../factories/profiles"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
@@ -348,6 +351,48 @@ describe("api", function() {
             removed: status
           })
         })
+      })
+
+      it("gets profile", async () => {
+        const username = "username"
+        const profile = makeProfile(username)
+        fetchJSONStub.returns(Promise.resolve(profile))
+        const result = await getProfile(username)
+        assert.ok(fetchJSONStub.calledWith(`/api/v0/profiles/${username}/`))
+        assert.deepEqual(result, profile)
+      })
+    })
+
+    describe("updates profile image", () => {
+      const imageName = "a file name"
+      const userName = "jane"
+      const checkArgs = () => {
+        const [url, obj] = fetchStub.args[0]
+        assert.equal(url, `/api/v0/profiles/${userName}/`)
+        assert.equal(obj.method, "PATCH")
+        const img = obj.body.get("image_file")
+        assert.equal(img.name, imageName)
+      }
+
+      it("successfully updates a user profile image", () => {
+        const blob = new Blob()
+        const formData = new FormData()
+        formData.append("image", blob, imageName)
+        fetchStub.returns(Promise.resolve("good response"))
+        return patchProfileImage(userName, blob, imageName).then(res => {
+          assert.equal(res, "good response")
+          checkArgs()
+        })
+      })
+
+      it("fails to update a user profile image", () => {
+        const blob = new Blob()
+        fetchStub.returns(Promise.reject())
+        return assert
+          .isRejected(patchProfileImage(userName, blob, imageName))
+          .then(() => {
+            checkArgs()
+          })
       })
     })
 
