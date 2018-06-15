@@ -145,10 +145,5 @@ export const validateRegisterDetailsForm = validate([
     ),
     R.lensPath(["value", "password"]),
     "Password must be at least 8 characters"
-  ),
-  validation(
-    R.not, // if it's not true
-    R.lensPath(["value", "tos"]),
-    "You must agree to the terms of service and privacy policy"
   )
 ])

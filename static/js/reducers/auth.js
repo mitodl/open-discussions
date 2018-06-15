@@ -23,8 +23,7 @@ export const authEndpoint = {
     registerDetails: (
       partialToken: string,
       name: string,
-      password: string,
-      tos: boolean
-    ) => api.postDetailsRegister(partialToken, name, password, tos)
+      password: string
+    ) => api.postDetailsRegister(partialToken, name, password)
   })
 }

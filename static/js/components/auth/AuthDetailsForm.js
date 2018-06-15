@@ -43,14 +43,6 @@ export default class AuthDetailsForm extends React.Component<*, void> {
           />
           {validationMessage(validation.password)}
         </div>
-        <div className="passwordfield row">
-          <Checkbox checked={form.tos || false} name="tos" onChange={onUpdate}>
-            I agree to the{" "}
-            <a href={SETTINGS.authenticated_site.tos_url}>terms & conditions</a>{" "}
-            and the <a href="">privacy policy</a>
-          </Checkbox>
-          {validationMessage(validation.tos)}
-        </div>
         <div className="actions row">
           <button
             type="submit"

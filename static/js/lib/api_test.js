@@ -512,16 +512,14 @@ describe("api", function() {
         const partialToken = "def456"
         const name = "sally"
         const password = "abc123"
-        const tos = true
-        await postDetailsRegister(partialToken, name, password, tos)
+        await postDetailsRegister(partialToken, name, password)
         assert.ok(
           fetchJSONStub.calledWith("/api/v0/register/details/", {
             method: POST,
             body:   JSON.stringify({
               partial_token: partialToken,
               name,
-              password,
-              tos
+              password
             })
           })
         )

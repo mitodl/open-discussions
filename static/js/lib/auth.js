@@ -27,7 +27,7 @@ export const STATE_REGISTER_DETAILS = "register/details"
 
 export const processAuthResponse = (
   history: Object,
-  response: LoginResponse|RegisterResponse
+  response: LoginResponse | RegisterResponse
 ) => {
   if (response.state === STATE_LOGIN_EMAIL) {
     history.push(LOGIN_URL)

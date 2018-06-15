@@ -287,10 +287,9 @@ export const postConfirmRegister = (code: string): Promise<RegisterResponse> =>
 export const postDetailsRegister = (
   partialToken: string,
   name: string,
-  password: string,
-  tos: boolean
+  password: string
 ): Promise<RegisterResponse> =>
   fetchJSONWithCSRF("/api/v0/register/details/", {
     method: POST,
-    body:   JSON.stringify({ partial_token: partialToken, name, password, tos })
+    body:   JSON.stringify({ partial_token: partialToken, name, password })
   })

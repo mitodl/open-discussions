@@ -40,10 +40,10 @@ const RegisterDetailsPage = ({ renderForm }: RegisterDetailsPageProps) => (
   </div>
 )
 
-const newDetailsForm = () => ({ name: "", password: "", tos: false })
+const newDetailsForm = () => ({ name: "", password: ""})
 
 const onSubmit = (partialToken: string, form: DetailsForm) =>
-  actions.auth.registerDetails(partialToken, form.name, form.password, form.tos)
+  actions.auth.registerDetails(partialToken, form.name, form.password)
 
 const onSubmitResult = R.curry(processAuthResponse)
 
