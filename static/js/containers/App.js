@@ -87,7 +87,9 @@ class App extends React.Component<*, void> {
 
     const channels = await dispatch(actions.subscribedChannels.get())
     dispatch(setChannelData(channels))
-    await dispatch(actions.profiles.get(SETTINGS.username || ""))
+    if (SETTINGS.username) {
+      await dispatch(actions.profiles.get(SETTINGS.username))
+    }
   }
 
   render() {
@@ -176,6 +178,8 @@ export default connect(state => {
     profiles,
     ui: { showDrawer, snackbar, showUserMenu }
   } = state
-  const profile = profiles.data.get(SETTINGS.username || "")
+  const profile = SETTINGS.username
+    ? profiles.data.get(SETTINGS.username)
+    : null
   return { showDrawer, snackbar, showUserMenu, profile }
 })(App)

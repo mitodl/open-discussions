@@ -27,12 +27,6 @@ PROFILE_PROPS = (
     'bio',
 )
 
-COMPLETE_PROPS = (
-    'name',
-    'headline',
-    'bio',
-)
-
 
 class Profile(models.Model):
     """Profile model"""

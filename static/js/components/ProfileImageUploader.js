@@ -107,7 +107,11 @@ const ProfileImageUploader = ({
       contentStyle={{ maxWidth: "620px" }}
       open={photoDialogOpen}
       onAccept={photo || inFlight ? updateUserPhoto : null}
-      onCancel={clearPhotoEdit}
+      onCancel={() => {
+        clearPhotoEdit()
+        setDialogVisibility(false)
+      }}
+      validateOnClick={true}
       hideDialog={() => {
         setDialogVisibility(false)
       }}
