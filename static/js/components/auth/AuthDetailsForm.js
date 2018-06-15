@@ -42,6 +42,10 @@ export default class AuthDetailsForm extends React.Component<*, void> {
           />
           {validationMessage(validation.password)}
         </div>
+        <div className="tos row">
+          By creating an account, I agree to the{" "}
+          <a href={SETTINGS.authenticated_site.tos_url}>terms & conditions</a>{" "}
+        </div>
         <div className="actions row">
           <button
             type="submit"
