@@ -41,15 +41,19 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture()
 def mock_get_client(mocker):
     """Mock reddit get_client"""
-    mocked = mocker.patch('channels.api._get_client', autospec=True)
-    mocked.return_value.subreddit.return_value.submit.return_value.id = 'abc'
-    mocked.return_value.submission.return_value.reply.return_value.id = '456'
-    mocked.return_value.submission.return_value.reply.return_value.submission.id = '123'
-    mocked.return_value.submission.return_value.reply.return_value.subreddit.display_name = 'subreddit'
-    mocked.return_value.comment.return_value.reply.return_value.id = '789'
-    mocked.return_value.comment.return_value.reply.return_value.submission.id = '687'
-    mocked.return_value.comment.return_value.reply.return_value.subreddit.display_name = 'other_subreddit'
-    return mocked
+    return mocker.patch('channels.api._get_client', autospec=True, return_value=Mock(
+        subreddit=Mock(return_value=Mock(submit=Mock(return_value=Mock(id='abc')))),
+        submission=Mock(return_value=Mock(reply=Mock(return_value=Mock(
+            id='456',
+            submission=Mock(id='123'),
+            subreddit=Mock(display_name='subreddit'),
+        )))),
+        comment=Mock(return_value=Mock(reply=Mock(return_value=Mock(
+            id='789',
+            submission=Mock(id='687'),
+            subreddit=Mock(display_name='other_subreddit'),
+        )))),
+    ))
 
 
 @pytest.fixture()
@@ -502,21 +506,20 @@ def test_init_more_comments_invalid_sort(mock_client, mocker):  # pylint: disabl
     assert more_patch.call_count == 0
 
 
-def test_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
+def test_more_comments(mocker):  # pylint: disable=unused-argument
     """Test more_comments without any extra comments"""
     client = api.Api(UserFactory.create())
     children = ['t1_itmt', 't1_it56t']
 
     init_more_mock = mocker.patch('channels.api.Api.init_more_comments')
     post_id = 'post_i2'
+    mocker.patch.object(RedditComment, 'replies', [])
 
     def _make_comment(comment_id):
         """Helper to make a comment with a valid list of replies"""
-        comment = RedditComment(client.reddit, id=comment_id)
-        comment.replies = []
-        return comment
+        return RedditComment(client.reddit, id=comment_id)
 
-    comments = [_make_comment(child) for child in children]
+    comments = [_make_comment(comment_id) for comment_id in children]
     init_more_mock.return_value.comments.return_value = CommentForest(post_id, comments=comments)
 
     result = client.more_comments('parent_3i', post_id, children, COMMENTS_SORT_BEST)
@@ -529,7 +532,7 @@ def test_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
     assert result == comments
 
 
-def test_more_comments_with_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
+def test_more_comments_with_more_comments(mocker):  # pylint: disable=unused-argument
     """Test more_comments with an extra MoreComments"""
     client = api.Api(UserFactory.create())
     children = ['1', '2', '3']
@@ -537,12 +540,11 @@ def test_more_comments_with_more_comments(mock_client, mocker):  # pylint: disab
 
     init_more_mock = mocker.patch('channels.api.Api.init_more_comments')
     post_id = 'post_i2'
+    mocker.patch.object(RedditComment, 'replies', [])
 
     def _make_comment(comment_id):
         """Helper to make a comment with a valid list of replies"""
-        comment = RedditComment(client.reddit, id=comment_id)
-        comment.replies = []
-        return comment
+        return RedditComment(client.reddit, id=comment_id)
 
     first_comments = [_make_comment(child) for child in children]
     side_effects = [
