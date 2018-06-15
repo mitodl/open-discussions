@@ -40,7 +40,7 @@ const RegisterDetailsPage = ({ renderForm }: RegisterDetailsPageProps) => (
   </div>
 )
 
-const newDetailsForm = () => ({ name: "", password: ""})
+const newDetailsForm = () => ({ name: "", password: "" })
 
 const onSubmit = (partialToken: string, form: DetailsForm) =>
   actions.auth.registerDetails(partialToken, form.name, form.password)

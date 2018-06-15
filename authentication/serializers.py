@@ -17,7 +17,6 @@ from authentication.exceptions import (
     RequirePasswordAndProfileException
 )
 from authentication.utils import SocialAuthState
-from open_discussions.validators import is_true
 
 log = logging.getLogger()
 

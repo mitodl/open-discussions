@@ -80,7 +80,6 @@ def require_password_and_profile_via_email(
             user=user,
             defaults={
                 'name': data['name'],
-                'toc_optin': data.get('tos', False)  # practically this will always be True
             },
         )
 

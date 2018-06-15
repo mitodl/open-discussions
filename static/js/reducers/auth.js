@@ -20,10 +20,7 @@ export const authEndpoint = {
       return { email, ...response }
     },
     registerConfirm: (code: string) => api.postConfirmRegister(code),
-    registerDetails: (
-      partialToken: string,
-      name: string,
-      password: string
-    ) => api.postDetailsRegister(partialToken, name, password)
+    registerDetails: (partialToken: string, name: string, password: string) =>
+      api.postDetailsRegister(partialToken, name, password)
   })
 }

@@ -1,7 +1,6 @@
 // @flow
 /* global SETTINGS:false */
 import React from "react"
-import Checkbox from "rmwc/Checkbox"
 
 import { validationMessage } from "../../lib/validation"
 
