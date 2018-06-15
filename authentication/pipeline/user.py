@@ -86,6 +86,7 @@ def require_password_and_profile_via_email(
 
     if 'password' in data:
         user.set_password(data['password'])
+        user.save()
 
     if not user.password or not hasattr(user, 'profile') or not user.profile.name:
         raise RequirePasswordAndProfileException(backend, current_partial)
@@ -155,6 +156,7 @@ def validate_password(
         raise RequirePasswordException(backend, current_partial)
 
     password = data['password']
+
     if not user or not user.check_password(password):
         raise InvalidPasswordException(backend, current_partial)
 
