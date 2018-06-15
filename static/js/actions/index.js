@@ -10,7 +10,3 @@ endpoints.forEach(endpoint => {
 })
 
 export { actions }
-
-export const FETCH_FAILURE = "FETCH_FAILURE"
-export const FETCH_SUCCESS = "FETCH_SUCCESS"
-export const FETCH_PROCESSING = "FETCH_PROCESSING"

@@ -11,10 +11,16 @@ import {
   receivePatchPhotoSuccess,
   requestPatchPhoto
 } from "../actions/image_upload"
-import { FETCH_FAILURE, FETCH_PROCESSING, FETCH_SUCCESS } from "../actions"
-import type { Action, Dispatcher } from "../flow/reduxTypes"
+import {
+  FETCH_FAILURE,
+  FETCH_PROCESSING,
+  FETCH_SUCCESS
+} from "../actions/image_upload"
+import type { Action } from "../flow/reduxTypes"
 import { patchProfileImage } from "../lib/api"
 import { Dispatch } from "redux"
+
+export type Dispatcher<T> = (d: Dispatch) => Promise<T>
 
 export const INITIAL_IMAGE_UPLOAD_STATE = {
   edit:        null,

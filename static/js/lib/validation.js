@@ -74,18 +74,6 @@ export const validatePostCreateForm = validate([
   postUrlOrTextPresent
 ])
 
-export const validateProfileForm = validate([
-  validation(
-    R.compose(
-      R.gt(R.__, 300),
-      R.length
-    ),
-    R.lensPath(["value", "name"]),
-    "Full name length is limited to 300 characters"
-  ),
-  validation(emptyOrNil, R.lensPath(["value", "name"]), "Full name is required")
-])
-
 export const validateChannelEditForm = validate([
   validation(
     R.compose(

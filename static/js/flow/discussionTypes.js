@@ -187,11 +187,3 @@ export type Profile = {
   headline:                    ?string,
   username:                    string
 }
-
-
-export type ProfileForm = {
-  name:                        string,
-  image_file:                  ?string,
-  bio:                         ?string,
-  headline:                    ?string,
-}

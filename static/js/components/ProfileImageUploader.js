@@ -5,7 +5,7 @@ import R from "ramda"
 import Dropzone from "react-dropzone"
 
 import CropperWrapper from "./CropperWrapper"
-import { FETCH_PROCESSING } from "../actions"
+import { FETCH_PROCESSING } from "../actions/image_upload"
 import type { ImageUploadState } from "../reducers/image_upload"
 
 const onDrop = R.curry((startPhotoEdit, files) => startPhotoEdit(...files))

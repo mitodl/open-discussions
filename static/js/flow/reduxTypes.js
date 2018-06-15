@@ -1,5 +1,4 @@
 // @flow
-import {Dispatch} from "redux"
 
 export type ActionType = string
 
@@ -9,4 +8,3 @@ export type Action<payload, meta> = {
   meta: meta,
 }
 
-export type Dispatcher<T> = (d: Dispatch) => Promise<T>

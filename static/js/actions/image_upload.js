@@ -25,3 +25,7 @@ export const RECEIVE_PATCH_PHOTO_SUCCESS = "RECEIVE_PATCH_PHOTO_SUCCESS"
 export const receivePatchPhotoSuccess = createAction(
   RECEIVE_PATCH_PHOTO_SUCCESS
 )
+
+export const FETCH_FAILURE = "FETCH_FAILURE"
+export const FETCH_SUCCESS = "FETCH_SUCCESS"
+export const FETCH_PROCESSING = "FETCH_PROCESSING"
