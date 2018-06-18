@@ -456,12 +456,13 @@ describe("api", function() {
 
     describe("postEmailLogin", () => {
       it("should pass email", async () => {
+        const flow = "register"
         const email = "test@example.com"
-        await postEmailLogin(email)
+        await postEmailLogin(flow, email)
         assert.ok(
           fetchJSONStub.calledWith("/api/v0/login/email/", {
             method: POST,
-            body:   JSON.stringify({ email })
+            body:   JSON.stringify({ flow, email })
           })
         )
       })
@@ -469,13 +470,14 @@ describe("api", function() {
 
     describe("postPasswordLogin", () => {
       it("should pass password and partial_token", async () => {
+        const flow = "register"
         const password = "abc123"
         const partialToken = "def456"
-        await postPasswordLogin(partialToken, password)
+        await postPasswordLogin(flow, partialToken, password)
         assert.ok(
           fetchJSONStub.calledWith("/api/v0/login/password/", {
             method: POST,
-            body:   JSON.stringify({ partial_token: partialToken, password })
+            body:   JSON.stringify({ flow, partial_token: partialToken, password })
           })
         )
       })
@@ -483,12 +485,13 @@ describe("api", function() {
 
     describe("postEmailRegister", () => {
       it("should pass email", async () => {
+        const flow = "register"
         const email = "test@example.com"
-        await postEmailRegister(email)
+        await postEmailRegister(flow, email)
         assert.ok(
           fetchJSONStub.calledWith("/api/v0/register/email/", {
             method: POST,
-            body:   JSON.stringify({ email })
+            body:   JSON.stringify({ flow, email })
           })
         )
       })
@@ -496,12 +499,13 @@ describe("api", function() {
 
     describe("postConfirmRegister", () => {
       it("should pass code", async () => {
+        const flow = "register"
         const code = "123456"
-        await postConfirmRegister(code)
+        await postConfirmRegister(flow, code)
         assert.ok(
           fetchJSONStub.calledWith("/api/v0/register/confirm/", {
             method: POST,
-            body:   JSON.stringify({ verification_code: code })
+            body:   JSON.stringify({ flow, verification_code: code })
           })
         )
       })
@@ -509,14 +513,16 @@ describe("api", function() {
 
     describe("postDetailsRegister", () => {
       it("should pass name, password, and partial_token", async () => {
+        const flow = "register"
         const partialToken = "def456"
         const name = "sally"
         const password = "abc123"
-        await postDetailsRegister(partialToken, name, password)
+        await postDetailsRegister(flow, partialToken, name, password)
         assert.ok(
           fetchJSONStub.calledWith("/api/v0/register/details/", {
             method: POST,
             body:   JSON.stringify({
+              flow,
               partial_token: partialToken,
               name,
               password
