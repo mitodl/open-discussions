@@ -1,5 +1,5 @@
 """API tests"""
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,too-many-lines
 from unittest.mock import Mock
 from urllib.parse import urljoin
 
@@ -23,6 +23,9 @@ from channels.constants import (
     VoteActions,
 )
 from channels.models import (
+    Channel,
+    Comment,
+    Post,
     RedditAccessToken,
     RedditRefreshToken,
     Subscription,
@@ -933,3 +936,74 @@ def test_remove_comment_subscription(mock_client, user):  # pylint: disable=unus
     assert Subscription.objects.filter(user=user, post_id='abc', comment_id='def').exists()
     client.remove_comment_subscription('abc', 'def')
     assert not Subscription.objects.filter(user=user, post_id='abc', comment_id='def').exists()
+
+
+def test_sync_channel_model(settings):
+    """sync_channel_model should write the channel info to our database"""
+    settings.FEATURES[features.KEEP_LOCAL_COPY] = True
+    channel_name = 'channel'
+    assert Channel.objects.count() == 0
+    channel = api.sync_channel_model(channel_name)
+    assert Channel.objects.count() == 1
+    assert channel == Channel.objects.first()
+    assert channel.name == channel_name
+
+    assert channel == api.sync_channel_model(channel_name)
+
+
+def test_sync_comment_model(settings):
+    """sync_comment_model should write the comment to our database"""
+    settings.FEATURES[features.KEEP_LOCAL_COPY] = True
+    channel_name = 'channel name'
+    post_id = '456'
+    comment_id = 'def'
+    parent_id = 'abc'
+
+    assert Comment.objects.count() == 0
+    assert Post.objects.count() == 0
+    assert Channel.objects.count() == 0
+    comment = api.sync_comment_model(
+        channel_name=channel_name,
+        post_id=post_id,
+        comment_id=comment_id,
+        parent_id=parent_id,
+    )
+    assert Comment.objects.count() == 1
+    assert Post.objects.count() == 1
+    assert Channel.objects.count() == 1
+    assert comment == Comment.objects.first()
+    assert comment.post.channel.name == channel_name
+    assert comment.post.post_id == post_id
+    assert comment.comment_id == comment_id
+    assert comment.parent_id == parent_id
+
+    assert comment == api.sync_comment_model(
+        channel_name=channel_name,
+        post_id=post_id,
+        comment_id=comment_id,
+        parent_id=parent_id,
+    )
+
+
+def test_sync_post_model(settings):
+    """sync_post_model should write the post information to our database"""
+    settings.FEATURES[features.KEEP_LOCAL_COPY] = True
+    channel_name = 'channel'
+    post_id = 'post_id'
+
+    assert Channel.objects.count() == 0
+    assert Post.objects.count() == 0
+    post = api.sync_post_model(
+        channel_name=channel_name,
+        post_id=post_id,
+    )
+    assert Channel.objects.count() == 1
+    assert Post.objects.count() == 1
+    assert post == Post.objects.first()
+    assert post.channel.name == channel_name
+    assert post.post_id == post_id
+
+    assert post == api.sync_post_model(
+        channel_name=channel_name,
+        post_id=post_id,
+    )
