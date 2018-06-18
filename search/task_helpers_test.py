@@ -31,22 +31,26 @@ def enable_index_update_feature(settings):
     settings.FEATURES[INDEX_UPDATES] = True
 
 
-def test_reddit_object_indexer(mocker):
+def test_reddit_object_persist(mocker):
     """
-    Test that a function decorated with reddit_object_indexer receives the return value
+    Test that a function decorated with reddit_object_persist receives the return value
     of the decorated function, passes it to a provided function, and returns the value
     as normal.
     """
-    def mock_indexer(reddit_obj):  # pylint: disable=missing-docstring
-        reddit_obj.changed = True
+    def mock_indexer1(reddit_obj):  # pylint: disable=missing-docstring
+        reddit_obj.changed1 = True
 
-    @reddit_object_persist(persistence_func=mock_indexer)
+    def mock_indexer2(reddit_obj):  # pylint: disable=missing-docstring
+        reddit_obj.changed2 = True
+
+    @reddit_object_persist(mock_indexer1, mock_indexer2)
     def decorated_api_func(mock_reddit_obj):  # pylint: disable=missing-docstring
         return mock_reddit_obj
 
     mock_reddit_obj = mocker.Mock()
     reddit_obj = decorated_api_func(mock_reddit_obj)
-    assert reddit_obj.changed is True
+    assert reddit_obj.changed1 is True
+    assert reddit_obj.changed2 is True
     assert reddit_obj == mock_reddit_obj
 
 

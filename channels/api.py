@@ -50,7 +50,7 @@ from channels.models import (
 )
 from channels.utils import get_kind_mapping
 
-from channels import tasks
+from channels import task_helpers
 from open_discussions import features
 from open_discussions.utils import now_in_utc
 from search.task_helpers import (
@@ -398,6 +398,7 @@ class Api:
         """
         return self.reddit.subreddit(name)
 
+    @reddit_object_persist(task_helpers.sync_channel_model)
     def create_channel(self, name, title, channel_type=CHANNEL_TYPE_PUBLIC, **other_settings):
         """
         Create a channel
@@ -418,14 +419,12 @@ class Api:
             if key not in CHANNEL_SETTINGS:
                 raise ValueError('Invalid argument {}={}'.format(key, value))
 
-        channel = self.reddit.subreddit.create(
+        return self.reddit.subreddit.create(
             name,
             title=title,
             subreddit_type=channel_type,
             **other_settings
         )
-        tasks.sync_channel_model(name)
-        return channel
 
     def update_channel(self, name, title=None, channel_type=None, **other_settings):
         """
@@ -507,7 +506,10 @@ class Api:
     apply_post_vote = partialmethod(_apply_vote, allow_downvote=False, instance_type=POST_TYPE)
     apply_comment_vote = partialmethod(_apply_vote, allow_downvote=True, instance_type=COMMENT_TYPE)
 
-    @reddit_object_persist(persistence_func=index_new_post)
+    @reddit_object_persist(
+        index_new_post,
+        task_helpers.sync_post_model,
+    )
     def create_post(self, channel_name, title, text=None, url=None):
         """
         Create a new post in a channel
@@ -526,12 +528,7 @@ class Api:
         """
         if len(list(filter(lambda val: val is not None, [text, url]))) != 1:
             raise ValueError('Exactly one of text and url must be provided')
-        post = self.get_channel(channel_name).submit(title, selftext=text, url=url)
-        tasks.sync_post_model(
-            channel_name=channel_name,
-            post_id=post.id,
-        )
-        return post
+        return self.get_channel(channel_name).submit(title, selftext=text, url=url)
 
     def front_page(self, listing_params):
         """
@@ -611,7 +608,7 @@ class Api:
         """
         return self.reddit.submission(id=post_id)
 
-    @reddit_object_persist(persistence_func=update_post_text)
+    @reddit_object_persist(update_post_text)
     def update_post(self, post_id, text):
         """
         Updates the post
@@ -644,7 +641,7 @@ class Api:
         post = self.get_post(post_id)
         post.mod.sticky(pinned)
 
-    @reddit_object_persist(persistence_func=update_post_removal_status)
+    @reddit_object_persist(update_post_removal_status)
     def remove_post(self, post_id):
         """
         Removes the post, opposite of approve_post
@@ -656,7 +653,7 @@ class Api:
         post.mod.remove()
         return post
 
-    @reddit_object_persist(persistence_func=update_post_removal_status)
+    @reddit_object_persist(update_post_removal_status)
     def approve_post(self, post_id):
         """
         Approves the post, opposite of remove_post
@@ -668,7 +665,7 @@ class Api:
         post.mod.approve()
         return post
 
-    @reddit_object_persist(persistence_func=set_post_to_deleted)
+    @reddit_object_persist(set_post_to_deleted)
     def delete_post(self, post_id):
         """
         Deletes the post
@@ -681,7 +678,10 @@ class Api:
         post.delete()
         return post
 
-    @reddit_object_persist(persistence_func=index_new_comment)
+    @reddit_object_persist(
+        index_new_comment,
+        task_helpers.sync_comment_model,
+    )
     def create_comment(self, text, post_id=None, comment_id=None):
         """
         Create a new comment in reply to a post or comment
@@ -701,21 +701,11 @@ class Api:
             raise ValueError('Exactly one of post_id and comment_id must be provided')
 
         if post_id is not None:
-            reply = self.get_post(post_id).reply(text)
-            parent_id = None
+            return self.get_post(post_id).reply(text)
         else:
-            reply = self.get_comment(comment_id).reply(text)
-            parent_id = comment_id
+            return self.get_comment(comment_id).reply(text)
 
-        tasks.sync_comment_model(
-            channel_name=reply.subreddit.display_name,
-            post_id=reply.submission.id,
-            comment_id=reply.id,
-            parent_id=parent_id,
-        )
-        return reply
-
-    @reddit_object_persist(persistence_func=update_comment_text)
+    @reddit_object_persist(update_comment_text)
     def update_comment(self, comment_id, text):
         """
         Updates a existing comment
@@ -730,7 +720,7 @@ class Api:
         comment = self.get_comment(comment_id).edit(text)
         return comment
 
-    @reddit_object_persist(persistence_func=update_comment_removal_status)
+    @reddit_object_persist(update_comment_removal_status)
     def remove_comment(self, comment_id):
         """
         Removes a comment
@@ -742,7 +732,7 @@ class Api:
         comment.mod.remove()
         return comment
 
-    @reddit_object_persist(persistence_func=update_comment_removal_status)
+    @reddit_object_persist(update_comment_removal_status)
     def approve_comment(self, comment_id):
         """
         Approves a comment
@@ -754,7 +744,7 @@ class Api:
         comment.mod.approve()
         return comment
 
-    @reddit_object_persist(persistence_func=set_comment_to_deleted)
+    @reddit_object_persist(set_comment_to_deleted)
     def delete_comment(self, comment_id):
         """
         Deletes the comment
