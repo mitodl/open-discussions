@@ -1,7 +1,6 @@
 """
 Functions related to tasks for channels
 """
-from channels import tasks
 
 
 def sync_channel_model(channel):
@@ -11,6 +10,7 @@ def sync_channel_model(channel):
     Args:
         channel (Channel): The PRAW channel object
     """
+    from channels import tasks
     tasks.sync_channel_model.delay(channel.display_name)
 
 
@@ -21,8 +21,9 @@ def sync_post_model(post):
     Args:
         post (Post): A PRAW post object
     """
+    from channels import tasks
     tasks.sync_post_model.delay(
-        channel_name=post.channel.display_name,
+        channel_name=post.subreddit.display_name,
         post_id=post.id,
     )
 
@@ -34,6 +35,7 @@ def sync_comment_model(comment):
     Args:
         comment (Comment): A PRAW comment object
     """
+    from channels import tasks
     tasks.sync_comment_model.delay(
         channel_name=comment.subreddit.display_name,
         post_id=comment.submission.id,
