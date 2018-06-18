@@ -106,7 +106,7 @@ const ProfileImageUploader = ({
       autoScrollBodyContent={true}
       contentStyle={{ maxWidth: "620px" }}
       open={photoDialogOpen}
-      onAccept={photo || inFlight ? updateUserPhoto : null}
+      onAccept={photo  && !inFlight ? updateUserPhoto : null}
       onCancel={() => {
         clearPhotoEdit()
         setDialogVisibility(false)
