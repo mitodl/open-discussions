@@ -491,7 +491,7 @@ def test_init_more_comments_invalid_sort(mock_client, mocker):  # pylint: disabl
     assert more_patch.call_count == 0
 
 
-def test_more_comments(mocker):  # pylint: disable=unused-argument
+def test_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
     """Test more_comments without any extra comments"""
     client = api.Api(UserFactory.create())
     children = ['t1_itmt', 't1_it56t']
@@ -517,7 +517,7 @@ def test_more_comments(mocker):  # pylint: disable=unused-argument
     assert result == comments
 
 
-def test_more_comments_with_more_comments(mocker):  # pylint: disable=unused-argument
+def test_more_comments_with_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
     """Test more_comments with an extra MoreComments"""
     client = api.Api(UserFactory.create())
     children = ['1', '2', '3']
