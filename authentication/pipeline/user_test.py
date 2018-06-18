@@ -1,18 +1,17 @@
 """Tests of user pipeline actions"""
-import inspect
-
 from django.contrib.sessions.middleware import SessionMiddleware
 import pytest
-from social_core.exceptions import AuthForbidden
 from social_django.utils import load_strategy, load_backend
-from rest_framework import status
 
 from channels.models import RedditAccessToken, RedditRefreshToken
 from notifications.models import NotificationSettings
 from open_discussions.factories import UserFactory
-from authentication.constants import AUTH_TYPE_LOGIN, AUTH_TYPE_REGISTER
 from authentication.pipeline import user as user_actions
 from authentication.pipeline.user import update_full_name
+from authentication.exceptions import (
+    InvalidPasswordException,
+    RequirePasswordException,
+)
 
 
 def _validate_email_auth_request_not_email_backend(mocker):
@@ -20,23 +19,23 @@ def _validate_email_auth_request_not_email_backend(mocker):
     mock_strategy = mocker.MagicMock()
     mock_backend = mocker.Mock()
     mock_backend.name = 'notemail'
-    assert user_actions.validate_password(mock_strategy, mock_backend) is None
+    assert user_actions.validate_password(mock_strategy, mock_backend) == {}
 
 
-@pytest.mark.parametrize('auth_type,has_user,expected', [
-    (AUTH_TYPE_LOGIN, True, {
+@pytest.mark.parametrize('is_login,has_user,expected', [
+    (True, True, {
         'is_login': True,
         'is_register': False,
     }),
-    (AUTH_TYPE_LOGIN, False, {
+    (True, False, {
         'is_login': True,
         'is_register': False,
     }),
-    (AUTH_TYPE_REGISTER, True, {
+    (False, True, {
         'is_login': True,
         'is_register': False,
     }),
-    (AUTH_TYPE_REGISTER, False, {
+    (False, False, {
         'is_login': False,
         'is_register': True,
     }),
@@ -44,27 +43,30 @@ def _validate_email_auth_request_not_email_backend(mocker):
         'is_login': True,
         'is_register': False,
     }),
-    (None, False, AuthForbidden),
+    (None, False, {
+        'is_login': False,
+        'is_register': True,
+    }),
 ])
 @pytest.mark.django_db
-def test_validate_email_auth_request(rf, auth_type, has_user, expected):
+def test_validate_email_auth_request(rf, is_login, has_user, expected):
     """Test that validate_email_auth_request returns correctly given the input"""
-    request = rf.post('/complete/email', {
-        'auth_type': auth_type,
-    } if auth_type else {})
+    request = rf.post('/complete/email', )
     middleware = SessionMiddleware()
     middleware.process_request(request)
     request.session.save()
     strategy = load_strategy(request)
     backend = load_backend(strategy, 'email', None)
 
+    kwargs = {
+        'is_login': is_login,
+    } if is_login is not None else {}
+
     user = UserFactory.create() if has_user else None
 
-    if inspect.isclass(expected) and issubclass(expected, Exception):
-        with pytest.raises(expected):
-            user_actions.validate_email_auth_request(strategy, backend, user=user)
-    else:
-        assert user_actions.validate_email_auth_request(strategy, backend, user=user) == expected
+    assert user_actions.validate_email_auth_request(
+        strategy, backend, pipeline_index=0, user=user, **kwargs
+    ) == expected
 
 
 def test_get_username(mocker, user):
@@ -88,7 +90,9 @@ def test_user_password_not_email_backend(mocker):
     mock_user = mocker.Mock()
     mock_backend = mocker.Mock()
     mock_backend.name = 'notemail'
-    assert user_actions.validate_password(mock_strategy, mock_backend, user=mock_user, is_login=True) is None
+    assert user_actions.validate_password(
+        mock_strategy, mock_backend, pipeline_index=0, user=mock_user, is_login=True
+    ) == {}
     # make sure we didn't update or check the password
     mock_user.set_password.assert_not_called()
     mock_user.save.assert_not_called()
@@ -104,7 +108,6 @@ def test_user_password_login(rf, user, user_password):
     request = rf.post('/complete/email', {
         'password': request_password,
         'email': user.email,
-        'auth_type': AUTH_TYPE_LOGIN,
     })
     middleware = SessionMiddleware()
     middleware.process_request(request)
@@ -113,10 +116,10 @@ def test_user_password_login(rf, user, user_password):
     backend = load_backend(strategy, 'email', None)
 
     if request_password == user_password:
-        assert user_actions.validate_password(strategy, backend, user=user, is_login=True) is None
+        assert user_actions.validate_password(strategy, backend, pipeline_index=0, user=user, is_login=True) == {}
     else:
-        with pytest.raises(AuthForbidden):
-            user_actions.validate_password(strategy, backend, user=user, is_login=True)
+        with pytest.raises(InvalidPasswordException):
+            user_actions.validate_password(strategy, backend, pipeline_index=0, user=user, is_login=True)
 
 
 def test_user_password_not_login(rf, user):
@@ -128,7 +131,6 @@ def test_user_password_not_login(rf, user):
     user.save()
     request = rf.post('/complete/email', {
         'email': user.email,
-        'auth_type': AUTH_TYPE_LOGIN,
     })
     middleware = SessionMiddleware()
     middleware.process_request(request)
@@ -136,9 +138,8 @@ def test_user_password_not_login(rf, user):
     strategy = load_strategy(request)
     backend = load_backend(strategy, 'email', None)
 
-    response = user_actions.validate_password(strategy, backend, user=user, is_login=True)
-    assert response.status_code == status.HTTP_200_OK
-    assert 'This field is required' in str(response.content)
+    with pytest.raises(RequirePasswordException):
+        user_actions.validate_password(strategy, backend, pipeline_index=0, user=user, is_login=True)
 
 
 def test_user_password_not_exists(rf):
@@ -146,7 +147,6 @@ def test_user_password_not_exists(rf):
     request = rf.post('/complete/email', {
         'password': 'abc123',
         'email': 'doesntexist@localhost',
-        'auth_type': AUTH_TYPE_REGISTER,
     })
     middleware = SessionMiddleware()
     middleware.process_request(request)
@@ -154,8 +154,8 @@ def test_user_password_not_exists(rf):
     strategy = load_strategy(request)
     backend = load_backend(strategy, 'email', None)
 
-    with pytest.raises(AuthForbidden):
-        user_actions.validate_password(strategy, backend, user=None, is_login=True)
+    with pytest.raises(InvalidPasswordException):
+        user_actions.validate_password(strategy, backend, pipeline_index=0, user=None, is_login=True)
 
 
 @pytest.mark.parametrize('backend_name,is_login', [
@@ -169,7 +169,7 @@ def test_validate_require_password_and_profile_not_email_backend(mocker, backend
     mock_backend = mocker.Mock()
     mock_backend.name = backend_name
     assert user_actions.require_password_and_profile_via_email(
-        mock_strategy, mock_backend, 0, is_login=is_login
+        mock_strategy, mock_backend, pipeline_index=0, is_login=is_login
     ) == {}
 
 
@@ -225,7 +225,7 @@ def test_initialize_user():
     assert RedditAccessToken.objects.filter(user=user).count() == 0
     assert RedditRefreshToken.objects.filter(user=user).count() == 0
 
-    assert user_actions.initialize_user(user=user, is_new=True) is None
+    assert user_actions.initialize_user(user=user, is_new=True) == {}
 
     assert RedditAccessToken.objects.filter(user=user).count() == 1
     assert RedditRefreshToken.objects.filter(user=user).count() == 1

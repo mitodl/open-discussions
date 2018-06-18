@@ -8,7 +8,9 @@ import {
   validate,
   validatePostCreateForm,
   validateChannelEditForm,
-  validateContentReportForm
+  validateContentReportForm,
+  validateEmailForm,
+  validatePasswordForm
 } from "./validation"
 
 describe("validation library", () => {
@@ -180,6 +182,37 @@ describe("validation library", () => {
       assert.deepEqual(validateContentReportForm(report), {})
       report.value.reason = "a".repeat(3)
       assert.deepEqual(validateContentReportForm(report), {})
+    })
+  })
+
+  describe("validateEmailForm", () => {
+    it("should complain about no email", () => {
+      const form = { value: { email: "" } }
+      assert.deepEqual(validateEmailForm(form), {
+        value: {
+          email: "Email is required"
+        }
+      })
+    })
+
+    it("should complain about invalid email", () => {
+      const form = { value: { email: "abbbb@ddd" } }
+      assert.deepEqual(validateEmailForm(form), {
+        value: {
+          email: "Email is not formatted correctly"
+        }
+      })
+    })
+  })
+
+  describe("validatePasswordForm", () => {
+    it("should complain about no password", () => {
+      const form = { value: { password: "" } }
+      assert.deepEqual(validatePasswordForm(form), {
+        value: {
+          password: "Password is required"
+        }
+      })
     })
   })
 })

@@ -29,4 +29,4 @@ def test_send_verification_email(mocker, rf):
     send_messages_mock.assert_called_once_with([any_instance_of(EmailMessage)])
 
     email_body = send_messages_mock.call_args[0][0][0].body
-    assert '/complete/email/?verification_code=abc&auth_type=register' in email_body
+    assert '/register/confirm/?verification_code=abc' in email_body

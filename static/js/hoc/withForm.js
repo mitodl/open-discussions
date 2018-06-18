@@ -41,7 +41,14 @@ const withForm = R.curry(
 
       onUpdate = (e: Object) => {
         const { formUpdate } = this.props
-        const { name, value } = e.target
+        const { name, type } = e.target
+
+        let value
+        if (type === "checkbox") {
+          value = e.target.checked
+        } else {
+          value = e.target.value
+        }
 
         formUpdate({
           [name]: value

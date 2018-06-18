@@ -17,6 +17,7 @@ const _createSettings = () => ({
     session_url: "http://fake.session.url",
     tos_url:     "http://fake.tos.url/"
   },
+  supprt_email:        "support@fake.url",
   allow_anonymous:     false,
   is_authenticated:    true,
   username:            "greatusername",
@@ -26,6 +27,11 @@ const _createSettings = () => ({
 global.SETTINGS = _createSettings()
 
 window.scrollTo = () => "scroll!"
+
+// required for react 16+
+window.requestAnimationFrame = function(callback) {
+  setTimeout(callback, 0)
+}
 
 // polyfill for Object.entries
 import entries from "object.entries"

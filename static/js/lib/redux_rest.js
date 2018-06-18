@@ -11,6 +11,7 @@ import { postRemovedEndpoint } from "../reducers/post_removed"
 import { reportsEndpoint } from "../reducers/reports"
 import { settingsEndpoint } from "../reducers/settings"
 import { embedlyEndpoint } from "../reducers/embedly"
+import { authEndpoint } from "../reducers/auth"
 
 export const endpoints = [
   postsEndpoint,
@@ -25,5 +26,6 @@ export const endpoints = [
   postRemovedEndpoint,
   reportsEndpoint,
   settingsEndpoint,
-  embedlyEndpoint
+  embedlyEndpoint,
+  authEndpoint
 ]

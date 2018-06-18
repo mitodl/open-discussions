@@ -4591,7 +4591,7 @@ lodash.assign@^4.0.3, lodash.assign@^4.0.6, lodash.assign@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/lodash.assign/-/lodash.assign-4.2.0.tgz#0d99f3ccd7a6d261d19bdaeb9245005d285808e7"
 
-lodash.camelcase@^4.3.0:
+lodash.camelcase@^4.1.1, lodash.camelcase@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
 
@@ -4705,6 +4705,10 @@ lru-cache@^4.0.1:
 macaddress@^0.2.8:
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/macaddress/-/macaddress-0.2.8.tgz#5904dc537c39ec6dbefeae902327135fa8511f12"
+
+mailcheck@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/mailcheck/-/mailcheck-1.1.1.tgz#d87cf6ba0b64ba512199dbf93f1489f479591e34"
 
 make-dir@^1.0.0:
   version "1.0.0"
@@ -6408,13 +6412,14 @@ redux-debounced@^0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/redux-debounced/-/redux-debounced-0.5.0.tgz#4dde27a3e66ea428afe78215f30a27f22714605b"
 
-redux-hammock@^0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/redux-hammock/-/redux-hammock-0.2.3.tgz#0235e8657d4808c6a9c9d25bdf367b2e3f0714f2"
+redux-hammock@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/redux-hammock/-/redux-hammock-0.3.0.tgz#7db00cf826bdba6b5a69baf15f29ea9ce9cd525b"
   dependencies:
     babel-polyfill "^6.23.0"
     babel-runtime "^6.23.0"
     isomorphic-fetch "^2.2.1"
+    lodash.camelcase "^4.1.1"
     lodash.merge "^4.6.0"
     lodash.snakecase "^4.1.1"
     ramda "^0.24.1"

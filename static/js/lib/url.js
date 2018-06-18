@@ -35,6 +35,16 @@ export const AUTH_REQUIRED_URL = "/auth_required/"
 export const CONTENT_POLICY_URL = "/content_policy/"
 export const SETTINGS_URL = "/settings/"
 
+// auth urls
+export const LOGIN_URL = "/login/"
+export const LOGIN_PASSWORD_URL = "/login/password/"
+
+export const REGISTER_URL = "/register/"
+export const REGISTER_CONFIRM_URL = "/register/confirm/"
+export const REGISTER_DETAILS_URL = "/register/details/"
+
+export const INACTIVE_USER_URL = "/account/inactive/"
+
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`
 
