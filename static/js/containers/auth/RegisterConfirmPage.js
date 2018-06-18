@@ -10,9 +10,10 @@ import Card from "../../components/Card"
 import { Loading } from "../../components/Loading"
 
 import { actions } from "../../actions"
-import { processAuthResponse, STATE_INVALID_EMAIL } from "../../lib/auth"
+import { processAuthResponse } from "../../lib/auth"
 import { formatTitle } from "../../lib/title"
 import { REGISTER_URL } from "../../lib/url"
+import { STATE_INVALID_EMAIL, FLOW_REGISTER } from "../../reducers/auth"
 
 type RegisterConfirmPageProps = {
   confirmCode: Function,
@@ -70,7 +71,8 @@ export class RegisterConfirmPage extends React.Component<*, *> {
   }
 }
 
-const confirmCode = (code: string) => actions.auth.registerConfirm(code)
+const confirmCode = (code: string) =>
+  actions.auth.registerConfirm(FLOW_REGISTER, code)
 
 const mapStateToProps = state => {
   const invalid = isInvalid(state.auth)

@@ -15,8 +15,9 @@ import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
+import { FLOW_REGISTER, STATE_REGISTER_CONFIRM_SENT } from "../../reducers/auth"
 
-import type { EmailForm } from "../../flow/authTypes"
+import type { EmailForm, AuthResponse } from "../../flow/authTypes"
 import type { WithFormProps } from "../../hoc/withForm"
 
 type RegisterPageProps = {
@@ -43,7 +44,8 @@ const { getForm, actionCreators } = configureForm(
   newEmailForm
 )
 
-const onSubmit = (form: EmailForm) => actions.auth.registerEmail(form.email)
+const onSubmit = (form: EmailForm) =>
+  actions.auth.registerEmail(FLOW_REGISTER, form.email)
 
 const mapStateToProps = state => {
   const form = getForm(state)
@@ -58,13 +60,15 @@ const mapStateToProps = state => {
 
 const mergeProps = mergeAndInjectProps(
   (stateProps, { setSnackbarMessage }, { history }) => ({
-    onSubmitResult: response => {
+    onSubmitResult: (response: AuthResponse) => {
       processAuthResponse(history, response)
-      setSnackbarMessage({
-        message: `We sent an email to <${
-          response.email
-        }>, please validate to continue`
-      })
+      if (response.state === STATE_REGISTER_CONFIRM_SENT && response.email) {
+        setSnackbarMessage({
+          message: `We sent an email to <${
+            response.email
+          }>, please validate to continue`
+        })
+      }
     }
   })
 )

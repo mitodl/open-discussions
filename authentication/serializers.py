@@ -24,6 +24,10 @@ log = logging.getLogger()
 class SocialAuthSerializer(serializers.Serializer):
     """Serializer for social auth"""
     partial_token = serializers.CharField(source='partial.token', default=None)
+    flow = serializers.ChoiceField(choices=(
+        (SocialAuthState.FLOW_LOGIN, "Login"),
+        (SocialAuthState.FLOW_REGISTER, "Reigster"),
+    ))
     state = serializers.CharField(read_only=True)
     errors = serializers.ListField(read_only=True)
 
@@ -84,6 +88,10 @@ class SocialAuthSerializer(serializers.Serializer):
         if isinstance(result, SocialAuthState) and result.partial is not None:
             strategy = self.context['strategy']
             strategy.storage.partial.store(result.partial)
+
+        # return the passed flow back to the caller
+        # this way they know if they're on a particular page because of an attempted registration or login
+        result.flow = self.validated_data['flow']
 
         return result
 

@@ -5,6 +5,9 @@ from social_django.utils import STORAGE
 
 class SocialAuthState:
     """Social auth state"""
+    FLOW_REGISTER = "register"
+    FLOW_LOGIN = "login"
+
     # login states
     STATE_LOGIN_EMAIL = "login/email"
     STATE_LOGIN_PASSWORD = "login/password"
@@ -22,9 +25,10 @@ class SocialAuthState:
     STATE_INACTIVE = "inactive"
     STATE_INVALID_EMAIL = "invalid-email"
 
-    def __init__(self, state, partial=None, errors=None):
+    def __init__(self, state, partial=None, flow=None, errors=None):
         self.state = state
         self.partial = partial
+        self.flow = flow
         self.errors = errors or []
 
 

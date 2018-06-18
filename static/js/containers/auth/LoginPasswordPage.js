@@ -15,21 +15,34 @@ import { formatTitle } from "../../lib/title"
 import { LOGIN_URL } from "../../lib/url"
 import { validatePasswordForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
-import { getPartialToken } from "../../reducers/auth"
+import {
+  getPartialTokenSelector,
+  getAuthFlowSelector,
+  FLOW_LOGIN
+} from "../../reducers/auth"
 
-import type { PasswordForm } from "../../flow/authTypes"
+import type { PasswordForm, AuthFlow } from "../../flow/authTypes"
 import type { WithFormProps } from "../../hoc/withForm"
 
 type LoginPasswordPageProps = {
   history: Object,
-  partialToken: string
+  partialToken: string,
+  authFlow: AuthFlow,
+  isLoginFlow: boolean
 } & WithFormProps
 
-const LoginPasswordPage = ({ renderForm }: LoginPasswordPageProps) => (
+const LoginPasswordPage = ({
+  renderForm,
+  isLoginFlow
+}: LoginPasswordPageProps) => (
   <div className="content auth-page login-password-page">
     <div className="main-content">
       <Card className="login-card">
-        <h3>Log In</h3>
+        <h3>
+          {isLoginFlow
+            ? "Welcome Back!"
+            : "There is already an account with this email"}
+        </h3>
         <DocumentTitle title={formatTitle("Log In")} />
         {renderForm()}
       </Card>
@@ -44,8 +57,11 @@ const { getForm, actionCreators } = configureForm(
   newPasswordForm
 )
 
-const onSubmit = (partialToken: string, form: PasswordForm) =>
-  actions.auth.loginPassword(partialToken, form.password)
+const onSubmit = (
+  authFlow: AuthFlow,
+  partialToken: string,
+  form: PasswordForm
+) => actions.auth.loginPassword(authFlow, partialToken, form.password)
 
 const onSubmitResult = R.curry(processAuthResponse)
 
@@ -62,24 +78,28 @@ const formBeginEditIfPartial = (
 }
 
 const mergeProps = mergeAndInjectProps(
-  ({ partialToken }, { formBeginEdit, onSubmit }, { history }) => ({
+  ({ partialToken, authFlow }, { formBeginEdit, onSubmit }, { history }) => ({
     formBeginEdit:  formBeginEditIfPartial(formBeginEdit, history, partialToken),
-    onSubmit:       (form: PasswordForm) => onSubmit(partialToken, form),
+    onSubmit:       (form: PasswordForm) => onSubmit(authFlow, partialToken, form),
     onSubmitResult: onSubmitResult(history)
   })
 )
 
 const mapStateToProps = state => {
   const form = getForm(state)
-  const partialToken = getPartialToken(state)
+  const partialToken = getPartialTokenSelector(state)
   const processing = state.auth.processing
+  const authFlow = getAuthFlowSelector(state)
+  const isLoginFlow = authFlow === FLOW_LOGIN
 
   return {
     form,
     partialToken,
     processing,
     onSubmitResult,
-    validateForm
+    validateForm,
+    authFlow,
+    isLoginFlow
   }
 }
 

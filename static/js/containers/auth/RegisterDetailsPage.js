@@ -14,7 +14,7 @@ import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { validateRegisterDetailsForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
-import { getPartialToken } from "../../reducers/auth"
+import { getPartialTokenSelector, FLOW_REGISTER } from "../../reducers/auth"
 
 import type { DetailsForm } from "../../flow/authTypes"
 import type { WithFormProps } from "../../hoc/withForm"
@@ -43,7 +43,12 @@ const RegisterDetailsPage = ({ renderForm }: RegisterDetailsPageProps) => (
 const newDetailsForm = () => ({ name: "", password: "" })
 
 const onSubmit = (partialToken: string, form: DetailsForm) =>
-  actions.auth.registerDetails(partialToken, form.name, form.password)
+  actions.auth.registerDetails(
+    FLOW_REGISTER,
+    partialToken,
+    form.name,
+    form.password
+  )
 
 const onSubmitResult = R.curry(processAuthResponse)
 
@@ -55,7 +60,7 @@ const { getForm, actionCreators } = configureForm(
 const mapStateToProps = state => {
   const processing = state.auth.processing
   const form = getForm(state)
-  const partialToken = getPartialToken(state)
+  const partialToken = getPartialTokenSelector(state)
 
   return {
     processing,

@@ -21,26 +21,32 @@ export type PasswordFormValidation = {
 
 export type DetailsForm = {
   name: string,
-  tos: boolean
+  tos:  boolean
 } & PasswordForm
 
 export type DetailsFormValidation = {
   name: string,
-  tos: string
+  tos:  string
 } & PasswordFormValidation
 
 
 // API response types
-export type CommonStates = "success" | "inactive" | "error"
-export type LoginState = CommonStates | "login/email" | "login/password"
-export type RegisterState = CommonStates | "register/email" | "register/confirm-sent" | "register/confirm" | "register/details"
+export type AuthStates =
+  |"success"
+  | "inactive"
+  | "error"
+  | "login/email"
+  | "login/password"
+  | "register/email"
+  | "register/confirm-sent"
+  | "register/confirm"
+  | "register/details"
 
-export type LoginResponse = {
-  partial_token: string,
-  state: LoginState,
-}
+export type AuthFlow = "register" | "login"
 
-export type RegisterResponse = {
+export type AuthResponse = {
   partial_token: string,
-  state: RegisterState,
+  flow:          AuthFlow,
+  state:         AuthStates,
+  email:         ?string
 }

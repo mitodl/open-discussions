@@ -14,6 +14,7 @@ import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
+import { FLOW_LOGIN } from "../../reducers/auth"
 
 import type { EmailForm } from "../../flow/authTypes"
 import type { WithFormProps } from "../../hoc/withForm"
@@ -37,7 +38,8 @@ const LoginPage = ({ renderForm }: LoginPageProps) => (
 
 const newEmailForm = () => ({ email: "" })
 
-const onSubmit = ({ email }: EmailForm) => actions.auth.loginEmail(email)
+const onSubmit = ({ email }: EmailForm) =>
+  actions.auth.loginEmail(FLOW_LOGIN, email)
 
 const onSubmitResult = R.curry(processAuthResponse)
 

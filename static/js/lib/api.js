@@ -15,7 +15,7 @@ import {
 import { toQueryString } from "../lib/url"
 import { getPaginationSortParams } from "../lib/posts"
 
-import type { RegisterResponse, LoginResponse } from "../flow/authTypes"
+import type { AuthResponse, AuthFlow } from "../flow/authTypes"
 import type {
   Channel,
   ChannelModerators,
@@ -254,42 +254,54 @@ export const getEmbedly = async (url: string): Promise<EmbedlyResponse> => {
   return { url, response }
 }
 
-export const postEmailLogin = (email: string): Promise<LoginResponse> =>
+export const postEmailLogin = (
+  flow: AuthFlow,
+  email: string
+): Promise<AuthResponse> =>
   fetchJSONWithCSRF("/api/v0/login/email/", {
     method: POST,
-    body:   JSON.stringify({ email })
+    body:   JSON.stringify({ flow, email })
   })
 
 export const postPasswordLogin = (
+  flow: AuthFlow,
   partialToken: string,
   password: string
-): Promise<LoginResponse> =>
+): Promise<AuthResponse> =>
   fetchJSONWithCSRF("/api/v0/login/password/", {
     method: POST,
     body:   JSON.stringify({
+      flow,
       partial_token: partialToken,
-      password:      password
+      password
     })
   })
 
-export const postEmailRegister = (email: string): Promise<RegisterResponse> =>
+export const postEmailRegister = (
+  flow: AuthFlow,
+  email: string
+): Promise<AuthResponse> =>
   fetchJSONWithCSRF("/api/v0/register/email/", {
     method: POST,
-    body:   JSON.stringify({ email })
+    body:   JSON.stringify({ flow, email })
   })
 
-export const postConfirmRegister = (code: string): Promise<RegisterResponse> =>
+export const postConfirmRegister = (
+  flow: AuthFlow,
+  code: string
+): Promise<AuthResponse> =>
   fetchJSONWithCSRF("/api/v0/register/confirm/", {
     method: POST,
-    body:   JSON.stringify({ verification_code: code })
+    body:   JSON.stringify({ flow, verification_code: code })
   })
 
 export const postDetailsRegister = (
+  flow: AuthFlow,
   partialToken: string,
   name: string,
   password: string
-): Promise<RegisterResponse> =>
+): Promise<AuthResponse> =>
   fetchJSONWithCSRF("/api/v0/register/details/", {
     method: POST,
-    body:   JSON.stringify({ partial_token: partialToken, name, password })
+    body:   JSON.stringify({ flow, partial_token: partialToken, name, password })
   })
