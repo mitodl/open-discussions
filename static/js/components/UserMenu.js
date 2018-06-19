@@ -55,9 +55,6 @@ export default class UserMenu extends React.Component<*, *> {
 
   render() {
     const { toggleShowUserMenu, showUserMenu, profile } = this.props
-    if (!profile) {
-      return null
-    }
 
     return (
       <div className="user-menu">
