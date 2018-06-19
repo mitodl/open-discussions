@@ -34,14 +34,13 @@ log = logging.getLogger()
 
 def reddit_object_persist(*persistence_funcs):
     """
-    Decorator that passes a PRAW object to a function that will perform some indexing action.
+    Decorator that passes a PRAW object to any number of functions that persist the object to a new data store.
     The decorated function must return a PRAW object
     (e.g.: praw.models.reddit.submission.Submission, praw.models.reddit.comment.Comment)
     """
     def api_indexing_listener_inner(func):  # pylint: disable=missing-docstring
         @wraps(func)
         def wrapped_api_func(*args, **kwargs):  # pylint: disable=missing-docstring
-
             reddit_obj = func(*args, **kwargs)
             try:
                 for persistence_func in persistence_funcs:
