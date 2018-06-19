@@ -34,7 +34,7 @@ from channels.utils import (
     DEFAULT_LISTING_PARAMS,
     ListingParams,
 )
-from search import task_helpers
+from search import task_helpers as search_task_helpers
 from open_discussions.factories import UserFactory
 from open_discussions import features
 
@@ -228,7 +228,7 @@ def test_create_post_text(mock_client, indexing_decorator):
     mock_client.subreddit.return_value.submit.assert_called_once_with('Title', selftext='Text', url=None)
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 2
-    assert task_helpers.index_new_post in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.index_new_post in indexing_decorator.mock_indexer_func.original
     assert channels_task_helpers.sync_post_model in indexing_decorator.mock_indexer_func.original
 
 
@@ -243,7 +243,7 @@ def test_create_post_url(mock_client, indexing_decorator):
     )
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 2
-    assert task_helpers.index_new_post in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.index_new_post in indexing_decorator.mock_indexer_func.original
     assert channels_task_helpers.sync_post_model in indexing_decorator.mock_indexer_func.original
 
 
@@ -292,7 +292,7 @@ def test_update_post_valid(mock_client, indexing_decorator):
     mock_client.submission.return_value.edit.assert_called_once_with('Text')
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert task_helpers.update_post_text in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.update_post_text in indexing_decorator.mock_indexer_func.original
 
 
 def test_update_post_invalid(mock_client):
@@ -314,7 +314,7 @@ def test_approve_post(mock_client, indexing_decorator):
     mock_client.submission.return_value.mod.approve.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert task_helpers.update_post_removal_status in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.update_post_removal_status in indexing_decorator.mock_indexer_func.original
 
 
 def test_remove_post(mock_client, indexing_decorator):
@@ -326,7 +326,7 @@ def test_remove_post(mock_client, indexing_decorator):
     mock_client.submission.return_value.mod.remove.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert task_helpers.update_post_removal_status in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.update_post_removal_status in indexing_decorator.mock_indexer_func.original
 
 
 def test_create_comment_on_post(mock_client, indexing_decorator):
@@ -339,7 +339,7 @@ def test_create_comment_on_post(mock_client, indexing_decorator):
     mock_client.submission.return_value.reply.assert_called_once_with('text')
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 2
-    assert task_helpers.index_new_comment in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.index_new_comment in indexing_decorator.mock_indexer_func.original
     assert channels_task_helpers.sync_post_model in indexing_decorator.mock_indexer_func.original
 
 
@@ -353,7 +353,7 @@ def test_create_comment_on_comment(mock_client, indexing_decorator):
     mock_client.comment.return_value.reply.assert_called_once_with('text')
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 2
-    assert task_helpers.index_new_comment in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.index_new_comment in indexing_decorator.mock_indexer_func.original
     assert channels_task_helpers.sync_post_model in indexing_decorator.mock_indexer_func.original
 
 
@@ -401,7 +401,7 @@ def test_delete_comment(mock_client, indexing_decorator):
     mock_client.comment.return_value.delete.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert task_helpers.set_comment_to_deleted in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.set_comment_to_deleted in indexing_decorator.mock_indexer_func.original
 
 
 def test_update_comment(mock_client, indexing_decorator):
@@ -413,7 +413,7 @@ def test_update_comment(mock_client, indexing_decorator):
     mock_client.comment.return_value.edit.assert_called_once_with('Text')
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert task_helpers.update_comment_text in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.update_comment_text in indexing_decorator.mock_indexer_func.original
 
 
 def test_approve_comment(mock_client, indexing_decorator):
@@ -425,7 +425,7 @@ def test_approve_comment(mock_client, indexing_decorator):
     mock_client.comment.return_value.mod.approve.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert task_helpers.update_comment_removal_status in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.update_comment_removal_status in indexing_decorator.mock_indexer_func.original
 
 
 def test_remove_comment(mock_client, indexing_decorator):
@@ -437,7 +437,7 @@ def test_remove_comment(mock_client, indexing_decorator):
     mock_client.comment.return_value.mod.remove.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert task_helpers.update_comment_removal_status in indexing_decorator.mock_indexer_func.original
+    assert search_task_helpers.update_comment_removal_status in indexing_decorator.mock_indexer_func.original
 
 
 def test_init_more_comments(mock_client, mocker):
