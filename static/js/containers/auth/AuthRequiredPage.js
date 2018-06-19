@@ -3,9 +3,9 @@
 import React from "react"
 import DocumentTitle from "react-document-title"
 
-import Card from "../components/Card"
+import Card from "../../components/Card"
 
-import { formatTitle } from "../lib/title"
+import { formatTitle } from "../../lib/title"
 
 export default class AuthRequiredPage extends React.Component<*, void> {
   render() {

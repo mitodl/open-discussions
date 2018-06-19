@@ -21,6 +21,7 @@ declare var SETTINGS: {
   is_authenticated: boolean,
   allow_anonymous: boolean,
   allow_email_auth: boolean,
+  support_email: string
 }
 
 // mocha

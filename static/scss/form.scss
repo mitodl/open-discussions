@@ -32,7 +32,7 @@
   vertical-align: middle;
 }
 
-input[type=text], input[type=url] {
+input[type=text], input[type=url], input[type=password] {
   width: 100%;
   padding: 10px 10px;
   font-size: 15px;
@@ -40,11 +40,11 @@ input[type=text], input[type=url] {
   border: 1px solid #b7b7b7;
   transition: width 0.4s ease-in-out;
   box-sizing: border-box;
-}
 
-input[type=text]:disabled {
-  background: #f7f7f7;
-  border-color: #ccc;
+  &:disabled {
+    background: #f7f7f7;
+    border-color: #ccc;
+  }
 }
 
 textarea {

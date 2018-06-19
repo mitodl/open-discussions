@@ -32,7 +32,12 @@ import {
   getEmbedly,
   getProfile,
   patchProfileImage,
-  updateProfile
+  updateProfile,
+  postEmailLogin,
+  postPasswordLogin,
+  postEmailRegister,
+  postConfirmRegister,
+  postDetailsRegister
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -505,6 +510,88 @@ describe("api", function() {
           fetchJSONStub.calledWith(
             "/api/v0/embedly/https%253A%252F%252Fen.wikipedia.org%252Fwiki%252FGiant_panda/"
           )
+        )
+      })
+    })
+
+    describe("postEmailLogin", () => {
+      it("should pass email", async () => {
+        const flow = "register"
+        const email = "test@example.com"
+        await postEmailLogin(flow, email)
+        assert.ok(
+          fetchJSONStub.calledWith("/api/v0/login/email/", {
+            method: POST,
+            body:   JSON.stringify({ flow, email })
+          })
+        )
+      })
+    })
+
+    describe("postPasswordLogin", () => {
+      it("should pass password and partial_token", async () => {
+        const flow = "register"
+        const password = "abc123"
+        const partialToken = "def456"
+        await postPasswordLogin(flow, partialToken, password)
+        assert.ok(
+          fetchJSONStub.calledWith("/api/v0/login/password/", {
+            method: POST,
+            body:   JSON.stringify({
+              flow,
+              partial_token: partialToken,
+              password
+            })
+          })
+        )
+      })
+    })
+
+    describe("postEmailRegister", () => {
+      it("should pass email", async () => {
+        const flow = "register"
+        const email = "test@example.com"
+        await postEmailRegister(flow, email)
+        assert.ok(
+          fetchJSONStub.calledWith("/api/v0/register/email/", {
+            method: POST,
+            body:   JSON.stringify({ flow, email })
+          })
+        )
+      })
+    })
+
+    describe("postConfirmRegister", () => {
+      it("should pass code", async () => {
+        const flow = "register"
+        const code = "123456"
+        await postConfirmRegister(flow, code)
+        assert.ok(
+          fetchJSONStub.calledWith("/api/v0/register/confirm/", {
+            method: POST,
+            body:   JSON.stringify({ flow, verification_code: code })
+          })
+        )
+      })
+    })
+
+    describe("postDetailsRegister", () => {
+      it("should pass name, password, and partial_token", async () => {
+        const flow = "register"
+        const partialToken = "def456"
+        const name = "sally"
+        const password = "abc123"
+        await postDetailsRegister(flow, partialToken, name, password)
+        assert.ok(
+          fetchJSONStub.calledWith("/api/v0/register/details/", {
+            method: POST,
+            body:   JSON.stringify({
+              flow,
+              partial_token: partialToken,
+              name,
+              password
+            })
+          })
         )
       })
     })

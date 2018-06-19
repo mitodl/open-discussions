@@ -20,7 +20,8 @@ const _createSettings = () => ({
   allow_anonymous:    false,
   is_authenticated:   true,
   username:           "greatusername",
-  profile_ui_enabled: false
+  profile_ui_enabled: false,
+  support_email:      "support@fake.url"
 })
 
 global.SETTINGS = _createSettings()

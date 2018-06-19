@@ -5,6 +5,7 @@ import R from "ramda"
 import "isomorphic-fetch"
 import qs from "query-string"
 import { PATCH, POST, DELETE } from "redux-hammock/constants"
+import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 
 import {
   fetchJSONWithAuthFailure,
@@ -14,6 +15,7 @@ import {
 import { toQueryString } from "../lib/url"
 import { getPaginationSortParams } from "../lib/posts"
 
+import type { AuthResponse, AuthFlow } from "../flow/authTypes"
 import type {
   Channel,
   ChannelModerators,
@@ -289,3 +291,59 @@ export function updateProfile(
     body:   JSON.stringify(payload)
   })
 }
+
+export const postEmailLogin = (
+  flow: AuthFlow,
+  email: string
+): Promise<AuthResponse> =>
+  fetchJSONWithCSRF("/api/v0/login/email/", {
+    method: POST,
+    body:   JSON.stringify({ flow, email })
+  })
+
+export const postPasswordLogin = (
+  flow: AuthFlow,
+  partialToken: string,
+  password: string
+): Promise<AuthResponse> =>
+  fetchJSONWithCSRF("/api/v0/login/password/", {
+    method: POST,
+    body:   JSON.stringify({
+      flow,
+      partial_token: partialToken,
+      password
+    })
+  })
+
+// here, if a partial token is provided it takes precedence
+export const postEmailRegister = (
+  flow: AuthFlow,
+  email: string,
+  partialToken: ?string
+): Promise<AuthResponse> =>
+  fetchJSONWithCSRF("/api/v0/register/email/", {
+    method: POST,
+    body:   JSON.stringify(
+      partialToken ? { flow, partial_token: partialToken } : { flow, email }
+    )
+  })
+
+export const postConfirmRegister = (
+  flow: AuthFlow,
+  code: string
+): Promise<AuthResponse> =>
+  fetchJSONWithCSRF("/api/v0/register/confirm/", {
+    method: POST,
+    body:   JSON.stringify({ flow, verification_code: code })
+  })
+
+export const postDetailsRegister = (
+  flow: AuthFlow,
+  partialToken: string,
+  name: string,
+  password: string
+): Promise<AuthResponse> =>
+  fetchJSONWithCSRF("/api/v0/register/details/", {
+    method: POST,
+    body:   JSON.stringify({ flow, partial_token: partialToken, name, password })
+  })

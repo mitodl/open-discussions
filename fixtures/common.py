@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 from django.utils.deprecation import RemovedInDjango20Warning
 import factory
 import pytest
+from _pytest.deprecated import RemovedInPytest4Warning
 from urllib3.exceptions import InsecureRequestWarning
 
 import channels.api
@@ -47,6 +48,10 @@ def warnings_as_errors():
             "ignore",
             module="(social_django|social_core).*",
             category=RemovedInDjango20Warning,
+        )
+        warnings.filterwarnings(
+            "ignore",
+            category=RemovedInPytest4Warning
         )
 
         yield

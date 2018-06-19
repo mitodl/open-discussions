@@ -1,9 +1,12 @@
 /* global SETTINGS: false */
 import React from "react"
-import { mount } from "enzyme"
+import R from "ramda"
+import { mount, shallow } from "enzyme"
 import sinon from "sinon"
 import { createMemoryHistory } from "history"
 import configureTestStore from "redux-asserts"
+import configureStore from "redux-mock-store"
+import thunk from "redux-thunk"
 
 import Router, { routes } from "../Router"
 
@@ -96,5 +99,37 @@ export default class IntegrationTestHelper {
     }).then(() => {
       return Promise.resolve([wrapper, div])
     })
+  }
+
+  configureHOCRenderer(
+    WrappedComponent: Class<React.Component<*, *>>,
+    InnerComponent: Class<React.Component<*, *>>,
+    defaultState: Object,
+    defaultProps = {}
+  ) {
+    const mockStore = configureStore([thunk])
+    const history = this.browserHistory
+    return async (
+      extraState = {},
+      extraProps = {
+        history
+      }
+    ) => {
+      const initialState = R.mergeDeepRight(defaultState, extraState)
+      const store = mockStore(initialState)
+      const wrapper = await shallow(
+        <WrappedComponent store={store} {...defaultProps} {...extraProps} />
+      )
+
+      // dive through layers of HOCs until we reach the desired inner component
+      let inner = wrapper
+      while (!inner.is(InnerComponent)) {
+        inner = await inner.dive()
+      }
+      // one more time to shallow render the InnerComponent
+      inner = await inner.dive()
+
+      return { wrapper, inner, store }
+    }
   }
 }

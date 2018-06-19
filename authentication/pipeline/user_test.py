@@ -13,6 +13,7 @@ from authentication.exceptions import (
     RequireRegistrationException,
     RequirePasswordAndProfileException,
 )
+from authentication.utils import SocialAuthState
 
 
 def validate_email_auth_request_not_email_backend(mocker):
@@ -23,34 +24,14 @@ def validate_email_auth_request_not_email_backend(mocker):
     assert user_actions.validate_email_auth_request(mock_strategy, mock_backend) == {}
 
 
-@pytest.mark.parametrize('is_login,has_user,expected', [
-    (True, True, {
-        'is_login': True,
-        'is_register': False,
+@pytest.mark.parametrize('has_user,expected', [
+    (True, {
+        'flow': SocialAuthState.FLOW_LOGIN,
     }),
-    (True, False, {
-        'is_login': True,
-        'is_register': False,
-    }),
-    (False, True, {
-        'is_login': True,
-        'is_register': False,
-    }),
-    (False, False, {
-        'is_login': False,
-        'is_register': True,
-    }),
-    (None, True, {
-        'is_login': True,
-        'is_register': False,
-    }),
-    (None, False, {
-        'is_login': False,
-        'is_register': True,
-    }),
+    (False, {}),
 ])
 @pytest.mark.django_db
-def test_validate_email_auth_request(rf, is_login, has_user, expected):
+def test_validate_email_auth_request(rf, has_user, expected):
     """Test that validate_email_auth_request returns correctly given the input"""
     request = rf.post('/complete/email')
     middleware = SessionMiddleware()
@@ -59,14 +40,10 @@ def test_validate_email_auth_request(rf, is_login, has_user, expected):
     strategy = load_strategy(request)
     backend = load_backend(strategy, 'email', None)
 
-    kwargs = {
-        'is_login': is_login,
-    } if is_login is not None else {}
-
     user = UserFactory.create() if has_user else None
 
     assert user_actions.validate_email_auth_request(
-        strategy, backend, pipeline_index=0, user=user, **kwargs
+        strategy, backend, pipeline_index=0, user=user
     ) == expected
 
 
@@ -92,7 +69,7 @@ def test_user_password_not_email_backend(mocker):
     mock_backend = mocker.Mock()
     mock_backend.name = 'notemail'
     assert user_actions.validate_password(
-        mock_strategy, mock_backend, pipeline_index=0, user=mock_user, is_login=True
+        mock_strategy, mock_backend, pipeline_index=0, user=mock_user, flow=SocialAuthState.FLOW_LOGIN
     ) == {}
     # make sure we didn't update or check the password
     mock_user.set_password.assert_not_called()
@@ -117,10 +94,14 @@ def test_user_password_login(rf, user, user_password):
     backend = load_backend(strategy, 'email', None)
 
     if request_password == user_password:
-        assert user_actions.validate_password(strategy, backend, pipeline_index=0, user=user, is_login=True) == {}
+        assert user_actions.validate_password(
+            strategy, backend, pipeline_index=0, user=user, flow=SocialAuthState.FLOW_LOGIN
+            ) == {}
     else:
         with pytest.raises(InvalidPasswordException):
-            user_actions.validate_password(strategy, backend, pipeline_index=0, user=user, is_login=True)
+            user_actions.validate_password(
+                strategy, backend, pipeline_index=0, user=user, flow=SocialAuthState.FLOW_LOGIN
+            )
 
 
 def test_user_password_not_login(rf, user):
@@ -140,7 +121,9 @@ def test_user_password_not_login(rf, user):
     backend = load_backend(strategy, 'email', None)
 
     with pytest.raises(RequirePasswordException):
-        user_actions.validate_password(strategy, backend, pipeline_index=0, user=user, is_login=True)
+        user_actions.validate_password(
+            strategy, backend, pipeline_index=0, user=user, flow=SocialAuthState.FLOW_LOGIN
+        )
 
 
 def test_user_password_not_exists(rf):
@@ -156,21 +139,25 @@ def test_user_password_not_exists(rf):
     backend = load_backend(strategy, 'email', None)
 
     with pytest.raises(RequireRegistrationException):
-        user_actions.validate_password(strategy, backend, pipeline_index=0, user=None, is_login=True)
+        user_actions.validate_password(
+            strategy, backend, pipeline_index=0, user=None, flow=SocialAuthState.FLOW_LOGIN
+        )
 
 
-@pytest.mark.parametrize('backend_name,is_register', [
-    ('notemail', False),
-    ('notemail', True),
-    ('email', False),
+@pytest.mark.parametrize('backend_name,flow', [
+    ('notemail', None),
+    ('notemail', SocialAuthState.FLOW_REGISTER),
+    ('notemail', SocialAuthState.FLOW_LOGIN),
+    ('email', None),
+    ('email', SocialAuthState.FLOW_LOGIN),
 ])
-def test_validate_require_password_and_profile_via_email_exit(mocker, backend_name, is_register):
+def test_validate_require_password_and_profile_via_email_exit(mocker, backend_name, flow):
     """Tests that require_password_and_profile_via_email returns if not using the email backend"""
     mock_strategy = mocker.Mock()
     mock_backend = mocker.Mock()
     mock_backend.name = backend_name
     assert user_actions.require_password_and_profile_via_email(
-        mock_strategy, mock_backend, pipeline_index=0, is_register=is_register
+        mock_strategy, mock_backend, pipeline_index=0, flow=flow
     ) == {}
 
     mock_strategy.request_data.assert_not_called()
@@ -189,7 +176,7 @@ def test_validate_require_password_and_profile_via_email(mocker):
     mock_backend = mocker.Mock()
     mock_backend.name = 'email'
     response = user_actions.require_password_and_profile_via_email(
-        mock_strategy, mock_backend, pipeline_index=0, is_register=True, user=user
+        mock_strategy, mock_backend, pipeline_index=0, user=user, flow=SocialAuthState.FLOW_REGISTER
     )
     assert response == {
         'user': user,
@@ -208,7 +195,7 @@ def test_validate_require_password_and_profile_via_email_no_data(mocker):
     mock_backend.name = 'email'
     with pytest.raises(RequirePasswordAndProfileException):
         user_actions.require_password_and_profile_via_email(
-            mock_strategy, mock_backend, pipeline_index=0, is_register=True, user=user
+            mock_strategy, mock_backend, pipeline_index=0, user=user, flow=SocialAuthState.FLOW_REGISTER
         )
 
 
@@ -223,7 +210,7 @@ def test_validate_require_password_and_profile_via_email_password_set(mocker):
     mock_backend = mocker.Mock()
     mock_backend.name = 'email'
     assert user_actions.require_password_and_profile_via_email(
-        mock_strategy, mock_backend, pipeline_index=0, is_register=True, user=user
+        mock_strategy, mock_backend, pipeline_index=0, user=user, flow=SocialAuthState.FLOW_REGISTER
     ) == {
         'user': user,
         'profile': user.profile

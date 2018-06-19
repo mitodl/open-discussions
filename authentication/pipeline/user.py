@@ -10,6 +10,7 @@ from authentication.exceptions import (
     RequirePasswordAndProfileException,
     RequireRegistrationException,
 )
+from authentication.utils import SocialAuthState
 from channels import api as channel_api
 from notifications import api as notifications_api
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
@@ -29,12 +30,13 @@ def validate_email_auth_request(strategy, backend, user=None, *args, **kwargs): 
     if backend.name != EmailAuth.name:
         return {}
 
-    is_login = (user is not None) or kwargs.get('is_login', False)
+    # if there's a user, force this to be a login
+    if user is not None:
+        return {
+            'flow': SocialAuthState.FLOW_LOGIN,
+        }
 
-    return {
-        'is_register': not is_login,
-        'is_login': is_login,
-    }
+    return {}
 
 
 def get_username(strategy, backend, user=None, *args, **kwargs):  # pylint: disable=unused-argument
@@ -58,7 +60,7 @@ def get_username(strategy, backend, user=None, *args, **kwargs):  # pylint: disa
 
 @partial
 def require_password_and_profile_via_email(
-        strategy, backend, user=None, is_register=False, current_partial=None, *args, **kwargs
+        strategy, backend, user=None, flow=None, current_partial=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
     """
     Sets a new user's password and profile
@@ -72,7 +74,7 @@ def require_password_and_profile_via_email(
     Raises:
         RequirePasswordAndProfileException: if the user hasn't set password or name
     """
-    if backend.name != EmailAuth.name or not is_register:
+    if backend.name != EmailAuth.name or flow != SocialAuthState.FLOW_REGISTER:
         return {}
 
     data = strategy.request_data()
@@ -138,7 +140,7 @@ def require_profile_update_user_via_saml(
 
 @partial
 def validate_password(
-        strategy, backend, user=None, is_login=False, current_partial=None, *args, **kwargs
+        strategy, backend, user=None, flow=None, current_partial=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
     """
     Validates a user's password for login
@@ -152,7 +154,7 @@ def validate_password(
     Raises:
         RequirePasswordException: if the user password is invalid
     """
-    if backend.name != EmailAuth.name or not is_login:
+    if backend.name != EmailAuth.name or flow != SocialAuthState.FLOW_LOGIN:
         return {}
 
     data = strategy.request_data()

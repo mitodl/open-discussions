@@ -12,6 +12,7 @@ import { reportsEndpoint } from "../reducers/reports"
 import { settingsEndpoint } from "../reducers/settings"
 import { embedlyEndpoint } from "../reducers/embedly"
 import { profilesEndpoint } from "../reducers/profiles"
+import { authEndpoint } from "../reducers/auth"
 
 import type { Dispatch } from "redux"
 
@@ -29,7 +30,8 @@ export const endpoints = [
   reportsEndpoint,
   settingsEndpoint,
   embedlyEndpoint,
-  profilesEndpoint
+  profilesEndpoint,
+  authEndpoint
 ]
 
 /**

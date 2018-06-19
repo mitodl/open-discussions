@@ -40,6 +40,11 @@ export const validate = R.curry((validations, toValidate) =>
 
 const emptyOrNil = R.either(R.isEmpty, R.isNil)
 
+export const validEmail = R.compose(
+  R.test(/^\S+@\S+\.\S+$/), // matches any email that matches the format local@domain.tld
+  R.trim
+)
+
 // POST CREATE VALIDATION
 export const postUrlOrTextPresent = (postForm: { value: PostForm }) => {
   if (R.isEmpty(postForm)) {
@@ -127,7 +132,44 @@ export const validateContentReportForm = validate([
   )
 ])
 
-export const validationMessage = (message: string) =>
+export const validationMessage = (message: ?string) =>
   R.isEmpty(message) || R.isNil(message) ? null : (
     <div className="validation-message">{message}</div>
   )
+
+export const validateEmailForm = validate([
+  validation(
+    R.complement(validEmail),
+    R.lensPath(["value", "email"]),
+    "Email is not formatted correctly"
+  ),
+  validation(emptyOrNil, R.lensPath(["value", "email"]), "Email is required")
+])
+
+export const validatePasswordForm = validate([
+  validation(
+    R.compose(
+      R.gt(8),
+      R.length
+    ),
+    R.lensPath(["value", "password"]),
+    "Password must be at least 8 characters"
+  )
+])
+
+export const validateRegisterDetailsForm = validate([
+  validation(emptyOrNil, R.lensPath(["value", "name"]), "Name is required"),
+  validation(
+    emptyOrNil,
+    R.lensPath(["value", "password"]),
+    "Password is required"
+  ),
+  validation(
+    R.compose(
+      R.gt(8),
+      R.length
+    ),
+    R.lensPath(["value", "password"]),
+    "Password must be at least 8 characters"
+  )
+])

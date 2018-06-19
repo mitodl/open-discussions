@@ -14,7 +14,7 @@ import type { Dispatch } from "redux"
 
 type CommentFormProps = {
   dispatch: Dispatch<*>,
-  forms: FormsState<*>,
+  forms: FormsState,
   post: Post,
   initialValue: CommentForm,
   formKey: string,

@@ -2,90 +2,87 @@
 import React from "react"
 import R from "ramda"
 
-import type { ConfiguredFormProps } from "../lib/forms"
-import type { FormValue } from "../flow/formTypes"
+import type {
+  FormComponentCls,
+  WrappedComponentCls,
+  WithFormProps
+} from "../flow/formTypes"
 
-export type WithFormProps = {
-  form: ?FormValue<*>,
-  processing: boolean,
-  onUpdate: Object => void,
-  onSubmit: Object => void,
-  onSubmitResult: Function,
-  validateForm: Function,
-  renderForm: Function
-} & ConfiguredFormProps
+const withForm = <T>(FormComponent: FormComponentCls<T>) => (
+  WrappedComponent: WrappedComponentCls<T>
+) => {
+  class withForm extends React.Component<*, *> {
+    props: WithFormProps<T>
 
-export type FormProps = {
-  form: Object,
-  validation: Object,
-  processing: boolean,
-  onUpdate: Object => void,
-  onSubmit: Object => void
-}
+    componentDidMount() {
+      const { formBeginEdit } = this.props
+      formBeginEdit()
+    }
 
-const withForm = R.curry(
-  (
-    FormComponent: Class<React.Component<*, FormProps>>,
-    WrappedComponent: Class<React.Component<*, WithFormProps>>
-  ) => {
-    class withForm extends React.Component<*, *> {
-      componentDidMount() {
-        const { formBeginEdit } = this.props
-        formBeginEdit()
+    componentWillUnmount() {
+      const { formEndEdit } = this.props
+      formEndEdit()
+    }
+
+    onUpdate = (e: Object) => {
+      const { formUpdate } = this.props
+      const { name, type } = e.target
+
+      let value
+      if (type === "checkbox") {
+        value = e.target.checked
+      } else {
+        value = e.target.value
       }
 
-      componentWillUnmount() {
-        const { formEndEdit } = this.props
-        formEndEdit()
-      }
+      formUpdate({
+        [name]: value
+      })
+    }
 
-      onUpdate = (e: Object) => {
-        const { formUpdate } = this.props
-        const { name, value } = e.target
+    onSubmit = (e?: Object) => {
+      const {
+        form,
+        formValidate,
+        onSubmit,
+        onSubmitResult,
+        validateForm
+      } = this.props
 
-        formUpdate({
-          [name]: value
-        })
-      }
-
-      onSubmit = (e: Object) => {
-        const {
-          form,
-          formValidate,
-          onSubmit,
-          onSubmitResult,
-          validateForm
-        } = this.props
-
+      if (e) {
         e.preventDefault()
-
-        const validation = validateForm(form)
-
-        if (!form || !R.isEmpty(validation)) {
-          formValidate(validation.value)
-        } else {
-          onSubmit(form.value).then(onSubmitResult)
-        }
       }
 
-      render() {
-        const { form, processing } = this.props
-        const renderForm = props =>
-          form ? (
-            <FormComponent
-              onUpdate={this.onUpdate}
-              onSubmit={this.onSubmit}
-              processing={processing}
-              form={form.value}
-              validation={form.errors}
-              {...props}
-            />
-          ) : null
-        return <WrappedComponent {...this.props} renderForm={renderForm} />
+      if (!form) {
+        return
+      }
+
+      const validation = validateForm(form)
+
+      formValidate(R.isEmpty(validation) ? {} : validation.value)
+
+      if (R.isEmpty(validation)) {
+        onSubmit(form.value).then(onSubmitResult)
       }
     }
-    return withForm
+
+    render() {
+      const { form, processing } = this.props
+      const renderForm = props =>
+        form ? (
+          <FormComponent
+            onUpdate={this.onUpdate}
+            onSubmit={this.onSubmit}
+            processing={processing}
+            form={form.value}
+            validation={form.errors}
+            {...props}
+          />
+        ) : null
+      return <WrappedComponent {...this.props} renderForm={renderForm} />
+    }
   }
-)
+  return withForm
+}
 
 export default withForm

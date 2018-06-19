@@ -9,6 +9,10 @@ from authentication.utils import SocialAuthState
 EMAIL = 'email@example.com'
 TOKEN = {'token': 'value'}
 
+pytestmark = [
+    pytest.mark.django_db,
+]
+
 
 @pytest.mark.parametrize('side_effect,result', (
     (AuthException(None, "message"), SocialAuthState(SocialAuthState.STATE_ERROR, errors=["message"])),

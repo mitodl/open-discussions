@@ -1,6 +1,7 @@
 """Authentication serializers"""
 import logging
 
+from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
 from social_django.views import _do_login as login
 from social_core.exceptions import InvalidEmail, AuthException
@@ -21,6 +22,8 @@ from authentication.utils import SocialAuthState
 
 log = logging.getLogger()
 
+User = get_user_model()
+
 
 class SocialAuthSerializer(serializers.Serializer):
     """Serializer for social auth"""
@@ -32,7 +35,7 @@ class SocialAuthSerializer(serializers.Serializer):
     state = serializers.CharField(read_only=True)
     errors = serializers.ListField(read_only=True)
 
-    def _authenticate(self, is_login=None):
+    def _authenticate(self, flow):
         """Authenticate the current request"""
         request = self.context['request']
         strategy = self.context['strategy']
@@ -44,10 +47,8 @@ class SocialAuthSerializer(serializers.Serializer):
 
         kwargs = {
             'request': request,
+            'flow': flow,
         }
-
-        if is_login is not None:
-            kwargs['is_login'] = is_login
 
         partial = partial_pipeline_data(backend, user, **kwargs)
         if partial:
@@ -79,7 +80,10 @@ class SocialAuthSerializer(serializers.Serializer):
                 return SocialAuthState(SocialAuthState.STATE_INACTIVE)
         else:  # pragma: no cover
             # this follows similar code in PSA itself, but wasn't reachable through normal testing
-            return SocialAuthState(SocialAuthState.STATE_ERROR)
+            log.error("Unexpected authentication result")
+            return SocialAuthState(SocialAuthState.STATE_ERROR, errors=[
+                "Unexpected authentication result"
+            ])
 
     def save(self, **kwargs):
         try:
@@ -117,7 +121,7 @@ class LoginEmailSerializer(SocialAuthSerializer):
     def create(self, validated_data):
         """Try to 'save' the request"""
         try:
-            result = super()._authenticate(is_login=True)
+            result = super()._authenticate(SocialAuthState.FLOW_LOGIN)
         except RequireRegistrationException as exc:
             # tried to login to a nonexistent account, so needs to register
             result = SocialAuthState(SocialAuthState.STATE_REGISTER_EMAIL, partial=exc.partial)
@@ -134,7 +138,7 @@ class LoginPasswordSerializer(SocialAuthSerializer):
     def create(self, validated_data):
         """Try to 'save' the request"""
         try:
-            result = super()._authenticate(is_login=True)
+            result = super()._authenticate(SocialAuthState.FLOW_LOGIN)
         except InvalidPasswordException as exc:
             result = SocialAuthState(
                 SocialAuthState.STATE_ERROR,
@@ -163,7 +167,7 @@ class RegisterEmailSerializer(SocialAuthSerializer):
     def create(self, validated_data):
         """Try to 'save' the request"""
         try:
-            result = super()._authenticate(is_login=False)
+            result = super()._authenticate(SocialAuthState.FLOW_REGISTER)
             if isinstance(result, HttpResponseRedirect):
                 # a redirect here means confirmation email sent
                 result = SocialAuthState(SocialAuthState.STATE_REGISTER_CONFIRM_SENT)
@@ -184,12 +188,11 @@ class RegisterConfirmSerializer(SocialAuthSerializer):
     def create(self, validated_data):
         """Try to 'save' the request"""
         try:
-            result = super()._authenticate(is_login=False)
+            result = super()._authenticate(SocialAuthState.FLOW_REGISTER)
         except RequirePasswordAndProfileException as exc:
             result = SocialAuthState(
                 SocialAuthState.STATE_REGISTER_DETAILS,
                 partial=exc.partial,
-                errors=[str(exc)],
             )
         return result
 
@@ -201,4 +204,4 @@ class RegisterDetailsSerializer(SocialAuthSerializer):
 
     def create(self, validated_data):
         """Try to 'save' the request"""
-        return super()._authenticate(is_login=False)
+        return super()._authenticate(SocialAuthState.FLOW_REGISTER)

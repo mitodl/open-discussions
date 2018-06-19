@@ -75,8 +75,7 @@ import type {
   CommentInTree,
   GenericComment,
   MoreCommentsInTree,
-  Post,
-  PostForm
+  Post
 } from "../flow/discussionTypes"
 
 type PostPageProps = {
@@ -89,7 +88,7 @@ type PostPageProps = {
   focusedComment: ?CommentInTree,
   showRemoveCommentDialog: boolean,
   commentsTree: Array<GenericComment>,
-  forms: FormsState<PostForm>,
+  forms: FormsState,
   commentInFlight: boolean,
   // from the router match
   channelName: string,

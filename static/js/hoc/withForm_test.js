@@ -8,26 +8,58 @@ import withForm from "./withForm"
 
 import { wait } from "../lib/util"
 
+import type { FormProps, WithFormProps } from "../flow/formTypes"
+
+type TestForm = {
+  name: string
+}
+
+type TestFormProps = {
+  [string]: any
+} & FormProps<TestForm>
+
+type PageProps = {
+  extraProps: Object
+} & WithFormProps<TestFormProps>
+
+class Form extends React.Component<*, *> {
+  props: TestFormProps
+
+  render() {
+    const { form, validation, onSubmit, onUpdate, processing } = this.props
+    return (
+      <form onSubmit={onSubmit}>
+        <input type="text" name={form.name} onChange={onUpdate} />
+        {validation ? <div>{validation.name}</div> : null}
+        <button type="submit" disabled={processing}>
+          Submit
+        </button>
+      </form>
+    )
+  }
+}
+
+class Page extends React.Component<*, *> {
+  props: PageProps
+
+  render() {
+    const { renderForm, extraProps } = this.props
+    return <div>{renderForm(extraProps)}</div>
+  }
+}
+
+const WrappedPage = withForm(Form)(Page)
+
 describe("withForm", () => {
   const result = { state: "success" }
 
-  let sandbox, formData, formProps
+  let sandbox, formData
   let formEndEditStub, formBeginEditStub, formUpdateStub, formValidateStub
   let validateFormStub, onSubmitStub, onSubmitResultStub
 
-  const Form = ({ onUpdate, onSubmit, form }) => (
-    <form onSubmit={onSubmit}>
-      <input type="text" name={form.name} onChange={onUpdate} />
-    </form>
-  )
-
-  const Page = withForm(Form, ({ renderForm }) => (
-    <div>{renderForm(formProps)}</div>
-  ))
-
-  const renderPage = () =>
+  const renderPage = (extraProps = {}) =>
     mount(
-      <Page
+      <WrappedPage
         form={formData}
         processing={true}
         validateForm={validateFormStub}
@@ -37,6 +69,7 @@ describe("withForm", () => {
         formValidate={formValidateStub}
         onSubmit={onSubmitStub}
         onSubmitResult={onSubmitResultStub}
+        extraProps={extraProps}
       />
     )
 
@@ -55,7 +88,6 @@ describe("withForm", () => {
       },
       errors: {}
     }
-    formProps = {}
   })
 
   afterEach(() => {
@@ -71,15 +103,15 @@ describe("withForm", () => {
         name: "name is too short"
       }
     }
-    formProps = {
+    const formProps = {
       hello: "there"
     }
 
-    const wrapper = renderPage()
+    const wrapper = renderPage(formProps)
     const form = wrapper.find(Form)
     const inst = wrapper.instance()
 
-    assert.deepEqual(form.props(), {
+    assert.deepInclude(form.props(), {
       form:       formData.value,
       validation: formData.errors,
       processing: true,
@@ -109,7 +141,7 @@ describe("withForm", () => {
     assert.ok(formEndEditStub.calledWith())
   })
 
-  it("should update the form", () => {
+  it("should update the form for an input", () => {
     const name = "name"
     const value = "Molly"
     const wrapper = renderPage()
@@ -125,6 +157,28 @@ describe("withForm", () => {
         [name]: value
       })
     )
+  })
+
+  //
+  ;[true, false].forEach(checked => {
+    it(`should update the form for a checked == ${checked.toString()} checkbox`, () => {
+      const name = "tos"
+      const wrapper = renderPage()
+      const form = wrapper.find(Form)
+
+      assert.ok(formUpdateStub.notCalled)
+
+      form
+        .find("input")
+        .simulate("change", { target: { name, type: "checkbox", checked } })
+
+      assert.ok(formUpdateStub.calledOnce)
+      assert.ok(
+        formUpdateStub.calledWith({
+          [name]: checked
+        })
+      )
+    })
   })
 
   it("should validates and updates form validation if there are errors", () => {
@@ -156,6 +210,8 @@ describe("withForm", () => {
     const wrapper = renderPage()
     const form = wrapper.find(Form)
 
+    validateFormStub.returns({})
+
     assert.ok(validateFormStub.notCalled)
 
     form.find("form").simulate("submit")
@@ -164,6 +220,9 @@ describe("withForm", () => {
 
     assert.ok(validateFormStub.calledOnce)
     assert.ok(validateFormStub.calledWith(formData))
+
+    assert.ok(formValidateStub.calledOnce)
+    assert.ok(formValidateStub.calledWith({}))
 
     assert.ok(onSubmitStub.calledOnce)
     assert.ok(onSubmitStub.calledWith(formData.value))
