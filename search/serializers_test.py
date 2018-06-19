@@ -1,6 +1,5 @@
 """Tests for elasticsearch serializers"""
-# pylint: disable=redefined-outer-name
-from types import SimpleNamespace
+# pylint: disable=redefined-outer-name,unused-argument
 import pytest
 
 from channels.constants import (
@@ -8,8 +7,8 @@ from channels.constants import (
     COMMENT_TYPE,
 )
 from search.serializers import (
-    serialize_comment,
-    serialize_post,
+    ESPostSerializer,
+    ESCommentSerializer,
     serialize_bulk_post_and_comments,
     serialize_post_for_bulk,
     serialize_comment_for_bulk,
@@ -17,22 +16,102 @@ from search.serializers import (
 
 
 @pytest.fixture
-def fake_db_user(mocker):
-    """Fixture that patches the function to fetch a user from the database"""
-    author_name = "Test User"
-    patched_getter = mocker.patch(
-        'search.serializers._get_user_from_reddit_object',
-        return_value=SimpleNamespace(profile=SimpleNamespace(name=author_name))
-    )
-    return SimpleNamespace(
-        name=author_name,
-        patched_getter=patched_getter
+def patched_base_post_serializer(mocker):
+    """Fixture that patches the base serializer class for ESPostSerializer"""
+    base_serialized_data = {
+        'author_id': 1,
+        'author_name': 'Author Name',
+        'channel_title': 'channel_1',
+        'text': 'Post Text',
+        'score': 1,
+        'created': 123,
+        'num_comments': 0,
+        'removed': False,
+        'deleted': False,
+        'id': 1,
+        'title': 'post_title',
+    }
+    yield mocker.patch(
+        'search.serializers.ESPostSerializer.base_serializer',
+        return_value=mocker.Mock(
+            data=base_serialized_data,
+            _get_user=mocker.Mock()
+        )
     )
 
 
-def test_serialize_bulk_post_and_comments(mocker):
+@pytest.fixture
+def patched_base_comment_serializer(mocker):
+    """Fixture that patches the base serializer class for ESCommentSerializer"""
+    base_serialized_data = {
+        'author_id': 1,
+        'author_name': 'Author Name',
+        'text': 'Comment Text',
+        'score': 1,
+        'created': 456,
+        'removed': False,
+        'deleted': False,
+        'id': 1,
+        'parent_id': 2
+    }
+    yield mocker.patch(
+        'search.serializers.ESCommentSerializer.base_serializer',
+        return_value=mocker.Mock(
+            data=base_serialized_data,
+            _get_user=mocker.Mock()
+        )
+    )
+
+
+def test_es_post_serializer(patched_base_post_serializer, reddit_submission_obj):
+    """
+    Test that ESPostSerializer correctly serializes a post/submission object
+    """
+    base_serialized = patched_base_post_serializer.return_value.data
+    serialized = ESPostSerializer().serialize(reddit_submission_obj)
+    patched_base_post_serializer.assert_called_once_with(reddit_submission_obj)
+    assert serialized == {
+        'object_type': POST_TYPE,
+        'author_id': base_serialized['author_id'],
+        'author_name': base_serialized['author_name'],
+        'channel_title': base_serialized['channel_title'],
+        'text': base_serialized['text'],
+        'score': base_serialized['score'],
+        'removed': base_serialized['removed'],
+        'created': base_serialized['created'],
+        'deleted': base_serialized['deleted'],
+        'num_comments': base_serialized['num_comments'],
+        'post_id': base_serialized['id'],
+        'post_title': base_serialized['title'],
+    }
+
+
+def test_es_comment_serializer(patched_base_comment_serializer, reddit_comment_obj):
+    """
+    Test that ESCommentSerializer correctly serializes a comment object
+    """
+    base_serialized = patched_base_comment_serializer.return_value.data
+    serialized = ESCommentSerializer().serialize(reddit_comment_obj)
+    patched_base_comment_serializer.assert_called_once_with(reddit_comment_obj)
+    assert serialized == {
+        'object_type': COMMENT_TYPE,
+        'author_id': base_serialized['author_id'],
+        'author_name': base_serialized['author_name'],
+        'text': base_serialized['text'],
+        'score': base_serialized['score'],
+        'created': base_serialized['created'],
+        'removed': base_serialized['removed'],
+        'deleted': base_serialized['deleted'],
+        'comment_id': base_serialized['id'],
+        'parent_comment_id': base_serialized['parent_id'],
+        'channel_title': reddit_comment_obj.subreddit.display_name,
+        'post_id': reddit_comment_obj.submission.id,
+        'post_title': reddit_comment_obj.submission.title,
+    }
+
+
+def test_serialize_bulk_post_and_comments(mocker, patched_base_post_serializer, patched_base_comment_serializer):
     """index_comments should index comments and then call itself recursively to index more comments"""
-    mocker.patch('search.serializers._get_user_from_reddit_object')
     inner_comment_mock = mocker.Mock(
         id='comment_2',
         replies=[],
@@ -49,77 +128,13 @@ def test_serialize_bulk_post_and_comments(mocker):
     ]
 
 
-def test_serialize_post(reddit_submission_obj, fake_db_user):
-    """
-    Test that serialize_post correctly serializes a post/submission object
-    """
-    serialized = serialize_post(reddit_submission_obj)
-    fake_db_user.patched_getter.assert_called_once_with(reddit_submission_obj)
-    assert serialized == {
-        'object_type': POST_TYPE,
-        'author_id': reddit_submission_obj.author.name,
-        'author_name': fake_db_user.name,
-        'channel_title': reddit_submission_obj.subreddit.display_name,
-        'text': reddit_submission_obj.selftext,
-        'score': reddit_submission_obj.score,
-        'created': reddit_submission_obj.created,
-        'post_id': reddit_submission_obj.id,
-        'post_title': reddit_submission_obj.title,
-        'num_comments': reddit_submission_obj.num_comments,
-    }
-
-
-# pylint: disable=too-many-arguments
-@pytest.mark.parametrize('parent_type,parent_id,expected_parent_comment_id', [
-    (COMMENT_TYPE, 1, 1),
-    (POST_TYPE, 1, None),
-])
-def test_serialize_comment(
-        mocker, reddit_comment_obj, fake_db_user, parent_type, parent_id, expected_parent_comment_id
-):
-    """
-    Test that serialize_comment correctly serializes a comment object
-    """
-    patched_type_func = mocker.patch('search.serializers.get_reddit_object_type', return_value=parent_type)
-    mock_parent_obj = mocker.Mock(id=parent_id)
-    reddit_comment_obj.parent.return_value = mock_parent_obj
-    serialized = serialize_comment(reddit_comment_obj)
-    fake_db_user.patched_getter.assert_called_once_with(reddit_comment_obj)
-    patched_type_func.assert_called_once()
-    assert serialized == {
-        'object_type': COMMENT_TYPE,
-        'author_id': reddit_comment_obj.author.name,
-        'author_name': fake_db_user.name,
-        'channel_title': reddit_comment_obj.subreddit.display_name,
-        'text': reddit_comment_obj.body,
-        'score': reddit_comment_obj.score,
-        'created': reddit_comment_obj.created,
-        'post_id': reddit_comment_obj.submission.id,
-        'post_title': reddit_comment_obj.submission.title,
-        'comment_id': reddit_comment_obj.id,
-        'parent_comment_id': expected_parent_comment_id,
-    }
-
-
-def test_serialize_missing_author(reddit_submission_obj, reddit_comment_obj):
-    """Test that objects with missing author information can still be serialized"""
-    reddit_submission_obj.author = None
-    reddit_comment_obj.author = None
-    serialized_post = serialize_post(reddit_submission_obj)
-    serialized_comment = serialize_comment(reddit_comment_obj)
-    assert serialized_post['author_id'] is None
-    assert serialized_post['author_name'] is None
-    assert serialized_comment['author_id'] is None
-    assert serialized_comment['author_name'] is None
-
-
 def test_serialize_post_for_bulk(mocker, reddit_submission_obj):
     """
     Test that serialize_post_for_bulk correctly serializes a post/submission object
     """
     post_id = 'post1'
     base_serialized_post = {'serialized': 'post'}
-    mocker.patch('search.serializers.serialize_post', return_value=base_serialized_post)
+    mocker.patch('search.serializers.ESPostSerializer.serialize', return_value=base_serialized_post)
     mocker.patch('search.serializers.gen_post_id', return_value=post_id)
     serialized = serialize_post_for_bulk(reddit_submission_obj)
     assert serialized == {
@@ -134,10 +149,31 @@ def test_serialize_comment_for_bulk(mocker, reddit_comment_obj):
     """
     comment_id = 'comment1'
     base_serialized_comment = {'serialized': 'comment'}
-    mocker.patch('search.serializers.serialize_comment', return_value=base_serialized_comment)
+    mocker.patch('search.serializers.ESCommentSerializer.serialize', return_value=base_serialized_comment)
     mocker.patch('search.serializers.gen_comment_id', return_value=comment_id)
     serialized = serialize_comment_for_bulk(reddit_comment_obj)
     assert serialized == {
         '_id': comment_id,
         **base_serialized_comment,
     }
+
+
+def test_serialize_missing_author(
+        patched_base_post_serializer,
+        patched_base_comment_serializer,
+        reddit_submission_obj,
+        reddit_comment_obj
+):
+    """Test that objects with missing author information can still be serialized"""
+    deleted_author_dict = {
+        'author_id': '[deleted]',
+        'author_name': '[deleted]',
+    }
+    patched_base_post_serializer.return_value.data.update(deleted_author_dict)
+    patched_base_comment_serializer.return_value.data.update(deleted_author_dict)
+    serialized_post = ESPostSerializer().serialize(reddit_submission_obj)
+    serialized_comment = ESCommentSerializer().serialize(reddit_comment_obj)
+    assert serialized_post['author_id'] is None
+    assert serialized_post['author_name'] is None
+    assert serialized_comment['author_id'] is None
+    assert serialized_comment['author_name'] is None

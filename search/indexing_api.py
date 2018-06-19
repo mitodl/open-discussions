@@ -208,8 +208,8 @@ def index_post_with_comments(post_id):
     from channels.api import Api
 
     conn = get_conn()
-    api_username = settings.INDEXING_API_USERNAME
-    client = Api(User.objects.get(username=api_username))
+    api_user = User.objects.get(username=settings.INDEXING_API_USERNAME)
+    client = Api(api_user)
     post = client.get_post(post_id)
     comments = post.comments
     # Make sure all morecomments are replaced before serializing

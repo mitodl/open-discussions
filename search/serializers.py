@@ -1,86 +1,113 @@
 """Serializers for elasticsearch data"""
-from django.contrib.auth import get_user_model
-
 from channels.constants import (
     POST_TYPE,
     COMMENT_TYPE,
 )
-from search.api import (
-    get_reddit_object_type,
-    gen_post_id,
-    gen_comment_id,
-)
-
-User = get_user_model()
+from channels.serializers import BasePostSerializer, BaseCommentSerializer
+from search.api import gen_post_id, gen_comment_id
+from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
 
-def _get_user_from_reddit_object(reddit_obj):
+class ESSerializer:
     """
-    Gets the User that corresponds to a given reddit object
+    Serializer class for Elasticsearch objects
 
-    Args:
-        reddit_obj (praw.models.Submission|praw.models.Comment):
-            A post or comment object
-
-    Returns:
-        User|None: A User object (or None if author information is missing from the instance)
+    Attributes:
+        object_type (str): String indicating the type of reddit object
+        use_keys (list[str]):
+            A list of keys from the base serializer results to use in the final serialized object
+        rename_keys (dict(str, str)):
+            A dict representing keys from the base serializer results that should be renamed for
+            the final serialized object
     """
-    if reddit_obj.author is None:
-        return None
-    else:
-        return User.objects.filter(username=reddit_obj.author.name).select_related('profile').first()
+    object_type = None
+    use_keys = []
+    rename_keys = {}
+
+    @property
+    def base_serializer(self):
+        """DRF Serializer class to use for the base serialization functionality"""
+        raise NotImplementedError
+
+    def postprocess_fields(self, reddit_obj, serialized_data):  # pylint: disable=unused-argument
+        """Returns a dict of additional or altered fields for the final serialized object"""
+        return {}
+
+    def serialize(self, reddit_obj):
+        """
+        Serializes a reddit object by modifying the results from a base serializer class
+        """
+        base_serialized = self.base_serializer(reddit_obj).data
+        serialized = {
+            **filter_dict_keys(base_serialized, self.use_keys),
+            **filter_dict_with_renamed_keys(base_serialized, self.rename_keys),
+            'object_type': self.object_type
+        }
+        return {
+            **serialized,
+            **self.postprocess_fields(reddit_obj, serialized),
+        }
 
 
-def serialize_post(post_obj):
-    """
-    Serialize a reddit Submission
-
-    Args:
-        post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
-    """
-    author_user = _get_user_from_reddit_object(post_obj)
-    author_name = author_user.profile.name if author_user else None
-    return {
-        'object_type': POST_TYPE,
-        'author_id': post_obj.author.name if post_obj.author else None,
-        'author_name': author_name,
-        'channel_title': post_obj.subreddit.display_name,
-        'text': post_obj.selftext,
-        'score': post_obj.score,
-        'created': post_obj.created,
-        'post_id': post_obj.id,
-        'post_title': post_obj.title,
-        'num_comments': post_obj.num_comments,
+class ESPostSerializer(ESSerializer):
+    """Elasticsearch serializer class for posts"""
+    object_type = POST_TYPE
+    use_keys = [
+        'author_id',
+        'author_name',
+        'channel_title',
+        'text',
+        'score',
+        'created',
+        'num_comments',
+        'removed',
+        'deleted',
+    ]
+    rename_keys = {
+        'id': 'post_id',
+        'title': 'post_title',
     }
 
+    @property
+    def base_serializer(self):
+        return BasePostSerializer
 
-def serialize_comment(comment_obj):
-    """
-    Serialize a comment
+    def postprocess_fields(self, reddit_obj, serialized_data):
+        return {
+            'author_id': None if serialized_data['author_id'] == '[deleted]' else serialized_data['author_id'],
+            'author_name': None if serialized_data['author_name'] == '[deleted]' else serialized_data['author_name'],
+        }
 
-    Args:
-        comment_obj (Comment): A PRAW comment
-    """
-    author_user = _get_user_from_reddit_object(comment_obj)
-    author_name = author_user.profile.name if author_user else None
 
-    post_obj = comment_obj.submission
-    parent_comment = comment_obj.parent()
-    parent_comment_id = None if get_reddit_object_type(parent_comment) != COMMENT_TYPE else parent_comment.id
-
-    return {
-        'object_type': COMMENT_TYPE,
-        'author_id': comment_obj.author.name if comment_obj.author else None,
-        'author_name': author_name,
-        'channel_title': comment_obj.subreddit.display_name,
-        'text': comment_obj.body,
-        'score': comment_obj.score,
-        'created': comment_obj.created,
-        'post_id': post_obj.id,
-        'post_title': post_obj.title,
-        'comment_id': comment_obj.id,
-        'parent_comment_id': parent_comment_id,
+class ESCommentSerializer(ESSerializer):
+    """Elasticsearch serializer class for comments"""
+    object_type = COMMENT_TYPE
+    use_keys = [
+        'author_id',
+        'author_name',
+        'text',
+        'score',
+        'created',
+        'removed',
+        'deleted',
+    ]
+    rename_keys = {
+        'id': 'comment_id',
+        'parent_id': 'parent_comment_id',
     }
+
+    @property
+    def base_serializer(self):
+        return BaseCommentSerializer
+
+    def postprocess_fields(self, reddit_obj, serialized_data):
+        return {
+            'author_id': None if serialized_data['author_id'] == '[deleted]' else serialized_data['author_id'],
+            'author_name': None if serialized_data['author_name'] == '[deleted]' else serialized_data['author_name'],
+            'channel_title': reddit_obj.subreddit.display_name,
+            'post_id': reddit_obj.submission.id,
+            'post_title': reddit_obj.submission.title,
+        }
 
 
 def _serialize_comment_tree_for_bulk(comments):
@@ -118,7 +145,7 @@ def serialize_post_for_bulk(post_obj):
     """
     return {
         '_id': gen_post_id(post_obj.id),
-        **serialize_post(post_obj),
+        **ESPostSerializer().serialize(post_obj),
     }
 
 
@@ -131,5 +158,5 @@ def serialize_comment_for_bulk(comment_obj):
     """
     return {
         '_id': gen_comment_id(comment_obj.id),
-        **serialize_comment(comment_obj),
+        **ESCommentSerializer().serialize(comment_obj),
     }

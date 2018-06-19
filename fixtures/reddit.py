@@ -86,13 +86,17 @@ def reddit_submission_obj():
     """A dummy Post object"""
     return SimpleNamespace(
         author=SimpleNamespace(name='testuser'),
-        subreddit=SimpleNamespace(display_name='channel_1'),
+        subreddit=SimpleNamespace(display_name='channel_1', title='Channel'),
         selftext='Body text',
         score=1,
         created=12345,
         id='a',
         title='Post Title',
-        num_comments=1
+        num_comments=1,
+        is_self=True,
+        likes=1,
+        banned_by=None,
+        edited=False,
     )
 
 
@@ -108,4 +112,7 @@ def reddit_comment_obj(mocker, reddit_submission_obj):
         id='b',
         score=1,
         created=12345,
+        likes=1,
+        banned_by=None,
+        edited=False,
     )

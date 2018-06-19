@@ -11,6 +11,8 @@ from open_discussions.utils import (
     normalize_to_start_of_day,
     chunks,
     merge_strings,
+    filter_dict_keys,
+    filter_dict_with_renamed_keys,
 )
 
 
@@ -88,3 +90,18 @@ def test_merge_strings(list_or_string, output):
     merge_strings should flatten a nested list of strings
     """
     assert merge_strings(list_or_string) == output
+
+
+def test_filter_dict_keys():
+    """filter_dict_keys should return a dict with only the specified list of keys"""
+    d = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+    assert filter_dict_keys(d, ['b', 'd']) == {'b': 2, 'd': 4}
+
+
+def test_filter_dict_with_renamed_keys():
+    """
+    filter_dict_with_renamed_keys should return a dict with only the keys in a filter dict,
+    and should rename those keys according to the values in the filter dict.
+    """
+    d = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+    assert filter_dict_with_renamed_keys(d, {'b': 'b1', 'd': 'd1'}) == {'b1': 2, 'd1': 4}
