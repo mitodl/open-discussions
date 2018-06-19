@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.32.0
+--------------
+
+- Update drawer and toolbar layout!
+- Profile image uploader (#816)
+- Added channel API middleware and moved channel API imports out of serializers
+
 Version 0.31.2
 --------------
 
