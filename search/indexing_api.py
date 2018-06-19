@@ -9,6 +9,10 @@ from elasticsearch.exceptions import ConflictError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+from channels.constants import (
+    COMMENT_TYPE,
+    POST_TYPE,
+)
 from search.connection import (
     get_active_aliases,
     get_conn,
@@ -198,6 +202,34 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
     )
 
 
+def sync_post_and_comments(serialized):
+    """
+    Sync posts and comments in serialized data
+
+    Args:
+        serialized (iterable of dict): An iterable of serialized elasticsearch documents
+
+    Returns:
+         iterable of dict: Passes through the serialized data unaltered
+    """
+    from channels.api import sync_post_model, sync_comment_model
+
+    for item in serialized:
+        if item['object_type'] == POST_TYPE:
+            sync_post_model(
+                channel_name=item['channel_title'],
+                post_id=item['post_id'],
+            )
+        elif item['object_type'] == COMMENT_TYPE:
+            sync_comment_model(
+                channel_name=item['channel_title'],
+                post_id=item['post_id'],
+                comment_id=item['comment_id'],
+                parent_id=item['parent_comment_id'],
+            )
+        yield item
+
+
 def index_post_with_comments(post_id):
     """
     Index a post and its comments
@@ -218,7 +250,7 @@ def index_post_with_comments(post_id):
     for alias in get_active_aliases():
         _, errors = bulk(
             conn,
-            serialize_bulk_post_and_comments(post),
+            sync_post_and_comments(serialize_bulk_post_and_comments(post)),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable

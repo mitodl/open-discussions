@@ -41,26 +41,20 @@ from channels.constants import (
     VoteActions,
 )
 from channels.models import (
+    Channel,
+    Comment,
+    Post,
     RedditAccessToken,
     RedditRefreshToken,
     Subscription,
 )
 from channels.utils import get_kind_mapping
 
+from channels import task_helpers as channels_task_helpers
 from open_discussions import features
 from open_discussions.utils import now_in_utc
-from search.task_helpers import (
-    reddit_object_indexer,
-    index_new_post,
-    index_new_comment,
-    update_post_text,
-    update_post_removal_status,
-    update_comment_text,
-    update_indexed_score,
-    update_comment_removal_status,
-    set_comment_to_deleted,
-    set_post_to_deleted,
-)
+from search import task_helpers as search_task_helpers
+from search.task_helpers import reddit_object_persist
 
 USER_AGENT = 'MIT-Open: {version}'
 ACCESS_TOKEN_HEADER_NAME = 'X-Access-Token'
@@ -282,6 +276,73 @@ def replace_load_comment(original_load_comment):
     return replacement_load_comment
 
 
+@features.if_feature_enabled(features.KEEP_LOCAL_COPY)
+def sync_channel_model(name):
+    """
+    Create the channel in our database if it doesn't already exist
+
+    Args:
+        name (str): The name of the channel
+
+    Returns:
+        Channel: The channel object
+    """
+    return Channel.objects.get_or_create(name=name)[0]
+
+
+@features.if_feature_enabled(features.KEEP_LOCAL_COPY)
+def sync_post_model(*, channel_name, post_id):
+    """
+    Create a new Post if it doesn't exist already. Also create a new Channel if necessary
+
+    Args:
+        channel_name (str): The name of the channel
+        post_id (str): The id of the post
+
+    Returns:
+        Post: The post object
+    """
+    with transaction.atomic():
+        post = Post.objects.filter(post_id=post_id).first()
+        if post is not None:
+            return post
+
+        channel = sync_channel_model(channel_name)
+        return Post.objects.get_or_create(
+            post_id=post_id,
+            defaults={'channel': channel},
+        )[0]
+
+
+@features.if_feature_enabled(features.KEEP_LOCAL_COPY)
+def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):
+    """
+    Create a new Comment if it doesn't already exist. Also create a new Post and Channel if necessary
+
+    Args:
+        channel_name (str): The name of the channel
+        post_id (str): The id of the post
+        comment_id (str): The id of the comment
+        parent_id (str): The id of the reply comment. If None the parent is the post
+
+    Returns:
+        Comment: The comment object
+    """
+    with transaction.atomic():
+        comment = Comment.objects.filter(comment_id=comment_id).first()
+        if comment is not None:
+            return comment
+
+        post = sync_post_model(channel_name=channel_name, post_id=post_id)
+        return Comment.objects.get_or_create(
+            comment_id=comment_id,
+            defaults={
+                'post': post,
+                'parent_id': parent_id,
+            }
+        )[0]
+
+
 class Api:
     """Channel API"""
     def __init__(self, user):
@@ -327,6 +388,7 @@ class Api:
         """
         return self.reddit.subreddit(name)
 
+    @reddit_object_persist(channels_task_helpers.sync_channel_model)
     def create_channel(self, name, title, channel_type=CHANNEL_TYPE_PUBLIC, **other_settings):
         """
         Create a channel
@@ -426,7 +488,7 @@ class Api:
             instance.clear_vote()
 
         try:
-            update_indexed_score(instance, instance_type, vote_action)
+            search_task_helpers.update_indexed_score(instance, instance_type, vote_action)
         except Exception:  # pylint: disable=broad-except
             log.exception('Error occurred while trying to index [%s] object score', instance_type)
         return True
@@ -434,7 +496,10 @@ class Api:
     apply_post_vote = partialmethod(_apply_vote, allow_downvote=False, instance_type=POST_TYPE)
     apply_comment_vote = partialmethod(_apply_vote, allow_downvote=True, instance_type=COMMENT_TYPE)
 
-    @reddit_object_indexer(indexing_func=index_new_post)
+    @reddit_object_persist(
+        search_task_helpers.index_new_post,
+        channels_task_helpers.sync_post_model,
+    )
     def create_post(self, channel_name, title, text=None, url=None):
         """
         Create a new post in a channel
@@ -533,7 +598,7 @@ class Api:
         """
         return self.reddit.submission(id=post_id)
 
-    @reddit_object_indexer(indexing_func=update_post_text)
+    @reddit_object_persist(search_task_helpers.update_post_text)
     def update_post(self, post_id, text):
         """
         Updates the post
@@ -566,7 +631,7 @@ class Api:
         post = self.get_post(post_id)
         post.mod.sticky(pinned)
 
-    @reddit_object_indexer(indexing_func=update_post_removal_status)
+    @reddit_object_persist(search_task_helpers.update_post_removal_status)
     def remove_post(self, post_id):
         """
         Removes the post, opposite of approve_post
@@ -578,7 +643,7 @@ class Api:
         post.mod.remove()
         return post
 
-    @reddit_object_indexer(indexing_func=update_post_removal_status)
+    @reddit_object_persist(search_task_helpers.update_post_removal_status)
     def approve_post(self, post_id):
         """
         Approves the post, opposite of remove_post
@@ -590,7 +655,7 @@ class Api:
         post.mod.approve()
         return post
 
-    @reddit_object_indexer(indexing_func=set_post_to_deleted)
+    @reddit_object_persist(search_task_helpers.set_post_to_deleted)
     def delete_post(self, post_id):
         """
         Deletes the post
@@ -603,7 +668,10 @@ class Api:
         post.delete()
         return post
 
-    @reddit_object_indexer(indexing_func=index_new_comment)
+    @reddit_object_persist(
+        search_task_helpers.index_new_comment,
+        channels_task_helpers.sync_comment_model,
+    )
     def create_comment(self, text, post_id=None, comment_id=None):
         """
         Create a new comment in reply to a post or comment
@@ -624,10 +692,10 @@ class Api:
 
         if post_id is not None:
             return self.get_post(post_id).reply(text)
+        else:
+            return self.get_comment(comment_id).reply(text)
 
-        return self.get_comment(comment_id).reply(text)
-
-    @reddit_object_indexer(indexing_func=update_comment_text)
+    @reddit_object_persist(search_task_helpers.update_comment_text)
     def update_comment(self, comment_id, text):
         """
         Updates a existing comment
@@ -639,9 +707,10 @@ class Api:
         Returns:
             praw.models.Comment: the updated comment
         """
-        return self.get_comment(comment_id).edit(text)
+        comment = self.get_comment(comment_id).edit(text)
+        return comment
 
-    @reddit_object_indexer(indexing_func=update_comment_removal_status)
+    @reddit_object_persist(search_task_helpers.update_comment_removal_status)
     def remove_comment(self, comment_id):
         """
         Removes a comment
@@ -653,7 +722,7 @@ class Api:
         comment.mod.remove()
         return comment
 
-    @reddit_object_indexer(indexing_func=update_comment_removal_status)
+    @reddit_object_persist(search_task_helpers.update_comment_removal_status)
     def approve_comment(self, comment_id):
         """
         Approves a comment
@@ -665,7 +734,7 @@ class Api:
         comment.mod.approve()
         return comment
 
-    @reddit_object_indexer(indexing_func=set_comment_to_deleted)
+    @reddit_object_persist(search_task_helpers.set_comment_to_deleted)
     def delete_comment(self, comment_id):
         """
         Deletes the comment

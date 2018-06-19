@@ -1,17 +1,20 @@
 """API tests"""
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,too-many-lines
 from unittest.mock import Mock
 from urllib.parse import urljoin
 
 from django.contrib.auth.models import AnonymousUser
 import pytest
-from praw.models import Comment
+from praw.models import Comment as RedditComment
 from praw.models.comment_forest import CommentForest
 from praw.models.reddit.redditor import Redditor
 from prawcore.exceptions import ResponseException
 from rest_framework.exceptions import NotFound
 
-from channels import api
+from channels import (
+    api,
+    task_helpers as channels_task_helpers,
+)
 from channels.constants import (
     COMMENTS_SORT_BEST,
     VALID_CHANNEL_TYPES,
@@ -20,6 +23,9 @@ from channels.constants import (
     VoteActions,
 )
 from channels.models import (
+    Channel,
+    Comment,
+    Post,
     RedditAccessToken,
     RedditRefreshToken,
     Subscription,
@@ -28,7 +34,7 @@ from channels.utils import (
     DEFAULT_LISTING_PARAMS,
     ListingParams,
 )
-from search import task_helpers
+from search import task_helpers as search_task_helpers
 from open_discussions.factories import UserFactory
 from open_discussions import features
 
@@ -38,7 +44,19 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture()
 def mock_get_client(mocker):
     """Mock reddit get_client"""
-    return mocker.patch('channels.api._get_client', autospec=True)
+    return mocker.patch('channels.api._get_client', autospec=True, return_value=Mock(
+        subreddit=Mock(return_value=Mock(submit=Mock(return_value=Mock(id='abc')))),
+        submission=Mock(return_value=Mock(reply=Mock(return_value=Mock(
+            id='456',
+            submission=Mock(id='123'),
+            subreddit=Mock(display_name='subreddit'),
+        )))),
+        comment=Mock(return_value=Mock(reply=Mock(return_value=Mock(
+            id='789',
+            submission=Mock(id='687'),
+            subreddit=Mock(display_name='other_subreddit'),
+        )))),
+    ))
 
 
 @pytest.fixture()
@@ -65,7 +83,7 @@ def test_apply_vote(mocker, vote_func, request_data, likes_value, expected_insta
     Tests that the functions to apply an upvote/downvote behave appropriately given
     the voting request and the current state of upvotes/downvotes for the user.
     """
-    mocker.patch('channels.api.update_indexed_score')
+    mocker.patch('search.task_helpers.update_indexed_score')
     mock_instance = mocker.Mock(likes=likes_value)
     vote_result = vote_func(mock_instance, request_data, allow_downvote=True)
     expected_vote_success = expected_instance_vote_func is not None
@@ -81,7 +99,7 @@ def test_apply_vote(mocker, vote_func, request_data, likes_value, expected_insta
 ])
 def test_vote_indexing(mocker, vote_func, expected_allowed_downvote, expected_instance_type):
     """Test that an upvote/downvote calls a function to update the index"""
-    patched_vote_indexer = mocker.patch('channels.api.update_indexed_score')
+    patched_vote_indexer = mocker.patch('search.task_helpers.update_indexed_score')
     # Test upvote
     mock_reddit_obj = Mock()
     mock_reddit_obj.likes = False
@@ -135,7 +153,7 @@ def test_list_channels_user(mock_get_client):
 
 
 @pytest.mark.parametrize('channel_type', VALID_CHANNEL_TYPES)
-def test_create_channel_user(mock_get_client, channel_type):
+def test_create_channel_user(mock_get_client, indexing_decorator, channel_type):
     """Test create_channel for logged-in user"""
     user = UserFactory.create()
     channel = api.Api(user=user).create_channel('name', 'Title', channel_type=channel_type)
@@ -144,6 +162,8 @@ def test_create_channel_user(mock_get_client, channel_type):
     mock_get_client.return_value.subreddit.create.assert_called_once_with(
         'name', title='Title', subreddit_type=channel_type
     )
+    assert indexing_decorator.mock_persist_func.call_count == 1
+    assert channels_task_helpers.sync_channel_model in indexing_decorator.mock_persist_func.original
 
 
 @pytest.mark.parametrize('channel_setting', api.CHANNEL_SETTINGS)
@@ -207,8 +227,9 @@ def test_create_post_text(mock_client, indexing_decorator):
     mock_client.subreddit.assert_called_once_with('channel')
     mock_client.subreddit.return_value.submit.assert_called_once_with('Title', selftext='Text', url=None)
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.index_new_post
+    assert indexing_decorator.mock_persist_func.call_count == 2
+    assert search_task_helpers.index_new_post in indexing_decorator.mock_persist_func.original
+    assert channels_task_helpers.sync_post_model in indexing_decorator.mock_persist_func.original
 
 
 def test_create_post_url(mock_client, indexing_decorator):
@@ -221,8 +242,9 @@ def test_create_post_url(mock_client, indexing_decorator):
         'Title', selftext=None, url='http://google.com'
     )
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.index_new_post
+    assert indexing_decorator.mock_persist_func.call_count == 2
+    assert search_task_helpers.index_new_post in indexing_decorator.mock_persist_func.original
+    assert channels_task_helpers.sync_post_model in indexing_decorator.mock_persist_func.original
 
 
 def test_create_post_url_and_text(mock_client):
@@ -269,8 +291,8 @@ def test_update_post_valid(mock_client, indexing_decorator):
     mock_client.submission.assert_called_once_with(id='id')
     mock_client.submission.return_value.edit.assert_called_once_with('Text')
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.update_post_text
+    assert indexing_decorator.mock_persist_func.call_count == 1
+    assert search_task_helpers.update_post_text in indexing_decorator.mock_persist_func.original
 
 
 def test_update_post_invalid(mock_client):
@@ -291,8 +313,8 @@ def test_approve_post(mock_client, indexing_decorator):
     mock_client.submission.assert_called_once_with(id='id')
     mock_client.submission.return_value.mod.approve.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.update_post_removal_status
+    assert indexing_decorator.mock_persist_func.call_count == 1
+    assert search_task_helpers.update_post_removal_status in indexing_decorator.mock_persist_func.original
 
 
 def test_remove_post(mock_client, indexing_decorator):
@@ -303,8 +325,8 @@ def test_remove_post(mock_client, indexing_decorator):
     mock_client.submission.assert_called_once_with(id='id')
     mock_client.submission.return_value.mod.remove.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.update_post_removal_status
+    assert indexing_decorator.mock_persist_func.call_count == 1
+    assert search_task_helpers.update_post_removal_status in indexing_decorator.mock_persist_func.original
 
 
 def test_create_comment_on_post(mock_client, indexing_decorator):
@@ -316,8 +338,9 @@ def test_create_comment_on_post(mock_client, indexing_decorator):
     mock_client.submission.assert_called_once_with(id='id1')
     mock_client.submission.return_value.reply.assert_called_once_with('text')
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.index_new_comment
+    assert indexing_decorator.mock_persist_func.call_count == 2
+    assert search_task_helpers.index_new_comment in indexing_decorator.mock_persist_func.original
+    assert channels_task_helpers.sync_post_model in indexing_decorator.mock_persist_func.original
 
 
 def test_create_comment_on_comment(mock_client, indexing_decorator):
@@ -329,8 +352,9 @@ def test_create_comment_on_comment(mock_client, indexing_decorator):
     mock_client.comment.assert_called_once_with('id2')
     mock_client.comment.return_value.reply.assert_called_once_with('text')
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.index_new_comment
+    assert indexing_decorator.mock_persist_func.call_count == 2
+    assert search_task_helpers.index_new_comment in indexing_decorator.mock_persist_func.original
+    assert channels_task_helpers.sync_post_model in indexing_decorator.mock_persist_func.original
 
 
 def test_create_comment_args_error(mock_client):
@@ -376,8 +400,8 @@ def test_delete_comment(mock_client, indexing_decorator):
     mock_client.comment.assert_called_once_with('id')
     mock_client.comment.return_value.delete.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.set_comment_to_deleted
+    assert indexing_decorator.mock_persist_func.call_count == 1
+    assert search_task_helpers.set_comment_to_deleted in indexing_decorator.mock_persist_func.original
 
 
 def test_update_comment(mock_client, indexing_decorator):
@@ -388,8 +412,8 @@ def test_update_comment(mock_client, indexing_decorator):
     mock_client.comment.assert_called_once_with('id')
     mock_client.comment.return_value.edit.assert_called_once_with('Text')
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.update_comment_text
+    assert indexing_decorator.mock_persist_func.call_count == 1
+    assert search_task_helpers.update_comment_text in indexing_decorator.mock_persist_func.original
 
 
 def test_approve_comment(mock_client, indexing_decorator):
@@ -400,8 +424,8 @@ def test_approve_comment(mock_client, indexing_decorator):
     mock_client.comment.assert_called_once_with('id')
     mock_client.comment.return_value.mod.approve.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.update_comment_removal_status
+    assert indexing_decorator.mock_persist_func.call_count == 1
+    assert search_task_helpers.update_comment_removal_status in indexing_decorator.mock_persist_func.original
 
 
 def test_remove_comment(mock_client, indexing_decorator):
@@ -412,8 +436,8 @@ def test_remove_comment(mock_client, indexing_decorator):
     mock_client.comment.assert_called_once_with('id')
     mock_client.comment.return_value.mod.remove.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_indexer_func.call_count == 1
-    assert indexing_decorator.mock_indexer_func.original == task_helpers.update_comment_removal_status
+    assert indexing_decorator.mock_persist_func.call_count == 1
+    assert search_task_helpers.update_comment_removal_status in indexing_decorator.mock_persist_func.original
 
 
 def test_init_more_comments(mock_client, mocker):
@@ -474,14 +498,13 @@ def test_more_comments(mock_client, mocker):  # pylint: disable=unused-argument
 
     init_more_mock = mocker.patch('channels.api.Api.init_more_comments')
     post_id = 'post_i2'
+    mocker.patch.object(RedditComment, 'replies', [])
 
     def _make_comment(comment_id):
         """Helper to make a comment with a valid list of replies"""
-        comment = Comment(client.reddit, id=comment_id)
-        comment.replies = []
-        return comment
+        return RedditComment(client.reddit, id=comment_id)
 
-    comments = [_make_comment(child) for child in children]
+    comments = [_make_comment(comment_id) for comment_id in children]
     init_more_mock.return_value.comments.return_value = CommentForest(post_id, comments=comments)
 
     result = client.more_comments('parent_3i', post_id, children, COMMENTS_SORT_BEST)
@@ -502,12 +525,11 @@ def test_more_comments_with_more_comments(mock_client, mocker):  # pylint: disab
 
     init_more_mock = mocker.patch('channels.api.Api.init_more_comments')
     post_id = 'post_i2'
+    mocker.patch.object(RedditComment, 'replies', [])
 
     def _make_comment(comment_id):
         """Helper to make a comment with a valid list of replies"""
-        comment = Comment(client.reddit, id=comment_id)
-        comment.replies = []
-        return comment
+        return RedditComment(client.reddit, id=comment_id)
 
     first_comments = [_make_comment(child) for child in children]
     side_effects = [
@@ -914,3 +936,74 @@ def test_remove_comment_subscription(mock_client, user):  # pylint: disable=unus
     assert Subscription.objects.filter(user=user, post_id='abc', comment_id='def').exists()
     client.remove_comment_subscription('abc', 'def')
     assert not Subscription.objects.filter(user=user, post_id='abc', comment_id='def').exists()
+
+
+def test_sync_channel_model(settings):
+    """sync_channel_model should write the channel info to our database"""
+    settings.FEATURES[features.KEEP_LOCAL_COPY] = True
+    channel_name = 'channel'
+    assert Channel.objects.count() == 0
+    channel = api.sync_channel_model(channel_name)
+    assert Channel.objects.count() == 1
+    assert channel == Channel.objects.first()
+    assert channel.name == channel_name
+
+    assert channel == api.sync_channel_model(channel_name)
+
+
+def test_sync_comment_model(settings):
+    """sync_comment_model should write the comment to our database"""
+    settings.FEATURES[features.KEEP_LOCAL_COPY] = True
+    channel_name = 'channel name'
+    post_id = '456'
+    comment_id = 'def'
+    parent_id = 'abc'
+
+    assert Comment.objects.count() == 0
+    assert Post.objects.count() == 0
+    assert Channel.objects.count() == 0
+    comment = api.sync_comment_model(
+        channel_name=channel_name,
+        post_id=post_id,
+        comment_id=comment_id,
+        parent_id=parent_id,
+    )
+    assert Comment.objects.count() == 1
+    assert Post.objects.count() == 1
+    assert Channel.objects.count() == 1
+    assert comment == Comment.objects.first()
+    assert comment.post.channel.name == channel_name
+    assert comment.post.post_id == post_id
+    assert comment.comment_id == comment_id
+    assert comment.parent_id == parent_id
+
+    assert comment == api.sync_comment_model(
+        channel_name=channel_name,
+        post_id=post_id,
+        comment_id=comment_id,
+        parent_id=parent_id,
+    )
+
+
+def test_sync_post_model(settings):
+    """sync_post_model should write the post information to our database"""
+    settings.FEATURES[features.KEEP_LOCAL_COPY] = True
+    channel_name = 'channel'
+    post_id = 'post_id'
+
+    assert Channel.objects.count() == 0
+    assert Post.objects.count() == 0
+    post = api.sync_post_model(
+        channel_name=channel_name,
+        post_id=post_id,
+    )
+    assert Channel.objects.count() == 1
+    assert Post.objects.count() == 1
+    assert post == Post.objects.first()
+    assert post.channel.name == channel_name
+    assert post.post_id == post_id
+
+    assert post == api.sync_post_model(
+        channel_name=channel_name,
+        post_id=post_id,
+    )

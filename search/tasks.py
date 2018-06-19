@@ -110,7 +110,8 @@ def index_channel(self, channel_name):
     """
     try:
         with wrap_retry_exception(PrawcoreException, PRAWException):
-            from channels.api import Api
+            from channels.api import Api, sync_channel_model
+            sync_channel_model(channel_name)
 
             client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
             posts = client.list_posts(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
