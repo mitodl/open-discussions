@@ -80,8 +80,30 @@ def _parse_bool(value, field_name):
     raise ValidationError("{} must be a bool".format(field_name))
 
 
-class PostSerializer(serializers.Serializer):
-    """Serializer for posts"""
+class RedditObjectSerializer(serializers.Serializer):
+    """Serializer class for reddit objects (posts, comments)"""
+
+    def _get_user(self, instance):
+        """
+        Look up user in the context from the post author
+
+        Args:
+            instance (praw.models.Submission):
+                The post to look up the user for
+        """
+        if instance.author is None:
+            return None
+        if 'users' in self.context:
+            return self.context['users'].get(instance.author.name)
+        else:
+            return User.objects.filter(username=instance.author.name).select_related('profile').first()
+
+
+class BasePostSerializer(RedditObjectSerializer):
+    """
+    Basic serializer class for reddit posts. Only includes serialization functionality
+    (no deserialization or validation), and does not fetch/serialize Subscription data
+    """
     url = WriteableSerializerMethodField(allow_null=True)
     text = WriteableSerializerMethodField(allow_null=True)
     title = serializers.CharField()
@@ -100,27 +122,7 @@ class PostSerializer(serializers.Serializer):
     author_name = serializers.SerializerMethodField()
     edited = serializers.SerializerMethodField()
     num_reports = serializers.IntegerField(read_only=True)
-    subscribed = WriteableSerializerMethodField()
-
-    @property
-    def _current_user(self):
-        """Get the current user"""
-        return self.context['current_user']
-
-    def _get_user(self, instance):
-        """
-        Look up user in the context from the post author
-
-        Args:
-            instance (praw.models.Submission):
-                The post to look up the user for
-        """
-        if instance.author is None:
-            return None
-        if 'users' in self.context:
-            return self.context['users'].get(instance.author.name)
-        else:
-            return User.objects.filter(username=instance.author.name).first()
+    deleted = serializers.SerializerMethodField()
 
     def get_url(self, instance):
         """Returns a url or null depending on if it's a self post"""
@@ -161,13 +163,41 @@ class PostSerializer(serializers.Serializer):
         """Return a Boolean signifying if the post has been edited or not"""
         return instance.edited if instance.edited is False else True
 
-    def validate_upvoted(self, value):
-        """Validate that upvoted is a bool"""
-        return {'upvoted': _parse_bool(value, 'upvoted')}
-
     def get_removed(self, instance):
         """Returns True if the post was removed"""
         return instance.banned_by is not None
+
+    def get_deleted(self, instance):
+        """Returns True if the post was deleted"""
+        return instance.selftext == "[deleted]"  # only way to tell
+
+
+class PostSerializer(BasePostSerializer):
+    """
+    Full serializer class for reddit posts. Includes deserialization and validation functionality
+    and can fetch/serialize Subscription information.
+    """
+    subscribed = WriteableSerializerMethodField()
+
+    @property
+    def _current_user(self):
+        """Get the current user"""
+        return self.context['current_user']
+
+    def get_subscribed(self, instance):
+        """Returns True if user is subscrisbed to the post"""
+        if 'post_subscriptions' not in self.context:
+            # this code is run if a post was just created
+            return Subscription.objects.filter(
+                user=self._current_user,
+                post_id=instance.id,
+                comment_id__isnull=True,
+            ).exists()
+        return instance.id in self.context['post_subscriptions']
+
+    def validate_upvoted(self, value):
+        """Validate that upvoted is a bool"""
+        return {'upvoted': _parse_bool(value, 'upvoted')}
 
     def validate_removed(self, value):
         """Validate that removed is a bool"""
@@ -188,17 +218,6 @@ class PostSerializer(serializers.Serializer):
     def validate_subscribed(self, value):
         """Validate that subscribed is a bool"""
         return {'subscribed': _parse_bool(value, 'subscribed')}
-
-    def get_subscribed(self, instance):
-        """Returns True if user is subscribed to the post"""
-        if 'post_subscriptions' not in self.context:
-            # this code is run if a post was just created
-            return Subscription.objects.filter(
-                user=self._current_user,
-                post_id=instance.id,
-                comment_id__isnull=True,
-            ).exists()
-        return instance.id in self.context['post_subscriptions']
 
     def create(self, validated_data):
         title = validated_data['title']
@@ -271,8 +290,11 @@ class PostSerializer(serializers.Serializer):
         return api.get_post(post_id=post_id)
 
 
-class CommentSerializer(serializers.Serializer):
-    """Serializer for comments"""
+class BaseCommentSerializer(RedditObjectSerializer):
+    """
+    Basic serializer class for reddit comments. Only includes serialization functionality
+    (no deserialization or validation), and does not fetch/serialize Subscription data
+    """
     id = serializers.CharField(read_only=True)
     parent_id = serializers.SerializerMethodField()
     post_id = serializers.SerializerMethodField()
@@ -291,28 +313,6 @@ class CommentSerializer(serializers.Serializer):
     comment_type = serializers.SerializerMethodField()
     num_reports = serializers.IntegerField(read_only=True)
     deleted = serializers.SerializerMethodField()
-    subscribed = WriteableSerializerMethodField()
-
-    @property
-    def _current_user(self):
-        """Get the current user"""
-        return self.context['current_user']
-
-    def _get_user(self, instance):
-        """
-        Look up user in the context from the comment author
-
-        Args:
-            instance (praw.models.Comment):
-                The comment to look up the user for
-        """
-
-        if instance.author is None:
-            return None
-        if 'users' in self.context:
-            return self.context['users'].get(instance.author.name)
-        else:
-            return User.objects.filter(username=instance.author.name).first()
 
     def get_post_id(self, instance):
         """The post id for this comment"""
@@ -367,29 +367,26 @@ class CommentSerializer(serializers.Serializer):
         """Let the frontend know which type this is"""
         return "comment"
 
-    def validate_upvoted(self, value):
-        """Validate that upvoted is a bool"""
-        return {'upvoted': _parse_bool(value, 'upvoted')}
-
-    def validate_downvoted(self, value):
-        """Validate that downvoted is a bool"""
-        return {'downvoted': _parse_bool(value, 'downvoted')}
-
     def get_removed(self, instance):
         """Returns True if the comment was removed"""
         return instance.banned_by is not None
-
-    def validate_removed(self, value):
-        """Validate that removed is a bool"""
-        return {'removed': _parse_bool(value, 'removed')}
 
     def get_deleted(self, instance):
         """Returns True if the comment was deleted"""
         return instance.body == "[deleted]"  # only way to tell
 
-    def validate_subscribed(self, value):
-        """Validate that subscribed is a bool"""
-        return {'subscribed': _parse_bool(value, 'subscribed')}
+
+class CommentSerializer(BaseCommentSerializer):
+    """
+    Full serializer class for reddit comments. Includes deserialization and validation functionality
+    and can fetch/serialize Subscription information.
+    """
+    subscribed = WriteableSerializerMethodField()
+
+    @property
+    def _current_user(self):
+        """Get the current user"""
+        return self.context['current_user']
 
     def get_subscribed(self, instance):
         """Returns True if user is subscribed to the comment"""
@@ -401,6 +398,22 @@ class CommentSerializer(serializers.Serializer):
                 comment_id=instance.id,
             ).exists()
         return instance.id in self.context.get('comment_subscriptions', [])
+
+    def validate_upvoted(self, value):
+        """Validate that upvoted is a bool"""
+        return {'upvoted': _parse_bool(value, 'upvoted')}
+
+    def validate_downvoted(self, value):
+        """Validate that downvoted is a bool"""
+        return {'downvoted': _parse_bool(value, 'downvoted')}
+
+    def validate_subscribed(self, value):
+        """Validate that subscribed is a bool"""
+        return {'subscribed': _parse_bool(value, 'subscribed')}
+
+    def validate_removed(self, value):
+        """Validate that removed is a bool"""
+        return {'removed': _parse_bool(value, 'removed')}
 
     def validate(self, attrs):
         """Validate that the the combination of fields makes sense"""

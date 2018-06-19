@@ -10,9 +10,9 @@ from rest_framework.exceptions import ValidationError
 from channels.serializers import (
     ChannelSerializer,
     CommentSerializer,
+    PostSerializer,
     ContributorSerializer,
     ModeratorSerializer,
-    PostSerializer,
     ReportSerializer,
     ReportedContentSerializer,
     SubscriberSerializer,

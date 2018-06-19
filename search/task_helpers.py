@@ -13,14 +13,15 @@ from channels.constants import (
     COMMENT_TYPE,
     VoteActions,
 )
+
 from search.api import (
     gen_post_id,
     gen_comment_id,
     is_reddit_object_removed,
 )
 from search.serializers import (
-    serialize_post,
-    serialize_comment,
+    ESPostSerializer,
+    ESCommentSerializer,
 )
 from search.tasks import (
     create_document,
@@ -59,7 +60,7 @@ def index_new_post(post_obj):
     Args:
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
-    data = serialize_post(post_obj)
+    data = ESPostSerializer().serialize(post_obj)
     create_document.delay(
         gen_post_id(post_obj.id),
         data
@@ -74,7 +75,7 @@ def index_new_comment(comment_obj):
     Args:
         comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
     """
-    data = serialize_comment(comment_obj)
+    data = ESCommentSerializer().serialize(comment_obj)
     create_document.delay(
         gen_comment_id(comment_obj.id),
         data

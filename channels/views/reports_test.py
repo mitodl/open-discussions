@@ -110,6 +110,7 @@ def test_list_reports(staff_client, private_channel_and_contributor, reddit_fact
             "title": post.title,
             "upvoted": False,
             'removed': False,
+            "deleted": False,
             "subscribed": False,
             "score": 1,
             "author_id": user.username,

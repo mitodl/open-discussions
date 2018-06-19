@@ -124,3 +124,13 @@ def _merge_strings(list_or_str, list_to_return):
             _merge_strings(item, list_to_return)
     elif list_or_str is not None:
         list_to_return.append(list_or_str)
+
+
+def filter_dict_keys(orig_dict, keys_to_keep):
+    """Returns a copy of a dictionary without any keys that don't exist in a given set"""
+    return {key: orig_dict[key] for key in keys_to_keep}
+
+
+def filter_dict_with_renamed_keys(orig_dict, key_rename_dict):
+    """Returns a copy of a dictionary with keys renamed according to a provided dictionary"""
+    return {new_key: orig_dict[key] for key, new_key in key_rename_dict.items()}
