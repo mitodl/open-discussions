@@ -86,7 +86,7 @@ class ProfileImage extends React.Component<*> {
           ) : (
             <img
               src={imageUrl}
-              alt={`Profile image for ${profile ? profile.name : 'anonymous'}`}
+              alt={`Profile image for ${profile ? profile.name : "anonymous"}`}
               className={`profile-image ${imageSizeClass}`}
             />
           )}
