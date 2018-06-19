@@ -50,21 +50,11 @@ from channels.models import (
 )
 from channels.utils import get_kind_mapping
 
-from channels import task_helpers
+from channels import task_helpers as channels_task_helpers
 from open_discussions import features
 from open_discussions.utils import now_in_utc
-from search.task_helpers import (
-    reddit_object_persist,
-    index_new_post,
-    index_new_comment,
-    update_post_text,
-    update_post_removal_status,
-    update_comment_text,
-    update_indexed_score,
-    update_comment_removal_status,
-    set_comment_to_deleted,
-    set_post_to_deleted,
-)
+from search import task_helpers as search_task_helpers
+from search.task_helpers import reddit_object_persist
 
 USER_AGENT = 'MIT-Open: {version}'
 ACCESS_TOKEN_HEADER_NAME = 'X-Access-Token'
@@ -398,7 +388,7 @@ class Api:
         """
         return self.reddit.subreddit(name)
 
-    @reddit_object_persist(task_helpers.sync_channel_model)
+    @reddit_object_persist(channels_task_helpers.sync_channel_model)
     def create_channel(self, name, title, channel_type=CHANNEL_TYPE_PUBLIC, **other_settings):
         """
         Create a channel
@@ -498,7 +488,7 @@ class Api:
             instance.clear_vote()
 
         try:
-            update_indexed_score(instance, instance_type, vote_action)
+            search_task_helpers.update_indexed_score(instance, instance_type, vote_action)
         except Exception:  # pylint: disable=broad-except
             log.exception('Error occurred while trying to index [%s] object score', instance_type)
         return True
@@ -507,8 +497,8 @@ class Api:
     apply_comment_vote = partialmethod(_apply_vote, allow_downvote=True, instance_type=COMMENT_TYPE)
 
     @reddit_object_persist(
-        index_new_post,
-        task_helpers.sync_post_model,
+        search_task_helpers.index_new_post,
+        channels_task_helpers.sync_post_model,
     )
     def create_post(self, channel_name, title, text=None, url=None):
         """
@@ -608,7 +598,7 @@ class Api:
         """
         return self.reddit.submission(id=post_id)
 
-    @reddit_object_persist(update_post_text)
+    @reddit_object_persist(search_task_helpers.update_post_text)
     def update_post(self, post_id, text):
         """
         Updates the post
@@ -641,7 +631,7 @@ class Api:
         post = self.get_post(post_id)
         post.mod.sticky(pinned)
 
-    @reddit_object_persist(update_post_removal_status)
+    @reddit_object_persist(search_task_helpers.update_post_removal_status)
     def remove_post(self, post_id):
         """
         Removes the post, opposite of approve_post
@@ -653,7 +643,7 @@ class Api:
         post.mod.remove()
         return post
 
-    @reddit_object_persist(update_post_removal_status)
+    @reddit_object_persist(search_task_helpers.update_post_removal_status)
     def approve_post(self, post_id):
         """
         Approves the post, opposite of remove_post
@@ -665,7 +655,7 @@ class Api:
         post.mod.approve()
         return post
 
-    @reddit_object_persist(set_post_to_deleted)
+    @reddit_object_persist(search_task_helpers.set_post_to_deleted)
     def delete_post(self, post_id):
         """
         Deletes the post
@@ -679,8 +669,8 @@ class Api:
         return post
 
     @reddit_object_persist(
-        index_new_comment,
-        task_helpers.sync_comment_model,
+        search_task_helpers.index_new_comment,
+        channels_task_helpers.sync_comment_model,
     )
     def create_comment(self, text, post_id=None, comment_id=None):
         """
@@ -705,7 +695,7 @@ class Api:
         else:
             return self.get_comment(comment_id).reply(text)
 
-    @reddit_object_persist(update_comment_text)
+    @reddit_object_persist(search_task_helpers.update_comment_text)
     def update_comment(self, comment_id, text):
         """
         Updates a existing comment
@@ -720,7 +710,7 @@ class Api:
         comment = self.get_comment(comment_id).edit(text)
         return comment
 
-    @reddit_object_persist(update_comment_removal_status)
+    @reddit_object_persist(search_task_helpers.update_comment_removal_status)
     def remove_comment(self, comment_id):
         """
         Removes a comment
@@ -732,7 +722,7 @@ class Api:
         comment.mod.remove()
         return comment
 
-    @reddit_object_persist(update_comment_removal_status)
+    @reddit_object_persist(search_task_helpers.update_comment_removal_status)
     def approve_comment(self, comment_id):
         """
         Approves a comment
@@ -744,7 +734,7 @@ class Api:
         comment.mod.approve()
         return comment
 
-    @reddit_object_persist(set_comment_to_deleted)
+    @reddit_object_persist(search_task_helpers.set_comment_to_deleted)
     def delete_comment(self, comment_id):
         """
         Deletes the comment

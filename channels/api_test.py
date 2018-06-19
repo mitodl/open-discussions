@@ -83,7 +83,7 @@ def test_apply_vote(mocker, vote_func, request_data, likes_value, expected_insta
     Tests that the functions to apply an upvote/downvote behave appropriately given
     the voting request and the current state of upvotes/downvotes for the user.
     """
-    mocker.patch('channels.api.update_indexed_score')
+    mocker.patch('search.task_helpers.update_indexed_score')
     mock_instance = mocker.Mock(likes=likes_value)
     vote_result = vote_func(mock_instance, request_data, allow_downvote=True)
     expected_vote_success = expected_instance_vote_func is not None
@@ -99,7 +99,7 @@ def test_apply_vote(mocker, vote_func, request_data, likes_value, expected_insta
 ])
 def test_vote_indexing(mocker, vote_func, expected_allowed_downvote, expected_instance_type):
     """Test that an upvote/downvote calls a function to update the index"""
-    patched_vote_indexer = mocker.patch('channels.api.update_indexed_score')
+    patched_vote_indexer = mocker.patch('search.task_helpers.update_indexed_score')
     # Test upvote
     mock_reddit_obj = Mock()
     mock_reddit_obj.likes = False
