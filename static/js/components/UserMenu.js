@@ -4,9 +4,10 @@ import React from "react"
 import { Link } from "react-router-dom"
 import onClickOutside from "react-onclickoutside"
 
-import { isProfileComplete, makeProfileImageUrl } from "../lib/util"
-import { SETTINGS_URL } from "../lib/url"
+import { isProfileComplete } from "../lib/util"
+import { profileURL, SETTINGS_URL } from "../lib/url"
 import type { Profile } from "../flow/discussionTypes"
+import ProfileImage from "../containers/ProfileImage"
 export class Dropdown extends React.Component<*, *> {
   handleClickOutside = () => {
     const { toggleShowUserMenu } = this.props
@@ -16,7 +17,6 @@ export class Dropdown extends React.Component<*, *> {
 
   render() {
     const { toggleShowUserMenu } = this.props
-
     return (
       <ul className="user-menu-dropdown">
         <li>
@@ -24,6 +24,16 @@ export class Dropdown extends React.Component<*, *> {
             Settings
           </Link>
         </li>
+        {SETTINGS.profile_ui_enabled && SETTINGS.username ? (
+          <li>
+            <Link
+              onClick={toggleShowUserMenu}
+              to={profileURL(SETTINGS.username)}
+            >
+              View Profile
+            </Link>
+          </li>
+        ) : null}
         {SETTINGS.allow_email_auth ? (
           <li>
             <a href="/logout">Sign Out</a>
@@ -45,13 +55,18 @@ export default class UserMenu extends React.Component<*, *> {
 
   render() {
     const { toggleShowUserMenu, showUserMenu, profile } = this.props
+    if (!profile) {
+      return null
+    }
 
     return (
       <div className="user-menu">
-        <img
+        <ProfileImage
+          editable={false}
+          useSmall={true}
+          userName={SETTINGS.username}
+          profile={profile}
           onClick={toggleShowUserMenu}
-          className="profile-image"
-          src={makeProfileImageUrl(profile)}
         />
         {SETTINGS.profile_ui_enabled && !isProfileComplete(profile) ? (
           <div className="profile-incomplete" />

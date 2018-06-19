@@ -187,3 +187,14 @@ export type Profile = {
   headline:                    ?string,
   username:                    string
 }
+
+export type ProfileValidation = {
+  name:                         string
+}
+
+export type ProfilePayload = {
+  name:                         string,
+  bio:                         ?string,
+  headline:                    ?string,
+}
+

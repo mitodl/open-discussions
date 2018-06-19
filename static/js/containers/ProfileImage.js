@@ -4,7 +4,7 @@ import React from "react"
 import { connect } from "react-redux"
 import type { Dispatch } from "redux"
 
-import { makeProfileImageUrl } from "../lib/util"
+import { defaultProfileImageUrl, makeProfileImageUrl } from "../lib/util"
 import type { Profile } from "../flow/discussionTypes"
 import ProfileImageUploader from "../components/ProfileImageUploader"
 import { createActionHelper } from "../lib/redux_rest"
@@ -18,6 +18,7 @@ import {
 import { showDialog, hideDialog, DIALOG_PROFILE_IMAGE } from "../actions/ui"
 import { actions } from "../actions"
 import { updateProfilePhoto } from "../reducers/image_upload"
+import { initials } from "../lib/profile"
 
 const formatPhotoName = photo => `${photo.name.replace(/\.\w*$/, "")}.jpg`
 
@@ -33,7 +34,8 @@ class ProfileImage extends React.Component<*> {
     setPhotoError: (s: string) => void,
     startPhotoEdit: (p: File) => void,
     updatePhotoEdit: (b: Blob) => void,
-    useSmall?: boolean
+    useSmall?: boolean,
+    onClick?: Function
   }
 
   static defaultProps = {
@@ -67,19 +69,27 @@ class ProfileImage extends React.Component<*> {
   }
 
   render() {
-    const { profile, useSmall, editable } = this.props
+    const { profile, useSmall, editable, onClick } = this.props
 
     const imageUrl = makeProfileImageUrl(profile, useSmall)
     const imageSizeClass = useSmall ? "small" : "medium"
 
     return (
-      <div className="profile-image-edit">
-        <div className="avatar">
-          <img
-            src={imageUrl}
-            alt={`Profile image for ${profile.name}`}
-            className={`profile-image ${imageSizeClass}`}
-          />
+      <div className="profile-image-container">
+        <div className="avatar" onClick={onClick}>
+          {imageUrl === defaultProfileImageUrl ? (
+            <div className={`profile-image ${imageSizeClass}`}>
+              <div className={`profile-initials ${imageSizeClass}`}>
+                {initials(profile.name)}
+              </div>
+            </div>
+          ) : (
+            <img
+              src={imageUrl}
+              alt={`Profile image for ${profile.name}`}
+              className={`profile-image ${imageSizeClass}`}
+            />
+          )}
           {editable ? (
             <span>
               <ProfileImageUploader
@@ -93,9 +103,15 @@ class ProfileImage extends React.Component<*> {
                   this.setDialogVisibility(true)
                 }}
               >
-                <i name="camera_alt" className="material-icons edit">
-                  edit
-                </i>
+                {imageUrl === defaultProfileImageUrl ? (
+                  <i name="camera_alt" className="material-icons add">
+                    add
+                  </i>
+                ) : (
+                  <i name="camera_alt" className="material-icons edit">
+                    edit
+                  </i>
+                )}
               </button>
             </span>
           ) : null}

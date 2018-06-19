@@ -1,0 +1,53 @@
+.profile-page {
+  padding: 30px 25px;
+  max-width: 1100px;
+  width: 60%;
+  margin: 0 auto;
+
+  h1 {
+    font-size: 25px;
+    font-weight: 400;
+    margin: 0 0 25px;
+  }
+
+  li {
+    margin: 0 0 10px;
+  }
+}
+
+.profile-card {
+  padding: 6px 22px 0 22px;
+  overflow: auto;
+
+  @include breakpoint(phone) {
+    padding: 4px 9px 0;
+  }
+}
+
+.profile-view-fullname {
+  display: table-cell;
+  vertical-align: middle;
+  height: 110px;
+}
+
+.profile-view-name {
+  font-size: 24px;
+  padding: 0px 0px 5px 10px;
+}
+
+.profile-view-headline {
+  padding: 10px 0px 10px 0px;
+}
+
+.profile-view-bio {
+  padding: 10px 0px 10px 0px;
+}
+
+.profile-edit-button {
+  float: right;
+}
+
+.image-and-name {
+  height: 110px;
+  margin-bottom: 20px;
+}

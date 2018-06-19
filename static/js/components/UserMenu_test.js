@@ -9,9 +9,9 @@ import { Link } from "react-router-dom"
 import UserMenu from "./UserMenu"
 import { DropdownWithClickOutside, Dropdown } from "./UserMenu"
 
-import { SETTINGS_URL } from "../lib/url"
-import { defaultProfileImageUrl } from "../lib/util"
+import { profileURL, SETTINGS_URL } from "../lib/url"
 import * as utilFuncs from "../lib/util"
+import ProfileImage from "../containers/ProfileImage"
 
 describe("UserMenu", () => {
   let toggleShowUserMenuStub, showUserMenu, profile, sandbox
@@ -50,13 +50,11 @@ describe("UserMenu", () => {
   const renderDropdown = () =>
     shallow(<Dropdown toggleShowUserMenu={toggleShowUserMenuStub} />)
 
-  it("should include the profile image with onclick handler", () => {
+  it("should include the ProfileImage with onclick handler", () => {
     const wrapper = renderUserMenu()
-    const { className, onClick, src } = wrapper.find("img").props()
-    assert.equal(className, "profile-image")
+    const { onClick } = wrapper.find(ProfileImage).props()
     onClick()
     assert.isOk(toggleShowUserMenuStub.called)
-    assert.equal(src, defaultProfileImageUrl)
   })
 
   it("should render the dropdown if showUserMenu", () => {
@@ -90,9 +88,28 @@ describe("UserMenu", () => {
 
   it("should not include a red dot if profile is complete", () => {
     SETTINGS.profile_ui_enabled = true
+    SETTINGS.username = profile.username
     sandbox.stub(utilFuncs, "isProfileComplete").returns(true)
     const wrapper = renderUserMenu()
     assert.isNotOk(wrapper.find(".profile-incomplete").exists())
+  })
+  ;[true, false].forEach(uiEnabled => {
+    it(`dropdown menu should ${
+      uiEnabled ? "" : "not"
+    } include a profile link if profile UI ${
+      uiEnabled ? "" : "not"
+    } enabled`, async () => {
+      SETTINGS.profile_ui_enabled = uiEnabled
+      SETTINGS.username = profile.username
+      const wrapper = renderDropdown()
+      assert.equal(
+        wrapper
+          .find(Link)
+          .at(1)
+          .props().to === profileURL(profile.username),
+        uiEnabled
+      )
+    })
   })
 
   it("dropdown menu should have a settings link", () => {

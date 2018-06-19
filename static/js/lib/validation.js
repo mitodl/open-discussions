@@ -74,6 +74,10 @@ export const validatePostCreateForm = validate([
   postUrlOrTextPresent
 ])
 
+export const validateProfileForm = validate([
+  validation(emptyOrNil, R.lensPath(["value", "name"]), "Name is required")
+])
+
 export const validateChannelEditForm = validate([
   validation(
     R.compose(

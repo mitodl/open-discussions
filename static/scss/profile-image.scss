@@ -1,7 +1,21 @@
 .profile-image {
+  border-radius: 100%;
+  background-color: #579CF9;
+  color: #fff;
   width: 45px;
   height: 45px;
-  border-radius: 100%;
+}
+
+.small {
+  width: 45px;
+  height: 45px;
+  font-size: 16px;
+}
+
+.medium {
+  width: 109px;
+  height: 109px;
+  font-size: 36px;
 }
 
 .medium {
@@ -15,12 +29,15 @@
   background-color: red;
   border-radius: 50%;
   position: relative;
-  left: 42px;
-  top: -46px;
+  left: 34px;
+  top: 3px;
 }
 
-.profile-image-edit {
+
+.profile-image-container {
   display: flex;
+  float: left;
+  padding: 0px 15px 15px 0px;
 
   .avatar {
     position: relative;
@@ -118,5 +135,11 @@
     border: none;
     border-radius: 0;
   }
+}
+
+.profile-initials {
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
 }
 

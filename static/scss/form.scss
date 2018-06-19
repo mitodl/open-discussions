@@ -26,6 +26,12 @@
   color: rgba(0,0,0,.87);
 }
 
+.profile-name {
+  height: 109px;
+  display: table-cell;
+  vertical-align: middle;
+}
+
 input[type=text], input[type=url] {
   width: 100%;
   padding: 10px 10px;
