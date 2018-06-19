@@ -287,15 +287,17 @@ def test_switch_indices(mocked_es, mocker, default_exists):
 @pytest.mark.parametrize("temp_alias_exists", [True, False])
 def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     """create_backing_index should make a new backing index and set the reindex alias to point to it"""
+    reindexing_alias = get_reindexing_alias_name()
+    backing_index = 'backing_index'
     conn_mock = mocked_es.conn
     conn_mock.indices.exists_alias.return_value = temp_alias_exists
+    get_alias = conn_mock.indices.get_alias
+    get_alias.return_value = {backing_index: {'alias': {reindexing_alias: {}}}} if temp_alias_exists else {}
     clear_and_create_mock = mocker.patch('search.indexing_api.clear_and_create_index', autospec=True)
-    backing_index = 'backing'
     make_backing_index_mock = mocker.patch('search.indexing_api.make_backing_index_name', return_value=backing_index)
 
     assert create_backing_index() == backing_index
 
-    reindexing_alias = get_reindexing_alias_name()
     get_conn_mock = mocked_es.get_conn
     get_conn_mock.assert_called_once_with(verify=False)
     make_backing_index_mock.assert_called_once_with()
@@ -304,7 +306,7 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     conn_mock.indices.exists_alias.assert_called_once_with(name=reindexing_alias)
     if temp_alias_exists:
         conn_mock.indices.delete_alias.assert_any_call(
-            index="_all", name=reindexing_alias,
+            index=backing_index, name=reindexing_alias,
         )
     assert conn_mock.indices.delete_alias.called is temp_alias_exists
 
