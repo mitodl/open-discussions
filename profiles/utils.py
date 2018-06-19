@@ -163,3 +163,18 @@ def make_thumbnail(full_size_image, max_dimension):
     pil_image.convert('RGB').save(buffer, "JPEG", quality=90)
     buffer.seek(0)
     return buffer
+
+
+def update_full_name(user, name):
+    """
+    Update the first and last names of a user.
+
+    Args:
+        user(User): The user to modify.
+        name(str): The full name of the user.
+    """
+    name_parts = name.split(' ')
+    user.first_name = name_parts[0][:30]
+    if len(name_parts) > 1:
+        user.last_name = ' '.join(name_parts[1:])[:30]
+    user.save()

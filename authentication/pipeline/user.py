@@ -1,21 +1,20 @@
 """Auth pipline functions for email authentication"""
-from django.shortcuts import render
 import ulid
 from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
-from social_core.exceptions import AuthForbidden
 from social_core.pipeline.partial import partial
 
+from authentication.exceptions import (
+    InvalidPasswordException,
+    RequirePasswordException,
+    RequirePasswordAndProfileException,
+    RequireRegistrationException,
+)
 from channels import api as channel_api
 from notifications import api as notifications_api
-from authentication.forms import (
-    AUTH_TYPE_LOGIN,
-    AUTH_TYPE_REGISTER,
-    LoginForm,
-    PasswordAndProfileForm,
-)
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles.models import Profile
+from profiles.utils import update_full_name
 
 
 def validate_email_auth_request(strategy, backend, user=None, *args, **kwargs):  # pylint: disable=unused-argument
@@ -28,23 +27,14 @@ def validate_email_auth_request(strategy, backend, user=None, *args, **kwargs): 
         user (User): the current user
     """
     if backend.name != EmailAuth.name:
-        return
+        return {}
 
-    auth_type = strategy.request_data().get('auth_type', None)
+    is_login = (user is not None) or kwargs.get('is_login', False)
 
-    # if the user exists force a login, regardless of auth_type value
-    if user or (auth_type == AUTH_TYPE_LOGIN):
-        return {
-            'is_register': False,
-            'is_login': True,
-        }
-    elif auth_type == AUTH_TYPE_REGISTER:
-        return {
-            'is_register': True,
-            'is_login': False,
-        }
-    else:
-        raise AuthForbidden(backend)
+    return {
+        'is_register': not is_login,
+        'is_login': is_login,
+    }
 
 
 def get_username(strategy, backend, user=None, *args, **kwargs):  # pylint: disable=unused-argument
@@ -77,37 +67,36 @@ def require_password_and_profile_via_email(
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
-        is_new (bool): True if the user just got created
+        is_register (bool): True if the user is registering
+
+    Raises:
+        RequirePasswordAndProfileException: if the user hasn't set password or name
     """
     if backend.name != EmailAuth.name or not is_register:
-        return
+        return {}
 
-    if strategy.request.method == 'POST':
-        data = strategy.request_data()
-        form = PasswordAndProfileForm(data)
-        if form.is_valid():
-            password = form.cleaned_data['password']
-            name = form.cleaned_data['fullname']
-            user.set_password(password)
-            user.save()
-            profile, _ = Profile.objects.update_or_create(
-                user=user,
-                defaults={
-                    'name': name,
-                },
-            )
-            # user has password and profile now so return those updated values to the pipeline
-            return {
-                'user': user,
-                'profile': profile,
-            }
-    else:
-        form = PasswordAndProfileForm()
+    data = strategy.request_data()
+    profile = None
 
-    return render(strategy.request, 'profile.html', {
-        'form': form,
-        'partial_token': current_partial.token,
-    })
+    if 'name' in data:
+        profile, _ = Profile.objects.update_or_create(
+            user=user,
+            defaults={
+                'name': data['name'],
+            },
+        )
+
+    if 'password' in data:
+        user.set_password(data['password'])
+        user.save()
+
+    if not user.password or not hasattr(user, 'profile') or not user.profile.name:
+        raise RequirePasswordAndProfileException(backend, current_partial)
+
+    return {
+        'user': user,
+        'profile': profile or user.profile,
+    }
 
 
 @partial
@@ -123,10 +112,10 @@ def require_profile_update_user_via_saml(
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
-        is_register (bool): True if the user just got registered
+        is_new (bool): True if the user just got created
     """
     if backend.name != SAMLAuth.name or not is_new:
-        return
+        return {}
 
     try:
         update_full_name(user, kwargs['response']['attributes'][SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME][0])
@@ -147,8 +136,9 @@ def require_profile_update_user_via_saml(
     }
 
 
+@partial
 def validate_password(
-        strategy, backend, user=None, is_login=False, *args, **kwargs
+        strategy, backend, user=None, is_login=False, current_partial=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
     """
     Validates a user's password for login
@@ -158,22 +148,27 @@ def validate_password(
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
         is_login (bool): True if the request is a login
+
+    Raises:
+        RequirePasswordException: if the user password is invalid
     """
+    if backend.name != EmailAuth.name or not is_login:
+        return {}
+
     data = strategy.request_data()
 
-    if backend.name != EmailAuth.name or not is_login:
-        return
+    if user is None:
+        raise RequireRegistrationException(backend, current_partial)
 
-    form = LoginForm(data)
+    if 'password' not in data:
+        raise RequirePasswordException(backend, current_partial)
 
-    if not form.is_valid():
-        return render(strategy.request, 'login.html', context={
-            'form': form,
-        })
+    password = data['password']
 
-    password = form.cleaned_data['password']
     if not user or not user.check_password(password):
-        raise AuthForbidden(backend)
+        raise InvalidPasswordException(backend, current_partial)
+
+    return {}
 
 
 def initialize_user(user, is_new=False, *args, **kwargs):  # pylint: disable=unused-argument
@@ -185,23 +180,10 @@ def initialize_user(user, is_new=False, *args, **kwargs):  # pylint: disable=unu
         is_new (bool): True if the user just got created
     """
     if not is_new:
-        return
+        return {}
 
     notifications_api.ensure_notification_settings(user)
 
     channel_api.get_or_create_auth_tokens(user)
 
-
-def update_full_name(user, name):
-    """
-    Update the first and last names of a user.
-
-    Args:
-        user(User): The user to modify.
-        name(str): The full name of the user.
-    """
-    name_parts = name.split(' ')
-    user.first_name = name_parts[0][:30]
-    if len(name_parts) > 1:
-        user.last_name = ' '.join(name_parts[1:])[:30]
-    user.save()
+    return {}

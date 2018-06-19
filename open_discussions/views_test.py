@@ -8,7 +8,7 @@ import pytest
 from django.urls import reverse
 from rest_framework_jwt.settings import api_settings
 
-from open_discussions.features import ANONYMOUS_ACCESS, SAML_AUTH
+from open_discussions import features
 
 pytestmark = [
     pytest.mark.django_db,
@@ -20,7 +20,8 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
     """Verify that webpack bundle src shows up in production"""
     settings.GA_TRACKING_ID = 'fake'
     get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
-    settings.FEATURES[ANONYMOUS_ACCESS] = 'access'
+    settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
+    settings.FEATURES[features.EMAIL_AUTH] = False
 
     client.force_login(user)
     response = client.get(reverse('open_discussions-index'))
@@ -51,6 +52,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
         'is_authenticated': True,
         'allow_anonymous': 'access',
         'allow_email_auth': False,
+        'support_email': settings.EMAIL_SUPPORT,
     }
 
 
@@ -60,7 +62,7 @@ def test_webpack_url_jwt(
     """Verify that webpack bundle src shows up in production for jwt auth"""
     settings.GA_TRACKING_ID = 'fake'
     get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
-    settings.FEATURES[ANONYMOUS_ACCESS] = 'access'
+    settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
     client.cookies[api_settings.JWT_AUTH_COOKIE] = jwt_token
 
     response = client.get(reverse('open_discussions-index'))
@@ -91,6 +93,7 @@ def test_webpack_url_jwt(
         'is_authenticated': False,
         'allow_anonymous': 'access',
         'allow_email_auth': False,
+        'support_email': settings.EMAIL_SUPPORT,
     }
 
 
@@ -98,7 +101,8 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
     """Verify that webpack bundle src shows up in production"""
     settings.GA_TRACKING_ID = 'fake'
     get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
-    settings.FEATURES[ANONYMOUS_ACCESS] = 'access'
+    settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
+    settings.FEATURES[features.EMAIL_AUTH] = False
 
     response = client.get(reverse('open_discussions-index'))
 
@@ -128,13 +132,14 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
         'is_authenticated': False,
         'allow_anonymous': 'access',
         'allow_email_auth': False,
+        'support_email': settings.EMAIL_SUPPORT,
     }
 
 
 @pytest.mark.parametrize('is_enabled', [True, False])
 def test_saml_metadata(settings, client, user, is_enabled):
     """Test that SAML metadata page renders or returns a 404"""
-    settings.FEATURES[SAML_AUTH] = is_enabled
+    settings.FEATURES[features.SAML_AUTH] = is_enabled
     if is_enabled:
         settings.SOCIAL_AUTH_SAML_SP_ENTITY_ID = "http://mit.edu"
         settings.SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = ""

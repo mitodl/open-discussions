@@ -59,6 +59,10 @@ urlpatterns = [
     url(r'^settings/', index),
     url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
     url(r'^profile/[A-Za-z0-9_]+/', index, name='profile'),
+    url(r'^login/', index),
+    url(r'^register/', index),
+    url(r'^register/confirm/$', index, name='register-confirm'),
+    url(r'^account/inactive/$', index),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

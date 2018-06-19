@@ -5,8 +5,15 @@ import pytest
 from PIL import Image
 
 from open_discussions.factories import UserFactory
-from profiles.utils import profile_image_upload_uri, profile_image_upload_uri_small, _generate_upload_to_uri, \
-    profile_image_upload_uri_medium, image_uri, default_profile_image
+from profiles.utils import (
+    profile_image_upload_uri,
+    profile_image_upload_uri_small,
+    profile_image_upload_uri_medium,
+    _generate_upload_to_uri,
+    image_uri,
+    default_profile_image,
+    update_full_name,
+)
 
 
 def test_upload_url(user):
@@ -84,3 +91,17 @@ def test_profile_img_url(url, image):
     assert image_uri(profile.user, 'image_small') == (
         profile.image_small_file.url if image else url if url else default_profile_image
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('first_name, last_name', [
+    ['Keihanaikukauakahihuliheekahaunaele', 'van der Graaf'],
+    ['Jane', ''],
+    ['Joe', 'FakeName10' * 16]
+])
+def test_update_full_name(first_name, last_name):
+    """ Tests that user names are updated correctly """
+    user = UserFactory.create()
+    update_full_name(user, ' '.join([first_name, last_name]))
+    assert user.first_name == first_name[:30]
+    assert user.last_name == last_name[:30]

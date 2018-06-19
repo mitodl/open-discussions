@@ -24,9 +24,7 @@ User = get_user_model()
 
 
 def index(request, **kwargs):  # pylint: disable=unused-argument
-    """
-    The index view.
-    """
+    """Render the react app"""
     user = None
     auth = request.COOKIES.get(api_settings.JWT_AUTH_COOKIE)
     site_key = settings.OPEN_DISCUSSIONS_DEFAULT_SITE_KEY
@@ -76,6 +74,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
             "session_url": site.session_url,
             "tos_url": site.tos_url,
         },
+        "support_email": settings.EMAIL_SUPPORT,
         "is_authenticated": bool(request.user.is_authenticated),
         "profile_ui_enabled": features.is_enabled(features.PROFILE_UI),
         "allow_anonymous": features.is_enabled(features.ANONYMOUS_ACCESS),

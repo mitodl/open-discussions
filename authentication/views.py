@@ -1,59 +1,101 @@
-"""
-authentication views
-"""
+"""Authentication views"""
 from django.conf import settings
-from django.http import Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework_jwt.settings import api_settings
+from social_core.backends.email import EmailAuth
+from social_django.utils import load_backend
 
 from open_discussions import features
-from authentication.forms import (
-    LoginForm,
-    EmailForm,
+
+from authentication.serializers import (
+    LoginEmailSerializer,
+    LoginPasswordSerializer,
+    RegisterEmailSerializer,
+    RegisterConfirmSerializer,
+    RegisterDetailsSerializer,
 )
+from authentication.utils import load_drf_strategy
 
 
-def login(request, **kwargs):  # pylint: disable=unused-argument
-    """The login view"""
-    if not features.is_enabled(features.EMAIL_AUTH):
-        raise Http404("Page not found")
+class SocialAuthAPIView(APIView):
+    """API view for social auth endpoints"""
+    authentication_classes = []
+    permission_classes = []
 
-    if not request.user.is_anonymous:
-        return redirect('/')
+    def get_serializer_cls(self):  # pragma: no cover
+        """Return the serializer cls"""
+        raise NotImplementedError("get_serializer_cls must be implemented")
 
-    return render(request, "login.html", context={
-        "form": LoginForm(),
-    })
+    def post(self, request):
+        """Processes a request"""
+        if not features.is_enabled(features.EMAIL_AUTH):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer_cls = self.get_serializer_cls()
+        strategy = load_drf_strategy(request)
+        backend = load_backend(strategy, EmailAuth.name, None)
+        serializer = serializer_cls(data=request.data, context={
+            'request': request,
+            'strategy': strategy,
+            'backend': backend,
+        })
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def register(request, **kwargs):  # pylint: disable=unused-argument
-    """The register view"""
-    if not features.is_enabled(features.EMAIL_AUTH):
-        raise Http404("Page not found")
-
-    if not request.user.is_anonymous:
-        return redirect('/')
-
-    return render(request, "register.html", context={
-        "form": EmailForm(),
-    })
+class LoginEmailView(SocialAuthAPIView):
+    """Email login view"""
+    def get_serializer_cls(self):
+        """Return the serializer cls"""
+        return LoginEmailSerializer
 
 
-def jwt_login_complete(request, **kwargs):  # pylint: disable=unused-argument
-    """View that complete the jwt-based login by clearing the cookie"""
-    # redirect to what python-social-auth normally would have
-    response = redirect(settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL)
-    # to clear a cookie, it's most reliable to set it to expire immediately
-    response.set_cookie(
-        api_settings.JWT_AUTH_COOKIE,
-        domain=settings.OPEN_DISCUSSIONS_COOKIE_DOMAIN,
-        httponly=True,
-        max_age=0,
-    )
+class LoginPasswordView(SocialAuthAPIView):
+    """Email login view"""
+    def get_serializer_cls(self):
+        """Return the serializer cls"""
+        return LoginPasswordSerializer
+
+
+class RegisterEmailView(SocialAuthAPIView):
+    """Email register view"""
+    def get_serializer_cls(self):
+        """Return the serializer cls"""
+        return RegisterEmailSerializer
+
+
+class RegisterConfirmView(SocialAuthAPIView):
+    """Email registration confirmation view"""
+    def get_serializer_cls(self):
+        """Return the serializer cls"""
+        return RegisterConfirmSerializer
+
+
+class RegisterDetailsView(SocialAuthAPIView):
+    """Email registration details view"""
+    def get_serializer_cls(self):
+        """Return the serializer cls"""
+        return RegisterDetailsSerializer
+
+
+def login_complete(request, **kwargs):  # pylint: disable=unused-argument
+    """View that completes the login"""
+    # redirect to home
+    response = redirect('/')
+
+    if api_settings.JWT_AUTH_COOKIE in request.COOKIES:
+        # to clear a cookie, it's most reliable to set it to expire immediately
+        response.set_cookie(
+            api_settings.JWT_AUTH_COOKIE,
+            domain=settings.OPEN_DISCUSSIONS_COOKIE_DOMAIN,
+            httponly=True,
+            max_age=0,
+        )
 
     return response
-
-
-def confirmation_sent(request, **kwargs):  # pylint: disable=unused-argument
-    """The confirmation of an email being sent"""
-    return render(request, "confirmation_sent.html")
