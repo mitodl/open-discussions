@@ -26,7 +26,8 @@ def test_serialize_user(user):
             'image_small_file': profile.image_small_file.url,
             'image_medium_file': profile.image_medium_file.url,
             'bio': profile.bio,
-            'headline': profile.headline
+            'headline': profile.headline,
+            'username': profile.user.username
         }
     }
 
@@ -57,7 +58,8 @@ def test_serialize_create_user(db, mocker):
     profile.update({
         'image_file': None,
         'image_small_file': None,
-        'image_medium_file': None
+        'image_medium_file': None,
+        'username': user.username
     })
     assert UserSerializer(user).data == {
         'id': user.id,

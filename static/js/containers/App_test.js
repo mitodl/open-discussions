@@ -24,6 +24,7 @@ describe("App", () => {
       Promise.resolve([makeFrontpageSetting(), makeCommentSetting()])
     )
     helper.getFrontpageStub.returns(Promise.resolve({ posts: postList }))
+    helper.getProfileStub.returns(Promise.resolve(""))
     renderComponent = helper.renderComponent.bind(helper)
   })
 

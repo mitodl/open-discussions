@@ -10,8 +10,7 @@ declare var SETTINGS: {
   },
   username: ?string,
   user_full_name: ?string,
-  profile_image_small: ?string,
-  profile_complete: boolean,
+  profile_ui_enabled: boolean,
   authenticated_site: {
     title: string,
     login_url: string,

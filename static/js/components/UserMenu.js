@@ -4,8 +4,9 @@ import React from "react"
 import { Link } from "react-router-dom"
 import onClickOutside from "react-onclickoutside"
 
+import { isProfileComplete, makeProfileImageUrl } from "../lib/util"
 import { SETTINGS_URL } from "../lib/url"
-
+import type { Profile } from "../flow/discussionTypes"
 export class Dropdown extends React.Component<*, *> {
   handleClickOutside = () => {
     const { toggleShowUserMenu } = this.props
@@ -36,17 +37,23 @@ export class Dropdown extends React.Component<*, *> {
 export const DropdownWithClickOutside = onClickOutside(Dropdown)
 
 export default class UserMenu extends React.Component<*, *> {
+  props: {
+    profile: Profile,
+    toggleShowUserMenu: Function,
+    showUserMenu: boolean
+  }
+
   render() {
-    const { toggleShowUserMenu, showUserMenu } = this.props
+    const { toggleShowUserMenu, showUserMenu, profile } = this.props
 
     return (
       <div className="user-menu">
         <img
           onClick={toggleShowUserMenu}
           className="profile-image"
-          src={SETTINGS.profile_image_small}
+          src={makeProfileImageUrl(profile)}
         />
-        {!SETTINGS.profile_complete ? (
+        {!isProfileComplete(profile) ? (
           <div className="profile-incomplete" />
         ) : null}
         {showUserMenu ? (

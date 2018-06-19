@@ -8,7 +8,10 @@ import {
   enumerate,
   isEmptyText,
   preventDefaultAndInvoke,
-  userIsAnonymous
+  userIsAnonymous,
+  isProfileComplete,
+  defaultProfileImageUrl,
+  makeProfileImageUrl
 } from "./util"
 
 describe("utility functions", () => {
@@ -72,6 +75,67 @@ describe("utility functions", () => {
     [[null, true], ["username", false]].forEach(([username, expectation]) => {
       SETTINGS.username = username
       assert.equal(userIsAnonymous(), expectation)
+    })
+  })
+
+  it("isProfileComplete returns false if any required fields are missing", () => {
+    [[null, "bio"], [null, "headline"], [null, "image"]].forEach(
+      ([bio, headline, image]) => {
+        const profile = {
+          name:              "Test User",
+          username:          "AHJS123123FHG",
+          image:             image,
+          image_small:       image,
+          image_medium:      image,
+          image_file:        image,
+          image_small_file:  image,
+          image_medium_file: image,
+          bio:               bio,
+          headline:          headline
+        }
+        assert.equal(
+          isProfileComplete(profile),
+          bio !== null && headline !== null && image !== null
+        )
+      }
+    )
+  })
+
+  it("makeProfileImageUrl returns the correct value depending on existing profile values", () => {
+    [true, false].forEach(isSmall => {
+      [
+        [null, "image_small"],
+        [null, "image_small_file"],
+        [null, "image_medium"],
+        [null, "image_medium_file"]
+      ].forEach(
+        ([imageSmall, imageSmallFile, imageMedium, imageMediumFile]) => {
+          const profile = {
+            name:              "Test User",
+            username:          "AHJS123123FHG",
+            image:             null,
+            image_small:       imageSmall,
+            image_medium:      imageMedium,
+            image_file:        null,
+            image_small_file:  imageSmallFile,
+            image_medium_file: imageMediumFile,
+            bio:               null,
+            headline:          null
+          }
+          const expectedImageUrl = isSmall
+            ? imageSmallFile
+              ? imageSmallFile
+              : imageSmall
+                ? imageSmall
+                : defaultProfileImageUrl
+            : imageMediumFile
+              ? imageMediumFile
+              : imageMedium
+                ? imageMedium
+                : defaultProfileImageUrl
+          assert.equal(makeProfileImageUrl(profile, isSmall), expectedImageUrl)
+        }
+      )
     })
   })
 })

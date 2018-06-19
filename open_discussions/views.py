@@ -17,7 +17,6 @@ from social_django.utils import load_strategy, load_backend
 from open_discussions import features
 
 from open_discussions.templatetags.render_bundle import public_path
-from profiles.utils import image_uri
 from sites.models import AuthenticatedSite
 
 
@@ -59,15 +58,10 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
 
     user_full_name = None
     user_email = None
-    profile_image_small = None
-    profile_complete = True
 
     if user:
         user_full_name = user.profile.name
-        profile_image_small = image_uri(user)
-        profile_complete = user.profile.is_complete
         user_email = user.email
-
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
         "public_path": public_path(request),
@@ -75,8 +69,6 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "username": username,
         "user_full_name": user_full_name,
         "user_email": user_email,
-        "profile_image_small": profile_image_small,
-        "profile_complete": profile_complete,
         "authenticated_site": {
             "title": site.title,
             "base_url": site.base_url,
@@ -85,6 +77,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
             "tos_url": site.tos_url,
         },
         "is_authenticated": bool(request.user.is_authenticated),
+        "profile_ui_enabled": features.is_enabled(features.PROFILE_UI),
         "allow_anonymous": features.is_enabled(features.ANONYMOUS_ACCESS),
         "allow_email_auth": features.is_enabled(features.EMAIL_AUTH),
     }

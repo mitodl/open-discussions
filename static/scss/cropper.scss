@@ -1,0 +1,315 @@
+.cropper-container {
+  font-size: 0;
+  line-height: 0;
+
+  position: relative;
+
+  user-select: none;
+
+  direction: ltr;
+  touch-action: none;
+
+  & img {
+    /* Avoid margin top issue (Occur only when margin-top <= -height) */
+    display: block;
+
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    width: 100%;
+    height: 100%;
+
+    image-orientation: 0deg;
+  }
+}
+
+.cropper-wrap-box,
+.cropper-canvas,
+.cropper-drag-box,
+.cropper-crop-box,
+.cropper-modal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.cropper-crop-box {
+  border: 1px solid #fff;
+}
+
+.cropper-wrap-box {
+  overflow: hidden;
+}
+
+.cropper-drag-box {
+  opacity: 0;
+  background-color: #fff;
+}
+
+.cropper-modal {
+  opacity: .5;
+  background-color: #000;
+}
+
+.cropper-view-box {
+  display: block;
+  overflow: hidden;
+
+  width: 100%;
+  height: 100%;
+
+  outline: 1px solid var(--blue);
+  outline-color: color(var(--blue) alpha(75%));
+
+  border-radius: 50%;
+}
+
+.cropper-dashed {
+  position: absolute;
+
+  display: block;
+
+  opacity: .5;
+  border: 0 dashed #eee;
+
+  &.dashed-h {
+    top: 33%;
+    left: 0;
+
+    width: 100%;
+    height: 33%;
+
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+  }
+
+  &.dashed-v {
+    top: 0;
+    left: 33%;
+
+    width: 33%;
+    height: 100%;
+
+    border-right-width: 1px;
+    border-left-width: 1px;
+  }
+}
+
+.cropper-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  display: block;
+
+  width: 0;
+  height: 0;
+
+  opacity: .75;
+
+  &:before,
+  &:after {
+    position: absolute;
+
+    display: block;
+
+    content: ' ';
+
+    background-color: #eee;
+  }
+
+  &:before {
+    top: 0;
+    left: -3px;
+
+    width: 7px;
+    height: 1px;
+  }
+
+  &:after {
+    top: -3px;
+    left: 0;
+
+    width: 1px;
+    height: 7px;
+  }
+}
+
+.cropper-face,
+.cropper-line,
+.cropper-point {
+  position: absolute;
+
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  opacity: .1;
+}
+
+.cropper-face {
+  top: 0;
+  left: 0;
+
+  background-color: #fff;
+}
+
+.cropper-line {
+  background-color: var(--blue);
+
+  &.line-e {
+    top: 0;
+    right: -3px;
+
+    width: 5px;
+
+    cursor: e-resize;
+  }
+
+  &.line-n {
+    top: -3px;
+    left: 0;
+
+    height: 5px;
+
+    cursor: n-resize;
+  }
+
+  &.line-w {
+    top: 0;
+    left: -3px;
+
+    width: 5px;
+
+    cursor: w-resize;
+  }
+
+  &.line-s {
+    bottom: -3px;
+    left: 0;
+
+    height: 5px;
+
+    cursor: s-resize;
+  }
+}
+
+.cropper-point {
+  width: 10px;
+  height: 10px;
+
+  opacity: 1;
+  background-color: #fff;
+
+  &.point-e {
+    top: 50%;
+    right: -5px;
+
+    margin-top: -5px;
+
+    cursor: e-resize;
+  }
+
+  &.point-n {
+    top: -5px;
+    left: 50%;
+
+    margin-left: -5px;
+
+    cursor: n-resize;
+  }
+
+  &.point-w {
+    top: 50%;
+    left: -5px;
+
+    margin-top: -5px;
+
+    cursor: w-resize;
+  }
+
+  &.point-s {
+    bottom: -5px;
+    left: 50%;
+
+    margin-left: -5px;
+
+    cursor: s-resize;
+  }
+
+  &.point-ne {
+    top: -5px;
+    right: -5px;
+
+    cursor: ne-resize;
+  }
+
+  &.point-nw {
+    top: -5px;
+    left: -5px;
+
+    cursor: nw-resize;
+  }
+
+  &.point-sw {
+    bottom: -5px;
+    left: -5px;
+
+    cursor: sw-resize;
+  }
+
+  &.point-se {
+    right: -5px;
+    bottom: -5px;
+
+    cursor: se-resize;
+  }
+
+}
+
+.cropper-invisible {
+  opacity: 0;
+}
+
+.cropper-bg {
+  background-image: inline('../images/bg.png');
+}
+
+.cropper-hide {
+  position: absolute;
+
+  display: block;
+
+  width: 0;
+  height: 0;
+}
+
+.cropper-hidden {
+  display: none !important;
+}
+
+.cropper-move {
+  cursor: move;
+}
+
+.cropper-crop {
+  cursor: crosshair;
+}
+
+.cropper-disabled .cropper-drag-box,
+.cropper-disabled .cropper-face,
+.cropper-disabled .cropper-line,
+.cropper-disabled .cropper-point {
+  cursor: not-allowed;
+}
+
+.cropper-text {
+  padding-top: 25px;
+  position: absolute;
+  color: $font-grey;
+}

@@ -1,4 +1,5 @@
 // @flow
+
 export type ActionType = string
 
 export type Action<payload, meta> = {
@@ -6,3 +7,4 @@ export type Action<payload, meta> = {
   payload: payload,
   meta: meta,
 }
+

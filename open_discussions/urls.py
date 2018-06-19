@@ -58,6 +58,7 @@ urlpatterns = [
     url(r'^moderation/', index),
     url(r'^settings/', index),
     url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
+    url(r'^profile/(?P<channel_name>[A-Za-z0-9_]+)/$', index, name='profile'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

@@ -33,7 +33,8 @@ def test_list_users(client, staff_user, staff_jwt_header):
                 'image_small_file': 'http://testserver{}'.format(profile.image_small_file.url),
                 'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
                 'bio': profile.bio,
-                'headline': profile.headline
+                'headline': profile.headline,
+                'username': staff_user.username,
             }
         }
     ]
@@ -73,6 +74,7 @@ def test_create_user(
     get_or_create_auth_tokens_stub = mocker.patch('profiles.serializers.get_or_create_auth_tokens')
     ensure_notifications_stub = mocker.patch('profiles.serializers.ensure_notification_settings')
     resp = client.post(url, data=payload, **staff_jwt_header)
+    user = User.objects.get(username=resp.json()['username'])
     assert resp.status_code == 201
     for optin in ('email_optin', 'toc_optin'):
         if optin in payload['profile']:
@@ -80,10 +82,10 @@ def test_create_user(
     payload['profile'].update({
         'image_file': None,
         'image_small_file': None,
-        'image_medium_file': None
+        'image_medium_file': None,
+        'username': user.username
     })
     assert resp.json()['profile'] == payload['profile']
-    user = User.objects.get(username=resp.json()['username'])
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
     ensure_notifications_stub.assert_called_once_with(user)
     assert user.email == email
@@ -112,6 +114,7 @@ def test_get_user(client, user, staff_jwt_header):
             'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
             'bio': profile.bio,
             'headline': profile.headline,
+            'username': profile.user.username
         }
     }
 
@@ -156,6 +159,7 @@ def test_patch_user(client, user, staff_jwt_header, email, email_optin, toc_opti
             'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
             'bio': profile.bio,
             'headline': profile.headline,
+            'username': profile.user.username
         }
     }
     user.refresh_from_db()

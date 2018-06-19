@@ -22,6 +22,7 @@ describe("HomePage", () => {
     helper = new IntegrationTestHelper()
     helper.getFrontpageStub.returns(Promise.resolve({ posts: postList }))
     helper.getChannelsStub.returns(Promise.resolve(channels))
+    helper.getProfileStub.returns(Promise.resolve(""))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
   })

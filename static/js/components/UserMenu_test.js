@@ -10,13 +10,32 @@ import UserMenu from "./UserMenu"
 import { DropdownWithClickOutside, Dropdown } from "./UserMenu"
 
 import { SETTINGS_URL } from "../lib/url"
+import { defaultProfileImageUrl } from "../lib/util"
+import * as utilFuncs from "../lib/util"
 
 describe("UserMenu", () => {
-  let toggleShowUserMenuStub, showUserMenu
+  let toggleShowUserMenuStub, showUserMenu, profile, sandbox
 
   beforeEach(() => {
     toggleShowUserMenuStub = sinon.stub()
+    sandbox = sinon.sandbox.create()
     showUserMenu = false
+    profile = {
+      name:              "Test User",
+      username:          "AHJS123123FHG",
+      image:             null,
+      image_small:       null,
+      image_medium:      null,
+      image_file:        null,
+      image_small_file:  null,
+      image_medium_file: null,
+      bio:               null,
+      headline:          null
+    }
+  })
+
+  afterEach(() => {
+    sandbox.restore()
   })
 
   const renderUserMenu = () =>
@@ -24,6 +43,7 @@ describe("UserMenu", () => {
       <UserMenu
         toggleShowUserMenu={toggleShowUserMenuStub}
         showUserMenu={showUserMenu}
+        profile={profile}
       />
     )
 
@@ -36,7 +56,7 @@ describe("UserMenu", () => {
     assert.equal(className, "profile-image")
     onClick()
     assert.isOk(toggleShowUserMenuStub.called)
-    assert.equal(src, SETTINGS.profile_image_small)
+    assert.equal(src, defaultProfileImageUrl)
   })
 
   it("should render the dropdown if showUserMenu", () => {
@@ -52,9 +72,17 @@ describe("UserMenu", () => {
   })
 
   it("should include a red dot if profile is incomplete", () => {
-    SETTINGS.profile_complete = false
+    SETTINGS.profile_ui_enabled = true
+    sandbox.stub(utilFuncs, "isProfileComplete").returns(false)
     const wrapper = renderUserMenu()
     assert.isOk(wrapper.find(".profile-incomplete").exists())
+  })
+
+  it("should not include a red dot if profile is complete", () => {
+    SETTINGS.profile_ui_enabled = true
+    sandbox.stub(utilFuncs, "isProfileComplete").returns(true)
+    const wrapper = renderUserMenu()
+    assert.isNotOk(wrapper.find(".profile-incomplete").exists())
   })
 
   it("dropdown menu should have a settings link", () => {

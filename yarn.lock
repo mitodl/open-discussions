@@ -859,6 +859,12 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
+attr-accept@^1.0.3:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/attr-accept/-/attr-accept-1.1.2.tgz#6836bfe054e4ef1ee3076fdde56cec9bb3ffead6"
+  dependencies:
+    core-js "^2.5.0"
+
 autoprefixer@^6.3.1:
   version "6.7.7"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-6.7.7.tgz#1dbd1c835658e35ce3f9984099db00585c782014"
@@ -2265,6 +2271,10 @@ create-react-class@^15.5.2, create-react-class@^15.5.3:
     loose-envify "^1.3.1"
     object-assign "^4.1.1"
 
+cropperjs@v1.0.0-rc.3:
+  version "1.0.0-rc.3"
+  resolved "https://registry.yarnpkg.com/cropperjs/-/cropperjs-1.0.0-rc.3.tgz#50a7c7611befc442702f845ede77d7df4572e82b"
+
 cross-spawn@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-3.0.1.tgz#1256037ecb9f0c5f79e3d6ef135e30770184b982"
@@ -2553,6 +2563,10 @@ des.js@^1.0.0:
 destroy@~1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
+
+detect-browser@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/detect-browser/-/detect-browser-2.5.1.tgz#141d1580fb901156576a0a992ac319c4b2148f8b"
 
 detect-indent@^4.0.0:
   version "4.0.0"
@@ -5970,6 +5984,14 @@ prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6:
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
 
+prop-types@^15.5.7, prop-types@^15.5.8:
+  version "15.6.1"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.1.tgz#36644453564255ddda391191fb3a125cbdf654ca"
+  dependencies:
+    fbjs "^0.8.16"
+    loose-envify "^1.3.1"
+    object-assign "^4.1.1"
+
 prop-types@^15.6.0:
   version "15.6.0"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.0.tgz#ceaf083022fc46b4a35f69e13ef75aed0d639856"
@@ -6129,6 +6151,13 @@ react-content-loader@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/react-content-loader/-/react-content-loader-3.1.2.tgz#98230b4604b4b744eaa2d3fc88917dd988df6766"
 
+react-cropper@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/react-cropper/-/react-cropper-1.0.1.tgz#6e5595abb8576088ab3e51ecfdcfe5f865d0340f"
+  dependencies:
+    cropperjs v1.0.0-rc.3
+    prop-types "^15.5.8"
+
 react-deep-force-update@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/react-deep-force-update/-/react-deep-force-update-2.0.1.tgz#4f7f6c12c3e7de42f345992a3c518236fa1ecad3"
@@ -6148,6 +6177,13 @@ react-dom@^16.4.0:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.0"
+
+react-dropzone@^4.2.5:
+  version "4.2.11"
+  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-4.2.11.tgz#c20ff6a62634c5803bed5f292ef1bd4b3e1f90c3"
+  dependencies:
+    attr-accept "^1.0.3"
+    prop-types "^15.5.7"
 
 react-ga@^2.2.0:
   version "2.2.0"
