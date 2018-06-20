@@ -53,7 +53,7 @@ export default class UserMenu extends React.Component<*, *> {
           className="profile-image"
           src={makeProfileImageUrl(profile)}
         />
-        {!isProfileComplete(profile) ? (
+        {SETTINGS.profile_ui_enabled && !isProfileComplete(profile) ? (
           <div className="profile-incomplete" />
         ) : null}
         {showUserMenu ? (

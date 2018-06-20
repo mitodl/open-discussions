@@ -70,12 +70,22 @@ describe("UserMenu", () => {
       }
     })
   })
-
-  it("should include a red dot if profile is incomplete", () => {
-    SETTINGS.profile_ui_enabled = true
-    sandbox.stub(utilFuncs, "isProfileComplete").returns(false)
-    const wrapper = renderUserMenu()
-    assert.isOk(wrapper.find(".profile-incomplete").exists())
+  ;[
+    [true, true, false],
+    [true, false, true],
+    [false, true, false],
+    [false, false, false]
+  ].forEach(([featureFlagEnabled, complete, shouldShowDot]) => {
+    it(`should ${
+      shouldShowDot ? "" : "not "
+    }include a red dot since the feature flag
+     is ${featureFlagEnabled ? "enabled" : "disabled"} and the profile is
+      ${complete ? "complete" : "incomplete"}`, () => {
+      SETTINGS.profile_ui_enabled = featureFlagEnabled
+      sandbox.stub(utilFuncs, "isProfileComplete").returns(complete)
+      const wrapper = renderUserMenu()
+      assert.equal(wrapper.find(".profile-incomplete").exists(), shouldShowDot)
+    })
   })
 
   it("should not include a red dot if profile is complete", () => {
