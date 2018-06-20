@@ -1,5 +1,6 @@
 .channel-about {
   position: relative;
+  max-width: 400px;
 
   @include breakpoint(desktop) {
     &:first-child {
