@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.32.1
+--------------
+
+- Fix a layout bug on the channel page
+- Add models to store id information for posts, channels and comments (#742)
+- Refactored Elasticsearch serializers to use DRF post/comment serializers
+
 Version 0.32.0
 --------------
 
