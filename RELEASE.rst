@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.32.2
+--------------
+
+- Use feature flag to determine whether to show profile incompleteness red dot (#838)
+- Delete indices one by one to avoid use of _all (#829)
+
 Version 0.32.1
 --------------
 
