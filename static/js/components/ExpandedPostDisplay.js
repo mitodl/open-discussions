@@ -14,6 +14,7 @@ import { editPostKey } from "../components/CommentForms"
 
 import type { Post } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
+import ProfileImage from "../containers/ProfileImage"
 
 export default class ExpandedPostDisplay extends React.Component<*, void> {
   props: {
@@ -152,7 +153,13 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     return (
       <div className="post-summary expanded">
         <div className="summary">
-          <img className="profile-image" src={post.profile_image} />
+          <ProfileImage
+            profile={{
+              name:        post.author_name,
+              image_small: post.profile_image
+            }}
+            useSmall={true}
+          />
           <div className="post-title">{formatPostTitle(post)}</div>
           <div className="authored-by">
             by <span className="author-name">{post.author_name}</span>,{" "}
