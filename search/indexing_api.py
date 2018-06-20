@@ -279,7 +279,9 @@ def create_backing_index():
     temp_alias = get_reindexing_alias_name()
     if conn.indices.exists_alias(name=temp_alias):
         # Deletes both alias and backing indexes
-        conn.indices.delete_alias(index="_all", name=temp_alias)
+        indices = conn.indices.get_alias(temp_alias).keys()
+        for index in indices:
+            conn.indices.delete_alias(index=index, name=temp_alias)
 
     # Point temp_alias toward new backing index
     conn.indices.put_alias(index=new_backing_index, name=temp_alias)
