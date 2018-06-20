@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.32.2
+--------------
+
+- Delete indices one by one to avoid use of _all (#829)
+
 Version 0.32.1
 --------------
 
