@@ -8,6 +8,7 @@ import type {
 } from "../flow/discussionTypes"
 
 export const CHANNEL_TYPE_PUBLIC = "public"
+export const CHANNEL_TYPE_RESTRICTED = "restricted"
 export const CHANNEL_TYPE_PRIVATE = "private"
 
 export const newChannelForm = (): ChannelForm => ({

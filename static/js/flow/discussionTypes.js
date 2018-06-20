@@ -18,11 +18,10 @@ export type ChannelForm = {
   channel_type:       ChannelType,
 }
 
-export type ChannelEditValidation = {
+export type ChannelAppearanceEditValidation = {
   title:              string,
   description:        string,
   public_description: string,
-  channel_type:       string,
 }
 
 export type AuthoredContent = {

@@ -6,10 +6,10 @@ import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
 import { FORM_BEGIN_EDIT, FORM_END_EDIT } from "../../actions/forms"
 import { formatTitle } from "../../lib/title"
-import { editChannelURL, channelURL } from "../../lib/url"
+import { editChannelAppearanceURL, channelURL } from "../../lib/url"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 
-describe("EditChannelPage", () => {
+describe("EditChannelAppearancePage", () => {
   let helper, renderComponent, channel, listenForActions
 
   beforeEach(() => {
@@ -51,14 +51,17 @@ describe("EditChannelPage", () => {
   const submit = wrapper => wrapper.find(".save-changes").simulate("submit")
 
   const renderPage = async () => {
-    const [wrapper] = await renderComponent(editChannelURL(channel.name), [
-      actions.subscribedChannels.get.requestType,
-      actions.subscribedChannels.get.successType,
-      actions.channels.get.requestType,
-      actions.channels.get.successType,
-      SET_CHANNEL_DATA,
-      FORM_BEGIN_EDIT
-    ])
+    const [wrapper] = await renderComponent(
+      editChannelAppearanceURL(channel.name),
+      [
+        actions.subscribedChannels.get.requestType,
+        actions.subscribedChannels.get.successType,
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
+        SET_CHANNEL_DATA,
+        FORM_BEGIN_EDIT
+      ]
+    )
     return wrapper.update()
   }
 
@@ -98,9 +101,9 @@ describe("EditChannelPage", () => {
     assert.equal(helper.currentLocation.pathname, channelURL(channel.name))
   })
 
-  it("cancel and navigate to previous page", async () => {
+  it("navigates to the channel page", async () => {
     const wrapper = await renderPage()
     wrapper.find(".cancel").simulate("click")
-    assert.equal(helper.currentLocation.pathname, "/")
+    assert.equal(helper.currentLocation.pathname, channelURL(channel.name))
   })
 })

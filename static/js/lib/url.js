@@ -7,8 +7,11 @@ export const channelURL = (channelName: string) => `/channel/${channelName}`
 export const channelModerationURL = (channelName: string) =>
   `/moderation/channel/${channelName}`
 
-export const editChannelURL = (channelName: string) =>
-  `/manage/channel/edit/${channelName}/`
+export const editChannelBasicURL = (channelName: string) =>
+  `/manage/channel/edit/basic/${channelName}/`
+
+export const editChannelAppearanceURL = (channelName: string) =>
+  `/manage/channel/edit/appearance/${channelName}/`
 
 export const postDetailURL = (channelName: string, postID: string) =>
   `/channel/${channelName}/${postID}`
