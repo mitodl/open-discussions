@@ -34,3 +34,12 @@ def assert_not_raises():
         raise
     except Exception:  # pylint: disable=broad-except
         pytest.fail(f'An exception was not raised: {traceback.format_exc()}')
+
+
+class MockResponse:
+    """
+    Mock requests.Response
+    """
+    def __init__(self, content, status_code):
+        self.content = content
+        self.status_code = status_code

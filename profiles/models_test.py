@@ -2,6 +2,9 @@
 import pytest
 from django.core.files.uploadedfile import UploadedFile
 
+from open_discussions.factories import UserFactory
+from open_discussions.test_utils import MockResponse
+from profiles.models import Profile, IMAGE_SMALL_MAX_DIMENSION, IMAGE_MEDIUM_MAX_DIMENSION
 
 pytestmark = pytest.mark.django_db
 
@@ -37,3 +40,56 @@ def test_null_image(user):
     assert not profile.image_file
     assert not profile.image_medium_file
     assert not profile.image_small_file
+
+
+def test_save_with_gravatar_image(mocker):
+    """
+    An empty image should be replaced with a gravatar URL if found
+    """
+    new_user = UserFactory(email='testuser@example.com')
+    new_user.profile.delete()
+    base_img_url = 'https://www.gravatar.com/avatar/7ec7606c46a14a7ef514d1f1f9038823.jpg'
+    mocker.patch('profiles.models.requests.get', return_value=MockResponse("", 200))
+    profile = Profile(user=new_user, image=None, image_file=None)
+    profile.save()
+    assert profile.image == base_img_url
+    assert profile.image_small == '{}?s={}'.format(base_img_url, IMAGE_SMALL_MAX_DIMENSION)
+    assert profile.image_medium == '{}?s={}'.format(base_img_url, IMAGE_MEDIUM_MAX_DIMENSION)
+
+
+def test_save_no_gravatar(mocker):
+    """
+    An empty image should not be replaced with a gravatar URL if the URL request returns a 404
+    """
+    new_user = UserFactory(email='testuser@example.com')
+    new_user.profile.delete()
+    mocker.patch('profiles.models.requests.get', return_value=MockResponse("", 404))
+    profile = Profile(user=new_user, image=None, image_file=None)
+    profile.save()
+    assert profile.image is None
+    assert profile.image_small is None
+    assert profile.image_medium is None
+
+
+def test_existing_image_not_replaced(mocker):
+    """
+    A non-empty image URL should not be replaced with a gravatar URL
+    """
+    new_user = UserFactory(email='testuser@example.com')
+    new_user.profile.delete()
+    original_url = 'https://example.cloudront.com/0.jpg'
+    mocker.patch('profiles.models.requests.get', return_value=MockResponse("", 200))
+    profile = Profile(user=new_user, image=original_url)
+    profile.save()
+    assert profile.image == original_url
+
+
+def test_no_gravatar_for_updated_profile(mocker, user):
+    """
+    An empty image URL should not be replaced with a gravatar URL if the profile is not new.
+    """
+    mocker.patch('profiles.models.requests.get', return_value=MockResponse("", 200))
+    profile = user.profile
+    profile.image = None
+    profile.save()
+    assert profile.image is None

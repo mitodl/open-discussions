@@ -1,7 +1,7 @@
 """Tests for test utils"""
 import pytest
 
-from open_discussions.test_utils import any_instance_of, assert_not_raises
+from open_discussions.test_utils import any_instance_of, assert_not_raises, MockResponse
 
 
 def test_any_instance_of():
@@ -37,3 +37,11 @@ def test_assert_not_raises_failure():
     with pytest.raises(AssertionError):
         with assert_not_raises():
             assert 1 == 2
+
+
+def test_mock_response():
+    """ assert MockResponse returns correct values """
+    content = 'test'
+    response = MockResponse(content, 404)
+    assert response.status_code == 404
+    assert response.content == content

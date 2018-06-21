@@ -7,6 +7,7 @@ import ProfileImage from "./ProfileImage"
 import { actions } from "../actions"
 import { initials } from "../lib/profile"
 import { formatTitle } from "../lib/title"
+import { defaultProfileImageUrl } from "../lib/util"
 
 describe("ProfilePage", function() {
   let helper, renderComponent, profile
@@ -77,6 +78,19 @@ describe("ProfilePage", function() {
         .at(0)
         .text(),
       initials(profile.name)
+    )
+  })
+
+  it("should include a ProfileImage and default image when no profile name exists", async () => {
+    profile.name = ""
+    const wrapper = await renderPage()
+    assert.equal(
+      wrapper
+        .find(ProfileImage)
+        .find("img")
+        .at(1)
+        .props().src,
+      defaultProfileImageUrl
     )
   })
 

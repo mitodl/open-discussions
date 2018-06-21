@@ -14,11 +14,6 @@ from open_discussions.utils import now_in_utc
 
 # This is the Django ImageField max path size
 IMAGE_PATH_MAX_LENGTH = 100
-
-# Max dimension of either height or width for small and medium images
-IMAGE_SMALL_MAX_DIMENSION = 64
-IMAGE_MEDIUM_MAX_DIMENSION = 128
-
 IMAGE_PATH_PREFIX = 'profile'
 
 default_profile_image = urljoin(settings.STATIC_URL, "images/avatar_default.png")

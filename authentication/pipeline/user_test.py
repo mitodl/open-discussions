@@ -179,6 +179,7 @@ def test_validate_require_password_and_profile_via_email_exit(mocker, backend_na
 @pytest.mark.django_db
 def test_validate_require_password_and_profile_via_email(mocker):
     """Tests that require_password_and_profile_via_email processes the request"""
+    mocker.patch('profiles.models.requests.get')
     user = UserFactory(profile=None)
     mock_strategy = mocker.Mock()
     mock_strategy.request_data.return_value = {
@@ -239,6 +240,7 @@ def test_validate_require_password_and_profile_via_email_password_set(mocker):
 def test_validate_require_profile_update_user_via_saml(mocker, backend_name, is_new):
     """Tests that require_profile_update_user_via_saml returns {} if not using the saml backend"""
     user = UserFactory(first_name='Jane', last_name='Doe', profile=None)
+    mocker.patch('profiles.models.requests.get')
     mock_strategy = mocker.Mock()
     mock_backend = mocker.Mock()
     mock_backend.name = backend_name
