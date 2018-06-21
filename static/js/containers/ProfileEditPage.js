@@ -20,6 +20,7 @@ import { Redirect } from "react-router"
 import { validateProfileForm } from "../lib/validation"
 import { any404Error, anyErrorExcept404 } from "../util/rest"
 import withLoading from "../components/Loading"
+import withSingleColumn from "../hoc/withSingleColumn"
 
 type ProfileEditPageProps = {
   dispatch: Dispatch,
@@ -163,5 +164,6 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
+  withSingleColumn("profile-page"),
   withLoading
 )(ProfileEditPage)

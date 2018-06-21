@@ -16,6 +16,7 @@ import ProfileImage from "./ProfileImage"
 import { any404Error, anyErrorExcept404 } from "../util/rest"
 import { clearPostError } from "../actions/post"
 import withLoading from "../components/Loading"
+import withSingleColumn from "../hoc/withSingleColumn"
 
 type ProfilePageProps = {
   dispatch: Dispatch,
@@ -98,7 +99,9 @@ class ProfilePage extends React.Component<*, void> {
                 </div>
                 {userName === SETTINGS.username ? (
                   <div className="row profile-edit-button">
-                    <button onClick={this.onClick}>Edit Your Profile</button>
+                    <button type="submit" onClick={this.onClick}>
+                      Edit Your Profile
+                    </button>
                   </div>
                 ) : null}
               </div>
@@ -128,5 +131,6 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
+  withSingleColumn("profile-view-page"),
   withLoading
 )(ProfilePage)

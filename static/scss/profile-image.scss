@@ -2,19 +2,19 @@
   border-radius: 100%;
   background-color: #579cf9;
   color: #fff;
-  width: 45px;
-  height: 45px;
+  max-width: 45px;
+  max-height: 45px;
 }
 
 .small {
-  width: 45px;
-  height: 45px;
+  max-width: 45px;
+  max-height: 45px;
   font-size: 16px;
 }
 
 .medium {
-  width: 109px;
-  height: 109px;
+  max-width: 109px;
+  max-height: 109px;
   font-size: 36px;
 }
 
@@ -27,7 +27,6 @@
   left: 34px;
   top: 3px;
 }
-
 
 .profile-image-container {
   display: flex;
@@ -68,10 +67,6 @@
     margin-bottom: auto;
     cursor: pointer;
   }
-}
-
-.rounded-profile-image {
-  margin-left: 15px;
 }
 
 .img-error {
