@@ -15,6 +15,7 @@ import CreatePostPage from "./CreatePostPage"
 import ChannelModerationPage from "./ChannelModerationPage"
 import SettingsPage from "./SettingsPage"
 import ProfilePage from "./ProfilePage"
+import ProfileEditPage from "./ProfileEditPage"
 import Snackbar from "../components/material/Snackbar"
 import Drawer from "../containers/Drawer"
 import Toolbar from "../components/Toolbar"
@@ -182,7 +183,12 @@ class App extends React.Component<*, void> {
           />
           <Route
             exact
-            path={`${match.url}profile/:userName/`}
+            path={`${match.url}profile/:userName/edit`}
+            component={ProfileEditPage}
+          />
+          <Route
+            exact
+            path={`${match.url}profile/:userName`}
             component={ProfilePage}
           />
           <Footer />

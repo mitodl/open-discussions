@@ -1,12 +1,21 @@
 .profile-image {
-  width: 45px;
-  height: 45px;
   border-radius: 100%;
+  background-color: #579cf9;
+  color: #fff;
+  max-width: 45px;
+  max-height: 45px;
+}
+
+.small {
+  max-width: 45px;
+  max-height: 45px;
+  font-size: 16px;
 }
 
 .medium {
-  width: 109px;
-  height: 109px;
+  max-width: 109px;
+  max-height: 109px;
+  font-size: 36px;
 }
 
 .profile-incomplete {
@@ -15,12 +24,14 @@
   background-color: red;
   border-radius: 50%;
   position: relative;
-  left: 42px;
-  top: -46px;
+  left: 34px;
+  top: 3px;
 }
 
-.profile-image-edit {
+.profile-image-container {
   display: flex;
+  float: left;
+  padding: 0px 15px 15px 0px;
 
   .avatar {
     position: relative;
@@ -56,10 +67,6 @@
     margin-bottom: auto;
     cursor: pointer;
   }
-}
-
-.rounded-profile-image {
-  margin-left: 15px;
 }
 
 .img-error {
@@ -118,5 +125,11 @@
     border: none;
     border-radius: 0;
   }
+}
+
+.profile-initials {
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
 }
 

@@ -24,7 +24,8 @@ import type {
   CommentFromAPI,
   MoreCommentsFromAPI,
   GenericReport,
-  ReportRecord
+  ReportRecord,
+  ProfilePayload
 } from "../flow/discussionTypes"
 import type { NotificationSetting } from "../flow/settingsTypes"
 import type { EmbedlyResponse } from "../reducers/embedly"
@@ -271,4 +272,14 @@ export function patchProfileImage(
 
 export function getProfile(username: string): Promise<Profile> {
   return fetchJSONWithAuthFailure(`/api/v0/profiles/${username}/`)
+}
+
+export function updateProfile(
+  username: string,
+  payload: ProfilePayload
+): Promise<Profile> {
+  return fetchJSONWithAuthFailure(`/api/v0/profiles/${username}/`, {
+    method: PATCH,
+    body:   JSON.stringify(payload)
+  })
 }

@@ -27,6 +27,7 @@ import type {
 import type { FormsState } from "../flow/formTypes"
 import type { CommentRemoveFunc } from "./CommentRemovalForm"
 import type { CommentVoteFunc } from "./CommentVoteForm"
+import ProfileImage from "../containers/ProfileImage"
 
 type LoadMoreCommentsFunc = (comment: MoreCommentsInTree) => Promise<*>
 type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
@@ -108,7 +109,13 @@ export default class CommentTree extends React.Component<*, *> {
         className={`comment ${comment.removed ? "removed" : ""}`}
         key={`comment-${comment.id}`}
       >
-        <img className="profile-image" src={comment.profile_image} />
+        <ProfileImage
+          profile={{
+            name:        comment.author_name,
+            image_small: comment.profile_image
+          }}
+          useSmall={true}
+        />
         <div className="comment-contents">
           <div className="author-info">
             <span className="author-name">{comment.author_name}</span>
