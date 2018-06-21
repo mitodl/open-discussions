@@ -16,6 +16,10 @@ export const postDetailURL = (channelName: string, postID: string) =>
 export const newPostURL = (channelName: ?string) =>
   channelName ? `/create_post/${channelName}` : "/create_post/"
 
+export const profileURL = (username: string) => `/profile/${username}/`
+
+export const editProfileURL = (username: string) => `/profile/${username}/edit`
+
 export const commentPermalink = R.curry(
   (channelName: string, postID: string, commentID: string) =>
     `${postDetailURL(channelName, postID)}/comment/${commentID}/`

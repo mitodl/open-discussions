@@ -31,7 +31,8 @@ import {
   patchCommentSetting,
   getEmbedly,
   getProfile,
-  patchProfileImage
+  patchProfileImage,
+  updateProfile
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -360,6 +361,20 @@ describe("api", function() {
         const result = await getProfile(username)
         assert.ok(fetchJSONStub.calledWith(`/api/v0/profiles/${username}/`))
         assert.deepEqual(result, profile)
+      })
+
+      it("updates a profile", async () => {
+        const profile = makeProfile()
+        profile.headline = "updated!"
+        fetchJSONStub.returns(Promise.resolve(profile))
+        await updateProfile(profile.username, profile)
+        assert.ok(
+          fetchJSONStub.calledWith(`/api/v0/profiles/${profile.username}/`)
+        )
+        assert.deepEqual(fetchJSONStub.args[0][1], {
+          method: PATCH,
+          body:   JSON.stringify(profile)
+        })
       })
     })
 

@@ -13,6 +13,7 @@ import {
 import { userIsAnonymous } from "../lib/util"
 
 import type { Post } from "../flow/discussionTypes"
+import ProfileImage from "../containers/ProfileImage"
 
 class CompactPostDisplay extends React.Component<*, void> {
   props: {
@@ -55,7 +56,10 @@ class CompactPostDisplay extends React.Component<*, void> {
         className={`post-summary ${post.stickied && showPinUI ? "sticky" : ""}`}
       >
         <PostVotingButtons post={post} toggleUpvote={toggleUpvote} />
-        <img className="profile-image" src={post.profile_image} />
+        <ProfileImage
+          profile={{ name: post.author_name, image_small: post.profile_image }}
+          useSmall={true}
+        />
         <div className="summary">
           <div className="post-title">{formatPostTitle(post)}</div>
           <div className="authored-by">

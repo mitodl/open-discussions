@@ -2,15 +2,18 @@
 import casual from "casual-browserify"
 import type { Profile } from "../flow/discussionTypes"
 
-export const makeProfile = (username: string = casual.word): Profile => ({
+export const makeProfile = (
+  username: string = casual.word,
+  image: string = ""
+): Profile => ({
   name:              casual.word,
   username:          username,
-  image:             null,
-  image_small:       null,
-  image_medium:      null,
-  image_file:        null,
-  image_small_file:  null,
-  image_medium_file: null,
+  image:             image,
+  image_small:       image,
+  image_medium:      image,
+  image_file:        image,
+  image_small_file:  image,
+  image_medium_file: image,
   bio:               casual.word,
   headline:          casual.word
 })

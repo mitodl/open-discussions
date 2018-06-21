@@ -2,7 +2,7 @@
 import * as api from "../lib/api"
 import { GET, PATCH, INITIAL_STATE } from "redux-hammock/constants"
 
-import type { Profile } from "../flow/discussionTypes"
+import type { Profile, ProfilePayload } from "../flow/discussionTypes"
 
 const updateProfileHandler = (
   payload: Profile,
@@ -18,5 +18,8 @@ export const profilesEndpoint = {
   verbs:             [GET, PATCH],
   initialState:      { ...INITIAL_STATE, data: new Map() },
   getFunc:           (username: string) => api.getProfile(username),
-  getSuccessHandler: updateProfileHandler
+  getSuccessHandler: updateProfileHandler,
+  patchFunc:         (username: string, payload: ProfilePayload) =>
+    api.updateProfile(username, payload),
+  patchSuccessHandler: updateProfileHandler
 }
