@@ -24,4 +24,18 @@
     flex-direction: row;
     justify-content: flex-end;
   }
+
+  .post-types {
+    display: flex;
+    flex-direction: column;
+
+    .mdc-form-field {
+      display: flex;
+      align-items: center;
+
+      label {
+        margin: 0;
+      }
+    }
+  }
 }

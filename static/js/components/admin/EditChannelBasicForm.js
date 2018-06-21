@@ -1,5 +1,6 @@
 // @flow
 import React from "react"
+import Checkbox from "rmwc/Checkbox"
 
 import Card from "../Card"
 
@@ -7,12 +8,16 @@ import { channelURL } from "../../lib/url"
 import {
   CHANNEL_TYPE_PUBLIC,
   CHANNEL_TYPE_RESTRICTED,
-  CHANNEL_TYPE_PRIVATE
+  CHANNEL_TYPE_PRIVATE,
+  LINK_TYPE_LINK,
+  LINK_TYPE_TEXT,
+  isLinkTypeChecked
 } from "../../lib/channels"
+import { validationMessage } from "../../lib/validation"
 
 import type {
   ChannelForm,
-  ChannelAppearanceEditValidation
+  ChannelBasicEditValidation
 } from "../../flow/discussionTypes"
 
 const makeChannelTypeOption = (
@@ -39,12 +44,19 @@ export default class EditChannelBasicForm extends React.Component<*, void> {
     onUpdate: Function,
     form: ChannelForm,
     history: Object,
-    validation: ChannelAppearanceEditValidation,
+    validation: ChannelBasicEditValidation,
     processing: boolean
   }
 
   render() {
-    const { onSubmit, onUpdate, form, processing, history } = this.props
+    const {
+      onSubmit,
+      onUpdate,
+      form,
+      processing,
+      validation,
+      history
+    } = this.props
     return (
       <form onSubmit={onSubmit} className="form channel-form">
         <Card title="Type">
@@ -66,6 +78,27 @@ export default class EditChannelBasicForm extends React.Component<*, void> {
             form,
             onUpdate
           )}
+        </Card>
+        <Card title="Allowed post types">
+          <div className="post-types">
+            <Checkbox
+              name="link_type"
+              value={LINK_TYPE_TEXT}
+              checked={isLinkTypeChecked(form.link_type, LINK_TYPE_TEXT)}
+              onChange={onUpdate}
+            >
+              Short text posts
+            </Checkbox>
+            <Checkbox
+              name="link_type"
+              value={LINK_TYPE_LINK}
+              checked={isLinkTypeChecked(form.link_type, LINK_TYPE_LINK)}
+              onChange={onUpdate}
+            >
+              Links to external sites
+            </Checkbox>
+          </div>
+          <div className="row">{validationMessage(validation.link_type)}</div>
         </Card>
         <div className="row actions">
           <button

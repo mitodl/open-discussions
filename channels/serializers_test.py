@@ -33,6 +33,7 @@ def test_serialize_channel(user):
         subreddit_type='public',
         description='description',
         public_description='public_description',
+        submission_type='link',
     )
     request = Mock(user=user)
     assert ChannelSerializer(channel, context={
@@ -41,6 +42,7 @@ def test_serialize_channel(user):
         'name': 'name',
         'title': 'title',
         'channel_type': 'public',
+        'link_type': 'link',
         'description': 'description',
         'public_description': 'public_description',
         'user_is_moderator': True,
@@ -56,6 +58,7 @@ def test_create_channel(user):
         'display_name': 'name',
         'title': 'title',
         'subreddit_type': 'public',
+        'submission_type': 'self',
         'description': 'description',
         'public_description': 'public_description',
     }
@@ -71,6 +74,7 @@ def test_create_channel(user):
         channel_type=validated_data['subreddit_type'],
         description=validated_data['description'],
         public_description=validated_data['public_description'],
+        link_type=validated_data['submission_type'],
     )
     assert channel == api_mock.create_channel.return_value
 
@@ -85,6 +89,7 @@ def test_update_channel(user, is_empty):
         'subreddit_type': 'public',
         'description': 'description',
         'public_description': 'public_description',
+        'submission_type': 'text',
     }
     display_name = 'subreddit'
     instance = Mock(display_name=display_name)
@@ -100,6 +105,7 @@ def test_update_channel(user, is_empty):
         "channel_type": validated_data['subreddit_type'],
         "description": validated_data['description'],
         "public_description": validated_data['public_description'],
+        "link_type": validated_data['submission_type'],
     }
     api_mock.update_channel.assert_called_once_with(
         name=display_name,

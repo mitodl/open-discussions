@@ -5,6 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from channels.factories import STRATEGY_BUILD
+from channels.constants import LINK_TYPE_ANY
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
@@ -28,6 +29,7 @@ def test_list_channels(client, jwt_header, private_channel_and_contributor, requ
             'channel_type': channel.channel_type,
             'user_is_contributor': True,
             'user_is_moderator': False,
+            'link_type': channel.link_type,
         }
     ]
 
@@ -60,6 +62,7 @@ def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
         'title': channel.title,
         'description': channel.description,
         'public_description': channel.public_description,
+        'link_type': channel.link_type,
     }
     resp = client.post(url, data=payload, **staff_jwt_header)
     expected = {
@@ -79,6 +82,7 @@ def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, re
     channel = reddit_factories.channel("private", user=staff_user, strategy=STRATEGY_BUILD)
     payload = {
         'channel_type': channel.channel_type,
+        'link_type': 'any',
         'name': channel.name,
         'title': channel.title,
     }
@@ -106,6 +110,7 @@ def test_create_channel_already_exists(client, staff_jwt_header, private_channel
         'title': 'Channel title',
         'description': 'a description of the channel',
         'public_description': 'public',
+        'link_type': private_channel.link_type,
     }
     resp = client.post(url, data=payload, **staff_jwt_header)
     assert resp.status_code == status.HTTP_409_CONFLICT
@@ -122,6 +127,7 @@ def test_create_channel_nonstaff(client, jwt_header):
         'title': 'Channel title',
         'description': 'a description of the channel',
         'public_description': 'public',
+        'link_type': LINK_TYPE_ANY,
     }
     resp = client.post(url, data=payload, **jwt_header)
     assert resp.status_code == status.HTTP_403_FORBIDDEN
@@ -159,6 +165,7 @@ def test_get_channel(client, jwt_header, private_channel_and_contributor):
         'public_description': channel.public_description,
         'user_is_contributor': True,
         'user_is_moderator': False,
+        'link_type': channel.link_type,
     }
 
 
@@ -180,6 +187,7 @@ def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous
             'public_description': public_channel.public_description,
             'user_is_contributor': False,
             'user_is_moderator': False,
+            'link_type': public_channel.link_type,
         }
     else:
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
@@ -225,6 +233,7 @@ def test_patch_channel(client, staff_jwt_header, private_channel):
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'channel_type': 'public',
+        'link_type': private_channel.link_type,
         'name': private_channel.name,
         'title': private_channel.title,
         'description': private_channel.description,
@@ -253,6 +262,7 @@ def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_
         'public_description': private_channel.public_description,
         'user_is_contributor': True,
         'user_is_moderator': True,
+        'link_type': private_channel.link_type,
     }
 
 

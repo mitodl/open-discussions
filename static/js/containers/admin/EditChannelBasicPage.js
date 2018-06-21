@@ -9,11 +9,11 @@ import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
 import withSingleColumn from "../../hoc/withSingleColumn"
 
 import { actions } from "../../actions"
-import { editChannelForm } from "../../lib/channels"
+import { editChannelForm, updateLinkType } from "../../lib/channels"
 import { channelURL } from "../../lib/url"
 import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
-import { validateChannelEditForm } from "../../lib/validation"
+import { validateChannelBasicEditForm } from "../../lib/validation"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
@@ -73,12 +73,19 @@ class EditChannelBasicPage extends React.Component<*, void> {
   }
 
   onUpdate = (e: Object) => {
-    const { dispatch } = this.props
+    const { dispatch, channelForm } = this.props
+    const linkType = updateLinkType(
+      channelForm.value.link_type,
+      e.target.value,
+      e.target.checked
+    )
+
     dispatch(
       actions.forms.formUpdate(
         R.merge(EDIT_CHANNEL_PAYLOAD, {
           value: {
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.value,
+            link_type:       linkType
           }
         })
       )
@@ -90,7 +97,7 @@ class EditChannelBasicPage extends React.Component<*, void> {
 
     e.preventDefault()
 
-    const validation = validateChannelEditForm(channelForm)
+    const validation = validateChannelBasicEditForm(channelForm)
 
     if (!channelForm || !R.isEmpty(validation)) {
       dispatch(

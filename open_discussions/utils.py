@@ -126,11 +126,25 @@ def _merge_strings(list_or_str, list_to_return):
         list_to_return.append(list_or_str)
 
 
-def filter_dict_keys(orig_dict, keys_to_keep):
-    """Returns a copy of a dictionary without any keys that don't exist in a given set"""
-    return {key: orig_dict[key] for key in keys_to_keep}
+def filter_dict_keys(orig_dict, keys_to_keep, *, optional=False):
+    """
+    Returns a copy of a dictionary filtered by a collection of keys to keep
+
+    Args:
+        orig_dict (dict): A dictionary
+        keys_to_keep (iterable): Keys to filter on
+        optional (bool): If True, ignore keys that don't exist in the dict. If False, raise a KeyError.
+    """
+    return {key: orig_dict[key] for key in keys_to_keep if not optional or key in orig_dict}
 
 
-def filter_dict_with_renamed_keys(orig_dict, key_rename_dict):
-    """Returns a copy of a dictionary with keys renamed according to a provided dictionary"""
-    return {new_key: orig_dict[key] for key, new_key in key_rename_dict.items()}
+def filter_dict_with_renamed_keys(orig_dict, key_rename_dict, *, optional=False):
+    """
+    Returns a copy of a dictionary with keys renamed according to a provided dictionary
+
+    Args:
+        orig_dict (dict): A dictionary
+        key_rename_dict (dict): Mapping of old key to new key
+        optional (bool): If True, ignore keys that don't exist in the dict. If False, raise a KeyError.
+    """
+    return {new_key: orig_dict[key] for key, new_key in key_rename_dict.items() if not optional or key in orig_dict}

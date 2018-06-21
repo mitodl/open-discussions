@@ -1,5 +1,6 @@
 // @flow
-export type ChannelType = "private" | "public";
+export type ChannelType = "private" | "restricted" | "public";
+export type LinkType = "link" | "text" | "any";
 
 export type Channel = {
   name:                string,
@@ -10,6 +11,7 @@ export type Channel = {
   num_users:           number,
   user_is_contributor: boolean,
   user_is_moderator:   boolean,
+  link_type:          LinkType,
 }
 
 export type ChannelForm = {
@@ -18,12 +20,17 @@ export type ChannelForm = {
   description:        string,
   public_description: string,
   channel_type:       ChannelType,
+  link_type:          LinkType,
 }
 
 export type ChannelAppearanceEditValidation = {
   title:              string,
   description:        string,
   public_description: string,
+}
+
+export type ChannelBasicEditValidation = {
+  link_type: string,
 }
 
 export type AuthoredContent = {

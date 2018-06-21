@@ -7,7 +7,7 @@ import {
   validation,
   validate,
   validatePostCreateForm,
-  validateChannelEditForm,
+  validateChannelAppearanceEditForm,
   validateContentReportForm
 } from "./validation"
 
@@ -148,13 +148,13 @@ describe("validation library", () => {
           description: "a".repeat(5121)
         }
       }
-      assert.deepEqual(validateChannelEditForm(channel), {
+      assert.deepEqual(validateChannelAppearanceEditForm(channel), {
         value: {
           description: "Description length is limited to 5120 characters"
         }
       })
       channel.value.description = "a".repeat(5120)
-      assert.deepEqual(validateChannelEditForm(channel), {})
+      assert.deepEqual(validateChannelAppearanceEditForm(channel), {})
     })
   })
 

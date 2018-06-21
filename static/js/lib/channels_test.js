@@ -8,7 +8,12 @@ import {
   newChannelForm,
   editChannelForm,
   isModerator,
-  userCanPost
+  userCanPost,
+  LINK_TYPE_ANY,
+  LINK_TYPE_TEXT,
+  LINK_TYPE_LINK,
+  updateLinkType,
+  isLinkTypeChecked
 } from "./channels"
 import { makeModerators, makeChannel } from "../factories/channels"
 
@@ -19,7 +24,8 @@ describe("Channel utils", () => {
       name:               "",
       description:        "",
       public_description: "",
-      channel_type:       CHANNEL_TYPE_PUBLIC
+      channel_type:       CHANNEL_TYPE_PUBLIC,
+      link_type:          LINK_TYPE_ANY
     })
   })
 
@@ -31,7 +37,8 @@ describe("Channel utils", () => {
       name:               channel.name,
       description:        channel.description,
       public_description: channel.public_description,
-      channel_type:       channel.channel_type
+      channel_type:       channel.channel_type,
+      link_type:          channel.link_type
     })
   })
 
@@ -67,6 +74,50 @@ describe("Channel utils", () => {
         }
         assert.equal(userCanPost(channel), expected)
       })
+    })
+  })
+
+  describe("updateLinkType", () => {
+    [
+      // If one checkbox is already checked and the other is now checked we have ANY to represent both.
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, true, LINK_TYPE_ANY],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, true, LINK_TYPE_ANY],
+      // If none is previously checked and a value is checked, the expected value is that value.
+      ["", LINK_TYPE_TEXT, true, LINK_TYPE_TEXT],
+      ["", LINK_TYPE_LINK, true, LINK_TYPE_LINK],
+      // If both checkboxes are checked and one is unchecked, the value is the other one which is still checked.
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, false, LINK_TYPE_LINK],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, false, LINK_TYPE_TEXT],
+      // If only one checkbox is checked and it's unchecked, use an empty string to represent nothing checked.
+      // This case is invalid, it's only used to allow the user to have both unchecked at once. It should
+      // fail validation on submit.
+      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, false, ""],
+      [LINK_TYPE_LINK, LINK_TYPE_LINK, false, ""]
+    ].forEach(([oldLinkType, value, checked, expected]) => {
+      it(`has the right value when clicking a ${
+        checked ? "checked" : "unchecked"
+      } checkbox
+       with value ${value} and the previous link type is ${oldLinkType}`, () => {
+        assert.equal(updateLinkType(oldLinkType, value, checked), expected)
+      })
+    })
+  })
+
+  describe("isLinkTypeChecked", () => {
+    [
+      // If the link value is ANY all checkboxes are checked
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, true],
+      // The value should be checked if it matches the link value
+      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, false],
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, false],
+      [LINK_TYPE_LINK, LINK_TYPE_LINK, true],
+      // An empty string means no link value is checked
+      ["", LINK_TYPE_TEXT, false],
+      ["", LINK_TYPE_LINK, false]
+    ].forEach(([linkType, value, expected]) => {
+      assert.equal(isLinkTypeChecked(linkType, value), expected)
     })
   })
 })

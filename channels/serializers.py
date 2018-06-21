@@ -13,8 +13,12 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from channels.utils import get_kind_mapping
-from channels.constants import VALID_CHANNEL_TYPES
+from channels.constants import (
+    VALID_CHANNEL_TYPES,
+    VALID_LINK_TYPES,
+)
 from channels.models import Subscription
+from open_discussions.utils import filter_dict_with_renamed_keys
 from profiles.utils import image_uri
 
 User = get_user_model()
@@ -30,6 +34,12 @@ class ChannelSerializer(serializers.Serializer):
     channel_type = serializers.ChoiceField(
         source="subreddit_type",
         choices=VALID_CHANNEL_TYPES,
+    )
+    link_type = serializers.ChoiceField(
+        required=False,
+        allow_blank=True,
+        source="submission_type",
+        choices=VALID_LINK_TYPES,
     )
     user_is_contributor = serializers.SerializerMethodField()
     user_is_moderator = serializers.SerializerMethodField()
@@ -50,26 +60,34 @@ class ChannelSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         api = self.context['channel_api']
-        return api.create_channel(
-            name=validated_data['display_name'],
-            title=validated_data['title'],
-            channel_type=validated_data['subreddit_type'],
-            description=validated_data.get('description', ''),
-            public_description=validated_data.get('public_description', ''),
-        )
+
+        # This is to reduce number of cassettes which need replacing
+        validated_data['description'] = validated_data.get('description', '')
+        validated_data['public_description'] = validated_data.get('public_description', '')
+
+        lookup = {
+            'display_name': 'name',
+            'title': 'title',
+            'subreddit_type': 'channel_type',
+            'description': 'description',
+            'public_description': 'public_description',
+            'submission_type': 'link_type',
+        }
+        kwargs = filter_dict_with_renamed_keys(validated_data, lookup, optional=True)
+
+        return api.create_channel(**kwargs)
 
     def update(self, instance, validated_data):
         api = self.context['channel_api']
         name = instance.display_name
-        kwargs = {}
-        if 'title' in validated_data:
-            kwargs['title'] = validated_data['title']
-        if 'subreddit_type' in validated_data:
-            kwargs['channel_type'] = validated_data['subreddit_type']
-        if 'description' in validated_data:
-            kwargs['description'] = validated_data['description']
-        if 'public_description' in validated_data:
-            kwargs['public_description'] = validated_data['public_description']
+        lookup = {
+            'title': 'title',
+            'subreddit_type': 'channel_type',
+            'submission_type': 'link_type',
+            'description': 'description',
+            'public_description': 'public_description',
+        }
+        kwargs = filter_dict_with_renamed_keys(validated_data, lookup, optional=True)
 
         return api.update_channel(name=name, **kwargs)
 

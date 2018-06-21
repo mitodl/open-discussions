@@ -13,7 +13,7 @@ import { editChannelForm } from "../../lib/channels"
 import { channelURL } from "../../lib/url"
 import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
-import { validateChannelEditForm } from "../../lib/validation"
+import { validateChannelAppearanceEditForm } from "../../lib/validation"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
@@ -90,7 +90,7 @@ class EditChannelAppearancePage extends React.Component<*, void> {
 
     e.preventDefault()
 
-    const validation = validateChannelEditForm(channelForm)
+    const validation = validateChannelAppearanceEditForm(channelForm)
 
     if (!channelForm || !R.isEmpty(validation)) {
       dispatch(

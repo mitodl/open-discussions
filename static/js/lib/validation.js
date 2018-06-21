@@ -78,7 +78,7 @@ export const validateProfileForm = validate([
   validation(emptyOrNil, R.lensPath(["value", "name"]), "Name is required")
 ])
 
-export const validateChannelEditForm = validate([
+export const validateChannelAppearanceEditForm = validate([
   validation(
     R.compose(
       R.gt(R.__, 5120),
@@ -86,6 +86,14 @@ export const validateChannelEditForm = validate([
     ),
     R.lensPath(["value", "description"]),
     "Description length is limited to 5120 characters"
+  )
+])
+
+export const validateChannelBasicEditForm = validate([
+  validation(
+    R.isEmpty,
+    R.lensPath(["value", "link_type"]),
+    "One of the post type options must be selected"
   )
 ])
 
