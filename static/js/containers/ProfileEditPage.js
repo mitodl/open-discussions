@@ -164,6 +164,6 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
-  withSingleColumn("profile-page"),
+  withSingleColumn("profile-edit-page"),
   withLoading
 )(ProfileEditPage)
