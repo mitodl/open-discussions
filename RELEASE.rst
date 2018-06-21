@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.33.0
+--------------
+
+- fix profile url (#849)
+- View/edit profile (#828)
+- Add autouse fixture to prevent requests from executing during tests (#822)
+
 Version 0.32.2
 --------------
 
