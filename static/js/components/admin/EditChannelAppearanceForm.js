@@ -48,7 +48,6 @@ export default class EditChannelAppearanceForm extends React.Component<
             />
             {validationMessage(validation.description)}
           </div>
-
           <div className="row actions">
             <button
               className="cancel"
