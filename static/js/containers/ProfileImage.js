@@ -51,9 +51,7 @@ class ProfileImage extends React.Component<*> {
       userName
     } = this.props
 
-    await dispatch(
-      updateProfilePhoto(userName, edit, formatPhotoName(photo))
-    )
+    await dispatch(updateProfilePhoto(userName, edit, formatPhotoName(photo)))
 
     clearPhotoEdit()
     this.setDialogVisibility(false)
