@@ -2,19 +2,21 @@
   border-radius: 100%;
   background-color: #579cf9;
   color: #fff;
-  max-width: 45px;
-  max-height: 45px;
+  width: 45px;
+  height: 45px;
+  display: block;
+  overflow: hidden;
 }
 
 .small {
-  max-width: 45px;
-  max-height: 45px;
+  width: 45px;
+  height: 45px;
   font-size: 16px;
 }
 
 .medium {
-  max-width: 109px;
-  max-height: 109px;
+  width: 109px;
+  height: 109px;
   font-size: 36px;
 }
 

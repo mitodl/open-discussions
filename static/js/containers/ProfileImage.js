@@ -77,19 +77,21 @@ class ProfileImage extends React.Component<*> {
     return (
       <div className="profile-image-container">
         <div className="avatar" onClick={onClick}>
-          {imageUrl === defaultProfileImageUrl && profile ? (
-            <div className={`profile-image ${imageSizeClass}`}>
-              <div className={`profile-initials ${imageSizeClass}`}>
-                {initials(profile.name)}
+          {imageUrl.endsWith(defaultProfileImageUrl) &&
+          profile &&
+          profile.name ? (
+              <div className={`profile-image ${imageSizeClass}`}>
+                <div className={`profile-initials ${imageSizeClass}`}>
+                  {initials(profile.name)}
+                </div>
               </div>
-            </div>
-          ) : (
-            <img
-              src={imageUrl}
-              alt={`Profile image for ${profile ? profile.name : "anonymous"}`}
-              className={`profile-image ${imageSizeClass}`}
-            />
-          )}
+            ) : (
+              <img
+                src={imageUrl}
+                alt={`Profile image for ${profile ? profile.name : "anonymous"}`}
+                className={`profile-image ${imageSizeClass}`}
+              />
+            )}
           {editable ? (
             <span>
               <ProfileImageUploader
