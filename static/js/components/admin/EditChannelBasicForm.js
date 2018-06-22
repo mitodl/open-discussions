@@ -15,6 +15,24 @@ import type {
   ChannelAppearanceEditValidation
 } from "../../flow/discussionTypes"
 
+const makeChannelTypeOption = (
+  value: string,
+  text: string,
+  form: ChannelForm,
+  onUpdate: Function
+) => (
+  <label>
+    <input
+      type="radio"
+      name="channel_type"
+      value={value}
+      checked={form.channel_type === value}
+      onChange={onUpdate}
+    />{" "}
+    {text}
+  </label>
+)
+
 export default class EditChannelBasicForm extends React.Component<*, void> {
   props: {
     onSubmit: Function,
@@ -30,36 +48,24 @@ export default class EditChannelBasicForm extends React.Component<*, void> {
     return (
       <form onSubmit={onSubmit} className="form channel-form">
         <Card title="Type">
-          <label>
-            <input
-              type="radio"
-              name="channel_type"
-              value={CHANNEL_TYPE_PUBLIC}
-              checked={form.channel_type === CHANNEL_TYPE_PUBLIC}
-              onChange={onUpdate}
-            />{" "}
-            Public (everybody can see & create posts)
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="channel_type"
-              value={CHANNEL_TYPE_RESTRICTED}
-              checked={form.channel_type === CHANNEL_TYPE_RESTRICTED}
-              onChange={onUpdate}
-            />{" "}
-            Restricted (everybody can see & only you can create posts)
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="channel_type"
-              value={CHANNEL_TYPE_PRIVATE}
-              checked={form.channel_type === CHANNEL_TYPE_PRIVATE}
-              onChange={onUpdate}
-            />{" "}
-            Private (only invited members can see & create posts)
-          </label>
+          {makeChannelTypeOption(
+            CHANNEL_TYPE_PUBLIC,
+            "Public (everybody can see & create posts)",
+            form,
+            onUpdate
+          )}
+          {makeChannelTypeOption(
+            CHANNEL_TYPE_RESTRICTED,
+            "Restricted (everybody can see & only you can create posts)",
+            form,
+            onUpdate
+          )}
+          {makeChannelTypeOption(
+            CHANNEL_TYPE_PRIVATE,
+            "Private (only invited members can see & create posts)",
+            form,
+            onUpdate
+          )}
         </Card>
         <div className="row actions">
           <button
