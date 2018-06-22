@@ -27,7 +27,7 @@ const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
 
 class EditChannelBasicPage extends React.Component<*, void> {
   props: {
-    dispatch: Dispatch,
+    dispatch: Dispatch<*>,
     history: Object,
     channel: Channel,
     channelForm: FormValue,

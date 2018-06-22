@@ -80,7 +80,7 @@ import type {
 
 type PostPageProps = {
   match: Match,
-  dispatch: Dispatch,
+  dispatch: Dispatch<any>,
   post: Post,
   channel: Channel,
   moderators: ChannelModerators,

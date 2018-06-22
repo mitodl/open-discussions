@@ -83,7 +83,7 @@ type ImageUploadProps = {
   startPhotoEdit: (p: File) => void,
   clearPhotoEdit: () => void,
   imageUpload: ImageUploadState,
-  updateUserPhoto: (i: string) => Promise<string>,
+  updateUserPhoto: (i?: string) => Promise<any>,
   updatePhotoEdit: (b: Blob) => void,
   setPhotoError: (s: string) => void
 }

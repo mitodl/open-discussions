@@ -2,7 +2,6 @@
 /* global SETTINGS: false */
 import React from "react"
 import { connect } from "react-redux"
-import type { Dispatch } from "redux"
 
 import { defaultProfileImageUrl, makeProfileImageUrl } from "../lib/util"
 import type { Profile } from "../flow/discussionTypes"
@@ -20,12 +19,14 @@ import { actions } from "../actions"
 import { updateProfilePhoto } from "../reducers/image_upload"
 import { initials } from "../lib/profile"
 
+import type { Dispatch } from "redux"
+
 const formatPhotoName = photo => `${photo.name.replace(/\.\w*$/, "")}.jpg`
 
 class ProfileImage extends React.Component<*> {
   props: {
     clearPhotoEdit: () => void,
-    dispatch: Dispatch,
+    dispatch: Dispatch<any>,
     editable: boolean,
     imageUpload: Object,
     photoDialogOpen: boolean,
@@ -42,7 +43,7 @@ class ProfileImage extends React.Component<*> {
     editable: false
   }
 
-  saveProfilePhoto = () => {
+  saveProfilePhoto = async () => {
     const {
       imageUpload: { edit, photo },
       dispatch,
@@ -50,13 +51,13 @@ class ProfileImage extends React.Component<*> {
       userName
     } = this.props
 
-    return dispatch(
+    await dispatch(
       updateProfilePhoto(userName, edit, formatPhotoName(photo))
-    ).then(() => {
-      clearPhotoEdit()
-      this.setDialogVisibility(false)
-      dispatch(actions.profiles.get(userName))
-    })
+    )
+
+    clearPhotoEdit()
+    this.setDialogVisibility(false)
+    dispatch(actions.profiles.get(userName))
   }
 
   setDialogVisibility = (visibility: boolean) => {

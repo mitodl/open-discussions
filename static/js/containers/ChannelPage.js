@@ -40,7 +40,7 @@ import type { Channel, Post, PostListPagination } from "../flow/discussionTypes"
 type ChannelPageProps = {
   match: Match,
   location: Location,
-  dispatch: Dispatch,
+  dispatch: Dispatch<any>,
   channelName: string,
   channel: ?Channel,
   postsForChannel: ?Array<string>,

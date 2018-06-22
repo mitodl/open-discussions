@@ -13,7 +13,7 @@ import type { FormsState } from "../flow/formTypes"
 import type { Dispatch } from "redux"
 
 type CommentFormProps = {
-  dispatch: Dispatch,
+  dispatch: Dispatch<*>,
   forms: FormsState,
   post: Post,
   initialValue: CommentForm,

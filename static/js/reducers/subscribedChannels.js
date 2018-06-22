@@ -9,6 +9,6 @@ export const subscribedChannelsEndpoint = {
   verbs:             [GET],
   initialState:      { ...INITIAL_STATE, data: [] },
   getFunc:           () => api.getChannels(),
-  getSuccessHandler: (payload: Array<Channel>) =>
+  getSuccessHandler: (payload: Array<Channel>): any =>
     payload.map(channel => channel.name)
 }

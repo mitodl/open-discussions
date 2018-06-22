@@ -1,4 +1,3 @@
-// @flow
 import React from "react"
 import R from "ramda"
 import { Provider } from "react-redux"
