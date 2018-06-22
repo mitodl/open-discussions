@@ -1,6 +1,8 @@
 // @flow
 import React from "react"
 
+import Card from "../Card"
+
 import { channelURL } from "../../lib/url"
 import {
   CHANNEL_TYPE_PUBLIC,
@@ -8,7 +10,6 @@ import {
   CHANNEL_TYPE_PRIVATE
 } from "../../lib/channels"
 
-import Card from "../Card"
 import type {
   ChannelForm,
   ChannelAppearanceEditValidation
@@ -60,7 +61,6 @@ export default class EditChannelBasicForm extends React.Component<*, void> {
             Private (only invited members can see & create posts)
           </label>
         </Card>
-
         <div className="row actions">
           <button
             className="cancel"
