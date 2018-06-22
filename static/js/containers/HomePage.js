@@ -35,7 +35,7 @@ const shouldLoadData = R.complement(R.eqBy(R.path(["location", "search"])))
 class HomePage extends React.Component<*, void> {
   props: {
     location: Location,
-    dispatch: Dispatch<*>,
+    dispatch: Dispatch<any>,
     posts: Array<Post>,
     subscribedChannels: RestState<Array<string>>,
     channels: RestState<Map<string, Channel>>,
@@ -54,15 +54,14 @@ class HomePage extends React.Component<*, void> {
     }
   }
 
-  loadData = () => {
+  loadData = async () => {
     const {
       dispatch,
       location: { search }
     } = this.props
 
-    dispatch(actions.frontpage.get(qs.parse(search))).then(response => {
-      dispatch(setPostData(response.posts))
-    })
+    const response = await dispatch(actions.frontpage.get(qs.parse(search)))
+    dispatch(setPostData(response.posts))
   }
 
   render() {

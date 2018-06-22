@@ -22,7 +22,7 @@ import type { Match } from "react-router"
 
 type CreatePostPageProps = {
   match: Match,
-  dispatch: Dispatch,
+  dispatch: Dispatch<*>,
   postForm: ?FormValue,
   channel: Channel,
   channels: RestState<Map<string, Channel>>,

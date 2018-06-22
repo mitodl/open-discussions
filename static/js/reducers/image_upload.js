@@ -16,11 +16,12 @@ import {
   FETCH_PROCESSING,
   FETCH_SUCCESS
 } from "../actions/image_upload"
-import type { Action } from "../flow/reduxTypes"
 import { patchProfileImage } from "../lib/api"
-import { Dispatch } from "redux"
 
-export type Dispatcher<T> = (d: Dispatch) => Promise<T>
+import type { Action } from "../flow/reduxTypes"
+import type { Dispatch } from "redux"
+
+export type Dispatcher<T> = (d: Dispatch<*>) => Promise<T>
 
 export const INITIAL_IMAGE_UPLOAD_STATE = {
   edit:        null,
@@ -77,7 +78,7 @@ export function updateProfilePhoto(
   image: Blob,
   name: string
 ): Dispatcher<string | void> {
-  return (dispatch: Dispatch) => {
+  return (dispatch: Dispatch<*>) => {
     dispatch(requestPatchPhoto(username))
     return patchProfileImage(username, image, name).then(
       () => {

@@ -163,6 +163,7 @@ declare class express$Router extends express$Route {
   ): void;
 
   // Can't use regular callable signature syntax due to https://github.com/facebook/flow/issues/3084
+  // $FlowFixMe: no workaround yet
   $call: (req: http$IncomingMessage, res: http$ServerResponse, next?: ?express$NextFunction) => void;
 }
 

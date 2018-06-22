@@ -23,7 +23,7 @@ import withLoading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 
 type ProfileEditPageProps = {
-  dispatch: Dispatch,
+  dispatch: Dispatch<*>,
   history: Object,
   profileForm: FormValue,
   processing: boolean,

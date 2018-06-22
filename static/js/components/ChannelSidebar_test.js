@@ -9,7 +9,7 @@ import ChannelSidebar from "./ChannelSidebar"
 import { Markdown } from "./Markdown"
 
 import { makeChannel } from "../factories/channels"
-import { editChannelURL, channelModerationURL } from "../lib/url"
+import { editChannelBasicURL, channelModerationURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -42,7 +42,7 @@ describe("ChannelSidebar", () => {
         .find(".edit-button")
         .find(Link)
         .props().to,
-      editChannelURL(channel.name)
+      editChannelBasicURL(channel.name)
     )
   })
 

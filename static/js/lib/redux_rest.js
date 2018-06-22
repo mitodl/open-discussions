@@ -13,6 +13,8 @@ import { settingsEndpoint } from "../reducers/settings"
 import { embedlyEndpoint } from "../reducers/embedly"
 import { profilesEndpoint } from "../reducers/profiles"
 
+import type { Dispatch } from "redux"
+
 export const endpoints = [
   postsEndpoint,
   subscribedChannelsEndpoint,
@@ -35,7 +37,7 @@ export const endpoints = [
  * dispatches the action created by that actionCreator to the store
  */
 export function createActionHelper(
-  dispatch: Dispatch,
+  dispatch: Dispatch<*>,
   actionCreator: Function
 ): (...args: any) => void {
   return (...args) => dispatch(actionCreator(...args))

@@ -3,7 +3,8 @@ import React from "react"
 import { Route } from "react-router-dom"
 
 import CreateChannelPage from "./CreateChannelPage"
-import EditChannelPage from "./EditChannelPage"
+import EditChannelAppearancePage from "./EditChannelAppearancePage"
+import EditChannelBasicPage from "./EditChannelBasicPage"
 
 import type { Match } from "react-router"
 
@@ -15,16 +16,20 @@ export default class AdminPage extends React.Component<*, void> {
   render() {
     const { match } = this.props
     return (
-      <div>
+      <React.Fragment>
         <Route
           path={`${match.url}/channel/new`}
           component={CreateChannelPage}
         />
         <Route
-          path={`${match.url}/channel/edit/:channelName`}
-          component={EditChannelPage}
+          path={`${match.url}/channel/edit/:channelName/basic`}
+          component={EditChannelBasicPage}
         />
-      </div>
+        <Route
+          path={`${match.url}/channel/edit/:channelName/appearance`}
+          component={EditChannelAppearancePage}
+        />
+      </React.Fragment>
     )
   }
 }

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import Card from "./Card"
 import { Markdown } from "./Markdown"
 
-import { editChannelURL, channelModerationURL } from "../lib/url"
+import { editChannelBasicURL, channelModerationURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -23,7 +23,7 @@ const ChannelSidebar = ({ channel, isModerator }: ChannelSidebarProps) => {
       <Card title="About this channel" className="channel-about">
         {isModerator ? (
           <div className="edit-button">
-            <Link to={editChannelURL(channel.name)}>
+            <Link to={editChannelBasicURL(channel.name)}>
               <i className="material-icons edit">edit</i>
             </Link>
           </div>

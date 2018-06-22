@@ -20,7 +20,7 @@ const getForm = R.prop(CREATE_CHANNEL_KEY)
 
 class CreateChannelPage extends React.Component<*, void> {
   props: {
-    dispatch: Dispatch,
+    dispatch: Dispatch<*>,
     history: Object,
     channelForm: FormValue
   }

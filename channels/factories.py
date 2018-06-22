@@ -16,10 +16,7 @@ from factory.fuzzy import FuzzyChoice
 from open_discussions.factories import UserFactory
 from open_discussions.utils import now_in_utc
 from channels import api
-from channels.constants import (
-    CHANNEL_TYPE_PUBLIC,
-    CHANNEL_TYPE_PRIVATE,
-)
+from channels.constants import VALID_CHANNEL_TYPES
 from channels.models import (
     RedditAccessToken,
     RedditRefreshToken,
@@ -401,7 +398,7 @@ class ChannelFactory(factory.Factory):
     title = factory.Faker('text', max_nb_chars=50)
     description = factory.Faker('text', max_nb_chars=500)
     public_description = factory.Faker('text', max_nb_chars=100)
-    channel_type = FuzzyChoice([CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_PRIVATE])
+    channel_type = FuzzyChoice(VALID_CHANNEL_TYPES)
 
     @factory.lazy_attribute
     def name(self):

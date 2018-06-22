@@ -19,7 +19,7 @@ import withLoading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 
 type ProfilePageProps = {
-  dispatch: Dispatch,
+  dispatch: Dispatch<*>,
   profile: Profile,
   userName: string,
   history: Object,

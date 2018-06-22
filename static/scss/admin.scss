@@ -1,12 +1,27 @@
-.channel-form {
-  margin-top: 18px;
+.edit-channel {
+  .channel-form {
+    margin-top: 18px;
 
-  .description {
-    width: 800px;
-    max-width: 100%;
-
-    textarea {
-      height: 250px;
+    .description {
+      textarea {
+        height: 250px;
+      }
     }
+  }
+
+  .edit-channel-navbar {
+    a {
+      margin-right: 25px;
+
+      &.active {
+        font-weight: 700;
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
   }
 }

@@ -43,7 +43,7 @@ class App extends React.Component<*, void> {
     showDrawerDesktop: boolean,
     showDrawerMobile: boolean,
     snackbar: SnackbarState,
-    dispatch: Dispatch,
+    dispatch: Dispatch<*>,
     showUserMenu: boolean,
     profile: Profile
   }

@@ -4,29 +4,30 @@ import R from "ramda"
 import { connect } from "react-redux"
 import DocumentTitle from "react-document-title"
 
-import Card from "../../components/Card"
-import EditChannelForm from "../../components/admin/EditChannelForm"
+import EditChannelAppearanceForm from "../../components/admin/EditChannelAppearanceForm"
+import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
+
 import { actions } from "../../actions"
 import { editChannelForm } from "../../lib/channels"
 import { channelURL } from "../../lib/url"
 import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
 import { validateChannelEditForm } from "../../lib/validation"
-import { ChannelBreadcrumbs } from "../../components/ChannelBreadcrumbs"
+import withSingleColumn from "../../hoc/withSingleColumn"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
 import type { Channel } from "../../flow/discussionTypes"
 
-const EDIT_CHANNEL_KEY = "channel:edit"
+const EDIT_CHANNEL_KEY = "channel:edit:appearance"
 const EDIT_CHANNEL_PAYLOAD = { formKey: EDIT_CHANNEL_KEY }
 const getForm = R.prop(EDIT_CHANNEL_KEY)
 
 const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
 
-class EditChannelPage extends React.Component<*, void> {
+class EditChannelAppearancePage extends React.Component<*, void> {
   props: {
-    dispatch: Dispatch,
+    dispatch: Dispatch<*>,
     history: Object,
     channel: Channel,
     channelForm: FormValue,
@@ -113,22 +114,18 @@ class EditChannelPage extends React.Component<*, void> {
     }
 
     return (
-      <div className="content">
+      <React.Fragment>
         <DocumentTitle title={formatTitle("Edit Channel")} />
-        <div className="main-content">
-          <ChannelBreadcrumbs channel={channel} />
-          <Card title="Edit Channel">
-            <EditChannelForm
-              onSubmit={this.onSubmit}
-              onUpdate={this.onUpdate}
-              form={channelForm.value}
-              history={history}
-              validation={channelForm.errors}
-              processing={processing}
-            />
-          </Card>
-        </div>
-      </div>
+        <EditChannelNavbar channelName={channel.name} />
+        <EditChannelAppearanceForm
+          onSubmit={this.onSubmit}
+          onUpdate={this.onUpdate}
+          form={channelForm.value}
+          history={history}
+          validation={channelForm.errors}
+          processing={processing}
+        />
+      </React.Fragment>
     )
   }
 }
@@ -145,4 +142,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps)(EditChannelPage)
+export default R.compose(
+  connect(mapStateToProps),
+  withSingleColumn("edit-channel")
+)(EditChannelAppearancePage)
