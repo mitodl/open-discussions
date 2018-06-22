@@ -16,7 +16,7 @@ export default class AdminPage extends React.Component<*, void> {
   render() {
     const { match } = this.props
     return (
-      <div>
+      <React.Fragment>
         <Route
           path={`${match.url}/channel/new`}
           component={CreateChannelPage}
@@ -29,7 +29,7 @@ export default class AdminPage extends React.Component<*, void> {
           path={`${match.url}/channel/edit/:channelName/appearance`}
           component={EditChannelAppearancePage}
         />
-      </div>
+      </React.Fragment>
     )
   }
 }

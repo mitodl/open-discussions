@@ -5,13 +5,15 @@ import { connect } from "react-redux"
 import DocumentTitle from "react-document-title"
 
 import EditChannelBasicForm from "../../components/admin/EditChannelBasicForm"
+import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
+
 import { actions } from "../../actions"
 import { editChannelForm } from "../../lib/channels"
 import { channelURL } from "../../lib/url"
 import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
 import { validateChannelEditForm } from "../../lib/validation"
-import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
+import withSingleColumn from "../../hoc/withSingleColumn"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
@@ -112,20 +114,18 @@ class EditChannelBasicPage extends React.Component<*, void> {
     }
 
     return (
-      <div className="edit-channel">
+      <React.Fragment>
         <DocumentTitle title={formatTitle("Edit Channel")} />
-        <div className="main-content">
-          <EditChannelNavbar channelName={channel.name} />
-          <EditChannelBasicForm
-            onSubmit={this.onSubmit}
-            onUpdate={this.onUpdate}
-            form={channelForm.value}
-            history={history}
-            validation={channelForm.errors}
-            processing={processing}
-          />
-        </div>
-      </div>
+        <EditChannelNavbar channelName={channel.name} />
+        <EditChannelBasicForm
+          onSubmit={this.onSubmit}
+          onUpdate={this.onUpdate}
+          form={channelForm.value}
+          history={history}
+          validation={channelForm.errors}
+          processing={processing}
+        />
+      </React.Fragment>
     )
   }
 }
@@ -142,4 +142,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps)(EditChannelBasicPage)
+export default R.compose(
+  connect(mapStateToProps),
+  withSingleColumn("edit-channel")
+)(EditChannelBasicPage)

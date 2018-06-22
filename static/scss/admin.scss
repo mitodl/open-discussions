@@ -1,13 +1,8 @@
 .edit-channel {
-  min-width: 600px;
-
   .channel-form {
     margin-top: 18px;
 
     .description {
-      width: 800px;
-      max-width: 100%;
-
       textarea {
         height: 250px;
       }
@@ -15,8 +10,6 @@
   }
 
   .edit-channel-navbar {
-    margin-bottom: 20px;
-
     a {
       margin-right: 25px;
 
