@@ -22,11 +22,11 @@ export default class AdminPage extends React.Component<*, void> {
           component={CreateChannelPage}
         />
         <Route
-          path={`${match.url}/channel/edit/basic/:channelName`}
+          path={`${match.url}/channel/edit/:channelName/basic`}
           component={EditChannelBasicPage}
         />
         <Route
-          path={`${match.url}/channel/edit/appearance/:channelName`}
+          path={`${match.url}/channel/edit/:channelName/appearance`}
           component={EditChannelAppearancePage}
         />
       </div>
