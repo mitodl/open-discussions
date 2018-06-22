@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.33.0
+--------------
+
+- Use gravatar for new profiles without images (#848)
+- Added and updated APIs to support DRF-based social auth
+- Pin dockerfile pytohn version to 3.6.4
+- fix profile url (#849)
+- View/edit profile (#828)
+- Add autouse fixture to prevent requests from executing during tests (#822)
+
 Version 0.32.2
 --------------
 
