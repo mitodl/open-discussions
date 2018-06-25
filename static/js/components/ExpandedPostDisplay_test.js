@@ -5,22 +5,27 @@ import { mount } from "enzyme"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import R from "ramda"
+import moment from "moment"
 
 import ExpandedPostDisplay from "./ExpandedPostDisplay"
 import Router from "../Router"
 import Embedly from "./Embedly"
+import ProfileImage from "../containers/ProfileImage"
+import SharePopup from "./SharePopup"
 
 import { wait } from "../lib/util"
-import { urlHostname } from "../lib/url"
+import { urlHostname, postPermalink } from "../lib/url"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
 import { editPostKey } from "../components/CommentForms"
 import * as utilFuncs from "../lib/util"
+import { makeChannel } from "../factories/channels"
 
 describe("ExpandedPostDisplay", () => {
   let helper,
     post,
+    channel,
     beginEditingStub,
     approvePostStub,
     removePostStub,
@@ -28,7 +33,7 @@ describe("ExpandedPostDisplay", () => {
     showPostReportDialogStub,
     toggleFollowPostStub
 
-  const renderPostDisplay = props => {
+  const renderPostDisplay = (props = {}) => {
     props = {
       toggleUpvote: () => {},
       beginEditing: R.curry((key, post, e) => {
@@ -39,7 +44,10 @@ describe("ExpandedPostDisplay", () => {
       showPostDeleteDialog: showPostDeleteDialogStub,
       showPostReportDialog: showPostReportDialogStub,
       toggleFollowPost:     toggleFollowPostStub,
+      postDropdownMenuOpen: true,
       forms:                {},
+      channel,
+      post,
       ...props
     }
     return mount(
@@ -52,6 +60,7 @@ describe("ExpandedPostDisplay", () => {
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     post = makePost()
+    channel = makeChannel()
     beginEditingStub = helper.sandbox.stub()
     approvePostStub = helper.sandbox.stub()
     removePostStub = helper.sandbox.stub()
@@ -66,7 +75,7 @@ describe("ExpandedPostDisplay", () => {
 
   it("should render a post correctly", () => {
     post.edited = false
-    const wrapper = renderPostDisplay({ post })
+    const wrapper = renderPostDisplay()
     const summary = wrapper.find(".summary")
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
     assert.equal(
@@ -76,20 +85,24 @@ describe("ExpandedPostDisplay", () => {
         .props().children,
       post.title
     )
-    const authoredBy = wrapper.find(".authored-by").text()
-    assert(authoredBy.startsWith(`by ${post.author_name}`))
-    assert.isNotEmpty(authoredBy.substring(post.author_name.length))
+    const authoredBy = wrapper.find(".authored-by")
+    assert.ok(authoredBy.find(ProfileImage).exists())
+    assert.equal(authoredBy.find(".author-name").text(), post.author_name)
+    assert.equal(
+      authoredBy.find(".right").text(),
+      moment(post.created).fromNow()
+    )
   })
 
   it("should hide text content if passed showPermalinkUI", () => {
-    const wrapper = renderPostDisplay({ post, showPermalinkUI: true })
+    const wrapper = renderPostDisplay({ showPermalinkUI: true })
     assert.isFalse(wrapper.find(ReactMarkdown).exists())
   })
 
   it("should show an embedly component, if a link post", () => {
     [true, false].forEach(isLinkPost => {
       post = makePost(isLinkPost)
-      const wrapper = renderPostDisplay({ post })
+      const wrapper = renderPostDisplay()
       assert.equal(isLinkPost, wrapper.find(Embedly).exists())
     })
   })
@@ -98,27 +111,21 @@ describe("ExpandedPostDisplay", () => {
     const string = "JUST SOME GREAT TEXT!"
     post.text = string
     post.edited = false
-    const wrapper = renderPostDisplay({ post: post })
+    const wrapper = renderPostDisplay()
     assert.equal(wrapper.find(ReactMarkdown).props().source, string)
-  })
-
-  it("should display profile image", () => {
-    const wrapper = renderPostDisplay({ post: post })
-    const { src } = wrapper.find(".summary img").props()
-    assert.equal(src, post.profile_image)
   })
 
   it("should not display images from markdown", () => {
     post.edited = false
     post.text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
-    const wrapper = renderPostDisplay({ post: post })
+    const wrapper = renderPostDisplay()
     assert.equal(wrapper.find(ReactMarkdown).props().source, post.text)
     assert.lengthOf(wrapper.find(ReactMarkdown).find("img"), 0)
   })
 
   it("should include an external link, if a url post", () => {
-    const post = makePost(true)
-    const wrapper = renderPostDisplay({ post: post })
+    post = makePost(true)
+    const wrapper = renderPostDisplay()
     const { href, target, children } = wrapper
       .find("a")
       .at(0)
@@ -129,13 +136,13 @@ describe("ExpandedPostDisplay", () => {
   })
 
   it("should display the domain, for a url post", () => {
-    const post = makePost(true)
-    const wrapper = renderPostDisplay({ post })
+    post = makePost(true)
+    const wrapper = renderPostDisplay()
     assert.include(wrapper.find(".url-hostname").text(), urlHostname(post.url))
   })
 
   it("should link to the detail view, if a text post", () => {
-    const wrapper = renderPostDisplay({ post })
+    const wrapper = renderPostDisplay()
     const { to, children } = wrapper
       .find(Link)
       .at(0)
@@ -161,14 +168,16 @@ describe("ExpandedPostDisplay", () => {
   })
 
   //
-  ;[[true, "unfollow"], [false, "follow"]].forEach(
+  ;[[true, "Unfollow"], [false, "Follow"]].forEach(
     ([subscribed, buttonText]) => {
       it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
-        const post = makePost()
+        post = makePost()
         post.subscribed = subscribed
-        const wrapper = renderPostDisplay({ post })
-        const button = wrapper.find(".subscribe-post")
-        assert.equal(button.text(), buttonText)
+        const wrapper = renderPostDisplay()
+        const button = wrapper.find(
+          subscribed ? ".subscribed" : ".unsubscribed"
+        )
+        assert.include(button.text(), buttonText)
         button.simulate("click")
         assert.ok(toggleFollowPostStub.called)
       })
@@ -177,34 +186,38 @@ describe("ExpandedPostDisplay", () => {
 
   it("should show a delete button if authored by the user", () => {
     [true, false].forEach(userAuthor => {
-      const post = makePost()
+      post = makePost()
       if (userAuthor) {
         SETTINGS.username = post.author_id
       }
-      const wrapper = renderPostDisplay({ post })
+      const wrapper = renderPostDisplay()
       assert.equal(wrapper.find(".delete-post").exists(), userAuthor)
     })
   })
 
   it("should call showPostDeleteDialog when user clicks 'delete'", () => {
-    const post = makePost()
     SETTINGS.username = post.author_id
-    const wrapper = renderPostDisplay({ post })
-    wrapper.find(".delete-post").simulate("click")
+    const wrapper = renderPostDisplay()
+    wrapper
+      .find(".delete-post")
+      .find("a")
+      .simulate("click")
     assert.ok(showPostDeleteDialogStub.called)
   })
 
   it("should call showPostReportDialog when user clicks 'report'", () => {
-    const post = makePost()
-    const wrapper = renderPostDisplay({ post })
-    wrapper.find(".report-post").simulate("click")
+    const wrapper = renderPostDisplay()
+    wrapper
+      .find(".report-post")
+      .find("a")
+      .simulate("click")
     assert.ok(showPostReportDialogStub.called)
   })
 
   it('should call beginEditing when user clicks "edit"', () => {
-    const post = makePost(false)
+    post = makePost(false)
     SETTINGS.username = post.author_id
-    const wrapper = renderPostDisplay({ post })
+    const wrapper = renderPostDisplay()
     wrapper
       .find(".edit-post")
       .at(0)
@@ -213,23 +226,21 @@ describe("ExpandedPostDisplay", () => {
   })
 
   it("should hide the report link for anonymous users", () => {
-    const post = makePost()
     helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-    const wrapper = renderPostDisplay({ post })
+    const wrapper = renderPostDisplay()
     assert.isNotOk(wrapper.find(".comment-action-button.report-post").exists())
   })
 
   it("should hide the follow link for anonymous users", () => {
-    const post = makePost()
     helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-    const wrapper = renderPostDisplay({ post })
+    const wrapper = renderPostDisplay()
     assert.isNotOk(
       wrapper.find(".comment-action-button.subscribe-post").exists()
     )
   })
 
   it("should hide post action buttons when editing", () => {
-    const post = makePost(false)
+    post = makePost(false)
     helper.store.dispatch(
       actions.forms.formBeginEdit({
         formKey: editPostKey(post),
@@ -237,7 +248,6 @@ describe("ExpandedPostDisplay", () => {
       })
     )
     const wrapper = renderPostDisplay({
-      post,
       forms: helper.store.getState().forms
     })
     assert.lengthOf(wrapper.find(".post-actions"), 0)
@@ -295,7 +305,7 @@ describe("ExpandedPostDisplay", () => {
     [[true, false], [true, true], [false, false], [false, true]].forEach(
       ([isModerator, removed]) => {
         post.removed = removed
-        const wrapper = renderPostDisplay({ post, isModerator })
+        const wrapper = renderPostDisplay({ isModerator })
         assert.equal(
           wrapper.find(".approve-post").exists(),
           isModerator && removed
@@ -310,21 +320,27 @@ describe("ExpandedPostDisplay", () => {
 
   it('should call approvePost when user clicks "approve"', () => {
     post.removed = true
-    const wrapper = renderPostDisplay({ post, isModerator: true })
-    wrapper.find(".approve-post").simulate("click")
+    const wrapper = renderPostDisplay({ isModerator: true })
+    wrapper
+      .find(".approve-post")
+      .find("a")
+      .simulate("click")
     assert.ok(approvePostStub.called)
   })
 
   it('should call removePost when user clicks "remove"', () => {
     post.removed = false
-    const wrapper = renderPostDisplay({ post, isModerator: true })
-    wrapper.find(".remove-post").simulate("click")
+    const wrapper = renderPostDisplay({ isModerator: true })
+    wrapper
+      .find(".remove-post")
+      .find("a")
+      .simulate("click")
     assert.ok(removePostStub.called)
   })
 
   it("should display a report count, if num_reports has a value", () => {
     post.num_reports = 2
-    const wrapper = renderPostDisplay({ post })
+    const wrapper = renderPostDisplay()
     const count = wrapper.find(".report-count")
     assert.ok(count.exists())
     // $FlowFixMe: thinks this doesn't exist
@@ -332,8 +348,24 @@ describe("ExpandedPostDisplay", () => {
   })
 
   it("should not render a report count, if post has no report data", () => {
-    const wrapper = renderPostDisplay({ post })
+    const wrapper = renderPostDisplay()
     const count = wrapper.find(".report-count")
     assert.isNotOk(count.exists())
+  })
+
+  it("should render a sharepopup", () => {
+    const wrapper = renderPostDisplay({ postShareMenuOpen: true }).find(
+      SharePopup
+    )
+    assert.ok(wrapper.exists())
+    assert.equal(wrapper.props().url, postPermalink(post))
+  })
+
+  it("should pass down hideSocialButtons to SharePopup if private channel", () => {
+    channel.channel_type = "private"
+    const popup = renderPostDisplay({ postShareMenuOpen: true }).find(
+      SharePopup
+    )
+    assert.isTrue(popup.props().hideSocialButtons)
   })
 })

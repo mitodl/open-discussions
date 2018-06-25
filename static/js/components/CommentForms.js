@@ -26,7 +26,8 @@ type CommentFormProps = {
   processing: boolean,
   patchComment: (c: Object) => void,
   patchPost: (p: Object) => void,
-  comment: CommentInTree
+  comment: CommentInTree,
+  editing: boolean
 }
 
 export const replyToCommentKey = (comment: CommentInTree) =>
@@ -144,7 +145,7 @@ export const beginEditing = R.curry((dispatch, formKey, initialValue, e) => {
   )
 })
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = (dispatch: any, ownProps: CommentFormProps) => {
   const formKey = ownProps.editing
     ? getEditFormKeyFromOwnProps(ownProps)
     : getFormKeyFromOwnProps(ownProps)
@@ -206,7 +207,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 }
 
-export const ReplyToCommentForm = connect(
+export const ReplyToCommentForm: Class<React$Component<*, *>> = connect(
   mapStateToProps,
   mapDispatchToProps
 )(
@@ -253,7 +254,7 @@ export const ReplyToCommentForm = connect(
   }
 )
 
-export const EditCommentForm = connect(
+export const EditCommentForm: Class<React$Component<*, *>> = connect(
   mapStateToProps,
   mapDispatchToProps
 )(
@@ -302,7 +303,7 @@ export const EditCommentForm = connect(
   }
 )
 
-export const EditPostForm = connect(
+export const EditPostForm: Class<React$Component<*, *>> = connect(
   mapStateToProps,
   mapDispatchToProps
 )(
@@ -363,7 +364,7 @@ const getFormData = (lensFunc, forms) => ({
   comment_id: R.view(lensFunc("comment_id"), forms)
 })
 
-export const ReplyToPostForm = connect(
+export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
   mapStateToProps,
   mapDispatchToProps
 )(

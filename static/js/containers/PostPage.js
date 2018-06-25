@@ -27,7 +27,11 @@ import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import { CommentSortPicker } from "../components/SortPicker"
 
 import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/sorting"
-import { formatCommentsCount } from "../lib/posts"
+import {
+  formatCommentsCount,
+  getPostDropdownMenuKey,
+  postMenuDropdownFuncs
+} from "../lib/posts"
 import { validateContentReportForm } from "../lib/validation"
 import { actions } from "../actions"
 import { replaceMoreComments } from "../actions/comment"
@@ -65,6 +69,7 @@ import {
   REPORT_CONTENT_PAYLOAD
 } from "../lib/reports"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
+import { showDropdown, hideDropdownDebounced } from "../actions/ui"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -107,7 +112,9 @@ type PostPageProps = {
   removeComment: (c: Comment) => void,
   location: Location,
   reportPost: (p: Post) => void,
-  embedly: Object
+  embedly: Object,
+  postShareMenuOpen: boolean,
+  postDropdownMenuOpen: boolean
 }
 
 const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
@@ -115,6 +122,8 @@ const DELETE_COMMENT_DIALOG = "DELETE_COMMENT_DIALOG"
 
 const REPORT_POST_DIALOG = "REPORT_POST_DIALOG"
 const REPORT_COMMENT_DIALOG = "REPORT_COMMENT_DIALOG"
+
+const POST_SHARE_MENU_KEY = "POST_SHARE_MENU_KEY"
 
 // if postId, channelName, or commentID don't match
 const shouldLoadData = R.complement(
@@ -126,9 +135,7 @@ const shouldLoadData = R.complement(
   ])
 )
 
-class PostPage extends React.Component<*, void> {
-  props: PostPageProps
-
+class PostPage extends React.Component<PostPageProps, void> {
   componentDidMount() {
     this.loadData()
 
@@ -309,6 +316,16 @@ class PostPage extends React.Component<*, void> {
     }
   }
 
+  showPostShareMenu = () => {
+    const { dispatch } = this.props
+    dispatch(showDropdown(POST_SHARE_MENU_KEY))
+  }
+
+  hidePostShareMenu = () => {
+    const { dispatch } = this.props
+    dispatch(hideDropdownDebounced(POST_SHARE_MENU_KEY))
+  }
+
   render() {
     const {
       dispatch,
@@ -328,12 +345,16 @@ class PostPage extends React.Component<*, void> {
       approveComment,
       location: { search },
       embedly,
-      reportPost
+      reportPost,
+      postDropdownMenuOpen,
+      postShareMenuOpen
     } = this.props
 
     if (!channel) {
       return null
     }
+
+    const { showPostMenu, hidePostMenu } = postMenuDropdownFuncs(dispatch, post)
 
     const reportForm = getReportForm(forms)
     const showPermalinkUI = R.not(R.isNil(commentID))
@@ -397,6 +418,13 @@ class PostPage extends React.Component<*, void> {
               showPermalinkUI={showPermalinkUI}
               toggleFollowPost={toggleFollowPost(dispatch)}
               embedly={embedly}
+              postDropdownMenuOpen={postDropdownMenuOpen}
+              showPostMenu={showPostMenu}
+              hidePostMenu={hidePostMenu}
+              showPostShareMenu={this.showPostShareMenu}
+              hidePostShareMenu={this.hidePostShareMenu}
+              postShareMenuOpen={postShareMenuOpen}
+              channel={channel}
             />
             {showPermalinkUI || userIsAnonymous() ? null : (
               <ReplyToPostForm
@@ -471,6 +499,12 @@ const mapStateToProps = (state, ownProps) => {
     ? true
     : R.none(R.isNil, [post, channel, commentsTree])
 
+  const postDropdownMenuOpen = post
+    ? ui.dropdownMenus.has(getPostDropdownMenuKey(post))
+    : false
+
+  const postShareMenuOpen = ui.dropdownMenus.has(POST_SHARE_MENU_KEY)
+
   return {
     ...postModerationSelector(state, ownProps),
     ...commentModerationSelector(state, ownProps),
@@ -486,6 +520,8 @@ const mapStateToProps = (state, ownProps) => {
     loaded,
     notFound,
     notAuthorized,
+    postDropdownMenuOpen,
+    postShareMenuOpen,
     isModerator: isModerator(moderators, SETTINGS.username),
     errored:
       anyErrorExcept404([posts, channels]) ||

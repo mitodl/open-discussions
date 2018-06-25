@@ -11,8 +11,10 @@ import {
   commentPermalink,
   toQueryString,
   urlHostname,
-  channelModerationURL
+  channelModerationURL,
+  postPermalink
 } from "./url"
+import { makePost } from "../factories/posts"
 
 describe("url helper functions", () => {
   describe("channelURL", () => {
@@ -143,6 +145,15 @@ describe("url helper functions", () => {
       ].forEach(([url, expectation]) => {
         assert.equal(urlHostname(url), expectation)
       })
+    })
+  })
+
+  describe("postPermalink", () => {
+    it("should return a good url", () => {
+      const post = makePost()
+      const url = postPermalink(post)
+      assert.ok(url.startsWith(window.location.origin))
+      assert.ok(url.includes(postDetailURL(post.channel_name, post.id)))
     })
   })
 })

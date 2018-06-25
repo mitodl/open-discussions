@@ -6,7 +6,9 @@ import ReactTooltip from "react-tooltip"
 
 import { postDetailURL, urlHostname } from "./url"
 import { userIsAnonymous, votingTooltipText } from "./util"
+import { showDropdown, hideDropdownDebounced } from "../actions/ui"
 
+import type { Dispatch } from "redux"
 import type {
   PostForm,
   Post,
@@ -137,5 +139,17 @@ export class PostVotingButtons extends React.Component<*, *> {
         <span className="votes">{post.score}</span>
       </div>
     )
+  }
+}
+
+// a shared function which provides a showPostMenu and hidePostMenu
+// function, for showing and hiding a post menu dropdown (we use on the
+// detail and list pages)
+export const postMenuDropdownFuncs = (dispatch: Dispatch<*>, post: Post) => {
+  const postMenuKey = getPostDropdownMenuKey(post)
+
+  return {
+    showPostMenu: () => dispatch(showDropdown(postMenuKey)),
+    hidePostMenu: () => dispatch(hideDropdownDebounced(postMenuKey))
   }
 }

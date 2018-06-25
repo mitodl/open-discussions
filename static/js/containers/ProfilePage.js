@@ -6,7 +6,7 @@ import R from "ramda"
 import DocumentTitle from "react-document-title"
 
 import Card from "../components/Card"
-import ProfileImage from "./ProfileImage"
+import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
 import withLoading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 
@@ -74,7 +74,7 @@ class ProfilePage extends React.Component<*, void> {
                   profile={profile}
                   userName={userName}
                   editable={editable}
-                  useSmall={false}
+                  imageSize={PROFILE_IMAGE_MEDIUM}
                 />
                 <div className="row image-and-name">
                   <div className="profile-view-fullname">

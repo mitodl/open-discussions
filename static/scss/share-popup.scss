@@ -1,0 +1,48 @@
+.share-popup {
+  position: absolute;
+  background: white;
+  top: 30px;
+  right: -109px;
+  box-shadow: 0 0 20px $card-shadow;
+  padding: 12px;
+  min-width: 250px;
+
+  .triangle {
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    top: -7px;
+    background: white;
+    transform: rotate(45deg);
+    right: 50%;
+  }
+
+  .share-title {
+    color: $font-black;
+    margin-bottom: 2px;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+
+    .share-buttons {
+      display: flex;
+
+      > div {
+        margin-right: 3px;
+      }
+    }
+
+    .copy-url {
+      font-size: 12px;
+    }
+  }
+}

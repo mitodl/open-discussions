@@ -7,31 +7,45 @@ import R from "ramda"
 import { EditPostForm } from "./CommentForms"
 import { renderTextContent } from "./Markdown"
 import Embedly from "./Embedly"
+import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
+import DropdownMenu from "./DropdownMenu"
+import SharePopup from "./SharePopup"
 
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
+import { makeProfile } from "../lib/profile"
+import { postPermalink } from "../lib/url"
 
-import type { Post } from "../flow/discussionTypes"
+import type { Post, Channel } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
-import ProfileImage from "../containers/ProfileImage"
 
-export default class ExpandedPostDisplay extends React.Component<*, void> {
-  props: {
-    post: Post,
-    toggleUpvote: Post => void,
-    approvePost: Post => void,
-    removePost: Post => void,
-    forms: FormsState,
-    isModerator: boolean,
-    beginEditing: (key: string, initialValue: Object, e: ?Event) => void,
-    showPostDeleteDialog: () => void,
-    showPostReportDialog: () => void,
-    showPermalinkUI: boolean,
-    toggleFollowPost: Post => void,
-    embedly: Object
-  }
+type ExpandedProps = {
+  post: Post,
+  toggleUpvote: Post => void,
+  approvePost: Post => void,
+  removePost: Post => void,
+  forms: FormsState,
+  isModerator: boolean,
+  beginEditing: (key: string, initialValue: Object, e: ?Event) => void,
+  showPostDeleteDialog: () => void,
+  showPostReportDialog: () => void,
+  showPermalinkUI: boolean,
+  toggleFollowPost: Post => void,
+  embedly: Object,
+  showPostMenu: Function,
+  hidePostMenu: Function,
+  postDropdownMenuOpen: boolean,
+  showPostShareMenu: Function,
+  hidePostShareMenu: Function,
+  postShareMenuOpen: boolean,
+  channel: Channel
+}
 
+export default class ExpandedPostDisplay extends React.Component<
+  ExpandedProps,
+  void
+> {
   renderTextContent = () => {
     const { forms, post } = this.props
 
@@ -62,21 +76,23 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     const { toggleFollowPost, post } = this.props
     return post.subscribed ? (
       <div
-        className="comment-action-button subscribe-post subscribed"
+        className="post-action subscribed"
         onClick={preventDefaultAndInvoke(() => {
           toggleFollowPost(post)
         })}
       >
-        <a href="#">unfollow</a>
+        <i className="material-icons rss_feed">rss_feed</i>
+        Unfollow
       </div>
     ) : (
       <div
-        className="comment-action-button subscribe-post unsubscribed"
+        className="post-action unsubscribed"
         onClick={preventDefaultAndInvoke(() => {
           toggleFollowPost(post)
         })}
       >
-        <a href="#">follow</a>
+        <i className="material-icons rss_feed">rss_feed</i>
+        Follow
       </div>
     )
   }
@@ -88,60 +104,93 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
       beginEditing,
       isModerator,
       showPostDeleteDialog,
-      showPostReportDialog
+      showPostReportDialog,
+      postDropdownMenuOpen,
+      showPostMenu,
+      hidePostMenu,
+      showPostShareMenu,
+      hidePostShareMenu,
+      postShareMenuOpen,
+      channel
     } = this.props
 
     return (
       <div className="post-actions">
-        <PostVotingButtons
-          post={post}
-          className="expanded"
-          toggleUpvote={toggleUpvote}
-        />
-        {SETTINGS.username === post.author_id && post.text ? (
-          <div
-            className="comment-action-button edit-post"
-            onClick={beginEditing(editPostKey(post), post)}
-          >
-            <a href="#">edit</a>
+        <div className="left">
+          <PostVotingButtons
+            post={post}
+            className="expanded"
+            toggleUpvote={toggleUpvote}
+          />
+        </div>
+        <div className="right">
+          {SETTINGS.username === post.author_id && post.text ? (
+            <div
+              className="post-action edit-post"
+              onClick={beginEditing(editPostKey(post), post)}
+            >
+              <i className="material-icons edit">edit</i>
+              Edit
+            </div>
+          ) : null}
+          <div className="post-action share-action">
+            <div onClick={showPostShareMenu}>
+              <i className="material-icons reply">reply</i>
+              Share
+            </div>
+            {postShareMenuOpen ? (
+              <SharePopup
+                url={postPermalink(post)}
+                closePopup={hidePostShareMenu}
+                hideSocialButtons={channel.channel_type === "private"}
+              />
+            ) : null}
           </div>
-        ) : null}
-        {post.num_reports ? (
-          <div className="report-count">Reports: {post.num_reports}</div>
-        ) : null}
-        {SETTINGS.username === post.author_id ? (
-          <div
-            className="comment-action-button delete-post"
-            onClick={showPostDeleteDialog}
-          >
-            <a href="#">delete</a>
-          </div>
-        ) : null}
-        {userIsAnonymous() ? null : this.postSubscriptionButton()}
-        {isModerator && !post.removed ? (
-          <div
-            className="comment-action-button remove-post"
-            onClick={this.removePost.bind(this)}
-          >
-            <a href="#">remove</a>
-          </div>
-        ) : null}
-        {isModerator && post.removed ? (
-          <div
-            className="comment-action-button approve-post"
-            onClick={this.approvePost.bind(this)}
-          >
-            <a href="#">approve</a>
-          </div>
-        ) : null}
-        {!userIsAnonymous() ? (
-          <div
-            className="comment-action-button report-post"
-            onClick={showPostReportDialog}
-          >
-            <a href="#">report</a>
-          </div>
-        ) : null}
+          {userIsAnonymous() ? null : this.postSubscriptionButton()}
+          {userIsAnonymous() ? null : (
+            <i
+              className="material-icons more_vert"
+              onClick={postDropdownMenuOpen ? null : showPostMenu}
+            >
+              more_vert
+            </i>
+          )}
+          {postDropdownMenuOpen ? (
+            <DropdownMenu closeMenu={hidePostMenu}>
+              {post.num_reports ? (
+                <div className="report-count">Reports: {post.num_reports}</div>
+              ) : null}
+              {SETTINGS.username === post.author_id ? (
+                <li className="comment-action-button delete-post">
+                  <a onClick={showPostDeleteDialog} href="#">
+                    delete
+                  </a>
+                </li>
+              ) : null}
+              {isModerator && !post.removed ? (
+                <li className="comment-action-button remove-post">
+                  <a onClick={this.removePost.bind(this)} href="#">
+                    remove
+                  </a>
+                </li>
+              ) : null}
+              {isModerator && post.removed ? (
+                <li className="comment-action-button approve-post">
+                  <a onClick={this.approvePost.bind(this)} href="#">
+                    approve
+                  </a>
+                </li>
+              ) : null}
+              {!userIsAnonymous() ? (
+                <li className="comment-action-button report-post">
+                  <a onClick={showPostReportDialog} href="#">
+                    report
+                  </a>
+                </li>
+              ) : null}
+            </DropdownMenu>
+          ) : null}
+        </div>
       </div>
     )
   }
@@ -153,17 +202,19 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     return (
       <div className="post-summary expanded">
         <div className="summary">
-          <ProfileImage
-            profile={{
-              name:        post.author_name,
-              image_small: post.profile_image
-            }}
-            useSmall={true}
-          />
           <div className="post-title">{formatPostTitle(post)}</div>
           <div className="authored-by">
-            by <span className="author-name">{post.author_name}</span>,{" "}
-            {formattedDate}
+            <div className="left">
+              <ProfileImage
+                profile={makeProfile({
+                  name:        post.author_name,
+                  image_small: post.profile_image
+                })}
+                imageSize={PROFILE_IMAGE_MICRO}
+              />
+              <div className="author-name">{post.author_name}</div>
+            </div>
+            <div className="right">{formattedDate}</div>
           </div>
           {post && post.url ? <Embedly embedly={embedly} /> : null}
         </div>

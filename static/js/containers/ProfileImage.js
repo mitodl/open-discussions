@@ -23,22 +23,31 @@ import type { Dispatch } from "redux"
 
 const formatPhotoName = photo => `${photo.name.replace(/\.\w*$/, "")}.jpg`
 
-class ProfileImage extends React.Component<*> {
-  props: {
-    clearPhotoEdit: () => void,
-    dispatch: Dispatch<any>,
-    editable: boolean,
-    imageUpload: Object,
-    photoDialogOpen: boolean,
-    profile: Profile,
-    userName: string,
-    setPhotoError: (s: string) => void,
-    startPhotoEdit: (p: File) => void,
-    updatePhotoEdit: (b: Blob) => void,
-    useSmall?: boolean,
-    onClick?: Function
-  }
+export const PROFILE_IMAGE_MICRO: "micro" = "micro"
+export const PROFILE_IMAGE_SMALL: "small" = "small"
+export const PROFILE_IMAGE_MEDIUM: "medium" = "medium"
 
+type ImageSize =
+  | typeof PROFILE_IMAGE_MICRO
+  | typeof PROFILE_IMAGE_SMALL
+  | typeof PROFILE_IMAGE_MEDIUM
+
+type ProfileImageProps = {
+  clearPhotoEdit: () => void,
+  dispatch: Dispatch<any>,
+  editable: boolean,
+  imageUpload: Object,
+  photoDialogOpen: boolean,
+  profile: Profile,
+  userName?: ?string,
+  setPhotoError: (s: string) => void,
+  startPhotoEdit: (p: File) => void,
+  updatePhotoEdit: (b: Blob) => void,
+  imageSize: ImageSize,
+  onClick?: Function
+}
+
+class ProfileImage extends React.Component<ProfileImageProps> {
   static defaultProps = {
     editable: false
   }
@@ -51,11 +60,13 @@ class ProfileImage extends React.Component<*> {
       userName
     } = this.props
 
-    await dispatch(updateProfilePhoto(userName, edit, formatPhotoName(photo)))
+    if (userName) {
+      await dispatch(updateProfilePhoto(userName, edit, formatPhotoName(photo)))
 
-    clearPhotoEdit()
-    this.setDialogVisibility(false)
-    dispatch(actions.profiles.get(userName))
+      clearPhotoEdit()
+      this.setDialogVisibility(false)
+      dispatch(actions.profiles.get(userName))
+    }
   }
 
   setDialogVisibility = (visibility: boolean) => {
@@ -68,10 +79,12 @@ class ProfileImage extends React.Component<*> {
   }
 
   render() {
-    const { profile, useSmall, editable, onClick } = this.props
+    const { profile, imageSize, editable, onClick } = this.props
 
-    const imageUrl = makeProfileImageUrl(profile, useSmall)
-    const imageSizeClass = useSmall ? "small" : "medium"
+    const imageUrl = makeProfileImageUrl(
+      profile,
+      imageSize === "micro" || imageSize === "small"
+    )
 
     return (
       <div className="profile-image-container">
@@ -79,8 +92,8 @@ class ProfileImage extends React.Component<*> {
           {imageUrl.endsWith(defaultProfileImageUrl) &&
           profile &&
           profile.name ? (
-              <div className={`profile-image ${imageSizeClass}`}>
-                <div className={`profile-initials ${imageSizeClass}`}>
+              <div className={`profile-image ${imageSize}`}>
+                <div className={`profile-initials ${imageSize}`}>
                   {initials(profile.name)}
                 </div>
               </div>
@@ -88,7 +101,7 @@ class ProfileImage extends React.Component<*> {
               <img
                 src={imageUrl}
                 alt={`Profile image for ${profile ? profile.name : "anonymous"}`}
-                className={`profile-image ${imageSizeClass}`}
+                className={`profile-image ${imageSize}`}
               />
             )}
           {editable ? (
@@ -132,7 +145,7 @@ const mapStateToProps = state => {
   }
 }
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   startPhotoEdit:  createActionHelper(dispatch, startPhotoEdit),
   clearPhotoEdit:  createActionHelper(dispatch, clearPhotoEdit),
   updatePhotoEdit: createActionHelper(dispatch, updatePhotoEdit),

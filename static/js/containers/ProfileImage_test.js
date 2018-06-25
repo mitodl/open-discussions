@@ -4,13 +4,19 @@ import { mount } from "enzyme"
 import { assert } from "chai"
 import { Provider } from "react-redux"
 
-import ProfileImage from "./ProfileImage"
+import ProfileImage, {
+  PROFILE_IMAGE_MICRO,
+  PROFILE_IMAGE_SMALL,
+  PROFILE_IMAGE_MEDIUM
+} from "./ProfileImage"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { startPhotoEdit } from "../actions/image_upload"
+import { defaultProfileImageUrl } from "../lib/util"
+import * as utilFuncs from "../lib/util"
 
 describe("ProfileImage", () => {
-  let helper, div
+  let helper, div, makeProfileImageUrlStub
 
   const thatProfile = {
     name:              "test_name",
@@ -43,6 +49,9 @@ describe("ProfileImage", () => {
     SETTINGS.username = thatProfile.username
     helper.patchProfileImageStub.returns(Promise.resolve(""))
     helper.getProfileStub.returns(Promise.resolve(thatProfile))
+    makeProfileImageUrlStub = helper.sandbox
+      .stub(utilFuncs, "makeProfileImageUrl")
+      .returns(defaultProfileImageUrl)
   })
 
   afterEach(() => {
@@ -69,7 +78,8 @@ describe("ProfileImage", () => {
     describe("save button", () => {
       it("should call patchProfileImageStub when the save button is pressed", () => {
         const image = renderProfileImage({
-          editable: true
+          editable: true,
+          userName: "a username"
         })
         helper.store.dispatch(startPhotoEdit({ name: "a name" }))
         image
@@ -81,6 +91,7 @@ describe("ProfileImage", () => {
         saveButton.simulate("click")
         assert.isTrue(helper.patchProfileImageStub.called)
       })
+
       it("should not be visible if no photo is selected", () => {
         const image = renderProfileImage({
           editable: true
@@ -92,6 +103,32 @@ describe("ProfileImage", () => {
         const dialog = image.find("ProfileImageUploader").find("Dialog")
         assert.equal(dialog.find(".edit-button").length, 0)
       })
+    })
+  })
+
+  it("should set imageSize as a className", () => {
+    [PROFILE_IMAGE_MICRO, PROFILE_IMAGE_SMALL, PROFILE_IMAGE_MEDIUM].forEach(
+      imageSize => {
+        const image = renderProfileImage({
+          imageSize
+        })
+        assert.include(
+          image.find(".profile-image").props().className,
+          imageSize
+        )
+      }
+    )
+  })
+
+  //
+  ;[
+    [PROFILE_IMAGE_MICRO, true],
+    [PROFILE_IMAGE_SMALL, true],
+    [PROFILE_IMAGE_MEDIUM, false]
+  ].forEach(([imageSize, exp]) => {
+    it(`should call makeProfileImageUrl with ${exp} if imageSize is ${imageSize}`, () => {
+      renderProfileImage({ imageSize })
+      assert.ok(makeProfileImageUrlStub.calledWith(thatProfile, exp))
     })
   })
 })

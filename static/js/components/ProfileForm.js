@@ -2,14 +2,16 @@
 /* global SETTINGS: false */
 import React from "react"
 
-import ProfileImage from "../containers/ProfileImage"
+import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "../containers/ProfileImage"
+
+import { validationMessage } from "../lib/validation"
+import { goBackAndHandleEvent } from "../lib/util"
+
 import type {
   Profile,
   ProfilePayload,
   ProfileValidation
 } from "../flow/discussionTypes"
-import { validationMessage } from "../lib/validation"
-import { goBackAndHandleEvent } from "../lib/util"
 
 type ProfileFormProps = {
   form: ProfilePayload,
@@ -45,7 +47,7 @@ export default class ProfileForm extends React.Component<*, void> {
           profile={profile}
           userName={profile.username}
           editable={profile.username === SETTINGS.username}
-          useSmall={false}
+          imageSize={PROFILE_IMAGE_MEDIUM}
         />
         <form onSubmit={onSubmit} className="form">
           <div className="row image-and-name">

@@ -11,11 +11,12 @@ import { channelURL, postDetailURL } from "../lib/url"
 import {
   PostVotingButtons,
   PostTitleAndHostname,
-  getPostDropdownMenuKey
+  getPostDropdownMenuKey,
+  postMenuDropdownFuncs
 } from "../lib/posts"
 import { userIsAnonymous } from "../lib/util"
-import { showDropdown, hideDropdownDebounced } from "../actions/ui"
 
+import type { Dispatch } from "redux"
 import type { Post } from "../flow/discussionTypes"
 
 export class CompactPostDisplay extends React.Component<*, void> {
@@ -31,7 +32,8 @@ export class CompactPostDisplay extends React.Component<*, void> {
     reportPost: (p: Post) => void,
     menuOpen: boolean,
     showPostMenu: Function,
-    hidePostMenu: Function
+    hidePostMenu: Function,
+    dispatch: Dispatch<*>
   }
 
   showChannelLink = () => {
@@ -55,11 +57,11 @@ export class CompactPostDisplay extends React.Component<*, void> {
       removePost,
       ignorePostReports,
       reportPost,
-      showPostMenu,
-      hidePostMenu,
-      menuOpen
+      menuOpen,
+      dispatch
     } = this.props
     const formattedDate = moment(post.created).fromNow()
+    const { showPostMenu, hidePostMenu } = postMenuDropdownFuncs(dispatch, post)
 
     return (
       <Card
@@ -164,17 +166,4 @@ const mapStateToProps = (state, ownProps) => {
   return { menuOpen }
 }
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  const { post } = ownProps
-  const postMenuKey = getPostDropdownMenuKey(post)
-
-  return {
-    showPostMenu: () => dispatch(showDropdown(postMenuKey)),
-    hidePostMenu: () => dispatch(hideDropdownDebounced(postMenuKey))
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CompactPostDisplay)
+export default connect(mapStateToProps)(CompactPostDisplay)

@@ -4,7 +4,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 
 import DropdownMenu from "./DropdownMenu"
-import ProfileImage from "../containers/ProfileImage"
+import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 
 import { isProfileComplete } from "../lib/util"
 import { profileURL, SETTINGS_URL } from "../lib/url"
@@ -25,10 +25,10 @@ export default class UserMenu extends React.Component<*, *> {
       <div className="user-menu">
         <ProfileImage
           editable={false}
-          useSmall={true}
           userName={SETTINGS.username}
           profile={profile}
           onClick={toggleShowUserMenu}
+          imageSize={PROFILE_IMAGE_SMALL}
         />
         {SETTINGS.profile_ui_enabled && !isProfileComplete(profile) ? (
           <div className="profile-incomplete" />

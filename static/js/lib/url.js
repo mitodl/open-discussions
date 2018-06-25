@@ -2,6 +2,8 @@
 import R from "ramda"
 import qs from "query-string"
 
+import type { Post } from "../flow/discussionTypes"
+
 export const channelURL = (channelName: string) => `/channel/${channelName}`
 
 export const channelModerationURL = (channelName: string) =>
@@ -30,6 +32,12 @@ export const commentPermalink = R.curry(
   (channelName: string, postID: string, postSlug: string, commentID: string) =>
     `${postDetailURL(channelName, postID, postSlug)}/comment/${commentID}/`
 )
+
+export const postPermalink = (post: Post): string =>
+  new URL(
+    postDetailURL(post.channel_name, post.id),
+    window.location.origin
+  ).toString()
 
 // pull the channel name out of location.pathname
 // see here for why this hackish approach was necessary:

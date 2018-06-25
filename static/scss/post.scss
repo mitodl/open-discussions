@@ -11,6 +11,26 @@
   font-size: 15px;
 }
 
+.comments-and-menu, .post-actions {
+  // to make the user-menu live in it correctly
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  > * {
+    color: $font-grey-light;
+  }
+
+  i {
+    cursor: pointer;
+  }
+
+  .dropdown-menu {
+    top: 22px;
+    right: 11px;
+  }
+}
+
 .compact-post-summary {
   a {
     color: $font-black;
@@ -56,33 +76,15 @@
     }
 
     .comments-and-menu {
-      display: flex;
-      align-items: center;
-
-      // to make the user-menu live in it correctly
-      position: relative;
-
-      > * {
-        color: $font-grey-light;
-      }
-
-      i {
-        cursor: pointer;
-      }
-
       .comment-link {
         display: flex;
         align-items: center;
         margin-right: 8px;
+        color: $font-grey-light;
 
         i {
           margin-right: 11px;
         }
-      }
-
-      .dropdown-menu {
-        top: 22px;
-        right: 11px;
       }
     }
   }
@@ -146,7 +148,6 @@
   }
 
   .profile-image {
-    margin-right: 15px;
     flex-shrink: 0;
   }
 
@@ -186,7 +187,7 @@
 
 .expanded {
   .post-title {
-    font-size: 20px;
+    font-size: 28px;
     font-weight: 400;
     margin: 7px 0 9px;
 
@@ -195,9 +196,59 @@
     }
   }
 
+  .post-actions {
+    justify-content: space-between;
+
+    .right {
+      display: flex;
+      position: relative;
+
+      .post-action {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        margin: 0 13px;
+
+        &.share-action {
+          position: relative;
+
+          > div:not(.share-popup) {
+            display: flex;
+            align-items: center;
+          }
+        }
+
+        i {
+          margin-right: 2px;
+        }
+
+        @include breakpoint(phone) {
+          margin: 0 5px;
+        }
+      }
+    }
+  }
+
   .authored-by {
     font-size: 14px;
     color: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+
+    .profile-image-container {
+      padding: 0 10px 0 0;
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+    }
+
+    .right {
+      color: $font-grey;
+    }
 
     span.author-name {
       font-weight: 500;

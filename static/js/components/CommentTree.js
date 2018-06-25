@@ -11,6 +11,7 @@ import { ReplyToCommentForm, EditCommentForm } from "./CommentForms"
 import CommentVoteForm from "./CommentVoteForm"
 import CommentRemovalForm from "./CommentRemovalForm"
 import { renderTextContent } from "./Markdown"
+import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 import {
@@ -18,6 +19,7 @@ import {
   editCommentKey,
   getCommentReplyInitialValue
 } from "../components/CommentForms"
+import { makeProfile } from "../lib/profile"
 
 import type {
   GenericComment,
@@ -27,7 +29,6 @@ import type {
 import type { FormsState } from "../flow/formTypes"
 import type { CommentRemoveFunc } from "./CommentRemovalForm"
 import type { CommentVoteFunc } from "./CommentVoteForm"
-import ProfileImage from "../containers/ProfileImage"
 
 type LoadMoreCommentsFunc = (comment: MoreCommentsInTree) => Promise<*>
 type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
@@ -110,11 +111,12 @@ export default class CommentTree extends React.Component<*, *> {
         key={`comment-${comment.id}`}
       >
         <ProfileImage
-          profile={{
+          profile={makeProfile({
             name:        comment.author_name,
-            image_small: comment.profile_image
-          }}
-          useSmall={true}
+            image_small: comment.profile_image,
+            username:    SETTINGS.username
+          })}
+          imageSize={PROFILE_IMAGE_SMALL}
         />
         <div className="comment-contents">
           <div className="author-info">
