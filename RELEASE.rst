@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.34.0
+--------------
+
+- Add UI for editing channel types (#846)
+
 Version 0.33.0
 --------------
 
