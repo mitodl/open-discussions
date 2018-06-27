@@ -31,6 +31,22 @@ class ChannelSerializer(serializers.Serializer):
         source="subreddit_type",
         choices=VALID_CHANNEL_TYPES,
     )
+    user_is_contributor = serializers.SerializerMethodField()
+    user_is_moderator = serializers.SerializerMethodField()
+
+    def get_user_is_contributor(self, channel):
+        """
+        Get is_contributor from reddit object.
+        For some reason reddit returns None instead of False so an explicit conversion is done here.
+        """
+        return bool(channel.user_is_contributor)
+
+    def get_user_is_moderator(self, channel):
+        """
+        Get is_moderator from reddit object.
+        For some reason reddit returns None instead of False so an explicit conversion is done here.
+        """
+        return bool(channel.user_is_moderator)
 
     def create(self, validated_data):
         api = self.context['channel_api']

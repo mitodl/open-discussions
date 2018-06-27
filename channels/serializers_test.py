@@ -43,6 +43,8 @@ def test_serialize_channel(user):
         'channel_type': 'public',
         'description': 'description',
         'public_description': 'public_description',
+        'user_is_moderator': True,
+        'user_is_contributor': True,
     }
 
 

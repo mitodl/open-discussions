@@ -26,6 +26,8 @@ def test_list_channels(client, jwt_header, private_channel_and_contributor, requ
             'description': channel.description,
             'public_description': channel.public_description,
             'channel_type': channel.channel_type,
+            'user_is_contributor': True,
+            'user_is_moderator': False,
         }
     ]
 
@@ -60,8 +62,13 @@ def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
         'public_description': channel.public_description,
     }
     resp = client.post(url, data=payload, **staff_jwt_header)
+    expected = {
+        **payload,
+        'user_is_contributor': True,
+        'user_is_moderator': True,
+    }
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == payload
+    assert resp.json() == expected
 
 
 def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, reddit_factories):
@@ -76,7 +83,13 @@ def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, re
         'title': channel.title,
     }
     resp = client.post(url, data=payload, **staff_jwt_header)
-    expected = dict(payload, description='', public_description='')
+    expected = {
+        **payload,
+        'description': '',
+        'public_description': '',
+        'user_is_contributor': True,
+        'user_is_moderator': True,
+    }
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
 
@@ -144,6 +157,8 @@ def test_get_channel(client, jwt_header, private_channel_and_contributor):
         'title': channel.title,
         'description': channel.description,
         'public_description': channel.public_description,
+        'user_is_contributor': True,
+        'user_is_moderator': False,
     }
 
 
@@ -163,6 +178,8 @@ def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous
             'title': public_channel.title,
             'description': public_channel.description,
             'public_description': public_channel.public_description,
+            'user_is_contributor': False,
+            'user_is_moderator': False,
         }
     else:
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
@@ -212,6 +229,8 @@ def test_patch_channel(client, staff_jwt_header, private_channel):
         'title': private_channel.title,
         'description': private_channel.description,
         'public_description': private_channel.public_description,
+        'user_is_contributor': True,
+        'user_is_moderator': True,
     }
 
 
@@ -232,6 +251,8 @@ def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_
         'title': private_channel.title,
         'description': private_channel.description,
         'public_description': private_channel.public_description,
+        'user_is_contributor': True,
+        'user_is_moderator': True,
     }
 
 

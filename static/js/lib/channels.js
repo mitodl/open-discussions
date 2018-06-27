@@ -29,3 +29,8 @@ export const isModerator = (
   moderators: ChannelModerators,
   username: ?string
 ): boolean => R.any(R.propEq("moderator_name", username), moderators || [])
+
+export const userCanPost = (channel: Channel) =>
+  channel.channel_type === CHANNEL_TYPE_PUBLIC ||
+  channel.user_is_moderator ||
+  channel.user_is_contributor

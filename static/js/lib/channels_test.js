@@ -3,9 +3,12 @@ import { assert } from "chai"
 
 import {
   CHANNEL_TYPE_PUBLIC,
+  CHANNEL_TYPE_RESTRICTED,
+  CHANNEL_TYPE_PRIVATE,
   newChannelForm,
   editChannelForm,
-  isModerator
+  isModerator,
+  userCanPost
 } from "./channels"
 import { makeModerators, makeChannel } from "../factories/channels"
 
@@ -32,11 +35,36 @@ describe("Channel utils", () => {
     })
   })
 
-  it("isModerator should return true for a moderator user", () => {
-    assert.isTrue(isModerator(makeModerators("username"), "username"))
+  describe("isModerator", () => {
+    it("should return true for a moderator user", () => {
+      assert.isTrue(isModerator(makeModerators("username"), "username"))
+    })
+
+    it("should return false for a regular user", () => {
+      assert.isFalse(isModerator(makeModerators(), "username"))
+    })
   })
 
-  it("isModerator should return false for a regular user", () => {
-    assert.isFalse(isModerator(makeModerators(), "username"))
+  describe("userCanPost", () => {
+    [
+      [CHANNEL_TYPE_PUBLIC, false, false, true],
+      [CHANNEL_TYPE_RESTRICTED, false, false, false],
+      [CHANNEL_TYPE_PRIVATE, false, false, false],
+      [CHANNEL_TYPE_PRIVATE, true, false, true],
+      [CHANNEL_TYPE_PRIVATE, false, true, true]
+    ].forEach(([channelType, isModerator, isContributor, expected]) => {
+      it(`${expected ? "shows" : "doesn't show"} the submit button when
+       channelType is ${channelType}${
+  isModerator ? "and the user is a moderator " : ""
+}${isContributor ? "and the user is a contributor" : ""}`, () => {
+        const channel: Object = {
+          ...makeChannel(),
+          channel_type:        channelType,
+          user_is_moderator:   isModerator,
+          user_is_contributor: isContributor
+        }
+        assert.equal(userCanPost(channel), expected)
+      })
+    })
   })
 })

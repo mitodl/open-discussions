@@ -8,6 +8,7 @@ import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import { userCanPost } from "../lib/channels"
 import { formatTitle } from "../lib/title"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import { wait } from "../lib/util"
@@ -258,7 +259,8 @@ describe("CreatePostPage", () => {
   it("should render a select with all subreddits", async () => {
     const wrapper = await renderPage()
     const select = wrapper.find("select")
-    assert.lengthOf(select.find("option"), channels.length + 1)
+    const allowedChannels = channels.filter(channel => userCanPost(channel))
+    assert.lengthOf(select.find("option"), allowedChannels.length + 1)
     assert.deepEqual(
       select.find("option").map(option => {
         const props = option.props()
@@ -266,12 +268,12 @@ describe("CreatePostPage", () => {
       }),
       [
         ["", "Select a channel"],
-        ...channels.map(channel => [channel.name, channel.title])
+        ...allowedChannels.map(channel => [channel.name, channel.title])
       ]
     )
     assert.deepEqual(select.find("option").map(option => option.text()), [
       "Select a channel",
-      ...channels.map(channel => channel.title)
+      ...allowedChannels.map(channel => channel.title)
     ])
   })
 

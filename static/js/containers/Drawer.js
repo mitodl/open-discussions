@@ -19,7 +19,8 @@ import type { Location } from "react-router"
 type DrawerPropsFromState = {
   showDrawerDesktop: boolean,
   showDrawerMobile: boolean,
-  subscribedChannels: Array<Channel>
+  subscribedChannels: Array<Channel>,
+  channels: Map<string, Channel>
 }
 
 type DrawerProps = DrawerPropsFromState & {
@@ -71,6 +72,7 @@ export class ResponsiveDrawer extends React.Component<DrawerProps, *> {
 
   render() {
     const {
+      channels,
       showDrawerDesktop,
       showDrawerMobile,
       subscribedChannels,
@@ -108,6 +110,7 @@ export class ResponsiveDrawer extends React.Component<DrawerProps, *> {
               <Navigation
                 subscribedChannels={subscribedChannels}
                 pathname={pathname}
+                channels={channels}
               />
             </DrawerContent>
           </Drawer>
@@ -120,7 +123,8 @@ export class ResponsiveDrawer extends React.Component<DrawerProps, *> {
 export const mapStateToProps = (state: Object): DrawerPropsFromState => ({
   subscribedChannels: getSubscribedChannels(state),
   showDrawerDesktop:  state.ui.showDrawerDesktop,
-  showDrawerMobile:   state.ui.showDrawerMobile
+  showDrawerMobile:   state.ui.showDrawerMobile,
+  channels:           state.channels.data
 })
 
 export default R.compose(

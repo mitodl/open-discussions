@@ -8,52 +8,90 @@ import sinon from "sinon"
 import Navigation from "./Navigation"
 import SubscriptionsList from "./SubscriptionsList"
 
+import * as channels from "../lib/channels"
 import { newPostURL, FRONTPAGE_URL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
 import * as util from "../lib/util"
 
 describe("Navigation", () => {
-  let sandbox, userIsAnonymousStub
+  let sandbox, userIsAnonymousStub, defaultProps: Object, userCanPostStub
 
   beforeEach(() => {
     sandbox = sinon.sandbox.create()
     userIsAnonymousStub = sandbox.stub(util, "userIsAnonymous")
     userIsAnonymousStub.returns(false)
+    userCanPostStub = sandbox.stub(channels, "userCanPost")
+    userCanPostStub.returns(true)
+
+    const subscribedChannels = makeChannelList(10)
+    defaultProps = {
+      pathname:           "/",
+      subscribedChannels: subscribedChannels,
+      channels:           new Map(
+        subscribedChannels.map(channel => [channel.name, channel])
+      )
+    }
   })
 
   afterEach(() => {
     sandbox.restore()
   })
 
-  const defaultProps = { pathname: "/", subscribedChannels: [] }
   const renderComponent = (props = defaultProps) =>
     shallow(<Navigation {...props} />)
 
-  it("create post link should not have channel name if channelName is not in URL", () => {
-    const wrapper = renderComponent()
-    assert.lengthOf(wrapper.find(Link), 2)
-    const props = wrapper
-      .find(Link)
-      .at(0)
-      .props()
-    assert.equal(props.to, "/create_post/")
-    assert.equal(props.children, "Submit a New Post")
-  })
-
-  it("create post link should have channel name if channelName is in URL", () => {
-    const wrapper = renderComponent({
-      ...defaultProps,
-      pathname: "/channel/foobar"
+  describe("create post link", () => {
+    it("should not have channel name if channelName is not in URL", () => {
+      const wrapper = renderComponent()
+      assert.lengthOf(wrapper.find(Link), 2)
+      const props = wrapper
+        .find(Link)
+        .at(0)
+        .props()
+      assert.equal(props.to, "/create_post/")
+      assert.equal(props.children, "Submit a New Post")
     })
-    const link = wrapper.find(Link).first()
-    assert.equal(link.props().to, newPostURL("foobar"))
-    assert.equal(link.props().children, "Submit a New Post")
-  })
 
-  it("should not show the create post link if an anonymous user", () => {
-    userIsAnonymousStub.returns(true)
-    const wrapper = renderComponent()
-    assert.isNotOk(wrapper.find(".mdc-button").exists())
+    it("create post link should have channel name if channelName is in URL", () => {
+      const wrapper = renderComponent({
+        ...defaultProps,
+        pathname: "/channel/foobar"
+      })
+      const link = wrapper.find(Link).first()
+      assert.equal(link.props().to, newPostURL("foobar"))
+      assert.equal(link.props().children, "Submit a New Post")
+    })
+
+    it("should not show the create post link if an anonymous user", () => {
+      userIsAnonymousStub.returns(true)
+      const wrapper = renderComponent()
+      assert.isNotOk(wrapper.find(".mdc-button").exists())
+    })
+
+    it("should not show the create post link if the channel can't be shown to the user", () => {
+      userCanPostStub.returns(false)
+      const channel = defaultProps.subscribedChannels[3]
+      const wrapper = renderComponent({
+        ...defaultProps,
+        pathname: `/channel/${channel.name}`
+      })
+      assert.isNotOk(wrapper.find(".mdc-button").exists())
+      assert.equal(userCanPostStub.callCount, 1)
+      sinon.assert.calledWith(userCanPostStub, channel)
+    })
+
+    it("should not show the create post link if no channel can be shown to the user", () => {
+      userCanPostStub.returns(false)
+      const wrapper = renderComponent()
+      assert.isNotOk(wrapper.find(".mdc-button").exists())
+      assert.equal(
+        userCanPostStub.callCount,
+        defaultProps.subscribedChannels.length
+      )
+      defaultProps.subscribedChannels.forEach(channel => {
+        sinon.assert.calledWith(userCanPostStub, channel)
+      })
+    })
   })
 
   it("should show a SubscriptionsList", () => {
