@@ -1,6 +1,6 @@
 // @flow
 /* global SETTINGS: false */
-import React, { Fragment } from "react"
+import React from "react"
 import { Dialog } from "@mitodl/mdl-react-components"
 import R from "ramda"
 
@@ -143,7 +143,7 @@ export const withPostModeration = (
       const reportForm = getReportForm(forms)
 
       return (
-        <Fragment>
+        <React.Fragment>
           <Dialog
             open={reportPostDialogVisible}
             hideDialog={preventDefaultAndInvoke(this.hideReportPostDialog)}
@@ -184,7 +184,7 @@ export const withPostModeration = (
             ignorePostReports={this.ignoreReports}
             reportPost={this.openReportPostDialog}
           />
-        </Fragment>
+        </React.Fragment>
       )
     }
   }

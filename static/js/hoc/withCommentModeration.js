@@ -1,6 +1,6 @@
 // @flow
 /* global SETTINGS: false */
-import React, { Fragment } from "react"
+import React from "react"
 import { Dialog } from "@mitodl/mdl-react-components"
 
 import { actions } from "../actions"
@@ -87,7 +87,7 @@ export const withCommentModeration = (
       const { showRemoveCommentDialog } = this.props
 
       return (
-        <Fragment>
+        <React.Fragment>
           <Dialog
             id="remove-comment-dialog"
             open={showRemoveCommentDialog}
@@ -107,7 +107,7 @@ export const withCommentModeration = (
             approveComment={this.approveComment}
             ignoreCommentReports={this.ignoreReports}
           />
-        </Fragment>
+        </React.Fragment>
       )
     }
   }
