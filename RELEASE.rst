@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.34.1
+--------------
+
+- Redesign post listing
+- Remove a flow workaround
+- fix &#39;submit post&#39; button color
+
 Version 0.34.0
 --------------
 
