@@ -7,6 +7,7 @@ import DocumentTitle from "react-document-title"
 import CreatePostForm from "../components/CreatePostForm"
 
 import { actions } from "../actions"
+import { isTextTabSelected } from "../lib/channels"
 import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
 import { getChannelName } from "../lib/util"
@@ -15,7 +16,11 @@ import { validatePostCreateForm } from "../lib/validation"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 
 import type { FormValue } from "../flow/formTypes"
-import type { Channel, CreatePostPayload } from "../flow/discussionTypes"
+import type {
+  Channel,
+  CreatePostPayload,
+  PostForm
+} from "../flow/discussionTypes"
 import type { RestState } from "../flow/restTypes"
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -23,7 +28,7 @@ import type { Match } from "react-router"
 type CreatePostPageProps = {
   match: Match,
   dispatch: Dispatch<*>,
-  postForm: ?FormValue,
+  postForm: ?FormValue<PostForm>,
   channel: Channel,
   channels: RestState<Map<string, Channel>>,
   history: Object,
@@ -83,12 +88,12 @@ class CreatePostPage extends React.Component<*, void> {
     }
   }
 
-  updateIsText = (isText: boolean) => {
+  updatePostType = (postType: string) => {
     const { dispatch } = this.props
     dispatch(
       actions.forms.formUpdate({
         ...CREATE_POST_PAYLOAD,
-        value: { isText }
+        value: { postType }
       })
     )
 
@@ -122,7 +127,8 @@ class CreatePostPage extends React.Component<*, void> {
       )
     } else {
       const channelName = channel.name
-      const { isText, title, url, text } = postForm.value
+      const { postType, title, url, text } = postForm.value
+      const isText = isTextTabSelected(postType, channel)
       const data: CreatePostPayload = isText ? { title, text } : { title, url }
       dispatch(actions.posts.post(channelName, data)).then(post => {
         history.push(postDetailURL(channelName, post.id))
@@ -160,7 +166,7 @@ class CreatePostPage extends React.Component<*, void> {
           <CreatePostForm
             onSubmit={this.onSubmit}
             onUpdate={this.onUpdate}
-            updateIsText={this.updateIsText}
+            updatePostType={this.updatePostType}
             updateChannelSelection={this.updateChannelSelection}
             postForm={postForm.value}
             validation={postForm.errors}

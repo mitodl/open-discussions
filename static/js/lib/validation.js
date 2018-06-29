@@ -3,6 +3,8 @@ import React from "react"
 import R from "ramda"
 
 import { S } from "./sanctuary"
+
+import { isTextTabSelected } from "../lib/channels"
 import type { PostForm } from "../flow/discussionTypes"
 
 // this function checks that a given object fails validation (validator function returns true)
@@ -45,14 +47,15 @@ export const postUrlOrTextPresent = (postForm: { value: PostForm }) => {
   }
 
   const post = postForm.value
+  const isText = isTextTabSelected(postForm.value.postType, null)
 
-  if (post.isText && emptyOrNil(post.text)) {
+  if (isText && emptyOrNil(post.text)) {
     return S.Just(
       R.set(R.lensPath(["value", "text"]), "Post text cannot be empty")
     )
   }
 
-  if (!post.isText && emptyOrNil(post.url)) {
+  if (!isText && emptyOrNil(post.url)) {
     return S.Just(
       R.set(R.lensPath(["value", "url"]), "Post url cannot be empty")
     )

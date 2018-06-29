@@ -17,7 +17,7 @@ import { validateChannelAppearanceEditForm } from "../../lib/validation"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
-import type { Channel } from "../../flow/discussionTypes"
+import type { Channel, ChannelForm } from "../../flow/discussionTypes"
 
 const EDIT_CHANNEL_KEY = "channel:edit:appearance"
 const EDIT_CHANNEL_PAYLOAD = { formKey: EDIT_CHANNEL_KEY }
@@ -30,7 +30,7 @@ class EditChannelAppearancePage extends React.Component<*, void> {
     dispatch: Dispatch<*>,
     history: Object,
     channel: Channel,
-    channelForm: FormValue,
+    channelForm: FormValue<ChannelForm>,
     channelName: string,
     processing: boolean
   }

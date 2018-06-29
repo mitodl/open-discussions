@@ -14,7 +14,7 @@ import type { FormsState, FormActionPayload } from "../flow/formTypes"
 export const forms = (
   state: Object = {},
   action: Action<FormActionPayload, null>
-): FormsState => {
+): FormsState<*> => {
   switch (action.type) {
   case FORM_BEGIN_EDIT:
     return {

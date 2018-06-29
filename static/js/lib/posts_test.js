@@ -20,10 +20,10 @@ import * as utilFuncs from "./util"
 describe("Post utils", () => {
   it("should return a new post with empty values", () => {
     assert.deepEqual(newPostForm(), {
-      isText: true,
-      text:   "",
-      url:    "",
-      title:  ""
+      postType: null,
+      text:     "",
+      url:      "",
+      title:    ""
     })
   })
 

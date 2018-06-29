@@ -1,6 +1,6 @@
 // @flow
 export type ChannelType = "private" | "restricted" | "public";
-export type LinkType = "link" | "text" | "any";
+export type LinkType = "link" | "self" | "any";
 
 export type Channel = {
   name:                string,
@@ -59,7 +59,7 @@ export type Post = AuthoredContent & {
 }
 
 export type PostForm = {
-  isText: boolean,
+  postType: "link" | "self" | null,
   text:   string,
   url:    string,
   title:  string,

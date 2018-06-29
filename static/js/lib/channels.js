@@ -74,3 +74,16 @@ export const isLinkTypeChecked = (linkType: string, value: string) => {
     return linkType === value
   }
 }
+
+export const isTextTabSelected = (
+  postType: string | null,
+  channel: ?Channel
+) => {
+  if (postType !== null) {
+    return postType !== LINK_TYPE_LINK
+  }
+  if (!channel) {
+    return true
+  }
+  return channel.link_type !== LINK_TYPE_LINK
+}

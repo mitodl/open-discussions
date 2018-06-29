@@ -12,7 +12,7 @@ import { formatPostTitle, PostVotingButtons } from "../lib/posts"
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
 
-import type { Post } from "../flow/discussionTypes"
+import type { Post, PostForm } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 import ProfileImage from "../containers/ProfileImage"
 
@@ -22,7 +22,7 @@ export default class ExpandedPostDisplay extends React.Component<*, void> {
     toggleUpvote: Post => void,
     approvePost: Post => void,
     removePost: Post => void,
-    forms: FormsState,
+    forms: FormsState<PostForm>,
     isModerator: boolean,
     beginEditing: (key: string, initialValue: Object, e: ?Event) => void,
     showPostDeleteDialog: () => void,

@@ -2,6 +2,7 @@
 import { assert } from "chai"
 import R from "ramda"
 
+import { LINK_TYPE_TEXT, LINK_TYPE_LINK } from "./channels"
 import { assertIsNothing, assertIsJustNoVal } from "./test_utils"
 import {
   validation,
@@ -97,7 +98,7 @@ describe("validation library", () => {
 
   describe("validatePostCreateForm", () => {
     it("should complain about no title", () => {
-      const post = { value: { isText: true, text: "foobar" } }
+      const post = { value: { postType: LINK_TYPE_TEXT, text: "foobar" } }
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
           title: "Title is required"
@@ -106,7 +107,7 @@ describe("validation library", () => {
     })
 
     it("should complain about no text on a text post", () => {
-      const post = { value: { isText: true, title: "potato" } }
+      const post = { value: { postType: null, title: "potato" } }
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
           text: "Post text cannot be empty"
@@ -115,7 +116,7 @@ describe("validation library", () => {
     })
 
     it("should complain about no url on a url post", () => {
-      const post = { value: { isText: false, title: "potato" } }
+      const post = { value: { postType: LINK_TYPE_LINK, title: "potato" } }
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
           url: "Post url cannot be empty"
@@ -126,9 +127,9 @@ describe("validation library", () => {
     it("should complain about too long of a title", () => {
       const post = {
         value: {
-          isText: true,
-          title:  "a".repeat(301),
-          text:   "a great post! really"
+          postType: LINK_TYPE_TEXT,
+          title:    "a".repeat(301),
+          text:     "a great post! really"
         }
       }
       assert.deepEqual(validatePostCreateForm(post), {

@@ -13,7 +13,8 @@ import {
   LINK_TYPE_TEXT,
   LINK_TYPE_LINK,
   updateLinkType,
-  isLinkTypeChecked
+  isLinkTypeChecked,
+  isTextTabSelected
 } from "./channels"
 import { makeModerators, makeChannel } from "../factories/channels"
 
@@ -118,6 +119,46 @@ describe("Channel utils", () => {
       ["", LINK_TYPE_LINK, false]
     ].forEach(([linkType, value, expected]) => {
       assert.equal(isLinkTypeChecked(linkType, value), expected)
+    })
+  })
+
+  describe("isTextTabSelected", () => {
+    [
+      // no channel selected and default tab selected
+      [null, null, true],
+      // no channel selected, we should use whatever tab the user selected
+      [null, LINK_TYPE_TEXT, true],
+      [null, LINK_TYPE_LINK, false],
+      // no tab selected but a channel is selected. Use TEXT if the channel supports it else use LINK
+      [LINK_TYPE_ANY, null, true],
+      [LINK_TYPE_TEXT, null, true],
+      [LINK_TYPE_LINK, null, false],
+      // if both are specified use the postType which is an explicit choice by the user
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, false]
+    ].forEach(([channelLinkType, postType, expected]) => {
+      const postTypeDescription =
+        postType === null
+          ? "no tab was previously selected"
+          : `${
+            postType === LINK_TYPE_TEXT ? "text" : "link"
+          } was previously selected`
+      const channel = channelLinkType
+        ? {
+          ...makeChannel(),
+          link_type: channelLinkType
+        }
+        : null
+      const channelDescription =
+        channel === null
+          ? "no channel is selected"
+          : `the channel link type is ${channel.link_type}`
+
+      it(`${
+        expected ? "text" : "link"
+      } tab is selected if ${postTypeDescription} and ${channelDescription}`, () => {
+        assert.equal(isTextTabSelected(postType, channel), expected)
+      })
     })
   })
 })

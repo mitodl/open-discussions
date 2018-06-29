@@ -8,7 +8,7 @@ import type { FormValue } from "../flow/formTypes"
 export type FormData = { [string]: any }
 export type NewFormFunc = () => FormData
 export type ConfiguredFormProps = {
-  getForm: Object => ?FormValue,
+  getForm: Object => ?FormValue<*>,
   actionCreators: {
     formBeginEdit: () => Action,
     formEndEdit: () => Action,
