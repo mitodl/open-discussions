@@ -9,6 +9,7 @@ import {
   validate,
   validatePostCreateForm,
   validateChannelAppearanceEditForm,
+  validateChannelBasicEditForm,
   validateContentReportForm
 } from "./validation"
 
@@ -142,7 +143,7 @@ describe("validation library", () => {
     })
   })
 
-  describe("validateChannelEditForm", () => {
+  describe("validateChannelAppearanceEditForm", () => {
     it("should complain about too long of a description", () => {
       const channel = {
         value: {
@@ -151,11 +152,29 @@ describe("validation library", () => {
       }
       assert.deepEqual(validateChannelAppearanceEditForm(channel), {
         value: {
-          description: "Description length is limited to 5120 characters"
+          description:
+            "Description One of the length is limited to 5120 characters"
         }
       })
       channel.value.description = "a".repeat(5120)
       assert.deepEqual(validateChannelAppearanceEditForm(channel), {})
+    })
+  })
+
+  describe("validateChannelBasicEditForm", () => {
+    it("should complain about no link types being selected", () => {
+      const channel = {
+        value: {
+          link_type: []
+        }
+      }
+      assert.deepEqual(validateChannelBasicEditForm(channel), {
+        value: {
+          link_type: "At least one of the post type options must be selected"
+        }
+      })
+      channel.value.link_type = [LINK_TYPE_LINK]
+      assert.deepEqual(validateChannelBasicEditForm(channel), {})
     })
   })
 

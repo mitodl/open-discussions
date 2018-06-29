@@ -96,7 +96,7 @@ export const validateChannelBasicEditForm = validate([
   validation(
     R.isEmpty,
     R.lensPath(["value", "link_type"]),
-    "One of the post type options must be selected"
+    "At least one of the post type options must be selected"
   )
 ])
 

@@ -118,7 +118,11 @@ describe("Channel utils", () => {
       ["", LINK_TYPE_TEXT, false],
       ["", LINK_TYPE_LINK, false]
     ].forEach(([linkType, value, expected]) => {
-      assert.equal(isLinkTypeChecked(linkType, value), expected)
+      it(`has a checked value of ${String(
+        expected
+      )} for a channel link type ${linkType} and for checkbox ${value}`, () => {
+        assert.equal(isLinkTypeChecked(linkType, value), expected)
+      })
     })
   })
 
