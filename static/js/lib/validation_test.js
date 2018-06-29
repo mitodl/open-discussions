@@ -152,8 +152,7 @@ describe("validation library", () => {
       }
       assert.deepEqual(validateChannelAppearanceEditForm(channel), {
         value: {
-          description:
-            "Description One of the length is limited to 5120 characters"
+          description: "Description length is limited to 5120 characters"
         }
       })
       channel.value.description = "a".repeat(5120)

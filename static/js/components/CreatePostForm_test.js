@@ -27,30 +27,36 @@ describe("CreatePostForm", () => {
     sandbox.restore()
   })
 
-  it("should show an embedly preview when link post and non-error embedly object", () => {
+  describe("embedly preview link", () => {
     const errorArticle = makeArticle()
     errorArticle.type = "error"
     ;[
-      [LINK_TYPE_LINK, true, makeArticle()],
-      [LINK_TYPE_TEXT, false, makeArticle()],
-      [LINK_TYPE_LINK, false, errorArticle],
-      [LINK_TYPE_LINK, false, undefined],
-      [LINK_TYPE_TEXT, false, undefined]
-    ].forEach(([postType, shouldShowEmbed, embedlyResponse]) => {
-      const form = {
-        postType: postType,
-        title:    "title"
+      [true, true, makeArticle(), "valid"],
+      [false, false, makeArticle(), "valid"],
+      [true, false, errorArticle, "errored"],
+      [true, false, undefined, "missing"],
+      [false, false, undefined, "missing"]
+    ].forEach(
+      ([linkPost, shouldShowEmbed, embedlyResponse, embedlyDescription]) => {
+        it(`should ${shouldShowEmbed ? " " : "not "}show the link for a ${
+          linkPost ? "link" : "text"
+        } post and a ${embedlyDescription} embedly response`, () => {
+          isTextTabSelectedStub.returns(!linkPost)
+          const form = {
+            title: "title"
+          }
+          const wrapper = shallow(
+            <CreatePostForm
+              postForm={form}
+              embedly={embedlyResponse}
+              validation={{}}
+              channels={[]}
+            />
+          )
+          assert.equal(shouldShowEmbed, wrapper.find(Embedly).exists())
+        })
       }
-      const wrapper = shallow(
-        <CreatePostForm
-          postForm={form}
-          embedly={embedlyResponse}
-          validation={{}}
-          channels={[]}
-        />
-      )
-      assert.equal(shouldShowEmbed, wrapper.find(Embedly).exists())
-    })
+    )
   })
 
   it("uses isTextTabSelected to determine which tab to show", () => {
