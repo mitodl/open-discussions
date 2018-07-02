@@ -79,11 +79,21 @@ export const isTextTabSelected = (
   postType: string | null,
   channel: ?Channel
 ) => {
-  if (postType !== null) {
-    return postType !== LINK_TYPE_LINK
+  let selectedTab
+  if (postType) {
+    selectedTab = postType
+  } else if (channel) {
+    selectedTab = channel.link_type
+  } else {
+    selectedTab = LINK_TYPE_ANY
   }
-  if (!channel) {
-    return true
+
+  const isTextTabSelected = selectedTab !== LINK_TYPE_LINK
+
+  // If the selected tab is invalid, choose the other one. At least one tab should be valid for a channel.
+  if (channel && !isLinkTypeChecked(channel.link_type, selectedTab)) {
+    return !isTextTabSelected
   }
-  return channel.link_type !== LINK_TYPE_LINK
+
+  return isTextTabSelected
 }

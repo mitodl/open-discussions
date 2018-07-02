@@ -137,9 +137,12 @@ describe("Channel utils", () => {
       [LINK_TYPE_ANY, null, true],
       [LINK_TYPE_TEXT, null, true],
       [LINK_TYPE_LINK, null, false],
-      // if both are specified use the postType which is an explicit choice by the user
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, false]
+      // if both are specified and they conflict, use the only tab type which is valid
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
+      // If there is no conflict choose the one the user selected
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, false]
     ].forEach(([channelLinkType, postType, expected]) => {
       const postTypeDescription =
         postType === null
