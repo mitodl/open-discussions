@@ -31,7 +31,7 @@ const Navigation = (props: NavigationProps) => {
     !userIsAnonymous() &&
     (currentChannel
       ? userCanPost(currentChannel)
-      : R.any(channel => userCanPost(channel), Array.from(channels.values())))
+      : R.any(userCanPost, [...channels.values()]))
 
   return (
     <div className="navigation">
