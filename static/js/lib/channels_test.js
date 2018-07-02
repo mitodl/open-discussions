@@ -51,12 +51,14 @@ describe("Channel utils", () => {
       [CHANNEL_TYPE_RESTRICTED, false, false, false],
       [CHANNEL_TYPE_PRIVATE, false, false, false],
       [CHANNEL_TYPE_PRIVATE, true, false, true],
-      [CHANNEL_TYPE_PRIVATE, false, true, true]
+      [CHANNEL_TYPE_PRIVATE, false, true, true],
+      [CHANNEL_TYPE_RESTRICTED, true, true, true]
     ].forEach(([channelType, isModerator, isContributor, expected]) => {
-      it(`${expected ? "shows" : "doesn't show"} the submit button when
-       channelType is ${channelType}${
-  isModerator ? "and the user is a moderator " : ""
-}${isContributor ? "and the user is a contributor" : ""}`, () => {
+      it(`${
+        expected ? "shows" : "doesn't show"
+      } the submit button when channelType is ${channelType}${
+        isModerator ? "and the user is a moderator " : ""
+      }${isContributor ? "and the user is a contributor" : ""}`, () => {
         const channel: Object = {
           ...makeChannel(),
           channel_type:        channelType,
