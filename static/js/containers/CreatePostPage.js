@@ -7,7 +7,12 @@ import DocumentTitle from "react-document-title"
 import CreatePostForm from "../components/CreatePostForm"
 
 import { actions } from "../actions"
-import { isTextTabSelected } from "../lib/channels"
+import {
+  isTextTabSelected,
+  isLinkTypeChecked,
+  LINK_TYPE_TEXT,
+  LINK_TYPE_LINK
+} from "../lib/channels"
 import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
 import { getChannelName } from "../lib/util"
@@ -56,6 +61,32 @@ class CreatePostPage extends React.Component<*, void> {
       })
     )
     ensureTwitterEmbedJS()
+    this.updateTabSelection()
+  }
+
+  componentDidUpdate() {
+    this.updateTabSelection()
+  }
+
+  updateTabSelection = () => {
+    const { channel, dispatch, postForm } = this.props
+
+    if (
+      postForm &&
+      channel &&
+      (postForm.value.postType === null ||
+        !isLinkTypeChecked(channel.link_type, postForm.value.postType))
+    ) {
+      const postType = isTextTabSelected(null, channel)
+        ? LINK_TYPE_TEXT
+        : LINK_TYPE_LINK
+      dispatch(
+        actions.forms.formUpdate({
+          ...CREATE_POST_PAYLOAD,
+          value: { postType }
+        })
+      )
+    }
   }
 
   componentWillUnmount() {
@@ -86,6 +117,8 @@ class CreatePostPage extends React.Component<*, void> {
       const embedlyResponse = await dispatch(embedlyGetFunc)
       handleTwitterWidgets(embedlyResponse)
     }
+
+    this.updateTabSelection()
   }
 
   updatePostType = (postType: string) => {

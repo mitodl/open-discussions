@@ -108,7 +108,7 @@ describe("validation library", () => {
     })
 
     it("should complain about no text on a text post", () => {
-      const post = { value: { postType: null, title: "potato" } }
+      const post = { value: { postType: LINK_TYPE_TEXT, title: "potato" } }
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
           text: "Post text cannot be empty"
@@ -121,6 +121,15 @@ describe("validation library", () => {
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
           url: "Post url cannot be empty"
+        }
+      })
+    })
+
+    it("should complain about missing post type", () => {
+      const post = { value: { postType: null, title: "potato" } }
+      assert.deepEqual(validatePostCreateForm(post), {
+        value: {
+          post_type: "One of text or post tabs must be selected"
         }
       })
     })

@@ -47,6 +47,14 @@ export const postUrlOrTextPresent = (postForm: { value: PostForm }) => {
   }
 
   const post = postForm.value
+  if (!postForm.value.postType) {
+    return S.Just(
+      R.set(
+        R.lensPath(["value", "post_type"]),
+        "One of text or post tabs must be selected"
+      )
+    )
+  }
   const isText = isTextTabSelected(postForm.value.postType, null)
 
   if (isText && emptyOrNil(post.text)) {
