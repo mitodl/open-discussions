@@ -13,7 +13,7 @@ describe("AuthPasswordForm component", () => {
 
   beforeEach(() => {
     browserHistory = createMemoryHistory()
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     onSubmitStub = sandbox.stub()
     onUpdateStub = sandbox.stub()
     form = {

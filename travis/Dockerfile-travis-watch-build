@@ -1,4 +1,4 @@
-FROM node:9.3
+FROM node:10.5
 LABEL maintainer "ODL DevOps <mitx-devops@mit.edu>"
 
 # this dockerfile builds the hub image for the watch container
@@ -18,10 +18,10 @@ COPY scripts /src/scripts
 
 RUN node /src/scripts/install_yarn.js
 
-USER node
-
 # this is just to get a warm cache, we delete node_modules afterwards to
 # avoid issues with native extensions (mainly node-sass)
 RUN yarn install --frozen-lockfile --ignore-engines
 
 RUN rm -rf node_modules
+
+USER node

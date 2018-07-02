@@ -76,7 +76,7 @@ export class CompactPostDisplay extends React.Component<*, void> {
             </div>
           </Link>
           {post.url ? (
-            <a href={post.url} target="_blank">
+            <a href={post.url} target="_blank" rel="noopener noreferrer">
               <i className="material-icons open_in_new">open_in_new</i>
             </a>
           ) : (

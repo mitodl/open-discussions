@@ -15,7 +15,7 @@ describe("forms reducer", () => {
   let sandbox, store, dispatchThen
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     store = configureTestStore(rootReducer)
     dispatchThen = store.createDispatchThen(state => state.forms)
   })

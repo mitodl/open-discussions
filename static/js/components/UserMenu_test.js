@@ -18,7 +18,7 @@ describe("UserMenu", () => {
 
   beforeEach(() => {
     toggleShowUserMenuStub = sinon.stub()
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     showUserMenu = false
     profile = {
       name:              "Test User",

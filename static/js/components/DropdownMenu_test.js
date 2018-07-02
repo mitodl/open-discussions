@@ -10,7 +10,7 @@ describe("dropdown menu", () => {
   let sandbox, closeMenu
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     closeMenu = sandbox.stub()
   })
 

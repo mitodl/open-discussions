@@ -30,7 +30,7 @@ describe("image upload reducer", () => {
   let patchProfileImageStub
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     store = configureTestStore(rootReducer)
     dispatchThen = store.createDispatchThen(state => state.imageUpload)
     patchProfileImageStub = sandbox.stub(api, "patchProfileImage")

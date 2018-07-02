@@ -17,7 +17,7 @@ describe("Navigation", () => {
   let sandbox, userIsAnonymousStub, defaultProps: Object, userCanPostStub
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     userIsAnonymousStub = sandbox.stub(util, "userIsAnonymous")
     userIsAnonymousStub.returns(false)
     userCanPostStub = sandbox.stub(channels, "userCanPost")

@@ -10,7 +10,7 @@ describe("ReportForm", () => {
   let sandbox, onUpdateStub
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     onUpdateStub = sandbox.stub()
   })
 
