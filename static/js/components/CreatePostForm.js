@@ -6,6 +6,7 @@ import Card from "../components/Card"
 import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import Embedly from "./Embedly"
 
+import { userCanPost } from "../lib/channels"
 import { CONTENT_POLICY_URL } from "../lib/url"
 import { goBackAndHandleEvent } from "../lib/util"
 import { validationMessage } from "../lib/validation"
@@ -27,11 +28,13 @@ type CreatePostFormProps = {
 }
 
 const channelOptions = (channels: Map<string, Channel>) =>
-  Array.from(channels).map(([key, value], index) => (
-    <option label={value.title} value={key} key={index}>
-      {value.title}
-    </option>
-  ))
+  Array.from(channels)
+    .filter(([, channel]) => userCanPost(channel))
+    .map(([key, value], index) => (
+      <option label={value.title} value={key} key={index}>
+        {value.title}
+      </option>
+    ))
 
 export default class CreatePostForm extends React.Component<*, void> {
   props: CreatePostFormProps
