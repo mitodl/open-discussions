@@ -68,7 +68,7 @@ describe("Navigation", () => {
       assert.isNotOk(wrapper.find(".mdc-button").exists())
     })
 
-    it("should not show the create post link if the channel can't be shown to the user", () => {
+    it("should not show the create post link if the user can't post in the channel", () => {
       userCanPostStub.returns(false)
       const channel = defaultProps.subscribedChannels[3]
       const wrapper = renderComponent({
@@ -80,7 +80,7 @@ describe("Navigation", () => {
       sinon.assert.calledWith(userCanPostStub, channel)
     })
 
-    it("should not show the create post link if no channel can be shown to the user", () => {
+    it("should not show the create post link if the user can't post in any channel", () => {
       userCanPostStub.returns(false)
       const wrapper = renderComponent()
       assert.isNotOk(wrapper.find(".mdc-button").exists())
