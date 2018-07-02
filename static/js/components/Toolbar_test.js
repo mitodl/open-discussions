@@ -32,7 +32,9 @@ describe("Toolbar", () => {
     renderToolbar()
       .find("a")
       .at(0)
-      .simulate("click")
+      .simulate("click", {
+        preventDefault: sandbox.stub()
+      })
     assert.ok(toggleShowDrawerStub.called)
   })
 })
