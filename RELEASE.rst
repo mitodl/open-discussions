@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.35.0
+--------------
+
+- Hide post button for channels not allowing it (#857)
+- Add preventDefault to toolbar click handler (#862)
+
 Version 0.34.1
 --------------
 
