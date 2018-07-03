@@ -10,7 +10,6 @@ import { actions } from "../actions"
 import {
   isTextTabSelected,
   LINK_TYPE_TEXT,
-  LINK_TYPE_LINK,
   LINK_TYPE_ANY
 } from "../lib/channels"
 import { newPostForm } from "../lib/posts"
