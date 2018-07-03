@@ -66,6 +66,7 @@ class ESPostSerializer(ESSerializer):
     rename_keys = {
         'id': 'post_id',
         'title': 'post_title',
+        'url': 'post_link_url',
     }
 
     @property

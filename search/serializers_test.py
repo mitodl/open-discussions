@@ -30,6 +30,7 @@ def patched_base_post_serializer(mocker):
         'deleted': False,
         'id': 1,
         'title': 'post_title',
+        'url': None,
     }
     yield mocker.patch(
         'search.serializers.ESPostSerializer.base_serializer',
@@ -63,10 +64,18 @@ def patched_base_comment_serializer(mocker):
     )
 
 
-def test_es_post_serializer(patched_base_post_serializer, reddit_submission_obj):
+@pytest.mark.parametrize("post_text,post_url", [
+    ["some text", None],
+    ["", "http://example.com"]
+])
+def test_es_post_serializer(patched_base_post_serializer, reddit_submission_obj, post_text, post_url):
     """
     Test that ESPostSerializer correctly serializes a post/submission object
     """
+    patched_base_post_serializer.return_value.data.update({
+        'text': post_text,
+        'url': post_url,
+    })
     base_serialized = patched_base_post_serializer.return_value.data
     serialized = ESPostSerializer().serialize(reddit_submission_obj)
     patched_base_post_serializer.assert_called_once_with(reddit_submission_obj)
@@ -83,6 +92,7 @@ def test_es_post_serializer(patched_base_post_serializer, reddit_submission_obj)
         'num_comments': base_serialized['num_comments'],
         'post_id': base_serialized['id'],
         'post_title': base_serialized['title'],
+        'post_link_url': base_serialized['url'],
     }
 
 
