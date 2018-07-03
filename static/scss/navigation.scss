@@ -15,7 +15,8 @@ a.mitlogo {
       padding: 16px 0 16px 12px;
     }
 
-    .mdc-toolbar__title, .mdc-toolbar__title a {
+    .mdc-toolbar__title,
+    .mdc-toolbar__title a {
       color: #5d5d5d;
       font-size: 1.1rem;
     }
@@ -42,7 +43,8 @@ a.mitlogo {
     margin-left: 36px;
   }
 
-  .mdc-button, .home-link {
+  .mdc-button,
+  .home-link {
     width: 87%;
     height: 43px;
     line-height: 43px;

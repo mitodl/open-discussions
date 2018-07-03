@@ -51,7 +51,7 @@
 }
 
 .cropper-modal {
-  opacity: .5;
+  opacity: 0.5;
   background-color: #000;
 }
 
@@ -73,7 +73,7 @@
 
   display: block;
 
-  opacity: .5;
+  opacity: 0.5;
   border: 0 dashed #eee;
 
   &.dashed-h {
@@ -109,7 +109,7 @@
   width: 0;
   height: 0;
 
-  opacity: .75;
+  opacity: 0.75;
 
   &:before,
   &:after {
@@ -117,7 +117,7 @@
 
     display: block;
 
-    content: ' ';
+    content: " ";
 
     background-color: #eee;
   }
@@ -149,7 +149,7 @@
   width: 100%;
   height: 100%;
 
-  opacity: .1;
+  opacity: 0.1;
 }
 
 .cropper-face {
@@ -269,7 +269,6 @@
 
     cursor: se-resize;
   }
-
 }
 
 .cropper-invisible {
@@ -277,7 +276,7 @@
 }
 
 .cropper-bg {
-  background-image: inline('../images/bg.png');
+  background-image: inline("../images/bg.png");
 }
 
 .cropper-hide {

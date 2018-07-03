@@ -1,13 +1,13 @@
 .form {
   .form-item {
     margin: 0 0 28px 0;
-    color: rgba(0,0,0,.87);
+    color: rgba(0, 0, 0, 0.87);
 
-    .label, .input {
+    .label,
+    .input {
       display: block;
     }
   }
-
 
   .row {
     margin: 10px 10px 24px 15px;
@@ -23,7 +23,7 @@
 
 .form-field {
   margin: 0 0 28px 0;
-  color: rgba(0,0,0,.87);
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .profile-name {
@@ -32,7 +32,9 @@
   vertical-align: middle;
 }
 
-input[type=text], input[type=url], input[type=password] {
+input[type="text"],
+input[type="url"],
+input[type="password"] {
   width: 100%;
   padding: 10px 10px;
   font-size: 15px;
@@ -81,7 +83,9 @@ label.radiolabel {
   font-size: 16px;
 }
 
-input[type=submit], button[type=submit], button.cancel {
+input[type="submit"],
+button[type="submit"],
+button.cancel {
   background-color: $button-blue;
   border: none;
   color: white;
@@ -99,11 +103,13 @@ input[type=submit], button[type=submit], button.cancel {
   }
 }
 
-button.cancel, button.disabled {
+button.cancel,
+button.disabled {
   background: #cecece;
 }
 
-input[type=checkbox], input[type=radio] {
+input[type="checkbox"],
+input[type="radio"] {
   box-sizing: border-box;
   font-size: 16px;
 }
@@ -112,14 +118,15 @@ select {
   background: #f8f8f8;
   border: 1px solid #bbb;
   font-size: 15px;
-  color: rgba(0,0,0,.87);
+  color: rgba(0, 0, 0, 0.87);
   border-radius: 3px;
   height: 39px;
   padding: 8px 20px; /* If you add too much padding here, the options won't show in IE */
   width: 100%;
 }
 
-input::placeholder, textarea::placeholder {
+input::placeholder,
+textarea::placeholder {
   color: #bbb;
 }
 

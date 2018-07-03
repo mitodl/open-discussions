@@ -22,8 +22,9 @@
       margin: 0 -15px 33px -15px;
       padding: 0 20px;
 
-      .new-text-post, .new-link-post {
-        padding: 10px 29px 17px ;
+      .new-text-post,
+      .new-link-post {
+        padding: 10px 29px 17px;
         color: #585858;
         text-transform: uppercase;
         font-weight: 400;
@@ -45,7 +46,8 @@
       }
     }
 
-    .posting-to-channel, .posting-policy {
+    .posting-to-channel,
+    .posting-policy {
       font-size: 1rem;
       color: $font-grey;
     }
