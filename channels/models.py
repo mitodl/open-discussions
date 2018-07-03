@@ -92,6 +92,7 @@ class Channel(TimestampedModel):
     Keep track of channels which are stored in reddit
     """
     name = models.CharField(unique=True, max_length=100)
+    membership_is_managed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name}"

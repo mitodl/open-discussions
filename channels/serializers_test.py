@@ -7,6 +7,7 @@ import pytest
 from praw.models.reddit.redditor import Redditor
 from rest_framework.exceptions import ValidationError
 
+from channels.models import Channel
 from channels.serializers import (
     ChannelSerializer,
     CommentSerializer,
@@ -23,7 +24,8 @@ from open_discussions.factories import UserFactory
 pytestmark = pytest.mark.django_db
 
 
-def test_serialize_channel(user):
+@pytest.mark.parametrize("membership_is_managed", [True, False, None])
+def test_serialize_channel(user, membership_is_managed):
     """
     Test serializing a channel
     """
@@ -36,6 +38,10 @@ def test_serialize_channel(user):
         submission_type='link',
     )
     request = Mock(user=user)
+
+    if membership_is_managed is not None:
+        Channel.objects.create(name=channel.display_name, membership_is_managed=membership_is_managed)
+
     assert ChannelSerializer(channel, context={
         "request": request,
     }).data == {
@@ -47,10 +53,12 @@ def test_serialize_channel(user):
         'public_description': 'public_description',
         'user_is_moderator': True,
         'user_is_contributor': True,
+        'membership_is_managed': bool(membership_is_managed),
     }
 
 
-def test_create_channel(user):
+@pytest.mark.parametrize("membership_is_managed", [True, False, None])
+def test_create_channel(user, membership_is_managed):
     """
     Test creating a channel
     """
@@ -62,12 +70,16 @@ def test_create_channel(user):
         'description': 'description',
         'public_description': 'public_description',
     }
+    if membership_is_managed is not None:
+        validated_data['membership_is_managed'] = membership_is_managed
+    expected_membership = membership_is_managed is not False
     request = Mock(user=user)
     api_mock = Mock()
     channel = ChannelSerializer(context={
         "channel_api": api_mock,
         "request": request,
     }).create(validated_data)
+
     api_mock.create_channel.assert_called_once_with(
         name=validated_data['display_name'],
         title=validated_data['title'],
@@ -75,6 +87,7 @@ def test_create_channel(user):
         description=validated_data['description'],
         public_description=validated_data['public_description'],
         link_type=validated_data['submission_type'],
+        membership_is_managed=expected_membership,
     )
     assert channel == api_mock.create_channel.return_value
 

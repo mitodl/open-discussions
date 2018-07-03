@@ -3,17 +3,6 @@ Functions related to tasks for channels
 """
 
 
-def sync_channel_model(channel):
-    """
-    Create the channel in our database if it doesn't already exist
-
-    Args:
-        channel (Channel): The PRAW channel object
-    """
-    from channels import tasks
-    tasks.sync_channel_model.delay(channel.display_name)
-
-
 def sync_post_model(post):
     """
     Create or update local post id information

@@ -162,8 +162,7 @@ def test_create_channel_user(mock_get_client, indexing_decorator, channel_type):
     mock_get_client.return_value.subreddit.create.assert_called_once_with(
         'name', title='Title', subreddit_type=channel_type
     )
-    assert indexing_decorator.mock_persist_func.call_count == 1
-    assert channels_task_helpers.sync_channel_model in indexing_decorator.mock_persist_func.original
+    assert indexing_decorator.mock_persist_func.call_count == 0
 
 
 @pytest.mark.parametrize('channel_setting', api.CHANNEL_SETTINGS)
@@ -196,6 +195,15 @@ def test_create_channel_user_invalid_type(mock_client):
     assert mock_client.subreddit.create.call_count == 0
 
 
+def test_create_channel_invalid_membership(mock_client):
+    """Test create_channel for logged-in user"""
+    user = UserFactory.create()
+    client = api.Api(user=user)
+    with pytest.raises(ValueError):
+        client.create_channel('name', 'Title', membership_is_managed='notabool')
+    assert mock_client.subreddit.create.call_count == 0
+
+
 @pytest.mark.parametrize('channel_type', VALID_CHANNEL_TYPES)
 def test_update_channel_type(mock_client, channel_type):
     """Test create_channel for channel_type"""
@@ -209,7 +217,7 @@ def test_update_channel_type(mock_client, channel_type):
 
 @pytest.mark.parametrize('channel_setting', api.CHANNEL_SETTINGS + ('title',))
 def test_update_channel_setting(mock_client, channel_setting):
-    """Test update_channel for {channel_setting}"""
+    """Test update_channel for channel_setting"""
     user = UserFactory.create()
     kwargs = {channel_setting: 'value'}
     channel = api.Api(user=user).update_channel('name', **kwargs)
@@ -217,6 +225,50 @@ def test_update_channel_setting(mock_client, channel_setting):
     mock_client.subreddit.assert_called_with('name')
     assert mock_client.subreddit.call_count == 2
     mock_client.subreddit.return_value.mod.update.assert_called_once_with(**kwargs)
+
+
+@pytest.mark.parametrize("membership_is_managed", [None, True, False])
+def test_update_channel_membership(mock_client, membership_is_managed):
+    """Test update_channel for membership"""
+    name = 'name'
+    Channel.objects.create(name=name)
+    user = UserFactory.create()
+    channel = api.Api(user=user).update_channel(name, membership_is_managed=membership_is_managed)
+    assert channel == mock_client.subreddit.return_value
+    mock_client.subreddit.assert_called_with(name)
+    assert mock_client.subreddit.call_count == 2
+    mock_client.subreddit.return_value.mod.update.assert_called_once_with()
+
+    assert Channel.objects.count() == 1
+    channel_obj = Channel.objects.first()
+    assert channel_obj.name == name
+    assert channel_obj.membership_is_managed is (
+        membership_is_managed if membership_is_managed is not None else False
+    )
+
+
+def test_update_channel_invalid_channel_type(mock_client):
+    """update_channel should restrict to valid channel types"""
+    user = UserFactory.create()
+    with pytest.raises(ValueError):
+        api.Api(user=user).update_channel('name', channel_type='not_a_type')
+    assert mock_client.subreddit.call_count == 0
+
+
+def test_update_channel_invalid_key(mock_client):
+    """update_channel should restrict to valid channel types"""
+    user = UserFactory.create()
+    with pytest.raises(ValueError):
+        api.Api(user=user).update_channel('name', unexpected='key')
+    assert mock_client.subreddit.call_count == 0
+
+
+def test_update_channel_invalid_membership(mock_client):
+    """update_channel should restrict to valid channel types"""
+    user = UserFactory.create()
+    with pytest.raises(ValueError):
+        api.Api(user=user).update_channel('name', membership_is_managed='not_a_bool')
+    assert mock_client.subreddit.call_count == 0
 
 
 def test_create_post_text(mock_client, indexing_decorator):
