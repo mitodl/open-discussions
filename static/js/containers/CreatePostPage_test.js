@@ -8,7 +8,12 @@ import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { userCanPost } from "../lib/channels"
+import {
+  userCanPost,
+  LINK_TYPE_TEXT,
+  LINK_TYPE_LINK,
+  LINK_TYPE_ANY
+} from "../lib/channels"
 import { formatTitle } from "../lib/title"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import { wait } from "../lib/util"
@@ -329,6 +334,10 @@ describe("CreatePostPage", () => {
   it("should change URL when you select a new subreddit if URL param is absent", async () => {
     const wrapper = await renderPage("/create_post/")
     let select = wrapper.find("select")
+
+    // allow only LINK so we can assert it doesn't choose the default of TEXT
+    channels[6].link_type = LINK_TYPE_LINK
+
     select.simulate("change", { target: { value: channels[6].name } })
     assert.equal(
       helper.currentLocation.pathname,
@@ -337,5 +346,57 @@ describe("CreatePostPage", () => {
     wrapper.update()
     select = wrapper.find("select")
     assert.equal(select.props().value, channels[6].name)
+    assert.deepEqual(
+      helper.store.getState().forms["post:new"].value.postType,
+      LINK_TYPE_LINK
+    )
+  })
+
+  describe("updateTabSelection", () => {
+    [
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT],
+      [LINK_TYPE_TEXT, LINK_TYPE_TEXT],
+      [LINK_TYPE_LINK, LINK_TYPE_LINK]
+    ].forEach(([channelLinkType, formLinkType]) => {
+      it(`picks an explicit initial value for link_type ${channelLinkType}`, async () => {
+        currentChannel.link_type = channelLinkType
+        await renderPage()
+        assert.equal(
+          helper.store.getState().forms["post:new"].value.postType,
+          formLinkType
+        )
+      })
+    })
+    ;[
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
+      [LINK_TYPE_LINK, LINK_TYPE_LINK, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, true]
+    ].forEach(([fromLinkType, toLinkType, shouldDispatch]) => {
+      it(`${
+        shouldDispatch ? "dispatches" : "doesn't dispatch"
+      } FORM_UPDATE if the post types when it goes from ${fromLinkType} to ${toLinkType}`, async () => {
+        currentChannel.link_type = fromLinkType
+        const wrapper = await renderPage()
+        const startingActions = [...helper.actionsLog]
+        channels[7].link_type = toLinkType
+        const select = wrapper.find("select")
+        select.simulate("change", { target: { value: channels[7].name } })
+        // Not sure how to wait for something which might not to happen
+        await wait(100)
+        assert.deepEqual(
+          helper.store.getState().forms["post:new"].value.postType,
+          toLinkType
+        )
+
+        const actionTypes = helper.actionsLog
+          .map((...args) => args[0][1].type)
+          .splice(startingActions.length)
+        assert.deepEqual(
+          shouldDispatch ? [actions.forms.FORM_UPDATE] : [],
+          actionTypes
+        )
+      })
+    })
   })
 })
