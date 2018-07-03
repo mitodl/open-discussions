@@ -24,6 +24,7 @@ import { ChannelModerationBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import { commentPermalink, channelURL } from "../lib/url"
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
+import { dropdownMenuFuncs } from "../lib/ui"
 
 import type { Dispatch } from "redux"
 import type {
@@ -45,7 +46,8 @@ type Props = {
   ignorePostReports: Function,
   approveComment: Function,
   removeComment: Function,
-  ignoreCommentReports: Function
+  ignoreCommentReports: Function,
+  dropdownMenus: Set<string>
 }
 
 class ChannelModerationPage extends React.Component<Props> {
@@ -71,7 +73,9 @@ class ChannelModerationPage extends React.Component<Props> {
       channelName,
       ignorePostReports,
       ignoreCommentReports,
-      commentReports
+      commentReports,
+      dropdownMenus,
+      dispatch
     } = this.props
 
     if (report.post) {
@@ -87,23 +91,23 @@ class ChannelModerationPage extends React.Component<Props> {
       )
     } else {
       return (
-        <Card>
-          <CommentTree
-            comments={[addDummyReplies(report.comment)]}
-            commentReports={commentReports}
-            commentPermalink={commentPermalink(
-              channelName,
-              report.comment.post_id,
-              null
-            )}
-            approve={approveComment}
-            remove={removeComment}
-            ignoreCommentReports={ignoreCommentReports}
-            key={`${report.comment.id}-${report.comment.post_id}`}
-            moderationUI
-            isModerator={isModerator}
-          />
-        </Card>
+        <CommentTree
+          comments={[addDummyReplies(report.comment)]}
+          commentReports={commentReports}
+          commentPermalink={commentPermalink(
+            channelName,
+            report.comment.post_id,
+            null
+          )}
+          approve={approveComment}
+          remove={removeComment}
+          ignoreCommentReports={ignoreCommentReports}
+          key={`${report.comment.id}-${report.comment.post_id}`}
+          moderationUI
+          isModerator={isModerator}
+          dropdownMenus={dropdownMenus}
+          curriedDropdownMenufunc={dropdownMenuFuncs(dispatch)}
+        />
       )
     }
   }
@@ -135,7 +139,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     ...postModerationSelector(state, ownProps),
     ...commentModerationSelector(state, ownProps),
-    shouldGetReports: true
+    shouldGetReports: true,
+    dropdownMenus:    state.ui.dropdownMenus
   }
 }
 

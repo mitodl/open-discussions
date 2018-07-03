@@ -3,7 +3,7 @@ $profileImageHeight: $profileImageWidth;
 $commentTopMargin: 19px;
 $commentPaddingLeftDesktop: 12px;
 $commentPaddingLeftPhone: 12px;
-$replyPaddingLeft: 8px;
+$replyPaddingLeft: 30px;
 
 .comments {
   .card {
@@ -11,11 +11,7 @@ $replyPaddingLeft: 8px;
   }
 
   .card-contents {
-    padding: 30px 14px 35px;
-
-    @include breakpoint(phone) {
-      padding: 22px 13px 25px;
-    }
+    display: flex;
   }
 
   .top-level-comment {
@@ -31,13 +27,10 @@ $replyPaddingLeft: 8px;
   }
 
   .comment {
-    margin: $commentTopMargin 0 0;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
 
     img.profile-image {
-      width: $profileImageWidth;
-      height: $profileImageHeight;
       flex-shrink: 0;
 
       @include breakpoint(phone) {
@@ -80,7 +73,27 @@ $replyPaddingLeft: 8px;
 
       &.comment-actions {
         margin: 4px 0 5px;
-        display: inline-block;
+        position: relative;
+        display: flex;
+        justify-content: flex-start;
+
+        .share-button-wrapper {
+          position: relative;
+        }
+
+        .dropdown-menu {
+          top: 20px;
+          left: 78px;
+          right: inherit;
+        }
+
+        i {
+          cursor: pointer;
+        }
+
+        > * {
+          color: $font-grey-light;
+        }
 
         .votes-form {
           margin-right: 5px;
@@ -164,7 +177,6 @@ $replyPaddingLeft: 8px;
     }
 
     .replies {
-      border-left: 1px solid #e6e6e6;
       margin-left: 0;
 
       @include breakpoint(phone) {
@@ -208,7 +220,8 @@ $replyPaddingLeft: 8px;
   .comment-action-button {
     font-size: 0.9em;
     font-weight: 400;
-    display: inline-block;
+    cursor: pointer;
+    margin-right: 10px;
   }
 }
 

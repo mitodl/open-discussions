@@ -1,4 +1,6 @@
 // @flow
+import R from "ramda"
+
 import {
   SET_SHOW_DRAWER_DESKTOP,
   SET_SHOW_DRAWER_MOBILE,
@@ -32,7 +34,7 @@ export type UIState = {
   snackbar: ?SnackbarState,
   banner: BannerState,
   dialogs: Map<string, any>,
-  dropdownMenus: Map<string, any>
+  dropdownMenus: Set<string>
 }
 
 const INITIAL_BANNER_STATE = {
@@ -46,7 +48,7 @@ export const INITIAL_UI_STATE: UIState = {
   snackbar:          null,
   banner:            INITIAL_BANNER_STATE,
   dialogs:           new Map(),
-  dropdownMenus:     new Map()
+  dropdownMenus:     new Set()
 }
 
 // this generates a new sequential id for each snackbar state that is pushed
@@ -54,7 +56,7 @@ export const INITIAL_UI_STATE: UIState = {
 const nextSnackbarId = (snackbar: ?SnackbarState): number =>
   snackbar ? snackbar.id + 1 : 0
 
-const updateVisibilitySet = (
+const updateVisibilityMap = (
   dialogs: Map<string, any>,
   dialogKey: string,
   show: boolean
@@ -66,6 +68,15 @@ const updateVisibilitySet = (
   }
   return copy
 }
+
+const updateVisibilitySet = (
+  visibilitySet: Set<string>,
+  key: string,
+  show: boolean
+) =>
+  show
+    ? new Set([...visibilitySet, key])
+    : new Set([...visibilitySet].filter(R.complement(R.equals)(key)))
 
 const setDialogData = (
   dialogs: Map<string, any>,
@@ -113,12 +124,12 @@ export const ui = (
   case SHOW_DIALOG:
     return {
       ...state,
-      dialogs: updateVisibilitySet(state.dialogs, action.payload, true)
+      dialogs: updateVisibilityMap(state.dialogs, action.payload, true)
     }
   case HIDE_DIALOG:
     return {
       ...state,
-      dialogs: updateVisibilitySet(state.dialogs, action.payload, false)
+      dialogs: updateVisibilityMap(state.dialogs, action.payload, false)
     }
   case SET_DIALOG_DATA:
     return {

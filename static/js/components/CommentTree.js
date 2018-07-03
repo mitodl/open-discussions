@@ -11,7 +11,9 @@ import { ReplyToCommentForm, EditCommentForm } from "./CommentForms"
 import CommentVoteForm from "./CommentVoteForm"
 import CommentRemovalForm from "./CommentRemovalForm"
 import { renderTextContent } from "./Markdown"
-import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
+import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
+import DropdownMenu from "../components/DropdownMenu"
+import SharePopup from "./SharePopup"
 
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 import {
@@ -51,56 +53,188 @@ type Props = {
   commentPermalink: (commentID: string) => string,
   moderationUI?: boolean,
   ignoreCommentReports?: (c: CommentInTree) => void,
-  toggleFollowComment?: Function
+  toggleFollowComment?: Function,
+  curriedDropdownMenufunc: (key: string) => Object,
+  dropdownMenus: Set<string>
 }
+
+export const commentDropdownKey = (c: CommentInTree) =>
+  `COMMENT_DROPDOWN_${c.id}`
+
+export const commentShareKey = (c: CommentInTree) =>
+  `COMMENT_SHARE_MENU_${c.id}`
 
 export default class CommentTree extends React.Component<Props> {
   renderFollowButton = (comment: CommentInTree) => {
     const { toggleFollowComment } = this.props
-    return comment.subscribed ? (
-      <div
-        className="comment-action-button subscribe-comment subscribed"
-        onClick={preventDefaultAndInvoke(() => {
-          if (toggleFollowComment) {
-            toggleFollowComment(comment)
-          }
-        })}
-      >
-        <a href="#">unfollow</a>
-      </div>
-    ) : (
-      <div
-        className="comment-action-button subscribe-comment unsubscribed"
-        onClick={preventDefaultAndInvoke(() => {
-          if (toggleFollowComment) {
-            toggleFollowComment(comment)
-          }
-        })}
-      >
-        <a href="#">follow</a>
-      </div>
+
+    return (
+      <li>
+        <div
+          className={`comment-action-button subscribe-comment ${
+            comment.subscribed ? "subscribed" : "unsubscribed"
+          }`}
+          onClick={preventDefaultAndInvoke(() => {
+            if (toggleFollowComment) {
+              toggleFollowComment(comment)
+            }
+          })}
+        >
+          <a href="#">{comment.subscribed ? "unfollow" : "follow"}</a>
+        </div>
+      </li>
     )
   }
 
-  renderComment = (depth: number, comment: CommentInTree) => {
+  renderCommentActions = (comment: CommentInTree, atMaxDepth: boolean) => {
     const {
-      forms,
       upvote,
       downvote,
       approve,
       remove,
       deleteComment,
       beginEditing,
-      processing,
       isModerator,
       reportComment,
       commentPermalink,
       moderationUI,
-      ignoreCommentReports
+      ignoreCommentReports,
+      curriedDropdownMenufunc,
+      dropdownMenus
     } = this.props
     const formKey = replyToCommentKey(comment)
     const editFormKey = editCommentKey(comment)
     const initialValue = getCommentReplyInitialValue(comment)
+
+    const { showDropdown, hideDropdown } = curriedDropdownMenufunc(
+      commentDropdownKey(comment)
+    )
+    const {
+      showDropdown: showShareMenu,
+      hideDropdown: hideShareMenu
+    } = curriedDropdownMenufunc(commentShareKey(comment))
+    const commentMenuOpen = dropdownMenus.has(commentDropdownKey(comment))
+    const commentShareOpen = dropdownMenus.has(commentShareKey(comment))
+
+    return (
+      <div className="row comment-actions">
+        {upvote && downvote ? (
+          <CommentVoteForm
+            comment={comment}
+            upvote={upvote}
+            downvote={downvote}
+          />
+        ) : null}
+        {atMaxDepth ||
+        moderationUI ||
+        comment.deleted ||
+        userIsAnonymous() ? null : (
+            <div
+              className="comment-action-button reply-button"
+              onClick={e => {
+                if (beginEditing) {
+                  beginEditing(formKey, initialValue, e)
+                }
+              }}
+            >
+            reply
+            </div>
+          )}
+        <div className="share-button-wrapper">
+          <div
+            className="comment-action-button share-button"
+            onClick={showShareMenu}
+          >
+            share
+          </div>
+          {commentShareOpen ? (
+            <SharePopup
+              url={commentPermalink(comment.id)}
+              closePopup={hideShareMenu}
+            />
+          ) : null}
+        </div>
+        <i className="material-icons more_vert" onClick={showDropdown}>
+          more_vert
+        </i>
+        {commentMenuOpen ? (
+          <DropdownMenu closeMenu={hideDropdown}>
+            {userIsAnonymous() ? null : this.renderFollowButton(comment)}
+            {comment.num_reports ? (
+              <li className="comment-action-button report-count">
+                Reports: {comment.num_reports}
+              </li>
+            ) : null}
+            {SETTINGS.username === comment.author_id && !moderationUI ? (
+              <li>
+                <div
+                  className="comment-action-button edit-button"
+                  onClick={e => {
+                    if (beginEditing) {
+                      beginEditing(editFormKey, comment, e)
+                    }
+                  }}
+                >
+                  <a href="#">edit</a>
+                </div>
+              </li>
+            ) : null}
+            {SETTINGS.username === comment.author_id && deleteComment ? (
+              <li>
+                <div
+                  className="comment-action-button delete-button"
+                  onClick={preventDefaultAndInvoke(() =>
+                    deleteComment(comment)
+                  )}
+                >
+                  <a href="#">delete</a>
+                </div>
+              </li>
+            ) : null}
+            {comment.num_reports && ignoreCommentReports ? (
+              <li>
+                <div
+                  className="comment-action-button ignore-button"
+                  onClick={preventDefaultAndInvoke(() =>
+                    ignoreCommentReports(comment)
+                  )}
+                >
+                  <a href="#">ignore all reports</a>
+                </div>
+              </li>
+            ) : null}
+            <li className="comment-action-button permalink-button">
+              <Link to={commentPermalink(comment.id)}>permalink</Link>
+            </li>
+            <li>
+              <CommentRemovalForm
+                comment={comment}
+                remove={remove}
+                approve={approve}
+                isModerator={isModerator}
+              />
+            </li>
+            {moderationUI || userIsAnonymous() || !reportComment ? null : (
+              <li>
+                <div
+                  className="comment-action-button report-button"
+                  onClick={preventDefaultAndInvoke(() =>
+                    reportComment(comment)
+                  )}
+                >
+                  <a href="#">report</a>
+                </div>
+              </li>
+            )}
+          </DropdownMenu>
+        ) : null}
+      </div>
+    )
+  }
+
+  renderComment = (depth: number, comment: CommentInTree) => {
+    const { forms, processing } = this.props
+    const editFormKey = editCommentKey(comment)
     // ramda can't determine arity here so use curryN
     const renderGenericComment = R.curryN(2, this.renderGenericComment)(
       depth + 1
@@ -113,134 +247,60 @@ export default class CommentTree extends React.Component<Props> {
         className={`comment ${comment.removed ? "removed" : ""}`}
         key={`comment-${comment.id}`}
       >
-        <Link to={profileURL(comment.author_id)}>
-          <ProfileImage
-            profile={makeProfile({
-              name:                comment.author_name,
-              username:            SETTINGS.username,
-              profile_image_small: comment.profile_image
-            })}
-            imageSize={PROFILE_IMAGE_SMALL}
-          />
-        </Link>
-        <div className="comment-contents">
-          <div className="author-info">
-            <Link to={profileURL(comment.author_id)}>
-              <span className="author-name">{comment.author_name}</span>
-            </Link>
-            <span className="authored-date">
-              {moment(comment.created).fromNow()}
-            </span>
-            <span className="removed-note">
-              {comment.removed ? (
-                <span>[comment removed by moderator]</span>
-              ) : null}
-            </span>
-          </div>
-          <div className="row text">
-            {forms && R.has(editFormKey, forms) ? (
-              <EditCommentForm
-                forms={forms}
-                comment={comment}
-                processing={processing}
-                editing
-              />
-            ) : (
-              renderTextContent(comment)
-            )}
-          </div>
-          <div className="row comment-actions">
-            {upvote && downvote ? (
-              <CommentVoteForm
-                comment={comment}
-                upvote={upvote}
-                downvote={downvote}
-              />
-            ) : null}
-            {atMaxDepth ||
-            moderationUI ||
-            comment.deleted ||
-            userIsAnonymous() ? null : (
-                <div
-                  className="comment-action-button reply-button"
-                  onClick={e => {
-                    if (beginEditing) {
-                      beginEditing(formKey, initialValue, e)
-                    }
-                  }}
-                >
-                  <a href="#">reply</a>
-                </div>
-              )}
-            {userIsAnonymous() ? null : this.renderFollowButton(comment)}
-            {comment.num_reports ? (
-              <div className="comment-action-button report-count">
-                Reports: {comment.num_reports}
-              </div>
-            ) : null}
-            {SETTINGS.username === comment.author_id && !moderationUI ? (
-              <div
-                className="comment-action-button edit-button"
-                onClick={e => {
-                  if (beginEditing) {
-                    beginEditing(editFormKey, comment, e)
-                  }
-                }}
-              >
-                <a href="#">edit</a>
-              </div>
-            ) : null}
-            {SETTINGS.username === comment.author_id && deleteComment ? (
-              <div
-                className="comment-action-button delete-button"
-                onClick={preventDefaultAndInvoke(() => deleteComment(comment))}
-              >
-                <a href="#">delete</a>
-              </div>
-            ) : null}
-            {comment.num_reports && ignoreCommentReports ? (
-              <div
-                className="comment-action-button ignore-button"
-                onClick={preventDefaultAndInvoke(() =>
-                  ignoreCommentReports(comment)
-                )}
-              >
-                <a href="#">ignore all reports</a>
-              </div>
-            ) : null}
-            <div className="comment-action-button permalink-button">
-              <Link to={commentPermalink(comment.id)}>permalink</Link>
-            </div>
-            <CommentRemovalForm
-              comment={comment}
-              remove={remove}
-              approve={approve}
-              isModerator={isModerator}
+        <Card>
+          <Link to={profileURL(comment.author_id)}>
+            <ProfileImage
+              profile={makeProfile({
+                name:                comment.author_name,
+                username:            SETTINGS.username,
+                profile_image_small: comment.profile_image
+              })}
+              imageSize={PROFILE_IMAGE_MICRO}
             />
-            {moderationUI || userIsAnonymous() || !reportComment ? null : (
-              <div
-                className="comment-action-button report-button"
-                onClick={preventDefaultAndInvoke(() => reportComment(comment))}
-              >
-                <a href="#">report</a>
+          </Link>
+          <div className="comment-contents">
+            <div className="author-info">
+              <Link to={profileURL(comment.author_id)}>
+                <span className="author-name">{comment.author_name}</span>
+              </Link>
+              <span className="authored-date">
+                {moment(comment.created).fromNow()}
+              </span>
+              <span className="removed-note">
+                {comment.removed ? (
+                  <span>[comment removed by moderator]</span>
+                ) : null}
+              </span>
+            </div>
+            <div className="row text">
+              {forms && R.has(editFormKey, forms) ? (
+                <EditCommentForm
+                  forms={forms}
+                  comment={comment}
+                  processing={processing}
+                  editing
+                />
+              ) : (
+                renderTextContent(comment)
+              )}
+            </div>
+            {atMaxDepth ? null : (
+              <div>
+                <ReplyToCommentForm
+                  forms={forms}
+                  comment={comment}
+                  processing={processing}
+                />
               </div>
             )}
+            {this.renderCommentActions(comment, atMaxDepth)}
           </div>
-          {atMaxDepth ? null : (
-            <div>
-              <ReplyToCommentForm
-                forms={forms}
-                comment={comment}
-                processing={processing}
-              />
-            </div>
-          )}
-          {atMaxDepth ? null : (
-            <div className="replies">
-              {R.map(renderGenericComment, comment.replies)}
-            </div>
-          )}
-        </div>
+        </Card>
+        {atMaxDepth ? null : (
+          <div className="replies">
+            {R.map(renderGenericComment, comment.replies)}
+          </div>
+        )}
       </div>
     )
   }
@@ -273,17 +333,10 @@ export default class CommentTree extends React.Component<Props> {
   }
 
   renderTopLevelComment = (comment: GenericComment, idx: number) => {
-    const { moderationUI } = this.props
-    return moderationUI ? (
+    return (
       <div className="top-level-comment" key={idx}>
         {this.renderGenericComment(0, comment)}
       </div>
-    ) : (
-      <Card key={idx}>
-        <div className="top-level-comment">
-          {this.renderGenericComment(0, comment)}
-        </div>
-      </Card>
     )
   }
 

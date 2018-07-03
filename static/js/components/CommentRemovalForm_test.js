@@ -54,6 +54,8 @@ describe("CommentRemovalForm", () => {
     const wrapper = renderForm(false)
     assert.isFalse(wrapper.find(".comment-action-button").exists())
   })
+
+  //
   ;[true, false].forEach(isRemove => {
     it(`clicks the ${isRemove ? "remove" : "approve"} button`, async () => {
       comment.removed = !isRemove

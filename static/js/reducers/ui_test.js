@@ -128,15 +128,14 @@ describe("ui reducer", () => {
     assert.deepEqual(keys, [...dialogs.keys()])
   })
 
-  it("should let you toggle show user menu", async () => {
-    let state = await dispatchThen(showDropdown(USER_MENU_DROPDOWN), [
-      SHOW_DROPDOWN
-    ])
-    assert.equal(state.dropdownMenus.has(USER_MENU_DROPDOWN), true)
-    state = await dispatchThen(hideDropdown(USER_MENU_DROPDOWN), [
-      HIDE_DROPDOWN
-    ])
-    assert.equal(state.dropdownMenus.has(USER_MENU_DROPDOWN), false)
+  it("should let you toggle show dropdown", async () => {
+    for (const key of [USER_MENU_DROPDOWN, "some other key"]) {
+      let state = await dispatchThen(showDropdown(key), [SHOW_DROPDOWN])
+      assert.equal(state.dropdownMenus.has(key), true)
+      state = await dispatchThen(hideDropdown(key), [HIDE_DROPDOWN])
+      assert.equal(state.dropdownMenus.has(key), false)
+      assert.instanceOf(state.dropdownMenus, Set)
+    }
   })
 
   it("should let you set the banner message", async () => {

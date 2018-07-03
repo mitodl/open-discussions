@@ -70,6 +70,8 @@ import {
 } from "../lib/reports"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 import { showDropdown, hideDropdownDebounced } from "../actions/ui"
+import { withChannelTracker } from "../hoc/withChannelTracker"
+import { dropdownMenuFuncs } from "../lib/ui"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -81,7 +83,6 @@ import type {
   MoreCommentsInTree,
   Post
 } from "../flow/discussionTypes"
-import { withChannelTracker } from "../hoc/withChannelTracker"
 
 type PostPageProps = {
   match: Match,
@@ -113,7 +114,8 @@ type PostPageProps = {
   reportPost: (p: Post) => void,
   embedly: Object,
   postShareMenuOpen: boolean,
-  postDropdownMenuOpen: boolean
+  postDropdownMenuOpen: boolean,
+  dropdownMenus: Set<string>
 }
 
 const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
@@ -371,7 +373,8 @@ class PostPage extends React.Component<PostPageProps> {
       embedly,
       reportPost,
       postDropdownMenuOpen,
-      postShareMenuOpen
+      postShareMenuOpen,
+      dropdownMenus
     } = this.props
 
     if (!channel) {
@@ -483,6 +486,8 @@ class PostPage extends React.Component<PostPageProps> {
               post.slug
             )}
             toggleFollowComment={toggleFollowComment(dispatch)}
+            curriedDropdownMenufunc={dropdownMenuFuncs(dispatch)}
+            dropdownMenus={dropdownMenus}
           />
         ) : null}
       </div>
@@ -512,12 +517,13 @@ const mapStateToProps = (state, ownProps) => {
     ? ui.dropdownMenus.has(getPostDropdownMenuKey(post))
     : false
 
+  const { dropdownMenus } = ui
+
   const postShareMenuOpen = ui.dropdownMenus.has(POST_SHARE_MENU_KEY)
 
   return {
     ...postModerationSelector(state, ownProps),
     ...commentModerationSelector(state, ownProps),
-    ui,
     postID,
     channelName,
     commentID,
@@ -530,6 +536,7 @@ const mapStateToProps = (state, ownProps) => {
     notAuthorized,
     postDropdownMenuOpen,
     postShareMenuOpen,
+    dropdownMenus,
     isModerator: channel && channel.user_is_moderator,
     errored:
       anyErrorExcept404([posts, channels]) ||

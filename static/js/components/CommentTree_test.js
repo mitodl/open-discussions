@@ -8,7 +8,7 @@ import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 
 import Card from "../components/Card"
-import CommentTree from "./CommentTree"
+import CommentTree, { commentDropdownKey, commentShareKey } from "./CommentTree"
 import {
   ReplyToCommentForm,
   replyToCommentKey,
@@ -16,6 +16,7 @@ import {
 } from "./CommentForms"
 import { commentPermalink, profileURL } from "../lib/url"
 import Router from "../Router"
+import SharePopup from "./SharePopup"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeCommentsResponse, makeMoreComments } from "../factories/comments"
@@ -23,6 +24,7 @@ import { makePost } from "../factories/posts"
 import { createCommentTree } from "../reducers/comments"
 import { makeCommentReport } from "../factories/reports"
 import * as utilFuncs from "../lib/util"
+import { dropdownMenuFuncs } from "../lib/ui"
 
 describe("CommentTree", () => {
   let comments,
@@ -76,14 +78,33 @@ describe("CommentTree", () => {
           reportComment={reportCommentStub}
           commentPermalink={permalinkFunc}
           toggleFollowComment={toggleFollowCommentStub}
+          curriedDropdownMenufunc={dropdownMenuFuncs(helper.sandbox.stub())}
+          dropdownMenus={new Set()}
           {...props}
         />
       </Router>
     )
 
-  it("should render all top-level comments as separate cards", () => {
+  const openMenu = R.curry((keyFunc, comment) => {
+    const dropdownMenus = new Set()
+    dropdownMenus.add(keyFunc(comment))
+    return { dropdownMenus }
+  })
+
+  const openDropdownMenu = openMenu(commentDropdownKey)
+
+  const openShareMenu = openMenu(commentShareKey)
+
+  it("should wrap all top-level comments in a div", () => {
     const wrapper = renderCommentTree()
-    assert.equal(wrapper.find(Card).length, comments.length)
+    assert.equal(wrapper.find("div.top-level-comment").length, comments.length)
+  })
+
+  it("should render a share menu if it's open", () => {
+    const wrapper = renderCommentTree(openShareMenu(comments[0]))
+    assert.ok(wrapper.find(SharePopup).exists())
+    const { url } = wrapper.find(SharePopup).props()
+    assert.equal(url, permalinkFunc(comments[0].id))
   })
 
   it("should render all replies to a top-level comment", () => {
@@ -160,7 +181,7 @@ describe("CommentTree", () => {
   })
 
   it('should include a "report" button', () => {
-    const wrapper = renderCommentTree()
+    const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
     wrapper
       .find(".comment-action-button.report-button")
       .at(0)
@@ -198,11 +219,8 @@ describe("CommentTree", () => {
 
   it('should include an "Edit" button, if the user wrote the comment', () => {
     SETTINGS.username = comments[0].author_id
-    const wrapper = renderCommentTree()
-    wrapper
-      .find(".comment-action-button")
-      .at(2)
-      .simulate("click")
+    const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
+    wrapper.find(".edit-button").simulate("click")
     assert.ok(beginEditingStub.called)
     assert.ok(beginEditingStub.calledWith(editCommentKey(comments[0])))
     assert.deepEqual(beginEditingStub.args[0][1], comments[0])
@@ -213,7 +231,7 @@ describe("CommentTree", () => {
     ([subscribed, buttonText]) => {
       it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
         comments[0].subscribed = subscribed
-        const wrapper = renderCommentTree()
+        const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
         const button = wrapper.find(".subscribe-comment").at(0)
         assert.equal(button.text(), buttonText)
         button.simulate("click")
@@ -224,7 +242,7 @@ describe("CommentTree", () => {
 
   it("should include a 'delete' button, if the user wrote the comment", () => {
     SETTINGS.username = comments[0].author_id
-    const wrapper = renderCommentTree()
+    const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
     const eventStub = {
       preventDefault: helper.sandbox.stub()
     }
@@ -246,7 +264,9 @@ describe("CommentTree", () => {
   })
 
   it("should include a permalink", () => {
-    const button = renderCommentTree().find(".permalink-button")
+    const button = renderCommentTree(openDropdownMenu(comments[0])).find(
+      ".permalink-button"
+    )
     assert(button.exists())
     assert.equal(
       button
@@ -299,20 +319,14 @@ describe("CommentTree", () => {
       .find(".replies .comment")
       .first()
 
-    assert.lengthOf(
-      topCommentWrapper
-        .find(".comment-actions")
-        .at(0)
-        .find(".comment-action-button"),
-      4
-    )
-    assert.lengthOf(nextCommentWrapper.find(".comment-action-button"), 3)
+    assert.ok(topCommentWrapper.find(".reply-button").exists())
+    assert.isNotOk(nextCommentWrapper.find(".reply-button").exists())
 
-    assert.lengthOf(topCommentWrapper.find(ReplyToCommentForm), 1)
-    assert.lengthOf(nextCommentWrapper.find(ReplyToCommentForm), 0)
+    assert.ok(topCommentWrapper.find(ReplyToCommentForm).exists())
+    assert.isNotOk(nextCommentWrapper.find(ReplyToCommentForm).exists())
 
-    assert.lengthOf(topCommentWrapper.find(".replies"), 1)
-    assert.lengthOf(nextCommentWrapper.find(".replies"), 0)
+    assert.ok(topCommentWrapper.find(".replies").exists())
+    assert.isNotOk(nextCommentWrapper.find(".replies").exists())
   })
 
   describe("moderation UI", () => {
@@ -333,15 +347,16 @@ describe("CommentTree", () => {
       assert.isNotOk(wrapper.find(".report-button").exists())
     })
 
-    it("should not render top level comments as cards with moderationUI", () => {
+    it("should render top level comments as cards with moderationUI", () => {
       const wrapper = renderCommentTree({ moderationUI })
-      assert.isNotOk(wrapper.find(Card).exists())
+      assert.isOk(wrapper.find(Card).exists())
     })
 
     it("should include the report count if the user is a moderator", () => {
       const wrapper = renderCommentTree({
         isModerator,
-        comments: [report.comment]
+        comments: [report.comment],
+        ...openDropdownMenu(report.comment)
       })
       assert.ok(wrapper.find(".report-count").exists())
       assert.equal(wrapper.find(".report-count").text(), "Reports: 2")
@@ -358,7 +373,8 @@ describe("CommentTree", () => {
       const wrapper = renderCommentTree({
         isModerator,
         ignoreCommentReports: ignoreCommentReportsStub,
-        comments:             [report.comment]
+        comments:             [report.comment],
+        ...openDropdownMenu(report.comment)
       })
       const ignoreButton = wrapper.find(".ignore-button")
       assert.equal(ignoreButton.text(), "ignore all reports")

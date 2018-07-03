@@ -10,13 +10,11 @@ import {
 
 import type { Channel } from "../../flow/discussionTypes"
 
-type MembersNavbarProps = {
+type Props = {
   channel: Channel
 }
 
-export default class MembersNavbar extends React.Component<*, void> {
-  props: MembersNavbarProps
-
+export default class MembersNavbar extends React.Component<Props, void> {
   render() {
     const { channel } = this.props
 
