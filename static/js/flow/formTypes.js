@@ -1,13 +1,13 @@
-//@flow
+// @flow
 
 
-export type FormValue = {
-  value:  Object,
+export type FormValue<T> = {
+  value:  T,
   errors: Object,
 }
 
-export type FormsState = {
-  [string]: FormValue,
+export type FormsState<T> = {
+  [string]: FormValue<T>,
 }
 
 export type FormActionPayload = {

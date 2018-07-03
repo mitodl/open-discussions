@@ -35,7 +35,7 @@ type ReportCommentFunc = (comment: CommentInTree) => void
 
 type CommentTreeProps = {
   comments: Array<GenericComment>,
-  forms: FormsState,
+  forms: FormsState<*>,
   upvote: CommentVoteFunc,
   downvote: CommentVoteFunc,
   remove: CommentRemoveFunc,

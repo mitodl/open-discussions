@@ -13,11 +13,11 @@ import { editChannelForm } from "../../lib/channels"
 import { channelURL } from "../../lib/url"
 import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
-import { validateChannelEditForm } from "../../lib/validation"
+import { validateChannelAppearanceEditForm } from "../../lib/validation"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
-import type { Channel } from "../../flow/discussionTypes"
+import type { Channel, ChannelForm } from "../../flow/discussionTypes"
 
 const EDIT_CHANNEL_KEY = "channel:edit:appearance"
 const EDIT_CHANNEL_PAYLOAD = { formKey: EDIT_CHANNEL_KEY }
@@ -30,7 +30,7 @@ class EditChannelAppearancePage extends React.Component<*, void> {
     dispatch: Dispatch<*>,
     history: Object,
     channel: Channel,
-    channelForm: FormValue,
+    channelForm: FormValue<ChannelForm>,
     channelName: string,
     processing: boolean
   }
@@ -90,7 +90,7 @@ class EditChannelAppearancePage extends React.Component<*, void> {
 
     e.preventDefault()
 
-    const validation = validateChannelEditForm(channelForm)
+    const validation = validateChannelAppearanceEditForm(channelForm)
 
     if (!channelForm || !R.isEmpty(validation)) {
       dispatch(

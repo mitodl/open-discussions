@@ -79,7 +79,13 @@ export function updateChannel(channel: Channel): Promise<Channel> {
     method: PATCH,
     body:   JSON.stringify(
       R.pickAll(
-        ["title", "description", "public_description", "channel_type"],
+        [
+          "title",
+          "description",
+          "public_description",
+          "channel_type",
+          "link_type"
+        ],
         channel
       )
     )

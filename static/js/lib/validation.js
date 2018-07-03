@@ -3,6 +3,8 @@ import React from "react"
 import R from "ramda"
 
 import { S } from "./sanctuary"
+
+import { isTextTabSelected } from "../lib/channels"
 import type { PostForm } from "../flow/discussionTypes"
 
 // this function checks that a given object fails validation (validator function returns true)
@@ -45,14 +47,23 @@ export const postUrlOrTextPresent = (postForm: { value: PostForm }) => {
   }
 
   const post = postForm.value
+  if (!postForm.value.postType) {
+    return S.Just(
+      R.set(
+        R.lensPath(["value", "post_type"]),
+        "One of text or post tabs must be selected"
+      )
+    )
+  }
+  const isText = isTextTabSelected(postForm.value.postType, null)
 
-  if (post.isText && emptyOrNil(post.text)) {
+  if (isText && emptyOrNil(post.text)) {
     return S.Just(
       R.set(R.lensPath(["value", "text"]), "Post text cannot be empty")
     )
   }
 
-  if (!post.isText && emptyOrNil(post.url)) {
+  if (!isText && emptyOrNil(post.url)) {
     return S.Just(
       R.set(R.lensPath(["value", "url"]), "Post url cannot be empty")
     )
@@ -78,7 +89,7 @@ export const validateProfileForm = validate([
   validation(emptyOrNil, R.lensPath(["value", "name"]), "Name is required")
 ])
 
-export const validateChannelEditForm = validate([
+export const validateChannelAppearanceEditForm = validate([
   validation(
     R.compose(
       R.gt(R.__, 5120),
@@ -86,6 +97,14 @@ export const validateChannelEditForm = validate([
     ),
     R.lensPath(["value", "description"]),
     "Description length is limited to 5120 characters"
+  )
+])
+
+export const validateChannelBasicEditForm = validate([
+  validation(
+    R.isEmpty,
+    R.lensPath(["value", "link_type"]),
+    "At least one of the post type options must be selected"
   )
 ])
 

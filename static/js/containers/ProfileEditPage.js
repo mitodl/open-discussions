@@ -26,7 +26,7 @@ import type { Dispatch } from "redux"
 type ProfileEditPageProps = {
   dispatch: Dispatch<*>,
   history: Object,
-  profileForm: FormValue,
+  profileForm: FormValue<ProfilePayload>,
   processing: boolean,
   profile: Profile,
   userName: string,

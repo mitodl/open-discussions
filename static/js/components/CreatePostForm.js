@@ -6,7 +6,13 @@ import Card from "../components/Card"
 import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import Embedly from "./Embedly"
 
-import { userCanPost } from "../lib/channels"
+import {
+  isLinkTypeAllowed,
+  isTextTabSelected,
+  userCanPost,
+  LINK_TYPE_LINK,
+  LINK_TYPE_TEXT
+} from "../lib/channels"
 import { CONTENT_POLICY_URL } from "../lib/url"
 import { goBackAndHandleEvent } from "../lib/util"
 import { validationMessage } from "../lib/validation"
@@ -16,7 +22,7 @@ import type { Channel, PostForm, PostValidation } from "../flow/discussionTypes"
 type CreatePostFormProps = {
   onSubmit: Function,
   onUpdate: Function,
-  updateIsText: (isText: boolean) => void,
+  updatePostType: (postType: string) => void,
   postForm: ?PostForm,
   validation: PostValidation,
   channel: Channel,
@@ -45,7 +51,7 @@ export default class CreatePostForm extends React.Component<*, void> {
       postForm,
       onUpdate,
       onSubmit,
-      updateIsText,
+      updatePostType,
       history,
       processing,
       channels,
@@ -57,7 +63,11 @@ export default class CreatePostForm extends React.Component<*, void> {
       return null
     }
 
-    const { isText, text, url, title } = postForm
+    const { postType, text, url, title } = postForm
+
+    const isText = isTextTabSelected(postType, channel)
+    const showTextTab = isLinkTypeAllowed(channel, LINK_TYPE_TEXT)
+    const showLinkTab = isLinkTypeAllowed(channel, LINK_TYPE_LINK)
 
     return (
       <div>
@@ -65,18 +75,22 @@ export default class CreatePostForm extends React.Component<*, void> {
         <Card className="new-post-card">
           <form onSubmit={onSubmit} className="form">
             <div className="post-types row">
-              <div
-                className={`new-text-post ${isText ? "active" : ""}`}
-                onClick={() => updateIsText(true)}
-              >
-                New text post
-              </div>
-              <div
-                className={`new-link-post ${isText ? "" : "active"}`}
-                onClick={() => updateIsText(false)}
-              >
-                New link post
-              </div>
+              {showTextTab ? (
+                <div
+                  className={`new-text-post ${isText ? "active" : ""}`}
+                  onClick={() => updatePostType(LINK_TYPE_TEXT)}
+                >
+                  New text post
+                </div>
+              ) : null}
+              {showLinkTab ? (
+                <div
+                  className={`new-link-post ${isText ? "" : "active"}`}
+                  onClick={() => updatePostType(LINK_TYPE_LINK)}
+                >
+                  New link post
+                </div>
+              ) : null}
             </div>
             <div className="titlefield row">
               <label>Title</label>

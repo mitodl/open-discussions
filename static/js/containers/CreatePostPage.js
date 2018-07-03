@@ -7,6 +7,11 @@ import DocumentTitle from "react-document-title"
 import CreatePostForm from "../components/CreatePostForm"
 
 import { actions } from "../actions"
+import {
+  isTextTabSelected,
+  LINK_TYPE_TEXT,
+  LINK_TYPE_ANY
+} from "../lib/channels"
 import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
 import { getChannelName } from "../lib/util"
@@ -15,7 +20,11 @@ import { validatePostCreateForm } from "../lib/validation"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 
 import type { FormValue } from "../flow/formTypes"
-import type { Channel, CreatePostPayload } from "../flow/discussionTypes"
+import type {
+  Channel,
+  CreatePostPayload,
+  PostForm
+} from "../flow/discussionTypes"
 import type { RestState } from "../flow/restTypes"
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -23,7 +32,7 @@ import type { Match } from "react-router"
 type CreatePostPageProps = {
   match: Match,
   dispatch: Dispatch<*>,
-  postForm: ?FormValue,
+  postForm: ?FormValue<PostForm>,
   channel: Channel,
   channels: RestState<Map<string, Channel>>,
   history: Object,
@@ -51,6 +60,37 @@ class CreatePostPage extends React.Component<*, void> {
       })
     )
     ensureTwitterEmbedJS()
+    this.updateTabSelection()
+  }
+
+  componentDidUpdate() {
+    this.updateTabSelection()
+  }
+
+  updateTabSelection = () => {
+    const { channel, dispatch, postForm } = this.props
+
+    // If there is no postForm there is nothing to update.
+    // If there is no channel then all post types are valid.
+    // postType is null when the form is first loaded but we need to switch to an explict choice.
+    // If it's not null we may still need to switch if the user changes the channel and there's a different
+    // post type than what's in the form.
+    if (
+      postForm &&
+      channel &&
+      (postForm.value.postType === null ||
+        (channel.link_type !== LINK_TYPE_ANY &&
+          channel.link_type !== postForm.value.postType))
+    ) {
+      const postType =
+        channel.link_type === LINK_TYPE_ANY ? LINK_TYPE_TEXT : channel.link_type
+      dispatch(
+        actions.forms.formUpdate({
+          ...CREATE_POST_PAYLOAD,
+          value: { postType }
+        })
+      )
+    }
   }
 
   componentWillUnmount() {
@@ -81,14 +121,16 @@ class CreatePostPage extends React.Component<*, void> {
       const embedlyResponse = await dispatch(embedlyGetFunc)
       handleTwitterWidgets(embedlyResponse)
     }
+
+    this.updateTabSelection()
   }
 
-  updateIsText = (isText: boolean) => {
+  updatePostType = (postType: string) => {
     const { dispatch } = this.props
     dispatch(
       actions.forms.formUpdate({
         ...CREATE_POST_PAYLOAD,
-        value: { isText }
+        value: { postType }
       })
     )
 
@@ -122,7 +164,8 @@ class CreatePostPage extends React.Component<*, void> {
       )
     } else {
       const channelName = channel.name
-      const { isText, title, url, text } = postForm.value
+      const { postType, title, url, text } = postForm.value
+      const isText = isTextTabSelected(postType, channel)
       const data: CreatePostPayload = isText ? { title, text } : { title, url }
       dispatch(actions.posts.post(channelName, data)).then(post => {
         history.push(postDetailURL(channelName, post.id))
@@ -160,7 +203,7 @@ class CreatePostPage extends React.Component<*, void> {
           <CreatePostForm
             onSubmit={this.onSubmit}
             onUpdate={this.onUpdate}
-            updateIsText={this.updateIsText}
+            updatePostType={this.updatePostType}
             updateChannelSelection={this.updateChannelSelection}
             postForm={postForm.value}
             validation={postForm.errors}
@@ -196,4 +239,5 @@ const mapStateToProps = (state, props) => {
   }
 }
 
+export { CreatePostPage }
 export default connect(mapStateToProps)(CreatePostPage)

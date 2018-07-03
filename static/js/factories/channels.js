@@ -2,6 +2,7 @@
 import casual from "casual-browserify"
 import R from "ramda"
 
+import { LINK_TYPE_ANY } from "../lib/channels"
 import type { Channel } from "../flow/discussionTypes"
 import { incrementer } from "../factories/util"
 
@@ -12,6 +13,7 @@ export const makeChannel = (privateChannel: boolean = false): Channel => ({
   name:                `channel_${incr.next().value}`,
   title:               casual.title,
   channel_type:        privateChannel ? "private" : "public",
+  link_type:           LINK_TYPE_ANY,
   description:         casual.description,
   public_description:  casual.description,
   num_users:           casual.integer(0, 500),

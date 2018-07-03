@@ -2,12 +2,14 @@
 import { assert } from "chai"
 import R from "ramda"
 
+import { LINK_TYPE_TEXT, LINK_TYPE_LINK } from "./channels"
 import { assertIsNothing, assertIsJustNoVal } from "./test_utils"
 import {
   validation,
   validate,
   validatePostCreateForm,
-  validateChannelEditForm,
+  validateChannelAppearanceEditForm,
+  validateChannelBasicEditForm,
   validateContentReportForm
 } from "./validation"
 
@@ -97,7 +99,7 @@ describe("validation library", () => {
 
   describe("validatePostCreateForm", () => {
     it("should complain about no title", () => {
-      const post = { value: { isText: true, text: "foobar" } }
+      const post = { value: { postType: LINK_TYPE_TEXT, text: "foobar" } }
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
           title: "Title is required"
@@ -106,7 +108,7 @@ describe("validation library", () => {
     })
 
     it("should complain about no text on a text post", () => {
-      const post = { value: { isText: true, title: "potato" } }
+      const post = { value: { postType: LINK_TYPE_TEXT, title: "potato" } }
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
           text: "Post text cannot be empty"
@@ -115,7 +117,7 @@ describe("validation library", () => {
     })
 
     it("should complain about no url on a url post", () => {
-      const post = { value: { isText: false, title: "potato" } }
+      const post = { value: { postType: LINK_TYPE_LINK, title: "potato" } }
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
           url: "Post url cannot be empty"
@@ -123,12 +125,21 @@ describe("validation library", () => {
       })
     })
 
+    it("should complain about missing post type", () => {
+      const post = { value: { postType: null, title: "potato" } }
+      assert.deepEqual(validatePostCreateForm(post), {
+        value: {
+          post_type: "One of text or post tabs must be selected"
+        }
+      })
+    })
+
     it("should complain about too long of a title", () => {
       const post = {
         value: {
-          isText: true,
-          title:  "a".repeat(301),
-          text:   "a great post! really"
+          postType: LINK_TYPE_TEXT,
+          title:    "a".repeat(301),
+          text:     "a great post! really"
         }
       }
       assert.deepEqual(validatePostCreateForm(post), {
@@ -141,20 +152,37 @@ describe("validation library", () => {
     })
   })
 
-  describe("validateChannelEditForm", () => {
+  describe("validateChannelAppearanceEditForm", () => {
     it("should complain about too long of a description", () => {
       const channel = {
         value: {
           description: "a".repeat(5121)
         }
       }
-      assert.deepEqual(validateChannelEditForm(channel), {
+      assert.deepEqual(validateChannelAppearanceEditForm(channel), {
         value: {
           description: "Description length is limited to 5120 characters"
         }
       })
       channel.value.description = "a".repeat(5120)
-      assert.deepEqual(validateChannelEditForm(channel), {})
+      assert.deepEqual(validateChannelAppearanceEditForm(channel), {})
+    })
+  })
+
+  describe("validateChannelBasicEditForm", () => {
+    it("should complain about no link types being selected", () => {
+      const channel = {
+        value: {
+          link_type: []
+        }
+      }
+      assert.deepEqual(validateChannelBasicEditForm(channel), {
+        value: {
+          link_type: "At least one of the post type options must be selected"
+        }
+      })
+      channel.value.link_type = [LINK_TYPE_LINK]
+      assert.deepEqual(validateChannelBasicEditForm(channel), {})
     })
   })
 

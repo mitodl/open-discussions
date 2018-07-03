@@ -2,13 +2,20 @@
 import { assert } from "chai"
 import sinon from "sinon"
 
+import { CreatePostPage as InnerCreatePostPage } from "../containers/CreatePostPage"
+
 import { makeModerators, makeChannelList } from "../factories/channels"
 import { makeCommentsResponse } from "../factories/comments"
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { userCanPost } from "../lib/channels"
+import {
+  userCanPost,
+  LINK_TYPE_TEXT,
+  LINK_TYPE_LINK,
+  LINK_TYPE_ANY
+} from "../lib/channels"
 import { formatTitle } from "../lib/title"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import { wait } from "../lib/util"
@@ -87,6 +94,7 @@ describe("CreatePostPage", () => {
         ]
         : [
           actions.forms.FORM_BEGIN_EDIT,
+          actions.forms.FORM_UPDATE,
           actions.channels.get.requestType,
           actions.channels.get.successType,
           actions.subscribedChannels.get.requestType,
@@ -328,6 +336,10 @@ describe("CreatePostPage", () => {
   it("should change URL when you select a new subreddit if URL param is absent", async () => {
     const wrapper = await renderPage("/create_post/")
     let select = wrapper.find("select")
+
+    // allow only LINK so we can assert it doesn't choose the default of TEXT
+    channels[6].link_type = LINK_TYPE_LINK
+
     select.simulate("change", { target: { value: channels[6].name } })
     assert.equal(
       helper.currentLocation.pathname,
@@ -336,5 +348,54 @@ describe("CreatePostPage", () => {
     wrapper.update()
     select = wrapper.find("select")
     assert.equal(select.props().value, channels[6].name)
+    assert.deepEqual(
+      helper.store.getState().forms["post:new"].value.postType,
+      LINK_TYPE_LINK
+    )
+  })
+
+  describe("updateTabSelection", () => {
+    [
+      [null, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
+      [null, LINK_TYPE_LINK, true],
+      [LINK_TYPE_LINK, LINK_TYPE_LINK, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
+      [null, LINK_TYPE_ANY, true],
+      [LINK_TYPE_LINK, LINK_TYPE_ANY, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, false]
+    ].forEach(([fromLinkType, toLinkType, shouldDispatch]) => {
+      it(`${
+        shouldDispatch ? "dispatches" : "doesn't dispatch"
+      } FORM_UPDATE if the post types when it goes from ${String(
+        fromLinkType
+      )} to ${toLinkType}`, () => {
+        const dispatch = helper.sandbox.stub()
+        currentChannel.link_type = toLinkType
+        const page = new InnerCreatePostPage()
+
+        // $FlowFixMe: Ignore the type difference
+        page.props = {
+          dispatch: dispatch,
+          channel:  currentChannel,
+          postForm: {
+            value: {
+              postType: fromLinkType
+            }
+          }
+        }
+        page.updateTabSelection()
+        if (shouldDispatch) {
+          assert.equal(dispatch.callCount, 1)
+          assert.equal(
+            dispatch.args[0][0].payload.value.postType,
+            toLinkType !== LINK_TYPE_LINK ? LINK_TYPE_TEXT : LINK_TYPE_LINK
+          )
+        } else {
+          assert.equal(dispatch.callCount, 0)
+        }
+      })
+    })
   })
 })

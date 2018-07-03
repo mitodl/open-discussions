@@ -97,6 +97,11 @@ def test_filter_dict_keys():
     d = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
     assert filter_dict_keys(d, ['b', 'd']) == {'b': 2, 'd': 4}
 
+    with pytest.raises(KeyError):
+        assert filter_dict_keys(d, ['b', 'missing'])
+
+    assert filter_dict_keys(d, ['b', 'missing'], optional=True) == {'b': 2}
+
 
 def test_filter_dict_with_renamed_keys():
     """
@@ -105,3 +110,8 @@ def test_filter_dict_with_renamed_keys():
     """
     d = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
     assert filter_dict_with_renamed_keys(d, {'b': 'b1', 'd': 'd1'}) == {'b1': 2, 'd1': 4}
+
+    with pytest.raises(KeyError):
+        assert filter_dict_with_renamed_keys(d, {'b': 'b1', 'missing': 'd1'})
+
+    assert filter_dict_with_renamed_keys(d, {'b': 'b1', 'missing': 'd1'}, optional=True) == {'b1': 2}

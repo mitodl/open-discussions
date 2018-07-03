@@ -6,7 +6,7 @@ import type { ConfiguredFormProps } from "../lib/forms"
 import type { FormValue } from "../flow/formTypes"
 
 export type WithFormProps = {
-  form: ?FormValue,
+  form: ?FormValue<*>,
   processing: boolean,
   onUpdate: Object => void,
   onSubmit: Object => void,
