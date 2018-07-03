@@ -2,6 +2,8 @@
 import { assert } from "chai"
 import sinon from "sinon"
 
+import { CreatePostPage as InnerCreatePostPage } from "../containers/CreatePostPage"
+
 import { makeModerators, makeChannelList } from "../factories/channels"
 import { makeCommentsResponse } from "../factories/comments"
 import { makePost, makeChannelPostList } from "../factories/posts"
@@ -354,48 +356,45 @@ describe("CreatePostPage", () => {
 
   describe("updateTabSelection", () => {
     [
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT],
-      [LINK_TYPE_TEXT, LINK_TYPE_TEXT],
-      [LINK_TYPE_LINK, LINK_TYPE_LINK]
-    ].forEach(([channelLinkType, formLinkType]) => {
-      it(`picks an explicit initial value for link_type ${channelLinkType}`, async () => {
-        currentChannel.link_type = channelLinkType
-        await renderPage()
-        assert.equal(
-          helper.store.getState().forms["post:new"].value.postType,
-          formLinkType
-        )
-      })
-    })
-    ;[
+      [null, LINK_TYPE_TEXT, true],
       [LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
       [LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
+      [null, LINK_TYPE_LINK, true],
       [LINK_TYPE_LINK, LINK_TYPE_LINK, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, true]
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
+      [null, LINK_TYPE_ANY, true],
+      [LINK_TYPE_LINK, LINK_TYPE_ANY, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, false]
     ].forEach(([fromLinkType, toLinkType, shouldDispatch]) => {
       it(`${
         shouldDispatch ? "dispatches" : "doesn't dispatch"
-      } FORM_UPDATE if the post types when it goes from ${fromLinkType} to ${toLinkType}`, async () => {
-        currentChannel.link_type = fromLinkType
-        const wrapper = await renderPage()
-        const startingActions = [...helper.actionsLog]
-        channels[7].link_type = toLinkType
-        const select = wrapper.find("select")
-        select.simulate("change", { target: { value: channels[7].name } })
-        // Not sure how to wait for something which might not to happen
-        await wait(100)
-        assert.deepEqual(
-          helper.store.getState().forms["post:new"].value.postType,
-          toLinkType
-        )
+      } FORM_UPDATE if the post types when it goes from ${String(
+        fromLinkType
+      )} to ${toLinkType}`, () => {
+        const dispatch = helper.sandbox.stub()
+        currentChannel.link_type = toLinkType
+        const page = new InnerCreatePostPage()
 
-        const actionTypes = helper.actionsLog
-          .map((...args) => args[0][1].type)
-          .splice(startingActions.length)
-        assert.deepEqual(
-          shouldDispatch ? [actions.forms.FORM_UPDATE] : [],
-          actionTypes
-        )
+        // $FlowFixMe: Ignore the type difference
+        page.props = {
+          dispatch: dispatch,
+          channel:  currentChannel,
+          postForm: {
+            value: {
+              postType: fromLinkType
+            }
+          }
+        }
+        page.updateTabSelection()
+        if (shouldDispatch) {
+          assert.equal(dispatch.callCount, 1)
+          assert.equal(
+            dispatch.args[0][0].payload.value.postType,
+            toLinkType !== LINK_TYPE_LINK ? LINK_TYPE_TEXT : LINK_TYPE_LINK
+          )
+        } else {
+          assert.equal(dispatch.callCount, 0)
+        }
       })
     })
   })

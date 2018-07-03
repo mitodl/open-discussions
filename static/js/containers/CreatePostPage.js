@@ -239,4 +239,5 @@ const mapStateToProps = (state, props) => {
   }
 }
 
+export { CreatePostPage }
 export default connect(mapStateToProps)(CreatePostPage)
