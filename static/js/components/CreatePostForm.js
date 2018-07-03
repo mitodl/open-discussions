@@ -7,7 +7,7 @@ import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import Embedly from "./Embedly"
 
 import {
-  isLinkTypeChecked,
+  isLinkTypeAllowed,
   isTextTabSelected,
   userCanPost,
   LINK_TYPE_LINK,
@@ -66,12 +66,8 @@ export default class CreatePostForm extends React.Component<*, void> {
     const { postType, text, url, title } = postForm
 
     const isText = isTextTabSelected(postType, channel)
-    const showTextTab = !channel
-      ? true
-      : isLinkTypeChecked(channel.link_type, LINK_TYPE_TEXT)
-    const showLinkTab = !channel
-      ? true
-      : isLinkTypeChecked(channel.link_type, LINK_TYPE_LINK)
+    const showTextTab = isLinkTypeAllowed(channel, LINK_TYPE_TEXT)
+    const showLinkTab = isLinkTypeAllowed(channel, LINK_TYPE_LINK)
 
     return (
       <div>

@@ -13,6 +13,7 @@ import {
   LINK_TYPE_TEXT,
   LINK_TYPE_LINK,
   updateLinkType,
+  isLinkTypeAllowed,
   isLinkTypeChecked,
   isTextTabSelected
 } from "./channels"
@@ -100,6 +101,33 @@ describe("Channel utils", () => {
       } checkbox
        with value ${value} and the previous link type is ${oldLinkType}`, () => {
         assert.equal(updateLinkType(oldLinkType, value, checked), expected)
+      })
+    })
+  })
+
+  describe("isLinkTypeAllowed", () => {
+    [
+      // If the link value is ANY all checkboxes are checked
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, true],
+      // The value should be checked if it matches the link value
+      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, false],
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, false],
+      [LINK_TYPE_LINK, LINK_TYPE_LINK, true]
+    ].forEach(([linkType, value, expected]) => {
+      it(`${
+        expected ? "should" : "should not"
+      } show ${value} for a channel with linkType ${linkType}`, () => {
+        const channel = makeChannel()
+        channel.link_type = linkType
+
+        assert.equal(isLinkTypeAllowed(channel, value), expected)
+      })
+    })
+    ;[LINK_TYPE_LINK, LINK_TYPE_TEXT].forEach(linkType => {
+      it(`should allow ${linkType} if the channel is null`, () => {
+        assert.isTrue(isLinkTypeAllowed(null, linkType))
       })
     })
   })

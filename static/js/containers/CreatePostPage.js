@@ -9,9 +9,9 @@ import CreatePostForm from "../components/CreatePostForm"
 import { actions } from "../actions"
 import {
   isTextTabSelected,
-  isLinkTypeChecked,
   LINK_TYPE_TEXT,
-  LINK_TYPE_LINK
+  LINK_TYPE_LINK,
+  LINK_TYPE_ANY
 } from "../lib/channels"
 import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
@@ -71,15 +71,20 @@ class CreatePostPage extends React.Component<*, void> {
   updateTabSelection = () => {
     const { channel, dispatch, postForm } = this.props
 
+    // If there is no postForm there is nothing to update.
+    // If there is no channel then all post types are valid.
+    // postType is null when the form is first loaded but we need to switch to an explict choice.
+    // If it's not null we may still need to switch if the user changes the channel and there's a different
+    // post type than what's in the form.
     if (
       postForm &&
       channel &&
       (postForm.value.postType === null ||
-        !isLinkTypeChecked(channel.link_type, postForm.value.postType))
+        (channel.link_type !== LINK_TYPE_ANY &&
+          channel.link_type !== postForm.value.postType))
     ) {
-      const postType = isTextTabSelected(null, channel)
-        ? LINK_TYPE_TEXT
-        : LINK_TYPE_LINK
+      const postType =
+        channel.link_type === LINK_TYPE_ANY ? LINK_TYPE_TEXT : channel.link_type
       dispatch(
         actions.forms.formUpdate({
           ...CREATE_POST_PAYLOAD,

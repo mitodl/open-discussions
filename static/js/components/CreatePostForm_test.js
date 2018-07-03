@@ -13,14 +13,14 @@ import { makeChannel } from "../factories/channels"
 import { makeArticle } from "../factories/embedly"
 
 describe("CreatePostForm", () => {
-  let sandbox, isTextTabSelectedStub, isLinkTypeCheckedStub
+  let sandbox, isTextTabSelectedStub, isLinkTypeAllowedStub
 
   beforeEach(() => {
     sandbox = sinon.sandbox.create()
     isTextTabSelectedStub = sandbox.stub(channels, "isTextTabSelected")
     isTextTabSelectedStub.returns(true)
-    isLinkTypeCheckedStub = sandbox.stub(channels, "isLinkTypeChecked")
-    isLinkTypeCheckedStub.returns(true)
+    isLinkTypeAllowedStub = sandbox.stub(channels, "isLinkTypeAllowed")
+    isLinkTypeAllowedStub.returns(true)
   })
 
   afterEach(() => {
@@ -86,7 +86,7 @@ describe("CreatePostForm", () => {
             ? "the text tab"
             : "the link tab"
       }`, () => {
-        isLinkTypeCheckedStub.callsFake(
+        isLinkTypeAllowedStub.callsFake(
           (_, linkType) => (linkType === LINK_TYPE_TEXT ? showText : showLink)
         )
         const form = {
