@@ -237,6 +237,9 @@ def get_reddit_slug(permalink):
     """
     Get the reddit slug from a submission permalink
 
+    Args:
+        permalink (str): reddit submission permalink
+
     Returns:
         str: the reddit slug for a submission
     """

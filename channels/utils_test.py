@@ -26,7 +26,8 @@ from channels.utils import (
     get_listing_params,
     get_pagination_and_posts,
     translate_praw_exceptions,
-    get_reddit_slug)
+    get_reddit_slug
+)
 
 
 def test_get_listing_params_none(mocker):
