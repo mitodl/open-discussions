@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.35.1
+--------------
+
+- Add UI to edit post types (#852)
+- Added link url to search serializer
+
 Version 0.35.0
 --------------
 

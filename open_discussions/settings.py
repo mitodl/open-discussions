@@ -27,7 +27,7 @@ from open_discussions.envs import (
     get_list_of_str,
 )
 
-VERSION = "0.35.0"
+VERSION = "0.35.1"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
