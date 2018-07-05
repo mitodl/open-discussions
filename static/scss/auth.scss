@@ -1,8 +1,10 @@
 
 .app {
-  form {
-    @include breakpoint(desktop) {
-      width: 450px;
+  .auth-page {
+    form {
+      @include breakpoint(desktop) {
+        width: 450px;
+      }
     }
   }
 }
