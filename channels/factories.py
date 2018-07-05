@@ -439,6 +439,7 @@ class PostFactory(factory.Factory):
     created = None
     title = factory.Faker('text', max_nb_chars=50)
     channel = factory.SubFactory(ChannelFactory, api=factory.SelfAttribute('..api'))
+    permalink = factory.Faker('word')
 
     class Meta:
         abstract = True
@@ -458,6 +459,7 @@ class TextPostFactory(PostFactory):
 
         self.id = reddit_post.id
         self.created = _timestamp_to_iso_str(reddit_post.created)
+        self.permalink = reddit_post.permalink
 
     class Meta:
         model = Post
@@ -477,6 +479,7 @@ class LinkPostFactory(PostFactory):
 
         self.id = reddit_post.id
         self.created = _timestamp_to_iso_str(reddit_post.created)
+        self.permalink = reddit_post.permalink
 
     class Meta:
         model = Post

@@ -168,7 +168,7 @@ class CreatePostPage extends React.Component<*, void> {
       const isText = isTextTabSelected(postType, channel)
       const data: CreatePostPayload = isText ? { title, text } : { title, url }
       dispatch(actions.posts.post(channelName, data)).then(post => {
-        history.push(postDetailURL(channelName, post.id))
+        history.push(postDetailURL(channelName, post.id, post.slug))
       })
     }
   }

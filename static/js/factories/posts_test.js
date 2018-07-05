@@ -10,6 +10,7 @@ describe("posts factories", () => {
       const post = makePost()
       assert.isString(post.id)
       assert.isString(post.title)
+      assert.isString(post.slug)
       assert.isBoolean(post.upvoted)
       assert.isString(post.author_id)
       assert.isString(post.text)

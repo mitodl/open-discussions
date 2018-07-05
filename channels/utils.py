@@ -231,3 +231,13 @@ def get_kind_mapping():
         dict: A map of the kind name to the kind prefix (ie t1)
     """
     return Config('DEFAULT').kinds
+
+
+def get_reddit_slug(permalink):
+    """
+    Get the reddit slug from a submission permalink
+
+    Returns:
+        str: the reddit slug for a submission
+    """
+    return list(filter(None, permalink.split('/')))[-1]

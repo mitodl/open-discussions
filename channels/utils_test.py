@@ -26,7 +26,7 @@ from channels.utils import (
     get_listing_params,
     get_pagination_and_posts,
     translate_praw_exceptions,
-)
+    get_reddit_slug)
 
 
 def test_get_listing_params_none(mocker):
@@ -188,3 +188,12 @@ def test_translate_praw_exceptions(raised_exception, is_anonymous, expected_exce
             with translate_praw_exceptions(user):
                 if raised_exception is not None:
                     raise raised_exception
+
+
+@pytest.mark.parametrize("permalink,slug", [
+    ["/r/1511374327_magnam/comments/ea/text_post/", "text_post"],
+    ["/r/1511371168_mollitia/comments/e6/url_post", "url_post"],
+])
+def test_get_reddit_slug(permalink, slug):
+    """Test that the correct slug is retrieved from a permalink"""
+    assert get_reddit_slug(permalink) == slug

@@ -14,6 +14,7 @@ export const makePost = (
   // $FlowFixMe: incr.next().value is never undefined but Flow thinks it may be
   id:            `post${incr.next().value}`,
   title:         casual.sentence,
+  slug:          casual.word,
   score:         Math.round(Math.random() * 15),
   upvoted:       Math.random() < 0.5,
   author_id:     `justareddituser${String(Math.random())}`,

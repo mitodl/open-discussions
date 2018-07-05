@@ -12,7 +12,7 @@ from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from channels.utils import get_kind_mapping
+from channels.utils import get_kind_mapping, get_reddit_slug
 from channels.constants import (
     VALID_CHANNEL_TYPES,
     VALID_LINK_TYPES,
@@ -141,6 +141,7 @@ class BasePostSerializer(RedditObjectSerializer):
     url = WriteableSerializerMethodField(allow_null=True)
     text = WriteableSerializerMethodField(allow_null=True)
     title = serializers.CharField()
+    slug = serializers.SerializerMethodField()
     upvoted = WriteableSerializerMethodField()
     removed = WriteableSerializerMethodField()
     ignore_reports = serializers.BooleanField(required=False, write_only=True)
@@ -161,6 +162,10 @@ class BasePostSerializer(RedditObjectSerializer):
     def get_url(self, instance):
         """Returns a url or null depending on if it's a self post"""
         return instance.url if not instance.is_self else None
+
+    def get_slug(self, instance):
+        """Returns the post slug"""
+        return get_reddit_slug(instance.permalink)
 
     def get_author_name(self, instance):
         """get the authors name"""

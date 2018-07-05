@@ -68,7 +68,7 @@ export class CompactPostDisplay extends React.Component<*, void> {
         }`}
       >
         <div className="row title-row">
-          <Link to={postDetailURL(post.channel_name, post.id)}>
+          <Link to={postDetailURL(post.channel_name, post.id, post.slug)}>
             <div className="post-title">
               <PostTitleAndHostname post={post} />
             </div>
@@ -97,7 +97,7 @@ export class CompactPostDisplay extends React.Component<*, void> {
           <div className="comments-and-menu">
             <Link
               className="comment-link"
-              to={postDetailURL(post.channel_name, post.id)}
+              to={postDetailURL(post.channel_name, post.id, post.slug)}
             >
               <i className="material-icons chat_bubble_outline">
                 chat_bubble_outline
