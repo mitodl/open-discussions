@@ -2,7 +2,7 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import EditChannelBasicForm from "../../components/admin/EditChannelBasicForm"
 import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
@@ -122,7 +122,9 @@ class EditChannelBasicPage extends React.Component<*, void> {
 
     return (
       <React.Fragment>
-        <DocumentTitle title={formatTitle("Edit Channel")} />
+        <MetaTags>
+          <title>{formatTitle("Edit Channel")}</title>
+        </MetaTags>
         <EditChannelNavbar channelName={channel.name} />
         <EditChannelBasicForm
           onSubmit={this.onSubmit}

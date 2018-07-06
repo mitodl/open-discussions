@@ -4,7 +4,7 @@ import React from "react"
 import R from "ramda"
 import qs from "query-string"
 import { connect } from "react-redux"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import PostList from "../components/PostList"
 import withLoading from "../components/Loading"
@@ -141,7 +141,9 @@ class ChannelPage extends React.Component<*, void> {
     } else {
       return (
         <React.Fragment>
-          <DocumentTitle title={formatTitle(channel.title)} />
+          <MetaTags>
+            <title>{formatTitle(channel.title)}</title>
+          </MetaTags>
           <ChannelBreadcrumbs channel={channel} />
           <div className="post-list-title">
             <div>{channel.title}</div>

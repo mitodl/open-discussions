@@ -1,7 +1,7 @@
 // @flow
 /* global SETTINGS:false */
 import React from "react"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
 import { formatTitle } from "../../lib/title"
@@ -13,7 +13,9 @@ const InactiveUserPage = () => {
       <div className="main-content">
         <Card className="inactive-account-card">
           <h3>Log In</h3>
-          <DocumentTitle title={formatTitle("Account is inactive")} />
+          <MetaTags>
+            <title>{formatTitle("Account is inactive")}</title>
+          </MetaTags>
           <p>
             Your account is not currently active. To fix this, please email
             support at <a href={`mailto:${supportEmail}`}>{supportEmail}</a>

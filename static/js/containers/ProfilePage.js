@@ -3,7 +3,7 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import Card from "../components/Card"
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
@@ -65,7 +65,9 @@ class ProfilePage extends React.Component<*, void> {
 
     return (
       <div className="profile-page">
-        <DocumentTitle title={formatTitle(`Profile for ${profile.name}`)} />
+        <MetaTags>
+          <title>{formatTitle(`Profile for ${profile.name}`)}</title>
+        </MetaTags>
         <div className="main-content">
           <Card>
             <div className="profile-card">

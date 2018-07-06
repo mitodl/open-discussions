@@ -2,7 +2,7 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 import qs from "query-string"
 import { Link } from "react-router-dom"
 
@@ -54,7 +54,9 @@ export class RegisterConfirmPage extends React.Component<*, *> {
         <div className="main-content">
           <Card className="register-confirm-card">
             <h3>Confirming Email</h3>
-            <DocumentTitle title={formatTitle("Confirming Email")} />
+            <MetaTags>
+              <title>{formatTitle("Confirming Email")}</title>
+            </MetaTags>
             {showLoading ? (
               <Loading />
             ) : (

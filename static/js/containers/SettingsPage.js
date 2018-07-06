@@ -2,7 +2,7 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 import { Radio } from "@mitodl/mdl-react-components"
 import Checkbox from "rmwc/Checkbox"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
@@ -104,7 +104,9 @@ class SettingsPage extends React.Component<*, *> {
 
     return form ? (
       <div className="content">
-        <DocumentTitle title={formatTitle("Settings")} />
+        <MetaTags>
+          <title>{formatTitle("Settings")}</title>
+        </MetaTags>
         <div className="main-content settings-page">
           <div className="breadcrumbs">Email Settings</div>
           <form onSubmit={this.onSubmit} className="form">

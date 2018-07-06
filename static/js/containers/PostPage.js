@@ -3,10 +3,10 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import DocumentTitle from "react-document-title"
 import { Dialog } from "@mitodl/mdl-react-components"
 import { Link } from "react-router-dom"
 import qs from "query-string"
+import { MetaTags } from "react-meta-tags"
 
 import Card from "../components/Card"
 import withLoading from "../components/Loading"
@@ -47,7 +47,7 @@ import {
   getChannelName,
   getPostID,
   getCommentID,
-  userIsAnonymous
+  userIsAnonymous, truncate
 } from "../lib/util"
 import { isModerator } from "../lib/channels"
 import {
@@ -361,8 +361,14 @@ class PostPage extends React.Component<PostPageProps, void> {
 
     return (
       <div>
+        <MetaTags>
+          <title>{formatTitle(post.title)}</title>
+          <meta
+            name="description"
+            content={truncate(post.text, 300)}
+          />
+        </MetaTags>
         <ChannelBreadcrumbs channel={channel} />
-        <DocumentTitle title={formatTitle(post.title)} />
         <Dialog
           open={commentDeleteDialogVisible}
           hideDialog={this.hideCommentDialog(DELETE_COMMENT_DIALOG)}

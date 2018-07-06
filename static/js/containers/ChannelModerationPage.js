@@ -3,7 +3,7 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 import { Redirect } from "react-router"
 
 import Card from "../components/Card"
@@ -93,7 +93,9 @@ class ChannelModerationPage extends React.Component<*, *> {
 
     return isModerator ? (
       <div className="channel-moderation">
-        <DocumentTitle title={formatTitle(`${channel.title} moderation`)} />
+        <MetaTags>
+          <title>{formatTitle(`${channel.title} moderation`)} </title>
+        </MetaTags>
         <ChannelModerationBreadcrumbs channel={channel} />
         {reports.length === 0 ? (
           <Card title="Reported Posts & Comments">

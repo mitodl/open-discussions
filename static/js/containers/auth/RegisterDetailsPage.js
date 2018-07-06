@@ -2,7 +2,7 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
 import AuthDetailsForm from "../../components/auth/AuthDetailsForm"
@@ -39,7 +39,9 @@ export const RegisterDetailsPage = ({
       <Card className="register-card">
         <h3>Thanks for confirming!</h3>
         <h4>Last details:</h4>
-        <DocumentTitle title={formatTitle("Thanks for confirming!")} />
+        <MetaTags>
+          <title>{formatTitle("Thanks for confirming!")}</title>
+        </MetaTags>
         {renderForm({ formError })}
       </Card>
     </div>

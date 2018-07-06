@@ -3,7 +3,7 @@
 import React from "react"
 import { Route, Redirect } from "react-router-dom"
 import { connect } from "react-redux"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import HomePage from "./HomePage"
 import ChannelPage from "./ChannelPage"
@@ -149,7 +149,9 @@ class App extends React.Component<*, void> {
 
     return (
       <div className="app">
-        <DocumentTitle title="MIT Open Discussions" />
+        <MetaTags>
+          <title>MIT Open Discussions</title>
+        </MetaTags>
         <Snackbar snackbar={snackbar} />
         <Toolbar
           toggleShowDrawer={this.toggleShowDrawer}
