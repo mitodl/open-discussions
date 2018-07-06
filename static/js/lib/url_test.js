@@ -32,7 +32,6 @@ describe("url helper functions", () => {
     })
   })
 
-
   describe("postDetailURLWithSlug", () => {
     it(`should return a good post URL including slug`, () => {
       assert.equal(
@@ -44,10 +43,7 @@ describe("url helper functions", () => {
 
   describe("postDetailURLWithoutSlug", () => {
     it(`should return a good post URL without a slug`, () => {
-      assert.equal(
-        postDetailURL("foobar", "23434j3j3"),
-        "/c/foobar/23434j3j3"
-      )
+      assert.equal(postDetailURL("foobar", "23434j3j3"), "/c/foobar/23434j3j3")
     })
   })
 
@@ -88,7 +84,7 @@ describe("url helper functions", () => {
   describe("commentPermalink with post slug", () => {
     it("should return a comment permalink with post slug", () => {
       assert.equal(
-        "/channel/channel_name/post_id/post_slug/comment/comment_id/",
+        "/c/channel_name/post_id/post_slug/comment/comment_id/",
         commentPermalink("channel_name", "post_id", "post_slug", "comment_id")
       )
     })
@@ -97,13 +93,8 @@ describe("url helper functions", () => {
   describe("commentPermalink without post slug", () => {
     it("should return a comment permalink without post slug", () => {
       assert.equal(
-<<<<<<< HEAD
-        "/channel/channel_name/post_id/comment/comment_id/",
-        commentPermalink("channel_name", "post_id", null, "comment_id")
-=======
         "/c/channel_name/post_id/comment/comment_id/",
-        commentPermalink("channel_name", "post_id", "comment_id")
->>>>>>> Replace channel with c in URLs, redirect old URLs to new ones
+        commentPermalink("channel_name", "post_id", null, "comment_id")
       )
     })
   })
