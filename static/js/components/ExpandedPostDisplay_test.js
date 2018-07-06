@@ -14,7 +14,7 @@ import ProfileImage from "../containers/ProfileImage"
 import SharePopup from "./SharePopup"
 
 import { wait } from "../lib/util"
-import { urlHostname, postPermalink } from "../lib/url"
+import { urlHostname, postPermalink, postDetailURL } from "../lib/url"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
@@ -148,7 +148,7 @@ describe("ExpandedPostDisplay", () => {
       .at(0)
       .props()
     assert.equal(children, post.title)
-    assert.equal(to, `/c/${post.channel_name}/${post.id}/${post.slug}`)
+    assert.equal(to, postDetailURL(post.channel_name, post.id, post.slug))
   })
 
   it("should only show an edit link if a text post and authored by the user", () => {

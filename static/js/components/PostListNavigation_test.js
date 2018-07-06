@@ -5,6 +5,7 @@ import { shallow } from "enzyme"
 import { Link } from "react-router-dom"
 
 import PostListNavigation from "./PostListNavigation"
+import { channelURL } from "../lib/url"
 
 describe("PostListNavigation", () => {
   describe("component", () => {
@@ -28,11 +29,11 @@ describe("PostListNavigation", () => {
         ...defaultProps,
         after:      "abc",
         afterCount: 5,
-        pathname:   "/c/foobar"
+        pathname:   channelURL("foobar")
       })
       const link = wrapper.find(Link)
       assert.deepEqual(link.props().to, {
-        pathname: "/c/foobar",
+        pathname: channelURL("foobar"),
         search:   "?after=abc&count=5"
       })
       assert.equal(link.props().children, "next >")
@@ -43,11 +44,11 @@ describe("PostListNavigation", () => {
         ...defaultProps,
         before:      "abc",
         beforeCount: 5,
-        pathname:    "/c/foobar"
+        pathname:    channelURL("foobar")
       })
       const link = wrapper.find(Link)
       assert.deepEqual(link.props().to, {
-        pathname: "/c/foobar",
+        pathname: channelURL("foobar"),
         search:   "?before=abc&count=5"
       })
       assert.equal(link.props().children, "< previous")
@@ -60,16 +61,16 @@ describe("PostListNavigation", () => {
         beforeCount: 5,
         after:       "abc",
         afterCount:  5,
-        pathname:    "/c/foobar"
+        pathname:    channelURL("foobar")
       })
       const links = wrapper.find(Link)
       assert.deepEqual(links.at(0).props().to, {
-        pathname: "/c/foobar",
+        pathname: channelURL("foobar"),
         search:   "?before=abc&count=5"
       })
       assert.equal(links.at(0).props().children, "< previous")
       assert.deepEqual(links.at(1).props().to, {
-        pathname: "/c/foobar",
+        pathname: channelURL("foobar"),
         search:   "?after=abc&count=5"
       })
       assert.equal(links.at(1).props().children, "next >")

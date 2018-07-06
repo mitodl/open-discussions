@@ -9,7 +9,7 @@ import Navigation from "./Navigation"
 import SubscriptionsList from "./SubscriptionsList"
 
 import * as channels from "../lib/channels"
-import { newPostURL, FRONTPAGE_URL } from "../lib/url"
+import { newPostURL, FRONTPAGE_URL, channelURL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
 import * as util from "../lib/util"
 
@@ -55,7 +55,7 @@ describe("Navigation", () => {
     it("create post link should have channel name if channelName is in URL", () => {
       const wrapper = renderComponent({
         ...defaultProps,
-        pathname: "/c/foobar"
+        pathname: channelURL("foobar")
       })
       const link = wrapper.find(Link).first()
       assert.equal(link.props().to, newPostURL("foobar"))
@@ -73,7 +73,7 @@ describe("Navigation", () => {
       const channel = defaultProps.subscribedChannels[3]
       const wrapper = renderComponent({
         ...defaultProps,
-        pathname: `/c/${channel.name}`
+        pathname: channelURL(channel.name)
       })
       assert.isNotOk(wrapper.find(".mdc-button").exists())
       assert.equal(userCanPostStub.callCount, 1)
@@ -109,7 +109,7 @@ describe("Navigation", () => {
   it("should pass the current channel down to the SubscriptionsList", () => {
     const wrapper = renderComponent({
       ...defaultProps,
-      pathname: "/c/foobar"
+      pathname: channelURL("foobar")
     })
     assert.equal(
       wrapper.find(SubscriptionsList).props().currentChannel,

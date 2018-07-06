@@ -9,6 +9,7 @@ import {
 } from "./ChannelBreadcrumbs"
 
 import { makeChannel } from "../factories/channels"
+import { channelModerationURL, channelURL } from "../lib/url"
 
 describe("ChannelBreadcrumbs", () => {
   it("should render breadcrumbs", () => {
@@ -17,7 +18,7 @@ describe("ChannelBreadcrumbs", () => {
     const [first, second] = wrapper.find(Link)
     assert.equal(first.props.to, "/")
     assert.equal(first.props.children, "Home")
-    assert.equal(second.props.to, `/c/${channel.name}`)
+    assert.equal(second.props.to, channelURL(channel.name))
     assert.equal(second.props.children, channel.title)
   })
 
@@ -27,9 +28,9 @@ describe("ChannelBreadcrumbs", () => {
     const [first, second, third] = wrapper.find(Link)
     assert.equal(first.props.to, "/")
     assert.equal(first.props.children, "Home")
-    assert.equal(second.props.to, `/c/${channel.name}`)
+    assert.equal(second.props.to, channelURL(channel.name))
     assert.equal(second.props.children, channel.title)
-    assert.equal(third.props.to, `/moderation/c/${channel.name}`)
+    assert.equal(third.props.to, channelModerationURL(channel.name))
     assert.equal(third.props.children, "Reported Posts & Comments")
   })
 })
