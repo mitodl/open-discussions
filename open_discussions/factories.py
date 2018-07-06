@@ -3,7 +3,7 @@ Factory for Users
 """
 import ulid
 from django.contrib.auth.models import User
-from factory import LazyFunction, RelatedFactory
+from factory import LazyFunction, RelatedFactory, Trait
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyText
 
@@ -19,3 +19,6 @@ class UserFactory(DjangoModelFactory):
 
     class Meta:
         model = User
+
+    class Params:
+        no_profile = Trait(profile=None)

@@ -9,7 +9,7 @@ from social_core.exceptions import AuthException
 class BaseJwtAuth(LegacyAuth):
     """Base implementation for JWT-based authentication"""
     ID_KEY = 'username'
-    EXTRA_DATA = ['username']
+    EXTRA_DATA = ['username', 'email']
 
     def auth_complete(self, *args, **kwargs):
         """Perform the authentication"""
@@ -41,4 +41,6 @@ class BaseJwtAuth(LegacyAuth):
 
     def get_user_details(self, response):
         """Get the user details"""
-        return {}
+        return {
+            'username': response['username'],
+        }

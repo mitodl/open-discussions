@@ -1,12 +1,13 @@
 """Tests for views for REST APIs for users"""
+# pylint: disable=redefined-outer-name, unused-argument, too-many-arguments
 from os.path import splitext, basename
 
 from django.contrib.auth.models import User
 from django.urls import reverse
 import pytest
+from social_django.models import UserSocialAuth
 
-
-# pylint: disable=redefined-outer-name, unused-argument, too-many-arguments
+from authentication.backends.micromasters import MicroMastersAuth
 from profiles.utils import make_temp_image_file
 
 pytestmark = pytest.mark.django_db
@@ -41,7 +42,7 @@ def test_list_users(client, staff_user, staff_jwt_header):
 
 
 # These can be removed once all clients have been updated and are sending both these fields
-@pytest.mark.parametrize('email', ['', 'test.email@example.com'])
+@pytest.mark.parametrize('email', ['test.email@example.com'])
 @pytest.mark.parametrize('email_optin', [None, True, False])
 @pytest.mark.parametrize('toc_optin', [None, True, False])
 def test_create_user(
@@ -71,8 +72,9 @@ def test_create_user(
         payload['profile']['email_optin'] = email_optin
     if toc_optin is not None:
         payload['profile']['toc_optin'] = toc_optin
-    get_or_create_auth_tokens_stub = mocker.patch('profiles.serializers.get_or_create_auth_tokens')
-    ensure_notifications_stub = mocker.patch('profiles.serializers.ensure_notification_settings')
+    assert UserSocialAuth.objects.filter(uid=email, provider=MicroMastersAuth.name).count() == 0
+    get_or_create_auth_tokens_stub = mocker.patch('channels.api.get_or_create_auth_tokens')
+    ensure_notifications_stub = mocker.patch('notifications.api.ensure_notification_settings')
     resp = client.post(url, data=payload, **staff_jwt_header)
     user = User.objects.get(username=resp.json()['username'])
     assert resp.status_code == 201
@@ -91,6 +93,7 @@ def test_create_user(
     assert user.email == email
     assert user.profile.email_optin is email_optin
     assert user.profile.toc_optin is toc_optin
+    assert UserSocialAuth.objects.filter(uid=user.username, provider=MicroMastersAuth.name).count() == 1
 
 
 def test_get_user(client, user, staff_jwt_header):

@@ -204,6 +204,8 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+SOCIAL_AUTH_STRATEGY = 'authentication.strategy.OpenDiscussionsStrategy'
+
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'login-complete'
 SOCIAL_AUTH_LOGIN_ERROR_URL = 'login'
 
@@ -269,9 +271,6 @@ SOCIAL_AUTH_PIPELINE = (
 
     # require a profile if they're not set via SAML
     'authentication.pipeline.user.require_profile_update_user_via_saml',
-
-    # initialize the user, must happen after we're sure who the user is
-    'authentication.pipeline.user.initialize_user',
 
     # Create the record that associates the social account with the user.
     'social_core.pipeline.social_auth.associate_user',

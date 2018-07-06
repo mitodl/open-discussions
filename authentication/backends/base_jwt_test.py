@@ -23,7 +23,10 @@ def auth(mock_strategy):
 
 def test_user_details(auth):
     """Tests get_user_details"""
-    assert auth.get_user_details(None) == {}
+    assert auth.get_user_details({
+        'username': 'abc',
+        'other': 'missing',
+    }) == {'username': 'abc'}
 
 
 def test_auth_complete_no_auth_header(auth):

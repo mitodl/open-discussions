@@ -1,8 +1,6 @@
 """Profile models"""
-import hashlib
 from uuid import uuid4
 
-import requests
 from django.db import models, transaction
 from django.conf import settings
 
@@ -10,7 +8,8 @@ from profiles.utils import (
     profile_image_upload_uri,
     profile_image_upload_uri_medium,
     profile_image_upload_uri_small,
-    make_thumbnail)
+    make_thumbnail
+)
 
 # Max dimension of either height or width for small and medium images
 IMAGE_SMALL_MAX_DIMENSION = 64
@@ -28,6 +27,19 @@ PROFILE_PROPS = (
     'headline',
     'bio',
 )
+
+
+def filter_profile_props(data):
+    """
+    Filters the passed profile data to valid profile fields
+
+    Args:
+        data (dict): profile data
+
+    Return:
+        dict: filtered dict
+    """
+    return {key: value for key, value in data.items() if key in PROFILE_PROPS}
 
 
 class Profile(models.Model):
@@ -52,17 +64,6 @@ class Profile(models.Model):
     headline = models.TextField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
 
-    def set_gravatar(self):
-        """
-        Query gravatar for an image and set user's profile image fields to it if found.
-        """
-        gravatar_hash = hashlib.md5(self.user.email.lower().encode('utf-8')).hexdigest()
-        gravatar_base_url = "https://www.gravatar.com/avatar/{}.jpg".format(gravatar_hash)
-        if requests.get("{}?d=404".format(gravatar_base_url), timeout=5).status_code == 200:
-            self.image = gravatar_base_url
-            self.image_small = '{}?s={}'.format(gravatar_base_url, IMAGE_SMALL_MAX_DIMENSION)
-            self.image_medium = '{}?s={}'.format(gravatar_base_url, IMAGE_MEDIUM_MAX_DIMENSION)
-
     @transaction.atomic
     def save(self, *args, update_image=False, **kwargs):  # pylint: disable=arguments-differ
         """Update thumbnails if necessary"""
@@ -77,8 +78,6 @@ class Profile(models.Model):
             else:
                 self.image_small_file = None
                 self.image_medium_file = None
-        elif not self.pk and not self.image_file and not self.image:
-            self.set_gravatar()
         super(Profile, self).save(*args, **kwargs)
 
     def __str__(self):
