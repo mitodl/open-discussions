@@ -938,9 +938,8 @@ def test_remove_comment_subscription(mock_client, user):  # pylint: disable=unus
     assert not Subscription.objects.filter(user=user, post_id='abc', comment_id='def').exists()
 
 
-def test_sync_channel_model(settings):
+def test_sync_channel_model():
     """sync_channel_model should write the channel info to our database"""
-    settings.FEATURES[features.KEEP_LOCAL_COPY] = True
     channel_name = 'channel'
     assert Channel.objects.count() == 0
     channel = api.sync_channel_model(channel_name)
@@ -951,9 +950,8 @@ def test_sync_channel_model(settings):
     assert channel == api.sync_channel_model(channel_name)
 
 
-def test_sync_comment_model(settings):
+def test_sync_comment_model():
     """sync_comment_model should write the comment to our database"""
-    settings.FEATURES[features.KEEP_LOCAL_COPY] = True
     channel_name = 'channel name'
     post_id = '456'
     comment_id = 'def'
@@ -985,9 +983,8 @@ def test_sync_comment_model(settings):
     )
 
 
-def test_sync_post_model(settings):
+def test_sync_post_model():
     """sync_post_model should write the post information to our database"""
-    settings.FEATURES[features.KEEP_LOCAL_COPY] = True
     channel_name = 'channel'
     post_id = 'post_id'
 

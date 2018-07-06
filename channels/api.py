@@ -276,7 +276,6 @@ def replace_load_comment(original_load_comment):
     return replacement_load_comment
 
 
-@features.if_feature_enabled(features.KEEP_LOCAL_COPY)
 def sync_channel_model(name):
     """
     Create the channel in our database if it doesn't already exist
@@ -290,7 +289,6 @@ def sync_channel_model(name):
     return Channel.objects.get_or_create(name=name)[0]
 
 
-@features.if_feature_enabled(features.KEEP_LOCAL_COPY)
 def sync_post_model(*, channel_name, post_id):
     """
     Create a new Post if it doesn't exist already. Also create a new Channel if necessary
@@ -314,7 +312,6 @@ def sync_post_model(*, channel_name, post_id):
         )[0]
 
 
-@features.if_feature_enabled(features.KEEP_LOCAL_COPY)
 def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):
     """
     Create a new Comment if it doesn't already exist. Also create a new Post and Channel if necessary
