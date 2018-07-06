@@ -30,8 +30,17 @@ describe("url helper functions", () => {
     })
   })
 
-  describe("postDetailURL", () => {
-    it("should return a good URL", () => {
+  describe("postDetailURLWithSlug", () => {
+    it(`should return a good post URL including slug`, () => {
+      assert.equal(
+        postDetailURL("foobar", "23434j3j3", "post_slug"),
+        "/channel/foobar/23434j3j3/post_slug"
+      )
+    })
+  })
+
+  describe("postDetailURLWithoutSlug", () => {
+    it(`should return a good post URL without a slug`, () => {
       assert.equal(
         postDetailURL("foobar", "23434j3j3"),
         "/channel/foobar/23434j3j3"
@@ -73,11 +82,20 @@ describe("url helper functions", () => {
     })
   })
 
-  describe("commentPermalink", () => {
-    it("should return a comment permalink", () => {
+  describe("commentPermalink with post slug", () => {
+    it("should return a comment permalink with post slug", () => {
+      assert.equal(
+        "/channel/channel_name/post_id/post_slug/comment/comment_id/",
+        commentPermalink("channel_name", "post_id", "post_slug", "comment_id")
+      )
+    })
+  })
+
+  describe("commentPermalink without post slug", () => {
+    it("should return a comment permalink without post slug", () => {
       assert.equal(
         "/channel/channel_name/post_id/comment/comment_id/",
-        commentPermalink("channel_name", "post_id", "comment_id")
+        commentPermalink("channel_name", "post_id", null, "comment_id")
       )
     })
   })

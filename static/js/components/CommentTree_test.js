@@ -52,7 +52,7 @@ describe("CommentTree", () => {
     deleteCommentStub = helper.sandbox.stub()
     reportCommentStub = helper.sandbox.stub()
     toggleFollowCommentStub = helper.sandbox.stub()
-    permalinkFunc = commentPermalink("channel", post.id)
+    permalinkFunc = commentPermalink("channel", post.id, post.slug)
   })
 
   afterEach(() => {

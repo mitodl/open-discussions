@@ -116,7 +116,7 @@ describe("CompactPostDisplay", () => {
       .find(Link)
       .at(0)
     const { to } = detailLink.props()
-    assert.equal(to, `/channel/${post.channel_name}/${post.id}`)
+    assert.equal(to, `/channel/${post.channel_name}/${post.id}/${post.slug}`)
     assert.ok(detailLink.find(PostTitleAndHostname).exists())
   })
 

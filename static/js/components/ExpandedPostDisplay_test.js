@@ -141,7 +141,7 @@ describe("ExpandedPostDisplay", () => {
       .at(0)
       .props()
     assert.equal(children, post.title)
-    assert.equal(to, `/channel/${post.channel_name}/${post.id}`)
+    assert.equal(to, `/channel/${post.channel_name}/${post.id}/${post.slug}`)
   })
 
   it("should only show an edit link if a text post and authored by the user", () => {

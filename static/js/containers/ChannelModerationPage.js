@@ -73,7 +73,8 @@ class ChannelModerationPage extends React.Component<*, *> {
             commentReports={commentReports}
             commentPermalink={commentPermalink(
               channelName,
-              report.comment.post_id
+              report.comment.post_id,
+              null
             )}
             approve={approveComment}
             remove={removeComment}

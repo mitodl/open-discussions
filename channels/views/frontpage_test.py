@@ -8,6 +8,7 @@ from channels.constants import (
     POSTS_SORT_HOT,
     VALID_POST_SORT_TYPES,
 )
+from channels.utils import get_reddit_slug
 from open_discussions.features import ANONYMOUS_ACCESS
 from profiles.utils import image_uri
 
@@ -53,6 +54,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
             "score": 1,
             "author_id": user.username,
             "id": post.id,
+            "slug": get_reddit_slug(post.permalink),
             "created": post.created,
             "num_comments": 0,
             "channel_name": channel.name,
@@ -97,6 +99,7 @@ def test_frontpage_sorted(client, private_channel_and_contributor, reddit_factor
             "score": 1,
             "author_id": user.username,
             "id": post.id,
+            "slug": get_reddit_slug(post.permalink),
             "created": post.created,
             "num_comments": 0,
             "channel_name": channel.name,

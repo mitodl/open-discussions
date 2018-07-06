@@ -206,7 +206,7 @@ describe("PostPage", function() {
 
   it("should show a comment permalink UI if at the right URL", async () => {
     const [wrapper] = await renderComponent(
-      commentPermalink(channel.name, post.id, comments[0].id),
+      commentPermalink(channel.name, post.id, post.slug, comments[0].id),
       basicPostPageActions
     )
     wrapper.update()
@@ -221,7 +221,7 @@ describe("PostPage", function() {
     )
     assert.equal(
       card.find(Link).props().to,
-      postDetailURL(channel.name, post.id)
+      postDetailURL(channel.name, post.id, post.slug)
     )
     assert.equal(
       card.find(Link).props().children,

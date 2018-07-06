@@ -410,7 +410,7 @@ class PostPage extends React.Component<*, void> {
         {commentID ? (
           <Card className="comment-detail-card">
             <div>You are viewing a single comment's thread.</div>
-            <Link to={postDetailURL(channel.name, post.id)}>
+            <Link to={postDetailURL(channel.name, post.id, post.slug)}>
               View the rest of the comments
             </Link>
           </Card>
@@ -436,7 +436,7 @@ class PostPage extends React.Component<*, void> {
           loadMoreComments={this.loadMoreComments}
           beginEditing={beginEditing(dispatch)}
           processing={commentInFlight}
-          commentPermalink={commentPermalink(channel.name, post.id)}
+          commentPermalink={commentPermalink(channel.name, post.id, post.slug)}
           toggleFollowComment={toggleFollowComment(dispatch)}
         />
       </div>

@@ -37,12 +37,13 @@ urlpatterns = [
     url(r'^auth_required/$', index),
     url(r'^content_policy/$', index),
     url(  # so that we can use reverse() to link to this
-        r'^channel/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/comment/(?P<comment_id>[A-Za-z0-9_]+)/$',
+        r'^channel/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/'
+        r'(?P<post_slug>[A-Za-z0-9_])?/?comment/(?P<comment_id>[A-Za-z0-9_]+)/$',
         index,
         name='channel-post-comment',
     ),
     url(  # so that we can use reverse() to link to this
-        r'^channel/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/$',
+        r'^channel/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/(?P<post_slug>[A-Za-z0-9_])?/?$',
         index,
         name='channel-post',
     ),

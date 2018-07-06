@@ -53,7 +53,10 @@ export const getPostDropdownMenuKey = (post: Post) => `POST_DROPDOWN_${post.id}`
 
 export const formatPostTitle = (post: Post) =>
   post.text ? (
-    <Link className="post-title" to={postDetailURL(post.channel_name, post.id)}>
+    <Link
+      className="post-title"
+      to={postDetailURL(post.channel_name, post.id, post.slug)}
+    >
       {post.title}
     </Link>
   ) : (

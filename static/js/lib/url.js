@@ -13,8 +13,11 @@ export const editChannelBasicURL = (channelName: string) =>
 export const editChannelAppearanceURL = (channelName: string) =>
   `/manage/channel/edit/${channelName}/appearance/`
 
-export const postDetailURL = (channelName: string, postID: string) =>
-  `/channel/${channelName}/${postID}`
+export const postDetailURL = (
+  channelName: string,
+  postID: string,
+  postSlug?: string
+) => `/channel/${channelName}/${postID}${postSlug ? `/${postSlug}` : ""}`
 
 export const newPostURL = (channelName: ?string) =>
   channelName ? `/create_post/${channelName}` : "/create_post/"
@@ -24,8 +27,8 @@ export const profileURL = (username: string) => `/profile/${username}/`
 export const editProfileURL = (username: string) => `/profile/${username}/edit`
 
 export const commentPermalink = R.curry(
-  (channelName: string, postID: string, commentID: string) =>
-    `${postDetailURL(channelName, postID)}/comment/${commentID}/`
+  (channelName: string, postID: string, postSlug: string, commentID: string) =>
+    `${postDetailURL(channelName, postID, postSlug)}/comment/${commentID}/`
 )
 
 // pull the channel name out of location.pathname

@@ -4,6 +4,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from channels.api import Api
+from channels.utils import get_reddit_slug
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 from profiles.utils import image_uri
@@ -115,6 +116,7 @@ def test_list_reports(staff_client, private_channel_and_contributor, reddit_fact
             "score": 1,
             "author_id": user.username,
             "id": post.id,
+            "slug": get_reddit_slug(post.permalink),
             "created": post.created,
             "num_comments": 1,
             "channel_name": channel.name,
