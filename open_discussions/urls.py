@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework_jwt.views import refresh_jwt_token
 
-from open_discussions.views import index, saml_metadata
+from open_discussions.views import index, saml_metadata, channel_redirect
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -37,23 +37,24 @@ urlpatterns = [
     url(r'^auth_required/$', index),
     url(r'^content_policy/$', index),
     url(  # so that we can use reverse() to link to this
-        r'^channel/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/'
+        r'^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/'
         r'(?P<post_slug>[A-Za-z0-9_])?/?comment/(?P<comment_id>[A-Za-z0-9_]+)/$',
         index,
         name='channel-post-comment',
     ),
     url(  # so that we can use reverse() to link to this
-        r'^channel/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/(?P<post_slug>[A-Za-z0-9_])?/?$',
+        r'^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/(?P<post_slug>[A-Za-z0-9_])?/?$',
         index,
         name='channel-post',
     ),
     url(  # so that we can use reverse() to link to this
-        r'^channel/(?P<channel_name>[A-Za-z0-9_]+)/$',
+        r'^c/(?P<channel_name>[A-Za-z0-9_]+)/$',
         index,
         name='channel',
     ),
     url(r'^settings/(?P<token>[^/]+)/$', index, name='settings-anon'),
-    url(r'^channel/', index),
+    url(r'^c/', index),
+    url(r'^channel/', channel_redirect),
     url(r'^manage/', index),
     url(r'^create_post/', index),
     url(r'^moderation/', index),

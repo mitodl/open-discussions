@@ -87,14 +87,14 @@ describe("App", () => {
   const expectedLoginRequiredTitle = "Login Required | MIT Open Discussions"
   it("redirects if you have no session url", async () => {
     delete SETTINGS.authenticated_site.session_url
-    await renderComponent("/channel/foobaz", [])
+    await renderComponent("/c/foobaz", [])
     assert.equal(document.title, expectedLoginRequiredTitle)
   })
 
   it("doesn't redirect if you have no session url but anonymous access is allowed", async () => {
     delete SETTINGS.authenticated_site.session_url
     SETTINGS.allow_anonymous = true
-    await renderComponent("/channel/foobaz", [])
+    await renderComponent("/c/foobaz", [])
     assert.notEqual(document.title, expectedLoginRequiredTitle)
   })
 

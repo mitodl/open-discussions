@@ -158,3 +158,15 @@ def test_saml_metadata(settings, client, user, is_enabled):
         assert response.status_code == 200
     else:
         assert response.status_code == 404
+
+
+@pytest.mark.parametrize('url, redirect', [
+    ['/channel/test_channel/', '/c/test_channel/'],
+    ['/channel/channel/n', '/c/channel/n'],
+    ['/channel/channel/n/comment/20/', '/c/channel/n/comment/20/'],
+])
+def test_channel_redirect(client, url, redirect):
+    """ Test that old channel URL's are redirected to new ones"""
+    response = client.get(url, follow=True)
+    last_url, _ = response.redirect_chain[-1]
+    assert last_url == redirect

@@ -19,7 +19,7 @@ import { makePost } from "../factories/posts"
 describe("url helper functions", () => {
   describe("channelURL", () => {
     it("should return a good URL", () => {
-      assert.equal(channelURL("foobar"), "/channel/foobar")
+      assert.equal(channelURL("foobar"), "/c/foobar")
     })
   })
 
@@ -27,16 +27,17 @@ describe("url helper functions", () => {
     it("should return a good URL", () => {
       assert.equal(
         channelModerationURL("foochannel"),
-        "/moderation/channel/foochannel"
+        "/moderation/c/foochannel"
       )
     })
   })
+
 
   describe("postDetailURLWithSlug", () => {
     it(`should return a good post URL including slug`, () => {
       assert.equal(
         postDetailURL("foobar", "23434j3j3", "post_slug"),
-        "/channel/foobar/23434j3j3/post_slug"
+        "/c/foobar/23434j3j3/post_slug"
       )
     })
   })
@@ -45,7 +46,7 @@ describe("url helper functions", () => {
     it(`should return a good post URL without a slug`, () => {
       assert.equal(
         postDetailURL("foobar", "23434j3j3"),
-        "/channel/foobar/23434j3j3"
+        "/c/foobar/23434j3j3"
       )
     })
   })
@@ -63,15 +64,15 @@ describe("url helper functions", () => {
   describe("getChannelNameFromPathname", () => {
     it("should return a channel", () => {
       [
-        ["/channel/foobar/", "foobar"],
-        ["/channel/foobar", "foobar"],
-        ["/channel/foobar/baz/", "foobar"],
-        ["/channel/foobar_baz/boz", "foobar_baz"],
-        ["/channel/foobarbaz9/boz", "foobarbaz9"],
-        ["/channel/Foobarbaz9/boz", "Foobarbaz9"],
-        ["/channel/fOObar_Baz9/boz", "fOObar_Baz9"],
-        ["/moderation/channel/foobar", "foobar"],
-        ["/moderation/channel/bippity/boppity", "bippity"]
+        ["/c/foobar/", "foobar"],
+        ["/c/foobar", "foobar"],
+        ["/c/foobar/baz/", "foobar"],
+        ["/c/foobar_baz/boz", "foobar_baz"],
+        ["/c/foobarbaz9/boz", "foobarbaz9"],
+        ["/c/Foobarbaz9/boz", "Foobarbaz9"],
+        ["/c/fOObar_Baz9/boz", "fOObar_Baz9"],
+        ["/moderation/c/foobar", "foobar"],
+        ["/moderation/c/bippity/boppity", "bippity"]
       ].forEach(([url, expectation]) => {
         assert.equal(expectation, getChannelNameFromPathname(url))
       })
@@ -79,8 +80,8 @@ describe("url helper functions", () => {
 
     it("should return null otherwise", () => {
       assert.equal(null, getChannelNameFromPathname(""))
-      assert.equal(null, getChannelNameFromPathname("/moderation/channel"))
-      assert.equal(null, getChannelNameFromPathname("/moderation/channel/"))
+      assert.equal(null, getChannelNameFromPathname("/moderation/c"))
+      assert.equal(null, getChannelNameFromPathname("/moderation/c/"))
     })
   })
 
@@ -96,8 +97,13 @@ describe("url helper functions", () => {
   describe("commentPermalink without post slug", () => {
     it("should return a comment permalink without post slug", () => {
       assert.equal(
+<<<<<<< HEAD
         "/channel/channel_name/post_id/comment/comment_id/",
         commentPermalink("channel_name", "post_id", null, "comment_id")
+=======
+        "/c/channel_name/post_id/comment/comment_id/",
+        commentPermalink("channel_name", "post_id", "comment_id")
+>>>>>>> Replace channel with c in URLs, redirect old URLs to new ones
       )
     })
   })

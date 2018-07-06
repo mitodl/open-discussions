@@ -72,7 +72,7 @@ describe("CompactPostDisplay", () => {
       .find(Link)
       .at(1)
       .props()
-    assert.equal(linkProps.to, "/channel/channel_name")
+    assert.equal(linkProps.to, "/c/channel_name")
     assert.equal(linkProps.children, post.channel_title)
   })
 
@@ -116,7 +116,7 @@ describe("CompactPostDisplay", () => {
       .find(Link)
       .at(0)
     const { to } = detailLink.props()
-    assert.equal(to, `/channel/${post.channel_name}/${post.id}/${post.slug}`)
+    assert.equal(to, `/c/${post.channel_name}/${post.id}/${post.slug}`)
     assert.ok(detailLink.find(PostTitleAndHostname).exists())
   })
 

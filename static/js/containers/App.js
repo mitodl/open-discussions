@@ -159,24 +159,24 @@ class App extends React.Component<*, void> {
         <div className="content">
           <Route exact path={match.url} component={HomePage} />
           <Route
-            path={`${match.url}moderation/channel/:channelName`}
+            path={`${match.url}moderation/c/:channelName`}
             component={ChannelModerationPage}
           />
           <Route
             exact
-            path={`${match.url}channel/:channelName`}
+            path={`${match.url}c/:channelName`}
             component={ChannelPage}
           />
           <Route
             exact
-            path={`${match.url}channel/:channelName/:postID/:postSlug?`}
+            path={`${match.url}c/:channelName/:postID/:postSlug?`}
             component={PostPage}
           />
           <Route
             exact
             path={`${
               match.url
-            }channel/:channelName/:postID/:postSlug?/comment/:commentID`}
+            }c/:channelName/:postID/:postSlug?/comment/:commentID`}
             component={PostPage}
           />
           <Route path={`${match.url}manage/`} component={AdminPage} />
