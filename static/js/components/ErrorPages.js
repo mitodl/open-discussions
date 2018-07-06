@@ -3,7 +3,7 @@ import React from "react"
 
 import Card from "../components/Card"
 
-const ErrorPage = (header, detail) => () => (
+const ErrorPage = (header: string, detail: string) => () => (
   <div>
     <Card>
       <div className="not-found">

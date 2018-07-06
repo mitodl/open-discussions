@@ -8,19 +8,18 @@ import type { CommentInTree } from "../flow/discussionTypes"
 
 export type CommentVoteFunc = (comment: CommentInTree) => Promise<*>
 
-type CommentVoteFormProps = {
+type Props = {
   comment: CommentInTree,
   upvote: CommentVoteFunc,
   downvote: CommentVoteFunc
 }
 
-export default class CommentVoteForm extends React.Component<*, *> {
-  props: CommentVoteFormProps
-  state: {
-    downvoting: boolean,
-    upvoting: boolean
-  }
+type State = {
+  downvoting: boolean,
+  upvoting: boolean
+}
 
+export default class CommentVoteForm extends React.Component<Props, State> {
   constructor() {
     super()
 

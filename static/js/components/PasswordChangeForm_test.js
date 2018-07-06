@@ -40,6 +40,7 @@ describe("PasswordChangeForm component", () => {
           form={form}
           validation={{}}
           processing={false}
+          invalidPwError={undefined}
           {...props}
         />
       </Router>

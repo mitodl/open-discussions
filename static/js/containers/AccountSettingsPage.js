@@ -13,8 +13,14 @@ import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
 
 import type { SocialAuth } from "../flow/discussionTypes"
+import type { Dispatch } from "redux"
 
-class AccountSettingsPage extends React.Component<*, void> {
+type Props = {
+  dispatch: Dispatch<*>,
+  socialAuths: Array<SocialAuth>
+}
+
+class AccountSettingsPage extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }

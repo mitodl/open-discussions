@@ -1,3 +1,4 @@
+// @flow
 /* global SETTINGS: false */
 import React from "react"
 import { mount } from "enzyme"
@@ -35,7 +36,11 @@ describe("ProfileImage", () => {
     div = document.createElement("div")
     return mount(
       <Provider store={helper.store}>
-        <ProfileImage profile={thatProfile} {...props} />
+        <ProfileImage
+          profile={thatProfile}
+          imageSize={PROFILE_IMAGE_MEDIUM}
+          {...props}
+        />
       </Provider>,
       {
         attachTo: div
@@ -126,7 +131,9 @@ describe("ProfileImage", () => {
     [PROFILE_IMAGE_SMALL, true],
     [PROFILE_IMAGE_MEDIUM, false]
   ].forEach(([imageSize, exp]) => {
-    it(`should call makeProfileImageUrl with ${exp} if imageSize is ${imageSize}`, () => {
+    it(`should call makeProfileImageUrl with ${String(
+      exp
+    )} if imageSize is ${imageSize}`, () => {
       renderProfileImage({ imageSize })
       assert.ok(makeProfileImageUrlStub.calledWith(thatProfile, exp))
     })

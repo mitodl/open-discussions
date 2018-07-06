@@ -9,13 +9,13 @@ import ScrollToTop from "./components/ScrollToTop"
 
 import type { Store } from "redux"
 
-export default class Router extends React.Component<*, void> {
-  props: {
-    store: Store<*, *>,
-    history: Object,
-    children: React$Element<*>
-  }
+type Props = {
+  store: Store<*, *>,
+  history: Object,
+  children: React$Element<*>
+}
 
+export default class Router extends React.Component<Props> {
   render() {
     const { store, children, history } = this.props
 

@@ -1,3 +1,4 @@
+// @flow
 import React from "react"
 import { assert } from "chai"
 import sinon from "sinon"
@@ -19,7 +20,9 @@ describe("EditChannelAppearanceForm", () => {
         form={form}
         onSubmit={onSubmit}
         onUpdate={onUpdate}
-        validation={{}}
+        validation={{ title: "", description: "", public_description: "" }}
+        history={{}}
+        processing={false}
       />
     )
   let sandbox, form
@@ -35,6 +38,7 @@ describe("EditChannelAppearanceForm", () => {
 
   it("should render a blank form", () => {
     const wrapper = renderForm(form)
+    // $FlowFixMe
     const [description] = wrapper.find("textarea")
     assert.equal(description.props.value, form.description)
   })

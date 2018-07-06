@@ -13,7 +13,7 @@ import type {
   ProfileValidation
 } from "../flow/discussionTypes"
 
-type ProfileFormProps = {
+type Props = {
   form: ProfilePayload,
   validation: ProfileValidation,
   onUpdate: Function,
@@ -23,9 +23,7 @@ type ProfileFormProps = {
   history: Object
 }
 
-export default class ProfileForm extends React.Component<*, void> {
-  props: ProfileFormProps
-
+export default class ProfileForm extends React.Component<Props> {
   render() {
     const {
       form,

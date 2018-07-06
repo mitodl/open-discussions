@@ -30,7 +30,7 @@ describe("ProfileForm", () => {
       bio:      profile.bio,
       headline: profile.headline
     },
-    validation = { reason: "" }
+    validation = { reason: "", name: "" }
   ) =>
     mount(
       <Provider store={helper.store}>
@@ -40,6 +40,8 @@ describe("ProfileForm", () => {
           validation={validation}
           onUpdate={onUpdateStub}
           onSubmit={onSubmitStub}
+          history={{}}
+          processing={false}
           {...props}
         />
       </Provider>

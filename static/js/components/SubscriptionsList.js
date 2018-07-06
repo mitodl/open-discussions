@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import { channelURL } from "../lib/url"
 import type { Channel } from "../flow/discussionTypes"
 
-type SubscriptionsListProps = {
+type Props = {
   subscribedChannels: Array<Channel>,
   currentChannel: ?string
 }
@@ -15,9 +15,7 @@ const channelClassName = (channelName, currentChannel) =>
     ? "channelname current-location"
     : "channelname"
 
-export default class SubscriptionsList extends React.Component<*, void> {
-  props: SubscriptionsListProps
-
+export default class SubscriptionsList extends React.Component<Props> {
   render() {
     const { subscribedChannels, currentChannel } = this.props
 

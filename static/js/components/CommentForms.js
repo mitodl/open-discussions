@@ -30,6 +30,10 @@ type CommentFormProps = {
   editing: boolean
 }
 
+type CommentFormState = {
+  replying: boolean
+}
+
 export const replyToCommentKey = (comment: CommentInTree) =>
   `post:${comment.post_id}:comment:${comment.id}:comment:new`
 
@@ -211,13 +215,10 @@ export const ReplyToCommentForm: Class<React$Component<*, *>> = connect(
   mapStateToProps,
   mapDispatchToProps
 )(
-  class ReplyCommentForm extends React.Component<*, *> {
-    props: CommentFormProps
-
-    state: {
-      replying: boolean
-    }
-
+  class ReplyCommentForm extends React.Component<
+    CommentFormProps,
+    CommentFormState
+  > {
     constructor(props) {
       super(props)
       this.state = {

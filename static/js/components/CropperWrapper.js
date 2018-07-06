@@ -3,13 +3,14 @@ import React from "react"
 import Cropper from "react-cropper"
 import browser from "detect-browser"
 
-export default class CropperWrapper extends React.Component<*> {
+type Props = {
+  updatePhotoEdit: (b: Blob) => void,
+  photo: Object,
+  uploaderBodyHeight: () => number
+}
+
+export default class CropperWrapper extends React.Component<Props> {
   cropper: Cropper
-  props: {
-    updatePhotoEdit: (b: Blob) => void,
-    photo: Object,
-    uploaderBodyHeight: () => number
-  }
 
   cropperHelper = () => {
     const { updatePhotoEdit } = this.props

@@ -31,18 +31,18 @@ import type { Channel, Post, PostListPagination } from "../flow/discussionTypes"
 // querystring doesn't match
 const shouldLoadData = R.complement(R.eqBy(R.path(["location", "search"])))
 
-class HomePage extends React.Component<*, void> {
-  props: {
-    location: Location,
-    dispatch: Dispatch<any>,
-    posts: Array<Post>,
-    subscribedChannels: RestState<Array<string>>,
-    channels: RestState<Map<string, Channel>>,
-    showSidebar: boolean,
-    pagination: PostListPagination,
-    reportPost: (p: Post) => void
-  }
+type Props = {
+  location: Location,
+  dispatch: Dispatch<any>,
+  posts: Array<Post>,
+  subscribedChannels: RestState<Array<string>>,
+  channels: RestState<Map<string, Channel>>,
+  showSidebar: boolean,
+  pagination: PostListPagination,
+  reportPost: (p: Post) => void
+}
 
+class HomePage extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }

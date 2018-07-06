@@ -19,7 +19,7 @@ import { clearPostError } from "../actions/post"
 import type { Profile } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
 
-type ProfilePageProps = {
+type Props = {
   dispatch: Dispatch<*>,
   profile: Profile,
   userName: string,
@@ -28,9 +28,7 @@ type ProfilePageProps = {
   errored: boolean
 }
 
-class ProfilePage extends React.Component<*, void> {
-  props: ProfilePageProps
-
+class ProfilePage extends React.Component<Props> {
   componentDidMount() {
     const { profile } = this.props
     if (!profile) {

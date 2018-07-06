@@ -24,6 +24,10 @@ import {
 import { setSnackbarMessage } from "../actions/ui"
 import { withRouter } from "react-router"
 
+import type { Dispatch } from "redux"
+import type { FormValue } from "../flow/formTypes"
+import type { FrontpageFrequency, CommentFrequency } from "../reducers/settings"
+
 export const SETTINGS_FORM_KEY = "SETTINGS_FORM_KEY"
 
 const FRONTPAGE_INPUT_NAME = "frontpage"
@@ -39,7 +43,22 @@ const getCommentFrequency = R.compose(
   R.find(R.propEq("notification_type", COMMENT_NOTIFICATION))
 )
 
-class SettingsPage extends React.Component<*, *> {
+type SettingsForm = {
+  comments: CommentFrequency,
+  frontpage: FrontpageFrequency
+}
+
+type StateProps = {
+  form: FormValue<SettingsForm>,
+  saving: boolean,
+  token: string
+}
+
+type Props = {
+  dispatch: Dispatch<*>
+} & StateProps
+
+class SettingsPage extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }
@@ -154,16 +173,12 @@ class SettingsPage extends React.Component<*, *> {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    settings: state.settings.data,
-    token:    getTokenFromUrl(ownProps),
-    form:     state.forms[SETTINGS_FORM_KEY],
-    saving:
-      state.settings.processing &&
-      state.settings.patchStatus === FETCH_PROCESSING
-  }
-}
+const mapStateToProps = (state, ownProps): StateProps => ({
+  token:  getTokenFromUrl(ownProps),
+  form:   state.forms[SETTINGS_FORM_KEY],
+  saving:
+    state.settings.processing && state.settings.patchStatus === FETCH_PROCESSING
+})
 
 export default R.compose(
   connect(mapStateToProps),

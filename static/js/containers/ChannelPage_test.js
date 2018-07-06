@@ -22,10 +22,6 @@ import { channelURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
 import { VALID_POST_SORT_TYPES } from "../lib/sorting"
 import { makeReportRecord } from "../factories/reports"
-import {
-  RECEIVE_GET_PROFILES_SUCCESS,
-  REQUEST_GET_PROFILES
-} from "../actions/profile"
 import { showDropdown } from "../actions/ui"
 import { getPostDropdownMenuKey } from "../lib/posts"
 
@@ -59,8 +55,8 @@ describe("ChannelPage", () => {
 
   const renderPage = async channel => {
     const [wrapper] = await renderComponent(channelURL(channel.name), [
-      REQUEST_GET_PROFILES,
-      RECEIVE_GET_PROFILES_SUCCESS,
+      actions.profiles.get.requestType,
+      actions.profiles.get.successType,
       actions.channels.get.requestType,
       actions.channels.get.successType,
       actions.postsForChannel.get.requestType,
@@ -96,8 +92,8 @@ describe("ChannelPage", () => {
     postList[0] = post
 
     const [wrapper] = await renderComponent(channelURL(currentChannel.name), [
-      REQUEST_GET_PROFILES,
-      RECEIVE_GET_PROFILES_SUCCESS,
+      actions.profiles.get.requestType,
+      actions.profiles.get.successType,
       actions.channels.get.requestType,
       actions.channels.get.successType,
       actions.postsForChannel.get.requestType,
@@ -196,8 +192,8 @@ describe("ChannelPage", () => {
     })
 
     await renderComponent(channelURL(currentChannel.name), [
-      REQUEST_GET_PROFILES,
-      RECEIVE_GET_PROFILES_SUCCESS,
+      actions.profiles.get.requestType,
+      actions.profiles.get.successType,
       actions.channels.get.requestType,
       actions.channels.get.successType,
       actions.postsForChannel.get.requestType,

@@ -1,3 +1,4 @@
+// @flow
 import React from "react"
 import { mount } from "enzyme"
 import { assert } from "chai"
@@ -47,7 +48,7 @@ describe("Markdown", () => {
     const wrapper = renderMD(
       "![](https://upload.wikimedia.org/wikipedia/commons/4/4c/Chihuahua1_bvdb.jpg)"
     )
-    assert.notOk(wrapper.find("img").exists())
+    assert.isNotOk(wrapper.find("img").exists())
   })
 
   it("should automatically turn URLs into links", () => {
@@ -64,6 +65,6 @@ describe("Markdown", () => {
 
   it("shouldnt turn non-url brackets into links", () => {
     const wrapper = renderMD("just [bracket] stuff")
-    assert.notOk(wrapper.find("a").exists())
+    assert.isNotOk(wrapper.find("a").exists())
   })
 })

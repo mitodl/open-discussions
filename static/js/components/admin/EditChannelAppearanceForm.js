@@ -11,19 +11,16 @@ import type {
   ChannelAppearanceEditValidation
 } from "../../flow/discussionTypes"
 
-export default class EditChannelAppearanceForm extends React.Component<
-  *,
-  void
-> {
-  props: {
-    onSubmit: Function,
-    onUpdate: Function,
-    form: ChannelForm,
-    history: Object,
-    validation: ChannelAppearanceEditValidation,
-    processing: boolean
-  }
+type Props = {
+  onSubmit: Function,
+  onUpdate: Function,
+  form: ChannelForm,
+  history: Object,
+  validation: ChannelAppearanceEditValidation,
+  processing: boolean
+}
 
+export default class EditChannelAppearanceForm extends React.Component<Props> {
   render() {
     const {
       onSubmit,

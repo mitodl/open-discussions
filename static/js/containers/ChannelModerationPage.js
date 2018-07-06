@@ -25,9 +25,30 @@ import { commentPermalink, channelURL } from "../lib/url"
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
 
+import type { Dispatch } from "redux"
+import type {
+  Channel,
+  PostReportRecord,
+  CommentReportRecord
+} from "../flow/discussionTypes"
+
 const addDummyReplies = R.over(R.lensPath(["replies"]), () => [])
 
-class ChannelModerationPage extends React.Component<*, *> {
+type Props = {
+  dispatch: Dispatch<*>,
+  channelName: string,
+  channel: Channel,
+  reports: Array<PostReportRecord>,
+  commentReports: Array<CommentReportRecord>,
+  isModerator: boolean,
+  removePost: Function,
+  ignorePostReports: Function,
+  approveComment: Function,
+  removeComment: Function,
+  ignoreCommentReports: Function
+}
+
+class ChannelModerationPage extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }

@@ -5,13 +5,11 @@ import { validationMessage } from "../../lib/validation"
 import type { FormProps } from "../../flow/formTypes"
 import type { ResetConfirmForm } from "../../flow/authTypes"
 
-type PasswordResetConfirmFormProps = {
+type Props = {
   tokenApiError: ?string
 } & FormProps<ResetConfirmForm>
 
-export default class PasswordResetConfirmForm extends React.Component<*, void> {
-  props: PasswordResetConfirmFormProps
-
+export default class PasswordResetConfirmForm extends React.Component<Props> {
   render() {
     const {
       form,

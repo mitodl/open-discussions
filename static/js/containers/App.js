@@ -50,18 +50,18 @@ import type { Profile } from "../flow/discussionTypes"
 
 export const USER_MENU_DROPDOWN = "USER_MENU_DROPDOWN"
 
-class App extends React.Component<*, void> {
-  props: {
-    match: Match,
-    location: Location,
-    showDrawerDesktop: boolean,
-    showDrawerMobile: boolean,
-    snackbar: SnackbarState,
-    dispatch: Dispatch<*>,
-    showUserMenu: boolean,
-    profile: Profile
-  }
+type AppProps = {
+  match: Match,
+  location: Location,
+  showDrawerDesktop: boolean,
+  showDrawerMobile: boolean,
+  snackbar: SnackbarState,
+  dispatch: Dispatch<*>,
+  showUserMenu: boolean,
+  profile: Profile
+}
 
+class App extends React.Component<AppProps> {
   toggleShowDrawer = () => {
     const { dispatch, showDrawerMobile, showDrawerDesktop } = this.props
     dispatch(

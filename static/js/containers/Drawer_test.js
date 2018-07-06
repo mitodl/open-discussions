@@ -1,3 +1,4 @@
+// @flow
 import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
@@ -10,6 +11,7 @@ import { setShowDrawerMobile } from "../actions/ui"
 import { DRAWER_BREAKPOINT } from "../lib/util"
 import * as selectors from "../lib/redux_selectors"
 import * as utilFuncs from "../lib/util"
+import { makeChannelList } from "../factories/channels"
 
 describe("Drawer tests", () => {
   let sandbox
@@ -29,15 +31,18 @@ describe("Drawer tests", () => {
       dispatchStub = sandbox.stub()
       isMobileWidthStub = sandbox.stub(utilFuncs, "isMobileWidth").returns(true)
       getViewportWidthStub = sandbox.stub(utilFuncs, "getViewportWidth")
-      channels = ["channels"]
+      channels = makeChannelList()
     })
 
     const renderDrawer = (props = {}) =>
       shallow(
         <ResponsiveDrawer
           subscribedChannels={channels}
-          location={{ pathname: "a path" }}
+          location={{ pathname: "a path", search: "", hash: "" }}
           dispatch={dispatchStub}
+          channels={channels}
+          showDrawerDesktop={false}
+          showDrawerMobile={false}
           {...props}
         />
       )

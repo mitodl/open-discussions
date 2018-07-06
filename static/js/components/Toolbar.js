@@ -4,18 +4,19 @@ import React from "react"
 import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
 
 import UserMenu from "./UserMenu"
+
 import type { Profile } from "../flow/discussionTypes"
 
-export default class Toolbar extends React.Component<*, void> {
+type Props = {
+  profile: Profile,
+  showUserMenu: boolean,
+  toggleShowDrawer: Function,
+  toggleShowUserMenu: Function
+}
+
+export default class Toolbar extends React.Component<Props> {
   toolbarRoot: HTMLElement | null
   toolbar: Object
-
-  props: {
-    toggleShowDrawer: () => void,
-    toggleShowUserMenu: Function,
-    showUserMenu: boolean,
-    profile: Profile
-  }
 
   componentDidMount() {
     this.toolbar = new MDCToolbar(this.toolbarRoot)

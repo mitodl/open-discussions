@@ -20,7 +20,7 @@ import { postPermalink } from "../lib/url"
 import type { Post, Channel } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 
-type ExpandedProps = {
+type Props = {
   post: Post,
   toggleUpvote: Post => void,
   approvePost: Post => void,
@@ -42,10 +42,7 @@ type ExpandedProps = {
   channel: Channel
 }
 
-export default class ExpandedPostDisplay extends React.Component<
-  ExpandedProps,
-  void
-> {
+export default class ExpandedPostDisplay extends React.Component<Props> {
   renderTextContent = () => {
     const { forms, post } = this.props
 

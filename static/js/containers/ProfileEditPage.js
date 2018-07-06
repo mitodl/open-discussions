@@ -23,7 +23,7 @@ import type { FormValue } from "../flow/formTypes"
 import type { ProfilePayload } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
 
-type ProfileEditPageProps = {
+type Props = {
   dispatch: Dispatch<*>,
   history: Object,
   profileForm: FormValue<ProfilePayload>,
@@ -41,9 +41,7 @@ const getForm = R.prop(PROFILE_KEY)
 export const editProfileForm = (profile: Profile): ProfilePayload =>
   R.pickAll(["name", "bio", "headline"], profile)
 
-class ProfileEditPage extends React.Component<*, void> {
-  props: ProfileEditPageProps
-
+class ProfileEditPage extends React.Component<Props> {
   beginFormEdit() {
     const { dispatch, profile } = this.props
     dispatch(

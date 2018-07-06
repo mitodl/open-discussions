@@ -8,7 +8,7 @@ type DropdownMenuProps = {
   children: any
 }
 
-export class _DropdownMenu extends React.Component<DropdownMenuProps, *> {
+export class _DropdownMenu extends React.Component<DropdownMenuProps> {
   handleClickOutside = () => {
     const { closeMenu } = this.props
 

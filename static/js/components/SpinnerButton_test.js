@@ -27,6 +27,7 @@ describe("SpinnerButton", () => {
           className:      "class1 class2"
         }
         const wrapper = shallow(
+          // $FlowFixMe
           <SpinnerButton {...props}>childText</SpinnerButton>
         )
         const button = wrapper.find("button")

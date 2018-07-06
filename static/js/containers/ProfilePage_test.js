@@ -1,3 +1,4 @@
+// @flow
 /* global SETTINGS: false */
 import { assert } from "chai"
 

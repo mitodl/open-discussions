@@ -7,6 +7,8 @@ import { shallow } from "enzyme"
 
 import Toolbar from "./Toolbar"
 
+import { makeProfile } from "../factories/profiles"
+
 describe("Toolbar", () => {
   let toggleShowDrawerStub, sandbox
 
@@ -16,6 +18,7 @@ describe("Toolbar", () => {
         toggleShowDrawer={toggleShowDrawerStub}
         toggleShowUserMenu={sandbox.stub()}
         showUserMenu={false}
+        profile={makeProfile()}
       />,
       { disableLifecycleMethods: true }
     )

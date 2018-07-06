@@ -14,7 +14,7 @@ import { validationMessage } from "../lib/validation"
 
 import type { Channel, PostForm, PostValidation } from "../flow/discussionTypes"
 
-type CreatePostFormProps = {
+type Props = {
   onSubmit: Function,
   onUpdate: Function,
   updatePostType: (postType: ?string) => void,
@@ -38,10 +38,7 @@ const channelOptions = (channels: Map<string, Channel>) =>
       </option>
     ))
 
-export default class CreatePostForm extends React.Component<
-  CreatePostFormProps,
-  void
-> {
+export default class CreatePostForm extends React.Component<Props> {
   postTypeButtons = () => {
     const { channel, updatePostType, validation } = this.props
 

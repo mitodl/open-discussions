@@ -1,3 +1,4 @@
+// @flow
 import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
@@ -10,7 +11,9 @@ import { makeChannelPostList } from "../factories/posts"
 
 describe("PostList", () => {
   const renderPostList = (props = { posts: makeChannelPostList() }) =>
-    shallow(<PostList toggleUpvote={() => {}} {...props} />)
+    shallow(
+      <PostList reportPost={() => {}} toggleUpvote={() => {}} {...props} />
+    )
 
   it("should render a list of posts", () => {
     const wrapper = renderPostList()

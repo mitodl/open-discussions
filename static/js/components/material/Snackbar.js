@@ -6,15 +6,13 @@ import { MDCSnackbar } from "@material/snackbar/dist/mdc.snackbar"
 
 import type { SnackbarState } from "../../reducers/ui"
 
-type SnackbarProps = {
+type Props = {
   snackbar: ?SnackbarState
 }
 
-export default class Snackbar extends React.Component<*, *> {
+export default class Snackbar extends React.Component<Props> {
   snackbar = null
   snackbarRoot = null
-
-  props: SnackbarProps
 
   componentDidMount() {
     this.snackbar = new MDCSnackbar(this.snackbarRoot)
@@ -23,7 +21,7 @@ export default class Snackbar extends React.Component<*, *> {
   // see here: https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops
   // this method will be deprecated soon, so we need to refactor away from it somehow
   // eslint-disable-next-line camelcase
-  UNSAFE_componentWillReceiveProps(nextProps: SnackbarProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (!R.equals(this.props.snackbar, nextProps.snackbar)) {
       this.showSnackbar(nextProps.snackbar)
     }

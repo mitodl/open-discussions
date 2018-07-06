@@ -1,3 +1,4 @@
+// @flow
 import { assert } from "chai"
 import sinon from "sinon"
 
@@ -378,15 +379,15 @@ describe("CreatePostPage", () => {
     ].forEach(([fromLinkType, toLinkType, formValue, shouldDispatch]) => {
       it(`${
         shouldDispatch ? "dispatches" : "doesn't dispatch"
-      } FORM_UPDATE if the postType is ${formValue} when it goes from ${String(
-        fromLinkType
-      )} to ${toLinkType}`, () => {
+      } FORM_UPDATE if the postType is ${String(
+        formValue
+      )} when it goes from ${String(fromLinkType)} to ${toLinkType}`, () => {
         const dispatch = helper.sandbox.stub()
         currentChannel.link_type = fromLinkType
         const nextChannel = channels[1]
         nextChannel.link_type = toLinkType
         const page = new InnerCreatePostPage()
-        page.props = {
+        const props: any = {
           dispatch: dispatch,
           channel:  nextChannel,
           postForm: {
@@ -395,10 +396,12 @@ describe("CreatePostPage", () => {
             }
           }
         }
+        page.props = props
         const prevProps = {
           channel: currentChannel
         }
 
+        // $FlowFixMe
         page.componentDidUpdate(prevProps)
         if (shouldDispatch) {
           assert.equal(dispatch.callCount, 1)

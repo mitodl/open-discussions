@@ -19,7 +19,14 @@ import { validatePasswordChangeForm as validateForm } from "../lib/validation"
 
 import type { PwChangeForm } from "../flow/authTypes"
 
-export class PasswordChangePage extends React.Component<*, void> {
+type Props = {
+  clearPasswordChange: Function,
+  successfullySubmitted: boolean,
+  renderForm: Function,
+  invalidPwError: string
+}
+
+export class PasswordChangePage extends React.Component<Props> {
   componentWillUnmount() {
     const { clearPasswordChange, successfullySubmitted } = this.props
     // If the form has been successfully submitted and we are navigating away

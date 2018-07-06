@@ -28,7 +28,7 @@ type DrawerProps = DrawerPropsFromState & {
   dispatch: Dispatch<*>
 }
 
-export class ResponsiveDrawer extends React.Component<DrawerProps, *> {
+export class ResponsiveDrawer extends React.Component<DrawerProps> {
   width: number
 
   constructor(props: DrawerProps) {

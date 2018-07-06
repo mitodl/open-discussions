@@ -106,8 +106,8 @@ type PostPageProps = {
   errored: boolean,
   approvePost: (p: Post) => void,
   removePost: (p: Post) => void,
-  approveComment: (c: Comment) => void,
-  removeComment: (c: Comment) => void,
+  approveComment: (c: CommentInTree) => void,
+  removeComment: (c: CommentInTree) => void,
   location: Location,
   reportPost: (p: Post) => void,
   embedly: Object,
@@ -133,7 +133,7 @@ const shouldLoadData = R.complement(
   ])
 )
 
-class PostPage extends React.Component<PostPageProps, void> {
+class PostPage extends React.Component<PostPageProps> {
   componentDidMount() {
     this.loadData()
 

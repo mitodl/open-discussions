@@ -31,6 +31,7 @@ describe("PasswordResetForm component", () => {
         form={form}
         validation={{}}
         processing={false}
+        emailApiError={undefined}
         {...props}
       />
     )

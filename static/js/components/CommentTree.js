@@ -34,35 +34,35 @@ type LoadMoreCommentsFunc = (comment: MoreCommentsInTree) => Promise<*>
 type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
 type ReportCommentFunc = (comment: CommentInTree) => void
 
-type CommentTreeProps = {
+type Props = {
   comments: Array<GenericComment>,
-  forms: FormsState,
-  upvote: CommentVoteFunc,
-  downvote: CommentVoteFunc,
+  forms?: FormsState,
+  upvote?: CommentVoteFunc,
+  downvote?: CommentVoteFunc,
   remove: CommentRemoveFunc,
   approve: CommentRemoveFunc,
-  loadMoreComments: LoadMoreCommentsFunc,
-  beginEditing: BeginEditingFunc,
+  loadMoreComments?: LoadMoreCommentsFunc,
+  beginEditing?: BeginEditingFunc,
   isModerator: boolean,
-  processing: boolean,
-  deleteComment: CommentRemoveFunc,
-  reportComment: ReportCommentFunc,
+  processing?: boolean,
+  deleteComment?: CommentRemoveFunc,
+  reportComment?: ReportCommentFunc,
   commentPermalink: (commentID: string) => string,
-  moderationUI: boolean,
-  ignoreCommentReports: (c: CommentInTree) => void,
-  toggleFollowComment: Function
+  moderationUI?: boolean,
+  ignoreCommentReports?: (c: CommentInTree) => void,
+  toggleFollowComment?: Function
 }
 
-export default class CommentTree extends React.Component<*, *> {
-  props: CommentTreeProps
-
+export default class CommentTree extends React.Component<Props> {
   renderFollowButton = (comment: CommentInTree) => {
     const { toggleFollowComment } = this.props
     return comment.subscribed ? (
       <div
         className="comment-action-button subscribe-comment subscribed"
         onClick={preventDefaultAndInvoke(() => {
-          toggleFollowComment(comment)
+          if (toggleFollowComment) {
+            toggleFollowComment(comment)
+          }
         })}
       >
         <a href="#">unfollow</a>
@@ -71,7 +71,9 @@ export default class CommentTree extends React.Component<*, *> {
       <div
         className="comment-action-button subscribe-comment unsubscribed"
         onClick={preventDefaultAndInvoke(() => {
-          toggleFollowComment(comment)
+          if (toggleFollowComment) {
+            toggleFollowComment(comment)
+          }
         })}
       >
         <a href="#">follow</a>
@@ -143,11 +145,13 @@ export default class CommentTree extends React.Component<*, *> {
             )}
           </div>
           <div className="row comment-actions">
-            <CommentVoteForm
-              comment={comment}
-              upvote={upvote}
-              downvote={downvote}
-            />
+            {upvote && downvote ? (
+              <CommentVoteForm
+                comment={comment}
+                upvote={upvote}
+                downvote={downvote}
+              />
+            ) : null}
             {atMaxDepth ||
             moderationUI ||
             comment.deleted ||
@@ -155,7 +159,9 @@ export default class CommentTree extends React.Component<*, *> {
                 <div
                   className="comment-action-button reply-button"
                   onClick={e => {
-                    beginEditing(formKey, initialValue, e)
+                    if (beginEditing) {
+                      beginEditing(formKey, initialValue, e)
+                    }
                   }}
                 >
                   <a href="#">reply</a>
@@ -171,13 +177,15 @@ export default class CommentTree extends React.Component<*, *> {
               <div
                 className="comment-action-button edit-button"
                 onClick={e => {
-                  beginEditing(editFormKey, comment, e)
+                  if (beginEditing) {
+                    beginEditing(editFormKey, comment, e)
+                  }
                 }}
               >
                 <a href="#">edit</a>
               </div>
             ) : null}
-            {SETTINGS.username === comment.author_id ? (
+            {SETTINGS.username === comment.author_id && deleteComment ? (
               <div
                 className="comment-action-button delete-button"
                 onClick={preventDefaultAndInvoke(() => deleteComment(comment))}
@@ -204,7 +212,7 @@ export default class CommentTree extends React.Component<*, *> {
               approve={approve}
               isModerator={isModerator}
             />
-            {moderationUI || userIsAnonymous() ? null : (
+            {moderationUI || userIsAnonymous() || !reportComment ? null : (
               <div
                 className="comment-action-button report-button"
                 onClick={preventDefaultAndInvoke(() => reportComment(comment))}
@@ -234,7 +242,7 @@ export default class CommentTree extends React.Component<*, *> {
 
   renderMoreComments = (comment: MoreCommentsInTree) => {
     const { loadMoreComments } = this.props
-    return (
+    return loadMoreComments ? (
       <div
         className="more-comments"
         key={`more-comments-${comment.parent_id || "null"}`} // will be null if parent_id is null, indicating root level
@@ -246,7 +254,7 @@ export default class CommentTree extends React.Component<*, *> {
           Load More Comments
         </SpinnerButton>
       </div>
-    )
+    ) : null
   }
 
   renderGenericComment = (depth: number, comment: GenericComment) => {

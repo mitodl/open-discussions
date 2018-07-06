@@ -3,18 +3,20 @@ import React from "react"
 
 import type { ChildrenArray } from "react"
 
-type SpinnerButtonProps = {
-  component: React.Component<*, *>,
+type Props = {
   className?: string,
   onClickPromise: () => Promise<*>,
   children?: ChildrenArray<*>
 }
 
-export default class SpinnerButton extends React.Component<*, *> {
-  props: SpinnerButtonProps
+type State = {
+  processing: boolean
+}
+
+export default class SpinnerButton extends React.Component<Props, State> {
   _mounted: boolean
 
-  constructor(props: SpinnerButtonProps) {
+  constructor(props: Props) {
     super(props)
     this.state = {
       processing: false

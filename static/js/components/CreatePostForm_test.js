@@ -1,3 +1,4 @@
+// @flow
 import React from "react"
 import { shallow } from "enzyme"
 import { assert } from "chai"
@@ -19,8 +20,17 @@ describe("CreatePostForm", () => {
     shallow(
       <CreatePostForm
         validation={{}}
-        channels={[]}
+        channels={new Map()}
+        channel={makeChannel()}
         postForm={newPostForm()}
+        embedlyInFlight={false}
+        embedly={{}}
+        history={{}}
+        onSubmit={sandbox.stub()}
+        onUpdate={sandbox.stub()}
+        updatePostType={sandbox.stub()}
+        processing={false}
+        updateChannelSelection={sandbox.stub()}
         {...props}
       />
     )
@@ -83,7 +93,12 @@ describe("CreatePostForm", () => {
   })
 
   describe("embedly preview link", () => {
-    const postForm = { url: "some url", postType: LINK_TYPE_LINK }
+    const postForm = {
+      url:      "some url",
+      postType: LINK_TYPE_LINK,
+      title:    "",
+      text:     ""
+    }
 
     it("should show embedly when a non-error response has arrived", () => {
       const article = makeArticle()
@@ -98,6 +113,7 @@ describe("CreatePostForm", () => {
           if (shouldRenderComponent) {
             assert.ok(wrapper.find(Embedly).exists())
           } else {
+            // $FlowFixMe
             assert.ok(wrapper.find("input", { name: "url" }).exists())
           }
         }
@@ -141,7 +157,8 @@ describe("CreatePostForm", () => {
         const form = {
           postType: null,
           title:    "",
-          text:     ""
+          text:     "",
+          url:      ""
         }
         const channel = makeChannel()
         const wrapper = renderPostForm({

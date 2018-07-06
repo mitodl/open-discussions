@@ -38,16 +38,16 @@ const makeChannelTypeOption = (
   </label>
 )
 
-export default class EditChannelBasicForm extends React.Component<*, void> {
-  props: {
-    onSubmit: Function,
-    onUpdate: Function,
-    form: ChannelForm,
-    history: Object,
-    validation: ChannelBasicEditValidation,
-    processing: boolean
-  }
+type Props = {
+  onSubmit: Function,
+  onUpdate: Function,
+  form: ChannelForm,
+  history: Object,
+  validation: ChannelBasicEditValidation,
+  processing: boolean
+}
 
+export default class EditChannelBasicForm extends React.Component<Props> {
   render() {
     const {
       onSubmit,

@@ -21,7 +21,11 @@ export const EmbedlyLoader = (props: Object = {}) => (
   </div>
 )
 
-export default class Embedly extends React.Component<*> {
+type Props = {
+  embedly: Object
+}
+
+export default class Embedly extends React.Component<Props> {
   renderEmbed() {
     const { embedly } = this.props
 

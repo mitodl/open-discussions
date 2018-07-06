@@ -34,6 +34,7 @@ describe("PasswordResetConfirmForm component", () => {
         form={form}
         validation={{}}
         processing={false}
+        tokenApiError={undefined}
         {...props}
       />
     )

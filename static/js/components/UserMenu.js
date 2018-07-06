@@ -11,13 +11,13 @@ import { profileURL, SETTINGS_URL } from "../lib/url"
 
 import type { Profile } from "../flow/discussionTypes"
 
-export default class UserMenu extends React.Component<*, *> {
-  props: {
-    profile: Profile,
-    toggleShowUserMenu: Function,
-    showUserMenu: boolean
-  }
+type Props = {
+  profile: Profile,
+  toggleShowUserMenu: Function,
+  showUserMenu: boolean
+}
 
+export default class UserMenu extends React.Component<Props> {
   render() {
     const { toggleShowUserMenu, showUserMenu, profile } = this.props
 

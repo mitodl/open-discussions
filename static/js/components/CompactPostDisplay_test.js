@@ -22,8 +22,14 @@ describe("CompactPostDisplay", () => {
 
   const renderPostDisplay = props => {
     props = {
-      toggleUpvote: () => {},
-      menuOpen:     false,
+      toggleUpvote:    () => {},
+      menuOpen:        false,
+      isModerator:     false,
+      reportPost:      helper.sandbox.stub(),
+      showChannelLink: false,
+      showPinUI:       false,
+      showPostMenu:    helper.sandbox.stub(),
+      togglePinPost:   helper.sandbox.stub(),
       ...props
     }
     return mount(

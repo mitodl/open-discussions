@@ -3,14 +3,24 @@ import R from "ramda"
 
 import type { Channel, ChannelForm } from "../flow/discussionTypes"
 
-export const CHANNEL_TYPE_PUBLIC = "public"
-export const CHANNEL_TYPE_RESTRICTED = "restricted"
-export const CHANNEL_TYPE_PRIVATE = "private"
+export const CHANNEL_TYPE_PUBLIC: "public" = "public"
+export const CHANNEL_TYPE_RESTRICTED: "restricted" = "restricted"
+export const CHANNEL_TYPE_PRIVATE: "private" = "private"
 
-export const LINK_TYPE_TEXT = "self"
-export const LINK_TYPE_LINK = "link"
-export const LINK_TYPE_ANY = "any"
+export type ChannelType =
+  | typeof CHANNEL_TYPE_PUBLIC
+  | typeof CHANNEL_TYPE_RESTRICTED
+  | typeof CHANNEL_TYPE_PRIVATE
+
+export const LINK_TYPE_TEXT: "self" = "self"
+export const LINK_TYPE_LINK: "link" = "link"
+export const LINK_TYPE_ANY: "any" = "any"
 export const VALID_LINK_TYPES = [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ANY]
+
+export type LinkType =
+  | typeof LINK_TYPE_TEXT
+  | typeof LINK_TYPE_LINK
+  | typeof LINK_TYPE_ANY
 
 export const newChannelForm = (): ChannelForm => ({
   name:               "",
@@ -39,11 +49,13 @@ export const userCanPost = (channel: Channel) =>
   channel.user_is_moderator ||
   channel.user_is_contributor
 
+type MaybeLinkType = LinkType | ""
+
 export const updateLinkType = (
-  oldLinkType: string,
-  value: string,
+  oldLinkType: MaybeLinkType,
+  value: LinkType,
   checked: boolean
-) => {
+): MaybeLinkType => {
   if (checked) {
     // ignoring case if oldLinkType is already ANY, assuming LINK or TEXT.
     // UI should prevent that from happening.

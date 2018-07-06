@@ -7,7 +7,7 @@ import Card from "../components/Card"
 
 import { formatTitle } from "../lib/title"
 
-export default class ContentPolicyPage extends React.Component<*, void> {
+export default class ContentPolicyPage extends React.Component<{}> {
   render() {
     return (
       <div className="content content-policy-page">

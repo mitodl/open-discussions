@@ -5,13 +5,11 @@ import { validationMessage } from "../../lib/validation"
 import type { FormProps } from "../../flow/formTypes"
 import type { EmailForm } from "../../flow/authTypes"
 
-type PasswordResetFormProps = {
+type Props = {
   emailApiError: ?string
 } & FormProps<EmailForm>
 
-export default class PasswordResetForm extends React.Component<*, void> {
-  props: PasswordResetFormProps
-
+export default class PasswordResetForm extends React.Component<Props> {
   render() {
     const {
       form,

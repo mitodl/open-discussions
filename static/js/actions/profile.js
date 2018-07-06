@@ -1,4 +1,0 @@
-// @flow
-// actions for user profile
-export const REQUEST_GET_PROFILES = "REQUEST_GET_PROFILES"
-export const RECEIVE_GET_PROFILES_SUCCESS = "RECEIVE_GET_PROFILES_SUCCESS"

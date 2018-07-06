@@ -8,13 +8,11 @@ import { ACCOUNT_SETTINGS_URL } from "../lib/url"
 import type { FormProps } from "../flow/formTypes"
 import type { PwChangeForm } from "../flow/authTypes"
 
-type PasswordChangeFormProps = {
+type Props = {
   invalidPwError: ?string
 } & FormProps<PwChangeForm>
 
-export default class PasswordChangeForm extends React.Component<*, void> {
-  props: PasswordChangeFormProps
-
+export default class PasswordChangeForm extends React.Component<Props> {
   render() {
     const {
       form,

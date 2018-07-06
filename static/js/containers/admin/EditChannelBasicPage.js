@@ -25,16 +25,16 @@ const getForm = R.prop(EDIT_CHANNEL_KEY)
 
 const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
 
-class EditChannelBasicPage extends React.Component<*, void> {
-  props: {
-    dispatch: Dispatch<*>,
-    history: Object,
-    channel: Channel,
-    channelForm: FormValue<ChannelForm>,
-    channelName: string,
-    processing: boolean
-  }
+type Props = {
+  dispatch: Dispatch<*>,
+  history: Object,
+  channel: Channel,
+  channelForm: FormValue<ChannelForm>,
+  channelName: string,
+  processing: boolean
+}
 
+class EditChannelBasicPage extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }

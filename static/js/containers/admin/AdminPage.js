@@ -8,11 +8,11 @@ import EditChannelBasicPage from "./EditChannelBasicPage"
 
 import type { Match } from "react-router"
 
-export default class AdminPage extends React.Component<*, void> {
-  props: {
-    match: Match
-  }
+type Props = {
+  match: Match
+}
 
+export default class AdminPage extends React.Component<Props> {
   render() {
     const { match } = this.props
     return (

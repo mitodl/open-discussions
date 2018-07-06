@@ -1,6 +1,10 @@
 // @flow
-export type ChannelType = "private" | "restricted" | "public";
-export type LinkType = "link" | "self" | "any";
+import {
+  LINK_TYPE_TEXT,
+  LINK_TYPE_LINK,
+} from "../lib/channels"
+
+import type { LinkType, ChannelType } from "../lib/channels"
 
 export type Channel = {
   name:                string,
@@ -11,7 +15,7 @@ export type Channel = {
   num_users:           number,
   user_is_contributor: boolean,
   user_is_moderator:   boolean,
-  link_type:          LinkType,
+  link_type:           LinkType
 }
 
 export type ChannelForm = {
@@ -20,17 +24,17 @@ export type ChannelForm = {
   description:        string,
   public_description: string,
   channel_type:       ChannelType,
-  link_type:          LinkType,
+  link_type:          LinkType
 }
 
 export type ChannelAppearanceEditValidation = {
   title:              string,
   description:        string,
-  public_description: string,
+  public_description: string
 }
 
 export type ChannelBasicEditValidation = {
-  link_type: string,
+  link_type: string
 }
 
 export type AuthoredContent = {
@@ -44,7 +48,7 @@ export type AuthoredContent = {
   edited:          boolean,
   num_reports:     ?number,
   ignore_reports?: boolean,
-  subscribed:      boolean,
+  subscribed:      boolean
 }
 
 export type Post = AuthoredContent & {
@@ -56,14 +60,19 @@ export type Post = AuthoredContent & {
   channel_name:  string,
   channel_title: string,
   stickied:      boolean,
-  removed:       boolean,
+  removed:       boolean
 }
 
+type PostFormType =
+  | typeof LINK_TYPE_LINK
+  | typeof LINK_TYPE_TEXT
+  | null
+
 export type PostForm = {
-  postType: "link" | "self" | null,
-  text:   string,
-  url:    string,
-  title:  string,
+  postType: PostFormType,
+  text:     string,
+  url:      string,
+  title:    string
 }
 
 export type PostValidation = {
@@ -77,61 +86,62 @@ export type PostValidation = {
 export type CreatePostPayload = {
   url?:  string,
   text?: string,
-  title: string,
-};
+  title: string
+}
 
 export type PostListPagination = {
-  after: ?string,
-  after_count: ?number,
-  before: ?string,
-  before_count: ?number,
+  after:        ?string,
+  after_count:  ?number,
+  before:       ?string,
+  before_count: ?number
 }
 
 export type PostListPaginationParams = {
   before: ?string,
-  after: ?string,
-  count: ?number,
+  after:  ?string,
+  count:  ?number
 }
 
 export type PostListData = {
   pagination: PostListPagination,
-  postIds: Array<string>
+  postIds:    Array<string>
 }
 
 export type PostListResponse = {
   pagination: PostListPagination,
-  posts: Array<Post>,
+  posts:      Array<Post>
 }
 
 type HasParentId = {
-  parent_id:    ?string,
+  parent_id: ?string
 }
 
 export type MoreCommentsFromAPI = HasParentId & {
   post_id:      string,
   children:     Array<string>,
-  comment_type: "more_comments",
+  comment_type: "more_comments"
 }
 
-export type CommentFromAPI = AuthoredContent & HasParentId & {
-  post_id:       string,
-  text:          string,
-  downvoted:     boolean,
-  removed:       boolean,
-  deleted:       boolean,
-  comment_type:  "comment",
-}
+export type CommentFromAPI = AuthoredContent &
+  HasParentId & {
+    post_id:      string,
+    text:         string,
+    downvoted:    boolean,
+    removed:      boolean,
+    deleted:      boolean,
+    comment_type: "comment"
+  }
 
 export type CommentInTree = CommentFromAPI & {
-  replies: Array<GenericComment>,
+  replies: Array<GenericComment>
 }
 
 export type MoreCommentsInTree = MoreCommentsFromAPI
 
 export type CommentForm = {
-  post_id:      string,
-  comment_id?:  string,
-  text:         string,
+  post_id:     string,
+  comment_id?: string,
+  text:        string
 }
 
 // If you're looking for a 'Comment' type this is probably what you want.
@@ -140,40 +150,40 @@ export type GenericComment = CommentInTree | MoreCommentsInTree
 
 // This is not a data structure from the API, this is for the payload of the action updating the tree in the reducer
 export type ReplaceMoreCommentsPayload = {
-  comments: Array<CommentFromAPI|MoreCommentsFromAPI>,
+  comments: Array<CommentFromAPI | MoreCommentsFromAPI>,
   parentId: string,
-  postId: string,
+  postId:   string
 }
 
 // The optional fields here are shown only to other moderators
 export type Moderator = {
   moderator_name: string,
-  email?: string,
-  full_name?: string,
+  email?:         string,
+  full_name?:     string
 }
 
 export type ChannelModerators = Array<Moderator>
 
 export type Contributor = {
   contributor_name: string,
-  email: string,
-  full_name: string,
+  email:            string,
+  full_name:        string
 }
 
 export type ChannelContributors = Array<Contributor>
 
 export type Report = {
-  reason: string,
+  reason: string
 }
 
 export type CommentReport = Report & {
-  reportType:  "comment",
-  commentId:    string,
+  reportType: "comment",
+  commentId:  string
 }
 
 export type PostReport = Report & {
-  reportType:  "post",
-  postId:       string,
+  reportType: "post",
+  postId:     string
 }
 
 export type GenericReport = PostReport | CommentReport
@@ -183,40 +193,40 @@ export type ReportValidation = {
 }
 
 export type PostReportRecord = {
-  post: Post,
+  post:    Post,
   comment: null,
   reasons: Array<string>
 }
 
 export type CommentReportRecord = {
   comment: CommentFromAPI,
-  post: null,
+  post:    null,
   reasons: Array<string>
 }
 
 export type ReportRecord = PostReportRecord | CommentReportRecord
 
 export type Profile = {
-  name:                        string,
-  image:                       ?string,
-  image_small:                 ?string,
-  image_medium:                ?string,
-  image_file:                  ?string,
-  image_small_file:            ?string,
-  image_medium_file:           ?string,
-  bio:                         ?string,
-  headline:                    ?string,
-  username:                    string
+  name:              string,
+  image:             ?string,
+  image_small:       ?string,
+  image_medium:      ?string,
+  image_file:        ?string,
+  image_small_file:  ?string,
+  image_medium_file: ?string,
+  bio:               ?string,
+  headline:          ?string,
+  username:          string
 }
 
 export type ProfileValidation = {
-  name:                         string
+  name: string
 }
 
 export type ProfilePayload = {
-  name:                         string,
-  bio:                         ?string,
-  headline:                    ?string,
+  name:     string,
+  bio:      ?string,
+  headline: ?string
 }
 
 export type SocialAuth = {

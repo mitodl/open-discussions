@@ -15,13 +15,6 @@ import { formatTitle } from "../../lib/title"
 import { REGISTER_URL } from "../../lib/url"
 import { STATE_INVALID_EMAIL, FLOW_REGISTER } from "../../reducers/auth"
 
-type RegisterConfirmPageProps = {
-  confirmCode: Function,
-  location: Object,
-  history: Object,
-  invalid: boolean
-}
-
 const onResult = R.curry(processAuthResponse)
 
 const confirmationCodeFromLocation = R.compose(
@@ -32,9 +25,14 @@ const confirmationCodeFromLocation = R.compose(
 
 const isInvalid = R.pathEq(["data", "state"], STATE_INVALID_EMAIL)
 
-export class RegisterConfirmPage extends React.Component<*, *> {
-  props: RegisterConfirmPageProps
+type Props = {
+  confirmCode: Function,
+  location: Object,
+  history: Object,
+  invalid: boolean
+}
 
+export class RegisterConfirmPage extends React.Component<Props, *> {
   componentDidMount() {
     const { confirmCode, location, history } = this.props
     const code = confirmationCodeFromLocation(location)

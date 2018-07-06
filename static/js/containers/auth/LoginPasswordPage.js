@@ -26,7 +26,7 @@ import {
 import type { PasswordForm, AuthFlow } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
 
-type LoginPasswordPageProps = {
+type Props = {
   history: Object,
   partialToken: string,
   authFlow: AuthFlow,
@@ -34,9 +34,7 @@ type LoginPasswordPageProps = {
   formError: ?string
 } & WithFormProps<PasswordForm>
 
-export class LoginPasswordPage extends React.Component<*, *> {
-  props: LoginPasswordPageProps
-
+export class LoginPasswordPage extends React.Component<Props> {
   componentDidMount() {
     const { history, partialToken } = this.props
     if (!partialToken) {

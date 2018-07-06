@@ -4,13 +4,11 @@ import NavLink from "react-router-dom/NavLink"
 
 import { editChannelBasicURL, editChannelAppearanceURL } from "../../lib/url"
 
-type EditChannelNavbarProps = {
+type Props = {
   channelName: string
 }
 
-export default class EditChannelNavbar extends React.Component<*, void> {
-  props: EditChannelNavbarProps
-
+export default class EditChannelNavbar extends React.Component<Props> {
   render() {
     const { channelName } = this.props
 

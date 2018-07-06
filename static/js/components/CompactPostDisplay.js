@@ -19,23 +19,21 @@ import { userIsAnonymous } from "../lib/util"
 import type { Dispatch } from "redux"
 import type { Post } from "../flow/discussionTypes"
 
-export class CompactPostDisplay extends React.Component<*, void> {
-  props: {
-    post: Post,
-    showChannelLink: boolean,
-    toggleUpvote: Post => void,
-    togglePinPost: Post => void,
-    showPinUI: boolean,
-    isModerator: boolean,
-    removePost?: (p: Post) => void,
-    ignorePostReports?: (p: Post) => void,
-    reportPost: (p: Post) => void,
-    menuOpen: boolean,
-    showPostMenu: Function,
-    hidePostMenu: Function,
-    dispatch: Dispatch<*>
-  }
+type Props = {
+  post: Post,
+  showChannelLink?: boolean,
+  toggleUpvote?: Post => void,
+  togglePinPost?: Post => Promise<*>,
+  showPinUI?: boolean,
+  isModerator: boolean,
+  removePost?: (p: Post) => void,
+  ignorePostReports?: (p: Post) => void,
+  reportPost?: (p: Post) => void,
+  menuOpen: boolean,
+  dispatch: Dispatch<*>
+}
 
+export class CompactPostDisplay extends React.Component<Props> {
   showChannelLink = () => {
     const { post, showChannelLink } = this.props
 
@@ -123,7 +121,7 @@ export class CompactPostDisplay extends React.Component<*, void> {
                     </div>
                   </li>
                 ) : null}
-                {showPinUI && post.text && isModerator ? (
+                {showPinUI && post.text && isModerator && togglePinPost ? (
                   <li>
                     <a onClick={() => togglePinPost(post)}>
                       {post.stickied ? "unpin" : "pin"}
@@ -142,7 +140,7 @@ export class CompactPostDisplay extends React.Component<*, void> {
                     </a>
                   </li>
                 ) : null}
-                {!userIsAnonymous() ? (
+                {!userIsAnonymous() && reportPost ? (
                   <li>
                     <a onClick={() => reportPost(post)}>report</a>
                   </li>

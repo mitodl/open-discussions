@@ -6,7 +6,7 @@ import { mount } from "enzyme"
 import withLoading from "./Loading"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 
-class Content extends React.Component<*, void> {
+class Content extends React.Component<*> {
   render() {
     return <div>CONTENT</div>
   }
