@@ -43,7 +43,7 @@ import {
   RECEIVE_GET_PROFILES_SUCCESS,
   REQUEST_GET_PROFILES
 } from "../actions/profile"
-import {truncate} from "../lib/util";
+import {truncate} from "../lib/util"
 
 describe("PostPage", function() {
   let helper,
