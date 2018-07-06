@@ -11,10 +11,7 @@ from authentication.exceptions import (
     RequireRegistrationException,
 )
 from authentication.utils import SocialAuthState
-from channels import api as channel_api
-from notifications import api as notifications_api
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
-from profiles.models import Profile
 from profiles.utils import update_full_name
 
 
@@ -78,21 +75,17 @@ def require_password_and_profile_via_email(
         return {}
 
     data = strategy.request_data()
-    profile = None
+    profile = user.profile
 
     if 'name' in data:
-        profile, _ = Profile.objects.update_or_create(
-            user=user,
-            defaults={
-                'name': data['name'],
-            },
-        )
+        profile.name = data['name']
+        profile.save()
 
     if 'password' in data:
         user.set_password(data['password'])
         user.save()
 
-    if not user.password or not hasattr(user, 'profile') or not user.profile.name:
+    if not user.password or not user.profile.name:
         raise RequirePasswordAndProfileException(backend, current_partial)
 
     return {
@@ -125,12 +118,9 @@ def require_profile_update_user_via_saml(
         # No name information passed, skipping
         pass
 
-    profile, _ = Profile.objects.update_or_create(
-        user=user,
-        defaults={
-            'name': user.get_full_name()
-        },
-    )
+    profile = user.profile
+    profile.name = user.get_full_name()
+    profile.save()
 
     return {
         'user': user,
@@ -169,23 +159,5 @@ def validate_password(
 
     if not user or not user.check_password(password):
         raise InvalidPasswordException(backend, current_partial)
-
-    return {}
-
-
-def initialize_user(user, is_new=False, *args, **kwargs):  # pylint: disable=unused-argument
-    """
-    Performs first-time initialization of the user
-
-    Args:
-        user (User): the current user
-        is_new (bool): True if the user just got created
-    """
-    if not is_new:
-        return {}
-
-    notifications_api.ensure_notification_settings(user)
-
-    channel_api.get_or_create_auth_tokens(user)
 
     return {}

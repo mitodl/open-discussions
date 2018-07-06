@@ -2,6 +2,8 @@
 from rest_framework.request import Request
 from social_django.strategy import DjangoStrategy
 
+from authentication import api as auth_api
+
 
 class DjangoRestFrameworkStrategy(DjangoStrategy):
     """Strategy specific to handling DRF requests"""
@@ -27,3 +29,12 @@ class DjangoRestFrameworkStrategy(DjangoStrategy):
 
         # DRF stores json payload data here, not in request.POST or request.GET like PSA expects
         return self.drf_request.data
+
+    def create_user(self, *args, **kwargs):
+        """Creates the user during the pipeline execution"""
+        # this is normally delegated to the storage mechanism,
+        # specifically social_django.storage.DjangoUserMixin.create_user
+        # but we want to call our own method to create the user so we override at the strategy level
+        username = kwargs.get('username')
+        email = kwargs.get('email')
+        return auth_api.create_user(username, email)

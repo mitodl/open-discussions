@@ -30,6 +30,19 @@ PROFILE_PROPS = (
 )
 
 
+def filter_profile_props(data):
+    """
+    Filters the passed profile data to valid profile fields
+
+    Args:
+        data (dict): profile data
+
+    Return:
+        dict: filtered dict
+    """
+    return {key: value for key, value in data.items() if key in PROFILE_PROPS}
+
+
 class Profile(models.Model):
     """Profile model"""
     user = models.OneToOneField(settings.AUTH_USER_MODEL)

@@ -47,10 +47,13 @@ def test_serialize_create_user(db, mocker):
         'headline': 'headline',
     }
 
-    get_or_create_auth_tokens_stub = mocker.patch('profiles.serializers.get_or_create_auth_tokens')
-    user = UserSerializer().create({
-        'profile': profile
+    get_or_create_auth_tokens_stub = mocker.patch('channels.api.get_or_create_auth_tokens')
+    serializer = UserSerializer(data={
+        'email': 'test@localhost',
+        'profile': profile,
     })
+    serializer.is_valid(raise_exception=True)
+    user = serializer.save()
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
 
     del profile['email_optin']  # is write-only
@@ -105,7 +108,7 @@ def test_update_user_profile(user, key, value):
         'profile': {
             key: value,
         }
-    })
+    }, partial=True)
     serializer.is_valid(raise_exception=True)
     serializer.save()
 
