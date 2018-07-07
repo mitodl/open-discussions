@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from rest_framework import serializers
+import ulid
 
 from authentication import api as auth_api
 from profiles.models import Profile, PROFILE_PROPS
@@ -76,7 +77,6 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
     class Meta:
-        profile_data = validated_data.get('profile', {})
         model = User
         fields = ('id', 'username', 'profile', 'email')
         read_only_fields = ('id', 'username')
