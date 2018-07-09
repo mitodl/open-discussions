@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import sinon from "sinon"
 import { assert } from "chai"
@@ -36,5 +37,20 @@ describe("Toolbar", () => {
         preventDefault: sandbox.stub()
       })
     assert.ok(toggleShowDrawerStub.called)
+  })
+
+  //
+  ;[true, false].forEach(isLoggedIn => {
+    it(`should ${isLoggedIn ? "" : "not"} display UserMenu if user is logged ${
+      isLoggedIn ? "in" : "out"
+    }`, () => {
+      SETTINGS.username = isLoggedIn ? "username" : null
+      assert.equal(
+        renderToolbar()
+          .find("UserMenu")
+          .exists(),
+        isLoggedIn
+      )
+    })
   })
 })

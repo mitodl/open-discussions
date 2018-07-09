@@ -57,13 +57,15 @@ export default class Toolbar extends React.Component<*, void> {
                 </a>{" "}
               </span>
             </section>
-            <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
-              <UserMenu
-                toggleShowUserMenu={toggleShowUserMenu}
-                showUserMenu={showUserMenu}
-                profile={profile}
-              />
-            </section>
+            {SETTINGS.username ? (
+              <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
+                <UserMenu
+                  toggleShowUserMenu={toggleShowUserMenu}
+                  showUserMenu={showUserMenu}
+                  profile={profile}
+                />
+              </section>
+            ) : null}
           </div>
         </header>
       </div>
