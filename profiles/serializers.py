@@ -4,12 +4,13 @@ Serializers for profile REST APIs
 from django.contrib.auth import get_user_model
 from django.db import transaction
 
-import ulid
 from rest_framework import serializers
+import ulid
 
-from channels.api import get_or_create_auth_tokens
-from notifications.api import ensure_notification_settings
+from authentication import api as auth_api
 from profiles.models import Profile, PROFILE_PROPS
+
+User = get_user_model()
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -50,24 +51,20 @@ class UserSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CreateOnlyDefault(ulid.new)
     )
-    email = serializers.CharField(write_only=True, required=False)
+    email = serializers.CharField(write_only=True)
     profile = ProfileSerializer()
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile') or {}
-        with transaction.atomic():
-            user = get_user_model().objects.create(**validated_data)
-            Profile.objects.create(user=user, **profile_data)
-            ensure_notification_settings(user)
+        username = validated_data.get('username')
+        email = validated_data.get('email')
 
-        get_or_create_auth_tokens(user)
-        return user
+        return auth_api.create_user(username, email, profile_data)
 
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', None)
 
         with transaction.atomic():
-
             instance.email = validated_data.pop('email', instance.email)
             instance.save()
 
@@ -80,6 +77,6 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ('id', 'username', 'profile', 'email')
-        read_only_fields = ('id',)
+        read_only_fields = ('id', 'username')

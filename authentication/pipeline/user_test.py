@@ -3,8 +3,6 @@ from django.contrib.sessions.middleware import SessionMiddleware
 import pytest
 from social_django.utils import load_strategy, load_backend
 
-from channels.models import RedditAccessToken, RedditRefreshToken
-from notifications.models import NotificationSettings
 from open_discussions.factories import UserFactory
 from authentication.pipeline import user as user_actions
 from authentication.exceptions import (
@@ -167,7 +165,7 @@ def test_validate_require_password_and_profile_via_email_exit(mocker, backend_na
 def test_validate_require_password_and_profile_via_email(mocker):
     """Tests that require_password_and_profile_via_email processes the request"""
     mocker.patch('profiles.models.requests.get')
-    user = UserFactory(profile=None)
+    user = UserFactory.create(profile__name='')
     mock_strategy = mocker.Mock()
     mock_strategy.request_data.return_value = {
         'name': 'Jane Doe',
@@ -188,7 +186,7 @@ def test_validate_require_password_and_profile_via_email(mocker):
 @pytest.mark.django_db
 def test_validate_require_password_and_profile_via_email_no_data(mocker):
     """Tests that require_password_and_profile_via_email raises an error if no data for name and password provided"""
-    user = UserFactory(profile=None)
+    user = UserFactory.create(profile__name='')
     mock_strategy = mocker.Mock()
     mock_strategy.request_data.return_value = {}
     mock_backend = mocker.Mock()
@@ -226,7 +224,7 @@ def test_validate_require_password_and_profile_via_email_password_set(mocker):
 ])
 def test_validate_require_profile_update_user_via_saml(mocker, backend_name, is_new):
     """Tests that require_profile_update_user_via_saml returns {} if not using the saml backend"""
-    user = UserFactory(first_name='Jane', last_name='Doe', profile=None)
+    user = UserFactory(first_name='Jane', last_name='Doe', profile__name='')
     mocker.patch('profiles.models.requests.get')
     mock_strategy = mocker.Mock()
     mock_backend = mocker.Mock()
@@ -244,21 +242,3 @@ def test_validate_require_profile_update_user_via_saml(mocker, backend_name, is_
     assert response == expected
     if 'user' in response:
         assert response['profile'].name == 'Jane Doe'
-
-
-@pytest.mark.parametrize('is_new', [True, False])
-@pytest.mark.django_db
-@pytest.mark.betamax
-def test_initialize_user(is_new):
-    """Tests that a new users is initialized"""
-    # don't use the user fixture because it creates Reddit*Token objects implicitly
-    user = UserFactory.create()
-    assert NotificationSettings.objects.filter(user=user).count() == 0
-    assert RedditAccessToken.objects.filter(user=user).count() == 0
-    assert RedditRefreshToken.objects.filter(user=user).count() == 0
-
-    assert user_actions.initialize_user(user=user, is_new=is_new) == {}
-
-    assert RedditAccessToken.objects.filter(user=user).count() == (1 if is_new else 0)
-    assert RedditRefreshToken.objects.filter(user=user).count() == (1 if is_new else 0)
-    assert NotificationSettings.objects.filter(user=user).count() == (2 if is_new else 0)
