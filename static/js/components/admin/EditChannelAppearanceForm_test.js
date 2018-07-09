@@ -26,7 +26,7 @@ describe("EditChannelAppearanceForm", () => {
 
   beforeEach(() => {
     form = editChannelForm(makeChannel())
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
   })
 
   afterEach(() => {

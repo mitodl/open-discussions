@@ -36,7 +36,12 @@ export default class Embedly extends React.Component<*> {
     }
 
     return (
-      <a href={embedly.url} target="_blank" className="link">
+      <a
+        href={embedly.url}
+        target="_blank"
+        className="link"
+        rel="noopener noreferrer"
+      >
         {embedly.thumbnail_url ? (
           <div className="thumbnail">
             <img src={embedly.thumbnail_url} />

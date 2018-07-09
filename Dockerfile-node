@@ -1,4 +1,4 @@
-FROM node:9.3
+FROM node:10.5
 LABEL maintainer "ODL DevOps <mitx-devops@mit.edu>"
 
 RUN apt-get update && apt-get install libelf1

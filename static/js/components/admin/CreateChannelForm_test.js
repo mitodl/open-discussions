@@ -24,7 +24,7 @@ describe("CreateChannelForm", () => {
 
   beforeEach(() => {
     form = newChannelForm()
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
   })
 
   afterEach(() => {

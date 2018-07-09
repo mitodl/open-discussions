@@ -20,7 +20,7 @@ describe("SharePopup", () => {
     mount(<SharePopupHelper closePopup={closePopupStub} url={url} {...props} />)
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     closePopupStub = sandbox.stub()
     execCommandStub = sandbox.stub()
     // $FlowFixMe: flow thinks this isn't writable (normally that's true!)

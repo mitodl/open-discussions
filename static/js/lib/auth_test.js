@@ -34,7 +34,7 @@ const DEFAULT_ARGS = {
 describe("auth libs", () => {
   let sandbox, history
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     history = {
       push: sandbox.stub()
     }

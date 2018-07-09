@@ -18,7 +18,7 @@ describe("auth", function() {
   let sandbox, fetchStub
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
   })
 
   afterEach(() => {

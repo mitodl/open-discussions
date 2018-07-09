@@ -43,7 +43,7 @@ describe("Post utils", () => {
     const renderButtons = () => mount(<PostVotingButtons post={makePost()} />)
 
     beforeEach(() => {
-      sandbox = sinon.sandbox.create()
+      sandbox = sinon.createSandbox()
     })
 
     afterEach(() => {

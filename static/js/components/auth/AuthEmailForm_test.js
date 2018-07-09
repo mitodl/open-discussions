@@ -9,7 +9,7 @@ import AuthEmailForm from "./AuthEmailForm"
 describe("AuthEmailForm component", () => {
   let sandbox, onSubmitStub, onUpdateStub, form
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     onSubmitStub = sandbox.stub()
     onUpdateStub = sandbox.stub()
     form = {

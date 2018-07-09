@@ -20,7 +20,7 @@ describe("Toolbar", () => {
     )
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     toggleShowDrawerStub = sandbox.stub()
   })
 

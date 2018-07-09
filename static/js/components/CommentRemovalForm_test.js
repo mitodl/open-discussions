@@ -13,7 +13,7 @@ describe("CommentRemovalForm", () => {
   let sandbox, approveStub, removeStub, comment, resolveApprove, resolveRemove
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     // use promise which will never resolve
     approveStub = sandbox.stub().returns(
       new Promise(resolve => {

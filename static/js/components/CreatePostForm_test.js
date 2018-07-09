@@ -16,7 +16,7 @@ describe("CreatePostForm", () => {
   let sandbox, isTextTabSelectedStub, isLinkTypeAllowedStub
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     isTextTabSelectedStub = sandbox.stub(channels, "isTextTabSelected")
     isTextTabSelectedStub.returns(true)
     isLinkTypeAllowedStub = sandbox.stub(channels, "isLinkTypeAllowed")

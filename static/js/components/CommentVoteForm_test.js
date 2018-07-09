@@ -16,7 +16,7 @@ describe("CommentVoteForm", () => {
   let sandbox, upvoteStub, downvoteStub, comment, resolveUpvote, resolveDownvote
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     // use promise which will never resolve
     upvoteStub = sandbox.stub().returns(
       new Promise(resolve => {

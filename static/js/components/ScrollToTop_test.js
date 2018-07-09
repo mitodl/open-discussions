@@ -12,7 +12,7 @@ describe("ScrollToTop", () => {
   let scrollStub, sandbox, browserHistory
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     scrollStub = sandbox.stub()
     window.scrollTo = scrollStub
     browserHistory = createMemoryHistory()

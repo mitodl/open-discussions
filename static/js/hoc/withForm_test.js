@@ -74,7 +74,7 @@ describe("withForm", () => {
     )
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     formEndEditStub = sandbox.stub()
     formBeginEditStub = sandbox.stub()
     formUpdateStub = sandbox.stub()

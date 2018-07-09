@@ -21,7 +21,9 @@ const _createSettings = () => ({
   is_authenticated:   true,
   username:           "greatusername",
   profile_ui_enabled: false,
-  support_email:      "support@fake.url"
+  support_email:      "support@fake.url",
+  reactGaDebug:       true,
+  gaTrackingID:       "fake"
 })
 
 global.SETTINGS = _createSettings()
