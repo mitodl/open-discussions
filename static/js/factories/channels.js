@@ -17,15 +17,16 @@ const incr = incrementer()
 
 export const makeChannel = (privateChannel: boolean = false): Channel => ({
   // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
-  name:                `channel_${incr.next().value}`,
-  title:               casual.title,
-  channel_type:        privateChannel ? "private" : "public",
-  link_type:           LINK_TYPE_ANY,
-  description:         casual.description,
-  public_description:  casual.description,
-  num_users:           casual.integer(0, 500),
-  user_is_contributor: casual.coin_flip,
-  user_is_moderator:   casual.coin_flip
+  name:                  `channel_${incr.next().value}`,
+  title:                 casual.title,
+  channel_type:          privateChannel ? "private" : "public",
+  link_type:             LINK_TYPE_ANY,
+  description:           casual.description,
+  public_description:    casual.description,
+  num_users:             casual.integer(0, 500),
+  user_is_contributor:   casual.coin_flip,
+  user_is_moderator:     casual.coin_flip,
+  membership_is_managed: casual.coin_flip
 })
 
 export const makeChannelList = (numChannels: number = 20) => {

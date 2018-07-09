@@ -4,9 +4,15 @@ import { assert } from "chai"
 import {
   AUTH_REQUIRED_URL,
   channelURL,
+  editChannelAppearanceURL,
+  editChannelBasicURL,
+  editChannelContributorsURL,
+  editChannelModeratorsURL,
   FRONTPAGE_URL,
   newPostURL,
   postDetailURL,
+  editProfileURL,
+  profileURL,
   getChannelNameFromPathname,
   commentPermalink,
   toQueryString,
@@ -54,6 +60,54 @@ describe("url helper functions", () => {
 
     it("should return a non-specific URL if not passed a channel name", () => {
       assert.equal(newPostURL(undefined), "/create_post/")
+    })
+  })
+
+  describe("editChannelAppearanceURL", () => {
+    it("should return a url to edit channel appearance", () => {
+      assert.equal(
+        editChannelAppearanceURL("channel_name"),
+        "/manage/c/edit/channel_name/appearance/"
+      )
+    })
+  })
+
+  describe("editChannelBasicURL", () => {
+    it("should return a url to edit basic channel settings", () => {
+      assert.equal(
+        editChannelBasicURL("channel_name"),
+        "/manage/c/edit/channel_name/basic/"
+      )
+    })
+  })
+
+  describe("editChannelContributorsURL", () => {
+    it("should return a url to edit channel appearance", () => {
+      assert.equal(
+        editChannelContributorsURL("channel_name"),
+        "/manage/c/edit/channel_name/members/contributors/"
+      )
+    })
+  })
+
+  describe("editChannelModeratorsURL", () => {
+    it("should return a url to edit channel appearance", () => {
+      assert.equal(
+        editChannelModeratorsURL("channel_name"),
+        "/manage/c/edit/channel_name/members/moderators/"
+      )
+    })
+  })
+
+  describe("editProfileURL", () => {
+    it("should return a url to edit a profile", () => {
+      assert.equal(editProfileURL("username"), "/profile/username/edit")
+    })
+  })
+
+  describe("profileURL", () => {
+    it("should return a url to view a profile", () => {
+      assert.equal(profileURL("username"), "/profile/username/")
     })
   })
 

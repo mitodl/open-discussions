@@ -6,6 +6,8 @@ import {
   CHANNEL_TYPE_RESTRICTED,
   CHANNEL_TYPE_PRIVATE,
   newChannelForm,
+  newContributorsForm,
+  newModeratorsForm,
   editChannelForm,
   userCanPost,
   LINK_TYPE_ANY,
@@ -16,7 +18,11 @@ import {
   isLinkTypeChecked,
   isTextTabSelected
 } from "./channels"
-import { makeChannel } from "../factories/channels"
+import {
+  makeChannel,
+  makeContributors,
+  makeModerators
+} from "../factories/channels"
 
 describe("Channel utils", () => {
   it("newChannelForm should return a new channel form with empty values and public type", () => {
@@ -40,6 +46,28 @@ describe("Channel utils", () => {
       public_description: channel.public_description,
       channel_type:       channel.channel_type,
       link_type:          channel.link_type
+    })
+  })
+
+  describe("newModeratorsForm", () => {
+    it("should make a new form for moderators and a channel", () => {
+      const channel = makeChannel()
+      const moderators = makeModerators()
+      assert.deepEqual(newModeratorsForm(channel, moderators), {
+        channel:    channel,
+        moderators: moderators
+      })
+    })
+  })
+
+  describe("newContributorsForm", () => {
+    it("should make a new form for contributors and a channel", () => {
+      const channel = makeChannel()
+      const contributors = makeContributors()
+      assert.deepEqual(newContributorsForm(channel, contributors), {
+        channel:      channel,
+        contributors: contributors
+      })
     })
   })
 
