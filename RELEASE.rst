@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.35.2
+--------------
+
+- Update post detail page to new design
+- Remove KEEP_LOCAL_COPY feature flag (#879)
+- Include reddit slug in post/comment URLs (#873)
+- Scope fixed-width form styles to auth pages
+- Added login/register UI
+
 Version 0.35.1
 --------------
 
