@@ -1,7 +1,7 @@
 """ Permissions for profiles """
 from rest_framework import permissions
 
-from open_discussions.permissions import _is_staff_jwt
+from open_discussions.permissions import is_staff_jwt
 
 
 class HasEditPermission(permissions.BasePermission):
@@ -16,4 +16,4 @@ class HasEditPermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        return obj.user == request.user or request.user.is_superuser or _is_staff_jwt(request)
+        return obj.user == request.user or request.user.is_superuser or is_staff_jwt(request)

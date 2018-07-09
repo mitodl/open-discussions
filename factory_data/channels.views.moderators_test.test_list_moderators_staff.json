@@ -1,0 +1,22 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Officiis recusandae reiciendis perspiciatis tempora ea. Consequatur quae veniam quis nemo nemo minus nostrum. Libero itaque molestiae amet inventore ad delectus. Soluta pariatur recusandae quia dolor veritatis incidunt expedita. Harum odit dolorem dicta quibusdam.\nAutem voluptate sapiente officiis molestiae laborum corporis eius. Eius laudantium vel aut. Accusantium saepe tenetur ullam velit blanditiis explicabo adipisci.",
+      "name": "1531251439_animi",
+      "public_description": "Esse ipsa officiis ipsam sed totam quibusdam. Accusamus cum deleniti veritatis.",
+      "title": "Repudiandae asperiores vitae amet quaerat."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CJ2V5GGVW5SC766HSB6VFHYW"
+    },
+    "staff_user": {
+      "username": "01CJ2V5A5899V3B15YC1E9BPXD"
+    },
+    "user2": {
+      "username": "01CJ2V5KXRHGK39KBH86PVYCYS"
+    }
+  }
+}

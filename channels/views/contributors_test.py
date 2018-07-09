@@ -10,14 +10,23 @@ from open_discussions.features import ANONYMOUS_ACCESS
 pytestmark = pytest.mark.betamax
 
 
-def test_list_contributors(client, logged_in_profile):
+def test_list_contributors(client, private_channel_and_contributor, staff_user, staff_jwt_header):
     """
     List contributors in a channel
     """
-    url = reverse('contributor-list', kwargs={'channel_name': 'test_channel'})
-    resp = client.get(url)
+    channel, user = private_channel_and_contributor
+    url = reverse('contributor-list', kwargs={'channel_name': channel.name})
+    resp = client.get(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == [{'contributor_name': 'othercontributor'}, {'contributor_name': 'fooadmin'}]
+    assert resp.json() == [{
+        'contributor_name': user.username,
+        'full_name': user.profile.name,
+        'email': user.email,
+    }, {
+        'contributor_name': staff_user.username,
+        'full_name': staff_user.profile.name,
+        'email': staff_user.email,
+    }]
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
@@ -38,7 +47,11 @@ def test_add_contributor(client, staff_jwt_header):
     url = reverse('contributor-list', kwargs={'channel_name': 'admin_channel'})
     resp = client.post(url, data={'contributor_name': contributor.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {'contributor_name': contributor.username}
+    assert resp.json() == {
+        'contributor_name': contributor.username,
+        'full_name': contributor.profile.name,
+        'email': contributor.email,
+    }
 
 
 def test_add_contributor_again(client, staff_jwt_header):
@@ -49,7 +62,11 @@ def test_add_contributor_again(client, staff_jwt_header):
     url = reverse('contributor-list', kwargs={'channel_name': 'admin_channel'})
     resp = client.post(url, data={'contributor_name': contributor.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {'contributor_name': contributor.username}
+    assert resp.json() == {
+        'contributor_name': contributor.username,
+        'full_name': contributor.profile.name,
+        'email': contributor.email,
+    }
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
@@ -60,43 +77,6 @@ def test_add_contributor_anonymous(client, settings, allow_anonymous):
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('contributor-list', kwargs={'channel_name': 'admin_channel'})
     resp = client.post(url, data={'contributor_name': 'some_username'}, format='json')
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
-
-
-def test_detail_contributor_error(client):
-    """
-    Detail of a contributor in a channel in case the user is not a contributor
-    """
-    admin = UserFactory.create(username='fooadmin')
-    client.force_login(admin)
-    nocontributor = UserFactory.create(username='nocontributor')
-    url = reverse(
-        'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': nocontributor.username})
-    resp = client.get(url)
-    assert resp.status_code == status.HTTP_404_NOT_FOUND
-
-
-def test_detail_contributor(client):
-    """
-    Detail of a contributor in a channel
-    """
-    client.force_login(UserFactory.create(username='fooadmin'))
-    contributor = UserFactory.create(username='othercontributor')
-    url = reverse(
-        'contributor-detail', kwargs={'channel_name': 'test_channel', 'contributor_name': contributor.username})
-    resp = client.get(url)
-    assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {'contributor_name': 'othercontributor'}
-
-
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_detail_contributor_anonymous(client, settings, allow_anonymous):
-    """
-    Anonymous users can't see information about a contributor
-    """
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
-    url = reverse('contributor-detail', kwargs={'channel_name': 'admin_channel', 'contributor_name': 'contributor'})
-    resp = client.get(url, data={'contributor_name': 'some_username'}, format='json')
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
