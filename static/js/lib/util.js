@@ -104,4 +104,4 @@ export const DRAWER_BREAKPOINT = 950
 export const isMobileWidth = () => getViewportWidth() < DRAWER_BREAKPOINT
 
 export const truncate = (text: ?string, length: number): string =>
-  text ? _.truncate(text, { length: length }) : ""
+  text ? _.truncate(text, { length: length, separator: " " }) : ""

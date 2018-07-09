@@ -68,7 +68,7 @@ describe("utility functions", () => {
       ["A random string", "A random string"],
       ["A random string with many words.", "A random string..."]
     ].forEach(([text, expected]) => {
-      assert.equal(truncate(text, 18), expected)
+      assert.equal(truncate(text, 20), expected)
     })
   })
 
