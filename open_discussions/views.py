@@ -8,7 +8,7 @@ import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from rest_framework_jwt.settings import api_settings
@@ -98,3 +98,8 @@ def saml_metadata(request):
     )
     metadata, _ = saml_backend.generate_metadata_xml()
     return HttpResponse(content=metadata, content_type='text/xml')
+
+
+def channel_redirect(request):
+    """ Redirect all URL's starting with `channel/` to `c/` """
+    return HttpResponsePermanentRedirect(request.path.replace('channel/', 'c/', 1))

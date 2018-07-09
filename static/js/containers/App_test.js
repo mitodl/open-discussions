@@ -8,7 +8,7 @@ import App from "./App"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeChannelList } from "../factories/channels"
 import { actions } from "../actions"
-import { SETTINGS_URL } from "../lib/url"
+import { channelURL, SETTINGS_URL } from "../lib/url"
 import { makeFrontpageSetting, makeCommentSetting } from "../factories/settings"
 import { makeChannelPostList } from "../factories/posts"
 
@@ -87,14 +87,14 @@ describe("App", () => {
   const expectedLoginRequiredTitle = "Login Required | MIT Open Discussions"
   it("redirects if you have no session url", async () => {
     delete SETTINGS.authenticated_site.session_url
-    await renderComponent("/channel/foobaz", [])
+    await renderComponent(channelURL("foobaz"), [])
     assert.equal(document.title, expectedLoginRequiredTitle)
   })
 
   it("doesn't redirect if you have no session url but anonymous access is allowed", async () => {
     delete SETTINGS.authenticated_site.session_url
     SETTINGS.allow_anonymous = true
-    await renderComponent("/channel/foobaz", [])
+    await renderComponent(channelURL("foobaz"), [])
     assert.notEqual(document.title, expectedLoginRequiredTitle)
   })
 

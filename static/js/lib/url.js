@@ -4,22 +4,22 @@ import qs from "query-string"
 
 import type { Post } from "../flow/discussionTypes"
 
-export const channelURL = (channelName: string) => `/channel/${channelName}`
+export const channelURL = (channelName: string) => `/c/${channelName}`
 
 export const channelModerationURL = (channelName: string) =>
-  `/moderation/channel/${channelName}`
+  `/moderation/c/${channelName}`
 
 export const editChannelBasicURL = (channelName: string) =>
-  `/manage/channel/edit/${channelName}/basic/`
+  `/manage/c/edit/${channelName}/basic/`
 
 export const editChannelAppearanceURL = (channelName: string) =>
-  `/manage/channel/edit/${channelName}/appearance/`
+  `/manage/c/edit/${channelName}/appearance/`
 
 export const postDetailURL = (
   channelName: string,
   postID: string,
   postSlug?: string
-) => `/channel/${channelName}/${postID}${postSlug ? `/${postSlug}` : ""}`
+) => `/c/${channelName}/${postID}${postSlug ? `/${postSlug}` : ""}`
 
 export const newPostURL = (channelName: ?string) =>
   channelName ? `/create_post/${channelName}` : "/create_post/"
@@ -45,7 +45,7 @@ export const postPermalink = (post: Post): string =>
 export const getChannelNameFromPathname = R.compose(
   R.defaultTo(null),
   R.view(R.lensIndex(1)),
-  R.match(/channel\/([^/]+)\/?/)
+  R.match(/c\/([^/]+)\/?/)
 )
 
 export const FRONTPAGE_URL = "/"
