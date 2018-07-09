@@ -1,19 +1,14 @@
 // @flow
 import React from "react"
-import { Link } from "react-router-dom"
 
-import Card from "../components/Card"
-import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
-import Embedly from "./Embedly"
+import Embedly, { EmbedlyLoader } from "./Embedly"
 
 import {
   isLinkTypeAllowed,
-  isTextTabSelected,
   userCanPost,
   LINK_TYPE_LINK,
   LINK_TYPE_TEXT
 } from "../lib/channels"
-import { CONTENT_POLICY_URL } from "../lib/url"
 import { goBackAndHandleEvent } from "../lib/util"
 import { validationMessage } from "../lib/validation"
 
@@ -22,7 +17,7 @@ import type { Channel, PostForm, PostValidation } from "../flow/discussionTypes"
 type CreatePostFormProps = {
   onSubmit: Function,
   onUpdate: Function,
-  updatePostType: (postType: string) => void,
+  updatePostType: (postType: ?string) => void,
   postForm: ?PostForm,
   validation: PostValidation,
   channel: Channel,
@@ -30,7 +25,8 @@ type CreatePostFormProps = {
   processing: boolean,
   channels: Map<string, Channel>,
   updateChannelSelection: Function,
-  embedly: Object
+  embedly: Object,
+  embedlyInFlight: boolean
 }
 
 const channelOptions = (channels: Map<string, Channel>) =>
@@ -42,8 +38,96 @@ const channelOptions = (channels: Map<string, Channel>) =>
       </option>
     ))
 
-export default class CreatePostForm extends React.Component<*, void> {
-  props: CreatePostFormProps
+export default class CreatePostForm extends React.Component<
+  CreatePostFormProps,
+  void
+> {
+  postTypeButtons = () => {
+    const { channel, updatePostType, validation } = this.props
+
+    return (
+      <div className="row post-type-row">
+        <div className="post-types">
+          {isLinkTypeAllowed(channel, LINK_TYPE_TEXT) ? (
+            <button
+              className="write-something"
+              onClick={() => updatePostType(LINK_TYPE_TEXT)}
+            >
+              <i className="material-icons notes">notes</i>
+              Write something
+            </button>
+          ) : null}
+          {isLinkTypeAllowed(channel, LINK_TYPE_LINK) ? (
+            <button
+              className="share-a-link"
+              onClick={() => updatePostType(LINK_TYPE_LINK)}
+            >
+              <i className="material-icons open_in_new">open_in_new</i>
+              Share a link
+            </button>
+          ) : null}
+        </div>
+        {validationMessage(validation.post_type)}
+      </div>
+    )
+  }
+
+  renderEmbed = () => {
+    const { embedly } = this.props
+
+    return (
+      <div className="embedly-preview">
+        <Embedly embedly={embedly} />
+      </div>
+    )
+  }
+
+  postContentInputs = () => {
+    const {
+      postForm,
+      onUpdate,
+      validation,
+      updatePostType,
+      embedlyInFlight,
+      embedly
+    } = this.props
+    if (!postForm) {
+      return null
+    }
+
+    const { postType, text, url } = postForm
+
+    return postType === LINK_TYPE_TEXT ? (
+      <div className="text row post-content">
+        <textarea placeholder="" name="text" value={text} onChange={onUpdate} />
+        <div className="close-button" onClick={() => updatePostType(null)}>
+          <i className="material-icons clear">clear</i>
+        </div>
+        {validationMessage(validation.text)}
+      </div>
+    ) : (
+      <div className="url row post-content">
+        {url !== "" && embedly && embedly.type !== "error" ? (
+          this.renderEmbed()
+        ) : (
+          <input
+            type="url"
+            placeholder="Paste a link to something related to the title..."
+            name="url"
+            value={url}
+            onChange={onUpdate}
+          />
+        )}
+        {embedlyInFlight && !embedly ? (
+          <EmbedlyLoader primaryColor="#c9bfbf" secondaryColor="#c9c8c8" />
+        ) : null}
+        <div className="close-button" onClick={() => updatePostType(null)}>
+          <i className="material-icons clear">clear</i>
+        </div>
+        {validationMessage(validation.url)}
+      </div>
+    )
+  }
 
   render() {
     const {
@@ -51,133 +135,67 @@ export default class CreatePostForm extends React.Component<*, void> {
       postForm,
       onUpdate,
       onSubmit,
-      updatePostType,
       history,
       processing,
       channels,
       updateChannelSelection,
-      validation,
-      embedly
+      validation
     } = this.props
     if (!postForm) {
       return null
     }
 
-    const { postType, text, url, title } = postForm
-
-    const isText = isTextTabSelected(postType, channel)
-    const showTextTab = isLinkTypeAllowed(channel, LINK_TYPE_TEXT)
-    const showLinkTab = isLinkTypeAllowed(channel, LINK_TYPE_LINK)
+    const { postType, title } = postForm
 
     return (
-      <div>
-        {channel ? <ChannelBreadcrumbs channel={channel} /> : null}
-        <Card className="new-post-card">
-          <form onSubmit={onSubmit} className="form">
-            <div className="post-types row">
-              {showTextTab ? (
-                <div
-                  className={`new-text-post ${isText ? "active" : ""}`}
-                  onClick={() => updatePostType(LINK_TYPE_TEXT)}
-                >
-                  New text post
-                </div>
-              ) : null}
-              {showLinkTab ? (
-                <div
-                  className={`new-link-post ${isText ? "" : "active"}`}
-                  onClick={() => updatePostType(LINK_TYPE_LINK)}
-                >
-                  New link post
-                </div>
-              ) : null}
-            </div>
-            <div className="titlefield row">
-              <label>Title</label>
-              <textarea
-                type="text"
-                placeholder=""
-                name="title"
-                value={title}
-                onChange={onUpdate}
-                rows="1"
-                className="no-height"
-              />
-              {validationMessage(validation.title)}
-            </div>
-            {isText ? (
-              <div className="text row">
-                <label>Type Your Post Here</label>
-                <textarea
-                  placeholder=""
-                  name="text"
-                  value={text}
-                  onChange={onUpdate}
-                />
-                {validationMessage(validation.text)}
-              </div>
-            ) : (
-              <div className="url row">
-                <label>Link URL</label>
-                <input
-                  type="url"
-                  placeholder="https://www.example.com"
-                  name="url"
-                  value={url}
-                  onChange={onUpdate}
-                />
-                {validationMessage(validation.url)}
-              </div>
-            )}
-            {!isText && embedly && embedly.type !== "error" ? (
-              <div className="embedly-preview row">
-                <div className="preview-header">
-                  this is a preview of your post
-                </div>
-                <Embedly embedly={embedly} />
-              </div>
-            ) : null}
-            <div className="row channel-select">
-              <label>Channel</label>
-              <select
-                onChange={updateChannelSelection}
-                name="channel"
-                value={channel ? channel.name : ""}
-              >
-                <option label="Select a channel" value="">
-                  Select a channel
-                </option>
-                {channelOptions(channels)}
-              </select>
-              {validationMessage(validation.channel)}
-            </div>
-            <div className="posting-policy row">
-              <span>
-                Please be mindful of{" "}
-                <Link to={CONTENT_POLICY_URL}>
-                  MicroMasters Discussions Community Guidelines
-                </Link>{" "}
-                and practice good online etiquette.
-              </span>
-            </div>
-            <div className="actions row">
-              <button
-                className={`submit-post ${processing ? "disabled" : ""}`}
-                type="submit"
-                disabled={processing}
-              >
-                Submit Post
-              </button>
-              <button
-                className="cancel"
-                onClick={goBackAndHandleEvent(history)}
-                disabled={processing}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </Card>
+      <div className="new-post-form">
+        <form onSubmit={onSubmit} className="form">
+          <div className="row channel-select">
+            <label>Will be published in:</label>
+            <select
+              onChange={updateChannelSelection}
+              name="channel"
+              value={channel ? channel.name : ""}
+            >
+              <option label="Select a channel" value="">
+                Select a channel
+              </option>
+              {channelOptions(channels)}
+            </select>
+            {validationMessage(validation.channel)}
+          </div>
+          <div className="titlefield row">
+            <textarea
+              type="text"
+              placeholder="Add the title of your post..."
+              name="title"
+              value={title}
+              onChange={onUpdate}
+              rows="1"
+              className="no-height"
+            />
+            {validationMessage(validation.title)}
+          </div>
+          {postType === null
+            ? this.postTypeButtons()
+            : this.postContentInputs()}
+          <div className="actions row">
+            <button
+              className="cancel"
+              onClick={goBackAndHandleEvent(history)}
+              disabled={processing}
+            >
+              Cancel
+            </button>
+            <button
+              className={`submit-post ${processing ? "disabled" : ""}`}
+              type="submit"
+              disabled={processing}
+            >
+              Post
+            </button>
+          </div>
+        </form>
       </div>
     )
   }

@@ -133,7 +133,7 @@ describe("validation library", () => {
       const post = { value: { postType: null, title: "potato" } }
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
-          post_type: "One of text or post tabs must be selected"
+          post_type: "You must either add text or a link to your post"
         }
       })
     })

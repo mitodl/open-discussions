@@ -67,10 +67,11 @@ export type PostForm = {
 }
 
 export type PostValidation = {
-  text:   string,
-  url:    string,
-  title:  string,
-  channel:string,
+  text?:      string,
+  url?:       string,
+  title?:     string,
+  channel?:   string,
+  post_type?: string
 }
 
 export type CreatePostPayload = {

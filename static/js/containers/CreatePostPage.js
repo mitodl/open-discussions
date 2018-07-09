@@ -2,15 +2,14 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
+import { MetaTags } from "react-meta-tags"
+import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import CreatePostForm from "../components/CreatePostForm"
+import withSingleColumn from "../hoc/withSingleColumn"
 
 import { actions } from "../actions"
-import {
-  isTextTabSelected,
-  LINK_TYPE_TEXT,
-  LINK_TYPE_ANY
-} from "../lib/channels"
+import { isTextTabSelected, LINK_TYPE_ANY } from "../lib/channels"
 import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
 import { getChannelName } from "../lib/util"
@@ -18,35 +17,38 @@ import { formatTitle } from "../lib/title"
 import { validatePostCreateForm } from "../lib/validation"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 
-import type { FormValue } from "../flow/formTypes"
 import type {
   Channel,
   CreatePostPayload,
-  PostForm
+  PostForm,
+  PostValidation
 } from "../flow/discussionTypes"
 import type { RestState } from "../flow/restTypes"
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
-import { MetaTags } from "react-meta-tags"
+
+type PostFormValue = {
+  value: PostForm,
+  errors: PostValidation
+}
 
 type CreatePostPageProps = {
   match: Match,
   dispatch: Dispatch<*>,
-  postForm: ?FormValue<PostForm>,
+  postForm: ?PostFormValue,
   channel: Channel,
   channels: RestState<Map<string, Channel>>,
   history: Object,
   processing: boolean,
-  embedly: Object
+  embedly: Object,
+  embedlyInFlight: boolean
 }
 
 const CREATE_POST_KEY = "post:new"
 const CREATE_POST_PAYLOAD = { formKey: CREATE_POST_KEY }
 const getForm = R.prop(CREATE_POST_KEY)
 
-class CreatePostPage extends React.Component<*, void> {
-  props: CreatePostPageProps
-
+class CreatePostPage extends React.Component<CreatePostPageProps, void> {
   componentDidMount() {
     const { dispatch, channels } = this.props
     const channelName = getChannelName(this.props)
@@ -60,34 +62,29 @@ class CreatePostPage extends React.Component<*, void> {
       })
     )
     ensureTwitterEmbedJS()
-    this.updateTabSelection()
   }
 
-  componentDidUpdate() {
-    this.updateTabSelection()
-  }
-
-  updateTabSelection = () => {
+  componentDidUpdate(prevProps: CreatePostPageProps) {
     const { channel, dispatch, postForm } = this.props
 
-    // If there is no postForm there is nothing to update.
-    // If there is no channel then all post types are valid.
-    // postType is null when the form is first loaded but we need to switch to an explict choice.
-    // If it's not null we may still need to switch if the user changes the channel and there's a different
-    // post type than what's in the form.
+    // we may need to null out the postType under certain conditions
+    // basically, if the user switches channels, and the post type they
+    // already have selected is not allowed on the new channel, we want to null
+    // out the postType so that they will be presented with the options
+    // available on the new channel
     if (
       postForm &&
       channel &&
-      (postForm.value.postType === null ||
-        (channel.link_type !== LINK_TYPE_ANY &&
-          channel.link_type !== postForm.value.postType))
+      prevProps.channel &&
+      prevProps.channel.name !== channel.name &&
+      postForm.value.postType !== null &&
+      channel.link_type !== LINK_TYPE_ANY &&
+      channel.link_type !== postForm.value.postType
     ) {
-      const postType =
-        channel.link_type === LINK_TYPE_ANY ? LINK_TYPE_TEXT : channel.link_type
       dispatch(
         actions.forms.formUpdate({
           ...CREATE_POST_PAYLOAD,
-          value: { postType }
+          value: { postType: null, url: "", text: "" }
         })
       )
     }
@@ -121,16 +118,14 @@ class CreatePostPage extends React.Component<*, void> {
       const embedlyResponse = await dispatch(embedlyGetFunc)
       handleTwitterWidgets(embedlyResponse)
     }
-
-    this.updateTabSelection()
   }
 
-  updatePostType = (postType: string) => {
+  updatePostType = (postType: ?string) => {
     const { dispatch } = this.props
     dispatch(
       actions.forms.formUpdate({
         ...CREATE_POST_PAYLOAD,
-        value: { postType }
+        value: { postType, url: "", text: "" }
       })
     )
 
@@ -189,7 +184,8 @@ class CreatePostPage extends React.Component<*, void> {
       postForm,
       history,
       processing,
-      embedly
+      embedly,
+      embedlyInFlight
     } = this.props
 
     if (!postForm) {
@@ -197,26 +193,25 @@ class CreatePostPage extends React.Component<*, void> {
     }
 
     return (
-      <div className="content create-post-page">
+      <React.Fragment>
         <MetaTags>
           <title>{formatTitle("Submit a Post")}</title>
         </MetaTags>
-        <div className="main-content">
-          <CreatePostForm
-            onSubmit={this.onSubmit}
-            onUpdate={this.onUpdate}
-            updatePostType={this.updatePostType}
-            updateChannelSelection={this.updateChannelSelection}
-            postForm={postForm.value}
-            validation={postForm.errors}
-            channel={channel}
-            history={history}
-            processing={processing}
-            channels={channels.data}
-            embedly={embedly}
-          />
-        </div>
-      </div>
+        <CreatePostForm
+          onSubmit={this.onSubmit}
+          onUpdate={this.onUpdate}
+          updatePostType={this.updatePostType}
+          updateChannelSelection={this.updateChannelSelection}
+          postForm={postForm.value}
+          validation={postForm.errors}
+          channel={channel}
+          history={history}
+          processing={processing}
+          channels={channels.data || new Map()}
+          embedly={embedly}
+          embedlyInFlight={embedlyInFlight}
+        />
+      </React.Fragment>
     )
   }
 }
@@ -232,14 +227,20 @@ const mapStateToProps = (state, props) => {
       ? state.embedly.data.get(postForm.value.url)
       : undefined
 
+  const embedlyInFlight = state.embedly.getStatus === FETCH_PROCESSING
+
   return {
     postForm,
     channel,
     channels,
     processing,
-    embedly
+    embedly,
+    embedlyInFlight
   }
 }
 
 export { CreatePostPage }
-export default connect(mapStateToProps)(CreatePostPage)
+export default R.compose(
+  connect(mapStateToProps),
+  withSingleColumn("create-post-page")
+)(CreatePostPage)

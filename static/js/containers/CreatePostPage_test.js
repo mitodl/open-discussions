@@ -1,4 +1,3 @@
-// @flow
 import { assert } from "chai"
 import sinon from "sinon"
 
@@ -47,8 +46,10 @@ describe("CreatePostPage", () => {
   const setUrl = (wrapper, url) =>
     wrapper.find(".url input").simulate("change", makeEvent("url", url))
 
-  const setLinkPost = wrapper =>
-    wrapper.find(".new-link-post").simulate("click")
+  const setTextPost = wrapper =>
+    wrapper.find(".write-something").simulate("click")
+
+  const setLinkPost = wrapper => wrapper.find(".share-a-link").simulate("click")
 
   const submitPost = wrapper => wrapper.find(".submit-post").simulate("submit")
 
@@ -93,7 +94,6 @@ describe("CreatePostPage", () => {
         ]
         : [
           actions.forms.FORM_BEGIN_EDIT,
-          actions.forms.FORM_UPDATE,
           actions.channels.get.requestType,
           actions.channels.get.successType,
           actions.subscribedChannels.get.requestType,
@@ -125,7 +125,9 @@ describe("CreatePostPage", () => {
       const url = "http://url.example.com"
       setTitle(wrapper, title)
 
-      if (!isText) {
+      if (isText) {
+        setTextPost(wrapper)
+      } else {
         setLinkPost(wrapper)
       }
       if (isText) {
@@ -209,6 +211,7 @@ describe("CreatePostPage", () => {
 
   it("should show validation errors when body of text post is empty", async () => {
     const wrapper = await renderPage()
+    setTextPost(wrapper)
     submitPost(wrapper)
     assert.equal(
       wrapper.find(".text .validation-message").text(),
@@ -336,9 +339,6 @@ describe("CreatePostPage", () => {
     const wrapper = await renderPage("/create_post/")
     let select = wrapper.find("select")
 
-    // allow only LINK so we can assert it doesn't choose the default of TEXT
-    channels[6].link_type = LINK_TYPE_LINK
-
     select.simulate("change", { target: { value: channels[6].name } })
     assert.equal(
       helper.currentLocation.pathname,
@@ -347,50 +347,66 @@ describe("CreatePostPage", () => {
     wrapper.update()
     select = wrapper.find("select")
     assert.equal(select.props().value, channels[6].name)
-    assert.deepEqual(
-      helper.store.getState().forms["post:new"].value.postType,
-      LINK_TYPE_LINK
-    )
   })
 
-  describe("updateTabSelection", () => {
+  describe("componentDidUpdate logic", () => {
     [
-      [null, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
-      [null, LINK_TYPE_LINK, true],
-      [LINK_TYPE_LINK, LINK_TYPE_LINK, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
-      [null, LINK_TYPE_ANY, true],
-      [LINK_TYPE_LINK, LINK_TYPE_ANY, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, false]
-    ].forEach(([fromLinkType, toLinkType, shouldDispatch]) => {
+      // starting with ANY
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, null, false],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_LINK, false],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, null, false],
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_LINK, false],
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_TEXT, false],
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, null, false],
+      // starting with LINK
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, null, false],
+      [LINK_TYPE_LINK, LINK_TYPE_LINK, LINK_TYPE_LINK, false],
+      [LINK_TYPE_LINK, LINK_TYPE_LINK, null, false],
+      [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, false],
+      [LINK_TYPE_LINK, LINK_TYPE_ANY, null, false],
+      // starting with TEXT
+      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, null, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, null, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, null, false]
+    ].forEach(([fromLinkType, toLinkType, formValue, shouldDispatch]) => {
       it(`${
         shouldDispatch ? "dispatches" : "doesn't dispatch"
-      } FORM_UPDATE if the post types when it goes from ${String(
+      } FORM_UPDATE if the postType is ${formValue} when it goes from ${String(
         fromLinkType
       )} to ${toLinkType}`, () => {
         const dispatch = helper.sandbox.stub()
-        currentChannel.link_type = toLinkType
+        currentChannel.link_type = fromLinkType
+        const nextChannel = channels[1]
+        nextChannel.link_type = toLinkType
         const page = new InnerCreatePostPage()
-
-        // $FlowFixMe: Ignore the type difference
         page.props = {
           dispatch: dispatch,
-          channel:  currentChannel,
+          channel:  nextChannel,
           postForm: {
             value: {
-              postType: fromLinkType
+              postType: formValue
             }
           }
         }
-        page.updateTabSelection()
+        const prevProps = {
+          channel: currentChannel
+        }
+
+        page.componentDidUpdate(prevProps)
         if (shouldDispatch) {
           assert.equal(dispatch.callCount, 1)
-          assert.equal(
-            dispatch.args[0][0].payload.value.postType,
-            toLinkType !== LINK_TYPE_LINK ? LINK_TYPE_TEXT : LINK_TYPE_LINK
-          )
+          assert.deepEqual(dispatch.args[0][0].payload.value, {
+            postType: null,
+            url:      "",
+            text:     ""
+          })
         } else {
           assert.equal(dispatch.callCount, 0)
         }

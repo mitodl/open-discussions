@@ -63,7 +63,7 @@ export const postUrlOrTextPresent = (postForm: { value: PostForm }) => {
     return S.Just(
       R.set(
         R.lensPath(["value", "post_type"]),
-        "One of text or post tabs must be selected"
+        "You must either add text or a link to your post"
       )
     )
   }
