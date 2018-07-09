@@ -347,3 +347,25 @@ export const postDetailsRegister = (
     method: POST,
     body:   JSON.stringify({ flow, partial_token: partialToken, name, password })
   })
+
+export const postPasswordResetEmail = (email: string): Promise<*> =>
+  fetchJSONWithCSRF("/api/v0/password_reset/", {
+    method: POST,
+    body:   JSON.stringify({ email })
+  })
+
+export const postPasswordResetNewPassword = (
+  newPassword: string,
+  reNewPassword: string,
+  token: string,
+  uid: string
+): Promise<*> =>
+  fetchJSONWithCSRF("/api/v0/password_reset/confirm/", {
+    method: POST,
+    body:   JSON.stringify({
+      new_password:    newPassword,
+      re_new_password: reNewPassword,
+      token,
+      uid
+    })
+  })

@@ -7,6 +7,8 @@ import { S } from "./sanctuary"
 import { isTextTabSelected } from "../lib/channels"
 import type { PostForm } from "../flow/discussionTypes"
 
+export const PASSWORD_LENGTH_MINIMUM = 8
+
 // this function checks that a given object fails validation (validator function returns true)
 // if it fails, it returns a setter (R.set) which which set the appropirate
 // validation message in an object. Else, it returns nothing.
@@ -16,7 +18,7 @@ import type { PostForm } from "../flow/discussionTypes"
 // to validate.
 export const validation = R.curry(
   (validator: Function, lens: Function, message: string, toValidate: Object) =>
-    validator(R.view(lens, toValidate))
+    validator(R.view(lens, toValidate), toValidate)
       ? S.Just(R.set(lens, message))
       : S.Nothing
 )
@@ -166,10 +168,31 @@ export const validateRegisterDetailsForm = validate([
   ),
   validation(
     R.compose(
-      R.gt(8),
+      R.gt(PASSWORD_LENGTH_MINIMUM),
       R.length
     ),
     R.lensPath(["value", "password"]),
-    "Password must be at least 8 characters"
+    `Password must be at least ${PASSWORD_LENGTH_MINIMUM} characters`
+  )
+])
+
+export const validatePasswordResetForm = validate([
+  validation(
+    (reNewPassword, form) => reNewPassword !== form.value.new_password,
+    R.lensPath(["value", "re_new_password"]),
+    "Passwords must match"
+  ),
+  validation(
+    R.compose(
+      R.gt(PASSWORD_LENGTH_MINIMUM),
+      R.length
+    ),
+    R.lensPath(["value", "new_password"]),
+    `Password must be at least ${PASSWORD_LENGTH_MINIMUM} characters`
+  ),
+  validation(
+    emptyOrNil,
+    R.lensPath(["value", "new_password"]),
+    "Password is required"
   )
 ])

@@ -3,21 +3,17 @@ import React from "react"
 import sinon from "sinon"
 import { mount } from "enzyme"
 import { assert } from "chai"
-import { Router } from "react-router"
-import { createMemoryHistory } from "history"
 
-import AuthPasswordForm from "./AuthPasswordForm"
+import PasswordResetForm from "./PasswordResetForm"
 
-describe("AuthPasswordForm component", () => {
-  let sandbox, onSubmitStub, onUpdateStub, form, browserHistory
-
+describe("PasswordResetForm component", () => {
+  let sandbox, onSubmitStub, onUpdateStub, form
   beforeEach(() => {
-    browserHistory = createMemoryHistory()
     sandbox = sinon.sandbox.create()
     onSubmitStub = sandbox.stub()
     onUpdateStub = sandbox.stub()
     form = {
-      password: ""
+      email: ""
     }
   })
 
@@ -25,30 +21,26 @@ describe("AuthPasswordForm component", () => {
     sandbox.restore()
   })
 
-  const getPasswordInput = wrapper => wrapper.find("input[name='password']")
+  const getEmailInput = wrapper => wrapper.find("input[name='email']")
 
   const mountForm = (props = {}) =>
     mount(
-      <Router history={browserHistory}>
-        <AuthPasswordForm
-          onSubmit={onSubmitStub}
-          onUpdate={onUpdateStub}
-          form={form}
-          validation={{}}
-          processing={false}
-          formError={""}
-          {...props}
-        />
-      </Router>
+      <PasswordResetForm
+        onSubmit={onSubmitStub}
+        onUpdate={onUpdateStub}
+        form={form}
+        validation={{}}
+        processing={false}
+        {...props}
+      />
     )
 
   it("should render an initial form", () => {
     const wrapper = mountForm()
 
-    assert.equal(getPasswordInput(wrapper).props().value, "")
+    assert.equal(getEmailInput(wrapper).props().value, "")
     assert.equal(wrapper.find(".validation-message").exists(), false)
     assert.equal(wrapper.find("button").props().disabled, false)
-    assert.equal(wrapper.find("Link").prop("to"), "/password_reset")
   })
 
   it("should disable the submit button if processing === true", () => {
@@ -57,31 +49,27 @@ describe("AuthPasswordForm component", () => {
     assert.equal(wrapper.find("button").props().disabled, true)
   })
 
-  it("should show validation", () => {
+  it("should show an error message if validation fails", () => {
     const wrapper = mountForm({
       validation: {
-        password: "Password is required"
-      },
-      formError: "error"
+        email: "Email is required"
+      }
     })
 
     assert.equal(
       wrapper.find(".validation-message").text(),
-      "Password is required"
+      "Email is required"
     )
-
-    // form level error shouldn't show
-    assert.isNotOk(wrapper.find(".row.error .validation-message").exists())
   })
 
-  it("should show a form level error", () => {
-    const wrapper = mountForm({ formError: "backend error" })
+  it("should show an error message if the API call fails", () => {
+    const wrapper = mountForm({
+      emailApiError: "Email does not exist"
+    })
+
     assert.equal(
-      wrapper
-        .find(".validation-message")
-        .at(0)
-        .text(),
-      "backend error"
+      wrapper.find(".validation-message").text(),
+      "Email does not exist"
     )
   })
 
@@ -89,11 +77,11 @@ describe("AuthPasswordForm component", () => {
     const wrapper = mountForm({ processing: true })
     const event = {
       target: {
-        name:  "password",
-        value: "password1"
+        name:  "email",
+        value: "user@localhost"
       }
     }
-    getPasswordInput(wrapper).simulate("change", event)
+    getEmailInput(wrapper).simulate("change", event)
     sinon.assert.calledOnce(onUpdateStub)
     const eventArg = onUpdateStub.firstCall.args[0]
     assert.equal(eventArg.target.name, event.target.name)

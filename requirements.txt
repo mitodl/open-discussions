@@ -25,10 +25,12 @@ django-cors-headers==2.1.0
 django-redis==4.7.0
 django-server-status==0.5.0
 django-storages==1.6.6
+django-templated-mail==1.1.1  # via djoser
 django-webpack-loader==0.5.0
 django==1.11.10
 djangorestframework-jwt==1.11.0
 djangorestframework==3.7.7
+djoser==1.1.5
 elasticsearch-dsl==6.1.0
 elasticsearch==6.2.0
 factory-boy==2.10.0

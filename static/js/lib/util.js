@@ -42,6 +42,8 @@ export const isEmptyText = R.compose(
   R.defaultTo("")
 )
 
+export const notNil = R.complement(R.isNil)
+
 export const goBackAndHandleEvent = R.curry((history, e) => {
   e.preventDefault()
   history.goBack()

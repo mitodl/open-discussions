@@ -1,0 +1,21 @@
+{% extends "email_base.html" %}
+
+{% block title %}Open Discussions - Reset Password{% endblock %}
+
+{% block content %}
+{% autoescape off %}
+
+<p>
+    You're receiving this email because you requested a password reset for your
+    user account at {{ site_name }}.
+</p>
+
+<p>
+    Please go to the following page and choose a new password:
+    {% block reset_link %}
+    {{ protocol }}://{{ domain }}{% url 'password-reset-confirm' uid=uid token=token %}
+    {% endblock %}
+</p>
+
+{% endautoescape %}
+{% endblock %}

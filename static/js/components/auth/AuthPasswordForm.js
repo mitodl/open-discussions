@@ -1,6 +1,7 @@
 // @flow
 import React from "react"
 import R from "ramda"
+import { Link } from "react-router-dom"
 
 import { validationMessage } from "../../lib/validation"
 
@@ -34,6 +35,9 @@ const AuthPasswordForm = ({
       {!processing && R.isEmpty(validation)
         ? validationMessage(formError)
         : null}
+    </div>
+    <div className="row">
+      <Link to="/password_reset">Forgot your password?</Link>
     </div>
     <div className="actions row">
       <button

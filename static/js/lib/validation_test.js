@@ -12,7 +12,9 @@ import {
   validateChannelBasicEditForm,
   validateContentReportForm,
   validateEmailForm,
-  validatePasswordForm
+  validatePasswordForm,
+  validatePasswordResetForm,
+  PASSWORD_LENGTH_MINIMUM
 } from "./validation"
 
 describe("validation library", () => {
@@ -239,6 +241,39 @@ describe("validation library", () => {
       assert.deepEqual(validatePasswordForm(form), {
         value: {
           password: "Password must be at least 8 characters"
+        }
+      })
+    })
+  })
+
+  describe("validatePasswordResetForm", () => {
+    it("should complain about no password", () => {
+      const form = {
+        value: { new_password: "", re_new_password: "" }
+      }
+      assert.deepEqual(validatePasswordResetForm(form), {
+        value: {
+          new_password: "Password is required"
+        }
+      })
+    })
+
+    it("should complain about password length", () => {
+      const form = { value: { new_password: "a", re_new_password: "a" } }
+      assert.deepEqual(validatePasswordResetForm(form), {
+        value: {
+          new_password: `Password must be at least ${PASSWORD_LENGTH_MINIMUM} characters`
+        }
+      })
+    })
+
+    it("should complain about non-matching passwords", () => {
+      const form = {
+        value: { new_password: "abcdefgh", re_new_password: "01234567" }
+      }
+      assert.deepEqual(validatePasswordResetForm(form), {
+        value: {
+          re_new_password: "Passwords must match"
         }
       })
     })

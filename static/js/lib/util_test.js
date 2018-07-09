@@ -11,7 +11,8 @@ import {
   userIsAnonymous,
   isProfileComplete,
   defaultProfileImageUrl,
-  makeProfileImageUrl
+  makeProfileImageUrl,
+  notNil
 } from "./util"
 
 describe("utility functions", () => {
@@ -136,6 +137,18 @@ describe("utility functions", () => {
           assert.equal(makeProfileImageUrl(profile, isSmall), expectedImageUrl)
         }
       )
+    })
+  })
+
+  it("notNil works as expected", () => {
+    [
+      [null, false],
+      [undefined, false],
+      [0, true],
+      ["", true],
+      ["abc", true]
+    ].forEach(([val, exp]) => {
+      assert.equal(notNil(val), exp)
     })
   })
 })

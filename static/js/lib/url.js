@@ -52,6 +52,7 @@ export const FRONTPAGE_URL = "/"
 export const AUTH_REQUIRED_URL = "/auth_required/"
 export const CONTENT_POLICY_URL = "/content_policy/"
 export const SETTINGS_URL = "/settings/"
+export const PASSWORD_RESET_URL = "/password_reset/"
 
 // auth urls
 export const LOGIN_URL = "/login/"

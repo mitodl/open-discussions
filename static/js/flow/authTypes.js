@@ -14,6 +14,10 @@ export type DetailsForm = {
   name: string
 } & PasswordForm
 
+export type ResetConfirmForm = {
+  new_password: string,
+  re_new_password: string
+}
 
 // API response types
 export type AuthStates =
