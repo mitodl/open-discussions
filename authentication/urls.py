@@ -1,5 +1,6 @@
 """URL configurations for authentication"""
 from django.conf.urls import url
+from django.contrib.auth import views as auth_views
 
 from authentication.views import (
     LoginEmailView,
@@ -26,4 +27,5 @@ urlpatterns = [
         name='password-reset-confirm-api'
     ),
     url(r'^login/complete$', login_complete, name='login-complete'),
+    url(r'^logout/$', auth_views.logout, name='logout')
 ]
