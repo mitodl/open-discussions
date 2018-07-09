@@ -37,7 +37,9 @@ import {
   postPasswordLogin,
   postEmailRegister,
   postConfirmRegister,
-  postDetailsRegister
+  postDetailsRegister,
+  postPasswordResetEmail,
+  postPasswordResetNewPassword
 } from "./api"
 import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
@@ -590,6 +592,45 @@ describe("api", function() {
               partial_token: partialToken,
               name,
               password
+            })
+          })
+        )
+      })
+    })
+
+    describe("postPasswordResetEmail", () => {
+      it("should pass email", async () => {
+        const email = "test@example.com"
+        await postPasswordResetEmail(email)
+        assert.ok(
+          fetchJSONStub.calledWith("/api/v0/password_reset/", {
+            method: POST,
+            body:   JSON.stringify({ email })
+          })
+        )
+      })
+    })
+
+    describe("postPasswordResetNewPassword", () => {
+      it("should pass password with confirmation, token, and uid", async () => {
+        const newPassword = "abcdefgh"
+        const reNewPassword = "abcdefgh"
+        const token = "4xe-88789b25f477a553b150"
+        const uid = "AA"
+        await postPasswordResetNewPassword(
+          newPassword,
+          reNewPassword,
+          token,
+          uid
+        )
+        assert.ok(
+          fetchJSONStub.calledWith("/api/v0/password_reset/confirm/", {
+            method: POST,
+            body:   JSON.stringify({
+              new_password:    newPassword,
+              re_new_password: reNewPassword,
+              token,
+              uid
             })
           })
         )

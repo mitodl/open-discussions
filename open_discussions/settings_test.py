@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.urls import reverse
 import semantic_version
 
 
@@ -160,3 +161,20 @@ class TestSettings(TestCase):
             with mock.patch.dict('os.environ', required_settings, clear=True):
                 with self.assertRaises(ImproperlyConfigured):
                     self.reload_settings()
+
+    def test_djoser_confirm_url(self):
+        """
+        Assert that the PASSWORD_RESET_CONFIRM_URL setting value produces a
+        URL that
+        """
+        token = '4xj-8aa0d06b40f1c067b464'
+        uid = 'AA'
+        template_generated_url = settings.PASSWORD_RESET_CONFIRM_URL.format(
+            uid=uid,
+            token=token
+        )
+        reverse_url = reverse('password-reset-confirm', kwargs=dict(
+            uid=uid,
+            token=token
+        ))
+        assert reverse_url == '/{}'.format(template_generated_url)

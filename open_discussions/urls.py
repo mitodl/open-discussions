@@ -61,10 +61,18 @@ urlpatterns = [
     url(r'^settings/', index),
     url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
     url(r'^profile/[A-Za-z0-9_]+/', index, name='profile'),
+
     url(r'^login/', index),
     url(r'^register/', index),
     url(r'^register/confirm/$', index, name='register-confirm'),
     url(r'^account/inactive/$', index),
+
+    url(r'^password_reset/', index, name='password-reset'),
+    url(
+        r'^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        index,
+        name='password-reset-confirm'
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

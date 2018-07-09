@@ -22,6 +22,8 @@ import RegisterPage from "./auth/RegisterPage"
 import RegisterConfirmPage from "./auth/RegisterConfirmPage"
 import RegisterDetailsPage from "./auth/RegisterDetailsPage"
 import InactiveUserPage from "./auth/InactiveUserPage"
+import PasswordResetPage from "./auth/PasswordResetPage"
+import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
 import Snackbar from "../components/material/Snackbar"
 import Drawer from "../containers/Drawer"
 import Toolbar from "../components/Toolbar"
@@ -232,6 +234,16 @@ class App extends React.Component<*, void> {
             exact
             path={`${match.url}account/inactive/`}
             component={InactiveUserPage}
+          />
+          <Route
+            exact
+            path={`${match.url}password_reset/`}
+            component={PasswordResetPage}
+          />
+          <Route
+            exact
+            path={`${match.url}password_reset/confirm/:uid/:token`}
+            component={PasswordResetConfirmPage}
           />
           <Footer />
         </div>

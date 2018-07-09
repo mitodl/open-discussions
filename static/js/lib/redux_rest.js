@@ -13,6 +13,7 @@ import { settingsEndpoint } from "../reducers/settings"
 import { embedlyEndpoint } from "../reducers/embedly"
 import { profilesEndpoint } from "../reducers/profiles"
 import { authEndpoint } from "../reducers/auth"
+import { passwordResetEndpoint } from "../reducers/password_reset"
 
 import type { Dispatch } from "redux"
 
@@ -31,7 +32,8 @@ export const endpoints = [
   settingsEndpoint,
   embedlyEndpoint,
   profilesEndpoint,
-  authEndpoint
+  authEndpoint,
+  passwordResetEndpoint
 ]
 
 /**

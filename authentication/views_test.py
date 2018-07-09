@@ -399,3 +399,33 @@ def test_login_complete(settings, client, user, jwt_token, use_jwt):
         assert cookie['domain'] == settings.OPEN_DISCUSSIONS_COOKIE_DOMAIN
     else:
         assert COOKIE_KEY not in response.cookies
+
+
+@pytest.mark.parametrize('url', (
+    'password-reset-api',
+    'password-reset-confirm-api',
+))
+def test_password_reset_disabled_without_flag(settings, client, url):
+    """Verify that password reset views return a 404 if the EMAIL_AUTH is disabled"""
+    settings.FEATURES[features.EMAIL_AUTH] = False
+    response = client.post(reverse(url), {})
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.parametrize('url,parent_view_cls', [
+    ['password-reset-api', 'DjoserPasswordResetView'],
+    ['password-reset-confirm-api', 'DjoserPasswordResetConfirmView'],
+])
+def test_password_reset_coerce_204(settings, mocker, client, url, parent_view_cls):
+    """
+    Verify that password reset views coerce a 204 response to a 200 in order
+    to play nice with redux-hammock.
+    """
+    settings.FEATURES[features.EMAIL_AUTH] = True
+    mocker.patch(
+        'authentication.views.{parent_view_cls}.post'.format(parent_view_cls=parent_view_cls),
+        return_value=mocker.Mock(status_code=status.HTTP_204_NO_CONTENT)
+    )
+    response = client.post(reverse(url), {})
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {}

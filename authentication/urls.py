@@ -1,6 +1,5 @@
 """URL configurations for authentication"""
 from django.conf.urls import url
-from django.contrib.auth import views as auth_views
 
 from authentication.views import (
     LoginEmailView,
@@ -9,6 +8,8 @@ from authentication.views import (
     RegisterConfirmView,
     RegisterDetailsView,
     login_complete,
+    CustomPasswordResetView,
+    CustomPasswordResetConfirmView,
 )
 
 
@@ -18,6 +19,11 @@ urlpatterns = [
     url(r'^api/v0/register/email/$', RegisterEmailView.as_view(), name='psa-register-email'),
     url(r'^api/v0/register/confirm/$', RegisterConfirmView.as_view(), name='psa-register-confirm'),
     url(r'^api/v0/register/details/$', RegisterDetailsView.as_view(), name='psa-register-details'),
+    url(r'^api/v0/password_reset/$', CustomPasswordResetView.as_view(), name='password-reset-api'),
+    url(
+        r'^api/v0/password_reset/confirm/$',
+        CustomPasswordResetConfirmView.as_view(),
+        name='password-reset-confirm-api'
+    ),
     url(r'^login/complete$', login_complete, name='login-complete'),
-    url(r'^logout/$', auth_views.logout, name='logout'),
 ]
