@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.36.0
+--------------
+
+- Hide user menu if user is not logged in
+- Added logout url back in after accidental removal
+- Upgrade javascript dependencies (#863)
+- Added password reset UI
+- Replace &#39;channel&#39; with &#39;c&#39; in URLs, redirect old URLs to new ones (#876)
+- Add scss to our fmt commands for prettier
+
 Version 0.35.2
 --------------
 
