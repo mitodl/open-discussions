@@ -43,7 +43,7 @@ import {
   RECEIVE_GET_PROFILES_SUCCESS,
   REQUEST_GET_PROFILES
 } from "../actions/profile"
-import {truncate} from "../lib/util"
+import { truncate } from "../lib/util"
 
 describe("PostPage", function() {
   let helper,
@@ -123,7 +123,8 @@ describe("PostPage", function() {
   it("should set the document meta description", async () => {
     await renderPage()
     assert.equal(
-      document.head.querySelector("[name=description]").content, truncate(post.text, 300)
+      document.head.querySelector("[name=description]").content,
+      truncate(post.text, 300)
     )
   })
 

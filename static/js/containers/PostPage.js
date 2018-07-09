@@ -47,7 +47,8 @@ import {
   getChannelName,
   getPostID,
   getCommentID,
-  userIsAnonymous, truncate
+  userIsAnonymous,
+  truncate
 } from "../lib/util"
 import { isModerator } from "../lib/channels"
 import {
@@ -363,10 +364,7 @@ class PostPage extends React.Component<PostPageProps, void> {
       <div>
         <MetaTags>
           <title>{formatTitle(post.title)}</title>
-          <meta
-            name="description"
-            content={truncate(post.text, 300)}
-          />
+          <meta name="description" content={truncate(post.text, 300)} />
         </MetaTags>
         <ChannelBreadcrumbs channel={channel} />
         <Dialog

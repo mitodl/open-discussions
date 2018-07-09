@@ -12,7 +12,8 @@ import {
   isProfileComplete,
   defaultProfileImageUrl,
   makeProfileImageUrl,
-  notNil
+  notNil,
+  truncate
 } from "./util"
 
 describe("utility functions", () => {
@@ -57,6 +58,17 @@ describe("utility functions", () => {
       ["   \n\tfoo", false]
     ].forEach(([text, exp]) => {
       assert.equal(isEmptyText(text), exp)
+    })
+  })
+
+  it("truncate works as expected", () => {
+    [
+      ["", ""],
+      [null, ""],
+      ["A random string", "A random string"],
+      ["A random string with many words.", "A random string..."]
+    ].forEach(([text, expected]) => {
+      assert.equal(truncate(text, 18), expected)
     })
   })
 
