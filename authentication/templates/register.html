@@ -3,14 +3,12 @@
 
 {% block content %}
 <div id="login-page">
-  <h2>Sign up for free to unlock more features.</h2>
+  <h2>Register</h2>
   <form method="post" action="{% url 'social:complete' 'email' %}">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Sign Up</button>
+    <button type="submit">Register</button>
   </form>
-    <div class="text-divider">Or use</div>
-    <a class="touchstone-button" href="/login/saml?idp=default">Touchstone@MIT</a>
   <br>
 </div>
 {% endblock %}
