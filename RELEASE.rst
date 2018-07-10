@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.36.1
+--------------
+
+- Add membership field to Channel and REST API serializer (#881)
+
 Version 0.36.0
 --------------
 
