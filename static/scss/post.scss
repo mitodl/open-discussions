@@ -158,12 +158,6 @@
 
   .summary {
     overflow: hidden;
-
-    .profile-image {
-      float: left;
-      position: relative;
-      top: 6px;
-    }
   }
 
   .text-content {
@@ -216,6 +210,10 @@
 
         &.share-action {
           position: relative;
+
+          i {
+            transform: scaleX(-1);
+          }
 
           > div:not(.share-popup) {
             display: flex;
