@@ -7,7 +7,7 @@ type ExternalLoginProps = {
 }
 
 const ExternalLogins = ({ className }: ExternalLoginProps) => (
-  <div className={className ? `actions row ${className}` : "actions row"}>
+  <div className={`actions row ${className || ""}`}>
     <a className="link-button" href={TOUCHSTONE_URL}>
       Touchstone
       <span className="ampersand">@</span>

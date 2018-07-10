@@ -237,13 +237,14 @@ describe("validation library", () => {
     it("should complain about an MIT email", () => {
       [
         ["user@mit.edu", true],
+        ["user@MIT.EDU", true],
         ["user@test.mit.edu", true],
         ["user@TEST.MIT.edu", true],
         ["user@amit.edu", false],
         ["user@mit.eduu", false],
         ["user@mit.com", false]
       ].forEach(([email, invalid]) => {
-        const form = { value: { email: email } }
+        const form = { value: { email } }
         assert.deepEqual(
           validateEmailForm(form),
           invalid

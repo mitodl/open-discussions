@@ -7,8 +7,8 @@ import { TOUCHSTONE_URL } from "../lib/url"
 import ExternalLogins from "./ExternalLogins"
 
 describe("ExternalLogins component", () => {
-  const mountExternalLogins = (children, props = {}) =>
-    shallow(<ExternalLogins {...props}>{children}</ExternalLogins>)
+  const mountExternalLogins = (props = {}) =>
+    shallow(<ExternalLogins {...props} />)
 
   it("should have a link to Touchstone", () => {
     const wrapper = mountExternalLogins()
@@ -18,7 +18,7 @@ describe("ExternalLogins component", () => {
   })
 
   it("should put className, if passed one", () => {
-    const wrapper = mountExternalLogins(<div />, { className: "custom-class" })
+    const wrapper = mountExternalLogins({ className: "custom-class" })
     assert.equal(wrapper.props().className, "actions row custom-class")
   })
 })

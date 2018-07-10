@@ -146,14 +146,14 @@ export const validationMessage = (message: ?string) =>
 
 export const validateEmailForm = validate([
   validation(
-    R.complement(validEmail),
-    R.lensPath(["value", "email"]),
-    "Email is not formatted correctly"
-  ),
-  validation(
     R.complement(validNotMIT),
     R.lensPath(["value", "email"]),
     "MIT users please login with Touchstone below"
+  ),
+  validation(
+    R.complement(validEmail),
+    R.lensPath(["value", "email"]),
+    "Email is not formatted correctly"
   ),
   validation(emptyOrNil, R.lensPath(["value", "email"]), "Email is required")
 ])
