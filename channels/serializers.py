@@ -17,11 +17,27 @@ from channels.constants import (
     VALID_CHANNEL_TYPES,
     VALID_LINK_TYPES,
 )
-from channels.models import Subscription
+from channels.models import (
+    Channel,
+    Subscription,
+)
 from open_discussions.utils import filter_dict_with_renamed_keys
 from profiles.utils import image_uri
 
 User = get_user_model()
+
+
+class WriteableSerializerMethodField(serializers.SerializerMethodField):
+    """
+    A SerializerMethodField which has been marked as not read_only so that submitted data passed validation.
+    The actual update is handled in PostSerializer.update(...).
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.read_only = False
+
+    def to_internal_value(self, data):
+        return data
 
 
 class ChannelSerializer(serializers.Serializer):
@@ -43,6 +59,7 @@ class ChannelSerializer(serializers.Serializer):
     )
     user_is_contributor = serializers.SerializerMethodField()
     user_is_moderator = serializers.SerializerMethodField()
+    membership_is_managed = WriteableSerializerMethodField()
 
     def get_user_is_contributor(self, channel):
         """
@@ -58,12 +75,22 @@ class ChannelSerializer(serializers.Serializer):
         """
         return bool(channel.user_is_moderator)
 
+    def get_membership_is_managed(self, channel):
+        """
+        Get membership_is_managed from the associated Channel model
+        """
+        channel_obj = Channel.objects.get(name=channel.display_name)
+        return channel_obj.membership_is_managed
+
     def create(self, validated_data):
         api = self.context['channel_api']
 
         # This is to reduce number of cassettes which need replacing
         validated_data['description'] = validated_data.get('description', '')
         validated_data['public_description'] = validated_data.get('public_description', '')
+
+        # Set default value for managed to true since this is how micromasters will create channels.
+        validated_data['membership_is_managed'] = validated_data.get('membership_is_managed', True)
 
         lookup = {
             'display_name': 'name',
@@ -72,6 +99,7 @@ class ChannelSerializer(serializers.Serializer):
             'description': 'description',
             'public_description': 'public_description',
             'submission_type': 'link_type',
+            'membership_is_managed': 'membership_is_managed',
         }
         kwargs = filter_dict_with_renamed_keys(validated_data, lookup, optional=True)
 
@@ -86,23 +114,11 @@ class ChannelSerializer(serializers.Serializer):
             'submission_type': 'link_type',
             'description': 'description',
             'public_description': 'public_description',
+            'membership_is_managed': 'membership_is_managed',
         }
         kwargs = filter_dict_with_renamed_keys(validated_data, lookup, optional=True)
 
         return api.update_channel(name=name, **kwargs)
-
-
-class WriteableSerializerMethodField(serializers.SerializerMethodField):
-    """
-    A SerializerMethodField which has been marked as not read_only so that submitted data passed validation.
-    The actual update is handled in PostSerializer.update(...).
-    """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.read_only = False
-
-    def to_internal_value(self, data):
-        return data
 
 
 def _parse_bool(value, field_name):

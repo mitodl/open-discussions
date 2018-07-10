@@ -2,21 +2,9 @@
 
 
 from channels.task_helpers import (
-    sync_channel_model,
     sync_comment_model,
     sync_post_model,
 )
-
-
-def test_sync_channel_model(mocker):
-    """sync_channel_model should sync the PRAW channel object into our database"""
-    channel_name = 'a_channel'
-    channel = mocker.Mock(
-        display_name=channel_name,
-    )
-    patched = mocker.patch('channels.tasks.sync_channel_model', autospec=True)
-    sync_channel_model(channel)
-    patched.delay.assert_called_once_with(channel_name)
 
 
 def test_sync_comment_model(mocker):

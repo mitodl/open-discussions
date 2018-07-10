@@ -41,14 +41,3 @@ def sync_post_model(*, channel_name, post_id):
         channel_name=channel_name,
         post_id=post_id
     )
-
-
-@app.task
-def sync_channel_model(name):
-    """
-    Create or update local channel name information
-
-    Args:
-        name (str): The name of the channel
-    """
-    api.sync_channel_model(name)

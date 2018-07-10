@@ -4,8 +4,9 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from channels.factories import STRATEGY_BUILD
 from channels.constants import LINK_TYPE_ANY
+from channels.factories import STRATEGY_BUILD
+from channels.models import Channel
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
@@ -30,6 +31,7 @@ def test_list_channels(client, jwt_header, private_channel_and_contributor, requ
             'user_is_contributor': True,
             'user_is_moderator': False,
             'link_type': channel.link_type,
+            'membership_is_managed': False,
         }
     ]
 
@@ -69,6 +71,7 @@ def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
         **payload,
         'user_is_contributor': True,
         'user_is_moderator': True,
+        'membership_is_managed': True,
     }
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
@@ -93,6 +96,7 @@ def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, re
         'public_description': '',
         'user_is_contributor': True,
         'user_is_moderator': True,
+        'membership_is_managed': True,
     }
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
@@ -166,6 +170,7 @@ def test_get_channel(client, jwt_header, private_channel_and_contributor):
         'user_is_contributor': True,
         'user_is_moderator': False,
         'link_type': channel.link_type,
+        'membership_is_managed': False,
     }
 
 
@@ -188,6 +193,7 @@ def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous
             'user_is_contributor': False,
             'user_is_moderator': False,
             'link_type': public_channel.link_type,
+            'membership_is_managed': False,
         }
     else:
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
@@ -240,7 +246,12 @@ def test_patch_channel(client, staff_jwt_header, private_channel):
         'public_description': private_channel.public_description,
         'user_is_contributor': True,
         'user_is_moderator': True,
+        'membership_is_managed': False,
     }
+    assert Channel.objects.count() == 1
+    channel_obj = Channel.objects.first()
+    assert channel_obj.name == private_channel.name
+    assert channel_obj.membership_is_managed is False
 
 
 def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_and_contributor):
@@ -263,6 +274,7 @@ def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_
         'user_is_contributor': True,
         'user_is_moderator': True,
         'link_type': private_channel.link_type,
+        'membership_is_managed': False,
     }
 
 

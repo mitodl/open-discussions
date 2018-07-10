@@ -385,8 +385,9 @@ class Api:
         """
         return self.reddit.subreddit(name)
 
-    @reddit_object_persist(channels_task_helpers.sync_channel_model)
-    def create_channel(self, name, title, channel_type=CHANNEL_TYPE_PUBLIC, **other_settings):
+    def create_channel(
+            self, name, title, channel_type=CHANNEL_TYPE_PUBLIC, membership_is_managed=False, **other_settings
+    ):
         """
         Create a channel
 
@@ -394,6 +395,7 @@ class Api:
             name (str): name of the channel
             title (str): title of the channel
             channel_type (str): type of the channel
+            membership_is_managed (bool): Whether the channel membership is managed externally
             **other_settings (dict): dict of additional settings
 
         Returns:
@@ -406,12 +408,21 @@ class Api:
             if key not in CHANNEL_SETTINGS:
                 raise ValueError('Invalid argument {}={}'.format(key, value))
 
-        return self.reddit.subreddit.create(
+        if not isinstance(membership_is_managed, bool):
+            raise ValueError("Invalid argument membership_is_managed")
+
+        channel = self.reddit.subreddit.create(
             name,
             title=title,
             subreddit_type=channel_type,
             **other_settings
         )
+
+        channel_obj = sync_channel_model(name)
+        channel_obj.membership_is_managed = membership_is_managed
+        channel_obj.save()
+
+        return channel
 
     def update_channel(self, name, title=None, channel_type=None, **other_settings):
         """
@@ -426,12 +437,19 @@ class Api:
         Returns:
             praw.models.Subreddit: the updated subreddit
         """
+        membership_is_managed = other_settings.pop('membership_is_managed', None)
+
         if channel_type is not None and channel_type not in VALID_CHANNEL_TYPES:
             raise ValueError('Invalid argument channel_type={}'.format(channel_type))
 
         for key, value in other_settings.items():
             if key not in CHANNEL_SETTINGS:
                 raise ValueError('Invalid argument {}={}'.format(key, value))
+
+        if membership_is_managed is not None:
+            if not isinstance(membership_is_managed, bool):
+                raise ValueError("Invalid argument membership_is_managed")
+            Channel.objects.filter(name=name).update(membership_is_managed=membership_is_managed)
 
         values = other_settings.copy()
         if title is not None:
