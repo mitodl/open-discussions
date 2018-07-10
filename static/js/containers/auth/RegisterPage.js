@@ -13,7 +13,6 @@ import { setSnackbarMessage } from "../../actions/ui"
 import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
-import { TOUCHSTONE_URL } from "../../lib/url"
 import { preventDefaultAndInvoke } from "../../lib/util"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
@@ -28,6 +27,7 @@ import {
 
 import type { EmailForm, AuthResponse } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
+import ExternalLogins from "../../components/ExternalLogins"
 
 type RegisterPageProps = {
   history: Object,
@@ -72,13 +72,7 @@ export const RegisterPage = ({
           renderForm({ formError })
         )}
         <div className="textline">Or use</div>
-        <div className="actions row">
-          <a className="link-button" href={TOUCHSTONE_URL}>
-            Touchstone
-            <span className="ampersand">@</span>
-            MIT
-          </a>
-        </div>
+        <ExternalLogins />
       </Card>
     </div>
   </div>

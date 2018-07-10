@@ -3,7 +3,6 @@ import { assert } from "chai"
 import sinon from "sinon"
 
 import { actions } from "../../actions"
-import { TOUCHSTONE_URL } from "../../lib/url"
 import { FLOW_LOGIN, STATE_SUCCESS } from "../../reducers/auth"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import ConnectedLoginPage, { LoginPage, FORM_KEY } from "./LoginPage"
@@ -59,7 +58,7 @@ describe("LoginPage", () => {
     assert.equal(form.props().formError, "error")
   })
 
-  it("should render a Touchstone login link", async () => {
+  it("should render an ExternalLogins component", async () => {
     const { inner } = await renderPage({
       auth: {
         data: {
@@ -68,9 +67,8 @@ describe("LoginPage", () => {
       }
     })
 
-    const link = inner.find(".link-button")
+    const link = inner.find("ExternalLogins")
     assert.ok(link.exists())
-    assert.equal(link.props().href, TOUCHSTONE_URL)
   })
 
   it("form onSubmit prop calls api correctly", async () => {

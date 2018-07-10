@@ -6,7 +6,6 @@ import { actions } from "../../actions"
 import { FLOW_REGISTER, STATE_REGISTER_CONFIRM_SENT } from "../../reducers/auth"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import ConnectedRegisterPage, { RegisterPage, FORM_KEY } from "./RegisterPage"
-import { TOUCHSTONE_URL } from "../../lib/url"
 
 const email = "test@example.com"
 
@@ -61,7 +60,7 @@ describe("RegisterPage", () => {
     assert.equal(form.props().formError, "error")
   })
 
-  it("should render a Touchstone login link", async () => {
+  it("should render an ExternalLogins component", async () => {
     const { inner } = await renderPage({
       auth: {
         data: {
@@ -70,9 +69,8 @@ describe("RegisterPage", () => {
       }
     })
 
-    const link = inner.find(".link-button")
+    const link = inner.find("ExternalLogins")
     assert.ok(link.exists())
-    assert.equal(link.props().href, TOUCHSTONE_URL)
   })
 
   it("should show a different header if tried to login", async () => {
