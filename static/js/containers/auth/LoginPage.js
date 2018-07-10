@@ -12,6 +12,7 @@ import { actions } from "../../actions"
 import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
+import { TOUCHSTONE_URL } from "../../lib/url"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 import {
@@ -35,7 +36,14 @@ export const LoginPage = ({ renderForm, formError }: LoginPageProps) => (
         <h3>Log In</h3>
         <DocumentTitle title={formatTitle("Log In")} />
         {renderForm({ formError })}
-        <hr />
+        <div className="textline">Or use</div>
+        <div className="actions row">
+          <a className="link-button" href={TOUCHSTONE_URL}>
+            Touchstone
+            <span className="ampersand">@</span>
+            MIT
+          </a>
+        </div>
       </Card>
     </div>
   </div>

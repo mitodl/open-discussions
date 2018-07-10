@@ -13,3 +13,34 @@ a.button {
   font-weight: 300;
   margin: 10px 0 20px;
 }
+
+.link-button {
+  display: block;
+  padding: 17px 40px;
+  color: $font-grey;
+  border: 1px solid $bg-grey;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 400;
+  margin: 10px 0 20px;
+
+  .ampersand {
+    color: #68b90f;
+  }
+}
+
+.textline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $font-grey;
+}
+
+.textline:after,
+.textline:before {
+  content: "";
+  width: 150px;
+  height: 2px;
+  background: $bg-grey;
+  margin: 0 10px;
+}

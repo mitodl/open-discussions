@@ -64,6 +64,8 @@ export const REGISTER_DETAILS_URL = "/register/details/"
 
 export const INACTIVE_USER_URL = "/account/inactive/"
 
+export const TOUCHSTONE_URL = "/login/saml/?idp=default"
+
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`
 

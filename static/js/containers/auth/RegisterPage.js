@@ -13,6 +13,7 @@ import { setSnackbarMessage } from "../../actions/ui"
 import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
+import { TOUCHSTONE_URL } from "../../lib/url"
 import { preventDefaultAndInvoke } from "../../lib/util"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
@@ -51,7 +52,7 @@ export const RegisterPage = ({
         <h3>
           {partialToken && email
             ? `We could not find an account with the email: ${email}`
-            : "Register"}
+            : "Sign up for free to unlock more features."}
         </h3>
         <DocumentTitle title={formatTitle("Register")} />
         {partialToken && email ? (
@@ -70,7 +71,14 @@ export const RegisterPage = ({
         ) : (
           renderForm({ formError })
         )}
-        <hr />
+        <div className="textline">Or use</div>
+        <div className="actions row">
+          <a className="link-button" href={TOUCHSTONE_URL}>
+            Touchstone
+            <span className="ampersand">@</span>
+            MIT
+          </a>
+        </div>
       </Card>
     </div>
   </div>
