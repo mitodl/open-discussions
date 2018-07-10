@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 import { connect } from "react-redux"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 import { FETCH_SUCCESS } from "redux-hammock/constants"
 import R from "ramda"
 
@@ -41,7 +41,9 @@ export const PasswordResetPage = ({
       ) : (
         <Card className="login-card">
           <h3>Enter your email address</h3>
-          <DocumentTitle title={formatTitle("Password Reset")} />
+          <MetaTags>
+            <title>{formatTitle("Password Reset")}</title>
+          </MetaTags>
           {renderForm({ emailApiError })}
         </Card>
       )}
