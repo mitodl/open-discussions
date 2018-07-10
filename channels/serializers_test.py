@@ -24,7 +24,7 @@ from open_discussions.factories import UserFactory
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize("membership_is_managed", [True, False, None])
+@pytest.mark.parametrize("membership_is_managed", [True, False])
 def test_serialize_channel(user, membership_is_managed):
     """
     Test serializing a channel
@@ -39,8 +39,7 @@ def test_serialize_channel(user, membership_is_managed):
     )
     request = Mock(user=user)
 
-    if membership_is_managed is not None:
-        Channel.objects.create(name=channel.display_name, membership_is_managed=membership_is_managed)
+    Channel.objects.create(name=channel.display_name, membership_is_managed=membership_is_managed)
 
     assert ChannelSerializer(channel, context={
         "request": request,
@@ -53,7 +52,7 @@ def test_serialize_channel(user, membership_is_managed):
         'public_description': 'public_description',
         'user_is_moderator': True,
         'user_is_contributor': True,
-        'membership_is_managed': bool(membership_is_managed),
+        'membership_is_managed': membership_is_managed,
     }
 
 

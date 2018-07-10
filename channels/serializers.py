@@ -79,11 +79,8 @@ class ChannelSerializer(serializers.Serializer):
         """
         Get membership_is_managed from the associated Channel model
         """
-        try:
-            channel_obj = Channel.objects.get(name=channel.display_name)
-            return channel_obj.membership_is_managed
-        except Channel.DoesNotExist:
-            return False
+        channel_obj = Channel.objects.get(name=channel.display_name)
+        return channel_obj.membership_is_managed
 
     def create(self, validated_data):
         api = self.context['channel_api']
