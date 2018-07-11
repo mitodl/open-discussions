@@ -18,6 +18,7 @@ import { getPaginationSortParams } from "../lib/posts"
 import type { AuthResponse, AuthFlow } from "../flow/authTypes"
 import type {
   Channel,
+  ChannelContributors,
   ChannelModerators,
   GenericComment,
   CreatePostPayload,
@@ -62,6 +63,14 @@ export function getChannelModerators(
   channelName: string
 ): Promise<ChannelModerators> {
   return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/moderators/`)
+}
+
+export function getChannelContributors(
+  channelName: string
+): Promise<ChannelContributors> {
+  return fetchJSONWithAuthFailure(
+    `/api/v0/channels/${channelName}/contributors/`
+  )
 }
 
 export function createChannel(channel: Channel): Promise<Channel> {
