@@ -27,6 +27,7 @@ import {
 
 import type { EmailForm, AuthResponse } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
+import ExternalLogins from "../../components/ExternalLogins"
 
 type RegisterPageProps = {
   history: Object,
@@ -51,7 +52,7 @@ export const RegisterPage = ({
         <h3>
           {partialToken && email
             ? `We could not find an account with the email: ${email}`
-            : "Register"}
+            : "Sign up for free to unlock more features."}
         </h3>
         <DocumentTitle title={formatTitle("Register")} />
         {partialToken && email ? (
@@ -70,7 +71,8 @@ export const RegisterPage = ({
         ) : (
           renderForm({ formError })
         )}
-        <hr />
+        <div className="textline">Or use</div>
+        <ExternalLogins />
       </Card>
     </div>
   </div>

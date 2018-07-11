@@ -58,6 +58,19 @@ describe("LoginPage", () => {
     assert.equal(form.props().formError, "error")
   })
 
+  it("should render an ExternalLogins component", async () => {
+    const { inner } = await renderPage({
+      auth: {
+        data: {
+          errors: ["error"]
+        }
+      }
+    })
+
+    const link = inner.find("ExternalLogins")
+    assert.ok(link.exists())
+  })
+
   it("form onSubmit prop calls api correctly", async () => {
     const { inner, store } = await renderPage()
 

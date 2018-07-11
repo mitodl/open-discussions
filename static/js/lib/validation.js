@@ -47,6 +47,11 @@ export const validEmail = R.compose(
   R.trim
 )
 
+export const validNotMIT = R.compose(
+  R.not,
+  R.test(/^.*@(((?!alum\.).)+\.)*mit.edu$/i) // matches any mit.edu email except alum.mit.edu
+)
+
 // POST CREATE VALIDATION
 export const postUrlOrTextPresent = (postForm: { value: PostForm }) => {
   if (R.isEmpty(postForm)) {
@@ -140,6 +145,11 @@ export const validationMessage = (message: ?string) =>
   )
 
 export const validateEmailForm = validate([
+  validation(
+    R.complement(validNotMIT),
+    R.lensPath(["value", "email"]),
+    "MIT users please login with Touchstone below"
+  ),
   validation(
     R.complement(validEmail),
     R.lensPath(["value", "email"]),

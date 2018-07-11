@@ -22,6 +22,7 @@ import {
 
 import type { EmailForm } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
+import ExternalLogins from "../../components/ExternalLogins"
 
 type LoginPageProps = {
   history: Object,
@@ -35,7 +36,8 @@ export const LoginPage = ({ renderForm, formError }: LoginPageProps) => (
         <h3>Log In</h3>
         <DocumentTitle title={formatTitle("Log In")} />
         {renderForm({ formError })}
-        <hr />
+        <div className="textline">Or use</div>
+        <ExternalLogins />
       </Card>
     </div>
   </div>
