@@ -49,7 +49,7 @@ export const validEmail = R.compose(
 
 export const validNotMIT = R.compose(
   R.not,
-  R.test(/[.@]mit\.edu$/i) // matches any mit.edu email
+  R.test(/^.*@(((?!alum\.).)+\.)*mit.edu$/i) // matches any mit.edu email except alum.mit.edu
 )
 
 // POST CREATE VALIDATION

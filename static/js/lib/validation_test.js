@@ -234,12 +234,17 @@ describe("validation library", () => {
       })
     })
 
-    it("should complain about an MIT email", () => {
+    it("should complain about an MIT email except alum.mit.edu", () => {
       [
         ["user@mit.edu", true],
         ["user@MIT.EDU", true],
         ["user@test.mit.edu", true],
         ["user@TEST.MIT.edu", true],
+        ["user@ALUM.MIT.edu", false],
+        ["user@alum.mit.edu", false],
+        ["user@other.alum.mit.edu", false],
+        ["user@other.school.mit.edu", true],
+        ["user@aluminum.mit.edu", true],
         ["user@amit.edu", false],
         ["user@mit.eduu", false],
         ["user@mit.com", false]
