@@ -1,7 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import Card from "../components/Card"
 
@@ -11,9 +11,11 @@ export default class ContentPolicyPage extends React.Component<*, void> {
   render() {
     return (
       <div className="content content-policy-page">
-        <DocumentTitle
-          title={formatTitle("MicroMasters Discussions Community Guidelines")}
-        />
+        <MetaTags>
+          <title>
+            {formatTitle("MicroMasters Discussions Community Guidelines")}
+          </title>
+        </MetaTags>
         <div className="main-content">
           <Card className="content-policy">
             <h1>MicroMasters Discussions Community Guidelines</h1>

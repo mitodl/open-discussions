@@ -2,7 +2,6 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import DocumentTitle from "react-document-title"
 
 import CreatePostForm from "../components/CreatePostForm"
 
@@ -28,6 +27,7 @@ import type {
 import type { RestState } from "../flow/restTypes"
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
+import { MetaTags } from "react-meta-tags"
 
 type CreatePostPageProps = {
   match: Match,
@@ -198,7 +198,9 @@ class CreatePostPage extends React.Component<*, void> {
 
     return (
       <div className="content create-post-page">
-        <DocumentTitle title={formatTitle("Submit a Post")} />
+        <MetaTags>
+          <title>{formatTitle("Submit a Post")}</title>
+        </MetaTags>
         <div className="main-content">
           <CreatePostForm
             onSubmit={this.onSubmit}

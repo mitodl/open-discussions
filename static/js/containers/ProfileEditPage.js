@@ -3,7 +3,7 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import ProfileForm from "../components/ProfileForm"
 import Card from "../components/Card"
@@ -120,7 +120,9 @@ class ProfileEditPage extends React.Component<*, void> {
 
     return profile.username === SETTINGS.username ? (
       <div className="profile-page">
-        <DocumentTitle title={formatTitle("Edit your profile")} />
+        <MetaTags>
+          <title>{formatTitle("Edit your profile")}</title>
+        </MetaTags>
         <div className="main-content">
           <Card>
             <div className="profile-card">

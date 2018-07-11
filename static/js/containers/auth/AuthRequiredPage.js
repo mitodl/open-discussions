@@ -1,7 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
 
@@ -11,7 +11,9 @@ export default class AuthRequiredPage extends React.Component<*, void> {
   render() {
     return (
       <div className="content auth-required-page">
-        <DocumentTitle title={formatTitle("Login Required")} />
+        <MetaTags>
+          <title>{formatTitle("Login Required")}</title>
+        </MetaTags>
         <div className="main-content">
           <Card className="auth-required">
             <div className="explanation">

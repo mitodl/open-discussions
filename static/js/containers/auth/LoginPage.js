@@ -2,7 +2,7 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
@@ -34,7 +34,9 @@ export const LoginPage = ({ renderForm, formError }: LoginPageProps) => (
     <div className="main-content">
       <Card className="login-card">
         <h3>Log In</h3>
-        <DocumentTitle title={formatTitle("Log In")} />
+        <MetaTags>
+          <title>{formatTitle("Log In")}</title>
+        </MetaTags>
         {renderForm({ formError })}
         <div className="textline">Or use</div>
         <ExternalLogins />

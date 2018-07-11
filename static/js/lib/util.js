@@ -1,6 +1,7 @@
 // @flow
 /* global SETTINGS:false */
 import R from "ramda"
+import _ from "lodash"
 
 import type { Match } from "react-router"
 import type { Profile } from "../flow/discussionTypes"
@@ -101,3 +102,6 @@ export const getViewportWidth = () => window.innerWidth
 export const DRAWER_BREAKPOINT = 950
 
 export const isMobileWidth = () => getViewportWidth() < DRAWER_BREAKPOINT
+
+export const truncate = (text: ?string, length: number): string =>
+  text ? _.truncate(text, { length: length, separator: " " }) : ""

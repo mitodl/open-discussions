@@ -2,7 +2,7 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
 import AuthPasswordForm from "../../components/auth/AuthPasswordForm"
@@ -55,7 +55,9 @@ export class LoginPasswordPage extends React.Component<*, *> {
                 ? "Welcome Back!"
                 : "There is already an account with this email"}
             </h3>
-            <DocumentTitle title={formatTitle("Log In")} />
+            <MetaTags>
+              <title>{formatTitle("Log In")}</title>
+            </MetaTags>
             {renderForm({ formError })}
           </Card>
         </div>

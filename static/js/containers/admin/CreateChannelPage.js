@@ -2,7 +2,7 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
 import CreateChannelForm from "../../components/admin/CreateChannelForm"
@@ -75,7 +75,9 @@ class CreateChannelPage extends React.Component<*, void> {
 
     return (
       <div className="content">
-        <DocumentTitle title={formatTitle("Create a Channel")} />
+        <MetaTags>
+          <title>{formatTitle("Create a Channel")}</title>
+        </MetaTags>
         <div className="main-content">
           <Card title="Create a Channel">
             <CreateChannelForm

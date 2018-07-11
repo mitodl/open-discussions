@@ -2,7 +2,7 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import DocumentTitle from "react-document-title"
+import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
@@ -54,7 +54,9 @@ export const RegisterPage = ({
             ? `We could not find an account with the email: ${email}`
             : "Sign up for free to unlock more features."}
         </h3>
-        <DocumentTitle title={formatTitle("Register")} />
+        <MetaTags>
+          <title>{formatTitle("Register")}</title>
+        </MetaTags>
         {partialToken && email ? (
           <form
             onSubmit={preventDefaultAndInvoke(() =>
