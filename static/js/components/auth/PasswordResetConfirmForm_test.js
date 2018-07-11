@@ -9,7 +9,7 @@ import PasswordResetConfirmForm from "./PasswordResetConfirmForm"
 describe("PasswordResetConfirmForm component", () => {
   let sandbox, onSubmitStub, onUpdateStub, form
   beforeEach(() => {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     onSubmitStub = sandbox.stub()
     onUpdateStub = sandbox.stub()
     form = {
