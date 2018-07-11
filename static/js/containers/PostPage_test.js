@@ -325,6 +325,10 @@ describe("PostPage", function() {
   })
 
   describe("as a moderator user", () => {
+    beforeEach(() => {
+      channel.user_is_moderator = true
+    })
+
     it("should remove the post", async () => {
       post.removed = false
       const wrapper = await renderPage()

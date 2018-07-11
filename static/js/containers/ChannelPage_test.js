@@ -79,6 +79,8 @@ describe("ChannelPage", () => {
   })
 
   it("pin post link should just post what's necessary", async () => {
+    currentChannel.user_is_moderator = true
+
     SETTINGS.username = "username"
     const post = makePost()
     helper.editPostStub.returns(
