@@ -37,7 +37,6 @@ class ChannelModerationPage extends React.Component<*, *> {
 
     try {
       await dispatch(actions.channels.get(channelName))
-      await dispatch(actions.channelModerators.get(channelName))
       await dispatch(actions.reports.get(channelName))
     } catch (_) {} // eslint-disable-line no-empty
   }

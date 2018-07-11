@@ -4,7 +4,7 @@ import sinon from "sinon"
 
 import { CreatePostPage as InnerCreatePostPage } from "../containers/CreatePostPage"
 
-import { makeModerators, makeChannelList } from "../factories/channels"
+import { makeChannelList } from "../factories/channels"
 import { makeCommentsResponse } from "../factories/comments"
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
@@ -65,7 +65,6 @@ describe("CreatePostPage", () => {
     )
     helper.getChannelsStub.returns(Promise.resolve(channels))
     helper.getPostStub.returns(Promise.resolve(post))
-    helper.getChannelModeratorsStub.returns(Promise.resolve(makeModerators()))
     helper.getCommentsStub.returns(Promise.resolve(commentsResponse))
     helper.getEmbedlyStub.returns(
       Promise.resolve({ url: post.url, response: article })

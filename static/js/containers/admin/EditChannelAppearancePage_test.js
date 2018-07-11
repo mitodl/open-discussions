@@ -17,7 +17,6 @@ describe("EditChannelAppearancePage", () => {
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(channel))
     helper.getChannelsStub.returns(Promise.resolve([channel]))
-    helper.getChannelModeratorsStub.returns(Promise.resolve([]))
     helper.getPostsForChannelStub.returns(
       Promise.resolve({
         pagination: {},
@@ -85,8 +84,6 @@ describe("EditChannelAppearancePage", () => {
         actions.channels.patch.successType,
         actions.channels.get.requestType,
         actions.channels.get.successType,
-        actions.channelModerators.get.requestType,
-        actions.channelModerators.get.successType,
         actions.postsForChannel.get.requestType,
         actions.postsForChannel.get.successType,
         FORM_END_EDIT

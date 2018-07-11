@@ -21,7 +21,6 @@ import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
 import { safeBulkGet } from "../lib/maps"
 import { getChannelName } from "../lib/util"
-import { isModerator } from "../lib/channels"
 import { getPostIds } from "../lib/posts"
 import { channelURL } from "../lib/url"
 import { toggleUpvote } from "../util/api_actions"
@@ -101,7 +100,6 @@ class ChannelPage extends React.Component<*, void> {
 
     try {
       await dispatch(actions.channels.get(channelName))
-      await dispatch(actions.channelModerators.get(channelName))
 
       this.fetchPostsForChannel()
     } catch (_) {} // eslint-disable-line no-empty
@@ -181,7 +179,6 @@ const mapStateToProps = (state, ownProps) => {
   const postsForChannel = state.postsForChannel.data.get(channelName) || {}
   const channel = channels.data.get(channelName)
   const postIds = getPostIds(postsForChannel)
-  const channelModerators = state.channelModerators.data.get(channelName) || []
   // NOTE: postsForChannel.postIds cannot be `postIds` because that never evals to a Nil value
   const loaded = channels.error
     ? true
@@ -193,7 +190,7 @@ const mapStateToProps = (state, ownProps) => {
     ? channels.error && channels.error.errorStatusCode === 403
     : false
 
-  const userIsModerator = isModerator(channelModerators, SETTINGS.username)
+  const userIsModerator = channel && channel.user_is_moderator
 
   return {
     ...postModerationSelector(state, ownProps),

@@ -16,7 +16,6 @@ import {
 } from "../actions/ui"
 import { setFocusedPost, clearFocusedPost } from "../actions/focus"
 import { getChannelName } from "../lib/util"
-import { isModerator } from "../lib/channels"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { anyErrorExcept404 } from "../util/rest"
 import {
@@ -195,9 +194,8 @@ export const postModerationSelector = (state: Object, ownProps: Object) => {
   const { channels, reports, ui, focus, forms } = state
   const channelName = getChannelName(ownProps)
   const channel = channels.data.get(channelName)
-  const channelModerators = state.channelModerators.data.get(channelName) || []
 
-  const userIsModerator = isModerator(channelModerators, SETTINGS.username)
+  const userIsModerator = channel && channel.user_is_moderator
 
   const loaded =
     channels.error || reports.error ? true : channels.loaded && reports.loaded
