@@ -1,8 +1,9 @@
 // @flow
 import { GET, INITIAL_STATE } from "redux-hammock/constants"
 
-import type { ChannelContributors } from "../flow/discussionTypes"
 import * as api from "../lib/api"
+
+import type { ChannelContributors } from "../flow/discussionTypes"
 
 type ChannelContributorsEndpointResponse = {
   channelName: string,
