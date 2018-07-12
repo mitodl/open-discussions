@@ -33,7 +33,7 @@ export const makeChannelList = (numChannels: number = 20) => {
 }
 
 export const makeContributor = (username: ?string = null): Contributor => ({
-  contributor_name: username ? username : casual.word,
+  contributor_name: username || casual.word,
   email:            casual.email,
   full_name:        casual.full_name
 })
@@ -50,7 +50,7 @@ export const makeModerator = (
   username: ?string = null,
   isModerator: ?boolean
 ): Moderator => ({
-  moderator_name: username ? username : casual.word,
+  moderator_name: username || casual.word,
   ...(isModerator
     ? {
       email:     casual.email,
