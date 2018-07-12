@@ -7,7 +7,6 @@ import {
   CHANNEL_TYPE_PRIVATE,
   newChannelForm,
   editChannelForm,
-  isModerator,
   userCanPost,
   LINK_TYPE_ANY,
   LINK_TYPE_TEXT,
@@ -17,7 +16,7 @@ import {
   isLinkTypeChecked,
   isTextTabSelected
 } from "./channels"
-import { makeModerators, makeChannel } from "../factories/channels"
+import { makeChannel } from "../factories/channels"
 
 describe("Channel utils", () => {
   it("newChannelForm should return a new channel form with empty values and public type", () => {
@@ -41,16 +40,6 @@ describe("Channel utils", () => {
       public_description: channel.public_description,
       channel_type:       channel.channel_type,
       link_type:          channel.link_type
-    })
-  })
-
-  describe("isModerator", () => {
-    it("should return true for a moderator user", () => {
-      assert.isTrue(isModerator(makeModerators("username"), "username"))
-    })
-
-    it("should return false for a regular user", () => {
-      assert.isFalse(isModerator(makeModerators(), "username"))
     })
   })
 

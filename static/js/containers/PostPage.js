@@ -50,7 +50,6 @@ import {
   userIsAnonymous,
   truncate
 } from "../lib/util"
-import { isModerator } from "../lib/channels"
 import {
   anyErrorExcept404,
   anyErrorExcept404or410,
@@ -77,7 +76,6 @@ import type { Match, Location } from "react-router"
 import type { FormsState } from "../flow/formTypes"
 import type {
   Channel,
-  ChannelModerators,
   CommentInTree,
   GenericComment,
   MoreCommentsInTree,
@@ -89,7 +87,6 @@ type PostPageProps = {
   dispatch: Dispatch<any>,
   post: Post,
   channel: Channel,
-  moderators: ChannelModerators,
   isModerator: boolean,
   focusedComment: ?CommentInTree,
   showRemoveCommentDialog: boolean,
@@ -175,8 +172,6 @@ class PostPage extends React.Component<PostPageProps, void> {
       channel,
       location: { search }
     } = this.props
-    const { moderators } = this.props
-
     if (!postID || !channelName) {
       // should not happen, this should be guaranteed by react-router
       throw Error("Match error")
@@ -195,10 +190,6 @@ class PostPage extends React.Component<PostPageProps, void> {
 
       if (!channel) {
         dispatch(actions.channels.get(channelName))
-      }
-
-      if (!moderators) {
-        await dispatch(actions.channelModerators.get(channelName))
       }
     } catch (_) {} // eslint-disable-line no-empty
   }
@@ -477,22 +468,13 @@ class PostPage extends React.Component<PostPageProps, void> {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const {
-    posts,
-    channels,
-    comments,
-    forms,
-    channelModerators,
-    ui,
-    embedly
-  } = state
+  const { posts, channels, comments, forms, ui, embedly } = state
   const postID = getPostID(ownProps)
   const channelName = getChannelName(ownProps)
   const commentID = getCommentID(ownProps)
   const post = posts.data.get(postID)
   const channel = channels.data.get(channelName)
   const commentsTree = comments.data.get(postID)
-  const moderators = channelModerators.data.get(channelName)
   const embedlyResponse =
     post && post.url ? embedly.data.get(post.url) : undefined
 
@@ -520,13 +502,12 @@ const mapStateToProps = (state, ownProps) => {
     post,
     channel,
     commentsTree,
-    moderators,
     loaded,
     notFound,
     notAuthorized,
     postDropdownMenuOpen,
     postShareMenuOpen,
-    isModerator: isModerator(moderators, SETTINGS.username),
+    isModerator: channel && channel.user_is_moderator,
     errored:
       anyErrorExcept404([posts, channels]) ||
       anyErrorExcept404or410([comments]),

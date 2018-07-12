@@ -17,7 +17,7 @@ import {
   makeCommentsResponse,
   makeMoreComments
 } from "../factories/comments"
-import { makeChannel, makeModerators } from "../factories/channels"
+import { makeChannel } from "../factories/channels"
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
 import { SET_CHANNEL_DATA } from "../actions/channel"
@@ -52,7 +52,6 @@ describe("PostPage", function() {
     post,
     comments,
     channel,
-    moderators,
     twitterEmbedStub
 
   this.timeout(5000)
@@ -62,7 +61,6 @@ describe("PostPage", function() {
     const commentsResponse = makeCommentsResponse(post, 3)
     comments = createCommentTree(commentsResponse)
     channel = makeChannel()
-    moderators = makeModerators()
 
     helper = new IntegrationTestHelper()
     helper.getPostStub.returns(Promise.resolve(post))
@@ -73,7 +71,6 @@ describe("PostPage", function() {
     helper.getCommentStub.returns(
       Promise.resolve(R.slice(0, 1, commentsResponse))
     )
-    helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
     helper.getPostsForChannelStub.returns(
       Promise.resolve({
         posts: makeChannelPostList()
@@ -102,8 +99,6 @@ describe("PostPage", function() {
     actions.subscribedChannels.get.successType,
     actions.channels.get.requestType,
     actions.channels.get.successType,
-    actions.channelModerators.get.requestType,
-    actions.channelModerators.get.successType,
     SET_CHANNEL_DATA
   ]
 
@@ -322,8 +317,6 @@ describe("PostPage", function() {
         actions.channels.get.requestType,
         actions.channels.get.successType,
         actions.postsForChannel.get.requestType,
-        actions.channelModerators.get.requestType,
-        actions.channelModerators.get.successType,
         SET_SNACKBAR_MESSAGE
       ],
       () => {
@@ -342,9 +335,7 @@ describe("PostPage", function() {
 
   describe("as a moderator user", () => {
     beforeEach(() => {
-      helper.getChannelModeratorsStub.returns(
-        Promise.resolve(makeModerators(SETTINGS.username))
-      )
+      channel.user_is_moderator = true
     })
 
     it("should remove the post", async () => {

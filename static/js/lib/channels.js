@@ -1,11 +1,7 @@
 //@flow
 import R from "ramda"
 
-import type {
-  Channel,
-  ChannelForm,
-  ChannelModerators
-} from "../flow/discussionTypes"
+import type { Channel, ChannelForm } from "../flow/discussionTypes"
 
 export const CHANNEL_TYPE_PUBLIC = "public"
 export const CHANNEL_TYPE_RESTRICTED = "restricted"
@@ -37,11 +33,6 @@ export const editChannelForm = (channel: Channel): ChannelForm =>
     ],
     channel
   )
-
-export const isModerator = (
-  moderators: ChannelModerators,
-  username: ?string
-): boolean => R.any(R.propEq("moderator_name", username), moderators || [])
 
 export const userCanPost = (channel: Channel) =>
   channel.channel_type === CHANNEL_TYPE_PUBLIC ||

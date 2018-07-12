@@ -11,11 +11,7 @@ import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ChannelPage from "./ChannelPage"
 import DropdownMenu from "../components/DropdownMenu"
 
-import {
-  makeChannel,
-  makeChannelList,
-  makeModerators
-} from "../factories/channels"
+import { makeChannel, makeChannelList } from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import { actions } from "../actions"
 import { SET_POST_DATA, CLEAR_POST_ERROR } from "../actions/post"
@@ -40,19 +36,16 @@ describe("ChannelPage", () => {
     channels,
     currentChannel,
     otherChannel,
-    postList,
-    moderators
+    postList
 
   beforeEach(() => {
     channels = makeChannelList(10)
     currentChannel = channels[3]
     otherChannel = channels[4]
-    moderators = makeModerators()
     postList = makeChannelPostList()
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(currentChannel))
     helper.getChannelsStub.returns(Promise.resolve(channels))
-    helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
     helper.getPostsForChannelStub.returns(Promise.resolve({ posts: postList }))
     helper.getReportsStub.returns(Promise.resolve(R.times(makeReportRecord, 4)))
     helper.getProfileStub.returns(Promise.resolve(""))
@@ -74,8 +67,6 @@ describe("ChannelPage", () => {
       actions.postsForChannel.get.successType,
       actions.subscribedChannels.get.requestType,
       actions.subscribedChannels.get.successType,
-      actions.channelModerators.get.requestType,
-      actions.channelModerators.get.successType,
       SET_POST_DATA,
       SET_CHANNEL_DATA
     ])
@@ -88,10 +79,9 @@ describe("ChannelPage", () => {
   })
 
   it("pin post link should just post what's necessary", async () => {
+    currentChannel.user_is_moderator = true
+
     SETTINGS.username = "username"
-    helper.getChannelModeratorsStub.returns(
-      Promise.resolve(makeModerators(SETTINGS.username))
-    )
     const post = makePost()
     helper.editPostStub.returns(
       Promise.resolve(
@@ -114,8 +104,6 @@ describe("ChannelPage", () => {
       actions.postsForChannel.get.successType,
       actions.subscribedChannels.get.requestType,
       actions.subscribedChannels.get.successType,
-      actions.channelModerators.get.requestType,
-      actions.channelModerators.get.successType,
       SET_POST_DATA,
       SET_CHANNEL_DATA
     ])
@@ -147,8 +135,6 @@ describe("ChannelPage", () => {
           actions.channels.get.successType,
           actions.postsForChannel.get.requestType,
           actions.postsForChannel.get.successType,
-          actions.channelModerators.get.requestType,
-          actions.channelModerators.get.successType,
           SET_POST_DATA
         ],
         () => {
@@ -194,8 +180,6 @@ describe("ChannelPage", () => {
         actions.channels.get.successType,
         actions.postsForChannel.get.requestType,
         actions.postsForChannel.get.successType,
-        actions.channelModerators.get.requestType,
-        actions.channelModerators.get.successType,
         EVICT_POSTS_FOR_CHANNEL
       ],
       () => {
@@ -220,8 +204,6 @@ describe("ChannelPage", () => {
       actions.postsForChannel.get.successType,
       actions.subscribedChannels.get.requestType,
       actions.subscribedChannels.get.successType,
-      actions.channelModerators.get.requestType,
-      actions.channelModerators.get.successType,
       SET_POST_DATA,
       SET_CHANNEL_DATA,
       CLEAR_CHANNEL_ERROR,
