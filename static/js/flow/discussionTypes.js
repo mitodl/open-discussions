@@ -144,6 +144,7 @@ export type ReplaceMoreCommentsPayload = {
   postId: string,
 }
 
+// The optional fields here are shown only to other moderators
 export type Moderator = {
   moderator_name: string,
   email?: string,
