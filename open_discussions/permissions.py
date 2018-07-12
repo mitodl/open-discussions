@@ -7,14 +7,13 @@ from prawcore.exceptions import (
 from rest_framework import permissions
 from rest_framework_jwt.settings import api_settings
 
-from channels import api
 from open_discussions import features
 
 
-def _is_staff_jwt(request):
+def is_staff_jwt(request):
     """
     Args:
-        request: django request object
+        request (HTTPRequest): django request object
 
     Returns:
         bool: True if user is staff
@@ -32,19 +31,25 @@ def _is_staff_jwt(request):
     return 'roles' in payload and 'staff' in payload['roles']
 
 
-def _is_moderator(request, view):
+def is_moderator(request, view):
     """
+    Helper function to check if a user is a moderator
+
     Args:
-        request: django request object
-        view: a DRF view ooject
+        request (HTTPRequest): django request object
+        view (APIView): a DRF view ooject
 
     Returns:
         bool: True if user is moderator on the channel
     """
-    user_api = api.Api(request.user)
+    user_api = request.channel_api
     channel_name = view.kwargs.get('channel_name', None)
     try:
-        return channel_name and user_api.is_moderator(channel_name, request.user.username)
+        return (
+            channel_name and
+            not request.user.is_anonymous and
+            user_api.is_moderator(channel_name, request.user.username)
+        )
     except PrawForbidden:
         # User was forbidden to list moderators so they are most certainly not one
         return False
@@ -59,7 +64,7 @@ class JwtIsStaffPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role"""
-        return _is_staff_jwt(request)
+        return is_staff_jwt(request)
 
 
 class JwtIsStaffOrReadonlyPermission(JwtIsStaffPermission):
@@ -78,7 +83,7 @@ class JwtIsStaffOrModeratorPermission(JwtIsStaffPermission):
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or is a moderator"""
-        return super().has_permission(request, view) or _is_moderator(request, view)
+        return super().has_permission(request, view) or is_moderator(request, view)
 
 
 class JwtIsStaffModeratorOrReadonlyPermission(JwtIsStaffOrModeratorPermission):

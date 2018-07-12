@@ -22,6 +22,7 @@ from channels.models import (
     Subscription,
 )
 from open_discussions.utils import filter_dict_with_renamed_keys
+from profiles.models import Profile
 from profiles.utils import image_uri
 
 User = get_user_model()
@@ -581,12 +582,22 @@ class GenericCommentSerializer(serializers.Serializer):
 
 
 class ContributorSerializer(serializers.Serializer):
-    """Serializer for contributors"""
+    """Serializer for contributors. Should be accessible by moderators only"""
     contributor_name = WriteableSerializerMethodField()
+    email = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
 
     def get_contributor_name(self, instance):
         """Returns the name for the contributor"""
         return instance.name
+
+    def get_email(self, instance):
+        """Get the email from the associated user"""
+        return User.objects.filter(username=instance.name).values_list('email', flat=True).first()
+
+    def get_full_name(self, instance):
+        """Get the full name of the associated user"""
+        return Profile.objects.filter(user__username=instance.name).values_list('name', flat=True).first()
 
     def validate_contributor_name(self, value):
         """Validates the contributor name"""
@@ -602,13 +613,32 @@ class ContributorSerializer(serializers.Serializer):
         return api.add_contributor(validated_data['contributor_name'], channel_name)
 
 
-class ModeratorSerializer(serializers.Serializer):
-    """Serializer for Moderators"""
-    moderator_name = WriteableSerializerMethodField()
+class ModeratorPublicSerializer(serializers.Serializer):
+    """Serializer for moderators, viewable by end users"""
+    moderator_name = serializers.SerializerMethodField()
 
     def get_moderator_name(self, instance):
         """Returns the name for the moderator"""
         return instance.name
+
+
+class ModeratorPrivateSerializer(serializers.Serializer):
+    """Serializer for moderators, viewable by other moderators"""
+    moderator_name = WriteableSerializerMethodField()
+    email = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
+
+    def get_moderator_name(self, instance):
+        """Returns the name for the moderator"""
+        return instance.name
+
+    def get_email(self, instance):
+        """Get the email from the associated user"""
+        return User.objects.filter(username=instance.name).values_list('email', flat=True).first()
+
+    def get_full_name(self, instance):
+        """Get the full name of the associated user"""
+        return Profile.objects.filter(user__username=instance.name).values_list('name', flat=True).first()
 
     def validate_moderator_name(self, value):
         """Validates the moderator name"""

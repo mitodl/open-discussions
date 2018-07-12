@@ -55,13 +55,13 @@ def test_staff_or_moderator(mocker, user, jwt_token, is_moderator):
     """
     Test that moderators are allowed or not
     """
-    mocked_api = mocker.patch('channels.api.Api').return_value
-    mocked_api.is_moderator.return_value = is_moderator
     perm = JwtIsStaffOrModeratorPermission()
     request = mocker.Mock(auth=jwt_token, user=user)
+    request.channel_api = mocker.patch('channels.api.Api').return_value
+    request.channel_api.is_moderator.return_value = is_moderator
     view = mocker.Mock(kwargs=dict(channel_name='abc'))
     assert perm.has_permission(request, view) is is_moderator
-    mocked_api.is_moderator.assert_called_once_with('abc', user.username)
+    request.channel_api.is_moderator.assert_called_once_with('abc', user.username)
 
 
 @pytest.mark.parametrize('exception_cls', [
@@ -72,12 +72,12 @@ def test_staff_or_moderator_exceptions(mocker, jwt_token, exception_cls):
     """
     Test that user is deemed not a moderator if praw raises a forbidden or redirect error
     """
-    mocked_api = mocker.patch('channels.api.Api').return_value
-    mocked_api.is_moderator.side_effect = exception_cls(mocker.MagicMock(headers={
-        'location': '/'
-    }))
     perm = JwtIsStaffOrModeratorPermission()
     request = mocker.Mock(auth=jwt_token)
+    request.channel_api = mocker.patch('channels.api.Api').return_value
+    request.channel_api.is_moderator.side_effect = exception_cls(mocker.MagicMock(headers={
+        'location': '/'
+    }))
     view = mocker.Mock(kwargs=dict(channel_name='abc'))
     assert perm.has_permission(request, view) is False
 

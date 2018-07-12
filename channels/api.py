@@ -979,7 +979,7 @@ class Api:
             # and the double removal case is probably more common.
             pass
 
-    def list_moderators(self, channel_name, moderator_name=None):
+    def _list_moderators(self, *, channel_name, moderator_name):
         """
         Returns a list of moderators for the channel
 
@@ -992,6 +992,18 @@ class Api:
         """
         return self.get_channel(channel_name).moderator(redditor=moderator_name)
 
+    def list_moderators(self, channel_name):
+        """
+        Returns a list of moderators for the channel
+
+        Args:
+            channel_name(str): name of the channel
+
+        Returns:
+            praw.models.listing.generator.ListingGenerator: a generator representing the contributors in the channel
+        """
+        return self._list_moderators(channel_name=channel_name, moderator_name=None)
+
     def is_moderator(self, channel_name, moderator_name):
         """
         Returns True if the given username is a moderator on the channel
@@ -1003,8 +1015,12 @@ class Api:
         Returns:
             bool: True if the given username is a moderator on the channel
         """
+        if not moderator_name:
+            # If we just let this pass through to reddit it will helpfully assume we mean to return all moderators.
+            # So we have to be explicit here.
+            raise ValueError("Missing moderator_name")
         # generators always eval True, so eval as list first and then as bool
-        return bool(list(self.list_moderators(channel_name, moderator_name=moderator_name)))
+        return bool(list(self._list_moderators(channel_name=channel_name, moderator_name=moderator_name)))
 
     def add_subscriber(self, subscriber_name, channel_name):
         """

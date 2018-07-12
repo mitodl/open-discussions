@@ -1,17 +1,20 @@
 """Views for REST APIs for moderators"""
 
-from praw.models import Redditor
 from rest_framework import status
-from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from channels.api import Api
-from channels.serializers import ModeratorSerializer
+from channels.serializers import (
+    ModeratorPrivateSerializer,
+    ModeratorPublicSerializer,
+)
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
-    JwtIsStaffOrReadonlyPermission,
+    is_moderator,
+    is_staff_jwt,
+    JwtIsStaffModeratorOrReadonlyPermission,
 )
 
 
@@ -19,8 +22,15 @@ class ModeratorListView(ListCreateAPIView):
     """
     View for listing and adding moderators
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffOrReadonlyPermission,)
-    serializer_class = ModeratorSerializer
+    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffModeratorOrReadonlyPermission,)
+
+    def get_serializer_class(self):
+        """
+        Pick private serializer if user is moderator of this channel, else use public one
+        """
+        return ModeratorPrivateSerializer if (
+            is_staff_jwt(self.request) or is_moderator(self.request, self)
+        ) else ModeratorPublicSerializer
 
     def get_serializer_context(self):
         """Context for the request and view"""
@@ -40,27 +50,7 @@ class ModeratorDetailView(APIView):
     """
     View to retrieve and remove moderators
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffOrReadonlyPermission,)
-
-    def get_serializer_context(self):
-        """Context for the request and view"""
-        return {
-            'channel_api': self.request.channel_api,
-            'view': self,
-        }
-
-    def get(self, request, *args, **kwargs):
-        """Get moderator for the channel"""
-        api = Api(user=request.user)
-        moderator_name = self.kwargs['moderator_name']
-        channel_name = self.kwargs['channel_name']
-        if moderator_name not in api.list_moderators(channel_name):
-            raise NotFound('User {} is not a moderator of {}'.format(moderator_name, channel_name))
-        return Response(
-            ModeratorSerializer(
-                Redditor(api.reddit, name=moderator_name)
-            ).data
-        )
+    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffModeratorOrReadonlyPermission,)
 
     def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """

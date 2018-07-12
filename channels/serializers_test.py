@@ -13,7 +13,8 @@ from channels.serializers import (
     CommentSerializer,
     PostSerializer,
     ContributorSerializer,
-    ModeratorSerializer,
+    ModeratorPublicSerializer,
+    ModeratorPrivateSerializer,
     ReportSerializer,
     ReportedContentSerializer,
     SubscriberSerializer,
@@ -231,7 +232,12 @@ def test_contributor():
     redditor = Mock(spec=Redditor)
     # the `name` attribute cannot be configured during the mock object creation
     redditor.name = 'fooo_username'
-    assert ContributorSerializer(redditor).data == {'contributor_name': 'fooo_username'}
+    user = UserFactory.create(username=redditor.name)
+    assert ContributorSerializer(redditor).data == {
+        'contributor_name': 'fooo_username',
+        'full_name': user.profile.name,
+        'email': user.email,
+    }
 
 
 def test_contributor_validate_name_no_string():
@@ -270,32 +276,39 @@ def test_contributor_create():
     api_mock.add_contributor.assert_called_once_with(contributor_user.username, 'foo_channel')
 
 
-def test_moderator():
+@pytest.mark.parametrize("is_public", [True, False])
+def test_moderator(is_public):
     """Serialize of a redditor-like object"""
+    serializer_cls = ModeratorPublicSerializer if is_public else ModeratorPrivateSerializer
     redditor = Mock(spec=Redditor)
     # the `name` attribute cannot be configured during the mock object creation
     redditor.name = 'fooo_username'
-    assert ModeratorSerializer(redditor).data == {'moderator_name': 'fooo_username'}
+    user = UserFactory.create(username=redditor.name)
+    assert serializer_cls(redditor).data == {'moderator_name': 'fooo_username'} if is_public else {
+        'moderator_name': 'fooo_username',
+        'full_name': user.profile.name,
+        'email': user.email,
+    }
 
 
 def test_moderator_validate_name_no_string():
     """validate the input in case the value is not a string"""
     with pytest.raises(ValidationError) as ex:
-        ModeratorSerializer().validate_moderator_name(None)
+        ModeratorPrivateSerializer().validate_moderator_name(None)
     assert ex.value.args[0] == 'moderator name must be a string'
 
 
 def test_moderator_validate_name_no_valid_user():
     """validate the input in case the user does not exists in the DB"""
     with pytest.raises(ValidationError) as ex:
-        ModeratorSerializer().validate_moderator_name('foo_user')
+        ModeratorPrivateSerializer().validate_moderator_name('foo_user')
     assert ex.value.args[0] == 'moderator name is not a valid user'
 
 
 def test_moderator_validate_name():
     """validate the input"""
     user = UserFactory.create()
-    assert ModeratorSerializer().validate_moderator_name(user.username) == {'moderator_name': user.username}
+    assert ModeratorPrivateSerializer().validate_moderator_name(user.username) == {'moderator_name': user.username}
 
 
 def test_moderator_create():
@@ -306,7 +319,7 @@ def test_moderator_create():
     moderator_redditor.name = moderator_user.username
 
     api_mock = Mock(add_moderator=Mock(return_value=moderator_redditor))
-    contributor = ModeratorSerializer(context={
+    contributor = ModeratorPrivateSerializer(context={
         "channel_api": api_mock,
         "request": Mock(user=user),
         "view": Mock(kwargs={'channel_name': 'foo_channel'})

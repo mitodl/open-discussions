@@ -12,7 +12,7 @@ pytestmark = pytest.mark.betamax
 
 def test_list_moderators(client, private_channel_and_contributor, staff_user):
     """
-    List moderators in a channel
+    List moderators in a channel as a logged in contributor
     """
     channel, user = private_channel_and_contributor
     url = reverse('moderator-list', kwargs={'channel_name': channel.name})
@@ -20,6 +20,50 @@ def test_list_moderators(client, private_channel_and_contributor, staff_user):
     resp = client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [{'moderator_name': staff_user.username}]
+
+
+def test_list_moderators_staff(  # pylint: disable=too-many-arguments
+        client, private_channel, staff_user, staff_api, reddit_factories, staff_jwt_header
+):
+    """
+    List moderators in a channel as a staff user
+    """
+    mod_user = reddit_factories.user("user2")
+    staff_api.add_moderator(mod_user.username, private_channel.name)
+    staff_api.remove_moderator(staff_user.username, private_channel.name)
+    url = reverse('moderator-list', kwargs={'channel_name': private_channel.name})
+    client.force_login(staff_user)
+    resp = client.get(url, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [{
+        'moderator_name': mod_user.username,
+        'full_name': mod_user.profile.name,
+        'email': mod_user.email,
+    }]
+
+
+def test_list_moderators_moderator(client, private_channel, staff_user, staff_api, reddit_factories):
+    """
+    List moderators in a channel as a logged in moderator of that channel
+    """
+    url = reverse('moderator-list', kwargs={'channel_name': private_channel.name})
+    mod_user = reddit_factories.user("user2")
+    staff_api.add_moderator(mod_user.username, private_channel.name)
+    client.force_login(mod_user)
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [
+        {
+            'moderator_name': staff_user.username,
+            'full_name': staff_user.profile.name,
+            'email': staff_user.email,
+        },
+        {
+            'moderator_name': mod_user.username,
+            'full_name': mod_user.profile.name,
+            'email': mod_user.email,
+        }
+    ]
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
@@ -43,7 +87,11 @@ def test_add_moderator(client, staff_jwt_header):
     url = reverse('moderator-list', kwargs={'channel_name': 'admin_channel'})
     resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {'moderator_name': moderator.username}
+    assert resp.json() == {
+        'moderator_name': moderator.username,
+        'email': moderator.email,
+        'full_name': moderator.profile.name,
+    }
 
 
 def test_add_moderator_again(client, staff_jwt_header):
@@ -54,7 +102,11 @@ def test_add_moderator_again(client, staff_jwt_header):
     url = reverse('moderator-list', kwargs={'channel_name': 'a_channel'})
     resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {'moderator_name': moderator.username}
+    assert resp.json() == {
+        'moderator_name': moderator.username,
+        'email': moderator.email,
+        'full_name': moderator.profile.name,
+    }
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])

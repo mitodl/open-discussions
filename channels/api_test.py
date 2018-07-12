@@ -701,23 +701,25 @@ def test_list_moderator(mock_client):
     assert mock_client.subreddit.return_value.moderator.return_value == moderators
 
 
-def test_list_moderator_filter(mock_client):
-    """Test list moderator"""
-    client = api.Api(UserFactory.create())
-    moderators = client.list_moderators('channel_test_name', moderator_name='username')
-    mock_client.subreddit.return_value.moderator.assert_called_once_with(redditor='username')
-    assert mock_client.subreddit.return_value.moderator.return_value == moderators
-
-
 @pytest.mark.parametrize('is_moderator', [True, False])
 def test_is_moderator(mock_client, is_moderator):
-    """Test list moderator"""
+    """is_moderator should pass a username to reddit to filter on"""
     client = api.Api(UserFactory.create())
     # the actual return value here will be different against a reddit backend
     # but truthiness of the return iterable is all that matters
     mock_client.subreddit.return_value.moderator.return_value = ['username'] if is_moderator else []
     assert client.is_moderator('channel_test_name', 'username') is is_moderator
     mock_client.subreddit.return_value.moderator.assert_called_once_with(redditor='username')
+
+
+def test_is_moderator_missing_username(mock_client):  # pylint: disable=unused-argument
+    """is_moderator should raise an exception if the username is missing"""
+    client = api.Api(UserFactory.create())
+    # the actual return value here will be different against a reddit backend
+    # but truthiness of the return iterable is all that matters
+    with pytest.raises(ValueError) as ex:
+        client.is_moderator('channel_test_name', '')
+    assert ex.value.args[0] == 'Missing moderator_name'
 
 
 @pytest.mark.parametrize('verify_ssl', [True, False])
