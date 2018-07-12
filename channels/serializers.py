@@ -637,14 +637,6 @@ class ContributorSerializer(serializers.Serializer):
         """Validates the contributor email"""
         return _validate_email(value)
 
-    def validate_email(self, value):
-        """Validates the contributor email"""
-        if not isinstance(value, str):
-            raise ValidationError("email must be a string")
-        if not User.objects.filter(email__iexact=value).exists():
-            raise ValidationError("email does not exist")
-        return {'email': value}
-
     def create(self, validated_data):
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
@@ -698,14 +690,6 @@ class ModeratorPrivateSerializer(serializers.Serializer):
     def validate_email(self, value):
         """Validates the moderator email"""
         return _validate_email(value)
-
-    def validate_email(self, value):
-        """Validates the moderator email"""
-        if not isinstance(value, str):
-            raise ValidationError("email must be a string")
-        if not User.objects.filter(email__iexact=value).exists():
-            raise ValidationError("email does not exist")
-        return {'email': value}
 
     def create(self, validated_data):
         api = self.context['channel_api']

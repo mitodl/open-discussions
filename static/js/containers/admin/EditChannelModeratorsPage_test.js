@@ -1,7 +1,12 @@
 // @flow
 import { assert } from "chai"
+import sinon from "sinon"
 
-import { makeChannel, makeModerators } from "../../factories/channels"
+import {
+  makeChannel,
+  makeModerator,
+  makeModerators
+} from "../../factories/channels"
 import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
 import { formatTitle } from "../../lib/title"
@@ -9,7 +14,7 @@ import { editChannelModeratorsURL } from "../../lib/url"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("EditChannelModeratorsPage", () => {
-  let helper, renderComponent, channel, moderators
+  let helper, renderComponent, listenForActions, channel, moderators
 
   beforeEach(() => {
     channel = makeChannel()
@@ -30,9 +35,9 @@ describe("EditChannelModeratorsPage", () => {
         posts:      []
       })
     )
-    helper.updateChannelStub.returns(Promise.resolve(channel))
     helper.getProfileStub.returns(Promise.resolve(""))
     renderComponent = helper.renderComponent.bind(helper)
+    listenForActions = helper.listenForActions.bind(helper)
     window.scrollTo = helper.sandbox.stub()
   })
 
@@ -52,7 +57,8 @@ describe("EditChannelModeratorsPage", () => {
         actions.channelModerators.get.successType,
         actions.profiles.get.requestType,
         actions.profiles.get.successType,
-        SET_CHANNEL_DATA
+        SET_CHANNEL_DATA,
+        actions.forms.FORM_BEGIN_EDIT
       ]
     )
     return wrapper.update()
@@ -71,5 +77,120 @@ describe("EditChannelModeratorsPage", () => {
       props.usernameGetter(moderators[0]),
       moderators[0].moderator_name
     )
+    assert.deepEqual(props.channel, channel)
+  })
+
+  describe("editable", () => {
+    beforeEach(() => {
+      channel.membership_is_managed = false
+    })
+
+    it("tries to add a new moderator but fails validation", async () => {
+      const wrapper = await renderPage()
+      await listenForActions([actions.forms.FORM_VALIDATE], () => {
+        wrapper
+          .find("button[type='submit']")
+          .props()
+          .onClick({})
+      })
+
+      assert.equal(
+        helper.store.getState().forms["channel:edit:moderators"].errors.email,
+        "Email must not be blank"
+      )
+    })
+
+    it("tries to add a new moderator but the API request fails", async () => {
+      const wrapper = await renderPage()
+      const email = "new@email.com"
+
+      helper.addChannelModeratorStub.returns(Promise.reject())
+
+      wrapper
+        .find("input[name='email']")
+        .props()
+        .onChange({
+          target:         { value: email },
+          preventDefault: helper.sandbox.stub()
+        })
+      await listenForActions(
+        [
+          actions.channelModerators.post.requestType,
+          actions.channelModerators.post.failureType,
+          actions.forms.FORM_VALIDATE
+        ],
+        () => {
+          wrapper
+            .find("button[type='submit']")
+            .props()
+            .onClick({ preventDefault: helper.sandbox.stub() })
+        }
+      )
+
+      assert.equal(
+        helper.store.getState().forms["channel:edit:moderators"].errors.email,
+        "Error adding new moderator"
+      )
+    })
+
+    it("adds a new moderator", async () => {
+      const wrapper = await renderPage()
+      const email = "new@email.com"
+
+      const newModerator = makeModerator()
+      helper.addChannelModeratorStub.returns(Promise.resolve(newModerator))
+
+      wrapper
+        .find("input[name='email']")
+        .props()
+        .onChange({
+          target:         { value: email },
+          preventDefault: helper.sandbox.stub()
+        })
+      await listenForActions(
+        [
+          actions.channelModerators.post.requestType,
+          actions.channelModerators.post.successType
+        ],
+        () => {
+          wrapper
+            .find("button[type='submit']")
+            .props()
+            .onClick({ preventDefault: helper.sandbox.stub() })
+        }
+      )
+
+      sinon.assert.calledWith(
+        helper.addChannelModeratorStub,
+        channel.name,
+        email
+      )
+    })
+
+    it("removes a moderator", async () => {
+      const wrapper = await renderPage()
+
+      helper.deleteChannelModeratorStub.returns(Promise.resolve())
+
+      await listenForActions(
+        [
+          actions.channelModerators.delete.requestType,
+          actions.channelModerators.delete.successType
+        ],
+        () => {
+          wrapper
+            .find(".remove")
+            .first()
+            .props()
+            .onClick({ preventDefault: helper.sandbox.stub() })
+        }
+      )
+
+      sinon.assert.calledWith(
+        helper.deleteChannelModeratorStub,
+        channel.name,
+        moderators[0].moderator_name
+      )
+    })
   })
 })

@@ -683,7 +683,7 @@ describe("api", function() {
 
         assert.deepEqual(
           contributor,
-          await addChannelContributor(channelName, contributor.contributor_name)
+          await addChannelContributor(channelName, contributor.email)
         )
 
         assert.ok(
@@ -694,7 +694,7 @@ describe("api", function() {
         assert.deepEqual(fetchJSONStub.args[0][1], {
           method: POST,
           body:   JSON.stringify({
-            contributor_name: contributor.contributor_name
+            email: contributor.email
           })
         })
       })
@@ -711,13 +711,13 @@ describe("api", function() {
         )
 
         assert.ok(
-          fetchJSONStub.calledWith(
+          fetchStub.calledWith(
             `/api/v0/channels/${channelName}/contributors/${
               contributor.contributor_name
             }/`
           )
         )
-        assert.deepEqual(fetchJSONStub.args[0][1], {
+        assert.deepEqual(fetchStub.args[0][1], {
           method: DELETE
         })
       })
@@ -747,7 +747,7 @@ describe("api", function() {
 
         assert.deepEqual(
           moderator,
-          await addChannelModerator(channelName, moderator.moderator_name)
+          await addChannelModerator(channelName, moderator.email)
         )
 
         assert.ok(
@@ -758,7 +758,7 @@ describe("api", function() {
         assert.deepEqual(fetchJSONStub.args[0][1], {
           method: POST,
           body:   JSON.stringify({
-            moderator_name: moderator.moderator_name
+            email: moderator.email
           })
         })
       })
@@ -772,13 +772,13 @@ describe("api", function() {
         await deleteChannelModerator(channelName, moderator.moderator_name)
 
         assert.ok(
-          fetchJSONStub.calledWith(
+          fetchStub.calledWith(
             `/api/v0/channels/${channelName}/moderators/${
               moderator.moderator_name
             }/`
           )
         )
-        assert.deepEqual(fetchJSONStub.args[0][1], {
+        assert.deepEqual(fetchStub.args[0][1], {
           method: DELETE
         })
       })

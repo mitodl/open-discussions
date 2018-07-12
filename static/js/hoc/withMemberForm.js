@@ -7,17 +7,29 @@ import EditChannelMembersForm from "../components/admin/EditChannelMembersForm"
 import EditChannelNavbar from "../components/admin/EditChannelNavbar"
 import MembersNavbar from "../components/admin/MembersNavbar"
 
-import type { Channel, Member } from "../flow/discussionTypes"
+import { validateMembersForm } from "../lib/validation"
+
+import type { AddMemberForm, Channel, Member } from "../flow/discussionTypes"
+import type { FormValue } from "../flow/formTypes"
 
 const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
 
 const withMemberForm = (WrappedComponent: *) => {
   type Props = {
     channel: Channel,
+    form: FormValue<AddMemberForm>,
     loadChannel: () => Promise<*>,
     loadMembers: () => Promise<*>,
     members: Array<Member>,
-    usernameGetter: (member: Member) => string
+    usernameGetter: (member: Member) => string,
+    addMember: (channel: Channel, email: string) => Promise<*>,
+    removeMember: (channel: Channel, email: string) => Promise<*>,
+    noun: string,
+    processing: boolean,
+    beginFormEdit: () => void,
+    endFormEdit: () => void,
+    formValidate: Function,
+    updateEmail: (email: string) => void
   }
 
   class withMemberForm extends React.Component<Props> {
@@ -31,8 +43,19 @@ const withMemberForm = (WrappedComponent: *) => {
       }
     }
 
+    componentWillUnmount() {
+      const { endFormEdit } = this.props
+      endFormEdit()
+    }
+
     loadData = async () => {
-      const { channel, loadChannel, loadMembers, members } = this.props
+      const {
+        channel,
+        loadChannel,
+        loadMembers,
+        members,
+        beginFormEdit
+      } = this.props
       if (!channel) {
         await loadChannel()
       }
@@ -40,12 +63,53 @@ const withMemberForm = (WrappedComponent: *) => {
       if (!members) {
         await loadMembers()
       }
+
+      beginFormEdit()
+    }
+
+    addMember = async () => {
+      const {
+        addMember,
+        form,
+        channel,
+        noun,
+        formValidate,
+        beginFormEdit
+      } = this.props
+
+      const validation = validateMembersForm(form)
+
+      if (!form || !channel || !R.isEmpty(validation)) {
+        formValidate({ errors: validation.value })
+      } else {
+        try {
+          await addMember(channel, form.value.email)
+          beginFormEdit()
+        } catch (e) {
+          formValidate({ errors: { email: `Error adding new ${noun}` } })
+        }
+      }
+    }
+
+    removeMember = async (username: string) => {
+      const { channel, removeMember } = this.props
+
+      await removeMember(channel, username)
     }
 
     renderBody = () => {
-      const { channel, members, usernameGetter } = this.props
+      const {
+        channel,
+        form,
+        members,
+        noun,
+        processing,
+        updateEmail,
+        beginFormEdit,
+        usernameGetter
+      } = this.props
 
-      if (!channel || !members) {
+      if (!channel || !members || !form) {
         return null
       }
 
@@ -55,8 +119,17 @@ const withMemberForm = (WrappedComponent: *) => {
           <Card>
             <MembersNavbar channel={channel} />
             <EditChannelMembersForm
+              channel={channel}
               members={members}
               usernameGetter={usernameGetter}
+              form={form.value}
+              validation={form.errors}
+              processing={processing}
+              updateEmail={updateEmail}
+              addMember={this.addMember}
+              removeMember={this.removeMember}
+              beginFormEdit={beginFormEdit}
+              noun={noun}
             />
           </Card>
         </React.Fragment>

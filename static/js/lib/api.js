@@ -70,13 +70,13 @@ export function getChannelModerators(
 
 export function addChannelModerator(
   channelName: string,
-  username: string
+  email: string
 ): Promise<Moderator> {
   return fetchJSONWithAuthFailure(
     `/api/v0/channels/${channelName}/moderators/`,
     {
       method: POST,
-      body:   JSON.stringify({ moderator_name: username })
+      body:   JSON.stringify({ email })
     }
   )
 }
@@ -85,7 +85,7 @@ export function deleteChannelModerator(
   channelName: string,
   username: string
 ): Promise<void> {
-  return fetchJSONWithAuthFailure(
+  return fetchWithAuthFailure(
     `/api/v0/channels/${channelName}/moderators/${username}/`,
     { method: DELETE }
   )
@@ -101,13 +101,13 @@ export function getChannelContributors(
 
 export function addChannelContributor(
   channelName: string,
-  username: string
+  email: string
 ): Promise<Contributor> {
   return fetchJSONWithAuthFailure(
     `/api/v0/channels/${channelName}/contributors/`,
     {
       method: POST,
-      body:   JSON.stringify({ contributor_name: username })
+      body:   JSON.stringify({ email })
     }
   )
 }
@@ -116,7 +116,7 @@ export function deleteChannelContributor(
   channelName: string,
   username: string
 ): Promise<void> {
-  return fetchJSONWithAuthFailure(
+  return fetchWithAuthFailure(
     `/api/v0/channels/${channelName}/contributors/${username}/`,
     { method: DELETE }
   )

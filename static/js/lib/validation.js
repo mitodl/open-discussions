@@ -105,6 +105,14 @@ export const validateChannelBasicEditForm = validate([
   )
 ])
 
+export const validateMembersForm = validate([
+  validation(
+    R.isEmpty,
+    R.lensPath(["value", "email"]),
+    "Email must not be blank"
+  )
+])
+
 export const validateContentReportForm = validate([
   validation(
     R.compose(

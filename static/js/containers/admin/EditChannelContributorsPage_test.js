@@ -1,7 +1,12 @@
 // @flow
 import { assert } from "chai"
+import sinon from "sinon"
 
-import { makeChannel, makeContributors } from "../../factories/channels"
+import {
+  makeChannel,
+  makeContributor,
+  makeContributors
+} from "../../factories/channels"
 import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
 import { formatTitle } from "../../lib/title"
@@ -9,7 +14,7 @@ import { editChannelContributorsURL } from "../../lib/url"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("EditChannelContributorsPage", () => {
-  let helper, renderComponent, channel, contributors
+  let helper, renderComponent, listenForActions, channel, contributors
 
   beforeEach(() => {
     channel = makeChannel()
@@ -30,9 +35,9 @@ describe("EditChannelContributorsPage", () => {
         posts:      []
       })
     )
-    helper.updateChannelStub.returns(Promise.resolve(channel))
     helper.getProfileStub.returns(Promise.resolve(""))
     renderComponent = helper.renderComponent.bind(helper)
+    listenForActions = helper.listenForActions.bind(helper)
     window.scrollTo = helper.sandbox.stub()
   })
 
@@ -52,7 +57,8 @@ describe("EditChannelContributorsPage", () => {
         actions.channelContributors.get.successType,
         actions.profiles.get.requestType,
         actions.profiles.get.successType,
-        SET_CHANNEL_DATA
+        SET_CHANNEL_DATA,
+        actions.forms.FORM_BEGIN_EDIT
       ]
     )
     return wrapper.update()
@@ -71,5 +77,120 @@ describe("EditChannelContributorsPage", () => {
       props.usernameGetter(contributors[0]),
       contributors[0].contributor_name
     )
+    assert.deepEqual(props.channel, channel)
+  })
+
+  describe("editable", () => {
+    beforeEach(() => {
+      channel.membership_is_managed = false
+    })
+
+    it("tries to add a new contributor but fails validation", async () => {
+      const wrapper = await renderPage()
+      await listenForActions([actions.forms.FORM_VALIDATE], () => {
+        wrapper
+          .find("button[type='submit']")
+          .props()
+          .onClick({})
+      })
+
+      assert.equal(
+        helper.store.getState().forms["channel:edit:contributors"].errors.email,
+        "Email must not be blank"
+      )
+    })
+
+    it("tries to add a new contributor but the API request fails", async () => {
+      const wrapper = await renderPage()
+      const email = "new@email.com"
+
+      helper.addChannelContributorStub.returns(Promise.reject())
+
+      wrapper
+        .find("input[name='email']")
+        .props()
+        .onChange({
+          target:         { value: email },
+          preventDefault: helper.sandbox.stub()
+        })
+      await listenForActions(
+        [
+          actions.channelContributors.post.requestType,
+          actions.channelContributors.post.failureType,
+          actions.forms.FORM_VALIDATE
+        ],
+        () => {
+          wrapper
+            .find("button[type='submit']")
+            .props()
+            .onClick({ preventDefault: helper.sandbox.stub() })
+        }
+      )
+
+      assert.equal(
+        helper.store.getState().forms["channel:edit:contributors"].errors.email,
+        "Error adding new contributor"
+      )
+    })
+
+    it("adds a new contributor", async () => {
+      const wrapper = await renderPage()
+      const email = "new@email.com"
+
+      const newContributor = makeContributor()
+      helper.addChannelContributorStub.returns(Promise.resolve(newContributor))
+
+      wrapper
+        .find("input[name='email']")
+        .props()
+        .onChange({
+          target:         { value: email },
+          preventDefault: helper.sandbox.stub()
+        })
+      await listenForActions(
+        [
+          actions.channelContributors.post.requestType,
+          actions.channelContributors.post.successType
+        ],
+        () => {
+          wrapper
+            .find("button[type='submit']")
+            .props()
+            .onClick({ preventDefault: helper.sandbox.stub() })
+        }
+      )
+
+      sinon.assert.calledWith(
+        helper.addChannelContributorStub,
+        channel.name,
+        email
+      )
+    })
+
+    it("removes a contributor", async () => {
+      const wrapper = await renderPage()
+
+      helper.deleteChannelContributorStub.returns(Promise.resolve())
+
+      await listenForActions(
+        [
+          actions.channelContributors.delete.requestType,
+          actions.channelContributors.delete.successType
+        ],
+        () => {
+          wrapper
+            .find(".remove")
+            .first()
+            .props()
+            .onClick({ preventDefault: helper.sandbox.stub() })
+        }
+      )
+
+      sinon.assert.calledWith(
+        helper.deleteChannelContributorStub,
+        channel.name,
+        contributors[0].contributor_name
+      )
+    })
   })
 })
