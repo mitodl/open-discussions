@@ -12,7 +12,7 @@ pytestmark = pytest.mark.betamax
 
 def test_list_moderators(client, private_channel_and_contributor, staff_user):
     """
-    List moderators in a channel as a logged in user
+    List moderators in a channel as a logged in contributor
     """
     channel, user = private_channel_and_contributor
     url = reverse('moderator-list', kwargs={'channel_name': channel.name})
@@ -26,7 +26,7 @@ def test_list_moderators_staff(  # pylint: disable=too-many-arguments
         client, private_channel, staff_user, staff_api, reddit_factories, staff_jwt_header
 ):
     """
-    List moderators in a channel
+    List moderators in a channel as a staff user
     """
     mod_user = reddit_factories.user("user2")
     staff_api.add_moderator(mod_user.username, private_channel.name)
@@ -44,7 +44,7 @@ def test_list_moderators_staff(  # pylint: disable=too-many-arguments
 
 def test_list_moderators_moderator(client, private_channel, staff_user, staff_api, reddit_factories):
     """
-    List moderators in a channel
+    List moderators in a channel as a logged in moderator of that channel
     """
     url = reverse('moderator-list', kwargs={'channel_name': private_channel.name})
     mod_user = reddit_factories.user("user2")
