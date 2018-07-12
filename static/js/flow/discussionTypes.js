@@ -144,11 +144,22 @@ export type ReplaceMoreCommentsPayload = {
   postId: string,
 }
 
+// The optional fields here are shown only to other moderators
 export type Moderator = {
   moderator_name: string,
+  email?: string,
+  full_name?: string,
 }
 
 export type ChannelModerators = Array<Moderator>
+
+export type Contributor = {
+  contributor_name: string,
+  email: string,
+  full_name: string,
+}
+
+export type ChannelContributors = Array<Contributor>
 
 export type Report = {
   reason: string,

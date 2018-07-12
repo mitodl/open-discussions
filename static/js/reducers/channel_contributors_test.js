@@ -4,19 +4,19 @@ import { INITIAL_STATE } from "redux-hammock/constants"
 
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { makeModerators } from "../factories/channels"
+import { makeContributors } from "../factories/channels"
 
-describe("channelModerators reducers", () => {
-  let helper, store, dispatchThen, moderators
+describe("channelContributors reducers", () => {
+  let helper, store, dispatchThen, contributors
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     store = helper.store
-    moderators = makeModerators("username")
+    contributors = makeContributors("username")
     dispatchThen = helper.store.createDispatchThen(
-      state => state.channelModerators
+      state => state.channelContributors
     )
-    helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
+    helper.getChannelContributorsStub.returns(Promise.resolve(contributors))
   })
 
   afterEach(() => {
@@ -24,26 +24,26 @@ describe("channelModerators reducers", () => {
   })
 
   it("should have some initial state", () => {
-    assert.deepEqual(store.getState().channelModerators, {
+    assert.deepEqual(store.getState().channelContributors, {
       ...INITIAL_STATE,
       data: new Map()
     })
   })
 
   it("should handle a response with data", () => {
-    const { requestType, successType } = actions.channelModerators.get
-    return dispatchThen(actions.channelModerators.get("channelname"), [
+    const { requestType, successType } = actions.channelContributors.get
+    return dispatchThen(actions.channelContributors.get("channelname"), [
       requestType,
       successType
     ]).then(({ data }) => {
-      assert.deepEqual(moderators, data.get("channelname"))
+      assert.deepEqual(contributors, data.get("channelname"))
     })
   })
 
   it("should handle an empty response ok", () => {
-    const { requestType, successType } = actions.channelModerators.get
-    helper.getChannelModeratorsStub.returns(Promise.resolve([]))
-    return dispatchThen(actions.channelModerators.get("channelname"), [
+    const { requestType, successType } = actions.channelContributors.get
+    helper.getChannelContributorsStub.returns(Promise.resolve([]))
+    return dispatchThen(actions.channelContributors.get("channelname"), [
       requestType,
       successType
     ]).then(({ data }) => {

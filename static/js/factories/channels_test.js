@@ -1,9 +1,9 @@
 // @flow
 import { assert } from "chai"
 
-import { makeChannel, makeModerators } from "./channels"
+import { makeChannel, makeModerators, makeContributors } from "./channels"
 
-describe("channels factory", () => {
+describe("channels related factories", () => {
   it("should make a channel", () => {
     const channel = makeChannel()
     assert.isString(channel.name)
@@ -13,18 +13,41 @@ describe("channels factory", () => {
     assert.isString(channel.public_description)
     assert.isNumber(channel.num_users)
   })
-
-  it("should make an empty moderators list", () => {
-    const moderators = makeModerators()
-    assert.deepEqual(moderators, [])
+  ;[true, false].forEach(specifyUsername => {
+    [true, false].forEach(isModerator => {
+      it(`should make a moderators list as a ${
+        isModerator ? "moderator" : "regular user"
+      } ${specifyUsername ? "with a special username" : ""}`, () => {
+        const moderators = makeModerators(
+          specifyUsername ? "username" : null,
+          isModerator
+        )
+        if (specifyUsername) {
+          assert.equal(moderators[0].moderator_name, "username")
+        }
+        assert.deepEqual(moderators.length, 3)
+        for (const moderator of moderators) {
+          assert.ok(moderator.moderator_name)
+          assert.equal(!!moderator.full_name, isModerator)
+          assert.equal(!!moderator.email, isModerator)
+        }
+      })
+    })
   })
-
-  it("should make a moderators list with username", () => {
-    const moderators = makeModerators("username")
-    assert.deepEqual(moderators, [
-      {
-        moderator_name: "username"
+  ;[true, false].forEach(specifyUsername => {
+    it(`should make a contributors list as a ${
+      specifyUsername ? "with a special username" : ""
+    }`, () => {
+      const contributors = makeContributors(specifyUsername ? "username" : null)
+      if (specifyUsername) {
+        assert.equal(contributors[0].contributor_name, "username")
       }
-    ])
+      assert.deepEqual(contributors.length, 3)
+      for (const contributor of contributors) {
+        assert.ok(contributor.contributor_name)
+        assert.ok(contributor.full_name)
+        assert.ok(contributor.email)
+      }
+    })
   })
 })
