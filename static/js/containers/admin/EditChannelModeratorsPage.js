@@ -78,7 +78,7 @@ class EditChannelModeratorsPage extends React.Component<*, void> {
   }
 
   render() {
-    const { channel, channelForm, processing, history } = this.props
+    const { channel, channelForm, processing } = this.props
 
     if (!channelForm) {
       return null
