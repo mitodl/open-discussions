@@ -4,13 +4,12 @@ import { assert } from "chai"
 import { makeChannel, makeContributors } from "../../factories/channels"
 import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
-import { FORM_BEGIN_EDIT, FORM_END_EDIT } from "../../actions/forms"
 import { formatTitle } from "../../lib/title"
 import { editChannelContributorsURL } from "../../lib/url"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("EditChannelContributorsPage", () => {
-  let helper, renderComponent, channel, contributors, listenForActions
+  let helper, renderComponent, channel, contributors
 
   beforeEach(() => {
     channel = makeChannel()
@@ -34,7 +33,6 @@ describe("EditChannelContributorsPage", () => {
     helper.updateChannelStub.returns(Promise.resolve(channel))
     helper.getProfileStub.returns(Promise.resolve(""))
     renderComponent = helper.renderComponent.bind(helper)
-    listenForActions = helper.listenForActions.bind(helper)
     window.scrollTo = helper.sandbox.stub()
   })
 
@@ -54,8 +52,7 @@ describe("EditChannelContributorsPage", () => {
         actions.channelContributors.get.successType,
         actions.profiles.get.requestType,
         actions.profiles.get.successType,
-        SET_CHANNEL_DATA,
-        FORM_BEGIN_EDIT
+        SET_CHANNEL_DATA
       ]
     )
     return wrapper.update()
@@ -64,15 +61,5 @@ describe("EditChannelContributorsPage", () => {
   it("should set the document title", async () => {
     await renderPage()
     assert.equal(document.title, formatTitle("Edit Channel"))
-  })
-
-  it("ends the form after hitting the back button", async () => {
-    await renderPage()
-    await listenForActions(
-      [FORM_END_EDIT, actions.frontpage.get.requestType],
-      () => {
-        helper.browserHistory.goBack()
-      }
-    )
   })
 })
