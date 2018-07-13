@@ -25,7 +25,10 @@ const addModerator = (
   data: Map<string, ChannelModerators>
 ): Map<string, ChannelModerators> => {
   const update = new Map(data)
-  const moderators = update.get(channelName) || []
+  let moderators = update.get(channelName) || []
+  moderators = moderators.filter(
+    _moderator => _moderator.moderator_name !== moderator.moderator_name
+  )
   update.set(channelName, moderators.concat([moderator]))
   return update
 }

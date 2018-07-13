@@ -71,6 +71,35 @@ describe("channelModerators reducers", () => {
     assert.deepEqual(data.get(channelName), [...moderators, newModerator])
   })
 
+  it("should filter out duplicates when adding a new moderator", async () => {
+    const channelName = "a_channel"
+    await dispatchThen(actions.channelModerators.get(channelName), [
+      actions.channelModerators.get.requestType,
+      actions.channelModerators.get.successType
+    ])
+
+    const existingModerator = moderators[0]
+    helper.addChannelModeratorStub.returns(Promise.resolve(existingModerator))
+
+    const { data } = await dispatchThen(
+      actions.channelModerators.post(
+        channelName,
+        existingModerator.moderator_name
+      ),
+      [
+        actions.channelModerators.post.requestType,
+        actions.channelModerators.post.successType
+      ]
+    )
+    assert.deepEqual(data.get(channelName), [
+      ...moderators.filter(
+        _moderator =>
+          _moderator.moderator_name !== existingModerator.moderator_name
+      ),
+      existingModerator
+    ])
+  })
+
   it("should remove a moderator from the list", async () => {
     const channelName = "a_channel"
     await dispatchThen(actions.channelModerators.get(channelName), [

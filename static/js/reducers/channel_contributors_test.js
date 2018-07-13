@@ -74,6 +74,37 @@ describe("channelContributors reducers", () => {
     assert.deepEqual(data.get(channelName), [...contributors, newContributor])
   })
 
+  it("should filter out duplicates when adding a new contributor", async () => {
+    const channelName = "a_channel"
+    await dispatchThen(actions.channelContributors.get(channelName), [
+      actions.channelContributors.get.requestType,
+      actions.channelContributors.get.successType
+    ])
+
+    const existingContributor = contributors[0]
+    helper.addChannelContributorStub.returns(
+      Promise.resolve(existingContributor)
+    )
+
+    const { data } = await dispatchThen(
+      actions.channelContributors.post(
+        channelName,
+        existingContributor.contributor_name
+      ),
+      [
+        actions.channelContributors.post.requestType,
+        actions.channelContributors.post.successType
+      ]
+    )
+    assert.deepEqual(data.get(channelName), [
+      ...contributors.filter(
+        _contributor =>
+          _contributor.contributor_name !== existingContributor.contributor_name
+      ),
+      existingContributor
+    ])
+  })
+
   it("should remove a contributor from the list", async () => {
     const channelName = "a_channel"
     await dispatchThen(actions.channelContributors.get(channelName), [

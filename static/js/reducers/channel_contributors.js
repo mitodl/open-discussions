@@ -25,7 +25,11 @@ const addContributor = (
   data: Map<string, ChannelContributors>
 ): Map<string, ChannelContributors> => {
   const update = new Map(data)
-  const contributors = update.get(channelName) || []
+  let contributors = update.get(channelName) || []
+  contributors = contributors.filter(
+    _contributor =>
+      _contributor.contributor_name !== contributor.contributor_name
+  )
   update.set(channelName, contributors.concat([contributor]))
   return update
 }
