@@ -20,6 +20,8 @@ import type {
   Channel,
   ChannelContributors,
   ChannelModerators,
+  Contributor,
+  Moderator,
   GenericComment,
   CreatePostPayload,
   PostListPaginationParams,
@@ -65,11 +67,57 @@ export function getChannelModerators(
   return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/moderators/`)
 }
 
+export function addChannelModerator(
+  channelName: string,
+  username: string
+): Promise<Moderator> {
+  return fetchJSONWithAuthFailure(
+    `/api/v0/channels/${channelName}/moderators/`,
+    {
+      method: POST,
+      body:   JSON.stringify({ moderator_name: username })
+    }
+  )
+}
+
+export function deleteChannelModerator(
+  channelName: string,
+  username: string
+): Promise<void> {
+  return fetchJSONWithAuthFailure(
+    `/api/v0/channels/${channelName}/moderators/${username}/`,
+    { method: DELETE }
+  )
+}
+
 export function getChannelContributors(
   channelName: string
 ): Promise<ChannelContributors> {
   return fetchJSONWithAuthFailure(
     `/api/v0/channels/${channelName}/contributors/`
+  )
+}
+
+export function addChannelContributor(
+  channelName: string,
+  username: string
+): Promise<Contributor> {
+  return fetchJSONWithAuthFailure(
+    `/api/v0/channels/${channelName}/contributors/`,
+    {
+      method: POST,
+      body:   JSON.stringify({ contributor_name: username })
+    }
+  )
+}
+
+export function deleteChannelContributor(
+  channelName: string,
+  username: string
+): Promise<void> {
+  return fetchJSONWithAuthFailure(
+    `/api/v0/channels/${channelName}/contributors/${username}/`,
+    { method: DELETE }
   )
 }
 
