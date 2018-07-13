@@ -7,43 +7,40 @@ import MembersNavbar from "./MembersNavbar"
 
 import { profileURL } from "../../lib/url"
 
-import type { ChannelContributorsForm } from "../../flow/discussionTypes"
+import type { ChannelContributors } from "../../flow/discussionTypes"
 
 export default class EditChannelContributorsForm extends React.Component<
   *,
   void
 > {
   props: {
-    form: ChannelContributorsForm
+    channelName: string,
+    contributors: ChannelContributors
   }
 
   render() {
-    const { form } = this.props
+    const { channelName, contributors } = this.props
     return (
-      <form className="form contributors-form">
-        <Card>
-          <MembersNavbar channelName={form.channel.name} />
-          <div className="contributors">
-            {form.contributors.map((contributor, index) => (
-              <div key={index} className="row">
-                {contributor.full_name ? (
-                  <Link
-                    className="name"
-                    to={profileURL(contributor.contributor_name)}
-                  >
-                    {contributor.full_name}
-                  </Link>
-                ) : (
-                  <span className="name">{"<missing>"}</span>
-                )}
-                <span className="email">
-                  {contributor.email || "<missing>"}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </form>
+      <Card>
+        <MembersNavbar channelName={channelName} />
+        <div className="contributors">
+          {contributors.map((contributor, index) => (
+            <div key={index} className="row">
+              {contributor.full_name ? (
+                <Link
+                  className="name"
+                  to={profileURL(contributor.contributor_name)}
+                >
+                  {contributor.full_name}
+                </Link>
+              ) : (
+                <span className="name">{"<missing>"}</span>
+              )}
+              <span className="email">{contributor.email || "<missing>"}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
     )
   }
 }

@@ -14,16 +14,10 @@ import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
 
 import type { Dispatch } from "redux"
-import type { FormValue } from "../../flow/formTypes"
-import type {
-  Channel,
-  ChannelModerators,
-  ChannelModeratorsForm
-} from "../../flow/discussionTypes"
+import type { Channel, ChannelModerators } from "../../flow/discussionTypes"
 
 const EDIT_CHANNEL_KEY = "channel:edit:moderators"
 const EDIT_CHANNEL_PAYLOAD = { formKey: EDIT_CHANNEL_KEY }
-const getForm = R.prop(EDIT_CHANNEL_KEY)
 
 const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
 
@@ -32,10 +26,8 @@ class EditChannelModeratorsPage extends React.Component<*, void> {
     dispatch: Dispatch<*>,
     history: Object,
     channel: Channel,
-    channelForm: FormValue<ChannelModeratorsForm>,
     channelName: string,
-    moderators: ChannelModerators,
-    processing: boolean
+    moderators: ChannelModerators
   }
 
   componentDidMount() {
@@ -78,9 +70,9 @@ class EditChannelModeratorsPage extends React.Component<*, void> {
   }
 
   render() {
-    const { channel, channelForm, processing } = this.props
+    const { channel, moderators } = this.props
 
-    if (!channelForm) {
+    if (!channel || !moderators) {
       return null
     }
 
@@ -91,9 +83,8 @@ class EditChannelModeratorsPage extends React.Component<*, void> {
         </MetaTags>
         <EditChannelNavbar channelName={channel.name} />
         <EditChannelModeratorsForm
-          form={channelForm.value}
-          validation={channelForm.errors}
-          processing={processing}
+          moderators={moderators}
+          channelName={channel.name}
         />
       </React.Fragment>
     )
@@ -110,8 +101,7 @@ const mapStateToProps = (state, ownProps) => {
     channel,
     moderators,
     channelName,
-    processing,
-    channelForm: getForm(state.forms)
+    processing
   }
 }
 

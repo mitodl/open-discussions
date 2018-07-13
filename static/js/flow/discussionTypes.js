@@ -28,16 +28,6 @@ export type ChannelForm = {
   link_type:          LinkType
 }
 
-export type ChannelModeratorsForm = {
-  moderators: ChannelModerators,
-  channel: Channel,
-}
-
-export type ChannelContributorsForm = {
-  contributors: ChannelContributors,
-  channel: Channel,
-}
-
 export type ChannelAppearanceEditValidation = {
   title:              string,
   description:        string,

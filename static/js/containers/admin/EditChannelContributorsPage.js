@@ -14,16 +14,10 @@ import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
 
 import type { Dispatch } from "redux"
-import type { FormValue } from "../../flow/formTypes"
-import type {
-  Channel,
-  ChannelContributors,
-  ChannelContributorsForm
-} from "../../flow/discussionTypes"
+import type { Channel, ChannelContributors } from "../../flow/discussionTypes"
 
 const EDIT_CHANNEL_KEY = "channel:edit:contributors"
 const EDIT_CHANNEL_PAYLOAD = { formKey: EDIT_CHANNEL_KEY }
-const getForm = R.prop(EDIT_CHANNEL_KEY)
 
 const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
 
@@ -32,10 +26,8 @@ class EditChannelContributorsPage extends React.Component<*, void> {
     dispatch: Dispatch<*>,
     history: Object,
     channel: Channel,
-    channelForm: FormValue<ChannelContributorsForm>,
     channelName: string,
-    contributors: ChannelContributors,
-    processing: boolean
+    contributors: ChannelContributors
   }
 
   componentDidMount() {
@@ -78,9 +70,9 @@ class EditChannelContributorsPage extends React.Component<*, void> {
   }
 
   render() {
-    const { channel, channelForm, processing } = this.props
+    const { channel, contributors } = this.props
 
-    if (!channelForm) {
+    if (!channel || !contributors) {
       return null
     }
 
@@ -91,9 +83,8 @@ class EditChannelContributorsPage extends React.Component<*, void> {
         </MetaTags>
         <EditChannelNavbar channelName={channel.name} />
         <EditChannelContributorsForm
-          form={channelForm.value}
-          validation={channelForm.errors}
-          processing={processing}
+          channelName={channel.name}
+          contributors={contributors}
         />
       </React.Fragment>
     )
@@ -110,8 +101,7 @@ const mapStateToProps = (state, ownProps) => {
     channel,
     contributors,
     channelName,
-    processing,
-    channelForm: getForm(state.forms)
+    processing
   }
 }
 
