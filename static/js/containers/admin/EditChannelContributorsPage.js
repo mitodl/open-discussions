@@ -9,15 +9,11 @@ import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
 import withSingleColumn from "../../hoc/withSingleColumn"
 
 import { actions } from "../../actions"
-import { newContributorsForm } from "../../lib/channels"
 import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
 
 import type { Dispatch } from "redux"
 import type { Channel, ChannelContributors } from "../../flow/discussionTypes"
-
-const EDIT_CHANNEL_KEY = "channel:edit:contributors"
-const EDIT_CHANNEL_PAYLOAD = { formKey: EDIT_CHANNEL_KEY }
 
 const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
 
@@ -40,11 +36,6 @@ class EditChannelContributorsPage extends React.Component<*, void> {
     }
   }
 
-  componentWillUnmount() {
-    const { dispatch } = this.props
-    dispatch(actions.forms.formEndEdit(EDIT_CHANNEL_PAYLOAD))
-  }
-
   loadData = async () => {
     const { dispatch, channel, channelName, contributors } = this.props
     if (!channel) {
@@ -54,19 +45,6 @@ class EditChannelContributorsPage extends React.Component<*, void> {
     if (!contributors) {
       await dispatch(actions.channelContributors.get(channelName))
     }
-
-    this.beginFormEdit()
-  }
-
-  beginFormEdit = () => {
-    const { dispatch, channel, contributors } = this.props
-    dispatch(
-      actions.forms.formBeginEdit(
-        R.merge(EDIT_CHANNEL_PAYLOAD, {
-          value: newContributorsForm(channel, contributors)
-        })
-      )
-    )
   }
 
   render() {
