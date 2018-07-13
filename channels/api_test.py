@@ -271,13 +271,14 @@ def test_update_channel_invalid_membership(mock_client):
     assert mock_client.subreddit.call_count == 0
 
 
-def test_create_post_text(mock_client, indexing_decorator):
+@pytest.mark.parametrize('text', ['Text', ''])
+def test_create_post_text(mock_client, indexing_decorator, text):
     """Test create_post with text"""
     client = api.Api(UserFactory.create())
-    post = client.create_post('channel', 'Title', text='Text')
+    post = client.create_post('channel', 'Title', text=text)
     assert post == mock_client.subreddit.return_value.submit.return_value
     mock_client.subreddit.assert_called_once_with('channel')
-    mock_client.subreddit.return_value.submit.assert_called_once_with('Title', selftext='Text', url=None)
+    mock_client.subreddit.return_value.submit.assert_called_once_with('Title', selftext=text, url=None)
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 2
     assert search_task_helpers.index_new_post in indexing_decorator.mock_persist_func.original
@@ -300,7 +301,7 @@ def test_create_post_url(mock_client, indexing_decorator):
 
 
 def test_create_post_url_and_text(mock_client):
-    """Test create_post with url and text raises error"""
+    """Test create_post with url and text (or neither) raises error"""
     client = api.Api(UserFactory.create())
     with pytest.raises(ValueError):
         client.create_post('channel', 'Title', url='http://google.com', text='Text')
