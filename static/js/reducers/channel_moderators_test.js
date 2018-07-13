@@ -4,19 +4,22 @@ import { INITIAL_STATE } from "redux-hammock/constants"
 
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { makeModerators } from "../factories/channels"
+import { makeModerator, makeModerators } from "../factories/channels"
 
 describe("channelModerators reducers", () => {
-  let helper, store, dispatchThen, moderators
+  let helper, store, dispatchThen, moderators, newModerator
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     store = helper.store
     moderators = makeModerators("username")
+    newModerator = makeModerator()
     dispatchThen = helper.store.createDispatchThen(
       state => state.channelModerators
     )
     helper.getChannelModeratorsStub.returns(Promise.resolve(moderators))
+    helper.addChannelModeratorStub.returns(Promise.resolve(newModerator))
+    helper.deleteChannelModeratorStub.returns(Promise.resolve())
   })
 
   afterEach(() => {
@@ -49,5 +52,49 @@ describe("channelModerators reducers", () => {
     ]).then(({ data }) => {
       assert.deepEqual([], data.get("channelname"))
     })
+  })
+
+  it("should add a new moderator to the list", async () => {
+    const channelName = "a_channel"
+    await dispatchThen(actions.channelModerators.get(channelName), [
+      actions.channelModerators.get.requestType,
+      actions.channelModerators.get.successType
+    ])
+
+    const { data } = await dispatchThen(
+      actions.channelModerators.post(channelName, newModerator.moderator_name),
+      [
+        actions.channelModerators.post.requestType,
+        actions.channelModerators.post.successType
+      ]
+    )
+    assert.deepEqual(data.get(channelName), [...moderators, newModerator])
+  })
+
+  it("should remove a moderator from the list", async () => {
+    const channelName = "a_channel"
+    await dispatchThen(actions.channelModerators.get(channelName), [
+      actions.channelModerators.get.requestType,
+      actions.channelModerators.get.successType
+    ])
+
+    const existingModerator = moderators[0]
+    const { data } = await dispatchThen(
+      actions.channelModerators.delete(
+        channelName,
+        existingModerator.moderator_name
+      ),
+      [
+        actions.channelModerators.delete.requestType,
+        actions.channelModerators.delete.successType
+      ]
+    )
+    assert.deepEqual(
+      data.get(channelName),
+      moderators.filter(
+        moderator =>
+          moderator.moderator_name !== existingModerator.moderator_name
+      )
+    )
   })
 })

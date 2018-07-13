@@ -39,9 +39,22 @@ import {
   postConfirmRegister,
   postDetailsRegister,
   postPasswordResetEmail,
-  postPasswordResetNewPassword
+  postPasswordResetNewPassword,
+  addChannelContributor,
+  addChannelModerator,
+  deleteChannelContributor,
+  deleteChannelModerator,
+  getChannelContributors,
+  getChannelModerators
 } from "./api"
-import { makeChannel, makeChannelList } from "../factories/channels"
+import {
+  makeChannel,
+  makeChannelList,
+  makeContributors,
+  makeModerators,
+  makeContributor,
+  makeModerator
+} from "../factories/channels"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import {
   makeCommentsResponse,
@@ -634,6 +647,134 @@ describe("api", function() {
             })
           })
         )
+      })
+    })
+
+    describe("contributors", () => {
+      it("gets a list of contributors", async () => {
+        const channelName = "channel_name"
+        const contributors = makeContributors()
+
+        fetchJSONStub.returns(Promise.resolve(contributors))
+
+        assert.deepEqual(
+          contributors,
+          await getChannelContributors(channelName)
+        )
+
+        assert.ok(
+          fetchJSONStub.calledWith(
+            `/api/v0/channels/${channelName}/contributors/`
+          )
+        )
+      })
+
+      it("adds a contributor", async () => {
+        const channelName = "channel_name"
+        const contributor = makeContributor()
+
+        fetchJSONStub.returns(Promise.resolve(contributor))
+
+        assert.deepEqual(
+          contributor,
+          await addChannelContributor(channelName, contributor.contributor_name)
+        )
+
+        assert.ok(
+          fetchJSONStub.calledWith(
+            `/api/v0/channels/${channelName}/contributors/`
+          )
+        )
+        assert.deepEqual(fetchJSONStub.args[0][1], {
+          method: POST,
+          body:   JSON.stringify({
+            contributor_name: contributor.contributor_name
+          })
+        })
+      })
+
+      it("removes a contributor", async () => {
+        const channelName = "channel_name"
+        const contributor = makeContributor()
+
+        fetchJSONStub.returns(Promise.resolve(contributor))
+
+        await deleteChannelContributor(
+          channelName,
+          contributor.contributor_name
+        )
+
+        assert.ok(
+          fetchJSONStub.calledWith(
+            `/api/v0/channels/${channelName}/contributors/${
+              contributor.contributor_name
+            }/`
+          )
+        )
+        assert.deepEqual(fetchJSONStub.args[0][1], {
+          method: DELETE
+        })
+      })
+    })
+
+    describe("moderators", () => {
+      it("gets a list of moderator", async () => {
+        const channelName = "channel_name"
+        const moderators = makeModerators()
+
+        fetchJSONStub.returns(Promise.resolve(moderators))
+
+        assert.deepEqual(moderators, await getChannelModerators(channelName))
+
+        assert.ok(
+          fetchJSONStub.calledWith(
+            `/api/v0/channels/${channelName}/moderators/`
+          )
+        )
+      })
+
+      it("adds a moderator", async () => {
+        const channelName = "channel_name"
+        const moderator = makeModerator()
+
+        fetchJSONStub.returns(Promise.resolve(moderator))
+
+        assert.deepEqual(
+          moderator,
+          await addChannelModerator(channelName, moderator.moderator_name)
+        )
+
+        assert.ok(
+          fetchJSONStub.calledWith(
+            `/api/v0/channels/${channelName}/moderators/`
+          )
+        )
+        assert.deepEqual(fetchJSONStub.args[0][1], {
+          method: POST,
+          body:   JSON.stringify({
+            moderator_name: moderator.moderator_name
+          })
+        })
+      })
+
+      it("removes a moderator", async () => {
+        const channelName = "channel_name"
+        const moderator = makeModerator()
+
+        fetchJSONStub.returns(Promise.resolve(moderator))
+
+        await deleteChannelModerator(channelName, moderator.moderator_name)
+
+        assert.ok(
+          fetchJSONStub.calledWith(
+            `/api/v0/channels/${channelName}/moderators/${
+              moderator.moderator_name
+            }/`
+          )
+        )
+        assert.deepEqual(fetchJSONStub.args[0][1], {
+          method: DELETE
+        })
       })
     })
   })
