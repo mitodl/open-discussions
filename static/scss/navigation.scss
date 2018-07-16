@@ -73,6 +73,33 @@ a.mitlogo {
   }
 }
 
+.tab-row {
+  display: flex;
+  flex-direction: row;
+
+  .tab {
+    padding: 10px 29px 17px;
+    color: #585858;
+    text-transform: uppercase;
+    font-weight: 400;
+    font-size: 14px;
+
+    @include breakpoint(phone) {
+      padding: 10px 15px 17px;
+    }
+  }
+
+  & > div {
+    cursor: pointer;
+  }
+
+  .active {
+    border-bottom: 4px solid #0085df;
+    font-weight: 500;
+    color: #000;
+  }
+}
+
 .subscriptions {
   margin: 15px 0 20px;
   width: 100%;

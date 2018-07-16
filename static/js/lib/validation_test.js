@@ -14,6 +14,7 @@ import {
   validateEmailForm,
   validatePasswordForm,
   validatePasswordResetForm,
+  validatePasswordChangeForm,
   PASSWORD_LENGTH_MINIMUM
 } from "./validation"
 
@@ -280,7 +281,7 @@ describe("validation library", () => {
       }
       assert.deepEqual(validatePasswordResetForm(form), {
         value: {
-          new_password: "Password is required"
+          new_password: "New password is required"
         }
       })
     })
@@ -301,6 +302,29 @@ describe("validation library", () => {
       assert.deepEqual(validatePasswordResetForm(form), {
         value: {
           re_new_password: "Passwords must match"
+        }
+      })
+    })
+  })
+
+  describe("validatePasswordChangeForm", () => {
+    it("should complain about no password", () => {
+      const form = {
+        value: { current_password: "", new_password: "" }
+      }
+      assert.deepEqual(validatePasswordChangeForm(form), {
+        value: {
+          current_password: "Current password is required",
+          new_password:     "New password is required"
+        }
+      })
+    })
+
+    it("should complain about password length", () => {
+      const form = { value: { current_password: "a", new_password: "a" } }
+      assert.deepEqual(validatePasswordChangeForm(form), {
+        value: {
+          new_password: `Password must be at least ${PASSWORD_LENGTH_MINIMUM} characters`
         }
       })
     })

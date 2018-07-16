@@ -11,10 +11,12 @@ import { channelModeratorsEndpoint } from "../reducers/channel_moderators"
 import { postRemovedEndpoint } from "../reducers/post_removed"
 import { reportsEndpoint } from "../reducers/reports"
 import { settingsEndpoint } from "../reducers/settings"
+import { accountSettingsEndpoint } from "../reducers/account_settings"
 import { embedlyEndpoint } from "../reducers/embedly"
 import { profilesEndpoint } from "../reducers/profiles"
 import { authEndpoint } from "../reducers/auth"
 import { passwordResetEndpoint } from "../reducers/password_reset"
+import { passwordChangeEndpoint } from "../reducers/password_change"
 
 import type { Dispatch } from "redux"
 
@@ -32,10 +34,12 @@ export const endpoints = [
   postRemovedEndpoint,
   reportsEndpoint,
   settingsEndpoint,
+  accountSettingsEndpoint,
   embedlyEndpoint,
   profilesEndpoint,
   authEndpoint,
-  passwordResetEndpoint
+  passwordResetEndpoint,
+  passwordChangeEndpoint
 ]
 
 /**

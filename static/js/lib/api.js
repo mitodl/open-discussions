@@ -30,11 +30,12 @@ import type {
   MoreCommentsFromAPI,
   GenericReport,
   ReportRecord,
-  ProfilePayload
+  Profile,
+  ProfilePayload,
+  SocialAuth
 } from "../flow/discussionTypes"
 import type { NotificationSetting } from "../flow/settingsTypes"
 import type { EmbedlyResponse } from "../reducers/embedly"
-import type { Profile } from "../flow/discussionTypes"
 
 const paramsToQueryString = paramSelector =>
   R.compose(
@@ -424,5 +425,21 @@ export const postPasswordResetNewPassword = (
       re_new_password: reNewPassword,
       token,
       uid
+    })
+  })
+
+export function getSocialAuthTypes(): Promise<Array<SocialAuth>> {
+  return fetchJSONWithAuthFailure("/api/v0/auths/")
+}
+
+export const postSetPassword = (
+  currentPassword: string,
+  newPassword: string
+): Promise<*> =>
+  fetchJSONWithCSRF("/api/v0/set_password/", {
+    method: POST,
+    body:   JSON.stringify({
+      current_password: currentPassword,
+      new_password:     newPassword
     })
   })
