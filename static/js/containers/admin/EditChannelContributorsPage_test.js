@@ -62,4 +62,11 @@ describe("EditChannelContributorsPage", () => {
     await renderPage()
     assert.equal(document.title, formatTitle("Edit Channel"))
   })
+
+  it("renders the form", async () => {
+    const wrapper = await renderPage()
+    const props = wrapper.find("EditChannelContributorsForm").props()
+    assert.deepEqual(props.contributors, contributors)
+    assert.equal(props.channelName, channel.name)
+  })
 })
