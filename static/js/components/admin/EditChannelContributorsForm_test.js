@@ -3,6 +3,8 @@ import { assert } from "chai"
 import { shallow } from "enzyme"
 
 import EditChannelContributorsForm from "./EditChannelContributorsForm"
+
+import { MISSING_TEXT } from "../../lib/channels"
 import { profileURL } from "../../lib/url"
 import { makeChannel, makeContributors } from "../../factories/channels"
 
@@ -44,8 +46,8 @@ describe("EditChannelContributorsForm", () => {
     const rows = wrapper.find(".contributors .row")
     contributors.forEach((contributor, i) => {
       const row = rows.at(i)
-      assert.equal(row.find(".name").text(), "<missing>")
-      assert.equal(row.find(".email").text(), "<missing>")
+      assert.equal(row.find(".name").text(), MISSING_TEXT)
+      assert.equal(row.find(".email").text(), MISSING_TEXT)
     })
   })
 })

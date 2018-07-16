@@ -5,6 +5,7 @@ import { Link } from "react-router-dom"
 import Card from "../Card"
 import MembersNavbar from "./MembersNavbar"
 
+import { MISSING_TEXT } from "../../lib/channels"
 import { profileURL } from "../../lib/url"
 
 import type { ChannelModerators } from "../../flow/discussionTypes"
@@ -34,9 +35,9 @@ export default class EditChannelModeratorsForm extends React.Component<
                   {moderator.full_name}
                 </Link>
               ) : (
-                <span className="name">{"<missing>"}</span>
+                <span className="name">{MISSING_TEXT}</span>
               )}
-              <span className="email">{moderator.email || "<missing>"}</span>
+              <span className="email">{moderator.email || MISSING_TEXT}</span>
             </div>
           ))}
         </div>
