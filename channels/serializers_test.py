@@ -159,15 +159,6 @@ def test_post_both_text_and_url():
     assert ex.value.args[0] == 'Only one of text or url can be used to create a post'
 
 
-def test_post_neither_text_nor_url():
-    """One of text or url must be specified"""
-    with pytest.raises(ValidationError) as ex:
-        PostSerializer().create({
-            "title": "title",
-        })
-    assert ex.value.args[0] == 'One of text or url must be provided to create a post'
-
-
 def test_post_edit_url():
     """Cannot update the URL for a post"""
     with pytest.raises(ValidationError) as ex:

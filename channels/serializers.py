@@ -283,14 +283,12 @@ class PostSerializer(BasePostSerializer):
         if text and url:
             raise ValidationError('Only one of text or url can be used to create a post')
 
-        if not text and not url:
-            raise ValidationError('One of text or url must be provided to create a post')
-
         kwargs = {}
-        if text:
-            kwargs['text'] = text
-        else:
+        if url:
             kwargs['url'] = url
+        else:
+            # Reddit API requires that either url or text not be `None`.
+            kwargs['text'] = text or ''
 
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']

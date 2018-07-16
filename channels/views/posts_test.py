@@ -15,6 +15,8 @@ from channels.models import Subscription
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
+# pylint: disable=too-many-lines
+
 pytestmark = pytest.mark.betamax
 
 
@@ -88,6 +90,20 @@ def test_create_text_post(client, private_channel_and_contributor):
         "stickied": False,
         'num_reports': None,
     }
+
+
+def test_create_text_post_blank(client, private_channel_and_contributor):
+    """
+    Create a new text post with no text
+    """
+    channel, user = private_channel_and_contributor
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    client.force_login(user)
+    resp = client.post(url, {
+        'title': 'blank post'
+    })
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json()['text'] == ''
 
 
 def test_create_post_forbidden(client, private_channel, jwt_header):
