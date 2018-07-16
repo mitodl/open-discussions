@@ -8,8 +8,10 @@ import Checkbox from "rmwc/Checkbox"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import Card from "../components/Card"
+import SettingsTabs from "../components/SettingsTabs"
 
 import { formatTitle } from "../lib/title"
+import { getTokenFromUrl } from "../lib/util"
 import { actions } from "../actions"
 import {
   FRONTPAGE_FREQUENCY_CHOICES,
@@ -20,6 +22,7 @@ import {
   COMMENT_NOTIFICATION
 } from "../reducers/settings"
 import { setSnackbarMessage } from "../actions/ui"
+import { withRouter } from "react-router"
 
 export const SETTINGS_FORM_KEY = "SETTINGS_FORM_KEY"
 
@@ -108,8 +111,8 @@ class SettingsPage extends React.Component<*, *> {
           <title>{formatTitle("Settings")}</title>
         </MetaTags>
         <div className="main-content settings-page">
-          <div className="breadcrumbs">Email Settings</div>
-          <form onSubmit={this.onSubmit} className="form">
+          <SettingsTabs />
+          <form onSubmit={this.onSubmit}>
             <Card>
               <label htmlFor="frequency" className="label">
                 How often do you want to receive discussion digest emails?
@@ -151,12 +154,18 @@ class SettingsPage extends React.Component<*, *> {
   }
 }
 
-const mapStateToProps = (state, ownProps) => ({
-  settings: state.settings.data,
-  token:    ownProps.match.params.token || "",
-  form:     state.forms[SETTINGS_FORM_KEY],
-  saving:
-    state.settings.processing && state.settings.patchStatus === FETCH_PROCESSING
-})
+const mapStateToProps = (state, ownProps) => {
+  return {
+    settings: state.settings.data,
+    token:    getTokenFromUrl(ownProps),
+    form:     state.forms[SETTINGS_FORM_KEY],
+    saving:
+      state.settings.processing &&
+      state.settings.patchStatus === FETCH_PROCESSING
+  }
+}
 
-export default connect(mapStateToProps)(SettingsPage)
+export default R.compose(
+  connect(mapStateToProps),
+  withRouter
+)(SettingsPage)

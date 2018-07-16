@@ -2,6 +2,7 @@
 /* global SETTINGS:false */
 import R from "ramda"
 import _ from "lodash"
+import qs from "query-string"
 
 import type { Match } from "react-router"
 import type { Profile } from "../flow/discussionTypes"
@@ -105,3 +106,16 @@ export const isMobileWidth = () => getViewportWidth() < DRAWER_BREAKPOINT
 
 export const truncate = (text: ?string, length: number): string =>
   text ? _.truncate(text, { length: length, separator: " " }) : ""
+
+export const getTokenFromUrl = (props: Object): string => {
+  const urlMatchPath = ["match", "params", "token"],
+    querystringPath = ["location", "search"]
+
+  let token = R.view(R.lensPath(urlMatchPath))(props)
+  if (token) return token
+
+  const querystring = R.view(R.lensPath(querystringPath))(props)
+  const parsedQuerystring = qs.parse(querystring)
+  token = parsedQuerystring.token
+  return token || ""
+}

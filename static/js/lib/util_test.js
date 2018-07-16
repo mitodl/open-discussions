@@ -13,7 +13,8 @@ import {
   defaultProfileImageUrl,
   makeProfileImageUrl,
   notNil,
-  truncate
+  truncate,
+  getTokenFromUrl
 } from "./util"
 
 describe("utility functions", () => {
@@ -161,6 +162,29 @@ describe("utility functions", () => {
       ["abc", true]
     ].forEach(([val, exp]) => {
       assert.equal(notNil(val), exp)
+    })
+  })
+
+  it("getTokenFromUrl gets a token value from a url match or the querystring", () => {
+    [
+      ["url_token", undefined, "url_token"],
+      [undefined, "?token=querystring_token", "querystring_token"],
+      ["url_token", "?token=querystring_token", "url_token"],
+      [undefined, "?not_token=whatever", ""],
+      [undefined, undefined, ""]
+    ].forEach(([urlMatchTokenValue, querystringValue, exp]) => {
+      const props = {
+        match: {
+          params: {
+            token: urlMatchTokenValue
+          }
+        },
+        location: {
+          search: querystringValue
+        }
+      }
+      const token = getTokenFromUrl(props)
+      assert.equal(token, exp)
     })
   })
 })

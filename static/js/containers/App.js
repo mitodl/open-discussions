@@ -1,7 +1,7 @@
 /* global SETTINGS: false */
 // @flow
 import React from "react"
-import { Route, Redirect } from "react-router-dom"
+import { Route, Redirect, Switch } from "react-router-dom"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
@@ -14,6 +14,8 @@ import AuthRequiredPage from "./auth/AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
 import ChannelModerationPage from "./ChannelModerationPage"
 import SettingsPage from "./SettingsPage"
+import AccountSettingsPage from "./AccountSettingsPage"
+import PasswordChangePage from "./PasswordChangePage"
 import ProfilePage from "./ProfilePage"
 import ProfileEditPage from "./ProfileEditPage"
 import LoginPage from "./auth/LoginPage"
@@ -196,11 +198,28 @@ class App extends React.Component<*, void> {
             path={`${match.url}content_policy/`}
             component={ContentPolicyPage}
           />
-          <Route
-            exact
-            path={`${match.url}settings/:token?`}
-            component={SettingsPage}
-          />
+          <Switch>
+            <Route
+              exact
+              path={`${match.url}settings/notifications`}
+              component={SettingsPage}
+            />
+            <Route
+              exact
+              path={`${match.url}settings/account`}
+              component={AccountSettingsPage}
+            />
+            <Route
+              exact
+              path={`${match.url}settings/password`}
+              component={PasswordChangePage}
+            />
+            <Route
+              exact
+              path={`${match.url}settings/:token?`}
+              component={SettingsPage}
+            />
+          </Switch>
           <Route
             exact
             path={`${match.url}profile/:userName/edit`}

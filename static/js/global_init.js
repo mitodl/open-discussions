@@ -20,6 +20,7 @@ const _createSettings = () => ({
   allow_anonymous:    false,
   is_authenticated:   true,
   username:           "greatusername",
+  user_full_name:     "Great User",
   profile_ui_enabled: false,
   support_email:      "support@fake.url",
   reactGaDebug:       true,

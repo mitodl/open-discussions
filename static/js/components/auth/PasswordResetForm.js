@@ -25,7 +25,7 @@ export default class PasswordResetForm extends React.Component<*, void> {
     return (
       <form onSubmit={onSubmit} className="form">
         <div className="emailfield row">
-          <label>Email</label>
+          <label>We will send a reset email to:</label>
           <input
             type="email"
             name="email"
@@ -41,7 +41,7 @@ export default class PasswordResetForm extends React.Component<*, void> {
             className={`submit-password-reset ${processing ? "disabled" : ""}`}
             disabled={processing}
           >
-            Reset Password
+            Send Reset Email
           </button>
         </div>
       </form>

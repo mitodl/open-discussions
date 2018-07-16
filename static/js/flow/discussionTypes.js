@@ -219,3 +219,7 @@ export type ProfilePayload = {
   headline:                    ?string,
 }
 
+export type SocialAuth = {
+  provider: string,
+  email:    ?string
+}

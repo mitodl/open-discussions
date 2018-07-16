@@ -401,31 +401,84 @@ def test_login_complete(settings, client, user, jwt_token, use_jwt):
         assert COOKIE_KEY not in response.cookies
 
 
-@pytest.mark.parametrize('url', (
-    'password-reset-api',
-    'password-reset-confirm-api',
-))
-def test_password_reset_disabled_without_flag(settings, client, url):
-    """Verify that password reset views return a 404 if the EMAIL_AUTH is disabled"""
-    settings.FEATURES[features.EMAIL_AUTH] = False
-    response = client.post(reverse(url), {})
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+class DjoserViewTests:
+    """Tests for views that modify Djoser views"""
+    # pylint: disable=too-many-arguments
+    @pytest.mark.parametrize('url,parent_view_cls,logged_in', [
+        ['password-reset-api', False],
+        ['password-reset-confirm-api', False],
+        ['set-password-api', True],
+    ])
+    def test_password_reset_disabled_without_flag(
+            self,
+            settings,
+            client,
+            user,
+            url,
+            logged_in
+    ):
+        """Verify that password reset views return a 404 if the EMAIL_AUTH is disabled"""
+        settings.FEATURES[features.EMAIL_AUTH] = False
+        if logged_in:
+            client.force_login(user)
+        response = client.post(reverse(url), {})
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    # pylint: disable=too-many-arguments
+    @pytest.mark.parametrize('url', [
+        'password-reset-api',
+        'password-reset-confirm-api',
+        'set-password-api',
+    ])
+    def test_password_reset_coerce_204(
+            self,
+            settings,
+            mocker,
+            client,
+            user,
+            url
+    ):
+        """
+        Verify that password reset views coerce a 204 response to a 200 in order
+        to play nice with redux-hammock.
+        """
+        settings.FEATURES[features.EMAIL_AUTH] = True
+        mocker.patch(
+            'authentication.views.ActionViewMixin.post',
+            return_value=mocker.Mock(status_code=status.HTTP_400_BAD_REQUEST)
+        )
+        client.force_login(user)
+        response = client.post(reverse(url), {})
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {}
 
-@pytest.mark.parametrize('url,parent_view_cls', [
-    ['password-reset-api', 'DjoserPasswordResetView'],
-    ['password-reset-confirm-api', 'DjoserPasswordResetConfirmView'],
-])
-def test_password_reset_coerce_204(settings, mocker, client, url, parent_view_cls):
-    """
-    Verify that password reset views coerce a 204 response to a 200 in order
-    to play nice with redux-hammock.
-    """
-    settings.FEATURES[features.EMAIL_AUTH] = True
-    mocker.patch(
-        'authentication.views.{parent_view_cls}.post'.format(parent_view_cls=parent_view_cls),
-        return_value=mocker.Mock(status_code=status.HTTP_204_NO_CONTENT)
-    )
-    response = client.post(reverse(url), {})
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {}
+    @pytest.mark.parametrize('response_status,expected_session_update', [
+        [status.HTTP_200_OK, True],
+        [status.HTTP_204_NO_CONTENT, True],
+        [status.HTTP_400_BAD_REQUEST, False],
+    ])
+    def test_password_change_session_update(
+            self,
+            settings,
+            mocker,
+            response_status,
+            expected_session_update,
+            client,
+            user
+    ):
+        """
+        Tests that the password change view updates the Django session when the
+        request succeeds.
+        """
+        settings.FEATURES[features.EMAIL_AUTH] = True
+        mocker.patch(
+            'authentication.views.ActionViewMixin.post',
+            return_value=mocker.Mock(status_code=response_status)
+        )
+        update_session_patch = mocker.patch(
+            'authentication.views.update_session_auth_hash',
+            return_value=mocker.Mock()
+        )
+        client.force_login(user)
+        client.post(reverse('set-password-api'), {})
+        assert update_session_patch.called is expected_session_update

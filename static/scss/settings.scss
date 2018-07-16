@@ -1,4 +1,22 @@
+.app .settings-page form {
+  @include breakpoint(desktop) {
+    width: inherit;
+  }
+}
+
 .settings-page {
+  .card {
+    width: 500px;
+
+    @include breakpoint(mobile) {
+      width: 350px;
+    }
+  }
+
+  .tab-row {
+    margin: 0 0 20px 0;
+  }
+
   button {
     margin-left: 15px;
   }
@@ -21,5 +39,9 @@
     label {
       margin: 0;
     }
+  }
+
+  a.buttonLink {
+    display: inline-block;
   }
 }

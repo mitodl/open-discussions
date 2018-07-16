@@ -40,6 +40,7 @@ import {
   postDetailsRegister,
   postPasswordResetEmail,
   postPasswordResetNewPassword,
+  postSetPassword,
   addChannelContributor,
   addChannelModerator,
   deleteChannelContributor,
@@ -775,6 +776,23 @@ describe("api", function() {
         assert.deepEqual(fetchJSONStub.args[0][1], {
           method: DELETE
         })
+      })
+    })
+
+    describe("postSetPassword", () => {
+      it("should pass a current and new password", async () => {
+        const currentPassword = "abcdefgh"
+        const newPassword = "abcdefgh"
+        await postSetPassword(currentPassword, newPassword)
+        assert.ok(
+          fetchJSONStub.calledWith("/api/v0/set_password/", {
+            method: POST,
+            body:   JSON.stringify({
+              current_password: currentPassword,
+              new_password:     newPassword
+            })
+          })
+        )
       })
     })
   })

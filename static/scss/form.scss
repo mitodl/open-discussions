@@ -74,6 +74,10 @@ label {
   font-weight: 400;
   font-size: 15px;
   color: #777;
+
+  .highlight {
+    color: #000;
+  }
 }
 
 label.radiolabel {
@@ -86,17 +90,18 @@ label.radiolabel {
 
 input[type="submit"],
 button[type="submit"],
-button.cancel {
+button.cancel,
+a.buttonLink {
   background-color: $button-blue;
-  border: none;
   color: white;
-  text-decoration: none;
   margin: 0 10px 5px 0;
-  cursor: pointer;
+  padding: 9px 16px;
+  border: none;
   border-radius: 2px;
   font-weight: 400;
-  padding: 9px 16px;
   font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
 
   &:hover {
     box-shadow: 2px 3px 5px 0px rgba(0, 0, 0, 0.2);
@@ -105,7 +110,8 @@ button.cancel {
 }
 
 button.cancel,
-button.disabled {
+button.disabled,
+a.buttonLink.cancel {
   background: #cecece;
 }
 
@@ -141,4 +147,18 @@ textarea::placeholder {
 
 .actions {
   margin-top: 20px;
+}
+
+.account-settings-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  color: #777;
+  border-bottom: 1px solid #777;
+  padding: 0 0 8px 0;
+
+  a:link {
+    font-weight: bold;
+  }
 }

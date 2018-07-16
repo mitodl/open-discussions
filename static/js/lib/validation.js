@@ -186,12 +186,7 @@ export const validateRegisterDetailsForm = validate([
   )
 ])
 
-export const validatePasswordResetForm = validate([
-  validation(
-    (reNewPassword, form) => reNewPassword !== form.value.new_password,
-    R.lensPath(["value", "re_new_password"]),
-    "Passwords must match"
-  ),
+const newPasswordValidations = [
   validation(
     R.compose(
       R.gt(PASSWORD_LENGTH_MINIMUM),
@@ -203,6 +198,28 @@ export const validatePasswordResetForm = validate([
   validation(
     emptyOrNil,
     R.lensPath(["value", "new_password"]),
-    "Password is required"
+    "New password is required"
   )
-])
+]
+
+export const validatePasswordResetForm = validate(
+  R.prepend(
+    validation(
+      (reNewPassword, form) => reNewPassword !== form.value.new_password,
+      R.lensPath(["value", "re_new_password"]),
+      "Passwords must match"
+    ),
+    newPasswordValidations
+  )
+)
+
+export const validatePasswordChangeForm = validate(
+  R.append(
+    validation(
+      emptyOrNil,
+      R.lensPath(["value", "current_password"]),
+      "Current password is required"
+    ),
+    newPasswordValidations
+  )
+)

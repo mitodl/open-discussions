@@ -19,6 +19,11 @@ export type ResetConfirmForm = {
   re_new_password: string
 }
 
+export type PwChangeForm = {
+  current_password: string,
+  new_password: string
+}
+
 // API response types
 export type AuthStates =
   |"success"

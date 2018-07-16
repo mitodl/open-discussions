@@ -40,10 +40,10 @@ export const PasswordResetPage = ({
         </Card>
       ) : (
         <Card className="login-card">
-          <h3>Enter your email address</h3>
           <MetaTags>
             <title>{formatTitle("Password Reset")}</title>
           </MetaTags>
+          <h3>Forgot your password?</h3>
           {renderForm({ emailApiError })}
         </Card>
       )}

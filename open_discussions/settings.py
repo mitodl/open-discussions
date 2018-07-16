@@ -692,7 +692,8 @@ PASSWORD_RESET_CONFIRM_URL = 'password_reset/confirm/{uid}/{token}/'
 # Djoser library settings (see: http://djoser.readthedocs.io/en/stable/settings.html)
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': PASSWORD_RESET_CONFIRM_URL,
-    'SET_PASSWORD_RETYPE': True,
+    'SET_PASSWORD_RETYPE': False,
+    'LOGOUT_ON_PASSWORD_CHANGE': False,
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
     'EMAIL': {
