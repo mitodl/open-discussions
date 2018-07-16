@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
 
@@ -9,9 +10,11 @@ import {
   REGISTER_CONFIRM_URL,
   REGISTER_DETAILS_URL,
   INACTIVE_USER_URL,
-  FRONTPAGE_URL
+  FRONTPAGE_URL,
+  AUTH_REQUIRED_URL,
+  SETTINGS_URL,
+  channelURL
 } from "./url"
-
 import {
   FLOW_REGISTER,
   STATE_LOGIN_EMAIL,
@@ -23,7 +26,12 @@ import {
   STATE_SUCCESS,
   STATE_INACTIVE
 } from "../reducers/auth"
-import { processAuthResponse } from "./auth"
+
+import {
+  processAuthResponse,
+  isAnonAccessiblePath,
+  needsAuthedSite
+} from "./auth"
 
 const DEFAULT_ARGS = {
   partial_token: null,
@@ -31,7 +39,7 @@ const DEFAULT_ARGS = {
   errors:        []
 }
 
-describe("auth libs", () => {
+describe("auth lib", () => {
   let sandbox, history
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -63,6 +71,41 @@ describe("auth libs", () => {
     it(`redirects to ${FRONTPAGE_URL} if state === ${STATE_SUCCESS}`, () => {
       processAuthResponse(history, { state: STATE_SUCCESS, ...DEFAULT_ARGS })
       assert.equal(window.location.pathname, FRONTPAGE_URL)
+    })
+  })
+
+  describe("isAnonAccessiblePath", () => {
+    [
+      [AUTH_REQUIRED_URL, true],
+      [SETTINGS_URL, true],
+      [`${SETTINGS_URL}token123`, true],
+      [channelURL("channel1"), false],
+      ["other/url", false]
+    ].forEach(([pathname, exp]) => {
+      it(`returns ${String(exp)} when pathname=${pathname}`, () => {
+        assert.equal(isAnonAccessiblePath(pathname), exp)
+      })
+    })
+  })
+
+  describe("needsAuthedSite", () => {
+    [
+      [undefined, false, true],
+      ["", false, true],
+      ["some_url", false, false],
+      [undefined, true, false]
+    ].forEach(([sessionUrl, allowAnon, exp]) => {
+      it(`returns ${String(exp)} when session url=${String(
+        sessionUrl
+      )}, anon allowed=${String(allowAnon)}`, () => {
+        if (sessionUrl === undefined) {
+          delete SETTINGS.authenticated_site.session_url
+        } else {
+          SETTINGS.authenticated_site.session_url = sessionUrl
+        }
+        SETTINGS.allow_anonymous = allowAnon
+        assert.equal(needsAuthedSite(), exp)
+      })
     })
   })
 })

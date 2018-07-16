@@ -38,6 +38,7 @@ import {
 } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
 import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
+import { isAnonAccessiblePath, needsAuthedSite } from "../lib/auth"
 import { isMobileWidth } from "../lib/util"
 
 import type { Location, Match } from "react-router"
@@ -82,14 +83,7 @@ class App extends React.Component<*, void> {
     const {
       location: { pathname }
     } = this.props
-    if (pathname === AUTH_REQUIRED_URL || pathname.startsWith(SETTINGS_URL)) {
-      // user is at auth required page or settings page
-      return
-    }
-
-    if (!SETTINGS.authenticated_site.session_url && !SETTINGS.allow_anonymous) {
-      // user will be redirected to login required page due to missing session_url
-      // if anonymous access is not allowed
+    if (needsAuthedSite() || isAnonAccessiblePath(pathname)) {
       return
     }
 
@@ -137,13 +131,7 @@ class App extends React.Component<*, void> {
       profile
     } = this.props
 
-    if (
-      !SETTINGS.authenticated_site.session_url &&
-      pathname !== AUTH_REQUIRED_URL &&
-      !pathname.startsWith(SETTINGS_URL) &&
-      !SETTINGS.allow_anonymous
-    ) {
-      // user does not have the jwt cookie, they must go through login workflow first
+    if (needsAuthedSite() && !isAnonAccessiblePath(pathname)) {
       return <Redirect to={AUTH_REQUIRED_URL} />
     }
 

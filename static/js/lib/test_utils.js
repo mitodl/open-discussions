@@ -20,3 +20,7 @@ export const assertIsJust = (m: Maybe, val: any) => {
 export const assertIsJustNoVal = (m: Maybe) => {
   assert(m.isJust, "should be a Just")
 }
+
+export const shouldIf = (tf: boolean) => (tf ? "should" : "should not")
+
+export const shouldIfGt0 = (num: number) => shouldIf(num > 0)
