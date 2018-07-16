@@ -22,6 +22,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
     get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
     settings.FEATURES[features.EMAIL_AUTH] = False
+    settings.FEATURES[features.SAML_AUTH] = False
 
     client.force_login(user)
     response = client.get(reverse('open_discussions-index'))
@@ -51,6 +52,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
         },
         'is_authenticated': True,
         'allow_anonymous': 'access',
+        'allow_saml_auth': False,
         'allow_email_auth': False,
         'support_email': settings.EMAIL_SUPPORT,
     }
@@ -63,6 +65,7 @@ def test_webpack_url_jwt(
     settings.GA_TRACKING_ID = 'fake'
     get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
+    settings.FEATURES[features.SAML_AUTH] = False
     client.cookies[api_settings.JWT_AUTH_COOKIE] = jwt_token
 
     response = client.get(reverse('open_discussions-index'))
@@ -92,6 +95,7 @@ def test_webpack_url_jwt(
         },
         'is_authenticated': False,
         'allow_anonymous': 'access',
+        'allow_saml_auth': False,
         'allow_email_auth': False,
         'support_email': settings.EMAIL_SUPPORT,
     }
@@ -103,6 +107,7 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
     get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
     settings.FEATURES[features.EMAIL_AUTH] = False
+    settings.FEATURES[features.SAML_AUTH] = False
 
     response = client.get(reverse('open_discussions-index'))
 
@@ -131,6 +136,7 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
         },
         'is_authenticated': False,
         'allow_anonymous': 'access',
+        'allow_saml_auth': False,
         'allow_email_auth': False,
         'support_email': settings.EMAIL_SUPPORT,
     }

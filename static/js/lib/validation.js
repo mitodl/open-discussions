@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import React from "react"
 import R from "ramda"
 
@@ -146,7 +147,7 @@ export const validationMessage = (message: ?string) =>
 
 export const validateEmailForm = validate([
   validation(
-    R.complement(validNotMIT),
+    R.complement(SETTINGS.allow_saml_auth ? validNotMIT : R.always(true)),
     R.lensPath(["value", "email"]),
     "MIT users please login with Touchstone below"
   ),

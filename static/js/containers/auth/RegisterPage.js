@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
@@ -73,8 +74,12 @@ export const RegisterPage = ({
         ) : (
           renderForm({ formError })
         )}
-        <div className="textline">Or use</div>
-        <ExternalLogins />
+        {SETTINGS.allow_saml_auth ? (
+          <div>
+            <div className="textline">Or use</div>
+            <ExternalLogins />
+          </div>
+        ) : null}
       </Card>
     </div>
   </div>
