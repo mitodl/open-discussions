@@ -54,14 +54,7 @@ export const PostTitleAndHostname = ({ post }: { post: Post }) => (
 export const getPostDropdownMenuKey = (post: Post) => `POST_DROPDOWN_${post.id}`
 
 export const formatPostTitle = (post: Post) =>
-  post.text ? (
-    <Link
-      className="post-title"
-      to={postDetailURL(post.channel_name, post.id, post.slug)}
-    >
-      {post.title}
-    </Link>
-  ) : (
+  post.url ? (
     <div>
       <a
         className="post-title"
@@ -73,6 +66,13 @@ export const formatPostTitle = (post: Post) =>
       </a>
       <span className="url-hostname">{`(${urlHostname(post.url)})`}</span>
     </div>
+  ) : (
+    <Link
+      className="post-title"
+      to={postDetailURL(post.channel_name, post.id, post.slug)}
+    >
+      {post.title}
+    </Link>
   )
 
 type PostVotingProps = {

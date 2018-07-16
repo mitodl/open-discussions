@@ -7,7 +7,8 @@ import {
   isLinkTypeAllowed,
   userCanPost,
   LINK_TYPE_LINK,
-  LINK_TYPE_TEXT
+  LINK_TYPE_TEXT,
+  LINK_TYPE_ANY
 } from "../lib/channels"
 import { goBackAndHandleEvent } from "../lib/util"
 import { validationMessage } from "../lib/validation"
@@ -79,12 +80,21 @@ export default class CreatePostForm extends React.Component<Props> {
     )
   }
 
+  clearInputButton = () => {
+    const { updatePostType, channel } = this.props
+
+    return channel.link_type === LINK_TYPE_ANY ? (
+      <div className="close-button" onClick={() => updatePostType(null)}>
+        <i className="material-icons clear">clear</i>
+      </div>
+    ) : null
+  }
+
   postContentInputs = () => {
     const {
       postForm,
       onUpdate,
       validation,
-      updatePostType,
       embedlyInFlight,
       embedly
     } = this.props
@@ -97,9 +107,7 @@ export default class CreatePostForm extends React.Component<Props> {
     return postType === LINK_TYPE_TEXT ? (
       <div className="text row post-content">
         <textarea placeholder="" name="text" value={text} onChange={onUpdate} />
-        <div className="close-button" onClick={() => updatePostType(null)}>
-          <i className="material-icons clear">clear</i>
-        </div>
+        {this.clearInputButton()}
         {validationMessage(validation.text)}
       </div>
     ) : (
@@ -118,9 +126,7 @@ export default class CreatePostForm extends React.Component<Props> {
         {embedlyInFlight && !embedly ? (
           <EmbedlyLoader primaryColor="#c9bfbf" secondaryColor="#c9c8c8" />
         ) : null}
-        <div className="close-button" onClick={() => updatePostType(null)}>
-          <i className="material-icons clear">clear</i>
-        </div>
+        {this.clearInputButton()}
         {validationMessage(validation.url)}
       </div>
     )

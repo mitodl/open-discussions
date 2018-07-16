@@ -7,7 +7,7 @@ import sinon from "sinon"
 import CreatePostForm from "./CreatePostForm"
 import Embedly, { EmbedlyLoader } from "./Embedly"
 
-import { LINK_TYPE_LINK, LINK_TYPE_TEXT } from "../lib/channels"
+import { LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_ANY } from "../lib/channels"
 import * as channels from "../lib/channels"
 import { makeChannel } from "../factories/channels"
 import { makeArticle } from "../factories/embedly"
@@ -71,6 +71,24 @@ describe("CreatePostForm", () => {
       postForm
     })
     assert.equal(wrapper.find(".text .validation-message").text(), "HEY")
+  })
+
+  //
+  ;[
+    [LINK_TYPE_ANY, LINK_TYPE_LINK, true],
+    [LINK_TYPE_ANY, LINK_TYPE_TEXT, true],
+    [LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
+    [LINK_TYPE_LINK, LINK_TYPE_LINK, false]
+  ].forEach(([channelType, selectedType, showClosebutton]) => {
+    it(`${
+      showClosebutton ? "should" : "should not"
+    } show clear button when channel ${channelType} and form has ${selectedType}`, () => {
+      const postForm = { ...newPostForm(), postType: selectedType }
+      const channel = makeChannel()
+      channel.link_type = channelType
+      const wrapper = renderPostForm({ postForm, channel })
+      assert.equal(wrapper.find(".close-button").exists(), showClosebutton)
+    })
   })
 
   it("should show url validation message", () => {

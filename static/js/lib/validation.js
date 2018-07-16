@@ -4,8 +4,8 @@ import React from "react"
 import R from "ramda"
 
 import { S } from "./sanctuary"
+import { LINK_TYPE_LINK } from "../lib/channels"
 
-import { isTextTabSelected } from "../lib/channels"
 import type { PostForm } from "../flow/discussionTypes"
 
 export const PASSWORD_LENGTH_MINIMUM = 8
@@ -60,23 +60,7 @@ export const postUrlOrTextPresent = (postForm: { value: PostForm }) => {
   }
 
   const post = postForm.value
-  if (!postForm.value.postType) {
-    return S.Just(
-      R.set(
-        R.lensPath(["value", "post_type"]),
-        "You must either add text or a link to your post"
-      )
-    )
-  }
-  const isText = isTextTabSelected(postForm.value.postType, null)
-
-  if (isText && emptyOrNil(post.text)) {
-    return S.Just(
-      R.set(R.lensPath(["value", "text"]), "Post text cannot be empty")
-    )
-  }
-
-  if (!isText && emptyOrNil(post.url)) {
+  if (post.postType === LINK_TYPE_LINK && emptyOrNil(post.url)) {
     return S.Just(
       R.set(R.lensPath(["value", "url"]), "Post url cannot be empty")
     )

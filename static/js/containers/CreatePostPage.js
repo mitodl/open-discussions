@@ -44,21 +44,30 @@ type CreatePostPageProps = {
   embedlyInFlight: boolean
 }
 
-const CREATE_POST_KEY = "post:new"
+export const CREATE_POST_KEY = "post:new"
 const CREATE_POST_PAYLOAD = { formKey: CREATE_POST_KEY }
 const getForm = R.prop(CREATE_POST_KEY)
 
 class CreatePostPage extends React.Component<CreatePostPageProps> {
-  componentDidMount() {
+  async componentDidMount() {
     const { dispatch, channels } = this.props
     const channelName = getChannelName(this.props)
-    if (!channels.loaded && !channels.processing && channelName) {
-      dispatch(actions.channels.get(channelName))
+    const form = newPostForm()
+
+    const channel =
+      !channels.loaded && !channels.processing && channelName
+        ? await dispatch(actions.channels.get(channelName))
+        : this.props.channel
+
+    if (channel && channel.link_type !== LINK_TYPE_ANY) {
+      // $FlowFixMe
+      form.postType = channel.link_type
     }
+
     dispatch(
       actions.forms.formBeginEdit({
         ...CREATE_POST_PAYLOAD,
-        value: newPostForm()
+        value: form
       })
     )
     ensureTwitterEmbedJS()
@@ -67,24 +76,26 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
   componentDidUpdate(prevProps: CreatePostPageProps) {
     const { channel, dispatch, postForm } = this.props
 
-    // we may need to null out the postType under certain conditions
-    // basically, if the user switches channels, and the post type they
-    // already have selected is not allowed on the new channel, we want to null
-    // out the postType so that they will be presented with the options
-    // available on the new channel
+    // we may need to change out the postType under certain conditions
+    // if the user switches channels and the new channel isn't LINK_TYPE_ANY,
+    // and the current postType is null or a postType which is incompatible with the
+    // new channel, we want to set the postType to be the link_type for the channel
     if (
       postForm &&
       channel &&
-      prevProps.channel &&
-      prevProps.channel.name !== channel.name &&
-      postForm.value.postType !== null &&
+      ((prevProps.channel && prevProps.channel.name !== channel.name) ||
+        !prevProps.channel) &&
       channel.link_type !== LINK_TYPE_ANY &&
       channel.link_type !== postForm.value.postType
     ) {
       dispatch(
         actions.forms.formUpdate({
           ...CREATE_POST_PAYLOAD,
-          value: { postType: null, url: "", text: "" }
+          value: {
+            postType: channel.link_type,
+            url:      "",
+            text:     ""
+          }
         })
       )
     }

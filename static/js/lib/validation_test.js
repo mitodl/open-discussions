@@ -114,13 +114,9 @@ describe("validation library", () => {
       })
     })
 
-    it("should complain about no text on a text post", () => {
+    it("should not complain about no text on a text post", () => {
       const post = { value: { postType: LINK_TYPE_TEXT, title: "potato" } }
-      assert.deepEqual(validatePostCreateForm(post), {
-        value: {
-          text: "Post text cannot be empty"
-        }
-      })
+      assert.deepEqual(validatePostCreateForm(post), {})
     })
 
     it("should complain about no url on a url post", () => {
@@ -128,15 +124,6 @@ describe("validation library", () => {
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
           url: "Post url cannot be empty"
-        }
-      })
-    })
-
-    it("should complain about missing post type", () => {
-      const post = { value: { postType: null, title: "potato" } }
-      assert.deepEqual(validatePostCreateForm(post), {
-        value: {
-          post_type: "You must either add text or a link to your post"
         }
       })
     })

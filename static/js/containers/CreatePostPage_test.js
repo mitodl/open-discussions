@@ -2,7 +2,10 @@
 import { assert } from "chai"
 import sinon from "sinon"
 
-import { CreatePostPage as InnerCreatePostPage } from "../containers/CreatePostPage"
+import {
+  CreatePostPage as InnerCreatePostPage,
+  CREATE_POST_KEY
+} from "../containers/CreatePostPage"
 
 import { makeChannelList } from "../factories/channels"
 import { makeCommentsResponse } from "../factories/comments"
@@ -20,6 +23,7 @@ import { formatTitle } from "../lib/title"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import { wait } from "../lib/util"
 import * as embedUtil from "../lib/embed"
+import { newPostForm } from "../lib/posts"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
 
@@ -107,6 +111,22 @@ describe("CreatePostPage", () => {
   it("should set the document title", async () => {
     await renderPage()
     assert.equal(document.title, formatTitle("Submit a Post"))
+  })
+
+  //
+  ;[
+    [LINK_TYPE_ANY, false],
+    [LINK_TYPE_LINK, true],
+    [LINK_TYPE_TEXT, true]
+  ].forEach(([linkType, shouldSetPostType]) => {
+    it(`${
+      shouldSetPostType ? "should" : "shouldn't"
+    } set the post type when channel is ${linkType}`, async () => {
+      currentChannel.link_type = linkType
+      await renderPage()
+      const { postType } = helper.store.getState().forms[CREATE_POST_KEY].value
+      assert.equal(postType, shouldSetPostType ? linkType : null)
+    })
   })
 
   it("attempts to clear form and load channels on mount", async () => {
@@ -206,21 +226,9 @@ describe("CreatePostPage", () => {
       "Title is required"
     )
     setTitle(wrapper, "title")
+    setLinkPost(wrapper)
     submitPost(wrapper)
     assert.lengthOf(wrapper.find(".titlefield .validation-message"), 0)
-  })
-
-  it("should show validation errors when body of text post is empty", async () => {
-    const wrapper = await renderPage()
-    setTextPost(wrapper)
-    submitPost(wrapper)
-    assert.equal(
-      wrapper.find(".text .validation-message").text(),
-      "Post text cannot be empty"
-    )
-    setText(wrapper, "text")
-    submitPost(wrapper)
-    assert.lengthOf(wrapper.find(".text .validation-message"), 0)
   })
 
   it("should show validation errors when the url post is empty", async () => {
@@ -355,25 +363,22 @@ describe("CreatePostPage", () => {
       // starting with ANY
       [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
       [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, null, false],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, null, true],
       [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_LINK, false],
       [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, null, false],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, null, true],
       [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_LINK, false],
       [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_TEXT, false],
       [LINK_TYPE_ANY, LINK_TYPE_ANY, null, false],
       // starting with LINK
       [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, null, false],
-      [LINK_TYPE_LINK, LINK_TYPE_LINK, LINK_TYPE_LINK, false],
-      [LINK_TYPE_LINK, LINK_TYPE_LINK, null, false],
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, null, true],
       [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, false],
       [LINK_TYPE_LINK, LINK_TYPE_ANY, null, false],
       // starting with TEXT
       [LINK_TYPE_TEXT, LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, null, false],
       [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, null, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, null, true],
       [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, false],
       [LINK_TYPE_TEXT, LINK_TYPE_ANY, null, false]
     ].forEach(([fromLinkType, toLinkType, formValue, shouldDispatch]) => {
@@ -406,7 +411,44 @@ describe("CreatePostPage", () => {
         if (shouldDispatch) {
           assert.equal(dispatch.callCount, 1)
           assert.deepEqual(dispatch.args[0][0].payload.value, {
-            postType: null,
+            postType: toLinkType,
+            url:      "",
+            text:     ""
+          })
+        } else {
+          assert.equal(dispatch.callCount, 0)
+        }
+      })
+    })
+
+    //
+    ;[
+      [LINK_TYPE_ANY, false],
+      [LINK_TYPE_LINK, true],
+      [LINK_TYPE_TEXT, true]
+    ].forEach(([linkType, shouldDispatch]) => {
+      it(`${
+        shouldDispatch ? "should" : "shouldn't"
+      } FORM_UPDATE when coming from no channel to a channel with ${linkType}`, () => {
+        const dispatch = helper.sandbox.stub()
+        currentChannel.link_type = linkType
+        const page = new InnerCreatePostPage()
+        const props: any = {
+          dispatch,
+          postForm: { value: newPostForm() },
+          channel:  currentChannel
+        }
+        page.props = props
+        const prevProps = {
+          channel: null
+        }
+
+        // $FlowFixMe
+        page.componentDidUpdate(prevProps)
+        if (shouldDispatch) {
+          assert.equal(dispatch.callCount, 1)
+          assert.deepEqual(dispatch.args[0][0].payload.value, {
+            postType: linkType,
             url:      "",
             text:     ""
           })
