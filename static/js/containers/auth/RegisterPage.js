@@ -74,12 +74,7 @@ export const RegisterPage = ({
         ) : (
           renderForm({ formError })
         )}
-        {SETTINGS.allow_saml_auth ? (
-          <div>
-            <div className="textline">Or use</div>
-            <ExternalLogins />
-          </div>
-        ) : null}
+        <ExternalLogins />
       </Card>
     </div>
   </div>

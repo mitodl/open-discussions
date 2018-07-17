@@ -39,12 +39,7 @@ export const LoginPage = ({ renderForm, formError }: LoginPageProps) => (
           <title>{formatTitle("Log In")}</title>
         </MetaTags>
         {renderForm({ formError })}
-        {SETTINGS.allow_saml_auth ? (
-          <div>
-            <div className="textline">Or use</div>
-            <ExternalLogins />
-          </div>
-        ) : null}
+        <ExternalLogins />
       </Card>
     </div>
   </div>

@@ -58,22 +58,18 @@ describe("LoginPage", () => {
     assert.ok(form.exists())
     assert.equal(form.props().formError, "error")
   })
-  ;[true, false].forEach(allowSAML => {
-    it(`should ${
-      allowSAML ? "" : "not"
-    } render an ExternalLogins component`, async () => {
-      SETTINGS.allow_saml_auth = allowSAML
-      const { inner } = await renderPage({
-        auth: {
-          data: {
-            errors: ["error"]
-          }
-        }
-      })
 
-      const link = inner.find("ExternalLogins")
-      assert.equal(link.exists(), allowSAML)
+  it("should render an ExternalLogins component", async () => {
+    const { inner } = await renderPage({
+      auth: {
+        data: {
+          errors: ["error"]
+        }
+      }
     })
+
+    const link = inner.find("ExternalLogins")
+    assert.ok(link.exists())
   })
 
   it("form onSubmit prop calls api correctly", async () => {
