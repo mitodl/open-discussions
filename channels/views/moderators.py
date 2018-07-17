@@ -10,6 +10,7 @@ from channels.serializers import (
     ModeratorPrivateSerializer,
     ModeratorPublicSerializer,
 )
+from channels.utils import translate_praw_exceptions
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     is_moderator,
@@ -60,5 +61,6 @@ class ModeratorDetailView(APIView):
         channel_name = self.kwargs['channel_name']
         moderator_name = self.kwargs['moderator_name']
 
-        api.remove_moderator(moderator_name, channel_name)
+        with translate_praw_exceptions(request.user):
+            api.remove_moderator(moderator_name, channel_name)
         return Response(status=status.HTTP_204_NO_CONTENT)

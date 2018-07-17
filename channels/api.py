@@ -971,13 +971,7 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
 
-        try:
-            self.get_channel(channel_name).moderator.remove(user)
-        except PrawForbidden:
-            # User is already not a moderator,
-            # or maybe there's another unrelated 403 error from reddit, but we can't tell the difference,
-            # and the double removal case is probably more common.
-            pass
+        self.get_channel(channel_name).moderator.remove(user)
 
     def _list_moderators(self, *, channel_name, moderator_name):
         """

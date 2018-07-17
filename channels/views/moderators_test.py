@@ -131,13 +131,14 @@ def test_remove_moderator(client, staff_jwt_header):
 
 def test_remove_moderator_again(client, staff_jwt_header):
     """
-    If a user is already not a moderator for a channel we should still return a 204
+    If a user is already not a moderator for a channel we should return a 403, signaling that the user does not have
+    permission to remove that user as a moderator.
     """
     moderator = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse(
         'moderator-detail', kwargs={'channel_name': 'admin_channel', 'moderator_name': moderator.username})
     resp = client.delete(url, **staff_jwt_header)
-    assert resp.status_code == status.HTTP_204_NO_CONTENT
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
