@@ -91,13 +91,7 @@ describe("channelModerators reducers", () => {
         actions.channelModerators.post.successType
       ]
     )
-    assert.deepEqual(data.get(channelName), [
-      ...moderators.filter(
-        _moderator =>
-          _moderator.moderator_name !== existingModerator.moderator_name
-      ),
-      existingModerator
-    ])
+    assert.deepEqual(data.get(channelName), moderators)
   })
 
   it("should remove a moderator from the list", async () => {

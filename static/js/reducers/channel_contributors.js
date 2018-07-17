@@ -1,5 +1,6 @@
 // @flow
 import { GET, POST, DELETE, INITIAL_STATE } from "redux-hammock/constants"
+import R from "ramda"
 
 import * as api from "../lib/api"
 
@@ -26,11 +27,14 @@ const addContributor = (
 ): Map<string, ChannelContributors> => {
   const update = new Map(data)
   let contributors = update.get(channelName) || []
-  contributors = contributors.filter(
-    _contributor =>
-      _contributor.contributor_name !== contributor.contributor_name
+  const existingContributor = R.find(
+    R.eqProps("contributor_name", contributor),
+    contributors
   )
-  update.set(channelName, contributors.concat([contributor]))
+  if (!existingContributor) {
+    contributors = contributors.concat([contributor])
+    update.set(channelName, contributors)
+  }
   return update
 }
 

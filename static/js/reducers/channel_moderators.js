@@ -1,5 +1,6 @@
 // @flow
 import { GET, POST, DELETE, INITIAL_STATE } from "redux-hammock/constants"
+import R from "ramda"
 
 import type { ChannelModerators, Moderator } from "../flow/discussionTypes"
 
@@ -26,10 +27,14 @@ const addModerator = (
 ): Map<string, ChannelModerators> => {
   const update = new Map(data)
   let moderators = update.get(channelName) || []
-  moderators = moderators.filter(
-    _moderator => _moderator.moderator_name !== moderator.moderator_name
+  const existingModerator = R.find(
+    R.eqProps("moderator_name", moderator),
+    moderators
   )
-  update.set(channelName, moderators.concat([moderator]))
+  if (!existingModerator) {
+    moderators = moderators.concat([moderator])
+    update.set(channelName, moderators)
+  }
   return update
 }
 

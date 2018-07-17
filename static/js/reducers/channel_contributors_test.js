@@ -74,7 +74,7 @@ describe("channelContributors reducers", () => {
     assert.deepEqual(data.get(channelName), [...contributors, newContributor])
   })
 
-  it("should filter out duplicates when adding a new contributor", async () => {
+  it("should check for duplicates when adding a new contributor", async () => {
     const channelName = "a_channel"
     await dispatchThen(actions.channelContributors.get(channelName), [
       actions.channelContributors.get.requestType,
@@ -96,13 +96,7 @@ describe("channelContributors reducers", () => {
         actions.channelContributors.post.successType
       ]
     )
-    assert.deepEqual(data.get(channelName), [
-      ...contributors.filter(
-        _contributor =>
-          _contributor.contributor_name !== existingContributor.contributor_name
-      ),
-      existingContributor
-    ])
+    assert.deepEqual(data.get(channelName), contributors)
   })
 
   it("should remove a contributor from the list", async () => {
