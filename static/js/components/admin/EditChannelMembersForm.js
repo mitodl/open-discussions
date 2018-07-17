@@ -13,12 +13,12 @@ import type { Member } from "../../flow/discussionTypes"
 type Props = {
   channelName: string,
   members: Array<Member>,
-  usernameField: string
+  usernameGetter: (member: Member) => string
 }
 
 export default class EditChannelMembersForm extends React.Component<Props> {
   render() {
-    const { channelName, members, usernameField } = this.props
+    const { channelName, members, usernameGetter } = this.props
     return (
       <Card>
         <MembersNavbar channelName={channelName} />
@@ -26,7 +26,7 @@ export default class EditChannelMembersForm extends React.Component<Props> {
           {members.map((member, index) => (
             <div key={index} className="row">
               {member.full_name ? (
-                <Link className="name" to={profileURL(member[usernameField])}>
+                <Link className="name" to={profileURL(usernameGetter(member))}>
                   {member.full_name}
                 </Link>
               ) : (

@@ -61,7 +61,7 @@ describe("EditChannelMembersPage", () => {
       "moderator_name",
       editChannelModeratorsURL
     ]
-  ].forEach(([pageDescription, reducerName, usernameField, urlFunction]) => {
+  ].forEach(([pageDescription, reducerName, usernameGetter, urlFunction]) => {
     describe(pageDescription, () => {
       let members
 
@@ -95,7 +95,7 @@ describe("EditChannelMembersPage", () => {
         const props = wrapper.find("EditChannelMembersPage").props()
 
         assert.equal(props.reducerName, reducerName)
-        assert.equal(props.usernameField, usernameField)
+        assert.isOk(props.usernameGetter(members[0]))
       })
 
       it("renders the form", async () => {

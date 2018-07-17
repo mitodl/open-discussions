@@ -1,6 +1,7 @@
 import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
+import R from "ramda"
 
 import EditChannelMembersForm from "./EditChannelMembersForm"
 
@@ -21,9 +22,9 @@ describe("EditChannelMembersForm", () => {
     moderators = makeModerators(null, true)
   })
   ;[
-    ["contributors", "contributor_name"],
-    ["moderators", "moderator_name"]
-  ].forEach(([pageDescription, usernameField]) => {
+    ["contributors", R.prop("contributor_name")],
+    ["moderators", R.prop("moderator_name")]
+  ].forEach(([pageDescription, usernameGetter]) => {
     describe(pageDescription, () => {
       let members
 
@@ -36,7 +37,7 @@ describe("EditChannelMembersForm", () => {
           <EditChannelMembersForm
             channelName={channel.name}
             members={members}
-            usernameField={usernameField}
+            usernameGetter={usernameGetter}
           />
         )
 
@@ -47,7 +48,7 @@ describe("EditChannelMembersForm", () => {
           const row = rows.at(i)
           const link = row.find(".name")
           assert.equal(link.children().text(), member.full_name)
-          assert.equal(link.props().to, profileURL(member[usernameField]))
+          assert.equal(link.props().to, profileURL(usernameGetter(member)))
           assert.equal(row.find(".email").text(), member.email)
         })
       })

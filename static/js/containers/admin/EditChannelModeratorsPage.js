@@ -1,5 +1,6 @@
 // @flow
 import React from "react"
+import R from "ramda"
 
 import EditChannelMembersPage from "./EditChannelMembersPage"
 
@@ -15,7 +16,7 @@ class EditChannelModeratorsPage extends React.Component<Props> {
     return (
       <EditChannelMembersPage
         reducerName="channelModerators"
-        usernameField="moderator_name"
+        usernameGetter={R.prop("moderator_name")}
         history={history}
         match={match}
       />

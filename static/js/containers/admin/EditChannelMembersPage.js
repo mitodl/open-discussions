@@ -24,7 +24,7 @@ type Props = {
   channelName: string,
   reducerName: string,
   members: Array<Member>,
-  usernameField: string
+  usernameGetter: (member: Member) => string
 }
 
 class EditChannelMembersPage extends React.Component<Props> {
@@ -50,7 +50,7 @@ class EditChannelMembersPage extends React.Component<Props> {
   }
 
   render() {
-    const { channel, members, usernameField } = this.props
+    const { channel, members, usernameGetter } = this.props
 
     if (!channel || !members) {
       return null
@@ -65,7 +65,7 @@ class EditChannelMembersPage extends React.Component<Props> {
         <EditChannelMembersForm
           channelName={channel.name}
           members={members}
-          usernameField={usernameField}
+          usernameGetter={usernameGetter}
         />
       </React.Fragment>
     )
