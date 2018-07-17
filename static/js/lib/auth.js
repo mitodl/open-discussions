@@ -1,3 +1,4 @@
+/* global SETTINGS: false */
 // @flow
 import {
   LOGIN_URL,
@@ -6,7 +7,9 @@ import {
   REGISTER_CONFIRM_URL,
   REGISTER_DETAILS_URL,
   INACTIVE_USER_URL,
-  FRONTPAGE_URL
+  FRONTPAGE_URL,
+  SETTINGS_URL,
+  AUTH_REQUIRED_URL
 } from "./url"
 
 import {
@@ -45,3 +48,9 @@ export const processAuthResponse = (
     history.push(INACTIVE_USER_URL)
   }
 }
+
+export const isAnonAccessiblePath = (pathname: string): boolean =>
+  pathname === AUTH_REQUIRED_URL || pathname.startsWith(SETTINGS_URL)
+
+export const needsAuthedSite = (): boolean =>
+  !SETTINGS.allow_anonymous && !SETTINGS.authenticated_site.session_url

@@ -7,6 +7,7 @@ import R from "ramda"
 
 import Card from "../../components/Card"
 import PasswordResetForm from "../../components/auth/PasswordResetForm"
+import ExternalLogins from "../../components/ExternalLogins"
 import withForm from "../../hoc/withForm"
 
 import { actions } from "../../actions"
@@ -45,6 +46,8 @@ export const PasswordResetPage = ({
           </MetaTags>
           <h3>Forgot your password?</h3>
           {renderForm({ emailApiError })}
+          <div className="textline">Or use</div>
+          <ExternalLogins />
         </Card>
       )}
     </div>
