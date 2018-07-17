@@ -9,6 +9,8 @@ from rest_framework_jwt.settings import api_settings
 
 from open_discussions import features
 
+from channels.models import Channel
+
 
 def is_staff_jwt(request):
     """
@@ -37,7 +39,7 @@ def is_moderator(request, view):
 
     Args:
         request (HTTPRequest): django request object
-        view (APIView): a DRF view ooject
+        view (APIView): a DRF view object
 
     Returns:
         bool: True if user is moderator on the channel
@@ -59,6 +61,37 @@ def is_moderator(request, view):
         return False
 
 
+def channel_is_mod_editable(view):
+    """
+    Helper function to check that a channel can be edited by a moderator on discussions.
+
+    Args:
+        view (APIView): a DRF view object
+
+    Returns:
+        bool:
+            True if the channel can be edited by a moderator. False if the channel does not exist or can only
+            be edited by a staff user from another server.
+    """
+    channel_name = view.kwargs.get('channel_name')
+    managed = Channel.objects.filter(name=channel_name).values_list('membership_is_managed', flat=True).first()
+    # None means the channel does not exist, True means it does but we shouldn't edit it via REST API
+    return managed is False
+
+
+def is_readonly(request):
+    """
+    Returns True if the request uses a readonly verb
+
+    Args:
+        request (HTTPRequest): A request
+
+    Returns:
+        bool: True if the request method is readonly
+    """
+    return request.method in permissions.SAFE_METHODS
+
+
 class JwtIsStaffPermission(permissions.BasePermission):
     """Checks the JWT payload for the staff permission"""
 
@@ -67,34 +100,48 @@ class JwtIsStaffPermission(permissions.BasePermission):
         return is_staff_jwt(request)
 
 
-class JwtIsStaffOrReadonlyPermission(JwtIsStaffPermission):
+class JwtIsStaffOrReadonlyPermission(permissions.BasePermission):
     """Checks the JWT payload for the staff permission"""
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or if the request is readonly"""
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        return super().has_permission(request, view)
+        return is_readonly(request) or is_staff_jwt(request)
 
 
-class JwtIsStaffOrModeratorPermission(JwtIsStaffPermission):
+class JwtIsStaffOrModeratorPermission(permissions.BasePermission):
     """Checks that the user is either staff or a moderator"""
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or is a moderator"""
-        return super().has_permission(request, view) or is_moderator(request, view)
+        return is_staff_jwt(request) or is_moderator(request, view)
 
 
-class JwtIsStaffModeratorOrReadonlyPermission(JwtIsStaffOrModeratorPermission):
+class JwtIsStaffModeratorOrReadonlyPermission(permissions.BasePermission):
     """Checks that the user is either staff, a moderator, or performing a readonly operation"""
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role, is a moderator, or the request is readonly"""
-        if request.method in permissions.SAFE_METHODS:
-            return True
+        return is_readonly(request) or is_staff_jwt(request) or is_moderator(request, view)
 
-        return super().has_permission(request, view)
+
+class ContributorPermissions(permissions.BasePermission):
+    """
+    Only staff and moderators should be able to see and edit the list of contributors
+    """
+    def has_permission(self, request, view):
+        return is_staff_jwt(request) or (
+            channel_is_mod_editable(view) and is_moderator(request, view)
+        )
+
+
+class ModeratorPermissions(permissions.BasePermission):
+    """
+    All users should be able to see a list of moderators. Only staff and moderators should be able to edit it.
+    """
+    def has_permission(self, request, view):
+        return is_readonly(request) or is_staff_jwt(request) or (
+            channel_is_mod_editable(view) and is_moderator(request, view)
+        )
 
 
 class AnonymousAccessReadonlyPermission(permissions.BasePermission):

@@ -10,11 +10,12 @@ from channels.serializers import (
     ModeratorPrivateSerializer,
     ModeratorPublicSerializer,
 )
+from channels.utils import translate_praw_exceptions
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
+    ModeratorPermissions,
     is_moderator,
     is_staff_jwt,
-    JwtIsStaffModeratorOrReadonlyPermission,
 )
 
 
@@ -22,7 +23,9 @@ class ModeratorListView(ListCreateAPIView):
     """
     View for listing and adding moderators
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffModeratorOrReadonlyPermission,)
+    permission_classes = (
+        AnonymousAccessReadonlyPermission, ModeratorPermissions,
+    )
 
     def get_serializer_class(self):
         """
@@ -50,7 +53,9 @@ class ModeratorDetailView(APIView):
     """
     View to retrieve and remove moderators
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffModeratorOrReadonlyPermission,)
+    permission_classes = (
+        AnonymousAccessReadonlyPermission, ModeratorPermissions,
+    )
 
     def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """
@@ -60,5 +65,6 @@ class ModeratorDetailView(APIView):
         channel_name = self.kwargs['channel_name']
         moderator_name = self.kwargs['moderator_name']
 
-        api.remove_moderator(moderator_name, channel_name)
+        with translate_praw_exceptions(request.user):
+            api.remove_moderator(moderator_name, channel_name)
         return Response(status=status.HTTP_204_NO_CONTENT)
