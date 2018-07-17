@@ -9,7 +9,10 @@
     }
   }
 
-  .edit-channel-navbar {
+  .edit-channel-navbar,
+  .members-navbar {
+    margin-bottom: 20px;
+
     a {
       margin-right: 25px;
 
@@ -36,6 +39,14 @@
       label {
         margin: 0;
       }
+    }
+  }
+
+  .contributors,
+  .moderators {
+    .row {
+      display: flex;
+      justify-content: space-between;
     }
   }
 }

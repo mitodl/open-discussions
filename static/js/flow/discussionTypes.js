@@ -15,7 +15,8 @@ export type Channel = {
   num_users:           number,
   user_is_contributor: boolean,
   user_is_moderator:   boolean,
-  link_type:           LinkType
+  link_type:          LinkType,
+  membership_is_managed: boolean,
 }
 
 export type ChannelForm = {

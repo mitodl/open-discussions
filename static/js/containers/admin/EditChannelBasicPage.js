@@ -50,15 +50,13 @@ class EditChannelBasicPage extends React.Component<Props> {
     dispatch(actions.forms.formEndEdit(EDIT_CHANNEL_PAYLOAD))
   }
 
-  loadData = () => {
+  loadData = async () => {
     const { dispatch, channel, channelName } = this.props
     if (!channel) {
-      dispatch(actions.channels.get(channelName)).then(() => {
-        this.beginFormEdit()
-      })
-    } else {
-      this.beginFormEdit()
+      await dispatch(actions.channels.get(channelName))
     }
+
+    this.beginFormEdit()
   }
 
   beginFormEdit = () => {

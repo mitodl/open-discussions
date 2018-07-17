@@ -15,6 +15,12 @@ export const editChannelBasicURL = (channelName: string) =>
 export const editChannelAppearanceURL = (channelName: string) =>
   `/manage/c/edit/${channelName}/appearance/`
 
+export const editChannelModeratorsURL = (channelName: string) =>
+  `/manage/c/edit/${channelName}/members/moderators/`
+
+export const editChannelContributorsURL = (channelName: string) =>
+  `/manage/c/edit/${channelName}/members/contributors/`
+
 export const postDetailURL = (
   channelName: string,
   postID: string,

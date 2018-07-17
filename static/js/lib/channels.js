@@ -22,6 +22,8 @@ export type LinkType =
   | typeof LINK_TYPE_LINK
   | typeof LINK_TYPE_ANY
 
+export const MISSING_TEXT = "<missing>"
+
 export const newChannelForm = (): ChannelForm => ({
   name:               "",
   title:              "",
