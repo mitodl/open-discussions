@@ -1,14 +1,11 @@
 // @flow
 import React from "react"
 import R from "ramda"
-import { MetaTags } from "react-meta-tags"
 
 import Card from "../components/Card"
 import EditChannelMembersForm from "../components/admin/EditChannelMembersForm"
 import EditChannelNavbar from "../components/admin/EditChannelNavbar"
 import MembersNavbar from "../components/admin/MembersNavbar"
-
-import { formatTitle } from "../lib/title"
 
 import type { Channel, Member } from "../flow/discussionTypes"
 
@@ -54,9 +51,6 @@ const withMemberForm = (WrappedComponent: *) => {
 
       return (
         <React.Fragment>
-          <MetaTags>
-            <title>{formatTitle("Edit Channel")}</title>
-          </MetaTags>
           <EditChannelNavbar channelName={channel.name} />
           <Card>
             <MembersNavbar channelName={channel.name} />
