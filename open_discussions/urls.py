@@ -63,8 +63,8 @@ urlpatterns = [
     url(r'^profile/[A-Za-z0-9_]+/', index, name='profile'),
 
     url(r'^login/', index),
-    url(r'^register/', index),
-    url(r'^register/confirm/$', index, name='register-confirm'),
+    url(r'^signup/', index),
+    url(r'^signup/confirm/$', index, name='register-confirm'),
     url(r'^account/inactive/$', index),
 
     url(r'^password_reset/', index, name='password-reset'),

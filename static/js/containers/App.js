@@ -224,19 +224,15 @@ class App extends React.Component<AppProps> {
             path={`${match.url}login/password/`}
             component={LoginPasswordPage}
           />
+          <Route exact path={`${match.url}signup/`} component={RegisterPage} />
           <Route
             exact
-            path={`${match.url}register/`}
-            component={RegisterPage}
-          />
-          <Route
-            exact
-            path={`${match.url}register/confirm/`}
+            path={`${match.url}signup/confirm/`}
             component={RegisterConfirmPage}
           />
           <Route
             exact
-            path={`${match.url}register/details/`}
+            path={`${match.url}signup/details/`}
             component={RegisterDetailsPage}
           />
           <Route

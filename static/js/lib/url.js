@@ -67,9 +67,9 @@ export const PASSWORD_CHANGE_URL = "/settings/password"
 export const LOGIN_URL = "/login/"
 export const LOGIN_PASSWORD_URL = "/login/password/"
 
-export const REGISTER_URL = "/register/"
-export const REGISTER_CONFIRM_URL = "/register/confirm/"
-export const REGISTER_DETAILS_URL = "/register/details/"
+export const REGISTER_URL = "/signup/"
+export const REGISTER_CONFIRM_URL = "/signup/confirm/"
+export const REGISTER_DETAILS_URL = "/signup/details/"
 
 export const INACTIVE_USER_URL = "/account/inactive/"
 
