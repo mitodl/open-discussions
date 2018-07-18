@@ -46,7 +46,6 @@ export const PasswordResetPage = ({
           </MetaTags>
           <h3>Forgot your password?</h3>
           {renderForm({ emailApiError })}
-          <div className="textline">Or use</div>
           <ExternalLogins />
         </Card>
       )}

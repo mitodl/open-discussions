@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
@@ -38,7 +39,6 @@ export const LoginPage = ({ renderForm, formError }: LoginPageProps) => (
           <title>{formatTitle("Log In")}</title>
         </MetaTags>
         {renderForm({ formError })}
-        <div className="textline">Or use</div>
         <ExternalLogins />
       </Card>
     </div>

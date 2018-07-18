@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import { assert } from "chai"
 import R from "ramda"
 
@@ -15,7 +16,8 @@ import {
   validatePasswordForm,
   validatePasswordResetForm,
   validatePasswordChangeForm,
-  PASSWORD_LENGTH_MINIMUM
+  PASSWORD_LENGTH_MINIMUM,
+  validNotMIT
 } from "./validation"
 
 describe("validation library", () => {
@@ -216,6 +218,27 @@ describe("validation library", () => {
     })
   })
 
+  describe("validNotMIT", () => {
+    [
+      ["user@mit.edu", true],
+      ["user@MIT.EDU", true],
+      ["user@test.mit.edu", true],
+      ["user@TEST.MIT.edu", true],
+      ["user@ALUM.MIT.edu", false],
+      ["user@alum.mit.edu", false],
+      ["user@other.alum.mit.edu", false],
+      ["user@other.school.mit.edu", true],
+      ["user@aluminum.mit.edu", true],
+      ["user@amit.edu", false],
+      ["user@mit.eduu", false],
+      ["user@mit.com", false]
+    ].forEach(([email, invalid]) => {
+      it(`should ${invalid ? "" : "not"} invalidate ${email}`, () => {
+        assert.equal(validNotMIT(email), !invalid)
+      })
+    })
+  })
+
   describe("validateEmailForm", () => {
     it("should complain about no email", () => {
       const form = { value: { email: "" } }
@@ -232,33 +255,6 @@ describe("validation library", () => {
         value: {
           email: "Email is not formatted correctly"
         }
-      })
-    })
-
-    it("should complain about an MIT email except alum.mit.edu", () => {
-      [
-        ["user@mit.edu", true],
-        ["user@MIT.EDU", true],
-        ["user@test.mit.edu", true],
-        ["user@TEST.MIT.edu", true],
-        ["user@ALUM.MIT.edu", false],
-        ["user@alum.mit.edu", false],
-        ["user@other.alum.mit.edu", false],
-        ["user@other.school.mit.edu", true],
-        ["user@aluminum.mit.edu", true],
-        ["user@amit.edu", false],
-        ["user@mit.eduu", false],
-        ["user@mit.com", false]
-      ].forEach(([email, invalid]) => {
-        const form = { value: { email } }
-        assert.deepEqual(
-          validateEmailForm(form),
-          invalid
-            ? {
-              value: { email: "MIT users please login with Touchstone below" }
-            }
-            : {}
-        )
       })
     })
   })

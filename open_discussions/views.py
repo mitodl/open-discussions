@@ -79,6 +79,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "profile_ui_enabled": features.is_enabled(features.PROFILE_UI),
         "allow_anonymous": features.is_enabled(features.ANONYMOUS_ACCESS),
         "allow_email_auth": features.is_enabled(features.EMAIL_AUTH),
+        "allow_saml_auth": features.is_enabled(features.SAML_AUTH)
     }
 
     return render(request, "index.html", context={

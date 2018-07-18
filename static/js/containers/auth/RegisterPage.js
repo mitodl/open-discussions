@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
@@ -73,7 +74,6 @@ export const RegisterPage = ({
         ) : (
           renderForm({ formError })
         )}
-        <div className="textline">Or use</div>
         <ExternalLogins />
       </Card>
     </div>
