@@ -45,7 +45,7 @@ def reddit_object_persist(*persistence_funcs):
             reddit_obj = func(*args, **kwargs)
             try:
                 for persistence_func in persistence_funcs:
-                    persistence_func(reddit_obj)
+                    persistence_func(*reddit_obj)
             except Exception:  # pylint: disable=broad-except
                 log.exception('Error occurred while trying to serialize and index PRAW object')
             return reddit_obj
@@ -54,7 +54,7 @@ def reddit_object_persist(*persistence_funcs):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_new_post(post_obj):
+def index_new_post(post_obj, thumbnail):
     """
     Serializes a post object and runs a task to create an ES document for it.
 

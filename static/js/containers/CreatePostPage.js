@@ -92,9 +92,10 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
         actions.forms.formUpdate({
           ...CREATE_POST_PAYLOAD,
           value: {
-            postType: channel.link_type,
-            url:      "",
-            text:     ""
+            postType:  channel.link_type,
+            url:       "",
+            text:      "",
+            thumbnail: null
           }
         })
       )
@@ -128,6 +129,16 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       }
       const embedlyResponse = await dispatch(embedlyGetFunc)
       handleTwitterWidgets(embedlyResponse)
+      if (embedlyResponse.response && embedlyResponse.response.thumbnail_url) {
+        dispatch(
+          actions.forms.formUpdate({
+            ...CREATE_POST_PAYLOAD,
+            value: {
+              ['thumbnail']: embedlyResponse.response.thumbnail_url
+            }
+          })
+        )
+      }
     }
   }
 
@@ -170,9 +181,9 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       )
     } else {
       const channelName = channel.name
-      const { postType, title, url, text } = postForm.value
+      const { postType, title, url, text, thumbnail } = postForm.value
       const isText = isTextTabSelected(postType, channel)
-      const data: CreatePostPayload = isText ? { title, text } : { title, url }
+      const data: CreatePostPayload = isText ? { title, text } : { title, url, thumbnail }
       dispatch(actions.posts.post(channelName, data)).then(post => {
         history.push(postDetailURL(channelName, post.id, post.slug))
       })

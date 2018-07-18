@@ -289,13 +289,14 @@ def sync_channel_model(name):
     return Channel.objects.get_or_create(name=name)[0]
 
 
-def sync_post_model(*, channel_name, post_id):
+def sync_post_model(*, channel_name, post_id, thumbnail=None):
     """
     Create a new Post if it doesn't exist already. Also create a new Channel if necessary
 
     Args:
         channel_name (str): The name of the channel
         post_id (str): The id of the post
+        thumbnail (str): The thumbnail URL for a link post
 
     Returns:
         Post: The post object
@@ -308,7 +309,7 @@ def sync_post_model(*, channel_name, post_id):
         channel = sync_channel_model(channel_name)
         return Post.objects.get_or_create(
             post_id=post_id,
-            defaults={'channel': channel},
+            defaults={'channel': channel, 'thumbnail': thumbnail},
         )[0]
 
 
@@ -515,7 +516,7 @@ class Api:
         search_task_helpers.index_new_post,
         channels_task_helpers.sync_post_model,
     )
-    def create_post(self, channel_name, title, text=None, url=None):
+    def create_post(self, channel_name, title, text=None, url=None, thumbnail=None):
         """
         Create a new post in a channel
 
@@ -523,7 +524,8 @@ class Api:
             channel_name(str): the channel name identifier
             title(str): the title of the post
             text(str): the text of the post
-            url(str): the url of the post
+            url(str): the url of the
+            thumbnail(str): the url of the link thumbnail
 
         Raises:
             ValueError: if both text and url are provided
@@ -533,7 +535,7 @@ class Api:
         """
         if len(list(filter(lambda val: val is not None, [text, url]))) != 1:
             raise ValueError('Exactly one of text and url must be provided')
-        return self.get_channel(channel_name).submit(title, selftext=text, url=url)
+        return self.get_channel(channel_name).submit(title, selftext=text, url=url), thumbnail
 
     def front_page(self, listing_params):
         """

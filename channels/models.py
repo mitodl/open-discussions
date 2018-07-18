@@ -2,6 +2,7 @@
 import base36
 from django.conf import settings
 from django.db import models
+from django.db.models import URLField
 
 from open_discussions.models import TimestampedModel
 
@@ -104,6 +105,7 @@ class Post(TimestampedModel):
     """
     channel = models.ForeignKey(Channel)
     post_id = Base36IntegerField(unique=True)
+    thumbnail = models.URLField(max_length=2048, blank=True, null=True)
 
     def __str__(self):
         return f"{self.post_id} on channel {self.channel}"

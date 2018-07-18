@@ -175,6 +175,7 @@ class BasePostSerializer(RedditObjectSerializer):
     edited = serializers.SerializerMethodField()
     num_reports = serializers.IntegerField(read_only=True)
     deleted = serializers.SerializerMethodField()
+    thumbnail = serializers.URLField(allow_null=True)
 
     def get_url(self, instance):
         """Returns a url or null depending on if it's a self post"""
@@ -279,6 +280,7 @@ class PostSerializer(BasePostSerializer):
         title = validated_data['title']
         text = validated_data.get('text')
         url = validated_data.get('url')
+        thumbnail = validated_data.get('thumbnail')
 
         if text and url:
             raise ValidationError('Only one of text or url can be used to create a post')
@@ -286,13 +288,14 @@ class PostSerializer(BasePostSerializer):
         kwargs = {}
         if url:
             kwargs['url'] = url
+            kwargs['thumbnail'] = thumbnail
         else:
             # Reddit API requires that either url or text not be `None`.
             kwargs['text'] = text or ''
 
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
-        post = api.create_post(
+        post, thumbnail = api.create_post(
             channel_name,
             title=title,
             **kwargs

@@ -165,13 +165,14 @@ export function createPost(
   channelName: string,
   payload: CreatePostPayload
 ): Promise<Post> {
-  const { text, url, title } = payload
+  const { text, url, title, thumbnail } = payload
   return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/posts/`, {
     method: "POST",
     body:   JSON.stringify({
-      url:   url,
-      text:  text,
-      title: title
+      url:       url,
+      text:      text,
+      title:     title,
+      thumbnail: thumbnail
     })
   })
 }

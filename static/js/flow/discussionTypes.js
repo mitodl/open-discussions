@@ -61,7 +61,8 @@ export type Post = AuthoredContent & {
   channel_name:  string,
   channel_title: string,
   stickied:      boolean,
-  removed:       boolean
+  removed:       boolean,
+  thumbnail:     ?string
 }
 
 type PostFormType =
@@ -70,10 +71,11 @@ type PostFormType =
   | null
 
 export type PostForm = {
-  postType: PostFormType,
-  text:     string,
-  url:      string,
-  title:    string
+  postType:   PostFormType,
+  text:       string,
+  url:        string,
+  title:      string,
+  thumbnail?: string
 }
 
 export type PostValidation = {
@@ -85,9 +87,10 @@ export type PostValidation = {
 }
 
 export type CreatePostPayload = {
-  url?:  string,
-  text?: string,
-  title: string
+  url?:       string,
+  text?:      string,
+  title:      string,
+  thumbnail?: string
 }
 
 export type PostListPagination = {

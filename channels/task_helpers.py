@@ -3,7 +3,7 @@ Functions related to tasks for channels
 """
 
 
-def sync_post_model(post):
+def sync_post_model(post, thumbnail):
     """
     Create or update local post id information
 
@@ -14,7 +14,9 @@ def sync_post_model(post):
     tasks.sync_post_model.delay(
         channel_name=post.subreddit.display_name,
         post_id=post.id,
+        thumbnail=thumbnail
     )
+    raise Exception("{} - {}".format(post, thumbnail))
 
 
 def sync_comment_model(comment):
