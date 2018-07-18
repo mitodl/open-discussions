@@ -7,10 +7,7 @@ import EditChannelMembersForm from "./EditChannelMembersForm"
 
 import { MISSING_TEXT } from "../../lib/channels"
 import { profileURL } from "../../lib/url"
-import {
-  makeContributors,
-  makeModerators
-} from "../../factories/channels"
+import { makeContributors, makeModerators } from "../../factories/channels"
 
 describe("EditChannelMembersForm", () => {
   let contributors, moderators
