@@ -35,8 +35,7 @@ export class EditChannelModeratorsPage extends React.Component<Props> {
 const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) => ({
   loadMembers: () =>
     dispatch(actions.channelModerators.get(getChannelName(ownProps))),
-  loadChannel:    () => dispatch(actions.channels.get(getChannelName(ownProps))),
-  usernameGetter: (member: any): string => member.moderator_name
+  loadChannel: () => dispatch(actions.channels.get(getChannelName(ownProps)))
 })
 
 const mapStateToProps = (state, ownProps) => {
@@ -49,7 +48,8 @@ const mapStateToProps = (state, ownProps) => {
     channel,
     members,
     channelName,
-    processing
+    processing,
+    usernameGetter: (member: any): string => member.contributor_name
   }
 }
 
