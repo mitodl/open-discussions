@@ -52,16 +52,14 @@ describe("EditChannelMembersPage", () => {
     [
       "contributors",
       "channelContributors",
-      "contributor_name",
       editChannelContributorsURL
     ],
     [
       "moderators",
       "channelModerators",
-      "moderator_name",
       editChannelModeratorsURL
     ]
-  ].forEach(([pageDescription, reducerName, usernameGetter, urlFunction]) => {
+  ].forEach(([pageDescription, reducerName, urlFunction]) => {
     describe(pageDescription, () => {
       let members
 
