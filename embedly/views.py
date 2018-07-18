@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from django.conf import settings
 
+from channels.models import LinkThumbnail
 from embedly.api import get_embedly
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
@@ -17,6 +18,10 @@ def embedly_view(request, **kwargs):  # pylint: disable=unused-argument
     if settings.EMBEDLY_KEY:
         url = unquote(unquote(kwargs["url"]))
         response = get_embedly(url).json()
+        if 'thumbnail_url' in response:
+            LinkThumbnail.objects.get_or_create(url=url, defaults={
+                'thumbnail': response['thumbnail_url']
+            })
         return Response(response)
     else:
         return Response({}, status=status.HTTP_503_SERVICE_UNAVAILABLE)

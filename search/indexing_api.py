@@ -48,6 +48,7 @@ COMBINED_MAPPING = {
     'post_id': {'type': 'keyword'},
     'post_title': {'type': 'text'},
     'post_link_url': {'type': 'keyword'},
+    'post_link_thumbnail': {'type': 'keyword'},
     'num_comments': {'type': 'long'},
     'comment_id': {'type': 'keyword'},
     'parent_comment_id': {'type': 'keyword'},

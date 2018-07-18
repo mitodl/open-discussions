@@ -35,6 +35,7 @@ def test_create_url_post(client, private_channel_and_contributor):
     assert resp.json() == {
         'title': 'url title 🐨',
         'url': 'http://micromasters.mit.edu/🐨',
+        "thumbnail": None,
         'text': None,
         'author_id': user.username,
         'created': '2017-11-22T17:19:35+00:00',
@@ -72,6 +73,7 @@ def test_create_text_post(client, private_channel_and_contributor):
         'title': 'parameterized testing',
         'text': 'tests are great',
         'url': None,
+        "thumbnail": None,
         'author_id': user.username,
         'created': '2017-11-22T17:29:51+00:00',
         'upvoted': True,
@@ -182,6 +184,7 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         "url": None,
+        "thumbnail": None,
         "text": post.text,
         "title": post.title,
         "upvoted": True,
@@ -231,6 +234,7 @@ def test_get_post_stickied(client, private_channel_and_contributor, reddit_facto
     assert get_resp.status_code == status.HTTP_200_OK
     assert get_resp.json() == {
         "url": None,
+        "thumbnail": None,
         "text": post.text,
         "title": post.title,
         "upvoted": True,
@@ -285,6 +289,7 @@ def test_get_post_anonymous(client, public_channel, reddit_factories, settings, 
             'title': post.title,
             'upvoted': False,
             'url': post.url,
+            'thumbnail': None,
         }
     else:
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
@@ -322,6 +327,7 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
             'posts': [
                 {
                     "url": post.url,
+                    "thumbnail": None,
                     "text": post.text,
                     "title": post.title,
                     "upvoted": True,
@@ -383,6 +389,7 @@ def test_list_posts_sorted(client, private_channel_and_contributor, reddit_facto
     assert resp.json() == {
         'posts': [{
             "url": None,
+            "thumbnail": None,
             "text": post.text,
             "title": post.title,
             "upvoted": True,
@@ -423,6 +430,7 @@ def test_list_posts_stickied(client, private_channel_and_contributor, reddit_fac
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["posts"][0] == {
         "url": posts[2].url,
+        "thumbnail": None,
         "text": posts[2].text,
         "title": posts[2].title,
         "upvoted": True,
@@ -573,6 +581,7 @@ def test_list_posts_anonymous(client, public_channel, reddit_factories, settings
                 'title': post.title,
                 'upvoted': False,
                 'url': post.url,
+                'thumbnail': None,
             }]
         }
     else:
@@ -589,6 +598,7 @@ def test_update_post_text(client, private_channel_and_contributor, reddit_factor
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': 'overwrite',
         'title': post.title,
         'upvoted': True,
@@ -621,6 +631,7 @@ def test_update_post_stickied(client, private_channel_and_contributor, reddit_fa
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': False,
@@ -675,6 +686,7 @@ def test_update_post_clear_vote(client, private_channel_and_contributor, reddit_
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': False,
@@ -707,6 +719,7 @@ def test_update_post_upvote(client, private_channel_and_contributor, reddit_fact
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': True,
@@ -739,6 +752,7 @@ def test_update_post_removed(client, staff_user, private_channel_and_contributor
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': False,
@@ -774,6 +788,7 @@ def test_update_post_clear_removed(
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': False,
@@ -808,6 +823,7 @@ def test_update_post_ignore_reports(
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': False,
@@ -891,6 +907,7 @@ def test_create_post_without_upvote(client, private_channel_and_contributor):
         'title': 'x',
         'text': 'y',
         'url': None,
+        'thumbnail': None,
         'author_id': user.username,
         'created': '2017-11-22T20:19:53+00:00',
         'upvoted': False,
@@ -958,6 +975,7 @@ def test_subscribe_post(
         'title': post.title,
         'text': post.text,
         'url': None,
+        'thumbnail': None,
         'author_id': user.username,
         'created': post.created,
         'upvoted': False,
@@ -995,6 +1013,7 @@ def test_unsubscribe_post(client, private_channel_and_contributor, reddit_factor
         'title': post.title,
         'text': post.text,
         'url': None,
+        'thumbnail': None,
         'author_id': user.username,
         'created': post.created,
         'upvoted': True,

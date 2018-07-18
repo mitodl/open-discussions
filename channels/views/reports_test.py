@@ -107,6 +107,7 @@ def test_list_reports(staff_client, private_channel_and_contributor, reddit_fact
     }, {
         "post": {
             "url": None,
+            "thumbnail": None,
             "text": post.text,
             "title": post.title,
             "upvoted": False,

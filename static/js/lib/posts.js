@@ -17,11 +17,10 @@ import type {
 } from "../flow/discussionTypes"
 
 export const newPostForm = (): PostForm => ({
-  postType:  null,
-  text:      "",
-  url:       "",
-  title:     "",
-  thumbnail: null
+  postType: null,
+  text:     "",
+  url:      "",
+  title:    ""
 })
 
 export const formatCommentsCount = (post: Post): string =>

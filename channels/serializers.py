@@ -20,6 +20,7 @@ from channels.constants import (
 from channels.models import (
     Channel,
     Subscription,
+    LinkThumbnail
 )
 from open_discussions.utils import filter_dict_with_renamed_keys
 from profiles.models import Profile
@@ -156,6 +157,7 @@ class BasePostSerializer(RedditObjectSerializer):
     (no deserialization or validation), and does not fetch/serialize Subscription data
     """
     url = WriteableSerializerMethodField(allow_null=True)
+    thumbnail = WriteableSerializerMethodField(allow_null=True)
     text = WriteableSerializerMethodField(allow_null=True)
     title = serializers.CharField()
     slug = serializers.SerializerMethodField()
@@ -175,11 +177,17 @@ class BasePostSerializer(RedditObjectSerializer):
     edited = serializers.SerializerMethodField()
     num_reports = serializers.IntegerField(read_only=True)
     deleted = serializers.SerializerMethodField()
-    thumbnail = serializers.URLField(allow_null=True)
 
     def get_url(self, instance):
         """Returns a url or null depending on if it's a self post"""
         return instance.url if not instance.is_self else None
+
+    def get_thumbnail(self, instance):
+        """ Returns a thumbnail url or null"""
+        link_thumb = LinkThumbnail.objects.filter(url=instance.url).first()
+        if link_thumb:
+            return link_thumb.thumbnail
+        return None
 
     def get_slug(self, instance):
         """Returns the post slug"""
@@ -280,7 +288,6 @@ class PostSerializer(BasePostSerializer):
         title = validated_data['title']
         text = validated_data.get('text')
         url = validated_data.get('url')
-        thumbnail = validated_data.get('thumbnail')
 
         if text and url:
             raise ValidationError('Only one of text or url can be used to create a post')
@@ -288,14 +295,13 @@ class PostSerializer(BasePostSerializer):
         kwargs = {}
         if url:
             kwargs['url'] = url
-            kwargs['thumbnail'] = thumbnail
         else:
             # Reddit API requires that either url or text not be `None`.
             kwargs['text'] = text or ''
 
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
-        post, thumbnail = api.create_post(
+        post = api.create_post(
             channel_name,
             title=title,
             **kwargs

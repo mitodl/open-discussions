@@ -67,6 +67,7 @@ class ESPostSerializer(ESSerializer):
         'id': 'post_id',
         'title': 'post_title',
         'url': 'post_link_url',
+        'thumbnail': 'post_link_thumbnail'
     }
 
     @property
