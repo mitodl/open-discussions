@@ -582,7 +582,7 @@ class GenericCommentSerializer(serializers.Serializer):
 class ContributorSerializer(serializers.Serializer):
     """Serializer for contributors. Should be accessible by moderators only"""
     contributor_name = WriteableSerializerMethodField()
-    email = serializers.SerializerMethodField()
+    email = WriteableSerializerMethodField()
     full_name = serializers.SerializerMethodField()
 
     def get_contributor_name(self, instance):
@@ -608,7 +608,20 @@ class ContributorSerializer(serializers.Serializer):
     def create(self, validated_data):
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
-        return api.add_contributor(validated_data['contributor_name'], channel_name)
+        contributor_name = validated_data.get('contributor_name')
+        email = validated_data.get('email')
+
+        if email and contributor_name:
+            raise ValueError("Only one of contributor_name, email should be specified")
+
+        if contributor_name:
+            username = contributor_name
+        elif email:
+            username = User.objects.get(email__iexact=email).username
+        else:
+            raise ValueError("Missing contributor_name or email")
+
+        return api.add_contributor(username, channel_name)
 
 
 class ModeratorPublicSerializer(serializers.Serializer):
@@ -623,7 +636,7 @@ class ModeratorPublicSerializer(serializers.Serializer):
 class ModeratorPrivateSerializer(serializers.Serializer):
     """Serializer for moderators, viewable by other moderators"""
     moderator_name = WriteableSerializerMethodField()
-    email = serializers.SerializerMethodField()
+    email = WriteableSerializerMethodField()
     full_name = serializers.SerializerMethodField()
 
     def get_moderator_name(self, instance):
@@ -650,7 +663,20 @@ class ModeratorPrivateSerializer(serializers.Serializer):
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
 
-        return api.add_moderator(validated_data['moderator_name'], channel_name)
+        moderator_name = validated_data.get('moderator_name')
+        email = validated_data.get('email')
+
+        if email and moderator_name:
+            raise ValueError("Only one of moderator_name, email should be specified")
+
+        if moderator_name:
+            username = moderator_name
+        elif email:
+            username = User.objects.get(email__iexact=email).username
+        else:
+            raise ValueError("Missing moderator_name or email")
+
+        return api.add_moderator(username, channel_name)
 
 
 class SubscriberSerializer(serializers.Serializer):
