@@ -14,10 +14,9 @@ import {
 } from "../../factories/channels"
 
 describe("EditChannelMembersForm", () => {
-  let channel, contributors, moderators
+  let contributors, moderators
 
   beforeEach(() => {
-    channel = makeChannel()
     contributors = makeContributors()
     moderators = makeModerators(null, true)
   })
@@ -35,7 +34,6 @@ describe("EditChannelMembersForm", () => {
       const renderForm = () =>
         shallow(
           <EditChannelMembersForm
-            channelName={channel.name}
             members={members}
             usernameGetter={usernameGetter}
           />
