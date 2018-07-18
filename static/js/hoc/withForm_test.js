@@ -22,9 +22,7 @@ type PageProps = {
   extraProps: Object
 } & WithFormProps<TestFormProps>
 
-class Form extends React.Component<*, *> {
-  props: TestFormProps
-
+class Form extends React.Component<TestFormProps> {
   render() {
     const { form, validation, onSubmit, onUpdate, processing } = this.props
     return (
@@ -70,6 +68,8 @@ describe("withForm", () => {
         onSubmit={onSubmitStub}
         onSubmitResult={onSubmitResultStub}
         extraProps={extraProps}
+        onUpdate={sandbox.stub()}
+        renderForm={sandbox.stub()}
       />
     )
 
