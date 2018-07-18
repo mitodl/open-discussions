@@ -18,6 +18,8 @@ const _createSettings = () => ({
     tos_url:     "http://fake.tos.url/"
   },
   allow_anonymous:    false,
+  allow_saml_auth:    false,
+  allow_email_auth:   false,
   is_authenticated:   true,
   username:           "greatusername",
   user_full_name:     "Great User",

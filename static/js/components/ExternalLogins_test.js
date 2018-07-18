@@ -16,6 +16,7 @@ describe("ExternalLogins component", () => {
     const wrapper = mountExternalLogins({ className: "custom-class" })
     assert.equal(wrapper.props().className, "actions row custom-class")
   })
+  //
   ;[true, false].forEach(allowSaml => {
     it(`should ${allowSaml ? "" : "not "}have a link to Touchstone`, () => {
       SETTINGS.allow_saml_auth = allowSaml
