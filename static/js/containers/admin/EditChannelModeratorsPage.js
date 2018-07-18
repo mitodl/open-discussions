@@ -49,7 +49,7 @@ const mapStateToProps = (state, ownProps) => {
     members,
     channelName,
     processing,
-    usernameGetter: (member: any): string => member.contributor_name
+    usernameGetter: (member: any): string => member.moderator_name
   }
 }
 
