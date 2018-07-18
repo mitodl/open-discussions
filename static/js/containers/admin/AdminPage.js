@@ -31,11 +31,19 @@ export default class AdminPage extends React.Component<Props> {
         />
         <Route
           path={`${match.url}/c/edit/:channelName/members/moderators`}
-          component={withMemberForm("moderator", "channelModerators", R.prop('moderator_name'))}
+          component={withMemberForm(
+            "moderator",
+            "channelModerators",
+            R.prop("moderator_name")
+          )}
         />
         <Route
           path={`${match.url}/c/edit/:channelName/members/contributors`}
-          component={withMemberForm("contributor", "channelContributors", R.prop('contributor_name'))}
+          component={withMemberForm(
+            "contributor",
+            "channelContributors",
+            R.prop("contributor_name")
+          )}
         />
       </React.Fragment>
     )
