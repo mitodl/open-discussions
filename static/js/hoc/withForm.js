@@ -11,9 +11,7 @@ import type {
 const withForm = <T>(FormComponent: FormComponentCls<T>) => (
   WrappedComponent: WrappedComponentCls<T>
 ) => {
-  class withForm extends React.Component<*, *> {
-    props: WithFormProps<T>
-
+  class withForm extends React.Component<WithFormProps<T>> {
     componentDidMount() {
       const { formBeginEdit } = this.props
       formBeginEdit()

@@ -1,12 +1,13 @@
 // @flow
 import React from "react"
 import { Route } from "react-router-dom"
+import R from "ramda"
 
 import CreateChannelPage from "./CreateChannelPage"
 import EditChannelAppearancePage from "./EditChannelAppearancePage"
 import EditChannelBasicPage from "./EditChannelBasicPage"
-import EditChannelModeratorsPage from "./EditChannelModeratorsPage"
-import EditChannelContributorsPage from "./EditChannelContributorsPage"
+
+import withMemberForm from "../../hoc/withMemberForm"
 
 import type { Match } from "react-router"
 
@@ -30,11 +31,11 @@ export default class AdminPage extends React.Component<Props> {
         />
         <Route
           path={`${match.url}/c/edit/:channelName/members/moderators`}
-          component={EditChannelModeratorsPage}
+          component={withMemberForm("moderator", "channelModerators", R.prop('moderator_name'))}
         />
         <Route
           path={`${match.url}/c/edit/:channelName/members/contributors`}
-          component={EditChannelContributorsPage}
+          component={withMemberForm("contributor", "channelContributors", R.prop('contributor_name'))}
         />
       </React.Fragment>
     )
