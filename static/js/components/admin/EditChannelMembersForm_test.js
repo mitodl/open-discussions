@@ -8,7 +8,6 @@ import EditChannelMembersForm from "./EditChannelMembersForm"
 import { MISSING_TEXT } from "../../lib/channels"
 import { profileURL } from "../../lib/url"
 import {
-  makeChannel,
   makeContributors,
   makeModerators
 } from "../../factories/channels"

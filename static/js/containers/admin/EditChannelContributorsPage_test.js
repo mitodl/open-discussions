@@ -67,6 +67,6 @@ describe("EditChannelContributorsPage", () => {
     const wrapper = await renderPage()
     const props = wrapper.find("EditChannelMembersForm").props()
     assert.deepEqual(props.members, contributors)
-    assert.equal(props.channelName, channel.name)
+    assert.equal(props.usernameGetter(contributors[0]), contributors[0].contributor_name)
   })
 })
