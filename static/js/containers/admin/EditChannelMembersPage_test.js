@@ -49,16 +49,8 @@ describe("EditChannelMembersPage", () => {
     helper.cleanup()
   })
   ;[
-    [
-      "contributors",
-      "channelContributors",
-      editChannelContributorsURL
-    ],
-    [
-      "moderators",
-      "channelModerators",
-      editChannelModeratorsURL
-    ]
+    ["contributors", "channelContributors", editChannelContributorsURL],
+    ["moderators", "channelModerators", editChannelModeratorsURL]
   ].forEach(([pageDescription, reducerName, urlFunction]) => {
     describe(pageDescription, () => {
       let members

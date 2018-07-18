@@ -2,7 +2,6 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import Card from "../Card"
 import MembersNavbar from "./MembersNavbar"
 
 import { MISSING_TEXT } from "../../lib/channels"
@@ -20,7 +19,7 @@ export default class EditChannelMembersForm extends React.Component<Props> {
   render() {
     const { channelName, members, usernameGetter } = this.props
     return (
-      <Card>
+      <React.Fragment>
         <MembersNavbar channelName={channelName} />
         <div className="members">
           {members.map((member, index) => (
@@ -36,7 +35,7 @@ export default class EditChannelMembersForm extends React.Component<Props> {
             </div>
           ))}
         </div>
-      </Card>
+      </React.Fragment>
     )
   }
 }

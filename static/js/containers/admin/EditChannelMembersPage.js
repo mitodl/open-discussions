@@ -4,6 +4,7 @@ import R from "ramda"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
+import Card from "../../components/Card"
 import EditChannelMembersForm from "../../components/admin/EditChannelMembersForm"
 import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
 import withSingleColumn from "../../hoc/withSingleColumn"
@@ -62,11 +63,13 @@ class EditChannelMembersPage extends React.Component<Props> {
           <title>{formatTitle("Edit Channel")}</title>
         </MetaTags>
         <EditChannelNavbar channelName={channel.name} />
-        <EditChannelMembersForm
-          channelName={channel.name}
-          members={members}
-          usernameGetter={usernameGetter}
-        />
+        <Card>
+          <EditChannelMembersForm
+            channelName={channel.name}
+            members={members}
+            usernameGetter={usernameGetter}
+          />
+        </Card>
       </React.Fragment>
     )
   }
