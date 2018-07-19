@@ -173,6 +173,8 @@ export type Contributor = {
 
 export type ChannelContributors = Array<Contributor>
 
+export type Member = Contributor | Moderator
+
 export type Report = {
   reason: string
 }

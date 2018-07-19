@@ -1,89 +1,63 @@
 // @flow
 import React from "react"
 import R from "ramda"
-import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
+import { connect } from "react-redux"
 
-import EditChannelContributorsForm from "../../components/admin/EditChannelContributorsForm"
-import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
+import withMemberForm from "../../hoc/withMemberForm"
 import withSingleColumn from "../../hoc/withSingleColumn"
 
-import { actions } from "../../actions"
 import { formatTitle } from "../../lib/title"
+import { actions } from "../../actions"
 import { getChannelName } from "../../lib/util"
 
 import type { Dispatch } from "redux"
-import type { Channel, ChannelContributors } from "../../flow/discussionTypes"
 
-const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
+type Props = {
+  renderBody: () => React$Element<*>
+}
 
-class EditChannelContributorsPage extends React.Component<*, void> {
-  props: {
-    dispatch: Dispatch<*>,
-    history: Object,
-    channel: Channel,
-    channelName: string,
-    contributors: ChannelContributors
-  }
-
-  componentDidMount() {
-    this.loadData()
-  }
-
-  componentDidUpdate(prevProps) {
-    if (shouldLoadData(prevProps, this.props)) {
-      this.loadData()
-    }
-  }
-
-  loadData = async () => {
-    const { dispatch, channel, channelName, contributors } = this.props
-    if (!channel) {
-      await dispatch(actions.channels.get(channelName))
-    }
-
-    if (!contributors) {
-      await dispatch(actions.channelContributors.get(channelName))
-    }
-  }
-
+export class EditChannelContributorsPage extends React.Component<Props> {
   render() {
-    const { channel, contributors } = this.props
-
-    if (!channel || !contributors) {
-      return null
-    }
+    const { renderBody } = this.props
 
     return (
       <React.Fragment>
         <MetaTags>
           <title>{formatTitle("Edit Channel")}</title>
         </MetaTags>
-        <EditChannelNavbar channelName={channel.name} />
-        <EditChannelContributorsForm
-          channelName={channel.name}
-          contributors={contributors}
-        />
+        {renderBody()}
       </React.Fragment>
     )
   }
 }
+
+const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) => ({
+  loadMembers: () =>
+    dispatch(actions.channelContributors.get(getChannelName(ownProps))),
+  loadChannel: () => dispatch(actions.channels.get(getChannelName(ownProps)))
+})
 
 const mapStateToProps = (state, ownProps) => {
   const channelName = getChannelName(ownProps)
   const channel = state.channels.data.get(channelName)
   const processing =
     state.channels.processing || state.channelContributors.processing
-  const contributors = state.channelContributors.data.get(channelName)
+  const members = state.channelContributors.data.get(channelName)
   return {
     channel,
-    contributors,
+    members,
     channelName,
-    processing
+    processing,
+    usernameGetter: (member: any): string => member.contributor_name
   }
 }
 
 export default R.compose(
-  connect(mapStateToProps),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
+  withMemberForm,
   withSingleColumn("edit-channel")
 )(EditChannelContributorsPage)
