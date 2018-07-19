@@ -46,13 +46,11 @@ from channels.models import (
     Post,
     RedditAccessToken,
     RedditRefreshToken,
-    Subscription,
-    LinkMeta
+    Subscription
 )
-from channels.utils import get_kind_mapping
+from channels.utils import get_kind_mapping, get_or_create_link_meta
 
 from channels import task_helpers as channels_task_helpers
-from embedly.api import get_embedly, THUMBNAIL_URL
 from open_discussions import features
 from open_discussions.utils import now_in_utc
 from search import task_helpers as search_task_helpers
@@ -314,13 +312,7 @@ def sync_post_model(*, channel_name, post_id, post_url=None):
             defaults={'channel': channel},
         )[0]
         if post_url and post_obj.link_meta is None and settings.EMBEDLY_KEY:
-            link_meta, created = LinkMeta.objects.get_or_create(url=post_url)
-            if created:
-                response = get_embedly(post_url).json()
-                if THUMBNAIL_URL in response:
-                    link_meta.thumbnail = response[THUMBNAIL_URL]
-                    link_meta.save()
-            post_obj.link_meta = link_meta
+            post_obj.link_meta = get_or_create_link_meta(post_url)
             post_obj.save()
         return post_obj
 

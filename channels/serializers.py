@@ -13,7 +13,7 @@ from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from channels.utils import get_kind_mapping, get_reddit_slug
+from channels.utils import get_kind_mapping, get_reddit_slug, get_or_create_link_meta
 from channels.constants import (
     VALID_CHANNEL_TYPES,
     VALID_LINK_TYPES,
@@ -23,7 +23,6 @@ from channels.models import (
     Subscription,
     LinkMeta
 )
-from embedly.api import get_embedly, THUMBNAIL_URL
 from open_discussions.utils import filter_dict_with_renamed_keys
 from profiles.models import Profile
 from profiles.utils import image_uri
@@ -305,12 +304,7 @@ class PostSerializer(BasePostSerializer):
         channel_name = self.context['view'].kwargs['channel_name']
 
         if url and settings.EMBEDLY_KEY:
-            link_meta, created = LinkMeta.objects.get_or_create(url=url)
-            if created:
-                response = get_embedly(url).json()
-                if THUMBNAIL_URL in response:
-                    link_meta.thumbnail = response[THUMBNAIL_URL]
-                    link_meta.save()
+            get_or_create_link_meta(url)
 
         post = api.create_post(
             channel_name,
