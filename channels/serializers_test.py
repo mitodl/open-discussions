@@ -251,8 +251,8 @@ def test_contributor_validate_name():
     assert ContributorSerializer().validate_contributor_name(user.username) == {'contributor_name': user.username}
 
 
-def test_contributor_create():
-    """Adds a contributor"""
+def test_contributor_create_username():
+    """Adds a contributor by username"""
     user = UserFactory.create()
     contributor_user = UserFactory.create()
     contributor_redditor = Mock(spec=Redditor)
@@ -265,6 +265,59 @@ def test_contributor_create():
     }).create({'contributor_name': contributor_user.username})
     assert contributor is contributor_redditor
     api_mock.add_contributor.assert_called_once_with(contributor_user.username, 'foo_channel')
+
+
+def test_contributor_create_email():
+    """Adds a contributor by email address"""
+    user = UserFactory.create()
+    contributor_user = UserFactory.create()
+    contributor_redditor = Mock(spec=Redditor)
+    contributor_redditor.name = contributor_user.username
+    api_mock = Mock(add_contributor=Mock(return_value=contributor_redditor))
+    # Make sure that we're testing case insensitivity of email
+    assert contributor_user.email != contributor_user.email.upper()
+    contributor = ContributorSerializer(context={
+        "channel_api": api_mock,
+        "request": Mock(user=user),
+        "view": Mock(kwargs={'channel_name': 'foo_channel'})
+    }).create({'email': contributor_user.email.upper()})
+    assert contributor is contributor_redditor
+    api_mock.add_contributor.assert_called_once_with(contributor_user.username, 'foo_channel')
+
+
+def test_contributor_create_both():
+    """The user should only be able to specify an email address or a username"""
+    user = UserFactory.create()
+    contributor_user = UserFactory.create()
+    contributor_redditor = Mock(spec=Redditor)
+    contributor_redditor.name = contributor_user.username
+    api_mock = Mock(add_contributor=Mock(return_value=contributor_redditor))
+
+    with pytest.raises(ValueError) as ex:
+        ContributorSerializer(context={
+            "channel_api": api_mock,
+            "request": Mock(user=user),
+            "view": Mock(kwargs={'channel_name': 'foo_channel'})
+        }).create({'contributor_name': contributor_user.username, 'email': contributor_user.email})
+    assert ex.value.args[0] == "Only one of contributor_name, email should be specified"
+
+
+def test_contributor_create_neither():
+    """The user must specify an email address or a username"""
+    user = UserFactory.create()
+    contributor_user = UserFactory.create()
+    contributor_redditor = Mock(spec=Redditor)
+    contributor_redditor.name = contributor_user.username
+    api_mock = Mock(add_contributor=Mock(return_value=contributor_redditor))
+
+    with pytest.raises(ValueError) as ex:
+        ContributorSerializer(context={
+            "channel_api": api_mock,
+            "request": Mock(user=user),
+            "view": Mock(kwargs={'channel_name': 'foo_channel'})
+        }).create({})
+
+    assert ex.value.args[0] == 'Missing contributor_name or email'
 
 
 @pytest.mark.parametrize("is_public", [True, False])
@@ -302,21 +355,77 @@ def test_moderator_validate_name():
     assert ModeratorPrivateSerializer().validate_moderator_name(user.username) == {'moderator_name': user.username}
 
 
-def test_moderator_create():
-    """Adds a moderator"""
+def test_moderator_create_username():
+    """Adds a moderator by username"""
     user = UserFactory.create()
     moderator_user = UserFactory.create()
     moderator_redditor = Mock(spec=Redditor)
     moderator_redditor.name = moderator_user.username
 
     api_mock = Mock(add_moderator=Mock(return_value=moderator_redditor))
-    contributor = ModeratorPrivateSerializer(context={
+    moderator = ModeratorPrivateSerializer(context={
         "channel_api": api_mock,
         "request": Mock(user=user),
         "view": Mock(kwargs={'channel_name': 'foo_channel'})
     }).create({'moderator_name': moderator_user.username})
-    assert contributor is moderator_redditor
+    assert moderator is moderator_redditor
     api_mock.add_moderator.assert_called_once_with(moderator_user.username, 'foo_channel')
+
+
+def test_moderator_create_email():
+    """Adds a moderator by email address"""
+    user = UserFactory.create()
+    moderator_user = UserFactory.create()
+    moderator_redditor = Mock(spec=Redditor)
+    moderator_redditor.name = moderator_user.username
+    api_mock = Mock(add_moderator=Mock(return_value=moderator_redditor))
+    # Make sure that we're testing case insensitivity of email
+    assert moderator_user.email != moderator_user.email.upper()
+    moderator = ModeratorPrivateSerializer(context={
+        "channel_api": api_mock,
+        "request": Mock(user=user),
+        "view": Mock(kwargs={'channel_name': 'foo_channel'})
+    }).create({'email': moderator_user.email.upper()})
+    assert moderator is moderator_redditor
+    api_mock.add_moderator.assert_called_once_with(moderator_user.username, 'foo_channel')
+
+
+def test_moderator_create_both():
+    """The user should only be able to specify an email address or a username"""
+    user = UserFactory.create()
+    moderator_user = UserFactory.create()
+    moderator_redditor = Mock(spec=Redditor)
+    moderator_redditor.name = moderator_user.username
+    api_mock = Mock(add_moderator=Mock(return_value=moderator_redditor))
+    # Make sure that we're testing case insensitivity of email
+    assert moderator_user.email != moderator_user.email.upper()
+
+    with pytest.raises(ValueError) as ex:
+        ModeratorPrivateSerializer(context={
+            "channel_api": api_mock,
+            "request": Mock(user=user),
+            "view": Mock(kwargs={'channel_name': 'foo_channel'})
+        }).create({'email': moderator_user.email.upper(), 'moderator_name': moderator_user.username})
+    assert ex.value.args[0] == "Only one of moderator_name, email should be specified"
+
+
+def test_moderator_create_neither():
+    """The user must specify an email address or a username"""
+    user = UserFactory.create()
+    moderator_user = UserFactory.create()
+    moderator_redditor = Mock(spec=Redditor)
+    moderator_redditor.name = moderator_user.username
+    api_mock = Mock(add_moderator=Mock(return_value=moderator_redditor))
+    # Make sure that we're testing case insensitivity of email
+    assert moderator_user.email != moderator_user.email.upper()
+
+    with pytest.raises(ValueError) as ex:
+        ModeratorPrivateSerializer(context={
+            "channel_api": api_mock,
+            "request": Mock(user=user),
+            "view": Mock(kwargs={'channel_name': 'foo_channel'})
+        }).create({})
+    assert ex.value.args[0] == "Missing moderator_name or email"
 
 
 def test_subscriber():
