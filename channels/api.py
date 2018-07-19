@@ -47,10 +47,12 @@ from channels.models import (
     RedditAccessToken,
     RedditRefreshToken,
     Subscription,
+    LinkMeta
 )
 from channels.utils import get_kind_mapping
 
 from channels import task_helpers as channels_task_helpers
+from embedly.api import get_embedly, THUMBNAIL_URL
 from open_discussions import features
 from open_discussions.utils import now_in_utc
 from search import task_helpers as search_task_helpers
@@ -289,13 +291,14 @@ def sync_channel_model(name):
     return Channel.objects.get_or_create(name=name)[0]
 
 
-def sync_post_model(*, channel_name, post_id):
+def sync_post_model(*, channel_name, post_id, post_url=None):
     """
-    Create a new Post if it doesn't exist already. Also create a new Channel if necessary
+    Create a new Post if it doesn't exist already. Also create a new Channel and LinkMeta if necessary
 
     Args:
         channel_name (str): The name of the channel
         post_id (str): The id of the post
+        post_url (str): The link url for a link post
 
     Returns:
         Post: The post object
@@ -306,10 +309,20 @@ def sync_post_model(*, channel_name, post_id):
             return post
 
         channel = sync_channel_model(channel_name)
-        return Post.objects.get_or_create(
+        post_obj = Post.objects.get_or_create(
             post_id=post_id,
             defaults={'channel': channel},
         )[0]
+        if post_url and post_obj.link_meta is None and settings.EMBEDLY_KEY:
+            link_meta, created = LinkMeta.objects.get_or_create(url=post_url)
+            if created:
+                response = get_embedly(post_url).json()
+                if THUMBNAIL_URL in response:
+                    link_meta.thumbnail = response[THUMBNAIL_URL]
+                    link_meta.save()
+            post_obj.link_meta = link_meta
+            post_obj.save()
+        return post_obj
 
 
 def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):

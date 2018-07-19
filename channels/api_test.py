@@ -1042,12 +1042,14 @@ def test_sync_post_model():
     """sync_post_model should write the post information to our database"""
     channel_name = 'channel'
     post_id = 'post_id'
+    post_url = 'http://fake'
 
     assert Channel.objects.count() == 0
     assert Post.objects.count() == 0
     post = api.sync_post_model(
         channel_name=channel_name,
         post_id=post_id,
+        post_url=post_url
     )
     assert Channel.objects.count() == 1
     assert Post.objects.count() == 1
@@ -1058,4 +1060,5 @@ def test_sync_post_model():
     assert post == api.sync_post_model(
         channel_name=channel_name,
         post_id=post_id,
+        post_url=post_url
     )

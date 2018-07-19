@@ -14,6 +14,7 @@ def sync_post_model(post):
     tasks.sync_post_model.delay(
         channel_name=post.subreddit.display_name,
         post_id=post.id,
+        post_url=post.url
     )
 
 

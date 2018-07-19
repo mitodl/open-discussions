@@ -99,23 +99,24 @@ class Channel(TimestampedModel):
         return f"{self.name}"
 
 
+class LinkMeta(TimestampedModel):
+    """
+    The thumbnail embedly provides for a particular URL
+    """
+    url = URLField(unique=True, max_length=2048)
+    thumbnail = URLField(blank=True, null=True, max_length=2048)
+
+
 class Post(TimestampedModel):
     """
     Keep track of post ids so that we can index all posts
     """
     channel = models.ForeignKey(Channel)
     post_id = Base36IntegerField(unique=True)
+    link_meta = models.ForeignKey(LinkMeta, null=True)
 
     def __str__(self):
         return f"{self.post_id} on channel {self.channel}"
-
-
-class LinkThumbnail(TimestampedModel):
-    """
-    The thumbnail embedly provides for a particular URL
-    """
-    url = URLField(unique=True, max_length=2048)
-    thumbnail = URLField(blank=True, null=True, max_length=2048)
 
 
 class Comment(TimestampedModel):

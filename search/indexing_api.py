@@ -220,6 +220,7 @@ def sync_post_and_comments(serialized):
             sync_post_model(
                 channel_name=item['channel_title'],
                 post_id=item['post_id'],
+                post_url=item['post_link_url']
             )
         elif item['object_type'] == COMMENT_TYPE:
             sync_comment_model(

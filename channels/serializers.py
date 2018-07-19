@@ -6,6 +6,7 @@ from datetime import (
     timezone,
 )
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from praw.models import Comment, MoreComments
 from praw.models.reddit.submission import Submission
@@ -20,8 +21,9 @@ from channels.constants import (
 from channels.models import (
     Channel,
     Subscription,
-    LinkThumbnail
+    LinkMeta
 )
+from embedly.api import get_embedly, THUMBNAIL_URL
 from open_discussions.utils import filter_dict_with_renamed_keys
 from profiles.models import Profile
 from profiles.utils import image_uri
@@ -184,9 +186,9 @@ class BasePostSerializer(RedditObjectSerializer):
 
     def get_thumbnail(self, instance):
         """ Returns a thumbnail url or null"""
-        link_thumb = LinkThumbnail.objects.filter(url=instance.url).first()
-        if link_thumb:
-            return link_thumb.thumbnail
+        link_meta = LinkMeta.objects.filter(url=instance.url).first()
+        if link_meta:
+            return link_meta.thumbnail
         return None
 
     def get_slug(self, instance):
@@ -301,6 +303,15 @@ class PostSerializer(BasePostSerializer):
 
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
+
+        if url and settings.EMBEDLY_KEY:
+            link_meta, created = LinkMeta.objects.get_or_create(url=url)
+            if created:
+                response = get_embedly(url).json()
+                if THUMBNAIL_URL in response:
+                    link_meta.thumbnail = response[THUMBNAIL_URL]
+                    link_meta.save()
+
         post = api.create_post(
             channel_name,
             title=title,

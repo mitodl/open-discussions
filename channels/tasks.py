@@ -29,7 +29,7 @@ def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):
 
 
 @app.task
-def sync_post_model(*, channel_name, post_id):
+def sync_post_model(*, channel_name, post_id, post_url=None):
     """
     Create or update local post id information
 
@@ -39,5 +39,6 @@ def sync_post_model(*, channel_name, post_id):
     """
     api.sync_post_model(
         channel_name=channel_name,
-        post_id=post_id
+        post_id=post_id,
+        post_url=post_url
     )
