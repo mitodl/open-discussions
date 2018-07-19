@@ -8,14 +8,14 @@ from rest_framework.views import APIView
 
 from channels.api import Api
 from channels.serializers import ContributorSerializer
-from open_discussions.permissions import JwtIsStaffOrModeratorPermission
+from open_discussions.permissions import ContributorPermissions
 
 
 class ContributorListView(ListCreateAPIView):
     """
     View to list and add contributors in channels
     """
-    permission_classes = (IsAuthenticated, JwtIsStaffOrModeratorPermission, )
+    permission_classes = (IsAuthenticated, ContributorPermissions)
     serializer_class = ContributorSerializer
 
     def get_serializer_context(self):
@@ -35,7 +35,7 @@ class ContributorDetailView(APIView):
     """
     View to retrieve and remove contributors in channels
     """
-    permission_classes = (IsAuthenticated, JwtIsStaffOrModeratorPermission, )
+    permission_classes = (IsAuthenticated, ContributorPermissions)
 
     def get_serializer_context(self):
         """Context for the request and view"""

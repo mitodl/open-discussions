@@ -13,9 +13,9 @@ from channels.serializers import (
 from channels.utils import translate_praw_exceptions
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
+    ModeratorPermissions,
     is_moderator,
     is_staff_jwt,
-    JwtIsStaffModeratorOrReadonlyPermission,
 )
 
 
@@ -23,7 +23,9 @@ class ModeratorListView(ListCreateAPIView):
     """
     View for listing and adding moderators
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffModeratorOrReadonlyPermission,)
+    permission_classes = (
+        AnonymousAccessReadonlyPermission, ModeratorPermissions,
+    )
 
     def get_serializer_class(self):
         """
@@ -51,7 +53,9 @@ class ModeratorDetailView(APIView):
     """
     View to retrieve and remove moderators
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffModeratorOrReadonlyPermission,)
+    permission_classes = (
+        AnonymousAccessReadonlyPermission, ModeratorPermissions,
+    )
 
     def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """
