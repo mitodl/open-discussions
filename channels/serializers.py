@@ -6,7 +6,6 @@ from datetime import (
     timezone,
 )
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from praw.models import Comment, MoreComments
 from praw.models.reddit.submission import Submission
@@ -21,7 +20,6 @@ from channels.constants import (
 from channels.models import (
     Channel,
     Subscription,
-    LinkMeta
 )
 from open_discussions.utils import filter_dict_with_renamed_keys
 from profiles.models import Profile
@@ -185,7 +183,7 @@ class BasePostSerializer(RedditObjectSerializer):
 
     def get_thumbnail(self, instance):
         """ Returns a thumbnail url or null"""
-        link_meta = LinkMeta.objects.filter(url=instance.url).first()
+        link_meta = get_or_create_link_meta(instance.url) if not instance.is_self else None
         if link_meta:
             return link_meta.thumbnail
         return None
@@ -296,15 +294,13 @@ class PostSerializer(BasePostSerializer):
         kwargs = {}
         if url:
             kwargs['url'] = url
+            get_or_create_link_meta(url)
         else:
             # Reddit API requires that either url or text not be `None`.
             kwargs['text'] = text or ''
 
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
-
-        if url and settings.EMBEDLY_KEY:
-            get_or_create_link_meta(url)
 
         post = api.create_post(
             channel_name,

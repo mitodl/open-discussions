@@ -259,7 +259,7 @@ def get_or_create_link_meta(url):
 
     """
     link_meta = LinkMeta.objects.filter(url=url).first()
-    if link_meta is None:
+    if link_meta is None and settings.EMBEDLY_KEY:
         response = get_embedly(url).json()
         if THUMBNAIL_URL in response:
             link_meta, _ = LinkMeta.objects.get_or_create(

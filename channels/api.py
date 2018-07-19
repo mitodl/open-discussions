@@ -46,7 +46,7 @@ from channels.models import (
     Post,
     RedditAccessToken,
     RedditRefreshToken,
-    Subscription
+    Subscription,
 )
 from channels.utils import get_kind_mapping, get_or_create_link_meta
 

@@ -19,7 +19,7 @@ def embedly_view(request, **kwargs):  # pylint: disable=unused-argument
         url = unquote(unquote(kwargs["url"]))
         response = get_embedly(url).json()
         if THUMBNAIL_URL in response:
-            LinkMeta.objects.get_or_create(url=url, defaults={
+            LinkMeta.objects.update_or_create(url=url, defaults={
                 'thumbnail': response[THUMBNAIL_URL]
             })
         return Response(response)
