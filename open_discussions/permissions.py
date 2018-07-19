@@ -152,7 +152,7 @@ class AnonymousAccessReadonlyPermission(permissions.BasePermission):
         if not request.user.is_anonymous:
             return True
 
-        if request.method not in permissions.SAFE_METHODS:
+        if not is_readonly(request):
             return False
 
         return features.is_enabled(features.ANONYMOUS_ACCESS)
