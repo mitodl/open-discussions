@@ -1,6 +1,30 @@
 Release Notes
 =============
 
+Version 0.37.0
+--------------
+
+- Rename /register -&gt; /signup
+- Make touchstone button &amp; MIT email invalidation contingent on FEATURE_SAML_AUTH flag  (#920)
+- Added command to backpopulate social auth
+- Refactor user create code and create social auth record for MM users
+- Don&#39;t silence 403 status for reddit moderator API (#939)
+- Remove duplicates when adding a new moderator or contributor (#914)
+- Add readonly moderator and contributor tabs (#906)
+- Fix flow issues with component prop typing
+- Added password change UI
+- Make text post body optional (#910)
+- Fixed password reset UI and refactored redirect/load logic
+- Add functions to add and remove moderators and contributors (#913)
+- Implement new submit post design
+- Add reducer and API function for contributors (#902)
+- Make contributors API moderator-only and add moderator-only serializer for contributors (#898)
+- Don&#39;t fetch from moderators list to check whether user is mod (#901)
+- Change sandbox.create to createSandbox (#904)
+- a few small CSS tweaks
+- Description metatag (#884)
+- Touchstone login UI (#895)
+
 Version 0.36.1
 --------------
 
