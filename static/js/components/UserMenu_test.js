@@ -6,7 +6,7 @@ import { shallow } from "enzyme"
 import sinon from "sinon"
 import { Link } from "react-router-dom"
 
-import UserMenu from "./UserMenu"
+import UserMenu, { DropDownArrow, DropUpArrow } from "./UserMenu"
 import DropdownMenu from "./DropdownMenu"
 
 import { profileURL, SETTINGS_URL } from "../lib/url"
@@ -38,12 +38,13 @@ describe("UserMenu", () => {
     sandbox.restore()
   })
 
-  const renderUserMenu = () =>
+  const renderUserMenu = (props = {}) =>
     shallow(
       <UserMenu
         toggleShowUserMenu={toggleShowUserMenuStub}
         showUserMenu={showUserMenu}
         profile={profile}
+        {...props}
       />
     )
 
@@ -55,14 +56,17 @@ describe("UserMenu", () => {
   })
 
   it("should render the dropdown if showUserMenu", () => {
-    [true, false].forEach(showUserMenuValue => {
-      showUserMenu = showUserMenuValue
-      const wrapper = renderUserMenu()
-      if (showUserMenu) {
-        assert.isOk(wrapper.find(DropdownMenu).exists())
-      } else {
-        assert.isNotOk(wrapper.find(DropdownMenu).exists())
-      }
+    [true, false].forEach(showUserMenu => {
+      const wrapper = renderUserMenu({ showUserMenu })
+      assert.equal(showUserMenu, wrapper.find(DropdownMenu).exists())
+    })
+  })
+
+  it("should show a drop-down or -up menu, depending on showUserMenu", () => {
+    [true, false].forEach(showUserMenu => {
+      const wrapper = renderUserMenu({ showUserMenu })
+      assert.equal(showUserMenu, wrapper.find(DropUpArrow).exists())
+      assert.equal(!showUserMenu, wrapper.find(DropDownArrow).exists())
     })
   })
 

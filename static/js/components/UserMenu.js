@@ -17,6 +17,14 @@ type Props = {
   showUserMenu: boolean
 }
 
+export const DropDownArrow = () => (
+  <i className="material-icons arrow_drop_down">arrow_drop_down</i>
+)
+
+export const DropUpArrow = () => (
+  <i className="material-icons arrow_drop_up">arrow_drop_up</i>
+)
+
 export default class UserMenu extends React.Component<Props> {
   render() {
     const { toggleShowUserMenu, showUserMenu, profile } = this.props
@@ -30,6 +38,7 @@ export default class UserMenu extends React.Component<Props> {
           onClick={toggleShowUserMenu}
           imageSize={PROFILE_IMAGE_SMALL}
         />
+        {showUserMenu ? <DropUpArrow /> : <DropDownArrow />}
         {SETTINGS.profile_ui_enabled && !isProfileComplete(profile) ? (
           <div className="profile-incomplete" />
         ) : null}

@@ -3,6 +3,11 @@
   left: 0;
   height: calc(100vh - #{$toolbar-height-desktop});
   top: $toolbar-height-desktop;
+  width: $drawer-width;
+
+  .mdc-drawer__drawer {
+    width: $drawer-width;
+  }
 
   @include breakpoint(materialmobile) {
     height: calc(100vh - #{$toolbar-height-mobile});

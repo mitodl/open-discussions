@@ -52,6 +52,28 @@ describe("Navigation", () => {
       assert.equal(props.children, "Submit a New Post")
     })
 
+    it("should highlight the home link if, well, home", () => {
+      const wrapper = renderComponent()
+      assert.ok(
+        wrapper
+          .find(".location.current-location")
+          .find(".home-link")
+          .exists()
+      )
+    })
+
+    it("shouldn't highlight the homelink if not home!", () => {
+      defaultProps.pathname = "/hfodfo/asdfasdfasdf"
+      const wrapper = renderComponent()
+      defaultProps.pathname = "/hfodfo/asdfasdfasdf"
+      assert.isNotOk(
+        wrapper
+          .find(".location.current-location")
+          .find(".home-link")
+          .exists()
+      )
+    })
+
     it("create post link should have channel name if channelName is in URL", () => {
       const wrapper = renderComponent({
         ...defaultProps,

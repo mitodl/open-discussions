@@ -28,7 +28,8 @@ a.mitlogo {
 
   .user-menu-section {
     flex-grow: unset;
-    height: 49px;
+    padding-right: 0;
+    align-items: center;
   }
 }
 
@@ -43,8 +44,7 @@ a.mitlogo {
     margin-left: 36px;
   }
 
-  .mdc-button,
-  .home-link {
+  .mdc-button {
     width: 87%;
     height: 43px;
     line-height: 43px;
@@ -54,17 +54,6 @@ a.mitlogo {
     padding: 0 5px;
     box-shadow: none;
     margin-left: 14px;
-  }
-
-  .home-link {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-    color: $navigation-text;
-
-    i {
-      margin-right: 10px;
-    }
   }
 
   .mdc-button:hover {
@@ -100,16 +89,35 @@ a.mitlogo {
   }
 }
 
-.subscriptions {
-  margin: 15px 0 20px;
-  width: 100%;
-  padding: 16px 0 18px 0;
-  box-sizing: border-box;
-  border: 1px solid $border-grey-alt;
-  border-width: 1px 0;
+.current-location {
+  background-color: $bg-grey;
+}
 
-  .channelname {
+.location-list {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 10px 0 5px;
+
+  &.subscribed-channels {
+    border: 1px solid $border-grey-alt;
+    border-width: 1px 0;
+    padding: 16px 0 18px 0;
+    margin: 15px 0 20px;
+  }
+
+  .location {
     margin: 0 0 0 0;
+
+    .home-link {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+      color: $navigation-text;
+
+      i {
+        margin-right: 10px;
+      }
+    }
 
     a {
       color: $navigation-text;

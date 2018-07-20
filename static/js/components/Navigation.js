@@ -33,6 +33,9 @@ const Navigation = (props: NavigationProps) => {
       ? userCanPost(currentChannel)
       : R.any(userCanPost, [...channels.values()]))
 
+  const homeClassName =
+    pathname === "/" ? "location current-location" : "location"
+
   return (
     <div className="navigation">
       {showPostButton ? (
@@ -43,10 +46,14 @@ const Navigation = (props: NavigationProps) => {
           Submit a New Post
         </Link>
       ) : null}
-      <Link className="home-link" to={FRONTPAGE_URL}>
-        <i className="material-icons home">home</i>
-        Home
-      </Link>
+      <div className="location-list">
+        <div className={homeClassName}>
+          <Link className="home-link" to={FRONTPAGE_URL}>
+            <i className="material-icons home">home</i>
+            Home
+          </Link>
+        </div>
+      </div>
       <SubscriptionsList
         currentChannel={channelName}
         subscribedChannels={subscribedChannels}

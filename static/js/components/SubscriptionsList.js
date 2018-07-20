@@ -11,16 +11,14 @@ type Props = {
 }
 
 const channelClassName = (channelName, currentChannel) =>
-  currentChannel === channelName
-    ? "channelname current-location"
-    : "channelname"
+  currentChannel === channelName ? "location current-location" : "location"
 
 export default class SubscriptionsList extends React.Component<Props> {
   render() {
     const { subscribedChannels, currentChannel } = this.props
 
     return (
-      <div className="subscriptions">
+      <div className="location-list subscribed-channels">
         {subscribedChannels.map(channel => (
           <div
             className={channelClassName(channel.name, currentChannel)}

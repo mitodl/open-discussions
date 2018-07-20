@@ -32,10 +32,7 @@ describe("SubscriptionsList", function() {
     const wrapper = renderSubscriptionsList()
     const currentLocation = wrapper.find(".current-location")
     assert.lengthOf(currentLocation, 1)
-    assert.equal(
-      currentLocation.props().className,
-      "channelname current-location"
-    )
+    assert.equal(currentLocation.props().className, "location current-location")
     assert.equal(currentLocation.children().props().children, channels[0].title)
     assert.equal(
       currentLocation.children().props().to,

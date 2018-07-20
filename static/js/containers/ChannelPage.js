@@ -11,7 +11,6 @@ import withLoading from "../components/Loading"
 import PostListNavigation from "../components/PostListNavigation"
 import withChannelSidebar from "../hoc/withChannelSidebar"
 import { PostSortPicker } from "../components/SortPicker"
-import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import {
   withPostModeration,
   postModerationSelector
@@ -140,7 +139,6 @@ class ChannelPage extends React.Component<ChannelPageProps> {
           <MetaTags>
             <title>{formatTitle(channel.title)}</title>
           </MetaTags>
-          <ChannelBreadcrumbs channel={channel} />
           <div className="post-list-title">
             <div>{channel.title}</div>
             <PostSortPicker
