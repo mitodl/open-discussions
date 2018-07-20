@@ -579,6 +579,28 @@ class GenericCommentSerializer(serializers.Serializer):
         raise ValueError('Unknown type {} in the comments list'.format(type(instance)))
 
 
+def _validate_username(key, value):
+    """
+    Helper function to validate the username
+    """
+    if not isinstance(value, str):
+        raise ValidationError("username must be a string")
+    if not User.objects.filter(username=value).exists():
+        raise ValidationError("username is not a valid user")
+    return {key: value}
+
+
+def _validate_email(value):
+    """
+    Helper function to validate email
+    """
+    if not isinstance(value, str):
+        raise ValidationError("email must be a string")
+    if not User.objects.filter(email__iexact=value).exists():
+        raise ValidationError("email does not exist")
+    return {'email': value}
+
+
 class ContributorSerializer(serializers.Serializer):
     """Serializer for contributors. Should be accessible by moderators only"""
     contributor_name = WriteableSerializerMethodField()
@@ -599,11 +621,11 @@ class ContributorSerializer(serializers.Serializer):
 
     def validate_contributor_name(self, value):
         """Validates the contributor name"""
-        if not isinstance(value, str):
-            raise ValidationError("contributor name must be a string")
-        if not User.objects.filter(username=value).exists():
-            raise ValidationError("contributor name is not a valid user")
-        return {'contributor_name': value}
+        return _validate_username('contributor_name', value)
+
+    def validate_email(self, value):
+        """Validates the contributor email"""
+        return _validate_email(value)
 
     def create(self, validated_data):
         api = self.context['channel_api']
@@ -653,11 +675,11 @@ class ModeratorPrivateSerializer(serializers.Serializer):
 
     def validate_moderator_name(self, value):
         """Validates the moderator name"""
-        if not isinstance(value, str):
-            raise ValidationError("moderator name must be a string")
-        if not User.objects.filter(username=value).exists():
-            raise ValidationError("moderator name is not a valid user")
-        return {'moderator_name': value}
+        return _validate_username('moderator_name', value)
+
+    def validate_email(self, value):
+        """Validates the moderator email"""
+        return _validate_email(value)
 
     def create(self, validated_data):
         api = self.context['channel_api']

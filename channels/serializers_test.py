@@ -235,20 +235,40 @@ def test_contributor_validate_name_no_string():
     """validate the input in case the value is not a string"""
     with pytest.raises(ValidationError) as ex:
         ContributorSerializer().validate_contributor_name(None)
-    assert ex.value.args[0] == 'contributor name must be a string'
+    assert ex.value.args[0] == 'username must be a string'
 
 
 def test_contributor_validate_name_no_valid_user():
     """validate the input in case the user does not exists in the DB"""
     with pytest.raises(ValidationError) as ex:
         ContributorSerializer().validate_contributor_name('foo_user')
-    assert ex.value.args[0] == 'contributor name is not a valid user'
+    assert ex.value.args[0] == 'username is not a valid user'
 
 
 def test_contributor_validate_name():
     """validate the input"""
     user = UserFactory.create()
     assert ContributorSerializer().validate_contributor_name(user.username) == {'contributor_name': user.username}
+
+
+def test_contributor_validate_email_no_string():
+    """validate the input in case the value is not a string"""
+    with pytest.raises(ValidationError) as ex:
+        ContributorSerializer().validate_email(None)
+    assert ex.value.args[0] == 'email must be a string'
+
+
+def test_contributor_validate_email_no_valid_user():
+    """validate the input in case the user does not exists in the DB"""
+    with pytest.raises(ValidationError) as ex:
+        ContributorSerializer().validate_email('foo_user')
+    assert ex.value.args[0] == 'email does not exist'
+
+
+def test_contributor_validate_email():
+    """validate the input"""
+    user = UserFactory.create()
+    assert ContributorSerializer().validate_email(user.email) == {'email': user.email}
 
 
 def test_contributor_create_username():
@@ -339,20 +359,40 @@ def test_moderator_validate_name_no_string():
     """validate the input in case the value is not a string"""
     with pytest.raises(ValidationError) as ex:
         ModeratorPrivateSerializer().validate_moderator_name(None)
-    assert ex.value.args[0] == 'moderator name must be a string'
+    assert ex.value.args[0] == 'username must be a string'
 
 
 def test_moderator_validate_name_no_valid_user():
     """validate the input in case the user does not exists in the DB"""
     with pytest.raises(ValidationError) as ex:
         ModeratorPrivateSerializer().validate_moderator_name('foo_user')
-    assert ex.value.args[0] == 'moderator name is not a valid user'
+    assert ex.value.args[0] == 'username is not a valid user'
 
 
 def test_moderator_validate_name():
     """validate the input"""
     user = UserFactory.create()
     assert ModeratorPrivateSerializer().validate_moderator_name(user.username) == {'moderator_name': user.username}
+
+
+def test_moderator_validate_email_no_string():
+    """validate the input in case the value is not a string"""
+    with pytest.raises(ValidationError) as ex:
+        ModeratorPrivateSerializer().validate_email(None)
+    assert ex.value.args[0] == 'email must be a string'
+
+
+def test_moderator_validate_email_no_valid_user():
+    """validate the input in case the user does not exists in the DB"""
+    with pytest.raises(ValidationError) as ex:
+        ModeratorPrivateSerializer().validate_email('foo_user')
+    assert ex.value.args[0] == 'email does not exist'
+
+
+def test_moderator_validate_email():
+    """validate the input"""
+    user = UserFactory.create()
+    assert ModeratorPrivateSerializer().validate_email(user.email) == {'email': user.email}
 
 
 def test_moderator_create_username():

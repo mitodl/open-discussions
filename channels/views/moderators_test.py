@@ -94,6 +94,26 @@ def test_add_moderator(client, staff_jwt_header):
     }
 
 
+def test_add_moderator_email(client, public_channel, staff_jwt_header, staff_api, reddit_factories):
+    """
+    Adds a moderator to a channel by email
+    """
+    existing_mod_user = reddit_factories.user("mod_user1")
+    new_mod_user = reddit_factories.user("new_mod_user")
+    staff_api.add_moderator(existing_mod_user.username, public_channel.name)
+    client.force_login(existing_mod_user)
+
+    url = reverse('moderator-list', kwargs={'channel_name': public_channel.name})
+    resp = client.post(url, data={'email': new_mod_user.email}, format='json', **staff_jwt_header)
+
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json() == {
+        'moderator_name': new_mod_user.username,
+        'email': new_mod_user.email,
+        'full_name': new_mod_user.profile.name,
+    }
+
+
 def test_add_moderator_again(client, staff_jwt_header):
     """
     If a user is already a moderator we should return 201 without making any changes
