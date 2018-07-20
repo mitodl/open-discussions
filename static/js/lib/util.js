@@ -119,14 +119,3 @@ export const getTokenFromUrl = (props: Object): string => {
   token = parsedQuerystring.token
   return token || ""
 }
-
-export const parentHeight = (): number =>
-  document
-    .querySelector(".post-toprow-column2")
-    .at(0)
-    .clientHeight()
-export const parentWidth = (): number =>
-  document
-    .querySelector(".post-toprow-column2")
-    .at(0)
-    .clientWidth()

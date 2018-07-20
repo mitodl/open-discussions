@@ -30,7 +30,8 @@ export const makePost = (
   stickied:      casual.boolean,
   removed:       casual.boolean,
   num_reports:   null,
-  subscribed:    casual.boolean
+  subscribed:    casual.boolean,
+  thumbnail:     isURLPost ? casual.url : null,
 })
 
 export const makeChannelPostList = (channelName: string = casual.word) =>
