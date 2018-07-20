@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.37.0
+Version 0.37.0 (Released July 18, 2018)
 --------------
 
 - Rename /register -&gt; /signup
@@ -25,12 +25,12 @@ Version 0.37.0
 - Description metatag (#884)
 - Touchstone login UI (#895)
 
-Version 0.36.1
+Version 0.36.1 (Released July 10, 2018)
 --------------
 
 - Add membership field to Channel and REST API serializer (#881)
 
-Version 0.36.0
+Version 0.36.0 (Released July 09, 2018)
 --------------
 
 - Hide user menu if user is not logged in
@@ -40,7 +40,7 @@ Version 0.36.0
 - Replace &#39;channel&#39; with &#39;c&#39; in URLs, redirect old URLs to new ones (#876)
 - Add scss to our fmt commands for prettier
 
-Version 0.35.2
+Version 0.35.2 (Released July 06, 2018)
 --------------
 
 - Update post detail page to new design
@@ -49,31 +49,31 @@ Version 0.35.2
 - Scope fixed-width form styles to auth pages
 - Added login/register UI
 
-Version 0.35.1
+Version 0.35.1 (Released July 05, 2018)
 --------------
 
 - Add UI to edit post types (#852)
 - Added link url to search serializer
 
-Version 0.35.0
+Version 0.35.0 (Released July 03, 2018)
 --------------
 
 - Hide post button for channels not allowing it (#857)
 - Add preventDefault to toolbar click handler (#862)
 
-Version 0.34.1
+Version 0.34.1 (Released June 29, 2018)
 --------------
 
 - Redesign post listing
 - Remove a flow workaround
 - fix &#39;submit post&#39; button color
 
-Version 0.34.0
+Version 0.34.0 (Released June 26, 2018)
 --------------
 
 - Add UI for editing channel types (#846)
 
-Version 0.33.0
+Version 0.33.0 (Released June 22, 2018)
 --------------
 
 - Use gravatar for new profiles without images (#848)
@@ -83,27 +83,27 @@ Version 0.33.0
 - View/edit profile (#828)
 - Add autouse fixture to prevent requests from executing during tests (#822)
 
-Version 0.32.2
+Version 0.32.2 (Released June 20, 2018)
 --------------
 
 - Use feature flag to determine whether to show profile incompleteness red dot (#838)
 - Delete indices one by one to avoid use of _all (#829)
 
-Version 0.32.1
+Version 0.32.1 (Released June 20, 2018)
 --------------
 
 - Fix a layout bug on the channel page
 - Add models to store id information for posts, channels and comments (#742)
 - Refactored Elasticsearch serializers to use DRF post/comment serializers
 
-Version 0.32.0
+Version 0.32.0 (Released June 19, 2018)
 --------------
 
 - Update drawer and toolbar layout!
 - Profile image uploader (#816)
 - Added channel API middleware and moved channel API imports out of serializers
 
-Version 0.31.2
+Version 0.31.2 (Released June 14, 2018)
 --------------
 
 - Fix silly bug with embedly display
@@ -111,7 +111,7 @@ Version 0.31.2
 - Add a fancy loading animation to link posts
 - Require uwsgi to honour stdin locally for debugging
 
-Version 0.31.1
+Version 0.31.1 (Released June 12, 2018)
 --------------
 
 - Fixed locally failing lint
@@ -124,7 +124,7 @@ Version 0.31.1
 - Nginx headers for Touchstone (#803)
 - Minor serializer test refactor
 
-Version 0.31.0
+Version 0.31.0 (Released June 11, 2018)
 --------------
 
 - Added ES comment document indexing
@@ -134,19 +134,19 @@ Version 0.31.0
 - Add security config and entityID setting (#797)
 - Fixed id assignment during indexing
 
-Version 0.30.2
+Version 0.30.2 (Released June 08, 2018)
 --------------
 
 - Fixed faulty downvote logic and added tests
 
-Version 0.30.1
+Version 0.30.1 (Released June 07, 2018)
 --------------
 
 - Refactored lib/auth*.js files
 - Update to latest version of React and a few other packages
 - Remove authentication requirement for viewing SAML metadata (#773)
 
-Version 0.30.0
+Version 0.30.0 (Released June 06, 2018)
 --------------
 
 - Remove redundant profile image and move &#39;incomplete&#39; dot
@@ -157,7 +157,7 @@ Version 0.30.0
 - Aptfile for heroku (#756)
 - SAML login support (#735)
 
-Version 0.29.1
+Version 0.29.1 (Released May 31, 2018)
 --------------
 
 - Fix issue with twitter embeds
@@ -166,13 +166,13 @@ Version 0.29.1
 - Add management command to index comments and posts (#651)
 - Add a user menu in the upper right
 
-Version 0.29.0
+Version 0.29.0 (Released May 29, 2018)
 --------------
 
 - Use keyword so post_link_url won&#39;t be tokenized (#737)
 - Refactored authentication code to its own app
 
-Version 0.28.0
+Version 0.28.0 (Released May 24, 2018)
 --------------
 
 - Add tooltip for anonymous users for the voting buttons
@@ -185,7 +185,7 @@ Version 0.28.0
 - Fix bug related to fetching subscriptions in App.js
 - Hide the reply and follow buttons if the user is anonymous
 
-Version 0.27.1
+Version 0.27.1 (Released May 18, 2018)
 --------------
 
 - Enable anonymous acces to the embedly API
@@ -193,7 +193,7 @@ Version 0.27.1
 - Added Elasticsearch document and added indexing handlers for posts
 - Increased uwsgi buffer size
 
-Version 0.27.0
+Version 0.27.0 (Released May 15, 2018)
 --------------
 
 - Hide the report button for anonymous users
@@ -202,7 +202,7 @@ Version 0.27.0
 - Add a link preview to the link post creation screen
 - README for OSX without docker-machine (#698)
 
-Version 0.26.0
+Version 0.26.0 (Released May 10, 2018)
 --------------
 
 - Add Zendesk widget
@@ -210,12 +210,12 @@ Version 0.26.0
 - Don&#39;t HTML escape subject lines for frontpage emails
 - Simplified layout for notification email (#661)
 
-Version 0.25.0
+Version 0.25.0 (Released May 01, 2018)
 --------------
 
 - Upgrade celery (#652)
 
-Version 0.24.1
+Version 0.24.1 (Released April 26, 2018)
 --------------
 
 - Added handling for praw errors in email notifications
@@ -229,12 +229,12 @@ Version 0.24.1
 - Handle anonymous users for comments (#621)
 - Remove email_optin logic (#631)
 
-Version 0.24.0
+Version 0.24.0 (Released April 23, 2018)
 --------------
 
 - Allow anonymous access for channels (#626)
 
-Version 0.23.0
+Version 0.23.0 (Released April 19, 2018)
 --------------
 
 - Post / Comment follow settings UI
@@ -243,36 +243,36 @@ Version 0.23.0
 - Add missing environment variable for Travis (#622)
 - Added comment notifications
 
-Version 0.22.2
+Version 0.22.2 (Released April 12, 2018)
 --------------
 
 - Fix some style issues with outlook
 - Add error page for 403 error
 - Setup Cloudfront for serving static assets
 
-Version 0.22.1
+Version 0.22.1 (Released April 11, 2018)
 --------------
 
 - Fixed safe_format_recipients to quote display name
 - Adds a read more button to digest email (#594)
 
-Version 0.22.0
+Version 0.22.0 (Released April 09, 2018)
 --------------
 
 - changing logo in micromasters digest emails (#591)
 - Add a link, in the sidebar, to the Settings page
 
-Version 0.21.2
+Version 0.21.2 (Released April 05, 2018)
 --------------
 
 - Fix missing profile picture in email
 
-Version 0.21.1
+Version 0.21.1 (Released April 04, 2018)
 --------------
 
 - Fix 401 auth errors (#579)
 
-Version 0.21.0
+Version 0.21.0 (Released April 02, 2018)
 --------------
 
 - Some small font, margin, and profile image size tweaks (#580)
@@ -281,75 +281,75 @@ Version 0.21.0
 - Fixed shrinking profile images in discussions (#571)
 - Add the &#39;remove post&#39; button to the channel view
 
-Version 0.20.0
+Version 0.20.0 (Released March 27, 2018)
 --------------
 
 - Ensure new users get the default NotificationSettings
 
-Version 0.19.3
+Version 0.19.3 (Released March 23, 2018)
 --------------
 
 - Fix settings page
 - Added email tasks to crontab
 
-Version 0.19.2
+Version 0.19.2 (Released March 22, 2018)
 --------------
 
 - Fixed issue with request KeyError on email send
 
-Version 0.19.1
+Version 0.19.1 (Released March 20, 2018)
 --------------
 
 - Fixed query error on populate command
 - Added model and API to subscribe to comments and posts
 
-Version 0.19.0
+Version 0.19.0 (Released March 19, 2018)
 --------------
 
 - Updated populate_notification_settings to add for comments and respect email_optin
 - Added responsive frontpage email
 
-Version 0.18.1
+Version 0.18.1 (Released March 14, 2018)
 --------------
 
 - Added cancelation and better error handling to email sending
 - Upgrade Django to 1.11, other upgrades (#530)
 
-Version 0.18.0
+Version 0.18.0 (Released March 12, 2018)
 --------------
 
 - Fixed celery log levels with sentry
 - Fix travis errors
 - Add the current user&#39;s name and profile image
 
-Version 0.17.3
+Version 0.17.3 (Released March 08, 2018)
 --------------
 
 - Refactored and added user_activity middleware
 
-Version 0.17.2
+Version 0.17.2 (Released March 07, 2018)
 --------------
 
 - Add settings page for adjusting notification prefs
 - Added frontpage digest email tasks (#460, #461)
 
-Version 0.17.1
+Version 0.17.1 (Released March 06, 2018)
 --------------
 
 - Fix calculation of loaded and notFound on the post page
 
-Version 0.17.0
+Version 0.17.0 (Released March 05, 2018)
 --------------
 
 - Add report links to frontpage and channel page
 
-Version 0.16.0
+Version 0.16.0 (Released February 26, 2018)
 --------------
 
 - Updated UI and views to use AuthenticatedSite (#444)
 - A little renaming
 
-Version 0.15.0
+Version 0.15.0 (Released February 22, 2018)
 --------------
 
 - Added stateless token auth to notification settings api
@@ -362,52 +362,52 @@ Version 0.15.0
 - Fix 403 error on post page (from moderator API)
 - Added mail app supporting sending of emails (#449)
 
-Version 0.14.0
+Version 0.14.0 (Released February 13, 2018)
 --------------
 
 - Add preventDefault wrapper to report post dialog
 - Fix error with non-moderators editing posts
 - Added Site models (#444)
 
-Version 0.13.2
+Version 0.13.2 (Released February 09, 2018)
 --------------
 
 - Fixed error page on comment error (#477)
 - Fix non-moderator comment editing
 - Add profile image to CompactPostDisplay
 
-Version 0.13.1
+Version 0.13.1 (Released February 08, 2018)
 --------------
 
 - Omit status check for code coverage to prevent blocking of deploys (#479)
 - Automatically render plain URLs in Markdown as &lt;a&gt; tags
 - Add comment sorting UI
 
-Version 0.13.0
+Version 0.13.0 (Released February 06, 2018)
 --------------
 
 - Add channel moderation page
 
-Version 0.12.0
+Version 0.12.0 (Released February 01, 2018)
 --------------
 
 - Added email and email_optin fields to user API (#447)
 
-Version 0.11.0
+Version 0.11.0 (Released January 22, 2018)
 --------------
 
 - add UI for choosing post sort method
 - Updated post/comment APIs to enable ignoring future reports (#427)
 - Add comment permalinks
 
-Version 0.10.1
+Version 0.10.1 (Released January 18, 2018)
 --------------
 
 - Added Comment sort api
 - Added report counts to post/comment serializers (#432)
 - Added sorting to posts and frontpage APIs (#192)
 
-Version 0.10.0
+Version 0.10.0 (Released January 17, 2018)
 --------------
 
 - Add a footer
@@ -416,7 +416,7 @@ Version 0.10.0
 - Add a 404 message to the channel page
 - Added post/comment reporting UI (#235)
 
-Version 0.9.0
+Version 0.9.0 (Released January 10, 2018)
 -------------
 
 - Add check_pip.sh (#419)
@@ -424,19 +424,19 @@ Version 0.9.0
 - Added api to report posts and comments (#197)
 - Have update-docker-hub update local dockerfiles (#418)
 
-Version 0.8.2
+Version 0.8.2 (Released December 28, 2017)
 -------------
 
 - Refactored channels/views*.py into separate modules
 - Fixed loading spinner on channel page
 
-Version 0.8.1
+Version 0.8.1 (Released December 27, 2017)
 -------------
 
 - Changed public_description to be optional on channel creation
 - Css tweaks to community guidelines page (#409)
 
-Version 0.8.0
+Version 0.8.0 (Released December 21, 2017)
 -------------
 
 - Upgrade node.js version to 9.3 ⬆️
@@ -444,13 +444,13 @@ Version 0.8.0
 - Pin astroid to fix pylint issue (#406)
 - Some dependency upgrades
 
-Version 0.7.3
+Version 0.7.3 (Released December 15, 2017)
 -------------
 
 - Add user post deletion
 - Added comment removal UI
 
-Version 0.7.2
+Version 0.7.2 (Released December 13, 2017)
 -------------
 
 - Add support for dealing with dialogs in the UI reducer
@@ -458,37 +458,37 @@ Version 0.7.2
 - fix for url breaking layout problem (#394)
 - upgrade the hammock package
 
-Version 0.7.1
+Version 0.7.1 (Released December 12, 2017)
 -------------
 
 - Added comment removal API
 
-Version 0.7.0
+Version 0.7.0 (Released December 11, 2017)
 -------------
 
 - Fix post pinning issue
 - Add UI for pinning posts
 - Refactored CommentTree to make it classy
 
-Version 0.6.1
+Version 0.6.1 (Released December 05, 2017)
 -------------
 
 - Added UI to remove posts as a moderator
 
-Version 0.6.0
+Version 0.6.0 (Released December 04, 2017)
 -------------
 
 - Make stickied not required (#378)
 - Add spinner for Load more comments link (#371)
 - Added editing of channel description
 
-Version 0.5.2
+Version 0.5.2 (Released December 01, 2017)
 -------------
 
 - fixed styling of channel page (#360)
 - Add pinning support to post API
 
-Version 0.5.1
+Version 0.5.1 (Released November 30, 2017)
 -------------
 
 - Comments pagination (#298)
@@ -497,7 +497,7 @@ Version 0.5.1
 - s/self/text/ on guidelines page
 - Add post editing
 
-Version 0.5.0
+Version 0.5.0 (Released November 29, 2017)
 -------------
 
 - Fix channel navigation error
@@ -507,7 +507,7 @@ Version 0.5.0
 - Default to empty description for new channel if not provided (#349)
 - Fixed regression in CSS for new post page (#346)
 
-Version 0.4.0
+Version 0.4.0 (Released November 21, 2017)
 -------------
 
 - Added channel description to API and UI
@@ -519,25 +519,25 @@ Version 0.4.0
 - Switched factories to class-based model and added created field
 - Stabilized factory serialization
 
-Version 0.3.4
+Version 0.3.4 (Released November 08, 2017)
 -------------
 
 - Refactored User/Profile factories to be UserFactory-centric
 
-Version 0.3.3
+Version 0.3.3 (Released November 07, 2017)
 -------------
 
 - Added factories for reddit objects
 - Handle Forbidden exception (#293)
 - Refactor docker-compose layout (#324)
 
-Version 0.3.2
+Version 0.3.2 (Released November 07, 2017)
 -------------
 
 - Monkey patch prawcore&#39;s rate limit to not limit
 - Use application log level for Celery (#313)
 
-Version 0.3.1
+Version 0.3.1 (Released November 06, 2017)
 -------------
 
 - Handle ALREADY_MODERATOR error (#292)
@@ -550,12 +550,12 @@ Version 0.3.1
 - Refactor betamax cassette code to automatically create cassettes (#305)
 - Use yarn install --frozen-lockfile (#303)
 
-Version 0.3.0
+Version 0.3.0 (Released October 30, 2017)
 -------------
 
 - Added caching for refresh and access tokens
 
-Version 0.2.2
+Version 0.2.2 (Released October 19, 2017)
 -------------
 
 - Switched to static reddit OAuth for local
@@ -563,7 +563,7 @@ Version 0.2.2
 - Fix a bug with the MDC Drawer component
 - Added docs with gh-pages style.
 
-Version 0.2.1
+Version 0.2.1 (Released October 12, 2017)
 -------------
 
 - Added a setting for the JWT cookie name
@@ -574,13 +574,13 @@ Version 0.2.1
 - Smaller avatars in comments section (#277)
 - Fix root logger location (#266)
 
-Version 0.2.0
+Version 0.2.0 (Released October 10, 2017)
 -------------
 
 - Added pagination for frontpage (#199)
 - Add check for presence of mailgun variables (#249)
 
-Version 0.1.0
+Version 0.1.0 (Released October 06, 2017)
 -------------
 
 - Fixing problems for realease
