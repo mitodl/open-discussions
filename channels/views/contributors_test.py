@@ -10,22 +10,20 @@ from open_discussions.features import ANONYMOUS_ACCESS
 pytestmark = pytest.mark.betamax
 
 
-def test_list_contributors(client, private_channel_and_contributor, staff_user, staff_jwt_header):
+def test_list_contributors(client, private_channel_and_contributor, staff_user, staff_jwt_header, settings):
     """
     List contributors in a channel
     """
+    settings.INDEXING_API_USERNAME = staff_user.username
     channel, user = private_channel_and_contributor
     url = reverse('contributor-list', kwargs={'channel_name': channel.name})
     resp = client.get(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_200_OK
+    # staff user is filtered out
     assert resp.json() == [{
         'contributor_name': user.username,
         'full_name': user.profile.name,
         'email': user.email,
-    }, {
-        'contributor_name': staff_user.username,
-        'full_name': staff_user.profile.name,
-        'email': staff_user.email,
     }]
 
 

@@ -1,5 +1,6 @@
 """Views for REST APIs for contributors"""
 
+from django.conf import settings
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -28,7 +29,11 @@ class ContributorListView(ListCreateAPIView):
     def get_queryset(self):
         """Get generator for contributors in channel"""
         api = Api(user=self.request.user)
-        return api.list_contributors(self.kwargs['channel_name'])
+        return (
+            contributor for contributor in
+            api.list_contributors(self.kwargs['channel_name'])
+            if contributor.name != settings.INDEXING_API_USERNAME
+        )
 
 
 class ContributorDetailView(APIView):
