@@ -1,6 +1,7 @@
 """Serializers tests"""
 import pytest
 from rest_framework.serializers import ValidationError
+from social_core.backends.email import EmailAuth
 from social_core.exceptions import InvalidEmail, AuthException
 
 from authentication.serializers import RegisterEmailSerializer
@@ -24,6 +25,7 @@ def test_social_auth_serializer_error(mocker, side_effect, result):
     mocked_authenticate.side_effect = side_effect
 
     result.flow = SocialAuthState.FLOW_REGISTER
+    result.provider = EmailAuth.name
 
     serializer = RegisterEmailSerializer(data={
         'flow': result.flow,

@@ -4,10 +4,12 @@ from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
 from social_core.pipeline.partial import partial
 
+from authentication.backends.micromasters import MicroMastersAuth
 from authentication.exceptions import (
     InvalidPasswordException,
     RequirePasswordException,
     RequirePasswordAndProfileException,
+    RequireProviderException,
     RequireRegistrationException,
 )
 from authentication.utils import SocialAuthState
@@ -67,7 +69,8 @@ def require_password_and_profile_via_email(
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
-        is_register (bool): True if the user is registering
+        flow (str): the type of flow (login or register)
+        current_partial (Partial): the partial for the step in the pipeline
 
     Raises:
         RequirePasswordAndProfileException: if the user hasn't set password or name
@@ -142,7 +145,8 @@ def validate_password(
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
         user (User): the current user
-        is_login (bool): True if the request is a login
+        flow (str): the type of flow (login or register)
+        current_partial (Partial): the partial for the step in the pipeline
 
     Raises:
         RequirePasswordException: if the user password is invalid
@@ -162,5 +166,34 @@ def validate_password(
 
     if not user or not user.check_password(password):
         raise InvalidPasswordException(backend, current_partial)
+
+    return {}
+
+
+def require_micromasters_provider(
+        strategy, backend, user=None, flow=None, **kwargs
+):  # pylint: disable=unused-argument
+    """
+    If the user exists and only has a micromasters auth, require them to login that way
+
+
+    Args:
+        strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
+        backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
+        user (User): the current user
+        flow (str): the type of flow (login or register)
+    """
+    # only do this check if the user is attempting an email login
+    if backend.name != EmailAuth.name or flow != SocialAuthState.FLOW_LOGIN or user is None:
+        return {}
+
+    user_storage = strategy.storage.user
+
+    # if the user only has one social auth and it is MicroMasters, prompt them to login via that method
+    if (
+            user_storage.get_social_auth_for_user(user, provider=MicroMastersAuth.name).exists() and
+            user_storage.get_social_auth_for_user(user).count() == 1
+    ):
+        raise RequireProviderException(backend, MicroMastersAuth.name)
 
     return {}

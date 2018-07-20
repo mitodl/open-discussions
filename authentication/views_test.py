@@ -2,11 +2,14 @@
 # pylint: disable=redefined-outer-name
 from django.contrib.auth import get_user, get_user_model
 from django.urls import reverse
+import factory
 import pytest
 from rest_framework import status
 from rest_framework_jwt.settings import api_settings
-import factory
+from social_core.backends.email import EmailAuth
+from social_django.models import UserSocialAuth
 
+from authentication.backends.micromasters import MicroMastersAuth
 from authentication.utils import SocialAuthState
 from open_discussions import features
 from open_discussions.factories import UserSocialAuthFactory
@@ -81,8 +84,33 @@ def login_email_exists(client, user):
             {
                 'errors': [],
                 'flow': SocialAuthState.FLOW_LOGIN,
+                'provider': EmailAuth.name,
                 'partial_token': any_instance_of(str),
                 'state': SocialAuthState.STATE_LOGIN_PASSWORD,
+            }
+        )
+    yield run_step
+
+
+@pytest.fixture()
+def login_email_mm_only(client, user):
+    """Yield a function for this step"""
+    def run_step(last_result):  # pylint: disable=unused-argument
+        """Run the step"""
+        UserSocialAuth.objects.create(user=user, provider=MicroMastersAuth.name, uid=user.username)
+        return assert_api_call(
+            client,
+            'psa-login-email',
+            {
+                'flow': SocialAuthState.FLOW_LOGIN,
+                'email': user.email,
+            },
+            {
+                'errors': [],
+                'flow': SocialAuthState.FLOW_LOGIN,
+                'provider': MicroMastersAuth.name,
+                'partial_token': None,
+                'state': SocialAuthState.STATE_LOGIN_PROVIDER,
             }
         )
     yield run_step
@@ -103,6 +131,7 @@ def register_email_exists(client, user, mock_email_send):
             {
                 'errors': ['Password is required to login'],
                 'flow': SocialAuthState.FLOW_REGISTER,
+                'provider': EmailAuth.name,
                 'partial_token': any_instance_of(str),
                 'state': SocialAuthState.STATE_LOGIN_PASSWORD,
             }
@@ -127,6 +156,7 @@ def login_email_not_exists(client):
             {
                 'errors': [],
                 'flow': SocialAuthState.FLOW_LOGIN,
+                'provider': EmailAuth.name,
                 'partial_token': any_instance_of(str),
                 'state': SocialAuthState.STATE_REGISTER_EMAIL,
             }
@@ -151,6 +181,7 @@ def register_email_not_exists(client, mock_email_send):
             {
                 'errors': [],
                 'flow': SocialAuthState.FLOW_REGISTER,
+                'provider': EmailAuth.name,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_REGISTER_CONFIRM_SENT,
             }
@@ -181,6 +212,7 @@ def login_password_valid(client, user):
             {
                 'errors': [],
                 'flow': SocialAuthState.FLOW_LOGIN,
+                'provider': EmailAuth.name,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_SUCCESS,
             },
@@ -210,6 +242,7 @@ def login_password_user_inactive(client, user):
             {
                 'errors': [],
                 'flow': SocialAuthState.FLOW_LOGIN,
+                'provider': EmailAuth.name,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_INACTIVE,
             }
@@ -235,6 +268,7 @@ def login_password_invalid(client, user):
             {
                 'errors': ['Unable to login with that email and password combination'],
                 'flow': SocialAuthState.FLOW_LOGIN,
+                'provider': EmailAuth.name,
                 'partial_token': any_instance_of(str),
                 'state': SocialAuthState.STATE_ERROR,
             }
@@ -257,6 +291,7 @@ def register_continue_from_login(client, mock_email_send):
             {
                 'errors': [],
                 'flow': SocialAuthState.FLOW_REGISTER,
+                'provider': EmailAuth.name,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_REGISTER_CONFIRM_SENT,
             }
@@ -284,6 +319,7 @@ def redeem_confirmation_code(client, mock_email_send):
             {
                 'errors': [],
                 'flow': SocialAuthState.FLOW_REGISTER,
+                'provider': EmailAuth.name,
                 'partial_token': any_instance_of(str),
                 'state': SocialAuthState.STATE_REGISTER_DETAILS,
             }
@@ -308,6 +344,7 @@ def register_profile_details(client):
             {
                 'errors': [],
                 'flow': SocialAuthState.FLOW_REGISTER,
+                'provider': EmailAuth.name,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_SUCCESS,
             },
@@ -350,6 +387,9 @@ def register_profile_details(client):
         'redeem_confirmation_code',
         'register_profile_details',
     ],
+    [
+        'login_email_mm_only',
+    ],
 ], ids=lambda arg: '->'.join(arg) if isinstance(arg, list) else None)
 def test_login_register_flows(request, steps):
     """Walk the steps and assert expected results"""
@@ -376,6 +416,7 @@ def test_login_email_error(settings, client, mocker):
     assert response.json() == {
         'errors': [],
         'flow': SocialAuthState.FLOW_LOGIN,
+        'provider': EmailAuth.name,
         'partial_token': None,
         'state': SocialAuthState.STATE_ERROR,
     }

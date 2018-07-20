@@ -17,7 +17,7 @@ class SocialAuthState:
     # login states
     STATE_LOGIN_EMAIL = "login/email"
     STATE_LOGIN_PASSWORD = "login/password"
-    STATE_LOGIN_EDX = "login/edx"
+    STATE_LOGIN_PROVIDER = "login/provider"
 
     # registration states
     STATE_REGISTER_EMAIL = "register/email"
@@ -31,10 +31,13 @@ class SocialAuthState:
     STATE_INACTIVE = "inactive"
     STATE_INVALID_EMAIL = "invalid-email"
 
-    def __init__(self, state, partial=None, flow=None, errors=None):
+    def __init__(
+            self, state, *, provider=None, partial=None, flow=None, errors=None
+    ):  # pylint: disable=too-many-arguments
         self.state = state
         self.partial = partial
         self.flow = flow
+        self.provider = provider
         self.errors = errors or []
 
 

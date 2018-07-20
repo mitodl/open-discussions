@@ -9,6 +9,7 @@ from authentication.exceptions import (
     InvalidPasswordException,
     RequirePasswordException,
     RequireRegistrationException,
+    RequireProviderException,
     RequirePasswordAndProfileException,
 )
 from authentication.utils import SocialAuthState
@@ -240,3 +241,52 @@ def test_validate_require_profile_update_user_via_saml(mocker, backend_name, is_
     assert response == expected
     if 'user' in response:
         assert response['profile'].name == 'Jane Doe'
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('backend_name,flow,has_user,auth_count,has_mm_auth,raises', [
+    ['email', SocialAuthState.FLOW_LOGIN, True, 1, True, True],
+    ['email', SocialAuthState.FLOW_LOGIN, True, 1, False, False],
+    ['email', SocialAuthState.FLOW_LOGIN, True, 2, True, False],
+    ['email', SocialAuthState.FLOW_REGISTER, False, 0, False, False],
+    ['email', SocialAuthState.FLOW_REGISTER, True, 0, False, False],
+    ['email', None, True, 0, False, False],
+    ['email', None, False, 0, False, False],
+    ['saml', None, True, 0, False, False],
+    ['saml', None, False, 0, False, False],
+    ['no', None, True, 0, False, False],
+    ['no', None, False, 0, False, False],
+])
+def test_require_micromasters_provider(
+        mocker, user, backend_name, flow, has_user, auth_count, has_mm_auth, raises
+):  # pylint: disable=too-many-arguments
+    """
+    Tests that verify require_micromasters_provider behaves correctly
+
+    It should only raise RequireProviderException if the user is logging in via email and only has MM auth setup
+    """
+    mock_strategy = mocker.Mock()
+    count_query_mock = mocker.Mock()
+    count_query_mock.count.return_value = auth_count
+    exists_query_mock = mocker.Mock()
+    exists_query_mock.exists.return_value = has_mm_auth
+
+    mock_strategy.storage.user.get_social_auth_for_user.side_effect = [
+        exists_query_mock,
+        count_query_mock,
+    ]
+
+    mock_backend = mocker.Mock()
+    mock_backend.name = backend_name
+
+    args = [mock_strategy, mock_backend]
+    kwargs = {
+        'user': user if has_user else None,
+        'flow': flow,
+    }
+
+    if raises:
+        with pytest.raises(RequireProviderException):
+            user_actions.require_micromasters_provider(*args, **kwargs)
+    else:
+        assert user_actions.require_micromasters_provider(*args, **kwargs) == {}

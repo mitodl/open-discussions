@@ -4,6 +4,7 @@ import logging
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
 from social_django.views import _do_login as login
+from social_core.backends.email import EmailAuth
 from social_core.exceptions import InvalidEmail, AuthException
 from social_core.utils import (
     user_is_authenticated,
@@ -16,6 +17,7 @@ from authentication.exceptions import (
     InvalidPasswordException,
     RequirePasswordException,
     RequirePasswordAndProfileException,
+    RequireProviderException,
     RequireRegistrationException,
 )
 from authentication.utils import SocialAuthState
@@ -32,6 +34,7 @@ class SocialAuthSerializer(serializers.Serializer):
         (SocialAuthState.FLOW_LOGIN, "Login"),
         (SocialAuthState.FLOW_REGISTER, "Reigster"),
     ))
+    provider = serializers.CharField(read_only=True)
     state = serializers.CharField(read_only=True)
     errors = serializers.ListField(read_only=True)
 
@@ -90,6 +93,8 @@ class SocialAuthSerializer(serializers.Serializer):
             result = super().save(**kwargs)
         except InvalidEmail:
             result = SocialAuthState(SocialAuthState.STATE_INVALID_EMAIL)
+        except RequireProviderException as exc:
+            result = SocialAuthState(SocialAuthState.STATE_LOGIN_PROVIDER, provider=exc.provider)
         except AuthException as exc:
             log.exception("Received unexpected AuthException")
             result = SocialAuthState(SocialAuthState.STATE_ERROR, errors=[str(exc)])
@@ -106,6 +111,9 @@ class SocialAuthSerializer(serializers.Serializer):
         # return the passed flow back to the caller
         # this way they know if they're on a particular page because of an attempted registration or login
         result.flow = self.validated_data['flow']
+
+        if result.provider is None:
+            result.provider = EmailAuth.name
 
         # update self.instance so we serializer the reight object
         self.instance = result

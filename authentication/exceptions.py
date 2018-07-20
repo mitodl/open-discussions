@@ -2,6 +2,13 @@
 from social_core.exceptions import AuthException
 
 
+class RequireProviderException(AuthException):
+    """The user is required to authenticate via a specific provider/backend"""
+    def __init__(self, backend, provider):
+        self.provider = provider
+        super().__init__(backend)
+
+
 class PartialException(AuthException):
     """Partial pipeline exception"""
     def __init__(self, backend, partial):

@@ -252,6 +252,9 @@ SOCIAL_AUTH_PIPELINE = (
     # validate an incoming email auth request
     'authentication.pipeline.user.validate_email_auth_request',
 
+    # if the user only has micromasters auth but is trying to login via email
+    'authentication.pipeline.user.require_micromasters_provider',
+
     # require a password and profile if they're not set
     'authentication.pipeline.user.validate_password',
 
