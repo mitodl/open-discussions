@@ -605,6 +605,14 @@ class ContributorSerializer(serializers.Serializer):
             raise ValidationError("contributor name is not a valid user")
         return {'contributor_name': value}
 
+    def validate_email(self, value):
+        """Validates the contributor email"""
+        if not isinstance(value, str):
+            raise ValidationError("email must be a string")
+        if not User.objects.filter(email__iexact=value).exists():
+            raise ValidationError("email does not exist")
+        return {'email': value}
+
     def create(self, validated_data):
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
@@ -658,6 +666,14 @@ class ModeratorPrivateSerializer(serializers.Serializer):
         if not User.objects.filter(username=value).exists():
             raise ValidationError("moderator name is not a valid user")
         return {'moderator_name': value}
+
+    def validate_email(self, value):
+        """Validates the moderator email"""
+        if not isinstance(value, str):
+            raise ValidationError("email must be a string")
+        if not User.objects.filter(email__iexact=value).exists():
+            raise ValidationError("email does not exist")
+        return {'email': value}
 
     def create(self, validated_data):
         api = self.context['channel_api']

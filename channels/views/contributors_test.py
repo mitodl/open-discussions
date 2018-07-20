@@ -54,6 +54,26 @@ def test_add_contributor(client, staff_jwt_header):
     }
 
 
+def test_add_contributor_email(client, public_channel, staff_jwt_header, staff_api, reddit_factories):
+    """
+    Adds a contributor to a channel by email
+    """
+    moderator = reddit_factories.user("mod_user1")
+    new_contributor = reddit_factories.user("new_mod_user")
+    staff_api.add_moderator(moderator.username, public_channel.name)
+    client.force_login(moderator)
+
+    url = reverse('contributor-list', kwargs={'channel_name': public_channel.name})
+    resp = client.post(url, data={'email': new_contributor.email}, format='json', **staff_jwt_header)
+
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json() == {
+        'contributor_name': new_contributor.username,
+        'email': new_contributor.email,
+        'full_name': new_contributor.profile.name,
+    }
+
+
 def test_add_contributor_again(client, staff_jwt_header):
     """
     If the user is already a contributor a 201 status should be returned

@@ -251,6 +251,26 @@ def test_contributor_validate_name():
     assert ContributorSerializer().validate_contributor_name(user.username) == {'contributor_name': user.username}
 
 
+def test_contributor_validate_email_no_string():
+    """validate the input in case the value is not a string"""
+    with pytest.raises(ValidationError) as ex:
+        ContributorSerializer().validate_email(None)
+    assert ex.value.args[0] == 'email must be a string'
+
+
+def test_contributor_validate_email_no_valid_user():
+    """validate the input in case the user does not exists in the DB"""
+    with pytest.raises(ValidationError) as ex:
+        ContributorSerializer().validate_email('foo_user')
+    assert ex.value.args[0] == 'email does not exist'
+
+
+def test_contributor_validate_email():
+    """validate the input"""
+    user = UserFactory.create()
+    assert ContributorSerializer().validate_email(user.email) == {'email': user.email}
+
+
 def test_contributor_create_username():
     """Adds a contributor by username"""
     user = UserFactory.create()
@@ -353,6 +373,26 @@ def test_moderator_validate_name():
     """validate the input"""
     user = UserFactory.create()
     assert ModeratorPrivateSerializer().validate_moderator_name(user.username) == {'moderator_name': user.username}
+
+
+def test_moderator_validate_email_no_string():
+    """validate the input in case the value is not a string"""
+    with pytest.raises(ValidationError) as ex:
+        ModeratorPrivateSerializer().validate_email(None)
+    assert ex.value.args[0] == 'email must be a string'
+
+
+def test_moderator_validate_email_no_valid_user():
+    """validate the input in case the user does not exists in the DB"""
+    with pytest.raises(ValidationError) as ex:
+        ModeratorPrivateSerializer().validate_email('foo_user')
+    assert ex.value.args[0] == 'email does not exist'
+
+
+def test_moderator_validate_email():
+    """validate the input"""
+    user = UserFactory.create()
+    assert ModeratorPrivateSerializer().validate_email(user.email) == {'email': user.email}
 
 
 def test_moderator_create_username():
