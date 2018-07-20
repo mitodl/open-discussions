@@ -235,14 +235,14 @@ def test_contributor_validate_name_no_string():
     """validate the input in case the value is not a string"""
     with pytest.raises(ValidationError) as ex:
         ContributorSerializer().validate_contributor_name(None)
-    assert ex.value.args[0] == 'contributor name must be a string'
+    assert ex.value.args[0] == 'username must be a string'
 
 
 def test_contributor_validate_name_no_valid_user():
     """validate the input in case the user does not exists in the DB"""
     with pytest.raises(ValidationError) as ex:
         ContributorSerializer().validate_contributor_name('foo_user')
-    assert ex.value.args[0] == 'contributor name is not a valid user'
+    assert ex.value.args[0] == 'username is not a valid user'
 
 
 def test_contributor_validate_name():
@@ -359,14 +359,14 @@ def test_moderator_validate_name_no_string():
     """validate the input in case the value is not a string"""
     with pytest.raises(ValidationError) as ex:
         ModeratorPrivateSerializer().validate_moderator_name(None)
-    assert ex.value.args[0] == 'moderator name must be a string'
+    assert ex.value.args[0] == 'username must be a string'
 
 
 def test_moderator_validate_name_no_valid_user():
     """validate the input in case the user does not exists in the DB"""
     with pytest.raises(ValidationError) as ex:
         ModeratorPrivateSerializer().validate_moderator_name('foo_user')
-    assert ex.value.args[0] == 'moderator name is not a valid user'
+    assert ex.value.args[0] == 'username is not a valid user'
 
 
 def test_moderator_validate_name():
