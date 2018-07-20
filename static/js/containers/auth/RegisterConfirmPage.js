@@ -23,6 +23,12 @@ const confirmationCodeFromLocation = R.compose(
   R.propOr("", "search")
 )
 
+const partialTokenFromLocation = R.compose(
+  R.propOr(null, "partial_token"),
+  qs.parse,
+  R.propOr("", "search")
+)
+
 const isInvalid = R.pathEq(["data", "state"], STATE_INVALID_EMAIL)
 
 type Props = {
@@ -36,8 +42,9 @@ export class RegisterConfirmPage extends React.Component<Props, *> {
   componentDidMount() {
     const { confirmCode, location, history } = this.props
     const code = confirmationCodeFromLocation(location)
-    if (code) {
-      confirmCode(code).then(onResult(history))
+    const partialToken = partialTokenFromLocation(location)
+    if (code && partialToken) {
+      confirmCode(partialToken, code).then(onResult(history))
     }
   }
 
@@ -45,7 +52,8 @@ export class RegisterConfirmPage extends React.Component<Props, *> {
     const { location, invalid } = this.props
 
     const code = confirmationCodeFromLocation(location)
-    const showLoading = code && !invalid
+    const partialToken = partialTokenFromLocation(location)
+    const showLoading = partialToken && code && !invalid
 
     return (
       <div className="content auth-page register-confirm-page">
@@ -72,8 +80,8 @@ export class RegisterConfirmPage extends React.Component<Props, *> {
   }
 }
 
-const confirmCode = (code: string) =>
-  actions.auth.registerConfirm(FLOW_REGISTER, code)
+const confirmCode = (partialToken: string, code: string) =>
+  actions.auth.registerConfirm(FLOW_REGISTER, partialToken, code)
 
 const mapStateToProps = state => {
   const invalid = isInvalid(state.auth)

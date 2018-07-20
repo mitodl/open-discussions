@@ -270,13 +270,14 @@ def redeem_confirmation_code(client, mock_email_send):
     """Yield a function for this step"""
     def run_step(last_result):  # pylint: disable=unused-argument
         """Run the step"""
-        code = mock_email_send.call_args[0][2]
+        _, _, code, partial_token = mock_email_send.call_args[0]
         return assert_api_call(
             client,
             'psa-register-confirm',
             {
                 'flow': SocialAuthState.FLOW_REGISTER,
                 'verification_code': code.code,
+                'partial_token': partial_token,
             },
             {
                 'errors': [],

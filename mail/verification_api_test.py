@@ -24,9 +24,9 @@ def test_send_verification_email(mocker, rf):
     strategy = load_strategy(request)
     backend = load_backend(strategy, EmailAuth.name, None)
     code = mocker.Mock(code='abc')
-    verification_api.send_verification_email(strategy, backend, code, None)
+    verification_api.send_verification_email(strategy, backend, code, 'def')
 
     send_messages_mock.assert_called_once_with([any_instance_of(EmailMessage)])
 
     email_body = send_messages_mock.call_args[0][0][0].body
-    assert '/signup/confirm/?verification_code=abc' in email_body
+    assert '/signup/confirm/?verification_code=abc&partial_token=def' in email_body

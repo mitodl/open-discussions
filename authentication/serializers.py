@@ -150,7 +150,6 @@ class LoginPasswordSerializer(SocialAuthSerializer):
 
 class RegisterEmailSerializer(SocialAuthSerializer):
     """Serializer for email register"""
-    partial_token = serializers.CharField(source='partial.token', required=False, default=None)
     email = serializers.EmailField(write_only=True, required=False)
 
     def validate(self, attrs):
@@ -182,7 +181,7 @@ class RegisterEmailSerializer(SocialAuthSerializer):
 
 class RegisterConfirmSerializer(SocialAuthSerializer):
     """Serializer for email confirmation"""
-    partial_token = serializers.CharField(source='partial.token', read_only=True, default=None)
+    partial_token = serializers.CharField(source='partial.token')
     verification_code = serializers.CharField(write_only=True)
 
     def create(self, validated_data):

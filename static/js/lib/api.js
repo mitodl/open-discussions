@@ -388,11 +388,16 @@ export const postEmailRegister = (
 
 export const postConfirmRegister = (
   flow: AuthFlow,
+  partialToken: string,
   code: string
 ): Promise<AuthResponse> =>
   fetchJSONWithCSRF("/api/v0/register/confirm/", {
     method: POST,
-    body:   JSON.stringify({ flow, verification_code: code })
+    body:   JSON.stringify({
+      flow,
+      partial_token:     partialToken,
+      verification_code: code
+    })
   })
 
 export const postDetailsRegister = (

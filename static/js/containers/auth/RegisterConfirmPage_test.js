@@ -32,7 +32,7 @@ describe("RegisterConfirmPage", () => {
       DEFAULT_STATE,
       {
         location: {
-          search: "verification_code=abc"
+          search: "verification_code=abc&partial_token=def"
         }
       }
     )
@@ -42,7 +42,7 @@ describe("RegisterConfirmPage", () => {
     helper.cleanup()
   })
 
-  it("should render an error message if no code", async () => {
+  it("should render an error message if no code or partial_token", async () => {
     const { inner } = await renderPage(
       {},
       {
@@ -62,7 +62,7 @@ describe("RegisterConfirmPage", () => {
     assert.equal(inner.find("Link").props().to, REGISTER_URL)
   })
 
-  it("should render <Loading/> if code", async () => {
+  it("should render <Loading/> if code and partial_token", async () => {
     const { inner } = await renderPage()
 
     assert.ok(inner.find("Loading").exists())

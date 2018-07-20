@@ -19,9 +19,10 @@ def send_verification_email(strategy, backend, code, partial_token):  # pylint: 
         code (social_django.models.Code): the confirmation code used to confirm the email address
         partial_token (str): token used to resume a halted pipeline
     """
-    url = '{}?verification_code={}'.format(
+    url = '{}?verification_code={}&partial_token={}'.format(
         strategy.build_absolute_uri(reverse('register-confirm')),
         quote_plus(code.code),
+        quote_plus(partial_token),
     )
 
     api.send_messages(list(api.messages_for_recipients([

@@ -63,8 +63,8 @@ export const authEndpoint = {
       const response = await api.postEmailRegister(flow, email, partialToken)
       return { email, ...response }
     },
-    registerConfirm: (flow: AuthFlow, code: string) =>
-      api.postConfirmRegister(flow, code),
+    registerConfirm: (flow: AuthFlow, partialToken: string, code: string) =>
+      api.postConfirmRegister(flow, partialToken, code),
     registerDetails: (
       flow: AuthFlow,
       partialToken: string,

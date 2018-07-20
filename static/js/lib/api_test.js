@@ -581,11 +581,16 @@ describe("api", function() {
       it("should pass code", async () => {
         const flow = "register"
         const code = "123456"
-        await postConfirmRegister(flow, code)
+        const token = "abcdef"
+        await postConfirmRegister(flow, token, code)
         assert.ok(
           fetchJSONStub.calledWith("/api/v0/register/confirm/", {
             method: POST,
-            body:   JSON.stringify({ flow, verification_code: code })
+            body:   JSON.stringify({
+              flow,
+              partial_token:     token,
+              verification_code: code
+            })
           })
         )
       })
