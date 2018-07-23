@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.37.1
+--------------
+
+- Support confirming email on a different device/browser
+- Fix adding contributors and moderators by email (#953)
+- Tweak embedly display
+- Release date for 0.37.0
+- Refactor moderator and contributor forms (#941)
+- Implement adding contributors and moderators by email (#946)
+- Check on server that channels are not managed before letting users moderate them (#940)
+- make post body optional (frontend work)
+
 Version 0.37.0 (Released July 18, 2018)
 --------------
 
