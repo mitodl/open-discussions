@@ -10,16 +10,22 @@ from open_discussions.features import ANONYMOUS_ACCESS
 pytestmark = pytest.mark.betamax
 
 
-def test_list_moderators(client, private_channel_and_contributor, staff_user):
+def test_list_moderators(  # pylint: disable=too-many-arguments
+        client, private_channel_and_contributor, reddit_factories, staff_user, staff_api, settings
+):
     """
     List moderators in a channel as a logged in contributor
     """
+    settings.INDEXING_API_USERNAME = staff_user.username
     channel, user = private_channel_and_contributor
+    new_mod = reddit_factories.user("new_mod")
+    staff_api.add_moderator(new_mod.username, channel.name)
     url = reverse('moderator-list', kwargs={'channel_name': channel.name})
     client.force_login(user)
     resp = client.get(url)
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == [{'moderator_name': staff_user.username}]
+    # Staff user is filtered out
+    assert resp.json() == [{'moderator_name': new_mod.username}]
 
 
 def test_list_moderators_staff(  # pylint: disable=too-many-arguments

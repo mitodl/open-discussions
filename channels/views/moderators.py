@@ -1,5 +1,5 @@
 """Views for REST APIs for moderators"""
-
+from django.conf import settings
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
@@ -46,7 +46,11 @@ class ModeratorListView(ListCreateAPIView):
         """Get a list of moderators for channel"""
         api = Api(user=self.request.user)
         channel_name = self.kwargs['channel_name']
-        return api.list_moderators(channel_name)
+        return (
+            moderator for moderator in
+            api.list_moderators(channel_name)
+            if moderator.name != settings.INDEXING_API_USERNAME
+        )
 
 
 class ModeratorDetailView(APIView):
