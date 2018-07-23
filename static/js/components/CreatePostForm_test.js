@@ -91,6 +91,15 @@ describe("CreatePostForm", () => {
     })
   })
 
+  //
+  ;[LINK_TYPE_LINK, LINK_TYPE_TEXT].forEach(linkType => {
+    it(`should show close button when channel is not present and ${linkType} is selected`, () => {
+      const postForm = { ...newPostForm(), postType: linkType }
+      const wrapper = renderPostForm({ channel: undefined, postForm })
+      assert.isOk(wrapper.find(".close-button").exists())
+    })
+  })
+
   it("should show url validation message", () => {
     const postForm = { ...newPostForm(), postType: LINK_TYPE_LINK }
     const wrapper = renderPostForm({

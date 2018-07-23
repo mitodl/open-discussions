@@ -83,7 +83,7 @@ export default class CreatePostForm extends React.Component<Props> {
   clearInputButton = () => {
     const { updatePostType, channel } = this.props
 
-    return channel.link_type === LINK_TYPE_ANY ? (
+    return !channel || channel.link_type === LINK_TYPE_ANY ? (
       <div className="close-button" onClick={() => updatePostType(null)}>
         <i className="material-icons clear">clear</i>
       </div>
