@@ -12,7 +12,7 @@ from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from channels.utils import get_kind_mapping, get_reddit_slug
+from channels.utils import get_kind_mapping, get_reddit_slug, get_or_create_link_meta
 from channels.constants import (
     VALID_CHANNEL_TYPES,
     VALID_LINK_TYPES,
@@ -156,6 +156,7 @@ class BasePostSerializer(RedditObjectSerializer):
     (no deserialization or validation), and does not fetch/serialize Subscription data
     """
     url = WriteableSerializerMethodField(allow_null=True)
+    thumbnail = WriteableSerializerMethodField(allow_null=True)
     text = WriteableSerializerMethodField(allow_null=True)
     title = serializers.CharField()
     slug = serializers.SerializerMethodField()
@@ -179,6 +180,13 @@ class BasePostSerializer(RedditObjectSerializer):
     def get_url(self, instance):
         """Returns a url or null depending on if it's a self post"""
         return instance.url if not instance.is_self else None
+
+    def get_thumbnail(self, instance):
+        """ Returns a thumbnail url or null"""
+        link_meta = get_or_create_link_meta(instance.url) if not instance.is_self else None
+        if link_meta:
+            return link_meta.thumbnail
+        return None
 
     def get_slug(self, instance):
         """Returns the post slug"""
@@ -286,12 +294,14 @@ class PostSerializer(BasePostSerializer):
         kwargs = {}
         if url:
             kwargs['url'] = url
+            get_or_create_link_meta(url)
         else:
             # Reddit API requires that either url or text not be `None`.
             kwargs['text'] = text or ''
 
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
+
         post = api.create_post(
             channel_name,
             title=title,

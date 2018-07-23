@@ -45,6 +45,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
     assert resp.json() == {
         'posts': [{
             "url": None,
+            "thumbnail": None,
             "text": post.text,
             "title": post.title,
             "upvoted": True,
@@ -90,6 +91,7 @@ def test_frontpage_sorted(client, private_channel_and_contributor, reddit_factor
     assert resp.json() == {
         'posts': [{
             "url": None,
+            "thumbnail": None,
             "text": post.text,
             "title": post.title,
             "upvoted": True,

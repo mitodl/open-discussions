@@ -48,7 +48,7 @@ from channels.models import (
     RedditRefreshToken,
     Subscription,
 )
-from channels.utils import get_kind_mapping
+from channels.utils import get_kind_mapping, get_or_create_link_meta
 
 from channels import task_helpers as channels_task_helpers
 from open_discussions import features
@@ -289,13 +289,14 @@ def sync_channel_model(name):
     return Channel.objects.get_or_create(name=name)[0]
 
 
-def sync_post_model(*, channel_name, post_id):
+def sync_post_model(*, channel_name, post_id, post_url=None):
     """
-    Create a new Post if it doesn't exist already. Also create a new Channel if necessary
+    Create a new Post if it doesn't exist already. Also create a new Channel and LinkMeta if necessary
 
     Args:
         channel_name (str): The name of the channel
         post_id (str): The id of the post
+        post_url (str): The link url for a link post
 
     Returns:
         Post: The post object
@@ -306,10 +307,14 @@ def sync_post_model(*, channel_name, post_id):
             return post
 
         channel = sync_channel_model(channel_name)
-        return Post.objects.get_or_create(
+        post_obj = Post.objects.get_or_create(
             post_id=post_id,
             defaults={'channel': channel},
         )[0]
+        if post_url and post_obj.link_meta is None and settings.EMBEDLY_KEY:
+            post_obj.link_meta = get_or_create_link_meta(post_url)
+            post_obj.save()
+        return post_obj
 
 
 def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):

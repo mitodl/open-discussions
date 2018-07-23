@@ -48,6 +48,7 @@ COMBINED_MAPPING = {
     'post_id': {'type': 'keyword'},
     'post_title': {'type': 'text'},
     'post_link_url': {'type': 'keyword'},
+    'post_link_thumbnail': {'type': 'keyword'},
     'num_comments': {'type': 'long'},
     'comment_id': {'type': 'keyword'},
     'parent_comment_id': {'type': 'keyword'},
@@ -219,6 +220,7 @@ def sync_post_and_comments(serialized):
             sync_post_model(
                 channel_name=item['channel_title'],
                 post_id=item['post_id'],
+                post_url=item['post_link_url']
             )
         elif item['object_type'] == COMMENT_TYPE:
             sync_comment_model(

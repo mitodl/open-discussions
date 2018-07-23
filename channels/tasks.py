@@ -29,15 +29,17 @@ def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):
 
 
 @app.task
-def sync_post_model(*, channel_name, post_id):
+def sync_post_model(*, channel_name, post_id, post_url):
     """
     Create or update local post id information
 
     Args:
         channel_name (str): The name of the channel
         post_id (str): The id of the post
+        post_url(str): The external url of a link post
     """
     api.sync_post_model(
         channel_name=channel_name,
-        post_id=post_id
+        post_id=post_id,
+        post_url=post_url
     )

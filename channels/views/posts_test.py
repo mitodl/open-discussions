@@ -5,13 +5,14 @@ from django.urls import reverse
 from rest_framework import status
 
 from profiles.utils import image_uri
+from channels.factories import LinkMetaFactory
 from channels.api import Api
 from channels.utils import get_reddit_slug
 from channels.constants import (
     VALID_POST_SORT_TYPES,
     POSTS_SORT_HOT,
 )
-from channels.models import Subscription
+from channels.models import Subscription, LinkMeta
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
@@ -20,26 +21,33 @@ from open_discussions.features import ANONYMOUS_ACCESS
 pytestmark = pytest.mark.betamax
 
 
-def test_create_url_post(client, private_channel_and_contributor):
+def test_create_url_post_existing_meta(client, private_channel_and_contributor, mocker, settings):
     """
     Create a new url post
     """
+    settings.EMBEDLY_KEY = 'FAKE'
     channel, user = private_channel_and_contributor
+    link_url = 'http://micromasters.mit.edu/🐨'
+    thumbnail = 'http://fake/thumb.jpg'
+    embedly_stub = mocker.patch('channels.utils.get_embedly')
+    LinkMetaFactory.create(url=link_url, thumbnail=thumbnail)
     url = reverse('post-list', kwargs={'channel_name': channel.name})
     client.force_login(user)
     resp = client.post(url, {
         'title': 'url title 🐨',
-        'url': 'http://micromasters.mit.edu/🐨',
+        'url': link_url,
     })
+    assert embedly_stub.not_called()
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'title': 'url title 🐨',
-        'url': 'http://micromasters.mit.edu/🐨',
+        'url': link_url,
+        "thumbnail": thumbnail,
         'text': None,
         'author_id': user.username,
-        'created': '2017-11-22T17:19:35+00:00',
+        'created': '2018-07-19T17:13:55+00:00',
         'upvoted': True,
-        'id': 'e6',
+        'id': '1v',
         'slug': 'url_title',
         'num_comments': 0,
         'removed': False,
@@ -54,6 +62,47 @@ def test_create_url_post(client, private_channel_and_contributor):
         "stickied": False,
         'num_reports': None,
     }
+
+
+def test_post_create_post_new_meta(client, private_channel_and_contributor, mocker, settings):
+    """ Tests that a new LinkMeta object is created for the URL if none exists"""
+    settings.EMBEDLY_KEY = 'FAKE'
+    channel, user = private_channel_and_contributor
+    link_url = 'http://fake'
+    thumbnail = 'http://fake/thumbnail.jpg'
+    embed_return_value = mocker.Mock()
+    embed_return_value.configure_mock(**{
+        'json.return_value': {'some': 'json', 'thumbnail_url': thumbnail}
+    })
+    embedly_stub = mocker.patch('channels.utils.get_embedly', return_value=embed_return_value)
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    client.force_login(user)
+    client.post(url, {
+        'title': 'url title 🐨',
+        'url': link_url,
+    })
+    assert embedly_stub.called_with(link_url)
+    assert LinkMeta.objects.filter(url=link_url).first() is not None
+
+
+def test_post_create_post_no_thumbnail(client, private_channel_and_contributor, mocker, settings):
+    """ Tests that no LinkMeta object is created if embedly does not return a thumbnail """
+    settings.EMBEDLY_KEY = 'FAKE'
+    channel, user = private_channel_and_contributor
+    link_url = 'http://fake'
+    embed_return_value = mocker.Mock()
+    embed_return_value.configure_mock(**{
+        'json.return_value': {'some': 'json'}
+    })
+    embedly_stub = mocker.patch('channels.utils.get_embedly', return_value=embed_return_value)
+    url = reverse('post-list', kwargs={'channel_name': channel.name})
+    client.force_login(user)
+    client.post(url, {
+        'title': 'url title 🐨',
+        'url': link_url,
+    })
+    assert embedly_stub.called_once()
+    assert LinkMeta.objects.filter(url=url).first() is None
 
 
 def test_create_text_post(client, private_channel_and_contributor):
@@ -72,6 +121,7 @@ def test_create_text_post(client, private_channel_and_contributor):
         'title': 'parameterized testing',
         'text': 'tests are great',
         'url': None,
+        "thumbnail": None,
         'author_id': user.username,
         'created': '2017-11-22T17:29:51+00:00',
         'upvoted': True,
@@ -182,6 +232,7 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         "url": None,
+        "thumbnail": None,
         "text": post.text,
         "title": post.title,
         "upvoted": True,
@@ -231,6 +282,7 @@ def test_get_post_stickied(client, private_channel_and_contributor, reddit_facto
     assert get_resp.status_code == status.HTTP_200_OK
     assert get_resp.json() == {
         "url": None,
+        "thumbnail": None,
         "text": post.text,
         "title": post.title,
         "upvoted": True,
@@ -285,6 +337,7 @@ def test_get_post_anonymous(client, public_channel, reddit_factories, settings, 
             'title': post.title,
             'upvoted': False,
             'url': post.url,
+            'thumbnail': None,
         }
     else:
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
@@ -322,6 +375,7 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
             'posts': [
                 {
                     "url": post.url,
+                    "thumbnail": None,
                     "text": post.text,
                     "title": post.title,
                     "upvoted": True,
@@ -383,6 +437,7 @@ def test_list_posts_sorted(client, private_channel_and_contributor, reddit_facto
     assert resp.json() == {
         'posts': [{
             "url": None,
+            "thumbnail": None,
             "text": post.text,
             "title": post.title,
             "upvoted": True,
@@ -423,6 +478,7 @@ def test_list_posts_stickied(client, private_channel_and_contributor, reddit_fac
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["posts"][0] == {
         "url": posts[2].url,
+        "thumbnail": None,
         "text": posts[2].text,
         "title": posts[2].title,
         "upvoted": True,
@@ -573,6 +629,7 @@ def test_list_posts_anonymous(client, public_channel, reddit_factories, settings
                 'title': post.title,
                 'upvoted': False,
                 'url': post.url,
+                'thumbnail': None,
             }]
         }
     else:
@@ -589,6 +646,7 @@ def test_update_post_text(client, private_channel_and_contributor, reddit_factor
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': 'overwrite',
         'title': post.title,
         'upvoted': True,
@@ -621,6 +679,7 @@ def test_update_post_stickied(client, private_channel_and_contributor, reddit_fa
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': False,
@@ -675,6 +734,7 @@ def test_update_post_clear_vote(client, private_channel_and_contributor, reddit_
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': False,
@@ -707,6 +767,7 @@ def test_update_post_upvote(client, private_channel_and_contributor, reddit_fact
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': True,
@@ -739,6 +800,7 @@ def test_update_post_removed(client, staff_user, private_channel_and_contributor
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': False,
@@ -774,6 +836,7 @@ def test_update_post_clear_removed(
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': False,
@@ -808,6 +871,7 @@ def test_update_post_ignore_reports(
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'url': None,
+        'thumbnail': None,
         'text': post.text,
         'title': post.title,
         'upvoted': False,
@@ -891,6 +955,7 @@ def test_create_post_without_upvote(client, private_channel_and_contributor):
         'title': 'x',
         'text': 'y',
         'url': None,
+        'thumbnail': None,
         'author_id': user.username,
         'created': '2017-11-22T20:19:53+00:00',
         'upvoted': False,
@@ -958,6 +1023,7 @@ def test_subscribe_post(
         'title': post.title,
         'text': post.text,
         'url': None,
+        'thumbnail': None,
         'author_id': user.username,
         'created': post.created,
         'upvoted': False,
@@ -995,6 +1061,7 @@ def test_unsubscribe_post(client, private_channel_and_contributor, reddit_factor
         'title': post.title,
         'text': post.text,
         'url': None,
+        'thumbnail': None,
         'author_id': user.username,
         'created': post.created,
         'upvoted': True,

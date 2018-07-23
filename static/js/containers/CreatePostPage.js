@@ -92,9 +92,10 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
         actions.forms.formUpdate({
           ...CREATE_POST_PAYLOAD,
           value: {
-            postType: channel.link_type,
-            url:      "",
-            text:     ""
+            postType:  channel.link_type,
+            url:       "",
+            text:      "",
+            thumbnail: null
           }
         })
       )

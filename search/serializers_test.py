@@ -31,6 +31,7 @@ def patched_base_post_serializer(mocker):
         'id': 1,
         'title': 'post_title',
         'url': None,
+        'thumbnail': None
     }
     yield mocker.patch(
         'search.serializers.ESPostSerializer.base_serializer',
@@ -93,6 +94,7 @@ def test_es_post_serializer(patched_base_post_serializer, reddit_submission_obj,
         'post_id': base_serialized['id'],
         'post_title': base_serialized['title'],
         'post_link_url': base_serialized['url'],
+        'post_link_thumbnail': base_serialized['thumbnail'],
     }
 
 

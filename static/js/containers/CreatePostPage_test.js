@@ -411,9 +411,10 @@ describe("CreatePostPage", () => {
         if (shouldDispatch) {
           assert.equal(dispatch.callCount, 1)
           assert.deepEqual(dispatch.args[0][0].payload.value, {
-            postType: toLinkType,
-            url:      "",
-            text:     ""
+            postType:  toLinkType,
+            url:       "",
+            text:      "",
+            thumbnail: null
           })
         } else {
           assert.equal(dispatch.callCount, 0)
@@ -448,9 +449,10 @@ describe("CreatePostPage", () => {
         if (shouldDispatch) {
           assert.equal(dispatch.callCount, 1)
           assert.deepEqual(dispatch.args[0][0].payload.value, {
-            postType: linkType,
-            url:      "",
-            text:     ""
+            postType:  linkType,
+            url:       "",
+            text:      "",
+            thumbnail: null
           })
         } else {
           assert.equal(dispatch.callCount, 0)

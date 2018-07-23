@@ -4,6 +4,7 @@ from contextlib import contextmanager
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.utils.functional import SimpleLazyObject
 from praw.config import Config
 from praw.exceptions import APIException
@@ -21,7 +22,8 @@ from rest_framework.exceptions import (
 
 from channels.constants import POSTS_SORT_HOT
 from channels.exceptions import ConflictException, GoneException
-from channels.models import Subscription
+from channels.models import Subscription, LinkMeta
+from embedly.api import get_embedly, THUMBNAIL_URL
 
 User = get_user_model()
 
@@ -244,3 +246,26 @@ def get_reddit_slug(permalink):
         str: the reddit slug for a submission
     """
     return list(filter(None, permalink.split('/')))[-1]
+
+
+@transaction.atomic
+def get_or_create_link_meta(url):
+    """
+    Gets (and if necessary creates) a LinkMeta object for a URL
+
+    Args:
+        url(str): The URL of an external link
+
+    Returns:
+        channels.models.LinkMeta: the LinkMeta object for the URL
+
+    """
+    link_meta = LinkMeta.objects.filter(url=url).first()
+    if link_meta is None and settings.EMBEDLY_KEY:
+        response = get_embedly(url).json()
+        if THUMBNAIL_URL in response:
+            link_meta, _ = LinkMeta.objects.get_or_create(
+                url=url,
+                defaults={'thumbnail': response[THUMBNAIL_URL]}
+            )
+    return link_meta

@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 import faker
 import factory
 from factory.django import DjangoModelFactory
-from factory.fuzzy import FuzzyChoice
+from factory.fuzzy import FuzzyChoice, FuzzyText
 
 from open_discussions.factories import UserFactory
 from open_discussions.utils import now_in_utc
@@ -24,7 +24,7 @@ from channels.models import (
     RedditAccessToken,
     RedditRefreshToken,
     Subscription,
-)
+    LinkMeta)
 
 FAKE = faker.Factory.create()
 
@@ -66,6 +66,16 @@ class Comment:
         self.children = kwargs.get('children', [])
         self.created = kwargs.get('created', None)
         self.api = kwargs.get('api', None)
+
+
+class LinkMetaFactory(DjangoModelFactory):
+    """Simple factory representation for a linkmeta"""
+    url = FuzzyText(prefix='https://')
+    thumbnail = FuzzyText(prefix='https://', suffix='.jpg')
+
+    class Meta:
+        model = LinkMeta
+
 
 User = get_user_model()
 
