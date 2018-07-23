@@ -94,7 +94,7 @@ export default class EditChannelMembersForm extends React.Component<Props> {
                 <td>
                   <span className="email">{member.email || MISSING_TEXT}</span>
                 </td>
-                {!editable ? null : (
+                {editable ? (
                   <td>
                     <a
                       className="remove"
@@ -103,7 +103,7 @@ export default class EditChannelMembersForm extends React.Component<Props> {
                       Remove
                     </a>
                   </td>
-                )}
+                ) : null}
               </tr>
             ))}
           </tbody>
