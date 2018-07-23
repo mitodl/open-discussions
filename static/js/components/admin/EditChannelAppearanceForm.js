@@ -2,16 +2,20 @@
 import React from "react"
 
 import Card from "../Card"
+import ChannelAvatar from "../../containers/ChannelAvatar"
+import ChannelBanner from "../../containers/ChannelBanner"
 
 import { channelURL } from "../../lib/url"
 import { validationMessage } from "../../lib/validation"
 
 import type {
   ChannelForm,
-  ChannelAppearanceEditValidation
+  ChannelAppearanceEditValidation,
+  Channel
 } from "../../flow/discussionTypes"
 
 type Props = {
+  channel: Channel,
   onSubmit: Function,
   onUpdate: Function,
   form: ChannelForm,
@@ -23,6 +27,7 @@ type Props = {
 export default class EditChannelAppearanceForm extends React.Component<Props> {
   render() {
     const {
+      channel,
       onSubmit,
       onUpdate,
       form,
@@ -33,6 +38,19 @@ export default class EditChannelAppearanceForm extends React.Component<Props> {
     return (
       <form onSubmit={onSubmit} className="form channel-form">
         <Card>
+          <ChannelAvatar
+            channel={channel}
+            channelName={form.name}
+            editable={true}
+            name="avatar"
+            onUpdate={onUpdate}
+            formImageUrl={
+              form.avatar &&
+              form.avatar.edit &&
+              URL.createObjectURL(form.avatar.edit)
+            }
+          />
+
           <div className="row description">
             <label htmlFor="description" className="label">
               Description
@@ -45,6 +63,20 @@ export default class EditChannelAppearanceForm extends React.Component<Props> {
             />
             {validationMessage(validation.description)}
           </div>
+
+          <ChannelBanner
+            channel={channel}
+            channelName={form.name}
+            editable={true}
+            name="banner"
+            onUpdate={onUpdate}
+            formImageUrl={
+              form.banner &&
+              form.banner.edit &&
+              URL.createObjectURL(form.banner.edit)
+            }
+          />
+
           <div className="row actions">
             <button
               className="cancel"

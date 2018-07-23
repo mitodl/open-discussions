@@ -27,7 +27,9 @@ export const makeChannel = (privateChannel: boolean = false): Channel => ({
   user_is_contributor:   casual.coin_flip,
   user_is_moderator:     casual.coin_flip,
   membership_is_managed: casual.coin_flip,
-  ga_tracking_id:        casual.random_element(["UA-FAKE-01", null])
+  ga_tracking_id:        casual.random_element(["UA-FAKE-01", null]),
+  avatar:                casual.coin_flip ? "http://avatar.url" : null,
+  banner:                casual.coin_flip ? "http://banner.url" : null
 })
 
 export const makeChannelList = (numChannels: number = 20) => {
@@ -72,3 +74,10 @@ export const makeModerators = (
   makeModerator(null, isModerator),
   makeModerator(null, isModerator)
 ]
+
+export const makeImage = (imageName: string) => ({
+  image: {
+    name: imageName
+  },
+  edit: new Blob([casual.word])
+})

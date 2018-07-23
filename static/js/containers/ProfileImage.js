@@ -79,8 +79,11 @@ class ProfileImage extends React.Component<Props> {
             <ImageUploader
               name="profile"
               onUpdate={this.submitImage}
+              showButton={true}
               isAdd={isAdd}
               description="Profile Image"
+              width={512}
+              height={512}
             />
           ) : null}
         </div>

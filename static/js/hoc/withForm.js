@@ -94,7 +94,7 @@ const withForm = <T>(FormComponent: FormComponentCls<T>) => (
   }
 
   withForm.WrappedComponent = WrappedComponent
-
+  withForm.displayName = `withForm(${WrappedComponent.name})`
   return withForm
 }
 
