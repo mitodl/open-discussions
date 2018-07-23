@@ -53,7 +53,7 @@ const withMemberForm = (WrappedComponent: *) => {
         <React.Fragment>
           <EditChannelNavbar channelName={channel.name} />
           <Card>
-            <MembersNavbar channelName={channel.name} />
+            <MembersNavbar channel={channel} />
             <EditChannelMembersForm
               members={members}
               usernameGetter={usernameGetter}
