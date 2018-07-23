@@ -89,9 +89,9 @@ describe("EditChannelModeratorsPage", () => {
       const wrapper = await renderPage()
       await listenForActions([actions.forms.FORM_VALIDATE], () => {
         wrapper
-          .find("button[type='submit']")
+          .find("form")
           .props()
-          .onClick({})
+          .onSubmit({ preventDefault: helper.sandbox.stub() })
       })
 
       assert.equal(
@@ -121,9 +121,9 @@ describe("EditChannelModeratorsPage", () => {
         ],
         () => {
           wrapper
-            .find("button[type='submit']")
+            .find("form")
             .props()
-            .onClick({ preventDefault: helper.sandbox.stub() })
+            .onSubmit({ preventDefault: helper.sandbox.stub() })
         }
       )
 
@@ -154,9 +154,9 @@ describe("EditChannelModeratorsPage", () => {
         ],
         () => {
           wrapper
-            .find("button[type='submit']")
+            .find("form")
             .props()
-            .onClick({ preventDefault: helper.sandbox.stub() })
+            .onSubmit({ preventDefault: helper.sandbox.stub() })
         }
       )
 

@@ -34,9 +34,14 @@ export default class EditChannelMembersForm extends React.Component<Props> {
     updateEmail(e.target.value)
   }
 
+  onSubmit = (e: Object) => {
+    const { addMember } = this.props
+    e.preventDefault()
+    addMember()
+  }
+
   render() {
     const {
-      addMember,
       removeMember,
       processing,
       validation,
@@ -57,7 +62,7 @@ export default class EditChannelMembersForm extends React.Component<Props> {
           </div>
         ) : (
           <React.Fragment>
-            <div className="add-member-form">
+            <form className="add-member-form" onSubmit={this.onSubmit}>
               <input
                 type="textbox"
                 onChange={this.onUpdateEmail}
@@ -65,10 +70,10 @@ export default class EditChannelMembersForm extends React.Component<Props> {
                 placeholder={`The email of the ${memberTypeDescription} you want to add`}
                 value={form.email}
               />{" "}
-              <button onClick={addMember} type="submit" disabled={processing}>
+              <button type="submit" disabled={processing}>
                 Submit
               </button>
-            </div>
+            </form>
             {validationMessage(validation.email)}
           </React.Fragment>
         )}
