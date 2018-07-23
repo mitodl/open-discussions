@@ -106,6 +106,9 @@ class LinkMeta(TimestampedModel):
     url = URLField(unique=True, max_length=2048)
     thumbnail = URLField(blank=True, null=True, max_length=2048)
 
+    def __str__(self):
+        return f"{self.url} with thumbnail {self.thumbnail}"
+
 
 class Post(TimestampedModel):
     """

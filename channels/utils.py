@@ -4,6 +4,7 @@ from contextlib import contextmanager
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.utils.functional import SimpleLazyObject
 from praw.config import Config
 from praw.exceptions import APIException
@@ -247,6 +248,7 @@ def get_reddit_slug(permalink):
     return list(filter(None, permalink.split('/')))[-1]
 
 
+@transaction.atomic
 def get_or_create_link_meta(url):
     """
     Gets (and if necessary creates) a LinkMeta object for a URL
