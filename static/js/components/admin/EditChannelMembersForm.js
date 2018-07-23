@@ -69,7 +69,7 @@ export default class EditChannelMembersForm extends React.Component<Props> {
                 Submit
               </button>
             </div>
-            {validation ? validationMessage(validation.email) : null}
+            {validationMessage(validation.email)}
           </React.Fragment>
         )}
         <table>
