@@ -56,13 +56,16 @@ const withMemberForm = (WrappedComponent: *) => {
         members,
         beginFormEdit
       } = this.props
+
+      const promises = []
       if (!channel) {
-        await loadChannel()
+        promises.push(loadChannel())
       }
 
       if (!members) {
-        await loadMembers()
+        promises.push(loadMembers())
       }
+      await Promise.all(promises)
 
       beginFormEdit()
     }
