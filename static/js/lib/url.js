@@ -39,6 +39,9 @@ export const commentPermalink = R.curry(
     `${postDetailURL(channelName, postID, postSlug)}/comment/${commentID}/`
 )
 
+export const blankThumbnailUrl = () =>
+  new URL("/static/images/blank.png", window.location.origin).toString()
+
 export const embedlyThumbnail = (
   key: string,
   url: string,
@@ -47,7 +50,7 @@ export const embedlyThumbnail = (
 ) =>
   `https://i.embed.ly/1/display/crop/?key=${key}&url=${encodeURIComponent(
     url
-  )}&height=${height}&width=${width}&grow=true`
+  )}&height=${height}&width=${width}&grow=true&errorurl=${blankThumbnailUrl()}`
 
 export const postPermalink = (post: Post): string =>
   new URL(

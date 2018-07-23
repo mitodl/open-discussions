@@ -31,7 +31,7 @@ export const makePost = (
   removed:       casual.boolean,
   num_reports:   null,
   subscribed:    casual.boolean,
-  thumbnail:     isURLPost ? casual.url : null,
+  thumbnail:     isURLPost ? casual.url : null
 })
 
 export const makeChannelPostList = (channelName: string = casual.word) =>
