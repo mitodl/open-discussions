@@ -194,17 +194,26 @@ def test_is_staff_moderator_or_readonly_exceptions(mocker, jwt_token, exception_
     assert perm.has_permission(request, view) is False
 
 
-@pytest.mark.parametrize('is_staff, mod_editable, moderator, expected', [
-    [True, True, True, True],
-    [True, True, False, True],
-    [True, False, True, True],
-    [True, False, False, True],
-    [False, True, True, True],
-    [False, True, False, False],
-    [False, False, True, False],
-    [False, False, False, False],
-])
-def test_contributor_permission(mocker, is_staff, mod_editable, moderator, expected):
+# This is essentially is_staff or (moderator and (mod_editable or readonly))
+@pytest.mark.parametrize('is_staff, moderator, mod_editable, readonly, expected', [
+    [True, True, True, True, True],
+    [True, True, True, False, True],
+    [True, True, False, True, True],
+    [True, True, False, False, True],
+    [True, False, True, True, True],
+    [True, False, True, False, True],
+    [True, False, False, True, True],
+    [True, False, False, False, True],
+    [False, True, True, True, True],
+    [False, True, True, False, True],
+    [False, True, False, True, True],
+    [False, True, False, False, False],
+    [False, False, True, True, False],
+    [False, False, True, False, False],
+    [False, False, False, True, False],
+    [False, False, False, False, False],
+])  # pylint: disable=too-many-arguments
+def test_contributor_permission(mocker, is_staff, moderator, mod_editable, readonly, expected):
     """
     Test who can view and edit via the contributor REST API
     """
@@ -216,12 +225,17 @@ def test_contributor_permission(mocker, is_staff, mod_editable, moderator, expec
     channel_is_mod_editable_mock = mocker.patch(
         'open_discussions.permissions.channel_is_mod_editable', autospec=True, return_value=mod_editable
     )
+    is_readonly_mock = mocker.patch(
+        'open_discussions.permissions.is_readonly', autospec=True, return_value=readonly
+    )
     assert ContributorPermissions().has_permission(request, view) is expected
     is_staff_jwt_mock.assert_called_once_with(request)
     if is_moderator_mock.called:
         is_moderator_mock.assert_called_once_with(request, view)
     if channel_is_mod_editable_mock.called:
         channel_is_mod_editable_mock.assert_called_once_with(view)
+    if is_readonly_mock.called:
+        is_readonly_mock.assert_called_once_with(request)
 
 
 @pytest.mark.parametrize('readonly, is_staff, mod_editable, moderator, expected', [
