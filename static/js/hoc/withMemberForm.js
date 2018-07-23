@@ -24,7 +24,7 @@ const withMemberForm = (WrappedComponent: *) => {
     usernameGetter: (member: Member) => string,
     addMember: (channel: Channel, email: string) => Promise<*>,
     removeMember: (channel: Channel, email: string) => Promise<*>,
-    noun: string,
+    memberTypeDescription: string,
     processing: boolean,
     beginFormEdit: () => void,
     endFormEdit: () => void,
@@ -72,7 +72,7 @@ const withMemberForm = (WrappedComponent: *) => {
         addMember,
         form,
         channel,
-        noun,
+        memberTypeDescription,
         formValidate,
         beginFormEdit
       } = this.props
@@ -86,7 +86,9 @@ const withMemberForm = (WrappedComponent: *) => {
           await addMember(channel, form.value.email)
           beginFormEdit()
         } catch (e) {
-          formValidate({ errors: { email: `Error adding new ${noun}` } })
+          formValidate({
+            errors: { email: `Error adding new ${memberTypeDescription}` }
+          })
         }
       }
     }
@@ -102,7 +104,7 @@ const withMemberForm = (WrappedComponent: *) => {
         channel,
         form,
         members,
-        noun,
+        memberTypeDescription,
         processing,
         updateEmail,
         beginFormEdit,
@@ -129,7 +131,7 @@ const withMemberForm = (WrappedComponent: *) => {
               addMember={this.addMember}
               removeMember={this.removeMember}
               beginFormEdit={beginFormEdit}
-              noun={noun}
+              memberTypeDescription={memberTypeDescription}
             />
           </Card>
         </React.Fragment>

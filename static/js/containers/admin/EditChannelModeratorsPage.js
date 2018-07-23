@@ -86,9 +86,9 @@ const mapStateToProps = (state, ownProps) => {
     members,
     channelName,
     processing,
-    noun:           "moderator",
-    usernameGetter: R.prop("moderator_name"),
-    form:           getForm(state.forms)
+    memberTypeDescription: "moderator",
+    usernameGetter:        R.prop("moderator_name"),
+    form:                  getForm(state.forms)
   }
 }
 

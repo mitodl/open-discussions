@@ -24,7 +24,7 @@ type Props = {
   form: AddMemberForm,
   processing: boolean,
   beginFormEdit: Function,
-  noun: string
+  memberTypeDescription: string
 }
 
 export default class EditChannelMembersForm extends React.Component<Props> {
@@ -44,7 +44,7 @@ export default class EditChannelMembersForm extends React.Component<Props> {
       members,
       usernameGetter,
       form,
-      noun
+      memberTypeDescription
     } = this.props
 
     const editable = !channel.membership_is_managed
@@ -62,7 +62,7 @@ export default class EditChannelMembersForm extends React.Component<Props> {
                 type="textbox"
                 onChange={this.onUpdateEmail}
                 name="email"
-                placeholder={`The email of the ${noun} you want to add`}
+                placeholder={`The email of the ${memberTypeDescription} you want to add`}
                 value={form.email}
               />{" "}
               <button onClick={addMember} type="submit" disabled={processing}>
