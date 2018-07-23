@@ -130,7 +130,9 @@ class ContributorPermissions(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         return is_staff_jwt(request) or (
-            channel_is_mod_editable(view) and is_moderator(request, view)
+            (
+                channel_is_mod_editable(view) or is_readonly(request)
+            ) and is_moderator(request, view)
         )
 
 
