@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.37.1
+Version 0.37.1 (Released July 20, 2018)
 --------------
 
 - Support confirming email on a different device/browser
