@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.38.0
+--------------
+
+- Release date for 0.37.1
+- General page layout tweaks
+
 Version 0.37.1 (Released July 20, 2018)
 --------------
 
