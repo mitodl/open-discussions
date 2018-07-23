@@ -79,20 +79,18 @@ export default class EditChannelMembersForm extends React.Component<Props> {
                 key={index}
                 className={`row ${editable ? "three-cols" : "two-cols"}`}
               >
-                {member.full_name ? (
-                  <td>
+                <td>
+                  {member.full_name ? (
                     <Link
                       className="name"
                       to={profileURL(usernameGetter(member))}
                     >
                       {member.full_name}
                     </Link>
-                  </td>
-                ) : (
-                  <td>
+                  ) : (
                     <span className="name">{MISSING_TEXT}</span>
-                  </td>
-                )}
+                  )}
+                </td>
                 <td>
                   <span className="email">{member.email || MISSING_TEXT}</span>
                 </td>
