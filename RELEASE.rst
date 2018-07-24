@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.38.1
+--------------
+
+- Save embedly thumbnail URL's (#944)
+- Fix a bug with the create post page
+- Filter out indexing user from moderator and contributor lists (#958)
+- Allow readonly contributor view for moderators for managed channels (#962)
+- Add membership notice and alert tab visibility based on channel type (#955)
+
 Version 0.38.0 (Released July 24, 2018)
 --------------
 
