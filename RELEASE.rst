@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.38.0
+Version 0.38.0 (Released July 24, 2018)
 --------------
 
 - Release date for 0.37.1
