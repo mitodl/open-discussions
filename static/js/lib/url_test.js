@@ -19,7 +19,8 @@ import {
   urlHostname,
   channelModerationURL,
   postPermalink,
-  embedlyThumbnail
+  embedlyThumbnail,
+  blankThumbnailUrl
 } from "./url"
 import { makePost } from "../factories/posts"
 
@@ -220,6 +221,15 @@ describe("url helper functions", () => {
       assert.ok(embedlyUrl.includes(`width=${width}`))
       assert.ok(embedlyUrl.includes(`key=${key}`))
       assert.ok(embedlyUrl.includes(`url=${encodeURIComponent(url)}`))
+    })
+  })
+
+  describe("blankThumbnailUrl", () => {
+    it("should return a good blank thumbnail url", () => {
+      assert.equal(
+        blankThumbnailUrl(),
+        `${window.location.origin}/static/images/blank.png`
+      )
     })
   })
 })

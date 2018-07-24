@@ -69,7 +69,7 @@ export class CompactPostDisplay extends React.Component<Props> {
         }`}
       >
         <div className="row post-toprow">
-          <div className="post-toprow-column1">
+          <div className="column1">
             <div className="row title-row">
               <Link to={postDetailURL(post.channel_name, post.id, post.slug)}>
                 <div className="post-title">
@@ -88,15 +88,14 @@ export class CompactPostDisplay extends React.Component<Props> {
             </div>
           </div>
           {post.url ? (
-            <div className="post-toprow-column2">
-              <div className="post-row-top-right">
+            <div className="column2">
+              <div className="top-right">
                 <a href={post.url} target="_blank" rel="noopener noreferrer">
-                  <i className="material-icons open_in_new post-row-top-right overlay-icon">
+                  <i className="material-icons open_in_new top-right overlay-icon">
                     open_in_new
                   </i>
                   {post.thumbnail ? (
                     <img
-                      ref={`img_${post.id}`}
                       src={embedlyThumbnail(
                         SETTINGS.embedlyKey,
                         post.thumbnail,

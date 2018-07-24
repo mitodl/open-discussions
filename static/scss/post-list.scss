@@ -18,44 +18,39 @@
   min-height: 103px;
   height: auto;
   margin-bottom: 10px;
-  overflow: hidden;
-}
+  word-break: break-word;
 
-.post-toprow-column2 {
-  position: relative;
-  min-width: 201px;
-  width: 201px;
-  overflow: hidden;
-
-  @include breakpoint(mobile) {
-    min-width: 94px;
-    width: 94px;
-    height: 103px;
+  .column1 {
+    word-break: break-word;
+    overflow: hidden;
   }
 
-  @include breakpoint(phone) {
-    min-width: 94px;
-    width: 94px;
-    height: 103px;
-  }
-}
-
-.post-row-top-right {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-
-  img {
+  .column2 {
+    position: relative;
+    min-width: 201px;
     width: 201px;
-    height: 103px;
-    margin: 0px 0px 0px 0px;
+    overflow: hidden;
 
     @include breakpoint(mobile) {
-      margin: 0px -53px 0px 53px;
+      min-width: 94px;
+      width: 94px;
+      height: 103px;
     }
 
-    @include breakpoint(phone) {
-      margin: 0px -53px 0px 53px;
+    .top-right {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+
+      img {
+        width: 201px;
+        height: 103px;
+        margin: 0px 0px 0px 0px;
+
+        @include breakpoint(mobile) {
+          margin: 0px -53px 0px 53px;
+        }
+      }
     }
   }
 }
