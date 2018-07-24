@@ -42,13 +42,25 @@
     }
   }
 
-  .members {
-    table {
-      width: 100%;
+  table {
+    width: 100%;
 
-      td:last-child {
-        text-align: right;
+    .three-cols {
+      td {
+        width: 3*(100%/8);
+
+        &:last-child {
+          width: 2*(100%/8);
+        }
       }
+    }
+
+    .two-cols {
+      width: 50%;
+    }
+
+    td:last-child {
+      text-align: right;
     }
   }
 
