@@ -53,9 +53,9 @@ describe("withForm", () => {
 
   let sandbox, formData
   let formEndEditStub, formBeginEditStub, formUpdateStub, formValidateStub
-  let validateFormStub, onSubmitStub, onSubmitResultStub
+  let validateFormStub, onSubmitStub, onSubmitResultStub, onSubmitErrorStub
 
-  const renderPage = (extraProps = {}) =>
+  const renderPage = ({ ...props }) =>
     mount(
       <WrappedPage
         form={formData}
@@ -67,9 +67,10 @@ describe("withForm", () => {
         formValidate={formValidateStub}
         onSubmit={onSubmitStub}
         onSubmitResult={onSubmitResultStub}
-        extraProps={extraProps}
+        onSubmitError={onSubmitErrorStub}
         onUpdate={sandbox.stub()}
         renderForm={sandbox.stub()}
+        {...props}
       />
     )
 
@@ -82,6 +83,7 @@ describe("withForm", () => {
     validateFormStub = sandbox.stub().returns({})
     onSubmitStub = sandbox.stub().resolves(result)
     onSubmitResultStub = sandbox.stub()
+    onSubmitErrorStub = sandbox.stub()
     formData = {
       value: {
         name: ""
@@ -107,7 +109,7 @@ describe("withForm", () => {
       hello: "there"
     }
 
-    const wrapper = renderPage(formProps)
+    const wrapper = renderPage({ extraProps: formProps })
     const form = wrapper.find(Form)
     const inst = wrapper.instance()
 
@@ -229,5 +231,45 @@ describe("withForm", () => {
 
     assert.ok(onSubmitResultStub.calledOnce)
     assert.ok(onSubmitResultStub.calledWith(result))
+  })
+
+  describe("onSubmitError", () => {
+    [true, false].forEach(onSubmitErrorExists => {
+      it(`handles an error in onSubmit when onSubmitError is ${
+        onSubmitErrorExists ? "" : "not "
+      }defined`, async () => {
+        const wrapper = renderPage({
+          onSubmitError: onSubmitErrorExists ? onSubmitErrorStub : undefined
+        })
+        const form = wrapper.find(Form)
+
+        const error = "error"
+        onSubmitStub.returns(Promise.reject(error))
+        validateFormStub.returns({})
+
+        assert.ok(validateFormStub.notCalled)
+
+        form.find("form").simulate("submit")
+
+        await wait(5) // wait for onSubmit to resolve
+
+        assert.ok(validateFormStub.calledOnce)
+        assert.ok(validateFormStub.calledWith(formData))
+
+        assert.ok(formValidateStub.calledOnce)
+        assert.ok(formValidateStub.calledWith({}))
+
+        assert.ok(onSubmitStub.calledOnce)
+        assert.ok(onSubmitStub.calledWith(formData.value))
+
+        assert.ok(onSubmitResultStub.notCalled)
+        if (onSubmitErrorExists) {
+          assert.ok(onSubmitErrorStub.calledOnce)
+          assert.ok(onSubmitErrorStub.calledWith(error))
+        } else {
+          assert.ok(onSubmitErrorStub.notCalled)
+        }
+      })
+    })
   })
 })

@@ -9,6 +9,7 @@ import {
 } from "../../factories/channels"
 import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
+import { newMemberForm } from "../../lib/channels"
 import { formatTitle } from "../../lib/title"
 import { editChannelContributorsURL } from "../../lib/url"
 import IntegrationTestHelper from "../../util/integration_test_helper"
@@ -69,10 +70,20 @@ describe("EditChannelContributorsPage", () => {
     assert.equal(document.title, formatTitle("Edit Channel"))
   })
 
-  it("renders the form", async () => {
+  it("displays a notice that membership is managed by micromasters", async () => {
+    channel.membership_is_managed = true
     const wrapper = await renderPage()
-    const props = wrapper.find("EditChannelMembersForm").props()
+    assert.equal(
+      wrapper.find(".membership-notice").text(),
+      "Membership is managed via MicroMasters"
+    )
+  })
+
+  it("renders the member list", async () => {
+    const wrapper = await renderPage()
+    const props = wrapper.find("MembersList").props()
     assert.deepEqual(props.members, contributors)
+    assert.equal(props.editable, !channel.membership_is_managed)
     assert.equal(
       props.usernameGetter(contributors[0]),
       contributors[0].contributor_name
@@ -83,6 +94,13 @@ describe("EditChannelContributorsPage", () => {
   describe("editable", () => {
     beforeEach(() => {
       channel.membership_is_managed = false
+    })
+
+    it("renders the form", async () => {
+      const wrapper = await renderPage()
+      const props = wrapper.find("EditChannelMembersForm").props()
+      assert.deepEqual(props.memberTypeDescription, "contributor")
+      assert.deepEqual(props.form, newMemberForm())
     })
 
     it("tries to add a new contributor but fails validation", async () => {
@@ -110,13 +128,13 @@ describe("EditChannelContributorsPage", () => {
         .find("input[name='email']")
         .props()
         .onChange({
-          target:         { value: email },
-          preventDefault: helper.sandbox.stub()
+          target: { name: "email", value: email }
         })
       await listenForActions(
         [
           actions.channelContributors.post.requestType,
           actions.channelContributors.post.failureType,
+          actions.forms.FORM_VALIDATE,
           actions.forms.FORM_VALIDATE
         ],
         () => {
@@ -127,6 +145,11 @@ describe("EditChannelContributorsPage", () => {
         }
       )
 
+      sinon.assert.calledWith(
+        helper.addChannelContributorStub,
+        channel.name,
+        email
+      )
       assert.equal(
         helper.store.getState().forms["channel:edit:contributors"].errors.email,
         "Error adding new contributor"
@@ -144,13 +167,13 @@ describe("EditChannelContributorsPage", () => {
         .find("input[name='email']")
         .props()
         .onChange({
-          target:         { value: email },
-          preventDefault: helper.sandbox.stub()
+          target: { name: "email", value: email }
         })
       await listenForActions(
         [
           actions.channelContributors.post.requestType,
-          actions.channelContributors.post.successType
+          actions.channelContributors.post.successType,
+          actions.forms.FORM_VALIDATE
         ],
         () => {
           wrapper

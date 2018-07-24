@@ -38,12 +38,13 @@ const withForm = <T>(FormComponent: FormComponentCls<T>) => (
       })
     }
 
-    onSubmit = (e?: Object) => {
+    onSubmit = async (e?: Object) => {
       const {
         form,
         formValidate,
         onSubmit,
         onSubmitResult,
+        onSubmitError,
         validateForm
       } = this.props
 
@@ -60,7 +61,16 @@ const withForm = <T>(FormComponent: FormComponentCls<T>) => (
       formValidate(R.isEmpty(validation) ? {} : validation.value)
 
       if (R.isEmpty(validation)) {
-        onSubmit(form.value).then(onSubmitResult)
+        try {
+          const result = await onSubmit(form.value)
+          if (onSubmitResult) {
+            onSubmitResult(result)
+          }
+        } catch (e) {
+          if (onSubmitError) {
+            onSubmitError(e)
+          }
+        }
       }
     }
 
