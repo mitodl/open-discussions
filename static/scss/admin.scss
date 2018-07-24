@@ -47,10 +47,10 @@
 
     .three-cols {
       td {
-        width: 3*(100%/8);
+        width: 3 * (100%/8);
 
         &:last-child {
-          width: 2*(100%/8);
+          width: 2 * (100%/8);
         }
       }
     }
