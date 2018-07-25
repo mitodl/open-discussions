@@ -36,6 +36,7 @@ export type WithFormProps<T> = {
   onUpdate: Object => void,
   onSubmit: T => Promise<*>,
   onSubmitResult: Function,
+  onSubmitError?: Function,
   validateForm: FormValue<T> => {value: FormErrors<T>},
   renderForm: Function
 } & FormActionCreators<T>

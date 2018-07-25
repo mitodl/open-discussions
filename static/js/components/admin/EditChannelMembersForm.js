@@ -1,34 +1,41 @@
 // @flow
 import React from "react"
-import { Link } from "react-router-dom"
 
-import { MISSING_TEXT } from "../../lib/channels"
-import { profileURL } from "../../lib/url"
+import { validationMessage } from "../../lib/validation"
 
-import type { Member } from "../../flow/discussionTypes"
+import type { FormProps } from "../../flow/formTypes"
+import type { AddMemberForm } from "../../flow/discussionTypes"
 
 type Props = {
-  members: Array<Member>,
-  usernameGetter: (member: Member) => string
-}
+  memberTypeDescription: string
+} & FormProps<AddMemberForm>
 
 export default class EditChannelMembersForm extends React.Component<Props> {
   render() {
-    const { members, usernameGetter } = this.props
+    const {
+      processing,
+      validation,
+      form,
+      onUpdate,
+      onSubmit,
+      memberTypeDescription
+    } = this.props
+
     return (
       <div className="members">
-        {members.map((member, index) => (
-          <div key={index} className="row">
-            {member.full_name ? (
-              <Link className="name" to={profileURL(usernameGetter(member))}>
-                {member.full_name}
-              </Link>
-            ) : (
-              <span className="name">{MISSING_TEXT}</span>
-            )}
-            <span className="email">{member.email || MISSING_TEXT}</span>
-          </div>
-        ))}
+        <form className="add-member-form" onSubmit={onSubmit}>
+          <input
+            type="textbox"
+            onChange={onUpdate}
+            name="email"
+            placeholder={`The email of the ${memberTypeDescription} you want to add`}
+            value={form.email}
+          />{" "}
+          <button type="submit" disabled={processing}>
+            Submit
+          </button>
+        </form>
+        {validationMessage(validation.email)}
       </div>
     )
   }

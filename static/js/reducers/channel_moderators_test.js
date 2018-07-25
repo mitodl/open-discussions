@@ -13,7 +13,7 @@ describe("channelModerators reducers", () => {
     helper = new IntegrationTestHelper()
     store = helper.store
     moderators = makeModerators("username")
-    newModerator = makeModerator()
+    newModerator = makeModerator("new_mod")
     dispatchThen = helper.store.createDispatchThen(
       state => state.channelModerators
     )

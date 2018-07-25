@@ -38,6 +38,10 @@ export type ChannelBasicEditValidation = {
   link_type: string
 }
 
+export type AddMemberForm = {
+  email: string,
+}
+
 export type AuthoredContent = {
   id:              string,
   author_id:       string,

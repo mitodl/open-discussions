@@ -1,7 +1,11 @@
 //@flow
 import R from "ramda"
 
-import type { Channel, ChannelForm } from "../flow/discussionTypes"
+import type {
+  Channel,
+  ChannelForm,
+  AddMemberForm
+} from "../flow/discussionTypes"
 
 export const CHANNEL_TYPE_PUBLIC: "public" = "public"
 export const CHANNEL_TYPE_RESTRICTED: "restricted" = "restricted"
@@ -45,6 +49,10 @@ export const editChannelForm = (channel: Channel): ChannelForm =>
     ],
     channel
   )
+
+export const newMemberForm = (): AddMemberForm => ({
+  email: ""
+})
 
 export const userCanPost = (channel: Channel) =>
   channel.channel_type === CHANNEL_TYPE_PUBLIC ||

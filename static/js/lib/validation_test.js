@@ -13,6 +13,7 @@ import {
   validateChannelBasicEditForm,
   validateContentReportForm,
   validateEmailForm,
+  validateMembersForm,
   validatePasswordForm,
   validatePasswordResetForm,
   validatePasswordChangeForm,
@@ -241,6 +242,17 @@ describe("validation library", () => {
       assert.deepEqual(validateEmailForm(form), {
         value: {
           email: "Email is not formatted correctly"
+        }
+      })
+    })
+  })
+
+  describe("validateMembersForm", () => {
+    it("should complain about no email", () => {
+      const form = { value: { email: "" } }
+      assert.deepEqual(validateMembersForm(form), {
+        value: {
+          email: "Email must not be blank"
         }
       })
     })

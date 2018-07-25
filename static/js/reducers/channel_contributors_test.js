@@ -13,7 +13,7 @@ describe("channelContributors reducers", () => {
     helper = new IntegrationTestHelper()
     store = helper.store
     contributors = makeContributors("username")
-    newContributor = makeContributor()
+    newContributor = makeContributor("new_contributor")
     dispatchThen = helper.store.createDispatchThen(
       state => state.channelContributors
     )
