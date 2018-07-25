@@ -7,6 +7,7 @@ import { actions } from "../../actions"
 import { FLOW_LOGIN, STATE_SUCCESS } from "../../reducers/auth"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import ConnectedLoginPage, { LoginPage, FORM_KEY } from "./LoginPage"
+import { REGISTER_URL } from "../../lib/url"
 
 const DEFAULT_STATE = {
   auth: {
@@ -69,6 +70,14 @@ describe("LoginPage", () => {
     })
 
     const link = inner.find("ExternalLogins")
+    assert.ok(link.exists())
+  })
+
+  it("should contain a link to the signup page", async () => {
+    const { inner } = await renderPage()
+    const link = inner
+      .find("Link")
+      .findWhere(c => c.prop("to") === REGISTER_URL)
     assert.ok(link.exists())
   })
 

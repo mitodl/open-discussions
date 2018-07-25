@@ -4,6 +4,7 @@ import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
 import { MetaTags } from "react-meta-tags"
+import { Link } from "react-router-dom"
 
 import Card from "../../components/Card"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
@@ -13,6 +14,7 @@ import { actions } from "../../actions"
 import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
+import { REGISTER_URL } from "../../lib/url"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 import {
@@ -40,6 +42,9 @@ export const LoginPage = ({ renderForm, formError }: LoginPageProps) => (
         </MetaTags>
         {renderForm({ formError })}
         <ExternalLogins />
+        <div className="alternate-auth-link">
+          Not a member? <Link to={REGISTER_URL}>Sign up &gt;</Link>
+        </div>
       </Card>
     </div>
   </div>

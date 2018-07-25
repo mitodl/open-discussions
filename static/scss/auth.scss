@@ -7,3 +7,14 @@
     }
   }
 }
+
+.alternate-auth-link {
+  text-align: center;
+  color: $font-grey;
+
+  a:link,
+  a:visited {
+    text-decoration: underline;
+    color: $font-grey;
+  }
+}
