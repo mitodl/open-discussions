@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.38.2
+Version 0.38.2 (Released July 25, 2018)
 --------------
 
 - Implement adding and removing moderators and contributors (#916)
