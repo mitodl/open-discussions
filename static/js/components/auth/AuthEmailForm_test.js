@@ -78,32 +78,6 @@ describe("AuthEmailForm component", () => {
     )
   })
 
-  it("should show a suggestion on an email typo", () => {
-    const wrapper = mountForm({
-      form: {
-        email: "user@mit.ed"
-      }
-    })
-
-    assert.equal(
-      wrapper.find(".validation-message").text(),
-      "Did you mean user@mit.edu?"
-    )
-  })
-
-  it("should call onUpdate with the suggestion if the user clicks it", () => {
-    const wrapper = mountForm({
-      form: {
-        email: "user@mit.ed"
-      }
-    })
-    wrapper.find(".validation-message a").simulate("click")
-    sinon.assert.calledOnce(onUpdateStub)
-    const eventArg = onUpdateStub.firstCall.args[0]
-    assert.equal(eventArg.target.name, "email")
-    assert.equal(eventArg.target.value, "user@mit.edu")
-  })
-
   it("should call onUpdate when the input text changes", () => {
     const wrapper = mountForm({ processing: true })
     const event = {
