@@ -4,6 +4,7 @@ import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
 import { MetaTags } from "react-meta-tags"
+import { Link } from "react-router-dom"
 
 import Card from "../../components/Card"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
@@ -15,6 +16,7 @@ import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { preventDefaultAndInvoke } from "../../lib/util"
+import { LOGIN_URL } from "../../lib/url"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 import {
@@ -53,7 +55,7 @@ export const RegisterPage = ({
         <h3>
           {partialToken && email
             ? `We could not find an account with the email: ${email}`
-            : "Sign up for free to unlock more features."}
+            : "Join MIT OPEN for free"}
         </h3>
         <MetaTags>
           <title>{formatTitle("Register")}</title>
@@ -75,6 +77,9 @@ export const RegisterPage = ({
           renderForm({ formError })
         )}
         <ExternalLogins />
+        <div className="alternate-auth-link">
+          Already have an account? <Link to={LOGIN_URL}>Log in &gt;</Link>
+        </div>
       </Card>
     </div>
   </div>

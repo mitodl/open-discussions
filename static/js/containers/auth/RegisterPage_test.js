@@ -7,6 +7,7 @@ import { actions } from "../../actions"
 import { FLOW_REGISTER, STATE_REGISTER_CONFIRM_SENT } from "../../reducers/auth"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import ConnectedRegisterPage, { RegisterPage, FORM_KEY } from "./RegisterPage"
+import { LOGIN_URL } from "../../lib/url"
 
 const email = "test@example.com"
 
@@ -71,6 +72,12 @@ describe("RegisterPage", () => {
     })
 
     const link = inner.find("ExternalLogins")
+    assert.ok(link.exists())
+  })
+
+  it("should contain a link to the login page", async () => {
+    const { inner } = await renderPage()
+    const link = inner.find("Link").findWhere(c => c.prop("to") === LOGIN_URL)
     assert.ok(link.exists())
   })
 
