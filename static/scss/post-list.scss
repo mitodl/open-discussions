@@ -27,15 +27,9 @@
 
   .column2 {
     position: relative;
-    min-width: 201px;
-    width: 201px;
     overflow: hidden;
-
-    @include breakpoint(mobile) {
-      min-width: 94px;
-      width: 94px;
-      height: 103px;
-    }
+    min-width: 24px;
+    width: 24px;
 
     .top-right {
       position: absolute;
@@ -51,6 +45,17 @@
           margin: 0px -53px 0px 53px;
         }
       }
+    }
+  }
+
+  .link-thumbnail {
+    min-width: 201px;
+    width: 201px;
+
+    @include breakpoint(mobile) {
+      min-width: 94px;
+      width: 94px;
+      height: 103px;
     }
   }
 }
