@@ -37,3 +37,7 @@ class RequirePasswordAndProfileException(PartialException):
     """Authentication requires a password and profile"""
     def __str__(self):
         return "Password and profile need to be filled out"
+
+
+class UserMissingSocialAuthException(Exception):
+    """Raised if the user doesn't have a social auth"""

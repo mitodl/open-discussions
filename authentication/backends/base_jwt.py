@@ -1,5 +1,4 @@
 """JWT-based authentication"""
-from django.contrib.auth.models import User
 import jwt
 from rest_framework_jwt.settings import api_settings
 from social_core.backends.legacy import LegacyAuth
@@ -10,9 +9,12 @@ class BaseJwtAuth(LegacyAuth):
     """Base implementation for JWT-based authentication"""
     ID_KEY = 'username'
     EXTRA_DATA = ['username', 'email']
+    ISSUER_NAME = None
 
-    def auth_complete(self, *args, **kwargs):
-        """Perform the authentication"""
+    def user_data(self):
+        """
+        Returns user data from the JWT
+        """
         jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
 
         cookies = self.strategy.request.COOKIES
@@ -23,24 +25,18 @@ class BaseJwtAuth(LegacyAuth):
         auth = cookies.get(api_settings.JWT_AUTH_COOKIE)
 
         try:
-            payload = jwt_decode_handler(auth)
+            # this should have the remote username in the ID_KEY field
+            return jwt_decode_handler(auth)
         except jwt.InvalidTokenError as exc:
             raise AuthException(self, 'Invalid JWT') from exc
 
-        try:
-            user = User.objects.get(username=payload['username'])
-        except User.DoesNotExist as exc:
-            raise AuthException(self, 'Invalid JWT username') from exc
+    def auth_complete(self, *args, **kwargs):
+        """Perform the authentication"""
+        data = self.user_data()
 
         kwargs.update({
-            'user': user,
-            'response': payload,
+            'response': data,
             'backend': self,
         })
-        return self.strategy.authenticate(*args, **kwargs)
 
-    def get_user_details(self, response):
-        """Get the user details"""
-        return {
-            'username': response['username'],
-        }
+        return self.strategy.authenticate(*args, **kwargs)

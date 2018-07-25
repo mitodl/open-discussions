@@ -626,6 +626,8 @@ JWT_AUTH = {
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
     'JWT_AUTH_COOKIE': OPEN_DISCUSSIONS_COOKIE_NAME,
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+    # custom username lookup to handle python-social-auth authentication
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER': 'authentication.utils.jwt_get_username_from_payload_handler',
 }
 
 

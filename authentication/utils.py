@@ -1,6 +1,12 @@
 """Authentication utils"""
 from social_core.utils import get_strategy
+from social_django.models import UserSocialAuth
 from social_django.utils import STORAGE
+
+from authentication.backends.micromasters import MicroMastersAuth
+from authentication.exceptions import UserMissingSocialAuthException
+# static for now
+ALLOWED_PROVIDERS = [MicroMastersAuth.name]
 
 
 class SocialAuthState:
@@ -35,3 +41,33 @@ class SocialAuthState:
 def load_drf_strategy(request=None):
     """Returns the DRF strategy"""
     return get_strategy('authentication.strategy.DjangoRestFrameworkStrategy', STORAGE, request)
+
+
+def jwt_get_username_from_payload_handler(payload):
+    """
+    Get the username from the payload
+
+    To do this in concert with PSA, we lookup the username of the user that corresponds to the matching provider
+
+    Args:
+        payload(dict): JWT payload deserialized
+
+    Returns:
+        str: the username associated with this JWT
+    """
+    username = payload.get('username')
+
+    # if an provider is provided and valid, treat the username as a social auth username
+    # otherwise the username is used verbatim for backwards compatibility
+    provider = payload.get('provider')
+    if provider and provider in ALLOWED_PROVIDERS:
+        # get the User.username for this social auth
+        # if this errors, (not exactly one UserSocialAuth/User) we want to know
+        try:
+            username = UserSocialAuth.objects.values_list(
+                'user__username', flat=True
+            ).get(provider=provider, uid=username)
+        except UserSocialAuth.DoesNotExist as exc:
+            raise UserMissingSocialAuthException("Found no UserSocialAuth for username") from exc
+
+    return username

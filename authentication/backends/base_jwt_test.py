@@ -21,14 +21,6 @@ def auth(mock_strategy):
     return BaseJwtAuth(mock_strategy)
 
 
-def test_user_details(auth):
-    """Tests get_user_details"""
-    assert auth.get_user_details({
-        'username': 'abc',
-        'other': 'missing',
-    }) == {'username': 'abc'}
-
-
 def test_auth_complete_no_auth_header(auth):
     """BaseJwtAuth raises an error if the header isn't present"""
     with pytest.raises(AuthException) as exc:
@@ -48,21 +40,6 @@ def test_auth_complete_invalid_jwt_token(auth, mock_strategy):
     assert exc.value.args == ('Invalid JWT',)
 
 
-@pytest.mark.django_db
-def test_auth_complete_invalid_user(auth, mock_strategy):
-    """BaseJwtAuth raises an error if the header is invalid"""
-    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-    jwt_value = jwt_encode_handler({
-        'username': 'doesntexist',
-    })
-    mock_strategy.request.COOKIES[api_settings.JWT_AUTH_COOKIE] = jwt_value
-    with pytest.raises(AuthException) as exc:
-        auth.auth_complete()
-
-    assert exc.value.backend == auth
-    assert exc.value.args == ('Invalid JWT username',)
-
-
 def test_auth_complete(user, auth, mock_strategy):
     """BaseJwtAuth authenticates"""
     jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -72,4 +49,4 @@ def test_auth_complete(user, auth, mock_strategy):
     mock_strategy.request.COOKIES[api_settings.JWT_AUTH_COOKIE] = jwt_value
 
     assert auth.auth_complete(1, arg2=2) == mock_strategy.authenticate.return_value
-    mock_strategy.authenticate.assert_called_once_with(1, arg2=2, user=user, response=jwt_payload, backend=auth)
+    mock_strategy.authenticate.assert_called_once_with(1, arg2=2, response=jwt_payload, backend=auth)

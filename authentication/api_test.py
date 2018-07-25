@@ -73,20 +73,41 @@ def test_create_user_token_error(mocker):
     auth_token_mock.assert_called_once()
 
 
-def test_create_micromasters_social_auth(user):
+def test_create_or_update_micromasters_social_auth(user):
     """Test that we create a MM social auth"""
+    username = 'abc123'
+    email = 'test@localhost'
+    email2 = 'test2@localhost'
 
     assert UserSocialAuth.objects.count() == 0
-    assert api.create_micromasters_social_auth(user) is not None
+    assert api.create_or_update_micromasters_social_auth(user, username, {
+        'email': email,
+    }) is not None
 
     assert UserSocialAuth.objects.count() == 1
 
     social = UserSocialAuth.objects.first()
     assert social.user == user
-    assert social.uid == user.username
+    assert social.uid == username
     assert social.provider == 'micromasters'
     assert social.extra_data == {
-        'email': user.email,
-        'username': user.username,
+        'email': email,
+        'username': username,
         'auth_time': any_instance_of(int),
     }
+
+    # should be the same one as before, except email has updated
+    assert api.create_or_update_micromasters_social_auth(user, username, {
+        'email': email2,
+    }) == social
+
+    social.refresh_from_db()
+    assert social.user == user
+    assert social.uid == username
+    assert social.extra_data == {
+        'email': email2,
+        'username': username,
+        'auth_time': any_instance_of(int),
+    }
+
+    assert UserSocialAuth.objects.count() == 1

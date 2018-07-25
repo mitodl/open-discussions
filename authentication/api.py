@@ -52,12 +52,14 @@ def create_user(username, email, profile_data=None, user_extra=None):
     return user
 
 
-def create_micromasters_social_auth(user):
+def create_or_update_micromasters_social_auth(user, uid, details):
     """
-    Creates a MicroMasters social auth for a user
+    Creates or updates MicroMasters social auth for a user
 
     Args:
-        user(User): user to create the auth for
+        user (User): user to create the auth for
+        uid (str): the micromasters username of the user
+        details (dict): additional details
 
     Returns:
         UserSocialAuth: the created social auth record
@@ -68,15 +70,15 @@ def create_micromasters_social_auth(user):
     storage = strategy.storage
     backend = load_backend(strategy, MicroMastersAuth.name, None)
     try:
-        social = storage.user.create_social_auth(user, user.username, MicroMastersAuth.name)
-
-        extra_data = backend.extra_data(user, user.username, {
-            'email': user.email,
-            'username': str(user.username),
-        }, {})
-        social.set_extra_data(extra_data)
-        return social
+        social = storage.user.create_social_auth(user, uid, MicroMastersAuth.name)
     except IntegrityError:
         # if the user already has a social auth for MM, we don't want to fail
-        # so just return the existing one
-        return storage.user.get_social_auth_for_user(user, provider=MicroMastersAuth.name)
+        # so just use the existing one
+        social = storage.user.get_social_auth_for_user(user, provider=MicroMastersAuth.name).filter(uid=uid).first()
+
+    # update metadata
+    extra_data = backend.extra_data(user, uid, {
+        'username': uid,
+    }, details)
+    social.set_extra_data(extra_data)
+    return social

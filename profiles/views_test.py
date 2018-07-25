@@ -42,11 +42,11 @@ def test_list_users(client, staff_user, staff_jwt_header):
 
 
 # These can be removed once all clients have been updated and are sending both these fields
-@pytest.mark.parametrize('email', ['test.email@example.com'])
+@pytest.mark.parametrize('uid', [None, 'abc123'])
 @pytest.mark.parametrize('email_optin', [None, True, False])
 @pytest.mark.parametrize('toc_optin', [None, True, False])
 def test_create_user(
-        client, staff_user, staff_jwt_header, mocker, email, email_optin, toc_optin
+        client, staff_user, staff_jwt_header, mocker, uid, email_optin, toc_optin
 ):  # pylint: disable=too-many-arguments
     """
     Create a user and assert the response
@@ -56,7 +56,9 @@ def test_create_user(
     staff_user.profile.save()
     staff_user.save()
     url = reverse('user_api-list')
+    email = 'test.email@example.com'
     payload = {
+        'email': email,
         'profile': {
             'name': 'name',
             'image': 'image',
@@ -66,13 +68,13 @@ def test_create_user(
             'headline': 'headline'
         }
     }
-    if email:
-        payload['email'] = email
+    if uid:
+        payload['uid'] = uid
     if email_optin is not None:
         payload['profile']['email_optin'] = email_optin
     if toc_optin is not None:
         payload['profile']['toc_optin'] = toc_optin
-    assert UserSocialAuth.objects.filter(uid=email, provider=MicroMastersAuth.name).count() == 0
+    assert UserSocialAuth.objects.filter(provider=MicroMastersAuth.name, uid=uid).exists() is False
     get_or_create_auth_tokens_stub = mocker.patch('channels.api.get_or_create_auth_tokens')
     ensure_notifications_stub = mocker.patch('notifications.api.ensure_notification_settings')
     resp = client.post(url, data=payload, **staff_jwt_header)
@@ -93,7 +95,7 @@ def test_create_user(
     assert user.email == email
     assert user.profile.email_optin is email_optin
     assert user.profile.toc_optin is toc_optin
-    assert UserSocialAuth.objects.filter(uid=user.username, provider=MicroMastersAuth.name).count() == 1
+    assert UserSocialAuth.objects.filter(provider=MicroMastersAuth.name, uid=uid).exists() is (uid is not None)
 
 
 def test_get_user(client, user, staff_jwt_header):
@@ -122,11 +124,11 @@ def test_get_user(client, user, staff_jwt_header):
     }
 
 
-# These can be removed once all clients have been updated and are sending both these fields
+@pytest.mark.parametrize('uid', [None, 'abc123'])
 @pytest.mark.parametrize('email', ['', 'test.email@example.com'])
 @pytest.mark.parametrize('email_optin', [None, True, False])
 @pytest.mark.parametrize('toc_optin', [None, True, False])
-def test_patch_user(client, user, staff_jwt_header, email, email_optin, toc_optin):
+def test_patch_user(client, user, staff_jwt_header, uid, email, email_optin, toc_optin):
     """
     Update a users' profile
     """
@@ -142,10 +144,13 @@ def test_patch_user(client, user, staff_jwt_header, email, email_optin, toc_opti
     }
     if email:
         payload['email'] = email
+    if uid:
+        payload['uid'] = uid
     if email_optin is not None:
         payload['profile']['email_optin'] = email_optin
     if toc_optin is not None:
         payload['profile']['toc_optin'] = toc_optin
+    assert UserSocialAuth.objects.filter(provider=MicroMastersAuth.name, uid=uid).exists() is False
     url = reverse('user_api-detail', kwargs={'username': user.username})
     resp = client.patch(url, data=payload, **staff_jwt_header)
     assert resp.status_code == 200
@@ -170,6 +175,7 @@ def test_patch_user(client, user, staff_jwt_header, email, email_optin, toc_opti
     assert user.email == email
     assert profile.email_optin is email_optin
     assert profile.toc_optin is toc_optin
+    assert UserSocialAuth.objects.filter(provider=MicroMastersAuth.name, uid=uid).exists() is (uid is not None)
 
 
 def test_patch_username(client, user, staff_jwt_header):
