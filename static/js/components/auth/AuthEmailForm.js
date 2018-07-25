@@ -2,9 +2,7 @@
 import React from "react"
 import R from "ramda"
 
-import { suggestEmail } from "../../lib/email"
-import { preventDefaultAndInvoke } from "../../lib/util"
-import { validationMessage, validEmail } from "../../lib/validation"
+import { validationMessage } from "../../lib/validation"
 
 import type { EmailForm } from "../../flow/authTypes"
 import type { FormProps } from "../../flow/formTypes"
@@ -21,8 +19,6 @@ const AuthEmailForm = ({
   processing,
   formError
 }: LoginFormProps) => {
-  const suggestion = validEmail(form.email) ? suggestEmail(form.email) : null
-
   return (
     <form onSubmit={onSubmit} className="form">
       <div className="emailfield row">
@@ -34,24 +30,6 @@ const AuthEmailForm = ({
           onChange={onUpdate}
         />
         {validationMessage(validation.email)}
-        {suggestion && !validation.email ? (
-          <div className="validation-message">
-            Did you mean{" "}
-            <a
-              href="#"
-              onClick={preventDefaultAndInvoke(() =>
-                onUpdate({
-                  target: {
-                    name:  "email",
-                    value: suggestion.full
-                  }
-                })
-              )}
-            >
-              {suggestion.full}
-            </a>?
-          </div>
-        ) : null}
       </div>
       <div className="error row">
         {!processing && R.isEmpty(validation)
