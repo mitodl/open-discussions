@@ -96,18 +96,20 @@ export class CompactPostDisplay extends React.Component<Props> {
                   <i className="material-icons open_in_new top-right overlay-icon">
                     open_in_new
                   </i>
-                  {post.thumbnail ? (
-                    <img
-                      src={embedlyThumbnail(
-                        SETTINGS.embedlyKey,
-                        post.thumbnail,
-                        103,
-                        201
-                      )}
-                    />
-                  ) : null}
                 </a>
               </div>
+              {post.thumbnail ? (
+                <a href={post.url} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={embedlyThumbnail(
+                      SETTINGS.embedlyKey,
+                      post.thumbnail,
+                      103,
+                      201
+                    )}
+                  />
+                </a>
+              ) : null}
             </div>
           ) : null}
         </div>

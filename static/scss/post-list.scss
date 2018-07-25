@@ -30,6 +30,10 @@
     overflow: hidden;
     min-width: 24px;
     width: 24px;
+    margin-left: 5px;
+    display: flex;
+    justify-content: center;
+    height: 103px;
 
     .top-right {
       position: absolute;
@@ -39,24 +43,14 @@
       img {
         width: 201px;
         height: 103px;
-        margin: 0px 0px 0px 0px;
-
-        @include breakpoint(mobile) {
-          margin: 0px -53px 0px 53px;
-        }
       }
     }
   }
 
   .link-thumbnail {
-    min-width: 201px;
-    width: 201px;
-
-    @include breakpoint(mobile) {
-      min-width: 94px;
-      width: 94px;
-      height: 103px;
-    }
+    min-width: 25%;
+    width: 25%;
+    overflow: hidden;
   }
 }
 
