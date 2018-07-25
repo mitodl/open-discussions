@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.38.2
+--------------
+
+- Implement adding and removing moderators and contributors (#916)
+- Added login & signup links to the signup & login pages
+
 Version 0.38.1 (Released July 24, 2018)
 --------------
 
