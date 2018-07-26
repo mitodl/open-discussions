@@ -1,7 +1,10 @@
 """ Utils for profiles """
+import hashlib
+import re
 from io import BytesIO
 from os import path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
+from xml.sax.saxutils import escape as xml_escape
 
 from contextlib import contextmanager
 from django.conf import settings
@@ -12,19 +15,88 @@ from PIL import Image
 from open_discussions.utils import now_in_utc
 
 
+# Max dimension of either height or width for small and medium images
+IMAGE_SMALL_MAX_DIMENSION = 64
+IMAGE_MEDIUM_MAX_DIMENSION = 128
+
+IMAGE_STANDARD = "image"
+IMAGE_SMALL = "image_small"
+IMAGE_MEDIUM = "image_medium"
+
+MAX_IMAGE_FIELD_LENGTH = 1024
+
+IMAGE_FIELDS = {
+    IMAGE_STANDARD: "",
+    IMAGE_SMALL: IMAGE_SMALL_MAX_DIMENSION,
+    IMAGE_MEDIUM: IMAGE_MEDIUM_MAX_DIMENSION
+}
+
 # This is the Django ImageField max path size
 IMAGE_PATH_MAX_LENGTH = 100
 IMAGE_PATH_PREFIX = 'profile'
+GRAVATAR_IMAGE_URL = "https://www.gravatar.com/avatar/{}.jpg"
 
-default_profile_image = urljoin(settings.STATIC_URL, "images/avatar_default.png")
+DEFAULT_FONTS = [
+    'HelveticaNeue-Light',
+    'Helvetica Neue Light',
+    'Helvetica Neue',
+    'Helvetica',
+    'Arial',
+    'Lucida Grande',
+    'sans-serif',
+]
+
+SVG_TEMPLATE = """
+<svg xmlns="http://www.w3.org/2000/svg" pointer-events="none"
+     width="{size}" height="{size}">
+  <circle cx="{cx}" cy="{cy}" r="{radius}" style="{style}"></circle>
+  <text text-anchor="middle" y="50%" x="50%" dy="0.35em"
+        pointer-events="auto" font-family="{font-family}"
+        font-weight="400" fill="#{color}" style="{text-style}">{text}</text>
+</svg>
+""".strip()
+SVG_TEMPLATE = re.sub(r'(\s+|\n)', ' ', SVG_TEMPLATE)
+
+default_profile_image = urljoin(settings.STATIC_URL, "/images/avatar_default.png")
 
 
-def image_uri(user, image_field='image_small'):
+def get_gravatar_image(user, image_field=None):
+    """
+    Query gravatar for an image and return those image properties
+
+    Args:
+        user (User): the user to compute gravatar image urls for
+
+    Returns:
+        str: The URL to the image.
+    """
+    gravatar_hash = hashlib.md5(user.email.lower().encode('utf-8')).hexdigest()
+    gravatar_image_url = GRAVATAR_IMAGE_URL.format(gravatar_hash)
+    max_dimension = IMAGE_FIELDS[image_field]
+    size_param = '&s={}'.format(max_dimension) if max_dimension else ''
+    if user.profile.name:
+        d_param = urljoin(
+            settings.SITE_BASE_URL,
+            '/profile/{}/{}/fff/579cf9.png'.format(
+                user.username,
+                max_dimension
+            )
+        )
+    else:
+        d_param = settings.SITE_BASE_URL + default_profile_image
+
+    return '{}?d={}{}'.format(gravatar_image_url, quote(d_param), size_param)
+
+
+def image_uri(user, image_field=IMAGE_SMALL):
     """ Return the correctly formatted profile image URI for a user """
-    if user and user.profile:
+    if user and hasattr(user, 'profile'):
         image_file = getattr(user.profile, '{}_file'.format(image_field))
         if not image_file.name:
-            return getattr(user.profile, image_field) or default_profile_image
+            image_file = getattr(user.profile, image_field)
+            if not image_file:
+                return get_gravatar_image(user, image_field)
+            return image_file
         return image_file.url
     return default_profile_image
 
@@ -173,3 +245,67 @@ def update_full_name(user, name):
     if len(name_parts) > 1:
         user.last_name = ' '.join(name_parts[1:])[:30]
     user.save()
+
+
+def dict_to_style(style_dict):
+    """
+    Transform a dict into a string formatted as an HTML style
+
+    Args:
+        style_dict(dict): A dictionary of style attributes/values
+
+    Returns:
+        str: An HTML style string
+    """
+
+    return '; '.join(['{}: {}'.format(k, v) for k, v in style_dict.items()])
+
+
+def get_svg_avatar(text, size, color, bgcolor):
+    """
+    Generate an SVG avatar based om input text.  Adopted from https://github.com/CraveFood/avinit
+
+    Args:
+        text(str): The text to extract two initials from.
+        size(int): The width (and height) of the output SVG image
+        color(str): The font color code (minus the # prefix).
+        bgcolor(str): The image background color (minus the # prefix)
+
+    Returns:
+        str: an SVG image.
+    """
+
+    initials = '=)'
+
+    text = text.strip()
+    if text:
+        split_text = text.split(' ')
+        if len(split_text) > 1:
+            initials = split_text[0][0] + split_text[-1][0]
+        else:
+            initials = split_text[0][0]
+
+    style = {
+        'fill': '#{}'.format(bgcolor),
+        'border-radius': '{}px'.format(size - 1),
+        '-moz-border-radius': '{}px'.format(size - 1)
+    }
+
+    text_style = {
+        'font-weight': '400px',
+        'font-size': '{}px'.format(int(size/2)),
+        'color': '#{}'.format(color)
+    }
+
+    return SVG_TEMPLATE.format(**{
+        'height': size,
+        'size': size,
+        'cx': int(size / 2),
+        'cy': int(size / 2),
+        'radius': int((size - 1) / 2),
+        'style': dict_to_style(style),
+        'color': color,
+        'font-family': ','.join(DEFAULT_FONTS),
+        'text-style': dict_to_style(text_style),
+        'text': xml_escape(initials.upper()),
+    }).replace('\n', '')

@@ -1,11 +1,13 @@
 django-cors-headers==2.1.0
 Django==1.11.10
 PyYAML==3.11
+avinit
 base36
 beautifulsoup4==4.6.0
 betamax
 betamax_serializers
 boto==2.39.0
+cairosvg
 celery==4.2.0
 dj-database-url==0.3.0
 dj-static==0.0.6

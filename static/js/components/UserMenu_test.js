@@ -12,6 +12,7 @@ import DropdownMenu from "./DropdownMenu"
 import { profileURL, SETTINGS_URL } from "../lib/url"
 import * as utilFuncs from "../lib/util"
 import ProfileImage from "../containers/ProfileImage"
+import { defaultProfileImageUrl } from "../lib/util"
 
 describe("UserMenu", () => {
   let toggleShowUserMenuStub, showUserMenu, profile, sandbox
@@ -21,16 +22,18 @@ describe("UserMenu", () => {
     sandbox = sinon.createSandbox()
     showUserMenu = false
     profile = {
-      name:              "Test User",
-      username:          "AHJS123123FHG",
-      image:             null,
-      image_small:       null,
-      image_medium:      null,
-      image_file:        null,
-      image_small_file:  null,
-      image_medium_file: null,
-      bio:               null,
-      headline:          null
+      name:                 "Test User",
+      username:             "AHJS123123FHG",
+      image:                null,
+      image_small:          null,
+      image_medium:         null,
+      image_file:           null,
+      image_small_file:     null,
+      image_medium_file:    null,
+      profile_image_small:  defaultProfileImageUrl,
+      profile_image_medium: defaultProfileImageUrl,
+      bio:                  null,
+      headline:             null
     }
   })
 

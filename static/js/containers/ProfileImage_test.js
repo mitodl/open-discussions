@@ -15,23 +15,24 @@ import ProfileImage, {
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { defaultProfileImageUrl, wait } from "../lib/util"
-import * as utilFuncs from "../lib/util"
 import { HIDE_DIALOG } from "../actions/ui"
 
 describe("ProfileImage", () => {
-  let helper, div, makeProfileImageUrlStub, listenForActions
+  let helper, div, listenForActions
 
   const thatProfile = {
-    name:              "test_name",
-    bio:               "test_bio",
-    headline:          "test_headline",
-    image_file:        null,
-    image_small_file:  null,
-    image_medium_file: null,
-    image:             null,
-    image_small:       null,
-    image_medium:      null,
-    username:          "test_username"
+    name:                 "test_name",
+    bio:                  "test_bio",
+    headline:             "test_headline",
+    image_file:           null,
+    image_small_file:     null,
+    image_medium_file:    null,
+    image:                null,
+    image_small:          null,
+    image_medium:         null,
+    username:             "test_username",
+    profile_image_small:  defaultProfileImageUrl,
+    profile_image_medium: defaultProfileImageUrl
   }
 
   const renderProfileImage = (props = {}) => {
@@ -57,9 +58,6 @@ describe("ProfileImage", () => {
     listenForActions = helper.listenForActions
     helper.patchProfileImageStub.returns(Promise.resolve(""))
     helper.getProfileStub.returns(Promise.resolve(thatProfile))
-    makeProfileImageUrlStub = helper.sandbox
-      .stub(utilFuncs, "makeProfileImageUrl")
-      .returns(defaultProfileImageUrl)
   })
 
   afterEach(() => {
@@ -304,11 +302,14 @@ describe("ProfileImage", () => {
     [PROFILE_IMAGE_SMALL, true],
     [PROFILE_IMAGE_MEDIUM, false]
   ].forEach(([imageSize, exp]) => {
-    it(`should call makeProfileImageUrl with ${String(
-      exp
-    )} if imageSize is ${imageSize}`, () => {
-      renderProfileImage({ imageSize })
-      assert.ok(makeProfileImageUrlStub.calledWith(thatProfile, exp))
+    it(`image url should ${
+      exp ? "" : " not"
+    } be small if imageSize is ${imageSize}`, () => {
+      const image = renderProfileImage({ imageSize })
+      assert.equal(
+        image.find(".profile-image").props().src,
+        thatProfile.profile_image_small
+      )
     })
   })
 })

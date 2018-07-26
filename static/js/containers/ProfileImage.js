@@ -15,7 +15,6 @@ import { configureForm } from "../lib/forms"
 import { newProfileImageForm } from "../lib/profile"
 import { mergeAndInjectProps } from "../lib/redux_props"
 import { validateImageForm } from "../lib/validation"
-
 import type { Profile, ProfileImageForm } from "../flow/discussionTypes"
 import type { WithFormProps } from "../flow/formTypes"
 import type { Dispatch } from "redux"
@@ -82,29 +81,20 @@ class ProfileImage extends React.Component<ProfileImageProps> {
       formValidate
     } = this.props
 
-    const imageUrl = makeProfileImageUrl(
-      profile,
-      imageSize === "micro" || imageSize === "small"
-    )
+    const imageUrl = profile
+      ? imageSize === "micro" || imageSize === "small"
+        ? profile.profile_image_small
+        : profile.profile_image_medium
+      : defaultProfileImageUrl
 
     return (
       <div className="profile-image-container">
         <div className="avatar" onClick={onClick}>
-          {imageUrl.endsWith(defaultProfileImageUrl) &&
-          profile &&
-          profile.name ? (
-              <div className={`profile-image ${imageSize}`}>
-                <div className={`profile-initials ${imageSize}`}>
-                  {initials(profile.name)}
-                </div>
-              </div>
-            ) : (
-              <img
-                src={imageUrl}
-                alt={`Profile image for ${profile ? profile.name : "anonymous"}`}
-                className={`profile-image ${imageSize}`}
-              />
-            )}
+          <img
+            src={imageUrl}
+            alt={`Profile image for ${profile ? profile.name : "anonymous"}`}
+            className={`profile-image ${imageSize}`}
+          />
           {editable ? (
             <span>
               {renderForm({

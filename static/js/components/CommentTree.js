@@ -114,9 +114,9 @@ export default class CommentTree extends React.Component<Props> {
       >
         <ProfileImage
           profile={makeProfile({
-            name:        comment.author_name,
-            image_small: comment.profile_image,
-            username:    SETTINGS.username
+            name:                comment.author_name,
+            username:            SETTINGS.username,
+            profile_image_small: comment.profile_image
           })}
           imageSize={PROFILE_IMAGE_SMALL}
         />

@@ -8,14 +8,8 @@ from profiles.utils import (
     profile_image_upload_uri,
     profile_image_upload_uri_medium,
     profile_image_upload_uri_small,
-    make_thumbnail
-)
-
-# Max dimension of either height or width for small and medium images
-IMAGE_SMALL_MAX_DIMENSION = 64
-IMAGE_MEDIUM_MAX_DIMENSION = 128
-
-MAX_IMAGE_FIELD_LENGTH = 1024
+    make_thumbnail,
+    MAX_IMAGE_FIELD_LENGTH, IMAGE_SMALL_MAX_DIMENSION, IMAGE_MEDIUM_MAX_DIMENSION)
 
 PROFILE_PROPS = (
     'name',
