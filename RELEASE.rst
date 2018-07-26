@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.38.3
+--------------
+
+- Removed email suggestion
+
 Version 0.38.2 (Released July 25, 2018)
 --------------
 
