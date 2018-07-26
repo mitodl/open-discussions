@@ -1,6 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
+import sinon from "sinon"
 import { mount } from "enzyme"
 import { assert } from "chai"
 import { Provider } from "react-redux"
@@ -11,13 +12,14 @@ import ProfileImage, {
   PROFILE_IMAGE_MEDIUM
 } from "./ProfileImage"
 
+import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { startPhotoEdit } from "../actions/image_upload"
-import { defaultProfileImageUrl } from "../lib/util"
+import { defaultProfileImageUrl, wait } from "../lib/util"
 import * as utilFuncs from "../lib/util"
+import { HIDE_DIALOG } from "../actions/ui"
 
 describe("ProfileImage", () => {
-  let helper, div, makeProfileImageUrlStub
+  let helper, div, makeProfileImageUrlStub, listenForActions
 
   const thatProfile = {
     name:              "test_name",
@@ -52,6 +54,7 @@ describe("ProfileImage", () => {
     helper = new IntegrationTestHelper()
     // thatProfile is the logged in user
     SETTINGS.username = thatProfile.username
+    listenForActions = helper.listenForActions
     helper.patchProfileImageStub.returns(Promise.resolve(""))
     helper.getProfileStub.returns(Promise.resolve(thatProfile))
     makeProfileImageUrlStub = helper.sandbox
@@ -73,28 +76,198 @@ describe("ProfileImage", () => {
       }
     })
 
-    it("should have a ProfileImageUploader only if editable === true", () => {
+    it("should have a Uploader only if editable === true", () => {
       for (const editable of [true, false]) {
         const image = renderProfileImage({ editable })
-        assert.equal(image.find("ProfileImageUploader").length === 1, editable)
+        assert.equal(image.find("Uploader").length === 1, editable)
       }
     })
 
     describe("save button", () => {
-      it("should call patchProfileImageStub when the save button is pressed", () => {
+      it("should call patchProfileImageStub when the save button is pressed", async () => {
+        const username = "a username"
         const image = renderProfileImage({
           editable: true,
-          userName: "a username"
+          userName: username
         })
-        helper.store.dispatch(startPhotoEdit({ name: "a name" }))
+        const props = image.find("Uploader").props()
+        // set initial state to populate a form with an image loaded
+        props.formBeginEdit()
+        props.onUpdate({
+          target: {
+            name:  "image",
+            value: { name: "a name" }
+          }
+        })
         image
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ProfileImageUploader").find("Dialog")
+        const dialog = image.find("Uploader").find("Dialog")
         const saveButton = dialog.find(".edit-button").at(0)
         saveButton.simulate("click")
+        // do a cycle for rerender based on promises
+        await wait(0)
         assert.isTrue(helper.patchProfileImageStub.called)
+        sinon.assert.calledWith(helper.getProfileStub, username)
+        assert.deepEqual(helper.store.getState().ui.dialogs, new Set())
+      })
+
+      it("should show a validation message if the image upload fails", async () => {
+        const image = renderProfileImage({
+          editable: true,
+          userName: "a username"
+        })
+        const props = image.find("Uploader").props()
+        // set initial state to populate a form with an image loaded
+        props.formBeginEdit()
+        props.onUpdate({
+          target: {
+            name:  "image",
+            value: { name: "a name" }
+          }
+        })
+        helper.patchProfileImageStub.returns(Promise.reject("abc"))
+        image
+          .find(".open-photo-dialog")
+          .at(0)
+          .simulate("click")
+        const dialog = image.find("Uploader").find("Dialog")
+        const saveButton = dialog.find(".edit-button").at(0)
+        saveButton.simulate("click")
+        // do a cycle for rerender based on promises
+        await wait(0)
+        image.update()
+        assert.equal(
+          image.find(".validation-message").text(),
+          "Error uploading image"
+        )
+        assert.isTrue(helper.patchProfileImageStub.called)
+      })
+
+      it("should populate the file in the state from the drag and drop", async () => {
+        const image = renderProfileImage({
+          editable: true,
+          userName: "a username"
+        })
+        const validFile = new Blob(["bytes"], { type: "image/png" })
+        // $FlowFixMe: adding a fake name to the Blob to make it more like a File
+        validFile.name = "name.png"
+        image
+          .find(".photo-dropzone")
+          .at(0)
+          .props()
+          .onDrop([validFile])
+        // do a cycle for rerender based on promises
+        await wait(0)
+        image.update()
+        assert.equal(image.find(".validation-message").length, 0)
+        assert.deepEqual(helper.store.getState().forms["profile:image"], {
+          errors: {},
+          value:  {
+            edit:  null,
+            image: validFile
+          }
+        })
+      })
+
+      it("should show a validation message if the drag and drop fails", async () => {
+        const image = renderProfileImage({
+          editable: true,
+          userName: "a username"
+        })
+        image
+          .find(".photo-dropzone")
+          .at(0)
+          .props()
+          .onDropRejected()
+        // do a cycle for rerender based on promises
+        await wait(0)
+        image.update()
+        assert.equal(
+          image.find(".validation-message").text(),
+          "Please select a valid photo"
+        )
+      })
+
+      it("should update the edited blob", async () => {
+        const image = renderProfileImage({
+          editable: true,
+          userName: "a username"
+        })
+        const props = image.find("Uploader").props()
+        // set initial state to populate a form with an image loaded
+        const file = new Blob(["nothing here", { type: "image/png" }])
+        // $FlowFixMe: adding a fake name to the Blob to make it more like a File
+        file.name = "a name"
+        props.formBeginEdit()
+        props.onUpdate({
+          target: {
+            name:  "image",
+            value: file
+          }
+        })
+        // do a cycle for rerender based on promises
+        await wait(0)
+        image.update()
+        assert.equal(image.find(".cropper-text").text(), "Crop your image")
+
+        const updatedBlob = new Blob(["updated"])
+        image
+          .find("CropperWrapper")
+          .props()
+          .updatePhotoEdit(updatedBlob)
+        assert.deepEqual(helper.store.getState().forms["profile:image"], {
+          errors: {},
+          value:  {
+            edit:  updatedBlob,
+            image: file
+          }
+        })
+      })
+
+      it("clears the form when the cancel button is clicked", async () => {
+        const image = renderProfileImage({
+          editable: true,
+          userName: "a username"
+        })
+        image
+          .find(".open-photo-dialog")
+          .at(0)
+          .simulate("click")
+        const dialog = image.find("Uploader").find("Dialog")
+        const cancelButton = dialog.find(".cancel-button").at(0)
+        await listenForActions(
+          [actions.forms.FORM_BEGIN_EDIT, HIDE_DIALOG],
+          () => {
+            cancelButton.simulate("click")
+          }
+        )
+      })
+
+      it("removes the form when the component is unmounted", async () => {
+        const image = renderProfileImage({
+          editable: true,
+          userName: "a username"
+        })
+        await listenForActions([actions.forms.FORM_END_EDIT], () => {
+          image.unmount()
+        })
+      })
+
+      it("hides the dialog", async () => {
+        const image = renderProfileImage({
+          editable: true,
+          userName: "a username"
+        })
+        image
+          .find(".open-photo-dialog")
+          .at(0)
+          .simulate("click")
+        const dialog = image.find("Uploader").find("Dialog")
+        await listenForActions([HIDE_DIALOG], () => {
+          dialog.props().hideDialog()
+        })
       })
 
       it("should not be visible if no photo is selected", () => {
@@ -105,7 +278,7 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ProfileImageUploader").find("Dialog")
+        const dialog = image.find("Uploader").find("Dialog")
         assert.equal(dialog.find(".edit-button").length, 0)
       })
     })

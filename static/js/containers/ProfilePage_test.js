@@ -34,11 +34,11 @@ describe("ProfilePage", function() {
     actions.subscribedChannels.get.successType
   ]
 
-  const renderPage = async () => {
-    const [wrapper] = await renderComponent(
-      profileURL(profile.username),
-      basicProfilePageActions
-    )
+  const renderPage = async (extraActions = []) => {
+    const [wrapper] = await renderComponent(profileURL(profile.username), [
+      ...basicProfilePageActions,
+      ...extraActions
+    ])
     return wrapper.update()
   }
 
@@ -117,7 +117,9 @@ describe("ProfilePage", function() {
       sameUser ? "" : "not"
     } include an edit profile button`, async () => {
       SETTINGS.username = sameUser ? profile.username : "other_user"
-      const wrapper = await renderPage()
+      const wrapper = await renderPage(
+        sameUser ? [actions.forms.FORM_BEGIN_EDIT] : []
+      )
       assert.equal(wrapper.find(".profile-edit-button").exists(), sameUser)
     })
   })

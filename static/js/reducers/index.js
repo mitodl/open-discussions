@@ -7,7 +7,6 @@ import { endpoints } from "../lib/redux_rest"
 import * as formReducers from "./forms"
 import { ui } from "./ui"
 import { focus } from "./focus"
-import { imageUpload } from "./image_upload"
 
 const reducers: Object = {}
 endpoints.forEach(endpoint => {
@@ -18,6 +17,5 @@ export default combineReducers({
   ...reducers,
   ...formReducers,
   ui,
-  focus,
-  imageUpload
+  focus
 })

@@ -227,6 +227,16 @@ export type Profile = {
   username:          string
 }
 
+export type ProfileImageForm = {
+  edit:  ?Blob,
+  image: ?File
+}
+
+export type ChannelAvatarForm = {
+  edit:  ?Blob,
+  image: ?File
+}
+
 export type ProfileValidation = {
   name: string
 }
