@@ -18,7 +18,9 @@ import {
   toQueryString,
   urlHostname,
   channelModerationURL,
-  postPermalink
+  postPermalink,
+  embedlyThumbnail,
+  blankThumbnailUrl
 } from "./url"
 import { makePost } from "../factories/posts"
 
@@ -205,6 +207,29 @@ describe("url helper functions", () => {
       const url = postPermalink(post)
       assert.ok(url.startsWith(window.location.origin))
       assert.ok(url.includes(postDetailURL(post.channel_name, post.id)))
+    })
+  })
+
+  describe("embedlyThumbnail", () => {
+    it("should return a good embedly url", () => {
+      const key = "embedlyKey"
+      const height = 100
+      const width = 200
+      const url = "http://www.fake.url/fake.html"
+      const embedlyUrl = embedlyThumbnail(key, url, height, width)
+      assert.ok(embedlyUrl.includes(`height=${height}`))
+      assert.ok(embedlyUrl.includes(`width=${width}`))
+      assert.ok(embedlyUrl.includes(`key=${key}`))
+      assert.ok(embedlyUrl.includes(`url=${encodeURIComponent(url)}`))
+    })
+  })
+
+  describe("blankThumbnailUrl", () => {
+    it("should return a good blank thumbnail url", () => {
+      assert.equal(
+        blankThumbnailUrl(),
+        `${window.location.origin}/static/images/blank.png`
+      )
     })
   })
 })

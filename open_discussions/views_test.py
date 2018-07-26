@@ -19,6 +19,7 @@ pytestmark = [
 def test_webpack_url(settings, client, user, mocker, authenticated_site):
     """Verify that webpack bundle src shows up in production"""
     settings.GA_TRACKING_ID = 'fake'
+    settings.EMBEDLY_KEY = 'fake'
     get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
     settings.FEATURES[features.EMAIL_AUTH] = False
@@ -55,6 +56,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
         'allow_saml_auth': False,
         'allow_email_auth': False,
         'support_email': settings.EMAIL_SUPPORT,
+        'embedlyKey': 'fake'
     }
 
 
@@ -63,6 +65,7 @@ def test_webpack_url_jwt(
 ):  # pylint: disable=too-many-arguments
     """Verify that webpack bundle src shows up in production for jwt auth"""
     settings.GA_TRACKING_ID = 'fake'
+    settings.EMBEDLY_KEY = 'fake'
     get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
     settings.FEATURES[features.SAML_AUTH] = False
@@ -98,12 +101,14 @@ def test_webpack_url_jwt(
         'allow_saml_auth': False,
         'allow_email_auth': False,
         'support_email': settings.EMAIL_SUPPORT,
+        'embedlyKey': 'fake'
     }
 
 
 def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
     """Verify that webpack bundle src shows up in production"""
     settings.GA_TRACKING_ID = 'fake'
+    settings.EMBEDLY_KEY = 'fake'
     get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
     settings.FEATURES[features.EMAIL_AUTH] = False
@@ -139,6 +144,7 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
         'allow_saml_auth': False,
         'allow_email_auth': False,
         'support_email': settings.EMAIL_SUPPORT,
+        'embedlyKey': 'fake'
     }
 
 

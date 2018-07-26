@@ -65,7 +65,8 @@ export type Post = AuthoredContent & {
   channel_name:  string,
   channel_title: string,
   stickied:      boolean,
-  removed:       boolean
+  removed:       boolean,
+  thumbnail:     ?string
 }
 
 type PostFormType =

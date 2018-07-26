@@ -26,7 +26,8 @@ const _createSettings = () => ({
   profile_ui_enabled: false,
   support_email:      "support@fake.url",
   reactGaDebug:       true,
-  gaTrackingID:       "fake"
+  gaTrackingID:       "fake",
+  embedlyKey:         "fake"
 })
 
 global.SETTINGS = _createSettings()

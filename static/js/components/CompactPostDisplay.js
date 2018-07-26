@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import React from "react"
 import moment from "moment"
 import { connect } from "react-redux"
@@ -7,7 +8,7 @@ import { Link } from "react-router-dom"
 import Card from "./Card"
 import DropdownMenu from "./DropdownMenu"
 
-import { channelURL, postDetailURL } from "../lib/url"
+import { channelURL, embedlyThumbnail, postDetailURL } from "../lib/url"
 import {
   PostVotingButtons,
   PostTitleAndHostname,
@@ -67,28 +68,50 @@ export class CompactPostDisplay extends React.Component<Props> {
           post.stickied && showPinUI ? "sticky" : ""
         }`}
       >
-        <div className="row title-row">
-          <Link to={postDetailURL(post.channel_name, post.id, post.slug)}>
-            <div className="post-title">
-              <PostTitleAndHostname post={post} />
+        <div className="row post-toprow">
+          <div className="column1">
+            <div className="row title-row">
+              <Link to={postDetailURL(post.channel_name, post.id, post.slug)}>
+                <div className="post-title">
+                  <PostTitleAndHostname post={post} />
+                </div>
+              </Link>
             </div>
-          </Link>
-          {post.url ? (
-            <a href={post.url} target="_blank" rel="noopener noreferrer">
-              <i className="material-icons open_in_new">open_in_new</i>
-            </a>
-          ) : (
-            <i className="material-icons notes">notes</i>
-          )}
-        </div>
-        <div className="row">
-          <div className="authored-by">
-            <div className="author-name">{post.author_name}</div>
-            <div className="date">
-              {formattedDate}
-              {this.showChannelLink()}
+            <div className="row">
+              <div className="authored-by">
+                <div className="author-name">{post.author_name}</div>
+                <div className="date">
+                  {formattedDate}
+                  {this.showChannelLink()}
+                </div>
+              </div>
             </div>
           </div>
+          {post.url ? (
+            <div
+              className={`column2 ${post.thumbnail ? "link-thumbnail" : ""}`}
+            >
+              <div className="top-right">
+                <a href={post.url} target="_blank" rel="noopener noreferrer">
+                  <i className="material-icons open_in_new top-right overlay-icon">
+                    open_in_new
+                  </i>
+                </a>
+              </div>
+              {post.thumbnail ? (
+                <a href={post.url} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={embedlyThumbnail(
+                      SETTINGS.embedlyKey,
+                      post.thumbnail,
+                      103,
+                      201
+                    )}
+                  />
+                </a>
+              ) : null}
+            </div>
+          ) : null}
         </div>
         <div className="row">
           <div>

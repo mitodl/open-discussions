@@ -22,7 +22,8 @@ declare var SETTINGS: {
   allow_anonymous: boolean,
   allow_saml_auth: boolean,
   allow_email_auth: boolean,
-  support_email: string
+  support_email: string,
+  embedlyKey: string
 }
 
 // mocha

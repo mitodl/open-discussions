@@ -13,3 +13,49 @@
     color: $font-grey;
   }
 }
+
+.post-toprow {
+  min-height: 103px;
+  height: auto;
+  margin-bottom: 10px;
+  word-break: break-word;
+
+  .column1 {
+    word-break: break-word;
+    overflow: hidden;
+  }
+
+  .column2 {
+    position: relative;
+    overflow: hidden;
+    min-width: 24px;
+    width: 24px;
+    margin-left: 5px;
+    display: flex;
+    justify-content: center;
+    height: 103px;
+
+    .top-right {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+
+      img {
+        width: 201px;
+        height: 103px;
+      }
+    }
+  }
+
+  .link-thumbnail {
+    min-width: 25%;
+    width: 25%;
+    overflow: hidden;
+  }
+}
+
+.overlay-icon {
+  color: $bg-grey;
+  background-color: white;
+  opacity: 0.9;
+}
