@@ -60,7 +60,7 @@ SVG_TEMPLATE = re.sub(r'(\s+|\n)', ' ', SVG_TEMPLATE)
 DEFAULT_PROFILE_IMAGE = urljoin(settings.STATIC_URL, "images/avatar_default.png")
 
 
-def get_gravatar_image(user, image_field=None):
+def generate_gravatar_image(user, image_field=None):
     """
     Query gravatar for an image and return those image properties
 
@@ -88,14 +88,14 @@ def get_gravatar_image(user, image_field=None):
     return '{}?d={}{}'.format(gravatar_image_url, quote(d_param), size_param)
 
 
-def image_uri(user, image_field=IMAGE_SMALL):
+def image_uri(profile, image_field=IMAGE_SMALL):
     """ Return the correctly formatted profile image URI for a user """
-    if user and hasattr(user, 'profile'):
-        image_file = getattr(user.profile, '{}_file'.format(image_field))
+    if profile:
+        image_file = getattr(profile, '{}_file'.format(image_field))
         if not image_file.name:
-            image_file = getattr(user.profile, image_field)
+            image_file = getattr(profile, image_field)
             if not image_file:
-                return get_gravatar_image(user, image_field)
+                return generate_gravatar_image(profile.user, image_field)
             return image_file
         return image_file.url
     return DEFAULT_PROFILE_IMAGE
@@ -261,7 +261,29 @@ def dict_to_style(style_dict):
     return '; '.join(['{}: {}'.format(k, v) for k, v in style_dict.items()])
 
 
-def get_svg_avatar(text, size, color, bgcolor):
+def generate_initials(text):
+    """
+    Extract initials from a string
+
+    Args:
+        text(str): The string to extract initials from
+
+    Returns:
+        str: The initials extracted from the string
+    """
+    if not text:
+        return None
+    text = text.strip()
+    if text:
+        split_text = text.split(' ')
+        if len(split_text) > 1:
+            return (split_text[0][0] + split_text[-1][0]).upper()
+        else:
+            return split_text[0][0].upper()
+    return None
+
+
+def generate_svg_avatar(text, size, color, bgcolor):
     """
     Generate an SVG avatar based om input text.  Adopted from https://github.com/CraveFood/avinit
 
@@ -275,15 +297,7 @@ def get_svg_avatar(text, size, color, bgcolor):
         str: an SVG image.
     """
 
-    initials = '=)'
-
-    text = text.strip()
-    if text:
-        split_text = text.split(' ')
-        if len(split_text) > 1:
-            initials = split_text[0][0] + split_text[-1][0]
-        else:
-            initials = split_text[0][0]
+    initials = generate_initials(text) or 'A'
 
     style = {
         'fill': '#{}'.format(bgcolor),

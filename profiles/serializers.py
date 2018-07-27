@@ -28,11 +28,11 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_profile_image_medium(self, obj):
         """ Custom getter for medium profile image """
-        return image_uri(obj.user, IMAGE_MEDIUM)
+        return image_uri(obj, IMAGE_MEDIUM)
 
     def get_profile_image_small(self, obj):
         """ Custom getter for medium profile image """
-        return image_uri(obj.user, IMAGE_SMALL)
+        return image_uri(obj, IMAGE_SMALL)
 
     def update(self, instance, validated_data):
         with transaction.atomic():

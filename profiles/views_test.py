@@ -238,9 +238,9 @@ def test_initialized_avatar(client, user):
     assert resp.__getitem__('Content-Type') == 'image/png'
 
 
-def test_initialized_avatar_fake_user(mocker, client):
+def test_initials_avatar_fake_user(client):
     """
-    Test that a PNG avatar image is returned for a fake user
+    Test that a default avatar image is returned for a fake user
     """
     url = reverse(
         'profile_avatar',

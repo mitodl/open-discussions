@@ -15,7 +15,7 @@ from profiles.utils import (
     image_uri,
     DEFAULT_PROFILE_IMAGE,
     update_full_name,
-    get_svg_avatar)
+    generate_svg_avatar, generate_initials)
 
 
 def test_upload_url(user):
@@ -76,42 +76,54 @@ def test_too_long_prefix(user):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('url', [None, 'http://testserver/profiles/image.jpg'])
-@pytest.mark.parametrize('image', [None, Image.new('RGBA', size=(50, 50), color=(155, 0, 0))])
-@pytest.mark.parametrize('fullname', [None, 'Test User'])
-def test_profile_img_url(url, image, fullname):
+def test_profile_img_url_uploaded_image():
     """
-    Test that the correct profile image URL is returned.
+    Test that the correct profile image URL is returned for a profile with an uploaded image
     """
     profile = UserFactory.create().profile
-    profile.image_small = url
-    profile.name = fullname
-    if image:
-        profile.image_small_file.save('/profiles/realimage.jpg', BytesIO(image.tobytes()), True)
-    else:
-        profile.image_small_file = None
+    image = Image.new('RGBA', size=(50, 50), color=(155, 0, 0))
+    profile.image_small_file.save('/profiles/realimage.jpg', BytesIO(image.tobytes()), True)
     profile.save()
-
-    profile_image = image_uri(profile.user, 'image_small')
-    assert profile_image.startswith(
-        profile.image_small_file.url if image else url if url else 'https://www.gravatar.com/avatar/'
-    )
-    if not image and not url:
-        params_d = parse_qs(urlparse(profile_image).query)['d'][0]
-        if fullname:
-            assert params_d.endswith('profile/{}/64/fff/579cf9.png'.format(profile.user.username))
-        else:
-            assert params_d.endswith(DEFAULT_PROFILE_IMAGE)
+    assert image_uri(profile, 'image_small') == profile.image_small_file.url
 
 
 @pytest.mark.django_db
-def test_profile_img_url_anon():
+def test_profile_img_url_micromaster_image():
     """
-    Test that a user without a profile gets the default profile image
+    Test that the correct profile image URL is returned for a profile with a micromasters profile URL
     """
-    user = UserFactory.create()
-    user.profile = None
-    assert image_uri(user, 'image_small') == DEFAULT_PROFILE_IMAGE
+    profile = UserFactory.create().profile
+    profile.image_file = profile.image_medium_file = profile.image_small_file = None
+    profile.image_medium = 'http://testserver/profiles/image.jpg'
+    profile.save()
+    assert image_uri(profile, 'image_medium').endswith(profile.image_medium)
+
+
+@pytest.mark.django_db
+def test_profile_img_url_gravatar_fullname():
+    """ Test that the correct profile gravatar image URL is returned for a profile with a name """
+    profile = UserFactory.create().profile
+    profile.image = profile.image_small = profile.image_medium = None
+    profile.image_file = profile.image_medium_file = profile.image_small_file = None
+    profile.save()
+    profile_image = image_uri(profile, 'image_small')
+    assert profile_image.startswith('https://www.gravatar.com/avatar/')
+    params_d = parse_qs(urlparse(profile_image).query)['d'][0]
+    assert params_d.endswith('profile/{}/64/fff/579cf9.png'.format(profile.user.username))
+
+
+@pytest.mark.django_db
+def test_profile_img_url_gravatar_nameless():
+    """ Test that the correct profile gravatar image URL is returned for a profile with no name """
+    profile = UserFactory.create().profile
+    profile.image = profile.image_small = profile.image_medium = None
+    profile.image_file = profile.image_medium_file = profile.image_small_file = None
+    profile.name = None
+    profile.save()
+    profile_image = image_uri(profile, 'image_small')
+    assert profile_image.startswith('https://www.gravatar.com/avatar/')
+    params_d = parse_qs(urlparse(profile_image).query)['d'][0]
+    assert params_d.endswith(DEFAULT_PROFILE_IMAGE)
 
 
 @pytest.mark.django_db
@@ -134,7 +146,7 @@ def test_get_svg_avatar():
     color = 'afafaf'
     bgcolor = 'dedede'
     size = 92
-    svg = get_svg_avatar(username, size, color, bgcolor)
+    svg = generate_svg_avatar(username, size, color, bgcolor)
     root = etree.fromstring(svg)
     assert root.tag == '{http://www.w3.org/2000/svg}svg'
     circle = root.find('{http://www.w3.org/2000/svg}circle')
@@ -143,3 +155,16 @@ def test_get_svg_avatar():
     text = root.find('{http://www.w3.org/2000/svg}text')
     assert text.get('fill') == '#{}'.format(color)
     assert text.text == 'TU'
+
+
+@pytest.mark.parametrize('text, initials', [
+    ['Test User', 'TU'],
+    ['another user', 'AU'],
+    ['Test Van Der Graaf', 'TG'],
+    ['Test', 'T'],
+    [None, None],
+    [' ', None]
+])
+def test_generate_initials(text, initials):
+    """ Test that expected initials are returned from text"""
+    assert generate_initials(text) == initials

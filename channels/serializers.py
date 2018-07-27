@@ -149,6 +149,20 @@ class RedditObjectSerializer(serializers.Serializer):
         else:
             return User.objects.filter(username=instance.author.name).select_related('profile').first()
 
+    def _get_profile(self, instance):
+        """ Return a user profile if it exists, else None
+        Args:
+            instance (praw.models.Submission):
+                The post to look up the user for
+
+        Returns:
+            profiles.models.Profile: the user profile if it exists
+        """
+        user = self._get_user(instance)
+        if user and hasattr(user, 'profile'):
+            return user.profile
+        return None
+
 
 class BasePostSerializer(RedditObjectSerializer):
     """
@@ -201,7 +215,7 @@ class BasePostSerializer(RedditObjectSerializer):
 
     def get_profile_image(self, instance):
         """Find the profile image for the post author"""
-        return image_uri(self._get_user(instance))
+        return image_uri(self._get_profile(instance))
 
     def get_text(self, instance):
         """Returns text or null depending on if it's a self post"""
@@ -404,7 +418,7 @@ class BaseCommentSerializer(RedditObjectSerializer):
 
     def get_profile_image(self, instance):
         """Find the Profile for the comment author"""
-        return image_uri(self._get_user(instance))
+        return image_uri(self._get_profile(instance))
 
     def get_author_name(self, instance):
         """get the author name"""

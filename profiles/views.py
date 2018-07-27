@@ -14,7 +14,7 @@ from open_discussions.permissions import JwtIsStaffPermission
 from profiles.models import Profile
 from profiles.permissions import HasEditPermission
 from profiles.serializers import UserSerializer, ProfileSerializer
-from profiles.utils import get_svg_avatar, DEFAULT_PROFILE_IMAGE
+from profiles.utils import generate_svg_avatar, DEFAULT_PROFILE_IMAGE
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -36,10 +36,10 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewset
 
 
 @cache_page(60*60*24)
-def initialized_avatar(request, username, size, color, bgcolor):  # pylint:disable=unused-argument
+def name_initials_avatar_view(request, username, size, color, bgcolor):  # pylint:disable=unused-argument
     """ View for initial avatar """
     user = User.objects.filter(username=username).first()
     if not user:
         return redirect(DEFAULT_PROFILE_IMAGE)
-    svg = get_svg_avatar(user.profile.name, int(size), color, bgcolor)
+    svg = generate_svg_avatar(user.profile.name, int(size), color, bgcolor)
     return HttpResponse(svg2png(bytestring=svg), content_type="image/png")

@@ -7,10 +7,9 @@ import { connect } from "react-redux"
 import ImageUploader from "../components/ImageUploader"
 import withForm from "../hoc/withForm"
 
-import { defaultProfileImageUrl, makeProfileImageUrl } from "../lib/util"
+import { defaultProfileImageUrl } from "../lib/util"
 import { showDialog, hideDialog, DIALOG_PROFILE_IMAGE } from "../actions/ui"
 import { actions } from "../actions"
-import { initials } from "../lib/profile"
 import { configureForm } from "../lib/forms"
 import { newProfileImageForm } from "../lib/profile"
 import { mergeAndInjectProps } from "../lib/redux_props"
@@ -69,6 +68,7 @@ class ProfileImage extends React.Component<ProfileImageProps> {
   }
 
   render() {
+
     const {
       profile,
       imageSize,
@@ -81,11 +81,15 @@ class ProfileImage extends React.Component<ProfileImageProps> {
       formValidate
     } = this.props
 
-    const imageUrl = profile
-      ? imageSize === "micro" || imageSize === "small"
-        ? profile.profile_image_small
-        : profile.profile_image_medium
-      : defaultProfileImageUrl
+    let imageUrl
+    if (profile) {
+      imageUrl =
+        imageSize === "micro" || imageSize === "small"
+          ? profile.profile_image_small
+          : profile.profile_image_medium
+    } else {
+      imageUrl = defaultProfileImageUrl
+    }
 
     return (
       <div className="profile-image-container">

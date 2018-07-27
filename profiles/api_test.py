@@ -17,7 +17,7 @@ pytestmark = pytest.mark.django_db
 ])
 @pytest.mark.parametrize('no_profile', [True, False])
 def test_ensure_profile(profile_data, no_profile):
-    """Test that it creates a profile form the data"""
+    """Test that it creates a profile from the data"""
     user = UserFactory.create(email='testuser@example.com', no_profile=no_profile)
     profile = api.ensure_profile(user, profile_data=profile_data)
 
@@ -28,7 +28,3 @@ def test_ensure_profile(profile_data, no_profile):
             assert profile.image == profile_data['image']
         else:
             assert not profile.image
-    else:
-        assert 'gravatar.com' not in profile.image
-        assert 'gravatar.com' not in profile.image_small
-        assert 'gravatar.com' not in profile.image_medium
