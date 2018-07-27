@@ -9,7 +9,7 @@ from rest_framework import status
 from channels.test_constants import LIST_MORE_COMMENTS_RESPONSE
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
-from profiles.utils import image_uri, default_profile_image
+from profiles.utils import image_uri, DEFAULT_PROFILE_IMAGE
 
 pytestmark = pytest.mark.betamax
 
@@ -26,7 +26,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
     if missing_user:
         logged_in_profile.user.username = 'renamed'
         logged_in_profile.user.save()
-        profile_image = default_profile_image
+        profile_image = DEFAULT_PROFILE_IMAGE
         name = "[deleted]"
         author_id = '[deleted]'
     else:
@@ -416,7 +416,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             'downvoted': False,
             'parent_id': None,
             'post_id': 'p',
-            'profile_image': default_profile_image,
+            'profile_image': DEFAULT_PROFILE_IMAGE,
             'score': 1,
             'text': '[deleted]',
             'upvoted': False,

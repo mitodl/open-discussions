@@ -8,7 +8,7 @@ import pytest
 from social_django.models import UserSocialAuth
 
 from authentication.backends.micromasters import MicroMastersAuth
-from profiles.utils import make_temp_image_file
+from profiles.utils import make_temp_image_file, DEFAULT_PROFILE_IMAGE
 
 pytestmark = pytest.mark.django_db
 
@@ -236,3 +236,21 @@ def test_initialized_avatar(client, user):
     resp = client.get(url)
     assert resp.status_code == 200
     assert resp.__getitem__('Content-Type') == 'image/png'
+
+
+def test_initialized_avatar_fake_user(mocker, client):
+    """
+    Test that a PNG avatar image is returned for a fake user
+    """
+    url = reverse(
+        'profile_avatar',
+        kwargs={
+            'username': 'fakeuser',
+            'color': 'afafaf',
+            'bgcolor': 'dedede',
+            'size': 92
+        }
+    )
+    response = client.get(url, follow=True)
+    last_url, _ = response.redirect_chain[-1]
+    assert last_url.endswith(DEFAULT_PROFILE_IMAGE)

@@ -13,7 +13,7 @@ from profiles.utils import (
     profile_image_upload_uri_medium,
     _generate_upload_to_uri,
     image_uri,
-    default_profile_image,
+    DEFAULT_PROFILE_IMAGE,
     update_full_name,
     get_svg_avatar)
 
@@ -101,7 +101,7 @@ def test_profile_img_url(url, image, fullname):
         if fullname:
             assert params_d.endswith('profile/{}/64/fff/579cf9.png'.format(profile.user.username))
         else:
-            assert params_d.endswith(default_profile_image)
+            assert params_d.endswith(DEFAULT_PROFILE_IMAGE)
 
 
 @pytest.mark.django_db
@@ -111,7 +111,7 @@ def test_profile_img_url_anon():
     """
     user = UserFactory.create()
     user.profile = None
-    assert image_uri(user, 'image_small') == default_profile_image
+    assert image_uri(user, 'image_small') == DEFAULT_PROFILE_IMAGE
 
 
 @pytest.mark.django_db

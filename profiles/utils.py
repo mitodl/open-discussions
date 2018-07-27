@@ -57,7 +57,7 @@ SVG_TEMPLATE = """
 """.strip()
 SVG_TEMPLATE = re.sub(r'(\s+|\n)', ' ', SVG_TEMPLATE)
 
-default_profile_image = urljoin(settings.STATIC_URL, "/images/avatar_default.png")
+DEFAULT_PROFILE_IMAGE = urljoin(settings.STATIC_URL, "images/avatar_default.png")
 
 
 def get_gravatar_image(user, image_field=None):
@@ -83,7 +83,7 @@ def get_gravatar_image(user, image_field=None):
             )
         )
     else:
-        d_param = settings.SITE_BASE_URL + default_profile_image
+        d_param = settings.SITE_BASE_URL + DEFAULT_PROFILE_IMAGE
 
     return '{}?d={}{}'.format(gravatar_image_url, quote(d_param), size_param)
 
@@ -98,7 +98,7 @@ def image_uri(user, image_field=IMAGE_SMALL):
                 return get_gravatar_image(user, image_field)
             return image_file
         return image_file.url
-    return default_profile_image
+    return DEFAULT_PROFILE_IMAGE
 
 
 def generate_filepath(filename, username, suffix=''):
