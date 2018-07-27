@@ -5,6 +5,8 @@ import {
   SET_SHOW_DRAWER_DESKTOP,
   SET_SHOW_DRAWER_MOBILE,
   SET_SNACKBAR_MESSAGE,
+  SET_BANNER_MESSAGE,
+  HIDE_BANNER,
   SHOW_DIALOG,
   HIDE_DIALOG,
   SHOW_DROPDOWN,
@@ -20,18 +22,30 @@ export type SnackbarState = {
   timeout: ?number
 }
 
+export type BannerState = {
+  message: string,
+  visible: boolean
+}
+
 export type UIState = {
   showDrawerDesktop: boolean,
   showDrawerMobile: boolean,
   snackbar: ?SnackbarState,
+  banner: BannerState,
   dialogs: Set<string>,
   dropdownMenus: Set<string>
+}
+
+const INITIAL_BANNER_STATE = {
+  message: "",
+  visible: false
 }
 
 export const INITIAL_UI_STATE: UIState = {
   showDrawerDesktop: true,
   showDrawerMobile:  false,
   snackbar:          null,
+  banner:            INITIAL_BANNER_STATE,
   dialogs:           new Set(),
   dropdownMenus:     new Set()
 }
@@ -65,6 +79,22 @@ export const ui = (
       snackbar: {
         ...action.payload,
         id: nextSnackbarId(state.snackbar)
+      }
+    }
+  case SET_BANNER_MESSAGE:
+    return {
+      ...state,
+      banner: {
+        message: action.payload,
+        visible: true
+      }
+    }
+  case HIDE_BANNER:
+    return {
+      ...state,
+      banner: {
+        message: "",
+        visible: false
       }
     }
   case SHOW_DIALOG:

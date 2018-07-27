@@ -11,13 +11,17 @@ import {
   HIDE_DIALOG,
   SHOW_DROPDOWN,
   HIDE_DROPDOWN,
+  SET_BANNER_MESSAGE,
+  HIDE_BANNER,
   setShowDrawerDesktop,
   setShowDrawerMobile,
   setSnackbarMessage,
   showDialog,
   hideDialog,
   showDropdown,
-  hideDropdown
+  hideDropdown,
+  setBannerMessage,
+  hideBanner
 } from "../actions/ui"
 import { USER_MENU_DROPDOWN } from "../containers/App"
 
@@ -109,5 +113,21 @@ describe("ui reducer", () => {
       HIDE_DROPDOWN
     ])
     assert.equal(state.dropdownMenus.has(USER_MENU_DROPDOWN), false)
+  })
+
+  it("should let you set the banner message", async () => {
+    const message = "some message"
+    let state = await dispatchThen(setBannerMessage("some message"), [
+      SET_BANNER_MESSAGE
+    ])
+    assert.deepEqual(state.banner, {
+      message: message,
+      visible: true
+    })
+    state = await dispatchThen(hideBanner(), [HIDE_BANNER])
+    assert.deepEqual(state.banner, {
+      message: "",
+      visible: false
+    })
   })
 })

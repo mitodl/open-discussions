@@ -11,6 +11,14 @@ a.mitlogo {
     z-index: 4;
     position: fixed;
 
+    .mdc-toolbar__row {
+      height: $toolbar-height-desktop;
+
+      @include breakpoint(materialmobile) {
+        height: $toolbar-height-mobile;
+      }
+    }
+
     a.mitlogo {
       padding: 16px 0 16px 12px;
     }

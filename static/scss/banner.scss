@@ -1,0 +1,36 @@
+.persistent-drawer-open ~ .banner {
+  width: calc(100% - #{$drawer-width});
+}
+
+.banner {
+  position: fixed;
+  top: $toolbar-height-mobile - $banner-height;
+  right: 0;
+  height: $banner-height;
+  width: 100%;
+  transition: $banner-slide-trans;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #323232;
+  opacity: 0.7;
+  text-align: center;
+  color: #ffffff;
+
+  &.banner--active {
+    top: $toolbar-height-desktop;
+
+    @include breakpoint(materialmobile) {
+      top: $toolbar-height-mobile;
+    }
+  }
+
+  .close {
+    position: absolute;
+    right: 10px;
+    padding: 2px 5px;
+    height: 24px;
+    width: 24px;
+    color: #ffffff;
+  }
+}
