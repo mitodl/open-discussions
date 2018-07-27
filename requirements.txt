@@ -6,7 +6,6 @@
 #
 amqp==2.1.4               # via kombu
 appnope==0.1.0            # via ipython
-avinit==1.2.1
 base36==0.1.1
 beautifulsoup4==4.6.0
 betamax-serializers==0.2.0
