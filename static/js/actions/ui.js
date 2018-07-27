@@ -14,6 +14,12 @@ export const setShowDrawerMobile = createAction(SET_SHOW_DRAWER_MOBILE)
 export const SET_SNACKBAR_MESSAGE = "SET_SNACKBAR_MESSAGE"
 export const setSnackbarMessage = createAction(SET_SNACKBAR_MESSAGE)
 
+export const SET_BANNER_MESSAGE = "SET_BANNER_MESSAGE"
+export const setBannerMessage = createAction(SET_BANNER_MESSAGE)
+
+export const HIDE_BANNER = "HIDE_BANNER"
+export const hideBanner = createAction(HIDE_BANNER)
+
 export const SHOW_DIALOG = "SHOW_DIALOG"
 export const showDialog = createAction(SHOW_DIALOG)
 

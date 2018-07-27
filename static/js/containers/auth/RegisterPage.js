@@ -11,7 +11,7 @@ import AuthEmailForm from "../../components/auth/AuthEmailForm"
 import withForm from "../../hoc/withForm"
 
 import { actions } from "../../actions"
-import { setSnackbarMessage } from "../../actions/ui"
+import { setBannerMessage } from "../../actions/ui"
 import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
@@ -114,15 +114,15 @@ const mapStateToProps = state => {
 }
 
 const mergeProps = mergeAndInjectProps(
-  (stateProps, { setSnackbarMessage }, { history }) => ({
+  (stateProps, { setBannerMessage }, { history }) => ({
     onSubmitResult: (response: AuthResponse) => {
       processAuthResponse(history, response)
       if (response.state === STATE_REGISTER_CONFIRM_SENT && response.email) {
-        setSnackbarMessage({
-          message: `We sent an email to <${
+        setBannerMessage(
+          `We sent an email to <${
             response.email
-          }>, please validate to continue`
-        })
+          }>, please validate your address to continue.`
+        )
       }
     }
   })
@@ -132,7 +132,7 @@ export default R.compose(
   connect(
     mapStateToProps,
     {
-      setSnackbarMessage,
+      setBannerMessage,
       onSubmit,
       onSubmitContinue,
       ...actionCreators

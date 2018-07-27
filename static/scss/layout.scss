@@ -39,6 +39,7 @@
 @import "user-menu";
 @import "cropper";
 @import "drawer";
+@import "banner";
 @import "dropdown-menu";
 @import "auth";
 @import "share-popup";
@@ -55,8 +56,12 @@ body {
   width: 100%;
   min-height: 100vh;
 
-  .persistent-drawer-open + .content {
+  .persistent-drawer-open ~ .content {
     padding-left: $drawer-width;
+  }
+
+  .banner--active ~ .content {
+    padding-top: $toolbar-height-desktop + $banner-height;
   }
 
   .content {
@@ -64,6 +69,7 @@ body {
     flex-direction: column;
     align-items: center;
     padding-top: $toolbar-height-desktop;
+    transition: $banner-slide-content-trans;
 
     @include breakpoint(materialmobile) {
       padding-top: $toolbar-height-mobile;

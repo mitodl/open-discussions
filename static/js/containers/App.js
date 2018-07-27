@@ -27,6 +27,7 @@ import InactiveUserPage from "./auth/InactiveUserPage"
 import PasswordResetPage from "./auth/PasswordResetPage"
 import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
 import Snackbar from "../components/material/Snackbar"
+import Banner from "../components/material/Banner"
 import Drawer from "../containers/Drawer"
 import Toolbar from "../components/Toolbar"
 import Footer from "../components/Footer"
@@ -36,16 +37,17 @@ import {
   setShowDrawerMobile,
   setShowDrawerDesktop,
   showDropdown,
-  hideDropdown
+  hideDropdown,
+  hideBanner
 } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
 import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
 import { isAnonAccessiblePath, needsAuthedSite } from "../lib/auth"
-import { isMobileWidth } from "../lib/util"
+import { isMobileWidth, preventDefaultAndInvoke } from "../lib/util"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
-import type { SnackbarState } from "../reducers/ui"
+import type { SnackbarState, BannerState } from "../reducers/ui"
 import type { Profile } from "../flow/discussionTypes"
 
 export const USER_MENU_DROPDOWN = "USER_MENU_DROPDOWN"
@@ -56,6 +58,7 @@ type AppProps = {
   showDrawerDesktop: boolean,
   showDrawerMobile: boolean,
   snackbar: SnackbarState,
+  banner: BannerState,
   dispatch: Dispatch<*>,
   showUserMenu: boolean,
   profile: Profile
@@ -124,11 +127,18 @@ class App extends React.Component<AppProps> {
     }
   }
 
+  hideBanner = () => {
+    const { dispatch } = this.props
+
+    dispatch(hideBanner())
+  }
+
   render() {
     const {
       match,
       location: { pathname },
       snackbar,
+      banner,
       showUserMenu,
       profile
     } = this.props
@@ -150,6 +160,10 @@ class App extends React.Component<AppProps> {
           profile={profile}
         />
         <Drawer />
+        <Banner
+          banner={banner}
+          hide={preventDefaultAndInvoke(this.hideBanner)}
+        />
         <div className="content">
           <Route exact path={match.url} component={HomePage} />
           <Route
@@ -260,7 +274,7 @@ class App extends React.Component<AppProps> {
 export default connect(state => {
   const {
     profiles,
-    ui: { showDrawerMobile, showDrawerDesktop, snackbar, dropdownMenus }
+    ui: { showDrawerMobile, showDrawerDesktop, snackbar, banner, dropdownMenus }
   } = state
 
   const profile = SETTINGS.username
@@ -272,6 +286,7 @@ export default connect(state => {
     showDrawerMobile,
     showDrawerDesktop,
     snackbar,
+    banner,
     showUserMenu,
     profile
   }
