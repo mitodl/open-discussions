@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.38.4
+--------------
+
+- Added banner component and changed "email sent" snackbar notification to use it
+- Display link post thumbnails in list view (#956)
+
 Version 0.38.3 (Released July 26, 2018)
 --------------
 
