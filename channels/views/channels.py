@@ -1,5 +1,4 @@
 """Views for REST APIs for channels"""
-
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
@@ -8,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from channels.api import Api
+from channels.models import Channel
 from channels.serializers import ChannelSerializer
 from channels.utils import translate_praw_exceptions
 from open_discussions.permissions import (
@@ -26,8 +26,13 @@ class ChannelListView(ListCreateAPIView):
 
     def get_serializer_context(self):
         """Context for the request and view"""
+        channels = {
+            channel.name: channel for channel in Channel.objects.all()
+        }
+
         return {
             'channel_api': self.request.channel_api,
+            'channels': channels,
             'view': self,
         }
 
@@ -52,6 +57,9 @@ class ChannelDetailView(RetrieveUpdateAPIView):
         """Context for the request and view"""
         return {
             'channel_api': self.request.channel_api,
+            'channels': {
+                self.kwargs['channel_name']: Channel.objects.get(name=self.kwargs['channel_name']),
+            },
             'view': self,
         }
 

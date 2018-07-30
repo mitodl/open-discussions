@@ -61,6 +61,8 @@ class ChannelSerializer(serializers.Serializer):
     user_is_contributor = serializers.SerializerMethodField()
     user_is_moderator = serializers.SerializerMethodField()
     membership_is_managed = WriteableSerializerMethodField()
+    avatar = WriteableSerializerMethodField()
+    banner = WriteableSerializerMethodField()
 
     def get_user_is_contributor(self, channel):
         """
@@ -80,8 +82,44 @@ class ChannelSerializer(serializers.Serializer):
         """
         Get membership_is_managed from the associated Channel model
         """
-        channel_obj = Channel.objects.get(name=channel.display_name)
+        channel_obj = self._get_channel(name=channel.display_name)
         return channel_obj.membership_is_managed
+
+    def get_avatar(self, channel):
+        """Get the avatar image URL"""
+        channel_obj = self._get_channel(name=channel.display_name)
+        try:
+            return channel_obj.avatar.url
+        except ValueError:
+            return None
+
+    def get_banner(self, channel):
+        """Get the banner image URL"""
+        channel_obj = self._get_channel(name=channel.display_name)
+        try:
+            return channel_obj.banner.url
+        except ValueError:
+            return None
+
+    def validate_avatar(self, value):
+        """Empty validation function, but this is required for WriteableSerializerMethodField"""
+        if not hasattr(value, 'name'):
+            raise ValidationError("Expected avatar to be a file")
+        return {"avatar": value}
+
+    def validate_banner(self, value):
+        """Empty validation function, but this is required for WriteableSerializerMethodField"""
+        if not hasattr(value, 'name'):
+            raise ValidationError("Expected banner to be a file")
+        return {"banner": value}
+
+    def _get_channel(self, name):
+        """Get channel"""
+        try:
+            return self.context['channels'][name]
+        except KeyError:
+            # This can happen if the channel is newly created
+            return Channel.objects.get(name=name)
 
     def create(self, validated_data):
         api = self.context['channel_api']
@@ -119,7 +157,19 @@ class ChannelSerializer(serializers.Serializer):
         }
         kwargs = filter_dict_with_renamed_keys(validated_data, lookup, optional=True)
 
-        return api.update_channel(name=name, **kwargs)
+        channel = api.update_channel(name=name, **kwargs)
+
+        channel_obj = self._get_channel(name)
+
+        avatar = validated_data.get('avatar')
+        if avatar:
+            channel_obj.avatar.save(f"channel_avatar_{name}.jpg", avatar)
+
+        banner = validated_data.get('banner')
+        if banner:
+            channel_obj.banner.save(f"channel_banner_{name}.jpg", banner)
+
+        return channel
 
 
 def _parse_bool(value, field_name):

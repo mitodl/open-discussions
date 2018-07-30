@@ -1,5 +1,7 @@
 """Tests for views for REST APIs for channels"""
 # pylint: disable=unused-argument
+import os.path
+
 import pytest
 from django.urls import reverse
 from rest_framework import status
@@ -32,6 +34,8 @@ def test_list_channels(client, jwt_header, private_channel_and_contributor, requ
             'user_is_moderator': False,
             'link_type': channel.link_type,
             'membership_is_managed': False,
+            'avatar': None,
+            'banner': None,
         }
     ]
 
@@ -72,6 +76,8 @@ def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
         'user_is_contributor': True,
         'user_is_moderator': True,
         'membership_is_managed': True,
+        'avatar': None,
+        'banner': None,
     }
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
@@ -97,6 +103,8 @@ def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, re
         'user_is_contributor': True,
         'user_is_moderator': True,
         'membership_is_managed': True,
+        'avatar': None,
+        'banner': None,
     }
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
@@ -171,6 +179,8 @@ def test_get_channel(client, jwt_header, private_channel_and_contributor):
         'user_is_moderator': False,
         'link_type': channel.link_type,
         'membership_is_managed': False,
+        'avatar': None,
+        'banner': None,
     }
 
 
@@ -194,6 +204,8 @@ def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous
             'user_is_moderator': False,
             'link_type': public_channel.link_type,
             'membership_is_managed': False,
+            'avatar': None,
+            'banner': None,
         }
     else:
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
@@ -203,6 +215,7 @@ def test_get_short_channel(client, jwt_header):
     """
     test getting a one-character channel name
     """
+    Channel.objects.create(name='a')
     url = reverse('channel-detail', kwargs={'channel_name': 'a'})
     resp = client.get(url, **jwt_header)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
@@ -212,6 +225,7 @@ def test_get_channel_forbidden(client):
     """
     If PRAW returns a 403 error we should also return a 403 error
     """
+    Channel.objects.create(name='xavier2')
     client.force_login(UserFactory.create())
     url = reverse('channel-detail', kwargs={'channel_name': 'xavier2'})
     resp = client.get(url)
@@ -223,9 +237,26 @@ def test_get_channel_not_found(client):
     If PRAW returns a 404 error we should also return a 404 error
     """
     client.force_login(UserFactory.create())
+    Channel.objects.create(name='not_a_real_channel_name')
     url = reverse('channel-detail', kwargs={'channel_name': 'not_a_real_channel_name'})
     resp = client.get(url)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_get_channel_with_avatar_banner(client, staff_jwt_header, public_channel):
+    """
+    If a channel has an image we should show its URL
+    """
+    channel = Channel.objects.get(name=public_channel.name)
+    channel.avatar = 'avatar'
+    channel.banner = 'banner'
+    channel.save()
+
+    url = reverse('channel-detail', kwargs={'channel_name': public_channel.name})
+    resp = client.get(url, **staff_jwt_header)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json()['avatar'] == '/media/avatar'
+    assert resp.json()['banner'] == '/media/banner'
 
 
 def test_patch_channel(client, staff_jwt_header, private_channel):
@@ -247,6 +278,8 @@ def test_patch_channel(client, staff_jwt_header, private_channel):
         'user_is_contributor': True,
         'user_is_moderator': True,
         'membership_is_managed': False,
+        'avatar': None,
+        'banner': None,
     }
     assert Channel.objects.count() == 1
     channel_obj = Channel.objects.first()
@@ -275,13 +308,47 @@ def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_
         'user_is_moderator': True,
         'link_type': private_channel.link_type,
         'membership_is_managed': False,
+        'avatar': None,
+        'banner': None,
     }
+
+
+@pytest.mark.parametrize("field", ["avatar", "banner"])
+def test_patch_channel_image(client, public_channel, staff_jwt_header, field):
+    """
+    Update a channel's avatar
+    """
+    url = reverse('channel-detail', kwargs={'channel_name': public_channel.name})
+    png_file = os.path.join(os.path.dirname(__file__), "..", "..", "static", "images", "blank.png")
+    with open(png_file, "rb") as f:
+        resp = client.patch(url, {
+            field:  f
+        }, format='multipart', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_200_OK
+    image = getattr(Channel.objects.get(name=public_channel.name), field)
+
+    assert image.name.startswith(f"channel_{field}_") is True
+    assert len(image.read()) == os.path.getsize(png_file)
+
+
+@pytest.mark.parametrize("field", ["avatar", "banner"])
+def test_patch_channel_validate_image(client, private_channel, staff_jwt_header, field):
+    """
+    It should error if the avatar or banner patch object is not a file
+    """
+    url = reverse('channel-detail', kwargs={'channel_name': private_channel.name})
+    resp = client.patch(url, {
+        field:  b'test'
+    }, format='json', **staff_jwt_header)
+    assert resp.status_code == status.HTTP_400_BAD_REQUEST
+    assert resp.json() == {field: [f'Expected {field} to be a file']}
 
 
 def test_patch_channel_forbidden(client, staff_jwt_header):
     """
     Update a channel's settings for a channel the user doesn't have permission to
     """
+    Channel.objects.create(name='dedp2')
     url = reverse('channel-detail', kwargs={'channel_name': 'dedp2'})
     resp = client.patch(url, {
         'channel_type': 'public',
@@ -293,6 +360,7 @@ def test_patch_channel_not_found(client, staff_jwt_header):
     """
     Update a channel's settings for a missing channel
     """
+    Channel.objects.create(name='missing')
     url = reverse('channel-detail', kwargs={'channel_name': 'missing'})
     resp = client.patch(url, {
         'channel_type': 'public',
@@ -304,6 +372,7 @@ def test_patch_channel_nonstaff(client, jwt_header):
     """
     Fail to update a channel's settings if nonstaff user
     """
+    Channel.objects.create(name='subreddit_for_testing')
     url = reverse('channel-detail', kwargs={'channel_name': 'subreddit_for_testing'})
     resp = client.patch(url, {
         'channel_type': 'public',
