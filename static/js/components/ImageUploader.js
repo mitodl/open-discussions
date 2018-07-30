@@ -76,7 +76,7 @@ const dialogContents = (
   }
 }
 
-type ImageUploadProps<Form> = {
+type ImageUploaderProps<Form> = {
   description: string,
   dialogOpen: boolean,
   setDialogVisibility: (b: boolean) => void,
@@ -87,8 +87,8 @@ type ImageUploadProps<Form> = {
   formValidate: ($Shape<Form>) => Action
 } & FormProps<Form>
 
-export default class Uploader<Form> extends React.Component<
-  ImageUploadProps<Form>
+export default class ImageUploader<Form> extends React.Component<
+  ImageUploaderProps<Form>
 > {
   startPhotoEdit = (photo: File) => {
     const { formBeginEdit, onUpdate } = this.props

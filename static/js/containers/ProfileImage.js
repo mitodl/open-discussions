@@ -4,7 +4,7 @@ import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
 
-import Uploader from "../components/Uploader"
+import ImageUploader from "../components/ImageUploader"
 import withForm from "../hoc/withForm"
 
 import { defaultProfileImageUrl, makeProfileImageUrl } from "../lib/util"
@@ -197,5 +197,5 @@ export default R.compose(
     },
     mergeProps
   ),
-  withForm(Uploader)
+  withForm(ImageUploader)
 )(ProfileImage)
