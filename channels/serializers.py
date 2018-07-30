@@ -158,10 +158,10 @@ class RedditObjectSerializer(serializers.Serializer):
         Returns:
             profiles.models.Profile: the user profile if it exists
         """
-        user = self._get_user(instance)
-        if user and hasattr(user, 'profile'):
-            return user.profile
-        return None
+        try:
+            return self._get_user(instance).profile
+        except (AttributeError, Profile.DoesNotExist):
+            return None
 
 
 class BasePostSerializer(RedditObjectSerializer):

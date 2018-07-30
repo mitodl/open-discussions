@@ -81,13 +81,15 @@ class ProfileImage extends React.Component<ProfileImageProps> {
       formValidate
     } = this.props
 
-    let imageUrl
+    let imageUrl, profileName
     if (profile) {
+      profileName = profile.name
       imageUrl =
         imageSize === "micro" || imageSize === "small"
           ? profile.profile_image_small
           : profile.profile_image_medium
     } else {
+      profileName = "anonymous"
       imageUrl = defaultProfileImageUrl
     }
 
@@ -96,7 +98,7 @@ class ProfileImage extends React.Component<ProfileImageProps> {
         <div className="avatar" onClick={onClick}>
           <img
             src={imageUrl}
-            alt={`Profile image for ${profile ? profile.name : "anonymous"}`}
+            alt={`Profile image for ${profileName}`}
             className={`profile-image ${imageSize}`}
           />
           {editable ? (

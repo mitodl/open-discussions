@@ -16,6 +16,8 @@ import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { defaultProfileImageUrl, wait } from "../lib/util"
 import { HIDE_DIALOG } from "../actions/ui"
+import {shouldIf} from "../lib/test_utils"
+
 
 describe("ProfileImage", () => {
   let helper, div, listenForActions
@@ -302,9 +304,7 @@ describe("ProfileImage", () => {
     [PROFILE_IMAGE_SMALL, true],
     [PROFILE_IMAGE_MEDIUM, false]
   ].forEach(([imageSize, exp]) => {
-    it(`image url should ${
-      exp ? "" : " not"
-    } be small if imageSize is ${imageSize}`, () => {
+    it(`image url ${shouldIf(exp)} be small if imageSize is ${imageSize}`, () => {
       const image = renderProfileImage({ imageSize })
       assert.equal(
         image.find(".profile-image").props().src,

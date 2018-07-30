@@ -225,7 +225,7 @@ def test_initialized_avatar(client, user):
     Test that a PNG avatar image is returned for a user
     """
     url = reverse(
-        'profile_avatar',
+        'name-initials-avatar',
         kwargs={
             'username': user.username,
             'color': 'afafaf',
@@ -243,7 +243,7 @@ def test_initials_avatar_fake_user(client):
     Test that a default avatar image is returned for a fake user
     """
     url = reverse(
-        'profile_avatar',
+        'name-initials-avatar',
         kwargs={
             'username': 'fakeuser',
             'color': 'afafaf',

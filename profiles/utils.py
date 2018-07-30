@@ -83,7 +83,7 @@ def generate_gravatar_image(user, image_field=None):
             )
         )
     else:
-        d_param = settings.SITE_BASE_URL + DEFAULT_PROFILE_IMAGE
+        d_param = urljoin(settings.SITE_BASE_URL, DEFAULT_PROFILE_IMAGE)
 
     return '{}?d={}{}'.format(gravatar_image_url, quote(d_param), size_param)
 
@@ -283,12 +283,12 @@ def generate_initials(text):
     return None
 
 
-def generate_svg_avatar(text, size, color, bgcolor):
+def generate_svg_avatar(name, size, color, bgcolor):
     """
-    Generate an SVG avatar based om input text.  Adopted from https://github.com/CraveFood/avinit
+    Generate an SVG avatar based on input text.  Adopted from https://github.com/CraveFood/avinit
 
     Args:
-        text(str): The text to extract two initials from.
+        name(str): The text to extract two initials from.
         size(int): The width (and height) of the output SVG image
         color(str): The font color code (minus the # prefix).
         bgcolor(str): The image background color (minus the # prefix)
@@ -297,7 +297,7 @@ def generate_svg_avatar(text, size, color, bgcolor):
         str: an SVG image.
     """
 
-    initials = generate_initials(text) or 'A'
+    initials = generate_initials(name) or 'A'
 
     style = {
         'fill': '#{}'.format(bgcolor),
