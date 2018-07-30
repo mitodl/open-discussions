@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.38.4
+Version 0.38.4 (Released July 30, 2018)
 --------------
 
 - Added banner component and changed "email sent" snackbar notification to use it
