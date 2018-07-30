@@ -113,6 +113,8 @@ export const validateMembersForm = validate([
   )
 ])
 
+export const validateImageForm = validate([])
+
 export const validateContentReportForm = validate([
   validation(
     R.compose(

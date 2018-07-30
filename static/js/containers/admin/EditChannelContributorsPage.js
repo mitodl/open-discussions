@@ -18,10 +18,10 @@ import { formatTitle } from "../../lib/title"
 import { actions } from "../../actions"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 import { getChannelName } from "../../lib/util"
+import { validateMembersForm } from "../../lib/validation"
 
 import type { AddMemberForm, Channel, Member } from "../../flow/discussionTypes"
 import type { WithFormProps } from "../../flow/formTypes"
-import { validateMembersForm } from "../../lib/validation"
 
 const CONTRIBUTORS_KEY = "channel:edit:contributors"
 const { getForm, actionCreators } = configureForm(

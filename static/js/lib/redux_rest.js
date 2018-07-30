@@ -17,6 +17,7 @@ import { profilesEndpoint } from "../reducers/profiles"
 import { authEndpoint } from "../reducers/auth"
 import { passwordResetEndpoint } from "../reducers/password_reset"
 import { passwordChangeEndpoint } from "../reducers/password_change"
+import { profileImageEndpoint } from "../reducers/profile_image"
 
 import type { Dispatch } from "redux"
 
@@ -39,7 +40,8 @@ export const endpoints = [
   profilesEndpoint,
   authEndpoint,
   passwordResetEndpoint,
-  passwordChangeEndpoint
+  passwordChangeEndpoint,
+  profileImageEndpoint
 ]
 
 /**

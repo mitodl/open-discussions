@@ -73,13 +73,13 @@
     margin-bottom: auto;
     cursor: pointer;
   }
-}
 
-.img-error {
-  color: $validation-text;
-  background-color: $validation-bg;
-  font-size: 14px;
-  text-align: center;
+  .validation-message {
+    color: $validation-text;
+    background-color: $validation-bg;
+    font-size: 14px;
+    text-align: center;
+  }
 }
 
 .photo-upload-dialog {
