@@ -4,6 +4,7 @@ import React from "react"
 import ContentLoader from "react-content-loader"
 
 import { urlHostname } from "../lib/url"
+import { hasIframe } from "../lib/embed"
 
 export const EmbedlyLoader = (props: Object = {}) => (
   <div className="content-loader">
@@ -36,7 +37,7 @@ export default class Embedly extends React.Component<Props> {
     if (embedly.type === "video") {
       return (
         <div
-          className="video-container"
+          className="video iframe-container"
           dangerouslySetInnerHTML={{ __html: embedly.html }}
         />
       )
@@ -45,7 +46,9 @@ export default class Embedly extends React.Component<Props> {
     if (embedly.type === "rich" || embedly.html) {
       return (
         <div
-          className="rich"
+          className={`rich ${
+            hasIframe(embedly.html) ? "iframe-container" : ""
+          }`}
           dangerouslySetInnerHTML={{ __html: embedly.html }}
         />
       )

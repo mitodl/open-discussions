@@ -1,4 +1,6 @@
 // @flow
+import R from "ramda"
+
 import type { EmbedlyResponse } from "../reducers/embedly"
 
 export const ensureTwitterEmbedJS = () => {
@@ -27,3 +29,9 @@ export const handleTwitterWidgets = (embedlyResponse: EmbedlyResponse) => {
     window.twttr.widgets.load()
   }
 }
+
+export const hasIframe = R.memoizeWith(R.identity, (html: string) => {
+  const div = document.createElement("div")
+  div.innerHTML = html
+  return !!div.querySelector("iframe")
+})

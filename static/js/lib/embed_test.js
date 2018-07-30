@@ -1,7 +1,7 @@
 import { assert } from "chai"
 import sinon from "sinon"
 
-import { handleTwitterWidgets } from "./embed"
+import { handleTwitterWidgets, hasIframe } from "./embed"
 
 describe("embed utils", () => {
   let twitterLoadStub
@@ -23,6 +23,15 @@ describe("embed utils", () => {
     }call the load func when appropriate`, () => {
       handleTwitterWidgets(response)
       assert.equal(shouldCall, twitterLoadStub.called)
+    })
+  })
+
+  it("hasIframe should check for an iframe!", () => {
+    [
+      ['<iframe className="iframe-wow"></iframe>', true],
+      ['<div className="iframe">iframe here? never!</div', false]
+    ].forEach(([htmlString, exp]) => {
+      assert.equal(hasIframe(htmlString), exp)
     })
   })
 })

@@ -2,20 +2,32 @@ import React from "react"
 import { mount } from "enzyme"
 import { assert } from "chai"
 import ContentLoader from "react-content-loader"
+import sinon from "sinon"
 
 import Embedly from "./Embedly"
 
 import { urlHostname } from "../lib/url"
 import { makeArticle, makeYoutubeVideo, makeImage } from "../factories/embedly"
+import * as embedFuncs from "../lib/embed"
 
 const renderEmbedly = embedlyResponse =>
   mount(<Embedly embedly={embedlyResponse} />)
 
 describe("Embedly", () => {
+  let sandbox
+
+  beforeEach(() => {
+    sandbox = sinon.createSandbox()
+  })
+
+  afterEach(() => {
+    sandbox.restore()
+  })
+
   it("should render the returned HTML for a video", () => {
     const wrapper = renderEmbedly(makeYoutubeVideo())
     assert.equal(wrapper.text(), "dummy html")
-    assert.ok(wrapper.find(".video-container").exists())
+    assert.ok(wrapper.find(".video").exists())
   })
 
   it("should render an image sensibly", () => {
@@ -50,12 +62,27 @@ describe("Embedly", () => {
     assert.equal(link.text(), `Read this on ${urlHostname(article.url)}`)
   })
 
-  it("should render a link which returns HTML sensibly", () => {
-    const article = makeArticle()
-    article.html = "<span>beep boop beepity boop</span>"
-    const wrapper = renderEmbedly(article)
-    assert.ok(wrapper.find(".rich").exists())
-    assert.equal(wrapper.text(), "beep boop beepity boop")
+  //
+  ;[true, false].forEach(hasIframe => {
+    it(`should render a 'rich' type link ${
+      hasIframe ? "with" : "without"
+    } an iframe`, () => {
+      const hasIframeStub = sandbox
+        .stub(embedFuncs, "hasIframe")
+        .returns(hasIframe)
+      const article = makeArticle()
+      article.type = "rich"
+      article.html = "beep boop beepity boop"
+      const wrapper = renderEmbedly(article)
+      assert.ok(hasIframeStub.called)
+      if (hasIframe) {
+        assert.ok(wrapper.find(".rich.iframe-container").exists())
+      } else {
+        assert.ok(wrapper.find(".rich").exists())
+        assert.isNotOk(wrapper.find(".iframe-container").exists())
+      }
+      assert.equal(wrapper.text(), "beep boop beepity boop")
+    })
   })
 
   it("shouldnt render anything if embedly had some kind of error", () => {
