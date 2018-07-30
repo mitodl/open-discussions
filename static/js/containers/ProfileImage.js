@@ -68,7 +68,6 @@ class ProfileImage extends React.Component<ProfileImageProps> {
   }
 
   render() {
-
     const {
       profile,
       imageSize,
