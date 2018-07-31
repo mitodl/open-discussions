@@ -14,6 +14,7 @@ import { configureForm } from "../lib/forms"
 import { newProfileImageForm } from "../lib/profile"
 import { mergeAndInjectProps } from "../lib/redux_props"
 import { validateImageForm } from "../lib/validation"
+
 import type { Profile, ProfileImageForm } from "../flow/discussionTypes"
 import type { WithFormProps } from "../flow/formTypes"
 import type { Dispatch } from "redux"

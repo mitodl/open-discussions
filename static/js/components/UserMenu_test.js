@@ -11,7 +11,6 @@ import DropdownMenu from "./DropdownMenu"
 
 import { profileURL, SETTINGS_URL } from "../lib/url"
 import * as utilFuncs from "../lib/util"
-import ProfileImage from "../containers/ProfileImage"
 import { defaultProfileImageUrl } from "../lib/util"
 
 describe("UserMenu", () => {
@@ -53,7 +52,7 @@ describe("UserMenu", () => {
 
   it("should include the profile image with onclick handler", () => {
     const wrapper = renderUserMenu()
-    const { onClick } = wrapper.find(ProfileImage).props()
+    const { onClick } = wrapper.find(".user-menu-clickarea").props()
     onClick()
     assert.isOk(toggleShowUserMenuStub.called)
   })

@@ -31,17 +31,18 @@ export default class UserMenu extends React.Component<Props> {
 
     return (
       <div className="user-menu">
-        <ProfileImage
-          editable={false}
-          userName={SETTINGS.username}
-          profile={profile}
-          onClick={toggleShowUserMenu}
-          imageSize={PROFILE_IMAGE_SMALL}
-        />
-        {showUserMenu ? <DropUpArrow /> : <DropDownArrow />}
-        {SETTINGS.profile_ui_enabled && !isProfileComplete(profile) ? (
-          <div className="profile-incomplete" />
-        ) : null}
+        <div className="user-menu-clickarea" onClick={toggleShowUserMenu}>
+          <ProfileImage
+            editable={false}
+            userName={SETTINGS.username}
+            profile={profile}
+            imageSize={PROFILE_IMAGE_SMALL}
+          />
+          {showUserMenu ? <DropUpArrow /> : <DropDownArrow />}
+          {SETTINGS.profile_ui_enabled && !isProfileComplete(profile) ? (
+            <div className="profile-incomplete" />
+          ) : null}
+        </div>
         {showUserMenu ? (
           <DropdownMenu closeMenu={toggleShowUserMenu}>
             <li>
