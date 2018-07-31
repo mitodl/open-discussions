@@ -25,6 +25,8 @@ def test_serialize_user(user):
             'image_file': profile.image_file.url,
             'image_small_file': profile.image_small_file.url,
             'image_medium_file': profile.image_medium_file.url,
+            'profile_image_small': profile.image_small_file.url,
+            'profile_image_medium': profile.image_medium_file.url,
             'bio': profile.bio,
             'headline': profile.headline,
             'username': profile.user.username
@@ -62,6 +64,8 @@ def test_serialize_create_user(db, mocker):
         'image_file': None,
         'image_small_file': None,
         'image_medium_file': None,
+        'profile_image_small': 'image_small',
+        'profile_image_medium': 'image_medium',
         'username': user.username
     })
     assert UserSerializer(user).data == {
@@ -96,6 +100,8 @@ def test_update_user_profile(user, key, value):
         'image_file': profile.image_file.url,
         'image_small_file': profile.image_small_file.url,
         'image_medium_file': profile.image_medium_file.url,
+        'profile_image_small': profile.image_small_file.url,
+        'profile_image_medium': profile.image_medium_file.url,
         'email_optin': None,
         'toc_optoin': profile.toc_optin,
         'bio': profile.bio,

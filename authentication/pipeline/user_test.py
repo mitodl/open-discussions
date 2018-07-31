@@ -226,8 +226,6 @@ def test_validate_require_profile_update_user_via_saml(mocker, backend_name, is_
     user = UserFactory(first_name='Jane', last_name='Doe', profile__name='')
     mock_strategy = mocker.Mock()
     mock_backend = mocker.Mock()
-    # don't test this, so mock an empty return
-    mocker.patch('profiles.api._get_gravatar_urls_properties', return_value={})
     mock_backend.name = backend_name
     response = user_actions.require_profile_update_user_via_saml(  # pylint:disable=redundant-keyword-arg
         mock_strategy, mock_backend, 0, user=user, is_new=is_new

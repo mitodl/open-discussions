@@ -8,9 +8,7 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import { profileURL } from "../lib/url"
 import { makeProfile } from "../factories/profiles"
 import { actions } from "../actions"
-import { initials } from "../lib/profile"
 import { formatTitle } from "../lib/title"
-import { defaultProfileImageUrl } from "../lib/util"
 
 describe("ProfilePage", function() {
   let helper, renderComponent, profile
@@ -72,20 +70,7 @@ describe("ProfilePage", function() {
     )
   })
 
-  it("should include a ProfileImage and initials when no profile image exists", async () => {
-    const wrapper = await renderPage()
-    assert.equal(
-      wrapper
-        .find(ProfileImage)
-        .find(".profile-initials")
-        .at(0)
-        .text(),
-      initials(profile.name)
-    )
-  })
-
-  it("should include a ProfileImage and default image when no profile name exists", async () => {
-    profile.name = ""
+  it("should include a ProfileImage equal to profile.profile_image_medium", async () => {
     const wrapper = await renderPage()
     assert.equal(
       wrapper
@@ -93,23 +78,7 @@ describe("ProfilePage", function() {
         .find("img")
         .at(1)
         .props().src,
-      defaultProfileImageUrl
-    )
-  })
-
-  it("should include a ProfileImage and thumbnail when profile image exists", async () => {
-    const profileWithImage = makeProfile(
-      "userWithImage",
-      "http://example.com/test.jpg"
-    )
-    helper.getProfileStub.returns(Promise.resolve(profileWithImage))
-    const wrapper = await renderPage()
-    assert.isTrue(
-      wrapper
-        .find(ProfileImage)
-        .find("img")
-        .at(0)
-        .exists()
+      profile.profile_image_medium
     )
   })
   ;[true, false].forEach(sameUser => {

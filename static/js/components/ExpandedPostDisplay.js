@@ -204,8 +204,8 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
             <div className="left">
               <ProfileImage
                 profile={makeProfile({
-                  name:        post.author_name,
-                  image_small: post.profile_image
+                  name:                post.author_name,
+                  profile_image_small: post.profile_image
                 })}
                 imageSize={PROFILE_IMAGE_MICRO}
               />

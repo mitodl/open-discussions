@@ -9,6 +9,7 @@ import ulid
 
 from authentication import api as auth_api
 from profiles.models import Profile, PROFILE_PROPS
+from profiles.utils import image_uri, IMAGE_MEDIUM, IMAGE_SMALL
 
 User = get_user_model()
 
@@ -18,10 +19,20 @@ class ProfileSerializer(serializers.ModelSerializer):
     email_optin = serializers.BooleanField(write_only=True, required=False)
     toc_optin = serializers.BooleanField(write_only=True, required=False)
     username = serializers.SerializerMethodField(read_only=True)
+    profile_image_medium = serializers.SerializerMethodField(read_only=True)
+    profile_image_small = serializers.SerializerMethodField(read_only=True)
 
     def get_username(self, obj):
         """Custom getter for the username"""
         return str(obj.user.username)
+
+    def get_profile_image_medium(self, obj):
+        """ Custom getter for medium profile image """
+        return image_uri(obj, IMAGE_MEDIUM)
+
+    def get_profile_image_small(self, obj):
+        """ Custom getter for medium profile image """
+        return image_uri(obj, IMAGE_SMALL)
 
     def update(self, instance, validated_data):
         with transaction.atomic():
@@ -36,10 +47,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ('name', 'image', 'image_small', 'image_medium',
                   'image_file', 'image_small_file', 'image_medium_file',
+                  'profile_image_small', 'profile_image_medium',
                   'email_optin', 'toc_optin', 'bio', 'headline', 'username')
         read_only_fields = (
             'image_file_small',
             'image_file_medium',
+            'profile_image_small',
+            'profile_image_medium',
             'username'
         )
 

@@ -8,7 +8,7 @@ import pytest
 from social_django.models import UserSocialAuth
 
 from authentication.backends.micromasters import MicroMastersAuth
-from profiles.utils import make_temp_image_file
+from profiles.utils import make_temp_image_file, DEFAULT_PROFILE_IMAGE
 
 pytestmark = pytest.mark.django_db
 
@@ -33,6 +33,8 @@ def test_list_users(client, staff_user, staff_jwt_header):
                 'image_file': 'http://testserver{}'.format(profile.image_file.url),
                 'image_small_file': 'http://testserver{}'.format(profile.image_small_file.url),
                 'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
+                'profile_image_small': profile.image_small_file.url,
+                'profile_image_medium': profile.image_medium_file.url,
                 'bio': profile.bio,
                 'headline': profile.headline,
                 'username': staff_user.username,
@@ -87,7 +89,9 @@ def test_create_user(
         'image_file': None,
         'image_small_file': None,
         'image_medium_file': None,
-        'username': user.username
+        'username': user.username,
+        'profile_image_small': 'image_small',
+        'profile_image_medium': 'image_medium'
     })
     assert resp.json()['profile'] == payload['profile']
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
@@ -117,6 +121,8 @@ def test_get_user(client, user, staff_jwt_header):
             'image_file': 'http://testserver{}'.format(profile.image_file.url),
             'image_small_file': 'http://testserver{}'.format(profile.image_small_file.url),
             'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
+            'profile_image_small': profile.image_small_file.url,
+            'profile_image_medium': profile.image_medium_file.url,
             'bio': profile.bio,
             'headline': profile.headline,
             'username': profile.user.username
@@ -165,6 +171,8 @@ def test_patch_user(client, user, staff_jwt_header, uid, email, email_optin, toc
             'image_file': 'http://testserver{}'.format(profile.image_file.url),
             'image_small_file': 'http://testserver{}'.format(profile.image_small_file.url),
             'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
+            'profile_image_small': profile.image_small_file.url,
+            'profile_image_medium': profile.image_medium_file.url,
             'bio': profile.bio,
             'headline': profile.headline,
             'username': profile.user.username
@@ -216,3 +224,39 @@ def test_patch_profile_by_user(client, logged_in_profile):
     assert logged_in_profile.image_small_file.width == 64
     assert logged_in_profile.image_medium_file.height == 128
     assert logged_in_profile.image_medium_file.width == 128
+
+
+def test_initialized_avatar(client, user):
+    """
+    Test that a PNG avatar image is returned for a user
+    """
+    url = reverse(
+        'name-initials-avatar',
+        kwargs={
+            'username': user.username,
+            'color': 'afafaf',
+            'bgcolor': 'dedede',
+            'size': 92
+        }
+    )
+    resp = client.get(url)
+    assert resp.status_code == 200
+    assert resp.__getitem__('Content-Type') == 'image/png'
+
+
+def test_initials_avatar_fake_user(client):
+    """
+    Test that a default avatar image is returned for a fake user
+    """
+    url = reverse(
+        'name-initials-avatar',
+        kwargs={
+            'username': 'fakeuser',
+            'color': 'afafaf',
+            'bgcolor': 'dedede',
+            'size': 92
+        }
+    )
+    response = client.get(url, follow=True)
+    last_url, _ = response.redirect_chain[-1]
+    assert last_url.endswith(DEFAULT_PROFILE_IMAGE)
