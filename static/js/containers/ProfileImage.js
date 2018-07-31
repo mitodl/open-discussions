@@ -107,7 +107,8 @@ class ProfileImage extends React.Component<ProfileImageProps> {
                 dialogOpen:          photoDialogOpen,
                 formBeginEdit:       formBeginEdit,
                 formEndEdit:         formEndEdit,
-                formValidate:        formValidate
+                formValidate:        formValidate,
+                description:         "Profile Image"
               })}
               <button
                 className="open-photo-dialog"

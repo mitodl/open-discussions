@@ -82,6 +82,14 @@ describe("ProfileImage", () => {
       }
     })
 
+    it("should have a description in the upload dialog", () => {
+      const image = renderProfileImage({ editable: true })
+      assert.equal(
+        image.find(".mdc-dialog__header__title").text(),
+        "Upload a Profile Image"
+      )
+    })
+
     describe("save button", () => {
       it("should call patchProfileImageStub when the save button is pressed", async () => {
         const username = "a username"
