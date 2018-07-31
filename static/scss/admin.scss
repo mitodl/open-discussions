@@ -81,16 +81,16 @@
     }
   }
 
-  button[type="submit"] {
-    margin: auto;
-  }
-
   .add-member-form {
     display: flex;
     flex-direction: row;
     align-items: center;
 
     margin-bottom: 20px;
+
+    button[type="submit"] {
+      margin: auto;
+    }
   }
 
   .remove {
