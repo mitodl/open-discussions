@@ -104,6 +104,7 @@ def test_send_notification(mocker):
     serializer_mock.return_value.data = {
         'id': 1,
         'title': 'post\'s title',
+        'slug': 'a_slug',
         'channel_name': 'micromasters',
         'channel_title': 'MicroMasters',
         'created': now_in_utc().isoformat(),

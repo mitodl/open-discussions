@@ -50,7 +50,7 @@ p.comments {
       <td width="72" style="width: 72px"><img src="{{ post.profile_image }}" class="user-photo" width="72" height="72"/></td>
       <td><div>
         <h3 class="post-title">
-          <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id %}">{{ post.title }}</a>
+          <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}">{{ post.title }}</a>
         </h3>
         <p class="by-line">by {{ post.author_name }}, {{ post.created|parse_iso|naturaltime }} in <a href="{{ base_url }}{% url 'channel' channel_name=post.channel_name %}">{{ post.channel_title }}</a></p>
         <p class="comments">{{ post.num_comments }} comment{% if post.num_comments != 1 %}s{% endif %}</p>
