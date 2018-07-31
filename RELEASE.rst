@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.39.0 (Released July 31, 2018)
+--------------
+
+- Profile image improvements - generate initials png avatars and use as default url via gravatar API (#975)
+- fix rich embed display width
+- Updated user api to create social auth if provider_username is present
+- Refactor profile upload to use withForm (#978)
+
 Version 0.38.4 (Released July 30, 2018)
 --------------
 
