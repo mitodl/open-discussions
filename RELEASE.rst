@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.39.0
+Version 0.39.0 (Released July 31, 2018)
 --------------
 
 - Profile image improvements - generate initials png avatars and use as default url via gravatar API (#975)
