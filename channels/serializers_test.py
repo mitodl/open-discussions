@@ -54,6 +54,8 @@ def test_serialize_channel(user, membership_is_managed):
         'user_is_moderator': True,
         'user_is_contributor': True,
         'membership_is_managed': membership_is_managed,
+        'avatar': None,
+        'banner': None,
     }
 
 
@@ -105,6 +107,7 @@ def test_update_channel(user, is_empty):
         'submission_type': 'text',
     }
     display_name = 'subreddit'
+    Channel.objects.create(name=display_name)
     instance = Mock(display_name=display_name)
     request = Mock(user=user)
     api_mock = Mock()

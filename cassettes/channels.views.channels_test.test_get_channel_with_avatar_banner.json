@@ -1,0 +1,255 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2018-07-27T21:56:21",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CKEVW3SSDZ4W04ZPYWQ98W71"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDK0MNc1SctONK10TC7PdDMOSc7NMg8r8c0OMk1zjjBQ0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLaFZEV5B+kaZZkUljkHRaWk6Fb4GQQGWJQZe4aC9KSklmUmp8ZnpoAMhnCUagEhk4HhuAAAAA==",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 27 Jul 2018 21:56:21 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=G2VCz6NyCuiBHde7Yd; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 26-Jul-2020 21:56:21 GMT",
+            "loidcreated=2018-07-27T21%3A56%3A20.936Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 26-Jul-2020 21:56:21 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CKEVW3SSDZ4W04ZPYWQ98W71"
+      }
+    },
+    {
+      "recorded_at": "2018-07-27T21:56:21",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&description=Hic+nam+voluptatem+voluptatem+ratione+aspernatur+commodi+quo.+Necessitatibus+magnam+unde+aliquid+eum+alias+adipisci.+Blanditiis+eaque+debitis+soluta.%0AAsperiores+itaque+ut+repellat+ducimus+libero.+Minus+laborum+repellendus+magnam+sint+eius+nemo.+Commodi+exercitationem+accusamus+commodi+asperiores+excepturi.%0AAb+ab+corrupti+provident+delectus+ullam+placeat.+Fugit+quidem+sunt+voluptatibus+modi.+Quibusdam+est+cum+facere+corporis+error+quam+minima.&link_type=any&name=1532728581_voluptates&public_description=Soluta+nihil+totam+fugiat+necessitatibus+odit.+Animi+vitae+occaecati+facilis.&title=Ad+sunt+perferendis+veniam+unde.&type=public&wikimode=disabled"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 187-4fka5yAcwiF3Tcmj7VtMkR5fCX0"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "683"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=G2VCz6NyCuiBHde7Yd; loidcreated=2018-07-27T21%3A56%3A20.936Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.38.3 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 27 Jul 2018 21:56:21 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "219"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-07-27T21:56:24",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 187-4fka5yAcwiF3Tcmj7VtMkR5fCX0"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=G2VCz6NyCuiBHde7Yd; loidcreated=2018-07-27T21%3A56%3A20.936Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.38.3 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1532728581_voluptates/about/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"u\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"1532728581_voluptates\", \"header_img\": null, \"description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EHic nam voluptatem voluptatem ratione aspernatur commodi quo. Necessitatibus magnam unde aliquid eum alias adipisci. Blanditiis eaque debitis soluta.\\nAsperiores itaque ut repellat ducimus libero. Minus laborum repellendus magnam sint eius nemo. Commodi exercitationem accusamus commodi asperiores excepturi.\\nAb ab corrupti provident delectus ullam placeat. Fugit quidem sunt voluptatibus modi. Quibusdam est cum facere corporis error quam minima.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"title\": \"Ad sunt perferendis veniam unde.\", \"collapse_deleted_comments\": false, \"public_description\": \"Soluta nihil totam fugiat necessitatibus odit. Animi vitae occaecati facilis.\", \"over18\": false, \"public_description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003ESoluta nihil totam fugiat necessitatibus odit. Animi vitae occaecati facilis.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"Hic nam voluptatem voluptatem ratione aspernatur commodi quo. Necessitatibus magnam unde aliquid eum alias adipisci. Blanditiis eaque debitis soluta.\\nAsperiores itaque ut repellat ducimus libero. Minus laborum repellendus magnam sint eius nemo. Commodi exercitationem accusamus commodi asperiores excepturi.\\nAb ab corrupti provident delectus ullam placeat. Fugit quidem sunt voluptatibus modi. Quibusdam est cum facere corporis error quam minima.\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 1, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 1, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_u\", \"created\": 1532728581.0, \"url\": \"/r/1532728581_voluptates/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1532728581.0, \"banner_size\": null, \"user_is_moderator\": true, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"public\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "2404"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Fri, 27 Jul 2018 21:56:24 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "216"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=jiwpLakQZ3z2aE4ad%2Fy38FE4jcvJRib0mTUEyspLcI9cJ85Z0VzIFLWfKPMJrD5irihRZoysRlPfeOE5OCjPOKyC4FytjN5J"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1532728581_voluptates/about/?raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
