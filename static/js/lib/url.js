@@ -91,4 +91,5 @@ export const TOUCHSTONE_URL = "/login/saml/?idp=default"
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`
 
-export const urlHostname = (url: ?string) => (url ? new URL(url).hostname : "")
+export const urlHostname = (url: ?string) =>
+  url ? new URL(url).hostname.replace(/^www\.(.*\.\w)/i, "$1") : ""
