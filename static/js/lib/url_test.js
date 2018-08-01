@@ -193,8 +193,10 @@ describe("url helper functions", () => {
         ["https://mail.google.com/", "mail.google.com"],
         [
           "https://www.nytimes.com/2017/10/16/us/politics/trump-mcconnell-bannon.html",
-          "www.nytimes.com"
-        ]
+          "nytimes.com"
+        ],
+        ["http://www.org/Security", "www.org"],
+        ["http://www.www.org/Security", "www.org"]
       ].forEach(([url, expectation]) => {
         assert.equal(urlHostname(url), expectation)
       })
