@@ -3,6 +3,7 @@ import { assert } from "chai"
 
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
+import { SET_SNACKBAR_MESSAGE } from "../actions/ui"
 import {
   toggleUpvote,
   approvePost,
@@ -53,15 +54,18 @@ describe("api_actions util", () => {
       helper.editPostStub.returns(Promise.resolve(makePost))
     })
     ;[true, false].forEach(subscribed => {
-      it(`should let you toggle subscribed from ${subscribed} to ${!subscribed}`, async () => {
+      it(`should set subscribed from ${subscribed} to ${!subscribed} and show a snackbar message`, async () => {
         const post = makePost()
         post.subscribed = subscribed
 
         const { requestType, successType } = actions.posts.patch
 
-        await helper.listenForActions([requestType, successType], () => {
-          toggleFollowPost(helper.store.dispatch, post)
-        })
+        await helper.listenForActions(
+          [requestType, successType, SET_SNACKBAR_MESSAGE],
+          () => {
+            toggleFollowPost(helper.store.dispatch, post)
+          }
+        )
       })
     })
   })
@@ -71,15 +75,18 @@ describe("api_actions util", () => {
       helper.updateCommentStub.returns(Promise.resolve(makePost))
     })
     ;[true, false].forEach(subscribed => {
-      it(`should let you toggle subscribed from ${subscribed} to ${!subscribed}`, async () => {
+      it(`should set subscribed from ${subscribed} to ${!subscribed} and show a snackbar message`, async () => {
         const comment = makeComment(makePost())
         comment.subscribed = subscribed
 
         const { requestType, successType } = actions.comments.patch
 
-        await helper.listenForActions([requestType, successType], () => {
-          toggleFollowComment(helper.store.dispatch, comment)
-        })
+        await helper.listenForActions(
+          [requestType, successType, SET_SNACKBAR_MESSAGE],
+          () => {
+            toggleFollowComment(helper.store.dispatch, comment)
+          }
+        )
       })
     })
   })
