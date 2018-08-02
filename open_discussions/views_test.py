@@ -9,6 +9,7 @@ import pytest
 from django.urls import reverse
 from rest_framework_jwt.settings import api_settings
 
+from channels.models import Channel
 from open_discussions import features
 
 pytestmark = [
@@ -39,6 +40,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
     js_settings = json.loads(response.context['js_settings_json'])
     assert js_settings == {
         'gaTrackingID': 'fake',
+        'gaChannelTrackers': {},
         'public_path': '/static/bundles/',
         'max_comment_depth': 6,
         'user_email': user.email,
@@ -105,6 +107,7 @@ def test_webpack_url_jwt(
     js_settings = json.loads(response.context['js_settings_json'])
     assert js_settings == {
         'gaTrackingID': 'fake',
+        'gaChannelTrackers': {},
         'public_path': '/static/bundles/',
         'max_comment_depth': 6,
         'user_email': user.email,
@@ -148,6 +151,7 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
     js_settings = json.loads(response.context['js_settings_json'])
     assert js_settings == {
         'gaTrackingID': 'fake',
+        'gaChannelTrackers': {},
         'public_path': '/static/bundles/',
         'max_comment_depth': 6,
         'user_email': None,
@@ -168,6 +172,17 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
         'support_email': settings.EMAIL_SUPPORT,
         'embedlyKey': 'fake'
     }
+
+
+def test_webpack_url_ga_channels(client, user):
+    """Verify that js_settings contains correct value for gaChannelTrackers """
+    Channel.objects.create(ga_tracking_id='UA-fake-01', name='testga')
+
+    client.force_login(user)
+    response = client.get(reverse('open_discussions-index'))
+
+    js_settings = json.loads(response.context['js_settings_json'])
+    assert js_settings['gaChannelTrackers']['testga'] == 'UA-fake-01'
 
 
 @pytest.mark.parametrize('is_enabled', [True, False])

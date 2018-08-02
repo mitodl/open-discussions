@@ -414,6 +414,7 @@ class ChannelFactory(factory.Factory):
     public_description = factory.Faker('text', max_nb_chars=100)
     channel_type = FuzzyChoice(VALID_CHANNEL_TYPES)
     link_type = LINK_TYPE_ANY
+    ga_tracking_id = None
 
     @factory.lazy_attribute
     def name(self):

@@ -2,6 +2,9 @@
 /* eslint-disable no-unused-vars */
 declare var SETTINGS: {
   gaTrackingID: string,
+  gaChannelTrackers: {
+    [key:string]: string,
+  },
   reactGaDebug: boolean,
   public_path: string,
   max_comment_depth: number,
