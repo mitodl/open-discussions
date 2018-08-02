@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.39.1
+--------------
+
+- Set snackbar message when posts/comments are followed/unfollowed
+- Add avatar and banner fields to serializer and models (#996)
+- Use urls with post slugs in emails (#1009)
+- Update the urlHostname function to remove www. from beginning of domains (#1014)
+- fix profile dot location, user menu click area
+- Fix save, cancel button alignment (#991)
+
 Version 0.39.0 (Released July 31, 2018)
 --------------
 
