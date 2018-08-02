@@ -165,7 +165,8 @@ export type ReplaceMoreCommentsPayload = {
 export type Moderator = {
   moderator_name: string,
   email?:         string,
-  full_name?:     string
+  full_name?:     string,
+  can_remove?:    boolean
 }
 
 export type ChannelModerators = Array<Moderator>

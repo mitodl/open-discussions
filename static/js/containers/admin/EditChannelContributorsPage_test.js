@@ -13,6 +13,7 @@ import { newMemberForm } from "../../lib/channels"
 import { formatTitle } from "../../lib/title"
 import { editChannelContributorsURL } from "../../lib/url"
 import IntegrationTestHelper from "../../util/integration_test_helper"
+import { SET_DIALOG_DATA, SHOW_DIALOG } from "../../actions/ui"
 
 describe("EditChannelContributorsPage", () => {
   let helper, renderComponent, listenForActions, channel, contributors
@@ -89,6 +90,7 @@ describe("EditChannelContributorsPage", () => {
       contributors[0].contributor_name
     )
     assert.deepEqual(props.channel, channel)
+    assert.equal(props.memberTypeDescription, "contributor")
   })
 
   describe("editable", () => {
@@ -197,6 +199,8 @@ describe("EditChannelContributorsPage", () => {
 
       await listenForActions(
         [
+          SHOW_DIALOG,
+          SET_DIALOG_DATA,
           actions.channelContributors.delete.requestType,
           actions.channelContributors.delete.successType
         ],
@@ -206,6 +210,14 @@ describe("EditChannelContributorsPage", () => {
             .first()
             .props()
             .onClick({ preventDefault: helper.sandbox.stub() })
+
+          wrapper.update()
+          wrapper
+            .find("#remove-member button.edit-button")
+            .props()
+            .onClick({
+              type: "MDCDialog:accept"
+            })
         }
       )
 

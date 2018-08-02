@@ -9,6 +9,7 @@ import {
 } from "../../factories/channels"
 import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
+import { SHOW_DIALOG, SET_DIALOG_DATA } from "../../actions/ui"
 import { newMemberForm } from "../../lib/channels"
 import { formatTitle } from "../../lib/title"
 import { editChannelModeratorsURL } from "../../lib/url"
@@ -89,6 +90,7 @@ describe("EditChannelModeratorsPage", () => {
       moderators[0].moderator_name
     )
     assert.deepEqual(props.channel, channel)
+    assert.equal(props.memberTypeDescription, "moderator")
   })
 
   describe("editable", () => {
@@ -197,6 +199,8 @@ describe("EditChannelModeratorsPage", () => {
 
       await listenForActions(
         [
+          SHOW_DIALOG,
+          SET_DIALOG_DATA,
           actions.channelModerators.delete.requestType,
           actions.channelModerators.delete.successType
         ],
@@ -206,6 +210,14 @@ describe("EditChannelModeratorsPage", () => {
             .first()
             .props()
             .onClick({ preventDefault: helper.sandbox.stub() })
+
+          wrapper.update()
+          wrapper
+            .find("#remove-member button.edit-button")
+            .props()
+            .onClick({
+              type: "MDCDialog:accept"
+            })
         }
       )
 

@@ -19,6 +19,12 @@ import { actions } from "../../actions"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 import { getChannelName } from "../../lib/util"
 import { validateMembersForm } from "../../lib/validation"
+import {
+  setDialogData,
+  showDialog,
+  hideDialog,
+  DIALOG_REMOVE_MEMBER
+} from "../../actions/ui"
 
 import type { AddMemberForm, Channel, Member } from "../../flow/discussionTypes"
 import type { WithFormProps } from "../../flow/formTypes"
@@ -33,7 +39,11 @@ type Props = {
   loadChannel: () => Promise<*>,
   loadMembers: () => Promise<*>,
   members: Array<Member>,
-  removeMember: (channel: Channel, email: string) => Promise<*>
+  removeMember: (channel: Channel, email: string) => Promise<*>,
+  memberToRemove: ?Member,
+  dialogOpen: boolean,
+  setDialogVisibility: (visibility: boolean) => void,
+  setDialogData: (data: any) => void
 } & WithFormProps<AddMemberForm>
 
 export class EditChannelModeratorsPage extends React.Component<Props> {
@@ -62,7 +72,17 @@ export class EditChannelModeratorsPage extends React.Component<Props> {
   }
 
   render() {
-    const { renderForm, form, channel, members, removeMember } = this.props
+    const {
+      renderForm,
+      form,
+      channel,
+      members,
+      removeMember,
+      memberToRemove,
+      dialogOpen,
+      setDialogData,
+      setDialogVisibility
+    } = this.props
 
     if (!channel || !members || !form) {
       return null
@@ -93,6 +113,11 @@ export class EditChannelModeratorsPage extends React.Component<Props> {
             editable={editable}
             members={members}
             usernameGetter={R.prop("moderator_name")}
+            memberTypeDescription="moderator"
+            memberToRemove={memberToRemove}
+            dialogOpen={dialogOpen}
+            setDialogData={setDialogData}
+            setDialogVisibility={setDialogVisibility}
           />
         </Card>
       </React.Fragment>
@@ -106,6 +131,8 @@ const mapStateToProps = (state, ownProps) => {
   const processing =
     state.channels.processing || state.channelModerators.processing
   const members = state.channelModerators.data.get(channelName)
+  const memberToRemove = state.ui.dialogs.get(DIALOG_REMOVE_MEMBER)
+  const dialogOpen = state.ui.dialogs.has(DIALOG_REMOVE_MEMBER)
   const form = getForm(state)
 
   return {
@@ -113,6 +140,8 @@ const mapStateToProps = (state, ownProps) => {
     members,
     channelName,
     processing,
+    memberToRemove,
+    dialogOpen,
     validateForm: validateMembersForm,
     form:         form
   }
@@ -154,6 +183,12 @@ export default R.compose(
       removeMember,
       onSubmit,
       onSubmitError,
+      setDialogData: (data: any) =>
+        setDialogData({ dialogKey: DIALOG_REMOVE_MEMBER, data: data }),
+      setDialogVisibility: (visibility: boolean) =>
+        visibility
+          ? showDialog(DIALOG_REMOVE_MEMBER)
+          : hideDialog(DIALOG_REMOVE_MEMBER),
       ...actionCreators
     },
     mergeProps

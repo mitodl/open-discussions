@@ -9,6 +9,7 @@ import {
   SET_SNACKBAR_MESSAGE,
   SHOW_DIALOG,
   HIDE_DIALOG,
+  SET_DIALOG_DATA,
   SHOW_DROPDOWN,
   HIDE_DROPDOWN,
   SET_BANNER_MESSAGE,
@@ -18,6 +19,7 @@ import {
   setSnackbarMessage,
   showDialog,
   hideDialog,
+  setDialogData,
   showDropdown,
   hideDropdown,
   setBannerMessage,
@@ -86,13 +88,35 @@ describe("ui reducer", () => {
       ...payload
     })
   })
+  ;[true, false].forEach(show => {
+    it(`should let you ${show ? "show" : "hide"} a dialog`, async () => {
+      const dialogKey = "key!"
+      const data = { a: { b: "c" } }
+      const actionFunc = show ? showDialog : hideDialog
+      const actionType = show ? SHOW_DIALOG : HIDE_DIALOG
 
-  it("should let you show and hide a dialog", async () => {
+      await dispatchThen(showDialog(dialogKey), [SHOW_DIALOG])
+      let state = await dispatchThen(setDialogData({ dialogKey, data }), [
+        SET_DIALOG_DATA
+      ])
+      // make sure we start with dialog state so we can assert that it's cleared
+      assert.deepEqual(state.dialogs.get(dialogKey), data)
+
+      state = await dispatchThen(actionFunc(dialogKey), [actionType])
+      assert.equal(state.dialogs.has(dialogKey), show)
+      assert.equal(state.dialogs.get(dialogKey), null)
+    })
+  })
+
+  it("should set data for the dialog", async () => {
     const dialogKey = "key!"
-    let state = await dispatchThen(showDialog(dialogKey), [SHOW_DIALOG])
-    assert.isTrue(state.dialogs.has(dialogKey))
-    state = await dispatchThen(hideDialog(dialogKey), [HIDE_DIALOG])
-    assert.isFalse(state.dialogs.has(dialogKey))
+    const data = [1, 2, 3]
+    await dispatchThen(showDialog(dialogKey), [SHOW_DIALOG])
+    const state = await dispatchThen(setDialogData({ dialogKey, data }), [
+      SET_DIALOG_DATA
+    ])
+    // make sure we start with dialog state so we can assert that it's cleared
+    assert.deepEqual(state.dialogs.get(dialogKey), data)
   })
 
   it("should support multiple dialogs at once", async () => {
