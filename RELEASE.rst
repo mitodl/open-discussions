@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.39.1
+Version 0.39.1 (Released August 02, 2018)
 --------------
 
 - Set snackbar message when posts/comments are followed/unfollowed
