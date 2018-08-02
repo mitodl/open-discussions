@@ -13,16 +13,24 @@ import { FacebookIcon, TwitterIcon, LinkedinIcon } from "react-share"
 import { SharePopupHelper } from "./SharePopup"
 
 describe("SharePopup", () => {
-  let closePopupStub, execCommandStub, url, sandbox
+  let closePopupStub, execCommandStub, setSnackbarMessageStub, url, sandbox
 
   // unfortunately have to use mount to get the ref to work
   const renderSharePopupHelper = (props = {}) =>
-    mount(<SharePopupHelper closePopup={closePopupStub} url={url} {...props} />)
+    mount(
+      <SharePopupHelper
+        closePopup={closePopupStub}
+        url={url}
+        setSnackbarMessage={setSnackbarMessageStub}
+        {...props}
+      />
+    )
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     closePopupStub = sandbox.stub()
     execCommandStub = sandbox.stub()
+    setSnackbarMessageStub = sandbox.stub()
     // $FlowFixMe: flow thinks this isn't writable (normally that's true!)
     document.execCommand = execCommandStub
     url = "http://en.wikipedia.org"
@@ -57,10 +65,13 @@ describe("SharePopup", () => {
     const wrapperInstance = renderSharePopupHelper().instance()
     const selectStub = sandbox.stub(wrapperInstance.input.current, "select")
     const fakeEvent = { preventDefault: sandbox.stub() }
-    wrapperInstance.selectInputText(fakeEvent)
+    wrapperInstance.selectAndCopyLinkText(fakeEvent)
     assert.ok(selectStub.called)
     assert.ok(fakeEvent.preventDefault.called)
     assert.ok(execCommandStub.calledWith("copy"))
+    assert.ok(
+      setSnackbarMessageStub.calledWith({ message: "Copied to clipboard" })
+    )
   })
 
   it("should include the share buttons we expect", () => {
