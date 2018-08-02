@@ -45,6 +45,7 @@ def test_list_moderators_staff(  # pylint: disable=too-many-arguments
         'moderator_name': mod_user.username,
         'full_name': mod_user.profile.name,
         'email': mod_user.email,
+        'can_remove': True,
     }]
 
 
@@ -63,12 +64,48 @@ def test_list_moderators_moderator(client, private_channel, staff_user, staff_ap
             'moderator_name': staff_user.username,
             'full_name': staff_user.profile.name,
             'email': staff_user.email,
+            'can_remove': False,
         },
         {
             'moderator_name': mod_user.username,
             'full_name': mod_user.profile.name,
             'email': mod_user.email,
+            'can_remove': True,
         }
+    ]
+
+
+def test_list_moderators_many_moderator(client, private_channel, staff_user, staff_api, reddit_factories):
+    """
+    List moderators in a channel as a logged in moderator of that channel
+    """
+    url = reverse('moderator-list', kwargs={'channel_name': private_channel.name})
+
+    mod_users = []
+    for i in range(10):
+        mod_user = reddit_factories.user(f"user{i}")
+        staff_api.add_moderator(mod_user.username, private_channel.name)
+        mod_users.append(mod_user)
+    logged_in_user_index = 5
+    client.force_login(mod_users[logged_in_user_index])
+    resp = client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [
+        {
+            'moderator_name': staff_user.username,
+            'full_name': staff_user.profile.name,
+            'email': staff_user.email,
+            'can_remove': False,
+        },
+        *[
+            {
+                'moderator_name': mod_user.username,
+                'full_name': mod_user.profile.name,
+                'email': mod_user.email,
+                'can_remove': i >= logged_in_user_index
+            }
+            for i, mod_user in enumerate(mod_users)
+        ],
     ]
 
 
@@ -85,18 +122,19 @@ def test_list_moderators_anonymous(client, public_channel, staff_user, settings,
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_add_moderator(client, staff_jwt_header):
+def test_add_moderator(client, public_channel, staff_jwt_header, reddit_factories):
     """
     Adds a moderator to a channel
     """
-    moderator = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
-    url = reverse('moderator-list', kwargs={'channel_name': 'admin_channel'})
+    moderator = reddit_factories.user("new_mod_user")
+    url = reverse('moderator-list', kwargs={'channel_name': public_channel.name})
     resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'moderator_name': moderator.username,
         'email': moderator.email,
         'full_name': moderator.profile.name,
+        'can_remove': True,
     }
 
 
@@ -117,21 +155,24 @@ def test_add_moderator_email(client, public_channel, staff_jwt_header, staff_api
         'moderator_name': new_mod_user.username,
         'email': new_mod_user.email,
         'full_name': new_mod_user.profile.name,
+        'can_remove': True,
     }
 
 
-def test_add_moderator_again(client, staff_jwt_header):
+def test_add_moderator_again(client, public_channel, staff_jwt_header, staff_api, reddit_factories):
     """
     If a user is already a moderator we should return 201 without making any changes
     """
-    moderator = UserFactory.create(username='already_mod')
-    url = reverse('moderator-list', kwargs={'channel_name': 'a_channel'})
+    moderator = reddit_factories.user("already_mod")
+    staff_api.add_moderator(moderator.username, public_channel.name)
+    url = reverse('moderator-list', kwargs={'channel_name': public_channel.name})
     resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'moderator_name': moderator.username,
         'email': moderator.email,
         'full_name': moderator.profile.name,
+        'can_remove': True,
     }
 
 

@@ -734,6 +734,7 @@ class ModeratorPrivateSerializer(serializers.Serializer):
     moderator_name = WriteableSerializerMethodField()
     email = WriteableSerializerMethodField()
     full_name = serializers.SerializerMethodField()
+    can_remove = serializers.SerializerMethodField()
 
     def get_moderator_name(self, instance):
         """Returns the name for the moderator"""
@@ -746,6 +747,11 @@ class ModeratorPrivateSerializer(serializers.Serializer):
     def get_full_name(self, instance):
         """Get the full name of the associated user"""
         return Profile.objects.filter(user__username=instance.name).values_list('name', flat=True).first()
+
+    def get_can_remove(self, instance):
+        """Figure out whether the logged in user can remove this moderator"""
+        channel_api = self.context['channel_api']
+        return int(instance.created) >= int(channel_api.reddit.user.me().created)
 
     def validate_moderator_name(self, value):
         """Validates the moderator name"""

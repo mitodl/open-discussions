@@ -1,0 +1,46 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Perspiciatis in officia nulla quae dolores cumque. Pariatur animi accusantium dolorem magnam. Itaque distinctio quaerat fugiat autem nesciunt tempora. Qui quo accusamus nobis culpa ipsum autem odio.\nAliquid repellat pariatur minima sunt repudiandae. Omnis voluptate sunt sequi error facere unde explicabo. Eligendi pariatur cum reiciendis officia rerum.",
+      "name": "1533158948_distinctio",
+      "public_description": "Explicabo qui blanditiis eaque odit amet. Dicta dicta ipsam soluta doloremque.",
+      "title": "Architecto nobis quasi aliquam iusto."
+    }
+  },
+  "users": {
+    "staff_user": {
+      "username": "01CKVP9WQCKBM0NVNGKRWZ6WVM"
+    },
+    "user0": {
+      "username": "01CKVPA313F8E136M5A6RRPGJ3"
+    },
+    "user1": {
+      "username": "01CKVPA6HCTE1R0RFX6E0QR4WB"
+    },
+    "user2": {
+      "username": "01CKVPAA2441BGJZ1NQB6SRYZS"
+    },
+    "user3": {
+      "username": "01CKVPADM6Q93ZX1VFSWK1QRPD"
+    },
+    "user4": {
+      "username": "01CKVPAH2MZPM05NJQ5RMRJBST"
+    },
+    "user5": {
+      "username": "01CKVPAMHXN8EHVVMDBWQET8VB"
+    },
+    "user6": {
+      "username": "01CKVPAR09Y0MVT5PT9BD6YTHT"
+    },
+    "user7": {
+      "username": "01CKVPAVF2NHV89J2C7YB78S13"
+    },
+    "user8": {
+      "username": "01CKVPAYXCN60GNN63KTS11S1Q"
+    },
+    "user9": {
+      "username": "01CKVPB2CMY0VXHNA183P2NKP6"
+    }
+  }
+}

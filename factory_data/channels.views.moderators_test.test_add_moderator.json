@@ -1,7 +1,19 @@
 {
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Cumque unde ipsam dicta blanditiis omnis ea aliquid soluta. Laborum voluptas blanditiis saepe magnam optio atque illo. Quisquam repudiandae molestiae fugit. Facilis minima asperiores iure atque soluta ullam.\nMagni quaerat neque nisi quas ducimus. Dolorum qui ab quisquam accusantium. Quos at excepturi ducimus. Harum non quibusdam at debitis quibusdam.\nDolorem corrupti delectus modi inventore. Occaecati mollitia sed debitis. Consequuntur possimus non quam repellat.",
+      "name": "1533222073_tenetur",
+      "public_description": "Nesciunt voluptatibus voluptates pariatur eaque. Sunt facilis totam ullam facilis labore tenetur.",
+      "title": "Veritatis dolorem reprehenderit laudantium id."
+    }
+  },
   "users": {
+    "new_mod_user": {
+      "username": "01CKXJGFSKN49XFKM3W9ZFHMYW"
+    },
     "staff_user": {
-      "username": "01BYXNKW00TWQ74CZE1J38HZB6"
+      "username": "01CKXJG9F9PKYEZTNH1J16DSPG"
     }
   }
 }

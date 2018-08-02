@@ -1,7 +1,19 @@
 {
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Perferendis provident beatae id dolorem quia ducimus sit. Quaerat fugit quam quo molestias voluptate sapiente vitae. Explicabo itaque recusandae voluptates. Dolore facere recusandae numquam at rerum.\nImpedit similique cupiditate assumenda possimus nemo quis. Eveniet suscipit deserunt laudantium quia ducimus earum fuga. Iusto dolorem repudiandae nobis odio architecto distinctio at.",
+      "name": "1533221470_dolor",
+      "public_description": "Dicta ullam magnam assumenda illum. Cumque eligendi quas quam ex. Facilis quos at nihil.",
+      "title": "Neque eligendi et accusamus dolores."
+    }
+  },
   "users": {
+    "already_mod": {
+      "username": "01CKXHY37XP7484ZDAVQBS4B71"
+    },
     "staff_user": {
-      "username": "01BYXNKW1KGTC7K86AAHB8QYPQ"
+      "username": "01CKXHXWSKNQYR0JEHY1QH2RMM"
     }
   }
 }
