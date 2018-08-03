@@ -1,5 +1,7 @@
 // @flow
+import { connect } from "react-redux"
 import React from "react"
+import R from "ramda"
 import onClickOutside from "react-onclickoutside"
 import {
   FacebookShareButton,
@@ -8,10 +10,13 @@ import {
 } from "react-share"
 import { FacebookIcon, TwitterIcon, LinkedinIcon } from "react-share"
 
+import { setSnackbarMessage } from "../actions/ui"
+
 type SharePopupProps = {
   url: string,
   closePopup: Function,
-  hideSocialButtons?: boolean
+  hideSocialButtons?: boolean,
+  setSnackbarMessage: Function
 }
 
 export class SharePopupHelper extends React.Component<SharePopupProps> {
@@ -27,11 +32,13 @@ export class SharePopupHelper extends React.Component<SharePopupProps> {
     closePopup()
   }
 
-  selectInputText = (e: Event) => {
+  selectAndCopyLinkText = (e: Event) => {
+    const { setSnackbarMessage } = this.props
     e.preventDefault()
     if (this.input.current) {
       this.input.current.select()
       document.execCommand("copy")
+      setSnackbarMessage({ message: "Copied to clipboard" })
     }
   }
 
@@ -57,7 +64,7 @@ export class SharePopupHelper extends React.Component<SharePopupProps> {
               </TwitterShareButton>
             </div>
           )}
-          <a href="#" className="copy-url" onClick={this.selectInputText}>
+          <a href="#" className="copy-url" onClick={this.selectAndCopyLinkText}>
             Copy URL to clipboard
           </a>
         </div>
@@ -66,5 +73,10 @@ export class SharePopupHelper extends React.Component<SharePopupProps> {
   }
 }
 
-const SharePopup = onClickOutside(SharePopupHelper)
-export default SharePopup
+export default R.compose(
+  connect(
+    R.always({}), // mapStateToProps is not needed - just return an object
+    { setSnackbarMessage }
+  ),
+  onClickOutside
+)(SharePopupHelper)
