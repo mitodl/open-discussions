@@ -71,7 +71,8 @@ describe("withTracker", () => {
   ].forEach(([trackers, path, sender]) => {
     it(`${shouldIf(
       sender !== null
-    )} make a pageview call with sender ${sender} for url /c/${path} from trackers [${_
+    )} make a pageview call with sender ${sender ||
+      "null"} for url /c/${path} from trackers [${_
       .keys(trackers)
       .toString()}]`, () => {
       SETTINGS.gaChannelTrackers = trackers
