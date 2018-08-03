@@ -9,12 +9,14 @@ import {
   INACTIVE_USER_URL,
   FRONTPAGE_URL,
   SETTINGS_URL,
-  AUTH_REQUIRED_URL
+  AUTH_REQUIRED_URL,
+  LOGIN_PROVIDER_URL
 } from "./url"
 
 import {
   STATE_LOGIN_EMAIL,
   STATE_LOGIN_PASSWORD,
+  STATE_LOGIN_PROVIDER,
   STATE_REGISTER_EMAIL,
   STATE_REGISTER_CONFIRM_SENT,
   STATE_REGISTER_CONFIRM,
@@ -46,6 +48,8 @@ export const processAuthResponse = (
     window.location.href = FRONTPAGE_URL
   } else if (state === STATE_INACTIVE) {
     history.push(INACTIVE_USER_URL)
+  } else if (state === STATE_LOGIN_PROVIDER) {
+    history.push(LOGIN_PROVIDER_URL)
   }
 }
 

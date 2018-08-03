@@ -20,6 +20,7 @@ import ProfilePage from "./ProfilePage"
 import ProfileEditPage from "./ProfileEditPage"
 import LoginPage from "./auth/LoginPage"
 import LoginPasswordPage from "./auth/LoginPasswordPage"
+import LoginProviderRequiredPage from "./auth/LoginProviderRequiredPage"
 import RegisterPage from "./auth/RegisterPage"
 import RegisterConfirmPage from "./auth/RegisterConfirmPage"
 import RegisterDetailsPage from "./auth/RegisterDetailsPage"
@@ -237,6 +238,11 @@ class App extends React.Component<AppProps> {
             exact
             path={`${match.url}login/password/`}
             component={LoginPasswordPage}
+          />
+          <Route
+            exact
+            path={`${match.url}login/external/`}
+            component={LoginProviderRequiredPage}
           />
           <Route exact path={`${match.url}signup/`} component={RegisterPage} />
           <Route

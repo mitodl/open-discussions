@@ -16,7 +16,7 @@ export const STATE_INVALID_EMAIL = "invalid-email"
 
 export const STATE_LOGIN_EMAIL = "login/email"
 export const STATE_LOGIN_PASSWORD = "login/password"
-export const STATE_LOGIN_MICROMASTERS = "login/micromasters"
+export const STATE_LOGIN_PROVIDER = "login/provider"
 
 export const STATE_REGISTER_EMAIL = "register/email"
 export const STATE_REGISTER_CONFIRM_SENT = "register/confirm-sent"
@@ -30,6 +30,7 @@ export const getAuthPartialTokenSelector = R.path([
 ])
 export const getAuthFlowSelector = R.path(["auth", "data", "flow"])
 export const getAuthStateSelector = R.path(["auth", "data", "state"])
+export const getAuthProviderSelector = R.path(["auth", "data", "provider"])
 export const getAuthEmailSelector = R.path(["auth", "data", "email"])
 export const getFormErrorSelector = R.compose(
   R.head,

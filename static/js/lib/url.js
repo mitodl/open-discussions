@@ -79,6 +79,7 @@ export const PASSWORD_CHANGE_URL = "/settings/password"
 // auth urls
 export const LOGIN_URL = "/login/"
 export const LOGIN_PASSWORD_URL = "/login/password/"
+export const LOGIN_PROVIDER_URL = "/login/external/"
 
 export const REGISTER_URL = "/signup/"
 export const REGISTER_CONFIRM_URL = "/signup/confirm/"

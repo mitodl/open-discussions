@@ -26,11 +26,12 @@ export type PwChangeForm = {
 
 // API response types
 export type AuthStates =
-  |"success"
+  | "success"
   | "inactive"
   | "error"
   | "login/email"
   | "login/password"
+  | "login/provider"
   | "register/email"
   | "register/confirm-sent"
   | "register/confirm"
