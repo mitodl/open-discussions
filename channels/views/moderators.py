@@ -37,14 +37,26 @@ class ModeratorListView(ListCreateAPIView):
 
     def get_serializer_context(self):
         """Context for the request and view"""
+        channel_api = self.request.channel_api
+        channel_name = self.kwargs['channel_name']
+        mods = list(channel_api._list_moderators(
+            channel_name=channel_name,
+            moderator_name=channel_api.user.username,
+        ))
+        if mods:
+            user_mod_date = mods[0].date
+        else:
+            user_mod_date = None
+
         return {
-            'channel_api': self.request.channel_api,
+            'channel_api': channel_api,
             'view': self,
+            'mod_date': user_mod_date,
         }
 
     def get_queryset(self):
         """Get a list of moderators for channel"""
-        api = Api(user=self.request.user)
+        api = self.request.channel_api
         channel_name = self.kwargs['channel_name']
         return (
             moderator for moderator in

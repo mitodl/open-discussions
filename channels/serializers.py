@@ -750,8 +750,9 @@ class ModeratorPrivateSerializer(serializers.Serializer):
 
     def get_can_remove(self, instance):
         """Figure out whether the logged in user can remove this moderator"""
-        channel_api = self.context['channel_api']
-        return int(instance.created) >= int(channel_api.reddit.user.me().created)
+        if self.context['mod_date'] is None:
+            return False
+        return int(instance.date) >= int(self.context['mod_date'])
 
     def validate_moderator_name(self, value):
         """Validates the moderator name"""
@@ -778,7 +779,11 @@ class ModeratorPrivateSerializer(serializers.Serializer):
         else:
             raise ValueError("Missing moderator_name or email")
 
-        return api.add_moderator(username, channel_name)
+        api.add_moderator(username, channel_name)
+        return api._list_moderators(
+            channel_name=channel_name,
+            moderator_name=username,
+        )[0]
 
 
 class SubscriberSerializer(serializers.Serializer):

@@ -937,9 +937,6 @@ class Api:
         Args:
             moderator_name(str): username of the user
             channel_name(str): name of the channel
-
-        Returns:
-            praw.models.Redditor: the reddit representation of the user
         """
         try:
             user = User.objects.get(username=moderator_name)
@@ -952,7 +949,6 @@ class Api:
         except APIException as ex:
             if ex.error_type != "ALREADY_MODERATOR":
                 raise
-        return Redditor(self.reddit, name=moderator_name)
 
     def accept_invite(self, channel_name):
         """

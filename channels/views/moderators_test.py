@@ -45,7 +45,7 @@ def test_list_moderators_staff(  # pylint: disable=too-many-arguments
         'moderator_name': mod_user.username,
         'full_name': mod_user.profile.name,
         'email': mod_user.email,
-        'can_remove': True,
+        'can_remove': False,
     }]
 
 
