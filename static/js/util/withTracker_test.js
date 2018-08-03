@@ -10,7 +10,6 @@ import _ from "lodash"
 import withTracker from "./withTracker"
 import { shouldIf } from "../lib/test_utils"
 
-
 class Page extends React.Component<*, *> {
   props: {}
 
@@ -78,11 +77,9 @@ describe("withTracker", () => {
       WrappedPage = withTracker(Page)
       renderPage({ location: window.location })
       assert.ok(gaInitStub.calledOnce)
-      assert.ok(gaPageViewStub.calledWith(window.location.pathname))
+      assert.ok(gaPageViewStub.calledWith(`/c/${path}`))
       if (sender) {
-        assert.ok(
-          gaGaStub.calledWith(sender, "pageview", window.location.pathname)
-        )
+        assert.ok(gaGaStub.calledWith(sender, "pageview", `/c/${path}`))
       } else {
         assert.ok(gaGaStub.notCalled)
       }
