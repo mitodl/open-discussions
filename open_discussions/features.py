@@ -12,7 +12,7 @@ SAML_AUTH = 'SAML_AUTH'
 PROFILE_UI = 'PROFILE_UI'
 
 
-def is_enabled(name, default=False):
+def is_enabled(name, default=None):
     """
     Returns True if the feature flag is enabled
 
@@ -23,10 +23,10 @@ def is_enabled(name, default=False):
     Returns:
         bool: True if the feature flag is enabled
     """
-    return settings.FEATURES.get(name, default)
+    return settings.FEATURES.get(name, default or settings.OPEN_DISCUSSIONS_FEATURES_DEFAULT)
 
 
-def if_feature_enabled(name, default=False):
+def if_feature_enabled(name, default=None):
     """
     Wrapper that results in a no-op if the given feature isn't enabled, and otherwise
     runs the wrapped function as normal.
