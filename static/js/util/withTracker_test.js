@@ -10,12 +10,9 @@ import _ from "lodash"
 import withTracker from "./withTracker"
 import { shouldIf } from "../lib/test_utils"
 
-type PageProps = {
-  extraProps: Object
-}
 
 class Page extends React.Component<*, *> {
-  props: PageProps
+  props: {}
 
   render() {
     return <div />
