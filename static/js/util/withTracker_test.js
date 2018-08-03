@@ -2,7 +2,7 @@
 // @flow
 import React from "react"
 import { assert } from "chai"
-import { mount } from "enzyme"
+import { shallow } from "enzyme"
 import sinon from "sinon"
 import ReactGA from "react-ga"
 import _ from "lodash"
@@ -25,7 +25,7 @@ class Page extends React.Component<*, *> {
 describe("withTracker", () => {
   let sandbox, gaInitStub, gaPageViewStub, gaGaStub, WrappedPage
 
-  const renderPage = ({ ...props }) => mount(<WrappedPage {...props} />)
+  const renderPage = ({ ...props }) => shallow(<WrappedPage {...props} />)
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
