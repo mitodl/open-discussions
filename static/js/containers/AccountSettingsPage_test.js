@@ -5,7 +5,7 @@ import { assert } from "chai"
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
-describe("PasswordChangePage", () => {
+describe("AccountSettingsPage", () => {
   let helper, renderComponent
 
   const renderPage = async () => {
@@ -29,61 +29,60 @@ describe("PasswordChangePage", () => {
     SETTINGS.user_full_name = "Test User"
     helper.getSocialAuthTypesStub.returns(
       Promise.resolve([
-        { provider: "email", email: "test1@example.com" },
-        { provider: "micromasters", email: "test2@example.com" },
-        { provider: "unknown_provider", email: "test3@example.com" }
+        { provider: "email" },
+        { provider: "micromasters" },
+        { provider: "saml" },
+        { provider: "unknown_provider" }
       ])
     )
     const wrapper = await renderPage()
 
-    const card = wrapper.find("Card").at(0)
-    assert.equal(card.find(".account-settings-row").length, 2)
+    const rows = wrapper.find(".account-settings-row")
+    assert.equal(rows.length, 3)
     assert.equal(
-      card
-        .find(".email")
+      rows
         .at(0)
+        .find("Link")
         .text(),
-      "test1@example.com"
+      "Change Password"
     )
     assert.equal(
-      card
-        .find(".email")
+      rows
+        .at(0)
+        .find("h5")
+        .text(),
+      "MIT Open"
+    )
+    assert.equal(
+      rows
         .at(1)
+        .find("h5")
         .text(),
-      "test2@example.com"
+      "MicroMasters"
     )
     assert.equal(
-      card
-        .find(".highlight")
-        .at(0)
-        .text()
-        .trim(),
-      "Test User"
+      rows
+        .at(2)
+        .find("h5")
+        .text(),
+      "Touchstone@MIT"
     )
   })
 
   it("renders the email auth type first", async () => {
     helper.getSocialAuthTypesStub.returns(
-      Promise.resolve([
-        { provider: "micromasters", email: "mm_auth@example.com" },
-        { provider: "email", email: "email_auth@example.com" }
-      ])
+      Promise.resolve([{ provider: "micromasters" }, { provider: "email" }])
     )
     const wrapper = await renderPage()
 
+    const rows = wrapper.find(".account-settings-row")
+    assert.equal(rows.length, 2)
     assert.equal(
-      wrapper
-        .find(".email")
+      rows
         .at(0)
+        .find("h5")
         .text(),
-      "email_auth@example.com"
-    )
-    assert.equal(
-      wrapper
-        .find(".email")
-        .at(1)
-        .text(),
-      "mm_auth@example.com"
+      "MIT Open"
     )
   })
 })

@@ -433,10 +433,6 @@ export const postPasswordResetNewPassword = (
     })
   })
 
-export function getSocialAuthTypes(): Promise<Array<SocialAuth>> {
-  return fetchJSONWithAuthFailure("/api/v0/auths/")
-}
-
 export const postSetPassword = (
   currentPassword: string,
   newPassword: string
@@ -448,3 +444,7 @@ export const postSetPassword = (
       new_password:     newPassword
     })
   })
+
+export function getSocialAuthTypes(): Promise<Array<SocialAuth>> {
+  return fetchJSONWithAuthFailure("/api/v0/auths/")
+}
