@@ -40,11 +40,28 @@ describe("withTracker", () => {
   //
   ;[
     [
-      { channel01: "UA-fake01-1", channel02: "UA-fake02-1" },
+      {
+        channel01: "UA-fake01-1",
+        channel02: "UA-fake02-1",
+        channel03: "UA-fake01-1"
+      },
       "channel02",
-      "channel02.send"
+      "UA_fake02_1.send"
     ],
-    [{ channel01: "UA-fake01-1" }, "channel01/w4/comment/b2", "channel01.send"],
+    [
+      {
+        channel01: "UA-fake01-1",
+        channel02: "UA-fake02-1",
+        channel03: "UA-fake01-1"
+      },
+      "channel01",
+      "UA_fake01_1.send"
+    ],
+    [
+      { channel01: "UA-fake01-1" },
+      "channel01/w4/comment/b2",
+      "UA_fake01_1.send"
+    ],
     [
       { channel01: "UA-fake01-1", channel02: "UA-fake02-1" },
       "channel03/w4/comment/b2",
@@ -54,7 +71,7 @@ describe("withTracker", () => {
   ].forEach(([trackers, path, sender]) => {
     it(`${shouldIf(
       sender !== null
-    )} make a channel-specific pageview call for url /c/${path} and trackers [${_
+    )} make a pageview call with sender ${sender} for url /c/${path} from trackers [${_
       .keys(trackers)
       .toString()}]`, () => {
       SETTINGS.gaChannelTrackers = trackers
