@@ -8,7 +8,12 @@ import { Link } from "react-router-dom"
 import Card from "./Card"
 import DropdownMenu from "./DropdownMenu"
 
-import { channelURL, embedlyThumbnail, postDetailURL } from "../lib/url"
+import {
+  channelURL,
+  embedlyThumbnail,
+  postDetailURL,
+  profileURL
+} from "../lib/url"
 import {
   PostVotingButtons,
   PostTitleAndHostname,
@@ -79,7 +84,9 @@ export class CompactPostDisplay extends React.Component<Props> {
             </div>
             <div className="row">
               <div className="authored-by">
-                <div className="author-name">{post.author_name}</div>
+                <Link to={profileURL(post.author_id)}>
+                  <div className="author-name">{post.author_name}</div>
+                </Link>
                 <div className="date">
                   {formattedDate}
                   {this.showChannelLink()}

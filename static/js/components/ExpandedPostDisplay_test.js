@@ -14,7 +14,7 @@ import ProfileImage from "../containers/ProfileImage"
 import SharePopup from "./SharePopup"
 
 import { wait } from "../lib/util"
-import { postPermalink, postDetailURL } from "../lib/url"
+import { postPermalink, postDetailURL, profileURL } from "../lib/url"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
@@ -92,6 +92,14 @@ describe("ExpandedPostDisplay", () => {
       authoredBy.find(".right").text(),
       moment(post.created).fromNow()
     )
+  })
+
+  it("should link to the post author's profile", () => {
+    const link = renderPostDisplay()
+      .find(".authored-by")
+      .find("Link")
+    assert.equal(link.text(), post.author_name)
+    assert.equal(link.props().to, profileURL(post.author_id))
   })
 
   it("should hide text content if passed showPermalinkUI", () => {

@@ -11,7 +11,7 @@ import DropdownMenu from "./DropdownMenu"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { wait } from "../lib/util"
-import { channelURL, postDetailURL, urlHostname } from "../lib/url"
+import { channelURL, postDetailURL, urlHostname, profileURL } from "../lib/url"
 import { PostTitleAndHostname, getPostDropdownMenuKey } from "../lib/posts"
 import { makePost } from "../factories/posts"
 import { showDropdown } from "../actions/ui"
@@ -71,12 +71,20 @@ describe("CompactPostDisplay", () => {
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
   })
 
+  it("should link to the author's profile", () => {
+    const link = renderPostDisplay({ post })
+      .find(".authored-by")
+      .find("Link")
+    assert.equal(link.text(), post.author_name)
+    assert.equal(link.props().to, profileURL(post.author_id))
+  })
+
   it("should link to the subreddit, if told to", () => {
     post.channel_name = "channel_name"
     const wrapper = renderPostDisplay({ post, showChannelLink: true })
     const linkProps = wrapper
+      .find(".date")
       .find(Link)
-      .at(1)
       .props()
     assert.equal(linkProps.to, channelURL("channel_name"))
     assert.equal(linkProps.children, post.channel_title)
@@ -87,7 +95,7 @@ describe("CompactPostDisplay", () => {
     const wrapper = renderPostDisplay({ post })
     const { href, target } = wrapper
       .find("a")
-      .at(1)
+      .at(2)
       .props()
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
@@ -261,8 +269,8 @@ describe("CompactPostDisplay", () => {
         isModerator: true,
         removePost:  removePostStub
       })
-      const link = wrapper.find("a").at(2)
-      assert.equal(link.text(), "remove")
+      const link = wrapper.find({ children: "remove" })
+      assert(link.exists())
       link.simulate("click")
       assert.ok(removePostStub.calledWith(post))
     })
@@ -274,8 +282,8 @@ describe("CompactPostDisplay", () => {
         isModerator:       true,
         ignorePostReports: ignorePostStub
       })
-      const link = wrapper.find("a").at(2)
-      assert.equal(link.text(), "ignore all reports")
+      const link = wrapper.find({ children: "ignore all reports" })
+      assert(link.exists())
       link.simulate("click")
       assert.ok(ignorePostStub.calledWith(post))
     })

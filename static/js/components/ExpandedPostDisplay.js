@@ -3,6 +3,7 @@
 import React from "react"
 import moment from "moment"
 import R from "ramda"
+import { Link } from "react-router-dom"
 
 import { EditPostForm } from "./CommentForms"
 import { renderTextContent } from "./Markdown"
@@ -15,7 +16,7 @@ import { formatPostTitle, PostVotingButtons } from "../lib/posts"
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
 import { makeProfile } from "../lib/profile"
-import { postPermalink } from "../lib/url"
+import { postPermalink, profileURL } from "../lib/url"
 
 import type { Post, Channel } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
@@ -201,7 +202,7 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
         <div className="summary">
           <div className="post-title">{formatPostTitle(post)}</div>
           <div className="authored-by">
-            <div className="left">
+            <Link className="left" to={profileURL(post.author_id)}>
               <ProfileImage
                 profile={makeProfile({
                   name:                post.author_name,
@@ -210,7 +211,7 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
                 imageSize={PROFILE_IMAGE_MICRO}
               />
               <div className="author-name">{post.author_name}</div>
-            </div>
+            </Link>
             <div className="right">{formattedDate}</div>
           </div>
           {embedly && embedly.provider_name ? (

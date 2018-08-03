@@ -14,7 +14,7 @@ import {
   replyToCommentKey,
   editCommentKey
 } from "./CommentForms"
-import { commentPermalink } from "../lib/url"
+import { commentPermalink, profileURL } from "../lib/url"
 import Router from "../Router"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
@@ -266,6 +266,23 @@ describe("CommentTree", () => {
       .at(0)
       .text()
     assert.equal(authorName, comments[0].author_name)
+  })
+
+  it("should link to the author's profile", () => {
+    const wrapper = renderCommentTree()
+    const link = wrapper
+      .find(".author-info")
+      .at(0)
+      .find("Link")
+    assert.equal(link.text(), comments[0].author_name)
+    assert.equal(link.props().to, profileURL(comments[0].author_id))
+    const secondLink = wrapper
+      .find(".comment")
+      .at(0)
+      .find("Link")
+      .at(0)
+    assert.equal(secondLink.props().to, profileURL(comments[0].author_id))
+    assert(secondLink.find("ProfileImage").exists())
   })
 
   it("should limit replies to the max comment depth", () => {

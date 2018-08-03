@@ -20,6 +20,7 @@ import {
   getCommentReplyInitialValue
 } from "../components/CommentForms"
 import { makeProfile } from "../lib/profile"
+import { profileURL } from "../lib/url"
 
 import type {
   GenericComment,
@@ -112,17 +113,21 @@ export default class CommentTree extends React.Component<Props> {
         className={`comment ${comment.removed ? "removed" : ""}`}
         key={`comment-${comment.id}`}
       >
-        <ProfileImage
-          profile={makeProfile({
-            name:                comment.author_name,
-            username:            SETTINGS.username,
-            profile_image_small: comment.profile_image
-          })}
-          imageSize={PROFILE_IMAGE_SMALL}
-        />
+        <Link to={profileURL(comment.author_id)}>
+          <ProfileImage
+            profile={makeProfile({
+              name:                comment.author_name,
+              username:            SETTINGS.username,
+              profile_image_small: comment.profile_image
+            })}
+            imageSize={PROFILE_IMAGE_SMALL}
+          />
+        </Link>
         <div className="comment-contents">
           <div className="author-info">
-            <span className="author-name">{comment.author_name}</span>
+            <Link to={profileURL(comment.author_id)}>
+              <span className="author-name">{comment.author_name}</span>
+            </Link>
             <span className="authored-date">
               {moment(comment.created).fromNow()}
             </span>
