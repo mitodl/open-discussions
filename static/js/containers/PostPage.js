@@ -318,6 +318,38 @@ class PostPage extends React.Component<PostPageProps> {
     dispatch(hideDropdownDebounced(POST_SHARE_MENU_KEY))
   }
 
+  renderCommentSectionHeader = () => {
+    const {
+      post,
+      commentID,
+      channel,
+      location: { search }
+    } = this.props
+
+    if (commentID) {
+      return (
+        <Card className="comment-detail-card">
+          <div>You are viewing a single comment's thread.</div>
+          <Link to={postDetailURL(channel.name, post.id, post.slug)}>
+            View the rest of the comments
+          </Link>
+        </Card>
+      )
+    }
+    if (post.num_comments > 0) {
+      return (
+        <div className="count-and-sort">
+          <div className="comments-count">{formatCommentsCount(post)}</div>
+          <CommentSortPicker
+            updateSortParam={updateCommentSortParam(this.props)}
+            value={qs.parse(search).sort || COMMENT_SORT_BEST}
+          />
+        </div>
+      )
+    }
+    return null
+  }
+
   render() {
     const {
       dispatch,
@@ -335,7 +367,6 @@ class PostPage extends React.Component<PostPageProps> {
       approvePost,
       removeComment,
       approveComment,
-      location: { search },
       embedly,
       reportPost,
       postDropdownMenuOpen,
@@ -430,38 +461,29 @@ class PostPage extends React.Component<PostPageProps> {
             )}
           </div>
         </Card>
-        {commentID ? (
-          <Card className="comment-detail-card">
-            <div>You are viewing a single comment's thread.</div>
-            <Link to={postDetailURL(channel.name, post.id, post.slug)}>
-              View the rest of the comments
-            </Link>
-          </Card>
-        ) : (
-          <div className="count-and-sort">
-            <div className="comments-count">{formatCommentsCount(post)}</div>
-            <CommentSortPicker
-              updateSortParam={updateCommentSortParam(this.props)}
-              value={qs.parse(search).sort || COMMENT_SORT_BEST}
-            />
-          </div>
-        )}
-        <CommentTree
-          comments={commentsTree}
-          forms={forms}
-          upvote={this.upvote}
-          downvote={this.downvote}
-          approve={approveComment}
-          remove={removeComment}
-          deleteComment={this.showCommentDialog(DELETE_COMMENT_DIALOG)}
-          reportComment={this.showReportCommentDialog}
-          isModerator={isModerator}
-          loadMoreComments={this.loadMoreComments}
-          beginEditing={beginEditing(dispatch)}
-          processing={commentInFlight}
-          commentPermalink={commentPermalink(channel.name, post.id, post.slug)}
-          toggleFollowComment={toggleFollowComment(dispatch)}
-        />
+        {this.renderCommentSectionHeader()}
+        {commentsTree.length > 0 ? (
+          <CommentTree
+            comments={commentsTree}
+            forms={forms}
+            upvote={this.upvote}
+            downvote={this.downvote}
+            approve={approveComment}
+            remove={removeComment}
+            deleteComment={this.showCommentDialog(DELETE_COMMENT_DIALOG)}
+            reportComment={this.showReportCommentDialog}
+            isModerator={isModerator}
+            loadMoreComments={this.loadMoreComments}
+            beginEditing={beginEditing(dispatch)}
+            processing={commentInFlight}
+            commentPermalink={commentPermalink(
+              channel.name,
+              post.id,
+              post.slug
+            )}
+            toggleFollowComment={toggleFollowComment(dispatch)}
+          />
+        ) : null}
       </div>
     )
   }

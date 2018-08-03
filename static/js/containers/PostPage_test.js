@@ -230,6 +230,14 @@ describe("PostPage", function() {
     assert.isTrue(wrapper.find(ExpandedPostDisplay).props().showPermalinkUI)
   })
 
+  it("should hide the comments header section when there are no comments", async () => {
+    post.num_comments = 0
+    helper.getPostStub.returns(Promise.resolve(post))
+    helper.getCommentsStub.returns(Promise.resolve([]))
+    const wrapper = await renderPage()
+    assert.isFalse(wrapper.find(".count-and-sort").exists())
+  })
+
   //
   ;[true, false].forEach(userIsAnon => {
     it(`should not show a ReplyToPostForm when userIsAnonymous() === ${userIsAnon}`, async () => {
