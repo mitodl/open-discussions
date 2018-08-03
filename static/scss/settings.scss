@@ -45,3 +45,27 @@
     display: inline-block;
   }
 }
+
+.account-settings-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 0 10px 0;
+  margin: 40px 0 0 0;
+  border-bottom: 1px solid #777;
+  color: #000;
+
+  h5,
+  h5.touchstone-text-logo {
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+    font-weight: 700;
+    color: inherit;
+  }
+
+  a:link {
+    font-weight: 700;
+  }
+}

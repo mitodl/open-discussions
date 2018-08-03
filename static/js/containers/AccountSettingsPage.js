@@ -37,23 +37,23 @@ class AccountSettingsPage extends React.Component<Props> {
     switch (socialAuth.provider) {
     case "email":
       return (
-        <div key={index}>
-          <h4>MIT Open</h4>
-          <div className="account-settings-row">
-            <div className="email">{socialAuth.email}</div>
-            <div className="action">
-              <Link to="/settings/password">Change Password</Link>
-            </div>
-          </div>
+        <div key={index} className="account-settings-row">
+          <h5>MIT Open</h5>
+          <Link to="/settings/password">Change Password</Link>
         </div>
       )
     case "micromasters":
       return (
-        <div key={index}>
-          <h4>MicroMasters</h4>
-          <div className="account-settings-row">
-            <div className="email">{socialAuth.email}</div>
-          </div>
+        <div key={index} className="account-settings-row">
+          <h5>MicroMasters</h5>
+        </div>
+      )
+    case "saml":
+      return (
+        <div key={index} className="account-settings-row">
+          <h5 className="touchstone-text-logo">
+              Touchstone<span className="ampersand">@</span>MIT
+          </h5>
         </div>
       )
     default:
@@ -80,7 +80,7 @@ class AccountSettingsPage extends React.Component<Props> {
             {R.compose(
               R.addIndex(R.map)(this.renderSocialAuthLine),
               // Show email auth before any other social auths
-              R.sortBy(x => (x.provider === "email" ? 0 : 1))
+              R.sortBy(auth => (auth.provider === "email" ? 0 : 1))
             )(socialAuths)}
           </Card>
         </div>

@@ -5,9 +5,11 @@ from django.urls import reverse
 import pytest
 from rest_framework import status
 from rest_framework_jwt.settings import api_settings
+import factory
 
 from authentication.utils import SocialAuthState
 from open_discussions import features
+from open_discussions.factories import UserSocialAuthFactory
 from open_discussions.test_utils import any_instance_of
 
 pytestmark = [
@@ -483,3 +485,17 @@ class DjoserViewTests:
         client.force_login(user)
         client.post(reverse('set-password-api'), {})
         assert update_session_patch.called is expected_session_update
+
+
+def test_get_social_auth_types(client, user):
+    """Verify that get_social_auth_types returns a list of providers that the user has authenticated with"""
+    social_auth_providers = ['provider1', 'provider2']
+    url = reverse('get-auth-types-api')
+    UserSocialAuthFactory.create_batch(
+        2,
+        user=user,
+        provider=factory.Iterator(social_auth_providers)
+    )
+    client.force_login(user)
+    resp = client.get(url)
+    assert resp.json() == [{'provider': provider} for provider in social_auth_providers]

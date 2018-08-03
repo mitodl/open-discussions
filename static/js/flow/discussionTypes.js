@@ -251,5 +251,4 @@ export type ProfilePayload = {
 
 export type SocialAuth = {
   provider: string,
-  email:    ?string
 }

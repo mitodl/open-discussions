@@ -112,17 +112,11 @@ def get_social_auth_types(request):
         UserSocialAuth
         .objects
         .filter(user=request.user)
-        .values('provider', 'user__email')
+        .values('provider')
+        .distinct()
     )
-    serialized_social_auths = [
-        {
-            'provider': social_auth['provider'],
-            'email': social_auth['user__email']
-        }
-        for social_auth in social_auths
-    ]
     return Response(
-        data=serialized_social_auths,
+        data=social_auths,
         status=status.HTTP_200_OK
     )
 

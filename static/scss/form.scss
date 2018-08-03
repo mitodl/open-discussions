@@ -148,17 +148,3 @@ textarea::placeholder {
 .actions {
   margin-top: 20px;
 }
-
-.account-settings-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  color: #777;
-  border-bottom: 1px solid #777;
-  padding: 0 0 8px 0;
-
-  a:link {
-    font-weight: bold;
-  }
-}

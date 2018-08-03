@@ -3,7 +3,8 @@ Factory for Users
 """
 import ulid
 from django.contrib.auth.models import User
-from factory import LazyFunction, RelatedFactory, Trait
+from social_django.models import UserSocialAuth
+from factory import LazyFunction, RelatedFactory, SubFactory, Trait
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyText
 
@@ -22,3 +23,12 @@ class UserFactory(DjangoModelFactory):
 
     class Params:
         no_profile = Trait(profile=None)
+
+
+class UserSocialAuthFactory(DjangoModelFactory):
+    """Factory for UserSocialAuth"""
+    provider = FuzzyText()
+    user = SubFactory(UserFactory)
+
+    class Meta:
+        model = UserSocialAuth

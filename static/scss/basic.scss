@@ -17,12 +17,15 @@ a.button {
 .link-button {
   display: block;
   padding: 17px 40px;
-  color: $font-grey;
   border: 1px solid $bg-grey;
   text-align: center;
+  margin: 10px 0 20px;
+}
+
+.touchstone-text-logo {
+  color: $font-grey;
   font-size: 17px;
   font-weight: 400;
-  margin: 10px 0 20px;
 
   .ampersand {
     color: #68b90f;
