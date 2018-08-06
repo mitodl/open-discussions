@@ -1,3 +1,14 @@
+#### Pre-Flight checklist
+
+- [ ] Migrations
+ - [ ] Migration is backwards-compatible with current production code
+- [ ] Testing
+  - [ ] Code is tested
+  - [ ] Changes have been manually tested
+- [ ] Settings
+  - [ ] New settings are documented and present in `app.json`
+  - [ ] New settings have reasonable development defaults, if applicable
+
 #### What are the relevant tickets?
 (Required)
 
