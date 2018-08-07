@@ -1,7 +1,7 @@
 #### Pre-Flight checklist
 
 - [ ] Migrations
- - [ ] Migration is backwards-compatible with current production code
+  - [ ] Migration is backwards-compatible with current production code
 - [ ] Testing
   - [ ] Code is tested
   - [ ] Changes have been manually tested
