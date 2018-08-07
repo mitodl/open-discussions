@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Aut quo sunt reiciendis tenetur. Minima corrupti nesciunt quas. Laudantium totam nobis sed eligendi eligendi iste nemo. Est consectetur sapiente alias excepturi.\nSed corporis voluptatem quis incidunt. Labore illo ut suscipit rem totam. Minus quis suscipit modi asperiores iure velit dolorum. Aliquid officia blanditiis saepe reprehenderit.\nExplicabo excepturi itaque illum et. Nostrum optio magni libero ducimus. Eos odio quis illum hic hic fugit.",
+      "name": "1533667455_id",
+      "public_description": "Odio ab eos natus molestiae. Dolores fugit voluptates repudiandae nisi porro.",
+      "title": "Voluptatum vero impedit maxime labore."
+    }
+  },
+  "posts": {
+    "my geat post": {
+      "id": "35",
+      "text": "Assumenda fugiat dolore omnis. Harum ea eligendi rerum dicta nostrum dolorem temporibus est.",
+      "title": "Eum eveniet quasi aliquid repudiandae minus nisi."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CMAV8FPXP3YHDM1YZ044TCST"
+    },
+    "staff_user": {
+      "username": "01CMAV89C5B6KWQAQXYS2S7Q18"
+    }
+  }
+}
