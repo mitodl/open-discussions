@@ -13,7 +13,7 @@ import DropdownMenu from "./DropdownMenu"
 import SharePopup from "./SharePopup"
 
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
-import { preventDefaultAndInvoke, truncate, userIsAnonymous } from "../lib/util"
+import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
 import { makeProfile } from "../lib/profile"
 import { postPermalink, profileURL } from "../lib/url"
@@ -215,7 +215,7 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
               </Link>
               {post.author_headline ? (
                 <span className="author-headline">
-                  &nbsp;&#8212;&nbsp;{truncate(post.author_headline, 64)}
+                  &nbsp;&#8212;&nbsp;{post.author_headline}
                 </span>
               ) : null}
             </div>

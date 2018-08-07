@@ -10,7 +10,7 @@ import Router from "../Router"
 import DropdownMenu from "./DropdownMenu"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { truncate, wait } from "../lib/util"
+import { wait } from "../lib/util"
 import { channelURL, postDetailURL, urlHostname, profileURL } from "../lib/url"
 import { PostTitleAndHostname, getPostDropdownMenuKey } from "../lib/posts"
 import { makePost } from "../factories/posts"
