@@ -39,7 +39,7 @@ class ModeratorListView(ListCreateAPIView):
         """Context for the request and view"""
         channel_api = self.request.channel_api
         channel_name = self.kwargs['channel_name']
-        mods = list(channel_api._list_moderators(
+        mods = list(channel_api._list_moderators(  # pylint: disable=protected-access
             channel_name=channel_name,
             moderator_name=channel_api.user.username,
         ))

@@ -780,7 +780,7 @@ class ModeratorPrivateSerializer(serializers.Serializer):
             raise ValueError("Missing moderator_name or email")
 
         api.add_moderator(username, channel_name)
-        return api._list_moderators(
+        return api._list_moderators(  # pylint: disable=protected-access
             channel_name=channel_name,
             moderator_name=username,
         )[0]
