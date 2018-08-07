@@ -3,6 +3,7 @@ Test end to end django views.
 """
 import json
 import xml.etree.ElementTree as etree
+from urllib.parse import urlencode
 
 import pytest
 from django.urls import reverse
@@ -58,6 +59,27 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
         'support_email': settings.EMAIL_SUPPORT,
         'embedlyKey': 'fake'
     }
+
+
+def test_webpack_url_jwt_redirect(client, user):
+    """Test that a redirect happens for MM JWT tokens if provider is present"""
+    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+    payload = jwt_payload_handler(user)
+    payload['provider'] = 'micromasters'
+    jwt_token = jwt_encode_handler(payload)
+
+    client.cookies[api_settings.JWT_AUTH_COOKIE] = jwt_token
+
+    response = client.get(reverse('open_discussions-index'))
+    assert response.status_code == 302
+    assert response.url == '{}?{}'.format(
+        reverse('social:complete', args=('micromasters',)),
+        urlencode({
+            'next': 'http://testserver/',
+        })
+    )
 
 
 def test_webpack_url_jwt(

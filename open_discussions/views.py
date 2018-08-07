@@ -3,13 +3,14 @@ open_discussions views
 """
 import json
 from datetime import timedelta
+from urllib.parse import urlencode
 
 import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from rest_framework_jwt.settings import api_settings
 from social_django.utils import load_strategy, load_backend
@@ -42,6 +43,17 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
                 leeway=timedelta(days=365),
                 algorithms=[api_settings.JWT_ALGORITHM]
             )
+            provider = payload.get("provider", None)
+            if provider:
+                # redirect to authenticate the user using their JWT for the provider
+                # PSA will then redirect back here using the next param
+                return redirect("{}?{}".format(
+                    reverse('social:complete', args=(provider,)),
+                    urlencode({
+                        'next': request.build_absolute_uri(),
+                    })
+                ))
+
             username = payload.get("username", None)
             site_key = payload.get("site_key", site_key)
             user = User.objects.get(username=username)
@@ -60,6 +72,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
     if user:
         user_full_name = user.profile.name
         user_email = user.email
+
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
         "public_path": public_path(request),
