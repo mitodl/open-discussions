@@ -1,7 +1,19 @@
 {
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Iure at blanditiis repellendus sunt dicta. Consequuntur ad ex minus fugit saepe odit est voluptas.\nEligendi nemo dignissimos dolorum distinctio. Accusantium mollitia veritatis quisquam quod temporibus blanditiis nesciunt. Optio placeat adipisci excepturi necessitatibus eum doloribus.\nEsse excepturi velit numquam sunt corporis suscipit. Dolore dolorem at nam quas. Delectus eum ullam facere ducimus ad. Odio excepturi eius ad quas aspernatur excepturi laboriosam.",
+      "name": "1533330636_ratione",
+      "public_description": "Fugit quasi quisquam officia. Cumque repellat dolor delectus voluptate magnam aut sed earum.",
+      "title": "Dolorum architecto quos officia magni est."
+    }
+  },
   "users": {
+    "already_mod": {
+      "username": "01CM0T1JP7Z4BZ0H0CASQJJD33"
+    },
     "staff_user": {
-      "username": "01BYXNKW1KGTC7K86AAHB8QYPQ"
+      "username": "01CM0T1CB3AP4NFXWPWYSHRQXQ"
     }
   }
 }

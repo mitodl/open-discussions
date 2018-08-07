@@ -404,15 +404,24 @@ def test_moderator_create_username():
     moderator_user = UserFactory.create()
     moderator_redditor = Mock(spec=Redditor)
     moderator_redditor.name = moderator_user.username
-
-    api_mock = Mock(add_moderator=Mock(return_value=moderator_redditor))
+    add_moderator_mock = Mock(return_value=None)
+    list_moderators_mock = Mock(return_value=[moderator_redditor])
+    api_mock = Mock(
+        add_moderator=add_moderator_mock,
+        _list_moderators=list_moderators_mock,
+    )
+    channel_name = 'foo_channel'
     moderator = ModeratorPrivateSerializer(context={
         "channel_api": api_mock,
         "request": Mock(user=user),
-        "view": Mock(kwargs={'channel_name': 'foo_channel'})
+        "view": Mock(kwargs={'channel_name': channel_name})
     }).create({'moderator_name': moderator_user.username})
     assert moderator is moderator_redditor
-    api_mock.add_moderator.assert_called_once_with(moderator_user.username, 'foo_channel')
+    api_mock.add_moderator.assert_called_once_with(moderator_user.username, channel_name)
+    list_moderators_mock.assert_called_once_with(
+        channel_name=channel_name,
+        moderator_name=moderator_user.username,
+    )
 
 
 def test_moderator_create_email():
@@ -421,16 +430,27 @@ def test_moderator_create_email():
     moderator_user = UserFactory.create()
     moderator_redditor = Mock(spec=Redditor)
     moderator_redditor.name = moderator_user.username
-    api_mock = Mock(add_moderator=Mock(return_value=moderator_redditor))
+    add_moderator_mock = Mock(return_value=None)
+    list_moderators_mock = Mock(return_value=[moderator_redditor])
+    api_mock = Mock(
+        add_moderator=add_moderator_mock,
+        _list_moderators=list_moderators_mock,
+    )
+    channel_name = 'foo_channel'
     # Make sure that we're testing case insensitivity of email
     assert moderator_user.email != moderator_user.email.upper()
     moderator = ModeratorPrivateSerializer(context={
         "channel_api": api_mock,
         "request": Mock(user=user),
-        "view": Mock(kwargs={'channel_name': 'foo_channel'})
+        "view": Mock(kwargs={'channel_name': channel_name})
     }).create({'email': moderator_user.email.upper()})
     assert moderator is moderator_redditor
-    api_mock.add_moderator.assert_called_once_with(moderator_user.username, 'foo_channel')
+
+    add_moderator_mock.assert_called_once_with(moderator_user.username, channel_name)
+    list_moderators_mock.assert_called_once_with(
+        channel_name=channel_name,
+        moderator_name=moderator_user.username,
+    )
 
 
 def test_moderator_create_both():

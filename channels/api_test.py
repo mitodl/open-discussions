@@ -671,7 +671,8 @@ def test_add_moderator(mock_client):
     moderator = UserFactory.create()
     redditor = client.add_moderator(moderator.username, 'channel_test_name')
     mock_client.subreddit.return_value.moderator.add.assert_called_once_with(moderator)
-    assert redditor.name == moderator.username
+    # API function doesn't return the moderator. To do this the view calls _list_moderators
+    assert redditor is None
 
 
 def test_add_moderator_no_user(mock_client):

@@ -1,0 +1,46 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Inventore ullam perspiciatis mollitia harum. Molestias eaque quas aspernatur aperiam. Explicabo esse illo maiores dignissimos. Dolorum non rem nemo.\nVoluptatibus rerum quae tempora. Quae laborum sapiente maiores eum alias velit consequuntur. Omnis minus repellendus fuga provident.\nPerspiciatis earum ad praesentium tempora enim laudantium. Omnis asperiores accusantium debitis magnam dolores laudantium dicta sint. Corrupti aspernatur perspiciatis dolorum.",
+      "name": "1533330569_deserunt",
+      "public_description": "Rem quam unde quae saepe a deserunt. Eveniet aliquam nemo aut beatae.",
+      "title": "Quisquam debitis eum ea eos eos perferendis."
+    }
+  },
+  "users": {
+    "staff_user": {
+      "username": "01CM0SZAYNWVX9CJDCASX97R06"
+    },
+    "user0": {
+      "username": "01CM0SZH7K02WE30CE4Y7FP5F0"
+    },
+    "user1": {
+      "username": "01CM0SZMQ4ES7QPHGGZV4BTJB7"
+    },
+    "user2": {
+      "username": "01CM0SZR6GKXE0YM63AEAW43FZ"
+    },
+    "user3": {
+      "username": "01CM0SZVRMKGKQ2AS76FB3S4VP"
+    },
+    "user4": {
+      "username": "01CM0SZZABEQZA8G1VV899VW95"
+    },
+    "user5": {
+      "username": "01CM0T02Y8AY8DS06PTQ8TQ5D4"
+    },
+    "user6": {
+      "username": "01CM0T06FE7XDB9P6RZY4PTM4B"
+    },
+    "user7": {
+      "username": "01CM0T0A0W8AWR91X67FWYM4WB"
+    },
+    "user8": {
+      "username": "01CM0T0DG81C5FKQB75HJA7VVG"
+    },
+    "user9": {
+      "username": "01CM0T0H3ZBHK5W23F9HE3VR4H"
+    }
+  }
+}
