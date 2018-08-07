@@ -75,10 +75,10 @@ describe("ProfileImage", () => {
       }
     })
 
-    it("should have a ImageUploader only if editable === true", () => {
+    it("should have a ImageUploaderForm only if editable === true", () => {
       for (const editable of [true, false]) {
         const image = renderProfileImage({ editable })
-        assert.equal(image.find("ImageUploader").length === 1, editable)
+        assert.equal(image.find("ImageUploaderForm").length === 1, editable)
       }
     })
 
@@ -97,7 +97,7 @@ describe("ProfileImage", () => {
           editable: true,
           userName: username
         })
-        const props = image.find("ImageUploader").props()
+        const props = image.find("ImageUploaderForm").props()
         // set initial state to populate a form with an image loaded
         props.formBeginEdit()
         props.onUpdate({
@@ -110,7 +110,7 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ImageUploader").find("Dialog")
+        const dialog = image.find("ImageUploaderForm").find("Dialog")
         const saveButton = dialog.find(".edit-button").at(0)
         saveButton.simulate("click")
         // do a cycle for rerender based on promises
@@ -125,7 +125,7 @@ describe("ProfileImage", () => {
           editable: true,
           userName: "a username"
         })
-        const props = image.find("ImageUploader").props()
+        const props = image.find("ImageUploaderForm").props()
         // set initial state to populate a form with an image loaded
         props.formBeginEdit()
         props.onUpdate({
@@ -139,7 +139,7 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ImageUploader").find("Dialog")
+        const dialog = image.find("ImageUploaderForm").find("Dialog")
         const saveButton = dialog.find(".edit-button").at(0)
         saveButton.simulate("click")
         // do a cycle for rerender based on promises
@@ -169,7 +169,7 @@ describe("ProfileImage", () => {
         await wait(0)
         image.update()
         assert.equal(image.find(".validation-message").length, 0)
-        assert.deepEqual(helper.store.getState().forms["profile:image"], {
+        assert.deepEqual(helper.store.getState().forms["image:upload:profile"], {
           errors: {},
           value:  {
             edit:  null,
@@ -202,7 +202,7 @@ describe("ProfileImage", () => {
           editable: true,
           userName: "a username"
         })
-        const props = image.find("ImageUploader").props()
+        const props = image.find("ImageUploaderForm").props()
         // set initial state to populate a form with an image loaded
         const file = new Blob(["nothing here", { type: "image/png" }])
         // $FlowFixMe: adding a fake name to the Blob to make it more like a File
@@ -224,7 +224,7 @@ describe("ProfileImage", () => {
           .find("CropperWrapper")
           .props()
           .updatePhotoEdit(updatedBlob)
-        assert.deepEqual(helper.store.getState().forms["profile:image"], {
+        assert.deepEqual(helper.store.getState().forms["image:upload:profile"], {
           errors: {},
           value:  {
             edit:  updatedBlob,
@@ -242,7 +242,7 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ImageUploader").find("Dialog")
+        const dialog = image.find("ImageUploaderForm").find("Dialog")
         const cancelButton = dialog.find(".cancel-button").at(0)
         await listenForActions(
           [actions.forms.FORM_BEGIN_EDIT, HIDE_DIALOG],
@@ -271,7 +271,7 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ImageUploader").find("Dialog")
+        const dialog = image.find("ImageUploaderForm").find("Dialog")
         await listenForActions([HIDE_DIALOG], () => {
           dialog.props().hideDialog()
         })
@@ -285,7 +285,7 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ImageUploader").find("Dialog")
+        const dialog = image.find("ImageUploaderForm").find("Dialog")
         assert.equal(dialog.find(".edit-button").length, 0)
       })
     })

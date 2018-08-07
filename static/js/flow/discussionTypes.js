@@ -230,7 +230,7 @@ export type Profile = {
   profile_image_medium: string
 }
 
-export type ProfileImageForm = {
+export type ImageForm = {
   edit:  ?Blob,
   image: ?File
 }

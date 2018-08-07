@@ -87,7 +87,7 @@ type ImageUploaderProps<Form> = {
   formValidate: ($Shape<Form>) => Action
 } & FormProps<Form>
 
-export default class ImageUploader<Form> extends React.Component<
+export default class ImageUploaderForm<Form> extends React.Component<
   ImageUploaderProps<Form>
 > {
   startPhotoEdit = (photo: File) => {
