@@ -58,7 +58,7 @@ class Profile(models.Model):
 
     last_active_on = models.DateTimeField(null=True)
 
-    headline = models.TextField(blank=True, null=True)
+    headline = models.CharField(blank=True, null=True, max_length=60)
     bio = models.TextField(blank=True, null=True)
 
     @transaction.atomic

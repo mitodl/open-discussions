@@ -12,26 +12,27 @@ export const makePost = (
   channelName: string = casual.word
 ): Post => ({
   // $FlowFixMe: incr.next().value is never undefined but Flow thinks it may be
-  id:            `post${incr.next().value}`,
-  title:         casual.sentence,
-  slug:          casual.word,
-  score:         Math.round(Math.random() * 15),
-  upvoted:       Math.random() < 0.5,
-  author_id:     `justareddituser${String(Math.random())}`,
-  text:          isURLPost ? null : casual.text,
-  url:           isURLPost ? casual.url : null,
-  created:       casual.moment.format(),
-  num_comments:  Math.round(Math.random() * 10),
-  channel_name:  channelName,
-  channel_title: casual.string,
-  profile_image: casual.url,
-  author_name:   casual.name,
-  edited:        casual.boolean,
-  stickied:      casual.boolean,
-  removed:       casual.boolean,
-  num_reports:   null,
-  subscribed:    casual.boolean,
-  thumbnail:     isURLPost ? casual.url : null
+  id:              `post${incr.next().value}`,
+  title:           casual.sentence,
+  slug:            casual.word,
+  score:           Math.round(Math.random() * 15),
+  upvoted:         Math.random() < 0.5,
+  author_id:       `justareddituser${String(Math.random())}`,
+  text:            isURLPost ? null : casual.text,
+  url:             isURLPost ? casual.url : null,
+  created:         casual.moment.format(),
+  num_comments:    Math.round(Math.random() * 10),
+  channel_name:    channelName,
+  channel_title:   casual.string,
+  profile_image:   casual.url,
+  author_name:     casual.name,
+  author_headline: casual.sentence,
+  edited:          casual.boolean,
+  stickied:        casual.boolean,
+  removed:         casual.boolean,
+  num_reports:     null,
+  subscribed:      casual.boolean,
+  thumbnail:       isURLPost ? casual.url : null
 })
 
 export const makeChannelPostList = (channelName: string = casual.word) =>

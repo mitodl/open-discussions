@@ -84,9 +84,16 @@ export class CompactPostDisplay extends React.Component<Props> {
             </div>
             <div className="row">
               <div className="authored-by">
-                <Link to={profileURL(post.author_id)}>
-                  <div className="author-name">{post.author_name}</div>
-                </Link>
+                <div>
+                  <Link to={profileURL(post.author_id)}>
+                    <span className="author-name">{post.author_name}</span>
+                  </Link>
+                  {post.author_headline ? (
+                    <span className="author-headline">
+                      &nbsp;&#8212;&nbsp;{post.author_headline}
+                    </span>
+                  ) : null}
+                </div>
                 <div className="date">
                   {formattedDate}
                   {this.showChannelLink()}

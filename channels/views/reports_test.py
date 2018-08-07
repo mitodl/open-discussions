@@ -123,6 +123,7 @@ def test_list_reports(staff_client, private_channel_and_contributor, reddit_fact
             "channel_name": channel.name,
             "channel_title": channel.title,
             'author_name': user.profile.name,
+            'author_headline': user.profile.headline,
             'profile_image': image_uri(user.profile),
             'edited': False,
             "stickied": False,

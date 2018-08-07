@@ -19,24 +19,25 @@ export const makeComment = (
   parentId: ?string = null
 ): CommentInTree => {
   const comment: CommentInTree = {
-    id:            String(nextCommentId()),
-    parent_id:     parentId,
-    post_id:       post.id,
-    text:          casual.text,
-    author_id:     casual.username,
-    score:         casual.integer(-50, 100),
-    upvoted:       casual.coin_flip,
-    downvoted:     casual.coin_flip,
-    removed:       casual.coin_flip,
-    deleted:       false, // we want this the majority of the time
-    created:       casual.moment.format(),
-    replies:       [],
-    profile_image: casual.url,
-    author_name:   casual.name,
-    edited:        casual.boolean,
-    comment_type:  "comment",
-    num_reports:   0,
-    subscribed:    casual.boolean
+    id:               String(nextCommentId()),
+    parent_id:        parentId,
+    post_id:          post.id,
+    text:             casual.text,
+    author_id:        casual.username,
+    score:            casual.integer(-50, 100),
+    upvoted:          casual.coin_flip,
+    downvoted:        casual.coin_flip,
+    removed:          casual.coin_flip,
+    deleted:          false, // we want this the majority of the time
+    created:          casual.moment.format(),
+    replies:          [],
+    profile_image:    casual.url,
+    author_name:      casual.name,
+    author_headline:  casual.text,
+    edited:           casual.boolean,
+    comment_type:     "comment",
+    num_reports:      0,
+    subscribed:       casual.boolean
   }
 
   if (comment.upvoted && comment.downvoted) {

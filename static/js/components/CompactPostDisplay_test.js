@@ -10,7 +10,7 @@ import Router from "../Router"
 import DropdownMenu from "./DropdownMenu"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { wait } from "../lib/util"
+import { truncate, wait } from "../lib/util"
 import { channelURL, postDetailURL, urlHostname, profileURL } from "../lib/url"
 import { PostTitleAndHostname, getPostDropdownMenuKey } from "../lib/posts"
 import { makePost } from "../factories/posts"
@@ -69,6 +69,19 @@ describe("CompactPostDisplay", () => {
     const authoredBy = wrapper.find(".authored-by").text()
     assert(authoredBy.startsWith(post.author_name))
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
+  })
+
+  it("should not display headline span if author headline is null", () => {
+    post.author_headline = null
+    const wrapper = renderPostDisplay({ post })
+    assert.isNotOk(wrapper.find(".author-headline").exists())
+  })
+
+  it("should display headline span with correct text", () => {
+    post.author_headline = "My headline"
+    const wrapper = renderPostDisplay({ post })
+    const headlineSpan = wrapper.find(".author-headline")
+    assert(headlineSpan.text().includes("My headline"))
   })
 
   it("should link to the author's profile", () => {

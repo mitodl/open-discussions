@@ -102,6 +102,19 @@ describe("ExpandedPostDisplay", () => {
     assert.equal(link.props().to, profileURL(post.author_id))
   })
 
+  it("should not display headline span if author headline is null", () => {
+    post.author_headline = null
+    const wrapper = renderPostDisplay({ post })
+    assert.isNotOk(wrapper.find(".author-headline").exists())
+  })
+
+  it("should display headline span with correct text", () => {
+    post.author_headline = "My headline"
+    const wrapper = renderPostDisplay({ post })
+    const headlineSpan = wrapper.find(".author-headline")
+    assert(headlineSpan.text().includes("My headline"))
+  })
+
   it("should hide text content if passed showPermalinkUI", () => {
     const wrapper = renderPostDisplay({ showPermalinkUI: true })
     assert.isFalse(wrapper.find(ReactMarkdown).exists())

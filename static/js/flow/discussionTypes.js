@@ -50,6 +50,7 @@ export type AuthoredContent = {
   created:         string,
   profile_image:   string,
   author_name:     string,
+  author_headline: ?string,
   edited:          boolean,
   num_reports:     ?number,
   ignore_reports?: boolean,

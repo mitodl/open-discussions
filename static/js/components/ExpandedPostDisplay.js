@@ -13,7 +13,7 @@ import DropdownMenu from "./DropdownMenu"
 import SharePopup from "./SharePopup"
 
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
-import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
+import { preventDefaultAndInvoke, truncate, userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
 import { makeProfile } from "../lib/profile"
 import { postPermalink, profileURL } from "../lib/url"
@@ -202,16 +202,23 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
         <div className="summary">
           <div className="post-title">{formatPostTitle(post)}</div>
           <div className="authored-by">
-            <Link className="left" to={profileURL(post.author_id)}>
-              <ProfileImage
-                profile={makeProfile({
-                  name:                post.author_name,
-                  profile_image_small: post.profile_image
-                })}
-                imageSize={PROFILE_IMAGE_MICRO}
-              />
-              <div className="author-name">{post.author_name}</div>
-            </Link>
+            <div className="left">
+              <Link className="left" to={profileURL(post.author_id)}>
+                <ProfileImage
+                  profile={makeProfile({
+                    name:                post.author_name,
+                    profile_image_small: post.profile_image
+                  })}
+                  imageSize={PROFILE_IMAGE_MICRO}
+                />
+                <span className="author-name">{post.author_name}</span>
+              </Link>
+              {post.author_headline ? (
+                <span className="author-headline">
+                  &nbsp;&#8212;&nbsp;{truncate(post.author_headline, 64)}
+                </span>
+              ) : null}
+            </div>
             <div className="right">{formattedDate}</div>
           </div>
           {embedly && embedly.provider_name ? (
