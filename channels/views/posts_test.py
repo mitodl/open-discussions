@@ -258,6 +258,43 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
     }
 
 
+def test_get_post_no_profile(client, private_channel_and_contributor, reddit_factories):
+    """Get an existing post for a user with no profile"""
+    channel, user = private_channel_and_contributor
+    user.profile.delete()
+
+    post = reddit_factories.text_post('my geat post', user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    client.force_login(user)
+    resp = client.get(url)
+
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        "url": None,
+        "thumbnail": None,
+        "text": post.text,
+        "title": post.title,
+        "upvoted": True,
+        'removed': False,
+        'deleted': False,
+        'subscribed': False,
+        "score": 1,
+        "author_id": user.username,
+        "id": post.id,
+        'slug': get_reddit_slug(post.permalink),
+        "created": post.created,
+        "num_comments": 0,
+        "channel_name": channel.name,
+        "channel_title": channel.title,
+        'author_name': '[deleted]',
+        "author_headline": None,
+        "profile_image": image_uri(None),
+        'edited': False,
+        "stickied": False,
+        'num_reports': None,
+    }
+
+
 def test_get_post_forbidden(client, logged_in_profile):
     """Get a post the user doesn't have permission to"""
     post_id = 'adc'
