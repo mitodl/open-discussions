@@ -128,10 +128,19 @@
     a,
     span.author-name {
       color: $font-black;
+      white-space: nowrap;
     }
 
     .author-headline {
       color: $font-grey-light;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    .date {
+      white-space: nowrap;
     }
   }
 

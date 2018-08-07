@@ -202,24 +202,22 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
         <div className="summary">
           <div className="post-title">{formatPostTitle(post)}</div>
           <div className="authored-by">
-            <div className="left">
-              <Link className="left" to={profileURL(post.author_id)}>
-                <ProfileImage
-                  profile={makeProfile({
-                    name:                post.author_name,
-                    profile_image_small: post.profile_image
-                  })}
-                  imageSize={PROFILE_IMAGE_MICRO}
-                />
-                <span className="author-name">{post.author_name}</span>
-              </Link>
-              {post.author_headline ? (
-                <span className="author-headline">
-                  &nbsp;&#8212;&nbsp;{post.author_headline}
-                </span>
-              ) : null}
-            </div>
-            <div className="right">{formattedDate}</div>
+            <Link className="left" to={profileURL(post.author_id)}>
+              <ProfileImage
+                profile={makeProfile({
+                  name:                post.author_name,
+                  profile_image_small: post.profile_image
+                })}
+                imageSize={PROFILE_IMAGE_MICRO}
+              />
+              <span className="author-name">{post.author_name}</span>
+            </Link>
+            {post.author_headline ? (
+              <span className="author-headline">
+                &nbsp;&#8212;&nbsp;{post.author_headline}
+              </span>
+            ) : null}
+            <div className="right date">{formattedDate}</div>
           </div>
           {embedly && embedly.provider_name ? (
             <div className="provider-name">{embedly.provider_name}</div>
