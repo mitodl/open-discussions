@@ -1,6 +1,19 @@
 Release Notes
 =============
 
+Version 0.40.0 (Released August 08, 2018)
+--------------
+
+- Fixed indent in PR template
+- Added some PR template checkboxes
+- Add can_remove field to serializers (#1017)
+- Added a setting to change the default for feature flags
+- Added API change to support prompting the user to login via MM
+- Touched up account settings UI and added SAML auth type
+- Add links to profile to comment, post displays
+- Hide comment section header when post has no comments
+- Notify user via snackbar when URL is copied
+
 Version 0.39.1 (Released August 02, 2018)
 --------------
 
