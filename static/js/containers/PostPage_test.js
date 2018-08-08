@@ -701,6 +701,7 @@ describe("PostPage", function() {
   })
 
   it("should switch the sorting method when an option is selected", async () => {
+    post.num_comments = 5
     const wrapper = await renderPage()
 
     for (const sortType of VALID_COMMENT_SORT_TYPES) {

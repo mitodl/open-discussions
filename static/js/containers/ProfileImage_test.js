@@ -117,7 +117,7 @@ describe("ProfileImage", () => {
         await wait(0)
         assert.isTrue(helper.patchProfileImageStub.called)
         sinon.assert.calledWith(helper.getProfileStub, username)
-        assert.deepEqual(helper.store.getState().ui.dialogs, new Set())
+        assert.deepEqual(helper.store.getState().ui.dialogs, new Map())
       })
 
       it("should show a validation message if the image upload fails", async () => {

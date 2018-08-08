@@ -1,3 +1,4 @@
+/* global SETTINGS */
 import React from "react"
 import sinon from "sinon"
 import R from "ramda"
@@ -25,15 +26,15 @@ describe("MembersList", () => {
     sandbox.restore()
   })
   ;[
-    ["contributors", R.prop("contributor_name")],
-    ["moderators", R.prop("moderator_name")]
-  ].forEach(([pageDescription, usernameGetter]) => {
-    describe(pageDescription, () => {
+    ["contributor", R.prop("contributor_name")],
+    ["moderator", R.prop("moderator_name")]
+  ].forEach(([memberTypeDescription, usernameGetter]) => {
+    describe(memberTypeDescription, () => {
       let members
 
       beforeEach(() => {
         members =
-          pageDescription === "contributors"
+          memberTypeDescription === "contributor"
             ? makeContributors()
             : makeModerators(null, true)
       })
@@ -44,6 +45,7 @@ describe("MembersList", () => {
             members={members}
             usernameGetter={usernameGetter}
             channel={channel}
+            memberTypeDescription={memberTypeDescription}
             {...props}
           />
         )
@@ -78,10 +80,16 @@ describe("MembersList", () => {
       ;[true, false].forEach(editable => {
         it(`should ${
           editable ? "" : "not "
-        }render 'remove' links when the channel is ${
+        }render remove links when the channel is ${
           editable ? "" : "not "
-        } editable`, () => {
+        }editable`, () => {
+          members.forEach(member => {
+            member.can_remove = true
+          })
+
           const removeMember = sandbox.stub()
+          const yourIndex = 1
+          SETTINGS.username = usernameGetter(members[yourIndex])
           const wrapper = renderForm({ removeMember, editable })
           const rows = wrapper.find(".row")
           members.forEach((member, i) => {
@@ -92,15 +100,129 @@ describe("MembersList", () => {
               assert.equal(link.length, 0)
             } else {
               assert.equal(link.length, 1)
-              link.props().onClick()
-              sinon.assert.calledWith(
-                removeMember,
-                channel,
-                usernameGetter(member)
-              )
+
+              assert.equal(link.text(), i === yourIndex ? "Leave" : "Remove")
             }
           })
         })
+      })
+
+      it("shows a dialog box when the user clicks remove or leave", () => {
+        members.forEach(member => {
+          member.can_remove = true
+        })
+        const setDialogVisibility = sandbox.stub()
+        const setDialogData = sandbox.stub()
+        const removeMember = sandbox.stub()
+        const yourIndex = 1
+        SETTINGS.username = usernameGetter(members[yourIndex])
+        const wrapper = renderForm({
+          editable: true,
+          setDialogVisibility,
+          setDialogData,
+          removeMember
+        })
+        const rows = wrapper.find(".row")
+        members.forEach((member, i) => {
+          const row = rows.at(i)
+          const link = row.find(".remove")
+
+          link.props().onClick()
+          sinon.assert.calledWith(setDialogVisibility, true)
+          setDialogVisibility.reset()
+          sinon.assert.calledWith(setDialogData, member)
+          setDialogData.reset()
+        })
+
+        assert.equal(removeMember.callCount, 0)
+      })
+      ;[true, false].forEach(isYou => {
+        it(`removes ${
+          isYou ? "you" : "a member"
+        } from the member list when the dialog box accept button is clicked`, () => {
+          const memberToRemove = members[0]
+          if (isYou) {
+            SETTINGS.username = usernameGetter(memberToRemove)
+          }
+          const removeMember = sandbox.stub()
+          const wrapper = renderForm({
+            editable:   true,
+            removeMember,
+            dialogOpen: true,
+            memberToRemove
+          })
+          const dialog = wrapper.find("Dialog")
+          const name = isYou ? "yourself" : memberToRemove.full_name
+          assert.equal(dialog.props().title, `Remove ${name}?`)
+
+          // verify that only MDCDialog:accept will work
+          dialog.props().onAccept({ type: "click" })
+          assert.equal(removeMember.callCount, 0)
+
+          dialog.props().onAccept({
+            type: "MDCDialog:accept"
+          })
+          assert.equal(removeMember.callCount, 1)
+          sinon.assert.calledWith(
+            removeMember,
+            channel,
+            usernameGetter(memberToRemove)
+          )
+        })
+      })
+
+      it("dismisses the dialog box", () => {
+        const memberToRemove = members[0]
+        const setDialogVisibility = sandbox.stub()
+        const removeMember = sandbox.stub()
+        const wrapper = renderForm({
+          editable:   true,
+          removeMember,
+          dialogOpen: true,
+          memberToRemove,
+          setDialogVisibility
+        })
+        wrapper
+          .find("Dialog")
+          .props()
+          .hideDialog()
+
+        assert.equal(removeMember.callCount, 0)
+        assert.equal(setDialogVisibility.callCount, 1)
+        sinon.assert.calledWith(setDialogVisibility, false)
+      })
+
+      it(`should tell the user it can't remove if the field is explicitly set that way`, () => {
+        const member = members[0]
+        member.can_remove = false
+
+        const wrapper = renderForm({ editable: true })
+        const text = wrapper
+          .find(".row")
+          .first()
+          .find(".cant_remove")
+        assert.equal(text.text(), "Can't remove")
+        assert.equal(
+          wrapper
+            .find(".row")
+            .first()
+            .find(".remove").length,
+          0
+        )
+      })
+
+      it("should show a special message in place of the user's own name", () => {
+        const member = members[0]
+        SETTINGS.username = usernameGetter(member)
+
+        const wrapper = renderForm({ editable: true })
+        const text = wrapper
+          .find(".row")
+          .first()
+          .find("td")
+          .first()
+          .text()
+        assert.equal(text, `You are a ${memberTypeDescription} of this channel`)
       })
     })
   })

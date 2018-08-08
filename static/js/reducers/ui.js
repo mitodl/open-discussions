@@ -1,6 +1,4 @@
 // @flow
-import R from "ramda"
-
 import {
   SET_SHOW_DRAWER_DESKTOP,
   SET_SHOW_DRAWER_MOBILE,
@@ -10,7 +8,8 @@ import {
   SHOW_DIALOG,
   HIDE_DIALOG,
   SHOW_DROPDOWN,
-  HIDE_DROPDOWN
+  HIDE_DROPDOWN,
+  SET_DIALOG_DATA
 } from "../actions/ui"
 
 import type { Action } from "../flow/reduxTypes"
@@ -32,8 +31,8 @@ export type UIState = {
   showDrawerMobile: boolean,
   snackbar: ?SnackbarState,
   banner: BannerState,
-  dialogs: Set<string>,
-  dropdownMenus: Set<string>
+  dialogs: Map<string, any>,
+  dropdownMenus: Map<string, any>
 }
 
 const INITIAL_BANNER_STATE = {
@@ -46,8 +45,8 @@ export const INITIAL_UI_STATE: UIState = {
   showDrawerMobile:  false,
   snackbar:          null,
   banner:            INITIAL_BANNER_STATE,
-  dialogs:           new Set(),
-  dropdownMenus:     new Set()
+  dialogs:           new Map(),
+  dropdownMenus:     new Map()
 }
 
 // this generates a new sequential id for each snackbar state that is pushed
@@ -56,13 +55,27 @@ const nextSnackbarId = (snackbar: ?SnackbarState): number =>
   snackbar ? snackbar.id + 1 : 0
 
 const updateVisibilitySet = (
-  dialogs: Set<string>,
+  dialogs: Map<string, any>,
   dialogKey: string,
   show: boolean
-) =>
-  show
-    ? new Set([...dialogs, dialogKey])
-    : new Set([...dialogs].filter(R.complement(R.equals)(dialogKey)))
+) => {
+  const copy: Map<string, any> = new Map(dialogs)
+  copy.delete(dialogKey)
+  if (show) {
+    copy.set(dialogKey, null)
+  }
+  return copy
+}
+
+const setDialogData = (
+  dialogs: Map<string, any>,
+  dialogKey: string,
+  data: any
+) => {
+  const copy: Map<string, any> = new Map(dialogs)
+  copy.set(dialogKey, data)
+  return copy
+}
 
 export const ui = (
   state: UIState = INITIAL_UI_STATE,
@@ -106,6 +119,15 @@ export const ui = (
     return {
       ...state,
       dialogs: updateVisibilitySet(state.dialogs, action.payload, false)
+    }
+  case SET_DIALOG_DATA:
+    return {
+      ...state,
+      dialogs: setDialogData(
+        state.dialogs,
+        action.payload.dialogKey,
+        action.payload.data
+      )
     }
   case SHOW_DROPDOWN:
     return {

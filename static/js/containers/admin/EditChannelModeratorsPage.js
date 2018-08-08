@@ -17,8 +17,15 @@ import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { actions } from "../../actions"
 import { mergeAndInjectProps } from "../../lib/redux_props"
+import { channelURL } from "../../lib/url"
 import { getChannelName } from "../../lib/util"
 import { validateMembersForm } from "../../lib/validation"
+import {
+  setDialogData,
+  showDialog,
+  hideDialog,
+  DIALOG_REMOVE_MEMBER
+} from "../../actions/ui"
 
 import type { AddMemberForm, Channel, Member } from "../../flow/discussionTypes"
 import type { WithFormProps } from "../../flow/formTypes"
@@ -30,10 +37,15 @@ const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
 
 type Props = {
   channel: Channel,
-  loadChannel: () => Promise<*>,
+  loadChannel: () => Promise<Channel>,
   loadMembers: () => Promise<*>,
   members: Array<Member>,
-  removeMember: (channel: Channel, email: string) => Promise<*>
+  removeMember: (channel: Channel, email: string) => Promise<*>,
+  memberToRemove: ?Member,
+  dialogOpen: boolean,
+  setDialogVisibility: (visibility: boolean) => void,
+  setDialogData: (data: any) => void,
+  history: Object
 } & WithFormProps<AddMemberForm>
 
 export class EditChannelModeratorsPage extends React.Component<Props> {
@@ -48,21 +60,42 @@ export class EditChannelModeratorsPage extends React.Component<Props> {
   }
 
   loadData = async () => {
-    const { channel, loadChannel, loadMembers, members } = this.props
-
-    const promises = []
-    if (!channel) {
-      promises.push(loadChannel())
-    }
+    const { channel, loadMembers, members } = this.props
 
     if (!members) {
-      promises.push(loadMembers())
+      loadMembers()
     }
-    await Promise.all(promises)
+    if (!channel) {
+      this.validateModerator()
+    }
+  }
+
+  validateModerator = async () => {
+    const { loadChannel, history } = this.props
+
+    const channel = await loadChannel()
+    if (!channel.user_is_moderator) {
+      history.push(channelURL(channel.name))
+    }
+  }
+
+  removeMember = async (channel: Channel, email: string) => {
+    const { removeMember } = this.props
+    await removeMember(channel, email)
+    this.validateModerator()
   }
 
   render() {
-    const { renderForm, form, channel, members, removeMember } = this.props
+    const {
+      renderForm,
+      form,
+      channel,
+      members,
+      memberToRemove,
+      dialogOpen,
+      setDialogData,
+      setDialogVisibility
+    } = this.props
 
     if (!channel || !members || !form) {
       return null
@@ -89,10 +122,15 @@ export class EditChannelModeratorsPage extends React.Component<Props> {
           )}
           <MembersList
             channel={channel}
-            removeMember={removeMember}
+            removeMember={this.removeMember}
             editable={editable}
             members={members}
             usernameGetter={R.prop("moderator_name")}
+            memberTypeDescription="moderator"
+            memberToRemove={memberToRemove}
+            dialogOpen={dialogOpen}
+            setDialogData={setDialogData}
+            setDialogVisibility={setDialogVisibility}
           />
         </Card>
       </React.Fragment>
@@ -106,6 +144,8 @@ const mapStateToProps = (state, ownProps) => {
   const processing =
     state.channels.processing || state.channelModerators.processing
   const members = state.channelModerators.data.get(channelName)
+  const memberToRemove = state.ui.dialogs.get(DIALOG_REMOVE_MEMBER)
+  const dialogOpen = state.ui.dialogs.has(DIALOG_REMOVE_MEMBER)
   const form = getForm(state)
 
   return {
@@ -113,6 +153,8 @@ const mapStateToProps = (state, ownProps) => {
     members,
     channelName,
     processing,
+    memberToRemove,
+    dialogOpen,
     validateForm: validateMembersForm,
     form:         form
   }
@@ -154,6 +196,12 @@ export default R.compose(
       removeMember,
       onSubmit,
       onSubmitError,
+      setDialogData: (data: any) =>
+        setDialogData({ dialogKey: DIALOG_REMOVE_MEMBER, data: data }),
+      setDialogVisibility: (visibility: boolean) =>
+        visibility
+          ? showDialog(DIALOG_REMOVE_MEMBER)
+          : hideDialog(DIALOG_REMOVE_MEMBER),
       ...actionCreators
     },
     mergeProps

@@ -54,8 +54,9 @@ export const makeModerator = (
   moderator_name: username || casual.word,
   ...(isModerator
     ? {
-      email:     casual.email,
-      full_name: casual.full_name
+      email:      casual.email,
+      full_name:  casual.full_name,
+      can_remove: casual.coin_flip
     }
     : {})
 })
