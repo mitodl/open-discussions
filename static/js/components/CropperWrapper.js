@@ -10,16 +10,22 @@ type Props = {
 }
 
 export default class CropperWrapper extends React.Component<Props> {
-  cropper: Cropper
+  cropperRef: Cropper
+
+  constructor(props: Props) {
+    super(props)
+    this.cropperRef = React.createRef()
+  }
 
   cropperHelper = () => {
     const { updatePhotoEdit } = this.props
     let canvas
-    if (this.cropper) {
+    if (this.cropperRef.current) {
+      const cropper = this.cropperRef.current
       if (browser.name === "safari" || browser.name === "ios") {
-        canvas = this.cropper.getCroppedCanvas()
+        canvas = cropper.getCroppedCanvas()
       } else {
-        canvas = this.cropper.getCroppedCanvas({
+        canvas = cropper.getCroppedCanvas({
           width:  512,
           height: 512
         })
@@ -33,7 +39,7 @@ export default class CropperWrapper extends React.Component<Props> {
 
     return (
       <Cropper
-        ref={cropper => (this.cropper = cropper)}
+        ref={this.cropperRef}
         style={{ height: uploaderBodyHeight() }}
         className="photo-upload-dialog photo-active-item cropper"
         src={photo.preview}

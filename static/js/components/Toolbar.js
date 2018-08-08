@@ -18,8 +18,15 @@ export default class Toolbar extends React.Component<Props> {
   toolbarRoot: HTMLElement | null
   toolbar: Object
 
+  constructor(props: Props) {
+    super(props)
+    this.toolbarRef = React.createRef()
+  }
+
   componentDidMount() {
-    this.toolbar = new MDCToolbar(this.toolbarRoot)
+    if (this.toolbarRef.current) {
+      this.toolbar = new MDCToolbar(this.toolbarRef.current)
+    }
   }
 
   componentWillUnmount() {
@@ -39,7 +46,7 @@ export default class Toolbar extends React.Component<Props> {
 
     return (
       <div className="navbar">
-        <header className="mdc-toolbar" ref={div => (this.toolbarRoot = div)}>
+        <header className="mdc-toolbar" ref={this.toolbarRef}>
           <div className="mdc-toolbar__row">
             <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
               <a
