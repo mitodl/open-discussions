@@ -27,7 +27,6 @@ const _createSettings = () => ({
   support_email:      "support@fake.url",
   reactGaDebug:       true,
   gaTrackingID:       "fake",
-  gaChannelTrackers:  {},
   embedlyKey:         "fake"
 })
 

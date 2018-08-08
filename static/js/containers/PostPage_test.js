@@ -40,6 +40,7 @@ import { makeArticle, makeTweet } from "../factories/embedly"
 import * as utilFuncs from "../lib/util"
 import * as embedUtil from "../lib/embed"
 import { truncate } from "../lib/util"
+import { shouldIf } from "../lib/test_utils"
 
 describe("PostPage", function() {
   let helper,
@@ -117,6 +118,17 @@ describe("PostPage", function() {
       document.head.querySelector("[name=description]").content,
       truncate(post.text, 300)
     )
+  })
+
+  //
+  ;[["UA-FAKE-01", true], [null, false]].forEach(([trackingId, rendered]) => {
+    it(`${shouldIf(
+      rendered
+    )} include an instance of ChannelTracker`, async () => {
+      channel.ga_tracking_id = trackingId
+      const wrapper = await renderPage()
+      assert.equal(wrapper.find("ChannelTracker").exists(), rendered)
+    })
   })
 
   it("should fetch post, comments, channel, and render", async () => {

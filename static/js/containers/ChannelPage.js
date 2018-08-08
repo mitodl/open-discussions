@@ -33,6 +33,7 @@ import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
 import type { Channel, Post, PostListPagination } from "../flow/discussionTypes"
+import { ChannelTracker } from "../components/ChannelTracker"
 
 type ChannelPageProps = {
   match: Match,
@@ -139,6 +140,9 @@ class ChannelPage extends React.Component<ChannelPageProps> {
           <MetaTags>
             <title>{formatTitle(channel.title)}</title>
           </MetaTags>
+          {channel.ga_tracking_id ? (
+            <ChannelTracker channel={channel} location={location} />
+          ) : null}
           <div className="post-list-title">
             <div>{channel.title}</div>
             <PostSortPicker

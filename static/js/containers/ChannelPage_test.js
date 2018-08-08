@@ -24,6 +24,7 @@ import { VALID_POST_SORT_TYPES } from "../lib/sorting"
 import { makeReportRecord } from "../factories/reports"
 import { showDropdown } from "../actions/ui"
 import { getPostDropdownMenuKey } from "../lib/posts"
+import { shouldIf } from "../lib/test_utils"
 
 describe("ChannelPage", () => {
   let helper,
@@ -144,6 +145,17 @@ describe("ChannelPage", () => {
         `?sort=${sortType}`
       )
     }
+  })
+
+  //
+  ;[["UA-FAKE-01", true], [null, false]].forEach(([trackingId, rendered]) => {
+    it(`${shouldIf(
+      rendered
+    )} include an instance of ChannelTracker`, async () => {
+      currentChannel.ga_tracking_id = trackingId
+      const wrapper = await renderPage(currentChannel)
+      assert.equal(wrapper.find("ChannelTracker").exists(), rendered)
+    })
   })
 
   it("should fetch postsForChannel, set post data, and render", async () => {

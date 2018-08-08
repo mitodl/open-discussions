@@ -15,7 +15,6 @@ from django.urls import reverse
 from rest_framework_jwt.settings import api_settings
 from social_django.utils import load_strategy, load_backend
 
-from channels.models import Channel
 from open_discussions import features
 
 from open_discussions.templatetags.render_bundle import public_path
@@ -68,16 +67,12 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
 
     user_full_name = None
     user_email = None
-
     if user:
         user_full_name = user.profile.name
         user_email = user.email
 
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
-        "gaChannelTrackers": dict(
-            Channel.objects.filter(ga_tracking_id__isnull=False).values_list('name', 'ga_tracking_id')
-        ),
         "public_path": public_path(request),
         "max_comment_depth": settings.OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH,
         "username": username,
