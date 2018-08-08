@@ -83,6 +83,10 @@ describe("MembersList", () => {
         }render remove links when the channel is ${
           editable ? "" : "not "
         }editable`, () => {
+          members.forEach(member => {
+            member.can_remove = true
+          })
+
           const removeMember = sandbox.stub()
           const yourIndex = 1
           SETTINGS.username = usernameGetter(members[yourIndex])
@@ -104,6 +108,9 @@ describe("MembersList", () => {
       })
 
       it("shows a dialog box when the user clicks remove or leave", () => {
+        members.forEach(member => {
+          member.can_remove = true
+        })
         const setDialogVisibility = sandbox.stub()
         const setDialogData = sandbox.stub()
         const removeMember = sandbox.stub()

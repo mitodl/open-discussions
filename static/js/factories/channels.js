@@ -56,7 +56,7 @@ export const makeModerator = (
     ? {
       email:      casual.email,
       full_name:  casual.full_name,
-      can_remove: casual.coin_clip
+      can_remove: casual.coin_flip
     }
     : {})
 })
