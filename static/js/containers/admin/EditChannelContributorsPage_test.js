@@ -11,7 +11,7 @@ import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
 import { newMemberForm } from "../../lib/channels"
 import { formatTitle } from "../../lib/title"
-import { editChannelContributorsURL } from "../../lib/url"
+import { channelURL, editChannelContributorsURL } from "../../lib/url"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import { SET_DIALOG_DATA, SHOW_DIALOG } from "../../actions/ui"
 
@@ -20,6 +20,7 @@ describe("EditChannelContributorsPage", () => {
 
   beforeEach(() => {
     channel = makeChannel()
+    channel.user_is_moderator = true
     contributors = makeContributors()
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(channel))
@@ -47,7 +48,7 @@ describe("EditChannelContributorsPage", () => {
     helper.cleanup()
   })
 
-  const renderPage = async () => {
+  const renderPage = async (extraActions = []) => {
     const [wrapper] = await renderComponent(
       editChannelContributorsURL(channel.name),
       [
@@ -60,7 +61,8 @@ describe("EditChannelContributorsPage", () => {
         actions.profiles.get.requestType,
         actions.profiles.get.successType,
         SET_CHANNEL_DATA,
-        actions.forms.FORM_BEGIN_EDIT
+        actions.forms.FORM_BEGIN_EDIT,
+        ...extraActions
       ]
     )
     return wrapper.update()
@@ -91,6 +93,18 @@ describe("EditChannelContributorsPage", () => {
     )
     assert.deepEqual(props.channel, channel)
     assert.equal(props.memberTypeDescription, "contributor")
+  })
+
+  it("redirects if the user is not a moderator", async () => {
+    channel.user_is_moderator = false
+    await renderPage([
+      actions.channels.get.requestType,
+      actions.channels.get.successType,
+      actions.forms.FORM_END_EDIT
+    ])
+
+    const history = helper.browserHistory
+    assert.equal(history.location.pathname, channelURL(channel.name))
   })
 
   describe("editable", () => {

@@ -12,7 +12,7 @@ import { SET_CHANNEL_DATA } from "../../actions/channel"
 import { SHOW_DIALOG, SET_DIALOG_DATA } from "../../actions/ui"
 import { newMemberForm } from "../../lib/channels"
 import { formatTitle } from "../../lib/title"
-import { editChannelModeratorsURL } from "../../lib/url"
+import { editChannelModeratorsURL, channelURL } from "../../lib/url"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("EditChannelModeratorsPage", () => {
@@ -20,6 +20,7 @@ describe("EditChannelModeratorsPage", () => {
 
   beforeEach(() => {
     channel = makeChannel()
+    channel.user_is_moderator = true
     moderators = makeModerators()
     helper = new IntegrationTestHelper()
     helper.getChannelStub.returns(Promise.resolve(channel))
@@ -47,7 +48,7 @@ describe("EditChannelModeratorsPage", () => {
     helper.cleanup()
   })
 
-  const renderPage = async () => {
+  const renderPage = async (extraActions = []) => {
     const [wrapper] = await renderComponent(
       editChannelModeratorsURL(channel.name),
       [
@@ -60,7 +61,8 @@ describe("EditChannelModeratorsPage", () => {
         actions.profiles.get.requestType,
         actions.profiles.get.successType,
         SET_CHANNEL_DATA,
-        actions.forms.FORM_BEGIN_EDIT
+        actions.forms.FORM_BEGIN_EDIT,
+        ...extraActions
       ]
     )
     return wrapper.update()
@@ -91,6 +93,18 @@ describe("EditChannelModeratorsPage", () => {
     )
     assert.deepEqual(props.channel, channel)
     assert.equal(props.memberTypeDescription, "moderator")
+  })
+
+  it("redirects if the user is not a moderator", async () => {
+    channel.user_is_moderator = false
+    await renderPage([
+      actions.channels.get.requestType,
+      actions.channels.get.successType,
+      actions.forms.FORM_END_EDIT
+    ])
+
+    const history = helper.browserHistory
+    assert.equal(history.location.pathname, channelURL(channel.name))
   })
 
   describe("editable", () => {
@@ -191,41 +205,63 @@ describe("EditChannelModeratorsPage", () => {
         email
       )
     })
+    ;[true, false].forEach(isYou => {
+      it(`removes ${
+        isYou ? "yourself from being a moderator" : "a moderator"
+      }`, async () => {
+        const wrapper = await renderPage()
 
-    it("removes a moderator", async () => {
-      const wrapper = await renderPage()
+        helper.deleteChannelModeratorStub.returns(Promise.resolve())
 
-      helper.deleteChannelModeratorStub.returns(Promise.resolve())
+        const redirectActions = isYou
+          ? [
+            actions.channels.get.requestType,
+            actions.channels.get.successType,
+            actions.forms.FORM_END_EDIT
+          ]
+          : []
+        await listenForActions(
+          [
+            SHOW_DIALOG,
+            SET_DIALOG_DATA,
+            actions.channelModerators.delete.requestType,
+            actions.channelModerators.delete.successType,
+            ...redirectActions
+          ],
+          () => {
+            if (isYou) {
+              // this will be checked after the refresh
+              channel.user_is_moderator = false
+              helper.getChannelStub.returns(Promise.resolve(channel))
+            }
+            wrapper
+              .find(".remove")
+              .first()
+              .props()
+              .onClick({ preventDefault: helper.sandbox.stub() })
 
-      await listenForActions(
-        [
-          SHOW_DIALOG,
-          SET_DIALOG_DATA,
-          actions.channelModerators.delete.requestType,
-          actions.channelModerators.delete.successType
-        ],
-        () => {
-          wrapper
-            .find(".remove")
-            .first()
-            .props()
-            .onClick({ preventDefault: helper.sandbox.stub() })
+            wrapper.update()
+            wrapper
+              .find("#remove-member button.edit-button")
+              .props()
+              .onClick({
+                type: "MDCDialog:accept"
+              })
+          }
+        )
 
-          wrapper.update()
-          wrapper
-            .find("#remove-member button.edit-button")
-            .props()
-            .onClick({
-              type: "MDCDialog:accept"
-            })
-        }
-      )
-
-      sinon.assert.calledWith(
-        helper.deleteChannelModeratorStub,
-        channel.name,
-        moderators[0].moderator_name
-      )
+        sinon.assert.calledWith(
+          helper.deleteChannelModeratorStub,
+          channel.name,
+          moderators[0].moderator_name
+        )
+        assert.equal(
+          helper.browserHistory.location.pathname,
+          isYou
+            ? channelURL(channel.name)
+            : editChannelModeratorsURL(channel.name)
+        )
+      })
     })
   })
 })
