@@ -38,6 +38,11 @@ a.mitlogo {
     flex-grow: unset;
     padding-right: 0;
     align-items: center;
+
+    .login-link {
+      margin: 0 32px 0 0;
+      color: $font-grey;
+    }
   }
 }
 

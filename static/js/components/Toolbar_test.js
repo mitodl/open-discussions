@@ -8,6 +8,7 @@ import { shallow } from "enzyme"
 import Toolbar from "./Toolbar"
 
 import { makeProfile } from "../factories/profiles"
+import { shouldIf } from "../lib/test_utils"
 
 describe("Toolbar", () => {
   let toggleShowDrawerStub, sandbox
@@ -56,4 +57,22 @@ describe("Toolbar", () => {
       )
     })
   })
+
+  //
+  ;[[true, "enabled"], [false, "disabled"]].forEach(
+    ([isEmailEnabled, desc]) => {
+      it(`${shouldIf(
+        isEmailEnabled
+      )} display login button if allow_email_auth is ${desc}`, () => {
+        SETTINGS.username = null
+        SETTINGS.allow_email_auth = isEmailEnabled
+        assert.equal(
+          renderToolbar()
+            .find("Link")
+            .exists(),
+          isEmailEnabled
+        )
+      })
+    }
+  )
 })
