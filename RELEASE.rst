@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.40.0
+Version 0.40.0 (Released August 08, 2018)
 --------------
 
 - Fixed indent in PR template
