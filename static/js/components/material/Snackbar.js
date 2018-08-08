@@ -12,10 +12,17 @@ type Props = {
 
 export default class Snackbar extends React.Component<Props> {
   snackbar = null
-  snackbarRoot = null
+  snackbarRef = null
+
+  constructor(props: Props) {
+    super(props)
+    this.snackbarRef = React.createRef()
+  }
 
   componentDidMount() {
-    this.snackbar = new MDCSnackbar(this.snackbarRoot)
+    if (this.snackbarRef.current) {
+      this.snackbar = new MDCSnackbar(this.snackbarRef.current)
+    }
   }
 
   // see here: https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops
@@ -41,7 +48,7 @@ export default class Snackbar extends React.Component<Props> {
           aria-live="assertive"
           aria-atomic="true"
           aria-hidden="true"
-          ref={node => (this.snackbarRoot = node)}
+          ref={this.snackbarRef}
         >
           <div className="mdc-snackbar__text" />
           <div className="mdc-snackbar__action-wrapper">
