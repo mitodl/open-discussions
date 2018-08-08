@@ -169,13 +169,16 @@ describe("ProfileImage", () => {
         await wait(0)
         image.update()
         assert.equal(image.find(".validation-message").length, 0)
-        assert.deepEqual(helper.store.getState().forms["image:upload:profile"], {
-          errors: {},
-          value:  {
-            edit:  null,
-            image: validFile
+        assert.deepEqual(
+          helper.store.getState().forms["image:upload:profile"],
+          {
+            errors: {},
+            value:  {
+              edit:  null,
+              image: validFile
+            }
           }
-        })
+        )
       })
 
       it("should show a validation message if the drag and drop fails", async () => {
@@ -224,13 +227,16 @@ describe("ProfileImage", () => {
           .find("CropperWrapper")
           .props()
           .updatePhotoEdit(updatedBlob)
-        assert.deepEqual(helper.store.getState().forms["image:upload:profile"], {
-          errors: {},
-          value:  {
-            edit:  updatedBlob,
-            image: file
+        assert.deepEqual(
+          helper.store.getState().forms["image:upload:profile"],
+          {
+            errors: {},
+            value:  {
+              edit:  updatedBlob,
+              image: file
+            }
           }
-        })
+        )
       })
 
       it("clears the form when the cancel button is clicked", async () => {

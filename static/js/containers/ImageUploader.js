@@ -56,34 +56,32 @@ class ImageUploader extends React.Component<ImageProps> {
     } = this.props
 
     return (
-      <React.Fragment>
-        <span>
-          {renderForm({
-            setDialogVisibility: this.setDialogVisibility,
-            dialogOpen:          dialogOpen,
-            formBeginEdit:       formBeginEdit,
-            formEndEdit:         formEndEdit,
-            formValidate:        formValidate,
-            description:         description
-          })}
-          <button
-            className="open-photo-dialog"
-            onClick={() => {
-              this.setDialogVisibility(true)
-            }}
-          >
-            {isAdd ? (
-              <i name="camera_alt" className="material-icons add">
-                add
-              </i>
-            ) : (
-              <i name="camera_alt" className="material-icons edit">
-                edit
-              </i>
-            )}
-          </button>
-        </span>
-      </React.Fragment>
+      <span>
+        {renderForm({
+          setDialogVisibility: this.setDialogVisibility,
+          dialogOpen:          dialogOpen,
+          formBeginEdit:       formBeginEdit,
+          formEndEdit:         formEndEdit,
+          formValidate:        formValidate,
+          description:         description
+        })}
+        <button
+          className="open-photo-dialog"
+          onClick={() => {
+            this.setDialogVisibility(true)
+          }}
+        >
+          {isAdd ? (
+            <i name="camera_alt" className="material-icons add">
+              add
+            </i>
+          ) : (
+            <i name="camera_alt" className="material-icons edit">
+              edit
+            </i>
+          )}
+        </button>
+      </span>
     )
   }
 }

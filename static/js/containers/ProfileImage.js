@@ -68,33 +68,29 @@ class ProfileImage extends React.Component<Props> {
 
     const isAdd = imageUrl === defaultProfileImageUrl
     return (
-      <React.Fragment>
-        <div className="profile-image-container">
-          <div className="avatar">
-            <img
-              src={imageUrl}
-              alt={`Profile image for ${profileName}`}
-              className={`profile-image ${imageSize}`}
+      <div className="profile-image-container">
+        <div className="avatar">
+          <img
+            src={imageUrl}
+            alt={`Profile image for ${profileName}`}
+            className={`profile-image ${imageSize}`}
+          />
+          {editable ? (
+            <ImageUploader
+              name="profile"
+              onUpdate={this.submitImage}
+              isAdd={isAdd}
+              description="Profile Image"
             />
-            {editable ? (
-              <ImageUploader
-                name="profile"
-                onUpdate={this.submitImage}
-                isAdd={isAdd}
-                description="Profile Image"
-              />
-            ) : null}
-          </div>
+          ) : null}
         </div>
-      </React.Fragment>
+      </div>
     )
   }
 }
 
-const mapStateToProps = () => ({})
-
 export default connect(
-  mapStateToProps,
+  null,
   {
     submitImage: actions.profileImage.patch,
     getProfile:  actions.profiles.get
