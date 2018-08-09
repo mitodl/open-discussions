@@ -29,31 +29,47 @@ import ExternalLogins from "../../components/ExternalLogins"
 
 type LoginPageProps = {
   history: Object,
-  formError: ?string
+  formError: ?string,
+  clearEndpointState: Function
 } & WithFormProps<EmailForm>
 
-export const LoginPage = ({ renderForm, formError }: LoginPageProps) => (
-  <div className="content auth-page login-page">
-    <div className="main-content">
-      <Card className="login-card">
-        <h3>Log In</h3>
-        <MetaTags>
-          <title>{formatTitle("Log In")}</title>
-        </MetaTags>
-        {renderForm({ formError })}
-        <ExternalLogins />
-        <div className="alternate-auth-link">
-          Not a member? <Link to={REGISTER_URL}>Sign up &gt;</Link>
+export class LoginPage extends React.Component<LoginPageProps> {
+  componentWillUnmount() {
+    const { formError, clearEndpointState } = this.props
+    if (formError) {
+      clearEndpointState()
+    }
+  }
+
+  render() {
+    const { renderForm, formError } = this.props
+
+    return (
+      <div className="content auth-page login-page">
+        <div className="main-content">
+          <Card className="login-card">
+            <h3>Login</h3>
+            <MetaTags>
+              <title>{formatTitle("Login")}</title>
+            </MetaTags>
+            {renderForm({ formError })}
+            <ExternalLogins />
+            <div className="alternate-auth-link">
+              Not a member? <Link to={REGISTER_URL}>Sign up</Link>
+            </div>
+          </Card>
         </div>
-      </Card>
-    </div>
-  </div>
-)
+      </div>
+    )
+  }
+}
 
 const newEmailForm = () => ({ email: "" })
 
 const onSubmit = ({ email }: EmailForm) =>
   actions.auth.loginEmail(FLOW_LOGIN, email)
+
+const clearEndpointState = actions.auth.clear
 
 const onSubmitResult = R.curry(processAuthResponse)
 
@@ -85,6 +101,7 @@ export default R.compose(
     mapStateToProps,
     {
       onSubmit,
+      clearEndpointState,
       ...actionCreators
     },
     mergeProps

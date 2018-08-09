@@ -2,12 +2,14 @@
 /* global SETTINGS:false */
 import { assert } from "chai"
 import sinon from "sinon"
+import R from "ramda"
 
 import { actions } from "../../actions"
+import { SET_BANNER_MESSAGE } from "../../actions/ui"
 import { FLOW_REGISTER, STATE_REGISTER_CONFIRM_SENT } from "../../reducers/auth"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import ConnectedRegisterPage, { RegisterPage, FORM_KEY } from "./RegisterPage"
-import { LOGIN_URL } from "../../lib/url"
+import { FRONTPAGE_URL, LOGIN_URL } from "../../lib/url"
 
 const email = "test@example.com"
 
@@ -81,22 +83,6 @@ describe("RegisterPage", () => {
     assert.ok(link.exists())
   })
 
-  it("should show a different header if tried to login", async () => {
-    const { inner } = await renderPage({
-      auth: {
-        data: {
-          partial_token: "abc",
-          email
-        }
-      }
-    })
-
-    assert.equal(
-      inner.find("h3").text(),
-      `We could not find an account with the email: ${email}`
-    )
-  })
-
   it("form onSubmit prop calls api correctly", async () => {
     const { inner, store } = await renderPage()
 
@@ -119,33 +105,22 @@ describe("RegisterPage", () => {
     )
   })
 
-  it("form onSubmitContinue prop calls api correctly", async () => {
-    const { inner, store } = await renderPage({
-      auth: {
-        data: {
-          partial_token: "abc",
-          email
-        }
-      }
+  it("form onSubmitResult prop redirects and sets a banner message", async () => {
+    const { wrapper, store } = await renderPage()
+
+    const { onSubmitResult } = wrapper.props()
+
+    onSubmitResult({
+      state:  STATE_REGISTER_CONFIRM_SENT,
+      flow:   "register",
+      email:  email,
+      errors: []
     })
 
-    inner.find("form").simulate("submit", {
-      preventDefault: helper.sandbox.stub()
-    })
-
+    const historyEntries = helper.browserHistory.entries
+    assert.equal(historyEntries.length, 2)
+    assert.equal(R.last(historyEntries).pathname, FRONTPAGE_URL)
     const dispatchedActions = store.getActions()
-
-    assert.lengthOf(dispatchedActions, 2)
-    assert.equal(
-      dispatchedActions[1].type,
-      actions.auth.registerEmail.requestType
-    )
-    sinon.assert.calledOnce(helper.postEmailRegisterStub)
-    sinon.assert.calledWith(
-      helper.postEmailRegisterStub,
-      FLOW_REGISTER,
-      "test@example.com",
-      "abc"
-    )
+    assert.equal(R.last(dispatchedActions).type, SET_BANNER_MESSAGE)
   })
 })

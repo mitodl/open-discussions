@@ -154,11 +154,11 @@ def login_email_not_exists(client):
                 'email': NEW_EMAIL,
             },
             {
-                'errors': [],
+                'errors': ["Couldn't find your MIT OPEN Account"],
                 'flow': SocialAuthState.FLOW_LOGIN,
                 'provider': EmailAuth.name,
-                'partial_token': any_instance_of(str),
-                'state': SocialAuthState.STATE_REGISTER_EMAIL,
+                'partial_token': None,
+                'state': SocialAuthState.STATE_ERROR,
             }
         )
         assert User.objects.filter(email=NEW_EMAIL).exists() is False
@@ -277,32 +277,6 @@ def login_password_invalid(client, user):
 
 
 @pytest.fixture()
-def register_continue_from_login(client, mock_email_send):
-    """Yield a function for this step"""
-    def run_step(last_result):
-        """Run the step"""
-        result = assert_api_call(
-            client,
-            'psa-register-email',
-            {
-                'flow': SocialAuthState.FLOW_REGISTER,
-                'partial_token': last_result['partial_token'],
-            },
-            {
-                'errors': [],
-                'flow': SocialAuthState.FLOW_REGISTER,
-                'provider': EmailAuth.name,
-                'partial_token': None,
-                'state': SocialAuthState.STATE_REGISTER_CONFIRM_SENT,
-            }
-        )
-        mock_email_send.assert_called_once()
-        assert User.objects.filter(email=NEW_EMAIL).exists() is False
-        return result
-    yield run_step
-
-
-@pytest.fixture()
 def redeem_confirmation_code(client, mock_email_send):
     """Yield a function for this step"""
     def run_step(last_result):  # pylint: disable=unused-argument
@@ -370,9 +344,6 @@ def register_profile_details(client):
     ],
     [
         'login_email_not_exists',
-        'register_continue_from_login',
-        'redeem_confirmation_code',
-        'register_profile_details',
     ],
     [
         'register_email_exists',
