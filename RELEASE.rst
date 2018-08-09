@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.40.1
+--------------
+
+- Improvements to moderator/contributor UI (#1024)
+- Added redirect to MM on login
+- Added redirect for new JWT tokens to /complete/provider
+
 Version 0.40.0 (Released August 08, 2018)
 --------------
 
