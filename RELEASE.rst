@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.40.1
+Version 0.40.1 (Released August 09, 2018)
 --------------
 
 - Improvements to moderator/contributor UI (#1024)
