@@ -31,7 +31,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         return image_uri(obj, IMAGE_MEDIUM)
 
     def get_profile_image_small(self, obj):
-        """ Custom getter for medium profile image """
+        """ Custom getter for small profile image """
         return image_uri(obj, IMAGE_SMALL)
 
     def update(self, instance, validated_data):

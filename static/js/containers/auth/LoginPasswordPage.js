@@ -18,9 +18,11 @@ import { mergeAndInjectProps } from "../../lib/redux_props"
 import {
   getAuthPartialTokenSelector,
   getAuthFlowSelector,
-  isLoginFlow,
+  getAuthEmailSelector,
   isProcessing,
-  getFormErrorSelector
+  getFormErrorSelector,
+  getAuthNameSelector,
+  getAuthProfileImageSelector
 } from "../../reducers/auth"
 
 import type { PasswordForm, AuthFlow } from "../../flow/authTypes"
@@ -30,8 +32,10 @@ type Props = {
   history: Object,
   partialToken: string,
   authFlow: AuthFlow,
-  isLoginFlow: boolean,
-  formError: ?string
+  formError: ?string,
+  email: string,
+  name: ?string,
+  profileImageUrl: ?string
 } & WithFormProps<PasswordForm>
 
 export class LoginPasswordPage extends React.Component<Props> {
@@ -43,19 +47,27 @@ export class LoginPasswordPage extends React.Component<Props> {
   }
 
   render() {
-    const { renderForm, isLoginFlow, formError } = this.props
+    const { renderForm, formError, email, name, profileImageUrl } = this.props
     return (
       <div className="content auth-page login-password-page">
         <div className="main-content">
           <Card className="login-card">
-            <h3>
-              {isLoginFlow
-                ? "Welcome Back!"
-                : "There is already an account with this email"}
-            </h3>
+            <h3>{name && profileImageUrl ? `Hi ${name}` : "Welcome Back!"}</h3>
             <MetaTags>
               <title>{formatTitle("Log In")}</title>
             </MetaTags>
+            {name && profileImageUrl ? (
+              <div className="form-header">
+                <div className="row profile-image-email">
+                  <img
+                    src={profileImageUrl}
+                    alt={`Profile image for ${name}`}
+                    className="profile-image small"
+                  />
+                  <span>{email}</span>
+                </div>
+              </div>
+            ) : null}
             {renderForm({ formError })}
           </Card>
         </div>
@@ -90,6 +102,9 @@ const mapStateToProps = state => {
   const authFlow = getAuthFlowSelector(state)
   const partialToken = getAuthPartialTokenSelector(state)
   const formError = getFormErrorSelector(state)
+  const email = getAuthEmailSelector(state)
+  const name = getAuthNameSelector(state)
+  const profileImageUrl = getAuthProfileImageSelector(state)
   return {
     form,
     partialToken,
@@ -98,7 +113,9 @@ const mapStateToProps = state => {
     onSubmitResult,
     validateForm,
     formError,
-    isLoginFlow: isLoginFlow(state)
+    email,
+    name,
+    profileImageUrl
   }
 }
 

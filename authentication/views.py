@@ -22,6 +22,7 @@ from djoser.utils import ActionViewMixin
 from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
 
 from open_discussions import features
+from open_discussions.utils import filter_dict_keys
 from authentication.serializers import (
     LoginEmailSerializer,
     LoginPasswordSerializer,
@@ -29,8 +30,9 @@ from authentication.serializers import (
     RegisterConfirmSerializer,
     RegisterDetailsSerializer,
 )
-from authentication.utils import load_drf_strategy
+from authentication.utils import load_drf_strategy, SocialAuthState
 from mail.api import render_email_templates, send_messages
+from profiles.serializers import ProfileSerializer
 
 User = get_user_model()
 
@@ -69,6 +71,30 @@ class LoginEmailView(SocialAuthAPIView):
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return LoginEmailSerializer
+
+    def post(self, request):
+        resp = super().post(request)
+        if (
+                status.is_success(resp.status_code) and
+                resp.data['state'] == SocialAuthState.STATE_LOGIN_PASSWORD
+        ):
+            # We show some extra information to the user if they enter a recognized
+            # email into the login form. Before returning the response, use the email
+            # to fetch that information and add it to the response data.
+            email_auth = (
+                UserSocialAuth.objects
+                .filter(uid=request.data['email'], provider=EmailAuth.name)
+                .select_related('user__profile')
+                .first()
+            )
+            profile_data = ProfileSerializer(email_auth.user.profile).data
+            resp.data['extra_data'] = filter_dict_keys(
+                profile_data, [
+                    'profile_image_small',
+                    'name'
+                ]
+            )
+        return resp
 
 
 class LoginPasswordView(SocialAuthAPIView):
