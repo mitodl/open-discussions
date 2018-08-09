@@ -1,5 +1,6 @@
 // @flow
 /* global SETTINGS:false */
+import R from "ramda"
 import { assert } from "chai"
 import sinon from "sinon"
 
@@ -58,6 +59,20 @@ describe("LoginPage", () => {
     const form = inner.find("AuthEmailForm")
     assert.ok(form.exists())
     assert.equal(form.props().formError, "error")
+  })
+
+  it("should clear the auth endpoint state when unmounting if form errors exist", async () => {
+    const { inner, store } = await renderPage({
+      auth: {
+        data: {
+          errors: ["error"]
+        }
+      }
+    })
+    inner.unmount()
+
+    const dispatchedActions = store.getActions()
+    assert.equal(R.last(dispatchedActions).type, actions.auth.clearType)
   })
 
   it("should render an ExternalLogins component", async () => {

@@ -7,78 +7,44 @@ import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
 
 import Card from "../../components/Card"
+import ExternalLogins from "../../components/ExternalLogins"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
 import withForm from "../../hoc/withForm"
 
 import { actions } from "../../actions"
 import { setBannerMessage } from "../../actions/ui"
-import { processAuthResponse } from "../../lib/auth"
-import { configureForm } from "../../lib/forms"
-import { formatTitle } from "../../lib/title"
-import { preventDefaultAndInvoke } from "../../lib/util"
-import { LOGIN_URL } from "../../lib/url"
-import { validateEmailForm as validateForm } from "../../lib/validation"
-import { mergeAndInjectProps } from "../../lib/redux_props"
 import {
   FLOW_REGISTER,
   STATE_REGISTER_CONFIRM_SENT,
-  getAuthEmailSelector,
-  getAuthPartialTokenSelector,
-  isProcessing,
   getFormErrorSelector
 } from "../../reducers/auth"
+import { processAuthResponse } from "../../lib/auth"
+import { configureForm } from "../../lib/forms"
+import { formatTitle } from "../../lib/title"
+import { LOGIN_URL } from "../../lib/url"
+import { validateEmailForm as validateForm } from "../../lib/validation"
+import { mergeAndInjectProps } from "../../lib/redux_props"
 
 import type { EmailForm, AuthResponse } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
-import ExternalLogins from "../../components/ExternalLogins"
 
 type RegisterPageProps = {
   history: Object,
-  email: ?string,
-  partialToken: ?string,
-  onSubmitContinue: Function,
   formError: ?string
 } & WithFormProps<EmailForm>
 
-export const RegisterPage = ({
-  renderForm,
-  partialToken,
-  email,
-  onSubmitResult,
-  onSubmitContinue,
-  processing,
-  formError
-}: RegisterPageProps) => (
+export const RegisterPage = ({ renderForm, formError }: RegisterPageProps) => (
   <div className="content auth-page register-page">
     <div className="main-content">
       <Card className="register-card">
-        <h3>
-          {partialToken && email
-            ? `We could not find an account with the email: ${email}`
-            : "Join MIT OPEN for free"}
-        </h3>
+        <h3>Join MIT OPEN for free</h3>
         <MetaTags>
           <title>{formatTitle("Register")}</title>
         </MetaTags>
-        {partialToken && email ? (
-          <form
-            onSubmit={preventDefaultAndInvoke(() =>
-              onSubmitContinue(email, partialToken).then(onSubmitResult)
-            )}
-            className="form"
-          >
-            <div className="actions row">
-              <button type="submit" disabled={processing}>
-                Make an account with the email above
-              </button>
-            </div>
-          </form>
-        ) : (
-          renderForm({ formError })
-        )}
+        {renderForm({ formError })}
         <ExternalLogins />
         <div className="alternate-auth-link">
-          Already have an account? <Link to={LOGIN_URL}>Log in &gt;</Link>
+          Already have an account? <Link to={LOGIN_URL}>Log in</Link>
         </div>
       </Card>
     </div>
@@ -93,28 +59,9 @@ const { getForm, actionCreators } = configureForm(FORM_KEY, newEmailForm)
 const onSubmit = (form: EmailForm) =>
   actions.auth.registerEmail(FLOW_REGISTER, form.email)
 
-const onSubmitContinue = (email: string, partialToken: string) =>
-  actions.auth.registerEmail(FLOW_REGISTER, email, partialToken)
-
-const mapStateToProps = state => {
-  const form = getForm(state)
-  const processing = isProcessing(state)
-  const email = getAuthEmailSelector(state)
-  const partialToken = getAuthPartialTokenSelector(state)
-  const formError = getFormErrorSelector(state)
-
-  return {
-    form,
-    processing,
-    validateForm,
-    email,
-    partialToken,
-    formError
-  }
-}
-
 const mergeProps = mergeAndInjectProps(
   (stateProps, { setBannerMessage }, { history }) => ({
+    // Used by withForm()
     onSubmitResult: (response: AuthResponse) => {
       processAuthResponse(history, response)
       if (response.state === STATE_REGISTER_CONFIRM_SENT && response.email) {
@@ -128,13 +75,23 @@ const mergeProps = mergeAndInjectProps(
   })
 )
 
+const mapStateToProps = state => {
+  const form = getForm(state)
+  const formError = getFormErrorSelector(state)
+
+  return {
+    form,
+    validateForm,
+    formError
+  }
+}
+
 export default R.compose(
   connect(
     mapStateToProps,
     {
       setBannerMessage,
       onSubmit,
-      onSubmitContinue,
       ...actionCreators
     },
     mergeProps

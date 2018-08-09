@@ -32,7 +32,7 @@ class SocialAuthSerializer(serializers.Serializer):
     partial_token = serializers.CharField(source='partial.token', default=None)
     flow = serializers.ChoiceField(choices=(
         (SocialAuthState.FLOW_LOGIN, "Login"),
-        (SocialAuthState.FLOW_REGISTER, "Reigster"),
+        (SocialAuthState.FLOW_REGISTER, "Register"),
     ))
     provider = serializers.CharField(read_only=True)
     state = serializers.CharField(read_only=True)
@@ -130,12 +130,12 @@ class LoginEmailSerializer(SocialAuthSerializer):
         """Try to 'save' the request"""
         try:
             result = super()._authenticate(SocialAuthState.FLOW_LOGIN)
-        except RequireRegistrationException as exc:
-            # tried to login to a nonexistent account, so needs to register
-            result = SocialAuthState(SocialAuthState.STATE_REGISTER_EMAIL, partial=exc.partial)
+        except RequireRegistrationException:
+            result = SocialAuthState(SocialAuthState.STATE_ERROR, errors=[
+                "Couldn't find your MIT OPEN Account"
+            ])
         except RequirePasswordException as exc:
             result = SocialAuthState(SocialAuthState.STATE_LOGIN_PASSWORD, partial=exc.partial)
-
         return result
 
 
