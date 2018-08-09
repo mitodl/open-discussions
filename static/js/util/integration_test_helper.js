@@ -124,7 +124,16 @@ export default class IntegrationTestHelper {
       // dive through layers of HOCs until we reach the desired inner component
       let inner = wrapper
       while (!inner.is(InnerComponent)) {
+        // determine the type before we dive
+        const cls = inner.type()
+
+        // shallow render this component
         inner = await inner.dive()
+
+        // if it defines WrappedComponent, find() that so we skip over any intermediaries
+        if (cls && cls.hasOwnProperty("WrappedComponent")) {
+          inner = inner.find(cls.WrappedComponent)
+        }
       }
       // one more time to shallow render the InnerComponent
       inner = await inner.dive()

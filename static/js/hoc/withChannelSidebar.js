@@ -8,6 +8,8 @@ import Sidebar from "../components/Sidebar"
 const withChannelSidebar = R.curry(
   (className: string, WrappedComponent: Class<React.Component<*, *>>) => {
     class WithChannelSidebar extends React.Component<*, *> {
+      static WrappedComponent: Class<React.Component<*, *>>
+
       render() {
         return (
           <div className={`main-content two-column ${className}`}>
@@ -19,6 +21,9 @@ const withChannelSidebar = R.curry(
         )
       }
     }
+
+    WithChannelSidebar.WrappedComponent = WrappedComponent
+
     return WithChannelSidebar
   }
 )

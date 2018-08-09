@@ -12,6 +12,8 @@ const withForm = <T>(FormComponent: FormComponentCls<T>) => (
   WrappedComponent: WrappedComponentCls<T>
 ) => {
   class withForm extends React.Component<WithFormProps<T>> {
+    static WrappedComponent: WrappedComponentCls<T>
+
     componentDidMount() {
       const { formBeginEdit } = this.props
       formBeginEdit()
@@ -90,6 +92,9 @@ const withForm = <T>(FormComponent: FormComponentCls<T>) => (
       return <WrappedComponent {...this.props} renderForm={renderForm} />
     }
   }
+
+  withForm.WrappedComponent = WrappedComponent
+
   return withForm
 }
 

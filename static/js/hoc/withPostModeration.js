@@ -36,6 +36,8 @@ export const withPostModeration = (
   WrappedComponent: Class<React.Component<*, *>>
 ) => {
   class WithPostModeration extends React.Component<*, *> {
+    static WrappedComponent: Class<React.Component<*, *>>
+
     openRemovePostDialog = (post: Post) => {
       const { dispatch } = this.props
 
@@ -187,6 +189,9 @@ export const withPostModeration = (
       )
     }
   }
+
+  WithPostModeration.WrappedComponent = WrappedComponent
+
   return WithPostModeration
 }
 

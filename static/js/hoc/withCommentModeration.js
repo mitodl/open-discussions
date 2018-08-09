@@ -20,6 +20,8 @@ export const withCommentModeration = (
   WrappedComponent: Class<React.Component<*, *>>
 ) => {
   class WithCommentModeration extends React.Component<*, *> {
+    static WrappedComponent: Class<React.Component<*, *>>
+
     openCommentDialog = (comment: CommentInTree) => {
       const { dispatch } = this.props
       dispatch(setFocusedComment(comment))
@@ -111,6 +113,9 @@ export const withCommentModeration = (
       )
     }
   }
+
+  WithCommentModeration.WrappedComponent = WrappedComponent
+
   return WithCommentModeration
 }
 
