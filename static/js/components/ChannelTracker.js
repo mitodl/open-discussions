@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 import ReactGA from "react-ga"
-
+import type { Location } from "react-router"
 import type { Channel } from "../flow/discussionTypes"
 
 type ChannelTrackerProps = {
