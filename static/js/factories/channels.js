@@ -34,7 +34,8 @@ export const makeChannelList = (numChannels: number = 20) => {
 }
 
 export const makeContributor = (username: ?string = null): Contributor => ({
-  contributor_name: username || casual.word,
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  contributor_name: username || `${casual.word}_${incr.next().value}`,
   email:            casual.email,
   full_name:        casual.full_name
 })
@@ -51,7 +52,8 @@ export const makeModerator = (
   username: ?string = null,
   isModerator: ?boolean
 ): Moderator => ({
-  moderator_name: username || casual.word,
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  moderator_name: username || `${casual.word}_${incr.next().value}`,
   ...(isModerator
     ? {
       email:      casual.email,
