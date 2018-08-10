@@ -81,7 +81,7 @@ describe("CompactPostDisplay", () => {
         const wrapper = renderPostDisplay({ post })
         const headlineSpan = wrapper.find(".author-headline")
         assert.equal(headlineSpan.exists(), expElementExists)
-        if (expElementExists) {
+        if (expElementExists && headlineText) {
           assert(headlineSpan.text().includes(headlineText))
         }
       })
