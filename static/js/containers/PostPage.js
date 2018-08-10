@@ -371,8 +371,7 @@ class PostPage extends React.Component<PostPageProps> {
       embedly,
       reportPost,
       postDropdownMenuOpen,
-      postShareMenuOpen,
-      location
+      postShareMenuOpen
     } = this.props
 
     if (!channel) {
