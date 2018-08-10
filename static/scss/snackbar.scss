@@ -1,0 +1,26 @@
+.mdc-snackbar {
+  z-index: 10;
+  background-color: $message-component-bg-color;
+  left: 50%;
+  border-radius: $std-border-radius;
+
+  @include breakpoint(materialmobile) {
+    left: 0;
+  }
+
+  &.mdc-snackbar--active {
+    bottom: 10px;
+  }
+
+  .mdc-snackbar__text {
+    margin: 5px 0;
+    padding: 0;
+    min-width: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+}
+
+.persistent-drawer-open ~ .mdc-snackbar {
+  left: calc(50% + (#{$drawer-width}/ 2));
+}

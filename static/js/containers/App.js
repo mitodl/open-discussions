@@ -153,7 +153,6 @@ class App extends React.Component<AppProps> {
         <MetaTags>
           <title>MIT Open Discussions</title>
         </MetaTags>
-        <Snackbar snackbar={snackbar} />
         <Toolbar
           toggleShowDrawer={this.toggleShowDrawer}
           toggleShowUserMenu={this.toggleShowUserMenu}
@@ -161,6 +160,7 @@ class App extends React.Component<AppProps> {
           profile={profile}
         />
         <Drawer />
+        <Snackbar snackbar={snackbar} />
         <Banner
           banner={banner}
           hide={preventDefaultAndInvoke(this.hideBanner)}
