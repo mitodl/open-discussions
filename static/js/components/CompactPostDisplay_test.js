@@ -16,6 +16,7 @@ import { PostTitleAndHostname, getPostDropdownMenuKey } from "../lib/posts"
 import { makePost } from "../factories/posts"
 import { showDropdown } from "../actions/ui"
 import * as utilFuncs from "../lib/util"
+import { shouldIf } from "../lib/test_utils"
 
 describe("CompactPostDisplay", () => {
   let helper, post, openMenu
@@ -70,19 +71,22 @@ describe("CompactPostDisplay", () => {
     assert(authoredBy.startsWith(post.author_name))
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
   })
-
-  it("should not display headline span if author headline is null", () => {
-    post.author_headline = null
-    const wrapper = renderPostDisplay({ post })
-    assert.isNotOk(wrapper.find(".author-headline").exists())
-  })
-
-  it("should display headline span with correct text", () => {
-    post.author_headline = "My headline"
-    const wrapper = renderPostDisplay({ post })
-    const headlineSpan = wrapper.find(".author-headline")
-    assert(headlineSpan.text().includes("My headline"))
-  })
+  //
+  ;[["My headline", true], [null, false]].forEach(
+    ([headlineText, expElementExists]) => {
+      it(`${shouldIf(
+        expElementExists
+      )} display headline span when text=${String(headlineText)}`, () => {
+        post.author_headline = headlineText
+        const wrapper = renderPostDisplay({ post })
+        const headlineSpan = wrapper.find(".author-headline")
+        assert.equal(headlineSpan.exists(), expElementExists)
+        if (expElementExists) {
+          assert(headlineSpan.text().includes(headlineText))
+        }
+      })
+    }
+  )
 
   it("should link to the author's profile", () => {
     const link = renderPostDisplay({ post })
