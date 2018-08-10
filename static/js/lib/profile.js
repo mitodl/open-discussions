@@ -1,7 +1,7 @@
 // @flow
 import R from "ramda"
 
-import type { Profile, ProfileImageForm } from "../flow/discussionTypes"
+import type { Profile, ImageForm } from "../flow/discussionTypes"
 
 export const initials = R.pipe(
   R.split(/\s+/),
@@ -22,7 +22,7 @@ export const makeProfile = (props: Object): Profile => ({
   ...props
 })
 
-export const newProfileImageForm = (): ProfileImageForm => ({
+export const newImageForm = (): ImageForm => ({
   edit:  null,
   image: null
 })
