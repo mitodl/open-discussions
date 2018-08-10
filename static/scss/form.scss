@@ -39,7 +39,7 @@ input[type="password"] {
   width: 100%;
   padding: 10px 10px;
   font-size: 15px;
-  border-radius: 3px;
+  border-radius: $std-border-radius;
   border: 1px solid #b7b7b7;
   transition: width 0.4s ease-in-out;
   box-sizing: border-box;
@@ -55,7 +55,7 @@ textarea {
   height: 110px;
   padding: 12px 10px;
   box-sizing: border-box;
-  border-radius: 3px;
+  border-radius: $std-border-radius;
   border: 1px solid #b7b7b7;
   background-color: #fff;
   resize: auto;
@@ -126,7 +126,7 @@ select {
   border: 1px solid #bbb;
   font-size: 15px;
   color: rgba(0, 0, 0, 0.87);
-  border-radius: 3px;
+  border-radius: $std-border-radius;
   height: 39px;
   padding: 8px 20px; /* If you add too much padding here, the options won't show in IE */
   width: 100%;

@@ -35,18 +35,16 @@ export default class Snackbar extends React.Component<Props> {
 
   render() {
     return (
-      <div>
-        <div
-          className="mdc-snackbar"
-          aria-live="assertive"
-          aria-atomic="true"
-          aria-hidden="true"
-          ref={node => (this.snackbarRoot = node)}
-        >
-          <div className="mdc-snackbar__text" />
-          <div className="mdc-snackbar__action-wrapper">
-            <button type="button" className="mdc-snackbar__action-button" />
-          </div>
+      <div
+        className="mdc-snackbar"
+        aria-live="assertive"
+        aria-atomic="true"
+        aria-hidden="true"
+        ref={node => (this.snackbarRoot = node)}
+      >
+        <div className="mdc-snackbar__text" />
+        <div className="mdc-snackbar__action-wrapper">
+          <button type="button" className="mdc-snackbar__action-button" />
         </div>
       </div>
     )
