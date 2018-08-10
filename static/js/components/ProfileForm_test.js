@@ -129,4 +129,13 @@ describe("ProfileForm", () => {
     submitBtn.simulate("click")
     assert.isNotOk(onSubmitStub.called)
   })
+
+  it("renders an empty form", () => {
+    ["name", "bio", "headline"].forEach(field => {
+      // $FlowFixMe
+      profile[field] = null
+      const wrapper = renderForm()
+      assert.equal(wrapper.find(`[name="${field}"]`).props().value, "")
+    })
+  })
 })

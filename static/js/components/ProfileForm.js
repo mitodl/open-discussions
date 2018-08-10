@@ -54,7 +54,7 @@ export default class ProfileForm extends React.Component<Props> {
                 <label>Full Name</label>
                 <input
                   type="text"
-                  value={form.name}
+                  value={form.name || ""}
                   placeholder="Your name"
                   className="name"
                   name="name"
@@ -69,7 +69,7 @@ export default class ProfileForm extends React.Component<Props> {
             <input
               type="text"
               name="headline"
-              value={form.headline}
+              value={form.headline || ""}
               placeholder="Add a headline (For example: 'Post Doc, Photonics MIT')"
               onChange={onUpdate}
             />
@@ -77,7 +77,7 @@ export default class ProfileForm extends React.Component<Props> {
           <div className="row bio">
             <label>Biography</label>
             <textarea
-              value={form.bio}
+              value={form.bio || ""}
               name="bio"
               onChange={onUpdate}
               placeholder="Add a short description of yourself"
