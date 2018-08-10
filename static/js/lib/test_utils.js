@@ -2,6 +2,7 @@
 import { assert } from "chai"
 
 import { S } from "./sanctuary"
+import React from "react"
 const { Maybe } = S
 
 export const assertMaybeEquality = (m1: Maybe, m2: Maybe) => {
@@ -24,3 +25,11 @@ export const assertIsJustNoVal = (m: Maybe) => {
 export const shouldIf = (tf: boolean) => (tf ? "should" : "should not")
 
 export const shouldIfGt0 = (num: number) => shouldIf(num > 0)
+
+export class TestPage extends React.Component<*, *> {
+  props: {}
+
+  render() {
+    return <div />
+  }
+}

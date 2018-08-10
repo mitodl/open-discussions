@@ -4,16 +4,19 @@ import sinon from "sinon"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 
-import { ChannelTracker } from "./ChannelTracker"
-
 import { makeChannel } from "../factories/channels"
+import { withChannelTracker } from "./withChannelTracker"
+import { TestPage } from "../lib/test_utils"
 
-describe("ChannelTracker", () => {
-  let gaGaStub, sandbox
+describe("withTracker", () => {
+  let sandbox, gaGaStub, channel, WrappedPage
+
+  const renderPage = ({ ...props }) => shallow(<WrappedPage {...props} />)
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     gaGaStub = sandbox.stub(ReactGA, "ga")
+    channel = makeChannel()
   })
 
   afterEach(() => {
@@ -21,10 +24,10 @@ describe("ChannelTracker", () => {
   })
 
   it("should call GA create and pageview if channel has a tracking id", () => {
-    const channel = makeChannel()
     channel.ga_tracking_id = "UA-FAKE-01"
     window.location = "http://fake/c/path"
-    shallow(<ChannelTracker channel={channel} location={window.location} />)
+    WrappedPage = withChannelTracker(TestPage)
+    renderPage({ location: window.location, channel: channel })
     assert.ok(
       gaGaStub.calledWith("create", channel.ga_tracking_id, "auto", {
         name: "UA_FAKE_01"
@@ -40,10 +43,10 @@ describe("ChannelTracker", () => {
   })
 
   it("should not call GA create and pageview if channel does not have a tracking id", () => {
-    const channel = makeChannel()
     channel.ga_tracking_id = null
     window.location = "http://fake/c/path"
-    shallow(<ChannelTracker channel={channel} location={window.location} />)
+    WrappedPage = withChannelTracker(TestPage)
+    renderPage({ location: window.location, channel: channel })
     assert.ok(gaGaStub.notCalled)
   })
 })

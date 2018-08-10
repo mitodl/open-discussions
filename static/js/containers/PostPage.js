@@ -81,7 +81,7 @@ import type {
   MoreCommentsInTree,
   Post
 } from "../flow/discussionTypes"
-import { ChannelTracker } from "../components/ChannelTracker"
+import { withChannelTracker } from "../hoc/withChannelTracker"
 
 type PostPageProps = {
   match: Match,
@@ -390,9 +390,6 @@ class PostPage extends React.Component<PostPageProps> {
           <title>{formatTitle(post.title)}</title>
           <meta name="description" content={truncate(post.text, 300)} />
         </MetaTags>
-        {channel.ga_tracking_id ? (
-          <ChannelTracker channel={channel} location={location} />
-        ) : null}
         <ChannelBreadcrumbs channel={channel} />
         <Dialog
           open={commentDeleteDialogVisible}
@@ -553,5 +550,6 @@ export default R.compose(
   withPostModeration,
   withCommentModeration,
   withSingleColumn("post-page"),
+  withChannelTracker,
   withLoading
 )(PostPage)

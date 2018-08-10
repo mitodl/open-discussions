@@ -29,6 +29,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
     user = None
     auth = request.COOKIES.get(api_settings.JWT_AUTH_COOKIE)
     site_key = settings.OPEN_DISCUSSIONS_DEFAULT_SITE_KEY
+
     if request.user.is_authenticated:
         user = request.user
         username = request.user.username
@@ -67,6 +68,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
 
     user_full_name = None
     user_email = None
+
     if user:
         user_full_name = user.profile.name
         user_email = user.email

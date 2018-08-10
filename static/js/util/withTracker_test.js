@@ -7,14 +7,7 @@ import sinon from "sinon"
 import ReactGA from "react-ga"
 
 import withTracker from "./withTracker"
-
-class Page extends React.Component<*, *> {
-  props: {}
-
-  render() {
-    return <div />
-  }
-}
+import { TestPage } from "../lib/test_utils"
 
 describe("withTracker", () => {
   let sandbox, gaInitStub, gaPageViewStub, WrappedPage
@@ -34,7 +27,7 @@ describe("withTracker", () => {
   it("should make an initialization and pageview call", () => {
     SETTINGS.gaTrackingID = "UA-default-1"
     window.location = `http://fake/c/path`
-    WrappedPage = withTracker(Page)
+    WrappedPage = withTracker(TestPage)
     renderPage({ location: window.location })
     assert.ok(gaInitStub.calledOnce)
     assert.ok(gaPageViewStub.calledWith("/c/path"))
