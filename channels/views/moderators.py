@@ -15,7 +15,7 @@ from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     ModeratorPermissions,
     is_moderator,
-    is_staff_jwt,
+    is_staff_user,
 )
 
 
@@ -32,7 +32,7 @@ class ModeratorListView(ListCreateAPIView):
         Pick private serializer if user is moderator of this channel, else use public one
         """
         return ModeratorPrivateSerializer if (
-            is_staff_jwt(self.request) or is_moderator(self.request, self)
+            is_staff_user(self.request) or is_moderator(self.request, self)
         ) else ModeratorPublicSerializer
 
     def get_serializer_context(self):

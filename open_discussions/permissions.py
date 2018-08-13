@@ -12,7 +12,7 @@ from open_discussions import features
 from channels.models import Channel
 
 
-def is_staff_jwt(request):
+def is_staff_user(request):
     """
     Args:
         request (HTTPRequest): django request object
@@ -21,6 +21,9 @@ def is_staff_jwt(request):
         bool: True if user is staff
     """
     if request.auth is None:
+        if request.user and request.user.is_authenticated:
+            return request.user.is_staff
+
         return False
 
     jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
@@ -97,31 +100,31 @@ class JwtIsStaffPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role"""
-        return is_staff_jwt(request)
+        return is_staff_user(request)
 
 
-class JwtIsStaffOrReadonlyPermission(permissions.BasePermission):
+class IsStaffOrReadonlyPermission(permissions.BasePermission):
     """Checks the JWT payload for the staff permission"""
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or if the request is readonly"""
-        return is_readonly(request) or is_staff_jwt(request)
+        return is_readonly(request) or is_staff_user(request)
 
 
-class JwtIsStaffOrModeratorPermission(permissions.BasePermission):
+class IsStaffOrModeratorPermission(permissions.BasePermission):
     """Checks that the user is either staff or a moderator"""
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or is a moderator"""
-        return is_staff_jwt(request) or is_moderator(request, view)
+        return is_staff_user(request) or is_moderator(request, view)
 
 
-class JwtIsStaffModeratorOrReadonlyPermission(permissions.BasePermission):
+class IsStaffModeratorOrReadonlyPermission(permissions.BasePermission):
     """Checks that the user is either staff, a moderator, or performing a readonly operation"""
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role, is a moderator, or the request is readonly"""
-        return is_readonly(request) or is_staff_jwt(request) or is_moderator(request, view)
+        return is_readonly(request) or is_staff_user(request) or is_moderator(request, view)
 
 
 class ContributorPermissions(permissions.BasePermission):
@@ -129,7 +132,7 @@ class ContributorPermissions(permissions.BasePermission):
     Only staff and moderators should be able to see and edit the list of contributors
     """
     def has_permission(self, request, view):
-        return is_staff_jwt(request) or (
+        return is_staff_user(request) or (
             (
                 channel_is_mod_editable(view) or is_readonly(request)
             ) and is_moderator(request, view)
@@ -141,7 +144,7 @@ class ModeratorPermissions(permissions.BasePermission):
     All users should be able to see a list of moderators. Only staff and moderators should be able to edit it.
     """
     def has_permission(self, request, view):
-        return is_readonly(request) or is_staff_jwt(request) or (
+        return is_readonly(request) or is_staff_user(request) or (
             channel_is_mod_editable(view) and is_moderator(request, view)
         )
 

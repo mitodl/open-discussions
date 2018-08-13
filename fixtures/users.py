@@ -25,7 +25,7 @@ def staff_user(db, use_betamax, request):
     if use_betamax:
         request.getfixturevalue('configure_betamax')
         return request.getfixturevalue('reddit_staff_user')
-    return UserFactory.create()
+    return UserFactory.create(is_staff=True)
 
 
 @pytest.fixture()

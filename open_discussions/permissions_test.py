@@ -12,14 +12,14 @@ from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     ContributorPermissions,
     JwtIsStaffPermission,
-    JwtIsStaffOrModeratorPermission,
-    JwtIsStaffOrReadonlyPermission,
-    JwtIsStaffModeratorOrReadonlyPermission,
+    IsStaffOrModeratorPermission,
+    IsStaffOrReadonlyPermission,
+    IsStaffModeratorOrReadonlyPermission,
     ModeratorPermissions,
     channel_is_mod_editable,
     is_readonly,
     is_moderator,
-    is_staff_jwt,
+    is_staff_user,
 )
 
 
@@ -48,12 +48,23 @@ def test_is_moderator(user, mocker, result):
     request.channel_api.is_moderator.assert_called_once_with(channel_name, user.username)
 
 
-@pytest.mark.parametrize('result', [True, False])
-def test_is_staff_jwt(mocker, staff_jwt_token, result):
-    """is_staff_jwt should return True if a valid JWT is provided"""
-    auth_kwargs = {'auth': staff_jwt_token} if result else {}
-    request = mocker.Mock(**auth_kwargs)
-    assert is_staff_jwt(request) is result
+@pytest.mark.parametrize('has_token, has_user, is_staff, expected', [
+    [True, False, False, True],
+    [False, False, False, False],
+    [False, True, False, False],
+    [False, True, True, True],
+])
+def test_is_staff_user(
+        mocker, staff_jwt_token, user, staff_user, has_token, has_user, is_staff, expected
+):  # pylint: disable=too-many-arguments
+    """is_staff_user should return True if a valid JWT is provided"""
+    request = mocker.Mock()
+    request.auth = staff_jwt_token if has_token else None
+    if has_user:
+        request.user = staff_user if is_staff else user
+    else:
+        request.user = None
+    assert is_staff_user(request) is expected
 
 
 @pytest.mark.parametrize('membership_is_managed,expected', [
@@ -81,9 +92,11 @@ def test_is_staff_permission(mocker, is_staff):
     Test that JwtIsStaffPermission checks that the user is a staff user
     """
     request, view = mocker.Mock(), mocker.Mock()
-    is_staff_jwt_mock = mocker.patch('open_discussions.permissions.is_staff_jwt', autospec=True, return_value=is_staff)
+    is_staff_user_mock = mocker.patch(
+        'open_discussions.permissions.is_staff_user', autospec=True, return_value=is_staff,
+    )
     assert JwtIsStaffPermission().has_permission(request, view) is is_staff
-    is_staff_jwt_mock.assert_called_once_with(request)
+    is_staff_user_mock.assert_called_once_with(request)
 
 
 @pytest.mark.parametrize('is_staff,readonly,expected', [
@@ -97,13 +110,15 @@ def test_is_staff_or_readonly_permission(mocker, is_staff, readonly, expected):
     Test that staff users or readonly verbs are allowed
     """
     request, view = mocker.Mock(), mocker.Mock()
-    is_staff_jwt_mock = mocker.patch('open_discussions.permissions.is_staff_jwt', autospec=True, return_value=is_staff)
+    is_staff_user_mock = mocker.patch(
+        'open_discussions.permissions.is_staff_user', autospec=True, return_value=is_staff,
+    )
     is_readonly_mock = mocker.patch(
         'open_discussions.permissions.is_readonly', autospec=True, return_value=readonly
     )
-    assert JwtIsStaffOrReadonlyPermission().has_permission(request, view) is expected
-    if is_staff_jwt_mock.called:
-        is_staff_jwt_mock.assert_called_once_with(request)
+    assert IsStaffOrReadonlyPermission().has_permission(request, view) is expected
+    if is_staff_user_mock.called:
+        is_staff_user_mock.assert_called_once_with(request)
     is_readonly_mock.assert_called_once_with(request)
 
 
@@ -118,14 +133,16 @@ def test_is_staff_or_moderator_permission(mocker, is_staff, moderator, expected)
     Test that staff users or moderators are allowed
     """
     request, view = mocker.Mock(), mocker.Mock()
-    is_staff_jwt_mock = mocker.patch('open_discussions.permissions.is_staff_jwt', autospec=True, return_value=is_staff)
+    is_staff_user_mock = mocker.patch(
+        'open_discussions.permissions.is_staff_user', autospec=True, return_value=is_staff
+    )
     is_moderator_mock = mocker.patch(
         'open_discussions.permissions.is_moderator', autospec=True, return_value=moderator
     )
-    assert JwtIsStaffOrModeratorPermission().has_permission(request, view) is expected
+    assert IsStaffOrModeratorPermission().has_permission(request, view) is expected
     if is_moderator_mock.called:
         is_moderator_mock.assert_called_once_with(request, view)
-    is_staff_jwt_mock.assert_called_once_with(request)
+    is_staff_user_mock.assert_called_once_with(request)
 
 
 @pytest.mark.parametrize('exception_cls', [
@@ -136,7 +153,7 @@ def test_is_staff_or_moderator_exceptions(mocker, jwt_token, exception_cls):
     """
     Test that user is deemed not a moderator if praw raises a forbidden or redirect error
     """
-    perm = JwtIsStaffOrModeratorPermission()
+    perm = IsStaffOrModeratorPermission()
     request = mocker.Mock(auth=jwt_token)
     request.channel_api = mocker.patch('channels.api.Api').return_value
     request.channel_api.is_moderator.side_effect = exception_cls(mocker.MagicMock(headers={
@@ -161,17 +178,19 @@ def test_is_staff_moderator_or_readonly_permission(mocker, is_staff, moderator, 
     Test that staff users or moderators are allowed
     """
     request, view = mocker.Mock(), mocker.Mock()
-    is_staff_jwt_mock = mocker.patch('open_discussions.permissions.is_staff_jwt', autospec=True, return_value=is_staff)
+    is_staff_user_mock = mocker.patch(
+        'open_discussions.permissions.is_staff_user', autospec=True, return_value=is_staff,
+    )
     is_moderator_mock = mocker.patch(
         'open_discussions.permissions.is_moderator', autospec=True, return_value=moderator
     )
     is_readonly_mock = mocker.patch(
         'open_discussions.permissions.is_readonly', autospec=True, return_value=readonly
     )
-    assert JwtIsStaffModeratorOrReadonlyPermission().has_permission(request, view) is expected
+    assert IsStaffModeratorOrReadonlyPermission().has_permission(request, view) is expected
     is_readonly_mock.assert_called_once_with(request)
-    if is_staff_jwt_mock.called:
-        is_staff_jwt_mock.assert_called_once_with(request)
+    if is_staff_user_mock.called:
+        is_staff_user_mock.assert_called_once_with(request)
     if is_moderator_mock.called:
         is_moderator_mock.assert_called_once_with(request, view)
 
@@ -184,7 +203,7 @@ def test_is_staff_moderator_or_readonly_exceptions(mocker, jwt_token, exception_
     """
     Test that user is deemed not a moderator if praw raises a forbidden or redirect error
     """
-    perm = JwtIsStaffModeratorOrReadonlyPermission()
+    perm = IsStaffModeratorOrReadonlyPermission()
     request = mocker.Mock(auth=jwt_token)
     request.channel_api = mocker.patch('channels.api.Api').return_value
     request.channel_api.is_moderator.side_effect = exception_cls(mocker.MagicMock(headers={
@@ -218,7 +237,9 @@ def test_contributor_permission(mocker, is_staff, moderator, mod_editable, reado
     Test who can view and edit via the contributor REST API
     """
     request, view = mocker.Mock(), mocker.Mock()
-    is_staff_jwt_mock = mocker.patch('open_discussions.permissions.is_staff_jwt', autospec=True, return_value=is_staff)
+    is_staff_user_mock = mocker.patch(
+        'open_discussions.permissions.is_staff_user', autospec=True, return_value=is_staff,
+    )
     is_moderator_mock = mocker.patch(
         'open_discussions.permissions.is_moderator', autospec=True, return_value=moderator
     )
@@ -229,7 +250,7 @@ def test_contributor_permission(mocker, is_staff, moderator, mod_editable, reado
         'open_discussions.permissions.is_readonly', autospec=True, return_value=readonly
     )
     assert ContributorPermissions().has_permission(request, view) is expected
-    is_staff_jwt_mock.assert_called_once_with(request)
+    is_staff_user_mock.assert_called_once_with(request)
     if is_moderator_mock.called:
         is_moderator_mock.assert_called_once_with(request, view)
     if channel_is_mod_editable_mock.called:
@@ -262,7 +283,9 @@ def test_moderator_permission(mocker, readonly, is_staff, mod_editable, moderato
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_readonly_mock = mocker.patch('open_discussions.permissions.is_readonly', autospec=True, return_value=readonly)
-    is_staff_jwt_mock = mocker.patch('open_discussions.permissions.is_staff_jwt', autospec=True, return_value=is_staff)
+    is_staff_user_mock = mocker.patch(
+        'open_discussions.permissions.is_staff_user', autospec=True, return_value=is_staff
+    )
     is_moderator_mock = mocker.patch(
         'open_discussions.permissions.is_moderator', autospec=True, return_value=moderator
     )
@@ -271,8 +294,8 @@ def test_moderator_permission(mocker, readonly, is_staff, mod_editable, moderato
     )
     assert ModeratorPermissions().has_permission(request, view) is expected
     is_readonly_mock.assert_called_once_with(request)
-    if is_staff_jwt_mock.called:
-        is_staff_jwt_mock.assert_called_once_with(request)
+    if is_staff_user_mock.called:
+        is_staff_user_mock.assert_called_once_with(request)
     if is_moderator_mock.called:
         is_moderator_mock.assert_called_once_with(request, view)
     if channel_is_mod_editable_mock.called:

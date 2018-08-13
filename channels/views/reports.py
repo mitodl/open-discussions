@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from open_discussions.permissions import JwtIsStaffOrModeratorPermission
+from open_discussions.permissions import IsStaffOrModeratorPermission
 from channels.api import Api
 from channels.serializers import ReportSerializer, ReportedContentSerializer
 from channels.utils import translate_praw_exceptions
@@ -46,7 +46,7 @@ class ChannelReportListView(APIView):
     Moderator view for reported comments and posts in a channels
     """
 
-    permission_classes = (IsAuthenticated, JwtIsStaffOrModeratorPermission)
+    permission_classes = (IsAuthenticated, IsStaffOrModeratorPermission)
 
     def get_serializer_context(self):
         """Context for the request and view"""

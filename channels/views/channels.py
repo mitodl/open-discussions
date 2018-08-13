@@ -12,8 +12,8 @@ from channels.serializers import ChannelSerializer
 from channels.utils import translate_praw_exceptions
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
-    JwtIsStaffOrReadonlyPermission,
-    JwtIsStaffModeratorOrReadonlyPermission,
+    IsStaffOrReadonlyPermission,
+    IsStaffModeratorOrReadonlyPermission,
 )
 
 
@@ -21,7 +21,7 @@ class ChannelListView(ListCreateAPIView):
     """
     View for listing and creating channels
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffOrReadonlyPermission,)
+    permission_classes = (AnonymousAccessReadonlyPermission, IsStaffOrReadonlyPermission,)
     serializer_class = ChannelSerializer
 
     def get_serializer_context(self):
@@ -50,7 +50,7 @@ class ChannelDetailView(RetrieveUpdateAPIView):
     """
     View for getting information about or updating a specific channel
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, JwtIsStaffModeratorOrReadonlyPermission,)
+    permission_classes = (AnonymousAccessReadonlyPermission, IsStaffModeratorOrReadonlyPermission,)
     serializer_class = ChannelSerializer
 
     def get_serializer_context(self):
