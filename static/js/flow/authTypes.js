@@ -46,3 +46,10 @@ export type AuthResponse = {
   errors:        Array<string>,
   email?:        string
 }
+
+export type EmailDetailAuthResponse = {
+  extra_data?: {
+    name: string,
+    profile_image_small: string
+  }
+} & AuthResponse

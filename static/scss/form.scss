@@ -8,17 +8,18 @@
       display: block;
     }
   }
+}
 
-  .row {
-    margin: 10px 10px 24px 15px;
+.form .row,
+.form-header .row {
+  margin: 10px 10px 24px 15px;
+}
 
-    .validation-message {
-      background-color: $validation-bg;
-      color: $validation-text;
-      font-size: 14px;
-      padding: 5px;
-    }
-  }
+.form .row .validation-message {
+  background-color: $validation-bg;
+  color: $validation-text;
+  font-size: 14px;
+  padding: 5px;
 }
 
 .form-field {

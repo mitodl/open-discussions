@@ -36,13 +36,19 @@ export const getFormErrorSelector = R.compose(
   R.head,
   R.pathOr([], ["auth", "data", "errors"])
 )
-export const isLoginFlow = R.pathEq(["auth", "data", "flow"], FLOW_LOGIN)
+export const getAuthNameSelector = R.path([
+  "auth",
+  "data",
+  "extra_data",
+  "name"
+])
+export const getAuthProfileImageSelector = R.path([
+  "auth",
+  "data",
+  "extra_data",
+  "profile_image_small"
+])
 export const isProcessing = R.path(["auth", "processing"])
-
-export const isPasswordLogin = R.compose(
-  R.equals(STATE_LOGIN_PASSWORD),
-  getAuthStateSelector
-)
 
 export const authEndpoint = {
   name:         "auth",

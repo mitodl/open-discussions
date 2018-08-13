@@ -25,11 +25,11 @@ import {
   STATE_INACTIVE
 } from "../reducers/auth"
 
-import type { AuthResponse } from "../flow/authTypes"
+import type { AuthResponse, EmailDetailAuthResponse } from "../flow/authTypes"
 
 export const processAuthResponse = (
   history: Object,
-  { state }: AuthResponse
+  { state }: AuthResponse | EmailDetailAuthResponse
 ) => {
   if (state === STATE_LOGIN_EMAIL) {
     history.push(LOGIN_URL)

@@ -1,9 +1,11 @@
+$profile-image-small-size: 45px;
+
 .profile-image {
   border-radius: 100%;
   background-color: #579cf9;
   color: #fff;
-  width: 45px;
-  height: 45px;
+  width: $profile-image-small-size;
+  height: $profile-image-small-size;
   display: block;
   overflow: hidden;
 }
@@ -15,8 +17,8 @@
 }
 
 .small {
-  width: 45px;
-  height: 45px;
+  width: $profile-image-small-size;
+  height: $profile-image-small-size;
   font-size: 16px;
 }
 
@@ -53,7 +55,7 @@
       top: 0;
       right: 0;
       text-align: center;
-      line-height: 45px;
+      line-height: $profile-image-small-size;
 
       img {
         width: 22px;
@@ -138,4 +140,14 @@
   text-align: center;
   display: table-cell;
   vertical-align: middle;
+}
+
+.profile-image-email {
+  display: flex;
+  justify-content: start;
+  line-height: $profile-image-small-size;
+
+  img {
+    margin-right: 10px;
+  }
 }

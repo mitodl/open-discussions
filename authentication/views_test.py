@@ -27,6 +27,13 @@ User = get_user_model()
 
 
 @pytest.fixture
+def email_user(user):
+    """Fixture for a user that has an 'email' type UserSocialAuth"""
+    UserSocialAuthFactory.create(user=user, provider=EmailAuth.name, uid=user.email)
+    return user
+
+
+@pytest.fixture
 def email_auth_enabled(settings):
     """Ensure email auth is enabled"""
     settings.FEATURES[features.EMAIL_AUTH] = True
@@ -39,11 +46,11 @@ def email_auth_enabled(settings):
     'psa-register-confirm',
     'psa-register-details',
 ))
-def test_auth_views_disabled(settings, client, user, url):
+def test_auth_views_disabled(settings, client, email_user, url):
     """Tests all the auth views return a 404 if this feature is disabled"""
     settings.FEATURES[features.EMAIL_AUTH] = False
     response = client.post(reverse(url), {
-        'email': user.email
+        'email': email_user.email
     })
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -70,7 +77,7 @@ def mock_email_send(mocker):
 
 
 @pytest.fixture()
-def login_email_exists(client, user):
+def login_email_exists(client, email_user):
     """Yield a function for this step"""
     def run_step(last_result):  # pylint: disable=unused-argument
         """Run the step"""
@@ -79,7 +86,7 @@ def login_email_exists(client, user):
             'psa-login-email',
             {
                 'flow': SocialAuthState.FLOW_LOGIN,
-                'email': user.email,
+                'email': email_user.email,
             },
             {
                 'errors': [],
@@ -87,6 +94,10 @@ def login_email_exists(client, user):
                 'provider': EmailAuth.name,
                 'partial_token': any_instance_of(str),
                 'state': SocialAuthState.STATE_LOGIN_PASSWORD,
+                'extra_data': {
+                    'name': email_user.profile.name,
+                    'profile_image_small': email_user.profile.image_small_file.url
+                }
             }
         )
     yield run_step
