@@ -84,8 +84,6 @@ const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) =>
     dispatch
   )
 
-export { ChannelBanner }
-
 export default connect(
   mapStateToProps,
   mapDispatchToProps

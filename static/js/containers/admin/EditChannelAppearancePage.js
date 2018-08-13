@@ -34,7 +34,7 @@ type Props = {
   processing: boolean
 }
 
-class EditChannelAppearancePage extends React.Component<Props> {
+export class EditChannelAppearancePage extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }
@@ -173,8 +173,6 @@ const mapStateToProps = (state, ownProps) => {
     channelForm: getForm(state.forms)
   }
 }
-
-export { EditChannelAppearancePage }
 
 export default R.compose(
   connect(mapStateToProps),
