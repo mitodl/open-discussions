@@ -120,8 +120,9 @@ const onSubmitError = formValidate =>
 
 const mergeProps = mergeAndInjectProps(
   (
-    { name, onUpdate },
-    { formValidate, formBeginEdit, formEndEdit, hideDialog }
+    { onUpdate },
+    { formValidate, formBeginEdit, formEndEdit, hideDialog },
+    { name }
   ) => ({
     onSubmit: async ({ image, edit }) => {
       await onUpdate({
