@@ -142,7 +142,7 @@ def update_field_values_by_query(query, field_name, field_value):
         num_version_conflicts = es_response.get('version_conflicts', 0)
         if num_version_conflicts > 0:
             log.error(
-                'Update By Query API request resulted in %s verson conflict(s) (alias: %s, query: %s)',
+                'Update By Query API request resulted in %s version conflict(s) (alias: %s, query: %s)',
                 num_version_conflicts,
                 alias,
                 query
