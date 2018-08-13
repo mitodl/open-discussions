@@ -62,10 +62,10 @@ urlpatterns = [
     url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
     url(r'^profile/[A-Za-z0-9_]+/', index, name='profile'),
 
-    url(r'^login/', index),
-    url(r'^signup/', index),
+    url(r'^login/', index, name='login'),
+    url(r'^signup/', index, name='signup'),
     url(r'^signup/confirm/$', index, name='register-confirm'),
-    url(r'^account/inactive/$', index),
+    url(r'^account/inactive/$', index, name='account-inactive'),
 
     url(r'^password_reset/', index, name='password-reset'),
     url(
