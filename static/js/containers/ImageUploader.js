@@ -109,7 +109,6 @@ const mapStateToProps = (state, ownProps) => {
     dialogOpen,
     processing,
     onUpdate,
-    name,
     userName:     ownProps.userName,
     validateForm: validateImageForm,
     form:         getForm(state)
