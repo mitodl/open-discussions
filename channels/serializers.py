@@ -237,6 +237,7 @@ class BasePostSerializer(RedditObjectSerializer):
     channel_title = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
+    author_headline = serializers.SerializerMethodField()
     edited = serializers.SerializerMethodField()
     num_reports = serializers.IntegerField(read_only=True)
     deleted = serializers.SerializerMethodField()
@@ -258,10 +259,17 @@ class BasePostSerializer(RedditObjectSerializer):
 
     def get_author_name(self, instance):
         """get the authors name"""
-        user = self._get_user(instance)
-        if user and user.profile.name:
-            return user.profile.name
+        profile = self._get_profile(instance)
+        if profile and profile.name:
+            return profile.name
         return "[deleted]"
+
+    def get_author_headline(self, instance):
+        """ get the author's headline"""
+        profile = self._get_profile(instance)
+        if profile:
+            return profile.headline
+        return None
 
     def get_profile_image(self, instance):
         """Find the profile image for the post author"""

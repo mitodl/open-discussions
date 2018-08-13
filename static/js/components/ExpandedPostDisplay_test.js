@@ -21,6 +21,7 @@ import { actions } from "../actions"
 import { editPostKey } from "../components/CommentForms"
 import * as utilFuncs from "../lib/util"
 import { makeChannel } from "../factories/channels"
+import { shouldIf } from "../lib/test_utils"
 
 describe("ExpandedPostDisplay", () => {
   let helper,
@@ -101,6 +102,23 @@ describe("ExpandedPostDisplay", () => {
     assert.equal(link.text(), post.author_name)
     assert.equal(link.props().to, profileURL(post.author_id))
   })
+
+  //
+  ;[["My headline", true], [null, false]].forEach(
+    ([headlineText, expElementExists]) => {
+      it(`${shouldIf(
+        expElementExists
+      )} display headline span when text=${String(headlineText)}`, () => {
+        post.author_headline = headlineText
+        const wrapper = renderPostDisplay({ post })
+        const headlineSpan = wrapper.find(".author-headline")
+        assert.equal(headlineSpan.exists(), expElementExists)
+        if (expElementExists && headlineText) {
+          assert(headlineSpan.text().includes(headlineText))
+        }
+      })
+    }
+  )
 
   it("should hide text content if passed showPermalinkUI", () => {
     const wrapper = renderPostDisplay({ showPermalinkUI: true })

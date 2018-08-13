@@ -16,6 +16,7 @@ import { PostTitleAndHostname, getPostDropdownMenuKey } from "../lib/posts"
 import { makePost } from "../factories/posts"
 import { showDropdown } from "../actions/ui"
 import * as utilFuncs from "../lib/util"
+import { shouldIf } from "../lib/test_utils"
 
 describe("CompactPostDisplay", () => {
   let helper, post, openMenu
@@ -70,6 +71,22 @@ describe("CompactPostDisplay", () => {
     assert(authoredBy.startsWith(post.author_name))
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
   })
+  //
+  ;[["My headline", true], [null, false]].forEach(
+    ([headlineText, expElementExists]) => {
+      it(`${shouldIf(
+        expElementExists
+      )} display headline span when text=${String(headlineText)}`, () => {
+        post.author_headline = headlineText
+        const wrapper = renderPostDisplay({ post })
+        const headlineSpan = wrapper.find(".author-headline")
+        assert.equal(headlineSpan.exists(), expElementExists)
+        if (expElementExists && headlineText) {
+          assert(headlineSpan.text().includes(headlineText))
+        }
+      })
+    }
+  )
 
   it("should link to the author's profile", () => {
     const link = renderPostDisplay({ post })

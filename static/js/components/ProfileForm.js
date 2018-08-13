@@ -71,6 +71,7 @@ export default class ProfileForm extends React.Component<Props> {
               name="headline"
               value={form.headline || ""}
               placeholder="Add a headline (For example: 'Post Doc, Photonics MIT')"
+              maxLength="60"
               onChange={onUpdate}
             />
           </div>

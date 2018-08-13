@@ -210,9 +210,14 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
                 })}
                 imageSize={PROFILE_IMAGE_MICRO}
               />
-              <div className="author-name">{post.author_name}</div>
+              <span className="author-name">{post.author_name}</span>
             </Link>
-            <div className="right">{formattedDate}</div>
+            {post.author_headline ? (
+              <span className="author-headline">
+                &nbsp;&#8212;&nbsp;{post.author_headline}
+              </span>
+            ) : null}
+            <div className="right date">{formattedDate}</div>
           </div>
           {embedly && embedly.provider_name ? (
             <div className="provider-name">{embedly.provider_name}</div>
