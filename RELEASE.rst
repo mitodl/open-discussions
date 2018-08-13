@@ -1,6 +1,19 @@
 Release Notes
 =============
 
+Version 0.41.0
+--------------
+
+- Enable channel-specific google analytics tracking (#1019)
+- Display author headline near name on post cards, limit length of headline text (#1030)
+- Fixed contributor and moderator factories for username collisions
+- Silence warning with empty profile fields (#1044)
+- Fixed snackbar UI bugs
+- Login button on header
+- Move container level form code out of ProfileImage (#1031)
+- Added WrappedComponent to our HOCs and taught the helper render how to traverse them
+- Changed unrecognized email UX to a validation message
+
 Version 0.40.1 (Released August 09, 2018)
 --------------
 
