@@ -58,9 +58,7 @@ export default class ImageUploaderForm<Form> extends React.Component<
   }
 
   uploaderBodyHeight = (): number => {
-    const { height } = this.props
-
-    return R.min(height - 12, window.innerHeight * 0.44)
+    return R.min(500, window.innerHeight * 0.44)
   }
 
   dialogContents = () => {
