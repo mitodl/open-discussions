@@ -26,6 +26,7 @@ import type {
 import type { RestState } from "../flow/restTypes"
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
+import { setBannerMessage } from "../actions/ui"
 
 type PostFormValue = {
   value: PostForm,
@@ -174,9 +175,15 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       const { postType, title, url, text } = postForm.value
       const isText = isTextTabSelected(postType, channel)
       const data: CreatePostPayload = isText ? { title, text } : { title, url }
-      dispatch(actions.posts.post(channelName, data)).then(post => {
-        history.push(postDetailURL(channelName, post.id, post.slug))
-      })
+      dispatch(actions.posts.post(channelName, data))
+        .catch(() => {
+          dispatch(
+            setBannerMessage("Unknown error creating post, please try again.")
+          )
+        })
+        .then(post => {
+          history.push(postDetailURL(channelName, post.id, post.slug))
+        })
     }
   }
 
