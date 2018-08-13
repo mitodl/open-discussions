@@ -36,6 +36,7 @@ def test_list_channels(client, jwt_header, private_channel_and_contributor, requ
             'membership_is_managed': False,
             'avatar': None,
             'banner': None,
+            'ga_tracking_id': None
         }
     ]
 
@@ -78,6 +79,7 @@ def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
         'membership_is_managed': True,
         'avatar': None,
         'banner': None,
+        'ga_tracking_id': None
     }
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
@@ -105,6 +107,7 @@ def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, re
         'membership_is_managed': True,
         'avatar': None,
         'banner': None,
+        'ga_tracking_id': None
     }
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
@@ -181,6 +184,7 @@ def test_get_channel(client, jwt_header, private_channel_and_contributor):
         'membership_is_managed': False,
         'avatar': None,
         'banner': None,
+        'ga_tracking_id': None
     }
 
 
@@ -206,6 +210,7 @@ def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous
             'membership_is_managed': False,
             'avatar': None,
             'banner': None,
+            'ga_tracking_id': None
         }
     else:
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
@@ -280,6 +285,7 @@ def test_patch_channel(client, staff_jwt_header, private_channel):
         'membership_is_managed': False,
         'avatar': None,
         'banner': None,
+        'ga_tracking_id': None
     }
     assert Channel.objects.count() == 1
     channel_obj = Channel.objects.first()
@@ -310,6 +316,7 @@ def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_
         'membership_is_managed': False,
         'avatar': None,
         'banner': None,
+        'ga_tracking_id': None
     }
 
 

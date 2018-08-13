@@ -63,6 +63,7 @@ class ChannelSerializer(serializers.Serializer):
     membership_is_managed = WriteableSerializerMethodField()
     avatar = WriteableSerializerMethodField()
     banner = WriteableSerializerMethodField()
+    ga_tracking_id = WriteableSerializerMethodField()
 
     def get_user_is_contributor(self, channel):
         """
@@ -84,6 +85,13 @@ class ChannelSerializer(serializers.Serializer):
         """
         channel_obj = self._get_channel(name=channel.display_name)
         return channel_obj.membership_is_managed
+
+    def get_ga_tracking_id(self, channel):
+        """
+        Get ga_tracking_id from the associated Channel model
+        """
+        channel_obj = self._get_channel(name=channel.display_name)
+        return channel_obj.ga_tracking_id
 
     def get_avatar(self, channel):
         """Get the avatar image URL"""

@@ -17,6 +17,7 @@ export type Channel = {
   user_is_moderator:   boolean,
   link_type:          LinkType,
   membership_is_managed: boolean,
+  ga_tracking_id:      ?string
 }
 
 export type ChannelForm = {

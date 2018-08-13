@@ -81,6 +81,7 @@ import type {
   MoreCommentsInTree,
   Post
 } from "../flow/discussionTypes"
+import { withChannelTracker } from "../hoc/withChannelTracker"
 
 type PostPageProps = {
   match: Match,
@@ -548,5 +549,6 @@ export default R.compose(
   withPostModeration,
   withCommentModeration,
   withSingleColumn("post-page"),
+  withChannelTracker,
   withLoading
 )(PostPage)

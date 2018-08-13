@@ -96,6 +96,7 @@ class Channel(TimestampedModel):
     membership_is_managed = models.BooleanField(default=False)
     avatar = models.ImageField(null=True)
     banner = models.ImageField(null=True)
+    ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}"

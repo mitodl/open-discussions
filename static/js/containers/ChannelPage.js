@@ -33,6 +33,7 @@ import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
 import type { Channel, Post, PostListPagination } from "../flow/discussionTypes"
+import { withChannelTracker } from "../hoc/withChannelTracker"
 
 type ChannelPageProps = {
   match: Match,
@@ -213,5 +214,6 @@ export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
   withChannelSidebar("channel-page"),
+  withChannelTracker,
   withLoading
 )(ChannelPage)
