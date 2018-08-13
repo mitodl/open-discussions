@@ -105,12 +105,9 @@ describe("ChannelAvatar", () => {
     const showDialogStub = helper.sandbox
       .stub(uiActions, "showDialog")
       .returns({ type: "action" })
-    const preventDefaultStub = helper.sandbox.stub()
     const { inner } = await renderPage({}, { channel, editable: true })
     const imageUploader = inner.find(".upload-avatar")
-    const event = { preventDefault: preventDefaultStub }
-    imageUploader.props().onClick(event)
+    imageUploader.props().onClick()
     sinon.assert.calledWith(showDialogStub)
-    sinon.assert.calledWith(preventDefaultStub)
   })
 })

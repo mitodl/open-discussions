@@ -71,13 +71,7 @@ class ChannelAvatar extends React.Component<Props> {
           ) : null}
         </div>
         {editable ? (
-          <a
-            className="upload-avatar"
-            onClick={e => {
-              e.preventDefault()
-              showDialog()
-            }}
-          >
+          <a className="upload-avatar" onClick={showDialog}>
             Upload Avatar
           </a>
         ) : null}
