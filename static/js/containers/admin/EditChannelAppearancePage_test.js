@@ -92,6 +92,31 @@ describe("EditChannelAppearancePage", () => {
     assert.deepEqual(props.validation, errors)
     assert.equal(props.processing, "processing")
   })
+  ;[
+    [true, true, true, true],
+    [true, true, false, true],
+    [true, false, true, true],
+    [true, false, false, true],
+    [false, true, true, true],
+    [false, true, false, true],
+    [false, false, true, true],
+    [false, false, false, false]
+  ].forEach(([page, avatar, banner, expected]) => {
+    it(`is ${expected ? "" : "not "}processing when page processing=${String(
+      page
+    )}, avatar processing=${String(avatar)}, and banner processing=${String(
+      banner
+    )}`, async () => {
+      const { inner } = await render({
+        channels:      { processing: page },
+        channelAvatar: { processing: avatar },
+        channelBanner: { processing: banner }
+      })
+
+      const props = inner.find("EditChannelAppearanceForm").props()
+      assert.equal(props.processing, expected)
+    })
+  })
 
   it("should set the document title", async () => {
     const { inner } = await render()

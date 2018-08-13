@@ -165,7 +165,10 @@ export class EditChannelAppearancePage extends React.Component<Props> {
 const mapStateToProps = (state, ownProps) => {
   const channelName = getChannelName(ownProps)
   const channel = state.channels.data.get(channelName)
-  const processing = state.channels.processing
+  const processing =
+    state.channels.processing ||
+    state.channelAvatar.processing ||
+    state.channelBanner.processing
   return {
     channel,
     channelName,
