@@ -111,6 +111,7 @@ a.buttonLink {
 
 button.cancel,
 button.disabled,
+button[disabled],
 a.buttonLink.cancel {
   background: #cecece;
 }
