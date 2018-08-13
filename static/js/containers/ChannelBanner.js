@@ -75,7 +75,6 @@ class ChannelBanner extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = () => ({})
 const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) =>
   bindActionCreators(
     {
@@ -85,6 +84,6 @@ const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) =>
   )
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(ChannelBanner)
