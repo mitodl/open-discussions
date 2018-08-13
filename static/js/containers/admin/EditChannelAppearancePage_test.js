@@ -42,7 +42,14 @@ describe("EditChannelAppearancePage", () => {
       R.mergeDeepRight(
         {
           channels: {
-            data: new Map([[channel.name, channel]])
+            data:       new Map([[channel.name, channel]]),
+            processing: false
+          },
+          channelAvatar: {
+            processing: false
+          },
+          channelBanner: {
+            processing: false
           },
           forms: {
             [EDIT_CHANNEL_KEY]: {
