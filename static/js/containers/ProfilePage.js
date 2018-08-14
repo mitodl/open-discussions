@@ -59,7 +59,6 @@ class ProfilePage extends React.Component<Props> {
     if (!profile) {
       return null
     }
-    const editable = userName === SETTINGS.username
 
     return (
       <div className="profile-page">
@@ -73,7 +72,7 @@ class ProfilePage extends React.Component<Props> {
                 <ProfileImage
                   profile={profile}
                   userName={userName}
-                  editable={editable}
+                  editable={false}
                   imageSize={PROFILE_IMAGE_MEDIUM}
                 />
                 <div className="row image-and-name">

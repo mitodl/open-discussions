@@ -84,12 +84,10 @@ describe("ProfilePage", function() {
   ;[true, false].forEach(sameUser => {
     it(`should ${
       sameUser ? "" : "not"
-    } include an edit profile button`, async () => {
+    } never include an edit profile button on this page regardless of user`, async () => {
       SETTINGS.username = sameUser ? profile.username : "other_user"
-      const wrapper = await renderPage(
-        sameUser ? [actions.forms.FORM_BEGIN_EDIT] : []
-      )
-      assert.equal(wrapper.find(".profile-edit-button").exists(), sameUser)
+      const wrapper = await renderPage()
+      assert.notOk(wrapper.find(".profile-edit-button").exists())
     })
   })
 })
