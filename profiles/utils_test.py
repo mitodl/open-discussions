@@ -71,7 +71,9 @@ def test_too_long_prefix(user):
     """
     filename = '{}.jpg'.format('a' * 150)
     with pytest.raises(ValueError) as ex:
-        _generate_upload_to_uri("x" * 150)(user.profile, filename)  # pylint: disable=protected-access
+        _generate_upload_to_uri("x" * 150, lambda _profile: _profile.user.username)(
+            user.profile, filename
+        )  # pylint: disable=protected-access
     assert str(ex.value).startswith("path is longer than max length even without name")
 
 

@@ -5,6 +5,10 @@ from django.db import models
 from django.db.models import URLField
 
 from open_discussions.models import TimestampedModel
+from profiles.utils import (
+    avatar_uri,
+    banner_uri,
+)
 
 
 class Base36IntegerField(models.BigIntegerField):
@@ -94,8 +98,8 @@ class Channel(TimestampedModel):
     """
     name = models.CharField(unique=True, max_length=100)
     membership_is_managed = models.BooleanField(default=False)
-    avatar = models.ImageField(null=True)
-    banner = models.ImageField(null=True)
+    avatar = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri)
+    banner = models.ImageField(null=True, max_length=2083, upload_to=banner_uri)
     ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
 
     def __str__(self):

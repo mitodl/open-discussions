@@ -334,7 +334,7 @@ def test_patch_channel_image(client, public_channel, staff_jwt_header, field):
     assert resp.status_code == status.HTTP_200_OK
     image = getattr(Channel.objects.get(name=public_channel.name), field)
 
-    assert image.name.startswith(f"channel_{field}_") is True
+    assert f"{public_channel.name}/channel_{field}_" in image.name
     assert len(image.read()) == os.path.getsize(png_file)
 
 
