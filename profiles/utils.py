@@ -33,7 +33,6 @@ IMAGE_FIELDS = {
 
 # This is the Django ImageField max path size
 IMAGE_PATH_MAX_LENGTH = 100
-IMAGE_PATH_PREFIX = 'profile'
 GRAVATAR_IMAGE_URL = "https://www.gravatar.com/avatar/{}.jpg"
 
 DEFAULT_FONTS = [
@@ -101,25 +100,27 @@ def image_uri(profile, image_field=IMAGE_SMALL):
     return DEFAULT_PROFILE_IMAGE
 
 
-def generate_filepath(filename, username, suffix=''):
+def generate_filepath(filename, directory_name, suffix, prefix):
     """
     Generate and return the filepath for an uploaded image
 
     Args:
         filename(str): The name of the image file
+        directory_name (str): A directory name
         suffix(str): 'small', 'medium', or ''
+        prefix (str): A directory name to use as a prefix
 
     Returns:
         str: The filepath for the uploaded image.
     """
     name, ext = path.splitext(filename)
     timestamp = now_in_utc().replace(microsecond=0)
-    path_format = "{prefix}/{username}/{name}-{timestamp}{suffix}{ext}"
+    path_format = "{prefix}/{directory_name}/{name}-{timestamp}{suffix}{ext}"
 
     path_without_name = path_format.format(
         timestamp=timestamp.strftime("%Y-%m-%dT%H%M%S"),
-        prefix=IMAGE_PATH_PREFIX,
-        username=username,
+        prefix=prefix,
+        directory_name=directory_name,
         suffix=suffix,
         ext=ext,
         name='',
@@ -131,8 +132,8 @@ def generate_filepath(filename, username, suffix=''):
     full_path = path_format.format(
         name=name[:max_name_length],
         timestamp=timestamp.strftime("%Y-%m-%dT%H%M%S"),
-        prefix=IMAGE_PATH_PREFIX,
-        username=username,
+        prefix=prefix,
+        directory_name=directory_name,
         suffix=suffix,
         ext=ext,
     )
@@ -140,45 +141,40 @@ def generate_filepath(filename, username, suffix=''):
     return full_path
 
 
-def _generate_upload_to_uri(suffix=""):
-    """
-    Returns a function to specify the upload directory and filename, via upload_to on an ImageField
-
-    Args:
-        suffix (str):
-            A suffix for the filename
-    Returns:
-        function:
-            A function to use with upload_to to specify an upload directory and filename
-    """
-
-    def _upload_to(instance, filename):
-        """Function passed to upload_to on an ImageField"""
-        return generate_filepath(filename, instance.user.username, suffix)
-
-    return _upload_to
-
-
-# These three functions are referenced in migrations so be careful refactoring
+# These five functions are referenced in migrations so be careful refactoring
 def profile_image_upload_uri(instance, filename):
     """
     upload_to handler for Profile.image
     """
-    return _generate_upload_to_uri()(instance, filename)
+    return generate_filepath(filename, instance.user.username, "", "profile")
 
 
 def profile_image_upload_uri_small(instance, filename):
     """
     upload_to handler for Profile.image_small
     """
-    return _generate_upload_to_uri("_small")(instance, filename)
+    return generate_filepath(filename, instance.user.username, "_small", "profile")
 
 
 def profile_image_upload_uri_medium(instance, filename):
     """
     upload_to handler for Profile.image_medium
     """
-    return _generate_upload_to_uri("_medium")(instance, filename)
+    return generate_filepath(filename, instance.user.username, "_medium", "profile")
+
+
+def avatar_uri(instance, filename):
+    """
+    upload_to handler for Channel.avatar
+    """
+    return generate_filepath(filename, instance.name, "_avatar", "channel")
+
+
+def banner_uri(instance, filename):
+    """
+    upload_to handler for Channel.banner
+    """
+    return generate_filepath(filename, instance.name, "_banner", "channel")
 
 
 @contextmanager
