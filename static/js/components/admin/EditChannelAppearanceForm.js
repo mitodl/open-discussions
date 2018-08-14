@@ -49,6 +49,7 @@ export default class EditChannelAppearanceForm extends React.Component<Props> {
               form.avatar.edit &&
               URL.createObjectURL(form.avatar.edit)
             }
+            imageSize="medium"
           />
 
           <div className="row description">
