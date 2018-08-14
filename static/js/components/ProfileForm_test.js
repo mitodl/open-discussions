@@ -59,9 +59,9 @@ describe("ProfileForm", () => {
     assert.equal(
       wrapper
         .find(".profile-name")
-        .find("label")
-        .text(),
-      "Full Name"
+        .find(".name")
+        .props().placeholder,
+      "Full name"
     )
     assert.equal(
       wrapper
@@ -73,9 +73,16 @@ describe("ProfileForm", () => {
     assert.equal(
       wrapper
         .find(".bio")
+        .find("textarea")
+        .props().placeholder,
+      "Description"
+    )
+    assert.equal(
+      wrapper
+        .find(".bio")
         .find("label")
         .text(),
-      "Biography"
+      "Add a short description about yourself, max 1000 characters"
     )
     assert.equal(
       wrapper
@@ -87,9 +94,16 @@ describe("ProfileForm", () => {
     assert.equal(
       wrapper
         .find(".headline")
+        .find("input")
+        .props().placeholder,
+      "Headline"
+    )
+    assert.equal(
+      wrapper
+        .find(".headline")
         .find("label")
         .text(),
-      "Headline"
+      "For example: 'Post Doc, Photonics MIT', max 60 characters"
     )
   })
 
