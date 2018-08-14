@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { mount } from "enzyme"
 import { assert } from "chai"
@@ -93,9 +94,17 @@ describe("ProfileForm", () => {
     )
   })
 
-  it("includes a ProfileImage container", () => {
-    const wrapper = renderForm()
-    assert.isTrue(wrapper.find(ProfileImage).exists())
+  //
+  ;[true, false].forEach(sameUser => {
+    it(`ProfileImage should ${
+      sameUser ? "" : "not"
+    } include an edit profile button`, async () => {
+      SETTINGS.username = sameUser ? profile.username : "other_user"
+      const wrapper = renderForm()
+      const profileImage = wrapper.find(ProfileImage)
+      assert.isTrue(profileImage.exists())
+      assert.equal(profileImage.props().editable, sameUser)
+    })
   })
 
   it("calls onUpdate", () => {

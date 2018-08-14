@@ -82,12 +82,17 @@ describe("ProfilePage", function() {
     )
   })
   ;[true, false].forEach(sameUser => {
-    it(`should ${
+    it(`should not include an edit profile button on this page when profile is ${
       sameUser ? "" : "not"
-    } never include an edit profile button on this page regardless of user`, async () => {
+    } for the logged in user`, async () => {
       SETTINGS.username = sameUser ? profile.username : "other_user"
       const wrapper = await renderPage()
-      assert.notOk(wrapper.find(".profile-edit-button").exists())
+      assert.isNotOk(
+        wrapper
+          .find("ProfileImage")
+          .at(1)
+          .props().editable
+      )
     })
   })
 })
