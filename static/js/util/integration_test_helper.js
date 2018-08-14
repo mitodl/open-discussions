@@ -40,7 +40,7 @@ export default class IntegrationTestHelper {
         const stubName = `${methodName}Stub`
         this[stubName] = this.sandbox
           .stub(api, methodName)
-          .throws(new Error(`${stubName} not implemented`))
+          .throws(() => new Error(`${stubName} not implemented`))
       }
     }
 

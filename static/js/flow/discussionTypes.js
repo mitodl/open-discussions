@@ -17,7 +17,9 @@ export type Channel = {
   user_is_moderator:   boolean,
   link_type:          LinkType,
   membership_is_managed: boolean,
-  ga_tracking_id:      ?string
+  ga_tracking_id:      ?string,
+  avatar: string|null,
+  banner: string|null,
 }
 
 export type ChannelForm = {
@@ -26,7 +28,15 @@ export type ChannelForm = {
   description:        string,
   public_description: string,
   channel_type:       ChannelType,
-  link_type:          LinkType
+  link_type:          LinkType,
+  avatar?:            {
+    edit:  Blob,
+    image: File
+  },
+  banner?:            {
+    edit:  Blob,
+    image: File
+  },
 }
 
 export type ChannelAppearanceEditValidation = {
@@ -233,11 +243,6 @@ export type Profile = {
 }
 
 export type ImageForm = {
-  edit:  ?Blob,
-  image: ?File
-}
-
-export type ChannelAvatarForm = {
   edit:  ?Blob,
   image: ?File
 }

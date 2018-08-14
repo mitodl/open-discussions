@@ -110,4 +110,66 @@
     width: 100%;
     margin-right: 10px;
   }
+
+  a {
+    cursor: pointer;
+  }
+}
+
+$avatar-dimension: 90px;
+
+.avatar-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  a {
+    margin-left: 20px;
+  }
+
+  .avatar {
+    display: table;
+  }
+
+  .avatar-image {
+    border-radius: 15px;
+    color: #fff;
+    width: $avatar-dimension;
+    height: $avatar-dimension;
+    display: table;
+    overflow: hidden;
+  }
+
+  .avatar-initials {
+    border-radius: 15px;
+    width: $avatar-dimension;
+    height: $avatar-dimension;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .cropper-view-box {
+    border-radius: inherit;
+  }
+}
+
+.banner-container {
+  .banner-image {
+    width: 100%;
+    display: block;
+  }
+
+  .cropper-view-box {
+    border-radius: inherit;
+  }
+
+  .upload-banner {
+    margin-top: 20px;
+    display: block;
+    text-align: right;
+  }
 }

@@ -19,7 +19,7 @@ import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
 import type { Channel, ChannelForm } from "../../flow/discussionTypes"
 
-const EDIT_CHANNEL_KEY = "channel:edit:appearance"
+export const EDIT_CHANNEL_KEY = "channel:edit:appearance"
 const EDIT_CHANNEL_PAYLOAD = { formKey: EDIT_CHANNEL_KEY }
 const getForm = R.prop(EDIT_CHANNEL_KEY)
 
@@ -34,12 +34,12 @@ type Props = {
   processing: boolean
 }
 
-class EditChannelAppearancePage extends React.Component<Props> {
+export class EditChannelAppearancePage extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     if (shouldLoadData(prevProps, this.props)) {
       this.loadData()
     }
@@ -83,7 +83,7 @@ class EditChannelAppearancePage extends React.Component<Props> {
     )
   }
 
-  onSubmit = (e: Object) => {
+  onSubmit = async (e: Object) => {
     const { dispatch, history, channelForm } = this.props
 
     e.preventDefault()
@@ -97,11 +97,42 @@ class EditChannelAppearancePage extends React.Component<Props> {
           errors: validation.value
         })
       )
-    } else {
-      dispatch(actions.channels.patch(channelForm.value)).then(channel => {
-        history.push(channelURL(channel.name))
-      })
+      return
     }
+
+    const formValue = channelForm.value
+    const channelName = formValue.name
+    const patchValue = R.omit(["avatar", "banner"], formValue)
+    const promises = [dispatch(actions.channels.patch(patchValue))]
+
+    if (formValue.avatar) {
+      promises.push(
+        dispatch(
+          actions.channelAvatar.patch(
+            channelName,
+            formValue.avatar.edit,
+            formValue.avatar.image.name
+          )
+        )
+      )
+    }
+    if (formValue.banner) {
+      promises.push(
+        dispatch(
+          actions.channelBanner.patch(
+            channelName,
+            formValue.banner.edit,
+            formValue.banner.image.name
+          )
+        )
+      )
+    }
+    await Promise.all(promises)
+    if (formValue.avatar || formValue.banner) {
+      await dispatch(actions.channels.get(channelName))
+    }
+
+    history.push(channelURL(channelName))
   }
 
   render() {
@@ -118,6 +149,7 @@ class EditChannelAppearancePage extends React.Component<Props> {
         </MetaTags>
         <EditChannelNavbar channelName={channel.name} />
         <EditChannelAppearanceForm
+          channel={channel}
           onSubmit={this.onSubmit}
           onUpdate={this.onUpdate}
           form={channelForm.value}
@@ -133,7 +165,10 @@ class EditChannelAppearancePage extends React.Component<Props> {
 const mapStateToProps = (state, ownProps) => {
   const channelName = getChannelName(ownProps)
   const channel = state.channels.data.get(channelName)
-  const processing = state.channels.processing
+  const processing =
+    state.channels.processing ||
+    state.channelAvatar.processing ||
+    state.channelBanner.processing
   return {
     channel,
     channelName,

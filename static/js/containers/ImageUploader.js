@@ -18,23 +18,26 @@ import type { ImageForm } from "../flow/discussionTypes"
 import type { WithFormProps } from "../flow/formTypes"
 import type { Dispatch } from "redux"
 
-const makeDialogKey = name => `DIALOG_IMAGE_UPLOAD_${name}`
-const makeFormKey = name => `image:upload:${name}`
+export const makeDialogKey = (name: string) => `DIALOG_IMAGE_UPLOAD_${name}`
+const makeFormKey = (name: string) => `image:upload:${name}`
 
 type ImageProps = {
   dispatch: Dispatch<any>,
   dialogOpen: boolean,
   onClick?: Function,
-  showDialog: () => void,
-  hideDialog: () => void,
+  showDialog: () => any,
+  hideDialog: () => any,
   isAdd: boolean,
   name: string,
   description: string,
   onSubmit: () => void,
-  onUpdate: (event: Object) => Promise<*>
+  onUpdate: (event: Object) => Promise<*>,
+  width: number,
+  height: number,
+  showButton: boolean
 } & WithFormProps<ImageForm>
 
-class ImageUploader extends React.Component<ImageProps> {
+export class ImageUploader extends React.Component<ImageProps> {
   setDialogVisibility = (visibility: boolean) => {
     const { showDialog, hideDialog } = this.props
     if (visibility) {
@@ -52,7 +55,11 @@ class ImageUploader extends React.Component<ImageProps> {
       formBeginEdit,
       formEndEdit,
       formValidate,
-      description
+      description,
+      width,
+      height,
+      showButton,
+      processing
     } = this.props
 
     return (
@@ -63,37 +70,41 @@ class ImageUploader extends React.Component<ImageProps> {
           formBeginEdit:       formBeginEdit,
           formEndEdit:         formEndEdit,
           formValidate:        formValidate,
-          description:         description
+          description:         description,
+          width:               width,
+          height:              height,
+          processing:          processing
         })}
-        <button
-          className="open-photo-dialog"
-          onClick={() => {
-            this.setDialogVisibility(true)
-          }}
-        >
-          {isAdd ? (
-            <i name="camera_alt" className="material-icons add">
-              add
-            </i>
-          ) : (
-            <i name="camera_alt" className="material-icons edit">
-              edit
-            </i>
-          )}
-        </button>
+        {showButton ? (
+          <button
+            className="open-photo-dialog"
+            onClick={() => {
+              this.setDialogVisibility(true)
+            }}
+          >
+            {isAdd ? (
+              <i name="camera_alt" className="material-icons add">
+                add
+              </i>
+            ) : (
+              <i name="camera_alt" className="material-icons edit">
+                edit
+              </i>
+            )}
+          </button>
+        ) : null}
       </span>
     )
   }
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { name, onUpdate } = ownProps
+  const { name, onUpdate, processing } = ownProps
   const formKey = makeFormKey(name)
   const dialogKey = makeDialogKey(name)
   const { getForm } = configureForm(formKey, newImageForm)
-  const { ui, profileImage } = state
+  const { ui } = state
   const dialogOpen = ui.dialogs.has(dialogKey)
-  const processing = profileImage.processing
 
   return {
     dialogOpen,
@@ -110,8 +121,9 @@ const onSubmitError = formValidate =>
 
 const mergeProps = mergeAndInjectProps(
   (
-    { name, onUpdate },
-    { formValidate, formBeginEdit, formEndEdit, hideDialog }
+    { onUpdate },
+    { formValidate, formBeginEdit, formEndEdit, hideDialog },
+    { name }
   ) => ({
     onSubmit: async ({ image, edit }) => {
       await onUpdate({
@@ -124,7 +136,7 @@ const mergeProps = mergeAndInjectProps(
         }
       })
 
-      formEndEdit()
+      formBeginEdit()
       hideDialog()
     },
     onSubmitError: () => onSubmitError(formValidate),

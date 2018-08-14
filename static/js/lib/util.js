@@ -65,6 +65,10 @@ export const userIsAnonymous = () => R.isNil(SETTINGS.username)
 export const votingTooltipText = "Sign Up or Login to vote"
 
 export const defaultProfileImageUrl = "/static/images/avatar_default.png"
+export const defaultChannelAvatarUrl =
+  "/static/images/channel_avatar_default.svg"
+export const defaultChannelBannerUrl =
+  "/static/images/channel_banner_default.svg"
 
 export function isProfileComplete(profile: Profile): boolean {
   if (

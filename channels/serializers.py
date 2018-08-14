@@ -171,11 +171,13 @@ class ChannelSerializer(serializers.Serializer):
 
         avatar = validated_data.get('avatar')
         if avatar:
-            channel_obj.avatar.save(f"channel_avatar_{name}.jpg", avatar)
+            channel_obj.avatar.save(f"channel_avatar_{name}.jpg", avatar, save=False)
+            channel_obj.save(update_fields=['avatar'])
 
         banner = validated_data.get('banner')
         if banner:
-            channel_obj.banner.save(f"channel_banner_{name}.jpg", banner)
+            channel_obj.banner.save(f"channel_banner_{name}.jpg", banner, save=False)
+            channel_obj.save(update_fields=['banner'])
 
         return channel
 

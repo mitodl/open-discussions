@@ -6,22 +6,24 @@ import browser from "detect-browser"
 type Props = {
   updatePhotoEdit: (b: Blob) => void,
   photo: Object,
-  uploaderBodyHeight: () => number
+  uploaderBodyHeight: () => number,
+  width: number,
+  height: number
 }
 
 export default class CropperWrapper extends React.Component<Props> {
   cropper: Cropper
 
   cropperHelper = () => {
-    const { updatePhotoEdit } = this.props
+    const { updatePhotoEdit, height, width } = this.props
     let canvas
     if (this.cropper) {
       if (browser.name === "safari" || browser.name === "ios") {
         canvas = this.cropper.getCroppedCanvas()
       } else {
         canvas = this.cropper.getCroppedCanvas({
-          width:  512,
-          height: 512
+          width,
+          height
         })
       }
       canvas.toBlob(blob => updatePhotoEdit(blob), "image/jpeg")
@@ -29,7 +31,7 @@ export default class CropperWrapper extends React.Component<Props> {
   }
 
   render() {
-    const { photo, uploaderBodyHeight } = this.props
+    const { photo, height, width, uploaderBodyHeight } = this.props
 
     return (
       <Cropper
@@ -37,7 +39,7 @@ export default class CropperWrapper extends React.Component<Props> {
         style={{ height: uploaderBodyHeight() }}
         className="photo-upload-dialog photo-active-item cropper"
         src={photo.preview}
-        aspectRatio={1 / 1}
+        aspectRatio={width / height}
         guides={true}
         cropend={this.cropperHelper}
         ready={this.cropperHelper}

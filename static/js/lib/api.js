@@ -354,6 +354,38 @@ export function updateProfile(
   })
 }
 
+export function patchChannelAvatar(
+  channelName: string,
+  image: Blob,
+  name: string
+): Promise<string> {
+  const formData = new FormData()
+  formData.append("avatar", image, name)
+  return fetchWithAuthFailure(`/api/v0/channels/${channelName}/`, {
+    headers: {
+      Accept: "text/html"
+    },
+    method: "PATCH",
+    body:   formData
+  })
+}
+
+export function patchChannelBanner(
+  channelName: string,
+  image: Blob,
+  name: string
+): Promise<string> {
+  const formData = new FormData()
+  formData.append("banner", image, name)
+  return fetchWithAuthFailure(`/api/v0/channels/${channelName}/`, {
+    headers: {
+      Accept: "text/html"
+    },
+    method: "PATCH",
+    body:   formData
+  })
+}
+
 export const postEmailLogin = (
   flow: AuthFlow,
   email: string

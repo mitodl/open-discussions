@@ -311,6 +311,25 @@ describe("ProfileImage", () => {
     )
   })
 
+  it("should pass the processing value", async () => {
+    const render = helper.configureHOCRenderer(
+      ProfileImage,
+      "ProfileImage",
+      {
+        profileImage: {
+          processing: true
+        }
+      },
+      { editable: true }
+    )
+
+    const { inner } = await render()
+    assert.equal(
+      inner.find("Connect(withForm(ImageUploader))").props().processing,
+      true
+    )
+  })
+
   //
   ;[
     [PROFILE_IMAGE_MICRO, true],
