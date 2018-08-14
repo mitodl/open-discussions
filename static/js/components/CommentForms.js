@@ -1,11 +1,12 @@
 // @flow
+/* global SETTINGS:false */
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
-import { setSnackbarMessage } from "../actions/ui"
+import { setBannerMessage } from "../actions/ui"
 import { isEmptyText } from "../lib/util"
 
 import type { CommentForm, CommentInTree, Post } from "../flow/discussionTypes"
@@ -184,17 +185,18 @@ const mapDispatchToProps = (dispatch: any, ownProps: CommentFormProps) => {
           if (err.errorStatusCode === 410) {
             // Comment was deleted
             dispatch(
-              setSnackbarMessage({
-                message:
-                  "This comment has been deleted and cannot be replied to"
-              })
+              setBannerMessage(
+                "This comment has been deleted and cannot be replied to"
+              )
             )
           } else {
             // Unknown errors
             dispatch(
-              setSnackbarMessage({
-                message: "Unknown error replying to comment"
-              })
+              setBannerMessage(
+                `Something went wrong creating your comment. Please try again or contact us at ${
+                  SETTINGS.support_email
+                }`
+              )
             )
           }
         })
