@@ -141,60 +141,40 @@ def generate_filepath(filename, directory_name, suffix=''):
     return full_path
 
 
-def _generate_upload_to_uri(suffix, directory_getter):
-    """
-    Returns a function to specify the upload directory and filename, via upload_to on an ImageField
-
-    Args:
-        suffix (str):
-            A suffix for the filename
-        directory_getter (function): A function to get the directory name, instance => directory_name
-    Returns:
-        function:
-            A function to use with upload_to to specify an upload directory and filename
-    """
-
-    def _upload_to(instance, filename):
-        """Function passed to upload_to on an ImageField"""
-        return generate_filepath(filename, directory_getter(instance), suffix)
-
-    return _upload_to
-
-
 # These five functions are referenced in migrations so be careful refactoring
 def profile_image_upload_uri(instance, filename):
     """
     upload_to handler for Profile.image
     """
-    return _generate_upload_to_uri("", lambda profile: profile.user.username)(instance, filename)
+    return generate_filepath(filename, instance.user.username, "")
 
 
 def profile_image_upload_uri_small(instance, filename):
     """
     upload_to handler for Profile.image_small
     """
-    return _generate_upload_to_uri("_small", lambda profile: profile.user.username)(instance, filename)
+    return generate_filepath(filename, instance.user.username, "_small")
 
 
 def profile_image_upload_uri_medium(instance, filename):
     """
     upload_to handler for Profile.image_medium
     """
-    return _generate_upload_to_uri("_medium", lambda profile: profile.user.username)(instance, filename)
+    return generate_filepath(filename, instance.user.username, "_medium")
 
 
 def avatar_uri(instance, filename):
     """
     upload_to handler for Channel.avatar
     """
-    return _generate_upload_to_uri("_avatar", lambda channel: channel.name)(instance, filename)
+    return generate_filepath(filename, instance.name, "_avatar")
 
 
 def banner_uri(instance, filename):
     """
     upload_to handler for Channel.banner
     """
-    return _generate_upload_to_uri("_banner", lambda channel: channel.name)(instance, filename)
+    return generate_filepath(filename, instance.name, "_banner")
 
 
 @contextmanager
