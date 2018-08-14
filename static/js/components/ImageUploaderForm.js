@@ -9,6 +9,8 @@ import { validationMessage } from "../lib/validation"
 import type { FormProps } from "../flow/formTypes"
 import type { FormErrors, FormValue } from "../flow/formTypes"
 
+const uploaderBodyHeight = (): number => R.min(500, window.innerHeight * 0.44)
+
 type ImageUploaderProps<Form> = {
   description: string,
   dialogOpen: boolean,
@@ -57,10 +59,6 @@ export default class ImageUploaderForm<Form> extends React.Component<
     formValidate({ image: message })
   }
 
-  uploaderBodyHeight = (): number => {
-    return R.min(500, window.innerHeight * 0.44)
-  }
-
   dialogContents = () => {
     const {
       height,
@@ -78,7 +76,7 @@ export default class ImageUploaderForm<Form> extends React.Component<
             updatePhotoEdit={this.updatePhotoEdit}
             photo={image}
             guides={true}
-            uploaderBodyHeight={this.uploaderBodyHeight}
+            uploaderBodyHeight={uploaderBodyHeight}
             height={height}
             width={width}
           />
@@ -93,7 +91,7 @@ export default class ImageUploaderForm<Form> extends React.Component<
   spinner = () => (
     <div
       className="photo-upload-dialog photo-active-item photo-dropzone dashed-border"
-      style={{ height: this.uploaderBodyHeight() }}
+      style={{ height: uploaderBodyHeight() }}
     >
       <div className="sk-fading-circle">
         <div className="sk-circle1 sk-circle" />
@@ -119,7 +117,7 @@ export default class ImageUploaderForm<Form> extends React.Component<
       <Dropzone
         onDrop={onDrop(this.startPhotoEdit)}
         className="photo-upload-dialog photo-active-item photo-dropzone dashed-border"
-        style={{ height: this.uploaderBodyHeight() }}
+        style={{ height: uploaderBodyHeight() }}
         accept="image/*"
         onDropRejected={() => this.setPhotoError("Please select a valid photo")}
       >
