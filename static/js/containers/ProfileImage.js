@@ -24,7 +24,8 @@ type Props = {
   userName?: ?string,
   editable: boolean,
   getProfile: (username: string) => Promise<*>,
-  submitImage: (username: string, edit: Blob, name: string) => Promise<*>
+  submitImage: (username: string, edit: Blob, name: string) => Promise<*>,
+  processing: boolean
 }
 
 const formatPhotoName = photo => `${photo.name.replace(/\.\w*$/, "")}.jpg`
@@ -52,7 +53,7 @@ class ProfileImage extends React.Component<Props> {
   }
 
   render() {
-    const { editable, profile, imageSize } = this.props
+    const { editable, profile, imageSize, processing } = this.props
 
     let imageUrl, profileName
     if (profile) {
@@ -84,6 +85,7 @@ class ProfileImage extends React.Component<Props> {
               description="Profile Image"
               width={512}
               height={512}
+              processing={processing}
             />
           ) : null}
         </div>
@@ -92,8 +94,12 @@ class ProfileImage extends React.Component<Props> {
   }
 }
 
+const mapStateToProps = state => ({
+  processing: state.profileImage.processing
+})
+
 export default connect(
-  null,
+  mapStateToProps,
   {
     submitImage: actions.profileImage.patch,
     getProfile:  actions.profiles.get

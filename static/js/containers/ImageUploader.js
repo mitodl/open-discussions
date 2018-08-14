@@ -37,7 +37,7 @@ type ImageProps = {
   showButton: boolean
 } & WithFormProps<ImageForm>
 
-class ImageUploader extends React.Component<ImageProps> {
+export class ImageUploader extends React.Component<ImageProps> {
   setDialogVisibility = (visibility: boolean) => {
     const { showDialog, hideDialog } = this.props
     if (visibility) {
@@ -58,7 +58,8 @@ class ImageUploader extends React.Component<ImageProps> {
       description,
       width,
       height,
-      showButton
+      showButton,
+      processing
     } = this.props
 
     return (
@@ -71,7 +72,8 @@ class ImageUploader extends React.Component<ImageProps> {
           formValidate:        formValidate,
           description:         description,
           width:               width,
-          height:              height
+          height:              height,
+          processing:          processing
         })}
         {showButton ? (
           <button
@@ -97,13 +99,12 @@ class ImageUploader extends React.Component<ImageProps> {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const { name, onUpdate } = ownProps
+  const { name, onUpdate, processing } = ownProps
   const formKey = makeFormKey(name)
   const dialogKey = makeDialogKey(name)
   const { getForm } = configureForm(formKey, newImageForm)
-  const { ui, profileImage } = state
+  const { ui } = state
   const dialogOpen = ui.dialogs.has(dialogKey)
-  const processing = profileImage.processing
 
   return {
     dialogOpen,
