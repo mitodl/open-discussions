@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.41.0
+Version 0.41.0 (Released August 14, 2018)
 --------------
 
 - Enable channel-specific google analytics tracking (#1019)
