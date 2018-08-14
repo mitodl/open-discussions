@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
 
@@ -261,6 +262,8 @@ describe("CreatePostPage", () => {
   it(`should display a banner message if error on form submit`, async () => {
     helper.createPostStub.returns(Promise.reject({ errorStatusCode: 500 }))
     const wrapper = await renderPage()
+    const email = "fakesupport@example.com"
+    SETTINGS.support_email = email
     setTitle(wrapper, post.title)
     setTextPost(wrapper)
     setText(wrapper, post.text)
@@ -275,10 +278,9 @@ describe("CreatePostPage", () => {
         submitPost(wrapper)
       }
     )
-    assert.ok(
-      state.ui.banner.message.startsWith(
-        "Something went wrong creating your post."
-      )
+    assert.equal(
+      state.ui.banner.message,
+      `Something went wrong creating your post. Please try again or contact us at ${email}`
     )
   })
 
