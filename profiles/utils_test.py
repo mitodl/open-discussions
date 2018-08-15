@@ -71,7 +71,7 @@ def test_too_long_prefix(user):
     """
     filename = '{}.jpg'.format('a' * 150)
     with pytest.raises(ValueError) as ex:
-        generate_filepath(filename, user.username, "x" * 150, "profile")
+        generate_filepath(filename, user.username, "x" * 150)
     assert str(ex.value).startswith("path is longer than max length even without name")
 
 
