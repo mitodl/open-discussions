@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.41.2
+--------------
+
+- Made JWT redirect conditional on non-expired JWT
+- Update edit profile form to match Invision design (#1073)
+- Remove edit button from profile image on profile view page (#1071)
+
 Version 0.41.1 (Released August 15, 2018)
 --------------
 
