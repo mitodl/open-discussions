@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.41.1 (Released August 15, 2018)
+--------------
+
+- Add upload_to to banner and avatar (#1070)
+- Implement uploading channel avatar and banner (#983)
+- Updated staff permission to check user.is_staff for authenticated users
+- Added well-named urls to urls.py
+- fix typo in error log (#1021)
+- Changed login UI to show image & name when email entered
+
 Version 0.41.0 (Released August 14, 2018)
 --------------
 
