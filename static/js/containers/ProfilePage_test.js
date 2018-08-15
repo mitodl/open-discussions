@@ -82,14 +82,17 @@ describe("ProfilePage", function() {
     )
   })
   ;[true, false].forEach(sameUser => {
-    it(`should ${
+    it(`should not include an edit profile button on this page when profile is ${
       sameUser ? "" : "not"
-    } include an edit profile button`, async () => {
+    } for the logged in user`, async () => {
       SETTINGS.username = sameUser ? profile.username : "other_user"
-      const wrapper = await renderPage(
-        sameUser ? [actions.forms.FORM_BEGIN_EDIT] : []
+      const wrapper = await renderPage()
+      assert.isNotOk(
+        wrapper
+          .find("ProfileImage")
+          .at(1)
+          .props().editable
       )
-      assert.equal(wrapper.find(".profile-edit-button").exists(), sameUser)
     })
   })
 })
