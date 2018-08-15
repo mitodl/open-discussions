@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.41.2
+Version 0.41.2 (Released August 15, 2018)
 --------------
 
 - Made JWT redirect conditional on non-expired JWT
