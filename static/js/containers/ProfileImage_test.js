@@ -75,6 +75,13 @@ describe("ProfileImage", () => {
       }
     })
 
+    it("should use className props", () => {
+      const image = renderProfileImage({
+        className: "testcss"
+      })
+      assert.ok(image.find(".testcss").exists())
+    })
+
     it("should have a ImageUploaderForm only if editable === true", () => {
       for (const editable of [true, false]) {
         const image = renderProfileImage({ editable })

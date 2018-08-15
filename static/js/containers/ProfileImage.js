@@ -70,7 +70,7 @@ class ProfileImage extends React.Component<Props> {
 
     const isAdd = imageUrl === defaultProfileImageUrl
     return (
-      <div className={`profile-image-container ${className ? className : ""}`}>
+      <div className={`profile-image-container ${className || ""}`}>
         <div className="avatar">
           <img
             src={imageUrl}
