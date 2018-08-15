@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.41.1
+Version 0.41.1 (Released August 15, 2018)
 --------------
 
 - Add upload_to to banner and avatar (#1070)
