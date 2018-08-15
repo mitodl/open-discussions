@@ -72,7 +72,9 @@ export default class ProfileForm extends React.Component<Props> {
               maxLength="60"
               onChange={onUpdate}
             />
-            <label className="bottom-label">For example: 'Post Doc, Photonics MIT', max 60 characters</label>
+            <label className="bottom-label">
+              For example: 'Post Doc, Photonics MIT', max 60 characters
+            </label>
           </div>
           <div className="row bio">
             <textarea
@@ -81,7 +83,9 @@ export default class ProfileForm extends React.Component<Props> {
               onChange={onUpdate}
               placeholder="Description"
             />
-            <label className="bottom-label">Add a short description about yourself, max 1000 characters</label>
+            <label className="bottom-label">
+              Add a short description about yourself, max 1000 characters
+            </label>
           </div>
           <div className="row actions">
             <button className="cancel" onClick={goBackAndHandleEvent(history)}>
