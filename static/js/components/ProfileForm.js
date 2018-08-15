@@ -41,21 +41,20 @@ export default class ProfileForm extends React.Component<Props> {
 
     return (
       <div>
-        <ProfileImage
-          profile={profile}
-          userName={profile.username}
-          editable={profile.username === SETTINGS.username}
-          imageSize={PROFILE_IMAGE_MEDIUM}
-        />
         <form onSubmit={onSubmit} className="form">
           <div className="row image-and-name">
+            <ProfileImage
+              profile={profile}
+              userName={profile.username}
+              editable={profile.username === SETTINGS.username}
+              imageSize={PROFILE_IMAGE_MEDIUM}
+            />
             <div className="profile-name">
               <div>
-                <label>Full Name</label>
                 <input
                   type="text"
                   value={form.name || ""}
-                  placeholder="Your name"
+                  placeholder="Full name"
                   className="name"
                   name="name"
                   onChange={onUpdate}
@@ -65,24 +64,28 @@ export default class ProfileForm extends React.Component<Props> {
             </div>
           </div>
           <div className="row headline">
-            <label>Headline</label>
             <input
               type="text"
               name="headline"
               value={form.headline || ""}
-              placeholder="Add a headline (For example: 'Post Doc, Photonics MIT')"
+              placeholder="Headline"
               maxLength="60"
               onChange={onUpdate}
             />
+            <label className="bottom-label">
+              For example: 'Post Doc, Photonics MIT', max 60 characters
+            </label>
           </div>
           <div className="row bio">
-            <label>Biography</label>
             <textarea
               value={form.bio || ""}
               name="bio"
               onChange={onUpdate}
-              placeholder="Add a short description of yourself"
+              placeholder="Description"
             />
+            <label className="bottom-label">
+              Add a short description about yourself, max 1000 characters
+            </label>
           </div>
           <div className="row actions">
             <button className="cancel" onClick={goBackAndHandleEvent(history)}>

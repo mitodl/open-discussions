@@ -28,9 +28,16 @@
 }
 
 .profile-name {
-  height: 109px;
-  display: table-cell;
+  height: 110px;
+  width: 100%;
+  margin: 20px 0px 0px 30px;
   vertical-align: middle;
+}
+
+.bottom-label {
+  margin: 5px 0px 0px 10px;
+  font-size: 11px;
+  color: $font-grey-light;
 }
 
 input[type="email"],
