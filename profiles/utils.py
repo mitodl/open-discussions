@@ -33,6 +33,7 @@ IMAGE_FIELDS = {
 
 # This is the Django ImageField max path size
 IMAGE_PATH_MAX_LENGTH = 100
+IMAGE_PATH_PREFIX = 'profile'
 GRAVATAR_IMAGE_URL = "https://www.gravatar.com/avatar/{}.jpg"
 
 DEFAULT_FONTS = [
@@ -100,7 +101,7 @@ def image_uri(profile, image_field=IMAGE_SMALL):
     return DEFAULT_PROFILE_IMAGE
 
 
-def generate_filepath(filename, directory_name, suffix, prefix):
+def generate_filepath(filename, directory_name, suffix):
     """
     Generate and return the filepath for an uploaded image
 
@@ -108,7 +109,6 @@ def generate_filepath(filename, directory_name, suffix, prefix):
         filename(str): The name of the image file
         directory_name (str): A directory name
         suffix(str): 'small', 'medium', or ''
-        prefix (str): A directory name to use as a prefix
 
     Returns:
         str: The filepath for the uploaded image.
@@ -119,7 +119,7 @@ def generate_filepath(filename, directory_name, suffix, prefix):
 
     path_without_name = path_format.format(
         timestamp=timestamp.strftime("%Y-%m-%dT%H%M%S"),
-        prefix=prefix,
+        prefix=IMAGE_PATH_PREFIX,
         directory_name=directory_name,
         suffix=suffix,
         ext=ext,
@@ -132,7 +132,7 @@ def generate_filepath(filename, directory_name, suffix, prefix):
     full_path = path_format.format(
         name=name[:max_name_length],
         timestamp=timestamp.strftime("%Y-%m-%dT%H%M%S"),
-        prefix=prefix,
+        prefix=IMAGE_PATH_PREFIX,
         directory_name=directory_name,
         suffix=suffix,
         ext=ext,
@@ -146,35 +146,35 @@ def profile_image_upload_uri(instance, filename):
     """
     upload_to handler for Profile.image
     """
-    return generate_filepath(filename, instance.user.username, "", "profile")
+    return generate_filepath(filename, instance.user.username, "")
 
 
 def profile_image_upload_uri_small(instance, filename):
     """
     upload_to handler for Profile.image_small
     """
-    return generate_filepath(filename, instance.user.username, "_small", "profile")
+    return generate_filepath(filename, instance.user.username, "_small")
 
 
 def profile_image_upload_uri_medium(instance, filename):
     """
     upload_to handler for Profile.image_medium
     """
-    return generate_filepath(filename, instance.user.username, "_medium", "profile")
+    return generate_filepath(filename, instance.user.username, "_medium")
 
 
 def avatar_uri(instance, filename):
     """
     upload_to handler for Channel.avatar
     """
-    return generate_filepath(filename, instance.name, "_avatar", "channel")
+    return generate_filepath(filename, instance.name, "_avatar")
 
 
 def banner_uri(instance, filename):
     """
     upload_to handler for Channel.banner
     """
-    return generate_filepath(filename, instance.name, "_banner", "channel")
+    return generate_filepath(filename, instance.name, "_banner")
 
 
 @contextmanager
