@@ -2,6 +2,7 @@
 open_discussions views
 """
 import json
+import time
 from datetime import timedelta
 from urllib.parse import urlencode
 
@@ -14,7 +15,9 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from rest_framework_jwt.settings import api_settings
 from social_django.utils import load_strategy, load_backend
+from social_django.models import UserSocialAuth
 
+from authentication.backends.micromasters import MicroMastersAuth
 from open_discussions import features
 
 from open_discussions.templatetags.render_bundle import public_path
@@ -43,20 +46,24 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
                 leeway=timedelta(days=365),
                 algorithms=[api_settings.JWT_ALGORITHM]
             )
-            provider = payload.get("provider", None)
-            if provider:
-                # redirect to authenticate the user using their JWT for the provider
-                # PSA will then redirect back here using the next param
-                return redirect("{}?{}".format(
-                    reverse('social:complete', args=(provider,)),
-                    urlencode({
-                        'next': request.build_absolute_uri(),
-                    })
-                ))
 
             username = payload.get("username", None)
             site_key = payload.get("site_key", site_key)
-            user = User.objects.get(username=username)
+            provider = payload.get("provider", None)
+            if provider:
+                if payload.get('exp', 0) > time.time():
+                    # redirect to authenticate the user using their JWT for the provider
+                    # PSA will then redirect back here using the next param
+                    return redirect("{}?{}".format(
+                        reverse('social:complete', args=(provider,)),
+                        urlencode({
+                            'next': request.build_absolute_uri(),
+                        })
+                    ))
+                user = UserSocialAuth.objects.get(provider=MicroMastersAuth.name, uid=username).user
+            else:
+
+                user = User.objects.get(username=username)
 
         except jwt.InvalidTokenError:
             username = None
