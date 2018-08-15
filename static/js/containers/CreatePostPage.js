@@ -184,11 +184,8 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       const isText = isTextTabSelected(postType, channel)
       const data: CreatePostPayload = isText ? { title, text } : { title, url }
       // $FlowFixMe
-      dispatch(actions.posts.post(channelName, data))
-        .then(post => {
-          history.push(postDetailURL(channelName, post.id, post.slug))
-        })
-        .catch(() => {
+      const post = await dispatch(actions.posts.post(channelName, data)).catch(
+        () => {
           dispatch(
             setBannerMessage(
               `Something went wrong creating your post. Please try again or contact us at ${
@@ -196,7 +193,11 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
               }`
             )
           )
-        })
+        }
+      )
+      if (post) {
+        history.push(postDetailURL(channelName, post.id, post.slug))
+      }
     }
   }
 

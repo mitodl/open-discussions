@@ -258,7 +258,7 @@ describe("CreatePostPage", () => {
     submitPost(wrapper)
     assert.lengthOf(wrapper.find(".channel-select .validation-message"), 0)
   })
-  //
+
   it(`should display a banner message if error on form submit`, async () => {
     helper.createPostStub.returns(Promise.reject({ errorStatusCode: 500 }))
     const wrapper = await renderPage()
