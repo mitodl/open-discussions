@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
@@ -9,6 +10,8 @@ import CreatePostForm from "../components/CreatePostForm"
 import withSingleColumn from "../hoc/withSingleColumn"
 
 import { actions } from "../actions"
+import { setBannerMessage } from "../actions/ui"
+import { clearPostError } from "../actions/post"
 import { isTextTabSelected, LINK_TYPE_ANY } from "../lib/channels"
 import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
@@ -16,6 +19,7 @@ import { getChannelName } from "../lib/util"
 import { formatTitle } from "../lib/title"
 import { validatePostCreateForm } from "../lib/validation"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
+import { anyErrorExcept404 } from "../util/rest"
 
 import type {
   Channel,
@@ -41,7 +45,8 @@ type CreatePostPageProps = {
   history: Object,
   processing: boolean,
   embedly: Object,
-  embedlyInFlight: boolean
+  embedlyInFlight: boolean,
+  errored: boolean
 }
 
 export const CREATE_POST_KEY = "post:new"
@@ -103,8 +108,11 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
   }
 
   componentWillUnmount() {
-    const { dispatch } = this.props
+    const { dispatch, errored } = this.props
     dispatch(actions.forms.formEndEdit(CREATE_POST_PAYLOAD))
+    if (errored) {
+      dispatch(clearPostError())
+    }
   }
 
   onUpdate = async (e: Object) => {
@@ -127,6 +135,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
           key:  actions.embedly.get.requestType
         }
       }
+      // $FlowFixMe
       const embedlyResponse = await dispatch(embedlyGetFunc)
       handleTwitterWidgets(embedlyResponse)
     }
@@ -149,7 +158,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     )
   }
 
-  onSubmit = (e: Object) => {
+  onSubmit = async (e: Object) => {
     const { dispatch, history, postForm, channel } = this.props
 
     e.preventDefault()
@@ -174,9 +183,19 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       const { postType, title, url, text } = postForm.value
       const isText = isTextTabSelected(postType, channel)
       const data: CreatePostPayload = isText ? { title, text } : { title, url }
-      dispatch(actions.posts.post(channelName, data)).then(post => {
+      try {
+        // $FlowFixMe
+        const post = await dispatch(actions.posts.post(channelName, data))
         history.push(postDetailURL(channelName, post.id, post.slug))
-      })
+      } catch (err) {
+        dispatch(
+          setBannerMessage(
+            `Something went wrong creating your post. Please try again or contact us at ${
+              SETTINGS.support_email
+            }`
+          )
+        )
+      }
     }
   }
 
@@ -243,6 +262,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     postForm,
+    errored: anyErrorExcept404([state.posts]),
     channel,
     channels,
     processing,

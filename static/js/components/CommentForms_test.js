@@ -21,7 +21,7 @@ import {
 import * as forms from "../actions/forms"
 import { actions } from "../actions"
 import { SET_POST_DATA, setPostData } from "../actions/post"
-import { SET_SNACKBAR_MESSAGE } from "../actions/ui"
+import { SET_BANNER_MESSAGE } from "../actions/ui"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
 import IntegrationTestHelper from "../util/integration_test_helper"
@@ -421,7 +421,7 @@ describe("CommentForms", () => {
     })
     ;[
       [410, "This comment has been deleted and cannot be replied to"],
-      [500, "Unknown error replying to comment"]
+      [500, "Something went wrong creating your comment"]
     ].forEach(([errorStatusCode, message]) => {
       it(`should display a toast message if ${errorStatusCode} error on form submit`, async () => {
         const { requestType, failureType } = actions.comments.post
@@ -438,12 +438,12 @@ describe("CommentForms", () => {
           })
         })
         const state = await helper.listenForActions(
-          [requestType, failureType, SET_SNACKBAR_MESSAGE],
+          [requestType, failureType, SET_BANNER_MESSAGE],
           () => {
             wrapper.find("form").simulate("submit")
           }
         )
-        assert.equal(state.ui.snackbar.message, message)
+        assert.ok(state.ui.banner.message.startsWith(message))
         assert.equal(
           state.posts.data.get(post.id).num_comments,
           post.num_comments

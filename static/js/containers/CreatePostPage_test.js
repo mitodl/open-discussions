@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
 
@@ -26,6 +27,7 @@ import * as embedUtil from "../lib/embed"
 import { newPostForm } from "../lib/posts"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
+import { SET_BANNER_MESSAGE } from "../actions/ui"
 
 describe("CreatePostPage", () => {
   let helper,
@@ -255,6 +257,31 @@ describe("CreatePostPage", () => {
     select.simulate("change", { target: { value: channels[6].name } })
     submitPost(wrapper)
     assert.lengthOf(wrapper.find(".channel-select .validation-message"), 0)
+  })
+
+  it(`should display a banner message if error on form submit`, async () => {
+    helper.createPostStub.returns(Promise.reject({ errorStatusCode: 500 }))
+    const wrapper = await renderPage()
+    const email = "fakesupport@example.com"
+    SETTINGS.support_email = email
+    setTitle(wrapper, post.title)
+    setTextPost(wrapper)
+    setText(wrapper, post.text)
+
+    const state = await listenForActions(
+      [
+        actions.posts.post.requestType,
+        actions.posts.post.failureType,
+        SET_BANNER_MESSAGE
+      ],
+      () => {
+        submitPost(wrapper)
+      }
+    )
+    assert.equal(
+      state.ui.banner.message,
+      `Something went wrong creating your post. Please try again or contact us at ${email}`
+    )
   })
 
   it("goes back when cancel is clicked", async () => {
