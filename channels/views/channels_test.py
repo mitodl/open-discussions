@@ -35,6 +35,8 @@ def test_list_channels(client, jwt_header, private_channel_and_contributor, requ
             'link_type': channel.link_type,
             'membership_is_managed': False,
             'avatar': None,
+            'avatar_small': None,
+            'avatar_medium': None,
             'banner': None,
             'ga_tracking_id': None
         }
@@ -78,6 +80,8 @@ def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
         'user_is_moderator': True,
         'membership_is_managed': True,
         'avatar': None,
+        'avatar_small': None,
+        'avatar_medium': None,
         'banner': None,
         'ga_tracking_id': None
     }
@@ -106,6 +110,8 @@ def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, re
         'user_is_moderator': True,
         'membership_is_managed': True,
         'avatar': None,
+        'avatar_small': None,
+        'avatar_medium': None,
         'banner': None,
         'ga_tracking_id': None
     }
@@ -183,6 +189,8 @@ def test_get_channel(client, jwt_header, private_channel_and_contributor):
         'link_type': channel.link_type,
         'membership_is_managed': False,
         'avatar': None,
+        'avatar_small': None,
+        'avatar_medium': None,
         'banner': None,
         'ga_tracking_id': None
     }
@@ -209,6 +217,8 @@ def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous
             'link_type': public_channel.link_type,
             'membership_is_managed': False,
             'avatar': None,
+            'avatar_small': None,
+            'avatar_medium': None,
             'banner': None,
             'ga_tracking_id': None
         }
@@ -254,6 +264,8 @@ def test_get_channel_with_avatar_banner(client, staff_jwt_header, public_channel
     """
     channel = Channel.objects.get(name=public_channel.name)
     channel.avatar = 'avatar'
+    channel.avatar_small = 'avatar_small'
+    channel.avatar_medium = 'avatar_medium'
     channel.banner = 'banner'
     channel.save()
 
@@ -261,6 +273,8 @@ def test_get_channel_with_avatar_banner(client, staff_jwt_header, public_channel
     resp = client.get(url, **staff_jwt_header)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['avatar'] == '/media/avatar'
+    assert resp.json()['avatar_small'] == '/media/avatar_small'
+    assert resp.json()['avatar_medium'] == '/media/avatar_medium'
     assert resp.json()['banner'] == '/media/banner'
 
 
@@ -284,6 +298,8 @@ def test_patch_channel(client, staff_jwt_header, private_channel):
         'user_is_moderator': True,
         'membership_is_managed': False,
         'avatar': None,
+        'avatar_small': None,
+        'avatar_medium': None,
         'banner': None,
         'ga_tracking_id': None
     }
@@ -315,6 +331,8 @@ def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_
         'link_type': private_channel.link_type,
         'membership_is_managed': False,
         'avatar': None,
+        'avatar_small': None,
+        'avatar_medium': None,
         'banner': None,
         'ga_tracking_id': None
     }
@@ -323,7 +341,7 @@ def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_
 @pytest.mark.parametrize("field", ["avatar", "banner"])
 def test_patch_channel_image(client, public_channel, staff_jwt_header, field):
     """
-    Update a channel's avatar
+    Update a channel's image
     """
     url = reverse('channel-detail', kwargs={'channel_name': public_channel.name})
     png_file = os.path.join(os.path.dirname(__file__), "..", "..", "static", "images", "blank.png")
@@ -332,10 +350,17 @@ def test_patch_channel_image(client, public_channel, staff_jwt_header, field):
             field:  f
         }, format='multipart', **staff_jwt_header)
     assert resp.status_code == status.HTTP_200_OK
-    image = getattr(Channel.objects.get(name=public_channel.name), field)
+    channel = Channel.objects.get(name=public_channel.name)
+    image = getattr(channel, field)
 
     assert f"{public_channel.name}/channel_{field}_" in image.name
     assert len(image.read()) == os.path.getsize(png_file)
+
+    if field == "avatar":
+        for size_field in ('avatar_small', 'avatar_medium'):
+            size_image = getattr(channel, size_field)
+            assert f"_{size_field}" in size_image.name
+            assert len(size_image.read()) > 0
 
 
 @pytest.mark.parametrize("field", ["avatar", "banner"])

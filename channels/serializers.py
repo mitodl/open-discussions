@@ -12,7 +12,11 @@ from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from channels.utils import get_kind_mapping, get_reddit_slug, get_or_create_link_meta
+from channels.utils import (
+    get_kind_mapping,
+    get_reddit_slug,
+    get_or_create_link_meta,
+)
 from channels.constants import (
     VALID_CHANNEL_TYPES,
     VALID_LINK_TYPES,
@@ -62,6 +66,8 @@ class ChannelSerializer(serializers.Serializer):
     user_is_moderator = serializers.SerializerMethodField()
     membership_is_managed = WriteableSerializerMethodField()
     avatar = WriteableSerializerMethodField()
+    avatar_small = serializers.SerializerMethodField()
+    avatar_medium = serializers.SerializerMethodField()
     banner = WriteableSerializerMethodField()
     ga_tracking_id = WriteableSerializerMethodField()
 
@@ -93,21 +99,29 @@ class ChannelSerializer(serializers.Serializer):
         channel_obj = self._get_channel(name=channel.display_name)
         return channel_obj.ga_tracking_id
 
-    def get_avatar(self, channel):
-        """Get the avatar image URL"""
+    def _lookup_image_url(self, channel, field):
+        """Lookup an image url, return None if not found"""
         channel_obj = self._get_channel(name=channel.display_name)
         try:
-            return channel_obj.avatar.url
+            return getattr(channel_obj, field).url
         except ValueError:
             return None
 
+    def get_avatar(self, channel):
+        """Get the avatar image URL"""
+        return self._lookup_image_url(channel, 'avatar')
+
+    def get_avatar_small(self, channel):
+        """Get the avatar image small URL"""
+        return self._lookup_image_url(channel, 'avatar_small')
+
+    def get_avatar_medium(self, channel):
+        """Get the avatar image medium URL"""
+        return self._lookup_image_url(channel, 'avatar_medium')
+
     def get_banner(self, channel):
         """Get the banner image URL"""
-        channel_obj = self._get_channel(name=channel.display_name)
-        try:
-            return channel_obj.banner.url
-        except ValueError:
-            return None
+        return self._lookup_image_url(channel, 'banner')
 
     def validate_avatar(self, value):
         """Empty validation function, but this is required for WriteableSerializerMethodField"""
@@ -172,12 +186,12 @@ class ChannelSerializer(serializers.Serializer):
         avatar = validated_data.get('avatar')
         if avatar:
             channel_obj.avatar.save(f"channel_avatar_{name}.jpg", avatar, save=False)
-            channel_obj.save(update_fields=['avatar'])
+            channel_obj.save(update_fields=['avatar'], update_image=True)
 
         banner = validated_data.get('banner')
         if banner:
             channel_obj.banner.save(f"channel_banner_{name}.jpg", banner, save=False)
-            channel_obj.save(update_fields=['banner'])
+            channel_obj.save(update_fields=['banner'], update_image=True)
 
         return channel
 

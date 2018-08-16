@@ -1,13 +1,22 @@
 """Channels models"""
+from uuid import uuid4
+
 import base36
 from django.conf import settings
 from django.db import models
 from django.db.models import URLField
 
+from channels.utils import (
+    AVATAR_MEDIUM_MAX_DIMENSION,
+    AVATAR_SMALL_MAX_DIMENSION,
+)
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
     avatar_uri,
+    avatar_uri_small,
+    avatar_uri_medium,
     banner_uri,
+    make_thumbnail,
 )
 
 
@@ -99,8 +108,25 @@ class Channel(TimestampedModel):
     name = models.CharField(unique=True, max_length=100)
     membership_is_managed = models.BooleanField(default=False)
     avatar = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri)
+    avatar_small = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri_small)
+    avatar_medium = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri_medium)
     banner = models.ImageField(null=True, max_length=2083, upload_to=banner_uri)
     ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
+
+    def save(self, *args, update_image=False, **kwargs):  # pylint: disable=arguments-differ
+        if update_image:
+            if self.avatar:
+                small_thumbnail = make_thumbnail(self.avatar, AVATAR_SMALL_MAX_DIMENSION)
+                medium_thumbnail = make_thumbnail(self.avatar, AVATAR_MEDIUM_MAX_DIMENSION)
+
+                # name doesn't matter here, we use upload_to to produce that
+                self.avatar_small.save(f"{uuid4().hex}.jpg", small_thumbnail)
+                self.avatar_medium.save(f"{uuid4().hex}.jpg", medium_thumbnail)
+            else:
+                self.avatar_small = None
+                self.avatar_medium = None
+
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name}"

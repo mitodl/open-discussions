@@ -55,6 +55,8 @@ def test_serialize_channel(user, membership_is_managed):
         'user_is_contributor': True,
         'membership_is_managed': membership_is_managed,
         'avatar': None,
+        'avatar_small': None,
+        'avatar_medium': None,
         'banner': None,
         'ga_tracking_id': None
     }

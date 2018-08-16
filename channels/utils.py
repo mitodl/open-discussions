@@ -22,8 +22,10 @@ from rest_framework.exceptions import (
 
 from channels.constants import POSTS_SORT_HOT
 from channels.exceptions import ConflictException, GoneException
-from channels.models import Subscription, LinkMeta
 from embedly.api import get_embedly, THUMBNAIL_URL
+
+AVATAR_SMALL_MAX_DIMENSION = 22
+AVATAR_MEDIUM_MAX_DIMENSION = 90
 
 User = get_user_model()
 
@@ -156,6 +158,7 @@ def _lookup_subscriptions_for_posts(posts, user):
     Return:
         list of str: list of base36 ids of posts the user is subscribed to
     """
+    from channels.models import Subscription
     if not posts or user.is_anonymous:
         return []
 
@@ -195,6 +198,7 @@ def _lookup_subscriptions_for_comments(comments, user):
     Return:
         list of int: list of integer ids of comments the user is subscribed to
     """
+    from channels.models import Subscription
     if not comments or user.is_anonymous:
         return []
 
@@ -260,6 +264,7 @@ def get_or_create_link_meta(url):
         channels.models.LinkMeta: the LinkMeta object for the URL
 
     """
+    from channels.models import LinkMeta
     link_meta = LinkMeta.objects.filter(url=url).first()
     if link_meta is None and settings.EMBEDLY_KEY:
         response = get_embedly(url).json()
