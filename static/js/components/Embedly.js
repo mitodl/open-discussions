@@ -58,7 +58,7 @@ export default class Embedly extends React.Component<Props> {
     if (embedly.type === "photo") {
       return (
         <div className="photo">
-          <img src={embedlyImage(SETTINGS.embedlyKey, embedly.url, 500)} />
+          <img src={embedlyImage(SETTINGS.embedlyKey, embedly.url, 600)} />
         </div>
       )
     }
