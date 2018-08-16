@@ -35,7 +35,10 @@ describe("Embedly", () => {
     const wrapper = renderEmbedly(image)
     assert.ok(wrapper.find(".photo"))
     const img = wrapper.find("img")
-    assert.equal(img.props().src, image.url)
+    assert.ok(img.props().src.includes(encodeURIComponent(image.url)))
+    assert.ok(
+      img.props().src.startsWith("https://i.embed.ly/1/display/resize/")
+    )
   })
 
   it("should render generic article-type content sensibly", () => {
@@ -48,10 +51,9 @@ describe("Embedly", () => {
         .props().href,
       article.url
     )
-    assert.equal(
-      wrapper.find(".thumbnail img").props().src,
-      article.thumbnail_url
-    )
+    const imgSrc = wrapper.find(".thumbnail img").props().src
+    assert.ok(imgSrc.includes(encodeURIComponent(article.thumbnail_url)))
+    assert.ok(imgSrc.startsWith("https://i.embed.ly/1/display/resize/"))
     assert.equal(wrapper.find(".link-summary h2").text(), article.title)
     assert.equal(
       wrapper.find(".link-summary .description").text(),
