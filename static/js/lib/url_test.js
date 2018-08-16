@@ -21,7 +21,7 @@ import {
   postPermalink,
   embedlyThumbnail,
   blankThumbnailUrl,
-  embedlyImage
+  embedlyResizeImage
 } from "./url"
 import { makePost } from "../factories/posts"
 
@@ -227,12 +227,12 @@ describe("url helper functions", () => {
     })
   })
 
-  describe("embedlyImage", () => {
+  describe("embedlyResizeImage", () => {
     it("should return a good embedly image resize url", () => {
       const key = "embedlyKey"
       const height = 512
       const url = "http://www.fake.url/fake.jpg"
-      const embedlyUrl = embedlyImage(key, url, height)
+      const embedlyUrl = embedlyResizeImage(key, url, height)
       assert.ok(embedlyUrl.includes(`height=${height}`))
       assert.ok(embedlyUrl.includes(`key=${key}`))
       assert.ok(embedlyUrl.includes(`url=${encodeURIComponent(url)}`))

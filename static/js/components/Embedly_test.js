@@ -9,6 +9,7 @@ import Embedly from "./Embedly"
 import { urlHostname } from "../lib/url"
 import { makeArticle, makeYoutubeVideo, makeImage } from "../factories/embedly"
 import * as embedFuncs from "../lib/embed"
+import * as urlFuncs from "../lib/url"
 
 const renderEmbedly = embedlyResponse =>
   mount(<Embedly embedly={embedlyResponse} />)
@@ -32,17 +33,20 @@ describe("Embedly", () => {
 
   it("should render an image sensibly", () => {
     const image = makeImage()
+    const resizedImageUrl = `http://embedly/resize/?url=${image.url}`
+    sandbox.stub(urlFuncs, "embedlyResizeImage").returns(resizedImageUrl)
     const wrapper = renderEmbedly(image)
     assert.ok(wrapper.find(".photo"))
     const img = wrapper.find("img")
-    assert.ok(img.props().src.includes(encodeURIComponent(image.url)))
-    assert.ok(
-      img.props().src.startsWith("https://i.embed.ly/1/display/resize/")
-    )
+    assert.equal(img.props().src, resizedImageUrl)
   })
 
   it("should render generic article-type content sensibly", () => {
     const article = makeArticle()
+    const resizedImageUrl = `http://embedly/resize/?url=${
+      article.thumbnail_url
+    }`
+    sandbox.stub(urlFuncs, "embedlyResizeImage").returns(resizedImageUrl)
     const wrapper = renderEmbedly(article)
     assert.equal(
       wrapper
@@ -51,9 +55,7 @@ describe("Embedly", () => {
         .props().href,
       article.url
     )
-    const imgSrc = wrapper.find(".thumbnail img").props().src
-    assert.ok(imgSrc.includes(encodeURIComponent(article.thumbnail_url)))
-    assert.ok(imgSrc.startsWith("https://i.embed.ly/1/display/resize/"))
+    assert.equal(wrapper.find(".thumbnail img").props().src, resizedImageUrl)
     assert.equal(wrapper.find(".link-summary h2").text(), article.title)
     assert.equal(
       wrapper.find(".link-summary .description").text(),

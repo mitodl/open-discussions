@@ -52,7 +52,7 @@ export const embedlyThumbnail = (
     url
   )}&height=${height}&width=${width}&grow=true&errorurl=${blankThumbnailUrl()}`
 
-export const embedlyImage = (key: string, url: string, height: number) =>
+export const embedlyResizeImage = (key: string, url: string, height: number) =>
   `https://i.embed.ly/1/display/resize/?key=${key}&url=${encodeURIComponent(
     url
   )}&height=${height}&grow=false&errorurl=${blankThumbnailUrl()}`

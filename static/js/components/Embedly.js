@@ -4,7 +4,7 @@ import React from "react"
 
 import ContentLoader from "react-content-loader"
 
-import { embedlyImage, urlHostname } from "../lib/url"
+import { embedlyResizeImage, urlHostname } from "../lib/url"
 import { hasIframe } from "../lib/embed"
 
 export const EmbedlyLoader = (props: Object = {}) => (
@@ -58,7 +58,9 @@ export default class Embedly extends React.Component<Props> {
     if (embedly.type === "photo") {
       return (
         <div className="photo">
-          <img src={embedlyImage(SETTINGS.embedlyKey, embedly.url, 600)} />
+          <img
+            src={embedlyResizeImage(SETTINGS.embedlyKey, embedly.url, 600)}
+          />
         </div>
       )
     }
@@ -78,7 +80,7 @@ export default class Embedly extends React.Component<Props> {
           {embedly.thumbnail_url ? (
             <div className={compactView ? "thumbnail compact" : "thumbnail"}>
               <img
-                src={embedlyImage(
+                src={embedlyResizeImage(
                   SETTINGS.embedlyKey,
                   embedly.thumbnail_url,
                   500
