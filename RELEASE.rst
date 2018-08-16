@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.41.3
+--------------
+
+- Use embedly image api to resize thumbnails in Embedly component (#1083)
+- Banner message if creating a post on reddit fails (#1055)
+- Remove IS_OSX since it's unnecessary with Docker for Mac (#1079)
+- Fix profile image upload bug (#1081)
+
 Version 0.41.2 (Released August 15, 2018)
 --------------
 
