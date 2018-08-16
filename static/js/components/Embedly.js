@@ -1,9 +1,10 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 
 import ContentLoader from "react-content-loader"
 
-import { urlHostname } from "../lib/url"
+import { embedlyResizeImage, urlHostname } from "../lib/url"
 import { hasIframe } from "../lib/embed"
 
 export const EmbedlyLoader = (props: Object = {}) => (
@@ -57,7 +58,9 @@ export default class Embedly extends React.Component<Props> {
     if (embedly.type === "photo") {
       return (
         <div className="photo">
-          <img src={embedly.url} />
+          <img
+            src={embedlyResizeImage(SETTINGS.embedlyKey, embedly.url, 600)}
+          />
         </div>
       )
     }
@@ -76,7 +79,13 @@ export default class Embedly extends React.Component<Props> {
         >
           {embedly.thumbnail_url ? (
             <div className={compactView ? "thumbnail compact" : "thumbnail"}>
-              <img src={embedly.thumbnail_url} />
+              <img
+                src={embedlyResizeImage(
+                  SETTINGS.embedlyKey,
+                  embedly.thumbnail_url,
+                  500
+                )}
+              />
             </div>
           ) : null}
           <div className="link-summary">

@@ -20,7 +20,8 @@ import {
   channelModerationURL,
   postPermalink,
   embedlyThumbnail,
-  blankThumbnailUrl
+  blankThumbnailUrl,
+  embedlyResizeImage
 } from "./url"
 import { makePost } from "../factories/posts"
 
@@ -221,6 +222,18 @@ describe("url helper functions", () => {
       const embedlyUrl = embedlyThumbnail(key, url, height, width)
       assert.ok(embedlyUrl.includes(`height=${height}`))
       assert.ok(embedlyUrl.includes(`width=${width}`))
+      assert.ok(embedlyUrl.includes(`key=${key}`))
+      assert.ok(embedlyUrl.includes(`url=${encodeURIComponent(url)}`))
+    })
+  })
+
+  describe("embedlyResizeImage", () => {
+    it("should return a good embedly image resize url", () => {
+      const key = "embedlyKey"
+      const height = 512
+      const url = "http://www.fake.url/fake.jpg"
+      const embedlyUrl = embedlyResizeImage(key, url, height)
+      assert.ok(embedlyUrl.includes(`height=${height}`))
       assert.ok(embedlyUrl.includes(`key=${key}`))
       assert.ok(embedlyUrl.includes(`url=${encodeURIComponent(url)}`))
     })
