@@ -20,7 +20,7 @@ class Base36IntegerField(models.BigIntegerField):
             return base36.loads(value)
         return value
 
-    def from_db_value(self, value, expression, connection, context):  # pylint: disable=unused-argument
+    def from_db_value(self, value, expression, connection):  # pylint: disable=unused-argument
         """Converts from base10 to base36 for application"""
         if value is None:
             return value
@@ -121,9 +121,9 @@ class Post(TimestampedModel):
     """
     Keep track of post ids so that we can index all posts
     """
-    channel = models.ForeignKey(Channel)
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     post_id = Base36IntegerField(unique=True)
-    link_meta = models.ForeignKey(LinkMeta, null=True)
+    link_meta = models.ForeignKey(LinkMeta, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.post_id} on channel {self.channel}"
@@ -133,7 +133,7 @@ class Comment(TimestampedModel):
     """
     Keep track of comment ids so that we can index all comments efficiently
     """
-    post = models.ForeignKey(Post)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     comment_id = Base36IntegerField(unique=True)
     parent_id = Base36IntegerField(null=True)
 

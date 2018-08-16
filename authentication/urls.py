@@ -31,5 +31,5 @@ urlpatterns = [
     url(r'^api/v0/set_password/$', CustomSetPasswordView.as_view(), name='set-password-api'),
     url(r'^api/v0/auths/$', get_social_auth_types, name='get-auth-types-api'),
     url(r'^login/complete$', login_complete, name='login-complete'),
-    url(r'^logout/$', auth_views.logout, name='logout')
+    url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout')
 ]

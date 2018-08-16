@@ -6,7 +6,7 @@ from functools import wraps
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango30Warning
 import factory
 import pytest
 from _pytest.deprecated import RemovedInPytest4Warning
@@ -43,11 +43,11 @@ def warnings_as_errors():
             module=".*(api_jwt|api_jws|rest_framework_jwt|betamax).*",
             category=DeprecationWarning,
         )
-        # Ignore warnings for social_django compatability code
+        # Ignore warnings for social_django compatibility code
         warnings.filterwarnings(
             "ignore",
-            module="(social_django|social_core).*",
-            category=RemovedInDjango20Warning,
+            message=r".*(JSONField\.from_db_value).*",
+            category=RemovedInDjango30Warning,
         )
         warnings.filterwarnings(
             "ignore",

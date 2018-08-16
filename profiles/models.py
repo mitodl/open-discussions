@@ -41,7 +41,7 @@ def filter_profile_props(data):
 
 class Profile(models.Model):
     """Profile model"""
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     name = models.TextField(blank=True, null=True)
 
