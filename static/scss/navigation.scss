@@ -181,3 +181,37 @@ $link-padding: 11px 20px 11px 19px;
     margin-right: 12px;
   }
 }
+
+// footer
+.mdc-drawer__content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .navigation {
+    flex: 1 0 auto;
+  }
+
+  .footer {
+    flex-shrink: 0;
+    font-size: 12px;
+    padding: $icon-padding-left;
+
+    a,
+    a:hover {
+      color: black;
+    }
+
+    .mit-logo {
+      margin-top: 5px;
+    }
+
+    .row {
+      display: block;
+
+      &.legal {
+        color: $font-grey;
+      }
+    }
+  }
+}
