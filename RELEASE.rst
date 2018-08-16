@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.41.3
+Version 0.41.3 (Released August 16, 2018)
 --------------
 
 - Use embedly image api to resize thumbnails in Embedly component (#1083)
