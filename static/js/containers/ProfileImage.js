@@ -25,7 +25,8 @@ type Props = {
   editable: boolean,
   getProfile: (username: string) => Promise<*>,
   submitImage: (username: string, edit: Blob, name: string) => Promise<*>,
-  processing: boolean
+  processing: boolean,
+  className?: string
 }
 
 const formatPhotoName = photo => `${photo.name.replace(/\.\w*$/, "")}.jpg`
@@ -53,7 +54,7 @@ class ProfileImage extends React.Component<Props> {
   }
 
   render() {
-    const { editable, profile, imageSize, processing } = this.props
+    const { editable, profile, imageSize, processing, className } = this.props
 
     let imageUrl, profileName
     if (profile) {
@@ -69,7 +70,7 @@ class ProfileImage extends React.Component<Props> {
 
     const isAdd = imageUrl === defaultProfileImageUrl
     return (
-      <div className="profile-image-container">
+      <div className={`profile-image-container ${className || ""}`}>
         <div className="avatar">
           <img
             src={imageUrl}

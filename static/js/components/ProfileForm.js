@@ -41,14 +41,15 @@ export default class ProfileForm extends React.Component<Props> {
 
     return (
       <div>
+        <ProfileImage
+          profile={profile}
+          userName={profile.username}
+          editable={profile.username === SETTINGS.username}
+          imageSize={PROFILE_IMAGE_MEDIUM}
+          className="float-left"
+        />
         <form onSubmit={onSubmit} className="form">
           <div className="row image-and-name">
-            <ProfileImage
-              profile={profile}
-              userName={profile.username}
-              editable={profile.username === SETTINGS.username}
-              imageSize={PROFILE_IMAGE_MEDIUM}
-            />
             <div className="profile-name">
               <div>
                 <input
