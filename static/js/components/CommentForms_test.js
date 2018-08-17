@@ -4,6 +4,7 @@ import { Provider } from "react-redux"
 import { assert } from "chai"
 import { mount } from "enzyme"
 import sinon from "sinon"
+import { EditorView } from "prosemirror-view"
 
 import {
   ReplyToCommentForm,
@@ -57,6 +58,12 @@ describe("CommentForms", () => {
       </Provider>
     )
 
+  const setEditorText = (wrapper, text) =>
+    wrapper
+      .find("Editor")
+      .props()
+      .onChange(text)
+
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     post = makePost()
@@ -72,6 +79,7 @@ describe("CommentForms", () => {
       comment_id: comment.id,
       text:       "comment text"
     }
+    helper.sandbox.stub(EditorView.prototype, "focus")
   })
 
   afterEach(() => {
@@ -540,18 +548,18 @@ describe("CommentForms", () => {
       wrapper = renderEditPostForm()
     })
 
+    it("should use the <Editor /> rather than a textarea", () => {
+      assert.ok(wrapper.find("Editor").exists())
+      assert.isNotOk(wrapper.find("textarea").exists())
+    })
+
     it("should have the autofocus prop", () => {
-      assert.isTrue(wrapper.find("textarea").props().autoFocus)
+      assert.isTrue(wrapper.find("Editor").props().autoFocus)
     })
 
     it("should trigger an update when text is input", async () => {
       const state = await helper.listenForActions([forms.FORM_UPDATE], () => {
-        wrapper.find("textarea[name='text']").simulate("change", {
-          target: {
-            name:  "text",
-            value: "new post text"
-          }
-        })
+        setEditorText(wrapper, "new post text")
       })
       assert.equal(R.keys(state.forms).length, 1)
       assert.deepInclude(state.forms[R.keys(state.forms)[0]], {
@@ -577,12 +585,7 @@ describe("CommentForms", () => {
       beginEditing(helper.store.dispatch, editPostKey(post), post, undefined)
 
       await helper.listenForActions([forms.FORM_UPDATE], () => {
-        wrapper.find("textarea[name='text']").simulate("change", {
-          target: {
-            name:  "text",
-            value: "edited text"
-          }
-        })
+        setEditorText(wrapper, "edited text")
       })
 
       const state = await helper.listenForActions(

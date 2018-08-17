@@ -8,6 +8,7 @@ import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 import { setBannerMessage } from "../actions/ui"
 import { isEmptyText } from "../lib/util"
+import Editor, { editorUpdateFormShim } from "./Editor"
 
 import type { CommentForm, CommentInTree, Post } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
@@ -63,7 +64,8 @@ const commentForm = (
   cancelReply: () => void,
   isComment: boolean,
   disabled: boolean,
-  autoFocus: boolean
+  autoFocus: boolean,
+  wysiwyg: boolean = false
 ) => (
   <div className="reply-form">
     <form
@@ -76,15 +78,23 @@ const commentForm = (
       }}
     >
       <div className="form-item">
-        <textarea
-          name="text"
-          type="text"
-          className="input"
-          placeholder="Write a reply here..."
-          value={text || ""}
-          onChange={onUpdate}
-          autoFocus={autoFocus}
-        />
+        {wysiwyg ? (
+          <Editor
+            initialValue={text || ""}
+            onChange={editorUpdateFormShim("text", onUpdate)}
+            autoFocus={autoFocus}
+          />
+        ) : (
+          <textarea
+            name="text"
+            type="text"
+            className="input"
+            placeholder="Write a reply here..."
+            value={text || ""}
+            onChange={onUpdate}
+            autoFocus={autoFocus}
+          />
+        )}
       </div>
       <button
         type="submit"
@@ -351,6 +361,7 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
         cancelReply,
         true,
         patching,
+        true,
         true
       )
     }
