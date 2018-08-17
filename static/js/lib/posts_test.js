@@ -10,7 +10,8 @@ import {
   newPostForm,
   formatCommentsCount,
   PostVotingButtons,
-  PostTitleAndHostname
+  PostTitleAndHostname,
+  formatPostTitle
 } from "./posts"
 import { makePost } from "../factories/posts"
 import { votingTooltipText } from "./util"
@@ -34,6 +35,18 @@ describe("Post utils", () => {
         post.num_comments = num
         assert.equal(formatCommentsCount(post), expectation)
       }
+    )
+  })
+
+  it("should include a domain and link icon for link posts", () => {
+    const post = makePost(true)
+    const postTitle = shallow(formatPostTitle(post))
+    assert.ok(postTitle.find(".open_in_new").exists())
+    assert.ok(
+      postTitle
+        .find(".expanded-url-hostname")
+        .text()
+        .startsWith(`(${urlHostname(post.url)}`)
     )
   })
 
