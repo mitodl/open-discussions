@@ -31,9 +31,9 @@ export default class SubscriptionsList extends React.Component<Props> {
         {channel.user_is_moderator ? (
           <Link
             to={editChannelBasicURL(channel.name)}
-            className="material-icons settings-link"
+            className="settings-link"
           >
-            settings
+            Edit
           </Link>
         ) : null}
       </div>
