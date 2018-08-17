@@ -31,7 +31,7 @@ import type { AddMemberForm, Channel, Member } from "../../flow/discussionTypes"
 import type { WithFormProps } from "../../flow/formTypes"
 import { channelURL } from "../../lib/url"
 
-const CONTRIBUTORS_KEY = "channel:edit:contributors"
+export const CONTRIBUTORS_KEY = "channel:edit:contributors"
 const { getForm, actionCreators } = configureForm(
   CONTRIBUTORS_KEY,
   newMemberForm

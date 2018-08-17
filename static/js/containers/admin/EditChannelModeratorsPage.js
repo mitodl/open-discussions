@@ -31,7 +31,7 @@ import {
 import type { AddMemberForm, Channel, Member } from "../../flow/discussionTypes"
 import type { WithFormProps } from "../../flow/formTypes"
 
-const MODERATORS_KEY = "channel:edit:moderators"
+export const MODERATORS_KEY = "channel:edit:moderators"
 const { getForm, actionCreators } = configureForm(MODERATORS_KEY, newMemberForm)
 
 const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
