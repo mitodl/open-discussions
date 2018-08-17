@@ -65,6 +65,7 @@ def generate_gravatar_image(user, image_field=None):
 
     Args:
         user (User): the user to compute gravatar image urls for
+        image_field (str):
 
     Returns:
         str: The URL to the image.
@@ -141,7 +142,7 @@ def generate_filepath(filename, directory_name, suffix, prefix):
     return full_path
 
 
-# These five functions are referenced in migrations so be careful refactoring
+# These functions are referenced in migrations so be careful refactoring
 def profile_image_upload_uri(instance, filename):
     """
     upload_to handler for Profile.image
@@ -168,6 +169,20 @@ def avatar_uri(instance, filename):
     upload_to handler for Channel.avatar
     """
     return generate_filepath(filename, instance.name, "_avatar", "channel")
+
+
+def avatar_uri_medium(instance, filename):
+    """
+    upload_to handler for Channel.avatar_medium
+    """
+    return generate_filepath(filename, instance.name, "_avatar_medium", "channel")
+
+
+def avatar_uri_small(instance, filename):
+    """
+    upload_to handler for Channel.avatar_small
+    """
+    return generate_filepath(filename, instance.name, "_avatar_small", "channel")
 
 
 def banner_uri(instance, filename):
