@@ -168,7 +168,8 @@ $link-padding: 11px 20px 11px 19px;
     }
 
     &.current-location {
-      background-color: $bg-grey;
+      background-color: #e7ebf5;
+      font-weight: 600;
     }
   }
 }
