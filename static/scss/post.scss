@@ -101,6 +101,16 @@
   margin-left: 4px;
 }
 
+.expanded-url-hostname {
+  color: $font-grey-light;
+  font-size: 18px;
+  margin-left: 4px;
+
+  i {
+    vertical-align: middle;
+  }
+}
+
 .post-summary {
   display: flex;
   flex-direction: column;

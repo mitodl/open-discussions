@@ -160,7 +160,7 @@ describe("ExpandedPostDisplay", () => {
       .props()
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
-    assert.equal(children, post.title)
+    assert.equal(children[0], post.title)
   })
 
   it("should display the domain, for a url post", () => {
