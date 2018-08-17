@@ -7,7 +7,7 @@ import moment from "moment"
 const Footer = () => (
   <div className="footer">
     <div className="row">
-      <Link to="/content_policy">Community Guidelines</Link>
+      <Link to="/content_policy">Community guidelines</Link>
     </div>
     <div className="row">
       <a href={SETTINGS.authenticated_site.tos_url}>Terms & Conditions</a>
@@ -21,10 +21,8 @@ const Footer = () => (
       />
     </div>
     <div className="row legal">
-      <div className="address">Massachusetts Institute of Technology</div>
-      <div className="copyright">
-        © 2016-{moment().format("Y")} - All rights reserved
-      </div>
+      Massachusetts Institute of Technology<br />
+      © 2016-{moment().format("Y")} - All rights reserved
     </div>
   </div>
 )

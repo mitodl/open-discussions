@@ -203,14 +203,16 @@ $link-padding: 11px 20px 11px 19px;
     }
 
     .mit-logo {
-      margin-top: 5px;
+      margin: 15px 0 5px 0;
     }
 
     .row {
       display: block;
+      line-height: 20px;
 
       &.legal {
         color: $font-grey;
+        line-height: 16px;
       }
     }
   }
