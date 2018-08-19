@@ -1,15 +1,12 @@
 """Custom permissions"""
-import jwt
 from prawcore.exceptions import (
     Forbidden as PrawForbidden,
     Redirect as PrawRedirect,
 )
 from rest_framework import permissions
-from rest_framework_jwt.settings import api_settings
-
-from open_discussions import features
 
 from channels.models import Channel
+from open_discussions import features
 
 
 def is_staff_user(request):
@@ -20,20 +17,7 @@ def is_staff_user(request):
     Returns:
         bool: True if user is staff
     """
-    if request.auth is None:
-        if request.user and request.user.is_authenticated:
-            return request.user.is_staff
-
-        return False
-
-    jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
-
-    try:
-        payload = jwt_decode_handler(request.auth)
-    except jwt.InvalidTokenError:
-        return False
-
-    return 'roles' in payload and 'staff' in payload['roles']
+    return request.user is not None and request.user.is_staff
 
 
 def is_moderator(request, view):
@@ -95,8 +79,8 @@ def is_readonly(request):
     return request.method in permissions.SAFE_METHODS
 
 
-class JwtIsStaffPermission(permissions.BasePermission):
-    """Checks the JWT payload for the staff permission"""
+class IsStaffPermission(permissions.BasePermission):
+    """Checks the user for the staff permission"""
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role"""
@@ -104,7 +88,7 @@ class JwtIsStaffPermission(permissions.BasePermission):
 
 
 class IsStaffOrReadonlyPermission(permissions.BasePermission):
-    """Checks the JWT payload for the staff permission"""
+    """Checks the user for the staff permission"""
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or if the request is readonly"""

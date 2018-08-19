@@ -54,7 +54,7 @@ import {
   anyErrorExcept404,
   anyErrorExcept404or410,
   any404Error,
-  any403Error
+  anyNotAuthorizedErrorType
 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginEditing } from "../components/CommentForms"
@@ -507,7 +507,7 @@ const mapStateToProps = (state, ownProps) => {
     post && post.url ? embedly.data.get(post.url) : undefined
 
   const notFound = any404Error([posts, comments])
-  const notAuthorized = any403Error([posts, comments])
+  const notAuthorized = anyNotAuthorizedErrorType([posts, comments])
 
   const loaded = notFound
     ? true

@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from cairosvg import svg2png  # pylint:disable=no-name-in-module
 
-from open_discussions.permissions import JwtIsStaffPermission
+from open_discussions.permissions import IsStaffPermission
 from profiles.models import Profile
 from profiles.permissions import HasEditPermission
 from profiles.serializers import UserSerializer, ProfileSerializer
@@ -19,7 +19,7 @@ from profiles.utils import generate_svg_avatar, DEFAULT_PROFILE_IMAGE
 
 class UserViewSet(viewsets.ModelViewSet):
     """View for users"""
-    permission_classes = (IsAuthenticated, JwtIsStaffPermission,)
+    permission_classes = (IsAuthenticated, IsStaffPermission,)
 
     serializer_class = UserSerializer
     queryset = get_user_model().objects.all()

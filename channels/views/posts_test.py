@@ -13,6 +13,10 @@ from channels.constants import (
     POSTS_SORT_HOT,
 )
 from channels.models import Subscription, LinkMeta
+from open_discussions.constants import (
+    NOT_AUTHENTICATED_ERROR_TYPE,
+    PERMISSION_DENIED_ERROR_TYPE,
+)
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
@@ -158,15 +162,15 @@ def test_create_text_post_blank(client, private_channel_and_contributor):
     assert resp.json()['text'] == ''
 
 
-def test_create_post_forbidden(client, private_channel, jwt_header):
+def test_create_post_forbidden(user_client, private_channel):
     """
     Create a new text post for a channel the user doesn't have permission to
     """
     url = reverse('post-list', kwargs={'channel_name': private_channel.name})
-    resp = client.post(url, {
+    resp = user_client.post(url, {
         'title': 'parameterized testing',
         'text': 'tests are great',
-    }, **jwt_header)
+    })
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
@@ -193,11 +197,12 @@ def test_create_post_anonymous(client, settings, allow_anonymous):
         'title': 'parameterized testing',
         'text': 'tests are great',
     })
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
-def test_get_deleted_post(client, missing_user, staff_jwt_header, private_channel_and_contributor, reddit_factories):
+def test_get_deleted_post(staff_client, missing_user, private_channel_and_contributor, reddit_factories):
     """Get an existing post for a deleted user"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post("deleted", user, channel=channel)
@@ -207,7 +212,7 @@ def test_get_deleted_post(client, missing_user, staff_jwt_header, private_channe
         user.save()
 
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    resp = client.get(url, **staff_jwt_header)
+    resp = staff_client.get(url)
     if missing_user:
         assert resp.status_code == status.HTTP_404_NOT_FOUND
     else:
@@ -382,7 +387,8 @@ def test_get_post_anonymous(client, public_channel, reddit_factories, settings, 
             'thumbnail': None,
         }
     else:
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+        assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
@@ -561,7 +567,7 @@ def test_list_posts_not_found(client, logged_in_profile):
 
 
 def test_list_posts_pagination_first_page_no_params(
-        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+        user_client, settings, private_channel_and_contributor, reddit_factories
 ):
     """Test that post pagination works for the first page if no params"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
@@ -574,13 +580,13 @@ def test_list_posts_pagination_first_page_no_params(
         'sort': POSTS_SORT_HOT,
     }
     url = reverse('post-list', kwargs={'channel_name': channel.name})
-    resp = client.get(url, params, **jwt_header)
+    resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected
 
 
 def test_list_posts_pagination_first_page_with_params(
-        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+        user_client, settings, private_channel_and_contributor, reddit_factories
 ):
     """Test that post pagination works for the first page with params"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
@@ -593,13 +599,13 @@ def test_list_posts_pagination_first_page_with_params(
         'sort': POSTS_SORT_HOT,
     }
     url = reverse('post-list', kwargs={'channel_name': channel.name})
-    resp = client.get(url, params, **jwt_header)
+    resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected
 
 
 def test_list_posts_pagination_non_first_page(
-        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+        user_client, settings, private_channel_and_contributor, reddit_factories
 ):
     """Test that post pagination works for a page that's not the first one"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
@@ -614,13 +620,13 @@ def test_list_posts_pagination_non_first_page(
         'sort': POSTS_SORT_HOT,
     }
     url = reverse('post-list', kwargs={'channel_name': channel.name})
-    resp = client.get(url, params, **jwt_header)
+    resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected
 
 
 def test_list_posts_pagination_non_offset_page(
-        client, settings, private_channel_and_contributor, reddit_factories, jwt_header
+        user_client, settings, private_channel_and_contributor, reddit_factories
 ):
     """Test that post pagination works for a page that doesn't align to the number of results"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
@@ -635,7 +641,7 @@ def test_list_posts_pagination_non_offset_page(
         'sort': POSTS_SORT_HOT,
     }
     url = reverse('post-list', kwargs={'channel_name': channel.name})
-    resp = client.get(url, params, **jwt_header)
+    resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['pagination'] == expected
 
@@ -679,7 +685,8 @@ def test_list_posts_anonymous(client, public_channel, reddit_factories, settings
             }]
         }
     else:
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+        assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 def test_update_post_text(client, private_channel_and_contributor, reddit_factories):
@@ -947,40 +954,46 @@ def test_update_post_ignore_reports(
     }
 
 
-def test_update_post_ignore_reports_forbidden(client, private_channel_and_contributor, reddit_factories):
+def test_update_post_ignore_reports_forbidden(user_client, private_channel_and_contributor, reddit_factories):
     """Test updating a post to ignore reports with a nonstaff user"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('just a post', user, channel=channel)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    client.force_login(user)
-    resp = client.patch(url, format='json', data={"ignore_reports": True})
-    assert resp.status_code == status.HTTP_403_FORBIDDEN
+    resp = user_client.patch(url, format='json', data={"ignore_reports": True})
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data == {
+        'error_type': PERMISSION_DENIED_ERROR_TYPE,
+        'detail': 'You do not have permission to perform this action.',
+    }
 
 
-def test_update_post_removed_forbidden(client, private_channel_and_contributor, reddit_factories):
+def test_update_post_removed_forbidden(user_client, private_channel_and_contributor, reddit_factories):
     """Test updating a post to remove with a nonstaff user"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('just a post', user, channel=channel)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    client.force_login(user)
-    resp = client.patch(url, format='json', data={"removed": True})
-    assert resp.status_code == status.HTTP_403_FORBIDDEN
+    resp = user_client.patch(url, format='json', data={"removed": True})
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data == {
+        'error_type': PERMISSION_DENIED_ERROR_TYPE,
+        'detail': 'You do not have permission to perform this action.',
+    }
 
 
-def test_update_post_forbidden(client, staff_jwt_header, private_channel_and_contributor, reddit_factories):
+def test_update_post_forbidden(staff_client, private_channel_and_contributor, reddit_factories):
     """Test updating a post the user isn't the owner of"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post("text", user=user, channel=channel)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    resp = client.patch(url, format='json', data={"text": "overwrite"}, **staff_jwt_header)
+    resp = staff_client.patch(url, format='json', data={"text": "overwrite"})
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_update_post_not_found(client, jwt_header):
+def test_update_post_not_found(user_client):
     """Test updating a post that doesn't exist"""
     post_id = 'missing'
     url = reverse('post-detail', kwargs={'post_id': post_id})
-    resp = client.patch(url, format='json', data={"text": "overwrite"}, **jwt_header)
+    resp = user_client.patch(url, format='json', data={"text": "overwrite"})
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
@@ -990,15 +1003,15 @@ def test_update_post_anonymous(client, settings, allow_anonymous):
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('post-detail', kwargs={'post_id': 'doesntmatter'})
     resp = client.patch(url, format='json', data={'text': 'overwrite'})
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_create_post_without_upvote(client, private_channel_and_contributor):
+def test_create_post_without_upvote(user_client, private_channel_and_contributor):
     """Test creating a post without an upvote in the body"""
     channel, user = private_channel_and_contributor
     url = reverse('post-list', kwargs={'channel_name': channel.name})
-    client.force_login(user)
-    resp = client.post(url, {
+    resp = user_client.post(url, {
         'title': 'x',
         'text': 'y',
         'upvoted': False,
@@ -1031,10 +1044,10 @@ def test_create_post_without_upvote(client, private_channel_and_contributor):
 
 
 # Reddit doesn't indicate if a post deletion failed so we don't have tests for that
-def test_delete_post(client, logged_in_profile):
+def test_delete_post(user_client):
     """Delete a post in a channel"""
     url = reverse('post-detail', kwargs={'post_id': '2'})
-    resp = client.delete(url)
+    resp = user_client.delete(url)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
@@ -1044,7 +1057,8 @@ def test_delete_post_anonymous(client, settings, allow_anonymous):
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('post-detail', kwargs={'post_id': 'doesnt_matter'})
     resp = client.delete(url)
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 @pytest.mark.parametrize('has_post_subscription,has_comment_subscription,expected_before,expected_after', [
@@ -1054,22 +1068,20 @@ def test_delete_post_anonymous(client, settings, allow_anonymous):
     (False, False, 0, 1),
 ])
 def test_subscribe_post(
-        client, private_channel_and_contributor, reddit_factories, staff_user,
+        staff_client, private_channel_and_contributor, reddit_factories, staff_api,
         has_post_subscription, has_comment_subscription, expected_before, expected_after
 ):  # pylint: disable=too-many-arguments
     """Test subscribing to a post"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('just a post', user, channel=channel)
     comment = reddit_factories.comment('just a comment', user, post_id=post.id)
-    api = Api(staff_user)
     if has_post_subscription:
-        api.add_post_subscription(post.id)
+        staff_api.add_post_subscription(post.id)
     if has_comment_subscription:
-        api.add_comment_subscription(post.id, comment.id)
+        staff_api.add_comment_subscription(post.id, comment.id)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    client.force_login(staff_user)
     assert Subscription.objects.count() == expected_before
-    resp = client.patch(url, {
+    resp = staff_client.patch(url, {
         'subscribed': True,
     })
     assert resp.status_code == status.HTTP_200_OK
@@ -1100,15 +1112,14 @@ def test_subscribe_post(
     assert Subscription.objects.count() == expected_after
 
 
-def test_unsubscribe_post(client, private_channel_and_contributor, reddit_factories):
+def test_unsubscribe_post(user_client, private_channel_and_contributor, reddit_factories):
     """Test unsubscribing to a post"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('just a post', user, channel=channel)
     api = Api(user)
     api.add_post_subscription(post.id)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    client.force_login(user)
-    resp = client.patch(url, {
+    resp = user_client.patch(url, {
         'subscribed': False,
     })
     assert resp.status_code == status.HTTP_200_OK

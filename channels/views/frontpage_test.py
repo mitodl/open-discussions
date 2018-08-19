@@ -9,6 +9,7 @@ from channels.constants import (
     VALID_POST_SORT_TYPES,
 )
 from channels.utils import get_reddit_slug
+from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.features import ANONYMOUS_ACCESS
 from profiles.utils import image_uri
 
@@ -151,4 +152,5 @@ def test_frontpage_anonymous(client, public_channel, settings, allow_anonymous):
         # Since the front page is shared between all channels it's hard to assert reproduceable results
         assert isinstance(resp.json()['posts'], list) is True
     else:
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+        assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE

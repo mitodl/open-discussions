@@ -6,6 +6,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from channels.models import LinkMeta
+from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.features import ANONYMOUS_ACCESS
 
 
@@ -81,4 +82,5 @@ def test_get_embedly_anon(client, mocker, settings, allow_anonymous):
         assert resp.status_code == status.HTTP_200_OK
         get_stub.assert_called_once_with("https://en.wikipedia.org/wiki/Giant_panda/")
     else:
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+        assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE

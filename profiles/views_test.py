@@ -13,13 +13,13 @@ from profiles.utils import make_temp_image_file, DEFAULT_PROFILE_IMAGE
 pytestmark = pytest.mark.django_db
 
 
-def test_list_users(client, staff_user, staff_jwt_header):
+def test_list_users(staff_client, staff_user):
     """
     List users
     """
     profile = staff_user.profile
     url = reverse('user_api-list')
-    resp = client.get(url, **staff_jwt_header)
+    resp = staff_client.get(url)
     assert resp.status_code == 200
     assert resp.json() == [
         {
@@ -48,7 +48,7 @@ def test_list_users(client, staff_user, staff_jwt_header):
 @pytest.mark.parametrize('email_optin', [None, True, False])
 @pytest.mark.parametrize('toc_optin', [None, True, False])
 def test_create_user(
-        client, staff_user, staff_jwt_header, mocker, uid, email_optin, toc_optin
+        staff_client, staff_user, mocker, uid, email_optin, toc_optin
 ):  # pylint: disable=too-many-arguments
     """
     Create a user and assert the response
@@ -79,7 +79,7 @@ def test_create_user(
     assert UserSocialAuth.objects.filter(provider=MicroMastersAuth.name, uid=uid).exists() is False
     get_or_create_auth_tokens_stub = mocker.patch('channels.api.get_or_create_auth_tokens')
     ensure_notifications_stub = mocker.patch('notifications.api.ensure_notification_settings')
-    resp = client.post(url, data=payload, **staff_jwt_header)
+    resp = staff_client.post(url, data=payload)
     user = User.objects.get(username=resp.json()['username'])
     assert resp.status_code == 201
     for optin in ('email_optin', 'toc_optin'):
@@ -102,13 +102,13 @@ def test_create_user(
     assert UserSocialAuth.objects.filter(provider=MicroMastersAuth.name, uid=uid).exists() is (uid is not None)
 
 
-def test_get_user(client, user, staff_jwt_header):
+def test_get_user(staff_client, user):
     """
     Get a user
     """
     profile = user.profile
     url = reverse('user_api-detail', kwargs={'username': user.username})
-    resp = client.get(url, **staff_jwt_header)
+    resp = staff_client.get(url)
     assert resp.status_code == 200
     assert resp.json() == {
         'id': user.id,
@@ -134,7 +134,7 @@ def test_get_user(client, user, staff_jwt_header):
 @pytest.mark.parametrize('email', ['', 'test.email@example.com'])
 @pytest.mark.parametrize('email_optin', [None, True, False])
 @pytest.mark.parametrize('toc_optin', [None, True, False])
-def test_patch_user(client, user, staff_jwt_header, uid, email, email_optin, toc_optin):
+def test_patch_user(staff_client, user, uid, email, email_optin, toc_optin):
     """
     Update a users' profile
     """
@@ -158,7 +158,7 @@ def test_patch_user(client, user, staff_jwt_header, uid, email, email_optin, toc
         payload['profile']['toc_optin'] = toc_optin
     assert UserSocialAuth.objects.filter(provider=MicroMastersAuth.name, uid=uid).exists() is False
     url = reverse('user_api-detail', kwargs={'username': user.username})
-    resp = client.patch(url, data=payload, **staff_jwt_header)
+    resp = staff_client.patch(url, data=payload)
     assert resp.status_code == 200
     assert resp.json() == {
         'id': user.id,
@@ -186,14 +186,14 @@ def test_patch_user(client, user, staff_jwt_header, uid, email, email_optin, toc
     assert UserSocialAuth.objects.filter(provider=MicroMastersAuth.name, uid=uid).exists() is (uid is not None)
 
 
-def test_patch_username(client, user, staff_jwt_header):
+def test_patch_username(staff_client, user):
     """
     Trying to update a users's username does not change anything
     """
     url = reverse('user_api-detail', kwargs={'username': user.username})
-    resp = client.patch(url, data={
+    resp = staff_client.patch(url, data={
         'username': 'notallowed'
-    }, **staff_jwt_header)
+    })
     assert resp.status_code == 200
     assert resp.json()['username'] == user.username
 

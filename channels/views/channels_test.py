@@ -9,19 +9,22 @@ from rest_framework import status
 from channels.constants import LINK_TYPE_ANY
 from channels.factories import STRATEGY_BUILD
 from channels.models import Channel
-from open_discussions.factories import UserFactory
+from open_discussions.constants import (
+    NOT_AUTHENTICATED_ERROR_TYPE,
+    PERMISSION_DENIED_ERROR_TYPE,
+)
 from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = pytest.mark.betamax
 
 
-def test_list_channels(client, jwt_header, private_channel_and_contributor, request):
+def test_list_channels(user_client, private_channel_and_contributor, request):
     """
     List channels the user is subscribed to
     """
     channel, _ = private_channel_and_contributor
     url = reverse('channel-list')
-    resp = client.get(url, **jwt_header)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [
         {
@@ -56,10 +59,11 @@ def test_list_channels_anonymous(client, settings, allow_anonymous):
         # Until we decide otherwise this should always be an empty list.
         assert resp.json() == []
     else:
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+        assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
+def test_create_channel(staff_client, staff_user, reddit_factories):
     """
     Create a channel and assert the response
     """
@@ -73,7 +77,7 @@ def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
         'public_description': channel.public_description,
         'link_type': channel.link_type,
     }
-    resp = client.post(url, data=payload, **staff_jwt_header)
+    resp = staff_client.post(url, data=payload)
     expected = {
         **payload,
         'user_is_contributor': True,
@@ -89,7 +93,7 @@ def test_create_channel(client, staff_user, staff_jwt_header, reddit_factories):
     assert resp.json() == expected
 
 
-def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, reddit_factories):
+def test_create_channel_no_descriptions(staff_client, staff_user, reddit_factories):
     """
     Create a channel and assert the response for no descriptions
     """
@@ -101,7 +105,7 @@ def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, re
         'name': channel.name,
         'title': channel.title,
     }
-    resp = client.post(url, data=payload, **staff_jwt_header)
+    resp = staff_client.post(url, data=payload)
     expected = {
         **payload,
         'description': '',
@@ -119,11 +123,10 @@ def test_create_channel_no_descriptions(client, staff_user, staff_jwt_header, re
     assert resp.json() == expected
 
 
-def test_create_channel_already_exists(client, staff_jwt_header, private_channel):
+def test_create_channel_already_exists(staff_client, private_channel):
     """
     Create a channel which already exists
     """
-    client.force_login(UserFactory.create())
     url = reverse('channel-list')
     payload = {
         'channel_type': 'private',
@@ -133,11 +136,11 @@ def test_create_channel_already_exists(client, staff_jwt_header, private_channel
         'public_description': 'public',
         'link_type': private_channel.link_type,
     }
-    resp = client.post(url, data=payload, **staff_jwt_header)
+    resp = staff_client.post(url, data=payload)
     assert resp.status_code == status.HTTP_409_CONFLICT
 
 
-def test_create_channel_nonstaff(client, jwt_header):
+def test_create_channel_nonstaff(user_client):
     """
     Try to create a channel with nonstaff auth and assert a failure
     """
@@ -150,8 +153,12 @@ def test_create_channel_nonstaff(client, jwt_header):
         'public_description': 'public',
         'link_type': LINK_TYPE_ANY,
     }
-    resp = client.post(url, data=payload, **jwt_header)
-    assert resp.status_code == status.HTTP_403_FORBIDDEN
+    resp = user_client.post(url, data=payload)
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data == {
+        'error_type': PERMISSION_DENIED_ERROR_TYPE,
+        'detail': 'You do not have permission to perform this action.',
+    }
 
 
 def test_create_channel_noauth(client):
@@ -167,16 +174,17 @@ def test_create_channel_noauth(client):
         'public_description': 'public',
     }
     resp = client.post(url, data=payload)
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_get_channel(client, jwt_header, private_channel_and_contributor):
+def test_get_channel(user_client, private_channel_and_contributor):
     """
     Get a channel
     """
     channel, _ = private_channel_and_contributor
     url = reverse('channel-detail', kwargs={'channel_name': channel.name})
-    resp = client.get(url, **jwt_header)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'channel_type': channel.channel_type,
@@ -223,42 +231,41 @@ def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous
             'ga_tracking_id': None
         }
     else:
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+        assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_get_short_channel(client, jwt_header):
+def test_get_short_channel(user_client):
     """
     test getting a one-character channel name
     """
     Channel.objects.create(name='a')
     url = reverse('channel-detail', kwargs={'channel_name': 'a'})
-    resp = client.get(url, **jwt_header)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_get_channel_forbidden(client):
+def test_get_channel_forbidden(user_client):
     """
     If PRAW returns a 403 error we should also return a 403 error
     """
     Channel.objects.create(name='xavier2')
-    client.force_login(UserFactory.create())
     url = reverse('channel-detail', kwargs={'channel_name': 'xavier2'})
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_get_channel_not_found(client):
+def test_get_channel_not_found(user_client):
     """
     If PRAW returns a 404 error we should also return a 404 error
     """
-    client.force_login(UserFactory.create())
     Channel.objects.create(name='not_a_real_channel_name')
     url = reverse('channel-detail', kwargs={'channel_name': 'not_a_real_channel_name'})
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_get_channel_with_avatar_banner(client, staff_jwt_header, public_channel):
+def test_get_channel_with_avatar_banner(staff_client, public_channel):
     """
     If a channel has an image we should show its URL
     """
@@ -270,7 +277,7 @@ def test_get_channel_with_avatar_banner(client, staff_jwt_header, public_channel
     channel.save()
 
     url = reverse('channel-detail', kwargs={'channel_name': public_channel.name})
-    resp = client.get(url, **staff_jwt_header)
+    resp = staff_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['avatar'] == '/media/avatar'
     assert resp.json()['avatar_small'] == '/media/avatar_small'
@@ -278,14 +285,14 @@ def test_get_channel_with_avatar_banner(client, staff_jwt_header, public_channel
     assert resp.json()['banner'] == '/media/banner'
 
 
-def test_patch_channel(client, staff_jwt_header, private_channel):
+def test_patch_channel(staff_client, private_channel):
     """
     Update a channel's settings
     """
     url = reverse('channel-detail', kwargs={'channel_name': private_channel.name})
-    resp = client.patch(url, {
+    resp = staff_client.patch(url, {
         'channel_type': 'public',
-    }, format='json', **staff_jwt_header)
+    }, format='json')
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'channel_type': 'public',
@@ -309,16 +316,16 @@ def test_patch_channel(client, staff_jwt_header, private_channel):
     assert channel_obj.membership_is_managed is False
 
 
-def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_and_contributor):
+def test_patch_channel_moderator(user_client, staff_api, private_channel_and_contributor):
     """
     Update a channel's settings with a moderator user
     """
     private_channel, user = private_channel_and_contributor
     url = reverse('channel-detail', kwargs={'channel_name': private_channel.name})
     staff_api.add_moderator(user.username, private_channel.name)
-    resp = client.patch(url, {
+    resp = user_client.patch(url, {
         'channel_type': 'public',
-    }, format='json', **jwt_header)
+    }, format='json')
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         'channel_type': 'public',
@@ -339,16 +346,16 @@ def test_patch_channel_moderator(client, jwt_header, staff_api, private_channel_
 
 
 @pytest.mark.parametrize("field", ["avatar", "banner"])
-def test_patch_channel_image(client, public_channel, staff_jwt_header, field):
+def test_patch_channel_image(staff_client, public_channel, field):
     """
     Update a channel's image
     """
     url = reverse('channel-detail', kwargs={'channel_name': public_channel.name})
     png_file = os.path.join(os.path.dirname(__file__), "..", "..", "static", "images", "blank.png")
     with open(png_file, "rb") as f:
-        resp = client.patch(url, {
+        resp = staff_client.patch(url, {
             field:  f
-        }, format='multipart', **staff_jwt_header)
+        }, format='multipart')
     assert resp.status_code == status.HTTP_200_OK
     channel = Channel.objects.get(name=public_channel.name)
     image = getattr(channel, field)
@@ -364,52 +371,59 @@ def test_patch_channel_image(client, public_channel, staff_jwt_header, field):
 
 
 @pytest.mark.parametrize("field", ["avatar", "banner"])
-def test_patch_channel_validate_image(client, private_channel, staff_jwt_header, field):
+def test_patch_channel_validate_image(staff_client, private_channel, field):
     """
     It should error if the avatar or banner patch object is not a file
     """
     url = reverse('channel-detail', kwargs={'channel_name': private_channel.name})
-    resp = client.patch(url, {
+    resp = staff_client.patch(url, {
         field:  b'test'
-    }, format='json', **staff_jwt_header)
+    }, format='json')
     assert resp.status_code == status.HTTP_400_BAD_REQUEST
-    assert resp.json() == {field: [f'Expected {field} to be a file']}
+    assert resp.json() == {
+        'error_type': 'ValidationError',
+        field: [f'Expected {field} to be a file']
+    }
 
 
-def test_patch_channel_forbidden(client, staff_jwt_header):
+def test_patch_channel_forbidden(staff_client):
     """
     Update a channel's settings for a channel the user doesn't have permission to
     """
     Channel.objects.create(name='dedp2')
     url = reverse('channel-detail', kwargs={'channel_name': 'dedp2'})
-    resp = client.patch(url, {
+    resp = staff_client.patch(url, {
         'channel_type': 'public',
-    }, format='json', **staff_jwt_header)
+    }, format='json')
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_patch_channel_not_found(client, staff_jwt_header):
+def test_patch_channel_not_found(staff_client):
     """
     Update a channel's settings for a missing channel
     """
     Channel.objects.create(name='missing')
     url = reverse('channel-detail', kwargs={'channel_name': 'missing'})
-    resp = client.patch(url, {
+    resp = staff_client.patch(url, {
         'channel_type': 'public',
-    }, format='json', **staff_jwt_header)
+    }, format='json')
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_patch_channel_nonstaff(client, jwt_header):
+def test_patch_channel_nonstaff(user_client):
     """
     Fail to update a channel's settings if nonstaff user
     """
     Channel.objects.create(name='subreddit_for_testing')
     url = reverse('channel-detail', kwargs={'channel_name': 'subreddit_for_testing'})
-    resp = client.patch(url, {
+    resp = user_client.patch(url, {
         'channel_type': 'public',
-    }, format='json', **jwt_header)
-    assert resp.status_code == status.HTTP_403_FORBIDDEN
+    }, format='json')
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data == {
+        'error_type': PERMISSION_DENIED_ERROR_TYPE,
+        'detail': 'You do not have permission to perform this action.',
+    }
 
 
 def test_patch_channel_noauth(client):
@@ -420,4 +434,5 @@ def test_patch_channel_noauth(client):
     resp = client.patch(url, {
         'channel_type': 'public',
     }, format='json')
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE

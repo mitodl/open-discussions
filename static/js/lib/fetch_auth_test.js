@@ -7,12 +7,13 @@ import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 import * as auth from "./fetch_auth"
 
 import { AUTH_REQUIRED_URL } from "./url"
+import { NOT_AUTHENTICATED_ERROR_TYPE } from "../util/rest"
 
-describe("auth", function() {
+describe("fetch_auth", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
 
   const error500 = { errorStatusCode: 500 }
-  const error401 = { errorStatusCode: 401 }
+  const error401 = { error_type: NOT_AUTHENTICATED_ERROR_TYPE }
   const typeError = new TypeError()
 
   let sandbox, fetchStub

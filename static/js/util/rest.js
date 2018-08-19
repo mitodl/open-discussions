@@ -35,6 +35,22 @@ const anySpecificError = code =>
   )
 
 export const any404Error = anySpecificError(404)
-export const any403Error = anySpecificError(403)
 export const anyErrorExcept404 = anyErrorExcept([404])
 export const anyErrorExcept404or410 = anyErrorExcept([404, 410])
+
+// 401/403 status codes are unreliable for detecting authentication errors.
+// Our auth endpoints return an error type in the response, and these values
+// can be matched to that error type to properly detect authentication errors.
+export const NOT_AUTHENTICATED_ERROR_TYPE = "NotAuthenticated"
+export const NOT_AUTHORIZED_ERROR_TYPE = "PermissionDenied"
+
+const anySpecificErrorType = errorType =>
+  R.compose(
+    R.any(R.propSatisfies(R.equals(errorType), "error_type")),
+    R.map(R.prop("error")),
+    R.filter(hasError)
+  )
+
+export const anyNotAuthorizedErrorType = anySpecificErrorType(
+  NOT_AUTHORIZED_ERROR_TYPE
+)

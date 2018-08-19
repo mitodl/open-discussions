@@ -4,6 +4,7 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
+from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
@@ -11,25 +12,24 @@ pytestmark = pytest.mark.betamax
 
 
 def test_list_moderators(  # pylint: disable=too-many-arguments
-        client, private_channel_and_contributor, reddit_factories, staff_user, staff_api, settings
+        user_client, private_channel_and_contributor, reddit_factories, staff_user, staff_api, settings
 ):
     """
     List moderators in a channel as a logged in contributor
     """
     settings.INDEXING_API_USERNAME = staff_user.username
-    channel, user = private_channel_and_contributor
+    channel, _ = private_channel_and_contributor
     new_mod = reddit_factories.user("new_mod")
     staff_api.add_moderator(new_mod.username, channel.name)
     url = reverse('moderator-list', kwargs={'channel_name': channel.name})
-    client.force_login(user)
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     # Staff user is filtered out
     assert resp.json() == [{'moderator_name': new_mod.username}]
 
 
 def test_list_moderators_staff(  # pylint: disable=too-many-arguments
-        client, private_channel, staff_user, staff_api, reddit_factories, staff_jwt_header
+        staff_client, private_channel, staff_user, staff_api, reddit_factories
 ):
     """
     List moderators in a channel as a staff user
@@ -38,8 +38,7 @@ def test_list_moderators_staff(  # pylint: disable=too-many-arguments
     staff_api.add_moderator(mod_user.username, private_channel.name)
     staff_api.remove_moderator(staff_user.username, private_channel.name)
     url = reverse('moderator-list', kwargs={'channel_name': private_channel.name})
-    client.force_login(staff_user)
-    resp = client.get(url, **staff_jwt_header)
+    resp = staff_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [{
         'moderator_name': mod_user.username,
@@ -119,16 +118,17 @@ def test_list_moderators_anonymous(client, public_channel, staff_user, settings,
         assert resp.status_code == status.HTTP_200_OK
         assert resp.json() == [{'moderator_name': staff_user.username}]
     else:
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+        assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_add_moderator(client, public_channel, staff_jwt_header, reddit_factories):
+def test_add_moderator(staff_client, public_channel, reddit_factories):
     """
     Adds a moderator to a channel
     """
     moderator = reddit_factories.user("new_mod_user")
     url = reverse('moderator-list', kwargs={'channel_name': public_channel.name})
-    resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
+    resp = staff_client.post(url, data={'moderator_name': moderator.username}, format='json')
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'moderator_name': moderator.username,
@@ -138,17 +138,14 @@ def test_add_moderator(client, public_channel, staff_jwt_header, reddit_factorie
     }
 
 
-def test_add_moderator_email(client, public_channel, staff_jwt_header, staff_api, reddit_factories):
+def test_add_moderator_email(staff_client, public_channel, reddit_factories):
     """
     Adds a moderator to a channel by email
     """
-    existing_mod_user = reddit_factories.user("mod_user1")
     new_mod_user = reddit_factories.user("new_mod_user")
-    staff_api.add_moderator(existing_mod_user.username, public_channel.name)
-    client.force_login(existing_mod_user)
 
     url = reverse('moderator-list', kwargs={'channel_name': public_channel.name})
-    resp = client.post(url, data={'email': new_mod_user.email}, format='json', **staff_jwt_header)
+    resp = staff_client.post(url, data={'email': new_mod_user.email}, format='json')
 
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
@@ -159,14 +156,14 @@ def test_add_moderator_email(client, public_channel, staff_jwt_header, staff_api
     }
 
 
-def test_add_moderator_again(client, public_channel, staff_jwt_header, staff_api, reddit_factories):
+def test_add_moderator_again(staff_client, public_channel, staff_api, reddit_factories):
     """
     If a user is already a moderator we should return 201 without making any changes
     """
     moderator = reddit_factories.user("already_mod")
     staff_api.add_moderator(moderator.username, public_channel.name)
     url = reverse('moderator-list', kwargs={'channel_name': public_channel.name})
-    resp = client.post(url, data={'moderator_name': moderator.username}, format='json', **staff_jwt_header)
+    resp = staff_client.post(url, data={'moderator_name': moderator.username}, format='json')
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         'moderator_name': moderator.username,
@@ -182,21 +179,22 @@ def test_add_moderator_anonymous(client, settings, allow_anonymous):
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('moderator-list', kwargs={'channel_name': 'a_channel'})
     resp = client.post(url, data={'moderator_name': 'some_moderator'}, format='json')
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_remove_moderator(client, staff_jwt_header):
+def test_remove_moderator(staff_client):
     """
     Removes a moderator from a channel
     """
     moderator = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse(
         'moderator-detail', kwargs={'channel_name': 'admin_channel', 'moderator_name': moderator.username})
-    resp = client.delete(url, **staff_jwt_header)
+    resp = staff_client.delete(url)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-def test_remove_moderator_again(client, staff_jwt_header):
+def test_remove_moderator_again(staff_client):
     """
     If a user is already not a moderator for a channel we should return a 403, signaling that the user does not have
     permission to remove that user as a moderator.
@@ -204,7 +202,7 @@ def test_remove_moderator_again(client, staff_jwt_header):
     moderator = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
     url = reverse(
         'moderator-detail', kwargs={'channel_name': 'admin_channel', 'moderator_name': moderator.username})
-    resp = client.delete(url, **staff_jwt_header)
+    resp = staff_client.delete(url)
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
@@ -214,4 +212,5 @@ def test_remove_moderator_anonymous(client, settings, allow_anonymous):
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('moderator-detail', kwargs={'channel_name': 'a_channel', 'moderator_name': 'doesnt_matter'})
     resp = client.delete(url, data={'moderator_name': 'some_moderator'}, format='json')
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE

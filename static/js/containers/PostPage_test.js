@@ -40,6 +40,7 @@ import { makeArticle, makeTweet } from "../factories/embedly"
 import * as utilFuncs from "../lib/util"
 import * as embedUtil from "../lib/embed"
 import { truncate } from "../lib/util"
+import { NOT_AUTHORIZED_ERROR_TYPE } from "../util/rest"
 
 describe("PostPage", function() {
   let helper,
@@ -628,8 +629,10 @@ describe("PostPage", function() {
     assert(wrapper.find(NotFound).exists())
   })
 
-  it("should show a 403 page", async () => {
-    helper.getPostStub.returns(Promise.reject({ errorStatusCode: 403 }))
+  it("should show an unauthorized page", async () => {
+    helper.getPostStub.returns(
+      Promise.reject({ error_type: NOT_AUTHORIZED_ERROR_TYPE })
+    )
     const [wrapper] = await renderComponent(
       postDetailURL(channel.name, post.id),
       [

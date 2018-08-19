@@ -5,6 +5,10 @@ from rest_framework import status
 
 from channels.api import Api
 from channels.utils import get_reddit_slug
+from open_discussions.constants import (
+    NOT_AUTHENTICATED_ERROR_TYPE,
+    PERMISSION_DENIED_ERROR_TYPE,
+)
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 from profiles.utils import image_uri
@@ -12,33 +16,31 @@ from profiles.utils import image_uri
 pytestmark = pytest.mark.betamax
 
 
-def test_report_post(client, private_channel_and_contributor, reddit_factories):
+def test_report_post(user_client, private_channel_and_contributor, reddit_factories):
     """Report a post"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('post', user, channel=channel)
     url = reverse('report-content')
-    client.force_login(user)
     payload = {
         'post_id': post.id,
         'reason': 'spam',
     }
-    resp = client.post(url, data=payload)
+    resp = user_client.post(url, data=payload)
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == payload
 
 
-def test_report_comment(client, private_channel_and_contributor, reddit_factories):
+def test_report_comment(user_client, private_channel_and_contributor, reddit_factories):
     """Report a post"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('post', user, channel=channel)
     comment = reddit_factories.comment("comment", user, post_id=post.id)
     url = reverse('report-content')
-    client.force_login(user)
     payload = {
         'comment_id': comment.id,
         'reason': 'spam',
     }
-    resp = client.post(url, data=payload)
+    resp = user_client.post(url, data=payload)
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == payload
 
@@ -57,14 +59,16 @@ def test_report_anonymous(client, public_channel, reddit_factories, settings, al
         'post_id': post.id,
         'reason': 'spam',
     })
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
     # Comment
     resp = client.post(url, data={
         'comment_id': comment.id,
         'reason': 'spam',
     })
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 def test_list_reports(staff_client, private_channel_and_contributor, reddit_factories, staff_api):
@@ -142,13 +146,17 @@ def test_list_reports_empty(staff_client, private_channel):
     assert resp.json() == []
 
 
-def test_patch_channel_nonstaff(client, jwt_header, private_channel):
+def test_patch_channel_nonstaff(user_client, private_channel):
     """
     Fail to list a channels reported content if nonstaff user
     """
     url = reverse('channel-reports', kwargs={'channel_name': private_channel.name})
-    resp = client.get(url, **jwt_header)
-    assert resp.status_code == status.HTTP_403_FORBIDDEN
+    resp = user_client.get(url)
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data == {
+        'error_type': PERMISSION_DENIED_ERROR_TYPE,
+        'detail': 'You do not have permission to perform this action.',
+    }
 
 
 def test_patch_channel_noauth(client, private_channel):
@@ -157,4 +165,5 @@ def test_patch_channel_noauth(client, private_channel):
     """
     url = reverse('channel-reports', kwargs={'channel_name': private_channel.name})
     resp = client.get(url)
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE

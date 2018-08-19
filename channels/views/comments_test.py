@@ -7,6 +7,10 @@ from django.urls import reverse
 from rest_framework import status
 
 from channels.test_constants import LIST_MORE_COMMENTS_RESPONSE
+from open_discussions.constants import (
+    NOT_AUTHENTICATED_ERROR_TYPE,
+    PERMISSION_DENIED_ERROR_TYPE,
+)
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 from profiles.utils import image_uri, DEFAULT_PROFILE_IMAGE
@@ -133,16 +137,16 @@ def test_list_comments_anonymous(client, public_channel, reddit_factories, setti
             },
         ]
     else:
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+        assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_list_comments_none(client, private_channel_and_contributor, reddit_factories):
+def test_list_comments_none(user_client, private_channel_and_contributor, reddit_factories):
     """List for no comments on a post"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('one post', user, channel=channel)
-    client.force_login(user)
     url = reverse('comment-list', kwargs={'post_id': post.id})
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == []
 
@@ -365,7 +369,8 @@ def test_more_comments_anonymous(client, public_channel, reddit_factories, setti
             },
         ]
     else:
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+        assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 @pytest.mark.parametrize("missing_post,missing_parent", product([True, False], repeat=2))
@@ -450,16 +455,15 @@ def test_list_deleted_comments(client, logged_in_profile):
     ]
 
 
-def test_get_comment(client, jwt_header, private_channel_and_contributor, reddit_factories):
+def test_get_comment(user_client, private_channel_and_contributor, reddit_factories):
     """
     should be able to GET a comment
     """
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('my geat post', user, channel=channel)
     comment = reddit_factories.comment("comment", user, post_id=post.id)
-    client.force_login(user)
     url = reverse('comment-detail', kwargs={'comment_id': comment.id})
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [{
         'author_id': user.username,
@@ -482,14 +486,12 @@ def test_get_comment(client, jwt_header, private_channel_and_contributor, reddit
     }]
 
 
-def test_get_comment_404(client, jwt_header, private_channel_and_contributor, reddit_factories):
+def test_get_comment_404(user_client, private_channel_and_contributor, reddit_factories):
     """
     test that we get a 404 for a missing comment
     """
-    _, user = private_channel_and_contributor
-    client.force_login(user)
     url = reverse('comment-detail', kwargs={'comment_id': '23432'})
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
@@ -527,7 +529,8 @@ def test_get_comment_anonymous(client, public_channel, reddit_factories, setting
             },
         ]
     else:
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+        assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 def test_create_comment(client, logged_in_profile, mock_notify_subscribed_users):
@@ -579,7 +582,8 @@ def test_create_comment_anonymous(client, settings, allow_anonymous):
     resp = client.post(url, data={
         "text": "reply_to_post 2",
     })
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 def test_create_comment_not_found(client, logged_in_profile):
@@ -687,7 +691,7 @@ def test_create_comment_reply_to_comment(client, logged_in_profile, mock_notify_
 
 
 def test_create_comment_reply_to_deleted_comment(
-        client, private_channel_and_contributor, reddit_factories, contributor_api
+        user_client, private_channel_and_contributor, reddit_factories, contributor_api
 ):
     """Create a comment that's a reply to a deleted comment"""
     channel, user = private_channel_and_contributor
@@ -696,13 +700,15 @@ def test_create_comment_reply_to_deleted_comment(
     contributor_api.delete_comment(comment.id)
 
     url = reverse('comment-list', kwargs={'post_id': post.id})
-    client.force_login(user)
-    resp = client.post(url, data={
+    resp = user_client.post(url, data={
         "text": "reply_to_comment 3",
         "comment_id": comment.id,
     })
     assert resp.status_code == status.HTTP_410_GONE
-    assert resp.json() == {"detail": "Resource is gone."}
+    assert resp.json() == {
+        "detail": "Resource is gone.",
+        "error_type": "GoneException",
+    }
 
 
 def test_update_comment_text(client, logged_in_profile):
@@ -752,7 +758,8 @@ def test_update_comment_anonymous(client, settings, allow_anonymous):
     resp = client.patch(url, type='json', data={
         "text": "missing",
     })
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 def test_update_comment_upvote(client, logged_in_profile):
@@ -871,15 +878,14 @@ def test_update_comment_clear_downvote(client, logged_in_profile):
 
 
 def test_update_comment_remove(
-        client, staff_user, private_channel_and_contributor, reddit_factories, staff_api
+        staff_client, private_channel_and_contributor, reddit_factories, staff_api
 ):
     """Update a comment to remove it as a moderator"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post("post", user, channel=channel)
     comment = reddit_factories.comment("comment", user, post_id=post.id)
-    client.force_login(staff_user)
     url = reverse('comment-detail', kwargs={'comment_id': comment.id})
-    resp = client.patch(url, type='json', data={
+    resp = staff_client.patch(url, type='json', data={
         "removed": True,
     })
     assert resp.status_code == status.HTTP_200_OK
@@ -905,16 +911,15 @@ def test_update_comment_remove(
 
 
 def test_update_comment_approve(
-        client, staff_user, private_channel_and_contributor, reddit_factories, staff_api
+        staff_client, private_channel_and_contributor, reddit_factories, staff_api
 ):
     """Update a comment to approve it as a moderator"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post("post", user, channel=channel)
     comment = reddit_factories.comment("comment", user, post_id=post.id)
     staff_api.remove_comment(comment.id)
-    client.force_login(staff_user)
     url = reverse('comment-detail', kwargs={'comment_id': comment.id})
-    resp = client.patch(url, type='json', data={
+    resp = staff_client.patch(url, type='json', data={
         "removed": False,
     })
     assert resp.status_code == status.HTTP_200_OK
@@ -940,15 +945,14 @@ def test_update_comment_approve(
 
 
 def test_update_comment_ignore_reports(
-        client, staff_user, private_channel_and_contributor, reddit_factories
+        staff_client, private_channel_and_contributor, reddit_factories
 ):
     """Update a comment to ignore reports as a moderator"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post("post", user, channel=channel)
     comment = reddit_factories.comment("comment", user, post_id=post.id)
-    client.force_login(staff_user)
     url = reverse('comment-detail', kwargs={'comment_id': comment.id})
-    resp = client.patch(url, type='json', data={
+    resp = staff_client.patch(url, type='json', data={
         "ignore_reports": True,
     })
     assert resp.status_code == status.HTTP_200_OK
@@ -973,22 +977,25 @@ def test_update_comment_ignore_reports(
     }
 
 
-def test_update_comment_ignore_reports_forbidden(client, private_channel_and_contributor, reddit_factories):
+def test_update_comment_ignore_reports_forbidden(user_client, private_channel_and_contributor, reddit_factories):
     """Test updating a comment to ignore reports with a nonstaff user"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post("post", user, channel=channel)
     comment = reddit_factories.comment("comment", user, post_id=post.id)
-    client.force_login(user)
     url = reverse('comment-detail', kwargs={'comment_id': comment.id})
-    resp = client.patch(url, type='json', data={"ignore_reports": True})
-    assert resp.status_code == status.HTTP_403_FORBIDDEN
+    resp = user_client.patch(url, type='json', data={"ignore_reports": True})
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data == {
+        'error_type': PERMISSION_DENIED_ERROR_TYPE,
+        'detail': 'You do not have permission to perform this action.',
+    }
 
 
 # Reddit doesn't indicate if a comment deletion failed so we don't have tests that
-def test_delete_comment(client, logged_in_profile):
+def test_delete_comment(user_client):
     """Delete a comment"""
     url = reverse('comment-detail', kwargs={'comment_id': '6'})
-    resp = client.delete(url)
+    resp = user_client.delete(url)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
@@ -998,17 +1005,17 @@ def test_delete_comment_anonymous(client, settings, allow_anonymous):
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse('comment-detail', kwargs={'comment_id': 'doesntmatter'})
     resp = client.delete(url)
-    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_update_comment_subscribe(client, staff_user, private_channel_and_contributor, reddit_factories):
+def test_update_comment_subscribe(staff_client, private_channel_and_contributor, reddit_factories):
     """Update a comment to subscribe to it"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post("post", user, channel=channel)
     comment = reddit_factories.comment("comment", user, post_id=post.id)
-    client.force_login(staff_user)
     url = reverse('comment-detail', kwargs={'comment_id': comment.id})
-    resp = client.patch(url, type='json', data={
+    resp = staff_client.patch(url, type='json', data={
         "subscribed": True,
     })
     assert resp.status_code == status.HTTP_200_OK
@@ -1033,15 +1040,14 @@ def test_update_comment_subscribe(client, staff_user, private_channel_and_contri
     }
 
 
-def test_update_comment_unsubscribe(client, staff_user, staff_api, private_channel_and_contributor, reddit_factories):
+def test_update_comment_unsubscribe(staff_client, staff_api, private_channel_and_contributor, reddit_factories):
     """Update a comment to unsubscribe from it"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post("post", user, channel=channel)
     comment = reddit_factories.comment("comment", user, post_id=post.id)
     staff_api.add_comment_subscription(post.id, comment.id)
-    client.force_login(staff_user)
     url = reverse('comment-detail', kwargs={'comment_id': comment.id})
-    resp = client.patch(url, type='json', data={
+    resp = staff_client.patch(url, type='json', data={
         "subscribed": False,
     })
     assert resp.status_code == status.HTTP_200_OK

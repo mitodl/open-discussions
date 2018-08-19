@@ -37,17 +37,6 @@ def logged_in_profile(client):
 
 
 @pytest.fixture
-def staff_jwt_token(db, staff_user):
-    """Creates a JWT token for a staff user"""
-    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-
-    payload = jwt_payload_handler(staff_user)
-    payload['roles'] = ['staff']
-    return jwt_encode_handler(payload)
-
-
-@pytest.fixture
 def jwt_token(db, user):
     """Creates a JWT token for a regular user"""
     jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -58,23 +47,18 @@ def jwt_token(db, user):
 
 
 @pytest.fixture
-def staff_jwt_header(staff_jwt_token):
-    """Generate a staff Authorization HTTP header"""
-    return dict(HTTP_AUTHORIZATION='Bearer {}'.format(staff_jwt_token))
-
-
-@pytest.fixture
-def jwt_header(jwt_token):
-    """Generate a nonstaff Authorization HTTP header"""
-    return dict(HTTP_AUTHORIZATION='Bearer {}'.format(jwt_token))
-
-
-@pytest.fixture
 def client(db):
     """
     Similar to the builtin client but this provides the DRF client instead of the Django test client.
     """
     return APIClient()
+
+
+@pytest.fixture
+def user_client(client, user):
+    """Version of the client that is authenticated with the user"""
+    client.force_login(user)
+    return client
 
 
 @pytest.fixture
