@@ -113,7 +113,8 @@ type PostPageProps = {
   reportPost: (p: Post) => void,
   embedly: Object,
   postShareMenuOpen: boolean,
-  postDropdownMenuOpen: boolean
+  postDropdownMenuOpen: boolean,
+  loginMenuOpen: boolean
 }
 
 const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
@@ -123,6 +124,8 @@ const REPORT_POST_DIALOG = "REPORT_POST_DIALOG"
 const REPORT_COMMENT_DIALOG = "REPORT_COMMENT_DIALOG"
 
 const POST_SHARE_MENU_KEY = "POST_SHARE_MENU_KEY"
+
+const LOGIN_MENU_KEY = "LOGIN_MENU_KEY"
 
 // if postId, channelName, or commentID don't match
 const shouldLoadData = R.complement(
@@ -319,6 +322,16 @@ class PostPage extends React.Component<PostPageProps> {
     dispatch(hideDropdownDebounced(POST_SHARE_MENU_KEY))
   }
 
+  showLoginMenu = () => {
+    const { dispatch } = this.props
+    dispatch(showDropdown(LOGIN_MENU_KEY))
+  }
+
+  hideLoginMenu = () => {
+    const { dispatch } = this.props
+    dispatch(hideDropdownDebounced(LOGIN_MENU_KEY))
+  }
+
   renderCommentSectionHeader = () => {
     const {
       post,
@@ -371,7 +384,8 @@ class PostPage extends React.Component<PostPageProps> {
       embedly,
       reportPost,
       postDropdownMenuOpen,
-      postShareMenuOpen
+      postShareMenuOpen,
+      loginMenuOpen
     } = this.props
 
     if (!channel) {
@@ -451,6 +465,9 @@ class PostPage extends React.Component<PostPageProps> {
               showPostShareMenu={this.showPostShareMenu}
               hidePostShareMenu={this.hidePostShareMenu}
               postShareMenuOpen={postShareMenuOpen}
+              showLoginMenu={this.showLoginMenu}
+              hideLoginMenu={this.hideLoginMenu}
+              loginMenuOpen={loginMenuOpen}
               channel={channel}
             />
             {showPermalinkUI || userIsAnonymous() ? null : (
@@ -513,6 +530,7 @@ const mapStateToProps = (state, ownProps) => {
     : false
 
   const postShareMenuOpen = ui.dropdownMenus.has(POST_SHARE_MENU_KEY)
+  const loginMenuOpen = ui.dropdownMenus.has(LOGIN_MENU_KEY)
 
   return {
     ...postModerationSelector(state, ownProps),
@@ -530,6 +548,7 @@ const mapStateToProps = (state, ownProps) => {
     notAuthorized,
     postDropdownMenuOpen,
     postShareMenuOpen,
+    loginMenuOpen,
     isModerator: channel && channel.user_is_moderator,
     errored:
       anyErrorExcept404([posts, channels]) ||

@@ -2,10 +2,9 @@
 import React from "react"
 import R from "ramda"
 import { Link } from "react-router-dom"
-import ReactTooltip from "react-tooltip"
 
 import { postDetailURL, urlHostname } from "./url"
-import { userIsAnonymous, votingTooltipText } from "./util"
+import { userIsAnonymous } from "./util"
 import { showDropdown, hideDropdownDebounced } from "../actions/ui"
 
 import type { Dispatch } from "redux"
@@ -83,7 +82,8 @@ export const formatPostTitle = (post: Post) =>
 type PostVotingProps = {
   post: Post,
   className?: string,
-  toggleUpvote: Function
+  toggleUpvote: Function,
+  showLoginMenu: Function
 }
 
 export class PostVotingButtons extends React.Component<*, *> {
@@ -112,36 +112,37 @@ export class PostVotingButtons extends React.Component<*, *> {
   }
 
   render() {
-    const { post, className } = this.props
+    const {
+      post,
+      className,
+      showLoginMenu
+    } = this.props
     const { upvoting } = this.state
     const upvoted = post.upvoted !== upvoting
     const upvoteClass = upvoted ? "upvoted" : ""
 
     return (
-      <div className={`upvotes ${className || ""} ${upvoteClass}`}>
-        {userIsAnonymous() ? (
-          <ReactTooltip id="post-upvote-button">
-            {votingTooltipText}
-          </ReactTooltip>
-        ) : null}
-        <button
-          className="upvote-button"
-          onClick={userIsAnonymous() ? null : this.onToggleUpvote}
-          disabled={upvoting}
-          data-tip
-          data-for="post-upvote-button"
-        >
-          <img
-            className="vote-arrow"
-            src={
-              upvoted
-                ? "/static/images/upvote_arrow_on.png"
-                : "/static/images/upvote_arrow.png"
-            }
-            width="13"
-          />
-        </button>
-        <span className="votes">{post.score}</span>
+      <div>
+        <div className={`upvotes ${className || ""} ${upvoteClass}`}>
+          <button
+            className="upvote-button"
+            onClick={userIsAnonymous() ? showLoginMenu : this.onToggleUpvote}
+            disabled={upvoting}
+            data-tip
+            data-for="post-upvote-button"
+          >
+            <img
+              className="vote-arrow"
+              src={
+                upvoted
+                  ? "/static/images/upvote_arrow_on.png"
+                  : "/static/images/upvote_arrow.png"
+              }
+              width="13"
+            />
+          </button>
+          <span className="votes">{post.score}</span>
+        </div>
       </div>
     )
   }

@@ -20,6 +20,7 @@ import { postPermalink, profileURL } from "../lib/url"
 
 import type { Post, Channel } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
+import LoginPopup from "./LoginPopup";
 
 type Props = {
   post: Post,
@@ -40,6 +41,9 @@ type Props = {
   showPostShareMenu: Function,
   hidePostShareMenu: Function,
   postShareMenuOpen: boolean,
+  showLoginMenu: Function,
+  hideLoginMenu: Function,
+  loginMenuOpen: boolean,
   channel: Channel
 }
 
@@ -109,6 +113,9 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
       showPostShareMenu,
       hidePostShareMenu,
       postShareMenuOpen,
+      showLoginMenu,
+      hideLoginMenu,
+      loginMenuOpen,
       channel
     } = this.props
 
@@ -119,7 +126,16 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
             post={post}
             className="expanded"
             toggleUpvote={toggleUpvote}
+            showLoginMenu={showLoginMenu}
+            hideLoginMenu={hideLoginMenu}
+            loginMenuOpen={loginMenuOpen}
           />
+          {loginMenuOpen ? (
+            <LoginPopup
+              closePopup={hideLoginMenu}
+              message="Sign in to be able to vote"
+            />
+          ) : null}
         </div>
         <div className="right">
           {SETTINGS.username === post.author_id && post.text ? (
