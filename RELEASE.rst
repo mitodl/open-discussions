@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.41.4 (Released August 20, 2018)
+--------------
+
+- Upgrade to Django 2.0 (#1092)
+- Show domain and link icon next to title of link post (#1090)
+- Implement WYSIWYG editor for Posts
+
 Version 0.41.3 (Released August 16, 2018)
 --------------
 
