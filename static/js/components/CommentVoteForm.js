@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 
-import { userIsAnonymous } from "../lib/util"
+import { userIsAnonymous, votingTooltipText } from "../lib/util"
 
 import type { CommentInTree } from "../flow/discussionTypes"
 import LoginPopup from "./LoginPopup"
@@ -113,7 +113,7 @@ export default class CommentVoteForm extends React.Component<Props, State> {
         </button>
         {userIsAnonymous() ? (
           <LoginPopup
-            message="Sign in to be able to vote"
+            message={votingTooltipText}
             visible={popupVisible}
             closePopup={this.onTogglePopup}
           />

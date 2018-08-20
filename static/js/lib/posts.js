@@ -4,7 +4,7 @@ import R from "ramda"
 import { Link } from "react-router-dom"
 
 import { postDetailURL, urlHostname } from "./url"
-import { userIsAnonymous } from "./util"
+import { userIsAnonymous, votingTooltipText } from "./util"
 import { showDropdown, hideDropdownDebounced } from "../actions/ui"
 
 import type { Dispatch } from "redux"
@@ -153,7 +153,7 @@ export class PostVotingButtons extends React.Component<*, *> {
         </div>
         {userIsAnonymous() ? (
           <LoginPopup
-            message="Sign in to be able to vote"
+            message={votingTooltipText}
             visible={popupVisible}
             closePopup={this.onTogglePopup}
           />

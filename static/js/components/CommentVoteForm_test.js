@@ -4,13 +4,14 @@ import sinon from "sinon"
 import { shallow } from "enzyme"
 import { assert } from "chai"
 
+import * as utilFuncs from "../lib/util"
 import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
 import CommentVoteForm from "./CommentVoteForm"
-
-import * as utilFuncs from "../lib/util"
 import LoginPopup from "./LoginPopup"
+
+
 
 describe("CommentVoteForm", () => {
   let sandbox, upvoteStub, downvoteStub, comment, resolveUpvote, resolveDownvote
