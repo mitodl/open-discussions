@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.41.4
+Version 0.41.4 (Released August 20, 2018)
 --------------
 
 - Upgrade to Django 2.0 (#1092)
