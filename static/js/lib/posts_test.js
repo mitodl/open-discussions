@@ -1,9 +1,7 @@
 // @flow
 import React from "react"
 import { assert } from "chai"
-import { mount } from "enzyme"
 import sinon from "sinon"
-import ReactTooltip from "react-tooltip"
 import { shallow } from "enzyme"
 
 import {
@@ -14,9 +12,9 @@ import {
   formatPostTitle
 } from "./posts"
 import { makePost } from "../factories/posts"
-import { votingTooltipText } from "./util"
 import { urlHostname } from "./url"
 import * as utilFuncs from "./util"
+import LoginPopup from "../components/LoginPopup"
 
 describe("Post utils", () => {
   it("should return a new post with empty values", () => {
@@ -53,7 +51,7 @@ describe("Post utils", () => {
   describe("PostVotingButtons", () => {
     let sandbox
 
-    const renderButtons = () => mount(<PostVotingButtons post={makePost()} />)
+    const renderButtons = () => shallow(<PostVotingButtons post={makePost()} />)
 
     beforeEach(() => {
       sandbox = sinon.createSandbox()
@@ -63,17 +61,16 @@ describe("Post utils", () => {
       sandbox.restore()
     })
 
-    it("should include tooltips if user is anonymous", () => {
+    it("should include LoginPopup if user is anonymous", () => {
       sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-      const tooltip = renderButtons().find(ReactTooltip)
-      assert.isOk(tooltip.exists())
-      assert.equal(tooltip.text(), votingTooltipText)
+      const popup = renderButtons().find(LoginPopup)
+      assert.isOk(popup.exists())
     })
 
-    it("should not include tooltips if the user is not anonymous", () => {
+    it("should not include LoginPopup if the user is not anonymous", () => {
       sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
-      const tooltip = renderButtons().find(ReactTooltip)
-      assert.isNotOk(tooltip.exists())
+      const popup = renderButtons().find(LoginPopup)
+      assert.isNotOk(popup.exists())
     })
   })
 

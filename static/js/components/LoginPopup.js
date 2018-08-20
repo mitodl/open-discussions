@@ -7,27 +7,27 @@ import onClickOutside from "react-onclickoutside"
 
 import Button from "./Button"
 
-
 type LoginPopupProps = {
   closePopup: Function,
-  message: Function
+  message: string,
+  visible: boolean
 }
 
 export class LoginPopupHelper extends React.Component<LoginPopupProps> {
-
   handleClickOutside = () => {
-    const { closePopup } = this.props
-    closePopup()
+    const { closePopup, visible } = this.props
+    if (visible) {
+      closePopup()
+    }
   }
 
   render() {
-    const { message, closePopup } = this.props
-
-    return (
+    const { message, visible } = this.props
+    return visible ? (
       <div className="popup login-popup">
         <div className="triangle" />
-        <Button className="close-popup" onClick={closePopup}>
-          x
+        <Button className="close-popup" onClick={this.handleClickOutside}>
+          <span>x</span>
         </Button>
         <div className="popup-title">{message}</div>
         <div className="bottom-row">
@@ -41,13 +41,13 @@ export class LoginPopupHelper extends React.Component<LoginPopupProps> {
           </div>
         </div>
       </div>
-    )
+    ) : null
   }
 }
 
 export default R.compose(
   connect(
-    R.always({}), // mapStateToProps is not needed - just return an object
+    R.always({}) // mapStateToProps is not needed - just return an object
   ),
   onClickOutside
 )(LoginPopupHelper)

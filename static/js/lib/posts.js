@@ -14,6 +14,7 @@ import type {
   PostListData,
   PostListResponse
 } from "../flow/discussionTypes"
+import LoginPopup from "../components/LoginPopup"
 
 export const newPostForm = (): PostForm => ({
   postType: null,
@@ -90,13 +91,15 @@ export class PostVotingButtons extends React.Component<*, *> {
   props: PostVotingProps
 
   state: {
-    upvoting: boolean
+    upvoting: boolean,
+    popupVisible: boolean
   }
 
   constructor(props: PostVotingProps) {
     super(props)
     this.state = {
-      upvoting: false
+      upvoting:     false,
+      popupVisible: false
     }
   }
 
@@ -111,13 +114,16 @@ export class PostVotingButtons extends React.Component<*, *> {
     })
   }
 
+  onTogglePopup = async () => {
+    const { popupVisible } = this.state
+    this.setState({
+      popupVisible: !popupVisible
+    })
+  }
+
   render() {
-    const {
-      post,
-      className,
-      showLoginMenu
-    } = this.props
-    const { upvoting } = this.state
+    const { post, className } = this.props
+    const { upvoting, popupVisible } = this.state
     const upvoted = post.upvoted !== upvoting
     const upvoteClass = upvoted ? "upvoted" : ""
 
@@ -126,7 +132,9 @@ export class PostVotingButtons extends React.Component<*, *> {
         <div className={`upvotes ${className || ""} ${upvoteClass}`}>
           <button
             className="upvote-button"
-            onClick={userIsAnonymous() ? showLoginMenu : this.onToggleUpvote}
+            onClick={
+              userIsAnonymous() ? this.onTogglePopup : this.onToggleUpvote
+            }
             disabled={upvoting}
             data-tip
             data-for="post-upvote-button"
@@ -143,6 +151,13 @@ export class PostVotingButtons extends React.Component<*, *> {
           </button>
           <span className="votes">{post.score}</span>
         </div>
+        {userIsAnonymous() ? (
+          <LoginPopup
+            message="Sign in to be able to vote"
+            visible={popupVisible}
+            closePopup={this.onTogglePopup}
+          />
+        ) : null}
       </div>
     )
   }

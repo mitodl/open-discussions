@@ -8,10 +8,7 @@ type ButtonProps = {
 }
 
 const Button = ({ children, onClick, className }: ButtonProps) => (
-  <button
-    className={`mdc-button ${className || ""}`}
-    onClick={onClick}
-  >
+  <button className={`mdc-button ${className || ""}`} onClick={onClick}>
     {children}
   </button>
 )

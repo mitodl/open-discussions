@@ -1,10 +1,10 @@
 // @flow
 import React from "react"
-import ReactTooltip from "react-tooltip"
 
-import { userIsAnonymous, votingTooltipText } from "../lib/util"
+import { userIsAnonymous } from "../lib/util"
 
 import type { CommentInTree } from "../flow/discussionTypes"
+import LoginPopup from "./LoginPopup"
 
 export type CommentVoteFunc = (comment: CommentInTree) => Promise<*>
 
@@ -16,7 +16,8 @@ type Props = {
 
 type State = {
   downvoting: boolean,
-  upvoting: boolean
+  upvoting: boolean,
+  popupVisible: boolean
 }
 
 export default class CommentVoteForm extends React.Component<Props, State> {
@@ -24,8 +25,9 @@ export default class CommentVoteForm extends React.Component<Props, State> {
     super()
 
     this.state = {
-      downvoting: false,
-      upvoting:   false
+      downvoting:   false,
+      upvoting:     false,
+      popupVisible: false
     }
   }
 
@@ -53,9 +55,16 @@ export default class CommentVoteForm extends React.Component<Props, State> {
     })
   }
 
+  onTogglePopup = async () => {
+    const { popupVisible } = this.state
+    this.setState({
+      popupVisible: !popupVisible
+    })
+  }
+
   render() {
     const { comment } = this.props
-    const { upvoting, downvoting } = this.state
+    const { upvoting, downvoting, popupVisible } = this.state
 
     const disabled = upvoting || downvoting
 
@@ -67,14 +76,9 @@ export default class CommentVoteForm extends React.Component<Props, State> {
     return (
       <div className="votes-form">
         <div className="score">{comment.score}</div>
-        {userIsAnonymous() ? (
-          <ReactTooltip id="comment-upvote-button">
-            {votingTooltipText}
-          </ReactTooltip>
-        ) : null}
         <button
           className={`vote upvote-button ${upvoted ? "upvoted" : ""}`}
-          onClick={userIsAnonymous() ? null : this.upvote}
+          onClick={userIsAnonymous() ? this.onTogglePopup : this.upvote}
           disabled={disabled}
           data-tip
           data-for="comment-upvote-button"
@@ -90,14 +94,9 @@ export default class CommentVoteForm extends React.Component<Props, State> {
           />
         </button>
         <span className="pipe">|</span>
-        {userIsAnonymous() ? (
-          <ReactTooltip id="comment-downvote-button">
-            {votingTooltipText}
-          </ReactTooltip>
-        ) : null}
         <button
           className={`vote downvote-button ${downvoted ? "downvoted" : ""}`}
-          onClick={userIsAnonymous() ? null : this.downvote}
+          onClick={userIsAnonymous() ? this.onTogglePopup : this.downvote}
           disabled={disabled}
           data-tip
           data-for="comment-downvote-button"
@@ -112,6 +111,13 @@ export default class CommentVoteForm extends React.Component<Props, State> {
             width="13"
           />
         </button>
+        {userIsAnonymous() ? (
+          <LoginPopup
+            message="Sign in to be able to vote"
+            visible={popupVisible}
+            closePopup={this.onTogglePopup}
+          />
+        ) : null}
       </div>
     )
   }
