@@ -1,7 +1,6 @@
 // @flow
 import React from "react"
 import { Link } from "react-router-dom"
-import R from "ramda"
 
 import ChannelAvatar from "../containers/ChannelAvatar"
 import { channelURL, editChannelBasicURL } from "../lib/url"
@@ -16,7 +15,7 @@ const channelClassName = (channelName, currentChannel) =>
   currentChannel === channelName ? "location current-location" : "location"
 
 export default class SubscriptionsList extends React.Component<Props> {
-  makeChannelLink = R.curry((channel: Channel) => {
+  makeChannelLink = (channel: Channel) => {
     const { currentChannel } = this.props
 
     return (
@@ -38,7 +37,7 @@ export default class SubscriptionsList extends React.Component<Props> {
         ) : null}
       </div>
     )
-  })
+  }
 
   render() {
     const { subscribedChannels } = this.props
