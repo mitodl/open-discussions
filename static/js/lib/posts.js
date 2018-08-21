@@ -136,7 +136,6 @@ export class PostVotingButtons extends React.Component<*, *> {
               userIsAnonymous() ? this.onTogglePopup : this.onToggleUpvote
             }
             disabled={upvoting}
-            data-for="post-upvote-button"
           >
             <img
               className="vote-arrow"

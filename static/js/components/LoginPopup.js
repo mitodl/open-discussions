@@ -44,4 +44,4 @@ export class LoginPopupHelper extends React.Component<LoginPopupProps> {
   }
 }
 
-export default R.compose(onClickOutside)(LoginPopupHelper)
+export default onClickOutside(LoginPopupHelper)

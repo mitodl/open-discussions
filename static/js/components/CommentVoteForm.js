@@ -79,8 +79,6 @@ export default class CommentVoteForm extends React.Component<Props, State> {
           className={`vote upvote-button ${upvoted ? "upvoted" : ""}`}
           onClick={userIsAnonymous() ? this.onTogglePopup : this.upvote}
           disabled={disabled}
-          data-tip
-          data-for="comment-upvote-button"
         >
           <img
             className="vote-arrow"
@@ -97,7 +95,6 @@ export default class CommentVoteForm extends React.Component<Props, State> {
           className={`vote downvote-button ${downvoted ? "downvoted" : ""}`}
           onClick={userIsAnonymous() ? this.onTogglePopup : this.downvote}
           disabled={disabled}
-          data-for="comment-downvote-button"
         >
           <img
             className="vote-arrow"
