@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.42.0
+Version 0.42.0 (Released August 21, 2018)
 --------------
 
 - Add support for editing posts with the <Editor /> component
