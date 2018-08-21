@@ -116,6 +116,7 @@ describe("CommentVoteForm", () => {
       upvoting:     false,
       popupVisible: true
     })
+    assert.ok(wrapper.find(LoginPopup).props().visible)
   })
 
   //

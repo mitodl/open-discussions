@@ -3,6 +3,7 @@ import React from "react"
 import R from "ramda"
 import { Link } from "react-router-dom"
 
+import LoginPopup from "../components/LoginPopup"
 import { postDetailURL, urlHostname } from "./url"
 import { userIsAnonymous, votingTooltipText } from "./util"
 import { showDropdown, hideDropdownDebounced } from "../actions/ui"
@@ -14,7 +15,6 @@ import type {
   PostListData,
   PostListResponse
 } from "../flow/discussionTypes"
-import LoginPopup from "../components/LoginPopup"
 
 export const newPostForm = (): PostForm => ({
   postType: null,
@@ -128,7 +128,7 @@ export class PostVotingButtons extends React.Component<*, *> {
     const upvoteClass = upvoted ? "upvoted" : ""
 
     return (
-      <div>
+      <React.Fragment>
         <div className={`upvotes ${className || ""} ${upvoteClass}`}>
           <button
             className="upvote-button"
@@ -136,7 +136,6 @@ export class PostVotingButtons extends React.Component<*, *> {
               userIsAnonymous() ? this.onTogglePopup : this.onToggleUpvote
             }
             disabled={upvoting}
-            data-tip
             data-for="post-upvote-button"
           >
             <img
@@ -158,7 +157,7 @@ export class PostVotingButtons extends React.Component<*, *> {
             closePopup={this.onTogglePopup}
           />
         ) : null}
-      </div>
+      </React.Fragment>
     )
   }
 }

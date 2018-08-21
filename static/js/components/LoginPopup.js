@@ -1,5 +1,4 @@
 // @flow
-import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import React from "react"
 import R from "ramda"
@@ -45,9 +44,4 @@ export class LoginPopupHelper extends React.Component<LoginPopupProps> {
   }
 }
 
-export default R.compose(
-  connect(
-    R.always({}) // mapStateToProps is not needed - just return an object
-  ),
-  onClickOutside
-)(LoginPopupHelper)
+export default R.compose(onClickOutside)(LoginPopupHelper)

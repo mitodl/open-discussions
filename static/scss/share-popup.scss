@@ -7,6 +7,15 @@
   padding: 12px;
   min-width: 250px;
 
+  .triangle {
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    top: -7px;
+    background: white;
+    transform: rotate(45deg);
+  }
+
   .popup-title {
     color: $font-black;
     margin-bottom: 2px;
@@ -38,14 +47,7 @@
 }
 
 .share-popup {
-
   .triangle {
-    width: 15px;
-    height: 15px;
-    position: absolute;
-    top: -7px;
-    background: white;
-    transform: rotate(45deg);
     right: 50%;
   }
 }
@@ -54,15 +56,6 @@
   top: unset;
   right: unset;
   margin-top: 10px;
-
-  .triangle {
-    width: 15px;
-    height: 15px;
-    position: absolute;
-    top: -7px;
-    background: white;
-    transform: rotate(45deg);
-  }
 
   .close-popup {
     position: absolute;
