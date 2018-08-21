@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.42.0 (Released August 21, 2018)
+--------------
+
+- Add support for editing posts with the <Editor /> component
+- Upgrade dependencies
+- Add avatar_small and avatar_medium (#1086)
+
 Version 0.41.4 (Released August 20, 2018)
 --------------
 
