@@ -11,8 +11,6 @@ import { makeComment } from "../factories/comments"
 import CommentVoteForm from "./CommentVoteForm"
 import LoginPopup from "./LoginPopup"
 
-
-
 describe("CommentVoteForm", () => {
   let sandbox, upvoteStub, downvoteStub, comment, resolveUpvote, resolveDownvote
 
