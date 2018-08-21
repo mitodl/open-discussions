@@ -3,7 +3,9 @@ import R from "ramda"
 import casual from "casual-browserify"
 
 import { incrementer } from "../factories/util"
-import type { Post } from "../flow/discussionTypes"
+import { VALID_POST_SORT_TYPES } from "../lib/sorting"
+
+import type { Post, PostListPagination } from "../flow/discussionTypes"
 
 const incr = incrementer()
 
@@ -40,3 +42,11 @@ export const makeChannelPostList = (channelName: string = casual.word) =>
 
 export const makeFrontPageList = () =>
   R.range(0, 30).map(() => makePost(Math.random() > 0.5))
+
+export const makePagination = (): PostListPagination => ({
+  sort:         casual.random_element(VALID_POST_SORT_TYPES),
+  before:       "before",
+  before_count: 10,
+  after:        "after",
+  after_count:  20
+})

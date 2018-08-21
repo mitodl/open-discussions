@@ -10,10 +10,10 @@ type Props = {
   showChannelLinks: boolean,
   showPinUI: boolean,
   toggleUpvote: Post => void,
-  togglePinPost?: Post => Promise<*>,
+  togglePinPost?: ?(post: Post) => Promise<*>,
   isModerator: boolean,
-  reportPost: (p: Post) => void,
-  removePost?: (p: Post) => void
+  reportPost?: ?(post: Post) => void,
+  removePost?: ?(post: Post) => void
 }
 
 export default class PostList extends React.Component<Props> {

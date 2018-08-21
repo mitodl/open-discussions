@@ -118,7 +118,12 @@ export default class IntegrationTestHelper {
       const initialState = R.mergeDeepRight(defaultState, extraState)
       const store = mockStore(initialState)
       const wrapper = await shallow(
-        <WrappedComponent store={store} {...defaultProps} {...extraProps} />
+        <WrappedComponent
+          store={store}
+          dispatch={store.dispatch}
+          {...defaultProps}
+          {...extraProps}
+        />
       )
 
       // dive through layers of HOCs until we reach the desired inner component
@@ -126,6 +131,14 @@ export default class IntegrationTestHelper {
       while (!inner.is(InnerComponent)) {
         // determine the type before we dive
         const cls = inner.type()
+        if (
+          cls.name === "WithLoading" &&
+          InnerComponent === cls.WrappedComponent
+        ) {
+          // WithLoading is actually subclassing the component, not rendering it as an inner component so there's
+          // no extra step to dive here.
+          break
+        }
 
         // shallow render this component
         inner = await inner.dive()

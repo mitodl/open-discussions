@@ -8,6 +8,8 @@ import { setChannelData } from "../actions/channel"
 import { setPostData } from "../actions/post"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { getSubscribedChannels } from "../lib/redux_selectors"
+import { mapPostListResponse } from "../lib/posts"
+import { frontPageEndpoint } from "./frontpage"
 
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { makeChannel, makeChannelList } from "../factories/channels"
@@ -193,7 +195,10 @@ describe("reducers", () => {
     it("should have some initial state", () => {
       assert.deepEqual(store.getState().frontpage, {
         ...INITIAL_STATE,
-        data: []
+        data: {
+          pagination: null,
+          postIds:    []
+        }
       })
     })
 
@@ -204,6 +209,10 @@ describe("reducers", () => {
         successType
       ])
       assert.lengthOf(data.postIds, 20)
+    })
+
+    it("uses mapPostListResponse to combine posts and take pagination into account", async () => {
+      assert.equal(frontPageEndpoint.getSuccessHandler, mapPostListResponse)
     })
   })
 

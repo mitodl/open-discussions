@@ -36,7 +36,8 @@ import type {
   ReportRecord,
   Profile,
   ProfilePayload,
-  SocialAuth
+  SocialAuth,
+  PostListResponse
 } from "../flow/discussionTypes"
 import type { NotificationSetting } from "../flow/settingsTypes"
 import type { EmbedlyResponse } from "../reducers/embedly"
@@ -52,7 +53,9 @@ const getPaginationSortQS = paramsToQueryString(getPaginationSortParams)
 
 const getCommentSortQS = paramsToQueryString(R.pickAll(["sort"]))
 
-export function getFrontpage(params: PostListPaginationParams): Promise<Post> {
+export function getFrontpage(
+  params: PostListPaginationParams
+): Promise<PostListResponse> {
   return fetchJSONWithAuthFailure(
     `/api/v0/frontpage/${getPaginationSortQS(params)}`
   )
@@ -159,7 +162,7 @@ export function updateChannel(channel: Channel): Promise<Channel> {
 export function getPostsForChannel(
   channelName: string,
   params: PostListPaginationParams
-): Promise<Array<Post>> {
+): Promise<PostListResponse> {
   return fetchJSONWithAuthFailure(
     `/api/v0/channels/${channelName}/posts/${getPaginationSortQS(params)}`
   )

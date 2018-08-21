@@ -29,12 +29,12 @@ type Props = {
   post: Post,
   showChannelLink?: boolean,
   toggleUpvote?: Post => void,
-  togglePinPost?: Post => Promise<*>,
+  togglePinPost?: ?(post: Post) => Promise<*>,
   showPinUI?: boolean,
   isModerator: boolean,
-  removePost?: (p: Post) => void,
-  ignorePostReports?: (p: Post) => void,
-  reportPost?: (p: Post) => void,
+  removePost?: ?(post: Post) => void,
+  ignorePostReports?: (post: Post) => void,
+  reportPost?: ?(post: Post) => void,
   menuOpen: boolean,
   dispatch: Dispatch<*>
 }

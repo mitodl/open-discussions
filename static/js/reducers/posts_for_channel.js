@@ -30,7 +30,11 @@ export const postsForChannelEndpoint = {
   ): Map<string, PostListData> => {
     const { channelName, response } = payload
     const update = new Map(data)
-    update.set(channelName, mapPostListResponse(response))
+    const existingPosts: PostListData = update.get(channelName) || {
+      pagination: null,
+      postIds:    []
+    }
+    update.set(channelName, mapPostListResponse(response, existingPosts))
     return update
   },
   extraActions: {

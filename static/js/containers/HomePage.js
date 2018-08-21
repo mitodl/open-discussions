@@ -5,23 +5,20 @@ import R from "ramda"
 import qs from "query-string"
 import { MetaTags } from "react-meta-tags"
 
-import PostList from "../components/PostList"
+import CanonicalLink from "../components/CanonicalLink"
 import withLoading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
-import PostListNavigation from "../components/PostListNavigation"
 import { PostSortPicker } from "../components/SortPicker"
 import {
   withPostModeration,
   postModerationSelector
 } from "../hoc/withPostModeration"
-import CanonicalLink from "../components/CanonicalLink"
+import withPostList from "../hoc/withPostList"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 import { safeBulkGet } from "../lib/maps"
 import { getPostIds } from "../lib/posts"
-import { FRONTPAGE_URL } from "../lib/url"
-import { toggleUpvote } from "../util/api_actions"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 
@@ -43,38 +40,48 @@ type Props = {
   channels: RestState<Map<string, Channel>>,
   showSidebar: boolean,
   pagination: PostListPagination,
-  reportPost: (p: Post) => void
+  reportPost: (p: Post) => void,
+  canLoadMore: boolean,
+  renderPosts: Function,
+  loadPosts: (search: PostListPagination) => Promise<*>
 }
 
-class HomePage extends React.Component<Props> {
+export class HomePage extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }
 
-  componentDidUpdate(prevProps) {
+  componentWillUnmount() {
+    this.clearData()
+  }
+
+  componentDidUpdate(prevProps: Props) {
     if (shouldLoadData(prevProps, this.props)) {
+      this.clearData()
       this.loadData()
     }
   }
 
+  clearData = () => {
+    const { dispatch } = this.props
+    dispatch(actions.frontpage.clear())
+  }
+
   loadData = async () => {
     const {
-      dispatch,
+      loadPosts,
       location: { search }
     } = this.props
 
-    const response = await dispatch(actions.frontpage.get(qs.parse(search)))
-    dispatch(setPostData(response.posts))
+    await loadPosts(qs.parse(search))
   }
 
   render() {
     const {
-      posts,
-      pagination,
-      dispatch,
       location: { search },
       reportPost,
-      match
+      match,
+      renderPosts
     } = this.props
 
     return (
@@ -89,21 +96,7 @@ class HomePage extends React.Component<Props> {
             value={qs.parse(search).sort || POSTS_SORT_HOT}
           />
         </div>
-        <PostList
-          posts={posts}
-          toggleUpvote={toggleUpvote(dispatch)}
-          showChannelLinks={true}
-          reportPost={reportPost}
-        />
-        {pagination ? (
-          <PostListNavigation
-            after={pagination.after}
-            afterCount={pagination.after_count}
-            before={pagination.before}
-            beforeCount={pagination.before_count}
-            pathname={FRONTPAGE_URL}
-          />
-        ) : null}
+        {renderPosts()}
       </React.Fragment>
     )
   }
@@ -112,6 +105,7 @@ class HomePage extends React.Component<Props> {
 const mapStateToProps = (state, ownProps) => {
   const frontpage = state.frontpage.data
   const posts = state.posts.data
+
   return {
     ...postModerationSelector(state, ownProps),
     posts:              safeBulkGet(getPostIds(frontpage), posts),
@@ -119,13 +113,32 @@ const mapStateToProps = (state, ownProps) => {
     pagination:         frontpage.pagination,
     channels:           state.channels,
     showSidebar:        state.ui.showSidebar,
-    loaded:             state.frontpage.loaded
+    loaded:             state.frontpage.loaded || state.frontpage.data.postIds.length > 0,
+    canLoadMore:        state.frontpage.loaded,
+    showPinUI:          false,
+    showReportPost:     true,
+    showRemovePost:     false,
+    showTogglePinPost:  false,
+    showChannelLinks:   true,
+    isModerator:        false // for the intents of CompactPostDisplay UI
   }
 }
 
+const mapDispatchToProps = (dispatch: Dispatch<any>) => ({
+  loadPosts: async (search: Object) => {
+    const response = await dispatch(actions.frontpage.get(search))
+    dispatch(setPostData(response.posts))
+  },
+  dispatch: dispatch
+})
+
 export default R.compose(
-  connect(mapStateToProps),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
   withPostModeration,
   withSingleColumn("home-page"),
+  withPostList,
   withLoading
 )(HomePage)

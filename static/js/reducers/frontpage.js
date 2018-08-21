@@ -7,9 +7,15 @@ import { mapPostListResponse } from "../lib/posts"
 import type { PostListPaginationParams } from "../flow/discussionTypes"
 
 export const frontPageEndpoint = {
-  name:              "frontpage",
-  verbs:             [GET],
-  initialState:      { ...INITIAL_STATE, data: [] },
+  name:         "frontpage",
+  verbs:        [GET],
+  initialState: {
+    ...INITIAL_STATE,
+    data: {
+      pagination: null,
+      postIds:    []
+    }
+  },
   getFunc:           (params: PostListPaginationParams) => api.getFrontpage(params),
   getSuccessHandler: mapPostListResponse
 }
