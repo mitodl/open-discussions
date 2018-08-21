@@ -1,4 +1,5 @@
 .popup {
+  position: absolute;
   background: white;
   top: 30px;
   right: -109px;
@@ -37,7 +38,6 @@
 }
 
 .share-popup {
-  position: absolute;
 
   .triangle {
     width: 15px;
@@ -51,9 +51,9 @@
 }
 
 .login-popup {
-  position: absolute;
   top: unset;
   right: unset;
+  margin-top: 10px;
 
   .triangle {
     width: 15px;
