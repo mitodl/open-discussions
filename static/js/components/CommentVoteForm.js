@@ -5,7 +5,6 @@ import LoginPopup from "./LoginPopup"
 import { userIsAnonymous, votingTooltipText } from "../lib/util"
 import type { CommentInTree } from "../flow/discussionTypes"
 
-
 export type CommentVoteFunc = (comment: CommentInTree) => Promise<*>
 
 type Props = {
