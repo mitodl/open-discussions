@@ -116,44 +116,16 @@
   }
 }
 
-$avatar-dimension: 90px;
-
-.avatar-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  a {
-    margin-left: 20px;
-  }
-
-  .avatar {
-    display: table;
-  }
-
-  .avatar-image {
-    border-radius: 15px;
-    color: #fff;
-    width: $avatar-dimension;
-    height: $avatar-dimension;
-    display: table;
-    overflow: hidden;
-  }
-
-  .avatar-initials {
-    border-radius: 15px;
-    width: $avatar-dimension;
-    height: $avatar-dimension;
-    text-align: center;
-    display: table-cell;
-    vertical-align: middle;
-    color: #fff;
-    font-size: 24px;
-    font-weight: 600;
-  }
-
+.avatar-container,
+.banner-container {
   .cropper-view-box {
     border-radius: inherit;
+  }
+}
+
+.avatar-container {
+  .upload-avatar {
+    margin-left: 20px;
   }
 }
 
@@ -161,10 +133,6 @@ $avatar-dimension: 90px;
   .banner-image {
     width: 100%;
     display: block;
-  }
-
-  .cropper-view-box {
-    border-radius: inherit;
   }
 
   .upload-banner {

@@ -13,15 +13,25 @@ import { initials } from "../lib/profile"
 import type { Dispatch } from "redux"
 import type { Channel } from "../flow/discussionTypes"
 
+export const CHANNEL_AVATAR_SMALL: "small" = "small"
+export const CHANNEL_AVATAR_MEDIUM: "medium" = "medium"
+
+type ImageSize = typeof CHANNEL_AVATAR_SMALL | typeof CHANNEL_AVATAR_MEDIUM
+
 type Props = {
-  editable: boolean,
+  imageSize: ImageSize,
   channel: Channel,
-  channelName?: ?string,
-  formImageUrl: ?string,
-  showDialog: () => any,
-  name: string,
-  onUpdate: (event: Object) => Promise<*>
+  editable?: boolean,
+  formImageUrl?: ?string,
+  showDialog?: () => any,
+  name?: string,
+  onUpdate?: (event: Object) => Promise<*>
 }
+
+const getImage = (channel: Channel, imageSize: ImageSize) =>
+  imageSize === CHANNEL_AVATAR_SMALL
+    ? channel.avatar_small
+    : channel.avatar_medium
 
 class ChannelAvatar extends React.Component<Props> {
   static defaultProps = {
@@ -35,14 +45,16 @@ class ChannelAvatar extends React.Component<Props> {
       formImageUrl,
       showDialog,
       onUpdate,
-      name
+      name,
+      imageSize
     } = this.props
 
-    const imageUrl = formImageUrl || channel.avatar || defaultChannelAvatarUrl
+    const imageUrl =
+      formImageUrl || getImage(channel, imageSize) || defaultChannelAvatarUrl
     const isAdd = imageUrl === defaultChannelAvatarUrl
 
     return (
-      <div className="avatar-container row">
+      <div className={`avatar-container row ${imageSize}-size`}>
         <div className="avatar">
           {isAdd ? (
             <div
@@ -81,8 +93,10 @@ class ChannelAvatar extends React.Component<Props> {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) =>
+  // $FlowFixMe
   bindActionCreators(
     {
+      // $FlowFixMe
       showDialog: () => showDialog(makeDialogKey(ownProps.name))
     },
     dispatch

@@ -38,22 +38,22 @@ const Navigation = (props: NavigationProps) => {
 
   return (
     <div className="navigation">
-      {showPostButton ? (
-        <Link
-          className="mdc-button mdc-button--raised blue-button"
-          to={newPostURL(channelName)}
-        >
-          Submit a New Post
-        </Link>
-      ) : null}
       <div className="location-list">
         <div className={homeClassName}>
           <Link className="home-link" to={FRONTPAGE_URL}>
             <i className="material-icons home">home</i>
-            Home
+            <span className="title">Home</span>
           </Link>
         </div>
       </div>
+      {showPostButton ? (
+        <div className="new-post-link-container">
+          <Link className="new-post-link" to={newPostURL(channelName)}>
+            <i className="material-icons add">add</i>
+            <span className="title">Compose</span>
+          </Link>
+        </div>
+      ) : null}
       <SubscriptionsList
         currentChannel={channelName}
         subscribedChannels={subscribedChannels}
