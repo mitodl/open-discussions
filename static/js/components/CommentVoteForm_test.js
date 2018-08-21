@@ -105,6 +105,19 @@ describe("CommentVoteForm", () => {
     )
   })
 
+  it("clicking a vote button should set visible state to true and not trigger vote function", () => {
+    sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+    const wrapper = renderForm()
+    const voteStub = upvoteStub
+    wrapper.find(".upvote-button").simulate("click")
+    sinon.assert.notCalled(voteStub)
+    assert.deepEqual(wrapper.state(), {
+      downvoting:   false,
+      upvoting:     false,
+      popupVisible: true
+    })
+  })
+
   //
   ;[true, false].forEach(isUpvote => {
     describe(`clicks the ${isUpvote ? "upvote" : "downvote"} button`, () => {
