@@ -1,7 +1,6 @@
 // @flow
 import { Link } from "react-router-dom"
 import React from "react"
-import R from "ramda"
 import onClickOutside from "react-onclickoutside"
 
 import Button from "./Button"
