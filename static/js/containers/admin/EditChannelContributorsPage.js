@@ -21,6 +21,7 @@ import { getChannelName } from "../../lib/util"
 import { validateMembersForm } from "../../lib/validation"
 import {
   setDialogData,
+  setSnackbarMessage,
   showDialog,
   hideDialog,
   DIALOG_REMOVE_MEMBER
@@ -30,13 +31,14 @@ import type { AddMemberForm, Channel, Member } from "../../flow/discussionTypes"
 import type { WithFormProps } from "../../flow/formTypes"
 import { channelURL } from "../../lib/url"
 
-const CONTRIBUTORS_KEY = "channel:edit:contributors"
+export const CONTRIBUTORS_KEY = "channel:edit:contributors"
 const { getForm, actionCreators } = configureForm(
   CONTRIBUTORS_KEY,
   newMemberForm
 )
 
 const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
+const usernameGetter = R.prop("contributor_name")
 
 type Props = {
   channel: Channel,
@@ -48,7 +50,8 @@ type Props = {
   dialogOpen: boolean,
   setDialogVisibility: (visibility: boolean) => void,
   setDialogData: (data: any) => void,
-  history: Object
+  history: Object,
+  setSnackbarMessage: (obj: Object) => void
 } & WithFormProps<AddMemberForm>
 
 export class EditChannelContributorsPage extends React.Component<Props> {
@@ -82,13 +85,20 @@ export class EditChannelContributorsPage extends React.Component<Props> {
     }
   }
 
+  removeMember = async (channel: Channel, member: Member) => {
+    const { removeMember, setSnackbarMessage } = this.props
+    await removeMember(channel, usernameGetter(member))
+    setSnackbarMessage({
+      message: `Successfully removed ${String(member.email)} as a contributor`
+    })
+  }
+
   render() {
     const {
       renderForm,
       form,
       channel,
       members,
-      removeMember,
       memberToRemove,
       dialogOpen,
       setDialogData,
@@ -120,10 +130,10 @@ export class EditChannelContributorsPage extends React.Component<Props> {
           )}
           <MembersList
             channel={channel}
-            removeMember={removeMember}
+            removeMember={this.removeMember}
             editable={editable}
             members={members}
-            usernameGetter={R.prop("contributor_name")}
+            usernameGetter={usernameGetter}
             memberTypeDescription="contributor"
             memberToRemove={memberToRemove}
             dialogOpen={dialogOpen}
@@ -165,6 +175,9 @@ const addMember = (channel: Channel, email: string) =>
   actions.channelContributors.post(channel.name, email)
 const removeMember = (channel: Channel, username: string) =>
   actions.channelContributors.delete(channel.name, username)
+const onSubmitError = formValidate =>
+  formValidate({ email: `Error adding new contributor` })
+const onSubmit = (channel, { email }) => addMember(channel, email)
 
 const mergeProps = mergeAndInjectProps(
   (
@@ -175,21 +188,24 @@ const mergeProps = mergeAndInjectProps(
       onSubmit,
       onSubmitError,
       formValidate,
-      formBeginEdit
+      formBeginEdit,
+      setSnackbarMessage
     }
   ) => ({
     loadMembers:    () => loadMembers(channelName),
     loadChannel:    () => loadChannel(channelName),
     onSubmitResult: formBeginEdit,
-    onSubmit:       form => onSubmit(channel, form),
-    onSubmitError:  () => onSubmitError(formValidate)
+    onSubmit:       async form => {
+      const newMember = await onSubmit(channel, form)
+      setSnackbarMessage({
+        message: `Successfully added ${
+          newMember.contributor.email
+        } as a contributor`
+      })
+    },
+    onSubmitError: () => onSubmitError(formValidate)
   })
 )
-
-const onSubmitError = formValidate =>
-  formValidate({ email: `Error adding new contributor` })
-
-const onSubmit = (channel, { email }) => addMember(channel, email)
 
 export default R.compose(
   connect(
@@ -201,6 +217,7 @@ export default R.compose(
       removeMember,
       onSubmit,
       onSubmitError,
+      setSnackbarMessage,
       setDialogData: (data: any) =>
         setDialogData({ dialogKey: DIALOG_REMOVE_MEMBER, data: data }),
       setDialogVisibility: (visibility: boolean) =>

@@ -17,7 +17,7 @@ const withSingleColumn = R.curry(
     }
 
     WithSingleColumn.WrappedComponent = WrappedComponent
-
+    WithSingleColumn.displayName = `withSingleColumn(${WrappedComponent.name})`
     return WithSingleColumn
   }
 )

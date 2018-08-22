@@ -163,11 +163,7 @@ describe("MembersList", () => {
             type: "MDCDialog:accept"
           })
           assert.equal(removeMember.callCount, 1)
-          sinon.assert.calledWith(
-            removeMember,
-            channel,
-            usernameGetter(memberToRemove)
-          )
+          sinon.assert.calledWith(removeMember, channel, memberToRemove)
         })
       })
 
