@@ -214,10 +214,7 @@ describe("EditChannelModeratorsPage", () => {
       })
 
       const props = inner.find("EditChannelMembersForm").props()
-      props.onSubmit({ preventDefault: helper.sandbox.stub() })
-
-      // let promise resolve
-      await wait(0)
+      await props.onSubmit({ preventDefault: helper.sandbox.stub() })
       sinon.assert.calledWith(
         helper.addChannelModeratorStub,
         channel.name,
