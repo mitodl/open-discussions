@@ -9,7 +9,7 @@ import qs from "query-string"
 import { MetaTags } from "react-meta-tags"
 
 import Card from "../components/Card"
-import withLoading from "../components/Loading"
+import Loading from "../components/Loading"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"
 import ReportForm from "../components/ReportForm"
@@ -70,6 +70,7 @@ import {
 } from "../lib/reports"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 import { showDropdown, hideDropdownDebounced } from "../actions/ui"
+import { withChannelTracker } from "../hoc/withChannelTracker"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -81,7 +82,7 @@ import type {
   MoreCommentsInTree,
   Post
 } from "../flow/discussionTypes"
-import { withChannelTracker } from "../hoc/withChannelTracker"
+import type { LoadingProps } from "../components/Loading"
 
 type PostPageProps = {
   match: Match,
@@ -103,8 +104,6 @@ type PostPageProps = {
   commentDeleteDialogVisible: boolean,
   postReportDialogVisible: boolean,
   commentReportDialogVisible: boolean,
-  notFound: boolean,
-  errored: boolean,
   approvePost: (p: Post) => void,
   removePost: (p: Post) => void,
   approveComment: (c: CommentInTree) => void,
@@ -114,7 +113,7 @@ type PostPageProps = {
   embedly: Object,
   postShareMenuOpen: boolean,
   postDropdownMenuOpen: boolean
-}
+} & LoadingProps
 
 const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
 const DELETE_COMMENT_DIALOG = "DELETE_COMMENT_DIALOG"
@@ -351,7 +350,7 @@ class PostPage extends React.Component<PostPageProps> {
     return null
   }
 
-  render() {
+  renderPage = () => {
     const {
       dispatch,
       post,
@@ -374,7 +373,7 @@ class PostPage extends React.Component<PostPageProps> {
       postShareMenuOpen
     } = this.props
 
-    if (!channel) {
+    if (!channel || !commentsTree) {
       return null
     }
 
@@ -488,6 +487,20 @@ class PostPage extends React.Component<PostPageProps> {
       </div>
     )
   }
+
+  render() {
+    const { loaded, errored, notAuthorized, notFound } = this.props
+    return (
+      <Loading
+        loaded={loaded}
+        errored={errored}
+        notAuthorized={notAuthorized}
+        notFound={notFound}
+      >
+        {this.renderPage()}
+      </Loading>
+    )
+  }
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -549,6 +562,5 @@ export default R.compose(
   withPostModeration,
   withCommentModeration,
   withSingleColumn("post-page"),
-  withChannelTracker,
-  withLoading
+  withChannelTracker
 )(PostPage)

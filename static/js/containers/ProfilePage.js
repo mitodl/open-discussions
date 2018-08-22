@@ -7,7 +7,7 @@ import { MetaTags } from "react-meta-tags"
 
 import Card from "../components/Card"
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
-import withLoading from "../components/Loading"
+import Loading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 
 import { actions } from "../actions"
@@ -18,15 +18,14 @@ import { clearPostError } from "../actions/post"
 
 import type { Profile } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
+import type { LoadingProps } from "../components/Loading"
 
 type Props = {
   dispatch: Dispatch<*>,
   profile: Profile,
   userName: string,
-  history: Object,
-  notFound: boolean,
-  errored: boolean
-}
+  history: Object
+} & LoadingProps
 
 class ProfilePage extends React.Component<Props> {
   componentDidMount() {
@@ -54,7 +53,7 @@ class ProfilePage extends React.Component<Props> {
     history.push(`/profile/${userName}/edit`)
   }
 
-  render() {
+  renderPage = () => {
     const { profile, userName } = this.props
     if (!profile) {
       return null
@@ -111,6 +110,20 @@ class ProfilePage extends React.Component<Props> {
       </div>
     )
   }
+
+  render() {
+    const { loaded, errored, notAuthorized, notFound } = this.props
+    return (
+      <Loading
+        loaded={loaded}
+        errored={errored}
+        notAuthorized={notAuthorized}
+        notFound={notFound}
+      >
+        {this.renderPage()}
+      </Loading>
+    )
+  }
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -131,6 +144,5 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
-  withSingleColumn("profile-view-page"),
-  withLoading
+  withSingleColumn("profile-view-page")
 )(ProfilePage)
