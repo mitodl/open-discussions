@@ -696,7 +696,13 @@ describe("PostPage", function() {
         SET_CHANNEL_DATA
       ]
     )
-    assert.equal(wrapper.find(".main-content").text(), "Error loading page")
+    assert.equal(
+      wrapper
+        .find(".main-content")
+        .at(0)
+        .text(),
+      "Error loading page"
+    )
     assert.isFalse(wrapper.find(NotFound).exists())
   })
 

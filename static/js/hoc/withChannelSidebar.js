@@ -4,6 +4,7 @@ import R from "ramda"
 
 import ChannelSidebar from "../components/ChannelSidebar"
 import Sidebar from "../components/Sidebar"
+import { Grid, Cell } from "../components/Grid"
 
 const withChannelSidebar = R.curry(
   (className: string, WrappedComponent: Class<React.Component<*, *>>) => {
@@ -12,12 +13,16 @@ const withChannelSidebar = R.curry(
 
       render() {
         return (
-          <div className={`main-content two-column ${className}`}>
-            <WrappedComponent {...this.props} />
-            <Sidebar className="sidebar-right">
-              <ChannelSidebar {...this.props} />
-            </Sidebar>
-          </div>
+          <Grid className={`main-content two-column ${className}`}>
+            <Cell width={8}>
+              <WrappedComponent {...this.props} />
+            </Cell>
+            <Cell width={4}>
+              <Sidebar className="sidebar-right">
+                <ChannelSidebar {...this.props} />
+              </Sidebar>
+            </Cell>
+          </Grid>
         )
       }
     }
