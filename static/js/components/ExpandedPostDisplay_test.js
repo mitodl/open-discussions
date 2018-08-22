@@ -197,23 +197,6 @@ describe("ExpandedPostDisplay", () => {
     })
   })
 
-  //
-  ;[[true, "Unfollow"], [false, "Follow"]].forEach(
-    ([subscribed, buttonText]) => {
-      it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
-        post = makePost()
-        post.subscribed = subscribed
-        const wrapper = renderPostDisplay()
-        const button = wrapper.find(
-          subscribed ? ".subscribed" : ".unsubscribed"
-        )
-        assert.include(button.text(), buttonText)
-        button.simulate("click")
-        assert.ok(toggleFollowPostStub.called)
-      })
-    }
-  )
-
   it("should show a delete button if authored by the user", () => {
     [true, false].forEach(userAuthor => {
       post = makePost()

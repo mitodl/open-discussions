@@ -47,6 +47,14 @@
   }
 }
 
+.reversed {
+  right: 0px !important;
+
+  .triangle {
+    right: 10% !important;
+  }
+}
+
 .share-popup {
   .triangle {
     right: 50%;
@@ -57,6 +65,7 @@
   top: unset;
   right: unset;
   margin-top: 10px;
+  min-width: 255px;
 
   .close-popup {
     position: absolute;
