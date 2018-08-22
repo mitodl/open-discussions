@@ -167,6 +167,7 @@ $link-padding: 11px 20px 11px 19px;
       align-items: center;
       padding: $link-padding;
       color: $navigation-text;
+      flex-grow: 1;
     }
 
     &.current-location {
