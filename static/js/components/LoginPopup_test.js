@@ -3,6 +3,7 @@ import React from "react"
 import { shallow } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
+import { Link } from "react-router-dom"
 
 import { LoginPopupHelper } from "./LoginPopup"
 
@@ -50,16 +51,16 @@ describe("LoginPopup", () => {
     const wrapper = renderLoginPopupHelper()
     assert.equal(
       wrapper
-        .find("a")
+        .find(Link)
         .at(0)
-        .props().href,
+        .props().to,
       "/login"
     )
     assert.equal(
       wrapper
-        .find("a")
+        .find(Link)
         .at(1)
-        .props().href,
+        .props().to,
       "/signup"
     )
   })

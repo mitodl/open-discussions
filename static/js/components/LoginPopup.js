@@ -3,6 +3,7 @@ import React from "react"
 import onClickOutside from "react-onclickoutside"
 
 import Button from "./Button"
+import { Link } from "react-router-dom"
 
 type LoginPopupProps = {
   closePopup: Function,
@@ -30,12 +31,12 @@ export class LoginPopupHelper extends React.Component<LoginPopupProps> {
         <div className="popup-title">{message}</div>
         <div className="bottom-row">
           <div className="popup-buttons">
-            <a className="link-button" href="/login">
+            <Link className="link-button" to="/login">
               Log In
-            </a>
-            <a className="link-button red" href="/signup">
+            </Link>
+            <Link className="link-button red" to="/signup">
               Become a member
-            </a>
+            </Link>
           </div>
         </div>
       </div>

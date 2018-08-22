@@ -1,6 +1,5 @@
 // @flow
 import React from "react"
-import sinon from "sinon"
 import { mount } from "enzyme"
 import { assert } from "chai"
 
@@ -10,31 +9,38 @@ import LoginPopup from "./LoginPopup"
 import { makePost } from "../factories/posts"
 import { shouldIf } from "../lib/test_utils"
 import * as utilFuncs from "../lib/util"
+import Router from "../Router"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("FollowButton", () => {
-  let sandbox, toggleFollowPostStub, post
+  let helper, toggleFollowPostStub, post
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
-    toggleFollowPostStub = sandbox.stub()
+    //sandbox = sinon.createSandbox()
+    helper = new IntegrationTestHelper()
+    toggleFollowPostStub = helper.sandbox.stub()
     post = makePost()
   })
 
   afterEach(() => {
-    sandbox.restore()
+    helper.cleanup()
   })
 
   const renderButton = () =>
-    mount(<FollowButton post={post} toggleFollowPost={toggleFollowPostStub} />)
+    mount(
+      <Router store={helper.store} history={helper.browserHistory}>
+        <FollowButton post={post} toggleFollowPost={toggleFollowPostStub} />
+      </Router>
+    )
 
   it("should have a LoginPopup, if the user is anonymous", () => {
-    sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
     const wrapper = renderButton()
     wrapper.find(LoginPopup).exists()
   })
 
   it("should not have a LoginPopup, if the user is not anonymous", () => {
-    sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
+    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
     assert.isNotOk(
       renderButton()
         .find(LoginPopup)
@@ -46,7 +52,7 @@ describe("FollowButton", () => {
   ;[[true, "Unfollow"], [false, "Follow"]].forEach(
     ([subscribed, buttonText]) => {
       it(`should include a ${buttonText} button when subscribed === ${subscribed.toString()}`, () => {
-        sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
+        helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
         post.subscribed = subscribed
         const wrapper = renderButton()
         const button = wrapper.find(
@@ -66,13 +72,10 @@ describe("FollowButton", () => {
     )} set visible state to true and ${shouldIf(
       !isAnonymous
     )} trigger follow function`, () => {
-      sandbox.stub(utilFuncs, "userIsAnonymous").returns(isAnonymous)
+      helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(isAnonymous)
       post.subscribed = false
       const wrapper = renderButton()
       wrapper.find(".unsubscribed").simulate("click")
-      assert.deepEqual(wrapper.state(), {
-        popupVisible: isAnonymous
-      })
       if (isAnonymous) {
         assert.equal(wrapper.find(LoginPopup).props().visible, isAnonymous)
       }
