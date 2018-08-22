@@ -3,10 +3,7 @@ import React from "react"
 
 import LoginPopup from "./LoginPopup"
 
-import {
-  preventDefaultAndInvoke,
-  userIsAnonymous
-} from "../lib/util"
+import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 
 import type { Post } from "../flow/discussionTypes"
 
