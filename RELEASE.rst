@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.42.1
+--------------
+
+- Switch over to the material grid
+- Make home link full width (#1108)
+- Show snackbar when user adds/removes a moderator/contributor (#1099)
+- Login popup for anonymous user vote buttons on post detail page (#1102)
+- Move footer into sidebar (#1089)
+- Add channel avatar to sidebar (#1082)
+
 Version 0.42.0 (Released August 21, 2018)
 --------------
 
