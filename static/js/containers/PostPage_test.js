@@ -39,7 +39,7 @@ import { VALID_COMMENT_SORT_TYPES } from "../lib/sorting"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import * as utilFuncs from "../lib/util"
 import * as embedUtil from "../lib/embed"
-import { truncate } from "../lib/util"
+import { truncate, wait } from "../lib/util"
 
 describe("PostPage", function() {
   let helper,
@@ -62,7 +62,7 @@ describe("PostPage", function() {
     helper.getPostStub.returns(Promise.resolve(post))
     helper.getEmbedlyStub.returns(Promise.resolve(makeArticle()))
     helper.getChannelStub.returns(Promise.resolve(channel))
-    helper.getChannelsStub.returns(Promise.resolve([]))
+    helper.getChannelsStub.returns(Promise.resolve([channel]))
     helper.getCommentsStub.returns(Promise.resolve(commentsResponse))
     helper.getCommentStub.returns(
       Promise.resolve(R.slice(0, 1, commentsResponse))
@@ -607,6 +607,31 @@ describe("PostPage", function() {
       })
       wrapper.update()
       assert.include(dialog.text(), "Reason must be at least 3 characters")
+    })
+  })
+  ;["getChannels", "getComments", "getPost"].forEach(apiFunc => {
+    it(`should tolerate delay for ${apiFunc}`, async () => {
+      const stub = helper[`${apiFunc}Stub`]
+      stub.returns(
+        stub.defaultBehavior.returnValue.then(async value => {
+          await wait(10)
+          return value
+        })
+      )
+      await renderComponent(postDetailURL(channel.name, post.id), [
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
+        actions.posts.get.requestType,
+        actions.posts.get.successType,
+        actions.comments.get.requestType,
+        actions.comments.get.successType,
+        actions.subscribedChannels.get.requestType,
+        actions.subscribedChannels.get.successType,
+        actions.profiles.get.requestType,
+        actions.profiles.get.successType,
+        SET_CHANNEL_DATA,
+        FORM_BEGIN_EDIT
+      ])
     })
   })
 
