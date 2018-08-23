@@ -7,7 +7,7 @@ import qs from "query-string"
 import { Link } from "react-router-dom"
 
 import Card from "../../components/Card"
-import { Loading } from "../../components/Loading"
+import { Spinner } from "../../components/Loading"
 
 import { actions } from "../../actions"
 import { processAuthResponse } from "../../lib/auth"
@@ -64,7 +64,7 @@ export class RegisterConfirmPage extends React.Component<Props, *> {
               <title>{formatTitle("Confirming Email")}</title>
             </MetaTags>
             {showLoading ? (
-              <Loading />
+              <Spinner />
             ) : (
               <div>
                 <p>No confirmation code was provided or it has expired.</p>

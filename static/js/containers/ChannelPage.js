@@ -7,7 +7,7 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
 import PostList from "../components/PostList"
-import withLoading from "../components/Loading"
+import Loading from "../components/Loading"
 import PostListNavigation from "../components/PostListNavigation"
 import withChannelSidebar from "../hoc/withChannelSidebar"
 import { PostSortPicker } from "../components/SortPicker"
@@ -29,11 +29,12 @@ import { formatTitle } from "../lib/title"
 import { clearChannelError } from "../actions/channel"
 import { evictPostsForChannel } from "../actions/posts_for_channel"
 import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
+import { withChannelTracker } from "../hoc/withChannelTracker"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
 import type { Channel, Post, PostListPagination } from "../flow/discussionTypes"
-import { withChannelTracker } from "../hoc/withChannelTracker"
+import type { LoadingProps } from "../components/Loading"
 
 type ChannelPageProps = {
   match: Match,
@@ -45,12 +46,10 @@ type ChannelPageProps = {
   posts: ?Array<Post>,
   subscribedChannels: ?Array<Channel>,
   pagination: PostListPagination,
-  errored: boolean,
   isModerator: boolean,
-  notFound: boolean,
   reportPost: (p: Post) => void,
   removePost: (p: Post) => void
-}
+} & LoadingProps
 
 const shouldLoadData = R.complement(
   R.allPass([
@@ -118,7 +117,7 @@ class ChannelPage extends React.Component<ChannelPageProps> {
     dispatch(setPostData(posts))
   }
 
-  render() {
+  renderPage = () => {
     const {
       dispatch,
       channel,
@@ -170,6 +169,20 @@ class ChannelPage extends React.Component<ChannelPageProps> {
       )
     }
   }
+
+  render() {
+    const { loaded, errored, notAuthorized, notFound } = this.props
+    return (
+      <Loading
+        loaded={loaded}
+        errored={errored}
+        notAuthorized={notAuthorized}
+        notFound={notFound}
+      >
+        {this.renderPage()}
+      </Loading>
+    )
+  }
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -214,6 +227,5 @@ export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
   withChannelSidebar("channel-page"),
-  withChannelTracker,
-  withLoading
+  withChannelTracker
 )(ChannelPage)

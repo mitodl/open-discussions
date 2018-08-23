@@ -3,7 +3,7 @@ import React from "react"
 import { assert } from "chai"
 import { mount } from "enzyme"
 
-import withLoading from "./Loading"
+import Loading from "./Loading"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 
 class Content extends React.Component<*> {
@@ -11,8 +11,6 @@ class Content extends React.Component<*> {
     return <div>CONTENT</div>
   }
 }
-
-const LoadingContent = withLoading(Content)
 
 describe("Loading", () => {
   let props
@@ -27,7 +25,11 @@ describe("Loading", () => {
   })
 
   const renderLoading = () => {
-    return mount(<LoadingContent {...props} />)
+    return mount(
+      <Loading {...props}>
+        <Content />
+      </Loading>
+    )
   }
 
   it("should show a spinner if not loaded and not errored", () => {
