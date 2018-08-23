@@ -32,3 +32,55 @@
     right: 15px;
   }
 }
+
+$avatar-dimension-medium: 90px;
+$avatar-dimension-small: 22px;
+
+.avatar-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .avatar {
+    display: table;
+  }
+
+  .avatar-image {
+    display: table;
+    overflow: hidden;
+  }
+
+  .avatar-initials {
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  &.small-size {
+    img,
+    .avatar,
+    .avatar-initials {
+      width: $avatar-dimension-small;
+      height: $avatar-dimension-small;
+    }
+
+    .avatar-initials {
+      font-size: $avatar-dimension-small / 2;
+    }
+  }
+
+  &.medium-size {
+    img,
+    .avatar,
+    .avatar-initials {
+      width: $avatar-dimension-medium;
+      height: $avatar-dimension-medium;
+    }
+
+    .avatar-initials {
+      font-size: $avatar-dimension-medium / 4;
+    }
+  }
+}

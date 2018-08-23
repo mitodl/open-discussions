@@ -31,7 +31,6 @@ import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"
 import Drawer from "../containers/Drawer"
 import Toolbar from "../components/Toolbar"
-import Footer from "../components/Footer"
 
 import { actions } from "../actions"
 import {
@@ -270,7 +269,6 @@ class App extends React.Component<AppProps> {
             path={`${match.url}password_reset/confirm/:uid/:token`}
             component={PasswordResetConfirmPage}
           />
-          <Footer />
         </div>
       </div>
     )

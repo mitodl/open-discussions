@@ -15,6 +15,7 @@ import { getViewportWidth, isMobileWidth, DRAWER_BREAKPOINT } from "../lib/util"
 import type { Dispatch } from "redux"
 import type { Channel } from "../flow/discussionTypes"
 import type { Location } from "react-router"
+import Footer from "../components/Footer"
 
 type DrawerPropsFromState = {
   showDrawerDesktop: boolean,
@@ -112,6 +113,7 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
                 pathname={pathname}
                 channels={channels}
               />
+              <Footer />
             </DrawerContent>
           </Drawer>
         </Theme>

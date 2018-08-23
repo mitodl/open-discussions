@@ -22,6 +22,7 @@ import { getChannelName } from "../../lib/util"
 import { validateMembersForm } from "../../lib/validation"
 import {
   setDialogData,
+  setSnackbarMessage,
   showDialog,
   hideDialog,
   DIALOG_REMOVE_MEMBER
@@ -30,10 +31,11 @@ import {
 import type { AddMemberForm, Channel, Member } from "../../flow/discussionTypes"
 import type { WithFormProps } from "../../flow/formTypes"
 
-const MODERATORS_KEY = "channel:edit:moderators"
+export const MODERATORS_KEY = "channel:edit:moderators"
 const { getForm, actionCreators } = configureForm(MODERATORS_KEY, newMemberForm)
 
 const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
+const usernameGetter = R.prop("moderator_name")
 
 type Props = {
   channel: Channel,
@@ -45,7 +47,8 @@ type Props = {
   dialogOpen: boolean,
   setDialogVisibility: (visibility: boolean) => void,
   setDialogData: (data: any) => void,
-  history: Object
+  history: Object,
+  setSnackbarMessage: (obj: Object) => void
 } & WithFormProps<AddMemberForm>
 
 export class EditChannelModeratorsPage extends React.Component<Props> {
@@ -79,10 +82,13 @@ export class EditChannelModeratorsPage extends React.Component<Props> {
     }
   }
 
-  removeMember = async (channel: Channel, email: string) => {
-    const { removeMember } = this.props
-    await removeMember(channel, email)
+  removeMember = async (channel: Channel, member: Member) => {
+    const { removeMember, setSnackbarMessage } = this.props
+    await removeMember(channel, usernameGetter(member))
     this.validateModerator()
+    setSnackbarMessage({
+      message: `Successfully removed ${String(member.email)} as a moderator`
+    })
   }
 
   render() {
@@ -125,7 +131,7 @@ export class EditChannelModeratorsPage extends React.Component<Props> {
             removeMember={this.removeMember}
             editable={editable}
             members={members}
-            usernameGetter={R.prop("moderator_name")}
+            usernameGetter={usernameGetter}
             memberTypeDescription="moderator"
             memberToRemove={memberToRemove}
             dialogOpen={dialogOpen}
@@ -167,24 +173,36 @@ const addMember = (channel: Channel, email: string) =>
   actions.channelModerators.post(channel.name, email)
 const removeMember = (channel: Channel, username: string) =>
   actions.channelModerators.delete(channel.name, username)
+const onSubmitError = formValidate =>
+  formValidate({ email: `Error adding new moderator` })
+const onSubmit = (channel, { email }) => addMember(channel, email)
 
 const mergeProps = mergeAndInjectProps(
   (
     { channelName, channel },
-    { loadMembers, loadChannel, onSubmit, formValidate, formBeginEdit }
+    {
+      loadMembers,
+      loadChannel,
+      onSubmit,
+      formValidate,
+      formBeginEdit,
+      setSnackbarMessage
+    }
   ) => ({
     loadMembers:    () => loadMembers(channelName),
     loadChannel:    () => loadChannel(channelName),
     onSubmitResult: formBeginEdit,
-    onSubmit:       form => onSubmit(channel, form),
-    onSubmitError:  () => onSubmitError(formValidate)
+    onSubmit:       async form => {
+      const newMember = await onSubmit(channel, form)
+      setSnackbarMessage({
+        message: `Successfully added ${
+          newMember.moderator.email
+        } as a moderator`
+      })
+    },
+    onSubmitError: () => onSubmitError(formValidate)
   })
 )
-
-const onSubmitError = formValidate =>
-  formValidate({ email: `Error adding new moderator` })
-
-const onSubmit = (channel, { email }) => addMember(channel, email)
 
 export default R.compose(
   connect(
@@ -196,6 +214,7 @@ export default R.compose(
       removeMember,
       onSubmit,
       onSubmitError,
+      setSnackbarMessage,
       setDialogData: (data: any) =>
         setDialogData({ dialogKey: DIALOG_REMOVE_MEMBER, data: data }),
       setDialogVisibility: (visibility: boolean) =>

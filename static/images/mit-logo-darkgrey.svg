@@ -4,12 +4,12 @@
 width="72px" height="38px" viewBox="0 0 72 38" enable-background="new 0 0 72 38" xml:space="preserve" role="img" aria-labelledby="title">
 <title id="title">MIT large lightgray and white logo</title>
 <g>
-	<rect x="52" fill="#C3C0BF" width="20" height="8"/>
-	<rect x="13" fill="#C3C0BF" width="8" height="26"/>
-	<rect x="26" fill="#C3C0BF" width="8" height="38"/>
-	<rect fill="#C3C0BF" width="8" height="38"/>
-	<rect x="52" y="13" fill="#C3C0BF" width="8" height="25"/>
-	<rect x="39" fill="#C3C0BF" width="8" height="8"/>
-	<rect x="39" y="13" fill="#FFFFFF" width="8" height="25"/>
+	<rect x="52" fill="#898A8B" width="20" height="8"/>
+	<rect x="13" fill="#898A8B" width="8" height="26"/>
+	<rect x="26" fill="#898A8B" width="8" height="38"/>
+	<rect fill="#898A8B" width="8" height="38"/>
+	<rect x="52" y="13" fill="#898A8B" width="8" height="25"/>
+	<rect x="39" fill="#898A8B" width="8" height="8"/>
+	<rect x="39" y="13" fill="#C0BFBE" width="8" height="25"/>
 </g>
 </svg>

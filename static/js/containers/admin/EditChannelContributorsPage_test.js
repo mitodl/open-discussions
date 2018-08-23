@@ -1,28 +1,45 @@
 // @flow
 import { assert } from "chai"
 import sinon from "sinon"
+import R from "ramda"
+
+import EditChannelContributorsPage, {
+  EditChannelContributorsPage as InnerEditChannelContributorsPage,
+  CONTRIBUTORS_KEY
+} from "./EditChannelContributorsPage"
 
 import {
   makeChannel,
   makeContributor,
   makeContributors
 } from "../../factories/channels"
-import { actions } from "../../actions"
-import { SET_CHANNEL_DATA } from "../../actions/channel"
+import { FORM_VALIDATE, FORM_UPDATE } from "../../actions/forms"
+import {
+  DIALOG_REMOVE_MEMBER,
+  SHOW_DIALOG,
+  HIDE_DIALOG,
+  SET_DIALOG_DATA,
+  SET_SNACKBAR_MESSAGE
+} from "../../actions/ui"
+
 import { newMemberForm } from "../../lib/channels"
 import { formatTitle } from "../../lib/title"
-import { channelURL, editChannelContributorsURL } from "../../lib/url"
+import { wait } from "../../lib/util"
 import IntegrationTestHelper from "../../util/integration_test_helper"
-import { SET_DIALOG_DATA, SHOW_DIALOG } from "../../actions/ui"
 
 describe("EditChannelContributorsPage", () => {
-  let helper, renderComponent, listenForActions, channel, contributors
+  let helper, renderPage, channel, contributors
 
   beforeEach(() => {
     channel = makeChannel()
-    channel.user_is_moderator = true
+    channel.user_is_contributor = true
     contributors = makeContributors()
     helper = new IntegrationTestHelper()
+    renderPage = helper.configureHOCRenderer(
+      EditChannelContributorsPage,
+      InnerEditChannelContributorsPage,
+      {}
+    )
     helper.getChannelStub.returns(Promise.resolve(channel))
     helper.getChannelsStub.returns(Promise.resolve([channel]))
     helper.getChannelContributorsStub.returns(Promise.resolve(contributors))
@@ -39,8 +56,6 @@ describe("EditChannelContributorsPage", () => {
       })
     )
     helper.getProfileStub.returns(Promise.resolve(""))
-    renderComponent = helper.renderComponent.bind(helper)
-    listenForActions = helper.listenForActions.bind(helper)
     window.scrollTo = helper.sandbox.stub()
   })
 
@@ -48,43 +63,60 @@ describe("EditChannelContributorsPage", () => {
     helper.cleanup()
   })
 
-  const renderPage = async (extraActions = []) => {
-    const [wrapper] = await renderComponent(
-      editChannelContributorsURL(channel.name),
-      [
-        actions.subscribedChannels.get.requestType,
-        actions.subscribedChannels.get.successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        actions.channelContributors.get.requestType,
-        actions.channelContributors.get.successType,
-        actions.profiles.get.requestType,
-        actions.profiles.get.successType,
-        SET_CHANNEL_DATA,
-        actions.forms.FORM_BEGIN_EDIT,
-        ...extraActions
-      ]
+  const render = (extraProps = {}, extraState = {}) =>
+    renderPage(
+      R.mergeDeepRight(
+        {
+          channels: {
+            data:       new Map([[channel.name, channel]]),
+            processing: false
+          },
+          channelContributors: {
+            processing: false,
+            data:       new Map([[channel.name, contributors]])
+          },
+          forms: {
+            [CONTRIBUTORS_KEY]: {
+              value:  newMemberForm(),
+              errors: {}
+            }
+          },
+          ui: {
+            dialogs: new Map()
+          }
+        },
+        extraProps
+      ),
+      R.mergeDeepRight(
+        {
+          match: {
+            params: {
+              channelName: channel.name
+            }
+          },
+          channel: channel
+        },
+        extraState
+      )
     )
-    return wrapper.update()
-  }
 
   it("should set the document title", async () => {
-    await renderPage()
-    assert.equal(document.title, formatTitle("Edit Channel"))
+    const { inner } = await render()
+    assert.equal(inner.find("title").text(), formatTitle("Edit Channel"))
   })
 
   it("displays a notice that membership is managed by micromasters", async () => {
     channel.membership_is_managed = true
-    const wrapper = await renderPage()
+    const { inner } = await render()
     assert.equal(
-      wrapper.find(".membership-notice").text(),
+      inner.find(".membership-notice").text(),
       "Membership is managed via MicroMasters"
     )
   })
 
   it("renders the member list", async () => {
-    const wrapper = await renderPage()
-    const props = wrapper.find("MembersList").props()
+    const { inner } = await render()
+    const props = inner.find("MembersList").props()
     assert.deepEqual(props.members, contributors)
     assert.equal(props.editable, !channel.membership_is_managed)
     assert.equal(
@@ -95,151 +127,181 @@ describe("EditChannelContributorsPage", () => {
     assert.equal(props.memberTypeDescription, "contributor")
   })
 
-  it("redirects if the user is not a moderator", async () => {
-    channel.user_is_moderator = false
-    await renderPage([
-      actions.channels.get.requestType,
-      actions.channels.get.successType,
-      actions.forms.FORM_END_EDIT
-    ])
-
-    const history = helper.browserHistory
-    assert.equal(history.location.pathname, channelURL(channel.name))
-  })
-
   describe("editable", () => {
     beforeEach(() => {
       channel.membership_is_managed = false
     })
 
     it("renders the form", async () => {
-      const wrapper = await renderPage()
-      const props = wrapper.find("EditChannelMembersForm").props()
+      const { inner } = await render()
+      const props = inner.find("EditChannelMembersForm").props()
       assert.deepEqual(props.memberTypeDescription, "contributor")
       assert.deepEqual(props.form, newMemberForm())
     })
 
-    it("tries to add a new contributor but fails validation", async () => {
-      const wrapper = await renderPage()
-      await listenForActions([actions.forms.FORM_VALIDATE], () => {
-        wrapper
-          .find("form")
-          .props()
-          .onSubmit({ preventDefault: helper.sandbox.stub() })
-      })
+    it("updates the email", async () => {
+      const { inner, store } = await render()
+      const props = inner.find("EditChannelMembersForm").props()
+      const email = "new@email.com"
+      props.onUpdate({ target: { name: "email", value: email } })
 
-      assert.equal(
-        helper.store.getState().forms["channel:edit:contributors"].errors.email,
-        "Email must not be blank"
-      )
+      const actions = store.getActions()
+      assert.deepEqual(actions[actions.length - 1], {
+        type:    FORM_UPDATE,
+        payload: {
+          formKey: CONTRIBUTORS_KEY,
+          value:   { email }
+        }
+      })
     })
 
     it("tries to add a new contributor but the API request fails", async () => {
-      const wrapper = await renderPage()
+      helper.addChannelContributorStub.returns(Promise.reject("an error"))
+
       const email = "new@email.com"
-
-      helper.addChannelContributorStub.returns(Promise.reject())
-
-      wrapper
-        .find("input[name='email']")
-        .props()
-        .onChange({
-          target: { name: "email", value: email }
-        })
-      await listenForActions(
-        [
-          actions.channelContributors.post.requestType,
-          actions.channelContributors.post.failureType,
-          actions.forms.FORM_VALIDATE,
-          actions.forms.FORM_VALIDATE
-        ],
-        () => {
-          wrapper
-            .find("form")
-            .props()
-            .onSubmit({ preventDefault: helper.sandbox.stub() })
+      const { inner, store } = await render({
+        forms: {
+          [CONTRIBUTORS_KEY]: {
+            value: {
+              email
+            },
+            errors: {}
+          }
         }
-      )
+      })
 
+      const props = inner.find("EditChannelMembersForm").props()
+      props.onSubmit({ preventDefault: helper.sandbox.stub() })
+
+      // let promise resolve
+      await wait(0)
       sinon.assert.calledWith(
         helper.addChannelContributorStub,
         channel.name,
         email
       )
-      assert.equal(
-        helper.store.getState().forms["channel:edit:contributors"].errors.email,
-        "Error adding new contributor"
-      )
+
+      const actions = store.getActions()
+      assert.deepEqual(actions[actions.length - 1], {
+        type:    FORM_VALIDATE,
+        payload: {
+          formKey: CONTRIBUTORS_KEY,
+          errors:  {
+            email: "Error adding new contributor"
+          }
+        }
+      })
     })
 
     it("adds a new contributor", async () => {
-      const wrapper = await renderPage()
-      const email = "new@email.com"
-
       const newContributor = makeContributor()
       helper.addChannelContributorStub.returns(Promise.resolve(newContributor))
 
-      wrapper
-        .find("input[name='email']")
-        .props()
-        .onChange({
-          target: { name: "email", value: email }
-        })
-      await listenForActions(
-        [
-          actions.channelContributors.post.requestType,
-          actions.channelContributors.post.successType,
-          actions.forms.FORM_VALIDATE
-        ],
-        () => {
-          wrapper
-            .find("form")
-            .props()
-            .onSubmit({ preventDefault: helper.sandbox.stub() })
+      const email = "new@email.com"
+      const { inner, store } = await render({
+        forms: {
+          [CONTRIBUTORS_KEY]: {
+            value: {
+              email
+            },
+            errors: {}
+          }
         }
-      )
+      })
 
+      inner
+        .find("EditChannelMembersForm")
+        .props()
+        .onSubmit({ preventDefault: helper.sandbox.stub() })
+
+      await wait(0)
       sinon.assert.calledWith(
         helper.addChannelContributorStub,
         channel.name,
         email
       )
-    })
 
-    it("removes a contributor", async () => {
-      const wrapper = await renderPage()
-
-      helper.deleteChannelContributorStub.returns(Promise.resolve())
-
-      await listenForActions(
-        [
-          SHOW_DIALOG,
-          SET_DIALOG_DATA,
-          actions.channelContributors.delete.requestType,
-          actions.channelContributors.delete.successType
-        ],
-        () => {
-          wrapper
-            .find(".remove")
-            .first()
-            .props()
-            .onClick({ preventDefault: helper.sandbox.stub() })
-
-          wrapper.update()
-          wrapper
-            .find("#remove-member button.edit-button")
-            .props()
-            .onClick({
-              type: "MDCDialog:accept"
-            })
+      const actions = store.getActions()
+      assert.deepEqual(actions[actions.length - 2], {
+        type:    SET_SNACKBAR_MESSAGE,
+        payload: {
+          message: `Successfully added ${String(
+            newContributor.email
+          )} as a contributor`
         }
-      )
+      })
+    })
+  })
+  it("removes a contributor", async () => {
+    const { inner, store } = await render(
+      {},
+      { history: helper.browserHistory }
+    )
 
-      sinon.assert.calledWith(
-        helper.deleteChannelContributorStub,
-        channel.name,
-        contributors[0].contributor_name
-      )
+    helper.deleteChannelContributorStub.returns(Promise.resolve())
+
+    inner
+      .find("MembersList")
+      .props()
+      .removeMember(channel, contributors[0])
+
+    // wait for promise to resolve
+    await wait(0)
+    sinon.assert.calledWith(
+      helper.deleteChannelContributorStub,
+      channel.name,
+      contributors[0].contributor_name
+    )
+
+    const actions = store.getActions()
+
+    assert.deepEqual(actions[actions.length - 1], {
+      type:    SET_SNACKBAR_MESSAGE,
+      payload: {
+        message: `Successfully removed ${String(
+          contributors[0].email
+        )} as a contributor`
+      }
+    })
+  })
+  ;[true, false].forEach(hasDialog => {
+    it(`passes a dialog value of ${String(hasDialog)}`, async () => {
+      const { inner } = await render({
+        ui: {
+          dialogs: new Map(hasDialog ? [[DIALOG_REMOVE_MEMBER, true]] : [])
+        }
+      })
+
+      assert.equal(inner.find("MembersList").props().dialogOpen, hasDialog)
+    })
+  })
+  ;[true, false].forEach(dialogVisibility => {
+    it(`sets dialog visibility to ${String(dialogVisibility)}`, async () => {
+      const { inner, store } = await render()
+      inner
+        .find("MembersList")
+        .props()
+        .setDialogVisibility(dialogVisibility)
+
+      const actions = store.getActions()
+      assert.deepEqual(actions[actions.length - 1], {
+        type:    dialogVisibility ? SHOW_DIALOG : HIDE_DIALOG,
+        payload: DIALOG_REMOVE_MEMBER
+      })
+    })
+  })
+
+  it("sets dialog data", async () => {
+    const { inner, store } = await render()
+    const data = { a: "data" }
+    inner
+      .find("MembersList")
+      .props()
+      .setDialogData(data)
+    const actions = store.getActions()
+    assert.deepEqual(actions[actions.length - 1], {
+      type:    SET_DIALOG_DATA,
+      payload: { data, dialogKey: DIALOG_REMOVE_MEMBER }
     })
   })
 })

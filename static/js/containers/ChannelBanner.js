@@ -13,13 +13,12 @@ import type { Dispatch } from "redux"
 import type { Channel } from "../flow/discussionTypes"
 
 type Props = {
-  editable: boolean,
   channel: Channel,
-  channelName?: ?string,
-  formImageUrl: ?string,
-  showDialog: () => any,
-  name: string,
-  onUpdate: (event: Object) => Promise<*>
+  editable?: boolean,
+  formImageUrl?: ?string,
+  showDialog?: () => any,
+  name?: string,
+  onUpdate?: (event: Object) => Promise<*>
 }
 
 class ChannelBanner extends React.Component<Props> {
@@ -70,8 +69,10 @@ class ChannelBanner extends React.Component<Props> {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) =>
+  // $FlowFixMe
   bindActionCreators(
     {
+      // $FlowFixMe
       showDialog: () => showDialog(makeDialogKey(ownProps.name))
     },
     dispatch

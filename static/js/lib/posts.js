@@ -2,8 +2,8 @@
 import React from "react"
 import R from "ramda"
 import { Link } from "react-router-dom"
-import ReactTooltip from "react-tooltip"
 
+import LoginPopup from "../components/LoginPopup"
 import { postDetailURL, urlHostname } from "./url"
 import { userIsAnonymous, votingTooltipText } from "./util"
 import { showDropdown, hideDropdownDebounced } from "../actions/ui"
@@ -83,20 +83,23 @@ export const formatPostTitle = (post: Post) =>
 type PostVotingProps = {
   post: Post,
   className?: string,
-  toggleUpvote: Function
+  toggleUpvote: Function,
+  showLoginMenu: Function
 }
 
 export class PostVotingButtons extends React.Component<*, *> {
   props: PostVotingProps
 
   state: {
-    upvoting: boolean
+    upvoting: boolean,
+    popupVisible: boolean
   }
 
   constructor(props: PostVotingProps) {
     super(props)
     this.state = {
-      upvoting: false
+      upvoting:     false,
+      popupVisible: false
     }
   }
 
@@ -111,38 +114,49 @@ export class PostVotingButtons extends React.Component<*, *> {
     })
   }
 
+  onTogglePopup = async () => {
+    const { popupVisible } = this.state
+    this.setState({
+      popupVisible: !popupVisible
+    })
+  }
+
   render() {
     const { post, className } = this.props
-    const { upvoting } = this.state
+    const { upvoting, popupVisible } = this.state
     const upvoted = post.upvoted !== upvoting
     const upvoteClass = upvoted ? "upvoted" : ""
 
     return (
-      <div className={`upvotes ${className || ""} ${upvoteClass}`}>
-        {userIsAnonymous() ? (
-          <ReactTooltip id="post-upvote-button">
-            {votingTooltipText}
-          </ReactTooltip>
-        ) : null}
-        <button
-          className="upvote-button"
-          onClick={userIsAnonymous() ? null : this.onToggleUpvote}
-          disabled={upvoting}
-          data-tip
-          data-for="post-upvote-button"
-        >
-          <img
-            className="vote-arrow"
-            src={
-              upvoted
-                ? "/static/images/upvote_arrow_on.png"
-                : "/static/images/upvote_arrow.png"
+      <React.Fragment>
+        <div className={`upvotes ${className || ""} ${upvoteClass}`}>
+          <button
+            className="upvote-button"
+            onClick={
+              userIsAnonymous() ? this.onTogglePopup : this.onToggleUpvote
             }
-            width="13"
+            disabled={upvoting}
+          >
+            <img
+              className="vote-arrow"
+              src={
+                upvoted
+                  ? "/static/images/upvote_arrow_on.png"
+                  : "/static/images/upvote_arrow.png"
+              }
+              width="13"
+            />
+          </button>
+          <span className="votes">{post.score}</span>
+        </div>
+        {userIsAnonymous() ? (
+          <LoginPopup
+            message={votingTooltipText}
+            visible={popupVisible}
+            closePopup={this.onTogglePopup}
           />
-        </button>
-        <span className="votes">{post.score}</span>
-      </div>
+        ) : null}
+      </React.Fragment>
     )
   }
 }

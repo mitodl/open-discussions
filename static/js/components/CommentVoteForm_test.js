@@ -1,16 +1,15 @@
 // @flow
 import React from "react"
 import sinon from "sinon"
-import { mount } from "enzyme"
+import { shallow } from "enzyme"
 import { assert } from "chai"
-import ReactTooltip from "react-tooltip"
 
-import { wait, votingTooltipText } from "../lib/util"
+import * as utilFuncs from "../lib/util"
+import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
 import CommentVoteForm from "./CommentVoteForm"
-
-import * as utilFuncs from "../lib/util"
+import LoginPopup from "./LoginPopup"
 
 describe("CommentVoteForm", () => {
   let sandbox, upvoteStub, downvoteStub, comment, resolveUpvote, resolveDownvote
@@ -38,7 +37,7 @@ describe("CommentVoteForm", () => {
   })
 
   const renderForm = (props = {}) =>
-    mount(
+    shallow(
       <CommentVoteForm
         comment={comment}
         upvote={upvoteStub}
@@ -91,21 +90,33 @@ describe("CommentVoteForm", () => {
     )
   }
 
-  it("should have tooltips, if the user is anonymous", () => {
+  it("should have a LoginPopup, if the user is anonymous", () => {
     sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
     const wrapper = renderForm()
-    wrapper.find(ReactTooltip).forEach(tooltip => {
-      assert.equal(tooltip.text(), votingTooltipText)
-    })
+    wrapper.find(LoginPopup).exists()
   })
 
-  it("should not have any tooltips, if the user is not anonymous", () => {
+  it("should not have a LoginPopup, if the user is not anonymous", () => {
     sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
     assert.isNotOk(
       renderForm()
-        .find(ReactTooltip)
+        .find(LoginPopup)
         .exists()
     )
+  })
+
+  it("clicking a vote button should set visible state to true and not trigger vote function", () => {
+    sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+    const wrapper = renderForm()
+    const voteStub = upvoteStub
+    wrapper.find(".upvote-button").simulate("click")
+    sinon.assert.notCalled(voteStub)
+    assert.deepEqual(wrapper.state(), {
+      downvoting:   false,
+      upvoting:     false,
+      popupVisible: true
+    })
+    assert.ok(wrapper.find(LoginPopup).props().visible)
   })
 
   //
@@ -120,8 +131,9 @@ describe("CommentVoteForm", () => {
           .simulate("click")
         sinon.assert.calledWith(voteStub, comment)
         assert.deepEqual(wrapper.state(), {
-          downvoting: !isUpvote,
-          upvoting:   isUpvote
+          downvoting:   !isUpvote,
+          upvoting:     isUpvote,
+          popupVisible: false
         })
         assertButtons(wrapper, isUpvote, false, true)
 
