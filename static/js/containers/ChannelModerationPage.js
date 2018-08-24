@@ -15,7 +15,7 @@ import {
   withCommentModeration,
   commentModerationSelector
 } from "../hoc/withCommentModeration"
-import Loading from "../components/Loading"
+import withLoading from "../components/Loading"
 import withChannelSidebar from "../hoc/withChannelSidebar"
 import CompactPostDisplay from "../components/CompactPostDisplay"
 import CommentTree from "../components/CommentTree"
@@ -31,7 +31,6 @@ import type {
   PostReportRecord,
   CommentReportRecord
 } from "../flow/discussionTypes"
-import type { LoadingProps } from "../components/Loading"
 
 const addDummyReplies = R.over(R.lensPath(["replies"]), () => [])
 
@@ -47,7 +46,7 @@ type Props = {
   approveComment: Function,
   removeComment: Function,
   ignoreCommentReports: Function
-} & LoadingProps
+}
 
 class ChannelModerationPage extends React.Component<Props> {
   componentDidMount() {
@@ -109,7 +108,7 @@ class ChannelModerationPage extends React.Component<Props> {
     }
   }
 
-  renderPage = () => {
+  render() {
     const { channel, reports, isModerator } = this.props
 
     return isModerator ? (
@@ -130,20 +129,6 @@ class ChannelModerationPage extends React.Component<Props> {
       <Redirect to={channelURL(channel.name)} />
     )
   }
-
-  render() {
-    const { loaded, errored, notAuthorized, notFound } = this.props
-    return (
-      <Loading
-        loaded={loaded}
-        errored={errored}
-        notAuthorized={notAuthorized}
-        notFound={notFound}
-      >
-        {this.renderPage()}
-      </Loading>
-    )
-  }
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -158,5 +143,6 @@ export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
   withCommentModeration,
-  withChannelSidebar("channel-moderation-page")
+  withChannelSidebar("channel-moderation-page"),
+  withLoading
 )(ChannelModerationPage)

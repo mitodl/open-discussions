@@ -7,7 +7,7 @@ import { MetaTags } from "react-meta-tags"
 
 import ProfileForm from "../components/ProfileForm"
 import Card from "../components/Card"
-import Loading from "../components/Loading"
+import withLoading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 
 import { actions } from "../actions"
@@ -22,7 +22,6 @@ import type { Profile } from "../flow/discussionTypes"
 import type { FormValue } from "../flow/formTypes"
 import type { ProfilePayload } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
-import type { LoadingProps } from "../components/Loading"
 
 type Props = {
   dispatch: Dispatch<*>,
@@ -30,8 +29,10 @@ type Props = {
   profileForm: FormValue<ProfilePayload>,
   processing: boolean,
   profile: Profile,
-  userName: string
-} & LoadingProps
+  userName: string,
+  notFound: boolean,
+  errored: boolean
+}
 
 const PROFILE_KEY = "profile:edit"
 const EDIT_PROFILE_PAYLOAD = { formKey: PROFILE_KEY }
@@ -109,7 +110,7 @@ class ProfileEditPage extends React.Component<Props> {
     }
   }
 
-  renderPage = () => {
+  render() {
     const { profile, profileForm, processing, history } = this.props
     if (!profile || !profileForm) {
       return null
@@ -140,20 +141,6 @@ class ProfileEditPage extends React.Component<Props> {
       <Redirect to={profileURL(profile.username)} />
     )
   }
-
-  render() {
-    const { loaded, errored, notAuthorized, notFound } = this.props
-    return (
-      <Loading
-        loaded={loaded}
-        errored={errored}
-        notAuthorized={notAuthorized}
-        notFound={notFound}
-      >
-        {this.renderPage()}
-      </Loading>
-    )
-  }
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -178,5 +165,6 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
-  withSingleColumn("profile-edit-page")
+  withSingleColumn("profile-edit-page"),
+  withLoading
 )(ProfileEditPage)

@@ -3,14 +3,14 @@ import React from "react"
 
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 
-export type LoadingProps = {
+type LoadingProps = {
   loaded: boolean,
   errored: boolean,
   notFound: boolean,
   notAuthorized: boolean
 }
 
-export const Spinner = () => (
+export const Loading = () => (
   <div className="loading">
     <div className="sk-three-bounce">
       <div className="sk-child sk-bounce1" />
@@ -20,30 +20,32 @@ export const Spinner = () => (
   </div>
 )
 
-export default class Loading extends React.Component<
-  LoadingProps & {
-    children: any
-  }
-> {
-  render() {
-    const { loaded, errored, notAuthorized, notFound, children } = this.props
+const withLoading = (LoadedComponent: Class<React.Component<*, *>>) => {
+  return class extends LoadedComponent {
+    props: LoadingProps
 
-    if (notFound) {
-      return <NotFound />
+    render() {
+      const { loaded, errored, notAuthorized, notFound } = this.props
+
+      if (notFound) {
+        return <NotFound />
+      }
+
+      if (notAuthorized) {
+        return <NotAuthorized />
+      }
+
+      if (errored) {
+        return <div className="errored">Error loading page</div>
+      }
+
+      if (!loaded) {
+        return <Loading />
+      }
+
+      return <div className="loaded">{super.render()}</div>
     }
-
-    if (notAuthorized) {
-      return <NotAuthorized />
-    }
-
-    if (errored) {
-      return <div className="errored">Error loading page</div>
-    }
-
-    if (!loaded) {
-      return <Spinner />
-    }
-
-    return <div className="loaded">{children}</div>
   }
 }
+
+export default withLoading

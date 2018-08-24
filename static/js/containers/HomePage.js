@@ -5,7 +5,7 @@ import R from "ramda"
 import qs from "query-string"
 
 import PostList from "../components/PostList"
-import Loading from "../components/Loading"
+import withLoading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 import PostListNavigation from "../components/PostListNavigation"
 import { PostSortPicker } from "../components/SortPicker"
@@ -27,7 +27,6 @@ import type { Dispatch } from "redux"
 import type { Location } from "react-router"
 import type { RestState } from "../flow/restTypes"
 import type { Channel, Post, PostListPagination } from "../flow/discussionTypes"
-import type { LoadingProps } from "../components/Loading"
 
 // querystring doesn't match
 const shouldLoadData = R.complement(R.eqBy(R.path(["location", "search"])))
@@ -41,7 +40,7 @@ type Props = {
   showSidebar: boolean,
   pagination: PostListPagination,
   reportPost: (p: Post) => void
-} & LoadingProps
+}
 
 class HomePage extends React.Component<Props> {
   componentDidMount() {
@@ -64,7 +63,7 @@ class HomePage extends React.Component<Props> {
     dispatch(setPostData(response.posts))
   }
 
-  renderPage = () => {
+  render() {
     const {
       posts,
       pagination,
@@ -100,20 +99,6 @@ class HomePage extends React.Component<Props> {
       </React.Fragment>
     )
   }
-
-  render() {
-    const { loaded, errored, notAuthorized, notFound } = this.props
-    return (
-      <Loading
-        loaded={loaded}
-        errored={errored}
-        notAuthorized={notAuthorized}
-        notFound={notFound}
-      >
-        {this.renderPage()}
-      </Loading>
-    )
-  }
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -133,5 +118,6 @@ const mapStateToProps = (state, ownProps) => {
 export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
-  withSingleColumn("home-page")
+  withSingleColumn("home-page"),
+  withLoading
 )(HomePage)

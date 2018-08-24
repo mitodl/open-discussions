@@ -62,9 +62,9 @@ describe("RegisterConfirmPage", () => {
     assert.equal(inner.find("Link").props().to, REGISTER_URL)
   })
 
-  it("should render <Spinner/> if code and partial_token", async () => {
+  it("should render <Loading/> if code and partial_token", async () => {
     const { inner } = await renderPage()
 
-    assert.ok(inner.find("Spinner").exists())
+    assert.ok(inner.find("Loading").exists())
   })
 })
