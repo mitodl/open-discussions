@@ -373,7 +373,7 @@ class PostPage extends React.Component<PostPageProps> {
       postShareMenuOpen
     } = this.props
 
-    if (!channel || !commentsTree) {
+    if (!channel || !commentsTree || !post) {
       return null
     }
 

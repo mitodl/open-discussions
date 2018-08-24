@@ -49,7 +49,7 @@ type Props = {
   ignoreCommentReports: Function
 } & LoadingProps
 
-class ChannelModerationPage extends React.Component<Props> {
+export class ChannelModerationPage extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }
@@ -63,7 +63,7 @@ class ChannelModerationPage extends React.Component<Props> {
     } catch (_) {} // eslint-disable-line no-empty
   }
 
-  renderReport = report => {
+  renderReport = (report: PostReportRecord | CommentReportRecord) => {
     const {
       isModerator,
       removePost,
@@ -88,7 +88,7 @@ class ChannelModerationPage extends React.Component<Props> {
       )
     } else {
       return (
-        <Card>
+        <Card key={`${report.comment.id}-${report.comment.post_id}`}>
           <CommentTree
             comments={[addDummyReplies(report.comment)]}
             commentReports={commentReports}
@@ -100,7 +100,6 @@ class ChannelModerationPage extends React.Component<Props> {
             approve={approveComment}
             remove={removeComment}
             ignoreCommentReports={ignoreCommentReports}
-            key={`${report.comment.id}-${report.comment.post_id}`}
             moderationUI
             isModerator={isModerator}
           />
@@ -111,6 +110,10 @@ class ChannelModerationPage extends React.Component<Props> {
 
   renderPage = () => {
     const { channel, reports, isModerator } = this.props
+
+    if (!channel) {
+      return null
+    }
 
     return isModerator ? (
       <div className="channel-moderation">
