@@ -189,13 +189,9 @@ $link-padding: 11px 20px 11px 19px;
   flex-direction: column;
   height: 100%;
   overflow: scroll;
-
-  .navigation {
-    flex: 1 0 auto;
-  }
+  justify-content: space-between;
 
   .footer {
-    flex-shrink: 0;
     font-size: 12px;
     padding: $icon-padding-left;
 

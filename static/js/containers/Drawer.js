@@ -94,25 +94,27 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
             onClose={this.onDrawerClose}
           >
             <DrawerContent>
-              {isMobile ? (
-                <div className="drawer-mobile-header">
-                  <a
-                    href="#"
-                    className="material-icons"
-                    onClick={this.onDrawerClose}
-                  >
-                    menu
-                  </a>
-                  <a href="http://www.mit.edu" className="mitlogo">
-                    <img src="/static/images/mit-logo-transparent3.svg" />
-                  </a>
-                </div>
-              ) : null}
-              <Navigation
-                subscribedChannels={subscribedChannels}
-                pathname={pathname}
-                channels={channels}
-              />
+              <div>
+                {isMobile ? (
+                  <div className="drawer-mobile-header">
+                    <a
+                      href="#"
+                      className="material-icons"
+                      onClick={this.onDrawerClose}
+                    >
+                      menu
+                    </a>
+                    <a href="http://www.mit.edu" className="mitlogo">
+                      <img src="/static/images/mit-logo-transparent3.svg" />
+                    </a>
+                  </div>
+                ) : null}
+                <Navigation
+                  subscribedChannels={subscribedChannels}
+                  pathname={pathname}
+                  channels={channels}
+                />
+              </div>
               <Footer />
             </DrawerContent>
           </Drawer>
