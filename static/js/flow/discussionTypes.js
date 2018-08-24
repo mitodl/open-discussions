@@ -19,6 +19,8 @@ export type Channel = {
   membership_is_managed: boolean,
   ga_tracking_id:      ?string,
   avatar: string|null,
+  avatar_small: string|null,
+  avatar_medium: string|null,
   banner: string|null,
 }
 

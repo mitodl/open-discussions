@@ -18,7 +18,7 @@ type Props = {
   editable: boolean,
   members: Array<Member>,
   usernameGetter: (member: Member) => string,
-  removeMember: (channel: Channel, username: string) => Promise<*>,
+  removeMember: (channel: Channel, member: Member) => Promise<*>,
   memberTypeDescription: string
 }
 
@@ -28,12 +28,12 @@ export default class MembersList extends React.Component<Props> {
       // filter out click event to avoid double execution
       return
     }
-    const { removeMember, channel, memberToRemove, usernameGetter } = this.props
+    const { removeMember, channel, memberToRemove } = this.props
     if (!memberToRemove) {
       throw new Error("Expected memberToRemove to be set")
     }
 
-    return removeMember(channel, usernameGetter(memberToRemove))
+    return removeMember(channel, memberToRemove)
   }
 
   showRemoveDialog = (member: Member): void => {

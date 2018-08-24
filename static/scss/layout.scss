@@ -32,7 +32,6 @@
 @import "content-policy";
 @import "admin";
 @import "not-found";
-@import "footer";
 @import "reports";
 @import "sort-picker";
 @import "settings";
@@ -61,6 +60,10 @@ body {
 .app {
   width: 100%;
   min-height: 100vh;
+
+  .mdc-layout-grid {
+    padding: 0;
+  }
 
   .persistent-drawer-open ~ .content {
     padding-left: $drawer-width;
@@ -104,24 +107,10 @@ body {
       }
 
       &.two-column {
-        display: flex;
         width: 90%;
 
         @include breakpoint(desktop) {
-          flex-direction: row;
-          justify-content: center;
-          margin-left: auto;
-          margin-right: auto;
           max-width: 1300px;
-
-          > :first-child {
-            width: 66%;
-            margin-right: 20px;
-          }
-        }
-
-        @include breakpoint(mobile) {
-          flex-direction: column;
         }
 
         @include breakpoint(phone) {

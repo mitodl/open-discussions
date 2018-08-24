@@ -44,12 +44,15 @@ describe("Navigation", () => {
     it("should not have channel name if channelName is not in URL", () => {
       const wrapper = renderComponent()
       assert.lengthOf(wrapper.find(Link), 2)
-      const props = wrapper
-        .find(Link)
-        .at(0)
-        .props()
-      assert.equal(props.to, "/create_post/")
-      assert.equal(props.children, "Submit a New Post")
+      const link = wrapper.find(".new-post-link")
+      assert.equal(link.props().to, "/create_post/")
+      assert.equal(
+        link
+          .children()
+          .at(1)
+          .text(),
+        "Compose"
+      )
     })
 
     it("should highlight the home link if, well, home", () => {
@@ -79,9 +82,15 @@ describe("Navigation", () => {
         ...defaultProps,
         pathname: channelURL("foobar")
       })
-      const link = wrapper.find(Link).first()
+      const link = wrapper.find(".new-post-link")
       assert.equal(link.props().to, newPostURL("foobar"))
-      assert.equal(link.props().children, "Submit a New Post")
+      assert.equal(
+        link
+          .children()
+          .at(1)
+          .text(),
+        "Compose"
+      )
     })
 
     it("should not show the create post link if an anonymous user", () => {
@@ -140,13 +149,9 @@ describe("Navigation", () => {
   })
 
   it("should have to link to home", () => {
-    const { to, className, children } = renderComponent()
-      .find(Link)
-      .at(1)
-      .props()
-    assert.equal(children[1], "Home")
-    assert.equal(className, "home-link")
-    assert.equal(to, FRONTPAGE_URL)
+    const wrapper = renderComponent().find(".home-link")
+    assert.equal(wrapper.find(".title").text(), "Home")
+    assert.equal(wrapper.props().to, FRONTPAGE_URL)
   })
 
   it("should hide the link to settings, if the user is anonymous", () => {

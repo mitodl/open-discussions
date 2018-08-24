@@ -46,13 +46,13 @@ export class SharePopupHelper extends React.Component<SharePopupProps> {
     const { url, hideSocialButtons } = this.props
 
     return (
-      <div className="share-popup">
+      <div className="popup share-popup">
         <div className="triangle" />
-        <div className="share-title">Share a link to this post:</div>
+        <div className="popup-title">Share a link to this post:</div>
         <input ref={this.input} readOnly value={url} />
         <div className="bottom-row">
           {hideSocialButtons ? null : (
-            <div className="share-buttons">
+            <div className="popup-buttons">
               <FacebookShareButton url={url}>
                 <FacebookIcon round size={28} />
               </FacebookShareButton>

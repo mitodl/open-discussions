@@ -1,4 +1,4 @@
-.share-popup {
+.popup {
   position: absolute;
   background: white;
   top: 30px;
@@ -14,10 +14,9 @@
     top: -7px;
     background: white;
     transform: rotate(45deg);
-    right: 50%;
   }
 
-  .share-title {
+  .popup-title {
     color: $font-black;
     margin-bottom: 2px;
   }
@@ -33,7 +32,7 @@
     align-items: center;
     margin-top: 5px;
 
-    .share-buttons {
+    .popup-buttons {
       display: flex;
 
       > div {
@@ -44,5 +43,52 @@
     .copy-url {
       font-size: 12px;
     }
+  }
+}
+
+.share-popup {
+  .triangle {
+    right: 50%;
+  }
+}
+
+.login-popup {
+  top: unset;
+  right: unset;
+  margin-top: 10px;
+
+  .close-popup {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    padding: 5px;
+    background-color: #fff !important;
+    color: #000;
+    min-width: unset;
+    height: unset;
+    font-size: 12px;
+
+    &:before {
+      background-color: $bg-light-grey !important;
+    }
+
+    &:after {
+      background-color: $bg-light-grey !important;
+    }
+  }
+
+  .link-button {
+    display: block;
+    border-radius: 10px;
+    padding: 5px 15px;
+    border: 1px solid #972c37;
+    color: #972c37;
+    text-align: center;
+    margin: 10px 0 10px;
+  }
+
+  .red {
+    background-color: #972c37;
+    color: #fff;
   }
 }
