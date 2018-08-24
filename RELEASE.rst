@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.42.1
+Version 0.42.1 (Released August 24, 2018)
 --------------
 
 - remove some CSS which was creating another scrolling issue
