@@ -15,8 +15,6 @@ $replyPaddingLeft: 30px;
   }
 
   .top-level-comment {
-    padding: 0 15px 0 0;
-
     @include breakpoint(phone) {
       padding: 0;
     }

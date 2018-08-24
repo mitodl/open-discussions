@@ -93,6 +93,11 @@ body {
         min-height: calc(100vh - #{$toolbar-height-mobile});
       }
 
+      &.home-page,
+      &.channel-page {
+        margin-top: 5px;
+      }
+
       &.one-column {
         width: 80%;
         max-width: 950px;

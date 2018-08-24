@@ -27,7 +27,6 @@
     "@material/drawer": "^0.36.0",
     "@material/layout-grid": "^0.34.0",
     "@material/list": "^0.2.14",
-    "@material/menu": "^0.4.3",
     "@material/radio": "^0.30.0",
     "@material/rtl": "^0.1.7",
     "@material/snackbar": "^0.25.0",

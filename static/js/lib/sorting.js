@@ -13,9 +13,9 @@ export const VALID_POST_SORT_TYPES = [
 ]
 
 export const VALID_POST_SORT_LABELS = [
-  [POSTS_SORT_HOT, "active"],
-  [POSTS_SORT_TOP, "top"],
-  [POSTS_SORT_NEW, "new"]
+  [POSTS_SORT_HOT, "Active"],
+  [POSTS_SORT_TOP, "Top"],
+  [POSTS_SORT_NEW, "New"]
 ]
 
 export const COMMENT_SORT_NEW = "new"
@@ -34,14 +34,11 @@ export const VALID_COMMENT_SORT_LABELS = [
   [COMMENT_SORT_BEST, "Best"]
 ]
 
-const updateSortParam = R.curry((validSortTypes, props, e) => {
+const updateSortParam = R.curry((validSortTypes, props, value, e) => {
   const {
     history,
     location: { pathname, search }
   } = props
-  const {
-    target: { value }
-  } = e
 
   e.preventDefault()
 

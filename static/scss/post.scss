@@ -1,8 +1,12 @@
 .post-card {
-  padding: 6px 22px 0 22px;
+  margin-bottom: 0;
 
-  @include breakpoint(phone) {
-    padding: 4px 9px 0;
+  .post-card-inner {
+    padding: 6px 22px 0 22px;
+
+    @include breakpoint(phone) {
+      padding: 4px 9px 0;
+    }
   }
 }
 
@@ -321,7 +325,7 @@
 }
 
 .count-and-sort {
-  margin: 20px 0 20px 22px;
+  margin: 10px 0 10px 22px;
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -431,8 +431,8 @@ class PostPage extends React.Component<PostPageProps> {
             />
           ) : null}
         </Dialog>
-        <Card>
-          <div className="post-card">
+        <Card className="post-card">
+          <div className="post-card-inner">
             <ExpandedPostDisplay
               post={post}
               isModerator={isModerator}

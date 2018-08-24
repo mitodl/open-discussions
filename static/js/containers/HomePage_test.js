@@ -66,8 +66,10 @@ describe("HomePage", () => {
           SET_POST_DATA
         ],
         () => {
-          const select = wrapper.find(".post-list-title").find("select")
-          select.simulate("change", { target: { value: sortType } })
+          const select = wrapper.find(".post-list-title").find("SortPicker")
+          select.props().updateSortParam(sortType, {
+            preventDefault: helper.sandbox.stub()
+          })
         }
       )
 

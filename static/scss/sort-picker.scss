@@ -1,15 +1,12 @@
 .sorter {
-  display: flex;
-  align-items: center;
-  height: 30px;
+  cursor: pointer;
 
-  select {
-    width: 90px;
-    height: 20px;
-    padding: 0 0;
-    text-align: center;
-    text-align-last: center;
-    border: none;
-    background-color: $app-background;
+  .current-sort {
+    display: flex;
+    align-items: center;
+  }
+
+  .mdc-list-item {
+    margin: 0 8px;
   }
 }

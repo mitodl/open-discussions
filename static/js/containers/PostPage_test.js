@@ -722,10 +722,13 @@ describe("PostPage", function() {
           actions.comments.get.successType
         ],
         () => {
-          const select = wrapper.find(".sorter").find("select")
-          select.simulate("change", { target: { value: sortType } })
+          const select = wrapper.find(".count-and-sort").find("SortPicker")
+          select.props().updateSortParam(sortType, {
+            preventDefault: helper.sandbox.stub()
+          })
         }
       )
+      wrapper.update()
 
       assert.equal(
         wrapper.find(PostPage).props().location.search,

@@ -1,3 +1,4 @@
+// @flow
 import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
@@ -12,12 +13,24 @@ import {
 } from "../lib/sorting"
 
 describe("PostSortPicker", () => {
+  let updateSortParamStub
+
+  beforeEach(() => {
+    updateSortParamStub = sinon.stub()
+  })
+
+  const renderComponent = (Component, props = {}) =>
+    shallow(
+      <Component updateSortParam={updateSortParamStub} value="hey" {...props} />
+    )
+
   it("should have all the options we expect", () => {
     [
       [VALID_POST_SORT_LABELS, PostSortPicker],
       [VALID_COMMENT_SORT_LABELS, CommentSortPicker]
     ].forEach(([labels, Component]) => {
-      const wrapper = shallow(<Component />)
+      const wrapper = renderComponent(Component)
+      // $FlowFixMe
       R.zip([...wrapper.find("option")], labels).forEach(
         ([optionWrapper, [postSortType, postSortLabel]]) => {
           const props = optionWrapper.props
@@ -30,18 +43,43 @@ describe("PostSortPicker", () => {
     })
   })
 
-  it("should do what we want with the props we pass in", () => {
+  it("should display the label for the current value ", () => {
+    [
+      [PostSortPicker, VALID_POST_SORT_LABELS],
+      [CommentSortPicker, VALID_COMMENT_SORT_LABELS]
+    ].forEach(([Component, labels]) => {
+      labels.forEach(([value, label]) => {
+        const wrapper = renderComponent(Component, { value })
+        assert.include(wrapper.find(".current-sort").props().children, label)
+      })
+    })
+  })
+
+  it("should have an option for each option passed in", () => {
+    [
+      [PostSortPicker, VALID_POST_SORT_LABELS],
+      [CommentSortPicker, VALID_COMMENT_SORT_LABELS]
+    ].forEach(([Component, labels]) => {
+      labels.forEach(([type, label], idx) => {
+        updateSortParamStub = sinon.stub()
+        const wrapper = renderComponent(Component)
+        const menuItem = wrapper.find("MenuItem").at(idx)
+        assert.equal(menuItem.props().children, label)
+        menuItem.simulate("click")
+        sinon.assert.calledWith(updateSortParamStub, type)
+      })
+    })
+  })
+
+  it("should open and close", () => {
     [PostSortPicker, CommentSortPicker].forEach(Component => {
-      const updateSortStub = sinon.stub()
-      const wrapper = shallow(
-        <Component updateSortParam={updateSortStub} value={"a great value"} />
-      )
-      assert.equal(wrapper.find("select").props().value, "a great value")
-      wrapper
-        .find("select")
-        .props()
-        .onChange()
-      assert(updateSortStub.called)
+      const wrapper = renderComponent(Component)
+      assert.isFalse(wrapper.find("Menu").props().open)
+      assert.isFalse(wrapper.state("menuOpen"))
+      wrapper.instance().toggleMenuOpen()
+      wrapper.update()
+      assert.isTrue(wrapper.find("Menu").props().open)
+      assert.isTrue(wrapper.state("menuOpen"))
     })
   })
 })

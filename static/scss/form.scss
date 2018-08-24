@@ -8,6 +8,18 @@
       display: block;
     }
   }
+
+  select {
+    background: #f8f8f8;
+    border: 1px solid #bbb;
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.87);
+    border-radius: $std-border-radius;
+    height: 39px;
+    /* If you add too much padding here, the options won't show in IE */
+    padding: 8px 20px;
+    width: 100%;
+  }
 }
 
 .form .row,
@@ -128,17 +140,6 @@ input[type="checkbox"],
 input[type="radio"] {
   box-sizing: border-box;
   font-size: 16px;
-}
-
-select {
-  background: #f8f8f8;
-  border: 1px solid #bbb;
-  font-size: 15px;
-  color: rgba(0, 0, 0, 0.87);
-  border-radius: $std-border-radius;
-  height: 39px;
-  padding: 8px 20px; /* If you add too much padding here, the options won't show in IE */
-  width: 100%;
 }
 
 input::placeholder,
