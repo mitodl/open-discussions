@@ -1,9 +1,9 @@
 // @flow
 import React from "react"
+import { Link } from "react-router-dom"
 import onClickOutside from "react-onclickoutside"
 
 import Button from "./Button"
-import { Link } from "react-router-dom"
 
 type LoginPopupProps = {
   closePopup: Function,

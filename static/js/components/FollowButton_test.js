@@ -16,7 +16,6 @@ describe("FollowButton", () => {
   let helper, toggleFollowPostStub, post
 
   beforeEach(() => {
-    //sandbox = sinon.createSandbox()
     helper = new IntegrationTestHelper()
     toggleFollowPostStub = helper.sandbox.stub()
     post = makePost()

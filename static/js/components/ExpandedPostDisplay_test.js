@@ -11,6 +11,7 @@ import { EditorView } from "prosemirror-view"
 import ExpandedPostDisplay from "./ExpandedPostDisplay"
 import Router from "../Router"
 import Embedly from "./Embedly"
+import FollowButton from "./FollowButton"
 import ProfileImage from "../containers/ProfileImage"
 import SharePopup from "./SharePopup"
 
@@ -195,6 +196,15 @@ describe("ExpandedPostDisplay", () => {
       const wrapper = renderPostDisplay({ post })
       assert.equal(wrapper.find(".edit-post").exists(), shouldShowLink)
     })
+  })
+
+  it("should show a follow button with correct props", () => {
+    post = makePost()
+    const wrapper = renderPostDisplay()
+    const followButton = wrapper.find(FollowButton)
+    assert.ok(followButton.exists())
+    assert.equal(followButton.props().post, post)
+    assert.equal(followButton.props().toggleFollowPost, toggleFollowPostStub)
   })
 
   it("should show a delete button if authored by the user", () => {
