@@ -1,13 +1,13 @@
 // @flow
 import React from "react"
-import { Link } from "react-router-dom"
 import { shallow } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
+import { Link } from "react-router-dom"
 
 import { LoginPopupHelper } from "./LoginPopup"
 
-describe("SharePopup", () => {
+describe("LoginPopup", () => {
   let closePopupStub, message, visible, sandbox
 
   const renderLoginPopupHelper = (props = {}) =>

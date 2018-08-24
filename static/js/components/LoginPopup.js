@@ -1,6 +1,6 @@
 // @flow
-import { Link } from "react-router-dom"
 import React from "react"
+import { Link } from "react-router-dom"
 import onClickOutside from "react-onclickoutside"
 
 import Button from "./Button"
@@ -8,7 +8,8 @@ import Button from "./Button"
 type LoginPopupProps = {
   closePopup: Function,
   message: string,
-  visible: boolean
+  visible: boolean,
+  className?: string
 }
 
 export class LoginPopupHelper extends React.Component<LoginPopupProps> {
@@ -20,9 +21,9 @@ export class LoginPopupHelper extends React.Component<LoginPopupProps> {
   }
 
   render() {
-    const { message, visible } = this.props
+    const { message, visible, className } = this.props
     return visible ? (
-      <div className="popup login-popup">
+      <div className={`popup login-popup ${className || ""}`}>
         <div className="triangle" />
         <Button className="close-popup" onClick={this.handleClickOutside}>
           <span>x</span>

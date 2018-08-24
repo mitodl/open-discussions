@@ -11,9 +11,10 @@ import Embedly from "./Embedly"
 import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
 import DropdownMenu from "./DropdownMenu"
 import SharePopup from "./SharePopup"
+import FollowButton from "./FollowButton"
 
 import { formatPostTitle, PostVotingButtons } from "../lib/posts"
-import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
+import { userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
 import { makeProfile } from "../lib/profile"
 import { postPermalink, profileURL } from "../lib/url"
@@ -70,34 +71,10 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
     removePost(post)
   }
 
-  postSubscriptionButton = () => {
-    const { toggleFollowPost, post } = this.props
-    return post.subscribed ? (
-      <div
-        className="post-action subscribed"
-        onClick={preventDefaultAndInvoke(() => {
-          toggleFollowPost(post)
-        })}
-      >
-        <i className="material-icons rss_feed">rss_feed</i>
-        Unfollow
-      </div>
-    ) : (
-      <div
-        className="post-action unsubscribed"
-        onClick={preventDefaultAndInvoke(() => {
-          toggleFollowPost(post)
-        })}
-      >
-        <i className="material-icons rss_feed">rss_feed</i>
-        Follow
-      </div>
-    )
-  }
-
   postActionButtons = () => {
     const {
       toggleUpvote,
+      toggleFollowPost,
       post,
       beginEditing,
       isModerator,
@@ -144,7 +121,7 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
               />
             ) : null}
           </div>
-          {userIsAnonymous() ? null : this.postSubscriptionButton()}
+          <FollowButton post={post} toggleFollowPost={toggleFollowPost} />
           {userIsAnonymous() ? null : (
             <i
               className="material-icons more_vert"

@@ -11,6 +11,7 @@ import { EditorView } from "prosemirror-view"
 import ExpandedPostDisplay from "./ExpandedPostDisplay"
 import Router from "../Router"
 import Embedly from "./Embedly"
+import FollowButton from "./FollowButton"
 import ProfileImage from "../containers/ProfileImage"
 import SharePopup from "./SharePopup"
 
@@ -197,22 +198,14 @@ describe("ExpandedPostDisplay", () => {
     })
   })
 
-  //
-  ;[[true, "Unfollow"], [false, "Follow"]].forEach(
-    ([subscribed, buttonText]) => {
-      it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
-        post = makePost()
-        post.subscribed = subscribed
-        const wrapper = renderPostDisplay()
-        const button = wrapper.find(
-          subscribed ? ".subscribed" : ".unsubscribed"
-        )
-        assert.include(button.text(), buttonText)
-        button.simulate("click")
-        assert.ok(toggleFollowPostStub.called)
-      })
-    }
-  )
+  it("should show a follow button with correct props", () => {
+    post = makePost()
+    const wrapper = renderPostDisplay()
+    const followButton = wrapper.find(FollowButton)
+    assert.ok(followButton.exists())
+    assert.equal(followButton.props().post, post)
+    assert.equal(followButton.props().toggleFollowPost, toggleFollowPostStub)
+  })
 
   it("should show a delete button if authored by the user", () => {
     [true, false].forEach(userAuthor => {
