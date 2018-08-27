@@ -27,6 +27,9 @@ const DEFAULT_STATE = {
       },
       errors: {}
     }
+  },
+  ui: {
+    authUserDetail: {}
   }
 }
 
@@ -63,21 +66,17 @@ describe("LoginPasswordPage", () => {
     [undefined, undefined, "a@b.com", "does not exist"]
   ].forEach(([extraDataName, extraDataImg, email, descriptor]) => {
     it(`should render the page with correct messages when extra user data ${descriptor}`, async () => {
-      const expectedProfileInfo = R.none(R.isNil)([extraDataName, extraDataImg])
-      let expectedGreeting, extraData
-      if (expectedProfileInfo) {
-        expectedGreeting = `Hi ${String(extraDataName)}`
-        extraData = { name: extraDataName, profile_image_small: extraDataImg }
-      } else {
-        expectedGreeting = "Welcome Back!"
-        extraData = null
-      }
+      const expectedProfileInfo = R.none(R.isNil, [extraDataName, extraDataImg])
+      const expectedGreeting = expectedProfileInfo
+        ? `Hi ${String(extraDataName)}`
+        : "Welcome Back!"
 
       const { inner } = await renderPage({
-        auth: {
-          data: {
-            email:      email,
-            extra_data: extraData
+        ui: {
+          authUserDetail: {
+            email:               email,
+            name:                extraDataName,
+            profile_image_small: extraDataImg
           }
         }
       })
@@ -132,11 +131,11 @@ describe("LoginPasswordPage", () => {
 
     const { onSubmit } = inner.find("AuthPasswordForm").props()
 
-    onSubmit()
+    await onSubmit()
 
     const dispatchedActions = store.getActions()
 
-    assert.lengthOf(dispatchedActions, 3)
+    assert.isAtLeast(dispatchedActions.length, 3)
     assert.equal(
       dispatchedActions[2].type,
       actions.auth.loginPassword.requestType

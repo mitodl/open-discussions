@@ -88,11 +88,11 @@ describe("RegisterPage", () => {
 
     const { onSubmit } = inner.find("AuthEmailForm").props()
 
-    onSubmit()
+    await onSubmit()
 
     const dispatchedActions = store.getActions()
 
-    assert.lengthOf(dispatchedActions, 3)
+    assert.isAtLeast(dispatchedActions.length, 3)
     assert.equal(
       dispatchedActions[2].type,
       actions.auth.registerEmail.requestType

@@ -35,6 +35,9 @@ export const showDropdown = createAction(SHOW_DROPDOWN)
 export const HIDE_DROPDOWN = "HIDE_DROPDOWN"
 export const hideDropdown = createAction(HIDE_DROPDOWN)
 
+export const SET_AUTH_USER_DETAIL = "SET_AUTH_USER_DETAIL"
+export const setAuthUserDetail = createAction(SET_AUTH_USER_DETAIL)
+
 // this is a hack :/
 // needed to debounce just a little bit to get around a race
 // condition with the post dropdown menu

@@ -29,25 +29,11 @@ export const getAuthPartialTokenSelector = R.path([
   "partial_token"
 ])
 export const getAuthFlowSelector = R.path(["auth", "data", "flow"])
-export const getAuthStateSelector = R.path(["auth", "data", "state"])
 export const getAuthProviderSelector = R.path(["auth", "data", "provider"])
-export const getAuthEmailSelector = R.path(["auth", "data", "email"])
 export const getFormErrorSelector = R.compose(
   R.head,
   R.pathOr([], ["auth", "data", "errors"])
 )
-export const getAuthNameSelector = R.path([
-  "auth",
-  "data",
-  "extra_data",
-  "name"
-])
-export const getAuthProfileImageSelector = R.path([
-  "auth",
-  "data",
-  "extra_data",
-  "profile_image_small"
-])
 export const isProcessing = R.path(["auth", "processing"])
 
 export const authEndpoint = {

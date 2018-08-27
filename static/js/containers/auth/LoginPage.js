@@ -11,6 +11,7 @@ import AuthEmailForm from "../../components/auth/AuthEmailForm"
 import withForm from "../../hoc/withForm"
 
 import { actions } from "../../actions"
+import { setAuthUserDetail } from "../../actions/ui"
 import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
@@ -23,7 +24,11 @@ import {
   isProcessing
 } from "../../reducers/auth"
 
-import type { EmailForm } from "../../flow/authTypes"
+import type {
+  AuthResponse,
+  EmailDetailAuthResponse,
+  EmailForm
+} from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
 import ExternalLogins from "../../components/ExternalLogins"
 
@@ -71,7 +76,26 @@ const onSubmit = ({ email }: EmailForm) =>
 
 const clearEndpointState = actions.auth.clear
 
-const onSubmitResult = R.curry(processAuthResponse)
+const onSubmitResult = R.curry(
+  (
+    setAuthUserDetail: Function,
+    history: Object,
+    response: AuthResponse | EmailDetailAuthResponse
+  ) => {
+    // The auth endpoint returns some information about the user in a property called "extra_data".
+    // We want to keep that data around for UI purposes, so we dispatch an action here to set it in the state.
+    // NOTE:
+    // This auth user detail in the state is not explicitly cleared anywhere. When the login flow is
+    // finished we force a page reload, so that part of the state is "cleared" as a side effect.
+    // We may find situations where we need to clear that state programatically to avoid unintended
+    // UI consequences. In that case it would probably be best to wrap all of the auth flow components
+    // in a special <Route> that handles the lifecycle of that auth user detail state.
+    const authUserDetail = R.propOr({}, "extra_data")(response)
+    authUserDetail.email = response.email
+    setAuthUserDetail(authUserDetail)
+    return processAuthResponse(history, response)
+  }
+)
 
 export const FORM_KEY = "login:email"
 const { getForm, actionCreators } = configureForm(FORM_KEY, newEmailForm)
@@ -91,8 +115,8 @@ const mapStateToProps = state => {
 }
 
 const mergeProps = mergeAndInjectProps(
-  (stateProps, dispatchProps, { history }) => ({
-    onSubmitResult: onSubmitResult(history)
+  (stateProps, { setAuthUserDetail }, { history }) => ({
+    onSubmitResult: onSubmitResult(setAuthUserDetail, history)
   })
 )
 
@@ -102,6 +126,7 @@ export default R.compose(
     {
       onSubmit,
       clearEndpointState,
+      setAuthUserDetail,
       ...actionCreators
     },
     mergeProps

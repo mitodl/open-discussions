@@ -78,11 +78,11 @@ describe("PasswordResetConfirmPage", () => {
 
     const { onSubmit } = inner.find("PasswordResetConfirmForm").props()
 
-    onSubmit()
+    await onSubmit()
 
     const dispatchedActions = store.getActions()
 
-    assert.lengthOf(dispatchedActions, 3)
+    assert.isAtLeast(dispatchedActions.length, 3)
     assert.equal(
       dispatchedActions[2].type,
       actions.passwordReset.postNewPassword.requestType

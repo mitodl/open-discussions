@@ -11,7 +11,8 @@ import {
   HIDE_DIALOG,
   SHOW_DROPDOWN,
   HIDE_DROPDOWN,
-  SET_DIALOG_DATA
+  SET_DIALOG_DATA,
+  SET_AUTH_USER_DETAIL
 } from "../actions/ui"
 
 import type { Action } from "../flow/reduxTypes"
@@ -34,7 +35,8 @@ export type UIState = {
   snackbar: ?SnackbarState,
   banner: BannerState,
   dialogs: Map<string, any>,
-  dropdownMenus: Set<string>
+  dropdownMenus: Set<string>,
+  authUserDetail: Object
 }
 
 const INITIAL_BANNER_STATE = {
@@ -48,7 +50,8 @@ export const INITIAL_UI_STATE: UIState = {
   snackbar:          null,
   banner:            INITIAL_BANNER_STATE,
   dialogs:           new Map(),
-  dropdownMenus:     new Set()
+  dropdownMenus:     new Set(),
+  authUserDetail:    {}
 }
 
 // this generates a new sequential id for each snackbar state that is pushed
@@ -87,6 +90,14 @@ const setDialogData = (
   copy.set(dialogKey, data)
   return copy
 }
+
+export const getAuthUiNameSelector = R.path(["ui", "authUserDetail", "name"])
+export const getAuthUiEmailSelector = R.path(["ui", "authUserDetail", "email"])
+export const getAuthUiImgSelector = R.path([
+  "ui",
+  "authUserDetail",
+  "profile_image_small"
+])
 
 export const ui = (
   state: UIState = INITIAL_UI_STATE,
@@ -157,6 +168,11 @@ export const ui = (
         action.payload,
         false
       )
+    }
+  case SET_AUTH_USER_DETAIL:
+    return {
+      ...state,
+      authUserDetail: action.payload
     }
   }
   return state

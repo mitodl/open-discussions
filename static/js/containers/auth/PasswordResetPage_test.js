@@ -74,11 +74,11 @@ describe("PasswordResetPage", () => {
 
     const { onSubmit } = inner.find("PasswordResetForm").props()
 
-    onSubmit()
+    await onSubmit()
 
     const dispatchedActions = store.getActions()
 
-    assert.lengthOf(dispatchedActions, 3)
+    assert.isAtLeast(dispatchedActions.length, 3)
     assert.equal(
       dispatchedActions[2].type,
       actions.passwordReset.postEmail.requestType

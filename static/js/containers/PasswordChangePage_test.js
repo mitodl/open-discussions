@@ -75,11 +75,11 @@ describe("PasswordChangePage", () => {
 
     const { onSubmit } = inner.find("PasswordChangeForm").props()
 
-    onSubmit()
+    await onSubmit()
 
     const dispatchedActions = store.getActions()
 
-    assert.lengthOf(dispatchedActions, 3)
+    assert.isAtLeast(dispatchedActions.length, 3)
     assert.equal(
       dispatchedActions[2].type,
       actions.passwordChange.post.requestType
