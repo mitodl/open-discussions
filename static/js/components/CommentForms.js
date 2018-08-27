@@ -458,6 +458,7 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
             message={commentLoginText}
             visible={popupVisible}
             closePopup={this.onTogglePopup}
+            className="downshift"
           />
           {commentForm(
             this.onSubmit,
