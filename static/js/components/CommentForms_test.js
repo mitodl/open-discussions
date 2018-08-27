@@ -18,6 +18,7 @@ import {
   getCommentReplyInitialValue,
   editPostKey
 } from "./CommentForms"
+import Router from "../Router"
 
 import * as forms from "../actions/forms"
 import { actions } from "../actions"
@@ -26,6 +27,8 @@ import { SET_BANNER_MESSAGE } from "../actions/ui"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import * as utilFuncs from "../lib/util"
+import LoginPopup from "./LoginPopup"
 
 describe("CommentForms", () => {
   let helper, post, comment, postKeys, commentKeys
@@ -33,7 +36,9 @@ describe("CommentForms", () => {
   const renderPostForm = (props = {}) =>
     mount(
       <Provider store={helper.store}>
-        <ReplyToPostForm post={post} {...props} />
+        <Router store={helper.store} history={helper.browserHistory}>
+          <ReplyToPostForm post={post} {...props} />
+        </Router>
       </Provider>
     )
 
@@ -150,6 +155,14 @@ describe("CommentForms", () => {
         value:  expectedKeys,
         errors: {}
       })
+    })
+
+    it("should be disabled and display a login popup on click if user is anonymous", async () => {
+      helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+      wrapper = renderPostForm()
+      assert.isTrue(wrapper.find("button").props().disabled)
+      wrapper.find("textarea").simulate("click")
+      assert.isTrue(wrapper.find(LoginPopup).props().visible)
     })
 
     it("should submit the form", async () => {

@@ -82,7 +82,7 @@ const commentForm = (
             !disabled &&
             !isEmptyText(text)
           ) {
-            userIsAnonymous() && onTogglePopup ? onTogglePopup() : onSubmit(e)
+            onSubmit(e)
           }
         }}
       >
@@ -465,7 +465,7 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
             onUpdate,
             cancelReply,
             false,
-            replying,
+            replying || userIsAnonymous(),
             false,
             false,
             this.onTogglePopup

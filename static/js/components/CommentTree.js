@@ -34,7 +34,6 @@ import type { FormsState } from "../flow/formTypes"
 import type { CommentRemoveFunc } from "./CommentRemovalForm"
 import type { CommentVoteFunc } from "./CommentVoteForm"
 
-
 type LoadMoreCommentsFunc = (comment: MoreCommentsInTree) => Promise<*>
 type ReportCommentFunc = (comment: CommentInTree) => void
 export type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
@@ -99,13 +98,6 @@ export default class CommentTree extends React.Component<Props, State> {
         </div>
       </li>
     )
-  }
-
-  onTogglePopup = async () => {
-    const { popupVisible } = this.state
-    this.setState({
-      popupVisible: !popupVisible
-    })
   }
 
   renderCommentActions = (comment: CommentInTree, atMaxDepth: boolean) => {

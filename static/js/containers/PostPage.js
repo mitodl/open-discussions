@@ -43,12 +43,7 @@ import {
   toggleFollowPost,
   toggleFollowComment
 } from "../util/api_actions"
-import {
-  getChannelName,
-  getPostID,
-  getCommentID,
-  truncate
-} from "../lib/util"
+import { getChannelName, getPostID, getCommentID, truncate } from "../lib/util"
 import {
   anyErrorExcept404,
   anyErrorExcept404or410,
