@@ -18,12 +18,14 @@ import { mergeAndInjectProps } from "../../lib/redux_props"
 import {
   getAuthPartialTokenSelector,
   getAuthFlowSelector,
-  getAuthEmailSelector,
   isProcessing,
-  getFormErrorSelector,
-  getAuthNameSelector,
-  getAuthProfileImageSelector
+  getFormErrorSelector
 } from "../../reducers/auth"
+import {
+  getAuthUiNameSelector,
+  getAuthUiEmailSelector,
+  getAuthUiImgSelector
+} from "../../reducers/ui"
 
 import type { PasswordForm, AuthFlow } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
@@ -102,9 +104,9 @@ const mapStateToProps = state => {
   const authFlow = getAuthFlowSelector(state)
   const partialToken = getAuthPartialTokenSelector(state)
   const formError = getFormErrorSelector(state)
-  const email = getAuthEmailSelector(state)
-  const name = getAuthNameSelector(state)
-  const profileImageUrl = getAuthProfileImageSelector(state)
+  const name = getAuthUiNameSelector(state)
+  const email = getAuthUiEmailSelector(state)
+  const profileImageUrl = getAuthUiImgSelector(state)
   return {
     form,
     partialToken,
