@@ -47,7 +47,6 @@ import {
   getChannelName,
   getPostID,
   getCommentID,
-  userIsAnonymous,
   truncate
 } from "../lib/util"
 import {
@@ -456,7 +455,7 @@ class PostPage extends React.Component<PostPageProps> {
               postShareMenuOpen={postShareMenuOpen}
               channel={channel}
             />
-            {showPermalinkUI || userIsAnonymous() ? null : (
+            {showPermalinkUI ? null : (
               <ReplyToPostForm
                 forms={forms}
                 post={post}

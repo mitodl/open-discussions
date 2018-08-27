@@ -13,6 +13,7 @@ import CommentRemovalForm from "./CommentRemovalForm"
 import { renderTextContent } from "./Markdown"
 import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
 import DropdownMenu from "../components/DropdownMenu"
+import ReplyButton from "./ReplyButton"
 import SharePopup from "./SharePopup"
 
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
@@ -33,9 +34,14 @@ import type { FormsState } from "../flow/formTypes"
 import type { CommentRemoveFunc } from "./CommentRemovalForm"
 import type { CommentVoteFunc } from "./CommentVoteForm"
 
+
 type LoadMoreCommentsFunc = (comment: MoreCommentsInTree) => Promise<*>
-type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
 type ReportCommentFunc = (comment: CommentInTree) => void
+export type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
+
+type State = {
+  popupVisible: boolean
+}
 
 type Props = {
   comments: Array<GenericComment>,
@@ -64,7 +70,16 @@ export const commentDropdownKey = (c: CommentInTree) =>
 export const commentShareKey = (c: CommentInTree) =>
   `COMMENT_SHARE_MENU_${c.id}`
 
-export default class CommentTree extends React.Component<Props> {
+export const commentLoginText = "Sign Up or Login to comment"
+
+export default class CommentTree extends React.Component<Props, State> {
+  constructor() {
+    super()
+    this.state = {
+      popupVisible: false
+    }
+  }
+
   renderFollowButton = (comment: CommentInTree) => {
     const { toggleFollowComment } = this.props
 
@@ -86,6 +101,13 @@ export default class CommentTree extends React.Component<Props> {
     )
   }
 
+  onTogglePopup = async () => {
+    const { popupVisible } = this.state
+    this.setState({
+      popupVisible: !popupVisible
+    })
+  }
+
   renderCommentActions = (comment: CommentInTree, atMaxDepth: boolean) => {
     const {
       upvote,
@@ -102,9 +124,7 @@ export default class CommentTree extends React.Component<Props> {
       curriedDropdownMenufunc,
       dropdownMenus
     } = this.props
-    const formKey = replyToCommentKey(comment)
     const editFormKey = editCommentKey(comment)
-    const initialValue = getCommentReplyInitialValue(comment)
 
     const { showDropdown, hideDropdown } = curriedDropdownMenufunc(
       commentDropdownKey(comment)
@@ -125,21 +145,13 @@ export default class CommentTree extends React.Component<Props> {
             downvote={downvote}
           />
         ) : null}
-        {atMaxDepth ||
-        moderationUI ||
-        comment.deleted ||
-        userIsAnonymous() ? null : (
-            <div
-              className="comment-action-button reply-button"
-              onClick={e => {
-                if (beginEditing) {
-                  beginEditing(formKey, initialValue, e)
-                }
-              }}
-            >
-            reply
-            </div>
-          )}
+        {atMaxDepth || moderationUI || comment.deleted ? null : (
+          <ReplyButton
+            beginEditing={beginEditing}
+            formKey={replyToCommentKey(comment)}
+            initialValue={getCommentReplyInitialValue(comment)}
+          />
+        )}
         <div className="share-button-wrapper">
           <div
             className="comment-action-button share-button"

@@ -241,7 +241,7 @@ describe("PostPage", function() {
 
   //
   ;[true, false].forEach(userIsAnon => {
-    it(`should not show a ReplyToPostForm when userIsAnonymous() === ${userIsAnon}`, async () => {
+    it(`should show a ReplyToPostForm when userIsAnonymous() === ${userIsAnon}`, async () => {
       const anonStub = helper.sandbox.stub(utilFuncs, "userIsAnonymous")
       anonStub.returns(userIsAnon)
 
@@ -253,7 +253,7 @@ describe("PostPage", function() {
       )
       wrapper.update()
 
-      assert.equal(wrapper.find(ReplyToPostForm).exists(), !userIsAnon)
+      assert.ok(wrapper.find(ReplyToPostForm).exists())
     })
   })
 

@@ -7,12 +7,14 @@ import { connect } from "react-redux"
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 import { setBannerMessage } from "../actions/ui"
-import { isEmptyText } from "../lib/util"
+import { isEmptyText, userIsAnonymous } from "../lib/util"
 import Editor, { editorUpdateFormShim } from "./Editor"
 
 import type { CommentForm, CommentInTree, Post } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 import type { Dispatch } from "redux"
+import LoginPopup from "./LoginPopup"
+import { commentLoginText } from "./CommentTree"
 
 type CommentFormProps = {
   dispatch: Dispatch<*>,
@@ -65,59 +67,70 @@ const commentForm = (
   isComment: boolean,
   disabled: boolean,
   autoFocus: boolean,
-  wysiwyg: boolean = false
-) => (
-  <div className="reply-form">
-    <form
-      onSubmit={onSubmit}
-      className="form"
-      onKeyDown={e => {
-        if (e.key === "Enter" && e.ctrlKey && !disabled && !isEmptyText(text)) {
-          onSubmit(e)
-        }
-      }}
-    >
-      <div className="form-item">
-        {wysiwyg ? (
-          <Editor
-            initialValue={text || ""}
-            onChange={editorUpdateFormShim("text", onUpdate)}
-            autoFocus={autoFocus}
-          />
-        ) : (
-          <textarea
-            name="text"
-            type="text"
-            className="input"
-            placeholder="Write a reply here..."
-            value={text || ""}
-            onChange={onUpdate}
-            autoFocus={autoFocus}
-          />
-        )}
-      </div>
-      <button
-        type="submit"
-        className={`blue-button ${disabled ? "disabled" : ""}`}
-        disabled={disabled || isEmptyText(text)}
+  wysiwyg: boolean = false,
+  onTogglePopup?: Function
+) => {
+  return (
+    <div className="reply-form">
+      <form
+        onSubmit={onSubmit}
+        className="form"
+        onKeyDown={e => {
+          if (
+            e.key === "Enter" &&
+            e.ctrlKey &&
+            !disabled &&
+            !isEmptyText(text)
+          ) {
+            userIsAnonymous() && onTogglePopup ? onTogglePopup() : onSubmit(e)
+          }
+        }}
       >
-        Submit
-      </button>
-      {isComment ? (
-        <a
-          href="#"
-          onClick={R.compose(
-            cancelReply,
-            e => e.preventDefault()
+        <div className="form-item">
+          {wysiwyg ? (
+            <Editor
+              initialValue={text || ""}
+              onChange={editorUpdateFormShim("text", onUpdate)}
+              autoFocus={autoFocus}
+            />
+          ) : (
+            <textarea
+              name="text"
+              type="text"
+              className="input"
+              placeholder="Write a reply here..."
+              value={text || ""}
+              onChange={disabled ? null : onUpdate}
+              onClick={
+                userIsAnonymous() && onTogglePopup ? onTogglePopup : null
+              }
+              autoFocus={autoFocus}
+            />
           )}
-          className="cancel-button"
+        </div>
+        <button
+          type="submit"
+          className={`blue-button ${disabled ? "disabled" : ""}`}
+          disabled={disabled || isEmptyText(text)}
         >
-          Cancel
-        </a>
-      ) : null}
-    </form>
-  </div>
-)
+          Submit
+        </button>
+        {isComment ? (
+          <a
+            href="#"
+            onClick={R.compose(
+              cancelReply,
+              e => e.preventDefault()
+            )}
+            className="cancel-button"
+          >
+            Cancel
+          </a>
+        ) : null}
+      </form>
+    </div>
+  )
+}
 
 const getFormKeyFromOwnProps = ownProps =>
   ownProps.comment
@@ -386,13 +399,15 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
     props: CommentFormProps
 
     state: {
-      replying: boolean
+      replying: boolean,
+      popupVisible: boolean
     }
 
     constructor(props) {
       super(props)
       this.state = {
-        replying: false
+        replying:     false,
+        popupVisible: false
       }
     }
 
@@ -416,6 +431,13 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
       this.ensureInitialState()
     }
 
+    onTogglePopup = async () => {
+      const { popupVisible } = this.state
+      this.setState({
+        popupVisible: !popupVisible
+      })
+    }
+
     onSubmit = async (event: Event) => {
       const { onSubmit, formDataLens, forms, post } = this.props
       const { post_id, text, comment_id } = getFormData(formDataLens, forms) // eslint-disable-line camelcase
@@ -427,17 +449,28 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
 
     render() {
       const { forms, onUpdate, cancelReply, formDataLens } = this.props
-      const { replying } = this.state
+      const { replying, popupVisible } = this.state
       const { text } = getFormData(formDataLens, forms)
 
-      return commentForm(
-        this.onSubmit,
-        text,
-        onUpdate,
-        cancelReply,
-        false,
-        replying,
-        false
+      return (
+        <React.Fragment>
+          <LoginPopup
+            message={commentLoginText}
+            visible={popupVisible}
+            closePopup={this.onTogglePopup}
+          />
+          {commentForm(
+            this.onSubmit,
+            text,
+            onUpdate,
+            cancelReply,
+            false,
+            replying,
+            false,
+            false,
+            this.onTogglePopup
+          )}
+        </React.Fragment>
       )
     }
   }
