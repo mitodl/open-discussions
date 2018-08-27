@@ -2,25 +2,25 @@
   "channels": {
     "private_channel": {
       "channel_type": "private",
-      "description": "Ducimus quibusdam ea tempora. Officia error labore dolor cumque.\nDoloribus laudantium maiores quam. Natus labore totam quae deleniti mollitia cum. Culpa sint pariatur officia sint.\nPossimus fugiat voluptate deleniti quis delectus suscipit nesciunt. Aliquid doloremque mollitia recusandae distinctio vero. Sint labore officiis fugit est veritatis. Dolores molestiae quasi nobis sunt illo placeat officiis earum.",
-      "name": "1511379774_rerum",
-      "public_description": "Nulla quidem suscipit perspiciatis veritatis sint quod veniam. Pariatur ab a soluta.",
-      "title": "Dolorum sed odio atque dolor libero."
+      "description": "Nostrum fuga omnis natus soluta nostrum expedita. Cupiditate qui saepe similique laboriosam expedita consequatur. Nobis eius molestiae id debitis.\nIpsum officiis repellat deleniti ab impedit numquam. Laboriosam fugit laudantium voluptatum voluptates commodi.\nRerum dignissimos possimus numquam nulla reprehenderit. Ducimus ab quis quo magni facilis. Quas odio temporibus autem cum autem reiciendis consequuntur. Praesentium repudiandae cumque quasi reprehenderit.",
+      "name": "1535134304_libero",
+      "public_description": "Omnis debitis pariatur distinctio repudiandae. Dolores dolores eius ratione error accusantium.",
+      "title": "Eveniet magni distinctio quaerat alias quia."
     }
   },
   "posts": {
     "just a post": {
-      "id": "g6",
-      "text": "Sed ipsa excepturi sit. Dolorum eligendi expedita possimus amet labore totam.",
-      "title": "Consequuntur reiciendis eos fugit incidunt."
+      "id": "3r",
+      "text": "Quos nisi dolore modi illo molestias. Cum saepe officia eos laborum consectetur molestias.",
+      "title": "Praesentium sed eveniet iste temporibus."
     }
   },
   "users": {
     "contributor": {
-      "username": "01BZJM2EKJTGFRR19GD427TS6Z"
+      "username": "01CNPJ55229SA4P7R3E5TCH3V5"
     },
     "staff_user": {
-      "username": "01BZJM27ZS6RQJX0MWKK1CW1ZP"
+      "username": "01CNPJ4YPQ4H80DY27HE8D8SM1"
     }
   }
 }

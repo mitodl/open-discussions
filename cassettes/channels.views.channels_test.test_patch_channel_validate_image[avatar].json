@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2018-07-27T22:08:18",
+      "recorded_at": "2018-08-24T17:48:41",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -22,11 +22,11 @@
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CKEWJ0547SXDG09CG6F6N720"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPGTRMDDFDZ60YGMYB8MTMF"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDK0sNRNKvMqrkrNLY8oD/axDCpLNMr0DMlzCvdzDotU0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZaLZlWLibpwTl+hgEWbg7pXkWGFk4x2eZBPqaBoL0pKSWZSanxmemgAyGcJRqAbRgxEe4AAAA",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDI0MdD1SKqKDHcyM0mPLzS3DDUPMTEx9kzLjQyMcspX0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZaLZlOWa5G0U4mXi6liQHVjr55VskZif6pLt4R4L0pKSWZSanxmemgAyGcJRqAdBH61y4AAAA",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 27 Jul 2018 22:08:18 GMT"
+            "Fri, 24 Aug 2018 17:48:41 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=FPLcJ0ZhyP9N3dOXQS; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 26-Jul-2020 22:08:18 GMT",
-            "loidcreated=2018-07-27T22%3A08%3A18.082Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 26-Jul-2020 22:08:18 GMT"
+            "loid=EXbGJoBbHc8f3SEIo3; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 23-Aug-2020 17:48:41 GMT",
+            "loidcreated=2018-08-24T17%3A48%3A41.435Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 23-Aug-2020 17:48:41 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -66,15 +66,15 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CKEWJ0547SXDG09CG6F6N720"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPGTRMDDFDZ60YGMYB8MTMF"
       }
     },
     {
-      "recorded_at": "2018-07-27T22:08:18",
+      "recorded_at": "2018-08-24T17:48:41",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "api_type=json&description=Ducimus+quod+similique+totam+sit+dolorum.+Beatae+molestiae+fuga+maxime+aliquam+veritatis.+Recusandae+dolorum+corrupti+fugiat+vel+modi+culpa+molestiae+reprehenderit.+Minus+provident+aperiam+odio+corporis.%0AVeniam+quo+illum+quisquam+numquam+itaque.+A+culpa+possimus+iusto+excepturi+nihil.&link_type=any&name=1532729298_non&public_description=Expedita+fugit+tempore+consectetur+ducimus.+Aut+qui+ex+dolorem+fugit+rerum.&title=Ut+ratione+quo+distinctio+porro+temporibus.&type=private&wikimode=disabled"
+          "string": "allow_top=True&api_type=json&description=Tenetur+nemo+recusandae+neque+placeat.+Aspernatur+repellat+ipsa+reprehenderit+earum.+Voluptates+possimus+quam+ipsum+laboriosam.+Rerum+magnam+numquam+mollitia+dignissimos+dignissimos+nobis+vitae.+Distinctio+ad+blanditiis+quisquam+dignissimos.%0AArchitecto+amet+nostrum+non+similique+nihil+nisi+dolor.+Inventore+praesentium+tempora+minus+excepturi+assumenda+officiis.&link_type=any&name=1535132921_ab&public_description=Cum+adipisci+eius+vel+rem+esse+quidem+dolorem.+Minus+facere+voluptates+aliquam+tempora+enim.&title=Pariatur+quo+alias+totam+debitis+vitae.&type=private&wikimode=disabled"
         },
         "headers": {
           "Accept": [
@@ -84,22 +84,22 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 189-bvJszemwXwSL9Rva2iITnBWNCVY"
+            "bearer 140-HbzYWB64g_q79U7T443IfmYQZBo"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "523"
+            "628"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=FPLcJ0ZhyP9N3dOXQS; loidcreated=2018-07-27T22%3A08%3A18.082Z"
+            "loid=EXbGJoBbHc8f3SEIo3; loidcreated=2018-08-24T17%3A48%3A41.435Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.38.3 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -121,7 +121,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 27 Jul 2018 22:08:18 GMT"
+            "Fri, 24 Aug 2018 17:48:41 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -142,7 +142,7 @@
             "299.0"
           ],
           "x-ratelimit-reset": [
-            "102"
+            "79"
           ],
           "x-ratelimit-used": [
             "1"

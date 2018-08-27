@@ -120,7 +120,7 @@ def test_list_comments_anonymous(client, public_channel, reddit_factories, setti
                 "id": comment.id,
                 'parent_id': None,
                 "post_id": post.id,
-                "text": 'Ut distinctio omnis consequuntur numquam. Velit aspernatur voluptate sint.',
+                "text": comment.text,
                 "author_id": user.username,
                 "score": 1,
                 "upvoted": False,
@@ -363,8 +363,7 @@ def test_more_comments_anonymous(client, public_channel, reddit_factories, setti
                 'removed': False,
                 'score': 1,
                 'subscribed': False,
-                'text': 'Facilis velit magni autem neque velit vitae. '
-                        'Ipsam inventore nobis molestiae corrupti molestias.',
+                'text': last_comment.text,
                 'upvoted': False,
             },
         ]
@@ -524,7 +523,7 @@ def test_get_comment_anonymous(client, public_channel, reddit_factories, setting
                 'removed': False,
                 'score': 1,
                 'subscribed': False,
-                'text': 'Occaecati dolores excepturi nisi dolor sed. Repudiandae ut natus culpa quae voluptates.',
+                'text': comment.text,
                 'upvoted': False,
             },
         ]

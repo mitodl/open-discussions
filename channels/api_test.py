@@ -160,7 +160,7 @@ def test_create_channel_user(mock_get_client, indexing_decorator, channel_type):
     assert channel == mock_get_client.return_value.subreddit.create.return_value
     mock_get_client.assert_called_once_with(user=user)
     mock_get_client.return_value.subreddit.create.assert_called_once_with(
-        'name', title='Title', subreddit_type=channel_type
+        'name', title='Title', subreddit_type=channel_type, allow_top=True
     )
     assert indexing_decorator.mock_persist_func.call_count == 0
 
@@ -169,11 +169,11 @@ def test_create_channel_user(mock_get_client, indexing_decorator, channel_type):
 def test_create_channel_setting(mock_client, channel_setting):
     """Test create_channel for {channel_setting}"""
     user = UserFactory.create()
-    kwargs = {channel_setting: 'value'}
+    kwargs = {channel_setting: 'value'} if channel_setting != 'allow_top' else {}
     channel = api.Api(user=user).create_channel('name', 'Title', **kwargs)
     assert channel == mock_client.subreddit.create.return_value
     mock_client.subreddit.create.assert_called_once_with(
-        'name', title='Title', subreddit_type=api.CHANNEL_TYPE_PUBLIC, **kwargs
+        'name', title='Title', subreddit_type=api.CHANNEL_TYPE_PUBLIC, allow_top=True, **kwargs
     )
 
 
@@ -219,7 +219,7 @@ def test_update_channel_type(mock_client, channel_type):
 def test_update_channel_setting(mock_client, channel_setting):
     """Test update_channel for channel_setting"""
     user = UserFactory.create()
-    kwargs = {channel_setting: 'value'}
+    kwargs = {channel_setting: 'value' if channel_setting != 'allow_top' else False}
     channel = api.Api(user=user).update_channel('name', **kwargs)
     assert channel == mock_client.subreddit.return_value
     mock_client.subreddit.assert_called_with('name')

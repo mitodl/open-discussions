@@ -67,6 +67,7 @@ CHANNEL_SETTINGS = (
     'submit_link_label',
     'submit_text',
     'submit_text_label',
+    'allow_top',
 )
 
 # this comes from https://github.com/mitodl/reddit/blob/master/r2/r2/models/token.py#L270
@@ -375,8 +376,9 @@ class Api:
         Returns:
             ListingGenerator(praw.models.Subreddit): a generator over channel listings
         """
-        # Until we decide otherwise anonymous users should not see any channels in the list
-        return self.reddit.user.subreddits(limit=None) if not self.user.is_anonymous else []
+        if self.user.is_anonymous:
+            return self.reddit.subreddits.default()
+        return self.reddit.user.subreddits(limit=None)
 
     def get_channel(self, name):
         """
@@ -420,6 +422,7 @@ class Api:
             name,
             title=title,
             subreddit_type=channel_type,
+            allow_top=True,
             **other_settings
         )
 
