@@ -75,7 +75,7 @@ def normalize_to_start_of_day(dt):
     return dt.replace(hour=0, minute=0, second=0, microsecond=0)
 
 
-def chunks(iterable, chunk_size=20):
+def chunks(iterable, *, chunk_size=20):
     """
     Yields chunks of an iterable as sub lists each of max size chunk_size.
 

@@ -108,7 +108,7 @@ def send_unsent_email_notifications():
     """
     for notification_ids in chunks(EmailNotification.objects.filter(
             state=EmailNotification.STATE_PENDING,
-    ).values_list('id', flat=True), 100):
+    ).values_list('id', flat=True), chunk_size=100):
         EmailNotification.objects.filter(id__in=notification_ids).update(state=EmailNotification.STATE_SENDING)
         tasks.send_email_notification_batch.delay(notification_ids)
 
