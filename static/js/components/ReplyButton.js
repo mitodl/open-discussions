@@ -2,8 +2,7 @@
 import React from "react"
 
 import LoginPopup from "./LoginPopup"
-import { commentLoginText } from "./CommentTree"
-import { userIsAnonymous } from "../lib/util"
+import { commentLoginText, userIsAnonymous } from "../lib/util"
 
 import type { BeginEditingFunc } from "./CommentTree"
 

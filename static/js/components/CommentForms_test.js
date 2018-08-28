@@ -19,16 +19,16 @@ import {
   editPostKey
 } from "./CommentForms"
 import Router from "../Router"
+import LoginPopup from "./LoginPopup"
 
 import * as forms from "../actions/forms"
+import * as utilFuncs from "../lib/util"
 import { actions } from "../actions"
 import { SET_POST_DATA, setPostData } from "../actions/post"
 import { SET_BANNER_MESSAGE } from "../actions/ui"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import * as utilFuncs from "../lib/util"
-import LoginPopup from "./LoginPopup"
 
 describe("CommentForms", () => {
   let helper, post, comment, postKeys, commentKeys

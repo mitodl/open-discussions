@@ -7,14 +7,13 @@ import { connect } from "react-redux"
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 import { setBannerMessage } from "../actions/ui"
-import { isEmptyText, userIsAnonymous } from "../lib/util"
+import { isEmptyText, commentLoginText, userIsAnonymous } from "../lib/util"
 import Editor, { editorUpdateFormShim } from "./Editor"
+import LoginPopup from "./LoginPopup"
 
 import type { CommentForm, CommentInTree, Post } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 import type { Dispatch } from "redux"
-import LoginPopup from "./LoginPopup"
-import { commentLoginText } from "./CommentTree"
 
 type CommentFormProps = {
   dispatch: Dispatch<*>,

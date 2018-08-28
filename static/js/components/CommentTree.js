@@ -69,8 +69,6 @@ export const commentDropdownKey = (c: CommentInTree) =>
 export const commentShareKey = (c: CommentInTree) =>
   `COMMENT_SHARE_MENU_${c.id}`
 
-export const commentLoginText = "Sign Up or Login to comment"
-
 export default class CommentTree extends React.Component<Props, State> {
   constructor() {
     super()
