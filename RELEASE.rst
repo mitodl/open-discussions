@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.43.0
+--------------
+
+- Fixed incorrect password UI bug
+- Swapped order of authentication classes
+- LoginPopup for Follow button (#1106)
+
 Version 0.42.1 (Released August 24, 2018)
 --------------
 
