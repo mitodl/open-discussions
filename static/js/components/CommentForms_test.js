@@ -157,10 +157,10 @@ describe("CommentForms", () => {
       })
     })
 
-    it("should be disabled and display a login popup on click if user is anonymous", async () => {
+    it("should be enabled but display a login popup on click if user is anonymous", async () => {
       helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
       wrapper = renderPostForm()
-      assert.isTrue(wrapper.find("button").props().disabled)
+      assert.isFalse(wrapper.find("button").props().disabled)
       wrapper.find("textarea").simulate("click")
       assert.isTrue(wrapper.find(LoginPopup).props().visible)
     })

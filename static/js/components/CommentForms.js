@@ -72,7 +72,14 @@ const commentForm = (
   return (
     <div className="reply-form">
       <form
-        onSubmit={onSubmit}
+        onSubmit={
+          userIsAnonymous() && onTogglePopup
+            ? R.compose(
+              onTogglePopup,
+              e => e.preventDefault()
+            )
+            : onSubmit
+        }
         className="form"
         onKeyDown={e => {
           if (
@@ -110,7 +117,7 @@ const commentForm = (
         <button
           type="submit"
           className={`blue-button ${disabled ? "disabled" : ""}`}
-          disabled={disabled || isEmptyText(text)}
+          disabled={(disabled || isEmptyText(text)) && !userIsAnonymous()}
         >
           Submit
         </button>
