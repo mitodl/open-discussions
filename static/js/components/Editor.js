@@ -117,7 +117,7 @@ export class Editor extends React.Component<Props, State> {
   view: Object
   uuid: string
   formHelpers: Object
-  dispatchTransaction: Function
+  dispatchTransaction: Function = this.dispatchTransaction.bind(this)
 
   constructor(props: Props) {
     super(props)
@@ -143,7 +143,6 @@ export class Editor extends React.Component<Props, State> {
       editorState:  EditorState.create(editorStateOptions),
       showLinkMenu: false
     }
-    this.dispatchTransaction = this.dispatchTransaction.bind(this)
   }
 
   componentDidMount() {
