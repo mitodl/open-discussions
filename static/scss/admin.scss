@@ -2,9 +2,23 @@
   .channel-form {
     margin-top: 18px;
 
-    .description {
-      textarea {
-        height: 250px;
+    .max-characters {
+      margin: 12px;
+      font-size: 12px;
+    }
+
+    .avatar-and-title {
+      display: flex;
+
+      > * {
+        margin-top: auto;
+        margin-bottom: auto;
+        height: 100%;
+      }
+
+      .title-container {
+        margin-left: 40px;
+        width: 100%;
       }
     }
   }

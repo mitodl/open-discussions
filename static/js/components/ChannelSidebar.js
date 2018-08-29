@@ -30,7 +30,8 @@ const ChannelSidebar = ({ channel, isModerator }: ChannelSidebarProps) => {
         ) : null}
         <Markdown
           source={
-            channel.description || "(There is no description of this channel)"
+            channel.public_description ||
+            "(There is no description of this channel)"
           }
           className="description"
         />

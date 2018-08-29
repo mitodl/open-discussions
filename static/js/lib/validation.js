@@ -89,11 +89,16 @@ export const validateProfileForm = validate([
 export const validateChannelAppearanceEditForm = validate([
   validation(
     R.compose(
-      R.gt(R.__, 5120),
+      R.gt(R.__, 80),
       R.length
     ),
-    R.lensPath(["value", "description"]),
-    "Description length is limited to 5120 characters"
+    R.lensPath(["value", "public_description"]),
+    "Headline length is limited to 80 characters"
+  ),
+  validation(
+    R.isEmpty,
+    R.lensPath(["value", "title"]),
+    "Title must not be empty"
   )
 ])
 

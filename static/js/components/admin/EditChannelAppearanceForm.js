@@ -38,31 +38,45 @@ export default class EditChannelAppearanceForm extends React.Component<Props> {
     return (
       <form onSubmit={onSubmit} className="form channel-form">
         <Card>
-          <ChannelAvatar
-            channel={channel}
-            channelName={form.name}
-            editable={true}
-            name="avatar"
-            onUpdate={onUpdate}
-            formImageUrl={
-              form.avatar &&
-              form.avatar.edit &&
-              URL.createObjectURL(form.avatar.edit)
-            }
-            imageSize="medium"
-          />
+          <div className="row avatar-and-title">
+            <ChannelAvatar
+              channel={channel}
+              channelName={form.name}
+              editable={true}
+              name="avatar"
+              onUpdate={onUpdate}
+              formImageUrl={
+                form.avatar &&
+                form.avatar.edit &&
+                URL.createObjectURL(form.avatar.edit)
+              }
+              imageSize="medium"
+            />
+            <div className="title-container">
+              <input
+                type="text"
+                name="title"
+                placeholder="Title"
+                value={form.title}
+                onChange={onUpdate}
+              />
+              {validationMessage(validation.title)}
+            </div>
+          </div>
 
-          <div className="row description">
-            <label htmlFor="description" className="label">
-              Description
-            </label>
-            <textarea
-              name="description"
+          <div className="row">
+            <input
+              type="text"
+              name="public_description"
               className="input"
-              value={form.description}
+              placeholder="Headline"
+              value={form.public_description}
               onChange={onUpdate}
             />
-            {validationMessage(validation.description)}
+            <label htmlFor="public_description" className="max-characters">
+              Max 80 Characters
+            </label>
+            {validationMessage(validation.public_description)}
           </div>
 
           <ChannelBanner

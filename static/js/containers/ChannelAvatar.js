@@ -43,7 +43,6 @@ class ChannelAvatar extends React.Component<Props> {
       channel,
       editable,
       formImageUrl,
-      showDialog,
       onUpdate,
       name,
       imageSize
@@ -78,15 +77,10 @@ class ChannelAvatar extends React.Component<Props> {
               description="Channel Avatar"
               width={512}
               height={512}
-              showButton={false}
+              showButton={true}
             />
           ) : null}
         </div>
-        {editable ? (
-          <a className="upload-avatar" onClick={showDialog}>
-            Upload Avatar
-          </a>
-        ) : null}
       </div>
     )
   }

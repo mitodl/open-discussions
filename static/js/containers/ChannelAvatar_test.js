@@ -1,14 +1,12 @@
 // @flow
 /* global SETTINGS: false */
 import { assert } from "chai"
-import sinon from "sinon"
 
-import IntegrationTestHelper from "../util/integration_test_helper"
 import ChannelAvatar from "./ChannelAvatar"
-import * as uiActions from "../actions/ui"
-import { initials } from "../lib/profile"
 
 import { makeChannel } from "../factories/channels"
+import { initials } from "../lib/profile"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 const DEFAULT_STATE = {}
 
@@ -63,7 +61,7 @@ describe("ChannelAvatar", () => {
       ;[true, false].forEach(editable => {
         it(`${
           editable ? "renders" : "doesn't render"
-        } an ImageUploader and link`, async () => {
+        } an ImageUploader`, async () => {
           const { inner } = await renderPage(
             {},
             { channel, editable, imageSize }
@@ -72,8 +70,6 @@ describe("ChannelAvatar", () => {
             inner.find("Connect(withForm(ImageUploader))").length,
             editable ? 1 : 0
           )
-
-          assert.equal(inner.find(".upload-avatar").length, editable ? 1 : 0)
         })
       })
 
@@ -120,16 +116,14 @@ describe("ChannelAvatar", () => {
       })
 
       it("has a link to upload avatar which shows the dialog", async () => {
-        const showDialogStub = helper.sandbox
-          .stub(uiActions, "showDialog")
-          .returns({ type: "action" })
         const { inner } = await renderPage(
           {},
           { channel, editable: true, imageSize }
         )
-        const imageUploader = inner.find(".upload-avatar")
-        imageUploader.props().onClick()
-        sinon.assert.calledWith(showDialogStub)
+
+        assert.isTrue(
+          inner.find("Connect(withForm(ImageUploader))").props().showButton
+        )
       })
     })
   })

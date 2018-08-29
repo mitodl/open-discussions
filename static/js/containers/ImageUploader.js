@@ -78,7 +78,8 @@ export class ImageUploader extends React.Component<ImageProps> {
         {showButton ? (
           <button
             className="open-photo-dialog"
-            onClick={() => {
+            onClick={e => {
+              e.preventDefault()
               this.setDialogVisibility(true)
             }}
           >
