@@ -13,6 +13,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from raven.contrib.django.raven_compat.models import client as sentry
 from rest_framework_jwt.settings import api_settings
 from social_django.utils import load_strategy, load_backend
 from social_django.models import UserSocialAuth
@@ -82,6 +83,9 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
 
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
+        "environment": settings.ENVIRONMENT,
+        "sentry_dsn": sentry.get_public_dsn(),
+        "release_version": settings.VERSION,
         "public_path": public_path(request),
         "max_comment_depth": settings.OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH,
         "username": username,

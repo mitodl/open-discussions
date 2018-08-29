@@ -82,6 +82,7 @@
     "query-string": "^5.0.1",
     "raf": "^3.4.0",
     "ramda": "^0.24.1",
+    "raven-js": "^3.26.4",
     "react": "^16.4.1",
     "react-addons-shallow-compare": "^15.6.2",
     "react-content-loader": "^3.1.2",
