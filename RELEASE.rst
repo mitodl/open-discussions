@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.43.0
+Version 0.43.0 (Released August 29, 2018)
 --------------
 
 - Fixed incorrect password UI bug
