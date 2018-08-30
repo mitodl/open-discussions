@@ -1,8 +1,10 @@
 """Tests of user pipeline actions"""
+from unittest.mock import Mock
 from django.contrib.sessions.middleware import SessionMiddleware
 import pytest
 from social_django.utils import load_strategy, load_backend
 
+from open_discussions import features
 from open_discussions.factories import UserFactory
 from authentication.pipeline import user as user_actions
 from authentication.exceptions import (
@@ -244,21 +246,21 @@ def test_validate_require_profile_update_user_via_saml(mocker, backend_name, is_
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('backend_name,flow,has_user,auth_count,has_mm_auth,raises', [
-    ['email', SocialAuthState.FLOW_LOGIN, True, 1, True, True],
-    ['email', SocialAuthState.FLOW_LOGIN, True, 1, False, False],
-    ['email', SocialAuthState.FLOW_LOGIN, True, 2, True, False],
-    ['email', SocialAuthState.FLOW_REGISTER, False, 0, False, False],
-    ['email', SocialAuthState.FLOW_REGISTER, True, 0, False, False],
-    ['email', None, True, 0, False, False],
-    ['email', None, False, 0, False, False],
-    ['saml', None, True, 0, False, False],
-    ['saml', None, False, 0, False, False],
-    ['no', None, True, 0, False, False],
-    ['no', None, False, 0, False, False],
+@pytest.mark.parametrize('backend_name,flow,has_user,auth_types,raises', [
+    ['email', SocialAuthState.FLOW_LOGIN, True, ['micromasters'], True],
+    ['email', SocialAuthState.FLOW_LOGIN, True, ['saml'], False],
+    ['email', SocialAuthState.FLOW_LOGIN, True, ['micromasters', 'saml'], False],
+    ['email', SocialAuthState.FLOW_REGISTER, False, [], False],
+    ['email', SocialAuthState.FLOW_REGISTER, True, [], False],
+    ['email', None, True, [], False],
+    ['email', None, False, [], False],
+    ['saml', None, True, [], False],
+    ['saml', None, False, [], False],
+    ['no', None, True, [], False],
+    ['no', None, False, [], False],
 ])
 def test_require_micromasters_provider(
-        mocker, user, backend_name, flow, has_user, auth_count, has_mm_auth, raises
+        mocker, user, backend_name, flow, has_user, auth_types, raises
 ):  # pylint: disable=too-many-arguments
     """
     Tests that verify require_micromasters_provider behaves correctly
@@ -266,14 +268,9 @@ def test_require_micromasters_provider(
     It should only raise RequireProviderException if the user is logging in via email and only has MM auth setup
     """
     mock_strategy = mocker.Mock()
-    count_query_mock = mocker.Mock()
-    count_query_mock.count.return_value = auth_count
-    exists_query_mock = mocker.Mock()
-    exists_query_mock.exists.return_value = has_mm_auth
-
-    mock_strategy.storage.user.get_social_auth_for_user.side_effect = [
-        exists_query_mock,
-        count_query_mock,
+    mock_strategy.storage.user.get_social_auth_for_user.return_value = [
+        mocker.Mock(provider=auth_type)
+        for auth_type in auth_types
     ]
 
     mock_backend = mocker.Mock()
@@ -290,3 +287,36 @@ def test_require_micromasters_provider(
             user_actions.require_micromasters_provider(*args, **kwargs)
     else:
         assert user_actions.require_micromasters_provider(*args, **kwargs) == {}
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('backend_name,flow,social_auth,feature_flag_val,raises', [
+    ['email', SocialAuthState.FLOW_LOGIN, Mock(provider='saml'), True, True],
+    ['email', SocialAuthState.FLOW_LOGIN, Mock(provider='saml'), False, False],
+    ['email', SocialAuthState.FLOW_LOGIN, None, True, False],
+    ['email', SocialAuthState.FLOW_REGISTER, Mock(provider='saml'), True, False],
+    ['not_email', SocialAuthState.FLOW_LOGIN, Mock(provider='saml'), True, False],
+])
+def test_require_touchstone_login(
+        mocker, settings, backend_name, flow, social_auth, feature_flag_val, raises
+):  # pylint: disable=too-many-arguments
+    """
+    Tests that verify test_require_touchstone_login raises a RequireProviderException
+    if (a) the user is logging in via email, (b) has a SAML-type authentication, and
+    (c) the SAML auth feature flag in on
+    """
+    settings.FEATURES[features.SAML_AUTH] = feature_flag_val
+    mock_strategy = mocker.Mock()
+    mock_strategy.storage.user.get_social_auth.return_value = social_auth
+
+    mock_backend = mocker.Mock()
+    mock_backend.name = backend_name
+
+    args = [mock_strategy, mock_backend]
+    kwargs = {'flow': flow}
+
+    if raises:
+        with pytest.raises(RequireProviderException):
+            user_actions.require_touchstone_login(*args, **kwargs)
+    else:
+        assert user_actions.require_touchstone_login(*args, **kwargs) == {}

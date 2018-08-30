@@ -22,7 +22,7 @@ import { processAuthResponse } from "../../lib/auth"
 import { configureForm } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { LOGIN_URL } from "../../lib/url"
-import { validateEmailForm as validateForm } from "../../lib/validation"
+import { validateNewEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 
 import type { EmailForm, AuthResponse } from "../../flow/authTypes"

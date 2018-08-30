@@ -227,6 +227,10 @@ SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = 'mail.verification_api.send_verification
 SOCIAL_AUTH_EMAIL_VALIDATION_URL = '/'
 
 SOCIAL_AUTH_PIPELINE = (
+    # Checks if the user is attempting to log in with an email and has authenticated via SAML,
+    # in which case we want to force them to log in via SAML
+    'authentication.pipeline.user.require_touchstone_login',
+
     # Get the information we can about the user and return it in a simple
     # format to create the user instance later. On some cases the details are
     # already part of the auth response from the provider, but sometimes this
@@ -371,8 +375,9 @@ SOCIAL_AUTH_SAML_TECHNICAL_CONTACT = {
     "emailAddress": EMAIL_SUPPORT
 }
 SOCIAL_AUTH_SAML_SUPPORT_CONTACT = SOCIAL_AUTH_SAML_TECHNICAL_CONTACT
+SOCIAL_AUTH_DEFAULT_IDP_KEY = "default"
 SOCIAL_AUTH_SAML_ENABLED_IDPS = {
-    "default": {
+    SOCIAL_AUTH_DEFAULT_IDP_KEY: {
         "entity_id": SOCIAL_AUTH_SAML_IDP_ENTITY_ID,
         "url": SOCIAL_AUTH_SAML_IDP_URL,
         "attr_user_permanent_id": SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_PERM_ID,

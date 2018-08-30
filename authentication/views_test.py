@@ -1,5 +1,6 @@
 """Tests for authentication views"""
 # pylint: disable=redefined-outer-name
+from django.conf import settings
 from django.contrib.auth import get_user, get_user_model
 from django.urls import reverse
 import factory
@@ -7,7 +8,7 @@ import pytest
 from rest_framework import status
 from rest_framework_jwt.settings import api_settings
 from social_core.backends.email import EmailAuth
-from social_django.models import UserSocialAuth
+from social_core.backends.saml import SAMLAuth
 
 from authentication.backends.micromasters import MicroMastersAuth
 from authentication.utils import SocialAuthState
@@ -108,7 +109,7 @@ def login_email_mm_only(client, user):
     """Yield a function for this step"""
     def run_step(last_result):  # pylint: disable=unused-argument
         """Run the step"""
-        UserSocialAuth.objects.create(user=user, provider=MicroMastersAuth.name, uid=user.username)
+        UserSocialAuthFactory.create(user=user, provider=MicroMastersAuth.name, uid=user.username)
         return assert_api_call(
             client,
             'psa-login-email',
@@ -122,6 +123,44 @@ def login_email_mm_only(client, user):
                 'provider': MicroMastersAuth.name,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_LOGIN_PROVIDER,
+                'extra_data': {
+                    'name': user.profile.name,
+                    'profile_image_small': user.profile.image_small_file.url
+                }
+            }
+        )
+    yield run_step
+
+
+@pytest.fixture()
+def login_email_saml_exists(client, user):
+    """Yield a function for this step"""
+    def run_step(last_result):  # pylint: disable=unused-argument
+        """Run the step"""
+        settings.FEATURES[features.SAML_AUTH] = True
+        UserSocialAuthFactory.create_batch(
+            3,
+            user=user,
+            provider=factory.Iterator([SAMLAuth.name, MicroMastersAuth.name, EmailAuth.name]),
+            uid=user.username
+        )
+        return assert_api_call(
+            client,
+            'psa-login-email',
+            {
+                'flow': SocialAuthState.FLOW_LOGIN,
+                'email': user.email,
+            },
+            {
+                'errors': [],
+                'flow': SocialAuthState.FLOW_LOGIN,
+                'provider': SAMLAuth.name,
+                'partial_token': None,
+                'state': SocialAuthState.STATE_LOGIN_PROVIDER,
+                'extra_data': {
+                    'name': user.profile.name,
+                    'profile_image_small': user.profile.image_small_file.url
+                }
             }
         )
     yield run_step
@@ -371,6 +410,9 @@ def register_profile_details(client):
     ],
     [
         'login_email_mm_only',
+    ],
+    [
+        'login_email_saml_exists',
     ],
 ], ids=lambda arg: '->'.join(arg) if isinstance(arg, list) else None)
 def test_login_register_flows(request, steps):

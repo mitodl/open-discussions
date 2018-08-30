@@ -3,6 +3,7 @@ import ulid
 from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
 from social_core.pipeline.partial import partial
+from django.conf import settings
 
 from authentication.backends.micromasters import MicroMastersAuth
 from authentication.exceptions import (
@@ -13,6 +14,7 @@ from authentication.exceptions import (
     RequireRegistrationException,
 )
 from authentication.utils import SocialAuthState
+from open_discussions import features
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles import api as profile_api
 from profiles.utils import update_full_name
@@ -170,12 +172,47 @@ def validate_password(
     return {}
 
 
+# NOTE: This pipeline function should NOT be decorated with the @partial decorator. That could
+# present a potential security risk.
+def require_touchstone_login(
+        strategy, backend, flow=None, **kwargs
+):  # pylint: disable=unused-argument
+    """
+    If the user is attempting to log in via email and has authenticated via Touchstone/SAML, require
+    them to log in that way.
+
+    Args:
+        strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
+        backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
+        flow (str): the type of flow (login or register)
+    """
+    if (
+            backend.name != EmailAuth.name or
+            flow != SocialAuthState.FLOW_LOGIN or
+            not features.is_enabled(features.SAML_AUTH)
+    ):
+        return {}
+
+    data = strategy.request_data()
+    email = data.get('email')
+    if not email:
+        return {}
+
+    user_storage = strategy.storage.user
+    saml_auth = user_storage.get_social_auth(
+        SAMLAuth.name,
+        '{}:{}'.format(settings.SOCIAL_AUTH_DEFAULT_IDP_KEY, email)
+    )
+    if saml_auth:
+        raise RequireProviderException(backend, saml_auth)
+    return {}
+
+
 def require_micromasters_provider(
         strategy, backend, user=None, flow=None, **kwargs
 ):  # pylint: disable=unused-argument
     """
     If the user exists and only has a micromasters auth, require them to login that way
-
 
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
@@ -190,10 +227,11 @@ def require_micromasters_provider(
     user_storage = strategy.storage.user
 
     # if the user only has one social auth and it is MicroMasters, prompt them to login via that method
-    if (
-            user_storage.get_social_auth_for_user(user, provider=MicroMastersAuth.name).exists() and
-            user_storage.get_social_auth_for_user(user).count() == 1
-    ):
-        raise RequireProviderException(backend, MicroMastersAuth.name)
+    social_auths = user_storage.get_social_auth_for_user(user)
+    if len(social_auths) != 1:
+        return {}
 
+    social_auth = social_auths[0]
+    if social_auth.provider == MicroMastersAuth.name:
+        raise RequireProviderException(backend, social_auth)
     return {}

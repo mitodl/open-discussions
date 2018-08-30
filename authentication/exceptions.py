@@ -4,8 +4,12 @@ from social_core.exceptions import AuthException
 
 class RequireProviderException(AuthException):
     """The user is required to authenticate via a specific provider/backend"""
-    def __init__(self, backend, provider):
-        self.provider = provider
+    def __init__(self, backend, social_auth):
+        """
+        Args:
+            social_auth (social_django.models.UserSocialAuth): A social auth objects
+        """
+        self.social_auth = social_auth
         super().__init__(backend)
 
 

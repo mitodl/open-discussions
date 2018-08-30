@@ -1,7 +1,6 @@
 // @flow
 import { assert } from "chai"
 import sinon from "sinon"
-import R from "ramda"
 
 import { actions } from "../../actions"
 import { FLOW_REGISTER, FLOW_LOGIN, STATE_SUCCESS } from "../../reducers/auth"
@@ -58,41 +57,6 @@ describe("LoginPasswordPage", () => {
 
   afterEach(() => {
     helper.cleanup()
-  })
-
-  //
-  ;[
-    ["Testuser", "x.jpg", "a@b.com", "exists"],
-    [undefined, undefined, "a@b.com", "does not exist"]
-  ].forEach(([extraDataName, extraDataImg, email, descriptor]) => {
-    it(`should render the page with correct messages when extra user data ${descriptor}`, async () => {
-      const expectedProfileInfo = R.none(R.isNil, [extraDataName, extraDataImg])
-      const expectedGreeting = expectedProfileInfo
-        ? `Hi ${String(extraDataName)}`
-        : "Welcome Back!"
-
-      const { inner } = await renderPage({
-        ui: {
-          authUserDetail: {
-            email:               email,
-            name:                extraDataName,
-            profile_image_small: extraDataImg
-          }
-        }
-      })
-
-      const form = inner.find("AuthPasswordForm")
-      assert.ok(form.exists())
-      assert.equal(inner.find("h3").text(), expectedGreeting)
-      const profileInfoSection = inner.find(".profile-image-email")
-      assert.equal(profileInfoSection.exists(), expectedProfileInfo)
-      if (expectedProfileInfo) {
-        assert.equal(profileInfoSection.find("img").prop("src"), extraDataImg)
-        assert.equal(profileInfoSection.find("span").text(), email)
-      }
-
-      assert.lengthOf(helper.browserHistory, 1)
-    })
   })
 
   it("should render errors", async () => {
