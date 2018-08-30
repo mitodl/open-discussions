@@ -35,18 +35,29 @@ describe("LoginProviderRequiredPage", () => {
 
   //
   ;[
-    ["micromasters", "/login/micromasters/", "MicroMasters"],
-    ["invalid", "/login/invalid/", ""]
-  ].forEach(([provider, url, name]) => {
-    it(`should render the page given the provider: ${provider}`, async () => {
+    ["micromasters", 'a[href="/login/micromasters/"]'],
+    ["saml", "TouchstoneLoginButton"]
+  ].forEach(([provider, expectedElementSel]) => {
+    it(`should render the page with the right elements given the '${provider}' provider`, async () => {
       const { inner } = await renderPage({
         auth: {
           data: { provider }
         }
       })
 
-      assert.equal(inner.find("a").props().href, url)
-      assert.equal(inner.find("a").text(), name)
+      assert.isTrue(inner.find(expectedElementSel).exists())
     })
+  })
+
+  it("should render an error page when the provider isn't recognized", async () => {
+    const { inner } = await renderPage({
+      auth: {
+        data: {
+          provider: "unrecognized"
+        }
+      }
+    })
+
+    assert.include(inner.html(), "404 error")
   })
 })

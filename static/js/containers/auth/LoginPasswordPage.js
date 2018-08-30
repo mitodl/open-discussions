@@ -6,6 +6,7 @@ import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
 import AuthPasswordForm from "../../components/auth/AuthPasswordForm"
+import LoginGreeting from "../../components/auth/LoginGreeting"
 import withForm from "../../hoc/withForm"
 
 import { actions } from "../../actions"
@@ -54,22 +55,14 @@ export class LoginPasswordPage extends React.Component<Props> {
       <div className="content auth-page login-password-page">
         <div className="main-content">
           <Card className="login-card">
-            <h3>{name && profileImageUrl ? `Hi ${name}` : "Welcome Back!"}</h3>
             <MetaTags>
-              <title>{formatTitle("Log In")}</title>
+              <title>{formatTitle("Welcome Back!")}</title>
             </MetaTags>
-            {name && profileImageUrl ? (
-              <div className="form-header">
-                <div className="row profile-image-email">
-                  <img
-                    src={profileImageUrl}
-                    alt={`Profile image for ${name}`}
-                    className="profile-image small"
-                  />
-                  <span>{email}</span>
-                </div>
-              </div>
-            ) : null}
+            <LoginGreeting
+              email={email}
+              name={name}
+              profileImageUrl={profileImageUrl}
+            />
             {renderForm({ formError })}
           </Card>
         </div>

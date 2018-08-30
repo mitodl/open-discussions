@@ -139,19 +139,29 @@ export const validationMessage = (message: ?string) =>
     <div className="validation-message">{message}</div>
   )
 
-export const validateEmailForm = validate([
-  validation(
-    R.complement(SETTINGS.allow_saml_auth ? validNotMIT : R.always(true)),
-    R.lensPath(["value", "email"]),
-    "MIT users please login with Touchstone below"
-  ),
+const emailValidators = [
   validation(
     R.complement(validEmail),
     R.lensPath(["value", "email"]),
     "Email is not formatted correctly"
   ),
   validation(emptyOrNil, R.lensPath(["value", "email"]), "Email is required")
-])
+]
+
+export const validateEmailForm = validate(emailValidators)
+
+export const validateNewEmailForm = validate(
+  R.append(
+    validation(
+      R.complement(email => {
+        return SETTINGS.allow_saml_auth ? validNotMIT(email) : true
+      }),
+      R.lensPath(["value", "email"]),
+      "MIT users please login with Touchstone below"
+    ),
+    emailValidators
+  )
+)
 
 export const validatePasswordForm = validate([
   validation(

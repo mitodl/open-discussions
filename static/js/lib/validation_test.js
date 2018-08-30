@@ -13,6 +13,7 @@ import {
   validateChannelBasicEditForm,
   validateContentReportForm,
   validateEmailForm,
+  validateNewEmailForm,
   validateMembersForm,
   validatePasswordForm,
   validatePasswordResetForm,
@@ -227,23 +228,46 @@ describe("validation library", () => {
     })
   })
 
-  describe("validateEmailForm", () => {
-    it("should complain about no email", () => {
-      const form = { value: { email: "" } }
-      assert.deepEqual(validateEmailForm(form), {
-        value: {
-          email: "Email is required"
-        }
-      })
-    })
+  describe("email validator", () => {
+    [
+      [validateEmailForm, "existing email", "", "Email is required"],
+      [
+        validateEmailForm,
+        "existing email",
+        "abbbb@ddd",
+        "Email is not formatted correctly"
+      ],
+      [validateNewEmailForm, "new email", "", "Email is required"],
+      [
+        validateNewEmailForm,
+        "new email",
+        "abbbb@ddd",
+        "Email is not formatted correctly"
+      ],
+      [
+        validateNewEmailForm,
+        "new email",
+        "user@mit.edu",
+        "MIT users please login with Touchstone below"
+      ]
+    ].forEach(
+      ([validatorFunc, validatorDesc, emailInput, expectedErrorMsg]) => {
+        it(`for ${validatorDesc} should show the right error message given an email='${emailInput}'`, () => {
+          SETTINGS.allow_saml_auth = true
+          const form = { value: { email: emailInput } }
+          assert.deepEqual(validatorFunc(form), {
+            value: {
+              email: expectedErrorMsg
+            }
+          })
+        })
+      }
+    )
 
-    it("should complain about invalid email", () => {
-      const form = { value: { email: "abbbb@ddd" } }
-      assert.deepEqual(validateEmailForm(form), {
-        value: {
-          email: "Email is not formatted correctly"
-        }
-      })
+    it("for new email should not invalidate an MIT email if allow_saml_auth=false", () => {
+      SETTINGS.allow_saml_auth = false
+      const form = { value: { email: "user@mit.edu" } }
+      assert.deepEqual(validateNewEmailForm(form), {})
     })
   })
 

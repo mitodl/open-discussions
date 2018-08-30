@@ -21,6 +21,9 @@ from authentication.exceptions import (
     RequireRegistrationException,
 )
 from authentication.utils import SocialAuthState
+from profiles.models import Profile
+from profiles.serializers import ProfileSerializer
+from open_discussions.utils import filter_dict_keys
 
 log = logging.getLogger()
 
@@ -93,8 +96,6 @@ class SocialAuthSerializer(serializers.Serializer):
             result = super().save(**kwargs)
         except InvalidEmail:
             result = SocialAuthState(SocialAuthState.STATE_INVALID_EMAIL)
-        except RequireProviderException as exc:
-            result = SocialAuthState(SocialAuthState.STATE_LOGIN_PROVIDER, provider=exc.provider)
         except AuthException as exc:
             log.exception("Received unexpected AuthException")
             result = SocialAuthState(SocialAuthState.STATE_ERROR, errors=[str(exc)])
@@ -125,17 +126,34 @@ class LoginEmailSerializer(SocialAuthSerializer):
     """Serializer for email login"""
     partial_token = serializers.CharField(source='partial.token', read_only=True, default=None)
     email = serializers.EmailField(write_only=True)
+    extra_data = serializers.JSONField(read_only=True)
 
     def create(self, validated_data):
         """Try to 'save' the request"""
+        profile_to_serialize = None
         try:
             result = super()._authenticate(SocialAuthState.FLOW_LOGIN)
+        except RequireProviderException as exc:
+            result = SocialAuthState(SocialAuthState.STATE_LOGIN_PROVIDER, provider=exc.social_auth.provider)
+            profile_to_serialize = exc.social_auth.user.profile
         except RequireRegistrationException:
             result = SocialAuthState(SocialAuthState.STATE_ERROR, errors=[
                 "Couldn't find your MIT OPEN Account"
             ])
         except RequirePasswordException as exc:
             result = SocialAuthState(SocialAuthState.STATE_LOGIN_PASSWORD, partial=exc.partial)
+            profile_to_serialize = Profile.objects.filter(
+                user__social_auth__uid=validated_data.get('email'),
+                user__social_auth__provider=EmailAuth.name
+            ).first()
+        if profile_to_serialize:
+            profile_data = ProfileSerializer(profile_to_serialize).data
+            result.extra_data = filter_dict_keys(
+                profile_data, [
+                    'profile_image_small',
+                    'name'
+                ]
+            )
         return result
 
 
