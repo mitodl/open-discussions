@@ -188,7 +188,7 @@ $link-padding: 11px 20px 11px 19px;
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: scroll;
+  overflow-y: scroll;
   justify-content: space-between;
 
   .footer {
