@@ -8,7 +8,7 @@ import {
 } from "redux-hammock/django_csrf_fetch"
 
 import { AUTH_REQUIRED_URL } from "./url"
-import { NOT_AUTHENTICATED_ERROR_TYPE } from "../util/rest"
+import { isNotAuthenticatedErrorType } from "../util/rest"
 
 const renewSession = async () => {
   if (SETTINGS.is_authenticated) {
@@ -34,7 +34,7 @@ export const withAuthFailure = (fetchFunc: Function) => async (
   try {
     return await fetchFunc(...args)
   } catch (fetchError) {
-    if (!fetchError || fetchError.error_type !== NOT_AUTHENTICATED_ERROR_TYPE) {
+    if (!fetchError || !isNotAuthenticatedErrorType(fetchError)) {
       // not an authentication failure, rethrow
       throw fetchError
     }
@@ -76,7 +76,7 @@ export const fetchJSONWithToken = async (
       ...body
     })
   } catch (fetchError) {
-    if (fetchError.error_type !== NOT_AUTHENTICATED_ERROR_TYPE) {
+    if (!isNotAuthenticatedErrorType(fetchError)) {
       // not an authentication failure, rethrow
       throw fetchError
     }

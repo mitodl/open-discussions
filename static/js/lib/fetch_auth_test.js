@@ -7,13 +7,19 @@ import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 import * as auth from "./fetch_auth"
 
 import { AUTH_REQUIRED_URL } from "./url"
-import { NOT_AUTHENTICATED_ERROR_TYPE } from "../util/rest"
+import {
+  NOT_AUTHENTICATED_ERROR_TYPE,
+  AUTHENTICATION_FAILED_ERROR_TYPE
+} from "../util/rest"
 
 describe("fetch_auth", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
 
   const error500 = { errorStatusCode: 500 }
-  const error401 = { error_type: NOT_AUTHENTICATED_ERROR_TYPE }
+  const errorNotAuthenticated = { error_type: NOT_AUTHENTICATED_ERROR_TYPE }
+  const errorAuthenticationFailed = {
+    error_type: AUTHENTICATION_FAILED_ERROR_TYPE
+  }
   const typeError = new TypeError()
 
   let sandbox, fetchStub
@@ -66,59 +72,70 @@ describe("fetch_auth", function() {
         })
       }
 
-      it("renews and retries if the request failed", async () => {
-        fetchStub.onFirstCall().returns(Promise.reject(error401)) // original api call
-        fetchStub.onSecondCall().returns(Promise.resolve()) // original api call again
-        fetchMock.mock(SETTINGS.authenticated_site.session_url, {
-          has_token: true
+      //
+      [errorNotAuthenticated, errorAuthenticationFailed].forEach(error => {
+        it(`renews and retries if the request failed for error: ${
+          error.error_type
+        }`, async () => {
+          fetchStub.onFirstCall().returns(Promise.reject(error)) // original api call
+          fetchStub.onSecondCall().returns(Promise.resolve()) // original api call again
+          fetchMock.mock(SETTINGS.authenticated_site.session_url, {
+            has_token: true
+          })
+
+          await assert.isFulfilled(authFunc("/url"))
+
+          assert.ok(fetchMock.called())
+          assert.ok(fetchStub.calledTwice)
+          assert.ok(fetchStub.firstCall.calledWith("/url"))
+          assert.ok(fetchStub.secondCall.calledWith("/url"))
+          assert.equal(window.location.pathname, "/") // no redirect happened
         })
 
-        await assert.isFulfilled(authFunc("/url"))
+        it(`redirects and rejects if no token for error: ${
+          error.error_type
+        }`, async () => {
+          fetchStub.onFirstCall().returns(Promise.reject(error)) // original api call
+          fetchMock.mock(SETTINGS.authenticated_site.session_url, {
+            has_token: false
+          })
 
-        assert.ok(fetchMock.called())
-        assert.ok(fetchStub.calledTwice)
-        assert.ok(fetchStub.firstCall.calledWith("/url"))
-        assert.ok(fetchStub.secondCall.calledWith("/url"))
-        assert.equal(window.location.pathname, "/") // no redirect happened
-      })
+          await assert.isRejected(authFunc("/url"))
 
-      it("redirects and rejects if no token", async () => {
-        fetchStub.onFirstCall().returns(Promise.reject(error401)) // original api call
-        fetchMock.mock(SETTINGS.authenticated_site.session_url, {
-          has_token: false
+          assert.ok(fetchMock.called())
+          assert.ok(fetchStub.calledOnce)
+          assert.ok(fetchStub.calledWith("/url"))
+          assert.equal(window.location.pathname, "/auth_required/")
         })
 
-        await assert.isRejected(authFunc("/url"))
+        it(`renews and redirect to /auth_required/ if renew fails for error: ${
+          error.error_type
+        }`, async () => {
+          fetchStub.returns(Promise.reject(error)) // original api call
+          fetchMock.mock(SETTINGS.authenticated_site.session_url, 401)
 
-        assert.ok(fetchMock.called())
-        assert.ok(fetchStub.calledOnce)
-        assert.ok(fetchStub.calledWith("/url"))
-        assert.equal(window.location.pathname, "/auth_required/")
-      })
+          await assert.isRejected(authFunc("/url"))
 
-      it("renews and redirect to /auth_required/ if renew fails", async () => {
-        fetchStub.returns(Promise.reject(error401)) // original api call
-        fetchMock.mock(SETTINGS.authenticated_site.session_url, 401)
+          assert.ok(fetchMock.called())
+          assert.ok(fetchStub.calledOnce)
+          assert.ok(fetchStub.calledWith("/url"))
+          assert.equal(window.location.pathname, "/auth_required/")
+        })
 
-        await assert.isRejected(authFunc("/url"))
+        it(`renews and redirect to /auth_required/ if is_authenticated is true for error: ${
+          error.error_type
+        }`, async () => {
+          SETTINGS.is_authenticated = true
+          fetchStub.returns(Promise.reject(error)) // original api call
+          fetchMock.mock(SETTINGS.authenticated_site.session_url, 401)
 
-        assert.ok(fetchMock.called())
-        assert.ok(fetchStub.calledOnce)
-        assert.ok(fetchStub.calledWith("/url"))
-        assert.equal(window.location.pathname, "/auth_required/")
-      })
+          await assert.isRejected(authFunc("/url"))
 
-      it("renews and redirect to /auth_required/ if is_authenticated is true", async () => {
-        SETTINGS.is_authenticated = true
-        fetchStub.returns(Promise.reject(error401)) // original api call
-        fetchMock.mock(SETTINGS.authenticated_site.session_url, 401)
-
-        await assert.isRejected(authFunc("/url"))
-
-        assert.isNotOk(fetchMock.called())
-        assert.ok(fetchStub.calledOnce)
-        assert.ok(fetchStub.calledWith("/url"))
-        assert.equal(window.location.pathname, "/auth_required/")
+          assert.isNotOk(fetchMock.called())
+          assert.ok(fetchStub.calledOnce)
+          assert.ok(fetchStub.calledWith("/url"))
+          assert.equal(window.location.pathname, "/auth_required/")
+        })
       })
     })
   })
@@ -140,7 +157,7 @@ describe("fetch_auth", function() {
     })
 
     it("should return and redirect if 401 error", async () => {
-      fetchStub.returns(Promise.reject(error401))
+      fetchStub.returns(Promise.reject(errorNotAuthenticated))
 
       const err = await assert.isRejected(
         auth.fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")

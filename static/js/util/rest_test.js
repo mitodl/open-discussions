@@ -8,7 +8,10 @@ import {
   anyErrorExcept404,
   any404Error,
   anyNotAuthorizedErrorType,
-  NOT_AUTHORIZED_ERROR_TYPE
+  isNotAuthenticatedErrorType,
+  NOT_AUTHORIZED_ERROR_TYPE,
+  NOT_AUTHENTICATED_ERROR_TYPE,
+  AUTHENTICATION_FAILED_ERROR_TYPE
 } from "./rest"
 
 const makeError = n => ({ error: { errorStatusCode: n } })
@@ -157,5 +160,12 @@ describe("rest utils", () => {
         ])
       )
     })
+    ;[NOT_AUTHENTICATED_ERROR_TYPE, AUTHENTICATION_FAILED_ERROR_TYPE].forEach(
+      error => {
+        it(`should return true if the code is ${error}`, () => {
+          assert.isTrue(isNotAuthenticatedErrorType({ error_type: error }))
+        })
+      }
+    )
   })
 })

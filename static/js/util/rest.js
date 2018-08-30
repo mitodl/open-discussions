@@ -42,15 +42,24 @@ export const anyErrorExcept404or410 = anyErrorExcept([404, 410])
 // Our auth endpoints return an error type in the response, and these values
 // can be matched to that error type to properly detect authentication errors.
 export const NOT_AUTHENTICATED_ERROR_TYPE = "NotAuthenticated"
+export const AUTHENTICATION_FAILED_ERROR_TYPE = "AuthenticationFailed"
 export const NOT_AUTHORIZED_ERROR_TYPE = "PermissionDenied"
+export const AUTHENTICATION_ERRORS = [
+  NOT_AUTHENTICATED_ERROR_TYPE,
+  AUTHENTICATION_FAILED_ERROR_TYPE
+]
 
-const anySpecificErrorType = errorType =>
+const anyErrorTypes = errorTypes =>
+  R.propSatisfies(R.contains(R.__, errorTypes), "error_type")
+
+const anySpecificErrorTypes = errorTypes =>
   R.compose(
-    R.any(R.propSatisfies(R.equals(errorType), "error_type")),
+    R.any(anyErrorTypes(errorTypes)),
     R.map(R.prop("error")),
     R.filter(hasError)
   )
 
-export const anyNotAuthorizedErrorType = anySpecificErrorType(
+export const isNotAuthenticatedErrorType = anyErrorTypes(AUTHENTICATION_ERRORS)
+export const anyNotAuthorizedErrorType = anySpecificErrorTypes([
   NOT_AUTHORIZED_ERROR_TYPE
-)
+])
