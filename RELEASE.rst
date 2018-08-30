@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.43.1 (Released August 30, 2018)
+--------------
+
+- Changed API to pass allow_top and added mgmt command to update it (#950, #948)
+- Upgrade to Babel v7
+
 Version 0.43.0 (Released August 29, 2018)
 --------------
 
