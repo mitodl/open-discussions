@@ -1,18 +1,14 @@
 // @flow
-import React from "react"
 import { assert } from "chai"
-import { shallow } from "enzyme"
 
 import SubscriptionsList from "./SubscriptionsList"
 
 import { channelURL, editChannelBasicURL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
+import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("SubscriptionsList", function() {
-  let channels, myChannels, notMyChannels
-  const renderSubscriptionsList = (
-    props = { subscribedChannels: channels, currentChannel: channels[0].name }
-  ) => shallow(<SubscriptionsList {...props} />)
+  let channels, myChannels, notMyChannels, renderSubscriptionsList
 
   beforeEach(() => {
     channels = makeChannelList()
@@ -20,9 +16,12 @@ describe("SubscriptionsList", function() {
     channels.forEach((channel, i) => {
       channel.user_is_moderator = i % 2 === 0
     })
-
     myChannels = channels.filter(channel => channel.user_is_moderator)
     notMyChannels = channels.filter(channel => !channel.user_is_moderator)
+    renderSubscriptionsList = configureShallowRenderer(SubscriptionsList, {
+      subscribedChannels: channels,
+      currentChannel:     channels[0].name
+    })
   })
 
   it("should show each channel", () => {

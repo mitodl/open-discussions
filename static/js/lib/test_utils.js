@@ -1,5 +1,6 @@
 // @flow
 import { assert } from "chai"
+import { shallow } from "enzyme"
 
 import { S } from "./sanctuary"
 import React from "react"
@@ -33,3 +34,9 @@ export class TestPage extends React.Component<*, *> {
     return <div />
   }
 }
+
+export const configureShallowRenderer = (
+  Component: Class<React.Component<*, *>> | Function,
+  defaultProps: Object
+) => (extraProps: Object = {}) =>
+  shallow(<Component {...defaultProps} {...extraProps} />)

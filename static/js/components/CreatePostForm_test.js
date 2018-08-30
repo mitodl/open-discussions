@@ -1,6 +1,4 @@
 // @flow
-import React from "react"
-import { shallow } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
 
@@ -12,28 +10,10 @@ import * as channels from "../lib/channels"
 import { makeChannel } from "../factories/channels"
 import { makeArticle } from "../factories/embedly"
 import { newPostForm } from "../lib/posts"
+import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("CreatePostForm", () => {
-  let sandbox, isTextTabSelectedStub, isLinkTypeAllowedStub
-
-  const renderPostForm = (props = {}) =>
-    shallow(
-      <CreatePostForm
-        validation={{}}
-        channels={new Map()}
-        channel={makeChannel()}
-        postForm={newPostForm()}
-        embedlyInFlight={false}
-        embedly={{}}
-        history={{}}
-        onSubmit={sandbox.stub()}
-        onUpdate={sandbox.stub()}
-        updatePostType={sandbox.stub()}
-        processing={false}
-        updateChannelSelection={sandbox.stub()}
-        {...props}
-      />
-    )
+  let sandbox, isTextTabSelectedStub, isLinkTypeAllowedStub, renderPostForm
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -41,6 +21,20 @@ describe("CreatePostForm", () => {
     isTextTabSelectedStub.returns(true)
     isLinkTypeAllowedStub = sandbox.stub(channels, "isLinkTypeAllowed")
     isLinkTypeAllowedStub.returns(true)
+    renderPostForm = configureShallowRenderer(CreatePostForm, {
+      validation:             {},
+      channels:               new Map(),
+      channel:                makeChannel(),
+      postForm:               newPostForm(),
+      embedlyInFlight:        false,
+      embedly:                {},
+      history:                {},
+      onSubmit:               sandbox.stub(),
+      nUpdate:                sandbox.stub(),
+      updatePostType:         sandbox.stub(),
+      processing:             false,
+      updateChannelSelection: sandbox.stub()
+    })
   })
 
   afterEach(() => {

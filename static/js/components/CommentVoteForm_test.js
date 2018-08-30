@@ -1,18 +1,24 @@
 // @flow
-import React from "react"
 import sinon from "sinon"
-import { shallow } from "enzyme"
 import { assert } from "chai"
+
+import CommentVoteForm from "./CommentVoteForm"
+import LoginPopup from "./LoginPopup"
 
 import * as utilFuncs from "../lib/util"
 import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
-import CommentVoteForm from "./CommentVoteForm"
-import LoginPopup from "./LoginPopup"
+import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("CommentVoteForm", () => {
-  let sandbox, upvoteStub, downvoteStub, comment, resolveUpvote, resolveDownvote
+  let sandbox,
+    upvoteStub,
+    downvoteStub,
+    comment,
+    resolveUpvote,
+    resolveDownvote,
+    renderForm
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -30,21 +36,17 @@ describe("CommentVoteForm", () => {
     comment = makeComment(makePost())
     comment.upvoted = false
     comment.downvoted = false
+
+    renderForm = configureShallowRenderer(CommentVoteForm, {
+      comment,
+      upvote:   upvoteStub,
+      downvote: downvoteStub
+    })
   })
 
   afterEach(() => {
     sandbox.restore()
   })
-
-  const renderForm = (props = {}) =>
-    shallow(
-      <CommentVoteForm
-        comment={comment}
-        upvote={upvoteStub}
-        downvote={downvoteStub}
-        {...props}
-      />
-    )
 
   const assertButtons = (wrapper, isUpvote, isClear, isVoting) => {
     const clickedButtonSelector = isUpvote

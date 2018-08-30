@@ -1,16 +1,22 @@
 // @flow
-import React from "react"
 import sinon from "sinon"
-import { mount } from "enzyme"
 import { assert } from "chai"
+
+import CommentRemovalForm from "./CommentRemovalForm"
 
 import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
-import CommentRemovalForm from "./CommentRemovalForm"
+import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("CommentRemovalForm", () => {
-  let sandbox, approveStub, removeStub, comment, resolveApprove, resolveRemove
+  let sandbox,
+    approveStub,
+    removeStub,
+    comment,
+    resolveApprove,
+    resolveRemove,
+    renderForm
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -27,21 +33,17 @@ describe("CommentRemovalForm", () => {
     )
     comment = makeComment(makePost())
     comment.removed = false
+    renderForm = configureShallowRenderer(CommentRemovalForm, {
+      comment,
+      approve:     approveStub,
+      remove:      removeStub,
+      isModerator: true
+    })
   })
 
   afterEach(() => {
     sandbox.restore()
   })
-
-  const renderForm = (isModerator: boolean = true) =>
-    mount(
-      <CommentRemovalForm
-        comment={comment}
-        approve={approveStub}
-        remove={removeStub}
-        isModerator={isModerator}
-      />
-    )
 
   const assertButton = (wrapper, isRemove) => {
     const availableActionSelector = isRemove
@@ -51,7 +53,7 @@ describe("CommentRemovalForm", () => {
   }
 
   it("does not display for non-moderator users", () => {
-    const wrapper = renderForm(false)
+    const wrapper = renderForm({ isModerator: false })
     assert.isFalse(wrapper.find(".comment-action-button").exists())
   })
 
@@ -64,9 +66,16 @@ describe("CommentRemovalForm", () => {
 
       assertButton(wrapper, isRemove)
 
-      wrapper
-        .find(isRemove ? ".remove-button" : ".approve-button")
-        .simulate("click")
+      const button = wrapper.find(
+        isRemove ? ".remove-button" : ".approve-button"
+      )
+
+      const preventDefaultStub = sandbox.stub()
+      button.props().onClick({
+        preventDefault: preventDefaultStub
+      })
+      sinon.assert.called(preventDefaultStub)
+
       sinon.assert.calledWith(actionStub, comment)
 
       if (isRemove) {

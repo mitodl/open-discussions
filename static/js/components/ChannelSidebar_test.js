@@ -1,8 +1,6 @@
 // @flow
-import React from "react"
 import { Link } from "react-router-dom"
 import { assert } from "chai"
-import { shallow } from "enzyme"
 
 import Card from "./Card"
 import ChannelSidebar from "./ChannelSidebar"
@@ -10,20 +8,18 @@ import { Markdown } from "./Markdown"
 
 import { makeChannel } from "../factories/channels"
 import { editChannelBasicURL, channelModerationURL } from "../lib/url"
-
-import type { Channel } from "../flow/discussionTypes"
+import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("ChannelSidebar", () => {
-  let channel
+  let channel, renderSidebar
 
   beforeEach(() => {
     channel = makeChannel()
+    renderSidebar = configureShallowRenderer(ChannelSidebar, {
+      channel,
+      isModerator: false
+    })
   })
-
-  const renderSidebar = (
-    chan: Channel = channel,
-    isModerator: boolean = false
-  ) => shallow(<ChannelSidebar channel={chan} isModerator={isModerator} />)
 
   it("should render sidebar", () => {
     const wrapper = renderSidebar()
@@ -33,7 +29,7 @@ describe("ChannelSidebar", () => {
   })
 
   it("should render sidebar with edit channel button for moderators ", () => {
-    const wrapper = renderSidebar(channel, true)
+    const wrapper = renderSidebar({ isModerator: true })
     const description = wrapper.find(Markdown)
     assert.equal(description.props().source, channel.description)
     assert.isTrue(wrapper.find(".edit-button").exists())
@@ -57,7 +53,7 @@ describe("ChannelSidebar", () => {
   })
 
   it("should show a moderation card, if isModerator === true", () => {
-    const wrapper = renderSidebar(channel, true)
+    const wrapper = renderSidebar({ isModerator: true })
     assert.lengthOf(wrapper.find(Card), 2)
     const moderationCard = wrapper.find(Card).at(1)
     assert.equal(moderationCard.props().title, "Moderation Tools")

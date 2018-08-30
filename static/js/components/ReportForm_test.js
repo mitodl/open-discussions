@@ -1,40 +1,34 @@
 // @flow
-import React from "react"
 import sinon from "sinon"
-import { mount } from "enzyme"
 import { assert } from "chai"
 
 import ReportForm from "./ReportForm"
 
+import { configureShallowRenderer } from "../lib/test_utils"
+
 describe("ReportForm", () => {
-  let sandbox, onUpdateStub
+  let sandbox, onUpdateStub, renderForm
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     onUpdateStub = sandbox.stub()
+
+    renderForm = configureShallowRenderer(ReportForm, {
+      reportForm: {
+        reason:     "reason",
+        reportType: "comment",
+        commentId:  "1"
+      },
+      validation:  { reason: "" },
+      onUpdate:    onUpdateStub,
+      description: "description",
+      label:       "label"
+    })
   })
 
   afterEach(() => {
     sandbox.restore()
   })
-
-  const renderForm = (
-    reportForm = {
-      reason:     "reason",
-      reportType: "comment",
-      commentId:  "1"
-    },
-    validation = { reason: "" }
-  ) =>
-    mount(
-      <ReportForm
-        reportForm={reportForm}
-        validation={validation}
-        onUpdate={onUpdateStub}
-        description="description"
-        label="label"
-      />
-    )
 
   it("displays the description and label", () => {
     const wrapper = renderForm()

@@ -1,7 +1,5 @@
 // @flow
-import React from "react"
 import { assert } from "chai"
-import { shallow } from "enzyme"
 import R from "ramda"
 import sinon from "sinon"
 
@@ -11,25 +9,25 @@ import {
   VALID_POST_SORT_LABELS,
   VALID_COMMENT_SORT_LABELS
 } from "../lib/sorting"
+import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("PostSortPicker", () => {
-  let updateSortParamStub
+  let updateSortParamStub, renderComponent
 
   beforeEach(() => {
     updateSortParamStub = sinon.stub()
+    renderComponent = Component =>
+      configureShallowRenderer(Component, {
+        updateSortParam: updateSortParamStub
+      })
   })
-
-  const renderComponent = (Component, props = {}) =>
-    shallow(
-      <Component updateSortParam={updateSortParamStub} value="hey" {...props} />
-    )
 
   it("should have all the options we expect", () => {
     [
       [VALID_POST_SORT_LABELS, PostSortPicker],
       [VALID_COMMENT_SORT_LABELS, CommentSortPicker]
     ].forEach(([labels, Component]) => {
-      const wrapper = renderComponent(Component)
+      const wrapper = renderComponent(Component)()
       // $FlowFixMe
       R.zip([...wrapper.find("option")], labels).forEach(
         ([optionWrapper, [postSortType, postSortLabel]]) => {
@@ -49,7 +47,7 @@ describe("PostSortPicker", () => {
       [CommentSortPicker, VALID_COMMENT_SORT_LABELS]
     ].forEach(([Component, labels]) => {
       labels.forEach(([value, label]) => {
-        const wrapper = renderComponent(Component, { value })
+        const wrapper = renderComponent(Component)({ value })
         assert.include(wrapper.find(".current-sort").props().children, label)
       })
     })
@@ -62,7 +60,9 @@ describe("PostSortPicker", () => {
     ].forEach(([Component, labels]) => {
       labels.forEach(([type, label], idx) => {
         updateSortParamStub = sinon.stub()
-        const wrapper = renderComponent(Component)
+        const wrapper = configureShallowRenderer(Component, {
+          updateSortParam: updateSortParamStub
+        })()
         const menuItem = wrapper.find("MenuItem").at(idx)
         assert.equal(menuItem.props().children, label)
         menuItem.simulate("click")
@@ -73,7 +73,7 @@ describe("PostSortPicker", () => {
 
   it("should open and close", () => {
     [PostSortPicker, CommentSortPicker].forEach(Component => {
-      const wrapper = renderComponent(Component)
+      const wrapper = renderComponent(Component)()
       assert.isFalse(wrapper.find("Menu").props().open)
       assert.isFalse(wrapper.state("menuOpen"))
       wrapper.instance().toggleMenuOpen()

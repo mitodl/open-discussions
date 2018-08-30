@@ -1,8 +1,6 @@
 // @flow
 /* global SETTINGS:false */
-import React from "react"
 import { assert } from "chai"
-import { shallow } from "enzyme"
 import sinon from "sinon"
 import { Link } from "react-router-dom"
 
@@ -12,9 +10,10 @@ import DropdownMenu from "./DropdownMenu"
 import { profileURL, SETTINGS_URL } from "../lib/url"
 import * as utilFuncs from "../lib/util"
 import { defaultProfileImageUrl } from "../lib/util"
+import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("UserMenu", () => {
-  let toggleShowUserMenuStub, showUserMenu, profile, sandbox
+  let toggleShowUserMenuStub, showUserMenu, profile, sandbox, renderUserMenu
 
   beforeEach(() => {
     toggleShowUserMenuStub = sinon.stub()
@@ -34,21 +33,17 @@ describe("UserMenu", () => {
       bio:                  null,
       headline:             null
     }
+
+    renderUserMenu = configureShallowRenderer(UserMenu, {
+      toggleShowUserMenu: toggleShowUserMenuStub,
+      showUserMenu,
+      profile
+    })
   })
 
   afterEach(() => {
     sandbox.restore()
   })
-
-  const renderUserMenu = (props = {}) =>
-    shallow(
-      <UserMenu
-        toggleShowUserMenu={toggleShowUserMenuStub}
-        showUserMenu={showUserMenu}
-        profile={profile}
-        {...props}
-      />
-    )
 
   it("should include the profile image with onclick handler", () => {
     const wrapper = renderUserMenu()
@@ -109,8 +104,7 @@ describe("UserMenu", () => {
     } enabled`, async () => {
       SETTINGS.profile_ui_enabled = uiEnabled
       SETTINGS.username = profile.username
-      showUserMenu = true
-      const wrapper = renderUserMenu()
+      const wrapper = renderUserMenu({ showUserMenu: true })
       assert.equal(
         wrapper
           .find(Link)
@@ -122,8 +116,7 @@ describe("UserMenu", () => {
   })
 
   it("dropdown menu should have a settings link", () => {
-    showUserMenu = true
-    const wrapper = renderUserMenu()
+    const wrapper = renderUserMenu({ showUserMenu: true })
     const { to, children } = wrapper.find(Link).props()
     assert.equal(to, SETTINGS_URL)
     assert.equal(children, "Settings")
@@ -131,8 +124,7 @@ describe("UserMenu", () => {
 
   it("should include a logout link, if feature is enabled", () => {
     SETTINGS.allow_email_auth = true
-    showUserMenu = true
-    const wrapper = renderUserMenu()
+    const wrapper = renderUserMenu({ showUserMenu: true })
     const { href, children } = wrapper.find("a").props()
     assert.equal(href, "/logout")
     assert.equal(children, "Sign Out")

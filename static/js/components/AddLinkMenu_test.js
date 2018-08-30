@@ -1,17 +1,14 @@
 // @flow
-import React from "react"
 import { assert } from "chai"
-import { shallow } from "enzyme"
 import sinon from "sinon"
 
 import CloseButton from "./CloseButton"
 import AddLinkMenu from "./AddLinkMenu"
 
-describe("AddLinkMenu", () => {
-  let sandbox, onSubmit, onChange, closeMenu, props
+import { configureShallowRenderer } from "../lib/test_utils"
 
-  const renderLinkMenu = (extraProps = {}) =>
-    shallow(<AddLinkMenu {...props} {...extraProps} />)
+describe("AddLinkMenu", () => {
+  let sandbox, onSubmit, onChange, closeMenu, props, renderLinkMenu
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -25,6 +22,7 @@ describe("AddLinkMenu", () => {
       text:      "hey!",
       url:       "https://en.wikipedia.org/wiki/United_States_war_crimes"
     }
+    renderLinkMenu = configureShallowRenderer(AddLinkMenu, props)
   })
 
   //

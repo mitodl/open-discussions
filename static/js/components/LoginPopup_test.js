@@ -1,30 +1,26 @@
 // @flow
-import React from "react"
-import { shallow } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
 import { Link } from "react-router-dom"
 
 import { LoginPopupHelper } from "./LoginPopup"
 
-describe("LoginPopup", () => {
-  let closePopupStub, message, visible, sandbox
+import { configureShallowRenderer } from "../lib/test_utils"
 
-  const renderLoginPopupHelper = (props = {}) =>
-    shallow(
-      <LoginPopupHelper
-        closePopup={closePopupStub}
-        message={message}
-        visible={visible}
-        {...props}
-      />
-    )
+describe("LoginPopup", () => {
+  let closePopupStub, message, visible, sandbox, renderLoginPopupHelper
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     closePopupStub = sandbox.stub()
     message = "Login to do something"
     visible = true
+
+    renderLoginPopupHelper = configureShallowRenderer(LoginPopupHelper, {
+      message,
+      visible,
+      closePopup: closePopupStub
+    })
   })
 
   afterEach(() => {
@@ -66,8 +62,7 @@ describe("LoginPopup", () => {
   })
 
   it("should render null, if visible === false", () => {
-    visible = false
-    const wrapper = renderLoginPopupHelper()
+    const wrapper = renderLoginPopupHelper({ visible: false })
     assert.isNotOk(wrapper.find("div").exists())
   })
 })

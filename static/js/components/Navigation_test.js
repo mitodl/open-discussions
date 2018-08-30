@@ -1,7 +1,5 @@
 // @flow
-import React from "react"
 import { assert } from "chai"
-import { shallow } from "enzyme"
 import { Link } from "react-router-dom"
 import sinon from "sinon"
 
@@ -12,9 +10,14 @@ import * as channels from "../lib/channels"
 import { newPostURL, FRONTPAGE_URL, channelURL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
 import * as util from "../lib/util"
+import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("Navigation", () => {
-  let sandbox, userIsAnonymousStub, defaultProps: Object, userCanPostStub
+  let sandbox,
+    userIsAnonymousStub,
+    defaultProps: Object,
+    userCanPostStub,
+    renderComponent
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -22,7 +25,6 @@ describe("Navigation", () => {
     userIsAnonymousStub.returns(false)
     userCanPostStub = sandbox.stub(channels, "userCanPost")
     userCanPostStub.returns(true)
-
     const subscribedChannels = makeChannelList(10)
     defaultProps = {
       pathname:           "/",
@@ -31,14 +33,12 @@ describe("Navigation", () => {
         subscribedChannels.map(channel => [channel.name, channel])
       )
     }
+    renderComponent = configureShallowRenderer(Navigation, defaultProps)
   })
 
   afterEach(() => {
     sandbox.restore()
   })
-
-  const renderComponent = (props = defaultProps) =>
-    shallow(<Navigation {...props} />)
 
   describe("create post link", () => {
     it("should not have channel name if channelName is not in URL", () => {
@@ -66,9 +66,9 @@ describe("Navigation", () => {
     })
 
     it("shouldn't highlight the homelink if not home!", () => {
-      defaultProps.pathname = "/hfodfo/asdfasdfasdf"
-      const wrapper = renderComponent()
-      defaultProps.pathname = "/hfodfo/asdfasdfasdf"
+      const wrapper = renderComponent({
+        pathname: "/hfodfo/asdfasdfasdf"
+      })
       assert.isNotOk(
         wrapper
           .find(".location.current-location")
@@ -79,7 +79,6 @@ describe("Navigation", () => {
 
     it("create post link should have channel name if channelName is in URL", () => {
       const wrapper = renderComponent({
-        ...defaultProps,
         pathname: channelURL("foobar")
       })
       const link = wrapper.find(".new-post-link")
@@ -103,7 +102,6 @@ describe("Navigation", () => {
       userCanPostStub.returns(false)
       const channel = defaultProps.subscribedChannels[3]
       const wrapper = renderComponent({
-        ...defaultProps,
         pathname: channelURL(channel.name)
       })
       assert.isNotOk(wrapper.find(".mdc-button").exists())
@@ -128,7 +126,6 @@ describe("Navigation", () => {
   it("should show a SubscriptionsList", () => {
     const channels = makeChannelList(10)
     const wrapper = renderComponent({
-      ...defaultProps,
       subscribedChannels: channels
     })
     assert.equal(
@@ -139,7 +136,6 @@ describe("Navigation", () => {
 
   it("should pass the current channel down to the SubscriptionsList", () => {
     const wrapper = renderComponent({
-      ...defaultProps,
       pathname: channelURL("foobar")
     })
     assert.equal(

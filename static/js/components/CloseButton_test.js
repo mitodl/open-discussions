@@ -1,25 +1,23 @@
 // @flow
-import React from "react"
-import { shallow } from "enzyme"
 import sinon from "sinon"
 import { assert } from "chai"
 
 import CloseButton from "./CloseButton"
 
+import { configureShallowRenderer } from "../lib/test_utils"
+
 describe("CloseButton", () => {
-  let sandbox, onClick
+  let sandbox, onClick, renderButton
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     onClick = sandbox.stub()
+    renderButton = configureShallowRenderer(CloseButton, { onClick })
   })
 
   afterEach(() => {
     sandbox.restore
   })
-
-  const renderButton = (props = {}) =>
-    shallow(<CloseButton onClick={onClick} {...props} />)
 
   it("should have the class and icon we expect", () => {
     const wrapper = renderButton()
