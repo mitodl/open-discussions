@@ -25,6 +25,8 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
     settings.FEATURES[features.EMAIL_AUTH] = False
     settings.FEATURES[features.SAML_AUTH] = False
+    settings.ENVIRONMENT = 'test'
+    settings.VERSION = '1.2.3'
 
     client.force_login(user)
     response = client.get(reverse('open_discussions-index'))
@@ -57,7 +59,10 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
         'allow_saml_auth': False,
         'allow_email_auth': False,
         'support_email': settings.EMAIL_SUPPORT,
-        'embedlyKey': 'fake'
+        'embedlyKey': 'fake',
+        'environment': settings.ENVIRONMENT,
+        'sentry_dsn': None,
+        'release_version': settings.VERSION,
     }
 
 
@@ -92,6 +97,8 @@ def test_webpack_url_jwt(
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
     settings.FEATURES[features.SAML_AUTH] = False
     client.cookies[api_settings.JWT_AUTH_COOKIE] = jwt_token
+    settings.ENVIRONMENT = 'test'
+    settings.VERSION = '1.2.3'
 
     response = client.get(reverse('open_discussions-index'))
 
@@ -123,7 +130,10 @@ def test_webpack_url_jwt(
         'allow_saml_auth': False,
         'allow_email_auth': False,
         'support_email': settings.EMAIL_SUPPORT,
-        'embedlyKey': 'fake'
+        'embedlyKey': 'fake',
+        'environment': settings.ENVIRONMENT,
+        'sentry_dsn': None,
+        'release_version': settings.VERSION,
     }
 
 
@@ -135,6 +145,8 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
     settings.FEATURES[features.EMAIL_AUTH] = False
     settings.FEATURES[features.SAML_AUTH] = False
+    settings.ENVIRONMENT = 'test'
+    settings.VERSION = '1.2.3'
 
     response = client.get(reverse('open_discussions-index'))
 
@@ -166,7 +178,10 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
         'allow_saml_auth': False,
         'allow_email_auth': False,
         'support_email': settings.EMAIL_SUPPORT,
-        'embedlyKey': 'fake'
+        'embedlyKey': 'fake',
+        'environment': settings.ENVIRONMENT,
+        'sentry_dsn': None,
+        'release_version': settings.VERSION,
     }
 
 

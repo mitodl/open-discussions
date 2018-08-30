@@ -23,7 +23,10 @@ declare var SETTINGS: {
   allow_saml_auth: boolean,
   allow_email_auth: boolean,
   support_email: string,
-  embedlyKey: string
+  embedlyKey: string,
+  sentry_dsn: string,
+  release_version: string,
+  environment: string
 }
 
 // mocha
