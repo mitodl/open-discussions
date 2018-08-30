@@ -23,23 +23,6 @@
     }
   }
 
-  .edit-channel-navbar,
-  .members-navbar {
-    margin-bottom: 20px;
-
-    a {
-      margin-right: 25px;
-      color: $navigation-text;
-      padding-bottom: 20px;
-
-      &.active {
-        font-weight: 700;
-        background: linear-gradient(to right, black, black) repeat-x 0 1.5em;
-        background-size: 8px 5px;
-      }
-    }
-  }
-
   .actions {
     display: flex;
     flex-direction: row;

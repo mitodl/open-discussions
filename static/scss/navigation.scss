@@ -24,19 +24,20 @@ $link-padding: 11px 20px 11px 19px;
       }
     }
 
-    a.mitlogo {
-      padding: 16px 0 16px 12px;
-    }
-
     .mdc-toolbar__title,
     .mdc-toolbar__title a {
       color: #5d5d5d;
       font-size: 1.1rem;
     }
+
+    .mdc-toolbar__section--align-start {
+      align-items: center;
+      justify-content: flex-start;
+    }
   }
 
   .mdc-toolbar__icon--menu {
-    color: $brand-bg;
+    color: $navy;
   }
 
   .user-menu-section {
@@ -45,8 +46,7 @@ $link-padding: 11px 20px 11px 19px;
     align-items: center;
 
     .login-link {
-      margin: 0 32px 0 0;
-      color: $font-grey;
+      background: white;
     }
   }
 }
@@ -57,6 +57,8 @@ $link-padding: 11px 20px 11px 19px;
 
   .title {
     margin-left: $text-padding-left;
+    font-size: 18px;
+    word-break: break-all;
   }
 
   .new-post-link-container {
@@ -89,33 +91,6 @@ $link-padding: 11px 20px 11px 19px;
   }
 }
 
-.tab-row {
-  display: flex;
-  flex-direction: row;
-
-  .tab {
-    padding: 10px 29px 17px;
-    color: #585858;
-    text-transform: uppercase;
-    font-weight: 400;
-    font-size: 14px;
-
-    @include breakpoint(phone) {
-      padding: 10px 15px 17px;
-    }
-  }
-
-  & > div {
-    cursor: pointer;
-  }
-
-  .active {
-    border-bottom: 4px solid #0085df;
-    font-weight: 500;
-    color: #000;
-  }
-}
-
 .current-location {
   background-color: $bg-grey;
 }
@@ -123,7 +98,7 @@ $link-padding: 11px 20px 11px 19px;
 .location-list {
   width: 100%;
   box-sizing: border-box;
-  margin: 10px 0 5px;
+  margin: 0 0 5px;
 
   &.subscribed-channels {
     padding: 16px 0 18px 0;
@@ -146,8 +121,8 @@ $link-padding: 11px 20px 11px 19px;
       display: flex;
       flex-direction: row;
       align-items: center;
-      color: $navigation-text;
-      font-size: 15px;
+      color: $navy;
+      font-size: 18px;
       padding: $link-padding;
       flex-grow: 1;
     }
@@ -190,6 +165,7 @@ $link-padding: 11px 20px 11px 19px;
   height: 100%;
   overflow-y: scroll;
   justify-content: space-between;
+  padding: 0;
 
   .footer {
     font-size: 12px;

@@ -8,6 +8,7 @@ import { Link } from "react-router-dom"
 import Card from "./Card"
 import DropdownMenu from "./DropdownMenu"
 import ReportCount from "./ReportCount"
+import PostUpvoteButton from "./PostUpvoteButton"
 
 import {
   channelURL,
@@ -16,7 +17,6 @@ import {
   profileURL
 } from "../lib/url"
 import {
-  PostVotingButtons,
   PostTitleAndHostname,
   getPostDropdownMenuKey,
   postMenuDropdownFuncs
@@ -129,30 +129,33 @@ export class CompactPostDisplay extends React.Component<Props> {
           ) : null}
         </div>
         <div className="row">
-          <div className="left">
-            <PostVotingButtons post={post} toggleUpvote={toggleUpvote} />
+          <div>
+            <PostUpvoteButton post={post} toggleUpvote={toggleUpvote} />
             <ReportCount count={post.num_reports} />
           </div>
           <div className="comments-and-menu">
             <Link
-              className="comment-link"
+              className="comment-link grey-surround"
               to={postDetailURL(post.channel_name, post.id, post.slug)}
             >
               <i className="material-icons chat_bubble_outline">
                 chat_bubble_outline
               </i>
-              {post.num_comments}
+              <span>{post.num_comments}</span>
             </Link>
             {userIsAnonymous() ? null : (
               <i
-                className="material-icons more_vert"
+                className="material-icons more_vert post-menu-button grey-surround"
                 onClick={menuOpen ? null : showPostMenu}
               >
                 more_vert
               </i>
             )}
             {menuOpen ? (
-              <DropdownMenu closeMenu={hidePostMenu}>
+              <DropdownMenu
+                closeMenu={hidePostMenu}
+                className="post-comment-dropdown"
+              >
                 {showPinUI && post.text && isModerator && togglePinPost ? (
                   <li>
                     <a onClick={() => togglePinPost(post)}>

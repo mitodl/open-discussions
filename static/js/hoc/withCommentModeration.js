@@ -1,7 +1,8 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import { Dialog } from "@mitodl/mdl-react-components"
+
+import Dialog from "../components/Dialog"
 
 import { actions } from "../actions"
 import {
@@ -55,17 +56,14 @@ export const withCommentModeration = (
         channelName,
         shouldGetReports
       } = this.props
-
-      if (event.type !== "MDCDialog:accept") {
-        // filter out click event to avoid double execution
-        return
-      }
+      event.preventDefault()
 
       await removeComment(dispatch, focusedComment)
       if (shouldGetReports) {
         await dispatch(actions.reports.get(channelName))
       }
 
+      this.hideCommentDialog()
       dispatch(
         setSnackbarMessage({
           message: "Comment has been removed"
@@ -95,6 +93,7 @@ export const withCommentModeration = (
             onAccept={this.removeComment}
             hideDialog={this.hideCommentDialog}
             submitText="Yes, remove"
+            title="Remove Comment"
           >
             <p>
               Are you sure? You will still be able to see the comment, but it

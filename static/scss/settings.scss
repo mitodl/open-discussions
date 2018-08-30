@@ -13,12 +13,14 @@
     }
   }
 
-  .tab-row {
-    margin: 0 0 20px 0;
+  .row {
+    margin: 10px 10px 24px 10px;
   }
 
-  button {
-    margin-left: 15px;
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0;
   }
 
   .settings-radio {
@@ -41,7 +43,7 @@
     }
   }
 
-  a.buttonLink {
+  a.link-button {
     display: inline-block;
   }
 }

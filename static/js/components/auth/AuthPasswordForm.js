@@ -22,7 +22,6 @@ const AuthPasswordForm = ({
 }: LoginPasswordFormProps) => (
   <form onSubmit={onSubmit} className="form">
     <div className="passwordfield row">
-      <label>Password</label>
       <input
         type="password"
         name="password"
@@ -37,9 +36,11 @@ const AuthPasswordForm = ({
         : null}
     </div>
     <div className="row">
-      <Link to="/password_reset">Forgot your password?</Link>
+      <Link className="password-reset" to="/password_reset">
+        Forgot your password?
+      </Link>
     </div>
-    <div className="actions row">
+    <div className="actions row right-aligned">
       <button
         type="submit"
         className={`submit-password ${processing ? "disabled" : ""}`}

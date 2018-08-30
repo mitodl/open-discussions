@@ -282,7 +282,12 @@ describe("CommentForms", () => {
     })
 
     it("should disable submit button when passed empty comment", () => {
-      assert.isTrue(wrapper.find("button").props().disabled)
+      assert.isTrue(
+        wrapper
+          .find("button")
+          .at(0)
+          .props().disabled
+      )
     })
 
     it("should enable submit button when text in form", async () => {
@@ -295,7 +300,12 @@ describe("CommentForms", () => {
         })
       })
       wrapper = renderCommentForm()
-      assert.isFalse(wrapper.find("button").props().disabled)
+      assert.isFalse(
+        wrapper
+          .find("button")
+          .at(0)
+          .props().disabled
+      )
     })
 
     it("should show an empty form when reply has been started", async () => {
@@ -323,7 +333,7 @@ describe("CommentForms", () => {
     it("should cancel and hide the form", async () => {
       const mockPreventDefault = helper.sandbox.stub()
       const state = await helper.listenForActions([forms.FORM_END_EDIT], () => {
-        wrapper.find(".cancel-button").simulate("click", {
+        wrapper.find(".cancel").simulate("click", {
           preventDefault: mockPreventDefault
         })
       })
@@ -391,7 +401,10 @@ describe("CommentForms", () => {
       await helper.listenForActions([requestType], () => {
         wrapper.find("form").simulate("submit")
       })
-      const btnProps = wrapper.find("button").props()
+      const btnProps = wrapper
+        .find("button")
+        .at(0)
+        .props()
       assert.isTrue(btnProps.disabled)
     })
 
@@ -512,7 +525,7 @@ describe("CommentForms", () => {
     it("should cancel and go away", async () => {
       const mockPreventDefault = helper.sandbox.stub()
       const state = await helper.listenForActions([forms.FORM_END_EDIT], () => {
-        wrapper.find(".cancel-button").simulate("click", {
+        wrapper.find(".cancel").simulate("click", {
           preventDefault: mockPreventDefault
         })
       })
@@ -618,7 +631,7 @@ describe("CommentForms", () => {
     it("should cancel and go away", async () => {
       const mockPreventDefault = helper.sandbox.stub()
       const state = await helper.listenForActions([forms.FORM_END_EDIT], () => {
-        wrapper.find(".cancel-button").simulate("click", {
+        wrapper.find(".cancel").simulate("click", {
           preventDefault: mockPreventDefault
         })
       })

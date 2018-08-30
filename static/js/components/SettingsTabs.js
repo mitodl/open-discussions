@@ -3,6 +3,8 @@ import React from "react"
 import { NavLink } from "react-router-dom"
 import { withRouter } from "react-router"
 
+import IntraPageNav from "./IntraPageNav"
+
 import { NOTIFICATION_SETTINGS_URL, ACCOUNT_SETTINGS_URL } from "../lib/url"
 
 import type { Location } from "react-router"
@@ -36,7 +38,7 @@ const renderNavLinks = (
   })
 
 export const SettingsTabs = ({ location }: { location: Location }) => (
-  <div className="tab-row">
+  <IntraPageNav>
     {renderNavLinks(location, {
       [NOTIFICATION_SETTINGS_URL]: {
         isDefault: true,
@@ -47,7 +49,7 @@ export const SettingsTabs = ({ location }: { location: Location }) => (
         text:      "Account"
       }
     })}
-  </div>
+  </IntraPageNav>
 )
 
 export default withRouter(SettingsTabs)

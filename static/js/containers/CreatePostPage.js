@@ -10,6 +10,7 @@ import isURL from "validator/lib/isURL"
 import CreatePostForm from "../components/CreatePostForm"
 import withSingleColumn from "../hoc/withSingleColumn"
 import CanonicalLink from "../components/CanonicalLink"
+import IntraPageNav from "../components/IntraPageNav"
 
 import { actions } from "../actions"
 import { setBannerMessage } from "../actions/ui"
@@ -232,6 +233,11 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
           <title>{formatTitle("Submit a Post")}</title>
           <CanonicalLink match={match} />
         </MetaTags>
+        <IntraPageNav>
+          <a href="#" className="active">
+            Draft
+          </a>
+        </IntraPageNav>
         <CreatePostForm
           onSubmit={this.onSubmit}
           onUpdate={this.onUpdate}

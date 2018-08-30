@@ -25,12 +25,12 @@ const AuthEmailForm = ({
   return (
     <form onSubmit={onSubmit} className="form">
       <div className="emailfield row">
-        <label>Email</label>
         <input
           type="email"
           name="email"
           value={form.email}
           onChange={onUpdate}
+          placeholder="Email"
         />
         {validationMessage(validation.email)}
       </div>
@@ -45,7 +45,7 @@ const AuthEmailForm = ({
           ? validationMessage(formError)
           : null}
       </div>
-      <div className="actions row">
+      <div className="actions row right-aligned">
         <button
           type="submit"
           className={`submit-login ${processing ? "disabled" : ""}`}

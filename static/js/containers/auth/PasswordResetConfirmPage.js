@@ -30,7 +30,7 @@ export const PasswordResetConfirmPage = ({
   tokenApiError,
   successfullySubmitted
 }: PasswordResetConfirmPageProps) => (
-  <div className="content auth-page password-reset-confirm-page">
+  <div className="auth-page password-reset-confirm-page">
     <div className="main-content">
       {successfullySubmitted ? (
         <Card className="login-card">

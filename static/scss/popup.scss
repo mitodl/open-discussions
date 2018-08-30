@@ -9,12 +9,7 @@
   z-index: 10;
 
   .triangle {
-    width: 15px;
-    height: 15px;
-    position: absolute;
-    top: -7px;
-    background: white;
-    transform: rotate(45deg);
+    @extend %triangle;
   }
 
   .popup-title {

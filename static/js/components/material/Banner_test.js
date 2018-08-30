@@ -28,6 +28,8 @@ describe("Banner", () => {
     assert.include(wrapper.text(), message)
     assert.equal(wrapper.find("a").prop("onClick"), hide)
   })
+
+  //
   ;[[false, false], [true, true]].forEach(([visible, expActive]) => {
     it(`${shouldIf(
       expActive
@@ -37,7 +39,7 @@ describe("Banner", () => {
       banner.visible = visible
       const wrapper = renderBanner()
       assert.equal(
-        _.includes(wrapper.find("div").prop("className"), "banner--active"),
+        _.includes(wrapper.find(".banner").prop("className"), "banner--active"),
         expActive
       )
     })

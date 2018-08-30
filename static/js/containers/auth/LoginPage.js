@@ -53,7 +53,7 @@ export class LoginPage extends React.Component<LoginPageProps> {
     const { renderForm, formError, match } = this.props
 
     return (
-      <div className="content auth-page login-page">
+      <div className="auth-page login-page">
         <div className="main-content">
           <Card className="login-card">
             <h3>Login</h3>

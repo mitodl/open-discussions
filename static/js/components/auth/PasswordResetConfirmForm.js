@@ -42,7 +42,7 @@ export default class PasswordResetConfirmForm extends React.Component<Props> {
           />
           {validationMessage(validation.re_new_password)}
         </div>
-        <div className="actions row">
+        <div className="actions row right-aligned">
           <button
             type="submit"
             className={`submit-password ${processing ? "disabled" : ""}`}

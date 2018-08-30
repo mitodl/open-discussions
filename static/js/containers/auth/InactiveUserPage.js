@@ -16,7 +16,7 @@ type Props = {
 const InactiveUserPage = ({ match }: Props) => {
   const supportEmail = SETTINGS.support_email
   return (
-    <div className="content auth-page inactive-account-page">
+    <div className="auth-page inactive-account-page">
       <div className="main-content">
         <Card className="inactive-account-card">
           <h3>Log In</h3>

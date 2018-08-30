@@ -62,55 +62,45 @@ class ProfilePage extends React.Component<Props> {
     }
 
     return (
-      <div className="profile-page">
+      <React.Fragment>
         <MetaTags>
           <title>{formatTitle(`Profile for ${profile.name}`)}</title>
           <CanonicalLink relativeUrl="profile" />
         </MetaTags>
-        <div className="main-content">
-          <Card>
-            <div className="profile-card">
-              <div className="row profile-view">
-                <ProfileImage
-                  profile={profile}
-                  userName={userName}
-                  editable={false}
-                  imageSize={PROFILE_IMAGE_MEDIUM}
-                />
-                <div className="row image-and-name">
-                  <div className="profile-view-fullname">
-                    <div className="profile-view-name">{profile.name}</div>
-                  </div>
-                </div>
-              </div>
-              <div className="row profile-view">
-                <div className="row profile-view-headline">
-                  {profile.headline}
-                </div>
-                <div className="row profile-view-bio">
-                  {profile.bio
-                    ? profile.bio.split("\n").map((item, key) => {
-                      return (
-                        <span key={key}>
-                          {item}
-                          <br />
-                        </span>
-                      )
-                    })
-                    : profile.bio}
-                </div>
-                {userName === SETTINGS.username ? (
-                  <div className="row profile-edit-button">
-                    <button type="submit" onClick={this.onClick}>
-                      Edit Your Profile
-                    </button>
-                  </div>
-                ) : null}
-              </div>
+        <Card className="profile-card">
+          <div className="row">
+            <ProfileImage
+              profile={profile}
+              userName={userName}
+              editable={false}
+              imageSize={PROFILE_IMAGE_MEDIUM}
+            />
+            <div className="name-and-headline">
+              <div className="name">{profile.name}</div>
+              <div className="headline">{profile.headline}</div>
             </div>
-          </Card>
-        </div>
-      </div>
+          </div>
+          <div className="row bio">
+            {profile.bio
+              ? profile.bio.split("\n").map((item, key) => {
+                return (
+                  <span key={key}>
+                    {item}
+                    <br />
+                  </span>
+                )
+              })
+              : profile.bio}
+          </div>
+        </Card>
+        {userName === SETTINGS.username ? (
+          <div className="row actions">
+            <button type="submit" onClick={this.onClick}>
+              Edit
+            </button>
+          </div>
+        ) : null}
+      </React.Fragment>
     )
   }
 }

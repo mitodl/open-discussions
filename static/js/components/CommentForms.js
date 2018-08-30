@@ -4,6 +4,10 @@ import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
 
+import Editor, { editorUpdateFormShim } from "./Editor"
+import LoginPopup from "./LoginPopup"
+import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
+
 import { actions } from "../actions"
 import { clearCommentError } from "../actions/comment"
 import { setPostData } from "../actions/post"
@@ -14,14 +18,17 @@ import {
   userIsAnonymous,
   preventDefaultAndInvoke
 } from "../lib/util"
-import Editor, { editorUpdateFormShim } from "./Editor"
-import LoginPopup from "./LoginPopup"
 
-import type { CommentForm, CommentInTree, Post } from "../flow/discussionTypes"
+import type {
+  CommentForm,
+  CommentInTree,
+  Post,
+  Profile
+} from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 import type { Dispatch } from "redux"
 
-type CommentFormProps = {
+type CommentComponentProps = {
   dispatch: Dispatch<*>,
   forms: FormsState,
   post: Post,
@@ -36,7 +43,8 @@ type CommentFormProps = {
   patchComment: (c: Object) => void,
   patchPost: (p: Object) => void,
   comment: CommentInTree,
-  editing: boolean
+  editing: boolean,
+  profile?: Profile
 }
 
 type CommentFormState = {
@@ -64,7 +72,7 @@ const getPostReplyInitialValue = (parent: Post) => ({
   text:    ""
 })
 
-const commentForm = (
+type CommentFormProps = {
   onSubmit: (e: Event) => Promise<*>,
   text: string,
   onUpdate: (e: any) => void,
@@ -72,9 +80,23 @@ const commentForm = (
   isComment: boolean,
   disabled: boolean,
   autoFocus: boolean,
-  wysiwyg: boolean = false,
-  onTogglePopup?: Function
-) => (
+  wysiwyg?: boolean,
+  onTogglePopup?: Function,
+  profile?: Profile
+}
+
+const CommentFormHelper = ({
+  onSubmit,
+  text,
+  onUpdate,
+  cancelReply,
+  isComment,
+  disabled,
+  autoFocus,
+  wysiwyg,
+  onTogglePopup,
+  profile
+}: CommentFormProps) => (
   <div className="reply-form">
     <form
       onSubmit={
@@ -91,6 +113,12 @@ const commentForm = (
       }}
     >
       <div className="form-item">
+        {profile ? (
+          <React.Fragment>
+            <ProfileImage profile={profile} imageSize={PROFILE_IMAGE_MICRO} />
+            <div className="triangle" />
+          </React.Fragment>
+        ) : null}
         {wysiwyg ? (
           <Editor
             initialValue={text || ""}
@@ -117,19 +145,17 @@ const commentForm = (
       </div>
       <button
         type="submit"
-        className={`blue-button ${disabled ? "disabled" : ""}`}
         disabled={(disabled || isEmptyText(text)) && !userIsAnonymous()}
       >
         Submit
       </button>
       {isComment ? (
-        <a
-          href="#"
+        <button
           onClick={preventDefaultAndInvoke(cancelReply)}
-          className="cancel-button"
+          className="cancel"
         >
           Cancel
-        </a>
+        </button>
       ) : null}
     </form>
   </div>
@@ -176,7 +202,7 @@ export const beginEditing = R.curry((dispatch, formKey, initialValue, e) => {
   )
 })
 
-const mapDispatchToProps = (dispatch: any, ownProps: CommentFormProps) => {
+const mapDispatchToProps = (dispatch: any, ownProps: CommentComponentProps) => {
   const formKey = ownProps.editing
     ? getEditFormKeyFromOwnProps(ownProps)
     : getFormKeyFromOwnProps(ownProps)
@@ -267,7 +293,7 @@ export const ReplyToCommentForm: Class<React$Component<*, *>> = connect(
   mapDispatchToProps
 )(
   class ReplyCommentForm extends React.Component<
-    CommentFormProps,
+    CommentComponentProps,
     CommentFormState
   > {
     constructor(props) {
@@ -291,17 +317,17 @@ export const ReplyToCommentForm: Class<React$Component<*, *>> = connect(
       const { replying } = this.state
       const text = R.pathOr("", [formKey, "value", "text"], forms)
 
-      return R.has(formKey, forms)
-        ? commentForm(
-          this.onSubmit,
-          text,
-          onUpdate,
-          cancelReply,
-          true,
-          replying,
-          true
-        )
-        : null
+      return R.has(formKey, forms) ? (
+        <CommentFormHelper
+          onSubmit={this.onSubmit}
+          text={text}
+          onUpdate={onUpdate}
+          cancelReply={cancelReply}
+          isComment={true}
+          disabled={replying}
+          autoFocus={true}
+        />
+      ) : null
     }
   }
 )
@@ -310,15 +336,13 @@ export const EditCommentForm: Class<React$Component<*, *>> = connect(
   mapStateToProps,
   mapDispatchToProps
 )(
-  class EditCommentForm extends React.Component<*, *> {
+  class EditCommentForm extends React.Component<CommentComponentProps, *> {
     constructor(props) {
       super(props)
       this.state = {
         patching: false
       }
     }
-
-    props: CommentFormProps
 
     state: {
       patching: boolean
@@ -342,14 +366,16 @@ export const EditCommentForm: Class<React$Component<*, *>> = connect(
       const { patching } = this.state
       const text = R.pathOr("", [formKey, "value", "text"], forms)
 
-      return commentForm(
-        this.onSubmit,
-        text,
-        onUpdate,
-        cancelReply,
-        true,
-        patching,
-        true
+      return (
+        <CommentFormHelper
+          onSubmit={this.onSubmit}
+          text={text}
+          onUpdate={onUpdate}
+          cancelReply={cancelReply}
+          isComment={true}
+          disabled={patching}
+          autoFocus={true}
+        />
       )
     }
   }
@@ -367,7 +393,7 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
       }
     }
 
-    props: CommentFormProps
+    props: CommentComponentProps
 
     state: {
       patching: boolean
@@ -393,15 +419,17 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
       const { patching } = this.state
       const text = R.pathOr("", [formKey, "value", "text"], forms)
 
-      return commentForm(
-        this.onSubmit,
-        text,
-        onUpdate,
-        cancelReply,
-        true,
-        patching,
-        true,
-        true
+      return (
+        <CommentFormHelper
+          onSubmit={this.onSubmit}
+          text={text}
+          onUpdate={onUpdate}
+          cancelReply={cancelReply}
+          isComment={true}
+          disabled={patching}
+          autoFocus={true}
+          wysiwyg={true}
+        />
       )
     }
   }
@@ -422,7 +450,7 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
   mapDispatchToProps
 )(
   class ReplyPostForm extends React.Component<*, *> {
-    props: CommentFormProps
+    props: CommentComponentProps
 
     state: {
       replying: boolean,
@@ -474,30 +502,30 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
     }
 
     render() {
-      const { forms, onUpdate, cancelReply, formDataLens } = this.props
+      const { forms, onUpdate, cancelReply, formDataLens, profile } = this.props
       const { replying, popupVisible } = this.state
       const { text } = getFormData(formDataLens, forms)
 
       return (
-        <React.Fragment>
+        <div className="reply-post-form">
           <LoginPopup
             message={commentLoginText}
             visible={popupVisible}
             closePopup={this.onTogglePopup}
             className="downshift"
           />
-          {commentForm(
-            this.onSubmit,
-            text,
-            onUpdate,
-            cancelReply,
-            false,
-            replying || userIsAnonymous(),
-            false,
-            false,
-            this.onTogglePopup
-          )}
-        </React.Fragment>
+          <CommentFormHelper
+            onSubmit={this.onSubmit}
+            text={text}
+            onUpdate={onUpdate}
+            cancelReply={cancelReply}
+            isComment={false}
+            disabled={replying || userIsAnonymous()}
+            autoFocus={false}
+            onTogglePopup={this.onTogglePopup}
+            profile={profile}
+          />
+        </div>
       )
     }
   }

@@ -1,8 +1,7 @@
-.card {
+%card {
   width: 100%;
   background-color: $card-background;
-  box-shadow: 0 0 5px $card-shadow;
-  border-radius: 2px;
+  border-radius: 5px;
   margin: 0 0 20px 0;
 
   .card-contents {
@@ -15,4 +14,8 @@
     font-weight: 400;
     margin: 10px 0 7px 10px;
   }
+}
+
+.card {
+  @extend %card;
 }

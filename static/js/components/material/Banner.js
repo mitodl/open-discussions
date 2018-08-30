@@ -24,7 +24,7 @@ export default class Banner extends React.Component<Props> {
         aria-atomic="true"
         aria-hidden={!visible}
       >
-        {message}
+        <div className="message">{message}</div>
         <a href="#" onClick={hide} className="material-icons close">
           close
         </a>

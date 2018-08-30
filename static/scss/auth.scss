@@ -1,39 +1,143 @@
-.app {
+@include breakpoint(desktop) {
+  .content .auth-page .main-content {
+    margin-top: 70px !important;
+    max-width: 470px;
+  }
+
   .auth-page {
-    form {
-      @include breakpoint(desktop) {
-        width: 450px;
-      }
+    form,
+    .card-contents {
+      width: 350px;
     }
   }
 }
 
-.alternate-auth-link {
-  text-align: center;
-  color: $font-grey;
+.auth-page {
+  @include breakpoint(mobile) {
+    width: 95%;
+    margin: auto;
 
-  a:link,
-  a:visited {
-    text-decoration: underline;
+    form,
+    .actions,
+    .card-contents {
+      width: 100%;
+    }
+  }
+
+  .form-header {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .password-reset {
     color: $font-grey;
   }
-}
 
-.login-greeting-header {
-  display: flex;
-  margin: 1em 0;
-  line-height: 1.5em;
+  .link-button {
+    margin-right: 0;
+  }
 
-  .back-button {
-    flex-grow: 0;
-    color: #000;
-    margin-right: 5px;
+  .touchstone-text-logo {
+    background: white;
+    margin: 0 0 5px 0;
+    padding: 9px 0;
+  }
+
+  .textline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $navy;
+    margin-bottom: 25px;
+  }
+
+  .textline:after,
+  .textline:before {
+    content: "";
+    width: 150px;
+
+    @include breakpoint(mobile) {
+      width: 45%;
+    }
+
+    height: 2px;
+    background: $navy;
+    margin: 0 10px;
+  }
+
+  .card-contents {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    @include breakpoint(desktop) {
+      padding: 60px;
+    }
+  }
+
+  button {
+    width: 100%;
+
+    &[type="submit"] {
+      width: 35%;
+    }
+
+    &.submit-password-reset {
+      width: 50%;
+      padding: 9px 19px;
+    }
+  }
+
+  .actions {
+    margin-top: 0;
+    max-width: 350px;
+    width: 100%;
+
+    &.right-aligned {
+      flex-direction: column;
+      align-items: flex-end;
+      display: flex;
+    }
+  }
+
+  .row {
+    margin-right: 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .alternate-auth-link {
+    text-align: center;
+    color: $font-grey;
+    margin-top: 25px;
+
+    a:link,
+    a:visited {
+      text-decoration: underline;
+      color: $font-grey;
+    }
   }
 
   h3 {
-    padding: 0 $material-icon-size 0 0;
+    font-size: 24px;
+    color: $navy;
     margin: 0;
+    margin-bottom: 20px;
     flex-grow: 1;
     text-align: center;
+  }
+
+  .login-greeting-header {
+    display: flex;
+    margin: 1em 0;
+    line-height: 1.5em;
+
+    .back-button {
+      flex-grow: 0;
+      color: #000;
+      margin-right: 5px;
+    }
   }
 }

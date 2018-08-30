@@ -141,7 +141,7 @@ describe("ProfileForm", () => {
     wrapper
       .find(".save-profile")
       .at(0)
-      .simulate("submit")
+      .simulate("click")
     assert.ok(onSubmitStub.called)
   })
 

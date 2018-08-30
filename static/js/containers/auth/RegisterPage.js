@@ -41,7 +41,7 @@ export const RegisterPage = ({
   formError,
   match
 }: RegisterPageProps) => (
-  <div className="content auth-page register-page">
+  <div className="auth-page register-page">
     <div className="main-content">
       <Card className="register-card">
         <h3>Join MIT OPEN for free</h3>

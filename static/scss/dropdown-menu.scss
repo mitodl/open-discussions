@@ -11,7 +11,7 @@ ul.dropdown-menu {
 
   a {
     text-decoration: none;
-    color: $font-grey-light;
+    color: $navy;
     white-space: nowrap;
   }
 
@@ -23,10 +23,14 @@ ul.dropdown-menu {
       margin-bottom: 0;
     }
   }
-}
 
-.user-menu {
-  a {
-    color: $navigation-text;
+  &.post-comment-dropdown {
+    li:not(:last-child) {
+      margin-bottom: 10px;
+    }
+
+    a {
+      font-size: 12px;
+    }
   }
 }

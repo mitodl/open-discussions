@@ -1,4 +1,24 @@
-.blue-button {
-  background-color: $button-blue !important;
+button,
+input[type="submit"],
+.mdc-button,
+a.link-button {
+  background-color: $rouge;
   color: white;
+  margin: 0 10px 5px 0;
+  padding: 9px 36px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 400;
+  font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mdc-button.cancel-button,
+button.cancel,
+a.link-button.cancel,
+a.link-button.outlined {
+  background-color: inherit;
+  border: 1px solid $rouge;
+  color: $rouge;
 }

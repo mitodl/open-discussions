@@ -56,7 +56,7 @@ const AuthDetailsForm = ({
         ? validationMessage(formError)
         : null}
     </div>
-    <div className="actions row">
+    <div className="actions row right-aligned">
       <button
         type="submit"
         className={`submit-register ${processing ? "disabled" : ""}`}

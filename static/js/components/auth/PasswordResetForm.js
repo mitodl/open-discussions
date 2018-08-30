@@ -33,7 +33,7 @@ export default class PasswordResetForm extends React.Component<Props> {
           {validationMessage(validation.email)}
           {validationMessage(emailApiError)}
         </div>
-        <div className="actions row">
+        <div className="actions row right-aligned">
           <button
             type="submit"
             className={`submit-password-reset ${processing ? "disabled" : ""}`}

@@ -5,7 +5,8 @@ import onClickOutside from "react-onclickoutside"
 
 type DropdownMenuProps = {
   closeMenu: Function,
-  children: any
+  children: any,
+  className?: string
 }
 
 export class _DropdownMenu extends React.Component<DropdownMenuProps> {
@@ -28,9 +29,14 @@ export class _DropdownMenu extends React.Component<DropdownMenuProps> {
     )
   }
 
+  className = () => {
+    const { className } = this.props
+    return className ? `dropdown-menu ${className}` : "dropdown-menu"
+  }
+
   render() {
     return (
-      <ul className="dropdown-menu">{this.setClickHandlersOnChildren()}</ul>
+      <ul className={this.className()}>{this.setClickHandlersOnChildren()}</ul>
     )
   }
 }

@@ -13,6 +13,7 @@
 @import "node_modules/prosemirror-view/style/prosemirror";
 @import "breakpoints";
 @import "variables";
+@import "triangle";
 @import "card";
 @import "basic";
 @import "breadcrumbs";
@@ -48,10 +49,11 @@
 @import "editor";
 @import "add-link-menu";
 @import "close-button";
+@import "intra-page-nav";
 
 body {
-  font-family: "Roboto", helvetica, arial, sans-serif !important;
-  background-color: $app-background;
+  font-family: "Source Sans Pro", helvetica, arial, sans-serif !important;
+  background-image: linear-gradient(123deg, #e5e9f4, #ffffff);
   margin: 0;
   padding: 0;
   color: $font-black;
@@ -93,11 +95,6 @@ body {
         min-height: calc(100vh - #{$toolbar-height-mobile});
       }
 
-      &.home-page,
-      &.channel-page {
-        margin-top: 5px;
-      }
-
       &.one-column {
         width: 80%;
         max-width: 950px;
@@ -115,7 +112,7 @@ body {
         width: 90%;
 
         @include breakpoint(desktop) {
-          max-width: 1300px;
+          max-width: 960px;
         }
 
         @include breakpoint(phone) {

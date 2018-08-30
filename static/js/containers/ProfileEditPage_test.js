@@ -30,7 +30,7 @@ describe("ProfileEditPage", function() {
       .simulate("change", makeEvent("headline", text))
 
   const submitProfile = wrapper =>
-    wrapper.find(".save-profile").simulate("submit")
+    wrapper.find(".save-profile").simulate("click")
 
   beforeEach(() => {
     profile = makeProfile()
@@ -129,7 +129,7 @@ describe("ProfileEditPage", function() {
       helper.currentLocation.pathname,
       editProfileURL(profile.username)
     )
-    wrapper.find(".cancel").simulate("click")
+    wrapper.find(".row.actions .cancel").simulate("click")
     assert.equal(helper.currentLocation.pathname, "/")
   })
 })
