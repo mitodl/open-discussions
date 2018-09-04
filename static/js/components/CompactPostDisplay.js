@@ -33,7 +33,7 @@ type Props = {
   showPinUI?: boolean,
   isModerator: boolean,
   removePost?: ?(post: Post) => void,
-  ignorePostReports?: (post: Post) => void,
+  ignorePostReports?: (post: Post) => Promise<*>,
   reportPost?: ?(post: Post) => void,
   menuOpen: boolean,
   dispatch: Dispatch<*>

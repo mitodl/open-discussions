@@ -48,7 +48,7 @@ export const withCommentModeration = (
       )
     }
 
-    removeComment = async () => {
+    removeComment = async (event: Event) => {
       const {
         dispatch,
         focusedComment,
@@ -56,9 +56,8 @@ export const withCommentModeration = (
         shouldGetReports
       } = this.props
 
-      if (!focusedComment) {
-        // we are getting double events for this, so this is a hack to avoid dispatching
-        // a removeComment with a null comment
+      if (event.type !== "MDCDialog:accept") {
+        // filter out click event to avoid double execution
         return
       }
 
