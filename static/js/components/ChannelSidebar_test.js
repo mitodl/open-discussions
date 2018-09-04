@@ -24,14 +24,14 @@ describe("ChannelSidebar", () => {
   it("should render sidebar", () => {
     const wrapper = renderSidebar()
     const description = wrapper.find(Markdown)
-    assert.equal(description.props().source, channel.public_description)
+    assert.equal(description.props().source, channel.description)
     assert.isFalse(wrapper.find(".edit-button").exists())
   })
 
   it("should render sidebar with edit channel button for moderators ", () => {
     const wrapper = renderSidebar({ isModerator: true })
     const description = wrapper.find(Markdown)
-    assert.equal(description.props().source, channel.public_description)
+    assert.equal(description.props().source, channel.description)
     assert.isTrue(wrapper.find(".edit-button").exists())
     assert.equal(
       wrapper
@@ -43,7 +43,7 @@ describe("ChannelSidebar", () => {
   })
 
   it("should render a default description", () => {
-    channel.public_description = ""
+    channel.description = ""
     const wrapper = renderSidebar()
     const description = wrapper.find(Markdown)
     assert.equal(
