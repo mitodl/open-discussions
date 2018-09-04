@@ -32,7 +32,8 @@ import {
 import {
   processAuthResponse,
   isAnonAccessiblePath,
-  needsAuthedSite
+  needsAuthedSite,
+  goToFirstLoginStep
 } from "./auth"
 
 const DEFAULT_ARGS = {
@@ -110,5 +111,10 @@ describe("auth lib", () => {
         assert.equal(needsAuthedSite(), exp)
       })
     })
+  })
+
+  it(`goToFirstLoginStep goes to the first login step`, () => {
+    goToFirstLoginStep(history)
+    sinon.assert.calledWith(history.push, LOGIN_URL)
   })
 })

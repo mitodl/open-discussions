@@ -18,3 +18,22 @@
     color: $font-grey;
   }
 }
+
+.login-greeting-header {
+  display: flex;
+  margin: 1em 0;
+  line-height: 1.5em;
+
+  .back-button {
+    flex-grow: 0;
+    color: #000;
+    margin-right: 5px;
+  }
+
+  h3 {
+    padding: 0 $material-icon-size 0 0;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+  }
+}

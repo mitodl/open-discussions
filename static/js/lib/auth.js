@@ -1,5 +1,6 @@
 /* global SETTINGS: false */
 // @flow
+
 import {
   LOGIN_URL,
   LOGIN_PASSWORD_URL,
@@ -12,7 +13,6 @@ import {
   AUTH_REQUIRED_URL,
   LOGIN_PROVIDER_URL
 } from "./url"
-
 import {
   STATE_LOGIN_EMAIL,
   STATE_LOGIN_PASSWORD,
@@ -58,3 +58,7 @@ export const isAnonAccessiblePath = (pathname: string): boolean =>
 
 export const needsAuthedSite = (): boolean =>
   !SETTINGS.allow_anonymous && !SETTINGS.authenticated_site.session_url
+
+export const goToFirstLoginStep = (history: Object) => {
+  history.push(LOGIN_URL)
+}
