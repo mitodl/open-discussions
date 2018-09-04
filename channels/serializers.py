@@ -51,7 +51,7 @@ class ChannelSerializer(serializers.Serializer):
     title = serializers.CharField()
     name = serializers.CharField(source='display_name')
     description = serializers.CharField(required=False, allow_blank=True)
-    public_description = serializers.CharField(required=False, allow_blank=True)
+    public_description = serializers.CharField(required=False, allow_blank=True, max_length=80)
     channel_type = serializers.ChoiceField(
         source="subreddit_type",
         choices=VALID_CHANNEL_TYPES,

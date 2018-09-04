@@ -149,18 +149,18 @@ describe("validation library", () => {
   })
 
   describe("validateChannelAppearanceEditForm", () => {
-    it("should complain about too long of a description", () => {
+    it("should complain about too long of a headline", () => {
       const channel = {
         value: {
-          description: "a".repeat(5121)
+          public_description: "a".repeat(81)
         }
       }
       assert.deepEqual(validateChannelAppearanceEditForm(channel), {
         value: {
-          description: "Description length is limited to 5120 characters"
+          public_description: "Headline length is limited to 80 characters"
         }
       })
-      channel.value.description = "a".repeat(5120)
+      channel.value.public_description = "a".repeat(80)
       assert.deepEqual(validateChannelAppearanceEditForm(channel), {})
     })
   })

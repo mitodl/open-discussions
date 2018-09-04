@@ -40,10 +40,13 @@ describe("EditChannelAppearanceForm", () => {
     sandbox.restore()
   })
 
-  it("should render a blank form", () => {
+  it("should render a form with values", () => {
     const wrapper = renderForm(form)
-    const [description] = wrapper.find("textarea")
-    assert.equal(description.props.value, form.description)
+    assert.equal(
+      wrapper.find("input[name='public_description']").props().value,
+      form.public_description
+    )
+    assert.equal(wrapper.find("input[name='title']").props().value, form.title)
   })
 
   it("should redirect to the channel page on cancel", () => {
@@ -76,11 +79,18 @@ describe("EditChannelAppearanceForm", () => {
     })
 
     describe("onUpdate", () => {
-      it(`should be called when description input is modified`, () => {
+      it(`should be called when the headline is modified`, () => {
         const wrapper = renderForm(form, { onSubmit, onUpdate })
         const event = { target: { value: "text" } }
         assert.isNotOk(onSubmit.called)
-        wrapper.find(`[name="description"]`).simulate("change", event)
+        wrapper.find(`[name="public_description"]`).simulate("change", event)
+        assert.isOk(onUpdate.calledWith(event))
+      })
+      it(`should be called when the title is modified`, () => {
+        const wrapper = renderForm(form, { onSubmit, onUpdate })
+        const event = { target: { value: "text" } }
+        assert.isNotOk(onSubmit.called)
+        wrapper.find(`[name="title"]`).simulate("change", event)
         assert.isOk(onUpdate.calledWith(event))
       })
       ;["avatar", "banner"].forEach(field => {
