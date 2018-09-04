@@ -2,6 +2,7 @@
 /* global SETTINGS:false */
 import React from "react"
 import R from "ramda"
+import sinon from "sinon"
 import { mount } from "enzyme"
 import { assert } from "chai"
 
@@ -23,6 +24,7 @@ describe("LoginGreeting", () => {
           name={name}
           profileImageUrl={profileImageUrl}
           email={email}
+          onBackButtonClick={sinon.stub()}
         />
       )
 
@@ -37,5 +39,19 @@ describe("LoginGreeting", () => {
         assert.equal(profileInfoSection.find("span").text(), email)
       }
     })
+  })
+
+  it("passes down a back button click handler", async () => {
+    const onBackButtonClick = sinon.stub()
+    const wrapper = mount(
+      <LoginGreeting
+        name="Test User"
+        profileImageUrl="abc.jpg"
+        email="abc@example.com"
+        onBackButtonClick={onBackButtonClick}
+      />
+    )
+
+    assert.equal(wrapper.find("BackButton").prop("onClick"), onBackButtonClick)
   })
 })

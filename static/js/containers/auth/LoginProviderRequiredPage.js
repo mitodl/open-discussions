@@ -2,6 +2,7 @@
 import React from "react"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
+import R from "ramda"
 
 import Card from "../../components/Card"
 import TouchstoneLoginButton from "../../components/auth/TouchstoneLoginButton"
@@ -15,8 +16,11 @@ import {
   getAuthUiEmailSelector,
   getAuthUiImgSelector
 } from "../../reducers/ui"
+import { goToFirstLoginStep } from "../../lib/auth"
+import { preventDefaultAndInvoke } from "../../lib/util"
 
 type LoginProviderRequiredPageProps = {
+  history: Object,
   provider: string,
   email: string,
   name: string,
@@ -39,6 +43,7 @@ const renderExternalProviderLink = (provider: string) => {
 }
 
 export const LoginProviderRequiredPage = ({
+  history,
   provider,
   email,
   name,
@@ -48,6 +53,10 @@ export const LoginProviderRequiredPage = ({
   if (!externalLink) {
     return <NotFound />
   }
+
+  const onBackButtonClick = preventDefaultAndInvoke(
+    R.partial(goToFirstLoginStep, [history])
+  )
 
   return (
     <div className="content auth-page login-provider-page">
@@ -60,6 +69,7 @@ export const LoginProviderRequiredPage = ({
             email={email}
             name={name}
             profileImageUrl={profileImageUrl}
+            onBackButtonClick={onBackButtonClick}
           />
           <p>You already have a login with</p>
           {externalLink}
