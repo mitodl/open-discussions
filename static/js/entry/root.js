@@ -12,6 +12,9 @@ import Router, { routes } from "../Router"
 
 import Raven from "raven-js"
 
+// requirement for creating blob from crop canvas.
+import "blueimp-canvas-to-blob/js/canvas-to-blob.js"
+
 Raven.config(SETTINGS.sentry_dsn, {
   release:     SETTINGS.release_version,
   environment: SETTINGS.environment
