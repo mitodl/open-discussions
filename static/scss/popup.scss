@@ -55,10 +55,6 @@
   }
 }
 
-.downshift {
-  margin-top: 50px !important;
-}
-
 .share-popup {
   .triangle {
     right: 50%;
@@ -70,6 +66,10 @@
   right: unset;
   margin-top: 10px;
   min-width: 255px;
+
+  &.downshift {
+    margin-top: 50px;
+  }
 
   .close-popup {
     position: absolute;
