@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.44.0
+Version 0.44.0 (Released September 04, 2018)
 --------------
 
 - Add handling for AuthorizationFailed on expired JWTs
