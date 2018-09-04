@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.44.0 (Released September 04, 2018)
+--------------
+
+- Add handling for AuthorizationFailed on expired JWTs
+- create new helper function for simple component tests
+- Added command and tasks to backpopulate a default channel's subscribers
+- Add Raven.js (#1142)
+- Configured login flow to show greeting for external auth providers
+- Fixed overflow scrolling to only be vertical
+- Use material dropdown instead of browser-native select
+
 Version 0.43.1 (Released August 30, 2018)
 --------------
 
