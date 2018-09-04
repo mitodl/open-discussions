@@ -4,12 +4,8 @@ import React from "react"
 import LoginPopup from "./LoginPopup"
 import { commentLoginText, userIsAnonymous } from "../lib/util"
 
-import type { BeginEditingFunc } from "./CommentTree"
-
 type Props = {
-  beginEditing?: BeginEditingFunc,
-  formKey: string,
-  initialValue: Object
+  beginEditing?: Function
 }
 
 type State = {
@@ -32,7 +28,7 @@ export default class ReplyButton extends React.Component<Props, State> {
   }
 
   render() {
-    const { beginEditing, formKey, initialValue } = this.props
+    const { beginEditing } = this.props
     const { popupVisible } = this.state
     return (
       <div>
@@ -40,7 +36,7 @@ export default class ReplyButton extends React.Component<Props, State> {
           className="comment-action-button reply-button"
           onClick={e => {
             beginEditing && !userIsAnonymous()
-              ? beginEditing(formKey, initialValue, e)
+              ? beginEditing(e)
               : this.onTogglePopup()
           }}
         >

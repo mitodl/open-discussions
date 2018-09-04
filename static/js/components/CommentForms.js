@@ -79,7 +79,7 @@ const commentForm = (
       onSubmit={
         userIsAnonymous() && onTogglePopup
           ? // $FlowFixMe - the above ensures onTogglePopup is defined
-          preventDefaultAndInvoke(() => onTogglePopup())
+          preventDefaultAndInvoke(onTogglePopup)
           : onSubmit
       }
       className="form"
@@ -107,7 +107,7 @@ const commentForm = (
             onClick={
               userIsAnonymous() && onTogglePopup
                 ? // $FlowFixMe: the above
-                preventDefaultAndInvoke(() => onTogglePopup())
+                preventDefaultAndInvoke(onTogglePopup)
                 : null
             }
             autoFocus={autoFocus}
@@ -124,7 +124,7 @@ const commentForm = (
       {isComment ? (
         <a
           href="#"
-          onClick={preventDefaultAndInvoke(() => cancelReply())}
+          onClick={preventDefaultAndInvoke(cancelReply)}
           className="cancel-button"
         >
           Cancel
@@ -433,7 +433,7 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
       this.ensureInitialState()
     }
 
-    onTogglePopup = async () => {
+    onTogglePopup = () => {
       const { popupVisible } = this.state
       this.setState({
         popupVisible: !popupVisible

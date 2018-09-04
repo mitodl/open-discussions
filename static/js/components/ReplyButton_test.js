@@ -1,38 +1,26 @@
 // @flow
-import React from "react"
-import { shallow } from "enzyme"
 import { assert } from "chai"
 
 import ReplyButton from "./ReplyButton"
 import LoginPopup from "./LoginPopup"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { getCommentReplyInitialValue, replyToCommentKey } from "./CommentForms"
-import { makeComment } from "../factories/comments"
-import { makePost } from "../factories/posts"
-import { shouldIf } from "../lib/test_utils"
+import { configureShallowRenderer, shouldIf } from "../lib/test_utils"
 import * as utilFuncs from "../lib/util"
 
 describe("ReplyButton", () => {
-  let helper, beginEditingStub, comment
+  let helper, beginEditingStub, renderButton
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     beginEditingStub = helper.sandbox.stub()
-    comment = makeComment(makePost())
+    renderButton = configureShallowRenderer(ReplyButton, {
+      beginEditing: beginEditingStub
+    })
   })
 
   afterEach(() => {
     helper.cleanup()
   })
-
-  const renderButton = () =>
-    shallow(
-      <ReplyButton
-        formKey={replyToCommentKey(comment)}
-        initialValue={getCommentReplyInitialValue(comment)}
-        beginEditing={beginEditingStub}
-      />
-    )
 
   it("should have a LoginPopup, if the user is anonymous", () => {
     helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
@@ -51,7 +39,7 @@ describe("ReplyButton", () => {
 
   //
   ;[true, false].forEach(isAnonymous => {
-    it(`clicking the follow button ${shouldIf(
+    it(`clicking the reply button ${shouldIf(
       isAnonymous
     )} set visible state to true and ${shouldIf(
       !isAnonymous
@@ -62,13 +50,7 @@ describe("ReplyButton", () => {
       if (isAnonymous) {
         assert.equal(wrapper.find(LoginPopup).props().visible, isAnonymous)
       }
-      assert.equal(
-        beginEditingStub.calledWith(
-          replyToCommentKey(comment),
-          getCommentReplyInitialValue(comment)
-        ),
-        !isAnonymous
-      )
+      assert.equal(beginEditingStub.calledOnce, !isAnonymous)
     })
   })
 })

@@ -35,8 +35,8 @@ import type { CommentRemoveFunc } from "./CommentRemovalForm"
 import type { CommentVoteFunc } from "./CommentVoteForm"
 
 type LoadMoreCommentsFunc = (comment: MoreCommentsInTree) => Promise<*>
+type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
 type ReportCommentFunc = (comment: CommentInTree) => void
-export type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
 
 type Props = {
   comments: Array<GenericComment>,
@@ -126,9 +126,15 @@ export default class CommentTree extends React.Component<Props> {
         ) : null}
         {atMaxDepth || moderationUI || comment.deleted ? null : (
           <ReplyButton
-            beginEditing={beginEditing}
-            formKey={replyToCommentKey(comment)}
-            initialValue={getCommentReplyInitialValue(comment)}
+            beginEditing={e => {
+              if (beginEditing) {
+                beginEditing(
+                  replyToCommentKey(comment),
+                  getCommentReplyInitialValue(comment),
+                  e
+                )
+              }
+            }}
           />
         )}
         <div className="share-button-wrapper">
