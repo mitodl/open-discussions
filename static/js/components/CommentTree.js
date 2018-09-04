@@ -38,10 +38,6 @@ type LoadMoreCommentsFunc = (comment: MoreCommentsInTree) => Promise<*>
 type ReportCommentFunc = (comment: CommentInTree) => void
 export type BeginEditingFunc = (fk: string, iv: Object, e: ?Object) => void
 
-type State = {
-  popupVisible: boolean
-}
-
 type Props = {
   comments: Array<GenericComment>,
   forms?: FormsState,
@@ -69,14 +65,7 @@ export const commentDropdownKey = (c: CommentInTree) =>
 export const commentShareKey = (c: CommentInTree) =>
   `COMMENT_SHARE_MENU_${c.id}`
 
-export default class CommentTree extends React.Component<Props, State> {
-  constructor() {
-    super()
-    this.state = {
-      popupVisible: false
-    }
-  }
-
+export default class CommentTree extends React.Component<Props> {
   renderFollowButton = (comment: CommentInTree) => {
     const { toggleFollowComment } = this.props
 

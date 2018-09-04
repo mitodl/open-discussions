@@ -1,11 +1,10 @@
 // @flow
 import React from "react"
-import { mount } from "enzyme"
+import { shallow } from "enzyme"
 import { assert } from "chai"
 
 import ReplyButton from "./ReplyButton"
 import LoginPopup from "./LoginPopup"
-import Router from "../Router"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { getCommentReplyInitialValue, replyToCommentKey } from "./CommentForms"
 import { makeComment } from "../factories/comments"
@@ -27,14 +26,12 @@ describe("ReplyButton", () => {
   })
 
   const renderButton = () =>
-    mount(
-      <Router store={helper.store} history={helper.browserHistory}>
-        <ReplyButton
-          formKey={replyToCommentKey(comment)}
-          initialValue={getCommentReplyInitialValue(comment)}
-          beginEditing={beginEditingStub}
-        />
-      </Router>
+    shallow(
+      <ReplyButton
+        formKey={replyToCommentKey(comment)}
+        initialValue={getCommentReplyInitialValue(comment)}
+        beginEditing={beginEditingStub}
+      />
     )
 
   it("should have a LoginPopup, if the user is anonymous", () => {

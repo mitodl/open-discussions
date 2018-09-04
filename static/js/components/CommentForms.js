@@ -7,7 +7,12 @@ import { connect } from "react-redux"
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 import { setBannerMessage } from "../actions/ui"
-import { isEmptyText, commentLoginText, userIsAnonymous } from "../lib/util"
+import {
+  isEmptyText,
+  commentLoginText,
+  userIsAnonymous,
+  preventDefaultAndInvoke
+} from "../lib/util"
 import Editor, { editorUpdateFormShim } from "./Editor"
 import LoginPopup from "./LoginPopup"
 
@@ -68,75 +73,66 @@ const commentForm = (
   autoFocus: boolean,
   wysiwyg: boolean = false,
   onTogglePopup?: Function
-) => {
-  return (
-    <div className="reply-form">
-      <form
-        onSubmit={
-          userIsAnonymous() && onTogglePopup
-            ? R.compose(
-              onTogglePopup,
-              e => e.preventDefault()
-            )
-            : onSubmit
+) => (
+  <div className="reply-form">
+    <form
+      onSubmit={
+        userIsAnonymous() && onTogglePopup
+          ? // $FlowFixMe - the above ensures onTogglePopup is defined
+          preventDefaultAndInvoke(() => onTogglePopup())
+          : onSubmit
+      }
+      className="form"
+      onKeyDown={e => {
+        if (e.key === "Enter" && e.ctrlKey && !disabled && !isEmptyText(text)) {
+          onSubmit(e)
         }
-        className="form"
-        onKeyDown={e => {
-          if (
-            e.key === "Enter" &&
-            e.ctrlKey &&
-            !disabled &&
-            !isEmptyText(text)
-          ) {
-            onSubmit(e)
-          }
-        }}
+      }}
+    >
+      <div className="form-item">
+        {wysiwyg ? (
+          <Editor
+            initialValue={text || ""}
+            onChange={editorUpdateFormShim("text", onUpdate)}
+            autoFocus={autoFocus}
+          />
+        ) : (
+          <textarea
+            name="text"
+            type="text"
+            className="input"
+            placeholder="Write a reply here..."
+            value={text || ""}
+            onChange={disabled ? null : onUpdate}
+            onClick={
+              userIsAnonymous() && onTogglePopup
+                ? // $FlowFixMe: the above
+                preventDefaultAndInvoke(() => onTogglePopup())
+                : null
+            }
+            autoFocus={autoFocus}
+          />
+        )}
+      </div>
+      <button
+        type="submit"
+        className={`blue-button ${disabled ? "disabled" : ""}`}
+        disabled={(disabled || isEmptyText(text)) && !userIsAnonymous()}
       >
-        <div className="form-item">
-          {wysiwyg ? (
-            <Editor
-              initialValue={text || ""}
-              onChange={editorUpdateFormShim("text", onUpdate)}
-              autoFocus={autoFocus}
-            />
-          ) : (
-            <textarea
-              name="text"
-              type="text"
-              className="input"
-              placeholder="Write a reply here..."
-              value={text || ""}
-              onChange={disabled ? null : onUpdate}
-              onClick={
-                userIsAnonymous() && onTogglePopup ? onTogglePopup : null
-              }
-              autoFocus={autoFocus}
-            />
-          )}
-        </div>
-        <button
-          type="submit"
-          className={`blue-button ${disabled ? "disabled" : ""}`}
-          disabled={(disabled || isEmptyText(text)) && !userIsAnonymous()}
+        Submit
+      </button>
+      {isComment ? (
+        <a
+          href="#"
+          onClick={preventDefaultAndInvoke(() => cancelReply())}
+          className="cancel-button"
         >
-          Submit
-        </button>
-        {isComment ? (
-          <a
-            href="#"
-            onClick={R.compose(
-              cancelReply,
-              e => e.preventDefault()
-            )}
-            className="cancel-button"
-          >
-            Cancel
-          </a>
-        ) : null}
-      </form>
-    </div>
-  )
-}
+          Cancel
+        </a>
+      ) : null}
+    </form>
+  </div>
+)
 
 const getFormKeyFromOwnProps = ownProps =>
   ownProps.comment

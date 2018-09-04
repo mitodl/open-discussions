@@ -39,11 +39,9 @@ export default class ReplyButton extends React.Component<Props, State> {
         <div
           className="comment-action-button reply-button"
           onClick={e => {
-            if (beginEditing && !userIsAnonymous()) {
-              beginEditing(formKey, initialValue, e)
-            } else {
-              this.onTogglePopup()
-            }
+            beginEditing && !userIsAnonymous()
+              ? beginEditing(formKey, initialValue, e)
+              : this.onTogglePopup()
           }}
         >
           reply
