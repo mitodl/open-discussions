@@ -89,7 +89,7 @@
     },
     "OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE": {
       "description": "Number of users to sync per backpopulate batch",
-      "required": false,
+      "required": false
     },
     "OPEN_DISCUSSIONS_DEFAULT_SITE_KEY": {
       "description": "The default site key to use for JWT tokens missing one"
