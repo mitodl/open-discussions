@@ -7,8 +7,14 @@ import { connect } from "react-redux"
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
 import { setBannerMessage } from "../actions/ui"
-import { isEmptyText } from "../lib/util"
+import {
+  isEmptyText,
+  commentLoginText,
+  userIsAnonymous,
+  preventDefaultAndInvoke
+} from "../lib/util"
 import Editor, { editorUpdateFormShim } from "./Editor"
+import LoginPopup from "./LoginPopup"
 
 import type { CommentForm, CommentInTree, Post } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
@@ -65,11 +71,17 @@ const commentForm = (
   isComment: boolean,
   disabled: boolean,
   autoFocus: boolean,
-  wysiwyg: boolean = false
+  wysiwyg: boolean = false,
+  onTogglePopup?: Function
 ) => (
   <div className="reply-form">
     <form
-      onSubmit={onSubmit}
+      onSubmit={
+        userIsAnonymous() && onTogglePopup
+          ? // $FlowFixMe - the above ensures onTogglePopup is defined
+          preventDefaultAndInvoke(onTogglePopup)
+          : onSubmit
+      }
       className="form"
       onKeyDown={e => {
         if (e.key === "Enter" && e.ctrlKey && !disabled && !isEmptyText(text)) {
@@ -91,7 +103,13 @@ const commentForm = (
             className="input"
             placeholder="Write a reply here..."
             value={text || ""}
-            onChange={onUpdate}
+            onChange={disabled ? null : onUpdate}
+            onClick={
+              userIsAnonymous() && onTogglePopup
+                ? // $FlowFixMe: the above
+                preventDefaultAndInvoke(onTogglePopup)
+                : null
+            }
             autoFocus={autoFocus}
           />
         )}
@@ -99,17 +117,14 @@ const commentForm = (
       <button
         type="submit"
         className={`blue-button ${disabled ? "disabled" : ""}`}
-        disabled={disabled || isEmptyText(text)}
+        disabled={(disabled || isEmptyText(text)) && !userIsAnonymous()}
       >
         Submit
       </button>
       {isComment ? (
         <a
           href="#"
-          onClick={R.compose(
-            cancelReply,
-            e => e.preventDefault()
-          )}
+          onClick={preventDefaultAndInvoke(cancelReply)}
           className="cancel-button"
         >
           Cancel
@@ -386,13 +401,15 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
     props: CommentFormProps
 
     state: {
-      replying: boolean
+      replying: boolean,
+      popupVisible: boolean
     }
 
     constructor(props) {
       super(props)
       this.state = {
-        replying: false
+        replying:     false,
+        popupVisible: false
       }
     }
 
@@ -416,6 +433,13 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
       this.ensureInitialState()
     }
 
+    onTogglePopup = () => {
+      const { popupVisible } = this.state
+      this.setState({
+        popupVisible: !popupVisible
+      })
+    }
+
     onSubmit = async (event: Event) => {
       const { onSubmit, formDataLens, forms, post } = this.props
       const { post_id, text, comment_id } = getFormData(formDataLens, forms) // eslint-disable-line camelcase
@@ -427,17 +451,29 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
 
     render() {
       const { forms, onUpdate, cancelReply, formDataLens } = this.props
-      const { replying } = this.state
+      const { replying, popupVisible } = this.state
       const { text } = getFormData(formDataLens, forms)
 
-      return commentForm(
-        this.onSubmit,
-        text,
-        onUpdate,
-        cancelReply,
-        false,
-        replying,
-        false
+      return (
+        <React.Fragment>
+          <LoginPopup
+            message={commentLoginText}
+            visible={popupVisible}
+            closePopup={this.onTogglePopup}
+            className="downshift"
+          />
+          {commentForm(
+            this.onSubmit,
+            text,
+            onUpdate,
+            cancelReply,
+            false,
+            replying || userIsAnonymous(),
+            false,
+            false,
+            this.onTogglePopup
+          )}
+        </React.Fragment>
       )
     }
   }

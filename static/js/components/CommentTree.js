@@ -13,6 +13,7 @@ import CommentRemovalForm from "./CommentRemovalForm"
 import { renderTextContent } from "./Markdown"
 import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
 import DropdownMenu from "../components/DropdownMenu"
+import ReplyButton from "./ReplyButton"
 import SharePopup from "./SharePopup"
 
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
@@ -102,9 +103,7 @@ export default class CommentTree extends React.Component<Props> {
       curriedDropdownMenufunc,
       dropdownMenus
     } = this.props
-    const formKey = replyToCommentKey(comment)
     const editFormKey = editCommentKey(comment)
-    const initialValue = getCommentReplyInitialValue(comment)
 
     const { showDropdown, hideDropdown } = curriedDropdownMenufunc(
       commentDropdownKey(comment)
@@ -125,21 +124,19 @@ export default class CommentTree extends React.Component<Props> {
             downvote={downvote}
           />
         ) : null}
-        {atMaxDepth ||
-        moderationUI ||
-        comment.deleted ||
-        userIsAnonymous() ? null : (
-            <div
-              className="comment-action-button reply-button"
-              onClick={e => {
-                if (beginEditing) {
-                  beginEditing(formKey, initialValue, e)
-                }
-              }}
-            >
-            reply
-            </div>
-          )}
+        {atMaxDepth || moderationUI || comment.deleted ? null : (
+          <ReplyButton
+            beginEditing={e => {
+              if (beginEditing) {
+                beginEditing(
+                  replyToCommentKey(comment),
+                  getCommentReplyInitialValue(comment),
+                  e
+                )
+              }
+            }}
+          />
+        )}
         <div className="share-button-wrapper">
           <div
             className="comment-action-button share-button"

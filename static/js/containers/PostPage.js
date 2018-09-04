@@ -43,13 +43,7 @@ import {
   toggleFollowPost,
   toggleFollowComment
 } from "../util/api_actions"
-import {
-  getChannelName,
-  getPostID,
-  getCommentID,
-  userIsAnonymous,
-  truncate
-} from "../lib/util"
+import { getChannelName, getPostID, getCommentID, truncate } from "../lib/util"
 import {
   anyErrorExcept404,
   anyErrorExcept404or410,
@@ -456,7 +450,7 @@ class PostPage extends React.Component<PostPageProps> {
               postShareMenuOpen={postShareMenuOpen}
               channel={channel}
             />
-            {showPermalinkUI || userIsAnonymous() ? null : (
+            {showPermalinkUI ? null : (
               <ReplyToPostForm
                 forms={forms}
                 post={post}

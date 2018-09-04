@@ -67,6 +67,10 @@
   margin-top: 10px;
   min-width: 255px;
 
+  &.downshift {
+    margin-top: 50px;
+  }
+
   .close-popup {
     position: absolute;
     top: 0px;
@@ -94,7 +98,7 @@
     border: 1px solid #972c37;
     color: #972c37;
     text-align: center;
-    margin: 10px 0 10px;
+    margin: 10px 5px 10px;
   }
 
   .red {
