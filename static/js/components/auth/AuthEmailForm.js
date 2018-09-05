@@ -36,7 +36,7 @@ const AuthEmailForm = ({
       </div>
       {SETTINGS.recaptchaKey && onRecaptcha ? (
         <div className="recaptcha row">
-          <ReCAPTCHA sitekey={SETTINGS.recaptchaKey} onChange={onRecaptcha} />,
+          <ReCAPTCHA sitekey={SETTINGS.recaptchaKey} onChange={onRecaptcha} />
           {validationMessage(validation.recaptcha)}
         </div>
       ) : null}
