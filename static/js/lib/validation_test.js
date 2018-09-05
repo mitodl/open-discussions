@@ -254,6 +254,7 @@ describe("validation library", () => {
       ([validatorFunc, validatorDesc, emailInput, expectedErrorMsg]) => {
         it(`for ${validatorDesc} should show the right error message given an email='${emailInput}'`, () => {
           SETTINGS.allow_saml_auth = true
+          SETTINGS.recaptchaKey = ""
           const form = { value: { email: emailInput } }
           assert.deepEqual(validatorFunc(form), {
             value: {
@@ -266,8 +267,29 @@ describe("validation library", () => {
 
     it("for new email should not invalidate an MIT email if allow_saml_auth=false", () => {
       SETTINGS.allow_saml_auth = false
+      SETTINGS.recaptchaKey = ""
       const form = { value: { email: "user@mit.edu" } }
       assert.deepEqual(validateNewEmailForm(form), {})
+    })
+
+    it(`for new email should validate recaptcha if enabled`, () => {
+      SETTINGS.recaptchaKey = "fake"
+      const form = {
+        value: { email: "user@mit.edu", recaptcha: "fake_response" }
+      }
+      assert.deepEqual(validateNewEmailForm(form), {})
+    })
+
+    it(`for new email should invalidate recaptcha value of null/empty if enabled`, () => {
+      [null, ""].forEach(recaptcha => {
+        SETTINGS.recaptchaKey = "fake"
+        const form = { value: { email: "user@mit.edu", recaptcha } }
+        assert.deepEqual(validateNewEmailForm(form), {
+          value: {
+            recaptcha: "Please verify you're not a robot"
+          }
+        })
+      })
     })
   })
 

@@ -3,7 +3,8 @@
 // Form types
 
 export type EmailForm = {
-  email: string
+  email: string,
+  recaptcha?: string
 }
 
 export type PasswordForm = {

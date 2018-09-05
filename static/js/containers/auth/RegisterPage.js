@@ -70,6 +70,7 @@ const onSubmit = (form: EmailForm) =>
 const mergeProps = mergeAndInjectProps(
   (stateProps, { setBannerMessage }, { history }) => ({
     // Used by withForm()
+    useRecaptcha:   true,
     onSubmitResult: (response: AuthResponse) => {
       processAuthResponse(history, response)
       if (response.state === STATE_REGISTER_CONFIRM_SENT && response.email) {

@@ -498,6 +498,7 @@ STATUS_TOKEN = get_string("STATUS_TOKEN", "")
 HEALTH_CHECK = ['CELERY', 'REDIS', 'POSTGRES', 'ELASTIC_SEARCH']
 
 GA_TRACKING_ID = get_string("GA_TRACKING_ID", "")
+RECAPTCHA_SITE_KEY = get_string("RECAPTCHA_SITE_KEY", "")
 REACT_GA_DEBUG = get_bool("REACT_GA_DEBUG", False)
 
 MEDIA_ROOT = get_string('MEDIA_ROOT', '/var/media/')

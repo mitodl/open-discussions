@@ -183,6 +183,10 @@
     "PGBOUNCER_MIN_POOL_SIZE": {
       "value": "5"
     },
+    "RECAPTCHA_SITE_KEY": {
+      "description": "Google Recaptcha site key",
+      "required": false
+    },
     "SOCIAL_AUTH_SAML_LOGIN_URL": {
       "description": "Custom login url for SAML",
       "required": false

@@ -40,6 +40,14 @@ const withForm = <T>(FormComponent: FormComponentCls<T>) => (
       })
     }
 
+    onRecaptcha = (response: string) => {
+      const { formUpdate } = this.props
+      // $FlowFixMe
+      formUpdate({
+        ["recaptcha"]: response
+      })
+    }
+
     onSubmit = async (e?: Object) => {
       const {
         form,
@@ -77,12 +85,13 @@ const withForm = <T>(FormComponent: FormComponentCls<T>) => (
     }
 
     render() {
-      const { form, processing } = this.props
+      const { form, processing, useRecaptcha } = this.props
       const renderForm = props =>
         form ? (
           <FormComponent
             onUpdate={this.onUpdate}
             onSubmit={this.onSubmit}
+            onRecaptcha={useRecaptcha ? this.onRecaptcha : null}
             processing={processing}
             form={form.value}
             validation={form.errors}

@@ -1,6 +1,8 @@
 // @flow
+/* global SETTINGS:false */
 import React from "react"
 import R from "ramda"
+import ReCAPTCHA from "react-google-recaptcha"
 
 import { validationMessage } from "../../lib/validation"
 
@@ -16,6 +18,7 @@ const AuthEmailForm = ({
   validation,
   onSubmit,
   onUpdate,
+  onRecaptcha,
   processing,
   formError
 }: LoginFormProps) => {
@@ -31,6 +34,12 @@ const AuthEmailForm = ({
         />
         {validationMessage(validation.email)}
       </div>
+      {SETTINGS.recaptchaKey && onRecaptcha ? (
+        <div className="recaptcha row">
+          <ReCAPTCHA sitekey={SETTINGS.recaptchaKey} onChange={onRecaptcha} />,
+          {validationMessage(validation.recaptcha)}
+        </div>
+      ) : null}
       <div className="error row">
         {!processing && R.isEmpty(validation)
           ? validationMessage(formError)
