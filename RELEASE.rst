@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.44.1
+--------------
+
+- LoginPopup for comment reply buttons and post reply form (#1131)
+- Added back button to login pages
+- Add title and headline fields to edit channel appearance page (#1148)
+- fix app.json
+
 Version 0.44.0 (Released September 04, 2018)
 --------------
 
