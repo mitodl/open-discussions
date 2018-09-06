@@ -101,8 +101,8 @@ describe("withPostList", () => {
         sinon.assert.notCalled(loadPosts)
       })
       ;[
-        ["?sort=some_sort&after=different_after", {sort: "some_sort"}],
-        ["", {}],
+        ["?sort=some_sort&after=different_after", { sort: "some_sort" }],
+        ["", {}]
       ].forEach(([search, expectedExtraParams]) => {
         it(`${
           search ? "has" : "doesn't have"
@@ -152,27 +152,27 @@ describe("withPostList", () => {
         assert.equal(innerStub.firstCall.args[1], post)
       })
       ;[
-        ["reportPost", "showReportPost"],
-        ["removePost", "showRemovePost"]
-      ].forEach(([prop, showProp]) => {
-        [true, false].forEach(showPropValue => {
-          it(`${
-            showProp ? "passes" : "doesn't pass"
-          } through ${prop} when ${String(showProp)}=${String(
-            showPropValue
-          )}`, async () => {
-            const { inner } = await render(
-              {},
-              {
-                [prop]:     prop,
-                [showProp]: showProp
-              }
-            )
-            assert.equal(
-              inner.find("PostList").props()[prop],
-              showProp ? prop : null
-            )
-          })
+        ["reportPost", "showReportPost", true],
+        ["removePost", "showRemovePost", true],
+        ["reportPost", "showReportPost", false],
+        ["removePost", "showRemovePost", false]
+      ].forEach(([prop, showProp, showPropValue]) => {
+        it(`${
+          showProp ? "passes" : "doesn't pass"
+        } through ${prop} when ${String(showProp)}=${String(
+          showPropValue
+        )}`, async () => {
+          const { inner } = await render(
+            {},
+            {
+              [prop]:     prop,
+              [showProp]: showProp
+            }
+          )
+          assert.equal(
+            inner.find("PostList").props()[prop],
+            showProp ? prop : null
+          )
         })
       })
       ;["showPinUI", "showChannelLinks", "isModerator"].forEach(propName => {
