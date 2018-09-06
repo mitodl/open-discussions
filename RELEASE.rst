@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.44.1
+Version 0.44.1 (Released September 06, 2018)
 --------------
 
 - LoginPopup for comment reply buttons and post reply form (#1131)
