@@ -9,6 +9,8 @@ import { Link } from "react-router-dom"
 import Card from "../../components/Card"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
 import withForm from "../../hoc/withForm"
+import ExternalLogins from "../../components/ExternalLogins"
+import CanonicalLink from "../../components/CanonicalLink"
 
 import { actions } from "../../actions"
 import { setAuthUserDetail } from "../../actions/ui"
@@ -24,15 +26,16 @@ import {
   isProcessing
 } from "../../reducers/auth"
 
+import type { Match } from "react-router"
 import type {
   AuthResponse,
   EmailDetailAuthResponse,
   EmailForm
 } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
-import ExternalLogins from "../../components/ExternalLogins"
 
 type LoginPageProps = {
+  match: Match,
   history: Object,
   formError: ?string,
   clearEndpointState: Function
@@ -47,7 +50,7 @@ export class LoginPage extends React.Component<LoginPageProps> {
   }
 
   render() {
-    const { renderForm, formError } = this.props
+    const { renderForm, formError, match } = this.props
 
     return (
       <div className="content auth-page login-page">
@@ -56,6 +59,7 @@ export class LoginPage extends React.Component<LoginPageProps> {
             <h3>Login</h3>
             <MetaTags>
               <title>{formatTitle("Login")}</title>
+              <CanonicalLink match={match} />
             </MetaTags>
             {renderForm({ formError })}
             <ExternalLogins />

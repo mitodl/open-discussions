@@ -9,6 +9,7 @@ import Card from "../components/Card"
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
 import withLoading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
@@ -64,6 +65,7 @@ class ProfilePage extends React.Component<Props> {
       <div className="profile-page">
         <MetaTags>
           <title>{formatTitle(`Profile for ${profile.name}`)}</title>
+          <CanonicalLink relativeUrl="profile" />
         </MetaTags>
         <div className="main-content">
           <Card>

@@ -2,6 +2,8 @@
 import R from "ramda"
 import casual from "casual-browserify"
 
+import type { Match } from "react-router"
+
 export const arrayN = (min: number, max: number) =>
   R.range(0, casual.integer(min, max))
 
@@ -17,3 +19,10 @@ export function* incrementer(): Generator<number, *, *> {
     yield int++
   }
 }
+
+export const makeMatch = (url: string): Match => ({
+  url:     url,
+  isExact: true,
+  params:  {},
+  path:    ""
+})

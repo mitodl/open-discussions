@@ -9,6 +9,7 @@ import ProfileForm from "../components/ProfileForm"
 import Card from "../components/Card"
 import withLoading from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
@@ -120,6 +121,7 @@ class ProfileEditPage extends React.Component<Props> {
       <div className="profile-page">
         <MetaTags>
           <title>{formatTitle("Edit your profile")}</title>
+          <CanonicalLink relativeUrl="profile/edit" />
         </MetaTags>
         <div className="main-content">
           <Card>

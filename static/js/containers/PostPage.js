@@ -25,6 +25,7 @@ import {
 } from "../hoc/withCommentModeration"
 import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import { CommentSortPicker } from "../components/SortPicker"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/sorting"
 import {
@@ -350,6 +351,7 @@ class PostPage extends React.Component<PostPageProps> {
   render() {
     const {
       dispatch,
+      match,
       post,
       channel,
       commentsTree,
@@ -384,6 +386,7 @@ class PostPage extends React.Component<PostPageProps> {
       <div>
         <MetaTags>
           <title>{formatTitle(post.title)}</title>
+          <CanonicalLink match={match} />
           <meta name="description" content={truncate(post.text, 300)} />
         </MetaTags>
         <ChannelBreadcrumbs channel={channel} />

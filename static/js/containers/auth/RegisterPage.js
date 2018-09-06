@@ -10,6 +10,7 @@ import Card from "../../components/Card"
 import ExternalLogins from "../../components/ExternalLogins"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
 import withForm from "../../hoc/withForm"
+import CanonicalLink from "../../components/CanonicalLink"
 
 import { actions } from "../../actions"
 import { setBannerMessage } from "../../actions/ui"
@@ -25,21 +26,28 @@ import { LOGIN_URL } from "../../lib/url"
 import { validateNewEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 
+import type { Match } from "react-router"
 import type { EmailForm, AuthResponse } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
 
 type RegisterPageProps = {
+  match: Match,
   history: Object,
   formError: ?string
 } & WithFormProps<EmailForm>
 
-export const RegisterPage = ({ renderForm, formError }: RegisterPageProps) => (
+export const RegisterPage = ({
+  renderForm,
+  formError,
+  match
+}: RegisterPageProps) => (
   <div className="content auth-page register-page">
     <div className="main-content">
       <Card className="register-card">
         <h3>Join MIT OPEN for free</h3>
         <MetaTags>
           <title>{formatTitle("Register")}</title>
+          <CanonicalLink match={match} />
         </MetaTags>
         {renderForm({ formError })}
         <ExternalLogins />

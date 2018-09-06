@@ -9,6 +9,7 @@ import Card from "../../components/Card"
 import PasswordResetForm from "../../components/auth/PasswordResetForm"
 import ExternalLogins from "../../components/ExternalLogins"
 import withForm from "../../hoc/withForm"
+import CanonicalLink from "../../components/CanonicalLink"
 
 import { actions } from "../../actions"
 import { configureForm } from "../../lib/forms"
@@ -16,10 +17,12 @@ import { formatTitle } from "../../lib/title"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 
+import type { Match } from "react-router"
 import type { WithFormProps } from "../../flow/formTypes"
 import type { EmailForm } from "../../flow/authTypes"
 
 type PasswordResetPageProps = {
+  match: Match,
   emailApiError: ?Object,
   successfullySubmitted: boolean
 } & WithFormProps<EmailForm>
@@ -27,7 +30,8 @@ type PasswordResetPageProps = {
 export const PasswordResetPage = ({
   renderForm,
   emailApiError,
-  successfullySubmitted
+  successfullySubmitted,
+  match
 }: PasswordResetPageProps) => (
   <div className="content auth-page password-reset-page">
     <div className="main-content">
@@ -43,6 +47,7 @@ export const PasswordResetPage = ({
         <Card className="login-card">
           <MetaTags>
             <title>{formatTitle("Password Reset")}</title>
+            <CanonicalLink match={match} />
           </MetaTags>
           <h3>Forgot your password?</h3>
           {renderForm({ emailApiError })}

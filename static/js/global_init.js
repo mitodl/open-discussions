@@ -27,7 +27,8 @@ const _createSettings = () => ({
   support_email:      "support@fake.url",
   reactGaDebug:       true,
   gaTrackingID:       "fake",
-  embedlyKey:         "fake"
+  embedlyKey:         "fake",
+  public_path:        "http://fake.open.url/"
 })
 
 global.SETTINGS = _createSettings()

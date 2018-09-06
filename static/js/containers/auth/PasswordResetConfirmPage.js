@@ -8,6 +8,7 @@ import R from "ramda"
 import Card from "../../components/Card"
 import PasswordResetConfirmForm from "../../components/auth/PasswordResetConfirmForm"
 import withForm from "../../hoc/withForm"
+import CanonicalLink from "../../components/CanonicalLink"
 
 import { actions } from "../../actions"
 import { configureForm } from "../../lib/forms"
@@ -43,6 +44,7 @@ export const PasswordResetConfirmPage = ({
           <h3>Enter your new password</h3>
           <MetaTags>
             <title>{formatTitle("Password Reset")} </title>
+            <CanonicalLink relativeUrl="password_reset/confirm" />
           </MetaTags>
           {renderForm({ tokenApiError })}
         </Card>

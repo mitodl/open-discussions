@@ -4,9 +4,16 @@ import React from "react"
 import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
+import CanonicalLink from "../../components/CanonicalLink"
 import { formatTitle } from "../../lib/title"
 
-const InactiveUserPage = () => {
+import type { Match } from "react-router"
+
+type Props = {
+  match?: Match
+}
+
+const InactiveUserPage = ({ match }: Props) => {
   const supportEmail = SETTINGS.support_email
   return (
     <div className="content auth-page inactive-account-page">
@@ -15,6 +22,7 @@ const InactiveUserPage = () => {
           <h3>Log In</h3>
           <MetaTags>
             <title>{formatTitle("Account is inactive")}</title>
+            <CanonicalLink match={match} />
           </MetaTags>
           <p>
             Your account is not currently active. To fix this, please email

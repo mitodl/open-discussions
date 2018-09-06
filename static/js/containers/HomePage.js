@@ -3,6 +3,7 @@ import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
 import qs from "query-string"
+import { MetaTags } from "react-meta-tags"
 
 import PostList from "../components/PostList"
 import withLoading from "../components/Loading"
@@ -13,6 +14,7 @@ import {
   withPostModeration,
   postModerationSelector
 } from "../hoc/withPostModeration"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
@@ -23,6 +25,7 @@ import { toggleUpvote } from "../util/api_actions"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 
+import type { Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { Location } from "react-router"
 import type { RestState } from "../flow/restTypes"
@@ -32,6 +35,7 @@ import type { Channel, Post, PostListPagination } from "../flow/discussionTypes"
 const shouldLoadData = R.complement(R.eqBy(R.path(["location", "search"])))
 
 type Props = {
+  match: Match,
   location: Location,
   dispatch: Dispatch<any>,
   posts: Array<Post>,
@@ -69,11 +73,15 @@ class HomePage extends React.Component<Props> {
       pagination,
       dispatch,
       location: { search },
-      reportPost
+      reportPost,
+      match
     } = this.props
 
     return (
       <React.Fragment>
+        <MetaTags>
+          <CanonicalLink match={match} />
+        </MetaTags>
         <div className="post-list-title">
           <div>Home</div>
           <PostSortPicker

@@ -111,3 +111,8 @@ export const makeUUID = (len: number) =>
     .map(int => int.toString(16))
     .join("")
     .slice(0, len)
+
+export const removeTrailingSlash = (str: string) =>
+  str.length > 0 && str[str.length - 1] === "/"
+    ? str.substr(0, str.length - 1)
+    : str

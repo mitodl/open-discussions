@@ -8,6 +8,7 @@ import Card from "../../components/Card"
 import AuthPasswordForm from "../../components/auth/AuthPasswordForm"
 import LoginGreeting from "../../components/auth/LoginGreeting"
 import withForm from "../../hoc/withForm"
+import CanonicalLink from "../../components/CanonicalLink"
 
 import { actions } from "../../actions"
 import { processAuthResponse, goToFirstLoginStep } from "../../lib/auth"
@@ -29,10 +30,12 @@ import {
   getAuthUiImgSelector
 } from "../../reducers/ui"
 
+import type { Match } from "react-router"
 import type { PasswordForm, AuthFlow } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
 
 type Props = {
+  match: Match,
   history: Object,
   partialToken: string,
   authFlow: AuthFlow,
@@ -57,7 +60,8 @@ export class LoginPasswordPage extends React.Component<Props> {
       email,
       name,
       profileImageUrl,
-      history
+      history,
+      match
     } = this.props
 
     const onBackButtonClick = preventDefaultAndInvoke(
@@ -70,6 +74,7 @@ export class LoginPasswordPage extends React.Component<Props> {
           <Card className="login-card">
             <MetaTags>
               <title>{formatTitle("Welcome Back!")}</title>
+              <CanonicalLink match={match} />
             </MetaTags>
             <div className="form-header">
               <div className="row">

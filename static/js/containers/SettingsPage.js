@@ -9,6 +9,7 @@ import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import Card from "../components/Card"
 import SettingsTabs from "../components/SettingsTabs"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { formatTitle } from "../lib/title"
 import { getTokenFromUrl } from "../lib/util"
@@ -128,6 +129,7 @@ class SettingsPage extends React.Component<Props> {
       <div className="content">
         <MetaTags>
           <title>{formatTitle("Settings")}</title>
+          <CanonicalLink relativeUrl="settings" />
         </MetaTags>
         <div className="main-content settings-page">
           <SettingsTabs />

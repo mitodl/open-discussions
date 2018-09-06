@@ -8,6 +8,7 @@ import Card from "../../components/Card"
 import TouchstoneLoginButton from "../../components/auth/TouchstoneLoginButton"
 import LoginGreeting from "../../components/auth/LoginGreeting"
 import { NotFound } from "../../components/ErrorPages"
+import CanonicalLink from "../../components/CanonicalLink"
 
 import { formatTitle } from "../../lib/title"
 import { getAuthProviderSelector } from "../../reducers/auth"
@@ -19,7 +20,10 @@ import {
 import { goToFirstLoginStep } from "../../lib/auth"
 import { preventDefaultAndInvoke } from "../../lib/util"
 
+import type { Match } from "react-router"
+
 type LoginProviderRequiredPageProps = {
+  match: Match,
   history: Object,
   provider: string,
   email: string,
@@ -47,7 +51,8 @@ export const LoginProviderRequiredPage = ({
   provider,
   email,
   name,
-  profileImageUrl
+  profileImageUrl,
+  match
 }: LoginProviderRequiredPageProps) => {
   const externalLink = renderExternalProviderLink(provider)
   if (!externalLink) {
@@ -64,6 +69,7 @@ export const LoginProviderRequiredPage = ({
         <Card className="login-provider-card">
           <MetaTags>
             <title>{formatTitle("Welcome Back!")}</title>
+            <CanonicalLink match={match} />
           </MetaTags>
           <LoginGreeting
             email={email}

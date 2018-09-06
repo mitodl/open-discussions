@@ -20,12 +20,14 @@ import withChannelSidebar from "../hoc/withChannelSidebar"
 import CompactPostDisplay from "../components/CompactPostDisplay"
 import CommentTree from "../components/CommentTree"
 import { ChannelModerationBreadcrumbs } from "../components/ChannelBreadcrumbs"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { commentPermalink, channelURL } from "../lib/url"
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
 import { dropdownMenuFuncs } from "../lib/ui"
 
+import type { Match } from "react-router"
 import type { Dispatch } from "redux"
 import type {
   Channel,
@@ -36,6 +38,7 @@ import type {
 const addDummyReplies = R.over(R.lensPath(["replies"]), () => [])
 
 type Props = {
+  match: Match,
   dispatch: Dispatch<*>,
   channelName: string,
   channel: Channel,
@@ -113,12 +116,13 @@ class ChannelModerationPage extends React.Component<Props> {
   }
 
   render() {
-    const { channel, reports, isModerator } = this.props
+    const { channel, reports, isModerator, match } = this.props
 
     return isModerator ? (
       <div className="channel-moderation">
         <MetaTags>
-          <title>{formatTitle(`${channel.title} moderation`)} </title>
+          <title>{formatTitle(`${channel.title} moderation`)}</title>
+          <CanonicalLink match={match} />
         </MetaTags>
         <ChannelModerationBreadcrumbs channel={channel} />
         {reports.length === 0 ? (

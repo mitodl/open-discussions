@@ -8,6 +8,7 @@ import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import CreatePostForm from "../components/CreatePostForm"
 import withSingleColumn from "../hoc/withSingleColumn"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { actions } from "../actions"
 import { setBannerMessage } from "../actions/ui"
@@ -210,6 +211,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
 
   render() {
     const {
+      match,
       channel,
       channels,
       postForm,
@@ -227,6 +229,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       <React.Fragment>
         <MetaTags>
           <title>{formatTitle("Submit a Post")}</title>
+          <CanonicalLink match={match} />
         </MetaTags>
         <CreatePostForm
           onSubmit={this.onSubmit}
