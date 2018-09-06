@@ -4,17 +4,27 @@ import React from "react"
 import { MetaTags } from "react-meta-tags"
 
 import Card from "../components/Card"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { formatTitle } from "../lib/title"
 
-export default class ContentPolicyPage extends React.Component<{}> {
+import type { Match } from "react-router"
+
+type Props = {
+  match: Match
+}
+
+export default class ContentPolicyPage extends React.Component<Props> {
   render() {
+    const { match } = this.props
+
     return (
       <div className="content content-policy-page">
         <MetaTags>
           <title>
             {formatTitle("MicroMasters Discussions Community Guidelines")}
           </title>
+          <CanonicalLink match={match} />
         </MetaTags>
         <div className="main-content">
           <Card className="content-policy">

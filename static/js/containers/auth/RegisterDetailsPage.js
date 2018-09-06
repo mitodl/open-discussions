@@ -7,6 +7,7 @@ import { MetaTags } from "react-meta-tags"
 import Card from "../../components/Card"
 import AuthDetailsForm from "../../components/auth/AuthDetailsForm"
 import withForm from "../../hoc/withForm"
+import CanonicalLink from "../../components/CanonicalLink"
 
 import { actions } from "../../actions"
 import { processAuthResponse } from "../../lib/auth"
@@ -21,10 +22,12 @@ import {
   FLOW_REGISTER
 } from "../../reducers/auth"
 
+import type { Match } from "react-router"
 import type { DetailsForm } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
 
 type RegisterDetailsPageProps = {
+  match: Match,
   history: Object,
   partialToken: string,
   formError: ?string
@@ -32,7 +35,8 @@ type RegisterDetailsPageProps = {
 
 export const RegisterDetailsPage = ({
   renderForm,
-  formError
+  formError,
+  match
 }: RegisterDetailsPageProps) => (
   <div className="content auth-page register-details-page">
     <div className="main-content">
@@ -41,6 +45,7 @@ export const RegisterDetailsPage = ({
         <h4>Last details:</h4>
         <MetaTags>
           <title>{formatTitle("Thanks for confirming!")}</title>
+          <CanonicalLink match={match} />
         </MetaTags>
         {renderForm({ formError })}
       </Card>

@@ -8,14 +8,17 @@ import { Link } from "react-router-dom"
 
 import Card from "../components/Card"
 import SettingsTabs from "../components/SettingsTabs"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
 
+import type { Match } from "react-router"
 import type { SocialAuth } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
 
 type Props = {
+  match: Match,
   dispatch: Dispatch<*>,
   socialAuths: Array<SocialAuth>
 }
@@ -62,12 +65,13 @@ class AccountSettingsPage extends React.Component<Props> {
   }
 
   render() {
-    const { socialAuths } = this.props
+    const { socialAuths, match } = this.props
 
     return (
       <div className="content">
         <MetaTags>
           <title>{formatTitle("Account Settings")}</title>
+          <CanonicalLink match={match} />
         </MetaTags>
         <div className="main-content settings-page">
           <SettingsTabs />

@@ -15,6 +15,7 @@ import {
   withPostModeration,
   postModerationSelector
 } from "../hoc/withPostModeration"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
@@ -121,6 +122,7 @@ class ChannelPage extends React.Component<ChannelPageProps> {
   render() {
     const {
       dispatch,
+      match,
       channel,
       subscribedChannels,
       posts,
@@ -139,6 +141,7 @@ class ChannelPage extends React.Component<ChannelPageProps> {
         <React.Fragment>
           <MetaTags>
             <title>{formatTitle(channel.title)}</title>
+            <CanonicalLink match={match} />
           </MetaTags>
           <div className="post-list-title">
             <div>{channel.title}</div>

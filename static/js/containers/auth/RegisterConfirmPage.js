@@ -8,12 +8,15 @@ import { Link } from "react-router-dom"
 
 import Card from "../../components/Card"
 import { Loading } from "../../components/Loading"
+import CanonicalLink from "../../components/CanonicalLink"
 
 import { actions } from "../../actions"
 import { processAuthResponse } from "../../lib/auth"
 import { formatTitle } from "../../lib/title"
 import { REGISTER_URL } from "../../lib/url"
 import { STATE_INVALID_EMAIL, FLOW_REGISTER } from "../../reducers/auth"
+
+import type { Match } from "react-router"
 
 const onResult = R.curry(processAuthResponse)
 
@@ -32,6 +35,7 @@ const partialTokenFromLocation = R.compose(
 const isInvalid = R.pathEq(["data", "state"], STATE_INVALID_EMAIL)
 
 type Props = {
+  match: Match,
   confirmCode: Function,
   location: Object,
   history: Object,
@@ -49,7 +53,7 @@ export class RegisterConfirmPage extends React.Component<Props, *> {
   }
 
   render() {
-    const { location, invalid } = this.props
+    const { location, invalid, match } = this.props
 
     const code = confirmationCodeFromLocation(location)
     const partialToken = partialTokenFromLocation(location)
@@ -62,6 +66,7 @@ export class RegisterConfirmPage extends React.Component<Props, *> {
             <h3>Confirming Email</h3>
             <MetaTags>
               <title>{formatTitle("Confirming Email")}</title>
+              <CanonicalLink match={match} />
             </MetaTags>
             {showLoading ? (
               <Loading />

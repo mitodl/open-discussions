@@ -9,6 +9,7 @@ import { FETCH_SUCCESS } from "redux-hammock/constants"
 import Card from "../components/Card"
 import PasswordChangeForm from "../components/PasswordChangeForm"
 import withForm from "../hoc/withForm"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
@@ -17,9 +18,11 @@ import { configureForm } from "../lib/forms"
 import { ACCOUNT_SETTINGS_URL } from "../lib/url"
 import { validatePasswordChangeForm as validateForm } from "../lib/validation"
 
+import type { Match } from "react-router"
 import type { PwChangeForm } from "../flow/authTypes"
 
 type Props = {
+  match: Match,
   clearPasswordChange: Function,
   successfullySubmitted: boolean,
   renderForm: Function,
@@ -39,11 +42,17 @@ export class PasswordChangePage extends React.Component<Props> {
   }
 
   render() {
-    const { renderForm, successfullySubmitted, invalidPwError } = this.props
+    const {
+      renderForm,
+      successfullySubmitted,
+      invalidPwError,
+      match
+    } = this.props
     return (
       <div className="content">
         <MetaTags>
           <title>{formatTitle("Change Password")}</title>
+          <CanonicalLink match={match} />
         </MetaTags>
         <div className="main-content settings-page">
           <h4>Change Password</h4>
