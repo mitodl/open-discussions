@@ -18,8 +18,10 @@ export const NotFound = ErrorPage(
   "Page not found",
   "This is a 404 error. This is not the page you were looking for."
 )
+NotFound.displayName = "NotFound"
 
 export const NotAuthorized = ErrorPage(
   "Stop! Who goes there?",
   "You do not have permission to view this page."
 )
+NotAuthorized.displayName = "NotAuthorized"

@@ -1,9 +1,9 @@
 // @flow
 import React from "react"
 import { assert } from "chai"
-import { mount } from "enzyme"
+import { shallow, mount } from "enzyme"
 
-import withLoading from "./Loading"
+import withLoading, { Loading } from "./Loading"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 
 class Content extends React.Component<*> {
@@ -49,21 +49,23 @@ describe("Loading", () => {
     const wrapper = renderLoading()
     assert.equal(wrapper.text(), "Error loading page")
   })
-
-  it("should show NotFound if notFound", () => {
-    props.notFound = true
-    const wrapper = renderLoading()
-    assert.ok(wrapper.find(NotFound).exists())
-  })
-
-  it("should show NotAuthorized if notAuthorized", () => {
-    props.notAuthorized = true
-    const wrapper = renderLoading()
-    assert.ok(wrapper.find(NotAuthorized).exists())
-  })
+  ;[["notFound", NotFound], ["notAuthorized", NotAuthorized]].forEach(
+    ([propName, expectedComponent]) => {
+      it(`should show ${expectedComponent.displayName} if ${propName}`, () => {
+        props[propName] = true
+        const wrapper = renderLoading()
+        assert.ok(wrapper.find(expectedComponent).exists())
+      })
+    }
+  )
 
   it("should the contents if no errors and loaded", () => {
     const wrapper = renderLoading()
     assert.equal(wrapper.text(), "CONTENT")
+  })
+
+  it("passes the className to the containing div", () => {
+    const wrapper = shallow(<Loading className="abc xyz" />)
+    assert.equal(wrapper.props().className, "loading abc xyz")
   })
 })

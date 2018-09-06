@@ -58,5 +58,7 @@ const SortPicker = labels => {
 }
 
 export const PostSortPicker = SortPicker(VALID_POST_SORT_LABELS)
+PostSortPicker.displayName = "PostSortPicker"
 
 export const CommentSortPicker = SortPicker(VALID_COMMENT_SORT_LABELS)
+CommentSortPicker.displayName = "CommentSortPicker"

@@ -6,24 +6,21 @@ import qs from "query-string"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
-import PostList from "../components/PostList"
+import CanonicalLink from "../components/CanonicalLink"
 import withLoading from "../components/Loading"
-import PostListNavigation from "../components/PostListNavigation"
 import withChannelSidebar from "../hoc/withChannelSidebar"
 import { PostSortPicker } from "../components/SortPicker"
 import {
   withPostModeration,
   postModerationSelector
 } from "../hoc/withPostModeration"
-import CanonicalLink from "../components/CanonicalLink"
+import withPostList from "../hoc/withPostList"
 
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
 import { safeBulkGet } from "../lib/maps"
 import { getChannelName } from "../lib/util"
 import { getPostIds } from "../lib/posts"
-import { channelURL } from "../lib/url"
-import { toggleUpvote } from "../util/api_actions"
 import { anyErrorExcept404 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { formatTitle } from "../lib/title"
@@ -50,7 +47,10 @@ type ChannelPageProps = {
   isModerator: boolean,
   notFound: boolean,
   reportPost: (p: Post) => void,
-  removePost: (p: Post) => void
+  removePost: (p: Post) => void,
+  canLoadPosts: boolean,
+  renderPosts: Function,
+  loadPosts: (search: PostListPagination) => Promise<*>
 }
 
 const shouldLoadData = R.complement(
@@ -62,7 +62,7 @@ const shouldLoadData = R.complement(
   ])
 )
 
-class ChannelPage extends React.Component<ChannelPageProps> {
+export class ChannelPage extends React.Component<ChannelPageProps> {
   componentDidMount() {
     this.loadData()
   }
@@ -71,18 +71,11 @@ class ChannelPage extends React.Component<ChannelPageProps> {
     this.clearData(this.props.channelName)
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: ChannelPageProps) {
     if (shouldLoadData(prevProps, this.props)) {
       this.clearData(prevProps.channelName)
       this.loadData()
     }
-  }
-
-  togglePinPost = async (post: Post) => {
-    const { dispatch } = this.props
-
-    await dispatch(actions.posts.patch(post.id, { stickied: !post.stickied }))
-    this.fetchPostsForChannel()
   }
 
   clearData = (channelName: string) => {
@@ -91,7 +84,14 @@ class ChannelPage extends React.Component<ChannelPageProps> {
   }
 
   loadData = async () => {
-    const { dispatch, errored, notFound, channelName } = this.props
+    const {
+      dispatch,
+      errored,
+      notFound,
+      channelName,
+      loadPosts,
+      location: { search }
+    } = this.props
     if (errored || notFound) {
       dispatch(clearChannelError())
       dispatch(clearPostError())
@@ -99,39 +99,18 @@ class ChannelPage extends React.Component<ChannelPageProps> {
 
     try {
       await dispatch(actions.channels.get(channelName))
-
-      this.fetchPostsForChannel()
+      await loadPosts(qs.parse(search))
     } catch (_) {} // eslint-disable-line no-empty
-  }
-
-  fetchPostsForChannel = async () => {
-    const {
-      dispatch,
-      channelName,
-      location: { search }
-    } = this.props
-
-    const {
-      response: { posts }
-    } = await dispatch(
-      actions.postsForChannel.get(channelName, qs.parse(search))
-    )
-    dispatch(setPostData(posts))
   }
 
   render() {
     const {
-      dispatch,
       match,
       channel,
       subscribedChannels,
       posts,
-      pagination,
-      channelName,
-      isModerator,
       location: { search },
-      reportPost,
-      removePost
+      renderPosts
     } = this.props
 
     if (!channel || !subscribedChannels || !posts) {
@@ -150,25 +129,7 @@ class ChannelPage extends React.Component<ChannelPageProps> {
               value={qs.parse(search).sort || POSTS_SORT_HOT}
             />
           </div>
-          <PostList
-            channel={channel}
-            posts={posts}
-            toggleUpvote={toggleUpvote(dispatch)}
-            isModerator={isModerator}
-            togglePinPost={this.togglePinPost}
-            reportPost={reportPost}
-            removePost={removePost}
-            showPinUI
-          />
-          {pagination ? (
-            <PostListNavigation
-              after={pagination.after}
-              afterCount={pagination.after_count}
-              before={pagination.before}
-              beforeCount={pagination.before_count}
-              pathname={channelURL(channelName)}
-            />
-          ) : null}
+          {renderPosts()}
         </React.Fragment>
       )
     }
@@ -199,12 +160,18 @@ const mapStateToProps = (state, ownProps) => {
     channelName,
     channel,
     loaded,
+    canLoadMore:        !state.postsForChannel.processing,
     notFound,
     notAuthorized,
     isModerator:        userIsModerator,
     pagination:         postsForChannel.pagination,
     posts:              safeBulkGet(postIds, state.posts.data),
     subscribedChannels: getSubscribedChannels(state),
+    showPinUI:          true,
+    showChannelLinks:   false,
+    showReportPost:     true,
+    showRemovePost:     true,
+    showTogglePinPost:  true,
     errored:            anyErrorExcept404([
       channels,
       state.posts,
@@ -213,10 +180,29 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
+const mapDispatchToProps = (
+  dispatch: Dispatch<any>,
+  ownProps: ChannelPageProps
+) => ({
+  loadPosts: async (search: Object) => {
+    const channelName = getChannelName(ownProps)
+
+    const response = await dispatch(
+      actions.postsForChannel.get(channelName, search)
+    )
+    dispatch(setPostData(response.response.posts))
+  },
+  dispatch: dispatch
+})
+
 export default R.compose(
-  connect(mapStateToProps),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
   withPostModeration,
   withChannelSidebar("channel-page"),
   withChannelTracker,
+  withPostList,
   withLoading
 )(ChannelPage)

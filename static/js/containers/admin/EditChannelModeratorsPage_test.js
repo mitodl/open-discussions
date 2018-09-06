@@ -284,7 +284,7 @@ describe("EditChannelModeratorsPage", () => {
       helper.deleteChannelModeratorStub.returns(Promise.resolve())
 
       if (isYou) {
-        // this will be checked after the refresh
+        // this will be checked after the loadPosts
         channel.user_is_moderator = false
         helper.getChannelStub.returns(Promise.resolve(channel))
       }

@@ -110,10 +110,11 @@ export type CreatePostPayload = {
 }
 
 export type PostListPagination = {
-  after:        ?string,
-  after_count:  ?number,
-  before:       ?string,
-  before_count: ?number
+  after?:        string,
+  after_count?:  number,
+  before?:       string,
+  before_count?: number,
+  sort:          string,
 }
 
 export type PostListPaginationParams = {
@@ -123,7 +124,7 @@ export type PostListPaginationParams = {
 }
 
 export type PostListData = {
-  pagination: PostListPagination,
+  pagination: PostListPagination | null,
   postIds:    Array<string>
 }
 

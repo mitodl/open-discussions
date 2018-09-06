@@ -3,15 +3,17 @@ import React from "react"
 import { assert } from "chai"
 import sinon from "sinon"
 import { shallow } from "enzyme"
+import R from "ramda"
 
 import {
   newPostForm,
   formatCommentsCount,
   PostVotingButtons,
   PostTitleAndHostname,
-  formatPostTitle
+  formatPostTitle,
+  mapPostListResponse
 } from "./posts"
-import { makePost } from "../factories/posts"
+import { makeChannelPostList, makePost } from "../factories/posts"
 import { urlHostname } from "./url"
 import * as utilFuncs from "./util"
 import LoginPopup from "../components/LoginPopup"
@@ -93,6 +95,81 @@ describe("Post utils", () => {
         wrapper.find(".url-hostname").text(),
         urlHostname(post.url)
       )
+    })
+  })
+
+  describe("mapPostListResponse", () => {
+    let posts, postIds, oldPosts, oldPostIds
+
+    beforeEach(() => {
+      posts = makeChannelPostList()
+      postIds = posts.map(post => post.id)
+      oldPosts = makeChannelPostList()
+      oldPostIds = oldPosts.map(post => post.id)
+    })
+
+    it("clears existing post ids if there is no existing pagination", () => {
+      const response = {
+        pagination: {
+          sort: "new"
+        },
+        posts: posts
+      }
+      const data = {
+        pagination: null,
+        postIds:    oldPostIds
+      }
+      const returnValue = mapPostListResponse(response, data)
+      assert.deepEqual(returnValue, {
+        postIds:    postIds,
+        pagination: {
+          sort: "new"
+        }
+      })
+    })
+
+    it("clears existing post ids if the old and new paginations don't match", () => {
+      const response = {
+        pagination: {
+          sort: "new"
+        },
+        posts: posts
+      }
+      const data = {
+        pagination: {
+          sort: "hot"
+        },
+        postIds: oldPostIds
+      }
+      const returnValue = mapPostListResponse(response, data)
+      assert.deepEqual(returnValue, {
+        postIds:    postIds,
+        pagination: {
+          sort: "new"
+        }
+      })
+    })
+
+    it("concats new posts after old posts, removing duplicates", () => {
+      const response = {
+        pagination: {
+          sort: "hot"
+        },
+        posts: posts
+      }
+      const data = {
+        pagination: {
+          sort: "hot"
+        },
+        postIds: oldPostIds
+      }
+      const returnValue = mapPostListResponse(response, data)
+      assert.deepEqual(returnValue, {
+        postIds:    R.uniq(oldPosts.concat(posts).map(post => post.id)),
+        pagination: {
+          sort: "hot"
+        }
+      })
     })
   })
 })

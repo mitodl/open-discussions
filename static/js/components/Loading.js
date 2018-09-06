@@ -10,8 +10,12 @@ type LoadingProps = {
   notAuthorized: boolean
 }
 
-export const Loading = () => (
-  <div className="loading">
+type SpinnerProps = {
+  className?: string
+}
+
+export const Loading = (props: SpinnerProps) => (
+  <div className={`loading ${props.className ? props.className : ""}`}>
     <div className="sk-three-bounce">
       <div className="sk-child sk-bounce1" />
       <div className="sk-child sk-bounce2" />
@@ -21,8 +25,9 @@ export const Loading = () => (
 )
 
 const withLoading = (LoadedComponent: Class<React.Component<*, *>>) => {
-  return class extends LoadedComponent {
+  class WithLoading extends LoadedComponent {
     props: LoadingProps
+    static WrappedComponent: Class<React.Component<*, *>>
 
     render() {
       const { loaded, errored, notAuthorized, notFound } = this.props
@@ -46,6 +51,8 @@ const withLoading = (LoadedComponent: Class<React.Component<*, *>>) => {
       return <div className="loaded">{super.render()}</div>
     }
   }
+  WithLoading.WrappedComponent = LoadedComponent
+  return WithLoading
 }
 
 export default withLoading

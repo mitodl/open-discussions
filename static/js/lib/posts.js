@@ -27,11 +27,25 @@ export const formatCommentsCount = (post: Post): string =>
   post.num_comments === 1 ? "1 comment" : `${post.num_comments || 0} comments`
 
 export const mapPostListResponse = (
-  response: PostListResponse
-): PostListData => ({
-  pagination: response.pagination,
-  postIds:    response.posts.map(post => post.id)
-})
+  response: PostListResponse,
+  data: PostListData
+): PostListData => {
+  const pagination = response.pagination
+  const responsePostIds = response.posts.map(post => post.id)
+
+  let postIds
+  if (!data.pagination || data.pagination.sort !== pagination.sort) {
+    // If the user changed their sort do a clean reload
+    postIds = responsePostIds
+  } else {
+    postIds = R.uniq(data.postIds.concat(response.posts.map(post => post.id)))
+  }
+
+  return {
+    pagination,
+    postIds
+  }
+}
 
 export const getPostIds = R.propOr([], "postIds")
 
