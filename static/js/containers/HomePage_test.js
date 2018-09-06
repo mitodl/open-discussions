@@ -170,12 +170,13 @@ describe("HomePage", () => {
   it("sets props used by withPostList", async () => {
     const { wrapper } = await render()
 
-    assert.isFalse(wrapper.props().showPinUI)
-    assert.isTrue(wrapper.props().showReportPost)
-    assert.isFalse(wrapper.props().showRemovePost)
-    assert.isFalse(wrapper.props().showTogglePinPost)
-    assert.isTrue(wrapper.props().showChannelLinks)
-    assert.isFalse(wrapper.props().isModerator)
+    const props = wrapper.props()
+    assert.isFalse(props.showPinUI)
+    assert.isTrue(props.showReportPost)
+    assert.isFalse(props.showRemovePost)
+    assert.isFalse(props.showTogglePinPost)
+    assert.isTrue(props.showChannelLinks)
+    assert.isFalse(props.isModerator)
   })
 
   it("defines loadMore to fetch from postsForChannel", async () => {
