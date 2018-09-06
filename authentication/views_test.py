@@ -238,11 +238,10 @@ def login_email_not_exists(client):
 
 
 @pytest.fixture()
-def register_email_not_exists(settings, client, mock_email_send):
+def register_email_not_exists(client, mock_email_send):
     """Yield a function for this step"""
     def run_step(last_result):  # pylint: disable=unused-argument
         """Run the step"""
-        settings.USE_RECAPTCHA = False
         result = assert_api_call(
             client,
             'psa-register-email',
@@ -269,7 +268,7 @@ def register_email_not_exists_with_recaptcha(settings, client, mock_email_send, 
     """Yield a function for this step"""
     def run_step(last_result):  # pylint: disable=unused-argument
         """Run the step"""
-        settings.USE_RECAPTCHA = True
+        settings.RECAPTCHA_SITE_KEY = "fake"
         result = assert_api_call(
             client,
             'psa-register-email',
@@ -297,7 +296,7 @@ def register_email_not_exists_with_recaptcha_invalid(settings, client, mock_emai
     """Yield a function for this step"""
     def run_step(last_result):  # pylint: disable=unused-argument
         """Run the step"""
-        settings.USE_RECAPTCHA = True
+        settings.RECAPTCHA_SITE_KEY = "fake"
         result = assert_api_call(
             client,
             'psa-register-email',

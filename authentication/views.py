@@ -87,7 +87,7 @@ class RegisterEmailView(SocialAuthAPIView):
 
     def post(self, request):
         """ Verify recaptcha response before proceeding """
-        if settings.USE_RECAPTCHA:
+        if settings.RECAPTCHA_SITE_KEY:
             r = requests.post(
                 "https://www.google.com/recaptcha/api/siteverify?secret={}&response={}".format(
                     settings.RECAPTCHA_SECRET_KEY,

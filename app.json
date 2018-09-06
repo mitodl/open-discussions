@@ -257,11 +257,6 @@
     "STATUS_TOKEN": {
       "description": "Token to access the status API."
     },
-    "USE_RECAPTCHA": {
-      "description": "Use recaptcha for the email signup form",
-      "required": false,
-      "value": false
-    },
     "USE_X_FORWARDED_PORT": {
       "description": "Use the X-Forwarded-Port",
       "required": false
