@@ -166,12 +166,12 @@ describe("withPostList", () => {
             {},
             {
               [prop]:     prop,
-              [showProp]: showProp
+              [showProp]: showPropValue
             }
           )
           assert.equal(
-            inner.find("PostList").props()[prop],
-            showProp ? prop : null
+            inner.find("PostList").props(prop),
+            showPropValue ? prop : null
           )
         })
       })
