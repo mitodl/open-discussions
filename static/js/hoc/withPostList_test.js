@@ -170,7 +170,7 @@ describe("withPostList", () => {
             }
           )
           assert.equal(
-            inner.find("PostList").props(prop),
+            inner.find("PostList").prop(prop),
             showPropValue ? prop : null
           )
         })
