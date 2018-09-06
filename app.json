@@ -187,6 +187,10 @@
       "description": "Google Recaptcha site key",
       "required": false
     },
+    "RECAPTCHA_SECRET_KEY": {
+      "description": "Google Recaptcha secret key",
+      "required": false
+    },
     "SOCIAL_AUTH_SAML_LOGIN_URL": {
       "description": "Custom login url for SAML",
       "required": false
@@ -252,6 +256,11 @@
     },
     "STATUS_TOKEN": {
       "description": "Token to access the status API."
+    },
+    "USE_RECAPTCHA": {
+      "description": "Use recaptcha for the email signup form",
+      "required": false,
+      "value": false
     },
     "USE_X_FORWARDED_PORT": {
       "description": "Use the X-Forwarded-Port",

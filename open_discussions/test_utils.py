@@ -1,5 +1,6 @@
 """Testing utils"""
 import abc
+import json
 from contextlib import contextmanager
 import traceback
 
@@ -43,3 +44,7 @@ class MockResponse:
     def __init__(self, content, status_code):
         self.content = content
         self.status_code = status_code
+
+    def json(self):
+        """ Return content as json """
+        return json.loads(self.content)
