@@ -79,7 +79,6 @@ export class HomePage extends React.Component<Props> {
   render() {
     const {
       location: { search },
-      reportPost,
       match,
       renderPosts
     } = this.props

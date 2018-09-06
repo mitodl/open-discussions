@@ -105,7 +105,6 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
 
   render() {
     const {
-      dispatch,
       match,
       channel,
       subscribedChannels,
