@@ -100,9 +100,12 @@ describe("withPostList", () => {
         await props.loadMore()
         sinon.assert.notCalled(loadPosts)
       })
-      ;[true, false].forEach(hasParams => {
+      ;[
+        ["?sort=some_sort&after=different_after", {sort: "some_sort"}],
+        ["", {}],
+      ].forEach(([search, expectedExtraParams]) => {
         it(`${
-          hasParams ? "uses" : "doesn't use"
+          search ? "has" : "doesn't have"
         } query parameters from the URL for the pagination`, async () => {
           const { inner } = await render(
             {},
@@ -110,7 +113,7 @@ describe("withPostList", () => {
               canLoadMore: true,
               pagination:  pagination,
               location:    {
-                search: hasParams ? "?sort=some_sort&after=different_after" : ""
+                search
               }
             }
           )
@@ -120,7 +123,7 @@ describe("withPostList", () => {
           sinon.assert.calledWith(loadPosts, {
             after: pagination.after,
             count: pagination.after_count,
-            ...(hasParams ? { sort: "some_sort" } : {})
+            ...expectedExtraParams
           })
         })
       })
