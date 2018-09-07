@@ -1,4 +1,6 @@
 """Authentication views"""
+from html import escape
+
 import requests
 from django.conf import settings
 from django.core import mail as django_mail
@@ -89,9 +91,9 @@ class RegisterEmailView(SocialAuthAPIView):
         """ Verify recaptcha response before proceeding """
         if settings.RECAPTCHA_SITE_KEY:
             r = requests.post(
-                "https://www.google.com/recaptcha/api/siteverify?secret={}&response={}".format(
-                    settings.RECAPTCHA_SECRET_KEY,
-                    request.data["recaptcha"]
+                "https://www.google.com/recaptcha/api/siteverify?secret={key}&response={captcha}".format(
+                    key=escape(settings.RECAPTCHA_SECRET_KEY),
+                    captcha=escape(request.data["recaptcha"])
                 )
             )
             response = r.json()
