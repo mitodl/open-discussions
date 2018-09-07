@@ -35,7 +35,7 @@ import {
 } from "../lib/posts"
 import { validateContentReportForm } from "../lib/validation"
 import { actions } from "../actions"
-import { replaceMoreComments } from "../actions/comment"
+import { clearCommentError, replaceMoreComments } from "../actions/comment"
 import { setFocusedComment, clearFocusedComment } from "../actions/focus"
 import { formBeginEdit, formEndEdit } from "../actions/forms"
 import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
@@ -143,6 +143,7 @@ class PostPage extends React.Component<PostPageProps> {
 
     if (errored || notFound) {
       dispatch(clearPostError())
+      dispatch(clearCommentError())
     }
   }
 

@@ -24,6 +24,7 @@ import LoginPopup from "./LoginPopup"
 import * as forms from "../actions/forms"
 import * as utilFuncs from "../lib/util"
 import { actions } from "../actions"
+import { CLEAR_COMMENT_ERROR } from "../actions/comment"
 import { SET_POST_DATA, setPostData } from "../actions/post"
 import { SET_BANNER_MESSAGE } from "../actions/ui"
 import { makePost } from "../factories/posts"
@@ -459,7 +460,7 @@ describe("CommentForms", () => {
           })
         })
         const state = await helper.listenForActions(
-          [requestType, failureType, SET_BANNER_MESSAGE],
+          [requestType, failureType, CLEAR_COMMENT_ERROR, SET_BANNER_MESSAGE],
           () => {
             wrapper.find("form").simulate("submit")
           }

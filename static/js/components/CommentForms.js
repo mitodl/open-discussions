@@ -5,6 +5,7 @@ import R from "ramda"
 import { connect } from "react-redux"
 
 import { actions } from "../actions"
+import { clearCommentError } from "../actions/comment"
 import { setPostData } from "../actions/post"
 import { setBannerMessage } from "../actions/ui"
 import {
@@ -207,6 +208,7 @@ const mapDispatchToProps = (dispatch: any, ownProps: CommentFormProps) => {
           cancelReply(dispatch, formKey)()
         })
         .catch(err => {
+          dispatch(clearCommentError())
           if (err.errorStatusCode === 410) {
             // Comment was deleted
             dispatch(
