@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.44.2
+--------------
+
+- Recaptcha for new signups (#1159)
+- Implement infinite scroll (#1104)
+- Fix image uploads on Edge and iOS (#1155)
+- Added link tags with rel=canonical to improve SEO and analytics
+
 Version 0.44.1 (Released September 06, 2018)
 --------------
 
