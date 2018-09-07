@@ -1,5 +1,5 @@
 """Authentication views"""
-from html import escape
+from urllib.parse import quote
 
 import requests
 from django.conf import settings
@@ -92,8 +92,8 @@ class RegisterEmailView(SocialAuthAPIView):
         if settings.RECAPTCHA_SITE_KEY:
             r = requests.post(
                 "https://www.google.com/recaptcha/api/siteverify?secret={key}&response={captcha}".format(
-                    key=escape(settings.RECAPTCHA_SECRET_KEY),
-                    captcha=escape(request.data["recaptcha"])
+                    key=quote(settings.RECAPTCHA_SECRET_KEY),
+                    captcha=quote(request.data["recaptcha"])
                 )
             )
             response = r.json()
