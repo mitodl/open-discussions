@@ -416,12 +416,15 @@ export const postPasswordLogin = (
 export const postEmailRegister = (
   flow: AuthFlow,
   email: string,
+  recaptcha: ?string,
   partialToken: ?string
 ): Promise<AuthResponse> =>
   fetchJSONWithCSRF("/api/v0/register/email/", {
     method: POST,
     body:   JSON.stringify(
-      partialToken ? { flow, partial_token: partialToken } : { flow, email }
+      partialToken
+        ? { flow, partial_token: partialToken, recaptcha }
+        : { flow, email, recaptcha }
     )
   })
 

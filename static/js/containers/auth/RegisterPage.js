@@ -65,11 +65,16 @@ export const FORM_KEY = "register:email"
 const { getForm, actionCreators } = configureForm(FORM_KEY, newEmailForm)
 
 const onSubmit = (form: EmailForm) =>
-  actions.auth.registerEmail(FLOW_REGISTER, form.email)
+  actions.auth.registerEmail(FLOW_REGISTER, form.email, form.recaptcha)
+
+const onSubmitError = formValidate =>
+  formValidate({ recaptcha: `Error validating your submission.` })
 
 const mergeProps = mergeAndInjectProps(
-  (stateProps, { setBannerMessage }, { history }) => ({
+  (stateProps, { setBannerMessage, formValidate }, { history }) => ({
     // Used by withForm()
+    useRecaptcha:   true,
+    onSubmitError:  () => onSubmitError(formValidate),
     onSubmitResult: (response: AuthResponse) => {
       processAuthResponse(history, response)
       if (response.state === STATE_REGISTER_CONFIRM_SENT && response.email) {

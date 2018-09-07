@@ -153,18 +153,29 @@ const emailValidators = [
   validation(emptyOrNil, R.lensPath(["value", "email"]), "Email is required")
 ]
 
+export const recaptchaValidator = validation(
+  R.complement(recaptcha => {
+    return SETTINGS.recaptchaKey ? R.not(emptyOrNil(recaptcha)) : true
+  }),
+  R.lensPath(["value", "recaptcha"]),
+  "Please verify you're not a robot"
+)
+
 export const validateEmailForm = validate(emailValidators)
 
 export const validateNewEmailForm = validate(
   R.append(
-    validation(
-      R.complement(email => {
-        return SETTINGS.allow_saml_auth ? validNotMIT(email) : true
-      }),
-      R.lensPath(["value", "email"]),
-      "MIT users please login with Touchstone below"
-    ),
-    emailValidators
+    recaptchaValidator,
+    R.append(
+      validation(
+        R.complement(email => {
+          return SETTINGS.allow_saml_auth ? validNotMIT(email) : true
+        }),
+        R.lensPath(["value", "email"]),
+        "MIT users please login with Touchstone below"
+      ),
+      emailValidators
+    )
   )
 )
 

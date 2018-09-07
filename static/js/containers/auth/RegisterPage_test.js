@@ -12,6 +12,7 @@ import ConnectedRegisterPage, { RegisterPage, FORM_KEY } from "./RegisterPage"
 import { FRONTPAGE_URL, LOGIN_URL } from "../../lib/url"
 
 const email = "test@example.com"
+const recaptcha = "recaptcha_response"
 
 const DEFAULT_STATE = {
   auth: {
@@ -21,7 +22,8 @@ const DEFAULT_STATE = {
   forms: {
     [FORM_KEY]: {
       value: {
-        email
+        email,
+        recaptcha
       },
       errors: {}
     }

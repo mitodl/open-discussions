@@ -1,5 +1,6 @@
 """Tests for authentication views"""
 # pylint: disable=redefined-outer-name
+
 from django.conf import settings
 from django.contrib.auth import get_user, get_user_model
 from django.urls import reverse
@@ -14,7 +15,7 @@ from authentication.backends.micromasters import MicroMastersAuth
 from authentication.utils import SocialAuthState
 from open_discussions import features
 from open_discussions.factories import UserSocialAuthFactory
-from open_discussions.test_utils import any_instance_of
+from open_discussions.test_utils import any_instance_of, MockResponse
 
 pytestmark = [
     pytest.mark.django_db,
@@ -56,7 +57,8 @@ def test_auth_views_disabled(settings, client, email_user, url):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-def assert_api_call(client, url, payload, expected, expect_authenticated=False):
+# pylint:disable=too-many-arguments
+def assert_api_call(client, url, payload, expected, expect_authenticated=False, expect_status=status.HTTP_200_OK):
     """Run the API call and perform basic assertions"""
     assert bool(get_user(client).is_authenticated) is False
 
@@ -64,7 +66,7 @@ def assert_api_call(client, url, payload, expected, expect_authenticated=False):
     actual = response.json()
 
     assert actual == expected
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == expect_status
 
     assert bool(get_user(client).is_authenticated) is expect_authenticated
 
@@ -75,6 +77,25 @@ def assert_api_call(client, url, payload, expected, expect_authenticated=False):
 def mock_email_send(mocker):
     """Mock the email send API"""
     yield mocker.patch('mail.verification_api.send_verification_email')
+
+
+@pytest.fixture()
+def mock_recaptcha_success(mocker):
+    """ Mock Google recaptcha request"""
+    yield mocker.patch(
+        'authentication.views.requests.post',
+        return_value=MockResponse(content='{"success": true}', status_code=status.HTTP_200_OK))
+
+
+@pytest.fixture()
+def mock_recaptcha_failure(mocker):
+    """ Mock Google recaptcha request"""
+    yield mocker.patch(
+        'authentication.views.requests.post',
+        return_value=MockResponse(
+            content='{"success": false, "error-codes": ["bad-request"]}',
+            status_code=status.HTTP_200_OK
+        ))
 
 
 @pytest.fixture()
@@ -238,6 +259,62 @@ def register_email_not_exists(client, mock_email_send):
         )
         mock_email_send.assert_called_once()
         assert User.objects.filter(email=NEW_EMAIL).exists() is False
+        return result
+    yield run_step
+
+
+@pytest.fixture()
+def register_email_not_exists_with_recaptcha(settings, client, mock_email_send, mock_recaptcha_success):
+    """Yield a function for this step"""
+    def run_step(last_result):  # pylint: disable=unused-argument
+        """Run the step"""
+        settings.RECAPTCHA_SITE_KEY = "fake"
+        result = assert_api_call(
+            client,
+            'psa-register-email',
+            {
+                'flow': SocialAuthState.FLOW_REGISTER,
+                'email': NEW_EMAIL,
+                'recaptcha': 'fake'
+            },
+            {
+                'errors': [],
+                'flow': SocialAuthState.FLOW_REGISTER,
+                'provider': EmailAuth.name,
+                'partial_token': None,
+                'state': SocialAuthState.STATE_REGISTER_CONFIRM_SENT,
+            }
+        )
+        mock_recaptcha_success.assert_called_once()
+        mock_email_send.assert_called_once()
+        return result
+    yield run_step
+
+
+@pytest.fixture()
+def register_email_not_exists_with_recaptcha_invalid(settings, client, mock_email_send, mock_recaptcha_failure):
+    """Yield a function for this step"""
+    def run_step(last_result):  # pylint: disable=unused-argument
+        """Run the step"""
+        settings.RECAPTCHA_SITE_KEY = "fake"
+        result = assert_api_call(
+            client,
+            'psa-register-email',
+            {
+                'flow': SocialAuthState.FLOW_REGISTER,
+                'email': NEW_EMAIL,
+                'recaptcha': 'fake'
+            },
+            {
+                'success': False,
+                'error-codes': [
+                    'bad-request'
+                ]
+            },
+            expect_status=status.HTTP_400_BAD_REQUEST
+        )
+        mock_recaptcha_failure.assert_called_once()
+        mock_email_send.assert_not_called()
         return result
     yield run_step
 
@@ -407,6 +484,14 @@ def register_profile_details(client):
         'register_email_not_exists',
         'redeem_confirmation_code',
         'register_profile_details',
+    ],
+    [
+        'register_email_not_exists_with_recaptcha',
+        'redeem_confirmation_code',
+        'register_profile_details',
+    ],
+    [
+        'register_email_not_exists_with_recaptcha_invalid',
     ],
     [
         'login_email_mm_only',

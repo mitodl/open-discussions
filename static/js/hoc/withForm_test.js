@@ -143,6 +143,17 @@ describe("withForm", () => {
     assert.ok(formEndEditStub.calledWith())
   })
 
+  it("should update the form when onRecaptcha called", () => {
+    const wrapper = renderPage()
+    wrapper.instance().onRecaptcha("test_recaptcha")
+    assert.ok(formUpdateStub.calledOnce)
+    assert.ok(
+      formUpdateStub.calledWith({
+        ["recaptcha"]: "test_recaptcha"
+      })
+    )
+  })
+
   it("should update the form for an input", () => {
     const name = "name"
     const value = "Molly"

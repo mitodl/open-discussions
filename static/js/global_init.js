@@ -28,7 +28,8 @@ const _createSettings = () => ({
   reactGaDebug:       true,
   gaTrackingID:       "fake",
   embedlyKey:         "fake",
-  public_path:        "http://fake.open.url/"
+  public_path:        "http://fake.open.url/",
+  recaptchaKey:       ""
 })
 
 global.SETTINGS = _createSettings()

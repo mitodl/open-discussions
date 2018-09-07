@@ -26,7 +26,8 @@ declare var SETTINGS: {
   embedlyKey: string,
   sentry_dsn: string,
   release_version: string,
-  environment: string
+  environment: string,
+  recaptchaKey: string
 }
 
 // mocha

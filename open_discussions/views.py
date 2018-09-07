@@ -104,7 +104,8 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "allow_anonymous": features.is_enabled(features.ANONYMOUS_ACCESS),
         "allow_email_auth": features.is_enabled(features.EMAIL_AUTH),
         "allow_saml_auth": features.is_enabled(features.SAML_AUTH),
-        "embedlyKey": settings.EMBEDLY_KEY
+        "embedlyKey": settings.EMBEDLY_KEY,
+        "recaptchaKey": settings.RECAPTCHA_SITE_KEY
     }
 
     return render(request, "index.html", context={

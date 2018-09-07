@@ -1,4 +1,7 @@
 """Authentication views"""
+from urllib.parse import quote
+
+import requests
 from django.conf import settings
 from django.core import mail as django_mail
 from django.contrib.auth import get_user_model, update_session_auth_hash
@@ -83,6 +86,20 @@ class RegisterEmailView(SocialAuthAPIView):
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return RegisterEmailSerializer
+
+    def post(self, request):
+        """ Verify recaptcha response before proceeding """
+        if settings.RECAPTCHA_SITE_KEY:
+            r = requests.post(
+                "https://www.google.com/recaptcha/api/siteverify?secret={key}&response={captcha}".format(
+                    key=quote(settings.RECAPTCHA_SECRET_KEY),
+                    captcha=quote(request.data["recaptcha"])
+                )
+            )
+            response = r.json()
+            if not response['success']:
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        return super().post(request)
 
 
 class RegisterConfirmView(SocialAuthAPIView):

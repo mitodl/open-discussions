@@ -63,6 +63,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
         'environment': settings.ENVIRONMENT,
         'sentry_dsn': None,
         'release_version': settings.VERSION,
+        'recaptchaKey': settings.RECAPTCHA_SITE_KEY,
     }
 
 
@@ -134,6 +135,7 @@ def test_webpack_url_jwt(
         'environment': settings.ENVIRONMENT,
         'sentry_dsn': None,
         'release_version': settings.VERSION,
+        'recaptchaKey': settings.RECAPTCHA_SITE_KEY,
     }
 
 
@@ -182,6 +184,7 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
         'environment': settings.ENVIRONMENT,
         'sentry_dsn': None,
         'release_version': settings.VERSION,
+        'recaptchaKey': settings.RECAPTCHA_SITE_KEY,
     }
 
 

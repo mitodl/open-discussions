@@ -37,6 +37,7 @@ export type WithFormProps<T> = {
   onSubmit: T => Promise<*>,
   onSubmitResult: Function,
   onSubmitError?: Function,
+  useRecaptcha?: boolean,
   validateForm: FormValue<T> => {value: FormErrors<T>},
   renderForm: Function
 } & FormActionCreators<T>
@@ -46,7 +47,8 @@ export type FormProps<T> = {
   validation: FormErrors<T>,
   processing: boolean,
   onUpdate: Object => void,
-  onSubmit: ?Object => void
+  onSubmit: ?Object => void,
+  onRecaptcha?: Object => void
 }
 
 export type FormComponentCls<T> = React$ComponentType<$Subtype<FormProps<T>>>
