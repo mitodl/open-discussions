@@ -553,6 +553,40 @@ describe("CommentForms", () => {
         { text: "edited text", id: comment.id }
       ])
     })
+    ;[
+      [410, "This comment has been deleted and cannot be edited"],
+      [500, "Something went wrong editing your comment"]
+    ].forEach(([errorStatusCode, message]) => {
+      it(`should display a toast message if ${errorStatusCode} error on form submit`, async () => {
+        const { requestType, failureType } = actions.comments.patch
+        helper.updateCommentStub.returns(Promise.reject({ errorStatusCode }))
+
+        beginEditing(
+          helper.store.dispatch,
+          editCommentKey(comment),
+          comment,
+          undefined
+        )
+
+        await helper.listenForActions([forms.FORM_UPDATE], () => {
+          wrapper.find("textarea[name='text']").simulate("change", {
+            target: {
+              name:  "text",
+              value: "edited text"
+            }
+          })
+        })
+
+        const state = await helper.listenForActions(
+          [requestType, failureType, CLEAR_COMMENT_ERROR, SET_BANNER_MESSAGE],
+          () => {
+            wrapper.find("form").simulate("submit")
+          }
+        )
+
+        assert.ok(state.ui.banner.message.startsWith(message))
+      })
+    })
   })
 
   describe("EditPostForm", () => {

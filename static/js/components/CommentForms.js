@@ -229,9 +229,30 @@ const mapDispatchToProps = (dispatch: any, ownProps: CommentFormProps) => {
         })
     }),
     patchComment: comment =>
-      dispatch(actions.comments.patch(comment.id, comment)).then(() => {
-        cancelReply(dispatch, formKey)()
-      }),
+      dispatch(actions.comments.patch(comment.id, comment))
+        .then(() => {
+          cancelReply(dispatch, formKey)()
+        })
+        .catch(err => {
+          dispatch(clearCommentError())
+          if (err.errorStatusCode === 410) {
+            // Comment was deleted
+            dispatch(
+              setBannerMessage(
+                "This comment has been deleted and cannot be edited"
+              )
+            )
+          } else {
+            // Unknown errors
+            dispatch(
+              setBannerMessage(
+                `Something went wrong editing your comment. Please try again or contact us at ${
+                  SETTINGS.support_email
+                }`
+              )
+            )
+          }
+        }),
     patchPost: post =>
       dispatch(actions.posts.patch(post.id, post)).then(() => {
         cancelReply(dispatch, formKey)()
