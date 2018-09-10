@@ -195,64 +195,65 @@ const mapDispatchToProps = (dispatch: any, ownProps: CommentFormProps) => {
     },
     cancelReply:  cancelReply(dispatch, formKey),
     beginEditing: beginEditing(dispatch, formKey),
-    onSubmit:     R.curry((postID, text, commentID, post, e) => {
+    onSubmit:     R.curry(async (postID, text, commentID, post, e) => {
       e.preventDefault()
-      return dispatch(actions.comments.post(postID, text, commentID))
-        .then(() => {
+      try {
+        await dispatch(actions.comments.post(postID, text, commentID))
+        dispatch(
+          setPostData({
+            ...post,
+            num_comments: post.num_comments + 1
+          })
+        )
+        cancelReply(dispatch, formKey)()
+      } catch (err) {
+        dispatch(clearCommentError())
+        if (err.errorStatusCode === 410) {
+          // Comment was deleted
           dispatch(
-            setPostData({
-              ...post,
-              num_comments: post.num_comments + 1
-            })
+            setBannerMessage(
+              "This comment has been deleted and cannot be replied to"
+            )
           )
           cancelReply(dispatch, formKey)()
-        })
-        .catch(err => {
-          dispatch(clearCommentError())
-          if (err.errorStatusCode === 410) {
-            // Comment was deleted
-            dispatch(
-              setBannerMessage(
-                "This comment has been deleted and cannot be replied to"
-              )
+        } else {
+          // Unknown errors
+          dispatch(
+            setBannerMessage(
+              `Something went wrong creating your comment. Please try again or contact us at ${
+                SETTINGS.support_email
+              }`
             )
-          } else {
-            // Unknown errors
-            dispatch(
-              setBannerMessage(
-                `Something went wrong creating your comment. Please try again or contact us at ${
-                  SETTINGS.support_email
-                }`
-              )
-            )
-          }
-        })
+          )
+        }
+      }
     }),
-    patchComment: comment =>
-      dispatch(actions.comments.patch(comment.id, comment))
-        .then(() => {
+    patchComment: async comment => {
+      try {
+        await dispatch(actions.comments.patch(comment.id, comment))
+        cancelReply(dispatch, formKey)()
+      } catch (err) {
+        dispatch(clearCommentError())
+        if (err.errorStatusCode === 410) {
+          // Comment was deleted
+          dispatch(
+            setBannerMessage(
+              "This comment has been deleted and cannot be edited"
+            )
+          )
           cancelReply(dispatch, formKey)()
-        })
-        .catch(err => {
-          dispatch(clearCommentError())
-          if (err.errorStatusCode === 410) {
-            // Comment was deleted
-            dispatch(
-              setBannerMessage(
-                "This comment has been deleted and cannot be edited"
-              )
+        } else {
+          // Unknown errors
+          dispatch(
+            setBannerMessage(
+              `Something went wrong editing your comment. Please try again or contact us at ${
+                SETTINGS.support_email
+              }`
             )
-          } else {
-            // Unknown errors
-            dispatch(
-              setBannerMessage(
-                `Something went wrong editing your comment. Please try again or contact us at ${
-                  SETTINGS.support_email
-                }`
-              )
-            )
-          }
-        }),
+          )
+        }
+      }
+    },
     patchPost: post =>
       dispatch(actions.posts.patch(post.id, post)).then(() => {
         cancelReply(dispatch, formKey)()
