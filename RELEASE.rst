@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.44.2
+Version 0.44.2 (Released September 10, 2018)
 --------------
 
 - Recaptcha for new signups (#1159)
