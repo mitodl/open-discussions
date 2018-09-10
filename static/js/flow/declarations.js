@@ -4,6 +4,7 @@ declare var SETTINGS: {
   gaTrackingID: string,
   reactGaDebug: boolean,
   public_path: string,
+  site_url: string,
   max_comment_depth: number,
   FEATURES: {
     [key: string]: boolean,

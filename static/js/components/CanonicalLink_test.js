@@ -23,7 +23,7 @@ describe("CanonicalLink", () => {
     ]
   ].forEach(([relativeUrlProp, matchProp, expectedLinkHref, desc]) => {
     it(`renders a <link> tag with the right href when given a ${desc}`, () => {
-      SETTINGS.public_path = baseURL
+      SETTINGS.site_url = baseURL
       const wrapper = shallow(
         <CanonicalLink relativeUrl={relativeUrlProp} match={matchProp} />
       )
@@ -39,7 +39,7 @@ describe("CanonicalLink", () => {
   })
 
   it("removes a trailing slash from the link's href value", () => {
-    SETTINGS.public_path = baseURL
+    SETTINGS.site_url = baseURL
     const wrapper = shallow(<CanonicalLink relativeUrl="url/with/slash/" />)
     const link = wrapper.find("link")
     assert.isTrue(link.exists())
