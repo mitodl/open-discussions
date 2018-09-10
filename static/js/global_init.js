@@ -29,6 +29,7 @@ const _createSettings = () => ({
   gaTrackingID:       "fake",
   embedlyKey:         "fake",
   public_path:        "http://fake.open.url/",
+  site_url:           "http://fake.open.url/",
   recaptchaKey:       ""
 })
 

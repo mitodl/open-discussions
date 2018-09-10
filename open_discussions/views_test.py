@@ -42,6 +42,7 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
     assert js_settings == {
         'gaTrackingID': 'fake',
         'public_path': '/static/bundles/',
+        'site_url': settings.SITE_BASE_URL,
         'max_comment_depth': 6,
         'user_email': user.email,
         'username': user.username,
@@ -114,6 +115,7 @@ def test_webpack_url_jwt(
     assert js_settings == {
         'gaTrackingID': 'fake',
         'public_path': '/static/bundles/',
+        'site_url': settings.SITE_BASE_URL,
         'max_comment_depth': 6,
         'user_email': user.email,
         'username': user.username,
@@ -163,6 +165,7 @@ def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
     assert js_settings == {
         'gaTrackingID': 'fake',
         'public_path': '/static/bundles/',
+        'site_url': settings.SITE_BASE_URL,
         'max_comment_depth': 6,
         'user_email': None,
         'username': None,

@@ -22,7 +22,7 @@ const CanonicalLink = ({ relativeUrl, match }: Props) => {
   }
 
   const href = removeTrailingSlash(
-    String(new URL(partialUrl, SETTINGS.public_path))
+    String(new URL(partialUrl, SETTINGS.site_url))
   )
 
   return <link rel="canonical" href={href} />

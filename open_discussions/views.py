@@ -87,6 +87,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "sentry_dsn": sentry.get_public_dsn(),
         "release_version": settings.VERSION,
         "public_path": public_path(request),
+        "site_url": settings.SITE_BASE_URL,
         "max_comment_depth": settings.OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH,
         "username": username,
         "user_full_name": user_full_name,
