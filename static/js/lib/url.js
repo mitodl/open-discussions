@@ -68,8 +68,8 @@ export const postPermalink = (post: Post): string =>
 // https://github.com/mitodl/open-discussions/pull/118#discussion_r135284591
 export const getChannelNameFromPathname = R.compose(
   R.defaultTo(null),
-  R.view(R.lensIndex(1)),
-  R.match(/c\/([^/]+)\/?/)
+  R.view(R.lensIndex(2)),
+  R.match(/c\/(edit\/)?([^/]+)\/?/)
 )
 
 export const FRONTPAGE_URL = "/"
