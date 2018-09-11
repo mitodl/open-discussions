@@ -5,6 +5,7 @@ import { connect } from "react-redux"
 import R from "ramda"
 import { MetaTags } from "react-meta-tags"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
+import isURL from "validator/lib/isURL"
 
 import CreatePostForm from "../components/CreatePostForm"
 import withSingleColumn from "../hoc/withSingleColumn"
@@ -128,7 +129,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
         }
       })
     )
-    if (name === "url" && value !== "") {
+    if (name === "url" && isURL(value, { allow_underscores: true })) {
       const embedlyGetFunc = actions.embedly.get(value)
       embedlyGetFunc.meta = {
         debounce: {

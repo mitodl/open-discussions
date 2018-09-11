@@ -224,6 +224,27 @@ describe("CreatePostPage", () => {
     assert.ok(window.twttr.widgets.load.called)
   })
 
+  //
+  ;[
+    ["http", false],
+    ["http://", false],
+    ["http://foo", false],
+    ["http://foo.bar", true],
+    ["foo.bar", true],
+    ["https://foo.bar/fake_url/fake.html?param1=val1&param2=val2", true],
+    ["foo.bar/fake_url/fake.html?param1=val1&param2=val2", true]
+  ].forEach(([link, isValid]) => {
+    it(`${
+      isValid ? "should" : "shouldn't"
+    } call Embedly when the URL is ${link}`, async () => {
+      const wrapper = await renderPage()
+      setLinkPost(wrapper)
+      setUrl(wrapper, link)
+      await wait(100) // 🙃
+      assert.equal(isValid, helper.getEmbedlyStub.calledOnce)
+    })
+  })
+
   it("should show validation errors when title of post is empty", async () => {
     const wrapper = await renderPage()
     submitPost(wrapper)
