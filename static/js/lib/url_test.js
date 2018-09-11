@@ -125,7 +125,9 @@ describe("url helper functions", () => {
         ["/c/Foobarbaz9/boz", "Foobarbaz9"],
         ["/c/fOObar_Baz9/boz", "fOObar_Baz9"],
         ["/moderation/c/foobar", "foobar"],
-        ["/moderation/c/bippity/boppity", "bippity"]
+        ["/moderation/c/bippity/boppity", "bippity"],
+        ["/manage/c/edit/FooBar", "FooBar"],
+        ["/manage/c/edit/BippitY/boppity", "BippitY"]
       ].forEach(([url, expectation]) => {
         assert.equal(expectation, getChannelNameFromPathname(url))
       })
