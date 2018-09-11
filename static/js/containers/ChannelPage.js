@@ -7,7 +7,7 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
 import CanonicalLink from "../components/CanonicalLink"
-import withLoading from "../components/Loading"
+import { withPostLoading } from "../components/Loading"
 import withChannelSidebar from "../hoc/withChannelSidebar"
 import { PostSortPicker } from "../components/SortPicker"
 import {
@@ -204,5 +204,5 @@ export default R.compose(
   withChannelSidebar("channel-page"),
   withChannelTracker,
   withPostList,
-  withLoading
+  withPostLoading
 )(ChannelPage)

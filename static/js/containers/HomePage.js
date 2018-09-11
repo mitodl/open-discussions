@@ -6,7 +6,7 @@ import qs from "query-string"
 import { MetaTags } from "react-meta-tags"
 
 import CanonicalLink from "../components/CanonicalLink"
-import withLoading from "../components/Loading"
+import { withPostLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 import { PostSortPicker } from "../components/SortPicker"
 import {
@@ -139,5 +139,5 @@ export default R.compose(
   withPostModeration,
   withSingleColumn("home-page"),
   withPostList,
-  withLoading
+  withPostLoading
 )(HomePage)

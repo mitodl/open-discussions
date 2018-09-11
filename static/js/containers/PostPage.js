@@ -9,7 +9,7 @@ import qs from "query-string"
 import { MetaTags } from "react-meta-tags"
 
 import Card from "../components/Card"
-import withLoading from "../components/Loading"
+import { withSpinnerLoading } from "../components/Loading"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"
 import ReportForm from "../components/ReportForm"
@@ -555,5 +555,5 @@ export default R.compose(
   withCommentModeration,
   withSingleColumn("post-page"),
   withChannelTracker,
-  withLoading
+  withSpinnerLoading
 )(PostPage)

@@ -187,7 +187,7 @@ describe("ChannelPage", () => {
         }
       }
     )
-    assert.lengthOf(inner.find("Loading"), 1)
+    assert.lengthOf(inner.find("PostLoading"), 1)
   })
 
   it("should clear the error if present on load", async () => {

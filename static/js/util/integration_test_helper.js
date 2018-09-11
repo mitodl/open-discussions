@@ -101,6 +101,10 @@ export default class IntegrationTestHelper {
     })
   }
 
+  isLoadingComponentClass(cls) {
+    return cls.name === "WithLoading" || cls.name === "WithPostLoading"
+  }
+
   configureHOCRenderer(
     WrappedComponent: Class<React.Component<*, *>>,
     InnerComponent: Class<React.Component<*, *>>,
@@ -132,7 +136,7 @@ export default class IntegrationTestHelper {
         // determine the type before we dive
         const cls = inner.type()
         if (
-          cls.name === "WithLoading" &&
+          this.isLoadingComponentClass(cls) &&
           InnerComponent === cls.WrappedComponent
         ) {
           // WithLoading is actually subclassing the component, not rendering it as an inner component so there's

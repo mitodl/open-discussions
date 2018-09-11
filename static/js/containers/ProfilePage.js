@@ -7,7 +7,7 @@ import { MetaTags } from "react-meta-tags"
 
 import Card from "../components/Card"
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
-import withLoading from "../components/Loading"
+import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 import CanonicalLink from "../components/CanonicalLink"
 
@@ -134,5 +134,5 @@ const mapStateToProps = (state, ownProps) => {
 export default R.compose(
   connect(mapStateToProps),
   withSingleColumn("profile-view-page"),
-  withLoading
+  withSpinnerLoading
 )(ProfilePage)
