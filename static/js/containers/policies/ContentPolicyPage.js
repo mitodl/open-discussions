@@ -3,10 +3,10 @@
 import React from "react"
 import { MetaTags } from "react-meta-tags"
 
-import Card from "../components/Card"
-import CanonicalLink from "../components/CanonicalLink"
+import Card from "../../components/Card"
+import CanonicalLink from "../../components/CanonicalLink"
 
-import { formatTitle } from "../lib/title"
+import { formatTitle } from "../../lib/title"
 
 import type { Match } from "react-router"
 
@@ -27,7 +27,7 @@ export default class ContentPolicyPage extends React.Component<Props> {
           <CanonicalLink match={match} />
         </MetaTags>
         <div className="main-content">
-          <Card className="content-policy">
+          <Card className="site-policy content-policy">
             <h1>MicroMasters Discussions Community Guidelines</h1>
             <p>
               MITx offers these discussion forums as a place for you to grow

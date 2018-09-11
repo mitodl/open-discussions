@@ -72,6 +72,8 @@ urlpatterns = [
         index,
         name='password-reset-confirm'
     ),
+    url(r'^privacy-statement/', index),
+    url(r'^terms-and-conditions/', index),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

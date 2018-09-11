@@ -9,7 +9,9 @@ import qs from "query-string"
 import HomePage from "./HomePage"
 import ChannelPage from "./ChannelPage"
 import PostPage from "./PostPage"
-import ContentPolicyPage from "./ContentPolicyPage"
+import ContentPolicyPage from "./policies/ContentPolicyPage"
+import PrivacyPolicyPage from "./policies/PrivacyPolicyPage"
+import TermsOfServicePage from "./policies/TermsOfServicePage"
 import AdminPage from "./admin/AdminPage"
 import AuthRequiredPage from "./auth/AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
@@ -279,6 +281,16 @@ class App extends React.Component<AppProps> {
             exact
             path={`${match.url}password_reset/confirm/:uid/:token`}
             component={PasswordResetConfirmPage}
+          />
+          <Route
+            exact
+            path={`${match.url}terms-and-conditions`}
+            component={TermsOfServicePage}
+          />
+          <Route
+            exact
+            path={`${match.url}privacy-statement`}
+            component={PrivacyPolicyPage}
           />
         </div>
       </div>

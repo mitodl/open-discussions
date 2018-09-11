@@ -94,6 +94,9 @@ export const INACTIVE_USER_URL = "/account/inactive/"
 
 export const TOUCHSTONE_URL = "/login/saml/?idp=default"
 
+export const TERMS_OF_SERVICE_URL = "/terms-and-conditions"
+export const PRIVACY_POLICY_URL = "/privacy-statement"
+
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`
 
