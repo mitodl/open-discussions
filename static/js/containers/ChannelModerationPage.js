@@ -15,7 +15,7 @@ import {
   withCommentModeration,
   commentModerationSelector
 } from "../hoc/withCommentModeration"
-import withLoading from "../components/Loading"
+import { withSpinnerLoading } from "../components/Loading"
 import withChannelSidebar from "../hoc/withChannelSidebar"
 import CompactPostDisplay from "../components/CompactPostDisplay"
 import CommentTree from "../components/CommentTree"
@@ -153,5 +153,5 @@ export default R.compose(
   withPostModeration,
   withCommentModeration,
   withChannelSidebar("channel-moderation-page"),
-  withLoading
+  withSpinnerLoading
 )(ChannelModerationPage)

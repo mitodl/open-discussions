@@ -6,11 +6,12 @@ import ContentLoader from "react-content-loader"
 
 import { embedlyResizeImage, urlHostname } from "../lib/url"
 import { hasIframe } from "../lib/embed"
+import { contentLoaderSpeed } from "../lib/constants"
 
 export const EmbedlyLoader = (props: Object = {}) => (
-  <div className="content-loader">
+  <div className="embedly-content-loader">
     <ContentLoader
-      speed={2}
+      speed={contentLoaderSpeed}
       style={{ width: "100%", height: "300px" }}
       width="100%"
       height={300}

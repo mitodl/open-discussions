@@ -7,7 +7,7 @@ import { MetaTags } from "react-meta-tags"
 
 import ProfileForm from "../components/ProfileForm"
 import Card from "../components/Card"
-import withLoading from "../components/Loading"
+import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 import CanonicalLink from "../components/CanonicalLink"
 
@@ -168,5 +168,5 @@ const mapStateToProps = (state, ownProps) => {
 export default R.compose(
   connect(mapStateToProps),
   withSingleColumn("profile-edit-page"),
-  withLoading
+  withSpinnerLoading
 )(ProfileEditPage)

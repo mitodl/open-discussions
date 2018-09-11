@@ -1,10 +1,12 @@
 // @flow
 import React from "react"
 import { assert } from "chai"
-import { shallow, mount } from "enzyme"
+import { mount } from "enzyme"
 
-import withLoading, { Loading } from "./Loading"
+import { withLoading, withSpinnerLoading, withPostLoading } from "./Loading"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
+
+const GenericLoader = () => <div className="loading">loading...</div>
 
 class Content extends React.Component<*> {
   render() {
@@ -12,9 +14,11 @@ class Content extends React.Component<*> {
   }
 }
 
-const LoadingContent = withLoading(Content)
+const GenericLoadingContent = withLoading(GenericLoader, Content)
+const SpinnerLoadingContent = withSpinnerLoading(Content)
+const PostLoadingContent = withPostLoading(Content)
 
-describe("Loading", () => {
+describe("Loading component", () => {
   let props
 
   beforeEach(() => {
@@ -27,45 +31,54 @@ describe("Loading", () => {
   })
 
   const renderLoading = () => {
-    return mount(<LoadingContent {...props} />)
+    return mount(<GenericLoadingContent {...props} />)
   }
 
-  it("should show a spinner if not loaded and not errored", () => {
+  it("should render a loading indicator if not loaded and not errored", () => {
     props.loaded = false
     const wrapper = renderLoading()
-    assert.lengthOf(wrapper.find(".loading").find(".sk-three-bounce"), 1)
+    assert.isTrue(wrapper.find(".loading").exists())
   })
 
-  it("should render errors correctly if not loaded", () => {
-    props.loaded = false
-    props.errored = true
-    const wrapper = renderLoading()
-    assert.equal(wrapper.text(), "Error loading page")
+  //
+  ;[true, false].forEach(loaded => {
+    it(`should render errors correctly if loaded=${String(loaded)}`, () => {
+      props.loaded = loaded
+      props.errored = true
+      const wrapper = renderLoading()
+      assert.equal(wrapper.text(), "Error loading page")
+    })
   })
 
-  it("should render errors correctly if loaded", () => {
-    props.loaded = true
-    props.errored = true
-    const wrapper = renderLoading()
-    assert.equal(wrapper.text(), "Error loading page")
-  })
+  //
   ;[["notFound", NotFound], ["notAuthorized", NotAuthorized]].forEach(
-    ([propName, expectedComponent]) => {
-      it(`should show ${expectedComponent.displayName} if ${propName}`, () => {
-        props[propName] = true
+    ([errorPropName, expectedComponent]) => {
+      it(`should render correct error if '${errorPropName}'=true`, () => {
+        props[errorPropName] = true
         const wrapper = renderLoading()
         assert.ok(wrapper.find(expectedComponent).exists())
       })
     }
   )
 
-  it("should the contents if no errors and loaded", () => {
+  it("should render the contents if loaded=true and there are no errors", () => {
     const wrapper = renderLoading()
     assert.equal(wrapper.text(), "CONTENT")
   })
 
-  it("passes the className to the containing div", () => {
-    const wrapper = shallow(<Loading className="abc xyz" />)
-    assert.equal(wrapper.props().className, "loading abc xyz")
+  describe("(spinner-style)", () => {
+    it("should show a spinner if not loaded and not errored", () => {
+      props.loaded = false
+      const wrapper = mount(<SpinnerLoadingContent {...props} />)
+      assert.lengthOf(wrapper.find(".loading").find(".sk-three-bounce"), 1)
+    })
+  })
+
+  describe("(empty post-style)", () => {
+    it("should show an empty post loading animation if not loaded and not errored", () => {
+      props.loaded = false
+      const wrapper = mount(<PostLoadingContent {...props} />)
+      assert.lengthOf(wrapper.find(".post-content-loader"), 5)
+    })
   })
 })
