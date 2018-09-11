@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.45.0
+--------------
+
+- Added empty post loading animation when posts are being loaded
+- Extract correct channel name from edit pages (#1175)
+- Don't show an error page if comment posting fails (#1165)
+
 Version 0.44.2 (Released September 10, 2018)
 --------------
 
