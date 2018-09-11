@@ -13,6 +13,7 @@ import { makeCommentsResponse } from "../factories/comments"
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
+import { SET_BANNER_MESSAGE } from "../actions/ui"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import {
   userCanPost,
@@ -25,9 +26,9 @@ import { makeArticle, makeTweet } from "../factories/embedly"
 import { wait } from "../lib/util"
 import * as embedUtil from "../lib/embed"
 import { newPostForm } from "../lib/posts"
+import { shouldIf } from "../lib/test_utils"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
-import { SET_BANNER_MESSAGE } from "../actions/ui"
 
 describe("CreatePostPage", () => {
   let helper,
@@ -234,9 +235,9 @@ describe("CreatePostPage", () => {
     ["https://foo.bar/fake_url/fake.html?param1=val1&param2=val2", true],
     ["foo.bar/fake_url/fake.html?param1=val1&param2=val2", true]
   ].forEach(([link, isValid]) => {
-    it(`${
-      isValid ? "should" : "shouldn't"
-    } call Embedly when the URL is ${link}`, async () => {
+    it(`${shouldIf(
+      isValid
+    )} call Embedly when the URL is ${link}`, async () => {
       const wrapper = await renderPage()
       setLinkPost(wrapper)
       setUrl(wrapper, link)
