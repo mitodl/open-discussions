@@ -8,7 +8,7 @@ import {
   INITIAL_STATE
 } from "redux-hammock/constants"
 
-import { REPLACE_MORE_COMMENTS } from "../actions/comment"
+import { CLEAR_COMMENT_ERROR, REPLACE_MORE_COMMENTS } from "../actions/comment"
 import { findComment } from "../lib/comments"
 import * as api from "../lib/api"
 
@@ -303,7 +303,8 @@ export const commentsEndpoint = {
         ...state,
         data: update
       }
-    }
+    },
+    [CLEAR_COMMENT_ERROR]: R.dissoc("error")
   }
 }
 
