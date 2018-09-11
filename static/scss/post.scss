@@ -209,10 +209,22 @@
     a {
       margin: 0 5px;
     }
+  }
+}
+
+.expanded,
+.compact-post-summary {
+  .left {
+    display: flex;
+    align-items: center;
 
     .report-count {
       margin-left: 10px;
     }
+  }
+
+  .right {
+    color: $font-grey;
   }
 }
 
@@ -280,15 +292,6 @@
 
     .profile-image-container {
       padding: 0 10px 0 0;
-    }
-
-    .left {
-      display: flex;
-      align-items: center;
-    }
-
-    .right {
-      color: $font-grey;
     }
 
     span.author-name {

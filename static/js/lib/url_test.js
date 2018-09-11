@@ -36,7 +36,7 @@ describe("url helper functions", () => {
     it("should return a good URL", () => {
       assert.equal(
         channelModerationURL("foochannel"),
-        "/moderation/c/foochannel"
+        "/manage/c/edit/foochannel/moderation/"
       )
     })
   })

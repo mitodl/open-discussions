@@ -227,7 +227,7 @@ describe("CommentTree", () => {
   })
 
   //
-  ;[[true, "unfollow"], [false, "follow"]].forEach(
+  ;[[true, "Unfollow"], [false, "Follow"]].forEach(
     ([subscribed, buttonText]) => {
       it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
         comments[0].subscribed = subscribed
@@ -359,7 +359,7 @@ describe("CommentTree", () => {
         ...openDropdownMenu(report.comment)
       })
       assert.ok(wrapper.find(".report-count").exists())
-      assert.equal(wrapper.find(".report-count").text(), "Reports: 2")
+      assert.equal(wrapper.find(".report-count").text(), "Reported 2 times")
     })
 
     it("should not render a report count, if comment has no report data", () => {
@@ -377,7 +377,7 @@ describe("CommentTree", () => {
         ...openDropdownMenu(report.comment)
       })
       const ignoreButton = wrapper.find(".ignore-button")
-      assert.equal(ignoreButton.text(), "ignore all reports")
+      assert.equal(ignoreButton.text(), "Ignore report")
       const eventStub = {
         preventDefault: helper.sandbox.stub()
       }

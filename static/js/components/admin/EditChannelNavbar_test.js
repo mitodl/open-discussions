@@ -8,7 +8,8 @@ import {
   editChannelBasicURL,
   editChannelAppearanceURL,
   editChannelModeratorsURL,
-  editChannelContributorsURL
+  editChannelContributorsURL,
+  channelModerationURL
 } from "../../lib/url"
 
 describe("EditChannelNavbar", () => {
@@ -31,7 +32,8 @@ describe("EditChannelNavbar", () => {
     const linkPairs = [
       ["Basic", editChannelBasicURL(channelName)],
       ["Appearance", editChannelAppearanceURL(channelName)],
-      ["Members", editChannelModeratorsURL(channelName)]
+      ["Members", editChannelModeratorsURL(channelName)],
+      ["Reported Content", channelModerationURL(channelName)]
     ]
 
     assert.equal(links.length, linkPairs.length)

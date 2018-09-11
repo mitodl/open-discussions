@@ -6,7 +6,8 @@ import R from "ramda"
 import {
   editChannelBasicURL,
   editChannelAppearanceURL,
-  editChannelModeratorsURL
+  editChannelModeratorsURL,
+  channelModerationURL
 } from "../../lib/url"
 
 type Props = {
@@ -29,6 +30,9 @@ export default class EditChannelNavbar extends React.Component<Props> {
           isActive={membersIsActive(channelName)}
         >
           Members
+        </NavLink>
+        <NavLink to={channelModerationURL(channelName)}>
+          Reported Content
         </NavLink>
       </div>
     )

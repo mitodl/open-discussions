@@ -5,6 +5,7 @@ import R from "ramda"
 import moment from "moment"
 import { Link } from "react-router-dom"
 
+import ReportCount from "./ReportCount"
 import Card from "./Card"
 import SpinnerButton from "./SpinnerButton"
 import { ReplyToCommentForm, EditCommentForm } from "./CommentForms"
@@ -81,7 +82,7 @@ export default class CommentTree extends React.Component<Props> {
             }
           })}
         >
-          <a href="#">{comment.subscribed ? "unfollow" : "follow"}</a>
+          <a href="#">{comment.subscribed ? "Unfollow" : "Follow"}</a>
         </div>
       </li>
     )
@@ -154,14 +155,10 @@ export default class CommentTree extends React.Component<Props> {
         <i className="material-icons more_vert" onClick={showDropdown}>
           more_vert
         </i>
+        <ReportCount count={comment.num_reports} />
         {commentMenuOpen ? (
           <DropdownMenu closeMenu={hideDropdown}>
             {userIsAnonymous() ? null : this.renderFollowButton(comment)}
-            {comment.num_reports ? (
-              <li className="comment-action-button report-count">
-                Reports: {comment.num_reports}
-              </li>
-            ) : null}
             {SETTINGS.username === comment.author_id && !moderationUI ? (
               <li>
                 <div
@@ -172,7 +169,7 @@ export default class CommentTree extends React.Component<Props> {
                     }
                   }}
                 >
-                  <a href="#">edit</a>
+                  <a href="#">Edit</a>
                 </div>
               </li>
             ) : null}
@@ -184,7 +181,7 @@ export default class CommentTree extends React.Component<Props> {
                     deleteComment(comment)
                   )}
                 >
-                  <a href="#">delete</a>
+                  <a href="#">Delete</a>
                 </div>
               </li>
             ) : null}
@@ -196,12 +193,12 @@ export default class CommentTree extends React.Component<Props> {
                     ignoreCommentReports(comment)
                   )}
                 >
-                  <a href="#">ignore all reports</a>
+                  <a href="#">Ignore report</a>
                 </div>
               </li>
             ) : null}
             <li className="comment-action-button permalink-button">
-              <Link to={commentPermalink(comment.id)}>permalink</Link>
+              <Link to={commentPermalink(comment.id)}>Show this thread</Link>
             </li>
             <li>
               <CommentRemovalForm
@@ -219,7 +216,7 @@ export default class CommentTree extends React.Component<Props> {
                     reportComment(comment)
                   )}
                 >
-                  <a href="#">report</a>
+                  <a href="#">Report</a>
                 </div>
               </li>
             )}

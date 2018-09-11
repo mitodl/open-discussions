@@ -5,6 +5,7 @@ import moment from "moment"
 import R from "ramda"
 import { Link } from "react-router-dom"
 
+import ReportCount from "./ReportCount"
 import { EditPostForm } from "./CommentForms"
 import { renderTextContent } from "./Markdown"
 import Embedly from "./Embedly"
@@ -97,6 +98,7 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
             className="expanded"
             toggleUpvote={toggleUpvote}
           />
+          <ReportCount count={post.num_reports} />
         </div>
         <div className="right">
           {SETTINGS.username === post.author_id && post.text ? (
@@ -132,34 +134,31 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
           )}
           {postDropdownMenuOpen ? (
             <DropdownMenu closeMenu={hidePostMenu}>
-              {post.num_reports ? (
-                <div className="report-count">Reports: {post.num_reports}</div>
-              ) : null}
               {SETTINGS.username === post.author_id ? (
                 <li className="comment-action-button delete-post">
                   <a onClick={showPostDeleteDialog} href="#">
-                    delete
+                    Delete
                   </a>
                 </li>
               ) : null}
               {isModerator && !post.removed ? (
                 <li className="comment-action-button remove-post">
                   <a onClick={this.removePost.bind(this)} href="#">
-                    remove
+                    Remove content
                   </a>
                 </li>
               ) : null}
               {isModerator && post.removed ? (
                 <li className="comment-action-button approve-post">
                   <a onClick={this.approvePost.bind(this)} href="#">
-                    approve
+                    Approve content
                   </a>
                 </li>
               ) : null}
               {!userIsAnonymous() ? (
                 <li className="comment-action-button report-post">
                   <a onClick={showPostReportDialog} href="#">
-                    report
+                    Report
                   </a>
                 </li>
               ) : null}

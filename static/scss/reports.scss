@@ -1,7 +1,9 @@
 .report-count {
   background-color: $report-count-red;
-  color: white;
-  padding: 2px 5px;
+  color: black !important;
+  padding: 3px 15px;
+  font-size: 0.9em;
+  border-radius: 15px;
 }
 
 .channel-moderation {

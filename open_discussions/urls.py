@@ -57,7 +57,6 @@ urlpatterns = [
     url(r'^channel/', channel_redirect),
     url(r'^manage/', index),
     url(r'^create_post/', index),
-    url(r'^moderation/', index),
     url(r'^settings/', index),
     url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
     url(r'^profile/[A-Za-z0-9_]+/', index, name='profile'),
