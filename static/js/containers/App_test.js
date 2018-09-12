@@ -2,6 +2,7 @@
 /* global SETTINGS: false */
 import sinon from "sinon"
 import { assert } from "chai"
+import qs from "query-string"
 
 import App from "./App"
 
@@ -41,6 +42,29 @@ describe("App", () => {
     await renderComponent("/missing", [])
     sinon.assert.calledWith(helper.getChannelsStub)
   })
+
+  it("shows messages in the banner on mount", async () => {
+    SETTINGS.username = null
+    const message = "Something strange is afoot at the Circle K"
+    const [wrapper] = await renderComponent(
+      `/missing?${qs.stringify({ message })}`,
+      [
+        actions.subscribedChannels.get.requestType,
+        actions.subscribedChannels.get.successType,
+        actions.channel.SET_CHANNEL_DATA,
+        actions.ui.SET_BANNER_MESSAGE
+      ]
+    )
+
+    wrapper.update()
+
+    assert.deepEqual(helper.store.getState().ui.banner, {
+      message,
+      visible: true
+    })
+  })
+
+  //
   ;[
     [true, true, 0, false],
     [true, false, 0, true],
@@ -79,6 +103,8 @@ describe("App", () => {
       })
     })
   })
+
+  //
   ;[SETTINGS_URL, `${SETTINGS_URL}tokenbasedauthtokentoken`].forEach(url => {
     it(`loads requirements after navigating away from settings url ${url}`, async () => {
       const [wrapper] = await renderComponent(url, [

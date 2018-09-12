@@ -4,6 +4,7 @@ import React from "react"
 import { Route, Redirect, Switch } from "react-router-dom"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
+import qs from "query-string"
 
 import HomePage from "./HomePage"
 import ChannelPage from "./ChannelPage"
@@ -38,6 +39,7 @@ import {
   setShowDrawerDesktop,
   showDropdown,
   hideDropdown,
+  setBannerMessage,
   hideBanner
 } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
@@ -124,6 +126,19 @@ class App extends React.Component<AppProps> {
     dispatch(setChannelData(channels))
     if (SETTINGS.username) {
       await dispatch(actions.profiles.get(SETTINGS.username))
+    }
+    // wait to show messages
+    await this.showMessages()
+  }
+
+  showMessages = async () => {
+    const {
+      dispatch,
+      location: { search }
+    } = this.props
+    const params = qs.parse(search)
+    if (params.message) {
+      await dispatch(setBannerMessage(params.message))
     }
   }
 
