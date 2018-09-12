@@ -368,7 +368,7 @@ describe("PostPage", function() {
             .find("Dialog")
             .at(1)
             .props()
-            .onAccept()
+            .onAccept({ type: "MDCDialog:accept" })
         }
       )
 
@@ -456,7 +456,7 @@ describe("PostPage", function() {
               .find("Dialog")
               .at(2)
               .props()
-              .onAccept()
+              .onAccept({ type: "MDCDialog:accept" })
           })
         }
 

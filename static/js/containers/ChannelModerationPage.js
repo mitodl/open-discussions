@@ -32,7 +32,7 @@ import type { Dispatch } from "redux"
 import type {
   Channel,
   PostReportRecord,
-  CommentReportRecord
+  ReportRecord
 } from "../flow/discussionTypes"
 
 const addDummyReplies = R.over(R.lensPath(["replies"]), () => [])
@@ -43,7 +43,6 @@ type Props = {
   channelName: string,
   channel: Channel,
   reports: Array<PostReportRecord>,
-  commentReports: Array<CommentReportRecord>,
   isModerator: boolean,
   removePost: Function,
   ignorePostReports: Function,
@@ -53,7 +52,7 @@ type Props = {
   dropdownMenus: Set<string>
 }
 
-class ChannelModerationPage extends React.Component<Props> {
+export class ChannelModerationPage extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }
@@ -67,7 +66,7 @@ class ChannelModerationPage extends React.Component<Props> {
     } catch (_) {} // eslint-disable-line no-empty
   }
 
-  renderReport = report => {
+  renderReport = (report: ReportRecord) => {
     const {
       isModerator,
       removePost,
@@ -76,7 +75,6 @@ class ChannelModerationPage extends React.Component<Props> {
       channelName,
       ignorePostReports,
       ignoreCommentReports,
-      commentReports,
       dropdownMenus,
       dispatch
     } = this.props
@@ -96,7 +94,6 @@ class ChannelModerationPage extends React.Component<Props> {
       return (
         <CommentTree
           comments={[addDummyReplies(report.comment)]}
-          commentReports={commentReports}
           commentPermalink={commentPermalink(
             channelName,
             report.comment.post_id,
@@ -139,14 +136,12 @@ class ChannelModerationPage extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    ...postModerationSelector(state, ownProps),
-    ...commentModerationSelector(state, ownProps),
-    shouldGetReports: true,
-    dropdownMenus:    state.ui.dropdownMenus
-  }
-}
+const mapStateToProps = (state, ownProps) => ({
+  ...postModerationSelector(state, ownProps),
+  ...commentModerationSelector(state, ownProps),
+  shouldGetReports: true,
+  dropdownMenus:    state.ui.dropdownMenus
+})
 
 export default R.compose(
   connect(mapStateToProps),

@@ -59,13 +59,19 @@ export const withPostModeration = (
       dispatch(hideDialog(DIALOG_REMOVE_POST))
     }
 
-    removePost = async () => {
+    removePost = async (event: Event) => {
       const {
         dispatch,
         focusedPost,
         channelName,
         shouldGetReports
       } = this.props
+
+      if (event.type !== "MDCDialog:accept") {
+        // filter out click event to avoid double execution
+        return
+      }
+
       await removePost(dispatch, focusedPost)
       if (shouldGetReports) {
         await dispatch(actions.reports.get(channelName))
