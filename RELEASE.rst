@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.45.0
+Version 0.45.0 (Released September 12, 2018)
 --------------
 
 - Added empty post loading animation when posts are being loaded
