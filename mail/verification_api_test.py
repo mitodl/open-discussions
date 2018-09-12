@@ -16,7 +16,7 @@ def test_send_verification_email(mocker, rf):
     """Test that send_verification_email sends an email with the link in it"""
     send_messages_mock = mocker.patch('mail.api.send_messages')
     email = 'test@localhost'
-    request = rf.post(reverse('social:complete', args=('email',)), {
+    request = rf.post(reverse('social:complete', args=('email', )), {
         'email': email,
     })
     # social_django depends on request.sesssion, so use the middleware to set that

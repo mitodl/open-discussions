@@ -27,24 +27,38 @@ def test_social_auth_serializer_error(mocker, side_effect, result):
     result.flow = SocialAuthState.FLOW_REGISTER
     result.provider = EmailAuth.name
 
-    serializer = RegisterEmailSerializer(data={
-        'flow': result.flow,
-        'email': 'user@localhost',
-    }, context={
-        'backend': mocker.Mock(),
-        'strategy': mocker.Mock(),
-        'request': mocker.Mock(),
-    })
+    serializer = RegisterEmailSerializer(
+        data={
+            'flow': result.flow,
+            'email': 'user@localhost',
+        },
+        context={
+            'backend': mocker.Mock(),
+            'strategy': mocker.Mock(),
+            'request': mocker.Mock(),
+        })
     assert serializer.is_valid() is True, "Received errors: {}".format(serializer.errors)
     assert isinstance(serializer.save(), SocialAuthState)
     assert serializer.data == RegisterEmailSerializer(result).data
 
 
 @pytest.mark.parametrize('data,raises,message', (
-    ({'email': None, 'partial': None}, ValidationError, "One of 'partial' or 'email' is required"),
-    ({'email': EMAIL, 'partial': TOKEN}, ValidationError, "Pass only one of 'partial' or 'email'"),
-    ({'email': EMAIL, 'partial': None}, None, None),
-    ({'email': None, 'partial': TOKEN}, None, None),
+    ({
+        'email': None,
+        'partial': None
+    }, ValidationError, "One of 'partial' or 'email' is required"),
+    ({
+        'email': EMAIL,
+        'partial': TOKEN
+    }, ValidationError, "Pass only one of 'partial' or 'email'"),
+    ({
+        'email': EMAIL,
+        'partial': None
+    }, None, None),
+    ({
+        'email': None,
+        'partial': TOKEN
+    }, None, None),
 ))
 def test_register_email_validation(data, raises, message):
     """Tests class-level validation of RegisterEmailSerializer"""

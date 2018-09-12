@@ -14,7 +14,6 @@ from PIL import Image
 
 from open_discussions.utils import now_in_utc
 
-
 # Max dimension of either height or width for small and medium images
 IMAGE_SMALL_MAX_DIMENSION = 64
 IMAGE_MEDIUM_MAX_DIMENSION = 128
@@ -25,11 +24,7 @@ IMAGE_MEDIUM = "image_medium"
 
 MAX_IMAGE_FIELD_LENGTH = 1024
 
-IMAGE_FIELDS = {
-    IMAGE_STANDARD: "",
-    IMAGE_SMALL: IMAGE_SMALL_MAX_DIMENSION,
-    IMAGE_MEDIUM: IMAGE_MEDIUM_MAX_DIMENSION
-}
+IMAGE_FIELDS = {IMAGE_STANDARD: "", IMAGE_SMALL: IMAGE_SMALL_MAX_DIMENSION, IMAGE_MEDIUM: IMAGE_MEDIUM_MAX_DIMENSION}
 
 # This is the Django ImageField max path size
 IMAGE_PATH_MAX_LENGTH = 100
@@ -75,13 +70,7 @@ def generate_gravatar_image(user, image_field=None):
     max_dimension = IMAGE_FIELDS[image_field]
     size_param = '&s={}'.format(max_dimension) if max_dimension else ''
     if user.profile.name:
-        d_param = urljoin(
-            settings.SITE_BASE_URL,
-            '/profile/{}/{}/fff/579cf9.png'.format(
-                user.username,
-                max_dimension
-            )
-        )
+        d_param = urljoin(settings.SITE_BASE_URL, '/profile/{}/{}/fff/579cf9.png'.format(user.username, max_dimension))
     else:
         d_param = urljoin(settings.SITE_BASE_URL, DEFAULT_PROFILE_IMAGE)
 
@@ -316,21 +305,18 @@ def generate_svg_avatar(name, size, color, bgcolor):
         '-moz-border-radius': '{}px'.format(size - 1)
     }
 
-    text_style = {
-        'font-weight': '400px',
-        'font-size': '{}px'.format(int(size/2)),
-        'color': '#{}'.format(color)
-    }
+    text_style = {'font-weight': '400px', 'font-size': '{}px'.format(int(size / 2)), 'color': '#{}'.format(color)}
 
-    return SVG_TEMPLATE.format(**{
-        'height': size,
-        'size': size,
-        'cx': int(size / 2),
-        'cy': int(size / 2),
-        'radius': int((size - 1) / 2),
-        'style': dict_to_style(style),
-        'color': color,
-        'font-family': ','.join(DEFAULT_FONTS),
-        'text-style': dict_to_style(text_style),
-        'text': xml_escape(initials.upper()),
-    }).replace('\n', '')
+    return SVG_TEMPLATE.format(
+        **{
+            'height': size,
+            'size': size,
+            'cx': int(size / 2),
+            'cy': int(size / 2),
+            'radius': int((size - 1) / 2),
+            'style': dict_to_style(style),
+            'color': color,
+            'font-family': ','.join(DEFAULT_FONTS),
+            'text-style': dict_to_style(text_style),
+            'text': xml_escape(initials.upper()),
+        }).replace('\n', '')

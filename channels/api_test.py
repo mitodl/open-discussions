@@ -44,19 +44,28 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture()
 def mock_get_client(mocker):
     """Mock reddit get_client"""
-    return mocker.patch('channels.api._get_client', autospec=True, return_value=Mock(
-        subreddit=Mock(return_value=Mock(submit=Mock(return_value=Mock(id='abc')))),
-        submission=Mock(return_value=Mock(reply=Mock(return_value=Mock(
-            id='456',
-            submission=Mock(id='123'),
-            subreddit=Mock(display_name='subreddit'),
-        )))),
-        comment=Mock(return_value=Mock(reply=Mock(return_value=Mock(
-            id='789',
-            submission=Mock(id='687'),
-            subreddit=Mock(display_name='other_subreddit'),
-        )))),
-    ))
+    return mocker.patch(
+        'channels.api._get_client',
+        autospec=True,
+        return_value=Mock(
+            subreddit=Mock(return_value=Mock(submit=Mock(return_value=Mock(id='abc')))),
+            submission=Mock(
+                return_value=Mock(
+                    reply=Mock(
+                        return_value=Mock(
+                            id='456',
+                            submission=Mock(id='123'),
+                            subreddit=Mock(display_name='subreddit'),
+                        )))),
+            comment=Mock(
+                return_value=Mock(
+                    reply=Mock(
+                        return_value=Mock(
+                            id='789',
+                            submission=Mock(id='687'),
+                            subreddit=Mock(display_name='other_subreddit'),
+                        )))),
+        ))
 
 
 @pytest.fixture()
@@ -67,16 +76,36 @@ def mock_client(mock_get_client):
 
 @pytest.mark.parametrize('vote_func', [api.Api.apply_post_vote, api.Api.apply_comment_vote])
 @pytest.mark.parametrize('request_data,likes_value,expected_instance_vote_func', [
-    ({'upvoted': True}, None, 'upvote'),
-    ({'upvoted': True}, False, 'upvote'),
-    ({'downvoted': True}, None, 'downvote'),
-    ({'downvoted': True}, True, 'downvote'),
-    ({'upvoted': False}, True, 'clear_vote'),
-    ({'downvoted': False}, False, 'clear_vote'),
-    ({'upvoted': True}, True, None),
-    ({'upvoted': False}, False, None),
-    ({'downvoted': True}, False, None),
-    ({'downvoted': False}, True, None),
+    ({
+        'upvoted': True
+    }, None, 'upvote'),
+    ({
+        'upvoted': True
+    }, False, 'upvote'),
+    ({
+        'downvoted': True
+    }, None, 'downvote'),
+    ({
+        'downvoted': True
+    }, True, 'downvote'),
+    ({
+        'upvoted': False
+    }, True, 'clear_vote'),
+    ({
+        'downvoted': False
+    }, False, 'clear_vote'),
+    ({
+        'upvoted': True
+    }, True, None),
+    ({
+        'upvoted': False
+    }, False, None),
+    ({
+        'downvoted': True
+    }, False, None),
+    ({
+        'downvoted': False
+    }, True, None),
 ])
 def test_apply_vote(mocker, vote_func, request_data, likes_value, expected_instance_vote_func):
     """
@@ -104,22 +133,14 @@ def test_vote_indexing(mocker, vote_func, expected_allowed_downvote, expected_in
     mock_reddit_obj = Mock()
     mock_reddit_obj.likes = False
     vote_func(mock_reddit_obj, {'upvoted': True})
-    patched_vote_indexer.assert_called_once_with(
-        mock_reddit_obj,
-        expected_instance_type,
-        VoteActions.UPVOTE
-    )
+    patched_vote_indexer.assert_called_once_with(mock_reddit_obj, expected_instance_type, VoteActions.UPVOTE)
     # Test downvote (which may not be allowed)
     patched_vote_indexer.reset_mock()
     mock_reddit_obj.likes = True
     vote_func(mock_reddit_obj, {'downvoted': True})
     assert patched_vote_indexer.called is expected_allowed_downvote
     if patched_vote_indexer.called:
-        patched_vote_indexer.assert_called_once_with(
-            mock_reddit_obj,
-            expected_instance_type,
-            VoteActions.DOWNVOTE
-        )
+        patched_vote_indexer.assert_called_once_with(mock_reddit_obj, expected_instance_type, VoteActions.DOWNVOTE)
     # Test unchanged vote
     patched_vote_indexer.reset_mock()
     mock_reddit_obj.likes = True
@@ -160,8 +181,7 @@ def test_create_channel_user(mock_get_client, indexing_decorator, channel_type):
     assert channel == mock_get_client.return_value.subreddit.create.return_value
     mock_get_client.assert_called_once_with(user=user)
     mock_get_client.return_value.subreddit.create.assert_called_once_with(
-        'name', title='Title', subreddit_type=channel_type, allow_top=True
-    )
+        'name', title='Title', subreddit_type=channel_type, allow_top=True)
     assert indexing_decorator.mock_persist_func.call_count == 0
 
 
@@ -173,8 +193,7 @@ def test_create_channel_setting(mock_client, channel_setting):
     channel = api.Api(user=user).create_channel('name', 'Title', **kwargs)
     assert channel == mock_client.subreddit.create.return_value
     mock_client.subreddit.create.assert_called_once_with(
-        'name', title='Title', subreddit_type=api.CHANNEL_TYPE_PUBLIC, allow_top=True, **kwargs
-    )
+        'name', title='Title', subreddit_type=api.CHANNEL_TYPE_PUBLIC, allow_top=True, **kwargs)
 
 
 def test_create_channel_invalid_setting(mock_client):
@@ -215,7 +234,7 @@ def test_update_channel_type(mock_client, channel_type):
     mock_client.subreddit.return_value.mod.update.assert_called_once_with(subreddit_type=channel_type)
 
 
-@pytest.mark.parametrize('channel_setting', api.CHANNEL_SETTINGS + ('title',))
+@pytest.mark.parametrize('channel_setting', api.CHANNEL_SETTINGS + ('title', ))
 def test_update_channel_setting(mock_client, channel_setting):
     """Test update_channel for channel_setting"""
     user = UserFactory.create()
@@ -242,9 +261,7 @@ def test_update_channel_membership(mock_client, membership_is_managed):
     assert Channel.objects.count() == 1
     channel_obj = Channel.objects.first()
     assert channel_obj.name == name
-    assert channel_obj.membership_is_managed is (
-        membership_is_managed if membership_is_managed is not None else False
-    )
+    assert channel_obj.membership_is_managed is (membership_is_managed if membership_is_managed is not None else False)
 
 
 def test_update_channel_invalid_channel_type(mock_client):
@@ -291,9 +308,7 @@ def test_create_post_url(mock_client, indexing_decorator):
     post = client.create_post('channel', 'Title', url='http://google.com')
     assert post == mock_client.subreddit.return_value.submit.return_value
     mock_client.subreddit.assert_called_once_with('channel')
-    mock_client.subreddit.return_value.submit.assert_called_once_with(
-        'Title', selftext=None, url='http://google.com'
-    )
+    mock_client.subreddit.return_value.submit.assert_called_once_with('Title', selftext=None, url='http://google.com')
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 2
     assert search_task_helpers.index_new_post in indexing_decorator.mock_persist_func.original
@@ -586,11 +601,7 @@ def test_more_comments_with_more_comments(mock_client, mocker):  # pylint: disab
 
     first_comments = [_make_comment(child) for child in children]
     side_effects = [
-        Mock(
-            comments=Mock(
-                return_value=CommentForest(post_id, comments=first_comments)
-            )
-        ),
+        Mock(comments=Mock(return_value=CommentForest(post_id, comments=first_comments))),
         Mock()  # only used for identity comparison
     ]
     init_more_mock.side_effect = side_effects
@@ -1047,19 +1058,11 @@ def test_sync_post_model():
 
     assert Channel.objects.count() == 0
     assert Post.objects.count() == 0
-    post = api.sync_post_model(
-        channel_name=channel_name,
-        post_id=post_id,
-        post_url=post_url
-    )
+    post = api.sync_post_model(channel_name=channel_name, post_id=post_id, post_url=post_url)
     assert Channel.objects.count() == 1
     assert Post.objects.count() == 1
     assert post == Post.objects.first()
     assert post.channel.name == channel_name
     assert post.post_id == post_id
 
-    assert post == api.sync_post_model(
-        channel_name=channel_name,
-        post_id=post_id,
-        post_url=post_url
-    )
+    assert post == api.sync_post_model(channel_name=channel_name, post_id=post_id, post_url=post_url)

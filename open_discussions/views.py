@@ -24,7 +24,6 @@ from open_discussions import features
 from open_discussions.templatetags.render_bundle import public_path
 from sites.models import AuthenticatedSite
 
-
 User = get_user_model()
 
 
@@ -45,8 +44,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
                 api_settings.JWT_SECRET_KEY,
                 # use a high leeway because we're interested in whether this token was ever valid
                 leeway=timedelta(days=365),
-                algorithms=[api_settings.JWT_ALGORITHM]
-            )
+                algorithms=[api_settings.JWT_ALGORITHM])
 
             username = payload.get("username", None)
             site_key = payload.get("site_key", site_key)
@@ -56,11 +54,10 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
                     # redirect to authenticate the user using their JWT for the provider
                     # PSA will then redirect back here using the next param
                     return redirect("{}?{}".format(
-                        reverse('social:complete', args=(provider,)),
+                        reverse('social:complete', args=(provider, )),
                         urlencode({
                             'next': request.build_absolute_uri(),
-                        })
-                    ))
+                        })))
                 user = UserSocialAuth.objects.get(provider=MicroMastersAuth.name, uid=username).user
             else:
 
@@ -109,9 +106,10 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY
     }
 
-    return render(request, "index.html", context={
-        "js_settings_json": json.dumps(js_settings),
-    })
+    return render(
+        request, "index.html", context={
+            "js_settings_json": json.dumps(js_settings),
+        })
 
 
 def saml_metadata(request):

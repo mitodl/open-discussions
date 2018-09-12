@@ -20,11 +20,7 @@ from channels.constants import (
     VALID_CHANNEL_TYPES,
     LINK_TYPE_ANY,
 )
-from channels.models import (
-    RedditAccessToken,
-    RedditRefreshToken,
-    Subscription,
-    LinkMeta)
+from channels.models import (RedditAccessToken, RedditRefreshToken, Subscription, LinkMeta)
 
 FAKE = faker.Factory.create()
 
@@ -34,6 +30,7 @@ STRATEGY_BUILD = 'build'
 
 class Channel:
     """Simple factory representation for a channel"""
+
     def __init__(self, **kwargs):
         self.name = kwargs.get('name', None)
         self.title = kwargs.get('title', None)
@@ -46,6 +43,7 @@ class Channel:
 
 class Post:
     """Simple factory representation for a post"""
+
     def __init__(self, **kwargs):
         self.id = kwargs.get('id', None)
         self.title = kwargs.get('title', None)
@@ -58,6 +56,7 @@ class Post:
 
 class Comment:
     """Simple factory representation for a comment"""
+
     def __init__(self, **kwargs):
         self.id = kwargs.get('id', None)
         self.text = kwargs.get('text', None)
@@ -162,6 +161,7 @@ class FactoryStore:
     """
     Handles storage of factory data to/from disk
     """
+
     def __init__(self, name):
         self.filename = "factory_data/{}.json".format(name)
         self.data = {}
@@ -258,6 +258,7 @@ class RedditFactories:
     """
     Factory for users, channels, posts, and comments
     """
+
     def __init__(self, store):
         self.store = store
 
@@ -272,13 +273,7 @@ class RedditFactories:
         Returns:
             User: the created user
         """
-        user = self.store.get_or_make(
-            UserFactory,
-            "users",
-            ident,
-            strategy=strategy,
-            **kwargs
-        )
+        user = self.store.get_or_make(UserFactory, "users", ident, strategy=strategy, **kwargs)
         api.get_or_create_auth_tokens(user)
         return user
 
@@ -294,13 +289,7 @@ class RedditFactories:
             Channel: the created channel
         """
         return self.store.get_or_make(
-            ChannelFactory,
-            "channels",
-            ident,
-            strategy=strategy,
-            api=api.Api(user),
-            **kwargs
-        )
+            ChannelFactory, "channels", ident, strategy=strategy, api=api.Api(user), **kwargs)
 
     def text_post(self, ident, user, strategy=STRATEGY_CREATE, **kwargs):
         """
@@ -313,14 +302,7 @@ class RedditFactories:
         Returns:
             Post: the created post
         """
-        return self.store.get_or_make(
-            TextPostFactory,
-            "posts",
-            ident,
-            strategy=strategy,
-            api=api.Api(user),
-            **kwargs
-        )
+        return self.store.get_or_make(TextPostFactory, "posts", ident, strategy=strategy, api=api.Api(user), **kwargs)
 
     def link_post(self, ident, user, strategy=STRATEGY_CREATE, **kwargs):
         """
@@ -333,14 +315,7 @@ class RedditFactories:
         Returns:
             Post: the created post
         """
-        return self.store.get_or_make(
-            LinkPostFactory,
-            "posts",
-            ident,
-            strategy=strategy,
-            api=api.Api(user),
-            **kwargs
-        )
+        return self.store.get_or_make(LinkPostFactory, "posts", ident, strategy=strategy, api=api.Api(user), **kwargs)
 
     def comment(self, ident, user, strategy=STRATEGY_CREATE, **kwargs):
         """
@@ -354,13 +329,7 @@ class RedditFactories:
             Comment: the created comment
         """
         return self.store.get_or_make(
-            CommentFactory,
-            "comments",
-            ident,
-            strategy=strategy,
-            api=api.Api(user),
-            **kwargs
-        )
+            CommentFactory, "comments", ident, strategy=strategy, api=api.Api(user), **kwargs)
 
 
 class RedditRefreshTokenFactory(DjangoModelFactory):
@@ -379,8 +348,7 @@ class RedditAccessTokenFactory(DjangoModelFactory):
 
     token_value = factory.Faker('word')
     token_expires_at = factory.LazyFunction(
-        lambda: FAKE.date_time_this_year(before_now=False, after_now=True, tzinfo=pytz.utc)
-    )
+        lambda: FAKE.date_time_this_year(before_now=False, after_now=True, tzinfo=pytz.utc))
 
     class Meta:
         model = RedditAccessToken
@@ -388,9 +356,7 @@ class RedditAccessTokenFactory(DjangoModelFactory):
     class Params:
         expired = factory.Trait(
             token_expires_at=factory.LazyFunction(
-                lambda: FAKE.date_time_this_year(before_now=True, after_now=False, tzinfo=pytz.utc)
-            )
-        )
+                lambda: FAKE.date_time_this_year(before_now=True, after_now=False, tzinfo=pytz.utc)))
 
 
 def _timestamp_to_iso_str(timestamp):
@@ -436,8 +402,7 @@ class ChannelFactory(factory.Factory):
             channel_type=self.channel_type,
             link_type=self.link_type,
             description=self.description,
-            public_description=self.public_description
-        )
+            public_description=self.public_description)
 
     class Meta:
         model = Channel
@@ -525,8 +490,7 @@ class CommentFactory(factory.Factory):
         comment = self.api.create_comment(
             self.text,
             post_id=self.post_id if not self.comment_id else None,  # only use post_id if top-level comment
-            comment_id=self.comment_id
-        )
+            comment_id=self.comment_id)
 
         self.id = comment.id
         self.created = _timestamp_to_iso_str(comment.created)

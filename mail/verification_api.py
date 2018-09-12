@@ -25,9 +25,9 @@ def send_verification_email(strategy, backend, code, partial_token):  # pylint: 
         quote_plus(partial_token),
     )
 
-    api.send_messages(list(api.messages_for_recipients([
-        (code.email, {
-            'base_url': settings.SITE_BASE_URL,
-            'confirmation_url': url,
-        })
-    ], VERIFICATION_TEMPLATE_NAME)))
+    api.send_messages(
+        list(
+            api.messages_for_recipients([(code.email, {
+                'base_url': settings.SITE_BASE_URL,
+                'confirmation_url': url,
+            })], VERIFICATION_TEMPLATE_NAME)))

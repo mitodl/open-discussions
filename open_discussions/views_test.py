@@ -82,16 +82,12 @@ def test_webpack_url_jwt_redirect(client, user):
     response = client.get(reverse('open_discussions-index'))
     assert response.status_code == 302
     assert response.url == '{}?{}'.format(
-        reverse('social:complete', args=('micromasters',)),
-        urlencode({
+        reverse('social:complete', args=('micromasters', )), urlencode({
             'next': 'http://testserver/',
-        })
-    )
+        }))
 
 
-def test_webpack_url_jwt(
-        settings, client, user, jwt_token, mocker, authenticated_site
-):  # pylint: disable=too-many-arguments
+def test_webpack_url_jwt(settings, client, user, jwt_token, mocker, authenticated_site):  # pylint: disable=too-many-arguments
     """Verify that webpack bundle src shows up in production for jwt auth"""
     settings.GA_TRACKING_ID = 'fake'
     settings.EMBEDLY_KEY = 'fake'

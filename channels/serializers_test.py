@@ -21,7 +21,6 @@ from channels.serializers import (
 )
 from open_discussions.factories import UserFactory
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -42,24 +41,25 @@ def test_serialize_channel(user, membership_is_managed):
 
     Channel.objects.create(name=channel.display_name, membership_is_managed=membership_is_managed)
 
-    assert ChannelSerializer(channel, context={
-        "request": request,
-    }).data == {
-        'name': 'name',
-        'title': 'title',
-        'channel_type': 'public',
-        'link_type': 'link',
-        'description': 'description',
-        'public_description': 'public_description',
-        'user_is_moderator': True,
-        'user_is_contributor': True,
-        'membership_is_managed': membership_is_managed,
-        'avatar': None,
-        'avatar_small': None,
-        'avatar_medium': None,
-        'banner': None,
-        'ga_tracking_id': None
-    }
+    assert ChannelSerializer(
+        channel, context={
+            "request": request,
+        }).data == {
+            'name': 'name',
+            'title': 'title',
+            'channel_type': 'public',
+            'link_type': 'link',
+            'description': 'description',
+            'public_description': 'public_description',
+            'user_is_moderator': True,
+            'user_is_contributor': True,
+            'membership_is_managed': membership_is_managed,
+            'avatar': None,
+            'avatar_small': None,
+            'avatar_medium': None,
+            'banner': None,
+            'ga_tracking_id': None
+        }
 
 
 @pytest.mark.parametrize("membership_is_managed", [True, False, None])
@@ -126,10 +126,7 @@ def test_update_channel(user, is_empty):
         "public_description": validated_data['public_description'],
         "link_type": validated_data['submission_type'],
     }
-    api_mock.update_channel.assert_called_once_with(
-        name=display_name,
-        **kwargs
-    )
+    api_mock.update_channel.assert_called_once_with(name=display_name, **kwargs)
     assert channel == api_mock.update_channel.return_value
 
 
@@ -171,9 +168,7 @@ def test_post_edit_url():
         PostSerializer(context={
             "request": Mock(),
             "view": Mock(kwargs={'post_id': 'post'}),
-        }).update(Mock(), {
-            "url": "url"
-        })
+        }).update(Mock(), {"url": "url"})
     assert ex.value.args[0] == 'Cannot edit url for a post'
 
 
@@ -187,9 +182,7 @@ def test_post_validate_removed():
 def test_comment_update_with_comment_id():
     """Cannot pass comment_id to a comment, this is provided in the URL"""
     with pytest.raises(ValidationError) as ex:
-        CommentSerializer().update(Mock(), {
-            "comment_id": "something"
-        })
+        CommentSerializer().update(Mock(), {"comment_id": "something"})
     assert ex.value.args[0] == 'comment_id must be provided via URL'
 
 
@@ -288,7 +281,9 @@ def test_contributor_create_username():
         "channel_api": api_mock,
         "request": Mock(user=user),
         "view": Mock(kwargs={'channel_name': 'foo_channel'})
-    }).create({'contributor_name': contributor_user.username})
+    }).create({
+        'contributor_name': contributor_user.username
+    })
     assert contributor is contributor_redditor
     api_mock.add_contributor.assert_called_once_with(contributor_user.username, 'foo_channel')
 
@@ -306,7 +301,9 @@ def test_contributor_create_email():
         "channel_api": api_mock,
         "request": Mock(user=user),
         "view": Mock(kwargs={'channel_name': 'foo_channel'})
-    }).create({'email': contributor_user.email.upper()})
+    }).create({
+        'email': contributor_user.email.upper()
+    })
     assert contributor is contributor_redditor
     api_mock.add_contributor.assert_called_once_with(contributor_user.username, 'foo_channel')
 
@@ -324,7 +321,10 @@ def test_contributor_create_both():
             "channel_api": api_mock,
             "request": Mock(user=user),
             "view": Mock(kwargs={'channel_name': 'foo_channel'})
-        }).create({'contributor_name': contributor_user.username, 'email': contributor_user.email})
+        }).create({
+            'contributor_name': contributor_user.username,
+            'email': contributor_user.email
+        })
     assert ex.value.args[0] == "Only one of contributor_name, email should be specified"
 
 
@@ -354,7 +354,9 @@ def test_moderator(is_public):
     # the `name` attribute cannot be configured during the mock object creation
     redditor.name = 'fooo_username'
     user = UserFactory.create(username=redditor.name)
-    assert serializer_cls(redditor).data == {'moderator_name': 'fooo_username'} if is_public else {
+    assert serializer_cls(redditor).data == {
+        'moderator_name': 'fooo_username'
+    } if is_public else {
         'moderator_name': 'fooo_username',
         'full_name': user.profile.name,
         'email': user.email,
@@ -418,7 +420,9 @@ def test_moderator_create_username():
         "channel_api": api_mock,
         "request": Mock(user=user),
         "view": Mock(kwargs={'channel_name': channel_name})
-    }).create({'moderator_name': moderator_user.username})
+    }).create({
+        'moderator_name': moderator_user.username
+    })
     assert moderator is moderator_redditor
     api_mock.add_moderator.assert_called_once_with(moderator_user.username, channel_name)
     list_moderators_mock.assert_called_once_with(
@@ -446,7 +450,9 @@ def test_moderator_create_email():
         "channel_api": api_mock,
         "request": Mock(user=user),
         "view": Mock(kwargs={'channel_name': channel_name})
-    }).create({'email': moderator_user.email.upper()})
+    }).create({
+        'email': moderator_user.email.upper()
+    })
     assert moderator is moderator_redditor
 
     add_moderator_mock.assert_called_once_with(moderator_user.username, channel_name)
@@ -471,7 +477,10 @@ def test_moderator_create_both():
             "channel_api": api_mock,
             "request": Mock(user=user),
             "view": Mock(kwargs={'channel_name': 'foo_channel'})
-        }).create({'email': moderator_user.email.upper(), 'moderator_name': moderator_user.username})
+        }).create({
+            'email': moderator_user.email.upper(),
+            'moderator_name': moderator_user.username
+        })
     assert ex.value.args[0] == "Only one of moderator_name, email should be specified"
 
 
@@ -533,7 +542,9 @@ def test_subscriber_create():
         "channel_api": api_mock,
         "request": Mock(user=user),
         "view": Mock(kwargs={'channel_name': 'foo_channel'})
-    }).create({'subscriber_name': subscriber_user.username})
+    }).create({
+        'subscriber_name': subscriber_user.username
+    })
     assert subscriber is subscriber_redditor
     api_mock.add_subscriber.assert_called_once_with(subscriber_user.username, 'foo_channel')
 

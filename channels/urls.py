@@ -14,10 +14,9 @@ from channels.views import (
 
 urlpatterns = [
     url(r'^api/v0/channels/$', channels.ChannelListView.as_view(), name='channel-list'),
-    url(
-        r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/$',
-        channels.ChannelDetailView.as_view(), name='channel-detail'
-    ),
+    url(r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/$',
+        channels.ChannelDetailView.as_view(),
+        name='channel-detail'),
     url(
         r'^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/posts/$',
         posts.PostListView.as_view(),

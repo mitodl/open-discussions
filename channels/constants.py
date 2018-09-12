@@ -1,7 +1,6 @@
 """Constants for channels"""
 from enum import Enum, auto
 
-
 CHANNEL_TYPE_PUBLIC = 'public'
 CHANNEL_TYPE_RESTRICTED = 'restricted'
 CHANNEL_TYPE_PRIVATE = 'private'

@@ -35,6 +35,7 @@ def if_feature_enabled(name, default=None):
         name (str): Feature flag name
         default (bool): default value if not set in settings
     """
+
     def if_feature_enabled_inner(func):  # pylint: disable=missing-docstring
         @wraps(func)
         def wrapped_func(*args, **kwargs):  # pylint: disable=missing-docstring
@@ -44,5 +45,7 @@ def if_feature_enabled(name, default=None):
             else:
                 # If the given feature name is enabled, call the function and return as normal.
                 return func(*args, **kwargs)
+
         return wrapped_func
+
     return if_feature_enabled_inner

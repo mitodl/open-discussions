@@ -37,12 +37,8 @@ class NotificationSettingsFactory(DjangoModelFactory):
         model = NotificationSettings
 
     class Params:
-        frontpage_type = factory.Trait(
-            notification_type=NOTIFICATION_TYPE_FRONTPAGE,
-        )
-        comments_type = factory.Trait(
-            notification_type=NOTIFICATION_TYPE_COMMENTS,
-        )
+        frontpage_type = factory.Trait(notification_type=NOTIFICATION_TYPE_FRONTPAGE, )
+        comments_type = factory.Trait(notification_type=NOTIFICATION_TYPE_COMMENTS, )
 
         immediate = factory.Trait(trigger_frequency=FREQUENCY_IMMEDIATE)
         weekly = factory.Trait(trigger_frequency=FREQUENCY_WEEKLY)
@@ -62,17 +58,11 @@ class EmailNotificationFactory(DjangoModelFactory):
         model = EmailNotification
 
     class Params:
-        frontpage_type = factory.Trait(
-            notification_type=NOTIFICATION_TYPE_FRONTPAGE,
-        )
-        comments_type = factory.Trait(
-            notification_type=NOTIFICATION_TYPE_COMMENTS,
-        )
+        frontpage_type = factory.Trait(notification_type=NOTIFICATION_TYPE_FRONTPAGE, )
+        comments_type = factory.Trait(notification_type=NOTIFICATION_TYPE_COMMENTS, )
 
         sent = factory.Trait(
             state=EmailNotification.STATE_SENT,
             sent_at=Faker('past_datetime', tzinfo=pytz.utc),
         )
-        sending = factory.Trait(
-            state=EmailNotification.STATE_SENDING,
-        )
+        sending = factory.Trait(state=EmailNotification.STATE_SENDING, )

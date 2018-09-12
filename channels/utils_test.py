@@ -20,14 +20,8 @@ from channels.constants import (
     VALID_POST_SORT_TYPES,
 )
 from channels.exceptions import ConflictException, GoneException
-from channels.utils import (
-    ListingParams,
-    DEFAULT_LISTING_PARAMS,
-    get_listing_params,
-    get_pagination_and_posts,
-    translate_praw_exceptions,
-    get_reddit_slug
-)
+from channels.utils import (ListingParams, DEFAULT_LISTING_PARAMS, get_listing_params, get_pagination_and_posts,
+                            translate_praw_exceptions, get_reddit_slug)
 
 
 def test_get_listing_params_none(mocker):
@@ -40,20 +34,14 @@ def test_get_listing_params_none(mocker):
 def test_get_listing_params_after(mocker):
     """Test that get_listing_params extracts after params correctly"""
     request = mocker.Mock()
-    request.query_params = {
-        'after': 'abc',
-        'count': '5'
-    }
+    request.query_params = {'after': 'abc', 'count': '5'}
     assert get_listing_params(request) == ListingParams(None, 'abc', 5, POSTS_SORT_HOT)
 
 
 def test_get_listing_params_before(mocker):
     """Test that get_listing_params extracts before params correctly"""
     request = mocker.Mock()
-    request.query_params = {
-        'before': 'abc',
-        'count': '5'
-    }
+    request.query_params = {'before': 'abc', 'count': '5'}
     assert get_listing_params(request) == ListingParams('abc', None, 5, POSTS_SORT_HOT)
 
 

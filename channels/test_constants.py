@@ -537,10 +537,7 @@ LIST_MORE_COMMENTS_RESPONSE = [
     {
         'parent_id': None,
         'post_id': '1',
-        'children': ['e9l',
-                     'e9m',
-                     'e9n',
-                     'e9q'],
+        'children': ['e9l', 'e9m', 'e9n', 'e9q'],
         'comment_type': 'more_comments'
     },
     {

@@ -21,35 +21,31 @@ def test_list_users(staff_client, staff_user):
     url = reverse('user_api-list')
     resp = staff_client.get(url)
     assert resp.status_code == 200
-    assert resp.json() == [
-        {
-            'id': staff_user.id,
+    assert resp.json() == [{
+        'id': staff_user.id,
+        'username': staff_user.username,
+        'profile': {
+            'name': profile.name,
+            'image': profile.image,
+            'image_small': profile.image_small,
+            'image_medium': profile.image_medium,
+            'image_file': 'http://testserver{}'.format(profile.image_file.url),
+            'image_small_file': 'http://testserver{}'.format(profile.image_small_file.url),
+            'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
+            'profile_image_small': profile.image_small_file.url,
+            'profile_image_medium': profile.image_medium_file.url,
+            'bio': profile.bio,
+            'headline': profile.headline,
             'username': staff_user.username,
-            'profile': {
-                'name': profile.name,
-                'image': profile.image,
-                'image_small': profile.image_small,
-                'image_medium': profile.image_medium,
-                'image_file': 'http://testserver{}'.format(profile.image_file.url),
-                'image_small_file': 'http://testserver{}'.format(profile.image_small_file.url),
-                'image_medium_file': 'http://testserver{}'.format(profile.image_medium_file.url),
-                'profile_image_small': profile.image_small_file.url,
-                'profile_image_medium': profile.image_medium_file.url,
-                'bio': profile.bio,
-                'headline': profile.headline,
-                'username': staff_user.username,
-            }
         }
-    ]
+    }]
 
 
 # These can be removed once all clients have been updated and are sending both these fields
 @pytest.mark.parametrize('uid', [None, 'abc123'])
 @pytest.mark.parametrize('email_optin', [None, True, False])
 @pytest.mark.parametrize('toc_optin', [None, True, False])
-def test_create_user(
-        staff_client, staff_user, mocker, uid, email_optin, toc_optin
-):  # pylint: disable=too-many-arguments
+def test_create_user(staff_client, staff_user, mocker, uid, email_optin, toc_optin):  # pylint: disable=too-many-arguments
     """
     Create a user and assert the response
     """
@@ -191,9 +187,7 @@ def test_patch_username(staff_client, user):
     Trying to update a users's username does not change anything
     """
     url = reverse('user_api-detail', kwargs={'username': user.username})
-    resp = staff_client.patch(url, data={
-        'username': 'notallowed'
-    })
+    resp = staff_client.patch(url, data={'username': 'notallowed'})
     assert resp.status_code == 200
     assert resp.json()['username'] == user.username
 
@@ -206,10 +200,7 @@ def test_patch_profile_by_user(client, logged_in_profile):
     # create a dummy image file in memory for upload
     with make_temp_image_file(width=250, height=250) as image_file:
         # format patch using multipart upload
-        resp = client.patch(url, data={
-            'bio': 'updated_bio_value',
-            'image_file': image_file
-        }, format='multipart')
+        resp = client.patch(url, data={'bio': 'updated_bio_value', 'image_file': image_file}, format='multipart')
     filename, ext = splitext(image_file.name)
     assert resp.status_code == 200
     assert resp.json()['bio'] == 'updated_bio_value'
@@ -231,14 +222,12 @@ def test_initialized_avatar(client, user):
     Test that a PNG avatar image is returned for a user
     """
     url = reverse(
-        'name-initials-avatar',
-        kwargs={
+        'name-initials-avatar', kwargs={
             'username': user.username,
             'color': 'afafaf',
             'bgcolor': 'dedede',
             'size': 92
-        }
-    )
+        })
     resp = client.get(url)
     assert resp.status_code == 200
     assert resp.__getitem__('Content-Type') == 'image/png'
@@ -249,14 +238,12 @@ def test_initials_avatar_fake_user(client):
     Test that a default avatar image is returned for a fake user
     """
     url = reverse(
-        'name-initials-avatar',
-        kwargs={
+        'name-initials-avatar', kwargs={
             'username': 'fakeuser',
             'color': 'afafaf',
             'bgcolor': 'dedede',
             'size': 92
-        }
-    )
+        })
     response = client.get(url, follow=True)
     last_url, _ = response.redirect_chain[-1]
     assert last_url.endswith(DEFAULT_PROFILE_IMAGE)

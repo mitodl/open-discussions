@@ -13,11 +13,16 @@ User = get_user_model()
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize('profile_data', [
-    {'name': 'My Name', 'image': 'http://localhost/image.jpg'},
-    # {},
-    # None,
-])
+@pytest.mark.parametrize(
+    'profile_data',
+    [
+        {
+            'name': 'My Name',
+            'image': 'http://localhost/image.jpg'
+        },
+        # {},
+        # None,
+    ])
 def test_create_user(profile_data):
     """Tests that a user and associated objects are created"""
     email = 'email@localhost'

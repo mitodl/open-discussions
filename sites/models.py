@@ -22,24 +22,18 @@ class AuthenticatedSite(TimestampedModel):
     )
     login_url = models.URLField(
         verbose_name='External Login URL',
-        help_text=(
-            'This url should require a user to login and then '
-            'redirect back to discussions (e.g. http://my.site.domain/discussions)'
-        ),
+        help_text=('This url should require a user to login and then '
+                   'redirect back to discussions (e.g. http://my.site.domain/discussions)'),
     )
     session_url = models.URLField(
         verbose_name='External Session URL',
-        help_text=(
-            'The URL where discussions can request a new session '
-            '(e.g. http://my.site.domain/discussionsToken)'
-        ),
+        help_text=('The URL where discussions can request a new session '
+                   '(e.g. http://my.site.domain/discussionsToken)'),
     )
     tos_url = models.URLField(
         verbose_name='External TOS URL',
-        help_text=(
-            'There URL where discussions can link the user to view the site\'s TOS '
-            '(e.g. http://my.site.domain/terms-of-service)'
-        ),
+        help_text=('There URL where discussions can link the user to view the site\'s TOS '
+                   '(e.g. http://my.site.domain/terms-of-service)'),
     )
 
     def __str__(self):

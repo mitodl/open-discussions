@@ -129,10 +129,7 @@ def get_or_create_auth_tokens(user):
                 # offset it negatively a bit to account for response time
                 expires_at = now_in_utc() + timedelta(seconds=response['expires_in'] - EXPIRES_IN_OFFSET)
                 access_token = RedditAccessToken.objects.create(
-                    user=user,
-                    token_value=response['access_token'],
-                    token_expires_at=expires_at
-                )
+                    user=user, token_value=response['access_token'], token_expires_at=expires_at)
 
     # return the refresh token and access_token
     return refresh_token, (access_token or RedditAccessToken.valid_tokens_for_user(user, threshold_date).first())
@@ -166,10 +163,7 @@ def _configure_access_token(client, access_token, user):
         authorizer.refresh()
         expires_at = datetime.fromtimestamp(authorizer._expiration_timestamp)
         RedditAccessToken.objects.create(
-            user=user,
-            token_value=authorizer.access_token,
-            token_expires_at=expires_at.replace(tzinfo=pytz.utc)
-        )
+            user=user, token_value=authorizer.access_token, token_expires_at=expires_at.replace(tzinfo=pytz.utc))
 
     return client
 
@@ -231,16 +225,15 @@ def _get_client(user):
         praw.Reddit: configured reddit client
     """
     if user.is_anonymous:
-        return praw.Reddit(
-            **_get_client_base_kwargs(),
-        )
+        return praw.Reddit(**_get_client_base_kwargs(), )
 
     refresh_token, access_token = get_or_create_auth_tokens(user)
 
-    return _configure_access_token(praw.Reddit(
-        refresh_token=refresh_token.token_value,
-        **_get_client_base_kwargs(),
-    ), access_token, user)
+    return _configure_access_token(
+        praw.Reddit(
+            refresh_token=refresh_token.token_value,
+            **_get_client_base_kwargs(),
+        ), access_token, user)
 
 
 def _get_user_agent():
@@ -274,6 +267,7 @@ def replace_load_comment(original_load_comment):
             # If the parent doesn't exist the code will receive no children which will error as
             # an AssertionError
             raise Http404
+
     return replacement_load_comment
 
 
@@ -338,16 +332,15 @@ def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):
 
         post = sync_post_model(channel_name=channel_name, post_id=post_id)
         return Comment.objects.get_or_create(
-            comment_id=comment_id,
-            defaults={
+            comment_id=comment_id, defaults={
                 'post': post,
                 'parent_id': parent_id,
-            }
-        )[0]
+            })[0]
 
 
 class Api:
     """Channel API"""
+
     def __init__(self, user):
         """Constructor"""
         if user is None:
@@ -392,9 +385,12 @@ class Api:
         """
         return self.reddit.subreddit(name)
 
-    def create_channel(
-            self, name, title, channel_type=CHANNEL_TYPE_PUBLIC, membership_is_managed=False, **other_settings
-    ):
+    def create_channel(self,
+                       name,
+                       title,
+                       channel_type=CHANNEL_TYPE_PUBLIC,
+                       membership_is_managed=False,
+                       **other_settings):
         """
         Create a channel
 
@@ -419,12 +415,7 @@ class Api:
             raise ValueError("Invalid argument membership_is_managed")
 
         channel = self.reddit.subreddit.create(
-            name,
-            title=title,
-            subreddit_type=channel_type,
-            allow_top=True,
-            **other_settings
-        )
+            name, title=title, subreddit_type=channel_type, allow_top=True, **other_settings)
 
         channel_obj = sync_channel_model(name)
         channel_obj.membership_is_managed = membership_is_managed
@@ -835,11 +826,7 @@ class Api:
         # <MoreComments count=0, children=[]>
         if len(comments) < len(children):
             remaining_morecomments = self.init_more_comments(
-                parent_id=parent_id,
-                post_id=post_id,
-                children=children[len(comments):],
-                sort=sort
-            )
+                parent_id=parent_id, post_id=post_id, children=children[len(comments):], sort=sort)
             comments.append(remaining_morecomments)
         return comments
 

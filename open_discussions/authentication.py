@@ -41,10 +41,7 @@ def unsign_and_verify_username_from_token(token):
 
     signer = signing.TimestampSigner()
     try:
-        return signer.unsign(
-            token,
-            max_age=settings.OPEN_DISCUSSIONS_UNSUBSCRIBE_TOKEN_MAX_AGE_SECONDS
-        )
+        return signer.unsign(token, max_age=settings.OPEN_DISCUSSIONS_UNSUBSCRIBE_TOKEN_MAX_AGE_SECONDS)
     except:  # pylint: disable=bare-except
         return None
 
@@ -56,6 +53,7 @@ class StatelessTokenAuthentication(BaseAuthentication):
     NOTE: this is a highly trusting version of authentication and should only be
           used for certain things such as email unsubscribes
     """
+
     def authenticate(self, request):
         """
         Attempts to authenticate using a stateless token

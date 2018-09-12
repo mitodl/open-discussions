@@ -19,7 +19,10 @@ from profiles.utils import generate_svg_avatar, DEFAULT_PROFILE_IMAGE
 
 class UserViewSet(viewsets.ModelViewSet):
     """View for users"""
-    permission_classes = (IsAuthenticated, IsStaffPermission,)
+    permission_classes = (
+        IsAuthenticated,
+        IsStaffPermission,
+    )
 
     serializer_class = UserSerializer
     queryset = get_user_model().objects.all()
@@ -35,7 +38,7 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewset
     lookup_field = 'user__username'
 
 
-@cache_page(60*60*24)
+@cache_page(60 * 60 * 24)
 def name_initials_avatar_view(request, username, size, color, bgcolor):  # pylint:disable=unused-argument
     """ View for initial avatar """
     user = User.objects.filter(username=username).first()

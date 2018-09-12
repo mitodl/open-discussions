@@ -39,6 +39,7 @@ def reddit_object_persist(*persistence_funcs):
     The decorated function must return a PRAW object
     (e.g.: praw.models.reddit.submission.Submission, praw.models.reddit.comment.Comment)
     """
+
     def api_indexing_listener_inner(func):  # pylint: disable=missing-docstring
         @wraps(func)
         def wrapped_api_func(*args, **kwargs):  # pylint: disable=missing-docstring
@@ -49,7 +50,9 @@ def reddit_object_persist(*persistence_funcs):
             except Exception:  # pylint: disable=broad-except
                 log.exception('Error occurred while trying to serialize and index PRAW object')
             return reddit_obj
+
         return wrapped_api_func
+
     return api_indexing_listener_inner
 
 
@@ -62,10 +65,7 @@ def index_new_post(post_obj):
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
     data = ESPostSerializer().serialize(post_obj)
-    create_document.delay(
-        gen_post_id(post_obj.id),
-        data
-    )
+    create_document.delay(gen_post_id(post_obj.id), data)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -77,10 +77,7 @@ def index_new_comment(comment_obj):
         comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
     """
     data = ESCommentSerializer().serialize(comment_obj)
-    create_document.delay(
-        gen_comment_id(comment_obj.id),
-        data
-    )
+    create_document.delay(gen_comment_id(comment_obj.id), data)
     increment_parent_post_comment_count(comment_obj)
 
 
@@ -92,10 +89,7 @@ def update_post_text(post_obj):
     Args:
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
-    update_document_with_partial.delay(
-        gen_post_id(post_obj.id),
-        {'text': post_obj.selftext}
-    )
+    update_document_with_partial.delay(gen_post_id(post_obj.id), {'text': post_obj.selftext})
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -106,10 +100,7 @@ def update_comment_text(comment_obj):
     Args:
         comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
     """
-    update_document_with_partial.delay(
-        gen_comment_id(comment_obj.id),
-        {'text': comment_obj.body}
-    )
+    update_document_with_partial.delay(gen_comment_id(comment_obj.id), {'text': comment_obj.body})
 
 
 def update_field_for_all_post_comments(post_obj, field_name, field_value):
@@ -123,16 +114,20 @@ def update_field_for_all_post_comments(post_obj, field_name, field_value):
         query={
             "query": {
                 "bool": {
-                    "must": [
-                        {"match": {"object_type": COMMENT_TYPE}},
-                        {"match": {"post_id": post_obj.id}}
-                    ]
+                    "must": [{
+                        "match": {
+                            "object_type": COMMENT_TYPE
+                        }
+                    }, {
+                        "match": {
+                            "post_id": post_obj.id
+                        }
+                    }]
                 }
             }
         },
         field_name=field_name,
-        field_value=field_value
-    )
+        field_value=field_value)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -144,15 +139,9 @@ def update_post_removal_status(post_obj):
     Args:
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
-    update_document_with_partial.delay(
-        gen_post_id(post_obj.id),
-        {'removed': is_reddit_object_removed(post_obj)}
-    )
+    update_document_with_partial.delay(gen_post_id(post_obj.id), {'removed': is_reddit_object_removed(post_obj)})
     update_field_for_all_post_comments(
-        post_obj,
-        field_name='parent_post_removed',
-        field_value=is_reddit_object_removed(post_obj)
-    )
+        post_obj, field_name='parent_post_removed', field_value=is_reddit_object_removed(post_obj))
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -165,9 +154,7 @@ def update_comment_removal_status(comment_obj):
         comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
     """
     update_document_with_partial.delay(
-        gen_comment_id(comment_obj.id),
-        {'removed': is_reddit_object_removed(comment_obj)}
-    )
+        gen_comment_id(comment_obj.id), {'removed': is_reddit_object_removed(comment_obj)})
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -182,10 +169,7 @@ def _update_parent_post_comment_count(comment_obj, incr_amount=1):
     """
     post_obj = comment_obj.submission
     increment_document_integer_field.delay(
-        gen_post_id(post_obj.id),
-        field_name='num_comments',
-        incr_amount=incr_amount
-    )
+        gen_post_id(post_obj.id), field_name='num_comments', incr_amount=incr_amount)
 
 
 increment_parent_post_comment_count = partial(_update_parent_post_comment_count, incr_amount=1)
@@ -200,10 +184,7 @@ def set_post_to_deleted(post_obj):
     Args:
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
-    update_document_with_partial.delay(
-        gen_post_id(post_obj.id),
-        {'deleted': True}
-    )
+    update_document_with_partial.delay(gen_post_id(post_obj.id), {'deleted': True})
     update_field_for_all_post_comments(post_obj, field_name='deleted', field_value=True)
 
 
@@ -215,10 +196,7 @@ def set_comment_to_deleted(comment_obj):
     Args:
         comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
     """
-    update_document_with_partial.delay(
-        gen_comment_id(comment_obj.id),
-        {'deleted': True}
-    )
+    update_document_with_partial.delay(gen_comment_id(comment_obj.id), {'deleted': True})
     decrement_parent_post_comment_count(comment_obj)
 
 
@@ -241,8 +219,4 @@ def update_indexed_score(instance, instance_type, vote_action=None):
 
     if instance_type != POST_TYPE:
         return
-    increment_document_integer_field.delay(
-        gen_post_id(instance.id),
-        field_name='score',
-        incr_amount=vote_increment
-    )
+    increment_document_integer_field.delay(gen_post_id(instance.id), field_name='score', incr_amount=vote_increment)

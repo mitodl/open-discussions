@@ -1,6 +1,5 @@
 """Tests for task helper functions for channels"""
 
-
 from channels.task_helpers import (
     sync_comment_model,
     sync_post_model,
@@ -35,15 +34,7 @@ def test_sync_post_model(mocker):
     post_id = '456'
     post_url = 'http://fake'
 
-    post = mocker.Mock(
-        id=post_id,
-        subreddit=mocker.Mock(display_name=channel_name),
-        url=post_url
-    )
+    post = mocker.Mock(id=post_id, subreddit=mocker.Mock(display_name=channel_name), url=post_url)
     patched = mocker.patch('channels.tasks.sync_post_model', autospec=True)
     sync_post_model(post)
-    patched.delay.assert_called_once_with(
-        channel_name=channel_name,
-        post_id=post_id,
-        post_url=post_url
-    )
+    patched.delay.assert_called_once_with(channel_name=channel_name, post_id=post_id, post_url=post_url)

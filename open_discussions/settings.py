@@ -35,10 +35,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_string(
-    'SECRET_KEY',
-    'terribly_unsafe_default_secret_key'
-)
+SECRET_KEY = get_string('SECRET_KEY', 'terribly_unsafe_default_secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool('DEBUG', False)
@@ -51,7 +48,6 @@ SITE_BASE_URL = get_string("OPEN_DISCUSSIONS_BASE_URL", None)
 if not SITE_BASE_URL:
     raise ImproperlyConfigured("OPEN_DISCUSSIONS_BASE_URL is not set")
 
-
 WEBPACK_LOADER = {
     'DEFAULT': {
         'CACHE': not DEBUG,
@@ -59,13 +55,9 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
         'POLL_INTERVAL': 0.1,
         'TIMEOUT': None,
-        'IGNORE': [
-            r'.+\.hot-update\.+',
-            r'.+\.js\.map'
-        ]
+        'IGNORE': [r'.+\.hot-update\.+', r'.+\.js\.map']
     }
 }
-
 
 # Application definition
 
@@ -96,7 +88,7 @@ INSTALLED_APPS = (
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
 if not DISABLE_WEBPACK_LOADER_STATS:
-    INSTALLED_APPS += ('webpack_loader',)
+    INSTALLED_APPS += ('webpack_loader', )
 
 MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
@@ -119,12 +111,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # enable the nplusone profiler only in debug mode
 if DEBUG:
-    INSTALLED_APPS += (
-        'nplusone.ext.django',
-    )
-    MIDDLEWARE += (
-        'nplusone.ext.django.NPlusOneMiddleware',
-    )
+    INSTALLED_APPS += ('nplusone.ext.django', )
+    MIDDLEWARE += ('nplusone.ext.django.NPlusOneMiddleware', )
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
@@ -139,9 +127,7 @@ ROOT_URLCONF = 'open_discussions.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR + '/templates/'
-        ],
+        'DIRS': [BASE_DIR + '/templates/'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -158,18 +144,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'open_discussions.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 # Uses DATABASE_URL to configure with sqlite default:
 # For URL structure:
 # https://github.com/kennethreitz/dj-database-url
 DEFAULT_DATABASE_CONFIG = dj_database_url.parse(
-    get_string(
-        'DATABASE_URL',
-        'sqlite:///{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
-    )
-)
+    get_string('DATABASE_URL', 'sqlite:///{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))))
 DEFAULT_DATABASE_CONFIG['CONN_MAX_AGE'] = get_int('OPEN_DISCUSSIONS_DB_CONN_MAX_AGE', 0)
 
 if get_bool('OPEN_DISCUSSIONS_DB_DISABLE_SSL', False):
@@ -177,9 +158,7 @@ if get_bool('OPEN_DISCUSSIONS_DB_DISABLE_SSL', False):
 else:
     DEFAULT_DATABASE_CONFIG['OPTIONS'] = {'sslmode': 'require'}
 
-DATABASES = {
-    'default': DEFAULT_DATABASE_CONFIG
-}
+DATABASES = {'default': DEFAULT_DATABASE_CONFIG}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -214,7 +193,6 @@ SOCIAL_AUTH_MICROMASTERS_LOGIN_URL = get_string('SOCIAL_AUTH_MICROMASTERS_LOGIN_
 # Email backend settings
 SOCIAL_AUTH_EMAIL_FORM_URL = 'login'
 SOCIAL_AUTH_EMAIL_FORM_HTML = 'login.html'
-
 
 # SAML backend settings
 SOCIAL_AUTH_SAML_LOGIN_URL = get_string('SOCIAL_AUTH_SAML_LOGIN_URL', None)
@@ -289,7 +267,6 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
@@ -300,9 +277,7 @@ if CLOUDFRONT_DIST:
     STATIC_URL = urljoin('https://{dist}.cloudfront.net'.format(dist=CLOUDFRONT_DIST), STATIC_URL)
 
 STATIC_ROOT = 'staticfiles'
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
 
 # Request files from the webpack dev server
 USE_WEBPACK_DEV_SERVER = get_bool('OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER', False)
@@ -322,10 +297,8 @@ EMAIL_USE_TLS = get_bool('OPEN_DISCUSSIONS_EMAIL_TLS', False)
 EMAIL_SUPPORT = get_string('OPEN_DISCUSSIONS_SUPPORT_EMAIL', 'support@example.com')
 DEFAULT_FROM_EMAIL = get_string('OPEN_DISCUSSIONS_FROM_EMAIL', 'webmaster@localhost')
 
-NOTIFICATION_EMAIL_BACKEND = get_string(
-    'OPEN_DISCUSSIONS_NOTIFICATION_EMAIL_BACKEND',
-    'anymail.backends.mailgun.EmailBackend'
-)
+NOTIFICATION_EMAIL_BACKEND = get_string('OPEN_DISCUSSIONS_NOTIFICATION_EMAIL_BACKEND',
+                                        'anymail.backends.mailgun.EmailBackend')
 
 MAILGUN_SENDER_DOMAIN = get_string('MAILGUN_SENDER_DOMAIN', None)
 if not MAILGUN_SENDER_DOMAIN:
@@ -345,7 +318,7 @@ ANYMAIL = {
 # e-mail configurable admins
 ADMIN_EMAIL = get_string('OPEN_DISCUSSIONS_ADMIN_EMAIL', '')
 if ADMIN_EMAIL != '':
-    ADMINS = (('Admins', ADMIN_EMAIL),)
+    ADMINS = (('Admins', ADMIN_EMAIL), )
 else:
     ADMINS = ()
 
@@ -370,10 +343,7 @@ SOCIAL_AUTH_SAML_ORG_INFO = {
         "url": SITE_BASE_URL
     }
 }
-SOCIAL_AUTH_SAML_TECHNICAL_CONTACT = {
-    "givenName": SOCIAL_AUTH_SAML_CONTACT_NAME,
-    "emailAddress": EMAIL_SUPPORT
-}
+SOCIAL_AUTH_SAML_TECHNICAL_CONTACT = {"givenName": SOCIAL_AUTH_SAML_CONTACT_NAME, "emailAddress": EMAIL_SUPPORT}
 SOCIAL_AUTH_SAML_SUPPORT_CONTACT = SOCIAL_AUTH_SAML_TECHNICAL_CONTACT
 SOCIAL_AUTH_DEFAULT_IDP_KEY = "default"
 SOCIAL_AUTH_SAML_ENABLED_IDPS = {
@@ -387,12 +357,10 @@ SOCIAL_AUTH_SAML_ENABLED_IDPS = {
     }
 }
 
-
 SOCIAL_AUTH_SAML_SECURITY_CONFIG = {
     "wantAssertionsEncrypted": SOCIAL_AUTH_SAML_SECURITY_ENCRYPTED,
     "requestedAuthnContext": False
 }
-
 
 # embed.ly configuration
 EMBEDLY_KEY = get_string('EMBEDLY_KEY', None)
@@ -424,12 +392,11 @@ LOGGING = {
     },
     'formatters': {
         'verbose': {
-            'format': (
-                '[%(asctime)s] %(levelname)s %(process)d [%(name)s] '
-                '%(filename)s:%(lineno)d - '
-                '[{hostname}] - %(message)s'
-            ).format(hostname=HOSTNAME),
-            'datefmt': '%Y-%m-%d %H:%M:%S'
+            'format': ('[%(asctime)s] %(levelname)s %(process)d [%(name)s] '
+                       '%(filename)s:%(lineno)d - '
+                       '[{hostname}] - %(message)s').format(hostname=HOSTNAME),
+            'datefmt':
+            '%Y-%m-%d %H:%M:%S'
         }
     },
     'handlers': {
@@ -488,11 +455,7 @@ LOGGING = {
 # Sentry
 ENVIRONMENT = get_string('OPEN_DISCUSSIONS_ENVIRONMENT', 'dev')
 SENTRY_CLIENT = 'raven.contrib.django.raven_compat.DjangoClient'
-RAVEN_CONFIG = {
-    'dsn': get_string('SENTRY_DSN', ''),
-    'environment': ENVIRONMENT,
-    'release': VERSION
-}
+RAVEN_CONFIG = {'dsn': get_string('SENTRY_DSN', ''), 'environment': ENVIRONMENT, 'release': VERSION}
 
 STATUS_TOKEN = get_string("STATUS_TOKEN", "")
 HEALTH_CHECK = ['CELERY', 'REDIS', 'POSTGRES', 'ELASTIC_SEARCH']
@@ -511,17 +474,10 @@ AWS_SECRET_ACCESS_KEY = get_string('AWS_SECRET_ACCESS_KEY', False)
 AWS_STORAGE_BUCKET_NAME = get_string('AWS_STORAGE_BUCKET_NAME', False)
 AWS_QUERYSTRING_AUTH = get_string('AWS_QUERYSTRING_AUTH', False)
 # Provide nice validation of the configuration
-if (
-        OPEN_DISCUSSIONS_USE_S3 and
-        (not AWS_ACCESS_KEY_ID or
-         not AWS_SECRET_ACCESS_KEY or
-         not AWS_STORAGE_BUCKET_NAME)
-):
-    raise ImproperlyConfigured(
-        'You have enabled S3 support, but are missing one of '
-        'AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, or '
-        'AWS_STORAGE_BUCKET_NAME'
-    )
+if (OPEN_DISCUSSIONS_USE_S3 and (not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY or not AWS_STORAGE_BUCKET_NAME)):
+    raise ImproperlyConfigured('You have enabled S3 support, but are missing one of '
+                               'AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, or '
+                               'AWS_STORAGE_BUCKET_NAME')
 if OPEN_DISCUSSIONS_USE_S3:
     # Configure Django Storages to use Cloudfront distribution for S3 assets
     if CLOUDFRONT_DIST:
@@ -531,9 +487,7 @@ if OPEN_DISCUSSIONS_USE_S3:
 # Celery
 USE_CELERY = True
 CELERY_BROKER_URL = get_string("CELERY_BROKER_URL", get_string("REDISCLOUD_URL", None))
-CELERY_RESULT_BACKEND = get_string(
-    "CELERY_RESULT_BACKEND", get_string("REDISCLOUD_URL", None)
-)
+CELERY_RESULT_BACKEND = get_string("CELERY_RESULT_BACKEND", get_string("REDISCLOUD_URL", None))
 CELERY_TASK_ALWAYS_EAGER = get_bool("CELERY_TASK_ALWAYS_EAGER", False)
 CELERY_TASK_EAGER_PROPAGATES = get_bool("CELERY_TASK_EAGER_PROPAGATES", True)
 
@@ -560,7 +514,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TIMEZONE = 'UTC'
-
 
 # django cache back-ends
 CACHES = {
@@ -601,10 +554,7 @@ OPEN_DISCUSSIONS_REDDIT_ACCESS_TOKEN = get_string('OPEN_DISCUSSIONS_REDDIT_ACCES
 OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT = get_int('OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT', 50)
 
 # JWT authentication settings
-OPEN_DISCUSSIONS_JWT_SECRET = get_string(
-    'OPEN_DISCUSSIONS_JWT_SECRET',
-    'terribly_unsafe_default_jwt_secret_key'
-)
+OPEN_DISCUSSIONS_JWT_SECRET = get_string('OPEN_DISCUSSIONS_JWT_SECRET', 'terribly_unsafe_default_jwt_secret_key')
 
 OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = get_int("OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT", 25)
 OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH = get_int("OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH", 6)
@@ -631,7 +581,7 @@ JWT_AUTH = {
     'JWT_SECRET_KEY': OPEN_DISCUSSIONS_JWT_SECRET,
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': True,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60*60),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60 * 60),
     'JWT_ALLOW_REFRESH': True,
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
     'JWT_AUTH_COOKIE': OPEN_DISCUSSIONS_COOKIE_NAME,
@@ -640,16 +590,10 @@ JWT_AUTH = {
     'JWT_PAYLOAD_GET_USERNAME_HANDLER': 'authentication.utils.jwt_get_username_from_payload_handler',
 }
 
-
-OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS = get_int(
-    "OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS",
-    5
-)
+OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS = get_int("OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS", 5)
 
 OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE = get_int(
-    "OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE",
-    1000
-)
+    "OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE", 1000)
 
 
 # features flags
@@ -657,20 +601,18 @@ def get_all_config_keys():
     """Returns all the configuration keys from both environment and configuration files"""
     return list(os.environ.keys())
 
+
 OPEN_DISCUSSIONS_FEATURES_PREFIX = get_string('OPEN_DISCUSSIONS_FEATURES_PREFIX', 'FEATURE_')
 OPEN_DISCUSSIONS_FEATURES_DEFAULT = get_bool('OPEN_DISCUSSIONS_FEATURES_DEFAULT', False)
 FEATURES = {
-    key[len(OPEN_DISCUSSIONS_FEATURES_PREFIX):]: get_any(key, None) for key
-    in get_all_config_keys() if key.startswith(OPEN_DISCUSSIONS_FEATURES_PREFIX)
+    key[len(OPEN_DISCUSSIONS_FEATURES_PREFIX):]: get_any(key, None)
+    for key in get_all_config_keys() if key.startswith(OPEN_DISCUSSIONS_FEATURES_PREFIX)
 }
 
 MIDDLEWARE_FEATURE_FLAG_QS_PREFIX = get_string("MIDDLEWARE_FEATURE_FLAG_QS_PREFIX", None)
-MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME = get_string(
-    'MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME', 'OPEN_DISCUSSIONS_FEATURE_FLAGS'
-)
-MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS = get_int(
-    'MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS', 60 * 60
-)
+MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME = get_string('MIDDLEWARE_FEATURE_FLAG_COOKIE_NAME',
+                                                 'OPEN_DISCUSSIONS_FEATURE_FLAGS')
+MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS = get_int('MIDDLEWARE_FEATURE_FLAG_COOKIE_MAX_AGE_SECONDS', 60 * 60)
 
 if MIDDLEWARE_FEATURE_FLAG_QS_PREFIX:
     MIDDLEWARE = MIDDLEWARE + (
@@ -678,26 +620,22 @@ if MIDDLEWARE_FEATURE_FLAG_QS_PREFIX:
         'open_discussions.middleware.feature_flags.CookieFeatureFlagMiddleware',
     )
 
-
 # django debug toolbar only in debug mode
 if DEBUG:
     INSTALLED_APPS += ('debug_toolbar', )
     # it needs to be enabled before other middlewares
-    MIDDLEWARE = (
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-    ) + MIDDLEWARE
-
+    MIDDLEWARE = ('debug_toolbar.middleware.DebugToolbarMiddleware', ) + MIDDLEWARE
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated', ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
-    'EXCEPTION_HANDLER': 'open_discussions.exceptions.api_exception_handler',
-    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'EXCEPTION_HANDLER':
+    'open_discussions.exceptions.api_exception_handler',
+    'TEST_REQUEST_DEFAULT_FORMAT':
+    'json',
 }
 
 USE_X_FORWARDED_PORT = get_bool('USE_X_FORWARDED_PORT', False)

@@ -10,7 +10,6 @@ import logging
 import pytz
 from django.conf import settings
 
-
 log = logging.getLogger(__name__)
 
 

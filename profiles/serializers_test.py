@@ -110,11 +110,10 @@ def test_update_user_profile(user, key, value):
 
     expected_profile[key] = value
 
-    serializer = UserSerializer(instance=user, data={
-        'profile': {
+    serializer = UserSerializer(
+        instance=user, data={'profile': {
             key: value,
-        }
-    }, partial=True)
+        }}, partial=True)
     serializer.is_valid(raise_exception=True)
     serializer.save()
 

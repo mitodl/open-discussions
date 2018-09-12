@@ -8,6 +8,4 @@ from notifications.views import NotificationSettingsViewSet
 router = DefaultRouter()
 router.register(r'notification_settings', NotificationSettingsViewSet, base_name='notification_settings')
 
-urlpatterns = [
-    url(r'^api/v0/', include(router.urls))
-]
+urlpatterns = [url(r'^api/v0/', include(router.urls))]

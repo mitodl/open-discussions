@@ -7,15 +7,9 @@ import pytest
 from PIL import Image
 
 from open_discussions.factories import UserFactory
-from profiles.utils import (
-    profile_image_upload_uri,
-    profile_image_upload_uri_small,
-    profile_image_upload_uri_medium,
-    generate_filepath,
-    image_uri,
-    DEFAULT_PROFILE_IMAGE,
-    update_full_name,
-    generate_svg_avatar, generate_initials)
+from profiles.utils import (profile_image_upload_uri, profile_image_upload_uri_small, profile_image_upload_uri_medium,
+                            generate_filepath, image_uri, DEFAULT_PROFILE_IMAGE, update_full_name, generate_svg_avatar,
+                            generate_initials)
 
 
 def test_upload_url(user):
@@ -127,11 +121,9 @@ def test_profile_img_url_gravatar_nameless():
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('first_name, last_name', [
-    ['Keihanaikukauakahihuliheekahaunaele', 'van der Graaf'],
-    ['Jane', ''],
-    ['Joe', 'FakeName10' * 16]
-])
+@pytest.mark.parametrize(
+    'first_name, last_name',
+    [['Keihanaikukauakahihuliheekahaunaele', 'van der Graaf'], ['Jane', ''], ['Joe', 'FakeName10' * 16]])
 def test_update_full_name(first_name, last_name):
     """ Tests that user names are updated correctly """
     user = UserFactory.create()
@@ -157,14 +149,8 @@ def test_get_svg_avatar():
     assert text.text == 'TU'
 
 
-@pytest.mark.parametrize('text, initials', [
-    ['Test User', 'TU'],
-    ['another user', 'AU'],
-    ['Test Van Der Graaf', 'TG'],
-    ['Test', 'T'],
-    [None, None],
-    [' ', None]
-])
+@pytest.mark.parametrize('text, initials', [['Test User', 'TU'], ['another user', 'AU'], ['Test Van Der Graaf', 'TG'],
+                                            ['Test', 'T'], [None, None], [' ', None]])
 def test_generate_initials(text, initials):
     """ Test that expected initials are returned from text"""
     assert generate_initials(text) == initials

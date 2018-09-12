@@ -21,7 +21,7 @@ class NotificationSettingsViewSet(ListModelMixin, UpdateModelMixin, RetrieveMode
         SessionAuthentication,
         StatelessTokenAuthentication,
     )
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
     lookup_field = 'notification_type'
 
     def get_queryset(self):

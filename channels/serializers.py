@@ -37,6 +37,7 @@ class WriteableSerializerMethodField(serializers.SerializerMethodField):
     A SerializerMethodField which has been marked as not read_only so that submitted data passed validation.
     The actual update is handled in PostSerializer.update(...).
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.read_only = False
@@ -398,11 +399,7 @@ class PostSerializer(BasePostSerializer):
         api = self.context['channel_api']
         channel_name = self.context['view'].kwargs['channel_name']
 
-        post = api.create_post(
-            channel_name,
-            title=title,
-            **kwargs
-        )
+        post = api.create_post(channel_name, title=title, **kwargs)
 
         api.add_post_subscription(post.id)
 
@@ -591,10 +588,7 @@ class CommentSerializer(BaseCommentSerializer):
         else:
             kwargs['post_id'] = post_id
 
-        comment = api.create_comment(
-            text=validated_data['body'],
-            **kwargs
-        )
+        comment = api.create_comment(text=validated_data['body'], **kwargs)
 
         api.add_comment_subscription(post_id, comment.id)
 

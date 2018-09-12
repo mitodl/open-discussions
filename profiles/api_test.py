@@ -8,13 +8,7 @@ from profiles.models import Profile
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize('profile_data', [
-    {
-        'image': 'http://localhost:image.jpg'
-    },
-    {},
-    None
-])
+@pytest.mark.parametrize('profile_data', [{'image': 'http://localhost:image.jpg'}, {}, None])
 @pytest.mark.parametrize('no_profile', [True, False])
 def test_ensure_profile(profile_data, no_profile):
     """Test that it creates a profile from the data"""
