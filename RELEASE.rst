@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.45.1
+--------------
+
+- Add tests for ChannelModerationPage, fix remove post error (#1176)
+- Validate a new link post URL before calling embedly (#1180)
+
 Version 0.45.0 (Released September 12, 2018)
 --------------
 
