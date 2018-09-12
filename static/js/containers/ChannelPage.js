@@ -7,8 +7,7 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
 import CanonicalLink from "../components/CanonicalLink"
-import { withPostLoading } from "../components/Loading"
-import withChannelSidebar from "../hoc/withChannelSidebar"
+import { withPostLoadingSidebar } from "../components/Loading"
 import { PostSortPicker } from "../components/SortPicker"
 import {
   withPostModeration,
@@ -17,6 +16,13 @@ import {
 import withPostList from "../hoc/withPostList"
 import IntraPageNav from "../components/IntraPageNav"
 import { withChannelTracker } from "../hoc/withChannelTracker"
+import ChannelSidebar from "../components/ChannelSidebar"
+import Sidebar from "../components/Sidebar"
+import { Grid, Cell } from "../components/Grid"
+import ChannelBanner from "../containers/ChannelBanner"
+import ChannelAvatar, {
+  CHANNEL_AVATAR_MEDIUM
+} from "../containers/ChannelAvatar"
 
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
@@ -118,25 +124,48 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
       return null
     } else {
       return (
-        <React.Fragment>
-          <MetaTags>
-            <title>{formatTitle(channel.title)}</title>
-            <CanonicalLink match={match} />
-          </MetaTags>
-          <IntraPageNav>
-            <a href="#" className="active">
-              Posts
-            </a>
-          </IntraPageNav>
-          <div className="post-list-title">
-            <div>All</div>
-            <PostSortPicker
-              updateSortParam={updatePostSortParam(this.props)}
-              value={qs.parse(search).sort || POSTS_SORT_HOT}
-            />
-          </div>
-          {renderPosts()}
-        </React.Fragment>
+        <div className="channel-page-wrapper">
+          <ChannelBanner editable={false} channel={channel} />
+          <Grid className={`main-content two-column channel-page`}>
+            <Cell className="avatar-headline-row" width={12}>
+              <ChannelAvatar
+                editable={false}
+                channel={channel}
+                imageSize={CHANNEL_AVATAR_MEDIUM}
+              />
+              <div className="title-and-headline">
+                <div className="title">{channel.title}</div>
+                {channel.public_description ? (
+                  <div className="headline">{channel.public_description}</div>
+                ) : null}
+              </div>
+            </Cell>
+            <Cell width={8}>
+              <MetaTags>
+                <title>{formatTitle(channel.title)}</title>
+                <CanonicalLink match={match} />
+              </MetaTags>
+              <IntraPageNav>
+                <a href="#" className="active">
+                  Posts
+                </a>
+              </IntraPageNav>
+              <div className="post-list-title">
+                <div>All</div>
+                <PostSortPicker
+                  updateSortParam={updatePostSortParam(this.props)}
+                  value={qs.parse(search).sort || POSTS_SORT_HOT}
+                />
+              </div>
+              {renderPosts()}
+            </Cell>
+            <Cell width={4}>
+              <Sidebar className="sidebar-right">
+                <ChannelSidebar {...this.props} />
+              </Sidebar>
+            </Cell>
+          </Grid>
+        </div>
       )
     }
   }
@@ -207,8 +236,7 @@ export default R.compose(
     mapDispatchToProps
   ),
   withPostModeration,
-  withChannelSidebar("channel-page"),
   withChannelTracker,
   withPostList,
-  withPostLoading
+  withPostLoadingSidebar
 )(ChannelPage)

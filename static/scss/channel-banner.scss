@@ -1,0 +1,14 @@
+.banner-container {
+  .banner-image {
+    width: 100%;
+    display: block;
+    height: $channel-banner-height;
+    object-fit: cover;
+  }
+
+  .upload-banner {
+    margin-top: 20px;
+    display: block;
+    text-align: right;
+  }
+}

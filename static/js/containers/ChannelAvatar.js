@@ -18,8 +18,12 @@ import type { Channel } from "../flow/discussionTypes"
 
 export const CHANNEL_AVATAR_SMALL: "small" = "small"
 export const CHANNEL_AVATAR_MEDIUM: "medium" = "medium"
+export const CHANNEL_AVATAR_LARGE: "large" = "large"
 
-type ImageSize = typeof CHANNEL_AVATAR_SMALL | typeof CHANNEL_AVATAR_MEDIUM
+type ImageSize =
+  | typeof CHANNEL_AVATAR_SMALL
+  | typeof CHANNEL_AVATAR_MEDIUM
+  | typeof CHANNEL_AVATAR_LARGE
 
 type Props = {
   imageSize: ImageSize,

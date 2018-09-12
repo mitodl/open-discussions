@@ -10,7 +10,7 @@ import { editChannelBasicURL } from "../lib/url"
 import type { Channel } from "../flow/discussionTypes"
 
 type ChannelSidebarProps = {
-  channel: Channel,
+  channel: ?Channel,
   isModerator: boolean
 }
 

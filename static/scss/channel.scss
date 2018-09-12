@@ -1,3 +1,40 @@
+.channel-page-wrapper {
+  position: relative;
+}
+
+.avatar-headline-row {
+  position: absolute;
+  top: 0;
+  height: $channel-banner-height;
+  display: flex;
+  align-items: center;
+
+  .avatar-image,
+  .avatar-initials {
+    border-radius: 4px;
+  }
+
+  .avatar {
+    margin-right: 22px;
+  }
+
+  .title-and-headline {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    height: 57px;
+
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .headline {
+      font-size: 16px;
+    }
+  }
+}
+
 .channel-about {
   position: relative;
   max-width: 400px;
@@ -29,7 +66,8 @@
   }
 }
 
-$avatar-dimension-medium: 90px;
+$avatar-dimension-large: 90px;
+$avatar-dimension-medium: 57px;
 $avatar-dimension-small: 22px;
 
 .avatar-container {
@@ -78,6 +116,19 @@ $avatar-dimension-small: 22px;
 
     .avatar-initials {
       font-size: $avatar-dimension-medium / 4;
+    }
+  }
+
+  &.large-size {
+    img,
+    .avatar,
+    .avatar-initials {
+      width: $avatar-dimension-large;
+      height: $avatar-dimension-large;
+    }
+
+    .avatar-initials {
+      font-size: $avatar-dimension-large / 4;
     }
   }
 }

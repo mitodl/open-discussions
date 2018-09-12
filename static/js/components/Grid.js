@@ -46,10 +46,14 @@ type CellWidth =
   | typeof twelve
 
 type CellProps = {
-  children: React$Element<*>,
-  width: CellWidth
+  children: any,
+  width: CellWidth,
+  className?: string
 }
 
-export const Cell = ({ children, width }: CellProps) => (
-  <div className={`mdc-layout-grid__cell--span-${width}`}>{children}</div>
+const cellClassName = (width, className) =>
+  `mdc-layout-grid__cell--span-${width} ${className || ""}`.trim()
+
+export const Cell = ({ children, width, className }: CellProps) => (
+  <div className={cellClassName(width, className)}>{children}</div>
 )

@@ -32,4 +32,22 @@ describe("Grid components", () => {
       assert.ok(wrapper.find(".child").exists())
     })
   })
+
+  it("should allow passing a className to Grid", () => {
+    const wrapper = shallow(
+      <Grid width={2} className="foobar">
+        <div />
+      </Grid>
+    )
+    assert.ok(wrapper.find(".foobar"))
+  })
+
+  it("should allow passing a className to Cell", () => {
+    const wrapper = shallow(
+      <Cell width={2} className="foobar">
+        <div />
+      </Cell>
+    )
+    assert.ok(wrapper.find(".foobar"))
+  })
 })

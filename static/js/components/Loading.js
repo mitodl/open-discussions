@@ -6,6 +6,7 @@ import ContentLoader from "react-content-loader"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import Card from "./Card"
 import { contentLoaderSpeed } from "../lib/constants"
+import withChannelSidebar from "../hoc/withChannelSidebar"
 
 type LoadingProps = {
   loaded: boolean,
@@ -109,3 +110,6 @@ export const withLoading = R.curry(
 
 export const withSpinnerLoading = withLoading(Loading)
 export const withPostLoading = withLoading(PostLoading)
+export const withPostLoadingSidebar = withLoading(
+  withChannelSidebar("channel-page", PostLoading)
+)
