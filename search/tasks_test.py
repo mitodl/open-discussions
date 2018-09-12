@@ -25,7 +25,6 @@ from search.tasks import (
     wrap_retry_exception,
 )
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -143,7 +142,12 @@ def test_index_post_with_comments(mocker, wrap_retry_mock, with_error):  # pylin
 
 @pytest.mark.parametrize("with_error", [True, False])
 def test_index_channel(
-        mocker, mocked_celery, wrap_retry_mock, settings, user, with_error,
+        mocker,
+        mocked_celery,
+        wrap_retry_mock,
+        settings,
+        user,
+        with_error,
 ):  # pylint: disable=unused-argument,too-many-arguments
     """index_channel should index all posts of a channel"""
     settings.INDEXING_API_USERNAME = user.username
@@ -174,9 +178,7 @@ def test_start_recreate_index(mocker, mocked_celery, settings, user):
     settings.INDEXING_API_USERNAME = user.username
     client_mock = mocker.patch('channels.api.Api', autospec=True)
     channel_names = ['a', 'b', 'c']
-    client_mock.return_value.list_channels.return_value = [
-        mocker.Mock(display_name=name) for name in channel_names
-    ]
+    client_mock.return_value.list_channels.return_value = [mocker.Mock(display_name=name) for name in channel_names]
     index_channel_mock = mocker.patch('search.tasks.index_channel', autospec=True)
     backing_index = 'backing'
     create_backing_index_mock = mocker.patch(

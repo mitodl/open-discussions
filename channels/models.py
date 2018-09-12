@@ -97,8 +97,8 @@ class Subscription(TimestampedModel):
         return "{} is subscribed to post_id: {}, comment_id: {}".format(self.user, self.post_id, self.comment_id)
 
     class Meta:
-        unique_together = (('user', 'post_id', 'comment_id'),)
-        index_together = (('post_id', 'comment_id'),)
+        unique_together = (('user', 'post_id', 'comment_id'), )
+        index_together = (('post_id', 'comment_id'), )
 
 
 class Channel(TimestampedModel):

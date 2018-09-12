@@ -40,8 +40,7 @@ class ESSerializer:
         base_serialized = self.base_serializer(reddit_obj).data
         serialized = {
             **filter_dict_keys(base_serialized, self.use_keys),
-            **filter_dict_with_renamed_keys(base_serialized, self.rename_keys),
-            'object_type': self.object_type
+            **filter_dict_with_renamed_keys(base_serialized, self.rename_keys), 'object_type': self.object_type
         }
         return {
             **serialized,
@@ -63,12 +62,7 @@ class ESPostSerializer(ESSerializer):
         'removed',
         'deleted',
     ]
-    rename_keys = {
-        'id': 'post_id',
-        'title': 'post_title',
-        'url': 'post_link_url',
-        'thumbnail': 'post_link_thumbnail'
-    }
+    rename_keys = {'id': 'post_id', 'title': 'post_title', 'url': 'post_link_url', 'thumbnail': 'post_link_thumbnail'}
 
     @property
     def base_serializer(self):

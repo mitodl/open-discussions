@@ -27,7 +27,6 @@ from search.indexing_api import (
     UPDATE_CONFLICT_SETTING,
 )
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -206,7 +205,9 @@ def test_index_post_with_comments(mocked_es, mocker, settings, user):
         return_value=serialized_data,
     )
     bulk_mock = mocker.patch(
-        'search.indexing_api.bulk', autospec=True, return_value=(0, []),
+        'search.indexing_api.bulk',
+        autospec=True,
+        return_value=(0, []),
     )
 
     settings.INDEXING_API_USERNAME = user.username
@@ -306,10 +307,12 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     conn_mock.indices.exists_alias.assert_called_once_with(name=reindexing_alias)
     if temp_alias_exists:
         conn_mock.indices.delete_alias.assert_any_call(
-            index=backing_index, name=reindexing_alias,
+            index=backing_index,
+            name=reindexing_alias,
         )
     assert conn_mock.indices.delete_alias.called is temp_alias_exists
 
     conn_mock.indices.put_alias.assert_called_once_with(
-        index=backing_index, name=reindexing_alias,
+        index=backing_index,
+        name=reindexing_alias,
     )

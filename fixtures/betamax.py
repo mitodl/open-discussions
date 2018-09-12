@@ -44,11 +44,13 @@ def configure_betamax(mocker, cassette_exists, praw_settings, request):
     mocker.patch('channels.api._get_session', return_value=betamax_parametrized_recorder.session)
     if cassette_exists:
         # only patch if we're running off an existing cassette
-        mocker.patch('channels.api._get_refresh_token', return_value={
-            'refresh_token': 'fake',
-            'access_token': 'fake',
-            'expires_in': 1234,
-        })
+        mocker.patch(
+            'channels.api._get_refresh_token',
+            return_value={
+                'refresh_token': 'fake',
+                'access_token': 'fake',
+                'expires_in': 1234,
+            })
 
     urllib3.disable_warnings()
 

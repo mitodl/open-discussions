@@ -72,7 +72,7 @@ def test_chunks_iterable():
     chunk_output = []
     for chunk in chunks(input_range, chunk_size=10):
         chunk_output.append(chunk)
-    assert len(chunk_output) == ceil(113/10)
+    assert len(chunk_output) == ceil(113 / 10)
 
     range_list = []
     for chunk in chunk_output:

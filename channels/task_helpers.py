@@ -11,11 +11,7 @@ def sync_post_model(post):
         post (Post): A PRAW post object
     """
     from channels import tasks
-    tasks.sync_post_model.delay(
-        channel_name=post.subreddit.display_name,
-        post_id=post.id,
-        post_url=post.url
-    )
+    tasks.sync_post_model.delay(channel_name=post.subreddit.display_name, post_id=post.id, post_url=post.url)
 
 
 def sync_comment_model(comment):

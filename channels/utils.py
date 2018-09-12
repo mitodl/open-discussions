@@ -137,11 +137,8 @@ def lookup_users_for_posts(posts):
         posts (list of praw.models.Submission):
             A list of submissions
     """
-    users = User.objects.filter(
-        username__in=[
-            post.author.name for post in posts if post.author
-        ]
-    ).select_related('profile')
+    users = User.objects.filter(username__in=[post.author.name for post in posts
+                                              if post.author]).select_related('profile')
     return {user.username: user for user in users}
 
 
@@ -166,7 +163,8 @@ def _lookup_subscriptions_for_posts(posts, user):
         user=user,
         post_id__in=[post.id for post in posts],
         comment_id__isnull=True,
-    ).values_list('post_id', flat=True)
+    ).values_list(
+        'post_id', flat=True)
 
 
 def lookup_subscriptions_for_posts(posts, user):
@@ -210,7 +208,8 @@ def _lookup_subscriptions_for_comments(comments, user):
         user=user,
         post_id=post_id,
         comment_id__in=comment_ids,
-    ).values_list('comment_id', flat=True)
+    ).values_list(
+        'comment_id', flat=True)
 
 
 def lookup_subscriptions_for_comments(comments, user):
@@ -269,8 +268,5 @@ def get_or_create_link_meta(url):
     if link_meta is None and settings.EMBEDLY_KEY:
         response = get_embedly(url).json()
         if THUMBNAIL_URL in response:
-            link_meta, _ = LinkMeta.objects.get_or_create(
-                url=url,
-                defaults={'thumbnail': response[THUMBNAIL_URL]}
-            )
+            link_meta, _ = LinkMeta.objects.get_or_create(url=url, defaults={'thumbnail': response[THUMBNAIL_URL]})
     return link_meta

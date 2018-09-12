@@ -16,11 +16,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.settings import api_settings
 from anymail.message import AnymailMessage
-from djoser.views import (
-    PasswordResetView as DjoserPasswordResetView,
-    PasswordResetConfirmView as DjoserPasswordResetConfirmView,
-    SetPasswordView as DjoserSetPasswordView
-)
+from djoser.views import (PasswordResetView as DjoserPasswordResetView, PasswordResetConfirmView as
+                          DjoserPasswordResetConfirmView, SetPasswordView as DjoserSetPasswordView)
 from djoser.utils import ActionViewMixin
 from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
 
@@ -55,11 +52,12 @@ class SocialAuthAPIView(APIView):
         serializer_cls = self.get_serializer_cls()
         strategy = load_drf_strategy(request)
         backend = load_backend(strategy, EmailAuth.name, None)
-        serializer = serializer_cls(data=request.data, context={
-            'request': request,
-            'strategy': strategy,
-            'backend': backend,
-        })
+        serializer = serializer_cls(
+            data=request.data, context={
+                'request': request,
+                'strategy': strategy,
+                'backend': backend,
+            })
 
         if serializer.is_valid():
             serializer.save()
@@ -69,6 +67,7 @@ class SocialAuthAPIView(APIView):
 
 class LoginEmailView(SocialAuthAPIView):
     """Email login view"""
+
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return LoginEmailSerializer
@@ -76,6 +75,7 @@ class LoginEmailView(SocialAuthAPIView):
 
 class LoginPasswordView(SocialAuthAPIView):
     """Email login view"""
+
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return LoginPasswordSerializer
@@ -83,6 +83,7 @@ class LoginPasswordView(SocialAuthAPIView):
 
 class RegisterEmailView(SocialAuthAPIView):
     """Email register view"""
+
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return RegisterEmailSerializer
@@ -90,12 +91,8 @@ class RegisterEmailView(SocialAuthAPIView):
     def post(self, request):
         """ Verify recaptcha response before proceeding """
         if settings.RECAPTCHA_SITE_KEY:
-            r = requests.post(
-                "https://www.google.com/recaptcha/api/siteverify?secret={key}&response={captcha}".format(
-                    key=quote(settings.RECAPTCHA_SECRET_KEY),
-                    captcha=quote(request.data["recaptcha"])
-                )
-            )
+            r = requests.post("https://www.google.com/recaptcha/api/siteverify?secret={key}&response={captcha}".format(
+                key=quote(settings.RECAPTCHA_SECRET_KEY), captcha=quote(request.data["recaptcha"])))
             response = r.json()
             if not response['success']:
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
@@ -104,6 +101,7 @@ class RegisterEmailView(SocialAuthAPIView):
 
 class RegisterConfirmView(SocialAuthAPIView):
     """Email registration confirmation view"""
+
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return RegisterConfirmSerializer
@@ -111,6 +109,7 @@ class RegisterConfirmView(SocialAuthAPIView):
 
 class RegisterDetailsView(SocialAuthAPIView):
     """Email registration details view"""
+
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return RegisterDetailsSerializer
@@ -125,17 +124,8 @@ def get_social_auth_types(request):
     if not features.is_enabled(features.EMAIL_AUTH):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    social_auths = (
-        UserSocialAuth
-        .objects
-        .filter(user=request.user)
-        .values('provider')
-        .distinct()
-    )
-    return Response(
-        data=social_auths,
-        status=status.HTTP_200_OK
-    )
+    social_auths = (UserSocialAuth.objects.filter(user=request.user).values('provider').distinct())
+    return Response(data=social_auths, status=status.HTTP_200_OK)
 
 
 def login_complete(request, **kwargs):  # pylint: disable=unused-argument
@@ -162,6 +152,7 @@ def confirmation_sent(request, **kwargs):  # pylint: disable=unused-argument
 
 class CustomPasswordResetEmail(DjoserPasswordResetEmail):
     """Custom class to modify base functionality in Djoser's PasswordResetEmail class"""
+
     def send(self, to, *args, **kwargs):
         """
         Overrides djoser.email.PasswordResetEmail#send to use our mail API.
@@ -191,6 +182,7 @@ class CustomDjoserAPIView(ActionViewMixin):
     coercing that to a 200 with an empty dict as the response data. This can be removed
     when redux-hammock is changed to support 204's.
     """
+
     def post(self, request):  # pylint: disable=missing-docstring
         if not features.is_enabled(features.EMAIL_AUTH):
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -212,7 +204,7 @@ class CustomPasswordResetConfirmView(CustomDjoserAPIView, DjoserPasswordResetCon
 
 class CustomSetPasswordView(CustomDjoserAPIView, DjoserSetPasswordView):
     """Custom view to modify base functionality in Djoser's SetPasswordView class"""
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
 
     def post(self, request):
         """

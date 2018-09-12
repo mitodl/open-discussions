@@ -172,9 +172,7 @@ def send_messages(messages):
         try:
             msg.send()
         except Exception as exc:  # pylint: disable=broad-except
-            failed_message_errors.append(
-                (msg, exc)
-            )
+            failed_message_errors.append((msg, exc))
 
     if failed_message_errors:
         raise SendEmailsException(failed_message_errors)

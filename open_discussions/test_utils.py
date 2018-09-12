@@ -17,10 +17,13 @@ def any_instance_of(*cls):
     Returns:
         AnyInstanceOf: dynamic class type with the desired equality
     """
+
     class AnyInstanceOf(metaclass=abc.ABCMeta):
         """Dynamic class type for __eq__ in terms of isinstance"""
+
         def __eq__(self, other):
             return isinstance(other, cls)
+
     for c in cls:
         AnyInstanceOf.register(c)
     return AnyInstanceOf()
@@ -41,6 +44,7 @@ class MockResponse:
     """
     Mock requests.Response
     """
+
     def __init__(self, content, status_code):
         self.content = content
         self.status_code = status_code

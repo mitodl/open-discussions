@@ -12,7 +12,6 @@ from open_discussions.envs import (
     get_list_of_str,
 )
 
-
 FAKE_ENVIRONS = {
     'true': 'True',
     'false': 'False',

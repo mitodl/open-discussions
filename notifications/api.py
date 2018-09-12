@@ -28,9 +28,8 @@ def ensure_notification_settings(user):
     Args:
         user (User): user to create settings for
     """
-    existing_notification_types = NotificationSettings.objects.filter(
-        user=user
-    ).values_list('notification_type', flat=True)
+    existing_notification_types = NotificationSettings.objects.filter(user=user).values_list(
+        'notification_type', flat=True)
 
     if NOTIFICATION_TYPE_FRONTPAGE not in existing_notification_types:
         NotificationSettings.objects.get_or_create(
@@ -38,8 +37,7 @@ def ensure_notification_settings(user):
             notification_type=NOTIFICATION_TYPE_FRONTPAGE,
             defaults={
                 'trigger_frequency': FREQUENCY_DAILY,
-            }
-        )
+            })
 
     if NOTIFICATION_TYPE_COMMENTS not in existing_notification_types:
         NotificationSettings.objects.get_or_create(
@@ -47,8 +45,7 @@ def ensure_notification_settings(user):
             notification_type=NOTIFICATION_TYPE_COMMENTS,
             defaults={
                 'trigger_frequency': FREQUENCY_IMMEDIATE,
-            }
-        )
+            })
 
 
 def _send_frontpage_digests(notification_settings):
@@ -97,18 +94,17 @@ def _get_notifier_for_notification(notification):
     elif notification.notification_type == NOTIFICATION_TYPE_COMMENTS:
         return comments.CommentNotifier(notification_settings)
     else:
-        raise UnsupportedNotificationTypeError(
-            "Notification type '{}' is unsupported".format(notification.notification_type)
-        )
+        raise UnsupportedNotificationTypeError("Notification type '{}' is unsupported".format(
+            notification.notification_type))
 
 
 def send_unsent_email_notifications():
     """
     Send all notifications that haven't been sent yet
     """
-    for notification_ids in chunks(EmailNotification.objects.filter(
-            state=EmailNotification.STATE_PENDING,
-    ).values_list('id', flat=True), chunk_size=100):
+    for notification_ids in chunks(
+            EmailNotification.objects.filter(state=EmailNotification.STATE_PENDING, ).values_list('id', flat=True),
+            chunk_size=100):
         EmailNotification.objects.filter(id__in=notification_ids).update(state=EmailNotification.STATE_SENDING)
         tasks.send_email_notification_batch.delay(notification_ids)
 
@@ -137,9 +133,8 @@ def send_comment_notifications(post_id, comment_id, new_comment_id):
         comment_id (str): base36 comment id
         new_comment_id (str): base36 comment id of the new comment
     """
-    for subscription in Subscription.objects.filter(post_id=post_id).filter(
-            Q(comment_id=comment_id) | Q(comment_id=None)
-    ).distinct('user').iterator():
+    for subscription in Subscription.objects.filter(
+            post_id=post_id).filter(Q(comment_id=comment_id) | Q(comment_id=None)).distinct('user').iterator():
         try:
             notification_settings = NotificationSettings.objects.get(
                 user_id=subscription.user_id,

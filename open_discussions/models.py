@@ -15,6 +15,7 @@ class TimestampedModelQuerySet(QuerySet):
     """
     Subclassed QuerySet for TimestampedModelManager
     """
+
     def update(self, **kwargs):
         """
         Automatically update updated_on timestamp when .update(). This is because .update()
@@ -30,6 +31,7 @@ class TimestampedModelManager(Manager):
     """
     Subclassed manager for TimestampedModel
     """
+
     def update(self, **kwargs):
         """
         Allows access to TimestampedModelQuerySet's update method on the manager

@@ -7,7 +7,6 @@ import uuid
 from django.conf import settings
 from elasticsearch_dsl.connections import connections
 
-
 _CONN = None
 # When we create the connection, check to make sure all appropriate mappings exist
 _CONN_VERIFIED = False
@@ -36,8 +35,7 @@ def get_conn(*, verify=True):
             http_auth=http_auth,
             use_ssl=use_ssl,
             # make sure we verify SSL certificates (off by default)
-            verify_certs=use_ssl
-        )
+            verify_certs=use_ssl)
         # Verify connection on first connect if verify=True.
         do_verify = verify
 
@@ -83,9 +81,7 @@ def make_alias_name(*, is_reindexing):
         str: The name of the alias
     """
     return "{prefix}_{suffix}".format(
-        prefix=settings.ELASTICSEARCH_INDEX,
-        suffix='reindexing' if is_reindexing else 'default'
-    )
+        prefix=settings.ELASTICSEARCH_INDEX, suffix='reindexing' if is_reindexing else 'default')
 
 
 get_default_alias_name = partial(make_alias_name, is_reindexing=False)
@@ -100,10 +96,7 @@ def get_active_aliases():
         list of str: Aliases which exist
     """
     conn = get_conn(verify=False)
-    return [
-        alias for alias in [get_default_alias_name(), get_reindexing_alias_name()]
-        if conn.indices.exists(alias)
-    ]
+    return [alias for alias in [get_default_alias_name(), get_reindexing_alias_name()] if conn.indices.exists(alias)]
 
 
 def refresh_index(index):

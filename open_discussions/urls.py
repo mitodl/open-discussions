@@ -61,19 +61,16 @@ urlpatterns = [
     url(r'^settings/', index),
     url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
     url(r'^profile/[A-Za-z0-9_]+/', index, name='profile'),
-
     url(r'^login/', index, name='login'),
     url(r'^signup/', index, name='signup'),
     url(r'^signup/confirm/$', index, name='register-confirm'),
     url(r'^account/inactive/$', index, name='account-inactive'),
-
     url(r'^password_reset/', index, name='password-reset'),
-    url(
-        r'^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+    url(r'^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         index,
-        name='password-reset-confirm'
-    ),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+        name='password-reset-confirm'),
+] + static(
+    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar  # pylint: disable=wrong-import-position, wrong-import-order

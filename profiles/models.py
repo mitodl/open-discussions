@@ -4,15 +4,9 @@ from uuid import uuid4
 from django.db import models, transaction
 from django.conf import settings
 
-from profiles.utils import (
-    profile_image_upload_uri,
-    profile_image_upload_uri_medium,
-    profile_image_upload_uri_small,
-    make_thumbnail,
-    MAX_IMAGE_FIELD_LENGTH,
-    IMAGE_SMALL_MAX_DIMENSION,
-    IMAGE_MEDIUM_MAX_DIMENSION
-)
+from profiles.utils import (profile_image_upload_uri, profile_image_upload_uri_medium, profile_image_upload_uri_small,
+                            make_thumbnail, MAX_IMAGE_FIELD_LENGTH, IMAGE_SMALL_MAX_DIMENSION,
+                            IMAGE_MEDIUM_MAX_DIMENSION)
 
 PROFILE_PROPS = (
     'name',

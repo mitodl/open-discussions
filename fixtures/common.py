@@ -49,10 +49,7 @@ def warnings_as_errors():
             message=r".*(JSONField\.from_db_value).*",
             category=RemovedInDjango30Warning,
         )
-        warnings.filterwarnings(
-            "ignore",
-            category=RemovedInPytest4Warning
-        )
+        warnings.filterwarnings("ignore", category=RemovedInPytest4Warning)
 
         yield
     finally:
@@ -78,6 +75,7 @@ def session_indexing_decorator():
 
     def dummy_decorator(*persistence_funcs):  # pylint: disable=unused-argument
         """A decorator that calls a mock before calling the wrapped function"""
+
         def dummy_decorator_inner(func):  # pylint: disable=missing-docstring
             @wraps(func)
             def wrapped_api_func(*args, **kwargs):  # pylint: disable=missing-docstring
@@ -85,7 +83,9 @@ def session_indexing_decorator():
                     mock_persist_func.original.append(persistence_func)
                     mock_persist_func(*args, **kwargs)
                 return func(*args, **kwargs)
+
             return wrapped_api_func
+
         return dummy_decorator_inner
 
     patched_decorator = patch('search.task_helpers.reddit_object_persist', dummy_decorator)

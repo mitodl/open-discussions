@@ -81,12 +81,8 @@ class NotificationSettings(TimestampedModel):
         return self.trigger_frequency == FREQUENCY_NEVER
 
     class Meta:
-        unique_together = (
-            ('user', 'notification_type'),
-        )
-        index_together = (
-            ('notification_type', 'trigger_frequency'),
-        )
+        unique_together = (('user', 'notification_type'), )
+        index_together = (('notification_type', 'trigger_frequency'), )
 
 
 class NotificationBase(TimestampedModel):
@@ -109,9 +105,7 @@ class NotificationBase(TimestampedModel):
     class Meta:
         abstract = True
 
-        index_together = (
-            ('user', 'notification_type', 'created_on'),
-        )
+        index_together = (('user', 'notification_type', 'created_on'), )
 
 
 class EmailNotification(NotificationBase):
@@ -120,20 +114,14 @@ class EmailNotification(NotificationBase):
     STATE_SENDING = 'sending'
     STATE_SENT = 'sent'
     STATE_CANCELED = 'canceled'
-    STATE_CHOICES = (
-        (STATE_PENDING, 'Pending'),
-        (STATE_SENDING, 'Sending'),
-        (STATE_SENT, 'Sent'),
-        (STATE_CANCELED, 'Canceled')
-    )
+    STATE_CHOICES = ((STATE_PENDING, 'Pending'), (STATE_SENDING, 'Sending'), (STATE_SENT, 'Sent'), (STATE_CANCELED,
+                                                                                                    'Canceled'))
 
     state = models.CharField(choices=STATE_CHOICES, max_length=10, default=STATE_PENDING)
     sent_at = models.DateTimeField(null=True)
 
     class Meta:
-        index_together = (
-            ('state', 'updated_on'),
-        ) + NotificationBase.Meta.index_together
+        index_together = (('state', 'updated_on'), ) + NotificationBase.Meta.index_together
 
 
 class CommentEvent(TimestampedModel):
@@ -148,4 +136,4 @@ class CommentEvent(TimestampedModel):
     )
 
     class Meta:
-        unique_together = (('user', 'post_id', 'comment_id'),)
+        unique_together = (('user', 'post_id', 'comment_id'), )

@@ -45,27 +45,18 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('name', 'image', 'image_small', 'image_medium',
-                  'image_file', 'image_small_file', 'image_medium_file',
-                  'profile_image_small', 'profile_image_medium',
-                  'email_optin', 'toc_optin', 'bio', 'headline', 'username')
-        read_only_fields = (
-            'image_file_small',
-            'image_file_medium',
-            'profile_image_small',
-            'profile_image_medium',
-            'username'
-        )
+        fields = ('name', 'image', 'image_small', 'image_medium', 'image_file', 'image_small_file',
+                  'image_medium_file', 'profile_image_small', 'profile_image_medium', 'email_optin', 'toc_optin',
+                  'bio', 'headline', 'username')
+        read_only_fields = ('image_file_small', 'image_file_medium', 'profile_image_small', 'profile_image_medium',
+                            'username')
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for User"""
     uid = serializers.CharField(write_only=True, required=False)
     # username cannot be set but a default is generated on create using ulid.new
-    username = serializers.CharField(
-        read_only=True,
-        default=serializers.CreateOnlyDefault(ulid.new)
-    )
+    username = serializers.CharField(read_only=True, default=serializers.CreateOnlyDefault(ulid.new))
     email = serializers.CharField(write_only=True)
     profile = ProfileSerializer()
 

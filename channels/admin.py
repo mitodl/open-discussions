@@ -9,9 +9,9 @@ class ChannelAdmin(admin.ModelAdmin):
     """Customized Channel admin model"""
     model = Channel
     exclude = ('banner', 'avatar')
-    search_fields = ('name',)
-    readonly_fields = ('name',)
-    list_filter = ('ga_tracking_id',)
+    search_fields = ('name', )
+    readonly_fields = ('name', )
+    list_filter = ('ga_tracking_id', )
 
 
 admin.site.register(Channel, ChannelAdmin)

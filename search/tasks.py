@@ -20,20 +20,15 @@ from search.exceptions import (
     ReindexException,
 )
 
-
 User = get_user_model()
 log = logging.getLogger(__name__)
-
 
 # For our tasks that attempt to partially update a document, there's a chance that
 # the document has not yet been created. When we get an error that indicates that the
 # document doesn't exist for the given ID, we will retry a few times in case there is
 # a waiting task to create the document.
 PARTIAL_UPDATE_TASK_SETTINGS = dict(
-    autoretry_for=(NotFoundError,),
-    retry_kwargs={'max_retries': 5},
-    default_retry_delay=2
-)
+    autoretry_for=(NotFoundError, ), retry_kwargs={'max_retries': 5}, default_retry_delay=2)
 
 
 @contextmanager
@@ -116,11 +111,7 @@ def index_channel(self, channel_name):
             client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
             posts = client.list_posts(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
 
-        raise self.replace(
-            celery.group(
-                index_post_with_comments.si(post.id) for post in posts
-            )
-        )
+        raise self.replace(celery.group(index_post_with_comments.si(post.id) for post in posts))
     except RetryException:
         raise
     except Ignore:
@@ -147,21 +138,17 @@ def start_recreate_index(self):
 
         client = Api(user)
         channel_names = [channel.display_name for channel in client.list_channels()]
-        index_channels = celery.group(
-            index_channel.si(channel_name) for channel_name in channel_names
-        )
+        index_channels = celery.group(index_channel.si(channel_name) for channel_name in channel_names)
     except:  # pylint: disable=bare-except
         error = "start_recreate_index threw an error"
         log.exception(error)
         return error
 
     # Use self.replace so that code waiting on this task will also wait on the indexing and finish tasks
-    raise self.replace(
-        celery.chain(
-            index_channels,
-            finish_recreate_index.s(new_backing_index),
-        )
-    )
+    raise self.replace(celery.chain(
+        index_channels,
+        finish_recreate_index.s(new_backing_index),
+    ))
 
 
 @app.task

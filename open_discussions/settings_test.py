@@ -13,7 +13,6 @@ from django.test import TestCase
 from django.urls import reverse
 import semantic_version
 
-
 REQUIRED_SETTINGS = {
     'ELASTICSEARCH_INDEX': 'some_index',
     'MAILGUN_SENDER_DOMAIN': 'mailgun.fake.domain',
@@ -44,59 +43,52 @@ class TestSettings(TestCase):
     def test_s3_settings(self):
         """Verify that we enable and configure S3 with a variable"""
         # Unset, we don't do S3
-        with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_USE_S3': 'False'
-        }, clear=True):
+        with mock.patch.dict('os.environ', {**REQUIRED_SETTINGS, 'OPEN_DISCUSSIONS_USE_S3': 'False'}, clear=True):
             settings_vars = self.reload_settings()
-            self.assertNotEqual(
-                settings_vars.get('DEFAULT_FILE_STORAGE'),
-                'storages.backends.s3boto.S3BotoStorage'
-            )
+            self.assertNotEqual(settings_vars.get('DEFAULT_FILE_STORAGE'), 'storages.backends.s3boto.S3BotoStorage')
 
         with self.assertRaises(ImproperlyConfigured):
-            with mock.patch.dict('os.environ', {
-                'OPEN_DISCUSSIONS_USE_S3': 'True',
-            }, clear=True):
+            with mock.patch.dict(
+                    'os.environ', {
+                        'OPEN_DISCUSSIONS_USE_S3': 'True',
+                    }, clear=True):
                 self.reload_settings()
 
         # Verify it all works with it enabled and configured 'properly'
-        with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_USE_S3': 'True',
-            'AWS_ACCESS_KEY_ID': '1',
-            'AWS_SECRET_ACCESS_KEY': '2',
-            'AWS_STORAGE_BUCKET_NAME': '3',
-        }, clear=True):
+        with mock.patch.dict(
+                'os.environ', {
+                    **REQUIRED_SETTINGS,
+                    'OPEN_DISCUSSIONS_USE_S3': 'True',
+                    'AWS_ACCESS_KEY_ID': '1',
+                    'AWS_SECRET_ACCESS_KEY': '2',
+                    'AWS_STORAGE_BUCKET_NAME': '3',
+                },
+                clear=True):
             settings_vars = self.reload_settings()
-            self.assertEqual(
-                settings_vars.get('DEFAULT_FILE_STORAGE'),
-                'storages.backends.s3boto.S3BotoStorage'
-            )
+            self.assertEqual(settings_vars.get('DEFAULT_FILE_STORAGE'), 'storages.backends.s3boto.S3BotoStorage')
 
     def test_admin_settings(self):
         """Verify that we configure email with environment variable"""
 
-        with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_ADMIN_EMAIL': '',
-        }, clear=True):
+        with mock.patch.dict(
+                'os.environ', {
+                    **REQUIRED_SETTINGS,
+                    'OPEN_DISCUSSIONS_ADMIN_EMAIL': '',
+                }, clear=True):
             settings_vars = self.reload_settings()
             self.assertFalse(settings_vars.get('ADMINS', False))
 
         test_admin_email = 'cuddle_bunnies@example.com'
-        with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_ADMIN_EMAIL': test_admin_email,
-        }, clear=True):
+        with mock.patch.dict(
+                'os.environ', {
+                    **REQUIRED_SETTINGS,
+                    'OPEN_DISCUSSIONS_ADMIN_EMAIL': test_admin_email,
+                }, clear=True):
             settings_vars = self.reload_settings()
-            self.assertEqual(
-                (('Admins', test_admin_email),),
-                settings_vars['ADMINS']
-            )
+            self.assertEqual((('Admins', test_admin_email), ), settings_vars['ADMINS'])
         # Manually set ADMIN to our test setting and verify e-mail
         # goes where we expect
-        settings.ADMINS = (('Admins', test_admin_email),)
+        settings.ADMINS = (('Admins', test_admin_email), )
         mail.mail_admins('Test', 'message')
         self.assertIn(test_admin_email, mail.outbox[0].to)
 
@@ -106,40 +98,31 @@ class TestSettings(TestCase):
         # Check default state is SSL on
         with mock.patch.dict('os.environ', REQUIRED_SETTINGS, clear=True):
             settings_vars = self.reload_settings()
-            self.assertEqual(
-                settings_vars['DATABASES']['default']['OPTIONS'],
-                {'sslmode': 'require'}
-            )
+            self.assertEqual(settings_vars['DATABASES']['default']['OPTIONS'], {'sslmode': 'require'})
 
         # Check enabling the setting explicitly
-        with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'True'
-        }, clear=True):
+        with mock.patch.dict(
+                'os.environ', {
+                    **REQUIRED_SETTINGS, 'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'True'
+                }, clear=True):
             settings_vars = self.reload_settings()
-            self.assertEqual(
-                settings_vars['DATABASES']['default']['OPTIONS'],
-                {}
-            )
+            self.assertEqual(settings_vars['DATABASES']['default']['OPTIONS'], {})
 
         # Disable it
-        with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'False'
-        }, clear=True):
+        with mock.patch.dict(
+                'os.environ', {
+                    **REQUIRED_SETTINGS, 'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'False'
+                }, clear=True):
             settings_vars = self.reload_settings()
-            self.assertEqual(
-                settings_vars['DATABASES']['default']['OPTIONS'],
-                {'sslmode': 'require'}
-            )
+            self.assertEqual(settings_vars['DATABASES']['default']['OPTIONS'], {'sslmode': 'require'})
 
     def test_elasticsearch_index_pr_build(self):
         """For PR builds we will use the heroku app name instead of the given ELASTICSEARCH_INDEX"""
         index_name = 'heroku_app_name_as_index'
         with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'HEROKU_APP_NAME': index_name,
-            'HEROKU_PARENT_APP_NAME': 'some_name',
+                **REQUIRED_SETTINGS,
+                'HEROKU_APP_NAME': index_name,
+                'HEROKU_PARENT_APP_NAME': 'some_name',
         }):
             settings_vars = self.reload_settings()
             assert settings_vars['ELASTICSEARCH_INDEX'] == index_name
@@ -169,12 +152,6 @@ class TestSettings(TestCase):
         """
         token = '4xj-8aa0d06b40f1c067b464'
         uid = 'AA'
-        template_generated_url = settings.PASSWORD_RESET_CONFIRM_URL.format(
-            uid=uid,
-            token=token
-        )
-        reverse_url = reverse('password-reset-confirm', kwargs=dict(
-            uid=uid,
-            token=token
-        ))
+        template_generated_url = settings.PASSWORD_RESET_CONFIRM_URL.format(uid=uid, token=token)
+        reverse_url = reverse('password-reset-confirm', kwargs=dict(uid=uid, token=token))
         assert reverse_url == '/{}'.format(template_generated_url)

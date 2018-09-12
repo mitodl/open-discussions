@@ -33,10 +33,11 @@ User = get_user_model()
 class SocialAuthSerializer(serializers.Serializer):
     """Serializer for social auth"""
     partial_token = serializers.CharField(source='partial.token', default=None)
-    flow = serializers.ChoiceField(choices=(
-        (SocialAuthState.FLOW_LOGIN, "Login"),
-        (SocialAuthState.FLOW_REGISTER, "Register"),
-    ))
+    flow = serializers.ChoiceField(
+        choices=(
+            (SocialAuthState.FLOW_LOGIN, "Login"),
+            (SocialAuthState.FLOW_REGISTER, "Register"),
+        ))
     provider = serializers.CharField(read_only=True)
     state = serializers.CharField(read_only=True)
     errors = serializers.ListField(read_only=True)
@@ -87,9 +88,7 @@ class SocialAuthSerializer(serializers.Serializer):
         else:  # pragma: no cover
             # this follows similar code in PSA itself, but wasn't reachable through normal testing
             log.error("Unexpected authentication result")
-            return SocialAuthState(SocialAuthState.STATE_ERROR, errors=[
-                "Unexpected authentication result"
-            ])
+            return SocialAuthState(SocialAuthState.STATE_ERROR, errors=["Unexpected authentication result"])
 
     def save(self, **kwargs):
         try:
@@ -137,23 +136,15 @@ class LoginEmailSerializer(SocialAuthSerializer):
             result = SocialAuthState(SocialAuthState.STATE_LOGIN_PROVIDER, provider=exc.social_auth.provider)
             profile_to_serialize = exc.social_auth.user.profile
         except RequireRegistrationException:
-            result = SocialAuthState(SocialAuthState.STATE_ERROR, errors=[
-                "Couldn't find your MIT OPEN Account"
-            ])
+            result = SocialAuthState(SocialAuthState.STATE_ERROR, errors=["Couldn't find your MIT OPEN Account"])
         except RequirePasswordException as exc:
             result = SocialAuthState(SocialAuthState.STATE_LOGIN_PASSWORD, partial=exc.partial)
             profile_to_serialize = Profile.objects.filter(
                 user__social_auth__uid=validated_data.get('email'),
-                user__social_auth__provider=EmailAuth.name
-            ).first()
+                user__social_auth__provider=EmailAuth.name).first()
         if profile_to_serialize:
             profile_data = ProfileSerializer(profile_to_serialize).data
-            result.extra_data = filter_dict_keys(
-                profile_data, [
-                    'profile_image_small',
-                    'name'
-                ]
-            )
+            result.extra_data = filter_dict_keys(profile_data, ['profile_image_small', 'name'])
         return result
 
 

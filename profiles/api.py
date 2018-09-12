@@ -1,8 +1,5 @@
 """Profile API"""
-from profiles.models import (
-    Profile,
-    filter_profile_props
-)
+from profiles.models import (Profile, filter_profile_props)
 
 
 def ensure_profile(user, profile_data=None):

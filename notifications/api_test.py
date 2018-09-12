@@ -127,10 +127,7 @@ def test_send_email_notification_batch(mocker):
         mock_comment_notifier.send_notification.assert_any_call(notification)
 
 
-@pytest.mark.parametrize('post_id,comment_id', [
-    ('1', '4'),
-    ('1', None)
-])
+@pytest.mark.parametrize('post_id,comment_id', [('1', '4'), ('1', None)])
 def test_send_comment_notifications(post_id, comment_id):
     """Tests that send_comment_notifications works correctly"""
     comment_users = UserFactory.create_batch(5)

@@ -39,9 +39,7 @@ def test_is_enabled(settings, value_in_settings, default, default_in_settings, e
     (True, None, 'new value', 'new value'),
     (False, None, 'new value', None),
 ])
-def test_if_feature_enabled(
-        mocker, settings, feature_enabled, initial_value, update_value, expected_result_value
-):
+def test_if_feature_enabled(mocker, settings, feature_enabled, initial_value, update_value, expected_result_value):
     """
     Tests that if_feature_enabled turns a decorated function into a no-op if the
     given feature flag is disabled.

@@ -31,9 +31,7 @@ class SocialAuthState:
     STATE_INACTIVE = "inactive"
     STATE_INVALID_EMAIL = "invalid-email"
 
-    def __init__(
-            self, state, *, provider=None, partial=None, flow=None, errors=None
-    ):  # pylint: disable=too-many-arguments
+    def __init__(self, state, *, provider=None, partial=None, flow=None, errors=None):  # pylint: disable=too-many-arguments
         self.state = state
         self.partial = partial
         self.flow = flow
@@ -68,8 +66,8 @@ def jwt_get_username_from_payload_handler(payload):
         # if this errors, (not exactly one UserSocialAuth/User) we want to know
         try:
             username = UserSocialAuth.objects.values_list(
-                'user__username', flat=True
-            ).get(provider=provider, uid=username)
+                'user__username', flat=True).get(
+                    provider=provider, uid=username)
         except UserSocialAuth.DoesNotExist as exc:
             raise UserMissingSocialAuthException("Found no UserSocialAuth for username") from exc
 

@@ -16,7 +16,6 @@ from django.conf import settings  # noqa pylint: disable=wrong-import-position
 
 log = logging.getLogger(__name__)
 
-
 client = Client(**settings.RAVEN_CONFIG)
 
 register_logger_signal(client, loglevel=settings.SENTRY_LOG_LEVEL)

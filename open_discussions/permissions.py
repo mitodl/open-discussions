@@ -34,11 +34,8 @@ def is_moderator(request, view):
     user_api = request.channel_api
     channel_name = view.kwargs.get('channel_name', None)
     try:
-        return (
-            channel_name and
-            not request.user.is_anonymous and
-            user_api.is_moderator(channel_name, request.user.username)
-        )
+        return (channel_name and not request.user.is_anonymous
+                and user_api.is_moderator(channel_name, request.user.username))
     except PrawForbidden:
         # User was forbidden to list moderators so they are most certainly not one
         return False
@@ -115,22 +112,20 @@ class ContributorPermissions(permissions.BasePermission):
     """
     Only staff and moderators should be able to see and edit the list of contributors
     """
+
     def has_permission(self, request, view):
-        return is_staff_user(request) or (
-            (
-                channel_is_mod_editable(view) or is_readonly(request)
-            ) and is_moderator(request, view)
-        )
+        return is_staff_user(request) or ((channel_is_mod_editable(view) or is_readonly(request))
+                                          and is_moderator(request, view))
 
 
 class ModeratorPermissions(permissions.BasePermission):
     """
     All users should be able to see a list of moderators. Only staff and moderators should be able to edit it.
     """
+
     def has_permission(self, request, view):
-        return is_readonly(request) or is_staff_user(request) or (
-            channel_is_mod_editable(view) and is_moderator(request, view)
-        )
+        return is_readonly(request) or is_staff_user(request) or (channel_is_mod_editable(view)
+                                                                  and is_moderator(request, view))
 
 
 class AnonymousAccessReadonlyPermission(permissions.BasePermission):
