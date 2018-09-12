@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.45.1
+Version 0.45.1 (Released September 12, 2018)
 --------------
 
 - Add tests for ChannelModerationPage, fix remove post error (#1176)
