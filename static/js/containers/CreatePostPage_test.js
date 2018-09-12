@@ -13,6 +13,7 @@ import { makeCommentsResponse } from "../factories/comments"
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
+import { SET_BANNER_MESSAGE } from "../actions/ui"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import {
   userCanPost,
@@ -25,9 +26,9 @@ import { makeArticle, makeTweet } from "../factories/embedly"
 import { wait } from "../lib/util"
 import * as embedUtil from "../lib/embed"
 import { newPostForm } from "../lib/posts"
+import { shouldIf } from "../lib/test_utils"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
-import { SET_BANNER_MESSAGE } from "../actions/ui"
 
 describe("CreatePostPage", () => {
   let helper,
@@ -222,6 +223,27 @@ describe("CreatePostPage", () => {
 
     await wait(100) // 🙃
     assert.ok(window.twttr.widgets.load.called)
+  })
+
+  //
+  ;[
+    ["http", false],
+    ["http://", false],
+    ["http://foo", false],
+    ["http://foo.bar", true],
+    ["foo.bar", true],
+    ["https://foo.bar/fake_url/fake.html?param1=val1&param2=val2", true],
+    ["foo.bar/fake_url/fake.html?param1=val1&param2=val2", true]
+  ].forEach(([link, isValid]) => {
+    it(`${shouldIf(
+      isValid
+    )} call Embedly when the URL is ${link}`, async () => {
+      const wrapper = await renderPage()
+      setLinkPost(wrapper)
+      setUrl(wrapper, link)
+      await wait(100) // 🙃
+      assert.equal(isValid, helper.getEmbedlyStub.calledOnce)
+    })
   })
 
   it("should show validation errors when title of post is empty", async () => {
