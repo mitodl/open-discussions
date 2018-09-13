@@ -225,7 +225,7 @@ describe("ChannelModerationPage", () => {
           const actions = store.getActions()
           if (!canRemove) {
             assert.equal(helper.updateRemovedStub.callCount, 0)
-            assert.equal(helper.getReportsStub.callCount, 0)
+            sinon.assert.calledWith(helper.getReportsStub, channel.name)
           } else {
             sinon.assert.calledWith(helper.updateRemovedStub, post.id, true)
             sinon.assert.calledWith(helper.getReportsStub, channel.name)
@@ -399,7 +399,7 @@ describe("ChannelModerationPage", () => {
           const actions = store.getActions()
           if (!canRemove) {
             assert.equal(helper.updateRemovedStub.callCount, 0)
-            assert.equal(helper.getReportsStub.callCount, 0)
+            sinon.assert.calledWith(helper.getReportsStub, channel.name)
           } else {
             sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
               removed: true

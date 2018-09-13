@@ -62,12 +62,10 @@ export class ChannelModerationPage extends React.Component<Props> {
 
     try {
       if (!loaded) {
-        const promises = [
-          dispatch(actions.channels.get(channelName)),
-          dispatch(actions.reports.get(channelName))
-        ]
-        await Promise.all(promises)
+        await dispatch(actions.channels.get(channelName))
       }
+      // force refresh of reports whenever the user revisits the page
+      await dispatch(actions.reports.get(channelName))
     } catch (_) {} // eslint-disable-line no-empty
   }
 
