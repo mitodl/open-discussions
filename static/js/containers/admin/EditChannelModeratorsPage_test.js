@@ -11,7 +11,8 @@ import EditChannelModeratorsPage, {
 import {
   makeChannel,
   makeModerator,
-  makeModerators
+  makeModerators,
+  makeSubscriber
 } from "../../factories/channels"
 import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
@@ -235,7 +236,9 @@ describe("EditChannelModeratorsPage", () => {
 
     it("adds a new moderator", async () => {
       const newModerator = makeModerator(null, true)
+      const newSubscriber = makeSubscriber(newModerator.moderator_name)
       helper.addChannelModeratorStub.returns(Promise.resolve(newModerator))
+      helper.addChannelSubscriberStub.returns(Promise.resolve(newSubscriber))
 
       const email = "new@email.com"
       const { inner, store } = await render({
@@ -259,6 +262,11 @@ describe("EditChannelModeratorsPage", () => {
         helper.addChannelModeratorStub,
         channel.name,
         email
+      )
+      sinon.assert.calledWith(
+        helper.addChannelSubscriberStub,
+        channel.name,
+        newModerator.moderator_name
       )
 
       const actions = store.getActions()

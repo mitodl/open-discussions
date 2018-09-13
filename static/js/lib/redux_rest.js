@@ -8,6 +8,7 @@ import { commentsEndpoint, moreCommentsEndpoint } from "../reducers/comments"
 import { postUpvotesEndpoint } from "../reducers/post_upvotes"
 import { channelContributorsEndpoint } from "../reducers/channel_contributors"
 import { channelModeratorsEndpoint } from "../reducers/channel_moderators"
+import { channelSubscribersEndpoint } from "../reducers/channel_subscribers"
 import { postRemovedEndpoint } from "../reducers/post_removed"
 import { reportsEndpoint } from "../reducers/reports"
 import { settingsEndpoint } from "../reducers/settings"
@@ -29,6 +30,7 @@ export const endpoints = [
   channelsEndpoint,
   channelContributorsEndpoint,
   channelModeratorsEndpoint,
+  channelSubscribersEndpoint,
   postsForChannelEndpoint,
   frontPageEndpoint,
   commentsEndpoint,

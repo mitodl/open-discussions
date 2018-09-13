@@ -67,8 +67,8 @@ export const channelModeratorsEndpoint = {
     update.set(channelName, response)
     return update
   },
-  postFunc: async (channelName: string, username: string) => {
-    const moderator = await api.addChannelModerator(channelName, username)
+  postFunc: async (channelName: string, email: string) => {
+    const moderator = await api.addChannelModerator(channelName, email)
     return { channelName, moderator }
   },
   postSuccessHandler: addModerator,

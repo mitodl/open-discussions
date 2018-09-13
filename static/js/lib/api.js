@@ -26,6 +26,7 @@ import type {
   ChannelModerators,
   Contributor,
   Moderator,
+  Subscriber,
   GenericComment,
   CreatePostPayload,
   PostListPaginationParams,
@@ -125,6 +126,31 @@ export function deleteChannelContributor(
 ): Promise<void> {
   return fetchWithAuthFailure(
     `/api/v0/channels/${channelName}/contributors/${username}/`,
+    { method: DELETE }
+  )
+}
+
+export function addChannelSubscriber(
+  channelName: string,
+  username: string
+): Promise<Subscriber> {
+  return fetchJSONWithAuthFailure(
+    `/api/v0/channels/${channelName}/subscribers/`,
+    {
+      method: POST,
+      body:   JSON.stringify({
+        subscriber_name: username
+      })
+    }
+  )
+}
+
+export function deleteChannelSubscriber(
+  channelName: string,
+  username: string
+): Promise<void> {
+  return fetchWithAuthFailure(
+    `/api/v0/channels/${channelName}/subscribers/${username}/`,
     { method: DELETE }
   )
 }

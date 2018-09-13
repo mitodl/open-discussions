@@ -69,8 +69,8 @@ export const channelContributorsEndpoint = {
     update.set(channelName, response)
     return update
   },
-  postFunc: async (channelName: string, username: string) => {
-    const contributor = await api.addChannelContributor(channelName, username)
+  postFunc: async (channelName: string, email: string) => {
+    const contributor = await api.addChannelContributor(channelName, email)
     return { channelName, contributor }
   },
   postSuccessHandler: addContributor,
