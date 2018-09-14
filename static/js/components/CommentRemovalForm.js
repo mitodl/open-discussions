@@ -33,7 +33,7 @@ const CommentRemovalForm = ({
       }-button`}
       onClick={preventDefaultAndInvoke(() => commentAction(comment))}
     >
-      <a href="#">{comment.removed ? "approve" : "remove"}</a>
+      <a href="#">{comment.removed ? "Approve content" : "Remove content"}</a>
     </div>
   )
 }

@@ -6,29 +6,33 @@ import ChannelModerationPage, {
   ChannelModerationPage as InnerChannelModerationPage
 } from "./ChannelModerationPage"
 
-import { actions } from "../actions"
-import { SET_CHANNEL_DATA } from "../actions/channel"
+import { actions } from "../../actions"
+import { SET_CHANNEL_DATA } from "../../actions/channel"
 import {
   CLEAR_FOCUSED_COMMENT,
   CLEAR_FOCUSED_POST,
   SET_FOCUSED_COMMENT,
   SET_FOCUSED_POST
-} from "../actions/focus"
+} from "../../actions/focus"
 import {
   DIALOG_REMOVE_COMMENT,
   DIALOG_REMOVE_POST,
   HIDE_DIALOG,
   SET_SNACKBAR_MESSAGE
-} from "../actions/ui"
-import { makeChannelList } from "../factories/channels"
-import { makeChannelPostList } from "../factories/posts"
+} from "../../actions/ui"
+import { makeChannelList } from "../../factories/channels"
+import { makeChannelPostList } from "../../factories/posts"
 import {
   makeCommentReport,
   makePostReport,
   makeReportRecord
-} from "../factories/reports"
-import { channelModerationURL, channelURL, commentPermalink } from "../lib/url"
-import IntegrationTestHelper from "../util/integration_test_helper"
+} from "../../factories/reports"
+import {
+  channelModerationURL,
+  channelURL,
+  commentPermalink
+} from "../../lib/url"
+import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("ChannelModerationPage", () => {
   let render, channels, channel, postList, postIds, reports, helper
@@ -221,7 +225,7 @@ describe("ChannelModerationPage", () => {
           const actions = store.getActions()
           if (!canRemove) {
             assert.equal(helper.updateRemovedStub.callCount, 0)
-            assert.equal(helper.getReportsStub.callCount, 0)
+            sinon.assert.calledWith(helper.getReportsStub, channel.name)
           } else {
             sinon.assert.calledWith(helper.updateRemovedStub, post.id, true)
             sinon.assert.calledWith(helper.getReportsStub, channel.name)
@@ -395,7 +399,7 @@ describe("ChannelModerationPage", () => {
           const actions = store.getActions()
           if (!canRemove) {
             assert.equal(helper.updateRemovedStub.callCount, 0)
-            assert.equal(helper.getReportsStub.callCount, 0)
+            sinon.assert.calledWith(helper.getReportsStub, channel.name)
           } else {
             sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
               removed: true

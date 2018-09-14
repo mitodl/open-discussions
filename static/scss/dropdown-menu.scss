@@ -11,7 +11,7 @@ ul.dropdown-menu {
 
   a {
     text-decoration: none;
-    color: $navigation-text;
+    color: $font-grey-light;
     white-space: nowrap;
   }
 
@@ -22,5 +22,11 @@ ul.dropdown-menu {
     &:last-child {
       margin-bottom: 0;
     }
+  }
+}
+
+.user-menu {
+  a {
+    color: $navigation-text;
   }
 }

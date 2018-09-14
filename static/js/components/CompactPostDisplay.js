@@ -7,6 +7,7 @@ import { Link } from "react-router-dom"
 
 import Card from "./Card"
 import DropdownMenu from "./DropdownMenu"
+import ReportCount from "./ReportCount"
 
 import {
   channelURL,
@@ -128,8 +129,9 @@ export class CompactPostDisplay extends React.Component<Props> {
           ) : null}
         </div>
         <div className="row">
-          <div>
+          <div className="left">
             <PostVotingButtons post={post} toggleUpvote={toggleUpvote} />
+            <ReportCount count={post.num_reports} />
           </div>
           <div className="comments-and-menu">
             <Link
@@ -151,35 +153,26 @@ export class CompactPostDisplay extends React.Component<Props> {
             )}
             {menuOpen ? (
               <DropdownMenu closeMenu={hidePostMenu}>
-                {post.num_reports ? (
-                  <li>
-                    <div className="report-count">
-                      Reports: {post.num_reports}
-                    </div>
-                  </li>
-                ) : null}
                 {showPinUI && post.text && isModerator && togglePinPost ? (
                   <li>
                     <a onClick={() => togglePinPost(post)}>
-                      {post.stickied ? "unpin" : "pin"}
+                      {post.stickied ? "Unpin" : "Pin"}
                     </a>
                   </li>
                 ) : null}
                 {isModerator && removePost ? (
                   <li>
-                    <a onClick={() => removePost(post)}>remove</a>
+                    <a onClick={() => removePost(post)}>Remove content</a>
                   </li>
                 ) : null}
                 {isModerator && ignorePostReports ? (
                   <li>
-                    <a onClick={() => ignorePostReports(post)}>
-                      ignore all reports
-                    </a>
+                    <a onClick={() => ignorePostReports(post)}>Ignore report</a>
                   </li>
                 ) : null}
                 {!userIsAnonymous() && reportPost ? (
                   <li>
-                    <a onClick={() => reportPost(post)}>report</a>
+                    <a onClick={() => reportPost(post)}>Report</a>
                   </li>
                 ) : null}
               </DropdownMenu>

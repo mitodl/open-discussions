@@ -2,6 +2,7 @@
 import React from "react"
 import { Route } from "react-router-dom"
 
+import ChannelModerationPage from "./ChannelModerationPage"
 import CreateChannelPage from "./CreateChannelPage"
 import EditChannelAppearancePage from "./EditChannelAppearancePage"
 import EditChannelBasicPage from "./EditChannelBasicPage"
@@ -35,6 +36,10 @@ export default class AdminPage extends React.Component<Props> {
         <Route
           path={`${match.url}/c/edit/:channelName/members/contributors`}
           component={EditChannelContributorsPage}
+        />
+        <Route
+          path={`${match.url}/c/edit/:channelName/moderation`}
+          component={ChannelModerationPage}
         />
       </React.Fragment>
     )

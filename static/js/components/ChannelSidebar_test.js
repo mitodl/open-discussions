@@ -7,7 +7,7 @@ import ChannelSidebar from "./ChannelSidebar"
 import { Markdown } from "./Markdown"
 
 import { makeChannel } from "../factories/channels"
-import { editChannelBasicURL, channelModerationURL } from "../lib/url"
+import { editChannelBasicURL } from "../lib/url"
 import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("ChannelSidebar", () => {
@@ -50,16 +50,6 @@ describe("ChannelSidebar", () => {
       description.props().source,
       "(There is no description of this channel)"
     )
-  })
-
-  it("should show a moderation card, if isModerator === true", () => {
-    const wrapper = renderSidebar({ isModerator: true })
-    assert.lengthOf(wrapper.find(Card), 2)
-    const moderationCard = wrapper.find(Card).at(1)
-    assert.equal(moderationCard.props().title, "Moderation Tools")
-    const modLink = moderationCard.find(Link)
-    assert.equal(modLink.props().to, channelModerationURL(channel.name))
-    assert.equal(modLink.props().children, "View reported posts & comments")
   })
 
   it("should not show moderation card, if isModerator !== true", () => {

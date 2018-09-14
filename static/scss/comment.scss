@@ -85,6 +85,10 @@ $replyPaddingLeft: 30px;
           right: inherit;
         }
 
+        .report-count {
+          margin-left: 10px;
+        }
+
         i {
           cursor: pointer;
         }
@@ -216,6 +220,7 @@ $replyPaddingLeft: 30px;
   }
 
   .comment-action-button {
+    color: $font-grey-light;
     font-size: 0.9em;
     font-weight: 400;
     cursor: pointer;

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import Card from "./Card"
 import { Markdown } from "./Markdown"
 
-import { editChannelBasicURL, channelModerationURL } from "../lib/url"
+import { editChannelBasicURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -35,15 +35,6 @@ const ChannelSidebar = ({ channel, isModerator }: ChannelSidebarProps) => {
           className="description"
         />
       </Card>
-      {isModerator ? (
-        <Card title="Moderation Tools" className="channel-about">
-          <div className="mod-link-wrapper">
-            <Link to={channelModerationURL(channel.name)}>
-              View reported posts & comments
-            </Link>
-          </div>
-        </Card>
-      ) : null}
     </div>
   )
 }

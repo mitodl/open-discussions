@@ -13,7 +13,6 @@ import ContentPolicyPage from "./ContentPolicyPage"
 import AdminPage from "./admin/AdminPage"
 import AuthRequiredPage from "./auth/AuthRequiredPage"
 import CreatePostPage from "./CreatePostPage"
-import ChannelModerationPage from "./ChannelModerationPage"
 import SettingsPage from "./SettingsPage"
 import AccountSettingsPage from "./AccountSettingsPage"
 import PasswordChangePage from "./PasswordChangePage"
@@ -181,10 +180,6 @@ class App extends React.Component<AppProps> {
         />
         <div className="content">
           <Route exact path={match.url} component={HomePage} />
-          <Route
-            path={`${match.url}moderation/c/:channelName`}
-            component={ChannelModerationPage}
-          />
           <Route
             exact
             path={`${match.url}c/:channelName`}

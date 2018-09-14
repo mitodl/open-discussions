@@ -207,7 +207,7 @@ describe("CompactPostDisplay", () => {
     it("should show a report link", () => {
       const reportPost = helper.sandbox.stub()
       const wrapper = renderPostDisplay({ post, reportPost })
-      const link = wrapper.find({ children: "report" })
+      const link = wrapper.find({ children: "Report" })
       link.props().onClick()
       assert.ok(reportPost.called)
     })
@@ -215,7 +215,7 @@ describe("CompactPostDisplay", () => {
     it("should hide the report link for anon users", () => {
       SETTINGS.username = null
       const wrapper = renderPostDisplay({ post })
-      const link = wrapper.find({ children: "report" })
+      const link = wrapper.find({ children: "Report" })
       assert.isNotOk(link.exists())
     })
 
@@ -245,7 +245,7 @@ describe("CompactPostDisplay", () => {
     })
 
     it('should include a "pinning" link, if isModerator and showPinUI', () => {
-      [[true, "unpin"], [false, "pin"]].forEach(([pinned, linkText]) => {
+      [[true, "Unpin"], [false, "Pin"]].forEach(([pinned, linkText]) => {
         post.stickied = pinned
         const wrapper = renderPostDisplay({
           post,
@@ -270,7 +270,7 @@ describe("CompactPostDisplay", () => {
       const count = wrapper.find(".report-count")
       assert.ok(count.exists())
       // $FlowFixMe: thinks this doesn't exist
-      assert.equal(count.text(), `Reports: ${post.num_reports}`)
+      assert.equal(count.text(), `Reported ${post.num_reports} times`)
     })
 
     it("should not render a report count, if post has no report data", () => {
@@ -286,7 +286,7 @@ describe("CompactPostDisplay", () => {
         isModerator: true,
         removePost:  removePostStub
       })
-      const link = wrapper.find({ children: "remove" })
+      const link = wrapper.find({ children: "Remove content" })
       assert(link.exists())
       link.simulate("click")
       assert.ok(removePostStub.calledWith(post))
@@ -299,7 +299,7 @@ describe("CompactPostDisplay", () => {
         isModerator:       true,
         ignorePostReports: ignorePostStub
       })
-      const link = wrapper.find({ children: "ignore all reports" })
+      const link = wrapper.find({ children: "Ignore report" })
       assert(link.exists())
       link.simulate("click")
       assert.ok(ignorePostStub.calledWith(post))
