@@ -68,7 +68,6 @@ class ModeratorListView(ListCreateAPIView):
         )
 
 
-
 class ModeratorDetailView(APIView):
     """
     View to retrieve and remove moderators
