@@ -6,7 +6,10 @@ import { bindActionCreators } from "redux"
 
 import ImageUploader, { makeDialogKey } from "./ImageUploader"
 
-import { defaultChannelAvatarUrl } from "../lib/util"
+import {
+  getDefaultChannelAvatarUrl,
+  defaultChannelAvatarUrlPrefix
+} from "../lib/util"
 import { showDialog } from "../actions/ui"
 import { initials } from "../lib/profile"
 
@@ -49,8 +52,10 @@ class ChannelAvatar extends React.Component<Props> {
     } = this.props
 
     const imageUrl =
-      formImageUrl || getImage(channel, imageSize) || defaultChannelAvatarUrl
-    const isAdd = imageUrl === defaultChannelAvatarUrl
+      formImageUrl ||
+      getImage(channel, imageSize) ||
+      getDefaultChannelAvatarUrl(channel.name)
+    const isAdd = imageUrl.startsWith(defaultChannelAvatarUrlPrefix)
 
     return (
       <div className={`avatar-container row ${imageSize}-size`}>

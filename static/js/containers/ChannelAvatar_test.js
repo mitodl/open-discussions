@@ -6,6 +6,7 @@ import ChannelAvatar from "./ChannelAvatar"
 
 import { makeChannel } from "../factories/channels"
 import { initials } from "../lib/profile"
+import { getDefaultChannelAvatarUrl } from "../lib/util"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 const DEFAULT_STATE = {}
@@ -57,7 +58,13 @@ describe("ChannelAvatar", () => {
           inner.find(".avatar-initials").text(),
           initials(channel.title)
         )
+        assert.equal(
+          inner.find(".avatar-initials").props().style.backgroundImage,
+          `url(${getDefaultChannelAvatarUrl(channel.name)})`
+        )
       })
+
+      //
       ;[true, false].forEach(editable => {
         it(`${
           editable ? "renders" : "doesn't render"
