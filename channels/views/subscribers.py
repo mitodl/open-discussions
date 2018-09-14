@@ -10,14 +10,14 @@ from rest_framework.views import APIView
 
 from channels.api import Api
 from channels.serializers import SubscriberSerializer
-from open_discussions.permissions import IsStaffOrReadonlyPermission
+from open_discussions.permissions import IsStaffOrReadonlyPermission, IsStaffModeratorOrReadonlyPermission
 
 
 class SubscriberListView(CreateAPIView):
     """
     View to add subscribers in channels
     """
-    permission_classes = (IsAuthenticated, IsStaffOrReadonlyPermission, )
+    permission_classes = (IsAuthenticated, IsStaffModeratorOrReadonlyPermission, )
     serializer_class = SubscriberSerializer
 
     def get_serializer_context(self):
@@ -46,6 +46,7 @@ class SubscriberDetailView(APIView):
         api = Api(user=request.user)
         subscriber_name = self.kwargs['subscriber_name']
         channel_name = self.kwargs['channel_name']
+
         if not api.is_subscriber(subscriber_name, channel_name):
             raise NotFound('User {} is not a subscriber of {}'.format(subscriber_name, channel_name))
         return Response(
