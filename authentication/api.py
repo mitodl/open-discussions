@@ -42,12 +42,9 @@ def create_user(username, email, profile_data=None, user_extra=None):
         profile_api.ensure_profile(user, profile_data=profile_data)
         notifications_api.ensure_notification_settings(user)
 
-    try:
         # this could fail if the reddit backend is down
-        # but we don't want it to hard-fail the user creation process
+        # so if it fails we want to rollback this entire transaction
         channels_api.get_or_create_auth_tokens(user)
-    except:  # pylint: disable=bare-except
-        log.exception('Exception trying to create auth tokens')
 
     return user
 

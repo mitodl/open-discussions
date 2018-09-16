@@ -18,8 +18,9 @@ pytestmark = pytest.mark.django_db
     # {},
     # None,
 ])
-def test_create_user(profile_data):
+def test_create_user(mocker, profile_data):
     """Tests that a user and associated objects are created"""
+    auth_token_mock = mocker.patch('channels.api.get_or_create_auth_tokens')
     email = 'email@localhost'
     username = 'username'
     user = api.create_user(username, email, profile_data, {
@@ -31,6 +32,8 @@ def test_create_user(profile_data):
     assert user.username == username
     assert user.first_name == 'Bob'
     assert NotificationSettings.objects.count() == 2
+
+    auth_token_mock.assert_called_once()
 
     if 'name' in profile_data:
         assert user.profile.name == profile_data['name']
@@ -59,17 +62,18 @@ def test_create_user_errors(mocker, mock_method):
 
 
 def test_create_user_token_error(mocker):
-    """Test that an error creating a token does not fail the user creation"""
+    """Test that an error creating a token fails the user creation"""
     auth_token_mock = mocker.patch('channels.api.get_or_create_auth_tokens', side_effect=Exception('error'))
 
-    assert api.create_user('username', 'email@localhost', {
-        'name': 'My Name',
-        'image': 'http://localhost/image.jpg',
-    }) is not None
+    with pytest.raises(Exception):
+        assert api.create_user('username', 'email@localhost', {
+            'name': 'My Name',
+            'image': 'http://localhost/image.jpg',
+        }) is not None
 
-    assert User.objects.all().count() == 1
-    assert Profile.objects.count() == 1
-    assert NotificationSettings.objects.count() == 2
+    assert User.objects.all().count() == 0
+    assert Profile.objects.count() == 0
+    assert NotificationSettings.objects.count() == 0
     auth_token_mock.assert_called_once()
 
 
