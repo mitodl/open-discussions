@@ -40,6 +40,7 @@ def test_webpack_url(
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
     settings.FEATURES[features.SAML_AUTH] = False
     settings.FEATURES[features.EMAIL_AUTH] = False
+    settings.FEATURES[features.USE_NEW_BRANDING] = False
     settings.ENVIRONMENT = 'test'
     settings.VERSION = '1.2.3'
 
@@ -83,6 +84,7 @@ def test_webpack_url(
             'allow_anonymous': 'access',
             'allow_saml_auth': False,
             'allow_email_auth': False,
+            'use_new_branding': False,
             'support_email': settings.EMAIL_SUPPORT,
             'embedlyKey': 'fake',
             'environment': settings.ENVIRONMENT,

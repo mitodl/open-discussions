@@ -23,6 +23,7 @@ declare var SETTINGS: {
   allow_anonymous: boolean,
   allow_saml_auth: boolean,
   allow_email_auth: boolean,
+  use_new_branding: boolean,
   support_email: string,
   embedlyKey: string,
   sentry_dsn: string,
