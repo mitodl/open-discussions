@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.45.2 (Released September 17, 2018)
+--------------
+
+- Move channel moderation page (#1183)
+- Added banner message for PSA error messages
+
 Version 0.45.1 (Released September 12, 2018)
 --------------
 
