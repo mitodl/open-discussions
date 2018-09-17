@@ -60,16 +60,16 @@ def test_list_moderators_moderator(client, private_channel, staff_user, staff_ap
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [
         {
-            'moderator_name': staff_user.username,
-            'full_name': staff_user.profile.name,
-            'email': staff_user.email,
-            'can_remove': False,
-        },
-        {
             'moderator_name': mod_user.username,
             'full_name': mod_user.profile.name,
             'email': mod_user.email,
             'can_remove': True,
+        },
+        {
+            'moderator_name': staff_user.username,
+            'full_name': staff_user.profile.name,
+            'email': staff_user.email,
+            'can_remove': False,
         }
     ]
 
@@ -85,11 +85,17 @@ def test_list_moderators_many_moderator(client, private_channel, staff_user, sta
         mod_user = reddit_factories.user(f"user{i}")
         staff_api.add_moderator(mod_user.username, private_channel.name)
         mod_users.append(mod_user)
-    logged_in_user_index = 5
+    logged_in_user_index = 9
     client.force_login(mod_users[logged_in_user_index])
     resp = client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [
+        {
+            'moderator_name': mod_users[9].username,
+            'full_name': mod_users[9].profile.name,
+            'email': mod_users[9].email,
+            'can_remove': True
+        },
         {
             'moderator_name': staff_user.username,
             'full_name': staff_user.profile.name,
@@ -103,7 +109,7 @@ def test_list_moderators_many_moderator(client, private_channel, staff_user, sta
                 'email': mod_user.email,
                 'can_remove': i >= logged_in_user_index
             }
-            for i, mod_user in enumerate(mod_users)
+            for i, mod_user in enumerate(mod_users[:9])
         ],
     ]
 
