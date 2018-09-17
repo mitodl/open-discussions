@@ -15,7 +15,10 @@ from open_discussions.constants import (
 )
 from open_discussions.features import ANONYMOUS_ACCESS
 
-pytestmark = pytest.mark.betamax
+pytestmark = [
+    pytest.mark.betamax,
+    pytest.mark.usefixtures('mock_channel_exists')
+]
 
 
 def test_list_channels(user_client, private_channel_and_contributor, request):

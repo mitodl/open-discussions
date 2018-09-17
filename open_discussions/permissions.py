@@ -1,12 +1,30 @@
 """Custom permissions"""
 from prawcore.exceptions import (
     Forbidden as PrawForbidden,
-    Redirect as PrawRedirect,
+    Redirect as PrawRedirect
 )
 from rest_framework import permissions
+from rest_framework.generics import get_object_or_404
 
 from channels.models import Channel
 from open_discussions import features
+
+
+def channel_exists(view):
+    """
+    Return True if a Channel object exists for a channel_name in the view, or there is no channel name.
+    Raises 404 if the Channel does not exist.
+
+    Args:
+        view (rest_framework.views.APIView): django DRF view
+
+    Returns:
+        bool: True if Channel exists (or there is no channel name)
+    """
+    channel_name = view.kwargs.get('channel_name', None)
+    if channel_name:
+        get_object_or_404(Channel, name=channel_name)
+    return True
 
 
 def is_staff_user(request):
@@ -100,7 +118,7 @@ class IsStaffOrModeratorPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or is a moderator"""
-        return is_staff_user(request) or is_moderator(request, view)
+        return channel_exists(view) and (is_staff_user(request) or is_moderator(request, view))
 
 
 class IsStaffModeratorOrReadonlyPermission(permissions.BasePermission):
@@ -108,7 +126,9 @@ class IsStaffModeratorOrReadonlyPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role, is a moderator, or the request is readonly"""
-        return is_readonly(request) or is_staff_user(request) or is_moderator(request, view)
+        return channel_exists(view) and (
+            is_readonly(request) or is_staff_user(request) or is_moderator(request, view)
+        )
 
 
 class ContributorPermissions(permissions.BasePermission):
@@ -116,10 +136,12 @@ class ContributorPermissions(permissions.BasePermission):
     Only staff and moderators should be able to see and edit the list of contributors
     """
     def has_permission(self, request, view):
-        return is_staff_user(request) or (
-            (
-                channel_is_mod_editable(view) or is_readonly(request)
-            ) and is_moderator(request, view)
+        return channel_exists(view) and (
+            is_staff_user(request) or (
+                (
+                    channel_is_mod_editable(view) or is_readonly(request)
+                ) and is_moderator(request, view)
+            )
         )
 
 
@@ -128,8 +150,10 @@ class ModeratorPermissions(permissions.BasePermission):
     All users should be able to see a list of moderators. Only staff and moderators should be able to edit it.
     """
     def has_permission(self, request, view):
-        return is_readonly(request) or is_staff_user(request) or (
-            channel_is_mod_editable(view) and is_moderator(request, view)
+        return channel_exists(view) and (
+            is_readonly(request) or is_staff_user(request) or (
+                channel_is_mod_editable(view) and is_moderator(request, view)
+            )
         )
 
 

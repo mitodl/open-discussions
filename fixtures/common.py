@@ -107,3 +107,11 @@ def indexing_decorator(session_indexing_decorator):
     """
     session_indexing_decorator.mock_persist_func.reset_mock()
     yield session_indexing_decorator
+
+
+@pytest.fixture()
+def mock_channel_exists(mocker):
+    """
+    Mock the permissions.channel_exists function to always return True
+    """
+    return mocker.patch('open_discussions.permissions.channel_exists', return_value=True)

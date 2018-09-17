@@ -8,7 +8,10 @@ from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
-pytestmark = pytest.mark.betamax
+pytestmark = [
+    pytest.mark.betamax,
+    pytest.mark.usefixtures('mock_channel_exists')
+]
 
 
 def test_list_contributors(staff_client, private_channel_and_contributor, staff_user, settings):
