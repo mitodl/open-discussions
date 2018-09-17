@@ -100,6 +100,18 @@ export default class EditChannelBasicForm extends React.Component<Props> {
           </div>
           <div className="row">{validationMessage(validation.link_type)}</div>
         </Card>
+        <Card title="Description">
+          <div className="row">
+            <textarea
+              type="text"
+              name="description"
+              className="no-height"
+              placeholder="Description"
+              value={form.description}
+              onChange={onUpdate}
+            />
+          </div>
+        </Card>
         <div className="row actions">
           <button
             className="cancel"

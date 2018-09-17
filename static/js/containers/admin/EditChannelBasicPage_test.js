@@ -41,17 +41,24 @@ describe("EditChannelBasicPage", () => {
     helper.cleanup()
   })
 
-  const makeEvent = (name, checked) => ({ target: { checked, name } })
+  const makeEvent = (name, value, checked) => ({
+    target: { checked, name, value }
+  })
 
   const setChannelType = (wrapper, value) =>
     wrapper
       .find(`input[value='${value}']`)
-      .simulate("change", makeEvent("channel_type", true))
+      .simulate("change", makeEvent("channel_type", value, true))
 
   const setPostType = (wrapper, value) =>
     wrapper
       .find(`input[value='${value}']`)
-      .simulate("change", makeEvent("link_type", true))
+      .simulate("change", makeEvent("link_type", value, true))
+
+  const setDescription = (wrapper, value) =>
+    wrapper
+      .find(`[name="description"]`)
+      .simulate("change", makeEvent("description", value, null))
 
   const submit = wrapper => wrapper.find(".save-changes").simulate("submit")
 
@@ -74,14 +81,17 @@ describe("EditChannelBasicPage", () => {
 
   it("should set the channel and post types, submit, and navigate back to the channel page", async () => {
     const wrapper = await renderPage()
+    const description = "Test description"
     const expected = {
       ...channel,
       post_type:    LINK_TYPE_TEXT,
-      channel_type: CHANNEL_TYPE_RESTRICTED
+      channel_type: CHANNEL_TYPE_RESTRICTED,
+      description
     }
 
-    setChannelType(wrapper, expected.channel_type)
     setPostType(wrapper, expected.post_type)
+    setChannelType(wrapper, expected.channel_type)
+    setDescription(wrapper, description)
 
     await listenForActions(
       [
