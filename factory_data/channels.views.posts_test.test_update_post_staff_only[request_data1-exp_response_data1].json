@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Odio ex eum deleniti illum quidem modi dolorum. Fugit quod modi maiores officiis. Maxime aliquam aut necessitatibus corrupti quos.\nOptio nemo vero velit ipsum odio saepe incidunt. Est qui quam nobis sit. Possimus voluptatem omnis dicta iure inventore inventore possimus. Alias quod repudiandae dolor magni.\nMagni consequuntur veniam veniam. A rerum animi ullam itaque aspernatur eos. Necessitatibus assumenda asperiores facere facilis ex quos eaque. Quos eum repudiandae velit corporis.",
+      "name": "1536869180_tenetur",
+      "public_description": "Fugit quo expedita totam dicta illum minima officiis. Dolor atque placeat asperiores.",
+      "title": "Laboriosam sit ea iste iste."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "2n",
+      "text": "Rem ipsam cumque unde numquam officiis. Provident velit quam sunt omnis vero accusantium.",
+      "title": "Placeat aliquam officia eaque vero."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CQA8NBYH8R3TKBZK7YXTJMHV"
+    },
+    "staff_user": {
+      "username": "01CQA8N5MYKJ0ZT5CZCX0BJRC1"
+    }
+  }
+}

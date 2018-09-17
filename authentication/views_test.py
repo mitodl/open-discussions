@@ -1,13 +1,11 @@
 """Tests for authentication views"""
 # pylint: disable=redefined-outer-name
 
-from django.conf import settings
 from django.contrib.auth import get_user, get_user_model
 from django.urls import reverse
 import factory
 import pytest
 from rest_framework import status
-from rest_framework_jwt.settings import api_settings
 from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
 
@@ -21,8 +19,8 @@ pytestmark = [
     pytest.mark.django_db,
     pytest.mark.usefixtures('authenticated_site', 'email_auth_enabled'),
 ]
+lazy = pytest.lazy_fixture
 
-COOKIE_KEY = 'cookie_monster'
 NEW_EMAIL = 'test@example.com'
 
 User = get_user_model()
@@ -154,7 +152,7 @@ def login_email_mm_only(client, user):
 
 
 @pytest.fixture()
-def login_email_saml_exists(client, user):
+def login_email_saml_exists(client, user, settings):
     """Yield a function for this step"""
     def run_step(last_result):  # pylint: disable=unused-argument
         """Run the step"""
@@ -534,24 +532,19 @@ def test_login_email_error(settings, client, mocker):
     assert bool(get_user(client).is_authenticated) is False
 
 
-@pytest.mark.parametrize('use_jwt', [True, False])
-def test_login_complete(settings, client, user, jwt_token, use_jwt):
+@pytest.mark.parametrize('test_jwt_token', [lazy('jwt_token'), None])
+def test_login_complete(settings, client, logged_in_user, test_jwt_token):  # pylint: disable=unused-argument
     """Verify that the jwt-complete view invalidates the JWT auth cookie"""
-    if use_jwt:
-        client.cookies[api_settings.JWT_AUTH_COOKIE] = jwt_token
-    client.force_login(user)
-
     response = client.get(reverse('login-complete'))
 
     assert response.url == '/'
-
-    if use_jwt:
-        assert COOKIE_KEY in response.cookies
-        cookie = response.cookies[COOKIE_KEY]
+    if test_jwt_token:
+        assert settings.OPEN_DISCUSSIONS_COOKIE_NAME in response.cookies
+        cookie = response.cookies[settings.OPEN_DISCUSSIONS_COOKIE_NAME]
         assert cookie['max-age'] == 0
         assert cookie['domain'] == settings.OPEN_DISCUSSIONS_COOKIE_DOMAIN
     else:
-        assert COOKIE_KEY not in response.cookies
+        assert settings.OPEN_DISCUSSIONS_COOKIE_NAME not in response.cookies
 
 
 class DjoserViewTests:

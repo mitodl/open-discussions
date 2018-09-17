@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Ab perspiciatis sapiente nostrum rerum culpa. Fugit minima beatae reiciendis quam. Voluptate illum eligendi culpa earum illo. Ea illo culpa porro libero assumenda fugit totam.\nRepellendus omnis modi blanditiis magni consectetur. Doloribus iusto iure non voluptatem delectus nulla. Et voluptas voluptates laboriosam eum molestiae qui totam. Odit ducimus quaerat eligendi harum ad aut. Vitae corrupti placeat illo nam quasi placeat.",
+      "name": "1536868966_nesciunt",
+      "public_description": "Accusantium ipsum porro at odio eum. Exercitationem explicabo hic in rem earum velit.",
+      "title": "Doloremque qui pariatur ipsum temporibus ad."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "2k",
+      "text": "Libero velit reiciendis amet quod nemo autem. Ullam soluta minus doloremque quia.",
+      "title": "Tenetur odit reprehenderit sit eaque."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CQA8EHKD38T2DGFX2QQZKCX3"
+    },
+    "staff_user": {
+      "username": "01CQA8EMW5A9HE3FXDTVBFFAH3"
+    }
+  }
+}

@@ -29,6 +29,13 @@ def staff_user(db, use_betamax, request):
 
 
 @pytest.fixture()
+def logged_in_user(client, user):
+    """Log the user in and yield the user object"""
+    client.force_login(user)
+    return user
+
+
+@pytest.fixture()
 def logged_in_profile(client):
     """Add a Profile and logged-in User"""
     user = UserFactory.create(username='george')
@@ -37,13 +44,17 @@ def logged_in_profile(client):
 
 
 @pytest.fixture
-def jwt_token(db, user):
+def jwt_token(db, user, client, rf, settings):
     """Creates a JWT token for a regular user"""
     jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
     jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-
     payload = jwt_payload_handler(user)
-    return jwt_encode_handler(payload)
+    token = jwt_encode_handler(payload)
+    client.cookies[settings.OPEN_DISCUSSIONS_COOKIE_NAME] = token
+    rf.cookies.load({
+        settings.OPEN_DISCUSSIONS_COOKIE_NAME: token
+    })
+    return token
 
 
 @pytest.fixture

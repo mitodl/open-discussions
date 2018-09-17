@@ -1,5 +1,5 @@
 """Tests for views for REST APIs for posts"""
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,too-many-lines
 import pytest
 from django.urls import reverse
 from rest_framework import status
@@ -16,13 +16,58 @@ from channels.models import Subscription, LinkMeta
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
     PERMISSION_DENIED_ERROR_TYPE,
+    DJANGO_PERMISSION_ERROR_TYPES
 )
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
-# pylint: disable=too-many-lines
-
 pytestmark = pytest.mark.betamax
+
+
+def default_response_data(channel, post, user):
+    """
+    Helper function. Returns a dict containing some of the data that we expect from the API given
+    a channel, post, and user.
+    """
+    return {
+        'url': None,
+        'thumbnail': None,
+        'text': post.text,
+        'title': post.title,
+        'removed': False,
+        'deleted': False,
+        'subscribed': False,
+        'score': 1,
+        'author_id': user.username,
+        'id': post.id,
+        'slug': get_reddit_slug(post.permalink),
+        'created': post.created,
+        'num_comments': 0,
+        'channel_name': channel.name,
+        'channel_title': channel.title,
+        "profile_image": image_uri(user.profile),
+        "author_name": user.profile.name,
+        "author_headline": user.profile.headline,
+        'edited': False,
+        "stickied": False,
+        'upvoted': True,
+        'num_reports': None
+    }
+
+
+def default_staff_response_data(channel, post, user):
+    """
+    Helper function. Returns a dict containing some of the data that we expect from the API given
+    a channel, post, and user if a staff user makes the request. The defaults are different for staff
+    and non-staff users.
+    """
+    return {
+        **default_response_data(channel, post, user),
+        **{
+            'upvoted': False,
+            'num_reports': 0
+        }
+    }
 
 
 def test_create_url_post_existing_meta(client, private_channel_and_contributor, mocker, settings):
@@ -689,71 +734,86 @@ def test_list_posts_anonymous(client, public_channel, reddit_factories, settings
         assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_update_post_text(client, private_channel_and_contributor, reddit_factories):
-    """Test updating just the text of a post"""
+@pytest.mark.parametrize('request_data,exp_response_data', [
+    ({"text": "overwrite"}, {"text": "overwrite"}),
+    ({"upvoted": False}, {"upvoted": False}),
+    ({"upvoted": True}, {"upvoted": True})
+])
+def test_update_post(
+        client,
+        reddit_factories,
+        private_channel_and_contributor,
+        request_data,
+        exp_response_data
+):
+    """
+    Test that non-staff users are allowed to make certain requests to update a post, and that
+    the response from the API matches our expectations
+    """
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('just a post', user, channel=channel)
+    base_expected_data = default_response_data(channel, post, user)
     client.force_login(user)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    resp = client.patch(url, format='json', data={"text": "overwrite"})
+    resp = client.patch(url, format='json', data=request_data)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
-        'url': None,
-        'thumbnail': None,
-        'text': 'overwrite',
-        'title': post.title,
-        'upvoted': True,
-        'removed': False,
-        'deleted': False,
-        'subscribed': False,
-        'score': 1,
-        'author_id': user.username,
-        'id': post.id,
-        'slug': get_reddit_slug(post.permalink),
-        'created': post.created,
-        'num_comments': 0,
-        'channel_name': channel.name,
-        'channel_title': channel.title,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "author_headline": user.profile.headline,
-        'edited': False,
-        "stickied": False,
-        'num_reports': None,
+        **base_expected_data,
+        **exp_response_data
     }
 
 
-def test_update_post_stickied(client, private_channel_and_contributor, reddit_factories, staff_user):
-    """Test updating just the stickied boolean on a post"""
+@pytest.mark.parametrize('request_data,exp_response_data', [
+    ({"ignore_reports": True}, {}),
+    ({"removed": True}, {"removed": True}),
+    ({"stickied": True}, {"stickied": True})
+])
+def test_update_post_staff_only(
+        staff_client,
+        private_channel_and_contributor,
+        reddit_factories,
+        request_data,
+        exp_response_data
+):
+    """
+    Test that staff users are allowed to make certain requests to update a post, and that
+    the response from the API matches our expectations
+    """
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('just a post', user, channel=channel)
-    client.force_login(staff_user)
+    base_expected_data = default_staff_response_data(channel, post, user)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    resp = client.patch(url, format='json', data={"stickied": True})
+    resp = staff_client.patch(url, format='json', data=request_data)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
-        'url': None,
-        'thumbnail': None,
-        'text': post.text,
-        'title': post.title,
-        'upvoted': False,
-        'removed': False,
-        'deleted': False,
-        'subscribed': False,
-        'score': 1,
-        'author_id': user.username,
-        'id': post.id,
-        'slug': get_reddit_slug(post.permalink),
-        'created': post.created,
-        'num_comments': 0,
-        'channel_name': channel.name,
-        'channel_title': channel.title,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "author_headline": user.profile.headline,
-        'edited': False,
-        "stickied": True,
-        'num_reports': 0,
+        **base_expected_data,
+        **exp_response_data
+    }
+
+
+@pytest.mark.parametrize('request_data', [
+    {"ignore_reports": True},
+    {"removed": True},
+    {"stickied": True}
+])
+def test_update_post_non_staff_error(
+        user_client,
+        private_channel_and_contributor,
+        reddit_factories,
+        request_data
+):
+    """
+    Test that non-staff users attempting to make staff-only updates to a post will result in a
+    permission error
+    """
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post('just a post', user, channel=channel)
+    url = reverse('post-detail', kwargs={'post_id': post.id})
+    resp = user_client.patch(url, format='json', data=request_data)
+    assert resp.status_code in DJANGO_PERMISSION_ERROR_TYPES
+    assert resp.data == {
+        'error_type': PERMISSION_DENIED_ERROR_TYPE,
+        'detail': 'You do not have permission to perform this action.',
     }
 
 
@@ -767,118 +827,6 @@ def test_update_post_unsticky(client, private_channel_and_contributor, reddit_fa
     resp = client.patch(url, format='json', data={"stickied": False})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()['stickied'] is False
-
-
-def test_update_post_nonmoderator_cant_sticky(client, private_channel_and_contributor, reddit_factories):
-    """Test that a normal user cant sticky posts"""
-    channel, user = private_channel_and_contributor
-    post = reddit_factories.text_post('just a post', user, channel=channel)
-    client.force_login(user)
-    url = reverse('post-detail', kwargs={'post_id': post.id})
-    resp = client.patch(url, format='json', data={"stickied": True})
-    assert resp.status_code == status.HTTP_403_FORBIDDEN
-
-
-def test_update_post_clear_vote(client, private_channel_and_contributor, reddit_factories):
-    """Test updating a post to clear the user's vote"""
-    channel, user = private_channel_and_contributor
-    post = reddit_factories.text_post("just a post", user, channel=channel)
-    client.force_login(user)
-    url = reverse('post-detail', kwargs={'post_id': post.id})
-    resp = client.patch(url, format='json', data={"upvoted": False})
-    assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        'url': None,
-        'thumbnail': None,
-        'text': post.text,
-        'title': post.title,
-        'upvoted': False,
-        'removed': False,
-        'deleted': False,
-        'subscribed': False,
-        'score': 1,
-        'author_id': user.username,
-        'id': post.id,
-        'slug': get_reddit_slug(post.permalink),
-        'created': post.created,
-        'num_comments': 0,
-        'channel_name': channel.name,
-        'channel_title': channel.title,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "author_headline": user.profile.headline,
-        'edited': False,
-        "stickied": False,
-        'num_reports': None,
-    }
-
-
-def test_update_post_upvote(client, private_channel_and_contributor, reddit_factories):
-    """Test updating a post to upvote it"""
-    channel, user = private_channel_and_contributor
-    post = reddit_factories.text_post('just a post', user, channel=channel)
-    url = reverse('post-detail', kwargs={'post_id': post.id})
-    client.force_login(user)
-    resp = client.patch(url, format='json', data={"upvoted": True})
-    assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        'url': None,
-        'thumbnail': None,
-        'text': post.text,
-        'title': post.title,
-        'upvoted': True,
-        'removed': False,
-        'deleted': False,
-        'subscribed': False,
-        'score': 1,
-        'author_id': user.username,
-        'id': post.id,
-        'slug': get_reddit_slug(post.permalink),
-        'created': post.created,
-        'num_comments': 0,
-        'channel_name': channel.name,
-        'channel_title': channel.title,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "author_headline": user.profile.headline,
-        "edited": False,
-        "stickied": False,
-        'num_reports': None,
-    }
-
-
-def test_update_post_removed(client, staff_user, private_channel_and_contributor, reddit_factories):
-    """Test updating a post to remove it"""
-    channel, user = private_channel_and_contributor
-    post = reddit_factories.text_post('just a post', user, channel=channel)
-    url = reverse('post-detail', kwargs={'post_id': post.id})
-    client.force_login(staff_user)
-    resp = client.patch(url, format='json', data={"removed": True})
-    assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        'url': None,
-        'thumbnail': None,
-        'text': post.text,
-        'title': post.title,
-        'upvoted': False,
-        'score': 1,
-        'removed': True,
-        'deleted': False,
-        'subscribed': False,
-        'author_id': user.username,
-        'id': post.id,
-        'slug': get_reddit_slug(post.permalink),
-        'created': post.created,
-        'num_comments': 0,
-        'channel_name': channel.name,
-        'channel_title': channel.title,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "author_headline": user.profile.headline,
-        "edited": False,
-        "stickied": False,
-        'num_reports': 0,
-    }
 
 
 def test_update_post_clear_removed(
@@ -915,68 +863,6 @@ def test_update_post_clear_removed(
         'edited': False,
         "stickied": False,
         'num_reports': 0,
-    }
-
-
-def test_update_post_ignore_reports(
-        client, staff_user, staff_api, private_channel_and_contributor, reddit_factories
-):
-    """Test updating a post to ignore reports"""
-    channel, user = private_channel_and_contributor
-    post = reddit_factories.text_post('just a post', user, channel=channel)
-    url = reverse('post-detail', kwargs={'post_id': post.id})
-    client.force_login(staff_user)
-    resp = client.patch(url, format='json', data={"ignore_reports": True})
-    assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        'url': None,
-        'thumbnail': None,
-        'text': post.text,
-        'title': post.title,
-        'upvoted': False,
-        'score': 1,
-        'removed': False,
-        'deleted': False,
-        'subscribed': False,
-        'author_id': user.username,
-        'id': post.id,
-        'slug': get_reddit_slug(post.permalink),
-        'created': post.created,
-        'num_comments': 0,
-        'channel_name': channel.name,
-        'channel_title': channel.title,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "author_headline": user.profile.headline,
-        'edited': False,
-        "stickied": False,
-        'num_reports': 0,
-    }
-
-
-def test_update_post_ignore_reports_forbidden(user_client, private_channel_and_contributor, reddit_factories):
-    """Test updating a post to ignore reports with a nonstaff user"""
-    channel, user = private_channel_and_contributor
-    post = reddit_factories.text_post('just a post', user, channel=channel)
-    url = reverse('post-detail', kwargs={'post_id': post.id})
-    resp = user_client.patch(url, format='json', data={"ignore_reports": True})
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
-    assert resp.data == {
-        'error_type': PERMISSION_DENIED_ERROR_TYPE,
-        'detail': 'You do not have permission to perform this action.',
-    }
-
-
-def test_update_post_removed_forbidden(user_client, private_channel_and_contributor, reddit_factories):
-    """Test updating a post to remove with a nonstaff user"""
-    channel, user = private_channel_and_contributor
-    post = reddit_factories.text_post('just a post', user, channel=channel)
-    url = reverse('post-detail', kwargs={'post_id': post.id})
-    resp = user_client.patch(url, format='json', data={"removed": True})
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
-    assert resp.data == {
-        'error_type': PERMISSION_DENIED_ERROR_TYPE,
-        'detail': 'You do not have permission to perform this action.',
     }
 
 
