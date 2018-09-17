@@ -8,8 +8,8 @@ import {
   CHANNEL_TYPE_PUBLIC,
   CHANNEL_TYPE_PRIVATE,
   CHANNEL_TYPE_RESTRICTED,
-  editChannelForm,
-  LINK_TYPE_TEXT
+  LINK_TYPE_TEXT,
+  editChannelForm
 } from "../../lib/channels"
 import { makeChannel } from "../../factories/channels"
 
