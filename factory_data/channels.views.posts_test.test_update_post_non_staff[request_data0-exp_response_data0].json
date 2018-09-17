@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Aspernatur necessitatibus eligendi quam corrupti. Dolorum id molestiae quae soluta. Quidem id adipisci quidem voluptas eaque cum veritatis omnis. Nihil cum dolor recusandae nisi.\nQuaerat nihil eveniet eligendi maiores nam et pariatur. Id ex voluptates numquam repudiandae reiciendis veritatis laboriosam. Facere velit veritatis error libero. Saepe voluptatibus blanditiis quos facilis quidem maiores. Cum adipisci illo quod omnis iste officia.",
+      "name": "1536868568_ad",
+      "public_description": "Hic eligendi labore optio eum at. Vero architecto rerum dolores animi ducimus molestias unde.",
+      "title": "Accusantium fugit dolor at harum et rem."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "2g",
+      "text": "In dolores quas deleniti vel. Natus id saepe similique modi quae tempora consectetur.",
+      "title": "Aut ducimus mollitia quia tempora dolor maiores."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CQA82CH6JA9B6Q1DAXX6BPCG"
+    },
+    "staff_user": {
+      "username": "01CQA82FTP75G6TW6C6AR54RN6"
+    }
+  }
+}

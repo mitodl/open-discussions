@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Voluptate ipsum ipsam odio accusantium quod autem occaecati. Iste consequuntur officia magnam itaque. Odio voluptas temporibus repellendus libero commodi perferendis.\nDolores quisquam suscipit pariatur voluptatem placeat. Saepe atque doloribus perspiciatis nostrum quaerat. Accusantium nam ex maiores rem.\nQuisquam harum aliquid odit ut cupiditate enim. Eligendi est enim quisquam consequuntur nulla asperiores error. Doloremque doloribus voluptates ab iste impedit.",
+      "name": "1536871187_sequi",
+      "public_description": "Eius similique nemo veniam similique animi. Quisquam praesentium dolorem quae.",
+      "title": "Aliquid accusamus facere modi doloremque."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "2s",
+      "text": "Porro temporibus eveniet neque sit. Vero neque assumenda sunt similique pariatur.",
+      "title": "Sed reprehenderit voluptates deleniti possimus."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CQAAJAS721QS3AVC8AT3JSZZ"
+    },
+    "staff_user": {
+      "username": "01CQAAJE1H7Y3P38BQ7H38RB9D"
+    }
+  }
+}
