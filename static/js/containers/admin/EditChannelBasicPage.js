@@ -72,19 +72,22 @@ class EditChannelBasicPage extends React.Component<Props> {
 
   onUpdate = (e: Object) => {
     const { dispatch, channelForm } = this.props
-    const linkType = updateLinkType(
-      channelForm.value.link_type,
-      e.target.value,
-      e.target.checked
-    )
+    const updates = {
+      [e.target.name]: e.target.value
+    }
+    if (e.target.name === "link_type") {
+      // $FlowFixMe
+      updates.link_type = updateLinkType(
+        channelForm.value.link_type,
+        e.target.value,
+        e.target.checked
+      )
+    }
 
     dispatch(
       actions.forms.formUpdate(
         R.merge(EDIT_CHANNEL_PAYLOAD, {
-          value: {
-            [e.target.name]: e.target.value,
-            link_type:       linkType
-          }
+          value: updates
         })
       )
     )
