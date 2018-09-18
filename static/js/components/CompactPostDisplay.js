@@ -129,7 +129,7 @@ export class CompactPostDisplay extends React.Component<Props> {
           ) : null}
         </div>
         <div className="row">
-          <div>
+          <div className="upvote-report-count">
             <PostUpvoteButton post={post} toggleUpvote={toggleUpvote} />
             <ReportCount count={post.num_reports} />
           </div>

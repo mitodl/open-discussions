@@ -101,6 +101,11 @@
     color: $font-black;
   }
 
+  .upvote-report-count {
+    display: flex;
+    align-items: center;
+  }
+
   .post-title {
     font-size: 18px;
     font-weight: bold;
