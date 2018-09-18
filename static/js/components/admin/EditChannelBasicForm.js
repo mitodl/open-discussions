@@ -59,6 +59,17 @@ export default class EditChannelBasicForm extends React.Component<Props> {
     } = this.props
     return (
       <form onSubmit={onSubmit} className="form channel-form">
+        <Card title="Description">
+          <div className="row">
+            <textarea
+              type="text"
+              name="description"
+              placeholder="Description"
+              value={form.description}
+              onChange={onUpdate}
+            />
+          </div>
+        </Card>
         <Card title="Type">
           {makeChannelTypeOption(
             CHANNEL_TYPE_PUBLIC,
@@ -99,17 +110,6 @@ export default class EditChannelBasicForm extends React.Component<Props> {
             </Checkbox>
           </div>
           <div className="row">{validationMessage(validation.link_type)}</div>
-        </Card>
-        <Card title="Description">
-          <div className="row">
-            <textarea
-              type="text"
-              name="description"
-              placeholder="Description"
-              value={form.description}
-              onChange={onUpdate}
-            />
-          </div>
         </Card>
         <div className="row actions">
           <button
