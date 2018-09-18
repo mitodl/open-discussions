@@ -49,7 +49,7 @@ export class PasswordChangePage extends React.Component<Props> {
       match
     } = this.props
     return (
-      <div className="content">
+      <React.Fragment>
         <MetaTags>
           <title>{formatTitle("Change Password")}</title>
           <CanonicalLink match={match} />
@@ -59,15 +59,15 @@ export class PasswordChangePage extends React.Component<Props> {
           {successfullySubmitted ? (
             <Card>
               <h3>Your password has been changed successfully!</h3>
-              <Link to={ACCOUNT_SETTINGS_URL} className="buttonLink">
+              <Link to={ACCOUNT_SETTINGS_URL} className="link-button">
                 Back to Settings
               </Link>
             </Card>
           ) : (
-            <Card>{renderForm({ invalidPwError })}</Card>
+            renderForm({ invalidPwError })
           )}
         </div>
-      </div>
+      </React.Fragment>
     )
   }
 }

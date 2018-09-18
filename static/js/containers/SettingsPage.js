@@ -126,7 +126,7 @@ class SettingsPage extends React.Component<Props> {
     const { form, saving } = this.props
 
     return form ? (
-      <div className="content">
+      <React.Fragment>
         <MetaTags>
           <title>{formatTitle("Settings")}</title>
           <CanonicalLink relativeUrl="settings" />
@@ -170,7 +170,7 @@ class SettingsPage extends React.Component<Props> {
             </button>
           </form>
         </div>
-      </div>
+      </React.Fragment>
     ) : null
   }
 }

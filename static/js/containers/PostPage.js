@@ -3,7 +3,6 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import { Dialog } from "@mitodl/mdl-react-components"
 import { Link } from "react-router-dom"
 import qs from "query-string"
 import { MetaTags } from "react-meta-tags"
@@ -23,9 +22,9 @@ import {
   withCommentModeration,
   commentModerationSelector
 } from "../hoc/withCommentModeration"
-import { ChannelBreadcrumbs } from "../components/ChannelBreadcrumbs"
 import { CommentSortPicker } from "../components/SortPicker"
 import CanonicalLink from "../components/CanonicalLink"
+import Dialog from "../components/Dialog"
 
 import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/sorting"
 import {
@@ -67,6 +66,7 @@ import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 import { showDropdown, hideDropdownDebounced } from "../actions/ui"
 import { withChannelTracker } from "../hoc/withChannelTracker"
 import { dropdownMenuFuncs } from "../lib/ui"
+import { getOwnProfile } from "../lib/redux_selectors"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -76,7 +76,8 @@ import type {
   CommentInTree,
   GenericComment,
   MoreCommentsInTree,
-  Post
+  Post,
+  Profile
 } from "../flow/discussionTypes"
 
 type PostPageProps = {
@@ -110,7 +111,8 @@ type PostPageProps = {
   embedly: Object,
   postShareMenuOpen: boolean,
   postDropdownMenuOpen: boolean,
-  dropdownMenus: Set<string>
+  dropdownMenus: Set<string>,
+  profile: Profile
 }
 
 const DELETE_POST_DIALOG = "DELETE_POST_DIALOG"
@@ -371,7 +373,8 @@ class PostPage extends React.Component<PostPageProps> {
       reportPost,
       postDropdownMenuOpen,
       postShareMenuOpen,
-      dropdownMenus
+      dropdownMenus,
+      profile
     } = this.props
 
     if (!channel) {
@@ -390,7 +393,6 @@ class PostPage extends React.Component<PostPageProps> {
           <CanonicalLink match={match} />
           <meta name="description" content={truncate(post.text, 300)} />
         </MetaTags>
-        <ChannelBreadcrumbs channel={channel} />
         <Dialog
           open={commentDeleteDialogVisible}
           hideDialog={this.hideCommentDialog(DELETE_COMMENT_DIALOG)}
@@ -454,15 +456,16 @@ class PostPage extends React.Component<PostPageProps> {
               postShareMenuOpen={postShareMenuOpen}
               channel={channel}
             />
-            {showPermalinkUI ? null : (
-              <ReplyToPostForm
-                forms={forms}
-                post={post}
-                processing={commentInFlight}
-              />
-            )}
           </div>
         </Card>
+        {showPermalinkUI ? null : (
+          <ReplyToPostForm
+            forms={forms}
+            post={post}
+            processing={commentInFlight}
+            profile={profile}
+          />
+        )}
         {this.renderCommentSectionHeader()}
         {commentsTree.length > 0 ? (
           <CommentTree
@@ -535,6 +538,7 @@ const mapStateToProps = (state, ownProps) => {
     postDropdownMenuOpen,
     postShareMenuOpen,
     dropdownMenus,
+    profile:     getOwnProfile(state),
     isModerator: channel && channel.user_is_moderator,
     errored:
       anyErrorExcept404([posts, channels]) ||

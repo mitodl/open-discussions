@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Occaecati ratione veniam nemo nobis voluptates dolor. Corrupti eum id sint fugit tempore suscipit vitae. Fugit atque ipsum repellat adipisci eius alias assumenda. Nisi deleniti quo repellat minima ullam nisi dignissimos aliquam.\nNemo laudantium rerum dolores facere asperiores nihil odio fugiat. Dolor quas vero cum debitis. In dolor placeat error.\nEsse veniam doloribus minus ab voluptas. Quas exercitationem earum voluptatem vitae praesentium et. Aut non eum doloremque dolorum deleniti earum.",
+      "name": "1536871157_ducimus",
+      "public_description": "Placeat fuga incidunt eos quam natus nemo. Ipsum error illum non rerum eius facere.",
+      "title": "Ex quae eaque reprehenderit ratione."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "2q",
+      "text": "Ut aspernatur dolorem quaerat eveniet illo quibusdam. Veritatis accusantium esse odio maxime.",
+      "title": "Officia reiciendis dolore harum."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CQAAHPXDMYV50B62YH5CAJGZ"
+    },
+    "staff_user": {
+      "username": "01CQAAHGJDYHG3ADR0B45RK0JG"
+    }
+  }
+}

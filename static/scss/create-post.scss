@@ -1,10 +1,10 @@
 .new-post-form {
-  .channel-select {
-    max-width: 300px;
-  }
-
   textarea {
     resize: none;
+  }
+
+  select {
+    background-color: white;
   }
 
   .post-types {
@@ -21,11 +21,10 @@
       font-size: 14px;
       display: flex;
       align-items: center;
-      color: $font-grey;
-      background-color: $app-background;
-      border: 1px solid $border-grey;
-      border-radius: $std-border-radius;
-      padding: 3px 10px;
+      color: white;
+      background-color: $rouge;
+      border-radius: 4px;
+      padding: 9px 20px;
       cursor: pointer;
 
       i {

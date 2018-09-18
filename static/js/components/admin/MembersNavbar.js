@@ -2,6 +2,8 @@
 import React from "react"
 import NavLink from "react-router-dom/NavLink"
 
+import IntraPageNav from "../IntraPageNav"
+
 import { CHANNEL_TYPE_PUBLIC } from "../../lib/channels"
 import {
   editChannelModeratorsURL,
@@ -19,7 +21,7 @@ export default class MembersNavbar extends React.Component<Props, void> {
     const { channel } = this.props
 
     return (
-      <div className="members-navbar">
+      <IntraPageNav>
         <NavLink to={editChannelModeratorsURL(channel.name)}>
           Moderators
         </NavLink>{" "}
@@ -28,7 +30,7 @@ export default class MembersNavbar extends React.Component<Props, void> {
             Contributors
           </NavLink>
         ) : null}
-      </div>
+      </IntraPageNav>
     )
   }
 }

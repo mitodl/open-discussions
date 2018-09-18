@@ -1,0 +1,22 @@
+{
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Dolorum corporis labore minima dolore. Culpa inventore eum accusamus similique similique voluptates cupiditate.\nConsequuntur dignissimos blanditiis perspiciatis sequi ad. Laudantium incidunt nisi voluptatem eos totam ex. Sapiente cupiditate pariatur deleniti rem voluptate consectetur dolores. Mollitia natus exercitationem sed non quos vel omnis. Illum praesentium mollitia doloribus quam accusantium deleniti debitis.",
+      "name": "1536938059_natus",
+      "public_description": "Voluptatibus cupiditate inventore repellat dolores. Eveniet dolore laboriosam autem alias corrupti.",
+      "title": "Iure consectetur possimus molestias doloremque."
+    }
+  },
+  "users": {
+    "new_mod_user": {
+      "username": "01CQCABD7C0AYE733CKG73FM1Z"
+    },
+    "new_sub_user": {
+      "username": "01CQCABGEG379XRANA5GVK9VK7"
+    },
+    "staff_user": {
+      "username": "01CQCAB6P6ZXHVQXM3ZEDBDQZV"
+    }
+  }
+}

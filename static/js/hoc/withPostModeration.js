@@ -1,10 +1,10 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import { Dialog } from "@mitodl/mdl-react-components"
 import R from "ramda"
 
 import ReportForm from "../components/ReportForm"
+import Dialog from "../components/Dialog"
 
 import { actions } from "../actions"
 import { approvePost, removePost } from "../util/api_actions"
@@ -66,16 +66,13 @@ export const withPostModeration = (
         channelName,
         shouldGetReports
       } = this.props
-
-      if (event.type !== "MDCDialog:accept") {
-        // filter out click event to avoid double execution
-        return
-      }
+      event.preventDefault()
 
       await removePost(dispatch, focusedPost)
       if (shouldGetReports) {
         await dispatch(actions.reports.get(channelName))
       }
+      this.hideRemoveDialog()
       dispatch(
         setSnackbarMessage({
           message: "Post has been removed"
@@ -177,6 +174,7 @@ export const withPostModeration = (
             onAccept={this.removePost}
             hideDialog={this.hideRemoveDialog}
             submitText="Yes, remove"
+            title="Remove Post"
           >
             <p>
               Are you sure? You will still be able to see the post, but it will

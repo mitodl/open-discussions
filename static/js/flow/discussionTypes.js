@@ -194,6 +194,12 @@ export type Contributor = {
 
 export type ChannelContributors = Array<Contributor>
 
+export type Subscriber = {
+  subscriber_name: string
+}
+
+export type ChannelSubscribers = Array<Subscriber>
+
 export type Member = Contributor | Moderator
 
 export type Report = {

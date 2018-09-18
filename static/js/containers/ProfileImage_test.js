@@ -117,8 +117,8 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ImageUploaderForm").find("Dialog")
-        const saveButton = dialog.find(".edit-button").at(0)
+        const dialog = image.find("ImageUploaderForm").find("OurDialog")
+        const saveButton = dialog.find(".submit").at(0)
         saveButton.simulate("click")
         // do a cycle for rerender based on promises
         await wait(0)
@@ -146,8 +146,8 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ImageUploaderForm").find("Dialog")
-        const saveButton = dialog.find(".edit-button").at(0)
+        const dialog = image.find("ImageUploaderForm").find("OurDialog")
+        const saveButton = dialog.find(".submit").at(0)
         saveButton.simulate("click")
         // do a cycle for rerender based on promises
         await wait(0)
@@ -255,8 +255,8 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ImageUploaderForm").find("Dialog")
-        const cancelButton = dialog.find(".cancel-button").at(0)
+        const dialog = image.find("ImageUploaderForm").find("OurDialog")
+        const cancelButton = dialog.find(".cancel").at(0)
         await listenForActions(
           [actions.forms.FORM_BEGIN_EDIT, HIDE_DIALOG],
           () => {
@@ -284,7 +284,7 @@ describe("ProfileImage", () => {
           .find(".open-photo-dialog")
           .at(0)
           .simulate("click")
-        const dialog = image.find("ImageUploaderForm").find("Dialog")
+        const dialog = image.find("ImageUploaderForm").find("OurDialog")
         await listenForActions([HIDE_DIALOG], () => {
           dialog.props().hideDialog()
         })

@@ -2,12 +2,6 @@
   position: relative;
   max-width: 400px;
 
-  @include breakpoint(desktop) {
-    &:first-child {
-      margin-top: 57px; // margin to align with top of main-content card on desktop
-    }
-  }
-
   .mod-link-wrapper {
     margin: 15px 0;
   }
@@ -18,6 +12,8 @@
 
   .title {
     margin-left: 0;
+    font-size: 16px;
+    font-weight: bold;
   }
 
   .description {
@@ -68,6 +64,7 @@ $avatar-dimension-small: 22px;
 
     .avatar-initials {
       font-size: $avatar-dimension-small / 2;
+      border-radius: 4px;
     }
   }
 

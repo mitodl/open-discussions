@@ -194,51 +194,41 @@ describe("ChannelModerationPage", () => {
         payload: post
       })
     })
-    ;[[true, "MDCDialog:accept"], [false, "submit"]].forEach(
-      ([canRemove, eventType]) => {
-        it(`${
-          canRemove ? "removes" : "doesn't remove"
-        } a report for a post for event type ${eventType}`, async () => {
-          const post = postList[0]
-          const event = { type: eventType }
-          helper.updateRemovedStub.returns(Promise.resolve(post))
-          const { wrapper, store } = await render({
-            reports: {
-              data: {
-                reports: reports
-              },
-              processing: false,
-              loaded:     true
-            },
-            focus: {
-              post
-            }
-          })
 
-          const props = wrapper
-            .dive()
-            .find("Dialog[id='remove-post-dialog']")
-            .first()
-            .props()
+    it("removes a report for a post", async () => {
+      const post = postList[0]
+      const event = { preventDefault: helper.sandbox.stub() }
+      helper.updateRemovedStub.returns(Promise.resolve(post))
+      const { wrapper, store } = await render({
+        reports: {
+          data: {
+            reports: reports
+          },
+          processing: false,
+          loaded:     true
+        },
+        focus: {
+          post
+        }
+      })
 
-          await props.onAccept(event)
-          const actions = store.getActions()
-          if (!canRemove) {
-            assert.equal(helper.updateRemovedStub.callCount, 0)
-            sinon.assert.calledWith(helper.getReportsStub, channel.name)
-          } else {
-            sinon.assert.calledWith(helper.updateRemovedStub, post.id, true)
-            sinon.assert.calledWith(helper.getReportsStub, channel.name)
-            assert.deepEqual(actions[actions.length - 1], {
-              type:    SET_SNACKBAR_MESSAGE,
-              payload: {
-                message: "Post has been removed"
-              }
-            })
-          }
-        })
-      }
-    )
+      const props = wrapper
+        .dive()
+        .find("OurDialog[id='remove-post-dialog']")
+        .first()
+        .props()
+
+      await props.onAccept(event)
+      const actions = store.getActions()
+      sinon.assert.calledWith(helper.updateRemovedStub, post.id, true)
+      sinon.assert.calledWith(helper.getReportsStub, channel.name)
+      assert.deepEqual(actions[actions.length - 1], {
+        type:    SET_SNACKBAR_MESSAGE,
+        payload: {
+          message: "Post has been removed"
+        }
+      })
+    })
 
     it("ignores a report for a post", async () => {
       const post = postList[0]
@@ -285,7 +275,7 @@ describe("ChannelModerationPage", () => {
 
       const props = wrapper
         .dive()
-        .find("Dialog[id='remove-post-dialog']")
+        .find("OurDialog[id='remove-post-dialog']")
         .first()
         .props()
 
@@ -366,55 +356,45 @@ describe("ChannelModerationPage", () => {
         payload: comment
       })
     })
-    ;[[true, "MDCDialog:accept"], [false, "submit"]].forEach(
-      ([canRemove, eventType]) => {
-        it(`${
-          canRemove ? "removes" : "doesn't remove"
-        } a report for a comment for event type ${eventType}`, async () => {
-          const comment = reports[0].comment
-          const event = { type: eventType }
-          helper.updateCommentStub.returns(Promise.resolve(comment))
-          const { wrapper, store } = await render({
-            reports: {
-              data: {
-                reports: reports
-              },
-              processing: false,
-              loaded:     true
-            },
-            focus: {
-              comment
-            }
-          })
 
-          const props = wrapper
-            .dive()
-            .find("WithCommentModeration")
-            .dive()
-            .find("Dialog[id='remove-comment-dialog']")
-            .first()
-            .props()
+    it("removes a report for a comment", async () => {
+      const comment = reports[0].comment
+      const event = { preventDefault: helper.sandbox.stub() }
+      helper.updateCommentStub.returns(Promise.resolve(comment))
+      const { wrapper, store } = await render({
+        reports: {
+          data: {
+            reports: reports
+          },
+          processing: false,
+          loaded:     true
+        },
+        focus: {
+          comment
+        }
+      })
 
-          await props.onAccept(event)
-          const actions = store.getActions()
-          if (!canRemove) {
-            assert.equal(helper.updateRemovedStub.callCount, 0)
-            sinon.assert.calledWith(helper.getReportsStub, channel.name)
-          } else {
-            sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
-              removed: true
-            })
-            sinon.assert.calledWith(helper.getReportsStub, channel.name)
-            assert.deepEqual(actions[actions.length - 1], {
-              type:    SET_SNACKBAR_MESSAGE,
-              payload: {
-                message: "Comment has been removed"
-              }
-            })
-          }
-        })
-      }
-    )
+      const props = wrapper
+        .dive()
+        .find("WithCommentModeration")
+        .dive()
+        .find("OurDialog[id='remove-comment-dialog']")
+        .first()
+        .props()
+
+      await props.onAccept(event)
+      const actions = store.getActions()
+      sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
+        removed: true
+      })
+      sinon.assert.calledWith(helper.getReportsStub, channel.name)
+      assert.deepEqual(actions[actions.length - 1], {
+        type:    SET_SNACKBAR_MESSAGE,
+        payload: {
+          message: "Comment has been removed"
+        }
+      })
+    })
 
     it("ignores a report for a comment", async () => {
       const comment = reports[0].comment
@@ -463,7 +443,7 @@ describe("ChannelModerationPage", () => {
         .dive()
         .find("WithCommentModeration")
         .dive()
-        .find("Dialog[id='remove-comment-dialog']")
+        .find("OurDialog[id='remove-comment-dialog']")
         .first()
         .props()
 

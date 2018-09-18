@@ -1,6 +1,7 @@
 """
 Test end to end django views.
 """
+# pylint: disable=redefined-outer-name,too-many-arguments
 import json
 import xml.etree.ElementTree as etree
 from urllib.parse import urlencode
@@ -15,22 +16,47 @@ pytestmark = [
     pytest.mark.django_db,
     pytest.mark.usefixtures('authenticated_site'),
 ]
+lazy = pytest.lazy_fixture
 
 
-def test_webpack_url(settings, client, user, mocker, authenticated_site):
+@pytest.mark.parametrize('test_user,test_jwt_token,expect_auth', [
+    [lazy('logged_in_user'), None, True],
+    [lazy('user'), lazy('jwt_token'), False],
+    [None, None, False]
+])
+def test_webpack_url(
+        settings,
+        mocker,
+        client,
+        authenticated_site,
+        test_user,
+        test_jwt_token,
+        expect_auth
+):
     """Verify that webpack bundle src shows up in production"""
+    get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
     settings.GA_TRACKING_ID = 'fake'
     settings.EMBEDLY_KEY = 'fake'
-    get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
     settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
-    settings.FEATURES[features.EMAIL_AUTH] = False
     settings.FEATURES[features.SAML_AUTH] = False
+    settings.FEATURES[features.EMAIL_AUTH] = False
     settings.ENVIRONMENT = 'test'
     settings.VERSION = '1.2.3'
 
-    client.force_login(user)
-    response = client.get(reverse('open_discussions-index'))
+    if test_user or test_jwt_token:
+        expected_user_values = {
+            'user_email': test_user.email,
+            'username': test_user.username,
+            'user_full_name': test_user.profile.name,
+        }
+    else:
+        expected_user_values = {
+            'user_email': None,
+            'username': None,
+            'user_full_name': None,
+        }
 
+    response = client.get(reverse('open_discussions-index'))
     bundles = [bundle[0][1] for bundle in get_bundle_mock.call_args_list]
     assert set(bundles) == {
         'common',
@@ -40,31 +66,31 @@ def test_webpack_url(settings, client, user, mocker, authenticated_site):
     }
     js_settings = json.loads(response.context['js_settings_json'])
     assert js_settings == {
-        'gaTrackingID': 'fake',
-        'public_path': '/static/bundles/',
-        'site_url': settings.SITE_BASE_URL,
-        'max_comment_depth': 6,
-        'user_email': user.email,
-        'username': user.username,
-        'profile_ui_enabled': False,
-        'user_full_name': user.profile.name,
-        'authenticated_site': {
-            'title': authenticated_site.title,
-            'login_url': authenticated_site.login_url,
-            'session_url': authenticated_site.session_url,
-            'base_url': authenticated_site.base_url,
-            'tos_url': authenticated_site.tos_url,
+        **{
+            'gaTrackingID': 'fake',
+            'public_path': '/static/bundles/',
+            'site_url': settings.SITE_BASE_URL,
+            'max_comment_depth': 6,
+            'profile_ui_enabled': False,
+            'authenticated_site': {
+                'title': authenticated_site.title,
+                'login_url': authenticated_site.login_url,
+                'session_url': authenticated_site.session_url,
+                'base_url': authenticated_site.base_url,
+                'tos_url': authenticated_site.tos_url,
+            },
+            'is_authenticated': expect_auth,
+            'allow_anonymous': 'access',
+            'allow_saml_auth': False,
+            'allow_email_auth': False,
+            'support_email': settings.EMAIL_SUPPORT,
+            'embedlyKey': 'fake',
+            'environment': settings.ENVIRONMENT,
+            'sentry_dsn': None,
+            'release_version': settings.VERSION,
+            'recaptchaKey': settings.RECAPTCHA_SITE_KEY,
         },
-        'is_authenticated': True,
-        'allow_anonymous': 'access',
-        'allow_saml_auth': False,
-        'allow_email_auth': False,
-        'support_email': settings.EMAIL_SUPPORT,
-        'embedlyKey': 'fake',
-        'environment': settings.ENVIRONMENT,
-        'sentry_dsn': None,
-        'release_version': settings.VERSION,
-        'recaptchaKey': settings.RECAPTCHA_SITE_KEY,
+        **expected_user_values
     }
 
 
@@ -87,108 +113,6 @@ def test_webpack_url_jwt_redirect(client, user):
             'next': 'http://testserver/',
         })
     )
-
-
-def test_webpack_url_jwt(
-        settings, client, user, jwt_token, mocker, authenticated_site
-):  # pylint: disable=too-many-arguments
-    """Verify that webpack bundle src shows up in production for jwt auth"""
-    settings.GA_TRACKING_ID = 'fake'
-    settings.EMBEDLY_KEY = 'fake'
-    get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
-    settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
-    settings.FEATURES[features.SAML_AUTH] = False
-    client.cookies[api_settings.JWT_AUTH_COOKIE] = jwt_token
-    settings.ENVIRONMENT = 'test'
-    settings.VERSION = '1.2.3'
-
-    response = client.get(reverse('open_discussions-index'))
-
-    bundles = [bundle[0][1] for bundle in get_bundle_mock.call_args_list]
-    assert set(bundles) == {
-        'common',
-        'root',
-        'style',
-        'zendesk',
-    }
-    js_settings = json.loads(response.context['js_settings_json'])
-    assert js_settings == {
-        'gaTrackingID': 'fake',
-        'public_path': '/static/bundles/',
-        'site_url': settings.SITE_BASE_URL,
-        'max_comment_depth': 6,
-        'user_email': user.email,
-        'username': user.username,
-        'profile_ui_enabled': False,
-        'user_full_name': user.profile.name,
-        'authenticated_site': {
-            'title': authenticated_site.title,
-            'login_url': authenticated_site.login_url,
-            'session_url': authenticated_site.session_url,
-            'base_url': authenticated_site.base_url,
-            'tos_url': authenticated_site.tos_url,
-        },
-        'is_authenticated': False,
-        'allow_anonymous': 'access',
-        'allow_saml_auth': False,
-        'allow_email_auth': False,
-        'support_email': settings.EMAIL_SUPPORT,
-        'embedlyKey': 'fake',
-        'environment': settings.ENVIRONMENT,
-        'sentry_dsn': None,
-        'release_version': settings.VERSION,
-        'recaptchaKey': settings.RECAPTCHA_SITE_KEY,
-    }
-
-
-def test_webpack_url_anonymous(settings, client, mocker, authenticated_site):
-    """Verify that webpack bundle src shows up in production"""
-    settings.GA_TRACKING_ID = 'fake'
-    settings.EMBEDLY_KEY = 'fake'
-    get_bundle_mock = mocker.patch('open_discussions.templatetags.render_bundle._get_bundle')
-    settings.FEATURES[features.ANONYMOUS_ACCESS] = 'access'
-    settings.FEATURES[features.EMAIL_AUTH] = False
-    settings.FEATURES[features.SAML_AUTH] = False
-    settings.ENVIRONMENT = 'test'
-    settings.VERSION = '1.2.3'
-
-    response = client.get(reverse('open_discussions-index'))
-
-    bundles = [bundle[0][1] for bundle in get_bundle_mock.call_args_list]
-    assert set(bundles) == {
-        'common',
-        'root',
-        'style',
-        'zendesk',
-    }
-    js_settings = json.loads(response.context['js_settings_json'])
-    assert js_settings == {
-        'gaTrackingID': 'fake',
-        'public_path': '/static/bundles/',
-        'site_url': settings.SITE_BASE_URL,
-        'max_comment_depth': 6,
-        'user_email': None,
-        'username': None,
-        'profile_ui_enabled': False,
-        'user_full_name': None,
-        'authenticated_site': {
-            'title': authenticated_site.title,
-            'login_url': authenticated_site.login_url,
-            'session_url': authenticated_site.session_url,
-            'base_url': authenticated_site.base_url,
-            'tos_url': authenticated_site.tos_url,
-        },
-        'is_authenticated': False,
-        'allow_anonymous': 'access',
-        'allow_saml_auth': False,
-        'allow_email_auth': False,
-        'support_email': settings.EMAIL_SUPPORT,
-        'embedlyKey': 'fake',
-        'environment': settings.ENVIRONMENT,
-        'sentry_dsn': None,
-        'release_version': settings.VERSION,
-        'recaptchaKey': settings.RECAPTCHA_SITE_KEY,
-    }
 
 
 @pytest.mark.parametrize('is_enabled', [True, False])

@@ -15,6 +15,8 @@ import {
   postModerationSelector
 } from "../hoc/withPostModeration"
 import withPostList from "../hoc/withPostList"
+import IntraPageNav from "../components/IntraPageNav"
+import { withChannelTracker } from "../hoc/withChannelTracker"
 
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
@@ -31,7 +33,6 @@ import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
 import type { Channel, Post, PostListPagination } from "../flow/discussionTypes"
-import { withChannelTracker } from "../hoc/withChannelTracker"
 
 type ChannelPageProps = {
   match: Match,
@@ -122,8 +123,13 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
             <title>{formatTitle(channel.title)}</title>
             <CanonicalLink match={match} />
           </MetaTags>
+          <IntraPageNav>
+            <a href="#" className="active">
+              Posts
+            </a>
+          </IntraPageNav>
           <div className="post-list-title">
-            <div>{channel.title}</div>
+            <div>All</div>
             <PostSortPicker
               updateSortParam={updatePostSortParam(this.props)}
               value={qs.parse(search).sort || POSTS_SORT_HOT}

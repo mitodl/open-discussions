@@ -38,7 +38,7 @@ export const RegisterDetailsPage = ({
   formError,
   match
 }: RegisterDetailsPageProps) => (
-  <div className="content auth-page register-details-page">
+  <div className="auth-page register-details-page">
     <div className="main-content">
       <Card className="register-card">
         <h3>Thanks for confirming!</h3>

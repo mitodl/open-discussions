@@ -63,7 +63,6 @@ export default class EditChannelAppearanceForm extends React.Component<Props> {
               {validationMessage(validation.title)}
             </div>
           </div>
-
           <div className="row">
             <input
               type="text"
@@ -78,7 +77,6 @@ export default class EditChannelAppearanceForm extends React.Component<Props> {
             </label>
             {validationMessage(validation.public_description)}
           </div>
-
           <ChannelBanner
             channel={channel}
             channelName={form.name}
@@ -91,24 +89,19 @@ export default class EditChannelAppearanceForm extends React.Component<Props> {
               URL.createObjectURL(form.banner.edit)
             }
           />
-
-          <div className="row actions">
-            <button
-              className="cancel"
-              onClick={() => history.push(channelURL(form.name))}
-              disabled={processing}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="save-changes"
-              disabled={processing}
-            >
-              Save
-            </button>
-          </div>
         </Card>
+        <div className="row actions">
+          <button
+            className="cancel"
+            onClick={() => history.push(channelURL(form.name))}
+            disabled={processing}
+          >
+            Cancel
+          </button>
+          <button type="submit" className="save-changes" disabled={processing}>
+            Save
+          </button>
+        </div>
       </form>
     )
   }

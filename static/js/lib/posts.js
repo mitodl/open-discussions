@@ -3,9 +3,7 @@ import React from "react"
 import R from "ramda"
 import { Link } from "react-router-dom"
 
-import LoginPopup from "../components/LoginPopup"
 import { postDetailURL, urlHostname } from "./url"
-import { userIsAnonymous, votingTooltipText } from "./util"
 import { showDropdown, hideDropdownDebounced } from "../actions/ui"
 
 import type { Dispatch } from "redux"
@@ -93,87 +91,6 @@ export const formatPostTitle = (post: Post) =>
       {post.title}
     </Link>
   )
-
-type PostVotingProps = {
-  post: Post,
-  className?: string,
-  toggleUpvote: Function,
-  showLoginMenu: Function
-}
-
-export class PostVotingButtons extends React.Component<*, *> {
-  props: PostVotingProps
-
-  state: {
-    upvoting: boolean,
-    popupVisible: boolean
-  }
-
-  constructor(props: PostVotingProps) {
-    super(props)
-    this.state = {
-      upvoting:     false,
-      popupVisible: false
-    }
-  }
-
-  onToggleUpvote = async () => {
-    const { toggleUpvote, post } = this.props
-    this.setState({
-      upvoting: true
-    })
-    await toggleUpvote(post)
-    this.setState({
-      upvoting: false
-    })
-  }
-
-  onTogglePopup = async () => {
-    const { popupVisible } = this.state
-    this.setState({
-      popupVisible: !popupVisible
-    })
-  }
-
-  render() {
-    const { post, className } = this.props
-    const { upvoting, popupVisible } = this.state
-    const upvoted = post.upvoted !== upvoting
-    const upvoteClass = upvoted ? "upvoted" : ""
-
-    return (
-      <React.Fragment>
-        <div className={`upvotes ${className || ""} ${upvoteClass}`}>
-          <button
-            className="upvote-button"
-            onClick={
-              userIsAnonymous() ? this.onTogglePopup : this.onToggleUpvote
-            }
-            disabled={upvoting}
-          >
-            <img
-              className="vote-arrow"
-              src={
-                upvoted
-                  ? "/static/images/upvote_arrow_on.png"
-                  : "/static/images/upvote_arrow.png"
-              }
-              width="13"
-            />
-          </button>
-          <span className="votes">{post.score}</span>
-        </div>
-        {userIsAnonymous() ? (
-          <LoginPopup
-            message={votingTooltipText}
-            visible={popupVisible}
-            closePopup={this.onTogglePopup}
-          />
-        ) : null}
-      </React.Fragment>
-    )
-  }
-}
 
 // a shared function which provides a showPostMenu and hidePostMenu
 // function, for showing and hiding a post menu dropdown (we use on the

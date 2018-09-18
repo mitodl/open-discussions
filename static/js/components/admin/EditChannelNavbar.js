@@ -3,6 +3,8 @@ import React from "react"
 import NavLink from "react-router-dom/NavLink"
 import R from "ramda"
 
+import IntraPageNav from "../IntraPageNav"
+
 import {
   editChannelBasicURL,
   editChannelAppearanceURL,
@@ -22,7 +24,7 @@ export default class EditChannelNavbar extends React.Component<Props> {
     const { channelName } = this.props
 
     return (
-      <div className="edit-channel-navbar">
+      <IntraPageNav>
         <NavLink to={editChannelBasicURL(channelName)}>Basic</NavLink>{" "}
         <NavLink to={editChannelAppearanceURL(channelName)}>Appearance</NavLink>
         <NavLink
@@ -34,7 +36,7 @@ export default class EditChannelNavbar extends React.Component<Props> {
         <NavLink to={channelModerationURL(channelName)}>
           Reported Content
         </NavLink>
-      </div>
+      </IntraPageNav>
     )
   }
 }

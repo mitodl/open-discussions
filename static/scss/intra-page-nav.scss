@@ -1,0 +1,13 @@
+.intra-page-nav {
+  margin-bottom: 20px;
+
+  a {
+    margin-right: 25px;
+    color: $navy;
+
+    &.active {
+      font-weight: 700;
+      border-bottom: 4px solid $navy;
+    }
+  }
+}

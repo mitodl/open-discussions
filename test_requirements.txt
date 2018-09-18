@@ -15,6 +15,7 @@ pytest-django
 pytest-pep8
 pytest-mock
 pytest-pylint==0.6.0
+pytest-lazy-fixture
 safety
 semantic-version
 tox

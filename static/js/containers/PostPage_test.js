@@ -2,7 +2,6 @@
 import { assert } from "chai"
 import sinon from "sinon"
 import R from "ramda"
-import { Dialog } from "@mitodl/mdl-react-components"
 import { Link } from "react-router-dom"
 
 import CommentTree from "../components/CommentTree"
@@ -26,6 +25,7 @@ import { FORM_BEGIN_EDIT, FORM_END_EDIT, FORM_VALIDATE } from "../actions/forms"
 import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG, HIDE_DIALOG } from "../actions/ui"
 import {
   SET_FOCUSED_POST,
+  CLEAR_FOCUSED_POST,
   SET_FOCUSED_COMMENT,
   CLEAR_FOCUSED_COMMENT
 } from "../actions/focus"
@@ -326,7 +326,7 @@ describe("PostPage", function() {
       ],
       () => {
         wrapper
-          .find(Dialog)
+          .find("OurDialog")
           .at(4)
           .props()
           .onAccept()
@@ -358,6 +358,8 @@ describe("PostPage", function() {
           SET_FOCUSED_POST,
           actions.postRemoved.patch.requestType,
           actions.postRemoved.patch.successType,
+          HIDE_DIALOG,
+          CLEAR_FOCUSED_POST,
           SET_POST_DATA,
           SET_SNACKBAR_MESSAGE
         ],
@@ -365,10 +367,10 @@ describe("PostPage", function() {
           const props = wrapper.find("ExpandedPostDisplay").props()
           props.removePost(post)
           wrapper
-            .find("Dialog")
+            .find("OurDialog")
             .at(1)
             .props()
-            .onAccept({ type: "MDCDialog:accept" })
+            .onAccept({ preventDefault: helper.sandbox.stub() })
         }
       )
 
@@ -411,6 +413,8 @@ describe("PostPage", function() {
 
       sinon.assert.calledWith(helper.updateRemovedStub, post.id, false)
     })
+
+    //
     ;[
       [false, "should remove a comment"],
       [true, "should approve a comment"]
@@ -453,10 +457,10 @@ describe("PostPage", function() {
           // if we are removing the comment, handle the confirmation dialog
           newState = await listenForActions(patchActions, () => {
             wrapper
-              .find("Dialog")
+              .find("OurDialog")
               .at(2)
               .props()
-              .onAccept({ type: "MDCDialog:accept" })
+              .onAccept({ preventDefault: helper.sandbox.stub() })
           })
         }
 
@@ -490,7 +494,7 @@ describe("PostPage", function() {
       )
 
       wrapper.update()
-      const dialog = wrapper.find("Dialog").at(5)
+      const dialog = wrapper.find("OurDialog").at(5)
       dialog.find("input").simulate("change", {
         target: {
           name:  "reason",
@@ -534,7 +538,7 @@ describe("PostPage", function() {
     assert.ok(preventDefaultStub.called)
     wrapper.update()
 
-    const dialog = wrapper.find("Dialog").at(0)
+    const dialog = wrapper.find("OurDialog").at(0)
     dialog.find("input").simulate("change", {
       target: {
         name:  "reason",
@@ -594,7 +598,7 @@ describe("PostPage", function() {
       })
       wrapper.update()
 
-      const dialog = wrapper.find(Dialog).at(isComment ? 5 : 0)
+      const dialog = wrapper.find("OurDialog").at(isComment ? 5 : 0)
 
       dialog.find("input").simulate("change", {
         target: {

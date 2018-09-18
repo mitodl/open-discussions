@@ -6,7 +6,6 @@ import R from "ramda"
 import { MetaTags } from "react-meta-tags"
 
 import ProfileForm from "../components/ProfileForm"
-import Card from "../components/Card"
 import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 import CanonicalLink from "../components/CanonicalLink"
@@ -118,27 +117,21 @@ class ProfileEditPage extends React.Component<Props> {
     }
 
     return profile.username === SETTINGS.username ? (
-      <div className="profile-page">
+      <React.Fragment>
         <MetaTags>
           <title>{formatTitle("Edit your profile")}</title>
           <CanonicalLink relativeUrl="profile/edit" />
         </MetaTags>
-        <div className="main-content">
-          <Card>
-            <div className="profile-card">
-              <ProfileForm
-                profile={profile}
-                onSubmit={this.onSubmit}
-                onUpdate={this.onUpdate}
-                form={profileForm.value}
-                validation={profileForm.errors}
-                history={history}
-                processing={processing}
-              />
-            </div>
-          </Card>
-        </div>
-      </div>
+        <ProfileForm
+          profile={profile}
+          onSubmit={this.onSubmit}
+          onUpdate={this.onUpdate}
+          form={profileForm.value}
+          validation={profileForm.errors}
+          history={history}
+          processing={processing}
+        />
+      </React.Fragment>
     ) : (
       <Redirect to={profileURL(profile.username)} />
     )

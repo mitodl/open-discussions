@@ -1,22 +1,18 @@
 // @flow
 import React from "react"
 import { assert } from "chai"
-import sinon from "sinon"
 import { shallow } from "enzyme"
 import R from "ramda"
 
 import {
   newPostForm,
   formatCommentsCount,
-  PostVotingButtons,
   PostTitleAndHostname,
   formatPostTitle,
   mapPostListResponse
 } from "./posts"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import { urlHostname } from "./url"
-import * as utilFuncs from "./util"
-import LoginPopup from "../components/LoginPopup"
 
 describe("Post utils", () => {
   it("should return a new post with empty values", () => {
@@ -48,32 +44,6 @@ describe("Post utils", () => {
         .text()
         .startsWith(`(${urlHostname(post.url)}`)
     )
-  })
-
-  describe("PostVotingButtons", () => {
-    let sandbox
-
-    const renderButtons = () => shallow(<PostVotingButtons post={makePost()} />)
-
-    beforeEach(() => {
-      sandbox = sinon.createSandbox()
-    })
-
-    afterEach(() => {
-      sandbox.restore()
-    })
-
-    it("should include LoginPopup if user is anonymous", () => {
-      sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-      const popup = renderButtons().find(LoginPopup)
-      assert.isOk(popup.exists())
-    })
-
-    it("should not include LoginPopup if the user is not anonymous", () => {
-      sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
-      const popup = renderButtons().find(LoginPopup)
-      assert.isNotOk(popup.exists())
-    })
   })
 
   describe("postTitleAndHostname", () => {

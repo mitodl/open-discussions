@@ -33,7 +33,7 @@ export const PasswordResetPage = ({
   successfullySubmitted,
   match
 }: PasswordResetPageProps) => (
-  <div className="content auth-page password-reset-page">
+  <div className="auth-page password-reset-page">
     <div className="main-content">
       {successfullySubmitted ? (
         <Card className="login-card">

@@ -58,10 +58,13 @@ class ModeratorListView(ListCreateAPIView):
         """Get a list of moderators for channel"""
         api = self.request.channel_api
         channel_name = self.kwargs['channel_name']
-        return (
-            moderator for moderator in
-            api.list_moderators(channel_name)
-            if moderator.name != settings.INDEXING_API_USERNAME
+        return sorted(
+            (
+                moderator for moderator in
+                api.list_moderators(channel_name)
+                if moderator.name != settings.INDEXING_API_USERNAME
+            ),
+            key=lambda moderator: 0 if moderator.name == api.user.username else 1
         )
 
 

@@ -59,6 +59,17 @@ export default class EditChannelBasicForm extends React.Component<Props> {
     } = this.props
     return (
       <form onSubmit={onSubmit} className="form channel-form">
+        <Card title="Description">
+          <div className="row">
+            <textarea
+              type="text"
+              name="description"
+              placeholder="Description"
+              value={form.description}
+              onChange={onUpdate}
+            />
+          </div>
+        </Card>
         <Card title="Type">
           {makeChannelTypeOption(
             CHANNEL_TYPE_PUBLIC,

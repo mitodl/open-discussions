@@ -8,6 +8,7 @@ import {
   CHANNEL_TYPE_PUBLIC,
   CHANNEL_TYPE_PRIVATE,
   CHANNEL_TYPE_RESTRICTED,
+  LINK_TYPE_TEXT,
   editChannelForm
 } from "../../lib/channels"
 import { makeChannel } from "../../factories/channels"
@@ -49,6 +50,7 @@ describe("EditChannelBasicForm", () => {
     assert.equal(restrictedOption.props.checked, false)
     assert.equal(privateOption.props.value, CHANNEL_TYPE_PRIVATE)
     assert.equal(privateOption.props.checked, false)
+    assert.equal(wrapper.find("description").value, null)
   })
 
   describe("callbacks", () => {
@@ -67,15 +69,22 @@ describe("EditChannelBasicForm", () => {
       })
     })
 
-    describe("onUpdate", () => {
-      it(`should be called when input is modified`, () => {
-        const event = { target: { value: "text" } }
-        assert.isNotOk(onSubmit.called)
-        wrapper
-          .find(`[name="channel_type"]`)
-          .at(0)
-          .simulate("change", event)
-        assert.isOk(onUpdate.calledWith(event))
+    //
+    ;[
+      ["channel_type", CHANNEL_TYPE_PUBLIC],
+      ["link_type", LINK_TYPE_TEXT],
+      ["description", "Channel description"]
+    ].forEach(([name, value]) => {
+      describe("onUpdate", () => {
+        it(`should be called when ${name} input is modified`, () => {
+          const event = { target: { name: { name }, value: { value } } }
+          assert.isNotOk(onSubmit.called)
+          wrapper
+            .find(`[name="${name}"]`)
+            .at(0)
+            .simulate("change", event)
+          assert.isOk(onUpdate.calledWith(event))
+        })
       })
     })
   })

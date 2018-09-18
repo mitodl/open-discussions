@@ -19,7 +19,7 @@ export default class AuthRequiredPage extends React.Component<Props> {
     const { match } = this.props
 
     return (
-      <div className="content auth-required-page">
+      <div className="auth-page auth-required-page">
         <MetaTags>
           <title>{formatTitle("Login Required")}</title>
           <CanonicalLink match={match} />

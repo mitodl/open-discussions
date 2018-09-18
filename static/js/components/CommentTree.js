@@ -157,7 +157,10 @@ export default class CommentTree extends React.Component<Props> {
         </i>
         <ReportCount count={comment.num_reports} />
         {commentMenuOpen ? (
-          <DropdownMenu closeMenu={hideDropdown}>
+          <DropdownMenu
+            closeMenu={hideDropdown}
+            className="post-comment-dropdown"
+          >
             {userIsAnonymous() ? null : this.renderFollowButton(comment)}
             {SETTINGS.username === comment.author_id && !moderationUI ? (
               <li>

@@ -45,6 +45,7 @@ import { setChannelData } from "../actions/channel"
 import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
 import { isAnonAccessiblePath, needsAuthedSite } from "../lib/auth"
 import { isMobileWidth, preventDefaultAndInvoke } from "../lib/util"
+import { getOwnProfile } from "../lib/redux_selectors"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -287,13 +288,9 @@ class App extends React.Component<AppProps> {
 
 export default connect(state => {
   const {
-    profiles,
     ui: { showDrawerMobile, showDrawerDesktop, snackbar, banner, dropdownMenus }
   } = state
 
-  const profile = SETTINGS.username
-    ? profiles.data.get(SETTINGS.username)
-    : null
   const showUserMenu = dropdownMenus.has(USER_MENU_DROPDOWN)
 
   return {
@@ -302,6 +299,6 @@ export default connect(state => {
     snackbar,
     banner,
     showUserMenu,
-    profile
+    profile: getOwnProfile(state)
   }
 })(App)

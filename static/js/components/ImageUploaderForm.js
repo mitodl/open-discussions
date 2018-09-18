@@ -1,11 +1,13 @@
 // @flow
 import React from "react"
-import { Dialog } from "@mitodl/mdl-react-components"
 import R from "ramda"
 import Dropzone from "react-dropzone"
 
 import CropperWrapper from "./CropperWrapper"
+import Dialog from "./Dialog"
+
 import { validationMessage } from "../lib/validation"
+
 import type { FormProps } from "../flow/formTypes"
 import type { FormErrors, FormValue } from "../flow/formTypes"
 
@@ -155,6 +157,7 @@ export default class ImageUploaderForm<Form> extends React.Component<
         hideDialog={() => {
           setDialogVisibility(false)
         }}
+        submitText="Save"
       >
         {validationMessage(validation.image)}
         {this.dialogContents()}

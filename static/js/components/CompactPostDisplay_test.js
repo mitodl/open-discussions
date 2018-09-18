@@ -151,19 +151,16 @@ describe("CompactPostDisplay", () => {
     assert.ok(detailLink.find(PostTitleAndHostname).exists())
   })
 
-  const assertButton = (wrapper, isUpvote, isVoting) => {
-    assert.equal(wrapper.find(".upvote-button").props().disabled, isVoting)
+  const assertButton = (wrapper, isUpvote) => {
     if (isUpvote) {
-      assert.include(wrapper.find(".upvotes").props().className, "upvoted")
-      assert.equal(
-        wrapper.find(".upvotes img").props().src,
-        "/static/images/upvote_arrow_on.png"
+      assert.include(
+        wrapper.find(".post-upvote-button").props().className,
+        "upvoted"
       )
     } else {
-      assert.notInclude(wrapper.find(".upvotes").props().className, "upvoted")
-      assert.equal(
-        wrapper.find(".upvotes img").props().src,
-        "/static/images/upvote_arrow.png"
+      assert.notInclude(
+        wrapper.find(".post-upvote-button").props().className,
+        "upvoted"
       )
     }
   }
@@ -184,18 +181,18 @@ describe("CompactPostDisplay", () => {
         post,
         toggleUpvote
       })
-      assertButton(wrapper, prevUpvote, false)
-      wrapper.find(".upvote-button").simulate("click")
+      assertButton(wrapper, prevUpvote)
+      wrapper.find(".post-upvote-button").simulate("click")
       assert.isOk(toggleUpvote.calledOnce)
 
-      assertButton(wrapper, !prevUpvote, true)
+      assertButton(wrapper, !prevUpvote)
       resolveUpvote()
       post.upvoted = !prevUpvote
       wrapper.setProps({ post })
       // wait for promise resolve to trigger state changes
       await wait(10)
       wrapper.update()
-      assertButton(wrapper, !prevUpvote, false)
+      assertButton(wrapper, !prevUpvote)
     })
   })
 

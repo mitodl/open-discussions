@@ -13,8 +13,9 @@ import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
 import DropdownMenu from "./DropdownMenu"
 import SharePopup from "./SharePopup"
 import FollowButton from "./FollowButton"
+import PostUpvoteButton from "./PostUpvoteButton"
 
-import { formatPostTitle, PostVotingButtons } from "../lib/posts"
+import { formatPostTitle } from "../lib/posts"
 import { userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
 import { makeProfile } from "../lib/profile"
@@ -93,28 +94,25 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
     return (
       <div className="post-actions">
         <div className="left">
-          <PostVotingButtons
-            post={post}
-            className="expanded"
-            toggleUpvote={toggleUpvote}
-          />
+          <PostUpvoteButton post={post} toggleUpvote={toggleUpvote} />
           <ReportCount count={post.num_reports} />
         </div>
         <div className="right">
           {SETTINGS.username === post.author_id && post.text ? (
             <div
-              className="post-action edit-post"
+              className="post-action edit-post grey-surround"
               onClick={beginEditing(editPostKey(post), post)}
             >
               <i className="material-icons edit">edit</i>
-              Edit
+              <span>Edit</span>
             </div>
           ) : null}
-          <div className="post-action share-action">
-            <div onClick={showPostShareMenu}>
-              <i className="material-icons reply">reply</i>
-              Share
-            </div>
+          <div
+            className="post-action share-action grey-surround"
+            onClick={showPostShareMenu}
+          >
+            <i className="material-icons reply">reply</i>
+            <span>Share</span>
             {postShareMenuOpen ? (
               <SharePopup
                 url={postPermalink(post)}
@@ -126,14 +124,17 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
           <FollowButton post={post} toggleFollowPost={toggleFollowPost} />
           {userIsAnonymous() ? null : (
             <i
-              className="material-icons more_vert"
+              className="material-icons more_vert grey-surround"
               onClick={postDropdownMenuOpen ? null : showPostMenu}
             >
               more_vert
             </i>
           )}
           {postDropdownMenuOpen ? (
-            <DropdownMenu closeMenu={hidePostMenu}>
+            <DropdownMenu
+              closeMenu={hidePostMenu}
+              className="post-comment-dropdown"
+            >
               {SETTINGS.username === post.author_id ? (
                 <li className="comment-action-button delete-post">
                   <a onClick={showPostDeleteDialog} href="#">
@@ -174,25 +175,27 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
     const formattedDate = moment(post.created).fromNow()
 
     return (
-      <div className="post-summary expanded">
+      <div className="expanded-post-summary">
         <div className="summary">
           <div className="post-title">{formatPostTitle(post)}</div>
           <div className="authored-by">
-            <Link className="left" to={profileURL(post.author_id)}>
-              <ProfileImage
-                profile={makeProfile({
-                  name:                post.author_name,
-                  profile_image_small: post.profile_image
-                })}
-                imageSize={PROFILE_IMAGE_MICRO}
-              />
-              <span className="author-name">{post.author_name}</span>
-            </Link>
-            {post.author_headline ? (
-              <span className="author-headline">
-                &nbsp;&#8212;&nbsp;{post.author_headline}
-              </span>
-            ) : null}
+            <div className="left">
+              <Link to={profileURL(post.author_id)}>
+                <ProfileImage
+                  profile={makeProfile({
+                    name:                post.author_name,
+                    profile_image_small: post.profile_image
+                  })}
+                  imageSize={PROFILE_IMAGE_MICRO}
+                />
+                <span className="author-name">{post.author_name}</span>
+                {post.author_headline ? (
+                  <span className="author-headline">
+                    &nbsp;&#8212;&nbsp;{post.author_headline}
+                  </span>
+                ) : null}
+              </Link>
+            </div>
             <div className="right date">{formattedDate}</div>
           </div>
           {embedly && embedly.provider_name ? (

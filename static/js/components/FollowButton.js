@@ -38,26 +38,26 @@ export default class FollowButton extends React.Component<
     const { toggleFollowPost, post } = this.props
     const { popupVisible } = this.state
     return (
-      <div>
+      <React.Fragment>
         {post.subscribed ? (
           <div
-            className="post-action subscribed"
+            className="post-action subscribed grey-surround"
             onClick={preventDefaultAndInvoke(() => {
               toggleFollowPost(post)
             })}
           >
             <i className="material-icons rss_feed">rss_feed</i>
-            Unfollow
+            <span>Unfollow</span>
           </div>
         ) : (
           <div
-            className="post-action unsubscribed"
+            className="post-action unsubscribed grey-surround"
             onClick={preventDefaultAndInvoke(() => {
               userIsAnonymous() ? this.onTogglePopup() : toggleFollowPost(post)
             })}
           >
             <i className="material-icons rss_feed">rss_feed</i>
-            Follow
+            <span>Follow</span>
           </div>
         )}
         {userIsAnonymous() ? (
@@ -68,7 +68,7 @@ export default class FollowButton extends React.Component<
             className="reversed"
           />
         ) : null}
-      </div>
+      </React.Fragment>
     )
   }
 }

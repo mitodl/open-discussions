@@ -40,7 +40,11 @@ const renderExternalProviderLink = (provider: string) => {
       </a>
     )
   case "saml":
-    return <TouchstoneLoginButton />
+    return (
+      <div className="actions row">
+        <TouchstoneLoginButton />
+      </div>
+    )
   default:
     return null
   }
@@ -56,7 +60,13 @@ export const LoginProviderRequiredPage = ({
 }: LoginProviderRequiredPageProps) => {
   const externalLink = renderExternalProviderLink(provider)
   if (!externalLink) {
-    return <NotFound />
+    return (
+      <div className="auth-page">
+        <div className="main-content">
+          <NotFound />
+        </div>
+      </div>
+    )
   }
 
   const onBackButtonClick = preventDefaultAndInvoke(
@@ -64,7 +74,7 @@ export const LoginProviderRequiredPage = ({
   )
 
   return (
-    <div className="content auth-page login-provider-page">
+    <div className="auth-page login-provider-page">
       <div className="main-content">
         <Card className="login-provider-card">
           <MetaTags>

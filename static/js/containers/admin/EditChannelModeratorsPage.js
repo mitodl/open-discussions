@@ -169,13 +169,14 @@ const mapStateToProps = (state, ownProps) => {
 const loadMembers = (channelName: string) =>
   actions.channelModerators.get(channelName)
 const loadChannel = (channelName: string) => actions.channels.get(channelName)
-const addMember = (channel: Channel, email: string) =>
+const addModerator = (channel: Channel, email: string) =>
   actions.channelModerators.post(channel.name, email)
+const addSubscriber = (channel: Channel, username: string) =>
+  actions.channelSubscribers.post(channel.name, username)
 const removeMember = (channel: Channel, username: string) =>
   actions.channelModerators.delete(channel.name, username)
 const onSubmitError = formValidate =>
   formValidate({ email: `Error adding new moderator` })
-const onSubmit = (channel, { email }) => addMember(channel, email)
 
 const mergeProps = mergeAndInjectProps(
   (
@@ -183,7 +184,8 @@ const mergeProps = mergeAndInjectProps(
     {
       loadMembers,
       loadChannel,
-      onSubmit,
+      addModerator,
+      addSubscriber,
       formValidate,
       formBeginEdit,
       setSnackbarMessage
@@ -193,7 +195,9 @@ const mergeProps = mergeAndInjectProps(
     loadChannel:    () => loadChannel(channelName),
     onSubmitResult: formBeginEdit,
     onSubmit:       async form => {
-      const newMember = await onSubmit(channel, form)
+      const newMember = await addModerator(channel, form.email)
+      await addSubscriber(channel, newMember.moderator.moderator_name)
+
       setSnackbarMessage({
         message: `Successfully added ${
           newMember.moderator.email
@@ -210,9 +214,9 @@ export default R.compose(
     {
       loadMembers,
       loadChannel,
-      addMember,
+      addModerator,
+      addSubscriber,
       removeMember,
-      onSubmit,
       onSubmitError,
       setSnackbarMessage,
       setDialogData: (data: any) =>

@@ -10,7 +10,9 @@ import type {
   Contributor,
   ChannelContributors,
   ChannelModerators,
-  Moderator
+  ChannelSubscribers,
+  Moderator,
+  Subscriber
 } from "../flow/discussionTypes"
 
 const incr = incrementer()
@@ -78,6 +80,19 @@ export const makeModerators = (
   makeModerator(username, isModerator),
   makeModerator(null, isModerator),
   makeModerator(null, isModerator)
+]
+
+export const makeSubscriber = (username: ?string = null): Subscriber => ({
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  subscriber_name: username || `${casual.word}_${incr.next().value}`
+})
+
+export const makeSubscribers = (
+  username: ?string = null
+): ChannelSubscribers => [
+  makeSubscriber(username),
+  makeSubscriber(null),
+  makeSubscriber(null)
 ]
 
 export const makeImage = (imageName: string) => ({

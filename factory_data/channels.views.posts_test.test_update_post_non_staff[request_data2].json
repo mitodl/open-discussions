@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Nulla similique eveniet ipsam et saepe magni quaerat. Odio labore ratione ducimus voluptate earum. Nulla dolore sunt maiores repellat accusamus dolorem. Quam dolor nobis dicta consectetur.\nVel inventore facere laboriosam voluptas. Temporibus dolorem fugiat cumque tenetur illo cum. Autem illum iste facere dignissimos at quaerat. A quis dolorem animi similique recusandae.",
+      "name": "1536868979_illo",
+      "public_description": "Reiciendis dicta nam cupiditate cum impedit. Consequuntur quaerat molestias aut eius labore.",
+      "title": "Nemo quia quos neque in."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "2l",
+      "text": "Suscipit velit saepe voluptates possimus atque porro vitae quis. Non eos delectus ratione et.",
+      "title": "Aut alias ipsa animi."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CQA8EYMJF3RZ3C3D1N849CEP"
+    },
+    "staff_user": {
+      "username": "01CQA8F1XJQXFPSD6TGKSSA208"
+    }
+  }
+}

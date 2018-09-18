@@ -69,7 +69,7 @@ export class LoginPasswordPage extends React.Component<Props> {
     )
 
     return (
-      <div className="content auth-page login-password-page">
+      <div className="auth-page login-password-page">
         <div className="main-content">
           <Card className="login-card">
             <MetaTags>

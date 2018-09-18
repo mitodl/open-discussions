@@ -1,37 +1,46 @@
 .profile-card {
-  padding: 6px 22px 0 22px;
-  overflow: auto;
+  color: $navy;
 
-  @include breakpoint(phone) {
-    padding: 4px 9px 0;
+  .card-contents {
+    padding: 32px;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .actions {
+    justify-content: flex-end;
+  }
+
+  .profile-image-container {
+    margin-right: 40px;
+  }
+
+  .name-and-headline {
+    .name {
+      font-size: 24px;
+    }
+
+    .headline {
+      font-size: 16px;
+    }
+  }
+
+  .bio {
+    font-size: 16px;
+    margin-top: 22px;
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
-.profile-view-fullname {
-  display: table-cell;
-  vertical-align: middle;
-  height: 110px;
-}
-
-.profile-view-name {
-  font-size: 24px;
-  padding: 0px 0px 5px 10px;
-}
-
-.profile-view-headline {
-  padding: 10px 0px 10px 0px;
-}
-
-.profile-view-bio {
-  padding: 10px 0px 10px 0px;
-}
-
-.profile-edit-button {
-  float: right;
-}
-
-.image-and-name {
-  display: flex;
-  height: 110px;
-  margin-bottom: 20px;
+.profile-view-page,
+.profile-edit-page {
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+  }
 }

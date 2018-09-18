@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Autem doloribus eos eaque accusantium ipsum quidem. Inventore expedita possimus exercitationem quam natus rerum sapiente voluptas. Dolorem a libero saepe voluptatum error corporis.\nAb cum veniam a harum animi voluptatum. Quos labore nemo dolore nobis alias. Ut officiis repellat vero ipsum doloremque velit occaecati doloremque.\nDebitis vitae unde itaque fugiat porro. Libero ipsum nobis enim reprehenderit quod explicabo facilis. Natus assumenda nulla voluptates quos.",
+      "name": "1536871214_quidem",
+      "public_description": "Repudiandae dicta ipsa necessitatibus fugiat soluta labore. Blanditiis similique hic suscipit.",
+      "title": "Quidem inventore cumque voluptas impedit dolores."
+    }
+  },
+  "posts": {
+    "just a post": {
+      "id": "2u",
+      "text": "Et officia quidem deserunt eos. Commodi accusantium maiores mollitia quae omnis est quam.",
+      "title": "Rerum maxime dolores iusto nulla numquam."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CQAAK4FFYT7TQRYBTRTAE86T"
+    },
+    "staff_user": {
+      "username": "01CQAAK7QR22NBPTCSV9W3FDKG"
+    }
+  }
+}

@@ -60,7 +60,7 @@ export class RegisterConfirmPage extends React.Component<Props, *> {
     const showLoading = partialToken && code && !invalid
 
     return (
-      <div className="content auth-page register-confirm-page">
+      <div className="auth-page register-confirm-page">
         <div className="main-content">
           <Card className="register-confirm-card">
             <h3>Confirming Email</h3>

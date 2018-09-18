@@ -24,10 +24,10 @@
 
 .form .row,
 .form-header .row {
-  margin: 10px 10px 24px 15px;
+  margin: 10px 10px 24px 0;
 }
 
-.form .row .validation-message {
+.validation-message {
   background-color: $validation-bg;
   color: $validation-text;
   font-size: 14px;
@@ -108,38 +108,20 @@ label.radiolabel {
   font-size: 16px;
 }
 
-input[type="submit"],
-button[type="submit"],
-button.cancel,
-a.buttonLink {
-  background-color: $button-blue;
-  color: white;
-  margin: 0 10px 5px 0;
-  padding: 9px 16px;
-  border: none;
-  border-radius: 2px;
-  font-weight: 400;
-  font-size: 14px;
-  text-decoration: none;
-  cursor: pointer;
-
-  &:hover {
-    box-shadow: 2px 3px 5px 0px rgba(0, 0, 0, 0.2);
-    transition: none;
-  }
-}
-
-button.cancel,
-button.disabled,
-button[disabled],
-a.buttonLink.cancel {
-  background-color: #cecece !important;
-}
-
 input[type="checkbox"],
 input[type="radio"] {
   box-sizing: border-box;
   font-size: 16px;
+}
+
+.mdc-checkbox::before,
+.mdc-checkbox::after {
+  background-color: $navy;
+}
+
+.mdc-checkbox__background {
+  background-color: $navy !important;
+  border-color: $navy !important;
 }
 
 input::placeholder,

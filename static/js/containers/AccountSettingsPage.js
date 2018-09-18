@@ -68,7 +68,7 @@ class AccountSettingsPage extends React.Component<Props> {
     const { socialAuths, match } = this.props
 
     return (
-      <div className="content">
+      <React.Fragment>
         <MetaTags>
           <title>{formatTitle("Account Settings")}</title>
           <CanonicalLink match={match} />
@@ -88,7 +88,7 @@ class AccountSettingsPage extends React.Component<Props> {
             )(socialAuths)}
           </Card>
         </div>
-      </div>
+      </React.Fragment>
     )
   }
 }
