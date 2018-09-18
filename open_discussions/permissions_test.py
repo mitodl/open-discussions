@@ -341,13 +341,21 @@ def test_not_anonymous(method, mocker):
     assert perm.has_permission(request, mocker.Mock()) is True
 
 
-@pytest.mark.betamax
-def test_channel_exists(mocker, public_channel):
+@pytest.mark.parametrize('name,raises_404', [
+    ['real', False],
+    ['fake', True],
+    [None, False]
+])
+@pytest.mark.django_db
+def test_channel_exists(mocker, name, raises_404):
     """
-    channel_exists function should raise an Http404 if channel doesn't exist
+    channel_exists function should raise an Http404 if channel name is not None and doesn't exist
     """
-    real_channel_view = mocker.Mock(kwargs={'channel_name': public_channel.name})
-    fake_channel_view = mocker.Mock(kwargs={'channel_name': 'fake'})
-    assert channel_exists(real_channel_view)
-    with pytest.raises(Http404):
-        channel_exists(fake_channel_view)
+    channel_view = mocker.Mock(kwargs={'channel_name': name})
+    if name and not raises_404:
+        Channel.objects.create(name=name)
+    if raises_404:
+        with pytest.raises(Http404):
+            channel_exists(channel_view)
+    else:
+        assert channel_exists(channel_view)

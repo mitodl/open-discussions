@@ -1,10 +1,10 @@
 """Custom permissions"""
+from django.http import Http404
 from prawcore.exceptions import (
     Forbidden as PrawForbidden,
     Redirect as PrawRedirect
 )
 from rest_framework import permissions
-from rest_framework.generics import get_object_or_404
 
 from channels.models import Channel
 from open_discussions import features
@@ -22,9 +22,9 @@ def channel_exists(view):
         bool: True if Channel exists (or there is no channel name)
     """
     channel_name = view.kwargs.get('channel_name', None)
-    if channel_name:
-        get_object_or_404(Channel, name=channel_name)
-    return True
+    if not channel_name or Channel.objects.filter(name=channel_name).exists():
+        return True
+    raise Http404()
 
 
 def is_staff_user(request):
