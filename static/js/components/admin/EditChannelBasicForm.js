@@ -105,7 +105,6 @@ export default class EditChannelBasicForm extends React.Component<Props> {
             <textarea
               type="text"
               name="description"
-              className="no-height"
               placeholder="Description"
               value={form.description}
               onChange={onUpdate}
