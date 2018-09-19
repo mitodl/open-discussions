@@ -77,10 +77,8 @@ def test_messages_for_recipients():
         assert msg.subject == "Welcome {}".format(user.profile.name)
 
 
-def test_send_message(mocker, mailoutbox):
+def test_send_message(mailoutbox):
     """Tests that send_messages works as expected"""
-    sendmail = mocker.patch('mail.api.AnymailMessage.send', side_effect=ConnectionError)
-    patched_logger = mocker.patch('mail.api.log')
     users = UserFactory.create_batch(5)
 
     messages = list(messages_for_recipients([
@@ -93,6 +91,21 @@ def test_send_message(mocker, mailoutbox):
 
     for message in mailoutbox:
         assert message in messages
+
+
+def test_send_message_failure(mocker):
+    """Tests that send_messages logs all exceptions"""
+    sendmail = mocker.patch('mail.api.AnymailMessage.send', side_effect=ConnectionError)
+    patched_logger = mocker.patch('mail.api.log')
+    users = UserFactory.create_batch(2)
+
+    messages = list(messages_for_recipients([
+        (recipient, context_for_user(user, {
+            'url': 'https://example.com',
+        })) for recipient, user in safe_format_recipients(users)
+    ], 'sample'))
+
+    send_messages(messages)
 
     assert sendmail.call_count == len(users)
     assert patched_logger.exception.call_count == len(users)

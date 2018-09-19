@@ -16,10 +16,7 @@ messages = messages_for_recipients([
 # optional: anything else to `messages` beyond what `messages_for_recipients` does
 
 # send the emails
-try:
-    send_messages(messages)
-except SendEmailsException as exc:
-    pass  # handle failed emails
+send_messages(messages)
 """
 from email.utils import formataddr
 import logging
