@@ -13,7 +13,10 @@ from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 from profiles.utils import image_uri
 
-pytestmark = pytest.mark.betamax
+pytestmark = [
+    pytest.mark.betamax,
+    pytest.mark.usefixtures('mock_channel_exists')
+]
 
 
 def test_report_post(user_client, private_channel_and_contributor, reddit_factories):

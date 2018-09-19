@@ -1,6 +1,7 @@
 """Tests for permissions"""
-from django.contrib.auth.models import AnonymousUser
 import pytest
+from django.contrib.auth.models import AnonymousUser
+from django.http import Http404
 from prawcore.exceptions import (
     Forbidden as PrawForbidden,
     Redirect as PrawRedirect,
@@ -20,7 +21,9 @@ from open_discussions.permissions import (
     is_readonly,
     is_moderator,
     is_staff_user,
-)
+    channel_exists)
+
+pytestmark = pytest.mark.usefixtures('mock_channel_exists')
 
 
 @pytest.mark.parametrize('method,result', [
@@ -336,3 +339,23 @@ def test_not_anonymous(method, mocker):
     perm = AnonymousAccessReadonlyPermission()
     request = mocker.Mock(user=mocker.Mock(is_anonymous=False), method=method)
     assert perm.has_permission(request, mocker.Mock()) is True
+
+
+@pytest.mark.parametrize('name,raises_404', [
+    ['real', False],
+    ['fake', True],
+    [None, False]
+])
+@pytest.mark.django_db
+def test_channel_exists(mocker, name, raises_404):
+    """
+    channel_exists function should raise an Http404 if channel name is not None and doesn't exist
+    """
+    channel_view = mocker.Mock(kwargs={'channel_name': name})
+    if name and not raises_404:
+        Channel.objects.create(name=name)
+    if raises_404:
+        with pytest.raises(Http404):
+            channel_exists(channel_view)
+    else:
+        assert channel_exists(channel_view)

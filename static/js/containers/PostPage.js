@@ -507,7 +507,7 @@ const mapStateToProps = (state, ownProps) => {
   const embedlyResponse =
     post && post.url ? embedly.data.get(post.url) : undefined
 
-  const notFound = any404Error([posts, comments])
+  const notFound = any404Error([posts, comments, channels])
   const notAuthorized = anyNotAuthorizedErrorType([posts, comments])
 
   const loaded = notFound

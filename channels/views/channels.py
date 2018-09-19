@@ -1,4 +1,5 @@
 """Views for REST APIs for channels"""
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
@@ -58,7 +59,7 @@ class ChannelDetailView(RetrieveUpdateAPIView):
         return {
             'channel_api': self.request.channel_api,
             'channels': {
-                self.kwargs['channel_name']: Channel.objects.get(name=self.kwargs['channel_name']),
+                self.kwargs['channel_name']: get_object_or_404(Channel, name=self.kwargs['channel_name']),
             },
             'view': self,
         }
