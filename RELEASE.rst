@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.46.0 (Released September 19, 2018)
+--------------
+
+- Allow reddit errors to fail user creation
+- fix small style regression
+- Add description to basic channel form (#1199)
+- Site redesign
+- Always show current user at top of mods list (#1191)
+- Refactored tests and added pytest-lazy-fixture
+- Added random channel avatars and script to generate them
+- Add subscriber when a moderator adds another moderator (#1190)
+
 Version 0.45.2 (Released September 17, 2018)
 --------------
 
