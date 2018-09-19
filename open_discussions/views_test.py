@@ -4,11 +4,9 @@ Test end to end django views.
 # pylint: disable=redefined-outer-name,too-many-arguments
 import json
 import xml.etree.ElementTree as etree
-from urllib.parse import urlencode
 
 import pytest
 from django.urls import reverse
-from rest_framework_jwt.settings import api_settings
 
 from open_discussions import features
 
@@ -19,10 +17,9 @@ pytestmark = [
 lazy = pytest.lazy_fixture
 
 
-@pytest.mark.parametrize('test_user,test_jwt_token,expect_auth', [
-    [lazy('logged_in_user'), None, True],
-    [lazy('user'), lazy('jwt_token'), False],
-    [None, None, False]
+@pytest.mark.parametrize('test_user,expect_auth', [
+    [lazy('logged_in_user'), True],
+    [None, False]
 ])
 def test_webpack_url(
         settings,
@@ -30,7 +27,6 @@ def test_webpack_url(
         client,
         authenticated_site,
         test_user,
-        test_jwt_token,
         expect_auth
 ):
     """Verify that webpack bundle src shows up in production"""
@@ -44,7 +40,7 @@ def test_webpack_url(
     settings.ENVIRONMENT = 'test'
     settings.VERSION = '1.2.3'
 
-    if test_user or test_jwt_token:
+    if test_user:
         expected_user_values = {
             'user_email': test_user.email,
             'username': test_user.username,
@@ -94,27 +90,6 @@ def test_webpack_url(
         },
         **expected_user_values
     }
-
-
-def test_webpack_url_jwt_redirect(client, user):
-    """Test that a redirect happens for MM JWT tokens if provider is present"""
-    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-
-    payload = jwt_payload_handler(user)
-    payload['provider'] = 'micromasters'
-    jwt_token = jwt_encode_handler(payload)
-
-    client.cookies[api_settings.JWT_AUTH_COOKIE] = jwt_token
-
-    response = client.get(reverse('open_discussions-index'))
-    assert response.status_code == 302
-    assert response.url == '{}?{}'.format(
-        reverse('social:complete', args=('micromasters',)),
-        urlencode({
-            'next': 'http://testserver/',
-        })
-    )
 
 
 @pytest.mark.parametrize('is_enabled', [True, False])

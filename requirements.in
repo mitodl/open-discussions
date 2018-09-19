@@ -29,7 +29,6 @@ newrelic
 Pillow==3.4.2
 psycopg2==2.7
 praw==4.5.1
-premailer==3.1.1
 python-dateutil
 python3-saml==1.4.1
 raven==6.9.0

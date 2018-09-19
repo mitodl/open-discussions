@@ -2,64 +2,85 @@
 {% load humanize %}
 {% load timeago %}
 
-{% block title %}Open Discussions - Recent Popular Posts{% endblock %}
-{% block styles %}
-<style type="text/css">
-/* -------------------------------------
-    DISCUSSION POSTS TABLE
-------------------------------------- */
-p.lead-in {
-  text-align: center;
-  color: #666666;
-  font-size: 16px;
-  margin: 0;
-}
-img.user-photo {
-  width: 72px;
-  min-width: 72px;
-  border-radius: 100%;
-}
-h3.post-title {
-  margin: 0 0 5px;
-  font-weight: 600;
-}
-p.by-line {
-  margin: 0;
-}
-p.comments {
-  margin: 0;
-}
-.recent-posts-table td {
-  border-bottom: 1px solid #ddd;
-}
-</style>
-{% endblock %}
-
+{% block title %}{{ site_name }} - Recent Popular Posts{% endblock %}
 {% block content %}
 
-{% block logo %}<div class="aligncenter">
-  <img src="{{ base_url }}/static/images/mit-logo-micromasters.jpg" width="241" style="margin-bottom: 27px" />
-</div>{% endblock %}
-<div class="section">
-  <p class="lead-in">Here are some recent posts you might have missed</p>
-</div>
-<table class="recent-posts-table" width="100%" cellpadding="13" cellspacing="0" border="0">
-  <tbody>
-    {% for post in posts %}
+<!-- 1 Column Text : BEGIN -->
+  <tr>
+      <td style="background-color: #ffffff;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                  <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
+                      <h1 style="margin: 0 0 10px; font-size: 25px; line-height: 30px; color: #03152d; font-weight: bold;">Here are some recent posts you might have missed</h1>
+                  </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+<!-- 1 Column Text : END -->
+<!-- Thumbnail Right, Text Left : BEGIN -->
     <tr>
-      <td width="72" style="width: 72px"><img src="{{ post.profile_image }}" class="user-photo" width="72" height="72"/></td>
-      <td><div>
-        <h3 class="post-title">
-          <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}">{{ post.title }}</a>
-        </h3>
-        <p class="by-line">by {{ post.author_name }}, {{ post.created|parse_iso|naturaltime }} in <a href="{{ base_url }}{% url 'channel' channel_name=post.channel_name %}">{{ post.channel_title }}</a></p>
-        <p class="comments">{{ post.num_comments }} comment{% if post.num_comments != 1 %}s{% endif %}</p>
-      </div></td>
+        <!-- dir=rtl is where the magic happens. This can be changed to dir=ltr to swap the alignment on wide while maintaining stack order on narrow. -->
+        <td dir="rtl" height="100%" valign="top" width="100%" style="padding: 10px 0; background-color: #ffffff;">
+            <!--[if mso]>
+            <table align="center" role="presentation" border="0" cellspacing="0" cellpadding="0" width="660" style="width: 660px;">
+            <tr>
+            <td valign="top" width="660">
+            <![endif]-->
+            <table align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:660px;">
+              {% for post in posts %}
+                <tr>
+                    <td align="center" valign="top" style="font-size:0; padding: 10px 0;">
+                        <!--[if mso]>
+                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="660" style="width: 660px;">
+                        <tr>
+                        <td valign="top" width="660" style="width: 660px;">
+                        <![endif]-->
+                        <div style="display:inline-block; margin: 0 -2px; min-width:320px; vertical-align:top;" class="stack-column">
+                          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                            <tr>
+                              <td dir="ltr" style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; padding: 10px 10px 0; text-align: left;" class="center-on-narrow">
+                                <h2 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #03152d; font-weight: bold;">
+                                  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}" style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #03152d; font-weight: bold;">
+                                    {{ post.title }}
+                                  </a>
+                                </h2>
+                                <p style="margin: 0 0 10px 0;">{# NOTE: this next line is intentionally long so it renders correctly in plaintext #}
+                                  <a href="{{ base_url }}{% url 'profile' username=post.author_id %}" style="color: #212121">{{ post.author_name }}</a>{% if post.author_headline %}<span style="color: #b0b0b0;">&nbsp;&#8212;&nbsp;{{ post.author_headline }}</span>{% endif %}
+                                </p>
+                                <p style="margin: 0 0 10px 0; color: #b0b0b0;">{{ post.created|parse_iso|naturaltime }}</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
+                        <!--[if mso]>
+                        </td>
+                        </tr>
+                        </table>
+                        <![endif]-->
+                    </td>
+                </tr>
+              {% endfor %}
+                <tr>
+                    <td style="padding: 20px;">
+                        <!-- Button : BEGIN -->
+                        <table align="left" role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: auto;">
+                            <tr>
+                                <td class="button-td button-td-primary" style="border-radius: 4px; background: #a31f34;">
+                                     <a class="button-a button-a-primary" href="{{ base_url }}" style="background: #ffffff; border: 1px solid #a31f34; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #a31f34; display: block; border-radius: 4px;">Read More</a>
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- Button : END -->
+                    </td>
+                </tr>
+            </table>
+            <!--[if mso]>
+            </td>
+            </tr>
+            </table>
+            <![endif]-->
+        </td>
     </tr>
-    {% endfor %}
-  </tbody>
-</table>
-<div class="read-more aligncenter">
-  <a href="{{ base_url }}" class="ghost-button">Read More</a>
-</div>
+<!-- Thumbnail Right, Text Left : END -->
 {% endblock %}

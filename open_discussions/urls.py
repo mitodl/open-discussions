@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'', include('social_django.urls', namespace='social')),
     url(r'', include('channels.urls')),
     url(r'', include('profiles.urls')),
+    url(r'', include('mail.urls')),
     url(r'', include('notifications.urls')),
     url(r'', include('embedly.urls')),
     url(r'^api/token/refresh/', refresh_jwt_token),
@@ -59,7 +60,7 @@ urlpatterns = [
     url(r'^create_post/', index),
     url(r'^settings/', index),
     url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
-    url(r'^profile/[A-Za-z0-9_]+/', index, name='profile'),
+    url(r'^profile/(?P<username>[A-Za-z0-9_]+)/', index, name='profile'),
 
     url(r'^login/', index, name='login'),
     url(r'^signup/', index, name='signup'),
@@ -72,8 +73,8 @@ urlpatterns = [
         index,
         name='password-reset-confirm'
     ),
-    url(r'^privacy-statement/', index),
-    url(r'^terms-and-conditions/', index),
+    url(r'^privacy-statement/', index, name='privacy-statement'),
+    url(r'^terms-and-conditions/', index, name='terms-and-conditions'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

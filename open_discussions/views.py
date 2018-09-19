@@ -2,84 +2,34 @@
 open_discussions views
 """
 import json
-import time
-from datetime import timedelta
-from urllib.parse import urlencode
 
-import jwt
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
 from raven.contrib.django.raven_compat.models import client as sentry
-from rest_framework_jwt.settings import api_settings
 from social_django.utils import load_strategy, load_backend
-from social_django.models import UserSocialAuth
 
-from authentication.backends.micromasters import MicroMastersAuth
 from open_discussions import features
 
 from open_discussions.templatetags.render_bundle import public_path
-from sites.models import AuthenticatedSite
-
-
-User = get_user_model()
+from sites.api import get_default_site
 
 
 def index(request, **kwargs):  # pylint: disable=unused-argument
     """Render the react app"""
     user = None
-    auth = request.COOKIES.get(api_settings.JWT_AUTH_COOKIE)
-    site_key = settings.OPEN_DISCUSSIONS_DEFAULT_SITE_KEY
+    username = None
+    user_full_name = None
+    user_email = None
 
     if request.user.is_authenticated:
         user = request.user
         username = request.user.username
-    else:
-        try:
-            # verify with JWT instead of JWT_DECODE_HANDLER because we want to decode expired tokens
-            payload = jwt.decode(
-                auth,
-                api_settings.JWT_SECRET_KEY,
-                # use a high leeway because we're interested in whether this token was ever valid
-                leeway=timedelta(days=365),
-                algorithms=[api_settings.JWT_ALGORITHM]
-            )
-
-            username = payload.get("username", None)
-            site_key = payload.get("site_key", site_key)
-            provider = payload.get("provider", None)
-            if provider:
-                if payload.get('exp', 0) > time.time():
-                    # redirect to authenticate the user using their JWT for the provider
-                    # PSA will then redirect back here using the next param
-                    return redirect("{}?{}".format(
-                        reverse('social:complete', args=(provider,)),
-                        urlencode({
-                            'next': request.build_absolute_uri(),
-                        })
-                    ))
-                user = UserSocialAuth.objects.get(provider=MicroMastersAuth.name, uid=username).user
-            else:
-
-                user = User.objects.get(username=username)
-
-        except jwt.InvalidTokenError:
-            username = None
-
-    site = AuthenticatedSite.objects.filter(key=site_key).first()
-
-    if site is None:
-        raise ImproperlyConfigured("Unable to find site for site key: '{}'".format(site_key))
-
-    user_full_name = None
-    user_email = None
-
-    if user:
         user_full_name = user.profile.name
         user_email = user.email
+
+    site = get_default_site()
 
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
