@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.46.0
+Version 0.46.0 (Released September 19, 2018)
 --------------
 
 - Allow reddit errors to fail user creation
