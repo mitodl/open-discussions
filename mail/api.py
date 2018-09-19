@@ -16,12 +16,10 @@ messages = messages_for_recipients([
 # optional: anything else to `messages` beyond what `messages_for_recipients` does
 
 # send the emails
-try:
-    send_messages(messages)
-except SendEmailsException as exc:
-    pass  # handle failed emails
+send_messages(messages)
 """
 from email.utils import formataddr
+import logging
 import re
 
 from anymail.message import AnymailMessage
@@ -31,8 +29,9 @@ from django.core import mail
 from django.template.loader import render_to_string
 from premailer import transform
 
-from mail.exceptions import SendEmailsException
 from open_discussions.authentication import get_encoded_and_signed_subscription_token
+
+log = logging.getLogger()
 
 
 def safe_format_recipients(recipients):
@@ -159,22 +158,13 @@ def messages_for_recipients(recipients_and_contexts, template_name):
 
 def send_messages(messages):
     """
-    Sends the messages
+    Sends the messages and logs any exceptions
 
     Args:
         messages (list of EmailMultiAlternatives): list of messages to send
-
-    Raises:
-        SendEmailsException: error if any messages failed to send and why
     """
-    failed_message_errors = []
     for msg in messages:
         try:
             msg.send()
-        except Exception as exc:  # pylint: disable=broad-except
-            failed_message_errors.append(
-                (msg, exc)
-            )
-
-    if failed_message_errors:
-        raise SendEmailsException(failed_message_errors)
+        except:  # pylint: disable=bare-except
+            log.exception("Error sending email '%s' to %s", msg.subject, msg.to)
