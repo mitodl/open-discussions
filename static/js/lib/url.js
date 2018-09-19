@@ -57,11 +57,11 @@ export const embedlyResizeImage = (key: string, url: string, height: number) =>
     url
   )}&height=${height}&grow=false&errorurl=${blankThumbnailUrl()}`
 
+export const absolutizeURL = (url: string) =>
+  new URL(url, window.location.origin).toString()
+
 export const postPermalink = (post: Post): string =>
-  new URL(
-    postDetailURL(post.channel_name, post.id),
-    window.location.origin
-  ).toString()
+  absolutizeURL(postDetailURL(post.channel_name, post.id, post.slug))
 
 // pull the channel name out of location.pathname
 // see here for why this hackish approach was necessary:

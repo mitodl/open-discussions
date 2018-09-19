@@ -14,7 +14,7 @@ import {
   replyToCommentKey,
   editCommentKey
 } from "./CommentForms"
-import { commentPermalink, profileURL } from "../lib/url"
+import { commentPermalink, profileURL, absolutizeURL } from "../lib/url"
 import Router from "../Router"
 import SharePopup from "./SharePopup"
 
@@ -104,7 +104,7 @@ describe("CommentTree", () => {
     const wrapper = renderCommentTree(openShareMenu(comments[0]))
     assert.ok(wrapper.find(SharePopup).exists())
     const { url } = wrapper.find(SharePopup).props()
-    assert.equal(url, permalinkFunc(comments[0].id))
+    assert.equal(url, absolutizeURL(permalinkFunc(comments[0].id)))
   })
 
   it("should render all replies to a top-level comment", () => {

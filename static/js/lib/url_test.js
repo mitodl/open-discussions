@@ -21,7 +21,8 @@ import {
   postPermalink,
   embedlyThumbnail,
   blankThumbnailUrl,
-  embedlyResizeImage
+  embedlyResizeImage,
+  absolutizeURL
 } from "./url"
 import { makePost } from "../factories/posts"
 
@@ -211,7 +212,9 @@ describe("url helper functions", () => {
       const post = makePost()
       const url = postPermalink(post)
       assert.ok(url.startsWith(window.location.origin))
-      assert.ok(url.includes(postDetailURL(post.channel_name, post.id)))
+      assert.ok(
+        url.includes(postDetailURL(post.channel_name, post.id, post.slug))
+      )
     })
   })
 
@@ -247,6 +250,14 @@ describe("url helper functions", () => {
         blankThumbnailUrl(),
         `${window.location.origin}/static/images/blank.png`
       )
+    })
+  })
+
+  describe("absolutizeURL", () => {
+    it("should take a relative URL and make it absolute", () => {
+      const url = absolutizeURL("/foo/bar/baz")
+      assert.ok(url.startsWith(window.location.origin))
+      assert.ok(url.includes("/foo/bar/baz"))
     })
   })
 })

@@ -24,7 +24,7 @@ import {
   getCommentReplyInitialValue
 } from "../components/CommentForms"
 import { makeProfile } from "../lib/profile"
-import { profileURL } from "../lib/url"
+import { profileURL, absolutizeURL } from "../lib/url"
 
 import type {
   GenericComment,
@@ -147,7 +147,7 @@ export default class CommentTree extends React.Component<Props> {
           </div>
           {commentShareOpen ? (
             <SharePopup
-              url={commentPermalink(comment.id)}
+              url={absolutizeURL(commentPermalink(comment.id))}
               closePopup={hideShareMenu}
             />
           ) : null}
