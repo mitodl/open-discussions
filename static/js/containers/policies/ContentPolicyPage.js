@@ -21,9 +21,7 @@ export default class ContentPolicyPage extends React.Component<Props> {
     return (
       <div className="content content-policy-page">
         <MetaTags>
-          <title>
-            {formatTitle("Community Guidelines")}
-          </title>
+          <title>{formatTitle("Community Guidelines")}</title>
           <CanonicalLink match={match} />
         </MetaTags>
         <div className="main-content">
@@ -84,8 +82,8 @@ export default class ContentPolicyPage extends React.Component<Props> {
                 accurate to avoid any confusion down the line.
               </li>
               <li>
-                Read these rules and guidelines before
-                posting for the first time. Read it again every once in a while.
+                Read these rules and guidelines before posting for the first
+                time. Read it again every once in a while.
               </li>
             </ul>
 
