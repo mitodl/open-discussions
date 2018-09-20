@@ -1,3 +1,4 @@
+/* global SETTINGS:false */
 import React from "react"
 import R from "ramda"
 import { Provider } from "react-redux"
@@ -22,7 +23,6 @@ import Router from "../Router"
 import LoginPopup from "./LoginPopup"
 
 import * as forms from "../actions/forms"
-import * as utilFuncs from "../lib/util"
 import { actions } from "../actions"
 import { CLEAR_COMMENT_ERROR } from "../actions/comment"
 import { SET_POST_DATA, setPostData } from "../actions/post"
@@ -158,12 +158,15 @@ describe("CommentForms", () => {
       })
     })
 
-    it("should be enabled but display a login popup on click if user is anonymous", async () => {
-      helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-      wrapper = renderPostForm()
-      assert.isFalse(wrapper.find("button").props().disabled)
-      wrapper.find("textarea").simulate("click")
-      assert.isTrue(wrapper.find(LoginPopup).props().visible)
+    //
+    ;["change", "focus"].forEach(event => {
+      it(`should be enabled but display a login popup on ${event} if user is anonymous`, async () => {
+        SETTINGS.username = null
+        wrapper = renderPostForm()
+        assert.isFalse(wrapper.find("button").props().disabled)
+        wrapper.find("textarea").simulate(event)
+        assert.isTrue(wrapper.find(LoginPopup).props().visible)
+      })
     })
 
     it("should submit the form", async () => {
