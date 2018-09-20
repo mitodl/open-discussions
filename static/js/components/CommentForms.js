@@ -72,7 +72,8 @@ const getPostReplyInitialValue = (parent: Post) => ({
   text:    ""
 })
 
-const userConditionalFunction = (
+const userOrAnonymousFunction = (
+  //Return one of two functions depending on whether the user is logged in or anonymous.
   userFunc: ?Function,
   anonymousFunc: ?Function
 ) =>
@@ -107,7 +108,7 @@ const CommentFormHelper = ({
 }: CommentFormProps) => (
   <div className="reply-form">
     <form
-      onSubmit={userConditionalFunction(onSubmit, onTogglePopup)}
+      onSubmit={userOrAnonymousFunction(onSubmit, onTogglePopup)}
       className="form"
       onKeyDown={e => {
         if (e.key === "Enter" && e.ctrlKey && !disabled && !isEmptyText(text)) {
@@ -136,9 +137,9 @@ const CommentFormHelper = ({
             placeholder="Write a reply here..."
             value={text || ""}
             onChange={
-              disabled ? userConditionalFunction(null, onTogglePopup) : onUpdate
+              disabled ? userOrAnonymousFunction(null, onTogglePopup) : onUpdate
             }
-            onFocus={userConditionalFunction(null, onTogglePopup)}
+            onFocus={userOrAnonymousFunction(null, onTogglePopup)}
             autoFocus={autoFocus}
           />
         )}
