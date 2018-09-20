@@ -72,6 +72,15 @@ const getPostReplyInitialValue = (parent: Post) => ({
   text:    ""
 })
 
+const userOrAnonymousFunction = (
+  //Return one of two functions depending on whether the user is logged in or anonymous.
+  userFunc: ?Function,
+  anonymousFunc: ?Function
+) =>
+  userIsAnonymous() && anonymousFunc
+    ? preventDefaultAndInvoke(anonymousFunc)
+    : userFunc
+
 type CommentFormProps = {
   onSubmit: (e: Event) => Promise<*>,
   text: string,
@@ -99,12 +108,7 @@ const CommentFormHelper = ({
 }: CommentFormProps) => (
   <div className="reply-form">
     <form
-      onSubmit={
-        userIsAnonymous() && onTogglePopup
-          ? // $FlowFixMe - the above ensures onTogglePopup is defined
-          preventDefaultAndInvoke(onTogglePopup)
-          : onSubmit
-      }
+      onSubmit={userOrAnonymousFunction(onSubmit, onTogglePopup)}
       className="form"
       onKeyDown={e => {
         if (e.key === "Enter" && e.ctrlKey && !disabled && !isEmptyText(text)) {
@@ -132,13 +136,10 @@ const CommentFormHelper = ({
             className="input"
             placeholder="Write a reply here..."
             value={text || ""}
-            onChange={disabled ? null : onUpdate}
-            onClick={
-              userIsAnonymous() && onTogglePopup
-                ? // $FlowFixMe: the above
-                preventDefaultAndInvoke(onTogglePopup)
-                : null
+            onChange={
+              disabled ? userOrAnonymousFunction(null, onTogglePopup) : onUpdate
             }
+            onFocus={userOrAnonymousFunction(null, onTogglePopup)}
             autoFocus={autoFocus}
           />
         )}
