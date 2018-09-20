@@ -28,7 +28,7 @@ import {
 } from "../../actions/ui"
 
 import type { AddMemberForm, Channel, Member } from "../../flow/discussionTypes"
-import type { WithFormProps } from "../../flow/formTypes"
+import type { FormErrors, WithFormProps } from "../../flow/formTypes"
 import { channelURL } from "../../lib/url"
 
 export const CONTRIBUTORS_KEY = "channel:edit:contributors"
@@ -146,6 +146,18 @@ export class EditChannelContributorsPage extends React.Component<Props> {
   }
 }
 
+const loadMembers = (channelName: string) =>
+  actions.channelContributors.get(channelName)
+const loadChannel = (channelName: string) => actions.channels.get(channelName)
+const addMember = (channel: Channel, email: string) =>
+  actions.channelContributors.post(channel.name, email)
+const removeMember = (channel: Channel, username: string) =>
+  actions.channelContributors.delete(channel.name, username)
+const onSubmitFailure = (): FormErrors<*> => ({
+  email: "Error adding new contributor"
+})
+const onSubmit = (channel, { email }) => addMember(channel, email)
+
 const mapStateToProps = (state, ownProps) => {
   const channelName = getChannelName(ownProps)
   const channel = state.channels.data.get(channelName)
@@ -163,34 +175,16 @@ const mapStateToProps = (state, ownProps) => {
     processing,
     memberToRemove,
     dialogOpen,
+    onSubmitFailure,
     validateForm: validateMembersForm,
     form:         form
   }
 }
 
-const loadMembers = (channelName: string) =>
-  actions.channelContributors.get(channelName)
-const loadChannel = (channelName: string) => actions.channels.get(channelName)
-const addMember = (channel: Channel, email: string) =>
-  actions.channelContributors.post(channel.name, email)
-const removeMember = (channel: Channel, username: string) =>
-  actions.channelContributors.delete(channel.name, username)
-const onSubmitError = formValidate =>
-  formValidate({ email: `Error adding new contributor` })
-const onSubmit = (channel, { email }) => addMember(channel, email)
-
 const mergeProps = mergeAndInjectProps(
   (
     { channelName, channel },
-    {
-      loadMembers,
-      loadChannel,
-      onSubmit,
-      onSubmitError,
-      formValidate,
-      formBeginEdit,
-      setSnackbarMessage
-    }
+    { loadMembers, loadChannel, onSubmit, formBeginEdit, setSnackbarMessage }
   ) => ({
     loadMembers:    () => loadMembers(channelName),
     loadChannel:    () => loadChannel(channelName),
@@ -202,8 +196,7 @@ const mergeProps = mergeAndInjectProps(
           newMember.contributor.email
         } as a contributor`
       })
-    },
-    onSubmitError: () => onSubmitError(formValidate)
+    }
   })
 )
 
@@ -216,7 +209,6 @@ export default R.compose(
       addMember,
       removeMember,
       onSubmit,
-      onSubmitError,
       setSnackbarMessage,
       setDialogData: (data: any) =>
         setDialogData({ dialogKey: DIALOG_REMOVE_MEMBER, data: data }),

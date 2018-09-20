@@ -90,17 +90,21 @@ describe("PasswordResetPage", () => {
     )
   })
 
-  it("should pass an error object into the form when the API call fails", async () => {
-    const { inner } = await renderPage({
-      passwordReset: {
-        error: {
-          email: "This email doesn't exist"
-        }
-      }
+  describe("onSubmitFailure prop", () => {
+    [
+      [
+        { email: "error text" },
+        "error text",
+        "reset API response with an email error"
+      ],
+      [{}, "Error resetting password", "empty reset API response"]
+    ].forEach(([submitResponse, expErrorText, responseDesc]) => {
+      it(`should return correct error object when given ${responseDesc}`, async () => {
+        const { wrapper } = await renderPage()
+        const onSubmitFailure = wrapper.prop("onSubmitFailure")
+        const submitFailureResult = onSubmitFailure(submitResponse)
+        assert.deepEqual(submitFailureResult, { email: expErrorText })
+      })
     })
-
-    const form = inner.find("PasswordResetForm")
-    assert.ok(form.exists())
-    assert.equal(form.prop("emailApiError"), "This email doesn't exist")
   })
 })

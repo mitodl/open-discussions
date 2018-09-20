@@ -1,6 +1,5 @@
 // @flow
 import React from "react"
-import R from "ramda"
 import { Link } from "react-router-dom"
 
 import { validationMessage } from "../../lib/validation"
@@ -8,18 +7,13 @@ import { validationMessage } from "../../lib/validation"
 import type { PasswordForm } from "../../flow/authTypes"
 import type { FormProps } from "../../flow/formTypes"
 
-type LoginPasswordFormProps = {
-  formError: ?string
-} & FormProps<PasswordForm>
-
 const AuthPasswordForm = ({
   form,
   validation,
   onSubmit,
   onUpdate,
-  processing,
-  formError
-}: LoginPasswordFormProps) => (
+  processing
+}: FormProps<PasswordForm>) => (
   <form onSubmit={onSubmit} className="form">
     <div className="passwordfield row">
       <input
@@ -29,11 +23,6 @@ const AuthPasswordForm = ({
         onChange={onUpdate}
       />
       {validationMessage(validation.password)}
-    </div>
-    <div className="error row">
-      {!processing && R.isEmpty(validation)
-        ? validationMessage(formError)
-        : null}
     </div>
     <div className="row">
       <Link className="password-reset" to="/password_reset">

@@ -15,16 +15,12 @@ import CanonicalLink from "../../components/CanonicalLink"
 import { actions } from "../../actions"
 import { setAuthUserDetail } from "../../actions/ui"
 import { processAuthResponse } from "../../lib/auth"
-import { configureForm } from "../../lib/forms"
+import { configureForm, getAuthResponseFieldErrors } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { REGISTER_URL } from "../../lib/url"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
-import {
-  FLOW_LOGIN,
-  getFormErrorSelector,
-  isProcessing
-} from "../../reducers/auth"
+import { FLOW_LOGIN, isProcessing } from "../../reducers/auth"
 
 import type { Match } from "react-router"
 import type {
@@ -36,21 +32,12 @@ import type { WithFormProps } from "../../flow/formTypes"
 
 type LoginPageProps = {
   match: Match,
-  history: Object,
-  formError: ?string,
-  clearEndpointState: Function
+  history: Object
 } & WithFormProps<EmailForm>
 
 export class LoginPage extends React.Component<LoginPageProps> {
-  componentWillUnmount() {
-    const { formError, clearEndpointState } = this.props
-    if (formError) {
-      clearEndpointState()
-    }
-  }
-
   render() {
-    const { renderForm, formError, match } = this.props
+    const { renderForm, match } = this.props
 
     return (
       <div className="auth-page login-page">
@@ -61,7 +48,7 @@ export class LoginPage extends React.Component<LoginPageProps> {
               <title>{formatTitle("Login")}</title>
               <CanonicalLink match={match} />
             </MetaTags>
-            {renderForm({ formError })}
+            {renderForm()}
             <ExternalLogins />
             <div className="alternate-auth-link">
               Not a member? <Link to={REGISTER_URL}>Sign up</Link>
@@ -78,7 +65,7 @@ const newEmailForm = () => ({ email: "" })
 const onSubmit = ({ email }: EmailForm) =>
   actions.auth.loginEmail(FLOW_LOGIN, email)
 
-const clearEndpointState = actions.auth.clear
+const getSubmitResultErrors = getAuthResponseFieldErrors("email")
 
 const onSubmitResult = R.curry(
   (
@@ -107,14 +94,13 @@ const { getForm, actionCreators } = configureForm(FORM_KEY, newEmailForm)
 const mapStateToProps = state => {
   const form = getForm(state)
   const processing = isProcessing(state)
-  const formError = getFormErrorSelector(state)
 
   return {
     form,
     processing,
     onSubmitResult,
     validateForm,
-    formError
+    getSubmitResultErrors
   }
 }
 
@@ -129,7 +115,6 @@ export default R.compose(
     mapStateToProps,
     {
       onSubmit,
-      clearEndpointState,
       setAuthUserDetail,
       ...actionCreators
     },

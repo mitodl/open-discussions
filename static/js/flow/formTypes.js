@@ -36,7 +36,8 @@ export type WithFormProps<T> = {
   onUpdate: Object => void,
   onSubmit: T => Promise<*>,
   onSubmitResult: Function,
-  onSubmitError?: Function,
+  getSubmitResultErrors?: ?Object => ?FormErrors<string>,
+  onSubmitFailure?: Object => FormErrors<string>,
   useRecaptcha?: boolean,
   validateForm: FormValue<T> => {value: FormErrors<T>},
   renderForm: Function

@@ -7,6 +7,7 @@ import sinon from "sinon"
 import withForm from "./withForm"
 
 import { wait } from "../lib/util"
+import { shouldIf } from "../lib/test_utils"
 
 import type { FormProps, WithFormProps } from "../flow/formTypes"
 
@@ -53,7 +54,7 @@ describe("withForm", () => {
 
   let sandbox, formData
   let formEndEditStub, formBeginEditStub, formUpdateStub, formValidateStub
-  let validateFormStub, onSubmitStub, onSubmitResultStub, onSubmitErrorStub
+  let validateFormStub, onSubmitStub, onSubmitResultStub
 
   const renderPage = ({ ...props }) =>
     mount(
@@ -67,7 +68,7 @@ describe("withForm", () => {
         formValidate={formValidateStub}
         onSubmit={onSubmitStub}
         onSubmitResult={onSubmitResultStub}
-        onSubmitError={onSubmitErrorStub}
+        onSubmitFailure={sandbox.stub()}
         onUpdate={sandbox.stub()}
         renderForm={sandbox.stub()}
         {...props}
@@ -83,7 +84,6 @@ describe("withForm", () => {
     validateFormStub = sandbox.stub().returns({})
     onSubmitStub = sandbox.stub().resolves(result)
     onSubmitResultStub = sandbox.stub()
-    onSubmitErrorStub = sandbox.stub()
     formData = {
       value: {
         name: ""
@@ -128,10 +128,10 @@ describe("withForm", () => {
 
     assert.ok(wrapper.find(Form).exists())
 
-    assert.ok(formBeginEditStub.calledOnce)
-    assert.ok(formBeginEditStub.calledWith())
+    sinon.assert.calledOnce(formBeginEditStub)
+    sinon.assert.calledWith(formBeginEditStub)
 
-    assert.ok(formEndEditStub.notCalled)
+    sinon.assert.notCalled(formEndEditStub)
   })
 
   it("should call formEndEdit on unmount", () => {
@@ -139,19 +139,17 @@ describe("withForm", () => {
 
     wrapper.unmount()
 
-    assert.ok(formEndEditStub.calledOnce)
-    assert.ok(formEndEditStub.calledWith())
+    sinon.assert.calledOnce(formEndEditStub)
+    sinon.assert.calledWith(formEndEditStub)
   })
 
   it("should update the form when onRecaptcha called", () => {
     const wrapper = renderPage()
     wrapper.instance().onRecaptcha("test_recaptcha")
-    assert.ok(formUpdateStub.calledOnce)
-    assert.ok(
-      formUpdateStub.calledWith({
-        ["recaptcha"]: "test_recaptcha"
-      })
-    )
+    sinon.assert.calledOnce(formUpdateStub)
+    sinon.assert.calledWith(formUpdateStub, {
+      ["recaptcha"]: "test_recaptcha"
+    })
   })
 
   it("should update the form for an input", () => {
@@ -160,16 +158,12 @@ describe("withForm", () => {
     const wrapper = renderPage()
     const form = wrapper.find(Form)
 
-    assert.ok(formUpdateStub.notCalled)
-
     form.find("input").simulate("change", { target: { name, value } })
 
-    assert.ok(formUpdateStub.calledOnce)
-    assert.ok(
-      formUpdateStub.calledWith({
-        [name]: value
-      })
-    )
+    sinon.assert.calledOnce(formUpdateStub)
+    sinon.assert.calledWith(formUpdateStub, {
+      [name]: value
+    })
   })
 
   //
@@ -179,22 +173,18 @@ describe("withForm", () => {
       const wrapper = renderPage()
       const form = wrapper.find(Form)
 
-      assert.ok(formUpdateStub.notCalled)
-
       form
         .find("input")
         .simulate("change", { target: { name, type: "checkbox", checked } })
 
-      assert.ok(formUpdateStub.calledOnce)
-      assert.ok(
-        formUpdateStub.calledWith({
-          [name]: checked
-        })
-      )
+      sinon.assert.calledOnce(formUpdateStub)
+      sinon.assert.calledWith(formUpdateStub, {
+        [name]: checked
+      })
     })
   })
 
-  it("should validates and updates form validation if there are errors", () => {
+  it("should validate and update form validation if there are errors", () => {
     const wrapper = renderPage()
     const form = wrapper.find(Form)
     const errors = {
@@ -205,82 +195,139 @@ describe("withForm", () => {
 
     validateFormStub.returns(errors)
 
-    assert.ok(validateFormStub.notCalled)
-
     form.find("form").simulate("submit")
 
-    assert.ok(validateFormStub.calledOnce)
-    assert.ok(validateFormStub.calledWith(formData))
+    sinon.assert.calledOnce(validateFormStub)
+    sinon.assert.calledWith(validateFormStub, formData)
 
-    assert.ok(formValidateStub.calledOnce)
-    assert.ok(formValidateStub.calledWith(errors.value))
+    sinon.assert.calledOnce(formValidateStub)
+    sinon.assert.calledWith(formValidateStub, errors.value)
 
-    assert.ok(onSubmitStub.notCalled)
-    assert.ok(onSubmitResultStub.notCalled)
+    sinon.assert.notCalled(onSubmitStub)
+    sinon.assert.notCalled(onSubmitResultStub)
   })
 
-  it("should validates, submits, and handles the result the form on submit", async () => {
+  it("should validate, submit, and handle the result the form on submit", async () => {
     const wrapper = renderPage()
     const form = wrapper.find(Form)
-
-    validateFormStub.returns({})
-
-    assert.ok(validateFormStub.notCalled)
 
     form.find("form").simulate("submit")
 
     await wait(5) // wait for onSubmit to resolve
 
-    assert.ok(validateFormStub.calledOnce)
-    assert.ok(validateFormStub.calledWith(formData))
+    sinon.assert.calledOnce(validateFormStub)
+    sinon.assert.calledWith(validateFormStub, formData)
 
-    assert.ok(formValidateStub.calledOnce)
-    assert.ok(formValidateStub.calledWith({}))
+    sinon.assert.calledOnce(formValidateStub)
+    sinon.assert.calledWith(formValidateStub, {})
 
-    assert.ok(onSubmitStub.calledOnce)
-    assert.ok(onSubmitStub.calledWith(formData.value))
+    sinon.assert.calledOnce(onSubmitStub)
+    sinon.assert.calledWith(onSubmitStub, formData.value)
 
-    assert.ok(onSubmitResultStub.calledOnce)
-    assert.ok(onSubmitResultStub.calledWith(result))
+    sinon.assert.calledOnce(onSubmitResultStub)
+    sinon.assert.calledWith(onSubmitResultStub, result)
   })
 
-  describe("onSubmitError", () => {
-    [true, false].forEach(onSubmitErrorExists => {
-      it(`handles an error in onSubmit when onSubmitError is ${
-        onSubmitErrorExists ? "" : "not "
-      }defined`, async () => {
-        const wrapper = renderPage({
-          onSubmitError: onSubmitErrorExists ? onSubmitErrorStub : undefined
-        })
-        const form = wrapper.find(Form)
+  describe("onSubmitFailure", () => {
+    const onSubmitFailureStub = sinon.stub()
 
-        const error = "error"
-        onSubmitStub.returns(Promise.reject(error))
-        validateFormStub.returns({})
-
-        assert.ok(validateFormStub.notCalled)
-
-        form.find("form").simulate("submit")
-
-        await wait(5) // wait for onSubmit to resolve
-
-        assert.ok(validateFormStub.calledOnce)
-        assert.ok(validateFormStub.calledWith(formData))
-
-        assert.ok(formValidateStub.calledOnce)
-        assert.ok(formValidateStub.calledWith({}))
-
-        assert.ok(onSubmitStub.calledOnce)
-        assert.ok(onSubmitStub.calledWith(formData.value))
-
-        assert.ok(onSubmitResultStub.notCalled)
-        if (onSubmitErrorExists) {
-          assert.ok(onSubmitErrorStub.calledOnce)
-          assert.ok(onSubmitErrorStub.calledWith(error))
-        } else {
-          assert.ok(onSubmitErrorStub.notCalled)
-        }
-      })
+    beforeEach(() => {
+      onSubmitFailureStub.reset()
+      onSubmitFailureStub.returns({ field: ["error text"] })
     })
+
+    //
+    ;[
+      [onSubmitFailureStub, true, 2, "is defined"],
+      [undefined, false, 1, "is not defined"]
+    ].forEach(
+      ([
+        onSubmitFailureProp,
+        expSubmitFailureCall,
+        expValidateCallCount,
+        desc
+      ]) => {
+        it(`${shouldIf(
+          expSubmitFailureCall
+        )} call onSubmitFailure when onSubmit fails and the prop ${desc}`, async () => {
+          const wrapper = renderPage({
+            onSubmitFailure: onSubmitFailureProp
+          })
+          const form = wrapper.find(Form)
+          const error = "error"
+          onSubmitStub.returns(Promise.reject(error))
+
+          form.find("form").simulate("submit")
+
+          await wait(5) // wait for onSubmit to resolve
+
+          sinon.assert.callCount(formValidateStub, expValidateCallCount)
+          sinon.assert.calledWith(formValidateStub.firstCall, {})
+
+          sinon.assert.calledOnce(onSubmitStub)
+          sinon.assert.calledWith(onSubmitStub, formData.value)
+
+          sinon.assert.notCalled(onSubmitResultStub)
+
+          assert.equal(onSubmitFailureStub.called, expSubmitFailureCall)
+          if (expSubmitFailureCall) {
+            sinon.assert.calledWith(onSubmitFailureStub, error)
+            sinon.assert.calledWith(formValidateStub.lastCall, {
+              field: ["error text"]
+            })
+          }
+        })
+      }
+    )
+  })
+
+  describe("getSubmitResultErrors", () => {
+    const getSubmitResultErrorsStub = sinon.stub()
+
+    //
+    ;[
+      [
+        getSubmitResultErrorsStub,
+        { field: ["error text"] },
+        true,
+        "is defined and returns an error object"
+      ],
+      [
+        getSubmitResultErrorsStub,
+        undefined,
+        false,
+        "is defined and returns nothing"
+      ],
+      [undefined, undefined, false, "is not defined"]
+    ].forEach(
+      ([
+        getSubmitResultErrorsProp,
+        stubReturnValue,
+        expValidationFail,
+        desc
+      ]) => {
+        it(`${shouldIf(
+          expValidationFail
+        )} add a validation message if the function ${desc}`, async () => {
+          getSubmitResultErrorsStub.reset()
+          getSubmitResultErrorsStub.returns(stubReturnValue)
+
+          const wrapper = renderPage({
+            getSubmitResultErrors: getSubmitResultErrorsProp
+          })
+          const form = wrapper.find(Form)
+          onSubmitStub.returns(Promise.resolve({}))
+
+          form.find("form").simulate("submit")
+
+          await wait(5) // wait for onSubmit to resolve
+
+          sinon.assert.callCount(onSubmitResultStub, expValidationFail ? 0 : 1)
+          if (expValidationFail) {
+            sinon.assert.calledWith(formValidateStub.lastCall, stubReturnValue)
+          }
+        })
+      }
+    )
   })
 })

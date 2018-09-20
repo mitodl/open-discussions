@@ -12,7 +12,7 @@ import CanonicalLink from "../../components/CanonicalLink"
 
 import { actions } from "../../actions"
 import { processAuthResponse, goToFirstLoginStep } from "../../lib/auth"
-import { configureForm } from "../../lib/forms"
+import { configureForm, getAuthResponseFieldErrors } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
 import { LOGIN_URL } from "../../lib/url"
 import { preventDefaultAndInvoke } from "../../lib/util"
@@ -21,8 +21,7 @@ import { mergeAndInjectProps } from "../../lib/redux_props"
 import {
   getAuthPartialTokenSelector,
   getAuthFlowSelector,
-  isProcessing,
-  getFormErrorSelector
+  isProcessing
 } from "../../reducers/auth"
 import {
   getAuthUiNameSelector,
@@ -39,7 +38,6 @@ type Props = {
   history: Object,
   partialToken: string,
   authFlow: AuthFlow,
-  formError: ?string,
   email: string,
   name: ?string,
   profileImageUrl: ?string
@@ -56,7 +54,6 @@ export class LoginPasswordPage extends React.Component<Props> {
   render() {
     const {
       renderForm,
-      formError,
       email,
       name,
       profileImageUrl,
@@ -86,7 +83,7 @@ export class LoginPasswordPage extends React.Component<Props> {
                 />
               </div>
             </div>
-            {renderForm({ formError })}
+            {renderForm()}
           </Card>
         </div>
       </div>
@@ -105,6 +102,8 @@ const onSubmit = (
   form: PasswordForm
 ) => actions.auth.loginPassword(authFlow, partialToken, form.password)
 
+const getSubmitResultErrors = getAuthResponseFieldErrors("password")
+
 const onSubmitResult = R.curry(processAuthResponse)
 
 export const mergeProps = mergeAndInjectProps(
@@ -119,7 +118,6 @@ const mapStateToProps = state => {
   const processing = isProcessing(state)
   const authFlow = getAuthFlowSelector(state)
   const partialToken = getAuthPartialTokenSelector(state)
-  const formError = getFormErrorSelector(state)
   const name = getAuthUiNameSelector(state)
   const email = getAuthUiEmailSelector(state)
   const profileImageUrl = getAuthUiImgSelector(state)
@@ -129,8 +127,8 @@ const mapStateToProps = state => {
     authFlow,
     processing,
     onSubmitResult,
+    getSubmitResultErrors,
     validateForm,
-    formError,
     email,
     name,
     profileImageUrl
