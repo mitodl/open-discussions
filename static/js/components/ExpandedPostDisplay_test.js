@@ -364,7 +364,7 @@ describe("ExpandedPostDisplay", () => {
     const count = wrapper.find(".report-count")
     assert.ok(count.exists())
     // $FlowFixMe: thinks this doesn't exist
-    assert.equal(count.text(), `Reported ${post.num_reports} times`)
+    assert.equal(count.text(), `${post.num_reports} Reports`)
   })
 
   it("should not render a report count, if post has no report data", () => {
