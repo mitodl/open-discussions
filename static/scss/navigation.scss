@@ -7,7 +7,7 @@ a.mitlogo {
 $red-link-color: #9a2a33;
 $icon-padding-left: 19px;
 $text-padding-left: 26px;
-$link-padding: 11px 20px 11px 19px;
+$link-padding: 11px 20px 11px $icon-padding-left;
 
 .navbar {
   .mdc-toolbar {
@@ -17,11 +17,17 @@ $link-padding: 11px 20px 11px 19px;
     position: fixed;
 
     .mdc-toolbar__row {
+      min-height: $toolbar-height-desktop;
       height: $toolbar-height-desktop;
 
       @include breakpoint(materialmobile) {
+        min-height: $toolbar-height-mobile;
         height: $toolbar-height-mobile;
       }
+    }
+
+    .mdc-toolbar__section {
+      padding: $toolbar-vert-padding 0;
     }
 
     .mdc-toolbar__title,
@@ -38,6 +44,11 @@ $link-padding: 11px 20px 11px 19px;
 
   .mdc-toolbar__icon--menu {
     color: $navy;
+    padding: 0 0 0 $icon-padding-left;
+  }
+
+  a.mitlogo img {
+    margin-left: $text-padding-left;
   }
 
   .user-menu-section {
@@ -47,6 +58,9 @@ $link-padding: 11px 20px 11px 19px;
 
     .login-link {
       background: white;
+      margin: 0 30px 0 0;
+      padding: 4px 50px;
+      white-space: nowrap;
     }
   }
 }
