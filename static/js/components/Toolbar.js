@@ -19,7 +19,7 @@ type Props = {
 const loginButton = () =>
   SETTINGS.allow_email_auth ? (
     <Link to={LOGIN_URL} className="link-button outlined login-link">
-      Login
+      Log In
     </Link>
   ) : null
 
