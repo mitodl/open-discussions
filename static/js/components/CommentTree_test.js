@@ -294,6 +294,7 @@ describe("CommentTree", () => {
       .find(".author-info")
       .at(0)
       .find("Link")
+      .at(0)
     assert.equal(link.text(), comments[0].author_name)
     assert.equal(link.props().to, profileURL(comments[0].author_id))
     const secondLink = wrapper
@@ -303,6 +304,17 @@ describe("CommentTree", () => {
       .at(0)
     assert.equal(secondLink.props().to, profileURL(comments[0].author_id))
     assert(secondLink.find("ProfileImage").exists())
+  })
+
+  it("should link to the comment URL", () => {
+    const wrapper = renderCommentTree()
+    const link = wrapper
+      .find(".author-info")
+      .at(0)
+      .find("Link")
+      .at(1)
+      .props()
+    assert.equal(link.to, permalinkFunc(comments[0].id))
   })
 
   it("should limit replies to the max comment depth", () => {

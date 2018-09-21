@@ -230,7 +230,7 @@ export default class CommentTree extends React.Component<Props> {
   }
 
   renderComment = (depth: number, comment: CommentInTree) => {
-    const { forms, processing } = this.props
+    const { forms, processing, commentPermalink } = this.props
     const editFormKey = editCommentKey(comment)
     // ramda can't determine arity here so use curryN
     const renderGenericComment = R.curryN(2, this.renderGenericComment)(
@@ -260,9 +260,11 @@ export default class CommentTree extends React.Component<Props> {
               <Link to={profileURL(comment.author_id)}>
                 <span className="author-name">{comment.author_name}</span>
               </Link>
-              <span className="authored-date">
-                {moment(comment.created).fromNow()}
-              </span>
+              <Link to={commentPermalink(comment.id)}>
+                <span className="authored-date">
+                  {moment(comment.created).fromNow()}
+                </span>
+              </Link>
               <span className="removed-note">
                 {comment.removed ? (
                   <span>[comment removed by moderator]</span>

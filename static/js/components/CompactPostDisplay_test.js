@@ -92,8 +92,23 @@ describe("CompactPostDisplay", () => {
     const link = renderPostDisplay({ post })
       .find(".authored-by")
       .find("Link")
+      .at(0)
     assert.equal(link.text(), post.author_name)
     assert.equal(link.props().to, profileURL(post.author_id))
+  })
+
+  it("should link to the post detail page via post date", () => {
+    const wrapper = renderPostDisplay({ post })
+    const linkProps = wrapper
+      .find(".date")
+      .at(0)
+      .find(Link)
+      .at(0)
+      .props()
+    assert.equal(
+      linkProps.to,
+      postDetailURL(post.channel_name, post.id, post.slug)
+    )
   })
 
   it("should link to the subreddit, if told to", () => {
@@ -101,7 +116,9 @@ describe("CompactPostDisplay", () => {
     const wrapper = renderPostDisplay({ post, showChannelLink: true })
     const linkProps = wrapper
       .find(".date")
+      .at(0)
       .find(Link)
+      .at(1)
       .props()
     assert.equal(linkProps.to, channelURL("channel_name"))
     assert.equal(linkProps.children, post.channel_title)
@@ -112,7 +129,7 @@ describe("CompactPostDisplay", () => {
     const wrapper = renderPostDisplay({ post })
     const { href, target } = wrapper
       .find("a")
-      .at(2)
+      .at(3)
       .props()
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
