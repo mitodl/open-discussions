@@ -11,6 +11,7 @@ import { makeChannel } from "../factories/channels"
 import { makeArticle } from "../factories/embedly"
 import { newPostForm } from "../lib/posts"
 import { configureShallowRenderer } from "../lib/test_utils"
+import { shouldIf } from "../lib/test_utils"
 
 describe("CreatePostForm", () => {
   let sandbox, isTextTabSelectedStub, isLinkTypeAllowedStub, renderPostForm
@@ -111,6 +112,32 @@ describe("CreatePostForm", () => {
       wrapper.find(".channel-select .validation-message").text(),
       "HEY"
     )
+  })
+
+  //
+  ;[
+    ["", null, true],
+    ["", LINK_TYPE_LINK, true],
+    ["", LINK_TYPE_TEXT, true],
+    ["title", null, true],
+    ["title", LINK_TYPE_LINK, false],
+    ["title", LINK_TYPE_TEXT, false]
+  ].forEach(([title, type, shouldDisable]) => {
+    it(`${shouldIf(
+      shouldDisable
+    )} put .disabled on submit button when title is ${title} and post type is ${type}`, () => {
+      const postForm = { ...newPostForm(), postType: type, title }
+      const wrapper = renderPostForm({
+        postForm
+      })
+      assert.equal(
+        shouldDisable,
+        wrapper
+          .find(".submit-post")
+          .props()
+          .className.includes("disabled")
+      )
+    })
   })
 
   describe("embedly preview link", () => {
