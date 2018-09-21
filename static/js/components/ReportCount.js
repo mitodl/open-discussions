@@ -14,7 +14,7 @@ export default class ReportCount extends React.Component<Props> {
 
     return (
       <div className="report-count">
-        Reported {count} {count === 1 ? "time" : "times"}
+        {count} {count === 1 ? "Report" : "Reports"}
       </div>
     )
   }

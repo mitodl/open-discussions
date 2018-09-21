@@ -359,7 +359,7 @@ describe("CommentTree", () => {
         ...openDropdownMenu(report.comment)
       })
       assert.ok(wrapper.find(".report-count").exists())
-      assert.equal(wrapper.find(".report-count").text(), "Reported 2 times")
+      assert.equal(wrapper.find(".report-count").text(), "2 Reports")
     })
 
     it("should not render a report count, if comment has no report data", () => {
