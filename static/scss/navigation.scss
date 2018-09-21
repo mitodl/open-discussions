@@ -61,6 +61,11 @@ $link-padding: 11px 20px 11px $icon-padding-left;
       margin: 0 30px 0 0;
       padding: 4px 50px;
       white-space: nowrap;
+
+      @include breakpoint(materialmobile) {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
     }
   }
 }
