@@ -25,6 +25,7 @@ import { createCommentTree } from "../reducers/comments"
 import { makeCommentReport } from "../factories/reports"
 import * as utilFuncs from "../lib/util"
 import { dropdownMenuFuncs } from "../lib/ui"
+import {shouldIf} from "../lib/test_utils";
 
 describe("CommentTree", () => {
   let comments,
@@ -180,6 +181,15 @@ describe("CommentTree", () => {
     )
   })
 
+  //
+  ;['testuser', null].forEach((username) => {
+    it(`${shouldIf(username !== null)} include a showMenu icon`, () => {
+      SETTINGS.username = username
+      const wrapper = renderCommentTree()
+      assert.equal(wrapper.find('.more_vert').exists(), username !== null)
+    })
+  })
+
   it('should include a "report" button', () => {
     const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
     wrapper
@@ -260,20 +270,6 @@ describe("CommentTree", () => {
       renderCommentTree()
         .find(".delete-button")
         .exists()
-    )
-  })
-
-  it("should include a permalink", () => {
-    const button = renderCommentTree(openDropdownMenu(comments[0])).find(
-      ".permalink-button"
-    )
-    assert(button.exists())
-    assert.equal(
-      button
-        .find(Link)
-        .at(0)
-        .props().to,
-      permalinkFunc(comments[0].id)
     )
   })
 
