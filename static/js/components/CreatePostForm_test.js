@@ -125,7 +125,9 @@ describe("CreatePostForm", () => {
   ].forEach(([title, type, shouldDisable]) => {
     it(`${shouldIf(
       shouldDisable
-    )} put .disabled on submit button when title is ${title} and post type is ${type}`, () => {
+    )} put .disabled on submit button when title is ${title} and post type is ${String(
+      type
+    )}`, () => {
       const postForm = { ...newPostForm(), postType: type, title }
       const wrapper = renderPostForm({
         postForm
