@@ -74,17 +74,6 @@ describe("AuthPasswordForm component", () => {
     assert.isNotOk(wrapper.find(".row.error .validation-message").exists())
   })
 
-  it("should show a form level error", () => {
-    const wrapper = mountForm({ formError: "backend error" })
-    assert.equal(
-      wrapper
-        .find(".validation-message")
-        .at(0)
-        .text(),
-      "backend error"
-    )
-  })
-
   it("should call onUpdate when the input text changes", () => {
     const wrapper = mountForm({ processing: true })
     const event = {

@@ -18,7 +18,7 @@ import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 
 import type { Match } from "react-router"
-import type { WithFormProps } from "../../flow/formTypes"
+import type { FormErrors, WithFormProps } from "../../flow/formTypes"
 import type { EmailForm } from "../../flow/authTypes"
 
 type PasswordResetPageProps = {
@@ -29,7 +29,6 @@ type PasswordResetPageProps = {
 
 export const PasswordResetPage = ({
   renderForm,
-  emailApiError,
   successfullySubmitted,
   match
 }: PasswordResetPageProps) => (
@@ -50,7 +49,7 @@ export const PasswordResetPage = ({
             <CanonicalLink match={match} />
           </MetaTags>
           <h3>Forgot your password?</h3>
-          {renderForm({ emailApiError })}
+          {renderForm()}
           <ExternalLogins />
         </Card>
       )}
@@ -66,6 +65,11 @@ const { getForm, actionCreators } = configureForm(FORM_KEY, passwordResetForm)
 const onSubmit = (form: EmailForm) =>
   actions.passwordReset.postEmail(form.email)
 
+export const onSubmitFailure = (response: Object): FormErrors<*> => {
+  const error = R.prop("email", response)
+  return { email: error || "Error resetting password" }
+}
+
 const mergeProps = mergeAndInjectProps((stateProps, { onSubmit }) => {
   return {
     onSubmit: form => onSubmit(form)
@@ -75,7 +79,6 @@ const mergeProps = mergeAndInjectProps((stateProps, { onSubmit }) => {
 const mapStateToProps = state => {
   const form = getForm(state)
   const passwordReset = state.passwordReset
-  const emailApiError = R.view(R.lensPath(["error", "email"]))(passwordReset)
   const successfullySubmitted =
     passwordReset &&
     passwordReset.loaded &&
@@ -85,8 +88,8 @@ const mapStateToProps = state => {
   return {
     form,
     validateForm,
-    emailApiError,
-    successfullySubmitted
+    successfullySubmitted,
+    onSubmitFailure
   }
 }
 

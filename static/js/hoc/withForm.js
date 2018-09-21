@@ -53,8 +53,9 @@ const withForm = <T>(FormComponent: FormComponentCls<T>) => (
         form,
         formValidate,
         onSubmit,
+        getSubmitResultErrors,
+        onSubmitFailure,
         onSubmitResult,
-        onSubmitError,
         validateForm
       } = this.props
 
@@ -73,12 +74,23 @@ const withForm = <T>(FormComponent: FormComponentCls<T>) => (
       if (R.isEmpty(validation)) {
         try {
           const result = await onSubmit(form.value)
-          if (onSubmitResult) {
+          // If 'getSubmitResultErrors' is defined, it should take the result of
+          // 'onSubmit' and return an object if any errors are found.
+          const submitResultFieldErrors = getSubmitResultErrors
+            ? getSubmitResultErrors(result)
+            : null
+          // If any errors were found in the 'onSubmit' results, attach them to the form
+          // as validation messages.
+          if (submitResultFieldErrors) {
+            formValidate(submitResultFieldErrors)
+          } else if (onSubmitResult) {
             onSubmitResult(result)
           }
         } catch (e) {
-          if (onSubmitError) {
-            onSubmitError(e)
+          if (onSubmitFailure) {
+            // 'onSubmitFailure' should return an object mapping field names to error messages.
+            const submitFailureFieldErrors = onSubmitFailure(e)
+            formValidate(submitFailureFieldErrors)
           }
         }
       }

@@ -1,7 +1,7 @@
 // @flow
 import { assert } from "chai"
 
-import { configureForm } from "./forms"
+import { configureForm, getAuthResponseFieldErrors } from "./forms"
 import {
   FORM_BEGIN_EDIT,
   FORM_END_EDIT,
@@ -84,6 +84,27 @@ describe("forms lib", () => {
           errors
         },
         type: FORM_VALIDATE
+      })
+    })
+  })
+
+  describe("getAuthResponseFieldErrors", () => {
+    const field = "email"
+    const errorText = "error text"
+
+    //
+    ;[
+      [
+        { errors: [errorText] },
+        { [field]: errorText },
+        "response object with errors"
+      ],
+      [{}, undefined, "response object without errors"],
+      [undefined, undefined, "undefined response object"]
+    ].forEach(([responseObj, expReturnValue, desc]) => {
+      it(`returns correct object when given ${desc}`, () => {
+        const returnValue = getAuthResponseFieldErrors(field, responseObj)
+        assert.deepEqual(returnValue, expReturnValue)
       })
     })
   })

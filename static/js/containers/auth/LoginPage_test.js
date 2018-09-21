@@ -1,6 +1,5 @@
 // @flow
 /* global SETTINGS:false */
-import R from "ramda"
 import { assert } from "chai"
 import sinon from "sinon"
 
@@ -10,6 +9,7 @@ import { FLOW_LOGIN, STATE_SUCCESS } from "../../reducers/auth"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import ConnectedLoginPage, { LoginPage, FORM_KEY } from "./LoginPage"
 import { REGISTER_URL } from "../../lib/url"
+import { shouldIf } from "../../lib/test_utils"
 
 const TEST_EMAIL = "test@example.com"
 const DEFAULT_STATE = {
@@ -50,31 +50,34 @@ describe("LoginPage", () => {
   })
 
   it("should render an initial form", async () => {
-    const { inner } = await renderPage({
-      auth: {
-        data: {
-          errors: ["error"]
-        }
-      }
-    })
+    const { inner } = await renderPage()
 
     const form = inner.find("AuthEmailForm")
     assert.ok(form.exists())
-    assert.equal(form.props().formError, "error")
   })
 
-  it("should clear the auth endpoint state when unmounting if form errors exist", async () => {
-    const { inner, store } = await renderPage({
-      auth: {
-        data: {
-          errors: ["error"]
-        }
-      }
-    })
-    inner.unmount()
+  describe("getSubmitResultErrors prop", () => {
+    const errorText = "error text"
 
-    const dispatchedActions = store.getActions()
-    assert.equal(R.last(dispatchedActions).type, actions.auth.clearType)
+    //
+    ;[[[errorText], true], [[], false]].forEach(
+      ([errors, expectErrorObject]) => {
+        it(`${shouldIf(
+          expectErrorObject
+        )} return error object if API response error count == ${String(
+          errors.length
+        )}`, async () => {
+          const { wrapper } = await renderPage()
+          const getSubmitResultErrors = wrapper.prop("getSubmitResultErrors")
+          const submitResultErrors = getSubmitResultErrors({ errors: errors })
+
+          const expectedResult = expectErrorObject
+            ? { email: errorText }
+            : undefined
+          assert.deepEqual(submitResultErrors, expectedResult)
+        })
+      }
+    )
   })
 
   it("should render an ExternalLogins component", async () => {

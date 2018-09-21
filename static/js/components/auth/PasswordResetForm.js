@@ -11,14 +11,7 @@ type Props = {
 
 export default class PasswordResetForm extends React.Component<Props> {
   render() {
-    const {
-      form,
-      validation,
-      emailApiError,
-      onSubmit,
-      onUpdate,
-      processing
-    } = this.props
+    const { form, validation, onSubmit, onUpdate, processing } = this.props
 
     return (
       <form onSubmit={onSubmit} className="form">
@@ -31,7 +24,6 @@ export default class PasswordResetForm extends React.Component<Props> {
             onChange={onUpdate}
           />
           {validationMessage(validation.email)}
-          {validationMessage(emailApiError)}
         </div>
         <div className="actions row right-aligned">
           <button

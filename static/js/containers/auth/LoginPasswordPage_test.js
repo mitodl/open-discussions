@@ -10,6 +10,7 @@ import ConnectedLoginPasswordPage, {
   LoginPasswordPage,
   FORM_KEY
 } from "./LoginPasswordPage"
+import { shouldIf } from "../../lib/test_utils"
 
 const DEFAULT_STATE = {
   auth: {
@@ -57,19 +58,6 @@ describe("LoginPasswordPage", () => {
 
   afterEach(() => {
     helper.cleanup()
-  })
-
-  it("should render errors", async () => {
-    const { inner } = await renderPage({
-      auth: {
-        data: {
-          errors: ["error"]
-        }
-      }
-    })
-
-    const form = inner.find("AuthPasswordForm")
-    assert.equal(form.props().formError, "error")
   })
 
   //
@@ -126,5 +114,29 @@ describe("LoginPasswordPage", () => {
     const history = helper.browserHistory
     assert.lengthOf(history, 2)
     assert.equal(history.location.pathname, LOGIN_URL)
+  })
+
+  describe("getSubmitResultErrors prop", () => {
+    const errorText = "error text"
+
+    //
+    ;[[[errorText], true], [[], false]].forEach(
+      ([errors, expectErrorObject]) => {
+        it(`${shouldIf(
+          expectErrorObject
+        )} return error object if API response error count == ${String(
+          errors.length
+        )}`, async () => {
+          const { wrapper } = await renderPage()
+          const getSubmitResultErrors = wrapper.prop("getSubmitResultErrors")
+          const submitResultErrors = getSubmitResultErrors({ errors: errors })
+
+          const expectedResult = expectErrorObject
+            ? { password: errorText }
+            : undefined
+          assert.deepEqual(submitResultErrors, expectedResult)
+        })
+      }
+    )
   })
 })

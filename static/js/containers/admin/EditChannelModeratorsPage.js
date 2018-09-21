@@ -29,7 +29,7 @@ import {
 } from "../../actions/ui"
 
 import type { AddMemberForm, Channel, Member } from "../../flow/discussionTypes"
-import type { WithFormProps } from "../../flow/formTypes"
+import type { FormErrors, WithFormProps } from "../../flow/formTypes"
 
 export const MODERATORS_KEY = "channel:edit:moderators"
 const { getForm, actionCreators } = configureForm(MODERATORS_KEY, newMemberForm)
@@ -144,6 +144,19 @@ export class EditChannelModeratorsPage extends React.Component<Props> {
   }
 }
 
+const loadMembers = (channelName: string) =>
+  actions.channelModerators.get(channelName)
+const loadChannel = (channelName: string) => actions.channels.get(channelName)
+const addModerator = (channel: Channel, email: string) =>
+  actions.channelModerators.post(channel.name, email)
+const addSubscriber = (channel: Channel, username: string) =>
+  actions.channelSubscribers.post(channel.name, username)
+const removeMember = (channel: Channel, username: string) =>
+  actions.channelModerators.delete(channel.name, username)
+const onSubmitFailure = (): FormErrors<*> => ({
+  email: "Error adding new moderator"
+})
+
 const mapStateToProps = (state, ownProps) => {
   const channelName = getChannelName(ownProps)
   const channel = state.channels.data.get(channelName)
@@ -161,22 +174,11 @@ const mapStateToProps = (state, ownProps) => {
     processing,
     memberToRemove,
     dialogOpen,
+    onSubmitFailure,
     validateForm: validateMembersForm,
     form:         form
   }
 }
-
-const loadMembers = (channelName: string) =>
-  actions.channelModerators.get(channelName)
-const loadChannel = (channelName: string) => actions.channels.get(channelName)
-const addModerator = (channel: Channel, email: string) =>
-  actions.channelModerators.post(channel.name, email)
-const addSubscriber = (channel: Channel, username: string) =>
-  actions.channelSubscribers.post(channel.name, username)
-const removeMember = (channel: Channel, username: string) =>
-  actions.channelModerators.delete(channel.name, username)
-const onSubmitError = formValidate =>
-  formValidate({ email: `Error adding new moderator` })
 
 const mergeProps = mergeAndInjectProps(
   (
@@ -186,7 +188,6 @@ const mergeProps = mergeAndInjectProps(
       loadChannel,
       addModerator,
       addSubscriber,
-      formValidate,
       formBeginEdit,
       setSnackbarMessage
     }
@@ -203,8 +204,7 @@ const mergeProps = mergeAndInjectProps(
           newMember.moderator.email
         } as a moderator`
       })
-    },
-    onSubmitError: () => onSubmitError(formValidate)
+    }
   })
 )
 
@@ -217,7 +217,6 @@ export default R.compose(
       addModerator,
       addSubscriber,
       removeMember,
-      onSubmitError,
       setSnackbarMessage,
       setDialogData: (data: any) =>
         setDialogData({ dialogKey: DIALOG_REMOVE_MEMBER, data: data }),

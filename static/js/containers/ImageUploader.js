@@ -15,7 +15,7 @@ import { mergeAndInjectProps } from "../lib/redux_props"
 import { validateImageForm } from "../lib/validation"
 
 import type { ImageForm } from "../flow/discussionTypes"
-import type { WithFormProps } from "../flow/formTypes"
+import type { FormErrors, WithFormProps } from "../flow/formTypes"
 import type { Dispatch } from "redux"
 
 export const makeDialogKey = (name: string) => `DIALOG_IMAGE_UPLOAD_${name}`
@@ -99,6 +99,10 @@ export class ImageUploader extends React.Component<ImageProps> {
   }
 }
 
+const onSubmitFailure = (): FormErrors<*> => ({
+  image: `Error uploading image`
+})
+
 const mapStateToProps = (state, ownProps) => {
   const { name, onUpdate, processing } = ownProps
   const formKey = makeFormKey(name)
@@ -111,14 +115,12 @@ const mapStateToProps = (state, ownProps) => {
     dialogOpen,
     processing,
     onUpdate,
+    onSubmitFailure,
     userName:     ownProps.userName,
     validateForm: validateImageForm,
     form:         getForm(state)
   }
 }
-
-const onSubmitError = formValidate =>
-  formValidate({ image: `Error uploading image` })
 
 const mergeProps = mergeAndInjectProps(
   (
@@ -140,7 +142,6 @@ const mergeProps = mergeAndInjectProps(
       formBeginEdit()
       hideDialog()
     },
-    onSubmitError: () => onSubmitError(formValidate),
     formValidate:  formValidate,
     formBeginEdit: formBeginEdit,
     formEndEdit:   formEndEdit

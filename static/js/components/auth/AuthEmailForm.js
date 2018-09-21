@@ -1,7 +1,6 @@
 // @flow
 /* global SETTINGS:false */
 import React from "react"
-import R from "ramda"
 import ReCAPTCHA from "react-google-recaptcha"
 
 import { validationMessage } from "../../lib/validation"
@@ -9,19 +8,14 @@ import { validationMessage } from "../../lib/validation"
 import type { EmailForm } from "../../flow/authTypes"
 import type { FormProps } from "../../flow/formTypes"
 
-type LoginFormProps = {
-  formError: ?string
-} & FormProps<EmailForm>
-
 const AuthEmailForm = ({
   form,
   validation,
   onSubmit,
   onUpdate,
   onRecaptcha,
-  processing,
-  formError
-}: LoginFormProps) => {
+  processing
+}: FormProps<EmailForm>) => {
   return (
     <form onSubmit={onSubmit} className="form">
       <div className="emailfield row">
@@ -40,11 +34,6 @@ const AuthEmailForm = ({
           {validationMessage(validation.recaptcha)}
         </div>
       ) : null}
-      <div className="error row">
-        {!processing && R.isEmpty(validation)
-          ? validationMessage(formError)
-          : null}
-      </div>
       <div className="actions row right-aligned">
         <button
           type="submit"

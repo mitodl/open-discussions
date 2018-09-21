@@ -63,17 +63,6 @@ describe("PasswordResetForm component", () => {
     )
   })
 
-  it("should show an error message if the API call fails", () => {
-    const wrapper = mountForm({
-      emailApiError: "Email does not exist"
-    })
-
-    assert.equal(
-      wrapper.find(".validation-message").text(),
-      "Email does not exist"
-    )
-  })
-
   it("should call onUpdate when the input text changes", () => {
     const wrapper = mountForm({ processing: true })
     const event = {
