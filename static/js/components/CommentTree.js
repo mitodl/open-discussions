@@ -115,6 +115,7 @@ export default class CommentTree extends React.Component<Props> {
     } = curriedDropdownMenufunc(commentShareKey(comment))
     const commentMenuOpen = dropdownMenus.has(commentDropdownKey(comment))
     const commentShareOpen = dropdownMenus.has(commentShareKey(comment))
+
     return (
       <div className="row comment-actions">
         {upvote && downvote ? (
@@ -151,11 +152,11 @@ export default class CommentTree extends React.Component<Props> {
             />
           ) : null}
         </div>
-        { !userIsAnonymous() ? (
+        {!userIsAnonymous() ? (
           <i className="material-icons more_vert" onClick={showDropdown}>
             more_vert
-          </i>) : null
-        }
+          </i>
+        ) : null}
         <ReportCount count={comment.num_reports} />
         {commentMenuOpen ? (
           <DropdownMenu
