@@ -25,7 +25,6 @@ import { formatTitle } from "../lib/title"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import { wait } from "../lib/util"
 import * as embedUtil from "../lib/embed"
-import { newPostForm } from "../lib/posts"
 import { shouldIf } from "../lib/test_utils"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
@@ -477,24 +476,45 @@ describe("CreatePostPage", () => {
 
     //
     ;[
-      [LINK_TYPE_ANY, false],
-      [LINK_TYPE_LINK, true],
-      [LINK_TYPE_TEXT, true]
-    ].forEach(([linkType, shouldDispatch]) => {
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, "", "", false],
+      [null, LINK_TYPE_ANY, "", "", false],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, "text", "", false],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, "text", "", false],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, "text", "", true],
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, "", "http://foo.edu", false],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, "", "http://foo.edu", true],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, "", "http://foo.edu", false]
+    ].forEach(([channelTypeFrom, channelTypeTo, text, url, shouldDispatch]) => {
       it(`${
         shouldDispatch ? "should" : "shouldn't"
-      } FORM_UPDATE when coming from no channel to a channel with ${linkType}`, () => {
+      } FORM_UPDATE when coming from a ${channelTypeFrom ||
+        "null"} channel to a ${channelTypeTo} channel with text value '${text}' and url value '${url}'`, () => {
         const dispatch = helper.sandbox.stub()
-        currentChannel.link_type = linkType
+        currentChannel.link_type = channelTypeTo
         const page = new InnerCreatePostPage()
         const props: any = {
           dispatch,
-          postForm: { value: newPostForm() },
-          channel:  currentChannel
+          postForm: {
+            value: {
+              postType: text
+                ? LINK_TYPE_TEXT
+                : url
+                  ? LINK_TYPE_LINK
+                  : channelTypeFrom,
+              text:  { text },
+              url:   { url },
+              title: ""
+            }
+          },
+          channel: currentChannel
         }
         page.props = props
         const prevProps = {
-          channel: null
+          channel: channelTypeFrom
+            ? {
+              link_type: channelTypeFrom
+            }
+            : null
         }
 
         // $FlowFixMe
@@ -502,7 +522,7 @@ describe("CreatePostPage", () => {
         if (shouldDispatch) {
           assert.equal(dispatch.callCount, 1)
           assert.deepEqual(dispatch.args[0][0].payload.value, {
-            postType:  linkType,
+            postType:  channelTypeTo,
             url:       "",
             text:      "",
             thumbnail: null

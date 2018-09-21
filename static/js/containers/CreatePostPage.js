@@ -20,7 +20,7 @@ import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
 import { getChannelName } from "../lib/util"
 import { formatTitle } from "../lib/title"
-import { validatePostCreateForm } from "../lib/validation"
+import { emptyOrNil, validatePostCreateForm } from "../lib/validation"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 import { anyErrorExcept404 } from "../util/rest"
 
@@ -87,20 +87,24 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     // we may need to change out the postType under certain conditions
     // if the user switches channels and the new channel isn't LINK_TYPE_ANY,
     // and the current postType is null or a postType which is incompatible with the
-    // new channel, we want to set the postType to be the link_type for the channel
+    // new channel, we want to set the postType to be the link_type for the channel.
+    // If the new channel is LINK_TYPE_ANY and both text and url values are empty,
+    // we want to set the postType to null to display the post type options.
     if (
       postForm &&
       channel &&
       ((prevProps.channel && prevProps.channel.name !== channel.name) ||
         !prevProps.channel) &&
-      channel.link_type !== LINK_TYPE_ANY &&
+      (channel.link_type !== LINK_TYPE_ANY ||
+        emptyOrNil(postForm.value.text + postForm.value.url)) &&
       channel.link_type !== postForm.value.postType
     ) {
       dispatch(
         actions.forms.formUpdate({
           ...CREATE_POST_PAYLOAD,
           value: {
-            postType:  channel.link_type,
+            postType:
+              channel.link_type === LINK_TYPE_ANY ? null : channel.link_type,
             url:       "",
             text:      "",
             thumbnail: null
