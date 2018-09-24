@@ -1,6 +1,23 @@
 Release Notes
 =============
 
+Version 0.46.1 (Released September 24, 2018)
+--------------
+
+- remove 'MicroMasters' from community guidelines (#1174)
+- ## Reports instead of Reported ## times (#1229)
+- Changed HTTP response error handling to behave like form validation
+- Show LoginPopup in comment textarea via focus/change events (#1220)
+- fix issue with comment share URL
+- Updated top nav styling
+- Simplify exception handling for emails (#1206)
+- Fix line-break issue in the navigation sidebar
+- Added privacy policy and TOS
+- Prevent comment dropdown menu from hovering over top bar
+- Grouped channel post view tests together w/ common test scenario, other refactors
+- Better handling of non-existent channels (#1184)
+- Added new (unused as of yet) feature flag for branding changes (#1178)
+
 Version 0.46.0 (Released September 19, 2018)
 --------------
 
