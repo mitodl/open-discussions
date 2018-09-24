@@ -28,6 +28,7 @@ import * as embedUtil from "../lib/embed"
 import { shouldIf } from "../lib/test_utils"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
+import { newPostForm } from "../lib/posts"
 
 describe("CreatePostPage", () => {
   let helper,
@@ -413,108 +414,104 @@ describe("CreatePostPage", () => {
   describe("componentDidUpdate logic", () => {
     [
       // starting with ANY
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, null, true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_LINK, false],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, null, true],
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_LINK, false],
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_TEXT, false],
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, null, false],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_LINK, true, true],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_TEXT, true, false],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, null, false, true],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_LINK, true, false],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_TEXT, true, true],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, null, false, true],
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_LINK, true, false],
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_TEXT, true, false],
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, null, false, false],
       // starting with LINK
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, null, true],
-      [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, false],
-      [LINK_TYPE_LINK, LINK_TYPE_ANY, null, false],
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_LINK, true, true],
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, null, false, true],
+      [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, true, false],
+      [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, false, true],
+      [LINK_TYPE_LINK, LINK_TYPE_ANY, null, false, false],
       // starting with TEXT
-      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, null, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, null, false]
-    ].forEach(([fromLinkType, toLinkType, formValue, shouldDispatch]) => {
-      it(`${
-        shouldDispatch ? "dispatches" : "doesn't dispatch"
-      } FORM_UPDATE if the postType is ${String(
-        formValue
-      )} when it goes from ${String(fromLinkType)} to ${toLinkType}`, () => {
-        const dispatch = helper.sandbox.stub()
-        currentChannel.link_type = fromLinkType
-        const nextChannel = channels[1]
-        nextChannel.link_type = toLinkType
-        const page = new InnerCreatePostPage()
-        const props: any = {
-          dispatch: dispatch,
-          channel:  nextChannel,
-          postForm: {
-            value: {
-              postType: formValue
+      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, LINK_TYPE_TEXT, true, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_TEXT, true, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, null, false, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, true, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, false, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, null, false, false]
+    ].forEach(
+      ([fromLinkType, toLinkType, formValue, hasUrlOrText, shouldDispatch]) => {
+        it(`${shouldIf(
+          shouldDispatch
+        )} dispatch FORM_UPDATE if the postType is ${String(
+          formValue
+        )} when it goes from ${String(
+          fromLinkType
+        )} to ${toLinkType} and user has ${
+          hasUrlOrText ? "" : "not "
+        }entered a value`, () => {
+          const dispatch = helper.sandbox.stub()
+          currentChannel.link_type = fromLinkType
+          const nextChannel = channels[1]
+          nextChannel.link_type = toLinkType
+          const page = new InnerCreatePostPage()
+          const url =
+            hasUrlOrText && formValue === LINK_TYPE_LINK ? "http://foo.edu" : ""
+          const text =
+            hasUrlOrText && formValue === LINK_TYPE_TEXT ? "test text" : ""
+          const props: any = {
+            dispatch: dispatch,
+            channel:  nextChannel,
+            postForm: {
+              value: {
+                postType: formValue,
+                url,
+                text
+              }
             }
           }
-        }
-        page.props = props
-        const prevProps = {
-          channel: currentChannel
-        }
+          page.props = props
+          const prevProps = {
+            channel: currentChannel
+          }
 
-        // $FlowFixMe
-        page.componentDidUpdate(prevProps)
-        if (shouldDispatch) {
-          assert.equal(dispatch.callCount, 1)
-          assert.deepEqual(dispatch.args[0][0].payload.value, {
-            postType:  toLinkType,
-            url:       "",
-            text:      "",
-            thumbnail: null
-          })
-        } else {
-          assert.equal(dispatch.callCount, 0)
-        }
-      })
-    })
+          // $FlowFixMe
+          page.componentDidUpdate(prevProps)
+          if (shouldDispatch) {
+            assert.equal(dispatch.callCount, 1)
+            assert.deepEqual(dispatch.args[0][0].payload.value, {
+              postType:
+                toLinkType === LINK_TYPE_ANY && !hasUrlOrText
+                  ? null
+                  : toLinkType,
+              url:       "",
+              text:      "",
+              thumbnail: null
+            })
+          } else {
+            assert.equal(dispatch.callCount, 0)
+          }
+        })
+      }
+    )
 
     //
     ;[
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, "", "", false],
-      [null, LINK_TYPE_ANY, "", "", false],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, "text", "", false],
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, "text", "", false],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, "text", "", true],
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, "", "http://foo.edu", false],
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, "", "http://foo.edu", true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, "", "http://foo.edu", false]
-    ].forEach(([channelTypeFrom, channelTypeTo, text, url, shouldDispatch]) => {
+      [LINK_TYPE_ANY, false],
+      [LINK_TYPE_LINK, true],
+      [LINK_TYPE_TEXT, true]
+    ].forEach(([linkType, shouldDispatch]) => {
       it(`${
         shouldDispatch ? "should" : "shouldn't"
-      } FORM_UPDATE when coming from a ${channelTypeFrom ||
-        "null"} channel to a ${channelTypeTo} channel with text value '${text}' and url value '${url}'`, () => {
+      } FORM_UPDATE when coming from no channel to a channel with ${linkType}`, () => {
         const dispatch = helper.sandbox.stub()
-        currentChannel.link_type = channelTypeTo
+        currentChannel.link_type = linkType
         const page = new InnerCreatePostPage()
         const props: any = {
           dispatch,
-          postForm: {
-            value: {
-              postType: text
-                ? LINK_TYPE_TEXT
-                : url
-                  ? LINK_TYPE_LINK
-                  : channelTypeFrom,
-              text:  { text },
-              url:   { url },
-              title: ""
-            }
-          },
-          channel: currentChannel
+          postForm: { value: newPostForm() },
+          channel:  currentChannel
         }
         page.props = props
         const prevProps = {
-          channel: channelTypeFrom
-            ? {
-              link_type: channelTypeFrom
-            }
-            : null
+          channel: null
         }
 
         // $FlowFixMe
@@ -522,7 +519,7 @@ describe("CreatePostPage", () => {
         if (shouldDispatch) {
           assert.equal(dispatch.callCount, 1)
           assert.deepEqual(dispatch.args[0][0].payload.value, {
-            postType:  channelTypeTo,
+            postType:  linkType,
             url:       "",
             text:      "",
             thumbnail: null

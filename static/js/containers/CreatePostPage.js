@@ -96,7 +96,8 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       ((prevProps.channel && prevProps.channel.name !== channel.name) ||
         !prevProps.channel) &&
       (channel.link_type !== LINK_TYPE_ANY ||
-        emptyOrNil(postForm.value.text + postForm.value.url)) &&
+        (emptyOrNil(postForm.value.text + postForm.value.url) &&
+          !emptyOrNil(postForm.value.postType))) &&
       channel.link_type !== postForm.value.postType
     ) {
       dispatch(
