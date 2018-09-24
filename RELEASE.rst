@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.46.1
+Version 0.46.1 (Released September 24, 2018)
 --------------
 
 - remove 'MicroMasters' from community guidelines (#1174)
