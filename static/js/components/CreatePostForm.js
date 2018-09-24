@@ -152,6 +152,7 @@ export default class CreatePostForm extends React.Component<Props> {
     }
 
     const { postType, title } = postForm
+    const readyToSubmit = postType !== null && title !== ""
 
     return (
       <div className="new-post-form">
@@ -194,7 +195,9 @@ export default class CreatePostForm extends React.Component<Props> {
               Cancel
             </button>
             <button
-              className={`submit-post ${processing ? "disabled" : ""}`}
+              className={`submit-post ${
+                processing || !readyToSubmit ? "disabled" : ""
+              }`}
               type="submit"
               disabled={processing}
             >
