@@ -518,7 +518,13 @@ describe("CreatePostPage", () => {
       [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, true, false],
       [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, false, true]
     ].forEach(
-      ([fromChannelType, toChannelType, formValue, hasUrlOrText, shouldDispatch]) => {
+      ([
+        fromChannelType,
+        toChannelType,
+        formValue,
+        hasUrlOrText,
+        shouldDispatch
+      ]) => {
         it(`${shouldIf(
           shouldDispatch
         )} dispatch FORM_UPDATE if the postType is ${String(
