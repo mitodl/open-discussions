@@ -104,6 +104,10 @@
   .upvote-report-count {
     display: flex;
     align-items: center;
+
+    .report-count {
+      margin-left: 10px;
+    }
   }
 
   .post-title {

@@ -9,6 +9,10 @@ $icon-padding-left: 19px;
 $text-padding-left: 26px;
 $link-padding: 11px 20px 11px $icon-padding-left;
 
+.mdc-list {
+  font-family: inherit;
+}
+
 .navbar {
   .mdc-toolbar {
     background-color: #fff;
@@ -81,6 +85,8 @@ $link-padding: 11px 20px 11px $icon-padding-left;
   }
 
   .new-post-link-container {
+    margin-top: 61px;
+
     .new-post-link {
       color: $red-link-color;
       display: inline-flex;
@@ -89,6 +95,7 @@ $link-padding: 11px 20px 11px $icon-padding-left;
       margin-left: 13px;
       border: 1px solid $red-link-color;
       border-radius: 30px;
+      height: 26px;
     }
   }
 
@@ -121,13 +128,14 @@ $link-padding: 11px 20px 11px $icon-padding-left;
 
   &.subscribed-channels {
     padding: 16px 0 18px 0;
-    margin: 15px 0 20px;
+    margin: 0 0 20px;
 
     .heading {
       margin-left: $icon-padding-left;
       font-weight: 600;
       color: #8a8b8c;
       padding: 11px 0;
+      font-size: 18px;
     }
   }
 
