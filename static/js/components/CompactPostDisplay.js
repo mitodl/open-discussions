@@ -96,7 +96,11 @@ export class CompactPostDisplay extends React.Component<Props> {
                   ) : null}
                 </div>
                 <div className="date">
-                  {formattedDate}
+                  <Link
+                    to={postDetailURL(post.channel_name, post.id, post.slug)}
+                  >
+                    <span>{formattedDate}</span>
+                  </Link>
                   {this.showChannelLink()}
                 </div>
               </div>
