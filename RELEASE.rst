@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.47.0
+Version 0.47.0 (Released September 25, 2018)
 --------------
 
 - Add channel header, title, headline to channel page
