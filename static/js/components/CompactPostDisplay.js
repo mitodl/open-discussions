@@ -80,6 +80,12 @@ export class CompactPostDisplay extends React.Component<Props> {
         <div className="row post-toprow">
           <div className="column1">
             <div className="row title-row">
+              {post.stickied && showPinUI ? (
+                <img
+                  className="pin"
+                  src="/static/images/pinnned-post-icon.svg"
+                />
+              ) : null}
               <Link
                 to={postDetailURL(post.channel_name, post.id, post.slug)}
                 className="navy"

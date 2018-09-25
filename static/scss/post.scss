@@ -125,6 +125,19 @@
     margin: 0 0 10px;
   }
 
+  &.sticky {
+    .title-row {
+      overflow: visible;
+      position: relative;
+
+      .pin {
+        position: absolute;
+        left: -15px;
+        top: 6px;
+      }
+    }
+  }
+
   .title-row {
     i {
       color: $font-grey-light;
