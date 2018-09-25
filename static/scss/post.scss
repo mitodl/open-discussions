@@ -291,7 +291,7 @@
 .grey-surround {
   display: flex;
   align-items: center;
-  border-radius: 12px;
+  border-radius: 12.5px;
   cursor: pointer;
   background-color: $pale-grey;
   padding: 2px;
@@ -306,15 +306,19 @@
     }
   }
 
+  &.more_vert {
+    line-height: 18.7px;
+  }
+
   i {
-    font-weight: bold;
-    font-size: 14px;
+    font-size: 18.7px;
     background-color: white;
     border-radius: 50%;
   }
 
   span {
     margin: 0 6px;
+    line-height: 18.7px;
   }
 }
 
