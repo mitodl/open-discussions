@@ -1,4 +1,4 @@
-.mdc-drawer--persistent {
+.mdc-drawer.mdc-drawer--persistent {
   position: fixed;
   left: 0;
   height: calc(100vh - #{$toolbar-height-desktop});
@@ -6,12 +6,17 @@
   width: $drawer-width;
 
   .mdc-drawer__drawer {
+    // Height and width copied from above to support the ScrollArea component
+    height: calc(100vh - #{$toolbar-height-desktop});
     width: $drawer-width;
-  }
 
-  @include breakpoint(materialmobile) {
-    height: calc(100vh - #{$toolbar-height-mobile});
-    top: $toolbar-height-mobile;
+    .scrollbar-container {
+      display: none;
+    }
+
+    &:hover .scrollbar-container {
+      display: block;
+    }
   }
 }
 
@@ -20,10 +25,6 @@
   flex-direction: row;
   align-items: center;
   height: 60px;
-
-  @include breakpoint(materialmobile) {
-    height: 45px;
-  }
 
   a {
     padding-left: 35px;
