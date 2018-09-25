@@ -81,6 +81,12 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     ensureTwitterEmbedJS()
   }
 
+  shouldTriggerUpdate() {
+    const { postForm } = this.props
+    return (emptyOrNil(postForm.value.text + postForm.value.url) &&
+          !emptyOrNil(postForm.value.postType))
+  }
+
   componentDidUpdate(prevProps: CreatePostPageProps) {
     const { channel, dispatch, postForm } = this.props
 
@@ -95,9 +101,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       channel &&
       ((prevProps.channel && prevProps.channel.name !== channel.name) ||
         !prevProps.channel) &&
-      (channel.link_type !== LINK_TYPE_ANY ||
-        (emptyOrNil(postForm.value.text + postForm.value.url) &&
-          !emptyOrNil(postForm.value.postType))) &&
+      (channel.link_type !== LINK_TYPE_ANY || this.shouldTriggerUpdate()) &&
       channel.link_type !== postForm.value.postType
     ) {
       dispatch(

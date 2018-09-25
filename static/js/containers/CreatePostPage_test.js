@@ -414,83 +414,61 @@ describe("CreatePostPage", () => {
   describe("componentDidUpdate logic", () => {
     [
       // starting with ANY
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_LINK, true, true],
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_TEXT, true, false],
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, null, false, true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_LINK, true, false],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_TEXT, true, true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, null, false, true],
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_LINK, true, false],
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_TEXT, true, false],
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, null, false, false],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
+      [LINK_TYPE_ANY, LINK_TYPE_TEXT, null, true],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_LINK, false],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_ANY, LINK_TYPE_LINK, null, true],
       // starting with LINK
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_LINK, true, true],
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, null, false, true],
-      [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, true, false],
-      [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, false, true],
-      [LINK_TYPE_LINK, LINK_TYPE_ANY, null, false, false],
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
+      [LINK_TYPE_LINK, LINK_TYPE_TEXT, null, true],
+      [LINK_TYPE_LINK, LINK_TYPE_ANY, null, false],
       // starting with TEXT
-      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, LINK_TYPE_TEXT, true, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_TEXT, true, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, null, false, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, true, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, false, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, null, false, false]
-    ].forEach(
-      ([fromLinkType, toLinkType, formValue, hasUrlOrText, shouldDispatch]) => {
-        it(`${shouldIf(
-          shouldDispatch
-        )} dispatch FORM_UPDATE if the postType is ${String(
-          formValue
-        )} when it goes from ${String(
-          fromLinkType
-        )} to ${toLinkType} and user has ${
-          hasUrlOrText ? "" : "not "
-        }entered a value`, () => {
-          const dispatch = helper.sandbox.stub()
-          currentChannel.link_type = fromLinkType
-          const nextChannel = channels[1]
-          nextChannel.link_type = toLinkType
-          const page = new InnerCreatePostPage()
-          const url =
-            hasUrlOrText && formValue === LINK_TYPE_LINK ? "http://foo.edu" : ""
-          const text =
-            hasUrlOrText && formValue === LINK_TYPE_TEXT ? "test text" : ""
-          const props: any = {
-            dispatch: dispatch,
-            channel:  nextChannel,
-            postForm: {
-              value: {
-                postType: formValue,
-                url,
-                text
-              }
+      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_TEXT, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_LINK, null, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, null, false]
+    ].forEach(([fromLinkType, toLinkType, formValue, shouldDispatch]) => {
+      it(`${
+        shouldDispatch ? "dispatches" : "doesn't dispatch"
+      } FORM_UPDATE if the postType is ${String(
+        formValue
+      )} when it goes from ${String(fromLinkType)} to ${toLinkType}`, () => {
+        const dispatch = helper.sandbox.stub()
+        currentChannel.link_type = fromLinkType
+        const nextChannel = channels[1]
+        nextChannel.link_type = toLinkType
+        const page = new InnerCreatePostPage()
+        const props: any = {
+          dispatch: dispatch,
+          channel:  nextChannel,
+          postForm: {
+            value: {
+              postType: formValue
             }
           }
-          page.props = props
-          const prevProps = {
-            channel: currentChannel
-          }
+        }
+        page.props = props
+        const prevProps = {
+          channel: currentChannel
+        }
 
-          // $FlowFixMe
-          page.componentDidUpdate(prevProps)
-          if (shouldDispatch) {
-            assert.equal(dispatch.callCount, 1)
-            assert.deepEqual(dispatch.args[0][0].payload.value, {
-              postType:
-                toLinkType === LINK_TYPE_ANY && !hasUrlOrText
-                  ? null
-                  : toLinkType,
-              url:       "",
-              text:      "",
-              thumbnail: null
-            })
-          } else {
-            assert.equal(dispatch.callCount, 0)
-          }
-        })
-      }
-    )
+        // $FlowFixMe
+        page.componentDidUpdate(prevProps)
+        if (shouldDispatch) {
+          assert.equal(dispatch.callCount, 1)
+          assert.deepEqual(dispatch.args[0][0].payload.value, {
+            postType:  toLinkType,
+            url:       "",
+            text:      "",
+            thumbnail: null
+          })
+        } else {
+          assert.equal(dispatch.callCount, 0)
+        }
+      })
+    })
 
     //
     ;[
@@ -529,5 +507,70 @@ describe("CreatePostPage", () => {
         }
       })
     })
+
+    //
+    ;[
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_LINK, true, false],
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_TEXT, true, false],
+      [LINK_TYPE_ANY, LINK_TYPE_ANY, null, false, false],
+      [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, true, false],
+      [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, false, true],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, true, false],
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, false, true]
+    ].forEach(
+      ([fromChannelType, toChannelType, formValue, hasUrlOrText, shouldDispatch]) => {
+        it(`${shouldIf(
+          shouldDispatch
+        )} dispatch FORM_UPDATE if the postType is ${String(
+          formValue
+        )} when it goes from ${String(
+          fromChannelType
+        )} to ${toChannelType} and user has ${
+          hasUrlOrText ? "" : "not "
+        }entered a value`, () => {
+          const dispatch = helper.sandbox.stub()
+          currentChannel.link_type = fromChannelType
+          const nextChannel = channels[1]
+          nextChannel.link_type = toChannelType
+          const page = new InnerCreatePostPage()
+          const url =
+            hasUrlOrText && formValue === LINK_TYPE_LINK ? "http://foo.edu" : ""
+          const text =
+            hasUrlOrText && formValue === LINK_TYPE_TEXT ? "test text" : ""
+          const props: any = {
+            dispatch: dispatch,
+            channel:  nextChannel,
+            postForm: {
+              value: {
+                postType: formValue,
+                url,
+                text
+              }
+            }
+          }
+          page.props = props
+          const prevProps = {
+            channel: currentChannel
+          }
+
+          // $FlowFixMe
+          page.componentDidUpdate(prevProps)
+          if (shouldDispatch) {
+            assert.equal(dispatch.callCount, 1)
+            assert.deepEqual(dispatch.args[0][0].payload.value, {
+              postType:
+                toChannelType === LINK_TYPE_ANY && !hasUrlOrText
+                  ? null
+                  : toChannelType,
+              url:       "",
+              text:      "",
+              thumbnail: null
+            })
+          } else {
+            assert.equal(dispatch.callCount, 0)
+          }
+        })
+      }
+    )
   })
 })
