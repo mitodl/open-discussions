@@ -166,6 +166,7 @@ $replyPaddingLeftPhone: 10px;
 
       .authored-date {
         font-size: 14px;
+        color: $navy;
       }
 
       .author-name {
@@ -174,10 +175,6 @@ $replyPaddingLeftPhone: 10px;
         font-weight: 500;
         font-size: $author-font-size;
         color: $font-black;
-      }
-
-      .authored-date {
-        color: $navy;
       }
 
       .removed-note {
