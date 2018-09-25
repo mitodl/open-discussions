@@ -83,8 +83,11 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
 
   shouldTriggerUpdate() {
     const { postForm } = this.props
-    return (emptyOrNil(postForm.value.text + postForm.value.url) &&
-          !emptyOrNil(postForm.value.postType))
+    return (
+      postForm &&
+      emptyOrNil(postForm.value.text + postForm.value.url) &&
+      !emptyOrNil(postForm.value.postType)
+    )
   }
 
   componentDidUpdate(prevProps: CreatePostPageProps) {
