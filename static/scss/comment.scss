@@ -112,7 +112,7 @@ $replyPaddingLeftPhone: 10px;
         margin: 0;
         color: rgba(0, 0, 0, 0.77);
         line-height: 1.3;
-        font-size: 14px;
+        font-size: $submission-font-size;
         overflow-wrap: break-word;
         word-wrap: break-word;
         word-break: break-word;
@@ -161,15 +161,18 @@ $replyPaddingLeftPhone: 10px;
     }
 
     .author-info {
-      font-size: 14px;
       color: $font-grey;
       margin: 0 0 5px;
+
+      .authored-date {
+        font-size: 14px;
+      }
 
       .author-name {
         display: inline;
         padding-right: 6px;
         font-weight: 500;
-        font-size: 15px;
+        font-size: $author-font-size;
         color: $font-black;
       }
 
