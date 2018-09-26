@@ -6,3 +6,10 @@
   background: white;
   transform: rotate(45deg);
 }
+
+%blockquote {
+  border-left: 2px solid $navy;
+  padding: 0 40px;
+  margin: 16px 0;
+  font-style: italic;
+}

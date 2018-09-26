@@ -40,6 +40,7 @@ describe("Markdown", () => {
 
   it("should render markdown", () => {
     const wrapper = renderMD("# MARKDOWN\n\nyeah markdown")
+    assert.equal(wrapper.find("ReactMarkdown").props().className, "markdown")
     assert.equal(wrapper.find("h1").text(), "MARKDOWN")
     assert.equal(wrapper.text(), "MARKDOWNyeah markdown")
   })

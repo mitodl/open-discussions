@@ -20,6 +20,7 @@ export const Markdown = (props: MarkdownProps) => (
   <ReactMarkdown
     disallowedTypes={["image"]}
     escapeHtml
+    className="markdown"
     renderers={{
       linkReference: reference =>
         reference.href ? (

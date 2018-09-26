@@ -19,6 +19,10 @@
         outline: none;
       }
     }
+
+    blockquote {
+      @extend %blockquote;
+    }
   }
 
   .menu-bar {

@@ -13,7 +13,7 @@
 @import "node_modules/prosemirror-view/style/prosemirror";
 @import "breakpoints";
 @import "variables";
-@import "triangle";
+@import "extensions";
 @import "card";
 @import "basic";
 @import "breadcrumbs";
@@ -51,6 +51,7 @@
 @import "close-button";
 @import "intra-page-nav";
 @import "channel-banner";
+@import "markdown";
 
 body {
   font-family: "Source Sans Pro", helvetica, arial, sans-serif !important;
