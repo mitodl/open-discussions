@@ -1,27 +1,25 @@
+.content .auth-page .main-content {
+  max-width: 470px;
+}
+
 @include breakpoint(desktop) {
   .content .auth-page .main-content {
     margin-top: 70px !important;
-    max-width: 470px;
-  }
-
-  .auth-page {
-    form,
-    .card-contents {
-      width: 350px;
-    }
   }
 }
 
 .auth-page {
   @include breakpoint(mobile) {
     width: 95%;
-    margin: auto;
 
-    form,
-    .actions,
+    .main-content,
     .card-contents {
-      width: 100%;
+      margin: auto;
     }
+  }
+
+  form {
+    width: 100%;
   }
 
   .form-header {
@@ -33,8 +31,22 @@
     color: $font-grey;
   }
 
-  .link-button {
+  .link-button,
+  button[type="submit"] {
     margin-right: 0;
+  }
+
+  button {
+    width: 100%;
+
+    &[type="submit"] {
+      width: 35%;
+    }
+
+    &.submit-password-reset {
+      width: 50%;
+      padding: 9px 19px;
+    }
   }
 
   .touchstone-text-logo {
@@ -66,25 +78,14 @@
   }
 
   .card-contents {
+    max-width: 350px;
     display: flex;
     flex-direction: column;
     align-items: center;
 
     @include breakpoint(desktop) {
       padding: 60px;
-    }
-  }
-
-  button {
-    width: 100%;
-
-    &[type="submit"] {
-      width: 35%;
-    }
-
-    &.submit-password-reset {
-      width: 50%;
-      padding: 9px 19px;
+      width: 350px;
     }
   }
 
