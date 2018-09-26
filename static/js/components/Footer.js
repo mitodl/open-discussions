@@ -13,12 +13,14 @@ const Footer = () => (
       <a href={SETTINGS.authenticated_site.tos_url}>Terms & Conditions</a>
     </div>
     <div className="row mit-logo">
-      <img
-        src="/static/images/mit-logo-darkgrey.svg"
-        alt="MIT logo"
-        width="36"
-        height="16"
-      />
+      <a href="https://www.mit.edu/" target="_blank" rel="noopener noreferrer">
+        <img
+          src="/static/images/mit-logo-darkgrey.svg"
+          alt="MIT logo"
+          width="36"
+          height="16"
+        />
+      </a>
     </div>
     <div className="row legal">
       Massachusetts Institute of Technology<br />
