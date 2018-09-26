@@ -20,6 +20,21 @@
         margin-left: 40px;
         width: 100%;
       }
+
+      .open-photo-dialog {
+        height: 24px;
+        width: 24px;
+        line-height: initial;
+        top: -7px;
+        right: -5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+          font-size: 16px;
+        }
+      }
     }
   }
 

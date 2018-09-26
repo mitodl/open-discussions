@@ -1,14 +1,21 @@
 .banner-container {
-  .banner-image {
-    width: 100%;
-    display: block;
-    height: $channel-banner-height;
-    object-fit: cover;
-  }
+  .channel-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 
-  .upload-banner {
-    margin-top: 20px;
-    display: block;
-    text-align: right;
+    .banner-image {
+      width: 100%;
+      display: block;
+      height: $channel-banner-height;
+      object-fit: cover;
+    }
+
+    .upload-banner {
+      margin-top: 20px;
+      width: fit-content;
+      font-size: 16px;
+      padding: 2px 15px;
+    }
   }
 }

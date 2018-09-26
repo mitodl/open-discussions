@@ -57,8 +57,8 @@ class ChannelBanner extends React.Component<Props> {
                 width={1150}
                 height={125}
               />
-              <a onClick={showDialog} className="upload-banner">
-                Upload Banner
+              <a onClick={showDialog} className="upload-banner grey-surround">
+                Upload cover image
               </a>
             </React.Fragment>
           ) : null}
