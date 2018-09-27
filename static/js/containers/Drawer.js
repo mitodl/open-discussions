@@ -5,7 +5,6 @@ import { connect } from "react-redux"
 import { withRouter } from "react-router"
 import { Drawer, DrawerContent } from "rmwc/Drawer"
 import { Theme } from "rmwc/Theme"
-import ScrollArea from "react-scrollbar"
 
 import Navigation from "../components/Navigation"
 
@@ -94,32 +93,30 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
             open={isMobile ? showDrawerMobile : showDrawerDesktop}
             onClose={this.onDrawerClose}
           >
-            <ScrollArea horizontal={false}>
-              <DrawerContent>
-                <div>
-                  {isMobile ? (
-                    <div className="drawer-mobile-header">
-                      <a
-                        href="#"
-                        className="material-icons"
-                        onClick={this.onDrawerClose}
-                      >
-                        menu
-                      </a>
-                      <a href="http://www.mit.edu" className="mitlogo">
-                        <img src="/static/images/mit-logo-transparent3.svg" />
-                      </a>
-                    </div>
-                  ) : null}
-                  <Navigation
-                    subscribedChannels={subscribedChannels}
-                    pathname={pathname}
-                    channels={channels}
-                  />
-                </div>
-                <Footer />
-              </DrawerContent>
-            </ScrollArea>
+            <DrawerContent>
+              <div>
+                {isMobile ? (
+                  <div className="drawer-mobile-header">
+                    <a
+                      href="#"
+                      className="material-icons"
+                      onClick={this.onDrawerClose}
+                    >
+                      menu
+                    </a>
+                    <a href="http://www.mit.edu" className="mitlogo">
+                      <img src="/static/images/mit-logo-transparent3.svg" />
+                    </a>
+                  </div>
+                ) : null}
+                <Navigation
+                  subscribedChannels={subscribedChannels}
+                  pathname={pathname}
+                  channels={channels}
+                />
+              </div>
+              <Footer />
+            </DrawerContent>
           </Drawer>
         </Theme>
       </div>
