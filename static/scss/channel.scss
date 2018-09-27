@@ -1,13 +1,27 @@
+.app .content .main-content.channel-page {
+  margin-top: 0;
+}
+
 .channel-page-wrapper {
   position: relative;
+
+  .banner-container {
+    position: absolute;
+    width: 100%;
+    z-index: -1;
+  }
 }
 
 .avatar-headline-row {
-  position: absolute;
-  top: 0;
   height: $channel-banner-height;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+
+  .left {
+    display: flex;
+    align-items: center;
+  }
 
   .avatar-image,
   .avatar-initials {
@@ -32,6 +46,10 @@
     .headline {
       font-size: 16px;
     }
+  }
+
+  .edit-button {
+    color: white;
   }
 }
 

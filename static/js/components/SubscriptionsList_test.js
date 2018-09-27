@@ -3,7 +3,7 @@ import { assert } from "chai"
 
 import SubscriptionsList from "./SubscriptionsList"
 
-import { channelURL, editChannelBasicURL } from "../lib/url"
+import { channelURL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
 import { configureShallowRenderer } from "../lib/test_utils"
 
@@ -54,20 +54,6 @@ describe("SubscriptionsList", function() {
         notMyChannels[index]
       )
     })
-  })
-
-  it("should show settings links for channels you are moderator of", () => {
-    const wrapper = renderSubscriptionsList()
-
-    assert.equal(
-      wrapper.find(".my-channels .settings-link").length,
-      myChannels.length
-    )
-    wrapper.find(".my-channels .settings-link").forEach((link, index) => {
-      assert.equal(link.props().to, editChannelBasicURL(myChannels[index].name))
-    })
-
-    assert.equal(wrapper.find(".channels .settings-link").length, 0)
   })
 
   it("should highlight the current channel", () => {

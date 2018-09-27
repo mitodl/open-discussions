@@ -3,7 +3,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 
 import ChannelAvatar from "../containers/ChannelAvatar"
-import { channelURL, editChannelBasicURL } from "../lib/url"
+import { channelURL } from "../lib/url"
 import type { Channel } from "../flow/discussionTypes"
 
 type Props = {
@@ -27,14 +27,6 @@ export default class SubscriptionsList extends React.Component<Props> {
           <ChannelAvatar channel={channel} imageSize="small" />
           <span className="title">{channel.title}</span>
         </Link>
-        {channel.user_is_moderator ? (
-          <Link
-            to={editChannelBasicURL(channel.name)}
-            className="settings-link"
-          >
-            Edit
-          </Link>
-        ) : null}
       </div>
     )
   }

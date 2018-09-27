@@ -29,6 +29,8 @@ describe("ChannelBanner", () => {
   afterEach(() => {
     helper.cleanup()
   })
+
+  //
   ;[true, false].forEach(hasBanner => {
     it("renders an image", async () => {
       channel.banner = hasBanner ? "channel" : null
@@ -38,12 +40,15 @@ describe("ChannelBanner", () => {
         inner.find("img").props().alt,
         `Channel banner for ${channel.name}`
       )
+      assert.ok(inner.find(".gradient").exists())
       assert.equal(
         inner.find("img").props().src,
         hasBanner ? channel.banner : defaultChannelBannerUrl
       )
     })
   })
+
+  //
   ;[true, false].forEach(editable => {
     it(`${
       editable ? "renders" : "doesn't render"
@@ -66,6 +71,8 @@ describe("ChannelBanner", () => {
         assert.equal(imageUploader.props().isAdd, !hasBanner)
       })
     })
+
+    //
     ;[true, false].forEach(hasFormImageUrl => {
       it(`${
         hasFormImageUrl ? "provides" : "doesn't provide"
@@ -83,6 +90,8 @@ describe("ChannelBanner", () => {
       })
     })
   })
+
+  //
   ;["name", "onUpdate"].forEach(field => {
     it(`passes in ${field}`, async () => {
       const value = field

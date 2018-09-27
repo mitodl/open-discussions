@@ -46,6 +46,7 @@ class ChannelBanner extends React.Component<Props> {
             alt={`Channel banner for ${channel.name}`}
             className={`banner-image`}
           />
+          <div className="gradient" />
           {editable ? (
             <React.Fragment>
               <ImageUploader
