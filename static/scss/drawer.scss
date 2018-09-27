@@ -1,3 +1,11 @@
+$red-link-color: #9a2a33;
+$link-padding: 11px 20px 11px $icon-padding-left;
+$footer-height: 132px;
+
+.mdc-list {
+  font-family: inherit;
+}
+
 .mdc-drawer.mdc-drawer--persistent {
   position: fixed;
   left: 0;
@@ -6,8 +14,9 @@
   width: $drawer-width;
 
   .mdc-drawer__drawer {
-    // Height and width copied from above to support the ScrollArea component
-    height: calc(100vh - #{$toolbar-height-desktop});
+    position: absolute;
+    top: 0px;
+    left: 0px;
     width: $drawer-width;
 
     .scrollbar-container {
@@ -16,6 +25,143 @@
 
     &:hover .scrollbar-container {
       display: block;
+    }
+  }
+}
+
+.mdc-drawer__content {
+  &.mdc-list {
+    padding: 0;
+  }
+}
+
+.mdc-drawer__content .navigation {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - #{$toolbar-height-desktop} - #{$footer-height});
+
+  .title {
+    margin-left: $text-padding-left;
+    font-size: 18px;
+    word-break: break-word;
+  }
+
+  .new-post-link-container {
+    margin-top: 61px;
+
+    .new-post-link {
+      color: $red-link-color;
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 20px 5px 5px;
+      margin-left: 13px;
+      border: 1px solid $red-link-color;
+      border-radius: 30px;
+      height: 26px;
+    }
+  }
+
+  .mdc-button {
+    width: 87%;
+    height: 43px;
+    line-height: 43px;
+    font-size: 15px;
+    text-transform: none;
+    font-weight: 500;
+    padding: 0 5px;
+    box-shadow: none;
+    margin-left: 14px;
+  }
+
+  .mdc-button:hover {
+    box-shadow: 2px 3px 5px 0px rgba(0, 0, 0, 0.2);
+    transition: none;
+  }
+
+  .current-location {
+    background-color: $bg-grey;
+  }
+}
+
+.mdc-drawer__content .location-list {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 5px;
+
+  &.subscribed-channels {
+    padding: 16px 0 18px 0;
+    margin: 0 0 20px;
+
+    .heading {
+      margin-left: $icon-padding-left;
+      font-weight: 600;
+      color: #8a8b8c;
+      padding: 11px 0;
+      font-size: 18px;
+    }
+  }
+
+  .location {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .channel-link {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      color: $navy;
+      font-size: 18px;
+      padding: $link-padding;
+      flex-grow: 1;
+    }
+
+    .settings-link {
+      padding: 11px 20px;
+      color: $red-link-color;
+      font-weight: 600;
+    }
+
+    a:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .home-link {
+      display: flex;
+      align-items: center;
+      padding: $link-padding;
+      color: $navigation-text;
+      flex-grow: 1;
+    }
+
+    &.current-location {
+      background-color: #e7ebf5;
+      font-weight: 600;
+    }
+  }
+}
+
+.mdc-drawer__content .footer {
+  font-size: 12px;
+  padding: 0 $icon-padding-left;
+  height: $footer-height;
+
+  a,
+  a:hover {
+    color: black;
+  }
+
+  .mit-logo {
+    margin: 15px 0 5px 0;
+  }
+
+  .row {
+    display: block;
+    line-height: 20px;
+
+    &.legal {
+      color: $font-grey;
+      line-height: 16px;
     }
   }
 }
