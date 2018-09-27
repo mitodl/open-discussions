@@ -28,16 +28,6 @@ $profile-image-small-size: 45px;
   font-size: 36px;
 }
 
-.profile-incomplete {
-  height: 10px;
-  width: 10px;
-  background-color: red;
-  border-radius: 50%;
-  position: relative;
-  left: 3px;
-  top: -10px;
-}
-
 .profile-image-container,
 .avatar-container {
   display: flex;
