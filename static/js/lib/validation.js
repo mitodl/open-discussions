@@ -41,7 +41,7 @@ export const validate = R.curry((validations, toValidate) =>
   )(toValidate)
 )
 
-const emptyOrNil = R.either(R.isEmpty, R.isNil)
+export const emptyOrNil = R.either(R.isEmpty, R.isNil)
 
 export const validEmail = R.compose(
   R.test(/^\S+@\S+\.\S+$/), // matches any email that matches the format local@domain.tld
