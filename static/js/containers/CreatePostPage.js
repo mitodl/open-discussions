@@ -85,7 +85,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     const { postForm } = this.props
     return (
       postForm &&
-      emptyOrNil(postForm.value.text + postForm.value.url) &&
+      R.all(emptyOrNil, [postForm.value.text, postForm.value.url]) &&
       !emptyOrNil(postForm.value.postType)
     )
   }
