@@ -272,7 +272,7 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
         user.profile.image_small = '/just/a/great/image.png.jpg.gif'
     user.profile.save()
 
-    post = reddit_factories.text_post('my great post', user, channel=channel)
+    post = reddit_factories.text_post('my geat post', user, channel=channel)
     url = reverse('post-detail', kwargs={'post_id': post.id})
     client.force_login(user)
     resp = client.get(url)
@@ -290,7 +290,7 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
         "score": 1,
         "author_id": user.username,
         "id": post.id,
-        'slug': 'my-great-post',
+        'slug': get_reddit_slug(post.permalink),
         "created": post.created,
         "num_comments": 0,
         "channel_name": channel.name,
@@ -309,7 +309,7 @@ def test_get_post_no_profile(client, private_channel_and_contributor, reddit_fac
     channel, user = private_channel_and_contributor
     user.profile.delete()
 
-    post = reddit_factories.text_post('my great post', user, channel=channel)
+    post = reddit_factories.text_post('my geat post', user, channel=channel)
     url = reverse('post-detail', kwargs={'post_id': post.id})
     client.force_login(user)
     resp = client.get(url)
@@ -327,7 +327,7 @@ def test_get_post_no_profile(client, private_channel_and_contributor, reddit_fac
         "score": 1,
         "author_id": user.username,
         "id": post.id,
-        'slug': 'my-great-post',
+        'slug': get_reddit_slug(post.permalink),
         "created": post.created,
         "num_comments": 0,
         "channel_name": channel.name,
@@ -378,7 +378,7 @@ def test_get_post_stickied(client, private_channel_and_contributor, reddit_facto
         "score": 1,
         "author_id": user.username,
         "id": post.id,
-        'slug': 'just-a-post',
+        'slug': get_reddit_slug(post.permalink),
         "created": post.created,
         "num_comments": 0,
         "channel_name": channel.name,
@@ -709,7 +709,7 @@ def test_list_posts_anonymous(client, public_channel, reddit_factories, settings
                 'created': post.created,
                 'edited': False,
                 'id': post.id,
-                'slug': 'link-post',
+                'slug': get_reddit_slug(post.permalink),
                 'num_comments': 0,
                 'num_reports': None,
                 'profile_image': image_uri(user.profile),
