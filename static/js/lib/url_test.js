@@ -46,7 +46,7 @@ describe("url helper functions", () => {
     it(`should return a good post URL including slug`, () => {
       assert.equal(
         postDetailURL("foobar", "23434j3j3", "post_slug"),
-        "/c/foobar/23434j3j3/post_slug"
+        "/c/foobar/23434j3j3/post-slug"
       )
     })
   })
@@ -144,8 +144,8 @@ describe("url helper functions", () => {
   describe("commentPermalink with post slug", () => {
     it("should return a comment permalink with post slug", () => {
       assert.equal(
-        "/c/channel_name/post_id/post_slug/comment/comment_id/",
-        commentPermalink("channel_name", "post_id", "post_slug", "comment_id")
+        "/c/channel_name/post_id/post-slug/comment/comment_id/",
+        commentPermalink("channel_name", "post_id", "post-slug", "comment_id")
       )
     })
   })

@@ -278,8 +278,8 @@ class BasePostSerializer(RedditObjectSerializer):
         return None
 
     def get_slug(self, instance):
-        """Returns the post slug"""
-        return get_reddit_slug(instance.permalink)
+        """Returns the post slug from reddit and replaces '_' with '-'"""
+        return get_reddit_slug(instance.permalink).replace('_', '-')
 
     def get_author_name(self, instance):
         """get the authors name"""
