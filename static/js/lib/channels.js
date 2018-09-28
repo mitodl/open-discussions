@@ -116,3 +116,6 @@ export const isTextTabSelected = (
 
   return isTextTabSelected
 }
+
+export const isPrivate = (channel: Channel) =>
+  channel.channel_type === CHANNEL_TYPE_PRIVATE

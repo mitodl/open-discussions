@@ -23,6 +23,7 @@ import { commentPermalink, channelURL } from "../../lib/url"
 import { actions } from "../../actions"
 import { formatTitle } from "../../lib/title"
 import { dropdownMenuFuncs } from "../../lib/ui"
+import { isPrivate } from "../../lib/channels"
 
 import type { Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -75,6 +76,7 @@ export class ChannelModerationPage extends React.Component<Props> {
       removePost,
       approveComment,
       removeComment,
+      channel,
       channelName,
       ignorePostReports,
       ignoreCommentReports,
@@ -108,6 +110,7 @@ export class ChannelModerationPage extends React.Component<Props> {
           key={`${report.comment.id}-${report.comment.post_id}`}
           moderationUI
           isModerator={isModerator}
+          isPrivateChannel={isPrivate(channel)}
           dropdownMenus={dropdownMenus}
           curriedDropdownMenufunc={dropdownMenuFuncs(dispatch)}
         />

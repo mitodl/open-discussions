@@ -15,6 +15,7 @@ import SharePopup from "./SharePopup"
 import FollowButton from "./FollowButton"
 import PostUpvoteButton from "./PostUpvoteButton"
 
+import { isPrivate } from "../lib/channels"
 import { formatPostTitle } from "../lib/posts"
 import { userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
@@ -117,7 +118,7 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
               <SharePopup
                 url={postPermalink(post)}
                 closePopup={hidePostShareMenu}
-                hideSocialButtons={channel.channel_type === "private"}
+                hideSocialButtons={isPrivate(channel)}
               />
             ) : null}
           </div>

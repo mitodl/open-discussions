@@ -14,7 +14,8 @@ import {
   updateLinkType,
   isLinkTypeAllowed,
   isLinkTypeChecked,
-  isTextTabSelected
+  isTextTabSelected,
+  isPrivate
 } from "./channels"
 import { makeChannel } from "../factories/channels"
 
@@ -184,5 +185,19 @@ describe("Channel utils", () => {
         assert.equal(isTextTabSelected(postType, channel), expected)
       })
     })
+  })
+
+  describe("isPrivate", () => {
+    [[CHANNEL_TYPE_PRIVATE, true], [CHANNEL_TYPE_PUBLIC, false]].forEach(
+      ([channelType, expRetVal]) => {
+        it(`should return ${String(
+          expRetVal
+        )} when channel type=${channelType}`, () => {
+          const channel = makeChannel()
+          channel.channel_type = channelType
+          assert.equal(isPrivate(channel), expRetVal)
+        })
+      }
+    )
   })
 })
