@@ -10,6 +10,7 @@ from social_core.utils import (
     user_is_authenticated,
     user_is_active,
     partial_pipeline_data,
+    sanitize_redirect,
 )
 from rest_framework import serializers
 
@@ -40,6 +41,22 @@ class SocialAuthSerializer(serializers.Serializer):
     provider = serializers.CharField(read_only=True)
     state = serializers.CharField(read_only=True)
     errors = serializers.ListField(read_only=True)
+    redirect_url = serializers.CharField(read_only=True, default=None)
+
+    def _save_next(self, data):
+        """Persists the next url to the session"""
+        if 'next' in data:
+            backend = self.context['backend']
+            # Check and sanitize a user-defined GET/POST next field value
+            redirect_uri = data['next']
+            if backend.setting('SANITIZE_REDIRECTS', True):
+                allowed_hosts = backend.setting('ALLOWED_REDIRECT_HOSTS', []) + \
+                                [backend.strategy.request_host()]
+                redirect_uri = sanitize_redirect(allowed_hosts, redirect_uri)
+                backend.strategy.session_set(
+                    'next',
+                    redirect_uri or backend.setting('LOGIN_REDIRECT_URL')
+                )
 
     def _authenticate(self, flow):
         """Authenticate the current request"""
@@ -64,6 +81,10 @@ class SocialAuthSerializer(serializers.Serializer):
         else:
             user = backend.complete(user=user, **kwargs)
 
+        # pop redirect value before the session is trashed on login(), but after
+        # the pipeline so that the pipeline can change the redirect if needed
+        redirect_url = backend.strategy.session_get('next', None)
+
         # check if the output value is something else than a user and just
         # return it to the client
         user_model = strategy.storage.user.user_model()
@@ -72,7 +93,7 @@ class SocialAuthSerializer(serializers.Serializer):
             return user
 
         if is_authenticated:
-            return SocialAuthState(SocialAuthState.STATE_SUCCESS)
+            return SocialAuthState(SocialAuthState.STATE_SUCCESS, redirect_url=redirect_url)
         elif user:
             if user_is_active(user):
                 social_user = user.social_user
@@ -81,7 +102,7 @@ class SocialAuthSerializer(serializers.Serializer):
                 # store last login backend name in session
                 strategy.session_set('social_auth_last_login_backend', social_user.provider)
 
-                return SocialAuthState(SocialAuthState.STATE_SUCCESS)
+                return SocialAuthState(SocialAuthState.STATE_SUCCESS, redirect_url=redirect_url)
             else:
                 return SocialAuthState(SocialAuthState.STATE_INACTIVE)
         else:  # pragma: no cover
@@ -127,10 +148,14 @@ class LoginEmailSerializer(SocialAuthSerializer):
     partial_token = serializers.CharField(source='partial.token', read_only=True, default=None)
     email = serializers.EmailField(write_only=True)
     extra_data = serializers.JSONField(read_only=True)
+    next = serializers.CharField(write_only=True, required=False)
 
     def create(self, validated_data):
         """Try to 'save' the request"""
         profile_to_serialize = None
+
+        self._save_next(validated_data)
+
         try:
             result = super()._authenticate(SocialAuthState.FLOW_LOGIN)
         except RequireProviderException as exc:
@@ -177,6 +202,7 @@ class LoginPasswordSerializer(SocialAuthSerializer):
 class RegisterEmailSerializer(SocialAuthSerializer):
     """Serializer for email register"""
     email = serializers.EmailField(write_only=True, required=False)
+    next = serializers.CharField(write_only=True, required=False)
 
     def validate(self, attrs):
         token = (attrs.get('partial', {}) or {}).get('token', None)
@@ -191,6 +217,8 @@ class RegisterEmailSerializer(SocialAuthSerializer):
 
     def create(self, validated_data):
         """Try to 'save' the request"""
+        self._save_next(validated_data)
+
         try:
             result = super()._authenticate(SocialAuthState.FLOW_REGISTER)
             if isinstance(result, HttpResponseRedirect):

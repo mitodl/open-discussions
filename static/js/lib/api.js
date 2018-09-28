@@ -417,11 +417,12 @@ export function patchChannelBanner(
 
 export const postEmailLogin = (
   flow: AuthFlow,
-  email: string
+  email: string,
+  next: string
 ): Promise<EmailDetailAuthResponse> =>
   fetchJSONWithCSRF("/api/v0/login/email/", {
     method: POST,
-    body:   JSON.stringify({ flow, email })
+    body:   JSON.stringify({ flow, email, next })
   })
 
 export const postPasswordLogin = (
@@ -442,6 +443,7 @@ export const postPasswordLogin = (
 export const postEmailRegister = (
   flow: AuthFlow,
   email: string,
+  next: string,
   recaptcha: ?string,
   partialToken: ?string
 ): Promise<AuthResponse> =>
@@ -449,8 +451,8 @@ export const postEmailRegister = (
     method: POST,
     body:   JSON.stringify(
       partialToken
-        ? { flow, partial_token: partialToken, recaptcha }
-        : { flow, email, recaptcha }
+        ? { flow, partial_token: partialToken, recaptcha, next }
+        : { flow, email, recaptcha, next }
     )
   })
 
