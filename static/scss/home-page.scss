@@ -1,0 +1,49 @@
+.home-callout .card-contents {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  .logo-col {
+    img {
+      width: 67px;
+      height: 67px;
+    }
+  }
+
+  .text-col {
+    flex-shrink: 1;
+    flex-grow: 4;
+    padding: 0 10px;
+    min-width: 240px;
+    flex-basis: 240px;
+
+    h3 {
+      margin: 0;
+      padding: 0 0 8px 0;
+      font-size: 24px;
+    }
+
+    p {
+      margin: 0;
+      padding: 0;
+      font-size: 16px;
+      color: $font-grey;
+    }
+  }
+
+  .action-col {
+    align-self: flex-end;
+    flex-grow: 1;
+    text-align: center;
+    padding-top: 15px;
+
+    a.link-button {
+      display: inline-block;
+      width: 195px;
+      padding: 9px;
+      margin: 0;
+    }
+  }
+}
