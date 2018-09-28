@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.47.1
+Version 0.47.1 (Released September 28, 2018)
 --------------
 
 - Convert "days ago" text to post/comment link (#1234)
