@@ -3,6 +3,7 @@
   background-color: $message-component-bg-color;
   left: 50%;
   border-radius: $std-border-radius;
+  margin: 5px;
 
   @include breakpoint(materialmobile) {
     left: 0;
@@ -10,6 +11,7 @@
 
   &.mdc-snackbar--active {
     bottom: 10px;
+    padding: 10px;
   }
 
   .mdc-snackbar__text {
@@ -17,7 +19,6 @@
     padding: 0;
     min-width: 100%;
     width: 100%;
-    overflow: hidden;
   }
 }
 
