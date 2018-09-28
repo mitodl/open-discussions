@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.47.1 (Released September 28, 2018)
+--------------
+
+- Convert "days ago" text to post/comment link (#1234)
+- a few CSS fixes
+- Increased comment text size
+- Increased size of upvote & comment icons
+
 Version 0.47.0 (Released September 25, 2018)
 --------------
 
