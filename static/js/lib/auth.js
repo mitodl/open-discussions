@@ -29,8 +29,9 @@ import type { AuthResponse, EmailDetailAuthResponse } from "../flow/authTypes"
 
 export const processAuthResponse = (
   history: Object,
-  { state }: AuthResponse | EmailDetailAuthResponse
+  response: AuthResponse | EmailDetailAuthResponse
 ) => {
+  const { state } = response
   if (state === STATE_LOGIN_EMAIL) {
     history.push(LOGIN_URL)
   } else if (state === STATE_LOGIN_PASSWORD) {
@@ -45,7 +46,11 @@ export const processAuthResponse = (
     history.push(REGISTER_DETAILS_URL)
   } else if (state === STATE_SUCCESS) {
     // We now have a session, so force a redirect (we want the app to reinitialize)
-    window.location.href = FRONTPAGE_URL
+    if (response.redirect_url) {
+      window.location.href = response.redirect_url
+    } else {
+      window.location.href = FRONTPAGE_URL
+    }
   } else if (state === STATE_INACTIVE) {
     history.push(INACTIVE_USER_URL)
   } else if (state === STATE_LOGIN_PROVIDER) {

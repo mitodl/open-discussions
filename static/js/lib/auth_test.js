@@ -39,7 +39,8 @@ import {
 const DEFAULT_ARGS = {
   partial_token: null,
   flow:          FLOW_REGISTER,
-  errors:        []
+  errors:        [],
+  redirect_url:  null
 }
 
 describe("auth lib", () => {

@@ -1,5 +1,4 @@
 // @flow
-/* global SETTINGS: false */
 import React from "react"
 import { MetaTags } from "react-meta-tags"
 
@@ -7,16 +6,19 @@ import Card from "../../components/Card"
 import CanonicalLink from "../../components/CanonicalLink"
 
 import { formatTitle } from "../../lib/title"
+import { MICROMASTERS_URL, getNextParam } from "../../lib/url"
 
 import type { Match } from "react-router"
 
 type Props = {
+  location: { search: string },
   match?: Match
 }
 
 export default class AuthRequiredPage extends React.Component<Props> {
   render() {
-    const { match } = this.props
+    const { match, location } = this.props
+    const next = getNextParam(location.search)
 
     return (
       <div className="auth-page auth-required-page">
@@ -31,7 +33,7 @@ export default class AuthRequiredPage extends React.Component<Props> {
               To use this site you need to log in with a MicroMasters account.
             </div>
             <div className="login">
-              <a href={SETTINGS.authenticated_site.login_url}>
+              <a href={`${MICROMASTERS_URL}?next=${encodeURIComponent(next)}`}>
                 Log In to MicroMasters
               </a>
             </div>
