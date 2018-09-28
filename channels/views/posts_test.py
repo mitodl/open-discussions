@@ -709,7 +709,7 @@ def test_list_posts_anonymous(client, public_channel, reddit_factories, settings
                 'created': post.created,
                 'edited': False,
                 'id': post.id,
-                'slug': get_reddit_slug(post.permalink).replace('_', '-'),
+                'slug': 'link-post',
                 'num_comments': 0,
                 'num_reports': None,
                 'profile_image': image_uri(user.profile),

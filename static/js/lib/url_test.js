@@ -45,7 +45,7 @@ describe("url helper functions", () => {
   describe("postDetailURLWithSlug", () => {
     it(`should return a good post URL including slug`, () => {
       assert.equal(
-        postDetailURL("foobar", "23434j3j3", "post_slug"),
+        postDetailURL("foobar", "23434j3j3", "post-slug"),
         "/c/foobar/23434j3j3/post-slug"
       )
     })
