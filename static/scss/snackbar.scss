@@ -3,7 +3,6 @@
   background-color: $message-component-bg-color;
   left: 50%;
   border-radius: $std-border-radius;
-  margin: 5px;
 
   @include breakpoint(materialmobile) {
     left: 0;
