@@ -52,6 +52,7 @@ import {
 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { beginEditing } from "../components/CommentForms"
+import { isPrivate } from "../lib/channels"
 import { formatTitle } from "../lib/title"
 import { channelURL, postDetailURL, commentPermalink } from "../lib/url"
 import { clearPostError } from "../actions/post"
@@ -470,6 +471,7 @@ class PostPage extends React.Component<PostPageProps> {
         {commentsTree.length > 0 ? (
           <CommentTree
             comments={commentsTree}
+            isPrivateChannel={isPrivate(channel)}
             forms={forms}
             upvote={this.upvote}
             downvote={this.downvote}

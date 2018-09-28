@@ -80,6 +80,7 @@ describe("CommentTree", () => {
           toggleFollowComment={toggleFollowCommentStub}
           curriedDropdownMenufunc={dropdownMenuFuncs(helper.sandbox.stub())}
           dropdownMenus={new Set()}
+          isPrivateChannel={true}
           {...props}
         />
       </Router>

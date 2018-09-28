@@ -49,6 +49,7 @@ type Props = {
   loadMoreComments?: LoadMoreCommentsFunc,
   beginEditing?: BeginEditingFunc,
   isModerator: boolean,
+  isPrivateChannel: boolean,
   processing?: boolean,
   deleteComment?: CommentRemoveFunc,
   reportComment?: ReportCommentFunc,
@@ -96,6 +97,7 @@ export default class CommentTree extends React.Component<Props> {
       remove,
       deleteComment,
       beginEditing,
+      isPrivateChannel,
       isModerator,
       reportComment,
       commentPermalink,
@@ -149,6 +151,7 @@ export default class CommentTree extends React.Component<Props> {
             <SharePopup
               url={absolutizeURL(commentPermalink(comment.id))}
               closePopup={hideShareMenu}
+              hideSocialButtons={isPrivateChannel}
             />
           ) : null}
         </div>
