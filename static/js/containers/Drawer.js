@@ -8,6 +8,7 @@ import { Theme } from "rmwc/Theme"
 import ScrollArea from "react-scrollbar"
 
 import Navigation from "../components/Navigation"
+import HamburgerAndLogo from "../components/HamburgerAndLogo"
 
 import { setShowDrawerMobile, setShowDrawerDesktop } from "../actions/ui"
 import { getSubscribedChannels } from "../lib/redux_selectors"
@@ -99,16 +100,7 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
                 <div>
                   {isMobile ? (
                     <div className="drawer-mobile-header">
-                      <a
-                        href="#"
-                        className="material-icons"
-                        onClick={this.onDrawerClose}
-                      >
-                        menu
-                      </a>
-                      <a href="http://www.mit.edu" className="mitlogo">
-                        <img src="/static/images/mit-logo-transparent3.svg" />
-                      </a>
+                      <HamburgerAndLogo onHamburgerClick={this.onDrawerClose} />
                     </div>
                   ) : null}
                   <Navigation

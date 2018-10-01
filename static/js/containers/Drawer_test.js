@@ -61,17 +61,13 @@ describe("Drawer tests", () => {
 
     it("should include a menu button when mobile", () => {
       const wrapper = renderDrawer()
-      const mobileHeader = wrapper.find(".drawer-mobile-header")
-
-      const { href, onClick } = mobileHeader.find("a.material-icons").props()
-      assert.equal(href, "#")
-      assert.equal(onClick, wrapper.instance().onDrawerClose)
-
-      const logo = mobileHeader.find(".mitlogo")
-      assert.equal(logo.props().href, "http://www.mit.edu")
+      const component = wrapper
+        .find(".drawer-mobile-header")
+        .find("HamburgerAndLogo")
+      assert.ok(component.exists())
       assert.equal(
-        logo.find("img").props().src,
-        "/static/images/mit-logo-transparent3.svg"
+        component.props().onHamburgerClick,
+        wrapper.instance().onDrawerClose
       )
     })
 

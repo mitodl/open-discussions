@@ -5,6 +5,8 @@ import { Link } from "react-router-dom"
 import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
 
 import UserMenu from "./UserMenu"
+import HamburgerAndLogo from "../components/HamburgerAndLogo"
+
 import { LOGIN_URL } from "../lib/url"
 
 import type { Profile } from "../flow/discussionTypes"
@@ -51,16 +53,7 @@ export default class Toolbar extends React.Component<Props> {
         <header className="mdc-toolbar" ref={div => (this.toolbarRoot = div)}>
           <div className="mdc-toolbar__row">
             <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
-              <a
-                href="#"
-                className="material-icons mdc-toolbar__icon--menu"
-                onClick={this.toggleShowDrawer}
-              >
-                menu
-              </a>
-              <a href="http://www.mit.edu" className="mitlogo">
-                <img src="/static/images/mit-logo-transparent3.svg" />
-              </a>
+              <HamburgerAndLogo onHamburgerClick={this.toggleShowDrawer} />
               <span className="mdc-toolbar__title">
                 <a href={SETTINGS.authenticated_site.base_url}>
                   {SETTINGS.authenticated_site.title}

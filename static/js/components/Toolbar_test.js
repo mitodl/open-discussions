@@ -33,11 +33,11 @@ describe("Toolbar", () => {
     sandbox.restore()
   })
 
-  it("should call toggleShowDrawer when menu button is clicked", () => {
+  it("should pass toggleShowDrawer to menu component", () => {
     renderToolbar()
-      .find("a")
-      .at(0)
-      .simulate("click", {
+      .find("HamburgerAndLogo")
+      .props()
+      .onHamburgerClick({
         preventDefault: sandbox.stub()
       })
     assert.ok(toggleShowDrawerStub.called)

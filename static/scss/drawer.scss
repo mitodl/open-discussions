@@ -6,6 +6,10 @@ $footer-height: 132px;
   font-family: inherit;
 }
 
+.mdc-drawer.mdc-drawer--temporary {
+  z-index: 45;
+}
+
 .mdc-drawer.mdc-drawer--persistent {
   position: fixed;
   left: 0;
@@ -173,18 +177,16 @@ $footer-height: 132px;
   height: 60px;
 
   a {
-    padding-left: 35px;
-
     @include breakpoint(materialmobile) {
-      padding-left: 20px;
+      padding-left: 15px;
     }
   }
 
   a.material-icons {
-    color: $brand-bg;
+    color: $navy;
   }
 
   .mitlogo {
-    margin: 10px 0 0 7px;
+    margin-top: 4px;
   }
 }
