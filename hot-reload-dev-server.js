@@ -5,7 +5,7 @@ var devMiddleware = require('webpack-dev-middleware');
 var hotMiddleware = require('webpack-hot-middleware');
 var minimist = require('minimist');
 
-var makeDevConfig = require('./webpack.config.dev');
+var { makeDevConfig } = require('./webpack.config.dev');
 
 const { host, port } = minimist(process.argv.slice(2));
 

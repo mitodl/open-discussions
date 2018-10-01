@@ -56,4 +56,7 @@ const makeDevConfig = (host, port) => (
   })
 );
 
-module.exports = makeDevConfig;
+module.exports = {
+  makeDevConfig,
+  devConfig
+}
