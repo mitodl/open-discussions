@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.47.2
+Version 0.47.2 (Released October 01, 2018)
 --------------
 
 - Show post type buttons after switching channels if empty (#1248)
