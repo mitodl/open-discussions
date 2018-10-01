@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.47.2 (Released October 01, 2018)
+--------------
+
+- Show post type buttons after switching channels if empty (#1248)
+- Hid social sharing buttons for private channel comments
+- Remove "Show thread" from comment dropdown  (#1239)
+- Fixed styling for incomplete profile indicator
+- Fixed scrollbar-on-hover for the drawer
+- Fix appearance of quoted text in post body
+- Make MIT logo in <Footer /> a link
+- Enabled scrollbar-on-hover behavior for the drawer
+
 Version 0.47.1 (Released September 28, 2018)
 --------------
 
