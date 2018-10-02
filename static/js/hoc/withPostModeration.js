@@ -177,9 +177,9 @@ export const withPostModeration = (
             title="Remove Post"
           >
             <p>
-              Are you sure? You will still be able to see the post, but it will
-              be deleted for normal users. You can undo this later by clicking
-              "approve".
+              Are you sure? After you remove the post, it will no longer appear
+              in channel listings but you can access it directly. You can undo
+              this later by clicking "approve".
             </p>
           </Dialog>
           <WrappedComponent
