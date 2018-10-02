@@ -32,14 +32,13 @@ class SocialAuthState:
     STATE_INVALID_EMAIL = "invalid-email"
 
     def __init__(
-            self, state, *, provider=None, partial=None, flow=None, errors=None, redirect_url=None
+            self, state, *, provider=None, partial=None, flow=None, errors=None
     ):  # pylint: disable=too-many-arguments
         self.state = state
         self.partial = partial
         self.flow = flow
         self.provider = provider
         self.errors = errors or []
-        self.redirect_url = redirect_url
 
 
 def load_drf_strategy(request=None):

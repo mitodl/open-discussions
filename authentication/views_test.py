@@ -112,7 +112,6 @@ def login_email_exists(client, email_user):
                 'errors': [],
                 'flow': SocialAuthState.FLOW_LOGIN,
                 'provider': EmailAuth.name,
-                'redirect_url': None,
                 'partial_token': any_instance_of(str),
                 'state': SocialAuthState.STATE_LOGIN_PASSWORD,
                 'extra_data': {
@@ -141,7 +140,6 @@ def login_email_mm_only(client, user):
                 'errors': [],
                 'flow': SocialAuthState.FLOW_LOGIN,
                 'provider': MicroMastersAuth.name,
-                'redirect_url': None,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_LOGIN_PROVIDER,
                 'extra_data': {
@@ -176,7 +174,6 @@ def login_email_saml_exists(client, user, settings):
                 'errors': [],
                 'flow': SocialAuthState.FLOW_LOGIN,
                 'provider': SAMLAuth.name,
-                'redirect_url': None,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_LOGIN_PROVIDER,
                 'extra_data': {
@@ -204,7 +201,6 @@ def register_email_exists(client, user, mock_email_send):
                 'errors': ['Password is required to login'],
                 'flow': SocialAuthState.FLOW_REGISTER,
                 'provider': EmailAuth.name,
-                'redirect_url': None,
                 'partial_token': any_instance_of(str),
                 'state': SocialAuthState.STATE_LOGIN_PASSWORD,
             }
@@ -230,7 +226,6 @@ def login_email_not_exists(client):
                 'errors': ["Couldn't find your MIT OPEN Account"],
                 'flow': SocialAuthState.FLOW_LOGIN,
                 'provider': EmailAuth.name,
-                'redirect_url': None,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_ERROR,
             }
@@ -256,7 +251,6 @@ def register_email_not_exists(client, mock_email_send):
                 'errors': [],
                 'flow': SocialAuthState.FLOW_REGISTER,
                 'provider': EmailAuth.name,
-                'redirect_url': None,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_REGISTER_CONFIRM_SENT,
             }
@@ -285,7 +279,6 @@ def register_email_not_exists_with_recaptcha(settings, client, mock_email_send, 
                 'errors': [],
                 'flow': SocialAuthState.FLOW_REGISTER,
                 'provider': EmailAuth.name,
-                'redirect_url': None,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_REGISTER_CONFIRM_SENT,
             }
@@ -345,7 +338,6 @@ def login_password_valid(client, user):
                 'errors': [],
                 'flow': SocialAuthState.FLOW_LOGIN,
                 'provider': EmailAuth.name,
-                'redirect_url': None,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_SUCCESS,
             },
@@ -376,7 +368,6 @@ def login_password_user_inactive(client, user):
                 'errors': [],
                 'flow': SocialAuthState.FLOW_LOGIN,
                 'provider': EmailAuth.name,
-                'redirect_url': None,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_INACTIVE,
             }
@@ -403,7 +394,6 @@ def login_password_invalid(client, user):
                 'errors': ['Unable to login with that email and password combination'],
                 'flow': SocialAuthState.FLOW_LOGIN,
                 'provider': EmailAuth.name,
-                'redirect_url': None,
                 'partial_token': any_instance_of(str),
                 'state': SocialAuthState.STATE_ERROR,
             }
@@ -429,7 +419,6 @@ def redeem_confirmation_code(client, mock_email_send):
                 'errors': [],
                 'flow': SocialAuthState.FLOW_REGISTER,
                 'provider': EmailAuth.name,
-                'redirect_url': None,
                 'partial_token': any_instance_of(str),
                 'state': SocialAuthState.STATE_REGISTER_DETAILS,
             }
@@ -455,7 +444,6 @@ def register_profile_details(client):
                 'errors': [],
                 'flow': SocialAuthState.FLOW_REGISTER,
                 'provider': EmailAuth.name,
-                'redirect_url': None,
                 'partial_token': None,
                 'state': SocialAuthState.STATE_SUCCESS,
             },
@@ -536,7 +524,6 @@ def test_login_email_error(settings, client, mocker):
         'errors': [],
         'flow': SocialAuthState.FLOW_LOGIN,
         'provider': EmailAuth.name,
-        'redirect_url': None,
         'partial_token': None,
         'state': SocialAuthState.STATE_ERROR,
     }

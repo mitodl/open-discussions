@@ -93,7 +93,6 @@ export const REGISTER_DETAILS_URL = "/signup/details/"
 export const INACTIVE_USER_URL = "/account/inactive/"
 
 export const TOUCHSTONE_URL = "/login/saml/?idp=default"
-export const MICROMASTERS_URL = "/login/micromasters/"
 
 export const TERMS_OF_SERVICE_URL = "/terms-and-conditions"
 export const PRIVACY_POLICY_URL = "/privacy-statement"
@@ -103,5 +102,3 @@ export const toQueryString = (params: Object) =>
 
 export const urlHostname = (url: ?string) =>
   url ? new URL(url).hostname.replace(/^www\.(.*\.\w)/i, "$1") : ""
-
-export const getNextParam = (search: string) => qs.parse(search).next || "/"

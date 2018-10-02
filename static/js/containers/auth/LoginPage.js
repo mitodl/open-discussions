@@ -5,7 +5,6 @@ import { connect } from "react-redux"
 import R from "ramda"
 import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
-import qs from "query-string"
 
 import Card from "../../components/Card"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
@@ -18,12 +17,12 @@ import { setAuthUserDetail } from "../../actions/ui"
 import { processAuthResponse } from "../../lib/auth"
 import { configureForm, getAuthResponseFieldErrors } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
-import { REGISTER_URL, getNextParam } from "../../lib/url"
+import { REGISTER_URL } from "../../lib/url"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 import { FLOW_LOGIN, isProcessing } from "../../reducers/auth"
 
-import type { Location, Match } from "react-router"
+import type { Match } from "react-router"
 import type {
   AuthResponse,
   EmailDetailAuthResponse,
@@ -32,15 +31,13 @@ import type {
 import type { WithFormProps } from "../../flow/formTypes"
 
 type LoginPageProps = {
-  location: Location,
   match: Match,
-  history: Object,
-  next: string
+  history: Object
 } & WithFormProps<EmailForm>
 
 export class LoginPage extends React.Component<LoginPageProps> {
   render() {
-    const { renderForm, match, next } = this.props
+    const { renderForm, match } = this.props
 
     return (
       <div className="auth-page login-page">
@@ -54,10 +51,7 @@ export class LoginPage extends React.Component<LoginPageProps> {
             {renderForm()}
             <ExternalLogins />
             <div className="alternate-auth-link">
-              Not a member?{" "}
-              <Link to={`${REGISTER_URL}?${qs.stringify({ next })}`}>
-                Sign up
-              </Link>
+              Not a member? <Link to={REGISTER_URL}>Sign up</Link>
             </div>
           </Card>
         </div>
@@ -68,8 +62,8 @@ export class LoginPage extends React.Component<LoginPageProps> {
 
 const newEmailForm = () => ({ email: "" })
 
-const onSubmit = ({ email }: EmailForm, next: string) =>
-  actions.auth.loginEmail(FLOW_LOGIN, email, next)
+const onSubmit = ({ email }: EmailForm) =>
+  actions.auth.loginEmail(FLOW_LOGIN, email)
 
 const getSubmitResultErrors = getAuthResponseFieldErrors("email")
 
@@ -111,14 +105,9 @@ const mapStateToProps = state => {
 }
 
 const mergeProps = mergeAndInjectProps(
-  (stateProps, { setAuthUserDetail, onSubmit }, { history, location }) => {
-    const next = getNextParam(location.search)
-    return {
-      onSubmitResult: onSubmitResult(setAuthUserDetail, history),
-      onSubmit:       form => onSubmit(form, next),
-      next
-    }
-  }
+  (stateProps, { setAuthUserDetail }, { history }) => ({
+    onSubmitResult: onSubmitResult(setAuthUserDetail, history)
+  })
 )
 
 export default R.compose(

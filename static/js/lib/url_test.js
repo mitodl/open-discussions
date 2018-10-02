@@ -22,8 +22,7 @@ import {
   embedlyThumbnail,
   blankThumbnailUrl,
   embedlyResizeImage,
-  absolutizeURL,
-  getNextParam
+  absolutizeURL
 } from "./url"
 import { makePost } from "../factories/posts"
 
@@ -259,16 +258,6 @@ describe("url helper functions", () => {
       const url = absolutizeURL("/foo/bar/baz")
       assert.ok(url.startsWith(window.location.origin))
       assert.ok(url.includes("/foo/bar/baz"))
-    })
-  })
-
-  describe("getNextParam", () => {
-    it("should return a default value if no next param", () => {
-      assert.equal(getNextParam(""), "/")
-    })
-    it("should return the next param when present", () => {
-      const next = "/next/url"
-      assert.equal(getNextParam(`?next=${encodeURIComponent(next)}`), next)
     })
   })
 })

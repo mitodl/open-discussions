@@ -207,9 +207,6 @@ SOCIAL_AUTH_STRATEGY = 'authentication.strategy.OpenDiscussionsStrategy'
 
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'login-complete'
 SOCIAL_AUTH_LOGIN_ERROR_URL = 'login'
-SOCIAL_AUTH_ALLOWED_REDIRECT_HOSTS = [
-    urlparse(SITE_BASE_URL).netloc,
-]
 
 # Micromasters backend settings
 SOCIAL_AUTH_MICROMASTERS_LOGIN_URL = get_string('SOCIAL_AUTH_MICROMASTERS_LOGIN_URL', None)

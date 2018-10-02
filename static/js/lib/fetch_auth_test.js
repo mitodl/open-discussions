@@ -1,7 +1,6 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
-import qs from "query-string"
 import fetchMock from "fetch-mock/src/server"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
@@ -82,8 +81,6 @@ describe("fetch_auth", function() {
         it(`redirects to ${expectedUrl} if allow_email_auth: ${allowEmailAuth} for error: ${
           error.error_type
         }`, async () => {
-          const next = "/secret/url/?with=params#andhash"
-          window.location = next
           SETTINGS.allow_email_auth = allowEmailAuth
           fetchStub.returns(Promise.reject(error)) // original api call
 
@@ -92,7 +89,6 @@ describe("fetch_auth", function() {
           assert.ok(fetchStub.calledOnce)
           assert.ok(fetchStub.calledWith("/url"))
           assert.equal(window.location.pathname, expectedUrl)
-          assert.equal(qs.parse(window.location.search).next, next)
         })
       })
     })

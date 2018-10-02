@@ -41,8 +41,7 @@ describe("LoginPage", () => {
     renderPage = helper.configureHOCRenderer(
       ConnectedLoginPage,
       LoginPage,
-      DEFAULT_STATE,
-      { location: {} }
+      DEFAULT_STATE
     )
   })
 
@@ -98,7 +97,7 @@ describe("LoginPage", () => {
     const { inner } = await renderPage()
     const link = inner
       .find("Link")
-      .findWhere(c => c.prop("to") === `${REGISTER_URL}?next=%2F`)
+      .findWhere(c => c.prop("to") === REGISTER_URL)
     assert.ok(link.exists())
   })
 

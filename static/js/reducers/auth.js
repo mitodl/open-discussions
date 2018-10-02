@@ -41,8 +41,8 @@ export const authEndpoint = {
   initialState: { ...INITIAL_STATE },
   ...deriveVerbFuncs({
     // login functions
-    loginEmail: async (flow: AuthFlow, email: string, next: string) => {
-      const response = await api.postEmailLogin(flow, email, next)
+    loginEmail: async (flow: AuthFlow, email: string) => {
+      const response = await api.postEmailLogin(flow, email)
       return { email, ...response }
     },
     loginPassword: (flow: AuthFlow, partialToken: string, password: string) =>
@@ -51,14 +51,12 @@ export const authEndpoint = {
     registerEmail: async (
       flow: AuthFlow,
       email: string,
-      next: string,
       recaptcha: ?string,
-      partialToken: ?string
+      partialToken: string
     ) => {
       const response = await api.postEmailRegister(
         flow,
         email,
-        next,
         recaptcha,
         partialToken
       )
