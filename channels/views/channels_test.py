@@ -49,6 +49,16 @@ def test_list_channels(user_client, private_channel_and_contributor, request):
     ]
 
 
+def test_list_channels_ordered(user_client, subscribed_channels, request):
+    """
+    Channels should be in alphabetical order by title
+    """
+    url = reverse('channel-list')
+    channel_list = user_client.get(url).json()
+    for i in range(len(subscribed_channels)-1):
+        assert channel_list[i]['title'] < channel_list[i+1]['title']
+
+
 @pytest.mark.parametrize("allow_anonymous", [True, False])
 def test_list_channels_anonymous(client, settings, allow_anonymous):
     """

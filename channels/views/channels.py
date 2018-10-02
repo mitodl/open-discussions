@@ -42,6 +42,12 @@ class ChannelListView(ListCreateAPIView):
         api = Api(user=self.request.user)
         return api.list_channels()
 
+    def list(self, request, *args, **kwargs):
+        """Return the channels list in alphabetical order"""
+        queryset = self.get_queryset()
+        serializer = ChannelSerializer(queryset, many=True)
+        return Response(sorted(serializer.data, key=lambda channel: channel['title']))
+
     def post(self, request, *args, **kwargs):
         with translate_praw_exceptions(request.user):
             return super().post(request, *args, **kwargs)

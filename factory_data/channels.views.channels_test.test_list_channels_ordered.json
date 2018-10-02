@@ -1,0 +1,47 @@
+{
+  "channels": {
+    "private_channel_0": {
+      "channel_type": "private",
+      "description": "Rem iure exercitationem minus. Ab quasi quo tenetur nihil. Atque veritatis quis autem enim recusandae.\nSimilique odio repellat et. Asperiores magni laboriosam debitis maiores. Quae harum repudiandae amet.\nExpedita quos magni ipsa quas doloribus illum in. Ipsum esse praesentium odit deleniti quas. Saepe voluptas ea ipsa accusantium. Quisquam ex eveniet quaerat explicabo vitae voluptates assumenda. Deserunt laborum eius iusto officiis iste.",
+      "name": "1538426476_rerum",
+      "public_description": "Tempore aut corrupti et esse. Suscipit vitae ipsa similique numquam dolores.",
+      "title": "Dolores aliquid accusamus voluptatum."
+    },
+    "private_channel_1": {
+      "channel_type": "private",
+      "description": "Vel excepturi quae deserunt libero omnis quae explicabo. Animi praesentium omnis maxime. Aliquam possimus minima incidunt ut. Iste ducimus soluta incidunt ullam.\nQuidem officiis velit sint quae iste aperiam. Rerum aliquam placeat nulla incidunt incidunt ea repellendus. Deleniti repellat corrupti voluptatibus nisi maxime non ea. Perspiciatis voluptatum exercitationem culpa dicta fuga.\nPorro ipsam placeat velit. Eos magni distinctio minima eaque repellendus nesciunt consequatur.",
+      "name": "1538426480_velit",
+      "public_description": "Fugit tempora repudiandae optio atque blanditiis inventore. Eius quis iste nam laudantium odit.",
+      "title": "Voluptatibus magni accusantium earum consequatur."
+    },
+    "private_channel_2": {
+      "channel_type": "private",
+      "description": "Ut saepe necessitatibus illum id. Tenetur culpa velit maxime ullam vel repellendus minima. Incidunt ut dolorum libero vero rem quasi. Pariatur expedita maxime blanditiis laborum pariatur aspernatur facere.\nIusto reprehenderit corporis nobis doloremque atque quisquam. Praesentium ut mollitia aperiam voluptatibus doloremque explicabo qui. Neque expedita consequatur quas esse ad.",
+      "name": "1538426483_non",
+      "public_description": "Unde ea reprehenderit qui aspernatur aliquid. Atque officia laboriosam iste minima.",
+      "title": "Nobis laborum omnis explicabo recusandae."
+    },
+    "private_channel_3": {
+      "channel_type": "private",
+      "description": "Deleniti voluptatem sapiente recusandae hic nemo. Cum dolorum dolore laboriosam. Architecto tempore quibusdam nam dolor quae nemo exercitationem expedita.\nDistinctio ipsa repellat tempora esse. A odit at consectetur. Deleniti blanditiis similique fuga ducimus quisquam mollitia ducimus. Quam necessitatibus sequi accusamus vitae nulla ad recusandae.",
+      "name": "1538426486_quibusdam",
+      "public_description": "Et eveniet itaque sunt voluptates necessitatibus. Eius eligendi sit earum magni dicta.",
+      "title": "Porro ipsum voluptas iure aliquam."
+    },
+    "private_channel_4": {
+      "channel_type": "private",
+      "description": "Commodi maxime soluta quas similique. Eos minus reiciendis eum asperiores doloremque laborum eligendi.\nIllo dolorem quae temporibus ipsum. Id libero voluptas ipsum. Natus debitis exercitationem eaque modi sequi quo.\nAnimi doloremque velit temporibus. Quos ducimus et iure provident voluptatibus cumque ut. Non cumque commodi distinctio animi possimus.",
+      "name": "1538426490_illum",
+      "public_description": "Similique sed fuga adipisci fugit quo voluptate. Sapiente harum totam ullam iste animi voluptatem.",
+      "title": "Reprehenderit provident eaque inventore."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CRRNSZMCDFTNY9WP1A874HKQ"
+    },
+    "staff_user": {
+      "username": "01CRRNT2WT4F7SYXZQZ6TH5RZN"
+    }
+  }
+}
