@@ -6,7 +6,7 @@ import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
 import * as auth from "./fetch_auth"
 
-import { AUTH_REQUIRED_URL } from "./url"
+import { AUTH_REQUIRED_URL, LOGIN_URL } from "./url"
 import {
   NOT_AUTHENTICATED_ERROR_TYPE,
   AUTHENTICATION_FAILED_ERROR_TYPE
@@ -40,7 +40,6 @@ describe("fetch_auth", function() {
       beforeEach(() => {
         fetchStub = sandbox.stub(fetchFuncs, djangoCSRFFunc)
         SETTINGS.is_authenticated = false
-        SETTINGS.authenticated_site.session_url = "/session/url"
       })
       afterEach(function() {
         for (const cookie of document.cookie.split(";")) {
@@ -73,68 +72,23 @@ describe("fetch_auth", function() {
       }
 
       //
-      [errorNotAuthenticated, errorAuthenticationFailed].forEach(error => {
-        it(`renews and retries if the request failed for error: ${
+      [
+        [errorNotAuthenticated, false, AUTH_REQUIRED_URL],
+        [errorAuthenticationFailed, false, AUTH_REQUIRED_URL],
+        [errorNotAuthenticated, true, LOGIN_URL],
+        [errorAuthenticationFailed, true, LOGIN_URL]
+      ].forEach(([error, allowEmailAuth, expectedUrl]) => {
+        it(`redirects to ${expectedUrl} if allow_email_auth: ${allowEmailAuth} for error: ${
           error.error_type
         }`, async () => {
-          fetchStub.onFirstCall().returns(Promise.reject(error)) // original api call
-          fetchStub.onSecondCall().returns(Promise.resolve()) // original api call again
-          fetchMock.mock(SETTINGS.authenticated_site.session_url, {
-            has_token: true
-          })
-
-          await assert.isFulfilled(authFunc("/url"))
-
-          assert.ok(fetchMock.called())
-          assert.ok(fetchStub.calledTwice)
-          assert.ok(fetchStub.firstCall.calledWith("/url"))
-          assert.ok(fetchStub.secondCall.calledWith("/url"))
-          assert.equal(window.location.pathname, "/") // no redirect happened
-        })
-
-        it(`redirects and rejects if no token for error: ${
-          error.error_type
-        }`, async () => {
-          fetchStub.onFirstCall().returns(Promise.reject(error)) // original api call
-          fetchMock.mock(SETTINGS.authenticated_site.session_url, {
-            has_token: false
-          })
-
-          await assert.isRejected(authFunc("/url"))
-
-          assert.ok(fetchMock.called())
-          assert.ok(fetchStub.calledOnce)
-          assert.ok(fetchStub.calledWith("/url"))
-          assert.equal(window.location.pathname, "/auth_required/")
-        })
-
-        it(`renews and redirect to /auth_required/ if renew fails for error: ${
-          error.error_type
-        }`, async () => {
+          SETTINGS.allow_email_auth = allowEmailAuth
           fetchStub.returns(Promise.reject(error)) // original api call
-          fetchMock.mock(SETTINGS.authenticated_site.session_url, 401)
 
           await assert.isRejected(authFunc("/url"))
 
-          assert.ok(fetchMock.called())
           assert.ok(fetchStub.calledOnce)
           assert.ok(fetchStub.calledWith("/url"))
-          assert.equal(window.location.pathname, "/auth_required/")
-        })
-
-        it(`renews and redirect to /auth_required/ if is_authenticated is true for error: ${
-          error.error_type
-        }`, async () => {
-          SETTINGS.is_authenticated = true
-          fetchStub.returns(Promise.reject(error)) // original api call
-          fetchMock.mock(SETTINGS.authenticated_site.session_url, 401)
-
-          await assert.isRejected(authFunc("/url"))
-
-          assert.isNotOk(fetchMock.called())
-          assert.ok(fetchStub.calledOnce)
-          assert.ok(fetchStub.calledWith("/url"))
-          assert.equal(window.location.pathname, "/auth_required/")
+          assert.equal(window.location.pathname, expectedUrl)
         })
       })
     })
@@ -162,7 +116,7 @@ describe("fetch_auth", function() {
       const err = await assert.isRejected(
         auth.fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
       )
-      assert.equal(err, "invalid token")
+      assert.equal(err, "You were logged out, please login again")
       assert.equal(window.location.pathname, AUTH_REQUIRED_URL)
     })
 

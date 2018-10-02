@@ -190,12 +190,17 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
                   imageSize={PROFILE_IMAGE_MICRO}
                 />
                 <span className="author-name">{post.author_name}</span>
-                {post.author_headline ? (
-                  <span className="author-headline">
-                    &nbsp;&#8212;&nbsp;{post.author_headline}
-                  </span>
-                ) : null}
               </Link>
+              {post.author_headline ? (
+                <React.Fragment>
+                  <span className="author-headline separator">
+                    &nbsp;&#8212;&nbsp;
+                  </span>
+                  <span className="author-headline">
+                    {post.author_headline}
+                  </span>
+                </React.Fragment>
+              ) : null}
             </div>
             <div className="right date">{formattedDate}</div>
           </div>

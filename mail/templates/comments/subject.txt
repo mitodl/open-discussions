@@ -1,1 +1,1 @@
-[{{ post.channel_title|safe }}] {% if is_comment_reply %}Reply to your comment "{{ parent.text|truncatechars:20|safe }}"{% else %} Reply to {{ post.title|safe }}{% endif %}
+Re: [{{ post.channel_title|safe }}] {{ post.title|safe }}

@@ -109,10 +109,8 @@ $avatar-dimension-small: 22px;
     .avatar-initials {
       width: $avatar-dimension-medium;
       height: $avatar-dimension-medium;
-    }
-
-    .avatar-initials {
       font-size: $avatar-dimension-medium / 4;
+      border-radius: 8px;
     }
   }
 

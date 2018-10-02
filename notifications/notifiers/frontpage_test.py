@@ -92,7 +92,7 @@ def test_can_notify_invalid_frequency(trigger_frequency):
         notifier.can_notify(None)
 
 
-def test_send_notification(mocker):
+def test_send_notification(mocker, user):
     """Tests send_notification"""
     ns = NotificationSettingsFactory.create(
         via_email=True,
@@ -108,6 +108,7 @@ def test_send_notification(mocker):
         'channel_name': 'micromasters',
         'channel_title': 'MicroMasters',
         'created': now_in_utc().isoformat(),
+        'author_id': user.username,
     }
     post = mocker.Mock(
         created=int(now_in_utc().timestamp()),

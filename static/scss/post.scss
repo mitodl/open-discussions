@@ -167,20 +167,59 @@
   }
 
   .authored-by {
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: row;
-    margin: 20px 0;
+    line-height: 1;
+    align-items: flex-start;
+    flex-direction: column;
+    margin: 10px 0;
 
     .profile-image-container {
       padding: 0 10px 0 0;
     }
 
+    .date,
+    .author-headline {
+      margin-left: 35px;
+    }
+
+    .separator {
+      display: none;
+    }
+
     .left {
+      flex-direction: column;
+      align-items: flex-start;
+
       a {
         display: flex;
         align-items: center;
       }
+    }
+
+    @include breakpoint(extrawide) {
+      justify-content: space-between;
+      flex-direction: row;
+      align-items: center;
+      margin: 20px 0;
+      line-height: initial;
+
+      .date,
+      .author-headline {
+        margin-left: 0;
+      }
+
+      .separator {
+        display: initial;
+      }
+
+      .left {
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+      }
+    }
+
+    @include breakpoint(phone) {
+      font-size: 13px;
     }
   }
 

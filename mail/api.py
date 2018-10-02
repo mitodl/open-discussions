@@ -27,8 +27,8 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core import mail
 from django.template.loader import render_to_string
-from premailer import transform
 
+from open_discussions import features
 from open_discussions.authentication import get_encoded_and_signed_subscription_token
 
 log = logging.getLogger()
@@ -86,6 +86,7 @@ def context_for_user(user, extra_context=None):
     context = {
         'anon_token': get_encoded_and_signed_subscription_token(user),
         'base_url': settings.SITE_BASE_URL,
+        'use_new_branding': features.is_enabled(features.USE_NEW_BRANDING),
         'user': user,
     }
 
@@ -109,9 +110,6 @@ def render_email_templates(template_name, context):
     subject_text = render_to_string('{}/subject.txt'.format(template_name), context).rstrip()
     html_text = render_to_string('{}/body.html'.format(template_name), context)
 
-    # inline the css
-    html_text = transform(html_text)
-
     # pynliner internally uses bs4, which we can now modify the inlined version into a plaintext version
     # this avoids parsing the body twice in bs4
     soup = BeautifulSoup(html_text, 'html5lib')
@@ -123,10 +121,10 @@ def render_email_templates(template_name, context):
         style.clear()  # clear contents, just removing the tag isn't enough
 
     fallback_text = soup.get_text().strip()
-    # remove more than 3 consecutive newlines
+    # truncate more than 3 consecutive newlines
     fallback_text = re.sub(r'\n\s*\n', '\n\n\n', fallback_text)
     # ltrim the left side of all lines
-    fallback_text = re.sub(r'^\s+', '', fallback_text, flags=re.MULTILINE)
+    fallback_text = re.sub(r'^([ ]+)([\s\\X])', r'\2', fallback_text, flags=re.MULTILINE)
 
     return subject_text, fallback_text, html_text
 

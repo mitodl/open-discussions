@@ -7,25 +7,13 @@ import {
   fetchWithCSRF
 } from "redux-hammock/django_csrf_fetch"
 
-import { AUTH_REQUIRED_URL } from "./url"
+import { AUTH_REQUIRED_URL, LOGIN_URL } from "./url"
 import { isNotAuthenticatedErrorType } from "../util/rest"
 
-const renewSession = async () => {
-  if (SETTINGS.is_authenticated) {
-    return Promise.reject("Not using a JWT token")
-  }
-  if (SETTINGS.authenticated_site.session_url) {
-    return fetch(SETTINGS.authenticated_site.session_url, {
-      credentials: "include" // must be "include" for CORS fetch
-    })
-  }
-  return Promise.reject("Session renew url not provided")
-}
-
-const redirectAndReject = async (reason: string) => {
+const redirectAndReject = async () => {
   // redirect to the authenticating app
-  window.location = AUTH_REQUIRED_URL
-  return Promise.reject(reason)
+  window.location = SETTINGS.allow_email_auth ? LOGIN_URL : AUTH_REQUIRED_URL
+  return Promise.reject("You were logged out, please login again")
 }
 
 export const withAuthFailure = (fetchFunc: Function) => async (
@@ -39,18 +27,7 @@ export const withAuthFailure = (fetchFunc: Function) => async (
       throw fetchError
     }
 
-    try {
-      // renew the session
-      const session = await renewSession()
-      const json = await session.json()
-      if (!json.has_token) {
-        return redirectAndReject("New token was not created")
-      }
-    } catch (_) {
-      return redirectAndReject("Could not renew session")
-    }
-    // try again now that we have a proper auth
-    return fetchFunc(...args)
+    return redirectAndReject()
   }
 }
 
@@ -62,6 +39,8 @@ export const fetchWithAuthFailure = withAuthFailure((...args) =>
   fetchWithCSRF(...args)
 )
 
+// Fetch an api endpoint with an anonymous token
+// NOTE: this is NOT a JWT token
 export const fetchJSONWithToken = async (
   url: string,
   token: string,
@@ -80,6 +59,6 @@ export const fetchJSONWithToken = async (
       // not an authentication failure, rethrow
       throw fetchError
     }
-    return redirectAndReject("invalid token")
+    return redirectAndReject()
   }
 }

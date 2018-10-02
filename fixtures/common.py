@@ -40,7 +40,7 @@ def warnings_as_errors():
         # Ignore deprecation warnings in third party libraries
         warnings.filterwarnings(
             "ignore",
-            module=".*(api_jwt|api_jws|rest_framework_jwt|betamax).*",
+            module=".*(api_jwt|api_jws|rest_framework_jwt|betamax|astroid).*",
             category=DeprecationWarning,
         )
         # Ignore warnings for social_django compatibility code

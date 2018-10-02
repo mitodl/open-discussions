@@ -1,48 +1,51 @@
 {% extends "email_base.html" %}
-{% load humanize %}
-{% load timeago %}
 
-{% block title %}Open Discussions - New Comment{% endblock %}
-{% block styles %}
-<style type="text/css">
-</style>
-{% endblock %}
+{% block title %}Re: [{{ channel.name|safe }}]  post.title|safe %}{% endblock %}
 
 {% block content %}
-
-<table width="100%" cellpadding="13" cellspacing="0" border="0">
-  <tbody>
-    <tr>
+<!-- 1 Column Text : BEGIN -->
+  <tr>
       <td>
-        <div>
-          <p>From {{ comment.author_name }}:</p>
-          <p class="comment-content">
-            {{ comment.text|truncatewords:100 }}
-            {% if is_comment_reply %}
-              <a href="{{ base_url }}{% url 'channel-post-comment' channel_name=post.channel_name post_id=post.id post_slug=post.slug comment_id=comment.id %}">(read more)</a>
-            {% else %}
-              <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}">(read more)</a>
-            {% endif %}
-          </p>
-        </div>
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                  <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
+                      <p style="margin: 0 0 10px 0;">{{ comment.text }}</p>
+                  </td>
+              </tr>
+          </table>
       </td>
-    </tr>
-  </tbody>
-</table>
-<div class="read-more alignleft" style="margin-left: 13px; margin-top: 13px;">
-  {% if is_comment_reply %}
-  <a href="{{ base_url }}{% url 'channel-post-comment' channel_name=post.channel_name post_id=post.id post_slug=post.slug comment_id=comment.id %}" class="btn-primary">View on Open Discussions</a>
-  {% else %}
-  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}" class="btn-primary">View on Open Discussions</a>
-  {% endif %}
-</div>
+  </tr>
+  <tr>
+      <td style="padding: 0 20px 20px;">
+          <!-- Button : BEGIN -->
+          <table align="left" role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: auto;">
+              <tr>
+                  <td class="button-td button-td-primary" style="border-radius: 4px; background: #ffffff;">
+                       {% if is_comment_reply %}
+                         <a class="button-a button-a-primary" href="{{ base_url }}{% url 'channel-post-comment' channel_name=post.channel_name post_id=post.id post_slug=post.slug comment_id=comment.id %}" style="background: #ffffff; border: 1px solid #a31f34; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 28px; color: #a31f34; display: block; border-radius: 4px;">Read More</a>.
+                       {% else %}
+                         <a class="button-a button-a-primary" href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}" style="background: #ffffff; border: 1px solid #a31f34; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 28px; color: #a31f34; display: block; border-radius: 4px;">Read More</a>.
+                       {% endif %}
+                  </td>
+              </tr>
+          </table>
+          <!-- Button : END -->
+      </td>
+  </tr>
+<!-- 1 Column Text : END -->
 {% endblock %}
 
 {% block footer %}
-<p>
-  You are receiving this email because you are following a post on Open Discussions.
-  <br/>
-  If you don't want to receive these emails in the future, you can
-  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}">unfollow this post</a>.
-</p>
+You are receiving this email because you are following a post on {{ site_name }}.
+<br><br>
+To reply to this comment you can
+{% if is_comment_reply %}
+  <a href="{{ base_url }}{% url 'channel-post-comment' channel_name=post.channel_name post_id=post.id post_slug=post.slug comment_id=comment.id %}" style="color: #b0b0b0; text-decoration: underline;">view it on {{ site_name }}</a>.
+{% else %}
+  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}" style="color: #b0b0b0; text-decoration: underline;">view it on {{ site_name }}</a>.
+{% endif %}
+<br>
+If you don't want to receive these emails in the future, you can
+<a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}" style="color: #b0b0b0; text-decoration: underline;">unfollow this post</a>.
+<br><br>
 {% endblock %}

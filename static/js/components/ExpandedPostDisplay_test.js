@@ -114,7 +114,7 @@ describe("ExpandedPostDisplay", () => {
       )} display headline span when text=${String(headlineText)}`, () => {
         post.author_headline = headlineText
         const wrapper = renderPostDisplay({ post })
-        const headlineSpan = wrapper.find(".author-headline")
+        const headlineSpan = wrapper.find(".author-headline").at(1)
         assert.equal(headlineSpan.exists(), expElementExists)
         if (expElementExists && headlineText) {
           assert(headlineSpan.text().includes(headlineText))
