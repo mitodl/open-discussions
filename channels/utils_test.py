@@ -192,8 +192,8 @@ def test_translate_praw_exceptions(raised_exception, is_anonymous, expected_exce
 
 
 @pytest.mark.parametrize("permalink,slug", [
-    ["/r/1511374327_magnam/comments/ea/text_post/", "text_post"],
-    ["/r/1511371168_mollitia/comments/e6/url_post", "url_post"],
+    ["/r/1511374327_magnam/comments/ea/text_post/", "text-post"],
+    ["/r/1511371168_mollitia/comments/e6/url_post", "url-post"],
 ])
 def test_get_reddit_slug(permalink, slug):
     """Test that the correct slug is retrieved from a permalink"""

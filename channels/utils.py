@@ -241,7 +241,7 @@ def get_kind_mapping():
 
 def get_reddit_slug(permalink):
     """
-    Get the reddit slug from a submission permalink
+    Get the reddit slug from a submission permalink, with '_' replaced by '-'
 
     Args:
         permalink (str): reddit submission permalink
@@ -249,7 +249,7 @@ def get_reddit_slug(permalink):
     Returns:
         str: the reddit slug for a submission
     """
-    return list(filter(None, permalink.split('/')))[-1]
+    return list(filter(None, permalink.split('/')))[-1].replace('_', '-')
 
 
 @transaction.atomic

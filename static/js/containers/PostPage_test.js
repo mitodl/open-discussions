@@ -39,7 +39,7 @@ import { VALID_COMMENT_SORT_TYPES } from "../lib/sorting"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import * as utilFuncs from "../lib/util"
 import * as embedUtil from "../lib/embed"
-import { truncate } from "../lib/util"
+import { removeTrailingSlash, truncate } from "../lib/util"
 import { NOT_AUTHORIZED_ERROR_TYPE } from "../util/rest"
 
 describe("PostPage", function() {
@@ -117,6 +117,31 @@ describe("PostPage", function() {
     assert.equal(
       document.head.querySelector("[name=description]").content,
       truncate(post.text, 300)
+    )
+  })
+
+  it("should set the document meta canonical link to the post detail url", async () => {
+    await renderPage()
+    assert.equal(
+      document.head.querySelector("[rel=canonical]").href,
+      removeTrailingSlash(
+        `http://fake.open.url${postDetailURL(channel.name, post.id, post.slug)}`
+      )
+    )
+  })
+
+  it("should set the document meta canonical link to the comment permalink", async () => {
+    const commentLink = commentPermalink(
+      channel.name,
+      post.id,
+      post.slug,
+      comments[0].id
+    )
+    const [wrapper] = await renderComponent(commentLink, basicPostPageActions)
+    wrapper.update()
+    assert.equal(
+      document.head.querySelector("[rel=canonical]").href,
+      removeTrailingSlash(`http://fake.open.url${commentLink}`)
     )
   })
 

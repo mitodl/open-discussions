@@ -70,7 +70,7 @@ import { dropdownMenuFuncs } from "../lib/ui"
 import { getOwnProfile } from "../lib/redux_selectors"
 
 import type { Dispatch } from "redux"
-import type { Match, Location } from "react-router"
+import type { Location } from "react-router"
 import type { FormsState } from "../flow/formTypes"
 import type {
   Channel,
@@ -82,7 +82,6 @@ import type {
 } from "../flow/discussionTypes"
 
 type PostPageProps = {
-  match: Match,
   dispatch: Dispatch<any>,
   post: Post,
   channel: Channel,
@@ -355,7 +354,6 @@ class PostPage extends React.Component<PostPageProps> {
   render() {
     const {
       dispatch,
-      match,
       post,
       channel,
       commentsTree,
@@ -391,7 +389,13 @@ class PostPage extends React.Component<PostPageProps> {
       <div>
         <MetaTags>
           <title>{formatTitle(post.title)}</title>
-          <CanonicalLink match={match} />
+          <CanonicalLink
+            relativeUrl={
+              commentID
+                ? commentPermalink(channel.name, post.id, post.slug, commentID)
+                : postDetailURL(channel.name, post.id, post.slug)
+            }
+          />
           <meta name="description" content={truncate(post.text, 300)} />
         </MetaTags>
         <Dialog
