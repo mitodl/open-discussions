@@ -166,7 +166,7 @@ class CustomPasswordResetEmail(DjoserPasswordResetEmail):
         """
         Overrides djoser.email.PasswordResetEmail#send to use our mail API.
         """
-        context = super().get_context_data()
+        context = self.get_context_data()
         context.update(self.context)
         with django_mail.get_connection(settings.NOTIFICATION_EMAIL_BACKEND) as connection:
             subject, text_body, html_body = render_email_templates('password_reset', context)
@@ -179,6 +179,12 @@ class CustomPasswordResetEmail(DjoserPasswordResetEmail):
             )
             msg.attach_alternative(html_body, "text/html")
             send_messages([msg])
+
+    def get_context_data(self):
+        """Adds base_url to the template context"""
+        context = super().get_context_data()
+        context['base_url'] = settings.SITE_BASE_URL
+        return context
 
 
 class CustomDjoserAPIView(ActionViewMixin):
