@@ -39,13 +39,14 @@ const AnimatedEmptyPost = (i: number) => {
           <ContentLoader
             speed={contentLoaderSpeed}
             style={{ width: "100%", height: "137px" }}
-            width="100%"
+            width={1000}
             height={137}
+            preserveAspectRatio="none"
           >
             <rect x="0" y="0" rx="5" ry="5" width="70%" height="20" />
             <rect x="0" y="40" rx="5" ry="5" width="70%" height="16" />
             <rect x="0" y="58" rx="5" ry="5" width="70%" height="16" />
-            <rect x="0" y="113" rx="5" ry="5" width="35" height="24" />
+            <rect x="0" y="113" rx="5" ry="5" width="70" height="24" />
             <rect x="75%" y="0" rx="5" ry="5" width="25%" height="103" />
             <rect x="89%" y="113" rx="5" ry="5" width="11%" height="24" />
           </ContentLoader>
@@ -61,8 +62,9 @@ const PostLoading = () => (
       <ContentLoader
         speed={contentLoaderSpeed}
         style={{ width: "100%", height: "24px" }}
-        width="100%"
+        width={1000}
         height={24}
+        preserveAspectRatio="none"
       >
         <rect x="0" y="0" rx="5" ry="5" width="100%" height="100%" />
       </ContentLoader>

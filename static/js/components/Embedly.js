@@ -13,8 +13,9 @@ export const EmbedlyLoader = (props: Object = {}) => (
     <ContentLoader
       speed={contentLoaderSpeed}
       style={{ width: "100%", height: "300px" }}
-      width="100%"
+      width={1000}
       height={300}
+      preserveAspectRatio="none"
       {...props}
     >
       <rect x="0" y="0" rx="5" ry="5" width="100%" height="200" />
