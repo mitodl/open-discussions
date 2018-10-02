@@ -1,6 +1,24 @@
 Release Notes
 =============
 
+Version 0.48.0
+--------------
+
+- Added base_url to password reset email
+- Sort channels alphabetically (#1286)
+- Replace underscores with dashes in post slugs (#1279)
+- Fix issue with z-index on mobile drawer
+- Replace percent with viewport dimensions (#1285)
+- Revert "Added support for next param"
+- Added support for next param
+- update remove post dialog message to better match behavior (#1283)
+- Removed JWT logic and made login url conditional on email auth flag
+- Fix author line display on post page
+- Tweaks for channel settings page
+- Avoid squeezing snackbar message at narrow widths (#1282)
+- Updated email templates and added mail debugger
+- Fix auth card widths on various screen sizes
+
 Version 0.47.2 (Released October 01, 2018)
 --------------
 
