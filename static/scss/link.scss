@@ -1,0 +1,16 @@
+a {
+  cursor: pointer;
+}
+
+a.restyled {
+  color: $navy;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:visited {
+    color: $navy;
+  }
+}

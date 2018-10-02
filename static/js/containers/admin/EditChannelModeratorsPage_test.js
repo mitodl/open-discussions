@@ -317,7 +317,7 @@ describe("EditChannelModeratorsPage", () => {
 
       const actions = store.getActions()
 
-      assert.deepEqual(actions[actions.length - 2], {
+      assert.deepEqual(actions[actions.length - 3], {
         type:    SET_SNACKBAR_MESSAGE,
         payload: {
           message: `Successfully removed ${String(
@@ -325,8 +325,15 @@ describe("EditChannelModeratorsPage", () => {
           )} as a moderator`
         }
       })
+
+      assert.deepEqual(actions[actions.length - 2], {
+        type:    HIDE_DIALOG,
+        payload: DIALOG_REMOVE_MEMBER
+      })
     })
   })
+
+  //
   ;[true, false].forEach(hasDialog => {
     it(`passes a dialog value of ${String(hasDialog)}`, async () => {
       const { inner } = await render({

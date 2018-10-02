@@ -18,7 +18,7 @@ type Props = {
   title: string,
   submitText: string,
   id?: string,
-  children: any
+  children?: any
 }
 
 const OurDialog = ({

@@ -58,25 +58,43 @@
     }
   }
 
-  table {
-    width: 100%;
+  .members-list {
+    font-weight: bold;
 
-    .three-cols {
-      td {
-        width: 3 * (100%/8);
+    .email {
+      color: $font-grey-light;
+      font-weight: normal;
+    }
 
-        &:last-child {
-          width: 2 * (100%/8);
+    .remove {
+      font-size: 16px;
+      display: inline-block;
+      margin: 0 5px;
+      width: 100px;
+      padding: 2px 10px;
+    }
+
+    table {
+      width: 100%;
+      border-spacing: 12px;
+
+      .three-cols {
+        td {
+          width: 3 * 100% / 8;
+
+          &:last-child {
+            width: 2 * 100% / 8;
+          }
         }
       }
-    }
 
-    .two-cols {
-      width: 50%;
-    }
+      .two-cols {
+        width: 50%;
+      }
 
-    td:last-child {
-      text-align: right;
+      td:last-child {
+        text-align: center;
+      }
     }
   }
 
@@ -97,11 +115,15 @@
     }
   }
 
+  .members {
+    color: $navy;
+  }
+
   .add-member-form {
     display: flex;
     flex-direction: row;
     align-items: center;
-
+    color: $navy;
     margin-bottom: 20px;
 
     button[type="submit"] {
@@ -109,12 +131,9 @@
     }
   }
 
-  .remove {
-    cursor: pointer;
-  }
-
   .cant_remove {
-    color: grey;
+    color: $font-grey-light;
+    font-weight: normal;
   }
 
   .membership-notice {
@@ -125,10 +144,6 @@
   input[name="email"] {
     width: 100%;
     margin-right: 10px;
-  }
-
-  a {
-    cursor: pointer;
   }
 }
 

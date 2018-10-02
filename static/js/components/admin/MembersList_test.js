@@ -1,9 +1,7 @@
 /* global SETTINGS */
-import React from "react"
 import sinon from "sinon"
 import R from "ramda"
 import { assert } from "chai"
-import { shallow } from "enzyme"
 
 import MembersList from "./MembersList"
 
@@ -14,6 +12,7 @@ import {
   makeContributors,
   makeModerators
 } from "../../factories/channels"
+import { configureShallowRenderer } from "../../lib/test_utils"
 
 describe("MembersList", () => {
   let sandbox, channel
@@ -22,33 +21,32 @@ describe("MembersList", () => {
     sandbox = sinon.createSandbox()
     channel = makeChannel()
   })
+
   afterEach(() => {
     sandbox.restore()
   })
+
+  //
   ;[
     ["contributor", R.prop("contributor_name")],
     ["moderator", R.prop("moderator_name")]
   ].forEach(([memberTypeDescription, usernameGetter]) => {
     describe(memberTypeDescription, () => {
-      let members
+      let members, renderForm
 
       beforeEach(() => {
         members =
           memberTypeDescription === "contributor"
             ? makeContributors()
             : makeModerators(null, true)
-      })
 
-      const renderForm = ({ ...props }) =>
-        shallow(
-          <MembersList
-            members={members}
-            usernameGetter={usernameGetter}
-            channel={channel}
-            memberTypeDescription={memberTypeDescription}
-            {...props}
-          />
-        )
+        renderForm = configureShallowRenderer(MembersList, {
+          members,
+          usernameGetter,
+          channel,
+          memberTypeDescription
+        })
+      })
 
       it("should render names and emails", () => {
         const wrapper = renderForm()
@@ -69,7 +67,7 @@ describe("MembersList", () => {
           email:     null
         }))
 
-        const wrapper = renderForm()
+        const wrapper = renderForm({ members })
         const rows = wrapper.find(".row")
         members.forEach((member, i) => {
           const row = rows.at(i)
@@ -77,6 +75,8 @@ describe("MembersList", () => {
           assert.equal(row.find(".email").text(), MISSING_TEXT)
         })
       })
+
+      //
       ;[true, false].forEach(editable => {
         it(`should ${
           editable ? "" : "not "
@@ -136,6 +136,8 @@ describe("MembersList", () => {
 
         assert.equal(removeMember.callCount, 0)
       })
+
+      //
       ;[true, false].forEach(isYou => {
         it(`removes ${
           isYou ? "you" : "a member"
@@ -151,17 +153,11 @@ describe("MembersList", () => {
             dialogOpen: true,
             memberToRemove
           })
-          const dialog = wrapper.find("Dialog")
+          const dialog = wrapper.find("OurDialog")
           const name = isYou ? "yourself" : memberToRemove.full_name
           assert.equal(dialog.props().title, `Remove ${name}?`)
 
-          // verify that only MDCDialog:accept will work
           dialog.props().onAccept({ type: "click" })
-          assert.equal(removeMember.callCount, 0)
-
-          dialog.props().onAccept({
-            type: "MDCDialog:accept"
-          })
           assert.equal(removeMember.callCount, 1)
           sinon.assert.calledWith(removeMember, channel, memberToRemove)
         })
@@ -179,7 +175,7 @@ describe("MembersList", () => {
           setDialogVisibility
         })
         wrapper
-          .find("Dialog")
+          .find("OurDialog")
           .props()
           .hideDialog()
 

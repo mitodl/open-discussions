@@ -70,9 +70,9 @@ input[type="password"] {
   }
 }
 
-textarea {
+textarea,
+input[type="text"] {
   width: 100%;
-  height: 110px;
   padding: 12px 10px;
   box-sizing: border-box;
   border-radius: $std-border-radius;
@@ -85,6 +85,10 @@ textarea {
   &.no-height {
     height: auto;
   }
+}
+
+textarea {
+  height: 110px;
 }
 
 label {

@@ -3,11 +3,12 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
+import Dialog from "../Dialog"
+
 import { profileURL } from "../../lib/url"
 import { MISSING_TEXT } from "../../lib/channels"
 
 import type { Channel, Member } from "../../flow/discussionTypes"
-import { Dialog } from "@mitodl/mdl-react-components"
 
 type Props = {
   channel: Channel,
@@ -23,11 +24,7 @@ type Props = {
 }
 
 export default class MembersList extends React.Component<Props> {
-  removeMember = (event: Event) => {
-    if (event.type !== "MDCDialog:accept") {
-      // filter out click event to avoid double execution
-      return
-    }
+  removeMember = () => {
     const { removeMember, channel, memberToRemove } = this.props
     if (!memberToRemove) {
       throw new Error("Expected memberToRemove to be set")
@@ -55,7 +52,7 @@ export default class MembersList extends React.Component<Props> {
     } = this.props
 
     return (
-      <React.Fragment>
+      <div className="members-list">
         <table>
           <tbody>
             {members.map((member, index) => (
@@ -71,7 +68,7 @@ export default class MembersList extends React.Component<Props> {
                     {editable ? (
                       <td>
                         <a
-                          className="remove"
+                          className="remove grey-surround"
                           onClick={() => this.showRemoveDialog(member)}
                         >
                           Leave
@@ -84,7 +81,7 @@ export default class MembersList extends React.Component<Props> {
                     <td>
                       {member.full_name ? (
                         <Link
-                          className="name"
+                          className="restyled name"
                           to={profileURL(usernameGetter(member))}
                         >
                           {member.full_name}
@@ -104,7 +101,7 @@ export default class MembersList extends React.Component<Props> {
                           <span className="cant_remove">Can't remove</span>
                         ) : (
                           <a
-                            className="remove"
+                            className="remove grey-surround"
                             onClick={() => this.showRemoveDialog(member)}
                           >
                             Remove
@@ -130,7 +127,7 @@ export default class MembersList extends React.Component<Props> {
               : memberToRemove.full_name)) ||
             "member"}?`}
         />
-      </React.Fragment>
+      </div>
     )
   }
 }
