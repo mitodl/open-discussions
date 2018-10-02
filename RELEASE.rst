@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.48.0
+Version 0.48.0 (Released October 02, 2018)
 --------------
 
 - Added base_url to password reset email
