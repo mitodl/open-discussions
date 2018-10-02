@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 
 type Props = {
@@ -15,7 +16,13 @@ const HamburgerAndLogo = ({ onHamburgerClick }: Props) => (
       menu
     </a>
     <a href="http://www.mit.edu" className="mitlogo">
-      <img src="/static/images/mit-logo-transparent3.svg" />
+      <img
+        src={`/static/images/${
+          SETTINGS.use_new_branding
+            ? "MIT_circle.svg"
+            : "mit-logo-transparent3.svg"
+        }`}
+      />
     </a>
   </React.Fragment>
 )
