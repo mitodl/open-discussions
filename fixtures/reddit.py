@@ -78,7 +78,20 @@ def private_channel_and_contributor(private_channel, staff_api, user):
     """Fixture for a channel and a user who is a contributor"""
     staff_api.add_contributor(user.username, private_channel.name)
     staff_api.add_subscriber(user.username, private_channel.name)
-    return (private_channel, user)
+    return private_channel, user
+
+
+@pytest.fixture()
+def subscribed_channels(reddit_factories, staff_user, staff_api, user):
+    """Fixture for five channels with a user who is a contributor & subscriber"""
+    channels = []
+    for i in range(5):
+        channels.append(
+            reddit_factories.channel("private_channel_{}".format(i), staff_user, channel_type=CHANNEL_TYPE_PRIVATE)
+        )
+        staff_api.add_contributor(user.username, channels[i].name)
+        staff_api.add_subscriber(user.username, channels[i].name)
+    return channels
 
 
 @pytest.fixture()
