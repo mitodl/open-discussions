@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.48.1
+--------------
+
+- Added support for next param
+- Refactored form update logic on post creation page
+- Added support for conditional logo
+
 Version 0.48.0 (Released October 02, 2018)
 --------------
 
