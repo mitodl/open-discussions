@@ -5,17 +5,11 @@ type Props = {
   count: ?number
 }
 
-export default class ReportCount extends React.Component<Props> {
-  render() {
-    const { count } = this.props
-    if (!count) {
-      return null
-    }
+const ReportCount = ({ count }: Props) =>
+  count ? (
+    <div className="report-count">
+      {count} {count === 1 ? "Report" : "Reports"}
+    </div>
+  ) : null
 
-    return (
-      <div className="report-count">
-        {count} {count === 1 ? "Report" : "Reports"}
-      </div>
-    )
-  }
-}
+export default ReportCount

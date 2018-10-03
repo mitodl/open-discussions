@@ -16,21 +16,15 @@ type Props = {
   channel: Channel
 }
 
-export default class MembersNavbar extends React.Component<Props, void> {
-  render() {
-    const { channel } = this.props
+const MembersNavbar = ({ channel }: Props) => (
+  <IntraPageNav>
+    <NavLink to={editChannelModeratorsURL(channel.name)}>Moderators</NavLink>{" "}
+    {channel.channel_type !== CHANNEL_TYPE_PUBLIC ? (
+      <NavLink to={editChannelContributorsURL(channel.name)}>
+        Contributors
+      </NavLink>
+    ) : null}
+  </IntraPageNav>
+)
 
-    return (
-      <IntraPageNav>
-        <NavLink to={editChannelModeratorsURL(channel.name)}>
-          Moderators
-        </NavLink>{" "}
-        {channel.channel_type !== CHANNEL_TYPE_PUBLIC ? (
-          <NavLink to={editChannelContributorsURL(channel.name)}>
-            Contributors
-          </NavLink>
-        ) : null}
-      </IntraPageNav>
-    )
-  }
-}
+export default MembersNavbar

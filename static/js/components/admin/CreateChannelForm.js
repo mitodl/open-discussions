@@ -11,74 +11,69 @@ type Props = {
   form: ChannelForm
 }
 
-export default class CreateChannelForm extends React.Component<Props> {
-  render() {
-    const { onSubmit, onUpdate, form } = this.props
+const CreateChannelForm = ({ onSubmit, onUpdate, form }: Props) => (
+  <form onSubmit={onSubmit} className="form">
+    <div className="form-item">
+      <label htmlFor="title" className="label">
+        Title
+      </label>
+      <input
+        name="title"
+        type="text"
+        className="input"
+        value={form.title}
+        onChange={onUpdate}
+      />
+    </div>
+    <div className="form-item">
+      <label htmlFor="name" className="label">
+        Name
+      </label>
+      <input
+        name="name"
+        type="text"
+        className="input"
+        value={form.name}
+        onChange={onUpdate}
+      />
+    </div>
+    <div className="form-item">
+      <label htmlFor="description" className="label">
+        Description
+      </label>
+      <textarea
+        name="description"
+        type="text"
+        className="input"
+        value={form.description}
+        onChange={onUpdate}
+      />
+    </div>
+    <div className="form-item">
+      <div className="label">Channel Type</div>
+      <div className="input">
+        <input
+          id="channel_public"
+          type="radio"
+          name="channel_type"
+          value={CHANNEL_TYPE_PUBLIC}
+          checked={form.channel_type === CHANNEL_TYPE_PUBLIC}
+          onChange={onUpdate}
+        />
+        <label htmlFor="channel_public">Public</label>
+        <input
+          id="channel_private"
+          type="radio"
+          name="channel_type"
+          value={CHANNEL_TYPE_PRIVATE}
+          checked={form.channel_type === CHANNEL_TYPE_PRIVATE}
+          onChange={onUpdate}
+        />
+        <label htmlFor="channel_private">Private</label>
+      </div>
+    </div>
+    <button type="submit">Save</button>
+  </form>
+)
 
-    return (
-      <form onSubmit={onSubmit} className="form">
-        <div className="form-item">
-          <label htmlFor="title" className="label">
-            Title
-          </label>
-          <input
-            name="title"
-            type="text"
-            className="input"
-            value={form.title}
-            onChange={onUpdate}
-          />
-        </div>
-        <div className="form-item">
-          <label htmlFor="name" className="label">
-            Name
-          </label>
-          <input
-            name="name"
-            type="text"
-            className="input"
-            value={form.name}
-            onChange={onUpdate}
-          />
-        </div>
-        <div className="form-item">
-          <label htmlFor="description" className="label">
-            Description
-          </label>
-          <textarea
-            name="description"
-            type="text"
-            className="input"
-            value={form.description}
-            onChange={onUpdate}
-          />
-        </div>
-        <div className="form-item">
-          <div className="label">Channel Type</div>
-          <div className="input">
-            <input
-              id="channel_public"
-              type="radio"
-              name="channel_type"
-              value={CHANNEL_TYPE_PUBLIC}
-              checked={form.channel_type === CHANNEL_TYPE_PUBLIC}
-              onChange={onUpdate}
-            />
-            <label htmlFor="channel_public">Public</label>
-            <input
-              id="channel_private"
-              type="radio"
-              name="channel_type"
-              value={CHANNEL_TYPE_PRIVATE}
-              checked={form.channel_type === CHANNEL_TYPE_PRIVATE}
-              onChange={onUpdate}
-            />
-            <label htmlFor="channel_private">Private</label>
-          </div>
-        </div>
-
-        <button type="submit">Save</button>
-      </form>
-    )
-  }
-}
+export default CreateChannelForm

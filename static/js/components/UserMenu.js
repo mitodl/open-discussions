@@ -59,33 +59,31 @@ export const LoggedOutMenu = (props: DropdownMenuProps) => (
   </DropdownMenu>
 )
 
-export default class UserMenu extends React.Component<Props> {
-  render() {
-    const { toggleShowUserMenu, showUserMenu, profile } = this.props
+const UserMenu = ({ toggleShowUserMenu, showUserMenu, profile }: Props) => {
+  const ListComponent = profile ? LoggedInMenu : LoggedOutMenu
 
-    const ListComponent = profile ? LoggedInMenu : LoggedOutMenu
-
-    return (
-      <div className="user-menu">
-        <div className="user-menu-clickarea" onClick={toggleShowUserMenu}>
-          <ProfileImage
-            editable={false}
-            userName={SETTINGS.username}
-            profile={profile}
-            imageSize={PROFILE_IMAGE_SMALL}
-          />
-          {showUserMenu ? <DropUpArrow /> : <DropDownArrow />}
-          {SETTINGS.profile_ui_enabled && !isProfileComplete(profile) ? (
-            <div className="profile-incomplete" />
-          ) : null}
-        </div>
-        {showUserMenu ? (
-          <ListComponent
-            className="user-menu-dropdown"
-            closeMenu={toggleShowUserMenu}
-          />
+  return (
+    <div className="user-menu">
+      <div className="user-menu-clickarea" onClick={toggleShowUserMenu}>
+        <ProfileImage
+          editable={false}
+          userName={SETTINGS.username}
+          profile={profile}
+          imageSize={PROFILE_IMAGE_SMALL}
+        />
+        {showUserMenu ? <DropUpArrow /> : <DropDownArrow />}
+        {SETTINGS.profile_ui_enabled && !isProfileComplete(profile) ? (
+          <div className="profile-incomplete" />
         ) : null}
       </div>
-    )
-  }
+      {showUserMenu ? (
+        <ListComponent
+          className="user-menu-dropdown"
+          closeMenu={toggleShowUserMenu}
+        />
+      ) : null}
+    </div>
+  )
 }
+
+export default UserMenu
