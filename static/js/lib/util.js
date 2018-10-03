@@ -128,3 +128,6 @@ export const removeTrailingSlash = (str: string) =>
   str.length > 0 && str[str.length - 1] === "/"
     ? str.substr(0, str.length - 1)
     : str
+
+export const emptyOrNil = R.either(R.isEmpty, R.isNil)
+export const allEmptyOrNil = R.all(emptyOrNil)

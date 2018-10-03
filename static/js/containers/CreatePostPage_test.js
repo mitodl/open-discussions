@@ -425,17 +425,13 @@ describe("CreatePostPage", () => {
       [LINK_TYPE_ANY, LINK_TYPE_ANY, null, false, false],
       // starting with LINK
       [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_LINK, true, true],
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, null, false, true],
       [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, true, false],
       [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, false, true],
-      [LINK_TYPE_LINK, LINK_TYPE_ANY, null, false, false],
       // starting with TEXT
       [LINK_TYPE_TEXT, LINK_TYPE_TEXT, LINK_TYPE_TEXT, true, false],
       [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_TEXT, true, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, null, false, true],
       [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, true, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, false, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, null, false, false]
+      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, false, true]
     ].forEach(
       ([
         fromChannelType,
@@ -502,9 +498,9 @@ describe("CreatePostPage", () => {
       [LINK_TYPE_LINK, true],
       [LINK_TYPE_TEXT, true]
     ].forEach(([linkType, shouldDispatch]) => {
-      it(`${
-        shouldDispatch ? "should" : "shouldn't"
-      } FORM_UPDATE when coming from no channel to a channel with ${linkType}`, () => {
+      it(`${shouldIf(
+        shouldDispatch
+      )} update form when coming from no channel to a channel with link type '${linkType}'`, () => {
         const dispatch = helper.sandbox.stub()
         currentChannel.link_type = linkType
         const page = new InnerCreatePostPage()

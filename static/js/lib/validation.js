@@ -5,6 +5,7 @@ import R from "ramda"
 
 import { S } from "./sanctuary"
 import { LINK_TYPE_LINK } from "../lib/channels"
+import { emptyOrNil } from "../lib/util"
 
 import type { PostForm } from "../flow/discussionTypes"
 
@@ -40,8 +41,6 @@ export const validate = R.curry((validations, toValidate) =>
     validations
   )(toValidate)
 )
-
-export const emptyOrNil = R.either(R.isEmpty, R.isNil)
 
 export const validEmail = R.compose(
   R.test(/^\S+@\S+\.\S+$/), // matches any email that matches the format local@domain.tld

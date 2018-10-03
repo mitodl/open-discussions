@@ -18,9 +18,9 @@ import { clearPostError } from "../actions/post"
 import { isTextTabSelected, LINK_TYPE_ANY } from "../lib/channels"
 import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
-import { getChannelName } from "../lib/util"
+import { allEmptyOrNil, getChannelName } from "../lib/util"
 import { formatTitle } from "../lib/title"
-import { emptyOrNil, validatePostCreateForm } from "../lib/validation"
+import { validatePostCreateForm } from "../lib/validation"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 import { anyErrorExcept404 } from "../util/rest"
 
@@ -81,31 +81,34 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     ensureTwitterEmbedJS()
   }
 
-  shouldTriggerUpdate() {
-    const { postForm } = this.props
-    return (
-      postForm &&
-      R.all(emptyOrNil, [postForm.value.text, postForm.value.url]) &&
-      !emptyOrNil(postForm.value.postType)
-    )
+  shouldFormReset = (
+    channelLinkType: string,
+    prevChannelLinkType: ?string,
+    postForm: PostFormValue
+  ) => {
+    /*
+    If the selected channel accepts any type of post, the form should reset if there was a
+    previously-selected channel and no input has been entered.
+    If the selected channel only takes specific posts, the form should reset if the post type
+    of the current form doesn't match the channel's post type.
+     */
+    return channelLinkType === LINK_TYPE_ANY
+      ? prevChannelLinkType &&
+          allEmptyOrNil([postForm.value.url, postForm.value.text])
+      : channelLinkType !== postForm.value.postType
   }
 
   componentDidUpdate(prevProps: CreatePostPageProps) {
     const { channel, dispatch, postForm } = this.props
 
-    // we may need to change out the postType under certain conditions
-    // if the user switches channels and the new channel isn't LINK_TYPE_ANY,
-    // and the current postType is null or a postType which is incompatible with the
-    // new channel, we want to set the postType to be the link_type for the channel.
-    // If the new channel is LINK_TYPE_ANY and both text and url values are empty,
-    // we want to set the postType to null to display the post type options.
+    // If a newly-selected channel cannot or should not be rendered with the same form state as the
+    // previously-selected channel, we need to reset the form state.
+    const prevChannelLinkType = R.path(["channel", "link_type"], prevProps)
     if (
       postForm &&
       channel &&
-      ((prevProps.channel && prevProps.channel.name !== channel.name) ||
-        !prevProps.channel) &&
-      (channel.link_type !== LINK_TYPE_ANY || this.shouldTriggerUpdate()) &&
-      channel.link_type !== postForm.value.postType
+      channel.link_type !== prevChannelLinkType &&
+      this.shouldFormReset(channel.link_type, prevChannelLinkType, postForm)
     ) {
       dispatch(
         actions.forms.formUpdate({
