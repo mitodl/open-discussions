@@ -68,7 +68,11 @@ export default class PostUpvoteButton extends React.Component<Props, State> {
           <span className="votes">{post.score}</span>
         </div>
         {userIsAnonymous() ? (
-          <LoginPopup visible={popupVisible} closePopup={this.onTogglePopup} />
+          <LoginPopup
+            visible={popupVisible}
+            closePopup={this.onTogglePopup}
+            className="post-upvote-popup"
+          />
         ) : null}
       </React.Fragment>
     )
