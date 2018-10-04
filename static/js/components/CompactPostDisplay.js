@@ -169,7 +169,7 @@ export class CompactPostDisplay extends React.Component<Props> {
                 ) : null}
                 {isModerator && removePost ? (
                   <li>
-                    <a onClick={() => removePost(post)}>Remove content</a>
+                    <a onClick={() => removePost(post)}>Remove</a>
                   </li>
                 ) : null}
                 {isModerator && ignorePostReports ? (
