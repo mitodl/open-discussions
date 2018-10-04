@@ -2,7 +2,7 @@
 import React from "react"
 
 import LoginPopup from "./LoginPopup"
-import { userIsAnonymous, votingTooltipText } from "../lib/util"
+import { userIsAnonymous } from "../lib/util"
 import type { CommentInTree } from "../flow/discussionTypes"
 
 export type CommentVoteFunc = (comment: CommentInTree) => Promise<*>
@@ -107,11 +107,7 @@ export default class CommentVoteForm extends React.Component<Props, State> {
           />
         </button>
         {userIsAnonymous() ? (
-          <LoginPopup
-            message={votingTooltipText}
-            visible={popupVisible}
-            closePopup={this.onTogglePopup}
-          />
+          <LoginPopup visible={popupVisible} closePopup={this.onTogglePopup} />
         ) : null}
       </div>
     )

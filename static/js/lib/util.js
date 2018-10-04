@@ -69,9 +69,6 @@ const getAvatarIndex = (key: string, maxIdx: number) =>
 
 export const userIsAnonymous = () => R.isNil(SETTINGS.username)
 
-export const votingTooltipText = "Sign Up or Login to vote"
-export const commentLoginText = "Sign Up or Login to comment"
-
 export const defaultProfileImageUrl = "/static/images/avatar_default.png"
 export const defaultChannelAvatarUrlPrefix =
   "/static/images/channel_avatars/channel-avatar"

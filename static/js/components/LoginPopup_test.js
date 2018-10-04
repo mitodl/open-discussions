@@ -8,16 +8,14 @@ import { LoginPopupHelper } from "./LoginPopup"
 import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("LoginPopup", () => {
-  let closePopupStub, message, visible, sandbox, renderLoginPopupHelper
+  let closePopupStub, visible, sandbox, renderLoginPopupHelper
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     closePopupStub = sandbox.stub()
-    message = "Login to do something"
     visible = true
 
     renderLoginPopupHelper = configureShallowRenderer(LoginPopupHelper, {
-      message,
       visible,
       closePopup: closePopupStub
     })
@@ -31,38 +29,18 @@ describe("LoginPopup", () => {
     const wrapper = renderLoginPopupHelper()
     assert.isFunction(wrapper.instance().handleClickOutside)
     wrapper.instance().handleClickOutside()
-    assert.ok(closePopupStub.called)
-  })
-
-  it("should include the message text", () => {
-    assert.equal(
-      message,
-      renderLoginPopupHelper()
-        .find(".popup-title")
-        .text()
-    )
+    assert.isTrue(closePopupStub.called)
   })
 
   it("should include login and signup buttons", () => {
     const wrapper = renderLoginPopupHelper()
-    assert.equal(
-      wrapper
-        .find(Link)
-        .at(0)
-        .props().to,
-      "/login"
-    )
-    assert.equal(
-      wrapper
-        .find(Link)
-        .at(1)
-        .props().to,
-      "/signup"
-    )
+    const links = wrapper.find(Link)
+    assert.equal(links.at(0).prop("to"), "/login")
+    assert.equal(links.at(1).prop("to"), "/signup")
   })
 
   it("should render null, if visible === false", () => {
     const wrapper = renderLoginPopupHelper({ visible: false })
-    assert.isNotOk(wrapper.find("div").exists())
+    assert.isFalse(wrapper.find("div").exists())
   })
 })
