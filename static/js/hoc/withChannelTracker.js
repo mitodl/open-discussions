@@ -5,6 +5,8 @@ import R from "ramda"
 
 const shouldLoadData = R.complement(
   R.allPass([
+    // if channel name doesn't match
+    R.eqBy(R.path(["channel", "name"])),
     // if URL path doesn't match
     R.eqBy(R.path(["location", "search"]))
   ])
