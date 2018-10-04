@@ -7,7 +7,6 @@ import Button from "./Button"
 
 type LoginPopupProps = {
   closePopup: Function,
-  message: string,
   visible: boolean,
   className?: string
 }
@@ -21,21 +20,25 @@ export class LoginPopupHelper extends React.Component<LoginPopupProps> {
   }
 
   render() {
-    const { message, visible, className } = this.props
+    const { visible, className } = this.props
     return visible ? (
       <div className={`popup login-popup ${className || ""}`}>
         <div className="triangle" />
-        <Button className="close-popup" onClick={this.handleClickOutside}>
-          <span>x</span>
+        <Button className="close-btn" onClick={this.handleClickOutside}>
+          <i className="material-icons">close</i>
         </Button>
-        <div className="popup-title">{message}</div>
+        <h4>Join MIT Open</h4>
+        <div className="popup-text">
+          As a member, you can share your ideas, subscribe, vote, and comment on
+          educational content that matters to you.
+        </div>
         <div className="bottom-row">
           <div className="popup-buttons">
             <Link className="link-button" to="/login">
               Log In
             </Link>
             <Link className="link-button red" to="/signup">
-              Become a member
+              Sign Up
             </Link>
           </div>
         </div>

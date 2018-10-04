@@ -62,10 +62,9 @@ export default class FollowButton extends React.Component<
         )}
         {userIsAnonymous() ? (
           <LoginPopup
-            message="Sign up or Login to follow"
             visible={popupVisible}
             closePopup={this.onTogglePopup}
-            className="reversed"
+            className="reversed follow-btn-popup"
           />
         ) : null}
       </React.Fragment>

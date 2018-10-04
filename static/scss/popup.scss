@@ -7,14 +7,22 @@
   padding: 12px;
   min-width: 250px;
   z-index: 10;
+  font-size: $tooltip-font-size;
 
   .triangle {
     @extend %triangle;
   }
 
-  .popup-title {
+  .popup-text,
+  h4 {
+    width: 90%;
     color: $font-black;
-    margin-bottom: 2px;
+  }
+
+  h4 {
+    padding: 0 0 10px 0;
+    margin: 0;
+    font-size: inherit;
   }
 
   input {
@@ -24,9 +32,9 @@
 
   .bottom-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    margin-top: 5px;
+    margin-top: 15px;
 
     .popup-buttons {
       display: flex;
@@ -61,21 +69,22 @@
   right: unset;
   margin-top: 10px;
   min-width: 255px;
+  max-width: 290px;
 
-  &.downshift {
-    margin-top: 50px;
-  }
-
-  .close-popup {
+  .close-btn {
     position: absolute;
     top: 0px;
     right: 0px;
     padding: 5px;
+    margin: 7px 7px 0 0;
     background-color: #fff !important;
     color: #000;
     min-width: unset;
     height: unset;
-    font-size: 12px;
+
+    i {
+      font-size: 16px;
+    }
 
     &:before {
       background-color: $bg-light-grey !important;
@@ -89,16 +98,26 @@
   .link-button {
     background-color: #fff;
     display: block;
-    border-radius: 10px;
+    border-radius: $std-border-radius;
     padding: 5px 15px;
-    border: 1px solid #972c37;
-    color: #972c37;
+    margin: 0 0 0 10px;
+    border: 1px solid $brand-bg;
+    color: $brand-bg;
     text-align: center;
-    margin: 10px 5px 10px;
   }
 
   .red {
-    background-color: #972c37;
+    background-color: $brand-bg;
     color: #fff;
+  }
+
+  // Popup-specific spacing styles
+  // DELETE THESE WHEN #1299 IS COMPLETED
+  &.follow-btn-popup {
+    margin-top: 32px;
+  }
+
+  &.post-reply-popup {
+    margin-top: 50px;
   }
 }

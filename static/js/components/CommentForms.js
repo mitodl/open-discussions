@@ -14,7 +14,6 @@ import { setPostData } from "../actions/post"
 import { setBannerMessage } from "../actions/ui"
 import {
   isEmptyText,
-  commentLoginText,
   userIsAnonymous,
   preventDefaultAndInvoke
 } from "../lib/util"
@@ -509,12 +508,13 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
 
       return (
         <div className="reply-post-form">
-          <LoginPopup
-            message={commentLoginText}
-            visible={popupVisible}
-            closePopup={this.onTogglePopup}
-            className="downshift"
-          />
+          {userIsAnonymous() ? (
+            <LoginPopup
+              visible={popupVisible}
+              closePopup={this.onTogglePopup}
+              className="post-reply-popup"
+            />
+          ) : null}
           <CommentFormHelper
             onSubmit={this.onSubmit}
             text={text}

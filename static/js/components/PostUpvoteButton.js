@@ -2,7 +2,7 @@
 import React from "react"
 
 import LoginPopup from "./LoginPopup"
-import { userIsAnonymous, votingTooltipText } from "../lib/util"
+import { userIsAnonymous } from "../lib/util"
 
 import type { Post } from "../flow/discussionTypes"
 
@@ -68,11 +68,7 @@ export default class PostUpvoteButton extends React.Component<Props, State> {
           <span className="votes">{post.score}</span>
         </div>
         {userIsAnonymous() ? (
-          <LoginPopup
-            message={votingTooltipText}
-            visible={popupVisible}
-            closePopup={this.onTogglePopup}
-          />
+          <LoginPopup visible={popupVisible} closePopup={this.onTogglePopup} />
         ) : null}
       </React.Fragment>
     )

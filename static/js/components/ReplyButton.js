@@ -2,7 +2,7 @@
 import React from "react"
 
 import LoginPopup from "./LoginPopup"
-import { commentLoginText, userIsAnonymous } from "../lib/util"
+import { userIsAnonymous } from "../lib/util"
 
 type Props = {
   beginEditing?: Function
@@ -44,9 +44,9 @@ export default class ReplyButton extends React.Component<Props, State> {
         </div>
         {userIsAnonymous() ? (
           <LoginPopup
-            message={commentLoginText}
             visible={popupVisible}
             closePopup={this.onTogglePopup}
+            className="comment-reply-btn-popup"
           />
         ) : null}
       </div>
