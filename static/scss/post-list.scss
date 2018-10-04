@@ -31,7 +31,7 @@
     width: 24px;
     margin-left: 5px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     height: 103px;
 
     .top-right {
@@ -50,11 +50,19 @@
     min-width: 25%;
     width: 25%;
     overflow: hidden;
+    border-radius: 5px;
+
+    img {
+      border-radius: 5px;
+    }
   }
 }
 
 .overlay-icon {
-  color: $bg-grey;
-  background-color: white;
+  color: $navy;
+  background-color: $pale-grey;
+  padding: 5px;
   opacity: 0.9;
+  font-size: 18.7px;
+  border-radius: 5px;
 }
