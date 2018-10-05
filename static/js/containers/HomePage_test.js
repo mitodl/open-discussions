@@ -192,9 +192,9 @@ describe("HomePage", () => {
     })
   })
   ;[
-    ["username1", "Welcome Back!", "Create a post", newPostURL()],
-    [null, "Learn. Share. Connect.", "Become a member", REGISTER_URL]
-  ].forEach(([username, expHeader, expButtonText, expLinkTo]) => {
+    ["username1", "Create a post", newPostURL()],
+    [null, "Become a member", REGISTER_URL]
+  ].forEach(([username, expButtonText, expLinkTo]) => {
     it(`shows intro card with correct content when user is ${
       username ? "" : "not "
     }logged in`, async () => {
@@ -202,7 +202,6 @@ describe("HomePage", () => {
       const { inner } = await render()
       const introCard = inner.find(".home-callout")
       assert.isTrue(introCard.exists())
-      assert.equal(introCard.find("h3").text(), expHeader)
       const linkButton = introCard.find("Link")
       assert.equal(linkButton.prop("children"), expButtonText)
       assert.equal(linkButton.prop("to"), expLinkTo)

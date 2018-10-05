@@ -26,6 +26,7 @@ import { getPostIds } from "../lib/posts"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
 import { REGISTER_URL, newPostURL } from "../lib/url"
+import { userIsAnonymous } from "../lib/util"
 import { logoImageSrc } from "../lib/ui"
 
 import type { Match } from "react-router"
@@ -83,15 +84,13 @@ export class HomePage extends React.Component<Props> {
   }
 
   renderIntroCard() {
-    let headerText, buttonText, buttonLinkHref
-    if (SETTINGS.username) {
-      headerText = "Welcome Back!"
-      buttonText = "Create a post"
-      buttonLinkHref = newPostURL()
-    } else {
-      headerText = "Learn. Share. Connect."
+    let buttonText, buttonLinkHref
+    if (userIsAnonymous()) {
       buttonText = "Become a member"
       buttonLinkHref = REGISTER_URL
+    } else {
+      buttonText = "Create a post"
+      buttonLinkHref = newPostURL()
     }
 
     return (
@@ -99,17 +98,19 @@ export class HomePage extends React.Component<Props> {
         <div className="logo-col">
           <img src={logoImageSrc()} alt="MIT Logo" />
         </div>
-        <div className="text-col">
-          <h3>{headerText}</h3>
-          <p>
-            A place where learners, teachers and scientists worldwide meet with
-            MIT.
-          </p>
-        </div>
-        <div className="action-col">
-          <Link className="link-button" to={buttonLinkHref}>
-            {buttonText}
-          </Link>
+        <div className="callout-body">
+          <div className="text-col">
+            <h3>Learn. Share. Connect.</h3>
+            <p>
+              A place where learners, teachers and scientists worldwide meet
+              with MIT.
+            </p>
+          </div>
+          <div className="action-col">
+            <Link className="link-button" to={buttonLinkHref}>
+              {buttonText}
+            </Link>
+          </div>
         </div>
       </Card>
     )
