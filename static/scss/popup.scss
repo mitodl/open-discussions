@@ -124,4 +124,12 @@
   &.post-upvote-popup {
     margin-top: 97px;
   }
+
+  &.compose-popup {
+    top: 150px;
+
+    .triangle {
+      left: 80px;
+    }
+  }
 }

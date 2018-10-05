@@ -10,68 +10,101 @@ import { ResponsiveDrawer, mapStateToProps } from "./Drawer"
 import { setShowDrawerMobile } from "../actions/ui"
 import { DRAWER_BREAKPOINT } from "../lib/util"
 import * as selectors from "../lib/redux_selectors"
-import * as utilFuncs from "../lib/util"
+import * as util from "../lib/util"
+import * as channelLib from "../lib/channels"
+import { channelURL, newPostURL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
+import { makeLocation } from "../factories/util"
+import { shouldIf } from "../lib/test_utils"
 
-describe("Drawer tests", () => {
-  let sandbox
+describe("Drawer", () => {
+  let sandbox, dispatchStub, channels, isMobileWidthStub, getViewportWidthStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
+    dispatchStub = sandbox.stub()
+    isMobileWidthStub = sandbox.stub(util, "isMobileWidth").returns(true)
+    getViewportWidthStub = sandbox.stub(util, "getViewportWidth")
+    channels = makeChannelList()
   })
 
   afterEach(() => {
     sandbox.restore()
   })
 
-  describe("drawer component", () => {
-    let dispatchStub, channels, isMobileWidthStub, getViewportWidthStub
+  const renderDrawer = (props = {}) =>
+    shallow(
+      <ResponsiveDrawer
+        subscribedChannels={channels}
+        location={{ pathname: "a path", search: "", hash: "" }}
+        dispatch={dispatchStub}
+        channels={new Map(channels.map(channel => [channel.name, channel]))}
+        showDrawerDesktop={false}
+        showDrawerMobile={false}
+        {...props}
+      />
+    )
+
+  it("should set a CSS class when not mobile and open", () => {
+    isMobileWidthStub.returns(false)
+    ;[true, false].forEach(showDrawerDesktop => {
+      const wrapper = renderDrawer({ showDrawerDesktop })
+
+      assert.equal(
+        wrapper.props().className,
+        showDrawerDesktop ? "persistent-drawer-open" : ""
+      )
+    })
+  })
+
+  it("should include a menu button when mobile", () => {
+    const wrapper = renderDrawer()
+    const component = wrapper
+      .find(".drawer-mobile-header")
+      .find("HamburgerAndLogo")
+    assert.ok(component.exists())
+    assert.equal(
+      component.props().onHamburgerClick,
+      wrapper.instance().onDrawerClose
+    )
+  })
+
+  it("should have an onDrawerClose function to hide the mobile drawer", () => {
+    renderDrawer({ showDrawerMobile: true })
+      .instance()
+      .onDrawerClose()
+    assert.ok(dispatchStub.calledWith(setShowDrawerMobile(false)))
+  })
+
+  it("should close the mobile drawer when resizing above the breakpoint", () => {
+    getViewportWidthStub.returns(DRAWER_BREAKPOINT - 100)
+    const wrapper = renderDrawer({ showDrawerMobile: true })
+    getViewportWidthStub.returns(DRAWER_BREAKPOINT + 100)
+    wrapper.instance().onResize()
+    assert.ok(dispatchStub.calledWith(setShowDrawerMobile(false)))
+  })
+
+  it("should put an event listener on window resize", () => {
+    const onResizeStub = sandbox.stub(ResponsiveDrawer.prototype, "onResize")
+    const addEventListenerStub = sandbox.stub(window, "addEventListener")
+    renderDrawer()
+    assert.ok(addEventListenerStub.calledWith("resize"))
+    // this is to check that the onResize function was passed to addEventListener
+    // we'll call it and make sure that the stub was called.
+    addEventListenerStub.args[0][1]()
+    assert.ok(onResizeStub.called)
+  })
+
+  describe("props passed to Navigation component", () => {
+    let userCanPostStub, userIsAnonymousStub
 
     beforeEach(() => {
-      dispatchStub = sandbox.stub()
-      isMobileWidthStub = sandbox.stub(utilFuncs, "isMobileWidth").returns(true)
-      getViewportWidthStub = sandbox.stub(utilFuncs, "getViewportWidth")
-      channels = makeChannelList()
+      userCanPostStub = sandbox.stub(channelLib, "userCanPost")
+      userIsAnonymousStub = sandbox.stub(util, "userIsAnonymous")
+      userIsAnonymousStub.returns(false)
     })
 
-    const renderDrawer = (props = {}) =>
-      shallow(
-        <ResponsiveDrawer
-          subscribedChannels={channels}
-          location={{ pathname: "a path", search: "", hash: "" }}
-          dispatch={dispatchStub}
-          channels={channels}
-          showDrawerDesktop={false}
-          showDrawerMobile={false}
-          {...props}
-        />
-      )
-
-    it("should set a CSS class when not mobile and open", () => {
-      isMobileWidthStub.returns(false)
-      ;[true, false].forEach(showDrawerDesktop => {
-        const wrapper = renderDrawer({ showDrawerDesktop })
-
-        assert.equal(
-          wrapper.props().className,
-          showDrawerDesktop ? "persistent-drawer-open" : ""
-        )
-      })
-    })
-
-    it("should include a menu button when mobile", () => {
-      const wrapper = renderDrawer()
-      const component = wrapper
-        .find(".drawer-mobile-header")
-        .find("HamburgerAndLogo")
-      assert.ok(component.exists())
-      assert.equal(
-        component.props().onHamburgerClick,
-        wrapper.instance().onDrawerClose
-      )
-    })
-
-    it("should pass props to Navigation", () => {
+    it("should always include subscribed channels and path", () => {
       const { subscribedChannels, pathname } = renderDrawer()
         .find(Navigation)
         .props()
@@ -79,30 +112,72 @@ describe("Drawer tests", () => {
       assert.deepEqual(pathname, "a path")
     })
 
-    it("should have an onDrawerClose function to hide the mobile drawer", () => {
-      renderDrawer({ showDrawerMobile: true })
-        .instance()
-        .onDrawerClose()
-      assert.ok(dispatchStub.calledWith(setShowDrawerMobile(false)))
+    it("should include props that will link to post compose page if the user is not anonymous", () => {
+      userIsAnonymousStub.returns(false)
+      const { composeHref, useLoginPopup } = renderDrawer()
+        .find(Navigation)
+        .props()
+      assert.equal(composeHref, newPostURL())
+      assert.isFalse(useLoginPopup)
     })
 
-    it("should close the mobile drawer when resizing above the breakpoint", () => {
-      getViewportWidthStub.returns(DRAWER_BREAKPOINT - 100)
-      const wrapper = renderDrawer({ showDrawerMobile: true })
-      getViewportWidthStub.returns(DRAWER_BREAKPOINT + 100)
-      wrapper.instance().onResize()
-      assert.ok(dispatchStub.calledWith(setShowDrawerMobile(false)))
+    it("should include props that will show a tooltip if the user is anonymous", () => {
+      userIsAnonymousStub.returns(true)
+      const { showComposeLink, useLoginPopup } = renderDrawer()
+        .find(Navigation)
+        .props()
+      assert.isTrue(showComposeLink)
+      assert.isTrue(useLoginPopup)
     })
 
-    it("should put an event listener on window resize", () => {
-      const onResizeStub = sandbox.stub(ResponsiveDrawer.prototype, "onResize")
-      const addEventListenerStub = sandbox.stub(window, "addEventListener")
-      renderDrawer()
-      assert.ok(addEventListenerStub.calledWith("resize"))
-      // this is to check that the onResize function was passed to addEventListener
-      // we'll call it and make sure that the stub was called.
-      addEventListenerStub.args[0][1]()
-      assert.ok(onResizeStub.called)
+    describe("on a non-channel page", () => {
+      const drawerProps = { location: makeLocation("") }
+
+      it("should include showComposeLink=true if user has post permission for some channel", () => {
+        userCanPostStub.withArgs(channels[0]).returns(false)
+        userCanPostStub.withArgs(channels[1]).returns(true)
+
+        const wrapper = renderDrawer(drawerProps)
+        const { showComposeLink } = wrapper.find(Navigation).props()
+        assert.isTrue(showComposeLink)
+        sinon.assert.callCount(userCanPostStub, 2)
+      })
+
+      it("should include showComposeLink=false if user has no post permission for any channel", () => {
+        userCanPostStub.returns(false)
+
+        const wrapper = renderDrawer(drawerProps)
+        const { showComposeLink } = wrapper.find(Navigation).props()
+        assert.isFalse(showComposeLink)
+        sinon.assert.callCount(userCanPostStub, channels.length)
+      })
+    })
+
+    describe("on a channel page", () => {
+      let drawerProps, selectedChannel, otherChannel
+
+      beforeEach(() => {
+        selectedChannel = channels[3]
+        otherChannel = channels[0]
+        drawerProps = {
+          location: makeLocation(channelURL(selectedChannel.name))
+        }
+      })
+      ;[true, false].forEach(hasPermission => {
+        it(`${shouldIf(
+          hasPermission
+        )} include showComposeLink=true if user post permission=${String(
+          hasPermission
+        )}`, () => {
+          userCanPostStub.withArgs(selectedChannel).returns(hasPermission)
+          userCanPostStub.withArgs(otherChannel).returns(true)
+
+          const wrapper = renderDrawer(drawerProps)
+          const { showComposeLink } = wrapper.find(Navigation).props()
+          assert.equal(showComposeLink, hasPermission)
+          sinon.assert.calledOnce(userCanPostStub)
+        })
+      })
     })
   })
 

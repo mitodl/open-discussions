@@ -20,7 +20,7 @@ export class LoginPopupHelper extends React.Component<LoginPopupProps> {
   }
 
   render() {
-    const { visible, className } = this.props
+    const { visible, className, closePopup } = this.props
     return visible ? (
       <div className={`popup login-popup ${className || ""}`}>
         <div className="triangle" />
@@ -34,10 +34,10 @@ export class LoginPopupHelper extends React.Component<LoginPopupProps> {
         </div>
         <div className="bottom-row">
           <div className="popup-buttons">
-            <Link className="link-button" to="/login">
+            <Link className="link-button" to="/login" onClick={closePopup}>
               Log In
             </Link>
-            <Link className="link-button red" to="/signup">
+            <Link className="link-button red" to="/signup" onClick={closePopup}>
               Sign Up
             </Link>
           </div>
