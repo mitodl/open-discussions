@@ -174,7 +174,7 @@ export class CompactPostDisplay extends React.Component<Props> {
                 ) : null}
                 {isModerator && ignorePostReports ? (
                   <li>
-                    <a onClick={() => ignorePostReports(post)}>Ignore report</a>
+                    <a onClick={() => ignorePostReports(post)}>Ignore reports</a>
                   </li>
                 ) : null}
                 {!userIsAnonymous() && reportPost ? (

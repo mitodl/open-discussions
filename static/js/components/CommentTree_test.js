@@ -385,7 +385,7 @@ describe("CommentTree", () => {
         ...openDropdownMenu(report.comment)
       })
       const ignoreButton = wrapper.find(".ignore-button")
-      assert.equal(ignoreButton.text(), "Ignore report")
+      assert.equal(ignoreButton.text(), "Ignore reports")
       const eventStub = {
         preventDefault: helper.sandbox.stub()
       }

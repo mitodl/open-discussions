@@ -201,7 +201,7 @@ export default class CommentTree extends React.Component<Props> {
                     ignoreCommentReports(comment)
                   )}
                 >
-                  <a href="#">Ignore report</a>
+                  <a href="#">Ignore reports</a>
                 </div>
               </li>
             ) : null}
