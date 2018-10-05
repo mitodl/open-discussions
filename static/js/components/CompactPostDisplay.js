@@ -91,7 +91,8 @@ export class CompactPostDisplay extends React.Component<Props> {
                   </Link>
                   {post.author_headline ? (
                     <span className="author-headline">
-                      &nbsp;&#8212;&nbsp;{post.author_headline}
+                      &nbsp;&#8212;&nbsp;
+                      {post.author_headline}
                     </span>
                   ) : null}
                 </div>
@@ -174,7 +175,9 @@ export class CompactPostDisplay extends React.Component<Props> {
                 ) : null}
                 {isModerator && ignorePostReports ? (
                   <li>
-                    <a onClick={() => ignorePostReports(post)}>Ignore reports</a>
+                    <a onClick={() => ignorePostReports(post)}>
+                      Ignore reports
+                    </a>
                   </li>
                 ) : null}
                 {!userIsAnonymous() && reportPost ? (
