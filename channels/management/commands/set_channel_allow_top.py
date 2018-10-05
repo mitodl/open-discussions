@@ -24,7 +24,7 @@ class Command(BaseCommand):
         allow_top = options['allow_top']
 
         if options['name']:
-            channels = channels.filter(name=options['name'])
+            channels = channels.filter(name__in=options['name'])
 
         api_user = User.objects.get(username=settings.INDEXING_API_USERNAME)
         api = Api(api_user)
