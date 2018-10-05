@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.48.2 (Released October 05, 2018)
+--------------
+
+- Updated login tooltip prompt for anon users
+- Bumped django version
+- Fix styling issues on channel members tab
+
 Version 0.48.1 (Released October 03, 2018)
 --------------
 
