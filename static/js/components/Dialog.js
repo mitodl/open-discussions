@@ -38,10 +38,14 @@ const OurDialog = ({
       </DialogHeader>
       <DialogBody>{children}</DialogBody>
       <DialogFooter>
-        <button className="cancel" onClick={onCancel || hideDialog}>
+        <button
+          className="cancel"
+          onClick={onCancel || hideDialog}
+          type="button"
+        >
           Cancel
         </button>
-        <button className="submit" onClick={onAccept}>
+        <button className="submit" onClick={onAccept} type="button">
           {submitText || "Accept"}
         </button>
       </DialogFooter>
