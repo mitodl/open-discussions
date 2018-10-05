@@ -107,11 +107,20 @@ describe("UserMenu", () => {
       const wrapper = renderUserMenu({ showUserMenu: true })
       assert.equal(
         wrapper
-          .find(Link)
+          .find("Link")
           .at(1)
-          .props().to === profileURL(profile.username),
+          .exists(),
         uiEnabled
       )
+      if (uiEnabled) {
+        assert.equal(
+          wrapper
+            .find("Link")
+            .at(1)
+            .props().to,
+          profileURL(profile.username)
+        )
+      }
     })
   })
 

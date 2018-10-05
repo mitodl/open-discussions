@@ -751,7 +751,9 @@ describe("PostPage", function() {
           actions.comments.get.successType
         ],
         () => {
-          const select = wrapper.find(".count-and-sort").find("SortPicker")
+          const select = wrapper
+            .find(".count-and-sort")
+            .find("CommentSortPicker")
           select.props().updateSortParam(sortType, {
             preventDefault: helper.sandbox.stub()
           })
