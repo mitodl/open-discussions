@@ -54,6 +54,7 @@ $footer-height: 132px;
     margin-top: 61px;
 
     .new-post-link {
+      background-color: #ffffff;
       color: $red-link-color;
       display: inline-flex;
       align-items: center;
@@ -63,23 +64,6 @@ $footer-height: 132px;
       border-radius: 30px;
       height: 26px;
     }
-  }
-
-  .mdc-button {
-    width: 87%;
-    height: 43px;
-    line-height: 43px;
-    font-size: 15px;
-    text-transform: none;
-    font-weight: 500;
-    padding: 0 5px;
-    box-shadow: none;
-    margin-left: 14px;
-  }
-
-  .mdc-button:hover {
-    box-shadow: 2px 3px 5px 0px rgba(0, 0, 0, 0.2);
-    transition: none;
   }
 
   .current-location {

@@ -9,15 +9,22 @@ import ScrollArea from "react-scrollbar"
 
 import Navigation from "../components/Navigation"
 import HamburgerAndLogo from "../components/HamburgerAndLogo"
+import Footer from "../components/Footer"
 
 import { setShowDrawerMobile, setShowDrawerDesktop } from "../actions/ui"
 import { getSubscribedChannels } from "../lib/redux_selectors"
-import { getViewportWidth, isMobileWidth, DRAWER_BREAKPOINT } from "../lib/util"
+import {
+  getViewportWidth,
+  isMobileWidth,
+  DRAWER_BREAKPOINT,
+  userIsAnonymous
+} from "../lib/util"
+import { getChannelNameFromPathname, newPostURL } from "../lib/url"
+import { userCanPost } from "../lib/channels"
 
 import type { Dispatch } from "redux"
 import type { Channel } from "../flow/discussionTypes"
 import type { Location } from "react-router"
-import Footer from "../components/Footer"
 
 type DrawerPropsFromState = {
   showDrawerDesktop: boolean,
@@ -86,6 +93,20 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
     const wrappingClass =
       !isMobile && showDrawerDesktop ? "persistent-drawer-open" : ""
 
+    const channelName = getChannelNameFromPathname(pathname)
+    const currentChannel = channels.get(channelName)
+    let showComposeLink, composeHref, useLoginPopup
+    if (userIsAnonymous()) {
+      showComposeLink = true
+      useLoginPopup = true
+    } else {
+      showComposeLink = currentChannel
+        ? userCanPost(currentChannel)
+        : R.any(userCanPost, [...channels.values()])
+      composeHref = newPostURL(channelName)
+      useLoginPopup = false
+    }
+
     return (
       <div className={wrappingClass}>
         <Theme>
@@ -106,7 +127,9 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
                   <Navigation
                     subscribedChannels={subscribedChannels}
                     pathname={pathname}
-                    channels={channels}
+                    showComposeLink={showComposeLink}
+                    composeHref={composeHref}
+                    useLoginPopup={useLoginPopup}
                   />
                 </div>
                 <Footer />
