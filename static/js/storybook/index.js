@@ -53,3 +53,85 @@ storiesOf("CloseButton", module).add("basic display", () => (
     <CloseButton onClick={action("clicked")} />
   </StoryWrapper>
 ))
+
+const textContentKnob = () => text("textContent", "click me!")
+const urlKnob = () => text("url", "http://en.wikipedia.org/wiki/Elephant")
+
+storiesOf("Links and Buttons", module)
+  .addDecorator(withKnobs)
+  .add("basic link", () => {
+    const textContent = textContentKnob()
+    const url = urlKnob()
+
+    return (
+      <StoryWrapper>
+        <a href={url}>{textContent}</a>
+      </StoryWrapper>
+    )
+  })
+  .add("navy link", () => {
+    const textContent = textContentKnob()
+    const url = urlKnob()
+
+    return (
+      <StoryWrapper>
+        <a className="navy" href={url}>
+          {textContent}
+        </a>
+      </StoryWrapper>
+    )
+  })
+  .add("grey link", () => {
+    const textContent = textContentKnob()
+    const url = urlKnob()
+
+    return (
+      <StoryWrapper>
+        <a className="grey" href={url}>
+          {textContent}
+        </a>
+      </StoryWrapper>
+    )
+  })
+  .add("basic button", () => {
+    const textContent = textContentKnob()
+
+    return (
+      <StoryWrapper>
+        <button onClick={action("clicked")}>{textContent}</button>
+      </StoryWrapper>
+    )
+  })
+  .add("outlined button", () => {
+    const textContent = textContentKnob()
+
+    return (
+      <StoryWrapper>
+        <button className="outlined" onClick={action("clicked")}>
+          {textContent}
+        </button>
+      </StoryWrapper>
+    )
+  })
+  .add("dark-outlined button", () => {
+    const textContent = textContentKnob()
+
+    return (
+      <StoryWrapper>
+        <button className="dark-outlined" onClick={action("clicked")}>
+          {textContent}
+        </button>
+      </StoryWrapper>
+    )
+  })
+  .add("compact button", () => {
+    const textContent = textContentKnob()
+
+    return (
+      <StoryWrapper>
+        <button className="compact" onClick={action("clicked")}>
+          {textContent}
+        </button>
+      </StoryWrapper>
+    )
+  })

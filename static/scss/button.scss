@@ -23,3 +23,21 @@ a.link-button.outlined {
   border: 1px solid $rouge;
   color: $rouge;
 }
+
+button.dark-outlined {
+  background-color: inherit;
+  border: 1px solid $navy;
+  color: $navy;
+}
+
+button.compact {
+  font-size: 14px;
+  padding: 9px 20px;
+  display: flex;
+  align-items: center;
+
+  i {
+    font-size: 16px;
+    margin-right: 5px;
+  }
+}

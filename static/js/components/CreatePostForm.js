@@ -50,16 +50,16 @@ export default class CreatePostForm extends React.Component<Props> {
         <div className="post-types">
           {isLinkTypeAllowed(channel, LINK_TYPE_TEXT) ? (
             <button
-              className="write-something"
+              className="write-something dark-outlined compact"
               onClick={() => updatePostType(LINK_TYPE_TEXT)}
             >
-              <i className="material-icons notes">notes</i>
+              <i className="material-icons text_fields">text_fields</i>
               Write something
             </button>
           ) : null}
           {isLinkTypeAllowed(channel, LINK_TYPE_LINK) ? (
             <button
-              className="share-a-link"
+              className="share-a-link dark-outlined compact"
               onClick={() => updatePostType(LINK_TYPE_LINK)}
             >
               <i className="material-icons open_in_new">open_in_new</i>
