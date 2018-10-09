@@ -300,7 +300,7 @@ describe("CompactPostDisplay", () => {
         isModerator: true,
         removePost:  removePostStub
       })
-      const link = wrapper.find({ children: "Remove content" })
+      const link = wrapper.find({ children: "Remove" })
       assert(link.exists())
       link.simulate("click")
       assert.ok(removePostStub.calledWith(post))
@@ -313,7 +313,7 @@ describe("CompactPostDisplay", () => {
         isModerator:       true,
         ignorePostReports: ignorePostStub
       })
-      const link = wrapper.find({ children: "Ignore report" })
+      const link = wrapper.find({ children: "Ignore reports" })
       assert(link.exists())
       link.simulate("click")
       assert.ok(ignorePostStub.calledWith(post))

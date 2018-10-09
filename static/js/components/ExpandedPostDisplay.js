@@ -146,14 +146,14 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
               {isModerator && !post.removed ? (
                 <li className="comment-action-button remove-post">
                   <a onClick={this.removePost.bind(this)} href="#">
-                    Remove content
+                    Remove
                   </a>
                 </li>
               ) : null}
               {isModerator && post.removed ? (
                 <li className="comment-action-button approve-post">
                   <a onClick={this.approvePost.bind(this)} href="#">
-                    Approve content
+                    Approve
                   </a>
                 </li>
               ) : null}

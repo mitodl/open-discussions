@@ -50,7 +50,7 @@ export default class UserMenu extends React.Component<Props> {
             </li>
             {SETTINGS.profile_ui_enabled && SETTINGS.username ? (
               <li>
-                <Link to={profileURL(SETTINGS.username)}>View Profile</Link>
+                <Link to={profileURL(SETTINGS.username)}>Profile</Link>
               </li>
             ) : null}
             {SETTINGS.allow_email_auth ? (
