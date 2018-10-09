@@ -1,33 +1,39 @@
-import React from "react"
 import ReactGA from "react-ga"
-import sinon from "sinon"
 import { assert } from "chai"
-import { shallow } from "enzyme"
 
 import { makeChannel } from "../factories/channels"
 import { withChannelTracker } from "./withChannelTracker"
-import { TestPage } from "../lib/test_utils"
+import { shouldIf, TestPage } from "../lib/test_utils"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("withTracker", () => {
-  let sandbox, gaGaStub, channel, WrappedPage
-
-  const renderPage = ({ ...props }) => shallow(<WrappedPage {...props} />)
+  let helper, render, gaGaStub, channel, WrappedPage
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
-    gaGaStub = sandbox.stub(ReactGA, "ga")
+    helper = new IntegrationTestHelper()
+    gaGaStub = helper.sandbox.stub(ReactGA, "ga")
     channel = makeChannel()
+    WrappedPage = withChannelTracker(TestPage)
+    render = helper.configureHOCRenderer(
+      WrappedPage,
+      TestPage,
+      {},
+      {
+        channel:  channel,
+        location: { search: {} }
+      }
+    )
   })
 
   afterEach(() => {
-    sandbox.restore()
+    helper.cleanup()
   })
 
-  it("should call GA create and pageview if channel has a tracking id", () => {
+  it("should call GA create and pageview if channel has a tracking id", async () => {
     channel.ga_tracking_id = "UA-FAKE-01"
     window.location = "http://fake/c/path"
-    WrappedPage = withChannelTracker(TestPage)
-    renderPage({ location: window.location, channel: channel })
+
+    await render({}, { location: window.location, channel: channel })
     assert.ok(
       gaGaStub.calledWith("create", channel.ga_tracking_id, "auto", {
         name: "UA_FAKE_01"
@@ -42,11 +48,31 @@ describe("withTracker", () => {
     )
   })
 
-  it("should not call GA create and pageview if channel does not have a tracking id", () => {
+  it("should not call GA create and pageview if channel does not have a tracking id", async () => {
     channel.ga_tracking_id = null
     window.location = "http://fake/c/path"
-    WrappedPage = withChannelTracker(TestPage)
-    renderPage({ location: window.location, channel: channel })
+    await render({}, { location: window.location, channel: channel })
     assert.ok(gaGaStub.notCalled)
+  })
+
+  //
+  ;[[true, 4], [false, 2]].forEach(([missingPrevChannel, gaCalls]) => {
+    it(`${shouldIf(
+      missingPrevChannel
+    )} call google analytics on componentDidUpdate`, async () => {
+      channel.ga_tracking_id = "UA-FAKE-01"
+      const prevChannel = missingPrevChannel ? null : channel
+      window.location = "http://fake/c/path"
+      const { wrapper } = await render(
+        {},
+        { location: window.location, channel: channel }
+      )
+      const prevProps = {
+        location: window.location,
+        channel:  prevChannel
+      }
+      wrapper.instance().componentDidUpdate(prevProps)
+      assert.equal(gaGaStub.callCount, gaCalls)
+    })
   })
 })
