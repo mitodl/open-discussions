@@ -94,6 +94,21 @@ describe("fetch_auth", function() {
           assert.equal(window.location.pathname, expectedUrl)
           assert.equal(qs.parse(window.location.search).next, next)
         })
+
+        it(`does not redirect for error: ${
+          error.error_type
+        } if already on login page`, async () => {
+          window.location = expectedUrl
+          SETTINGS.allow_email_auth = allowEmailAuth
+          fetchStub.returns(Promise.reject(error)) // original api call
+
+          await assert.isRejected(authFunc("/url"))
+
+          assert.ok(fetchStub.calledOnce)
+          assert.ok(fetchStub.calledWith("/url"))
+          assert.equal(window.location.pathname, expectedUrl)
+          assert.equal(window.location.search, "") // this asserts we didn't redirect back onto the login page with a next param
+        })
       })
     })
   })

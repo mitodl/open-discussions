@@ -697,7 +697,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'open_discussions.authentication.IgnoreExpiredJwtAuthentication',
     ),
     'EXCEPTION_HANDLER': 'open_discussions.exceptions.api_exception_handler',
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',

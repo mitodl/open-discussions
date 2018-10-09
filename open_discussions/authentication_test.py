@@ -1,20 +1,16 @@
 """Tests for authentication"""
+from datetime import datetime, timedelta
+
+from rest_framework_jwt.settings import api_settings
+
+from open_discussions.auth_utils import get_encoded_and_signed_subscription_token
 from open_discussions.authentication import (
-    get_encoded_and_signed_subscription_token,
-    unsign_and_verify_username_from_token,
     StatelessTokenAuthentication,
+    IgnoreExpiredJwtAuthentication,
 )
 
-
-def test_get_encoded_and_signed_subscription_token(user):
-    """Tests that get_encoded_and_signed_subscription_token returns a token"""
-    assert get_encoded_and_signed_subscription_token(user) is not None
-
-
-def test_unsign_and_verify_username_from_token(user):
-    """Tests that unsign_and_verify_username_from_token returns the encoded username"""
-    token = get_encoded_and_signed_subscription_token(user)
-    assert unsign_and_verify_username_from_token(token) == user.username
+jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
 def test_stateless_token_authentication_expired(rf):
@@ -62,4 +58,23 @@ def test_stateless_token_authentication_no_user(rf, user):
     user.delete()
     request = rf.get('api/v0/notification_settings', HTTP_AUTHORIZATION='Token {}'.format(token))
     authentication = StatelessTokenAuthentication()
+    assert authentication.authenticate(request) is None
+
+
+def test_ignore_expired_jwt_authentication_valid(rf, user):
+    """Tests that IgnoreExpiredJwtAuthentication returns None if token is valid"""
+    payload = jwt_payload_handler(user)
+    token = jwt_encode_handler(payload)
+    request = rf.get('api/v0/notification_settings', HTTP_AUTHORIZATION='Bearer {}'.format(token))
+    authentication = IgnoreExpiredJwtAuthentication()
+    assert authentication.authenticate(request) == (user, token.encode('utf-8'))
+
+
+def test_ignore_expired_jwt_authentication_expired(rf, user):
+    """Tests that IgnoreExpiredJwtAuthentication returns None if token is expired"""
+    payload = jwt_payload_handler(user)
+    payload['exp'] = datetime.utcnow() - timedelta(seconds=100)
+    token = jwt_encode_handler(payload)
+    request = rf.get('api/v0/notification_settings', HTTP_AUTHORIZATION='Bearer {}'.format(token))
+    authentication = IgnoreExpiredJwtAuthentication()
     assert authentication.authenticate(request) is None

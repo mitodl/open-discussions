@@ -7,17 +7,16 @@ from rest_framework.mixins import (
     RetrieveModelMixin,
 )
 from rest_framework.viewsets import GenericViewSet
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from notifications.serializers import NotificationSettingsSerializer
-from open_discussions.authentication import StatelessTokenAuthentication
+from open_discussions.authentication import StatelessTokenAuthentication, IgnoreExpiredJwtAuthentication
 
 
 class NotificationSettingsViewSet(ListModelMixin, UpdateModelMixin, RetrieveModelMixin, GenericViewSet):
     """View for notification settings"""
     serializer_class = NotificationSettingsSerializer
     authentication_classes = (
-        JSONWebTokenAuthentication,
+        IgnoreExpiredJwtAuthentication,
         SessionAuthentication,
         StatelessTokenAuthentication,
     )

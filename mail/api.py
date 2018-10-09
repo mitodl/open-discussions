@@ -29,7 +29,7 @@ from django.core import mail
 from django.template.loader import render_to_string
 
 from open_discussions import features
-from open_discussions.authentication import get_encoded_and_signed_subscription_token
+from open_discussions.auth_utils import get_encoded_and_signed_subscription_token
 
 log = logging.getLogger()
 
