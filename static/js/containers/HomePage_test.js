@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
 
@@ -11,6 +12,7 @@ import { actions } from "../actions"
 import { SET_CHANNEL_DATA } from "../actions/channel"
 import { SET_POST_DATA } from "../actions/post"
 import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/sorting"
+import { REGISTER_URL, newPostURL } from "../lib/url"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("HomePage", () => {
@@ -187,6 +189,22 @@ describe("HomePage", () => {
     assert.deepEqual(store.getActions()[store.getActions().length - 1], {
       type:    SET_POST_DATA,
       payload: postList
+    })
+  })
+  ;[
+    ["username1", "Create a post", newPostURL()],
+    [null, "Become a member", REGISTER_URL]
+  ].forEach(([username, expButtonText, expLinkTo]) => {
+    it(`shows intro card with correct content when user is ${
+      username ? "" : "not "
+    }logged in`, async () => {
+      SETTINGS.username = username
+      const { inner } = await render()
+      const introCard = inner.find(".home-callout")
+      assert.isTrue(introCard.exists())
+      const linkButton = introCard.find("Link")
+      assert.equal(linkButton.prop("children"), expButtonText)
+      assert.equal(linkButton.prop("to"), expLinkTo)
     })
   })
 })

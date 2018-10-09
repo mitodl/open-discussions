@@ -1,10 +1,13 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
 import qs from "query-string"
 import { MetaTags } from "react-meta-tags"
+import { Link } from "react-router-dom"
 
+import Card from "../components/Card"
 import CanonicalLink from "../components/CanonicalLink"
 import { withPostLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
@@ -22,6 +25,9 @@ import { safeBulkGet } from "../lib/maps"
 import { getPostIds } from "../lib/posts"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
+import { REGISTER_URL, newPostURL } from "../lib/url"
+import { userIsAnonymous } from "../lib/util"
+import { logoImageSrc } from "../lib/ui"
 
 import type { Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -77,6 +83,39 @@ export class HomePage extends React.Component<Props> {
     await loadPosts(qs.parse(search))
   }
 
+  renderIntroCard() {
+    let buttonText, buttonLinkHref
+    if (userIsAnonymous()) {
+      buttonText = "Become a member"
+      buttonLinkHref = REGISTER_URL
+    } else {
+      buttonText = "Create a post"
+      buttonLinkHref = newPostURL()
+    }
+
+    return (
+      <Card className="home-callout">
+        <div className="logo-col">
+          <img src={logoImageSrc()} alt="MIT Logo" />
+        </div>
+        <div className="callout-body">
+          <div className="text-col">
+            <h3>Learn. Share. Connect.</h3>
+            <p>
+              A place where learners, teachers and scientists worldwide meet
+              with MIT.
+            </p>
+          </div>
+          <div className="action-col">
+            <Link className="link-button" to={buttonLinkHref}>
+              {buttonText}
+            </Link>
+          </div>
+        </div>
+      </Card>
+    )
+  }
+
   render() {
     const {
       location: { search },
@@ -89,6 +128,7 @@ export class HomePage extends React.Component<Props> {
         <MetaTags>
           <CanonicalLink match={match} />
         </MetaTags>
+        {this.renderIntroCard()}
         <IntraPageNav>
           <a href="#" className="active">
             Posts
