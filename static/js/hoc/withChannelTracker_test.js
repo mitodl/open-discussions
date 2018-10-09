@@ -56,11 +56,12 @@ describe("withTracker", () => {
   })
 
   //
-  ;[true, false].forEach(updateChannel => {
+  ;[[true, 4], [false, 2]].forEach(([missingPrevChannel, gaCalls]) => {
     it(`${shouldIf(
-      updateChannel
-    )} call loadGA() on componentDidUpdate`, async () => {
+      missingPrevChannel
+    )} call google analytics on componentDidUpdate`, async () => {
       channel.ga_tracking_id = "UA-FAKE-01"
+      const prevChannel = missingPrevChannel ? null : channel
       window.location = "http://fake/c/path"
       const { wrapper } = await render(
         {},
@@ -68,10 +69,10 @@ describe("withTracker", () => {
       )
       const prevProps = {
         location: window.location,
-        channel:  updateChannel ? null : channel
+        channel:  prevChannel
       }
       wrapper.instance().componentDidUpdate(prevProps)
-      assert.equal(gaGaStub.callCount, updateChannel ? 4 : 2)
+      assert.equal(gaGaStub.callCount, gaCalls)
     })
   })
 })
