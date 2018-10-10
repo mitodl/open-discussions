@@ -10,7 +10,10 @@ from notifications.notifiers import comments
 from open_discussions import features
 from open_discussions.test_utils import any_instance_of
 
-pytestmark = pytest.mark.django_db
+pytestmark = [
+    pytest.mark.django_db,
+    pytest.mark.usefixtures('authenticated_site'),
+]
 
 
 @pytest.mark.parametrize('is_enabled', [True, False])

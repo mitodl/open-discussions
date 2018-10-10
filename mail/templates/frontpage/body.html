@@ -2,7 +2,6 @@
 {% load humanize %}
 {% load timeago %}
 
-{% block title %}{{ site_name }} - Recent Popular Posts{% endblock %}
 {% block content %}
 
 <!-- 1 Column Text : BEGIN -->
@@ -11,7 +10,7 @@
           <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
               <tr>
                   <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
-                      <h1 style="margin: 0 0 10px; font-size: 25px; line-height: 30px; color: #03152d; font-weight: bold;">Here are some recent posts you might have missed</h1>
+                      <h1 style="margin: 0 0 10px; font-size: 20px; line-height: 30px; color: #03152d; font-weight: bold;">Top Stories for You</h1>
                   </td>
               </tr>
             </table>
@@ -39,16 +38,17 @@
                         <div style="display:inline-block; margin: 0 -2px; min-width:320px; vertical-align:top;" class="stack-column">
                           <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                             <tr>
-                              <td dir="ltr" style="font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555; padding: 10px 10px 0; text-align: left;" class="center-on-narrow">
-                                <h2 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #03152d; font-weight: bold;">
-                                  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}" style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 18px; line-height: 22px; color: #03152d; font-weight: bold;">
-                                    {{ post.title }}
+                              <td dir="ltr" style="font-family: sans-serif; font-size: 12px; line-height: 20px; color: #555555; padding: 10px 10px 0; text-align: left;">
+                                <h2 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 14px; line-height: 14px; color: #03152d; font-weight: bold;">
+                                  <a href="{{ base_url }}{% url 'channel-post' channel_name=post.channel_name post_id=post.id post_slug=post.slug %}" style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 14px; line-height: 22px; color: #03152d; font-weight: bold;">
+                                    {{ post.title }}{% if post.url_domain %} <span style="color:#b0b0b0; font-size: 12px;">({{ post.url_domain }})</span>{% endif %}
                                   </a>
                                 </h2>
                                 <p style="margin: 0 0 10px 0;">{# NOTE: this next line is intentionally long so it renders correctly in plaintext #}
                                   <a href="{{ base_url }}{% url 'profile' username=post.author_id %}" style="color: #212121">{{ post.author_name }}</a>{% if post.author_headline %}<span style="color: #b0b0b0;">&nbsp;&#8212;&nbsp;{{ post.author_headline }}</span>{% endif %}
+                                  <br/>
+                                  <span style="margin: 0 0 10px 0; color: #b0b0b0;">{{ post.created|parse_iso|naturaltime }} in <a href="{{ base_url }}{% url 'channel' channel_name=post.channel_name %}" style="color: #212121">{{ post.channel_title }}</a></span>
                                 </p>
-                                <p style="margin: 0 0 10px 0; color: #b0b0b0;">{{ post.created|parse_iso|naturaltime }}</p>
                               </td>
                             </tr>
                           </table>
@@ -62,12 +62,12 @@
                 </tr>
               {% endfor %}
                 <tr>
-                    <td style="padding: 20px;">
+                    <td style="padding: 5px;">
                         <!-- Button : BEGIN -->
                         <table align="left" role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: auto;">
                             <tr>
                                 <td class="button-td button-td-primary" style="border-radius: 4px; background: #a31f34;">
-                                     <a class="button-a button-a-primary" href="{{ base_url }}" style="background: #ffffff; border: 1px solid #a31f34; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #a31f34; display: block; border-radius: 4px;">Read More</a>
+                                     <a class="button-a button-a-primary" href="{{ base_url }}" style="background: #ffffff; border: 1px solid #a31f34; font-family: sans-serif; font-size: 14px; line-height: 14px; text-decoration: none; padding: 13px 17px; color: #a31f34; display: block; border-radius: 4px;">Read More</a>
                                 </td>
                             </tr>
                         </table>

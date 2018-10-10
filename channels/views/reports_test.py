@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from channels.api import Api
-from channels.utils import get_reddit_slug
+from channels.views.test_utils import default_post_response_data
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
     PERMISSION_DENIED_ERROR_TYPE,
@@ -113,28 +113,10 @@ def test_list_reports(staff_client, private_channel_and_contributor, reddit_fact
         "reasons": ["spam"],
     }, {
         "post": {
-            "url": None,
-            "thumbnail": None,
-            "text": post.text,
-            "title": post.title,
-            "upvoted": False,
-            'removed': False,
-            "deleted": False,
-            "subscribed": False,
-            "score": 1,
-            "author_id": user.username,
-            "id": post.id,
-            "slug": get_reddit_slug(post.permalink),
-            "created": post.created,
-            "num_comments": 1,
-            "channel_name": channel.name,
-            "channel_title": channel.title,
-            'author_name': user.profile.name,
-            'author_headline': user.profile.headline,
-            'profile_image': image_uri(user.profile),
-            'edited': False,
-            "stickied": False,
+            **default_post_response_data(channel, post, user),
+            'num_comments': 1,
             'num_reports': 2,
+            'upvoted': False,
         },
         "comment": None,
         "reasons": ["bad", "junk"],

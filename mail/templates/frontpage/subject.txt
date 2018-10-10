@@ -1,1 +1,1 @@
-{{ posts.0.title|safe }}
+[{{ site_name }}] Top Stories for You

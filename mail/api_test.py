@@ -13,7 +13,7 @@ from open_discussions.factories import UserFactory
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures('email_settings'),
+    pytest.mark.usefixtures('email_settings', 'authenticated_site'),
 ]
 
 
