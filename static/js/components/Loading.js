@@ -113,5 +113,5 @@ export const withLoading = R.curry(
 export const withSpinnerLoading = withLoading(Loading)
 export const withPostLoading = withLoading(PostLoading)
 export const withPostLoadingSidebar = withLoading(
-  withChannelSidebar("channel-page", PostLoading)
+  withChannelSidebar("channel-page channel-loading", PostLoading)
 )
