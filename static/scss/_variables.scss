@@ -1,3 +1,4 @@
+// Colors
 $brand-bg: #a31f34;
 $link-blue: #0b51bf;
 $button-blue: #0085df;
@@ -20,7 +21,12 @@ $bg-light-grey: #f5f5f5;
 $footer-link-color: #4e8398;
 $report-count-red: #ead1d5;
 $navigation-text: rgba(0, 0, 0, 0.77);
+
+// Channel colors
+$channel-avatar-bg: #2aab8b;
+$channel-banner-bg: #20316d;
 $subscribed-yellow: #fcffb0;
+
 $toolbar-height-desktop: 60px;
 $toolbar-height-mobile: 60px;
 $toolbar-vert-padding: 8px;
@@ -32,7 +38,7 @@ $banner-slide-timing: cubic-bezier(0.17, 0.04, 0.03, 0.94);
 $banner-slide-trans: top 300ms $banner-slide-timing;
 $banner-slide-content-trans: padding-top 300ms $banner-slide-timing;
 $material-icon-size: 24px;
-$channel-banner-height: 105px;
+$channel-banner-height: 200px;
 $author-font-size: 16px;
 $submission-font-size: 16px;
 $tooltip-font-size: 14px;

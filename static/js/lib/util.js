@@ -60,25 +60,9 @@ export const preventDefaultAndInvoke = R.curry(
   }
 )
 
-const MAX_CHANNEL_AVATAR_IDX = 9
-const getAvatarIndex = (key: string, maxIdx: number) =>
-  key
-    .split("")
-    .map(char => char.charCodeAt(0))
-    .reduce((current, previous) => previous + current) % maxIdx
-
 export const userIsAnonymous = () => R.isNil(SETTINGS.username)
 
 export const defaultProfileImageUrl = "/static/images/avatar_default.png"
-export const defaultChannelAvatarUrlPrefix =
-  "/static/images/channel_avatars/channel-avatar"
-export const getDefaultChannelAvatarUrl = (channelName: string) =>
-  `${defaultChannelAvatarUrlPrefix}-${getAvatarIndex(
-    channelName,
-    MAX_CHANNEL_AVATAR_IDX
-  )}.svg`
-export const defaultChannelBannerUrl =
-  "/static/images/channel_banner_default.svg"
 
 export function isProfileComplete(profile: Profile): boolean {
   if (

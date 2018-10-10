@@ -14,8 +14,6 @@ import {
   truncate,
   getTokenFromUrl,
   defaultProfileImageUrl,
-  getDefaultChannelAvatarUrl,
-  defaultChannelAvatarUrlPrefix,
   makeUUID
 } from "./util"
 
@@ -168,15 +166,6 @@ describe("utility functions", () => {
 
     it("it uhh shouldnt return the same thing twice :D", () => {
       assert.notEqual(makeUUID(10), makeUUID(10))
-    })
-  })
-
-  describe("getDefaultChannelAvatarUrl", () => {
-    it("should return a randomly assigned avatar image", () => {
-      assert.equal(
-        getDefaultChannelAvatarUrl("blah"),
-        `${defaultChannelAvatarUrlPrefix}-2.svg`
-      )
     })
   })
 })

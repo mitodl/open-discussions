@@ -17,7 +17,6 @@ import {
   postModerationSelector
 } from "../hoc/withPostModeration"
 import withPostList from "../hoc/withPostList"
-import IntraPageNav from "../components/IntraPageNav"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
@@ -129,13 +128,7 @@ export class HomePage extends React.Component<Props> {
           <CanonicalLink match={match} />
         </MetaTags>
         {this.renderIntroCard()}
-        <IntraPageNav>
-          <a href="#" className="active">
-            Posts
-          </a>
-        </IntraPageNav>
         <div className="post-list-title">
-          <div>Home</div>
           <PostSortPicker
             updateSortParam={updatePostSortParam(this.props)}
             value={qs.parse(search).sort || POSTS_SORT_HOT}
