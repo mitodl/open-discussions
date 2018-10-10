@@ -15,6 +15,7 @@ from channels.utils import ListingParams
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings
 from search import indexing_api as api
+from search.constants import VALID_DOC_TYPES
 from search.exceptions import (
     RetryException,
     ReindexException,
@@ -139,8 +140,7 @@ def start_recreate_index(self):
     try:
         from channels.api import Api
         user = User.objects.get(username=settings.INDEXING_API_USERNAME)
-
-        new_backing_index = api.create_backing_index()
+        new_backing_indices = {doctype: api.create_backing_index(doctype) for doctype in VALID_DOC_TYPES}
 
         # Do the indexing on the temp index
         log.info("starting to index all channels, posts and comments...")
@@ -159,13 +159,13 @@ def start_recreate_index(self):
     raise self.replace(
         celery.chain(
             index_channels,
-            finish_recreate_index.s(new_backing_index),
+            finish_recreate_index.s(new_backing_indices),
         )
     )
 
 
 @app.task
-def finish_recreate_index(results, backing_index):
+def finish_recreate_index(results, backing_indices):
     """
     Swap reindex backing index with default backing index
 
@@ -178,5 +178,6 @@ def finish_recreate_index(results, backing_index):
         raise ReindexException(f"Errors occurred during recreate_index: {errors}")
 
     log.info("Done with temporary index. Pointing default aliases to newly created backing indexes...")
-    api.switch_indices(backing_index)
+    for doctype, backing_index in backing_indices.items():
+        api.switch_indices(backing_index, doctype)
     log.info("recreate_index has finished successfully!")

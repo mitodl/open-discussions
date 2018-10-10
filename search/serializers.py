@@ -127,14 +127,23 @@ def _serialize_comment_tree_for_bulk(comments):
         yield from _serialize_comment_tree_for_bulk(comment.replies)
 
 
-def serialize_bulk_post_and_comments(post_obj):
+def serialize_bulk_post(post_obj):
+    """
+    Index a post
+
+    Args:
+        post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
+    """
+    yield serialize_post_for_bulk(post_obj)
+
+
+def serialize_bulk_comments(post_obj):
     """
     Index comments for a post and recurse to deeper level comments for a bulk API request
 
     Args:
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
-    yield serialize_post_for_bulk(post_obj)
     yield from _serialize_comment_tree_for_bulk(post_obj.comments)
 
 

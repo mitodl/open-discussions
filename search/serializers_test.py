@@ -9,7 +9,6 @@ from channels.constants import (
 from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
-    serialize_bulk_post_and_comments,
     serialize_post_for_bulk,
     serialize_comment_for_bulk,
 )

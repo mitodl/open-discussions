@@ -9,6 +9,7 @@ import pytest
 from channels.constants import POSTS_SORT_NEW
 from channels.utils import ListingParams
 from open_discussions.test_utils import assert_not_raises
+from search.constants import DOC_TYPE_POST, VALID_DOC_TYPES
 from search.exceptions import (
     ReindexException,
     RetryException,
@@ -188,8 +189,8 @@ def test_start_recreate_index(mocker, mocked_celery, settings, user):
 
     with pytest.raises(mocked_celery.replace_exception_class):
         start_recreate_index.delay()
-
-    create_backing_index_mock.assert_called_once_with()
+    for doctype in VALID_DOC_TYPES:
+        create_backing_index_mock.assert_any_call(doctype)
     finish_recreate_index_mock.s.assert_called_once_with(backing_index)
     assert mocked_celery.group.call_count == 1
 

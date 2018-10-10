@@ -7,6 +7,7 @@ import uuid
 from django.conf import settings
 from elasticsearch_dsl.connections import connections
 
+from search.constants import VALID_DOC_TYPES
 
 _CONN = None
 # When we create the connection, check to make sure all appropriate mappings exist
@@ -59,49 +60,62 @@ def get_conn(*, verify=True):
     return _CONN
 
 
-def make_backing_index_name():
+def make_backing_index_name(doctype):
     """
     Make a unique name for use for a backing index
+
+    Args:
+        doctype(str): The document type (post, comment, profile)
 
     Returns:
         str: A new name for a backing index
     """
-    return "{prefix}_{hash}".format(
+    return "{prefix}_{doctype}_{hash}".format(
         prefix=settings.ELASTICSEARCH_INDEX,
+        doctype=doctype,
         hash=uuid.uuid4().hex,
     )
 
 
-def make_alias_name(*, is_reindexing):
+def make_alias_name(is_reindexing, doctype):
     """
     Make the name used for the Elasticsearch alias
 
     Args:
+        doctype(str): The document type of the index
         is_reindexing (bool): If true, use the alias name meant for reindexing
 
     Returns:
         str: The name of the alias
     """
-    return "{prefix}_{suffix}".format(
+    return "{prefix}_{doctype}_{suffix}".format(
         prefix=settings.ELASTICSEARCH_INDEX,
+        doctype=doctype,
         suffix='reindexing' if is_reindexing else 'default'
     )
 
 
-get_default_alias_name = partial(make_alias_name, is_reindexing=False)
-get_reindexing_alias_name = partial(make_alias_name, is_reindexing=True)
+get_default_alias_name = partial(make_alias_name, False)
+get_reindexing_alias_name = partial(make_alias_name,  True)
 
 
-def get_active_aliases():
+def get_active_aliases(doctypes=None):
     """
     Returns aliases which exist
+
+    Args:
+        doctypes(list of str): list of doc types
 
     Returns:
         list of str: Aliases which exist
     """
+    if not doctypes:
+        doctypes = VALID_DOC_TYPES
     conn = get_conn(verify=False)
     return [
-        alias for alias in [get_default_alias_name(), get_reindexing_alias_name()]
+        alias for x in [
+            (get_default_alias_name(doc), get_reindexing_alias_name(doc)) for doc in doctypes
+        ] for alias in x
         if conn.indices.exists(alias)
     ]
 
