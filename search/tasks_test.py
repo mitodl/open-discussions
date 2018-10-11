@@ -71,10 +71,9 @@ def test_create_document_task(mocked_api):
     assert mocked_api.create_document.call_args[0] == indexing_api_args
 
 
-@pytest.mark.parametrize('doctype', [POST_TYPE, COMMENT_TYPE])
-def test_update_document_with_partial_task(mocked_api, doctype):
+def test_update_document_with_partial_task(mocked_api):
     """Test that the create_document task calls the indexing API function with the right args"""
-    indexing_api_args = ('doc_id', {'test': 'data'}, doctype)
+    indexing_api_args = ('doc_id', {'test': 'data'}, COMMENT_TYPE)
     update_document_with_partial(*indexing_api_args)
     assert mocked_api.update_document_with_partial.call_count == 1
     assert mocked_api.update_document_with_partial.call_args[0] == indexing_api_args

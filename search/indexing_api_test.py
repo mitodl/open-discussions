@@ -7,6 +7,8 @@ from types import SimpleNamespace
 import pytest
 
 from elasticsearch.exceptions import ConflictError
+
+from channels.models import Post, Comment
 from search.connection import get_default_alias_name
 from search.constants import POST_TYPE, COMMENT_TYPE, DOC_TYPE_ALL
 from search.indexing_api import (
@@ -22,7 +24,7 @@ from search.indexing_api import (
     GLOBAL_DOC_TYPE,
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
-)
+    sync_post, sync_comments)
 
 
 pytestmark = pytest.mark.django_db
@@ -347,3 +349,45 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     conn_mock.indices.put_alias.assert_called_once_with(
         index=backing_index, name=reindexing_alias,
     )
+
+
+def test_sync_post():
+    """Test that sync_post creates Post model objects"""
+    serialized = [
+        {
+            'channel_title': 'a',
+            'post_id': 'a1',
+            'post_link_url': 'http://a1.edu'
+        },
+        {
+            'channel_title': 'b',
+            'post_id': 'b1',
+            'post_link_url': 'http://b1.edu'
+        },
+    ]
+
+    list(sync_post(serialized))
+    for item in serialized:
+        assert Post.objects.filter(post_id=item['post_id']).exists()
+
+
+def test_sync_comments():
+    """Test that sync_comments creates Comment model objects"""
+    serialized = [
+        {
+            'channel_title': 'a',
+            'post_id': 'a1',
+            'comment_id': 'a1c',
+            'parent_comment_id': None
+        },
+        {
+            'channel_title': 'b',
+            'post_id': 'b1',
+            'comment_id': 'b1c',
+            'parent_comment_id': 'a1c'
+        },
+    ]
+
+    list(sync_comments(serialized))
+    for item in serialized:
+        assert Comment.objects.filter(comment_id=item['comment_id']).exists()
