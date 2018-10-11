@@ -21,7 +21,6 @@ from search.exceptions import (
     ReindexException,
 )
 
-
 User = get_user_model()
 log = logging.getLogger(__name__)
 
@@ -61,23 +60,23 @@ def create_document(doc_id, data):
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
-def update_document_with_partial(doc_id, partial_data):
+def update_document_with_partial(doc_id, partial_data, doctype):
     """Task that makes a request to update an ES document with a partial document"""
-    return api.update_document_with_partial(doc_id, partial_data)
+    return api.update_document_with_partial(doc_id, partial_data, doctype)
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
-def increment_document_integer_field(doc_id, field_name, incr_amount):
+def increment_document_integer_field(doc_id, field_name, incr_amount, doctype):
     """Task that makes a request to increment some integer field in an ES document"""
-    api.increment_document_integer_field(doc_id, field_name, incr_amount)
+    api.increment_document_integer_field(doc_id, field_name, incr_amount, doctype)
 
 
 @app.task
-def update_field_values_by_query(query, field_name, field_value):
+def update_field_values_by_query(query, field_name, field_value, doctypes):
     """
     Task that makes a request to update a field value for all ES documents that match some query.
     """
-    return api.update_field_values_by_query(query, field_name, field_value)
+    return api.update_field_values_by_query(query, field_name, field_value, doctypes)
 
 
 @app.task(autoretry_for=(RetryException, ), retry_backoff=True, rate_limit='600/m')

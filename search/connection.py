@@ -96,7 +96,7 @@ def make_alias_name(is_reindexing, doctype):
 
 
 get_default_alias_name = partial(make_alias_name, False)
-get_reindexing_alias_name = partial(make_alias_name,  True)
+get_reindexing_alias_name = partial(make_alias_name, True)
 
 
 def get_active_aliases(doctypes=None):

@@ -71,9 +71,10 @@ def test_create_document_task(mocked_api):
     assert mocked_api.create_document.call_args[0] == indexing_api_args
 
 
-def test_update_document_with_partial_task(mocked_api):
+@pytest.mark.parametrize('doctype', [POST_TYPE, COMMENT_TYPE])
+def test_update_document_with_partial_task(mocked_api, doctype):
     """Test that the create_document task calls the indexing API function with the right args"""
-    indexing_api_args = ('doc_id', {'test': 'data'})
+    indexing_api_args = ('doc_id', {'test': 'data'}, doctype)
     update_document_with_partial(*indexing_api_args)
     assert mocked_api.update_document_with_partial.call_count == 1
     assert mocked_api.update_document_with_partial.call_args[0] == indexing_api_args
@@ -84,7 +85,7 @@ def test_increment_document_integer_field_task(mocked_api):
     Test that the increment_document_integer_field task calls the indexing
     API function with the right args
     """
-    indexing_api_args = ('doc_id', {'test': 'data'}, 1)
+    indexing_api_args = ('doc_id', {'test': 'data'}, 1, POST_TYPE)
     increment_document_integer_field(*indexing_api_args)
     assert mocked_api.increment_document_integer_field.call_count == 1
     assert mocked_api.increment_document_integer_field.call_args[0] == indexing_api_args
@@ -95,7 +96,7 @@ def test_update_field_values_by_query(mocked_api):
     Test that the update_field_values_by_query task calls the indexing
     API function with the right args
     """
-    indexing_api_args = ({'query': {}}, 'field1', 'value1')
+    indexing_api_args = ({'query': {}}, 'field1', 'value1', POST_TYPE)
     update_field_values_by_query(*indexing_api_args)
     assert mocked_api.update_field_values_by_query.call_count == 1
     assert mocked_api.update_field_values_by_query.call_args[0] == indexing_api_args

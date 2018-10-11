@@ -94,7 +94,8 @@ def update_post_text(post_obj):
     """
     update_document_with_partial.delay(
         gen_post_id(post_obj.id),
-        {'text': post_obj.selftext}
+        {'text': post_obj.selftext},
+        POST_TYPE
     )
 
 
@@ -108,7 +109,8 @@ def update_comment_text(comment_obj):
     """
     update_document_with_partial.delay(
         gen_comment_id(comment_obj.id),
-        {'text': comment_obj.body}
+        {'text': comment_obj.body},
+        COMMENT_TYPE
     )
 
 
@@ -131,7 +133,8 @@ def update_field_for_all_post_comments(post_obj, field_name, field_value):
             }
         },
         field_name=field_name,
-        field_value=field_value
+        field_value=field_value,
+        doctypes=[COMMENT_TYPE]
     )
 
 
@@ -146,7 +149,8 @@ def update_post_removal_status(post_obj):
     """
     update_document_with_partial.delay(
         gen_post_id(post_obj.id),
-        {'removed': is_reddit_object_removed(post_obj)}
+        {'removed': is_reddit_object_removed(post_obj)},
+        POST_TYPE
     )
     update_field_for_all_post_comments(
         post_obj,
@@ -166,7 +170,8 @@ def update_comment_removal_status(comment_obj):
     """
     update_document_with_partial.delay(
         gen_comment_id(comment_obj.id),
-        {'removed': is_reddit_object_removed(comment_obj)}
+        {'removed': is_reddit_object_removed(comment_obj)},
+        COMMENT_TYPE
     )
 
 
@@ -202,7 +207,8 @@ def set_post_to_deleted(post_obj):
     """
     update_document_with_partial.delay(
         gen_post_id(post_obj.id),
-        {'deleted': True}
+        {'deleted': True},
+        POST_TYPE
     )
     update_field_for_all_post_comments(post_obj, field_name='deleted', field_value=True)
 
@@ -217,7 +223,8 @@ def set_comment_to_deleted(comment_obj):
     """
     update_document_with_partial.delay(
         gen_comment_id(comment_obj.id),
-        {'deleted': True}
+        {'deleted': True},
+        COMMENT_TYPE
     )
     decrement_parent_post_comment_count(comment_obj)
 

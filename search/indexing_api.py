@@ -17,7 +17,7 @@ from search.connection import (
     make_backing_index_name,
     refresh_index,
 )
-from search.constants import POST_TYPE, COMMENT_TYPE, DOC_TYPE_ALL
+from search.constants import POST_TYPE, COMMENT_TYPE, DOC_TYPE_ALL, VALID_DOC_TYPES
 from search.exceptions import ReindexException
 from search.serializers import (
     serialize_bulk_post,
@@ -108,7 +108,7 @@ def create_document(doc_id, data):
         data (dict): Full ES document data
     """
     conn = get_conn(verify=True)
-    for alias in get_active_aliases():
+    for alias in get_active_aliases(doctypes=[data['object_type']]):
         conn.create(
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
@@ -117,7 +117,7 @@ def create_document(doc_id, data):
         )
 
 
-def update_field_values_by_query(query, field_name, field_value):
+def update_field_values_by_query(query, field_name, field_value, doctypes=None):
     """
     Makes a request to ES to use the update_by_query API to update a single field
     value for all documents that match the given query.
@@ -126,10 +126,18 @@ def update_field_values_by_query(query, field_name, field_value):
         query (dict): A dict representing an ES query
         field_name (str): The name of the field that will be update
         field_value: The field value to set for all matching documents
+        doctypes (list of str): The document types to query
     """
+    if not doctypes:
+        doctypes = VALID_DOC_TYPES
     conn = get_conn(verify=True)
+<<<<<<< HEAD
     for alias in get_active_aliases():
         es_response = conn.update_by_query(  # pylint: disable=unexpected-keyword-arg
+=======
+    for alias in get_active_aliases(doctypes=doctypes):
+        es_response = conn.update_by_query(
+>>>>>>> Ensure that documents are created and updated in the correct index.
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             conflicts=UPDATE_CONFLICT_SETTING,
@@ -156,18 +164,19 @@ def update_field_values_by_query(query, field_name, field_value):
             )
 
 
-def _update_document_by_id(doc_id, data, update_key=None):
+def _update_document_by_id(doc_id, data, doctype, update_key=None):
     """
     Makes a request to ES to update an existing document
 
     Args:
         doc_id (str): The ES document id
         data (dict): Full ES document data
+        doctype (str): The document type to update
         update_key (str): A key indicating the type of update request to Elasticsearch
             (e.g.: 'script', 'doc')
     """
     conn = get_conn(verify=True)
-    for alias in get_active_aliases():
+    for alias in get_active_aliases(doctypes=[doctype]):
         try:
             conn.update(
                 index=alias,
@@ -188,12 +197,13 @@ def _update_document_by_id(doc_id, data, update_key=None):
 update_document_with_partial = partial(_update_document_by_id, update_key='doc')
 
 
-def increment_document_integer_field(doc_id, field_name, incr_amount):
+def increment_document_integer_field(doc_id, field_name, incr_amount, doctype):
     """
     Makes a request to ES to increment some integer field in a document
 
     Args:
         doc_id (str): The ES document id
+        doctype (str): The document type to update
         field_name (str): The name of the field to increment
         incr_amount (int): The amount to increment by
     """
@@ -206,6 +216,7 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
                 "incr_amount": incr_amount
             }
         },
+        doctype,
         update_key='script'
     )
 
