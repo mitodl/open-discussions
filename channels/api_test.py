@@ -669,6 +669,7 @@ def test_add_moderator(mock_client):
     """Test add moderator"""
     client = api.Api(UserFactory.create())
     moderator = UserFactory.create()
+    # pylint: disable=assignment-from-no-return
     redditor = client.add_moderator(moderator.username, 'channel_test_name')
     mock_client.subreddit.return_value.moderator.add.assert_called_once_with(moderator)
     # API function doesn't return the moderator. To do this the view calls _list_moderators
