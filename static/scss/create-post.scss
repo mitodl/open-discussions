@@ -15,24 +15,6 @@
       margin-right: 5px;
     }
 
-    .write-something,
-    .share-a-link {
-      font-weight: 400;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      color: white;
-      background-color: $rouge;
-      border-radius: 4px;
-      padding: 9px 20px;
-      cursor: pointer;
-
-      i {
-        font-size: 16px;
-        margin-right: 5px;
-      }
-    }
-
     & > div {
       cursor: pointer;
     }

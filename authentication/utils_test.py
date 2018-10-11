@@ -5,7 +5,10 @@ from social_django.models import UserSocialAuth
 from authentication.backends.micromasters import MicroMastersAuth
 from authentication.exceptions import UserMissingSocialAuthException
 from authentication.strategy import DjangoRestFrameworkStrategy
-from authentication.utils import load_drf_strategy, jwt_get_username_from_payload_handler
+from authentication.utils import (
+    load_drf_strategy,
+    jwt_get_username_from_payload_handler,
+)
 
 
 def test_load_drf_strategy(mocker):

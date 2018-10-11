@@ -15,8 +15,13 @@ const redirectAndReject = async () => {
   // redirect to the authenticating app
   const url = SETTINGS.allow_email_auth ? LOGIN_URL : AUTH_REQUIRED_URL
   const { pathname, search, hash } = window.location
-  const next = `${pathname}${search}${hash}`
-  window.location = `${url}?${qs.stringify({ next })}`
+
+  // ensure that we don't end up in a redirect loop
+  if (pathname !== url) {
+    const next = `${pathname}${search}${hash}`
+    window.location = `${url}?${qs.stringify({ next })}`
+  }
+
   return Promise.reject("You were logged out, please login again")
 }
 

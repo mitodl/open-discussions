@@ -47,7 +47,10 @@ export class CompactPostDisplay extends React.Component<Props> {
     return showChannelLink && post.channel_name ? (
       <span>
         {" "}
-        in <Link to={channelURL(post.channel_name)}>{post.channel_title}</Link>
+        in{" "}
+        <Link className="navy" to={channelURL(post.channel_name)}>
+          {post.channel_title}
+        </Link>
       </span>
     ) : null
   }
@@ -77,7 +80,10 @@ export class CompactPostDisplay extends React.Component<Props> {
         <div className="row post-toprow">
           <div className="column1">
             <div className="row title-row">
-              <Link to={postDetailURL(post.channel_name, post.id, post.slug)}>
+              <Link
+                to={postDetailURL(post.channel_name, post.id, post.slug)}
+                className="navy"
+              >
                 <div className="post-title">
                   <PostTitleAndHostname post={post} />
                 </div>
@@ -86,7 +92,7 @@ export class CompactPostDisplay extends React.Component<Props> {
             <div className="row">
               <div className="authored-by">
                 <div>
-                  <Link to={profileURL(post.author_id)}>
+                  <Link to={profileURL(post.author_id)} className="navy">
                     <span className="author-name">{post.author_name}</span>
                   </Link>
                   {post.author_headline ? (
@@ -99,6 +105,7 @@ export class CompactPostDisplay extends React.Component<Props> {
                 <div className="date">
                   <Link
                     to={postDetailURL(post.channel_name, post.id, post.slug)}
+                    className="grey"
                   >
                     <span>{formattedDate}</span>
                   </Link>

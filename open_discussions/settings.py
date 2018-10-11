@@ -27,7 +27,7 @@ from open_discussions.envs import (
     get_list_of_str,
 )
 
-VERSION = "0.49.0"
+VERSION = "0.49.1"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -697,7 +697,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'open_discussions.authentication.IgnoreExpiredJwtAuthentication',
     ),
     'EXCEPTION_HANDLER': 'open_discussions.exceptions.api_exception_handler',
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',

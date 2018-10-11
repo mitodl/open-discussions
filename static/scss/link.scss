@@ -2,15 +2,27 @@ a {
   cursor: pointer;
 }
 
-a.restyled {
+a.navy {
   color: $navy;
+
+  &:visited {
+    color: $navy;
+  }
+}
+
+a.grey {
+  color: $font-grey-light;
+
+  &:visited {
+    color: $font-grey-light;
+  }
+}
+
+a.grey,
+a.navy {
   text-decoration: none;
 
   &:hover {
     text-decoration: underline;
-  }
-
-  &:visited {
-    color: $navy;
   }
 }

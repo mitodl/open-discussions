@@ -81,7 +81,7 @@ export default class MembersList extends React.Component<Props> {
                     <td>
                       {member.full_name ? (
                         <Link
-                          className="restyled name"
+                          className="navy name"
                           to={profileURL(usernameGetter(member))}
                         >
                           {member.full_name}

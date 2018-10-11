@@ -1,10 +1,11 @@
 """Custom authentication for DRF"""
 import logging
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core import signing
+import jwt
 from rest_framework.authentication import BaseAuthentication
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+
 
 User = get_user_model()
 
@@ -14,39 +15,28 @@ HEADER_PREFIX_LENGTH = len(HEADER_PREFIX)
 logger = logging.getLogger()
 
 
-def get_encoded_and_signed_subscription_token(user):
-    """
-    Returns a signed and encoded token for subscription authentication_classes
+class IgnoreExpiredJwtAuthentication(JSONWebTokenAuthentication):
+    """Version of JSONWebTokenAuthentication that ignores JWT values if they're expired"""
 
-    Args:
-        user (User): user to generate the token for
+    def get_jwt_value(self, request):
+        """Returns the JWT values as long as it's not expired"""
+        value = super().get_jwt_value(request)
 
-    Returns:
-        str: a signed token for subscription authentication_classes
-    """
-    signer = signing.TimestampSigner()
-    return signer.sign(user.username)
+        try:
+            # try to decode the value just to see if it's expired
+            from rest_framework_jwt.settings import api_settings
+            jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
+            jwt_decode_handler(value)
+        except jwt.ExpiredSignature:
+            # if it is expired, treat it as if the user never passed a token
+            logger.debug("Ignoring expired JWT")
+            return None
+        except:  # pylint: disable=bare-except
+            # we're only interested in jwt.ExpiredSignature above
+            # exception handling in general is already handled in the base class
+            pass
 
-
-def unsign_and_verify_username_from_token(token):
-    """
-    Returns the unsigned username from a subscription token
-
-    Args:
-        token (str): the encoded token
-
-    Returns:
-        str: the decoded username
-    """
-
-    signer = signing.TimestampSigner()
-    try:
-        return signer.unsign(
-            token,
-            max_age=settings.OPEN_DISCUSSIONS_UNSUBSCRIBE_TOKEN_MAX_AGE_SECONDS
-        )
-    except:  # pylint: disable=bare-except
-        return None
+        return value
 
 
 class StatelessTokenAuthentication(BaseAuthentication):
@@ -60,6 +50,8 @@ class StatelessTokenAuthentication(BaseAuthentication):
         """
         Attempts to authenticate using a stateless token
         """
+        from open_discussions.auth_utils import unsign_and_verify_username_from_token
+
         if 'HTTP_AUTHORIZATION' in request.META:
             header_value = request.META['HTTP_AUTHORIZATION']
 
