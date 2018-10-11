@@ -11,6 +11,7 @@ from elasticsearch.exceptions import ConflictError
 from channels.models import Post, Comment
 from search.connection import get_default_alias_name
 from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES
+from search.exceptions import ReindexException
 from search.indexing_api import (
     clear_and_create_index,
     create_backing_index,
@@ -249,6 +250,24 @@ def test_index_post_with_comments(mocked_es, mocker, settings, user):  # pylint:
             doc_type=GLOBAL_DOC_TYPE,
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )
+
+
+@pytest.mark.parametrize("error", [POST_TYPE, COMMENT_TYPE])
+def test_index_post_with_comments_errors(mocked_es, mocker, error, settings, user):  # pylint: disable=unused-argument
+    """ Test that a ReindexException is raised if an error occurs when indexing posts or comments"""
+    settings.INDEXING_API_USERNAME = user.username
+    aliases = ['a', 'b']
+    mocker.patch('search.indexing_api.get_active_aliases', autospec=True, return_value=aliases)
+    mocker.patch('channels.api.Api', autospec=True)
+    bulk_mock = mocker.patch('search.indexing_api.bulk', autospec=True)
+
+    if error == POST_TYPE:
+        bulk_mock.side_effect = (({}, ['error']), ({}, []))
+    else:
+        bulk_mock.side_effect = (({}, []), ({}, ['error']))
+
+    with pytest.raises(ReindexException):
+        index_post_with_comments('post_id')
 
 
 @pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
