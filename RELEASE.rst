@@ -1,6 +1,21 @@
 Release Notes
 =============
 
+Version 0.49.0 (Released October 11, 2018)
+--------------
+
+- Added home page intro cards for logged in and anonymous users (#1268)
+- Add moment as a dependency
+- Fixes the dialog buttons submitting the form
+- Channel-specific analytics should trigger on direct URL load (#1315)
+- Shorten menu options (#1303)
+- Install storybook and set up a few basic stories
+- Fixed the --name arg to the set_channel_allow_top command
+- Added login popup/tooltip to drawer compose button
+- Styling tweaks for CompactPostDisplay
+- Move edit icon to channel banner, add gradient for readability
+- Fixed anonymous user signup prompt for post upvote button
+
 Version 0.48.2 (Released October 05, 2018)
 --------------
 
