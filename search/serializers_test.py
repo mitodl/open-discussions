@@ -11,7 +11,7 @@ from search.serializers import (
     ESCommentSerializer,
     serialize_post_for_bulk,
     serialize_comment_for_bulk,
-)
+    serialize_bulk_comments)
 
 
 @pytest.fixture
@@ -132,8 +132,7 @@ def test_serialize_bulk_post_and_comments(mocker, patched_base_post_serializer, 
         replies=[inner_comment_mock]
     )
     post_mock = mocker.MagicMock(comments=[outer_comment_mock])
-    assert list(serialize_bulk_post_and_comments(post_mock)) == [
-        serialize_post_for_bulk(post_mock),
+    assert list(serialize_bulk_comments(post_mock)) == [
         serialize_comment_for_bulk(outer_comment_mock),
         serialize_comment_for_bulk(inner_comment_mock),
     ]

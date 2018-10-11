@@ -9,7 +9,7 @@ import pytest
 from channels.constants import POSTS_SORT_NEW
 from channels.utils import ListingParams
 from open_discussions.test_utils import assert_not_raises
-from search.constants import DOC_TYPE_POST, VALID_DOC_TYPES
+from search.constants import DOC_TYPE_POST, VALID_DOC_TYPES, DOC_TYPE_COMMENT
 from search.exceptions import (
     ReindexException,
     RetryException,
@@ -191,7 +191,7 @@ def test_start_recreate_index(mocker, mocked_celery, settings, user):
         start_recreate_index.delay()
     for doctype in VALID_DOC_TYPES:
         create_backing_index_mock.assert_any_call(doctype)
-    finish_recreate_index_mock.s.assert_called_once_with(backing_index)
+    finish_recreate_index_mock.s.assert_called_once_with({'post': backing_index, 'comment': backing_index})
     assert mocked_celery.group.call_count == 1
 
     # Celery's 'group' function takes a generator as an argument. In order to make assertions about the items
@@ -212,14 +212,15 @@ def test_finish_recreate_index(mocker, with_error):
     """
     finish_recreate_index should attach the backing index to the default alias
     """
-    backing_index = 'backing'
+    backing_indices = {'post': 'backing', 'comment': 'backing'}
     results = ['error'] if with_error else []
     switch_indices_mock = mocker.patch('search.indexing_api.switch_indices', autospec=True)
 
     if with_error:
         with pytest.raises(ReindexException):
-            finish_recreate_index.delay(results, backing_index)
+            finish_recreate_index.delay(results, backing_indices)
         assert switch_indices_mock.call_count == 0
     else:
-        finish_recreate_index.delay(results, backing_index)
-        switch_indices_mock.assert_called_once_with(backing_index)
+        finish_recreate_index.delay(results, backing_indices)
+        switch_indices_mock.assert_any_call('backing', DOC_TYPE_POST)
+        switch_indices_mock.assert_any_call('backing', DOC_TYPE_COMMENT)
