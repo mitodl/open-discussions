@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.49.0
+Version 0.49.0 (Released October 11, 2018)
 --------------
 
 - Added home page intro cards for logged in and anonymous users (#1268)
