@@ -61,7 +61,7 @@ MAPPING = {
 }
 
 
-def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=POST_TYPE):
+def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=None):
     """
     Wipe and recreate index and mapping. No indexing is done.
 
@@ -70,6 +70,8 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=P
         skip_mapping (bool): If true, don't set any mapping
         object_type(str): The type of document (post, comment)
     """
+    if not object_type or object_type not in VALID_OBJECT_TYPES:
+        raise TypeError('A valid object type must be specified when clearing and creating an index')
     conn = get_conn(verify=False)
     if conn.indices.exists(index_name):
         conn.indices.delete(index_name)

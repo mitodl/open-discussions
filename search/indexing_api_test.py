@@ -158,9 +158,10 @@ def test_increment_document_integer_field(mocked_es):
         )
 
 
+@pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
 @pytest.mark.parametrize("skip_mapping", [True, False])
 @pytest.mark.parametrize("already_exists", [True, False])
-def test_clear_and_create_index(mocked_es, skip_mapping, already_exists):
+def test_clear_and_create_index(mocked_es, object_type, skip_mapping, already_exists):
     """
     clear_and_create_index should delete the index and create a new empty one with a mapping
     """
@@ -169,7 +170,7 @@ def test_clear_and_create_index(mocked_es, skip_mapping, already_exists):
     conn = mocked_es.conn
     conn.indices.exists.return_value = already_exists
 
-    clear_and_create_index(index_name=index, skip_mapping=skip_mapping)
+    clear_and_create_index(index_name=index, skip_mapping=skip_mapping, object_type=object_type)
 
     conn.indices.exists.assert_called_once_with(index)
     assert conn.indices.delete.called is already_exists
@@ -182,6 +183,15 @@ def test_clear_and_create_index(mocked_es, skip_mapping, already_exists):
 
     assert 'settings' in body
     assert 'mappings' not in body if skip_mapping else 'mappings' in body
+
+
+@pytest.mark.parametrize("object_type", [None, 'fake'])
+def test_clear_and_create_index_error(object_type):
+    """
+    clear_and_create_index should raise a TypeError if object_type is None or invalid
+    """
+    with pytest.raises(TypeError):
+        clear_and_create_index(index_name='idx', skip_mapping=False, object_type=object_type)
 
 
 def test_index_post_with_comments(mocked_es, mocker, settings, user):  # pylint:disable=too-many-locals
@@ -262,9 +272,9 @@ def test_index_post_with_comments_errors(mocked_es, mocker, error, settings, use
     bulk_mock = mocker.patch('search.indexing_api.bulk', autospec=True)
 
     if error == POST_TYPE:
-        bulk_mock.side_effect = (({}, ['error']), ({}, []))
+        bulk_mock.side_effect = (({}, ['error']),)
     else:
-        bulk_mock.side_effect = (({}, []), ({}, ['error']))
+        bulk_mock.side_effect = (({}, []), ({}, []), ({}, ['error']))
 
     with pytest.raises(ReindexException):
         index_post_with_comments('post_id')
