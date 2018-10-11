@@ -9,7 +9,7 @@ import pytest
 from channels.constants import POSTS_SORT_NEW
 from channels.utils import ListingParams
 from open_discussions.test_utils import assert_not_raises
-from search.constants import DOC_TYPE_POST, VALID_DOC_TYPES, DOC_TYPE_COMMENT
+from search.constants import POST_TYPE, COMMENT_TYPE, VALID_DOC_TYPES
 from search.exceptions import (
     ReindexException,
     RetryException,
@@ -222,5 +222,5 @@ def test_finish_recreate_index(mocker, with_error):
         assert switch_indices_mock.call_count == 0
     else:
         finish_recreate_index.delay(results, backing_indices)
-        switch_indices_mock.assert_any_call('backing', DOC_TYPE_POST)
-        switch_indices_mock.assert_any_call('backing', DOC_TYPE_COMMENT)
+        switch_indices_mock.assert_any_call('backing', POST_TYPE)
+        switch_indices_mock.assert_any_call('backing', COMMENT_TYPE)

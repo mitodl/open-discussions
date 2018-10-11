@@ -17,7 +17,7 @@ from search.connection import (
     make_backing_index_name,
     refresh_index,
 )
-from search.constants import DOC_TYPE_POST, DOC_TYPE_COMMENT, DOC_TYPE_ALL
+from search.constants import POST_TYPE, COMMENT_TYPE, DOC_TYPE_ALL
 from search.exceptions import ReindexException
 from search.serializers import (
     serialize_bulk_post,
@@ -33,43 +33,35 @@ GLOBAL_DOC_TYPE = '_doc'
 SCRIPTING_LANG = 'painless'
 UPDATE_CONFLICT_SETTING = 'proceed'
 
+BASE_CONTENT_TYPE = {
+    'object_type': {'type': 'keyword'},
+    'author_id': {'type': 'keyword'},
+    'author_name': {'type': 'keyword'},
+    'channel_title': {'type': 'keyword'},
+    'text': {'type': 'text'},
+    'score': {'type': 'long'},
+    'created': {'type': 'date'},
+    'deleted': {'type': 'boolean'},
+    'removed': {'type': 'boolean'},
+    'post_id': {'type': 'keyword'},
+    'post_title': {'type': 'text'},
+}
+
 MAPPING = {
-    DOC_TYPE_POST: {
-        'object_type': {'type': 'keyword'},
-        'author_id': {'type': 'keyword'},
-        'author_name': {'type': 'keyword'},
-        'channel_title': {'type': 'keyword'},
-        'text': {'type': 'text'},
-        'score': {'type': 'long'},
-        'created': {'type': 'date'},
-        'deleted': {'type': 'boolean'},
-        'removed': {'type': 'boolean'},
-        'post_id': {'type': 'keyword'},
-        'post_title': {'type': 'text'},
+    POST_TYPE: dict(BASE_CONTENT_TYPE, **{
         'post_link_url': {'type': 'keyword'},
         'post_link_thumbnail': {'type': 'keyword'},
         'num_comments': {'type': 'long'},
-    },
-    DOC_TYPE_COMMENT: {
-        'object_type': {'type': 'keyword'},
-        'author_id': {'type': 'keyword'},
-        'author_name': {'type': 'keyword'},
-        'channel_title': {'type': 'keyword'},
-        'text': {'type': 'text'},
-        'score': {'type': 'long'},
-        'created': {'type': 'date'},
-        'deleted': {'type': 'boolean'},
-        'removed': {'type': 'boolean'},
-        'parent_post_removed': {'type': 'boolean'},
-        'post_id': {'type': 'keyword'},
-        'post_title': {'type': 'text'},
+    }),
+    COMMENT_TYPE: dict(BASE_CONTENT_TYPE, **{
         'comment_id': {'type': 'keyword'},
         'parent_comment_id': {'type': 'keyword'},
-    }
+        'parent_post_removed': {'type': 'boolean'},
+    }),
 }
 
 
-def clear_and_create_index(*, index_name=None, skip_mapping=False, doctype=DOC_TYPE_POST):
+def clear_and_create_index(*, index_name=None, skip_mapping=False, doctype=POST_TYPE):
     """
     Wipe and recreate index and mapping. No indexing is done.
 
@@ -278,7 +270,7 @@ def index_post_with_comments(post_id):
     # Make sure all morecomments are replaced before serializing
     comments.replace_more(limit=None)
 
-    for alias in get_active_aliases([DOC_TYPE_POST]):
+    for alias in get_active_aliases([POST_TYPE]):
         _, errors = bulk(
             conn,
             sync_post(serialize_bulk_post(post)),
@@ -292,7 +284,7 @@ def index_post_with_comments(post_id):
                 errors=errors
             ))
 
-    for alias in get_active_aliases([DOC_TYPE_COMMENT]):
+    for alias in get_active_aliases([COMMENT_TYPE]):
         _, errors = bulk(
             conn,
             sync_comments(serialize_bulk_comments(post)),

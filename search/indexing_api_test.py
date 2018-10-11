@@ -7,12 +7,8 @@ from types import SimpleNamespace
 import pytest
 
 from elasticsearch.exceptions import ConflictError
-from channels.constants import (
-    COMMENT_TYPE,
-    POST_TYPE,
-)
 from search.connection import get_default_alias_name
-from search.constants import DOC_TYPE_POST, DOC_TYPE_COMMENT, DOC_TYPE_ALL
+from search.constants import POST_TYPE, COMMENT_TYPE, DOC_TYPE_ALL
 from search.indexing_api import (
     clear_and_create_index,
     create_backing_index,
@@ -40,8 +36,8 @@ def mocked_es(mocker, settings):
     conn = mocker.Mock()
     get_conn_patch = mocker.patch('search.indexing_api.get_conn', autospec=True, return_value=conn)
     mocker.patch('search.connection.get_conn', autospec=True)
-    default_alias = get_default_alias_name(DOC_TYPE_POST)
-    reindex_alias = get_reindexing_alias_name(DOC_TYPE_POST)
+    default_alias = get_default_alias_name(POST_TYPE)
+    reindex_alias = get_reindexing_alias_name(POST_TYPE)
     yield SimpleNamespace(
         get_conn=get_conn_patch,
         conn=conn,
@@ -225,8 +221,8 @@ def test_index_post_with_comments(mocked_es, mocker, settings, user):
     post_id = 'post_id'
     index_post_with_comments(post_id)
 
-    get_alias_mock.assert_any_call([DOC_TYPE_POST])
-    get_alias_mock.assert_any_call([DOC_TYPE_COMMENT])
+    get_alias_mock.assert_any_call([POST_TYPE])
+    get_alias_mock.assert_any_call([COMMENT_TYPE])
     api_mock.assert_called_once_with(user)
     client = api_mock.return_value
     client.get_post.assert_called_once_with(post_id)
@@ -249,7 +245,7 @@ def test_index_post_with_comments(mocked_es, mocker, settings, user):
         )
 
 
-@pytest.mark.parametrize("doctype", [DOC_TYPE_POST, DOC_TYPE_COMMENT])
+@pytest.mark.parametrize("doctype", [POST_TYPE, COMMENT_TYPE])
 @pytest.mark.parametrize("default_exists", [True, False])
 def test_switch_indices(mocked_es, mocker, default_exists, doctype):
     """
@@ -321,7 +317,7 @@ def test_switch_indices(mocked_es, mocker, default_exists, doctype):
 @pytest.mark.parametrize("temp_alias_exists", [True, False])
 def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     """create_backing_index should make a new backing index and set the reindex alias to point to it"""
-    reindexing_alias = get_reindexing_alias_name(DOC_TYPE_POST)
+    reindexing_alias = get_reindexing_alias_name(POST_TYPE)
     backing_index = 'backing_index'
     conn_mock = mocked_es.conn
     conn_mock.indices.exists_alias.return_value = temp_alias_exists
@@ -330,12 +326,12 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     clear_and_create_mock = mocker.patch('search.indexing_api.clear_and_create_index', autospec=True)
     make_backing_index_mock = mocker.patch('search.indexing_api.make_backing_index_name', return_value=backing_index)
 
-    assert create_backing_index(DOC_TYPE_POST) == backing_index
+    assert create_backing_index(POST_TYPE) == backing_index
 
     get_conn_mock = mocked_es.get_conn
     get_conn_mock.assert_called_once_with(verify=False)
-    make_backing_index_mock.assert_called_once_with(DOC_TYPE_POST)
-    clear_and_create_mock.assert_called_once_with(index_name=backing_index, doctype=DOC_TYPE_POST)
+    make_backing_index_mock.assert_called_once_with(POST_TYPE)
+    clear_and_create_mock.assert_called_once_with(index_name=backing_index, doctype=POST_TYPE)
 
     conn_mock.indices.exists_alias.assert_called_once_with(name=reindexing_alias)
     if temp_alias_exists:
