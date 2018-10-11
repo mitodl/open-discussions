@@ -196,7 +196,7 @@ def test_update_post_removal_for_comments(mocker, reddit_submission_obj):
         },
         field_name=field_name,
         field_value=field_value,
-        doctypes=[COMMENT_TYPE]
+        object_types=[COMMENT_TYPE]
     )
 
 

@@ -15,7 +15,7 @@ from channels.utils import ListingParams
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings
 from search import indexing_api as api
-from search.constants import VALID_DOC_TYPES
+from search.constants import VALID_OBJECT_TYPES
 from search.exceptions import (
     RetryException,
     ReindexException,
@@ -60,23 +60,23 @@ def create_document(doc_id, data):
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
-def update_document_with_partial(doc_id, partial_data, doctype):
+def update_document_with_partial(doc_id, partial_data, object_type):
     """Task that makes a request to update an ES document with a partial document"""
-    return api.update_document_with_partial(doc_id, partial_data, doctype)
+    return api.update_document_with_partial(doc_id, partial_data, object_type)
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
-def increment_document_integer_field(doc_id, field_name, incr_amount, doctype):
+def increment_document_integer_field(doc_id, field_name, incr_amount, object_types):
     """Task that makes a request to increment some integer field in an ES document"""
-    api.increment_document_integer_field(doc_id, field_name, incr_amount, doctype)
+    api.increment_document_integer_field(doc_id, field_name, incr_amount, object_types)
 
 
 @app.task
-def update_field_values_by_query(query, field_name, field_value, doctypes):
+def update_field_values_by_query(query, field_name, field_value, object_types):
     """
     Task that makes a request to update a field value for all ES documents that match some query.
     """
-    return api.update_field_values_by_query(query, field_name, field_value, doctypes)
+    return api.update_field_values_by_query(query, field_name, field_value, object_types)
 
 
 @app.task(autoretry_for=(RetryException, ), retry_backoff=True, rate_limit='600/m')
@@ -139,7 +139,7 @@ def start_recreate_index(self):
     try:
         from channels.api import Api
         user = User.objects.get(username=settings.INDEXING_API_USERNAME)
-        new_backing_indices = {doctype: api.create_backing_index(doctype) for doctype in VALID_DOC_TYPES}
+        new_backing_indices = {obj_type: api.create_backing_index(obj_type) for obj_type in VALID_OBJECT_TYPES}
 
         # Do the indexing on the temp index
         log.info("starting to index all channels, posts and comments...")
@@ -177,6 +177,6 @@ def finish_recreate_index(results, backing_indices):
         raise ReindexException(f"Errors occurred during recreate_index: {errors}")
 
     log.info("Done with temporary index. Pointing default aliases to newly created backing indexes...")
-    for doctype, backing_index in backing_indices.items():
-        api.switch_indices(backing_index, doctype)
+    for obj_type, backing_index in backing_indices.items():
+        api.switch_indices(backing_index, obj_type)
     log.info("recreate_index has finished successfully!")

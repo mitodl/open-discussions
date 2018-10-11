@@ -17,7 +17,7 @@ from search.connection import (
     make_backing_index_name,
     refresh_index,
 )
-from search.constants import POST_TYPE, COMMENT_TYPE, DOC_TYPE_ALL, VALID_DOC_TYPES
+from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, VALID_OBJECT_TYPES
 from search.exceptions import ReindexException
 from search.serializers import (
     serialize_bulk_post,
@@ -61,14 +61,14 @@ MAPPING = {
 }
 
 
-def clear_and_create_index(*, index_name=None, skip_mapping=False, doctype=POST_TYPE):
+def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=POST_TYPE):
     """
     Wipe and recreate index and mapping. No indexing is done.
 
     Args:
         index_name (str): The name of the index to clear
         skip_mapping (bool): If true, don't set any mapping
-        doctype(str): The type of document (post, comment)
+        object_type(str): The type of document (post, comment)
     """
     conn = get_conn(verify=False)
     if conn.indices.exists(index_name):
@@ -92,7 +92,7 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, doctype=POST_
     if not skip_mapping:
         index_create_data['mappings'] = {
             GLOBAL_DOC_TYPE: {
-                "properties": MAPPING[doctype]
+                "properties": MAPPING[object_type]
             }
         }
     # from https://www.elastic.co/guide/en/elasticsearch/guide/current/asciifolding-token-filter.html
@@ -108,7 +108,7 @@ def create_document(doc_id, data):
         data (dict): Full ES document data
     """
     conn = get_conn(verify=True)
-    for alias in get_active_aliases(doctypes=[data['object_type']]):
+    for alias in get_active_aliases([data['object_type']]):
         conn.create(
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
@@ -117,7 +117,7 @@ def create_document(doc_id, data):
         )
 
 
-def update_field_values_by_query(query, field_name, field_value, doctypes=None):
+def update_field_values_by_query(query, field_name, field_value, object_types=None):
     """
     Makes a request to ES to use the update_by_query API to update a single field
     value for all documents that match the given query.
@@ -126,16 +126,20 @@ def update_field_values_by_query(query, field_name, field_value, doctypes=None):
         query (dict): A dict representing an ES query
         field_name (str): The name of the field that will be update
         field_value: The field value to set for all matching documents
-        doctypes (list of str): The document types to query
+        object_types (list of str): The document types to query
     """
-    if not doctypes:
-        doctypes = VALID_DOC_TYPES
+    if not object_types:
+        object_types = VALID_OBJECT_TYPES
     conn = get_conn(verify=True)
+<<<<<<< HEAD
 <<<<<<< HEAD
     for alias in get_active_aliases():
         es_response = conn.update_by_query(  # pylint: disable=unexpected-keyword-arg
 =======
     for alias in get_active_aliases(doctypes=doctypes):
+=======
+    for alias in get_active_aliases(object_types):
+>>>>>>> Refactor argument names (doctype -> object_type)
         es_response = conn.update_by_query(
 >>>>>>> Ensure that documents are created and updated in the correct index.
             index=alias,
@@ -164,19 +168,19 @@ def update_field_values_by_query(query, field_name, field_value, doctypes=None):
             )
 
 
-def _update_document_by_id(doc_id, data, doctype, update_key=None):
+def _update_document_by_id(doc_id, data, object_type, update_key=None):
     """
     Makes a request to ES to update an existing document
 
     Args:
         doc_id (str): The ES document id
         data (dict): Full ES document data
-        doctype (str): The document type to update
+        object_type (str): The document type to update
         update_key (str): A key indicating the type of update request to Elasticsearch
             (e.g.: 'script', 'doc')
     """
     conn = get_conn(verify=True)
-    for alias in get_active_aliases(doctypes=[doctype]):
+    for alias in get_active_aliases([object_type]):
         try:
             conn.update(
                 index=alias,
@@ -197,13 +201,13 @@ def _update_document_by_id(doc_id, data, doctype, update_key=None):
 update_document_with_partial = partial(_update_document_by_id, update_key='doc')
 
 
-def increment_document_integer_field(doc_id, field_name, incr_amount, doctype):
+def increment_document_integer_field(doc_id, field_name, incr_amount, object_type):
     """
     Makes a request to ES to increment some integer field in a document
 
     Args:
         doc_id (str): The ES document id
-        doctype (str): The document type to update
+        object_type (str): The document type to update
         field_name (str): The name of the field to increment
         incr_amount (int): The amount to increment by
     """
@@ -216,7 +220,7 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, doctype):
                 "incr_amount": incr_amount
             }
         },
-        doctype,
+        object_type,
         update_key='script'
     )
 
@@ -310,7 +314,7 @@ def index_post_with_comments(post_id):
             ))
 
 
-def create_backing_index(doctype):
+def create_backing_index(object_type):
     """
     Start the reindexing process by creating a new backing index and pointing the reindex alias toward it
 
@@ -320,11 +324,11 @@ def create_backing_index(doctype):
     conn = get_conn(verify=False)
 
     # Create new backing index for reindex
-    new_backing_index = make_backing_index_name(doctype)
+    new_backing_index = make_backing_index_name(object_type)
 
     # Clear away temp alias so we can reuse it, and create mappings
-    clear_and_create_index(index_name=new_backing_index, doctype=doctype)
-    temp_alias = get_reindexing_alias_name(doctype)
+    clear_and_create_index(index_name=new_backing_index, object_type=object_type)
+    temp_alias = get_reindexing_alias_name(object_type)
     if conn.indices.exists_alias(name=temp_alias):
         # Deletes both alias and backing indexes
         indices = conn.indices.get_alias(temp_alias).keys()
@@ -337,7 +341,7 @@ def create_backing_index(doctype):
     return new_backing_index
 
 
-def switch_indices(backing_index, doctype):
+def switch_indices(backing_index, object_type):
     """
     Switch the default index to point to the backing index, and delete the reindex alias
 
@@ -347,8 +351,8 @@ def switch_indices(backing_index, doctype):
     conn = get_conn(verify=False)
     actions = []
     old_backing_indexes = []
-    default_alias = get_default_alias_name(doctype)
-    global_alias = get_default_alias_name(DOC_TYPE_ALL)
+    default_alias = get_default_alias_name(object_type)
+    global_alias = get_default_alias_name(ALIAS_ALL_INDICES)
     if conn.indices.exists_alias(name=default_alias):
         # Should only be one backing index in normal circumstances
         old_backing_indexes = list(conn.indices.get_alias(name=default_alias).keys())
@@ -389,4 +393,4 @@ def switch_indices(backing_index, doctype):
         conn.indices.delete(index)
 
     # Finally, remove the link to the reindexing alias
-    conn.indices.delete_alias(name=get_reindexing_alias_name(doctype), index=backing_index)
+    conn.indices.delete_alias(name=get_reindexing_alias_name(object_type), index=backing_index)

@@ -10,7 +10,7 @@ from elasticsearch.exceptions import ConflictError
 
 from channels.models import Post, Comment
 from search.connection import get_default_alias_name
-from search.constants import POST_TYPE, COMMENT_TYPE, DOC_TYPE_ALL
+from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES
 from search.indexing_api import (
     clear_and_create_index,
     create_backing_index,
@@ -50,18 +50,18 @@ def mocked_es(mocker, settings):
     )
 
 
-@pytest.mark.parametrize('doctype', [POST_TYPE, COMMENT_TYPE])
-def test_create_document(mocked_es, mocker, doctype):
+@pytest.mark.parametrize('object_type', [POST_TYPE, COMMENT_TYPE])
+def test_create_document(mocked_es, mocker, object_type):
     """
     Test that create_document gets a connection and calls the correct elasticsearch-dsl function
     """
-    doc_id, data = ('doc_id', {'object_type': doctype})
-    mock_get_aliases = mocker.patch('search.indexing_api.get_active_aliases', return_value=[doctype])
+    doc_id, data = ('doc_id', {'object_type': object_type})
+    mock_get_aliases = mocker.patch('search.indexing_api.get_active_aliases', return_value=[object_type])
     create_document(doc_id, data)
-    mock_get_aliases.assert_called_once_with(doctypes=[doctype])
+    mock_get_aliases.assert_called_once_with([object_type])
     mocked_es.get_conn.assert_called_once_with(verify=True)
     mocked_es.conn.create.assert_any_call(
-        index=doctype,
+        index=object_type,
         doc_type=GLOBAL_DOC_TYPE,
         body=data,
         id=doc_id,
@@ -102,18 +102,18 @@ def test_update_field_values_by_query(mocker, mocked_es, version_conflicts, expe
     assert patched_logger.error.called is expected_error_logged
 
 
-@pytest.mark.parametrize('doctype', [POST_TYPE, COMMENT_TYPE])
-def test_update_document_with_partial(mocked_es, mocker, doctype):
+@pytest.mark.parametrize('object_type', [POST_TYPE, COMMENT_TYPE])
+def test_update_document_with_partial(mocked_es, mocker, object_type):
     """
     Test that update_document_with_partial gets a connection and calls the correct elasticsearch-dsl function
     """
-    mock_get_aliases = mocker.patch('search.indexing_api.get_active_aliases', return_value=[doctype])
+    mock_get_aliases = mocker.patch('search.indexing_api.get_active_aliases', return_value=[object_type])
     doc_id, data = ('doc_id', {'key1': 'value1'})
-    update_document_with_partial(doc_id, data, doctype)
-    mock_get_aliases.assert_called_once_with(doctypes=[doctype])
+    update_document_with_partial(doc_id, data, object_type)
+    mock_get_aliases.assert_called_once_with([object_type])
     mocked_es.get_conn.assert_called_once_with(verify=True)
     mocked_es.conn.update.assert_called_once_with(
-        index=doctype,
+        index=object_type,
         doc_type=GLOBAL_DOC_TYPE,
         body={'doc': data},
         id=doc_id,
@@ -251,9 +251,9 @@ def test_index_post_with_comments(mocked_es, mocker, settings, user):  # pylint:
         )
 
 
-@pytest.mark.parametrize("doctype", [POST_TYPE, COMMENT_TYPE])
+@pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
 @pytest.mark.parametrize("default_exists", [True, False])
-def test_switch_indices(mocked_es, mocker, default_exists, doctype):
+def test_switch_indices(mocked_es, mocker, default_exists, object_type):
     """
     switch_indices should atomically remove the old backing index
     for the default alias and replace it with the new one
@@ -265,14 +265,14 @@ def test_switch_indices(mocked_es, mocker, default_exists, doctype):
     conn_mock.indices.get_alias.return_value.keys.return_value = [old_backing_index]
 
     backing_index = 'backing'
-    switch_indices(backing_index, doctype)
+    switch_indices(backing_index, object_type)
 
     conn_mock.indices.delete_alias.assert_any_call(
-        name=get_reindexing_alias_name(doctype),
+        name=get_reindexing_alias_name(object_type),
         index=backing_index,
     )
-    default_alias = get_default_alias_name(doctype)
-    all_alias = get_default_alias_name(DOC_TYPE_ALL)
+    default_alias = get_default_alias_name(object_type)
+    all_alias = get_default_alias_name(ALIAS_ALL_INDICES)
     conn_mock.indices.exists_alias.assert_called_once_with(name=default_alias)
 
     actions = []
@@ -315,7 +315,7 @@ def test_switch_indices(mocked_es, mocker, default_exists, doctype):
         assert conn_mock.indices.delete.called is False
 
     conn_mock.indices.delete_alias.assert_called_once_with(
-        name=get_reindexing_alias_name(doctype),
+        name=get_reindexing_alias_name(object_type),
         index=backing_index,
     )
 
@@ -337,7 +337,7 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     get_conn_mock = mocked_es.get_conn
     get_conn_mock.assert_called_once_with(verify=False)
     make_backing_index_mock.assert_called_once_with(POST_TYPE)
-    clear_and_create_mock.assert_called_once_with(index_name=backing_index, doctype=POST_TYPE)
+    clear_and_create_mock.assert_called_once_with(index_name=backing_index, object_type=POST_TYPE)
 
     conn_mock.indices.exists_alias.assert_called_once_with(name=reindexing_alias)
     if temp_alias_exists:

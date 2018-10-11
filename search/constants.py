@@ -1,9 +1,9 @@
 """ Constants for search """
 from channels.constants import POST_TYPE, COMMENT_TYPE
 
-DOC_TYPE_ALL = 'all'
+ALIAS_ALL_INDICES = 'all'
 
-VALID_DOC_TYPES = (
+VALID_OBJECT_TYPES = (
     POST_TYPE,
     COMMENT_TYPE,
 )
