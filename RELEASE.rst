@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.49.1
+--------------
+
+- dang buttons
+- Added new authentication class to ignore expired JWTs
+- Upgrade react, react-dom to latest
+- Link and button styling changes
+- Change the message shown in the image upload dialog box
+
 Version 0.49.0 (Released October 11, 2018)
 --------------
 
