@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.49.1
+Version 0.49.1 (Released October 11, 2018)
 --------------
 
 - dang buttons
