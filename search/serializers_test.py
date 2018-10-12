@@ -121,7 +121,7 @@ def test_es_comment_serializer(patched_base_comment_serializer, reddit_comment_o
     }
 
 
-def test_serialize_bulk_post_and_comments(mocker, patched_base_post_serializer, patched_base_comment_serializer):
+def test_serialize_bulk_comments(mocker, patched_base_comment_serializer):
     """index_comments should index comments and then call itself recursively to index more comments"""
     inner_comment_mock = mocker.Mock(
         id='comment_2',
