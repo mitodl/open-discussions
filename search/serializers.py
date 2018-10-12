@@ -55,6 +55,7 @@ class ESPostSerializer(ESSerializer):
     use_keys = [
         'author_id',
         'author_name',
+        'channel_name',
         'channel_title',
         'text',
         'score',
@@ -106,7 +107,8 @@ class ESCommentSerializer(ESSerializer):
         return {
             'author_id': None if serialized_data['author_id'] == '[deleted]' else serialized_data['author_id'],
             'author_name': None if serialized_data['author_name'] == '[deleted]' else serialized_data['author_name'],
-            'channel_title': reddit_obj.subreddit.display_name,
+            'channel_title': reddit_obj.subreddit.title,
+            'channel_name': reddit_obj.subreddit.display_name,
             'post_id': reddit_obj.submission.id,
             'post_title': reddit_obj.submission.title,
         }
