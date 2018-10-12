@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('channels', '0003_channels_comments_posts'),
-    ]
+    dependencies = [("channels", "0003_channels_comments_posts")]
 
     operations = [
         migrations.AddField(
-            model_name='channel',
-            name='membership_is_managed',
+            model_name="channel",
+            name="membership_is_managed",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

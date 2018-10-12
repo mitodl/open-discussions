@@ -7,21 +7,22 @@ from notifications import api
 
 class Command(BaseCommand):
     """Populates user notification setting"""
-    help = 'Populates user notification settings'
+
+    help = "Populates user notification settings"
 
     def add_arguments(self, parser):
-        parser.add_argument('--username', nargs='?', action='append')
-        parser.add_argument('--inactive', action='store_false', default=False)
+        parser.add_argument("--username", nargs="?", action="append")
+        parser.add_argument("--inactive", action="store_false", default=False)
 
     def handle(self, *args, **options):
         users = get_user_model().objects.all()
 
-        if not options['inactive']:
+        if not options["inactive"]:
             # unless the --inactive flag is specified, default to the safer subset of active users
             users = users.filter(profile__last_active_on__isnull=False)
 
-        if options['username']:
-            users = users.filter(username__in=options['username'])
+        if options["username"]:
+            users = users.filter(username__in=options["username"])
 
         for user in users.iterator():
             api.ensure_notification_settings(user)

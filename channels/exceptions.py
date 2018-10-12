@@ -15,15 +15,17 @@ class ConflictException(APIException):
     """
     An action would cause a conflict with an existing resource
     """
+
     status_code = status.HTTP_409_CONFLICT
-    default_detail = 'Resource conflict.'
-    default_code = 'resource_conflict'
+    default_detail = "Resource conflict."
+    default_code = "resource_conflict"
 
 
 class GoneException(APIException):
     """
     Existing resource is gone
     """
+
     status_code = status.HTTP_410_GONE
-    default_detail = 'Resource is gone.'
-    default_code = 'resource_gone'
+    default_detail = "Resource is gone."
+    default_code = "resource_gone"

@@ -33,11 +33,14 @@ User = get_user_model()
 
 class SocialAuthSerializer(serializers.Serializer):
     """Serializer for social auth"""
-    partial_token = serializers.CharField(source='partial.token', default=None)
-    flow = serializers.ChoiceField(choices=(
-        (SocialAuthState.FLOW_LOGIN, "Login"),
-        (SocialAuthState.FLOW_REGISTER, "Register"),
-    ))
+
+    partial_token = serializers.CharField(source="partial.token", default=None)
+    flow = serializers.ChoiceField(
+        choices=(
+            (SocialAuthState.FLOW_LOGIN, "Login"),
+            (SocialAuthState.FLOW_REGISTER, "Register"),
+        )
+    )
     provider = serializers.CharField(read_only=True)
     state = serializers.CharField(read_only=True)
     errors = serializers.ListField(read_only=True)
@@ -45,33 +48,30 @@ class SocialAuthSerializer(serializers.Serializer):
 
     def _save_next(self, data):
         """Persists the next url to the session"""
-        if 'next' in data:
-            backend = self.context['backend']
+        if "next" in data:
+            backend = self.context["backend"]
             # Check and sanitize a user-defined GET/POST next field value
-            redirect_uri = data['next']
-            if backend.setting('SANITIZE_REDIRECTS', True):
-                allowed_hosts = backend.setting('ALLOWED_REDIRECT_HOSTS', []) + \
-                                [backend.strategy.request_host()]
+            redirect_uri = data["next"]
+            if backend.setting("SANITIZE_REDIRECTS", True):
+                allowed_hosts = backend.setting("ALLOWED_REDIRECT_HOSTS", []) + [
+                    backend.strategy.request_host()
+                ]
                 redirect_uri = sanitize_redirect(allowed_hosts, redirect_uri)
             backend.strategy.session_set(
-                'next',
-                redirect_uri or backend.setting('LOGIN_REDIRECT_URL')
+                "next", redirect_uri or backend.setting("LOGIN_REDIRECT_URL")
             )
 
     def _authenticate(self, flow):
         """Authenticate the current request"""
-        request = self.context['request']
-        strategy = self.context['strategy']
-        backend = self.context['backend']
+        request = self.context["request"]
+        strategy = self.context["strategy"]
+        backend = self.context["backend"]
         user = request.user
 
         is_authenticated = user_is_authenticated(user)
         user = user if is_authenticated else None
 
-        kwargs = {
-            'request': request,
-            'flow': flow,
-        }
+        kwargs = {"request": request, "flow": flow}
 
         partial = partial_pipeline_data(backend, user, **kwargs)
         if partial:
@@ -83,7 +83,7 @@ class SocialAuthSerializer(serializers.Serializer):
 
         # pop redirect value before the session is trashed on login(), but after
         # the pipeline so that the pipeline can change the redirect if needed
-        redirect_url = backend.strategy.session_get('next', None)
+        redirect_url = backend.strategy.session_get("next", None)
 
         # check if the output value is something else than a user and just
         # return it to the client
@@ -93,24 +93,30 @@ class SocialAuthSerializer(serializers.Serializer):
             return user
 
         if is_authenticated:
-            return SocialAuthState(SocialAuthState.STATE_SUCCESS, redirect_url=redirect_url)
+            return SocialAuthState(
+                SocialAuthState.STATE_SUCCESS, redirect_url=redirect_url
+            )
         elif user:
             if user_is_active(user):
                 social_user = user.social_user
 
                 login(backend, user, social_user)
                 # store last login backend name in session
-                strategy.session_set('social_auth_last_login_backend', social_user.provider)
+                strategy.session_set(
+                    "social_auth_last_login_backend", social_user.provider
+                )
 
-                return SocialAuthState(SocialAuthState.STATE_SUCCESS, redirect_url=redirect_url)
+                return SocialAuthState(
+                    SocialAuthState.STATE_SUCCESS, redirect_url=redirect_url
+                )
             else:
                 return SocialAuthState(SocialAuthState.STATE_INACTIVE)
         else:  # pragma: no cover
             # this follows similar code in PSA itself, but wasn't reachable through normal testing
             log.error("Unexpected authentication result")
-            return SocialAuthState(SocialAuthState.STATE_ERROR, errors=[
-                "Unexpected authentication result"
-            ])
+            return SocialAuthState(
+                SocialAuthState.STATE_ERROR, errors=["Unexpected authentication result"]
+            )
 
     def save(self, **kwargs):
         try:
@@ -122,7 +128,7 @@ class SocialAuthSerializer(serializers.Serializer):
             result = SocialAuthState(SocialAuthState.STATE_ERROR, errors=[str(exc)])
 
         if isinstance(result, SocialAuthState) and result.partial is not None:
-            strategy = self.context['strategy']
+            strategy = self.context["strategy"]
             strategy.storage.partial.store(result.partial)
 
         if not isinstance(result, SocialAuthState):
@@ -132,7 +138,7 @@ class SocialAuthSerializer(serializers.Serializer):
 
         # return the passed flow back to the caller
         # this way they know if they're on a particular page because of an attempted registration or login
-        result.flow = self.validated_data['flow']
+        result.flow = self.validated_data["flow"]
 
         if result.provider is None:
             result.provider = EmailAuth.name
@@ -145,7 +151,10 @@ class SocialAuthSerializer(serializers.Serializer):
 
 class LoginEmailSerializer(SocialAuthSerializer):
     """Serializer for email login"""
-    partial_token = serializers.CharField(source='partial.token', read_only=True, default=None)
+
+    partial_token = serializers.CharField(
+        source="partial.token", read_only=True, default=None
+    )
     email = serializers.EmailField(write_only=True)
     extra_data = serializers.JSONField(read_only=True)
     next = serializers.CharField(write_only=True, required=False)
@@ -159,31 +168,34 @@ class LoginEmailSerializer(SocialAuthSerializer):
         try:
             result = super()._authenticate(SocialAuthState.FLOW_LOGIN)
         except RequireProviderException as exc:
-            result = SocialAuthState(SocialAuthState.STATE_LOGIN_PROVIDER, provider=exc.social_auth.provider)
+            result = SocialAuthState(
+                SocialAuthState.STATE_LOGIN_PROVIDER, provider=exc.social_auth.provider
+            )
             profile_to_serialize = exc.social_auth.user.profile
         except RequireRegistrationException:
-            result = SocialAuthState(SocialAuthState.STATE_ERROR, errors=[
-                "Couldn't find your MIT OPEN Account"
-            ])
+            result = SocialAuthState(
+                SocialAuthState.STATE_ERROR,
+                errors=["Couldn't find your MIT OPEN Account"],
+            )
         except RequirePasswordException as exc:
-            result = SocialAuthState(SocialAuthState.STATE_LOGIN_PASSWORD, partial=exc.partial)
+            result = SocialAuthState(
+                SocialAuthState.STATE_LOGIN_PASSWORD, partial=exc.partial
+            )
             profile_to_serialize = Profile.objects.filter(
-                user__social_auth__uid=validated_data.get('email'),
-                user__social_auth__provider=EmailAuth.name
+                user__social_auth__uid=validated_data.get("email"),
+                user__social_auth__provider=EmailAuth.name,
             ).first()
         if profile_to_serialize:
             profile_data = ProfileSerializer(profile_to_serialize).data
             result.extra_data = filter_dict_keys(
-                profile_data, [
-                    'profile_image_small',
-                    'name'
-                ]
+                profile_data, ["profile_image_small", "name"]
             )
         return result
 
 
 class LoginPasswordSerializer(SocialAuthSerializer):
     """Serializer for email login with password"""
+
     password = serializers.CharField(min_length=8, write_only=True)
 
     def create(self, validated_data):
@@ -192,21 +204,20 @@ class LoginPasswordSerializer(SocialAuthSerializer):
             result = super()._authenticate(SocialAuthState.FLOW_LOGIN)
         except InvalidPasswordException as exc:
             result = SocialAuthState(
-                SocialAuthState.STATE_ERROR,
-                partial=exc.partial,
-                errors=[str(exc)],
+                SocialAuthState.STATE_ERROR, partial=exc.partial, errors=[str(exc)]
             )
         return result
 
 
 class RegisterEmailSerializer(SocialAuthSerializer):
     """Serializer for email register"""
+
     email = serializers.EmailField(write_only=True, required=False)
     next = serializers.CharField(write_only=True, required=False)
 
     def validate(self, attrs):
-        token = (attrs.get('partial', {}) or {}).get('token', None)
-        email = attrs.get('email', None)
+        token = (attrs.get("partial", {}) or {}).get("token", None)
+        email = attrs.get("email", None)
         if not email and not token:
             raise serializers.ValidationError("One of 'partial' or 'email' is required")
 
@@ -235,7 +246,8 @@ class RegisterEmailSerializer(SocialAuthSerializer):
 
 class RegisterConfirmSerializer(SocialAuthSerializer):
     """Serializer for email confirmation"""
-    partial_token = serializers.CharField(source='partial.token')
+
+    partial_token = serializers.CharField(source="partial.token")
     verification_code = serializers.CharField(write_only=True)
 
     def create(self, validated_data):
@@ -244,14 +256,14 @@ class RegisterConfirmSerializer(SocialAuthSerializer):
             result = super()._authenticate(SocialAuthState.FLOW_REGISTER)
         except RequirePasswordAndProfileException as exc:
             result = SocialAuthState(
-                SocialAuthState.STATE_REGISTER_DETAILS,
-                partial=exc.partial,
+                SocialAuthState.STATE_REGISTER_DETAILS, partial=exc.partial
             )
         return result
 
 
 class RegisterDetailsSerializer(SocialAuthSerializer):
     """Serializer for registration details"""
+
     password = serializers.CharField(min_length=8, write_only=True)
     name = serializers.CharField(write_only=True)
 

@@ -31,8 +31,7 @@ def unsign_and_verify_username_from_token(token):
     signer = signing.TimestampSigner()
     try:
         return signer.unsign(
-            token,
-            max_age=settings.OPEN_DISCUSSIONS_UNSUBSCRIBE_TOKEN_MAX_AGE_SECONDS
+            token, max_age=settings.OPEN_DISCUSSIONS_UNSUBSCRIBE_TOKEN_MAX_AGE_SECONDS
         )
     except signing.BadSignature:
         return None

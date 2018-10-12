@@ -53,10 +53,11 @@ def safe_format_recipients(recipients):
     if settings.MAILGUN_RECIPIENT_OVERRIDE is not None:
         return [(settings.MAILGUN_RECIPIENT_OVERRIDE, recipients[0])]
 
-    return [(
-        formataddr((user.profile.name, user.email)),
-        user,
-    ) for user in recipients if can_email_user(user)]
+    return [
+        (formataddr((user.profile.name, user.email)), user)
+        for user in recipients
+        if can_email_user(user)
+    ]
 
 
 def can_email_user(user):
@@ -85,11 +86,11 @@ def context_for_user(user, extra_context=None):
     """
 
     context = {
-        'anon_token': get_encoded_and_signed_subscription_token(user),
-        'base_url': settings.SITE_BASE_URL,
-        'use_new_branding': features.is_enabled(features.USE_NEW_BRANDING),
-        'user': user,
-        'site_name': get_default_site().title,
+        "anon_token": get_encoded_and_signed_subscription_token(user),
+        "base_url": settings.SITE_BASE_URL,
+        "use_new_branding": features.is_enabled(features.USE_NEW_BRANDING),
+        "user": user,
+        "site_name": get_default_site().title,
     }
 
     if extra_context is not None:
@@ -109,28 +110,30 @@ def render_email_templates(template_name, context):
     Returns:
         (str, str, str): tuple of the templates for subject, text_body, html_body
     """
-    subject_text = render_to_string('{}/subject.txt'.format(template_name), context).rstrip()
+    subject_text = render_to_string(
+        "{}/subject.txt".format(template_name), context
+    ).rstrip()
 
-    context.update({
-        'subject': subject_text,
-    })
-    html_text = render_to_string('{}/body.html'.format(template_name), context)
+    context.update({"subject": subject_text})
+    html_text = render_to_string("{}/body.html".format(template_name), context)
 
     # pynliner internally uses bs4, which we can now modify the inlined version into a plaintext version
     # this avoids parsing the body twice in bs4
-    soup = BeautifulSoup(html_text, 'html5lib')
-    for link in soup.find_all('a'):
-        link.replace_with("{} ({})".format(link.string, link.attrs['href']))
+    soup = BeautifulSoup(html_text, "html5lib")
+    for link in soup.find_all("a"):
+        link.replace_with("{} ({})".format(link.string, link.attrs["href"]))
 
     # clear any surviving style and title tags, so their contents don't get printed
-    for style in soup.find_all(['style', 'title']):
+    for style in soup.find_all(["style", "title"]):
         style.clear()  # clear contents, just removing the tag isn't enough
 
     fallback_text = soup.get_text().strip()
     # truncate more than 3 consecutive newlines
-    fallback_text = re.sub(r'\n\s*\n', '\n\n\n', fallback_text)
+    fallback_text = re.sub(r"\n\s*\n", "\n\n\n", fallback_text)
     # ltrim the left side of all lines
-    fallback_text = re.sub(r'^([ ]+)([\s\\X])', r'\2', fallback_text, flags=re.MULTILINE)
+    fallback_text = re.sub(
+        r"^([ ]+)([\s\\X])", r"\2", fallback_text, flags=re.MULTILINE
+    )
 
     return subject_text, fallback_text, html_text
 
@@ -148,7 +151,9 @@ def messages_for_recipients(recipients_and_contexts, template_name):
     """
     with mail.get_connection(settings.NOTIFICATION_EMAIL_BACKEND) as connection:
         for recipient, context in recipients_and_contexts:
-            subject, text_body, html_body = render_email_templates(template_name, context)
+            subject, text_body, html_body = render_email_templates(
+                template_name, context
+            )
             msg = AnymailMessage(
                 subject=subject,
                 body=text_body,

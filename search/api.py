@@ -1,8 +1,5 @@
 """API for general search-related functionality"""
-from channels.constants import (
-    POST_TYPE,
-    COMMENT_TYPE,
-)
+from channels.constants import POST_TYPE, COMMENT_TYPE
 
 
 def get_reddit_object_type(reddit_obj):
@@ -16,7 +13,7 @@ def get_reddit_object_type(reddit_obj):
     Returns:
         str: A string constant indicating the object type
     """
-    return COMMENT_TYPE if hasattr(reddit_obj, 'submission') else POST_TYPE
+    return COMMENT_TYPE if hasattr(reddit_obj, "submission") else POST_TYPE
 
 
 def gen_post_id(reddit_obj_id):
@@ -29,7 +26,7 @@ def gen_post_id(reddit_obj_id):
     Returns:
         str: The Elasticsearch document id for this object
     """
-    return 'p_{}'.format(reddit_obj_id)
+    return "p_{}".format(reddit_obj_id)
 
 
 def gen_comment_id(reddit_obj_id):
@@ -42,7 +39,7 @@ def gen_comment_id(reddit_obj_id):
     Returns:
         str: The Elasticsearch document id for this object
     """
-    return 'c_{}'.format(reddit_obj_id)
+    return "c_{}".format(reddit_obj_id)
 
 
 def is_reddit_object_removed(reddit_obj):

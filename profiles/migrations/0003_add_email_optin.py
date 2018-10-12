@@ -7,14 +7,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0002_increase_max_length'),
-    ]
+    dependencies = [("profiles", "0002_increase_max_length")]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='email_optin',
-            field=models.NullBooleanField(),
-        ),
+            model_name="profile", name="email_optin", field=models.NullBooleanField()
+        )
     ]

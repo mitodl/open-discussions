@@ -25,13 +25,10 @@ def warnings_as_errors():
     """
     try:
         warnings.resetwarnings()
-        warnings.simplefilter('error')
+        warnings.simplefilter("error")
         # For celery
-        warnings.simplefilter('ignore', category=ImportWarning)
-        warnings.filterwarnings(
-            "ignore",
-            category=InsecureRequestWarning,
-        )
+        warnings.simplefilter("ignore", category=ImportWarning)
+        warnings.filterwarnings("ignore", category=InsecureRequestWarning)
         warnings.filterwarnings(
             "ignore",
             message="'async' and 'await' will become reserved keywords in Python 3.7",
@@ -49,10 +46,7 @@ def warnings_as_errors():
             message=r".*(JSONField\.from_db_value).*",
             category=RemovedInDjango30Warning,
         )
-        warnings.filterwarnings(
-            "ignore",
-            category=RemovedInPytest4Warning
-        )
+        warnings.filterwarnings("ignore", category=RemovedInPytest4Warning)
 
         yield
     finally:
@@ -65,7 +59,7 @@ def randomness():
     factory.fuzzy.reseed_random("happy little clouds")
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def session_indexing_decorator():
     """
     Fixture that mocks the reddit object indexer for the test suite by default.
@@ -78,6 +72,7 @@ def session_indexing_decorator():
 
     def dummy_decorator(*persistence_funcs):  # pylint: disable=unused-argument
         """A decorator that calls a mock before calling the wrapped function"""
+
         def dummy_decorator_inner(func):  # pylint: disable=missing-docstring
             @wraps(func)
             def wrapped_api_func(*args, **kwargs):  # pylint: disable=missing-docstring
@@ -85,10 +80,14 @@ def session_indexing_decorator():
                     mock_persist_func.original.append(persistence_func)
                     mock_persist_func(*args, **kwargs)
                 return func(*args, **kwargs)
+
             return wrapped_api_func
+
         return dummy_decorator_inner
 
-    patched_decorator = patch('search.task_helpers.reddit_object_persist', dummy_decorator)
+    patched_decorator = patch(
+        "search.task_helpers.reddit_object_persist", dummy_decorator
+    )
     patched_decorator.start()
     # Reload the modules that import and use the channels API. All methods decorated with
     # reddit_object_persist will now use the simple patched version that was created here.
@@ -114,4 +113,6 @@ def mock_channel_exists(mocker):
     """
     Mock the permissions.channel_exists function to always return True
     """
-    return mocker.patch('open_discussions.permissions.channel_exists', return_value=True)
+    return mocker.patch(
+        "open_discussions.permissions.channel_exists", return_value=True
+    )

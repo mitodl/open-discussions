@@ -6,10 +6,7 @@ import pytz
 
 from channels import api, serializers
 from channels.utils import ListingParams
-from notifications.models import (
-    FREQUENCY_DAILY,
-    FREQUENCY_WEEKLY,
-)
+from notifications.models import FREQUENCY_DAILY, FREQUENCY_WEEKLY
 from notifications.notifiers.email import EmailNotifier
 from notifications.notifiers.exceptions import (
     InvalidTriggerFrequencyError,
@@ -87,15 +84,16 @@ def _posts_since_notification(notification_settings, notification):
         if not post.stickied and _is_post_after_notification(post, notification)
     ]
 
-    posts = posts[:settings.OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS]
+    posts = posts[: settings.OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS]
 
     return posts
 
 
 class FrontpageDigestNotifier(EmailNotifier):
     """Notifier for frontpage digests"""
+
     def __init__(self, notification_settings):
-        super().__init__('frontpage', notification_settings)
+        super().__init__("frontpage", notification_settings)
 
     def can_notify(self, last_notification):
         """
@@ -111,15 +109,18 @@ class FrontpageDigestNotifier(EmailNotifier):
             bool: True if we're due to send another notification
         """
         return (
-            features.is_enabled(features.FRONTPAGE_EMAIL_DIGESTS) and
-            super().can_notify(last_notification) and
+            features.is_enabled(features.FRONTPAGE_EMAIL_DIGESTS)
+            and super().can_notify(last_notification)
+            and
             # do this last as it's expensive if the others are False anyway
             # check if we have posts since the last notification
-            bool(_posts_since_notification(self.notification_settings, last_notification))
+            bool(
+                _posts_since_notification(self.notification_settings, last_notification)
+            )
         )
 
     def _get_notification_data(
-            self, current_notification, last_notification
+        self, current_notification, last_notification
     ):  # pylint: disable=unused-argument
         """
         Gets the data for this notification
@@ -138,13 +139,10 @@ class FrontpageDigestNotifier(EmailNotifier):
             raise CancelNotificationError()
 
         return {
-            'posts': [
+            "posts": [
                 serializers.PostSerializer(
-                    post,
-                    context={
-                        'current_user': self.user,
-                    },
+                    post, context={"current_user": self.user}
                 ).data
                 for post in posts
-            ],
+            ]
         }

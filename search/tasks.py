@@ -16,10 +16,7 @@ from open_discussions.celery import app
 from open_discussions.utils import merge_strings
 from search import indexing_api as api
 from search.constants import VALID_OBJECT_TYPES
-from search.exceptions import (
-    RetryException,
-    ReindexException,
-)
+from search.exceptions import RetryException, ReindexException
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -31,8 +28,8 @@ log = logging.getLogger(__name__)
 # a waiting task to create the document.
 PARTIAL_UPDATE_TASK_SETTINGS = dict(
     autoretry_for=(NotFoundError,),
-    retry_kwargs={'max_retries': 5},
-    default_retry_delay=2
+    retry_kwargs={"max_retries": 5},
+    default_retry_delay=2,
 )
 
 
@@ -76,10 +73,12 @@ def update_field_values_by_query(query, field_name, field_value, object_types):
     """
     Task that makes a request to update a field value for all ES documents that match some query.
     """
-    return api.update_field_values_by_query(query, field_name, field_value, object_types)
+    return api.update_field_values_by_query(
+        query, field_name, field_value, object_types
+    )
 
 
-@app.task(autoretry_for=(RetryException, ), retry_backoff=True, rate_limit='600/m')
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_post_with_comments(post_id):
     """
     Index a post and its comments
@@ -100,7 +99,9 @@ def index_post_with_comments(post_id):
         return error
 
 
-@app.task(bind=True, autoretry_for=(RetryException, ), retry_backoff=True, rate_limit='600/m')
+@app.task(
+    bind=True, autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m"
+)
 def index_channel(self, channel_name):
     """
     Index the channel
@@ -111,15 +112,16 @@ def index_channel(self, channel_name):
     try:
         with wrap_retry_exception(PrawcoreException, PRAWException):
             from channels.api import Api, sync_channel_model
+
             sync_channel_model(channel_name)
 
             client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
-            posts = client.list_posts(channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW))
+            posts = client.list_posts(
+                channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW)
+            )
 
         raise self.replace(
-            celery.group(
-                index_post_with_comments.si(post.id) for post in posts
-            )
+            celery.group(index_post_with_comments.si(post.id) for post in posts)
         )
     except RetryException:
         raise
@@ -138,8 +140,12 @@ def start_recreate_index(self):
     """
     try:
         from channels.api import Api
+
         user = User.objects.get(username=settings.INDEXING_API_USERNAME)
-        new_backing_indices = {obj_type: api.create_backing_index(obj_type) for obj_type in VALID_OBJECT_TYPES}
+        new_backing_indices = {
+            obj_type: api.create_backing_index(obj_type)
+            for obj_type in VALID_OBJECT_TYPES
+        }
 
         # Do the indexing on the temp index
         log.info("starting to index all channels, posts and comments...")
@@ -156,10 +162,7 @@ def start_recreate_index(self):
 
     # Use self.replace so that code waiting on this task will also wait on the indexing and finish tasks
     raise self.replace(
-        celery.chain(
-            index_channels,
-            finish_recreate_index.s(new_backing_indices),
-        )
+        celery.chain(index_channels, finish_recreate_index.s(new_backing_indices))
     )
 
 
@@ -176,7 +179,9 @@ def finish_recreate_index(results, backing_indices):
     if errors:
         raise ReindexException(f"Errors occurred during recreate_index: {errors}")
 
-    log.info("Done with temporary index. Pointing default aliases to newly created backing indexes...")
+    log.info(
+        "Done with temporary index. Pointing default aliases to newly created backing indexes..."
+    )
     for obj_type, backing_index in backing_indices.items():
         api.switch_indices(backing_index, obj_type)
     log.info("recreate_index has finished successfully!")

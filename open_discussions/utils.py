@@ -1,9 +1,6 @@
 """open_discussions utilities"""
 import datetime
-from enum import (
-    auto,
-    Flag,
-)
+from enum import auto, Flag
 from itertools import islice
 import logging
 
@@ -21,6 +18,7 @@ class FeatureFlag(Flag):
     Members should have values of increasing powers of 2 (1, 2, 4, 8, ...)
 
     """
+
     EXAMPLE_FEATURE = auto()
 
 
@@ -35,7 +33,9 @@ def webpack_dev_server_url(request):
     """
     Get the full URL where the webpack dev server should be running
     """
-    return 'http://{}:{}'.format(webpack_dev_server_host(request), settings.WEBPACK_DEV_SERVER_PORT)
+    return "http://{}:{}".format(
+        webpack_dev_server_host(request), settings.WEBPACK_DEV_SERVER_PORT
+    )
 
 
 def is_near_now(time):
@@ -135,7 +135,9 @@ def filter_dict_keys(orig_dict, keys_to_keep, *, optional=False):
         keys_to_keep (iterable): Keys to filter on
         optional (bool): If True, ignore keys that don't exist in the dict. If False, raise a KeyError.
     """
-    return {key: orig_dict[key] for key in keys_to_keep if not optional or key in orig_dict}
+    return {
+        key: orig_dict[key] for key in keys_to_keep if not optional or key in orig_dict
+    }
 
 
 def filter_dict_with_renamed_keys(orig_dict, key_rename_dict, *, optional=False):
@@ -147,4 +149,8 @@ def filter_dict_with_renamed_keys(orig_dict, key_rename_dict, *, optional=False)
         key_rename_dict (dict): Mapping of old key to new key
         optional (bool): If True, ignore keys that don't exist in the dict. If False, raise a KeyError.
     """
-    return {new_key: orig_dict[key] for key, new_key in key_rename_dict.items() if not optional or key in orig_dict}
+    return {
+        new_key: orig_dict[key]
+        for key, new_key in key_rename_dict.items()
+        if not optional or key in orig_dict
+    }

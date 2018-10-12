@@ -8,5 +8,5 @@ urlpatterns = []
 
 if settings.DEBUG:
     urlpatterns += [
-        url(r'^__emaildebugger__/$', EmailDebuggerView.as_view(), name='email-debugger')
+        url(r"^__emaildebugger__/$", EmailDebuggerView.as_view(), name="email-debugger")
     ]

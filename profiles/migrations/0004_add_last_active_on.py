@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0003_add_email_optin'),
-    ]
+    dependencies = [("profiles", "0003_add_email_optin")]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='last_active_on',
+            model_name="profile",
+            name="last_active_on",
             field=models.DateTimeField(null=True),
-        ),
+        )
     ]

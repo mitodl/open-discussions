@@ -3,14 +3,16 @@ import pytest
 from django.core.files.uploadedfile import UploadedFile
 
 
-@pytest.mark.parametrize('update_image', [True, False])
+@pytest.mark.parametrize("update_image", [True, False])
 def test_image_update(user, profile_image, update_image):
     """
     Test that small and medium images are created only when update_image is True
     """
     profile = user.profile
     image_size = len(profile_image.getvalue())
-    profile.image_file = UploadedFile(profile_image, "filename.png", "image/png", image_size)
+    profile.image_file = UploadedFile(
+        profile_image, "filename.png", "image/png", image_size
+    )
     profile.image_small_file = None
     profile.image_medium_file = None
     profile.save(update_image=update_image)

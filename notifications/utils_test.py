@@ -3,11 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from praw.exceptions import APIException, PRAWException
-from prawcore.exceptions import (
-    Forbidden,
-    NotFound,
-    Redirect,
-)
+from prawcore.exceptions import Forbidden, NotFound, Redirect
 
 from notifications import utils
 from notifications.notifiers.exceptions import CancelNotificationError
@@ -59,32 +55,45 @@ def test_mark_as_sent_or_canceled_misc_error():
 
     with utils.mark_as_sent_or_canceled(notification) as will_send:
         assert will_send is True
-        raise Exception('some random error')
+        raise Exception("some random error")
 
     notification.refresh_from_db()
     assert notification.state == EmailNotification.STATE_PENDING
     assert notification.sent_at is None
 
 
-@pytest.mark.parametrize('error,expected_cls', [
-    (PRAWException("No 'Comment' data returned for thing t1_u5"), CancelNotificationError),
-    (PRAWException("NOT TRANSLATED"), PRAWException),
-    (APIException("FAKE_ERROR_TYPE", '', ''), APIException),
-    (Exception("NOT TRANSLATED"), Exception),
-] + [
-    (APIException(error_type, '', ''), CancelNotificationError)
-    for error_type
-    in ('SUBREDDIT_NOTALLOWED', 'SUBREDDIT_NOEXIST', 'DELETED_COMMENT')
-] + [
-    (error_cls(MagicMock(
-        # because of side-affecting constructors
-        headers={
-            'location': 'http://exmaple.com/',
-        },
-    )), CancelNotificationError)
-    for error_cls in
-    (Forbidden, NotFound, Redirect)
-])
+@pytest.mark.parametrize(
+    "error,expected_cls",
+    [
+        (
+            PRAWException("No 'Comment' data returned for thing t1_u5"),
+            CancelNotificationError,
+        ),
+        (PRAWException("NOT TRANSLATED"), PRAWException),
+        (APIException("FAKE_ERROR_TYPE", "", ""), APIException),
+        (Exception("NOT TRANSLATED"), Exception),
+    ]
+    + [
+        (APIException(error_type, "", ""), CancelNotificationError)
+        for error_type in (
+            "SUBREDDIT_NOTALLOWED",
+            "SUBREDDIT_NOEXIST",
+            "DELETED_COMMENT",
+        )
+    ]
+    + [
+        (
+            error_cls(
+                MagicMock(
+                    # because of side-affecting constructors
+                    headers={"location": "http://exmaple.com/"}
+                )
+            ),
+            CancelNotificationError,
+        )
+        for error_cls in (Forbidden, NotFound, Redirect)
+    ],
+)
 def test_praw_error_to_cancelled(error, expected_cls):
     """Test that each of the errors is correctly translated to CancelNotificationError or reraised"""
     with pytest.raises(expected_cls):

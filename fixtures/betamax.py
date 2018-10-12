@@ -26,9 +26,9 @@ def cassette_exists(cassette_name):
 @pytest.fixture(autouse=True)
 def use_betamax(request):
     """Determines if we're using betamax"""
-    marker = request.keywords.get('betamax', None)
+    marker = request.keywords.get("betamax", None)
     if marker:
-        request.getfixturevalue('configure_betamax')
+        request.getfixturevalue("configure_betamax")
         return True
     return False
 
@@ -36,19 +36,26 @@ def use_betamax(request):
 @pytest.fixture()
 def configure_betamax(mocker, cassette_exists, praw_settings, request):
     """Configure betamax"""
-    setup_betamax('once' if cassette_exists is False else 'none')
+    setup_betamax("once" if cassette_exists is False else "none")
 
     # defer this until we know we need it and after setup_betamax
-    betamax_parametrized_recorder = request.getfixturevalue('betamax_parametrized_recorder')
+    betamax_parametrized_recorder = request.getfixturevalue(
+        "betamax_parametrized_recorder"
+    )
 
-    mocker.patch('channels.api._get_session', return_value=betamax_parametrized_recorder.session)
+    mocker.patch(
+        "channels.api._get_session", return_value=betamax_parametrized_recorder.session
+    )
     if cassette_exists:
         # only patch if we're running off an existing cassette
-        mocker.patch('channels.api._get_refresh_token', return_value={
-            'refresh_token': 'fake',
-            'access_token': 'fake',
-            'expires_in': 1234,
-        })
+        mocker.patch(
+            "channels.api._get_refresh_token",
+            return_value={
+                "refresh_token": "fake",
+                "access_token": "fake",
+                "expires_in": 1234,
+            },
+        )
 
     urllib3.disable_warnings()
 

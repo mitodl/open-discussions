@@ -22,63 +22,57 @@ from rest_framework_jwt.views import refresh_jwt_token
 from open_discussions.views import index, saml_metadata, channel_redirect
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^status/', include('server_status.urls')),
-    url(r'', include('authentication.urls')),
-    url(r'', include('social_django.urls', namespace='social')),
-    url(r'', include('channels.urls')),
-    url(r'', include('profiles.urls')),
-    url(r'', include('mail.urls')),
-    url(r'', include('notifications.urls')),
-    url(r'', include('embedly.urls')),
-    url(r'^api/token/refresh/', refresh_jwt_token),
-
+    url(r"^admin/", admin.site.urls),
+    url(r"^status/", include("server_status.urls")),
+    url(r"", include("authentication.urls")),
+    url(r"", include("social_django.urls", namespace="social")),
+    url(r"", include("channels.urls")),
+    url(r"", include("profiles.urls")),
+    url(r"", include("mail.urls")),
+    url(r"", include("notifications.urls")),
+    url(r"", include("embedly.urls")),
+    url(r"^api/token/refresh/", refresh_jwt_token),
     # React App
-    url(r'^$', index, name='open_discussions-index'),
-    url(r'^auth_required/$', index),
-    url(r'^content_policy/$', index),
+    url(r"^$", index, name="open_discussions-index"),
+    url(r"^auth_required/$", index),
+    url(r"^content_policy/$", index),
     url(  # so that we can use reverse() to link to this
-        r'^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/'
-        r'(?P<post_slug>[A-Za-z0-9_\-]+)/comment/(?P<comment_id>[A-Za-z0-9_]+)/$',
+        r"^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/"
+        r"(?P<post_slug>[A-Za-z0-9_\-]+)/comment/(?P<comment_id>[A-Za-z0-9_]+)/$",
         index,
-        name='channel-post-comment',
+        name="channel-post-comment",
     ),
     url(  # so that we can use reverse() to link to this
-        r'^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/(?P<post_slug>[A-Za-z0-9_\-]+)/$',
+        r"^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/(?P<post_slug>[A-Za-z0-9_\-]+)/$",
         index,
-        name='channel-post',
+        name="channel-post",
     ),
     url(  # so that we can use reverse() to link to this
-        r'^c/(?P<channel_name>[A-Za-z0-9_]+)/$',
-        index,
-        name='channel',
+        r"^c/(?P<channel_name>[A-Za-z0-9_]+)/$", index, name="channel"
     ),
-    url(r'^settings/(?P<token>[^/]+)/$', index, name='settings-anon'),
-    url(r'^c/', index),
-    url(r'^channel/', channel_redirect),
-    url(r'^manage/', index),
-    url(r'^create_post/', index),
-    url(r'^settings/', index),
-    url(r'^saml/metadata/', saml_metadata, name='saml-metadata'),
-    url(r'^profile/(?P<username>[A-Za-z0-9_]+)/', index, name='profile'),
-
-    url(r'^login/', index, name='login'),
-    url(r'^signup/', index, name='signup'),
-    url(r'^signup/confirm/$', index, name='register-confirm'),
-    url(r'^account/inactive/$', index, name='account-inactive'),
-
-    url(r'^password_reset/', index, name='password-reset'),
+    url(r"^settings/(?P<token>[^/]+)/$", index, name="settings-anon"),
+    url(r"^c/", index),
+    url(r"^channel/", channel_redirect),
+    url(r"^manage/", index),
+    url(r"^create_post/", index),
+    url(r"^settings/", index),
+    url(r"^saml/metadata/", saml_metadata, name="saml-metadata"),
+    url(r"^profile/(?P<username>[A-Za-z0-9_]+)/", index, name="profile"),
+    url(r"^login/", index, name="login"),
+    url(r"^signup/", index, name="signup"),
+    url(r"^signup/confirm/$", index, name="register-confirm"),
+    url(r"^account/inactive/$", index, name="account-inactive"),
+    url(r"^password_reset/", index, name="password-reset"),
     url(
-        r'^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        r"^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
         index,
-        name='password-reset-confirm'
+        name="password-reset-confirm",
     ),
-    url(r'^privacy-statement/', index, name='privacy-statement'),
-    url(r'^terms-and-conditions/', index, name='terms-and-conditions'),
+    url(r"^privacy-statement/", index, name="privacy-statement"),
+    url(r"^terms-and-conditions/", index, name="terms-and-conditions"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar  # pylint: disable=wrong-import-position, wrong-import-order
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
+
+    urlpatterns += [url(r"^__debug__/", include(debug_toolbar.urls))]

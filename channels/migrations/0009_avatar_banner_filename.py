@@ -8,19 +8,21 @@ import profiles.utils
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('channels', '0008_channel_ga_tracking_id'),
-    ]
+    dependencies = [("channels", "0008_channel_ga_tracking_id")]
 
     operations = [
         migrations.AlterField(
-            model_name='channel',
-            name='avatar',
-            field=models.ImageField(max_length=2083, null=True, upload_to=profiles.utils.avatar_uri),
+            model_name="channel",
+            name="avatar",
+            field=models.ImageField(
+                max_length=2083, null=True, upload_to=profiles.utils.avatar_uri
+            ),
         ),
         migrations.AlterField(
-            model_name='channel',
-            name='banner',
-            field=models.ImageField(max_length=2083, null=True, upload_to=profiles.utils.banner_uri),
+            model_name="channel",
+            name="banner",
+            field=models.ImageField(
+                max_length=2083, null=True, upload_to=profiles.utils.banner_uri
+            ),
         ),
     ]

@@ -27,17 +27,17 @@ def test_auth_complete_no_auth_header(auth):
         auth.auth_complete()
 
     assert exc.value.backend == auth
-    assert exc.value.args == ('Authorization header not present',)
+    assert exc.value.args == ("Authorization header not present",)
 
 
 def test_auth_complete_invalid_jwt_token(auth, mock_strategy):
     """BaseJwtAuth raises an error if the header is invalid"""
-    mock_strategy.request.COOKIES[api_settings.JWT_AUTH_COOKIE] = 'invalid'
+    mock_strategy.request.COOKIES[api_settings.JWT_AUTH_COOKIE] = "invalid"
     with pytest.raises(AuthException) as exc:
         auth.auth_complete()
 
     assert exc.value.backend == auth
-    assert exc.value.args == ('Invalid JWT',)
+    assert exc.value.args == ("Invalid JWT",)
 
 
 def test_auth_complete(user, auth, mock_strategy):
@@ -49,4 +49,6 @@ def test_auth_complete(user, auth, mock_strategy):
     mock_strategy.request.COOKIES[api_settings.JWT_AUTH_COOKIE] = jwt_value
 
     assert auth.auth_complete(1, arg2=2) == mock_strategy.authenticate.return_value
-    mock_strategy.authenticate.assert_called_once_with(1, arg2=2, response=jwt_payload, backend=auth)
+    mock_strategy.authenticate.assert_called_once_with(
+        1, arg2=2, response=jwt_payload, backend=auth
+    )

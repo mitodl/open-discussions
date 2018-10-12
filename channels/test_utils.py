@@ -12,7 +12,7 @@ def no_ssl_verification():
     try:
         requests.Session.request = partialmethod(old_request, verify=False)
 
-        warnings.filterwarnings('ignore', 'Unverified HTTPS request')
+        warnings.filterwarnings("ignore", "Unverified HTTPS request")
 
         yield
     finally:

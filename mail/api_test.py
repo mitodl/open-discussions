@@ -13,7 +13,7 @@ from open_discussions.factories import UserFactory
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures('email_settings', 'authenticated_site'),
+    pytest.mark.usefixtures("email_settings", "authenticated_site"),
 ]
 
 
@@ -26,11 +26,9 @@ def email_settings(settings):
 def test_safe_format_recipients():
     """Test that we get a list of emailable recipients"""
     user = UserFactory.create()
-    user_no_email = UserFactory.create(email='')
-    user_no_name = UserFactory.create(profile__name='')
-    assert safe_format_recipients([
-        user, user_no_email, user_no_name
-    ]) == [
+    user_no_email = UserFactory.create(email="")
+    user_no_name = UserFactory.create(profile__name="")
+    assert safe_format_recipients([user, user_no_email, user_no_name]) == [
         (formataddr((user.profile.name, user.email)), user),
         (formataddr((None, user_no_name.email)), user_no_name),
     ]
@@ -38,25 +36,23 @@ def test_safe_format_recipients():
 
 def test_safe_format_recipients_override(user, settings):
     """Test that the recipient override works"""
-    settings.MAILGUN_RECIPIENT_OVERRIDE = 'admin@localhost'
-    assert safe_format_recipients([user]) == [('admin@localhost', user)]
+    settings.MAILGUN_RECIPIENT_OVERRIDE = "admin@localhost"
+    assert safe_format_recipients([user]) == [("admin@localhost", user)]
 
 
 def test_render_email_templates(user):
     """Test render_email_templates"""
-    user.profile.name = 'Jane Smith'
-    context = context_for_user(user, {
-        'url': 'http://example.com'
-    })
-    subject, text_body, html_body = render_email_templates('sample', context)
+    user.profile.name = "Jane Smith"
+    context = context_for_user(user, {"url": "http://example.com"})
+    subject, text_body, html_body = render_email_templates("sample", context)
     assert subject == "Welcome Jane Smith"
     assert text_body == "html link (http://example.com)"
     assert html_body == (
         '<style type="text/css">\n'
-        'a {\n'
-        '  color: red;\n'
-        '}\n'
-        '</style>\n'
+        "a {\n"
+        "  color: red;\n"
+        "}\n"
+        "</style>\n"
         '<a href="http://example.com">html link</a>\n'
     )
 
@@ -66,11 +62,15 @@ def test_messages_for_recipients():
 
     users = UserFactory.create_batch(5)
 
-    messages = list(messages_for_recipients([
-        (recipient, context_for_user(user, {
-            'url': 'https://example.com',
-        })) for recipient, user in safe_format_recipients(users)
-    ], 'sample'))
+    messages = list(
+        messages_for_recipients(
+            [
+                (recipient, context_for_user(user, {"url": "https://example.com"}))
+                for recipient, user in safe_format_recipients(users)
+            ],
+            "sample",
+        )
+    )
 
     assert len(messages) == len(users)
 
@@ -83,11 +83,15 @@ def test_send_message(mailoutbox):
     """Tests that send_messages works as expected"""
     users = UserFactory.create_batch(5)
 
-    messages = list(messages_for_recipients([
-        (recipient, context_for_user(user, {
-            'url': 'https://example.com',
-        })) for recipient, user in safe_format_recipients(users)
-    ], 'sample'))
+    messages = list(
+        messages_for_recipients(
+            [
+                (recipient, context_for_user(user, {"url": "https://example.com"}))
+                for recipient, user in safe_format_recipients(users)
+            ],
+            "sample",
+        )
+    )
 
     send_messages(messages)
 
@@ -97,15 +101,19 @@ def test_send_message(mailoutbox):
 
 def test_send_message_failure(mocker):
     """Tests that send_messages logs all exceptions"""
-    sendmail = mocker.patch('mail.api.AnymailMessage.send', side_effect=ConnectionError)
-    patched_logger = mocker.patch('mail.api.log')
+    sendmail = mocker.patch("mail.api.AnymailMessage.send", side_effect=ConnectionError)
+    patched_logger = mocker.patch("mail.api.log")
     users = UserFactory.create_batch(2)
 
-    messages = list(messages_for_recipients([
-        (recipient, context_for_user(user, {
-            'url': 'https://example.com',
-        })) for recipient, user in safe_format_recipients(users)
-    ], 'sample'))
+    messages = list(
+        messages_for_recipients(
+            [
+                (recipient, context_for_user(user, {"url": "https://example.com"}))
+                for recipient, user in safe_format_recipients(users)
+            ],
+            "sample",
+        )
+    )
 
     send_messages(messages)
 

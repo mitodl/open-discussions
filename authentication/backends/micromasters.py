@@ -5,7 +5,8 @@ from authentication.backends.base_jwt import BaseJwtAuth
 
 class MicroMastersAuth(BaseJwtAuth):
     """Authentication backend for MicroMasters JWT"""
-    name = 'micromasters'
+
+    name = "micromasters"
     REQUIRES_EMAIL_VALIDATION = False
 
     def uses_redirect(self):
@@ -14,4 +15,4 @@ class MicroMastersAuth(BaseJwtAuth):
 
     def auth_url(self):
         """Returns the url to authenticate the user at"""
-        return self.setting('LOGIN_URL')
+        return self.setting("LOGIN_URL")

@@ -25,6 +25,7 @@ class IgnoreExpiredJwtAuthentication(JSONWebTokenAuthentication):
         try:
             # try to decode the value just to see if it's expired
             from rest_framework_jwt.settings import api_settings
+
             jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
             jwt_decode_handler(value)
         except jwt.ExpiredSignature:
@@ -46,14 +47,15 @@ class StatelessTokenAuthentication(BaseAuthentication):
     NOTE: this is a highly trusting version of authentication and should only be
           used for certain things such as email unsubscribes
     """
+
     def authenticate(self, request):
         """
         Attempts to authenticate using a stateless token
         """
         from open_discussions.auth_utils import unsign_and_verify_username_from_token
 
-        if 'HTTP_AUTHORIZATION' in request.META:
-            header_value = request.META['HTTP_AUTHORIZATION']
+        if "HTTP_AUTHORIZATION" in request.META:
+            header_value = request.META["HTTP_AUTHORIZATION"]
 
             if not header_value.startswith(HEADER_PREFIX):
                 return None

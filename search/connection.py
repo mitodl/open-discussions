@@ -37,7 +37,7 @@ def get_conn(*, verify=True):
             http_auth=http_auth,
             use_ssl=use_ssl,
             # make sure we verify SSL certificates (off by default)
-            verify_certs=use_ssl
+            verify_certs=use_ssl,
         )
         # Verify connection on first connect if verify=True.
         do_verify = verify
@@ -91,7 +91,7 @@ def make_alias_name(is_reindexing, object_type):
     return "{prefix}_{object_type}_{suffix}".format(
         prefix=settings.ELASTICSEARCH_INDEX,
         object_type=object_type,
-        suffix='reindexing' if is_reindexing else 'default'
+        suffix="reindexing" if is_reindexing else "default",
     )
 
 
@@ -113,9 +113,12 @@ def get_active_aliases(object_types):
         object_types = VALID_OBJECT_TYPES
     conn = get_conn(verify=False)
     return [
-        alias for alias_tuple in [
-            (get_default_alias_name(obj), get_reindexing_alias_name(obj)) for obj in object_types
-        ] for alias in alias_tuple
+        alias
+        for alias_tuple in [
+            (get_default_alias_name(obj), get_reindexing_alias_name(obj))
+            for obj in object_types
+        ]
+        for alias in alias_tuple
         if conn.indices.exists(alias)
     ]
 

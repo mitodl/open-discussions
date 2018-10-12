@@ -4,4 +4,5 @@ from django.apps import AppConfig
 
 class ChannelsConfig(AppConfig):
     """Channels AppConfig"""
-    name = 'channels'
+
+    name = "channels"

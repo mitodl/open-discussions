@@ -6,10 +6,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import URLField
 
-from channels.utils import (
-    AVATAR_MEDIUM_MAX_DIMENSION,
-    AVATAR_SMALL_MAX_DIMENSION,
-)
+from channels.utils import AVATAR_MEDIUM_MAX_DIMENSION, AVATAR_SMALL_MAX_DIMENSION
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
     avatar_uri,
@@ -29,7 +26,9 @@ class Base36IntegerField(models.BigIntegerField):
             return base36.loads(value)
         return value
 
-    def from_db_value(self, value, expression, connection):  # pylint: disable=unused-argument
+    def from_db_value(
+        self, value, expression, connection
+    ):  # pylint: disable=unused-argument
         """Converts from base10 to base36 for application"""
         if value is None:
             return value
@@ -47,6 +46,7 @@ class RedditRefreshToken(models.Model):
     """
     Tracks the refresh token for a given user
     """
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     token_value = models.CharField(null=True, max_length=255)
@@ -61,6 +61,7 @@ class RedditAccessToken(models.Model):
 
     We generate a new one whenever the latest one expires and then clean up stale ones in a cron
     """
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     token_value = models.CharField(null=True, max_length=255)
@@ -78,7 +79,9 @@ class RedditAccessToken(models.Model):
         Returns:
             QuerySet: query set filtered to nonexpired tokens sorted by most recent first
         """
-        return cls.objects.filter(user=user, token_expires_at__gt=threshold_date).order_by('-token_expires_at')
+        return cls.objects.filter(
+            user=user, token_expires_at__gt=threshold_date
+        ).order_by("-token_expires_at")
 
     def __str__(self):
         return "{} expires: {}".format(self.token_value, self.token_expires_at)
@@ -88,36 +91,50 @@ class Subscription(TimestampedModel):
     """
     Tracks user subscriptions to a post or a comment
     """
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     post_id = Base36IntegerField()
     comment_id = Base36IntegerField(null=True)
 
     def __str__(self):
         """Prints the subscription as a str"""
-        return "{} is subscribed to post_id: {}, comment_id: {}".format(self.user, self.post_id, self.comment_id)
+        return "{} is subscribed to post_id: {}, comment_id: {}".format(
+            self.user, self.post_id, self.comment_id
+        )
 
     class Meta:
-        unique_together = (('user', 'post_id', 'comment_id'),)
-        index_together = (('post_id', 'comment_id'),)
+        unique_together = (("user", "post_id", "comment_id"),)
+        index_together = (("post_id", "comment_id"),)
 
 
 class Channel(TimestampedModel):
     """
     Keep track of channels which are stored in reddit
     """
+
     name = models.CharField(unique=True, max_length=100)
     membership_is_managed = models.BooleanField(default=False)
     avatar = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri)
-    avatar_small = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri_small)
-    avatar_medium = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri_medium)
+    avatar_small = models.ImageField(
+        null=True, max_length=2083, upload_to=avatar_uri_small
+    )
+    avatar_medium = models.ImageField(
+        null=True, max_length=2083, upload_to=avatar_uri_medium
+    )
     banner = models.ImageField(null=True, max_length=2083, upload_to=banner_uri)
     ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
 
-    def save(self, *args, update_image=False, **kwargs):  # pylint: disable=arguments-differ
+    def save(
+        self, *args, update_image=False, **kwargs
+    ):  # pylint: disable=arguments-differ
         if update_image:
             if self.avatar:
-                small_thumbnail = make_thumbnail(self.avatar, AVATAR_SMALL_MAX_DIMENSION)
-                medium_thumbnail = make_thumbnail(self.avatar, AVATAR_MEDIUM_MAX_DIMENSION)
+                small_thumbnail = make_thumbnail(
+                    self.avatar, AVATAR_SMALL_MAX_DIMENSION
+                )
+                medium_thumbnail = make_thumbnail(
+                    self.avatar, AVATAR_MEDIUM_MAX_DIMENSION
+                )
 
                 # name doesn't matter here, we use upload_to to produce that
                 self.avatar_small.save(f"{uuid4().hex}.jpg", small_thumbnail)
@@ -136,6 +153,7 @@ class LinkMeta(TimestampedModel):
     """
     The thumbnail embedly provides for a particular URL
     """
+
     url = URLField(unique=True, max_length=2048)
     thumbnail = URLField(blank=True, null=True, max_length=2048)
 
@@ -147,6 +165,7 @@ class Post(TimestampedModel):
     """
     Keep track of post ids so that we can index all posts
     """
+
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     post_id = Base36IntegerField(unique=True)
     link_meta = models.ForeignKey(LinkMeta, null=True, on_delete=models.CASCADE)
@@ -159,6 +178,7 @@ class Comment(TimestampedModel):
     """
     Keep track of comment ids so that we can index all comments efficiently
     """
+
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     comment_id = Base36IntegerField(unique=True)
     parent_id = Base36IntegerField(null=True)

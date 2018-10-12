@@ -12,27 +12,40 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('channels', '0001_add_tokens'),
+        ("channels", "0001_add_tokens"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Subscription',
+            name="Subscription",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('post_id', channels.models.Base36IntegerField()),
-                ('comment_id', channels.models.Base36IntegerField(null=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("post_id", channels.models.Base36IntegerField()),
+                ("comment_id", channels.models.Base36IntegerField(null=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AlterUniqueTogether(
-            name='subscription',
-            unique_together=set([('user', 'post_id', 'comment_id')]),
+            name="subscription",
+            unique_together=set([("user", "post_id", "comment_id")]),
         ),
         migrations.AlterIndexTogether(
-            name='subscription',
-            index_together=set([('post_id', 'comment_id')]),
+            name="subscription", index_together=set([("post_id", "comment_id")])
         ),
     ]

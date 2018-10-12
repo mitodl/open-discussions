@@ -22,7 +22,9 @@ from profiles.utils import update_full_name
 # pylint: disable=keyword-arg-before-vararg
 
 
-def validate_email_auth_request(strategy, backend, user=None, *args, **kwargs):  # pylint: disable=unused-argument
+def validate_email_auth_request(
+    strategy, backend, user=None, *args, **kwargs
+):  # pylint: disable=unused-argument
     """
     Validates an auth request for email
 
@@ -36,14 +38,14 @@ def validate_email_auth_request(strategy, backend, user=None, *args, **kwargs): 
 
     # if there's a user, force this to be a login
     if user is not None:
-        return {
-            'flow': SocialAuthState.FLOW_LOGIN,
-        }
+        return {"flow": SocialAuthState.FLOW_LOGIN}
 
     return {}
 
 
-def get_username(strategy, backend, user=None, *args, **kwargs):  # pylint: disable=unused-argument
+def get_username(
+    strategy, backend, user=None, *args, **kwargs
+):  # pylint: disable=unused-argument
     """
     Gets the username for a user
 
@@ -59,12 +61,12 @@ def get_username(strategy, backend, user=None, *args, **kwargs):  # pylint: disa
     else:
         username = strategy.storage.user.get_username(user)
 
-    return {'username': username}
+    return {"username": username}
 
 
 @partial
 def require_password_and_profile_via_email(
-        strategy, backend, user=None, flow=None, current_partial=None, *args, **kwargs
+    strategy, backend, user=None, flow=None, current_partial=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
     """
     Sets a new user's password and profile
@@ -85,26 +87,23 @@ def require_password_and_profile_via_email(
     data = strategy.request_data()
     profile = user.profile
 
-    if 'name' in data:
-        profile.name = data['name']
+    if "name" in data:
+        profile.name = data["name"]
         profile.save()
 
-    if 'password' in data:
-        user.set_password(data['password'])
+    if "password" in data:
+        user.set_password(data["password"])
         user.save()
 
     if not user.password or not user.profile.name:
         raise RequirePasswordAndProfileException(backend, current_partial)
 
-    return {
-        'user': user,
-        'profile': profile or user.profile,
-    }
+    return {"user": user, "profile": profile or user.profile}
 
 
 @partial
 def require_profile_update_user_via_saml(
-        strategy, backend, user=None, is_new=False, *args, **kwargs
+    strategy, backend, user=None, is_new=False, *args, **kwargs
 ):  # pylint: disable=unused-argument
     """
     Sets a new user's password and profile, and updates the user first and last names.
@@ -123,7 +122,10 @@ def require_profile_update_user_via_saml(
     profile_api.ensure_profile(user)
 
     try:
-        update_full_name(user, kwargs['response']['attributes'][SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME][0])
+        update_full_name(
+            user,
+            kwargs["response"]["attributes"][SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME][0],
+        )
     except (KeyError, IndexError):
         # No name information passed, skipping
         pass
@@ -132,15 +134,12 @@ def require_profile_update_user_via_saml(
     profile.name = user.get_full_name()
     profile.save()
 
-    return {
-        'user': user,
-        'profile': profile,
-    }
+    return {"user": user, "profile": profile}
 
 
 @partial
 def validate_password(
-        strategy, backend, user=None, flow=None, current_partial=None, *args, **kwargs
+    strategy, backend, user=None, flow=None, current_partial=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
     """
     Validates a user's password for login
@@ -163,10 +162,10 @@ def validate_password(
     if user is None:
         raise RequireRegistrationException(backend, current_partial)
 
-    if 'password' not in data:
+    if "password" not in data:
         raise RequirePasswordException(backend, current_partial)
 
-    password = data['password']
+    password = data["password"]
 
     if not user or not user.check_password(password):
         raise InvalidPasswordException(backend, current_partial)
@@ -177,7 +176,7 @@ def validate_password(
 # NOTE: This pipeline function should NOT be decorated with the @partial decorator. That could
 # present a potential security risk.
 def require_touchstone_login(
-        strategy, backend, flow=None, **kwargs
+    strategy, backend, flow=None, **kwargs
 ):  # pylint: disable=unused-argument
     """
     If the user is attempting to log in via email and has authenticated via Touchstone/SAML, require
@@ -189,21 +188,20 @@ def require_touchstone_login(
         flow (str): the type of flow (login or register)
     """
     if (
-            backend.name != EmailAuth.name or
-            flow != SocialAuthState.FLOW_LOGIN or
-            not features.is_enabled(features.SAML_AUTH)
+        backend.name != EmailAuth.name
+        or flow != SocialAuthState.FLOW_LOGIN
+        or not features.is_enabled(features.SAML_AUTH)
     ):
         return {}
 
     data = strategy.request_data()
-    email = data.get('email')
+    email = data.get("email")
     if not email:
         return {}
 
     user_storage = strategy.storage.user
     saml_auth = user_storage.get_social_auth(
-        SAMLAuth.name,
-        '{}:{}'.format(settings.SOCIAL_AUTH_DEFAULT_IDP_KEY, email)
+        SAMLAuth.name, "{}:{}".format(settings.SOCIAL_AUTH_DEFAULT_IDP_KEY, email)
     )
     if saml_auth:
         raise RequireProviderException(backend, saml_auth)
@@ -211,7 +209,7 @@ def require_touchstone_login(
 
 
 def require_micromasters_provider(
-        strategy, backend, user=None, flow=None, **kwargs
+    strategy, backend, user=None, flow=None, **kwargs
 ):  # pylint: disable=unused-argument
     """
     If the user exists and only has a micromasters auth, require them to login that way
@@ -223,7 +221,11 @@ def require_micromasters_provider(
         flow (str): the type of flow (login or register)
     """
     # only do this check if the user is attempting an email login
-    if backend.name != EmailAuth.name or flow != SocialAuthState.FLOW_LOGIN or user is None:
+    if (
+        backend.name != EmailAuth.name
+        or flow != SocialAuthState.FLOW_LOGIN
+        or user is None
+    ):
         return {}
 
     user_storage = strategy.storage.user

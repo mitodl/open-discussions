@@ -5,12 +5,14 @@ from social_django.utils import STORAGE
 
 from authentication.backends.micromasters import MicroMastersAuth
 from authentication.exceptions import UserMissingSocialAuthException
+
 # static for now
 ALLOWED_PROVIDERS = [MicroMastersAuth.name]
 
 
 class SocialAuthState:
     """Social auth state"""
+
     FLOW_REGISTER = "register"
     FLOW_LOGIN = "login"
 
@@ -32,7 +34,14 @@ class SocialAuthState:
     STATE_INVALID_EMAIL = "invalid-email"
 
     def __init__(
-            self, state, *, provider=None, partial=None, flow=None, errors=None, redirect_url=None
+        self,
+        state,
+        *,
+        provider=None,
+        partial=None,
+        flow=None,
+        errors=None,
+        redirect_url=None,
     ):  # pylint: disable=too-many-arguments
         self.state = state
         self.partial = partial
@@ -44,7 +53,9 @@ class SocialAuthState:
 
 def load_drf_strategy(request=None):
     """Returns the DRF strategy"""
-    return get_strategy('authentication.strategy.DjangoRestFrameworkStrategy', STORAGE, request)
+    return get_strategy(
+        "authentication.strategy.DjangoRestFrameworkStrategy", STORAGE, request
+    )
 
 
 def jwt_get_username_from_payload_handler(payload):
@@ -59,19 +70,21 @@ def jwt_get_username_from_payload_handler(payload):
     Returns:
         str: the username associated with this JWT
     """
-    username = payload.get('username')
+    username = payload.get("username")
 
     # if an provider is provided and valid, treat the username as a social auth username
     # otherwise the username is used verbatim for backwards compatibility
-    provider = payload.get('provider')
+    provider = payload.get("provider")
     if provider and provider in ALLOWED_PROVIDERS:
         # get the User.username for this social auth
         # if this errors, (not exactly one UserSocialAuth/User) we want to know
         try:
             username = UserSocialAuth.objects.values_list(
-                'user__username', flat=True
+                "user__username", flat=True
             ).get(provider=provider, uid=username)
         except UserSocialAuth.DoesNotExist as exc:
-            raise UserMissingSocialAuthException("Found no UserSocialAuth for username") from exc
+            raise UserMissingSocialAuthException(
+                "Found no UserSocialAuth for username"
+            ) from exc
 
     return username

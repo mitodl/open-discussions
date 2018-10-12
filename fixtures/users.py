@@ -15,7 +15,7 @@ from sites.factories import AuthenticatedSiteFactory
 def user(db, use_betamax, request):
     """Create a user"""
     if use_betamax:
-        return request.getfixturevalue('reddit_user')
+        return request.getfixturevalue("reddit_user")
     return UserFactory.create()
 
 
@@ -23,8 +23,8 @@ def user(db, use_betamax, request):
 def staff_user(db, use_betamax, request):
     """Create a staff user"""
     if use_betamax:
-        request.getfixturevalue('configure_betamax')
-        return request.getfixturevalue('reddit_staff_user')
+        request.getfixturevalue("configure_betamax")
+        return request.getfixturevalue("reddit_staff_user")
     return UserFactory.create(is_staff=True)
 
 
@@ -38,7 +38,7 @@ def logged_in_user(client, user):
 @pytest.fixture()
 def logged_in_profile(client):
     """Add a Profile and logged-in User"""
-    user = UserFactory.create(username='george')
+    user = UserFactory.create(username="george")
     client.force_login(user)
     return user.profile
 
@@ -51,9 +51,7 @@ def jwt_token(db, user, client, rf, settings):
     payload = jwt_payload_handler(user)
     token = jwt_encode_handler(payload)
     client.cookies[settings.OPEN_DISCUSSIONS_COOKIE_NAME] = token
-    rf.cookies.load({
-        settings.OPEN_DISCUSSIONS_COOKIE_NAME: token
-    })
+    rf.cookies.load({settings.OPEN_DISCUSSIONS_COOKIE_NAME: token})
     return token
 
 
@@ -82,14 +80,16 @@ def staff_client(client, staff_user):
 @pytest.fixture
 def authenticated_site(db, settings):
     """The authenticated site"""
-    return AuthenticatedSiteFactory.create(key=settings.OPEN_DISCUSSIONS_DEFAULT_SITE_KEY)
+    return AuthenticatedSiteFactory.create(
+        key=settings.OPEN_DISCUSSIONS_DEFAULT_SITE_KEY
+    )
 
 
 @pytest.fixture
 def profile_image():
     """ Create a PNG image """
     image_file = BytesIO()
-    image = Image.new('RGBA', size=(250, 250), color=(256, 0, 0))
-    image.save(image_file, 'png')
+    image = Image.new("RGBA", size=(250, 250), color=(256, 0, 0))
+    image.save(image_file, "png")
     image_file.seek(0)
     return image_file

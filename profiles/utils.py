@@ -28,7 +28,7 @@ MAX_IMAGE_FIELD_LENGTH = 1024
 IMAGE_FIELDS = {
     IMAGE_STANDARD: "",
     IMAGE_SMALL: IMAGE_SMALL_MAX_DIMENSION,
-    IMAGE_MEDIUM: IMAGE_MEDIUM_MAX_DIMENSION
+    IMAGE_MEDIUM: IMAGE_MEDIUM_MAX_DIMENSION,
 }
 
 # This is the Django ImageField max path size
@@ -36,13 +36,13 @@ IMAGE_PATH_MAX_LENGTH = 100
 GRAVATAR_IMAGE_URL = "https://www.gravatar.com/avatar/{}.jpg"
 
 DEFAULT_FONTS = [
-    'HelveticaNeue-Light',
-    'Helvetica Neue Light',
-    'Helvetica Neue',
-    'Helvetica',
-    'Arial',
-    'Lucida Grande',
-    'sans-serif',
+    "HelveticaNeue-Light",
+    "Helvetica Neue Light",
+    "Helvetica Neue",
+    "Helvetica",
+    "Arial",
+    "Lucida Grande",
+    "sans-serif",
 ]
 
 SVG_TEMPLATE = """
@@ -54,7 +54,7 @@ SVG_TEMPLATE = """
         font-weight="400" fill="#{color}" style="{text-style}">{text}</text>
 </svg>
 """.strip()
-SVG_TEMPLATE = re.sub(r'(\s+|\n)', ' ', SVG_TEMPLATE)
+SVG_TEMPLATE = re.sub(r"(\s+|\n)", " ", SVG_TEMPLATE)
 
 DEFAULT_PROFILE_IMAGE = urljoin(settings.STATIC_URL, "images/avatar_default.png")
 
@@ -70,28 +70,25 @@ def generate_gravatar_image(user, image_field=None):
     Returns:
         str: The URL to the image.
     """
-    gravatar_hash = hashlib.md5(user.email.lower().encode('utf-8')).hexdigest()
+    gravatar_hash = hashlib.md5(user.email.lower().encode("utf-8")).hexdigest()
     gravatar_image_url = GRAVATAR_IMAGE_URL.format(gravatar_hash)
     max_dimension = IMAGE_FIELDS[image_field]
-    size_param = '&s={}'.format(max_dimension) if max_dimension else ''
+    size_param = "&s={}".format(max_dimension) if max_dimension else ""
     if user.profile.name:
         d_param = urljoin(
             settings.SITE_BASE_URL,
-            '/profile/{}/{}/fff/579cf9.png'.format(
-                user.username,
-                max_dimension
-            )
+            "/profile/{}/{}/fff/579cf9.png".format(user.username, max_dimension),
         )
     else:
         d_param = urljoin(settings.SITE_BASE_URL, DEFAULT_PROFILE_IMAGE)
 
-    return '{}?d={}{}'.format(gravatar_image_url, quote(d_param), size_param)
+    return "{}?d={}{}".format(gravatar_image_url, quote(d_param), size_param)
 
 
 def image_uri(profile, image_field=IMAGE_SMALL):
     """ Return the correctly formatted profile image URI for a user """
     if profile:
-        image_file = getattr(profile, '{}_file'.format(image_field))
+        image_file = getattr(profile, "{}_file".format(image_field))
         if not image_file.name:
             image_file = getattr(profile, image_field)
             if not image_file:
@@ -124,10 +121,14 @@ def generate_filepath(filename, directory_name, suffix, prefix):
         directory_name=directory_name,
         suffix=suffix,
         ext=ext,
-        name='',
+        name="",
     )
     if len(path_without_name) >= IMAGE_PATH_MAX_LENGTH:
-        raise ValueError("path is longer than max length even without name: {}".format(path_without_name))
+        raise ValueError(
+            "path is longer than max length even without name: {}".format(
+                path_without_name
+            )
+        )
 
     max_name_length = IMAGE_PATH_MAX_LENGTH - len(path_without_name)
     full_path = path_format.format(
@@ -198,8 +199,8 @@ def make_temp_image_file(*, width=500, height=500):
     Create a temporary PNG image to test image uploads
     """
     with NamedTemporaryFile(suffix=".png") as image_file:
-        image = Image.new('RGBA', size=(width, height), color=(256, 0, 0))
-        image.save(image_file, 'png')
+        image = Image.new("RGBA", size=(width, height), color=(256, 0, 0))
+        image.save(image_file, "png")
         image_file.seek(0)
         yield image_file
 
@@ -236,9 +237,12 @@ def make_thumbnail(full_size_image, max_dimension):
             A jpeg image which is a thumbnail of full_size_image
     """
     pil_image = Image.open(full_size_image)
-    pil_image.thumbnail(shrink_dimensions(pil_image.width, pil_image.height, max_dimension), Image.ANTIALIAS)
+    pil_image.thumbnail(
+        shrink_dimensions(pil_image.width, pil_image.height, max_dimension),
+        Image.ANTIALIAS,
+    )
     buffer = BytesIO()
-    pil_image.convert('RGB').save(buffer, "JPEG", quality=90)
+    pil_image.convert("RGB").save(buffer, "JPEG", quality=90)
     buffer.seek(0)
     return buffer
 
@@ -251,10 +255,10 @@ def update_full_name(user, name):
         user(User): The user to modify.
         name(str): The full name of the user.
     """
-    name_parts = name.split(' ')
+    name_parts = name.split(" ")
     user.first_name = name_parts[0][:30]
     if len(name_parts) > 1:
-        user.last_name = ' '.join(name_parts[1:])[:30]
+        user.last_name = " ".join(name_parts[1:])[:30]
     user.save()
 
 
@@ -269,7 +273,7 @@ def dict_to_style(style_dict):
         str: An HTML style string
     """
 
-    return '; '.join(['{}: {}'.format(k, v) for k, v in style_dict.items()])
+    return "; ".join(["{}: {}".format(k, v) for k, v in style_dict.items()])
 
 
 def generate_initials(text):
@@ -286,7 +290,7 @@ def generate_initials(text):
         return None
     text = text.strip()
     if text:
-        split_text = text.split(' ')
+        split_text = text.split(" ")
         if len(split_text) > 1:
             return (split_text[0][0] + split_text[-1][0]).upper()
         else:
@@ -308,29 +312,31 @@ def generate_svg_avatar(name, size, color, bgcolor):
         str: an SVG image.
     """
 
-    initials = generate_initials(name) or 'A'
+    initials = generate_initials(name) or "A"
 
     style = {
-        'fill': '#{}'.format(bgcolor),
-        'border-radius': '{}px'.format(size - 1),
-        '-moz-border-radius': '{}px'.format(size - 1)
+        "fill": "#{}".format(bgcolor),
+        "border-radius": "{}px".format(size - 1),
+        "-moz-border-radius": "{}px".format(size - 1),
     }
 
     text_style = {
-        'font-weight': '400px',
-        'font-size': '{}px'.format(int(size/2)),
-        'color': '#{}'.format(color)
+        "font-weight": "400px",
+        "font-size": "{}px".format(int(size / 2)),
+        "color": "#{}".format(color),
     }
 
-    return SVG_TEMPLATE.format(**{
-        'height': size,
-        'size': size,
-        'cx': int(size / 2),
-        'cy': int(size / 2),
-        'radius': int((size - 1) / 2),
-        'style': dict_to_style(style),
-        'color': color,
-        'font-family': ','.join(DEFAULT_FONTS),
-        'text-style': dict_to_style(text_style),
-        'text': xml_escape(initials.upper()),
-    }).replace('\n', '')
+    return SVG_TEMPLATE.format(
+        **{
+            "height": size,
+            "size": size,
+            "cx": int(size / 2),
+            "cy": int(size / 2),
+            "radius": int((size - 1) / 2),
+            "style": dict_to_style(style),
+            "color": color,
+            "font-family": ",".join(DEFAULT_FONTS),
+            "text-style": dict_to_style(text_style),
+            "text": xml_escape(initials.upper()),
+        }
+    ).replace("\n", "")

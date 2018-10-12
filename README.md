@@ -131,6 +131,8 @@ Tests should be run in the Docker container, not the host machine. They can be r
     docker-compose run web tox
     # Single file test
     docker-compose run web tox /path/to/test.py
+    # format python code
+    docker-compose run web black .
     # Run the JS tests with coverage report
     docker-compose run watch npm run-script coverage
     # run the JS tests without coverage report
@@ -229,11 +231,8 @@ OPEN_DISCUSSIONS_BASE_URL=http://docker.for.mac.localhost:8063/
   - Check `FirstName`, `EmailAddress`
   - Paste the XML response from above into the text field
   - Submit the form
-- In an incognito browser window, go to `http://od.odl.local:8063/login/saml/?next=%2F&idp=default` 
+- In an incognito browser window, go to `http://od.odl.local:8063/login/saml/?next=%2F&idp=default`
 - You should be redirected to SSOCircle, fill out the captcha and click `Continue SAML Single Sign On`
-- You should be redirected back to the open-discussions home page, and be logged in. 
+- You should be redirected back to the open-discussions home page, and be logged in.
 - Log out & back in as a superuser and to go the Users admin page.
   - There should be a new user with the same email address and name that you used to register with SSOCircle.
-
-
-

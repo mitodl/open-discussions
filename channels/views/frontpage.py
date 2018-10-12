@@ -17,14 +17,15 @@ class FrontPageView(APIView):
     """
     View for listing posts for frontpage
     """
+
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
     def get_serializer_context(self):
         """Context for the request and view"""
         return {
-            'current_user': self.request.user,
-            'request': self.request,
-            'view': self,
+            "current_user": self.request.user,
+            "request": self.request,
+            "view": self,
         }
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
@@ -37,15 +38,17 @@ class FrontPageView(APIView):
         posts = [post for post in posts if post.author and post.author.name in users]
         subscriptions = lookup_subscriptions_for_posts(posts, self.request.user)
 
-        return Response({
-            'posts': PostSerializer(
-                posts,
-                context={
-                    **self.get_serializer_context(),
-                    'users': users,
-                    'post_subscriptions': subscriptions,
-                },
-                many=True,
-            ).data,
-            'pagination': pagination,
-        })
+        return Response(
+            {
+                "posts": PostSerializer(
+                    posts,
+                    context={
+                        **self.get_serializer_context(),
+                        "users": users,
+                        "post_subscriptions": subscriptions,
+                    },
+                    many=True,
+                ).data,
+                "pagination": pagination,
+            }
+        )

@@ -7,14 +7,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('notifications', '0002_add_notifications'),
-    ]
+    dependencies = [("notifications", "0002_add_notifications")]
 
     operations = [
         migrations.AlterField(
-            model_name='emailnotification',
-            name='state',
-            field=models.CharField(choices=[('pending', 'Pending'), ('sending', 'Sending'), ('sent', 'Sent'), ('canceled', 'Canceled')], default='pending', max_length=10),
-        ),
+            model_name="emailnotification",
+            name="state",
+            field=models.CharField(
+                choices=[
+                    ("pending", "Pending"),
+                    ("sending", "Sending"),
+                    ("sent", "Sent"),
+                    ("canceled", "Canceled"),
+                ],
+                default="pending",
+                max_length=10,
+            ),
+        )
     ]
