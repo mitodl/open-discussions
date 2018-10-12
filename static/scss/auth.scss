@@ -40,7 +40,7 @@
     width: 100%;
 
     &[type="submit"] {
-      width: 35%;
+      width: 130px;
     }
 
     &.submit-password-reset {
@@ -61,20 +61,28 @@
     justify-content: center;
     color: $navy;
     margin-bottom: 25px;
-  }
 
-  .textline:after,
-  .textline:before {
-    content: "";
-    width: 150px;
+    &:after,
+    &:before {
+      content: "";
+      width: 150px;
 
-    @include breakpoint(mobile) {
-      width: 45%;
+      @include breakpoint(mobile) {
+        width: 45%;
+      }
+
+      height: 2px;
+      background: $navy;
+      margin: 0;
     }
 
-    height: 2px;
-    background: $navy;
-    margin: 0 10px;
+    &:after {
+      margin-left: 10px;
+    }
+
+    &:before {
+      margin-right: 10px;
+    }
   }
 
   .card-contents {
@@ -86,6 +94,13 @@
     @include breakpoint(desktop) {
       padding: 60px;
       width: 350px;
+    }
+  }
+
+  &.register-page {
+    .card-contents {
+      // this number needs to match the width that ReCAPTCHA sets on its iframe
+      max-width: 304px;
     }
   }
 

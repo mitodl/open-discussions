@@ -118,6 +118,7 @@
     "sinon": "^6.0.1",
     "spinkit": "^1.2.5",
     "style-loader": "^0.21.0",
+    "styled-components": "^4.0.2",
     "url-loader": "^1.0.1",
     "validator": "^10.7.1",
     "webpack": "^3.12.0",
