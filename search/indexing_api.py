@@ -130,7 +130,7 @@ def update_field_values_by_query(query, field_name, field_value, object_types=No
         query (dict): A dict representing an ES query
         field_name (str): The name of the field that will be update
         field_value: The field value to set for all matching documents
-        object_types (list of str): The document types to query
+        object_types (list of str): The object types to query (post, comment, etc)
     """
     if not object_types:
         object_types = VALID_OBJECT_TYPES
@@ -179,7 +179,7 @@ def _update_document_by_id(doc_id, data, object_type, update_key=None):
     Args:
         doc_id (str): The ES document id
         data (dict): Full ES document data
-        object_type (str): The document type to update
+        object_type (str): The object type to update (post, comment, etc)
         update_key (str): A key indicating the type of update request to Elasticsearch
             (e.g.: 'script', 'doc')
     """
@@ -211,7 +211,7 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
 
     Args:
         doc_id (str): The ES document id
-        object_type (str): The document type to update
+        object_type (str): The object type to update (post, comment, etc)
         field_name (str): The name of the field to increment
         incr_amount (int): The amount to increment by
     """

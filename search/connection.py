@@ -65,7 +65,7 @@ def make_backing_index_name(object_type):
     Make a unique name for use for a backing index
 
     Args:
-        object_type(str): The document type (post, comment, profile)
+        object_type(str): The object type (post, comment, profile)
 
     Returns:
         str: A new name for a backing index
@@ -82,7 +82,7 @@ def make_alias_name(is_reindexing, object_type):
     Make the name used for the Elasticsearch alias
 
     Args:
-        object_type(str): The document type of the index
+        object_type(str): The object type of the index (post, comment, etc)
         is_reindexing (bool): If true, use the alias name meant for reindexing
 
     Returns:
@@ -104,7 +104,7 @@ def get_active_aliases(object_types):
     Returns aliases which exist for specified object types
 
     Args:
-        object_types(list of str): list of doc types
+        object_types(list of str): list of object types (post, comment, etc)
 
     Returns:
         list of str: Aliases which exist
