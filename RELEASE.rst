@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.49.2
+Version 0.49.2 (Released October 12, 2018)
 --------------
 
 - Fix spacing for top of channel loading animation
