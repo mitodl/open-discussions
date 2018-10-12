@@ -1,14 +1,12 @@
 {% extends "email_base.html" %}
 
-{% block title %}Verify your email{% endblock %}
-
 {% block content %}
 <!-- 1 Column Text + Button : BEGIN -->
   <tr>
       <td style="background-color: #ffffff;">
           <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
               <tr>
-                  <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
+                  <td style="padding: 20px; font-family: sans-serif; font-size: 14px; line-height: 20px; color: #555555;">
                       <h1 style="margin: 0 0 10px; font-size: 25px; line-height: 30px; color: #03152d; font-weight: bold;">Verify your email</h1>
                       <p style="margin: 0 0 10px;">Thank you for joining {{ site_name }}. To finish joining, you just need to confirm that we got your email right.</p>
                       <p style="margin: 0 0 10px;">To confirm your email, please click this link:</p>
@@ -20,7 +18,7 @@
                       <table align="left" role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: auto;">
                           <tr>
                               <td class="button-td button-td-primary" style="border-radius: 4px; background: #ffffff;">
-                                   <a class="button-a button-a-primary" href="{{ confirmation_url }}" style="background: #ffffff; border: 1px solid #a31f34; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 28px; color: #a31f34; display: block; border-radius: 4px;">Verify Your Email</a>
+                                   <a class="button-a button-a-primary" href="{{ confirmation_url }}" style="background: #ffffff; border: 1px solid #a31f34; font-family: sans-serif; font-size: 14px; line-height: 14px; text-decoration: none; padding: 13px 28px; color: #a31f34; display: block; border-radius: 4px;">Verify Your Email</a>
                               </td>
                           </tr>
                       </table>

@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.49.3
+--------------
+
+- Third pass of email templates
+
 Version 0.49.2 (Released October 12, 2018)
 --------------
 

@@ -7,12 +7,12 @@ from rest_framework import status
 
 from profiles.utils import image_uri
 from channels.factories import LinkMetaFactory
-from channels.utils import get_reddit_slug
 from channels.constants import (
     VALID_POST_SORT_TYPES,
     POSTS_SORT_HOT,
 )
 from channels.models import Subscription, LinkMeta
+from channels.views.test_utils import default_post_response_data
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
     PERMISSION_DENIED_ERROR_TYPE,
@@ -22,48 +22,6 @@ from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = pytest.mark.betamax
-
-
-def default_response_data(channel, post, user):
-    """
-    Helper function. Returns a dict containing some of the data that we expect from the API given
-    a channel, post, and user.
-    """
-    # For some reason, the default values are different for staff and non-staff users
-    if user.is_staff:
-        user_dependent_defaults = {
-            'upvoted': False,
-            'num_reports': 0
-        }
-    else:
-        user_dependent_defaults = {
-            'upvoted': True,
-            'num_reports': None
-        }
-
-    return {
-        'url': None,
-        'thumbnail': None,
-        'text': post.text,
-        'title': post.title,
-        'removed': False,
-        'deleted': False,
-        'subscribed': False,
-        'score': 1,
-        'author_id': user.username,
-        'id': post.id,
-        'slug': get_reddit_slug(post.permalink),
-        'created': post.created,
-        'num_comments': 0,
-        'channel_name': channel.name,
-        'channel_title': channel.title,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "author_headline": user.profile.headline,
-        'edited': False,
-        "stickied": False,
-        **user_dependent_defaults
-    }
 
 
 def test_create_url_post_existing_meta(client, private_channel_and_contributor, mocker, settings):
@@ -87,6 +45,7 @@ def test_create_url_post_existing_meta(client, private_channel_and_contributor, 
     assert resp.json() == {
         'title': 'url title 🐨',
         'url': link_url,
+        'url_domain': 'micromasters.mit.edu',
         "thumbnail": thumbnail,
         'text': None,
         'author_id': user.username,
@@ -167,6 +126,7 @@ def test_create_text_post(client, private_channel_and_contributor):
         'title': 'parameterized testing',
         'text': 'tests are great',
         'url': None,
+        'url_domain': None,
         "thumbnail": None,
         'author_id': user.username,
         'created': '2018-08-24T18:03:18+00:00',
@@ -262,7 +222,7 @@ def test_get_deleted_post(staff_client, missing_user, private_channel_and_contri
 
 # pylint: disable=too-many-arguments
 @pytest.mark.parametrize("missing_image", [True, False])
-def test_get_post(client, private_channel_and_contributor, reddit_factories, missing_image):
+def test_get_post(user_client, private_channel_and_contributor, reddit_factories, missing_image):
     """Get an existing post with no image"""
     channel, user = private_channel_and_contributor
 
@@ -274,70 +234,27 @@ def test_get_post(client, private_channel_and_contributor, reddit_factories, mis
 
     post = reddit_factories.text_post('my geat post', user, channel=channel)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    client.force_login(user)
-    resp = client.get(url)
+    resp = user_client.get(url)
 
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "url": None,
-        "thumbnail": None,
-        "text": post.text,
-        "title": post.title,
-        "upvoted": True,
-        'removed': False,
-        'deleted': False,
-        'subscribed': False,
-        "score": 1,
-        "author_id": user.username,
-        "id": post.id,
-        'slug': get_reddit_slug(post.permalink),
-        "created": post.created,
-        "num_comments": 0,
-        "channel_name": channel.name,
-        "channel_title": channel.title,
-        'author_name': user.profile.name,
-        "author_headline": user.profile.headline,
-        "profile_image": image_uri(user.profile),
-        'edited': False,
-        "stickied": False,
-        'num_reports': None,
-    }
+    assert resp.json() == default_post_response_data(channel, post, user)
 
 
-def test_get_post_no_profile(client, private_channel_and_contributor, reddit_factories):
+def test_get_post_no_profile(user_client, private_channel_and_contributor, reddit_factories):
     """Get an existing post for a user with no profile"""
     channel, user = private_channel_and_contributor
     user.profile.delete()
 
     post = reddit_factories.text_post('my geat post', user, channel=channel)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    client.force_login(user)
-    resp = client.get(url)
+    resp = user_client.get(url)
 
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
-        "url": None,
-        "thumbnail": None,
-        "text": post.text,
-        "title": post.title,
-        "upvoted": True,
-        'removed': False,
-        'deleted': False,
-        'subscribed': False,
-        "score": 1,
-        "author_id": user.username,
-        "id": post.id,
-        'slug': get_reddit_slug(post.permalink),
-        "created": post.created,
-        "num_comments": 0,
-        "channel_name": channel.name,
-        "channel_title": channel.title,
+        **default_post_response_data(channel, post, user),
         'author_name': '[deleted]',
         "author_headline": None,
         "profile_image": image_uri(None),
-        'edited': False,
-        "stickied": False,
-        'num_reports': None,
     }
 
 
@@ -357,38 +274,17 @@ def test_get_post_not_found(client, logged_in_profile):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_get_post_stickied(client, private_channel_and_contributor, reddit_factories, staff_api):
+def test_get_post_stickied(user_client, private_channel_and_contributor, reddit_factories, staff_api):
     """test that stickied posts come back that way"""
     channel, user = private_channel_and_contributor
     post = reddit_factories.text_post('just a post', user, channel=channel)
     staff_api.pin_post(post.id, True)
-    client.force_login(user)
     url = reverse('post-detail', kwargs={'post_id': post.id})
-    get_resp = client.get(url)
+    get_resp = user_client.get(url)
     assert get_resp.status_code == status.HTTP_200_OK
     assert get_resp.json() == {
-        "url": None,
-        "thumbnail": None,
-        "text": post.text,
-        "title": post.title,
-        "upvoted": True,
-        'removed': False,
-        'deleted': False,
-        'subscribed': False,
-        "score": 1,
-        "author_id": user.username,
-        "id": post.id,
-        'slug': get_reddit_slug(post.permalink),
-        "created": post.created,
-        "num_comments": 0,
-        "channel_name": channel.name,
-        "channel_title": channel.title,
-        'author_name': user.profile.name,
-        "author_headline": user.profile.headline,
-        "profile_image": image_uri(user.profile),
-        "edited": False,
+        **default_post_response_data(channel, post, user),
         "stickied": True,
-        'num_reports': None,
     }
 
 
@@ -404,28 +300,8 @@ def test_get_post_anonymous(client, public_channel, reddit_factories, settings, 
     if allow_anonymous:
         assert resp.status_code == status.HTTP_200_OK
         assert resp.json() == {
-            'author_id': user.username,
-            'author_name': user.profile.name,
-            "author_headline": user.profile.headline,
-            'channel_name': public_channel.name,
-            'channel_title': public_channel.title,
-            'created': post.created,
-            'edited': False,
-            'id': post.id,
-            'slug': get_reddit_slug(post.permalink),
-            'num_comments': 0,
-            'num_reports': None,
-            'profile_image': image_uri(user.profile),
-            'removed': False,
-            'deleted': False,
-            'score': 1,
-            'stickied': False,
-            'subscribed': False,
-            'text': None,
-            'title': post.title,
+            **default_post_response_data(public_channel, post, user),
             'upvoted': False,
-            'url': post.url,
-            'thumbnail': None,
         }
     else:
         assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
@@ -433,7 +309,7 @@ def test_get_post_anonymous(client, public_channel, reddit_factories, settings, 
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
-def test_list_posts(client, missing_user, private_channel_and_contributor, reddit_factories):
+def test_list_posts(user_client, missing_user, private_channel_and_contributor, reddit_factories):
     """List posts in a channel"""
     channel, user = private_channel_and_contributor
     posts = list(reversed([
@@ -445,10 +321,8 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
         user.username = 'renamed'
         user.save()
 
-    client.force_login(user)
-
     url = reverse('post-list', kwargs={'channel_name': channel.name})
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
 
     if missing_user:
@@ -462,30 +336,7 @@ def test_list_posts(client, missing_user, private_channel_and_contributor, reddi
     else:
         assert resp.json() == {
             'posts': [
-                {
-                    "url": post.url,
-                    "thumbnail": None,
-                    "text": post.text,
-                    "title": post.title,
-                    "upvoted": True,
-                    "removed": False,
-                    "deleted": False,
-                    "subscribed": False,
-                    "score": 1,
-                    "author_id": user.username,
-                    "id": post.id,
-                    'slug': get_reddit_slug(post.permalink),
-                    "created": post.created,
-                    "num_comments": 0,
-                    "channel_name": channel.name,
-                    "channel_title": channel.title,
-                    "author_name": user.profile.name,
-                    "author_headline": user.profile.headline,
-                    "profile_image": image_uri(user.profile),
-                    "edited": False,
-                    "stickied": False,
-                    'num_reports': None,
-                } for post in posts
+                default_post_response_data(channel, post, user) for post in posts
             ],
             'pagination': {
                 'sort': POSTS_SORT_HOT,
@@ -525,71 +376,31 @@ def test_list_posts_sorted(client, private_channel_and_contributor, reddit_facto
     resp = client.get(url, {'sort': sort})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
-        'posts': [{
-            "url": None,
-            "thumbnail": None,
-            "text": post.text,
-            "title": post.title,
-            "upvoted": True,
-            "removed": False,
-            "deleted": False,
-            "subscribed": False,
-            "score": 1,
-            "author_id": user.username,
-            "id": post.id,
-            'slug': get_reddit_slug(post.permalink),
-            "created": post.created,
-            "num_comments": 0,
-            "channel_name": channel.name,
-            "channel_title": channel.title,
-            "author_name": user.profile.name,
-            "author_headline": user.profile.headline,
-            "profile_image": image_uri(user.profile),
-            "edited": False,
-            "stickied": False,
-            'num_reports': None,
-        } for post in [fourth_post, third_post, second_post, first_post]],
+        'posts': [
+            default_post_response_data(channel, post, user)
+            for post in [fourth_post, third_post, second_post, first_post]
+        ],
         'pagination': {
             'sort': sort,
         },
     }
 
 
-def test_list_posts_stickied(client, private_channel_and_contributor, reddit_factories, staff_api):
+def test_list_posts_stickied(user_client, private_channel_and_contributor, reddit_factories, staff_api):
     """test that the stickied post is first"""
     channel, user = private_channel_and_contributor
     posts = [
         reddit_factories.text_post("great post!{}".format(i), user, channel=channel)
         for i in range(4)
     ]
-    staff_api.pin_post(posts[2].id, True)
-    client.force_login(user)
+    post = posts[2]
+    staff_api.pin_post(post.id, True)
     url = reverse('post-list', kwargs={'channel_name': channel.name})
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["posts"][0] == {
-        "url": posts[2].url,
-        "thumbnail": None,
-        "text": posts[2].text,
-        "title": posts[2].title,
-        "upvoted": True,
-        "removed": False,
-        "deleted": False,
-        "subscribed": False,
-        "score": 1,
-        "author_id": user.username,
-        "id": posts[2].id,
-        'slug': get_reddit_slug(posts[2].permalink),
-        "created": posts[2].created,
-        "num_comments": 0,
-        "channel_name": channel.name,
-        "channel_title": channel.title,
-        "author_name": user.profile.name,
-        "author_headline": user.profile.headline,
-        "profile_image": image_uri(user.profile),
-        "edited": False,
-        "stickied": True,
-        'num_reports': None,
+        **default_post_response_data(channel, post, user),
+        'stickied': True,
     }
 
 
@@ -701,28 +512,8 @@ def test_list_posts_anonymous(client, public_channel, reddit_factories, settings
         assert resp.json() == {
             'pagination': {'sort': 'hot'},
             'posts': [{
-                'author_id': user.username,
-                'author_name': user.profile.name,
-                'author_headline': user.profile.headline,
-                'channel_name': public_channel.name,
-                'channel_title': public_channel.title,
-                'created': post.created,
-                'edited': False,
-                'id': post.id,
-                'slug': get_reddit_slug(post.permalink),
-                'num_comments': 0,
-                'num_reports': None,
-                'profile_image': image_uri(user.profile),
-                'removed': False,
-                'deleted': False,
-                'score': 1,
-                'stickied': False,
-                'subscribed': False,
-                'text': None,
-                'title': post.title,
+                **default_post_response_data(public_channel, post, user),
                 'upvoted': False,
-                'url': post.url,
-                'thumbnail': None,
             }]
         }
     else:
@@ -744,6 +535,7 @@ def test_create_post_without_upvote(user_client, private_channel_and_contributor
         'title': 'x',
         'text': 'y',
         'url': None,
+        'url_domain': None,
         'thumbnail': None,
         'author_id': user.username,
         'created': '2018-08-24T18:14:32+00:00',
@@ -773,8 +565,8 @@ class PostDetailTests:
         channel, user = private_channel_and_contributor
         post = reddit_factories.text_post('just a post', user, channel=channel)
         url = reverse('post-detail', kwargs={'post_id': post.id})
-        default_response = default_response_data(channel, post, user)
-        default_staff_response = default_response_data(channel, post, staff_user)
+        default_response = default_post_response_data(channel, post, user)
+        default_staff_response = default_post_response_data(channel, post, staff_user)
         return SimpleNamespace(
             channel=channel,
             user=user,

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width"> <!-- Forcing initial-scale shouldn't be necessary -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge"> <!-- Use the latest (edge) version of IE rendering engine -->
     <meta name="x-apple-disable-message-reformatting">  <!-- Disable auto-scale in iOS 10 Mail entirely -->
-    <title>{% block title %}{% endblock %}</title> <!-- The title tag shows in email notifications, like Android 4.4. -->
+    <title>{{ subject }}</title> <!-- The title tag shows in email notifications, like Android 4.4. -->
 
     <!-- Web Font / @font-face : BEGIN -->
     <!-- NOTE: If web fonts are not required, lines 10 - 27 can be safely removed. -->
@@ -255,15 +255,18 @@
 
             <!-- Clear Spacer : BEGIN -->
               <tr>
-                  <td aria-hidden="true" height="40" style="font-size: 0px; line-height: 0px;text-align:left">
+                  <td aria-hidden="true" height="40" style="font-size: 0px; line-height: 0px;">
                       &nbsp;
                   </td>
               </tr>
             <!-- Clear Spacer : END -->
 
+            <tr>
+              <td style="padding: 0 20px; text-align: left;">--</td>
+            </tr>
+
           </table>
           <!-- Email Body : END -->
-          <span>--</span>
 
           <!-- Email Footer : BEGIN -->
             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 680px;">

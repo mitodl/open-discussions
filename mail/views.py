@@ -80,6 +80,8 @@ class EmailDebuggerView(View):
                         author_headline='Physics Professor',
                         author_id='njksdfg',
                         title="Batman Rules!",
+                        url='http://example.com/batman.jpg',
+                        url_domain='example.com',
                         slug='batman_rules',
                         created="2018-09-19T18:50:32+00:00",
                         channel_name='channel_name',
