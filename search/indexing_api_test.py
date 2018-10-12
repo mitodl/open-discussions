@@ -272,8 +272,10 @@ def test_index_post_with_comments_errors(mocked_es, mocker, error, settings, use
     bulk_mock = mocker.patch('search.indexing_api.bulk', autospec=True)
 
     if error == POST_TYPE:
+        # search.indexing_api.bulk() processes post index on first run
         bulk_mock.side_effect = (({}, ['error']),)
     else:
+        # search.indexing_api.bulk() processes comment index on third run
         bulk_mock.side_effect = (({}, []), ({}, []), ({}, ['error']))
 
     with pytest.raises(ReindexException):
