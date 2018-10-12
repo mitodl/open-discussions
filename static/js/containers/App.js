@@ -167,7 +167,7 @@ class App extends React.Component<AppProps> {
     return (
       <div className="app">
         <MetaTags>
-          <title>MIT Open Discussions</title>
+          <title>MIT Open Learning</title>
         </MetaTags>
         <Toolbar
           toggleShowDrawer={this.toggleShowDrawer}

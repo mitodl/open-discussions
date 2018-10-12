@@ -431,7 +431,7 @@ class PostPage extends React.Component<PostPageProps> {
               reportForm={reportForm.value}
               validation={reportForm.errors}
               onUpdate={onReportUpdate(dispatch)}
-              description="Are you sure you want to report this comment for violating the rules of MIT Open Discussions?"
+              description="Are you sure you want to report this comment for violating the rules of this site?"
               label="Why are you reporting this comment?"
             />
           ) : null}
