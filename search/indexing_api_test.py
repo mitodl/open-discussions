@@ -190,7 +190,7 @@ def test_clear_and_create_index_error(object_type):
     """
     clear_and_create_index should raise a TypeError if object_type is None or invalid
     """
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         clear_and_create_index(index_name='idx', skip_mapping=False, object_type=object_type)
 
 

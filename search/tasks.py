@@ -170,7 +170,7 @@ def finish_recreate_index(results, backing_indices):
 
     Args:
         results (list or bool): Results saying whether the error exists
-        backing_index (str): The backing elasticsearch index
+        backing_indices (dict): The backing elasticsearch indices keyed by object type
     """
     errors = merge_strings(results)
     if errors:

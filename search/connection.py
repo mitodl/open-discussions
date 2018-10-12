@@ -113,9 +113,9 @@ def get_active_aliases(object_types):
         object_types = VALID_OBJECT_TYPES
     conn = get_conn(verify=False)
     return [
-        alias for x in [
+        alias for alias_tuple in [
             (get_default_alias_name(obj), get_reindexing_alias_name(obj)) for obj in object_types
-        ] for alias in x
+        ] for alias in alias_tuple
         if conn.indices.exists(alias)
     ]
 

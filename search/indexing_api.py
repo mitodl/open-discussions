@@ -48,16 +48,18 @@ BASE_CONTENT_TYPE = {
 }
 
 MAPPING = {
-    POST_TYPE: dict(BASE_CONTENT_TYPE, **{
+    POST_TYPE: {
+        **BASE_CONTENT_TYPE,
         'post_link_url': {'type': 'keyword'},
         'post_link_thumbnail': {'type': 'keyword'},
         'num_comments': {'type': 'long'},
-    }),
-    COMMENT_TYPE: dict(BASE_CONTENT_TYPE, **{
+    },
+    COMMENT_TYPE: {
+        **BASE_CONTENT_TYPE,
         'comment_id': {'type': 'keyword'},
         'parent_comment_id': {'type': 'keyword'},
         'parent_post_removed': {'type': 'boolean'},
-    }),
+    },
 }
 
 
@@ -70,8 +72,8 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
         skip_mapping (bool): If true, don't set any mapping
         object_type(str): The type of document (post, comment)
     """
-    if not object_type or object_type not in VALID_OBJECT_TYPES:
-        raise TypeError('A valid object type must be specified when clearing and creating an index')
+    if object_type not in VALID_OBJECT_TYPES:
+        raise ValueError('A valid object type must be specified when clearing and creating an index')
     conn = get_conn(verify=False)
     if conn.indices.exists(index_name):
         conn.indices.delete(index_name)
@@ -297,7 +299,7 @@ def index_post_with_comments(post_id):
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )
         if len(errors) > 0:
-            raise ReindexException("Error during bulk insert: {errors}".format(
+            raise ReindexException("Error during bulk post insert: {errors}".format(
                 errors=errors
             ))
 
@@ -311,7 +313,7 @@ def index_post_with_comments(post_id):
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )
         if len(errors) > 0:
-            raise ReindexException("Error during bulk insert: {errors}".format(
+            raise ReindexException("Error during bulk comment insert: {errors}".format(
                 errors=errors
             ))
 
@@ -319,6 +321,9 @@ def index_post_with_comments(post_id):
 def create_backing_index(object_type):
     """
     Start the reindexing process by creating a new backing index and pointing the reindex alias toward it
+
+    Args:
+        object_type (str): The object type for the index (post, comment, etc)
 
     Returns:
         str: The new backing index
@@ -349,6 +354,7 @@ def switch_indices(backing_index, object_type):
 
     Args:
         backing_index (str): The backing index of the reindex alias
+        object_type (str): The object type for the index (post, comment, etc)
     """
     conn = get_conn(verify=False)
     actions = []
