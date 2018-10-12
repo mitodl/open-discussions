@@ -1,5 +1,8 @@
 #### Pre-Flight checklist
 
+- [ ] Screenshots and design review
+  - [ ] Add screenshots to the PR description for any changes that affect layout or styling
+  - [ ] tag @ferdi or @pdpinch for review  
 - [ ] Migrations
   - [ ] Migration is backwards-compatible with current production code
 - [ ] Testing
