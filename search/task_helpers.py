@@ -237,7 +237,7 @@ def update_indexed_score(instance, instance_type, vote_action=None):
     elif vote_action in (VoteActions.DOWNVOTE, VoteActions.CLEAR_UPVOTE):
         vote_increment = -1
     else:
-        raise ValueError('Received an invalid vote action value: %s', vote_action)
+        raise ValueError('Received an invalid vote action value: %s' % vote_action)
 
     if instance_type != POST_TYPE:
         return

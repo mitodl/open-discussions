@@ -122,7 +122,7 @@ def update_field_values_by_query(query, field_name, field_value):
     """
     conn = get_conn(verify=True)
     for alias in get_active_aliases():
-        es_response = conn.update_by_query(
+        es_response = conn.update_by_query(  # pylint: disable=unexpected-keyword-arg
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             conflicts=UPDATE_CONFLICT_SETTING,
@@ -190,7 +190,7 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
         field_name (str): The name of the field to increment
         incr_amount (int): The amount to increment by
     """
-    _update_document_by_id(
+    _update_document_by_id(  # pylint: disable=redundant-keyword-arg
         doc_id,
         {
             "source": "ctx._source.{} += params.incr_amount".format(field_name),

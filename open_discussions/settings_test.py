@@ -45,8 +45,8 @@ class TestSettings(TestCase):
         """Verify that we enable and configure S3 with a variable"""
         # Unset, we don't do S3
         with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_USE_S3': 'False'
+                **REQUIRED_SETTINGS,
+                'OPEN_DISCUSSIONS_USE_S3': 'False'
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertNotEqual(
@@ -56,17 +56,17 @@ class TestSettings(TestCase):
 
         with self.assertRaises(ImproperlyConfigured):
             with mock.patch.dict('os.environ', {
-                'OPEN_DISCUSSIONS_USE_S3': 'True',
+                    'OPEN_DISCUSSIONS_USE_S3': 'True',
             }, clear=True):
                 self.reload_settings()
 
         # Verify it all works with it enabled and configured 'properly'
         with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_USE_S3': 'True',
-            'AWS_ACCESS_KEY_ID': '1',
-            'AWS_SECRET_ACCESS_KEY': '2',
-            'AWS_STORAGE_BUCKET_NAME': '3',
+                **REQUIRED_SETTINGS,
+                'OPEN_DISCUSSIONS_USE_S3': 'True',
+                'AWS_ACCESS_KEY_ID': '1',
+                'AWS_SECRET_ACCESS_KEY': '2',
+                'AWS_STORAGE_BUCKET_NAME': '3',
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(
@@ -78,16 +78,16 @@ class TestSettings(TestCase):
         """Verify that we configure email with environment variable"""
 
         with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_ADMIN_EMAIL': '',
+                **REQUIRED_SETTINGS,
+                'OPEN_DISCUSSIONS_ADMIN_EMAIL': '',
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertFalse(settings_vars.get('ADMINS', False))
 
         test_admin_email = 'cuddle_bunnies@example.com'
         with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_ADMIN_EMAIL': test_admin_email,
+                **REQUIRED_SETTINGS,
+                'OPEN_DISCUSSIONS_ADMIN_EMAIL': test_admin_email,
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(
@@ -113,8 +113,8 @@ class TestSettings(TestCase):
 
         # Check enabling the setting explicitly
         with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'True'
+                **REQUIRED_SETTINGS,
+                'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'True'
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(
@@ -124,8 +124,8 @@ class TestSettings(TestCase):
 
         # Disable it
         with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'False'
+                **REQUIRED_SETTINGS,
+                'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'False'
         }, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(
@@ -137,9 +137,9 @@ class TestSettings(TestCase):
         """For PR builds we will use the heroku app name instead of the given ELASTICSEARCH_INDEX"""
         index_name = 'heroku_app_name_as_index'
         with mock.patch.dict('os.environ', {
-            **REQUIRED_SETTINGS,
-            'HEROKU_APP_NAME': index_name,
-            'HEROKU_PARENT_APP_NAME': 'some_name',
+                **REQUIRED_SETTINGS,
+                'HEROKU_APP_NAME': index_name,
+                'HEROKU_PARENT_APP_NAME': 'some_name',
         }):
             settings_vars = self.reload_settings()
             assert settings_vars['ELASTICSEARCH_INDEX'] == index_name

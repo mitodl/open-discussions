@@ -19,6 +19,8 @@ from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles import api as profile_api
 from profiles.utils import update_full_name
 
+# pylint: disable=keyword-arg-before-vararg
+
 
 def validate_email_auth_request(strategy, backend, user=None, *args, **kwargs):  # pylint: disable=unused-argument
     """
