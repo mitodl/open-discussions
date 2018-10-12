@@ -136,17 +136,8 @@ def update_field_values_by_query(query, field_name, field_value, object_types=No
     if not object_types:
         object_types = VALID_OBJECT_TYPES
     conn = get_conn(verify=True)
-<<<<<<< HEAD
-<<<<<<< HEAD
-    for alias in get_active_aliases():
-        es_response = conn.update_by_query(  # pylint: disable=unexpected-keyword-arg
-=======
-    for alias in get_active_aliases(doctypes=doctypes):
-=======
     for alias in get_active_aliases(object_types):
->>>>>>> Refactor argument names (doctype -> object_type)
-        es_response = conn.update_by_query(
->>>>>>> Ensure that documents are created and updated in the correct index.
+        es_response = conn.update_by_query(  # pylint: disable=unexpected-keyword-arg
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             conflicts=UPDATE_CONFLICT_SETTING,
