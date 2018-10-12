@@ -900,4 +900,4 @@ class ReportedContentSerializer(serializers.Serializer):
         Returns:
             list of str: list of reasons a post/comment has been reported for
         """
-        return sorted(list({report[0] for report in instance.user_reports + instance.mod_reports}))
+        return sorted({report[0] for report in instance.user_reports + instance.mod_reports})

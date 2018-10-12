@@ -19,8 +19,10 @@ from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles import api as profile_api
 from profiles.utils import update_full_name
 
+# pylint: disable=keyword-arg-before-vararg
 
-def validate_email_auth_request(strategy, backend, user=None, **kwargs):  # pylint: disable=unused-argument
+
+def validate_email_auth_request(strategy, backend, user=None, *args, **kwargs):  # pylint: disable=unused-argument
     """
     Validates an auth request for email
 
@@ -41,7 +43,7 @@ def validate_email_auth_request(strategy, backend, user=None, **kwargs):  # pyli
     return {}
 
 
-def get_username(strategy, backend, user=None, **kwargs):  # pylint: disable=unused-argument
+def get_username(strategy, backend, user=None, *args, **kwargs):  # pylint: disable=unused-argument
     """
     Gets the username for a user
 
@@ -62,7 +64,7 @@ def get_username(strategy, backend, user=None, **kwargs):  # pylint: disable=unu
 
 @partial
 def require_password_and_profile_via_email(
-        strategy, backend, user=None, flow=None, current_partial=None, **kwargs
+        strategy, backend, user=None, flow=None, current_partial=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
     """
     Sets a new user's password and profile
@@ -102,7 +104,7 @@ def require_password_and_profile_via_email(
 
 @partial
 def require_profile_update_user_via_saml(
-        strategy, backend, user=None, is_new=False, **kwargs
+        strategy, backend, user=None, is_new=False, *args, **kwargs
 ):  # pylint: disable=unused-argument
     """
     Sets a new user's password and profile, and updates the user first and last names.
@@ -138,7 +140,7 @@ def require_profile_update_user_via_saml(
 
 @partial
 def validate_password(
-        strategy, backend, user=None, flow=None, current_partial=None, **kwargs
+        strategy, backend, user=None, flow=None, current_partial=None, *args, **kwargs
 ):  # pylint: disable=unused-argument
     """
     Validates a user's password for login
