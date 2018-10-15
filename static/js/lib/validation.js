@@ -2,6 +2,7 @@
 /* global SETTINGS:false */
 import React from "react"
 import R from "ramda"
+import isURL from "validator/lib/isURL"
 
 import { S } from "./sanctuary"
 import { LINK_TYPE_LINK } from "../lib/channels"
@@ -53,16 +54,24 @@ export const validNotMIT = R.compose(
 )
 
 // POST CREATE VALIDATION
-export const postUrlOrTextPresent = (postForm: { value: PostForm }) => {
+export const postURLValidation = (postForm: { value: PostForm }) => {
   if (R.isEmpty(postForm)) {
     return S.Nothing
   }
 
   const post = postForm.value
-  if (post.postType === LINK_TYPE_LINK && emptyOrNil(post.url)) {
-    return S.Just(
-      R.set(R.lensPath(["value", "url"]), "Post url cannot be empty")
-    )
+  if (post.postType === LINK_TYPE_LINK) {
+    if (emptyOrNil(post.url)) {
+      return S.Just(
+        R.set(R.lensPath(["value", "url"]), "Post url cannot be empty")
+      )
+    }
+
+    if (!isURL(post.url)) {
+      return S.Just(
+        R.set(R.lensPath(["value", "url"]), "Post url must be a valid url")
+      )
+    }
   }
 
   return S.Nothing
@@ -78,7 +87,7 @@ export const validatePostCreateForm = validate([
     "Title length is limited to 300 characters"
   ),
   validation(emptyOrNil, R.lensPath(["value", "title"]), "Title is required"),
-  postUrlOrTextPresent
+  postURLValidation
 ])
 
 export const validateProfileForm = validate([

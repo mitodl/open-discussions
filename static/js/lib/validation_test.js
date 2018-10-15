@@ -130,6 +130,17 @@ describe("validation library", () => {
       })
     })
 
+    it("should complain about an invalid url on a url post", () => {
+      const post = {
+        value: { postType: LINK_TYPE_LINK, title: "potato", url: "potato" }
+      }
+      assert.deepEqual(validatePostCreateForm(post), {
+        value: {
+          url: "Post url must be a valid url"
+        }
+      })
+    })
+
     it("should complain about too long of a title", () => {
       const post = {
         value: {

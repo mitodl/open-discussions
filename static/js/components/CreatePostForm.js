@@ -119,7 +119,7 @@ export default class CreatePostForm extends React.Component<Props> {
           this.renderEmbed()
         ) : (
           <input
-            type="url"
+            type="text"
             placeholder="Paste a link to something related to the title..."
             name="url"
             value={url}
@@ -188,6 +188,7 @@ export default class CreatePostForm extends React.Component<Props> {
           <div className="actions row">
             <button
               className="cancel"
+              type="button"
               onClick={goBackAndHandleEvent(history)}
               disabled={processing}
             >
