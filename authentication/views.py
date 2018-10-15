@@ -184,6 +184,7 @@ class CustomPasswordResetEmail(DjoserPasswordResetEmail):
         """Adds base_url to the template context"""
         context = super().get_context_data()
         context['base_url'] = settings.SITE_BASE_URL
+        context['use_new_branding'] = features.is_enabled(features.USE_NEW_BRANDING)
         return context
 
 
