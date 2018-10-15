@@ -9,10 +9,9 @@ from channels.constants import (
 from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
-    serialize_bulk_post_and_comments,
     serialize_post_for_bulk,
     serialize_comment_for_bulk,
-)
+    serialize_bulk_comments)
 
 
 @pytest.fixture
@@ -21,7 +20,8 @@ def patched_base_post_serializer(mocker):
     base_serialized_data = {
         'author_id': 1,
         'author_name': 'Author Name',
-        'channel_title': 'channel_1',
+        'channel_title': 'channel 1',
+        'channel_name': 'channel_1',
         'text': 'Post Text',
         'score': 1,
         'created': 123,
@@ -84,6 +84,7 @@ def test_es_post_serializer(patched_base_post_serializer, reddit_submission_obj,
         'object_type': POST_TYPE,
         'author_id': base_serialized['author_id'],
         'author_name': base_serialized['author_name'],
+        'channel_name': base_serialized['channel_name'],
         'channel_title': base_serialized['channel_title'],
         'text': base_serialized['text'],
         'score': base_serialized['score'],
@@ -116,13 +117,14 @@ def test_es_comment_serializer(patched_base_comment_serializer, reddit_comment_o
         'deleted': base_serialized['deleted'],
         'comment_id': base_serialized['id'],
         'parent_comment_id': base_serialized['parent_id'],
-        'channel_title': reddit_comment_obj.subreddit.display_name,
+        'channel_name': reddit_comment_obj.subreddit.display_name,
+        'channel_title': reddit_comment_obj.subreddit.title,
         'post_id': reddit_comment_obj.submission.id,
         'post_title': reddit_comment_obj.submission.title,
     }
 
 
-def test_serialize_bulk_post_and_comments(mocker, patched_base_post_serializer, patched_base_comment_serializer):
+def test_serialize_bulk_comments(mocker, patched_base_comment_serializer):
     """index_comments should index comments and then call itself recursively to index more comments"""
     inner_comment_mock = mocker.Mock(
         id='comment_2',
@@ -133,8 +135,7 @@ def test_serialize_bulk_post_and_comments(mocker, patched_base_post_serializer, 
         replies=[inner_comment_mock]
     )
     post_mock = mocker.MagicMock(comments=[outer_comment_mock])
-    assert list(serialize_bulk_post_and_comments(post_mock)) == [
-        serialize_post_for_bulk(post_mock),
+    assert list(serialize_bulk_comments(post_mock)) == [
         serialize_comment_for_bulk(outer_comment_mock),
         serialize_comment_for_bulk(inner_comment_mock),
     ]

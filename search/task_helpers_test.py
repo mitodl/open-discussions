@@ -108,7 +108,8 @@ def test_update_post_text(mocker, reddit_submission_obj):
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
         gen_post_id(reddit_submission_obj.id),
-        {'text': reddit_submission_obj.selftext}
+        {'text': reddit_submission_obj.selftext},
+        POST_TYPE
     )
 
 
@@ -121,7 +122,8 @@ def test_update_comment_text(mocker, reddit_comment_obj):
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
         gen_comment_id(reddit_comment_obj.id),
-        {'text': reddit_comment_obj.body}
+        {'text': reddit_comment_obj.body},
+        COMMENT_TYPE
     )
 
 
@@ -143,12 +145,13 @@ def test_update_post_removal_status(mocker, reddit_submission_obj, removal_statu
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
         gen_post_id(reddit_submission_obj.id),
-        {'removed': expected_removed_arg}
+        {'removed': expected_removed_arg},
+        POST_TYPE
     )
     patched_comment_update_func.assert_called_with(
         reddit_submission_obj,
         field_name='parent_post_removed',
-        field_value=expected_removed_arg
+        field_value=expected_removed_arg,
     )
 
 
@@ -167,7 +170,8 @@ def test_update_comment_removal_status(mocker, reddit_comment_obj, removal_statu
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
         gen_comment_id(reddit_comment_obj.id),
-        {'removed': expected_removed_arg}
+        {'removed': expected_removed_arg},
+        COMMENT_TYPE
     )
 
 
@@ -191,7 +195,8 @@ def test_update_post_removal_for_comments(mocker, reddit_submission_obj):
             }
         },
         field_name=field_name,
-        field_value=field_value
+        field_value=field_value,
+        object_types=[COMMENT_TYPE]
     )
 
 
@@ -224,7 +229,8 @@ def test_set_comment_to_deleted(mocker, reddit_comment_obj):
     assert patched_partial_update_task.delay.called is True
     assert patched_partial_update_task.delay.call_args[0] == (
         gen_comment_id(reddit_comment_obj.id),
-        {'deleted': True}
+        {'deleted': True},
+        COMMENT_TYPE
     )
     assert patched_increment_task.delay.called is True
     assert patched_increment_task.delay.call_args[0] == (gen_post_id(reddit_comment_obj.submission.id),)

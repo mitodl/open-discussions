@@ -9,6 +9,7 @@ import pytest
 from channels.constants import POSTS_SORT_NEW
 from channels.utils import ListingParams
 from open_discussions.test_utils import assert_not_raises
+from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES
 from search.exceptions import (
     ReindexException,
     RetryException,
@@ -72,7 +73,7 @@ def test_create_document_task(mocked_api):
 
 def test_update_document_with_partial_task(mocked_api):
     """Test that the create_document task calls the indexing API function with the right args"""
-    indexing_api_args = ('doc_id', {'test': 'data'})
+    indexing_api_args = ('doc_id', {'test': 'data'}, COMMENT_TYPE)
     update_document_with_partial(*indexing_api_args)
     assert mocked_api.update_document_with_partial.call_count == 1
     assert mocked_api.update_document_with_partial.call_args[0] == indexing_api_args
@@ -83,7 +84,7 @@ def test_increment_document_integer_field_task(mocked_api):
     Test that the increment_document_integer_field task calls the indexing
     API function with the right args
     """
-    indexing_api_args = ('doc_id', {'test': 'data'}, 1)
+    indexing_api_args = ('doc_id', {'test': 'data'}, 1, POST_TYPE)
     increment_document_integer_field(*indexing_api_args)
     assert mocked_api.increment_document_integer_field.call_count == 1
     assert mocked_api.increment_document_integer_field.call_args[0] == indexing_api_args
@@ -94,7 +95,7 @@ def test_update_field_values_by_query(mocked_api):
     Test that the update_field_values_by_query task calls the indexing
     API function with the right args
     """
-    indexing_api_args = ({'query': {}}, 'field1', 'value1')
+    indexing_api_args = ({'query': {}}, 'field1', 'value1', POST_TYPE)
     update_field_values_by_query(*indexing_api_args)
     assert mocked_api.update_field_values_by_query.call_count == 1
     assert mocked_api.update_field_values_by_query.call_args[0] == indexing_api_args
@@ -188,9 +189,9 @@ def test_start_recreate_index(mocker, mocked_celery, settings, user):
 
     with pytest.raises(mocked_celery.replace_exception_class):
         start_recreate_index.delay()
-
-    create_backing_index_mock.assert_called_once_with()
-    finish_recreate_index_mock.s.assert_called_once_with(backing_index)
+    for doctype in VALID_OBJECT_TYPES:
+        create_backing_index_mock.assert_any_call(doctype)
+    finish_recreate_index_mock.s.assert_called_once_with({'post': backing_index, 'comment': backing_index})
     assert mocked_celery.group.call_count == 1
 
     # Celery's 'group' function takes a generator as an argument. In order to make assertions about the items
@@ -211,14 +212,15 @@ def test_finish_recreate_index(mocker, with_error):
     """
     finish_recreate_index should attach the backing index to the default alias
     """
-    backing_index = 'backing'
+    backing_indices = {'post': 'backing', 'comment': 'backing'}
     results = ['error'] if with_error else []
     switch_indices_mock = mocker.patch('search.indexing_api.switch_indices', autospec=True)
 
     if with_error:
         with pytest.raises(ReindexException):
-            finish_recreate_index.delay(results, backing_index)
+            finish_recreate_index.delay(results, backing_indices)
         assert switch_indices_mock.call_count == 0
     else:
-        finish_recreate_index.delay(results, backing_index)
-        switch_indices_mock.assert_called_once_with(backing_index)
+        finish_recreate_index.delay(results, backing_indices)
+        switch_indices_mock.assert_any_call('backing', POST_TYPE)
+        switch_indices_mock.assert_any_call('backing', COMMENT_TYPE)

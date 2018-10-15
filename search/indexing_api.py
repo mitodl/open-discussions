@@ -9,10 +9,6 @@ from elasticsearch.exceptions import ConflictError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from channels.constants import (
-    COMMENT_TYPE,
-    POST_TYPE,
-)
 from search.connection import (
     get_active_aliases,
     get_conn,
@@ -21,9 +17,11 @@ from search.connection import (
     make_backing_index_name,
     refresh_index,
 )
+from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, VALID_OBJECT_TYPES
 from search.exceptions import ReindexException
 from search.serializers import (
-    serialize_bulk_post_and_comments,
+    serialize_bulk_post,
+    serialize_bulk_comments
 )
 
 
@@ -34,35 +32,49 @@ User = get_user_model()
 GLOBAL_DOC_TYPE = '_doc'
 SCRIPTING_LANG = 'painless'
 UPDATE_CONFLICT_SETTING = 'proceed'
-COMBINED_MAPPING = {
+
+BASE_CONTENT_TYPE = {
     'object_type': {'type': 'keyword'},
     'author_id': {'type': 'keyword'},
     'author_name': {'type': 'keyword'},
-    'channel_title': {'type': 'keyword'},
+    'channel_name': {'type': 'keyword'},
+    'channel_title': {'type': 'text'},
     'text': {'type': 'text'},
     'score': {'type': 'long'},
     'created': {'type': 'date'},
     'deleted': {'type': 'boolean'},
     'removed': {'type': 'boolean'},
-    'parent_post_removed': {'type': 'boolean'},
     'post_id': {'type': 'keyword'},
     'post_title': {'type': 'text'},
-    'post_link_url': {'type': 'keyword'},
-    'post_link_thumbnail': {'type': 'keyword'},
-    'num_comments': {'type': 'long'},
-    'comment_id': {'type': 'keyword'},
-    'parent_comment_id': {'type': 'keyword'},
+}
+
+MAPPING = {
+    POST_TYPE: {
+        **BASE_CONTENT_TYPE,
+        'post_link_url': {'type': 'keyword'},
+        'post_link_thumbnail': {'type': 'keyword'},
+        'num_comments': {'type': 'long'},
+    },
+    COMMENT_TYPE: {
+        **BASE_CONTENT_TYPE,
+        'comment_id': {'type': 'keyword'},
+        'parent_comment_id': {'type': 'keyword'},
+        'parent_post_removed': {'type': 'boolean'},
+    },
 }
 
 
-def clear_and_create_index(*, index_name=None, skip_mapping=False):
+def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=None):
     """
     Wipe and recreate index and mapping. No indexing is done.
 
     Args:
         index_name (str): The name of the index to clear
         skip_mapping (bool): If true, don't set any mapping
+        object_type(str): The type of document (post, comment)
     """
+    if object_type not in VALID_OBJECT_TYPES:
+        raise ValueError('A valid object type must be specified when clearing and creating an index')
     conn = get_conn(verify=False)
     if conn.indices.exists(index_name):
         conn.indices.delete(index_name)
@@ -85,7 +97,7 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False):
     if not skip_mapping:
         index_create_data['mappings'] = {
             GLOBAL_DOC_TYPE: {
-                "properties": COMBINED_MAPPING
+                "properties": MAPPING[object_type]
             }
         }
     # from https://www.elastic.co/guide/en/elasticsearch/guide/current/asciifolding-token-filter.html
@@ -101,7 +113,7 @@ def create_document(doc_id, data):
         data (dict): Full ES document data
     """
     conn = get_conn(verify=True)
-    for alias in get_active_aliases():
+    for alias in get_active_aliases([data['object_type']]):
         conn.create(
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
@@ -110,7 +122,7 @@ def create_document(doc_id, data):
         )
 
 
-def update_field_values_by_query(query, field_name, field_value):
+def update_field_values_by_query(query, field_name, field_value, object_types=None):
     """
     Makes a request to ES to use the update_by_query API to update a single field
     value for all documents that match the given query.
@@ -119,9 +131,12 @@ def update_field_values_by_query(query, field_name, field_value):
         query (dict): A dict representing an ES query
         field_name (str): The name of the field that will be update
         field_value: The field value to set for all matching documents
+        object_types (list of str): The object types to query (post, comment, etc)
     """
+    if not object_types:
+        object_types = VALID_OBJECT_TYPES
     conn = get_conn(verify=True)
-    for alias in get_active_aliases():
+    for alias in get_active_aliases(object_types):
         es_response = conn.update_by_query(  # pylint: disable=unexpected-keyword-arg
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
@@ -149,18 +164,19 @@ def update_field_values_by_query(query, field_name, field_value):
             )
 
 
-def _update_document_by_id(doc_id, data, update_key=None):
+def _update_document_by_id(doc_id, data, object_type, update_key=None):
     """
     Makes a request to ES to update an existing document
 
     Args:
         doc_id (str): The ES document id
         data (dict): Full ES document data
+        object_type (str): The object type to update (post, comment, etc)
         update_key (str): A key indicating the type of update request to Elasticsearch
             (e.g.: 'script', 'doc')
     """
     conn = get_conn(verify=True)
-    for alias in get_active_aliases():
+    for alias in get_active_aliases([object_type]):
         try:
             conn.update(
                 index=alias,
@@ -181,12 +197,13 @@ def _update_document_by_id(doc_id, data, update_key=None):
 update_document_with_partial = partial(_update_document_by_id, update_key='doc')
 
 
-def increment_document_integer_field(doc_id, field_name, incr_amount):
+def increment_document_integer_field(doc_id, field_name, incr_amount, object_type):
     """
     Makes a request to ES to increment some integer field in a document
 
     Args:
         doc_id (str): The ES document id
+        object_type (str): The object type to update (post, comment, etc)
         field_name (str): The name of the field to increment
         incr_amount (int): The amount to increment by
     """
@@ -199,36 +216,51 @@ def increment_document_integer_field(doc_id, field_name, incr_amount):
                 "incr_amount": incr_amount
             }
         },
+        object_type,
         update_key='script'
     )
 
 
-def sync_post_and_comments(serialized):
+def sync_post(serialized):
     """
-    Sync posts and comments in serialized data
+    Sync posts in serialized data
 
     Args:
-        serialized (iterable of dict): An iterable of serialized elasticsearch documents
+        serialized (iterable of dict): An iterable of serialized elasticsearch post documents
 
     Returns:
          iterable of dict: Passes through the serialized data unaltered
     """
-    from channels.api import sync_post_model, sync_comment_model
+    from channels.api import sync_post_model
 
     for item in serialized:
-        if item['object_type'] == POST_TYPE:
-            sync_post_model(
-                channel_name=item['channel_title'],
-                post_id=item['post_id'],
-                post_url=item['post_link_url']
-            )
-        elif item['object_type'] == COMMENT_TYPE:
-            sync_comment_model(
-                channel_name=item['channel_title'],
-                post_id=item['post_id'],
-                comment_id=item['comment_id'],
-                parent_id=item['parent_comment_id'],
-            )
+        sync_post_model(
+            channel_name=item['channel_title'],
+            post_id=item['post_id'],
+            post_url=item['post_link_url']
+        )
+        yield item
+
+
+def sync_comments(serialized):
+    """
+    Sync comments in serialized data
+
+    Args:
+        serialized (iterable of dict): An iterable of serialized elasticsearch comment documents
+
+    Returns:
+         iterable of dict: Passes through the serialized data unaltered
+    """
+    from channels.api import sync_comment_model
+
+    for item in serialized:
+        sync_comment_model(
+            channel_name=item['channel_title'],
+            post_id=item['post_id'],
+            comment_id=item['comment_id'],
+            parent_id=item['parent_comment_id'],
+        )
         yield item
 
 
@@ -249,24 +281,41 @@ def index_post_with_comments(post_id):
     # Make sure all morecomments are replaced before serializing
     comments.replace_more(limit=None)
 
-    for alias in get_active_aliases():
+    for alias in get_active_aliases([POST_TYPE]):
         _, errors = bulk(
             conn,
-            sync_post_and_comments(serialize_bulk_post_and_comments(post)),
+            sync_post(serialize_bulk_post(post)),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )
         if len(errors) > 0:
-            raise ReindexException("Error during bulk insert: {errors}".format(
+            raise ReindexException("Error during bulk post insert: {errors}".format(
+                errors=errors
+            ))
+
+    for alias in get_active_aliases([COMMENT_TYPE]):
+        _, errors = bulk(
+            conn,
+            sync_comments(serialize_bulk_comments(post)),
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            # Adjust chunk size from 500 depending on environment variable
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+        if len(errors) > 0:
+            raise ReindexException("Error during bulk comment insert: {errors}".format(
                 errors=errors
             ))
 
 
-def create_backing_index():
+def create_backing_index(object_type):
     """
     Start the reindexing process by creating a new backing index and pointing the reindex alias toward it
+
+    Args:
+        object_type (str): The object type for the index (post, comment, etc)
 
     Returns:
         str: The new backing index
@@ -274,11 +323,11 @@ def create_backing_index():
     conn = get_conn(verify=False)
 
     # Create new backing index for reindex
-    new_backing_index = make_backing_index_name()
+    new_backing_index = make_backing_index_name(object_type)
 
     # Clear away temp alias so we can reuse it, and create mappings
-    clear_and_create_index(index_name=new_backing_index)
-    temp_alias = get_reindexing_alias_name()
+    clear_and_create_index(index_name=new_backing_index, object_type=object_type)
+    temp_alias = get_reindexing_alias_name(object_type)
     if conn.indices.exists_alias(name=temp_alias):
         # Deletes both alias and backing indexes
         indices = conn.indices.get_alias(temp_alias).keys()
@@ -291,33 +340,51 @@ def create_backing_index():
     return new_backing_index
 
 
-def switch_indices(backing_index):
+def switch_indices(backing_index, object_type):
     """
     Switch the default index to point to the backing index, and delete the reindex alias
 
     Args:
         backing_index (str): The backing index of the reindex alias
+        object_type (str): The object type for the index (post, comment, etc)
     """
     conn = get_conn(verify=False)
     actions = []
     old_backing_indexes = []
-    default_alias = get_default_alias_name()
+    default_alias = get_default_alias_name(object_type)
+    global_alias = get_default_alias_name(ALIAS_ALL_INDICES)
     if conn.indices.exists_alias(name=default_alias):
         # Should only be one backing index in normal circumstances
         old_backing_indexes = list(conn.indices.get_alias(name=default_alias).keys())
         for index in old_backing_indexes:
-            actions.append({
-                "remove": {
-                    "index": index,
-                    "alias": default_alias,
+            actions.extend([
+                {
+                    "remove": {
+                        "index": index,
+                        "alias": default_alias,
+                    }
+                },
+                {
+                    "remove": {
+                        "index": index,
+                        "alias": global_alias,
+                    }
                 }
-            })
-    actions.append({
-        "add": {
-            "index": backing_index,
-            "alias": default_alias,
+            ])
+    actions.extend([
+        {
+            "add": {
+                "index": backing_index,
+                "alias": default_alias,
+            },
         },
-    })
+        {
+            "add": {
+                "index": backing_index,
+                "alias": global_alias,
+            },
+        },
+    ])
     conn.indices.update_aliases({
         "actions": actions
     })
@@ -326,4 +393,4 @@ def switch_indices(backing_index):
         conn.indices.delete(index)
 
     # Finally, remove the link to the reindexing alias
-    conn.indices.delete_alias(name=get_reindexing_alias_name(), index=backing_index)
+    conn.indices.delete_alias(name=get_reindexing_alias_name(object_type), index=backing_index)
