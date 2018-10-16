@@ -1,3 +1,3 @@
 // @flow
 
-export const formatTitle = (text: string) => `${text} | MIT Open Discussions`
+export const formatTitle = (text: string) => `${text} | MIT Open Learning`
