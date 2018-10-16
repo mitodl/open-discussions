@@ -24,11 +24,18 @@ from authentication.exceptions import (
 from authentication.utils import SocialAuthState
 from profiles.models import Profile
 from profiles.serializers import ProfileSerializer
-from open_discussions.utils import filter_dict_keys
 
 log = logging.getLogger()
 
 User = get_user_model()
+
+
+class SocialAuthProfileSerializer(ProfileSerializer):
+    """A filtered version of ProfileSerializer"""
+
+    class Meta(ProfileSerializer.Meta):
+        fields = ("profile_image_small", "name")
+        read_only_fields = ("profile_image_small", "name")
 
 
 class SocialAuthSerializer(serializers.Serializer):
@@ -45,6 +52,14 @@ class SocialAuthSerializer(serializers.Serializer):
     state = serializers.CharField(read_only=True)
     errors = serializers.ListField(read_only=True)
     redirect_url = serializers.CharField(read_only=True, default=None)
+    extra_data = serializers.SerializerMethodField()
+
+    def get_extra_data(self, instance):
+        """Serialize extra_data"""
+        extra_data = {}
+        if instance.profile:
+            extra_data.update(SocialAuthProfileSerializer(instance.profile).data)
+        return extra_data
 
     def _save_next(self, data):
         """Persists the next url to the session"""
@@ -119,8 +134,15 @@ class SocialAuthSerializer(serializers.Serializer):
             )
 
     def save(self, **kwargs):
+        """'Save' the auth request"""
         try:
             result = super().save(**kwargs)
+        except RequireProviderException as exc:
+            result = SocialAuthState(
+                SocialAuthState.STATE_LOGIN_PROVIDER,
+                provider=exc.social_auth.provider,
+                profile=exc.social_auth.user.profile,
+            )
         except InvalidEmail:
             result = SocialAuthState(SocialAuthState.STATE_INVALID_EMAIL)
         except AuthException as exc:
@@ -156,22 +178,14 @@ class LoginEmailSerializer(SocialAuthSerializer):
         source="partial.token", read_only=True, default=None
     )
     email = serializers.EmailField(write_only=True)
-    extra_data = serializers.JSONField(read_only=True)
     next = serializers.CharField(write_only=True, required=False)
 
     def create(self, validated_data):
         """Try to 'save' the request"""
-        profile_to_serialize = None
-
         self._save_next(validated_data)
 
         try:
             result = super()._authenticate(SocialAuthState.FLOW_LOGIN)
-        except RequireProviderException as exc:
-            result = SocialAuthState(
-                SocialAuthState.STATE_LOGIN_PROVIDER, provider=exc.social_auth.provider
-            )
-            profile_to_serialize = exc.social_auth.user.profile
         except RequireRegistrationException:
             result = SocialAuthState(
                 SocialAuthState.STATE_ERROR,
@@ -179,16 +193,12 @@ class LoginEmailSerializer(SocialAuthSerializer):
             )
         except RequirePasswordException as exc:
             result = SocialAuthState(
-                SocialAuthState.STATE_LOGIN_PASSWORD, partial=exc.partial
-            )
-            profile_to_serialize = Profile.objects.filter(
-                user__social_auth__uid=validated_data.get("email"),
-                user__social_auth__provider=EmailAuth.name,
-            ).first()
-        if profile_to_serialize:
-            profile_data = ProfileSerializer(profile_to_serialize).data
-            result.extra_data = filter_dict_keys(
-                profile_data, ["profile_image_small", "name"]
+                SocialAuthState.STATE_LOGIN_PASSWORD,
+                partial=exc.partial,
+                profile=Profile.objects.filter(
+                    user__social_auth__uid=validated_data.get("email"),
+                    user__social_auth__provider=EmailAuth.name,
+                ).first(),
             )
         return result
 

@@ -15,11 +15,7 @@ import {
 import { toQueryString } from "../lib/url"
 import { getPaginationSortParams } from "../lib/posts"
 
-import type {
-  AuthResponse,
-  EmailDetailAuthResponse,
-  AuthFlow
-} from "../flow/authTypes"
+import type { AuthResponse, AuthFlow } from "../flow/authTypes"
 import type {
   Channel,
   ChannelContributors,
@@ -419,7 +415,7 @@ export const postEmailLogin = (
   flow: AuthFlow,
   email: string,
   next: string
-): Promise<EmailDetailAuthResponse> =>
+): Promise<AuthResponse> =>
   fetchJSONWithCSRF("/api/v0/login/email/", {
     method: POST,
     body:   JSON.stringify({ flow, email, next })

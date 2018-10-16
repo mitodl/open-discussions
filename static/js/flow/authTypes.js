@@ -46,12 +46,10 @@ export type AuthResponse = {
   state:         AuthStates,
   errors:        Array<string>,
   email?:        string,
-  redirect_url:  ?string
-}
-
-export type EmailDetailAuthResponse = {
-  extra_data?: {
-    name: string,
-    profile_image_small: string
+  redirect_url:  ?string,
+  extra_data: {
+    name?: string,
+    profile_image_small?: string,
+    email?: string
   }
-} & AuthResponse
+}

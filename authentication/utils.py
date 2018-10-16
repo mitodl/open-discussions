@@ -42,6 +42,7 @@ class SocialAuthState:
         flow=None,
         errors=None,
         redirect_url=None,
+        profile=None,
     ):  # pylint: disable=too-many-arguments
         self.state = state
         self.partial = partial
@@ -49,6 +50,7 @@ class SocialAuthState:
         self.provider = provider
         self.errors = errors or []
         self.redirect_url = redirect_url
+        self.profile = profile
 
 
 def load_drf_strategy(request=None):

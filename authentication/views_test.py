@@ -35,6 +35,15 @@ def email_user(user):
 
 
 @pytest.fixture
+def mm_user(user):
+    """Fixture for a user that has a 'micromasters' type UserSocialAuth"""
+    UserSocialAuthFactory.create(
+        user=user, provider=MicroMastersAuth.name, uid=user.email
+    )
+    return user
+
+
+@pytest.fixture
 def email_auth_enabled(settings):
     """Ensure email auth is enabled"""
     settings.FEATURES[features.EMAIL_AUTH] = True
@@ -65,6 +74,7 @@ def assert_api_call(
     expected,
     expect_authenticated=False,
     expect_status=status.HTTP_200_OK,
+    use_defaults=True,
 ):
     """Run the API call and perform basic assertions"""
     assert bool(get_user(client).is_authenticated) is False
@@ -72,7 +82,17 @@ def assert_api_call(
     response = client.post(reverse(url), payload)
     actual = response.json()
 
-    assert actual == expected
+    defaults = {
+        "errors": [],
+        "redirect_url": None,
+        "extra_data": {},
+        "state": None,
+        "provider": None,
+        "flow": None,
+        "partial_token": any_instance_of(str),
+    }
+
+    assert actual == ({**defaults, **expected} if use_defaults else expected)
     assert response.status_code == expect_status
 
     assert bool(get_user(client).is_authenticated) is expect_authenticated
@@ -124,11 +144,8 @@ def login_email_exists(client, email_user):
                 "next": NEXT_URL,
             },
             {
-                "errors": [],
                 "flow": SocialAuthState.FLOW_LOGIN,
                 "provider": EmailAuth.name,
-                "redirect_url": None,
-                "partial_token": any_instance_of(str),
                 "state": SocialAuthState.STATE_LOGIN_PASSWORD,
                 "extra_data": {
                     "name": email_user.profile.name,
@@ -155,11 +172,8 @@ def login_email_next(client, email_user):
                 "next": NEXT_URL,
             },
             {
-                "errors": [],
                 "flow": SocialAuthState.FLOW_LOGIN,
                 "provider": EmailAuth.name,
-                "redirect_url": None,
-                "partial_token": any_instance_of(str),
                 "state": SocialAuthState.STATE_LOGIN_PASSWORD,
                 "extra_data": {
                     "name": email_user.profile.name,
@@ -172,28 +186,23 @@ def login_email_next(client, email_user):
 
 
 @pytest.fixture()
-def login_email_mm_only(client, user):
+def login_email_mm_only(client, mm_user):
     """Yield a function for this step"""
 
     def run_step(last_result):  # pylint: disable=unused-argument
         """Run the step"""
-        UserSocialAuthFactory.create(
-            user=user, provider=MicroMastersAuth.name, uid=user.username
-        )
         return assert_api_call(
             client,
             "psa-login-email",
-            {"flow": SocialAuthState.FLOW_LOGIN, "email": user.email},
+            {"flow": SocialAuthState.FLOW_LOGIN, "email": mm_user.email},
             {
-                "errors": [],
                 "flow": SocialAuthState.FLOW_LOGIN,
                 "provider": MicroMastersAuth.name,
-                "redirect_url": None,
                 "partial_token": None,
                 "state": SocialAuthState.STATE_LOGIN_PROVIDER,
                 "extra_data": {
-                    "name": user.profile.name,
-                    "profile_image_small": user.profile.image_small_file.url,
+                    "name": mm_user.profile.name,
+                    "profile_image_small": mm_user.profile.image_small_file.url,
                 },
             },
         )
@@ -221,10 +230,8 @@ def login_email_saml_exists(client, user, settings):
             "psa-login-email",
             {"flow": SocialAuthState.FLOW_LOGIN, "email": user.email},
             {
-                "errors": [],
                 "flow": SocialAuthState.FLOW_LOGIN,
                 "provider": SAMLAuth.name,
-                "redirect_url": None,
                 "partial_token": None,
                 "state": SocialAuthState.STATE_LOGIN_PROVIDER,
                 "extra_data": {
@@ -255,9 +262,39 @@ def register_email_exists(client, user, mock_email_send):
                 "errors": ["Password is required to login"],
                 "flow": SocialAuthState.FLOW_REGISTER,
                 "provider": EmailAuth.name,
-                "redirect_url": None,
-                "partial_token": any_instance_of(str),
                 "state": SocialAuthState.STATE_LOGIN_PASSWORD,
+            },
+        )
+        mock_email_send.assert_not_called()
+        return result
+
+    yield run_step
+
+
+@pytest.fixture()
+def register_mm_exists(client, mm_user, mock_email_send):
+    """Yield a function for this step"""
+
+    def run_step(last_result):  # pylint: disable=unused-argument
+        """Run the step"""
+        result = assert_api_call(
+            client,
+            "psa-register-email",
+            {
+                "flow": SocialAuthState.FLOW_REGISTER,
+                "email": mm_user.email,
+                "next": NEXT_URL,
+            },
+            {
+                "errors": [],
+                "flow": SocialAuthState.FLOW_REGISTER,
+                "provider": MicroMastersAuth.name,
+                "partial_token": None,
+                "state": SocialAuthState.STATE_LOGIN_PROVIDER,
+                "extra_data": {
+                    "name": mm_user.profile.name,
+                    "profile_image_small": mm_user.profile.image_small_file.url,
+                },
             },
         )
         mock_email_send.assert_not_called()
@@ -280,7 +317,6 @@ def login_email_not_exists(client):
                 "errors": ["Couldn't find your MIT OPEN Account"],
                 "flow": SocialAuthState.FLOW_LOGIN,
                 "provider": EmailAuth.name,
-                "redirect_url": None,
                 "partial_token": None,
                 "state": SocialAuthState.STATE_ERROR,
             },
@@ -302,10 +338,8 @@ def register_email_not_exists(client, mock_email_send):
             "psa-register-email",
             {"flow": SocialAuthState.FLOW_REGISTER, "email": NEW_EMAIL},
             {
-                "errors": [],
                 "flow": SocialAuthState.FLOW_REGISTER,
                 "provider": EmailAuth.name,
-                "redirect_url": None,
                 "partial_token": None,
                 "state": SocialAuthState.STATE_REGISTER_CONFIRM_SENT,
             },
@@ -335,10 +369,8 @@ def register_email_not_exists_with_recaptcha(
                 "recaptcha": "fake",
             },
             {
-                "errors": [],
                 "flow": SocialAuthState.FLOW_REGISTER,
                 "provider": EmailAuth.name,
-                "redirect_url": None,
                 "partial_token": None,
                 "state": SocialAuthState.STATE_REGISTER_CONFIRM_SENT,
             },
@@ -367,8 +399,9 @@ def register_email_not_exists_with_recaptcha_invalid(
                 "email": NEW_EMAIL,
                 "recaptcha": "fake",
             },
-            {"success": False, "error-codes": ["bad-request"]},
+            {"error-codes": ["bad-request"], "success": False},
             expect_status=status.HTTP_400_BAD_REQUEST,
+            use_defaults=False,
         )
         mock_recaptcha_failure.assert_called_once()
         mock_email_send.assert_not_called()
@@ -395,7 +428,6 @@ def login_password_valid(client, user):
                 "password": password,
             },
             {
-                "errors": [],
                 "flow": SocialAuthState.FLOW_LOGIN,
                 "provider": EmailAuth.name,
                 "redirect_url": NEXT_URL,
@@ -427,10 +459,8 @@ def login_password_user_inactive(client, user):
                 "password": password,
             },
             {
-                "errors": [],
                 "flow": SocialAuthState.FLOW_LOGIN,
                 "provider": EmailAuth.name,
-                "redirect_url": None,
                 "partial_token": None,
                 "state": SocialAuthState.STATE_INACTIVE,
             },
@@ -459,8 +489,6 @@ def login_password_invalid(client, user):
                 "errors": ["Unable to login with that email and password combination"],
                 "flow": SocialAuthState.FLOW_LOGIN,
                 "provider": EmailAuth.name,
-                "redirect_url": None,
-                "partial_token": any_instance_of(str),
                 "state": SocialAuthState.STATE_ERROR,
             },
         )
@@ -484,11 +512,8 @@ def redeem_confirmation_code(client, mock_email_send):
                 "partial_token": partial_token,
             },
             {
-                "errors": [],
                 "flow": SocialAuthState.FLOW_REGISTER,
                 "provider": EmailAuth.name,
-                "redirect_url": None,
-                "partial_token": any_instance_of(str),
                 "state": SocialAuthState.STATE_REGISTER_DETAILS,
             },
         )
@@ -512,10 +537,8 @@ def register_profile_details(client):
                 "name": "Sally Smith",
             },
             {
-                "errors": [],
                 "flow": SocialAuthState.FLOW_REGISTER,
                 "provider": EmailAuth.name,
-                "redirect_url": None,
                 "partial_token": None,
                 "state": SocialAuthState.STATE_SUCCESS,
             },
@@ -583,6 +606,7 @@ def test_login_email_error(settings, client, mocker):
         "redirect_url": None,
         "partial_token": None,
         "state": SocialAuthState.STATE_ERROR,
+        "extra_data": {},
     }
     assert response.status_code == status.HTTP_200_OK
 
