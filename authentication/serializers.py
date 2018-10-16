@@ -41,7 +41,7 @@ class SocialAuthProfileSerializer(ProfileSerializer):
 class SocialAuthSerializer(serializers.Serializer):
     """Serializer for social auth"""
 
-    partial_token = serializers.CharField(source="partial.token", default=None)
+    partial_token = serializers.CharField(source="get_partial_token", default=None)
     flow = serializers.ChoiceField(
         choices=(
             (SocialAuthState.FLOW_LOGIN, "Login"),
@@ -175,7 +175,7 @@ class LoginEmailSerializer(SocialAuthSerializer):
     """Serializer for email login"""
 
     partial_token = serializers.CharField(
-        source="partial.token", read_only=True, default=None
+        source="get_partial_token", read_only=True, default=None
     )
     email = serializers.EmailField(write_only=True)
     next = serializers.CharField(write_only=True, required=False)
@@ -257,7 +257,7 @@ class RegisterEmailSerializer(SocialAuthSerializer):
 class RegisterConfirmSerializer(SocialAuthSerializer):
     """Serializer for email confirmation"""
 
-    partial_token = serializers.CharField(source="partial.token")
+    partial_token = serializers.CharField(source="get_partial_token")
     verification_code = serializers.CharField(write_only=True)
 
     def create(self, validated_data):

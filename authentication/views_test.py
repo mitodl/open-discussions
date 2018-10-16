@@ -522,6 +522,34 @@ def redeem_confirmation_code(client, mock_email_send):
 
 
 @pytest.fixture()
+def redeem_confirmation_code_twice(client, mock_email_send):
+    """Yield a function for this step"""
+
+    def run_step(last_result):  # pylint: disable=unused-argument
+        """Run the step"""
+        _, _, code, partial_token = mock_email_send.call_args[0]
+        return assert_api_call(
+            client,
+            "psa-register-confirm",
+            {
+                "flow": SocialAuthState.FLOW_REGISTER,
+                "verification_code": code.code,
+                "partial_token": partial_token,
+            },
+            {
+                "errors": [],
+                "flow": SocialAuthState.FLOW_REGISTER,
+                "provider": EmailAuth.name,
+                "redirect_url": None,
+                "partial_token": None,
+                "state": SocialAuthState.STATE_INVALID_EMAIL,
+            },
+        )
+
+    yield run_step
+
+
+@pytest.fixture()
 def register_profile_details(client):
     """Yield a function for this step"""
 
@@ -568,6 +596,11 @@ def register_profile_details(client):
             "register_email_not_exists_with_recaptcha",
             "redeem_confirmation_code",
             "register_profile_details",
+        ],
+        [
+            "register_email_not_exists",
+            "redeem_confirmation_code",
+            "redeem_confirmation_code_twice",
         ],
         ["register_email_not_exists_with_recaptcha_invalid"],
         ["login_email_mm_only"],

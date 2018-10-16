@@ -52,6 +52,10 @@ class SocialAuthState:
         self.redirect_url = redirect_url
         self.profile = profile
 
+    def get_partial_token(self):
+        """Return the partial token or None"""
+        return self.partial.token if self.partial else None
+
 
 def load_drf_strategy(request=None):
     """Returns the DRF strategy"""
