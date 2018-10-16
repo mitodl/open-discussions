@@ -5,6 +5,7 @@ from datetime import (
     datetime,
     timezone,
 )
+from urllib.parse import urlparse
 
 from django.contrib.auth import get_user_model
 from praw.models import Comment, MoreComments
@@ -244,6 +245,7 @@ class BasePostSerializer(RedditObjectSerializer):
     (no deserialization or validation), and does not fetch/serialize Subscription data
     """
     url = WriteableSerializerMethodField(allow_null=True)
+    url_domain = serializers.SerializerMethodField()
     thumbnail = WriteableSerializerMethodField(allow_null=True)
     text = WriteableSerializerMethodField(allow_null=True)
     title = serializers.CharField()
@@ -269,6 +271,10 @@ class BasePostSerializer(RedditObjectSerializer):
     def get_url(self, instance):
         """Returns a url or null depending on if it's a self post"""
         return instance.url if not instance.is_self else None
+
+    def get_url_domain(self, instance):
+        """Returns the url's domain or None"""
+        return urlparse(instance.url).hostname if not instance.is_self else None
 
     def get_thumbnail(self, instance):
         """ Returns a thumbnail url or null"""
@@ -900,4 +906,4 @@ class ReportedContentSerializer(serializers.Serializer):
         Returns:
             list of str: list of reasons a post/comment has been reported for
         """
-        return sorted(list(set([report[0] for report in instance.user_reports + instance.mod_reports])))
+        return sorted({report[0] for report in instance.user_reports + instance.mod_reports})

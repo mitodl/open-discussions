@@ -55,6 +55,7 @@ class ESPostSerializer(ESSerializer):
     use_keys = [
         'author_id',
         'author_name',
+        'channel_name',
         'channel_title',
         'text',
         'score',
@@ -106,7 +107,8 @@ class ESCommentSerializer(ESSerializer):
         return {
             'author_id': None if serialized_data['author_id'] == '[deleted]' else serialized_data['author_id'],
             'author_name': None if serialized_data['author_name'] == '[deleted]' else serialized_data['author_name'],
-            'channel_title': reddit_obj.subreddit.display_name,
+            'channel_title': reddit_obj.subreddit.title,
+            'channel_name': reddit_obj.subreddit.display_name,
             'post_id': reddit_obj.submission.id,
             'post_title': reddit_obj.submission.title,
         }
@@ -127,14 +129,23 @@ def _serialize_comment_tree_for_bulk(comments):
         yield from _serialize_comment_tree_for_bulk(comment.replies)
 
 
-def serialize_bulk_post_and_comments(post_obj):
+def serialize_bulk_post(post_obj):
+    """
+    Index a post
+
+    Args:
+        post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
+    """
+    yield serialize_post_for_bulk(post_obj)
+
+
+def serialize_bulk_comments(post_obj):
     """
     Index comments for a post and recurse to deeper level comments for a bulk API request
 
     Args:
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
-    yield serialize_post_for_bulk(post_obj)
     yield from _serialize_comment_tree_for_bulk(post_obj.comments)
 
 

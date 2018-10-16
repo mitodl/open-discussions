@@ -7,6 +7,7 @@ import uuid
 from django.conf import settings
 from elasticsearch_dsl.connections import connections
 
+from search.constants import VALID_OBJECT_TYPES
 
 _CONN = None
 # When we create the connection, check to make sure all appropriate mappings exist
@@ -52,56 +53,69 @@ def get_conn(*, verify=True):
             _CONN_VERIFIED = False
         return _CONN
 
-    if len(get_active_aliases()) == 0:
+    if len(get_active_aliases(VALID_OBJECT_TYPES)) == 0:
         raise Exception("Unable to find any active indices to update")
 
     _CONN_VERIFIED = True
     return _CONN
 
 
-def make_backing_index_name():
+def make_backing_index_name(object_type):
     """
     Make a unique name for use for a backing index
+
+    Args:
+        object_type(str): The object type (post, comment, profile)
 
     Returns:
         str: A new name for a backing index
     """
-    return "{prefix}_{hash}".format(
+    return "{prefix}_{object_type}_{hash}".format(
         prefix=settings.ELASTICSEARCH_INDEX,
+        object_type=object_type,
         hash=uuid.uuid4().hex,
     )
 
 
-def make_alias_name(*, is_reindexing):
+def make_alias_name(is_reindexing, object_type):
     """
     Make the name used for the Elasticsearch alias
 
     Args:
+        object_type(str): The object type of the index (post, comment, etc)
         is_reindexing (bool): If true, use the alias name meant for reindexing
 
     Returns:
         str: The name of the alias
     """
-    return "{prefix}_{suffix}".format(
+    return "{prefix}_{object_type}_{suffix}".format(
         prefix=settings.ELASTICSEARCH_INDEX,
+        object_type=object_type,
         suffix='reindexing' if is_reindexing else 'default'
     )
 
 
-get_default_alias_name = partial(make_alias_name, is_reindexing=False)
-get_reindexing_alias_name = partial(make_alias_name, is_reindexing=True)
+get_default_alias_name = partial(make_alias_name, False)
+get_reindexing_alias_name = partial(make_alias_name, True)
 
 
-def get_active_aliases():
+def get_active_aliases(object_types):
     """
-    Returns aliases which exist
+    Returns aliases which exist for specified object types
+
+    Args:
+        object_types(list of str): list of object types (post, comment, etc)
 
     Returns:
         list of str: Aliases which exist
     """
+    if not object_types:
+        object_types = VALID_OBJECT_TYPES
     conn = get_conn(verify=False)
     return [
-        alias for alias in [get_default_alias_name(), get_reindexing_alias_name()]
+        alias for alias_tuple in [
+            (get_default_alias_name(obj), get_reindexing_alias_name(obj)) for obj in object_types
+        ] for alias in alias_tuple
         if conn.indices.exists(alias)
     ]
 

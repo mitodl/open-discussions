@@ -8,10 +8,9 @@ from channels.constants import (
     POSTS_SORT_HOT,
     VALID_POST_SORT_TYPES,
 )
-from channels.utils import get_reddit_slug
+from channels.views.test_utils import default_post_response_data
 from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.features import ANONYMOUS_ACCESS
-from profiles.utils import image_uri
 
 pytestmark = pytest.mark.betamax
 
@@ -30,7 +29,7 @@ def test_frontpage_empty(client, logged_in_profile):
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
-def test_frontpage(client, private_channel_and_contributor, reddit_factories, missing_user):
+def test_frontpage(user_client, private_channel_and_contributor, reddit_factories, missing_user):
     """View the front page"""
     channel, user = private_channel_and_contributor
     first_post = reddit_factories.text_post('my post', user, channel=channel)
@@ -38,36 +37,14 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
     third_post = reddit_factories.text_post('my 3rd post', user, channel=channel)
     fourth_post = reddit_factories.text_post('my 4th post', user, channel=channel)
 
-    client.force_login(user)
-
     url = reverse('frontpage')
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
-        'posts': [{
-            "url": None,
-            "thumbnail": None,
-            "text": post.text,
-            "title": post.title,
-            "upvoted": True,
-            "removed": False,
-            "deleted": False,
-            'subscribed': False,
-            "score": 1,
-            "author_id": user.username,
-            "id": post.id,
-            "slug": get_reddit_slug(post.permalink),
-            "created": post.created,
-            "num_comments": 0,
-            "channel_name": channel.name,
-            "channel_title": channel.title,
-            "author_name": user.profile.name,
-            "author_headline": user.profile.headline,
-            "profile_image": image_uri(user.profile),
-            "edited": False,
-            "stickied": False,
-            "num_reports": None,
-        } for post in [fourth_post, third_post, second_post, first_post]],
+        'posts': [
+            default_post_response_data(channel, post, user)
+            for post in [fourth_post, third_post, second_post, first_post]
+        ],
         'pagination': {
             'sort': POSTS_SORT_HOT,
         },
@@ -75,7 +52,7 @@ def test_frontpage(client, private_channel_and_contributor, reddit_factories, mi
 
 
 @pytest.mark.parametrize("sort", VALID_POST_SORT_TYPES)
-def test_frontpage_sorted(client, private_channel_and_contributor, reddit_factories, sort):
+def test_frontpage_sorted(user_client, private_channel_and_contributor, reddit_factories, sort):
     """View the front page with sorted options"""
     # note: these sort types are difficult to reproduce unique sort orders in the span of a test,
     #       so we're just checking that the APIs don't error
@@ -85,36 +62,14 @@ def test_frontpage_sorted(client, private_channel_and_contributor, reddit_factor
     third_post = reddit_factories.text_post('my 3rd post', user, channel=channel)
     fourth_post = reddit_factories.text_post('my 4th post', user, channel=channel)
 
-    client.force_login(user)
-
     url = reverse('frontpage')
-    resp = client.get(url, {'sort': sort})
+    resp = user_client.get(url, {'sort': sort})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
-        'posts': [{
-            "url": None,
-            "thumbnail": None,
-            "text": post.text,
-            "title": post.title,
-            "upvoted": True,
-            "removed": False,
-            "deleted": False,
-            'subscribed': False,
-            "score": 1,
-            "author_id": user.username,
-            "id": post.id,
-            "slug": get_reddit_slug(post.permalink),
-            "created": post.created,
-            "num_comments": 0,
-            "channel_name": channel.name,
-            "channel_title": channel.title,
-            "author_name": user.profile.name,
-            "author_headline": user.profile.headline,
-            "profile_image": image_uri(user.profile),
-            "edited": False,
-            "stickied": False,
-            'num_reports': None,
-        } for post in [fourth_post, third_post, second_post, first_post]],
+        'posts': [
+            default_post_response_data(channel, post, user)
+            for post in [fourth_post, third_post, second_post, first_post]
+        ],
         'pagination': {
             'sort': sort,
         },

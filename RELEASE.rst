@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.50.0
+--------------
+
+- 'Open Discussions' -> 'Open Learning' (#1355)
+- add checkbox to PR template for mobile screenshots (#1362)
+- Split posts and comments into separate Elasticsearch indices (#1341)
+- Added a screenshots section to PR template (#1348)
+- Hide useless asteroid warnings when running tests (#1340)
+- Added hover highlight on post card
+- Third pass of email templates
+
 Version 0.49.2 (Released October 12, 2018)
 --------------
 

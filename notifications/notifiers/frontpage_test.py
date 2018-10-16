@@ -23,7 +23,7 @@ from open_discussions.test_utils import any_instance_of
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures('notifier_settings'),
+    pytest.mark.usefixtures('notifier_settings', 'authenticated_site'),
 ]
 
 
@@ -129,7 +129,6 @@ def test_send_notification(mocker, user):
     })
 
     send_messages_mock.assert_called_once_with([any_instance_of(EmailMessage)])
-    assert send_messages_mock.call_args[0][0][0].subject == 'post\'s title'
 
 
 def test_send_notification_no_posts(mocker):

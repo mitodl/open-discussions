@@ -1,4 +1,4 @@
-astroid==1.5.3 # fix https://github.com/PyCQA/pylint/issues/1609
+astroid==2.0.4
 bpython
 codecov
 ddt
@@ -7,14 +7,14 @@ ipdb
 nplusone>=0.8.1
 pdbpp
 pip-tools
-pylint==1.7.1
-pylint-django==0.7.2
+pylint==2.1.1
+pylint-django==2.0.2
 pytest
 pytest-cov
 pytest-django
 pytest-pep8
 pytest-mock
-pytest-pylint==0.6.0
+pytest-pylint==0.12.3
 pytest-lazy-fixture
 safety
 semantic-version

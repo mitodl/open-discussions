@@ -30,6 +30,7 @@ from django.template.loader import render_to_string
 
 from open_discussions import features
 from open_discussions.auth_utils import get_encoded_and_signed_subscription_token
+from sites.api import get_default_site
 
 log = logging.getLogger()
 
@@ -88,6 +89,7 @@ def context_for_user(user, extra_context=None):
         'base_url': settings.SITE_BASE_URL,
         'use_new_branding': features.is_enabled(features.USE_NEW_BRANDING),
         'user': user,
+        'site_name': get_default_site().title,
     }
 
     if extra_context is not None:
@@ -108,6 +110,10 @@ def render_email_templates(template_name, context):
         (str, str, str): tuple of the templates for subject, text_body, html_body
     """
     subject_text = render_to_string('{}/subject.txt'.format(template_name), context).rstrip()
+
+    context.update({
+        'subject': subject_text,
+    })
     html_text = render_to_string('{}/body.html'.format(template_name), context)
 
     # pynliner internally uses bs4, which we can now modify the inlined version into a plaintext version

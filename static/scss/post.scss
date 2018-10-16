@@ -101,6 +101,10 @@
 }
 
 .compact-post-summary {
+  &:hover {
+    background-color: rgba(3, 21, 45, 0.1);
+  }
+
   a {
     color: $font-black;
   }

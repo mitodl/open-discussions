@@ -163,7 +163,7 @@ export const withPostModeration = (
                 reportForm={reportForm.value}
                 validation={reportForm.errors}
                 onUpdate={onReportUpdate(dispatch)}
-                description="Are you sure you want to report this post for violating the rules of MIT Open Discussions?"
+                description="Are you sure you want to report this post for violating the rules of this site?"
                 label="Why are you reporting this post?"
               />
             ) : null}
