@@ -18,6 +18,7 @@ from open_discussions import features
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles import api as profile_api
 from profiles.utils import update_full_name
+from search.task_helpers import index_new_profile
 
 # pylint: disable=keyword-arg-before-vararg
 
@@ -90,6 +91,7 @@ def require_password_and_profile_via_email(
     if "name" in data:
         profile.name = data["name"]
         profile.save()
+        index_new_profile(profile)
 
     if "password" in data:
         user.set_password(data["password"])
@@ -133,6 +135,7 @@ def require_profile_update_user_via_saml(
     profile = user.profile
     profile.name = user.get_full_name()
     profile.save()
+    index_new_profile(profile)
 
     return {"user": user, "profile": profile}
 

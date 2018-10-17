@@ -8,9 +8,16 @@ import pytest
 from social_django.models import UserSocialAuth
 
 from authentication.backends.micromasters import MicroMastersAuth
+from open_discussions.features import INDEX_UPDATES
 from profiles.utils import make_temp_image_file, DEFAULT_PROFILE_IMAGE
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def disable_index_update_feature(settings):
+    """Disables the INDEX_UPDATES feature by default"""
+    settings.FEATURES[INDEX_UPDATES] = False
 
 
 def test_list_users(staff_client, staff_user):

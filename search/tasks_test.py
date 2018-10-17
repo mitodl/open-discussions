@@ -21,6 +21,7 @@ from search.tasks import (
     index_post_with_comments,
     start_recreate_index,
     wrap_retry_exception,
+    index_profiles,
 )
 
 
@@ -94,7 +95,8 @@ def test_update_field_values_by_query(mocked_api):
     Test that the update_field_values_by_query task calls the indexing
     API function with the right args
     """
-    indexing_api_args = ({"query": {}}, "field1", "value1", POST_TYPE)
+
+    indexing_api_args = ({"query": {}}, {"field1": "value1"}, [POST_TYPE])
     update_field_values_by_query(*indexing_api_args)
     assert mocked_api.update_field_values_by_query.call_count == 1
     assert mocked_api.update_field_values_by_query.call_args[0] == indexing_api_args
@@ -180,6 +182,18 @@ def test_index_channel(
     assert mocked_celery.replace.call_args[0][1] == mocked_celery.group.return_value
 
 
+@pytest.mark.parametrize("with_error", [True, False])
+def test_index_profiles(mocker, with_error):  # pylint: disable=unused-argument
+    """index_post should call the api function of the same name"""
+    index_profile_mock = mocker.patch("search.indexing_api.index_profiles")
+    if with_error:
+        index_profile_mock.side_effect = TabError
+    result = index_profiles.delay().get()
+    assert result == ("index_profiles threw an error" if with_error else None)
+
+    index_profile_mock.assert_called_once()
+
+
 def test_start_recreate_index(mocker, mocked_celery, settings, user):
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
@@ -206,7 +220,7 @@ def test_start_recreate_index(mocker, mocked_celery, settings, user):
     for doctype in VALID_OBJECT_TYPES:
         create_backing_index_mock.assert_any_call(doctype)
     finish_recreate_index_mock.s.assert_called_once_with(
-        {"post": backing_index, "comment": backing_index}
+        {"post": backing_index, "comment": backing_index, "profile": backing_index}
     )
     assert mocked_celery.group.call_count == 1
 
@@ -227,7 +241,7 @@ def test_finish_recreate_index(mocker, with_error):
     """
     finish_recreate_index should attach the backing index to the default alias
     """
-    backing_indices = {"post": "backing", "comment": "backing"}
+    backing_indices = {"post": "backing", "comment": "backing", "profile": "backing"}
     results = ["error"] if with_error else []
     switch_indices_mock = mocker.patch(
         "search.indexing_api.switch_indices", autospec=True
