@@ -9,7 +9,7 @@ from social_django.utils import load_backend, load_strategy
 from mail import verification_api
 from open_discussions.test_utils import any_instance_of
 
-pytestmark = pytest.mark.django_db
+pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("authenticated_site")]
 
 
 def test_send_verification_email(mocker, rf):

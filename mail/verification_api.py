@@ -1,7 +1,6 @@
 """API for email verifications"""
 from urllib.parse import quote_plus
 
-from django.conf import settings
 from django.urls import reverse
 
 from mail import api
@@ -33,7 +32,7 @@ def send_verification_email(
                 [
                     (
                         code.email,
-                        {"base_url": settings.SITE_BASE_URL, "confirmation_url": url},
+                        api.context_for_user(extra_context={"confirmation_url": url}),
                     )
                 ],
                 VERIFICATION_TEMPLATE_NAME,

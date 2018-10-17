@@ -9,12 +9,16 @@ from mail.api import (
     send_messages,
     messages_for_recipients,
 )
+from open_discussions import features
 from open_discussions.factories import UserFactory
+from open_discussions.test_utils import any_instance_of
+from sites.api import get_default_site
 
 pytestmark = [
     pytest.mark.django_db,
     pytest.mark.usefixtures("email_settings", "authenticated_site"),
 ]
+lazy = pytest.lazy_fixture
 
 
 @pytest.fixture
@@ -40,10 +44,27 @@ def test_safe_format_recipients_override(user, settings):
     assert safe_format_recipients([user]) == [("admin@localhost", user)]
 
 
+@pytest.mark.parametrize("test_user", [None, lazy("user")])
+@pytest.mark.parametrize("extra_context", [None, {}, {"other": "value"}])
+def test_context_for_user(settings, test_user, extra_context):
+    """Tests that context_for_user returns the expected values"""
+    user_ctx = (
+        {"user": test_user, "anon_token": any_instance_of(str)} if test_user else {}
+    )
+
+    assert context_for_user(user=test_user, extra_context=extra_context) == {
+        "base_url": settings.SITE_BASE_URL,
+        "site_name": get_default_site().title,
+        "use_new_branding": features.is_enabled(features.USE_NEW_BRANDING),
+        **(extra_context or {}),
+        **user_ctx,
+    }
+
+
 def test_render_email_templates(user):
     """Test render_email_templates"""
     user.profile.name = "Jane Smith"
-    context = context_for_user(user, {"url": "http://example.com"})
+    context = context_for_user(user=user, extra_context={"url": "http://example.com"})
     subject, text_body, html_body = render_email_templates("sample", context)
     assert subject == "Welcome Jane Smith"
     assert text_body == "html link (http://example.com)"
@@ -65,7 +86,12 @@ def test_messages_for_recipients():
     messages = list(
         messages_for_recipients(
             [
-                (recipient, context_for_user(user, {"url": "https://example.com"}))
+                (
+                    recipient,
+                    context_for_user(
+                        user=user, extra_context={"url": "https://example.com"}
+                    ),
+                )
                 for recipient, user in safe_format_recipients(users)
             ],
             "sample",
@@ -86,7 +112,12 @@ def test_send_message(mailoutbox):
     messages = list(
         messages_for_recipients(
             [
-                (recipient, context_for_user(user, {"url": "https://example.com"}))
+                (
+                    recipient,
+                    context_for_user(
+                        user=user, extra_context={"url": "https://example.com"}
+                    ),
+                )
                 for recipient, user in safe_format_recipients(users)
             ],
             "sample",
@@ -108,7 +139,12 @@ def test_send_message_failure(mocker):
     messages = list(
         messages_for_recipients(
             [
-                (recipient, context_for_user(user, {"url": "https://example.com"}))
+                (
+                    recipient,
+                    context_for_user(
+                        user=user, extra_context={"url": "https://example.com"}
+                    ),
+                )
                 for recipient, user in safe_format_recipients(users)
             ],
             "sample",

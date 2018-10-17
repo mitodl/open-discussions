@@ -86,7 +86,7 @@ class EmailNotifier(BaseNotifier):
             messages = list(
                 api.messages_for_recipients(
                     [
-                        (recipient, api.context_for_user(user, data))
+                        (recipient, api.context_for_user(user=user, extra_context=data))
                         for recipient, user in api.safe_format_recipients([user])
                     ],
                     self._template_name,

@@ -8,7 +8,7 @@ recipients = User.objects.all()[:10]
 
 # generator for recipient emails
 messages = messages_for_recipients([
-    (recipient, context_for_user(user, {
+    (recipient, context_for_user(user=user, extra_context={
         # per-recipient context here
     })) for recipient, user in safe_format_recipients(recipients)
 ], 'sample')
@@ -73,7 +73,7 @@ def can_email_user(user):
     return bool(user.email)
 
 
-def context_for_user(user, extra_context=None):
+def context_for_user(*, user=None, extra_context=None):
     """
     Returns an email context for the given user
 
@@ -86,12 +86,18 @@ def context_for_user(user, extra_context=None):
     """
 
     context = {
-        "anon_token": get_encoded_and_signed_subscription_token(user),
         "base_url": settings.SITE_BASE_URL,
-        "use_new_branding": features.is_enabled(features.USE_NEW_BRANDING),
-        "user": user,
         "site_name": get_default_site().title,
+        "use_new_branding": features.is_enabled(features.USE_NEW_BRANDING),
     }
+
+    if user:
+        context.update(
+            {
+                "user": user,
+                "anon_token": get_encoded_and_signed_subscription_token(user),
+            }
+        )
 
     if extra_context is not None:
         context.update(extra_context)
