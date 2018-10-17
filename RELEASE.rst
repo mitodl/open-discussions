@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.50.0
+Version 0.50.0 (Released October 17, 2018)
 --------------
 
 - Added fixes for email template font issues
