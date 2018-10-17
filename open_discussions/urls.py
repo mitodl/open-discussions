@@ -31,6 +31,7 @@ urlpatterns = [
     url(r"", include("mail.urls")),
     url(r"", include("notifications.urls")),
     url(r"", include("embedly.urls")),
+    url(r"", include("search.urls")),
     url(r"^api/token/refresh/", refresh_jwt_token),
     # React App
     url(r"^$", index, name="open_discussions-index"),
