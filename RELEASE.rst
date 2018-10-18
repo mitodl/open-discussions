@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.50.1 (Released October 18, 2018)
+--------------
+
+- Revert "Added hover highlight on post card" (#1390)
+- Fixed error when trying to use confirmation link a second time
+- Fixed register API for existing MM users
+- Channel design updates
+- Fixed template context for email confirmation emails
+- Add REST API for search (#1377)
+- Configuration for black code formatter
+- Implement new pinned post UI
+
 Version 0.50.0 (Released October 17, 2018)
 --------------
 
