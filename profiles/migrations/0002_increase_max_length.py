@@ -7,24 +7,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0001_add_profile'),
-    ]
+    dependencies = [("profiles", "0001_add_profile")]
 
     operations = [
         migrations.AlterField(
-            model_name='profile',
-            name='image',
+            model_name="profile",
+            name="image",
             field=models.CharField(max_length=1024, null=True),
         ),
         migrations.AlterField(
-            model_name='profile',
-            name='image_medium',
+            model_name="profile",
+            name="image_medium",
             field=models.CharField(max_length=1024, null=True),
         ),
         migrations.AlterField(
-            model_name='profile',
-            name='image_small',
+            model_name="profile",
+            name="image_small",
             field=models.CharField(max_length=1024, null=True),
         ),
     ]

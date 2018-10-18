@@ -24,11 +24,7 @@ import { mergeAndInjectProps } from "../../lib/redux_props"
 import { FLOW_LOGIN, isProcessing } from "../../reducers/auth"
 
 import type { Location, Match } from "react-router"
-import type {
-  AuthResponse,
-  EmailDetailAuthResponse,
-  EmailForm
-} from "../../flow/authTypes"
+import type { AuthResponse, EmailForm } from "../../flow/authTypes"
 import type { WithFormProps } from "../../flow/formTypes"
 
 type LoginPageProps = {
@@ -74,11 +70,7 @@ const onSubmit = ({ email }: EmailForm, next: string) =>
 const getSubmitResultErrors = getAuthResponseFieldErrors("email")
 
 const onSubmitResult = R.curry(
-  (
-    setAuthUserDetail: Function,
-    history: Object,
-    response: AuthResponse | EmailDetailAuthResponse
-  ) => {
+  (setAuthUserDetail: Function, history: Object, response: AuthResponse) => {
     // The auth endpoint returns some information about the user in a property called "extra_data".
     // We want to keep that data around for UI purposes, so we dispatch an action here to set it in the state.
     // NOTE:
@@ -87,7 +79,7 @@ const onSubmitResult = R.curry(
     // We may find situations where we need to clear that state programatically to avoid unintended
     // UI consequences. In that case it would probably be best to wrap all of the auth flow components
     // in a special <Route> that handles the lifecycle of that auth user detail state.
-    const authUserDetail = R.propOr({}, "extra_data")(response)
+    const authUserDetail = response.extra_data
     authUserDetail.email = response.email
     setAuthUserDetail(authUserDetail)
     return processAuthResponse(history, response)

@@ -11,28 +11,61 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('notifications', '0001_add_notification_settings'),
+        ("notifications", "0001_add_notification_settings"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EmailNotification',
+            name="EmailNotification",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('notification_type', models.CharField(choices=[('frontpage', 'Frontpage'), ('comments', 'Comments')], max_length=20)),
-                ('state', models.CharField(choices=[('pending', 'Pending'), ('sending', 'Sending'), ('sent', 'Sent')], default='pending', max_length=10)),
-                ('sent_at', models.DateTimeField(null=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                (
+                    "notification_type",
+                    models.CharField(
+                        choices=[("frontpage", "Frontpage"), ("comments", "Comments")],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "state",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("sending", "Sending"),
+                            ("sent", "Sent"),
+                        ],
+                        default="pending",
+                        max_length=10,
+                    ),
+                ),
+                ("sent_at", models.DateTimeField(null=True)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AlterIndexTogether(
-            name='notificationsettings',
-            index_together=set([('notification_type', 'trigger_frequency')]),
+            name="notificationsettings",
+            index_together=set([("notification_type", "trigger_frequency")]),
         ),
         migrations.AlterIndexTogether(
-            name='emailnotification',
-            index_together=set([('state', 'updated_on'), ('user', 'notification_type', 'created_on')]),
+            name="emailnotification",
+            index_together=set(
+                [("state", "updated_on"), ("user", "notification_type", "created_on")]
+            ),
         ),
     ]

@@ -21,15 +21,16 @@ class PostListView(APIView):
     """
     View for listing and creating posts
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, )
+
+    permission_classes = (AnonymousAccessReadonlyPermission,)
 
     def get_serializer_context(self):
         """Context for the request and view"""
         return {
-            'channel_api': self.request.channel_api,
-            'current_user': self.request.user,
-            'request': self.request,
-            'view': self,
+            "channel_api": self.request.channel_api,
+            "current_user": self.request.user,
+            "request": self.request,
+            "view": self,
         }
 
     def get(self, request, *args, **kwargs):
@@ -37,46 +38,58 @@ class PostListView(APIView):
         with translate_praw_exceptions(request.user):
             listing_params = get_listing_params(self.request)
             api = Api(user=request.user)
-            paginated_posts = api.list_posts(self.kwargs['channel_name'], listing_params)
-            pagination, posts = get_pagination_and_posts(paginated_posts, listing_params)
+            paginated_posts = api.list_posts(
+                self.kwargs["channel_name"], listing_params
+            )
+            pagination, posts = get_pagination_and_posts(
+                paginated_posts, listing_params
+            )
             users = lookup_users_for_posts(posts)
-            posts = [post for post in posts if post.author and post.author.name in users]
+            posts = [
+                post for post in posts if post.author and post.author.name in users
+            ]
             subscriptions = lookup_subscriptions_for_posts(posts, request.user)
 
-            return Response({
-                'posts': PostSerializer(posts, many=True, context={
-                    **self.get_serializer_context(),
-                    'users': users,
-                    'post_subscriptions': subscriptions,
-                }).data,
-                'pagination': pagination,
-            })
+            return Response(
+                {
+                    "posts": PostSerializer(
+                        posts,
+                        many=True,
+                        context={
+                            **self.get_serializer_context(),
+                            "users": users,
+                            "post_subscriptions": subscriptions,
+                        },
+                    ).data,
+                    "pagination": pagination,
+                }
+            )
 
     def post(self, request, *args, **kwargs):
         """Create a new post"""
         with translate_praw_exceptions(request.user):
-            serializer = PostSerializer(data=request.data, context=self.get_serializer_context())
+            serializer = PostSerializer(
+                data=request.data, context=self.get_serializer_context()
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED,
-            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class PostDetailView(APIView):
     """
     View for retrieving, updating or destroying posts
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, )
+
+    permission_classes = (AnonymousAccessReadonlyPermission,)
 
     def get_serializer_context(self):
         """Context for the request and view"""
         return {
-            'channel_api': self.request.channel_api,
-            'current_user': self.request.user,
-            'request': self.request,
-            'view': self,
+            "channel_api": self.request.channel_api,
+            "current_user": self.request.user,
+            "request": self.request,
+            "view": self,
         }
 
     @property
@@ -86,7 +99,7 @@ class PostDetailView(APIView):
 
     def get_object(self):
         """Get post"""
-        return self.api.get_post(self.kwargs['post_id'])
+        return self.api.get_post(self.kwargs["post_id"])
 
     def get(self, request, *args, **kwargs):
         """Get post"""
@@ -101,15 +114,15 @@ class PostDetailView(APIView):
                     instance=post,
                     context={
                         **self.get_serializer_context(),
-                        'users': users,
-                        'post_subscriptions': subscriptions,
+                        "users": users,
+                        "post_subscriptions": subscriptions,
                     },
-                ).data,
+                ).data
             )
 
     def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Delete a post"""
-        self.api.delete_post(self.kwargs['post_id'])
+        self.api.delete_post(self.kwargs["post_id"])
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, request, *args, **kwargs):  # pylint: disable=unused-argument
@@ -124,6 +137,4 @@ class PostDetailView(APIView):
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(
-                serializer.data,
-            )
+            return Response(serializer.data)

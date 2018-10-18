@@ -32,9 +32,7 @@ def create_user(username, email, profile_data=None, user_extra=None):
         defaults.update(user_extra)
 
     # this takes priority over a passed in value
-    defaults.update({
-        'username': username,
-    })
+    defaults.update({"username": username})
 
     with transaction.atomic():
         user, _ = User.objects.get_or_create(email=email, defaults=defaults)
@@ -63,6 +61,7 @@ def create_or_update_micromasters_social_auth(user, uid, details):
     """
     # avoid a circular import
     from social_django.utils import STORAGE, STRATEGY, load_backend
+
     strategy = get_strategy(STRATEGY, STORAGE)
     storage = strategy.storage
     backend = load_backend(strategy, MicroMastersAuth.name, None)
@@ -71,11 +70,13 @@ def create_or_update_micromasters_social_auth(user, uid, details):
     except IntegrityError:
         # if the user already has a social auth for MM, we don't want to fail
         # so just use the existing one
-        social = storage.user.get_social_auth_for_user(user, provider=MicroMastersAuth.name).filter(uid=uid).first()
+        social = (
+            storage.user.get_social_auth_for_user(user, provider=MicroMastersAuth.name)
+            .filter(uid=uid)
+            .first()
+        )
 
     # update metadata
-    extra_data = backend.extra_data(user, uid, {
-        'username': uid,
-    }, details)
+    extra_data = backend.extra_data(user, uid, {"username": uid}, details)
     social.set_extra_data(extra_data)
     return social

@@ -6,6 +6,7 @@ from sites.models import AuthenticatedSite
 
 class AuthenticatedSiteAdmin(admin.ModelAdmin):
     """Admin for Authenticated site models"""
+
     pass
 
 

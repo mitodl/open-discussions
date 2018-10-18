@@ -26,7 +26,7 @@ def record(name, user):
     session = requests.Session()
     session.verify = False
 
-    with patch('channels.api._get_session', return_value=session):
+    with patch("channels.api._get_session", return_value=session):
         with Betamax(session).use_cassette(name):
             api = Api(user)
             yield api

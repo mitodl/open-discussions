@@ -13,8 +13,8 @@ class OpenDiscussionsStrategy(DjangoStrategy):
         # this is normally delegated to the storage mechanism,
         # specifically social_django.storage.DjangoUserMixin.create_user
         # but we want to call our own method to create the user so we override at the strategy level
-        username = kwargs.pop('username')
-        email = kwargs.pop('email')
+        username = kwargs.pop("username")
+        email = kwargs.pop("email")
         return auth_api.create_user(username, email, user_extra=kwargs)
 
 
@@ -31,7 +31,7 @@ class DjangoRestFrameworkStrategy(OpenDiscussionsStrategy):
         """Cleanup request argument if present, which is passed to authenticate as for Django 1.11"""
         # this is similar to what DjangoStrategy does, but is specific to DRF's Request type
         if len(args) > 0 and isinstance(args[0], Request):
-            kwargs['request'], args = args[0], args[1:]
+            kwargs["request"], args = args[0], args[1:]
 
         return super().clean_authenticate_args(*args, **kwargs)
 

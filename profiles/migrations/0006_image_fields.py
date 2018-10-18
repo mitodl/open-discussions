@@ -8,24 +8,34 @@ import profiles.utils
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0005_add_bio_headline_toc'),
-    ]
+    dependencies = [("profiles", "0005_add_bio_headline_toc")]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='image_file',
-            field=models.ImageField(max_length=2083, null=True, upload_to=profiles.utils.profile_image_upload_uri),
+            model_name="profile",
+            name="image_file",
+            field=models.ImageField(
+                max_length=2083,
+                null=True,
+                upload_to=profiles.utils.profile_image_upload_uri,
+            ),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='image_medium_file',
-            field=models.ImageField(max_length=2083, null=True, upload_to=profiles.utils.profile_image_upload_uri_medium),
+            model_name="profile",
+            name="image_medium_file",
+            field=models.ImageField(
+                max_length=2083,
+                null=True,
+                upload_to=profiles.utils.profile_image_upload_uri_medium,
+            ),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='image_small_file',
-            field=models.ImageField(max_length=2083, null=True, upload_to=profiles.utils.profile_image_upload_uri_small),
+            model_name="profile",
+            name="image_small_file",
+            field=models.ImageField(
+                max_length=2083,
+                null=True,
+                upload_to=profiles.utils.profile_image_upload_uri_small,
+            ),
         ),
     ]

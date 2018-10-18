@@ -71,6 +71,7 @@ describe("CompactPostDisplay", () => {
     assert(authoredBy.startsWith(post.author_name))
     assert.isNotEmpty(authoredBy.substring(post.author_name.length))
   })
+
   //
   ;[["My headline", true], [null, false]].forEach(
     ([headlineText, expElementExists]) => {
@@ -135,7 +136,7 @@ describe("CompactPostDisplay", () => {
     assert.equal(target, "_blank")
   })
 
-  it("should set a class if stickied and showing pin ui", () => {
+  it("should set a class and show icon if stickied and showing pin ui", () => {
     [[true, true], [true, false], [false, true], [false, false]].forEach(
       ([showPinUI, stickied]) => {
         post.stickied = stickied
@@ -149,6 +150,7 @@ describe("CompactPostDisplay", () => {
             ? "compact-post-summary sticky"
             : "compact-post-summary "
         )
+        assert.equal(wrapper.find("img.pin").exists(), showPinUI && stickied)
       }
     )
   })

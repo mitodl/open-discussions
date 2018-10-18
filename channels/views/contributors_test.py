@@ -8,27 +8,28 @@ from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
-pytestmark = [
-    pytest.mark.betamax,
-    pytest.mark.usefixtures('mock_channel_exists')
-]
+pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
 
 
-def test_list_contributors(staff_client, private_channel_and_contributor, staff_user, settings):
+def test_list_contributors(
+    staff_client, private_channel_and_contributor, staff_user, settings
+):
     """
     List contributors in a channel
     """
     settings.INDEXING_API_USERNAME = staff_user.username
     channel, user = private_channel_and_contributor
-    url = reverse('contributor-list', kwargs={'channel_name': channel.name})
+    url = reverse("contributor-list", kwargs={"channel_name": channel.name})
     resp = staff_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     # staff user is filtered out
-    assert resp.json() == [{
-        'contributor_name': user.username,
-        'full_name': user.profile.name,
-        'email': user.email,
-    }]
+    assert resp.json() == [
+        {
+            "contributor_name": user.username,
+            "full_name": user.profile.name,
+            "email": user.email,
+        }
+    ]
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
@@ -36,24 +37,26 @@ def test_list_contributors_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't list contributors in a channel"""
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     # Well, maybe we could allow it but there's no point since this list is only meaningful for private channels.
-    url = reverse('contributor-list', kwargs={'channel_name': 'some_channel'})
+    url = reverse("contributor-list", kwargs={"channel_name": "some_channel"})
     resp = client.get(url)
     assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
-    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 def test_add_contributor(staff_client):
     """
     Adds a contributor to a channel
     """
-    contributor = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
-    url = reverse('contributor-list', kwargs={'channel_name': 'admin_channel'})
-    resp = staff_client.post(url, data={'contributor_name': contributor.username}, format='json')
+    contributor = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
+    url = reverse("contributor-list", kwargs={"channel_name": "admin_channel"})
+    resp = staff_client.post(
+        url, data={"contributor_name": contributor.username}, format="json"
+    )
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
-        'contributor_name': contributor.username,
-        'full_name': contributor.profile.name,
-        'email': contributor.email,
+        "contributor_name": contributor.username,
+        "full_name": contributor.profile.name,
+        "email": contributor.email,
     }
 
 
@@ -66,14 +69,14 @@ def test_add_contributor_email(client, public_channel, staff_api, reddit_factori
     staff_api.add_moderator(moderator.username, public_channel.name)
     client.force_login(moderator)
 
-    url = reverse('contributor-list', kwargs={'channel_name': public_channel.name})
-    resp = client.post(url, data={'email': new_contributor.email}, format='json')
+    url = reverse("contributor-list", kwargs={"channel_name": public_channel.name})
+    resp = client.post(url, data={"email": new_contributor.email}, format="json")
 
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
-        'contributor_name': new_contributor.username,
-        'email': new_contributor.email,
-        'full_name': new_contributor.profile.name,
+        "contributor_name": new_contributor.username,
+        "email": new_contributor.email,
+        "full_name": new_contributor.profile.name,
     }
 
 
@@ -81,14 +84,16 @@ def test_add_contributor_again(staff_client):
     """
     If the user is already a contributor a 201 status should be returned
     """
-    contributor = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
-    url = reverse('contributor-list', kwargs={'channel_name': 'admin_channel'})
-    resp = staff_client.post(url, data={'contributor_name': contributor.username}, format='json')
+    contributor = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
+    url = reverse("contributor-list", kwargs={"channel_name": "admin_channel"})
+    resp = staff_client.post(
+        url, data={"contributor_name": contributor.username}, format="json"
+    )
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
-        'contributor_name': contributor.username,
-        'full_name': contributor.profile.name,
-        'email': contributor.email,
+        "contributor_name": contributor.username,
+        "full_name": contributor.profile.name,
+        "email": contributor.email,
     }
 
 
@@ -98,19 +103,24 @@ def test_add_contributor_anonymous(client, settings, allow_anonymous):
     Anonymous users can't add contributors to a channel
     """
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
-    url = reverse('contributor-list', kwargs={'channel_name': 'admin_channel'})
-    resp = client.post(url, data={'contributor_name': 'some_username'}, format='json')
+    url = reverse("contributor-list", kwargs={"channel_name": "admin_channel"})
+    resp = client.post(url, data={"contributor_name": "some_username"}, format="json")
     assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
-    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
 def test_remove_contributor(staff_client):
     """
     Removes a contributor from a channel
     """
-    contributor = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    contributor = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
     url = reverse(
-        'contributor-detail', kwargs={'channel_name': 'admin_channel', 'contributor_name': contributor.username})
+        "contributor-detail",
+        kwargs={
+            "channel_name": "admin_channel",
+            "contributor_name": contributor.username,
+        },
+    )
     resp = staff_client.delete(url)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
@@ -119,9 +129,14 @@ def test_remove_contributor_again(staff_client):
     """
     Removes a contributor from a channel
     """
-    contributor = UserFactory.create(username='01BTN6G82RKTS3WF61Q33AA0ND')
+    contributor = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
     url = reverse(
-        'contributor-detail', kwargs={'channel_name': 'admin_channel', 'contributor_name': contributor.username})
+        "contributor-detail",
+        kwargs={
+            "channel_name": "admin_channel",
+            "contributor_name": contributor.username,
+        },
+    )
     resp = staff_client.delete(url)
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
@@ -130,7 +145,10 @@ def test_remove_contributor_again(staff_client):
 def test_remove_contributor_anonymous(client, settings, allow_anonymous):
     """Anonymous users can't remove contributors"""
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
-    url = reverse('contributor-detail', kwargs={'channel_name': 'a_channel', 'contributor_name': 'a_contributor'})
+    url = reverse(
+        "contributor-detail",
+        kwargs={"channel_name": "a_channel", "contributor_name": "a_contributor"},
+    )
     resp = client.delete(url)
     assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
-    assert resp.data['error_type'] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE

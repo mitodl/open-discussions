@@ -6,7 +6,6 @@ import { bindActionCreators } from "redux"
 
 import ImageUploader, { makeDialogKey } from "./ImageUploader"
 
-import { defaultChannelBannerUrl } from "../lib/util"
 import { showDialog } from "../actions/ui"
 
 import type { Dispatch } from "redux"
@@ -36,16 +35,20 @@ class ChannelBanner extends React.Component<Props> {
       name
     } = this.props
 
-    const imageUrl = formImageUrl || channel.banner || defaultChannelBannerUrl
+    const imageUrl = formImageUrl || channel.banner
 
     return (
       <div className="banner-container row">
         <div className="channel-banner">
-          <img
-            src={imageUrl}
-            alt={`Channel banner for ${channel.name}`}
-            className={`banner-image`}
-          />
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={`Channel banner for ${channel.name}`}
+              className="banner-image"
+            />
+          ) : (
+            <div className="banner-image default-image" />
+          )}
           <div className="gradient" />
           {editable ? (
             <React.Fragment>
@@ -53,10 +56,10 @@ class ChannelBanner extends React.Component<Props> {
                 name={name}
                 showButton={false}
                 onUpdate={onUpdate}
-                isAdd={imageUrl === defaultChannelBannerUrl}
+                isAdd={!imageUrl}
                 description="Channel Banner"
                 width={1150}
-                height={125}
+                height={200}
               />
               <a onClick={showDialog} className="upload-banner grey-surround">
                 Upload cover image

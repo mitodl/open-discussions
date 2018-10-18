@@ -23,10 +23,7 @@ from prawcore.exceptions import (
     NotFound as PrawNotFound,
     ResponseException,
 )
-from rest_framework.exceptions import (
-    PermissionDenied,
-    NotFound,
-)
+from rest_framework.exceptions import PermissionDenied, NotFound
 
 from channels.constants import (
     CHANNEL_TYPE_PUBLIC,
@@ -56,22 +53,22 @@ from open_discussions.utils import now_in_utc
 from search import task_helpers as search_task_helpers
 from search.task_helpers import reddit_object_persist
 
-USER_AGENT = 'MIT-Open: {version}'
-ACCESS_TOKEN_HEADER_NAME = 'X-Access-Token'
+USER_AGENT = "MIT-Open: {version}"
+ACCESS_TOKEN_HEADER_NAME = "X-Access-Token"
 
 CHANNEL_SETTINGS = (
-    'header_title',
-    'link_type',
-    'description',
-    'public_description',
-    'submit_link_label',
-    'submit_text',
-    'submit_text_label',
-    'allow_top',
+    "header_title",
+    "link_type",
+    "description",
+    "public_description",
+    "submit_link_label",
+    "submit_text",
+    "submit_text_label",
+    "allow_top",
 )
 
 # this comes from https://github.com/mitodl/reddit/blob/master/r2/r2/models/token.py#L270
-FULL_ACCESS_SCOPE = '*'
+FULL_ACCESS_SCOPE = "*"
 EXPIRES_IN_OFFSET = 30  # offsets the reddit refresh_token expirations by 30 seconds
 
 User = get_user_model()
@@ -96,10 +93,12 @@ def _get_refresh_token(username):
     # a modified instance of reddit. It registers a new user with a random password if
     # one does not exist, then obtains an OAuth refresh token for that user. This is then used
     # with praw to authenticate.
-    refresh_token_url = urljoin(settings.OPEN_DISCUSSIONS_REDDIT_URL, '/api/v1/generate_refresh_token')
+    refresh_token_url = urljoin(
+        settings.OPEN_DISCUSSIONS_REDDIT_URL, "/api/v1/generate_refresh_token"
+    )
 
     session = _get_session()
-    return session.get(refresh_token_url, params={'username': username}).json()
+    return session.get(refresh_token_url, params={"username": username}).json()
 
 
 def get_or_create_auth_tokens(user):
@@ -119,23 +118,33 @@ def get_or_create_auth_tokens(user):
     # if we created this token just now, atomically generate one
     if not refresh_token.token_value:
         with transaction.atomic():
-            refresh_token = RedditRefreshToken.objects.filter(user=user).select_for_update()[0]
+            refresh_token = RedditRefreshToken.objects.filter(
+                user=user
+            ).select_for_update()[0]
             if not refresh_token.token_value:
                 response = _get_refresh_token(user.username)
-                refresh_token.token_value = response['refresh_token']
+                refresh_token.token_value = response["refresh_token"]
                 refresh_token.save()
 
                 # the response also returns a valid access_token, so we might as well store that for use
                 # offset it negatively a bit to account for response time
-                expires_at = now_in_utc() + timedelta(seconds=response['expires_in'] - EXPIRES_IN_OFFSET)
+                expires_at = now_in_utc() + timedelta(
+                    seconds=response["expires_in"] - EXPIRES_IN_OFFSET
+                )
                 access_token = RedditAccessToken.objects.create(
                     user=user,
-                    token_value=response['access_token'],
-                    token_expires_at=expires_at
+                    token_value=response["access_token"],
+                    token_expires_at=expires_at,
                 )
 
     # return the refresh token and access_token
-    return refresh_token, (access_token or RedditAccessToken.valid_tokens_for_user(user, threshold_date).first())
+    return (
+        refresh_token,
+        (
+            access_token
+            or RedditAccessToken.valid_tokens_for_user(user, threshold_date).first()
+        ),
+    )
 
 
 def _configure_access_token(client, access_token, user):
@@ -168,7 +177,7 @@ def _configure_access_token(client, access_token, user):
         RedditAccessToken.objects.create(
             user=user,
             token_value=authorizer.access_token,
-            token_expires_at=expires_at.replace(tzinfo=pytz.utc)
+            token_expires_at=expires_at.replace(tzinfo=pytz.utc),
         )
 
     return client
@@ -182,14 +191,14 @@ def _get_client_base_kwargs():
         dict: set of client kwargs
     """
     return {
-        'reddit_url': settings.OPEN_DISCUSSIONS_REDDIT_URL,
-        'oauth_url': settings.OPEN_DISCUSSIONS_REDDIT_URL,
-        'short_url': settings.OPEN_DISCUSSIONS_REDDIT_URL,
-        'user_agent': _get_user_agent(),
-        'requestor_kwargs': _get_requester_kwargs(),
-        'check_for_updates': False,
-        'client_id': settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID,
-        'client_secret': settings.OPEN_DISCUSSIONS_REDDIT_SECRET,
+        "reddit_url": settings.OPEN_DISCUSSIONS_REDDIT_URL,
+        "oauth_url": settings.OPEN_DISCUSSIONS_REDDIT_URL,
+        "short_url": settings.OPEN_DISCUSSIONS_REDDIT_URL,
+        "user_agent": _get_user_agent(),
+        "requestor_kwargs": _get_requester_kwargs(),
+        "check_for_updates": False,
+        "client_id": settings.OPEN_DISCUSSIONS_REDDIT_CLIENT_ID,
+        "client_secret": settings.OPEN_DISCUSSIONS_REDDIT_SECRET,
     }
 
 
@@ -202,9 +211,9 @@ def _get_session():
     """
     session = requests.Session()
     session.verify = settings.OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL
-    session.headers.update({
-        ACCESS_TOKEN_HEADER_NAME: settings.OPEN_DISCUSSIONS_REDDIT_ACCESS_TOKEN,
-    })
+    session.headers.update(
+        {ACCESS_TOKEN_HEADER_NAME: settings.OPEN_DISCUSSIONS_REDDIT_ACCESS_TOKEN}
+    )
     return session
 
 
@@ -215,9 +224,7 @@ def _get_requester_kwargs():
     Returns:
         dict: dictionary of requester arguments
     """
-    return {
-        'session': _get_session(),
-    }
+    return {"session": _get_session()}
 
 
 def _get_client(user):
@@ -231,16 +238,17 @@ def _get_client(user):
         praw.Reddit: configured reddit client
     """
     if user.is_anonymous:
-        return praw.Reddit(
-            **_get_client_base_kwargs(),
-        )
+        return praw.Reddit(**_get_client_base_kwargs())
 
     refresh_token, access_token = get_or_create_auth_tokens(user)
 
-    return _configure_access_token(praw.Reddit(
-        refresh_token=refresh_token.token_value,
-        **_get_client_base_kwargs(),
-    ), access_token, user)
+    return _configure_access_token(
+        praw.Reddit(
+            refresh_token=refresh_token.token_value, **_get_client_base_kwargs()
+        ),
+        access_token,
+        user,
+    )
 
 
 def _get_user_agent():
@@ -274,6 +282,7 @@ def replace_load_comment(original_load_comment):
             # If the parent doesn't exist the code will receive no children which will error as
             # an AssertionError
             raise Http404
+
     return replacement_load_comment
 
 
@@ -309,8 +318,7 @@ def sync_post_model(*, channel_name, post_id, post_url=None):
 
         channel = sync_channel_model(channel_name)
         post_obj = Post.objects.get_or_create(
-            post_id=post_id,
-            defaults={'channel': channel},
+            post_id=post_id, defaults={"channel": channel}
         )[0]
         if post_url and post_obj.link_meta is None and settings.EMBEDLY_KEY:
             post_obj.link_meta = get_or_create_link_meta(post_url)
@@ -338,16 +346,13 @@ def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):
 
         post = sync_post_model(channel_name=channel_name, post_id=post_id)
         return Comment.objects.get_or_create(
-            comment_id=comment_id,
-            defaults={
-                'post': post,
-                'parent_id': parent_id,
-            }
+            comment_id=comment_id, defaults={"post": post, "parent_id": parent_id}
         )[0]
 
 
 class Api:
     """Channel API"""
+
     def __init__(self, user):
         """Constructor"""
         if user is None:
@@ -393,7 +398,12 @@ class Api:
         return self.reddit.subreddit(name)
 
     def create_channel(
-            self, name, title, channel_type=CHANNEL_TYPE_PUBLIC, membership_is_managed=False, **other_settings
+        self,
+        name,
+        title,
+        channel_type=CHANNEL_TYPE_PUBLIC,
+        membership_is_managed=False,
+        **other_settings,
     ):
         """
         Create a channel
@@ -409,11 +419,11 @@ class Api:
             praw.models.Subreddit: the created subreddit
         """
         if channel_type not in VALID_CHANNEL_TYPES:
-            raise ValueError('Invalid argument channel_type={}'.format(channel_type))
+            raise ValueError("Invalid argument channel_type={}".format(channel_type))
 
         for key, value in other_settings.items():
             if key not in CHANNEL_SETTINGS:
-                raise ValueError('Invalid argument {}={}'.format(key, value))
+                raise ValueError("Invalid argument {}={}".format(key, value))
 
         if not isinstance(membership_is_managed, bool):
             raise ValueError("Invalid argument membership_is_managed")
@@ -423,7 +433,7 @@ class Api:
             title=title,
             subreddit_type=channel_type,
             allow_top=True,
-            **other_settings
+            **other_settings,
         )
 
         channel_obj = sync_channel_model(name)
@@ -445,25 +455,27 @@ class Api:
         Returns:
             praw.models.Subreddit: the updated subreddit
         """
-        membership_is_managed = other_settings.pop('membership_is_managed', None)
+        membership_is_managed = other_settings.pop("membership_is_managed", None)
 
         if channel_type is not None and channel_type not in VALID_CHANNEL_TYPES:
-            raise ValueError('Invalid argument channel_type={}'.format(channel_type))
+            raise ValueError("Invalid argument channel_type={}".format(channel_type))
 
         for key, value in other_settings.items():
             if key not in CHANNEL_SETTINGS:
-                raise ValueError('Invalid argument {}={}'.format(key, value))
+                raise ValueError("Invalid argument {}={}".format(key, value))
 
         if membership_is_managed is not None:
             if not isinstance(membership_is_managed, bool):
                 raise ValueError("Invalid argument membership_is_managed")
-            Channel.objects.filter(name=name).update(membership_is_managed=membership_is_managed)
+            Channel.objects.filter(name=name).update(
+                membership_is_managed=membership_is_managed
+            )
 
         values = other_settings.copy()
         if title is not None:
-            values['title'] = title
+            values["title"] = title
         if channel_type is not None:
-            values['subreddit_type'] = channel_type
+            values["subreddit_type"] = channel_type
 
         self.get_channel(name).mod.update(**values)
         return self.get_channel(name)
@@ -482,9 +494,9 @@ class Api:
             bool:
                 True if a change was made, False otherwise
         """
-        upvote = validated_data.get('upvoted')
+        upvote = validated_data.get("upvoted")
         if allow_downvote:
-            downvote = validated_data.get('downvoted')
+            downvote = validated_data.get("downvoted")
         else:
             downvote = None
 
@@ -511,17 +523,24 @@ class Api:
             instance.clear_vote()
 
         try:
-            search_task_helpers.update_indexed_score(instance, instance_type, vote_action)
+            search_task_helpers.update_indexed_score(
+                instance, instance_type, vote_action
+            )
         except Exception:  # pylint: disable=broad-except
-            log.exception('Error occurred while trying to index [%s] object score', instance_type)
+            log.exception(
+                "Error occurred while trying to index [%s] object score", instance_type
+            )
         return True
 
-    apply_post_vote = partialmethod(_apply_vote, allow_downvote=False, instance_type=POST_TYPE)
-    apply_comment_vote = partialmethod(_apply_vote, allow_downvote=True, instance_type=COMMENT_TYPE)
+    apply_post_vote = partialmethod(
+        _apply_vote, allow_downvote=False, instance_type=POST_TYPE
+    )
+    apply_comment_vote = partialmethod(
+        _apply_vote, allow_downvote=True, instance_type=COMMENT_TYPE
+    )
 
     @reddit_object_persist(
-        search_task_helpers.index_new_post,
-        channels_task_helpers.sync_post_model,
+        search_task_helpers.index_new_post, channels_task_helpers.sync_post_model
     )
     def create_post(self, channel_name, title, text=None, url=None):
         """
@@ -540,7 +559,7 @@ class Api:
             praw.models.Submission: the submitted post
         """
         if len(list(filter(lambda val: val is not None, [text, url]))) != 1:
-            raise ValueError('Exactly one of text and url must be provided')
+            raise ValueError("Exactly one of text and url must be provided")
         return self.get_channel(channel_name).submit(title, selftext=text, url=url)
 
     def front_page(self, listing_params):
@@ -589,15 +608,15 @@ class Api:
 
         params = {}
         if before is not None:
-            params['before'] = before
+            params["before"] = before
         if after is not None:
-            params['after'] = after
+            params["after"] = after
         if count is not None:
-            params['count'] = count
+            params["count"] = count
 
         kwargs = {
-            'limit': settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT,
-            'params': params,
+            "limit": settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT,
+            "params": params,
         }
 
         if sort == POSTS_SORT_HOT:
@@ -607,7 +626,11 @@ class Api:
         elif sort == POSTS_SORT_TOP:
             return listing.top(**kwargs)
         else:
-            raise Exception("Sort method '{}' is in VALID_POST_SORT_TYPES but not actually supported".format(sort))
+            raise Exception(
+                "Sort method '{}' is in VALID_POST_SORT_TYPES but not actually supported".format(
+                    sort
+                )
+            )
 
     def get_post(self, post_id):
         """
@@ -639,7 +662,7 @@ class Api:
         post = self.get_post(post_id)
 
         if not post.is_self:
-            raise ValueError('Posts with a url cannot be updated')
+            raise ValueError("Posts with a url cannot be updated")
 
         return post.edit(text)
 
@@ -692,8 +715,7 @@ class Api:
         return post
 
     @reddit_object_persist(
-        search_task_helpers.index_new_comment,
-        channels_task_helpers.sync_comment_model,
+        search_task_helpers.index_new_comment, channels_task_helpers.sync_comment_model
     )
     def create_comment(self, text, post_id=None, comment_id=None):
         """
@@ -711,7 +733,7 @@ class Api:
             praw.models.Comment: the submitted comment
         """
         if len(list(filter(lambda val: val is not None, [post_id, comment_id]))) != 1:
-            raise ValueError('Exactly one of post_id and comment_id must be provided')
+            raise ValueError("Exactly one of post_id and comment_id must be provided")
 
         if post_id is not None:
             return self.get_post(post_id).reply(text)
@@ -794,7 +816,9 @@ class Api:
             praw.models.CommentForest: the base of the comment tree
         """
         if sort not in VALID_COMMENT_SORT_TYPES:
-            raise ValueError("Sort method '{}' is not supported for comments".format(sort))
+            raise ValueError(
+                "Sort method '{}' is not supported for comments".format(sort)
+            )
 
         post = self.get_post(post_id)
         post.comment_sort = sort
@@ -817,10 +841,7 @@ class Api:
             list: A list of comments, might include a MoreComment at the end if more fetching required
         """
         more_comments = self.init_more_comments(
-            parent_id=parent_id,
-            post_id=post_id,
-            children=children,
-            sort=sort,
+            parent_id=parent_id, post_id=post_id, children=children, sort=sort
         )
 
         # more_comments.comments() can return either a list of comments or a CommentForest object
@@ -837,8 +858,8 @@ class Api:
             remaining_morecomments = self.init_more_comments(
                 parent_id=parent_id,
                 post_id=post_id,
-                children=children[len(comments):],
-                sort=sort
+                children=children[len(comments) :],
+                sort=sort,
             )
             comments.append(remaining_morecomments)
         return comments
@@ -858,26 +879,31 @@ class Api:
             praw.models.MoreComments: the set of more comments
         """
         if parent_id is not None:
-            qualified_parent_id = '{kind}_{parent_id}'.format(
-                kind=get_kind_mapping()['comment'],
-                parent_id=parent_id,
+            qualified_parent_id = "{kind}_{parent_id}".format(
+                kind=get_kind_mapping()["comment"], parent_id=parent_id
             )
         else:
-            qualified_parent_id = '{kind}_{parent_id}'.format(
-                kind=get_kind_mapping()['submission'],
-                parent_id=post_id,
+            qualified_parent_id = "{kind}_{parent_id}".format(
+                kind=get_kind_mapping()["submission"], parent_id=post_id
             )
 
         if sort not in VALID_COMMENT_SORT_TYPES:
-            raise ValueError("Sort method '{}' is not supported for comments".format(sort))
+            raise ValueError(
+                "Sort method '{}' is not supported for comments".format(sort)
+            )
 
-        more_comments = more.MoreComments(self.reddit, {
-            'children': children,
-            'count': len(children),
-            'parent_id': qualified_parent_id
-        })
+        more_comments = more.MoreComments(
+            self.reddit,
+            {
+                "children": children,
+                "count": len(children),
+                "parent_id": qualified_parent_id,
+            },
+        )
         more_comments.submission = self.reddit.submission(post_id)
-        more_comments.submission.comment_limit = settings.OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT
+        more_comments.submission.comment_limit = (
+            settings.OPEN_DISCUSSIONS_REDDIT_COMMENTS_LIMIT
+        )
         more_comments.submission.comment_sort = sort
 
         more_comments._load_comment = replace_load_comment(  # pylint: disable=protected-access
@@ -1018,7 +1044,13 @@ class Api:
             # So we have to be explicit here.
             raise ValueError("Missing moderator_name")
         # generators always eval True, so eval as list first and then as bool
-        return bool(list(self._list_moderators(channel_name=channel_name, moderator_name=moderator_name)))
+        return bool(
+            list(
+                self._list_moderators(
+                    channel_name=channel_name, moderator_name=moderator_name
+                )
+            )
+        )
 
     def add_subscriber(self, subscriber_name, channel_name):
         """
@@ -1158,9 +1190,7 @@ class Api:
             post_id(str): the id of the post to unsubscribe from
         """
         Subscription.objects.filter(
-            user=self.user,
-            post_id=post_id,
-            comment_id__isnull=True,
+            user=self.user, post_id=post_id, comment_id__isnull=True
         ).delete()
 
     def add_comment_subscription(self, post_id, comment_id):
@@ -1175,9 +1205,7 @@ class Api:
             Subscription: the subscription
         """
         subscription, _ = Subscription.objects.get_or_create(
-            user=self.user,
-            post_id=post_id,
-            comment_id=comment_id,
+            user=self.user, post_id=post_id, comment_id=comment_id
         )
         return subscription
 
@@ -1190,7 +1218,5 @@ class Api:
             comment_id(str): the id of the comment to unsubscribe from
         """
         Subscription.objects.filter(
-            user=self.user,
-            post_id=post_id,
-            comment_id=comment_id,
+            user=self.user, post_id=post_id, comment_id=comment_id
         ).delete()

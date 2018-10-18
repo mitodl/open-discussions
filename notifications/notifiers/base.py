@@ -4,10 +4,7 @@ from datetime import timedelta
 
 from notifications.notifiers.exceptions import InvalidTriggerFrequencyError
 from notifications.models import NotificationBase
-from open_discussions.utils import (
-    now_in_utc,
-    normalize_to_start_of_day,
-)
+from open_discussions.utils import now_in_utc, normalize_to_start_of_day
 
 DELTA_ONE_DAY = timedelta(days=1)
 DELTA_ONE_WEEK = timedelta(days=7)
@@ -20,7 +17,9 @@ class BaseNotifier:
 
     def __init__(self, notification_cls, notification_settings):
         if not issubclass(notification_cls, NotificationBase):
-            raise AttributeError("'notification_cls' must be a subclass of NotificationBase")
+            raise AttributeError(
+                "'notification_cls' must be a subclass of NotificationBase"
+            )
         self.notification_cls = notification_cls
         self.notification_settings = notification_settings
 
@@ -47,7 +46,7 @@ class BaseNotifier:
         if before is not None:
             query = query.filter(created_on__lt=before.created_on)
 
-        return query.order_by('-created_on').first()
+        return query.order_by("-created_on").first()
 
     def can_notify(self, last_notification):
         """
@@ -63,7 +62,10 @@ class BaseNotifier:
             bool: True if we're due to send another notification
         """
         # special case if we've never sent a notification or the setting is for an immediate send
-        if last_notification is None or self.notification_settings.is_triggered_immediate:
+        if (
+            last_notification is None
+            or self.notification_settings.is_triggered_immediate
+        ):
             return True
 
         # normalize now and created_on to the start of their respective days
@@ -77,7 +79,9 @@ class BaseNotifier:
         else:
             # practically, we'd only see this if our code called a notifier invalidly for a NEVER trigger_frequency
             raise InvalidTriggerFrequencyError(
-                "Unsupported trigger_frequency: {}".format(self.notification_settings.trigger_frequency)
+                "Unsupported trigger_frequency: {}".format(
+                    self.notification_settings.trigger_frequency
+                )
             )
 
         # return true if the normalized value is at least trigger_offset in the past

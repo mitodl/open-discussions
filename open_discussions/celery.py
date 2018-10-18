@@ -10,7 +10,7 @@ from celery import Celery
 from raven import Client
 from raven.contrib.celery import register_logger_signal, register_signal
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'open_discussions.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "open_discussions.settings")
 
 from django.conf import settings  # noqa pylint: disable=wrong-import-position
 
@@ -26,6 +26,6 @@ register_logger_signal(client, loglevel=settings.SENTRY_LOG_LEVEL)
 # to be ignored
 register_signal(client, ignore_expected=True)
 
-app = Celery('open_discussions')
-app.config_from_object('django.conf:settings', namespace='CELERY')
+app = Celery("open_discussions")
+app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)  # pragma: no cover

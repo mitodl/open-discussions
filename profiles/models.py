@@ -11,18 +11,18 @@ from profiles.utils import (
     make_thumbnail,
     MAX_IMAGE_FIELD_LENGTH,
     IMAGE_SMALL_MAX_DIMENSION,
-    IMAGE_MEDIUM_MAX_DIMENSION
+    IMAGE_MEDIUM_MAX_DIMENSION,
 )
 
 PROFILE_PROPS = (
-    'name',
-    'image',
-    'image_small',
-    'image_medium',
-    'email_optin',
-    'toc_optin',
-    'headline',
-    'bio',
+    "name",
+    "image",
+    "image_small",
+    "image_medium",
+    "email_optin",
+    "toc_optin",
+    "headline",
+    "bio",
 )
 
 
@@ -41,6 +41,7 @@ def filter_profile_props(data):
 
 class Profile(models.Model):
     """Profile model"""
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     name = models.TextField(blank=True, null=True)
@@ -49,9 +50,15 @@ class Profile(models.Model):
     image_small = models.CharField(null=True, max_length=MAX_IMAGE_FIELD_LENGTH)
     image_medium = models.CharField(null=True, max_length=MAX_IMAGE_FIELD_LENGTH)
 
-    image_file = models.ImageField(null=True, max_length=2083, upload_to=profile_image_upload_uri)
-    image_small_file = models.ImageField(null=True, max_length=2083, upload_to=profile_image_upload_uri_small)
-    image_medium_file = models.ImageField(null=True, max_length=2083, upload_to=profile_image_upload_uri_medium)
+    image_file = models.ImageField(
+        null=True, max_length=2083, upload_to=profile_image_upload_uri
+    )
+    image_small_file = models.ImageField(
+        null=True, max_length=2083, upload_to=profile_image_upload_uri_small
+    )
+    image_medium_file = models.ImageField(
+        null=True, max_length=2083, upload_to=profile_image_upload_uri_medium
+    )
 
     email_optin = models.NullBooleanField()
     toc_optin = models.NullBooleanField()
@@ -62,16 +69,26 @@ class Profile(models.Model):
     bio = models.TextField(blank=True, null=True)
 
     @transaction.atomic
-    def save(self, *args, update_image=False, **kwargs):  # pylint: disable=arguments-differ
+    def save(
+        self, *args, update_image=False, **kwargs
+    ):  # pylint: disable=arguments-differ
         """Update thumbnails if necessary"""
         if update_image:
             if self.image_file:
-                small_thumbnail = make_thumbnail(self.image_file, IMAGE_SMALL_MAX_DIMENSION)
-                medium_thumbnail = make_thumbnail(self.image_file, IMAGE_MEDIUM_MAX_DIMENSION)
+                small_thumbnail = make_thumbnail(
+                    self.image_file, IMAGE_SMALL_MAX_DIMENSION
+                )
+                medium_thumbnail = make_thumbnail(
+                    self.image_file, IMAGE_MEDIUM_MAX_DIMENSION
+                )
 
                 # name doesn't matter here, we use upload_to to produce that
-                self.image_small_file.save("{}.jpg".format(uuid4().hex), small_thumbnail)
-                self.image_medium_file.save("{}.jpg".format(uuid4().hex), medium_thumbnail)
+                self.image_small_file.save(
+                    "{}.jpg".format(uuid4().hex), small_thumbnail
+                )
+                self.image_medium_file.save(
+                    "{}.jpg".format(uuid4().hex), medium_thumbnail
+                )
             else:
                 self.image_small_file = None
                 self.image_medium_file = None

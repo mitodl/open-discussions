@@ -39,7 +39,9 @@ def test_normalize_to_start_of_day():
     """
     Test that normalize_to_start_of_day zeroes out the time components
     """
-    assert normalize_to_start_of_day(datetime.datetime(2018, 1, 3, 5, 6, 7)) == datetime.datetime(2018, 1, 3)
+    assert normalize_to_start_of_day(
+        datetime.datetime(2018, 1, 3, 5, 6, 7)
+    ) == datetime.datetime(2018, 1, 3)
 
 
 def test_chunks():
@@ -72,7 +74,7 @@ def test_chunks_iterable():
     chunk_output = []
     for chunk in chunks(input_range, chunk_size=10):
         chunk_output.append(chunk)
-    assert len(chunk_output) == ceil(113/10)
+    assert len(chunk_output) == ceil(113 / 10)
 
     range_list = []
     for chunk in chunk_output:
@@ -80,11 +82,14 @@ def test_chunks_iterable():
     assert range_list == list(range(count))
 
 
-@pytest.mark.parametrize("list_or_string,output", [
-    ['str', ['str']],
-    [['str', None, [None]], ['str']],
-    [[['a'], 'b', ['c', 'd'], 'e'], ['a', 'b', 'c', 'd', 'e']],
-])
+@pytest.mark.parametrize(
+    "list_or_string,output",
+    [
+        ["str", ["str"]],
+        [["str", None, [None]], ["str"]],
+        [[["a"], "b", ["c", "d"], "e"], ["a", "b", "c", "d", "e"]],
+    ],
+)
 def test_merge_strings(list_or_string, output):
     """
     merge_strings should flatten a nested list of strings
@@ -94,13 +99,13 @@ def test_merge_strings(list_or_string, output):
 
 def test_filter_dict_keys():
     """filter_dict_keys should return a dict with only the specified list of keys"""
-    d = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
-    assert filter_dict_keys(d, ['b', 'd']) == {'b': 2, 'd': 4}
+    d = {"a": 1, "b": 2, "c": 3, "d": 4}
+    assert filter_dict_keys(d, ["b", "d"]) == {"b": 2, "d": 4}
 
     with pytest.raises(KeyError):
-        assert filter_dict_keys(d, ['b', 'missing'])
+        assert filter_dict_keys(d, ["b", "missing"])
 
-    assert filter_dict_keys(d, ['b', 'missing'], optional=True) == {'b': 2}
+    assert filter_dict_keys(d, ["b", "missing"], optional=True) == {"b": 2}
 
 
 def test_filter_dict_with_renamed_keys():
@@ -108,10 +113,15 @@ def test_filter_dict_with_renamed_keys():
     filter_dict_with_renamed_keys should return a dict with only the keys in a filter dict,
     and should rename those keys according to the values in the filter dict.
     """
-    d = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
-    assert filter_dict_with_renamed_keys(d, {'b': 'b1', 'd': 'd1'}) == {'b1': 2, 'd1': 4}
+    d = {"a": 1, "b": 2, "c": 3, "d": 4}
+    assert filter_dict_with_renamed_keys(d, {"b": "b1", "d": "d1"}) == {
+        "b1": 2,
+        "d1": 4,
+    }
 
     with pytest.raises(KeyError):
-        assert filter_dict_with_renamed_keys(d, {'b': 'b1', 'missing': 'd1'})
+        assert filter_dict_with_renamed_keys(d, {"b": "b1", "missing": "d1"})
 
-    assert filter_dict_with_renamed_keys(d, {'b': 'b1', 'missing': 'd1'}, optional=True) == {'b1': 2}
+    assert filter_dict_with_renamed_keys(
+        d, {"b": "b1", "missing": "d1"}, optional=True
+    ) == {"b1": 2}

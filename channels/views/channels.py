@@ -1,9 +1,6 @@
 """Views for REST APIs for channels"""
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import (
-    ListCreateAPIView,
-    RetrieveUpdateAPIView,
-)
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -22,19 +19,21 @@ class ChannelListView(ListCreateAPIView):
     """
     View for listing and creating channels
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, IsStaffOrReadonlyPermission,)
+
+    permission_classes = (
+        AnonymousAccessReadonlyPermission,
+        IsStaffOrReadonlyPermission,
+    )
     serializer_class = ChannelSerializer
 
     def get_serializer_context(self):
         """Context for the request and view"""
-        channels = {
-            channel.name: channel for channel in Channel.objects.all()
-        }
+        channels = {channel.name: channel for channel in Channel.objects.all()}
 
         return {
-            'channel_api': self.request.channel_api,
-            'channels': channels,
-            'view': self,
+            "channel_api": self.request.channel_api,
+            "channels": channels,
+            "view": self,
         }
 
     def get_queryset(self):
@@ -46,7 +45,9 @@ class ChannelListView(ListCreateAPIView):
         """Return the channels list in alphabetical order"""
         queryset = self.get_queryset()
         serializer = ChannelSerializer(queryset, many=True)
-        return Response(sorted(serializer.data, key=lambda channel: channel['title'].lower()))
+        return Response(
+            sorted(serializer.data, key=lambda channel: channel["title"].lower())
+        )
 
     def post(self, request, *args, **kwargs):
         with translate_praw_exceptions(request.user):
@@ -57,27 +58,33 @@ class ChannelDetailView(RetrieveUpdateAPIView):
     """
     View for getting information about or updating a specific channel
     """
-    permission_classes = (AnonymousAccessReadonlyPermission, IsStaffModeratorOrReadonlyPermission,)
+
+    permission_classes = (
+        AnonymousAccessReadonlyPermission,
+        IsStaffModeratorOrReadonlyPermission,
+    )
     serializer_class = ChannelSerializer
 
     def get_serializer_context(self):
         """Context for the request and view"""
         return {
-            'channel_api': self.request.channel_api,
-            'channels': {
-                self.kwargs['channel_name']: get_object_or_404(Channel, name=self.kwargs['channel_name']),
+            "channel_api": self.request.channel_api,
+            "channels": {
+                self.kwargs["channel_name"]: get_object_or_404(
+                    Channel, name=self.kwargs["channel_name"]
+                )
             },
-            'view': self,
+            "view": self,
         }
 
     def get_object(self):
         """Get channel referenced by API"""
         api = Api(user=self.request.user)
-        return api.get_channel(self.kwargs['channel_name'])
+        return api.get_channel(self.kwargs["channel_name"])
 
     def get(self, request, *args, **kwargs):
         # we don't want to let this through to Reddit, because it blows up :/
-        if len(kwargs['channel_name']) == 1:
+        if len(kwargs["channel_name"]) == 1:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
         with translate_praw_exceptions(request.user):

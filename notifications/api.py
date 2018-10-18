@@ -30,24 +30,20 @@ def ensure_notification_settings(user):
     """
     existing_notification_types = NotificationSettings.objects.filter(
         user=user
-    ).values_list('notification_type', flat=True)
+    ).values_list("notification_type", flat=True)
 
     if NOTIFICATION_TYPE_FRONTPAGE not in existing_notification_types:
         NotificationSettings.objects.get_or_create(
             user=user,
             notification_type=NOTIFICATION_TYPE_FRONTPAGE,
-            defaults={
-                'trigger_frequency': FREQUENCY_DAILY,
-            }
+            defaults={"trigger_frequency": FREQUENCY_DAILY},
         )
 
     if NOTIFICATION_TYPE_COMMENTS not in existing_notification_types:
         NotificationSettings.objects.get_or_create(
             user=user,
             notification_type=NOTIFICATION_TYPE_COMMENTS,
-            defaults={
-                'trigger_frequency': FREQUENCY_IMMEDIATE,
-            }
+            defaults={"trigger_frequency": FREQUENCY_IMMEDIATE},
         )
 
 
@@ -65,14 +61,18 @@ def _send_frontpage_digests(notification_settings):
 
 def send_daily_frontpage_digests():
     """Sends daily frontpage digest emails"""
-    notification_settings = NotificationSettings.frontpage_settings().filter(trigger_frequency=FREQUENCY_DAILY)
+    notification_settings = NotificationSettings.frontpage_settings().filter(
+        trigger_frequency=FREQUENCY_DAILY
+    )
 
     _send_frontpage_digests(notification_settings)
 
 
 def send_weekly_frontpage_digests():
     """Sends weekly frontpage digest emails"""
-    notification_settings = NotificationSettings.frontpage_settings().filter(trigger_frequency=FREQUENCY_WEEKLY)
+    notification_settings = NotificationSettings.frontpage_settings().filter(
+        trigger_frequency=FREQUENCY_WEEKLY
+    )
 
     _send_frontpage_digests(notification_settings)
 
@@ -88,8 +88,7 @@ def _get_notifier_for_notification(notification):
         Notifier: instance of the notifier to use
     """
     notification_settings = NotificationSettings.objects.get(
-        user=notification.user,
-        notification_type=notification.notification_type,
+        user=notification.user, notification_type=notification.notification_type
     )
 
     if notification.notification_type == NOTIFICATION_TYPE_FRONTPAGE:
@@ -98,7 +97,9 @@ def _get_notifier_for_notification(notification):
         return comments.CommentNotifier(notification_settings)
     else:
         raise UnsupportedNotificationTypeError(
-            "Notification type '{}' is unsupported".format(notification.notification_type)
+            "Notification type '{}' is unsupported".format(
+                notification.notification_type
+            )
         )
 
 
@@ -106,10 +107,15 @@ def send_unsent_email_notifications():
     """
     Send all notifications that haven't been sent yet
     """
-    for notification_ids in chunks(EmailNotification.objects.filter(
-            state=EmailNotification.STATE_PENDING,
-    ).values_list('id', flat=True), chunk_size=100):
-        EmailNotification.objects.filter(id__in=notification_ids).update(state=EmailNotification.STATE_SENDING)
+    for notification_ids in chunks(
+        EmailNotification.objects.filter(
+            state=EmailNotification.STATE_PENDING
+        ).values_list("id", flat=True),
+        chunk_size=100,
+    ):
+        EmailNotification.objects.filter(id__in=notification_ids).update(
+            state=EmailNotification.STATE_SENDING
+        )
         tasks.send_email_notification_batch.delay(notification_ids)
 
 
@@ -125,7 +131,7 @@ def send_email_notification_batch(notification_ids):
             notifier = _get_notifier_for_notification(notification)
             notifier.send_notification(notification)
         except:  # pylint: disable=bare-except
-            log.exception('Error sending notification')
+            log.exception("Error sending notification")
 
 
 def send_comment_notifications(post_id, comment_id, new_comment_id):
@@ -137,16 +143,21 @@ def send_comment_notifications(post_id, comment_id, new_comment_id):
         comment_id (str): base36 comment id
         new_comment_id (str): base36 comment id of the new comment
     """
-    for subscription in Subscription.objects.filter(post_id=post_id).filter(
-            Q(comment_id=comment_id) | Q(comment_id=None)
-    ).distinct('user').iterator():
+    for subscription in (
+        Subscription.objects.filter(post_id=post_id)
+        .filter(Q(comment_id=comment_id) | Q(comment_id=None))
+        .distinct("user")
+        .iterator()
+    ):
         try:
             notification_settings = NotificationSettings.objects.get(
                 user_id=subscription.user_id,
                 notification_type=NOTIFICATION_TYPE_COMMENTS,
             )
         except NotificationSettings.DoesNotExist:
-            log.exception("NotificationSettings didn't exist for subscription %s", subscription.id)
+            log.exception(
+                "NotificationSettings didn't exist for subscription %s", subscription.id
+            )
             continue
 
         notifier = comments.CommentNotifier(notification_settings)

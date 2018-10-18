@@ -27,16 +27,20 @@ class UserActivityMiddleware:
             bool: True if the activity was tracked
         """
         try:
-            payload = self.jwt_decode_handler(request.COOKIES.get(settings.OPEN_DISCUSSIONS_COOKIE_NAME, None))
+            payload = self.jwt_decode_handler(
+                request.COOKIES.get(settings.OPEN_DISCUSSIONS_COOKIE_NAME, None)
+            )
         except jwt.InvalidTokenError:
             return None
 
         if not payload:
             return None
 
-        if not payload.get('tracked', False) and 'username' in payload:
-            Profile.objects.filter(user__username=payload['username']).update(last_active_on=now_in_utc())
-            payload['tracked'] = True
+        if not payload.get("tracked", False) and "username" in payload:
+            Profile.objects.filter(user__username=payload["username"]).update(
+                last_active_on=now_in_utc()
+            )
+            payload["tracked"] = True
             return payload
         return None
 

@@ -7,24 +7,20 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0004_add_last_active_on'),
-    ]
+    dependencies = [("profiles", "0004_add_last_active_on")]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='bio',
+            model_name="profile",
+            name="bio",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='headline',
+            model_name="profile",
+            name="headline",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='toc_optin',
-            field=models.NullBooleanField(),
+            model_name="profile", name="toc_optin", field=models.NullBooleanField()
         ),
     ]

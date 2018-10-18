@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0007_remove_gravatar_urls'),
-    ]
+    dependencies = [("profiles", "0007_remove_gravatar_urls")]
 
     operations = [
         migrations.AlterField(
-            model_name='profile',
-            name='headline',
+            model_name="profile",
+            name="headline",
             field=models.CharField(blank=True, max_length=60, null=True),
-        ),
+        )
     ]

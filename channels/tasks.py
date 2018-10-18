@@ -44,11 +44,7 @@ def sync_post_model(*, channel_name, post_id, post_url):
         post_id (str): The id of the post
         post_url(str): The external url of a link post
     """
-    api.sync_post_model(
-        channel_name=channel_name,
-        post_id=post_id,
-        post_url=post_url
-    )
+    api.sync_post_model(channel_name=channel_name, post_id=post_id, post_url=post_url)
 
 
 @app.task
@@ -60,14 +56,15 @@ def subscribe_all_users_to_default_channel(*, channel_name):
         channel_name (str): The name of the channel
     """
     chunk_size = settings.OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE
-    query = User.objects.exclude(
-        username=settings.INDEXING_API_USERNAME
-    ).values_list('username', flat=True).iterator()
+    query = (
+        User.objects.exclude(username=settings.INDEXING_API_USERNAME)
+        .values_list("username", flat=True)
+        .iterator()
+    )
 
     for usernames in chunks(query, chunk_size=chunk_size):
         subscribe_user_range_to_default_channel.delay(
-            channel_name=channel_name,
-            usernames=usernames
+            channel_name=channel_name, usernames=usernames
         )
 
 

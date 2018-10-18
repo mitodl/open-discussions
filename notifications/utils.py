@@ -4,11 +4,7 @@ import logging
 
 from django.db import transaction
 from praw.exceptions import APIException, PRAWException
-from prawcore.exceptions import (
-    Forbidden,
-    NotFound,
-    Redirect,
-)
+from prawcore.exceptions import Forbidden, NotFound, Redirect
 
 from notifications.notifiers.exceptions import CancelNotificationError
 from notifications.models import EmailNotification
@@ -29,7 +25,9 @@ def mark_as_sent_or_canceled(notification):
         notification (NotificationBase): notification to mark as sent
     """
     with transaction.atomic():
-        notification = EmailNotification.objects.select_for_update().get(id=notification.id)
+        notification = EmailNotification.objects.select_for_update().get(
+            id=notification.id
+        )
         if notification.state != EmailNotification.STATE_SENDING:
             # prevent sending an email that is not ready to be sent or already has been
             log.debug("EmailNotification not in sending state: %s", notification.id)
@@ -49,7 +47,9 @@ def mark_as_sent_or_canceled(notification):
             notification.save()
         except:  # pylint: disable=bare-except
             # if any other error happens, roll back to pending so that the crontask picks it up again
-            log.exception("EmailNotification rolled back to pending: %s", notification.id)
+            log.exception(
+                "EmailNotification rolled back to pending: %s", notification.id
+            )
             notification.state = EmailNotification.STATE_PENDING
             notification.save()
 
@@ -62,7 +62,11 @@ def praw_error_to_cancelled():
     except (Forbidden, NotFound, Redirect) as exc:
         raise CancelNotificationError() from exc
     except APIException as exc:
-        if exc.error_type in ('SUBREDDIT_NOTALLOWED', 'SUBREDDIT_NOEXIST', 'DELETED_COMMENT'):
+        if exc.error_type in (
+            "SUBREDDIT_NOTALLOWED",
+            "SUBREDDIT_NOEXIST",
+            "DELETED_COMMENT",
+        ):
             raise CancelNotificationError() from exc
         raise
     except PRAWException as exc:

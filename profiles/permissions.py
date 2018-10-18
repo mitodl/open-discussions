@@ -16,4 +16,8 @@ class HasEditPermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        return obj.user == request.user or request.user.is_superuser or is_staff_user(request)
+        return (
+            obj.user == request.user
+            or request.user.is_superuser
+            or is_staff_user(request)
+        )

@@ -13,12 +13,13 @@ from factory.fuzzy import FuzzyText
 
 class UserFactory(DjangoModelFactory):
     """Factory for Users"""
+
     username = LazyFunction(lambda: ulid.new().str)
-    email = FuzzyText(suffix='@example.com')
+    email = FuzzyText(suffix="@example.com")
     first_name = FuzzyText()
     last_name = FuzzyText()
 
-    profile = RelatedFactory('profiles.factories.ProfileFactory', 'user')
+    profile = RelatedFactory("profiles.factories.ProfileFactory", "user")
 
     class Meta:
         model = User
@@ -29,6 +30,7 @@ class UserFactory(DjangoModelFactory):
 
 class UserSocialAuthFactory(DjangoModelFactory):
     """Factory for UserSocialAuth"""
+
     provider = FuzzyText()
     user = SubFactory(UserFactory)
     uid = FuzzyText()
@@ -40,4 +42,6 @@ class UserSocialAuthFactory(DjangoModelFactory):
     def post_gen(self, create, extracted, **kwargs):  # pylint: disable=unused-argument
         """Set uid appropriately if the given provider is 'saml'"""
         if self.provider == SAMLAuth.name:
-            self.uid = '{}:{}'.format(settings.SOCIAL_AUTH_DEFAULT_IDP_KEY, self.user.email)
+            self.uid = "{}:{}".format(
+                settings.SOCIAL_AUTH_DEFAULT_IDP_KEY, self.user.email
+            )

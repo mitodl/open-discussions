@@ -129,7 +129,7 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
       return (
         <div className="channel-page-wrapper">
           <ChannelBanner editable={false} channel={channel} />
-          <Grid className={`main-content two-column channel-page`}>
+          <Grid className="main-content two-column channel-header">
             <Cell className="avatar-headline-row" width={12}>
               <div className="left">
                 <ChannelAvatar
@@ -155,18 +155,25 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
                 ) : null}
               </div>
             </Cell>
+          </Grid>
+          <div className="channel-intra-nav-wrapper">
+            <Grid className="main-content two-column channel-intra-nav">
+              <Cell width={12}>
+                <IntraPageNav>
+                  <a href="#" className="active">
+                    Home
+                  </a>
+                </IntraPageNav>
+              </Cell>
+            </Grid>
+          </div>
+          <Grid className="main-content two-column channel-page">
             <Cell width={8}>
               <MetaTags>
                 <title>{formatTitle(channel.title)}</title>
                 <CanonicalLink match={match} />
               </MetaTags>
-              <IntraPageNav>
-                <a href="#" className="active">
-                  Posts
-                </a>
-              </IntraPageNav>
               <div className="post-list-title">
-                <div>All</div>
                 <PostSortPicker
                   updateSortParam={updatePostSortParam(this.props)}
                   value={qs.parse(search).sort || POSTS_SORT_HOT}

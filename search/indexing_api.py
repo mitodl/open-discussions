@@ -17,49 +17,51 @@ from search.connection import (
     make_backing_index_name,
     refresh_index,
 )
-from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, VALID_OBJECT_TYPES
-from search.exceptions import ReindexException
-from search.serializers import (
-    serialize_bulk_post,
-    serialize_bulk_comments
+from search.constants import (
+    POST_TYPE,
+    COMMENT_TYPE,
+    ALIAS_ALL_INDICES,
+    VALID_OBJECT_TYPES,
 )
+from search.exceptions import ReindexException
+from search.serializers import serialize_bulk_post, serialize_bulk_comments
 
 
 log = logging.getLogger(__name__)
 User = get_user_model()
 
 
-GLOBAL_DOC_TYPE = '_doc'
-SCRIPTING_LANG = 'painless'
-UPDATE_CONFLICT_SETTING = 'proceed'
+GLOBAL_DOC_TYPE = "_doc"
+SCRIPTING_LANG = "painless"
+UPDATE_CONFLICT_SETTING = "proceed"
 
 BASE_CONTENT_TYPE = {
-    'object_type': {'type': 'keyword'},
-    'author_id': {'type': 'keyword'},
-    'author_name': {'type': 'keyword'},
-    'channel_name': {'type': 'keyword'},
-    'channel_title': {'type': 'text'},
-    'text': {'type': 'text'},
-    'score': {'type': 'long'},
-    'created': {'type': 'date'},
-    'deleted': {'type': 'boolean'},
-    'removed': {'type': 'boolean'},
-    'post_id': {'type': 'keyword'},
-    'post_title': {'type': 'text'},
+    "object_type": {"type": "keyword"},
+    "author_id": {"type": "keyword"},
+    "author_name": {"type": "keyword"},
+    "channel_name": {"type": "keyword"},
+    "channel_title": {"type": "text"},
+    "text": {"type": "text"},
+    "score": {"type": "long"},
+    "created": {"type": "date"},
+    "deleted": {"type": "boolean"},
+    "removed": {"type": "boolean"},
+    "post_id": {"type": "keyword"},
+    "post_title": {"type": "text"},
 }
 
 MAPPING = {
     POST_TYPE: {
         **BASE_CONTENT_TYPE,
-        'post_link_url': {'type': 'keyword'},
-        'post_link_thumbnail': {'type': 'keyword'},
-        'num_comments': {'type': 'long'},
+        "post_link_url": {"type": "keyword"},
+        "post_link_thumbnail": {"type": "keyword"},
+        "num_comments": {"type": "long"},
     },
     COMMENT_TYPE: {
         **BASE_CONTENT_TYPE,
-        'comment_id': {'type': 'keyword'},
-        'parent_comment_id': {'type': 'keyword'},
-        'parent_post_removed': {'type': 'boolean'},
+        "comment_id": {"type": "keyword"},
+        "parent_comment_id": {"type": "keyword"},
+        "parent_post_removed": {"type": "boolean"},
     },
 }
 
@@ -74,31 +76,31 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
         object_type(str): The type of document (post, comment)
     """
     if object_type not in VALID_OBJECT_TYPES:
-        raise ValueError('A valid object type must be specified when clearing and creating an index')
+        raise ValueError(
+            "A valid object type must be specified when clearing and creating an index"
+        )
     conn = get_conn(verify=False)
     if conn.indices.exists(index_name):
         conn.indices.delete(index_name)
     index_create_data = {
-        'settings': {
-            'analysis': {
-                'analyzer': {
-                    'folding': {
-                        'type': 'custom',
-                        'tokenizer': 'standard',
-                        'filter': [
-                            'lowercase',
-                            'asciifolding',  # remove accents if we use folding analyzer
-                        ]
+        "settings": {
+            "analysis": {
+                "analyzer": {
+                    "folding": {
+                        "type": "custom",
+                        "tokenizer": "standard",
+                        "filter": [
+                            "lowercase",
+                            "asciifolding",  # remove accents if we use folding analyzer
+                        ],
                     }
                 }
             }
         }
     }
     if not skip_mapping:
-        index_create_data['mappings'] = {
-            GLOBAL_DOC_TYPE: {
-                "properties": MAPPING[object_type]
-            }
+        index_create_data["mappings"] = {
+            GLOBAL_DOC_TYPE: {"properties": MAPPING[object_type]}
         }
     # from https://www.elastic.co/guide/en/elasticsearch/guide/current/asciifolding-token-filter.html
     conn.indices.create(index_name, body=index_create_data)
@@ -113,13 +115,8 @@ def create_document(doc_id, data):
         data (dict): Full ES document data
     """
     conn = get_conn(verify=True)
-    for alias in get_active_aliases([data['object_type']]):
-        conn.create(
-            index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
-            body=data,
-            id=doc_id,
-        )
+    for alias in get_active_aliases([data["object_type"]]):
+        conn.create(index=alias, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id)
 
 
 def update_field_values_by_query(query, field_name, field_value, object_types=None):
@@ -145,22 +142,20 @@ def update_field_values_by_query(query, field_name, field_value, object_types=No
                 "script": {
                     "source": "ctx._source.{} = params.new_value".format(field_name),
                     "lang": SCRIPTING_LANG,
-                    "params": {
-                        "new_value": field_value
-                    },
+                    "params": {"new_value": field_value},
                 },
-                **query
+                **query,
             },
         )
         # Our policy for document update-related version conflicts right now is to log them
         # and allow the app to continue as normal.
-        num_version_conflicts = es_response.get('version_conflicts', 0)
+        num_version_conflicts = es_response.get("version_conflicts", 0)
         if num_version_conflicts > 0:
             log.error(
-                'Update By Query API request resulted in %s version conflict(s) (alias: %s, query: %s)',
+                "Update By Query API request resulted in %s version conflict(s) (alias: %s, query: %s)",
                 num_version_conflicts,
                 alias,
-                query
+                query,
             )
 
 
@@ -188,13 +183,13 @@ def _update_document_by_id(doc_id, data, object_type, update_key=None):
         # and allow the app to continue as normal.
         except ConflictError:
             log.error(
-                'Update API request resulted in a version conflict (alias: %s, doc id: %s)',
+                "Update API request resulted in a version conflict (alias: %s, doc id: %s)",
                 alias,
-                doc_id
+                doc_id,
             )
 
 
-update_document_with_partial = partial(_update_document_by_id, update_key='doc')
+update_document_with_partial = partial(_update_document_by_id, update_key="doc")
 
 
 def increment_document_integer_field(doc_id, field_name, incr_amount, object_type):
@@ -212,12 +207,10 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
         {
             "source": "ctx._source.{} += params.incr_amount".format(field_name),
             "lang": SCRIPTING_LANG,
-            "params": {
-                "incr_amount": incr_amount
-            }
+            "params": {"incr_amount": incr_amount},
         },
         object_type,
-        update_key='script'
+        update_key="script",
     )
 
 
@@ -235,9 +228,9 @@ def sync_post(serialized):
 
     for item in serialized:
         sync_post_model(
-            channel_name=item['channel_title'],
-            post_id=item['post_id'],
-            post_url=item['post_link_url']
+            channel_name=item["channel_title"],
+            post_id=item["post_id"],
+            post_url=item["post_link_url"],
         )
         yield item
 
@@ -256,10 +249,10 @@ def sync_comments(serialized):
 
     for item in serialized:
         sync_comment_model(
-            channel_name=item['channel_title'],
-            post_id=item['post_id'],
-            comment_id=item['comment_id'],
-            parent_id=item['parent_comment_id'],
+            channel_name=item["channel_title"],
+            post_id=item["post_id"],
+            comment_id=item["comment_id"],
+            parent_id=item["parent_comment_id"],
         )
         yield item
 
@@ -291,9 +284,9 @@ def index_post_with_comments(post_id):
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )
         if len(errors) > 0:
-            raise ReindexException("Error during bulk post insert: {errors}".format(
-                errors=errors
-            ))
+            raise ReindexException(
+                "Error during bulk post insert: {errors}".format(errors=errors)
+            )
 
     for alias in get_active_aliases([COMMENT_TYPE]):
         _, errors = bulk(
@@ -305,9 +298,9 @@ def index_post_with_comments(post_id):
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )
         if len(errors) > 0:
-            raise ReindexException("Error during bulk comment insert: {errors}".format(
-                errors=errors
-            ))
+            raise ReindexException(
+                "Error during bulk comment insert: {errors}".format(errors=errors)
+            )
 
 
 def create_backing_index(object_type):
@@ -357,40 +350,24 @@ def switch_indices(backing_index, object_type):
         # Should only be one backing index in normal circumstances
         old_backing_indexes = list(conn.indices.get_alias(name=default_alias).keys())
         for index in old_backing_indexes:
-            actions.extend([
-                {
-                    "remove": {
-                        "index": index,
-                        "alias": default_alias,
-                    }
-                },
-                {
-                    "remove": {
-                        "index": index,
-                        "alias": global_alias,
-                    }
-                }
-            ])
-    actions.extend([
-        {
-            "add": {
-                "index": backing_index,
-                "alias": default_alias,
-            },
-        },
-        {
-            "add": {
-                "index": backing_index,
-                "alias": global_alias,
-            },
-        },
-    ])
-    conn.indices.update_aliases({
-        "actions": actions
-    })
+            actions.extend(
+                [
+                    {"remove": {"index": index, "alias": default_alias}},
+                    {"remove": {"index": index, "alias": global_alias}},
+                ]
+            )
+    actions.extend(
+        [
+            {"add": {"index": backing_index, "alias": default_alias}},
+            {"add": {"index": backing_index, "alias": global_alias}},
+        ]
+    )
+    conn.indices.update_aliases({"actions": actions})
     refresh_index(backing_index)
     for index in old_backing_indexes:
         conn.indices.delete(index)
 
     # Finally, remove the link to the reindexing alias
-    conn.indices.delete_alias(name=get_reindexing_alias_name(object_type), index=backing_index)
+    conn.indices.delete_alias(
+        name=get_reindexing_alias_name(object_type), index=backing_index
+    )

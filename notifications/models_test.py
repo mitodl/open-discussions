@@ -13,7 +13,7 @@ from notifications.models import (
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize('trigger_frequency', FREQUENCIES)
+@pytest.mark.parametrize("trigger_frequency", FREQUENCIES)
 def test_triggered_properties(trigger_frequency):
     """Test that the is_triggered_X properties return correct values"""
     ns = NotificationSettingsFactory.create(trigger_frequency=trigger_frequency)

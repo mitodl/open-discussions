@@ -40,7 +40,8 @@ const DEFAULT_ARGS = {
   partial_token: null,
   flow:          FLOW_REGISTER,
   errors:        [],
-  redirect_url:  null
+  redirect_url:  null,
+  extra_data:    {}
 }
 
 describe("auth lib", () => {

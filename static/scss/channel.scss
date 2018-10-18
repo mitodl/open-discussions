@@ -1,5 +1,35 @@
-.app .content .main-content.channel-page:not(.channel-loading) {
-  margin-top: 0;
+.app .content .main-content {
+  &.channel-header {
+    margin: 0 auto;
+    min-height: 0;
+  }
+
+  &.channel-page:not(.channel-loading) {
+    margin-top: 0;
+  }
+
+  &.channel-intra-nav {
+    margin: 0 auto 5px;
+    min-height: 0;
+  }
+}
+
+.channel-intra-nav-wrapper {
+  background-color: #ffffff;
+  padding: 10px 0 0;
+
+  .intra-page-nav {
+    margin-bottom: 9px;
+
+    a {
+      color: $rouge;
+      padding: 5px 15px;
+
+      &.active {
+        border-bottom-color: $rouge;
+      }
+    }
+  }
 }
 
 .channel-page-wrapper {
@@ -84,7 +114,6 @@
   }
 }
 
-$avatar-dimension-large: 90px;
 $avatar-dimension-medium: 57px;
 $avatar-dimension-small: 22px;
 
@@ -107,6 +136,7 @@ $avatar-dimension-small: 22px;
     display: table-cell;
     vertical-align: middle;
     color: #fff;
+    background-color: $channel-avatar-bg;
     font-weight: 600;
   }
 
@@ -116,7 +146,7 @@ $avatar-dimension-small: 22px;
     .avatar-initials {
       width: $avatar-dimension-small;
       height: $avatar-dimension-small;
-      font-size: $avatar-dimension-small / 2;
+      font-size: 15px;
       border-radius: 4px;
     }
   }
@@ -127,21 +157,8 @@ $avatar-dimension-small: 22px;
     .avatar-initials {
       width: $avatar-dimension-medium;
       height: $avatar-dimension-medium;
-      font-size: $avatar-dimension-medium / 4;
+      font-size: 32px;
       border-radius: 8px;
-    }
-  }
-
-  &.large-size {
-    img,
-    .avatar,
-    .avatar-initials {
-      width: $avatar-dimension-large;
-      height: $avatar-dimension-large;
-    }
-
-    .avatar-initials {
-      font-size: $avatar-dimension-large / 4;
     }
   }
 }

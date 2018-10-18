@@ -19,7 +19,7 @@ from anymail.message import AnymailMessage
 from djoser.views import (
     PasswordResetView as DjoserPasswordResetView,
     PasswordResetConfirmView as DjoserPasswordResetConfirmView,
-    SetPasswordView as DjoserSetPasswordView
+    SetPasswordView as DjoserSetPasswordView,
 )
 from djoser.utils import ActionViewMixin
 from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
@@ -40,6 +40,7 @@ User = get_user_model()
 
 class SocialAuthAPIView(APIView):
     """API view for social auth endpoints"""
+
     authentication_classes = []
     permission_classes = []
 
@@ -55,11 +56,10 @@ class SocialAuthAPIView(APIView):
         serializer_cls = self.get_serializer_cls()
         strategy = load_drf_strategy(request)
         backend = load_backend(strategy, EmailAuth.name, None)
-        serializer = serializer_cls(data=request.data, context={
-            'request': request,
-            'strategy': strategy,
-            'backend': backend,
-        })
+        serializer = serializer_cls(
+            data=request.data,
+            context={"request": request, "strategy": strategy, "backend": backend},
+        )
 
         if serializer.is_valid():
             serializer.save()
@@ -69,6 +69,7 @@ class SocialAuthAPIView(APIView):
 
 class LoginEmailView(SocialAuthAPIView):
     """Email login view"""
+
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return LoginEmailSerializer
@@ -76,6 +77,7 @@ class LoginEmailView(SocialAuthAPIView):
 
 class LoginPasswordView(SocialAuthAPIView):
     """Email login view"""
+
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return LoginPasswordSerializer
@@ -83,6 +85,7 @@ class LoginPasswordView(SocialAuthAPIView):
 
 class RegisterEmailView(SocialAuthAPIView):
     """Email register view"""
+
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return RegisterEmailSerializer
@@ -93,17 +96,18 @@ class RegisterEmailView(SocialAuthAPIView):
             r = requests.post(
                 "https://www.google.com/recaptcha/api/siteverify?secret={key}&response={captcha}".format(
                     key=quote(settings.RECAPTCHA_SECRET_KEY),
-                    captcha=quote(request.data["recaptcha"])
+                    captcha=quote(request.data["recaptcha"]),
                 )
             )
             response = r.json()
-            if not response['success']:
+            if not response["success"]:
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
         return super().post(request)
 
 
 class RegisterConfirmView(SocialAuthAPIView):
     """Email registration confirmation view"""
+
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return RegisterConfirmSerializer
@@ -111,12 +115,13 @@ class RegisterConfirmView(SocialAuthAPIView):
 
 class RegisterDetailsView(SocialAuthAPIView):
     """Email registration details view"""
+
     def get_serializer_cls(self):
         """Return the serializer cls"""
         return RegisterDetailsSerializer
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_social_auth_types(request):
     """
@@ -126,22 +131,15 @@ def get_social_auth_types(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     social_auths = (
-        UserSocialAuth
-        .objects
-        .filter(user=request.user)
-        .values('provider')
-        .distinct()
+        UserSocialAuth.objects.filter(user=request.user).values("provider").distinct()
     )
-    return Response(
-        data=social_auths,
-        status=status.HTTP_200_OK
-    )
+    return Response(data=social_auths, status=status.HTTP_200_OK)
 
 
 def login_complete(request, **kwargs):  # pylint: disable=unused-argument
     """View that completes the login"""
     # redirect to home
-    response = redirect('/')
+    response = redirect("/")
 
     if api_settings.JWT_AUTH_COOKIE in request.COOKIES:
         # to clear a cookie, it's most reliable to set it to expire immediately
@@ -162,14 +160,19 @@ def confirmation_sent(request, **kwargs):  # pylint: disable=unused-argument
 
 class CustomPasswordResetEmail(DjoserPasswordResetEmail):
     """Custom class to modify base functionality in Djoser's PasswordResetEmail class"""
+
     def send(self, to, *args, **kwargs):
         """
         Overrides djoser.email.PasswordResetEmail#send to use our mail API.
         """
         context = self.get_context_data()
         context.update(self.context)
-        with django_mail.get_connection(settings.NOTIFICATION_EMAIL_BACKEND) as connection:
-            subject, text_body, html_body = render_email_templates('password_reset', context)
+        with django_mail.get_connection(
+            settings.NOTIFICATION_EMAIL_BACKEND
+        ) as connection:
+            subject, text_body, html_body = render_email_templates(
+                "password_reset", context
+            )
             msg = AnymailMessage(
                 subject=subject,
                 body=text_body,
@@ -183,8 +186,8 @@ class CustomPasswordResetEmail(DjoserPasswordResetEmail):
     def get_context_data(self):
         """Adds base_url to the template context"""
         context = super().get_context_data()
-        context['base_url'] = settings.SITE_BASE_URL
-        context['use_new_branding'] = features.is_enabled(features.USE_NEW_BRANDING)
+        context["base_url"] = settings.SITE_BASE_URL
+        context["use_new_branding"] = features.is_enabled(features.USE_NEW_BRANDING)
         return context
 
 
@@ -198,6 +201,7 @@ class CustomDjoserAPIView(ActionViewMixin):
     coercing that to a 200 with an empty dict as the response data. This can be removed
     when redux-hammock is changed to support 204's.
     """
+
     def post(self, request):  # pylint: disable=missing-docstring
         if not features.is_enabled(features.EMAIL_AUTH):
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -209,16 +213,21 @@ class CustomDjoserAPIView(ActionViewMixin):
 
 class CustomPasswordResetView(CustomDjoserAPIView, DjoserPasswordResetView):
     """Custom view to modify base functionality in Djoser's PasswordResetView class"""
+
     pass
 
 
-class CustomPasswordResetConfirmView(CustomDjoserAPIView, DjoserPasswordResetConfirmView):
+class CustomPasswordResetConfirmView(
+    CustomDjoserAPIView, DjoserPasswordResetConfirmView
+):
     """Custom view to modify base functionality in Djoser's PasswordResetConfirmView class"""
+
     pass
 
 
 class CustomSetPasswordView(CustomDjoserAPIView, DjoserSetPasswordView):
     """Custom view to modify base functionality in Djoser's SetPasswordView class"""
+
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):

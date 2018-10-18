@@ -1,8 +1,9 @@
 """API for general search-related functionality"""
-from channels.constants import (
-    POST_TYPE,
-    COMMENT_TYPE,
-)
+from elasticsearch_dsl import Search
+
+from channels.constants import POST_TYPE, COMMENT_TYPE
+from search.connection import get_conn, get_default_alias_name
+from search.constants import ALIAS_ALL_INDICES
 
 
 def get_reddit_object_type(reddit_obj):
@@ -16,7 +17,7 @@ def get_reddit_object_type(reddit_obj):
     Returns:
         str: A string constant indicating the object type
     """
-    return COMMENT_TYPE if hasattr(reddit_obj, 'submission') else POST_TYPE
+    return COMMENT_TYPE if hasattr(reddit_obj, "submission") else POST_TYPE
 
 
 def gen_post_id(reddit_obj_id):
@@ -29,7 +30,7 @@ def gen_post_id(reddit_obj_id):
     Returns:
         str: The Elasticsearch document id for this object
     """
-    return 'p_{}'.format(reddit_obj_id)
+    return "p_{}".format(reddit_obj_id)
 
 
 def gen_comment_id(reddit_obj_id):
@@ -42,7 +43,7 @@ def gen_comment_id(reddit_obj_id):
     Returns:
         str: The Elasticsearch document id for this object
     """
-    return 'c_{}'.format(reddit_obj_id)
+    return "c_{}".format(reddit_obj_id)
 
 
 def is_reddit_object_removed(reddit_obj):
@@ -57,3 +58,24 @@ def is_reddit_object_removed(reddit_obj):
         bool: True if the object is considered removed, False otherwise
     """
     return bool(reddit_obj.banned_by) and not reddit_obj.approved_by
+
+
+def execute_search(*, user, query):
+    """
+    Execute a search based on the query
+
+    Args:
+        user (User): The user executing the search. Used to determine filters to enforce permissions.
+        query (dict): The Elasticsearch query constructed in the frontend
+
+    Returns:
+        dict: The Elasticsearch response dict
+    """
+    from channels.api import Api
+
+    index = get_default_alias_name(ALIAS_ALL_INDICES)
+    search = Search(index=index, using=get_conn())
+    search.update_from_dict(query)
+    channel_names = [channel.display_name for channel in Api(user).list_channels()]
+    search = search.filter("terms", channel_name=channel_names)
+    return search.execute().to_dict()

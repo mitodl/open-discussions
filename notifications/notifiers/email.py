@@ -13,6 +13,7 @@ log = logging.getLogger()
 
 class EmailNotifier(BaseNotifier):
     """Notifier for email notifications"""
+
     def __init__(self, template_name, notification_settings):
         # sets notification_cls
         super().__init__(EmailNotification, notification_settings)
@@ -32,14 +33,14 @@ class EmailNotifier(BaseNotifier):
             bool: True if we're due to send another notification
         """
         return (
-            features.is_enabled(features.EMAIL_NOTIFICATIONS) and
-            self.notification_settings.via_email and
-            api.can_email_user(self.user) and
-            super().can_notify(last_notification)
+            features.is_enabled(features.EMAIL_NOTIFICATIONS)
+            and self.notification_settings.via_email
+            and api.can_email_user(self.user)
+            and super().can_notify(last_notification)
         )
 
     def _get_notification_data(
-            self, current_notification, last_notification
+        self, current_notification, last_notification
     ):  # pylint: disable=unused-argument
         """
         Gets the data for this notification
@@ -75,14 +76,22 @@ class EmailNotifier(BaseNotifier):
             if not will_send:
                 return
 
-            last_notification = self._get_most_recent_notification(before=email_notification)
+            last_notification = self._get_most_recent_notification(
+                before=email_notification
+            )
 
             data = self._get_notification_data(email_notification, last_notification)
 
             # generate the message (there's only 1)
-            messages = list(api.messages_for_recipients([
-                (recipient, api.context_for_user(user, data)) for recipient, user in api.safe_format_recipients([user])
-            ], self._template_name))
+            messages = list(
+                api.messages_for_recipients(
+                    [
+                        (recipient, api.context_for_user(user=user, extra_context=data))
+                        for recipient, user in api.safe_format_recipients([user])
+                    ],
+                    self._template_name,
+                )
+            )
 
             if not messages:
                 raise CancelNotificationError()

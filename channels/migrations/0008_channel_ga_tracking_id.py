@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('channels', '0007_avatar_banner'),
-    ]
+    dependencies = [("channels", "0007_avatar_banner")]
 
     operations = [
         migrations.AddField(
-            model_name='channel',
-            name='ga_tracking_id',
+            model_name="channel",
+            name="ga_tracking_id",
             field=models.CharField(blank=True, max_length=24, null=True),
-        ),
+        )
     ]

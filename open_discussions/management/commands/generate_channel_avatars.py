@@ -27,15 +27,13 @@ DIRECTORY = "static/images/channel_avatars"
 
 class Command(BaseCommand):
     """Command to generate the channel avatar SVGs"""
-    help = 'Command to generate the channel avatar SVGs'
+
+    help = "Command to generate the channel avatar SVGs"
 
     def handle(self, *args, **options):
         # get a list of the colors plus the reverse gradient of each
         all_colors = COLORS + list(map(reversed, COLORS))
         os.makedirs(DIRECTORY, exist_ok=True)
         for idx, (top_color, bottom_color) in enumerate(all_colors):
-            with open(f"{DIRECTORY}/channel-avatar-{idx}.svg", 'w') as f:
-                f.write(TEMPLATE.format(
-                    top_color=top_color,
-                    bottom_color=bottom_color,
-                ))
+            with open(f"{DIRECTORY}/channel-avatar-{idx}.svg", "w") as f:
+                f.write(TEMPLATE.format(top_color=top_color, bottom_color=bottom_color))

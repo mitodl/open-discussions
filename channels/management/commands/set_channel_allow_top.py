@@ -11,20 +11,21 @@ from channels.models import Channel
 
 class Command(BaseCommand):
     """Sets allow_top=True on channels"""
-    help = 'Sets allow_top=True on channels'
+
+    help = "Sets allow_top=True on channels"
 
     def add_arguments(self, parser):
-        parser.add_argument('--name', nargs='?', action='append')
-        parser.add_argument('--allow-top', action='store', default=True)
+        parser.add_argument("--name", nargs="?", action="append")
+        parser.add_argument("--allow-top", action="store", default=True)
 
     def handle(self, *args, **options):
         """Sets allow_top on channels"""
         channels = Channel.objects.all()
 
-        allow_top = options['allow_top']
+        allow_top = options["allow_top"]
 
-        if options['name']:
-            channels = channels.filter(name__in=options['name'])
+        if options["name"]:
+            channels = channels.filter(name__in=options["name"])
 
         api_user = User.objects.get(username=settings.INDEXING_API_USERNAME)
         api = Api(api_user)
@@ -35,15 +36,17 @@ class Command(BaseCommand):
         for channel in channels:
             try:
                 api.update_channel(channel.name, allow_top=allow_top)
-                self.stdout.write(self.style.SUCCESS("Channel '{}' SUCCESS: set allow_top={}".format(
-                    channel.name,
-                    allow_top,
-                )))
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        "Channel '{}' SUCCESS: set allow_top={}".format(
+                            channel.name, allow_top
+                        )
+                    )
+                )
             except Exception as exc:  # pylint: disable=broad-except
-                self.stderr.write("Channel '{}' ERROR: {}".format(
-                    channel.name,
-                    str(exc),
-                ))
+                self.stderr.write(
+                    "Channel '{}' ERROR: {}".format(channel.name, str(exc))
+                )
                 failed = True
 
         if failed:

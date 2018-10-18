@@ -15,14 +15,14 @@ import semantic_version
 
 
 REQUIRED_SETTINGS = {
-    'ELASTICSEARCH_INDEX': 'some_index',
-    'MAILGUN_SENDER_DOMAIN': 'mailgun.fake.domain',
-    'MAILGUN_KEY': 'fake_mailgun_key',
-    'OPEN_DISCUSSIONS_COOKIE_NAME': 'cookie_monster',
-    'OPEN_DISCUSSIONS_COOKIE_DOMAIN': 'od.fake.domain',
-    'OPEN_DISCUSSIONS_DEFAULT_SITE_KEY': 'mm_test',
-    'OPEN_DISCUSSIONS_BASE_URL': 'http:localhost:8063/',
-    'INDEXING_API_USERNAME': 'mitodl',
+    "ELASTICSEARCH_INDEX": "some_index",
+    "MAILGUN_SENDER_DOMAIN": "mailgun.fake.domain",
+    "MAILGUN_KEY": "fake_mailgun_key",
+    "OPEN_DISCUSSIONS_COOKIE_NAME": "cookie_monster",
+    "OPEN_DISCUSSIONS_COOKIE_DOMAIN": "od.fake.domain",
+    "OPEN_DISCUSSIONS_DEFAULT_SITE_KEY": "mm_test",
+    "OPEN_DISCUSSIONS_BASE_URL": "http:localhost:8063/",
+    "INDEXING_API_USERNAME": "mitodl",
 }
 
 
@@ -36,113 +36,117 @@ class TestSettings(TestCase):
         Returns:
             dict: dictionary of the newly reloaded settings ``vars``
         """
-        importlib.reload(sys.modules['open_discussions.settings'])
+        importlib.reload(sys.modules["open_discussions.settings"])
         # Restore settings to original settings after test
-        self.addCleanup(importlib.reload, sys.modules['open_discussions.settings'])
-        return vars(sys.modules['open_discussions.settings'])
+        self.addCleanup(importlib.reload, sys.modules["open_discussions.settings"])
+        return vars(sys.modules["open_discussions.settings"])
 
     def test_s3_settings(self):
         """Verify that we enable and configure S3 with a variable"""
         # Unset, we don't do S3
-        with mock.patch.dict('os.environ', {
-                **REQUIRED_SETTINGS,
-                'OPEN_DISCUSSIONS_USE_S3': 'False'
-        }, clear=True):
+        with mock.patch.dict(
+            "os.environ",
+            {**REQUIRED_SETTINGS, "OPEN_DISCUSSIONS_USE_S3": "False"},
+            clear=True,
+        ):
             settings_vars = self.reload_settings()
             self.assertNotEqual(
-                settings_vars.get('DEFAULT_FILE_STORAGE'),
-                'storages.backends.s3boto.S3BotoStorage'
+                settings_vars.get("DEFAULT_FILE_STORAGE"),
+                "storages.backends.s3boto.S3BotoStorage",
             )
 
         with self.assertRaises(ImproperlyConfigured):
-            with mock.patch.dict('os.environ', {
-                    'OPEN_DISCUSSIONS_USE_S3': 'True',
-            }, clear=True):
+            with mock.patch.dict(
+                "os.environ", {"OPEN_DISCUSSIONS_USE_S3": "True"}, clear=True
+            ):
                 self.reload_settings()
 
         # Verify it all works with it enabled and configured 'properly'
-        with mock.patch.dict('os.environ', {
+        with mock.patch.dict(
+            "os.environ",
+            {
                 **REQUIRED_SETTINGS,
-                'OPEN_DISCUSSIONS_USE_S3': 'True',
-                'AWS_ACCESS_KEY_ID': '1',
-                'AWS_SECRET_ACCESS_KEY': '2',
-                'AWS_STORAGE_BUCKET_NAME': '3',
-        }, clear=True):
+                "OPEN_DISCUSSIONS_USE_S3": "True",
+                "AWS_ACCESS_KEY_ID": "1",
+                "AWS_SECRET_ACCESS_KEY": "2",
+                "AWS_STORAGE_BUCKET_NAME": "3",
+            },
+            clear=True,
+        ):
             settings_vars = self.reload_settings()
             self.assertEqual(
-                settings_vars.get('DEFAULT_FILE_STORAGE'),
-                'storages.backends.s3boto.S3BotoStorage'
+                settings_vars.get("DEFAULT_FILE_STORAGE"),
+                "storages.backends.s3boto.S3BotoStorage",
             )
 
     def test_admin_settings(self):
         """Verify that we configure email with environment variable"""
 
-        with mock.patch.dict('os.environ', {
-                **REQUIRED_SETTINGS,
-                'OPEN_DISCUSSIONS_ADMIN_EMAIL': '',
-        }, clear=True):
+        with mock.patch.dict(
+            "os.environ",
+            {**REQUIRED_SETTINGS, "OPEN_DISCUSSIONS_ADMIN_EMAIL": ""},
+            clear=True,
+        ):
             settings_vars = self.reload_settings()
-            self.assertFalse(settings_vars.get('ADMINS', False))
+            self.assertFalse(settings_vars.get("ADMINS", False))
 
-        test_admin_email = 'cuddle_bunnies@example.com'
-        with mock.patch.dict('os.environ', {
-                **REQUIRED_SETTINGS,
-                'OPEN_DISCUSSIONS_ADMIN_EMAIL': test_admin_email,
-        }, clear=True):
+        test_admin_email = "cuddle_bunnies@example.com"
+        with mock.patch.dict(
+            "os.environ",
+            {**REQUIRED_SETTINGS, "OPEN_DISCUSSIONS_ADMIN_EMAIL": test_admin_email},
+            clear=True,
+        ):
             settings_vars = self.reload_settings()
-            self.assertEqual(
-                (('Admins', test_admin_email),),
-                settings_vars['ADMINS']
-            )
+            self.assertEqual((("Admins", test_admin_email),), settings_vars["ADMINS"])
         # Manually set ADMIN to our test setting and verify e-mail
         # goes where we expect
-        settings.ADMINS = (('Admins', test_admin_email),)
-        mail.mail_admins('Test', 'message')
+        settings.ADMINS = (("Admins", test_admin_email),)
+        mail.mail_admins("Test", "message")
         self.assertIn(test_admin_email, mail.outbox[0].to)
 
     def test_db_ssl_enable(self):
         """Verify that we can enable/disable database SSL with a var"""
 
         # Check default state is SSL on
-        with mock.patch.dict('os.environ', REQUIRED_SETTINGS, clear=True):
+        with mock.patch.dict("os.environ", REQUIRED_SETTINGS, clear=True):
             settings_vars = self.reload_settings()
             self.assertEqual(
-                settings_vars['DATABASES']['default']['OPTIONS'],
-                {'sslmode': 'require'}
+                settings_vars["DATABASES"]["default"]["OPTIONS"], {"sslmode": "require"}
             )
 
         # Check enabling the setting explicitly
-        with mock.patch.dict('os.environ', {
-                **REQUIRED_SETTINGS,
-                'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'True'
-        }, clear=True):
+        with mock.patch.dict(
+            "os.environ",
+            {**REQUIRED_SETTINGS, "OPEN_DISCUSSIONS_DB_DISABLE_SSL": "True"},
+            clear=True,
+        ):
             settings_vars = self.reload_settings()
-            self.assertEqual(
-                settings_vars['DATABASES']['default']['OPTIONS'],
-                {}
-            )
+            self.assertEqual(settings_vars["DATABASES"]["default"]["OPTIONS"], {})
 
         # Disable it
-        with mock.patch.dict('os.environ', {
-                **REQUIRED_SETTINGS,
-                'OPEN_DISCUSSIONS_DB_DISABLE_SSL': 'False'
-        }, clear=True):
+        with mock.patch.dict(
+            "os.environ",
+            {**REQUIRED_SETTINGS, "OPEN_DISCUSSIONS_DB_DISABLE_SSL": "False"},
+            clear=True,
+        ):
             settings_vars = self.reload_settings()
             self.assertEqual(
-                settings_vars['DATABASES']['default']['OPTIONS'],
-                {'sslmode': 'require'}
+                settings_vars["DATABASES"]["default"]["OPTIONS"], {"sslmode": "require"}
             )
 
     def test_elasticsearch_index_pr_build(self):
         """For PR builds we will use the heroku app name instead of the given ELASTICSEARCH_INDEX"""
-        index_name = 'heroku_app_name_as_index'
-        with mock.patch.dict('os.environ', {
+        index_name = "heroku_app_name_as_index"
+        with mock.patch.dict(
+            "os.environ",
+            {
                 **REQUIRED_SETTINGS,
-                'HEROKU_APP_NAME': index_name,
-                'HEROKU_PARENT_APP_NAME': 'some_name',
-        }):
+                "HEROKU_APP_NAME": index_name,
+                "HEROKU_PARENT_APP_NAME": "some_name",
+            },
+        ):
             settings_vars = self.reload_settings()
-            assert settings_vars['ELASTICSEARCH_INDEX'] == index_name
+            assert settings_vars["ELASTICSEARCH_INDEX"] == index_name
 
     @staticmethod
     def test_semantic_version():
@@ -158,7 +162,7 @@ class TestSettings(TestCase):
         for key in REQUIRED_SETTINGS:
             required_settings = {**REQUIRED_SETTINGS}
             del required_settings[key]
-            with mock.patch.dict('os.environ', required_settings, clear=True):
+            with mock.patch.dict("os.environ", required_settings, clear=True):
                 with self.assertRaises(ImproperlyConfigured):
                     self.reload_settings()
 
@@ -167,14 +171,12 @@ class TestSettings(TestCase):
         Assert that the PASSWORD_RESET_CONFIRM_URL setting value produces a
         URL that
         """
-        token = '4xj-8aa0d06b40f1c067b464'
-        uid = 'AA'
+        token = "4xj-8aa0d06b40f1c067b464"
+        uid = "AA"
         template_generated_url = settings.PASSWORD_RESET_CONFIRM_URL.format(
-            uid=uid,
-            token=token
+            uid=uid, token=token
         )
-        reverse_url = reverse('password-reset-confirm', kwargs=dict(
-            uid=uid,
-            token=token
-        ))
-        assert reverse_url == '/{}'.format(template_generated_url)
+        reverse_url = reverse(
+            "password-reset-confirm", kwargs=dict(uid=uid, token=token)
+        )
+        assert reverse_url == "/{}".format(template_generated_url)

@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sites', '0001_add_authenticated_site'),
-    ]
+    dependencies = [("sites", "0001_add_authenticated_site")]
 
     operations = [
         migrations.AlterField(
-            model_name='authenticatedsite',
-            name='key',
-            field=models.CharField(help_text='Key to lookup site in JWT token, must match exactly the key set by the authenticating site', max_length=20, unique=True),
-        ),
+            model_name="authenticatedsite",
+            name="key",
+            field=models.CharField(
+                help_text="Key to lookup site in JWT token, must match exactly the key set by the authenticating site",
+                max_length=20,
+                unique=True,
+            ),
+        )
     ]

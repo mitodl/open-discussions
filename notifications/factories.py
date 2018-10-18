@@ -1,9 +1,6 @@
 """Factories for making test data"""
 import factory
-from factory import (
-    Faker,
-    SubFactory,
-)
+from factory import Faker, SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 import pytz
@@ -25,11 +22,12 @@ from notifications.models import (
 
 class NotificationSettingsFactory(DjangoModelFactory):
     """Factory for NotificationSettings"""
+
     user = SubFactory(UserFactory)
     notification_type = FuzzyChoice(NOTIFICATION_TYPES)
 
-    via_app = Faker('boolean')
-    via_email = Faker('boolean')
+    via_app = Faker("boolean")
+    via_email = Faker("boolean")
 
     trigger_frequency = FuzzyChoice(FREQUENCIES)
 
@@ -37,12 +35,8 @@ class NotificationSettingsFactory(DjangoModelFactory):
         model = NotificationSettings
 
     class Params:
-        frontpage_type = factory.Trait(
-            notification_type=NOTIFICATION_TYPE_FRONTPAGE,
-        )
-        comments_type = factory.Trait(
-            notification_type=NOTIFICATION_TYPE_COMMENTS,
-        )
+        frontpage_type = factory.Trait(notification_type=NOTIFICATION_TYPE_FRONTPAGE)
+        comments_type = factory.Trait(notification_type=NOTIFICATION_TYPE_COMMENTS)
 
         immediate = factory.Trait(trigger_frequency=FREQUENCY_IMMEDIATE)
         weekly = factory.Trait(trigger_frequency=FREQUENCY_WEEKLY)
@@ -52,6 +46,7 @@ class NotificationSettingsFactory(DjangoModelFactory):
 
 class EmailNotificationFactory(DjangoModelFactory):
     """Factory for EmailNotification"""
+
     user = SubFactory(UserFactory)
     notification_type = FuzzyChoice(NOTIFICATION_TYPES)
 
@@ -62,17 +57,11 @@ class EmailNotificationFactory(DjangoModelFactory):
         model = EmailNotification
 
     class Params:
-        frontpage_type = factory.Trait(
-            notification_type=NOTIFICATION_TYPE_FRONTPAGE,
-        )
-        comments_type = factory.Trait(
-            notification_type=NOTIFICATION_TYPE_COMMENTS,
-        )
+        frontpage_type = factory.Trait(notification_type=NOTIFICATION_TYPE_FRONTPAGE)
+        comments_type = factory.Trait(notification_type=NOTIFICATION_TYPE_COMMENTS)
 
         sent = factory.Trait(
             state=EmailNotification.STATE_SENT,
-            sent_at=Faker('past_datetime', tzinfo=pytz.utc),
+            sent_at=Faker("past_datetime", tzinfo=pytz.utc),
         )
-        sending = factory.Trait(
-            state=EmailNotification.STATE_SENDING,
-        )
+        sending = factory.Trait(state=EmailNotification.STATE_SENDING)

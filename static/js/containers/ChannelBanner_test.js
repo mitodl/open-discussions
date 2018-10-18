@@ -6,7 +6,6 @@ import sinon from "sinon"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import ChannelBanner from "./ChannelBanner"
 import * as uiActions from "../actions/ui"
-import { defaultChannelBannerUrl } from "../lib/util"
 
 import { makeChannel } from "../factories/channels"
 
@@ -32,19 +31,18 @@ describe("ChannelBanner", () => {
 
   //
   ;[true, false].forEach(hasBanner => {
-    it("renders an image", async () => {
+    it(`${hasBanner ? "renders" : "doesn't render"} an image`, async () => {
       channel.banner = hasBanner ? "channel" : null
 
       const { inner } = await renderPage({}, { channel })
-      assert.equal(
-        inner.find("img").props().alt,
-        `Channel banner for ${channel.name}`
-      )
       assert.ok(inner.find(".gradient").exists())
-      assert.equal(
-        inner.find("img").props().src,
-        hasBanner ? channel.banner : defaultChannelBannerUrl
-      )
+      if (hasBanner) {
+        const img = inner.find("img")
+        assert.equal(img.props().src, channel.banner)
+        assert.equal(img.props().alt, `Channel banner for ${channel.name}`)
+      } else {
+        assert.ok(inner.find(".default-image").exists())
+      }
     })
   })
 

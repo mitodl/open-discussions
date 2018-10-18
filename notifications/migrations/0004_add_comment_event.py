@@ -12,24 +12,45 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('notifications', '0003_add_notification_skipped'),
+        ("notifications", "0003_add_notification_skipped"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CommentEvent',
+            name="CommentEvent",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('post_id', channels.models.Base36IntegerField()),
-                ('comment_id', channels.models.Base36IntegerField(null=True)),
-                ('email_notification', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='notifications.EmailNotification')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                ("post_id", channels.models.Base36IntegerField()),
+                ("comment_id", channels.models.Base36IntegerField(null=True)),
+                (
+                    "email_notification",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="notifications.EmailNotification",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AlterUniqueTogether(
-            name='commentevent',
-            unique_together=set([('user', 'post_id', 'comment_id')]),
+            name="commentevent",
+            unique_together=set([("user", "post_id", "comment_id")]),
         ),
     ]
