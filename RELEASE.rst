@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.50.1
+Version 0.50.1 (Released October 18, 2018)
 --------------
 
 - Revert "Added hover highlight on post card" (#1390)
