@@ -95,7 +95,6 @@ def test_update_field_values_by_query(mocked_api):
     Test that the update_field_values_by_query task calls the indexing
     API function with the right args
     """
-
     indexing_api_args = ({"query": {}}, {"field1": "value1"}, [POST_TYPE])
     update_field_values_by_query(*indexing_api_args)
     assert mocked_api.update_field_values_by_query.call_count == 1

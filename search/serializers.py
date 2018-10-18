@@ -37,7 +37,7 @@ class ESSerializer:
 
     def serialize(self, discussions_obj):
         """
-        Serializes a reddit object by modifying the results from a base serializer class
+        Serializes a reddit or django model object by modifying the results from a base serializer class
         """
         base_serialized = self.base_serializer(discussions_obj).data
         serialized = {

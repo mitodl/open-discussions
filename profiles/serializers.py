@@ -133,6 +133,7 @@ class UserSerializer(serializers.ModelSerializer):
                         prop_name,
                         profile_data.get(prop_name, getattr(profile, prop_name)),
                     )
+                    # Update author's posts, comments in ES if name or avatar changed
                     if prop_name in profile_data and (
                         prop_name == "name" or "image" in prop_name
                     ):

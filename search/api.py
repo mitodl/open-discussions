@@ -47,7 +47,7 @@ def gen_profile_id(profile_id):
     Generates the Elasticsearch document id for a profile
 
     Args:
-        profile_id (int|str): The username of a Profile object
+        profile_id (str): The username of a Profile object
 
     Returns:
         str: The Elasticsearch document id for this object

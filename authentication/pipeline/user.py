@@ -91,7 +91,7 @@ def require_password_and_profile_via_email(
     if "name" in data:
         profile.name = data["name"]
         profile.save()
-        index_new_profile(profile)
+    index_new_profile(profile)
 
     if "password" in data:
         user.set_password(data["password"])

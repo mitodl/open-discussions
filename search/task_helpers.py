@@ -57,7 +57,7 @@ def reddit_object_persist(*persistence_funcs):
 @if_feature_enabled(INDEX_UPDATES)
 def index_new_profile(profile_obj):
     """
-    Serializes a post object and runs a task to create an ES document for it.
+    Serializes a profile object and runs a task to create an ES document for it.
 
     Args:
         profile_obj (profiles.models.Profile): A user Profile object
