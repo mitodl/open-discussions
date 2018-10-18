@@ -17,13 +17,13 @@ export const makePost = (
   id:              `post${incr.next().value}`,
   title:           casual.sentence,
   slug:            casual.word,
-  score:           Math.round(Math.random() * 15),
-  upvoted:         Math.random() < 0.5,
-  author_id:       `justareddituser${String(Math.random())}`,
+  score:           casual.integer(-5, 15),
+  upvoted:         casual.boolean,
+  author_id:       `justareddituser${String(casual.random)}`,
   text:            isURLPost ? null : casual.text,
   url:             isURLPost ? casual.url : null,
   created:         casual.moment.format(),
-  num_comments:    Math.round(Math.random() * 10),
+  num_comments:    casual.integer(0, 25),
   channel_name:    channelName,
   channel_title:   casual.string,
   profile_image:   casual.url,
@@ -38,10 +38,10 @@ export const makePost = (
 })
 
 export const makeChannelPostList = (channelName: string = casual.word) =>
-  R.range(0, 20).map(() => makePost(Math.random() > 0.5, channelName))
+  R.range(0, 20).map(() => makePost(casual.boolean, channelName))
 
 export const makeFrontPageList = () =>
-  R.range(0, 30).map(() => makePost(Math.random() > 0.5))
+  R.range(0, 30).map(() => makePost(casual.boolean))
 
 export const makePagination = (): PostListPagination => ({
   sort:         casual.random_element(VALID_POST_SORT_TYPES),

@@ -58,22 +58,27 @@ export const makeMoreComments = (
 
 export const makeCommentsResponse = (
   post: Post,
-  minComments: number = 1
+  minComments: number = 1,
+  maxTopLevelComments: number = 10,
+  maxMidLevelComments: number = 5
 ): Array<GenericComment> => {
-  const topLevelComments = arrayN(minComments, 10).map(() => makeComment(post))
+  const topLevelComments = arrayN(minComments, maxTopLevelComments).map(() =>
+    makeComment(post)
+  )
   const comments = [...topLevelComments]
 
   topLevelComments.forEach((comment, index) => {
     if (casual.coin_flip || index === 0) {
-      for (const midComment of arrayN(minComments, 5).map(() =>
-        makeComment(post, comment.id)
+      for (const midComment of arrayN(minComments, maxMidLevelComments).map(
+        () => makeComment(post, comment.id)
       )) {
         comments.push(midComment)
 
         if (casual.coin_flip || index === 0) {
-          for (const edgeComment of arrayN(minComments, 5).map(() =>
-            makeComment(post, midComment.id)
-          )) {
+          for (const edgeComment of arrayN(
+            minComments,
+            maxMidLevelComments
+          ).map(() => makeComment(post, midComment.id))) {
             comments.push(edgeComment)
           }
         }
