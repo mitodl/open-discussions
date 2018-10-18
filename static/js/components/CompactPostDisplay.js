@@ -88,7 +88,7 @@ export class CompactPostDisplay extends React.Component<Props> {
               ) : null}
               <Link
                 to={postDetailURL(post.channel_name, post.id, post.slug)}
-                className="navy"
+                className="navy no-underline"
               >
                 <div className="post-title">
                   <PostTitleAndHostname post={post} />

@@ -93,6 +93,18 @@ storiesOf("Links and Buttons", module)
       </StoryWrapper>
     )
   })
+  .add("no-underline link", () => {
+    const textContent = textContentKnob()
+    const url = urlKnob()
+
+    return (
+      <StoryWrapper>
+        <a className="no-underline" href={url}>
+          {textContent}
+        </a>
+      </StoryWrapper>
+    )
+  })
   .add("basic button", () => {
     const textContent = textContentKnob()
 

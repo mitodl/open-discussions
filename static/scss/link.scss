@@ -26,3 +26,7 @@ a.navy {
     text-decoration: underline;
   }
 }
+
+a.no-underline:hover {
+  text-decoration: none;
+}
