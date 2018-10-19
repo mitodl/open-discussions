@@ -2,4 +2,8 @@
   blockquote {
     @extend %blockquote;
   }
+
+  a {
+    word-break: break-word;
+  }
 }
