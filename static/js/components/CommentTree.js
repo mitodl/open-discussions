@@ -156,77 +156,79 @@ export default class CommentTree extends React.Component<Props> {
           ) : null}
         </div>
         {!userIsAnonymous() ? (
-          <i className="material-icons more_vert" onClick={showDropdown}>
-            more_vert
-          </i>
+          <div>
+            <i className="material-icons more_vert" onClick={showDropdown}>
+              more_vert
+            </i>
+            {commentMenuOpen ? (
+              <DropdownMenu
+                closeMenu={hideDropdown}
+                className="post-comment-dropdown"
+              >
+                {userIsAnonymous() ? null : this.renderFollowButton(comment)}
+                {SETTINGS.username === comment.author_id && !moderationUI ? (
+                  <li>
+                    <div
+                      className="comment-action-button edit-button"
+                      onClick={e => {
+                        if (beginEditing) {
+                          beginEditing(editFormKey, comment, e)
+                        }
+                      }}
+                    >
+                      <a href="#">Edit</a>
+                    </div>
+                  </li>
+                ) : null}
+                {SETTINGS.username === comment.author_id && deleteComment ? (
+                  <li>
+                    <div
+                      className="comment-action-button delete-button"
+                      onClick={preventDefaultAndInvoke(() =>
+                        deleteComment(comment)
+                      )}
+                    >
+                      <a href="#">Delete</a>
+                    </div>
+                  </li>
+                ) : null}
+                {comment.num_reports && ignoreCommentReports ? (
+                  <li>
+                    <div
+                      className="comment-action-button ignore-button"
+                      onClick={preventDefaultAndInvoke(() =>
+                        ignoreCommentReports(comment)
+                      )}
+                    >
+                      <a href="#">Ignore reports</a>
+                    </div>
+                  </li>
+                ) : null}
+                <li>
+                  <CommentRemovalForm
+                    comment={comment}
+                    remove={remove}
+                    approve={approve}
+                    isModerator={isModerator}
+                  />
+                </li>
+                {moderationUI || userIsAnonymous() || !reportComment ? null : (
+                  <li>
+                    <div
+                      className="comment-action-button report-button"
+                      onClick={preventDefaultAndInvoke(() =>
+                        reportComment(comment)
+                      )}
+                    >
+                      <a href="#">Report</a>
+                    </div>
+                  </li>
+                )}
+              </DropdownMenu>
+            ) : null}
+          </div>
         ) : null}
         <ReportCount count={comment.num_reports} />
-        {commentMenuOpen ? (
-          <DropdownMenu
-            closeMenu={hideDropdown}
-            className="post-comment-dropdown"
-          >
-            {userIsAnonymous() ? null : this.renderFollowButton(comment)}
-            {SETTINGS.username === comment.author_id && !moderationUI ? (
-              <li>
-                <div
-                  className="comment-action-button edit-button"
-                  onClick={e => {
-                    if (beginEditing) {
-                      beginEditing(editFormKey, comment, e)
-                    }
-                  }}
-                >
-                  <a href="#">Edit</a>
-                </div>
-              </li>
-            ) : null}
-            {SETTINGS.username === comment.author_id && deleteComment ? (
-              <li>
-                <div
-                  className="comment-action-button delete-button"
-                  onClick={preventDefaultAndInvoke(() =>
-                    deleteComment(comment)
-                  )}
-                >
-                  <a href="#">Delete</a>
-                </div>
-              </li>
-            ) : null}
-            {comment.num_reports && ignoreCommentReports ? (
-              <li>
-                <div
-                  className="comment-action-button ignore-button"
-                  onClick={preventDefaultAndInvoke(() =>
-                    ignoreCommentReports(comment)
-                  )}
-                >
-                  <a href="#">Ignore reports</a>
-                </div>
-              </li>
-            ) : null}
-            <li>
-              <CommentRemovalForm
-                comment={comment}
-                remove={remove}
-                approve={approve}
-                isModerator={isModerator}
-              />
-            </li>
-            {moderationUI || userIsAnonymous() || !reportComment ? null : (
-              <li>
-                <div
-                  className="comment-action-button report-button"
-                  onClick={preventDefaultAndInvoke(() =>
-                    reportComment(comment)
-                  )}
-                >
-                  <a href="#">Report</a>
-                </div>
-              </li>
-            )}
-          </DropdownMenu>
-        ) : null}
       </div>
     )
   }
