@@ -422,8 +422,8 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
 def test_sync_post():
     """Test that sync_post creates Post model objects"""
     serialized = [
-        {"channel_title": "a", "post_id": "a1", "post_link_url": "http://a1.edu"},
-        {"channel_title": "b", "post_id": "b1", "post_link_url": "http://b1.edu"},
+        {"channel_name": "a", "post_id": "a1", "post_link_url": "http://a1.edu"},
+        {"channel_name": "b", "post_id": "b1", "post_link_url": "http://b1.edu"},
     ]
 
     list(sync_post(serialized))
@@ -435,13 +435,13 @@ def test_sync_comments():
     """Test that sync_comments creates Comment model objects"""
     serialized = [
         {
-            "channel_title": "a",
+            "channel_name": "a",
             "post_id": "a1",
             "comment_id": "a1c",
             "parent_comment_id": None,
         },
         {
-            "channel_title": "b",
+            "channel_name": "b",
             "post_id": "b1",
             "comment_id": "b1c",
             "parent_comment_id": "a1c",

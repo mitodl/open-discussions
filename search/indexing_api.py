@@ -253,7 +253,7 @@ def sync_post(serialized):
 
     for item in serialized:
         sync_post_model(
-            channel_name=item["channel_title"],
+            channel_name=item["channel_name"],
             post_id=item["post_id"],
             post_url=item["post_link_url"],
         )
@@ -274,7 +274,7 @@ def sync_comments(serialized):
 
     for item in serialized:
         sync_comment_model(
-            channel_name=item["channel_title"],
+            channel_name=item["channel_name"],
             post_id=item["post_id"],
             comment_id=item["comment_id"],
             parent_id=item["parent_comment_id"],
