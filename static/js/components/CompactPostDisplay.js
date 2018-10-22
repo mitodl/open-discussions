@@ -174,7 +174,7 @@ export class CompactPostDisplay extends React.Component<Props> {
                 closeMenu={hidePostMenu}
                 className="post-comment-dropdown"
               >
-                {showPinUI && post.text && isModerator && togglePinPost ? (
+                {showPinUI && isModerator && togglePinPost ? (
                   <li>
                     <a onClick={() => togglePinPost(post)}>
                       {post.stickied ? "Unpin" : "Pin"}
