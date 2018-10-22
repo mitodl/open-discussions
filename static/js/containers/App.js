@@ -29,6 +29,8 @@ import RegisterDetailsPage from "./auth/RegisterDetailsPage"
 import InactiveUserPage from "./auth/InactiveUserPage"
 import PasswordResetPage from "./auth/PasswordResetPage"
 import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
+import PubPubPage from './PubPubPage'
+
 import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"
 import Drawer from "../containers/Drawer"
@@ -291,6 +293,11 @@ class App extends React.Component<AppProps> {
             exact
             path={`${match.url}privacy-statement`}
             component={PrivacyPolicyPage}
+          />
+          <Route
+            exact
+            path={`${match.url}trypubpub`}
+            component={PubPubPage}
           />
         </div>
       </div>

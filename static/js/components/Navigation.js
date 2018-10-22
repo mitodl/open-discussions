@@ -87,6 +87,11 @@ class Navigation extends React.Component<NavigationProps, State> {
               <span className="title">Home</span>
             </Link>
           </div>
+          <div>
+            <Link to="/trypubpub">
+              pubpub editor page
+            </Link>
+          </div>
         </div>
         {composeBtn ? (
           <div className="new-post-link-container">{composeBtn}</div>
