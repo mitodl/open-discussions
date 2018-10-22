@@ -78,9 +78,7 @@ def test_search(settings, mocker, client):
     )
     query = {"query": {"match": {"title": "Search"}}}
     resp = client.post(reverse("search"), query)
-    assert resp.json() == [
-        hit["_source"] for hit in FAKE_SEARCH_RESPONSE["hits"]["hits"]
-    ]
+    assert resp.json() == FAKE_SEARCH_RESPONSE
     search_mock.assert_called_once_with(user=AnonymousUser(), query=query)
 
 

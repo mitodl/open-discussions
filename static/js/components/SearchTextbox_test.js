@@ -58,4 +58,11 @@ describe("SearchTextbox", () => {
       assert.equal(wrapper.find(".clear-icon").length, hasText ? 1 : 0)
     })
   })
+
+  it("triggers onSubmit when the enter key is pressed", () => {
+    const wrapper = render()
+    const event = { key: "Enter" }
+    wrapper.find("input").prop("onKeyDown")(event)
+    sinon.assert.calledWith(onSubmitStub, event)
+  })
 })

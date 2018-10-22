@@ -46,7 +46,8 @@ import {
   deleteChannelContributor,
   deleteChannelModerator,
   getChannelContributors,
-  getChannelModerators
+  getChannelModerators,
+  search
 } from "./api"
 import {
   makeChannel,
@@ -64,6 +65,7 @@ import {
 import { makeReportRecord } from "../factories/reports"
 import { COMMENT_SORT_NEW } from "./picker"
 import * as authFuncs from "./fetch_auth"
+import * as searchFuncs from "./search"
 import { makeProfile } from "../factories/profiles"
 
 describe("api", function() {
@@ -798,6 +800,22 @@ describe("api", function() {
             })
           })
         )
+      })
+    })
+
+    describe("search", () => {
+      it("should execute a search and return results", async () => {
+        const body = { a: "body" }
+        const buildStub = sandbox
+          .stub(searchFuncs, "buildSearchQuery")
+          .returns(body)
+        const params = { some: "params" }
+        await search(params)
+        sinon.assert.calledWith(buildStub, params)
+        sinon.assert.calledWith(fetchJSONStub, "/api/v0/search/", {
+          method: POST,
+          body:   JSON.stringify(body)
+        })
       })
     })
   })

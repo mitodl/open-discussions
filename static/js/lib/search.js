@@ -1,9 +1,13 @@
 // @flow
+import bodybuilder from "bodybuilder"
+import R from "ramda"
+
 import type { CommentInTree, Post, Profile } from "../flow/discussionTypes"
 import type {
   PostResult,
   CommentResult,
-  ProfileResult
+  ProfileResult,
+  SearchParams
 } from "../flow/searchTypes"
 
 export const searchResultToComment = (
@@ -68,3 +72,80 @@ export const searchResultToProfile = (result: ProfileResult): Profile => ({
   profile_image_medium: result.author_avatar_medium,
   username:             result.author_id
 })
+
+const POST_QUERY_FIELDS = ["text", "post_title"]
+const COMMENT_QUERY_FIELDS = ["text"]
+const PROFILE_QUERY_FIELDS = ["author_headline", "author_bio"]
+const _searchFields = (type: ?string) => {
+  if (type === "post") {
+    return POST_QUERY_FIELDS
+  } else if (type === "comment") {
+    return COMMENT_QUERY_FIELDS
+  } else if (type === "profile") {
+    return PROFILE_QUERY_FIELDS
+  } else {
+    return R.uniq([
+      ...POST_QUERY_FIELDS,
+      ...COMMENT_QUERY_FIELDS,
+      ...PROFILE_QUERY_FIELDS
+    ])
+  }
+}
+export { _searchFields as searchFields }
+import { searchFields } from "./search"
+
+const POST_CHANNEL_FIELDS = ["channel_name"]
+const COMMENT_CHANNEL_FIELDS = ["channel_name"]
+const PROFILE_CHANNEL_FIELDS = ["author_channel_membership"]
+const _channelFields = (type: ?string) => {
+  if (type === "post") {
+    return POST_CHANNEL_FIELDS
+  } else if (type === "comment") {
+    return COMMENT_CHANNEL_FIELDS
+  } else if (type === "profile") {
+    return PROFILE_CHANNEL_FIELDS
+  } else {
+    return R.uniq([
+      ...POST_CHANNEL_FIELDS,
+      ...COMMENT_CHANNEL_FIELDS,
+      ...PROFILE_CHANNEL_FIELDS
+    ])
+  }
+}
+export { _channelFields as channelFields }
+import { channelFields } from "./search"
+
+export const buildSearchQuery = ({
+  text,
+  type,
+  channelName,
+  from,
+  size
+}: SearchParams): Object => {
+  let builder = bodybuilder()
+  if (type) {
+    builder = builder.filter("term", "object_type", type)
+  } else {
+    // TEMPORARY: prevent search filter on profile. If type is present we will rely on UI to not show profile option
+    builder = builder.filter("terms", "object_type", ["comment", "post"])
+  }
+  if (!R.isNil(from)) {
+    builder = builder.from(from)
+  }
+  if (!R.isNil(size)) {
+    builder = builder.size(size)
+  }
+  if (channelName) {
+    const fields = channelFields(type)
+    for (const field of fields) {
+      builder = builder.orFilter("term", field, channelName)
+    }
+  }
+  if (text) {
+    const fields = searchFields(type)
+    builder = builder.query("multi_match", "fields", fields, {
+      query: text
+    })
+  }
+  return builder.build()
+}

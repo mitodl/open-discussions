@@ -18,7 +18,6 @@ from sites.api import get_default_site
 
 def index(request, **kwargs):  # pylint: disable=unused-argument
     """Render the react app"""
-    user = None
     username = None
     user_full_name = None
     user_email = None
@@ -56,8 +55,10 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "allow_email_auth": features.is_enabled(features.EMAIL_AUTH),
         "allow_saml_auth": features.is_enabled(features.SAML_AUTH),
         "use_new_branding": features.is_enabled(features.USE_NEW_BRANDING),
+        "allow_search": features.is_enabled(features.SEARCH_UI),
         "embedlyKey": settings.EMBEDLY_KEY,
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
+        "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,
     }
 
     return render(

@@ -32,6 +32,7 @@ def test_webpack_url(
     settings.FEATURES[features.USE_NEW_BRANDING] = False
     settings.ENVIRONMENT = "test"
     settings.VERSION = "1.2.3"
+    settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE = 123
 
     if test_user:
         expected_user_values = {
@@ -51,31 +52,31 @@ def test_webpack_url(
     assert set(bundles) == {"common", "root", "style", "zendesk"}
     js_settings = json.loads(response.context["js_settings_json"])
     assert js_settings == {
-        **{
-            "gaTrackingID": "fake",
-            "public_path": "/static/bundles/",
-            "site_url": settings.SITE_BASE_URL,
-            "max_comment_depth": 6,
-            "profile_ui_enabled": False,
-            "authenticated_site": {
-                "title": authenticated_site.title,
-                "login_url": authenticated_site.login_url,
-                "session_url": authenticated_site.session_url,
-                "base_url": authenticated_site.base_url,
-                "tos_url": authenticated_site.tos_url,
-            },
-            "is_authenticated": expect_auth,
-            "allow_anonymous": "access",
-            "allow_saml_auth": False,
-            "allow_email_auth": False,
-            "use_new_branding": False,
-            "support_email": settings.EMAIL_SUPPORT,
-            "embedlyKey": "fake",
-            "environment": settings.ENVIRONMENT,
-            "sentry_dsn": None,
-            "release_version": settings.VERSION,
-            "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
+        "gaTrackingID": "fake",
+        "public_path": "/static/bundles/",
+        "site_url": settings.SITE_BASE_URL,
+        "max_comment_depth": 6,
+        "profile_ui_enabled": False,
+        "authenticated_site": {
+            "title": authenticated_site.title,
+            "login_url": authenticated_site.login_url,
+            "session_url": authenticated_site.session_url,
+            "base_url": authenticated_site.base_url,
+            "tos_url": authenticated_site.tos_url,
         },
+        "is_authenticated": expect_auth,
+        "allow_anonymous": "access",
+        "allow_saml_auth": False,
+        "allow_email_auth": False,
+        "allow_search": False,
+        "use_new_branding": False,
+        "support_email": settings.EMAIL_SUPPORT,
+        "embedlyKey": "fake",
+        "environment": settings.ENVIRONMENT,
+        "sentry_dsn": None,
+        "release_version": settings.VERSION,
+        "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
+        "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,
         **expected_user_values,
     }
 

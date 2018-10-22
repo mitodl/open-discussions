@@ -34,4 +34,4 @@ class SearchView(APIView):
                 return Response(status=ex.status_code)
             else:
                 raise
-        return Response([hit["_source"] for hit in response["hits"]["hits"]])
+        return Response(response)

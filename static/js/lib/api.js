@@ -7,6 +7,7 @@ import qs from "query-string"
 import { PATCH, POST, DELETE } from "redux-hammock/constants"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 
+import { buildSearchQuery } from "./search"
 import {
   fetchJSONWithAuthFailure,
   fetchWithAuthFailure,
@@ -38,6 +39,7 @@ import type {
 } from "../flow/discussionTypes"
 import type { NotificationSetting } from "../flow/settingsTypes"
 import type { EmbedlyResponse } from "../reducers/embedly"
+import type { SearchParams } from "../flow/searchTypes"
 
 const paramsToQueryString = paramSelector =>
   R.compose(
@@ -49,6 +51,15 @@ const paramsToQueryString = paramSelector =>
 const getPaginationSortQS = paramsToQueryString(getPaginationSortParams)
 
 const getCommentSortQS = paramsToQueryString(R.pickAll(["sort"]))
+
+export function search(params: SearchParams): Promise<*> {
+  const body = buildSearchQuery(params)
+
+  return fetchJSONWithAuthFailure("/api/v0/search/", {
+    method: POST,
+    body:   JSON.stringify(body)
+  })
+}
 
 export function getFrontpage(
   params: PostListPaginationParams

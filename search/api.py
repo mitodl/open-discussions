@@ -1,5 +1,5 @@
 """API for general search-related functionality"""
-from elasticsearch_dsl import Search
+from elasticsearch_dsl import Q, Search
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from search.connection import get_conn, get_default_alias_name
@@ -90,5 +90,8 @@ def execute_search(*, user, query):
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
     channel_names = [channel.display_name for channel in Api(user).list_channels()]
-    search = search.filter("terms", channel_name=channel_names)
+    channels_filter = Q("terms", author_channel_membership=channel_names) | Q(
+        "terms", channel_name=channel_names
+    )
+    search = search.filter(channels_filter)
     return search.execute().to_dict()

@@ -31,6 +31,15 @@
         border-bottom-color: $rouge;
       }
     }
+
+    .search-link {
+      // correct vertical center alignment
+      margin-left: auto;
+      margin-right: 0;
+      padding-bottom: 5px;
+      padding-left: 6px;
+      padding-right: 6px;
+    }
   }
 }
 

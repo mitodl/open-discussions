@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { Link, NavLink } from "react-router-dom"
 
@@ -9,7 +10,7 @@ import ChannelAvatar, {
 } from "../containers/ChannelAvatar"
 import IntraPageNav from "./IntraPageNav"
 
-import { editChannelBasicURL, channelURL } from "../lib/url"
+import { editChannelBasicURL, channelURL, channelSearchURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -62,6 +63,16 @@ export default class ChannelHeader extends React.Component<Props> {
                 >
                   Home
                 </NavLink>
+                {SETTINGS.allow_search ? (
+                  <NavLink
+                    exact
+                    to={channelSearchURL(channel.name)}
+                    activeClassName="active"
+                    className="search-link"
+                  >
+                    <i className="material-icons">search</i>
+                  </NavLink>
+                ) : null}
               </IntraPageNav>
             </Cell>
           </Grid>

@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: true */
 import React from "react"
 import { shallow } from "enzyme"
 import { assert } from "chai"
@@ -51,6 +52,15 @@ describe("ChannelHeader", () => {
       const wrapper = render({ isModerator })
 
       assert.equal(wrapper.find(".edit-button").length, isModerator ? 1 : 0)
+    })
+  })
+  ;[true, false].forEach(allowSearch => {
+    it(`${
+      allowSearch ? "shows" : "doesn't show"
+    } the search button depending on if it's allowed`, () => {
+      SETTINGS.allow_search = allowSearch
+      const wrapper = render()
+      assert.equal(wrapper.find(".search-link").length, allowSearch ? 1 : 0)
     })
   })
 })

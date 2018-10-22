@@ -74,7 +74,31 @@ def test_execute_search(mocker, user):
     get_conn_mock.return_value.search.assert_called_once_with(
         body={
             **query,
-            "query": {"bool": {"filter": [{"terms": {"channel_name": channel_names}}]}},
+            "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "terms": {
+                                            "author_channel_membership": [
+                                                "channel1",
+                                                "channel2",
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "terms": {
+                                            "channel_name": ["channel1", "channel2"]
+                                        }
+                                    },
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
         },
         doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],

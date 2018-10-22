@@ -21,6 +21,7 @@ import { passwordChangeEndpoint } from "../reducers/password_change"
 import { profileImageEndpoint } from "../reducers/profile_image"
 import { channelAvatarEndpoint } from "../reducers/channel_avatar"
 import { channelBannerEndpoint } from "../reducers/channel_banner"
+import { searchEndpoint } from "../reducers/search"
 
 import type { Dispatch } from "redux"
 
@@ -47,7 +48,8 @@ export const endpoints = [
   passwordChangeEndpoint,
   profileImageEndpoint,
   channelAvatarEndpoint,
-  channelBannerEndpoint
+  channelBannerEndpoint,
+  searchEndpoint
 ]
 
 /**

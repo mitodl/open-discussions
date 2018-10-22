@@ -1,5 +1,7 @@
 // @flow
+/* global SETTINGS: false */
 import casual from "casual-browserify"
+import R from "ramda"
 
 import type {
   CommentResult,
@@ -55,3 +57,40 @@ export const makePostResult = (): PostResult => ({
   score:               casual.integer(-5, 15),
   text:                casual.text
 })
+
+export const makeSearchResult = () => {
+  const type = casual.random_element(["post", "comment", "profile"])
+  let hit
+  switch (type) {
+  case "post":
+    hit = makePostResult()
+    break
+  case "comment":
+    hit = makeCommentResult()
+    break
+  case "profile":
+    hit = makeProfileResult()
+    break
+  default:
+    // make flow happy
+    throw new Error("unknown type")
+  }
+
+  return {
+    _id:     `id_String${casual.random}`,
+    _source: hit
+  }
+}
+
+export const makeSearchResponse = (
+  pageSize: number = SETTINGS.search_page_size,
+  total: number = SETTINGS.search_page_size * 2
+) => {
+  const hits = R.range(0, pageSize).map(makeSearchResult)
+  return {
+    hits: {
+      total,
+      hits
+    }
+  }
+}
