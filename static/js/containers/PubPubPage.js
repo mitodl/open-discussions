@@ -1,6 +1,6 @@
 // @flow
 import React from "react"
-import Editor from "@pubpub/editor"
+import Editor from "@pubpub/editor/dist"
 import { connect } from "react-redux"
 import R from "ramda"
 
@@ -10,11 +10,29 @@ import { configureForm, getAuthResponseFieldErrors } from "../lib/forms"
 
 type Props = {}
 
-class PubPubPage extends React.Component<Props> {
+export default class PubPubPage extends React.Component<Props> {
   render() {
     const { renderForm } = this.props
 
-    return <div className="pubpub">{renderForm()}</div>
+    // return <div className="pubpub">{renderForm()}</div>
+          // initialContent={{}}
+
+    return (
+      <div className="pubpub">
+        <Editor
+          customNodes={{}}
+          customMarks={{}}
+          customPlugins={{}}
+          nodeOptions={{}}
+          collaborativeOptions={{}}
+          onChange={changeObject => {}}
+          placeholder="blaaaahhh"
+          isReadOnly={false}
+          highlights={[]}
+          getHighlightContent={(from, to) => {}}
+        />
+      </div>
+    )
   }
 }
 
@@ -35,7 +53,7 @@ const mapStateToProps = state => {
   return { form }
 }
 
-export default R.compose(
-  connect(mapStateToProps),
-  withForm(FormShim)
-)(PubPubPage)
+// export default R.compose(
+//   connect(mapStateToProps, actionCreators),
+//   withForm(FormShim)
+// )(PubPubPage)
