@@ -58,10 +58,6 @@
     border-radius: 4px;
   }
 
-  .avatar {
-    margin-right: 22px;
-  }
-
   .title-and-headline {
     display: flex;
     flex-direction: column;
@@ -124,6 +120,11 @@ $avatar-dimension-small: 22px;
 
   .avatar {
     display: table;
+    margin-right: 22px;
+
+    @include breakpoint(mobile) {
+      display: none;
+    }
   }
 
   .avatar-image {
