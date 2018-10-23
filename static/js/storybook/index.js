@@ -213,18 +213,18 @@ storiesOf("Links and Buttons", module)
 const fakeUrl = (prefix, id) =>
   `https://avatars.dicebear.com/v2/identicon/${prefix}_${id}.svg`
 
-storiesOf("Post", module)
+const postStories = storiesOf("Post", module)
   .addDecorator(withRandom)
   .addDecorator(withRouter)
   .addDecorator(withSettings)
   .addDecorator(withKnobs)
-  .add("compact post", () => {
-    const isUrl = boolean("URL post", false)
+;[[true, "url post"], [false, "text post"]].forEach(([isUrl, storyName]) => {
+  postStories.add(storyName, () => {
     const menuOpen = boolean("Menu open", false)
     const showPinUI = boolean("Show pin UI", false)
     const showChannelLink = boolean("Show channel link", false)
-    const isModerator = boolean("As moderator", false)
     const isAnonymous = boolean("As anonymous", false)
+    const isModerator = boolean("As moderator", false)
 
     const post = makePost(isUrl)
     post.profile_url = fakeUrl("pr", post.author_id)
@@ -252,6 +252,7 @@ storiesOf("Post", module)
       </StoryWrapper>
     )
   })
+})
 
 storiesOf("Comment", module)
   .addDecorator(withRandom)
@@ -271,7 +272,7 @@ storiesOf("Comment", module)
     const numReports = number("Number of reports", 0)
     const isAnonymous = boolean("As anonymous", false)
     const userIsAuthor = boolean("As comment author", false)
-    const isModerator = boolean("Is moderator", false)
+    const isModerator = boolean("As moderator", false)
 
     // The comments aren't broken out into pieces so it's easier just to render the CommentTree with only one comment
     const channel = makeChannel()
