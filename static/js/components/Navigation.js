@@ -88,8 +88,8 @@ class Navigation extends React.Component<NavigationProps, State> {
             </Link>
           </div>
           <div>
-            <Link to="/trypubpub">
-              pubpub editor page
+            <Link to="/makeabigpost">
+              big post editor page
             </Link>
           </div>
         </div>

@@ -15,7 +15,7 @@ import { addListNodes } from "prosemirror-schema-list"
 //
 // and then most of the rest will be UI work
 
-const bigPostSchema = new Schema({
+export const bigPostSchema = new Schema({
   nodes: addListNodes(schema.spec.nodes, "paragraph block*", "block"),
   marks: schema.spec.marks
 })
