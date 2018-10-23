@@ -76,7 +76,7 @@ def update_field_values_by_query(query, field_dict, object_types):
     return api.update_field_values_by_query(query, field_dict, object_types)
 
 
-@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+@app.task
 def index_profiles():
     """
     Index user profiles

@@ -1,5 +1,5 @@
 """Search task tests"""
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,unused-argument
 from types import SimpleNamespace
 
 from praw.exceptions import PRAWException
@@ -150,7 +150,13 @@ def test_index_post_with_comments(
 
 @pytest.mark.parametrize("with_error", [True, False])
 def test_index_channel(
-    mocker, mocked_celery, wrap_retry_mock, settings, user, with_error
+    mock_index_functions,
+    mocker,
+    mocked_celery,
+    wrap_retry_mock,
+    settings,
+    user,
+    with_error,
 ):  # pylint: disable=unused-argument,too-many-arguments
     """index_channel should index all posts of a channel"""
     settings.INDEXING_API_USERNAME = user.username
@@ -193,7 +199,9 @@ def test_index_profiles(mocker, with_error):  # pylint: disable=unused-argument
     index_profile_mock.assert_called_once()
 
 
-def test_start_recreate_index(mocker, mocked_celery, settings, user):
+def test_start_recreate_index(
+    mock_index_functions, mocker, mocked_celery, settings, user
+):
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
     """

@@ -10,11 +10,6 @@ import ulid
 from authentication import api as auth_api
 from profiles.models import Profile, PROFILE_PROPS
 from profiles.utils import image_uri, IMAGE_MEDIUM, IMAGE_SMALL
-from search.task_helpers import (
-    index_new_profile,
-    update_author,
-    update_author_posts_comments,
-)
 
 
 User = get_user_model()
@@ -43,17 +38,11 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """ Update the profile and related docs in Elasticsearch"""
-        name_changed = False
         with transaction.atomic():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
-                if attr == "name":
-                    name_changed = True
             update_image = "image_file" in validated_data
             instance.save(update_image=update_image)
-            update_author(instance)
-            if update_image or name_changed:
-                update_author_posts_comments(instance)
             return instance
 
     class Meta:
@@ -106,7 +95,6 @@ class UserSerializer(serializers.ModelSerializer):
                 auth_api.create_or_update_micromasters_social_auth(
                     user, uid, {"email": email}
                 )
-        index_new_profile(user.profile)
         return user
 
     def update(self, instance, validated_data):
@@ -126,22 +114,13 @@ class UserSerializer(serializers.ModelSerializer):
 
             if profile_data:
                 profile = instance.profile
-                update_posts = False
                 for prop_name in PROFILE_PROPS:
                     setattr(
                         profile,
                         prop_name,
                         profile_data.get(prop_name, getattr(profile, prop_name)),
                     )
-                    # Update author's posts, comments in ES if name or avatar changed
-                    if prop_name in profile_data and (
-                        prop_name == "name" or "image" in prop_name
-                    ):
-                        update_posts = True
                 profile.save()
-                update_author(profile)
-                if update_posts:
-                    update_author_posts_comments(profile)
 
         return instance
 

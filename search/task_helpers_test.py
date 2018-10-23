@@ -127,7 +127,7 @@ def test_index_new_comment(mocker, reddit_comment_obj):
     }
 
 
-def test_index_new_profile(mocker, user):
+def test_index_new_profile(mock_index_functions, mocker, user):
     """
     Test that index_new_profile calls indexing tasks with the right parameters
     """
@@ -337,7 +337,7 @@ def test_update_indexed_score(
     }
 
 
-def test_update_author(mocker, mock_es_profile_serializer, user):
+def test_update_author(mocker, mock_index_functions, mock_es_profile_serializer, user):
     """
     Tests that update_author calls update_field_values_by_query with the right parameters
     """
@@ -353,7 +353,9 @@ def test_update_author(mocker, mock_es_profile_serializer, user):
     )
 
 
-def test_update_author_posts_comments(mocker, mock_es_profile_serializer, user):
+def test_update_author_posts_comments(
+    mocker, mock_index_functions, mock_es_profile_serializer, user
+):
     """
     Tests that update_author_posts_comments calls update_field_values_by_query with the right parameters
     """

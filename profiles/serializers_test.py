@@ -1,10 +1,9 @@
-# pylint: disable=unused-argument,too-many-arguments
+# pylint: disable=unused-argument,too-many-arguments,redefined-outer-name
 """
 Tests for serializers for profiles REST APIS
 """
 import pytest
 
-from open_discussions.features import INDEX_UPDATES
 from profiles.models import Profile
 from profiles.serializers import UserSerializer, ProfileSerializer
 
@@ -78,29 +77,24 @@ def test_serialize_create_user(db, mocker):
 
 
 @pytest.mark.parametrize(
-    "key,value,update_posts",
+    "key,value",
     [
-        ("name", "name_value", True),
-        ("image", "image_value", True),
-        ("image_small", "image_small_value", True),
-        ("image_medium", "image_medium_value", True),
-        ("email_optin", True, False),
-        ("email_optin", False, False),
-        ("bio", "bio_value", False),
-        ("headline", "headline_value", False),
-        ("toc_optin", True, False),
-        ("toc_optin", False, False),
+        ("name", "name_value"),
+        ("image", "image_value"),
+        ("image_small", "image_small_value"),
+        ("image_medium", "image_medium_value"),
+        ("email_optin", True),
+        ("email_optin", False),
+        ("bio", "bio_value"),
+        ("headline", "headline_value"),
+        ("toc_optin", True),
+        ("toc_optin", False),
     ],
 )
-def test_update_user_profile(user, key, value, update_posts, settings, mocker):
+def test_update_user_profile(mock_index_functions, user, key, value):
     """
     Test updating a profile via the UserSerializer
     """
-    settings.FEATURES[INDEX_UPDATES] = True
-    mock_update_posts = mocker.patch(
-        "profiles.serializers.update_author_posts_comments"
-    )
-    mock_update_author = mocker.patch("profiles.serializers.update_author")
     profile = user.profile
 
     serializer = UserSerializer(
@@ -129,23 +123,18 @@ def test_update_user_profile(user, key, value, update_posts, settings, mocker):
         else:
             assert getattr(profile2, prop) == getattr(profile, prop)
 
-    mock_update_author.assert_called_once_with(profile2)
-    assert mock_update_posts.call_count == (1 if update_posts else 0)
+    mock_index_functions.update_author.assert_called_once_with(profile2)
+    assert mock_index_functions.update_posts.call_count == (1 if key == "name" else 0)
 
 
 @pytest.mark.parametrize(
     "key,value",
     [("name", "name_value"), ("bio", "bio_value"), ("headline", "headline_value")],
 )
-def test_update_profile(user, key, value, settings, mocker):
+def test_update_profile(mock_index_functions, user, key, value):
     """
     Test updating a profile via the ProfileSerializer
     """
-    settings.FEATURES[INDEX_UPDATES] = True
-    mock_update_posts = mocker.patch(
-        "profiles.serializers.update_author_posts_comments"
-    )
-    mock_update_author = mocker.patch("profiles.serializers.update_author")
     profile = user.profile
 
     serializer = ProfileSerializer(
@@ -158,7 +147,7 @@ def test_update_profile(user, key, value, settings, mocker):
 
     for prop in (
         "name",
-        "image",
+        "image_file",
         "image_small",
         "image_medium",
         "email_optin",
@@ -174,8 +163,8 @@ def test_update_profile(user, key, value, settings, mocker):
         else:
             assert getattr(profile2, prop) == getattr(profile, prop)
 
-    if key == "name":
-        mock_update_posts.assert_called_once_with(profile2)
+    if key in ("name", "image_file"):
+        mock_index_functions.update_posts.assert_called_once_with(profile2)
     else:
-        mock_update_posts.assert_not_called()
-    mock_update_author.assert_called_with(profile2)
+        mock_index_functions.update_posts.assert_not_called()
+        mock_index_functions.update_author.assert_called_with(profile2)
