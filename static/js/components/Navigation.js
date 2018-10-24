@@ -88,9 +88,7 @@ class Navigation extends React.Component<NavigationProps, State> {
             </Link>
           </div>
           <div>
-            <Link to="/makeabigpost">
-              big post editor page
-            </Link>
+            <Link to="/makeabigpost">big post editor page</Link>
           </div>
         </div>
         {composeBtn ? (

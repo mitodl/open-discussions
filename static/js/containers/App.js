@@ -29,7 +29,7 @@ import RegisterDetailsPage from "./auth/RegisterDetailsPage"
 import InactiveUserPage from "./auth/InactiveUserPage"
 import PasswordResetPage from "./auth/PasswordResetPage"
 import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
-import BigPostEditorPage from './BigPostEditorPage'
+import BigPostEditorPage from "./BigPostEditorPage"
 
 import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"

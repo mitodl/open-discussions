@@ -24,9 +24,9 @@ export default class BigPostEditor extends React.Component<Props, State> {
     this.node = React.createRef()
 
     const editorStateOptions = {
-      schema: bigPostSchema,
+      schema:  bigPostSchema,
       plugins: exampleSetup({
-        schema: bigPostSchema,
+        schema:  bigPostSchema,
         menuBar: false
       })
     }
@@ -57,16 +57,14 @@ export default class BigPostEditor extends React.Component<Props, State> {
     this.view.updateState(state)
     this.setState({ editorState: state })
 
-    onChange(
-      this.view.state.toJSON()
-    )
+    onChange(this.view.state.toJSON())
   }
 
   focusEditor = () => {
     this.view.focus()
   }
 
-  render () {
+  render() {
     return (
       <div className="editor-wrapper">
         <div
@@ -75,6 +73,9 @@ export default class BigPostEditor extends React.Component<Props, State> {
           onClick={this.focusEditor}
           ref={this.node}
         />
+        <button>
+          Add link
+        </button>
       </div>
     )
   }
