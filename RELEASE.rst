@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.51.0
+Version 0.51.0 (Released October 24, 2018)
 --------------
 
 - Use `word-break` css on anchor tags in expanded post displays. (#1393)
