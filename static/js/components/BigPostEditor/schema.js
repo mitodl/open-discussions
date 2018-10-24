@@ -21,13 +21,15 @@ const bigLinkSpec = {
     href: { default: "" }
   },
   marks: "",
-  atom: true,
+  inline: false,
+  draggable: true,
+  group: "block",
   toDOM(node) {
     return ["div", { class: "embedly"}, 0]
   }
 }
 
 export const bigPostSchema = new Schema({
-  nodes: addListNodes(schema.spec.nodes.addBefore("image", "big-link", bigLinkSpec), "paragraph block*", "block"),
+  nodes: addListNodes(schema.spec.nodes.addBefore("image", "biglink", bigLinkSpec), "paragraph block*", "block"),
   marks: schema.spec.marks
 })

@@ -5,20 +5,21 @@ import R from "ramda"
 
 import withForm from "../hoc/withForm"
 import BigPostEditor from "../components/BigPostEditor/Editor"
+import withSingleColumn from "../hoc/withSingleColumn"
 
 import { configureForm } from "../lib/forms"
 
 type Props = {}
 
-export default class BigPostEditorPage extends React.Component<Props> {
+class BigPostEditorPage extends React.Component<Props> {
   render() {
     return (
-      <div className="pubpub">
         <BigPostEditor onChange={console.log} />
-      </div>
     )
   }
 }
+
+export default withSingleColumn("big-post-page")(BigPostEditorPage)
 
 const form = () => ({ data: {} })
 
