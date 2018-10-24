@@ -1,11 +1,11 @@
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,too-many-arguments,redefined-outer-name
 """
 Tests for serializers for profiles REST APIS
 """
 import pytest
 
 from profiles.models import Profile
-from profiles.serializers import UserSerializer
+from profiles.serializers import UserSerializer, ProfileSerializer
 
 
 def test_serialize_user(user):
@@ -91,28 +91,11 @@ def test_serialize_create_user(db, mocker):
         ("toc_optin", False),
     ],
 )
-def test_update_user_profile(user, key, value):
+def test_update_user_profile(mock_index_functions, user, key, value):
     """
-    Test creating a user
+    Test updating a profile via the UserSerializer
     """
     profile = user.profile
-    expected_profile = {
-        "name": profile.name,
-        "image": profile.image,
-        "image_small": profile.image_small,
-        "image_medium": profile.image_medium,
-        "image_file": profile.image_file.url,
-        "image_small_file": profile.image_small_file.url,
-        "image_medium_file": profile.image_medium_file.url,
-        "profile_image_small": profile.image_small_file.url,
-        "profile_image_medium": profile.image_medium_file.url,
-        "email_optin": None,
-        "toc_optoin": profile.toc_optin,
-        "bio": profile.bio,
-        "headline": profile.headline,
-    }
-
-    expected_profile[key] = value
 
     serializer = UserSerializer(
         instance=user, data={"profile": {key: value}}, partial=True
@@ -139,3 +122,49 @@ def test_update_user_profile(user, key, value):
                 assert getattr(profile2, prop) == value
         else:
             assert getattr(profile2, prop) == getattr(profile, prop)
+
+    mock_index_functions.update_author.assert_called_once_with(profile2)
+    assert mock_index_functions.update_posts.call_count == (1 if key == "name" else 0)
+
+
+@pytest.mark.parametrize(
+    "key,value",
+    [("name", "name_value"), ("bio", "bio_value"), ("headline", "headline_value")],
+)
+def test_update_profile(mock_index_functions, user, key, value):
+    """
+    Test updating a profile via the ProfileSerializer
+    """
+    profile = user.profile
+
+    serializer = ProfileSerializer(
+        instance=user.profile, data={key: value}, partial=True
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    profile2 = Profile.objects.first()
+
+    for prop in (
+        "name",
+        "image_file",
+        "image_small",
+        "image_medium",
+        "email_optin",
+        "toc_optin",
+        "bio",
+        "headline",
+    ):
+        if prop == key:
+            if isinstance(value, bool):
+                assert getattr(profile2, prop) is value
+            else:
+                assert getattr(profile2, prop) == value
+        else:
+            assert getattr(profile2, prop) == getattr(profile, prop)
+
+    if key in ("name", "image_file"):
+        mock_index_functions.update_posts.assert_called_once_with(profile2)
+    else:
+        mock_index_functions.update_posts.assert_not_called()
+        mock_index_functions.update_author.assert_called_with(profile2)

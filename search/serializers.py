@@ -1,7 +1,9 @@
 """Serializers for elasticsearch data"""
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.serializers import BasePostSerializer, BaseCommentSerializer
-from search.api import gen_post_id, gen_comment_id
+from profiles.models import Profile
+from search.api import gen_post_id, gen_comment_id, gen_profile_id
+from search.constants import PROFILE_TYPE
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
 
@@ -10,7 +12,7 @@ class ESSerializer:
     Serializer class for Elasticsearch objects
 
     Attributes:
-        object_type (str): String indicating the type of reddit object
+        object_type (str): String indicating the type of reddit/django object
         use_keys (list[str]):
             A list of keys from the base serializer results to use in the final serialized object
         rename_keys (dict(str, str)):
@@ -28,22 +30,55 @@ class ESSerializer:
         raise NotImplementedError
 
     def postprocess_fields(
-        self, reddit_obj, serialized_data
+        self, discussions_obj, serialized_data
     ):  # pylint: disable=unused-argument
         """Returns a dict of additional or altered fields for the final serialized object"""
         return {}
 
-    def serialize(self, reddit_obj):
+    def serialize(self, discussions_obj):
         """
-        Serializes a reddit object by modifying the results from a base serializer class
+        Serializes a reddit or django model object by modifying the results from a base serializer class
         """
-        base_serialized = self.base_serializer(reddit_obj).data
+        base_serialized = self.base_serializer(discussions_obj).data
         serialized = {
             **filter_dict_keys(base_serialized, self.use_keys),
             **filter_dict_with_renamed_keys(base_serialized, self.rename_keys),
             "object_type": self.object_type,
         }
-        return {**serialized, **self.postprocess_fields(reddit_obj, serialized)}
+        return {**serialized, **self.postprocess_fields(discussions_obj, serialized)}
+
+
+class ESProfileSerializer(ESSerializer):
+    """
+    Elasticsearch serializer class for profiles
+    """
+
+    object_type = PROFILE_TYPE
+    use_keys = []
+    rename_keys = {
+        "username": "author_id",
+        "name": "author_name",
+        "bio": "author_bio",
+        "headline": "author_headline",
+        "profile_image_medium": "author_avatar_medium",
+        "profile_image_small": "author_avatar_small",
+    }
+
+    @property
+    def base_serializer(self):
+        from profiles.serializers import ProfileSerializer
+
+        return ProfileSerializer
+
+    def postprocess_fields(self, discussions_obj, serialized_data):
+        from channels.api import Api
+
+        client = Api(discussions_obj.user)
+        return {
+            "author_channel_membership": ",".join(
+                [channel.display_name for channel in client.list_channels()]
+            )
+        }
 
 
 class ESPostSerializer(ESSerializer):
@@ -67,13 +102,14 @@ class ESPostSerializer(ESSerializer):
         "title": "post_title",
         "url": "post_link_url",
         "thumbnail": "post_link_thumbnail",
+        "profile_image": "author_avatar_small",
     }
 
     @property
     def base_serializer(self):
         return BasePostSerializer
 
-    def postprocess_fields(self, reddit_obj, serialized_data):
+    def postprocess_fields(self, discussions_obj, serialized_data):
         return {
             "author_id": None
             if serialized_data["author_id"] == "[deleted]"
@@ -97,13 +133,17 @@ class ESCommentSerializer(ESSerializer):
         "removed",
         "deleted",
     ]
-    rename_keys = {"id": "comment_id", "parent_id": "parent_comment_id"}
+    rename_keys = {
+        "id": "comment_id",
+        "parent_id": "parent_comment_id",
+        "profile_image": "author_avatar_small",
+    }
 
     @property
     def base_serializer(self):
         return BaseCommentSerializer
 
-    def postprocess_fields(self, reddit_obj, serialized_data):
+    def postprocess_fields(self, discussions_obj, serialized_data):
         return {
             "author_id": None
             if serialized_data["author_id"] == "[deleted]"
@@ -111,10 +151,10 @@ class ESCommentSerializer(ESSerializer):
             "author_name": None
             if serialized_data["author_name"] == "[deleted]"
             else serialized_data["author_name"],
-            "channel_title": reddit_obj.subreddit.title,
-            "channel_name": reddit_obj.subreddit.display_name,
-            "post_id": reddit_obj.submission.id,
-            "post_title": reddit_obj.submission.title,
+            "channel_title": discussions_obj.subreddit.title,
+            "channel_name": discussions_obj.subreddit.display_name,
+            "post_id": discussions_obj.submission.id,
+            "post_title": discussions_obj.submission.title,
         }
 
 
@@ -151,6 +191,27 @@ def serialize_bulk_comments(post_obj):
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
     yield from _serialize_comment_tree_for_bulk(post_obj.comments)
+
+
+def serialize_bulk_profiles():
+    """
+    Serialize profiles for bulk indexing
+    """
+    for profile in Profile.objects.all():
+        yield serialize_profile_for_bulk(profile)
+
+
+def serialize_profile_for_bulk(profile_obj):
+    """
+    Serialize a profile for bulk API request
+
+    Args:
+        profile_obj (Profile): A user profile
+    """
+    return {
+        "_id": gen_profile_id(profile_obj.user.username),
+        **ESProfileSerializer().serialize(profile_obj),
+    }
 
 
 def serialize_post_for_bulk(post_obj):

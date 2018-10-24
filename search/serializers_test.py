@@ -1,15 +1,36 @@
 """Tests for elasticsearch serializers"""
 # pylint: disable=redefined-outer-name,unused-argument
+from unittest.mock import Mock
+
 import pytest
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
+from open_discussions.factories import UserFactory
+from profiles.utils import image_uri, IMAGE_MEDIUM
+from search.constants import PROFILE_TYPE
 from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
+    ESProfileSerializer,
     serialize_post_for_bulk,
     serialize_comment_for_bulk,
     serialize_bulk_comments,
+    serialize_bulk_profiles,
+    serialize_profile_for_bulk,
 )
+
+
+@pytest.fixture
+def mock_channel_api(mocker, user):
+    """
+    Fixture for returning a mock channel Api
+    """
+    mock_channel_api = mocker.patch("channels.api.Api", autospec=True)
+    mock_channel_api(user).list_channels.return_value = [
+        Mock(display_name="channel01"),
+        Mock(display_name="channel02"),
+    ]
+    return mock_channel_api
 
 
 @pytest.fixture
@@ -18,6 +39,7 @@ def patched_base_post_serializer(mocker):
     base_serialized_data = {
         "author_id": 1,
         "author_name": "Author Name",
+        "profile_image": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_small.jpg",
         "channel_title": "channel 1",
         "channel_name": "channel_1",
         "text": "Post Text",
@@ -43,6 +65,7 @@ def patched_base_comment_serializer(mocker):
     base_serialized_data = {
         "author_id": 1,
         "author_name": "Author Name",
+        "profile_image": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_small.jpg",
         "text": "Comment Text",
         "score": 1,
         "created": 456,
@@ -53,6 +76,23 @@ def patched_base_comment_serializer(mocker):
     }
     yield mocker.patch(
         "search.serializers.ESCommentSerializer.base_serializer",
+        return_value=mocker.Mock(data=base_serialized_data, _get_user=mocker.Mock()),
+    )
+
+
+@pytest.fixture
+def patched_base_profile_serializer(mocker, user):
+    """Fixture that patches the base serializer class for ESProfileSerializer"""
+    base_serialized_data = {
+        "username": user.username,
+        "name": "Author Name",
+        "profile_image_small": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_small.jpg",
+        "profile_image_medium": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_medium.jpg",
+        "bio": "Test bio",
+        "headline": "Test headline",
+    }
+    yield mocker.patch(
+        "search.serializers.ESProfileSerializer.base_serializer",
         return_value=mocker.Mock(data=base_serialized_data, _get_user=mocker.Mock()),
     )
 
@@ -76,6 +116,7 @@ def test_es_post_serializer(
         "object_type": POST_TYPE,
         "author_id": base_serialized["author_id"],
         "author_name": base_serialized["author_name"],
+        "author_avatar_small": base_serialized["profile_image"],
         "channel_name": base_serialized["channel_name"],
         "channel_title": base_serialized["channel_title"],
         "text": base_serialized["text"],
@@ -102,6 +143,7 @@ def test_es_comment_serializer(patched_base_comment_serializer, reddit_comment_o
         "object_type": COMMENT_TYPE,
         "author_id": base_serialized["author_id"],
         "author_name": base_serialized["author_name"],
+        "author_avatar_small": base_serialized["profile_image"],
         "text": base_serialized["text"],
         "score": base_serialized["score"],
         "created": base_serialized["created"],
@@ -113,6 +155,24 @@ def test_es_comment_serializer(patched_base_comment_serializer, reddit_comment_o
         "channel_title": reddit_comment_obj.subreddit.title,
         "post_id": reddit_comment_obj.submission.id,
         "post_title": reddit_comment_obj.submission.title,
+    }
+
+
+def test_es_profile_serializer(mock_channel_api, user):
+    """
+    Test that ESProfileSerializer correctly serializes a profile object
+
+    """
+    serialized = ESProfileSerializer().serialize(user.profile)
+    assert serialized == {
+        "object_type": PROFILE_TYPE,
+        "author_id": user.username,
+        "author_name": user.profile.name,
+        "author_avatar_small": image_uri(user.profile),
+        "author_avatar_medium": image_uri(user.profile, IMAGE_MEDIUM),
+        "author_bio": user.profile.bio,
+        "author_headline": user.profile.headline,
+        "author_channel_membership": "channel01,channel02",
     }
 
 
@@ -173,3 +233,29 @@ def test_serialize_missing_author(
     assert serialized_post["author_name"] is None
     assert serialized_comment["author_id"] is None
     assert serialized_comment["author_name"] is None
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_profiles(mocker):
+    """
+    Test that serialize_bulk_profiles calls serialize_profile_for_bulk for every existing profile
+    """
+    mock_serialize_profile = mocker.patch(
+        "search.serializers.serialize_profile_for_bulk"
+    )
+    users = UserFactory.create_batch(5)
+    list(serialize_bulk_profiles())
+    for user in users:
+        mock_serialize_profile.assert_any_call(user.profile)
+
+
+def test_serialize_profile_for_bulk(
+    mock_channel_api, patched_base_profile_serializer, user
+):
+    """
+    Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
+    """
+    assert serialize_profile_for_bulk(user.profile) == {
+        "_id": "u_{}".format(user.username),
+        **ESProfileSerializer().serialize(user.profile),
+    }

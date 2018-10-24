@@ -7,8 +7,18 @@ from functools import wraps, partial
 from open_discussions.features import INDEX_UPDATES, if_feature_enabled
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 
-from search.api import gen_post_id, gen_comment_id, is_reddit_object_removed
-from search.serializers import ESPostSerializer, ESCommentSerializer
+from search.api import (
+    gen_post_id,
+    gen_comment_id,
+    gen_profile_id,
+    is_reddit_object_removed,
+)
+from search.constants import PROFILE_TYPE
+from search.serializers import (
+    ESPostSerializer,
+    ESCommentSerializer,
+    ESProfileSerializer,
+)
 from search.tasks import (
     create_document,
     update_document_with_partial,
@@ -42,6 +52,18 @@ def reddit_object_persist(*persistence_funcs):
         return wrapped_api_func
 
     return api_indexing_listener_inner
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def index_new_profile(profile_obj):
+    """
+    Serializes a profile object and runs a task to create an ES document for it.
+
+    Args:
+        profile_obj (profiles.models.Profile): A user Profile object
+    """
+    data = ESProfileSerializer().serialize(profile_obj)
+    create_document.delay(gen_profile_id(profile_obj.user.username), data)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -113,9 +135,56 @@ def update_field_for_all_post_comments(post_obj, field_name, field_value):
                 }
             }
         },
-        field_name=field_name,
-        field_value=field_value,
+        field_dict={field_name: field_value},
         object_types=[COMMENT_TYPE],
+    )
+
+
+def update_fields_by_username(username, field_dict, object_types):
+    """
+    Runs a task to update a field value for all docs associated with a given user.
+
+    Args:
+        username (str): The username to query by
+        field_dict (dict): Dictionary of fields to update
+        object_types (list of str): The object types to update
+    """
+    update_field_values_by_query.delay(
+        query={"query": {"bool": {"must": [{"match": {"author_id": username}}]}}},
+        field_dict=field_dict,
+        object_types=object_types,
+    )
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def update_author(profile_obj):
+    """
+    Run a task to update all fields of a profile document except id (username)
+
+    Args:
+        profile_obj(profiles.models.Profile): the Profile object to query by and update
+    """
+    profile_data = ESProfileSerializer().serialize(profile_obj)
+    profile_data.pop("author_id", None)
+    update_fields_by_username(profile_obj.user.username, profile_data, [PROFILE_TYPE])
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def update_author_posts_comments(profile_obj):
+    """
+    Run a task to update author name and avatar in all associated post and comment docs
+
+    Args:
+        profile_obj(profiles.models.Profile): the Profile object to query by
+    """
+    profile_data = ESProfileSerializer().serialize(profile_obj)
+    update_keys = {
+        key: value
+        for key, value in profile_data.items()
+        if key in ["author_name", "author_avatar_small"]
+    }
+    update_fields_by_username(
+        profile_obj.user.username, update_keys, [POST_TYPE, COMMENT_TYPE]
     )
 
 
@@ -168,7 +237,10 @@ def _update_parent_post_comment_count(comment_obj, incr_amount=1):
     """
     post_obj = comment_obj.submission
     increment_document_integer_field.delay(
-        gen_post_id(post_obj.id), field_name="num_comments", incr_amount=incr_amount
+        gen_post_id(post_obj.id),
+        field_name="num_comments",
+        incr_amount=incr_amount,
+        object_type=POST_TYPE,
     )
 
 
@@ -228,5 +300,8 @@ def update_indexed_score(instance, instance_type, vote_action=None):
     if instance_type != POST_TYPE:
         return
     increment_document_integer_field.delay(
-        gen_post_id(instance.id), field_name="score", incr_amount=vote_increment
+        gen_post_id(instance.id),
+        field_name="score",
+        incr_amount=vote_increment,
+        object_type=POST_TYPE,
     )

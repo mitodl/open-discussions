@@ -1,9 +1,10 @@
 """Task helper tests"""
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,unused-argument
 import pytest
 
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
+from search.constants import PROFILE_TYPE
 from search.task_helpers import (
     reddit_object_persist,
     index_new_post,
@@ -17,14 +18,39 @@ from search.task_helpers import (
     decrement_parent_post_comment_count,
     set_comment_to_deleted,
     update_indexed_score,
+    index_new_profile,
+    update_author,
+    update_author_posts_comments,
 )
-from search.api import gen_post_id, gen_comment_id
+from search.api import gen_post_id, gen_comment_id, gen_profile_id
+
+
+es_profile_serializer_data = {
+    "object_type": PROFILE_TYPE,
+    "author_id": "testuser",
+    "author_name": "Test User",
+    "author_avatar_small": "/media/profiles/testuser/asd344/small.jpg",
+    "author_avatar_medium": "/media/profiles/testuser/asd344/medium.jpg",
+    "author_bio": "Test bio",
+    "author_headline": "Test headline",
+    "author_channel_membership": "channel01,channel02",
+}
 
 
 @pytest.fixture(autouse=True)
 def enable_index_update_feature(settings):
     """Enables the INDEX_UPDATES feature by default"""
     settings.FEATURES[INDEX_UPDATES] = True
+
+
+@pytest.fixture()
+def mock_es_profile_serializer(mocker):
+    """Mock ESProfileSerializer with canned serialized data"""
+    mocker.patch(
+        "search.task_helpers.ESProfileSerializer.serialize",
+        autospec=True,
+        return_value=es_profile_serializer_data,
+    )
 
 
 def test_reddit_object_persist(mocker):
@@ -97,7 +123,27 @@ def test_index_new_comment(mocker, reddit_comment_obj):
     assert patched_increment_task.delay.call_args[1] == {
         "field_name": "num_comments",
         "incr_amount": 1,
+        "object_type": POST_TYPE,
     }
+
+
+def test_index_new_profile(mock_index_functions, mocker, user):
+    """
+    Test that index_new_profile calls indexing tasks with the right parameters
+    """
+    fake_serialized_data = {"serialized": "profile"}
+    patched_create_task = mocker.patch("search.task_helpers.create_document")
+    patched_serialize_func = mocker.patch(
+        "search.task_helpers.ESProfileSerializer.serialize",
+        return_value=fake_serialized_data,
+    )
+    index_new_profile(user.profile)
+    patched_serialize_func.assert_called_once_with(user.profile)
+    assert patched_create_task.delay.called is True
+    assert patched_create_task.delay.call_args[0] == (
+        gen_profile_id(user.username),
+        fake_serialized_data,
+    )
 
 
 def test_update_post_text(mocker, reddit_submission_obj):
@@ -205,8 +251,7 @@ def test_update_post_removal_for_comments(mocker, reddit_submission_obj):
                 }
             }
         },
-        field_name=field_name,
-        field_value=field_value,
+        field_dict={field_name: field_value},
         object_types=[COMMENT_TYPE],
     )
 
@@ -233,6 +278,7 @@ def test_update_post_comment_count(
     assert patched_task.delay.call_args[1] == {
         "field_name": "num_comments",
         "incr_amount": expected_increment,
+        "object_type": POST_TYPE,
     }
 
 
@@ -261,6 +307,7 @@ def test_set_comment_to_deleted(mocker, reddit_comment_obj):
     assert patched_increment_task.delay.call_args[1] == {
         "field_name": "num_comments",
         "incr_amount": -1,
+        "object_type": POST_TYPE,
     }
 
 
@@ -286,4 +333,42 @@ def test_update_indexed_score(
     assert patched_task.delay.call_args[1] == {
         "field_name": "score",
         "incr_amount": expected_increment,
+        "object_type": POST_TYPE,
     }
+
+
+def test_update_author(mocker, mock_index_functions, mock_es_profile_serializer, user):
+    """
+    Tests that update_author calls update_field_values_by_query with the right parameters
+    """
+    patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
+    call_data = es_profile_serializer_data
+    call_data.pop("author_id")
+    update_author(user.profile)
+    assert patched_task.delay.called is True
+    assert patched_task.delay.call_args[1] == dict(
+        query={"query": {"bool": {"must": [{"match": {"author_id": user.username}}]}}},
+        field_dict=call_data,
+        object_types=[PROFILE_TYPE],
+    )
+
+
+def test_update_author_posts_comments(
+    mocker, mock_index_functions, mock_es_profile_serializer, user
+):
+    """
+    Tests that update_author_posts_comments calls update_field_values_by_query with the right parameters
+    """
+    patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
+    call_data = {
+        key: val
+        for key, val in es_profile_serializer_data.items()
+        if key in {"author_name", "author_avatar_small"}
+    }
+    update_author_posts_comments(user.profile)
+    assert patched_task.delay.called is True
+    assert patched_task.delay.call_args[1] == dict(
+        query={"query": {"bool": {"must": [{"match": {"author_id": user.username}}]}}},
+        field_dict=call_data,
+        object_types=[POST_TYPE, COMMENT_TYPE],
+    )

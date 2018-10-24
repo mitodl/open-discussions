@@ -63,19 +63,34 @@ def update_document_with_partial(doc_id, partial_data, object_type):
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
-def increment_document_integer_field(doc_id, field_name, incr_amount, object_types):
+def increment_document_integer_field(doc_id, field_name, incr_amount, object_type):
     """Task that makes a request to increment some integer field in an ES document"""
-    api.increment_document_integer_field(doc_id, field_name, incr_amount, object_types)
+    api.increment_document_integer_field(doc_id, field_name, incr_amount, object_type)
 
 
 @app.task
-def update_field_values_by_query(query, field_name, field_value, object_types):
+def update_field_values_by_query(query, field_dict, object_types):
     """
     Task that makes a request to update a field value for all ES documents that match some query.
     """
-    return api.update_field_values_by_query(
-        query, field_name, field_value, object_types
-    )
+    return api.update_field_values_by_query(query, field_dict, object_types)
+
+
+@app.task
+def index_profiles():
+    """
+    Index user profiles
+    """
+    try:
+        api.index_profiles()
+    except RetryException:
+        raise
+    except Ignore:
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_profiles threw an error"
+        log.exception(error)
+        return error
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
@@ -148,13 +163,15 @@ def start_recreate_index(self):
         }
 
         # Do the indexing on the temp index
-        log.info("starting to index all channels, posts and comments...")
+        log.info("starting to index all channels, posts, comments, and profiles...")
 
         client = Api(user)
         channel_names = [channel.display_name for channel in client.list_channels()]
         index_channels = celery.group(
-            index_channel.si(channel_name) for channel_name in channel_names
+            [index_channel.si(channel_name) for channel_name in channel_names]
+            + [index_profiles.si()]
         )
+
     except:  # pylint: disable=bare-except
         error = "start_recreate_index threw an error"
         log.exception(error)

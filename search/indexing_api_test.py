@@ -1,7 +1,7 @@
 """
 Tests for the indexing API
 """
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,unused-argument
 from types import SimpleNamespace
 
 import pytest
@@ -27,6 +27,7 @@ from search.indexing_api import (
     UPDATE_CONFLICT_SETTING,
     sync_post,
     sync_comments,
+    index_profiles,
 )
 
 
@@ -84,10 +85,11 @@ def test_update_field_values_by_query(
     """
     patched_logger = mocker.patch("search.indexing_api.log")
     query, field_name, field_value = ({"query": None}, "field1", "value1")
+    new_value_param = "new_value_{}".format(field_name)
     mocked_es.conn.update_by_query.return_value = {
         "version_conflicts": version_conflicts
     }
-    update_field_values_by_query(query, field_name, field_value)
+    update_field_values_by_query(query, {field_name: field_value})
 
     mocked_es.get_conn.assert_called_once_with(verify=True)
     for alias in mocked_es.active_aliases:
@@ -97,9 +99,11 @@ def test_update_field_values_by_query(
             conflicts=UPDATE_CONFLICT_SETTING,
             body={
                 "script": {
-                    "source": "ctx._source.{} = params.new_value".format(field_name),
+                    "source": "ctx._source['{}'] = params.{}".format(
+                        field_name, new_value_param
+                    ),
                     "lang": SCRIPTING_LANG,
-                    "params": {"new_value": field_value},
+                    "params": {new_value_param: field_value},
                 },
                 **query,
             },
@@ -285,6 +289,48 @@ def test_index_post_with_comments_errors(
         index_post_with_comments("post_id")
 
 
+def test_index_profiles(mocked_es, mocker, settings, user):
+    """
+    index_profiles should call bulk with correct arguments
+    """
+    settings.INDEXING_API_USERNAME = user.username
+    aliases = ["a", "b"]
+    mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=aliases
+    )
+    mock_serialize_profiles = mocker.patch(
+        "search.indexing_api.serialize_bulk_profiles",
+        return_value=[{"author_id": "testuser1"}, {"author_id": "testuser2"}],
+    )
+    mocker.patch("channels.api.Api", autospec=True)
+    bulk_mock = mocker.patch(
+        "search.indexing_api.bulk", autospec=True, return_value=(0, [])
+    )
+    index_profiles()
+    for alias in aliases:
+        bulk_mock.assert_any_call(
+            mocked_es.conn,
+            mock_serialize_profiles.return_value,
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+
+
+def test_index_profiles_error(mocked_es, mocker, settings, user):
+    """
+    index_profiles should raise a ReindexException if the bulk call fails
+    """
+    settings.INDEXING_API_USERNAME = user.username
+    mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
+    )
+    mocker.patch("search.indexing_api.serialize_bulk_profiles")
+    mocker.patch("search.indexing_api.bulk", autospec=True, return_value=(0, ["error"]))
+    with pytest.raises(ReindexException):
+        index_profiles()
+
+
 @pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
 @pytest.mark.parametrize("default_exists", [True, False])
 def test_switch_indices(mocked_es, mocker, default_exists, object_type):
@@ -376,8 +422,8 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
 def test_sync_post():
     """Test that sync_post creates Post model objects"""
     serialized = [
-        {"channel_title": "a", "post_id": "a1", "post_link_url": "http://a1.edu"},
-        {"channel_title": "b", "post_id": "b1", "post_link_url": "http://b1.edu"},
+        {"channel_name": "a", "post_id": "a1", "post_link_url": "http://a1.edu"},
+        {"channel_name": "b", "post_id": "b1", "post_link_url": "http://b1.edu"},
     ]
 
     list(sync_post(serialized))
@@ -389,13 +435,13 @@ def test_sync_comments():
     """Test that sync_comments creates Comment model objects"""
     serialized = [
         {
-            "channel_title": "a",
+            "channel_name": "a",
             "post_id": "a1",
             "comment_id": "a1c",
             "parent_comment_id": None,
         },
         {
-            "channel_title": "b",
+            "channel_name": "b",
             "post_id": "b1",
             "comment_id": "b1c",
             "parent_comment_id": "a1c",

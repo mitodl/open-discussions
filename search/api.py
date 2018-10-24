@@ -46,6 +46,19 @@ def gen_comment_id(reddit_obj_id):
     return "c_{}".format(reddit_obj_id)
 
 
+def gen_profile_id(profile_id):
+    """
+    Generates the Elasticsearch document id for a profile
+
+    Args:
+        profile_id (str): The username of a Profile object
+
+    Returns:
+        str: The Elasticsearch document id for this object
+    """
+    return "u_{}".format(profile_id)
+
+
 def is_reddit_object_removed(reddit_obj):
     """
     Indicates whether or not a given reddit object is considered to be removed by moderators

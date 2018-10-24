@@ -20,11 +20,16 @@ from search.connection import (
 from search.constants import (
     POST_TYPE,
     COMMENT_TYPE,
+    PROFILE_TYPE,
     ALIAS_ALL_INDICES,
     VALID_OBJECT_TYPES,
 )
 from search.exceptions import ReindexException
-from search.serializers import serialize_bulk_post, serialize_bulk_comments
+from search.serializers import (
+    serialize_bulk_post,
+    serialize_bulk_comments,
+    serialize_bulk_profiles,
+)
 
 
 log = logging.getLogger(__name__)
@@ -35,34 +40,49 @@ GLOBAL_DOC_TYPE = "_doc"
 SCRIPTING_LANG = "painless"
 UPDATE_CONFLICT_SETTING = "proceed"
 
-BASE_CONTENT_TYPE = {
+BASE_OBJECT_TYPE = {
     "object_type": {"type": "keyword"},
     "author_id": {"type": "keyword"},
     "author_name": {"type": "keyword"},
+    "author_avatar_small": {"type": "keyword"},
+}
+
+PROFILE_OBJECT_TYPE = {
+    **BASE_OBJECT_TYPE,
+    "author_headline": {"type": "text"},
+    "author_bio": {"type": "text"},
+    "author_channel_membership": {"type": "keyword"},
+    "author_avatar_medium": {"type": "keyword"},
+}
+
+CONTENT_OBJECT_TYPE = {
+    **BASE_OBJECT_TYPE,
     "channel_name": {"type": "keyword"},
     "channel_title": {"type": "text"},
     "text": {"type": "text"},
     "score": {"type": "long"},
+    "post_id": {"type": "keyword"},
+    "post_title": {"type": "text"},
     "created": {"type": "date"},
     "deleted": {"type": "boolean"},
     "removed": {"type": "boolean"},
-    "post_id": {"type": "keyword"},
-    "post_title": {"type": "text"},
 }
+
 
 MAPPING = {
     POST_TYPE: {
-        **BASE_CONTENT_TYPE,
+        **CONTENT_OBJECT_TYPE,
         "post_link_url": {"type": "keyword"},
         "post_link_thumbnail": {"type": "keyword"},
         "num_comments": {"type": "long"},
     },
     COMMENT_TYPE: {
-        **BASE_CONTENT_TYPE,
+        **CONTENT_OBJECT_TYPE,
         "comment_id": {"type": "keyword"},
         "parent_comment_id": {"type": "keyword"},
         "parent_post_removed": {"type": "boolean"},
     },
+    PROFILE_TYPE: PROFILE_OBJECT_TYPE,
 }
 
 
@@ -119,17 +139,22 @@ def create_document(doc_id, data):
         conn.create(index=alias, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id)
 
 
-def update_field_values_by_query(query, field_name, field_value, object_types=None):
+def update_field_values_by_query(query, field_dict, object_types=None):
     """
-    Makes a request to ES to use the update_by_query API to update a single field
-    value for all documents that match the given query.
+    Makes a request to ES to use the update_by_query API to update one or more field
+    values for all documents that match the given query.
 
     Args:
         query (dict): A dict representing an ES query
-        field_name (str): The name of the field that will be update
-        field_value: The field value to set for all matching documents
+        field_dict (dict): dictionary of fields with values to update
         object_types (list of str): The object types to query (post, comment, etc)
     """
+    sources = []
+    params = {}
+    for (field_name, field_value) in field_dict.items():
+        new_param = "new_value_{}".format(field_name)
+        sources.append("ctx._source['{}'] = params.{}".format(field_name, new_param))
+        params.update({new_param: field_value})
     if not object_types:
         object_types = VALID_OBJECT_TYPES
     conn = get_conn(verify=True)
@@ -140,9 +165,9 @@ def update_field_values_by_query(query, field_name, field_value, object_types=No
             conflicts=UPDATE_CONFLICT_SETTING,
             body={
                 "script": {
-                    "source": "ctx._source.{} = params.new_value".format(field_name),
+                    "source": ";".join([source for source in sources]),
                     "lang": SCRIPTING_LANG,
-                    "params": {"new_value": field_value},
+                    "params": params,
                 },
                 **query,
             },
@@ -228,7 +253,7 @@ def sync_post(serialized):
 
     for item in serialized:
         sync_post_model(
-            channel_name=item["channel_title"],
+            channel_name=item["channel_name"],
             post_id=item["post_id"],
             post_url=item["post_link_url"],
         )
@@ -249,7 +274,7 @@ def sync_comments(serialized):
 
     for item in serialized:
         sync_comment_model(
-            channel_name=item["channel_title"],
+            channel_name=item["channel_name"],
             post_id=item["post_id"],
             comment_id=item["comment_id"],
             parent_id=item["parent_comment_id"],
@@ -300,6 +325,26 @@ def index_post_with_comments(post_id):
         if len(errors) > 0:
             raise ReindexException(
                 "Error during bulk comment insert: {errors}".format(errors=errors)
+            )
+
+
+def index_profiles():
+    """
+    Index all user profiles
+    """
+    conn = get_conn()
+    for alias in get_active_aliases([PROFILE_TYPE]):
+        _, errors = bulk(
+            conn,
+            serialize_bulk_profiles(),
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            # Adjust chunk size from 500 depending on environment variable
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+        if len(errors) > 0:
+            raise ReindexException(
+                "Error during bulk profile insert: {errors}".format(errors=errors)
             )
 
 
