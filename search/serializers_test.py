@@ -5,6 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
+from channels.utils import get_reddit_slug
 from open_discussions.factories import UserFactory
 from profiles.utils import image_uri, IMAGE_MEDIUM
 from search.constants import PROFILE_TYPE
@@ -52,6 +53,7 @@ def patched_base_post_serializer(mocker):
         "title": "post_title",
         "url": None,
         "thumbnail": None,
+        "slug": "post-title",
     }
     yield mocker.patch(
         "search.serializers.ESPostSerializer.base_serializer",
@@ -129,6 +131,7 @@ def test_es_post_serializer(
         "post_title": base_serialized["title"],
         "post_link_url": base_serialized["url"],
         "post_link_thumbnail": base_serialized["thumbnail"],
+        "post_slug": base_serialized["slug"],
     }
 
 
@@ -155,6 +158,7 @@ def test_es_comment_serializer(patched_base_comment_serializer, reddit_comment_o
         "channel_title": reddit_comment_obj.subreddit.title,
         "post_id": reddit_comment_obj.submission.id,
         "post_title": reddit_comment_obj.submission.title,
+        "post_slug": get_reddit_slug(reddit_comment_obj.submission.permalink),
     }
 
 
@@ -176,10 +180,16 @@ def test_es_profile_serializer(mock_channel_api, user):
     }
 
 
-def test_serialize_bulk_comments(mocker, patched_base_comment_serializer):
+def test_serialize_bulk_comments(
+    mocker, patched_base_comment_serializer, reddit_submission_obj
+):
     """index_comments should index comments and then call itself recursively to index more comments"""
-    inner_comment_mock = mocker.Mock(id="comment_2", replies=[])
-    outer_comment_mock = mocker.Mock(id="comment_1", replies=[inner_comment_mock])
+    inner_comment_mock = mocker.Mock(
+        id="comment_2", replies=[], submission=reddit_submission_obj
+    )
+    outer_comment_mock = mocker.Mock(
+        id="comment_1", replies=[inner_comment_mock], submission=reddit_submission_obj
+    )
     post_mock = mocker.MagicMock(comments=[outer_comment_mock])
     assert list(serialize_bulk_comments(post_mock)) == [
         serialize_comment_for_bulk(outer_comment_mock),
