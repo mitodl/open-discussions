@@ -11,7 +11,6 @@ from authentication import api as auth_api
 from profiles.models import Profile, PROFILE_PROPS
 from profiles.utils import image_uri, IMAGE_MEDIUM, IMAGE_SMALL
 
-
 User = get_user_model()
 
 
@@ -37,10 +36,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         return image_uri(obj, IMAGE_SMALL)
 
     def update(self, instance, validated_data):
-        """ Update the profile and related docs in Elasticsearch"""
+        """Update the profile and related docs in Elasticsearch"""
         with transaction.atomic():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
+
             update_image = "image_file" in validated_data
             instance.save(update_image=update_image)
             return instance
@@ -91,10 +91,12 @@ class UserSerializer(serializers.ModelSerializer):
 
         with transaction.atomic():
             user = auth_api.create_user(username, email, profile_data)
+
             if uid:
                 auth_api.create_or_update_micromasters_social_auth(
                     user, uid, {"email": email}
                 )
+
         return user
 
     def update(self, instance, validated_data):
