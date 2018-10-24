@@ -2,15 +2,18 @@
   "channels": {
     "private_channel": {
       "channel_type": "private",
-      "description": "Asperiores eum perferendis nisi voluptatem amet. Modi quasi laborum quisquam vel accusantium. Quod reiciendis ea neque blanditiis.\nAdipisci fuga doloremque fugit dolores voluptas harum iure expedita. Error alias inventore in dolor hic qui dolorem illo. Placeat debitis quas ipsam perferendis voluptatibus. Doloribus expedita quaerat doloremque iste.\nAliquam culpa id eaque earum debitis. Ullam eligendi aut adipisci eligendi. Amet delectus qui laudantium illo inventore temporibus porro mollitia.",
-      "name": "1535132855_harum",
-      "public_description": "Facilis voluptatum possimus nulla. Blanditiis excepturi facilis voluptas eos nisi autem.",
-      "title": "Maxime omnis deserunt illo fugiat ullam."
+      "description": "Quibusdam iusto ex earum veritatis mollitia. Atque necessitatibus rem exercitationem eum. Sint similique non amet optio molestias accusamus. Fugiat sit ducimus corporis atque enim ut tempore.\nExplicabo soluta totam nesciunt iste. Dolores in odit numquam quibusdam. Similique commodi natus eum vel non perspiciatis.\nEsse ex vitae illum harum. Facere porro alias cupiditate earum totam. Aut aliquid sequi qui dolor.",
+      "name": "1540328290_ex",
+      "public_description": "Quo possimus ipsa necessitatibus id possimus neque maxime praesentium.",
+      "title": "Iure nam ratione porro magni."
     }
   },
   "users": {
+    "index_user": {
+      "username": "01CTHBGTMM2JJMT9DJAMHVAZCY"
+    },
     "staff_user": {
-      "username": "01CNPGRQQHAHB02YWZQSFCA0GJ"
+      "username": "01CTHBGQA8YGE871Z0K07X8H8B"
     }
   }
 }

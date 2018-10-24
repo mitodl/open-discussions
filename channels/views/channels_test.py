@@ -76,10 +76,13 @@ def test_list_channels_anonymous(client, settings, allow_anonymous):
         assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_create_channel(staff_client, staff_user, reddit_factories):
+def test_create_channel(
+    index_user, staff_client, staff_user, reddit_factories, settings
+):
     """
     Create a channel and assert the response
     """
+    settings.INDEXING_API_USERNAME = index_user.username
     url = reverse("channel-list")
     channel = reddit_factories.channel(
         "private", user=staff_user, strategy=STRATEGY_BUILD
@@ -104,14 +107,17 @@ def test_create_channel(staff_client, staff_user, reddit_factories):
         "banner": None,
         "ga_tracking_id": None,
     }
-    assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
+    assert resp.status_code == status.HTTP_201_CREATED
 
 
-def test_create_channel_no_descriptions(staff_client, staff_user, reddit_factories):
+def test_create_channel_no_descriptions(
+    index_user, staff_client, staff_user, reddit_factories, settings
+):
     """
     Create a channel and assert the response for no descriptions
     """
+    settings.INDEXING_API_USERNAME = index_user.username
     url = reverse("channel-list")
     channel = reddit_factories.channel(
         "private", user=staff_user, strategy=STRATEGY_BUILD
@@ -140,10 +146,13 @@ def test_create_channel_no_descriptions(staff_client, staff_user, reddit_factori
     assert resp.json() == expected
 
 
-def test_create_channel_already_exists(staff_client, private_channel):
+def test_create_channel_already_exists(
+    index_user, staff_client, private_channel, settings
+):
     """
     Create a channel which already exists
     """
+    settings.INDEXING_API_USERNAME = index_user.username
     url = reverse("channel-list")
     payload = {
         "channel_type": "private",

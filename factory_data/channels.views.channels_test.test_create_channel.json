@@ -1,16 +1,19 @@
 {
   "channels": {
     "private": {
-      "channel_type": "public",
-      "description": "Natus error veritatis veniam mollitia aliquam ea. Et veniam eos minima vel dicta nisi officia consequatur. Sint accusamus placeat assumenda velit.\nQuibusdam nobis quisquam perspiciatis. Vero ipsam recusandae voluptatem eaque quaerat earum eaque. Sit sit odit non voluptatem. Unde corporis at at.\nA ipsum blanditiis harum incidunt esse. Nihil quod modi sequi. Excepturi laborum rerum sunt quibusdam inventore.",
-      "name": "1535142997_nesciunt",
-      "public_description": "Odio vitae adipisci commodi expedita. Explicabo voluptatum iste ipsam veritatis.",
-      "title": "Veniam magnam corporis esse deleniti quibusdam."
+      "channel_type": "private",
+      "description": "Aliquam quod asperiores perspiciatis ratione eligendi laudantium quidem quod. Assumenda placeat nostrum magnam itaque molestias debitis ducimus accusamus. Odio architecto voluptate ab exercitationem provident repellendus. Inventore quos nobis blanditiis quis earum expedita.\nError reiciendis molestiae molestiae facere quas. Placeat nam repudiandae animi illum ex quam voluptates quam. Voluptates aliquam dolorum officiis nam. Ipsa placeat ipsa consequuntur recusandae.",
+      "name": "1540328202_non",
+      "public_description": "Minus nam ducimus ea. Possimus tempore vitae voluptatem repellendus doloremque.",
+      "title": "Vero praesentium dolore incidunt."
     }
   },
   "users": {
+    "index_user": {
+      "username": "01CTHBE1488HFBAT1MK9C7J4YE"
+    },
     "staff_user": {
-      "username": "01CNPTE7ZS1RGGGJD9YMPW461W"
+      "username": "01CTHBE4GSQME0P1GFY53T3YNX"
     }
   }
 }

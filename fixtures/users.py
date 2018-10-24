@@ -29,6 +29,16 @@ def staff_user(db, use_betamax, request):
 
 
 @pytest.fixture()
+def index_user(db, use_betamax, request):
+    """Create a user to be used for indexing"""
+    if use_betamax:
+        request.getfixturevalue("configure_betamax")
+        return request.getfixturevalue("reddit_index_user")
+    user = UserFactory.create(is_staff=True)
+    return user
+
+
+@pytest.fixture()
 def logged_in_user(client, user):
     """Log the user in and yield the user object"""
     client.force_login(user)

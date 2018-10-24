@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2018-08-24T17:47:35",
+      "recorded_at": "2018-10-23T20:58:06",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -22,11 +22,11 @@
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPGRQQHAHB02YWZQSFCA0GJ"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CTHBGQA8YGE871Z0K07X8H8B"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA1WNyw6CMBREf4V0aSThIQbcucJo3BAx7prSXkJDbJtbJEXjv0th5XJO5sx8COMcrKWD7kGRQ0DipAh3+VXFos5kTasE8VnqN20e6Ezek21AwBmJYKn0QrqPopktPh0mA36kAYaAvmu5XtHGJ4R2Frv/t6obT6+yqeqEuUt6nArBFM9u5/C+vAkYJQcqhR9eA/n+AN9wRmm4AAAA",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIxsNTN93cxzE3KCvT1sax0zMsKtjDIcPcM9so1rUhW0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLaFZwa5OfrHO7v5xZu5+wZkFGZYGAWGJ8eHGlmA9KSklmUmp8ZnpoAMhnCUagGm6fbauAAAAA==",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 17:47:35 GMT"
+            "Tue, 23 Oct 2018 20:58:06 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=Udsn6Pza3pALryGm6R; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 23-Aug-2020 17:47:35 GMT",
-            "loidcreated=2018-08-24T17%3A47%3A34.976Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 23-Aug-2020 17:47:35 GMT"
+            "loid=j4rteuEhbBOb3uXNV1; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 22-Oct-2020 20:58:06 GMT",
+            "loidcreated=2018-10-23T20%3A58%3A06.490Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 22-Oct-2020 20:58:06 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -66,15 +66,83 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPGRQQHAHB02YWZQSFCA0GJ"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CTHBGQA8YGE871Z0K07X8H8B"
       }
     },
     {
-      "recorded_at": "2018-08-24T17:47:35",
+      "recorded_at": "2018-10-23T20:58:10",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "allow_top=True&api_type=json&description=Asperiores+eum+perferendis+nisi+voluptatem+amet.+Modi+quasi+laborum+quisquam+vel+accusantium.+Quod+reiciendis+ea+neque+blanditiis.%0AAdipisci+fuga+doloremque+fugit+dolores+voluptas+harum+iure+expedita.+Error+alias+inventore+in+dolor+hic+qui+dolorem+illo.+Placeat+debitis+quas+ipsam+perferendis+voluptatibus.+Doloribus+expedita+quaerat+doloremque+iste.%0AAliquam+culpa+id+eaque+earum+debitis.+Ullam+eligendi+aut+adipisci+eligendi.+Amet+delectus+qui+laudantium+illo+inventore+temporibus+porro+mollitia.&link_type=any&name=1535132855_harum&public_description=Facilis+voluptatum+possimus+nulla.+Blanditiis+excepturi+facilis+voluptas+eos+nisi+autem.&title=Maxime+omnis+deserunt+illo+fugiat+ullam.&type=private&wikimode=disabled"
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=j4rteuEhbBOb3uXNV1; loidcreated=2018-10-23T20%3A58%3A06.490Z"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CTHBGTMM2JJMT9DJAMHVAZCY"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIxNNB1MywqNDDLSQ3w9qtIcswyzQsK9jcNz87IMXRU0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLYZeydHGroaZ2TnGeYVlHob5nk4RrhUuFVFeRWD9KSklmUmp8ZnpoAMhnCUagGpeApmuAAAAA==",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 23 Oct 2018 20:58:10 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CTHBGTMM2JJMT9DJAMHVAZCY"
+      }
+    },
+    {
+      "recorded_at": "2018-10-23T20:58:10",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "allow_top=True&api_type=json&description=Quibusdam+iusto+ex+earum+veritatis+mollitia.+Atque+necessitatibus+rem+exercitationem+eum.+Sint+similique+non+amet+optio+molestias+accusamus.+Fugiat+sit+ducimus+corporis+atque+enim+ut+tempore.%0AExplicabo+soluta+totam+nesciunt+iste.+Dolores+in+odit+numquam+quibusdam.+Similique+commodi+natus+eum+vel+non+perspiciatis.%0AEsse+ex+vitae+illum+harum.+Facere+porro+alias+cupiditate+earum+totam.+Aut+aliquid+sequi+qui+dolor.&link_type=any&name=1540328290_ex&public_description=Quo+possimus+ipsa+necessitatibus+id+possimus+neque+maxime+praesentium.&title=Iure+nam+ratione+porro+magni.&type=private&wikimode=disabled"
         },
         "headers": {
           "Accept": [
@@ -84,22 +152,22 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 129-48Mn1dU5iU_R2rrmGoz_bXrxp8k"
+            "bearer 409-oOD1mbjQML9yAnjS80hGISJm5xc"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "763"
+            "648"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=Udsn6Pza3pALryGm6R; loidcreated=2018-08-24T17%3A47%3A34.976Z"
+            "loid=j4rteuEhbBOb3uXNV1; loidcreated=2018-10-23T20%3A58%3A06.490Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.50.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -121,7 +189,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 17:47:35 GMT"
+            "Tue, 23 Oct 2018 20:58:10 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -142,7 +210,7 @@
             "299.0"
           ],
           "x-ratelimit-reset": [
-            "145"
+            "110"
           ],
           "x-ratelimit-used": [
             "1"
@@ -162,11 +230,11 @@
       }
     },
     {
-      "recorded_at": "2018-08-24T17:47:38",
+      "recorded_at": "2018-10-23T20:58:13",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "allow_top=True&api_type=json&description=a+description+of+the+channel&link_type=any&name=1535132855_harum&public_description=public&title=Channel+title&type=private&wikimode=disabled"
+          "string": "allow_top=True&api_type=json&description=a+description+of+the+channel&link_type=any&name=1540328290_ex&public_description=public&title=Channel+title&type=private&wikimode=disabled"
         },
         "headers": {
           "Accept": [
@@ -176,22 +244,22 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 129-48Mn1dU5iU_R2rrmGoz_bXrxp8k"
+            "bearer 410-F1rq06lePKNxbAj5nRSO5Wkhl1A"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "182"
+            "179"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=Udsn6Pza3pALryGm6R; loidcreated=2018-08-24T17%3A47%3A34.976Z"
+            "loid=j4rteuEhbBOb3uXNV1; loidcreated=2018-10-23T20%3A58%3A06.490Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.50.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -213,7 +281,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 17:47:38 GMT"
+            "Tue, 23 Oct 2018 20:58:13 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -231,13 +299,13 @@
             "SAMEORIGIN"
           ],
           "x-ratelimit-remaining": [
-            "298.0"
+            "299.0"
           ],
           "x-ratelimit-reset": [
-            "142"
+            "107"
           ],
           "x-ratelimit-used": [
-            "2"
+            "1"
           ],
           "x-ua-compatible": [
             "IE=edge"

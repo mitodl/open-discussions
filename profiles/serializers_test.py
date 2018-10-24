@@ -120,7 +120,7 @@ def test_update_user_profile(user, key, value):
     serializer.is_valid(raise_exception=True)
     serializer.save()
 
-    profile2 = Profile.objects.first()
+    profile2 = Profile.objects.get(user=user)
 
     for prop in (
         "name",
