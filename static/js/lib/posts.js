@@ -69,7 +69,7 @@ export const formatPostTitle = (post: Post) =>
   post.url ? (
     <div>
       <a
-        className="post-title"
+        className="post-title navy"
         href={post.url}
         target="_blank"
         rel="noopener noreferrer"
