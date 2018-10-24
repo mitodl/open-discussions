@@ -1,6 +1,7 @@
 """Serializers for elasticsearch data"""
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.serializers import BasePostSerializer, BaseCommentSerializer
+from channels.utils import get_reddit_slug
 from profiles.models import Profile
 from search.api import gen_post_id, gen_comment_id, gen_profile_id
 from search.constants import PROFILE_TYPE
@@ -103,6 +104,7 @@ class ESPostSerializer(ESSerializer):
         "url": "post_link_url",
         "thumbnail": "post_link_thumbnail",
         "profile_image": "author_avatar_small",
+        "slug": "post_slug",
     }
 
     @property
@@ -155,6 +157,7 @@ class ESCommentSerializer(ESSerializer):
             "channel_name": discussions_obj.subreddit.display_name,
             "post_id": discussions_obj.submission.id,
             "post_title": discussions_obj.submission.title,
+            "post_slug": get_reddit_slug(discussions_obj.submission.permalink),
         }
 
 
