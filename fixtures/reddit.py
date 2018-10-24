@@ -116,6 +116,7 @@ def reddit_submission_obj():
         likes=1,
         banned_by=None,
         edited=False,
+        permalink="http://reddit.local/r/channel_1/a/post-title",
     )
 
 

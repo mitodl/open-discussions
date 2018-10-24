@@ -63,12 +63,10 @@ CONTENT_OBJECT_TYPE = {
     "score": {"type": "long"},
     "post_id": {"type": "keyword"},
     "post_title": {"type": "text"},
+    "post_slug": {"type": "keyword"},
     "created": {"type": "date"},
     "deleted": {"type": "boolean"},
     "removed": {"type": "boolean"},
-    "post_id": {"type": "keyword"},
-    "post_title": {"type": "text"},
-    "post_slug": {"type": "keyword"},
 }
 
 
