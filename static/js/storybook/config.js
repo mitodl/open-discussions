@@ -7,13 +7,23 @@ function loadStories() {
     embedlyKey: null
   }
   const head = document.getElementsByTagName("head")[0]
-  const link = document.createElement("link")
-  link.setAttribute("rel", "stylesheet")
-  link.setAttribute(
+
+  const fontLink = document.createElement("link")
+  fontLink.setAttribute("rel", "stylesheet")
+  fontLink.setAttribute("type", "text/css")
+  fontLink.setAttribute(
+    "href",
+    "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
+  )
+  head.appendChild(fontLink)
+
+  const materialIconsLink = document.createElement("link")
+  materialIconsLink.setAttribute("rel", "stylesheet")
+  materialIconsLink.setAttribute(
     "href",
     "https://fonts.googleapis.com/icon?family=Material+Icons"
   )
-  head.appendChild(link)
+  head.appendChild(materialIconsLink)
 
   require("./index.js")
 }
