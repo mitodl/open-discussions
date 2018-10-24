@@ -99,7 +99,7 @@ export class BigPostEditor extends React.Component<Props, State> {
 
     //     this.dispatchTransaction(this.view.state.tr.insert($from, node))
 
-    // this.view.focus()
+    this.view.focus()
     this.toggleBigLinkMenu()
   }
 

@@ -15,21 +15,24 @@ import { addListNodes } from "prosemirror-schema-list"
 //
 // and then most of the rest will be UI work
 
-
 const bigLinkSpec = {
   attrs: {
     href: { default: "" }
   },
-  marks: "",
-  inline: false,
+  marks:     "",
+  inline:    false,
   draggable: true,
-  group: "block",
+  group:     "block",
   toDOM(node) {
-    return ["div", { class: "embedly"}, 0]
+    return ["div", { class: "embedly" }, 0]
   }
 }
 
 export const bigPostSchema = new Schema({
-  nodes: addListNodes(schema.spec.nodes.addBefore("image", "biglink", bigLinkSpec), "paragraph block*", "block"),
+  nodes: addListNodes(
+    schema.spec.nodes.addBefore("image", "biglink", bigLinkSpec),
+    "paragraph block*",
+    "block"
+  ),
   marks: schema.spec.marks
 })

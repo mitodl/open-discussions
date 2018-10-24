@@ -13,9 +13,7 @@ type Props = {}
 
 class BigPostEditorPage extends React.Component<Props> {
   render() {
-    return (
-        <BigPostEditor onChange={console.log} />
-    )
+    return <BigPostEditor onChange={console.log} />
   }
 }
 
