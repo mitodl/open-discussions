@@ -85,7 +85,7 @@ export const formatPostTitle = (post: Post) =>
     </div>
   ) : (
     <Link
-      className="post-title"
+      className="post-title navy"
       to={postDetailURL(post.channel_name, post.id, post.slug)}
     >
       {post.title}
