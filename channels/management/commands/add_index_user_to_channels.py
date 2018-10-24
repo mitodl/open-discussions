@@ -29,7 +29,9 @@ class Command(BaseCommand):
                         user_api.list_moderators(channel),
                         key=lambda moderator: moderator.date,
                     )
-                    if settings.INDEXING_API_USERNAME not in [mod.name for mod in existing_mods]:
+                    if settings.INDEXING_API_USERNAME not in [
+                        mod.name for mod in existing_mods
+                    ]:
                         if existing_mods and existing_mods[0] != user.username:
                             # First mod is most powerful mod, use that one.
                             user_api = Api(User.objects.get(username=existing_mods[0]))
