@@ -32,17 +32,17 @@ class Command(BaseCommand):
                     if settings.INDEXING_API_USERNAME not in [
                         mod.name for mod in existing_mods
                     ]:
-                        if existing_mods and existing_mods[0] != user.username:
+                        if existing_mods and existing_mods[0].name != user.username:
                             # First mod is most powerful mod, use that one.
                             user_api = Api(User.objects.get(username=existing_mods[0]))
                         # Add the indexing user as moderator if not present
                         user_api.add_moderator(settings.INDEXING_API_USERNAME, channel)
                         # Remove all the old moderators in reverse order
                         for mod in reversed(existing_mods):
-                            user_api.remove_moderator(mod, channel)
+                            user_api.remove_moderator(mod.name, channel)
                         # Add back all the old moderators in original order
                         for mod in existing_mods:
-                            index_api.add_moderator(mod, channel)
+                            index_api.add_moderator(mod.name, channel)
                     processed = True
                     self.stdout.write(
                         self.style.SUCCESS(
