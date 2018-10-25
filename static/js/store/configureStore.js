@@ -6,7 +6,7 @@ import createDebounce from "redux-debounced"
 
 import rootReducer from "../reducers"
 
-let createStoreWithMiddleware
+export let createStoreWithMiddleware
 if (process.env.NODE_ENV !== "production") {
   createStoreWithMiddleware = compose(
     applyMiddleware(createDebounce(), thunkMiddleware, createLogger()),

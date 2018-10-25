@@ -69,7 +69,7 @@ export const formatPostTitle = (post: Post) =>
   post.url ? (
     <div>
       <a
-        className="post-title"
+        className="post-title navy"
         href={post.url}
         target="_blank"
         rel="noopener noreferrer"
@@ -85,7 +85,7 @@ export const formatPostTitle = (post: Post) =>
     </div>
   ) : (
     <Link
-      className="post-title"
+      className="post-title navy"
       to={postDetailURL(post.channel_name, post.id, post.slug)}
     >
       {post.title}

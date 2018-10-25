@@ -40,7 +40,7 @@ export const makeChannel = (privateChannel: boolean = false): Channel => {
 }
 
 export const makeChannelList = (numChannels: number = 20) => {
-  return R.range(0, numChannels).map(() => makeChannel(Math.random() > 0.5))
+  return R.range(0, numChannels).map(() => makeChannel(casual.boolean))
 }
 
 export const makeContributor = (username: ?string = null): Contributor => ({

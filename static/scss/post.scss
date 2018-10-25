@@ -93,18 +93,10 @@
 
   .date {
     color: $font-grey-light;
-
-    a {
-      color: $navy;
-    }
   }
 }
 
 .compact-post-summary {
-  a {
-    color: $font-black;
-  }
-
   .upvote-report-count {
     display: flex;
     align-items: center;
@@ -285,10 +277,6 @@
     font-weight: bold;
     margin: 7px 0 9px;
     line-height: 29px;
-
-    a {
-      color: rgba(0, 0, 0, 0.87);
-    }
   }
 
   .left {
