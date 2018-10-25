@@ -7,6 +7,7 @@ import { EditorView } from "prosemirror-view"
 import { exampleSetup } from "prosemirror-example-setup"
 
 import withForm from "../../hoc/withForm"
+import BigLink from './nodeViews/BigLink'
 
 import { configureForm } from "../../lib/forms"
 import { bigPostSchema } from "./schema"
@@ -52,7 +53,7 @@ export class BigPostEditor extends React.Component<Props, State> {
         state:               editorState,
         dispatchTransaction: this.dispatchTransaction,
         nodeViews:           {
-          biglink: node => new ReactNodeView(node)
+          biglink: node => new ReactNodeView(node, BigLink)
         }
       })
     }

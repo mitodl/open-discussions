@@ -17,11 +17,6 @@ import { addListNodes } from "prosemirror-schema-list"
 // and then most of the rest will be UI work
 
 
-const BigLinkReact = ({href}) =>
-  <div className="embedly react">
-    { href}
-  </div>
-
 const bigLinkSpec = {
   attrs: {
     href: { default: "" }
@@ -30,7 +25,6 @@ const bigLinkSpec = {
   inline:    false,
   draggable: true,
   group:     "block",
-  reactComponent: BigLinkReact,
   toDOM(node) {
     return ["div", { class: "embedly" }, 0]
   }

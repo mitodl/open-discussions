@@ -3,8 +3,11 @@ import React from "react"
 import ReactDOM from "react-dom"
 
 export default class ReactNodeView {
-  constructor(node) {
+  constructor(node, component) {
+    console.log('constructor');
+    console.log(component);
     this.node = node
+    this.component = component
     this.dom = document.createElement('div')
     this.renderReact()
   }
@@ -16,7 +19,7 @@ export default class ReactNodeView {
   }
 
   renderReact() {
-    const Component = this.node.type.spec.reactComponent
+    const Component = this.component
 
     console.log(this.node);
 
