@@ -43,14 +43,22 @@ class Command(BaseCommand):
                         # Add back all the old moderators in original order
                         for mod in existing_mods:
                             index_api.add_moderator(mod.name, channel)
-                    processed = True
-                    self.stdout.write(
-                        self.style.SUCCESS(
-                            "Channel '{}' SUCCESS: Indexing user added or already present.".format(
-                                channel
+                        self.stdout.write(
+                            self.style.SUCCESS(
+                                "Channel '{}' SUCCESS: Indexing user added.".format(
+                                    channel
+                                )
                             )
                         )
-                    )
+                    else:
+                        self.stdout.write(
+                            self.style.SUCCESS(
+                                "Channel '{}' Indexing user already present.".format(
+                                    channel
+                                )
+                            )
+                        )
+                    processed = True
                     break
                 except Forbidden:
                     # Just try the next user
