@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React from "react"
 
 import { Schema } from "prosemirror-model"
 import { schema } from "prosemirror-schema-basic"
@@ -15,7 +15,6 @@ import { addListNodes } from "prosemirror-schema-list"
 // schema we'll just need to implement a custom node type for the embedly link type
 //
 // and then most of the rest will be UI work
-
 
 const bigLinkSpec = {
   attrs: {

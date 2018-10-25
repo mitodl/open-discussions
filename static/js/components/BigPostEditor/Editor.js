@@ -7,15 +7,23 @@ import { EditorView } from "prosemirror-view"
 import { exampleSetup } from "prosemirror-example-setup"
 
 import withForm from "../../hoc/withForm"
-import BigLink from './nodeViews/BigLink'
+import BigLink from "./nodeViews/BigLink"
 
 import { configureForm } from "../../lib/forms"
 import { bigPostSchema } from "./schema"
 import ReactNodeView from "./ReactNodeView"
+import { validationMessage } from "../../lib/validation"
+
+import type { WithFormProps } from "../../flow/formTypes"
+
+type BigPostForm = {
+  url: string
+}
 
 type Props = {
   onChange: Function
-}
+} & WithFormProps<BigPostForm>
+
 type State = {
   editorState: Object,
   showBigLinkMenu: boolean
@@ -65,13 +73,9 @@ export class BigPostEditor extends React.Component<Props, State> {
     // redux store (via the onChange prop)
     const { onChange } = this.props
 
-    console.log(transaction)
-
     const state = this.view.state.apply(transaction)
     this.view.updateState(state)
     this.setState({ editorState: state })
-
-    console.log("we here")
 
     onChange(state.toJSON())
   }
@@ -87,8 +91,8 @@ export class BigPostEditor extends React.Component<Props, State> {
       value: { url }
     } = form
 
-    const { $from } = this.view.state.selection
-    const index = $from.index()
+    // const { $from } = this.view.state.selection
+    // const index = $from.index()
 
     const tr = this.view.state.tr
 
@@ -131,7 +135,7 @@ export class BigPostEditor extends React.Component<Props, State> {
   }
 }
 
-const bigLinkForm = () => ({
+const bigLinkForm = (): BigPostForm => ({
   url: ""
 })
 
@@ -152,6 +156,7 @@ const BigLinkForm = ({ form, validation, onUpdate }) => (
       onChange={onUpdate}
       placeholder="url"
     />
+    {validationMessage(validation.url)}
   </form>
 )
 
