@@ -9,9 +9,10 @@ export default class ReactNodeView {
     this.renderReact()
   }
 
-  update(updatedNode) {
-    this.node = updatedNode
+  update(node) {
+    this.node = node
     this.renderReact()
+    return true
   }
 
   renderReact() {
