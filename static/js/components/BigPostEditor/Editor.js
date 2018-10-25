@@ -10,6 +10,7 @@ import withForm from "../../hoc/withForm"
 
 import { configureForm } from "../../lib/forms"
 import { bigPostSchema } from "./schema"
+import ReactNodeView from "./ReactNodeView"
 
 type Props = {
   onChange: Function
@@ -49,7 +50,10 @@ export class BigPostEditor extends React.Component<Props, State> {
     if (this.node.current) {
       this.view = new EditorView(this.node.current, {
         state:               editorState,
-        dispatchTransaction: this.dispatchTransaction
+        dispatchTransaction: this.dispatchTransaction,
+        nodeViews:           {
+          biglink: node => new ReactNodeView(node)
+        }
       })
     }
   }
@@ -75,31 +79,25 @@ export class BigPostEditor extends React.Component<Props, State> {
     this.view.focus()
   }
 
-  addLinkToEditor = (e: Object) => {
+  addBigLinkToEditor = (e: Object) => {
     e.preventDefault()
     const { form } = this.props
     const {
       value: { url }
     } = form
 
+    const { $from } = this.view.state.selection
+    const index = $from.index()
+
+    const tr = this.view.state.tr
+
     const node = bigPostSchema.nodes.biglink.create({
       href: url
     })
 
-    const { $from } = this.view.state.selection
-    const index = $from.index()
+    tr.replaceSelectionWith(node)
 
-    console.log(
-      $from.parent.canReplaceWith(index, index, bigPostSchema.nodes.biglink)
-    )
-
-    const tr = this.view.state.tr
-
-    this.dispatchTransaction(tr.replaceSelectionWith(node))
-
-    //     this.dispatchTransaction(this.view.state.tr.insert($from, node))
-
-    this.view.focus()
+    this.dispatchTransaction(tr)
     this.toggleBigLinkMenu()
   }
 
@@ -124,7 +122,7 @@ export class BigPostEditor extends React.Component<Props, State> {
           {showBigLinkMenu ? "close link menu" : "show link menu"}
         </button>
         {showBigLinkMenu ? renderForm() : null}
-        <button type="button" onClick={this.addLinkToEditor}>
+        <button type="button" onClick={this.addBigLinkToEditor}>
           add link
         </button>
       </div>
