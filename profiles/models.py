@@ -43,6 +43,7 @@ class Profile(models.Model):
     """Profile model"""
 
     __previous_name = None
+    __previous_headline = None
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -74,6 +75,7 @@ class Profile(models.Model):
         """Track previous name"""
         super(Profile, self).__init__(*args, **kwargs)
         self.__previous_name = self.name
+        self.__previous_headline = self.headline
 
     @transaction.atomic
     def save(
@@ -102,9 +104,14 @@ class Profile(models.Model):
                 self.image_small_file = None
                 self.image_medium_file = None
         is_new = self.pk is None
-        update_posts = update_image or self.name != self.__previous_name
+        update_posts = (
+            update_image
+            or self.name != self.__previous_name
+            or self.headline != self.__previous_headline
+        )
         super(Profile, self).save(*args, **kwargs)
         self.__previous_name = self.name
+        self.__previous_headline = self.headline
         if is_new:
             task_helpers.index_new_profile(self)
         else:

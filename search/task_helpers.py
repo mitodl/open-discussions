@@ -181,7 +181,7 @@ def update_author_posts_comments(profile_obj):
     update_keys = {
         key: value
         for key, value in profile_data.items()
-        if key in ["author_name", "author_avatar_small"]
+        if key in ["author_name", "author_headline", "author_avatar_small"]
     }
     update_fields_by_username(
         profile_obj.user.username, update_keys, [POST_TYPE, COMMENT_TYPE]

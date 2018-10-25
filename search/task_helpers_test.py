@@ -363,7 +363,7 @@ def test_update_author_posts_comments(
     call_data = {
         key: val
         for key, val in es_profile_serializer_data.items()
-        if key in {"author_name", "author_avatar_small"}
+        if key in {"author_name", "author_avatar_small", "author_headline"}
     }
     update_author_posts_comments(user.profile)
     assert patched_task.delay.called is True
