@@ -12,7 +12,7 @@ import BigLink from "./nodeViews/BigLink"
 
 import { configureForm } from "../../lib/forms"
 import { bigPostSchema } from "./schema"
-import ReactNodeView from "./ReactNodeView"
+import NodeView from "./NodeView"
 import { validationMessage } from "../../lib/validation"
 
 import type { WithFormProps } from "../../flow/formTypes"
@@ -73,19 +73,8 @@ export class BigPostEditor extends React.Component<Props, State> {
   }
 
   renderNodeView = (node: Object) => {
-    const nodeView = new ReactNodeView(node)
-
-    // ReactDOM.createPortal(
-    //   <BigLink
-    //     { ...node.attrs }
-    //   />,
-    //   nodeView.dom
-    // )
-
-    // this.setState({
-
+    const nodeView = new NodeView(node)
     this.nodeViews.push(nodeView)
-
     return nodeView
   }
 

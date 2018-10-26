@@ -1,8 +1,6 @@
 // @flow
-import React from "react"
-import ReactDOM from "react-dom"
 
-export default class ReactNodeView {
+export default class NodeView {
   node: Object
   dom: HTMLDivElement
   destroyed: boolean
