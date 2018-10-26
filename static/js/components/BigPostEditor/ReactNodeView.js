@@ -5,28 +5,22 @@ import ReactDOM from "react-dom"
 export default class ReactNodeView {
   node: Object
   dom: HTMLDivElement
-  component: React$ElementType
+  destroyed: boolean
 
   constructor(node: Object) {
-  // constructor(node: Object, component: React$ElementType) {
     this.node = node
-    // this.component = component
     this.dom = document.createElement("div")
-    // this.renderReact()
+    this.destroyed = false
   }
 
   update(node: Object) {
     this.node = node
-    // this.renderReact()
     return true
   }
 
   destroy() {
-  }
-
-  renderReact() {
-    const Component = this.component
-
-    ReactDOM.render(<Component {...this.node.attrs} />, this.dom)
+    this.dom = null
+    this.node = null
+    this.destroyed = true
   }
 }

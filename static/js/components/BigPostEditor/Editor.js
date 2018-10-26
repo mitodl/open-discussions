@@ -1,6 +1,6 @@
 // @flow
 import React from "react"
-import ReactDOM from 'react-dom';
+import ReactDOM from "react-dom"
 import { connect } from "react-redux"
 import R from "ramda"
 import { EditorState } from "prosemirror-state"
@@ -84,9 +84,7 @@ export class BigPostEditor extends React.Component<Props, State> {
 
     // this.setState({
 
-      this.nodeViews.push(
-        nodeView)
-
+    this.nodeViews.push(nodeView)
 
     return nodeView
   }
@@ -147,12 +145,14 @@ export class BigPostEditor extends React.Component<Props, State> {
           onClick={this.focusEditor}
           ref={this.node}
         />
-        {this.nodeViews.map(nodeView =>
-          ReactDOM.createPortal(
-            <BigLink {...nodeView.node.attrs} />,
-            nodeView.dom
-          ))
-        }
+        {this.nodeViews
+          .filter(nodeView => !nodeView.destroyed)
+          .map(nodeView =>
+            ReactDOM.createPortal(
+              <BigLink {...nodeView.node.attrs} />,
+              nodeView.dom
+            )
+          )}
         <button type="button" onClick={this.toggleBigLinkMenu}>
           {showBigLinkMenu ? "close link menu" : "show link menu"}
         </button>
