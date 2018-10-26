@@ -40,6 +40,7 @@ def patched_base_post_serializer(mocker):
     base_serialized_data = {
         "author_id": 1,
         "author_name": "Author Name",
+        "author_headline": "Author Headline",
         "profile_image": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_small.jpg",
         "channel_title": "channel 1",
         "channel_name": "channel_1",
@@ -67,6 +68,7 @@ def patched_base_comment_serializer(mocker):
     base_serialized_data = {
         "author_id": 1,
         "author_name": "Author Name",
+        "author_headline": "Author Headline",
         "profile_image": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_small.jpg",
         "text": "Comment Text",
         "score": 1,
@@ -118,6 +120,7 @@ def test_es_post_serializer(
         "object_type": POST_TYPE,
         "author_id": base_serialized["author_id"],
         "author_name": base_serialized["author_name"],
+        "author_headline": base_serialized["author_headline"],
         "author_avatar_small": base_serialized["profile_image"],
         "channel_name": base_serialized["channel_name"],
         "channel_title": base_serialized["channel_title"],
@@ -146,6 +149,7 @@ def test_es_comment_serializer(patched_base_comment_serializer, reddit_comment_o
         "object_type": COMMENT_TYPE,
         "author_id": base_serialized["author_id"],
         "author_name": base_serialized["author_name"],
+        "author_headline": base_serialized["author_headline"],
         "author_avatar_small": base_serialized["profile_image"],
         "text": base_serialized["text"],
         "score": base_serialized["score"],

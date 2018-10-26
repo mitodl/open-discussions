@@ -89,6 +89,7 @@ class ESPostSerializer(ESSerializer):
     use_keys = [
         "author_id",
         "author_name",
+        "author_headline",
         "channel_name",
         "channel_title",
         "text",
@@ -129,6 +130,7 @@ class ESCommentSerializer(ESSerializer):
     use_keys = [
         "author_id",
         "author_name",
+        "author_headline",
         "text",
         "score",
         "created",

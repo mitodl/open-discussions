@@ -33,9 +33,11 @@ def test_list_comments(client, logged_in_profile, missing_user):
         profile_image = DEFAULT_PROFILE_IMAGE
         name = "[deleted]"
         author_id = "[deleted]"
+        headline = None
     else:
         profile_image = image_uri(logged_in_profile)
         author_id = logged_in_profile.user.username
+        headline = logged_in_profile.headline
         name = logged_in_profile.name
 
     url = reverse("comment-list", kwargs={"post_id": "2"})
@@ -58,6 +60,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "created": "2017-07-25T17:09:45+00:00",
             "profile_image": profile_image,
             "author_name": name,
+            "author_headline": headline,
             "edited": False,
             "comment_type": "comment",
             "num_reports": 0,
@@ -77,6 +80,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "created": "2017-07-25T17:15:57+00:00",
             "profile_image": profile_image,
             "author_name": name,
+            "author_headline": headline,
             "edited": True,
             "comment_type": "comment",
             "num_reports": 0,
@@ -96,6 +100,7 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "created": "2017-07-25T17:16:10+00:00",
             "profile_image": profile_image,
             "author_name": name,
+            "author_headline": headline,
             "edited": False,
             "comment_type": "comment",
             "num_reports": 0,
@@ -135,6 +140,7 @@ def test_list_comments_anonymous(
                 "created": comment.created,
                 "profile_image": image_uri(user.profile),
                 "author_name": user.profile.name,
+                "author_headline": user.profile.headline,
                 "edited": False,
                 "comment_type": "comment",
                 "num_reports": None,
@@ -179,6 +185,7 @@ def test_list_comments_more(client, logged_in_profile):
     logged_in_profile.image_small = "/deserunt/consequatur.jpg"
     logged_in_profile.image_small_file = None
     logged_in_profile.name = "Brooke Robles"
+    logged_in_profile.headline = "Brooke's headline"
     logged_in_profile.save()
 
     url = reverse("comment-list", kwargs={"post_id": "1"})
@@ -193,11 +200,13 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
     image_url = "/deserunt/consequatur.jpg"
     name = "Brooke Robles"
     username = "01BWRGE5JQK4E8B0H90K9RM4WF"
+    headline = "test headline"
     UserFactory.create(
         username=username,
         profile__image_small=image_url,
         profile__image_small_file=None,
         profile__name=name,
+        profile__headline=headline,
     )
 
     post_id = "1"
@@ -217,6 +226,7 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "created": "2017-10-19T19:47:22+00:00",
             "profile_image": image_url,
             "author_name": name,
+            "author_headline": headline,
             "edited": False,
             "comment_type": "comment",
             "num_reports": None,
@@ -236,6 +246,7 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "created": "2017-10-23T17:45:14+00:00",
             "profile_image": image_url,
             "author_name": name,
+            "author_headline": headline,
             "edited": False,
             "comment_type": "comment",
             "num_reports": None,
@@ -255,6 +266,7 @@ def test_more_comments(client, logged_in_profile, is_root_comment):
             "created": "2017-10-23T17:45:25+00:00",
             "profile_image": image_url,
             "author_name": name,
+            "author_headline": headline,
             "edited": False,
             "comment_type": "comment",
             "num_reports": None,
@@ -281,10 +293,12 @@ def test_more_comments_children(client, logged_in_profile):
     image_url = "/deserunt/consequatur.jpg"
     name = "Brooke Robles"
     username = "george"
+    headline = "a test headline"
 
     logged_in_profile.image_small = image_url
     logged_in_profile.image_file_small = None
     logged_in_profile.name = name
+    logged_in_profile.headline = headline
     logged_in_profile.save()
 
     post_id = "1"
@@ -309,6 +323,7 @@ def test_more_comments_children(client, logged_in_profile):
             "created": "2017-11-09T16:35:55+00:00",
             "profile_image": image_uri(logged_in_profile),
             "author_name": name,
+            "author_headline": headline,
             "edited": False,
             "comment_type": "comment",
             "num_reports": None,
@@ -328,6 +343,7 @@ def test_more_comments_children(client, logged_in_profile):
             "created": "2017-11-09T16:36:00+00:00",
             "profile_image": image_uri(logged_in_profile),
             "author_name": name,
+            "author_headline": headline,
             "edited": False,
             "comment_type": "comment",
             "num_reports": None,
@@ -362,6 +378,7 @@ def test_more_comments_anonymous(
             {
                 "author_id": user.username,
                 "author_name": user.profile.name,
+                "author_headline": user.profile.headline,
                 "comment_type": "comment",
                 "created": last_comment.created,
                 "deleted": False,
@@ -449,6 +466,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             "id": "1s",
             "edited": False,
             "author_name": "[deleted]",
+            "author_headline": None,
             "num_reports": None,
         },
         {
@@ -468,6 +486,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             "deleted": False,
             "subscribed": False,
             "author_name": user.profile.name,
+            "author_headline": user.profile.headline,
             "num_reports": None,
         },
     ]
@@ -499,6 +518,7 @@ def test_get_comment(user_client, private_channel_and_contributor, reddit_factor
             "subscribed": False,
             "profile_image": image_uri(user.profile),
             "author_name": user.profile.name,
+            "author_headline": user.profile.headline,
             "edited": False,
             "comment_type": "comment",
             "num_reports": None,
@@ -537,6 +557,7 @@ def test_get_comment_anonymous(
             {
                 "author_id": user.username,
                 "author_name": user.profile.name,
+                "author_headline": user.profile.headline,
                 "comment_type": "comment",
                 "created": comment.created,
                 "deleted": False,
@@ -583,6 +604,7 @@ def test_create_comment(client, logged_in_profile, mock_notify_subscribed_users)
         "subscribed": True,
         "profile_image": image_uri(logged_in_profile),
         "author_name": logged_in_profile.name,
+        "author_headline": logged_in_profile.headline,
         "edited": False,
         "comment_type": "comment",
         "num_reports": 0,
@@ -640,6 +662,7 @@ def test_create_comment_no_upvote(
         "subscribed": True,
         "profile_image": image_uri(logged_in_profile),
         "author_name": logged_in_profile.name,
+        "author_headline": logged_in_profile.headline,
         "edited": False,
         "comment_type": "comment",
         "num_reports": 0,
@@ -670,6 +693,7 @@ def test_create_comment_downvote(
         "subscribed": True,
         "profile_image": image_uri(logged_in_profile),
         "author_name": logged_in_profile.name,
+        "author_headline": logged_in_profile.headline,
         "edited": False,
         "comment_type": "comment",
         "num_reports": 0,
@@ -703,6 +727,7 @@ def test_create_comment_reply_to_comment(
         "subscribed": True,
         "profile_image": image_uri(logged_in_profile),
         "author_name": logged_in_profile.name,
+        "author_headline": logged_in_profile.headline,
         "edited": False,
         "comment_type": "comment",
         "num_reports": 0,
@@ -731,28 +756,11 @@ def test_create_comment_reply_to_deleted_comment(
 
 def test_update_comment_text(client, logged_in_profile):
     """Update a comment's text"""
+    updated_text = "updated text"
     url = reverse("comment-detail", kwargs={"comment_id": "6"})
-    resp = client.patch(url, type="json", data={"text": "updated text"})
+    resp = client.patch(url, type="json", data={"text": updated_text})
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "author_id": "george",
-        "created": "2017-07-25T21:18:47+00:00",
-        "id": "6",
-        "parent_id": "3",
-        "post_id": "2",
-        "score": 1,
-        "text": "updated text",
-        "upvoted": False,
-        "downvoted": False,
-        "removed": False,
-        "deleted": False,
-        "subscribed": False,
-        "profile_image": image_uri(logged_in_profile),
-        "author_name": logged_in_profile.name,
-        "edited": True,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
+    assert resp.json()["text"] == updated_text
 
 
 # Reddit returns the same result for updating a missing comment
@@ -780,25 +788,7 @@ def test_update_comment_upvote(client, logged_in_profile):
     url = reverse("comment-detail", kwargs={"comment_id": comment_id})
     resp = client.patch(url, type="json", data={"upvoted": True})
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "author_id": "george",
-        "created": "2017-08-04T19:22:02+00:00",
-        "id": comment_id,
-        "parent_id": None,
-        "post_id": "2",
-        "score": 1,
-        "text": "downvoted",
-        "upvoted": True,
-        "downvoted": False,
-        "removed": False,
-        "deleted": False,
-        "subscribed": False,
-        "profile_image": image_uri(logged_in_profile),
-        "author_name": logged_in_profile.name,
-        "edited": False,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
+    assert resp.json()["upvoted"] is True
 
 
 def test_update_comment_downvote(client, logged_in_profile):
@@ -807,25 +797,7 @@ def test_update_comment_downvote(client, logged_in_profile):
     url = reverse("comment-detail", kwargs={"comment_id": comment_id})
     resp = client.patch(url, type="json", data={"downvoted": True})
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "author_id": "george",
-        "created": "2017-08-04T19:22:02+00:00",
-        "id": comment_id,
-        "parent_id": None,
-        "post_id": "2",
-        "score": 1,
-        "text": "downvoted",
-        "upvoted": False,
-        "downvoted": True,
-        "removed": False,
-        "deleted": False,
-        "subscribed": False,
-        "profile_image": image_uri(logged_in_profile),
-        "author_name": logged_in_profile.name,
-        "edited": False,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
+    assert resp.json()["downvoted"] is True
 
 
 def test_update_comment_clear_upvote(client, logged_in_profile):
@@ -833,25 +805,7 @@ def test_update_comment_clear_upvote(client, logged_in_profile):
     url = reverse("comment-detail", kwargs={"comment_id": "6"})
     resp = client.patch(url, type="json", data={"upvoted": False})
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "author_id": "george",
-        "created": "2017-07-25T21:18:47+00:00",
-        "id": "6",
-        "parent_id": "3",
-        "post_id": "2",
-        "score": 1,
-        "text": "reply_to_comment 3",
-        "upvoted": False,
-        "downvoted": False,
-        "removed": False,
-        "deleted": False,
-        "subscribed": False,
-        "profile_image": image_uri(logged_in_profile),
-        "author_name": logged_in_profile.name,
-        "edited": False,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
+    assert resp.json()["upvoted"] is False
 
 
 def test_update_comment_clear_downvote(client, logged_in_profile):
@@ -860,25 +814,7 @@ def test_update_comment_clear_downvote(client, logged_in_profile):
     url = reverse("comment-detail", kwargs={"comment_id": comment_id})
     resp = client.patch(url, type="json", data={"downvoted": False})
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "author_id": "george",
-        "created": "2017-08-04T19:22:02+00:00",
-        "id": comment_id,
-        "parent_id": None,
-        "post_id": "2",
-        "score": 1,
-        "text": "downvoted",
-        "upvoted": False,
-        "downvoted": False,
-        "removed": False,
-        "deleted": False,
-        "subscribed": False,
-        "profile_image": image_uri(logged_in_profile),
-        "author_name": logged_in_profile.name,
-        "edited": False,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
+    assert resp.json()["downvoted"] is False
 
 
 def test_update_comment_remove(
@@ -891,25 +827,7 @@ def test_update_comment_remove(
     url = reverse("comment-detail", kwargs={"comment_id": comment.id})
     resp = staff_client.patch(url, type="json", data={"removed": True})
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "author_id": user.username,
-        "created": comment.created,
-        "id": comment.id,
-        "parent_id": None,
-        "post_id": post.id,
-        "score": 1,
-        "text": comment.text,
-        "upvoted": False,
-        "downvoted": False,
-        "removed": True,
-        "deleted": False,
-        "subscribed": False,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "edited": False,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
+    assert resp.json()["removed"] is True
 
 
 def test_update_comment_approve(
@@ -923,25 +841,7 @@ def test_update_comment_approve(
     url = reverse("comment-detail", kwargs={"comment_id": comment.id})
     resp = staff_client.patch(url, type="json", data={"removed": False})
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "author_id": user.username,
-        "created": comment.created,
-        "id": comment.id,
-        "parent_id": None,
-        "post_id": post.id,
-        "score": 1,
-        "text": comment.text,
-        "upvoted": False,
-        "downvoted": False,
-        "removed": False,
-        "deleted": False,
-        "subscribed": False,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "edited": False,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
+    assert resp.json()["removed"] is False
 
 
 def test_update_comment_ignore_reports(
@@ -969,6 +869,7 @@ def test_update_comment_ignore_reports(
         "subscribed": False,
         "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
+        "author_headline": user.profile.headline,
         "edited": False,
         "comment_type": "comment",
         "num_reports": 0,
@@ -1019,25 +920,7 @@ def test_update_comment_subscribe(
     url = reverse("comment-detail", kwargs={"comment_id": comment.id})
     resp = staff_client.patch(url, type="json", data={"subscribed": True})
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "author_id": user.username,
-        "created": comment.created,
-        "id": comment.id,
-        "parent_id": None,
-        "post_id": post.id,
-        "score": 1,
-        "text": comment.text,
-        "upvoted": False,
-        "downvoted": False,
-        "removed": False,
-        "deleted": False,
-        "subscribed": True,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "edited": False,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
+    assert resp.json()["subscribed"] is True
 
 
 def test_update_comment_unsubscribe(
@@ -1051,22 +934,4 @@ def test_update_comment_unsubscribe(
     url = reverse("comment-detail", kwargs={"comment_id": comment.id})
     resp = staff_client.patch(url, type="json", data={"subscribed": False})
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "author_id": user.username,
-        "created": comment.created,
-        "id": comment.id,
-        "parent_id": None,
-        "post_id": post.id,
-        "score": 1,
-        "text": comment.text,
-        "upvoted": False,
-        "downvoted": False,
-        "removed": False,
-        "deleted": False,
-        "subscribed": False,
-        "profile_image": image_uri(user.profile),
-        "author_name": user.profile.name,
-        "edited": False,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
+    assert resp.json()["subscribed"] is False

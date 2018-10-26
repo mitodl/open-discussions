@@ -45,11 +45,11 @@ BASE_OBJECT_TYPE = {
     "author_id": {"type": "keyword"},
     "author_name": {"type": "keyword"},
     "author_avatar_small": {"type": "keyword"},
+    "author_headline": {"type": "text"},
 }
 
 PROFILE_OBJECT_TYPE = {
     **BASE_OBJECT_TYPE,
-    "author_headline": {"type": "text"},
     "author_bio": {"type": "text"},
     "author_channel_membership": {"type": "keyword"},
     "author_avatar_medium": {"type": "keyword"},

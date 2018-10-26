@@ -475,6 +475,7 @@ class BaseCommentSerializer(RedditObjectSerializer):
     created = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
+    author_headline = serializers.SerializerMethodField()
     edited = serializers.SerializerMethodField()
     comment_type = serializers.SerializerMethodField()
     num_reports = serializers.IntegerField(read_only=True)
@@ -516,6 +517,14 @@ class BaseCommentSerializer(RedditObjectSerializer):
         if user and user.profile.name:
             return user.profile.name
         return "[deleted]"
+
+    def get_author_headline(self, instance):
+        """get the author headline"""
+        user = self._get_user(instance)
+
+        if user and user.profile:
+            return user.profile.headline
+        return None
 
     def get_downvoted(self, instance):
         """Is a comment downvoted?"""

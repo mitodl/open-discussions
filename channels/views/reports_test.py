@@ -96,6 +96,7 @@ def test_list_reports(
                 "subscribed": False,
                 "profile_image": image_uri(user.profile),
                 "author_name": user.profile.name,
+                "author_headline": user.profile.headline,
                 "edited": False,
                 "comment_type": "comment",
                 "num_reports": 2,
