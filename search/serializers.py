@@ -200,7 +200,7 @@ def serialize_bulk_profiles():
     """
     Serialize profiles for bulk indexing
     """
-    for profile in Profile.objects.all():
+    for profile in Profile.objects.iterator():
         yield serialize_profile_for_bulk(profile)
 
 
