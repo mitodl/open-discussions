@@ -5,8 +5,8 @@ type Props = {
   href: string
 }
 
-const BigLinkReact = ({ href }: Props) => (
+const BigLink = ({ href }: Props) => (
   <div className="embedly react">{href}</div>
 )
 
-export default BigLinkReact
+export default BigLink
