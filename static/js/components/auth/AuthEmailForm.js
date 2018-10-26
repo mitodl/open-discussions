@@ -10,7 +10,9 @@ import { validationMessage } from "../../lib/validation"
 import type { EmailForm } from "../../flow/authTypes"
 import type { FormProps } from "../../flow/formTypes"
 
-type Props = FormProps<EmailForm>
+type Props = {
+  submitLabel?: string
+} & FormProps<EmailForm>
 type State = {
   recaptchaScale: number
 }
@@ -73,7 +75,8 @@ class AuthEmailForm extends React.Component<Props, State> {
       onSubmit,
       onUpdate,
       onRecaptcha,
-      processing
+      processing,
+      submitLabel
     } = this.props
     const { recaptchaScale } = this.state
 
@@ -106,7 +109,7 @@ class AuthEmailForm extends React.Component<Props, State> {
             className={`submit-login ${processing ? "disabled" : ""}`}
             disabled={processing}
           >
-            Sign Up
+            {submitLabel || "Next"}
           </button>
         </div>
       </form>

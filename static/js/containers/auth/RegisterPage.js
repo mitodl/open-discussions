@@ -52,7 +52,7 @@ export const RegisterPage = ({
           <title>{formatTitle("Register")}</title>
           <CanonicalLink match={match} />
         </MetaTags>
-        {renderForm({ formError })}
+        {renderForm({ formError, submitLabel: "Sign Up" })}
         <ExternalLogins />
         <div className="alternate-auth-link">
           Already have an account?{" "}
