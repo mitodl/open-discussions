@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.51.1
+--------------
+
+- Fix login page button label
+- Always align sort menu to right (#1416)
+- Storybook updates for post and comment (#1396)
+- Add `post_slug` to post and comment docs in Elasticsearch index (#1412)
+- Index user profiles in Elasticsearch (#1373)
+- Fixed channel header layout on mobile
+- Fixed signup page UI issues
+- Allow link type posts to be pinned
+
 Version 0.51.0 (Released October 24, 2018)
 --------------
 
