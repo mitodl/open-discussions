@@ -7,17 +7,21 @@ export default class ReactNodeView {
   dom: HTMLDivElement
   component: React$ElementType
 
-  constructor(node: Object, component: React$ElementType) {
+  constructor(node: Object) {
+  // constructor(node: Object, component: React$ElementType) {
     this.node = node
-    this.component = component
+    // this.component = component
     this.dom = document.createElement("div")
-    this.renderReact()
+    // this.renderReact()
   }
 
   update(node: Object) {
     this.node = node
-    this.renderReact()
+    // this.renderReact()
     return true
+  }
+
+  destroy() {
   }
 
   renderReact() {

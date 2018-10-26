@@ -1,5 +1,6 @@
 // @flow
 import React from "react"
+import ReactDOM from 'react-dom';
 import { connect } from "react-redux"
 import R from "ramda"
 import { EditorState } from "prosemirror-state"
@@ -34,10 +35,14 @@ export class BigPostEditor extends React.Component<Props, State> {
   view: Object
   dispatchTransaction: Function = this.dispatchTransaction.bind(this)
 
+  nodeViews
+
   constructor(props: Props) {
     super(props)
 
     this.node = React.createRef()
+
+    this.nodeViews = []
 
     const editorStateOptions = {
       schema:  bigPostSchema,
@@ -61,10 +66,29 @@ export class BigPostEditor extends React.Component<Props, State> {
         state:               editorState,
         dispatchTransaction: this.dispatchTransaction,
         nodeViews:           {
-          biglink: node => new ReactNodeView(node, BigLink)
+          biglink: this.renderNodeView
         }
       })
     }
+  }
+
+  renderNodeView = (node: Object) => {
+    const nodeView = new ReactNodeView(node)
+
+    // ReactDOM.createPortal(
+    //   <BigLink
+    //     { ...node.attrs }
+    //   />,
+    //   nodeView.dom
+    // )
+
+    // this.setState({
+
+      this.nodeViews.push(
+        nodeView)
+
+
+    return nodeView
   }
 
   dispatchTransaction(transaction: Object) {
@@ -123,6 +147,12 @@ export class BigPostEditor extends React.Component<Props, State> {
           onClick={this.focusEditor}
           ref={this.node}
         />
+        {this.nodeViews.map(nodeView =>
+          ReactDOM.createPortal(
+            <BigLink {...nodeView.node.attrs} />,
+            nodeView.dom
+          ))
+        }
         <button type="button" onClick={this.toggleBigLinkMenu}>
           {showBigLinkMenu ? "close link menu" : "show link menu"}
         </button>
