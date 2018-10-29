@@ -8,6 +8,7 @@ import pytest
 
 from channels.constants import POSTS_SORT_NEW
 from channels.utils import ListingParams
+from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
 from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES
 from search.exceptions import ReindexException, RetryException
@@ -196,7 +197,7 @@ def test_index_profiles(mocker, with_error):  # pylint: disable=unused-argument
     result = index_profiles.delay([1, 2, 3]).get()
     assert result == ("index_profiles threw an error" if with_error else None)
 
-    index_profile_mock.assert_called_once()
+    index_profile_mock.assert_called_once_with([1, 2, 3])
 
 
 def test_start_recreate_index(
@@ -206,12 +207,15 @@ def test_start_recreate_index(
     recreate_index should recreate the elasticsearch index and reindex all data with it
     """
     settings.INDEXING_API_USERNAME = user.username
+    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
     client_mock = mocker.patch("channels.api.Api", autospec=True)
     channel_names = ["a", "b", "c"]
+    users = UserFactory.create_batch(4)
     client_mock.return_value.list_channels.return_value = [
         mocker.Mock(display_name=name) for name in channel_names
     ]
     index_channel_mock = mocker.patch("search.tasks.index_channel", autospec=True)
+    index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
     backing_index = "backing"
     create_backing_index_mock = mocker.patch(
         "search.indexing_api.create_backing_index",
@@ -239,6 +243,8 @@ def test_start_recreate_index(
         mocked_celery.chain.assert_called_once_with(
             mocked_celery.group.return_value, finish_recreate_index_mock.s.return_value
         )
+    index_profiles_mock.si.assert_any_call([users[0].profile.id, users[1].profile.id])
+    index_profiles_mock.si.assert_any_call([users[2].profile.id, users[3].profile.id])
     assert mocked_celery.replace.call_count == 1
     assert mocked_celery.replace.call_args[0][1] == mocked_celery.chain.return_value
 
