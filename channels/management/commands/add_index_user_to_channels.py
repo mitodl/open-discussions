@@ -64,7 +64,7 @@ class Command(BaseCommand):
                 except Forbidden:
                     # Just try the next user
                     pass
-                except Exception as exc:  # pylint: disable=broad-except
+                except:  # pylint: disable=bare-except
                     self.stderr.write(
                         "Channel '{}' ERROR: {}".format(channel, traceback.format_exc())
                     )
