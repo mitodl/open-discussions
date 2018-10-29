@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.51.1
+Version 0.51.1 (Released October 29, 2018)
 --------------
 
 - Add author_headline to post, comment docs and update them when headline is changed (#1418)
