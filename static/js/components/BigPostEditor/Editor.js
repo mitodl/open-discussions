@@ -6,6 +6,7 @@ import R from "ramda"
 import { EditorState } from "prosemirror-state"
 import { EditorView } from "prosemirror-view"
 import { exampleSetup } from "prosemirror-example-setup"
+import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import withForm from "../../hoc/withForm"
 import BigLink from "./nodeViews/BigLink"
@@ -14,6 +15,7 @@ import { configureForm } from "../../lib/forms"
 import { bigPostSchema } from "./schema"
 import NodeView from "./NodeView"
 import { validationMessage } from "../../lib/validation"
+import { actions } from "../../actions"
 
 import type { WithFormProps } from "../../flow/formTypes"
 
@@ -34,8 +36,7 @@ export class BigPostEditor extends React.Component<Props, State> {
   node: { current: null | React$ElementRef<typeof HTMLDivElement> }
   view: Object
   dispatchTransaction: Function = this.dispatchTransaction.bind(this)
-
-  nodeViews
+  nodeViews: Array<NodeView>
 
   constructor(props: Props) {
     super(props)
@@ -124,7 +125,7 @@ export class BigPostEditor extends React.Component<Props, State> {
 
   render() {
     const { showBigLinkMenu } = this.state
-    const { renderForm } = this.props
+    const { renderForm, getEmbedly, embedlyInFlight, embedly } = this.props
 
     return (
       <div className="editor-wrapper">
@@ -136,12 +137,19 @@ export class BigPostEditor extends React.Component<Props, State> {
         />
         {this.nodeViews
           .filter(nodeView => !nodeView.destroyed)
-          .map(nodeView =>
-            ReactDOM.createPortal(
-              <BigLink {...nodeView.node.attrs} />,
+          .map(nodeView => {
+            const relevantEmbedly = embedly.get(nodeView.node.attrs.href)
+
+            return ReactDOM.createPortal(
+              <BigLink
+                {...nodeView.node.attrs}
+                getEmbedly={getEmbedly}
+                embedly={relevantEmbedly}
+                embedlyInFlight={embedlyInFlight}
+              />,
               nodeView.dom
             )
-          )}
+          })}
         <button type="button" onClick={this.toggleBigLinkMenu}>
           {showBigLinkMenu ? "close link menu" : "show link menu"}
         </button>
@@ -163,8 +171,15 @@ const FORM_KEY = "add-big-link"
 const { getForm, actionCreators } = configureForm(FORM_KEY, bigLinkForm)
 
 const mapStateToProps = state => ({
-  form: getForm(state)
+  form:            getForm(state),
+  embedly:         state.embedly.data,
+  embedlyInFlight: state.embedly.getStatus === FETCH_PROCESSING
 })
+
+const mapDispatchToProps = {
+  ...actionCreators,
+  getEmbedly: actions.embedly.get
+}
 
 const BigLinkForm = ({ form, validation, onUpdate }) => (
   <form className="form">
@@ -182,7 +197,7 @@ const BigLinkForm = ({ form, validation, onUpdate }) => (
 export default R.compose(
   connect(
     mapStateToProps,
-    actionCreators
+    mapDispatchToProps
   ),
   withForm(BigLinkForm)
 )(BigPostEditor)

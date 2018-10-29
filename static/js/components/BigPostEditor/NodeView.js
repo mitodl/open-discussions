@@ -1,8 +1,8 @@
 // @flow
 
 export default class NodeView {
-  node: Object
-  dom: HTMLDivElement
+  node: ?Object
+  dom: ?HTMLDivElement
   destroyed: boolean
 
   constructor(node: Object) {
