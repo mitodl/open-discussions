@@ -16,16 +16,18 @@
 
 .channel-intra-nav-wrapper {
   background-color: #ffffff;
-  padding: 10px 0 0;
+  padding: 6px 0 0;
 
   .intra-page-nav {
-    margin-bottom: 9px;
+    display: flex;
+    margin-bottom: 0;
+    font-size: 18px;
 
     a {
-      color: $rouge;
-      padding: 5px 15px;
+      padding: 4px 15px;
 
       &.active {
+        color: $rouge;
         border-bottom-color: $rouge;
       }
     }
