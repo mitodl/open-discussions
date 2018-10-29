@@ -5,8 +5,8 @@ import R from "ramda"
 import qs from "query-string"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
-import { Link } from "react-router-dom"
 
+import ChannelHeader from "../components/ChannelHeader"
 import CanonicalLink from "../components/CanonicalLink"
 import { withPostLoadingSidebar } from "../components/Loading"
 import { PostSortPicker } from "../components/SortPicker"
@@ -15,15 +15,10 @@ import {
   postModerationSelector
 } from "../hoc/withPostModeration"
 import withPostList from "../hoc/withPostList"
-import IntraPageNav from "../components/IntraPageNav"
 import { withChannelTracker } from "../hoc/withChannelTracker"
 import ChannelSidebar from "../components/ChannelSidebar"
 import Sidebar from "../components/Sidebar"
 import { Grid, Cell } from "../components/Grid"
-import ChannelBanner from "../containers/ChannelBanner"
-import ChannelAvatar, {
-  CHANNEL_AVATAR_MEDIUM
-} from "../containers/ChannelAvatar"
 
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
@@ -36,7 +31,6 @@ import { formatTitle } from "../lib/title"
 import { clearChannelError } from "../actions/channel"
 import { evictPostsForChannel } from "../actions/posts_for_channel"
 import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
-import { editChannelBasicURL } from "../lib/url"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -128,45 +122,7 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
     } else {
       return (
         <div className="channel-page-wrapper">
-          <ChannelBanner editable={false} channel={channel} />
-          <Grid className="main-content two-column channel-header">
-            <Cell className="avatar-headline-row" width={12}>
-              <div className="left">
-                <ChannelAvatar
-                  editable={false}
-                  channel={channel}
-                  imageSize={CHANNEL_AVATAR_MEDIUM}
-                />
-                <div className="title-and-headline">
-                  <div className="title">{channel.title}</div>
-                  {channel.public_description ? (
-                    <div className="headline">{channel.public_description}</div>
-                  ) : null}
-                </div>
-              </div>
-              <div className="right">
-                {isModerator ? (
-                  <Link
-                    to={editChannelBasicURL(channel.name)}
-                    className="edit-button"
-                  >
-                    <i className="material-icons settings">settings</i>
-                  </Link>
-                ) : null}
-              </div>
-            </Cell>
-          </Grid>
-          <div className="channel-intra-nav-wrapper">
-            <Grid className="main-content two-column channel-intra-nav">
-              <Cell width={12}>
-                <IntraPageNav>
-                  <a href="#" className="active">
-                    Home
-                  </a>
-                </IntraPageNav>
-              </Cell>
-            </Grid>
-          </div>
+          <ChannelHeader channel={channel} isModerator={isModerator} />
           <Grid className="main-content two-column channel-page">
             <Cell width={8}>
               <MetaTags>

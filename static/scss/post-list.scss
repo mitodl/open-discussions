@@ -1,7 +1,10 @@
 .post-list-title {
   display: flex;
-  justify-content: flex-end;
   padding-bottom: 10px;
+
+  .post-sort-picker {
+    margin-left: auto;
+  }
 }
 
 .post-list {

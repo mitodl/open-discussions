@@ -8,6 +8,7 @@ import { Provider } from "react-redux"
 import { createStoreWithMiddleware } from "../store/configureStore"
 import casual from "casual-browserify"
 
+import ChannelHeader from "../components/ChannelHeader"
 import {
   editCommentKey,
   editPostKey,
@@ -491,5 +492,33 @@ storiesOf("Comment", module)
           dropdownMenus={new Set()}
         />
       </StoryWrapper>
+    )
+  })
+
+storiesOf("Channel header", module)
+  .addDecorator(withKnobs)
+  .addDecorator(withRandom)
+  .addDecorator(withRouter)
+  .addDecorator(withRedux)
+  .add("header", () => {
+    const channel = makeChannel()
+    const hasPic = boolean("Has background pic", false)
+    const hasAvatar = boolean("Has avatar", false)
+    channel.banner = hasPic ? "https://picsum.photos/1024/200" : null
+    channel.avatar_small = hasAvatar ? fakeUrl("pr", channel.name) : null
+    channel.avatar_medium = channel.avatar_small
+    return (
+      <div className="app">
+        <div className="content">
+          <div className="loaded">
+            <div className="channel-page-wrapper">
+              <ChannelHeader
+                channel={channel}
+                isModerator={boolean("Is moderator", false)}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     )
   })

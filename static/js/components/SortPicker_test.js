@@ -82,4 +82,14 @@ describe("PostSortPicker", () => {
       assert.isTrue(wrapper.state("menuOpen"))
     })
   })
+
+  it("sets the className", () => {
+    [
+      ["post-sort-picker", PostSortPicker],
+      ["comment-sort-picker", CommentSortPicker]
+    ].forEach(([cssClass, Component]) => {
+      const wrapper = renderComponent(Component)()
+      assert.equal(wrapper.prop("className"), `sorter ${cssClass}`)
+    })
+  })
 })

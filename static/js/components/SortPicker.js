@@ -11,7 +11,7 @@ import {
 } from "../lib/sorting"
 
 type Props = {
-  updateSortParam: (t: string) => void,
+  updateSortParam: (value: string) => (event: Event) => void,
   value: string
 }
 
@@ -19,7 +19,7 @@ type State = {
   menuOpen: boolean
 }
 
-const SortPicker = labels => {
+const SortPicker = (labels, className) => {
   class SortPicker extends React.Component<Props, State> {
     constructor(props: Props) {
       super(props)
@@ -38,7 +38,7 @@ const SortPicker = labels => {
       const { menuOpen } = this.state
 
       return (
-        <MenuAnchor className="sorter">
+        <MenuAnchor className={`sorter ${className}`}>
           <Menu open={menuOpen} onClose={this.toggleMenuOpen}>
             {labels.map(([type, label]) => (
               <MenuItem key={label} onClick={updateSortParam(type)}>
@@ -57,8 +57,14 @@ const SortPicker = labels => {
   return SortPicker
 }
 
-export const PostSortPicker = SortPicker(VALID_POST_SORT_LABELS)
+export const PostSortPicker = SortPicker(
+  VALID_POST_SORT_LABELS,
+  "post-sort-picker"
+)
 PostSortPicker.displayName = "PostSortPicker"
 
-export const CommentSortPicker = SortPicker(VALID_COMMENT_SORT_LABELS)
+export const CommentSortPicker = SortPicker(
+  VALID_COMMENT_SORT_LABELS,
+  "comment-sort-picker"
+)
 CommentSortPicker.displayName = "CommentSortPicker"
