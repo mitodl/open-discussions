@@ -9,7 +9,7 @@ import { MetaTags } from "react-meta-tags"
 import ChannelHeader from "../components/ChannelHeader"
 import CanonicalLink from "../components/CanonicalLink"
 import { withPostLoadingSidebar } from "../components/Loading"
-import { PostSortPicker } from "../components/SortPicker"
+import { PostSortPicker } from "../components/Picker"
 import {
   withPostModeration,
   postModerationSelector
@@ -30,7 +30,7 @@ import { getSubscribedChannels } from "../lib/redux_selectors"
 import { formatTitle } from "../lib/title"
 import { clearChannelError } from "../actions/channel"
 import { evictPostsForChannel } from "../actions/posts_for_channel"
-import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
+import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/picker"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -131,7 +131,7 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
               </MetaTags>
               <div className="post-list-title">
                 <PostSortPicker
-                  updateSortParam={updatePostSortParam(this.props)}
+                  updatePickerParam={updatePostSortParam(this.props)}
                   value={qs.parse(search).sort || POSTS_SORT_HOT}
                 />
               </div>

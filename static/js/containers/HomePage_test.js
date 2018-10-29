@@ -11,7 +11,7 @@ import { makeChannelPostList } from "../factories/posts"
 import { actions } from "../actions"
 import { SET_CHANNEL_DATA } from "../actions/channel"
 import { SET_POST_DATA } from "../actions/post"
-import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/sorting"
+import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/picker"
 import { REGISTER_URL, newPostURL } from "../lib/url"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
@@ -125,7 +125,7 @@ describe("HomePage", () => {
         inner
           .find("PostSortPicker")
           .props()
-          .updateSortParam(sortType, {
+          .updatePickerParam(sortType, {
             preventDefault: helper.sandbox.stub()
           })
 

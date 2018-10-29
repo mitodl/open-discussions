@@ -35,7 +35,7 @@ import { postDetailURL, channelURL, commentPermalink } from "../lib/url"
 import { formatTitle } from "../lib/title"
 import { createCommentTree } from "../reducers/comments"
 import { makeReportRecord } from "../factories/reports"
-import { VALID_COMMENT_SORT_TYPES } from "../lib/sorting"
+import { VALID_COMMENT_SORT_TYPES } from "../lib/picker"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import * as utilFuncs from "../lib/util"
 import * as embedUtil from "../lib/embed"
@@ -754,7 +754,7 @@ describe("PostPage", function() {
           const select = wrapper
             .find(".count-and-sort")
             .find("CommentSortPicker")
-          select.props().updateSortParam(sortType, {
+          select.props().updatePickerParam(sortType, {
             preventDefault: helper.sandbox.stub()
           })
         }

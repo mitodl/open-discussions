@@ -22,11 +22,11 @@ import {
   withCommentModeration,
   commentModerationSelector
 } from "../hoc/withCommentModeration"
-import { CommentSortPicker } from "../components/SortPicker"
+import { CommentSortPicker } from "../components/Picker"
 import CanonicalLink from "../components/CanonicalLink"
 import Dialog from "../components/Dialog"
 
-import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/sorting"
+import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/picker"
 import {
   formatCommentsCount,
   getPostDropdownMenuKey,
@@ -342,7 +342,7 @@ class PostPage extends React.Component<PostPageProps> {
         <div className="count-and-sort">
           <div className="comments-count">{formatCommentsCount(post)}</div>
           <CommentSortPicker
-            updateSortParam={updateCommentSortParam(this.props)}
+            updatePickerParam={updateCommentSortParam(this.props)}
             value={qs.parse(search).sort || COMMENT_SORT_BEST}
           />
         </div>

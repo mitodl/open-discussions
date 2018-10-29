@@ -3,7 +3,7 @@ import R from "ramda"
 import casual from "casual-browserify"
 
 import { incrementer } from "../factories/util"
-import { VALID_POST_SORT_TYPES } from "../lib/sorting"
+import { VALID_POST_SORT_TYPES } from "../lib/picker"
 
 import type { Post, PostListPagination } from "../flow/discussionTypes"
 
