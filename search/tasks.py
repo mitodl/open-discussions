@@ -80,6 +80,10 @@ def update_field_values_by_query(query, field_dict, object_types):
 def index_profiles(ids):
     """
     Index user profiles
+
+    Args:
+        ids(list of int): List of profile id's
+
     """
     try:
         api.index_profiles(ids)
