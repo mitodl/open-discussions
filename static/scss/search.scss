@@ -1,0 +1,28 @@
+.search-textbox {
+  position: relative;
+
+  input {
+    padding: 3px 40px 2px 40px;
+    font-size: 22px;
+    font-weight: 600;
+    box-sizing: border-box;
+  }
+
+  .material-icons {
+    cursor: pointer;
+    position: absolute;
+    z-index: 3;
+    top: 6px;
+    height: 21px;
+    width: 21px;
+  }
+
+  .search-icon {
+    left: 10px;
+  }
+
+  .clear-icon {
+    right: 10px;
+    font-size: 20px;
+  }
+}
