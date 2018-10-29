@@ -198,11 +198,14 @@ def serialize_bulk_comments(post_obj):
     yield from _serialize_comment_tree_for_bulk(post_obj.comments)
 
 
-def serialize_bulk_profiles():
+def serialize_bulk_profiles(ids):
     """
     Serialize profiles for bulk indexing
+
+    Args:
+        ids(list of int): List of profile id's
     """
-    for profile in Profile.objects.iterator():
+    for profile in Profile.objects.filter(id__in=ids):
         yield serialize_profile_for_bulk(profile)
 
 

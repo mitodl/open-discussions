@@ -193,7 +193,7 @@ def test_index_profiles(mocker, with_error):  # pylint: disable=unused-argument
     index_profile_mock = mocker.patch("search.indexing_api.index_profiles")
     if with_error:
         index_profile_mock.side_effect = TabError
-    result = index_profiles.delay().get()
+    result = index_profiles.delay([1, 2, 3]).get()
     assert result == ("index_profiles threw an error" if with_error else None)
 
     index_profile_mock.assert_called_once()

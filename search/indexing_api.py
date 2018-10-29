@@ -329,15 +329,18 @@ def index_post_with_comments(post_id):
             )
 
 
-def index_profiles():
+def index_profiles(ids):
     """
     Index all user profiles
+
+    Args:
+        ids(list of int): List of profile id's
     """
     conn = get_conn()
     for alias in get_active_aliases([PROFILE_TYPE]):
         _, errors = bulk(
             conn,
-            serialize_bulk_profiles(),
+            serialize_bulk_profiles(ids),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable
