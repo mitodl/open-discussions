@@ -38,3 +38,5 @@ social-auth-app-django==2.1.0
 static3==0.5.1
 ulid-py
 uwsgi
+
+open-widget-framework

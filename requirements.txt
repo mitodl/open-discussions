@@ -25,6 +25,7 @@ dj-static==0.0.6
 django-anymail[mailgun]==3.0
 django-cors-headers==2.1.0
 django-redis==4.7.0
+django-rest-framework==0.1.0  # via open-widget-framework
 django-server-status==0.5.0
 django-storages==1.6.6
 django-templated-mail==1.1.1  # via djoser
@@ -49,6 +50,7 @@ lxml==4.1.1               # via xmlsec
 markdown2==2.3.5
 newrelic==4.2.0.100
 oauthlib==2.0.7           # via requests-oauthlib, social-auth-core
+open-widget-framework==1.0.4
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 pillow==3.4.2

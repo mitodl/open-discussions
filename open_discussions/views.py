@@ -58,6 +58,8 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "use_new_branding": features.is_enabled(features.USE_NEW_BRANDING),
         "embedlyKey": settings.EMBEDLY_KEY,
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
+        "widgetListId": 1,
+        "widgetFrameworkApiBase": settings.SITE_BASE_URL + 'api/v1/',
     }
 
     return render(

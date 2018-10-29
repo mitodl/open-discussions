@@ -34,6 +34,8 @@ import Banner from "../components/material/Banner"
 import Drawer from "../containers/Drawer"
 import Toolbar from "../components/Toolbar"
 
+import WidgetList from '@zagaran/open-widget-framework/es/widget-list'
+
 import { actions } from "../actions"
 import {
   setShowDrawerMobile,
@@ -292,6 +294,9 @@ class App extends React.Component<AppProps> {
             path={`${match.url}privacy-statement`}
             component={PrivacyPolicyPage}
           />
+          <Route path={match.url} render={() => {
+            return (<WidgetList widgetListId={SETTINGS.widgetListId} />)
+          }}/>
         </div>
       </div>
     )
