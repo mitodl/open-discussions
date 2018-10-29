@@ -205,7 +205,7 @@ def serialize_bulk_profiles(ids):
     Args:
         ids(list of int): List of profile id's
     """
-    for profile in Profile.objects.filter(id__in=ids):
+    for profile in Profile.objects.filter(id__in=ids).iterator():
         yield serialize_profile_for_bulk(profile)
 
 

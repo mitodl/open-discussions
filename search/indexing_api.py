@@ -331,7 +331,7 @@ def index_post_with_comments(post_id):
 
 def index_profiles(ids):
     """
-    Index all user profiles
+    Index user profiles based on list of profile ids
 
     Args:
         ids(list of int): List of profile id's
