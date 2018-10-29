@@ -1,5 +1,6 @@
 """Management command to add the indexing user account as a moderator to all channels"""
 import sys
+import traceback
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -65,7 +66,7 @@ class Command(BaseCommand):
                     pass
                 except Exception as exc:  # pylint: disable=broad-except
                     self.stderr.write(
-                        "Channel '{}' ERROR: {}".format(channel, str(exc))
+                        "Channel '{}' ERROR: {}".format(channel, traceback.format_exc())
                     )
                     failed = True
             if not processed:
