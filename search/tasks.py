@@ -155,7 +155,6 @@ def start_recreate_index(self):
     """
     try:
         from channels.api import Api
-        from profiles.models import Profile
 
         user = User.objects.get(username=settings.INDEXING_API_USERNAME)
         new_backing_indices = {
@@ -173,7 +172,9 @@ def start_recreate_index(self):
             + [
                 index_profiles.si(ids)
                 for ids in chunks(
-                    Profile.objects.values_list("id", flat=True),
+                    User.objects.exclude(username=settings.INDEXING_API_USERNAME)
+                    .exclude(profile__isnull=True)
+                    .values_list("profile__id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
