@@ -20,3 +20,11 @@ export const hasBlockType = R.curry((nodeType, state) => {
 
   return to <= $from.end() && $from.parent.hasMarkup(nodeType)
 })
+
+export const getSelectedText = view =>
+  view
+    ? view.state.selection
+      .content()
+      .content.content.map(node => node.textContent)
+      .join("")
+    : ""

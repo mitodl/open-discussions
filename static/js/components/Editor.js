@@ -17,7 +17,7 @@ import AddLinkMenu from "../components/AddLinkMenu"
 
 import { makeUUID } from "../lib/util"
 import { configureForm } from "../lib/forms"
-import { markIsActive } from "../lib/prosemirror"
+import { markIsActive, getSelectedText } from "../lib/prosemirror"
 
 import type { Dispatch } from "redux"
 
@@ -233,24 +233,15 @@ export class Editor extends React.Component<Props, State> {
       // to get the currently selected text and
       // check to see if it's an empty string
       this.view.state.selection.empty ||
-      this.getEditorSelectionText().trim() === ""
+      getSelectedText(this.view).trim() === ""
     )
-  }
-
-  getEditorSelectionText = () => {
-    return this.view
-      ? this.view.state.selection
-        .content()
-        .content.content.map(node => node.textContent)
-        .join("")
-      : ""
   }
 
   handleLinkClick = () => {
     if (markIsActive(schema.marks.link, this.view.state)) {
       this.dispatchTransaction(
         this.view.state.tr.replaceSelectionWith(
-          schema.text(this.getEditorSelectionText()),
+          schema.text(getSelectedText(this.view)),
           false
         )
       )
@@ -265,7 +256,7 @@ export class Editor extends React.Component<Props, State> {
     const { formBeginEdit, formUpdate } = this.formHelpers
 
     dispatch(formBeginEdit())
-    dispatch(formUpdate({ text: this.getEditorSelectionText() }))
+    dispatch(formUpdate({ text: getSelectedText(this.view)}))
     this.setState({ showLinkMenu: true })
   }
 

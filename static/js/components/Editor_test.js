@@ -23,7 +23,7 @@ import { shouldIf } from "../lib/test_utils"
 import * as util from "../lib/util"
 import * as pmLib from "../lib/prosemirror"
 
-describe("Editor component", () => {
+describe.only("Editor component", () => {
   let dispatch, onChange, makeUUIDStub, focusStub, helper
 
   const fakeUUID = "uuid wow hey great"
@@ -251,9 +251,7 @@ describe("Editor component", () => {
         )
 
         if (markIsActive) {
-          helper.sandbox
-            .stub(wrapper.instance(), "getEditorSelectionText")
-            .returns("link text")
+          helper.sandbox.stub(pmLib, "getSelectedText").returns("link text")
         }
 
         wrapper.instance().handleLinkClick()
