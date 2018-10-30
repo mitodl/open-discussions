@@ -99,22 +99,6 @@ export class Editor extends React.Component<Props, State> {
     onChange(defaultMarkdownSerializer.serialize(this.view.state.doc))
   }
 
-  menuClickHandlerCreator = (command: Function) => (e: Object) => {
-    e.preventDefault()
-    command(this.view.state, this.view.dispatch, this.view)
-    this.view.focus()
-  }
-
-  renderMenuButton = ({ command, title, icon, active }: MenuBarItem) => (
-    <div
-      className={(this.view ? this.view.state : null, command, active)}
-      onClick={this.menuClickHandlerCreator(command)}
-      key={title}
-    >
-      {icon}
-    </div>
-  )
-
   handleLinkClick = () => {
     if (markIsActive(schema.marks.link, this.view.state)) {
       this.dispatchTransaction(
