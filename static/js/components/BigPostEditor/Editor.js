@@ -10,6 +10,7 @@ import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import withForm from "../../hoc/withForm"
 import BigLink from "./nodeViews/BigLink"
+import MenuBar from '../../components/ProseMirror/MenuBar'
 
 import { configureForm } from "../../lib/forms"
 import { bigPostSchema } from "./schema"
@@ -129,6 +130,12 @@ export class BigPostEditor extends React.Component<Props, State> {
 
     return (
       <div className="editor-wrapper">
+        <MenuBar
+          view={this.view}
+          schema={bigPostSchema}
+          dispatchTransaction={this.dispatchTransaction}
+          openLinkMenu={this.openLinkMenu}
+        />
         <div
           className="editor big-post-editor"
           id="editor"
