@@ -195,7 +195,7 @@ export class Editor extends React.Component<Props, State> {
   )
 
   renderMenuBar = () => {
-    const selectionEmpty = selectionIsEmpty()
+    const selectionEmpty = selectionIsEmpty(this.view)
 
     const linkIconName =
       this.view && markIsActive(schema.marks.link, this.view.state)
