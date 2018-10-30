@@ -7,7 +7,7 @@ export type EmbedlyResponse = {
   response: Object
 }
 
-type EmbedlyData = Map<string, Object>
+export type EmbedlyData = Map<string, Object>
 
 export const embedlyEndpoint = {
   name:              "embedly",

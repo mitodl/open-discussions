@@ -10,7 +10,7 @@ import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import withForm from "../../hoc/withForm"
 import BigLink from "./nodeViews/BigLink"
-import MenuBar from '../../components/ProseMirror/MenuBar'
+import MenuBar from "../../components/ProseMirror/MenuBar"
 
 import { configureForm } from "../../lib/forms"
 import { bigPostSchema } from "./schema"
@@ -19,18 +19,23 @@ import { validationMessage } from "../../lib/validation"
 import { actions } from "../../actions"
 
 import type { WithFormProps } from "../../flow/formTypes"
+import type { EmbedlyData } from "../../reducers/embedly"
 
 type BigPostForm = {
   url: string
 }
 
 type Props = {
-  onChange: Function
+  onChange: Function,
+  getEmbedly: Function,
+  embedlyInFlight: boolean,
+  embedly: EmbedlyData
 } & WithFormProps<BigPostForm>
 
 type State = {
   editorState: Object,
-  showBigLinkMenu: boolean
+  showBigLinkMenu: boolean,
+  showLinkMenu: boolean
 }
 
 export class BigPostEditor extends React.Component<Props, State> {
@@ -56,7 +61,8 @@ export class BigPostEditor extends React.Component<Props, State> {
 
     this.state = {
       editorState:     EditorState.create(editorStateOptions),
-      showBigLinkMenu: false
+      showBigLinkMenu: false,
+      showLinkMenu:    false
     }
   }
 
@@ -124,46 +130,55 @@ export class BigPostEditor extends React.Component<Props, State> {
     this.setState({ showBigLinkMenu: !showBigLinkMenu })
   }
 
+  toggleLinkMenu = () => {
+    const { showLinkMenu } = this.state
+    this.setState({ showLinkMenu: !showLinkMenu })
+  }
+
   render() {
     const { showBigLinkMenu } = this.state
     const { renderForm, getEmbedly, embedlyInFlight, embedly } = this.props
 
     return (
-      <div className="editor-wrapper">
-        <MenuBar
-          view={this.view}
-          schema={bigPostSchema}
-          dispatchTransaction={this.dispatchTransaction}
-          openLinkMenu={this.openLinkMenu}
-        />
-        <div
-          className="editor big-post-editor"
-          id="editor"
-          onClick={this.focusEditor}
-          ref={this.node}
-        />
-        {this.nodeViews
-          .filter(nodeView => !nodeView.destroyed)
-          .map(nodeView => {
-            const relevantEmbedly = embedly.get(nodeView.node.attrs.href)
+      <div className="article-editor">
+        <div className="menu-bar">
+          <MenuBar
+            view={this.view}
+            schema={bigPostSchema}
+            dispatchTransaction={this.dispatchTransaction}
+            openLinkMenu={this.toggleLinkMenu}
+          />
+        </div>
+        <div className="editor-wrapper">
+          <div
+            className="editor big-post-editor"
+            id="editor"
+            onClick={this.focusEditor}
+            ref={this.node}
+          />
+          {this.nodeViews
+            .filter(nodeView => !nodeView.destroyed)
+            .map(nodeView => {
+              const relevantEmbedly = embedly.get(nodeView.node.attrs.href)
 
-            return ReactDOM.createPortal(
-              <BigLink
-                {...nodeView.node.attrs}
-                getEmbedly={getEmbedly}
-                embedly={relevantEmbedly}
-                embedlyInFlight={embedlyInFlight}
-              />,
-              nodeView.dom
-            )
-          })}
-        <button type="button" onClick={this.toggleBigLinkMenu}>
-          {showBigLinkMenu ? "close link menu" : "show link menu"}
-        </button>
-        {showBigLinkMenu ? renderForm() : null}
-        <button type="button" onClick={this.addBigLinkToEditor}>
-          add link
-        </button>
+              return ReactDOM.createPortal(
+                <BigLink
+                  {...nodeView.node.attrs}
+                  getEmbedly={getEmbedly}
+                  embedly={relevantEmbedly}
+                  embedlyInFlight={embedlyInFlight}
+                />,
+                nodeView.dom
+              )
+            })}
+          <button type="button" onClick={this.toggleBigLinkMenu}>
+            {showBigLinkMenu ? "close link menu" : "show link menu"}
+          </button>
+          {showBigLinkMenu ? renderForm() : null}
+          <button type="button" onClick={this.addBigLinkToEditor}>
+            add link
+          </button>
+        </div>
       </div>
     )
   }

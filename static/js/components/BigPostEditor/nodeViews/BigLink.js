@@ -5,7 +5,9 @@ import Embedly, { EmbedlyLoader } from "../../Embedly"
 
 type Props = {
   href: string,
-  getEmbedly: Function
+  getEmbedly: Function,
+  embedly?: Object,
+  embedlyInFlight: boolean
 }
 
 export default class BigLink extends React.Component<Props> {

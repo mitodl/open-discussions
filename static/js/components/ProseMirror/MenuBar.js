@@ -142,7 +142,7 @@ export default class MenuBar extends React.Component<Props> {
       view && markIsActive(schema.marks.link, view.state) ? "link_off" : "link"
 
     return (
-      <div className="menu-bar">
+      <div className="pm-menu-bar">
         {this.menuBarManifest.map((buttonGroup, idx) => (
           <div className="button-group" key={idx}>
             {buttonGroup.map(this.renderMenuButton)}
