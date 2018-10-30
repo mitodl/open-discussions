@@ -10,90 +10,15 @@ import {
   defaultMarkdownParser,
   defaultMarkdownSerializer
 } from "prosemirror-markdown"
-import { toggleMark, wrapIn } from "prosemirror-commands"
-import { wrapInList } from "prosemirror-schema-list"
 
 import AddLinkMenu from "../components/AddLinkMenu"
+import MenuBar from "../components/ProseMirror/MenuBar"
 
 import { makeUUID } from "../lib/util"
 import { configureForm } from "../lib/forms"
-import { markIsActive, getSelectedText, selectionIsEmpty } from "../lib/prosemirror"
+import { markIsActive, getSelectedText } from "../lib/prosemirror"
 
 import type { Dispatch } from "redux"
-
-// helpers for the menu bar
-type MenuBarItem = {
-  command: Function,
-  title: string,
-  icon: React$Element<"i">,
-  active?: Function
-}
-
-// each array in this array represents a 'group' of buttons
-// (we want to group certain buttons together with a border
-// around them in the UI)
-export const menuBarManifest: Array<Array<MenuBarItem>> = [
-  [
-    {
-      command: toggleMark(schema.marks.strong),
-      title:   "Bold",
-      icon:    <i className="material-icons format_bold">format_bold</i>,
-      active:  markIsActive(schema.marks.strong)
-    }
-  ],
-  [
-    {
-      command: toggleMark(schema.marks.em),
-      title:   "Italic",
-      icon:    <i className="material-icons format_italic">format_italic</i>,
-      active:  markIsActive(schema.marks.em)
-    }
-  ],
-  [
-    {
-      command: wrapInList(schema.nodes.bullet_list),
-      title:   "bullet list",
-      icon:    (
-        <i className="material-icons format_list_bulleted">
-          format_list_bulleted
-        </i>
-      )
-    },
-    {
-      command: wrapInList(schema.nodes.ordered_list),
-      title:   "ordered list",
-      icon:    (
-        <i className="material-icons format_list_numbered">
-          format_list_numbered
-        </i>
-      )
-    },
-    {
-      command: wrapIn(schema.nodes.blockquote),
-      title:   "quote",
-      icon:    <i className="material-icons format_quote">format_quote</i>
-    }
-  ]
-]
-
-export const menuButtonClass = (
-  state: ?Object,
-  command: Function,
-  active: ?Function
-) => {
-  // on the first render call this.view isn't there yet
-  // so we skip checking things in the state
-  if (!state) {
-    return "menu-button"
-  }
-
-  if (active && active(state)) {
-    return "menu-button active"
-  } else if (!command(state)) {
-    return "menu-button disabled"
-  }
-  return "menu-button"
-}
 
 export const newLinkForm = () => ({
   url:  "",
@@ -182,44 +107,13 @@ export class Editor extends React.Component<Props, State> {
 
   renderMenuButton = ({ command, title, icon, active }: MenuBarItem) => (
     <div
-      className={menuButtonClass(
-        this.view ? this.view.state : null,
-        command,
-        active
-      )}
+      className={(this.view ? this.view.state : null, command, active)}
       onClick={this.menuClickHandlerCreator(command)}
       key={title}
     >
       {icon}
     </div>
   )
-
-  renderMenuBar = () => {
-    const selectionEmpty = selectionIsEmpty(this.view)
-
-    const linkIconName =
-      this.view && markIsActive(schema.marks.link, this.view.state)
-        ? "link_off"
-        : "link"
-
-    return (
-      <div className="menu-bar">
-        {menuBarManifest.map((buttonGroup, idx) => (
-          <div className="button-group" key={idx}>
-            {buttonGroup.map(this.renderMenuButton)}
-          </div>
-        ))}
-        <div className="button-group">
-          <div
-            className={`menu-button ${selectionEmpty ? "disabled" : ""}`}
-            onClick={selectionEmpty ? null : this.handleLinkClick}
-          >
-            <i className={`material-icons ${linkIconName}`}>{linkIconName}</i>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   handleLinkClick = () => {
     if (markIsActive(schema.marks.link, this.view.state)) {
@@ -240,7 +134,7 @@ export class Editor extends React.Component<Props, State> {
     const { formBeginEdit, formUpdate } = this.formHelpers
 
     dispatch(formBeginEdit())
-    dispatch(formUpdate({ text: getSelectedText(this.view)}))
+    dispatch(formUpdate({ text: getSelectedText(this.view) }))
     this.setState({ showLinkMenu: true })
   }
 
@@ -314,7 +208,12 @@ export class Editor extends React.Component<Props, State> {
           onClick={this.setEditorFocus}
           ref={this.node}
         />
-        {this.renderMenuBar()}
+        <MenuBar
+          view={this.view}
+          schema={schema}
+          dispatchTransaction={this.dispatchTransaction}
+          openLinkMenu={this.openLinkMenu}
+        />
         {showLinkMenu ? this.renderLinkMenu() : null}
       </div>
     )
