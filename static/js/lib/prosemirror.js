@@ -28,3 +28,18 @@ export const getSelectedText = view =>
       .content.content.map(node => node.textContent)
       .join("")
     : ""
+
+export const selectionIsEmpty = view => {
+  if (!view) {
+    return true
+  }
+
+  return (
+    // we want to check whether the selection is "empty"
+    // (i.e. the user has nothing selected) or the selection
+    // is only whitespace. to check for whitespace we have
+    // to get the currently selected text and
+    // check to see if it's an empty string
+    view.state.selection.empty || getSelectedText(view).trim() === ""
+  )
+}

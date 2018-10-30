@@ -17,7 +17,7 @@ import AddLinkMenu from "../components/AddLinkMenu"
 
 import { makeUUID } from "../lib/util"
 import { configureForm } from "../lib/forms"
-import { markIsActive, getSelectedText } from "../lib/prosemirror"
+import { markIsActive, getSelectedText, selectionIsEmpty } from "../lib/prosemirror"
 
 import type { Dispatch } from "redux"
 
@@ -195,7 +195,7 @@ export class Editor extends React.Component<Props, State> {
   )
 
   renderMenuBar = () => {
-    const selectionIsEmpty = this.selectionIsEmpty()
+    const selectionEmpty = selectionIsEmpty()
 
     const linkIconName =
       this.view && markIsActive(schema.marks.link, this.view.state)
@@ -211,29 +211,13 @@ export class Editor extends React.Component<Props, State> {
         ))}
         <div className="button-group">
           <div
-            className={`menu-button ${selectionIsEmpty ? "disabled" : ""}`}
-            onClick={selectionIsEmpty ? null : this.handleLinkClick}
+            className={`menu-button ${selectionEmpty ? "disabled" : ""}`}
+            onClick={selectionEmpty ? null : this.handleLinkClick}
           >
             <i className={`material-icons ${linkIconName}`}>{linkIconName}</i>
           </div>
         </div>
       </div>
-    )
-  }
-
-  selectionIsEmpty = () => {
-    if (!this.view) {
-      return true
-    }
-
-    return (
-      // we want to check whether the selection is "empty"
-      // (i.e. the user has nothing selected) or the selection
-      // is only whitespace. to check for whitespace we have
-      // to get the currently selected text and
-      // check to see if it's an empty string
-      this.view.state.selection.empty ||
-      getSelectedText(this.view).trim() === ""
     )
   }
 

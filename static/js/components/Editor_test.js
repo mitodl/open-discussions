@@ -292,7 +292,7 @@ describe.only("Editor component", () => {
       }empty`, () => {
         const wrapper = renderEditor()
         const selectionIsEmptyStub = helper.sandbox
-          .stub(wrapper.instance(), "selectionIsEmpty")
+          .stub(pmLib, "selectionIsEmpty")
           .returns(empty)
         updateWrapper(wrapper)
         sinon.assert.called(selectionIsEmptyStub)
