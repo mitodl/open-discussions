@@ -33,6 +33,14 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
 
     site = get_default_site()
 
+    article_ui_enabled = (
+        features.is_enabled(features.ARTICLE_UI)
+        if settings.CKEDITOR_ENVIRONMENT_ID
+        and settings.CKEDITOR_SECRET_KEY
+        and settings.CKEDITOR_UPLOAD_URL
+        else False
+    )
+
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
         "environment": settings.ENVIRONMENT,
@@ -64,6 +72,8 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
         "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,
         "accepted_social_sites": list(SOCIAL_SITE_NAME_MAP.values()),
+        "article_ui_enabled": article_ui_enabled,
+        "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
     }
 
     return render(

@@ -2,26 +2,27 @@
 import {
   LINK_TYPE_TEXT,
   LINK_TYPE_LINK,
+  LINK_TYPE_ARTICLE
 } from "../lib/channels"
 
 import type { LinkType, ChannelType } from "../lib/channels"
 
 export type Channel = {
-  name:                string,
-  title:               string,
-  description:         string,
-  public_description:  string,
-  channel_type:        ChannelType,
-  num_users:           number,
-  user_is_contributor: boolean,
-  user_is_moderator:   boolean,
-  link_type:          LinkType,
+  name:                  string,
+  title:                 string,
+  description:           string,
+  public_description:    string,
+  channel_type:          ChannelType,
+  num_users:             number,
+  user_is_contributor:   boolean,
+  user_is_moderator:     boolean,
+  link_type:             LinkType,
   membership_is_managed: boolean,
-  ga_tracking_id:      ?string,
-  avatar: string|null,
-  avatar_small: string|null,
-  avatar_medium: string|null,
-  banner: string|null,
+  ga_tracking_id:        ?string,
+  avatar:                string|null,
+  avatar_small:          string|null,
+  avatar_medium:         string|null,
+  banner:                string|null,
 }
 
 export type ChannelForm = {
@@ -72,28 +73,31 @@ export type AuthoredContent = {
 }
 
 export type Post = AuthoredContent & {
-  title:         string,
-  url:           ?string,
-  text:          ?string,
-  slug:          string,
-  num_comments:  number,
-  channel_name:  string,
-  channel_title: string,
-  stickied:      boolean,
-  removed:       boolean,
-  thumbnail:     ?string
+  title:           string,
+  url:             ?string,
+  text:            ?string,
+  article_content: ?Array<Object>,
+  slug:            string,
+  num_comments:    number,
+  channel_name:    string,
+  channel_title:   string,
+  stickied:        boolean,
+  removed:         boolean,
+  thumbnail:       ?string
 }
 
-type PostFormType =
+export type PostFormType =
   | typeof LINK_TYPE_LINK
   | typeof LINK_TYPE_TEXT
+  | typeof LINK_TYPE_ARTICLE
   | null
 
 export type PostForm = {
   postType: PostFormType,
   text:     string,
   url:      string,
-  title:    string
+  title:    string,
+  article:  Array<Object>
 }
 
 export type PostValidation = {
@@ -101,13 +105,15 @@ export type PostValidation = {
   url?:       string,
   title?:     string,
   channel?:   string,
-  post_type?: string
+  post_type?: string,
+  article?:   string,
 }
 
 export type CreatePostPayload = {
-  url?:  string,
-  text?: string,
-  title: string
+  url?:     string,
+  text?:    string,
+  title:    string,
+  article?: Array<Object>
 }
 
 export type PostListPagination = {

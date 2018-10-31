@@ -5,13 +5,17 @@ type ResultCommon = {
   author_id: string,
   author_name: string,
 }
+
 type RESULT_TYPE_PROFILE = "profile"
+
 export type ProfileResult = ResultCommon & {
   object_type: RESULT_TYPE_PROFILE,
   author_bio: ?string,
   author_avatar_medium: string,
 }
+
 type RESULT_TYPE_COMMENT = "comment"
+
 export type CommentResult = ResultCommon & {
   channel_name: string,
   channel_title: string,
@@ -27,8 +31,11 @@ export type CommentResult = ResultCommon & {
   score: number,
   text: string,
 }
+
 type RESULT_TYPE_POST = "post"
+
 export type PostResult = ResultCommon & {
+  article_content: ?Array<Object>,
   channel_name: string,
   channel_title: string,
   created: string,
@@ -44,6 +51,7 @@ export type PostResult = ResultCommon & {
   score: number,
   text: string,
 }
+
 export type Result = PostResult | CommentResult | ProfileResult
 
 export type SearchInputs = {
@@ -51,6 +59,7 @@ export type SearchInputs = {
   type?: string,
   incremental: boolean
 }
+
 export type SearchParams = {
   type: ?string,
   text: ?string,

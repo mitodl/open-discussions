@@ -14,6 +14,7 @@ import DropdownMenu from "./DropdownMenu"
 import SharePopup from "./SharePopup"
 import FollowButton from "./FollowButton"
 import PostUpvoteButton from "./PostUpvoteButton"
+import ArticleEditor from "./ArticleEditor"
 
 import { isPrivate } from "../lib/channels"
 import { formatPostTitle } from "../lib/posts"
@@ -210,6 +211,9 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
           {post && post.url ? <Embedly embedly={embedly} /> : null}
         </div>
         {!showPermalinkUI && post.text ? this.renderTextContent() : null}
+        {!showPermalinkUI && post.article_content ? (
+          <ArticleEditor readOnly initialData={post.article_content} />
+        ) : null}
         {R.has(editPostKey(post), forms) ? null : this.postActionButtons()}
       </div>
     )

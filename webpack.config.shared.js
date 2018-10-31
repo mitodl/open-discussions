@@ -4,8 +4,8 @@ const webpack = require("webpack")
 module.exports = {
   config: {
     entry: {
-      root:    ["@babel/polyfill", "./static/js/entry/root"],
-      style:   "./static/js/entry/style"
+      root:  ["@babel/polyfill", "./static/js/entry/root"],
+      style: "./static/js/entry/style"
     },
     module: {
       rules: [
@@ -28,7 +28,11 @@ module.exports = {
     exclude: /node_modules/,
     loader:  "babel-loader",
     query:   {
-      presets: [["@babel/preset-env", { modules: false }], "@babel/preset-react", "@babel/preset-flow"],
+      presets: [
+        ["@babel/preset-env", { modules: false }],
+        "@babel/preset-react",
+        "@babel/preset-flow"
+      ],
       ignore:  ["node_modules/**"],
       plugins: [
         "react-hot-loader/babel",

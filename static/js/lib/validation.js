@@ -5,10 +5,10 @@ import R from "ramda"
 import isURL from "validator/lib/isURL"
 
 import { S } from "./sanctuary"
-import { LINK_TYPE_LINK } from "../lib/channels"
+import { LINK_TYPE_LINK, LINK_TYPE_ARTICLE } from "../lib/channels"
 import { emptyOrNil } from "../lib/util"
 
-import type { PostForm } from "../flow/discussionTypes"
+import type { PostForm, PostFormType } from "../flow/discussionTypes"
 
 export const PASSWORD_LENGTH_MINIMUM = 8
 
@@ -53,29 +53,52 @@ export const validNotMIT = R.compose(
   R.test(/^.*@(((?!alum\.).)+\.)*mit.edu$/i) // matches any mit.edu email except alum.mit.edu
 )
 
-// POST CREATE VALIDATION
-export const postURLValidation = (postForm: { value: PostForm }) => {
-  if (R.isEmpty(postForm)) {
-    return S.Nothing
-  }
+export const formLens = (key: string) => R.lensPath(["value", key])
 
-  const post = postForm.value
-  if (post.postType === LINK_TYPE_LINK) {
+export const formLensSetter = (key: string, msg: string) =>
+  R.set(formLens(key), msg)
+
+// POST CREATE VALIDATION
+
+// run a validator only if the post create form has a specific post type
+const validateIfPostType = (
+  postType: PostFormType,
+  validator: Function
+) => (postForm: { value: PostForm }) => {
+  if (R.isEmpty(postForm) || postForm.value.postType !== postType) {
+    return S.Nothing
+  } else {
+    return validator(postForm)
+  }
+}
+
+export const postURLValidation = validateIfPostType(
+  LINK_TYPE_LINK,
+  (postForm: { value: PostForm }) => {
+    const post = postForm.value
     if (emptyOrNil(post.url)) {
-      return S.Just(
-        R.set(R.lensPath(["value", "url"]), "Post url cannot be empty")
-      )
+      return S.Just(formLensSetter("url", "Post url cannot be empty"))
     }
 
     if (!isURL(post.url)) {
-      return S.Just(
-        R.set(R.lensPath(["value", "url"]), "Post url must be a valid url")
-      )
+      return S.Just(formLensSetter("url", "Post url must be a valid url"))
+    }
+
+    return S.Nothing
+  }
+)
+
+export const postArticleValidation = validateIfPostType(
+  LINK_TYPE_ARTICLE,
+  (postForm: { value: PostForm }) => {
+    const { value: post } = postForm
+    if (R.equals(post.article, [])) {
+      return S.Just(formLensSetter("article", "Article must not be empty"))
+    } else {
+      return S.Nothing
     }
   }
-
-  return S.Nothing
-}
+)
 
 export const validatePostCreateForm = validate([
   validation(
@@ -83,7 +106,7 @@ export const validatePostCreateForm = validate([
       R.gt(R.__, 300),
       R.length
     ),
-    R.lensPath(["value", "title"]),
+    formLens("title"),
     "Title length is limited to 300 characters"
   ),
   validation(
@@ -91,15 +114,16 @@ export const validatePostCreateForm = validate([
       R.gt(R.__, 40000),
       R.length
     ),
-    R.lensPath(["value", "text"]),
+    formLens("text"),
     "This post is too long. Please reduce the length and try again."
   ),
-  validation(emptyOrNil, R.lensPath(["value", "title"]), "Title is required"),
-  postURLValidation
+  validation(emptyOrNil, formLens("title"), "Title is required"),
+  postURLValidation,
+  postArticleValidation
 ])
 
 export const validateProfileForm = validate([
-  validation(emptyOrNil, R.lensPath(["value", "name"]), "Name is required")
+  validation(emptyOrNil, formLens("name"), "Name is required")
 ])
 
 export const validateUserWebsiteForm = validate([
@@ -120,30 +144,22 @@ export const validateChannelAppearanceEditForm = validate([
       R.gt(R.__, 80),
       R.length
     ),
-    R.lensPath(["value", "public_description"]),
+    formLens("public_description"),
     "Headline length is limited to 80 characters"
   ),
-  validation(
-    R.isEmpty,
-    R.lensPath(["value", "title"]),
-    "Title must not be empty"
-  )
+  validation(R.isEmpty, formLens("title"), "Title must not be empty")
 ])
 
 export const validateChannelBasicEditForm = validate([
   validation(
     R.isEmpty,
-    R.lensPath(["value", "link_type"]),
+    formLens("link_type"),
     "At least one of the post type options must be selected"
   )
 ])
 
 export const validateMembersForm = validate([
-  validation(
-    R.isEmpty,
-    R.lensPath(["value", "email"]),
-    "Email must not be blank"
-  )
+  validation(R.isEmpty, formLens("email"), "Email must not be blank")
 ])
 
 export const validateImageForm = validate([])
@@ -154,7 +170,7 @@ export const validateContentReportForm = validate([
       R.lt(100),
       R.length
     ),
-    R.lensPath(["value", "reason"]),
+    formLens("reason"),
     "Reason length is limited to 100 characters"
   ),
   validation(
@@ -162,7 +178,7 @@ export const validateContentReportForm = validate([
       R.gt(3),
       R.length
     ),
-    R.lensPath(["value", "reason"]),
+    formLens("reason"),
     "Reason must be at least 3 characters"
   )
 ])
@@ -175,17 +191,17 @@ export const validationMessage = (message: ?string) =>
 const emailValidators = [
   validation(
     R.complement(validEmail),
-    R.lensPath(["value", "email"]),
+    formLens("email"),
     "Email is not formatted correctly"
   ),
-  validation(emptyOrNil, R.lensPath(["value", "email"]), "Email is required")
+  validation(emptyOrNil, formLens("email"), "Email is required")
 ]
 
 export const recaptchaValidator = validation(
   R.complement(recaptcha => {
     return SETTINGS.recaptchaKey ? R.not(emptyOrNil(recaptcha)) : true
   }),
-  R.lensPath(["value", "recaptcha"]),
+  formLens("recaptcha"),
   "Please verify you're not a robot"
 )
 
@@ -199,7 +215,7 @@ export const validateNewEmailForm = validate(
         R.complement(email => {
           return SETTINGS.allow_saml_auth ? validNotMIT(email) : true
         }),
-        R.lensPath(["value", "email"]),
+        formLens("email"),
         "MIT users please login with Touchstone below"
       ),
       emailValidators
@@ -213,24 +229,20 @@ export const validatePasswordForm = validate([
       R.gt(8),
       R.length
     ),
-    R.lensPath(["value", "password"]),
+    formLens("password"),
     "Password must be at least 8 characters"
   )
 ])
 
 export const validateRegisterDetailsForm = validate([
   validation(emptyOrNil, R.lensPath(["value", "name"]), "Name is required"),
-  validation(
-    emptyOrNil,
-    R.lensPath(["value", "password"]),
-    "Password is required"
-  ),
+  validation(emptyOrNil, formLens("password"), "Password is required"),
   validation(
     R.compose(
       R.gt(PASSWORD_LENGTH_MINIMUM),
       R.length
     ),
-    R.lensPath(["value", "password"]),
+    formLens("password"),
     `Password must be at least ${PASSWORD_LENGTH_MINIMUM} characters`
   )
 ])
@@ -241,21 +253,17 @@ const newPasswordValidations = [
       R.gt(PASSWORD_LENGTH_MINIMUM),
       R.length
     ),
-    R.lensPath(["value", "new_password"]),
+    formLens("new_password"),
     `Password must be at least ${PASSWORD_LENGTH_MINIMUM} characters`
   ),
-  validation(
-    emptyOrNil,
-    R.lensPath(["value", "new_password"]),
-    "New password is required"
-  )
+  validation(emptyOrNil, formLens("new_password"), "New password is required")
 ]
 
 export const validatePasswordResetForm = validate(
   R.prepend(
     validation(
       (reNewPassword, form) => reNewPassword !== form.value.new_password,
-      R.lensPath(["value", "re_new_password"]),
+      formLens("re_new_password"),
       "Passwords must match"
     ),
     newPasswordValidations
@@ -266,7 +274,7 @@ export const validatePasswordChangeForm = validate(
   R.append(
     validation(
       emptyOrNil,
-      R.lensPath(["value", "current_password"]),
+      formLens("current_password"),
       "Current password is required"
     ),
     newPasswordValidations

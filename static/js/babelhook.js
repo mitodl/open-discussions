@@ -1,4 +1,6 @@
 const { babelSharedLoader } = require("../../webpack.config.shared")
+const idlUtils = require("jsdom/lib/jsdom/living/generated/utils")
+const whatwgURL = require("whatwg-url")
 
 babelSharedLoader.query.presets = [
   "@babel/preset-env",
@@ -13,6 +15,11 @@ require("jsdom-global")(undefined, {
   url: "http://fake/"
 })
 
+require("mutationobserver-shim")
+global.MutationObserver = window.MutationObserver
+
+global.DOMParser = window.DOMParser
+
 // react got a little more picky about the polyfill for
 // requestAnimaltionFrame, see:
 // https://reactjs.org/docs/javascript-environment-requirements.html
@@ -23,8 +30,13 @@ polyfill(window)
 // polyfill for the web crypto module
 window.crypto = require("@trust/webcrypto")
 
+const changeURL = (window, urlString) => {
+  const doc = idlUtils.implForWrapper(window._document)
+  doc._URL = whatwgURL.parseURL(urlString)
+  doc._origin = whatwgURL.serializeURLOrigin(doc._URL)
+}
+
 // We need to explicitly change the URL when window.location is used
-const changeURL = require("jsdom/lib/old-api").changeURL
 Object.defineProperty(window, "location", {
   set: value => {
     if (!value.startsWith("http")) {

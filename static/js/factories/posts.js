@@ -13,28 +13,29 @@ export const makePost = (
   isURLPost: boolean = false,
   channelName: string = casual.word
 ): Post => ({
-  // $FlowFixMe: incr.next().value is never undefined but Flow thinks it may be
-  id:              `post${incr.next().value}`,
-  title:           casual.sentence,
-  slug:            casual.word,
-  score:           casual.integer(-5, 15),
-  upvoted:         casual.boolean,
+  article_content: null,
+  author_headline: casual.sentence,
   author_id:       `justareddituser${String(casual.random)}`,
-  text:            isURLPost ? null : casual.text,
-  url:             isURLPost ? casual.url : null,
-  created:         casual.moment.format(),
-  num_comments:    casual.integer(0, 25),
+  author_name:     casual.name,
   channel_name:    channelName,
   channel_title:   casual.string,
-  profile_image:   casual.url,
-  author_name:     casual.name,
-  author_headline: casual.sentence,
+  created:         casual.moment.format(),
   edited:          casual.boolean,
-  stickied:        casual.boolean,
-  removed:         casual.boolean,
+  // $FlowFixMe: incr.next().value is never undefined but Flow thinks it may be
+  id:              `post${incr.next().value}`,
+  num_comments:    casual.integer(0, 25),
   num_reports:     null,
+  profile_image:   casual.url,
+  removed:         casual.boolean,
+  score:           casual.integer(-5, 15),
+  slug:            casual.word,
+  stickied:        casual.boolean,
   subscribed:      casual.boolean,
-  thumbnail:       isURLPost ? casual.url : null
+  text:            isURLPost ? null : casual.text,
+  thumbnail:       isURLPost ? casual.url : null,
+  title:           casual.sentence,
+  upvoted:         casual.boolean,
+  url:             isURLPost ? casual.url : null
 })
 
 export const makeChannelPostList = (channelName: string = casual.word) =>

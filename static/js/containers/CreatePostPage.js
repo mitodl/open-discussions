@@ -15,7 +15,12 @@ import IntraPageNav from "../components/IntraPageNav"
 import { actions } from "../actions"
 import { setBannerMessage } from "../actions/ui"
 import { clearPostError } from "../actions/post"
-import { isTextTabSelected, LINK_TYPE_ANY } from "../lib/channels"
+import {
+  LINK_TYPE_ANY,
+  LINK_TYPE_LINK,
+  LINK_TYPE_TEXT,
+  LINK_TYPE_ARTICLE
+} from "../lib/channels"
 import { newPostForm } from "../lib/posts"
 import { postDetailURL } from "../lib/url"
 import { allEmptyOrNil, getChannelName } from "../lib/util"
@@ -55,6 +60,24 @@ type CreatePostPageProps = {
 export const CREATE_POST_KEY = "post:new"
 const CREATE_POST_PAYLOAD = { formKey: CREATE_POST_KEY }
 const getForm = R.prop(CREATE_POST_KEY)
+
+const createPostPayload = (postForm: PostForm): CreatePostPayload => {
+  const { postType, title, url, text, article } = postForm
+
+  switch (postType) {
+  case LINK_TYPE_LINK:
+    return { title, url }
+  case LINK_TYPE_TEXT:
+    return { title, text }
+  case LINK_TYPE_ARTICLE:
+    return { title, article }
+  }
+
+  // if no postType was selected, we're dealing with a 'title only' post
+  // (these are really text posts under the hood, so we need to set the
+  // text key to something)
+  return { title, text }
+}
 
 class CreatePostPage extends React.Component<CreatePostPageProps> {
   async componentDidMount() {
@@ -198,9 +221,8 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       )
     } else {
       const channelName = channel.name
-      const { postType, title, url, text } = postForm.value
-      const isText = isTextTabSelected(postType, channel)
-      const data: CreatePostPayload = isText ? { title, text } : { title, url }
+      const data = createPostPayload(postForm.value)
+
       try {
         // $FlowFixMe
         const post = await dispatch(actions.posts.post(channelName, data))

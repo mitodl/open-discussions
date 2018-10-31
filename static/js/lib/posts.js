@@ -18,7 +18,8 @@ export const newPostForm = (): PostForm => ({
   postType: null,
   text:     "",
   url:      "",
-  title:    ""
+  title:    "",
+  article:  []
 })
 
 export const formatCommentsCount = (post: Post): string =>

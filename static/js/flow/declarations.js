@@ -33,7 +33,9 @@ declare var SETTINGS: {
   release_version: string,
   environment: string,
   recaptchaKey: string,
-  accepted_social_sites: Array<string>
+  accepted_social_sites: Array<string>,
+  ckeditor_upload_url: string,
+  article_ui_enabled: boolean,
 }
 
 // mocha

@@ -35,6 +35,7 @@ export const searchResultToComment = (
 })
 
 export const searchResultToPost = (result: PostResult): Post => ({
+  article_content: result.article_content,
   author_headline: result.author_headline,
   author_id:       result.author_id,
   author_name:     result.author_name,

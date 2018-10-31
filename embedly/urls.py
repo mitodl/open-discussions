@@ -1,4 +1,4 @@
-"""URL configurations for channels"""
+"""URL configurations for embedly"""
 from django.conf.urls import url
 
 from embedly.views import embedly_view

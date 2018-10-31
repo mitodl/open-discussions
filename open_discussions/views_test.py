@@ -31,6 +31,8 @@ def test_webpack_url(
     settings.FEATURES[features.SAML_AUTH] = False
     settings.FEATURES[features.EMAIL_AUTH] = False
     settings.FEATURES[features.USE_NEW_BRANDING] = False
+    settings.FEATURES[features.ARTICLE_UI] = False
+    settings.CKEDITOR_UPLOAD_URL = "https://foobar.example.com"
     settings.ENVIRONMENT = "test"
     settings.VERSION = "1.2.3"
     settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE = 123
@@ -52,7 +54,7 @@ def test_webpack_url(
 
     response = client.get(reverse("open_discussions-index"))
     bundles = [bundle[0][1] for bundle in get_bundle_mock.call_args_list]
-    assert set(bundles) == {"common", "root", "style"}
+    assert set(bundles) == {"root", "style"}
     js_settings = json.loads(response.context["js_settings_json"])
     assert js_settings == {
         "gaTrackingID": "fake",
@@ -81,8 +83,45 @@ def test_webpack_url(
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
         "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,
         "accepted_social_sites": list(SOCIAL_SITE_NAME_MAP.values()),
+        "article_ui_enabled": settings.FEATURES[features.ARTICLE_UI],
+        "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
         **expected_user_values,
     }
+
+
+@pytest.mark.parametrize(
+    "env_id,secret_key,upload_url,feature_enabled,exp",
+    [
+        (None, None, None, False, False),
+        (None, None, None, True, False),
+        ("env", None, None, False, False),
+        ("env", None, None, True, False),
+        (None, None, "http://upload.com/url", False, False),
+        (None, None, "http://upload.com/url", True, False),
+        (None, "secret", None, False, False),
+        (None, "secret", None, True, False),
+        ("env", None, "http://upload.com/url", False, False),
+        ("env", None, "http://upload.com/url", True, False),
+        ("env", "secret", None, False, False),
+        ("env", "secret", None, True, False),
+        (None, "secret", "http://upload.com/url", False, False),
+        (None, "secret", "http://upload.com/url", True, False),
+        ("env", "secret", "http://upload.com/url", False, False),
+        ("env", "secret", "http://upload.com/url", True, True),
+    ],
+)
+def test_article_ui_flag(
+    settings, client, env_id, secret_key, upload_url, feature_enabled, exp
+):
+    """make sure that the article ui flag is only true if feature and env vars are set"""
+    settings.CKEDITOR_ENVIRONMENT_ID = env_id
+    settings.CKEDITOR_SECRET_KEY = secret_key
+    settings.CKEDITOR_UPLOAD_URL = upload_url
+    settings.FEATURES[features.ARTICLE_UI] = feature_enabled
+
+    response = client.get(reverse("open_discussions-index"))
+    js_settings = json.loads(response.context["js_settings_json"])
+    assert js_settings["article_ui_enabled"] == exp
 
 
 @pytest.mark.parametrize("is_enabled", [True, False])

@@ -212,13 +212,14 @@ export function createPost(
   channelName: string,
   payload: CreatePostPayload
 ): Promise<Post> {
-  const { text, url, title } = payload
+  const { text, url, title, article } = payload
   return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/posts/`, {
     method: "POST",
     body:   JSON.stringify({
-      url:   url,
-      text:  text,
-      title: title
+      url:             url,
+      text:            text,
+      title:           title,
+      article_content: article
     })
   })
 }
@@ -553,3 +554,5 @@ export const postSetPassword = (
 export function getSocialAuthTypes(): Promise<Array<SocialAuth>> {
   return fetchJSONWithAuthFailure("/api/v0/auths/")
 }
+
+export const getCKEditorJWT = () => fetchWithAuthFailure("/api/v0/ckeditor/")

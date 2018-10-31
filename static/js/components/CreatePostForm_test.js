@@ -1,3 +1,4 @@
+/* global SETTINGS: false */
 // @flow
 import { assert } from "chai"
 import sinon from "sinon"
@@ -5,12 +6,18 @@ import sinon from "sinon"
 import CreatePostForm from "./CreatePostForm"
 import Embedly, { EmbedlyLoader } from "./Embedly"
 
-import { LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_ANY } from "../lib/channels"
+import {
+  LINK_TYPE_LINK,
+  LINK_TYPE_TEXT,
+  LINK_TYPE_ANY,
+  LINK_TYPE_ARTICLE
+} from "../lib/channels"
 import * as channels from "../lib/channels"
 import { makeChannel } from "../factories/channels"
 import { makeArticle } from "../factories/embedly"
 import { newPostForm } from "../lib/posts"
 import { configureShallowRenderer } from "../lib/test_utils"
+import { shouldIf } from "../lib/test_utils"
 
 describe("CreatePostForm", () => {
   let sandbox, isTextTabSelectedStub, isLinkTypeAllowedStub, renderPostForm
@@ -65,6 +72,18 @@ describe("CreatePostForm", () => {
       postForm
     })
     assert.equal(wrapper.find(".text .validation-message").text(), "HEY")
+  })
+
+  it("should show article validation message", () => {
+    const postForm = { ...newPostForm(), postType: LINK_TYPE_ARTICLE }
+    const wrapper = renderPostForm({
+      validation: { article: "WHAT?! NO! OF COURSE NOT!" },
+      postForm
+    })
+    assert.equal(
+      wrapper.find(".article .validation-message").text(),
+      "WHAT?! NO! OF COURSE NOT!"
+    )
   })
 
   //
@@ -195,4 +214,15 @@ describe("CreatePostForm", () => {
       })
     }
   )
+
+  //
+  ;[true, false].forEach(uiEnabled => {
+    it(`${shouldIf(uiEnabled)} show the article button when flag is ${String(
+      uiEnabled
+    )}`, () => {
+      SETTINGS.article_ui_enabled = uiEnabled
+      const wrapper = renderPostForm()
+      assert.equal(uiEnabled, wrapper.find(".write-an-article").exists())
+    })
+  })
 })

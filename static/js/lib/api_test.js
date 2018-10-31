@@ -47,7 +47,8 @@ import {
   deleteChannelModerator,
   getChannelContributors,
   getChannelModerators,
-  search
+  search,
+  getCKEditorJWT
 } from "./api"
 import {
   makeChannel,
@@ -816,6 +817,13 @@ describe("api", function() {
           method: POST,
           body:   JSON.stringify(body)
         })
+      })
+    })
+
+    describe("CKEditor endpoint", () => {
+      it("should get the token", async () => {
+        await getCKEditorJWT()
+        sinon.assert.calledWith(fetchStub, "/api/v0/ckeditor/")
       })
     })
   })

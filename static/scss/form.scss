@@ -60,7 +60,7 @@ input[type="password"] {
   padding: 10px 10px;
   font-size: 15px;
   border-radius: $std-border-radius;
-  border: 1px solid #b7b7b7;
+  border: 1px solid $input-border-grey;
   transition: width 0.4s ease-in-out;
   box-sizing: border-box;
 
@@ -76,7 +76,7 @@ input[type="text"] {
   padding: 12px 10px;
   box-sizing: border-box;
   border-radius: $std-border-radius;
-  border: 1px solid #b7b7b7;
+  border: 1px solid $input-border-grey;
   background-color: #fff;
   resize: auto;
   font-size: 15px;

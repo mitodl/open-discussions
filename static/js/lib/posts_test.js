@@ -20,7 +20,8 @@ describe("Post utils", () => {
       postType: null,
       text:     "",
       url:      "",
-      title:    ""
+      title:    "",
+      article:  []
     })
   })
 

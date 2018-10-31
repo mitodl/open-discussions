@@ -102,3 +102,6 @@ webpack-stats.json
 
 # Celery Beat
 celerybeat-schedule
+
+# for testing out NPM packages
+*.tgz

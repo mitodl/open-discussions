@@ -18,12 +18,20 @@ export type ChannelType =
 
 export const LINK_TYPE_TEXT: "self" = "self"
 export const LINK_TYPE_LINK: "link" = "link"
+export const LINK_TYPE_ARTICLE: "article" = "article"
 export const LINK_TYPE_ANY: "any" = "any"
-export const VALID_LINK_TYPES = [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ANY]
+
+export const VALID_LINK_TYPES = [
+  LINK_TYPE_TEXT,
+  LINK_TYPE_ARTICLE,
+  LINK_TYPE_LINK,
+  LINK_TYPE_ANY
+]
 
 export type LinkType =
   | typeof LINK_TYPE_TEXT
   | typeof LINK_TYPE_LINK
+  | typeof LINK_TYPE_ARTICLE
   | typeof LINK_TYPE_ANY
 
 export const MISSING_TEXT = "<missing>"

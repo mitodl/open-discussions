@@ -1,15 +1,18 @@
+/* global SETTINGS: false */
 // @flow
 import React from "react"
 
 import Embedly, { EmbedlyLoader } from "./Embedly"
 import Editor, { editorUpdateFormShim } from "./Editor"
 import CloseButton from "./CloseButton"
+import ArticleEditor from "./ArticleEditor"
 
 import {
   isLinkTypeAllowed,
   userCanPost,
   LINK_TYPE_LINK,
   LINK_TYPE_TEXT,
+  LINK_TYPE_ARTICLE,
   LINK_TYPE_ANY
 } from "../lib/channels"
 import { goBackAndHandleEvent } from "../lib/util"
@@ -66,6 +69,15 @@ export default class CreatePostForm extends React.Component<Props> {
               Share a link
             </button>
           ) : null}
+          {SETTINGS.article_ui_enabled ? (
+            <button
+              className="write-an-article dark-outlined compact"
+              onClick={() => updatePostType(LINK_TYPE_ARTICLE)}
+            >
+              <i className="material-icons text_fields">text_fields</i>
+              Write an Article
+            </button>
+          ) : null}
         </div>
         {validationMessage(validation.post_type)}
       </div>
@@ -104,35 +116,47 @@ export default class CreatePostForm extends React.Component<Props> {
 
     const { postType, url } = postForm
 
-    return postType === LINK_TYPE_TEXT ? (
-      <div className="text row post-content">
-        <Editor
-          onChange={editorUpdateFormShim("text", onUpdate)}
-          placeHolder="Tell your story..."
-        />
-        {this.clearInputButton()}
-        {validationMessage(validation.text)}
-      </div>
-    ) : (
-      <div className="url row post-content">
-        {url !== "" && embedly && embedly.type !== "error" ? (
-          this.renderEmbed()
-        ) : (
-          <input
-            type="text"
-            placeholder="Paste a link to something related to the title..."
-            name="url"
-            value={url}
-            onChange={onUpdate}
+    if (postType === LINK_TYPE_TEXT) {
+      return (
+        <div className="text row post-content">
+          <Editor
+            onChange={editorUpdateFormShim("text", onUpdate)}
+            placeHolder="Tell your story..."
           />
-        )}
-        {embedlyInFlight && !embedly ? (
-          <EmbedlyLoader primaryColor="#c9bfbf" secondaryColor="#c9c8c8" />
-        ) : null}
-        {this.clearInputButton()}
-        {validationMessage(validation.url)}
-      </div>
-    )
+          {this.clearInputButton()}
+          {validationMessage(validation.text)}
+        </div>
+      )
+    } else if (postType === LINK_TYPE_ARTICLE) {
+      return (
+        <div className="article row post-content">
+          <ArticleEditor onChange={editorUpdateFormShim("article", onUpdate)} />
+          {this.clearInputButton()}
+          {validationMessage(validation.article)}
+        </div>
+      )
+    } else {
+      return (
+        <div className="url row post-content">
+          {url !== "" && embedly && embedly.type !== "error" ? (
+            this.renderEmbed()
+          ) : (
+            <input
+              type="text"
+              placeholder="Paste a link to something related to the title..."
+              name="url"
+              value={url}
+              onChange={onUpdate}
+            />
+          )}
+          {embedlyInFlight && !embedly ? (
+            <EmbedlyLoader primaryColor="#c9bfbf" secondaryColor="#c9c8c8" />
+          ) : null}
+          {this.clearInputButton()}
+          {validationMessage(validation.url)}
+        </div>
+      )
+    }
   }
 
   render() {

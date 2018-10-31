@@ -3,7 +3,7 @@
 import { assert } from "chai"
 import R from "ramda"
 
-import { LINK_TYPE_TEXT, LINK_TYPE_LINK } from "./channels"
+import { LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE } from "./channels"
 import { assertIsNothing, assertIsJustNoVal } from "./test_utils"
 import {
   validation,
@@ -154,6 +154,28 @@ describe("validation library", () => {
           url: "Post url must be a valid url"
         }
       })
+    })
+
+    it("should complain about an empty article post", () => {
+      const post = {
+        value: { postType: LINK_TYPE_ARTICLE, title: "potato", article: [] }
+      }
+      assert.deepEqual(validatePostCreateForm(post), {
+        value: {
+          article: "Article must not be empty"
+        }
+      })
+    })
+
+    it("should allow an non-empty article post", () => {
+      const post = {
+        value: {
+          postType: LINK_TYPE_ARTICLE,
+          title:    "potato",
+          article:  [{ hey: "there" }]
+        }
+      }
+      assert.deepEqual(validatePostCreateForm(post), {})
     })
 
     it("should complain about too long of a title", () => {

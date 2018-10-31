@@ -1,7 +1,7 @@
 /* global SETTINGS: false */
 import React from "react"
 import { assert } from "chai"
-import { mount } from "enzyme"
+import { mount, shallow } from "enzyme"
 import { Link } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import R from "ramda"
@@ -36,26 +36,27 @@ describe("ExpandedPostDisplay", () => {
     showPostReportDialogStub,
     toggleFollowPostStub
 
+  const postProps = (props = {}) => ({
+    toggleUpvote: () => {},
+    beginEditing: R.curry((key, post, e) => {
+      beginEditingStub(key, post, e)
+    }),
+    approvePost:          approvePostStub,
+    removePost:           removePostStub,
+    showPostDeleteDialog: showPostDeleteDialogStub,
+    showPostReportDialog: showPostReportDialogStub,
+    toggleFollowPost:     toggleFollowPostStub,
+    postDropdownMenuOpen: true,
+    forms:                {},
+    channel,
+    post,
+    ...props
+  })
+
   const renderPostDisplay = (props = {}) => {
-    props = {
-      toggleUpvote: () => {},
-      beginEditing: R.curry((key, post, e) => {
-        beginEditingStub(key, post, e)
-      }),
-      approvePost:          approvePostStub,
-      removePost:           removePostStub,
-      showPostDeleteDialog: showPostDeleteDialogStub,
-      showPostReportDialog: showPostReportDialogStub,
-      toggleFollowPost:     toggleFollowPostStub,
-      postDropdownMenuOpen: true,
-      forms:                {},
-      channel,
-      post,
-      ...props
-    }
     return mount(
       <Router store={helper.store} history={helper.browserHistory}>
-        <ExpandedPostDisplay {...props} />
+        <ExpandedPostDisplay {...postProps(props)} />
       </Router>
     )
   }
@@ -387,5 +388,15 @@ describe("ExpandedPostDisplay", () => {
       SharePopup
     )
     assert.isTrue(popup.props().hideSocialButtons)
+  })
+
+  it("should use ArticleEditor to display if an article post", () => {
+    post.article_content = []
+    const wrapper = shallow(<ExpandedPostDisplay {...postProps()} />)
+    assert.ok(wrapper.find("ArticleEditor"))
+    assert.deepEqual(wrapper.find("ArticleEditor").props(), {
+      readOnly:    true,
+      initialData: []
+    })
   })
 })

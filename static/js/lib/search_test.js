@@ -57,6 +57,7 @@ describe("search functions", () => {
     const result = makePostResult()
     const post = searchResultToPost(result)
     assert.deepEqual(post, {
+      article_content: result.article_content,
       author_id:       result.author_id,
       author_name:     result.author_name,
       author_headline: result.author_headline,

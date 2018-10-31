@@ -18,6 +18,7 @@ export const makeProfileResult = (): ProfileResult => ({
   author_name:          casual.full_name,
   object_type:          "profile"
 })
+
 export const makeCommentResult = (): CommentResult => ({
   author_avatar_small: casual.url,
   author_headline:     casual.text,
@@ -37,7 +38,9 @@ export const makeCommentResult = (): CommentResult => ({
   removed:             casual.coin_flip,
   text:                casual.text
 })
+
 export const makePostResult = (): PostResult => ({
+  article_content:     null,
   author_avatar_small: casual.url,
   author_headline:     casual.text,
   author_id:           casual.username,
