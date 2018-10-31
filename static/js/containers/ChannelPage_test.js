@@ -17,7 +17,7 @@ import { EVICT_POSTS_FOR_CHANNEL } from "../actions/posts_for_channel"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { channelURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
-import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/sorting"
+import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/picker"
 import { makeReportRecord } from "../factories/reports"
 
 describe("ChannelPage", () => {
@@ -166,7 +166,7 @@ describe("ChannelPage", () => {
         inner
           .find("PostSortPicker")
           .props()
-          .updateSortParam(sortType, {
+          .updatePickerParam(sortType, {
             preventDefault: helper.sandbox.stub()
           })
 

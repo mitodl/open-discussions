@@ -62,7 +62,7 @@ import {
   makeMoreCommentsResponse
 } from "../factories/comments"
 import { makeReportRecord } from "../factories/reports"
-import { COMMENT_SORT_NEW } from "../lib/sorting"
+import { COMMENT_SORT_NEW } from "./picker"
 import * as authFuncs from "./fetch_auth"
 import { makeProfile } from "../factories/profiles"
 

@@ -8,7 +8,6 @@ import { Provider } from "react-redux"
 import { createStoreWithMiddleware } from "../store/configureStore"
 import casual from "casual-browserify"
 
-import ChannelHeader from "../components/ChannelHeader"
 import {
   editCommentKey,
   editPostKey,
@@ -22,9 +21,11 @@ import { CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC } from "../lib/channels"
 import { dropdownMenuFuncs } from "../lib/ui"
 import { commentPermalink } from "../lib/url"
 import { createCommentTree } from "../reducers/comments"
+import rootReducer from "../reducers"
 
 import BackButton from "../components/BackButton"
 import Card from "../components/Card"
+import ChannelHeader from "../components/ChannelHeader"
 import CloseButton from "../components/CloseButton"
 import { CompactPostDisplay } from "../components/CompactPostDisplay"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
@@ -32,7 +33,11 @@ import CommentTree, {
   commentDropdownKey,
   commentShareKey
 } from "../components/CommentTree"
-import rootReducer from "../reducers"
+import {
+  CommentSortPicker,
+  PostSortPicker,
+  SearchFilterPicker
+} from "../components/Picker"
 
 // delay import so fonts get applied first
 setTimeout(() => {
@@ -490,6 +495,38 @@ storiesOf("Comment", module)
           commentPermalink={commentPermalink(channel.name, post.id, post.slug)}
           curriedDropdownMenufunc={dropdownMenuFuncs(action("clicked"))}
           dropdownMenus={new Set()}
+        />
+      </StoryWrapper>
+    )
+  })
+
+storiesOf("Pickers", module)
+  .add("post sort", () => {
+    return (
+      <StoryWrapper>
+        <PostSortPicker
+          updatePickerParam={action("update sort param")}
+          value="top"
+        />
+      </StoryWrapper>
+    )
+  })
+  .add("comment sort", () => {
+    return (
+      <StoryWrapper>
+        <CommentSortPicker
+          updatePickerParam={action("update sort param")}
+          value="old"
+        />
+      </StoryWrapper>
+    )
+  })
+  .add("search filter", () => {
+    return (
+      <StoryWrapper>
+        <SearchFilterPicker
+          updatePickerParam={action("update sort param")}
+          value=""
         />
       </StoryWrapper>
     )

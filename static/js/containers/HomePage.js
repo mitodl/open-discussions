@@ -11,7 +11,7 @@ import Card from "../components/Card"
 import CanonicalLink from "../components/CanonicalLink"
 import { withPostLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
-import { PostSortPicker } from "../components/SortPicker"
+import { PostSortPicker } from "../components/Picker"
 import {
   withPostModeration,
   postModerationSelector
@@ -23,7 +23,7 @@ import { setPostData } from "../actions/post"
 import { safeBulkGet } from "../lib/maps"
 import { getPostIds } from "../lib/posts"
 import { getSubscribedChannels } from "../lib/redux_selectors"
-import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/sorting"
+import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/picker"
 import { REGISTER_URL, newPostURL } from "../lib/url"
 import { userIsAnonymous } from "../lib/util"
 import { logoImageSrc } from "../lib/ui"
@@ -130,7 +130,7 @@ export class HomePage extends React.Component<Props> {
         {this.renderIntroCard()}
         <div className="post-list-title">
           <PostSortPicker
-            updateSortParam={updatePostSortParam(this.props)}
+            updatePickerParam={updatePostSortParam(this.props)}
             value={qs.parse(search).sort || POSTS_SORT_HOT}
           />
         </div>
