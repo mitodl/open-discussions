@@ -416,7 +416,7 @@ class ChannelFactory(factory.Factory):
     api = None
     title = factory.Faker("text", max_nb_chars=50)
     description = factory.Faker("text", max_nb_chars=500)
-    public_description = factory.Faker("text", max_nb_chars=100)
+    public_description = factory.Faker("text", max_nb_chars=80)
     channel_type = FuzzyChoice(VALID_CHANNEL_TYPES)
     link_type = LINK_TYPE_ANY
     ga_tracking_id = None

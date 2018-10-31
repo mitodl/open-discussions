@@ -48,6 +48,15 @@ def reddit_staff_user(reddit_factories):
 
 
 @pytest.fixture()
+def reddit_index_user(reddit_factories):
+    """Override the staff_user fixture to use reddit_factories"""
+    from channels.test_utils import no_ssl_verification
+
+    with no_ssl_verification():
+        return reddit_factories.user("index_user", is_staff=True)
+
+
+@pytest.fixture()
 def private_channel(reddit_factories, staff_user):
     """Returns a standard private channel for tests"""
     return reddit_factories.channel(

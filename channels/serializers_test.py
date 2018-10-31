@@ -63,10 +63,14 @@ def test_serialize_channel(user, membership_is_managed):
 
 
 @pytest.mark.parametrize("membership_is_managed", [True, False, None])
-def test_create_channel(user, membership_is_managed):
+def test_create_channel(staff_user, user, membership_is_managed, mocker, settings):
     """
     Test creating a channel
     """
+    settings.INDEXING_API_USERNAME = staff_user.username
+    api_mock = mocker.patch("channels.api.Api")
+    context_api_mock = api_mock(user)
+    indexer_api_mock = api_mock(staff_user)
     validated_data = {
         "display_name": "name",
         "title": "title",
@@ -79,12 +83,11 @@ def test_create_channel(user, membership_is_managed):
         validated_data["membership_is_managed"] = membership_is_managed
     expected_membership = membership_is_managed is not False
     request = Mock(user=user)
-    api_mock = Mock()
     channel = ChannelSerializer(
-        context={"channel_api": api_mock, "request": request}
+        context={"channel_api": context_api_mock, "request": request}
     ).create(validated_data)
 
-    api_mock.create_channel.assert_called_once_with(
+    indexer_api_mock.create_channel.assert_called_once_with(
         name=validated_data["display_name"],
         title=validated_data["title"],
         channel_type=validated_data["subreddit_type"],
@@ -93,7 +96,10 @@ def test_create_channel(user, membership_is_managed):
         link_type=validated_data["submission_type"],
         membership_is_managed=expected_membership,
     )
-    assert channel == api_mock.create_channel.return_value
+    indexer_api_mock.add_moderator.assert_called_once_with(
+        context_api_mock.user.username, channel.display_name
+    )
+    assert channel == indexer_api_mock.create_channel.return_value
 
 
 @pytest.mark.parametrize("is_empty", [True, False])

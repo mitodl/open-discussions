@@ -103,7 +103,7 @@ def test_update_user_profile(mock_index_functions, user, key, value):
     serializer.is_valid(raise_exception=True)
     serializer.save()
 
-    profile2 = Profile.objects.first()
+    profile2 = Profile.objects.get(user=user)
 
     for prop in (
         "name",

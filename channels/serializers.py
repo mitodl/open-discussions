@@ -4,6 +4,7 @@ Serializers for channel REST APIs
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from praw.models import Comment, MoreComments
 from praw.models.reddit.submission import Submission
@@ -134,8 +135,9 @@ class ChannelSerializer(serializers.Serializer):
             return Channel.objects.get(name=name)
 
     def create(self, validated_data):
-        api = self.context["channel_api"]
+        from channels.api import Api
 
+        client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
         # This is to reduce number of cassettes which need replacing
         validated_data["description"] = validated_data.get("description", "")
         validated_data["public_description"] = validated_data.get(
@@ -158,7 +160,11 @@ class ChannelSerializer(serializers.Serializer):
         }
         kwargs = filter_dict_with_renamed_keys(validated_data, lookup, optional=True)
 
-        return api.create_channel(**kwargs)
+        channel = client.create_channel(**kwargs)
+        client.add_moderator(
+            self.context["channel_api"].user.username, channel.display_name
+        )
+        return channel
 
     def update(self, instance, validated_data):
         api = self.context["channel_api"]
