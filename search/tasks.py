@@ -13,7 +13,7 @@ from prawcore.exceptions import PrawcoreException
 from channels.constants import POSTS_SORT_NEW
 from channels.utils import ListingParams
 from open_discussions.celery import app
-from open_discussions.utils import merge_strings
+from open_discussions.utils import merge_strings, chunks
 from search import indexing_api as api
 from search.constants import VALID_OBJECT_TYPES
 from search.exceptions import RetryException, ReindexException
@@ -76,13 +76,17 @@ def update_field_values_by_query(query, field_dict, object_types):
     return api.update_field_values_by_query(query, field_dict, object_types)
 
 
-@app.task
-def index_profiles():
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_profiles(ids):
     """
     Index user profiles
+
+    Args:
+        ids(list of int): List of profile id's
+
     """
     try:
-        api.index_profiles()
+        api.index_profiles(ids)
     except RetryException:
         raise
     except Ignore:
@@ -169,7 +173,15 @@ def start_recreate_index(self):
         channel_names = [channel.display_name for channel in client.list_channels()]
         index_channels = celery.group(
             [index_channel.si(channel_name) for channel_name in channel_names]
-            + [index_profiles.si()]
+            + [
+                index_profiles.si(ids)
+                for ids in chunks(
+                    User.objects.exclude(username=settings.INDEXING_API_USERNAME)
+                    .exclude(profile__isnull=True)
+                    .values_list("profile__id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
         )
 
     except:  # pylint: disable=bare-except

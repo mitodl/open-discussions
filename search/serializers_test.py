@@ -7,6 +7,7 @@ import pytest
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.utils import get_reddit_slug
 from open_discussions.factories import UserFactory
+from profiles.models import Profile
 from profiles.utils import image_uri, IMAGE_MEDIUM
 from search.constants import PROFILE_TYPE
 from search.serializers import (
@@ -258,7 +259,7 @@ def test_serialize_bulk_profiles(mocker):
         "search.serializers.serialize_profile_for_bulk"
     )
     users = UserFactory.create_batch(5)
-    list(serialize_bulk_profiles())
+    list(serialize_bulk_profiles([profile.id for profile in Profile.objects.all()]))
     for user in users:
         mock_serialize_profile.assert_any_call(user.profile)
 

@@ -45,6 +45,10 @@
     "ELASTICSEARCH_INDEX": {
       "description": "Index to use on Elasticsearch"
     },
+    "ELASTICSEARCH_INDEXING_CHUNK_SIZE": {
+      "description": "Chunk size to use for Elasticsearch indexing tasks",
+      "required": false
+    },
     "ELASTICSEARCH_URL": {
       "description": "URL for connecting to Elasticsearch cluster"
     },

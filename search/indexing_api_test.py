@@ -306,7 +306,7 @@ def test_index_profiles(mocked_es, mocker, settings, user):
     bulk_mock = mocker.patch(
         "search.indexing_api.bulk", autospec=True, return_value=(0, [])
     )
-    index_profiles()
+    index_profiles([1, 2, 3])
     for alias in aliases:
         bulk_mock.assert_any_call(
             mocked_es.conn,
@@ -328,7 +328,7 @@ def test_index_profiles_error(mocked_es, mocker, settings, user):
     mocker.patch("search.indexing_api.serialize_bulk_profiles")
     mocker.patch("search.indexing_api.bulk", autospec=True, return_value=(0, ["error"]))
     with pytest.raises(ReindexException):
-        index_profiles()
+        index_profiles([1, 2, 3])
 
 
 @pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
