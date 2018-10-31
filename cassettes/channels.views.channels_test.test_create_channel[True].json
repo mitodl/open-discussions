@@ -1,0 +1,255 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2018-10-30T15:35:42",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CV2SVCYY3QWVXH2N2VA5QHEN"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA12N0QqCMBiFX0V2GQnLaUrXMlggRAVFN2NuvzWsHNvILHr3XN51eQ7n+84bCSnBOe67Fu5oFaGE5Fke0+Rw7SVJNab7bL2lNS1Yu3hxn6ZoHiF4Gm3BcR0QssR47H4G7gcDQVODsGDD1sluqmYhWWhG8PL/B7W89TtyUg0rz6xqxGYwihyL2FeBUvDQErhWQT0F9PkCOPiTDrwAAAA=",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 30 Oct 2018 15:35:42 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=qRo1qLFgfPZMyiWjb1; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 29-Oct-2020 15:35:42 GMT",
+            "loidcreated=2018-10-30T15%3A35%3A41.758Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 29-Oct-2020 15:35:42 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CV2SVCYY3QWVXH2N2VA5QHEN"
+      }
+    },
+    {
+      "recorded_at": "2018-10-30T15:35:45",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "allow_top=True&api_type=json&description=Accusantium+reiciendis+sunt+ullam+ab.+Officia+dolorum+voluptates+natus+totam+aperiam+nisi+at+libero.+Sunt+nisi+facere+maxime+suscipit+ad.+Iusto+pariatur+harum+voluptas+assumenda.%0AFugiat+architecto+nisi+eligendi+numquam+cumque+repellat+saepe+aliquid.+Debitis+perferendis+molestias+vero+unde+sequi+ipsam+ipsam.+Assumenda+libero+harum+nostrum+ad+omnis+consequuntur+animi+sapiente.%0ATempore+rerum+quas+laudantium+eaque+vitae+veniam.+Nisi+neque+officiis+error+tenetur+architecto+id+sequi.&link_type=any&name=1540913742_voluptatum&public_description=Dolores+in+expedita+quae+corporis+iure.+Rem+omnis+veniam+repellendus.&title=Nihil+doloremque+sunt+beatae.&type=private&wikimode=disabled"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 23757-F2Wlwc34i0FT5JRFbF8Ik1z_t44"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "724"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=qRo1qLFgfPZMyiWjb1; loidcreated=2018-10-30T15%3A35%3A41.758Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.51.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 30 Oct 2018 15:35:45 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "255"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-10-30T15:35:45",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 23757-F2Wlwc34i0FT5JRFbF8Ik1z_t44"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=qRo1qLFgfPZMyiWjb1; loidcreated=2018-10-30T15%3A35%3A41.758Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.51.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1540913742_voluptatum/about/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"3o\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"1540913742_voluptatum\", \"header_img\": null, \"description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EAccusantium reiciendis sunt ullam ab. Officia dolorum voluptates natus totam aperiam nisi at libero. Sunt nisi facere maxime suscipit ad. Iusto pariatur harum voluptas assumenda.\\nFugiat architecto nisi eligendi numquam cumque repellat saepe aliquid. Debitis perferendis molestias vero unde sequi ipsam ipsam. Assumenda libero harum nostrum ad omnis consequuntur animi sapiente.\\nTempore rerum quas laudantium eaque vitae veniam. Nisi neque officiis error tenetur architecto id sequi.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"title\": \"Nihil doloremque sunt beatae.\", \"collapse_deleted_comments\": false, \"public_description\": \"Dolores in expedita quae corporis iure. Rem omnis veniam repellendus.\", \"over18\": false, \"public_description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EDolores in expedita quae corporis iure. Rem omnis veniam repellendus.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"Accusantium reiciendis sunt ullam ab. Officia dolorum voluptates natus totam aperiam nisi at libero. Sunt nisi facere maxime suscipit ad. Iusto pariatur harum voluptas assumenda.\\nFugiat architecto nisi eligendi numquam cumque repellat saepe aliquid. Debitis perferendis molestias vero unde sequi ipsam ipsam. Assumenda libero harum nostrum ad omnis consequuntur animi sapiente.\\nTempore rerum quas laudantium eaque vitae veniam. Nisi neque officiis error tenetur architecto id sequi.\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 1, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 1, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_3o\", \"created\": 1540913745.0, \"url\": \"/r/1540913742_voluptatum/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1540913745.0, \"banner_size\": null, \"user_is_moderator\": true, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"private\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "2460"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 30 Oct 2018 15:35:45 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "255"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=%2Bb8hAuu7KTEolZSYmPcGdbN98PPOcMkf31VJBu6KPQS8%2FdCd%2Bnq6B62o5LN9YdDfcdvz1okXu1%2BpZXec7ScI9NMs9cNYKt96"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1540913742_voluptatum/about/?raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

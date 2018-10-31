@@ -25,12 +25,13 @@ export type Channel = {
 }
 
 export type ChannelForm = {
-  name:               string,
-  title:              string,
-  description:        string,
-  public_description: string,
-  channel_type:       ChannelType,
-  link_type:          LinkType,
+  name:                   string,
+  title:                  string,
+  description:            string,
+  public_description:     string,
+  channel_type:           ChannelType,
+  link_type:              LinkType,
+  membership_is_managed:  boolean,
   avatar?:            {
     edit:  Blob,
     image: File

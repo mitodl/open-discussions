@@ -126,6 +126,10 @@ class ChannelSerializer(serializers.Serializer):
             raise ValidationError("Expected banner to be a file")
         return {"banner": value}
 
+    def validate_membership_is_managed(self, value):
+        """Empty validation function, but this is required for WriteableSerializerMethodField"""
+        return {"membership_is_managed": value}
+
     def _get_channel(self, name):
         """Get channel"""
         try:

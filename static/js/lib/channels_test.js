@@ -22,12 +22,13 @@ import { makeChannel } from "../factories/channels"
 describe("Channel utils", () => {
   it("newChannelForm should return a new channel form with empty values and public type", () => {
     assert.deepEqual(newChannelForm(), {
-      title:              "",
-      name:               "",
-      description:        "",
-      public_description: "",
-      channel_type:       CHANNEL_TYPE_PUBLIC,
-      link_type:          LINK_TYPE_ANY
+      title:                 "",
+      name:                  "",
+      description:           "",
+      public_description:    "",
+      channel_type:          CHANNEL_TYPE_PUBLIC,
+      link_type:             LINK_TYPE_ANY,
+      membership_is_managed: false
     })
   })
 

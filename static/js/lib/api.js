@@ -156,7 +156,14 @@ export function createChannel(channel: Channel): Promise<Channel> {
     method: POST,
     body:   JSON.stringify(
       R.pickAll(
-        ["name", "title", "description", "public_description", "channel_type"],
+        [
+          "name",
+          "title",
+          "description",
+          "public_description",
+          "channel_type",
+          "membership_is_managed"
+        ],
         channel
       )
     )

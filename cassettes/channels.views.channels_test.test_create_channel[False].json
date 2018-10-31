@@ -1,0 +1,255 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2018-10-30T15:35:48",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.18.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CV2SVKJTDZ2F80QD5ZZ1DFJZ"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA12NvQ6CMBhFX4V0NDZBW8G46aKLGAMSmJpSPkJFLbb8GeO7S2VzvDf3nPtGXAgwhjWqggfaOGhJ/NUa9ye36xkOVHyO2t2Chj0uk/QQXgeF5g6CoZYaDJMWIZ7rjt3PwJpXDVaTAdeg7dYINVUzmzQUI1j+/+l7TAuPX27+cb9tadQkFQmyp09MaqkcOimAydyqp4A+X9kUxCW8AAAA",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 30 Oct 2018 15:35:48 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=XuAo9sMjeIepCNlUl5; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 29-Oct-2020 15:35:48 GMT",
+            "loidcreated=2018-10-30T15%3A35%3A48.512Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 29-Oct-2020 15:35:48 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CV2SVKJTDZ2F80QD5ZZ1DFJZ"
+      }
+    },
+    {
+      "recorded_at": "2018-10-30T15:35:52",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "allow_top=True&api_type=json&description=Porro+quia+quis+harum+suscipit+autem+aut.+Eos+qui+eveniet+ea+quam+voluptatem.+Deserunt+necessitatibus+esse+exercitationem+exercitationem+aperiam.%0AIllum+ipsam+earum+amet.+In+error+tempore+eos+voluptates+nihil+placeat+sapiente.%0ATempora+tenetur+voluptates+itaque+id+nobis+eveniet+dolorum.+Ut+consequuntur+repudiandae+doloribus+rem+inventore+repudiandae.+Alias+asperiores+quasi+odio+nam+earum+suscipit+velit.&link_type=any&name=1540913748_repudianda&public_description=Velit+illum+eos+itaque+cum+ipsum+maxime+sed.&title=Officiis+at+a+quasi+veritatis.&type=private&wikimode=disabled"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 23758-wO0vw_-NoVQTuB14Sw-hXYHSjxo"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "622"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=XuAo9sMjeIepCNlUl5; loidcreated=2018-10-30T15%3A35%3A48.512Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.51.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 30 Oct 2018 15:35:52 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "249"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-10-30T15:35:52",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 23758-wO0vw_-NoVQTuB14Sw-hXYHSjxo"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=XuAo9sMjeIepCNlUl5; loidcreated=2018-10-30T15%3A35%3A48.512Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.51.1 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1540913748_repudianda/about/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"3p\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"1540913748_repudianda\", \"header_img\": null, \"description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EPorro quia quis harum suscipit autem aut. Eos qui eveniet ea quam voluptatem. Deserunt necessitatibus esse exercitationem exercitationem aperiam.\\nIllum ipsam earum amet. In error tempore eos voluptates nihil placeat sapiente.\\nTempora tenetur voluptates itaque id nobis eveniet dolorum. Ut consequuntur repudiandae doloribus rem inventore repudiandae. Alias asperiores quasi odio nam earum suscipit velit.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"title\": \"Officiis at a quasi veritatis.\", \"collapse_deleted_comments\": false, \"public_description\": \"Velit illum eos itaque cum ipsum maxime sed.\", \"over18\": false, \"public_description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EVelit illum eos itaque cum ipsum maxime sed.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"Porro quia quis harum suscipit autem aut. Eos qui eveniet ea quam voluptatem. Deserunt necessitatibus esse exercitationem exercitationem aperiam.\\nIllum ipsam earum amet. In error tempore eos voluptates nihil placeat sapiente.\\nTempora tenetur voluptates itaque id nobis eveniet dolorum. Ut consequuntur repudiandae doloribus rem inventore repudiandae. Alias asperiores quasi odio nam earum suscipit velit.\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 4, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 1, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_3p\", \"created\": 1540913751.0, \"url\": \"/r/1540913748_repudianda/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1540913751.0, \"banner_size\": null, \"user_is_moderator\": true, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"private\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "2255"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 30 Oct 2018 15:35:52 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "248"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=rkkzqE7nbDAXc%2F2%2Bth%2BkuxwS6101xwfwM06phzcqfD9PxryjxPpEQDb3JbAeUwhTBeZltbRPaHFhE3zzau4j9nOzszUfwpJZ"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1540913748_repudianda/about/?raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
