@@ -38,6 +38,7 @@ import {
   PostSortPicker,
   SearchFilterPicker
 } from "../components/Picker"
+import SearchTextbox from "../components/SearchTextbox"
 
 // delay import so fonts get applied first
 setTimeout(() => {
@@ -557,5 +558,21 @@ storiesOf("Channel header", module)
           </div>
         </div>
       </div>
+    )
+  })
+
+storiesOf("Search textbox", module)
+  .addDecorator(withKnobs)
+  .add("search", () => {
+    return (
+      <StoryWrapper>
+        <SearchTextbox
+          className="search-field"
+          onSubmit={action("search")}
+          onClear={action("clear")}
+          onChange={action("change")}
+          value={text("text", "terms to search for")}
+        />
+      </StoryWrapper>
     )
   })
