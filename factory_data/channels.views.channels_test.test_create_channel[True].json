@@ -1,16 +1,19 @@
 {
   "channels": {
     "private": {
-      "channel_type": "private",
-      "description": "Accusantium reiciendis sunt ullam ab. Officia dolorum voluptates natus totam aperiam nisi at libero. Sunt nisi facere maxime suscipit ad. Iusto pariatur harum voluptas assumenda.\nFugiat architecto nisi eligendi numquam cumque repellat saepe aliquid. Debitis perferendis molestias vero unde sequi ipsam ipsam. Assumenda libero harum nostrum ad omnis consequuntur animi sapiente.\nTempore rerum quas laudantium eaque vitae veniam. Nisi neque officiis error tenetur architecto id sequi.",
-      "name": "1540913742_voluptatum",
-      "public_description": "Dolores in expedita quae corporis iure. Rem omnis veniam repellendus.",
-      "title": "Nihil doloremque sunt beatae."
+      "channel_type": "public",
+      "description": "Reprehenderit ab reiciendis voluptate iste perferendis quisquam cum aliquid. Iste quod accusamus nobis libero voluptas dignissimos ad. Voluptatum incidunt quia consequatur saepe repudiandae nam quasi.\nMagni dicta accusantium facilis animi sequi reprehenderit molestias. Facilis pariatur sequi necessitatibus sequi animi dolorem nobis.\nIpsa necessitatibus id quia voluptates. Aliquid quam velit maxime reprehenderit alias consectetur. Suscipit eius earum accusamus.",
+      "name": "1541016773_veritatis",
+      "public_description": "Iusto voluptatum iusto quasi exercitationem quod laudantium nam architecto.",
+      "title": "Consequatur architecto impedit voluptas dolor."
     }
   },
   "users": {
+    "index_user": {
+      "username": "01CV5W3JAKEP311W5H1NSDMKVS"
+    },
     "staff_user": {
-      "username": "01CV2SVCYY3QWVXH2N2VA5QHEN"
+      "username": "01CV5W3NM11R7F67H52TSSERK6"
     }
   }
 }

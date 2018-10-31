@@ -1,5 +1,5 @@
 """Tests for views for REST APIs for channels"""
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,too-many-arguments
 import os.path
 
 import pytest
@@ -77,7 +77,9 @@ def test_list_channels_anonymous(client, settings, allow_anonymous):
 
 
 @pytest.mark.parametrize("managed", [True, False, None])
-def test_create_channel(staff_client, staff_user, reddit_factories, managed):
+def test_create_channel(
+    index_user, staff_client, staff_user, reddit_factories, managed, settings
+):
     """
     Create a channel and assert the response
     """
