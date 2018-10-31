@@ -1,6 +1,6 @@
 // @flow
 import React from "react"
-import { toggleMark, wrapIn } from "prosemirror-commands"
+import { toggleMark, wrapIn, setBlockType } from "prosemirror-commands"
 import { wrapInList } from "prosemirror-schema-list"
 
 import {
@@ -60,6 +60,24 @@ export const menuBarManifest = (schema: Object): Array<Array<MenuBarItem>> => [
       command: wrapIn(schema.nodes.blockquote),
       title:   "quote",
       icon:    <i className="material-icons format_quote">format_quote</i>
+    }
+  ],
+  [
+    {
+      command: setBlockType(schema.nodes.heading, { level: 1 }),
+      title:   "heading",
+      icon:    <i className="material-icons phone">phone</i>
+      // active: setBlockType(schema.nodes.heading, { level: 1 }),
+    },
+    {
+      command: setBlockType(schema.nodes.paragraph, { level: 1 }),
+      title:   "heading",
+      icon:    (
+        <i className="material-icons format_indent_decrease">
+          format_indent_decrease
+        </i>
+      )
+      // active: setBlockType(schema.nodes.paragraph),
     }
   ]
 ]
