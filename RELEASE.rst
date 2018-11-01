@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.52.0
+Version 0.52.0 (Released November 01, 2018)
 --------------
 
 - Enabled newrelic for our workers
