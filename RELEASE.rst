@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.52.1
+--------------
+
+- Set membership_is_managed to False when creating channels from app (#1440)
+- Add components for search results (#1444)
+- Add search textbox component (#1437)
+- Add search filter component (#1438)
+- Split profiles into chunks for indexing (#1435)
+- Add indexing user as first moderator to every channel if not already a moderator (#1409)
+
 Version 0.52.0 (Released November 01, 2018)
 --------------
 
