@@ -14,9 +14,14 @@ import {
   replyToCommentKey,
   ReplyToPostForm
 } from "../components/CommentForms"
-import { makePost } from "../factories/posts"
 import { makeChannel } from "../factories/channels"
 import { makeCommentsResponse, makeMoreComments } from "../factories/comments"
+import { makePost } from "../factories/posts"
+import {
+  makeCommentResult,
+  makePostResult,
+  makeProfileResult
+} from "../factories/search"
 import { CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC } from "../lib/channels"
 import { dropdownMenuFuncs } from "../lib/ui"
 import { commentPermalink } from "../lib/url"
@@ -38,6 +43,7 @@ import {
   PostSortPicker,
   SearchFilterPicker
 } from "../components/Picker"
+import SearchResult from "../components/SearchResult"
 import SearchTextbox from "../components/SearchTextbox"
 
 // delay import so fonts get applied first
@@ -573,6 +579,40 @@ storiesOf("Search textbox", module)
           onChange={action("change")}
           value={text("text", "terms to search for")}
         />
+      </StoryWrapper>
+    )
+  })
+
+storiesOf("Search results", module)
+  .addDecorator(withKnobs)
+  .addDecorator(withRandom)
+  .addDecorator(withRouter)
+  .addDecorator(withRedux)
+  .addDecorator(withSettings)
+  .add("post", () => {
+    return (
+      <StoryWrapper>
+        <SearchResult result={makePostResult()} />
+      </StoryWrapper>
+    )
+  })
+  .add("comment", () => {
+    SETTINGS.username = "user"
+    const result = makeCommentResult()
+    result.author_avatar_small = fakeUrl("small", result.id)
+    return (
+      <StoryWrapper>
+        <SearchResult result={result} />
+      </StoryWrapper>
+    )
+  })
+  .add("profile", () => {
+    const result = makeProfileResult()
+    result.author_avatar_small = fakeUrl("small", result.author_id)
+    result.author_avatar_medium = fakeUrl("med", result.author_id)
+    return (
+      <StoryWrapper>
+        <SearchResult result={result} />
       </StoryWrapper>
     )
   })
