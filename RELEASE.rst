@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.52.0 (Released November 01, 2018)
+--------------
+
+- Enabled newrelic for our workers
+- Refactor channel header (#1433)
+
 Version 0.51.1 (Released October 29, 2018)
 --------------
 
