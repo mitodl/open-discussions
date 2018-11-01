@@ -1,5 +1,5 @@
 """Tests for views for REST APIs for channels"""
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,too-many-arguments
 import os.path
 
 import pytest
@@ -76,8 +76,9 @@ def test_list_channels_anonymous(client, settings, allow_anonymous):
         assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
+@pytest.mark.parametrize("managed", [True, False, None])
 def test_create_channel(
-    index_user, staff_client, staff_user, reddit_factories, settings
+    index_user, staff_client, staff_user, reddit_factories, managed, settings
 ):
     """
     Create a channel and assert the response
@@ -95,12 +96,14 @@ def test_create_channel(
         "public_description": channel.public_description,
         "link_type": channel.link_type,
     }
+    if managed is not None:
+        payload["membership_is_managed"] = managed
     resp = staff_client.post(url, data=payload)
     expected = {
         **payload,
         "user_is_contributor": True,
         "user_is_moderator": True,
-        "membership_is_managed": True,
+        "membership_is_managed": managed is not False,
         "avatar": None,
         "avatar_small": None,
         "avatar_medium": None,

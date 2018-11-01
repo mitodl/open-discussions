@@ -29,12 +29,13 @@ export type LinkType =
 export const MISSING_TEXT = "<missing>"
 
 export const newChannelForm = (): ChannelForm => ({
-  name:               "",
-  title:              "",
-  description:        "",
-  public_description: "",
-  channel_type:       CHANNEL_TYPE_PUBLIC,
-  link_type:          LINK_TYPE_ANY
+  name:                  "",
+  title:                 "",
+  description:           "",
+  public_description:    "",
+  channel_type:          CHANNEL_TYPE_PUBLIC,
+  link_type:             LINK_TYPE_ANY,
+  membership_is_managed: false
 })
 
 export const editChannelForm = (channel: Channel): ChannelForm =>
