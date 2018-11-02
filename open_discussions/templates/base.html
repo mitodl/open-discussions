@@ -13,6 +13,8 @@
     {% if js_settings_json %}
     <script type="text/javascript">
     var SETTINGS = {{ js_settings_json|safe }};
+    var csrfToken = '{{ csrf_token }}';
+    var apiBase = SETTINGS.widgetFrameworkApiBase;
     </script>
     {% endif %}
     {% load render_bundle %}
