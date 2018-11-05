@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.52.1
+Version 0.52.1 (Released November 05, 2018)
 --------------
 
 - Set membership_is_managed to False when creating channels from app (#1440)
