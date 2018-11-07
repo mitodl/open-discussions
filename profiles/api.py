@@ -17,3 +17,16 @@ def ensure_profile(user, profile_data=None):
 
     profile, _ = Profile.objects.get_or_create(user=user, defaults=defaults)
     return profile
+
+
+def get_channels(user):
+    """
+    Get the list of channel names for which the user is a moderator, contributor, or subscriber
+
+    Return:
+        set of str: Channel names
+    """
+    return set(
+        list(user.channelsubscription_set.values_list("channel__name", flat=True))
+        + list(user.channelrole_set.values_list("channel__name", flat=True))
+    )

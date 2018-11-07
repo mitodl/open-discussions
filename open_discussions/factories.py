@@ -3,7 +3,7 @@ Factory for Users
 """
 import ulid
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from social_core.backends.saml import SAMLAuth
 from social_django.models import UserSocialAuth
 from factory import LazyFunction, RelatedFactory, SubFactory, Trait, post_generation
@@ -45,3 +45,12 @@ class UserSocialAuthFactory(DjangoModelFactory):
             self.uid = "{}:{}".format(
                 settings.SOCIAL_AUTH_DEFAULT_IDP_KEY, self.user.email
             )
+
+
+class GroupFactory(DjangoModelFactory):
+    """ Factory for groups"""
+
+    name = FuzzyText()
+
+    class Meta:
+        model = Group

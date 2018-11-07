@@ -1,6 +1,5 @@
 """Search task tests"""
 # pylint: disable=redefined-outer-name,unused-argument
-from types import SimpleNamespace
 
 from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException
@@ -38,24 +37,6 @@ def wrap_retry_mock(mocker):
     wrap_mock = mocker.patch("search.tasks.wrap_retry_exception")
     yield
     wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
-
-
-@pytest.fixture()
-def mocked_celery(mocker):
-    """Mock object that patches certain celery functions"""
-    exception_class = TabError
-    replace_mock = mocker.patch(
-        "celery.app.task.Task.replace", autospec=True, side_effect=exception_class
-    )
-    group_mock = mocker.patch("celery.group", autospec=True)
-    chain_mock = mocker.patch("celery.chain", autospec=True)
-
-    yield SimpleNamespace(
-        replace=replace_mock,
-        group=group_mock,
-        chain=chain_mock,
-        replace_exception_class=exception_class,
-    )
 
 
 @pytest.fixture()

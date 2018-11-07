@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import base36
 from django.conf import settings
+from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models import URLField
 
@@ -185,3 +186,36 @@ class Comment(TimestampedModel):
 
     def __str__(self):
         return f"{self.comment_id} on post {self.post}"
+
+
+class ChannelSubscription(TimestampedModel):
+    """
+    Keep track of channel subscribers
+    """
+
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (("user", "channel"),)
+        index_together = (("user", "channel"),)
+
+    def __str__(self):
+        return f"User {self.user.username} subscription for Channel {self.channel.name}"
+
+
+class ChannelRole(TimestampedModel):
+    """
+    Keep track of channel moderators and contributors
+    """
+
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (("user", "channel", "group"),)
+        index_together = (("user", "channel"),)
+
+    def __str__(self):
+        return f"User {self.user.username} role {self.group.name} for Channel {self.channel.name}"

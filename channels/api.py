@@ -9,7 +9,7 @@ import pytz
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Group
 from django.db import transaction
 from django.http.response import Http404
 import praw
@@ -36,6 +36,8 @@ from channels.constants import (
     POST_TYPE,
     COMMENT_TYPE,
     VoteActions,
+    GROUP_CONTRIBUTORS,
+    GROUP_MODERATORS,
 )
 from channels.models import (
     Channel,
@@ -44,6 +46,8 @@ from channels.models import (
     RedditAccessToken,
     RedditRefreshToken,
     Subscription,
+    ChannelSubscription,
+    ChannelRole,
 )
 from channels.utils import get_kind_mapping, get_or_create_link_meta
 
@@ -347,6 +351,43 @@ def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):
         post = sync_post_model(channel_name=channel_name, post_id=post_id)
         return Comment.objects.get_or_create(
             comment_id=comment_id, defaults={"post": post, "parent_id": parent_id}
+        )[0]
+
+
+def sync_channel_subscription_model(channel_name, user):
+    """
+    Create or update channel subscription for a user
+
+    Args:
+        channel_name (str): The name of the channel
+        user (django.contrib.models.auth.User): The user
+
+    Returns:
+        ChannelSubscription: the channel user role object
+    """
+    with transaction.atomic():
+        channel = sync_channel_model(channel_name)
+        return ChannelSubscription.objects.update_or_create(channel=channel, user=user)[
+            0
+        ]
+
+
+def sync_channel_role_model(channel_name, user, group_name):
+    """
+    Create or update channel role for a user
+
+    Args:
+        channel_name(str): The name of the channel
+        user(django.contrib.auth.models.User): The user
+        group_name(str): The group name (moderators, contributors)
+
+    Returns:
+        ChannelRole: the channel user role object
+    """
+    with transaction.atomic():
+        channel = sync_channel_model(channel_name)
+        return ChannelRole.objects.update_or_create(
+            channel=channel, user=user, group=Group.objects.get(name=group_name)
         )[0]
 
 
@@ -928,6 +969,8 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(contributor_name))
         self.get_channel(channel_name).contributor.add(user)
+        sync_channel_role_model(channel_name, user, GROUP_CONTRIBUTORS)
+        search_task_helpers.update_author(user.profile)
         return Redditor(self.reddit, name=contributor_name)
 
     def remove_contributor(self, contributor_name, channel_name):
@@ -946,6 +989,10 @@ class Api:
         # This doesn't check if a user is a moderator because they should have access to the channel
         # regardless of their contributor status
         self.get_channel(channel_name).contributor.remove(user)
+        ChannelRole.objects.filter(
+            channel__name=channel_name, user=user, group__name=GROUP_CONTRIBUTORS
+        ).delete()
+        search_task_helpers.update_author(user.profile)
 
     def list_contributors(self, channel_name):
         """
@@ -978,6 +1025,8 @@ class Api:
         except APIException as ex:
             if ex.error_type != "ALREADY_MODERATOR":
                 raise
+        sync_channel_role_model(channel_name, user, GROUP_MODERATORS)
+        search_task_helpers.update_author(user.profile)
 
     def accept_invite(self, channel_name):
         """
@@ -1002,6 +1051,10 @@ class Api:
             raise NotFound("User {} does not exist".format(moderator_name))
 
         self.get_channel(channel_name).moderator.remove(user)
+        ChannelRole.objects.filter(
+            channel__name=channel_name, user=user, group__name=GROUP_MODERATORS
+        ).delete()
+        search_task_helpers.update_author(user.profile)
 
     def _list_moderators(self, *, channel_name, moderator_name):
         """
@@ -1072,6 +1125,8 @@ class Api:
             channel.subscribe()
         except PrawForbidden as ex:
             raise PermissionDenied() from ex
+        sync_channel_subscription_model(channel_name, user)
+        search_task_helpers.update_author(user.profile)
         return Redditor(self.reddit, name=subscriber_name)
 
     def remove_subscriber(self, subscriber_name, channel_name):
@@ -1095,6 +1150,10 @@ class Api:
             # or maybe there's another unrelated 403 error from reddit, but we can't tell the difference,
             # and the double removal case is probably more common.
             pass
+        ChannelSubscription.objects.filter(
+            user=user, channel__name=channel_name
+        ).delete()
+        search_task_helpers.update_author(user.profile)
 
     def is_subscriber(self, subscriber_name, channel_name):
         """
