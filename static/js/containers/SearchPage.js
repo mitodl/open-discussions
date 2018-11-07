@@ -127,7 +127,7 @@ export class SearchPage extends React.Component<Props, State> {
     } = this.props
 
     const searchObj = qs.parse(search)
-    const text = params.text || this.state.text || searchObj.q || undefined
+    const text = params.text || this.state.text || undefined
     const type = params.type || searchObj.type || undefined
 
     history.replace({
