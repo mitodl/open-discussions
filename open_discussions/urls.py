@@ -70,6 +70,7 @@ urlpatterns = [
         name="password-reset-confirm",
     ),
     url(r"^privacy-statement/", index, name="privacy-statement"),
+    url(r"^search/", index, name="site-search"),
     url(r"^terms-and-conditions/", index, name="terms-and-conditions"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

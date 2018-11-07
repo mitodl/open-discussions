@@ -66,6 +66,8 @@ export const absolutizeURL = (url: string) =>
 export const postPermalink = (post: Post): string =>
   absolutizeURL(postDetailURL(post.channel_name, post.id, post.slug))
 
+export const siteSearchURL = (): string => "/search/"
+
 // pull the channel name out of location.pathname
 // see here for why this hackish approach was necessary:
 // https://github.com/mitodl/open-discussions/pull/118#discussion_r135284591

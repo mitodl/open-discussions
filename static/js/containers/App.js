@@ -222,6 +222,9 @@ class App extends React.Component<AppProps> {
             path={`${match.url}content_policy/`}
             component={ContentPolicyPage}
           />
+          {SETTINGS.allow_search ? (
+            <Route path={`${match.url}search/`} component={SearchPage} />
+          ) : null}
           <Switch>
             <Route
               exact

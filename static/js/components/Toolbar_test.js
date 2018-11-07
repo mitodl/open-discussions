@@ -49,4 +49,13 @@ describe("Toolbar", () => {
         .exists()
     )
   })
+
+  //
+  ;[true, false].forEach(allowSearch => {
+    it(`${allowSearch ? "has" : "doesn't have"} as search icon`, () => {
+      SETTINGS.allow_search = allowSearch
+      const wrapper = renderToolbar()
+      assert.equal(wrapper.find(".search-link").length, allowSearch ? 1 : 0)
+    })
+  })
 })
