@@ -36,8 +36,8 @@ from channels.constants import (
     POST_TYPE,
     COMMENT_TYPE,
     VoteActions,
-    GROUP_CONTRIBUTORS,
-    GROUP_MODERATORS,
+    ROLE_CONTRIBUTORS,
+    ROLE_MODERATORS,
 )
 from channels.models import (
     Channel,
@@ -47,7 +47,7 @@ from channels.models import (
     RedditRefreshToken,
     Subscription,
     ChannelSubscription,
-    ChannelRole,
+    ChannelGroupRole,
 )
 from channels.utils import get_kind_mapping, get_or_create_link_meta
 
@@ -372,23 +372,43 @@ def sync_channel_subscription_model(channel_name, user):
         ]
 
 
-def sync_channel_role_model(channel_name, user, group_name):
+def sync_channel_role_models(channel_name):
     """
-    Create or update channel role for a user
+    Get or create Channel roles
 
     Args:
-        channel_name(str): The name of the channel
-        user(django.contrib.auth.models.User): The user
-        group_name(str): The group name (moderators, contributors)
+        channel_name(str): The channel name
 
     Returns:
-        ChannelRole: the channel user role object
+        list of ChannelGroupRole: the channel user role objects
     """
     with transaction.atomic():
         channel = sync_channel_model(channel_name)
-        return ChannelRole.objects.update_or_create(
-            channel=channel, user=user, group=Group.objects.get(name=group_name)
-        )[0]
+        roles = {}
+        for role in [ROLE_MODERATORS, ROLE_CONTRIBUTORS]:
+            group, _ = Group.objects.get_or_create(
+                name="{}_{}".format(channel.name, role)
+            )
+            roles[role] = ChannelGroupRole.objects.get_or_create(
+                channel=channel, group=group, role=role
+            )[0]
+        return roles
+
+
+def update_user_role(channel_name, role, user, remove=False):
+    """
+    Add or remove a user from a channel role's group
+
+    Args:
+        channel_name(str): The channel name
+        user(django.contrib.auth.models.User): The user
+        role(str): The role name (moderators, contributors)
+        remove(bool): If the user should be removed instead of added
+    """
+    roles = sync_channel_role_models(channel_name)
+    if remove:
+        return roles[role].group.user_set.remove(user)
+    return roles[role].group.user_set.add(user)
 
 
 class Api:
@@ -969,7 +989,7 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(contributor_name))
         self.get_channel(channel_name).contributor.add(user)
-        sync_channel_role_model(channel_name, user, GROUP_CONTRIBUTORS)
+        update_user_role(channel_name, ROLE_CONTRIBUTORS, user)
         search_task_helpers.update_author(user.profile)
         return Redditor(self.reddit, name=contributor_name)
 
@@ -989,9 +1009,7 @@ class Api:
         # This doesn't check if a user is a moderator because they should have access to the channel
         # regardless of their contributor status
         self.get_channel(channel_name).contributor.remove(user)
-        ChannelRole.objects.filter(
-            channel__name=channel_name, user=user, group__name=GROUP_CONTRIBUTORS
-        ).delete()
+        update_user_role(channel_name, ROLE_CONTRIBUTORS, user, remove=True)
         search_task_helpers.update_author(user.profile)
 
     def list_contributors(self, channel_name):
@@ -1025,7 +1043,7 @@ class Api:
         except APIException as ex:
             if ex.error_type != "ALREADY_MODERATOR":
                 raise
-        sync_channel_role_model(channel_name, user, GROUP_MODERATORS)
+        update_user_role(channel_name, ROLE_MODERATORS, user)
         search_task_helpers.update_author(user.profile)
 
     def accept_invite(self, channel_name):
@@ -1051,9 +1069,7 @@ class Api:
             raise NotFound("User {} does not exist".format(moderator_name))
 
         self.get_channel(channel_name).moderator.remove(user)
-        ChannelRole.objects.filter(
-            channel__name=channel_name, user=user, group__name=GROUP_MODERATORS
-        ).delete()
+        update_user_role(channel_name, ROLE_MODERATORS, user, remove=True)
         search_task_helpers.update_author(user.profile)
 
     def _list_moderators(self, *, channel_name, moderator_name):

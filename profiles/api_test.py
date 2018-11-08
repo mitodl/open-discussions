@@ -1,8 +1,8 @@
 """Profile API tests"""
 import pytest
 
-from channels.api import sync_channel_subscription_model, sync_channel_role_model
-from channels.constants import GROUP_CONTRIBUTORS, GROUP_MODERATORS
+from channels.api import sync_channel_subscription_model, update_user_role
+from channels.constants import ROLE_CONTRIBUTORS, ROLE_MODERATORS
 from channels.models import Channel
 from open_discussions.factories import UserFactory
 from profiles import api
@@ -38,6 +38,6 @@ def test_get_channels(user):
     for channel_name in channel_names:
         Channel.objects.create(name=channel_name)
     sync_channel_subscription_model("a", user)
-    sync_channel_role_model("b", user, GROUP_CONTRIBUTORS)
-    sync_channel_role_model("c", user, GROUP_MODERATORS)
+    update_user_role("b", ROLE_CONTRIBUTORS, user)
+    update_user_role("c", ROLE_MODERATORS, user)
     assert get_channels(user) == {"a", "b", "c"}

@@ -18,8 +18,8 @@ from channels.constants import (
     POST_TYPE,
     COMMENT_TYPE,
     VoteActions,
-    GROUP_CONTRIBUTORS,
-    GROUP_MODERATORS,
+    ROLE_CONTRIBUTORS,
+    ROLE_MODERATORS,
 )
 from channels.models import (
     Channel,
@@ -29,7 +29,7 @@ from channels.models import (
     RedditRefreshToken,
     Subscription,
     ChannelSubscription,
-    ChannelRole,
+    ChannelGroupRole,
 )
 from channels.utils import DEFAULT_LISTING_PARAMS, ListingParams
 from search import task_helpers as search_task_helpers
@@ -725,11 +725,12 @@ def test_add_contributor(mock_client, mock_update_author):
     mock_client.subreddit.return_value.contributor.add.assert_called_once_with(
         contributor
     )
-    assert ChannelRole.objects.filter(
-        channel__name="foo_channel_name",
-        user=contributor,
-        group__name=GROUP_CONTRIBUTORS,
-    ).exists()
+    assert (
+        ChannelGroupRole.objects.get(
+            channel__name="foo_channel_name", role=ROLE_CONTRIBUTORS
+        ).group
+        in contributor.groups.all()
+    )
     mock_update_author.assert_called_with(contributor.profile)
     assert isinstance(redditor, Redditor)
     assert redditor.name == contributor.username
@@ -757,11 +758,12 @@ def test_remove_contributor(mock_client, mock_update_author):
     mock_client.subreddit.return_value.contributor.remove.assert_called_once_with(
         contributor
     )
-    assert not ChannelRole.objects.filter(
-        channel__name="foo_channel_name",
-        user=contributor,
-        group__name=GROUP_CONTRIBUTORS,
-    ).exists()
+    assert (
+        not ChannelGroupRole.objects.get(
+            channel__name="foo_channel_name", role=ROLE_CONTRIBUTORS
+        ).group
+        in contributor.groups.all()
+    )
     mock_update_author.assert_called_with(contributor.profile)
 
 
@@ -783,9 +785,12 @@ def test_add_moderator(mock_client, mock_update_author):
     mock_client.subreddit.return_value.moderator.add.assert_called_once_with(moderator)
     # API function doesn't return the moderator. To do this the view calls _list_moderators
     assert redditor is None
-    assert ChannelRole.objects.filter(
-        channel__name="channel_test_name", user=moderator, group__name=GROUP_MODERATORS
-    ).exists()
+    assert (
+        ChannelGroupRole.objects.get(
+            channel__name="channel_test_name", role=ROLE_MODERATORS
+        ).group
+        in moderator.groups.all()
+    )
     mock_update_author.assert_called_with(moderator.profile)
 
 
@@ -809,9 +814,12 @@ def test_remove_moderator(mock_client, mock_update_author):
     mock_client.subreddit.return_value.moderator.remove.assert_called_once_with(
         moderator
     )
-    assert not ChannelRole.objects.filter(
-        channel__name="foo_channel_name", user=moderator, group__name=GROUP_MODERATORS
-    ).exists()
+    assert (
+        not ChannelGroupRole.objects.get(
+            channel__name="channel_test_name", role=ROLE_MODERATORS
+        ).group
+        in moderator.groups.all()
+    )
     mock_update_author.assert_called_with(moderator.profile)
 
 

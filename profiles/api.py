@@ -1,4 +1,5 @@
 """Profile API"""
+from channels.models import ChannelGroupRole
 from profiles.models import Profile, filter_profile_props
 
 
@@ -28,5 +29,9 @@ def get_channels(user):
     """
     return set(
         list(user.channelsubscription_set.values_list("channel__name", flat=True))
-        + list(user.channelrole_set.values_list("channel__name", flat=True))
+        + list(
+            ChannelGroupRole.objects.filter(group__in=user.groups.all()).values_list(
+                "channel__name", flat=True
+            )
+        )
     )

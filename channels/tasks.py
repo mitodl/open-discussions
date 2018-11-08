@@ -6,8 +6,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from channels import api
-from channels.api import Api, sync_channel_subscription_model, sync_channel_role_model
-from channels.constants import GROUP_MODERATORS, GROUP_CONTRIBUTORS
+from channels.api import Api, sync_channel_subscription_model, update_user_role
+from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel
 from open_discussions.celery import app
 from open_discussions.utils import chunks
@@ -120,11 +120,11 @@ def populate_user_roles(channel_ids):
         for moderator in client.list_moderators(channel.name):
             user = User.objects.filter(username=moderator.name).first()
             if user:
-                sync_channel_role_model(channel.name, user, GROUP_MODERATORS)
+                update_user_role(channel.name, ROLE_MODERATORS, user)
         for contributor in client.list_contributors(channel.name):
             user = User.objects.filter(username=contributor.name).first()
             if user:
-                sync_channel_role_model(channel.name, user, GROUP_CONTRIBUTORS)
+                update_user_role(channel.name, ROLE_CONTRIBUTORS, user)
 
 
 @app.task(bind=True)

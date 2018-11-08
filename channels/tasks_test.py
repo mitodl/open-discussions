@@ -3,8 +3,8 @@ import pytest
 from praw.models import Redditor
 
 from channels import tasks
-from channels.constants import GROUP_MODERATORS, GROUP_CONTRIBUTORS
-from channels.models import Channel, ChannelSubscription, ChannelRole
+from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
+from channels.models import Channel, ChannelSubscription, ChannelGroupRole
 from open_discussions.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -99,7 +99,7 @@ def test_populate_user_subscriptions(mocker, is_subscriber, channels_and_users):
 def test_populate_user_roles(
     mocker, is_contributor, is_moderator, channels_and_users, settings
 ):
-    """populate_user_roles should create ChannelRole objects"""
+    """populate_user_roles should create ChannelGroupRole objects"""
     channels, users = channels_and_users
     settings.INDEXING_API_USERNAME = users[0].username
     client_mock = mocker.patch("channels.tasks.Api", autospec=True)
@@ -118,15 +118,16 @@ def test_populate_user_roles(
     tasks.populate_user_roles.delay([channel.id for channel in channels])
     for user in users:
         for channel in channels:
+            tasks.sync_channel_role_models(channel.name)
             assert (
-                ChannelRole.objects.filter(
-                    user=user, channel=channel, group__name=GROUP_MODERATORS
-                ).exists()
-                == is_moderator
-            )
+                ChannelGroupRole.objects.get(
+                    channel=channel, role=ROLE_MODERATORS
+                ).group
+                in user.groups.all()
+            ) == is_moderator
             assert (
-                ChannelRole.objects.filter(
-                    user=user, channel=channel, group__name=GROUP_CONTRIBUTORS
-                ).exists()
-                == is_contributor
-            )
+                ChannelGroupRole.objects.get(
+                    channel=channel, role=ROLE_CONTRIBUTORS
+                ).group
+                in user.groups.all()
+            ) == is_contributor
