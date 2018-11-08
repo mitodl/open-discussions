@@ -56,7 +56,7 @@ def test_populate_subscriptions_and_roles(
     mocker, mocked_celery, settings, channels_and_users
 ):
     """
-    populate_channel_roles should call populate_user_channel_roles task with correct ids
+    populate_subscriptions_and_roles should call sub-tasks with correct ids
     """
     channels, users = channels_and_users
     settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
@@ -99,7 +99,7 @@ def test_populate_user_subscriptions(mocker, is_subscriber, channels_and_users):
 def test_populate_user_roles(
     mocker, is_contributor, is_moderator, channels_and_users, settings
 ):
-    """populate_subscriptions_and_roles should create ChannelRole objects"""
+    """populate_user_roles should create ChannelRole objects"""
     channels, users = channels_and_users
     settings.INDEXING_API_USERNAME = users[0].username
     client_mock = mocker.patch("channels.tasks.Api", autospec=True)
