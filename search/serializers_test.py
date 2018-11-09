@@ -3,6 +3,7 @@
 import pytest
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
+from channels.factories import PostFactory, CommentFactory
 from channels.utils import get_reddit_slug
 from open_discussions.factories import UserFactory
 from profiles.models import Profile
@@ -173,21 +174,21 @@ def test_es_profile_serializer(mocker, user):
     }
 
 
-def test_serialize_bulk_comments(
-    mocker, patched_base_comment_serializer, reddit_submission_obj
-):
-    """index_comments should index comments and then call itself recursively to index more comments"""
-    inner_comment_mock = mocker.Mock(
-        id="comment_2", replies=[], submission=reddit_submission_obj
+@pytest.mark.django_db
+def test_serialize_bulk_comments(mocker, reddit_submission_obj, user, settings):
+    """serialize_bulk_comments should index all comments for a post"""
+    settings.INDEXING_API_USERNAME = user.username
+    post = PostFactory.create(post_id=reddit_submission_obj.id)
+    outer_comment = CommentFactory(post=post)
+    inner_comment = CommentFactory(post=post, parent_id=outer_comment.comment_id)
+    mock_api = mocker.patch("channels.api.Api", autospec=True)
+    mock_serialize_comment = mocker.patch(
+        "search.serializers.serialize_comment_for_bulk"
     )
-    outer_comment_mock = mocker.Mock(
-        id="comment_1", replies=[inner_comment_mock], submission=reddit_submission_obj
-    )
-    post_mock = mocker.MagicMock(comments=[outer_comment_mock])
-    assert list(serialize_bulk_comments(post_mock)) == [
-        serialize_comment_for_bulk(outer_comment_mock),
-        serialize_comment_for_bulk(inner_comment_mock),
-    ]
+    list(serialize_bulk_comments(post.post_id))
+    mock_api(user).get_comment.assert_any_call(inner_comment.comment_id)
+    mock_api(user).get_comment.assert_any_call(outer_comment.comment_id)
+    assert mock_serialize_comment.call_count == 2
 
 
 def test_serialize_post_for_bulk(mocker, reddit_submission_obj):

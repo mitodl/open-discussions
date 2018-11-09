@@ -1,12 +1,12 @@
 """Search task tests"""
 # pylint: disable=redefined-outer-name,unused-argument
 
+from django.conf import settings
 from praw.exceptions import PRAWException
-from prawcore.exceptions import PrawcoreException
+from prawcore.exceptions import PrawcoreException, NotFound
 import pytest
 
-from channels.constants import POSTS_SORT_NEW
-from channels.utils import ListingParams
+from channels.factories import ChannelFactory, PostFactory
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
 from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES
@@ -83,10 +83,11 @@ def test_update_field_values_by_query(mocked_api):
     assert mocked_api.update_field_values_by_query.call_args[0] == indexing_api_args
 
 
-def test_wrap_retry_exception():
+@pytest.mark.parametrize("error", [KeyError, NotFound])
+def test_wrap_retry_exception(error):
     """wrap_retry_exception should raise RetryException when other exceptions are raised"""
     with assert_not_raises():
-        with wrap_retry_exception(KeyError):
+        with wrap_retry_exception(error):
             # Should not raise an exception
             pass
 
@@ -132,39 +133,26 @@ def test_index_post_with_comments(
 
 @pytest.mark.parametrize("with_error", [True, False])
 def test_index_channel(
-    mock_index_functions,
-    mocker,
-    mocked_celery,
-    wrap_retry_mock,
-    settings,
-    user,
-    with_error,
+    mock_index_functions, mocker, mocked_celery, settings, user, with_error
 ):  # pylint: disable=unused-argument,too-many-arguments
     """index_channel should index all posts of a channel"""
     settings.INDEXING_API_USERNAME = user.username
     index_post_mock = mocker.patch(
         "search.tasks.index_post_with_comments", autospec=True
     )
-    api_mock = mocker.patch("channels.api.Api", autospec=True)
+    channel = ChannelFactory.create(id=1, name="channel01")
+    posts = PostFactory.create_batch(2, channel=channel)
 
-    list_posts_mock = api_mock.return_value.list_posts
-    posts = [mocker.Mock(id=num) for num in (1, 2)]
-    list_posts_mock.return_value = posts
-    channel_name = "channel"
     assert (
-        index_channel.delay(channel_name).get()
-        == f"index_channel threw an error on channel {channel_name}"
-    )
-
-    api_mock.assert_called_once_with(user)
-    list_posts_mock.assert_called_once_with(
-        channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW)
+        index_channel.delay(channel.id).get()
+        == f"index_channel threw an error on channel id {channel.id}"
     )
 
     assert mocked_celery.group.call_count == 1
     list(mocked_celery.group.call_args[0][0])  # iterate through generator
+    assert index_post_mock.si.call_count == 2
     for post in posts:
-        index_post_mock.si.assert_any_call(post.id)
+        index_post_mock.si.assert_any_call(post.post_id)
     assert mocked_celery.replace.call_count == 1
     assert mocked_celery.replace.call_args[0][1] == mocked_celery.group.return_value
 
@@ -181,20 +169,14 @@ def test_index_profiles(mocker, with_error):  # pylint: disable=unused-argument
     index_profile_mock.assert_called_once_with([1, 2, 3])
 
 
-def test_start_recreate_index(
-    mock_index_functions, mocker, mocked_celery, settings, user
-):
+def test_start_recreate_index(mock_index_functions, mocker, mocked_celery, user):
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
     """
     settings.INDEXING_API_USERNAME = user.username
     settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
-    client_mock = mocker.patch("channels.api.Api", autospec=True)
-    channel_names = ["a", "b", "c"]
     users = UserFactory.create_batch(4)
-    client_mock.return_value.list_channels.return_value = [
-        mocker.Mock(display_name=name) for name in channel_names
-    ]
+    channels = ChannelFactory.create_batch(3)
     index_channel_mock = mocker.patch("search.tasks.index_channel", autospec=True)
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
     backing_index = "backing"
@@ -219,8 +201,8 @@ def test_start_recreate_index(
     # Celery's 'group' function takes a generator as an argument. In order to make assertions about the items
     # in that generator, 'list' is being called to force iteration through all of those items.
     list(mocked_celery.group.call_args[0][0])
-    for name in channel_names:
-        index_channel_mock.si.assert_any_call(name)
+    for channel in channels:
+        index_channel_mock.si.assert_any_call(channel.id)
         mocked_celery.chain.assert_called_once_with(
             mocked_celery.group.return_value, finish_recreate_index_mock.s.return_value
         )

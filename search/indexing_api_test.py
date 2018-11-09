@@ -218,18 +218,12 @@ def test_index_post_with_comments(
     serialized_data_post = [{"object_type": POST_TYPE}]
     serialized_data_comments = [{"object_type": COMMENT_TYPE}]
     serialize_post_mock = mocker.patch(
-        "search.indexing_api.serialize_bulk_post", autospec=True
-    )
-    serialize_comments_mock = mocker.patch(
-        "search.indexing_api.serialize_bulk_comments", autospec=True
-    )
-    sync_post_mock = mocker.patch(
-        "search.indexing_api.sync_post",
+        "search.indexing_api.serialize_bulk_post",
         autospec=True,
         return_value=serialized_data_post,
     )
-    sync_comments_mock = mocker.patch(
-        "search.indexing_api.sync_comments",
+    serialize_comments_mock = mocker.patch(
+        "search.indexing_api.serialize_bulk_comments",
         autospec=True,
         return_value=serialized_data_comments,
     )
@@ -249,16 +243,18 @@ def test_index_post_with_comments(
     post = client.get_post.return_value
 
     serialize_post_mock.assert_any_call(post)
-    sync_post_mock.assert_any_call(serialize_post_mock.return_value)
-
-    serialize_comments_mock.assert_any_call(post)
-    sync_comments_mock.assert_any_call(serialize_comments_mock.return_value)
-
-    post.comments.replace_more.assert_called_once_with(limit=None)
+    serialize_comments_mock.assert_any_call(post_id)
     for alias in aliases:
         bulk_mock.assert_any_call(
             mocked_es.conn,
             serialized_data_post,
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+        bulk_mock.assert_any_call(
+            mocked_es.conn,
+            serialized_data_comments,
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,

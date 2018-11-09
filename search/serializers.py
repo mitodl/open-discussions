@@ -1,5 +1,12 @@
 """Serializers for elasticsearch data"""
+import logging
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from prawcore import NotFound
+
 from channels.constants import POST_TYPE, COMMENT_TYPE
+from channels.models import Post
 from channels.serializers import BasePostSerializer, BaseCommentSerializer
 from channels.utils import get_reddit_slug
 from profiles.api import get_channels
@@ -7,6 +14,8 @@ from profiles.models import Profile
 from search.api import gen_post_id, gen_comment_id, gen_profile_id
 from search.constants import PROFILE_TYPE
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
+
+log = logging.getLogger()
 
 
 class ESSerializer:
@@ -162,14 +171,16 @@ def _serialize_comment_tree_for_bulk(comments):
     Serialize an iterable of Comment and their replies for a bulk API request
 
     Args:
-        comments (iterable of Comment): An iterable of comments
+        comments (iterable of str): An iterable of comment ids
 
     Yields:
         dict: Documents suitable for indexing in Elasticsearch
     """
-    for comment in comments:
-        yield serialize_comment_for_bulk(comment)
-        yield from _serialize_comment_tree_for_bulk(comment.replies)
+    from channels.api import Api
+
+    api = Api(user=User.objects.get(username=settings.INDEXING_API_USERNAME))
+    for comment_id in comments:
+        yield serialize_comment_for_bulk(api.get_comment(comment_id))
 
 
 def serialize_bulk_post(post_obj):
@@ -182,14 +193,18 @@ def serialize_bulk_post(post_obj):
     yield serialize_post_for_bulk(post_obj)
 
 
-def serialize_bulk_comments(post_obj):
+def serialize_bulk_comments(post_id):
     """
     Index comments for a post and recurse to deeper level comments for a bulk API request
 
     Args:
-        post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
+        post_id (str): A Post model object's post_id
     """
-    yield from _serialize_comment_tree_for_bulk(post_obj.comments)
+    yield from _serialize_comment_tree_for_bulk(
+        Post.objects.get(post_id=post_id).comment_set.values_list(
+            "comment_id", flat=True
+        )
+    )
 
 
 def serialize_bulk_profiles(ids):
@@ -223,7 +238,14 @@ def serialize_post_for_bulk(post_obj):
     Args:
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
-    return {"_id": gen_post_id(post_obj.id), **ESPostSerializer().serialize(post_obj)}
+    try:
+        return {
+            "_id": gen_post_id(post_obj.id),
+            **ESPostSerializer().serialize(post_obj),
+        }
+    except NotFound:
+        log.exception("Reddit post not found: %s", post_obj.id)
+        raise
 
 
 def serialize_comment_for_bulk(comment_obj):
@@ -233,7 +255,11 @@ def serialize_comment_for_bulk(comment_obj):
     Args:
         comment_obj (Comment): A PRAW comment
     """
-    return {
-        "_id": gen_comment_id(comment_obj.id),
-        **ESCommentSerializer().serialize(comment_obj),
-    }
+    try:
+        return {
+            "_id": gen_comment_id(comment_obj.id),
+            **ESCommentSerializer().serialize(comment_obj),
+        }
+    except NotFound:
+        log.exception("Reddit comment not found: %s", comment_obj.id)
+        raise
