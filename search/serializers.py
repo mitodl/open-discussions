@@ -2,6 +2,7 @@
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.serializers import BasePostSerializer, BaseCommentSerializer
 from channels.utils import get_reddit_slug
+from profiles.api import get_channels
 from profiles.models import Profile
 from search.api import gen_post_id, gen_comment_id, gen_profile_id
 from search.constants import PROFILE_TYPE
@@ -72,14 +73,7 @@ class ESProfileSerializer(ESSerializer):
         return ProfileSerializer
 
     def postprocess_fields(self, discussions_obj, serialized_data):
-        from channels.api import Api
-
-        client = Api(discussions_obj.user)
-        return {
-            "author_channel_membership": ",".join(
-                [channel.display_name for channel in client.list_channels()]
-            )
-        }
+        return {"author_channel_membership": sorted(get_channels(discussions_obj.user))}
 
 
 class ESPostSerializer(ESSerializer):

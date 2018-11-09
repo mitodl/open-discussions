@@ -116,3 +116,21 @@ def mock_channel_exists(mocker):
     return mocker.patch(
         "open_discussions.permissions.channel_exists", return_value=True
     )
+
+
+@pytest.fixture()
+def mocked_celery(mocker):
+    """Mock object that patches certain celery functions"""
+    exception_class = TabError
+    replace_mock = mocker.patch(
+        "celery.app.task.Task.replace", autospec=True, side_effect=exception_class
+    )
+    group_mock = mocker.patch("celery.group", autospec=True)
+    chain_mock = mocker.patch("celery.chain", autospec=True)
+
+    yield SimpleNamespace(
+        replace=replace_mock,
+        group=group_mock,
+        chain=chain_mock,
+        replace_exception_class=exception_class,
+    )

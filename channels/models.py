@@ -3,9 +3,11 @@ from uuid import uuid4
 
 import base36
 from django.conf import settings
+from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models import URLField
 
+from channels.constants import ROLE_CHOICES
 from channels.utils import AVATAR_MEDIUM_MAX_DIMENSION, AVATAR_SMALL_MAX_DIMENSION
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
@@ -185,3 +187,37 @@ class Comment(TimestampedModel):
 
     def __str__(self):
         return f"{self.comment_id} on post {self.post}"
+
+
+class ChannelSubscription(TimestampedModel):
+    """
+    Keep track of channel subscribers
+    """
+
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (("user", "channel"),)
+
+    def __str__(self):
+        return f"User {self.user.username} subscription for Channel {self.channel.name}"
+
+
+class ChannelGroupRole(TimestampedModel):
+    """
+    Keep track of channel moderators and contributors
+    """
+
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    role = models.CharField(max_length=48, choices=zip(ROLE_CHOICES, ROLE_CHOICES))
+
+    class Meta:
+        unique_together = (("channel", "group", "role"),)
+        index_together = (("channel", "role"),)
+
+    def __str__(self):
+        return (
+            f"Group {self.group.name} role {self.role} for Channel {self.channel.name}"
+        )

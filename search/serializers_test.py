@@ -1,7 +1,5 @@
 """Tests for elasticsearch serializers"""
 # pylint: disable=redefined-outer-name,unused-argument
-from unittest.mock import Mock
-
 import pytest
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
@@ -20,19 +18,6 @@ from search.serializers import (
     serialize_bulk_profiles,
     serialize_profile_for_bulk,
 )
-
-
-@pytest.fixture
-def mock_channel_api(mocker, user):
-    """
-    Fixture for returning a mock channel Api
-    """
-    mock_channel_api = mocker.patch("channels.api.Api", autospec=True)
-    mock_channel_api(user).list_channels.return_value = [
-        Mock(display_name="channel01"),
-        Mock(display_name="channel02"),
-    ]
-    return mock_channel_api
 
 
 @pytest.fixture
@@ -167,11 +152,14 @@ def test_es_comment_serializer(patched_base_comment_serializer, reddit_comment_o
     }
 
 
-def test_es_profile_serializer(mock_channel_api, user):
+def test_es_profile_serializer(mocker, user):
     """
     Test that ESProfileSerializer correctly serializes a profile object
 
     """
+    mocker.patch(
+        "search.serializers.get_channels", return_value={"channel01", "channel02"}
+    )
     serialized = ESProfileSerializer().serialize(user.profile)
     assert serialized == {
         "object_type": PROFILE_TYPE,
@@ -181,7 +169,7 @@ def test_es_profile_serializer(mock_channel_api, user):
         "author_avatar_medium": image_uri(user.profile, IMAGE_MEDIUM),
         "author_bio": user.profile.bio,
         "author_headline": user.profile.headline,
-        "author_channel_membership": "channel01,channel02",
+        "author_channel_membership": ["channel01", "channel02"],
     }
 
 
@@ -264,9 +252,7 @@ def test_serialize_bulk_profiles(mocker):
         mock_serialize_profile.assert_any_call(user.profile)
 
 
-def test_serialize_profile_for_bulk(
-    mock_channel_api, patched_base_profile_serializer, user
-):
+def test_serialize_profile_for_bulk(patched_base_profile_serializer, user):
     """
     Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
     """

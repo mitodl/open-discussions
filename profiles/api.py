@@ -1,4 +1,5 @@
 """Profile API"""
+from channels.models import ChannelGroupRole
 from profiles.models import Profile, filter_profile_props
 
 
@@ -8,7 +9,7 @@ def ensure_profile(user, profile_data=None):
 
     Args:
         user (User): the user to ensure a profile for
-        profile (dic): the profile data for the user
+        profile_data (dict): the profile data for the user
 
     Returns:
         Profile: the user's profile
@@ -17,3 +18,23 @@ def ensure_profile(user, profile_data=None):
 
     profile, _ = Profile.objects.get_or_create(user=user, defaults=defaults)
     return profile
+
+
+def get_channels(user):
+    """
+    Get the list of channel names for which the user is a moderator, contributor, or subscriber
+
+    Args:
+        user(django.contrib.auth.models.User): the user to retrieve channel names for
+
+    Returns:
+        set of str: Channel names
+    """
+    return set(
+        list(user.channelsubscription_set.values_list("channel__name", flat=True))
+        + list(
+            ChannelGroupRole.objects.filter(group__in=user.groups.all()).values_list(
+                "channel__name", flat=True
+            )
+        )
+    )

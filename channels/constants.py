@@ -33,6 +33,10 @@ VALID_COMMENT_SORT_TYPES = (COMMENTS_SORT_BEST, COMMENTS_SORT_NEW, COMMENTS_SORT
 POST_TYPE = "post"
 COMMENT_TYPE = "comment"
 
+ROLE_MODERATORS = "moderators"
+ROLE_CONTRIBUTORS = "contributors"
+ROLE_CHOICES = (ROLE_MODERATORS, ROLE_CONTRIBUTORS)
+
 
 class VoteActions(Enum):
     """An enum indicating the valid vote actions that can be taken for a post or comment"""

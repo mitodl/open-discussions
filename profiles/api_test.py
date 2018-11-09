@@ -1,8 +1,12 @@
 """Profile API tests"""
 import pytest
 
+from channels.api import sync_channel_subscription_model, add_user_role
+from channels.constants import ROLE_CONTRIBUTORS, ROLE_MODERATORS
+from channels.models import Channel
 from open_discussions.factories import UserFactory
 from profiles import api
+from profiles.api import get_channels
 from profiles.models import Profile
 
 pytestmark = pytest.mark.django_db
@@ -24,3 +28,16 @@ def test_ensure_profile(profile_data, no_profile):
             assert profile.image == profile_data["image"]
         else:
             assert not profile.image
+
+
+def test_get_channels(user):
+    """
+    Test that get_channels returns the correct list of channel names for a user
+    """
+    channel_names = ["a", "b", "c", "d"]
+    for channel_name in channel_names:
+        Channel.objects.create(name=channel_name)
+    sync_channel_subscription_model("a", user)
+    add_user_role("b", ROLE_CONTRIBUTORS, user)
+    add_user_role("c", ROLE_MODERATORS, user)
+    assert get_channels(user) == {"a", "b", "c"}
