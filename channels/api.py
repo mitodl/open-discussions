@@ -372,43 +372,45 @@ def sync_channel_subscription_model(channel_name, user):
         ]
 
 
-def sync_channel_role_models(channel_name):
+def get_role_model(channel_name, role):
     """
-    Get or create Channel roles
+    Get or create a ChannelGroupRole object
 
     Args:
         channel_name(str): The channel name
 
     Returns:
-        list of ChannelGroupRole: the channel user role objects
+        ChannelGroupRole: the ChannelGroupRole object
     """
-    with transaction.atomic():
-        channel = sync_channel_model(channel_name)
-        roles = {}
-        for role in [ROLE_MODERATORS, ROLE_CONTRIBUTORS]:
-            group, _ = Group.objects.get_or_create(
-                name="{}_{}".format(channel.name, role)
-            )
-            roles[role] = ChannelGroupRole.objects.get_or_create(
-                channel=channel, group=group, role=role
-            )[0]
-        return roles
+    return ChannelGroupRole.objects.get_or_create(
+        channel=Channel.objects.get_or_create(name=channel_name)[0],
+        group=Group.objects.get_or_create(name="{}_{}".format(channel_name, role))[0],
+        role=role,
+    )[0]
 
 
-def update_user_role(channel_name, role, user, remove=False):
+def add_user_role(channel_name, role, user):
     """
-    Add or remove a user from a channel role's group
+    Add a user to a channel role's group
 
     Args:
         channel_name(str): The channel name
         user(django.contrib.auth.models.User): The user
         role(str): The role name (moderators, contributors)
-        remove(bool): If the user should be removed instead of added
     """
-    roles = sync_channel_role_models(channel_name)
-    if remove:
-        return roles[role].group.user_set.remove(user)
-    return roles[role].group.user_set.add(user)
+    get_role_model(channel_name, role).group.user_set.add(user)
+
+
+def remove_user_role(channel_name, role, user):
+    """
+    Remove a user from a channel role's group
+
+    Args:
+        channel_name(str): The channel name
+        user(django.contrib.auth.models.User): The user
+        role(str): The role name (moderators, contributors)
+    """
+    get_role_model(channel_name, role).group.user_set.remove(user)
 
 
 class Api:
@@ -989,7 +991,7 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(contributor_name))
         self.get_channel(channel_name).contributor.add(user)
-        update_user_role(channel_name, ROLE_CONTRIBUTORS, user)
+        add_user_role(channel_name, ROLE_CONTRIBUTORS, user)
         search_task_helpers.update_author(user.profile)
         return Redditor(self.reddit, name=contributor_name)
 
@@ -1009,7 +1011,7 @@ class Api:
         # This doesn't check if a user is a moderator because they should have access to the channel
         # regardless of their contributor status
         self.get_channel(channel_name).contributor.remove(user)
-        update_user_role(channel_name, ROLE_CONTRIBUTORS, user, remove=True)
+        remove_user_role(channel_name, ROLE_CONTRIBUTORS, user)
         search_task_helpers.update_author(user.profile)
 
     def list_contributors(self, channel_name):
@@ -1043,7 +1045,7 @@ class Api:
         except APIException as ex:
             if ex.error_type != "ALREADY_MODERATOR":
                 raise
-        update_user_role(channel_name, ROLE_MODERATORS, user)
+        add_user_role(channel_name, ROLE_MODERATORS, user)
         search_task_helpers.update_author(user.profile)
 
     def accept_invite(self, channel_name):
@@ -1069,7 +1071,7 @@ class Api:
             raise NotFound("User {} does not exist".format(moderator_name))
 
         self.get_channel(channel_name).moderator.remove(user)
-        update_user_role(channel_name, ROLE_MODERATORS, user, remove=True)
+        remove_user_role(channel_name, ROLE_MODERATORS, user)
         search_task_helpers.update_author(user.profile)
 
     def _list_moderators(self, *, channel_name, moderator_name):

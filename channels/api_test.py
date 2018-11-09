@@ -759,10 +759,10 @@ def test_remove_contributor(mock_client, mock_update_author):
         contributor
     )
     assert (
-        not ChannelGroupRole.objects.get(
+        ChannelGroupRole.objects.get(
             channel__name="foo_channel_name", role=ROLE_CONTRIBUTORS
         ).group
-        in contributor.groups.all()
+        not in contributor.groups.all()
     )
     mock_update_author.assert_called_with(contributor.profile)
 
@@ -815,10 +815,10 @@ def test_remove_moderator(mock_client, mock_update_author):
         moderator
     )
     assert (
-        not ChannelGroupRole.objects.get(
+        ChannelGroupRole.objects.get(
             channel__name="channel_test_name", role=ROLE_MODERATORS
         ).group
-        in moderator.groups.all()
+        not in moderator.groups.all()
     )
     mock_update_author.assert_called_with(moderator.profile)
 

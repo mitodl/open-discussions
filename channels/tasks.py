@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from channels import api
-from channels.api import Api, sync_channel_subscription_model, update_user_role
+from channels.api import Api, sync_channel_subscription_model, add_user_role
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel
 from open_discussions.celery import app
@@ -100,7 +100,7 @@ def populate_user_subscriptions(user_ids):
     Args:
         user_ids(list of int): List of user ids
     """
-    for user in User.objects.filter(id__in=user_ids):
+    for user in User.objects.filter(id__in=user_ids).iterator():
         client = Api(user)
         channels = client.list_channels()
         for channel in channels:
@@ -120,11 +120,11 @@ def populate_user_roles(channel_ids):
         for moderator in client.list_moderators(channel.name):
             user = User.objects.filter(username=moderator.name).first()
             if user:
-                update_user_role(channel.name, ROLE_MODERATORS, user)
+                add_user_role(channel.name, ROLE_MODERATORS, user)
         for contributor in client.list_contributors(channel.name):
             user = User.objects.filter(username=contributor.name).first()
             if user:
-                update_user_role(channel.name, ROLE_CONTRIBUTORS, user)
+                add_user_role(channel.name, ROLE_CONTRIBUTORS, user)
 
 
 @app.task(bind=True)

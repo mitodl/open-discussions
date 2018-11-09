@@ -3,8 +3,9 @@ import pytest
 from praw.models import Redditor
 
 from channels import tasks
+from channels.api import get_role_model
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
-from channels.models import Channel, ChannelSubscription, ChannelGroupRole
+from channels.models import Channel, ChannelSubscription
 from open_discussions.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -90,7 +91,7 @@ def test_populate_user_subscriptions(mocker, is_subscriber, channels_and_users):
         for channel in channels:
             assert (
                 ChannelSubscription.objects.filter(user=user, channel=channel).exists()
-                == is_subscriber
+                is is_subscriber
             )
 
 
@@ -118,16 +119,9 @@ def test_populate_user_roles(
     tasks.populate_user_roles.delay([channel.id for channel in channels])
     for user in users:
         for channel in channels:
-            tasks.sync_channel_role_models(channel.name)
             assert (
-                ChannelGroupRole.objects.get(
-                    channel=channel, role=ROLE_MODERATORS
-                ).group
-                in user.groups.all()
-            ) == is_moderator
+                get_role_model(channel, ROLE_MODERATORS).group in user.groups.all()
+            ) is is_moderator
             assert (
-                ChannelGroupRole.objects.get(
-                    channel=channel, role=ROLE_CONTRIBUTORS
-                ).group
-                in user.groups.all()
-            ) == is_contributor
+                get_role_model(channel, ROLE_CONTRIBUTORS).group in user.groups.all()
+            ) is is_contributor

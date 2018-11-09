@@ -86,9 +86,6 @@ class Migration(migrations.Migration):
         migrations.AlterUniqueTogether(
             name="channelsubscription", unique_together={("user", "channel")}
         ),
-        migrations.AlterIndexTogether(
-            name="channelsubscription", index_together={("user", "channel")}
-        ),
         migrations.AlterUniqueTogether(
             name="channelgrouprole", unique_together={("channel", "group", "role")}
         ),

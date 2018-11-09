@@ -7,7 +7,7 @@ from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models import URLField
 
-from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
+from channels.constants import ROLE_CHOICES
 from channels.utils import AVATAR_MEDIUM_MAX_DIMENSION, AVATAR_SMALL_MAX_DIMENSION
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
@@ -199,7 +199,6 @@ class ChannelSubscription(TimestampedModel):
 
     class Meta:
         unique_together = (("user", "channel"),)
-        index_together = (("user", "channel"),)
 
     def __str__(self):
         return f"User {self.user.username} subscription for Channel {self.channel.name}"
@@ -212,13 +211,7 @@ class ChannelGroupRole(TimestampedModel):
 
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    role = models.CharField(
-        max_length=48,
-        choices=[
-            (ROLE_MODERATORS, ROLE_MODERATORS),
-            (ROLE_CONTRIBUTORS, ROLE_CONTRIBUTORS),
-        ],
-    )
+    role = models.CharField(max_length=48, choices=zip(ROLE_CHOICES, ROLE_CHOICES))
 
     class Meta:
         unique_together = (("channel", "group", "role"),)

@@ -9,7 +9,7 @@ def ensure_profile(user, profile_data=None):
 
     Args:
         user (User): the user to ensure a profile for
-        profile (dic): the profile data for the user
+        profile_data (dict): the profile data for the user
 
     Returns:
         Profile: the user's profile
@@ -24,7 +24,10 @@ def get_channels(user):
     """
     Get the list of channel names for which the user is a moderator, contributor, or subscriber
 
-    Return:
+    Args:
+        user(django.contrib.auth.models.User): the user to retrieve channel names for
+
+    Returns:
         set of str: Channel names
     """
     return set(
