@@ -372,6 +372,7 @@ def sync_channel_subscription_model(channel_name, user):
         ]
 
 
+@transaction.atomic
 def get_role_model(channel_name, role):
     """
     Get or create a ChannelGroupRole object
@@ -395,8 +396,8 @@ def add_user_role(channel_name, role, user):
 
     Args:
         channel_name(str): The channel name
-        user(django.contrib.auth.models.User): The user
         role(str): The role name (moderators, contributors)
+        user(django.contrib.auth.models.User): The user
     """
     get_role_model(channel_name, role).group.user_set.add(user)
 
@@ -407,8 +408,8 @@ def remove_user_role(channel_name, role, user):
 
     Args:
         channel_name(str): The channel name
-        user(django.contrib.auth.models.User): The user
         role(str): The role name (moderators, contributors)
+        user(django.contrib.auth.models.User): The user
     """
     get_role_model(channel_name, role).group.user_set.remove(user)
 

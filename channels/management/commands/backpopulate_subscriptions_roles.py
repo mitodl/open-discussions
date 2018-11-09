@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = "Create/update each user's ChannelSubscriptions and ChannelRoles (subscriber, moderator, contributor)"
 
     def handle(self, *args, **options):
-        """Adds the indexing user as the moderator on all channels"""
+        """Run celery task to create/update channel subscriptions and moderator/contributor roles"""
         task = populate_subscriptions_and_roles.delay()
         self.stdout.write(
             "Started celery task {task} to populate channel user roles and subscriptions".format(
