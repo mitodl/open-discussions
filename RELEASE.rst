@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.52.2
+--------------
+
+- Store channel memberships (subscriber, moderator, contributor) in django (#1449)
+
 Version 0.52.1 (Released November 05, 2018)
 --------------
 
