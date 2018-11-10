@@ -46,7 +46,6 @@ isodate==0.6.0            # via python3-saml
 jedi==0.10.2              # via ipython
 kombu==4.2.1              # via celery, django-server-status
 lxml==4.1.1               # via xmlsec
-markdown2==2.3.5
 newrelic==4.2.0.100
 oauthlib==2.0.7           # via requests-oauthlib, social-auth-core
 pexpect==4.2.1            # via ipython
