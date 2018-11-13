@@ -30,6 +30,7 @@ type Props = {
   location: Location,
   history: Object,
   channel: ?Channel,
+  channelLoaded: boolean,
   channelName: ?string,
   channelProcessing: boolean,
   getChannel: () => Promise<*>,
@@ -51,8 +52,9 @@ type State = {
 }
 
 const shouldLoadChannel = (currentProps: Props, prevProps: ?Props) => {
-  const { channel, channelName, channelProcessing } = currentProps
+  const { channelName, channelProcessing, channelLoaded } = currentProps
   if (!channelName) {
+    // This is a site search page
     return false
   }
 
@@ -61,10 +63,7 @@ const shouldLoadChannel = (currentProps: Props, prevProps: ?Props) => {
   if (!prevProps || prevProps.channelName !== channelName) {
     return true
   }
-  if (channelProcessing) {
-    return false
-  }
-  return !channel
+  return !channelLoaded && !channelProcessing
 }
 
 const shouldLoadSearch = (currentProps: Props) => {
@@ -204,16 +203,16 @@ export class SearchPage extends React.Component<Props, State> {
     } = this.props
     const { text } = this.state
 
-    if (channelName && !channel) {
-      return <PostLoading />
-    }
-
     if (notFound) {
       return <NotFound />
     }
 
     if (notAuthorized) {
       return <NotAuthorized />
+    }
+
+    if (channelName && !channel) {
+      return <PostLoading />
     }
 
     return (
@@ -256,6 +255,7 @@ const mapStateToProps = (state, ownProps) => {
   const { channels, search } = state
   const channel = channels.data.get(channelName)
 
+  const channelLoaded = channels.loaded
   const searchLoaded = search.loaded
   const searchProcessing = search.processing
   const loaded = (channels.error ? true : !!channel) && searchLoaded
@@ -273,6 +273,7 @@ const mapStateToProps = (state, ownProps) => {
     total,
     initialLoad,
     channel,
+    channelLoaded,
     channelProcessing,
     channelName,
     notFound,
