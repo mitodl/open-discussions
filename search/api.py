@@ -100,8 +100,10 @@ def execute_search(*, user, query):
         .values_list("channel__name", flat=True)
         .distinct()
     )
-    channels_filter = Q("terms", channel_name=channel_names) | ~Q(
-        "terms", object_type=(COMMENT_TYPE, POST_TYPE)
+    channels_filter = Q(
+        "terms", channel_name=channel_names
+    ) | ~Q(  # pylint: disable=invalid-unary-operator-type
+        "terms", object_type=[COMMENT_TYPE, POST_TYPE]
     )
     search = search.filter(channels_filter)
     return search.execute().to_dict()

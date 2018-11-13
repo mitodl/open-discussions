@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import pytest
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
+from channels.api import add_user_role
 from search.api import (
     execute_search,
     get_reddit_object_type,
@@ -61,10 +62,8 @@ def test_execute_search(mocker, user):
     """execute_search should execute an Elasticsearch search"""
     get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
     channel_names = ["channel1", "channel2"]
-    api_mock = mocker.patch("channels.api.Api", autospec=True)
-    api_mock.return_value.list_channels.return_value = [
-        mocker.Mock(display_name=name) for name in channel_names
-    ]
+    add_user_role("channel1", "moderators", user)
+    add_user_role("channel2", "contributors", user)
 
     query = {"a": "query"}
     assert (
@@ -81,18 +80,20 @@ def test_execute_search(mocker, user):
                             "bool": {
                                 "should": [
                                     {
-                                        "terms": {
-                                            "author_channel_membership": [
-                                                "channel1",
-                                                "channel2",
+                                        "bool": {
+                                            "must_not": [
+                                                {
+                                                    "terms": {
+                                                        "object_type": [
+                                                            "comment",
+                                                            "post",
+                                                        ]
+                                                    }
+                                                }
                                             ]
                                         }
                                     },
-                                    {
-                                        "terms": {
-                                            "channel_name": ["channel1", "channel2"]
-                                        }
-                                    },
+                                    {"terms": {"channel_name": channel_names}},
                                 ]
                             }
                         }
