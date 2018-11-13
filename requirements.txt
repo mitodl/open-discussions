@@ -68,7 +68,7 @@ pyyaml==3.11
 raven==6.9.0
 redis==2.10.5
 requests-oauthlib==0.8.0  # via social-auth-core
-requests==2.18.1
+requests==2.20.1
 simplegeneric==0.8.1      # via ipython
 six==1.10.0               # via django-anymail, django-server-status, elasticsearch-dsl, faker, html5lib, isodate, prompt-toolkit, python-dateutil, social-auth-app-django, social-auth-core, traitlets
 social-auth-app-django==2.1.0
