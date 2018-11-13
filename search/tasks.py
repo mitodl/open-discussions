@@ -45,7 +45,7 @@ def wrap_retry_exception(*exception_classes):
     except Exception as ex:
         if isinstance(ex, NotFound):
             # No corresponding reddit post/comment found for django model object.  Log error and continue indexing.
-            log.exception(str(ex))
+            log.exception()
             return
         # Celery is confused by exceptions which don't take a string as an argument, so we need to wrap before raising
         if isinstance(ex, exception_classes):

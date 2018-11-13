@@ -166,12 +166,12 @@ class ESCommentSerializer(ESSerializer):
         }
 
 
-def _serialize_comment_tree_for_bulk(comments):
+def _serialize_comment_tree_for_bulk(comment_ids):
     """
-    Serialize an iterable of Comment and their replies for a bulk API request
+    Serialize comments by an iterable of their ids for a bulk API request
 
     Args:
-        comments (iterable of str): An iterable of comment ids
+        comment_ids (iterable of str): An iterable of comment ids
 
     Yields:
         dict: Documents suitable for indexing in Elasticsearch
@@ -179,7 +179,7 @@ def _serialize_comment_tree_for_bulk(comments):
     from channels.api import Api
 
     api = Api(user=User.objects.get(username=settings.INDEXING_API_USERNAME))
-    for comment_id in comments:
+    for comment_id in comment_ids:
         yield serialize_comment_for_bulk(api.get_comment(comment_id))
 
 
