@@ -40,4 +40,4 @@ def test_get_channels(user):
     sync_channel_subscription_model("a", user)
     add_user_role("b", ROLE_CONTRIBUTORS, user)
     add_user_role("c", ROLE_MODERATORS, user)
-    assert get_channels(user) == {"a", "b", "c"}
+    assert get_channels(user) == {"b", "c"}

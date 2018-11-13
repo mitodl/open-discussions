@@ -22,7 +22,7 @@ def ensure_profile(user, profile_data=None):
 
 def get_channels(user):
     """
-    Get the list of channel names for which the user is a moderator, contributor, or subscriber
+    Get the set of channel names for which the user is a moderator or contributor
 
     Args:
         user(django.contrib.auth.models.User): the user to retrieve channel names for
@@ -31,10 +31,7 @@ def get_channels(user):
         set of str: Channel names
     """
     return set(
-        list(user.channelsubscription_set.values_list("channel__name", flat=True))
-        + list(
-            ChannelGroupRole.objects.filter(group__in=user.groups.all()).values_list(
-                "channel__name", flat=True
-            )
+        ChannelGroupRole.objects.filter(group__in=user.groups.all()).values_list(
+            "channel__name", flat=True
         )
     )
