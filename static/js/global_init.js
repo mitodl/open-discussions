@@ -30,7 +30,8 @@ const _createSettings = () => ({
   embedlyKey:         "fake",
   public_path:        "http://fake.open.url/",
   site_url:           "http://fake.open.url/",
-  recaptchaKey:       ""
+  recaptchaKey:       "",
+  search_page_size:   5
 })
 
 global.SETTINGS = _createSettings()

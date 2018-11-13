@@ -1,5 +1,5 @@
-// @flow
 import { assert } from "chai"
+import sinon from "sinon"
 
 import {
   makeCommentResult,
@@ -7,12 +7,26 @@ import {
   makeProfileResult
 } from "../factories/search"
 import {
+  buildSearchQuery,
+  channelField,
+  searchFields,
   searchResultToComment,
   searchResultToPost,
   searchResultToProfile
 } from "./search"
+import * as searchFuncs from "./search"
 
 describe("search functions", () => {
+  let sandbox
+
+  beforeEach(() => {
+    sandbox = sinon.createSandbox()
+  })
+
+  afterEach(() => {
+    sandbox.restore()
+  })
+
   it("converts a comment search result to a comment", () => {
     const result = makeCommentResult()
     const comment = searchResultToComment(result)
@@ -83,6 +97,214 @@ describe("search functions", () => {
       profile_image_medium: result.author_avatar_medium,
       profile_image_small:  result.author_avatar_small,
       username:             result.author_id
+    })
+  })
+
+  describe("buildSearchQuery", () => {
+    it("builds a search query with empty values", () => {
+      assert.deepEqual(buildSearchQuery({}), {
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "comment" } }]
+                    }
+                  }
+                }
+              },
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "post" } }]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      })
+    })
+
+    it("filters on object type", () => {
+      assert.deepEqual(buildSearchQuery({ type: "xyz" }), {
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "xyz" } }]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      })
+    })
+
+    it("paginates with from", () => {
+      assert.deepEqual(buildSearchQuery({ from: 0 }), {
+        from:  0,
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "comment" } }]
+                    }
+                  }
+                }
+              },
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "post" } }]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      })
+    })
+
+    it("paginates with size", () => {
+      assert.deepEqual(buildSearchQuery({ size: 4 }), {
+        size:  4,
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "comment" } }]
+                    }
+                  }
+                }
+              },
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "post" } }]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      })
+    })
+
+    it("filters by channelName", () => {
+      const fieldName = "chan_field"
+      const stub = sandbox.stub(searchFuncs, "channelField").returns(fieldName)
+      const type = "a_type"
+      const channelName = "a_channel"
+      assert.deepEqual(buildSearchQuery({ type, channelName }), {
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [
+                        {
+                          term: {
+                            object_type: type
+                          }
+                        },
+                        {
+                          term: {
+                            [fieldName]: channelName
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      })
+      sinon.assert.calledWith(stub, type)
+    })
+
+    it("filters by text", () => {
+      const fieldNames = ["field1", "field2", "field3"]
+      const stub = sandbox.stub(searchFuncs, "searchFields").returns(fieldNames)
+      const type = "a_type"
+      const text = "some text here"
+      assert.deepEqual(buildSearchQuery({ type, text }), {
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [
+                        {
+                          term: {
+                            object_type: type
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  must: {
+                    multi_match: {
+                      fields: fieldNames,
+                      query:  text
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      })
+      sinon.assert.calledWith(stub, type)
+    })
+  })
+
+  describe("channelField", () => {
+    [
+      ["post", "channel_name"],
+      ["comment", "channel_name"],
+      ["profile", "author_channel_membership"]
+    ].forEach(([type, field]) => {
+      it(`has the right channelField for ${type}`, () => {
+        assert.equal(channelField(type), field)
+      })
+    })
+  })
+
+  describe("searchFields", () => {
+    [
+      ["post", ["text", "post_title"]],
+      ["comment", ["text"]],
+      ["profile", ["author_headline", "author_bio"]]
+    ].forEach(([type, fields]) => {
+      it(`has the right searchFields for ${type}`, () => {
+        assert.deepEqual(searchFields(type), fields)
+      })
     })
   })
 })

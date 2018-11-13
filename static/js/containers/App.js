@@ -9,6 +9,7 @@ import qs from "query-string"
 import HomePage from "./HomePage"
 import ChannelPage from "./ChannelPage"
 import PostPage from "./PostPage"
+import SearchPage from "./SearchPage"
 import ContentPolicyPage from "./policies/ContentPolicyPage"
 import PrivacyPolicyPage from "./policies/PrivacyPolicyPage"
 import TermsOfServicePage from "./policies/TermsOfServicePage"
@@ -188,11 +189,19 @@ class App extends React.Component<AppProps> {
             path={`${match.url}c/:channelName`}
             component={ChannelPage}
           />
-          <Route
-            exact
-            path={`${match.url}c/:channelName/:postID/:postSlug?`}
-            component={PostPage}
-          />
+          <Switch>
+            {SETTINGS.allow_search ? (
+              <Route
+                path={`${match.url}c/:channelName/search/`}
+                component={SearchPage}
+              />
+            ) : null}
+            <Route
+              exact
+              path={`${match.url}c/:channelName/:postID/:postSlug?`}
+              component={PostPage}
+            />
+          </Switch>
           <Route
             exact
             path={`${

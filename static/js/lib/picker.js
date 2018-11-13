@@ -48,8 +48,7 @@ export const VALID_SEARCH_FILTER_TYPES = [
 export const VALID_SEARCH_FILTER_LABELS = [
   [SEARCH_FILTER_ALL, "All"],
   [SEARCH_FILTER_POST, "Post"],
-  [SEARCH_FILTER_COMMENT, "Comment"],
-  [SEARCH_FILTER_PROFILE, "Profile"]
+  [SEARCH_FILTER_COMMENT, "Comment"]
 ]
 
 const updatePickerParam = R.curry(

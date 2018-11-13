@@ -23,6 +23,7 @@ const SearchTextbox = ({ onChange, onClear, onSubmit, value }: Props) => (
       className="underlined"
       value={value}
       onChange={onChange}
+      onKeyDown={event => (event.key === "Enter" ? onSubmit(event) : null)}
     />
   </div>
 )

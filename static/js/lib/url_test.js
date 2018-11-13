@@ -23,7 +23,8 @@ import {
   blankThumbnailUrl,
   embedlyResizeImage,
   absolutizeURL,
-  getNextParam
+  getNextParam,
+  channelSearchURL
 } from "./url"
 import { makePost } from "../factories/posts"
 
@@ -269,6 +270,13 @@ describe("url helper functions", () => {
     it("should return the next param when present", () => {
       const next = "/next/url"
       assert.equal(getNextParam(`?next=${encodeURIComponent(next)}`), next)
+    })
+  })
+
+  describe("search", () => {
+    it("should return the channel search URL", () => {
+      const channelName = "name"
+      assert.equal(channelSearchURL(channelName), `/c/${channelName}/search/`)
     })
   })
 })

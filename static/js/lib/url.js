@@ -39,6 +39,9 @@ export const commentPermalink = R.curry(
     `${postDetailURL(channelName, postID, postSlug)}/comment/${commentID}/`
 )
 
+export const channelSearchURL = (channelName: string) =>
+  `/c/${channelName}/search/`
+
 export const blankThumbnailUrl = () =>
   new URL("/static/images/blank.png", window.location.origin).toString()
 

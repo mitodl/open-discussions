@@ -56,7 +56,7 @@ const AnimatedEmptyPost = (i: number) => {
   )
 }
 
-const PostLoading = () => (
+export const PostLoading = () => (
   <React.Fragment>
     <div className="post-list-title">
       <ContentLoader

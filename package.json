@@ -38,6 +38,7 @@
     "babel-loader": "^8.0.0",
     "babel-plugin-istanbul": "^4.1.6",
     "blueimp-canvas-to-blob": "^3.14.0",
+    "bodybuilder": "^2.2.15",
     "casual-browserify": "^1.5.12",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
