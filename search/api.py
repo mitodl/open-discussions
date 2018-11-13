@@ -79,6 +79,7 @@ def is_reddit_object_removed(reddit_obj):
     return bool(reddit_obj.banned_by) and not reddit_obj.approved_by
 
 
+# pylint: disable=invalid-unary-operand-type
 def execute_search(*, user, query):
     """
     Execute a search based on the query
@@ -100,9 +101,7 @@ def execute_search(*, user, query):
         .values_list("channel__name", flat=True)
         .distinct()
     )
-    channels_filter = Q(
-        "terms", channel_name=channel_names
-    ) | ~Q(  # pylint: disable=invalid-unary-operator-type
+    channels_filter = Q("terms", channel_name=channel_names) | ~Q(
         "terms", object_type=[COMMENT_TYPE, POST_TYPE]
     )
     search = search.filter(channels_filter)
