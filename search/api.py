@@ -1,7 +1,13 @@
 """API for general search-related functionality"""
 from elasticsearch_dsl import Q, Search
 
-from channels.constants import POST_TYPE, COMMENT_TYPE
+from channels.constants import (
+    COMMENT_TYPE,
+    POST_TYPE,
+    ROLE_CONTRIBUTORS,
+    ROLE_MODERATORS,
+)
+from channels.models import ChannelGroupRole
 from search.connection import get_conn, get_default_alias_name
 from search.constants import ALIAS_ALL_INDICES
 
@@ -84,14 +90,18 @@ def execute_search(*, user, query):
     Returns:
         dict: The Elasticsearch response dict
     """
-    from channels.api import Api
-
     index = get_default_alias_name(ALIAS_ALL_INDICES)
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
-    channel_names = [channel.display_name for channel in Api(user).list_channels()]
-    channels_filter = Q("terms", author_channel_membership=channel_names) | Q(
-        "terms", channel_name=channel_names
+    channel_names = list(
+        ChannelGroupRole.objects.filter(
+            group__user=user, role__in=(ROLE_CONTRIBUTORS, ROLE_MODERATORS)
+        )
+        .values_list("channel__name", flat=True)
+        .distinct()
+    )
+    channels_filter = Q("terms", channel_name=channel_names) | ~Q(
+        "terms", object_type=(COMMENT_TYPE, POST_TYPE)
     )
     search = search.filter(channels_filter)
     return search.execute().to_dict()
