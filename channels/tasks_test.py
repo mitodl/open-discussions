@@ -1,12 +1,14 @@
 """Tasks tests"""
 import pytest
 from praw.models import Redditor
+from prawcore.exceptions import ResponseException
 
 from channels import tasks
 from channels.api import get_role_model
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel, ChannelSubscription
 from open_discussions.factories import UserFactory
+from search.exceptions import PopulateUserRolesException
 
 pytestmark = pytest.mark.django_db
 
@@ -125,3 +127,33 @@ def test_populate_user_roles(
             assert (
                 get_role_model(channel, ROLE_CONTRIBUTORS).group in user.groups.all()
             ) is is_contributor
+
+
+@pytest.mark.parametrize("is_error_moderator", [True, False])
+def test_populate_user_roles_error(
+    mocker, is_error_moderator, channels_and_users, settings
+):
+    """populate_user_roles should raise a PopulateUserRolesException if there is a ResponseException error"""
+    channels, users = channels_and_users
+    settings.INDEXING_API_USERNAME = users[0].username
+    client_mock = mocker.patch("channels.tasks.Api", autospec=True)
+    redditors = []
+    for user in users:
+        redditor = mocker.Mock(spec=Redditor)
+        redditor.name = user.username
+        redditors.append(redditor)
+
+    client_mock.return_value.list_moderators.return_value = []
+    client_mock.return_value.list_contributors.return_value = []
+
+    if is_error_moderator:
+        client_mock.return_value.list_moderators.side_effect = ResponseException(
+            mocker.Mock()
+        )
+    else:
+        client_mock.return_value.list_contributors.side_effect = ResponseException(
+            mocker.Mock()
+        )
+
+    with pytest.raises(PopulateUserRolesException):
+        tasks.populate_user_roles.delay([channel.id for channel in channels])
