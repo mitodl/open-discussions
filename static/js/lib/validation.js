@@ -86,6 +86,14 @@ export const validatePostCreateForm = validate([
     R.lensPath(["value", "title"]),
     "Title length is limited to 300 characters"
   ),
+  validation(
+    R.compose(
+      R.gt(R.__, 40000),
+      R.length
+    ),
+    R.lensPath(["value", "text"]),
+    "This post is too long. Please reduce the length and try again."
+  ),
   validation(emptyOrNil, R.lensPath(["value", "title"]), "Title is required"),
   postURLValidation
 ])

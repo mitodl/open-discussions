@@ -121,6 +121,21 @@ describe("validation library", () => {
       assert.deepEqual(validatePostCreateForm(post), {})
     })
 
+    it("should complain about a super long text on a text post", () => {
+      const post = {
+        value: {
+          postType: LINK_TYPE_TEXT,
+          title:    "potato",
+          text:     R.repeat("a", 40001).join("")
+        }
+      }
+      assert.deepEqual(validatePostCreateForm(post), {
+        value: {
+          text: "This post is too long. Please reduce the length and try again."
+        }
+      })
+    })
+
     it("should complain about no url on a url post", () => {
       const post = { value: { postType: LINK_TYPE_LINK, title: "potato" } }
       assert.deepEqual(validatePostCreateForm(post), {
