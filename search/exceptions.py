@@ -7,3 +7,7 @@ class RetryException(Exception):
 
 class ReindexException(Exception):
     """An error during reindexing"""
+
+
+class PopulateUserRolesException(Exception):
+    """An error during populating user roles"""

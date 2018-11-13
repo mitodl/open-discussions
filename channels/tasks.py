@@ -1,9 +1,11 @@
 """Channels tasks"""
 import logging
+import traceback
 
 import celery
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from prawcore.exceptions import ResponseException
 
 from channels import api
 from channels.api import Api, sync_channel_subscription_model, add_user_role
@@ -11,7 +13,7 @@ from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel
 from open_discussions.celery import app
 from open_discussions.utils import chunks
-from search.exceptions import RetryException
+from search.exceptions import PopulateUserRolesException, RetryException
 
 User = get_user_model()
 log = logging.getLogger()
@@ -116,15 +118,23 @@ def populate_user_roles(channel_ids):
         channel_ids(list of int): List of channel ids
     """
     client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
+
     for channel in Channel.objects.filter(id__in=channel_ids):
-        for moderator in client.list_moderators(channel.name):
-            user = User.objects.filter(username=moderator.name).first()
-            if user:
-                add_user_role(channel.name, ROLE_MODERATORS, user)
-        for contributor in client.list_contributors(channel.name):
-            user = User.objects.filter(username=contributor.name).first()
-            if user:
-                add_user_role(channel.name, ROLE_CONTRIBUTORS, user)
+        try:
+            for moderator in client.list_moderators(channel.name):
+                user = User.objects.filter(username=moderator.name).first()
+                if user:
+                    add_user_role(channel.name, ROLE_MODERATORS, user)
+            for contributor in client.list_contributors(channel.name):
+                user = User.objects.filter(username=contributor.name).first()
+                if user:
+                    add_user_role(channel.name, ROLE_CONTRIBUTORS, user)
+        except ResponseException:
+            # This could mean the indexing user cannot access a channel, which is a bug.
+            # We need to raise a different exception here because celery doesn't handle PRAW exceptions correctly.
+            raise PopulateUserRolesException(
+                f"ResponseException received for channel {channel}: {traceback.format_exc()}"
+            )
 
 
 @app.task(bind=True)
