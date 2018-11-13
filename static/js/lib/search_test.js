@@ -8,7 +8,7 @@ import {
 } from "../factories/search"
 import {
   buildSearchQuery,
-  channelFields,
+  channelField,
   searchFields,
   searchResultToComment,
   searchResultToPost,
@@ -105,11 +105,26 @@ describe("search functions", () => {
       assert.deepEqual(buildSearchQuery({}), {
         query: {
           bool: {
-            filter: {
-              terms: {
-                object_type: ["comment", "post"]
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "comment" } }]
+                    }
+                  }
+                }
+              },
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "post" } }]
+                    }
+                  }
+                }
               }
-            }
+            ]
           }
         }
       })
@@ -119,11 +134,17 @@ describe("search functions", () => {
       assert.deepEqual(buildSearchQuery({ type: "xyz" }), {
         query: {
           bool: {
-            filter: {
-              term: {
-                object_type: "xyz"
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "xyz" } }]
+                    }
+                  }
+                }
               }
-            }
+            ]
           }
         }
       })
@@ -134,11 +155,26 @@ describe("search functions", () => {
         from:  0,
         query: {
           bool: {
-            filter: {
-              terms: {
-                object_type: ["comment", "post"]
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "comment" } }]
+                    }
+                  }
+                }
+              },
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "post" } }]
+                    }
+                  }
+                }
               }
-            }
+            ]
           }
         }
       })
@@ -149,40 +185,61 @@ describe("search functions", () => {
         size:  4,
         query: {
           bool: {
-            filter: {
-              terms: {
-                object_type: ["comment", "post"]
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "comment" } }]
+                    }
+                  }
+                }
+              },
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [{ term: { object_type: "post" } }]
+                    }
+                  }
+                }
               }
-            }
+            ]
           }
         }
       })
     })
 
     it("filters by channelName", () => {
-      const fieldNames = ["chan1", "chan2", "chan3"]
-      const stub = sandbox
-        .stub(searchFuncs, "channelFields")
-        .returns(fieldNames)
+      const fieldName = "chan_field"
+      const stub = sandbox.stub(searchFuncs, "channelField").returns(fieldName)
       const type = "a_type"
       const channelName = "a_channel"
       assert.deepEqual(buildSearchQuery({ type, channelName }), {
         query: {
           bool: {
-            filter: {
-              bool: {
-                must: {
-                  term: {
-                    object_type: type
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [
+                        {
+                          term: {
+                            object_type: type
+                          }
+                        },
+                        {
+                          term: {
+                            [fieldName]: channelName
+                          }
+                        }
+                      ]
+                    }
                   }
-                },
-                should: fieldNames.map(fieldName => ({
-                  term: {
-                    [fieldName]: channelName
-                  }
-                }))
+                }
               }
-            }
+            ]
           }
         }
       })
@@ -197,17 +254,29 @@ describe("search functions", () => {
       assert.deepEqual(buildSearchQuery({ type, text }), {
         query: {
           bool: {
-            filter: {
-              term: {
-                object_type: type
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [
+                        {
+                          term: {
+                            object_type: type
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  must: {
+                    multi_match: {
+                      fields: fieldNames,
+                      query:  text
+                    }
+                  }
+                }
               }
-            },
-            must: {
-              multi_match: {
-                fields: fieldNames,
-                query:  text
-              }
-            }
+            ]
           }
         }
       })
@@ -215,17 +284,14 @@ describe("search functions", () => {
     })
   })
 
-  describe("channelFields", () => {
+  describe("channelField", () => {
     [
-      [
-        "post",
-        ["channel_name"],
-        ["comment", ["channel_name"]],
-        ["profile", "author_channel_membership"]
-      ]
-    ].forEach(([type, fields]) => {
-      it(`has the right channelFields for ${type}`, () => {
-        assert.deepEqual(channelFields(type), fields)
+      ["post", "channel_name"],
+      ["comment", "channel_name"],
+      ["profile", "author_channel_membership"]
+    ].forEach(([type, field]) => {
+      it(`has the right channelField for ${type}`, () => {
+        assert.equal(channelField(type), field)
       })
     })
   })

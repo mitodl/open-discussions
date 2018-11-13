@@ -94,26 +94,22 @@ const _searchFields = (type: ?string) => {
 export { _searchFields as searchFields }
 import { searchFields } from "./search"
 
-const POST_CHANNEL_FIELDS = ["channel_name"]
-const COMMENT_CHANNEL_FIELDS = ["channel_name"]
-const PROFILE_CHANNEL_FIELDS = ["author_channel_membership"]
-const _channelFields = (type: ?string) => {
+const POST_CHANNEL_FIELD = "channel_name"
+const COMMENT_CHANNEL_FIELD = "channel_name"
+const PROFILE_CHANNEL_FIELD = "author_channel_membership"
+const _channelField = (type: ?string) => {
   if (type === "post") {
-    return POST_CHANNEL_FIELDS
+    return POST_CHANNEL_FIELD
   } else if (type === "comment") {
-    return COMMENT_CHANNEL_FIELDS
+    return COMMENT_CHANNEL_FIELD
   } else if (type === "profile") {
-    return PROFILE_CHANNEL_FIELDS
+    return PROFILE_CHANNEL_FIELD
   } else {
-    return R.uniq([
-      ...POST_CHANNEL_FIELDS,
-      ...COMMENT_CHANNEL_FIELDS,
-      ...PROFILE_CHANNEL_FIELDS
-    ])
+    throw new Error("Missing type")
   }
 }
-export { _channelFields as channelFields }
-import { channelFields } from "./search"
+export { _channelField as channelField }
+import { channelField } from "./search"
 
 export const buildSearchQuery = ({
   text,
@@ -123,28 +119,53 @@ export const buildSearchQuery = ({
   size
 }: SearchParams): Object => {
   let builder = bodybuilder()
-  if (type) {
-    builder = builder.filter("term", "object_type", type)
-  } else {
-    // TEMPORARY: prevent search filter on profile. If type is present we will rely on UI to not show profile option
-    builder = builder.filter("terms", "object_type", ["comment", "post"])
-  }
+
   if (!R.isNil(from)) {
     builder = builder.from(from)
   }
   if (!R.isNil(size)) {
     builder = builder.size(size)
   }
-  if (channelName) {
-    const fields = channelFields(type)
-    for (const field of fields) {
-      builder = builder.orFilter("term", field, channelName)
-    }
-  }
-  if (text) {
-    const fields = searchFields(type)
-    builder = builder.query("multi_match", "fields", fields, {
-      query: text
+  // Temporary: no "profile" in whole list
+  const types = type ? [type] : ["comment", "post"]
+  for (const type of types) {
+    // One of the text fields must match
+    const matchQuery = text
+      ? {
+        must: {
+          multi_match: {
+            query:  text,
+            fields: searchFields(type)
+          }
+        }
+      }
+      : {}
+
+    // If channelName is present add a filter for the type
+    const channelClauses = channelName
+      ? [
+        {
+          term: {
+            [channelField(type)]: channelName
+          }
+        }
+      ]
+      : []
+
+    builder = builder.orQuery("bool", {
+      filter: {
+        bool: {
+          must: [
+            {
+              term: {
+                object_type: type
+              }
+            },
+            ...channelClauses
+          ]
+        }
+      },
+      ...matchQuery
     })
   }
   return builder.build()
