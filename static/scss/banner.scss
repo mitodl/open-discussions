@@ -15,6 +15,7 @@
   background-color: $message-component-bg-color;
   text-align: center;
   color: #ffffff;
+  z-index: 15;
 
   &.banner--active {
     top: $toolbar-height-desktop;

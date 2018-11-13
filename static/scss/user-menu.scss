@@ -8,6 +8,10 @@
     height: 30px;
   }
 
+  .dropdown-menu {
+    z-index: 20;
+  }
+
   i {
     color: black;
     position: absolute;
