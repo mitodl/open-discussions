@@ -2,6 +2,8 @@
 from elasticsearch_dsl import Q, Search
 
 from channels.constants import (
+    CHANNEL_TYPE_PUBLIC,
+    CHANNEL_TYPE_RESTRICTED,
     COMMENT_TYPE,
     POST_TYPE,
     ROLE_CONTRIBUTORS,
@@ -94,15 +96,24 @@ def execute_search(*, user, query):
     index = get_default_alias_name(ALIAS_ALL_INDICES)
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
-    channel_names = list(
-        ChannelGroupRole.objects.filter(
-            group__user=user, role__in=(ROLE_CONTRIBUTORS, ROLE_MODERATORS)
+    channel_names = (
+        list(
+            ChannelGroupRole.objects.filter(
+                group__user=user, role__in=(ROLE_CONTRIBUTORS, ROLE_MODERATORS)
+            )
+            .values_list("channel__name", flat=True)
+            .distinct()
         )
-        .values_list("channel__name", flat=True)
-        .distinct()
+        if not user.is_anonymous
+        else []
     )
-    channels_filter = Q("terms", channel_name=channel_names) | ~Q(
-        "terms", object_type=[COMMENT_TYPE, POST_TYPE]
-    )
+
+    channels_filter = Q(
+        "terms", channel_type=[CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED]
+    ) | ~Q("terms", object_type=[COMMENT_TYPE, POST_TYPE])
+
+    if channel_names:
+        channels_filter = channels_filter | Q("terms", channel_name=channel_names)
+
     search = search.filter(channels_filter)
     return search.execute().to_dict()

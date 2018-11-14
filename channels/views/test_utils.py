@@ -33,6 +33,7 @@ def default_post_response_data(channel, post, user):
         "num_comments": 0,
         "channel_name": channel.name,
         "channel_title": channel.title,
+        "channel_type": channel.channel_type,
         "profile_image": image_uri(user.profile),
         "author_name": user.profile.name,
         "author_headline": user.profile.headline,

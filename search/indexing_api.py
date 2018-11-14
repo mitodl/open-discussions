@@ -59,6 +59,7 @@ CONTENT_OBJECT_TYPE = {
     **BASE_OBJECT_TYPE,
     "channel_name": {"type": "keyword"},
     "channel_title": {"type": "text"},
+    "channel_type": {"type": "keyword"},
     "text": {"type": "text"},
     "score": {"type": "long"},
     "post_id": {"type": "keyword"},

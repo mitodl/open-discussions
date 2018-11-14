@@ -269,6 +269,7 @@ class BasePostSerializer(RedditObjectSerializer):
     num_comments = serializers.IntegerField(read_only=True)
     channel_name = serializers.SerializerMethodField()
     channel_title = serializers.SerializerMethodField()
+    channel_type = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
     author_headline = serializers.SerializerMethodField()
@@ -334,6 +335,10 @@ class BasePostSerializer(RedditObjectSerializer):
     def get_channel_title(self, instance):
         """The title of the channel"""
         return instance.subreddit.title
+
+    def get_channel_type(self, instance):
+        """The type of the channel"""
+        return instance.subreddit.subreddit_type
 
     def get_edited(self, instance):
         """Return a Boolean signifying if the post has been edited or not"""
