@@ -9,6 +9,10 @@
     flex-grow: 0;
     align-self: flex-start;
 
+    @include breakpoint(phone) {
+      display: none;
+    }
+
     img {
       width: 67px;
       height: 67px;
@@ -28,6 +32,10 @@
     flex-wrap: wrap;
     flex-grow: 1;
     padding-left: 15px;
+
+    @include breakpoint(phone) {
+      padding-left: 0;
+    }
 
     .text-col {
       flex-shrink: 1;
