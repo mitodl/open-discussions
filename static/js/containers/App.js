@@ -66,7 +66,7 @@ type AppProps = {
   banner: BannerState,
   dispatch: Dispatch<*>,
   showUserMenu: boolean,
-  profile: Profile
+  profile: ?Profile
 }
 
 class App extends React.Component<AppProps> {

@@ -3,6 +3,8 @@
 import React from "react"
 import onClickOutside from "react-onclickoutside"
 
+import { spaceSeparated } from "../lib/util"
+
 type DropdownMenuProps = {
   closeMenu: Function,
   children: any,
@@ -29,14 +31,13 @@ export class _DropdownMenu extends React.Component<DropdownMenuProps> {
     )
   }
 
-  className = () => {
-    const { className } = this.props
-    return className ? `dropdown-menu ${className}` : "dropdown-menu"
-  }
-
   render() {
+    const { className } = this.props
+
     return (
-      <ul className={this.className()}>{this.setClickHandlersOnChildren()}</ul>
+      <ul className={spaceSeparated(["dropdown-menu", className])}>
+        {this.setClickHandlersOnChildren()}
+      </ul>
     )
   }
 }

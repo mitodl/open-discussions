@@ -20,7 +20,7 @@ type ImageSize =
 
 type Props = {
   imageSize: ImageSize,
-  profile: Profile,
+  profile: ?Profile,
   userName?: ?string,
   editable: boolean,
   getProfile: (username: string) => Promise<*>,

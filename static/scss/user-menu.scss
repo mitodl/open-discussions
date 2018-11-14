@@ -1,13 +1,23 @@
 .user-menu {
   position: relative;
   cursor: pointer;
-  margin-right: 30px;
+  margin-right: $icon-padding-left;
+
+  .avatar .profile-image {
+    width: 30px;
+    height: 30px;
+  }
 
   i {
     color: black;
     position: absolute;
-    top: 28px;
-    right: -6px;
+    top: 14px;
+    right: -8px;
+  }
+
+  .user-menu-dropdown {
+    top: 31px;
+    right: 0;
   }
 
   .profile-incomplete {

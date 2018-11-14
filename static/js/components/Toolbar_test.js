@@ -8,7 +8,6 @@ import { shallow } from "enzyme"
 import Toolbar from "./Toolbar"
 
 import { makeProfile } from "../factories/profiles"
-import { shouldIf } from "../lib/test_utils"
 
 describe("Toolbar", () => {
   let toggleShowDrawerStub, sandbox
@@ -43,36 +42,11 @@ describe("Toolbar", () => {
     assert.ok(toggleShowDrawerStub.called)
   })
 
-  //
-  ;[true, false].forEach(isLoggedIn => {
-    it(`should ${isLoggedIn ? "" : "not"} display UserMenu if user is logged ${
-      isLoggedIn ? "in" : "out"
-    }`, () => {
-      SETTINGS.username = isLoggedIn ? "username" : null
-      assert.equal(
-        renderToolbar()
-          .find("UserMenu")
-          .exists(),
-        isLoggedIn
-      )
-    })
+  it("should include UserMenu", () => {
+    assert.isTrue(
+      renderToolbar()
+        .find("UserMenu")
+        .exists()
+    )
   })
-
-  //
-  ;[[true, "enabled"], [false, "disabled"]].forEach(
-    ([isEmailEnabled, desc]) => {
-      it(`${shouldIf(
-        isEmailEnabled
-      )} display login button if allow_email_auth is ${desc}`, () => {
-        SETTINGS.username = null
-        SETTINGS.allow_email_auth = isEmailEnabled
-        assert.equal(
-          renderToolbar()
-            .find("Link")
-            .exists(),
-          isEmailEnabled
-        )
-      })
-    }
-  )
 })

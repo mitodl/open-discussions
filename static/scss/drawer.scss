@@ -159,18 +159,4 @@ $footer-height: 132px;
   flex-direction: row;
   align-items: center;
   height: 60px;
-
-  a {
-    @include breakpoint(materialmobile) {
-      padding-left: 15px;
-    }
-  }
-
-  a.material-icons {
-    color: $navy;
-  }
-
-  .mitlogo {
-    margin-top: 4px;
-  }
 }

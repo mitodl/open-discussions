@@ -1,16 +1,22 @@
 // @flow
 /* global SETTINGS:false */
+import React from "react"
 import { assert } from "chai"
 import sinon from "sinon"
+import { shallow } from "enzyme"
 import { Link } from "react-router-dom"
 
-import UserMenu, { DropDownArrow, DropUpArrow } from "./UserMenu"
-import DropdownMenu from "./DropdownMenu"
+import UserMenu, {
+  DropDownArrow,
+  DropUpArrow,
+  LoggedInMenu,
+  LoggedOutMenu
+} from "./UserMenu"
 
-import { profileURL, SETTINGS_URL } from "../lib/url"
+import { profileURL, SETTINGS_URL, LOGIN_URL, REGISTER_URL } from "../lib/url"
 import * as utilFuncs from "../lib/util"
 import { defaultProfileImageUrl } from "../lib/util"
-import { configureShallowRenderer } from "../lib/test_utils"
+import { configureShallowRenderer, shouldIf } from "../lib/test_utils"
 
 describe("UserMenu", () => {
   let toggleShowUserMenuStub, showUserMenu, profile, sandbox, renderUserMenu
@@ -52,13 +58,6 @@ describe("UserMenu", () => {
     assert.isOk(toggleShowUserMenuStub.called)
   })
 
-  it("should render the dropdown if showUserMenu", () => {
-    [true, false].forEach(showUserMenu => {
-      const wrapper = renderUserMenu({ showUserMenu })
-      assert.equal(showUserMenu, wrapper.find(DropdownMenu).exists())
-    })
-  })
-
   it("should show a drop-down or -up menu, depending on showUserMenu", () => {
     [true, false].forEach(showUserMenu => {
       const wrapper = renderUserMenu({ showUserMenu })
@@ -74,9 +73,9 @@ describe("UserMenu", () => {
     [false, true, false],
     [false, false, false]
   ].forEach(([featureFlagEnabled, complete, shouldShowDot]) => {
-    it(`should ${
-      shouldShowDot ? "" : "not "
-    }include a red dot since the feature flag is ${
+    it(`${shouldIf(
+      shouldShowDot
+    )} include a red dot since the feature flag is ${
       featureFlagEnabled ? "enabled" : "disabled"
     } and the profile is
       ${complete ? "complete" : "incomplete"}`, () => {
@@ -95,47 +94,79 @@ describe("UserMenu", () => {
     assert.isNotOk(wrapper.find(".profile-incomplete").exists())
   })
 
-  //
-  ;[true, false].forEach(uiEnabled => {
-    it(`dropdown menu should ${
-      uiEnabled ? "" : "not"
-    } include a profile link if profile UI ${
-      uiEnabled ? "" : "not"
-    } enabled`, async () => {
-      SETTINGS.profile_ui_enabled = uiEnabled
-      SETTINGS.username = profile.username
-      const wrapper = renderUserMenu({ showUserMenu: true })
-      assert.equal(
-        wrapper
-          .find("Link")
-          .at(1)
-          .exists(),
+  it("should render the dropdown if showUserMenu", () => {
+    [true, false].forEach(showUserMenu => {
+      const wrapper = renderUserMenu({ showUserMenu })
+      assert.equal(showUserMenu, wrapper.find(LoggedInMenu).exists())
+    })
+  })
+
+  it("should contain logged-in user links when profile is provided", () => {
+    const wrapper = renderUserMenu({ showUserMenu: true, profile: profile })
+    assert.isTrue(wrapper.find(LoggedInMenu).exists())
+  })
+
+  it("should contain logged-out user links when profile is null", () => {
+    const wrapper = renderUserMenu({ showUserMenu: true, profile: null })
+    assert.isTrue(wrapper.find(LoggedOutMenu).exists())
+  })
+
+  describe("menu items", () => {
+    const menuProps = { closeMenu: () => {} }
+
+    it("should include login and sign up links for logged-out users", () => {
+      const wrapper = shallow(<LoggedOutMenu {...menuProps} />)
+      const links = wrapper.find(Link)
+      const firstLinkProps = links.at(0).props()
+      assert.equal(firstLinkProps.to, LOGIN_URL)
+      assert.equal(firstLinkProps.children, "Log In")
+      const secondLinkProps = links.at(1).props()
+      assert.equal(secondLinkProps.to, REGISTER_URL)
+      assert.equal(secondLinkProps.children, "Sign Up")
+    })
+
+    it("should include settings link if non-null profile is provided", () => {
+      const wrapper = shallow(<LoggedInMenu {...menuProps} />)
+      const { to, children } = wrapper.find(Link).props()
+      assert.equal(to, SETTINGS_URL)
+      assert.equal(children, "Settings")
+    })
+
+    it("should include a logout link, if feature is enabled", () => {
+      SETTINGS.allow_email_auth = true
+      const wrapper = shallow(<LoggedInMenu {...menuProps} />)
+      const { href, children } = wrapper.find("a").props()
+      assert.equal(href, "/logout")
+      assert.equal(children, "Sign Out")
+    })
+
+    //
+    ;[true, false].forEach(uiEnabled => {
+      it(`dropdown menu ${shouldIf(
         uiEnabled
-      )
-      if (uiEnabled) {
+      )} include a profile link if profile UI ${
+        uiEnabled ? "" : "not"
+      } enabled`, async () => {
+        SETTINGS.profile_ui_enabled = uiEnabled
+        SETTINGS.username = profile.username
+        const wrapper = shallow(<LoggedInMenu {...menuProps} />)
         assert.equal(
           wrapper
             .find("Link")
             .at(1)
-            .props().to,
-          profileURL(profile.username)
+            .exists(),
+          uiEnabled
         )
-      }
+        if (uiEnabled) {
+          assert.equal(
+            wrapper
+              .find("Link")
+              .at(1)
+              .props().to,
+            profileURL(profile.username)
+          )
+        }
+      })
     })
-  })
-
-  it("dropdown menu should have a settings link", () => {
-    const wrapper = renderUserMenu({ showUserMenu: true })
-    const { to, children } = wrapper.find(Link).props()
-    assert.equal(to, SETTINGS_URL)
-    assert.equal(children, "Settings")
-  })
-
-  it("should include a logout link, if feature is enabled", () => {
-    SETTINGS.allow_email_auth = true
-    const wrapper = renderUserMenu({ showUserMenu: true })
-    const { href, children } = wrapper.find("a").props()
-    assert.equal(href, "/logout")
-    assert.equal(children, "Sign Out")
   })
 })

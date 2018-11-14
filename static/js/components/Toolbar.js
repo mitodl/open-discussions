@@ -1,29 +1,19 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import { Link } from "react-router-dom"
 import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
 
 import UserMenu from "./UserMenu"
 import HamburgerAndLogo from "../components/HamburgerAndLogo"
 
-import { LOGIN_URL } from "../lib/url"
-
 import type { Profile } from "../flow/discussionTypes"
 
 type Props = {
-  profile: Profile,
+  profile: ?Profile,
   showUserMenu: boolean,
   toggleShowDrawer: Function,
   toggleShowUserMenu: Function
 }
-
-const loginButton = () =>
-  SETTINGS.allow_email_auth ? (
-    <Link to={LOGIN_URL} className="link-button outlined login-link">
-      Log In
-    </Link>
-  ) : null
 
 export default class Toolbar extends React.Component<Props> {
   toolbarRoot: HTMLElement | null
@@ -61,15 +51,11 @@ export default class Toolbar extends React.Component<Props> {
               </span>
             </section>
             <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
-              {SETTINGS.username ? (
-                <UserMenu
-                  toggleShowUserMenu={toggleShowUserMenu}
-                  showUserMenu={showUserMenu}
-                  profile={profile}
-                />
-              ) : (
-                loginButton()
-              )}
+              <UserMenu
+                toggleShowUserMenu={toggleShowUserMenu}
+                showUserMenu={showUserMenu}
+                profile={profile}
+              />
             </section>
           </div>
         </header>

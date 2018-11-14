@@ -1,7 +1,24 @@
+$header-element-spacing: 8px;
+
 a.mitlogo {
+  color: $navy;
+  height: 25px;
+  line-height: 25px;
+
   img {
-    width: 46px;
+    width: 25px;
+    margin-left: $text-padding-left;
+
+    @include breakpoint(materialmobile) {
+      margin-left: 8px;
+    }
   }
+}
+
+.drawer-mobile-header .mdc-toolbar__icon--menu,
+.navbar .mdc-toolbar__icon--menu {
+  color: $navy;
+  padding: 0 0 0 $icon-padding-left;
 }
 
 .navbar {
@@ -27,23 +44,20 @@ a.mitlogo {
 
     .mdc-toolbar__title,
     .mdc-toolbar__title a {
-      color: #5d5d5d;
-      font-size: 1.1rem;
+      color: $navy;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    // Needed to override !important definition from MDC
+    span.mdc-toolbar__title {
+      margin-left: 8px !important;
     }
 
     .mdc-toolbar__section--align-start {
       align-items: center;
       justify-content: flex-start;
     }
-  }
-
-  .mdc-toolbar__icon--menu {
-    color: $navy;
-    padding: 0 0 0 $icon-padding-left;
-  }
-
-  a.mitlogo img {
-    margin-left: $text-padding-left;
   }
 
   .user-menu-section {

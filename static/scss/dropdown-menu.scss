@@ -1,9 +1,9 @@
 ul.dropdown-menu {
   margin: 0;
-  padding: 10px;
+  padding: 3px 10px;
   position: absolute;
-  top: 46px;
-  right: 24px;
+  top: 0;
+  right: 0;
   background-color: $card-background;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   list-style: none;
@@ -16,17 +16,17 @@ ul.dropdown-menu {
   }
 
   li {
-    margin-bottom: 14px;
+    margin-top: 7px;
+    margin-bottom: 7px;
     cursor: pointer;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
   }
 
   &.post-comment-dropdown {
-    li:not(:last-child) {
-      margin-bottom: 10px;
+    padding: 0 10px;
+
+    li {
+      margin-top: 5px;
+      margin-bottom: 5px;
     }
 
     a {
