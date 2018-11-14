@@ -502,6 +502,7 @@ class Api:
 
         channel_obj = sync_channel_model(name)
         channel_obj.membership_is_managed = membership_is_managed
+        channel_obj.channel_type = channel_type
         channel_obj.save()
 
         return channel
@@ -540,6 +541,7 @@ class Api:
             values["title"] = title
         if channel_type is not None:
             values["subreddit_type"] = channel_type
+            Channel.objects.filter(name=name).update(channel_type=channel_type)
 
         self.get_channel(name).mod.update(**values)
         return self.get_channel(name)

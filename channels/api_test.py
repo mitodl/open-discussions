@@ -183,6 +183,7 @@ def test_list_channels_user(mock_get_client):
 @pytest.mark.parametrize("channel_type", VALID_CHANNEL_TYPES)
 def test_create_channel_user(mock_get_client, indexing_decorator, channel_type):
     """Test create_channel for logged-in user"""
+    assert Channel.objects.count() == 0
     user = UserFactory.create()
     channel = api.Api(user=user).create_channel(
         "name", "Title", channel_type=channel_type
@@ -193,6 +194,9 @@ def test_create_channel_user(mock_get_client, indexing_decorator, channel_type):
         "name", title="Title", subreddit_type=channel_type, allow_top=True
     )
     assert indexing_decorator.mock_persist_func.call_count == 0
+    assert Channel.objects.count() == 1
+    channel_obj = Channel.objects.first()
+    assert channel_obj.channel_type == channel_type
 
 
 @pytest.mark.parametrize("channel_setting", api.CHANNEL_SETTINGS)
@@ -241,14 +245,19 @@ def test_create_channel_invalid_membership(mock_client):
 @pytest.mark.parametrize("channel_type", VALID_CHANNEL_TYPES)
 def test_update_channel_type(mock_client, channel_type):
     """Test create_channel for channel_type"""
+    name = "name"
+    channel_obj = Channel.objects.create(name=name)
     user = UserFactory.create()
-    channel = api.Api(user=user).update_channel("name", channel_type=channel_type)
+    channel = api.Api(user=user).update_channel(name, channel_type=channel_type)
     assert channel == mock_client.subreddit.return_value
-    mock_client.subreddit.assert_called_with("name")
+    mock_client.subreddit.assert_called_with(name)
     assert mock_client.subreddit.call_count == 2
     mock_client.subreddit.return_value.mod.update.assert_called_once_with(
         subreddit_type=channel_type
     )
+    assert list(Channel.objects.all()) == [channel_obj]
+    channel_obj.refresh_from_db()
+    assert channel_obj.channel_type == channel_type
 
 
 @pytest.mark.parametrize("channel_setting", api.CHANNEL_SETTINGS + ("title",))

@@ -115,6 +115,7 @@ class Channel(TimestampedModel):
     """
 
     name = models.CharField(unique=True, max_length=100)
+    channel_type = models.CharField(max_length=20, null=True, blank=True)
     membership_is_managed = models.BooleanField(default=False)
     avatar = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri)
     avatar_small = models.ImageField(
