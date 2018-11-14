@@ -12,7 +12,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from channels.utils import get_kind_mapping, get_reddit_slug, get_or_create_link_meta
-from channels.constants import VALID_CHANNEL_TYPES, VALID_LINK_TYPES
+from channels.constants import VALID_CHANNEL_TYPES, VALID_LINK_TYPES, ROLE_SEQ
 from channels.models import Channel, Subscription
 from open_discussions.utils import filter_dict_with_renamed_keys
 from profiles.models import Profile
@@ -748,23 +748,17 @@ class ContributorSerializer(serializers.Serializer):
 
     def get_contributor_name(self, instance):
         """Returns the name for the contributor"""
-        return instance.name
+        return instance.username
 
     def get_email(self, instance):
         """Get the email from the associated user"""
         return (
-            User.objects.filter(username=instance.name)
-            .values_list("email", flat=True)
-            .first()
+            instance.email
         )
 
     def get_full_name(self, instance):
         """Get the full name of the associated user"""
-        return (
-            Profile.objects.filter(user__username=instance.name)
-            .values_list("name", flat=True)
-            .first()
-        )
+        return instance.profile.name
 
     def validate_contributor_name(self, value):
         """Validates the contributor name"""
@@ -800,7 +794,7 @@ class ModeratorPublicSerializer(serializers.Serializer):
 
     def get_moderator_name(self, instance):
         """Returns the name for the moderator"""
-        return instance.name
+        return instance.username
 
 
 class ModeratorPrivateSerializer(serializers.Serializer):
@@ -813,29 +807,22 @@ class ModeratorPrivateSerializer(serializers.Serializer):
 
     def get_moderator_name(self, instance):
         """Returns the name for the moderator"""
-        return instance.name
+        return instance.username
 
     def get_email(self, instance):
         """Get the email from the associated user"""
-        return (
-            User.objects.filter(username=instance.name)
-            .values_list("email", flat=True)
-            .first()
-        )
+        return instance.email
 
     def get_full_name(self, instance):
         """Get the full name of the associated user"""
-        return (
-            Profile.objects.filter(user__username=instance.name)
-            .values_list("name", flat=True)
-            .first()
-        )
+        return instance.profile.name
 
     def get_can_remove(self, instance):
         """Figure out whether the logged in user can remove this moderator"""
-        if self.context["mod_date"] is None:
+        if self.context["mod_seq"] is None:
             return False
-        return int(instance.date) >= int(self.context["mod_date"])
+
+        return int(getattr(instance, ROLE_SEQ)) >= int(self.context["mod_seq"])
 
     def validate_moderator_name(self, value):
         """Validates the moderator name"""
@@ -863,9 +850,7 @@ class ModeratorPrivateSerializer(serializers.Serializer):
             raise ValueError("Missing moderator_name or email")
 
         api.add_moderator(username, channel_name)
-        return api._list_moderators(  # pylint: disable=protected-access
-            channel_name=channel_name, moderator_name=username
-        )[0]
+        return list(Channel.objects.get(name=channel_name).moderators)[-1]
 
 
 class SubscriberSerializer(serializers.Serializer):

@@ -7,7 +7,7 @@ from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models import URLField
 
-from channels.constants import ROLE_CHOICES
+from channels.constants import ROLE_CHOICES, ROLE_MODERATORS, ROLE_CONTRIBUTORS, ROLE_SEQ
 from channels.utils import AVATAR_MEDIUM_MAX_DIMENSION, AVATAR_SMALL_MAX_DIMENSION
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
@@ -146,6 +146,45 @@ class Channel(TimestampedModel):
                 self.avatar_medium = None
 
         return super().save(*args, **kwargs)
+
+    @property
+    def moderators(self):
+        """
+        Retrieve channel moderators
+
+        Returns:
+            iterable of User: users who are channel moderators
+
+        """
+        return ChannelGroupRole.objects.get(
+            channel=self, role=ROLE_MODERATORS
+        ).group.user_set.extra(select={ROLE_SEQ: 'auth_user_groups.id'}).order_by(ROLE_SEQ).iterator()
+
+    @property
+    def contributors(self):
+        """
+        Retrieve channel contributors
+
+        Returns:
+            iterable of User: users who are channel contributors
+
+        """
+        return ChannelGroupRole.objects.get(
+            channel=self, role=ROLE_CONTRIBUTORS
+        ).group.user_set.order_by('auth_user_groups.id').iterator()
+
+    @property
+    def subscribers(self):
+        """
+        Retrieve channel subscribers
+
+        Returns:
+            iterable of User: users who are channel subscribers
+
+        """
+        return User.objects.filter(
+            id__in=ChannelSubscription.objects.filter(channel=self).values_list("user", flat=True)
+        ).iterator()
 
     def __str__(self):
         return f"{self.name}"

@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from channels.api import Api
+from channels.constants import ROLE_SEQ
+from channels.models import Channel
 from channels.serializers import ModeratorPrivateSerializer, ModeratorPublicSerializer
 from channels.utils import translate_praw_exceptions
 from open_discussions.permissions import (
@@ -37,29 +39,24 @@ class ModeratorListView(ListCreateAPIView):
         """Context for the request and view"""
         channel_api = self.request.channel_api
         channel_name = self.kwargs["channel_name"]
-        mods = list(
-            channel_api._list_moderators(  # pylint: disable=protected-access
-                channel_name=channel_name, moderator_name=channel_api.user.username
-            )
-        )
-        if mods:
-            user_mod_date = mods[0].date
+        mods = list(Channel.objects.get(name=channel_name).moderators)
+        if mods and self.request.user in mods:
+            user_mod_seq = getattr(mods[mods.index(self.request.user)], ROLE_SEQ)
         else:
-            user_mod_date = None
+            user_mod_seq = None
 
-        return {"channel_api": channel_api, "view": self, "mod_date": user_mod_date}
+        return {"channel_api": channel_api, "view": self, "mod_seq": user_mod_seq}
 
     def get_queryset(self):
         """Get a list of moderators for channel"""
-        api = self.request.channel_api
         channel_name = self.kwargs["channel_name"]
         return sorted(
             (
                 moderator
-                for moderator in api.list_moderators(channel_name)
-                if moderator.name != settings.INDEXING_API_USERNAME
+                for moderator in Channel.objects.get(name=channel_name).moderators
+                if moderator.username != settings.INDEXING_API_USERNAME
             ),
-            key=lambda moderator: 0 if moderator.name == api.user.username else 1,
+            key=lambda moderator: 0 if moderator.username == self.request.user.username else 1
         )
 
 
