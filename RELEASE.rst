@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.53.1
+--------------
+
+- remove micromasters references from mail header (#1473)
+- Fix stacking issue with z-index banner and compact post buttons
+- Updated mobile navbar and drawer header styling
+- Upgrade requests lib
+- add validation for super long text posts
+- Add page for channel search (#1422)
+
 Version 0.53.0 (Released November 14, 2018)
 --------------
 
