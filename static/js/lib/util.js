@@ -64,7 +64,7 @@ export const userIsAnonymous = () => R.isNil(SETTINGS.username)
 
 export const defaultProfileImageUrl = "/static/images/avatar_default.png"
 
-export function isProfileComplete(profile: Profile): boolean {
+export function isProfileComplete(profile: ?Profile): boolean {
   if (
     !profile ||
     (profile.name &&
@@ -112,3 +112,6 @@ export const removeTrailingSlash = (str: string) =>
 
 export const emptyOrNil = R.either(R.isEmpty, R.isNil)
 export const allEmptyOrNil = R.all(emptyOrNil)
+
+export const spaceSeparated = (strings: Array<?string>): string =>
+  strings.filter(str => str).join(" ")

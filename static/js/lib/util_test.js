@@ -14,7 +14,8 @@ import {
   truncate,
   getTokenFromUrl,
   defaultProfileImageUrl,
-  makeUUID
+  makeUUID,
+  spaceSeparated
 } from "./util"
 
 describe("utility functions", () => {
@@ -166,6 +167,19 @@ describe("utility functions", () => {
 
     it("it uhh shouldnt return the same thing twice :D", () => {
       assert.notEqual(makeUUID(10), makeUUID(10))
+    })
+  })
+
+  describe("spaceSeparated", () => {
+    it("should return a space separated string when given an array of strings or nulls", () => {
+      [
+        [["a", "b", "c"], "a b c"],
+        [[null, null], ""],
+        [[null, "a", "b"], "a b"],
+        [["a", "b", null], "a b"]
+      ].forEach(([inputArr, expectedStr]) => {
+        assert.deepEqual(spaceSeparated(inputArr), expectedStr)
+      })
     })
   })
 })
