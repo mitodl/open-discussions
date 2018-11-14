@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from channels.api import Api
+from channels.proxies import proxy_posts
 from channels.serializers import PostSerializer
 from channels.utils import (
     get_pagination_and_posts,
@@ -35,7 +36,9 @@ class FrontPageView(APIView):
         paginated_posts = api.front_page(listing_params)
         pagination, posts = get_pagination_and_posts(paginated_posts, listing_params)
         users = lookup_users_for_posts(posts)
-        posts = [post for post in posts if post.author and post.author.name in users]
+        posts = proxy_posts(
+            [post for post in posts if post.author and post.author.name in users]
+        )
         subscriptions = lookup_subscriptions_for_posts(posts, self.request.user)
 
         return Response(

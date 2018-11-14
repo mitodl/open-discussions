@@ -4,10 +4,11 @@ from uuid import uuid4
 import base36
 from django.conf import settings
 from django.contrib.auth.models import User, Group
+from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.db.models import URLField
 
-from channels.constants import ROLE_CHOICES
+
+from channels.constants import ROLE_CHOICES, VALID_EXTENDED_POST_CHOICES
 from channels.utils import AVATAR_MEDIUM_MAX_DIMENSION, AVATAR_SMALL_MAX_DIMENSION
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
@@ -156,8 +157,8 @@ class LinkMeta(TimestampedModel):
     The thumbnail embedly provides for a particular URL
     """
 
-    url = URLField(unique=True, max_length=2048)
-    thumbnail = URLField(blank=True, null=True, max_length=2048)
+    url = models.URLField(unique=True, max_length=2048)
+    thumbnail = models.URLField(blank=True, null=True, max_length=2048)
 
     def __str__(self):
         return f"{self.url} with thumbnail {self.thumbnail}"
@@ -171,9 +172,23 @@ class Post(TimestampedModel):
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     post_id = Base36IntegerField(unique=True)
     link_meta = models.ForeignKey(LinkMeta, null=True, on_delete=models.CASCADE)
+    post_type = models.CharField(
+        max_length=10, choices=VALID_EXTENDED_POST_CHOICES, null=True
+    )
 
     def __str__(self):
         return f"{self.post_id} on channel {self.channel}"
+
+
+class Article(TimestampedModel):
+    """Data for an article post_type"""
+
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    post = models.OneToOneField(Post, on_delete=models.CASCADE)
+    content = JSONField()
+
+    def __str__(self):
+        return f"{self.post.id} on channel {self.post.channel} by {self.author.profile.name}"
 
 
 class Comment(TimestampedModel):

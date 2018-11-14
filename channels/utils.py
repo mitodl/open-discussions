@@ -84,7 +84,7 @@ def get_pagination_and_posts(posts, listing_params):
         pagination["after_count"] = count + per_page
 
     # NOTE: list(posts) can return duplicates, so we use the internal listing instead
-    return pagination, list(listing)
+    return (pagination, list(listing))
 
 
 @contextmanager
@@ -260,3 +260,28 @@ def get_or_create_link_meta(url):
                 url=url, defaults={"thumbnail": response[THUMBNAIL_URL]}
             )
     return link_meta
+
+
+def get_kind_and_id(thing_id):
+    """
+    Args:
+      thing_id (str): a reddit thing id in the form t#_#+
+
+    Returns:
+        (str, str): a tuple of kind and id
+    """
+    return thing_id.split("_", 1)
+
+
+def num_items_not_none(items):
+    """
+    Returns the count of items in the list that are not None
+
+    Args:
+        items (iterable): iterable of items to check for is not None
+
+    Returns:
+        int: count of items not None
+    """
+
+    return len(list(filter(lambda val: val is not None, items)))

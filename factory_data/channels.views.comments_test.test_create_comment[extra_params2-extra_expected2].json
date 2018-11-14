@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Aliquam sapiente perferendis iure ex. Modi molestiae a a quidem veritatis nam veniam odio. Blanditiis est error nobis repudiandae amet velit.\nTemporibus dolore exercitationem laudantium est. Iste et voluptatibus occaecati itaque quasi. Labore inventore illum enim similique praesentium.\nSimilique eveniet quibusdam sit quia molestiae. Fugiat esse necessitatibus cupiditate explicabo unde ipsum quia. Magni fugiat repudiandae perspiciatis.",
+      "name": "1541520827_quibusdam",
+      "public_description": "Quae modi a labore corporis delectus sed cum.",
+      "title": "Ex nobis pariatur magni."
+    }
+  },
+  "posts": {
+    "a post": {
+      "id": "57",
+      "text": "Labore odio quam iste asperiores. Voluptatibus vero unde eaque. Illo ex quae quod repellat.",
+      "title": "Nihil aperiam quisquam sit ex."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CVMWT2630JN90E752AKY1E97"
+    },
+    "staff_user": {
+      "username": "01CVMWT5FWRKM8RMTBBB49J3RX"
+    }
+  }
+}

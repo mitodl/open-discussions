@@ -11,7 +11,7 @@ from praw.models.reddit.redditor import Redditor
 from prawcore.exceptions import ResponseException
 from rest_framework.exceptions import NotFound
 
-from channels import api, task_helpers as channels_task_helpers
+from channels import api
 from channels.constants import (
     COMMENTS_SORT_BEST,
     VALID_CHANNEL_TYPES,
@@ -20,8 +20,13 @@ from channels.constants import (
     VoteActions,
     ROLE_CONTRIBUTORS,
     ROLE_MODERATORS,
+    LINK_TYPE_LINK,
+    LINK_TYPE_SELF,
+    EXTENDED_POST_TYPE_ARTICLE,
 )
+from channels.factories import ArticleFactory
 from channels.models import (
+    Article,
     Channel,
     Comment,
     Post,
@@ -39,6 +44,31 @@ from open_discussions import features
 pytestmark = pytest.mark.django_db
 
 
+def _mock_channel(*, name, **kwargs):
+    """Create a mock channel and associated DB record"""
+    Channel.objects.get_or_create(name=name)
+    return Mock(display_name=name, **kwargs)
+
+
+def _mock_post(*, post_id, subreddit, **kwargs):
+    """Create a mock post and associated DB record"""
+    Post.objects.get_or_create(
+        post_id=post_id,
+        defaults={"channel": Channel.objects.get(name=subreddit.display_name)},
+    )
+    return Mock(id=post_id, **kwargs)
+
+
+def _mock_comment(*, comment_id, submission, subreddit, parent_id, **kwargs):
+    """Create a mock comment and associated DB record"""
+    Comment.objects.create(
+        comment_id=comment_id,
+        post=Post.objects.get(post_id=submission.id),
+        parent_id=parent_id,
+    )
+    return Mock(id=comment_id, submission=submission, subreddit=subreddit, **kwargs)
+
+
 @pytest.fixture()
 def mock_get_client(mocker):
     """Mock reddit get_client"""
@@ -46,27 +76,52 @@ def mock_get_client(mocker):
         "channels.api._get_client",
         autospec=True,
         return_value=Mock(
-            subreddit=Mock(return_value=Mock(submit=Mock(return_value=Mock(id="abc")))),
+            subreddit=Mock(
+                return_value=_mock_channel(
+                    name="channel",
+                    submit=Mock(
+                        return_value=_mock_post(
+                            post_id="abc", subreddit=_mock_channel(name="channel")
+                        )
+                    ),
+                )
+            ),
             submission=Mock(
-                return_value=Mock(
+                return_value=_mock_post(
+                    post_id="abc",
+                    subreddit=_mock_channel(name="subreddit"),
                     reply=Mock(
                         return_value=Mock(
                             id="456",
-                            submission=Mock(id="123"),
-                            subreddit=Mock(display_name="subreddit"),
+                            link_id="t3_123",
+                            submission=_mock_post(
+                                post_id="abc", subreddit=_mock_channel(name="subreddit")
+                            ),
+                            subreddit=_mock_channel(name="subreddit"),
                         )
-                    )
+                    ),
                 )
             ),
             comment=Mock(
-                return_value=Mock(
+                return_value=_mock_comment(
+                    comment_id="567",
+                    parent_id="123",
+                    link_id="t3_123",
+                    submission=_mock_post(
+                        post_id="123", subreddit=_mock_channel(name="other_subreddit")
+                    ),
+                    subreddit=_mock_channel(name="other_subreddit"),
                     reply=Mock(
                         return_value=Mock(
                             id="789",
-                            submission=Mock(id="687"),
-                            subreddit=Mock(display_name="other_subreddit"),
+                            link_id="t3_123",
+                            submission=_mock_post(
+                                post_id="123",
+                                subreddit=_mock_channel(name="other_subreddit"),
+                            ),
+                            subreddit=_mock_channel(name="other_subreddit"),
                         )
-                    )
+                    ),
                 )
             ),
         ),
@@ -277,9 +332,7 @@ def test_update_channel_membership(mock_client, membership_is_managed):
     assert mock_client.subreddit.call_count == 2
     mock_client.subreddit.return_value.mod.update.assert_called_once_with()
 
-    assert Channel.objects.count() == 1
-    channel_obj = Channel.objects.first()
-    assert channel_obj.name == name
+    channel_obj = Channel.objects.get(name=name)
     assert channel_obj.membership_is_managed is (
         membership_is_managed if membership_is_managed is not None else False
     )
@@ -309,56 +362,99 @@ def test_update_channel_invalid_membership(mock_client):
     assert mock_client.subreddit.call_count == 0
 
 
-@pytest.mark.parametrize("text", ["Text", ""])
-def test_create_post_text(mock_client, indexing_decorator, text):
+@pytest.mark.parametrize("text", ["Text", None])
+def test_create_post_text(mock_client, text):
     """Test create_post with text"""
+    channel = Channel.objects.create(name="123")
     client = api.Api(UserFactory.create())
-    post = client.create_post("channel", "Title", text=text)
+    Post.objects.filter(
+        post_id=mock_client.subreddit.return_value.submit.return_value.id
+    ).delete()  # don't want this for this test
+    post = client.create_post(channel.name, "Title", text=text)
     assert post == mock_client.subreddit.return_value.submit.return_value
-    mock_client.subreddit.assert_called_once_with("channel")
+    mock_client.subreddit.assert_called_once_with(channel.name)
     mock_client.subreddit.return_value.submit.assert_called_once_with(
-        "Title", selftext=text, url=None
+        "Title", selftext=text or "", url=None
     )
-    # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_persist_func.call_count == 2
+    assert Post.objects.filter(
+        post_id=mock_client.subreddit.return_value.submit.return_value.id
+    ).exists()
     assert (
-        search_task_helpers.index_new_post
-        in indexing_decorator.mock_persist_func.original
-    )
-    assert (
-        channels_task_helpers.sync_post_model
-        in indexing_decorator.mock_persist_func.original
+        Post.objects.get(
+            post_id=mock_client.subreddit.return_value.submit.return_value.id
+        ).post_type
+        == LINK_TYPE_SELF
     )
 
 
-def test_create_post_url(mock_client, indexing_decorator):
+def test_create_post_url(mock_client):
     """Test create_post with url"""
+    channel = Channel.objects.create(name="123")
     client = api.Api(UserFactory.create())
-    post = client.create_post("channel", "Title", url="http://google.com")
+    Post.objects.filter(
+        post_id=mock_client.subreddit.return_value.submit.return_value.id
+    ).delete()  # don't want this for this test
+    post = client.create_post(channel.name, "Title", url="http://google.com")
     assert post == mock_client.subreddit.return_value.submit.return_value
-    mock_client.subreddit.assert_called_once_with("channel")
+    mock_client.subreddit.assert_called_once_with(channel.name)
     mock_client.subreddit.return_value.submit.assert_called_once_with(
         "Title", selftext=None, url="http://google.com"
     )
-    # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_persist_func.call_count == 2
+    assert Post.objects.filter(
+        post_id=mock_client.subreddit.return_value.submit.return_value.id
+    ).exists()
     assert (
-        search_task_helpers.index_new_post
-        in indexing_decorator.mock_persist_func.original
-    )
-    assert (
-        channels_task_helpers.sync_post_model
-        in indexing_decorator.mock_persist_func.original
+        Post.objects.get(
+            post_id=mock_client.subreddit.return_value.submit.return_value.id
+        ).post_type
+        == LINK_TYPE_LINK
     )
 
 
-def test_create_post_url_and_text(mock_client):
+def test_create_post_article(mock_client):
+    """Test create_post with url"""
+    channel = Channel.objects.create(name="123")
+    client = api.Api(UserFactory.create())
+    Post.objects.filter(
+        post_id=mock_client.subreddit.return_value.submit.return_value.id
+    ).delete()  # don't want this for this test
+    post = client.create_post(channel.name, "Title", article_content=["data"])
+    assert post == mock_client.subreddit.return_value.submit.return_value
+    mock_client.subreddit.assert_called_once_with(channel.name)
+    mock_client.subreddit.return_value.submit.assert_called_once_with(
+        "Title", selftext="", url=None
+    )
+    assert Post.objects.filter(
+        post_id=mock_client.subreddit.return_value.submit.return_value.id
+    ).exists()
+    assert (
+        Post.objects.get(
+            post_id=mock_client.subreddit.return_value.submit.return_value.id
+        ).post_type
+        == EXTENDED_POST_TYPE_ARTICLE
+    )
+    assert Article.objects.filter(
+        post__post_id=mock_client.subreddit.return_value.submit.return_value.id
+    ).exists()
+    assert Article.objects.get(
+        post__post_id=mock_client.subreddit.return_value.submit.return_value.id
+    ).content == ["data"]
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"url": "http://google.com", "text": "Text"},
+        {"url": "http://google.com", "text": "Text", "article_content": []},
+        {"url": "http://google.com", "article_content": []},
+        {"text": "Text", "article_content": []},
+    ],
+)
+def test_create_post_errors(mock_client, kwargs):
     """Test create_post with url and text (or neither) raises error"""
     client = api.Api(UserFactory.create())
     with pytest.raises(ValueError):
-        client.create_post("channel", "Title", url="http://google.com", text="Text")
-    with pytest.raises(ValueError):
-        client.create_post("channel", "Title")
+        client.create_post("channel", "Title", **kwargs)
     assert mock_client.subreddit.call_count == 0
 
 
@@ -384,18 +480,20 @@ def test_list_posts_invalid_sort(mock_client):
 def test_get_post(mock_client):
     """Test get_post"""
     client = api.Api(UserFactory.create())
-    post = client.get_post("id")
-    assert post == mock_client.submission.return_value
-    mock_client.submission.assert_called_once_with(id="id")
+    post = client.get_post("abc")
+    assert post.__wrapped__ == mock_client.submission.return_value
+    assert post._post.post_id == "abc"  # pylint: disable=protected-access
+    mock_client.submission.assert_called_once_with(id="abc")
 
 
-def test_update_post_valid(mock_client, indexing_decorator):
-    """Test update_post passes"""
+def test_update_post_text(mock_client, indexing_decorator):
+    """Test update_post for text passes"""
     mock_client.submission.return_value.selftext = "text"
     client = api.Api(UserFactory.create())
-    post = client.update_post("id", "Text")
-    assert post == mock_client.submission.return_value.edit.return_value
-    mock_client.submission.assert_called_once_with(id="id")
+    post = client.update_post("abc", text="Text")
+    assert post.__wrapped__ == mock_client.submission.return_value.edit.return_value
+    assert post._post.post_id == "abc"  # pylint: disable=protected-access
+    mock_client.submission.assert_called_once_with(id="abc")
     mock_client.submission.return_value.edit.assert_called_once_with("Text")
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
@@ -405,22 +503,68 @@ def test_update_post_valid(mock_client, indexing_decorator):
     )
 
 
-def test_update_post_invalid(mock_client):
+def test_update_post_article(mock_client, indexing_decorator):
+    """Test update_post for article passes"""
+    mock_client.submission.return_value.selftext = ""
+    client = api.Api(UserFactory.create())
+    article = ArticleFactory.create(
+        post=Post.objects.get(post_id=mock_client.submission.return_value.id)
+    )
+    updated_content = [{"data": "updated"}]
+    post_id = article.post.post_id
+    post = client.update_post(post_id, article_content=updated_content)
+    assert post.__wrapped__ == mock_client.submission.return_value
+    assert post._post.post_id == post_id  # pylint: disable=protected-access
+    mock_client.submission.assert_called_once_with(id=post_id)
+    article.refresh_from_db()
+    assert article.content == updated_content
+    # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
+    assert indexing_decorator.mock_persist_func.call_count == 1
+    assert (
+        search_task_helpers.update_post_text
+        in indexing_decorator.mock_persist_func.original
+    )
+
+
+@pytest.mark.parametrize(
+    "kwargs, post_type",
+    [
+        [{"text": "abc"}, LINK_TYPE_LINK],
+        [{"article_content": ["abc"]}, LINK_TYPE_LINK],
+        [{}, LINK_TYPE_SELF],
+        [{}, EXTENDED_POST_TYPE_ARTICLE],
+        [{"article_content": ["abc"], "text": "abc"}, LINK_TYPE_SELF],
+        [{"article_content": ["abc"], "text": "abc"}, EXTENDED_POST_TYPE_ARTICLE],
+        [{}, EXTENDED_POST_TYPE_ARTICLE],
+        [{"text": "abc"}, None],
+        [{"article_content": ["abc"]}, None],
+        [{"article_content": ["abc"], "text": "abc"}, None],
+    ],
+)
+def test_update_post_invalid(mock_client, kwargs, post_type):
     """Test update_post raises error if updating a post which is not a self post"""
-    mock_client.submission.return_value.is_self = ""
+    Post.objects.filter(post_id="abc").update(post_type=post_type)
+    article = None
+    mock_client.submission.return_value.is_self = False
+    if post_type == EXTENDED_POST_TYPE_ARTICLE:
+        article = ArticleFactory.create(
+            post=Post.objects.get(post_id=mock_client.submission.return_value.id)
+        )
     client = api.Api(UserFactory.create())
     with pytest.raises(ValueError):
-        client.update_post("id", "Text")
-    mock_client.submission.assert_called_once_with(id="id")
+        client.update_post("abc", **kwargs)
     assert mock_client.submission.return_value.edit.call_count == 0
+    if "article_content" in kwargs and article is not None:
+        article.refresh_from_db()
+        assert article.content != kwargs["article_content"]
 
 
 def test_approve_post(mock_client, indexing_decorator):
     """Test approve_post passes"""
     mock_client.submission.return_value.selftext = "text"
     client = api.Api(UserFactory.create())
-    client.approve_post("id")
-    mock_client.submission.assert_called_once_with(id="id")
+    client.approve_post("abc")
+    mock_client.submission.assert_called_once_with(id="abc")
     mock_client.submission.return_value.mod.approve.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
@@ -434,8 +578,8 @@ def test_remove_post(mock_client, indexing_decorator):
     """Test remove_post passes"""
     mock_client.submission.return_value.selftext = "text"
     client = api.Api(UserFactory.create())
-    client.remove_post("id")
-    mock_client.submission.assert_called_once_with(id="id")
+    client.remove_post("abc")
+    mock_client.submission.assert_called_once_with(id="abc")
     mock_client.submission.return_value.mod.remove.assert_called_once_with()
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
@@ -448,41 +592,41 @@ def test_remove_post(mock_client, indexing_decorator):
 def test_create_comment_on_post(mock_client, indexing_decorator):
     """Makes correct calls for comment on post"""
     client = api.Api(UserFactory.create())
-    comment = client.create_comment("text", post_id="id1")
+    comment = client.create_comment("text", post_id="abc")
     assert comment == mock_client.submission.return_value.reply.return_value
     assert mock_client.comment.call_count == 0
-    mock_client.submission.assert_called_once_with(id="id1")
+    mock_client.submission.assert_called_once_with(id="abc")
     mock_client.submission.return_value.reply.assert_called_once_with("text")
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_persist_func.call_count == 2
+    assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
         search_task_helpers.index_new_comment
         in indexing_decorator.mock_persist_func.original
     )
-    assert (
-        channels_task_helpers.sync_post_model
-        in indexing_decorator.mock_persist_func.original
-    )
+    assert Comment.objects.filter(
+        comment_id=mock_client.submission.return_value.reply.return_value.id,
+        parent_id=mock_client.submission.return_value.id,
+    ).exists()
 
 
 def test_create_comment_on_comment(mock_client, indexing_decorator):
     """Makes correct calls for comment on comment"""
     client = api.Api(UserFactory.create())
-    comment = client.create_comment("text", comment_id="id2")
+    comment = client.create_comment("text", comment_id="567")
     assert comment == mock_client.comment.return_value.reply.return_value
     assert mock_client.submission.call_count == 0
-    mock_client.comment.assert_called_once_with("id2")
+    mock_client.comment.assert_called_once_with("567")
     mock_client.comment.return_value.reply.assert_called_once_with("text")
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
-    assert indexing_decorator.mock_persist_func.call_count == 2
+    assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
         search_task_helpers.index_new_comment
         in indexing_decorator.mock_persist_func.original
     )
-    assert (
-        channels_task_helpers.sync_post_model
-        in indexing_decorator.mock_persist_func.original
-    )
+    assert Comment.objects.filter(
+        comment_id=mock_client.comment.return_value.reply.return_value.id,
+        parent_id=mock_client.comment.return_value.id,
+    ).exists()
 
 
 def test_create_comment_args_error(mock_client):
@@ -499,8 +643,8 @@ def test_create_comment_args_error(mock_client):
 def test_list_comments(mock_client):
     """Test list_comments"""
     client = api.Api(UserFactory.create())
-    result = client.list_comments("id", COMMENTS_SORT_BEST)
-    mock_client.submission.assert_called_once_with(id="id")
+    result = client.list_comments("abc", COMMENTS_SORT_BEST)
+    mock_client.submission.assert_called_once_with(id="abc")
     assert mock_client.submission.return_value.comment_sort == COMMENTS_SORT_BEST
     assert result == mock_client.submission.return_value.comments
 
@@ -721,13 +865,13 @@ def test_add_contributor(mock_client, mock_update_author):
     client_user = UserFactory.create()
     contributor = UserFactory.create()
     client = api.Api(client_user)
-    redditor = client.add_contributor(contributor.username, "foo_channel_name")
+    redditor = client.add_contributor(contributor.username, "channel")
     mock_client.subreddit.return_value.contributor.add.assert_called_once_with(
         contributor
     )
     assert (
         ChannelGroupRole.objects.get(
-            channel__name="foo_channel_name", role=ROLE_CONTRIBUTORS
+            channel__name="channel", role=ROLE_CONTRIBUTORS
         ).group
         in contributor.groups.all()
     )
@@ -741,11 +885,11 @@ def test_add_remove_contributor_no_user(mock_client):
     client_user = UserFactory.create()
     client = api.Api(client_user)
     with pytest.raises(NotFound):
-        client.add_contributor("fooooooo", "foo_channel_name")
+        client.add_contributor("fooooooo", "channel")
     assert mock_client.subreddit.return_value.contributor.add.call_count == 0
 
     with pytest.raises(NotFound):
-        client.remove_contributor("fooooooo", "foo_channel_name")
+        client.remove_contributor("fooooooo", "channel")
     assert mock_client.subreddit.return_value.contributor.remove.call_count == 0
 
 
@@ -754,13 +898,13 @@ def test_remove_contributor(mock_client, mock_update_author):
     client_user = UserFactory.create()
     contributor = UserFactory.create()
     client = api.Api(client_user)
-    client.remove_contributor(contributor.username, "foo_channel_name")
+    client.remove_contributor(contributor.username, "channel")
     mock_client.subreddit.return_value.contributor.remove.assert_called_once_with(
         contributor
     )
     assert (
         ChannelGroupRole.objects.get(
-            channel__name="foo_channel_name", role=ROLE_CONTRIBUTORS
+            channel__name="channel", role=ROLE_CONTRIBUTORS
         ).group
         not in contributor.groups.all()
     )
@@ -771,7 +915,7 @@ def test_list_contributors(mock_client):
     """Test list contributor"""
     client_user = UserFactory.create()
     client = api.Api(client_user)
-    contributors = client.list_contributors("foo_channel_name")
+    contributors = client.list_contributors("channel")
     mock_client.subreddit.return_value.contributor.assert_called_once_with()
     assert mock_client.subreddit.return_value.contributor.return_value == contributors
 
@@ -781,13 +925,13 @@ def test_add_moderator(mock_client, mock_update_author):
     client = api.Api(UserFactory.create())
     moderator = UserFactory.create()
     # pylint: disable=assignment-from-no-return
-    redditor = client.add_moderator(moderator.username, "channel_test_name")
+    redditor = client.add_moderator(moderator.username, "channel")
     mock_client.subreddit.return_value.moderator.add.assert_called_once_with(moderator)
     # API function doesn't return the moderator. To do this the view calls _list_moderators
     assert redditor is None
     assert (
         ChannelGroupRole.objects.get(
-            channel__name="channel_test_name", role=ROLE_MODERATORS
+            channel__name="channel", role=ROLE_MODERATORS
         ).group
         in moderator.groups.all()
     )
@@ -798,11 +942,11 @@ def test_add_moderator_no_user(mock_client):
     """Test add moderator where user does not exist"""
     client = api.Api(UserFactory.create())
     with pytest.raises(NotFound):
-        client.add_moderator("foo_username", "foo_channel_name")
+        client.add_moderator("foo_username", "channel")
     assert mock_client.subreddit.return_value.moderator.add.call_count == 0
 
     with pytest.raises(NotFound):
-        client.remove_moderator("foo_username", "foo_channel_name")
+        client.remove_moderator("foo_username", "channel")
     assert mock_client.subreddit.return_value.moderator.remove.call_count == 0
 
 
@@ -810,13 +954,13 @@ def test_remove_moderator(mock_client, mock_update_author):
     """Test remove moderator"""
     client = api.Api(UserFactory.create())
     moderator = UserFactory.create()
-    client.remove_moderator(moderator.username, "channel_test_name")
+    client.remove_moderator(moderator.username, "channel")
     mock_client.subreddit.return_value.moderator.remove.assert_called_once_with(
         moderator
     )
     assert (
         ChannelGroupRole.objects.get(
-            channel__name="channel_test_name", role=ROLE_MODERATORS
+            channel__name="channel", role=ROLE_MODERATORS
         ).group
         not in moderator.groups.all()
     )
@@ -826,7 +970,7 @@ def test_remove_moderator(mock_client, mock_update_author):
 def test_list_moderator(mock_client):
     """Test list moderator"""
     client = api.Api(UserFactory.create())
-    moderators = client.list_moderators("channel_test_name")
+    moderators = client.list_moderators("channel")
     mock_client.subreddit.return_value.moderator.assert_called_once_with(redditor=None)
     assert mock_client.subreddit.return_value.moderator.return_value == moderators
 
@@ -840,7 +984,7 @@ def test_is_moderator(mock_client, is_moderator):
     mock_client.subreddit.return_value.moderator.return_value = (
         ["username"] if is_moderator else []
     )
-    assert client.is_moderator("channel_test_name", "username") is is_moderator
+    assert client.is_moderator("channel", "username") is is_moderator
     mock_client.subreddit.return_value.moderator.assert_called_once_with(
         redditor="username"
     )
@@ -852,7 +996,7 @@ def test_is_moderator_missing_username(mock_client):  # pylint: disable=unused-a
     # the actual return value here will be different against a reddit backend
     # but truthiness of the return iterable is all that matters
     with pytest.raises(ValueError) as ex:
-        client.is_moderator("channel_test_name", "")
+        client.is_moderator("channel", "")
     assert ex.value.args[0] == "Missing moderator_name"
 
 
@@ -1019,11 +1163,11 @@ def test_add_subscriber(mock_client, mock_update_author):
     """Test add subscriber"""
     client = api.Api(UserFactory.create())
     subscriber = UserFactory.create()
-    redditor = client.add_subscriber(subscriber.username, "channel_test_name")
+    redditor = client.add_subscriber(subscriber.username, "channel")
     mock_client.subreddit.return_value.subscribe.assert_called_once_with()
     assert redditor.name == subscriber.username
     assert ChannelSubscription.objects.filter(
-        channel__name="channel_test_name", user=subscriber
+        channel__name="channel", user=subscriber
     ).exists()
     mock_update_author.assert_called_with(subscriber.profile)
 
@@ -1033,11 +1177,11 @@ def test_add_remove_subscriber_no_user(mock_client):
     client_user = UserFactory.create()
     client = api.Api(client_user)
     with pytest.raises(NotFound):
-        client.add_subscriber("fooooooo", "foo_channel_name")
+        client.add_subscriber("fooooooo", "channel")
     assert mock_client.subreddit.return_value.subscribe.call_count == 0
 
     with pytest.raises(NotFound):
-        client.remove_contributor("fooooooo", "foo_channel_name")
+        client.remove_contributor("fooooooo", "channel")
     assert mock_client.subreddit.return_value.unsubscribe.call_count == 0
 
 
@@ -1061,7 +1205,7 @@ def test_is_subscriber(mock_client):
         Mock(display_name="sub1"),
         Mock(display_name="sub2"),
     ]
-    assert client.is_subscriber(subscriber.username, "channel_test_name") is False
+    assert client.is_subscriber(subscriber.username, "channel") is False
     assert client.is_subscriber(subscriber.username, "sub2") is True
     assert mock_client.user.subreddits.call_count == 2
 
@@ -1077,8 +1221,8 @@ def test_report_comment(mock_client):
 def test_report_post(mock_client):
     """Test report_post"""
     client = api.Api(UserFactory.create())
-    client.report_post("id", "reason")
-    mock_client.submission.assert_called_once_with(id="id")
+    client.report_post("abc", "reason")
+    mock_client.submission.assert_called_once_with(id="abc")
     mock_client.submission.return_value.report.assert_called_once_with("reason")
 
 
@@ -1096,16 +1240,16 @@ def test_list_reports(mock_client):
 def test_ignore_comment_reports(mock_client):
     """Test ignore_comment_reports"""
     client = api.Api(UserFactory.create())
-    client.ignore_comment_reports("id")
-    mock_client.comment.assert_called_once_with("id")
+    client.ignore_comment_reports("456")
+    mock_client.comment.assert_called_once_with("456")
     mock_client.comment.return_value.mod.ignore_reports.assert_called_once_with()
 
 
 def test_ignore_post_reports(mock_client):
     """Test ignore_post_reports"""
     client = api.Api(UserFactory.create())
-    client.ignore_post_reports("id")
-    mock_client.submission.assert_called_once_with(id="id")
+    client.ignore_post_reports("abc")
+    mock_client.submission.assert_called_once_with(id="abc")
     mock_client.submission.return_value.mod.ignore_reports.assert_called_once_with()
 
 
@@ -1151,70 +1295,3 @@ def test_remove_comment_subscription(
     assert not Subscription.objects.filter(
         user=user, post_id="abc", comment_id="def"
     ).exists()
-
-
-def test_sync_channel_model():
-    """sync_channel_model should write the channel info to our database"""
-    channel_name = "channel"
-    assert Channel.objects.count() == 0
-    channel = api.sync_channel_model(channel_name)
-    assert Channel.objects.count() == 1
-    assert channel == Channel.objects.first()
-    assert channel.name == channel_name
-
-    assert channel == api.sync_channel_model(channel_name)
-
-
-def test_sync_comment_model():
-    """sync_comment_model should write the comment to our database"""
-    channel_name = "channel name"
-    post_id = "456"
-    comment_id = "def"
-    parent_id = "abc"
-
-    assert Comment.objects.count() == 0
-    assert Post.objects.count() == 0
-    assert Channel.objects.count() == 0
-    comment = api.sync_comment_model(
-        channel_name=channel_name,
-        post_id=post_id,
-        comment_id=comment_id,
-        parent_id=parent_id,
-    )
-    assert Comment.objects.count() == 1
-    assert Post.objects.count() == 1
-    assert Channel.objects.count() == 1
-    assert comment == Comment.objects.first()
-    assert comment.post.channel.name == channel_name
-    assert comment.post.post_id == post_id
-    assert comment.comment_id == comment_id
-    assert comment.parent_id == parent_id
-
-    assert comment == api.sync_comment_model(
-        channel_name=channel_name,
-        post_id=post_id,
-        comment_id=comment_id,
-        parent_id=parent_id,
-    )
-
-
-def test_sync_post_model():
-    """sync_post_model should write the post information to our database"""
-    channel_name = "channel"
-    post_id = "post_id"
-    post_url = "http://fake"
-
-    assert Channel.objects.count() == 0
-    assert Post.objects.count() == 0
-    post = api.sync_post_model(
-        channel_name=channel_name, post_id=post_id, post_url=post_url
-    )
-    assert Channel.objects.count() == 1
-    assert Post.objects.count() == 1
-    assert post == Post.objects.first()
-    assert post.channel.name == channel_name
-    assert post.post_id == post_id
-
-    assert post == api.sync_post_model(
-        channel_name=channel_name, post_id=post_id, post_url=post_url
-    )

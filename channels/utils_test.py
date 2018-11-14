@@ -16,6 +16,8 @@ from channels.utils import (
     get_pagination_and_posts,
     translate_praw_exceptions,
     get_reddit_slug,
+    get_kind_and_id,
+    num_items_not_none,
 )
 
 
@@ -195,3 +197,20 @@ def test_translate_praw_exceptions(raised_exception, is_anonymous, expected_exce
 def test_get_reddit_slug(permalink, slug):
     """Test that the correct slug is retrieved from a permalink"""
     assert get_reddit_slug(permalink) == slug
+
+
+def test_kind_and_id():
+    """Test that get_kind_and_id correctly splits the string"""
+    assert get_kind_and_id("t3_anbj_gu") == ["t3", "anbj_gu"]
+
+
+def test_num_items_not_none():
+    """Test that num_items_not_none returns expected results"""
+    assert num_items_not_none([]) == 0
+    assert num_items_not_none([None, None]) == 0
+
+    assert num_items_not_none([1]) == 1
+    assert num_items_not_none([None, 1]) == 1
+    assert num_items_not_none([1, None]) == 1
+
+    assert num_items_not_none([0, 1, "", "abc", False, True, None]) == 6

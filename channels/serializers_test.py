@@ -167,7 +167,10 @@ def test_post_both_text_and_url():
     """We can't create a post with both text and url specified"""
     with pytest.raises(ValidationError) as ex:
         PostSerializer().create({"title": "title", "text": "text", "url": "url"})
-    assert ex.value.args[0] == "Only one of text or url can be used to create a post"
+    assert (
+        ex.value.args[0]
+        == "Only one of text, article_content, or url can be used to create a post"
+    )
 
 
 def test_post_edit_url():

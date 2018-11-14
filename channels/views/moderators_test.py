@@ -5,7 +5,6 @@ from django.urls import reverse
 from rest_framework import status
 
 from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
-from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
@@ -209,31 +208,26 @@ def test_add_moderator_anonymous(client, settings, allow_anonymous):
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_remove_moderator(staff_client):
+@pytest.mark.parametrize("attempts", [1, 2])
+def test_remove_moderator(
+    staff_client, reddit_factories, private_channel, staff_api, attempts
+):
     """
     Removes a moderator from a channel
     """
-    moderator = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
+    user = reddit_factories.user("user1")
+    staff_api.add_moderator(user.username, private_channel.name)
     url = reverse(
         "moderator-detail",
-        kwargs={"channel_name": "admin_channel", "moderator_name": moderator.username},
+        kwargs={"channel_name": private_channel.name, "moderator_name": user.username},
     )
-    resp = staff_client.delete(url)
-    assert resp.status_code == status.HTTP_204_NO_CONTENT
-
-
-def test_remove_moderator_again(staff_client):
-    """
-    If a user is already not a moderator for a channel we should return a 403, signaling that the user does not have
-    permission to remove that user as a moderator.
-    """
-    moderator = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
-    url = reverse(
-        "moderator-detail",
-        kwargs={"channel_name": "admin_channel", "moderator_name": moderator.username},
-    )
-    resp = staff_client.delete(url)
-    assert resp.status_code == status.HTTP_403_FORBIDDEN
+    for attempt_idx in range(attempts):
+        resp = staff_client.delete(url)
+        assert resp.status_code == (
+            status.HTTP_204_NO_CONTENT
+            if attempt_idx == 0
+            else status.HTTP_403_FORBIDDEN
+        )
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])

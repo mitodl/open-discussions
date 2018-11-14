@@ -8,7 +8,6 @@ import pytest
 
 from elasticsearch.exceptions import ConflictError
 
-from channels.models import Post, Comment
 from search.connection import get_default_alias_name
 from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES
 from search.exceptions import ReindexException
@@ -25,8 +24,6 @@ from search.indexing_api import (
     GLOBAL_DOC_TYPE,
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
-    sync_post,
-    sync_comments,
     index_profiles,
 )
 
@@ -244,7 +241,10 @@ def test_index_post_with_comments(
 
     serialize_post_mock.assert_any_call(post)
     serialize_comments_mock.assert_any_call(post_id)
+
+    assert bulk_mock.call_count == 4
     for alias in aliases:
+        # expect a call per object per alias
         bulk_mock.assert_any_call(
             mocked_es.conn,
             serialized_data_post,
@@ -413,37 +413,3 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     conn_mock.indices.put_alias.assert_called_once_with(
         index=backing_index, name=reindexing_alias
     )
-
-
-def test_sync_post():
-    """Test that sync_post creates Post model objects"""
-    serialized = [
-        {"channel_name": "a", "post_id": "a1", "post_link_url": "http://a1.edu"},
-        {"channel_name": "b", "post_id": "b1", "post_link_url": "http://b1.edu"},
-    ]
-
-    list(sync_post(serialized))
-    for item in serialized:
-        assert Post.objects.filter(post_id=item["post_id"]).exists()
-
-
-def test_sync_comments():
-    """Test that sync_comments creates Comment model objects"""
-    serialized = [
-        {
-            "channel_name": "a",
-            "post_id": "a1",
-            "comment_id": "a1c",
-            "parent_comment_id": None,
-        },
-        {
-            "channel_name": "b",
-            "post_id": "b1",
-            "comment_id": "b1c",
-            "parent_comment_id": "a1c",
-        },
-    ]
-
-    list(sync_comments(serialized))
-    for item in serialized:
-        assert Comment.objects.filter(comment_id=item["comment_id"]).exists()

@@ -62,6 +62,7 @@ def test_populate_subscriptions_and_roles(
     populate_subscriptions_and_roles should call sub-tasks with correct ids
     """
     channels, users = channels_and_users
+    users = sorted(users, key=lambda user: user.id)
     settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
     mock_populate_user_subscriptions = mocker.patch(
         "channels.tasks.populate_user_subscriptions"

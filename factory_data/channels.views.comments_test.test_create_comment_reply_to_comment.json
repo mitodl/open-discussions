@@ -1,0 +1,35 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Aut temporibus aliquid esse expedita a qui maxime sint. Excepturi inventore hic ad esse officiis nulla ea.\nQuam nisi voluptate unde vero impedit animi culpa sequi. Dicta ducimus culpa eius. Voluptate facilis ipsam cupiditate ut. Sed aspernatur voluptatum sequi consequatur deleniti. Facilis beatae distinctio nobis nemo accusantium reprehenderit.",
+      "name": "1542380663_cum",
+      "public_description": "Laboriosam officiis quasi nisi placeat nemo voluptatum.",
+      "title": "Odit adipisci ullam asperiores blanditiis id."
+    }
+  },
+  "comments": {
+    "comment": {
+      "children": [],
+      "comment_id": null,
+      "id": "7t",
+      "post_id": "8j",
+      "text": "Mollitia impedit voluptatibus quas deleniti aspernatur. Reprehenderit in laudantium atque."
+    }
+  },
+  "posts": {
+    "a post": {
+      "id": "8j",
+      "text": "Quas culpa dolor in. Officiis a expedita dolore animi quae. Ab iste placeat incidunt nobis quaerat.",
+      "title": "Et molestiae quisquam dicta natus quaerat saepe."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CWEGT5M8A62QW9R4TEE14RFH"
+    },
+    "staff_user": {
+      "username": "01CWEGT8Y6XSNEREPTVFEY8CMN"
+    }
+  }
+}

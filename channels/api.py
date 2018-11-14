@@ -38,8 +38,13 @@ from channels.constants import (
     VoteActions,
     ROLE_CONTRIBUTORS,
     ROLE_MODERATORS,
+    LINK_TYPE_ANY,
+    LINK_TYPE_LINK,
+    LINK_TYPE_SELF,
+    EXTENDED_POST_TYPE_ARTICLE,
 )
 from channels.models import (
+    Article,
     Channel,
     Comment,
     Post,
@@ -49,9 +54,14 @@ from channels.models import (
     ChannelSubscription,
     ChannelGroupRole,
 )
-from channels.utils import get_kind_mapping, get_or_create_link_meta
+from channels.proxies import PostProxy, proxy_post
+from channels.utils import (
+    get_kind_mapping,
+    get_or_create_link_meta,
+    get_kind_and_id,
+    num_items_not_none,
+)
 
-from channels import task_helpers as channels_task_helpers
 from open_discussions import features
 from open_discussions.utils import now_in_utc
 from search import task_helpers as search_task_helpers
@@ -290,70 +300,6 @@ def replace_load_comment(original_load_comment):
     return replacement_load_comment
 
 
-def sync_channel_model(name):
-    """
-    Create the channel in our database if it doesn't already exist
-
-    Args:
-        name (str): The name of the channel
-
-    Returns:
-        Channel: The channel object
-    """
-    return Channel.objects.get_or_create(name=name)[0]
-
-
-def sync_post_model(*, channel_name, post_id, post_url=None):
-    """
-    Create a new Post if it doesn't exist already. Also create a new Channel and LinkMeta if necessary
-
-    Args:
-        channel_name (str): The name of the channel
-        post_id (str): The id of the post
-        post_url (str): The link url for a link post
-
-    Returns:
-        Post: The post object
-    """
-    with transaction.atomic():
-        post = Post.objects.filter(post_id=post_id).first()
-        if post is not None:
-            return post
-
-        channel = sync_channel_model(channel_name)
-        post_obj = Post.objects.get_or_create(
-            post_id=post_id, defaults={"channel": channel}
-        )[0]
-        if post_url and post_obj.link_meta is None and settings.EMBEDLY_KEY:
-            post_obj.link_meta = get_or_create_link_meta(post_url)
-            post_obj.save()
-        return post_obj
-
-
-def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):
-    """
-    Create a new Comment if it doesn't already exist. Also create a new Post and Channel if necessary
-
-    Args:
-        channel_name (str): The name of the channel
-        post_id (str): The id of the post
-        comment_id (str): The id of the comment
-        parent_id (str): The id of the reply comment. If None the parent is the post
-
-    Returns:
-        Comment: The comment object
-    """
-    with transaction.atomic():
-        comment = Comment.objects.filter(comment_id=comment_id).first()
-        if comment is not None:
-            return comment
-
-        post = sync_post_model(channel_name=channel_name, post_id=post_id)
-        return Comment.objects.get_or_create(
-            comment_id=comment_id, defaults={"post": post, "parent_id": parent_id}
-        )[0]
-
-
 def sync_channel_subscription_model(channel_name, user):
     """
     Create or update channel subscription for a user
@@ -366,7 +312,7 @@ def sync_channel_subscription_model(channel_name, user):
         ChannelSubscription: the channel user role object
     """
     with transaction.atomic():
-        channel = sync_channel_model(channel_name)
+        channel = Channel.objects.get(name=channel_name)
         return ChannelSubscription.objects.update_or_create(channel=channel, user=user)[
             0
         ]
@@ -384,7 +330,7 @@ def get_role_model(channel_name, role):
         ChannelGroupRole: the ChannelGroupRole object
     """
     return ChannelGroupRole.objects.get_or_create(
-        channel=Channel.objects.get_or_create(name=channel_name)[0],
+        channel=Channel.objects.get(name=channel_name),
         group=Group.objects.get_or_create(name="{}_{}".format(channel_name, role))[0],
         role=role,
     )[0]
@@ -412,6 +358,31 @@ def remove_user_role(channel_name, role, user):
         user(django.contrib.auth.models.User): The user
     """
     get_role_model(channel_name, role).group.user_set.remove(user)
+
+
+def get_post_type(*, text, url, article_content):
+    """
+    Returns the post type given the passed input values
+
+    Args:
+        text (str): the post text
+        url (str): the post url
+        article_content (dict): the post article text data
+    Returns:
+        str: the link type
+    """
+    if num_items_not_none([text, url, article_content]) != 1:
+        raise ValueError(
+            "Not more than one of text, url, or article_content can be provided"
+        )
+
+    if url is not None:
+        return LINK_TYPE_LINK
+    elif article_content is not None:
+        return EXTENDED_POST_TYPE_ARTICLE
+
+    # title-only or text
+    return LINK_TYPE_SELF
 
 
 class Api:
@@ -500,9 +471,7 @@ class Api:
             **other_settings,
         )
 
-        channel_obj = sync_channel_model(name)
-        channel_obj.membership_is_managed = membership_is_managed
-        channel_obj.save()
+        Channel.objects.create(name=name, membership_is_managed=membership_is_managed)
 
         return channel
 
@@ -603,10 +572,10 @@ class Api:
         _apply_vote, allow_downvote=True, instance_type=COMMENT_TYPE
     )
 
-    @reddit_object_persist(
-        search_task_helpers.index_new_post, channels_task_helpers.sync_post_model
-    )
-    def create_post(self, channel_name, title, text=None, url=None):
+    @reddit_object_persist(search_task_helpers.index_new_post)
+    def create_post(
+        self, channel_name, title, *, text=None, url=None, article_content=None
+    ):  # pylint: disable=too-many-arguments
         """
         Create a new post in a channel
 
@@ -615,16 +584,51 @@ class Api:
             title(str): the title of the post
             text(str): the text of the post
             url(str): the url of the post
+            article_content (dict): the article content of the post as a JSON dict
 
         Raises:
             ValueError: if both text and url are provided
 
         Returns:
-            praw.models.Submission: the submitted post
+            channels.proxies.PostProxy: the proxied submission and post
         """
-        if len(list(filter(lambda val: val is not None, [text, url]))) != 1:
-            raise ValueError("Exactly one of text and url must be provided")
-        return self.get_channel(channel_name).submit(title, selftext=text, url=url)
+
+        if not url and not article_content:
+            # Reddit requires at least an empty selftext string for title-only or article post types
+            text = text or ""
+
+        post_type = get_post_type(text=text, url=url, article_content=article_content)
+
+        if article_content:
+            # article posts shadow an empty text post, because reddit requires at least an empty string
+            text = ""
+
+        submission = self.get_channel(channel_name).submit(
+            title, selftext=text, url=url
+        )
+
+        post = None
+
+        with transaction.atomic():
+            channel = Channel.objects.get(name=channel_name)
+
+            # select_for_update so no one else can write to this
+            post, created = Post.objects.select_for_update().get_or_create(
+                post_id=submission.id,
+                defaults={"channel": channel, "post_type": post_type},
+            )
+
+            if created and article_content:
+                Article.objects.get_or_create(
+                    post=post,
+                    defaults={"author": self.user, "content": article_content},
+                )
+
+            if created and url and post.link_meta is None and settings.EMBEDLY_KEY:
+                post.link_meta = get_or_create_link_meta(url)
+                post.save()
+
+        return PostProxy(submission, post)
 
     def front_page(self, listing_params):
         """
@@ -659,7 +663,7 @@ class Api:
         List posts using the 'hot' algorithm
 
         Args:
-            listing(praw.models.listing.BaseListingMixin): the listing to returna  generator for
+            listing(praw.models.listing.BaseListingMixin): the listing to return a  generator for
             listing_params (channels.utils.ListingParams): the pagination/sorting params requested for the listing
 
         Returns:
@@ -704,18 +708,19 @@ class Api:
             post_id(str): the base36 id for the post
 
         Returns:
-            praw.models.Submission: the submitted post
+            channels.proxies.PostProxy: the submitted post
         """
-        return self.reddit.submission(id=post_id)
+        return proxy_post(self.reddit.submission(id=post_id))
 
     @reddit_object_persist(search_task_helpers.update_post_text)
-    def update_post(self, post_id, text):
+    def update_post(self, post_id, *, text=None, article_content=None):
         """
         Updates the post
 
         Args:
             post_id(str): the base36 id for the post
             text (str): The text for the post
+            article_content (dict): The article content as a JSON dict
 
         Raises:
             ValueError: if the url post was provided
@@ -723,12 +728,34 @@ class Api:
         Returns:
             praw.models.Submission: the submitted post
         """
+        if text and article_content:
+            raise ValueError("Only one of text and article_content can be specified")
+
+        if not text and not article_content:
+            raise ValueError("One of text and article_content must be specified")
+
         post = self.get_post(post_id)
 
-        if not post.is_self:
+        if post.post_type:
+            # new validation
+            if text and post.post_type not in (LINK_TYPE_ANY, LINK_TYPE_SELF):
+                raise ValueError(
+                    f"Posts of type '{post.post_type}' cannot have text updated"
+                )
+            elif article_content and post.post_type != EXTENDED_POST_TYPE_ARTICLE:
+                raise ValueError(
+                    f"Posts of type '{post.post_type}' cannot have article updated"
+                )
+        elif not post.is_self:
+            # legacy validation
             raise ValueError("Posts with a url cannot be updated")
 
-        return post.edit(text)
+        if text:
+            return post.update(submission=post.edit(text))
+        else:
+            post.article.content = article_content
+            post.article.save()
+            return post
 
     def pin_post(self, post_id, pinned):
         """
@@ -778,9 +805,7 @@ class Api:
         post.delete()
         return post
 
-    @reddit_object_persist(
-        search_task_helpers.index_new_comment, channels_task_helpers.sync_comment_model
-    )
+    @reddit_object_persist(search_task_helpers.index_new_comment)
     def create_comment(self, text, post_id=None, comment_id=None):
         """
         Create a new comment in reply to a post or comment
@@ -796,13 +821,23 @@ class Api:
         Returns:
             praw.models.Comment: the submitted comment
         """
-        if len(list(filter(lambda val: val is not None, [post_id, comment_id]))) != 1:
+        if num_items_not_none([post_id, comment_id]) != 1:
             raise ValueError("Exactly one of post_id and comment_id must be provided")
 
         if post_id is not None:
-            return self.get_post(post_id).reply(text)
+            comment = self.get_post(post_id).reply(text)
         else:
-            return self.get_comment(comment_id).reply(text)
+            comment = self.get_comment(comment_id).reply(text)
+
+        _, link_id = get_kind_and_id(comment.link_id)
+
+        Comment.objects.create(
+            comment_id=comment.id,
+            post=Post.objects.get(post_id=link_id),
+            parent_id=post_id or comment_id,
+        )
+
+        return comment
 
     @reddit_object_persist(search_task_helpers.update_comment_text)
     def update_comment(self, comment_id, text):

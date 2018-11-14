@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2017-11-13T20:13:24",
+      "recorded_at": "2018-11-16T15:04:07",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -18,15 +18,15 @@
             "keep-alive"
           ],
           "User-Agent": [
-            "python-requests/2.18.1"
+            "python-requests/2.20.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CWEGST0F5MHSN8FRP6G5J0KJ"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA1WNyw6CMBREf4V0aWzSaorGtahLawhENk1tL9r4gLRYQOO/S2Xlck7mzLyRVAqcE011hQdaRYiyBWZya1vOcXHX/VJz2GR47fNjqXqOphGCrjYWnDBBmMeEDOzni6avIYycQFqwoetUNaJJSBbKQbz8v93S18GQfUr5uYtzPMsYT4wv6HPXBkeDNwqE0WF4DOjzBSJuA7S4AAAA",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIysjTUdQ4szzQPz03xyK4MsrR0z6wIszD2yvcPSgkpVtJRUEqtKMgsSi2OzwTpMDYzMACKgQ2IL6ksSAWZkpSaWJRaBFJbnJwPEdIC8YpS04AaM9Csi4rKNC009koLNjcLKYoKDfDPc0rxcEryiPBNBmlKSS3LTE6Nz0wBmQzhKNUCAEXlUZS6AAAA",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 13 Nov 2017 20:13:24 GMT"
+            "Fri, 16 Nov 2018 15:04:07 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=Uc9d66m8gWo69G1Y3E; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 13-Nov-2019 20:13:24 GMT",
-            "loidcreated=2017-11-13T20%3A13%3A24.172Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 13-Nov-2019 20:13:24 GMT"
+            "loid=5p7SWCpJ6MblLuyzNT; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 15-Nov-2020 15:04:07 GMT",
+            "loidcreated=2018-11-16T15%3A04%3A07.331Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 15-Nov-2020 15:04:07 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -66,11 +66,11 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CWEGST0F5MHSN8FRP6G5J0KJ"
       }
     },
     {
-      "recorded_at": "2017-11-13T20:13:24",
+      "recorded_at": "2018-11-16T15:04:07",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -84,16 +84,16 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 157-5aGrwQQ-Zmdy8dQeFV-DvWYfcyQ"
+            "bearer 2291-CQwi7WmdHkyR99GixV83JoORdTs"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Cookie": [
-            "loid=Uc9d66m8gWo69G1Y3E; loidcreated=2017-11-13T20%3A13%3A24.172Z"
+            "loid=5p7SWCpJ6MblLuyzNT; loidcreated=2018-11-16T15%3A04%3A07.331Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.3.4 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.53.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "GET",
@@ -115,7 +115,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 13 Nov 2017 20:13:24 GMT"
+            "Fri, 16 Nov 2018 15:04:07 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -136,16 +136,16 @@
             "SAMEORIGIN"
           ],
           "x-ratelimit-remaining": [
-            "298.0"
+            "299.0"
           ],
           "x-ratelimit-reset": [
-            "396"
+            "353"
           ],
           "x-ratelimit-used": [
-            "2"
+            "1"
           ],
           "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=k16DlQvwHCtMRTytFdVuzuJ2RUskOkQqCbrCziE%2B%2BCw76oYNdnpgpd6Qxt2ff54u4EJBpgzi7sMcpazV01OkuR3T7aTscSBA"
+            "https://reddit.local/pixel/of_destiny.png?v=%2FWCq0h1x6Ht%2BG%2FpYLJT6R2P6XErFC%2BeWq696M%2FTQ682LKtjsHMTkKgdXDYNuDB9X727D0J%2FekEb1mkloannUr25jsYPF0qoy"
           ],
           "x-ua-compatible": [
             "IE=edge"

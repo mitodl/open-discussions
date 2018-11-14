@@ -38,3 +38,4 @@ static3==0.5.1
 tldextract
 ulid-py
 uwsgi
+wrapt==1.10.11 

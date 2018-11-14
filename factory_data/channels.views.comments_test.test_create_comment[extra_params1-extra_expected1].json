@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Corporis ex eaque cupiditate fuga aperiam blanditiis. Ex rem quis excepturi nam. Architecto assumenda ipsam molestias impedit officia.\nIure culpa soluta dolore a cum at unde. Aut aspernatur magni animi provident. Neque at sit doloremque recusandae tenetur.\nPorro nisi ea qui eaque deserunt molestiae architecto. Ea veniam porro fuga ducimus sunt totam velit dolorem. Illum asperiores ullam tenetur rem iste odio esse incidunt. Beatae in incidunt accusantium tempore blanditiis reprehenderit fuga.",
+      "name": "1541520813_distinctio",
+      "public_description": "Deleniti incidunt omnis dignissimos.",
+      "title": "Delectus amet a maxime ex."
+    }
+  },
+  "posts": {
+    "a post": {
+      "id": "56",
+      "text": "Quo assumenda necessitatibus minima debitis aliquam assumenda temporibus. Natus harum esse quo.",
+      "title": "Voluptatem qui error laudantium error cupiditate."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CVMWSN8EXQ5PJQQN5M1JMV9P"
+    },
+    "staff_user": {
+      "username": "01CVMWSRHG65DX6X5ZSC1DWZ26"
+    }
+  }
+}

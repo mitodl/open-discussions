@@ -3,6 +3,7 @@ from django.db import transaction
 from praw.models import Comment
 
 from channels import api
+from channels.proxies import proxy_post
 from channels.serializers import CommentSerializer, PostSerializer
 from notifications.models import CommentEvent
 from notifications.notifiers.email import EmailNotifier
@@ -54,9 +55,14 @@ class CommentNotifier(EmailNotifier):
         is_comment_reply = isinstance(parent, Comment)
         ctx = {"current_user": self.user}
 
+        post = proxy_post(comment.submission)
+
+        if not is_comment_reply:
+            parent = proxy_post(parent)
+
         return {
             "is_comment_reply": is_comment_reply,
-            "post": PostSerializer(comment.submission, context=ctx).data,
+            "post": PostSerializer(post, context=ctx).data,
             "parent": (
                 CommentSerializer(parent, context=ctx)
                 if is_comment_reply

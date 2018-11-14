@@ -26,38 +26,6 @@ def evict_expired_access_tokens():
 
 
 @app.task
-def sync_comment_model(*, channel_name, post_id, comment_id, parent_id):
-    """
-    Create or update local comment id information
-
-    Args:
-        channel_name (str): The name of the channel
-        post_id (str): The id of the post
-        comment_id (str): The id of the comment
-        parent_id (str): The id of the reply comment. If None the parent is the post
-    """
-    api.sync_comment_model(
-        channel_name=channel_name,
-        post_id=post_id,
-        comment_id=comment_id,
-        parent_id=parent_id,
-    )
-
-
-@app.task
-def sync_post_model(*, channel_name, post_id, post_url):
-    """
-    Create or update local post id information
-
-    Args:
-        channel_name (str): The name of the channel
-        post_id (str): The id of the post
-        post_url(str): The external url of a link post
-    """
-    api.sync_post_model(channel_name=channel_name, post_id=post_id, post_url=post_url)
-
-
-@app.task
 def subscribe_all_users_to_default_channel(*, channel_name):
     """
     Subscribes all users to a new default channel
@@ -146,6 +114,7 @@ def populate_subscriptions_and_roles(self):
             for ids in chunks(
                 User.objects.exclude(username=settings.INDEXING_API_USERNAME)
                 .exclude(profile__isnull=True)
+                .order_by("id")
                 .values_list("id", flat=True),
                 chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
             )

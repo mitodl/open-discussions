@@ -5,7 +5,6 @@ from django.urls import reverse
 from rest_framework import status
 
 from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
-from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
@@ -43,21 +42,22 @@ def test_list_contributors_anonymous(client, settings, allow_anonymous):
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_add_contributor(staff_client):
+@pytest.mark.parametrize("attempts", [1, 2])
+def test_add_contributor(staff_client, user, private_channel, attempts):
     """
     Adds a contributor to a channel
     """
-    contributor = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
-    url = reverse("contributor-list", kwargs={"channel_name": "admin_channel"})
-    resp = staff_client.post(
-        url, data={"contributor_name": contributor.username}, format="json"
-    )
-    assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {
-        "contributor_name": contributor.username,
-        "full_name": contributor.profile.name,
-        "email": contributor.email,
-    }
+    url = reverse("contributor-list", kwargs={"channel_name": private_channel.name})
+    for _ in range(attempts):
+        resp = staff_client.post(
+            url, data={"contributor_name": user.username}, format="json"
+        )
+        assert resp.status_code == status.HTTP_201_CREATED
+        assert resp.json() == {
+            "contributor_name": user.username,
+            "full_name": user.profile.name,
+            "email": user.email,
+        }
 
 
 def test_add_contributor_email(client, public_channel, staff_api, reddit_factories):
@@ -80,23 +80,6 @@ def test_add_contributor_email(client, public_channel, staff_api, reddit_factori
     }
 
 
-def test_add_contributor_again(staff_client):
-    """
-    If the user is already a contributor a 201 status should be returned
-    """
-    contributor = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
-    url = reverse("contributor-list", kwargs={"channel_name": "admin_channel"})
-    resp = staff_client.post(
-        url, data={"contributor_name": contributor.username}, format="json"
-    )
-    assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {
-        "contributor_name": contributor.username,
-        "full_name": contributor.profile.name,
-        "email": contributor.email,
-    }
-
-
 @pytest.mark.parametrize("allow_anonymous", [True, False])
 def test_add_contributor_anonymous(client, settings, allow_anonymous):
     """
@@ -109,36 +92,20 @@ def test_add_contributor_anonymous(client, settings, allow_anonymous):
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_remove_contributor(staff_client):
+@pytest.mark.parametrize("attempts", [1, 2])
+def test_remove_contributor(staff_client, private_channel_and_contributor, attempts):
     """
     Removes a contributor from a channel
     """
-    contributor = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
+    channel, contributor = private_channel_and_contributor
     url = reverse(
         "contributor-detail",
-        kwargs={
-            "channel_name": "admin_channel",
-            "contributor_name": contributor.username,
-        },
+        kwargs={"channel_name": channel.name, "contributor_name": contributor.username},
     )
-    resp = staff_client.delete(url)
-    assert resp.status_code == status.HTTP_204_NO_CONTENT
 
-
-def test_remove_contributor_again(staff_client):
-    """
-    Removes a contributor from a channel
-    """
-    contributor = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
-    url = reverse(
-        "contributor-detail",
-        kwargs={
-            "channel_name": "admin_channel",
-            "contributor_name": contributor.username,
-        },
-    )
-    resp = staff_client.delete(url)
-    assert resp.status_code == status.HTTP_204_NO_CONTENT
+    for _ in range(attempts):
+        resp = staff_client.delete(url)
+        assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])

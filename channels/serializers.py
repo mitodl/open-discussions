@@ -11,9 +11,15 @@ from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from channels.utils import get_kind_mapping, get_reddit_slug, get_or_create_link_meta
+from channels.utils import (
+    get_kind_mapping,
+    get_reddit_slug,
+    get_kind_and_id,
+    num_items_not_none,
+)
 from channels.constants import VALID_CHANNEL_TYPES, VALID_LINK_TYPES
 from channels.models import Channel, Subscription
+from channels.proxies import proxy_post
 from open_discussions.utils import filter_dict_with_renamed_keys
 from profiles.models import Profile
 from profiles.utils import image_uri
@@ -256,6 +262,7 @@ class BasePostSerializer(RedditObjectSerializer):
     url_domain = serializers.SerializerMethodField()
     thumbnail = WriteableSerializerMethodField(allow_null=True)
     text = WriteableSerializerMethodField(allow_null=True)
+    article_content = serializers.JSONField(allow_null=True, default=None)
     title = serializers.CharField()
     slug = serializers.SerializerMethodField()
     upvoted = WriteableSerializerMethodField()
@@ -286,13 +293,8 @@ class BasePostSerializer(RedditObjectSerializer):
         return urlparse(instance.url).hostname if not instance.is_self else None
 
     def get_thumbnail(self, instance):
-        """ Returns a thumbnail url or null"""
-        link_meta = (
-            get_or_create_link_meta(instance.url) if not instance.is_self else None
-        )
-        if link_meta:
-            return link_meta.thumbnail
-        return None
+        """Returns a thumbnail url or null"""
+        return instance.link_meta.thumbnail if instance.link_meta is not None else None
 
     def get_slug(self, instance):
         """Returns the post slug"""
@@ -401,34 +403,35 @@ class PostSerializer(BasePostSerializer):
 
     def create(self, validated_data):
         title = validated_data["title"]
-        text = validated_data.get("text")
-        url = validated_data.get("url")
+        text = validated_data.get("text", None)
+        url = validated_data.get("url", None)
+        article_content = validated_data.get("article_content", None)
 
-        if text and url:
+        # validation occurs here rather than validate(), because we only wathc to do this for POST, not PATCH
+        if num_items_not_none([text, url, article_content]) > 1:
             raise ValidationError(
-                "Only one of text or url can be used to create a post"
+                "Only one of text, article_content, or url can be used to create a post"
             )
-
-        kwargs = {}
-        if url:
-            kwargs["url"] = url
-            get_or_create_link_meta(url)
-        else:
-            # Reddit API requires that either url or text not be `None`.
-            kwargs["text"] = text or ""
 
         api = self.context["channel_api"]
         channel_name = self.context["view"].kwargs["channel_name"]
 
-        post = api.create_post(channel_name, title=title, **kwargs)
+        post = api.create_post(
+            channel_name,
+            title=title,
+            text=text,
+            url=url,
+            article_content=article_content,
+        )
 
         api.add_post_subscription(post.id)
 
         changed = api.apply_post_vote(post, validated_data)
-        if not changed:
-            return post
-        else:
-            return api.get_post(post_id=post.id)
+
+        if changed:
+            post = api.get_post(post_id=post.id)
+
+        return post
 
     def update(self, instance, validated_data):
         post_id = self.context["view"].kwargs["post_id"]
@@ -453,6 +456,11 @@ class PostSerializer(BasePostSerializer):
 
         if "text" in validated_data:
             instance = api.update_post(post_id=post_id, text=validated_data["text"])
+
+        if "article_content" in validated_data:
+            instance = api.update_post(
+                post_id=post_id, article_content=validated_data["article_content"]
+            )
 
         if "stickied" in validated_data:
             sticky = validated_data["stickied"]
@@ -683,7 +691,7 @@ class MoreCommentsSerializer(serializers.Serializer):
 
     def get_parent_id(self, instance):
         """Returns the comment id for the parent comment, or None if the parent is a post"""
-        kind, _id = instance.parent_id.split("_", 1)
+        kind, _id = get_kind_and_id(instance.parent_id)
         if kind == get_kind_mapping()["comment"]:
             return _id
         return None
@@ -946,7 +954,7 @@ class ReportedContentSerializer(serializers.Serializer):
     def get_post(self, instance):
         """Returns the post if this report was for one"""
         if isinstance(instance, Submission):
-            return PostSerializer(instance, context=self.context).data
+            return PostSerializer(proxy_post(instance), context=self.context).data
 
         return None
 

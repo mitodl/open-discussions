@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from channels.api import Api
+from channels.proxies import proxy_posts
 from channels.serializers import PostSerializer
 from channels.utils import (
     get_pagination_and_posts,
@@ -45,9 +46,9 @@ class PostListView(APIView):
                 paginated_posts, listing_params
             )
             users = lookup_users_for_posts(posts)
-            posts = [
-                post for post in posts if post.author and post.author.name in users
-            ]
+            posts = proxy_posts(
+                [post for post in posts if post.author and post.author.name in users]
+            )
             subscriptions = lookup_subscriptions_for_posts(posts, request.user)
 
             return Response(

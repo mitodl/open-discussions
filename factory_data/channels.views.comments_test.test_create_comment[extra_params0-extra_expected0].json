@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Molestias ratione fuga molestiae. Fugiat voluptate sint reprehenderit. Pariatur provident perspiciatis quod ipsum.\nDucimus reprehenderit sint est voluptatum. Quo ea aliquam deleniti nulla modi totam perferendis.\nSuscipit culpa molestiae omnis reprehenderit. Reiciendis itaque molestias exercitationem deserunt repudiandae magni. Nemo quas recusandae illo rerum excepturi ea assumenda.",
+      "name": "1541520800_ducimus",
+      "public_description": "Modi consequatur aliquam rerum quia accusamus repudiandae.",
+      "title": "Sequi unde minima laborum."
+    }
+  },
+  "posts": {
+    "a post": {
+      "id": "55",
+      "text": "Numquam dolore provident quod esse. Modi voluptatibus quasi odio adipisci deleniti autem.",
+      "title": "Consequatur debitis ipsa nobis natus tempora."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CVMWS7HH6VZ744P5S1K0M2AR"
+    },
+    "staff_user": {
+      "username": "01CVMWSBBRDZQ4RSEGPVNVA8NB"
+    }
+  }
+}

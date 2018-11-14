@@ -246,49 +246,6 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
     )
 
 
-def sync_post(serialized):
-    """
-    Sync posts in serialized data
-
-    Args:
-        serialized (iterable of dict): An iterable of serialized elasticsearch post documents
-
-    Returns:
-         iterable of dict: Passes through the serialized data unaltered
-    """
-    from channels.api import sync_post_model
-
-    for item in serialized:
-        sync_post_model(
-            channel_name=item["channel_name"],
-            post_id=item["post_id"],
-            post_url=item["post_link_url"],
-        )
-        yield item
-
-
-def sync_comments(serialized):
-    """
-    Sync comments in serialized data
-
-    Args:
-        serialized (iterable of dict): An iterable of serialized elasticsearch comment documents
-
-    Returns:
-         iterable of dict: Passes through the serialized data unaltered
-    """
-    from channels.api import sync_comment_model
-
-    for item in serialized:
-        sync_comment_model(
-            channel_name=item["channel_name"],
-            post_id=item["post_id"],
-            comment_id=item["comment_id"],
-            parent_id=item["parent_comment_id"],
-        )
-        yield item
-
-
 def index_post_with_comments(post_id):
     """
     Index a post and its comments

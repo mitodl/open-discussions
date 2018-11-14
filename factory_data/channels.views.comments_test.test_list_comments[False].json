@@ -1,0 +1,63 @@
+{
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Voluptatibus voluptatem ea ullam voluptates dicta explicabo cum. Odio nesciunt quia illum odit animi. A a a odio quasi ex dolorum. Harum impedit ea sapiente nulla doloremque pariatur non.\nAmet optio enim quis saepe. Exercitationem quod excepturi iste quas.\nAliquam quaerat incidunt quis dolore. Nisi ab asperiores rem mollitia voluptate tempore.\nVoluptas amet commodi aliquid inventore. Sit esse et molestiae atque. Veritatis sequi voluptates odio quae.",
+      "name": "1542381779_veritatis",
+      "public_description": "Impedit enim similique fugit aliquam.",
+      "title": "Ea fugiat accusamus repellat odio vitae."
+    }
+  },
+  "comments": {
+    "comment-0": {
+      "children": [],
+      "comment_id": null,
+      "id": "83",
+      "post_id": "bb",
+      "text": "Quidem temporibus nostrum enim ducimus. Dolorum dignissimos fuga a quaerat. Nihil eos at nam omnis."
+    },
+    "comment-1": {
+      "children": [],
+      "comment_id": null,
+      "id": "87",
+      "post_id": "bb",
+      "text": "Ipsum porro perferendis cum repudiandae non. Veniam vitae consectetur dicta fugit."
+    },
+    "comment-nested-0": {
+      "children": [],
+      "comment_id": "83",
+      "id": "84",
+      "post_id": null,
+      "text": "Quaerat provident eos molestiae totam corporis nulla. Cum optio distinctio repellendus modi."
+    },
+    "comment-nested-1": {
+      "children": [],
+      "comment_id": "83",
+      "id": "85",
+      "post_id": null,
+      "text": "Sed necessitatibus rem voluptates. Fugit fugiat harum laboriosam. Corrupti maxime atque optio."
+    },
+    "comment-nested-2": {
+      "children": [],
+      "comment_id": "83",
+      "id": "86",
+      "post_id": null,
+      "text": "Ipsa nobis rem sit enim. Quidem laboriosam similique itaque."
+    }
+  },
+  "posts": {
+    "a post with comments": {
+      "id": "bb",
+      "text": "Dicta dolor non odit. A et amet iste itaque. Fugit eveniet minima delectus.",
+      "title": "Tenetur architecto soluta asperiores."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CWEHWBFY8WG9VEY88E9HSA7M"
+    },
+    "staff_user": {
+      "username": "01CWEHW86XXTG19Q4R0WZ0MX8E"
+    }
+  }
+}

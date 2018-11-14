@@ -1,0 +1,39 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Fugit repellendus consequatur commodi molestias at. Doloremque dolores doloribus voluptatem illum cupiditate ipsam. Aperiam consequatur occaecati atque doloribus.\nEveniet commodi totam quas accusantium. Distinctio hic facilis fugit.\nAd rem modi tenetur natus odio. Corporis asperiores unde quam incidunt. Omnis asperiores qui excepturi consectetur delectus eligendi ullam.",
+      "name": "1542232683_autem",
+      "public_description": "Et a aliquam facere totam ut id. Enim labore nemo eius nesciunt.",
+      "title": "Sit dolorem id omnis deleniti necessitatibus."
+    }
+  },
+  "posts": {
+    "post": {
+      "article_content": [
+        {
+          "node": "text",
+          "value": "Itaque porro similique minus dolor odit. Commodi eaque deserunt minima sed sit. Asperiores pariatur quo esse aut aperiam velit."
+        },
+        {
+          "node": "text",
+          "value": "Rem expedita quis praesentium numquam quia consectetur laborum. Voluptas neque animi beatae nesciunt. Fuga expedita sint commodi voluptatem."
+        },
+        {
+          "node": "text",
+          "value": "Temporibus laborum sunt doloremque suscipit quia vero. Ipsa perferendis placeat adipisci quia. Id eaque eos nostrum enim doloremque cumque minus fuga."
+        }
+      ],
+      "id": "5k",
+      "title": "Optio molestiae porro incidunt sapiente."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CWA3P6H3BFRNKKBHBW9ZF571"
+    },
+    "staff_user": {
+      "username": "01CWA3P9SRGRJRAH53M2RZ137E"
+    }
+  }
+}

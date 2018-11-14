@@ -11,6 +11,7 @@ from channels.constants import (
     POST_TYPE,
 )
 from channels.api import add_user_role
+from channels.factories import ChannelFactory
 from search.api import (
     execute_search,
     get_reddit_object_type,
@@ -68,9 +69,9 @@ def test_is_reddit_object_removed(
 def test_execute_search(mocker, user):
     """execute_search should execute an Elasticsearch search"""
     get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
-    channel_names = ["channel1", "channel2"]
-    add_user_role("channel1", "moderators", user)
-    add_user_role("channel2", "contributors", user)
+    channel_names = sorted([channel.name for channel in ChannelFactory.create_batch(2)])
+    add_user_role(channel_names[0], "moderators", user)
+    add_user_role(channel_names[1], "contributors", user)
 
     query = {"a": "query"}
     assert (

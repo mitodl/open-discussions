@@ -1,18 +1,21 @@
 """Tests for views for REST APIs for comments"""
 # pylint: disable=unused-argument,redefined-outer-name,too-many-lines
 from itertools import product
+import time
 
 import pytest
 from django.urls import reverse
 from rest_framework import status
 
 from channels.test_constants import LIST_MORE_COMMENTS_RESPONSE
+from channels.views.test_utils import default_comment_response_data
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
     PERMISSION_DENIED_ERROR_TYPE,
 )
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
+from open_discussions.test_utils import any_instance_of
 from profiles.utils import image_uri, DEFAULT_PROFILE_IMAGE
 
 pytestmark = pytest.mark.betamax
@@ -25,51 +28,59 @@ def mock_notify_subscribed_users(mocker):
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
-def test_list_comments(client, logged_in_profile, missing_user):
+def test_list_comments(
+    cassette_exists, user_client, user, reddit_factories, public_channel, missing_user
+):  # pylint: disable=too-many-arguments,too-many-locals
     """List all comments in the comment tree"""
     if missing_user:
-        logged_in_profile.user.username = "renamed"
-        logged_in_profile.user.save()
+        user.username = "renamed"
+        user.save()
         profile_image = DEFAULT_PROFILE_IMAGE
         name = "[deleted]"
         author_id = "[deleted]"
         headline = None
     else:
-        profile_image = image_uri(logged_in_profile)
-        author_id = logged_in_profile.user.username
-        headline = logged_in_profile.headline
-        name = logged_in_profile.name
+        profile_image = image_uri(user.profile)
+        author_id = user.username
+        headline = user.profile.headline
+        name = user.profile.name
 
-    url = reverse("comment-list", kwargs={"post_id": "2"})
-    resp = client.get(url)
+    post = reddit_factories.text_post(
+        "a post with comments", user, channel=public_channel
+    )
+    comments = []
+    for idx in range(2):
+        comment = reddit_factories.comment(f"comment-{idx}", user, post_id=post.id)
+        comments.append((None, comment))
+        comments.extend(
+            [
+                (
+                    comment.id,
+                    reddit_factories.comment(
+                        f"comment-nested-{idx2}", user, comment_id=comment.id
+                    ),
+                )
+                for idx2 in range(3)
+            ]
+        )
+
+    if not cassette_exists:
+        # if we're writing the cassette, wait for the backend to asynchronously
+        # finish updating the comment tree so we see everything
+        time.sleep(10)
+
+    url = reverse("comment-list", kwargs={"post_id": post.id})
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json()[0]["profile_image"] == profile_image
-    assert resp.json() == [
-        {
-            "id": "1",
-            "parent_id": None,
-            "post_id": "2",
-            "text": "hello world",
-            "author_id": author_id,
-            "score": 1,
-            "upvoted": False,
-            "downvoted": False,
-            "removed": False,
-            "deleted": False,
-            "subscribed": False,
-            "created": "2017-07-25T17:09:45+00:00",
-            "profile_image": profile_image,
-            "author_name": name,
-            "author_headline": headline,
-            "edited": False,
-            "comment_type": "comment",
-            "num_reports": 0,
-        },
-        {
-            "id": "2",
-            "parent_id": "1",
-            "post_id": "2",
-            "text": "texty text text",
+    json = resp.json()
+    # the order isn't entirely deterministic when testing, so just assert the number of elements and the presence of all of them
+    assert len(json) == len(comments)
+    for parent_id, comment in comments:
+        assert {
+            "id": comment.id,
+            "parent_id": parent_id,
+            "post_id": post.id,
+            "text": comment.text,
             "author_id": author_id,
             "score": 1,
             "upvoted": True,
@@ -77,35 +88,14 @@ def test_list_comments(client, logged_in_profile, missing_user):
             "removed": False,
             "deleted": False,
             "subscribed": False,
-            "created": "2017-07-25T17:15:57+00:00",
-            "profile_image": profile_image,
-            "author_name": name,
-            "author_headline": headline,
-            "edited": True,
-            "comment_type": "comment",
-            "num_reports": 0,
-        },
-        {
-            "id": "3",
-            "parent_id": "1",
-            "post_id": "2",
-            "text": "reply2",
-            "author_id": author_id,
-            "score": 1,
-            "upvoted": True,
-            "downvoted": False,
-            "removed": False,
-            "deleted": False,
-            "subscribed": False,
-            "created": "2017-07-25T17:16:10+00:00",
+            "created": comment.created,
             "profile_image": profile_image,
             "author_name": name,
             "author_headline": headline,
             "edited": False,
             "comment_type": "comment",
-            "num_reports": 0,
-        },
-    ]
+            "num_reports": None,
+        } in json
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
@@ -166,17 +156,22 @@ def test_list_comments_none(
     assert resp.json() == []
 
 
-def test_list_comments_forbidden(client, logged_in_profile):
+def test_list_comments_forbidden(
+    client, private_channel_and_contributor, reddit_factories
+):
     """List all comments in the comment tree for a post the user doesn't have access to"""
-    url = reverse("comment-list", kwargs={"post_id": "adc"})
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("one post", user, channel=channel)
+    url = reverse("comment-list", kwargs={"post_id": post.id})
+    client.force_login(UserFactory.create())
     resp = client.get(url)
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_list_comments_not_found(client, logged_in_profile):
+def test_list_comments_not_found(user_client):
     """List all comments in the comment tree for a post that doesn't exist"""
     url = reverse("comment-list", kwargs={"post_id": "missing"})
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
@@ -553,28 +548,7 @@ def test_get_comment_anonymous(
     resp = client.get(url)
     if allow_anonymous:
         assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == [
-            {
-                "author_id": user.username,
-                "author_name": user.profile.name,
-                "author_headline": user.profile.headline,
-                "comment_type": "comment",
-                "created": comment.created,
-                "deleted": False,
-                "downvoted": False,
-                "edited": False,
-                "id": comment.id,
-                "num_reports": None,
-                "parent_id": None,
-                "post_id": post.id,
-                "profile_image": image_uri(user.profile),
-                "removed": False,
-                "score": 1,
-                "subscribed": False,
-                "text": comment.text,
-                "upvoted": False,
-            }
-        ]
+        assert resp.json() == [default_comment_response_data(post, comment, user)]
     else:
         assert resp.status_code in (
             status.HTTP_401_UNAUTHORIZED,
@@ -583,18 +557,34 @@ def test_get_comment_anonymous(
         assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_create_comment(client, logged_in_profile, mock_notify_subscribed_users):
+@pytest.mark.parametrize(
+    "extra_params,extra_expected",
+    [
+        ({}, {}),
+        ({"upvoted": False}, {"upvoted": False}),
+        ({"downvoted": True}, {"upvoted": False, "downvoted": True}),
+    ],
+)
+def test_create_comment(
+    user_client,
+    reddit_factories,
+    private_channel_and_contributor,
+    mock_notify_subscribed_users,
+    extra_params,
+    extra_expected,
+):  # pylint: disable=too-many-arguments
     """Create a comment"""
-    post_id = "2"
-    url = reverse("comment-list", kwargs={"post_id": post_id})
-    resp = client.post(url, data={"text": "reply_to_post 2"})
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("a post", user, channel=channel)
+    url = reverse("comment-list", kwargs={"post_id": post.id})
+    resp = user_client.post(url, data={"text": "reply_to_post 2", **extra_params})
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
-        "author_id": "george",
-        "created": "2017-07-25T21:20:35+00:00",
-        "id": "7",
+        "author_id": user.username,
+        "created": any_instance_of(str),
+        "id": any_instance_of(str),
         "parent_id": None,
-        "post_id": post_id,
+        "post_id": post.id,
         "score": 1,
         "text": "reply_to_post 2",
         "upvoted": True,
@@ -602,22 +592,25 @@ def test_create_comment(client, logged_in_profile, mock_notify_subscribed_users)
         "removed": False,
         "deleted": False,
         "subscribed": True,
-        "profile_image": image_uri(logged_in_profile),
-        "author_name": logged_in_profile.name,
-        "author_headline": logged_in_profile.headline,
+        "profile_image": image_uri(user.profile),
+        "author_name": user.profile.name,
+        "author_headline": user.profile.headline,
         "edited": False,
         "comment_type": "comment",
-        "num_reports": 0,
+        "num_reports": None,
+        **extra_expected,
     }
 
-    mock_notify_subscribed_users.assert_called_once_with(post_id, None, "7")
+    mock_notify_subscribed_users.assert_called_once_with(
+        post.id, None, resp.json()["id"]
+    )
 
 
-def test_create_comment_forbidden(client, logged_in_profile):
+def test_create_comment_forbidden(user_client):
     """Create a comment for a post the user doesn't have access to"""
     post_id = "adc"
     url = reverse("comment-list", kwargs={"post_id": post_id})
-    resp = client.post(url, data={"text": "reply_to_post 2"})
+    resp = user_client.post(url, data={"text": "reply_to_post 2"})
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
@@ -631,93 +624,35 @@ def test_create_comment_anonymous(client, settings, allow_anonymous):
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_create_comment_not_found(client, logged_in_profile):
+def test_create_comment_not_found(user_client):
     """Create a comment for a post that doesn't exist"""
     post_id = "missing"
     url = reverse("comment-list", kwargs={"post_id": post_id})
-    resp = client.post(url, data={"text": "reply_to_post 2"})
+    resp = user_client.post(url, data={"text": "reply_to_post 2"})
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_create_comment_no_upvote(
-    client, logged_in_profile, mock_notify_subscribed_users
-):
-    """Create a comment without an upvote"""
-    post_id = "2"
-    url = reverse("comment-list", kwargs={"post_id": post_id})
-    resp = client.post(url, data={"text": "no upvoted", "upvoted": False})
-    assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {
-        "author_id": "george",
-        "created": "2017-07-25T21:21:48+00:00",
-        "id": "9",
-        "parent_id": None,
-        "post_id": post_id,
-        "score": 1,
-        "text": "no upvoted",
-        "upvoted": False,
-        "downvoted": False,
-        "removed": False,
-        "deleted": False,
-        "subscribed": True,
-        "profile_image": image_uri(logged_in_profile),
-        "author_name": logged_in_profile.name,
-        "author_headline": logged_in_profile.headline,
-        "edited": False,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
-    mock_notify_subscribed_users.assert_called_once_with(post_id, None, "9")
-
-
-def test_create_comment_downvote(
-    client, logged_in_profile, mock_notify_subscribed_users
-):
-    """Create a comment with a downvote"""
-    post_id = "2"
-    url = reverse("comment-list", kwargs={"post_id": post_id})
-    resp = client.post(url, data={"text": "downvoted", "downvoted": True})
-    assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {
-        "author_id": "george",
-        "created": "2017-08-04T19:22:02+00:00",
-        "id": "l",
-        "parent_id": None,
-        "post_id": post_id,
-        "score": 1,
-        "text": "downvoted",
-        "upvoted": False,
-        "downvoted": True,
-        "removed": False,
-        "deleted": False,
-        "subscribed": True,
-        "profile_image": image_uri(logged_in_profile),
-        "author_name": logged_in_profile.name,
-        "author_headline": logged_in_profile.headline,
-        "edited": False,
-        "comment_type": "comment",
-        "num_reports": 0,
-    }
-    mock_notify_subscribed_users.assert_called_once_with(post_id, None, "l")
-
-
 def test_create_comment_reply_to_comment(
-    client, logged_in_profile, mock_notify_subscribed_users
+    user_client,
+    reddit_factories,
+    private_channel_and_contributor,
+    mock_notify_subscribed_users,
 ):
     """Create a comment that's a reply to another comment"""
-    post_id = "2"
-    parent_comment_id = "3"
-    url = reverse("comment-list", kwargs={"post_id": post_id})
-    resp = client.post(
-        url, data={"text": "reply_to_comment 3", "comment_id": parent_comment_id}
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("a post", user, channel=channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+    url = reverse("comment-list", kwargs={"post_id": post.id})
+    resp = user_client.post(
+        url, data={"text": "reply_to_comment 3", "comment_id": comment.id}
     )
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
-        "author_id": "george",
-        "created": "2017-07-25T21:18:47+00:00",
-        "id": "6",
-        "parent_id": parent_comment_id,
-        "post_id": post_id,
+        "author_id": user.username,
+        "created": any_instance_of(str),
+        "id": any_instance_of(str),
+        "parent_id": comment.id,
+        "post_id": post.id,
         "score": 1,
         "text": "reply_to_comment 3",
         "upvoted": True,
@@ -725,15 +660,15 @@ def test_create_comment_reply_to_comment(
         "removed": False,
         "deleted": False,
         "subscribed": True,
-        "profile_image": image_uri(logged_in_profile),
-        "author_name": logged_in_profile.name,
-        "author_headline": logged_in_profile.headline,
+        "profile_image": image_uri(user.profile),
+        "author_name": user.profile.name,
+        "author_headline": user.profile.headline,
         "edited": False,
         "comment_type": "comment",
-        "num_reports": 0,
+        "num_reports": None,
     }
     mock_notify_subscribed_users.assert_called_once_with(
-        post_id, parent_comment_id, "6"
+        post.id, comment.id, resp.json()["id"]
     )
 
 
@@ -754,21 +689,21 @@ def test_create_comment_reply_to_deleted_comment(
     assert resp.json() == {"detail": "Resource is gone.", "error_type": "GoneException"}
 
 
-def test_update_comment_text(client, logged_in_profile):
+def test_update_comment_text(user_client):
     """Update a comment's text"""
     updated_text = "updated text"
     url = reverse("comment-detail", kwargs={"comment_id": "6"})
-    resp = client.patch(url, type="json", data={"text": updated_text})
+    resp = user_client.patch(url, type="json", data={"text": updated_text})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["text"] == updated_text
 
 
 # Reddit returns the same result for updating a missing comment
 # as it does for updating a comment the user doesn't own.
-def test_update_comment_forbidden(client, logged_in_profile):
+def test_update_comment_forbidden(user_client):
     """Update a comment's text for a comment the user doesn't own"""
     url = reverse("comment-detail", kwargs={"comment_id": "e8h"})
-    resp = client.patch(url, type="json", data={"text": "updated text"})
+    resp = user_client.patch(url, type="json", data={"text": "updated text"})
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
@@ -782,37 +717,37 @@ def test_update_comment_anonymous(client, settings, allow_anonymous):
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_update_comment_upvote(client, logged_in_profile):
+def test_update_comment_upvote(user_client):
     """Update a comment to upvote it"""
     comment_id = "l"
     url = reverse("comment-detail", kwargs={"comment_id": comment_id})
-    resp = client.patch(url, type="json", data={"upvoted": True})
+    resp = user_client.patch(url, type="json", data={"upvoted": True})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["upvoted"] is True
 
 
-def test_update_comment_downvote(client, logged_in_profile):
+def test_update_comment_downvote(user_client):
     """Update a comment to downvote it"""
     comment_id = "l"
     url = reverse("comment-detail", kwargs={"comment_id": comment_id})
-    resp = client.patch(url, type="json", data={"downvoted": True})
+    resp = user_client.patch(url, type="json", data={"downvoted": True})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["downvoted"] is True
 
 
-def test_update_comment_clear_upvote(client, logged_in_profile):
+def test_update_comment_clear_upvote(user_client):
     """Update a comment to clear its upvote"""
     url = reverse("comment-detail", kwargs={"comment_id": "6"})
-    resp = client.patch(url, type="json", data={"upvoted": False})
+    resp = user_client.patch(url, type="json", data={"upvoted": False})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["upvoted"] is False
 
 
-def test_update_comment_clear_downvote(client, logged_in_profile):
+def test_update_comment_clear_downvote(user_client):
     """Update a comment to clear its downvote"""
     comment_id = "l"
     url = reverse("comment-detail", kwargs={"comment_id": comment_id})
-    resp = client.patch(url, type="json", data={"downvoted": False})
+    resp = user_client.patch(url, type="json", data={"downvoted": False})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["downvoted"] is False
 

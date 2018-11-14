@@ -16,7 +16,12 @@ from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyText
 
 from channels import api
-from channels.constants import VALID_CHANNEL_TYPES, LINK_TYPE_ANY
+from channels.constants import (
+    VALID_CHANNEL_TYPES,
+    LINK_TYPE_ANY,
+    VALID_EXTENDED_POST_TYPES,
+    EXTENDED_POST_TYPE_ARTICLE,
+)
 from channels.models import (
     RedditRefreshToken,
     RedditAccessToken,
@@ -25,6 +30,7 @@ from channels.models import (
     Channel,
     Post,
     Comment,
+    Article,
 )
 from open_discussions.factories import UserFactory
 from open_discussions.utils import now_in_utc
@@ -33,6 +39,14 @@ FAKE = faker.Factory.create()
 
 STRATEGY_CREATE = "create"
 STRATEGY_BUILD = "build"
+
+
+def _channel_name():
+    """Generate a channel name from the current time and a random word"""
+    now = now_in_utc().timestamp()
+    return "{}_{}".format(int(now), FAKE.word())[
+        :21
+    ]  # maximum of 21-char channel names
 
 
 class RedditChannel:
@@ -48,13 +62,14 @@ class RedditChannel:
         self.api = kwargs.get("api", None)
 
 
-class RedditPost:
+class RedditPost:  # pylint: disable=too-many-instance-attributes
     """Simple factory representation for a reddit post"""
 
     def __init__(self, **kwargs):
         self.id = kwargs.get("id", None)
         self.title = kwargs.get("title", None)
         self.text = kwargs.get("text", None)
+        self.article_content = kwargs.get("article_content", None)
         self.url = kwargs.get("url", None)
         self.channel = kwargs.get("channel", None)
         self.created = kwargs.get("created", None)
@@ -87,7 +102,7 @@ class LinkMetaFactory(DjangoModelFactory):
 class ChannelFactory(DjangoModelFactory):
     """Factory for a channels.models.Channel object"""
 
-    name = FuzzyText(chars=string.ascii_lowercase)
+    name = factory.LazyFunction(_channel_name)
 
     class Meta:
         model = Channel
@@ -96,9 +111,10 @@ class ChannelFactory(DjangoModelFactory):
 class PostFactory(DjangoModelFactory):
     """Factory for a channels.models.Post object"""
 
-    post_id = FuzzyText(chars=string.ascii_lowercase)
+    post_id = factory.Sequence(base36.dumps)
     channel = SubFactory(ChannelFactory)
     link_meta = SubFactory(LinkMetaFactory)
+    post_type = FuzzyChoice(VALID_EXTENDED_POST_TYPES)
 
     class Meta:
         model = Post
@@ -143,6 +159,12 @@ def serialize_factory_result(obj):
     elif isinstance(obj, RedditPost):
         if obj.url is not None:
             return {"id": obj.id, "title": obj.title, "url": obj.url}
+        elif Article.objects.filter(post__post_id=obj.id).exists():
+            return {
+                "id": obj.id,
+                "title": obj.title,
+                "article_content": Article.objects.get(post__post_id=obj.id).content,
+            }
         elif obj.text is not None:
             return {"id": obj.id, "title": obj.title, "text": obj.text}
     elif isinstance(obj, RedditChannel):
@@ -169,6 +191,9 @@ def transform_to_factory_kwargs(data, original_kwargs=None, prefix=""):
     Returns:
         dict: the generate kwargs to call the factory with
     """
+    if original_kwargs is None:
+        original_kwargs = {}
+
     kwargs = {
         key: value for key, value in original_kwargs.items() if key not in data.keys()
     }
@@ -376,6 +401,26 @@ class RedditFactories:
             **kwargs,
         )
 
+    def article_post(self, ident, user, strategy=STRATEGY_CREATE, **kwargs):
+        """
+        Creates a new named article post
+
+        Args:
+            ident (str): the logical name of the post within the test
+            strategy (str): either a create or build strategy for the factory
+
+        Returns:
+            Post: the created post
+        """
+        return self.store.get_or_make(
+            ArticlePostFactory,
+            "posts",
+            ident,
+            strategy=strategy,
+            api=api.Api(user),
+            **kwargs,
+        )
+
     def comment(self, ident, user, strategy=STRATEGY_CREATE, **kwargs):
         """
         Creates a new named comment
@@ -447,23 +492,16 @@ def _timestamp_to_iso_str(timestamp):
 
 
 class RedditChannelFactory(factory.Factory):
-    """Factory for reddit channels"""
+    """Factory for reddit-persisted channels"""
 
     api = None
+    name = factory.LazyFunction(_channel_name)
     title = factory.Faker("text", max_nb_chars=50)
     description = factory.Faker("text", max_nb_chars=500)
     public_description = factory.Faker("text", max_nb_chars=80)
     channel_type = FuzzyChoice(VALID_CHANNEL_TYPES)
     link_type = LINK_TYPE_ANY
     ga_tracking_id = None
-
-    @factory.lazy_attribute
-    def name(self):
-        """Lazily determine a unique channel name"""
-        now = now_in_utc().timestamp()
-        return "{}_{}".format(int(now), FAKE.word())[
-            :21
-        ]  # maximum of 21-char channel names
 
     @factory.post_generation
     def _create_in_reddit(
@@ -488,6 +526,23 @@ class RedditChannelFactory(factory.Factory):
         model = RedditChannel
 
 
+class ArticleFactory(DjangoModelFactory):
+    """Factory for Articles"""
+
+    author = factory.SubFactory(UserFactory)
+    post = factory.SubFactory(PostFactory, post_type=EXTENDED_POST_TYPE_ARTICLE)
+    content = factory.List(
+        [
+            factory.Dict({"node": "text", "value": factory.Faker("text")}),
+            factory.Dict({"node": "text", "value": factory.Faker("text")}),
+            factory.Dict({"node": "text", "value": factory.Faker("text")}),
+        ]
+    )
+
+    class Meta:
+        model = Article
+
+
 class RedditPostFactory(factory.Factory):
     """Abstract factory for posts"""
 
@@ -502,12 +557,14 @@ class RedditPostFactory(factory.Factory):
 
     class Meta:
         abstract = True
+        model = RedditPost
 
 
 class RedditTextPostFactory(RedditPostFactory):
     """Factory for text posts"""
 
     text = factory.Faker("text", max_nb_chars=100)
+    article_content = None
 
     @factory.post_generation
     def _create_in_reddit(self, *args, **kwargs):  # pylint: disable=unused-argument
@@ -516,15 +573,15 @@ class RedditTextPostFactory(RedditPostFactory):
             raise ValueError("RedditTextPostFactory requires an api instance")
 
         reddit_post = self.api.create_post(
-            self.channel.name, self.title, text=self.text
+            self.channel.name,
+            self.title,
+            text=self.text,
+            article_content=self.article_content,
         )
 
         self.id = reddit_post.id
         self.created = _timestamp_to_iso_str(reddit_post.created)
         self.permalink = reddit_post.permalink
-
-    class Meta:
-        model = RedditPost
 
 
 class RedditLinkPostFactory(RedditPostFactory):
@@ -536,7 +593,7 @@ class RedditLinkPostFactory(RedditPostFactory):
     def _create_in_reddit(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Create the post"""
         if not self.api:
-            raise ValueError("RedditTextPostFactory requires an api instance")
+            raise ValueError("RedditLinkPostFactory requires an api instance")
 
         reddit_post = self.api.create_post(self.channel.name, self.title, url=self.url)
 
@@ -544,8 +601,18 @@ class RedditLinkPostFactory(RedditPostFactory):
         self.created = _timestamp_to_iso_str(reddit_post.created)
         self.permalink = reddit_post.permalink
 
-    class Meta:
-        model = RedditPost
+
+class ArticlePostFactory(RedditTextPostFactory):
+    """Factory for article posts"""
+
+    article_content = factory.List(
+        [
+            factory.Dict({"node": "text", "value": factory.Faker("text")}),
+            factory.Dict({"node": "text", "value": factory.Faker("text")}),
+            factory.Dict({"node": "text", "value": factory.Faker("text")}),
+        ]
+    )
+    text = None
 
 
 class RedditCommentFactory(factory.Factory):

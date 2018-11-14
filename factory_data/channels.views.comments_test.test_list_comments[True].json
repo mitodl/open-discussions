@@ -1,0 +1,63 @@
+{
+  "channels": {
+    "public_channel": {
+      "channel_type": "public",
+      "description": "Suscipit aperiam molestias debitis delectus. Voluptates ullam sunt voluptatem aliquid voluptatem optio neque. Labore molestiae aut corrupti quis.\nNulla dolor optio fugit quod nisi provident. Impedit quo incidunt at quidem nulla quas. Vero aspernatur beatae alias eligendi magni blanditiis aut magnam.",
+      "name": "1542381740_quasi",
+      "public_description": "Nulla delectus repellat totam reprehenderit est facere.",
+      "title": "Non harum atque ex ratione."
+    }
+  },
+  "comments": {
+    "comment-0": {
+      "children": [],
+      "comment_id": null,
+      "id": "7v",
+      "post_id": "ba",
+      "text": "Ab officia animi ut occaecati praesentium. Soluta eos recusandae sapiente repellendus qui."
+    },
+    "comment-1": {
+      "children": [],
+      "comment_id": null,
+      "id": "7z",
+      "post_id": "ba",
+      "text": "Minus blanditiis tempore aut facere voluptates vero. Sint ex nobis quas veniam."
+    },
+    "comment-nested-0": {
+      "children": [],
+      "comment_id": "7v",
+      "id": "7w",
+      "post_id": null,
+      "text": "Numquam earum nobis amet aspernatur nesciunt voluptas cum. Voluptas animi enim commodi odit."
+    },
+    "comment-nested-1": {
+      "children": [],
+      "comment_id": "7v",
+      "id": "7x",
+      "post_id": null,
+      "text": "Ea explicabo expedita dicta eligendi. Hic eveniet vel nihil culpa qui occaecati."
+    },
+    "comment-nested-2": {
+      "children": [],
+      "comment_id": "7v",
+      "id": "7y",
+      "post_id": null,
+      "text": "Sit quisquam ratione blanditiis blanditiis adipisci assumenda et. Quo molestiae esse voluptatibus."
+    }
+  },
+  "posts": {
+    "a post with comments": {
+      "id": "ba",
+      "text": "Expedita ea esse magni ipsam praesentium vero. Mollitia dolor veniam amet sequi a corporis.",
+      "title": "Eos modi soluta tempore iusto."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CWEHV5MM5Y1TMX3FRXW9PEJF"
+    },
+    "staff_user": {
+      "username": "01CWEHV2B6D15J5D54AVX9FNB3"
+    }
+  }
+}

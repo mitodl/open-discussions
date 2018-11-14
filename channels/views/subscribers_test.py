@@ -19,17 +19,18 @@ def test_list_subscribers_not_allowed(staff_client):
     assert staff_client.get(url).status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
-def test_add_subscriber(staff_client):
+@pytest.mark.parametrize("attempts", [1, 2])
+def test_add_subscriber(staff_client, user, public_channel, attempts):
     """
     Adds a subscriber to a channel as a staff user
     """
-    subscriber = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
-    url = reverse("subscriber-list", kwargs={"channel_name": "admin_channel"})
-    resp = staff_client.post(
-        url, data={"subscriber_name": subscriber.username}, format="json"
-    )
-    assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {"subscriber_name": subscriber.username}
+    url = reverse("subscriber-list", kwargs={"channel_name": public_channel.name})
+    for _ in range(attempts):
+        resp = staff_client.post(
+            url, data={"subscriber_name": user.username}, format="json"
+        )
+        assert resp.status_code == status.HTTP_201_CREATED
+        assert resp.json() == {"subscriber_name": user.username}
 
 
 def test_add_subscriber_mod(client, public_channel, staff_api, reddit_factories):
@@ -48,19 +49,6 @@ def test_add_subscriber_mod(client, public_channel, staff_api, reddit_factories)
     assert resp.json() == {"subscriber_name": new_subscriber.username}
 
 
-def test_add_subscriber_again(staff_client):
-    """
-    If a user is already part of a channel we should return a 201 status
-    """
-    subscriber = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
-    url = reverse("subscriber-list", kwargs={"channel_name": "admin_channel"})
-    resp = staff_client.post(
-        url, data={"subscriber_name": subscriber.username}, format="json"
-    )
-    assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json() == {"subscriber_name": subscriber.username}
-
-
 def test_add_subscriber_forbidden(staff_client):
     """
     If a user gets a 403 from praw we should return a 403 status
@@ -74,16 +62,15 @@ def test_add_subscriber_forbidden(staff_client):
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_add_subscriber_anonymous(client, settings, allow_anonymous):
+def test_add_subscriber_anonymous(
+    client, user, public_channel, settings, allow_anonymous
+):
     """
     Anonymous users can't add subscribers
     """
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
-    subscriber = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
-    url = reverse("subscriber-list", kwargs={"channel_name": "admin_channel"})
-    resp = client.post(
-        url, data={"subscriber_name": subscriber.username}, format="json"
-    )
+    url = reverse("subscriber-list", kwargs={"channel_name": public_channel.name})
+    resp = client.post(url, data={"subscriber_name": user.username}, format="json")
     assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
@@ -115,65 +102,44 @@ def test_detail_subscriber_missing(user_client, private_channel, user):
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_detail_subscriber_anonymous(client, settings, allow_anonymous):
+def test_detail_subscriber_anonymous(
+    client, user, public_channel, settings, allow_anonymous
+):
     """Anonymous users can't see subscriber information"""
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
-    subscriber = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
     url = reverse(
         "subscriber-detail",
-        kwargs={
-            "channel_name": "admin_channel",
-            "subscriber_name": subscriber.username,
-        },
+        kwargs={"channel_name": public_channel.name, "subscriber_name": user.username},
     )
     resp = client.get(url)
     assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_remove_subscriber(staff_client):
+@pytest.mark.parametrize("attempts", [1, 2])
+def test_remove_subscriber(staff_client, staff_api, user, public_channel, attempts):
     """
     Removes a subscriber from a channel
     """
-    subscriber = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
+    staff_api.add_subscriber(user.username, public_channel.name)
     url = reverse(
         "subscriber-detail",
-        kwargs={
-            "channel_name": "admin_channel",
-            "subscriber_name": subscriber.username,
-        },
+        kwargs={"channel_name": public_channel.name, "subscriber_name": user.username},
     )
-    resp = staff_client.delete(url)
-    assert resp.status_code == status.HTTP_204_NO_CONTENT
-
-
-def test_remove_subscriber_again(staff_client):
-    """
-    The API should return a 204 even if the user isn't there
-    """
-    subscriber = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
-    url = reverse(
-        "subscriber-detail",
-        kwargs={
-            "channel_name": "admin_channel",
-            "subscriber_name": subscriber.username,
-        },
-    )
-    resp = staff_client.delete(url)
-    assert resp.status_code == status.HTTP_204_NO_CONTENT
+    for _ in range(attempts):
+        resp = staff_client.delete(url)
+        assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_remove_subscriber_anonymous(client, settings, allow_anonymous):
+def test_remove_subscriber_anonymous(
+    client, user, public_channel, settings, allow_anonymous
+):
     """Anonymous users can't remove subscribers"""
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
-    subscriber = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
     url = reverse(
         "subscriber-detail",
-        kwargs={
-            "channel_name": "admin_channel",
-            "subscriber_name": subscriber.username,
-        },
+        kwargs={"channel_name": public_channel.name, "subscriber_name": user.username},
     )
     resp = client.delete(url)
     assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)

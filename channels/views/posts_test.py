@@ -8,7 +8,7 @@ from rest_framework import status
 from profiles.utils import image_uri
 from channels.factories import LinkMetaFactory
 from channels.constants import VALID_POST_SORT_TYPES, POSTS_SORT_HOT
-from channels.models import Subscription, LinkMeta
+from channels.models import Subscription, LinkMeta, Article
 from channels.views.test_utils import default_post_response_data
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
@@ -17,12 +17,13 @@ from open_discussions.constants import (
 )
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
+from open_discussions.test_utils import any_instance_of
 
 pytestmark = pytest.mark.betamax
 
 
 def test_create_url_post_existing_meta(
-    client, private_channel_and_contributor, mocker, settings
+    user_client, private_channel_and_contributor, mocker, settings
 ):
     """
     Create a new url post
@@ -34,8 +35,7 @@ def test_create_url_post_existing_meta(
     embedly_stub = mocker.patch("channels.utils.get_embedly")
     LinkMetaFactory.create(url=link_url, thumbnail=thumbnail)
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    client.force_login(user)
-    resp = client.post(url, {"title": "url title 🐨", "url": link_url})
+    resp = user_client.post(url, {"title": "url title 🐨", "url": link_url})
     assert embedly_stub.not_called()
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
@@ -44,10 +44,11 @@ def test_create_url_post_existing_meta(
         "url_domain": "micromasters.mit.edu",
         "thumbnail": thumbnail,
         "text": None,
+        "article_content": None,
         "author_id": user.username,
-        "created": "2018-08-24T18:02:48+00:00",
+        "created": any_instance_of(str),
         "upvoted": True,
-        "id": "14",
+        "id": any_instance_of(str),
         "slug": "url-title",
         "num_comments": 0,
         "removed": False,
@@ -67,11 +68,11 @@ def test_create_url_post_existing_meta(
 
 
 def test_post_create_post_new_meta(
-    client, private_channel_and_contributor, mocker, settings
+    user_client, private_channel_and_contributor, mocker, settings
 ):
     """ Tests that a new LinkMeta object is created for the URL if none exists"""
     settings.EMBEDLY_KEY = "FAKE"
-    channel, user = private_channel_and_contributor
+    channel, _ = private_channel_and_contributor
     link_url = "http://fake"
     thumbnail = "http://fake/thumbnail.jpg"
     embed_return_value = mocker.Mock()
@@ -82,18 +83,17 @@ def test_post_create_post_new_meta(
         "channels.utils.get_embedly", return_value=embed_return_value
     )
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    client.force_login(user)
-    client.post(url, {"title": "url title 🐨", "url": link_url})
+    user_client.post(url, {"title": "url title 🐨", "url": link_url})
     assert embedly_stub.called_with(link_url)
     assert LinkMeta.objects.filter(url=link_url).first() is not None
 
 
 def test_post_create_post_no_thumbnail(
-    client, private_channel_and_contributor, mocker, settings
+    user_client, private_channel_and_contributor, mocker, settings
 ):
     """ Tests that no LinkMeta object is created if embedly does not return a thumbnail """
     settings.EMBEDLY_KEY = "FAKE"
-    channel, user = private_channel_and_contributor
+    channel, _ = private_channel_and_contributor
     link_url = "http://fake"
     embed_return_value = mocker.Mock()
     embed_return_value.configure_mock(**{"json.return_value": {"some": "json"}})
@@ -101,36 +101,35 @@ def test_post_create_post_no_thumbnail(
         "channels.utils.get_embedly", return_value=embed_return_value
     )
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    client.force_login(user)
-    client.post(url, {"title": "url title 🐨", "url": link_url})
+    user_client.post(url, {"title": "url title 🐨", "url": link_url})
     assert embedly_stub.called_once()
     assert LinkMeta.objects.filter(url=url).first() is None
 
 
-def test_create_text_post(client, private_channel_and_contributor):
+def test_create_text_post(user_client, private_channel_and_contributor):
     """
     Create a new text post
     """
     channel, user = private_channel_and_contributor
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    client.force_login(user)
-    resp = client.post(
+    resp = user_client.post(
         url, {"title": "parameterized testing", "text": "tests are great"}
     )
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         "title": "parameterized testing",
         "text": "tests are great",
+        "article_content": None,
         "url": None,
         "url_domain": None,
         "thumbnail": None,
         "author_id": user.username,
-        "created": "2018-08-24T18:03:18+00:00",
+        "created": any_instance_of(str),
         "upvoted": True,
         "removed": False,
         "deleted": False,
         "subscribed": True,
-        "id": "17",
+        "id": any_instance_of(str),
         "slug": "parameterized-testing",
         "num_comments": 0,
         "score": 1,
@@ -146,14 +145,56 @@ def test_create_text_post(client, private_channel_and_contributor):
     }
 
 
-def test_create_text_post_blank(client, private_channel_and_contributor):
+def test_create_article_post(user_client, private_channel_and_contributor):
     """
-    Create a new text post with no text
+    Create a new text post
     """
     channel, user = private_channel_and_contributor
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    client.force_login(user)
-    resp = client.post(url, {"title": "blank post"})
+    article_content = [{"key": "value", "nested": {"number": 4}}]
+    resp = user_client.post(
+        url, {"title": "parameterized testing", "article_content": article_content}
+    )
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json() == {
+        "title": "parameterized testing",
+        "text": "",
+        "article_content": article_content,
+        "url": None,
+        "url_domain": None,
+        "thumbnail": None,
+        "author_id": user.username,
+        "created": any_instance_of(str),
+        "upvoted": True,
+        "removed": False,
+        "deleted": False,
+        "subscribed": True,
+        "id": any_instance_of(str),
+        "slug": "parameterized-testing",
+        "num_comments": 0,
+        "score": 1,
+        "channel_name": channel.name,
+        "channel_title": channel.title,
+        "channel_type": "private",
+        "profile_image": image_uri(user.profile),
+        "author_name": user.profile.name,
+        "author_headline": user.profile.headline,
+        "edited": False,
+        "stickied": False,
+        "num_reports": None,
+    }
+    article = Article.objects.filter(post__post_id=resp.json()["id"])
+    assert article.exists()
+    assert article.first().content == article_content
+
+
+def test_create_text_post_blank(user_client, private_channel_and_contributor):
+    """
+    Create a new text post with no text
+    """
+    channel, _ = private_channel_and_contributor
+    url = reverse("post-list", kwargs={"channel_name": channel.name})
+    resp = user_client.post(url, {"title": "blank post"})
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json()["text"] == ""
 
@@ -348,19 +389,18 @@ def test_list_posts(
         }
 
 
-def test_list_posts_none(client, private_channel_and_contributor):
+def test_list_posts_none(user_client, private_channel_and_contributor):
     """List posts in a channel"""
-    channel, user = private_channel_and_contributor
-    client.force_login(user)
+    channel, _ = private_channel_and_contributor
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    resp = client.get(url)
+    resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {"posts": [], "pagination": {"sort": POSTS_SORT_HOT}}
 
 
 @pytest.mark.parametrize("sort", VALID_POST_SORT_TYPES)
 def test_list_posts_sorted(
-    client, private_channel_and_contributor, reddit_factories, sort
+    user_client, private_channel_and_contributor, reddit_factories, sort
 ):
     """View the channel listing with sorted options"""
     # note: these sort types are difficult to reproduce unique sort orders in the span of a test,
@@ -370,11 +410,8 @@ def test_list_posts_sorted(
     second_post = reddit_factories.text_post("my 2nd post", user, channel=channel)
     third_post = reddit_factories.text_post("my 3rd post", user, channel=channel)
     fourth_post = reddit_factories.text_post("my 4th post", user, channel=channel)
-
-    client.force_login(user)
-
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    resp = client.get(url, {"sort": sort})
+    resp = user_client.get(url, {"sort": sort})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         "posts": [
@@ -566,6 +603,7 @@ def test_create_post_without_upvote(user_client, private_channel_and_contributor
     assert resp.json() == {
         "title": "x",
         "text": "y",
+        "article_content": None,
         "url": None,
         "url_domain": None,
         "thumbnail": None,
@@ -588,6 +626,22 @@ def test_create_post_without_upvote(user_client, private_channel_and_contributor
         "edited": False,
         "stickied": False,
         "num_reports": None,
+    }
+
+
+def test_update_article_post(
+    user_client, reddit_factories, private_channel_and_contributor
+):
+    """Test that we can update the content of an article post"""
+    article_content = [{"data": "updated"}]
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.article_post("post", user=user, channel=channel)
+    url = reverse("post-detail", kwargs={"post_id": post.id})
+    resp = user_client.patch(url, {"article_content": article_content})
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        **default_post_response_data(channel, post, user),
+        "article_content": article_content,
     }
 
 

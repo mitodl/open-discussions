@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Ut nesciunt totam facilis iure deserunt consequuntur. Maxime sint delectus repudiandae dolor alias placeat. Recusandae explicabo distinctio dolor labore ea.\nRem pariatur temporibus nemo neque placeat. Facere dignissimos et veritatis.\nUnde nisi assumenda aut ducimus unde non ipsum. Ea repudiandae reprehenderit magni. Ullam voluptatibus placeat aspernatur a temporibus autem facilis. Nihil corporis quae corporis voluptatem libero.",
+      "name": "1542381815_molestiae",
+      "public_description": "Minima eveniet mollitia vel eos.",
+      "title": "Voluptas tempore reiciendis officia."
+    }
+  },
+  "posts": {
+    "one post": {
+      "id": "bc",
+      "text": "Nesciunt fugit velit explicabo. Est tenetur exercitationem ipsam deleniti facere.",
+      "title": "Totam ad dolorem ex perspiciatis quis officiis."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CWEHXMTZB34JB7G773JZ98EB"
+    },
+    "staff_user": {
+      "username": "01CWEHXEHDBJAWFBH478SCF729"
+    }
+  }
+}
