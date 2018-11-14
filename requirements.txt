@@ -38,7 +38,7 @@ elasticsearch==6.2.0
 factory-boy==2.10.0
 faker==0.7.17
 html5lib==0.999999999
-idna==2.5                 # via requests
+idna==2.5                 # via requests, tldextract
 ipaddress==1.0.22         # via elasticsearch-dsl
 ipython-genutils==0.2.0   # via traitlets
 ipython==6.1.0
@@ -67,14 +67,16 @@ pytz==2017.2              # via celery, django
 pyyaml==3.11
 raven==6.9.0
 redis==2.10.5
+requests-file==1.4.3      # via tldextract
 requests-oauthlib==0.8.0  # via social-auth-core
 requests==2.20.1
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via django-anymail, django-server-status, elasticsearch-dsl, faker, html5lib, isodate, prompt-toolkit, python-dateutil, social-auth-app-django, social-auth-core, traitlets
+six==1.10.0               # via django-anymail, django-server-status, elasticsearch-dsl, faker, html5lib, isodate, prompt-toolkit, python-dateutil, requests-file, social-auth-app-django, social-auth-core, traitlets
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0   # via social-auth-app-django
 static3==0.5.1
 tinycss2==0.6.1           # via cairosvg, cssselect2
+tldextract==2.2.0
 traitlets==4.3.2          # via ipython
 ulid-py==0.0.3
 update-checker==0.16      # via praw

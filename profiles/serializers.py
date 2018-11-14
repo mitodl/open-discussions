@@ -8,7 +8,8 @@ from rest_framework import serializers
 import ulid
 
 from authentication import api as auth_api
-from profiles.models import Profile, PROFILE_PROPS
+from profiles.api import get_site_type_from_url
+from profiles.models import Profile, PROFILE_PROPS, UserWebsite
 from profiles.utils import image_uri, IMAGE_MEDIUM, IMAGE_SMALL
 
 User = get_user_model()
@@ -45,6 +46,18 @@ class ProfileSerializer(serializers.ModelSerializer):
             instance.save(update_image=update_image)
             return instance
 
+    def to_representation(self, instance):
+        """
+        Overridden serialization method. Adds serialized UserWebsites if an option in the context indicates that
+        it should be included.
+        """
+        data = super().to_representation(instance)
+        if self.context.get("include_user_websites"):
+            data["user_websites"] = UserWebsiteSerializer(
+                instance.userwebsite_set.all(), many=True
+            ).data
+        return data
+
     class Meta:
         model = Profile
         fields = (
@@ -70,6 +83,43 @@ class ProfileSerializer(serializers.ModelSerializer):
             "profile_image_medium",
             "username",
         )
+
+
+class UserWebsiteSerializer(serializers.ModelSerializer):
+    """Serializer for UserWebsite"""
+
+    def validate_site_type(self, value):
+        """
+        Validator for site_type
+
+        NOTE: This is a no-op to allow for the calculation of site_type from the given url.
+        """
+        return value
+
+    def to_internal_value(self, data):
+        """
+        Overridden deserialization method. In addition to standard deserialization,
+        determine the site_type from the url and add it to the deserialized data
+        """
+        deserialized = super().to_internal_value(data)
+        return {
+            **deserialized,
+            "site_type": get_site_type_from_url(deserialized.get("url")),
+        }
+
+    def to_representation(self, instance):
+        """
+        Overridden serialization method. Excludes 'profile' from the serialized data as it isn't relevant as a
+        serialized field (we only need to deserialize that value).
+        """
+        data = super().to_representation(instance)
+        data.pop("profile")
+        return data
+
+    class Meta:
+        model = UserWebsite
+        fields = ("id", "profile", "url", "site_type")
+        read_only_fields = ("id", "site_type")
 
 
 class UserSerializer(serializers.ModelSerializer):

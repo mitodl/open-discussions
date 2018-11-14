@@ -11,9 +11,13 @@ from rest_framework.permissions import IsAuthenticated
 from cairosvg import svg2png  # pylint:disable=no-name-in-module
 
 from open_discussions.permissions import IsStaffPermission
-from profiles.models import Profile
-from profiles.permissions import HasEditPermission
-from profiles.serializers import UserSerializer, ProfileSerializer
+from profiles.models import Profile, UserWebsite
+from profiles.permissions import HasEditPermission, HasSiteEditPermission
+from profiles.serializers import (
+    UserSerializer,
+    ProfileSerializer,
+    UserWebsiteSerializer,
+)
 from profiles.utils import generate_svg_avatar, DEFAULT_PROFILE_IMAGE
 
 
@@ -33,10 +37,22 @@ class ProfileViewSet(
     """View for profile"""
 
     permission_classes = (IsAuthenticated, HasEditPermission)
-
     serializer_class = ProfileSerializer
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.prefetch_related("userwebsite_set").all()
     lookup_field = "user__username"
+
+    def get_serializer_context(self):
+        return {"include_user_websites": True}
+
+
+class UserWebsiteViewSet(
+    mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet
+):
+    """View for user websites"""
+
+    permission_classes = (IsAuthenticated, HasSiteEditPermission)
+    serializer_class = UserWebsiteSerializer
+    queryset = UserWebsite.objects.select_related("profile__user").all()
 
 
 @cache_page(60 * 60 * 24)

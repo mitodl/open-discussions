@@ -1,6 +1,13 @@
 """Profile API"""
+import tldextract
+
 from channels.models import ChannelGroupRole
-from profiles.models import Profile, filter_profile_props
+from profiles.models import (
+    Profile,
+    filter_profile_props,
+    SITE_TYPE_OPTIONS,
+    PERSONAL_SITE_TYPE,
+)
 
 
 def ensure_profile(user, profile_data=None):
@@ -38,3 +45,21 @@ def get_channels(user):
             )
         )
     )
+
+
+def get_site_type_from_url(url):
+    """
+    Gets a site type (as defined in profiles.models) from the given URL
+
+    Args:
+        url (str): A URL
+
+    Returns:
+        str: A string indicating the site type
+    """
+    no_fetch_extract = tldextract.TLDExtract(suffix_list_urls=False)
+    extract_result = no_fetch_extract(url)
+    domain = extract_result.domain.lower()
+    if domain in SITE_TYPE_OPTIONS:
+        return domain
+    return PERSONAL_SITE_TYPE
