@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.53.2
+--------------
+
+- Query database to get lists of channels, posts, comments for indexing (#1415)
+- Added backend support for adding/deleting user websites
+- Updated README and added references to common web app guide
+
 Version 0.53.1 (Released November 15, 2018)
 --------------
 
