@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from channels.api import Api
+from channels.models import Channel
 from channels.serializers import ContributorSerializer
 from open_discussions.permissions import ContributorPermissions
 
@@ -26,11 +27,12 @@ class ContributorListView(ListCreateAPIView):
 
     def get_queryset(self):
         """Get generator for contributors in channel"""
-        api = Api(user=self.request.user)
         return (
             contributor
-            for contributor in api.list_contributors(self.kwargs["channel_name"])
-            if contributor.name != settings.INDEXING_API_USERNAME
+            for contributor in list(
+                Channel.objects.get(name=self.kwargs["channel_name"]).contributors
+            )
+            if contributor.username != settings.INDEXING_API_USERNAME
         )
 
 

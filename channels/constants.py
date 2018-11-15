@@ -38,6 +38,7 @@ ROLE_CONTRIBUTORS = "contributors"
 ROLE_CHOICES = (ROLE_MODERATORS, ROLE_CONTRIBUTORS)
 ROLE_SEQ = "role_seq"
 
+
 class VoteActions(Enum):
     """An enum indicating the valid vote actions that can be taken for a post or comment"""
 

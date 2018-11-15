@@ -7,7 +7,12 @@ from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models import URLField
 
-from channels.constants import ROLE_CHOICES, ROLE_MODERATORS, ROLE_CONTRIBUTORS, ROLE_SEQ
+from channels.constants import (
+    ROLE_CHOICES,
+    ROLE_MODERATORS,
+    ROLE_CONTRIBUTORS,
+    ROLE_SEQ,
+)
 from channels.utils import AVATAR_MEDIUM_MAX_DIMENSION, AVATAR_SMALL_MAX_DIMENSION
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
@@ -156,9 +161,18 @@ class Channel(TimestampedModel):
             iterable of User: users who are channel moderators
 
         """
-        return ChannelGroupRole.objects.get(
+        channel_role = ChannelGroupRole.objects.filter(
             channel=self, role=ROLE_MODERATORS
-        ).group.user_set.extra(select={ROLE_SEQ: 'auth_user_groups.id'}).order_by(ROLE_SEQ).iterator()
+        ).first()
+        if channel_role:
+            return (
+                channel_role.group.user_set.extra(
+                    select={ROLE_SEQ: "auth_user_groups.id"}
+                )
+                .order_by(ROLE_SEQ)
+                .iterator()
+            )
+        return []
 
     @property
     def contributors(self):
@@ -169,9 +183,14 @@ class Channel(TimestampedModel):
             iterable of User: users who are channel contributors
 
         """
-        return ChannelGroupRole.objects.get(
+        channel_role = ChannelGroupRole.objects.filter(
             channel=self, role=ROLE_CONTRIBUTORS
-        ).group.user_set.order_by('auth_user_groups.id').iterator()
+        ).first()
+        if channel_role:
+            return channel_role.group.user_set.order_by(
+                "auth_user_groups.id"
+            ).iterator()
+        return []
 
     @property
     def subscribers(self):
@@ -183,7 +202,9 @@ class Channel(TimestampedModel):
 
         """
         return User.objects.filter(
-            id__in=ChannelSubscription.objects.filter(channel=self).values_list("user", flat=True)
+            id__in=ChannelSubscription.objects.filter(channel=self).values_list(
+                "user", flat=True
+            )
         ).iterator()
 
     def __str__(self):

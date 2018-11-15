@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2018-08-24T18:02:04",
+      "recorded_at": "2018-11-15T21:42:41",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -18,15 +18,15 @@
             "keep-alive"
           ],
           "User-Agent": [
-            "python-requests/2.18.1"
+            "python-requests/2.20.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPHK85M1KHY5647G2FQNYD5"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CWCN6W7JRFVJC9BZWRJQ0PCW"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIysNB1Nyu08M9Kic9wzs8szIyPCq2KSrU0NAhMKslX0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLalO3uGZKeVJRcZ5QT6BpuH+AWllxWbOIZ7FYJtS0kty0xOjc9MARkM4SjVAgCqYwwKuAAAAA==",
+          "base64_string": "H4sIAAAAAAAAA1WNvQrCMBhFX6VkFIWESEC3iluhP+LkEpL0q00abExKrYrvbmMnx3u45943EkpBCHzoO7ihfYIIo5u0OGSuE6JlwO7FJZjmUXKyzbsqResEweS0h8B1FCjDeGY/nw9PB3FEgvDgYzeofkGrmDw0s9j+v9nXaHeszE6C4LY6WikNpVdmprOKTg2jVsB1HYeXgD5f06t4J7gAAAA=",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 18:02:04 GMT"
+            "Thu, 15 Nov 2018 21:20:22 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=cP3B81DGqs65AaqV95; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 23-Aug-2020 18:02:04 GMT",
-            "loidcreated=2018-08-24T18%3A02%3A03.804Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 23-Aug-2020 18:02:04 GMT"
+            "loid=G1iW0ygLSSvEwI4wYF; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 14-Nov-2020 21:20:22 GMT",
+            "loidcreated=2018-11-15T21%3A20%3A22.131Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 14-Nov-2020 21:20:22 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -66,15 +66,15 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPHK85M1KHY5647G2FQNYD5"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CWCN6W7JRFVJC9BZWRJQ0PCW"
       }
     },
     {
-      "recorded_at": "2018-08-24T18:02:04",
+      "recorded_at": "2018-11-15T21:42:41",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "allow_top=True&api_type=json&description=Quis+deleniti+quod+est+delectus.+Molestias+quaerat+repellat+expedita+perspiciatis+unde+ex.+Sapiente+impedit+accusamus+nostrum+aspernatur.%0APlaceat+error+aliquam+corrupti+laboriosam+alias+illum+minima.+Aut+hic+necessitatibus+reiciendis+voluptates+recusandae.+Fuga+blanditiis+deserunt+voluptatibus+ipsum.+Iure+officiis+reprehenderit+dolor+dolore+sed+debitis.&link_type=any&name=1535133724_asperiores&public_description=Repellat+perferendis+nostrum+corporis+atque.+Nemo+cum+temporibus+eius+at.&title=Ratione+quod+dicta+iste+vel.&type=public&wikimode=disabled"
+          "string": "allow_top=True&api_type=json&description=Nulla+non+animi+in.+Fugiat+modi+necessitatibus+quibusdam+sapiente.+Aspernatur+quasi+inventore+cumque+rem+repudiandae+quisquam.%0ASuscipit+ab+nostrum+voluptas+odio+saepe+rerum.+Necessitatibus+mollitia+quas+nobis+corrupti.+In+eius+asperiores+atque+ea.%0ASequi+quisquam+soluta+nulla.+Sequi+consequuntur+voluptatum+dolor+veniam+dignissimos.+Pariatur+hic+vitae+sint+optio+id+tempora+sit.&link_type=any&name=1542318161_magnam&public_description=Quia+distinctio+sed+quo.&title=Optio+eius+nihil+blanditiis+quia.&type=public&wikimode=disabled"
         },
         "headers": {
           "Accept": [
@@ -84,22 +84,22 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 208-G6q8Ojd_hCoiqi_ZUzZe910Qbto"
+            "bearer 163-AOBKpkaah6e6qOZsjfwP_14NkQA"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "597"
+            "574"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=cP3B81DGqs65AaqV95; loidcreated=2018-08-24T18%3A02%3A03.804Z"
+            "loid=G1iW0ygLSSvEwI4wYF; loidcreated=2018-11-15T21%3A20%3A22.131Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.53.0 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -121,7 +121,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 18:02:04 GMT"
+            "Thu, 15 Nov 2018 21:20:22 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -142,7 +142,7 @@
             "299.0"
           ],
           "x-ratelimit-reset": [
-            "476"
+            "578"
           ],
           "x-ratelimit-used": [
             "1"
@@ -162,7 +162,7 @@
       }
     },
     {
-      "recorded_at": "2018-08-24T18:02:10",
+      "recorded_at": "2018-11-15T21:42:48",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -179,18 +179,18 @@
             "keep-alive"
           ],
           "Cookie": [
-            "loid=cP3B81DGqs65AaqV95; loidcreated=2018-08-24T18%3A02%3A03.804Z"
+            "loid=G1iW0ygLSSvEwI4wYF; loidcreated=2018-11-15T21%3A20%3A22.131Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.53.0 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPHKEH02E1WP1ZS8C8TVCH9"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CWCN72NE118MGETXGGYFZ165"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIysNQ1K4g38iwxDfP28kkJjSxxKXQ1Do8MTY9wLi1X0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLb55JRUhpe4BBikJKY4lVQlm6XlBxcGhxpbWESC9KSklmUmp8ZnpoAMhnCUagGAAW+6uAAAAA==",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDI0M9FNrfAJqfCNj6iq8q8MKrYo9Ss3CC1Oig+uzHVU0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLZVRHkGl5WGhES6xDsGh0SV5hiamSZ6ZnkG5ESC9KSklmUmp8ZnpoAMhnCUagHlzadmuAAAAA==",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -204,7 +204,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 18:02:10 GMT"
+            "Thu, 15 Nov 2018 21:20:29 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -226,15 +226,15 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPHKEH02E1WP1ZS8C8TVCH9"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CWCN72NE118MGETXGGYFZ165"
       }
     },
     {
-      "recorded_at": "2018-08-24T18:02:10",
+      "recorded_at": "2018-11-15T21:42:48",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": ""
+          "string": "api_type=json&name=01CWCN6W7JRFVJC9BZWRJQ0PCW&permissions=%2Ball&type=moderator"
         },
         "headers": {
           "Accept": [
@@ -244,38 +244,44 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 208-G6q8Ojd_hCoiqi_ZUzZe910Qbto"
+            "bearer 163-AOBKpkaah6e6qOZsjfwP_14NkQA"
           ],
           "Connection": [
             "keep-alive"
           ],
+          "Content-Length": [
+            "79"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
           "Cookie": [
-            "loid=cP3B81DGqs65AaqV95; loidcreated=2018-08-24T18%3A02%3A03.804Z"
+            "loid=G1iW0ygLSSvEwI4wYF; loidcreated=2018-11-15T21%3A20%3A22.131Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.53.0 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
-        "method": "GET",
-        "uri": "https://reddit.local/r/1535133724_asperiores/about/moderators/?user=01CNPHK85M1KHY5647G2FQNYD5&raw_json=1"
+        "method": "POST",
+        "uri": "https://reddit.local/r/1542318161_magnam/api/friend/?raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"kind\": \"UserList\", \"data\": {\"children\": [{\"date\": 1535133724.0, \"mod_permissions\": [\"all\"], \"name\": \"01CNPHK85M1KHY5647G2FQNYD5\", \"id\": \"t2_5s\"}]}}"
+          "string": "{\"json\": {\"errors\": [[\"ALREADY_MODERATOR\", \"that user is already a moderator\", \"name\"]]}}"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "149"
+            "89"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 18:02:10 GMT"
+            "Thu, 15 Nov 2018 21:20:29 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -296,13 +302,10 @@
             "298.0"
           ],
           "x-ratelimit-reset": [
-            "470"
+            "571"
           ],
           "x-ratelimit-used": [
             "2"
-          ],
-          "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=Dmgn0QVFvqs0mpdzmQRt1PsAztc3xgt6rGg3XIbYEF8VQ3a7mgXX2wMbUPGp0EDW9v4M9GK7Uu4loNSGPa4iNyHjMtqfno9Q"
           ],
           "x-ua-compatible": [
             "IE=edge"
@@ -315,15 +318,15 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/r/1535133724_asperiores/about/moderators/?user=01CNPHK85M1KHY5647G2FQNYD5&raw_json=1"
+        "url": "https://reddit.local/r/1542318161_magnam/api/friend/?raw_json=1"
       }
     },
     {
-      "recorded_at": "2018-08-24T18:02:10",
+      "recorded_at": "2018-11-15T21:42:48",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "api_type=json&name=01CNPHKEH02E1WP1ZS8C8TVCH9&permissions=%2Ball&type=moderator"
+          "string": "api_type=json&name=01CWCN72NE118MGETXGGYFZ165&permissions=%2Ball&type=moderator"
         },
         "headers": {
           "Accept": [
@@ -333,7 +336,7 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 208-G6q8Ojd_hCoiqi_ZUzZe910Qbto"
+            "bearer 163-AOBKpkaah6e6qOZsjfwP_14NkQA"
           ],
           "Connection": [
             "keep-alive"
@@ -345,14 +348,14 @@
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=cP3B81DGqs65AaqV95; loidcreated=2018-08-24T18%3A02%3A03.804Z"
+            "loid=G1iW0ygLSSvEwI4wYF; loidcreated=2018-11-15T21%3A20%3A22.131Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.53.0 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
-        "uri": "https://reddit.local/r/1535133724_asperiores/api/friend/?raw_json=1"
+        "uri": "https://reddit.local/r/1542318161_magnam/api/friend/?raw_json=1"
       },
       "response": {
         "body": {
@@ -370,7 +373,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 18:02:10 GMT"
+            "Thu, 15 Nov 2018 21:20:29 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -391,7 +394,7 @@
             "297.0"
           ],
           "x-ratelimit-reset": [
-            "470"
+            "571"
           ],
           "x-ratelimit-used": [
             "3"
@@ -407,11 +410,11 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/r/1535133724_asperiores/api/friend/?raw_json=1"
+        "url": "https://reddit.local/r/1542318161_magnam/api/friend/?raw_json=1"
       }
     },
     {
-      "recorded_at": "2018-08-24T18:02:10",
+      "recorded_at": "2018-11-15T21:42:48",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -425,7 +428,7 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 209-6p_2It5VKJLdUYtDqE3WYUgXCuw"
+            "bearer 164-exLTxM_XzzOyRs8uNw0Usb_SymA"
           ],
           "Connection": [
             "keep-alive"
@@ -437,14 +440,14 @@
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=cP3B81DGqs65AaqV95; loidcreated=2018-08-24T18%3A02%3A03.804Z"
+            "loid=G1iW0ygLSSvEwI4wYF; loidcreated=2018-11-15T21%3A20%3A22.131Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.53.0 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
-        "uri": "https://reddit.local/r/1535133724_asperiores/api/accept_moderator_invite?raw_json=1"
+        "uri": "https://reddit.local/r/1542318161_magnam/api/accept_moderator_invite?raw_json=1"
       },
       "response": {
         "body": {
@@ -462,7 +465,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 18:02:10 GMT"
+            "Thu, 15 Nov 2018 21:20:29 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -483,7 +486,7 @@
             "299.0"
           ],
           "x-ratelimit-reset": [
-            "470"
+            "571"
           ],
           "x-ratelimit-used": [
             "1"
@@ -499,96 +502,7 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/r/1535133724_asperiores/api/accept_moderator_invite?raw_json=1"
-      }
-    },
-    {
-      "recorded_at": "2018-08-24T18:02:10",
-      "request": {
-        "body": {
-          "encoding": "utf-8",
-          "string": ""
-        },
-        "headers": {
-          "Accept": [
-            "*/*"
-          ],
-          "Accept-Encoding": [
-            "gzip, deflate"
-          ],
-          "Authorization": [
-            "bearer 208-G6q8Ojd_hCoiqi_ZUzZe910Qbto"
-          ],
-          "Connection": [
-            "keep-alive"
-          ],
-          "Cookie": [
-            "loid=cP3B81DGqs65AaqV95; loidcreated=2018-08-24T18%3A02%3A03.804Z"
-          ],
-          "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
-          ]
-        },
-        "method": "GET",
-        "uri": "https://reddit.local/r/1535133724_asperiores/about/moderators/?user=01CNPHKEH02E1WP1ZS8C8TVCH9&raw_json=1"
-      },
-      "response": {
-        "body": {
-          "encoding": "UTF-8",
-          "string": "{\"kind\": \"UserList\", \"data\": {\"children\": [{\"date\": 1535133730.0, \"mod_permissions\": [\"all\"], \"name\": \"01CNPHKEH02E1WP1ZS8C8TVCH9\", \"id\": \"t2_5t\"}]}}"
-        },
-        "headers": {
-          "Connection": [
-            "keep-alive"
-          ],
-          "Content-Length": [
-            "149"
-          ],
-          "Content-Type": [
-            "application/json; charset=UTF-8"
-          ],
-          "Date": [
-            "Fri, 24 Aug 2018 18:02:10 GMT"
-          ],
-          "Server": [
-            "PasteWSGIServer/0.5 Python/2.7.6"
-          ],
-          "cache-control": [
-            "private, s-maxage=0, max-age=0, must-revalidate"
-          ],
-          "expires": [
-            "-1"
-          ],
-          "x-content-type-options": [
-            "nosniff"
-          ],
-          "x-frame-options": [
-            "SAMEORIGIN"
-          ],
-          "x-ratelimit-remaining": [
-            "296.0"
-          ],
-          "x-ratelimit-reset": [
-            "470"
-          ],
-          "x-ratelimit-used": [
-            "4"
-          ],
-          "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=ERsE2RBDDJch3Cj5Febs2UNvfDi5rBuxId%2F5GGEDZKWe6sA8Q%2Bs%2Fe9YsqOl1cunLSGTtRuWX71fGXDwoikkPDjj2f4%2B4tlVI"
-          ],
-          "x-ua-compatible": [
-            "IE=edge"
-          ],
-          "x-xss-protection": [
-            "1; mode=block"
-          ]
-        },
-        "status": {
-          "code": 200,
-          "message": "OK"
-        },
-        "url": "https://reddit.local/r/1535133724_asperiores/about/moderators/?user=01CNPHKEH02E1WP1ZS8C8TVCH9&raw_json=1"
+        "url": "https://reddit.local/r/1542318161_magnam/api/accept_moderator_invite?raw_json=1"
       }
     }
   ],

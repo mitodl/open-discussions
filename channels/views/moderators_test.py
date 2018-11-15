@@ -1,5 +1,5 @@
 """Tests for views for REST APIs for moderators"""
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,too-many-arguments
 import pytest
 from django.urls import reverse
 from rest_framework import status
@@ -63,6 +63,7 @@ def test_list_moderators_moderator(
     """
     url = reverse("moderator-list", kwargs={"channel_name": private_channel.name})
     mod_user = reddit_factories.user("user2")
+    staff_api.add_moderator(staff_user.username, private_channel.name)
     staff_api.add_moderator(mod_user.username, private_channel.name)
     client.force_login(mod_user)
     resp = client.get(url)
@@ -90,7 +91,7 @@ def test_list_moderators_many_moderator(
     List moderators in a channel as a logged in moderator of that channel
     """
     url = reverse("moderator-list", kwargs={"channel_name": private_channel.name})
-
+    staff_api.add_moderator(staff_user.username, private_channel.name)
     mod_users = []
     for i in range(10):
         mod_user = reddit_factories.user(f"user{i}")
@@ -127,11 +128,12 @@ def test_list_moderators_many_moderator(
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
 def test_list_moderators_anonymous(
-    client, public_channel, staff_user, settings, allow_anonymous
+    client, public_channel, staff_api, staff_user, settings, allow_anonymous
 ):
     """Anonymous users should see the moderator list"""
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("moderator-list", kwargs={"channel_name": public_channel.name})
+    staff_api.add_moderator(staff_user.username, public_channel.name)
     resp = client.get(url)
     if allow_anonymous:
         assert resp.status_code == status.HTTP_200_OK
@@ -144,12 +146,15 @@ def test_list_moderators_anonymous(
         assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
-def test_add_moderator(staff_client, public_channel, reddit_factories):
+def test_add_moderator(
+    staff_client, staff_api, staff_user, public_channel, reddit_factories
+):
     """
     Adds a moderator to a channel
     """
     moderator = reddit_factories.user("new_mod_user")
     url = reverse("moderator-list", kwargs={"channel_name": public_channel.name})
+    staff_api.add_moderator(staff_user.username, public_channel.name)
     resp = staff_client.post(
         url, data={"moderator_name": moderator.username}, format="json"
     )
@@ -162,12 +167,14 @@ def test_add_moderator(staff_client, public_channel, reddit_factories):
     }
 
 
-def test_add_moderator_email(staff_client, public_channel, reddit_factories):
+def test_add_moderator_email(
+    staff_client, staff_api, staff_user, public_channel, reddit_factories
+):
     """
     Adds a moderator to a channel by email
     """
     new_mod_user = reddit_factories.user("new_mod_user")
-
+    staff_api.add_moderator(staff_user.username, public_channel.name)
     url = reverse("moderator-list", kwargs={"channel_name": public_channel.name})
     resp = staff_client.post(url, data={"email": new_mod_user.email}, format="json")
 
@@ -180,11 +187,14 @@ def test_add_moderator_email(staff_client, public_channel, reddit_factories):
     }
 
 
-def test_add_moderator_again(staff_client, public_channel, staff_api, reddit_factories):
+def test_add_moderator_again(
+    staff_client, staff_user, public_channel, staff_api, reddit_factories
+):
     """
     If a user is already a moderator we should return 201 without making any changes
     """
     moderator = reddit_factories.user("already_mod")
+    staff_api.add_moderator(staff_user.username, public_channel.name)
     staff_api.add_moderator(moderator.username, public_channel.name)
     url = reverse("moderator-list", kwargs={"channel_name": public_channel.name})
     resp = staff_client.post(

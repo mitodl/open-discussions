@@ -56,7 +56,9 @@ class ModeratorListView(ListCreateAPIView):
                 for moderator in Channel.objects.get(name=channel_name).moderators
                 if moderator.username != settings.INDEXING_API_USERNAME
             ),
-            key=lambda moderator: 0 if moderator.username == self.request.user.username else 1
+            key=lambda moderator: 0
+            if moderator.username == self.request.user.username
+            else 1,
         )
 
 
