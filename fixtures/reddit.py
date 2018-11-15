@@ -114,7 +114,9 @@ def reddit_submission_obj():
     """A dummy Post object"""
     return SimpleNamespace(
         author=SimpleNamespace(name="testuser"),
-        subreddit=SimpleNamespace(display_name="channel_1", title="Channel"),
+        subreddit=SimpleNamespace(
+            display_name="channel_1", title="Channel", subreddit_type="public"
+        ),
         selftext="Body text",
         score=1,
         created=12345,

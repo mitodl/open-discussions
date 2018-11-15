@@ -1,8 +1,15 @@
 """Search API function tests"""
 from types import SimpleNamespace
+
+from django.contrib.auth.models import AnonymousUser
 import pytest
 
-from channels.constants import POST_TYPE, COMMENT_TYPE
+from channels.constants import (
+    CHANNEL_TYPE_PUBLIC,
+    CHANNEL_TYPE_RESTRICTED,
+    COMMENT_TYPE,
+    POST_TYPE,
+)
 from channels.api import add_user_role
 from search.api import (
     execute_search,
@@ -93,7 +100,67 @@ def test_execute_search(mocker, user):
                                             ]
                                         }
                                     },
+                                    {
+                                        "terms": {
+                                            "channel_type": [
+                                                CHANNEL_TYPE_PUBLIC,
+                                                CHANNEL_TYPE_RESTRICTED,
+                                            ]
+                                        }
+                                    },
                                     {"terms": {"channel_name": channel_names}},
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+        },
+        doc_type=[],
+        index=[get_default_alias_name(ALIAS_ALL_INDICES)],
+    )
+
+
+def test_execute_search_anonymous(mocker):
+    """execute_search should execute an Elasticsearch search with an anonymous user"""
+    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
+
+    query = {"a": "query"}
+    assert (
+        execute_search(user=AnonymousUser(), query=query)
+        == get_conn_mock.return_value.search.return_value
+    )
+    get_conn_mock.return_value.search.assert_called_once_with(
+        body={
+            **query,
+            "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {
+                                                    "terms": {
+                                                        "object_type": [
+                                                            "comment",
+                                                            "post",
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "terms": {
+                                            "channel_type": [
+                                                CHANNEL_TYPE_PUBLIC,
+                                                CHANNEL_TYPE_RESTRICTED,
+                                            ]
+                                        }
+                                    },
                                 ]
                             }
                         }
