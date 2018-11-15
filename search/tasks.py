@@ -8,10 +8,9 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
-from prawcore.exceptions import PrawcoreException
+from prawcore.exceptions import PrawcoreException, NotFound
 
-from channels.constants import POSTS_SORT_NEW
-from channels.utils import ListingParams
+from channels.models import Channel, Post
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks
 from search import indexing_api as api
@@ -44,6 +43,12 @@ def wrap_retry_exception(*exception_classes):
     try:
         yield
     except Exception as ex:
+        if isinstance(ex, NotFound):
+            # No corresponding reddit post/comment found for django model object.  Log error and continue indexing.
+            log.exception(
+                "No corresponding reddit post/comment found for django model object"
+            )
+            return
         # Celery is confused by exceptions which don't take a string as an argument, so we need to wrap before raising
         if isinstance(ex, exception_classes):
             raise RetryException(str(ex)) from ex
@@ -103,7 +108,7 @@ def index_post_with_comments(post_id):
     Index a post and its comments
 
     Args:
-        post_id (str): The post string
+        post_id (str): The post_id to index
     """
     try:
         with wrap_retry_exception(PrawcoreException, PRAWException):
@@ -121,32 +126,24 @@ def index_post_with_comments(post_id):
 @app.task(
     bind=True, autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m"
 )
-def index_channel(self, channel_name):
+def index_channel(self, channel_id):
     """
     Index the channel
 
     Args:
-        channel_name (str): The name of the channel
+        channel_id (str): The channel id to index
     """
     try:
-        with wrap_retry_exception(PrawcoreException, PRAWException):
-            from channels.api import Api, sync_channel_model
-
-            sync_channel_model(channel_name)
-            client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
-            posts = client.list_posts(
-                channel_name, ListingParams(None, None, 0, POSTS_SORT_NEW)
-            )
-
+        posts = Post.objects.filter(channel=channel_id).iterator()
         raise self.replace(
-            celery.group(index_post_with_comments.si(post.id) for post in posts)
+            celery.group(index_post_with_comments.si(post.post_id) for post in posts)
         )
     except RetryException:
         raise
     except Ignore:
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_channel threw an error on channel {channel_name}"
+        error = f"index_channel threw an error on channel id {channel_id}"
         log.exception(error)
         return error
 
@@ -157,9 +154,6 @@ def start_recreate_index(self):
     Wipe and recreate index and mapping, and index all items.
     """
     try:
-        from channels.api import Api
-
-        user = User.objects.get(username=settings.INDEXING_API_USERNAME)
         new_backing_indices = {
             obj_type: api.create_backing_index(obj_type)
             for obj_type in VALID_OBJECT_TYPES
@@ -168,10 +162,11 @@ def start_recreate_index(self):
         # Do the indexing on the temp index
         log.info("starting to index all channels, posts, comments, and profiles...")
 
-        client = Api(user)
-        channel_names = [channel.display_name for channel in client.list_channels()]
         index_channels = celery.group(
-            [index_channel.si(channel_name) for channel_name in channel_names]
+            [
+                index_channel.si(channel)
+                for channel in Channel.objects.values_list("id", flat=True)
+            ]
             + [
                 index_profiles.si(ids)
                 for ids in chunks(

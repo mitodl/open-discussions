@@ -288,22 +288,19 @@ def index_post_with_comments(post_id):
     Index a post and its comments
 
     Args:
-        post_id (str): The post string
+        post_id (str): The post id to index
     """
     from channels.api import Api
 
     conn = get_conn()
     api_user = User.objects.get(username=settings.INDEXING_API_USERNAME)
     client = Api(api_user)
-    post = client.get_post(post_id)
-    comments = post.comments
-    # Make sure all morecomments are replaced before serializing
-    comments.replace_more(limit=None)
+    reddit_post = client.get_post(post_id)
 
     for alias in get_active_aliases([POST_TYPE]):
         _, errors = bulk(
             conn,
-            sync_post(serialize_bulk_post(post)),
+            serialize_bulk_post(reddit_post),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable
@@ -317,7 +314,7 @@ def index_post_with_comments(post_id):
     for alias in get_active_aliases([COMMENT_TYPE]):
         _, errors = bulk(
             conn,
-            sync_comments(serialize_bulk_comments(post)),
+            serialize_bulk_comments(post_id),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable
