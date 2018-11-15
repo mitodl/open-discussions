@@ -1,170 +1,195 @@
-# open_discussions
+# Open Discussions
 This provides a discussion forum for use with other MIT applications.
 
-## Installation specific to this app
+**SECTIONS**
+1. [Initial Setup](#initial-setup)
+1. [Running and Accessing the App](#running-and-accessing-the-app)
+1. [Testing and Formatting](#testing-and-formatting)
+1. [Optional Setup](#optional-setup)
 
-This app uses a similar stack to other mitodl apps (Docker/Django/Webpack). Installation steps that are common to
-all of these apps can be found below, beginning with the [Major Dependencies](#major-dependencies) section. **Those
-installation steps should be completed before the following steps, which are specific to this app.**
 
- 1. Set up a reddit instance for use as a backing store. See the README
- at https://github.com/mitodl/reddit-config for instructions on how
- to set up reddit to work with open_discussions.
- 1. Run the containers for open_discussions and navigate to the running site in your browser
-    ([outlined here](#5-run-the-container)).
+# Initial Setup
 
-## Major Dependencies
-- Docker
-  - OSX recommended install method: [Download from Docker website](https://docs.docker.com/mac/)
-- docker-compose
-  - Recommended install: pip (`pip install docker-compose`)
-- Virtualbox (https://www.virtualbox.org/wiki/Downloads)
-- _(OSX only)_ Node/NPM, and Yarn
-  - OSX recommended install method: [Installer on Node website](https://nodejs.org/en/download/)
-  - No specific version has been chosen yet.
+Open Discussions follows the same [initial setup steps outlined in the common ODL web app guide](https://github.com/mitodl/handbook/blob/master/common-web-app-guide.md).
+Run through those steps **including the addition of `/etc/hosts` aliases and the optional step for running the
+`createsuperuser` command**.
 
-## Docker Container Configuration and Start-up
+After going through those steps in the common web app guide, run through these additional steps: 
 
-#### 1) Create your ``.env`` file
+### Set up a reddit instance
 
-This file should be copied from the example in the codebase:
+Open Discussions needs a running reddit instance as a backing store. Go to the
+[reddit-config](https://github.com/mitodl/reddit-config) repo for setup
+instructions.
 
-    cp .env.example .env
+### Set up an authenticated site
 
-All the  variables in the ``.env``` file should then be manually populated with values.
+The app requires at least one authenticated site record to run the app. The site that will be
+created in the code block below is for MicroMasters integration, but following through with the
+[full set of MicroMasters integration steps](#integration-with-micromasters) is not
+strictly needed to get the app working.
 
-The default values for ``OPEN_DISCUSSIONS_REDDIT_CLIENT_ID`` and ``OPEN_DISCUSSIONS_REDDIT_SECRET``
-can be found in the reddit-config repo's Vagrantfile.
-
-Set ``OPEN_DISCUSSIONS_BASE_URL`` to the ``protocol://host:port`` where open-discussions is reachable locally (e.g. http://localhost:8063).
-
-#### 3) Build the containers
-Run this command:
-
-    docker-compose build
-
-You will also need to run this command whenever ``requirements.txt`` or ``test_requirements.txt`` change.
-
-#### 4) Create data structures
-Create the database tables from the Django models:
-
-    docker-compose run web ./manage.py migrate
-
-#### 5) Run the container
-Start Django, PostgreSQL, and other related services:
-
-    docker-compose up
-
-In another terminal tab, navigate to the open_discussions directory
-and add a superuser in the now-running Docker container:
-
-    docker-compose run web ./manage.py createsuperuser
-
-You should now be able to do visit open_discussions in your browser on port `8063`. _(OSX Only)_ Docker auto-assigns
- the container IP. Run ``docker-machine ip`` to see it. Your open_discussions URL will
- be something like this: ``192.168.99.100:8063``.
-
-#### 5a) Log in
-
-There is no official login page yet, so in order to use the site as a logged in user, you'll need to login
-via Django admin first (`http://<open_discussions_url>:8063/admin`). Use the credentials for the superuser you created
-in the step above.
-
-#### 5b) Set up initial channel/post data
-
-The app UI is not currently usable until a channel exists and the logged-in user has a post associated with the channel.
-The following commands will create a channel and a post:
-
-First, create an authentication token (good for one hour) in a django shell.
- ```python
-from django.contrib.auth.models import User
-from rest_framework_jwt.settings import api_settings
-user = User.objects.get(username=<superuser username>)
-jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-payload = jwt_payload_handler(user)
-payload['roles'] = ['staff']
-token = jwt_encode_handler(payload)
-print(token)
+Run this in a Django Shell:
+```python
+from sites.models import AuthenticatedSite
+mm_base_url = 'http://od.odl.local:8079'
+AuthenticatedSite.objects.create(
+  key='micromasters',
+  title='MicroMasters',
+  base_url='{}/'.format(mm_base_url),
+  login_url='{}/discussions/'.format(mm_base_url),
+  session_url='{}/api/v0/discussions_token/'.format(mm_base_url),
+  tos_url='{}/terms-of-service'.format(mm_base_url),
+)
 ```
 
-Then use these bash commands with the above token to create a channel and post:
- ```bash
- TOKEN=<token>
- # Create a channel
- curl -X POST -H "Authorization: Bearer $TOKEN" "http://<open_discussions_url>:8063/api/v0/channels/" \
-   -H "Content-Type: application/json" \
-   -d '{"title": "Test Channel", "name": "test_channel", "public_description": "This is a test channel", "channel_type": "public"}'
+The key value printed above will be used as a value in `.env` settings.
 
- # Create a post for the channel
- curl -X POST -H "Authorization: Bearer $TOKEN" "http://<open_discussions_url>:8063/api/v0/channels/test_channel/posts/" \
-   -H "Content-Type: application/json" \
-   -d '{"text": "This is a text post in the test channel", "title": "Test Post", "channel_name": "test_channel"}'
- ```
+### Configure required `.env` settings
 
-#### 5c) Configure a site
+The following settings must be configured before running the app: 
 
-Login to the admin ui and create a new site. Some example values for MicroMasters:
+- `OPEN_DISCUSSIONS_DEFAULT_SITE_KEY`
+    
+    Set this to `micromasters` (see authenticated site code block above)
+    
+- `INDEXING_API_USERNAME`
+    
+    At least to start out, this should be set to the username of the superuser
+    you created above.
 
- - `key` -  `micromasters`
- - `title` - `MicroMasters`
- - `base_url` - `http://localhost:8079/`
- - `login_url` - `http://localhost:8079/discussions/`
- - `session_url` - `http://localhost:8079/api/v0/discussions_token/`
- - `tos_url` - `http://localhost:8079/terms-of-service`
+- `MAILGUN_KEY` and `MAILGUN_SENDER_DOMAIN`
+    
+    You can set these values to any non-empty string value if email-sending functionality
+    is not needed. It's recommended that you eventually configure the site to be able 
+    to send emails. Those configuration steps can be found [below](#enabling-email).
+    
+### Run the app and create a new user via the signup flow
 
-In your `.env` file, set `OPEN_DISCUSSIONS_DEFAULT_SITE_KEY` to the `key` value from your record
+The steps for running Open Discussions are outlined in the [common ODL web app guide for running and accessing the app](https://github.com/mitodl/handbook/blob/master/common-web-app-guide.md#running-and-accessing-the-app).
+
+Once the app is running, navigate to `/signup` and follow the signup flow. As mentioned
+above, this will involve receiving an email and clicking a link in that
+email to verify your address.
+
+### Configure user and set up initial channel/post data
+
+The app UI is not currently usable until a channel exists and the logged-in user has a post associated with the channel.
+The following block will create two channels (one public, one private) and a post in each, and
+it will set your user as a moderator in these new channels. 
+
+Run this in a Django shell (change the channel names as needed):
+```python
+PUBLIC_CHANNEL = ('public_channel', 'Public Channel', 'public')
+PRIVATE_CHANNEL = ('private_channel', 'Private Channel', 'private')
+TEST_POST_TITLE = 'Test Post'
+TEST_POST_TEXT = 'This is the test post content'
+USER_FULL_NAME = 'Admin User'
+#
+import json
+from rest_framework import status
+from django.urls import reverse
+from django.contrib.auth.models import User
+from django.test.client import Client
+from profiles.models import Profile
+from channels.api import Api
+CHANNEL_URL_NAME = 'channel-list'
+POST_URL_NAME = 'post-list'
+# Fetch & configure the new superuser
+user = User.objects.get(is_superuser=True)
+user.is_staff = True
+user.save()
+Profile.objects.get_or_create(user=user, name=USER_FULL_NAME)
+#
+client = Client()
+client.force_login(user)
+api = Api(user)
+#
+for channel_tuple in [PUBLIC_CHANNEL, PRIVATE_CHANNEL]:
+    # Create channel and post
+    channel_req_data = dict(
+      name=channel_tuple[0], 
+      title=channel_tuple[1], 
+      channel_type=channel_tuple[2], 
+    )
+    channel_resp = client.post(
+      reverse(CHANNEL_URL_NAME), 
+      data=json.dumps(channel_req_data), 
+      content_type='application/json'
+    )
+    if channel_resp.status_code == 409:
+      if not api.is_moderator(channel_tuple[0], user.username):
+        raise Exception(
+          'Channel already exists, and your user cannot be set as a moderator [%s]'
+          % channel_tuple[0]
+        )
+      continue
+    elif not status.is_success(channel_resp.status_code):
+      raise Exception('Failed to create channel - [%s] %s' % (
+        channel_resp.status_code, channel_resp.content
+      )) 
+    post_url = reverse(
+      POST_URL_NAME,
+      kwargs={'channel_name': channel_tuple[0]}
+    )
+    post_req_data = dict(
+      title=TEST_POST_TITLE,
+      text=TEST_POST_TEXT
+    )
+    post_resp = client.post(post_url, data=json.dumps(post_req_data), content_type='application/json')
+    # Set user as a moderator and contributor
+    api.add_moderator(user.username, channel_tuple[0])
+    api.add_contributor(user.username, channel_tuple[0])
+```
 
 
-## Running Commands and Testing
+# Running and Accessing the App
 
-As shown above, manage commands can be executed on the Docker-contained
-open_discussions app. For example, you can run a Python shell with the following command:
-
-    docker-compose run web ./manage.py shell
-
-Tests should be run in the Docker container, not the host machine. They can be run with the following commands:
-
-    # Run the full suite
-    ./test_suite.sh
-    # Run Python tests only
-    docker-compose run web tox
-    # Single file test
-    docker-compose run web tox /path/to/test.py
-    # format python code
-    docker-compose run web black .
-    # Run the JS tests with coverage report
-    docker-compose run watch npm run-script coverage
-    # run the JS tests without coverage report
-    docker-compose run watch npm test
-    # run a single JS test file
-    docker-compose run watch npm test /path/to/test.js
-    # Run the JS linter
-    docker-compose run watch npm run-script lint
-    # Run JS type-checking
-    docker-compose run watch npm run-script flow
-    # Run SCSS linter
-    docker-compose run watch npm run scss_lint
-
-Note that running [`flow`](https://flowtype.org) may not work properly if your
-host machine isn't running Linux. If you are using a Mac, you'll need to run
-`flow` on your host machine, like this:
-
-    yarn install --frozen-lockfile
-    npm run-script flow
+Open Discussions follows the same steps outlined in the [common ODL web app guide for running and accessing the app](https://github.com/mitodl/handbook/blob/master/common-web-app-guide.md#running-and-accessing-the-app).
+A reddit instance at the URL indicated by `OPEN_DISCUSSIONS_REDDIT_URL` will need to be running for the app 
+to work properly.
 
 
-#### 6) Integration with MicroMasters
+# Testing and Formatting
 
-MicroMasters and Open-Discussions share a cookie, which means that they need to be running on the same domain.
-This can be emulated by modifying your hosts file, for example:
+[The commands outlined in the common ODL web app guide](https://github.com/mitodl/handbook/blob/master/common-web-app-guide.md#testing-and-formatting) 
+are all relevant to Open Discussions.
 
- ```
-127.0.0.1  mm.odl.local
-127.0.0.1  od.odl.local
- ```
+The following commands are also available:
 
-The following variables should also be set in your Open-Discussions `.env` file, assuming you have modified your `hosts` file using `mm.odl.local` for Micromasters and `od.odl.local` for Open-Discussions:
+```
+# Format python code
+docker-compose run --rm web black .
+```
+
+
+# Optional Setup
+
+Described below are some setup steps that are not strictly necessary
+for running Open Discussions
+
+### Enabling email
+
+The app is usable without email-sending capability, but there is a lot of app functionality
+that depends on it. The following variables will need to be set in your `.env` file - 
+please reach out to a fellow developer or devops for the correct values.
+  
+```
+MAILGUN_SENDER_DOMAIN
+MAILGUN_URL
+MAILGUN_KEY
+```
+
+Additionally, you'll need to set `MAILGUN_RECIPIENT_OVERRIDE` to your own email address so
+any emails sent from the app will be delivered to you.
+
+### Integration with MicroMasters
+
+The following steps assume that you've added `/etc/hosts` aliases for MicroMasters
+and Open Discussions, and that those aliases are `mm.odl.local` and `od.odl.local` 
+respectively.
+
+The following variables should be set in your Open Discussions `.env` file:
 
 ```
 OPEN_DISCUSSIONS_COOKIE_DOMAIN=odl.local
@@ -175,7 +200,8 @@ MICROMASTERS_BASE_URL=http://mm.odl.local:8079/
 MICROMASTERS_BASE_URL=http://docker.for.mac.localhost:8079/   
 ```
 
-The following variables and their values should copied directly from this .env file to the MicroMasters .env file:
+The following variables and their values should copied directly from this `.env` file 
+to the MicroMasters .env file:
 
 ```
 OPEN_DISCUSSIONS_JWT_SECRET
@@ -184,7 +210,7 @@ OPEN_DISCUSSIONS_COOKIE_DOMAIN
 OPEN_DISCUSSIONS_SITE_KEY
 ```
 
-These variables should also be added to the MicroMasters .env file:
+These variables should also be added to the MicroMasters `.env` file:
 
 ```
 FEATURE_OPEN_DISCUSSIONS_POST_UI=True
@@ -198,8 +224,7 @@ OPEN_DISCUSSIONS_BASE_URL=http://od.odl.local:8063/
 OPEN_DISCUSSIONS_BASE_URL=http://docker.for.mac.localhost:8063/
 ```
 
-
-#### 7) Testing integration with SAML via SSOCircle
+### Testing integration with SAML via SSOCircle
 
 *Note: Testing with ShibTest instead of SSOCircle fails unless python-saml3 is downgraded to 1.2.6 and `use="signing"` is removed from the `KeyDescriptor` tag of the SP metadata*
 
