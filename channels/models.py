@@ -127,6 +127,8 @@ class Channel(TimestampedModel):
     banner = models.ImageField(null=True, max_length=2083, upload_to=banner_uri)
     ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
 
+    allowed_post_types = BitField(flags=VALID_EXTENDED_POST_CHOICES, null=True)
+
     def save(
         self, *args, update_image=False, **kwargs
     ):  # pylint: disable=arguments-differ

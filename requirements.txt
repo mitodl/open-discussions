@@ -23,6 +23,7 @@ defusedxml==0.5.0         # via cairosvg, python3-openid, python3-saml, social-a
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-anymail[mailgun]==3.0
+django-bitfield==1.9.3
 django-cors-headers==2.1.0
 django-redis==4.7.0
 django-server-status==0.5.0
@@ -71,7 +72,7 @@ requests-file==1.4.3      # via tldextract
 requests-oauthlib==0.8.0  # via social-auth-core
 requests==2.20.1
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via django-anymail, django-server-status, elasticsearch-dsl, faker, html5lib, isodate, prompt-toolkit, python-dateutil, requests-file, social-auth-app-django, social-auth-core, traitlets
+six==1.10.0               # via django-anymail, django-bitfield, django-server-status, elasticsearch-dsl, faker, html5lib, isodate, prompt-toolkit, python-dateutil, requests-file, social-auth-app-django, social-auth-core, traitlets
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0   # via social-auth-app-django
 static3==0.5.1

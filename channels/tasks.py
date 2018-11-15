@@ -128,3 +128,27 @@ def populate_subscriptions_and_roles(self):
         ]
     )
     raise self.replace(results)
+
+
+
+
+@app.task(bind=True)
+def populate_post_types(self):
+
+    results = celery.group(
+        [
+            populate_post_post_type.si(ids)
+            for ids in chunks(
+                Post.objects.values_list("id", flat=True),
+                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            )
+        ]
+        + [
+            populate_channel_post_type.si(ids)
+            for ids in chunks(
+                Channel.objects.values_list("id", flat=True),
+                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            )
+        ]
+    )
+    raise self.replace(results)
