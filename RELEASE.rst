@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.53.1
+Version 0.53.1 (Released November 15, 2018)
 --------------
 
 - remove micromasters references from mail header (#1473)
