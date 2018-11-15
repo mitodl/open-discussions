@@ -1,10 +1,13 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
+import { NavLink } from "react-router-dom"
 import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
 
 import UserMenu from "./UserMenu"
 import HamburgerAndLogo from "../components/HamburgerAndLogo"
+
+import { siteSearchURL } from "../lib/url"
 
 import type { Profile } from "../flow/discussionTypes"
 
@@ -51,6 +54,16 @@ export default class Toolbar extends React.Component<Props> {
               </span>
             </section>
             <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
+              {SETTINGS.allow_search ? (
+                <NavLink
+                  exact
+                  to={siteSearchURL()}
+                  activeClassName="active"
+                  className="search-link navy"
+                >
+                  <i className="material-icons">search</i>
+                </NavLink>
+              ) : null}
               <UserMenu
                 toggleShowUserMenu={toggleShowUserMenu}
                 showUserMenu={showUserMenu}

@@ -36,6 +36,37 @@ a.mitlogo {
         min-height: $toolbar-height-mobile;
         height: $toolbar-height-mobile;
       }
+
+      .search-link {
+        $search-icon-height: 28px;
+        $search-icon-border: 5px;
+        $search-icon-right-margin: 10px;
+        margin-right: 28px - $search-icon-right-margin;
+        padding: 0 $search-icon-right-margin;
+        border-bottom: 5px solid transparent;
+
+        &.active {
+          color: $rouge;
+          border-bottom-color: $rouge;
+        }
+
+        @include breakpoint(materialmobile) {
+          margin-right: 16px - $search-icon-right-margin;
+        }
+
+        .material-icons {
+          font-size: $search-icon-height;
+          padding-top: ($toolbar-height-desktop - $search-icon-height) / 2;
+          padding-bottom: ($toolbar-height-desktop - $search-icon-height) / 2 -
+            $search-icon-border;
+
+          @include breakpoint(materialmobile) {
+            padding-top: ($toolbar-height-mobile - $search-icon-height) / 2;
+            padding-bottom: ($toolbar-height-mobile - $search-icon-height) / 2 -
+              $search-icon-border;
+          }
+        }
+      }
     }
 
     .mdc-toolbar__section {

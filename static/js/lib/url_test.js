@@ -24,7 +24,8 @@ import {
   embedlyResizeImage,
   absolutizeURL,
   getNextParam,
-  channelSearchURL
+  channelSearchURL,
+  siteSearchURL
 } from "./url"
 import { makePost } from "../factories/posts"
 
@@ -217,6 +218,12 @@ describe("url helper functions", () => {
       assert.ok(
         url.includes(postDetailURL(post.channel_name, post.id, post.slug))
       )
+    })
+  })
+
+  describe("siteSearchURL", () => {
+    it("returns a site search URL", () => {
+      assert.equal(siteSearchURL(), "/search/")
     })
   })
 
