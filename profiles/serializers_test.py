@@ -3,9 +3,15 @@
 Tests for serializers for profiles REST APIS
 """
 import pytest
+import factory
 
-from profiles.models import Profile
-from profiles.serializers import UserSerializer, ProfileSerializer
+from profiles.factories import UserWebsiteFactory
+from profiles.models import Profile, PERSONAL_SITE_TYPE, FACEBOOK_DOMAIN
+from profiles.serializers import (
+    UserSerializer,
+    ProfileSerializer,
+    UserWebsiteSerializer,
+)
 
 
 def test_serialize_user(user):
@@ -170,3 +176,54 @@ def test_update_profile(mock_index_functions, user, key, value):
     else:
         mock_index_functions.update_posts.assert_not_called()
         mock_index_functions.update_author.assert_called_with(profile2)
+
+
+def test_serialize_profile_websites(user):
+    """Tests that the ProfileSerializer includes UserWebsite information when an option is set via the context"""
+    profile = user.profile
+    user_websites = UserWebsiteFactory.create_batch(
+        2,
+        profile=profile,
+        site_type=factory.Iterator([PERSONAL_SITE_TYPE, FACEBOOK_DOMAIN]),
+    )
+    serialized_profile = ProfileSerializer(
+        profile, context={"include_user_websites": True}
+    ).data
+    serialized_sites = UserWebsiteSerializer(user_websites, many=True).data
+    assert len(serialized_profile["user_websites"]) == 2
+    # Check that the two lists of OrderedDicts are equivalent
+    assert sorted(
+        [list(data.items()) for data in serialized_profile["user_websites"]]
+    ) == sorted([list(data.items()) for data in serialized_sites])
+
+
+def test_serialize_user_website():
+    """
+    Test serializing a user website
+    """
+    user_website = UserWebsiteFactory.build()
+    assert UserWebsiteSerializer(user_website).data == {
+        "id": user_website.id,
+        "url": user_website.url,
+        "site_type": user_website.site_type,
+    }
+
+
+def test_deserialize_user_website(mocker, user):
+    """
+    Test deserializing a user website
+    """
+    url = "https://example.com"
+    site_type = "dummy"
+    patched_get_site_type = mocker.patch(
+        "profiles.serializers.get_site_type_from_url", return_value=site_type
+    )
+    user_website_data = {"profile": user.profile.id, "url": url}
+
+    serializer = UserWebsiteSerializer(data=user_website_data)
+    is_valid = serializer.is_valid(raise_exception=True)
+    assert is_valid is True
+    assert serializer.validated_data["url"] == url
+    assert serializer.validated_data["site_type"] == site_type
+    assert serializer.validated_data["profile"] == user.profile
+    patched_get_site_type.assert_called_once_with(url)

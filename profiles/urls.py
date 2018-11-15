@@ -3,11 +3,17 @@ from django.conf.urls import url, include
 
 from rest_framework.routers import DefaultRouter
 
-from profiles.views import UserViewSet, ProfileViewSet, name_initials_avatar_view
+from profiles.views import (
+    UserViewSet,
+    ProfileViewSet,
+    UserWebsiteViewSet,
+    name_initials_avatar_view,
+)
 
 router = DefaultRouter()
 router.register(r"users", UserViewSet, base_name="user_api")
 router.register(r"profiles", ProfileViewSet, base_name="profile_api")
+router.register(r"websites", UserWebsiteViewSet, base_name="user_websites_api")
 
 urlpatterns = [
     url(r"^api/v0/", include(router.urls)),

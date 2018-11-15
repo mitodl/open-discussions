@@ -6,8 +6,14 @@ from channels.constants import ROLE_CONTRIBUTORS, ROLE_MODERATORS
 from channels.models import Channel
 from open_discussions.factories import UserFactory
 from profiles import api
-from profiles.api import get_channels
-from profiles.models import Profile
+from profiles.api import get_channels, get_site_type_from_url
+from profiles.models import (
+    Profile,
+    FACEBOOK_DOMAIN,
+    TWITTER_DOMAIN,
+    LINKEDIN_DOMAIN,
+    PERSONAL_SITE_TYPE,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -41,3 +47,19 @@ def test_get_channels(user):
     add_user_role("b", ROLE_CONTRIBUTORS, user)
     add_user_role("c", ROLE_MODERATORS, user)
     assert get_channels(user) == {"a", "b", "c"}
+
+
+@pytest.mark.parametrize(
+    "url,exp_site_type",
+    [
+        ("http://facebook.co.uk", FACEBOOK_DOMAIN),
+        ("HTTP://FACEBOOK.CO.UK", FACEBOOK_DOMAIN),
+        ("http://twitter.com", TWITTER_DOMAIN),
+        ("https://www.linkedin.com", LINKEDIN_DOMAIN),
+        ("https://not.a.socialsite.ca", PERSONAL_SITE_TYPE),
+        ("bad_url", PERSONAL_SITE_TYPE),
+    ],
+)
+def test_get_site_type_from_url(url, exp_site_type):
+    """Test that get_site_type_from_url returns the expected site type for a given URL value"""
+    assert get_site_type_from_url(url) == exp_site_type

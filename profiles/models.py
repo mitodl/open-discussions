@@ -24,6 +24,16 @@ PROFILE_PROPS = (
     "headline",
     "bio",
 )
+FACEBOOK_DOMAIN = "facebook"
+TWITTER_DOMAIN = "twitter"
+LINKEDIN_DOMAIN = "linkedin"
+PERSONAL_SITE_TYPE = "personal"
+SITE_TYPE_OPTIONS = {
+    FACEBOOK_DOMAIN,
+    TWITTER_DOMAIN,
+    LINKEDIN_DOMAIN,
+    PERSONAL_SITE_TYPE,
+}
 
 
 def filter_profile_props(data):
@@ -121,3 +131,21 @@ class Profile(models.Model):
 
     def __str__(self):
         return "{}".format(self.name)
+
+
+class UserWebsite(models.Model):
+    """A model for storing information for websites that should appear in a user's profile"""
+
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    url = models.CharField(max_length=200)
+    site_type = models.CharField(
+        max_length=15,
+        choices=zip(sorted(SITE_TYPE_OPTIONS), sorted(SITE_TYPE_OPTIONS)),
+        default=PERSONAL_SITE_TYPE,
+    )
+
+    class Meta:
+        unique_together = ("profile", "site_type")
+
+    def __str__(self):
+        return "url: {}; site_type: {}".format(self.url, self.site_typee)

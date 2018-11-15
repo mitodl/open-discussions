@@ -2,7 +2,7 @@
 from factory import Faker
 from factory.django import DjangoModelFactory, ImageField
 
-from profiles.models import Profile
+from profiles.models import Profile, UserWebsite
 
 
 class ProfileFactory(DjangoModelFactory):
@@ -22,3 +22,12 @@ class ProfileFactory(DjangoModelFactory):
 
     class Meta:
         model = Profile
+
+
+class UserWebsiteFactory(DjangoModelFactory):
+    """Factory for UserWebsite"""
+
+    url = Faker("url")
+
+    class Meta:
+        model = UserWebsite
