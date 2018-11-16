@@ -4,6 +4,7 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
+from channels.factories import ChannelFactory
 from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
@@ -15,7 +16,8 @@ def test_list_subscribers_not_allowed(staff_client):
     """
     Get method not allowed on the list of subscribers
     """
-    url = reverse("subscriber-list", kwargs={"channel_name": "test_channel"})
+    channel = ChannelFactory.create()
+    url = reverse("subscriber-list", kwargs={"channel_name": channel.name})
     assert staff_client.get(url).status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
