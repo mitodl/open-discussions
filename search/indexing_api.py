@@ -48,7 +48,7 @@ ENGLISH_TEXT_FIELD = {
 BASE_OBJECT_TYPE = {
     "object_type": {"type": "keyword"},
     "author_id": {"type": "keyword"},
-    "author_name": {"type": "keyword"},
+    "author_name": {"type": "text"},
     "author_avatar_small": {"type": "keyword"},
     "author_headline": ENGLISH_TEXT_FIELD,
 }
