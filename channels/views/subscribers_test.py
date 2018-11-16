@@ -4,7 +4,6 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from channels.factories import ChannelFactory
 from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.factories import UserFactory
 from open_discussions.features import ANONYMOUS_ACCESS
@@ -12,13 +11,17 @@ from open_discussions.features import ANONYMOUS_ACCESS
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
 
 
-def test_list_subscribers_allowed(staff_client):
+def test_list_subscribers(staff_client, staff_api, public_channel):
     """
-    Get method allowed on the list of subscribers
+    The correct list of subscriber usernames is returned.
     """
-    channel = ChannelFactory.create()
-    url = reverse("subscriber-list", kwargs={"channel_name": channel.name})
-    assert staff_client.get(url).status_code == status.HTTP_200_OK
+    users = UserFactory.create_batch(2)
+    for user in users:
+        staff_api.add_subscriber(user.username, public_channel.name)
+    url = reverse("subscriber-list", kwargs={"channel_name": public_channel.name})
+    resp = staff_client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [{"subscriber_name": user.username} for user in users]
 
 
 @pytest.mark.parametrize("attempts", [1, 2])
