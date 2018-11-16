@@ -1,6 +1,5 @@
 """Views for REST APIs for channels"""
 from django.conf import settings
-from praw.models import Redditor
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListCreateAPIView
@@ -9,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from channels.api import Api
-from channels.models import Channel
+from channels.models import Channel, ChannelSubscription
 from channels.serializers import SubscriberSerializer
 from open_discussions.permissions import (
     IsStaffOrReadonlyPermission,
@@ -53,19 +52,19 @@ class SubscriberDetailView(APIView):
 
     def get(self, request, *args, **kwargs):
         """Get subscriber for the channel"""
-        api = Api(user=request.user)
         subscriber_name = self.kwargs["subscriber_name"]
         channel_name = self.kwargs["channel_name"]
+        subscription = ChannelSubscription.objects.filter(
+            channel__name=channel_name, user__username=subscriber_name
+        ).first()
 
-        if not api.is_subscriber(subscriber_name, channel_name):
+        if not subscription:
             raise NotFound(
                 "User {} is not a subscriber of {}".format(
                     subscriber_name, channel_name
                 )
             )
-        return Response(
-            SubscriberSerializer(Redditor(api.reddit, name=subscriber_name)).data
-        )
+        return Response(SubscriberSerializer(subscription.user).data)
 
     def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """

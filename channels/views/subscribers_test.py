@@ -12,13 +12,13 @@ from open_discussions.features import ANONYMOUS_ACCESS
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
 
 
-def test_list_subscribers_not_allowed(staff_client):
+def test_list_subscribers_allowed(staff_client):
     """
-    Get method not allowed on the list of subscribers
+    Get method allowed on the list of subscribers
     """
     channel = ChannelFactory.create()
     url = reverse("subscriber-list", kwargs={"channel_name": channel.name})
-    assert staff_client.get(url).status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert staff_client.get(url).status_code == status.HTTP_200_OK
 
 
 def test_add_subscriber(staff_client):
