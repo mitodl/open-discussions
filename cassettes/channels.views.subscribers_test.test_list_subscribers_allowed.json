@@ -1,0 +1,74 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2018-11-16T14:53:59",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.20.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CWEG780363E4E12Y13GZY7GC"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA1WNyw6CMBREf4V0aTSpwfeORBtNIHFDXDZwe4EGwqOFKjX+u1RWLudkzsybJACoNe+bEmty8sh6f1xFYQP+RgRp+mQ1FMZcaWDjre1ETpYewVcrFWouneDvKJ3Yz+f92KIbSTFRqFxXQzOjhUsKs0ks/t9GZsaD1FDGVRZVdnhEd3o5D2HHbs4RaCQgl8INz4F8vqluak64AAAA",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 15 Nov 2018 23:41:00 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=ptVc0D5a7HkSMYSlGA; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 14-Nov-2020 23:41:00 GMT",
+            "loidcreated=2018-11-15T23%3A41%3A00.477Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 14-Nov-2020 23:41:00 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CWEG780363E4E12Y13GZY7GC"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

@@ -7,6 +7,7 @@ import pytest
 from praw.models.reddit.redditor import Redditor
 from rest_framework.exceptions import ValidationError
 
+from channels.api import sync_channel_subscription_model
 from channels.models import Channel
 from channels.serializers import (
     ChannelSerializer,
@@ -536,10 +537,11 @@ def test_moderator_create_neither():
 
 def test_subscriber():
     """Serialize of a redditor-like object"""
-    redditor = Mock(spec=Redditor)
-    # the `name` attribute cannot be configured during the mock object creation
-    redditor.name = "fooo_username"
-    assert SubscriberSerializer(redditor).data == {"subscriber_name": "fooo_username"}
+    redditor_name = "fooo_username"
+    redditor_user = UserFactory.create(username=redditor_name)
+    assert SubscriberSerializer(redditor_user).data == {
+        "subscriber_name": redditor_name
+    }
 
 
 def test_subscriber_validate_name_no_string():
@@ -568,9 +570,13 @@ def test_subscriber_create():
     """Adds a subscriber"""
     user = UserFactory.create()
     subscriber_user = UserFactory.create()
-    subscriber_redditor = Mock(spec=Redditor)
-    subscriber_redditor.name = subscriber_user.username
-    api_mock = Mock(add_subscriber=Mock(return_value=subscriber_redditor))
+    api_mock = Mock(
+        add_subscriber=Mock(
+            side_effect=[
+                sync_channel_subscription_model("foo_channel", subscriber_user)
+            ]
+        )
+    )
     subscriber = SubscriberSerializer(
         context={
             "channel_api": api_mock,
@@ -578,7 +584,7 @@ def test_subscriber_create():
             "view": Mock(kwargs={"channel_name": "foo_channel"}),
         }
     ).create({"subscriber_name": subscriber_user.username})
-    assert subscriber is subscriber_redditor
+    assert subscriber.id == subscriber_user.id
     api_mock.add_subscriber.assert_called_once_with(
         subscriber_user.username, "foo_channel"
     )

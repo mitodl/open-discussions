@@ -883,7 +883,7 @@ class SubscriberSerializer(serializers.Serializer):
 
     def get_subscriber_name(self, instance):
         """Returns the name for the subscriber"""
-        return instance.name
+        return instance.username
 
     def validate_subscriber_name(self, value):
         """Validates the subscriber name"""
@@ -896,7 +896,9 @@ class SubscriberSerializer(serializers.Serializer):
     def create(self, validated_data):
         api = self.context["channel_api"]
         channel_name = self.context["view"].kwargs["channel_name"]
-        return api.add_subscriber(validated_data["subscriber_name"], channel_name)
+        username = validated_data["subscriber_name"]
+        api.add_subscriber(username, channel_name)
+        return list(Channel.objects.get(name=channel_name).subscribers)[-1]
 
 
 class ReportSerializer(serializers.Serializer):
