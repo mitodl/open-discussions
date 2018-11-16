@@ -2,6 +2,8 @@
 Serializers for channel REST APIs
 """
 from datetime import datetime, timezone
+from functools import reduce
+import operator
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -59,6 +61,7 @@ class ChannelSerializer(serializers.Serializer):
         source="submission_type",
         choices=VALID_LINK_TYPES,
     )
+    allowed_post_types = WriteableSerializerMethodField()
     user_is_contributor = serializers.SerializerMethodField()
     user_is_moderator = serializers.SerializerMethodField()
     membership_is_managed = WriteableSerializerMethodField()
@@ -135,6 +138,16 @@ class ChannelSerializer(serializers.Serializer):
     def validate_membership_is_managed(self, value):
         """Empty validation function, but this is required for WriteableSerializerMethodField"""
         return {"membership_is_managed": value}
+
+    def get_allowed_post_types(self, channel):
+        """Returns a dictionary of allowed post types"""
+        return dict(channel.allowed_post_types.iteritems())
+
+    def validate_allowed_post_types(self, value):
+        """Validate the allowed post types"""
+        if not isinstance(value, dict):
+            raise ValidationError("Expected allowed_post_types to be a dict of enabled types")
+        return reduce(operator.and, [bit.number for (key, bit) in Channel.allowed_post_types if value.get(key, False)], 0)
 
     def _get_channel(self, name):
         """Get channel"""
