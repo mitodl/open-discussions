@@ -15,7 +15,6 @@ import {
   withCommentModeration,
   commentModerationSelector
 } from "../../hoc/withCommentModeration"
-import { withSpinnerLoading } from "../../components/Loading"
 import CompactPostDisplay from "../../components/CompactPostDisplay"
 import CommentTree from "../../components/CommentTree"
 
@@ -34,6 +33,7 @@ import type {
 } from "../../flow/discussionTypes"
 import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
 import withSingleColumn from "../../hoc/withSingleColumn"
+import withChannelHeader from "../../hoc/withChannelHeader"
 
 const addDummyReplies = R.over(R.lensPath(["replies"]), () => [])
 
@@ -121,6 +121,10 @@ export class ChannelModerationPage extends React.Component<Props> {
   render() {
     const { channel, reports, isModerator } = this.props
 
+    if (!channel) {
+      return null
+    }
+
     return isModerator ? (
       <React.Fragment>
         <MetaTags>
@@ -155,6 +159,6 @@ export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
   withCommentModeration,
-  withSingleColumn("edit-channel"),
-  withSpinnerLoading
+  withChannelHeader(false),
+  withSingleColumn("edit-channel")
 )(ChannelModerationPage)

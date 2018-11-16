@@ -51,6 +51,10 @@ export default class MembersList extends React.Component<Props> {
       memberTypeDescription
     } = this.props
 
+    if (!members) {
+      return null
+    }
+
     return (
       <div className="members-list">
         <table>

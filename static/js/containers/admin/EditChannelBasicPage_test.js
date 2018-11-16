@@ -118,4 +118,9 @@ describe("EditChannelBasicPage", () => {
     wrapper.find(".cancel").simulate("click")
     assert.equal(helper.currentLocation.pathname, channelURL(channel.name))
   })
+
+  it("has a channel header", async () => {
+    const wrapper = await renderPage()
+    assert.isTrue(wrapper.find(".channel-page-header").exists())
+  })
 })

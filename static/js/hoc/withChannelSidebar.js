@@ -4,25 +4,27 @@ import R from "ramda"
 
 import ChannelSidebar from "../components/ChannelSidebar"
 import Sidebar from "../components/Sidebar"
-import { Grid, Cell } from "../components/Grid"
+import withTwoColumns from "./withTwoColumns"
 
 const withChannelSidebar = R.curry(
   (className: string, WrappedComponent: Class<React.Component<*, *>>) => {
+    const TwoColumnComponent = withTwoColumns(className, WrappedComponent)
+
     class WithChannelSidebar extends React.Component<*, *> {
       static WrappedComponent: Class<React.Component<*, *>>
 
+      renderSidebar = () => (
+        <Sidebar className="sidebar-right">
+          <ChannelSidebar {...this.props} />
+        </Sidebar>
+      )
+
       render() {
         return (
-          <Grid className={`main-content two-column ${className}`}>
-            <Cell width={8}>
-              <WrappedComponent {...this.props} />
-            </Cell>
-            <Cell width={4}>
-              <Sidebar className="sidebar-right">
-                <ChannelSidebar {...this.props} />
-              </Sidebar>
-            </Cell>
-          </Grid>
+          <TwoColumnComponent
+            renderSidebar={this.renderSidebar}
+            {...this.props}
+          />
         )
       }
     }

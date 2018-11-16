@@ -7,6 +7,7 @@ import { MetaTags } from "react-meta-tags"
 import EditChannelAppearanceForm from "../../components/admin/EditChannelAppearanceForm"
 import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
 import withSingleColumn from "../../hoc/withSingleColumn"
+import withChannelHeader from "../../hoc/withChannelHeader"
 
 import { actions } from "../../actions"
 import { editChannelForm } from "../../lib/channels"
@@ -138,7 +139,7 @@ export class EditChannelAppearancePage extends React.Component<Props> {
   render() {
     const { channel, channelForm, processing, history } = this.props
 
-    if (!channelForm) {
+    if (!channel) {
       return null
     }
 
@@ -148,15 +149,17 @@ export class EditChannelAppearancePage extends React.Component<Props> {
           <title>{formatTitle("Edit Channel")}</title>
         </MetaTags>
         <EditChannelNavbar channelName={channel.name} />
-        <EditChannelAppearanceForm
-          channel={channel}
-          onSubmit={this.onSubmit}
-          onUpdate={this.onUpdate}
-          form={channelForm.value}
-          history={history}
-          validation={channelForm.errors}
-          processing={processing}
-        />
+        {channelForm ? (
+          <EditChannelAppearanceForm
+            channel={channel}
+            onSubmit={this.onSubmit}
+            onUpdate={this.onUpdate}
+            form={channelForm.value}
+            history={history}
+            validation={channelForm.errors}
+            processing={processing}
+          />
+        ) : null}
       </React.Fragment>
     )
   }
@@ -179,5 +182,6 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
+  withChannelHeader(false),
   withSingleColumn("edit-channel")
 )(EditChannelAppearancePage)

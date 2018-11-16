@@ -1,7 +1,6 @@
 // @flow
 import { assert } from "chai"
 import sinon from "sinon"
-import R from "ramda"
 
 import EditChannelModeratorsPage, {
   EditChannelModeratorsPage as InnerEditChannelModeratorsPage,
@@ -32,17 +31,46 @@ import { wait } from "../../lib/util"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("EditChannelModeratorsPage", () => {
-  let helper, renderPage, channel, moderators
+  let helper, render, channel, moderators, initialState, initialProps
 
   beforeEach(() => {
     channel = makeChannel()
     channel.user_is_moderator = true
     moderators = makeModerators(null, true)
     helper = new IntegrationTestHelper()
-    renderPage = helper.configureHOCRenderer(
+    initialState = {
+      channels: {
+        data:       new Map([[channel.name, channel]]),
+        processing: false
+      },
+      channelModerators: {
+        processing: false,
+        data:       new Map([[channel.name, moderators]])
+      },
+      forms: {
+        [MODERATORS_KEY]: {
+          value:  newMemberForm(),
+          errors: {}
+        }
+      },
+      ui: {
+        dialogs: new Map()
+      }
+    }
+    initialProps = {
+      match: {
+        params: {
+          channelName: channel.name
+        }
+      },
+      channel: channel
+    }
+
+    render = helper.configureHOCRenderer(
       EditChannelModeratorsPage,
       InnerEditChannelModeratorsPage,
-      {}
+      initialState,
+      initialProps
     )
     helper.getChannelStub.returns(Promise.resolve(channel))
     helper.getChannelsStub.returns(Promise.resolve([channel]))
@@ -66,43 +94,6 @@ describe("EditChannelModeratorsPage", () => {
   afterEach(() => {
     helper.cleanup()
   })
-
-  const render = (extraProps = {}, extraState = {}) =>
-    renderPage(
-      R.mergeDeepRight(
-        {
-          channels: {
-            data:       new Map([[channel.name, channel]]),
-            processing: false
-          },
-          channelModerators: {
-            processing: false,
-            data:       new Map([[channel.name, moderators]])
-          },
-          forms: {
-            [MODERATORS_KEY]: {
-              value:  newMemberForm(),
-              errors: {}
-            }
-          },
-          ui: {
-            dialogs: new Map()
-          }
-        },
-        extraProps
-      ),
-      R.mergeDeepRight(
-        {
-          match: {
-            params: {
-              channelName: channel.name
-            }
-          },
-          channel: channel
-        },
-        extraState
-      )
-    )
 
   it("should set the document title", async () => {
     const { inner } = await render()
@@ -373,5 +364,17 @@ describe("EditChannelModeratorsPage", () => {
       type:    SET_DIALOG_DATA,
       payload: { data, dialogKey: DIALOG_REMOVE_MEMBER }
     })
+  })
+
+  it("has a channel header", async () => {
+    render = helper.configureHOCRenderer(
+      EditChannelModeratorsPage,
+      "withChannelHeader(WithSingleColumn)",
+      initialState,
+      initialProps
+    )
+
+    const { inner } = await render()
+    assert.isTrue(inner.find("ChannelHeader").exists())
   })
 })

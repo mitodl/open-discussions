@@ -17,7 +17,14 @@ describe("ChannelHeader", () => {
   })
 
   const render = (props = {}) =>
-    shallow(<ChannelHeader channel={channel} isModerator={false} {...props} />)
+    shallow(
+      <ChannelHeader
+        channel={channel}
+        isModerator={false}
+        hasNavbar={true}
+        {...props}
+      />
+    )
 
   it("renders a channel page header", () => {
     const wrapper = render()

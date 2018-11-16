@@ -6,19 +6,17 @@ import qs from "query-string"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
-import ChannelHeader from "../components/ChannelHeader"
 import CanonicalLink from "../components/CanonicalLink"
-import { withPostLoadingSidebar } from "../components/Loading"
+import { PostLoading, withLoading } from "../components/Loading"
 import { PostSortPicker } from "../components/Picker"
 import {
   withPostModeration,
   postModerationSelector
 } from "../hoc/withPostModeration"
+import withChannelHeader from "../hoc/withChannelHeader"
+import withChannelSidebar from "../hoc/withChannelSidebar"
 import withPostList from "../hoc/withPostList"
 import { withChannelTracker } from "../hoc/withChannelTracker"
-import ChannelSidebar from "../components/ChannelSidebar"
-import Sidebar from "../components/Sidebar"
-import { Grid, Cell } from "../components/Grid"
 
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
@@ -113,37 +111,26 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
       subscribedChannels,
       posts,
       location: { search },
-      renderPosts,
-      isModerator
+      renderPosts
     } = this.props
 
     if (!channel || !subscribedChannels || !posts) {
       return null
     } else {
       return (
-        <div className="channel-page-wrapper">
-          <ChannelHeader channel={channel} isModerator={isModerator} />
-          <Grid className="main-content two-column channel-page">
-            <Cell width={8}>
-              <MetaTags>
-                <title>{formatTitle(channel.title)}</title>
-                <CanonicalLink match={match} />
-              </MetaTags>
-              <div className="post-list-title">
-                <PostSortPicker
-                  updatePickerParam={updatePostSortParam(this.props)}
-                  value={qs.parse(search).sort || POSTS_SORT_HOT}
-                />
-              </div>
-              {renderPosts()}
-            </Cell>
-            <Cell width={4}>
-              <Sidebar className="sidebar-right">
-                <ChannelSidebar {...this.props} />
-              </Sidebar>
-            </Cell>
-          </Grid>
-        </div>
+        <React.Fragment>
+          <MetaTags>
+            <title>{formatTitle(channel.title)}</title>
+            <CanonicalLink match={match} />
+          </MetaTags>
+          <div className="post-list-title">
+            <PostSortPicker
+              updatePickerParam={updatePostSortParam(this.props)}
+              value={qs.parse(search).sort || POSTS_SORT_HOT}
+            />
+          </div>
+          {renderPosts()}
+        </React.Fragment>
       )
     }
   }
@@ -213,8 +200,10 @@ export default R.compose(
     mapStateToProps,
     mapDispatchToProps
   ),
+  withChannelHeader(true),
   withPostModeration,
   withChannelTracker,
   withPostList,
-  withPostLoadingSidebar
+  withChannelSidebar("channel-page"),
+  withLoading(PostLoading)
 )(ChannelPage)
