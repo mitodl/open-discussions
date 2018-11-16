@@ -756,7 +756,7 @@ class ContributorSerializer(serializers.Serializer):
 
     def get_full_name(self, instance):
         """Get the full name of the associated user"""
-        return instance.profile.name if hasattr(instance, 'profile') else None
+        return instance.profile.name if hasattr(instance, "profile") else None
 
     def validate_contributor_name(self, value):
         """Validates the contributor name"""
@@ -814,7 +814,7 @@ class ModeratorPrivateSerializer(serializers.Serializer):
 
     def get_full_name(self, instance):
         """Get the full name of the associated user"""
-        return instance.profile.name if hasattr(instance, 'profile') else None
+        return instance.profile.name if hasattr(instance, "profile") else None
 
     def get_can_remove(self, instance):
         """Figure out whether the logged in user can remove this moderator"""
