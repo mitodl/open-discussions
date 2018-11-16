@@ -40,17 +40,22 @@ GLOBAL_DOC_TYPE = "_doc"
 SCRIPTING_LANG = "painless"
 UPDATE_CONFLICT_SETTING = "proceed"
 
+ENGLISH_TEXT_FIELD = {
+    "type": "text",
+    "fields": {"english": {"type": "text", "analyzer": "english"}},
+}
+
 BASE_OBJECT_TYPE = {
     "object_type": {"type": "keyword"},
     "author_id": {"type": "keyword"},
-    "author_name": {"type": "keyword"},
+    "author_name": {"type": "text"},
     "author_avatar_small": {"type": "keyword"},
-    "author_headline": {"type": "text"},
+    "author_headline": ENGLISH_TEXT_FIELD,
 }
 
 PROFILE_OBJECT_TYPE = {
     **BASE_OBJECT_TYPE,
-    "author_bio": {"type": "text"},
+    "author_bio": ENGLISH_TEXT_FIELD,
     "author_channel_membership": {"type": "keyword"},
     "author_avatar_medium": {"type": "keyword"},
 }
@@ -58,12 +63,12 @@ PROFILE_OBJECT_TYPE = {
 CONTENT_OBJECT_TYPE = {
     **BASE_OBJECT_TYPE,
     "channel_name": {"type": "keyword"},
-    "channel_title": {"type": "text"},
+    "channel_title": ENGLISH_TEXT_FIELD,
     "channel_type": {"type": "keyword"},
-    "text": {"type": "text"},
+    "text": ENGLISH_TEXT_FIELD,
     "score": {"type": "long"},
     "post_id": {"type": "keyword"},
-    "post_title": {"type": "text"},
+    "post_title": ENGLISH_TEXT_FIELD,
     "post_slug": {"type": "keyword"},
     "created": {"type": "date"},
     "deleted": {"type": "boolean"},

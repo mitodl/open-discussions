@@ -73,9 +73,9 @@ export const searchResultToProfile = (result: ProfileResult): Profile => ({
   username:             result.author_id
 })
 
-const POST_QUERY_FIELDS = ["text", "post_title"]
-const COMMENT_QUERY_FIELDS = ["text"]
-const PROFILE_QUERY_FIELDS = ["author_headline", "author_bio"]
+const POST_QUERY_FIELDS = ["text.english", "post_title.english"]
+const COMMENT_QUERY_FIELDS = ["text.english"]
+const PROFILE_QUERY_FIELDS = ["author_headline.english", "author_bio.english"]
 const _searchFields = (type: ?string) => {
   if (type === "post") {
     return POST_QUERY_FIELDS

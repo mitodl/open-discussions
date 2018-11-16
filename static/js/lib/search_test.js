@@ -298,9 +298,9 @@ describe("search functions", () => {
 
   describe("searchFields", () => {
     [
-      ["post", ["text", "post_title"]],
-      ["comment", ["text"]],
-      ["profile", ["author_headline", "author_bio"]]
+      ["post", ["text.english", "post_title.english"]],
+      ["comment", ["text.english"]],
+      ["profile", ["author_headline.english", "author_bio.english"]]
     ].forEach(([type, fields]) => {
       it(`has the right searchFields for ${type}`, () => {
         assert.deepEqual(searchFields(type), fields)
