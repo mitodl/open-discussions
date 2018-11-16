@@ -47,11 +47,6 @@ export default class Toolbar extends React.Component<Props> {
           <div className="mdc-toolbar__row">
             <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
               <HamburgerAndLogo onHamburgerClick={this.toggleShowDrawer} />
-              <span className="mdc-toolbar__title">
-                <a href={SETTINGS.authenticated_site.base_url}>
-                  {SETTINGS.authenticated_site.title}
-                </a>{" "}
-              </span>
             </section>
             <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
               {SETTINGS.allow_search ? (

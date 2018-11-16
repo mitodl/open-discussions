@@ -21,6 +21,18 @@ a.mitlogo {
   padding: 0 0 0 $icon-padding-left;
 }
 
+.mdc-toolbar__title,
+.mdc-toolbar__title a {
+  color: $navy;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+// Needed to override !important definition from MDC
+span.mdc-toolbar__title {
+  margin-left: 8px !important;
+}
+
 .navbar {
   .mdc-toolbar {
     background-color: #fff;
@@ -71,18 +83,6 @@ a.mitlogo {
 
     .mdc-toolbar__section {
       padding: $toolbar-vert-padding 0;
-    }
-
-    .mdc-toolbar__title,
-    .mdc-toolbar__title a {
-      color: $navy;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    // Needed to override !important definition from MDC
-    span.mdc-toolbar__title {
-      margin-left: 8px !important;
     }
 
     .mdc-toolbar__section--align-start {

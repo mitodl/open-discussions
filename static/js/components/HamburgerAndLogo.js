@@ -24,6 +24,11 @@ const HamburgerAndLogo = ({ onHamburgerClick }: Props) => (
         }`}
       />
     </a>
+    <span className="mdc-toolbar__title">
+      <a href={SETTINGS.authenticated_site.base_url}>
+        {SETTINGS.authenticated_site.title}
+      </a>{" "}
+    </span>
   </React.Fragment>
 )
 
