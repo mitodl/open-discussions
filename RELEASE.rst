@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.53.3 (Released November 19, 2018)
+--------------
+
+- Implement site search (#1481)
+- Add support anonymous users in search, and add support for public and restricted channels who are not already contributors or moderators (#1493)
+
 Version 0.53.2 (Released November 16, 2018)
 --------------
 
