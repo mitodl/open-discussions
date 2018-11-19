@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.53.3
+Version 0.53.3 (Released November 19, 2018)
 --------------
 
 - Implement site search (#1481)
