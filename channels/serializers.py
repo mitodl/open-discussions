@@ -18,7 +18,7 @@ from channels.utils import (
     num_items_not_none,
 )
 from channels.constants import VALID_CHANNEL_TYPES, VALID_LINK_TYPES
-from channels.models import Channel, Subscription
+from channels.models import Channel, Subscription, ChannelSubscription
 from channels.proxies import proxy_post
 from open_discussions.utils import filter_dict_with_renamed_keys
 from profiles.models import Profile
@@ -898,7 +898,9 @@ class SubscriberSerializer(serializers.Serializer):
         channel_name = self.context["view"].kwargs["channel_name"]
         username = validated_data["subscriber_name"]
         api.add_subscriber(username, channel_name)
-        return list(Channel.objects.get(name=channel_name).subscribers)[-1]
+        return ChannelSubscription.objects.get(
+            channel__name=channel_name, user__username=username
+        ).user
 
 
 class ReportSerializer(serializers.Serializer):

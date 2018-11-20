@@ -158,9 +158,9 @@ class Channel(TimestampedModel):
 
         """
         return User.objects.filter(
-            id__in=ChannelSubscription.objects.filter(channel=self).values_list(
-                "user", flat=True
-            )
+            id__in=ChannelSubscription.objects.filter(channel=self)
+            .order_by("created_on")
+            .values_list("user", flat=True)
         ).iterator()
 
     def __str__(self):
