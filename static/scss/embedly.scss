@@ -41,6 +41,10 @@
     @include breakpoint(desktopwide) {
       &.compact {
         flex-direction: row;
+
+        .thumbnail {
+          margin-right: 15px;
+        }
       }
     }
 
@@ -64,8 +68,6 @@
       }
 
       &.compact {
-        margin-right: 5px;
-
         @include breakpoint(desktopwide) {
           height: 200px;
           width: 300px;
@@ -86,7 +88,7 @@
       }
 
       .description {
-        font-size: 15px;
+        font-size: 16px;
       }
     }
   }
