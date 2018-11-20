@@ -8,6 +8,7 @@ from praw.models.reddit.redditor import Redditor
 from rest_framework.exceptions import ValidationError
 
 from channels.api import sync_channel_subscription_model
+from channels.factories import ChannelFactory
 from channels.models import Channel
 from channels.serializers import (
     ChannelSerializer,
@@ -569,6 +570,7 @@ def test_subscriber_validate_name():
 def test_subscriber_create():
     """Adds a subscriber"""
     user = UserFactory.create()
+    ChannelFactory.create(name="foo_channel")
     subscriber_user = UserFactory.create()
     api_mock = Mock(
         add_subscriber=Mock(
