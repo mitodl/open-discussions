@@ -307,4 +307,41 @@ describe("SearchPage", () => {
     inner.find("SearchTextbox").prop("onClear")()
     assert.equal(inner.state().text, "")
   })
+  ;[
+    [true, true, true, true],
+    [true, true, false, true],
+    [true, false, true, true],
+    [true, false, false, true],
+    [false, true, true, false],
+    [false, true, false, true],
+    [false, false, true, false],
+    [false, false, false, true]
+  ].forEach(([channelLoaded, searchLoaded, hasChannel, loaded]) => {
+    it(`has loaded=${String(loaded)} when channelLoaded=${String(
+      channelLoaded
+    )} and searchLoaded=${String(searchLoaded)} and it ${
+      hasChannel ? "has" : "doesn't have"
+    } a channel`, async () => {
+      const { inner } = await renderPage(
+        {
+          channels: {
+            loaded:     channelLoaded,
+            processing: !channelLoaded
+          },
+          search: {
+            loaded:     searchLoaded,
+            processing: !searchLoaded
+          }
+        },
+        {
+          match: {
+            params: {
+              channelName: hasChannel ? channel.name : null
+            }
+          }
+        }
+      )
+      assert.equal(inner.find("PostLoading").exists(), !loaded)
+    })
+  })
 })

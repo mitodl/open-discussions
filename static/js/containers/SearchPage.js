@@ -251,7 +251,7 @@ const mapStateToProps = (state, ownProps) => {
     channelName,
     // loaded is used in withLoading but we only want to look at channel loaded since search loaded will change
     // whenever the user makes a new search
-    loaded: channelLoaded,
+    loaded: channelName ? channelLoaded : true,
     notFound,
     notAuthorized,
     searchLoaded,
