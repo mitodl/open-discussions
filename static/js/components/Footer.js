@@ -7,7 +7,9 @@ import moment from "moment"
 const Footer = () => (
   <div className="footer">
     <div className="row">
-      <a href={`mailto:${SETTINGS.support_email}`}>Contact us</a>
+      <a href={`mailto:${SETTINGS.support_email}`} target="_blank">
+        Contact us
+      </a>
     </div>
     <div className="row">
       <Link to="/content_policy">Community Guidelines</Link>
