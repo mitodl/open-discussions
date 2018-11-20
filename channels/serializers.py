@@ -1,9 +1,10 @@
 """
 Serializers for channel REST APIs
 """
+# pylint: disable=too-many-lines
+import operator
 from datetime import datetime, timezone
 from functools import reduce
-import operator
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -141,13 +142,34 @@ class ChannelSerializer(serializers.Serializer):
 
     def get_allowed_post_types(self, channel):
         """Returns a dictionary of allowed post types"""
-        return dict(channel.allowed_post_types.iteritems())
+        return dict(channel.allowed_post_types.items())
 
     def validate_allowed_post_types(self, value):
         """Validate the allowed post types"""
         if not isinstance(value, dict):
-            raise ValidationError("Expected allowed_post_types to be a dict of enabled types")
-        return reduce(operator.and, [bit.number for (key, bit) in Channel.allowed_post_types if value.get(key, False)], 0)
+            raise ValidationError(
+                "Expected allowed_post_types to be a dict of enabled types"
+            )
+
+        allowed_keys = Channel.allowed_post_types.keys()
+
+        for key in value.keys():
+            if key not in allowed_keys:
+                raise ValidationError(
+                    f"Post type {key} not supported for allowed_post_types"
+                )
+
+        return {
+            "allowed_post_types": reduce(
+                operator.or_,
+                [
+                    bit
+                    for key, bit in Channel.allowed_post_types.items()
+                    if value.get(key, False)
+                ],
+                0,
+            )
+        }
 
     def _get_channel(self, name):
         """Get channel"""
@@ -199,6 +221,7 @@ class ChannelSerializer(serializers.Serializer):
             "description": "description",
             "public_description": "public_description",
             "membership_is_managed": "membership_is_managed",
+            "allowed_post_types": "allowed_post_types",
         }
         kwargs = filter_dict_with_renamed_keys(validated_data, lookup, optional=True)
 

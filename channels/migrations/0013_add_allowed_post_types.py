@@ -6,19 +6,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('channels', '0012_add_post_type_and_article'),
-    ]
+    dependencies = [("channels", "0012_add_post_type_and_article")]
 
     operations = [
         migrations.AddField(
-            model_name='channel',
-            name='allowed_post_types',
-            field=bitfield.models.BitField([('link', 'link'), ('self', 'self'), ('article', 'article')], default=None, null=True),
+            model_name="channel",
+            name="allowed_post_types",
+            field=bitfield.models.BitField(
+                [("link", "link"), ("self", "self"), ("article", "article")],
+                default=None,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='post',
-            name='post_type',
+            model_name="post",
+            name="post_type",
             field=models.CharField(max_length=10, null=True),
         ),
     ]

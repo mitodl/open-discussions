@@ -60,7 +60,10 @@ def reddit_index_user(reddit_factories):
 def private_channel(reddit_factories, staff_user):
     """Returns a standard private channel for tests"""
     return reddit_factories.channel(
-        "private_channel", staff_user, channel_type=CHANNEL_TYPE_PRIVATE
+        "private_channel",
+        staff_user,
+        channel_type=CHANNEL_TYPE_PRIVATE,
+        allowed_post_types={key: True for key in ["self", "link", "article"]},
     )
 
 
@@ -68,7 +71,10 @@ def private_channel(reddit_factories, staff_user):
 def public_channel(reddit_factories, staff_user):
     """Returns a standard public channel for tests"""
     return reddit_factories.channel(
-        "public_channel", staff_user, channel_type=CHANNEL_TYPE_PUBLIC
+        "public_channel",
+        staff_user,
+        channel_type=CHANNEL_TYPE_PUBLIC,
+        allowed_post_types={key: True for key in ["self", "link", "article"]},
     )
 
 

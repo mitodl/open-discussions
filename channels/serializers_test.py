@@ -39,6 +39,7 @@ def test_serialize_channel(user, membership_is_managed):
         description="description",
         public_description="public_description",
         submission_type="link",
+        allowed_post_types={},
     )
     request = Mock(user=user)
 
@@ -61,6 +62,7 @@ def test_serialize_channel(user, membership_is_managed):
         "avatar_medium": None,
         "banner": None,
         "ga_tracking_id": None,
+        "allowed_post_types": {},
     }
 
 

@@ -9,8 +9,14 @@ from prawcore.exceptions import ResponseException
 
 from channels import api
 from channels.api import Api, sync_channel_subscription_model, add_user_role
-from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
-from channels.models import Channel
+from channels.constants import (
+    ROLE_MODERATORS,
+    ROLE_CONTRIBUTORS,
+    LINK_TYPE_LINK,
+    LINK_TYPE_SELF,
+    EXTENDED_POST_TYPE_ARTICLE,
+)
+from channels.models import Channel, Post, Article
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 from search.exceptions import PopulateUserRolesException, RetryException
@@ -130,11 +136,57 @@ def populate_subscriptions_and_roles(self):
     raise self.replace(results)
 
 
+@app.task
+def populate_post_post_type(ids):
+    """
+    Populates Post.post_type for a range of posts
+
+    Args:
+        ids (list of int): list of post ids
+    """
+    client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
+
+    for post in Post.objects.filter(id__in=ids).iterator():
+        if post.post_type:
+            continue
+
+        submission = client.get_submission(post.post_id)
+        if submission.url:
+            post.post_type = LINK_TYPE_LINK
+        elif post.article:
+            post.post_type = EXTENDED_POST_TYPE_ARTICLE
+        else:
+            post.post_type = LINK_TYPE_SELF
+
+        post.savE()
+
+
+@app.task
+def populate_channel_post_type(channel_ids):
+    """
+    Populates Post.post_type for a range of posts
+
+    Args:
+        channel_ids (list of int): list of post ids
+    """
+    client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
+
+    for channel in Channel.objects.filter(id__in=channel_ids).iterator():
+        if channel.allowed_post_types:
+            continue
+
+        subreddit = client.get_subreddit(channel.display_name)
+        channel.allowed_post_types = get_allowed_post_types_from_link_type(
+            channel.link_type
+        )
+        channel.save()
 
 
 @app.task(bind=True)
-def populate_post_types(self):
-
+def populate_post_and_channel_types(self):
+    """
+    Populates Channel.allowed_post_types and Post.post_type
+    """
     results = celery.group(
         [
             populate_post_post_type.si(ids)

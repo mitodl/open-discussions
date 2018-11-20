@@ -9,6 +9,7 @@ from rest_framework import status
 from channels.constants import LINK_TYPE_ANY
 from channels.factories import STRATEGY_BUILD
 from channels.models import Channel
+from channels.views.test_utils import default_channel_response_data
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
     PERMISSION_DENIED_ERROR_TYPE,
@@ -26,24 +27,7 @@ def test_list_channels(user_client, private_channel_and_contributor, request):
     url = reverse("channel-list")
     resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == [
-        {
-            "title": channel.title,
-            "name": channel.name,
-            "description": channel.description,
-            "public_description": channel.public_description,
-            "channel_type": channel.channel_type,
-            "user_is_contributor": True,
-            "user_is_moderator": False,
-            "link_type": channel.link_type,
-            "membership_is_managed": False,
-            "avatar": None,
-            "avatar_small": None,
-            "avatar_medium": None,
-            "banner": None,
-            "ga_tracking_id": None,
-        }
-    ]
+    assert resp.json() == [default_channel_response_data(channel)]
 
 
 def test_list_channels_ordered(user_client, subscribed_channels, request):
@@ -100,15 +84,9 @@ def test_create_channel(
         payload["membership_is_managed"] = managed
     resp = staff_client.post(url, data=payload)
     expected = {
-        **payload,
-        "user_is_contributor": True,
+        **default_channel_response_data(channel),
         "user_is_moderator": True,
         "membership_is_managed": managed is not False,
-        "avatar": None,
-        "avatar_small": None,
-        "avatar_medium": None,
-        "banner": None,
-        "ga_tracking_id": None,
     }
     assert resp.json() == expected
     assert resp.status_code == status.HTTP_201_CREATED
@@ -133,17 +111,11 @@ def test_create_channel_no_descriptions(
     }
     resp = staff_client.post(url, data=payload)
     expected = {
+        **default_channel_response_data(channel),
         **payload,
         "description": "",
         "public_description": "",
-        "user_is_contributor": True,
         "user_is_moderator": True,
-        "membership_is_managed": True,
-        "avatar": None,
-        "avatar_small": None,
-        "avatar_medium": None,
-        "banner": None,
-        "ga_tracking_id": None,
     }
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
@@ -215,22 +187,7 @@ def test_get_channel(user_client, private_channel_and_contributor):
     url = reverse("channel-detail", kwargs={"channel_name": channel.name})
     resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == {
-        "channel_type": channel.channel_type,
-        "name": channel.name,
-        "title": channel.title,
-        "description": channel.description,
-        "public_description": channel.public_description,
-        "user_is_contributor": True,
-        "user_is_moderator": False,
-        "link_type": channel.link_type,
-        "membership_is_managed": False,
-        "avatar": None,
-        "avatar_small": None,
-        "avatar_medium": None,
-        "banner": None,
-        "ga_tracking_id": None,
-    }
+    assert resp.json() == default_channel_response_data(channel)
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
@@ -244,20 +201,8 @@ def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous
     if allow_anonymous:
         assert resp.status_code == status.HTTP_200_OK
         assert resp.json() == {
-            "channel_type": public_channel.channel_type,
-            "name": public_channel.name,
-            "title": public_channel.title,
-            "description": public_channel.description,
-            "public_description": public_channel.public_description,
+            **default_channel_response_data(public_channel),
             "user_is_contributor": False,
-            "user_is_moderator": False,
-            "link_type": public_channel.link_type,
-            "membership_is_managed": False,
-            "avatar": None,
-            "avatar_small": None,
-            "avatar_medium": None,
-            "banner": None,
-            "ga_tracking_id": None,
         }
     else:
         assert resp.status_code in (
@@ -325,20 +270,8 @@ def test_patch_channel(staff_client, private_channel):
     resp = staff_client.patch(url, {"channel_type": "public"}, format="json")
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
+        **default_channel_response_data(private_channel),
         "channel_type": "public",
-        "link_type": private_channel.link_type,
-        "name": private_channel.name,
-        "title": private_channel.title,
-        "description": private_channel.description,
-        "public_description": private_channel.public_description,
-        "user_is_contributor": True,
-        "user_is_moderator": True,
-        "membership_is_managed": False,
-        "avatar": None,
-        "avatar_small": None,
-        "avatar_medium": None,
-        "banner": None,
-        "ga_tracking_id": None,
     }
     assert Channel.objects.count() == 1
     channel_obj = Channel.objects.first()
@@ -358,20 +291,8 @@ def test_patch_channel_moderator(
     resp = user_client.patch(url, {"channel_type": "public"}, format="json")
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
+        **default_channel_response_data(private_channel),
         "channel_type": "public",
-        "name": private_channel.name,
-        "title": private_channel.title,
-        "description": private_channel.description,
-        "public_description": private_channel.public_description,
-        "user_is_contributor": True,
-        "user_is_moderator": True,
-        "link_type": private_channel.link_type,
-        "membership_is_managed": False,
-        "avatar": None,
-        "avatar_small": None,
-        "avatar_medium": None,
-        "banner": None,
-        "ga_tracking_id": None,
     }
 
 

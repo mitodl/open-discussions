@@ -2,7 +2,7 @@
 from django.utils.functional import SimpleLazyObject
 from wrapt import ObjectProxy
 
-from channels.models import Post
+from channels.models import Channel, Post
 
 
 class PostProxy(ObjectProxy):
@@ -133,7 +133,7 @@ class ChannelProxy(ObjectProxy):
         super().__init__(subreddit)
         # store the channel so @property overrides can reference it
         self._subreddit = subreddit
-        self._channel= channel
+        self._channel = channel
 
     def __getattr__(self, name):
         """
@@ -163,7 +163,8 @@ def proxy_channel(subreddit):
         ChannelProxy: proxied channel
     """
     return ChannelProxy(
-        subreddit, SimpleLazyObject(lambda: Channel.objects.get(name=subreddit.display_name))
+        subreddit,
+        SimpleLazyObject(lambda: Channel.objects.get(name=subreddit.display_name)),
     )
 
 
@@ -181,11 +182,11 @@ def proxy_channels(subreddits):
     channels = {
         channel.name: channel
         for channel in Channel.objects.filter(
-            name__in=[submission.display_name for submission in submissions]
+            name__in=[subreddit.display_name for subreddit in subreddits]
         )
     }
     return [
-        ChannelProxy(submission, channels[submission.display_name])
-        for submission in submissions
-        if submission.display_name in posts
+        ChannelProxy(subreddit, channels[subreddit.display_name])
+        for subreddit in subreddits
+        if subreddit.display_name in channels
     ]

@@ -54,7 +54,13 @@ from channels.models import (
     ChannelSubscription,
     ChannelGroupRole,
 )
-from channels.proxies import PostProxy, proxy_post
+from channels.proxies import (
+    PostProxy,
+    ChannelProxy,
+    proxy_post,
+    proxy_channel,
+    proxy_channels,
+)
 from channels.utils import (
     get_kind_mapping,
     get_or_create_link_meta,
@@ -385,6 +391,25 @@ def get_post_type(*, text, url, article_content):
     return LINK_TYPE_SELF
 
 
+def get_allowed_post_types_from_link_type(link_type):
+    """
+    Determine allowed_post_types based on a value for reddit's link_type setting
+
+    Args:
+        link_type (str): the link type or None
+
+    Returns:
+        int: bit mask of the allowed post types
+    """
+    if link_type == LINK_TYPE_LINK:
+        return Channel.allowed_post_types.link
+    elif link_type == LINK_TYPE_SELF:
+        return Channel.allowed_post_types.self
+    else:
+        # enforce a standard default
+        return Channel.allowed_post_types.self | Channel.allowed_post_types.link
+
+
 class Api:
     """Channel API"""
 
@@ -417,8 +442,24 @@ class Api:
             ListingGenerator(praw.models.Subreddit): a generator over channel listings
         """
         if self.user.is_anonymous:
-            return self.reddit.subreddits.default()
-        return self.reddit.user.subreddits(limit=None)
+            subreddits = self.reddit.subreddits.default()
+        else:
+            subreddits = self.reddit.user.subreddits(limit=None)
+
+        # call list() to force one-time evaluation of the generator
+        return proxy_channels(list(subreddits))
+
+    def get_subreddit(self, name):
+        """
+        Get the subreddit
+
+        Args:
+            name (str): The subreddit name
+
+        Returns:
+            praw.models.Subreddit: the specified subreddit
+        """
+        return self.reddit.subreddit(name)
 
     def get_channel(self, name):
         """
@@ -428,9 +469,9 @@ class Api:
             name (str): The channel name
 
         Returns:
-            praw.models.Subreddit: the specified channel
+            channels.proxies.ChannelProxy: the specified channel
         """
-        return self.reddit.subreddit(name)
+        return proxy_channel(self.get_subreddit(name))
 
     def create_channel(
         self,
@@ -438,8 +479,9 @@ class Api:
         title,
         channel_type=CHANNEL_TYPE_PUBLIC,
         membership_is_managed=False,
+        allowed_post_types=None,
         **other_settings,
-    ):
+    ):  # pylint: disable=too-many-arguments
         """
         Create a channel
 
@@ -463,7 +505,15 @@ class Api:
         if not isinstance(membership_is_managed, bool):
             raise ValueError("Invalid argument membership_is_managed")
 
-        channel = self.reddit.subreddit.create(
+        if not allowed_post_types:
+            # forward-port link type to allowed_post_types
+            link_type = other_settings.get("link_type", LINK_TYPE_ANY)
+            allowed_post_types = get_allowed_post_types_from_link_type(link_type)
+        else:
+            # set reddit to accept any link types since we're going to do the validation on our end going forward
+            other_settings["link_type"] = LINK_TYPE_ANY
+
+        subreddit = self.reddit.subreddit.create(
             name,
             title=title,
             subreddit_type=channel_type,
@@ -471,9 +521,13 @@ class Api:
             **other_settings,
         )
 
-        Channel.objects.create(name=name, membership_is_managed=membership_is_managed)
+        channel = Channel.objects.create(
+            name=name,
+            membership_is_managed=membership_is_managed,
+            allowed_post_types=allowed_post_types,
+        )
 
-        return channel
+        return ChannelProxy(subreddit, channel)
 
     @reddit_object_persist(search_task_helpers.update_channel_index)
     def update_channel(self, name, title=None, channel_type=None, **other_settings):
@@ -489,7 +543,8 @@ class Api:
         Returns:
             praw.models.Subreddit: the updated subreddit
         """
-        membership_is_managed = other_settings.pop("membership_is_managed", None)
+        membership_is_managed = other_settings.pop("membership_is_managed", False)
+        allowed_post_types = other_settings.pop("allowed_post_types", None)
 
         if channel_type is not None and channel_type not in VALID_CHANNEL_TYPES:
             raise ValueError("Invalid argument channel_type={}".format(channel_type))
@@ -498,12 +553,20 @@ class Api:
             if key not in CHANNEL_SETTINGS:
                 raise ValueError("Invalid argument {}={}".format(key, value))
 
+        channel_kwargs = {}
         if membership_is_managed is not None:
             if not isinstance(membership_is_managed, bool):
                 raise ValueError("Invalid argument membership_is_managed")
-            Channel.objects.filter(name=name).update(
-                membership_is_managed=membership_is_managed
-            )
+            channel_kwargs["membership_is_managed"] = membership_is_managed
+
+        if allowed_post_types is not None:
+            channel_kwargs["allowed_post_types"] = allowed_post_types
+
+            # set reddit to allow all link types, going forward we will validate the post link_type against allowed_post_types if it is set
+            other_settings["link_type"] = LINK_TYPE_ANY
+
+        if channel_kwargs:
+            Channel.objects.filter(name=name).update(**channel_kwargs)
 
         values = other_settings.copy()
         if title is not None:
@@ -604,19 +667,29 @@ class Api:
             # article posts shadow an empty text post, because reddit requires at least an empty string
             text = ""
 
-        submission = self.get_channel(channel_name).submit(
-            title, selftext=text, url=url
-        )
+        channel = self.get_channel(channel_name)
+
+        # if the channel has allowed_post_types configured, use that, otherwise delegate to reddit via the submit() call
+        if channel.allowed_post_types:
+            if not channel.allowed_post_types & getattr(
+                Channel.allowed_post_types, post_type
+            ):
+                raise ValueError(
+                    f"Post type {post_type} is not permitted in this channel"
+                )
+
+        submission = channel.submit(title, selftext=text, url=url)
 
         post = None
 
         with transaction.atomic():
-            channel = Channel.objects.get(name=channel_name)
-
             # select_for_update so no one else can write to this
             post, created = Post.objects.select_for_update().get_or_create(
                 post_id=submission.id,
-                defaults={"channel": channel, "post_type": post_type},
+                defaults={
+                    "channel": channel._channel,  # pylint: disable=protected-access
+                    "post_type": post_type,
+                },
             )
 
             if created and article_content:
@@ -701,6 +774,18 @@ class Api:
                 )
             )
 
+    def get_submission(self, submission_id):
+        """
+        Gets the submission
+
+        Args:
+            submission_id(str): the base36 id for the submission
+
+        Returns:
+            praw.models.Submission: the submission
+        """
+        return self.reddit.submission(id=submission_id)
+
     def get_post(self, post_id):
         """
         Gets the post
@@ -711,7 +796,7 @@ class Api:
         Returns:
             channels.proxies.PostProxy: the submitted post
         """
-        return proxy_post(self.reddit.submission(id=post_id))
+        return proxy_post(self.get_submission(post_id))
 
     @reddit_object_persist(search_task_helpers.update_post_text)
     def update_post(self, post_id, *, text=None, article_content=None):
@@ -739,7 +824,7 @@ class Api:
 
         if post.post_type:
             # new validation
-            if text and post.post_type not in (LINK_TYPE_ANY, LINK_TYPE_SELF):
+            if text and post.post_type != LINK_TYPE_SELF:
                 raise ValueError(
                     f"Posts of type '{post.post_type}' cannot have text updated"
                 )
