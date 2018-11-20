@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.54.0
+--------------
+
+- remove the logo from intro card on phones
+- Add the site name to the mobile drawer header
+- Adds article post_type
+- Add english analyzer to Elasticsearch mapping, and update search to use it (#1502)
+
 Version 0.53.3 (Released November 19, 2018)
 --------------
 
