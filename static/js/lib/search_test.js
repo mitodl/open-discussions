@@ -105,26 +105,15 @@ describe("search functions", () => {
       assert.deepEqual(buildSearchQuery({}), {
         query: {
           bool: {
-            should: [
-              {
-                bool: {
-                  filter: {
-                    bool: {
-                      must: [{ term: { object_type: "comment" } }]
-                    }
-                  }
-                }
-              },
-              {
-                bool: {
-                  filter: {
-                    bool: {
-                      must: [{ term: { object_type: "post" } }]
-                    }
+            should: ["comment", "post", "profile"].map(objectType => ({
+              bool: {
+                filter: {
+                  bool: {
+                    must: [{ term: { object_type: objectType } }]
                   }
                 }
               }
-            ]
+            }))
           }
         }
       })
@@ -134,17 +123,15 @@ describe("search functions", () => {
       assert.deepEqual(buildSearchQuery({ type: "xyz" }), {
         query: {
           bool: {
-            should: [
-              {
-                bool: {
-                  filter: {
-                    bool: {
-                      must: [{ term: { object_type: "xyz" } }]
-                    }
+            should: ["xyz"].map(objectType => ({
+              bool: {
+                filter: {
+                  bool: {
+                    must: [{ term: { object_type: objectType } }]
                   }
                 }
               }
-            ]
+            }))
           }
         }
       })
@@ -155,26 +142,15 @@ describe("search functions", () => {
         from:  0,
         query: {
           bool: {
-            should: [
-              {
-                bool: {
-                  filter: {
-                    bool: {
-                      must: [{ term: { object_type: "comment" } }]
-                    }
-                  }
-                }
-              },
-              {
-                bool: {
-                  filter: {
-                    bool: {
-                      must: [{ term: { object_type: "post" } }]
-                    }
+            should: ["comment", "post", "profile"].map(objectType => ({
+              bool: {
+                filter: {
+                  bool: {
+                    must: [{ term: { object_type: objectType } }]
                   }
                 }
               }
-            ]
+            }))
           }
         }
       })
@@ -185,26 +161,15 @@ describe("search functions", () => {
         size:  4,
         query: {
           bool: {
-            should: [
-              {
-                bool: {
-                  filter: {
-                    bool: {
-                      must: [{ term: { object_type: "comment" } }]
-                    }
-                  }
-                }
-              },
-              {
-                bool: {
-                  filter: {
-                    bool: {
-                      must: [{ term: { object_type: "post" } }]
-                    }
+            should: ["comment", "post", "profile"].map(objectType => ({
+              bool: {
+                filter: {
+                  bool: {
+                    must: [{ term: { object_type: objectType } }]
                   }
                 }
               }
-            ]
+            }))
           }
         }
       })
@@ -300,7 +265,10 @@ describe("search functions", () => {
     [
       ["post", ["text.english", "post_title.english"]],
       ["comment", ["text.english"]],
-      ["profile", ["author_headline.english", "author_bio.english"]]
+      [
+        "profile",
+        ["author_headline.english", "author_bio.english", "author_name"]
+      ]
     ].forEach(([type, fields]) => {
       it(`has the right searchFields for ${type}`, () => {
         assert.deepEqual(searchFields(type), fields)

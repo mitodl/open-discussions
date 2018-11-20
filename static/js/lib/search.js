@@ -75,7 +75,11 @@ export const searchResultToProfile = (result: ProfileResult): Profile => ({
 
 const POST_QUERY_FIELDS = ["text.english", "post_title.english"]
 const COMMENT_QUERY_FIELDS = ["text.english"]
-const PROFILE_QUERY_FIELDS = ["author_headline.english", "author_bio.english"]
+const PROFILE_QUERY_FIELDS = [
+  "author_headline.english",
+  "author_bio.english",
+  "author_name"
+]
 const _searchFields = (type: ?string) => {
   if (type === "post") {
     return POST_QUERY_FIELDS
@@ -126,8 +130,7 @@ export const buildSearchQuery = ({
   if (!R.isNil(size)) {
     builder = builder.size(size)
   }
-  // Temporary: no "profile" in whole list
-  const types = type ? [type] : ["comment", "post"]
+  const types = type ? [type] : ["comment", "post", "profile"]
   for (const type of types) {
     // One of the text fields must match
     const matchQuery = text
