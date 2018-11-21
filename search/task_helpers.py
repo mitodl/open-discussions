@@ -4,6 +4,8 @@ Functions that execute search-related asynchronous tasks
 import logging
 from functools import wraps, partial
 
+from django.conf import settings
+
 from open_discussions.features import INDEX_UPDATES, if_feature_enabled
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 
@@ -157,16 +159,18 @@ def update_fields_by_username(username, field_dict, object_types):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_author(profile_obj):
+def update_author(user_obj):
     """
     Run a task to update all fields of a profile document except id (username)
 
     Args:
-        profile_obj(profiles.models.Profile): the Profile object to query by and update
+        user_obj(django.contrib.auth.models.User): the User whose profile to query by and update
     """
-    profile_data = ESProfileSerializer().serialize(profile_obj)
-    profile_data.pop("author_id", None)
-    update_fields_by_username(profile_obj.user.username, profile_data, [PROFILE_TYPE])
+    if user_obj.username != settings.INDEXING_API_USERNAME:
+        profile = user_obj.profile
+        profile_data = ESProfileSerializer().serialize(profile)
+        profile_data.pop("author_id", None)
+        update_fields_by_username(user_obj.username, profile_data, [PROFILE_TYPE])
 
 
 @if_feature_enabled(INDEX_UPDATES)

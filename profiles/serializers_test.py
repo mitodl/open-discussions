@@ -129,7 +129,7 @@ def test_update_user_profile(mock_index_functions, user, key, value):
         else:
             assert getattr(profile2, prop) == getattr(profile, prop)
 
-    mock_index_functions.update_author.assert_called_once_with(profile2)
+    mock_index_functions.update_author.assert_called_once_with(profile2.user)
     assert mock_index_functions.update_posts.call_count == (
         1 if key in ["name", "headline"] else 0
     )
@@ -175,7 +175,7 @@ def test_update_profile(mock_index_functions, user, key, value):
         mock_index_functions.update_posts.assert_called_once_with(profile2)
     else:
         mock_index_functions.update_posts.assert_not_called()
-        mock_index_functions.update_author.assert_called_with(profile2)
+        mock_index_functions.update_author.assert_called_with(profile2.user)
 
 
 def test_serialize_profile_websites(user):

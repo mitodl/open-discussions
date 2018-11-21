@@ -1028,7 +1028,7 @@ class Api:
             raise NotFound("User {} does not exist".format(contributor_name))
         self.get_channel(channel_name).contributor.add(user)
         add_user_role(channel_name, ROLE_CONTRIBUTORS, user)
-        search_task_helpers.update_author(user.profile)
+        search_task_helpers.update_author(user)
         return Redditor(self.reddit, name=contributor_name)
 
     def remove_contributor(self, contributor_name, channel_name):
@@ -1048,7 +1048,7 @@ class Api:
         # regardless of their contributor status
         self.get_channel(channel_name).contributor.remove(user)
         remove_user_role(channel_name, ROLE_CONTRIBUTORS, user)
-        search_task_helpers.update_author(user.profile)
+        search_task_helpers.update_author(user)
 
     def list_contributors(self, channel_name):
         """
@@ -1082,7 +1082,7 @@ class Api:
             if ex.error_type != "ALREADY_MODERATOR":
                 raise
         add_user_role(channel_name, ROLE_MODERATORS, user)
-        search_task_helpers.update_author(user.profile)
+        search_task_helpers.update_author(user)
 
     def accept_invite(self, channel_name):
         """
@@ -1108,7 +1108,7 @@ class Api:
 
         self.get_channel(channel_name).moderator.remove(user)
         remove_user_role(channel_name, ROLE_MODERATORS, user)
-        search_task_helpers.update_author(user.profile)
+        search_task_helpers.update_author(user)
 
     def _list_moderators(self, *, channel_name, moderator_name):
         """
@@ -1180,7 +1180,7 @@ class Api:
         except PrawForbidden as ex:
             raise PermissionDenied() from ex
         sync_channel_subscription_model(channel_name, user)
-        search_task_helpers.update_author(user.profile)
+        search_task_helpers.update_author(user)
         return Redditor(self.reddit, name=subscriber_name)
 
     def remove_subscriber(self, subscriber_name, channel_name):
@@ -1207,7 +1207,7 @@ class Api:
         ChannelSubscription.objects.filter(
             user=user, channel__name=channel_name
         ).delete()
-        search_task_helpers.update_author(user.profile)
+        search_task_helpers.update_author(user)
 
     def is_subscriber(self, subscriber_name, channel_name):
         """
