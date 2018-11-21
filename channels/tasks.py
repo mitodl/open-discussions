@@ -8,7 +8,12 @@ from django.contrib.auth import get_user_model
 from prawcore.exceptions import ResponseException
 
 from channels import api
-from channels.api import Api, sync_channel_subscription_model, add_user_role
+from channels.api import (
+    Api,
+    sync_channel_subscription_model,
+    add_user_role,
+    get_allowed_post_types_from_link_type,
+)
 from channels.constants import (
     ROLE_MODERATORS,
     ROLE_CONTRIBUTORS,
@@ -16,7 +21,7 @@ from channels.constants import (
     LINK_TYPE_SELF,
     EXTENDED_POST_TYPE_ARTICLE,
 )
-from channels.models import Channel, Post, Article
+from channels.models import Channel, Post
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 from search.exceptions import PopulateUserRolesException, RetryException
@@ -177,7 +182,7 @@ def populate_channel_post_type(channel_ids):
 
         subreddit = client.get_subreddit(channel.display_name)
         channel.allowed_post_types = get_allowed_post_types_from_link_type(
-            channel.link_type
+            subreddit.submission_type
         )
         channel.save()
 

@@ -2,9 +2,11 @@
 import copy
 import json
 import os
+import operator
 import string
 import time
 from datetime import datetime
+from functools import reduce
 
 import base36
 import pytz
@@ -40,6 +42,8 @@ FAKE = faker.Factory.create()
 STRATEGY_CREATE = "create"
 STRATEGY_BUILD = "build"
 
+DEFAULT_ALLOWED_POST_TYPES = reduce(operator.or_, Channel.allowed_post_types.values())
+
 
 def _channel_name():
     """Generate a channel name from the current time and a random word"""
@@ -49,7 +53,7 @@ def _channel_name():
     ]  # maximum of 21-char channel names
 
 
-class RedditChannel:
+class RedditChannel:  # pylint: disable=too-many-instance-attributes
     """Simple factory representation for a reddit channel (subreddit)"""
 
     def __init__(self, **kwargs):
@@ -59,6 +63,9 @@ class RedditChannel:
         self.link_type = kwargs.get("link_type", None)
         self.description = kwargs.get("description", None)
         self.public_description = kwargs.get("public_description", None)
+        self.allowed_post_types = kwargs.get(
+            "allowed_post_types", DEFAULT_ALLOWED_POST_TYPES
+        )
         self.api = kwargs.get("api", None)
 
 
@@ -103,6 +110,7 @@ class ChannelFactory(DjangoModelFactory):
     """Factory for a channels.models.Channel object"""
 
     name = factory.LazyFunction(_channel_name)
+    allowed_post_types = DEFAULT_ALLOWED_POST_TYPES
 
     class Meta:
         model = Channel
@@ -502,6 +510,7 @@ class RedditChannelFactory(factory.Factory):
     channel_type = FuzzyChoice(VALID_CHANNEL_TYPES)
     link_type = LINK_TYPE_ANY
     ga_tracking_id = None
+    allowed_post_types = DEFAULT_ALLOWED_POST_TYPES
 
     @factory.post_generation
     def _create_in_reddit(
@@ -520,6 +529,7 @@ class RedditChannelFactory(factory.Factory):
             link_type=self.link_type,
             description=self.description,
             public_description=self.public_description,
+            allowed_post_types=self.allowed_post_types,
         )
 
     class Meta:

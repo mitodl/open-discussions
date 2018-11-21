@@ -139,17 +139,18 @@ class ChannelProxy(ObjectProxy):
         """
         Avoid proxying __getattr__ but "proxy" to the wrapped object on any non-local fields
         """
-        if name in ("allowed_post_types",):
-            return super().__getattr__(name)
+        if name in (
+            "allowed_post_types",
+            "membership_is_managed",
+            "avatar",
+            "avatar_small",
+            "avatar_medium",
+            "ga_tracking_id",
+            "banner",
+        ):
+            return getattr(self._channel, name)
         else:
             return getattr(self.__wrapped__, name)
-
-    @property
-    def allowed_post_types(self):
-        """
-        Get channel allowed post types
-        """
-        return self._channel.allowed_post_types
 
 
 def proxy_channel(subreddit):

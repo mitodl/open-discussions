@@ -116,6 +116,7 @@ def test_create_channel_no_descriptions(
         "description": "",
         "public_description": "",
         "user_is_moderator": True,
+        "membership_is_managed": True,
     }
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
@@ -271,6 +272,7 @@ def test_patch_channel(staff_client, private_channel):
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         **default_channel_response_data(private_channel),
+        "user_is_moderator": True,
         "channel_type": "public",
     }
     assert Channel.objects.count() == 1
@@ -292,6 +294,7 @@ def test_patch_channel_moderator(
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         **default_channel_response_data(private_channel),
+        "user_is_moderator": True,
         "channel_type": "public",
     }
 

@@ -27,8 +27,13 @@ from open_discussions.factories import UserFactory
 pytestmark = pytest.mark.django_db
 
 
+@pytest.mark.parametrize("has_avatar", [True, False])
+@pytest.mark.parametrize("has_banner", [True, False])
+@pytest.mark.parametrize("ga_tracking_id", [None, "abc123"])
 @pytest.mark.parametrize("membership_is_managed", [True, False])
-def test_serialize_channel(user, membership_is_managed):
+def test_serialize_channel(
+    user, has_avatar, has_banner, ga_tracking_id, membership_is_managed
+):
     """
     Test serializing a channel
     """
@@ -39,13 +44,16 @@ def test_serialize_channel(user, membership_is_managed):
         description="description",
         public_description="public_description",
         submission_type="link",
+        membership_is_managed=membership_is_managed,
         allowed_post_types={},
+        banner=Mock() if has_banner else None,
+        avatar=Mock() if has_avatar else None,
+        avatar_small=Mock() if has_avatar else None,
+        avatar_medium=Mock() if has_avatar else None,
+        ga_tracking_id=ga_tracking_id,
     )
-    request = Mock(user=user)
 
-    Channel.objects.create(
-        name=channel.display_name, membership_is_managed=membership_is_managed
-    )
+    request = Mock(user=user)
 
     assert ChannelSerializer(channel, context={"request": request}).data == {
         "name": "name",
@@ -57,11 +65,11 @@ def test_serialize_channel(user, membership_is_managed):
         "user_is_moderator": True,
         "user_is_contributor": True,
         "membership_is_managed": membership_is_managed,
-        "avatar": None,
-        "avatar_small": None,
-        "avatar_medium": None,
-        "banner": None,
-        "ga_tracking_id": None,
+        "avatar": channel.avatar.url if has_avatar else None,
+        "avatar_small": channel.avatar_small.url if has_avatar else None,
+        "avatar_medium": channel.avatar_medium.url if has_avatar else None,
+        "banner": channel.banner.url if has_banner else None,
+        "ga_tracking_id": channel.ga_tracking_id,
         "allowed_post_types": {},
     }
 

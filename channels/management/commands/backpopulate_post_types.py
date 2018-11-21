@@ -1,7 +1,7 @@
 """Management command to set channel allowed_post_types and post post_types"""
 from django.core.management.base import BaseCommand
 
-from channels.tasks import populate_post_types
+from channels.tasks import populate_post_and_channel_types
 from open_discussions.utils import now_in_utc
 
 
@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Set channel allowed_post_types and post post_types"""
-        task = populate_post_types.delay()
+        task = populate_post_and_channel_types.delay()
         self.stdout.write(
             "Started celery task {task} to populate allowed_post_types and post_types".format(
                 task=task

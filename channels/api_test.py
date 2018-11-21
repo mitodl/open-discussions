@@ -1,6 +1,6 @@
 """API tests"""
 # pylint: disable=redefined-outer-name,too-many-lines
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 from urllib.parse import urljoin
 
 from django.contrib.auth.models import AnonymousUser
@@ -75,7 +75,7 @@ def mock_get_client(mocker):
     return mocker.patch(
         "channels.api._get_client",
         autospec=True,
-        return_value=Mock(
+        return_value=MagicMock(
             subreddit=Mock(
                 return_value=_mock_channel(
                     name="channel",
@@ -229,6 +229,9 @@ def test_get_channel_user(mock_get_client):
 def test_list_channels_user(mock_get_client):
     """Test list_channels for logged-in user"""
     user = UserFactory.create()
+    mock_get_client.return_value.user.subreddits.return_value = [
+        _mock_channel(name="abc")
+    ]
     channels = api.Api(user=user).list_channels()
     assert channels == mock_get_client.return_value.user.subreddits.return_value
     mock_get_client.assert_called_once_with(user=user)
@@ -1212,8 +1215,8 @@ def test_is_subscriber(mock_client):
     client = api.Api(UserFactory.create(username="mitodl"))
     subscriber = UserFactory.create()
     mock_client.user.subreddits.return_value = [
-        Mock(display_name="sub1"),
-        Mock(display_name="sub2"),
+        _mock_channel(name="sub1"),
+        _mock_channel(name="sub2"),
     ]
     assert client.is_subscriber(subscriber.username, "channel") is False
     assert client.is_subscriber(subscriber.username, "sub2") is True
