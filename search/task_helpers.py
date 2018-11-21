@@ -167,8 +167,7 @@ def update_author(user_obj):
         user_obj(django.contrib.auth.models.User): the User whose profile to query by and update
     """
     if user_obj.username != settings.INDEXING_API_USERNAME:
-        profile = user_obj.profile
-        profile_data = ESProfileSerializer().serialize(profile)
+        profile_data = ESProfileSerializer().serialize(user_obj.profile)
         profile_data.pop("author_id", None)
         update_fields_by_username(user_obj.username, profile_data, [PROFILE_TYPE])
 
