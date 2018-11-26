@@ -228,6 +228,7 @@ describe("EditChannelAppearancePage", () => {
       })
     })
   })
+
   it("has a channel header", async () => {
     render = helper.configureHOCRenderer(
       EditChannelAppearancePage,
