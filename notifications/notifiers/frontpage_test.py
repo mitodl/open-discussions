@@ -4,6 +4,8 @@ from datetime import timedelta
 from django.core.mail import EmailMessage
 import pytest
 
+from channels.factories import PostFactory
+from channels.proxies import PostProxy
 from notifications.factories import (
     NotificationSettingsFactory,
     EmailNotificationFactory,
@@ -49,7 +51,7 @@ def test_can_notify(
     trigger_frequency,
     has_last_notification,
     has_posts_after,
-):  # pylint: disable=too-many-arguments
+):  # pylint: disable=too-many-arguments, too-many-locals
     """Test can_notify"""
     notification_settings = NotificationSettingsFactory.create(
         trigger_frequency=trigger_frequency
@@ -67,10 +69,12 @@ def test_can_notify(
         return_value=can_notify,
     )
     created_on = notification.created_on if notification is not None else now_in_utc()
+    post = PostFactory.create()
     api_mock = mocker.patch("channels.api.Api")
     api_mock.return_value.front_page.return_value = (
         [
             mocker.Mock(
+                id=post.post_id,
                 created=int(
                     (
                         created_on + timedelta(days=10 if has_posts_after else -10)
@@ -111,10 +115,11 @@ def test_send_notification(mocker, user):
     """Tests send_notification"""
     ns = NotificationSettingsFactory.create(via_email=True, weekly=True)
     notifier = frontpage.FrontpageDigestNotifier(ns)
+    post = PostFactory.create()
     send_messages_mock = mocker.patch("mail.api.send_messages")
     serializer_mock = mocker.patch("channels.serializers.PostSerializer")
     serializer_mock.return_value.data = {
-        "id": 1,
+        "id": post.post_id,
         "title": "post's title",
         "slug": "a_slug",
         "channel_name": "micromasters",
@@ -122,16 +127,20 @@ def test_send_notification(mocker, user):
         "created": now_in_utc().isoformat(),
         "author_id": user.username,
     }
-    post = mocker.Mock(created=int(now_in_utc().timestamp()), stickied=False)
+    submission = mocker.Mock(
+        id=post.post_id, created=int(now_in_utc().timestamp()), stickied=False
+    )
     api_mock = mocker.patch("channels.api.Api")
-    api_mock.return_value.front_page.return_value = [post]
+    api_mock.return_value.front_page.return_value = [submission]
     note = EmailNotificationFactory.create(
         user=ns.user, notification_type=ns.notification_type, sending=True
     )
 
     notifier.send_notification(note)
 
-    serializer_mock.assert_called_once_with(post, context={"current_user": note.user})
+    serializer_mock.assert_called_once_with(
+        PostProxy(submission, post), context={"current_user": note.user}
+    )
 
     send_messages_mock.assert_called_once_with([any_instance_of(EmailMessage)])
 

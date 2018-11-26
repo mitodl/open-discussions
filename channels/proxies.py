@@ -6,6 +6,7 @@ from channels.models import Post
 
 
 class PostProxy(ObjectProxy):
+    # pylint: disable=protected-access
     """
     Proxies properties to a Submission or a Post
 
@@ -23,6 +24,18 @@ class PostProxy(ObjectProxy):
         # store the post so @property overrides can reference it
         self._submission = submission
         self._post = post
+
+    def __eq__(self, other):
+        """PostProxy equality delegates to submission and post equality checks"""
+        # isinstance doesn't work here because ObjectProxy spoofs that
+        if hasattr(other, "_submission") and hasattr(other, "_post"):
+            # check the submission first because post may be lazy
+            return other._submission == self._submission and other._post == self._post
+        return False
+
+    def __str__(self):
+        """String representation"""
+        return f"PostProxy for submission: {self._submission.id}"
 
     def __getattr__(self, name):
         """

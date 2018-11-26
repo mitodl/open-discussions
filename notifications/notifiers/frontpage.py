@@ -5,6 +5,7 @@ from django.conf import settings
 import pytz
 
 from channels import api, serializers
+from channels.proxies import proxy_posts
 from channels.utils import ListingParams
 from notifications.models import FREQUENCY_DAILY, FREQUENCY_WEEKLY
 from notifications.notifiers.email import EmailNotifier
@@ -84,7 +85,7 @@ def _posts_since_notification(notification_settings, notification):
         if not post.stickied and _is_post_after_notification(post, notification)
     ]
 
-    posts = posts[: settings.OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS]
+    posts = proxy_posts(posts[: settings.OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS])
 
     return posts
 
