@@ -203,7 +203,7 @@ describe("SearchPage", () => {
     } the ChannelHeader`, async () => {
       const renderPageWithHeader = helper.configureHOCRenderer(
         ConnectedSearchPage,
-        "withChannelHeader(WithTwoColumns)",
+        "withChannelHeader(WithLoading)",
         initialState,
         initialProps
       )

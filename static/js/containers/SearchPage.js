@@ -13,7 +13,6 @@ import CanonicalLink from "../components/CanonicalLink"
 import { SearchFilterPicker } from "../components/Picker"
 import SearchResult from "../components/SearchResult"
 import withChannelHeader from "../hoc/withChannelHeader"
-import withTwoColumns from "../hoc/withTwoColumns"
 
 import { actions } from "../actions"
 import { SEARCH_FILTER_ALL, updateSearchFilterParam } from "../lib/picker"
@@ -24,6 +23,7 @@ import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { Channel } from "../flow/discussionTypes"
 import type { SearchInputs, SearchParams, Result } from "../flow/searchTypes"
+import { Cell, Grid } from "../components/Grid"
 
 type Props = {
   location: Location,
@@ -198,27 +198,29 @@ export class SearchPage extends React.Component<Props, State> {
     const { text } = this.state
 
     return (
-      <React.Fragment>
-        <MetaTags>
-          <CanonicalLink match={match} />
-        </MetaTags>
-        <SearchTextbox
-          onChange={this.updateText}
-          value={text || ""}
-          onClear={this.updateText}
-          onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
-        />
-        <div className="post-list-title">
-          <SearchFilterPicker
-            updatePickerParam={R.curry((type, event) => {
-              updateSearchFilterParam(this.props, event)
-              this.runSearch({ type, incremental: false })
-            })}
-            value={qs.parse(search).type || SEARCH_FILTER_ALL}
+      <Grid className="main-content two-column search-page">
+        <Cell width={8}>
+          <MetaTags>
+            <CanonicalLink match={match} />
+          </MetaTags>
+          <SearchTextbox
+            onChange={this.updateText}
+            value={text || ""}
+            onClear={this.updateText}
+            onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
           />
-        </div>
-        {this.renderResults()}
-      </React.Fragment>
+          <div className="post-list-title">
+            <SearchFilterPicker
+              updatePickerParam={R.curry((type, event) => {
+                updateSearchFilterParam(this.props, event)
+                this.runSearch({ type, incremental: false })
+              })}
+              value={qs.parse(search).type || SEARCH_FILTER_ALL}
+            />
+          </div>
+          {this.renderResults()}
+        </Cell>
+      </Grid>
     )
   }
 }
@@ -278,6 +280,5 @@ export default R.compose(
     mapDispatchToProps
   ),
   withChannelHeader(true),
-  withTwoColumns("search-page"),
   withLoading(PostLoading)
 )(SearchPage)
