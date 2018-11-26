@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.55.0
+--------------
+
+- Enable profile search (#1516)
+- Do not try to update the profile index for the indexing user (#1521)
+- API to retrieve channel followers (subscribers) (#1500)
+- Remove zendesk help and replace with "Contact us" email link (#1506)
+
 Version 0.54.0 (Released November 26, 2018)
 --------------
 
