@@ -159,6 +159,30 @@ def update_fields_by_username(username, field_dict, object_types):
 
 
 @if_feature_enabled(INDEX_UPDATES)
+def update_channel_index(channel_obj):
+    """
+    Runs a task to update the channel title for all posts and comments associated with the given channel.
+
+    Args:
+        channel_obj (praw.models.Subreddit): A PRAW channel ('subreddit') object
+    """
+    update_field_values_by_query.delay(
+        query={
+            "query": {
+                "bool": {
+                    "must": [{"match": {"channel_name": channel_obj.display_name}}]
+                }
+            }
+        },
+        field_dict={
+            "channel_title": channel_obj.title,
+            "channel_type": channel_obj.subreddit_type,
+        },
+        object_types=[COMMENT_TYPE, POST_TYPE],
+    )
+
+
+@if_feature_enabled(INDEX_UPDATES)
 def update_author(user_obj):
     """
     Run a task to update all fields of a profile document except id (username)

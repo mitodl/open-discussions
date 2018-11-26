@@ -1,5 +1,7 @@
 """Task helper tests"""
 # pylint: disable=redefined-outer-name,unused-argument
+from unittest.mock import Mock
+
 import pytest
 
 from open_discussions.features import INDEX_UPDATES
@@ -21,6 +23,7 @@ from search.task_helpers import (
     index_new_profile,
     update_author,
     update_author_posts_comments,
+    update_channel_index,
 )
 from search.api import gen_post_id, gen_comment_id, gen_profile_id
 
@@ -381,4 +384,33 @@ def test_update_author_posts_comments(
         query={"query": {"bool": {"must": [{"match": {"author_id": user.username}}]}}},
         field_dict=call_data,
         object_types=[POST_TYPE, COMMENT_TYPE],
+    )
+
+
+def test_update_channel_index(mocker, mock_index_functions):
+    """
+    Tests that update_channel_index calls update_field_values_by_query with the right parameters
+    """
+    patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
+    channel = Mock(
+        display_name="name",
+        title="title",
+        subreddit_type="public",
+        description="description",
+        public_description="public_description",
+        submission_type="link",
+    )
+    update_channel_index(channel)
+    assert patched_task.delay.called is True
+    assert patched_task.delay.call_args[1] == dict(
+        query={
+            "query": {
+                "bool": {"must": [{"match": {"channel_name": channel.display_name}}]}
+            }
+        },
+        field_dict={
+            "channel_title": channel.title,
+            "channel_type": channel.subreddit_type,
+        },
+        object_types=[COMMENT_TYPE, POST_TYPE],
     )

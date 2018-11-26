@@ -475,6 +475,7 @@ class Api:
 
         return channel
 
+    @reddit_object_persist(search_task_helpers.update_channel_index)
     def update_channel(self, name, title=None, channel_type=None, **other_settings):
         """
         Updates a channel

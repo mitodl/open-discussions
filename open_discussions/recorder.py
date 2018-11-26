@@ -16,7 +16,7 @@ def record(name, user):
 
     Usage:
         with record('cassette_name', my_user) as api:
-            api.update_channel('channel', title='new_title')
+            api.update_channel_index('channel', title='new_title')
 
     Args:
         name (str): The name of the new cassette
