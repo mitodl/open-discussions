@@ -70,4 +70,12 @@ describe("ChannelHeader", () => {
       assert.equal(wrapper.find(".search-link").length, allowSearch ? 1 : 0)
     })
   })
+  ;[true, false].forEach(hasNavbar => {
+    it(`${
+      hasNavbar ? "shows" : "doesn't show"
+    } a navbar depending on the prop`, () => {
+      const wrapper = render({ hasNavbar })
+      assert.equal(wrapper.find("IntraPageNav").exists(), hasNavbar)
+    })
+  })
 })
