@@ -11,12 +11,17 @@ from open_discussions.features import ANONYMOUS_ACCESS
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
 
 
-def test_list_subscribers_not_allowed(staff_client):
+def test_list_subscribers(staff_client, staff_api, public_channel):
     """
-    Get method not allowed on the list of subscribers
+    The correct list of subscriber usernames is returned.
     """
-    url = reverse("subscriber-list", kwargs={"channel_name": "test_channel"})
-    assert staff_client.get(url).status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    users = UserFactory.create_batch(2)
+    for user in users:
+        staff_api.add_subscriber(user.username, public_channel.name)
+    url = reverse("subscriber-list", kwargs={"channel_name": public_channel.name})
+    resp = staff_client.get(url)
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [{"subscriber_name": user.username} for user in users]
 
 
 @pytest.mark.parametrize("attempts", [1, 2])

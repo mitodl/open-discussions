@@ -148,6 +148,21 @@ class Channel(TimestampedModel):
 
         return super().save(*args, **kwargs)
 
+    @property
+    def subscribers(self):
+        """
+        Retrieve channel subscribers
+
+        Returns:
+            iterable of User: users who are channel subscribers
+
+        """
+        return User.objects.filter(
+            id__in=ChannelSubscription.objects.filter(channel=self)
+            .order_by("created_on")
+            .values_list("user", flat=True)
+        ).iterator()
+
     def __str__(self):
         return f"{self.name}"
 
