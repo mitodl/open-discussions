@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.55.1
+--------------
+
+- Added proxying for frontpage emails as well (#1523)
+
 Version 0.55.0 (Released November 26, 2018)
 --------------
 
