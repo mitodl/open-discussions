@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.54.0
+Version 0.54.0 (Released November 26, 2018)
 --------------
 
 - remove the logo from intro card on phones
