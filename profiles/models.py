@@ -54,6 +54,7 @@ class Profile(models.Model):
 
     __previous_name = None
     __previous_headline = None
+    __previous_bio = None
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -86,6 +87,7 @@ class Profile(models.Model):
         super(Profile, self).__init__(*args, **kwargs)
         self.__previous_name = self.name
         self.__previous_headline = self.headline
+        self.__previous_bio = self.bio
 
     @transaction.atomic
     def save(
@@ -119,12 +121,14 @@ class Profile(models.Model):
             or self.name != self.__previous_name
             or self.headline != self.__previous_headline
         )
+        update_author = update_posts or self.__previous_bio != self.bio
         super(Profile, self).save(*args, **kwargs)
         self.__previous_name = self.name
         self.__previous_headline = self.headline
+        self.__previous_bio = self.bio
         if is_new:
             task_helpers.index_new_profile(self)
-        else:
+        elif update_author:
             task_helpers.update_author(self.user)
         if update_posts:
             task_helpers.update_author_posts_comments(self)
