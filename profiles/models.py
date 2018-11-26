@@ -125,7 +125,7 @@ class Profile(models.Model):
         if is_new:
             task_helpers.index_new_profile(self)
         else:
-            task_helpers.update_author(self)
+            task_helpers.update_author(self.user)
         if update_posts:
             task_helpers.update_author_posts_comments(self)
 

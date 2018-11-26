@@ -344,13 +344,23 @@ def test_update_author(mocker, mock_index_functions, mock_es_profile_serializer,
     patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
     call_data = es_profile_serializer_data
     call_data.pop("author_id")
-    update_author(user.profile)
+    update_author(user)
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[1] == dict(
         query={"query": {"bool": {"must": [{"match": {"author_id": user.username}}]}}},
         field_dict=call_data,
         object_types=[PROFILE_TYPE],
     )
+
+
+def test_update_indexing_author(mocker, mock_index_functions, index_user, settings):
+    """
+    Tests that update_author does not call update_field_values_by_query for the indexing user
+    """
+    settings.INDEXING_API_USERNAME = index_user.username
+    patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
+    update_author(index_user)
+    assert patched_task.delay.called is False
 
 
 def test_update_author_posts_comments(
