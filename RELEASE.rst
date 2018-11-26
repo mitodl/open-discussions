@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.55.0
+Version 0.55.0 (Released November 26, 2018)
 --------------
 
 - Enable profile search (#1516)
