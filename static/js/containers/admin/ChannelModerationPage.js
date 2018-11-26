@@ -34,6 +34,7 @@ import type {
 import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
 import withSingleColumn from "../../hoc/withSingleColumn"
 import withChannelHeader from "../../hoc/withChannelHeader"
+import { withLoadingRender, Loading } from "../../components/Loading"
 
 const addDummyReplies = R.over(R.lensPath(["replies"]), () => [])
 
@@ -42,8 +43,11 @@ type Props = {
   dispatch: Dispatch<*>,
   channelName: string,
   channel: Channel,
+  errored: boolean,
   reports: Array<PostReportRecord>,
   isModerator: boolean,
+  notAuthorized: boolean,
+  notFound: boolean,
   removePost: Function,
   ignorePostReports: Function,
   approveComment: Function,
@@ -119,7 +123,15 @@ export class ChannelModerationPage extends React.Component<Props> {
   }
 
   render() {
-    const { channel, reports, isModerator } = this.props
+    const {
+      channel,
+      errored,
+      loaded,
+      notAuthorized,
+      notFound,
+      reports,
+      isModerator
+    } = this.props
 
     if (!channel) {
       return null
@@ -133,13 +145,21 @@ export class ChannelModerationPage extends React.Component<Props> {
         <EditChannelNavbar channelName={channel.name} />
 
         <div className="channel-moderation">
-          {reports.length === 0 ? (
-            <Card title="Reported Posts & Comments">
-              <div className="empty-message">No outstanding reports</div>
-            </Card>
-          ) : (
-            reports.map(this.renderReport)
-          )}
+          {withLoadingRender({
+            errored,
+            loaded,
+            notAuthorized,
+            notFound,
+            LoadingComponent: Loading,
+            render:           () =>
+              reports.length === 0 ? (
+                <Card title="Reported Posts & Comments">
+                  <div className="empty-message">No outstanding reports</div>
+                </Card>
+              ) : (
+                reports.map(this.renderReport)
+              )
+          })}
         </div>
       </React.Fragment>
     ) : (

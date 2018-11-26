@@ -72,6 +72,36 @@ export const PostLoading = () => (
   </div>
 )
 
+export const withLoadingRender = ({
+  LoadingComponent,
+  loaded,
+  errored,
+  notAuthorized,
+  notFound,
+  render
+}: LoadingProps & {
+  LoadingComponent: Class<React.Component<*, *>> | Function,
+  render: Function
+}) => {
+  if (notFound) {
+    return <NotFound />
+  }
+
+  if (notAuthorized) {
+    return <NotAuthorized />
+  }
+
+  if (errored) {
+    return <div className="errored">Error loading page</div>
+  }
+
+  if (!loaded) {
+    return <LoadingComponent />
+  }
+
+  return <div className="loaded">{render()}</div>
+}
+
 export const withLoading = R.curry(
   (
     LoadingComponent: Class<React.Component<*, *>> | Function,
@@ -84,23 +114,14 @@ export const withLoading = R.curry(
       render() {
         const { loaded, errored, notAuthorized, notFound } = this.props
 
-        if (notFound) {
-          return <NotFound />
-        }
-
-        if (notAuthorized) {
-          return <NotAuthorized />
-        }
-
-        if (errored) {
-          return <div className="errored">Error loading page</div>
-        }
-
-        if (!loaded) {
-          return <LoadingComponent />
-        }
-
-        return <div className="loaded">{super.render()}</div>
+        return withLoadingRender({
+          LoadingComponent,
+          loaded,
+          errored,
+          notAuthorized,
+          notFound,
+          render: () => super.render()
+        })
       }
     }
 

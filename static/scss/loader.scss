@@ -19,6 +19,13 @@
   height: 100px;
 }
 
+.channel-moderation,
+.edit-channel {
+  .loading {
+    height: 200px;
+  }
+}
+
 .loaded {
   width: 100%;
 }

@@ -9,6 +9,7 @@ import { profileURL } from "../../lib/url"
 import { MISSING_TEXT } from "../../lib/channels"
 
 import type { Channel, Member } from "../../flow/discussionTypes"
+import { Loading } from "../Loading"
 
 type Props = {
   channel: Channel,
@@ -52,7 +53,7 @@ export default class MembersList extends React.Component<Props> {
     } = this.props
 
     if (!members) {
-      return null
+      return <Loading />
     }
 
     return (
