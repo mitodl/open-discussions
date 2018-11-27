@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.55.2
+--------------
+
+- Update index when channel is updated (#1526)
+
 Version 0.55.1 (Released November 26, 2018)
 --------------
 
