@@ -9,7 +9,7 @@ router = DefaultRouter()
 router.register(
     r"notification_settings",
     NotificationSettingsViewSet,
-    base_name="notification_settings",
+    basename="notification_settings",
 )
 
 urlpatterns = [url(r"^api/v0/", include(router.urls))]

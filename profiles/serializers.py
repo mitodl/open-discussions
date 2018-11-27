@@ -127,15 +127,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     uid = serializers.CharField(write_only=True, required=False)
     # username cannot be set but a default is generated on create using ulid.new
-    username = serializers.CharField(
-        read_only=True, default=serializers.CreateOnlyDefault(ulid.new)
-    )
+    username = serializers.CharField(read_only=True)
     email = serializers.CharField(write_only=True)
     profile = ProfileSerializer()
 
     def create(self, validated_data):
         profile_data = validated_data.pop("profile") or {}
-        username = validated_data.get("username")
+        username = ulid.new()
         email = validated_data.get("email")
         uid = validated_data.get("uid", None)
 

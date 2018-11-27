@@ -11,9 +11,9 @@ from profiles.views import (
 )
 
 router = DefaultRouter()
-router.register(r"users", UserViewSet, base_name="user_api")
-router.register(r"profiles", ProfileViewSet, base_name="profile_api")
-router.register(r"websites", UserWebsiteViewSet, base_name="user_websites_api")
+router.register(r"users", UserViewSet, basename="user_api")
+router.register(r"profiles", ProfileViewSet, basename="profile_api")
+router.register(r"websites", UserWebsiteViewSet, basename="user_websites_api")
 
 urlpatterns = [
     url(r"^api/v0/", include(router.urls)),
