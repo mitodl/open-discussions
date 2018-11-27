@@ -1,7 +1,5 @@
 """Task helper tests"""
 # pylint: disable=redefined-outer-name,unused-argument
-from unittest.mock import Mock
-
 import pytest
 
 from open_discussions.features import INDEX_UPDATES
@@ -392,7 +390,7 @@ def test_update_channel_index(mocker, mock_index_functions):
     Tests that update_channel_index calls update_field_values_by_query with the right parameters
     """
     patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
-    channel = Mock(
+    channel = mocker.Mock(
         display_name="name",
         title="title",
         subreddit_type="public",

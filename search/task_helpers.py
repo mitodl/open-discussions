@@ -161,7 +161,7 @@ def update_fields_by_username(username, field_dict, object_types):
 @if_feature_enabled(INDEX_UPDATES)
 def update_channel_index(channel_obj):
     """
-    Runs a task to update the channel title for all posts and comments associated with the given channel.
+    Runs a task to update the channel title, type for all posts and comments associated with the given channel.
 
     Args:
         channel_obj (praw.models.Subreddit): A PRAW channel ('subreddit') object
