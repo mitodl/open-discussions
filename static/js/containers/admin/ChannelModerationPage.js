@@ -34,7 +34,7 @@ import type {
 import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
 import withSingleColumn from "../../hoc/withSingleColumn"
 import withChannelHeader from "../../hoc/withChannelHeader"
-import { withLoadingRender, Loading } from "../../components/Loading"
+import { renderDeferredLoading, Loading } from "../../components/Loading"
 
 const addDummyReplies = R.over(R.lensPath(["replies"]), () => [])
 
@@ -155,7 +155,7 @@ export class ChannelModerationPage extends React.Component<Props> {
         <EditChannelNavbar channelName={channel.name} />
 
         <div className="channel-moderation">
-          {withLoadingRender({
+          {renderDeferredLoading({
             errored,
             loaded,
             notAuthorized,

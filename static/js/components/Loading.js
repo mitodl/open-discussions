@@ -72,7 +72,7 @@ export const PostLoading = () => (
   </div>
 )
 
-export const withLoadingRender = ({
+export const renderDeferredLoading = ({
   LoadingComponent,
   loaded,
   errored,
@@ -114,7 +114,7 @@ export const withLoading = R.curry(
       render() {
         const { loaded, errored, notAuthorized, notFound } = this.props
 
-        return withLoadingRender({
+        return renderDeferredLoading({
           LoadingComponent,
           loaded,
           errored,
