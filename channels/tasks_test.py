@@ -6,6 +6,7 @@ from prawcore.exceptions import ResponseException
 from channels import tasks
 from channels.api import get_role_model
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
+from channels.factories import ChannelFactory
 from channels.models import Channel, ChannelSubscription
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
@@ -19,7 +20,7 @@ pytestmark = pytest.mark.django_db
 def channels_and_users():
     """Channels and users for testing"""
     return (
-        [Channel.objects.create(name=channel_name) for channel_name in ["a", "b", "c"]],
+        [ChannelFactory.create(name=channel_name) for channel_name in ["a", "b", "c"]],
         UserFactory.create_batch(4),
     )
 

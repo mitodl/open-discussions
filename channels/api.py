@@ -408,6 +408,42 @@ def get_allowed_post_types_from_link_type(link_type):
         return Channel.allowed_post_types.self | Channel.allowed_post_types.link
 
 
+def create_channel(name, membership_is_managed, allowed_post_types):
+    """
+    Create a channel and related models
+
+    Args:
+        name(str): the channel name
+        membership_is_managed (boolean): True if the channel is managed by another app
+        allowed_post_types (int): bitmask for allowed channel types
+
+    Returns:
+        channels.models.Channel: the created channel
+    """
+
+    channel = Channel.objects.create(
+        name=name,
+        membership_is_managed=membership_is_managed,
+        allowed_post_types=allowed_post_types,
+    )
+
+    create_channel_groups_and_roles(channel)
+
+    return channel
+
+
+def create_channel_groups_and_roles(channel):
+    """
+    Create a channel's groups and roles
+
+    Args:
+        channel(channels.models.Channel): the channel to create groups for
+    """
+    for role in ROLE_CHOICES:
+        group = Group.objects.create(name=f"{channel.name}_{role}")
+        ChannelGroupRole.objects.create(channel=channel, group=group, role=role)
+
+
 class Api:
     """Channel API"""
 
@@ -513,15 +549,7 @@ class Api:
 
         # wrap channel creation as an atomic operation across the db and reddit
         with transaction.atomic():
-            channel = Channel.objects.create(
-                name=name,
-                membership_is_managed=membership_is_managed,
-                allowed_post_types=allowed_post_types,
-            )
-
-            for role in ROLE_CHOICES:
-                group = Group.objects.create(name=f"{channel.name}_{role}")
-                ChannelGroupRole.objects.create(channel=channel, group=group, role=role)
+            channel = create_channel(name, membership_is_managed, allowed_post_types)
 
             # create in reddit after we persist the db records so an error here rolls back everything
             subreddit = self.reddit.subreddit.create(
@@ -1117,8 +1145,9 @@ class Api:
             user = User.objects.get(username=contributor_name)
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(contributor_name))
-        self.get_channel(channel_name).contributor.add(user)
-        add_user_role(channel_name, ROLE_CONTRIBUTORS, user)
+        proxy_channel = self.get_channel(channel_name)
+        proxy_channel.contributor.add(user)
+        add_user_role(proxy_channel.channel, ROLE_CONTRIBUTORS, user)
         search_task_helpers.update_author(user)
         return Redditor(self.reddit, name=contributor_name)
 
@@ -1137,8 +1166,9 @@ class Api:
             raise NotFound("User {} does not exist".format(contributor_name))
         # This doesn't check if a user is a moderator because they should have access to the channel
         # regardless of their contributor status
-        self.get_channel(channel_name).contributor.remove(user)
-        remove_user_role(channel_name, ROLE_CONTRIBUTORS, user)
+        proxy_channel = self.get_channel(channel_name)
+        proxy_channel.contributor.remove(user)
+        remove_user_role(proxy_channel.channel, ROLE_CONTRIBUTORS, user)
         search_task_helpers.update_author(user)
 
     def list_contributors(self, channel_name):
@@ -1165,14 +1195,14 @@ class Api:
             user = User.objects.get(username=moderator_name)
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
-        channel = self.get_channel(channel_name)
+        proxy_channel = self.get_channel(channel_name)
         try:
-            channel.moderator.add(user)
+            proxy_channel.moderator.add(user)
             Api(user).accept_invite(channel_name)
         except APIException as ex:
             if ex.error_type != "ALREADY_MODERATOR":
                 raise
-        add_user_role(channel, ROLE_MODERATORS, user)
+        add_user_role(proxy_channel.channel, ROLE_MODERATORS, user)
         search_task_helpers.update_author(user)
 
     def accept_invite(self, channel_name):
@@ -1197,9 +1227,9 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
 
-        channel = self.get_channel(channel_name)
-        channel.moderator.remove(user)
-        remove_user_role(channel, ROLE_MODERATORS, user)
+        proxy_channel = self.get_channel(channel_name)
+        proxy_channel.moderator.remove(user)
+        remove_user_role(proxy_channel.channel, ROLE_MODERATORS, user)
         search_task_helpers.update_author(user)
 
     def _list_moderators(self, *, channel_name, moderator_name):

@@ -24,7 +24,7 @@ from channels.constants import (
     LINK_TYPE_SELF,
     EXTENDED_POST_TYPE_ARTICLE,
 )
-from channels.factories import ArticleFactory
+from channels.factories import ArticleFactory, ChannelFactory
 from channels.models import (
     Article,
     Channel,
@@ -46,7 +46,8 @@ pytestmark = pytest.mark.django_db
 
 def _mock_channel(*, name, **kwargs):
     """Create a mock channel and associated DB record"""
-    Channel.objects.get_or_create(name=name)
+    if not Channel.objects.filter(name=name).exists():
+        ChannelFactory.create(name=name)
     return Mock(display_name=name, **kwargs)
 
 

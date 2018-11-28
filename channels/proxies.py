@@ -152,6 +152,11 @@ class ChannelProxy(ObjectProxy):
         else:
             return getattr(self.__wrapped__, name)
 
+    @property
+    def channel(self):
+        """Read-only access to the channel"""
+        return self._channel
+
 
 def proxy_channel(subreddit):
     """

@@ -112,6 +112,13 @@ class ChannelFactory(DjangoModelFactory):
     name = factory.LazyFunction(_channel_name)
     allowed_post_types = DEFAULT_ALLOWED_POST_TYPES
 
+    @factory.post_generation
+    def create_roles(self, create, *args, **kwargs):
+        if not create:
+            return
+
+        api.create_channel_groups_and_roles(channel)
+
     class Meta:
         model = Channel
 
