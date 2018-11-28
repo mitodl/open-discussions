@@ -103,11 +103,11 @@ def populate_user_roles(channel_ids):
             for moderator in client.list_moderators(channel.name):
                 user = User.objects.filter(username=moderator.name).first()
                 if user:
-                    add_user_role(channel.name, ROLE_MODERATORS, user)
+                    add_user_role(channel, ROLE_MODERATORS, user)
             for contributor in client.list_contributors(channel.name):
                 user = User.objects.filter(username=contributor.name).first()
                 if user:
-                    add_user_role(channel.name, ROLE_CONTRIBUTORS, user)
+                    add_user_role(channel, ROLE_CONTRIBUTORS, user)
         except ResponseException:
             # This could mean the indexing user cannot access a channel, which is a bug.
             # We need to raise a different exception here because celery doesn't handle PRAW exceptions correctly.

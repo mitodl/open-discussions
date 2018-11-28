@@ -38,6 +38,7 @@ from channels.constants import (
     VoteActions,
     ROLE_CONTRIBUTORS,
     ROLE_MODERATORS,
+    ROLE_CHOICES,
     LINK_TYPE_ANY,
     LINK_TYPE_LINK,
     LINK_TYPE_SELF,
@@ -325,45 +326,42 @@ def sync_channel_subscription_model(channel_name, user):
 
 
 @transaction.atomic
-def get_role_model(channel_name, role):
+def get_role_model(channel, role):
     """
     Get or create a ChannelGroupRole object
 
     Args:
-        channel_name(str): The channel name
+        channel(channels.models.Channel): The channel
+        role(str): The role name (moderators, contributors)
 
     Returns:
         ChannelGroupRole: the ChannelGroupRole object
     """
-    return ChannelGroupRole.objects.get_or_create(
-        channel=Channel.objects.get(name=channel_name),
-        group=Group.objects.get_or_create(name="{}_{}".format(channel_name, role))[0],
-        role=role,
-    )[0]
+    return ChannelGroupRole.objects.get(channel=channel, role=role)
 
 
-def add_user_role(channel_name, role, user):
+def add_user_role(channel, role, user):
     """
     Add a user to a channel role's group
 
     Args:
-        channel_name(str): The channel name
+        channel(channels.models.Channel): The channel
         role(str): The role name (moderators, contributors)
         user(django.contrib.auth.models.User): The user
     """
-    get_role_model(channel_name, role).group.user_set.add(user)
+    get_role_model(channel, role).group.user_set.add(user)
 
 
-def remove_user_role(channel_name, role, user):
+def remove_user_role(channel, role, user):
     """
     Remove a user from a channel role's group
 
     Args:
-        channel_name(str): The channel name
+        channel(channels.models.Channel): The channel
         role(str): The role name (moderators, contributors)
         user(django.contrib.auth.models.User): The user
     """
-    get_role_model(channel_name, role).group.user_set.remove(user)
+    get_role_model(channel, role).group.user_set.remove(user)
 
 
 def get_post_type(*, text, url, article_content):
@@ -493,7 +491,7 @@ class Api:
             **other_settings (dict): dict of additional settings
 
         Returns:
-            praw.models.Subreddit: the created subreddit
+            channels.proxies.ChannelProxy: the created channel
         """
         if channel_type not in VALID_CHANNEL_TYPES:
             raise ValueError("Invalid argument channel_type={}".format(channel_type))
@@ -513,19 +511,26 @@ class Api:
             # set reddit to accept any link types since we're going to do the validation on our end going forward
             other_settings["link_type"] = LINK_TYPE_ANY
 
-        subreddit = self.reddit.subreddit.create(
-            name,
-            title=title,
-            subreddit_type=channel_type,
-            allow_top=True,
-            **other_settings,
-        )
+        # wrap channel creation as an atomic operation across the db and reddit
+        with transaction.atomic():
+            channel = Channel.objects.create(
+                name=name,
+                membership_is_managed=membership_is_managed,
+                allowed_post_types=allowed_post_types,
+            )
 
-        channel = Channel.objects.create(
-            name=name,
-            membership_is_managed=membership_is_managed,
-            allowed_post_types=allowed_post_types,
-        )
+            for role in ROLE_CHOICES:
+                group = Group.objects.create(name=f"{channel.name}_{role}")
+                ChannelGroupRole.objects.create(channel=channel, group=group, role=role)
+
+            # create in reddit after we persist the db records so an error here rolls back everything
+            subreddit = self.reddit.subreddit.create(
+                name,
+                title=title,
+                subreddit_type=channel_type,
+                allow_top=True,
+                **other_settings,
+            )
 
         return ChannelProxy(subreddit, channel)
 
@@ -1167,7 +1172,7 @@ class Api:
         except APIException as ex:
             if ex.error_type != "ALREADY_MODERATOR":
                 raise
-        add_user_role(channel_name, ROLE_MODERATORS, user)
+        add_user_role(channel, ROLE_MODERATORS, user)
         search_task_helpers.update_author(user)
 
     def accept_invite(self, channel_name):
@@ -1192,8 +1197,9 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
 
-        self.get_channel(channel_name).moderator.remove(user)
-        remove_user_role(channel_name, ROLE_MODERATORS, user)
+        channel = self.get_channel(channel_name)
+        channel.moderator.remove(user)
+        remove_user_role(channel, ROLE_MODERATORS, user)
         search_task_helpers.update_author(user)
 
     def _list_moderators(self, *, channel_name, moderator_name):

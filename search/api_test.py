@@ -69,9 +69,9 @@ def test_is_reddit_object_removed(
 def test_execute_search(mocker, user):
     """execute_search should execute an Elasticsearch search"""
     get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
-    channel_names = sorted([channel.name for channel in ChannelFactory.create_batch(2)])
-    add_user_role(channel_names[0], "moderators", user)
-    add_user_role(channel_names[1], "contributors", user)
+    channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
+    add_user_role(channel[0], "moderators", user)
+    add_user_role(channel[1], "contributors", user)
 
     query = {"a": "query"}
     assert (
@@ -109,7 +109,13 @@ def test_execute_search(mocker, user):
                                             ]
                                         }
                                     },
-                                    {"terms": {"channel_name": channel_names}},
+                                    {
+                                        "terms": {
+                                            "channel_name": [
+                                                channel.name for channel in channels
+                                            ]
+                                        }
+                                    },
                                 ]
                             }
                         }
