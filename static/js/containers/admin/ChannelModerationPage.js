@@ -74,6 +74,17 @@ export class ChannelModerationPage extends React.Component<Props> {
     } catch (_) {} // eslint-disable-line no-empty
   }
 
+  renderReports = () => {
+    const { reports } = this.props
+    return reports.length === 0 ? (
+      <Card title="Reported Posts & Comments">
+        <div className="empty-message">No outstanding reports</div>
+      </Card>
+    ) : (
+      reports.map(this.renderReport)
+    )
+  }
+
   renderReport = (report: ReportRecord) => {
     const {
       isModerator,
@@ -129,7 +140,6 @@ export class ChannelModerationPage extends React.Component<Props> {
       loaded,
       notAuthorized,
       notFound,
-      reports,
       isModerator
     } = this.props
 
@@ -151,14 +161,7 @@ export class ChannelModerationPage extends React.Component<Props> {
             notAuthorized,
             notFound,
             LoadingComponent: Loading,
-            render:           () =>
-              reports.length === 0 ? (
-                <Card title="Reported Posts & Comments">
-                  <div className="empty-message">No outstanding reports</div>
-                </Card>
-              ) : (
-                reports.map(this.renderReport)
-              )
+            render:           this.renderReports
           })}
         </div>
       </React.Fragment>
