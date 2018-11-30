@@ -44,6 +44,7 @@ from channels.constants import (
     LINK_TYPE_SELF,
     EXTENDED_POST_TYPE_ARTICLE,
 )
+from channels.exceptions import ConflictException
 from channels.models import (
     Article,
     Channel,
@@ -421,11 +422,16 @@ def create_channel(name, membership_is_managed, allowed_post_types):
         channels.models.Channel: the created channel
     """
 
-    channel = Channel.objects.create(
+    channel, created = Channel.objects.get_or_create(
         name=name,
         membership_is_managed=membership_is_managed,
         allowed_post_types=allowed_post_types,
     )
+
+    if not created:
+        # previously this was handled by a praw exception being converted in channels.utils.translate_praw_exceptions
+        # but now we raise if we try to create, but didn't
+        raise ConflictException()
 
     create_channel_groups_and_roles(channel)
 

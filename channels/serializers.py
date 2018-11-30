@@ -116,7 +116,11 @@ class ChannelSerializer(serializers.Serializer):
 
     def get_allowed_post_types(self, channel):
         """Returns a dictionary of allowed post types"""
-        return dict(channel.allowed_post_types.items())
+        return (
+            dict(channel.allowed_post_types.items())
+            if channel.allowed_post_types
+            else None
+        )
 
     def validate_allowed_post_types(self, value):
         """Validate the allowed post types"""

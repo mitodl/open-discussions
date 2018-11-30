@@ -31,9 +31,17 @@ pytestmark = pytest.mark.django_db
 @pytest.mark.parametrize("has_banner", [True, False])
 @pytest.mark.parametrize("ga_tracking_id", [None, "abc123"])
 @pytest.mark.parametrize("membership_is_managed", [True, False])
+@pytest.mark.parametrize(
+    "allowed_post_types", [None, {}, {"self": True, "link": True, "article": True}]
+)
 def test_serialize_channel(
-    user, has_avatar, has_banner, ga_tracking_id, membership_is_managed
-):
+    user,
+    has_avatar,
+    has_banner,
+    ga_tracking_id,
+    membership_is_managed,
+    allowed_post_types,
+):  # pylint: disable=too-many-arguments
     """
     Test serializing a channel
     """
@@ -45,7 +53,7 @@ def test_serialize_channel(
         public_description="public_description",
         submission_type="link",
         membership_is_managed=membership_is_managed,
-        allowed_post_types={},
+        allowed_post_types=allowed_post_types,
         banner=Mock() if has_banner else None,
         avatar=Mock() if has_avatar else None,
         avatar_small=Mock() if has_avatar else None,
@@ -70,7 +78,7 @@ def test_serialize_channel(
         "avatar_medium": channel.avatar_medium.url if has_avatar else None,
         "banner": channel.banner.url if has_banner else None,
         "ga_tracking_id": channel.ga_tracking_id,
-        "allowed_post_types": {},
+        "allowed_post_types": allowed_post_types,
     }
 
 

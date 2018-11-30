@@ -22,6 +22,11 @@ export type Channel = {
   avatar_small: string|null,
   avatar_medium: string|null,
   banner: string|null,
+  allowed_post_types: ?{
+    self: boolean,
+    link: boolean,
+    article: boolean
+  }
 }
 
 export type ChannelForm = {
