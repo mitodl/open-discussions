@@ -76,15 +76,14 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 
 type Props = {
   result: Result,
-  upvotedPosts: Map<string, Post>,
+  upvotedPost: ?Post,
   toggleUpvote?: Post => void
 }
 export default class SearchResult extends React.Component<Props> {
   render() {
-    const { result, toggleUpvote, upvotedPosts } = this.props
-    let post
+    const { result, toggleUpvote, upvotedPost } = this.props
     if (result.object_type === "post") {
-      post = upvotedPosts.get(result.post_id) || searchResultToPost(result)
+      const post = upvotedPost || searchResultToPost(result)
       return <PostSearchResult post={post} toggleUpvote={toggleUpvote} />
     } else if (result.object_type === "comment") {
       return <CommentSearchResult result={result} />

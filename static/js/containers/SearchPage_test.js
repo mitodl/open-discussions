@@ -9,7 +9,7 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
 import { makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
-import {makePost} from "../factories/posts";
+import {makePost} from "../factories/posts"
 
 describe("SearchPage", () => {
   let helper, renderPage, searchResponse, channel, initialState, initialProps
