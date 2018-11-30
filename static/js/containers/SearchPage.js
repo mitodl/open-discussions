@@ -25,7 +25,13 @@ import type { Channel } from "../flow/discussionTypes"
 import type { SearchInputs, SearchParams, Result } from "../flow/searchTypes"
 import { Cell, Grid } from "../components/Grid"
 
+
+import {
+  toggleUpvote
+} from "../util/api_actions"
+
 type Props = {
+  dispatch: Dispatch<any>,
   location: Location,
   history: Object,
   channel: ?Channel,
@@ -158,7 +164,7 @@ export class SearchPage extends React.Component<Props, State> {
   }
 
   renderResults = () => {
-    const { results, searchProcessing, initialLoad, total } = this.props
+    const { results, searchProcessing, initialLoad, total, dispatch } = this.props
     const { from } = this.state
 
     if (searchProcessing && initialLoad) {
@@ -179,7 +185,7 @@ export class SearchPage extends React.Component<Props, State> {
         initialLoad={false}
         loader={<Loading className="infinite" key="loader" />}
       >
-        {results.map((result, i) => <SearchResult key={i} result={result} />)}
+        {results.map((result, i) => <SearchResult key={i} result={result} toggleUpvote={toggleUpvote(dispatch)}/>)}
       </InfiniteScroll>
     )
   }
@@ -271,7 +277,8 @@ const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps: Props) => ({
   getChannel: async () => {
     const channelName = getChannelName(ownProps)
     await dispatch(actions.channels.get(channelName))
-  }
+  },
+  dispatch: dispatch
 })
 
 export default R.compose(

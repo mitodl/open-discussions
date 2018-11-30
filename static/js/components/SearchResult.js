@@ -14,22 +14,24 @@ import {
 } from "../lib/search"
 import { commentPermalink, profileURL } from "../lib/url"
 import { dropdownMenuFuncs } from "../lib/ui"
-
 import type {
   CommentResult,
   PostResult,
   ProfileResult,
   Result
 } from "../flow/searchTypes"
+import type {Post} from "../flow/discussionTypes";
 
 type PostProps = {
-  result: PostResult
+  result: PostResult,
+  toggleUpvote: Post => void,
 }
-const PostSearchResult = ({ result }: PostProps) => (
+const PostSearchResult = ({ result, toggleUpvote }: PostProps) => (
   <CompactPostDisplay
     post={searchResultToPost(result)}
     isModerator={false}
     menuOpen={false}
+    toggleUpvote={toggleUpvote}
   />
 )
 
@@ -77,13 +79,14 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 }
 
 type Props = {
-  result: Result
+  result: Result,
+  toggleUpvote: Post => void,
 }
 export default class SearchResult extends React.Component<Props> {
   render() {
-    const { result } = this.props
+    const { result, toggleUpvote } = this.props
     if (result.object_type === "post") {
-      return <PostSearchResult result={result} />
+      return <PostSearchResult result={result} toggleUpvote={toggleUpvote}/>
     } else if (result.object_type === "comment") {
       return <CommentSearchResult result={result} />
     } else if (result.object_type === "profile") {
