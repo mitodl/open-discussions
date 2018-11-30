@@ -4,6 +4,7 @@ Tests for serializers for profiles REST APIS
 """
 import pytest
 import factory
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from profiles.factories import UserWebsiteFactory
 from profiles.models import Profile, PERSONAL_SITE_TYPE, FACEBOOK_DOMAIN
@@ -11,6 +12,12 @@ from profiles.serializers import (
     UserSerializer,
     ProfileSerializer,
     UserWebsiteSerializer,
+)
+
+small_gif = (
+    b"\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x00\x00\x00\x21\xf9\x04"
+    b"\x01\x0a\x00\x01\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02"
+    b"\x02\x4c\x01\x00\x3b"
 )
 
 
@@ -129,7 +136,9 @@ def test_update_user_profile(mock_index_functions, user, key, value):
         else:
             assert getattr(profile2, prop) == getattr(profile, prop)
 
-    mock_index_functions.update_author.assert_called_once_with(profile2.user)
+    mock_index_functions.update_author.call_count = (
+        1 if key in ["name", "headline", "bio"] else 0
+    )
     assert mock_index_functions.update_posts.call_count == (
         1 if key in ["name", "headline"] else 0
     )
@@ -137,7 +146,15 @@ def test_update_user_profile(mock_index_functions, user, key, value):
 
 @pytest.mark.parametrize(
     "key,value",
-    [("name", "name_value"), ("bio", "bio_value"), ("headline", "headline_value")],
+    [
+        ("name", "name_value"),
+        ("bio", "bio_value"),
+        ("headline", "headline_value"),
+        (
+            "image_file",
+            SimpleUploadedFile("small.gif", small_gif, content_type="image/gif"),
+        ),
+    ],
 )
 def test_update_profile(mock_index_functions, user, key, value):
     """
@@ -153,19 +170,12 @@ def test_update_profile(mock_index_functions, user, key, value):
 
     profile2 = Profile.objects.first()
 
-    for prop in (
-        "name",
-        "image_file",
-        "image_small",
-        "image_medium",
-        "email_optin",
-        "toc_optin",
-        "bio",
-        "headline",
-    ):
+    for prop in ("name", "image_file", "email_optin", "toc_optin", "bio", "headline"):
         if prop == key:
             if isinstance(value, bool):
                 assert getattr(profile2, prop) is value
+            elif key == "image_file":
+                assert getattr(profile2, prop).read() == small_gif
             else:
                 assert getattr(profile2, prop) == value
         else:
