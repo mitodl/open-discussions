@@ -7,7 +7,7 @@ from channels import tasks
 from channels.api import get_role_model
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.factories import ChannelFactory
-from channels.models import Channel, ChannelSubscription
+from channels.models import ChannelSubscription
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
 

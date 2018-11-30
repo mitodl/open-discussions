@@ -44,7 +44,7 @@ def test_get_channels(user):
     sync_channel_subscription_model(channels[0], user)
     add_user_role(channels[1], ROLE_CONTRIBUTORS, user)
     add_user_role(channels[2], ROLE_MODERATORS, user)
-    assert get_channels(user) == set(channels[:3])
+    assert get_channels(user) == set([channel.name for channel in channels[:3]])
 
 
 @pytest.mark.parametrize(

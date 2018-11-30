@@ -113,11 +113,14 @@ class ChannelFactory(DjangoModelFactory):
     allowed_post_types = DEFAULT_ALLOWED_POST_TYPES
 
     @factory.post_generation
-    def create_roles(self, create, *args, **kwargs):
+    def create_roles(
+        self, create, extracted, **kwargs
+    ):  # pylint: disable=unused-argument
+        """Create the channel groups and roles after the channel is created"""
         if not create:
             return
 
-        api.create_channel_groups_and_roles(channel)
+        api.create_channel_groups_and_roles(self)
 
     class Meta:
         model = Channel

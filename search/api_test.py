@@ -70,8 +70,8 @@ def test_execute_search(mocker, user):
     """execute_search should execute an Elasticsearch search"""
     get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
-    add_user_role(channel[0], "moderators", user)
-    add_user_role(channel[1], "contributors", user)
+    add_user_role(channels[0], "moderators", user)
+    add_user_role(channels[1], "contributors", user)
 
     query = {"a": "query"}
     assert (

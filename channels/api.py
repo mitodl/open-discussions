@@ -1145,9 +1145,9 @@ class Api:
             user = User.objects.get(username=contributor_name)
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(contributor_name))
-        proxy_channel = self.get_channel(channel_name)
-        proxy_channel.contributor.add(user)
-        add_user_role(proxy_channel.channel, ROLE_CONTRIBUTORS, user)
+        proxied_channel = self.get_channel(channel_name)
+        proxied_channel.contributor.add(user)
+        add_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
         search_task_helpers.update_author(user)
         return Redditor(self.reddit, name=contributor_name)
 
@@ -1166,9 +1166,9 @@ class Api:
             raise NotFound("User {} does not exist".format(contributor_name))
         # This doesn't check if a user is a moderator because they should have access to the channel
         # regardless of their contributor status
-        proxy_channel = self.get_channel(channel_name)
-        proxy_channel.contributor.remove(user)
-        remove_user_role(proxy_channel.channel, ROLE_CONTRIBUTORS, user)
+        proxied_channel = self.get_channel(channel_name)
+        proxied_channel.contributor.remove(user)
+        remove_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
         search_task_helpers.update_author(user)
 
     def list_contributors(self, channel_name):
@@ -1195,14 +1195,14 @@ class Api:
             user = User.objects.get(username=moderator_name)
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
-        proxy_channel = self.get_channel(channel_name)
+        proxied_channel = self.get_channel(channel_name)
         try:
-            proxy_channel.moderator.add(user)
+            proxied_channel.moderator.add(user)
             Api(user).accept_invite(channel_name)
         except APIException as ex:
             if ex.error_type != "ALREADY_MODERATOR":
                 raise
-        add_user_role(proxy_channel.channel, ROLE_MODERATORS, user)
+        add_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
         search_task_helpers.update_author(user)
 
     def accept_invite(self, channel_name):
