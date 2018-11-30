@@ -14,6 +14,7 @@ import CommentTree from "../components/CommentTree"
 import ReportForm from "../components/ReportForm"
 import { ReplyToPostForm } from "../components/CommentForms"
 import withSingleColumn from "../hoc/withSingleColumn"
+import withChannelHeader from "../hoc/withChannelHeader"
 import {
   withPostModeration,
   postModerationSelector
@@ -561,6 +562,7 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
+  withChannelHeader(false),
   withPostModeration,
   withCommentModeration,
   withSingleColumn("post-page"),

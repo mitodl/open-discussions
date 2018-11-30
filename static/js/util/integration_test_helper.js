@@ -148,7 +148,11 @@ export default class IntegrationTestHelper {
         inner = await inner.dive()
 
         // if it defines WrappedComponent, find() that so we skip over any intermediaries
-        if (cls && cls.hasOwnProperty("WrappedComponent")) {
+        if (
+          cls &&
+          cls.hasOwnProperty("WrappedComponent") &&
+          inner.find(cls.WrappedComponent).length
+        ) {
           inner = inner.find(cls.WrappedComponent)
         }
       }

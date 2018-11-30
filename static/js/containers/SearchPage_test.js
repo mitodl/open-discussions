@@ -11,7 +11,7 @@ import { makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 
 describe("SearchPage", () => {
-  let helper, renderPage, searchResponse, channel
+  let helper, renderPage, searchResponse, channel, initialState, initialProps
 
   beforeEach(() => {
     channel = makeChannel()
@@ -20,34 +20,37 @@ describe("SearchPage", () => {
 
     helper = new IntegrationTestHelper()
     helper.searchStub.returns(Promise.resolve(searchResponse))
+    initialState = {
+      channels: {
+        data:   new Map([[channel.name, channel]]),
+        loaded: true
+      },
+      search: {
+        loaded: true,
+        data:   {
+          results:     searchResponse.hits.hits,
+          total:       searchResponse.hits.total,
+          incremental: false
+        }
+      }
+    }
+    initialProps = {
+      match: {
+        params: {
+          channelName: channel.name
+        }
+      },
+      location: {
+        search: ""
+      },
+      history: helper.browserHistory
+    }
+
     renderPage = helper.configureHOCRenderer(
       ConnectedSearchPage,
       SearchPage,
-      {
-        channels: {
-          data:   new Map([[channel.name, channel]]),
-          loaded: true
-        },
-        search: {
-          loaded: true,
-          data:   {
-            results:     searchResponse.hits.hits,
-            total:       searchResponse.hits.total,
-            incremental: false
-          }
-        }
-      },
-      {
-        match: {
-          params: {
-            channelName: channel.name
-          }
-        },
-        location: {
-          search: ""
-        },
-        history: helper.browserHistory
-      }
+      initialState,
+      initialProps
     )
   })
 
@@ -198,7 +201,14 @@ describe("SearchPage", () => {
     it(`${
       hasChannel ? "shows" : "doesn't show"
     } the ChannelHeader`, async () => {
-      const { inner } = await renderPage(
+      const renderPageWithHeader = helper.configureHOCRenderer(
+        ConnectedSearchPage,
+        "withChannelHeader(WithLoading)",
+        initialState,
+        initialProps
+      )
+
+      const { inner } = await renderPageWithHeader(
         {},
         {
           match: {
@@ -208,7 +218,6 @@ describe("SearchPage", () => {
           }
         }
       )
-
       assert.equal(inner.find("ChannelHeader").length, hasChannel ? 1 : 0)
     })
   })
@@ -297,5 +306,42 @@ describe("SearchPage", () => {
     inner.setState({ text: "some text" })
     inner.find("SearchTextbox").prop("onClear")()
     assert.equal(inner.state().text, "")
+  })
+  ;[
+    [true, true, true, true],
+    [true, true, false, true],
+    [true, false, true, true],
+    [true, false, false, true],
+    [false, true, true, false],
+    [false, true, false, true],
+    [false, false, true, false],
+    [false, false, false, true]
+  ].forEach(([channelLoaded, searchLoaded, hasChannel, loaded]) => {
+    it(`has loaded=${String(loaded)} when channelLoaded=${String(
+      channelLoaded
+    )} and searchLoaded=${String(searchLoaded)} and it ${
+      hasChannel ? "has" : "doesn't have"
+    } a channel`, async () => {
+      const { inner } = await renderPage(
+        {
+          channels: {
+            loaded:     channelLoaded,
+            processing: !channelLoaded
+          },
+          search: {
+            loaded:     searchLoaded,
+            processing: !searchLoaded
+          }
+        },
+        {
+          match: {
+            params: {
+              channelName: hasChannel ? channel.name : null
+            }
+          }
+        }
+      )
+      assert.equal(inner.find("PostLoading").exists(), !loaded)
+    })
   })
 })

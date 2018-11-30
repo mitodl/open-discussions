@@ -17,7 +17,14 @@ describe("ChannelHeader", () => {
   })
 
   const render = (props = {}) =>
-    shallow(<ChannelHeader channel={channel} isModerator={false} {...props} />)
+    shallow(
+      <ChannelHeader
+        channel={channel}
+        isModerator={false}
+        hasNavbar={true}
+        {...props}
+      />
+    )
 
   it("renders a channel page header", () => {
     const wrapper = render()
@@ -61,6 +68,14 @@ describe("ChannelHeader", () => {
       SETTINGS.allow_search = allowSearch
       const wrapper = render()
       assert.equal(wrapper.find(".search-link").length, allowSearch ? 1 : 0)
+    })
+  })
+  ;[true, false].forEach(hasNavbar => {
+    it(`${
+      hasNavbar ? "shows" : "doesn't show"
+    } a navbar depending on the prop`, () => {
+      const wrapper = render({ hasNavbar })
+      assert.equal(wrapper.find("IntraPageNav").exists(), hasNavbar)
     })
   })
 })

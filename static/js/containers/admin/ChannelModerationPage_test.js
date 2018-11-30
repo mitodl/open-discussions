@@ -35,7 +35,15 @@ import {
 import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("ChannelModerationPage", () => {
-  let render, channels, channel, postList, postIds, reports, helper
+  let render,
+    channels,
+    channel,
+    postList,
+    postIds,
+    reports,
+    helper,
+    initialState,
+    initialProps
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
@@ -45,59 +53,61 @@ describe("ChannelModerationPage", () => {
     postList = makeChannelPostList()
     postIds = postList.map(post => post.id)
     reports = postList.map(makeReportRecord)
+    initialState = {
+      posts: {
+        data:       new Map(postList.map(post => [post.id, post])),
+        processing: false,
+        loaded:     true
+      },
+      postsForChannel: {
+        data:       new Map([[channel.name, { postIds: postIds }]]),
+        processing: false,
+        loaded:     true
+      },
+      channels: {
+        data:       new Map([[channel.name, channel]]),
+        processing: false,
+        loaded:     true
+      },
+      subscribedChannels: {
+        data:       channels.map(channel => channel.name),
+        processing: false,
+        loaded:     true
+      },
+      reports: {
+        data:       { reports: [] },
+        processing: false,
+        loaded:     true
+      },
+      ui: {
+        dialogs: new Map()
+      },
+      focus: {},
+      forms: {}
+    }
+    initialProps = {
+      match: {
+        params: {
+          channelName: channel.name
+        }
+      },
+      history:  helper.browserHistory,
+      location: {
+        search: {}
+      }
+    }
 
     helper.getChannelStub.returns(Promise.resolve(channel))
     helper.getChannelsStub.returns(Promise.resolve(channels))
     helper.getReportsStub.returns(Promise.resolve(reports))
-    helper.getProfileStub.returns(Promise.resolve(""))
-
     render = helper.configureHOCRenderer(
       ChannelModerationPage,
       InnerChannelModerationPage,
-      {
-        posts: {
-          data:       new Map(postList.map(post => [post.id, post])),
-          processing: false,
-          loaded:     true
-        },
-        postsForChannel: {
-          data:       new Map([[channel.name, { postIds: postIds }]]),
-          processing: false,
-          loaded:     true
-        },
-        channels: {
-          data:       new Map([[channel.name, channel]]),
-          processing: false,
-          loaded:     true
-        },
-        subscribedChannels: {
-          data:       channels.map(channel => channel.name),
-          processing: false,
-          loaded:     true
-        },
-        reports: {
-          data:       { reports: [] },
-          processing: false,
-          loaded:     true
-        },
-        ui: {
-          dialogs: new Map()
-        },
-        focus: {},
-        forms: {}
-      },
-      {
-        match: {
-          params: {
-            channelName: channel.name
-          }
-        },
-        history:  helper.browserHistory,
-        location: {
-          search: {}
-        }
-      }
+      initialState,
+      initialProps
     )
+
+    helper.getProfileStub.returns(Promise.resolve(""))
   })
 
   afterEach(() => {
@@ -131,7 +141,11 @@ describe("ChannelModerationPage", () => {
 
     it("should fetch reports", async () => {
       const wrapper = await renderPage()
-      assert.deepEqual(wrapper.find("WithLoading").props().reports, reports)
+      assert.deepEqual(
+        wrapper.find("withPostModeration(WithCommentModeration)").props()
+          .reports,
+        reports
+      )
     })
   })
 
@@ -140,6 +154,18 @@ describe("ChannelModerationPage", () => {
     const { inner } = await render()
 
     assert.equal(inner.find("Redirect").prop("to"), channelURL(channel.name))
+  })
+
+  it("has a channel header", async () => {
+    render = helper.configureHOCRenderer(
+      ChannelModerationPage,
+      "withChannelHeader(WithSingleColumn)",
+      initialState,
+      initialProps
+    )
+
+    const { inner } = await render()
+    assert.isTrue(inner.find("ChannelHeader").exists())
   })
 
   describe("post reports", () => {

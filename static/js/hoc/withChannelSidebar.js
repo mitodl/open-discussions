@@ -4,7 +4,7 @@ import R from "ramda"
 
 import ChannelSidebar from "../components/ChannelSidebar"
 import Sidebar from "../components/Sidebar"
-import { Grid, Cell } from "../components/Grid"
+import { Cell, Grid } from "../components/Grid"
 
 const withChannelSidebar = R.curry(
   (className: string, WrappedComponent: Class<React.Component<*, *>>) => {

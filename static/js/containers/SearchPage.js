@@ -7,13 +7,12 @@ import InfiniteScroll from "react-infinite-scroller"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
-import ChannelHeader from "../components/ChannelHeader"
-import { Loading, PostLoading } from "../components/Loading"
+import { Loading, PostLoading, withLoading } from "../components/Loading"
 import SearchTextbox from "../components/SearchTextbox"
 import CanonicalLink from "../components/CanonicalLink"
-import { Cell, Grid } from "../components/Grid"
 import { SearchFilterPicker } from "../components/Picker"
 import SearchResult from "../components/SearchResult"
+import withChannelHeader from "../hoc/withChannelHeader"
 
 import { actions } from "../actions"
 import { SEARCH_FILTER_ALL, updateSearchFilterParam } from "../lib/picker"
@@ -24,7 +23,7 @@ import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { Channel } from "../flow/discussionTypes"
 import type { SearchInputs, SearchParams, Result } from "../flow/searchTypes"
-import { NotAuthorized, NotFound } from "../components/ErrorPages"
+import { Cell, Grid } from "../components/Grid"
 
 type Props = {
   location: Location,
@@ -194,58 +193,34 @@ export class SearchPage extends React.Component<Props, State> {
   render() {
     const {
       location: { search },
-      channel,
-      channelName,
-      isModerator,
-      match,
-      notAuthorized,
-      notFound
+      match
     } = this.props
     const { text } = this.state
 
-    if (notFound) {
-      return <NotFound />
-    }
-
-    if (notAuthorized) {
-      return <NotAuthorized />
-    }
-
-    if (channelName && !channel) {
-      return <PostLoading />
-    }
-
     return (
-      <div className="loaded">
-        <div className="channel-page-wrapper">
-          {channel ? (
-            <ChannelHeader channel={channel} isModerator={isModerator} />
-          ) : null}
-          <Grid className="main-content two-column search-page">
-            <Cell width={8}>
-              <MetaTags>
-                <CanonicalLink match={match} />
-              </MetaTags>
-              <SearchTextbox
-                onChange={this.updateText}
-                value={text || ""}
-                onClear={this.updateText}
-                onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
-              />
-              <div className="post-list-title">
-                <SearchFilterPicker
-                  updatePickerParam={R.curry((type, event) => {
-                    updateSearchFilterParam(this.props, event)
-                    this.runSearch({ type, incremental: false })
-                  })}
-                  value={qs.parse(search).type || SEARCH_FILTER_ALL}
-                />
-              </div>
-              {this.renderResults()}
-            </Cell>
-          </Grid>
-        </div>
-      </div>
+      <Grid className="main-content two-column search-page">
+        <Cell width={8}>
+          <MetaTags>
+            <CanonicalLink match={match} />
+          </MetaTags>
+          <SearchTextbox
+            onChange={this.updateText}
+            value={text || ""}
+            onClear={this.updateText}
+            onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
+          />
+          <div className="post-list-title">
+            <SearchFilterPicker
+              updatePickerParam={R.curry((type, event) => {
+                updateSearchFilterParam(this.props, event)
+                this.runSearch({ type, incremental: false })
+              })}
+              value={qs.parse(search).type || SEARCH_FILTER_ALL}
+            />
+          </div>
+          {this.renderResults()}
+        </Cell>
+      </Grid>
     )
   }
 }
@@ -276,6 +251,9 @@ const mapStateToProps = (state, ownProps) => {
     channelLoaded,
     channelProcessing,
     channelName,
+    // loaded is used in withLoading but we only want to look at channel loaded since search loaded will change
+    // whenever the user makes a new search
+    loaded: channelName ? channelLoaded : true,
     notFound,
     notAuthorized,
     searchLoaded,
@@ -300,5 +278,7 @@ export default R.compose(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )
+  ),
+  withChannelHeader(true),
+  withLoading(PostLoading)
 )(SearchPage)

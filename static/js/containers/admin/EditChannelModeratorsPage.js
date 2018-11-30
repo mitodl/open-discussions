@@ -3,6 +3,7 @@ import R from "ramda"
 import { connect } from "react-redux"
 
 import EditChannelMembersForm from "../../components/admin/EditChannelMembersForm"
+import withChannelHeader from "../../hoc/withChannelHeader"
 import withForm from "../../hoc/withForm"
 import withSingleColumn from "../../hoc/withSingleColumn"
 import editChannelMembershipPage from "./EditChannelMembershipPage"
@@ -110,5 +111,6 @@ export default R.compose(
     mergeProps
   ),
   withForm(EditChannelMembersForm),
+  withChannelHeader(false),
   withSingleColumn("edit-channel")
 )(EditChannelModeratorsPage)

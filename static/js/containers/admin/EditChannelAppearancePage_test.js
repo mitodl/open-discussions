@@ -1,7 +1,6 @@
 // @flow
 import { assert } from "chai"
 import sinon from "sinon"
-import R from "ramda"
 
 import EditChannelAppearancePage, {
   EDIT_CHANNEL_KEY,
@@ -16,15 +15,44 @@ import * as validationFuncs from "../../lib/validation"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("EditChannelAppearancePage", () => {
-  let helper, renderPage, channel
+  let helper, render, channel, initialState, initialProps
 
   beforeEach(() => {
     channel = makeChannel()
     helper = new IntegrationTestHelper()
-    renderPage = helper.configureHOCRenderer(
+    initialState = {
+      channels: {
+        data:       new Map([[channel.name, channel]]),
+        processing: false
+      },
+      channelAvatar: {
+        processing: false
+      },
+      channelBanner: {
+        processing: false
+      },
+      forms: {
+        [EDIT_CHANNEL_KEY]: {
+          value: {
+            name: channel.name
+          },
+          errors: {}
+        }
+      }
+    }
+    initialProps = {
+      match: {
+        params: {
+          channelName: channel.name
+        }
+      },
+      history: helper.browserHistory
+    }
+    render = helper.configureHOCRenderer(
       EditChannelAppearancePage,
       InnerEditChannelAppearancePage,
-      {}
+      initialState,
+      initialProps
     )
 
     helper.getChannelStub.returns(Promise.resolve(channel))
@@ -36,44 +64,6 @@ describe("EditChannelAppearancePage", () => {
   afterEach(() => {
     helper.cleanup()
   })
-
-  const render = async (extraState = {}, extraProps = {}) =>
-    renderPage(
-      R.mergeDeepRight(
-        {
-          channels: {
-            data:       new Map([[channel.name, channel]]),
-            processing: false
-          },
-          channelAvatar: {
-            processing: false
-          },
-          channelBanner: {
-            processing: false
-          },
-          forms: {
-            [EDIT_CHANNEL_KEY]: {
-              value: {
-                name: channel.name
-              },
-              errors: {}
-            }
-          }
-        },
-        extraState
-      ),
-      R.mergeDeepRight(
-        {
-          match: {
-            params: {
-              channelName: channel.name
-            }
-          },
-          history: helper.browserHistory
-        },
-        extraProps
-      )
-    )
 
   it("passes proper props", async () => {
     const value = { a: "value" }
@@ -237,5 +227,17 @@ describe("EditChannelAppearancePage", () => {
         }
       })
     })
+  })
+
+  it("has a channel header", async () => {
+    render = helper.configureHOCRenderer(
+      EditChannelAppearancePage,
+      "withChannelHeader(WithSingleColumn)",
+      initialState,
+      initialProps
+    )
+
+    const { inner } = await render()
+    assert.isTrue(inner.find("ChannelHeader").exists())
   })
 })

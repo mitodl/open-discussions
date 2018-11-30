@@ -4,8 +4,12 @@
     min-height: 0;
   }
 
-  &.channel-page:not(.channel-loading) {
+  &.channel-page {
     margin-top: 0;
+
+    .post-loader {
+      margin-top: 20px;
+    }
   }
 
   &.channel-intra-nav {
@@ -45,11 +49,14 @@
 
 .channel-page-wrapper {
   position: relative;
+  width: 100%;
 
-  .banner-container {
-    position: absolute;
-    width: 100%;
-    z-index: -1;
+  .channel-page-header {
+    .banner-container {
+      position: absolute;
+      width: 100%;
+      z-index: -1;
+    }
   }
 }
 

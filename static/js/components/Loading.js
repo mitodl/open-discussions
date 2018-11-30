@@ -6,7 +6,6 @@ import ContentLoader from "react-content-loader"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import Card from "./Card"
 import { contentLoaderSpeed } from "../lib/constants"
-import withChannelSidebar from "../hoc/withChannelSidebar"
 
 type LoadingProps = {
   loaded: boolean,
@@ -57,7 +56,7 @@ const AnimatedEmptyPost = (i: number) => {
 }
 
 export const PostLoading = () => (
-  <React.Fragment>
+  <div className="post-loader">
     <div className="post-list-title">
       <ContentLoader
         speed={contentLoaderSpeed}
@@ -70,8 +69,38 @@ export const PostLoading = () => (
       </ContentLoader>
     </div>
     {R.times(AnimatedEmptyPost, emptyPostsToRender)}
-  </React.Fragment>
+  </div>
 )
+
+export const renderDeferredLoading = ({
+  LoadingComponent,
+  loaded,
+  errored,
+  notAuthorized,
+  notFound,
+  render
+}: LoadingProps & {
+  LoadingComponent: Class<React.Component<*, *>> | Function,
+  render: Function
+}) => {
+  if (notFound) {
+    return <NotFound />
+  }
+
+  if (notAuthorized) {
+    return <NotAuthorized />
+  }
+
+  if (errored) {
+    return <div className="errored">Error loading page</div>
+  }
+
+  if (!loaded) {
+    return <LoadingComponent />
+  }
+
+  return <div className="loaded">{render()}</div>
+}
 
 export const withLoading = R.curry(
   (
@@ -85,23 +114,14 @@ export const withLoading = R.curry(
       render() {
         const { loaded, errored, notAuthorized, notFound } = this.props
 
-        if (notFound) {
-          return <NotFound />
-        }
-
-        if (notAuthorized) {
-          return <NotAuthorized />
-        }
-
-        if (errored) {
-          return <div className="errored">Error loading page</div>
-        }
-
-        if (!loaded) {
-          return <LoadingComponent />
-        }
-
-        return <div className="loaded">{super.render()}</div>
+        return renderDeferredLoading({
+          LoadingComponent,
+          loaded,
+          errored,
+          notAuthorized,
+          notFound,
+          render: () => super.render()
+        })
       }
     }
 
@@ -112,6 +132,3 @@ export const withLoading = R.curry(
 
 export const withSpinnerLoading = withLoading(Loading)
 export const withPostLoading = withLoading(PostLoading)
-export const withPostLoadingSidebar = withLoading(
-  withChannelSidebar("channel-page channel-loading", PostLoading)
-)

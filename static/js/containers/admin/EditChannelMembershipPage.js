@@ -90,7 +90,6 @@ const editChannelMembershipPage = (
     render() {
       const {
         renderForm,
-        form,
         channel,
         members,
         memberToRemove,
@@ -99,7 +98,7 @@ const editChannelMembershipPage = (
         setDialogVisibility
       } = this.props
 
-      if (!channel || !members || !form) {
+      if (!channel) {
         return null
       }
 

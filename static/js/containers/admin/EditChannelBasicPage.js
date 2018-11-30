@@ -18,6 +18,7 @@ import { validateChannelBasicEditForm } from "../../lib/validation"
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
 import type { Channel, ChannelForm } from "../../flow/discussionTypes"
+import withChannelHeader from "../../hoc/withChannelHeader"
 
 const EDIT_CHANNEL_KEY = "channel:edit:basic"
 const EDIT_CHANNEL_PAYLOAD = { formKey: EDIT_CHANNEL_KEY }
@@ -117,7 +118,7 @@ class EditChannelBasicPage extends React.Component<Props> {
   render() {
     const { channel, channelForm, processing, history } = this.props
 
-    if (!channelForm) {
+    if (!channel) {
       return null
     }
 
@@ -127,14 +128,16 @@ class EditChannelBasicPage extends React.Component<Props> {
           <title>{formatTitle("Edit Channel")}</title>
         </MetaTags>
         <EditChannelNavbar channelName={channel.name} />
-        <EditChannelBasicForm
-          onSubmit={this.onSubmit}
-          onUpdate={this.onUpdate}
-          form={channelForm.value}
-          history={history}
-          validation={channelForm.errors}
-          processing={processing}
-        />
+        {channelForm ? (
+          <EditChannelBasicForm
+            onSubmit={this.onSubmit}
+            onUpdate={this.onUpdate}
+            form={channelForm.value}
+            history={history}
+            validation={channelForm.errors}
+            processing={processing}
+          />
+        ) : null}
       </React.Fragment>
     )
   }
@@ -154,5 +157,6 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
+  withChannelHeader(false),
   withSingleColumn("edit-channel")
 )(EditChannelBasicPage)
