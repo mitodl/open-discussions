@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.55.3
+Version 0.55.3 (Released November 30, 2018)
 --------------
 
 - Don't try to reindex profile more than once on image change (#1529)
