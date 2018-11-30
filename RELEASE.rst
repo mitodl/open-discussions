@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.55.3
+--------------
+
+- Don't try to reindex profile more than once on image change (#1529)
+- Add channel header to post detail and channel settings (#1504)
+- Updated DRF to 3.9.0
+- Update comment style colors (#1530)
+
 Version 0.55.2 (Released November 27, 2018)
 --------------
 
