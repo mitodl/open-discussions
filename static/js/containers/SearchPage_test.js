@@ -25,6 +25,9 @@ describe("SearchPage", () => {
         data:   new Map([[channel.name, channel]]),
         loaded: true
       },
+      postUpvotes: {
+        data: {}
+      },
       search: {
         loaded: true,
         data:   {
@@ -186,7 +189,8 @@ describe("SearchPage", () => {
       }
     )
     const text = "some text"
-    inner.setState({ text, from: 7 })
+    const upvotedPosts = new Map()
+    inner.setState({ text, from: 7, upvotedPosts })
     inner.find("SearchTextbox").prop("onSubmit")({
       preventDefault: helper.sandbox.stub()
     })
@@ -194,7 +198,8 @@ describe("SearchPage", () => {
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
       from: 0,
-      text
+      text,
+      upvotedPosts
     })
   })
   ;[true, false].forEach(hasChannel => {
@@ -254,7 +259,8 @@ describe("SearchPage", () => {
 
   it("triggers a non-incremental search when the filter type changes", async () => {
     const { inner, store } = await renderPage()
-    inner.setState({ from: 7 })
+    const upvotedPosts = new Map()
+    inner.setState({ from: 7, upvotedPosts })
     const type = "comment"
     helper.searchStub.reset()
     inner.find("SearchFilterPicker").prop("updatePickerParam")(type, {
@@ -271,7 +277,8 @@ describe("SearchPage", () => {
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
       from: 0,
-      text: undefined
+      text: undefined,
+      upvotedPosts
     })
     assert.equal(
       store.getActions()[store.getActions().length - 2].type,

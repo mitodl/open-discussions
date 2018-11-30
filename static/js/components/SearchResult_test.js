@@ -18,7 +18,8 @@ import { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 import { profileURL } from "../lib/url"
 
 describe("SearchResult", () => {
-  const render = ({ result, upvotedPosts }) => shallow(<SearchResult result={result} upvotedPosts={upvotedPosts}/>)
+  const render = ({ result, upvotedPosts }) =>
+    shallow(<SearchResult result={result} upvotedPosts={upvotedPosts} />)
 
   it("renders a profile card", () => {
     const result = makeProfileResult()
@@ -68,8 +69,8 @@ describe("SearchResult", () => {
 
   it("renders a comment", () => {
     const result = makeCommentResult()
-    const upvoted = new Map()
-    const wrapper = render({ result, upvoted }).dive()
+    const upvotedPosts = new Map()
+    const wrapper = render({ result, upvotedPosts }).dive()
     const comment = searchResultToComment(result)
     const commentTree = wrapper.find("CommentTree")
     assert.deepEqual(commentTree.prop("comments"), [comment])

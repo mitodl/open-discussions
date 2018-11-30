@@ -14,11 +14,7 @@ import {
 } from "../lib/search"
 import { commentPermalink, profileURL } from "../lib/url"
 import { dropdownMenuFuncs } from "../lib/ui"
-import type {
-  CommentResult,
-  ProfileResult,
-  Result
-} from "../flow/searchTypes"
+import type { CommentResult, ProfileResult, Result } from "../flow/searchTypes"
 import type { Post } from "../flow/discussionTypes"
 
 type PostProps = {
