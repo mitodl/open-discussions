@@ -21,14 +21,11 @@ import { getChannelName } from "../lib/util"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
-import type { Channel } from "../flow/discussionTypes"
+import type { Channel, Post } from "../flow/discussionTypes"
 import type { SearchInputs, SearchParams, Result } from "../flow/searchTypes"
 import { Cell, Grid } from "../components/Grid"
 
-
-import {
-  toggleUpvote
-} from "../util/api_actions"
+import { toggleUpvote } from "../util/api_actions"
 
 type Props = {
   dispatch: Dispatch<any>,
@@ -49,11 +46,13 @@ type Props = {
   searchLoaded: boolean,
   searchProcessing: boolean,
   total: number,
+  upvotedPost: ?Post,
   clearSearch: () => void
 }
 type State = {
   text: string,
-  from: number
+  from: number,
+  upvotedPosts: Map<string, Post>
 }
 
 const shouldLoadChannel = (currentProps: Props, prevProps: ?Props) => {
@@ -80,8 +79,9 @@ export class SearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      text: qs.parse(props.location.search).q,
-      from: 0
+      text:         qs.parse(props.location.search).q,
+      from:         0,
+      upvotedPosts: new Map()
     }
   }
 
@@ -164,8 +164,15 @@ export class SearchPage extends React.Component<Props, State> {
   }
 
   renderResults = () => {
-    const { results, searchProcessing, initialLoad, total, dispatch } = this.props
-    const { from } = this.state
+    const {
+      results,
+      searchProcessing,
+      initialLoad,
+      total,
+      dispatch,
+      upvotedPost
+    } = this.props
+    const { from, upvotedPosts } = this.state
 
     if (searchProcessing && initialLoad) {
       return <PostLoading />
@@ -177,6 +184,11 @@ export class SearchPage extends React.Component<Props, State> {
       )
     }
 
+    if (upvotedPost && upvotedPosts.get(upvotedPost.id) !== upvotedPost) {
+      upvotedPosts.set(upvotedPost.id, upvotedPost)
+      this.setState({ upvotedPosts })
+    }
+
     return (
       <InfiniteScroll
         // TODO: fix
@@ -185,7 +197,14 @@ export class SearchPage extends React.Component<Props, State> {
         initialLoad={false}
         loader={<Loading className="infinite" key="loader" />}
       >
-        {results.map((result, i) => <SearchResult key={i} result={result} toggleUpvote={toggleUpvote(dispatch)}/>)}
+        {results.map((result, i) => (
+          <SearchResult
+            key={i}
+            result={result}
+            toggleUpvote={toggleUpvote(dispatch)}
+            upvotedPosts={upvotedPosts}
+          />
+        ))}
       </InfiniteScroll>
     )
   }
@@ -233,9 +252,9 @@ export class SearchPage extends React.Component<Props, State> {
 
 const mapStateToProps = (state, ownProps) => {
   const channelName = getChannelName(ownProps)
-  const { channels, search } = state
+  const { channels, search, postUpvotes } = state
   const channel = channels.data.get(channelName)
-
+  const upvotedPost = postUpvotes.data
   const channelLoaded = channels.loaded
   const searchLoaded = search.loaded
   const searchProcessing = search.processing
@@ -263,7 +282,8 @@ const mapStateToProps = (state, ownProps) => {
     notFound,
     notAuthorized,
     searchLoaded,
-    searchProcessing
+    searchProcessing,
+    upvotedPost
   }
 }
 

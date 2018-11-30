@@ -16,19 +16,18 @@ import { commentPermalink, profileURL } from "../lib/url"
 import { dropdownMenuFuncs } from "../lib/ui"
 import type {
   CommentResult,
-  PostResult,
   ProfileResult,
   Result
 } from "../flow/searchTypes"
-import type {Post} from "../flow/discussionTypes";
+import type { Post } from "../flow/discussionTypes"
 
 type PostProps = {
-  result: PostResult,
-  toggleUpvote: Post => void,
+  post: Post,
+  toggleUpvote?: Function
 }
-const PostSearchResult = ({ result, toggleUpvote }: PostProps) => (
+const PostSearchResult = ({ post, toggleUpvote }: PostProps) => (
   <CompactPostDisplay
-    post={searchResultToPost(result)}
+    post={post}
     isModerator={false}
     menuOpen={false}
     toggleUpvote={toggleUpvote}
@@ -80,13 +79,16 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 
 type Props = {
   result: Result,
-  toggleUpvote: Post => void,
+  upvotedPosts: Map<string, Post>,
+  toggleUpvote?: Post => void
 }
 export default class SearchResult extends React.Component<Props> {
   render() {
-    const { result, toggleUpvote } = this.props
+    const { result, toggleUpvote, upvotedPosts } = this.props
+    let post
     if (result.object_type === "post") {
-      return <PostSearchResult result={result} toggleUpvote={toggleUpvote}/>
+      post = upvotedPosts.get(result.post_id) || searchResultToPost(result)
+      return <PostSearchResult post={post} toggleUpvote={toggleUpvote} />
     } else if (result.object_type === "comment") {
       return <CommentSearchResult result={result} />
     } else if (result.object_type === "profile") {
