@@ -9,6 +9,7 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
 import { makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
+import {makePost} from "../factories/posts";
 
 describe("SearchPage", () => {
   let helper, renderPage, searchResponse, channel, initialState, initialProps
@@ -259,7 +260,8 @@ describe("SearchPage", () => {
 
   it("triggers a non-incremental search when the filter type changes", async () => {
     const { inner, store } = await renderPage()
-    const upvotedPosts = new Map()
+    const upvotedPost = makePost()
+    const upvotedPosts = new Map([[upvotedPost.id, upvotedPost]])
     inner.setState({ from: 7, upvotedPosts })
     const type = "comment"
     helper.searchStub.reset()
