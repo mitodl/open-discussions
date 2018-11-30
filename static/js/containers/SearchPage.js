@@ -202,7 +202,11 @@ export class SearchPage extends React.Component<Props, State> {
             key={i}
             result={result}
             toggleUpvote={toggleUpvote(dispatch)}
-            upvotedPost={(result.object_type === "post") ? upvotedPosts.get(result.post_id) : null}
+            upvotedPost={
+              result.object_type === "post"
+                ? upvotedPosts.get(result.post_id)
+                : null
+            }
           />
         ))}
       </InfiniteScroll>

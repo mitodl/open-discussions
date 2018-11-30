@@ -24,7 +24,7 @@ describe("SearchResult", () => {
   it("renders a profile card", () => {
     const result = makeProfileResult()
     const upvotedPost = null
-    const wrapper = render({ result, upvotedPost}).dive()
+    const wrapper = render({ result, upvotedPost }).dive()
     const profile = searchResultToProfile(result)
     const profileImage = wrapper.find("Connect(ProfileImage)")
     assert.deepEqual(profileImage.prop("profile"), profile)
