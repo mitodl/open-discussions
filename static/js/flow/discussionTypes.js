@@ -249,7 +249,14 @@ export type Profile = {
   headline:             ?string,
   username:             string,
   profile_image_small:  string,
-  profile_image_medium: string
+  profile_image_medium: string,
+  user_websites?:       Array<UserWebsite>
+}
+
+export type UserWebsite = {
+  id: number,
+  url: string,
+  site_type: string
 }
 
 export type ImageForm = {

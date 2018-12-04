@@ -2,6 +2,8 @@
 import pytest
 from django.core.files.uploadedfile import UploadedFile
 
+from profiles.models import SITE_TYPE_OPTIONS, PERSONAL_SITE_TYPE, SOCIAL_SITE_NAME_MAP
+
 
 @pytest.mark.parametrize("update_image", [True, False])
 def test_image_update(user, profile_image, update_image):
@@ -36,3 +38,12 @@ def test_null_image(user):
     assert not profile.image_file
     assert not profile.image_medium_file
     assert not profile.image_small_file
+
+
+def test_social_site_name_map():
+    """
+    Test that all social sites are represented with a human-friendly name
+    """
+    social_site_type_options = set(SITE_TYPE_OPTIONS)
+    social_site_type_options.remove(PERSONAL_SITE_TYPE)
+    assert social_site_type_options == set(SOCIAL_SITE_NAME_MAP.keys())

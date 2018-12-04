@@ -41,3 +41,23 @@ button.compact {
     margin-right: 5px;
   }
 }
+
+.grey-surround {
+  display: flex;
+  align-items: center;
+  border-radius: 12.5px;
+  cursor: pointer;
+  background-color: $pale-grey;
+  padding: 2px;
+  color: $navy;
+  font-size: 12px;
+}
+
+.remove {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 2px 27px;
+  margin: 0;
+}

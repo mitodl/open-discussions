@@ -14,6 +14,7 @@ from open_discussions import features
 
 from open_discussions.templatetags.render_bundle import public_path
 from sites.api import get_default_site
+from profiles.models import SOCIAL_SITE_NAME_MAP
 
 
 def index(request, **kwargs):  # pylint: disable=unused-argument
@@ -59,6 +60,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "embedlyKey": settings.EMBEDLY_KEY,
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
         "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,
+        "accepted_social_sites": list(SOCIAL_SITE_NAME_MAP.values()),
     }
 
     return render(

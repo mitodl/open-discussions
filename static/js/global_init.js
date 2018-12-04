@@ -17,21 +17,22 @@ const _createSettings = () => ({
     session_url: "http://fake.session.url",
     tos_url:     "http://fake.tos.url/"
   },
-  allow_anonymous:    false,
-  allow_saml_auth:    false,
-  allow_email_auth:   false,
-  is_authenticated:   true,
-  username:           "greatusername",
-  user_full_name:     "Great User",
-  profile_ui_enabled: false,
-  support_email:      "support@fake.url",
-  reactGaDebug:       true,
-  gaTrackingID:       "fake",
-  embedlyKey:         "fake",
-  public_path:        "http://fake.open.url/",
-  site_url:           "http://fake.open.url/",
-  recaptchaKey:       "",
-  search_page_size:   5
+  allow_anonymous:       false,
+  allow_saml_auth:       false,
+  allow_email_auth:      false,
+  is_authenticated:      true,
+  username:              "greatusername",
+  user_full_name:        "Great User",
+  profile_ui_enabled:    false,
+  support_email:         "support@fake.url",
+  reactGaDebug:          true,
+  gaTrackingID:          "fake",
+  embedlyKey:            "fake",
+  public_path:           "http://fake.open.url/",
+  site_url:              "http://fake.open.url/",
+  recaptchaKey:          "",
+  search_page_size:      5,
+  accepted_social_sites: []
 })
 
 global.SETTINGS = _createSettings()

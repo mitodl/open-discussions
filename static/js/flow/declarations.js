@@ -31,7 +31,8 @@ declare var SETTINGS: {
   sentry_dsn: string,
   release_version: string,
   environment: string,
-  recaptchaKey: string
+  recaptchaKey: string,
+  accepted_social_sites: Array<string>
 }
 
 // mocha

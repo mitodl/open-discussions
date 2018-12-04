@@ -9,6 +9,7 @@ import pytest
 from django.urls import reverse
 
 from open_discussions import features
+from profiles.models import SOCIAL_SITE_NAME_MAP
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("authenticated_site")]
 lazy = pytest.lazy_fixture
@@ -77,6 +78,7 @@ def test_webpack_url(
         "release_version": settings.VERSION,
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
         "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,
+        "accepted_social_sites": list(SOCIAL_SITE_NAME_MAP.values()),
         **expected_user_values,
     }
 

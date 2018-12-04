@@ -1,12 +1,16 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
+import R from "ramda"
 
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "../containers/ProfileImage"
+import { SocialSiteLogoLink, SiteLogoLink } from "./SiteLogoLink"
 import Card from "../components/Card"
 
 import { validationMessage } from "../lib/validation"
 import { goBackAndHandleEvent } from "../lib/util"
+import { getSocialSites, getPersonalSite } from "../lib/profile"
+import { emptyOrNil } from "../lib/util"
 
 import type {
   Profile,
@@ -21,17 +25,148 @@ type Props = {
   onSubmit: Function,
   profile: Profile,
   processing: boolean,
-  history: Object
+  history: Object,
+  socialSiteFormValues: Object,
+  socialSiteFormErrors: Object,
+  personalSiteFormValues: Object,
+  personalSiteFormErrors: Object,
+  onUpdateSocialSite: Function,
+  onSubmitSocialSite: Function,
+  onUpdatePersonalSite: Function,
+  onSubmitPersonalSite: Function,
+  onDeleteSite: Function
 }
 
 export default class ProfileForm extends React.Component<Props> {
+  renderUserWebsiteSection() {
+    const {
+      profile,
+      socialSiteFormValues,
+      socialSiteFormErrors,
+      personalSiteFormValues,
+      personalSiteFormErrors,
+      onUpdateSocialSite,
+      onSubmitSocialSite,
+      onUpdatePersonalSite,
+      onSubmitPersonalSite,
+      onDeleteSite
+    } = this.props
+
+    const socialSites = getSocialSites(profile)
+    const personalSite = getPersonalSite(profile)
+    let acceptedSocialSites = ""
+    if (!emptyOrNil(SETTINGS.accepted_social_sites)) {
+      acceptedSocialSites = (
+        <label className="bottom-label">
+          Accepted sites:&nbsp;
+          {R.join(", ", SETTINGS.accepted_social_sites)}
+        </label>
+      )
+    }
+
+    return (
+      <React.Fragment>
+        <div className="row social-site-links">
+          <h4>Social media links</h4>
+          <div className="input-row">
+            <input
+              type="text"
+              name="socialSite"
+              value={socialSiteFormValues.url || ""}
+              placeholder="Add links to your social media profiles"
+              maxLength="60"
+              onChange={onUpdateSocialSite}
+            />
+            <button
+              type="button"
+              onClick={onSubmitSocialSite}
+              className="outlined"
+            >
+              Submit
+            </button>
+          </div>
+          {acceptedSocialSites}
+          {validationMessage(socialSiteFormErrors.url)}
+          {socialSites.map((site, i) => (
+            <div key={i} className="site-row">
+              <div className="site-link">
+                <SocialSiteLogoLink site={site.site_type} url={site.url} />
+                <a
+                  href={site.url}
+                  className="link-text"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {site.url}
+                </a>
+              </div>
+              <button
+                type="button"
+                className="remove grey-surround"
+                onClick={R.partial(onDeleteSite, [site.id])}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="row personal-site-link">
+          <h4>Your website</h4>
+          {personalSite ? (
+            <div className="site-row">
+              <div className="site-link">
+                <SiteLogoLink url={personalSite.url} />
+                <a
+                  href={personalSite.url}
+                  className="link-text"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {personalSite.url}
+                </a>
+              </div>
+              <button
+                type="button"
+                className="remove grey-surround"
+                onClick={R.partial(onDeleteSite, [personalSite.id])}
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <React.Fragment>
+              <div className="input-row">
+                <input
+                  type="text"
+                  name="personalSite"
+                  value={personalSiteFormValues.url || ""}
+                  placeholder="Add a link to your website"
+                  maxLength="60"
+                  onChange={onUpdatePersonalSite}
+                />
+                <button
+                  type="button"
+                  onClick={onSubmitPersonalSite}
+                  className="outlined"
+                >
+                  Submit
+                </button>
+              </div>
+              {validationMessage(personalSiteFormErrors.url)}
+            </React.Fragment>
+          )}
+        </div>
+      </React.Fragment>
+    )
+  }
+
   render() {
     const {
       form,
       profile,
       validation,
-      onSubmit,
       onUpdate,
+      onSubmit,
       processing,
       history
     } = this.props
@@ -90,6 +225,7 @@ export default class ProfileForm extends React.Component<Props> {
                 Add a short description about yourself, max 1000 characters
               </label>
             </div>
+            {this.renderUserWebsiteSection()}
           </form>
         </Card>
         <div className="row actions">

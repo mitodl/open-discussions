@@ -397,6 +397,27 @@ export function updateProfile(
   })
 }
 
+export const postUserWebsite = (
+  username: string,
+  url: string,
+  submittedSiteType?: string
+): Promise<AuthResponse> =>
+  fetchJSONWithAuthFailure("/api/v0/websites/", {
+    method: POST,
+    body:   JSON.stringify({
+      username:            username,
+      url:                 url,
+      submitted_site_type: submittedSiteType
+    })
+  })
+
+export const deleteUserWebsite = (
+  userWebsiteId: number
+): Promise<AuthResponse> =>
+  fetchWithAuthFailure(`/api/v0/websites/${userWebsiteId}/`, {
+    method: DELETE
+  })
+
 export function patchChannelAvatar(
   channelName: string,
   image: Blob,

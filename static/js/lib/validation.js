@@ -102,6 +102,18 @@ export const validateProfileForm = validate([
   validation(emptyOrNil, R.lensPath(["value", "name"]), "Name is required")
 ])
 
+export const validateUserWebsiteForm = validate([
+  validation(
+    R.compose(
+      R.complement(R.unary(isURL)),
+      R.defaultTo("")
+    ),
+    R.lensPath(["value", "url"]),
+    "Must be a valid URL"
+  ),
+  validation(emptyOrNil, R.lensPath(["value", "url"]), "URL is required")
+])
+
 export const validateChannelAppearanceEditForm = validate([
   validation(
     R.compose(
