@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.56.0
+Version 0.56.0 (Released December 04, 2018)
 --------------
 
 - Added UI for adding/deleting user websites
