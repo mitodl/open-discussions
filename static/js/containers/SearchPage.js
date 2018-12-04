@@ -21,9 +21,11 @@ import { getChannelName } from "../lib/util"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
-import type { Channel } from "../flow/discussionTypes"
+import type { Channel, Post } from "../flow/discussionTypes"
 import type { SearchInputs, SearchParams, Result } from "../flow/searchTypes"
 import { Cell, Grid } from "../components/Grid"
+
+import { toggleUpvote } from "../util/api_actions"
 
 type Props = {
   location: Location,
@@ -43,7 +45,9 @@ type Props = {
   searchLoaded: boolean,
   searchProcessing: boolean,
   total: number,
-  clearSearch: () => void
+  clearSearch: () => void,
+  toggleUpvote: () => void,
+  upvotedPosts: Map<string, Post>
 }
 type State = {
   text: string,
@@ -158,7 +162,14 @@ export class SearchPage extends React.Component<Props, State> {
   }
 
   renderResults = () => {
-    const { results, searchProcessing, initialLoad, total } = this.props
+    const {
+      results,
+      searchProcessing,
+      initialLoad,
+      total,
+      upvotedPosts,
+      toggleUpvote
+    } = this.props
     const { from } = this.state
 
     if (searchProcessing && initialLoad) {
@@ -179,7 +190,18 @@ export class SearchPage extends React.Component<Props, State> {
         initialLoad={false}
         loader={<Loading className="infinite" key="loader" />}
       >
-        {results.map((result, i) => <SearchResult key={i} result={result} />)}
+        {results.map((result, i) => (
+          <SearchResult
+            key={i}
+            result={result}
+            toggleUpvote={toggleUpvote}
+            upvotedPost={
+              result.object_type === "post"
+                ? upvotedPosts.get(result.post_id)
+                : null
+            }
+          />
+        ))}
       </InfiniteScroll>
     )
   }
@@ -227,9 +249,8 @@ export class SearchPage extends React.Component<Props, State> {
 
 const mapStateToProps = (state, ownProps) => {
   const channelName = getChannelName(ownProps)
-  const { channels, search } = state
+  const { channels, search, posts } = state
   const channel = channels.data.get(channelName)
-
   const channelLoaded = channels.loaded
   const searchLoaded = search.loaded
   const searchProcessing = search.processing
@@ -242,6 +263,7 @@ const mapStateToProps = (state, ownProps) => {
     ? channels.error && channels.error.errorStatusCode === 403
     : false
   const { results, total, initialLoad } = search.data
+  const upvotedPosts = posts.data
 
   return {
     results,
@@ -251,6 +273,7 @@ const mapStateToProps = (state, ownProps) => {
     channelLoaded,
     channelProcessing,
     channelName,
+    upvotedPosts,
     // loaded is used in withLoading but we only want to look at channel loaded since search loaded will change
     // whenever the user makes a new search
     loaded: channelName ? channelLoaded : true,
@@ -271,7 +294,8 @@ const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps: Props) => ({
   getChannel: async () => {
     const channelName = getChannelName(ownProps)
     await dispatch(actions.channels.get(channelName))
-  }
+  },
+  toggleUpvote: toggleUpvote(dispatch)
 })
 
 export default R.compose(
