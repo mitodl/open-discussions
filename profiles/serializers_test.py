@@ -5,6 +5,7 @@ Tests for serializers for profiles REST APIS
 import pytest
 import factory
 from django.core.files.uploadedfile import SimpleUploadedFile
+from rest_framework.exceptions import ValidationError
 
 from profiles.factories import UserWebsiteFactory
 from profiles.models import Profile, PERSONAL_SITE_TYPE, FACEBOOK_DOMAIN
@@ -207,33 +208,69 @@ def test_serialize_profile_websites(user):
     ) == sorted([list(data.items()) for data in serialized_sites])
 
 
-def test_serialize_user_website():
-    """
-    Test serializing a user website
-    """
-    user_website = UserWebsiteFactory.build()
-    assert UserWebsiteSerializer(user_website).data == {
-        "id": user_website.id,
-        "url": user_website.url,
-        "site_type": user_website.site_type,
-    }
+class TestUserWebsiteSerializer:
+    """UserWebsiteSerializer tests"""
 
+    def test_serialize(self):
+        """
+        Test serializing a user website
+        """
+        user_website = UserWebsiteFactory.build()
+        assert UserWebsiteSerializer(user_website).data == {
+            "id": user_website.id,
+            "url": user_website.url,
+            "site_type": user_website.site_type,
+        }
 
-def test_deserialize_user_website(mocker, user):
-    """
-    Test deserializing a user website
-    """
-    url = "https://example.com"
-    site_type = "dummy"
-    patched_get_site_type = mocker.patch(
-        "profiles.serializers.get_site_type_from_url", return_value=site_type
+    def test_deserialize(self, mocker, user):
+        """
+        Test deserializing a user website
+        """
+        url = "https://example.com"
+        site_type = "dummy"
+        patched_get_site_type = mocker.patch(
+            "profiles.serializers.get_site_type_from_url", return_value=site_type
+        )
+        user_website_data = {"username": user.username, "url": url}
+
+        serializer = UserWebsiteSerializer(data=user_website_data)
+        is_valid = serializer.is_valid(raise_exception=True)
+        assert is_valid is True
+        assert serializer.validated_data["url"] == url
+        assert serializer.validated_data["site_type"] == site_type
+        assert serializer.validated_data["profile"] == user.profile
+        patched_get_site_type.assert_called_once_with(url)
+
+    @pytest.mark.parametrize(
+        "input_url,exp_result_url",
+        [("HTtPS://AbC.COM", "https://abc.com"), ("AbC.cOM", "http://abc.com")],
     )
-    user_website_data = {"profile": user.profile.id, "url": url}
+    def test_user_website_url(self, mocker, user, input_url, exp_result_url):
+        """
+        Test that deserializing a user website url adds a protocol if necessary and forces lowercase.
+        """
+        site_type = "dummy"
+        mocker.patch(
+            "profiles.serializers.get_site_type_from_url", return_value=site_type
+        )
+        user_website_data = {"username": user.username, "url": input_url}
 
-    serializer = UserWebsiteSerializer(data=user_website_data)
-    is_valid = serializer.is_valid(raise_exception=True)
-    assert is_valid is True
-    assert serializer.validated_data["url"] == url
-    assert serializer.validated_data["site_type"] == site_type
-    assert serializer.validated_data["profile"] == user.profile
-    patched_get_site_type.assert_called_once_with(url)
+        serializer = UserWebsiteSerializer(data=user_website_data)
+        is_valid = serializer.is_valid(raise_exception=True)
+        assert is_valid is True
+        assert serializer.validated_data["url"] == exp_result_url
+
+    def test_site_uniqueness(self, user):
+        """
+        Test that a user can only save one of a specific type of site
+        """
+        UserWebsiteFactory.create(
+            profile=user.profile, url="facebook.com/1", site_type=FACEBOOK_DOMAIN
+        )
+        user_website_data = {"username": user.username, "url": "facebook.com/2"}
+        serializer = UserWebsiteSerializer(data=user_website_data)
+        with pytest.raises(
+            ValidationError, match="A website of this type has already been saved."
+        ):
+            serializer.is_valid(raise_exception=True)
+            serializer.save()

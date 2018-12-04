@@ -9,6 +9,11 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+
+    &.social-site-links,
+    &.personal-site-link {
+      display: block;
+    }
   }
 
   .actions {
@@ -34,6 +39,117 @@
     margin-top: 22px;
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  h4 {
+    margin: 0;
+    padding: 0 0 5px 0;
+  }
+
+  .social-site-links,
+  .personal-site-link {
+    button {
+      margin: 0;
+    }
+
+    .validation-message {
+      margin-top: 5px;
+    }
+
+    .input-row,
+    .site-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+
+      input,
+      .site-link {
+        display: inline-block;
+        width: auto;
+        flex-grow: 1;
+        flex-shrink: 1;
+        margin-right: 10px;
+        flex-basis: 65%;
+      }
+
+      button,
+      button.remove {
+        flex-grow: 1;
+        flex-shrink: 1;
+        min-width: 70px;
+        max-width: 125px;
+      }
+    }
+
+    .input-row {
+      input {
+        width: inherit;
+      }
+
+      button {
+        padding: 9px 0;
+      }
+    }
+
+    .site-row {
+      margin-top: 10px;
+
+      .circle-logo-wrapper {
+        margin-right: 10px;
+      }
+
+      .site-link {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+
+        a.link-text {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      button.remove {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  }
+
+  .circle-logo-wrapper {
+    height: 20px;
+    line-height: 20px;
+    width: 20px;
+    display: inline-block;
+    color: #8a8b8c;
+    border: 2px solid #8a8b8c;
+    border-radius: 16px;
+    padding: 4px;
+  }
+
+  .social-logo {
+    height: 20px;
+    width: 20px;
+    stroke: none;
+    fill: #8a8b8c;
+  }
+
+  .external-site-logo {
+    font-size: 9.5px;
+    text-decoration: none;
+    text-align: center;
+  }
+
+  .card-site-links {
+    display: flex;
+    align-items: center;
+    padding-top: 15px;
+
+    > * {
+      margin-right: 15px;
+    }
   }
 }
 

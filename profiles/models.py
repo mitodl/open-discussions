@@ -34,6 +34,11 @@ SITE_TYPE_OPTIONS = {
     LINKEDIN_DOMAIN,
     PERSONAL_SITE_TYPE,
 }
+SOCIAL_SITE_NAME_MAP = {
+    FACEBOOK_DOMAIN: "Facebook",
+    TWITTER_DOMAIN: "Twitter",
+    LINKEDIN_DOMAIN: "LinkedIn",
+}
 
 
 def filter_profile_props(data):
@@ -152,4 +157,4 @@ class UserWebsite(models.Model):
         unique_together = ("profile", "site_type")
 
     def __str__(self):
-        return "url: {}; site_type: {}".format(self.url, self.site_typee)
+        return "url: {}; site_type: {}".format(self.url, self.site_type)

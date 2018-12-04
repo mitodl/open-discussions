@@ -10,10 +10,12 @@ import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
 import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 import CanonicalLink from "../components/CanonicalLink"
+import { SocialSiteLogoLink, SiteLogoLink } from "../components/SiteLogoLink"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
 import { getUserName } from "../lib/util"
+import { PERSONAL_SITE_TYPE } from "../lib/constants"
 import { any404Error, anyErrorExcept404 } from "../util/rest"
 import { clearPostError } from "../actions/post"
 
@@ -55,6 +57,29 @@ class ProfilePage extends React.Component<Props> {
     history.push(`/profile/${userName}/edit`)
   }
 
+  renderUserWebsiteLinks() {
+    const { profile } = this.props
+
+    if (!profile.user_websites || profile.user_websites.length === 0)
+      return null
+
+    // $FlowFixMe: profile.user_websites cannot be undefined here
+    const socialSites = profile.user_websites
+      .filter(site => site.site_type !== PERSONAL_SITE_TYPE)
+      .map((site, i) => (
+        <SocialSiteLogoLink site={site.site_type} url={site.url} key={i} />
+      ))
+    // $FlowFixMe: profile.user_websites cannot be undefined here
+    const personalSite = profile.user_websites
+      .filter(site => site.site_type === PERSONAL_SITE_TYPE)
+      .map((site, i) => <SiteLogoLink url={site.url} key={i} />)
+
+    const sites = socialSites.concat([personalSite]).filter(site => site)
+
+    if (sites.length === 0) return null
+    return <div className="card-site-links">{sites}</div>
+  }
+
   render() {
     const { profile, userName } = this.props
     if (!profile) {
@@ -91,6 +116,7 @@ class ProfilePage extends React.Component<Props> {
                 )
               })
               : profile.bio}
+            {this.renderUserWebsiteLinks()}
           </div>
         </Card>
         {userName === SETTINGS.username ? (

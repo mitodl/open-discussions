@@ -1,6 +1,6 @@
 // @flow
 import casual from "casual-browserify"
-import type { Profile } from "../flow/discussionTypes"
+import type { Profile, UserWebsite } from "../flow/discussionTypes"
 
 export const makeProfile = (
   username: string = casual.word,
@@ -18,4 +18,14 @@ export const makeProfile = (
   headline:             casual.word,
   profile_image_small:  casual.url,
   profile_image_medium: casual.url
+})
+
+export const makeUserWebsite = (
+  id: number = 1,
+  url: string = casual.word,
+  siteType: string = casual.word
+): UserWebsite => ({
+  id:        id,
+  url:       url,
+  site_type: siteType
 })
