@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.56.0
+--------------
+
+- Added UI for adding/deleting user websites
+- Enable post voting in search results (#1545)
+
 Version 0.55.3 (Released November 30, 2018)
 --------------
 
