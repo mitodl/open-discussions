@@ -28,7 +28,6 @@ import { Cell, Grid } from "../components/Grid"
 import { toggleUpvote } from "../util/api_actions"
 
 type Props = {
-  dispatch: Dispatch<any>,
   location: Location,
   history: Object,
   channel: ?Channel,
@@ -46,13 +45,13 @@ type Props = {
   searchLoaded: boolean,
   searchProcessing: boolean,
   total: number,
-  upvotedPost: ?Post,
-  clearSearch: () => void
+  clearSearch: () => void,
+  toggleUpvote: () => void,
+  upvotedPosts: Map<string, Post>
 }
 type State = {
   text: string,
-  from: number,
-  upvotedPosts: Map<string, Post>
+  from: number
 }
 
 const shouldLoadChannel = (currentProps: Props, prevProps: ?Props) => {
@@ -79,9 +78,8 @@ export class SearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      text:         qs.parse(props.location.search).q,
-      from:         0,
-      upvotedPosts: new Map()
+      text: qs.parse(props.location.search).q,
+      from: 0
     }
   }
 
@@ -169,10 +167,10 @@ export class SearchPage extends React.Component<Props, State> {
       searchProcessing,
       initialLoad,
       total,
-      dispatch,
-      upvotedPost
+      upvotedPosts,
+      toggleUpvote
     } = this.props
-    const { from, upvotedPosts } = this.state
+    const { from } = this.state
 
     if (searchProcessing && initialLoad) {
       return <PostLoading />
@@ -182,11 +180,6 @@ export class SearchPage extends React.Component<Props, State> {
       return (
         <div className="empty-list-msg">There are no results to display.</div>
       )
-    }
-
-    if (upvotedPost && upvotedPosts.get(upvotedPost.id) !== upvotedPost) {
-      upvotedPosts.set(upvotedPost.id, upvotedPost)
-      this.setState({ upvotedPosts })
     }
 
     return (
@@ -201,7 +194,7 @@ export class SearchPage extends React.Component<Props, State> {
           <SearchResult
             key={i}
             result={result}
-            toggleUpvote={toggleUpvote(dispatch)}
+            toggleUpvote={toggleUpvote}
             upvotedPost={
               result.object_type === "post"
                 ? upvotedPosts.get(result.post_id)
@@ -256,9 +249,8 @@ export class SearchPage extends React.Component<Props, State> {
 
 const mapStateToProps = (state, ownProps) => {
   const channelName = getChannelName(ownProps)
-  const { channels, search, postUpvotes } = state
+  const { channels, search, posts } = state
   const channel = channels.data.get(channelName)
-  const upvotedPost = postUpvotes.data
   const channelLoaded = channels.loaded
   const searchLoaded = search.loaded
   const searchProcessing = search.processing
@@ -271,6 +263,7 @@ const mapStateToProps = (state, ownProps) => {
     ? channels.error && channels.error.errorStatusCode === 403
     : false
   const { results, total, initialLoad } = search.data
+  const upvotedPosts = posts.data
 
   return {
     results,
@@ -280,14 +273,14 @@ const mapStateToProps = (state, ownProps) => {
     channelLoaded,
     channelProcessing,
     channelName,
+    upvotedPosts,
     // loaded is used in withLoading but we only want to look at channel loaded since search loaded will change
     // whenever the user makes a new search
     loaded: channelName ? channelLoaded : true,
     notFound,
     notAuthorized,
     searchLoaded,
-    searchProcessing,
-    upvotedPost
+    searchProcessing
   }
 }
 
@@ -302,7 +295,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps: Props) => ({
     const channelName = getChannelName(ownProps)
     await dispatch(actions.channels.get(channelName))
   },
-  dispatch: dispatch
+  toggleUpvote: toggleUpvote(dispatch)
 })
 
 export default R.compose(

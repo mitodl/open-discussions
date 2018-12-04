@@ -7,17 +7,30 @@ import sinon from "sinon"
 import ConnectedSearchPage, { SearchPage } from "./SearchPage"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
-import { makeSearchResponse } from "../factories/search"
+import { makePostResult, makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 import { makePost } from "../factories/posts"
 
 describe("SearchPage", () => {
-  let helper, renderPage, searchResponse, channel, initialState, initialProps
+  let helper,
+    renderPage,
+    searchResponse,
+    channel,
+    initialState,
+    initialProps,
+    upvotedPost
 
   beforeEach(() => {
     channel = makeChannel()
     const numHits = 10
     searchResponse = makeSearchResponse(SETTINGS.search_page_size, numHits)
+
+    // Simulate an upvoted post
+    const searchPost = makePostResult()
+    searchPost.post_id = "post_uploaded_1"
+    searchResponse.hits.hits[0] = searchPost
+    upvotedPost = makePost()
+    upvotedPost.id = searchPost.post_id
 
     helper = new IntegrationTestHelper()
     helper.searchStub.returns(Promise.resolve(searchResponse))
@@ -26,8 +39,8 @@ describe("SearchPage", () => {
         data:   new Map([[channel.name, channel]]),
         loaded: true
       },
-      postUpvotes: {
-        data: {}
+      posts: {
+        data: new Map([[upvotedPost.id, upvotedPost]])
       },
       search: {
         loaded: true,
@@ -79,6 +92,13 @@ describe("SearchPage", () => {
           .at(i)
           .prop("result"),
         result
+      )
+      assert.deepEqual(
+        inner
+          .find("SearchResult")
+          .at(i)
+          .prop("upvotedPost"),
+        result.post_id === upvotedPost.id ? upvotedPost : null
       )
     })
   })
@@ -190,8 +210,7 @@ describe("SearchPage", () => {
       }
     )
     const text = "some text"
-    const upvotedPosts = new Map()
-    inner.setState({ text, from: 7, upvotedPosts })
+    inner.setState({ text, from: 7 })
     inner.find("SearchTextbox").prop("onSubmit")({
       preventDefault: helper.sandbox.stub()
     })
@@ -199,8 +218,7 @@ describe("SearchPage", () => {
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
       from: 0,
-      text,
-      upvotedPosts
+      text
     })
   })
   ;[true, false].forEach(hasChannel => {
@@ -260,9 +278,7 @@ describe("SearchPage", () => {
 
   it("triggers a non-incremental search when the filter type changes", async () => {
     const { inner, store } = await renderPage()
-    const upvotedPost = makePost()
-    const upvotedPosts = new Map([[upvotedPost.id, upvotedPost]])
-    inner.setState({ from: 7, upvotedPosts })
+    inner.setState({ from: 7 })
     const type = "comment"
     helper.searchStub.reset()
     inner.find("SearchFilterPicker").prop("updatePickerParam")(type, {
@@ -279,8 +295,7 @@ describe("SearchPage", () => {
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
       from: 0,
-      text: undefined,
-      upvotedPosts
+      text: undefined
     })
     assert.equal(
       store.getActions()[store.getActions().length - 2].type,
