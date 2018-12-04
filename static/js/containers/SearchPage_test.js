@@ -76,7 +76,7 @@ describe("SearchPage", () => {
   })
 
   it("renders search results", async () => {
-    const { inner } = await renderPage()
+    const { wrapper, inner } = await renderPage()
 
     sinon.assert.calledWith(helper.searchStub, {
       channelName: channel.name,
@@ -85,6 +85,10 @@ describe("SearchPage", () => {
       text:        undefined,
       type:        undefined
     })
+    assert.deepEqual(
+      wrapper.props().upvotedPosts.get(upvotedPost.id),
+      upvotedPost
+    )
     searchResponse.hits.hits.forEach((result, i) => {
       assert.deepEqual(
         inner
