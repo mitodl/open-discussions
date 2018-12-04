@@ -116,11 +116,14 @@ class ChannelSerializer(serializers.Serializer):
 
     def get_allowed_post_types(self, channel):
         """Returns a dictionary of allowed post types"""
-        return (
-            dict(channel.allowed_post_types.items())
-            if channel.allowed_post_types
-            else None
-        )
+        from channels.api import get_allowed_post_types_from_link_type
+
+        # use Channel.allowed_post_types if available
+        if channel.allowed_post_types:
+            return dict(channel.allowed_post_types.items())
+
+        # otherwise compute this on-demand from the subreddit submission_type
+        return get_allowed_post_types_from_link_type(channel.submission_type)
 
     def validate_allowed_post_types(self, value):
         """Validate the allowed post types"""

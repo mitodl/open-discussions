@@ -405,7 +405,7 @@ def get_allowed_post_types_from_link_type(link_type):
     elif link_type == LINK_TYPE_SELF:
         return Channel.allowed_post_types.self
     else:
-        # enforce a standard default
+        # ANY or enforce a standard default
         return Channel.allowed_post_types.self | Channel.allowed_post_types.link
 
 
@@ -520,6 +520,7 @@ class Api:
         channel_type=CHANNEL_TYPE_PUBLIC,
         membership_is_managed=False,
         allowed_post_types=None,
+        link_type=LINK_TYPE_ANY,
         **other_settings,
     ):  # pylint: disable=too-many-arguments
         """
@@ -530,6 +531,7 @@ class Api:
             title (str): title of the channel
             channel_type (str): type of the channel
             membership_is_managed (bool): Whether the channel membership is managed externally
+            link_type (str): the link type for this channel
             **other_settings (dict): dict of additional settings
 
         Returns:
@@ -547,11 +549,7 @@ class Api:
 
         if not allowed_post_types:
             # forward-port link type to allowed_post_types
-            link_type = other_settings.get("link_type", LINK_TYPE_ANY)
             allowed_post_types = get_allowed_post_types_from_link_type(link_type)
-        else:
-            # set reddit to accept any link types since we're going to do the validation on our end going forward
-            other_settings["link_type"] = LINK_TYPE_ANY
 
         # wrap channel creation as an atomic operation across the db and reddit
         with transaction.atomic():
@@ -563,6 +561,7 @@ class Api:
                 title=title,
                 subreddit_type=channel_type,
                 allow_top=True,
+                link_type=link_type,
                 **other_settings,
             )
 
