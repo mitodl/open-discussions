@@ -333,9 +333,19 @@ describe("CompactPostDisplay", () => {
     )
   })
 
-  it("should hide the menu open button when anonymous", () => {
-    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-    const wrapper = renderPostDisplay({ post })
-    assert.isNotOk(wrapper.find("i.more_vert").exists())
+  //
+  ;[true, false].forEach(isAnonymous => {
+    [true, false].forEach(useSearchPageUI => {
+      it(`${shouldIf(
+        isAnonymous || useSearchPageUI
+      )} hide the menu open button`, () => {
+        helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(isAnonymous)
+        const wrapper = renderPostDisplay({ post, useSearchPageUI })
+        assert.equal(
+          wrapper.find("i.more_vert").exists(),
+          !isAnonymous && !useSearchPageUI
+        )
+      })
+    })
   })
 })

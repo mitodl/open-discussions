@@ -169,6 +169,11 @@ describe("CommentTree", () => {
     assert.ok(beginEditingStub.calledWith(replyToCommentKey(comments[0])))
   })
 
+  it('should not include a "reply" button if useSearchPageUI is true', () => {
+    const wrapper = renderCommentTree({ useSearchPageUI: true })
+    assert.notOk(wrapper.find(".comment-action-button.reply-button").exists())
+  })
+
   it('should not include a "reply" button for deleted posts', () => {
     comments[0].deleted = true
     const wrapper = renderCommentTree()
@@ -182,11 +187,18 @@ describe("CommentTree", () => {
   })
 
   //
-  ;["testuser", null].forEach(username => {
-    it(`${shouldIf(username !== null)} include a showMenu icon`, () => {
-      SETTINGS.username = username
-      const wrapper = renderCommentTree()
-      assert.equal(wrapper.find(".more_vert").exists(), username !== null)
+  ;[true, false].forEach(useSearchPageUI => {
+    ["testuser", null].forEach(username => {
+      it(`${shouldIf(
+        username !== null && !useSearchPageUI
+      )} include a showMenu icon`, () => {
+        SETTINGS.username = username
+        const wrapper = renderCommentTree({ useSearchPageUI })
+        assert.equal(
+          wrapper.find(".more_vert").exists(),
+          username !== null && !useSearchPageUI
+        )
+      })
     })
   })
 

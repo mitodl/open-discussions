@@ -58,7 +58,8 @@ type Props = {
   ignoreCommentReports?: (c: CommentInTree) => void,
   toggleFollowComment?: Function,
   curriedDropdownMenufunc: (key: string) => Object,
-  dropdownMenus: Set<string>
+  dropdownMenus: Set<string>,
+  useSearchPageUI?: boolean
 }
 
 export const commentDropdownKey = (c: CommentInTree) =>
@@ -104,7 +105,8 @@ export default class CommentTree extends React.Component<Props> {
       moderationUI,
       ignoreCommentReports,
       curriedDropdownMenufunc,
-      dropdownMenus
+      dropdownMenus,
+      useSearchPageUI
     } = this.props
     const editFormKey = editCommentKey(comment)
 
@@ -127,19 +129,22 @@ export default class CommentTree extends React.Component<Props> {
             downvote={downvote}
           />
         ) : null}
-        {atMaxDepth || moderationUI || comment.deleted ? null : (
-          <ReplyButton
-            beginEditing={e => {
-              if (beginEditing) {
-                beginEditing(
-                  replyToCommentKey(comment),
-                  getCommentReplyInitialValue(comment),
-                  e
-                )
-              }
-            }}
-          />
-        )}
+        {atMaxDepth ||
+        moderationUI ||
+        comment.deleted ||
+        useSearchPageUI ? null : (
+            <ReplyButton
+              beginEditing={e => {
+                if (beginEditing) {
+                  beginEditing(
+                    replyToCommentKey(comment),
+                    getCommentReplyInitialValue(comment),
+                    e
+                  )
+                }
+              }}
+            />
+          )}
         <div className="share-button-wrapper">
           <div
             className="comment-action-button share-button"
@@ -155,7 +160,7 @@ export default class CommentTree extends React.Component<Props> {
             />
           ) : null}
         </div>
-        {!userIsAnonymous() ? (
+        {!userIsAnonymous() && !useSearchPageUI ? (
           <div>
             <i className="material-icons more_vert" onClick={showDropdown}>
               more_vert

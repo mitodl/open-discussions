@@ -27,6 +27,7 @@ const PostSearchResult = ({ post, toggleUpvote }: PostProps) => (
     post={post}
     isModerator={false}
     menuOpen={false}
+    useSearchPageUI
     toggleUpvote={toggleUpvote}
   />
 )
@@ -52,6 +53,7 @@ const CommentSearchResult = ({ result }: CommentProps) => {
       )}
       curriedDropdownMenufunc={dropdownMenuFuncs(() => null)}
       dropdownMenus={new Set()}
+      useSearchPageUI
     />
   )
 }

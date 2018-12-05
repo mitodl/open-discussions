@@ -37,6 +37,7 @@ type Props = {
   ignorePostReports?: (post: Post) => Promise<*>,
   reportPost?: ?(post: Post) => void,
   menuOpen: boolean,
+  useSearchPageUI?: boolean,
   dispatch: Dispatch<*>
 }
 
@@ -66,6 +67,7 @@ export class CompactPostDisplay extends React.Component<Props> {
       ignorePostReports,
       reportPost,
       menuOpen,
+      useSearchPageUI,
       dispatch
     } = this.props
     const formattedDate = moment(post.created).fromNow()
@@ -161,7 +163,7 @@ export class CompactPostDisplay extends React.Component<Props> {
               </i>
               <span>{post.num_comments}</span>
             </Link>
-            {userIsAnonymous() ? null : (
+            {userIsAnonymous() || useSearchPageUI ? null : (
               <i
                 className="material-icons more_vert post-menu-button grey-surround"
                 onClick={menuOpen ? null : showPostMenu}
