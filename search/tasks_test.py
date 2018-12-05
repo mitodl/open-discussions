@@ -176,7 +176,7 @@ def test_start_recreate_index(mock_index_functions, mocker, mocked_celery, user)
     settings.INDEXING_API_USERNAME = user.username
     settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
     users = UserFactory.create_batch(4)
-    channels = ChannelFactory.create_batch(3)
+    channels = [ChannelFactory.create(name=name) for name in ["a", "b", "c"]]
     index_channel_mock = mocker.patch("search.tasks.index_channel", autospec=True)
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
     backing_index = "backing"

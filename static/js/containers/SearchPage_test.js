@@ -10,6 +10,8 @@ import { actions } from "../actions"
 import { makePostResult, makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 import { makePost } from "../factories/posts"
+import {createCommentTree} from "../reducers/comments";
+import {makeCommentsResponse} from "../factories/comments";
 
 describe("SearchPage", () => {
   let helper,
@@ -222,7 +224,8 @@ describe("SearchPage", () => {
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
       from: 0,
-      text
+      text,
+      votedComments: new Map()
     })
   })
   ;[true, false].forEach(hasChannel => {
@@ -299,7 +302,8 @@ describe("SearchPage", () => {
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
       from: 0,
-      text: undefined
+      text: undefined,
+      votedComments: new Map()
     })
     assert.equal(
       store.getActions()[store.getActions().length - 2].type,
@@ -372,4 +376,18 @@ describe("SearchPage", () => {
       assert.equal(inner.find("PostLoading").exists(), !loaded)
     })
   })
+
+  it("calls updateVotedComments when upvote or downvote is triggered", async() => {
+    const { inner } = await renderPage()
+    const comment = createCommentTree(makeCommentsResponse(makePost()))[0]
+    helper.updateCommentStub.returns(Promise.resolve(comment))
+    comment.score = 215
+    await inner.instance().upvote(comment)
+    assert.deepEqual(inner.state().votedComments.get(comment.id).score, 215)
+    comment.score = 213
+    await inner.instance().downvote(comment)
+    assert.deepEqual(inner.state().votedComments.get(comment.id).score, 213)
+  })
+
+
 })

@@ -21,13 +21,14 @@ import { getChannelName } from "../lib/util"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
-import type { Channel, Post } from "../flow/discussionTypes"
+import type {Channel, CommentInTree, Post} from "../flow/discussionTypes"
 import type { SearchInputs, SearchParams, Result } from "../flow/searchTypes"
 import { Cell, Grid } from "../components/Grid"
 
 import { toggleUpvote } from "../util/api_actions"
 
 type Props = {
+  dispatch: Dispatch<any>,
   location: Location,
   history: Object,
   channel: ?Channel,
@@ -51,7 +52,8 @@ type Props = {
 }
 type State = {
   text: string,
-  from: number
+  from: number,
+  votedComments: Map<string, CommentInTree>
 }
 
 const shouldLoadChannel = (currentProps: Props, prevProps: ?Props) => {
@@ -79,7 +81,8 @@ export class SearchPage extends React.Component<Props, State> {
     super(props)
     this.state = {
       text: qs.parse(props.location.search).q,
-      from: 0
+      from: 0,
+      votedComments: new Map()
     }
   }
 
@@ -97,6 +100,16 @@ export class SearchPage extends React.Component<Props, State> {
     if (shouldLoadSearch(this.props)) {
       this.runSearch()
     }
+  }
+
+  downvote = async (comment: CommentInTree) => {
+    const { dispatch } = this.props
+    const updatedComment = await dispatch(
+      actions.comments.patch(comment.id, {
+        downvoted: !comment.downvoted
+      })
+    )
+    this.updateVotedComments(updatedComment)
   }
 
   loadChannel = async () => {
@@ -167,10 +180,10 @@ export class SearchPage extends React.Component<Props, State> {
       searchProcessing,
       initialLoad,
       total,
-      upvotedPosts,
-      toggleUpvote
+      toggleUpvote,
+      upvotedPosts
     } = this.props
-    const { from } = this.state
+    const { from, votedComments } = this.state
 
     if (searchProcessing && initialLoad) {
       return <PostLoading />
@@ -200,6 +213,13 @@ export class SearchPage extends React.Component<Props, State> {
                 ? upvotedPosts.get(result.post_id)
                 : null
             }
+            votedComment={
+              result.object_type === "comment"
+                ? votedComments.get(result.comment_id) || null
+                : null
+            }
+            commentDownvote={this.downvote}
+            commentUpvote={this.upvote}
           />
         ))}
       </InfiniteScroll>
@@ -211,6 +231,24 @@ export class SearchPage extends React.Component<Props, State> {
     const text = event ? event.target.value : ""
     this.setState({ text })
   }
+
+  upvote = async (comment: CommentInTree) => {
+    const { dispatch } = this.props
+    const updatedComment = await dispatch(
+      actions.comments.patch(comment.id, {
+        upvoted: !comment.upvoted
+      })
+    )
+    this.updateVotedComments(updatedComment)
+  }
+
+  updateVotedComments = (comment: CommentInTree) => {
+    const { votedComments } = this.state
+    const upvotedCommentMap = new Map(votedComments)
+    upvotedCommentMap.set(comment.id, comment)
+    this.setState({votedComments: upvotedCommentMap})
+  }
+
 
   render() {
     const {
@@ -273,14 +311,14 @@ const mapStateToProps = (state, ownProps) => {
     channelLoaded,
     channelProcessing,
     channelName,
-    upvotedPosts,
     // loaded is used in withLoading but we only want to look at channel loaded since search loaded will change
     // whenever the user makes a new search
     loaded: channelName ? channelLoaded : true,
     notFound,
     notAuthorized,
     searchLoaded,
-    searchProcessing
+    searchProcessing,
+    upvotedPosts
   }
 }
 
@@ -295,7 +333,8 @@ const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps: Props) => ({
     const channelName = getChannelName(ownProps)
     await dispatch(actions.channels.get(channelName))
   },
-  toggleUpvote: toggleUpvote(dispatch)
+  toggleUpvote: toggleUpvote(dispatch),
+  dispatch
 })
 
 export default R.compose(

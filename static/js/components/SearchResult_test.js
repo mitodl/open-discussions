@@ -18,13 +18,13 @@ import { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 import { profileURL } from "../lib/url"
 
 describe("SearchResult", () => {
-  const render = ({ result, upvotedPost }) =>
-    shallow(<SearchResult result={result} upvotedPost={upvotedPost} />)
+  const render = ({ result, props }) =>
+    shallow(<SearchResult result={result} {...props}/>)
 
   it("renders a profile card", () => {
     const result = makeProfileResult()
-    const upvotedPost = null
-    const wrapper = render({ result, upvotedPost }).dive()
+    const props = {}
+    const wrapper = render({ result, props }).dive()
     const profile = searchResultToProfile(result)
     const profileImage = wrapper.find("Connect(ProfileImage)")
     assert.deepEqual(profileImage.prop("profile"), profile)
@@ -48,8 +48,8 @@ describe("SearchResult", () => {
 
   it("renders a post", () => {
     const result = makePostResult()
-    const upvotedPost = null
-    const wrapper = render({ result, upvotedPost }).dive()
+    const props = {}
+    const wrapper = render({ result, props }).dive()
     const post = searchResultToPost(result)
     const postDisplay = wrapper.find("Connect(CompactPostDisplay)")
     assert.deepEqual(postDisplay.prop("post"), post)
@@ -61,17 +61,33 @@ describe("SearchResult", () => {
     const upvotedPost = Object.assign({}, post)
     upvotedPost.upvoted = true
     upvotedPost.score += 1
-    const wrapper = render({ result, upvotedPost }).dive()
+    const props = {upvotedPost}
+    const wrapper = render({ result, props }).dive()
     const postDisplay = wrapper.find("Connect(CompactPostDisplay)")
     assert.deepEqual(postDisplay.prop("post"), upvotedPost)
   })
 
   it("renders a comment", () => {
     const result = makeCommentResult()
-    const upvotedPost = null
-    const wrapper = render({ result, upvotedPost }).dive()
+    const props = {}
+    const wrapper = render({ result, props }).dive()
     const comment = searchResultToComment(result)
     const commentTree = wrapper.find("CommentTree")
     assert.deepEqual(commentTree.prop("comments"), [comment])
   })
+
+  it("renders a comment that has been voted on", () => {
+    const result = makeCommentResult()
+    const comment = searchResultToComment(result)
+    const votedComment = {
+      ...comment,
+      upvoted:  true,
+      score:    comment.score += 1
+    }
+    const props = {votedComment}
+    const wrapper = render({ result, props }).dive()
+    const commentTree = wrapper.find("CommentTree")
+    assert.deepEqual(commentTree.prop("comments"), [votedComment])
+  })
+
 })
