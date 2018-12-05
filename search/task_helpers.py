@@ -326,7 +326,11 @@ def update_indexed_score(instance, instance_type, vote_action=None):
 
     if instance_type not in [POST_TYPE, COMMENT_TYPE]:
         return
-    content_id = gen_post_id(instance.id) if instance_type == POST_TYPE else gen_comment_id(instance.id)
+    content_id = (
+        gen_post_id(instance.id)
+        if instance_type == POST_TYPE
+        else gen_comment_id(instance.id)
+    )
 
     increment_document_integer_field.delay(
         content_id,

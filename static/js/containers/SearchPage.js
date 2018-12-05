@@ -21,7 +21,7 @@ import { getChannelName } from "../lib/util"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
-import type {Channel, CommentInTree, Post} from "../flow/discussionTypes"
+import type { Channel, CommentInTree, Post } from "../flow/discussionTypes"
 import type { SearchInputs, SearchParams, Result } from "../flow/searchTypes"
 import { Cell, Grid } from "../components/Grid"
 
@@ -80,8 +80,8 @@ export class SearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      text: qs.parse(props.location.search).q,
-      from: 0,
+      text:          qs.parse(props.location.search).q,
+      from:          0,
       votedComments: new Map()
     }
   }
@@ -246,9 +246,8 @@ export class SearchPage extends React.Component<Props, State> {
     const { votedComments } = this.state
     const upvotedCommentMap = new Map(votedComments)
     upvotedCommentMap.set(comment.id, comment)
-    this.setState({votedComments: upvotedCommentMap})
+    this.setState({ votedComments: upvotedCommentMap })
   }
-
 
   render() {
     const {

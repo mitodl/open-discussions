@@ -19,7 +19,7 @@ import { profileURL } from "../lib/url"
 
 describe("SearchResult", () => {
   const render = ({ result, props }) =>
-    shallow(<SearchResult result={result} {...props}/>)
+    shallow(<SearchResult result={result} {...props} />)
 
   it("renders a profile card", () => {
     const result = makeProfileResult()
@@ -61,7 +61,7 @@ describe("SearchResult", () => {
     const upvotedPost = Object.assign({}, post)
     upvotedPost.upvoted = true
     upvotedPost.score += 1
-    const props = {upvotedPost}
+    const props = { upvotedPost }
     const wrapper = render({ result, props }).dive()
     const postDisplay = wrapper.find("Connect(CompactPostDisplay)")
     assert.deepEqual(postDisplay.prop("post"), upvotedPost)
@@ -81,13 +81,12 @@ describe("SearchResult", () => {
     const comment = searchResultToComment(result)
     const votedComment = {
       ...comment,
-      upvoted:  true,
-      score:    comment.score += 1
+      upvoted: true,
+      score:   (comment.score += 1)
     }
-    const props = {votedComment}
+    const props = { votedComment }
     const wrapper = render({ result, props }).dive()
     const commentTree = wrapper.find("CommentTree")
     assert.deepEqual(commentTree.prop("comments"), [votedComment])
   })
-
 })

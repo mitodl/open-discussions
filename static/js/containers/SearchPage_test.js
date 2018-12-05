@@ -10,8 +10,7 @@ import { actions } from "../actions"
 import { makePostResult, makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 import { makePost } from "../factories/posts"
-import {createCommentTree} from "../reducers/comments";
-import {makeCommentsResponse} from "../factories/comments";
+import { makeComment } from "../factories/comments"
 
 describe("SearchPage", () => {
   let helper,
@@ -223,7 +222,7 @@ describe("SearchPage", () => {
     assert.deepEqual(qs.parse(helper.currentLocation.search), { q: text, type })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
-      from: 0,
+      from:          0,
       text,
       votedComments: new Map()
     })
@@ -301,8 +300,8 @@ describe("SearchPage", () => {
     assert.deepEqual(qs.parse(helper.currentLocation.search), { type })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
-      from: 0,
-      text: undefined,
+      from:          0,
+      text:          undefined,
       votedComments: new Map()
     })
     assert.equal(
@@ -377,17 +376,20 @@ describe("SearchPage", () => {
     })
   })
 
-  it("calls updateVotedComments when upvote or downvote is triggered", async() => {
+  it("calls updateVotedComments when upvote or downvote is triggered", async () => {
     const { inner } = await renderPage()
-    const comment = createCommentTree(makeCommentsResponse(makePost()))[0]
-    helper.updateCommentStub.returns(Promise.resolve(comment))
-    comment.score = 215
-    await inner.instance().upvote(comment)
-    assert.deepEqual(inner.state().votedComments.get(comment.id).score, 215)
-    comment.score = 213
-    await inner.instance().downvote(comment)
-    assert.deepEqual(inner.state().votedComments.get(comment.id).score, 213)
+    const comments = [makeComment(makePost()), makeComment(makePost())]
+    helper.updateCommentStub.returns(Promise.resolve(comments[0]))
+    await inner.instance().upvote(comments[0])
+    assert.deepEqual(
+      inner.state().votedComments.get(comments[0].id),
+      comments[0]
+    )
+    helper.updateCommentStub.returns(Promise.resolve(comments[1]))
+    await inner.instance().downvote(comments[1])
+    assert.deepEqual(
+      inner.state().votedComments.get(comments[1].id),
+      comments[1]
+    )
   })
-
-
 })
