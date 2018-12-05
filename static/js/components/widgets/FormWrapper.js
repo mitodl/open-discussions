@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 
 export default class FormWrapper extends Component {
-
   submitAndClose = data => {
     const { updateWidgetList, closeForm } = this.props
     updateWidgetList(data)

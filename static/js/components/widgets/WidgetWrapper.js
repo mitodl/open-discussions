@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 
 export default class WidgetWrapper extends Component {
-
   moveWidgetUp = () => {
     const { moveWidget, position } = this.props
     moveWidget(position - 1)
