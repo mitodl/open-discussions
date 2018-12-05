@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-import Octicon from "react-component-octicons"
 
 export default class ListWrapper extends Component {
   /**
@@ -38,7 +37,7 @@ export default class ListWrapper extends Component {
         className="btn btn-info col add-widget-btn"
         onClick={this.addWidget}
       >
-        <Octicon name="plus" />
+        <i className="material-icons">add</i>
       </button>
     )
   }
@@ -94,7 +93,7 @@ export default class ListWrapper extends Component {
             }`}
             onClick={this.toggleEditMode}
           >
-            <Octicon name="pencil" />
+            <i className="material-icons">create</i>
           </button>
           {editMode ? this.renderAddWidgetButton() : null}
         </div>

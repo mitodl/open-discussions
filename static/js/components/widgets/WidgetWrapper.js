@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-import Octicon from "react-component-octicons"
 
 export default class WidgetWrapper extends Component {
   /**
@@ -64,7 +63,7 @@ export default class WidgetWrapper extends Component {
           onClick={this.moveWidgetUp}
           title="Move widget up"
         >
-          <Octicon name="chevron-up" />
+          <i className="material-icons">keyboard_arrow_up</i>
         </button>
         <button
           className="btn btn-info col"
@@ -72,21 +71,21 @@ export default class WidgetWrapper extends Component {
           onClick={this.moveWidgetDown}
           title="Move widget down"
         >
-          <Octicon name="chevron-down" />
+          <i className="material-icons">keyboard_arrow_down</i>
         </button>
         <button
           className="btn btn-info col"
           onClick={this.editWidget}
           title="Update widget"
         >
-          <Octicon name="pencil" />
+          <i className="material-icons">create</i>
         </button>
         <button
           className="btn btn-danger col"
           onClick={this.deleteWidget}
           title="Delete widget"
         >
-          <Octicon name="x" />
+          <i className="material-icons">clear</i>
         </button>
       </div>
     )
