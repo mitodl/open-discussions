@@ -335,15 +335,15 @@ describe("CompactPostDisplay", () => {
 
   //
   ;[true, false].forEach(isAnonymous => {
-    [true, false].forEach(menuDisabled => {
+    [true, false].forEach(useSearchPageUI => {
       it(`${shouldIf(
-        isAnonymous || menuDisabled
+        isAnonymous || useSearchPageUI
       )} hide the menu open button`, () => {
         helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(isAnonymous)
-        const wrapper = renderPostDisplay({ post, menuDisabled })
+        const wrapper = renderPostDisplay({ post, useSearchPageUI })
         assert.equal(
           wrapper.find("i.more_vert").exists(),
-          !isAnonymous && !menuDisabled
+          !isAnonymous && !useSearchPageUI
         )
       })
     })

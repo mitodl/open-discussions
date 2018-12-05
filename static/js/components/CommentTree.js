@@ -59,7 +59,7 @@ type Props = {
   toggleFollowComment?: Function,
   curriedDropdownMenufunc: (key: string) => Object,
   dropdownMenus: Set<string>,
-  menuDisabled?: boolean
+  useSearchPageUI?: boolean
 }
 
 export const commentDropdownKey = (c: CommentInTree) =>
@@ -106,7 +106,7 @@ export default class CommentTree extends React.Component<Props> {
       ignoreCommentReports,
       curriedDropdownMenufunc,
       dropdownMenus,
-      menuDisabled
+      useSearchPageUI
     } = this.props
     const editFormKey = editCommentKey(comment)
 
@@ -132,7 +132,7 @@ export default class CommentTree extends React.Component<Props> {
         {atMaxDepth ||
         moderationUI ||
         comment.deleted ||
-        !beginEditing ? null : (
+        useSearchPageUI ? null : (
             <ReplyButton
               beginEditing={e => {
                 if (beginEditing) {
@@ -160,7 +160,7 @@ export default class CommentTree extends React.Component<Props> {
             />
           ) : null}
         </div>
-        {!userIsAnonymous() && !menuDisabled ? (
+        {!userIsAnonymous() && !useSearchPageUI ? (
           <div>
             <i className="material-icons more_vert" onClick={showDropdown}>
               more_vert

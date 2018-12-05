@@ -169,8 +169,8 @@ describe("CommentTree", () => {
     assert.ok(beginEditingStub.calledWith(replyToCommentKey(comments[0])))
   })
 
-  it('should not include a "reply" button if beginEditing function is null', () => {
-    const wrapper = renderCommentTree({ beginEditing: null })
+  it('should not include a "reply" button if useSearchPageUI is true', () => {
+    const wrapper = renderCommentTree({ useSearchPageUI: true })
     assert.notOk(wrapper.find(".comment-action-button.reply-button").exists())
   })
 
@@ -187,16 +187,16 @@ describe("CommentTree", () => {
   })
 
   //
-  ;[true, false].forEach(menuDisabled => {
+  ;[true, false].forEach(useSearchPageUI => {
     ["testuser", null].forEach(username => {
       it(`${shouldIf(
-        username !== null && !menuDisabled
+        username !== null && !useSearchPageUI
       )} include a showMenu icon`, () => {
         SETTINGS.username = username
-        const wrapper = renderCommentTree({ menuDisabled })
+        const wrapper = renderCommentTree({ useSearchPageUI })
         assert.equal(
           wrapper.find(".more_vert").exists(),
-          username !== null && !menuDisabled
+          username !== null && !useSearchPageUI
         )
       })
     })
