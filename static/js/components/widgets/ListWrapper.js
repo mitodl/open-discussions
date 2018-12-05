@@ -1,16 +1,6 @@
 import React, { Component } from "react"
 
 export default class ListWrapper extends Component {
-  /**
-   * _defaultListWrapper is a basic wrapper for the widget-list component. It tracks when the user is adding or
-   * editing a widget and passes that status down to the widget and form wrappers so that they can render appropriately
-   *
-   * Props:
-   *    renderNewWidgetForm(props): renders a New Widget Form and passes props to the FormWrapper
-   *    renderEditWidgetForm(widgetId, props): renders an Edit Widget Form for the widget with id widgetId and
-   *      passes props to the FormWrapper
-   *    renderList(props): renders the list of widgets, passing props to each widgetWrapper
-   */
   state = {
     editMode:       false,
     addWidgetForm:  false,
@@ -18,9 +8,6 @@ export default class ListWrapper extends Component {
   }
 
   addWidget = () => {
-    /**
-     * addWidget is the onClick for the addWidgetButton. It sets the state so that a new widget form is rendered
-     */
     this.setState({
       editMode:       true,
       addWidgetForm:  true,
@@ -29,9 +16,6 @@ export default class ListWrapper extends Component {
   }
 
   renderAddWidgetButton = () => {
-    /**
-     * renderAddWidgetButton creates a button to add a new widget
-     */
     return (
       <button
         className="btn btn-info col add-widget-btn"
@@ -43,9 +27,6 @@ export default class ListWrapper extends Component {
   }
 
   closeForm = () => {
-    /**
-     * closeForm sets the state so that no forms are rendered
-     */
     this.setState({
       addWidgetForm:  false,
       editWidgetForm: null
@@ -53,9 +34,6 @@ export default class ListWrapper extends Component {
   }
 
   toggleEditMode = () => {
-    /**
-     * toggleEditMode toggles the value of editMode
-     */
     const { editMode } = this.state
     this.setState({
       editMode:       !editMode,
@@ -65,12 +43,6 @@ export default class ListWrapper extends Component {
   }
 
   editWidget = widgetId => {
-    /**
-     * editWidget sets the state so that an edit widget form is rendered
-     *
-     * inputs:
-     *    widgetId: the widget to edit
-     */
     this.setState({
       editMode:       true,
       editWidgetForm: widgetId,
