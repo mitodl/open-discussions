@@ -1,8 +1,7 @@
 import React, { Component } from "react"
 
 import WidgetForm from "./WidgetForm"
-
-import { apiPath } from "../../lib/widgets"
+import { getWidgetConfigurations, addWidget } from "../../lib/api"
 
 export default class NewWidgetForm extends Component {
   state = {
@@ -11,38 +10,28 @@ export default class NewWidgetForm extends Component {
   }
 
   componentDidMount() {
-    const { errorHandler, fetchData } = this.props
-    fetchData(apiPath("get_configurations"))
-      .then(data => {
-        this.setState({
-          widgetClassConfigurations: data.widgetClassConfigurations,
-          widgetClasses:             Object.keys(data.widgetClassConfigurations)
-        })
-      })
-      .catch(errorHandler)
+    this.loadData()
   }
 
-  onSubmit = (widgetClass, formData) => {
-    const {
-      errorHandler,
-      fetchData,
-      onSubmit,
-      widgetListId,
-      listLength
-    } = this.props
-    const { title, ...configuration } = formData
-    fetchData(apiPath("widget"), {
-      body: JSON.stringify({
-        configuration: configuration,
-        title:         title,
-        position:      listLength,
-        widget_list:   widgetListId,
-        widget_class:  widgetClass
-      }),
-      method: "POST"
+  loadData = async () => {
+    const data = await getWidgetConfigurations()
+    this.setState({
+      widgetClassConfigurations: data.widgetClassConfigurations,
+      widgetClasses:             Object.keys(data.widgetClassConfigurations)
     })
-      .then(onSubmit)
-      .catch(errorHandler)
+  }
+
+  onSubmit = async (widgetClass, formData) => {
+    const { onSubmit, widgetListId, listLength } = this.props
+    const { title, ...configuration } = formData
+    const data = await addWidget({
+      configuration: configuration,
+      title:         title,
+      position:      listLength,
+      widget_list:   widgetListId,
+      widget_class:  widgetClass
+    })
+    onSubmit(data)
   }
 
   render() {

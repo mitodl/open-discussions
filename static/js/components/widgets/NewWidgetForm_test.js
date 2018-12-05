@@ -3,13 +3,12 @@ import { mount } from "enzyme/build"
 import { expect } from "chai"
 import sinon from "sinon"
 
-import { apiPath } from "../../lib/widgets"
-
 import NewWidgetForm from "./NewWidgetForm"
 import Loader from "./Loader"
 
+import IntegrationTestHelper from "../../util/integration_test_helper"
+
 describe("<NewWidgetForm />", () => {
-  // props for a NewWidgetForm
   const dummyWidgetListId = 2
   const dummyListLength = 4
   const dummyWidgetClasses = ["Text", "Url"]
@@ -65,44 +64,52 @@ describe("<NewWidgetForm />", () => {
     body:  "dummyBody"
   }
 
-  const dummyFetch = () => Promise.resolve(null)
-
-  // General props for both types of widgetForms, edit and new
-  const dummyGeneralFormProps = {
-    widgetListId: dummyWidgetListId,
-    fetchData:    dummyFetch,
-    errorHandler: sinon.spy(),
-    onSubmit:     sinon.spy(),
-    Loader:       Loader
-  }
-
-  const fetchSpy = sinon.spy(dummyGeneralFormProps, "fetchData")
-  const resetSpyHistory = () => {
-    fetchSpy.resetHistory()
-    dummyGeneralFormProps.errorHandler.resetHistory()
-    dummyGeneralFormProps.onSubmit.resetHistory()
-  }
-
-  // props for a NewWidgetForm
-  const dummyNewWidgetFormProps = {
-    listLength: dummyListLength,
-    ...dummyGeneralFormProps
-  }
-
   const dummyNewWidgetFormState = {
     widgetClassConfigurations: dummyWidgetClassConfigurations,
     widgetClasses:             dummyWidgetClasses
   }
 
+  let helper
+
+  beforeEach(() => {
+    helper = new IntegrationTestHelper()
+    helper.getWidgetConfigurationsStub.returns(
+      Promise.resolve({
+        widgetClassConfigurations: dummyWidgetClassConfiguration
+      })
+    )
+    helper.addWidgetStub.returns(
+      Promise.resolve({
+        widgetClassConfigurations: dummyWidgetClassConfiguration
+      })
+    )
+  })
+
+  afterEach(() => {
+    helper.cleanup()
+  })
+
+  const render = (props = {}) =>
+    mount(
+      <NewWidgetForm
+        listLength={dummyListLength}
+        widgetListId={dummyWidgetListId}
+        errorHandler={helper.sandbox.spy()}
+        onSubmit={helper.sandbox.spy()}
+        Loader={Loader}
+        {...props}
+      />
+    )
+
   // Test default behavior
   it("returns loader if no data is loaded", () => {
-    const wrap = mount(<NewWidgetForm {...dummyNewWidgetFormProps} />)
+    const wrap = render()
 
     expect(wrap.exists(".default-loader")).to.equal(true)
   })
 
   it("renders a blank WidgetForm if data is loaded and that form submits properly", () => {
-    const wrap = mount(<NewWidgetForm {...dummyNewWidgetFormProps} />)
+    const wrap = render()
     wrap.setState(dummyNewWidgetFormState)
     wrap.update()
 
@@ -121,38 +128,26 @@ describe("<NewWidgetForm />", () => {
     wrap.find("WidgetForm").setState({ formData: dummyFormData })
     wrap.simulate("submit")
     const { title, ...configuration } = dummyFormData
-    expect(
-      fetchSpy.withArgs(apiPath("widget"), {
-        body: JSON.stringify({
-          configuration: configuration,
-          title:         title,
-          position:      dummyListLength,
-          widget_list:   dummyWidgetListId,
-          widget_class:  ""
-        }),
-        method: "POST"
-      }).callCount
-    ).to.equal(1)
-    resetSpyHistory()
+    sinon.assert.calledWith(helper.addWidgetStub, {
+      configuration: configuration,
+      title:         title,
+      position:      dummyListLength,
+      widget_list:   dummyWidgetListId,
+      widget_class:  ""
+    })
   })
 
   it("handles a null submit", () => {
-    const wrap = mount(<NewWidgetForm {...dummyNewWidgetFormProps} />)
+    const wrap = render()
     wrap.setState(dummyNewWidgetFormState)
     wrap.update()
     wrap.simulate("submit")
-    expect(
-      fetchSpy.withArgs(apiPath("widget"), {
-        body: JSON.stringify({
-          configuration: {},
-          title:         null,
-          position:      dummyListLength,
-          widget_list:   dummyWidgetListId,
-          widget_class:  ""
-        }),
-        method: "POST"
-      }).callCount
-    ).to.equal(1)
-    resetSpyHistory()
+    sinon.assert.calledWith(helper.addWidgetStub, {
+      configuration: {},
+      title:         null,
+      position:      dummyListLength,
+      widget_list:   dummyWidgetListId,
+      widget_class:  ""
+    })
   })
 })

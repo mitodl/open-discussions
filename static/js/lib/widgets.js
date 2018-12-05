@@ -1,28 +1,6 @@
 import _ from "lodash"
 
-function apiPath(name, pk) {
-  /**
-   * constructs an api path based on the view name and the list and widget ids
-   */
-  const apiBase = "/api/v1"
-  switch (name) {
-  case "get_lists":
-    return `${apiBase}/list/`
-
-  case "get_configurations":
-    return `${apiBase}/list/get_configurations/`
-
-  case "widget_list":
-    return `${apiBase}/list/${pk ? `${pk}/` : ""}`
-
-  case "widget":
-    return `${apiBase}/widget/${pk ? `${pk}/` : ""}`
-  }
-}
-
-// TODO: split into two functions
-
-function makeOptionsFromList(values) {
+export function makeOptionsFromList(values) {
   /**
    * constructs an options object from a list of values
    */
@@ -33,7 +11,7 @@ function makeOptionsFromList(values) {
   }))
 }
 
-function makeOptionsFromObject(options) {
+export function makeOptionsFromObject(options) {
   /**
    * constructs an options object from an object of key, value mappings where the keys are the value and the value
    * is the key and label
@@ -45,5 +23,3 @@ function makeOptionsFromObject(options) {
     value: keys[index]
   }))
 }
-
-export { makeOptionsFromList, makeOptionsFromObject, apiPath }

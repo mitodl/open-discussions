@@ -8,7 +8,7 @@ import WidgetWrapper from "./WidgetWrapper"
 import EditWidgetForm from "./EditWidgetForm"
 import NewWidgetForm from "./NewWidgetForm"
 
-import { apiPath } from "../../lib/widgets"
+import { getWidgetList, deleteWidget, updateWidget } from "../../lib/api"
 
 export default class WidgetList extends Component {
   static defaultProps = {
@@ -21,11 +21,7 @@ export default class WidgetList extends Component {
     widgetWrapperProps:     null,
     defaultRenderer:        Renderer,
     disableWidgetFramework: false,
-    errorHandler:           console.error, // eslint-disable-line no-console
-    fetchData:              () => {
-      throw new Error("unimplemented")
-    },
-    renderers: {}
+    renderers:              {}
   }
 
   state = { widgetInstances: null }
@@ -40,32 +36,26 @@ export default class WidgetList extends Component {
     }
   }
 
-  loadData = () => {
-    const { widgetListId, errorHandler, fetchData } = this.props
-    fetchData(apiPath("widget_list", widgetListId))
-      .then(this.updateWidgetList)
-      .catch(errorHandler)
+  loadData = async () => {
+    const { widgetListId } = this.props
+    const data = await getWidgetList(widgetListId)
+    this.updateWidgetList(data)
   }
 
   updateWidgetList = data => {
     this.setState({ widgetInstances: data })
   }
 
-  deleteWidget = widgetId => {
-    const { errorHandler, fetchData } = this.props
-    fetchData(apiPath("widget", widgetId), { method: "DELETE" })
-      .then(this.updateWidgetList)
-      .catch(errorHandler)
+  deleteWidget = async widgetId => {
+    const data = await deleteWidget(widgetId)
+    this.updateWidgetList(data)
   }
 
-  moveWidget = (widgetId, position) => {
-    const { errorHandler, fetchData } = this.props
-    fetchData(apiPath("widget", widgetId), {
-      body:   JSON.stringify({ position: position }),
-      method: "PATCH"
+  moveWidget = async (widgetId, position) => {
+    const data = await updateWidget(widgetId, {
+      position: position
     })
-      .then(this.updateWidgetList)
-      .catch(errorHandler)
+    this.updateWidgetList(data)
   }
 
   makePassThroughProps = widgetInstance => {
@@ -96,11 +86,9 @@ export default class WidgetList extends Component {
   }
 
   makeFormProps = () => {
-    const { widgetListId, errorHandler, fetchData, Loader } = this.props
+    const { widgetListId, Loader } = this.props
     const { widgetInstances } = this.state
     return {
-      fetchData:    fetchData,
-      errorHandler: errorHandler,
       Loader:       Loader,
       widgetListId: widgetListId,
       listLength:   widgetInstances.length,
