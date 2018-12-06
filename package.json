@@ -102,6 +102,7 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scrollbar": "^0.5.4",
+    "react-select": "^2.1.2",
     "react-share": "^2.2.0",
     "react-test-renderer": "^16.4.0",
     "redux": "^3.7.2",
