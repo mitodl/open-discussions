@@ -108,6 +108,17 @@ describe("CommentTree", () => {
     assert.equal(url, absolutizeURL(permalinkFunc(comments[0].id)))
   })
 
+  //
+  ;[true, false].forEach(useSearchPageUI => {
+    it(`${shouldIf(!useSearchPageUI)} show the Share button`, () => {
+      const wrapper = renderCommentTree({ useSearchPageUI })
+      assert.equal(
+        wrapper.find(".share-button-wrapper").exists(),
+        !useSearchPageUI
+      )
+    })
+  })
+
   it("should render all replies to a top-level comment", () => {
     const wrapper = renderCommentTree()
     const firstComment = wrapper.find(".top-level-comment").at(0)

@@ -145,21 +145,23 @@ export default class CommentTree extends React.Component<Props> {
               }}
             />
           )}
-        <div className="share-button-wrapper">
-          <div
-            className="comment-action-button share-button"
-            onClick={showShareMenu}
-          >
-            share
+        {useSearchPageUI ? null : (
+          <div className="share-button-wrapper">
+            <div
+              className="comment-action-button share-button"
+              onClick={showShareMenu}
+            >
+              share
+            </div>
+            {commentShareOpen ? (
+              <SharePopup
+                url={absolutizeURL(commentPermalink(comment.id))}
+                closePopup={hideShareMenu}
+                hideSocialButtons={isPrivateChannel}
+              />
+            ) : null}
           </div>
-          {commentShareOpen ? (
-            <SharePopup
-              url={absolutizeURL(commentPermalink(comment.id))}
-              closePopup={hideShareMenu}
-              hideSocialButtons={isPrivateChannel}
-            />
-          ) : null}
-        </div>
+        )}
         {!userIsAnonymous() && !useSearchPageUI ? (
           <div>
             <i className="material-icons more_vert" onClick={showDropdown}>
