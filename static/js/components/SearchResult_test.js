@@ -80,7 +80,7 @@ describe("SearchResult", () => {
       upvoted: true,
       score:   (comment.score += 1)
     }
-    const wrapper = render(result, {votedComment}).dive()
+    const wrapper = render(result, { votedComment }).dive()
     const commentTree = wrapper.find("CommentTree")
     assert.deepEqual(commentTree.prop("comments"), [votedComment])
   })
