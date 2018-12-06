@@ -38,12 +38,7 @@ import type {
   PostListResponse
 } from "../flow/discussionTypes"
 import type { NotificationSetting } from "../flow/settingsTypes"
-import type {
-  WidgetConfigurationsResponse,
-  WidgetListsResponse,
-  WidgetListResponse,
-  WidgetResponse
-} from "../flow/widgetTypes"
+import type { WidgetListResponse } from "../flow/widgetTypes"
 import type { EmbedlyResponse } from "../reducers/embedly"
 import type { SearchParams } from "../flow/searchTypes"
 
@@ -563,31 +558,8 @@ export function getSocialAuthTypes(): Promise<Array<SocialAuth>> {
 
 export const getCKEditorJWT = () => fetchWithAuthFailure("/api/v0/ckeditor/")
 
-export const getWidgetLists = (): Promise<WidgetListsResponse> =>
-  fetchJSONWithAuthFailure("/api/v1/list/")
 export const getWidgetList = (
   widgetListId: number
-): Promise<WidgetListResponse> =>
-  fetchJSONWithAuthFailure(`/api/v1/list/${widgetListId}/`)
-export const getWidget = (widgetListId: number): Promise<WidgetResponse> =>
-  fetchJSONWithAuthFailure(`/api/v1/widget/${widgetListId}/`)
-export const addWidget = (payload: Object): Promise<WidgetResponse> =>
-  // TODO: what is the response really?
-  fetchJSONWithAuthFailure("/api/v1/widget/", {
-    body:   JSON.stringify(payload),
-    method: "POST"
-  })
-export const updateWidget = (
-  widgetListId: number,
-  payload: Object
-): Promise<WidgetResponse> =>
-  // TODO: what is the response really?
-  fetchJSONWithAuthFailure(`/api/v1/widget/${widgetListId}/`, {
-    body:   JSON.stringify(payload),
-    method: "PATCH"
-  })
-export const deleteWidget = (widgetListId: number): Promise<any> =>
-  fetchJSONWithAuthFailure(`/api/v1/widget/${widgetListId}/`, {
-    method: "DELETE"
-  })
-export const getWidgetConfigurations = (): Promise<WidgetConfigurationsResponse> => fetchJSONWithAuthFailure(`/api/v1/list/get_configurations/`)
+): Promise<WidgetListResponse> => {
+  return fetchJSONWithAuthFailure(`/api/v0/widget_lists/${widgetListId}/`)
+}

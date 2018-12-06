@@ -23,6 +23,7 @@ import { profileImageEndpoint } from "../reducers/profile_image"
 import { channelAvatarEndpoint } from "../reducers/channel_avatar"
 import { channelBannerEndpoint } from "../reducers/channel_banner"
 import { searchEndpoint } from "../reducers/search"
+import { widgetsEndpoint } from "../reducers/widgets"
 
 import type { Dispatch } from "redux"
 
@@ -51,7 +52,8 @@ export const endpoints = [
   profileImageEndpoint,
   channelAvatarEndpoint,
   channelBannerEndpoint,
-  searchEndpoint
+  searchEndpoint,
+  widgetsEndpoint
 ]
 
 /**
