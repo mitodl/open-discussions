@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
 
@@ -12,6 +13,7 @@ import { actions } from "../../actions"
 import { formatTitle } from "../../lib/title"
 import { channelURL } from "../../lib/url"
 import * as validationFuncs from "../../lib/validation"
+import { shouldIf, isIf } from "../../lib/test_utils"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("EditChannelAppearancePage", () => {
@@ -201,6 +203,36 @@ describe("EditChannelAppearancePage", () => {
         })
       }
     )
+    ;[[true, true], [false, false]].forEach(([isAdmin, expectIncludeTitle]) => {
+      it(`${shouldIf(
+        expectIncludeTitle
+      )} send patch request with title if user ${isIf(
+        isAdmin
+      )} an admin`, async () => {
+        SETTINGS.is_admin = isAdmin
+        const { inner } = await render({
+          forms: {
+            [EDIT_CHANNEL_KEY]: {
+              value: {
+                description: "a description",
+                title:       "a title"
+              }
+            }
+          }
+        })
+        await inner
+          .find("EditChannelAppearanceForm")
+          .props()
+          .onSubmit({ preventDefault: helper.sandbox.stub() })
+
+        sinon.assert.calledOnce(helper.updateChannelStub)
+        const channelUpdateArg = helper.updateChannelStub.firstCall.args[0]
+        assert.equal(
+          channelUpdateArg.hasOwnProperty("title"),
+          expectIncludeTitle
+        )
+      })
+    })
 
     it("doesn't submit if there's a validation error", async () => {
       helper.sandbox

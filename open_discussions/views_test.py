@@ -40,12 +40,14 @@ def test_webpack_url(
             "user_email": test_user.email,
             "username": test_user.username,
             "user_full_name": test_user.profile.name,
+            "is_admin": test_user.is_superuser,
         }
     else:
         expected_user_values = {
             "user_email": None,
             "username": None,
             "user_full_name": None,
+            "is_admin": False,
         }
 
     response = client.get(reverse("open_discussions-index"))

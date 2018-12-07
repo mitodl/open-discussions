@@ -27,6 +27,8 @@ export const shouldIf = (tf: boolean) => (tf ? "should" : "should not")
 
 export const shouldIfGt0 = (num: number) => shouldIf(num > 0)
 
+export const isIf = (tf: boolean) => (tf ? "is" : "is not")
+
 export class TestPage extends React.Component<*, *> {
   props: {}
 

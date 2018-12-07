@@ -2,6 +2,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
 
 from channels.api import Api
@@ -79,8 +80,7 @@ class ChannelDetailView(RetrieveUpdateAPIView):
 
     def get_object(self):
         """Get channel referenced by API"""
-        api = Api(user=self.request.user)
-        return api.get_channel(self.kwargs["channel_name"])
+        return self.request.channel_api.get_channel(self.kwargs["channel_name"])
 
     def get(self, request, *args, **kwargs):
         # we don't want to let this through to Reddit, because it blows up :/
@@ -91,5 +91,19 @@ class ChannelDetailView(RetrieveUpdateAPIView):
             return super().get(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
+        # Deny permission if the user is not a superuser and is attempting to update the channel title.
+        if not self.request.user.is_superuser and "title" in self.request.data:
+            raise PermissionDenied()
         with translate_praw_exceptions(request.user):
             return super().patch(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        # Deny permission if the user is not a superuser and is attempting to update the channel title.
+        channel = self.get_object()
+        if (
+            not self.request.user.is_superuser
+            and self.request.data.get("title") != channel.title
+        ):
+            raise PermissionDenied()
+        with translate_praw_exceptions(request.user):
+            return super().put(request, *args, **kwargs)

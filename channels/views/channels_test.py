@@ -424,6 +424,43 @@ def test_patch_channel_forbidden(staff_client):
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
+@pytest.mark.parametrize("request_method", ["patch", "put"])
+def test_update_title_non_superuser_forbidden(
+    settings, index_user, staff_client, staff_user, reddit_factories, request_method
+):
+    """
+    Create a channel and assert the response for no descriptions
+    """
+    staff_user.is_superuser = False
+    staff_user.save()
+
+    # NOTE: Creating a channel in this way because I couldn't find a fixture or a
+    # straightforward way to prepare channel data for a PUT request
+    settings.INDEXING_API_USERNAME = index_user.username
+    url = reverse("channel-list")
+    channel = reddit_factories.channel(
+        "private", user=staff_user, strategy=STRATEGY_BUILD
+    )
+    payload = {
+        "channel_type": channel.channel_type,
+        "link_type": "any",
+        "name": channel.name,
+        "title": channel.title,
+    }
+    staff_client.post(url, data=payload)
+
+    url = reverse("channel-detail", kwargs={"channel_name": channel.name})
+    request_func = getattr(staff_client, request_method)
+    serialized_channel_unchanged_title = dict(payload)
+    if request_method == "patch":
+        del serialized_channel_unchanged_title["title"]
+    resp = request_func(url, serialized_channel_unchanged_title)
+    assert resp.status_code == status.HTTP_200_OK
+    payload["title"] = "{} [updated]".format(payload["title"])
+    resp = request_func(url, payload)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
 def test_patch_channel_not_found(staff_client):
     """
     Update a channel's settings for a missing channel

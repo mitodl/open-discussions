@@ -1,0 +1,436 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2018-12-05T19:17:15",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.20.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CXZWTYERDENZ6VPYW2QGZTRM"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDI0NtQtDgooNK2oKsrO8rQwzElzLymvSM71tQxPTg5V0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLbF61ZlW3jHezgGGfv6hxsE50ZWBrmEO5sY+0WC9KSklmUmp8ZnpoAMhnCUagEZ+FCZuAAAAA==",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 05 Dec 2018 19:17:15 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=uXp16Iw8QtqxWPx4fk; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Fri, 04-Dec-2020 19:17:15 GMT",
+            "loidcreated=2018-12-05T19%3A17%3A14.928Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Fri, 04-Dec-2020 19:17:15 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CXZWTYERDENZ6VPYW2QGZTRM"
+      }
+    },
+    {
+      "recorded_at": "2018-12-05T19:17:15",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "allow_top=True&api_type=json&description=Enim+perspiciatis+porro+omnis+hic+quasi.+Dolore+possimus+sed+corporis+vitae.+Et+nemo+exercitationem+reprehenderit+expedita.+Alias+nam+at+nulla.%0APraesentium+qui+nulla+odit.+Quas+unde+dolorum+unde+recusandae+quod+ab.+Nemo+eaque+optio+dolorum+consectetur.%0AMolestias+tempora+ad+iste+veritatis+autem.+Magnam+aliquam+suscipit+sit+reiciendis+placeat+hic+accusamus.+Magni+ad+quibusdam+impedit+consequatur+maxime+ea+quisquam.&link_type=any&name=1544037435_id&public_description=Quod+voluptatum+quia+natus+in+culpa+eligendi+autem.&title=Laboriosam+debitis+nihil+animi+corrupti.&type=public&wikimode=disabled"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 131-sRPq5xzrkjI81lfGtwxcmM9WccU"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "642"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=uXp16Iw8QtqxWPx4fk; loidcreated=2018-12-05T19%3A17%3A14.928Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.55.3 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 05 Dec 2018 19:17:15 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "165"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-12-05T19:17:18",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 131-sRPq5xzrkjI81lfGtwxcmM9WccU"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=uXp16Iw8QtqxWPx4fk; loidcreated=2018-12-05T19%3A17%3A14.928Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.55.3 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1544037435_id/about/edit/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"subreddit_settings\", \"data\": {\"default_set\": true, \"subreddit_id\": \"t5_c\", \"domain\": null, \"allow_images\": null, \"show_media\": false, \"wiki_edit_age\": 0, \"submit_text\": \"\", \"spam_links\": null, \"title\": \"Laboriosam debitis nihil animi corrupti.\", \"collapse_deleted_comments\": false, \"wikimode\": \"disabled\", \"over_18\": false, \"suggested_comment_sort\": null, \"description\": \"Enim perspiciatis porro omnis hic quasi. Dolore possimus sed corporis vitae. Et nemo exercitationem reprehenderit expedita. Alias nam at nulla.\\nPraesentium qui nulla odit. Quas unde dolorum unde recusandae quod ab. Nemo eaque optio dolorum consectetur.\\nMolestias tempora ad iste veritatis autem. Magnam aliquam suscipit sit reiciendis placeat hic accusamus. Magni ad quibusdam impedit consequatur maxime ea quisquam.\", \"submit_link_label\": null, \"spam_comments\": null, \"spam_selfposts\": null, \"submit_text_label\": null, \"language\": \"en\", \"wiki_edit_karma\": 0, \"hide_ads\": false, \"header_hover_text\": null, \"public_traffic\": false, \"public_description\": \"Quod voluptatum quia natus in culpa eligendi autem.\", \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"public\", \"exclude_banned_modqueue\": false, \"content_options\": \"any\"}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "1238"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 05 Dec 2018 19:17:18 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "162"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=hoAwW4sbnr%2FYtPzYlu4HyoqnpXJm%2Fnz1GWdFxVBarEyVEIhlP%2BLBcWy1IkeMOvcAM3bu6b2aYurIZ0%2FYxIoB8BS59IGJgL%2FK"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1544037435_id/about/edit/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-12-05T19:17:18",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "allow_top=True&api_type=json&collapse_deleted_comments=False&comment_score_hide_mins=0&description=Enim+perspiciatis+porro+omnis+hic+quasi.+Dolore+possimus+sed+corporis+vitae.+Et+nemo+exercitationem+reprehenderit+expedita.+Alias+nam+at+nulla.%0APraesentium+qui+nulla+odit.+Quas+unde+dolorum+unde+recusandae+quod+ab.+Nemo+eaque+optio+dolorum+consectetur.%0AMolestias+tempora+ad+iste+veritatis+autem.+Magnam+aliquam+suscipit+sit+reiciendis+placeat+hic+accusamus.+Magni+ad+quibusdam+impedit+consequatur+maxime+ea+quisquam.&exclude_banned_modqueue=False&hide_ads=False&lang=en&link_type=any&over_18=False&public_description=Quod+voluptatum+quia+natus+in+culpa+eligendi+autem.&public_traffic=False&show_media=False&show_media_preview=True&sr=t5_c&submit_text=&title=Laboriosam+debitis+nihil+animi+corrupti.&type=public&wiki_edit_age=0&wiki_edit_karma=0&wikimode=disabled"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 131-sRPq5xzrkjI81lfGtwxcmM9WccU"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "865"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=uXp16Iw8QtqxWPx4fk; loidcreated=2018-12-05T19%3A17%3A14.928Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.55.3 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 05 Dec 2018 19:17:18 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "297.0"
+          ],
+          "x-ratelimit-reset": [
+            "162"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2018-12-05T19:17:18",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 131-sRPq5xzrkjI81lfGtwxcmM9WccU"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=uXp16Iw8QtqxWPx4fk; loidcreated=2018-12-05T19%3A17%3A14.928Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.55.3 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1544037435_id/about/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"c\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"1544037435_id\", \"header_img\": null, \"description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EEnim perspiciatis porro omnis hic quasi. Dolore possimus sed corporis vitae. Et nemo exercitationem reprehenderit expedita. Alias nam at nulla.\\nPraesentium qui nulla odit. Quas unde dolorum unde recusandae quod ab. Nemo eaque optio dolorum consectetur.\\nMolestias tempora ad iste veritatis autem. Magnam aliquam suscipit sit reiciendis placeat hic accusamus. Magni ad quibusdam impedit consequatur maxime ea quisquam.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"title\": \"Laboriosam debitis nihil animi corrupti.\", \"collapse_deleted_comments\": false, \"public_description\": \"Quod voluptatum quia natus in culpa eligendi autem.\", \"over18\": false, \"public_description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EQuod voluptatum quia natus in culpa eligendi autem.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"Enim perspiciatis porro omnis hic quasi. Dolore possimus sed corporis vitae. Et nemo exercitationem reprehenderit expedita. Alias nam at nulla.\\nPraesentium qui nulla odit. Quas unde dolorum unde recusandae quod ab. Nemo eaque optio dolorum consectetur.\\nMolestias tempora ad iste veritatis autem. Magnam aliquam suscipit sit reiciendis placeat hic accusamus. Magni ad quibusdam impedit consequatur maxime ea quisquam.\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 5, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 1, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_c\", \"created\": 1544037435.0, \"url\": \"/r/1544037435_id/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1544037435.0, \"banner_size\": null, \"user_is_moderator\": true, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"public\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "2284"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Wed, 05 Dec 2018 19:17:18 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "296.0"
+          ],
+          "x-ratelimit-reset": [
+            "162"
+          ],
+          "x-ratelimit-used": [
+            "4"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=VDVPhT5tc3Y50Rp%2Bt9uu%2F%2FRK0HsLWWe2ZHHpUBGwB1KAJaES5NxQtB9g07mUSMgp6hXdfY7lUxhq21tqQl9LPWWahm6eDt%2Bi"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1544037435_id/about/?raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
