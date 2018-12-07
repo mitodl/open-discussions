@@ -22,8 +22,10 @@ class Command(BaseCommand):
         api_client = Api(user=User.objects.get(username=settings.INDEXING_API_USERNAME))
         for channel in Channel.objects.all():
             subreddit = api_client.reddit.subreddit(channel.name)
-            reddit_posts = {a.id for a in subreddit.hot(limit=1000)}
-            django_posts = {a.post_id for a in channel.post_set.all()}
+            reddit_posts = {reddit_post.id for reddit_post in subreddit.hot(limit=1000)}
+            django_posts = {
+                django_post.post_id for django_post in channel.post_set.all()
+            }
             missing_posts = reddit_posts.difference(django_posts)
             for post_id in missing_posts:
                 submission = api_client.get_post(post_id)
