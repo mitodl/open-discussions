@@ -10,6 +10,7 @@ import { actions } from "../actions"
 import { makePostResult, makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 import { makePost } from "../factories/posts"
+import { makeComment } from "../factories/comments"
 
 describe("SearchPage", () => {
   let helper,
@@ -221,8 +222,9 @@ describe("SearchPage", () => {
     assert.deepEqual(qs.parse(helper.currentLocation.search), { q: text, type })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
-      from: 0,
-      text
+      from:          0,
+      text,
+      votedComments: new Map()
     })
   })
   ;[true, false].forEach(hasChannel => {
@@ -298,8 +300,9 @@ describe("SearchPage", () => {
     assert.deepEqual(qs.parse(helper.currentLocation.search), { type })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
-      from: 0,
-      text: undefined
+      from:          0,
+      text:          undefined,
+      votedComments: new Map()
     })
     assert.equal(
       store.getActions()[store.getActions().length - 2].type,
@@ -371,5 +374,22 @@ describe("SearchPage", () => {
       )
       assert.equal(inner.find("PostLoading").exists(), !loaded)
     })
+  })
+
+  it("calls updateVotedComments when upvote or downvote is triggered", async () => {
+    const { inner } = await renderPage()
+    const comments = [makeComment(makePost()), makeComment(makePost())]
+    helper.updateCommentStub.returns(Promise.resolve(comments[0]))
+    await inner.instance().upvote(comments[0])
+    assert.deepEqual(
+      inner.state().votedComments.get(comments[0].id),
+      comments[0]
+    )
+    helper.updateCommentStub.returns(Promise.resolve(comments[1]))
+    await inner.instance().downvote(comments[1])
+    assert.deepEqual(
+      inner.state().votedComments.get(comments[1].id),
+      comments[1]
+    )
   })
 })

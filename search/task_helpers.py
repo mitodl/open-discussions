@@ -324,11 +324,17 @@ def update_indexed_score(instance, instance_type, vote_action=None):
     else:
         raise ValueError("Received an invalid vote action value: %s" % vote_action)
 
-    if instance_type != POST_TYPE:
+    if instance_type not in [POST_TYPE, COMMENT_TYPE]:
         return
+    content_id = (
+        gen_post_id(instance.id)
+        if instance_type == POST_TYPE
+        else gen_comment_id(instance.id)
+    )
+
     increment_document_integer_field.delay(
-        gen_post_id(instance.id),
+        content_id,
         field_name="score",
         incr_amount=vote_increment,
-        object_type=POST_TYPE,
+        object_type=instance_type,
     )

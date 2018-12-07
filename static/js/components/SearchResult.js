@@ -15,8 +15,8 @@ import {
 import { commentPermalink, profileURL } from "../lib/url"
 import { dropdownMenuFuncs } from "../lib/ui"
 
-import type { CommentResult, ProfileResult, Result } from "../flow/searchTypes"
-import type { Post } from "../flow/discussionTypes"
+import type { ProfileResult, Result } from "../flow/searchTypes"
+import type { CommentInTree, Post } from "../flow/discussionTypes"
 
 type PostProps = {
   post: Post,
@@ -33,24 +33,29 @@ const PostSearchResult = ({ post, toggleUpvote }: PostProps) => (
 )
 
 type CommentProps = {
-  result: CommentResult
+  comment: CommentInTree,
+  downvote?: Function,
+  upvote?: Function,
+  channel: string,
+  slug: string
 }
-const CommentSearchResult = ({ result }: CommentProps) => {
-  const comment = searchResultToComment(result)
+const CommentSearchResult = ({
+  comment,
+  upvote,
+  downvote,
+  channel,
+  slug
+}: CommentProps) => {
   return (
     <CommentTree
       comments={[comment]}
       remove={() => undefined}
       approve={() => undefined}
-      upvote={async () => undefined}
-      downvote={async () => undefined}
+      upvote={upvote}
+      downvote={downvote}
       isModerator={false}
       isPrivateChannel={false}
-      commentPermalink={commentPermalink(
-        result.channel_name,
-        result.post_id,
-        result.post_slug
-      )}
+      commentPermalink={commentPermalink(channel, comment.post_id, slug)}
       curriedDropdownMenufunc={dropdownMenuFuncs(() => null)}
       dropdownMenus={new Set()}
       useSearchPageUI
@@ -77,18 +82,45 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 }
 
 type Props = {
+  commentUpvote?: Function,
+  commentDownvote?: Function,
   result: Result,
-  upvotedPost: ?Post,
-  toggleUpvote?: Post => void
+  toggleUpvote?: Post => void,
+  upvotedPost?: ?Post,
+  votedComment?: ?CommentInTree
 }
 export default class SearchResult extends React.Component<Props> {
   render() {
-    const { result, toggleUpvote, upvotedPost } = this.props
+    const {
+      result,
+      toggleUpvote,
+      upvotedPost,
+      votedComment,
+      commentUpvote,
+      commentDownvote
+    } = this.props
     if (result.object_type === "post") {
       const post = upvotedPost || searchResultToPost(result)
       return <PostSearchResult post={post} toggleUpvote={toggleUpvote} />
     } else if (result.object_type === "comment") {
-      return <CommentSearchResult result={result} />
+      let comment = searchResultToComment(result)
+      if (votedComment) {
+        comment = {
+          ...comment,
+          upvoted:   votedComment.upvoted,
+          downvoted: votedComment.downvoted,
+          score:     votedComment.score
+        }
+      }
+      return (
+        <CommentSearchResult
+          comment={comment}
+          upvote={commentUpvote}
+          downvote={commentDownvote}
+          channel={result.channel_name}
+          slug={result.post_slug}
+        />
+      )
     } else if (result.object_type === "profile") {
       return <ProfileSearchResult result={result} />
     }
