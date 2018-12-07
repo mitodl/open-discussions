@@ -31,11 +31,13 @@ export const makeChannel = (privateChannel: boolean = false): Channel => {
     user_is_contributor:   casual.coin_flip,
     user_is_moderator:     casual.coin_flip,
     membership_is_managed: casual.coin_flip,
+    allow_widgets_ui:      casual.coin_flip,
     ga_tracking_id:        casual.random_element(["UA-FAKE-01", null]),
     avatar:                hasAvatar ? "http://avatar.url" : null,
     avatar_small:          hasAvatar ? "http://avatar.small.url" : null,
     avatar_medium:         hasAvatar ? "http://avatar.medium.url" : null,
-    banner:                casual.coin_flip ? "http://banner.url" : null
+    banner:                casual.coin_flip ? "http://banner.url" : null,
+    widget_list_id:        null
   }
 }
 

@@ -80,6 +80,7 @@ INSTALLED_APPS = (
     "compat",
     "hijack",
     "hijack_admin",
+    "guardian",
     # Put our apps after this point
     "open_discussions",
     "authentication",
@@ -89,6 +90,7 @@ INSTALLED_APPS = (
     "mail",
     "notifications",
     "search",
+    "widgets",
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -189,6 +191,7 @@ AUTHENTICATION_BACKENDS = (
     "social_core.backends.saml.SAMLAuth",
     # the following needs to stay here to allow login of local users
     "django.contrib.auth.backends.ModelBackend",
+    "guardian.backends.ObjectPermissionBackend",
 )
 
 SOCIAL_AUTH_STRATEGY = "authentication.strategy.OpenDiscussionsStrategy"
@@ -706,3 +709,7 @@ DJOSER = {
 # Hijack
 HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_LOGOUT_REDIRECT_URL = "/admin/auth/user"
+
+# Guardian
+# disable the anonymous user creation
+ANONYMOUS_USER_NAME = None

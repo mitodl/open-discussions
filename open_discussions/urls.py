@@ -33,6 +33,7 @@ urlpatterns = [
     url(r"", include("embedly.urls")),
     url(r"", include("search.urls")),
     url(r"", include("ckeditor.urls")),
+    url(r"", include("widgets.urls")),
     url(r"^api/token/refresh/", refresh_jwt_token),
     # React App
     url(r"^$", index, name="open_discussions-index"),

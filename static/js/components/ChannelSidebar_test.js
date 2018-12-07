@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import { Link } from "react-router-dom"
 import { assert } from "chai"
 
@@ -55,5 +56,13 @@ describe("ChannelSidebar", () => {
   it("should not show moderation card, if isModerator !== true", () => {
     const wrapper = renderSidebar()
     assert.lengthOf(wrapper.find(Card), 1)
+  })
+
+  it("should render the widget list instead if the ui is enabled", () => {
+    SETTINGS.allow_widgets_ui = true
+    const wrapper = renderSidebar()
+    assert.isFalse(wrapper.find("Markdown").exists())
+    assert.ok(wrapper.find("ChannelWidgetList").exists())
+    assert.equal(wrapper.find("ChannelWidgetList").props().channel, channel)
   })
 })

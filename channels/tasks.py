@@ -8,7 +8,12 @@ from django.contrib.auth import get_user_model
 from prawcore.exceptions import ResponseException
 
 from channels import api
-from channels.api import Api, sync_channel_subscription_model, add_user_role
+from channels.api import (
+    Api,
+    sync_channel_subscription_model,
+    add_user_role,
+    get_admin_api,
+)
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel
 from open_discussions.celery import app
@@ -55,8 +60,7 @@ def subscribe_user_range_to_default_channel(*, channel_name, usernames):
         channel_name (str): The name of the channel
         usernames (list of str): list of user usernames
     """
-    api_user = User.objects.get(username=settings.INDEXING_API_USERNAME)
-    admin_api = api.Api(api_user)
+    admin_api = get_admin_api()
     # walk the usernames and add them as subscribers
     for username in usernames:
         admin_api.add_subscriber(username, channel_name)
@@ -85,8 +89,7 @@ def populate_user_roles(channel_ids):
     Args:
         channel_ids(list of int): List of channel ids
     """
-    client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
-
+    client = get_admin_api()
     for channel in Channel.objects.filter(id__in=channel_ids):
         try:
             for moderator in client.list_moderators(channel.name):

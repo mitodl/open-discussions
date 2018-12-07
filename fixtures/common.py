@@ -134,3 +134,9 @@ def mocked_celery(mocker):
         chain=chain_mock,
         replace_exception_class=exception_class,
     )
+
+
+@pytest.fixture
+def disable_search_tasks(mocker):
+    """Patch search tasks so they no-op"""
+    return mocker.patch("search.task_helpers")

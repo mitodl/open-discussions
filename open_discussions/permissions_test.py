@@ -14,6 +14,7 @@ from open_discussions.permissions import (
     IsStaffOrReadonlyPermission,
     IsStaffModeratorOrReadonlyPermission,
     ModeratorPermissions,
+    ObjectOnlyPermissions,
     channel_is_mod_editable,
     is_readonly,
     is_moderator,
@@ -395,3 +396,10 @@ def test_channel_exists(mocker, name, raises_404):
             channel_exists(channel_view)
     else:
         assert channel_exists(channel_view)
+
+
+def test_object_only_permissions(mocker):
+    """Checks that ObjectOnlyPermissions.has_permission() returns True"""
+    perm = ObjectOnlyPermissions()
+    request = mocker.Mock(user=mocker.Mock(is_anonymous=False), method="PUT")
+    assert perm.has_permission(request, mocker.Mock()) is True

@@ -23,6 +23,7 @@ export type Channel = {
   avatar_small:          string|null,
   avatar_medium:         string|null,
   banner:                string|null,
+  widget_list_id:        ?number,
 }
 
 export type ChannelForm = {

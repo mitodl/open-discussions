@@ -4,7 +4,7 @@ from praw.models import Redditor
 from prawcore.exceptions import ResponseException
 
 from channels import tasks
-from channels.api import get_role_model
+from channels import api
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel, ChannelSubscription
 from open_discussions.factories import UserFactory
@@ -106,7 +106,7 @@ def test_populate_user_roles(
     """populate_user_roles should create ChannelGroupRole objects"""
     channels, users = channels_and_users
     settings.INDEXING_API_USERNAME = users[0].username
-    client_mock = mocker.patch("channels.tasks.Api", autospec=True)
+    client_mock = mocker.patch("channels.api.Api", autospec=True)
     redditors = []
     for user in users:
         redditor = mocker.Mock(spec=Redditor)
@@ -123,10 +123,11 @@ def test_populate_user_roles(
     for user in users:
         for channel in channels:
             assert (
-                get_role_model(channel, ROLE_MODERATORS).group in user.groups.all()
+                api.get_role_model(channel, ROLE_MODERATORS).group in user.groups.all()
             ) is is_moderator
             assert (
-                get_role_model(channel, ROLE_CONTRIBUTORS).group in user.groups.all()
+                api.get_role_model(channel, ROLE_CONTRIBUTORS).group
+                in user.groups.all()
             ) is is_contributor
 
 
@@ -137,7 +138,7 @@ def test_populate_user_roles_error(
     """populate_user_roles should raise a PopulateUserRolesException if there is a ResponseException error"""
     channels, users = channels_and_users
     settings.INDEXING_API_USERNAME = users[0].username
-    client_mock = mocker.patch("channels.tasks.Api", autospec=True)
+    client_mock = mocker.patch("channels.api.Api", autospec=True)
     redditors = []
     for user in users:
         redditor = mocker.Mock(spec=Redditor)

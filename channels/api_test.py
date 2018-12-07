@@ -248,6 +248,20 @@ def test_create_channel_user(mock_get_client, indexing_decorator, channel_type):
         "name", title="Title", subreddit_type=channel_type, allow_top=True
     )
     assert indexing_decorator.mock_persist_func.call_count == 0
+    assert Channel.objects.filter(name="name").exists()
+    widget_list = Channel.objects.get(name="name").widget_list
+    assert widget_list is not None
+    moderator_perms = api.get_role_model(
+        "name", ROLE_MODERATORS
+    ).group.groupobjectpermission_set.all()
+    assert len(moderator_perms) == 1
+    assert any(
+        [
+            p.content_object == widget_list
+            and p.permission.codename == "change_widgetlist"
+            for p in moderator_perms
+        ]
+    )
 
 
 @pytest.mark.parametrize("channel_setting", api.CHANNEL_SETTINGS)

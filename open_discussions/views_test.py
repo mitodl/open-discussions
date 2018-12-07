@@ -74,6 +74,7 @@ def test_webpack_url(
         "allow_saml_auth": False,
         "allow_email_auth": False,
         "allow_search": False,
+        "allow_widgets_ui": False,
         "use_new_branding": False,
         "support_email": settings.EMAIL_SUPPORT,
         "embedlyKey": "fake",

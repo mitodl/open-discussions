@@ -176,3 +176,21 @@ class AnonymousAccessReadonlyPermission(permissions.BasePermission):
             return False
 
         return features.is_enabled(features.ANONYMOUS_ACCESS)
+
+
+class ReadOnly(permissions.BasePermission):
+    """Allows read-only requests through for any user"""
+
+    def has_permission(self, request, view):
+        """Return true if the request is read-only"""
+        return request.method in permissions.SAFE_METHODS
+
+
+class ObjectOnlyPermissions(permissions.DjangoObjectPermissions):
+    """Validates only object-level permissions"""
+
+    # NOTE: this is because DjangoObjectPermissions subclasses DjangoModelPermissions, which also checks permissions on models
+
+    def has_permission(self, request, view):
+        """Ignores model-level permissions"""
+        return True

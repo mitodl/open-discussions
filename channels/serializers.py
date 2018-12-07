@@ -4,7 +4,6 @@ Serializers for channel REST APIs
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from praw.models import Comment, MoreComments
 from praw.models.reddit.submission import Submission
@@ -21,24 +20,11 @@ from channels.constants import VALID_CHANNEL_TYPES, VALID_LINK_TYPES
 from channels.models import Channel, Subscription, ChannelSubscription
 from channels.proxies import proxy_post
 from open_discussions.utils import filter_dict_with_renamed_keys
+from open_discussions.serializers import WriteableSerializerMethodField
 from profiles.models import Profile
 from profiles.utils import image_uri
 
 User = get_user_model()
-
-
-class WriteableSerializerMethodField(serializers.SerializerMethodField):
-    """
-    A SerializerMethodField which has been marked as not read_only so that submitted data passed validation.
-    The actual update is handled in PostSerializer.update(...).
-    """
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.read_only = False
-
-    def to_internal_value(self, data):
-        return data
 
 
 class ChannelSerializer(serializers.Serializer):
@@ -61,6 +47,7 @@ class ChannelSerializer(serializers.Serializer):
     )
     user_is_contributor = serializers.SerializerMethodField()
     user_is_moderator = serializers.SerializerMethodField()
+    widget_list_id = serializers.SerializerMethodField()
     membership_is_managed = WriteableSerializerMethodField()
     avatar = WriteableSerializerMethodField()
     avatar_small = serializers.SerializerMethodField()
@@ -81,6 +68,13 @@ class ChannelSerializer(serializers.Serializer):
         For some reason reddit returns None instead of False so an explicit conversion is done here.
         """
         return bool(channel.user_is_moderator)
+
+    def get_widget_list_id(self, channel):
+        """
+        Get widget_list_id from the associated Channel model
+        """
+        channel_obj = self._get_channel(name=channel.display_name)
+        return channel_obj.widget_list_id
 
     def get_membership_is_managed(self, channel):
         """
@@ -145,9 +139,9 @@ class ChannelSerializer(serializers.Serializer):
             return Channel.objects.get(name=name)
 
     def create(self, validated_data):
-        from channels.api import Api
+        from channels.api import get_admin_api
 
-        client = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
+        client = get_admin_api()
         # This is to reduce number of cassettes which need replacing
         validated_data["description"] = validated_data.get("description", "")
         validated_data["public_description"] = validated_data.get(

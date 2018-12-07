@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from widgets.models import WidgetList
 
 
 from channels.constants import ROLE_CHOICES, VALID_EXTENDED_POST_CHOICES
@@ -126,6 +127,7 @@ class Channel(TimestampedModel):
     )
     banner = models.ImageField(null=True, max_length=2083, upload_to=banner_uri)
     ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
+    widget_list = models.ForeignKey(WidgetList, on_delete=models.SET_NULL, null=True)
 
     def save(
         self, *args, update_image=False, **kwargs

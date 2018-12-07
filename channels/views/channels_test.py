@@ -42,6 +42,7 @@ def test_list_channels(user_client, private_channel_and_contributor, request):
             "avatar_medium": None,
             "banner": None,
             "ga_tracking_id": None,
+            "widget_list_id": Channel.objects.get(name=channel.name).widget_list_id,
         }
     ]
 
@@ -109,6 +110,7 @@ def test_create_channel(
         "avatar_medium": None,
         "banner": None,
         "ga_tracking_id": None,
+        "widget_list_id": Channel.objects.get(name=channel.name).widget_list_id,
     }
     assert resp.json() == expected
     assert resp.status_code == status.HTTP_201_CREATED
@@ -144,6 +146,7 @@ def test_create_channel_no_descriptions(
         "avatar_medium": None,
         "banner": None,
         "ga_tracking_id": None,
+        "widget_list_id": Channel.objects.get(name=channel.name).widget_list_id,
     }
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == expected
@@ -230,6 +233,7 @@ def test_get_channel(user_client, private_channel_and_contributor):
         "avatar_medium": None,
         "banner": None,
         "ga_tracking_id": None,
+        "widget_list_id": Channel.objects.get(name=channel.name).widget_list_id,
     }
 
 
@@ -258,6 +262,9 @@ def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous
             "avatar_medium": None,
             "banner": None,
             "ga_tracking_id": None,
+            "widget_list_id": Channel.objects.get(
+                name=public_channel.name
+            ).widget_list_id,
         }
     else:
         assert resp.status_code in (
@@ -339,6 +346,7 @@ def test_patch_channel(staff_client, private_channel):
         "avatar_medium": None,
         "banner": None,
         "ga_tracking_id": None,
+        "widget_list_id": Channel.objects.get(name=private_channel.name).widget_list_id,
     }
     assert Channel.objects.count() == 1
     channel_obj = Channel.objects.first()
@@ -372,6 +380,7 @@ def test_patch_channel_moderator(
         "avatar_medium": None,
         "banner": None,
         "ga_tracking_id": None,
+        "widget_list_id": Channel.objects.get(name=private_channel.name).widget_list_id,
     }
 
 

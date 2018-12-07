@@ -12,6 +12,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group
 from django.db import transaction
 from django.http.response import Http404
+from guardian.shortcuts import assign_perm
 import praw
 from praw.exceptions import APIException
 from praw.models.comment_forest import CommentForest
@@ -42,6 +43,7 @@ from channels.constants import (
     LINK_TYPE_LINK,
     LINK_TYPE_SELF,
     EXTENDED_POST_TYPE_ARTICLE,
+    WIDGET_LIST_CHANGE_PERM,
 )
 from channels.models import (
     Article,
@@ -66,6 +68,7 @@ from open_discussions import features
 from open_discussions.utils import now_in_utc
 from search import task_helpers as search_task_helpers
 from search.task_helpers import reddit_object_persist
+from widgets.models import WidgetList
 
 USER_AGENT = "MIT-Open: {version}"
 ACCESS_TOKEN_HEADER_NAME = "X-Access-Token"
@@ -385,6 +388,17 @@ def get_post_type(*, text, url, article_content):
     return LINK_TYPE_SELF
 
 
+def get_admin_api():
+    """
+    Creates an instance of the API configured with the admin user
+
+    Returns:
+        channels.api.Api: Api instance configured for the admin user
+    """
+    admin_user = User.objects.get(username=settings.INDEXING_API_USERNAME)
+    return Api(admin_user)
+
+
 class Api:
     """Channel API"""
 
@@ -471,7 +485,16 @@ class Api:
             **other_settings,
         )
 
-        Channel.objects.create(name=name, membership_is_managed=membership_is_managed)
+        # create an empty widget list for new channels
+        widget_list = WidgetList.objects.create()
+        Channel.objects.create(
+            name=name,
+            membership_is_managed=membership_is_managed,
+            widget_list=widget_list,
+        )
+
+        moderator_group = get_role_model(name, ROLE_MODERATORS).group
+        assign_perm(WIDGET_LIST_CHANGE_PERM, moderator_group, widget_list)
 
         return channel
 

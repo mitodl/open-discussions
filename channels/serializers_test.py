@@ -61,6 +61,7 @@ def test_serialize_channel(user, membership_is_managed):
         "avatar_medium": None,
         "banner": None,
         "ga_tracking_id": None,
+        "widget_list_id": None,
     }
 
 

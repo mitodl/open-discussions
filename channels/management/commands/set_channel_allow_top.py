@@ -1,11 +1,9 @@
 """Management command to set allow_top on channels"""
 import sys
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
 
-from channels.api import Api
+from channels.api import get_admin_api
 from channels.models import Channel
 
 
@@ -27,8 +25,7 @@ class Command(BaseCommand):
         if options["name"]:
             channels = channels.filter(name__in=options["name"])
 
-        api_user = User.objects.get(username=settings.INDEXING_API_USERNAME)
-        api = Api(api_user)
+        api = get_admin_api()
 
         self.stdout.write("Found {} channels to update".format(channels.count()))
 

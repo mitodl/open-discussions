@@ -11,6 +11,7 @@ celery==4.2.0
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-redis==4.7.0
+django-guardian==1.4.9
 django-server-status==0.5.0
 django-storages==1.6.6
 django-webpack-loader==0.5.0
@@ -25,6 +26,7 @@ elasticsearch-dsl==6.1.0
 elasticsearch==6.2.0
 factory_boy
 faker
+feedparser
 html5lib==0.999999999
 ipython
 newrelic

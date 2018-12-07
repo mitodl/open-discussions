@@ -253,11 +253,10 @@ def index_post_with_comments(post_id):
     Args:
         post_id (str): The post id to index
     """
-    from channels.api import Api
+    from channels.api import get_admin_api
 
     conn = get_conn()
-    api_user = User.objects.get(username=settings.INDEXING_API_USERNAME)
-    client = Api(api_user)
+    client = get_admin_api()
     reddit_post = client.get_post(post_id)
 
     for alias in get_active_aliases([POST_TYPE]):

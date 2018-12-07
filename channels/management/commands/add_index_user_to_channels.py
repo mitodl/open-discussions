@@ -3,12 +3,14 @@ import sys
 import traceback
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
 from prawcore import Forbidden
 
-from channels.api import Api
+from channels.api import get_admin_api, Api
 from channels.models import Channel
+
+User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -19,7 +21,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Adds the indexing user as the moderator on all channels"""
 
-        index_api = Api(User.objects.get(username=settings.INDEXING_API_USERNAME))
+        index_api = get_admin_api()
         failed = False
         for channel in Channel.objects.values_list("name", flat=True):
             processed = False
