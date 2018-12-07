@@ -21,6 +21,7 @@ const _createSettings = () => ({
   allow_saml_auth:       false,
   allow_email_auth:      false,
   is_authenticated:      true,
+  is_admin:              false,
   username:              "greatusername",
   user_full_name:        "Great User",
   profile_ui_enabled:    false,

@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
@@ -103,7 +104,10 @@ export class EditChannelAppearancePage extends React.Component<Props> {
 
     const formValue = channelForm.value
     const channelName = formValue.name
-    const patchValue = R.omit(["avatar", "banner"], formValue)
+    const patchValue = R.omit(
+      ["avatar", "banner", !SETTINGS.is_admin ? "title" : null],
+      formValue
+    )
     const promises = [dispatch(actions.channels.patch(patchValue))]
 
     if (formValue.avatar) {

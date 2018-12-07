@@ -20,6 +20,7 @@ declare var SETTINGS: {
     tos_url: string
   },
   is_authenticated: boolean,
+  is_admin: boolean,
   allow_anonymous: boolean,
   allow_saml_auth: boolean,
   allow_email_auth: boolean,

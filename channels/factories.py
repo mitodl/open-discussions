@@ -49,16 +49,20 @@ def _channel_name():
     ]  # maximum of 21-char channel names
 
 
-class RedditChannel:
+class RedditChannel:  # pylint: disable=too-many-instance-attributes
     """Simple factory representation for a reddit channel (subreddit)"""
 
     def __init__(self, **kwargs):
         self.name = kwargs.get("name", None)
         self.title = kwargs.get("title", None)
+        self.display_name = kwargs.get("display_name", None)
+        self.subreddit_type = kwargs.get("subreddit_type", None)
         self.channel_type = kwargs.get("channel_type", None)
         self.link_type = kwargs.get("link_type", None)
         self.description = kwargs.get("description", None)
         self.public_description = kwargs.get("public_description", None)
+        self.user_is_contributor = kwargs.get("user_is_contributor", True)
+        self.user_is_moderator = kwargs.get("user_is_moderator", True)
         self.api = kwargs.get("api", None)
 
 

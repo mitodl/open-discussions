@@ -109,6 +109,13 @@ describe("EditChannelBasicPage", () => {
     )
 
     helper.updateChannelStub.calledWith(expected)
+    const channelUpdateArg = helper.updateChannelStub.firstCall.args[0]
+    assert.deepEqual(Object.keys(channelUpdateArg), [
+      "name",
+      "channel_type",
+      "description",
+      "link_type"
+    ])
 
     assert.equal(helper.currentLocation.pathname, channelURL(channel.name))
   })

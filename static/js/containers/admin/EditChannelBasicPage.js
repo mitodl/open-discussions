@@ -109,7 +109,11 @@ class EditChannelBasicPage extends React.Component<Props> {
         })
       )
     } else {
-      dispatch(actions.channels.patch(channelForm.value)).then(channel => {
+      const patchValue = R.pickAll(
+        ["name", "channel_type", "description", "link_type"],
+        channelForm.value
+      )
+      dispatch(actions.channels.patch(patchValue)).then(channel => {
         history.push(channelURL(channel.name))
       })
     }

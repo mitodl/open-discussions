@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS */
 import React from "react"
 
 import Card from "../Card"
@@ -35,6 +36,27 @@ export default class EditChannelAppearanceForm extends React.Component<Props> {
       validation,
       history
     } = this.props
+
+    let titleInputProps, titleInputMessage
+    if (SETTINGS.is_admin) {
+      titleInputProps = {}
+      titleInputMessage = null
+    } else {
+      titleInputProps = { disabled: true }
+      titleInputMessage = (
+        <label className="bottom-label">
+          Need to change the channel title?{" "}
+          <a
+            href={`mailto:${SETTINGS.support_email}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Contact us
+          </a>
+        </label>
+      )
+    }
+
     return (
       <form onSubmit={onSubmit} className="form channel-form">
         <Card>
@@ -59,7 +81,9 @@ export default class EditChannelAppearanceForm extends React.Component<Props> {
                 placeholder="Title"
                 value={form.title}
                 onChange={onUpdate}
+                {...titleInputProps}
               />
+              {titleInputMessage}
               {validationMessage(validation.title)}
             </div>
           </div>
