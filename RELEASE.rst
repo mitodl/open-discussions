@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.56.1 (Released December 07, 2018)
+--------------
+
+- Add widget JS to open-discussions (#1558)
+- Hide Share button on comment cards in search (#1561)
+- Hide reply and menu icons on search post/comment result cards (#1555)
+
 Version 0.56.0 (Released December 04, 2018)
 --------------
 
