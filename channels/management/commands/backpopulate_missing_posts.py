@@ -1,3 +1,4 @@
+"""Management command for creating missing Post objects"""
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management import BaseCommand
@@ -13,16 +14,16 @@ from search.tasks import index_post_with_comments
 class Command(BaseCommand):
     """Find and create missing Post objects (and associated comments) for reddit submissions"""
 
-    help = "Find and create missing Post, Comment objects for reddit submissions"
+    help = "Find and create missing Post objects for reddit submissions"
 
-    def handle(self, *args, **options):
-        """Find and create missing Post and Comment objects for reddit submissions"""
+    def handle(self, *args, **options):  # pylint:disable=too-many-locals
+        """Find and create missing Post objects for reddit submissions"""
         total_missing = 0
         api_client = Api(user=User.objects.get(username=settings.INDEXING_API_USERNAME))
         for channel in Channel.objects.all():
             subreddit = api_client.reddit.subreddit(channel.name)
-            reddit_posts = set([a.id for a in subreddit.hot(limit=1000)])
-            django_posts = set([a.post_id for a in channel.post_set.all()])
+            reddit_posts = {a.id for a in subreddit.hot(limit=1000)}
+            django_posts = {a.post_id for a in channel.post_set.all()}
             missing_posts = reddit_posts.difference(django_posts)
             for post_id in missing_posts:
                 submission = api_client.get_post(post_id)
@@ -38,12 +39,11 @@ class Command(BaseCommand):
                     )
                 )
                 with transaction.atomic():
-                    post, created = Post.objects.get_or_create(
+                    post, _ = Post.objects.get_or_create(
                         post_id=post_id, channel=channel, post_type=submission_type
                     )
                     if (
-                        created
-                        and submission_type == LINK_TYPE_LINK
+                        submission_type == LINK_TYPE_LINK
                         and post.link_meta is None
                         and settings.EMBEDLY_KEY
                     ):
