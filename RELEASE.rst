@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.56.1
+Version 0.56.1 (Released December 07, 2018)
 --------------
 
 - Add widget JS to open-discussions (#1558)
