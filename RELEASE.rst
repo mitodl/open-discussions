@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.57.0
+--------------
+
+- Add CKEditor for creating Article posts
+- Small tweaks to embedly 'link' display
+- Enable comment voting in search results (#1560)
+- Prevent non-superusers from editing a channel title
+
 Version 0.56.1 (Released December 07, 2018)
 --------------
 
