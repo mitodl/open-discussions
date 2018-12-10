@@ -5,7 +5,7 @@ from django.core.management import BaseCommand
 from django.db import transaction
 
 from channels.api import Api
-from channels.constants import LINK_TYPE_SELF, LINK_TYPE_LINK, COMMENTS_SORT_NEW
+from channels.constants import LINK_TYPE_SELF, LINK_TYPE_LINK
 from channels.models import Channel, Post, Comment
 from channels.utils import get_or_create_link_meta
 from search.tasks import index_post_with_comments
@@ -29,16 +29,8 @@ class Command(BaseCommand):
             missing_posts = reddit_posts.difference(django_posts)
             for post_id in missing_posts:
                 submission = api_client.get_post(post_id)
-                submission.comment_limit = 1000
                 submission_type = (
                     LINK_TYPE_LINK if hasattr(submission, "url") else LINK_TYPE_SELF
-                )
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        "Creating missing {} post {} in channel {}".format(
-                            submission_type, post_id, channel.name
-                        )
-                    )
                 )
                 with transaction.atomic():
                     post, _ = Post.objects.get_or_create(
@@ -51,16 +43,20 @@ class Command(BaseCommand):
                     ):
                         post.link_meta = get_or_create_link_meta(submission.url)
                         post.save()
-                    for reddit_comment in api_client.list_comments(
-                        post_id, COMMENTS_SORT_NEW
-                    ):
-                        self.stdout.write("{}".format(reddit_comment.__dict__))
+                    for reddit_comment in submission.comments.list():
                         Comment.objects.get_or_create(
                             post=post,
                             comment_id=reddit_comment.id,
                             parent_id=reddit_comment.parent_id,
                         )
                     index_post_with_comments.delay(post_id)
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        "Created missing {} post {} in channel {}".format(
+                            submission_type, post_id, channel.name
+                        )
+                    )
+                )
             total_missing += len(missing_posts)
         self.stdout.write(
             self.style.SUCCESS("Created {} missing posts".format(total_missing))
