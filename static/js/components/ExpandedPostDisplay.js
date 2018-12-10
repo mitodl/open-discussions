@@ -49,14 +49,18 @@ type Props = {
 }
 
 export default class ExpandedPostDisplay extends React.Component<Props> {
-  renderTextContent = () => {
+  renderTextOrArticleContent = () => {
     const { forms, post } = this.props
 
-    return R.has(editPostKey(post), forms) ? (
-      <EditPostForm post={post} editing />
-    ) : (
-      renderTextContent(post)
-    )
+    if (R.has(editPostKey(post), forms)) {
+      return <EditPostForm post={post} editing />
+    } else {
+      return post.text ? (
+        renderTextContent(post)
+      ) : (
+        <ArticleEditor readOnly initialData={post.article_content || []} />
+      )
+    }
   }
 
   approvePost = (e: Event) => {
@@ -100,15 +104,16 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
           <ReportCount count={post.num_reports} />
         </div>
         <div className="right">
-          {SETTINGS.username === post.author_id && post.text ? (
-            <div
-              className="post-action edit-post grey-surround"
-              onClick={beginEditing(editPostKey(post), post)}
-            >
-              <i className="material-icons edit">edit</i>
-              <span>Edit</span>
-            </div>
-          ) : null}
+          {SETTINGS.username === post.author_id &&
+          (post.text || post.article_content) ? (
+              <div
+                className="post-action edit-post grey-surround"
+                onClick={beginEditing(editPostKey(post), post)}
+              >
+                <i className="material-icons edit">edit</i>
+                <span>Edit</span>
+              </div>
+            ) : null}
           <div
             className="post-action share-action grey-surround"
             onClick={showPostShareMenu}
@@ -210,10 +215,9 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
           ) : null}
           {post && post.url ? <Embedly embedly={embedly} /> : null}
         </div>
-        {!showPermalinkUI && post.text ? this.renderTextContent() : null}
-        {!showPermalinkUI && post.article_content ? (
-          <ArticleEditor readOnly initialData={post.article_content} />
-        ) : null}
+        {!showPermalinkUI && (post.text || post.article_content)
+          ? this.renderTextOrArticleContent()
+          : null}
         {R.has(editPostKey(post), forms) ? null : this.postActionButtons()}
       </div>
     )

@@ -40,12 +40,16 @@ export default class ArticleEditor extends React.Component<Props> {
           }
         })
 
-        this.node.appendChild(editor.ui.view.toolbar.element)
+        if (this.node) {
+          this.node.appendChild(editor.ui.view.toolbar.element)
+        }
       } else {
         editor.isReadOnly = true
       }
 
-      this.node.appendChild(editor.ui.view.editable.element)
+      if (this.node) {
+        this.node.appendChild(editor.ui.view.editable.element)
+      }
       this.editor = editor
     } catch (err) {
       console.error(err) // eslint-disable-line no-console

@@ -183,14 +183,22 @@ describe("ExpandedPostDisplay", () => {
     assert.equal(to, postDetailURL(post.channel_name, post.id, post.slug))
   })
 
-  it("should only show an edit link if a text post and authored by the user", () => {
+  it("should show an edit link if a text or article post and authored by the user", () => {
     [
-      [false, true, true],
-      [false, false, false],
-      [true, true, false],
-      [true, false, false]
-    ].forEach(([urlPost, userAuthor, shouldShowLink]) => {
-      const post = makePost(urlPost)
+      ["text", true, true],
+      ["article", true, true],
+      ["url", true, false],
+      ["text", false, false],
+      ["article", false, false],
+      ["url", false, false]
+    ].forEach(([postType, userAuthor, shouldShowLink]) => {
+      const post = makePost(postType === "url")
+
+      if (postType === "article") {
+        post.text === null
+        post.article = [{ foo: "bar" }]
+      }
+
       if (userAuthor) {
         SETTINGS.username = post.author_id
       }
@@ -392,6 +400,7 @@ describe("ExpandedPostDisplay", () => {
 
   it("should use ArticleEditor to display if an article post", () => {
     post.article_content = []
+    post.text = null
     const wrapper = shallow(<ExpandedPostDisplay {...postProps()} />)
     assert.ok(wrapper.find("ArticleEditor"))
     assert.deepEqual(wrapper.find("ArticleEditor").props(), {

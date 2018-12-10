@@ -7,6 +7,7 @@ import { connect } from "react-redux"
 import Editor, { editorUpdateFormShim } from "./Editor"
 import LoginPopup from "./LoginPopup"
 import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
+import ArticleEditor from "./ArticleEditor"
 
 import { actions } from "../actions"
 import { clearCommentError } from "../actions/comment"
@@ -80,7 +81,15 @@ const userOrAnonymousFunction = (
     ? preventDefaultAndInvoke(anonymousFunc)
     : userFunc
 
-type CommentFormProps = {
+const ArticleInput: "ArticleInput" = "ArticleInput"
+const WYSIWYGInput: "WYSIWYGInput" = "WYSIWYGInput"
+const TextInput: "TextInput" = "TextInput"
+type InputFormHelperInputType =
+  | typeof ArticleInput
+  | typeof WYSIWYGInput
+  | typeof TextInput
+
+type InputFormProps = {
   onSubmit: (e: Event) => Promise<*>,
   text: string,
   onUpdate: (e: any) => void,
@@ -88,12 +97,13 @@ type CommentFormProps = {
   isComment: boolean,
   disabled: boolean,
   autoFocus: boolean,
-  wysiwyg?: boolean,
   onTogglePopup?: Function,
-  profile?: Profile
+  profile?: Profile,
+  article?: Array<Object>,
+  inputType: InputFormHelperInputType
 }
 
-const CommentFormHelper = ({
+const InputFormHelper = ({
   onSubmit,
   text,
   onUpdate,
@@ -101,65 +111,94 @@ const CommentFormHelper = ({
   isComment,
   disabled,
   autoFocus,
-  wysiwyg,
   onTogglePopup,
-  profile
-}: CommentFormProps) => (
-  <div className="reply-form">
-    <form
-      onSubmit={userOrAnonymousFunction(onSubmit, onTogglePopup)}
-      className="form"
-      onKeyDown={e => {
-        if (e.key === "Enter" && e.ctrlKey && !disabled && !isEmptyText(text)) {
-          onSubmit(e)
+  profile,
+  article,
+  inputType
+}: InputFormProps) => {
+  let input
+  switch (inputType) {
+  case ArticleInput:
+    input = (
+      <ArticleEditor
+        initialData={article}
+        onChange={editorUpdateFormShim("article_content", onUpdate)}
+      />
+    )
+    break
+  case WYSIWYGInput:
+    input = (
+      <Editor
+        initialValue={text || ""}
+        onChange={editorUpdateFormShim("text", onUpdate)}
+        autoFocus={autoFocus}
+      />
+    )
+    break
+  case TextInput:
+    input = (
+      <textarea
+        name="text"
+        type="text"
+        className="input"
+        placeholder="Write a reply here..."
+        value={text || ""}
+        onChange={
+          disabled ? userOrAnonymousFunction(null, onTogglePopup) : onUpdate
         }
-      }}
-    >
-      <div className="form-item">
-        {profile ? (
-          <React.Fragment>
-            <ProfileImage profile={profile} imageSize={PROFILE_IMAGE_MICRO} />
-            <div className="triangle" />
-          </React.Fragment>
-        ) : null}
-        {wysiwyg ? (
-          <Editor
-            initialValue={text || ""}
-            onChange={editorUpdateFormShim("text", onUpdate)}
-            autoFocus={autoFocus}
-          />
-        ) : (
-          <textarea
-            name="text"
-            type="text"
-            className="input"
-            placeholder="Write a reply here..."
-            value={text || ""}
-            onChange={
-              disabled ? userOrAnonymousFunction(null, onTogglePopup) : onUpdate
-            }
-            onFocus={userOrAnonymousFunction(null, onTogglePopup)}
-            autoFocus={autoFocus}
-          />
-        )}
-      </div>
-      <button
-        type="submit"
-        disabled={(disabled || isEmptyText(text)) && !userIsAnonymous()}
+        onFocus={userOrAnonymousFunction(null, onTogglePopup)}
+        autoFocus={autoFocus}
+      />
+    )
+  }
+
+  return (
+    <div className="reply-form">
+      <form
+        onSubmit={userOrAnonymousFunction(onSubmit, onTogglePopup)}
+        className="form"
+        onKeyDown={e => {
+          if (
+            e.key === "Enter" &&
+            e.ctrlKey &&
+            !disabled &&
+            !isEmptyText(text)
+          ) {
+            onSubmit(e)
+          }
+        }}
       >
-        Submit
-      </button>
-      {isComment ? (
+        <div className="form-item">
+          {profile ? (
+            <React.Fragment>
+              <ProfileImage profile={profile} imageSize={PROFILE_IMAGE_MICRO} />
+              <div className="triangle" />
+            </React.Fragment>
+          ) : null}
+          {input}
+        </div>
         <button
-          onClick={preventDefaultAndInvoke(cancelReply)}
-          className="cancel"
+          type="submit"
+          disabled={
+            inputType === ArticleInput
+              ? disabled
+              : (disabled || isEmptyText(text)) && !userIsAnonymous()
+          }
         >
-          Cancel
+          Submit
         </button>
-      ) : null}
-    </form>
-  </div>
-)
+        {isComment ? (
+          <button
+            onClick={preventDefaultAndInvoke(cancelReply)}
+            className="cancel"
+          >
+            Cancel
+          </button>
+        ) : null}
+      </form>
+    </div>
+  )
+}
 
 const getFormKeyFromOwnProps = ownProps =>
   ownProps.comment
@@ -318,7 +357,7 @@ export const ReplyToCommentForm: Class<React$Component<*, *>> = connect(
       const text = R.pathOr("", [formKey, "value", "text"], forms)
 
       return R.has(formKey, forms) ? (
-        <CommentFormHelper
+        <InputFormHelper
           onSubmit={this.onSubmit}
           text={text}
           onUpdate={onUpdate}
@@ -326,6 +365,7 @@ export const ReplyToCommentForm: Class<React$Component<*, *>> = connect(
           isComment={true}
           disabled={replying}
           autoFocus={true}
+          inputType={TextInput}
         />
       ) : null
     }
@@ -367,7 +407,7 @@ export const EditCommentForm: Class<React$Component<*, *>> = connect(
       const text = R.pathOr("", [formKey, "value", "text"], forms)
 
       return (
-        <CommentFormHelper
+        <InputFormHelper
           onSubmit={this.onSubmit}
           text={text}
           onUpdate={onUpdate}
@@ -375,6 +415,7 @@ export const EditCommentForm: Class<React$Component<*, *>> = connect(
           isComment={true}
           disabled={patching}
           autoFocus={true}
+          inputType={TextInput}
         />
       )
     }
@@ -401,14 +442,17 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
 
     onSubmit = async e => {
       const { formKey, forms, patchPost, post } = this.props
-      const { text } = R.prop(formKey, forms).value
+      // eslint-disable-next-line camelcase
+      const { text, article_content } = R.prop(formKey, forms).value
 
       e.preventDefault()
 
       const { id } = post
       this.setState({ patching: true })
+      // eslint-disable-next-line camelcase
+      const content = article_content ? { id, article_content } : { id, text }
       try {
-        await patchPost({ id, text })
+        await patchPost(content)
       } catch (_) {
         this.setState({ patching: false })
       }
@@ -418,17 +462,25 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
       const { forms, formKey, onUpdate, cancelReply } = this.props
       const { patching } = this.state
       const text = R.pathOr("", [formKey, "value", "text"], forms)
+      const article = R.pathOr(
+        null,
+        [formKey, "value", "article_content"],
+        forms
+      )
+
+      const inputType = article ? ArticleInput : WYSIWYGInput
 
       return (
-        <CommentFormHelper
+        <InputFormHelper
           onSubmit={this.onSubmit}
           text={text}
+          article={article}
           onUpdate={onUpdate}
           cancelReply={cancelReply}
           isComment={true}
           disabled={patching}
           autoFocus={true}
-          wysiwyg={true}
+          inputType={inputType}
         />
       )
     }
@@ -515,7 +567,7 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
               className="post-reply-popup"
             />
           ) : null}
-          <CommentFormHelper
+          <InputFormHelper
             onSubmit={this.onSubmit}
             text={text}
             onUpdate={onUpdate}
@@ -525,6 +577,7 @@ export const ReplyToPostForm: Class<React$Component<*, *>> = connect(
             autoFocus={false}
             onTogglePopup={this.onTogglePopup}
             profile={profile}
+            inputType={TextInput}
           />
         </div>
       )

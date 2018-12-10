@@ -569,6 +569,8 @@ describe("CommentForms", () => {
         { text: "edited text", id: comment.id }
       ])
     })
+
+    //
     ;[
       [410, "This comment has been deleted and cannot be edited"],
       [500, "Something went wrong editing your comment"]
@@ -612,9 +614,15 @@ describe("CommentForms", () => {
       wrapper = renderEditPostForm()
     })
 
-    it("should use the <Editor /> rather than a textarea", () => {
+    it("should use the <Editor /> if a text post", () => {
       assert.ok(wrapper.find("Editor").exists())
       assert.isNotOk(wrapper.find("textarea").exists())
+    })
+
+    it("should use the ArticleEditor if an article post", () => {
+      post.article = []
+      wrapper = renderEditPostForm()
+      assert.ok(wrapper.find("ArticleEditor"))
     })
 
     it("should have the autofocus prop", () => {

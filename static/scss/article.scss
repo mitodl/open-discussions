@@ -1,12 +1,21 @@
-// this is a fix for these issues:
+// these are a few fixes for these issues:
 // https://github.com/ckeditor/ckeditor5-media-embed/issues/58
 // https://github.com/ckeditor/ckeditor5-media-embed/issues/57
-//
-// the fix is in master, we can remove this when they do another release
+// (this fix is in master, we can remove this when they do another release)
 .ck-editor.read-only {
   *[contenteditable="false"] {
     .ck-media__wrapper > *:not(.ck-media__placeholder) {
       pointer-events: all;
+    }
+  }
+
+  // and
+  // https://github.com/ckeditor/ckeditor5/issues/1261
+  .ck {
+    .ck-widget,
+    .ck-widget:hover,
+    .ck-widget_selected {
+      outline: none;
     }
   }
 }
