@@ -5,6 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 amqp==2.1.4               # via kombu
+appnope==0.1.0            # via ipython
 base36==0.1.1
 beautifulsoup4==4.6.0
 betamax-serializers==0.2.0
@@ -23,7 +24,10 @@ defusedxml==0.5.0         # via cairosvg, python3-openid, python3-saml, social-a
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-anymail[mailgun]==3.0
+django-compat==1.0.15
 django-cors-headers==2.1.0
+django-hijack-admin==2.1.10
+django-hijack==2.1.10
 django-redis==4.7.0
 django-server-status==0.5.0
 django-storages==1.6.6
@@ -71,7 +75,7 @@ requests-file==1.4.3      # via tldextract
 requests-oauthlib==0.8.0  # via social-auth-core
 requests==2.20.1
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via django-anymail, django-server-status, elasticsearch-dsl, faker, html5lib, isodate, prompt-toolkit, python-dateutil, requests-file, social-auth-app-django, social-auth-core, traitlets
+six==1.10.0               # via django-anymail, django-compat, django-server-status, elasticsearch-dsl, faker, html5lib, isodate, prompt-toolkit, python-dateutil, requests-file, social-auth-app-django, social-auth-core, traitlets
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0   # via social-auth-app-django
 static3==0.5.1

@@ -50,6 +50,9 @@ class SocialAuthAPIView(APIView):
 
     def post(self, request):
         """Processes a request"""
+        if request.session.get("is_hijacked_user", False):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         if not features.is_enabled(features.EMAIL_AUTH):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -92,6 +95,8 @@ class RegisterEmailView(SocialAuthAPIView):
 
     def post(self, request):
         """ Verify recaptcha response before proceeding """
+        if request.session.get("is_hijacked_user", False):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         if settings.RECAPTCHA_SITE_KEY:
             r = requests.post(
                 "https://www.google.com/recaptcha/api/siteverify?secret={key}&response={captcha}".format(
@@ -140,7 +145,8 @@ def login_complete(request, **kwargs):  # pylint: disable=unused-argument
     """View that completes the login"""
     # redirect to home
     response = redirect("/")
-
+    if request.session.get("is_hijacked_user", False):
+        return response
     if api_settings.JWT_AUTH_COOKIE in request.COOKIES:
         # to clear a cookie, it's most reliable to set it to expire immediately
         response.set_cookie(

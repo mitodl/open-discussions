@@ -239,3 +239,19 @@ def require_micromasters_provider(
     if social_auth.provider == MicroMastersAuth.name:
         raise RequireProviderException(backend, social_auth)
     return {}
+
+
+def forbid_hijack(strategy, backend, **kwargs):  # pylint: disable=unused-argument
+    """
+    Forbid an admin user from trying to login/register while hijacking another user
+
+    Args:
+        strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
+        backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
+        user (User): the current user
+        flow (str): the type of flow (login or register)
+    """
+    # As first step in pipeline, stop a hijacking admin from going any further
+    if strategy.session_get("is_hijacked_user"):
+        raise ValueError("You are hijacking another user, don't try to login again")
+    return {}

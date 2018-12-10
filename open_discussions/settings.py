@@ -77,6 +77,9 @@ INSTALLED_APPS = (
     "rest_framework",
     "corsheaders",
     "anymail",
+    "compat",
+    "hijack",
+    "hijack_admin",
     # Put our apps after this point
     "open_discussions",
     "authentication",
@@ -215,6 +218,8 @@ SOCIAL_AUTH_EMAIL_VALIDATION_FUNCTION = "mail.verification_api.send_verification
 SOCIAL_AUTH_EMAIL_VALIDATION_URL = "/"
 
 SOCIAL_AUTH_PIPELINE = (
+    # Checks if an admin user attempts to login/register while hijacking another user.
+    "authentication.pipeline.user.forbid_hijack",
     # Checks if the user is attempting to log in with an email and has authenticated via SAML,
     # in which case we want to force them to log in via SAML
     "authentication.pipeline.user.require_touchstone_login",
@@ -697,3 +702,7 @@ DJOSER = {
     "PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND": True,
     "EMAIL": {"password_reset": "authentication.views.CustomPasswordResetEmail"},
 }
+
+# Hijack
+HIJACK_ALLOW_GET_REQUESTS = True
+HIJACK_LOGOUT_REDIRECT_URL = "/admin/auth/user"
