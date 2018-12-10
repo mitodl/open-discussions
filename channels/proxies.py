@@ -2,7 +2,7 @@
 from django.utils.functional import SimpleLazyObject
 from wrapt import ObjectProxy
 
-from channels.models import Post
+from channels.models import Channel, Post
 
 
 class PostProxy(ObjectProxy):
@@ -113,4 +113,87 @@ def proxy_posts(submissions):
         PostProxy(submission, posts[submission.id])
         for submission in submissions
         if submission.id in posts
+    ]
+
+
+class ChannelProxy(ObjectProxy):
+    """
+    Proxies properties to a Subreddit or a Channel
+
+    This allows properties to be proxied to the Subreddit unless otherwise overridden
+    """
+
+    def __init__(self, subreddit, channel):
+        """
+        Args:
+            subreddit (praw.models.reddit.subreddit.Subreddit): a PRAW subreddit object
+            channel (channels.models.Channel): the channel associated with the subreddit
+        """
+        # treat subreddit as the primary proxy target
+        super().__init__(subreddit)
+        # store the channel so @property overrides can reference it
+        self._subreddit = subreddit
+        self._channel = channel
+
+    def __getattr__(self, name):
+        """
+        Avoid proxying __getattr__ but "proxy" to the wrapped object on any non-local fields
+        """
+        if name in (
+            "allowed_post_types",
+            "membership_is_managed",
+            "avatar",
+            "avatar_small",
+            "avatar_medium",
+            "ga_tracking_id",
+            "banner",
+            "widget_list_id",
+        ):
+            return getattr(self._channel, name)
+        else:
+            return getattr(self.__wrapped__, name)
+
+    @property
+    def channel(self):
+        """Read-only access to the channel"""
+        return self._channel
+
+
+def proxy_channel(subreddit):
+    """
+    Helper function to proxy a submission
+
+    Args:
+        subreddit (praw.models.Subreddit): subreddit to proxy
+
+    Returns:
+        ChannelProxy: proxied channel
+    """
+    return ChannelProxy(
+        subreddit,
+        SimpleLazyObject(lambda: Channel.objects.get(name=subreddit.display_name)),
+    )
+
+
+def proxy_channels(subreddits):
+    """
+    Helper function to proxy submissions and posts.
+
+    Args:
+        subreddits (list of praw.models.Subreddit):
+            A list of subreddits
+
+    Returns:
+        list of ChannelProxy: list of proxied channels
+    """
+    channels = {
+        channel.name: channel
+        for channel in Channel.objects.filter(
+            name__in=[subreddit.display_name for subreddit in subreddits]
+        )
+    }
+    return [
+        ChannelProxy(subreddit, channels[subreddit.display_name])
+        for subreddit in subreddits
+        if subreddit.display_name in channels
     ]

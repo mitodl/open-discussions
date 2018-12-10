@@ -1,10 +1,11 @@
 """Channels APIs"""
 # pylint: disable=too-many-public-methods, too-many-lines
 import logging
+import operator
 from datetime import datetime, timedelta
+from functools import reduce, partialmethod
 from urllib.parse import urljoin
 
-from functools import partialmethod
 import pytz
 import requests
 from django.conf import settings
@@ -39,12 +40,14 @@ from channels.constants import (
     VoteActions,
     ROLE_CONTRIBUTORS,
     ROLE_MODERATORS,
+    ROLE_CHOICES,
     LINK_TYPE_ANY,
     LINK_TYPE_LINK,
     LINK_TYPE_SELF,
     EXTENDED_POST_TYPE_ARTICLE,
     WIDGET_LIST_CHANGE_PERM,
 )
+from channels.exceptions import ConflictException
 from channels.models import (
     Article,
     Channel,
@@ -56,7 +59,13 @@ from channels.models import (
     ChannelSubscription,
     ChannelGroupRole,
 )
-from channels.proxies import PostProxy, proxy_post
+from channels.proxies import (
+    PostProxy,
+    ChannelProxy,
+    proxy_post,
+    proxy_channel,
+    proxy_channels,
+)
 from channels.utils import (
     get_kind_mapping,
     get_or_create_link_meta,
@@ -322,45 +331,42 @@ def sync_channel_subscription_model(channel_name, user):
 
 
 @transaction.atomic
-def get_role_model(channel_name, role):
+def get_role_model(channel, role):
     """
     Get or create a ChannelGroupRole object
 
     Args:
-        channel_name(str): The channel name
+        channel(channels.models.Channel): The channel
+        role(str): The role name (moderators, contributors)
 
     Returns:
         ChannelGroupRole: the ChannelGroupRole object
     """
-    return ChannelGroupRole.objects.get_or_create(
-        channel=Channel.objects.get(name=channel_name),
-        group=Group.objects.get_or_create(name="{}_{}".format(channel_name, role))[0],
-        role=role,
-    )[0]
+    return ChannelGroupRole.objects.get(channel=channel, role=role)
 
 
-def add_user_role(channel_name, role, user):
+def add_user_role(channel, role, user):
     """
     Add a user to a channel role's group
 
     Args:
-        channel_name(str): The channel name
+        channel(channels.models.Channel): The channel
         role(str): The role name (moderators, contributors)
         user(django.contrib.auth.models.User): The user
     """
-    get_role_model(channel_name, role).group.user_set.add(user)
+    get_role_model(channel, role).group.user_set.add(user)
 
 
-def remove_user_role(channel_name, role, user):
+def remove_user_role(channel, role, user):
     """
     Remove a user from a channel role's group
 
     Args:
-        channel_name(str): The channel name
+        channel(channels.models.Channel): The channel
         role(str): The role name (moderators, contributors)
         user(django.contrib.auth.models.User): The user
     """
-    get_role_model(channel_name, role).group.user_set.remove(user)
+    get_role_model(channel, role).group.user_set.remove(user)
 
 
 def get_post_type(*, text, url, article_content):
@@ -399,6 +405,97 @@ def get_admin_api():
     return Api(admin_user)
 
 
+def get_allowed_post_types_from_link_type(link_type):
+    """
+    Determine allowed_post_types based on a value for reddit's link_type setting
+
+    Args:
+        link_type (str): the link type or None
+
+    Returns:
+        list of str: list of allowed post types
+    """
+    if link_type in [LINK_TYPE_LINK, LINK_TYPE_SELF]:
+        return [link_type]
+    else:
+        # ANY or enforce a standard default
+        return [LINK_TYPE_LINK, LINK_TYPE_SELF]
+
+
+def allowed_post_types_bitmask(allowed_post_types):
+    """
+    Returns a computer bitmask for the post types
+
+    Args:
+        allowed_post_types (list of str): list of allowed post types
+
+    Returns:
+        int: bit mask for the allowed post types
+    """
+    return reduce(
+        operator.or_,
+        [
+            bit
+            for post_type, bit in Channel.allowed_post_types.items()
+            if post_type in allowed_post_types
+        ],
+        0,
+    )
+
+
+def create_channel(name, membership_is_managed, allowed_post_types):
+    """
+    Create a channel and related models
+
+    Args:
+        name(str): the channel name
+        membership_is_managed (boolean): True if the channel is managed by another app
+        allowed_post_types (list of str): list of allowed post types
+
+    Returns:
+        channels.models.Channel: the created channel
+    """
+    widget_list = WidgetList.objects.create()
+
+    channel, created = Channel.objects.get_or_create(
+        name=name,
+        defaults={
+            "widget_list": widget_list,
+            "membership_is_managed": membership_is_managed,
+            "allowed_post_types": allowed_post_types_bitmask(allowed_post_types),
+        },
+    )
+
+    if not created:
+        # previously this was handled by a praw exception being converted in channels.utils.translate_praw_exceptions
+        # but now we raise if we try to create, but didn't
+        raise ConflictException()
+
+    roles = create_channel_groups_and_roles(channel)
+
+    moderator_group = roles[ROLE_MODERATORS].group
+    assign_perm(WIDGET_LIST_CHANGE_PERM, moderator_group, widget_list)
+
+    return channel
+
+
+def create_channel_groups_and_roles(channel):
+    """
+    Create a channel's groups and roles
+
+    Args:
+        channel(channels.models.Channel): the channel to create groups for
+    """
+    roles = {}
+    for role in ROLE_CHOICES:
+        group = Group.objects.create(name=f"{channel.name}_{role}")
+        roles[role] = ChannelGroupRole.objects.create(
+            channel=channel, group=group, role=role
+        )
+
+    return roles
+
+
 class Api:
     """Channel API"""
 
@@ -431,8 +528,24 @@ class Api:
             ListingGenerator(praw.models.Subreddit): a generator over channel listings
         """
         if self.user.is_anonymous:
-            return self.reddit.subreddits.default()
-        return self.reddit.user.subreddits(limit=None)
+            subreddits = self.reddit.subreddits.default()
+        else:
+            subreddits = self.reddit.user.subreddits(limit=None)
+
+        # call list() to force one-time evaluation of the generator
+        return proxy_channels(list(subreddits))
+
+    def get_subreddit(self, name):
+        """
+        Get the subreddit
+
+        Args:
+            name (str): The subreddit name
+
+        Returns:
+            praw.models.Subreddit: the specified subreddit
+        """
+        return self.reddit.subreddit(name)
 
     def get_channel(self, name):
         """
@@ -442,9 +555,9 @@ class Api:
             name (str): The channel name
 
         Returns:
-            praw.models.Subreddit: the specified channel
+            channels.proxies.ChannelProxy: the specified channel
         """
-        return self.reddit.subreddit(name)
+        return proxy_channel(self.get_subreddit(name))
 
     def create_channel(
         self,
@@ -452,8 +565,10 @@ class Api:
         title,
         channel_type=CHANNEL_TYPE_PUBLIC,
         membership_is_managed=False,
+        allowed_post_types=None,
+        link_type=LINK_TYPE_ANY,
         **other_settings,
-    ):
+    ):  # pylint: disable=too-many-arguments
         """
         Create a channel
 
@@ -462,10 +577,12 @@ class Api:
             title (str): title of the channel
             channel_type (str): type of the channel
             membership_is_managed (bool): Whether the channel membership is managed externally
+            allowed_post_types (list of str): list of allowed post types
+            link_type (str): the link type for this channel
             **other_settings (dict): dict of additional settings
 
         Returns:
-            praw.models.Subreddit: the created subreddit
+            channels.proxies.ChannelProxy: the created channel
         """
         if channel_type not in VALID_CHANNEL_TYPES:
             raise ValueError("Invalid argument channel_type={}".format(channel_type))
@@ -477,26 +594,25 @@ class Api:
         if not isinstance(membership_is_managed, bool):
             raise ValueError("Invalid argument membership_is_managed")
 
-        channel = self.reddit.subreddit.create(
-            name,
-            title=title,
-            subreddit_type=channel_type,
-            allow_top=True,
-            **other_settings,
-        )
+        if not allowed_post_types:
+            # forward-port link type to allowed_post_types
+            allowed_post_types = get_allowed_post_types_from_link_type(link_type)
 
-        # create an empty widget list for new channels
-        widget_list = WidgetList.objects.create()
-        Channel.objects.create(
-            name=name,
-            membership_is_managed=membership_is_managed,
-            widget_list=widget_list,
-        )
+        # wrap channel creation as an atomic operation across the db and reddit
+        with transaction.atomic():
+            channel = create_channel(name, membership_is_managed, allowed_post_types)
 
-        moderator_group = get_role_model(name, ROLE_MODERATORS).group
-        assign_perm(WIDGET_LIST_CHANGE_PERM, moderator_group, widget_list)
+            # create in reddit after we persist the db records so an error here rolls back everything
+            subreddit = self.reddit.subreddit.create(
+                name,
+                title=title,
+                subreddit_type=channel_type,
+                allow_top=True,
+                link_type=link_type,
+                **other_settings,
+            )
 
-        return channel
+        return ChannelProxy(subreddit, channel)
 
     @reddit_object_persist(search_task_helpers.update_channel_index)
     def update_channel(self, name, title=None, channel_type=None, **other_settings):
@@ -512,7 +628,8 @@ class Api:
         Returns:
             praw.models.Subreddit: the updated subreddit
         """
-        membership_is_managed = other_settings.pop("membership_is_managed", None)
+        membership_is_managed = other_settings.pop("membership_is_managed", False)
+        allowed_post_types = other_settings.pop("allowed_post_types", None)
 
         if channel_type is not None and channel_type not in VALID_CHANNEL_TYPES:
             raise ValueError("Invalid argument channel_type={}".format(channel_type))
@@ -521,12 +638,26 @@ class Api:
             if key not in CHANNEL_SETTINGS:
                 raise ValueError("Invalid argument {}={}".format(key, value))
 
+        channel_kwargs = {}
         if membership_is_managed is not None:
             if not isinstance(membership_is_managed, bool):
                 raise ValueError("Invalid argument membership_is_managed")
-            Channel.objects.filter(name=name).update(
-                membership_is_managed=membership_is_managed
+            channel_kwargs["membership_is_managed"] = membership_is_managed
+
+        if allowed_post_types is not None:
+            channel_kwargs["allowed_post_types"] = allowed_post_types_bitmask(
+                allowed_post_types
             )
+
+            # set reddit to allow all link types, going forward we will validate the post link_type against allowed_post_types if it is set
+            other_settings["link_type"] = LINK_TYPE_ANY
+        elif "link_type" in other_settings:
+            channel_kwargs["allowed_post_types"] = allowed_post_types_bitmask(
+                get_allowed_post_types_from_link_type(other_settings["link_type"])
+            )
+
+        if channel_kwargs:
+            Channel.objects.filter(name=name).update(**channel_kwargs)
 
         values = other_settings.copy()
         if title is not None:
@@ -627,19 +758,29 @@ class Api:
             # article posts shadow an empty text post, because reddit requires at least an empty string
             text = ""
 
-        submission = self.get_channel(channel_name).submit(
-            title, selftext=text, url=url
-        )
+        channel = self.get_channel(channel_name)
+
+        # if the channel has allowed_post_types configured, use that, otherwise delegate to reddit via the submit() call
+        if channel.allowed_post_types:
+            if not channel.allowed_post_types & getattr(
+                Channel.allowed_post_types, post_type
+            ):
+                raise ValueError(
+                    f"Post type {post_type} is not permitted in this channel"
+                )
+
+        submission = channel.submit(title, selftext=text, url=url)
 
         post = None
 
         with transaction.atomic():
-            channel = Channel.objects.get(name=channel_name)
-
             # select_for_update so no one else can write to this
             post, created = Post.objects.select_for_update().get_or_create(
                 post_id=submission.id,
-                defaults={"channel": channel, "post_type": post_type},
+                defaults={
+                    "channel": channel._channel,  # pylint: disable=protected-access
+                    "post_type": post_type,
+                },
             )
 
             if created and article_content:
@@ -724,6 +865,18 @@ class Api:
                 )
             )
 
+    def get_submission(self, submission_id):
+        """
+        Gets the submission
+
+        Args:
+            submission_id(str): the base36 id for the submission
+
+        Returns:
+            praw.models.Submission: the submission
+        """
+        return self.reddit.submission(id=submission_id)
+
     def get_post(self, post_id):
         """
         Gets the post
@@ -734,7 +887,7 @@ class Api:
         Returns:
             channels.proxies.PostProxy: the submitted post
         """
-        return proxy_post(self.reddit.submission(id=post_id))
+        return proxy_post(self.get_submission(post_id))
 
     @reddit_object_persist(search_task_helpers.update_post_text)
     def update_post(self, post_id, *, text=None, article_content=None):
@@ -762,7 +915,7 @@ class Api:
 
         if post.post_type:
             # new validation
-            if text and post.post_type not in (LINK_TYPE_ANY, LINK_TYPE_SELF):
+            if text and post.post_type != LINK_TYPE_SELF:
                 raise ValueError(
                     f"Posts of type '{post.post_type}' cannot have text updated"
                 )
@@ -1050,8 +1203,9 @@ class Api:
             user = User.objects.get(username=contributor_name)
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(contributor_name))
-        self.get_channel(channel_name).contributor.add(user)
-        add_user_role(channel_name, ROLE_CONTRIBUTORS, user)
+        proxied_channel = self.get_channel(channel_name)
+        proxied_channel.contributor.add(user)
+        add_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
         search_task_helpers.update_author(user)
         return Redditor(self.reddit, name=contributor_name)
 
@@ -1070,8 +1224,9 @@ class Api:
             raise NotFound("User {} does not exist".format(contributor_name))
         # This doesn't check if a user is a moderator because they should have access to the channel
         # regardless of their contributor status
-        self.get_channel(channel_name).contributor.remove(user)
-        remove_user_role(channel_name, ROLE_CONTRIBUTORS, user)
+        proxied_channel = self.get_channel(channel_name)
+        proxied_channel.contributor.remove(user)
+        remove_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
         search_task_helpers.update_author(user)
 
     def list_contributors(self, channel_name):
@@ -1098,14 +1253,14 @@ class Api:
             user = User.objects.get(username=moderator_name)
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
-        channel = self.get_channel(channel_name)
+        proxied_channel = self.get_channel(channel_name)
         try:
-            channel.moderator.add(user)
+            proxied_channel.moderator.add(user)
             Api(user).accept_invite(channel_name)
         except APIException as ex:
             if ex.error_type != "ALREADY_MODERATOR":
                 raise
-        add_user_role(channel_name, ROLE_MODERATORS, user)
+        add_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
         search_task_helpers.update_author(user)
 
     def accept_invite(self, channel_name):
@@ -1130,8 +1285,9 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
 
-        self.get_channel(channel_name).moderator.remove(user)
-        remove_user_role(channel_name, ROLE_MODERATORS, user)
+        proxied_channel = self.get_channel(channel_name)
+        proxied_channel.moderator.remove(user)
+        remove_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
         search_task_helpers.update_author(user)
 
     def _list_moderators(self, *, channel_name, moderator_name):

@@ -1,6 +1,7 @@
 """
 Serializers for channel REST APIs
 """
+# pylint: disable=too-many-lines
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
@@ -8,7 +9,7 @@ from django.contrib.auth import get_user_model
 from praw.models import Comment, MoreComments
 from praw.models.reddit.submission import Submission
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 
 from channels.utils import (
     get_kind_mapping,
@@ -45,15 +46,18 @@ class ChannelSerializer(serializers.Serializer):
         source="submission_type",
         choices=VALID_LINK_TYPES,
     )
+    allowed_post_types = WriteableSerializerMethodField()
     user_is_contributor = serializers.SerializerMethodField()
     user_is_moderator = serializers.SerializerMethodField()
-    widget_list_id = serializers.SerializerMethodField()
-    membership_is_managed = WriteableSerializerMethodField()
+    widget_list_id = serializers.IntegerField(
+        required=False, allow_null=True, read_only=True
+    )
+    membership_is_managed = serializers.BooleanField(required=False)
     avatar = WriteableSerializerMethodField()
     avatar_small = serializers.SerializerMethodField()
     avatar_medium = serializers.SerializerMethodField()
     banner = WriteableSerializerMethodField()
-    ga_tracking_id = WriteableSerializerMethodField()
+    ga_tracking_id = serializers.CharField(required=False, allow_blank=True)
 
     def get_user_is_contributor(self, channel):
         """
@@ -69,50 +73,21 @@ class ChannelSerializer(serializers.Serializer):
         """
         return bool(channel.user_is_moderator)
 
-    def get_widget_list_id(self, channel):
-        """
-        Get widget_list_id from the associated Channel model
-        """
-        channel_obj = self._get_channel(name=channel.display_name)
-        return channel_obj.widget_list_id
-
-    def get_membership_is_managed(self, channel):
-        """
-        Get membership_is_managed from the associated Channel model
-        """
-        channel_obj = self._get_channel(name=channel.display_name)
-        return channel_obj.membership_is_managed
-
-    def get_ga_tracking_id(self, channel):
-        """
-        Get ga_tracking_id from the associated Channel model
-        """
-        channel_obj = self._get_channel(name=channel.display_name)
-        return channel_obj.ga_tracking_id
-
-    def _lookup_image_url(self, channel, field):
-        """Lookup an image url, return None if not found"""
-        channel_obj = self._get_channel(name=channel.display_name)
-        try:
-            return getattr(channel_obj, field).url
-        except ValueError:
-            return None
-
     def get_avatar(self, channel):
         """Get the avatar image URL"""
-        return self._lookup_image_url(channel, "avatar")
+        return channel.avatar.url if channel.avatar else None
 
     def get_avatar_small(self, channel):
         """Get the avatar image small URL"""
-        return self._lookup_image_url(channel, "avatar_small")
+        return channel.avatar_small.url if channel.avatar_small else None
 
     def get_avatar_medium(self, channel):
         """Get the avatar image medium URL"""
-        return self._lookup_image_url(channel, "avatar_medium")
+        return channel.avatar_medium.url if channel.avatar_medium else None
 
     def get_banner(self, channel):
         """Get the banner image URL"""
-        return self._lookup_image_url(channel, "banner")
+        return channel.banner.url if channel.banner else None
 
     def validate_avatar(self, value):
         """Empty validation function, but this is required for WriteableSerializerMethodField"""
@@ -126,9 +101,40 @@ class ChannelSerializer(serializers.Serializer):
             raise ValidationError("Expected banner to be a file")
         return {"banner": value}
 
-    def validate_membership_is_managed(self, value):
-        """Empty validation function, but this is required for WriteableSerializerMethodField"""
-        return {"membership_is_managed": value}
+    def get_allowed_post_types(self, channel):
+        """Returns a dictionary of allowed post types"""
+        from channels.api import get_allowed_post_types_from_link_type
+
+        if channel.allowed_post_types:
+            return [
+                post_type
+                for post_type, enabled in channel.allowed_post_types.items()
+                if enabled
+            ]
+
+        return get_allowed_post_types_from_link_type(channel.submission_type)
+
+    def validate_allowed_post_types(self, value):
+        """Validate the allowed post types"""
+        if not value:
+            return {}
+
+        if not isinstance(value, list) and not all(
+            [isinstance(item, str) for item in value]
+        ):
+            raise ValidationError(
+                "Expected allowed_post_types to be a list of enabled types"
+            )
+
+        allowed_keys = Channel.allowed_post_types.keys()
+
+        for allowed_type in value:
+            if allowed_type not in allowed_keys:
+                raise ValidationError(
+                    f"Post type {allowed_type} not supported for allowed_post_types"
+                )
+
+        return {"allowed_post_types": value}
 
     def _get_channel(self, name):
         """Get channel"""
@@ -180,12 +186,13 @@ class ChannelSerializer(serializers.Serializer):
             "description": "description",
             "public_description": "public_description",
             "membership_is_managed": "membership_is_managed",
+            "allowed_post_types": "allowed_post_types",
         }
         kwargs = filter_dict_with_renamed_keys(validated_data, lookup, optional=True)
 
         channel = api.update_channel(name=name, **kwargs)
 
-        channel_obj = self._get_channel(name)
+        channel_obj = channel._channel  # pylint: disable=protected-access
 
         avatar = validated_data.get("avatar")
         if avatar:
@@ -409,14 +416,16 @@ class PostSerializer(BasePostSerializer):
 
         api = self.context["channel_api"]
         channel_name = self.context["view"].kwargs["channel_name"]
-
-        post = api.create_post(
-            channel_name,
-            title=title,
-            text=text,
-            url=url,
-            article_content=article_content,
-        )
+        try:
+            post = api.create_post(
+                channel_name,
+                title=title,
+                text=text,
+                url=url,
+                article_content=article_content,
+            )
+        except Channel.DoesNotExist as exc:
+            raise NotFound("Channel doesn't exist") from exc
 
         api.add_post_subscription(post.id)
 

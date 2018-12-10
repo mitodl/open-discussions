@@ -5,8 +5,16 @@ from prawcore.exceptions import ResponseException
 
 from channels import tasks
 from channels import api
-from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
-from channels.models import Channel, ChannelSubscription
+from channels.constants import (
+    ROLE_MODERATORS,
+    ROLE_CONTRIBUTORS,
+    LINK_TYPE_ANY,
+    LINK_TYPE_LINK,
+    LINK_TYPE_SELF,
+    EXTENDED_POST_TYPE_ARTICLE,
+)
+from channels.factories import ChannelFactory, ArticleFactory, PostFactory
+from channels.models import ChannelSubscription, Post, Channel
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
 
@@ -19,7 +27,7 @@ pytestmark = pytest.mark.django_db
 def channels_and_users():
     """Channels and users for testing"""
     return (
-        [Channel.objects.create(name=channel_name) for channel_name in ["a", "b", "c"]],
+        [ChannelFactory.create(name=channel_name) for channel_name in ["a", "b", "c"]],
         UserFactory.create_batch(4),
     )
 
@@ -159,3 +167,75 @@ def test_populate_user_roles_error(
 
     with pytest.raises(PopulateUserRolesException):
         tasks.populate_user_roles.delay([channel.id for channel in channels])
+
+
+def test_populate_post_and_channel_types(mocker, mocked_celery, settings):
+    """
+    populate_post_and_channel_types should call sub-tasks with correct ids
+    """
+    channels = ChannelFactory.create_batch(4)
+    posts = PostFactory.create_batch(4, channel=channels[0])
+    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
+    mock_populate_channel_post_type = mocker.patch(
+        "channels.tasks.populate_channel_post_type"
+    )
+    mock_populate_post_post_type = mocker.patch(
+        "channels.tasks.populate_post_post_type"
+    )
+
+    with pytest.raises(mocked_celery.replace_exception_class):
+        tasks.populate_post_and_channel_types.delay()
+
+    assert mocked_celery.group.call_count == 1
+    list(mocked_celery.group.call_args[0][0])
+    mock_populate_channel_post_type.si.assert_any_call([channels[0].id, channels[1].id])
+    mock_populate_channel_post_type.si.assert_any_call([channels[2].id, channels[3].id])
+    mock_populate_post_post_type.si.assert_any_call([posts[0].id, posts[1].id])
+    mock_populate_post_post_type.si.assert_any_call([posts[2].id, posts[3].id])
+    assert mocked_celery.replace.call_count == 1
+
+
+def test_populate_channel_post_type(mocker, settings):
+    """
+    populate_channel_post_type should set allowed_post_types
+    """
+    settings.INDEXING_API_USERNAME = UserFactory.create().username
+    channels = ChannelFactory.create_batch(2)
+    mock_api = mocker.patch("channels.api.Api", autospec=True)
+    mock_api.return_value.get_subreddit.return_value.submission_type = LINK_TYPE_ANY
+
+    updated_channel = channels[0]
+    updated_channel.allowed_post_types = 0
+    updated_channel.save()
+
+    tasks.populate_channel_post_type.delay([channel.id for channel in channels])
+
+    updated_channel.refresh_from_db()
+
+    mock_api.return_value.get_subreddit.assert_called_once_with(updated_channel.name)
+
+    assert int(updated_channel.allowed_post_types) == int(
+        Channel.allowed_post_types.self | Channel.allowed_post_types.link
+    )
+
+
+def test_populate_post_post_type(mocker, settings):
+    """
+    populate_post_post_type should set allowed_post_types
+    """
+    settings.INDEXING_API_USERNAME = UserFactory.create().username
+    channel = ChannelFactory.create()
+    posts = PostFactory.create_batch(3, channel=channel, post_type=None)
+    ArticleFactory.create(post=posts[2])
+    mock_api = mocker.patch("channels.api.Api", autospec=True)
+    mock_api.return_value.get_submission.side_effect = [
+        mocker.Mock(url=True),
+        mocker.Mock(url=False),
+        mocker.Mock(url=False),
+    ]
+
+    tasks.populate_post_post_type.delay([post.id for post in posts])
+
+    assert Post.objects.get(id=posts[0].id).post_type == LINK_TYPE_LINK
+    assert Post.objects.get(id=posts[1].id).post_type == LINK_TYPE_SELF
+    assert Post.objects.get(id=posts[2].id).post_type == EXTENDED_POST_TYPE_ARTICLE

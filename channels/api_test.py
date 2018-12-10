@@ -1,6 +1,6 @@
 """API tests"""
 # pylint: disable=redefined-outer-name,too-many-lines
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 from urllib.parse import urljoin
 
 from django.contrib.auth.models import AnonymousUser
@@ -14,6 +14,9 @@ from rest_framework.exceptions import NotFound
 from channels import api
 from channels.constants import (
     COMMENTS_SORT_BEST,
+    CHANNEL_TYPE_PUBLIC,
+    CHANNEL_TYPE_PRIVATE,
+    CHANNEL_TYPE_RESTRICTED,
     VALID_CHANNEL_TYPES,
     POST_TYPE,
     COMMENT_TYPE,
@@ -22,9 +25,10 @@ from channels.constants import (
     ROLE_MODERATORS,
     LINK_TYPE_LINK,
     LINK_TYPE_SELF,
+    LINK_TYPE_ANY,
     EXTENDED_POST_TYPE_ARTICLE,
 )
-from channels.factories import ArticleFactory
+from channels.factories import ArticleFactory, ChannelFactory
 from channels.models import (
     Article,
     Channel,
@@ -46,7 +50,8 @@ pytestmark = pytest.mark.django_db
 
 def _mock_channel(*, name, **kwargs):
     """Create a mock channel and associated DB record"""
-    Channel.objects.get_or_create(name=name)
+    if not Channel.objects.filter(name=name).exists():
+        ChannelFactory.create(name=name)
     return Mock(display_name=name, **kwargs)
 
 
@@ -75,7 +80,7 @@ def mock_get_client(mocker):
     return mocker.patch(
         "channels.api._get_client",
         autospec=True,
-        return_value=Mock(
+        return_value=MagicMock(
             subreddit=Mock(
                 return_value=_mock_channel(
                     name="channel",
@@ -229,35 +234,92 @@ def test_get_channel_user(mock_get_client):
 def test_list_channels_user(mock_get_client):
     """Test list_channels for logged-in user"""
     user = UserFactory.create()
+    mock_get_client.return_value.user.subreddits.return_value = [
+        _mock_channel(name="abc")
+    ]
     channels = api.Api(user=user).list_channels()
     assert channels == mock_get_client.return_value.user.subreddits.return_value
     mock_get_client.assert_called_once_with(user=user)
     mock_get_client.return_value.user.subreddits.assert_called_once_with(limit=None)
 
 
-@pytest.mark.parametrize("channel_type", VALID_CHANNEL_TYPES)
-def test_create_channel_user(mock_get_client, indexing_decorator, channel_type):
+@pytest.mark.parametrize(
+    "kwargs, expected, allowed_post_types",
+    [
+        [
+            {"channel_type": CHANNEL_TYPE_PUBLIC},
+            {"subreddit_type": CHANNEL_TYPE_PUBLIC},
+            [LINK_TYPE_LINK, LINK_TYPE_SELF],
+        ],
+        [
+            {"channel_type": CHANNEL_TYPE_PRIVATE},
+            {"subreddit_type": CHANNEL_TYPE_PRIVATE},
+            [LINK_TYPE_LINK, LINK_TYPE_SELF],
+        ],
+        [
+            {"channel_type": CHANNEL_TYPE_RESTRICTED},
+            {"subreddit_type": CHANNEL_TYPE_RESTRICTED},
+            [LINK_TYPE_LINK, LINK_TYPE_SELF],
+        ],
+        [
+            {"link_type": LINK_TYPE_ANY},
+            {"link_type": LINK_TYPE_ANY},
+            [LINK_TYPE_LINK, LINK_TYPE_SELF],
+        ],
+        [
+            {"link_type": LINK_TYPE_LINK},
+            {"link_type": LINK_TYPE_LINK},
+            [LINK_TYPE_LINK],
+        ],
+        [
+            {"link_type": LINK_TYPE_SELF},
+            {"link_type": LINK_TYPE_SELF},
+            [LINK_TYPE_SELF],
+        ],
+        [
+            {"allowed_post_types": [LINK_TYPE_LINK]},
+            {"link_type": LINK_TYPE_ANY},
+            [LINK_TYPE_LINK],
+        ],
+    ],
+)
+def test_create_channel_user(
+    mock_get_client, indexing_decorator, kwargs, expected, allowed_post_types
+):
     """Test create_channel for logged-in user"""
     user = UserFactory.create()
-    channel = api.Api(user=user).create_channel(
-        "name", "Title", channel_type=channel_type
-    )
+    # some defaults
+    input_kwargs = {
+        "channel_type": CHANNEL_TYPE_PUBLIC,
+        "link_type": LINK_TYPE_ANY,
+        **kwargs,
+    }
+    expected = {
+        "subreddit_type": input_kwargs["channel_type"],
+        "link_type": input_kwargs["link_type"],
+        **expected,
+    }
+    channel = api.Api(user=user).create_channel("name", "Title", **input_kwargs)
     assert channel == mock_get_client.return_value.subreddit.create.return_value
     mock_get_client.assert_called_once_with(user=user)
     mock_get_client.return_value.subreddit.create.assert_called_once_with(
-        "name", title="Title", subreddit_type=channel_type, allow_top=True
+        "name", title="Title", allow_top=True, **expected
     )
     assert indexing_decorator.mock_persist_func.call_count == 0
     assert Channel.objects.filter(name="name").exists()
-    widget_list = Channel.objects.get(name="name").widget_list
-    assert widget_list is not None
+    channel = Channel.objects.get(name="name")
+    assert [
+        key for key, enabled in channel.allowed_post_types if enabled
+    ] == allowed_post_types
+    assert ChannelGroupRole.objects.filter(channel=channel).count() == 2
+    assert channel.widget_list is not None
     moderator_perms = api.get_role_model(
-        "name", ROLE_MODERATORS
+        channel, ROLE_MODERATORS
     ).group.groupobjectpermission_set.all()
     assert len(moderator_perms) == 1
     assert any(
         [
-            p.content_object == widget_list
+            p.content_object == channel.widget_list
             and p.permission.codename == "change_widgetlist"
             for p in moderator_perms
         ]
@@ -269,6 +331,7 @@ def test_create_channel_setting(mock_client, channel_setting):
     """Test create_channel for {channel_setting}"""
     user = UserFactory.create()
     kwargs = {channel_setting: "value"} if channel_setting != "allow_top" else {}
+    expected_kwargs = {"link_type": LINK_TYPE_ANY, **kwargs}
     channel = api.Api(user=user).create_channel("name", "Title", **kwargs)
     assert channel == mock_client.subreddit.create.return_value
     mock_client.subreddit.create.assert_called_once_with(
@@ -276,7 +339,7 @@ def test_create_channel_setting(mock_client, channel_setting):
         title="Title",
         subreddit_type=api.CHANNEL_TYPE_PUBLIC,
         allow_top=True,
-        **kwargs,
+        **expected_kwargs,
     )
 
 
@@ -340,6 +403,40 @@ def test_update_channel_setting(mock_client, channel_setting, indexing_decorator
         search_task_helpers.update_channel_index
         in indexing_decorator.mock_persist_func.original
     )
+
+
+@pytest.mark.parametrize(
+    "allowed_post_types",
+    [
+        [LINK_TYPE_LINK, LINK_TYPE_SELF, EXTENDED_POST_TYPE_ARTICLE],
+        [LINK_TYPE_LINK, EXTENDED_POST_TYPE_ARTICLE],
+        [LINK_TYPE_LINK, LINK_TYPE_SELF],
+        [LINK_TYPE_SELF, EXTENDED_POST_TYPE_ARTICLE],
+        [LINK_TYPE_LINK],
+        [LINK_TYPE_SELF],
+        [EXTENDED_POST_TYPE_ARTICLE],
+    ],
+)
+def test_update_channel_allowed_(mock_client, allowed_post_types):
+    """Test update_channel for channel_setting"""
+    user = UserFactory.create()
+    channel = ChannelFactory.create()
+
+    updated_channel = api.Api(user=user).update_channel(
+        channel.name, allowed_post_types=allowed_post_types
+    )
+
+    assert updated_channel == mock_client.subreddit.return_value
+    mock_client.subreddit.assert_called_with(channel.name)
+    assert mock_client.subreddit.call_count == 2
+    mock_client.subreddit.return_value.mod.update.assert_called_once_with(
+        link_type=LINK_TYPE_ANY
+    )
+
+    channel.refresh_from_db()
+    assert [
+        key for key, enabled in channel.allowed_post_types if enabled
+    ] == allowed_post_types
 
 
 @pytest.mark.parametrize("membership_is_managed", [None, True, False])
@@ -1226,8 +1323,8 @@ def test_is_subscriber(mock_client):
     client = api.Api(UserFactory.create(username="mitodl"))
     subscriber = UserFactory.create()
     mock_client.user.subreddits.return_value = [
-        Mock(display_name="sub1"),
-        Mock(display_name="sub2"),
+        _mock_channel(name="sub1"),
+        _mock_channel(name="sub2"),
     ]
     assert client.is_subscriber(subscriber.username, "channel") is False
     assert client.is_subscriber(subscriber.username, "sub2") is True
@@ -1319,3 +1416,17 @@ def test_remove_comment_subscription(
     assert not Subscription.objects.filter(
         user=user, post_id="abc", comment_id="def"
     ).exists()
+
+
+@pytest.mark.parametrize(
+    "link_type, expected",
+    [
+        [None, [LINK_TYPE_LINK, LINK_TYPE_SELF]],
+        [LINK_TYPE_ANY, [LINK_TYPE_LINK, LINK_TYPE_SELF]],
+        [LINK_TYPE_LINK, [LINK_TYPE_LINK]],
+        [LINK_TYPE_SELF, [LINK_TYPE_SELF]],
+    ],
+)
+def test_get_allowed_post_types_from_link_type(link_type, expected):
+    """Tests that allowed_post_types is correctly determined from link_type"""
+    assert api.get_allowed_post_types_from_link_type(link_type) == expected

@@ -2,9 +2,11 @@
 import copy
 import json
 import os
+import operator
 import string
 import time
 from datetime import datetime
+from functools import reduce
 
 import base36
 import pytz
@@ -40,11 +42,13 @@ FAKE = faker.Factory.create()
 STRATEGY_CREATE = "create"
 STRATEGY_BUILD = "build"
 
+DEFAULT_ALLOWED_POST_TYPES = reduce(operator.or_, Channel.allowed_post_types.values())
 
-def _channel_name():
+
+def _channel_name(channel, index):  # pylint: disable=unused-argument
     """Generate a channel name from the current time and a random word"""
     now = now_in_utc().timestamp()
-    return "{}_{}".format(int(now), FAKE.word())[
+    return "{}_{}_{}".format(int(now), index, FAKE.word())[
         :21
     ]  # maximum of 21-char channel names
 
@@ -63,6 +67,9 @@ class RedditChannel:  # pylint: disable=too-many-instance-attributes
         self.public_description = kwargs.get("public_description", None)
         self.user_is_contributor = kwargs.get("user_is_contributor", True)
         self.user_is_moderator = kwargs.get("user_is_moderator", True)
+        self.allowed_post_types = kwargs.get(
+            "allowed_post_types", Channel.allowed_post_types.keys()
+        )
         self.api = kwargs.get("api", None)
 
 
@@ -106,7 +113,18 @@ class LinkMetaFactory(DjangoModelFactory):
 class ChannelFactory(DjangoModelFactory):
     """Factory for a channels.models.Channel object"""
 
-    name = factory.LazyFunction(_channel_name)
+    name = factory.LazyAttributeSequence(_channel_name)
+    allowed_post_types = DEFAULT_ALLOWED_POST_TYPES
+
+    @factory.post_generation
+    def create_roles(
+        self, create, extracted, **kwargs
+    ):  # pylint: disable=unused-argument
+        """Create the channel groups and roles after the channel is created"""
+        if not create:
+            return
+
+        api.create_channel_groups_and_roles(self)
 
     class Meta:
         model = Channel
@@ -506,6 +524,7 @@ class RedditChannelFactory(factory.Factory):
     channel_type = FuzzyChoice(VALID_CHANNEL_TYPES)
     link_type = LINK_TYPE_ANY
     ga_tracking_id = None
+    allowed_post_types = Channel.allowed_post_types.keys()
 
     @factory.post_generation
     def _create_in_reddit(
@@ -524,6 +543,7 @@ class RedditChannelFactory(factory.Factory):
             link_type=self.link_type,
             description=self.description,
             public_description=self.public_description,
+            allowed_post_types=self.allowed_post_types,
         )
 
     class Meta:

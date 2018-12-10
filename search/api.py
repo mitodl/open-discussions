@@ -97,12 +97,14 @@ def execute_search(*, user, query):
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
     channel_names = (
-        list(
-            ChannelGroupRole.objects.filter(
-                group__user=user, role__in=(ROLE_CONTRIBUTORS, ROLE_MODERATORS)
+        sorted(
+            list(
+                ChannelGroupRole.objects.filter(
+                    group__user=user, role__in=(ROLE_CONTRIBUTORS, ROLE_MODERATORS)
+                )
+                .values_list("channel__name", flat=True)
+                .distinct()
             )
-            .values_list("channel__name", flat=True)
-            .distinct()
         )
         if not user.is_anonymous
         else []

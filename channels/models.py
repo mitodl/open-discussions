@@ -2,6 +2,7 @@
 from uuid import uuid4
 
 import base36
+from bitfield import BitField
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.postgres.fields import JSONField
@@ -128,6 +129,9 @@ class Channel(TimestampedModel):
     banner = models.ImageField(null=True, max_length=2083, upload_to=banner_uri)
     ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
     widget_list = models.ForeignKey(WidgetList, on_delete=models.SET_NULL, null=True)
+
+    # Bitfield mutates the list passed to
+    allowed_post_types = BitField(flags=VALID_EXTENDED_POST_CHOICES, null=True)
 
     def save(
         self, *args, update_image=False, **kwargs

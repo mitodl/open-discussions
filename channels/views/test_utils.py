@@ -1,9 +1,39 @@
 """Utilities for tests"""
 from urllib.parse import urlparse
 
-from channels.models import Article
+from channels.models import Article, Channel
 from channels.utils import get_reddit_slug
 from profiles.utils import image_uri
+
+
+def default_channel_response_data(channel):
+    """
+    Helper function. Returns a dict containing some of the data that we expect from the API given
+    a channel.
+    """
+    channel_record = Channel.objects.get(name=channel.name)
+    return {
+        "title": channel.title,
+        "name": channel.name,
+        "description": channel.description,
+        "public_description": channel.public_description,
+        "channel_type": channel.channel_type,
+        "user_is_contributor": True,
+        "user_is_moderator": False,
+        "link_type": channel.link_type,
+        "membership_is_managed": False,
+        "avatar": None,
+        "avatar_small": None,
+        "avatar_medium": None,
+        "banner": None,
+        "ga_tracking_id": None,
+        "allowed_post_types": [
+            post_type
+            for post_type, enabled in channel_record.allowed_post_types
+            if enabled
+        ],
+        "widget_list_id": channel_record.widget_list_id,
+    }
 
 
 def default_post_response_data(channel, post, user):

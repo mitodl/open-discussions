@@ -13,9 +13,17 @@ from channels.api import (
     sync_channel_subscription_model,
     add_user_role,
     get_admin_api,
+    get_allowed_post_types_from_link_type,
+    allowed_post_types_bitmask,
 )
-from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
-from channels.models import Channel
+from channels.constants import (
+    ROLE_MODERATORS,
+    ROLE_CONTRIBUTORS,
+    LINK_TYPE_LINK,
+    LINK_TYPE_SELF,
+    EXTENDED_POST_TYPE_ARTICLE,
+)
+from channels.models import Channel, Post
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 from search.exceptions import PopulateUserRolesException, RetryException
@@ -95,11 +103,11 @@ def populate_user_roles(channel_ids):
             for moderator in client.list_moderators(channel.name):
                 user = User.objects.filter(username=moderator.name).first()
                 if user:
-                    add_user_role(channel.name, ROLE_MODERATORS, user)
+                    add_user_role(channel, ROLE_MODERATORS, user)
             for contributor in client.list_contributors(channel.name):
                 user = User.objects.filter(username=contributor.name).first()
                 if user:
-                    add_user_role(channel.name, ROLE_CONTRIBUTORS, user)
+                    add_user_role(channel, ROLE_CONTRIBUTORS, user)
         except ResponseException:
             # This could mean the indexing user cannot access a channel, which is a bug.
             # We need to raise a different exception here because celery doesn't handle PRAW exceptions correctly.
@@ -124,6 +132,76 @@ def populate_subscriptions_and_roles(self):
         ]
         + [
             populate_user_roles.si(ids)
+            for ids in chunks(
+                Channel.objects.values_list("id", flat=True),
+                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            )
+        ]
+    )
+    raise self.replace(results)
+
+
+@app.task
+def populate_post_post_type(ids):
+    """
+    Populates Post.post_type for a range of posts
+
+    Args:
+        ids (list of int): list of post ids
+    """
+    client = get_admin_api()
+
+    for post in Post.objects.filter(id__in=ids).iterator():
+        if post.post_type:
+            continue
+
+        submission = client.get_submission(post.post_id)
+        if submission.url:
+            post.post_type = LINK_TYPE_LINK
+        elif hasattr(post, "article") and post.article:
+            post.post_type = EXTENDED_POST_TYPE_ARTICLE
+        else:
+            post.post_type = LINK_TYPE_SELF
+
+        post.save()
+
+
+@app.task
+def populate_channel_post_type(channel_ids):
+    """
+    Populates Channel.allowed_post_types for a range of channels
+
+    Args:
+        channel_ids (list of int): list channel post ids
+    """
+    client = get_admin_api()
+
+    for channel in Channel.objects.filter(id__in=channel_ids).iterator():
+        if channel.allowed_post_types:
+            continue
+
+        subreddit = client.get_subreddit(channel.name)
+        channel.allowed_post_types = allowed_post_types_bitmask(
+            get_allowed_post_types_from_link_type(subreddit.submission_type)
+        )
+        channel.save()
+
+
+@app.task(bind=True)
+def populate_post_and_channel_types(self):
+    """
+    Populates Channel.allowed_post_types and Post.post_type
+    """
+    results = celery.group(
+        [
+            populate_post_post_type.si(ids)
+            for ids in chunks(
+                Post.objects.values_list("id", flat=True),
+                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            )
+        ]
+        + [
+            populate_channel_post_type.si(ids)
             for ids in chunks(
                 Channel.objects.values_list("id", flat=True),
                 chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
