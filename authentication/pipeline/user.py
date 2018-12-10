@@ -2,6 +2,7 @@
 import ulid
 from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
+from social_core.exceptions import AuthException
 from social_core.pipeline.partial import partial
 from django.conf import settings
 
@@ -253,5 +254,5 @@ def forbid_hijack(strategy, backend, **kwargs):  # pylint: disable=unused-argume
     """
     # As first step in pipeline, stop a hijacking admin from going any further
     if strategy.session_get("is_hijacked_user"):
-        raise ValueError("You are hijacking another user, don't try to login again")
+        raise AuthException("You are hijacking another user, don't try to login again")
     return {}
