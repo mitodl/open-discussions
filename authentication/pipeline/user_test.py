@@ -355,3 +355,23 @@ def test_require_touchstone_login(
             user_actions.require_touchstone_login(*args, **kwargs)
     else:
         assert user_actions.require_touchstone_login(*args, **kwargs) == {}
+
+
+@pytest.mark.parametrize("hijacked", [True, False])
+def test_forbid_hijack(mocker, hijacked):
+    """
+    Tests that forbid_hijack action raises an exception if a user is hijacked
+    """
+    mock_strategy = mocker.Mock()
+    mock_strategy.session_get.return_value = hijacked
+
+    mock_backend = mocker.Mock(name="email")
+
+    args = [mock_strategy, mock_backend]
+    kwargs = {"flow": SocialAuthState.FLOW_LOGIN}
+
+    if hijacked:
+        with pytest.raises(ValueError):
+            user_actions.forbid_hijack(*args, **kwargs)
+    else:
+        assert user_actions.forbid_hijack(*args, **kwargs) == {}

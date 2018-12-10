@@ -646,15 +646,44 @@ def test_login_email_error(settings, client, mocker):
     assert bool(get_user(client).is_authenticated) is False
 
 
+def test_login_email_hijacked(client, user, admin_user, settings):
+    """ Test that a 403 response is returned for email login view if user is hijacked"""
+    client.force_login(admin_user)
+    client.post("/hijack/{}/".format(user.id))
+    settings.FEATURES[features.EMAIL_AUTH] = True
+    response = client.post(
+        reverse("psa-login-email"),
+        {"flow": SocialAuthState.FLOW_LOGIN, "email": "anything@example.com"},
+    )
+    assert response.status_code == 403
+
+
+def test_register_email_hijacked(client, user, admin_user, settings):
+    """ Test that a 403 response is returned for email register view if user is hijacked"""
+    client.force_login(admin_user)
+    client.post("/hijack/{}/".format(user.id))
+    settings.FEATURES[features.EMAIL_AUTH] = True
+    response = client.post(
+        reverse("psa-register-email"),
+        {"flow": SocialAuthState.FLOW_LOGIN, "email": "anything@example.com"},
+    )
+    assert response.status_code == 403
+
+
 @pytest.mark.parametrize("test_jwt_token", [lazy("jwt_token"), None])
+@pytest.mark.parametrize("hijacked", [True, False])
 def test_login_complete(
-    settings, client, logged_in_user, test_jwt_token
+    settings, client, logged_in_user, admin_user, test_jwt_token, hijacked
 ):  # pylint: disable=unused-argument
     """Verify that the jwt-complete view invalidates the JWT auth cookie"""
+    if hijacked:
+        client.force_login(admin_user)
+        client.post("/hijack/{}/".format(logged_in_user.id))
+
     response = client.get(reverse("login-complete"))
 
     assert response.url == "/"
-    if test_jwt_token:
+    if test_jwt_token and not hijacked:
         assert settings.OPEN_DISCUSSIONS_COOKIE_NAME in response.cookies
         cookie = response.cookies[settings.OPEN_DISCUSSIONS_COOKIE_NAME]
         assert cookie["max-age"] == 0
