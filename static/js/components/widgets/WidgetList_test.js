@@ -2,11 +2,10 @@ import React from "react"
 import { expect } from "chai"
 import sinon from "sinon"
 import { mount } from "enzyme"
-import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
 import WidgetList from "./WidgetList"
-import { apiPath } from "../../lib/widgets"
 import { mockTextWidget } from "../../factories/widgets"
+import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("<WidgetList />", () => {
   const dummyWidgetListId = 2
@@ -14,50 +13,82 @@ describe("<WidgetList />", () => {
   const dummyPosition = 10
   const dummyWidgetInstances = [mockTextWidget(dummyWidgetId)]
   const dummyFormProps = { formProp: "dummy-form-prop" }
-  let sandbox, fetchStub, dummyProps
+  const dummyWidgetClassConfiguration = {
+    Text: [
+      {
+        key:       "title",
+        label:     "Title",
+        inputType: "text",
+        props:     {
+          placeholder: "Enter widget title",
+          autoFocus:   true
+        }
+      },
+      {
+        key:       "body",
+        label:     "Body",
+        inputType: "textarea",
+        props:     {
+          placeholder: "Enter widget text",
+          maxLength:   "",
+          minLength:   ""
+        }
+      }
+    ]
+  }
+  let helper
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
-    fetchStub = sandbox.stub(fetchFuncs, "fetchJSONWithCSRF")
-    fetchStub.returns(Promise.resolve(dummyWidgetInstances))
-
-    dummyProps = {
-      widgetListId:       dummyWidgetListId,
-      fetchData:          fetchStub,
-      errorHandler:       sandbox.spy(),
-      listWrapperProps:   { listWrapperProp: "dummy-list-wrapper-prop" },
-      formWrapperProps:   { formWrapperProp: "dummy-form-wrapper-prop" },
-      widgetWrapperProps: { widgetWrapperProp: "dummy-widget-wrapper-prop" }
-    }
+    helper = new IntegrationTestHelper()
+    helper.getWidgetListStub.returns(Promise.resolve(dummyWidgetInstances))
+    helper.getWidgetConfigurationsStub.returns(
+      Promise.resolve({
+        widgetClassConfigurations: dummyWidgetClassConfiguration
+      })
+    )
+    helper.getWidgetStub.returns(
+      Promise.resolve({
+        widgetClassConfigurations: dummyWidgetClassConfiguration,
+        widgetData:                {}
+      })
+    )
+    helper.updateWidgetStub.returns(Promise.resolve(dummyWidgetInstances))
+    helper.deleteWidgetStub.returns(Promise.resolve(dummyWidgetInstances))
   })
 
   afterEach(() => {
-    sandbox.restore()
+    helper.cleanup()
   })
 
-  const resetSpyHistory = () => {
-    dummyProps.errorHandler.resetHistory()
-    fetchStub.resetHistory()
-  }
+  const render = (props = {}) =>
+    mount(
+      <WidgetList
+        widgetListId={dummyWidgetListId}
+        listWrapperProps={{ listWrapperProp: "dummy-list-wrapper-prop" }}
+        formWrapperProps={{ formWrapperProp: "dummy-form-wrapper-prop" }}
+        widgetWrapperProps={{ widgetWrapperProp: "dummy-widget-wrapper-prop" }}
+        {...props}
+      />
+    )
 
   // Default behavior tests
   it("returns null if disableWidgetFramework is true", () => {
-    const wrap = mount(
-      <WidgetList {...dummyProps} disableWidgetFramework={true} />
-    )
+    const wrap = render({
+      disableWidgetFramework: true
+    })
     const instance = wrap.instance()
 
     expect(instance.render()).to.equal(null)
   })
 
   it("returns loader if no widget instance is loaded", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
 
     expect(wrap.exists(".default-loader")).to.equal(true)
   })
 
   it("runs renderWidgetList is widgetInstances are loaded", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     const renderWidgetListSpy = sinon.spy(instance, "renderWidgetList")
     instance.updateWidgetList(dummyWidgetInstances)
@@ -69,7 +100,7 @@ describe("<WidgetList />", () => {
 
   // Method Tests
   it("componentDidMount calls loadData", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     const loadDataSpy = sinon.spy(instance, "loadData")
     instance.componentDidMount()
@@ -78,75 +109,62 @@ describe("<WidgetList />", () => {
   })
 
   it("componentDidMount calls loadData only when the widgetListId changes on props", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     const loadDataSpy = sinon.spy(instance, "loadData")
-    instance.componentDidUpdate(dummyProps)
+    const oldProps = wrap.props()
+    instance.componentDidUpdate(oldProps)
 
     expect(loadDataSpy.callCount).to.equal(0)
-    const oldProps = {
-      ...dummyProps,
-      widgetListId: dummyProps.widgetListId - 1
+    const adjustedProps = {
+      ...oldProps,
+      widgetListId: oldProps.widgetListId - 1
     }
-    instance.componentDidUpdate(oldProps)
+    instance.componentDidUpdate(adjustedProps)
     expect(loadDataSpy.callCount).to.equal(1)
   })
 
-  it("loadData calls fetch with widget list id", done => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+  it("loadData calls fetch with widget list id", async () => {
+    const wrap = render()
     const instance = wrap.instance()
     const updateWidgetListSpy = sinon.spy(instance, "updateWidgetList")
-    fetchStub.resolves(dummyWidgetInstances)
-    resetSpyHistory()
-    const loadDataTest = async () => {
-      await instance.loadData()
-      expect(
-        fetchStub.withArgs(apiPath("widget_list", dummyWidgetListId)).callCount
-      ).to.equal(1)
-      expect(
-        updateWidgetListSpy.withArgs(dummyWidgetInstances).callCount
-      ).to.equal(1)
-    }
-    loadDataTest().then(done)
+
+    // wait for componentDidMount promise to resolve
+    await instance.loadData()
+    sinon.assert.calledWith(helper.getWidgetListStub, dummyWidgetListId)
+    expect(
+      updateWidgetListSpy.withArgs(dummyWidgetInstances).callCount
+    ).to.equal(2) // TODO: remove this when refactoring for redux
   })
 
   it("updateWidgetList sets the state", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
-    resetSpyHistory()
     instance.updateWidgetList(dummyWidgetInstances)
 
     expect(wrap.state("widgetInstances")).to.equal(dummyWidgetInstances)
   })
 
   it("deleteWidget calls fetch with the widgetId and a DELETE request", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
-    resetSpyHistory()
     instance.deleteWidget(dummyWidgetId)
 
-    expect(
-      fetchStub.withArgs(apiPath("widget", dummyWidgetId), { method: "DELETE" })
-        .callCount
-    ).to.equal(1)
+    sinon.assert.calledWith(helper.deleteWidgetStub, dummyWidgetId)
   })
 
   it("moveWidget calls fetch with the widgetId and a PATCH request", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
-    resetSpyHistory()
     instance.moveWidget(dummyWidgetId, dummyPosition)
 
-    expect(
-      fetchStub.withArgs(apiPath("widget", dummyWidgetId), {
-        method: "PATCH",
-        body:   JSON.stringify({ position: dummyPosition })
-      }).callCount
-    ).to.equal(1)
+    sinon.assert.calledWith(helper.updateWidgetStub, dummyWidgetId, {
+      position: dummyPosition
+    })
   })
 
   it("makePassThroughProps constructs an appropriate set of passThroughProps", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
 
@@ -192,7 +210,7 @@ describe("<WidgetList />", () => {
   })
 
   it("makePassThroughProps constructs takes a widgetId and propagates it to the props", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
 
@@ -225,7 +243,7 @@ describe("<WidgetList />", () => {
   })
 
   it("makeFormProps constructs an appropriate set of formProps", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
 
@@ -234,15 +252,6 @@ describe("<WidgetList />", () => {
 
     expect(formProps.widgetListId).to.equal(dummyWidgetListId)
     expect(formProps.listLength).to.equal(dummyWidgetInstances.length)
-
-    resetSpyHistory()
-    const dummyUrl = apiPath("widget", dummyWidgetId)
-    formProps.fetchData(dummyUrl)
-    expect(fetchStub.withArgs(dummyUrl).callCount).to.equal(1)
-
-    const dummyError = "error"
-    formProps.errorHandler(dummyError)
-    expect(dummyProps.errorHandler.withArgs(dummyError).callCount).to.equal(1)
 
     formProps.onSubmit(dummyWidgetInstances)
     expect(
@@ -255,41 +264,41 @@ describe("<WidgetList />", () => {
   })
 
   it("renderWidgetList renders a ListWrapper", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
 
     const listWrap = mount(instance.renderWidgetList())
     expect(listWrap.exists(".default-list-wrapper")).to.equal(true)
     expect(listWrap.props()).to.include(instance.makePassThroughProps())
-    expect(listWrap.props()).to.include(dummyProps.listWrapperProps)
+    expect(listWrap.props()).to.include(wrap.props().listWrapperProps)
   })
 
   it("renderListBody runs render widget once for each widget in widget instances", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
     const renderWidgetSpy = sinon.spy(instance, "renderWidget")
-    instance.renderListBody(dummyProps.listWrapperProps)
+    instance.renderListBody(wrap.props().listWrapperProps)
 
     expect(renderWidgetSpy.callCount).to.equal(dummyWidgetInstances.length)
     dummyWidgetInstances.map(instance => {
       expect(
-        renderWidgetSpy.withArgs(instance, dummyProps.listWrapperProps)
+        renderWidgetSpy.withArgs(instance, wrap.props().listWrapperProps)
           .callCount
       ).to.equal(1)
     })
   })
 
   it("renderWidget renders a WidgetWrapper", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
     const dummyWidgetInstance = dummyWidgetInstances[0]
     const dummyWidgetId = dummyWidgetInstance.id
 
     const widgetWrap = mount(
-      instance.renderWidget(dummyWidgetInstance, dummyProps.listWrapperProps)
+      instance.renderWidget(dummyWidgetInstance, wrap.props().listWrapperProps)
     )
     expect(widgetWrap.exists(`#widget-${dummyWidgetId}`)).to.equal(true)
     expect(widgetWrap.props()).to.include(dummyWidgetInstance)
@@ -306,12 +315,12 @@ describe("<WidgetList />", () => {
     expect(widgetWrap.props()).to.have.property("renderEditWidgetForm")
     expect(widgetWrap.props()).to.have.property("renderWidget")
 
-    expect(widgetWrap.props()).to.include(dummyProps.widgetWrapperProps)
-    expect(widgetWrap.props()).to.include(dummyProps.listWrapperProps)
+    expect(widgetWrap.props()).to.include(wrap.props().widgetWrapperProps)
+    expect(widgetWrap.props()).to.include(wrap.props().listWrapperProps)
   })
 
   it("renderWidgetBody renders a renderer", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
     const dummyWidgetInstance = dummyWidgetInstances[0]
@@ -323,7 +332,7 @@ describe("<WidgetList />", () => {
   })
 
   it("renderEditWidgetForm renders a FormWrapper", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
     const renderEditWidgetFormSpy = sinon.spy(
@@ -332,11 +341,14 @@ describe("<WidgetList />", () => {
     )
 
     const formWrap = mount(
-      instance.renderEditWidgetForm(dummyWidgetId, dummyProps.listWrapperProps)
+      instance.renderEditWidgetForm(
+        dummyWidgetId,
+        wrap.props().listWrapperProps
+      )
     )
     expect(formWrap.exists(".default-form-wrapper")).to.equal(true)
-    expect(formWrap.props()).to.include(dummyProps.listWrapperProps)
-    expect(formWrap.props()).to.include(dummyProps.formWrapperProps)
+    expect(formWrap.props()).to.include(wrap.props().listWrapperProps)
+    expect(formWrap.props()).to.include(wrap.props().formWrapperProps)
     const {
       deleteWidget, // eslint-disable-line no-unused-vars
       moveWidget, // eslint-disable-line no-unused-vars
@@ -357,19 +369,19 @@ describe("<WidgetList />", () => {
   })
 
   it("renderEditWidgetFormBody renders an EditWidgetForm", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
 
     const formWrap = mount(
       instance.renderEditWidgetFormBody(
         dummyWidgetId,
-        dummyProps.formWrapperProps
+        wrap.props().formWrapperProps
       )
     )
     expect(formWrap.exists("EditWidgetForm")).to.equal(true)
     expect(formWrap.find("EditWidgetForm").props()).to.include(
-      dummyProps.formWrapperProps
+      wrap.props().formWrapperProps
     )
     expect(formWrap.find("EditWidgetForm").props()).to.include(
       instance.makeFormProps()
@@ -380,7 +392,7 @@ describe("<WidgetList />", () => {
   })
 
   it("renderNewWidgetForm renders a FormWrapper", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
     const renderNewWidgetFormSpy = sinon.spy(
@@ -389,11 +401,11 @@ describe("<WidgetList />", () => {
     )
 
     const formWrap = mount(
-      instance.renderNewWidgetForm(dummyProps.listWrapperProps)
+      instance.renderNewWidgetForm(wrap.props().listWrapperProps)
     )
     expect(formWrap.exists(".default-form-wrapper")).to.equal(true)
-    expect(formWrap.props()).to.include(dummyProps.listWrapperProps)
-    expect(formWrap.props()).to.include(dummyProps.formWrapperProps)
+    expect(formWrap.props()).to.include(wrap.props().listWrapperProps)
+    expect(formWrap.props()).to.include(wrap.props().formWrapperProps)
     expect(formWrap.props()).to.include(instance.makePassThroughProps())
     formWrap.prop("renderForm")(dummyFormProps)
     expect(renderNewWidgetFormSpy.withArgs(dummyFormProps).callCount).to.equal(
@@ -402,16 +414,16 @@ describe("<WidgetList />", () => {
   })
 
   it("renderNewWidgetFormBody renders a NewWidgetForm", () => {
-    const wrap = mount(<WidgetList {...dummyProps} />)
+    const wrap = render()
     const instance = wrap.instance()
     instance.updateWidgetList(dummyWidgetInstances)
 
     const formWrap = mount(
-      instance.renderNewWidgetFormBody(dummyProps.formWrapperProps)
+      instance.renderNewWidgetFormBody(wrap.props().formWrapperProps)
     )
     expect(formWrap.exists("NewWidgetForm")).to.equal(true)
     expect(formWrap.find("NewWidgetForm").props()).to.include(
-      dummyProps.formWrapperProps
+      wrap.props().formWrapperProps
     )
     expect(formWrap.find("NewWidgetForm").props()).to.include(
       instance.makeFormProps()

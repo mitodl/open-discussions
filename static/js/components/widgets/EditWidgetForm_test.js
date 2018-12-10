@@ -3,18 +3,17 @@ import { mount } from "enzyme/build"
 import { expect } from "chai"
 import sinon from "sinon"
 
-import { apiPath } from "../../lib/widgets"
-
 import Loader from "./Loader"
 import EditWidgetForm from "./EditWidgetForm"
 
+import IntegrationTestHelper from "../../util/integration_test_helper"
+
 describe("<EditWidgetForm />", () => {
-  // props for an EditWidgetForm
   const dummyWidgetListId = 2
   const dummyWidgetId = 3
   const dummyWidgetClass = "Text"
   const dummyWidgetClassConfiguration = {
-    Text: [
+    [dummyWidgetClass]: [
       {
         key:       "title",
         label:     "Title",
@@ -41,46 +40,53 @@ describe("<EditWidgetForm />", () => {
     body:  "dummyBody"
   }
 
-  const dummyFetch = () => Promise.resolve(null)
-
-  // General props for both types of widgetForms, edit and new
-  const dummyGeneralFormProps = {
-    widgetListId: dummyWidgetListId,
-    fetchData:    dummyFetch,
-    errorHandler: sinon.spy(),
-    onSubmit:     sinon.spy(),
-    Loader:       Loader
-  }
-
-  const fetchSpy = sinon.spy(dummyGeneralFormProps, "fetchData")
-  const resetSpyHistory = () => {
-    fetchSpy.resetHistory()
-    dummyGeneralFormProps.errorHandler.resetHistory()
-    dummyGeneralFormProps.onSubmit.resetHistory()
-  }
-
-  // props for an EditWidgetForm
-  const dummyEditWidgetFormProps = {
-    widgetId: dummyWidgetId,
-    ...dummyGeneralFormProps
-  }
-
-  // state for an EditWidgetForm
   const dummyEditWidgetFormState = {
     currentWidgetData:        dummyFormData,
     widgetClassConfiguration: dummyWidgetClassConfiguration,
     widgetClass:              dummyWidgetClass
   }
 
-  // Test default behavior
+  let helper
+  beforeEach(() => {
+    helper = new IntegrationTestHelper()
+    helper.getWidgetStub.returns(
+      Promise.resolve({
+        widgetClassConfigurations: dummyWidgetClassConfiguration,
+        widgetData:                {}
+      })
+    )
+    helper.updateWidgetStub.returns(
+      Promise.resolve({
+        widgetClassConfigurations: dummyWidgetClassConfiguration,
+        widgetData:                {}
+      })
+    )
+  })
+
+  afterEach(() => {
+    helper.cleanup()
+  })
+
+  const render = (props = {}) =>
+    mount(
+      <EditWidgetForm
+        widgetId={dummyWidgetId}
+        widgetListId={dummyWidgetListId}
+        errorHandler={helper.sandbox.spy()}
+        onSubmit={helper.sandbox.spy()}
+        Loader={Loader}
+        {...props}
+      />
+    )
+
   it("returns loader if no data is loaded", () => {
-    const wrap = mount(<EditWidgetForm {...dummyEditWidgetFormProps} />)
+    const wrap = render()
 
     expect(wrap.exists(".default-loader")).to.equal(true)
   })
 
   it("renders a WidgetForm if data is loaded and that form submits properly", () => {
-    const wrap = mount(<EditWidgetForm {...dummyEditWidgetFormProps} />)
+    const wrap = render()
     wrap.setState(dummyEditWidgetFormState)
     wrap.update()
 
@@ -104,16 +110,11 @@ describe("<EditWidgetForm />", () => {
       title,
       ...configuration
     } = dummyEditWidgetFormState.currentWidgetData
-    expect(
-      fetchSpy.withArgs(apiPath("widget", dummyWidgetId), {
-        body: JSON.stringify({
-          configuration: configuration,
-          title:         title,
-          widget_class:  dummyWidgetClass
-        }),
-        method: "PATCH"
-      }).callCount
-    ).to.equal(1)
-    resetSpyHistory()
+
+    sinon.assert.calledWith(helper.updateWidgetStub, dummyWidgetId, {
+      configuration: configuration,
+      title:         title,
+      widget_class:  dummyWidgetClass
+    })
   })
 })

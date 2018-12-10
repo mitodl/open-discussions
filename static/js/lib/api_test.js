@@ -922,4 +922,6 @@ describe("api", function() {
       })
     })
   })
+
+  describe("widget functions", () => {})
 })
