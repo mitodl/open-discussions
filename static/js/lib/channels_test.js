@@ -8,13 +8,11 @@ import {
   newChannelForm,
   editChannelForm,
   userCanPost,
-  LINK_TYPE_ANY,
   LINK_TYPE_TEXT,
   LINK_TYPE_LINK,
-  updateLinkType,
+  LINK_TYPE_ARTICLE,
+  updatePostTypes,
   isLinkTypeAllowed,
-  isLinkTypeChecked,
-  isTextTabSelected,
   isPrivate
 } from "./channels"
 import { makeChannel } from "../factories/channels"
@@ -27,7 +25,7 @@ describe("Channel utils", () => {
       description:           "",
       public_description:    "",
       channel_type:          CHANNEL_TYPE_PUBLIC,
-      link_type:             LINK_TYPE_ANY,
+      allowed_post_types:    [LINK_TYPE_TEXT, LINK_TYPE_LINK],
       membership_is_managed: false
     })
   })
@@ -41,7 +39,7 @@ describe("Channel utils", () => {
       description:        channel.description,
       public_description: channel.public_description,
       channel_type:       channel.channel_type,
-      link_type:          channel.link_type
+      allowed_post_types: channel.allowed_post_types
     })
   })
 
@@ -70,120 +68,108 @@ describe("Channel utils", () => {
     })
   })
 
-  describe("updateLinkType", () => {
+  describe("updatePostTypes", () => {
     [
-      // If one checkbox is already checked and the other is now checked we have ANY to represent both.
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, true, LINK_TYPE_ANY],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, true, LINK_TYPE_ANY],
-      // If none is previously checked and a value is checked, the expected value is that value.
-      ["", LINK_TYPE_TEXT, true, LINK_TYPE_TEXT],
-      ["", LINK_TYPE_LINK, true, LINK_TYPE_LINK],
-      // If both checkboxes are checked and one is unchecked, the value is the other one which is still checked.
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, false, LINK_TYPE_LINK],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, false, LINK_TYPE_TEXT],
-      // If only one checkbox is checked and it's unchecked, use an empty string to represent nothing checked.
-      // This case is invalid, it's only used to allow the user to have both unchecked at once. It should
-      // fail validation on submit.
-      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, false, ""],
-      [LINK_TYPE_LINK, LINK_TYPE_LINK, false, ""]
-    ].forEach(([oldLinkType, value, checked, expected]) => {
-      it(`has the right value when clicking a ${
-        checked ? "checked" : "unchecked"
-      } checkbox
-       with value ${value} and the previous link type is ${oldLinkType}`, () => {
-        assert.equal(updateLinkType(oldLinkType, value, checked), expected)
+      // if this one type is missing
+      [
+        [LINK_TYPE_TEXT, LINK_TYPE_LINK],
+        LINK_TYPE_ARTICLE,
+        [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE]
+      ],
+      [
+        [LINK_TYPE_TEXT, LINK_TYPE_ARTICLE],
+        LINK_TYPE_LINK,
+        [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE]
+      ],
+      [
+        [LINK_TYPE_LINK, LINK_TYPE_ARTICLE],
+        LINK_TYPE_TEXT,
+        [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE]
+      ],
+      // if only one other option is selected
+      [
+        [LINK_TYPE_LINK],
+        LINK_TYPE_ARTICLE,
+        [LINK_TYPE_LINK, LINK_TYPE_ARTICLE]
+      ],
+      [
+        [LINK_TYPE_TEXT],
+        LINK_TYPE_ARTICLE,
+        [LINK_TYPE_TEXT, LINK_TYPE_ARTICLE]
+      ],
+      [[LINK_TYPE_TEXT], LINK_TYPE_LINK, [LINK_TYPE_TEXT, LINK_TYPE_LINK]],
+      [
+        [LINK_TYPE_ARTICLE],
+        LINK_TYPE_LINK,
+        [LINK_TYPE_LINK, LINK_TYPE_ARTICLE]
+      ],
+      [[LINK_TYPE_LINK], LINK_TYPE_TEXT, [LINK_TYPE_TEXT, LINK_TYPE_LINK]],
+      [[LINK_TYPE_ARTICLE], LINK_TYPE_TEXT, [LINK_TYPE_TEXT, LINK_TYPE_ARTICLE]]
+    ].forEach(([leftTypes, value, rightTypes]) => {
+      it(`has the right value when clicking a checked checkbox
+       with value ${value} and the previous link type is ${leftTypes.toString()}`, () => {
+        // $FlowFixMe: https://github.com/flow-typed/flow-typed/issues/696
+        assert.sameMembers(updatePostTypes(leftTypes, value, true), rightTypes)
+      })
+
+      // checking for uncheck is just the reverse of the above
+      it(`has the right value when clicking a unchecked checkbox
+       with value ${value} and the previous link type is ${leftTypes.toString()}`, () => {
+        // $FlowFixMe: https://github.com/flow-typed/flow-typed/issues/696
+        assert.sameMembers(updatePostTypes(rightTypes, value, false), leftTypes)
       })
     })
   })
 
   describe("isLinkTypeAllowed", () => {
-    [
-      // If the link value is ANY all checkboxes are checked
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, true],
-      // The value should be checked if it matches the link value
-      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, false],
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, false],
-      [LINK_TYPE_LINK, LINK_TYPE_LINK, true]
-    ].forEach(([linkType, value, expected]) => {
+    const ALL_TYPES = [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE]
+
+    //
+    ;[
+      // true cases
+      [ALL_TYPES, LINK_TYPE_TEXT, true],
+      [ALL_TYPES, LINK_TYPE_LINK, true],
+      [ALL_TYPES, LINK_TYPE_ARTICLE, true],
+
+      [[LINK_TYPE_TEXT, LINK_TYPE_LINK], LINK_TYPE_TEXT, true],
+      [[LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], LINK_TYPE_TEXT, true],
+      [[LINK_TYPE_TEXT], LINK_TYPE_TEXT, true],
+
+      [[LINK_TYPE_LINK, LINK_TYPE_TEXT], LINK_TYPE_LINK, true],
+      [[LINK_TYPE_LINK, LINK_TYPE_ARTICLE], LINK_TYPE_LINK, true],
+      [[LINK_TYPE_LINK], LINK_TYPE_LINK, true],
+
+      [[LINK_TYPE_ARTICLE, LINK_TYPE_LINK], LINK_TYPE_ARTICLE, true],
+      [[LINK_TYPE_ARTICLE, LINK_TYPE_TEXT], LINK_TYPE_ARTICLE, true],
+      [[LINK_TYPE_ARTICLE], LINK_TYPE_ARTICLE, true],
+
+      // false cases
+      [[LINK_TYPE_ARTICLE, LINK_TYPE_LINK], LINK_TYPE_TEXT, false],
+      [[LINK_TYPE_ARTICLE], LINK_TYPE_TEXT, false],
+      [[LINK_TYPE_LINK], LINK_TYPE_TEXT, false],
+
+      [[LINK_TYPE_ARTICLE, LINK_TYPE_TEXT], LINK_TYPE_LINK, false],
+      [[LINK_TYPE_ARTICLE], LINK_TYPE_TEXT, false],
+      [[LINK_TYPE_TEXT], LINK_TYPE_LINK, false],
+
+      [[LINK_TYPE_LINK, LINK_TYPE_TEXT], LINK_TYPE_ARTICLE, false],
+      [[LINK_TYPE_LINK], LINK_TYPE_ARTICLE, false],
+      [[LINK_TYPE_TEXT], LINK_TYPE_ARTICLE, false]
+    ].forEach(([allowedTypes, value, expected]) => {
       it(`${
         expected ? "should" : "should not"
-      } show ${value} for a channel with linkType ${linkType}`, () => {
+      } show ${value} for a channel with allowed_post_types ${allowedTypes.toString()}`, () => {
         const channel = makeChannel()
-        channel.link_type = linkType
+        channel.allowed_post_types = allowedTypes
 
         assert.equal(isLinkTypeAllowed(channel, value), expected)
       })
     })
-    ;[LINK_TYPE_LINK, LINK_TYPE_TEXT].forEach(linkType => {
+
+    //
+    ALL_TYPES.forEach(linkType => {
       it(`should allow ${linkType} if the channel is null`, () => {
         assert.isTrue(isLinkTypeAllowed(null, linkType))
-      })
-    })
-  })
-
-  describe("isLinkTypeChecked", () => {
-    [
-      // If the link value is ANY all checkboxes are checked
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, true],
-      // The value should be checked if it matches the link value
-      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, false],
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, false],
-      [LINK_TYPE_LINK, LINK_TYPE_LINK, true],
-      // An empty string means no link value is checked
-      ["", LINK_TYPE_TEXT, false],
-      ["", LINK_TYPE_LINK, false]
-    ].forEach(([linkType, value, expected]) => {
-      it(`has a checked value of ${String(
-        expected
-      )} for a channel link type ${linkType} and for checkbox ${value}`, () => {
-        assert.equal(isLinkTypeChecked(linkType, value), expected)
-      })
-    })
-  })
-
-  describe("isTextTabSelected", () => {
-    [
-      // no channel selected and default tab selected
-      [null, null, true],
-      // no channel selected, we should use whatever tab the user selected
-      [null, LINK_TYPE_TEXT, true],
-      [null, LINK_TYPE_LINK, false],
-      // no tab selected but a channel is selected. Use TEXT if the channel supports it else use LINK
-      [LINK_TYPE_ANY, null, true],
-      [LINK_TYPE_TEXT, null, true],
-      [LINK_TYPE_LINK, null, false],
-      // if both are specified and they conflict, use the only tab type which is valid
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, true],
-      // If there is no conflict choose the one the user selected
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, false]
-    ].forEach(([channelLinkType, postType, expected]) => {
-      const postTypeDescription =
-        postType === null
-          ? "no tab was previously selected"
-          : `${
-            postType === LINK_TYPE_TEXT ? "text" : "link"
-          } was previously selected`
-      const channel = channelLinkType
-        ? {
-          ...makeChannel(),
-          link_type: channelLinkType
-        }
-        : null
-      const channelDescription =
-        channel === null
-          ? "no channel is selected"
-          : `the channel link type is ${channel.link_type}`
-
-      it(`${
-        expected ? "text" : "link"
-      } tab is selected if ${postTypeDescription} and ${channelDescription}`, () => {
-        assert.equal(isTextTabSelected(postType, channel), expected)
       })
     })
   })

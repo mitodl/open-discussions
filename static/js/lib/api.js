@@ -192,7 +192,7 @@ export function updateChannel(channel: Channel): Promise<Channel> {
           "description",
           "public_description",
           "channel_type",
-          "link_type"
+          "allowed_post_types"
         ],
         channel
       )

@@ -12,8 +12,7 @@ import {
   userCanPost,
   LINK_TYPE_LINK,
   LINK_TYPE_TEXT,
-  LINK_TYPE_ARTICLE,
-  LINK_TYPE_ANY
+  LINK_TYPE_ARTICLE
 } from "../lib/channels"
 import { goBackAndHandleEvent } from "../lib/util"
 import { validationMessage } from "../lib/validation"
@@ -69,15 +68,16 @@ export default class CreatePostForm extends React.Component<Props> {
               Share a link
             </button>
           ) : null}
-          {SETTINGS.article_ui_enabled ? (
-            <button
-              className="write-an-article dark-outlined compact"
-              onClick={() => updatePostType(LINK_TYPE_ARTICLE)}
-            >
-              <i className="material-icons text_fields">text_fields</i>
+          {SETTINGS.article_ui_enabled &&
+          isLinkTypeAllowed(channel, LINK_TYPE_ARTICLE) ? (
+              <button
+                className="write-an-article dark-outlined compact"
+                onClick={() => updatePostType(LINK_TYPE_ARTICLE)}
+              >
+                <i className="material-icons text_fields">text_fields</i>
               Write an Article
-            </button>
-          ) : null}
+              </button>
+            ) : null}
         </div>
         {validationMessage(validation.post_type)}
       </div>
@@ -97,7 +97,7 @@ export default class CreatePostForm extends React.Component<Props> {
   clearInputButton = () => {
     const { updatePostType, channel } = this.props
 
-    return !channel || channel.link_type === LINK_TYPE_ANY ? (
+    return !channel || channel.allowed_post_types.length > 1 ? (
       <CloseButton onClick={() => updatePostType(null)} />
     ) : null
   }

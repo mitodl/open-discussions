@@ -9,7 +9,6 @@ import Embedly, { EmbedlyLoader } from "./Embedly"
 import {
   LINK_TYPE_LINK,
   LINK_TYPE_TEXT,
-  LINK_TYPE_ANY,
   LINK_TYPE_ARTICLE
 } from "../lib/channels"
 import * as channels from "../lib/channels"
@@ -20,12 +19,10 @@ import { configureShallowRenderer } from "../lib/test_utils"
 import { shouldIf } from "../lib/test_utils"
 
 describe("CreatePostForm", () => {
-  let sandbox, isTextTabSelectedStub, isLinkTypeAllowedStub, renderPostForm
+  let sandbox, isLinkTypeAllowedStub, renderPostForm
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
-    isTextTabSelectedStub = sandbox.stub(channels, "isTextTabSelected")
-    isTextTabSelectedStub.returns(true)
     isLinkTypeAllowedStub = sandbox.stub(channels, "isLinkTypeAllowed")
     isLinkTypeAllowedStub.returns(true)
     renderPostForm = configureShallowRenderer(CreatePostForm, {
@@ -74,6 +71,24 @@ describe("CreatePostForm", () => {
     assert.equal(wrapper.find(".text .validation-message").text(), "HEY")
   })
 
+  //
+  ;[
+    ["share-a-link", [LINK_TYPE_TEXT, LINK_TYPE_ARTICLE]],
+    ["write-something", [LINK_TYPE_LINK, LINK_TYPE_ARTICLE]],
+    ["write-an-article", [LINK_TYPE_TEXT, LINK_TYPE_TEXT]]
+  ].forEach(([selector, postTypes]) => {
+    it(`should hide the ${selector} button when it is not in the allowed_post_types`, () => {
+      const channel = makeChannel()
+      channel.allowed_post_types = postTypes
+      const postForm = { ...newPostForm() }
+      const wrapper = renderPostForm({
+        postForm,
+        channel
+      })
+      assert.isFalse(wrapper.find(selector).exists())
+    })
+  })
+
   it("should show article validation message", () => {
     const postForm = { ...newPostForm(), postType: LINK_TYPE_ARTICLE }
     const wrapper = renderPostForm({
@@ -88,17 +103,20 @@ describe("CreatePostForm", () => {
 
   //
   ;[
-    [LINK_TYPE_ANY, LINK_TYPE_LINK, true],
-    [LINK_TYPE_ANY, LINK_TYPE_TEXT, true],
-    [LINK_TYPE_TEXT, LINK_TYPE_TEXT, false],
-    [LINK_TYPE_LINK, LINK_TYPE_LINK, false]
-  ].forEach(([channelType, selectedType, showClosebutton]) => {
+    [[LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE], LINK_TYPE_LINK, true],
+    [[LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE], LINK_TYPE_TEXT, true],
+    [[LINK_TYPE_LINK, LINK_TYPE_ARTICLE], LINK_TYPE_LINK, true],
+    [[LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], LINK_TYPE_TEXT, true],
+    [[LINK_TYPE_TEXT], LINK_TYPE_TEXT, false],
+    [[LINK_TYPE_LINK], LINK_TYPE_LINK, false],
+    [[LINK_TYPE_ARTICLE], LINK_TYPE_ARTICLE, false]
+  ].forEach(([allowedTypes, selectedType, showClosebutton]) => {
     it(`${
       showClosebutton ? "should" : "should not"
-    } show clear button when channel ${channelType} and form has ${selectedType}`, () => {
+    } show clear button when channel ${allowedTypes.toString()} and form has ${selectedType}`, () => {
       const postForm = { ...newPostForm(), postType: selectedType }
       const channel = makeChannel()
-      channel.link_type = channelType
+      channel.allowed_post_types = allowedTypes
       const wrapper = renderPostForm({ postForm, channel })
       assert.equal(wrapper.find("CloseButton").exists(), showClosebutton)
     })

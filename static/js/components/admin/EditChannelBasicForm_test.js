@@ -72,7 +72,7 @@ describe("EditChannelBasicForm", () => {
     //
     ;[
       ["channel_type", CHANNEL_TYPE_PUBLIC],
-      ["link_type", LINK_TYPE_TEXT],
+      ["allowed_post_types", LINK_TYPE_TEXT],
       ["description", "Channel description"]
     ].forEach(([name, value]) => {
       describe("onUpdate", () => {

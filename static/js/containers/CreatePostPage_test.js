@@ -2,6 +2,7 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
+import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
 import {
   CreatePostPage as InnerCreatePostPage,
@@ -19,7 +20,7 @@ import {
   userCanPost,
   LINK_TYPE_TEXT,
   LINK_TYPE_LINK,
-  LINK_TYPE_ANY
+  LINK_TYPE_ARTICLE
 } from "../lib/channels"
 import { formatTitle } from "../lib/title"
 import { makeArticle, makeTweet } from "../factories/embedly"
@@ -39,7 +40,8 @@ describe("CreatePostPage", () => {
     post,
     commentsResponse,
     article,
-    twitterEmbedStub
+    twitterEmbedStub,
+    sandbox
 
   const makeEvent = (name, value) => ({ target: { value, name } })
 
@@ -66,6 +68,9 @@ describe("CreatePostPage", () => {
   const submitPost = wrapper => wrapper.find(".submit-post").simulate("submit")
 
   beforeEach(() => {
+    SETTINGS.ckeditor_upload_url = "/upload/token"
+    sandbox = sinon.createSandbox()
+    sandbox.stub(fetchFuncs, "fetchWithCSRF")
     channels = makeChannelList(10)
     currentChannel = channels[0]
     post = makePost()
@@ -93,6 +98,7 @@ describe("CreatePostPage", () => {
 
   afterEach(() => {
     helper.cleanup()
+    sandbox.restore()
   })
 
   const renderPage = async (url = null) => {
@@ -122,17 +128,22 @@ describe("CreatePostPage", () => {
 
   //
   ;[
-    [LINK_TYPE_ANY, false],
-    [LINK_TYPE_LINK, true],
-    [LINK_TYPE_TEXT, true]
-  ].forEach(([linkType, shouldSetPostType]) => {
+    [[LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE], false],
+    [[LINK_TYPE_TEXT, LINK_TYPE_LINK], false],
+    [[LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], false],
+    [[LINK_TYPE_LINK, LINK_TYPE_ARTICLE], false],
+    [[LINK_TYPE_LINK], true],
+    [[LINK_TYPE_TEXT], true]
+    // NOTE: intentionally left commented out because the article editor needs to be configured somehow
+    // [[LINK_TYPE_ARTICLE], true]
+  ].forEach(([postTypes, shouldSetPostType]) => {
     it(`${
       shouldSetPostType ? "should" : "shouldn't"
-    } set the post type when channel is ${linkType}`, async () => {
-      currentChannel.link_type = linkType
+    } set the post type when channel is ${postTypes.toString()}`, async () => {
+      currentChannel.allowed_post_types = postTypes
       await renderPage()
       const { postType } = helper.store.getState().forms[CREATE_POST_KEY].value
-      assert.equal(postType, shouldSetPostType ? linkType : null)
+      assert.equal(postType, shouldSetPostType ? postTypes[0] : null)
     })
   })
 
@@ -412,30 +423,33 @@ describe("CreatePostPage", () => {
   })
 
   describe("componentDidUpdate logic", () => {
-    [
+    const ALL_LINK_TYPES = [LINK_TYPE_TEXT, LINK_TYPE_LINK]
+
+    //
+    ;[
       // starting with ANY
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_LINK, true, true],
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, LINK_TYPE_TEXT, true, false],
-      [LINK_TYPE_ANY, LINK_TYPE_TEXT, null, false, true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_LINK, true, false],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_TEXT, true, true],
-      [LINK_TYPE_ANY, LINK_TYPE_LINK, null, false, true],
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_LINK, true, false],
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, LINK_TYPE_TEXT, true, false],
-      [LINK_TYPE_ANY, LINK_TYPE_ANY, null, false, false],
+      ([ALL_LINK_TYPES, [LINK_TYPE_TEXT], LINK_TYPE_LINK, true, true],
+      [ALL_LINK_TYPES, [LINK_TYPE_TEXT], LINK_TYPE_TEXT, true, false],
+      [ALL_LINK_TYPES, [LINK_TYPE_TEXT], null, false, true],
+      [ALL_LINK_TYPES, [LINK_TYPE_LINK], LINK_TYPE_LINK, true, false],
+      [ALL_LINK_TYPES, [LINK_TYPE_LINK], LINK_TYPE_TEXT, true, true],
+      [ALL_LINK_TYPES, [LINK_TYPE_LINK], null, false, true],
+      [ALL_LINK_TYPES, ALL_LINK_TYPES, LINK_TYPE_LINK, true, false],
+      [ALL_LINK_TYPES, ALL_LINK_TYPES, LINK_TYPE_TEXT, true, false],
+      [ALL_LINK_TYPES, ALL_LINK_TYPES, null, false, false],
       // starting with LINK
-      [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_LINK, true, true],
-      [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, true, false],
-      [LINK_TYPE_LINK, LINK_TYPE_ANY, LINK_TYPE_LINK, false, true],
+      [[LINK_TYPE_LINK], LINK_TYPE_TEXT, LINK_TYPE_LINK, true, true],
+      [[LINK_TYPE_LINK], ALL_LINK_TYPES, LINK_TYPE_LINK, true, false],
+      [[LINK_TYPE_LINK], ALL_LINK_TYPES, LINK_TYPE_LINK, false, true],
       // starting with TEXT
-      [LINK_TYPE_TEXT, LINK_TYPE_TEXT, LINK_TYPE_TEXT, true, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_TEXT, true, true],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, true, false],
-      [LINK_TYPE_TEXT, LINK_TYPE_ANY, LINK_TYPE_TEXT, false, true]
+      [[LINK_TYPE_TEXT], [LINK_TYPE_TEXT], LINK_TYPE_TEXT, true, false],
+      [[LINK_TYPE_TEXT], [LINK_TYPE_LINK], LINK_TYPE_TEXT, true, true],
+      [[LINK_TYPE_TEXT], ALL_LINK_TYPES, LINK_TYPE_TEXT, true, false],
+      [[LINK_TYPE_TEXT], ALL_LINK_TYPES, LINK_TYPE_TEXT, false, true])
     ].forEach(
       ([
-        fromChannelType,
-        toChannelType,
+        fromChannelTypes,
+        toChannelTypes,
         postType,
         hasInput,
         shouldDispatch
@@ -443,14 +457,14 @@ describe("CreatePostPage", () => {
         it(`${shouldIf(
           shouldDispatch
         )} reset form if channel type changes from ${String(
-          fromChannelType
-        )} to ${toChannelType}, postType=${String(postType)}, user input is ${
-          hasInput ? "not " : ""
-        }empty`, () => {
+          fromChannelTypes
+        )} to ${toChannelTypes.toString()}, postType=${String(
+          postType
+        )}, user input is ${hasInput ? "not " : ""}empty`, () => {
           const dispatch = helper.sandbox.stub()
-          currentChannel.link_type = fromChannelType
+          currentChannel.allowed_post_types = fromChannelTypes
           const nextChannel = channels[1]
-          nextChannel.link_type = toChannelType
+          nextChannel.allowed_post_types = toChannelTypes
           const page = new InnerCreatePostPage()
           const url =
             hasInput && postType === LINK_TYPE_LINK ? "http://foo.edu" : ""
@@ -478,9 +492,9 @@ describe("CreatePostPage", () => {
             assert.equal(dispatch.callCount, 1)
             assert.deepEqual(dispatch.args[0][0].payload.value, {
               postType:
-                toChannelType === LINK_TYPE_ANY && !hasInput
+                toChannelTypes.length > 1 && !hasInput
                   ? null
-                  : toChannelType,
+                  : toChannelTypes[0],
               url:       "",
               text:      "",
               thumbnail: null
@@ -494,15 +508,19 @@ describe("CreatePostPage", () => {
 
     //
     ;[
-      [LINK_TYPE_ANY, false],
-      [LINK_TYPE_LINK, true],
-      [LINK_TYPE_TEXT, true]
-    ].forEach(([linkType, shouldDispatch]) => {
+      [[LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], false],
+      [[LINK_TYPE_LINK, LINK_TYPE_TEXT], false],
+      [[LINK_TYPE_LINK, LINK_TYPE_ARTICLE], false],
+      [[LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], false],
+      [[LINK_TYPE_LINK], true],
+      [[LINK_TYPE_TEXT], true],
+      [[LINK_TYPE_ARTICLE], true]
+    ].forEach(([postTypes, shouldDispatch]) => {
       it(`${shouldIf(
         shouldDispatch
-      )} update form when coming from no channel to a channel with link type '${linkType}'`, () => {
+      )} update form when coming from no channel to a channel with allowed post types '${postTypes.toString()}'`, () => {
         const dispatch = helper.sandbox.stub()
-        currentChannel.link_type = linkType
+        currentChannel.allowed_post_types = postTypes
         const page = new InnerCreatePostPage()
         const props: any = {
           dispatch,
@@ -519,7 +537,7 @@ describe("CreatePostPage", () => {
         if (shouldDispatch) {
           assert.equal(dispatch.callCount, 1)
           assert.deepEqual(dispatch.args[0][0].payload.value, {
-            postType:  linkType,
+            postType:  postTypes[0],
             url:       "",
             text:      "",
             thumbnail: null

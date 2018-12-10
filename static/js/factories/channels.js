@@ -2,7 +2,11 @@
 import casual from "casual-browserify"
 import R from "ramda"
 
-import { LINK_TYPE_ANY } from "../lib/channels"
+import {
+  LINK_TYPE_TEXT,
+  LINK_TYPE_LINK,
+  LINK_TYPE_ARTICLE
+} from "../lib/channels"
 import { incrementer } from "../factories/util"
 
 import type {
@@ -24,7 +28,6 @@ export const makeChannel = (privateChannel: boolean = false): Channel => {
     name:                  `channel_${incr.next().value}`,
     title:                 casual.title,
     channel_type:          privateChannel ? "private" : "public",
-    link_type:             LINK_TYPE_ANY,
     description:           casual.description,
     public_description:    casual.description,
     num_users:             casual.integer(0, 500),
@@ -37,7 +40,8 @@ export const makeChannel = (privateChannel: boolean = false): Channel => {
     avatar_small:          hasAvatar ? "http://avatar.small.url" : null,
     avatar_medium:         hasAvatar ? "http://avatar.medium.url" : null,
     banner:                casual.coin_flip ? "http://banner.url" : null,
-    widget_list_id:        null
+    widget_list_id:        null,
+    allowed_post_types:    [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE]
   }
 }
 

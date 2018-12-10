@@ -19,20 +19,17 @@ export type ChannelType =
 export const LINK_TYPE_TEXT: "self" = "self"
 export const LINK_TYPE_LINK: "link" = "link"
 export const LINK_TYPE_ARTICLE: "article" = "article"
-export const LINK_TYPE_ANY: "any" = "any"
 
 export const VALID_LINK_TYPES = [
   LINK_TYPE_TEXT,
   LINK_TYPE_ARTICLE,
-  LINK_TYPE_LINK,
-  LINK_TYPE_ANY
+  LINK_TYPE_LINK
 ]
 
 export type LinkType =
   | typeof LINK_TYPE_TEXT
   | typeof LINK_TYPE_LINK
   | typeof LINK_TYPE_ARTICLE
-  | typeof LINK_TYPE_ANY
 
 export const MISSING_TEXT = "<missing>"
 
@@ -42,7 +39,7 @@ export const newChannelForm = (): ChannelForm => ({
   description:           "",
   public_description:    "",
   channel_type:          CHANNEL_TYPE_PUBLIC,
-  link_type:             LINK_TYPE_ANY,
+  allowed_post_types:    [LINK_TYPE_TEXT, LINK_TYPE_LINK],
   membership_is_managed: false
 })
 
@@ -54,7 +51,7 @@ export const editChannelForm = (channel: Channel): ChannelForm =>
       "description",
       "public_description",
       "channel_type",
-      "link_type"
+      "allowed_post_types"
     ],
     channel
   )
@@ -68,63 +65,19 @@ export const userCanPost = (channel: Channel) =>
   channel.user_is_moderator ||
   channel.user_is_contributor
 
-type MaybeLinkType = LinkType | ""
-
-export const updateLinkType = (
-  oldLinkType: MaybeLinkType,
+export const updatePostTypes = (
+  allowedPostTypes: Array<LinkType>,
   value: LinkType,
   checked: boolean
-): MaybeLinkType => {
+): Array<LinkType> => {
   if (checked) {
-    // ignoring case if oldLinkType is already ANY, assuming LINK or TEXT.
-    // UI should prevent that from happening.
-    return !oldLinkType ? value : LINK_TYPE_ANY
-  } else {
-    if (oldLinkType === LINK_TYPE_ANY) {
-      return value === LINK_TYPE_TEXT ? LINK_TYPE_LINK : LINK_TYPE_TEXT
-    } else {
-      // this is invalid but we will check that in validation on submit
-      return ""
-    }
+    return R.append(value, allowedPostTypes)
   }
-}
-
-export const isLinkTypeChecked = (
-  channelLinkType: string,
-  linkType: string
-) => {
-  if (channelLinkType === LINK_TYPE_ANY) {
-    return true
-  } else {
-    return channelLinkType === linkType
-  }
+  return R.without([value], allowedPostTypes)
 }
 
 export const isLinkTypeAllowed = (channel: ?Channel, linkType: string) =>
-  !channel ? true : isLinkTypeChecked(channel.link_type, linkType)
-
-export const isTextTabSelected = (
-  postType: string | null,
-  channel: ?Channel
-) => {
-  let selectedTab
-  if (postType) {
-    selectedTab = postType
-  } else if (channel) {
-    selectedTab = channel.link_type
-  } else {
-    selectedTab = LINK_TYPE_ANY
-  }
-
-  const isTextTabSelected = selectedTab !== LINK_TYPE_LINK
-
-  // If the selected tab is invalid, choose the other one. At least one tab should be valid for a channel.
-  if (channel && !isLinkTypeChecked(channel.link_type, selectedTab)) {
-    return !isTextTabSelected
-  }
-
-  return isTextTabSelected
-}
+  !channel ? true : R.contains(linkType, channel.allowed_post_types)
 
 export const isPrivate = (channel: Channel) =>
   channel.channel_type === CHANNEL_TYPE_PRIVATE

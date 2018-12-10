@@ -16,7 +16,6 @@ import { actions } from "../actions"
 import { setBannerMessage } from "../actions/ui"
 import { clearPostError } from "../actions/post"
 import {
-  LINK_TYPE_ANY,
   LINK_TYPE_LINK,
   LINK_TYPE_TEXT,
   LINK_TYPE_ARTICLE
@@ -35,6 +34,7 @@ import type {
   PostForm,
   PostValidation
 } from "../flow/discussionTypes"
+import type { LinkType } from "../lib/channels"
 import type { RestState } from "../flow/restTypes"
 import type { Dispatch } from "redux"
 import type { Match } from "react-router"
@@ -85,14 +85,17 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     const channelName = getChannelName(this.props)
     const form = newPostForm()
 
-    const channel =
-      !channels.loaded && !channels.processing && channelName
-        ? await dispatch(actions.channels.get(channelName))
-        : this.props.channel
+    let channel: Channel
 
-    if (channel && channel.link_type !== LINK_TYPE_ANY) {
-      // $FlowFixMe
-      form.postType = channel.link_type
+    if (!channels.loaded && !channels.processing && channelName) {
+      // $FlowFixMe: flow incorrectly indentifies the return value as an action, not a promise
+      channel = await dispatch(actions.channels.get(channelName))
+    } else {
+      channel = this.props.channel
+    }
+
+    if (channel && channel.allowed_post_types.length === 1) {
+      form.postType = channel.allowed_post_types[0]
     }
 
     dispatch(
@@ -105,8 +108,8 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
   }
 
   shouldFormReset = (
-    channelLinkType: string,
-    prevChannelLinkType: ?string,
+    allowedTypes: Array<LinkType>,
+    prevChannelPostTypes: ?Array<string>,
     postForm: PostFormValue
   ) => {
     /*
@@ -115,10 +118,10 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     If the selected channel only takes specific posts, the form should reset if the post type
     of the current form doesn't match the channel's post type.
      */
-    return channelLinkType === LINK_TYPE_ANY
-      ? prevChannelLinkType &&
+    return allowedTypes.length > 1
+      ? prevChannelPostTypes &&
           allEmptyOrNil([postForm.value.url, postForm.value.text])
-      : channelLinkType !== postForm.value.postType
+      : allowedTypes[0] !== postForm.value.postType
   }
 
   componentDidUpdate(prevProps: CreatePostPageProps) {
@@ -126,19 +129,28 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
 
     // If a newly-selected channel cannot or should not be rendered with the same form state as the
     // previously-selected channel, we need to reset the form state.
-    const prevChannelLinkType = R.path(["channel", "link_type"], prevProps)
+    const prevChannelPostTypes = R.path(
+      ["channel", "allowed_post_types"],
+      prevProps
+    )
     if (
       postForm &&
       channel &&
-      channel.link_type !== prevChannelLinkType &&
-      this.shouldFormReset(channel.link_type, prevChannelLinkType, postForm)
+      !R.equals(channel.allowed_post_types, prevChannelPostTypes) &&
+      this.shouldFormReset(
+        channel.allowed_post_types,
+        prevChannelPostTypes,
+        postForm
+      )
     ) {
       dispatch(
         actions.forms.formUpdate({
           ...CREATE_POST_PAYLOAD,
           value: {
             postType:
-              channel.link_type === LINK_TYPE_ANY ? null : channel.link_type,
+              channel.allowed_post_types.length > 1
+                ? null
+                : channel.allowed_post_types[0],
             url:       "",
             text:      "",
             thumbnail: null

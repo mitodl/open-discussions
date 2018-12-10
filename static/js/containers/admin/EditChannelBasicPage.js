@@ -9,7 +9,7 @@ import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
 import withSingleColumn from "../../hoc/withSingleColumn"
 
 import { actions } from "../../actions"
-import { editChannelForm, updateLinkType } from "../../lib/channels"
+import { editChannelForm, updatePostTypes } from "../../lib/channels"
 import { channelURL } from "../../lib/url"
 import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
@@ -76,10 +76,10 @@ class EditChannelBasicPage extends React.Component<Props> {
     const updates = {
       [e.target.name]: e.target.value
     }
-    if (e.target.name === "link_type") {
+    if (e.target.name === "allowed_post_types") {
       // $FlowFixMe
-      updates.link_type = updateLinkType(
-        channelForm.value.link_type,
+      updates.allowed_post_types = updatePostTypes(
+        channelForm.value.allowed_post_types,
         e.target.value,
         e.target.checked
       )
@@ -110,7 +110,7 @@ class EditChannelBasicPage extends React.Component<Props> {
       )
     } else {
       const patchValue = R.pickAll(
-        ["name", "channel_type", "description", "link_type"],
+        ["name", "channel_type", "description", "allowed_post_types"],
         channelForm.value
       )
       dispatch(actions.channels.patch(patchValue)).then(channel => {

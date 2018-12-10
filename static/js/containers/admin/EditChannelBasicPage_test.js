@@ -53,7 +53,7 @@ describe("EditChannelBasicPage", () => {
   const setPostType = (wrapper, value) =>
     wrapper
       .find(`input[value='${value}']`)
-      .simulate("change", makeEvent("link_type", value, true))
+      .simulate("change", makeEvent("allowed_post_types", value, true))
 
   const setDescription = (wrapper, value) =>
     wrapper
@@ -114,7 +114,7 @@ describe("EditChannelBasicPage", () => {
       "name",
       "channel_type",
       "description",
-      "link_type"
+      "allowed_post_types"
     ])
 
     assert.equal(helper.currentLocation.pathname, channelURL(channel.name))

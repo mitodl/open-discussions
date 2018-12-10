@@ -1,6 +1,8 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import Checkbox from "rmwc/Checkbox"
+import R from "ramda"
 
 import Card from "../Card"
 
@@ -11,7 +13,7 @@ import {
   CHANNEL_TYPE_PRIVATE,
   LINK_TYPE_LINK,
   LINK_TYPE_TEXT,
-  isLinkTypeChecked
+  LINK_TYPE_ARTICLE
 } from "../../lib/channels"
 import { validationMessage } from "../../lib/validation"
 
@@ -93,23 +95,35 @@ export default class EditChannelBasicForm extends React.Component<Props> {
         <Card title="Allowed post types">
           <div className="post-types">
             <Checkbox
-              name="link_type"
+              name="allowed_post_types"
               value={LINK_TYPE_TEXT}
-              checked={isLinkTypeChecked(form.link_type, LINK_TYPE_TEXT)}
+              checked={R.contains(LINK_TYPE_TEXT, form.allowed_post_types)}
               onChange={onUpdate}
             >
               Short text posts
             </Checkbox>
             <Checkbox
-              name="link_type"
+              name="allowed_post_types"
               value={LINK_TYPE_LINK}
-              checked={isLinkTypeChecked(form.link_type, LINK_TYPE_LINK)}
+              checked={R.contains(LINK_TYPE_LINK, form.allowed_post_types)}
               onChange={onUpdate}
             >
               Links to external sites
             </Checkbox>
+            {SETTINGS.article_ui_enabled ? (
+              <Checkbox
+                name="allowed_post_types"
+                value={LINK_TYPE_ARTICLE}
+                checked={R.contains(LINK_TYPE_ARTICLE, form.allowed_post_types)}
+                onChange={onUpdate}
+              >
+                Article posts
+              </Checkbox>
+            ) : null}
           </div>
-          <div className="row">{validationMessage(validation.link_type)}</div>
+          <div className="row">
+            {validationMessage(validation.allowed_post_types)}
+          </div>
         </Card>
         <div className="row actions">
           <button

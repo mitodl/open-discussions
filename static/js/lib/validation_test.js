@@ -217,15 +217,16 @@ describe("validation library", () => {
     it("should complain about no link types being selected", () => {
       const channel = {
         value: {
-          link_type: []
+          allowed_post_types: []
         }
       }
       assert.deepEqual(validateChannelBasicEditForm(channel), {
         value: {
-          link_type: "At least one of the post type options must be selected"
+          allowed_post_types:
+            "At least one of the post type options must be selected"
         }
       })
-      channel.value.link_type = [LINK_TYPE_LINK]
+      channel.value.allowed_post_types = [LINK_TYPE_LINK]
       assert.deepEqual(validateChannelBasicEditForm(channel), {})
     })
   })

@@ -16,7 +16,6 @@ export type Channel = {
   num_users:             number,
   user_is_contributor:   boolean,
   user_is_moderator:     boolean,
-  link_type:             LinkType,
   membership_is_managed: boolean,
   ga_tracking_id:        ?string,
   avatar:                string|null,
@@ -24,6 +23,7 @@ export type Channel = {
   avatar_medium:         string|null,
   banner:                string|null,
   widget_list_id:        ?number,
+  allowed_post_types:    Array<LinkType>,
 }
 
 export type ChannelForm = {
@@ -32,7 +32,7 @@ export type ChannelForm = {
   description:            string,
   public_description:     string,
   channel_type:           ChannelType,
-  link_type:              LinkType,
+  allowed_post_types:     Array<LinkType>,
   membership_is_managed:  boolean,
   avatar?:            {
     edit:  Blob,
@@ -51,7 +51,7 @@ export type ChannelAppearanceEditValidation = {
 }
 
 export type ChannelBasicEditValidation = {
-  link_type: string
+  allowed_post_types: string
 }
 
 export type AddMemberForm = {
