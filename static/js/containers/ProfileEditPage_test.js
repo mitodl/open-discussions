@@ -37,6 +37,12 @@ describe("ProfileEditPage", function() {
       .props()
       .onChange(makeLocationEvent(json))
 
+  const clearLocation = wrapper =>
+    wrapper
+      .find(LocationPicker)
+      .props()
+      .onClear()
+
   const submitProfile = wrapper =>
     wrapper.find(".save-profile").simulate("click")
 
@@ -112,6 +118,31 @@ describe("ProfileEditPage", function() {
 
     helper.updateProfileStub.returns(
       Promise.resolve({ ...profile, name, bio, headline, locationJSON })
+    )
+
+    await listenForActions(
+      [actions.profiles.patch.requestType, actions.profiles.patch.successType],
+      () => {
+        submitProfile(wrapper)
+      }
+    )
+    const payload: ProfilePayload = { name, bio, headline, locationJSON }
+    sinon.assert.calledWith(helper.updateProfileStub, profile.username, payload)
+  })
+
+  it("should clear locationJSON and pass that on to api on submit", async () => {
+    const locationJSON = null
+    const wrapper = await renderPage()
+    const name = profile.name
+    const headline = profile.headline
+    const bio = profile.bio
+
+    await listenForActions([actions.forms.FORM_UPDATE], () => {
+      clearLocation(wrapper)
+    })
+
+    helper.updateProfileStub.returns(
+      Promise.resolve({ ...profile, locationJSON })
     )
 
     await listenForActions(

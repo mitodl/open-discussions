@@ -238,6 +238,9 @@ export default class ProfileForm extends React.Component<Props> {
                 onChange={onUpdateLocation}
                 onClear={onClearLocation}
               />
+              <label className="bottom-label">
+                Enter the city where you live or work.
+              </label>
             </div>
             {this.renderUserWebsiteSection()}
           </form>

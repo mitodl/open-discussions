@@ -44,7 +44,7 @@ def test_serialize_user(user):
             "bio": profile.bio,
             "headline": profile.headline,
             "username": profile.user.username,
-            "location": "",
+            "location": profile.locationJSON["value"],
         },
     }
 
@@ -75,6 +75,7 @@ def test_serialize_create_user(db, mocker):
 
     del profile["email_optin"]  # is write-only
     del profile["toc_optin"]  # is write-only
+
     profile.update(
         {
             "image_file": None,
@@ -153,6 +154,7 @@ def test_update_user_profile(mock_index_functions, user, key, value):
         ("name", "name_value"),
         ("bio", "bio_value"),
         ("headline", "headline_value"),
+        ("locationJSON", {"value": "Hobbiton, The Shire, Middle-Earth"}),
         (
             "image_file",
             SimpleUploadedFile("small.gif", small_gif, content_type="image/gif"),
@@ -173,7 +175,15 @@ def test_update_profile(mock_index_functions, user, key, value):
 
     profile2 = Profile.objects.first()
 
-    for prop in ("name", "image_file", "email_optin", "toc_optin", "bio", "headline"):
+    for prop in (
+        "name",
+        "image_file",
+        "email_optin",
+        "toc_optin",
+        "bio",
+        "headline",
+        "locationJSON",
+    ):
         if prop == key:
             if isinstance(value, bool):
                 assert getattr(profile2, prop) is value
@@ -188,7 +198,8 @@ def test_update_profile(mock_index_functions, user, key, value):
         mock_index_functions.update_posts.assert_called_once_with(profile2)
     else:
         mock_index_functions.update_posts.assert_not_called()
-        mock_index_functions.update_author.assert_called_with(profile2.user)
+        if key != "locationJSON":
+            mock_index_functions.update_author.assert_called_with(profile2.user)
 
 
 def test_serialize_profile_websites(user):

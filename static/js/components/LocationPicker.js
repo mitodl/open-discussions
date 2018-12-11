@@ -55,7 +55,7 @@ export default class LocationPicker extends React.Component<Props> {
       <div>
         <input
           type="text"
-          aria-label={placeholder}
+          placeholder={placeholder}
           ref={ref => {
             this.autocompleteElem = ref
           }}
