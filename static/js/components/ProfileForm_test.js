@@ -26,8 +26,8 @@ describe("ProfileForm", () => {
     onClearLocationStub
 
   beforeEach(() => {
-    SETTINGS.algolia_appId = 'fake'
-    SETTINGS.algolia_apiKey = 'fake'
+    SETTINGS.algolia_appId = "fake"
+    SETTINGS.algolia_apiKey = "fake"
     helper = new IntegrationTestHelper()
     profile = makeProfile()
     onUpdateStub = helper.sandbox.stub()

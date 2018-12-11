@@ -191,7 +191,7 @@ class ProfileEditPage extends React.Component<Props> {
     }
   )
 
-  onUpdateLocation =  async (e: Object) => {
+  onUpdateLocation = async (e: Object) => {
     const { dispatch } = this.props
 
     if (e.suggestion) {
@@ -206,7 +206,7 @@ class ProfileEditPage extends React.Component<Props> {
     }
   }
 
-  onClearLocation =  async () => {
+  onClearLocation = async () => {
     const { dispatch } = this.props
     dispatch(
       actions.forms.formUpdate({

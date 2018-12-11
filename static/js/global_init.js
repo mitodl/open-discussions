@@ -36,7 +36,7 @@ const _createSettings = () => ({
   search_page_size:      5,
   accepted_social_sites: [],
   algolia_appId:         "",
-  algolia_appKey:        "",
+  algolia_appKey:        ""
 })
 
 global.SETTINGS = _createSettings()

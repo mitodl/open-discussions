@@ -12,12 +12,11 @@ import { makeChannelPostList } from "../factories/posts"
 
 import type { ProfilePayload } from "../flow/discussionTypes"
 
-
 describe("ProfileEditPage", function() {
   let helper, listenForActions, renderComponent, profile
 
   const makeEvent = (name, value) => ({ target: { value, name } })
-  const makeLocationEvent = (json) => ({ suggestion: json })
+  const makeLocationEvent = json => ({ suggestion: json })
 
   const setName = (wrapper, name) =>
     wrapper
@@ -35,7 +34,8 @@ describe("ProfileEditPage", function() {
   const setLocation = (wrapper, json) =>
     wrapper
       .find(LocationPicker)
-      .props().onChange(makeLocationEvent(json))
+      .props()
+      .onChange(makeLocationEvent(json))
 
   const submitProfile = wrapper =>
     wrapper.find(".save-profile").simulate("click")
@@ -43,8 +43,8 @@ describe("ProfileEditPage", function() {
   beforeEach(() => {
     profile = makeProfile()
     SETTINGS.username = profile.username
-    SETTINGS.algolia_appId = 'fake'
-    SETTINGS.algolia_apiKey = 'fake'
+    SETTINGS.algolia_appId = "fake"
+    SETTINGS.algolia_apiKey = "fake"
     helper = new IntegrationTestHelper()
     helper.getProfileStub.returns(Promise.resolve(profile))
     helper.getChannelsStub.returns(Promise.resolve([]))
@@ -92,7 +92,7 @@ describe("ProfileEditPage", function() {
     const name = "Test User"
     const bio = "Test bio"
     const headline = "Test headline"
-    const locationJSON = {value: "Test location"}
+    const locationJSON = { value: "Test location" }
     const wrapper = await renderPage()
 
     await listenForActions(
@@ -120,7 +120,7 @@ describe("ProfileEditPage", function() {
         submitProfile(wrapper)
       }
     )
-    const payload: ProfilePayload = { name, bio, headline, locationJSON}
+    const payload: ProfilePayload = { name, bio, headline, locationJSON }
     sinon.assert.calledWith(helper.updateProfileStub, profile.username, payload)
   })
 
