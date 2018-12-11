@@ -4,6 +4,7 @@ import { assert } from "chai"
 import sinon from "sinon"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
+import LocationPicker from "../components/LocationPicker"
 import { editProfileURL } from "../lib/url"
 import { makeProfile } from "../factories/profiles"
 import { actions } from "../actions"
@@ -11,10 +12,12 @@ import { makeChannelPostList } from "../factories/posts"
 
 import type { ProfilePayload } from "../flow/discussionTypes"
 
+
 describe("ProfileEditPage", function() {
   let helper, listenForActions, renderComponent, profile
 
   const makeEvent = (name, value) => ({ target: { value, name } })
+  const makeLocationEvent = (json) => ({ suggestion: json })
 
   const setName = (wrapper, name) =>
     wrapper
@@ -29,12 +32,19 @@ describe("ProfileEditPage", function() {
       .find(".headline input")
       .simulate("change", makeEvent("headline", text))
 
+  const setLocation = (wrapper, json) =>
+    wrapper
+      .find(LocationPicker)
+      .props().onChange(makeLocationEvent(json))
+
   const submitProfile = wrapper =>
     wrapper.find(".save-profile").simulate("click")
 
   beforeEach(() => {
     profile = makeProfile()
     SETTINGS.username = profile.username
+    SETTINGS.algolia_appId = 'fake'
+    SETTINGS.algolia_apiKey = 'fake'
     helper = new IntegrationTestHelper()
     helper.getProfileStub.returns(Promise.resolve(profile))
     helper.getChannelsStub.returns(Promise.resolve([]))
@@ -82,10 +92,12 @@ describe("ProfileEditPage", function() {
     const name = "Test User"
     const bio = "Test bio"
     const headline = "Test headline"
+    const locationJSON = {value: "Test location"}
     const wrapper = await renderPage()
 
     await listenForActions(
       [
+        actions.forms.FORM_UPDATE,
         actions.forms.FORM_UPDATE,
         actions.forms.FORM_UPDATE,
         actions.forms.FORM_UPDATE
@@ -94,11 +106,12 @@ describe("ProfileEditPage", function() {
         setName(wrapper, name)
         setBio(wrapper, bio)
         setHeadline(wrapper, headline)
+        setLocation(wrapper, locationJSON)
       }
     )
 
     helper.updateProfileStub.returns(
-      Promise.resolve({ ...profile, name, bio, headline })
+      Promise.resolve({ ...profile, name, bio, headline, locationJSON })
     )
 
     await listenForActions(
@@ -107,7 +120,7 @@ describe("ProfileEditPage", function() {
         submitProfile(wrapper)
       }
     )
-    const payload: ProfilePayload = { name, bio, headline }
+    const payload: ProfilePayload = { name, bio, headline, locationJSON}
     sinon.assert.calledWith(helper.updateProfileStub, profile.username, payload)
   })
 

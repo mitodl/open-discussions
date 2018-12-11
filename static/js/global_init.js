@@ -34,7 +34,9 @@ const _createSettings = () => ({
   site_url:              "http://fake.open.url/",
   recaptchaKey:          "",
   search_page_size:      5,
-  accepted_social_sites: []
+  accepted_social_sites: [],
+  algolia_appId:         "",
+  algolia_appKey:        "",
 })
 
 global.SETTINGS = _createSettings()

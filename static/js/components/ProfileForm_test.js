@@ -21,9 +21,13 @@ describe("ProfileForm", () => {
     onSubmitSocialSiteStub,
     onUpdatePersonalSiteStub,
     onSubmitPersonalSiteStub,
-    onDeleteSiteStub
+    onDeleteSiteStub,
+    onUpdateLocationStub,
+    onClearLocationStub
 
   beforeEach(() => {
+    SETTINGS.algolia_appId = 'fake'
+    SETTINGS.algolia_apiKey = 'fake'
     helper = new IntegrationTestHelper()
     profile = makeProfile()
     onUpdateStub = helper.sandbox.stub()
@@ -33,6 +37,8 @@ describe("ProfileForm", () => {
     onUpdatePersonalSiteStub = helper.sandbox.stub()
     onSubmitPersonalSiteStub = helper.sandbox.stub()
     onDeleteSiteStub = helper.sandbox.stub()
+    onUpdateLocationStub = helper.sandbox.stub()
+    onClearLocationStub = helper.sandbox.stub()
   })
 
   afterEach(() => {
@@ -42,9 +48,10 @@ describe("ProfileForm", () => {
   const renderForm = (
     props = {},
     form = {
-      name:     profile.name,
-      bio:      profile.bio,
-      headline: profile.headline
+      name:         profile.name,
+      bio:          profile.bio,
+      headline:     profile.headline,
+      locationJSON: profile.locationJSON
     },
     validation = { reason: "", name: "" }
   ) =>
@@ -65,6 +72,8 @@ describe("ProfileForm", () => {
           onUpdatePersonalSite={onUpdatePersonalSiteStub}
           onSubmitPersonalSite={onSubmitPersonalSiteStub}
           onDeleteSite={onDeleteSiteStub}
+          onUpdateLocation={onUpdateLocationStub}
+          onClearLocation={onClearLocationStub}
           history={{}}
           processing={false}
           {...props}

@@ -1,4 +1,5 @@
 """Factories for making test data"""
+
 from factory import Faker
 from factory.django import DjangoModelFactory, ImageField
 

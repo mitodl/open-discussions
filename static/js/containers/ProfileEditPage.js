@@ -191,6 +191,33 @@ class ProfileEditPage extends React.Component<Props> {
     }
   )
 
+  onUpdateLocation =  async (e: Object) => {
+    const { dispatch } = this.props
+
+    if (e.suggestion) {
+      dispatch(
+        actions.forms.formUpdate({
+          ...EDIT_PROFILE_PAYLOAD,
+          value: {
+            locationJSON: e.suggestion
+          }
+        })
+      )
+    }
+  }
+
+  onClearLocation =  async () => {
+    const { dispatch } = this.props
+    dispatch(
+      actions.forms.formUpdate({
+        ...EDIT_PROFILE_PAYLOAD,
+        value: {
+          locationJSON: null
+        }
+      })
+    )
+  }
+
   onUpdateSocialSite = this.onUpdateWebsite(SOCIAL_SITE_TYPE)
   onSubmitSocialSite = this.onSubmitWebsite(
     SOCIAL_SITE_TYPE,
@@ -235,6 +262,8 @@ class ProfileEditPage extends React.Component<Props> {
           onSubmitSocialSite={this.onSubmitSocialSite}
           onUpdatePersonalSite={this.onUpdatePersonalSite}
           onSubmitPersonalSite={this.onSubmitPersonalSite}
+          onUpdateLocation={this.onUpdateLocation}
+          onClearLocation={this.onClearLocation}
           onDeleteSite={this.onDeleteWebsite}
           history={history}
           processing={processing}

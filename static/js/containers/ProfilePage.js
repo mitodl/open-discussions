@@ -105,6 +105,9 @@ class ProfilePage extends React.Component<Props> {
               <div className="headline">{profile.headline}</div>
             </div>
           </div>
+          <div className="row location">
+            {profile.location || ""}
+          </div>
           <div className="row bio">
             {profile.bio
               ? profile.bio.split("\n").map((item, key) => {

@@ -1,6 +1,7 @@
 """Profile models"""
 from uuid import uuid4
 
+from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from django.conf import settings
 
@@ -86,6 +87,7 @@ class Profile(models.Model):
 
     headline = models.CharField(blank=True, null=True, max_length=60)
     bio = models.TextField(blank=True, null=True)
+    locationJSON = JSONField(null=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         """Track previous name"""

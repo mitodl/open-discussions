@@ -6,6 +6,7 @@ import R from "ramda"
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "../containers/ProfileImage"
 import { SocialSiteLogoLink, SiteLogoLink } from "./SiteLogoLink"
 import Card from "../components/Card"
+import LocationPicker from "../components/LocationPicker"
 
 import { validationMessage } from "../lib/validation"
 import { goBackAndHandleEvent } from "../lib/util"
@@ -34,7 +35,9 @@ type Props = {
   onSubmitSocialSite: Function,
   onUpdatePersonalSite: Function,
   onSubmitPersonalSite: Function,
-  onDeleteSite: Function
+  onDeleteSite: Function,
+  onUpdateLocation: Function,
+  onClearLocation: Function
 }
 
 export default class ProfileForm extends React.Component<Props> {
@@ -166,6 +169,8 @@ export default class ProfileForm extends React.Component<Props> {
       profile,
       validation,
       onUpdate,
+      onUpdateLocation,
+      onClearLocation,
       onSubmit,
       processing,
       history
@@ -224,6 +229,15 @@ export default class ProfileForm extends React.Component<Props> {
               <label className="bottom-label">
                 Add a short description about yourself, max 1000 characters
               </label>
+            </div>
+            <div className="row location">
+              <LocationPicker
+                className="row bio"
+                initialLocation={profile.location || ""}
+                placeholder='Location (city)'
+                onChange={onUpdateLocation}
+                onClear={onClearLocation}
+              />
             </div>
             {this.renderUserWebsiteSection()}
           </form>

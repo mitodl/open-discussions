@@ -42,6 +42,7 @@ def test_list_users(staff_client, staff_user):
                 "bio": profile.bio,
                 "headline": profile.headline,
                 "username": staff_user.username,
+                "location": "",
             },
         }
     ]
@@ -72,6 +73,7 @@ def test_create_user(
             "image_medium": "image_medium",
             "bio": "bio",
             "headline": "headline",
+            "location": "",
         },
     }
     if uid:
@@ -145,6 +147,7 @@ def test_get_user(staff_client, user):
             "bio": profile.bio,
             "headline": profile.headline,
             "username": profile.user.username,
+            "location": "",
         },
     }
 
@@ -198,6 +201,7 @@ def test_patch_user(staff_client, user, uid, email, email_optin, toc_optin):
             "bio": profile.bio,
             "headline": profile.headline,
             "username": profile.user.username,
+            "location": "",
         },
     }
     user.refresh_from_db()

@@ -44,6 +44,7 @@ def test_serialize_user(user):
             "bio": profile.bio,
             "headline": profile.headline,
             "username": profile.user.username,
+            "location": "",
         },
     }
 
@@ -61,6 +62,7 @@ def test_serialize_create_user(db, mocker):
         "toc_optin": True,
         "bio": "bio",
         "headline": "headline",
+        "location": "",
     }
 
     get_or_create_auth_tokens_stub = mocker.patch(

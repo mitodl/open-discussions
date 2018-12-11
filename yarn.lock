@@ -1895,6 +1895,10 @@ address@1.0.3, address@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/address/-/address-1.0.3.tgz#b5f50631f8d6cec8bd20c963963afb55e06cbce9"
 
+agentkeepalive@^2.2.0:
+  version "2.2.0"
+  resolved "http://registry.npmjs.org/agentkeepalive/-/agentkeepalive-2.2.0.tgz#c5d1bd4b129008f1163f236f86e5faea2026e2ef"
+
 airbnb-js-shims@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/airbnb-js-shims/-/airbnb-js-shims-2.1.1.tgz#a509611480db7e6d9db62fe2acfaeb473b6842ac"
@@ -1982,6 +1986,30 @@ ajv@^6.5.5:
     fast-json-stable-stringify "^2.0.0"
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
+
+algolia-aerial@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/algolia-aerial/-/algolia-aerial-1.5.3.tgz#c8b8ca6bc484164ffc7b36717689a424ea6bfe6c"
+
+algoliasearch@^3.27.1:
+  version "3.31.0"
+  resolved "https://registry.yarnpkg.com/algoliasearch/-/algoliasearch-3.31.0.tgz#c4083375ff02538ef50d9ec73e6a72e5e19ed96f"
+  dependencies:
+    agentkeepalive "^2.2.0"
+    debug "^2.6.8"
+    envify "^4.0.0"
+    es6-promise "^4.1.0"
+    events "^1.1.0"
+    foreach "^2.0.5"
+    global "^4.3.2"
+    inherits "^2.0.1"
+    isarray "^2.0.1"
+    load-script "^1.0.0"
+    object-keys "^1.0.11"
+    querystring-es3 "^0.2.1"
+    reduce "^1.0.1"
+    semver "^5.1.0"
+    tunnel-agent "^0.6.0"
 
 align-text@^0.1.1, align-text@^0.1.3:
   version "0.1.4"
@@ -2251,6 +2279,12 @@ attr-accept@^1.0.3:
   resolved "https://registry.yarnpkg.com/attr-accept/-/attr-accept-1.1.2.tgz#6836bfe054e4ef1ee3076fdde56cec9bb3ffead6"
   dependencies:
     core-js "^2.5.0"
+
+autocomplete.js@^0.32.0:
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/autocomplete.js/-/autocomplete.js-0.32.0.tgz#a00eab44dcb9e573ebd8bb3178e7fe67466cd4f1"
+  dependencies:
+    immediate "^3.2.3"
 
 autoprefixer@^6.3.1:
   version "6.7.7"
@@ -4813,6 +4847,13 @@ entities@^1.1.1, entities@~1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/entities/-/entities-1.1.1.tgz#6e5c2d0a5621b5dadaecef80b90edfb5cd7772f0"
 
+envify@^4.0.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/envify/-/envify-4.1.0.tgz#f39ad3db9d6801b4e6b478b61028d3f0b6819f7e"
+  dependencies:
+    esprima "^4.0.0"
+    through "~2.3.4"
+
 enzyme-adapter-react-16@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/enzyme-adapter-react-16/-/enzyme-adapter-react-16-1.6.0.tgz#3fca28d3c32f3ff427495380fe2dd51494689073"
@@ -4948,6 +4989,10 @@ es6-map@^0.1.3:
     es6-set "~0.1.5"
     es6-symbol "~3.1.1"
     event-emitter "~0.3.5"
+
+es6-promise@^4.1.0:
+  version "4.2.5"
+  resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-4.2.5.tgz#da6d0d5692efb461e082c14817fe2427d8f5d054"
 
 es6-set@~0.1.5:
   version "0.1.5"
@@ -5264,7 +5309,7 @@ event-emitter@~0.3.5:
     d "1"
     es5-ext "~0.10.14"
 
-events@^1.0.0:
+events@^1.0.0, events@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/events/-/events-1.1.1.tgz#9ebdb7635ad099c70dcc4c2a1f5004288e8bd924"
 
@@ -6461,6 +6506,10 @@ ignore@^4.0.6:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-4.0.6.tgz#750e3db5862087b4737ebac8207ffd1ef27b25fc"
 
+immediate@^3.2.3:
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.2.3.tgz#d140fa8f614659bd6541233097ddaac25cdd991c"
+
 immutable@^3.8.1:
   version "3.8.2"
   resolved "https://registry.yarnpkg.com/immutable/-/immutable-3.8.2.tgz#c2439951455bb39913daf281376f1530e104adf3"
@@ -6951,6 +7000,10 @@ isarray@1.0.0, isarray@^1.0.0, isarray@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/isarray/-/isarray-1.0.0.tgz#bb935d48582cba168c06834957a54a3e07124f11"
 
+isarray@^2.0.1:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/isarray/-/isarray-2.0.4.tgz#38e7bcbb0f3ba1b7933c86ba1894ddfc3781bbb7"
+
 isexe@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
@@ -7310,6 +7363,10 @@ load-json-file@^1.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
     strip-bom "^2.0.0"
+
+load-script@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/load-script/-/load-script-1.0.0.tgz#0491939e0bee5643ee494a7e3da3d2bac70c6ca4"
 
 loader-runner@^2.3.0:
   version "2.3.0"
@@ -8377,6 +8434,10 @@ object-keys@^1.0.11, object-keys@^1.0.8:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/object-keys/-/object-keys-1.0.11.tgz#c54601778ad560f1142ce0e01bcca8b56d13426d"
 
+object-keys@~1.0.0:
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/object-keys/-/object-keys-1.0.12.tgz#09c53855377575310cca62f55bb334abff7b3ed2"
+
 object-visit@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/object-visit/-/object-visit-1.0.1.tgz#f79c4493af0c5377b59fe39d395e41042dd045bb"
@@ -8788,6 +8849,16 @@ pkg-up@2.0.0:
   resolved "https://registry.yarnpkg.com/pkg-up/-/pkg-up-2.0.0.tgz#c819ac728059a461cab1c3889a2be3c49a004d7f"
   dependencies:
     find-up "^2.1.0"
+
+places.js@^1.14.0:
+  version "1.14.0"
+  resolved "https://registry.yarnpkg.com/places.js/-/places.js-1.14.0.tgz#95a745b2cc4a9ba0f57476d4e84404f4312a6494"
+  dependencies:
+    algolia-aerial "^1.5.3"
+    algoliasearch "^3.27.1"
+    autocomplete.js "^0.32.0"
+    events "^3.0.0"
+    insert-css "^2.0.0"
 
 pluralize@^1.2.1:
   version "1.2.1"
@@ -9471,7 +9542,7 @@ query-string@^5.0.1:
     object-assign "^4.1.0"
     strict-uri-encode "^1.0.0"
 
-querystring-es3@^0.2.0:
+querystring-es3@^0.2.0, querystring-es3@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/querystring-es3/-/querystring-es3-0.2.1.tgz#9ec61f79049875707d69414596fd907a4d711e73"
 
@@ -10038,6 +10109,12 @@ reduce-function-call@^1.0.1:
 reduce-reducers@^0.1.0:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/reduce-reducers/-/reduce-reducers-0.1.2.tgz#fa1b4718bc5292a71ddd1e5d839c9bea9770f14b"
+
+reduce@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/reduce/-/reduce-1.0.1.tgz#14fa2e5ff1fc560703a020cbb5fbaab691565804"
+  dependencies:
+    object-keys "~1.0.0"
 
 redux-actions@^2.0.3:
   version "2.2.1"
@@ -10732,13 +10809,13 @@ semver@5.4.1:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.4.1.tgz#e059c09d8571f0540823733433505d3a2f00b18e"
 
+semver@^5.1.0, semver@^5.5.1:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
+
 semver@^5.3.0, semver@~5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.3.0.tgz#9b2ce5d3de02d17c6012ad326aa6b4d0cf54f94f"
-
-semver@^5.5.1:
-  version "5.6.0"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
 
 send@0.16.2:
   version "0.16.2"
@@ -11487,7 +11564,7 @@ through2@^2.0.0:
     readable-stream "^2.1.5"
     xtend "~4.0.1"
 
-through@^2.3.6, through@^2.3.8:
+through@^2.3.6, through@^2.3.8, through@~2.3.4:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
 
