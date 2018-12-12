@@ -230,7 +230,7 @@ export default class ProfileForm extends React.Component<Props> {
                 Add a short description about yourself, max 1000 characters
               </label>
             </div>
-            {SETTINGS.algolia_appId && SETTINGS.algolia_apiKey ?
+            {SETTINGS.algolia_appId && SETTINGS.algolia_apiKey ? (
               <div className="row location">
                 <LocationPicker
                   initialLocation={profile.placename || ""}
@@ -242,7 +242,7 @@ export default class ProfileForm extends React.Component<Props> {
                   Enter the city where you live or work.
                 </label>
               </div>
-              : null}
+            ) : null}
             {this.renderUserWebsiteSection()}
           </form>
         </Card>
