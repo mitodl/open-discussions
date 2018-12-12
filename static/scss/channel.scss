@@ -95,6 +95,17 @@
   .edit-button {
     color: white;
   }
+
+  .settings-menu {
+    position: relative;
+    cursor: pointer;
+    z-index: 20;
+
+    .settings-menu-dropdown {
+      top: 31px;
+      right: 0;
+    }
+  }
 }
 
 .channel-about {
