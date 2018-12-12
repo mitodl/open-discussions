@@ -46,6 +46,15 @@ export default class LocationPicker extends React.Component<Props> {
     this.autocomplete.removeAllListeners("clear")
   }
 
+  updateJSON = (e: Object) => {
+    const { onChange } = this.props
+    onChange({
+      suggestion: {
+        value: e.target.value
+      }
+    })
+  }
+
   render() {
     const { placeholder, initialLocation } = this.props
 
@@ -58,6 +67,7 @@ export default class LocationPicker extends React.Component<Props> {
           ref={ref => {
             this.autocompleteElem = ref
           }}
+          onChange={this.updateJSON}
         />
       </div>
     )
