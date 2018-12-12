@@ -230,17 +230,19 @@ export default class ProfileForm extends React.Component<Props> {
                 Add a short description about yourself, max 1000 characters
               </label>
             </div>
-            <div className="row location">
-              <LocationPicker
-                initialLocation={profile.placename || ""}
-                placeholder="Location (city)"
-                onChange={onUpdateLocation}
-                onClear={onClearLocation}
-              />
-              <label className="bottom-label">
-                Enter the city where you live or work.
-              </label>
-            </div>
+            {SETTINGS.algolia_appId && SETTINGS.algolia_apiKey ?
+              <div className="row location">
+                <LocationPicker
+                  initialLocation={profile.placename || ""}
+                  placeholder="Location (city)"
+                  onChange={onUpdateLocation}
+                  onClear={onClearLocation}
+                />
+                <label className="bottom-label">
+                  Enter the city where you live or work.
+                </label>
+              </div>
+              : null}
             {this.renderUserWebsiteSection()}
           </form>
         </Card>
