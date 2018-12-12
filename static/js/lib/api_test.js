@@ -48,7 +48,8 @@ import {
   getChannelContributors,
   getChannelModerators,
   search,
-  getCKEditorJWT
+  getCKEditorJWT,
+  getWidgetList
 } from "./api"
 import {
   makeChannel,
@@ -68,6 +69,7 @@ import { COMMENT_SORT_NEW } from "./picker"
 import * as authFuncs from "./fetch_auth"
 import * as searchFuncs from "./search"
 import { makeProfile } from "../factories/profiles"
+import { makeWidgetListResponse } from "../factories/widgets"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
@@ -826,6 +828,20 @@ describe("api", function() {
         sinon.assert.calledWith(fetchStub, "/api/v0/ckeditor/")
       })
     })
+
+    describe("widget functions", () => {
+      it("fetches a widget list", async () => {
+        const widgetList = makeWidgetListResponse()
+        fetchJSONStub.returns(Promise.resolve(widgetList))
+        const widgetListId = widgetList.id
+        const response = await getWidgetList(widgetListId)
+        assert.deepEqual(response, widgetList)
+        sinon.assert.calledWith(
+          fetchJSONStub,
+          `/api/v0/widget_lists/${widgetListId}/`
+        )
+      })
+    })
   })
 
   describe("settings functions", () => {
@@ -922,6 +938,4 @@ describe("api", function() {
       })
     })
   })
-
-  describe("widget functions", () => {})
 })
