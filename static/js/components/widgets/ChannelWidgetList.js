@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 
-import WidgetList from "../../containers/widgets/WidgetList"
+import WidgetListContainer from "../../containers/widgets/WidgetListContainer"
 
 import type { Channel } from "../../flow/discussionTypes"
 
@@ -11,7 +11,7 @@ type ChannelWidgetListProps = {
 
 const ChannelWidgetList = ({ channel }: ChannelWidgetListProps) =>
   channel.widget_list_id ? (
-    <WidgetList widgetListId={channel.widget_list_id} />
+    <WidgetListContainer widgetListId={channel.widget_list_id} />
   ) : null
 
 export default ChannelWidgetList

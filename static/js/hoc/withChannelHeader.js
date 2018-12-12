@@ -10,13 +10,14 @@ const withChannelHeader = R.curry(
       static WrappedComponent: Class<React.Component<*, *>>
 
       render() {
-        const { channel } = this.props
+        const { channel, history } = this.props
 
         return (
           <div className="channel-page-wrapper">
             {channel ? (
               <ChannelHeader
                 channel={channel}
+                history={history}
                 isModerator={channel.user_is_moderator}
                 hasNavbar={hasNavbar}
               />

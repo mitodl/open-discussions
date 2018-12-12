@@ -17,13 +17,13 @@ describe("ChannelWidgetList", () => {
   it("should render the list if widget_list_id is set", () => {
     channel.widget_list_id = 1
     const wrapper = renderWidgetList()
-    assert.ok(wrapper.find("Connect(WidgetList)").exists())
-    const props = wrapper.find("Connect(WidgetList)").props()
+    assert.ok(wrapper.find("Connect(WidgetListContainer)").exists())
+    const props = wrapper.find("Connect(WidgetListContainer)").props()
     assert.equal(props.widgetListId, 1)
   })
 
   it("should not render the list if widget_list_id is null", () => {
     const wrapper = renderWidgetList()
-    assert.isFalse(wrapper.find("Connect(WidgetList)").exists())
+    assert.isFalse(wrapper.find("Connect(WidgetListContainer)").exists())
   })
 })
