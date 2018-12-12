@@ -258,8 +258,8 @@ export type Profile = {
   profile_image_small:  string,
   profile_image_medium: string,
   user_websites?:       Array<UserWebsite>,
-  location?:            string,
-  locationJSON?:        Object
+  placename?:           string,
+  location?:            Object
 }
 
 export type UserWebsite = {
@@ -281,7 +281,7 @@ export type ProfilePayload = {
   name:     string,
   bio:      ?string,
   headline: ?string,
-  locationJSON: ?Object
+  location: ?Object
 }
 
 export type SocialAuth = {

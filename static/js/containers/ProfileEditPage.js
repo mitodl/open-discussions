@@ -199,7 +199,7 @@ class ProfileEditPage extends React.Component<Props> {
         actions.forms.formUpdate({
           ...EDIT_PROFILE_PAYLOAD,
           value: {
-            locationJSON: e.suggestion
+            location: e.suggestion
           }
         })
       )
@@ -212,7 +212,7 @@ class ProfileEditPage extends React.Component<Props> {
       actions.forms.formUpdate({
         ...EDIT_PROFILE_PAYLOAD,
         value: {
-          locationJSON: null
+          location: null
         }
       })
     )

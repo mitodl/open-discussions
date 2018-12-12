@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="profile",
-            name="locationJSON",
+            name="location",
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
         )
     ]

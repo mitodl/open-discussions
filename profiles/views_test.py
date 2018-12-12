@@ -43,7 +43,7 @@ def test_list_users(staff_client, staff_user):
                 "bio": profile.bio,
                 "headline": profile.headline,
                 "username": staff_user.username,
-                "location": profile.locationJSON.get("value", ""),
+                "placename": profile.location.get("value", ""),
             },
         }
     ]
@@ -74,7 +74,7 @@ def test_create_user(
             "image_medium": "image_medium",
             "bio": "bio",
             "headline": "headline",
-            "location": "",
+            "placename": "",
         },
     }
     if uid:
@@ -148,7 +148,7 @@ def test_get_user(staff_client, user):
             "bio": profile.bio,
             "headline": profile.headline,
             "username": profile.user.username,
-            "location": profile.locationJSON.get("value", ""),
+            "placename": profile.location.get("value", ""),
         },
     }
 
@@ -202,7 +202,7 @@ def test_patch_user(staff_client, user, uid, email, email_optin, toc_optin):
             "bio": profile.bio,
             "headline": profile.headline,
             "username": profile.user.username,
-            "location": profile.locationJSON.get("value", ""),
+            "placename": profile.location.get("value", ""),
         },
     }
     user.refresh_from_db()
@@ -241,14 +241,14 @@ def test_patch_profile_by_user(client, logged_in_profile):
             data={
                 "bio": "updated_bio_value",
                 "image_file": image_file,
-                "locationJSON": json.dumps(location_json),
+                "location": json.dumps(location_json),
             },
             format="multipart",
         )
     filename, ext = splitext(image_file.name)
     assert resp.status_code == 200
     assert resp.json()["bio"] == "updated_bio_value"
-    assert resp.json()["location"] == "Boston"
+    assert resp.json()["placename"] == "Boston"
     assert basename(filename) in resp.json()["image_file"]
     assert resp.json()["image_file"].endswith(ext)
     assert resp.json()["image_small_file"].endswith(".jpg")
@@ -260,7 +260,7 @@ def test_patch_profile_by_user(client, logged_in_profile):
     assert logged_in_profile.image_small_file.width == 64
     assert logged_in_profile.image_medium_file.height == 128
     assert logged_in_profile.image_medium_file.width == 128
-    assert logged_in_profile.locationJSON == location_json
+    assert logged_in_profile.location == location_json
 
 
 def test_initialized_avatar(client, user):

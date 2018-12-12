@@ -232,8 +232,7 @@ export default class ProfileForm extends React.Component<Props> {
             </div>
             <div className="row location">
               <LocationPicker
-                className="row bio"
-                initialLocation={profile.location || ""}
+                initialLocation={profile.placename || ""}
                 placeholder="Location (city)"
                 onChange={onUpdateLocation}
                 onClear={onClearLocation}

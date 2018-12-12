@@ -25,7 +25,7 @@ export default class LocationPicker extends React.Component<Props> {
   }
 
   componentDidMount() {
-    const { initialLocation, onChange, onClear, options } = this.props
+    const { onChange, onClear, options } = this.props
     this.autocomplete = Places({
       appId:     SETTINGS.algolia_appId,
       apiKey:    SETTINGS.algolia_apiKey,
@@ -35,8 +35,6 @@ export default class LocationPicker extends React.Component<Props> {
 
     this.autocomplete.on("change", onChange)
     this.autocomplete.on("clear", onClear)
-
-    this.autocomplete.setVal(initialLocation)
   }
 
   shouldComponentUpdate() {
@@ -49,13 +47,14 @@ export default class LocationPicker extends React.Component<Props> {
   }
 
   render() {
-    const { placeholder } = this.props
+    const { placeholder, initialLocation } = this.props
 
     return (
       <div>
         <input
           type="text"
           placeholder={placeholder}
+          defaultValue={initialLocation}
           ref={ref => {
             this.autocompleteElem = ref
           }}

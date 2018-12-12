@@ -48,10 +48,10 @@ describe("ProfileForm", () => {
   const renderForm = (
     props = {},
     form = {
-      name:         profile.name,
-      bio:          profile.bio,
-      headline:     profile.headline,
-      locationJSON: profile.locationJSON
+      name:     profile.name,
+      bio:      profile.bio,
+      headline: profile.headline,
+      location: profile.location
     },
     validation = { reason: "", name: "" }
   ) =>
@@ -138,6 +138,13 @@ describe("ProfileForm", () => {
         .find("label")
         .text(),
       "For example: 'Post Doc, Photonics MIT', max 60 characters"
+    )
+    assert.equal(
+      wrapper
+        .find(".location")
+        .find("input")
+        .props().defaultValue,
+      profile.placename
     )
   })
 

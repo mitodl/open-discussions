@@ -98,7 +98,7 @@ describe("ProfileEditPage", function() {
     const name = "Test User"
     const bio = "Test bio"
     const headline = "Test headline"
-    const locationJSON = { value: "Test location" }
+    const location = { value: "Test location" }
     const wrapper = await renderPage()
 
     await listenForActions(
@@ -112,12 +112,12 @@ describe("ProfileEditPage", function() {
         setName(wrapper, name)
         setBio(wrapper, bio)
         setHeadline(wrapper, headline)
-        setLocation(wrapper, locationJSON)
+        setLocation(wrapper, location)
       }
     )
 
     helper.updateProfileStub.returns(
-      Promise.resolve({ ...profile, name, bio, headline, locationJSON })
+      Promise.resolve({ ...profile, name, bio, headline, location })
     )
 
     await listenForActions(
@@ -126,12 +126,12 @@ describe("ProfileEditPage", function() {
         submitProfile(wrapper)
       }
     )
-    const payload: ProfilePayload = { name, bio, headline, locationJSON }
+    const payload: ProfilePayload = { name, bio, headline, location }
     sinon.assert.calledWith(helper.updateProfileStub, profile.username, payload)
   })
 
-  it("should clear locationJSON and pass that on to api on submit", async () => {
-    const locationJSON = null
+  it("should clear location and pass that on to api on submit", async () => {
+    const location = null
     const wrapper = await renderPage()
     const name = profile.name
     const headline = profile.headline
@@ -141,9 +141,7 @@ describe("ProfileEditPage", function() {
       clearLocation(wrapper)
     })
 
-    helper.updateProfileStub.returns(
-      Promise.resolve({ ...profile, locationJSON })
-    )
+    helper.updateProfileStub.returns(Promise.resolve({ ...profile, location }))
 
     await listenForActions(
       [actions.profiles.patch.requestType, actions.profiles.patch.successType],
@@ -151,7 +149,7 @@ describe("ProfileEditPage", function() {
         submitProfile(wrapper)
       }
     )
-    const payload: ProfilePayload = { name, bio, headline, locationJSON }
+    const payload: ProfilePayload = { name, bio, headline, location }
     sinon.assert.calledWith(helper.updateProfileStub, profile.username, payload)
   })
 

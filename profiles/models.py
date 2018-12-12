@@ -87,7 +87,7 @@ class Profile(models.Model):
 
     headline = models.CharField(blank=True, null=True, max_length=60)
     bio = models.TextField(blank=True, null=True)
-    locationJSON = JSONField(null=True, blank=True)
+    location = JSONField(null=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         """Track previous name"""

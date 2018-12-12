@@ -32,7 +32,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField(read_only=True)
     profile_image_medium = serializers.SerializerMethodField(read_only=True)
     profile_image_small = serializers.SerializerMethodField(read_only=True)
-    location = serializers.SerializerMethodField(read_only=True)
+    placename = serializers.SerializerMethodField(read_only=True)
 
     def get_username(self, obj):
         """Custom getter for the username"""
@@ -46,10 +46,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         """ Custom getter for small profile image """
         return image_uri(obj, IMAGE_SMALL)
 
-    def get_location(self, obj):
+    def get_placename(self, obj):
         """ Custom getter for location text"""
-        if obj.locationJSON:
-            return obj.locationJSON["value"]
+        if obj.location:
+            return obj.location.get("value", "")
         return ""
 
     def update(self, instance, validated_data):
@@ -91,8 +91,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             "bio",
             "headline",
             "username",
+            "placename",
             "location",
-            "locationJSON",
         )
         read_only_fields = (
             "image_file_small",
@@ -100,9 +100,9 @@ class ProfileSerializer(serializers.ModelSerializer):
             "profile_image_small",
             "profile_image_medium",
             "username",
-            "location",
+            "placename",
         )
-        extra_kwargs = {"locationJSON": {"write_only": True}}
+        extra_kwargs = {"location": {"write_only": True}}
 
 
 class UserWebsiteSerializer(serializers.ModelSerializer):

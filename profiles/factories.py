@@ -10,10 +10,11 @@ class LocationProvider(BaseProvider):
     """Factory for location JSON"""
 
     cities = [
-        "Boston, Massachusetts, United States of America",
-        "Paris, France",
-        "Venice, Veneto, Italy",
+        "Kathmandu, मध्यमाञ्चल विकास क्षेत्र, Nepal",
         "Paris, Île-de-France, France",
+        "Cairo, محافظة القاهرة, Egypt",
+        "Tokyo, 東京都, Japan",
+        "Medellín, Antioquia, Colombia",
     ]
 
     def location(self):
@@ -39,7 +40,7 @@ class ProfileFactory(DjangoModelFactory):
 
     email_optin = Faker("boolean")
 
-    locationJSON = Faker("location")
+    location = Faker("location")
 
     class Meta:
         model = Profile

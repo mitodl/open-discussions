@@ -18,8 +18,8 @@ export const makeProfile = (
   headline:             casual.word,
   profile_image_small:  casual.url,
   profile_image_medium: casual.url,
-  location:             casual.word,
-  locationJSON:         { value: casual.word }
+  placename:            casual.word,
+  location:             { value: casual.word }
 })
 
 export const makeUserWebsite = (

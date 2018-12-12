@@ -44,7 +44,7 @@ def test_serialize_user(user):
             "bio": profile.bio,
             "headline": profile.headline,
             "username": profile.user.username,
-            "location": profile.locationJSON["value"],
+            "placename": profile.location["value"],
         },
     }
 
@@ -62,7 +62,7 @@ def test_serialize_create_user(db, mocker):
         "toc_optin": True,
         "bio": "bio",
         "headline": "headline",
-        "location": "",
+        "placename": "",
     }
 
     get_or_create_auth_tokens_stub = mocker.patch(
@@ -154,7 +154,7 @@ def test_update_user_profile(mock_index_functions, user, key, value):
         ("name", "name_value"),
         ("bio", "bio_value"),
         ("headline", "headline_value"),
-        ("locationJSON", {"value": "Hobbiton, The Shire, Middle-Earth"}),
+        ("location", {"value": "Hobbiton, The Shire, Middle-Earth"}),
         (
             "image_file",
             SimpleUploadedFile("small.gif", small_gif, content_type="image/gif"),
@@ -182,7 +182,7 @@ def test_update_profile(mock_index_functions, user, key, value):
         "toc_optin",
         "bio",
         "headline",
-        "locationJSON",
+        "location",
     ):
         if prop == key:
             if isinstance(value, bool):
@@ -198,7 +198,7 @@ def test_update_profile(mock_index_functions, user, key, value):
         mock_index_functions.update_posts.assert_called_once_with(profile2)
     else:
         mock_index_functions.update_posts.assert_not_called()
-        if key != "locationJSON":
+        if key != "location":
             mock_index_functions.update_author.assert_called_with(profile2.user)
 
 
