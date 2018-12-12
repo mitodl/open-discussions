@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.57.0
+Version 0.57.0 (Released December 12, 2018)
 --------------
 
 - Add CKEditor for creating Article posts
