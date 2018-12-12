@@ -149,6 +149,24 @@ def test_update_user_profile(mock_index_functions, user, key, value):
 
 
 @pytest.mark.parametrize(
+    "data,is_valid",
+    [
+        ({}, True),
+        ("notjson", False),
+        ({"bad": "json"}, False),
+        (None, True),
+        ({"value": "city"}, True),
+    ],
+)
+def test_location_validation(user, data, is_valid):
+    """Test that lcoation validation works correctly"""
+    serializer = ProfileSerializer(
+        instance=user.profile, data={"location": data}, partial=True
+    )
+    assert serializer.is_valid(raise_exception=False) is is_valid
+
+
+@pytest.mark.parametrize(
     "key,value",
     [
         ("name", "name_value"),

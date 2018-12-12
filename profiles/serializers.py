@@ -52,6 +52,16 @@ class ProfileSerializer(serializers.ModelSerializer):
             return obj.location.get("value", "")
         return ""
 
+    def validate_location(self, location):
+        """
+        Validator for location.
+        """
+        if location and (
+            not isinstance(location, dict) or ("value" not in location.keys())
+        ):
+            raise ValidationError("Missing/incorrect location information")
+        return location
+
     def update(self, instance, validated_data):
         """Update the profile and related docs in Elasticsearch"""
         with transaction.atomic():
