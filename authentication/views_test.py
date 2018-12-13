@@ -10,6 +10,7 @@ from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
 
 from authentication.backends.micromasters import MicroMastersAuth
+from authentication.serializers import PARTIAL_PIPELINE_TOKEN_KEY
 from authentication.utils import SocialAuthState
 from open_discussions import features
 from open_discussions.factories import UserSocialAuthFactory
@@ -614,6 +615,26 @@ def test_login_register_flows(request, steps):
     for fixture_name in steps:
         assert_step = request.getfixturevalue(fixture_name)
         last_result = assert_step(last_result)
+
+
+def test_new_register_no_session_partial(client):
+    """
+    When a user registers for the first time and a verification email is sent, the partial
+    token should be cleared from the session. The Partial object associated with that token should
+    only be used when it's matched from the email verification link.
+    """
+    assert_api_call(
+        client,
+        "psa-register-email",
+        {"flow": SocialAuthState.FLOW_REGISTER, "email": NEW_EMAIL},
+        {
+            "flow": SocialAuthState.FLOW_REGISTER,
+            "provider": EmailAuth.name,
+            "partial_token": None,
+            "state": SocialAuthState.STATE_REGISTER_CONFIRM_SENT,
+        },
+    )
+    assert PARTIAL_PIPELINE_TOKEN_KEY not in client.session.keys()
 
 
 def test_login_email_error(settings, client, mocker):
