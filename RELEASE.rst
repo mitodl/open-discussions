@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.57.1
+--------------
+
+- Add popup to channel settings link (#1582)
+- Refactor widgets and style read-only widgets (#1574)
+- Added backend support for allowed post types
+- Fixed unverified user login bug
+- Django management command to create missing `Post` objects (#1567)
+- Added widgets backend
+- Remove errorHandling, use async/await, refactor API functions (#1562)
+- Add django-hijack (#1535)
+
 Version 0.57.0 (Released December 12, 2018)
 --------------
 
