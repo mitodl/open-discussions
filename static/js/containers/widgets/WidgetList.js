@@ -22,10 +22,6 @@ type Props = {
 }
 
 export class WidgetList extends React.Component<Props> {
-  static defaultProps = {
-    renderers: {}
-  }
-
   componentDidMount() {
     this.loadData()
   }
