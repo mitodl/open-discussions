@@ -1,7 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import { NavLink } from "react-router-dom"
+import { Link, NavLink } from "react-router-dom"
 
 import ChannelBanner from "../containers/ChannelBanner"
 import { Cell, Grid } from "./Grid"
@@ -9,9 +9,8 @@ import ChannelAvatar, {
   CHANNEL_AVATAR_MEDIUM
 } from "../containers/ChannelAvatar"
 import IntraPageNav from "./IntraPageNav"
-import ChannelSettingsLink from "../containers/ChannelSettingsLink"
 
-import { channelURL, channelSearchURL } from "../lib/url"
+import { editChannelBasicURL, channelURL, channelSearchURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -43,7 +42,14 @@ export default class ChannelHeader extends React.Component<Props> {
               </div>
             </div>
             <div className="right">
-              {isModerator ? <ChannelSettingsLink channel={channel} /> : null}
+              {isModerator ? (
+                <Link
+                  to={editChannelBasicURL(channel.name)}
+                  className="edit-button"
+                >
+                  <i className="material-icons settings">settings</i>
+                </Link>
+              ) : null}
             </div>
           </Cell>
         </Grid>

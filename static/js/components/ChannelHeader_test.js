@@ -58,10 +58,7 @@ describe("ChannelHeader", () => {
     } the moderator edit button`, () => {
       const wrapper = render({ isModerator })
 
-      assert.equal(
-        wrapper.find("Connect(ChannelSettingsLink)").length,
-        isModerator ? 1 : 0
-      )
+      assert.equal(wrapper.find(".edit-button").length, isModerator ? 1 : 0)
     })
   })
   ;[true, false].forEach(allowSearch => {
