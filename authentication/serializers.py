@@ -25,6 +25,9 @@ from authentication.utils import SocialAuthState
 from profiles.models import Profile
 from profiles.serializers import ProfileSerializer
 
+
+PARTIAL_PIPELINE_TOKEN_KEY = "partial_pipeline_token"
+
 log = logging.getLogger()
 
 User = get_user_model()
@@ -149,11 +152,19 @@ class SocialAuthSerializer(serializers.Serializer):
             log.exception("Received unexpected AuthException")
             result = SocialAuthState(SocialAuthState.STATE_ERROR, errors=[str(exc)])
 
-        if isinstance(result, SocialAuthState) and result.partial is not None:
-            strategy = self.context["strategy"]
-            strategy.storage.partial.store(result.partial)
-
-        if not isinstance(result, SocialAuthState):
+        if isinstance(result, SocialAuthState):
+            if result.partial is not None:
+                strategy = self.context["strategy"]
+                strategy.storage.partial.store(result.partial)
+            if result.state == SocialAuthState.STATE_REGISTER_CONFIRM_SENT:
+                # If the user has just signed up and a verification link has been emailed, we need
+                # to remove the partial token from the session. The partial token refers to a Partial
+                # object, and we only want to continue the pipeline with that object if the user has
+                # clicked the email verification link and the Partial has been matched from
+                # the verification URL (that URL also contains the verification code, which we need
+                # to continue the pipeline).
+                self.context["backend"].strategy.session.pop(PARTIAL_PIPELINE_TOKEN_KEY)
+        else:
             # if we got here, we saw an unexpected result
             log.error("Received unexpected result: %s", result)
             result = SocialAuthState(SocialAuthState.STATE_ERROR)
