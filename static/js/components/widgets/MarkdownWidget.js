@@ -2,17 +2,23 @@
 import React from "react"
 
 import { Markdown } from "../Markdown"
+import type { WidgetInstance } from "../../flow/widgetTypes"
 
 type Props = {
-  title: string,
-  source: string
+  widgetInstance: WidgetInstance
 }
 
-const MarkdownWidget = ({ title, source }: Props) => (
-  <div className="widget-body card-body">
-    <h5 className="widget-title card-title">{title}</h5>
-    <Markdown source={source} className="widget-text card-text text-truncate" />
-  </div>
-)
+const MarkdownWidget = ({ widgetInstance }: Props) => {
+  const {
+    title,
+    configuration: { source }
+  } = widgetInstance
+  return (
+    <div className="widget-body">
+      <span className="widget-title">{title}</span>
+      <Markdown source={source} className="widget-text" />
+    </div>
+  )
+}
 
 export default MarkdownWidget

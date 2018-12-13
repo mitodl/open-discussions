@@ -1,38 +1,28 @@
 // @flow
-
-export type WidgetListsResponse = Array<{
+export type WidgetInstance = {
   id: number,
-}>
-
-export type WidgetListResponse = Array<{
-  id: number,
-  widget_class: string,
-  react_renderer: string,
-  postition: number,
+  widget_type: string,
   title: string,
-  widget_list: number,
-  source: string,
-}>
+  configuration: Object,
+  react_renderer: string,
+  html: string|null,
+}
 
-type WidgetConfiguration = {
-  key: string,
+export type WidgetFieldSpec = {
+  field_name: string,
   label: string,
-  inputType: string,
-  props: Object
+  input_type: string,
+  props: Object,
+  default: any
 }
 
-export type WidgetConfigurationsResponse = {
-  widgetClassConfigurations: {
-    [widgetClass: string]: Array<WidgetConfiguration>
-  }
+export type WidgetSpec = {
+  widget_type: string,
+  form_spec: Array<WidgetFieldSpec>
 }
 
-export type WidgetResponse = {
-  widgetClassConfigurations: {
-    [widgetClass: string]: Array<WidgetConfiguration>
-  },
-  widgetData: {
-    source: string,
-    title: string,
-  }
+export type WidgetListResponse = {
+  id: number,
+  widgets: Array<WidgetInstance>,
+  available_widgets: Array<WidgetSpec>
 }

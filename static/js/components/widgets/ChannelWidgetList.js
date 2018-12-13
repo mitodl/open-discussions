@@ -1,16 +1,9 @@
 // @flow
 import React from "react"
 
-import WidgetList from "./WidgetList"
-
-import MarkdownWidget from "./MarkdownWidget"
-import { fetchJSONWithAuthFailure } from "../../lib/fetch_auth"
+import WidgetList from "../../containers/widgets/WidgetList"
 
 import type { Channel } from "../../flow/discussionTypes"
-
-const renderers = {
-  markdown: MarkdownWidget
-}
 
 type ChannelWidgetListProps = {
   channel: Channel
@@ -18,11 +11,7 @@ type ChannelWidgetListProps = {
 
 const ChannelWidgetList = ({ channel }: ChannelWidgetListProps) =>
   channel.widget_list_id ? (
-    <WidgetList
-      widgetListId={channel.widget_list_id}
-      renderers={renderers}
-      fetchData={fetchJSONWithAuthFailure}
-    />
+    <WidgetList widgetListId={channel.widget_list_id} />
   ) : null
 
 export default ChannelWidgetList

@@ -22,6 +22,7 @@ import {
   makePostResult,
   makeProfileResult
 } from "../factories/search"
+import { makeWidgetInstance } from "../factories/widgets"
 import { CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC } from "../lib/channels"
 import { dropdownMenuFuncs } from "../lib/ui"
 import { commentPermalink } from "../lib/url"
@@ -45,6 +46,7 @@ import {
 } from "../components/Picker"
 import SearchResult from "../components/SearchResult"
 import SearchTextbox from "../components/SearchTextbox"
+import WidgetInstance from "../components/widgets/WidgetInstance"
 
 // delay import so fonts get applied first
 setTimeout(() => {
@@ -613,6 +615,29 @@ storiesOf("Search results", module)
     return (
       <StoryWrapper>
         <SearchResult result={result} />
+      </StoryWrapper>
+    )
+  })
+
+storiesOf("Widgets", module)
+  .addDecorator(withKnobs)
+  .add("markdown", () => {
+    const instance = makeWidgetInstance("markdown")
+    instance.title = text("title", "Markdown widget title")
+    instance.configuration.source = text("markdown", "Markdown **body**")
+    return (
+      <StoryWrapper>
+        <WidgetInstance widgetInstance={instance} />
+      </StoryWrapper>
+    )
+  })
+  .add("default", () => {
+    const instance = makeWidgetInstance("missing")
+    instance.title = text("title", "Default widget title")
+    instance.html = text("html", "Some <i>unescaped</i> html")
+    return (
+      <StoryWrapper>
+        <WidgetInstance widgetInstance={instance} />
       </StoryWrapper>
     )
   })
