@@ -39,7 +39,7 @@ describe("ChannelSettingsLink", () => {
         dropdownMenus.add(CHANNEL_SETTINGS_MENU_DROPDOWN)
       }
       const { inner } = await render()
-      assert.equal(inner.find("DropdownMenu").exists(), isOpen)
+      assert.equal(inner.find("OnClickOutside(_DropdownMenu)").exists(), isOpen)
     })
   })
   ;[true, false].forEach(isOpen => {
