@@ -37,6 +37,8 @@ declare var SETTINGS: {
   accepted_social_sites: Array<string>,
   ckeditor_upload_url: string,
   article_ui_enabled: boolean,
+  algolia_appId: ?string,
+  algolia_apiKey: ?string
 }
 
 // mocha

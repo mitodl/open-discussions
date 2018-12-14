@@ -41,6 +41,17 @@
     align-items: flex-start;
   }
 
+  .location {
+    font-size: 16px;
+    margin-top: 22px;
+    flex-direction: column;
+    align-items: flex-start;
+
+    div {
+      width: 100%;
+    }
+  }
+
   h4 {
     margin: 0;
     padding: 0 0 5px 0;

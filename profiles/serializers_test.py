@@ -44,6 +44,7 @@ def test_serialize_user(user):
             "bio": profile.bio,
             "headline": profile.headline,
             "username": profile.user.username,
+            "placename": profile.location["value"],
         },
     }
 
@@ -61,6 +62,7 @@ def test_serialize_create_user(db, mocker):
         "toc_optin": True,
         "bio": "bio",
         "headline": "headline",
+        "placename": "",
     }
 
     get_or_create_auth_tokens_stub = mocker.patch(
@@ -73,6 +75,7 @@ def test_serialize_create_user(db, mocker):
 
     del profile["email_optin"]  # is write-only
     del profile["toc_optin"]  # is write-only
+
     profile.update(
         {
             "image_file": None,
@@ -146,11 +149,30 @@ def test_update_user_profile(mock_index_functions, user, key, value):
 
 
 @pytest.mark.parametrize(
+    "data,is_valid",
+    [
+        ({}, True),
+        ("notjson", False),
+        ({"bad": "json"}, False),
+        (None, True),
+        ({"value": "city"}, True),
+    ],
+)
+def test_location_validation(user, data, is_valid):
+    """Test that lcoation validation works correctly"""
+    serializer = ProfileSerializer(
+        instance=user.profile, data={"location": data}, partial=True
+    )
+    assert serializer.is_valid(raise_exception=False) is is_valid
+
+
+@pytest.mark.parametrize(
     "key,value",
     [
         ("name", "name_value"),
         ("bio", "bio_value"),
         ("headline", "headline_value"),
+        ("location", {"value": "Hobbiton, The Shire, Middle-Earth"}),
         (
             "image_file",
             SimpleUploadedFile("small.gif", small_gif, content_type="image/gif"),
@@ -171,7 +193,15 @@ def test_update_profile(mock_index_functions, user, key, value):
 
     profile2 = Profile.objects.first()
 
-    for prop in ("name", "image_file", "email_optin", "toc_optin", "bio", "headline"):
+    for prop in (
+        "name",
+        "image_file",
+        "email_optin",
+        "toc_optin",
+        "bio",
+        "headline",
+        "location",
+    ):
         if prop == key:
             if isinstance(value, bool):
                 assert getattr(profile2, prop) is value
@@ -186,7 +216,8 @@ def test_update_profile(mock_index_functions, user, key, value):
         mock_index_functions.update_posts.assert_called_once_with(profile2)
     else:
         mock_index_functions.update_posts.assert_not_called()
-        mock_index_functions.update_author.assert_called_with(profile2.user)
+        if key != "location":
+            mock_index_functions.update_author.assert_called_with(profile2.user)
 
 
 def test_serialize_profile_websites(user):

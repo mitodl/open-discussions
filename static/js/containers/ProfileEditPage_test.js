@@ -4,6 +4,7 @@ import { assert } from "chai"
 import sinon from "sinon"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
+import LocationPicker from "../components/LocationPicker"
 import { editProfileURL } from "../lib/url"
 import { makeProfile } from "../factories/profiles"
 import { actions } from "../actions"
@@ -15,6 +16,7 @@ describe("ProfileEditPage", function() {
   let helper, listenForActions, renderComponent, profile
 
   const makeEvent = (name, value) => ({ target: { value, name } })
+  const makeLocationEvent = json => ({ suggestion: json })
 
   const setName = (wrapper, name) =>
     wrapper
@@ -29,12 +31,26 @@ describe("ProfileEditPage", function() {
       .find(".headline input")
       .simulate("change", makeEvent("headline", text))
 
+  const setLocation = (wrapper, json) =>
+    wrapper
+      .find(LocationPicker)
+      .props()
+      .onChange(makeLocationEvent(json))
+
+  const clearLocation = wrapper =>
+    wrapper
+      .find(LocationPicker)
+      .props()
+      .onClear()
+
   const submitProfile = wrapper =>
     wrapper.find(".save-profile").simulate("click")
 
   beforeEach(() => {
     profile = makeProfile()
     SETTINGS.username = profile.username
+    SETTINGS.algolia_appId = "fake"
+    SETTINGS.algolia_apiKey = "fake"
     helper = new IntegrationTestHelper()
     helper.getProfileStub.returns(Promise.resolve(profile))
     helper.getChannelsStub.returns(Promise.resolve([]))
@@ -82,10 +98,12 @@ describe("ProfileEditPage", function() {
     const name = "Test User"
     const bio = "Test bio"
     const headline = "Test headline"
+    const location = { value: "Test location" }
     const wrapper = await renderPage()
 
     await listenForActions(
       [
+        actions.forms.FORM_UPDATE,
         actions.forms.FORM_UPDATE,
         actions.forms.FORM_UPDATE,
         actions.forms.FORM_UPDATE
@@ -94,11 +112,12 @@ describe("ProfileEditPage", function() {
         setName(wrapper, name)
         setBio(wrapper, bio)
         setHeadline(wrapper, headline)
+        setLocation(wrapper, location)
       }
     )
 
     helper.updateProfileStub.returns(
-      Promise.resolve({ ...profile, name, bio, headline })
+      Promise.resolve({ ...profile, name, bio, headline, location })
     )
 
     await listenForActions(
@@ -107,7 +126,30 @@ describe("ProfileEditPage", function() {
         submitProfile(wrapper)
       }
     )
-    const payload: ProfilePayload = { name, bio, headline }
+    const payload: ProfilePayload = { name, bio, headline, location }
+    sinon.assert.calledWith(helper.updateProfileStub, profile.username, payload)
+  })
+
+  it("should clear location and pass that on to api on submit", async () => {
+    const location = null
+    const wrapper = await renderPage()
+    const name = profile.name
+    const headline = profile.headline
+    const bio = profile.bio
+
+    await listenForActions([actions.forms.FORM_UPDATE], () => {
+      clearLocation(wrapper)
+    })
+
+    helper.updateProfileStub.returns(Promise.resolve({ ...profile, location }))
+
+    await listenForActions(
+      [actions.profiles.patch.requestType, actions.profiles.patch.successType],
+      () => {
+        submitProfile(wrapper)
+      }
+    )
+    const payload: ProfilePayload = { name, bio, headline, location }
     sinon.assert.calledWith(helper.updateProfileStub, profile.username, payload)
   })
 

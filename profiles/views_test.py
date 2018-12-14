@@ -1,5 +1,6 @@
 """Tests for views for REST APIs for users"""
 # pylint: disable=redefined-outer-name, unused-argument, too-many-arguments
+import json
 from os.path import splitext, basename
 
 from django.contrib.auth.models import User
@@ -42,6 +43,7 @@ def test_list_users(staff_client, staff_user):
                 "bio": profile.bio,
                 "headline": profile.headline,
                 "username": staff_user.username,
+                "placename": profile.location.get("value", ""),
             },
         }
     ]
@@ -72,6 +74,7 @@ def test_create_user(
             "image_medium": "image_medium",
             "bio": "bio",
             "headline": "headline",
+            "placename": "",
         },
     }
     if uid:
@@ -145,6 +148,7 @@ def test_get_user(staff_client, user):
             "bio": profile.bio,
             "headline": profile.headline,
             "username": profile.user.username,
+            "placename": profile.location.get("value", ""),
         },
     }
 
@@ -198,6 +202,7 @@ def test_patch_user(staff_client, user, uid, email, email_optin, toc_optin):
             "bio": profile.bio,
             "headline": profile.headline,
             "username": profile.user.username,
+            "placename": profile.location.get("value", ""),
         },
     }
     user.refresh_from_db()
@@ -228,16 +233,22 @@ def test_patch_profile_by_user(client, logged_in_profile):
         "profile_api-detail", kwargs={"user__username": logged_in_profile.user.username}
     )
     # create a dummy image file in memory for upload
+    location_json = {"value": "Boston"}
     with make_temp_image_file(width=250, height=250) as image_file:
         # format patch using multipart upload
         resp = client.patch(
             url,
-            data={"bio": "updated_bio_value", "image_file": image_file},
+            data={
+                "bio": "updated_bio_value",
+                "image_file": image_file,
+                "location": json.dumps(location_json),
+            },
             format="multipart",
         )
     filename, ext = splitext(image_file.name)
     assert resp.status_code == 200
     assert resp.json()["bio"] == "updated_bio_value"
+    assert resp.json()["placename"] == "Boston"
     assert basename(filename) in resp.json()["image_file"]
     assert resp.json()["image_file"].endswith(ext)
     assert resp.json()["image_small_file"].endswith(".jpg")
@@ -249,6 +260,7 @@ def test_patch_profile_by_user(client, logged_in_profile):
     assert logged_in_profile.image_small_file.width == 64
     assert logged_in_profile.image_medium_file.height == 128
     assert logged_in_profile.image_medium_file.width == 128
+    assert logged_in_profile.location == location_json
 
 
 def test_initialized_avatar(client, user):

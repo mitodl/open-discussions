@@ -27,6 +27,8 @@ def test_webpack_url(
     )
     settings.GA_TRACKING_ID = "fake"
     settings.EMBEDLY_KEY = "fake"
+    settings.ALGOLIA_APP_ID = "fake"
+    settings.ALGOLIA_API_KEY = "fake"
     settings.FEATURES[features.ANONYMOUS_ACCESS] = "access"
     settings.FEATURES[features.SAML_AUTH] = False
     settings.FEATURES[features.EMAIL_AUTH] = False
@@ -86,6 +88,8 @@ def test_webpack_url(
         "accepted_social_sites": list(SOCIAL_SITE_NAME_MAP.values()),
         "article_ui_enabled": settings.FEATURES[features.ARTICLE_UI],
         "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
+        "algolia_appId": settings.ALGOLIA_APP_ID,
+        "algolia_apiKey": settings.ALGOLIA_API_KEY,
         **expected_user_values,
     }
 

@@ -21,9 +21,13 @@ describe("ProfileForm", () => {
     onSubmitSocialSiteStub,
     onUpdatePersonalSiteStub,
     onSubmitPersonalSiteStub,
-    onDeleteSiteStub
+    onDeleteSiteStub,
+    onUpdateLocationStub,
+    onClearLocationStub
 
   beforeEach(() => {
+    SETTINGS.algolia_appId = "fake"
+    SETTINGS.algolia_apiKey = "fake"
     helper = new IntegrationTestHelper()
     profile = makeProfile()
     onUpdateStub = helper.sandbox.stub()
@@ -33,6 +37,8 @@ describe("ProfileForm", () => {
     onUpdatePersonalSiteStub = helper.sandbox.stub()
     onSubmitPersonalSiteStub = helper.sandbox.stub()
     onDeleteSiteStub = helper.sandbox.stub()
+    onUpdateLocationStub = helper.sandbox.stub()
+    onClearLocationStub = helper.sandbox.stub()
   })
 
   afterEach(() => {
@@ -44,7 +50,8 @@ describe("ProfileForm", () => {
     form = {
       name:     profile.name,
       bio:      profile.bio,
-      headline: profile.headline
+      headline: profile.headline,
+      location: profile.location
     },
     validation = { reason: "", name: "" }
   ) =>
@@ -65,6 +72,8 @@ describe("ProfileForm", () => {
           onUpdatePersonalSite={onUpdatePersonalSiteStub}
           onSubmitPersonalSite={onSubmitPersonalSiteStub}
           onDeleteSite={onDeleteSiteStub}
+          onUpdateLocation={onUpdateLocationStub}
+          onClearLocation={onClearLocationStub}
           history={{}}
           processing={false}
           {...props}
@@ -129,6 +138,13 @@ describe("ProfileForm", () => {
         .find("label")
         .text(),
       "For example: 'Post Doc, Photonics MIT', max 60 characters"
+    )
+    assert.equal(
+      wrapper
+        .find(".location")
+        .find("input")
+        .props().defaultValue,
+      profile.placename
     )
   })
 

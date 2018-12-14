@@ -23,6 +23,14 @@
   ],
   "description": "open-discussions",
   "env": {
+    "ALGOLIA_APP_ID": {
+      "description": "Algolia Places app ID",
+      "required": false
+    },
+    "ALGOLIA_API_KEY": {
+      "description": "Algolia Places API key",
+      "required": false
+    },
     "AWS_ACCESS_KEY_ID": {
       "description": "AWS Access Key for S3 storage.",
       "required": false
