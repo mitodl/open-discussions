@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.57.2
+Version 0.57.2 (Released December 14, 2018)
 --------------
 
 - Updated frontend to support allowed post types
