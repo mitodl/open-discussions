@@ -12,8 +12,10 @@ type Props = {
 }
 
 export default class LocationPicker extends React.Component<Props> {
+  autocompleteElem: {
+    current: null | React$ElementRef<typeof HTMLInputElement>
+  }
   autocomplete: Object
-  autocompleteElem: ?Object
 
   static defaultProps = {
     placeholder:     "Location (city)",
@@ -24,21 +26,24 @@ export default class LocationPicker extends React.Component<Props> {
     }
   }
 
-  componentDidMount() {
-    const { onChange, onClear, options } = this.props
-    this.autocomplete = Places({
-      appId:     SETTINGS.algolia_appId,
-      apiKey:    SETTINGS.algolia_apiKey,
-      ...options,
-      container: this.autocompleteElem
-    })
-
-    this.autocomplete.on("change", onChange)
-    this.autocomplete.on("clear", onClear)
+  constructor(props: Props) {
+    super(props)
+    this.autocompleteElem = React.createRef()
   }
 
-  shouldComponentUpdate() {
-    return false
+  componentDidMount() {
+    const { onChange, onClear, options } = this.props
+    if (this.autocompleteElem.current) {
+      this.autocomplete = Places({
+        appId:     SETTINGS.algolia_appId,
+        apiKey:    SETTINGS.algolia_apiKey,
+        ...options,
+        container: this.autocompleteElem.current
+      })
+
+      this.autocomplete.on("change", onChange)
+      this.autocomplete.on("clear", onClear)
+    }
   }
 
   componentWillUnmount() {
@@ -64,9 +69,7 @@ export default class LocationPicker extends React.Component<Props> {
           type="text"
           placeholder={placeholder}
           defaultValue={initialLocation}
-          ref={ref => {
-            this.autocompleteElem = ref
-          }}
+          ref={this.autocompleteElem}
           onChange={this.updateJSON}
         />
       </div>
