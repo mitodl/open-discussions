@@ -33,7 +33,7 @@ class Command(BaseCommand):
                 try:
                     submission = api_client.get_post(post_id)
                     submission_type = (
-                        LINK_TYPE_LINK if hasattr(submission, "url") else LINK_TYPE_SELF
+                        LINK_TYPE_SELF if submission.is_self else LINK_TYPE_LINK
                     )
                     with transaction.atomic():
                         post, _ = Post.objects.get_or_create(
