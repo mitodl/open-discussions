@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.57.1
+Version 0.57.1 (Released December 14, 2018)
 --------------
 
 - Fix post type assignment in backpopulate_missing_posts command (#1586)
