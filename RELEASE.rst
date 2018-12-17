@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.58.0
+--------------
+
+- Location for profiles (#1571)
+
 Version 0.57.2 (Released December 14, 2018)
 --------------
 
