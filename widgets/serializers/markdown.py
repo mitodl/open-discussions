@@ -19,6 +19,7 @@ class MarkdownWidgetSerializer(WidgetInstanceSerializer):
 
     name = "Markdown"
 
-    def get_react_renderer(self, instance):
+    @classmethod
+    def get_react_renderer(cls, *args):
         """Return the react renderer for the widget"""
         return "markdown"

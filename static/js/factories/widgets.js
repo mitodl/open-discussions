@@ -12,7 +12,8 @@ import type {
   WidgetSpec
 } from "../flow/widgetTypes"
 
-const validWidgetTypes = ["Markdown", "URL", "Text", "RSS Feed"]
+export const validWidgetTypes = ["Markdown", "URL", "Text", "RSS Feed"]
+export const validFieldSpecTypes = ["text", "textarea", "number"]
 
 const instanceIncr = incrementer()
 const listIncr = incrementer()
@@ -58,8 +59,13 @@ export const makeWidgetInstance = (
   }
 }
 
-export const makeFieldSpec = (suffix: string): WidgetFieldSpec => {
-  const specType = casual.random_element(["text", "textarea", "number"])
+export const makeFieldSpec = (
+  specType: ?string = null,
+  suffix: string = ""
+): WidgetFieldSpec => {
+  if (!specType) {
+    specType = casual.random_element(validFieldSpecTypes)
+  }
   const common = {
     field_name: `field_${suffix}`,
     label:      `Field ${suffix}`,
@@ -91,14 +97,22 @@ export const makeFieldSpec = (suffix: string): WidgetFieldSpec => {
   }
 }
 
-export const makeWidgetSpec = (widgetType: string): WidgetSpec => ({
-  widget_type: widgetType,
-  form_spec:   R.range(1, 5).map(i => makeFieldSpec(i))
-})
+export const makeWidgetSpec = (widgetType: ?string = null): WidgetSpec => {
+  if (!widgetType) {
+    widgetType = casual.random_element(validWidgetTypes)
+  }
+
+  return {
+    widget_type: widgetType,
+    form_spec:   R.range(1, 5).map(i => makeFieldSpec(null, i))
+  }
+}
 
 export const makeWidgetListResponse = (): WidgetListResponse => ({
   // $FlowFixMe
   id:                listIncr.next().value,
   widgets:           R.range(1, 3).map(() => makeWidgetInstance()),
-  available_widgets: validWidgetTypes.map(makeWidgetSpec)
+  available_widgets: validWidgetTypes.map(widgetType =>
+    makeWidgetSpec(widgetType)
+  )
 })

@@ -12,6 +12,7 @@ import type { WidgetInstance as WidgetInstanceType } from "../../flow/widgetType
 
 type Props = {
   deleteInstance: (widgetInstance: WidgetInstanceType) => void,
+  startEditInstance: (widgetInstance: WidgetInstanceType) => void,
   widgetInstance: WidgetInstanceType,
   editing: boolean
 }
@@ -20,27 +21,35 @@ const DragHandle = SortableHandle(() => (
   <i className="material-icons drag-handle">drag_handle</i>
 ))
 
-const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElement(({ widgetInstance, editing, deleteInstance }: Props) => {
-  const WidgetClass =
-    validWidgetRenderers[widgetInstance.react_renderer] || DefaultWidget
-  return (
-    <Card className="widget" key={widgetInstance.id}>
-      <WidgetClass widgetInstance={widgetInstance} />
-      {editing ? (
-        <React.Fragment>
-          <hr />
-          <div className="edit-buttons">
-            <i
-              className="material-icons delete"
-              onClick={() => deleteInstance(widgetInstance)}
-            >
-              delete
-            </i>
-            <DragHandle />
-          </div>
-        </React.Fragment>
-      ) : null}
-    </Card>
-  )
-})
+const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElement(
+  ({ widgetInstance, editing, deleteInstance, startEditInstance }: Props) => {
+    const WidgetClass =
+      validWidgetRenderers[widgetInstance.react_renderer] || DefaultWidget
+    return (
+      <Card className="widget" key={widgetInstance.id}>
+        <WidgetClass widgetInstance={widgetInstance} />
+        {editing ? (
+          <React.Fragment>
+            <hr />
+            <div className="edit-buttons">
+              <i
+                className="material-icons edit"
+                onClick={() => startEditInstance(widgetInstance)}
+              >
+                edit
+              </i>
+              <i
+                className="material-icons delete"
+                onClick={() => deleteInstance(widgetInstance)}
+              >
+                delete
+              </i>
+              <DragHandle />
+            </div>
+          </React.Fragment>
+        ) : null}
+      </Card>
+    )
+  }
+)
 export default SortableWidgetInstance

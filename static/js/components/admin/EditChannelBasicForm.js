@@ -64,7 +64,6 @@ export default class EditChannelBasicForm extends React.Component<Props> {
         <Card title="Description">
           <div className="row">
             <textarea
-              type="text"
               name="description"
               placeholder="Description"
               value={form.description}

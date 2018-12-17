@@ -139,7 +139,7 @@ class SettingsPage extends React.Component<Props> {
                 How often do you want to receive discussion digest emails?
               </label>
               <Radio
-                className="settings-radio"
+                className="radio"
                 name={FRONTPAGE_INPUT_NAME}
                 value={form.value[FRONTPAGE_INPUT_NAME] || FREQUENCY_DAILY}
                 onChange={this.onFrontpageChange}

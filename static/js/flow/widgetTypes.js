@@ -1,9 +1,12 @@
 // @flow
-export type WidgetInstance = {
-  id: number,
+export type WidgetInstancePatchable = {
+  id?: number,
   widget_type: string,
   title: string,
   configuration: Object,
+}
+
+export type WidgetInstance = WidgetInstancePatchable & {
   react_renderer: string,
   html: string|null,
 }
@@ -25,4 +28,10 @@ export type WidgetListResponse = {
   id: number,
   widgets: Array<WidgetInstance>,
   available_widgets: Array<WidgetSpec>
+}
+
+export type WidgetDialogData = {
+  isEditing: boolean,
+  state: string,
+  instance: WidgetInstancePatchable
 }

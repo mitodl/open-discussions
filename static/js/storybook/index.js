@@ -46,7 +46,8 @@ import {
 } from "../components/Picker"
 import SearchResult from "../components/SearchResult"
 import SearchTextbox from "../components/SearchTextbox"
-import WidgetInstance from "../components/widgets/WidgetInstance"
+import { WidgetInstance } from "../components/widgets/WidgetInstance"
+import { WIDGET_FORM_KEY } from "../lib/widgets"
 
 // delay import so fonts get applied first
 setTimeout(() => {
@@ -622,22 +623,40 @@ storiesOf("Search results", module)
 storiesOf("Widgets", module)
   .addDecorator(withKnobs)
   .add("markdown", () => {
+    const editing = boolean("editing")
+    const form = editing
+      ? { [WIDGET_FORM_KEY]: { value: { some: "value" } } }
+      : null
     const instance = makeWidgetInstance("markdown")
     instance.title = text("title", "Markdown widget title")
     instance.configuration.source = text("markdown", "Markdown **body**")
     return (
       <StoryWrapper>
-        <WidgetInstance widgetInstance={instance} />
+        <WidgetInstance
+          widgetInstance={instance}
+          form={form}
+          deleteInstance={action("delete")}
+          startEditInstance={action("start edit instance")}
+        />
       </StoryWrapper>
     )
   })
   .add("default", () => {
+    const editing = boolean("editing")
+    const form = editing
+      ? { [WIDGET_FORM_KEY]: { value: { some: "value" } } }
+      : null
     const instance = makeWidgetInstance("missing")
     instance.title = text("title", "Default widget title")
     instance.html = text("html", "Some <i>unescaped</i> html")
     return (
       <StoryWrapper>
-        <WidgetInstance widgetInstance={instance} />
+        <WidgetInstance
+          widgetInstance={instance}
+          form={form}
+          deleteInstance={action("delete")}
+          startEditInstance={action("start edit instance")}
+        />
       </StoryWrapper>
     )
   })
