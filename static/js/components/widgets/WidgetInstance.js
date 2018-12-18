@@ -13,16 +13,15 @@ import type { FormValue } from "../../flow/formTypes"
 type Props = {
   deleteInstance: (widgetInstance: WidgetInstanceType) => void,
   widgetInstance: WidgetInstanceType,
-  form: FormValue<Array<WidgetInstance>>
+  form: FormValue<Array<WidgetInstanceType>>
 }
 
 const DragHandle = SortableHandle(() => (
   <i className="material-icons drag-handle">drag_handle</i>
 ))
 
-export class WidgetInstance extends React.Component<Props> {
-  render() {
-    const { widgetInstance, form, deleteInstance } = this.props
+export default SortableElement(
+  ({ widgetInstance, form, deleteInstance }: Props) => {
     const WidgetClass =
       validWidgetRenderers[widgetInstance.react_renderer] || DefaultWidget
     return (
@@ -45,12 +44,4 @@ export class WidgetInstance extends React.Component<Props> {
       </Card>
     )
   }
-}
-
-export default SortableElement(({ widgetInstance, form, deleteInstance }) => (
-  <WidgetInstance
-    widgetInstance={widgetInstance}
-    form={form}
-    deleteInstance={deleteInstance}
-  />
-))
+)
