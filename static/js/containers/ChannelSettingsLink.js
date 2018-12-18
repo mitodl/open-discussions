@@ -13,7 +13,6 @@ import { channelURL, editChannelBasicURL } from "../lib/url"
 import { WIDGET_FORM_KEY } from "../lib/widgets"
 
 import type { Channel } from "../flow/discussionTypes"
-import type { Dispatch } from "redux"
 
 export const CHANNEL_SETTINGS_MENU_DROPDOWN = "CHANNEL_SETTINGS_MENU_DROPDOWN"
 
@@ -91,11 +90,10 @@ const mapStateToProps = state => {
   return { isOpen }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
-  showDropdown:  () => dispatch(showDropdown(CHANNEL_SETTINGS_MENU_DROPDOWN)),
-  hideDropdown:  () => dispatch(hideDropdown(CHANNEL_SETTINGS_MENU_DROPDOWN)),
-  startFormEdit: () =>
-    dispatch(actions.forms.formBeginEdit({ formKey: WIDGET_FORM_KEY }))
+const mapDispatchToProps = ({
+  showDropdown:  () => showDropdown(CHANNEL_SETTINGS_MENU_DROPDOWN),
+  hideDropdown:  () => hideDropdown(CHANNEL_SETTINGS_MENU_DROPDOWN),
+  startFormEdit: () => actions.forms.formBeginEdit({ formKey: WIDGET_FORM_KEY })
 })
 
 export default R.compose(
