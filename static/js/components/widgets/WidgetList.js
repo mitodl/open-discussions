@@ -15,15 +15,8 @@ type Props = {
   form: FormValue<Array<WidgetInstanceType>>
 }
 
-export class WidgetList extends React.Component<Props> {
-  render() {
-    const {
-      form,
-      clearForm,
-      submitForm,
-      deleteInstance,
-      widgetInstances
-    } = this.props
+export default SortableContainer(
+  ({ widgetInstances, form, clearForm, submitForm, deleteInstance }) => {
     return (
       <div className="widget-list">
         {form ? (
@@ -51,16 +44,4 @@ export class WidgetList extends React.Component<Props> {
       </div>
     )
   }
-}
-
-export default SortableContainer(
-  ({ widgetInstances, form, clearForm, submitForm, deleteInstance }) => (
-    <WidgetList
-      widgetInstances={widgetInstances}
-      form={form}
-      clearForm={clearForm}
-      submitForm={submitForm}
-      deleteInstance={deleteInstance}
-    />
-  )
 )

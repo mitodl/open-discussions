@@ -90,11 +90,11 @@ const mapStateToProps = state => {
   return { isOpen }
 }
 
-const mapDispatchToProps = ({
+const mapDispatchToProps = {
   showDropdown:  () => showDropdown(CHANNEL_SETTINGS_MENU_DROPDOWN),
   hideDropdown:  () => hideDropdown(CHANNEL_SETTINGS_MENU_DROPDOWN),
   startFormEdit: () => actions.forms.formBeginEdit({ formKey: WIDGET_FORM_KEY })
-})
+}
 
 export default R.compose(
   connect(
