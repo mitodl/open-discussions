@@ -59,7 +59,7 @@ export class ChannelSettingsLink extends React.Component<Props> {
         </a>
         {isOpen ? (
           <DropdownMenu
-            closeMenu={() => hideDropdown()}
+            closeMenu={hideDropdown}
             className="settings-menu-dropdown"
           >
             <li>
