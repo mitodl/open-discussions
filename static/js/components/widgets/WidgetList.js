@@ -23,10 +23,10 @@ export default SortableContainer(
           <div className="manage-widgets">
             <div className="header-one">
               <span className="manage-title">Manage widgets</span>
-              <button className="cancel" onClick={() => clearForm()}>
+              <button className="cancel" onClick={clearForm}>
                 Cancel
               </button>
-              <button className="submit" onClick={() => submitForm()}>
+              <button className="submit" onClick={submitForm}>
                 Done
               </button>
             </div>
