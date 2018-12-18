@@ -54,7 +54,7 @@ export class ChannelSettingsLink extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        <a onClick={() => this.toggleMenu()} className="edit-button">
+        <a onClick={this.toggleMenu} className="edit-button">
           <i className="material-icons settings">settings</i>
         </a>
         {isOpen ? (
