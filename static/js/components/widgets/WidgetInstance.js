@@ -8,12 +8,11 @@ import Card from "../Card"
 import { validWidgetRenderers } from "../../lib/widgets"
 
 import type { WidgetInstance as WidgetInstanceType } from "../../flow/widgetTypes"
-import type { FormValue } from "../../flow/formTypes"
 
 type Props = {
   deleteInstance: (widgetInstance: WidgetInstanceType) => void,
   widgetInstance: WidgetInstanceType,
-  form: FormValue<Array<WidgetInstanceType>>
+  editing: boolean,
 }
 
 const DragHandle = SortableHandle(() => (
@@ -21,13 +20,13 @@ const DragHandle = SortableHandle(() => (
 ))
 
 export default SortableElement(
-  ({ widgetInstance, form, deleteInstance }: Props) => {
+  ({ widgetInstance, editing, deleteInstance }: Props) => {
     const WidgetClass =
       validWidgetRenderers[widgetInstance.react_renderer] || DefaultWidget
     return (
       <Card className="widget" key={widgetInstance.id}>
         <WidgetClass widgetInstance={widgetInstance} />
-        {form ? (
+        {editing ? (
           <React.Fragment>
             <hr />
             <div className="edit-buttons">

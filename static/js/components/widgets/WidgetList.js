@@ -5,21 +5,20 @@ import { SortableContainer } from "react-sortable-hoc"
 import WidgetInstance from "./WidgetInstance"
 
 import type { WidgetInstance as WidgetInstanceType } from "../../flow/widgetTypes"
-import type { FormValue } from "../../flow/formTypes"
 
 type Props = {
   clearForm: () => void,
   deleteInstance: (widgetInstance: WidgetInstanceType) => void,
   submitForm: () => void,
   widgetInstances: Array<WidgetInstanceType>,
-  form: FormValue<Array<WidgetInstanceType>>
+  editing: boolean
 }
 
 export default SortableContainer(
-  ({ widgetInstances, form, clearForm, submitForm, deleteInstance }: Props) => {
+  ({ widgetInstances, editing, clearForm, submitForm, deleteInstance }: Props) => {
     return (
       <div className="widget-list">
-        {form ? (
+        {editing ? (
           <div className="manage-widgets">
             <div className="header-one">
               <span className="manage-title">Manage widgets</span>
@@ -37,7 +36,7 @@ export default SortableContainer(
             widgetInstance={widgetInstance}
             key={widgetInstance.id}
             index={i}
-            form={form}
+            editing={editing}
             deleteInstance={deleteInstance}
           />
         ))}

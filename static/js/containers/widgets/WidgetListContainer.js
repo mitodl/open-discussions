@@ -103,7 +103,7 @@ export class WidgetListContainer extends React.Component<Props> {
 
     return (
       <WidgetList
-        form={form}
+        editing={!!form}
         widgetInstances={this.getWidgetInstances()}
         onSortEnd={this.onSortEnd}
         clearForm={clearForm}
