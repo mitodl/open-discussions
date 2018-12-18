@@ -562,6 +562,7 @@ export const getWidgetList = (
   widgetListId: number
 ): Promise<WidgetListResponse> =>
   fetchJSONWithAuthFailure(`/api/v0/widget_lists/${widgetListId}/`)
+
 export const patchWidgetList = (
   widgetListId: number,
   payload: Object
