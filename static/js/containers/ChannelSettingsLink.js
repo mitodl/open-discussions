@@ -68,7 +68,7 @@ export class ChannelSettingsLink extends React.Component<Props> {
               </Link>
             </li>
             <li>
-              <a onClick={() => this.startEdit()}>Manage widgets</a>
+              <a onClick={this.startEdit}>Manage widgets</a>
             </li>
           </DropdownMenu>
         ) : null}
