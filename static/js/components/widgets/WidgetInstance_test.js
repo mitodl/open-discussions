@@ -26,6 +26,7 @@ describe("WidgetInstance", () => {
         widgetInstance={widgetInstance}
         deleteInstance={deleteInstanceStub}
         index={3}
+        editing={false}
         {...props}
       />,
       {

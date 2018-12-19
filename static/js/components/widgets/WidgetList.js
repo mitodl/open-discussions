@@ -10,7 +10,7 @@ import type { WidgetInstance as WidgetInstanceType } from "../../flow/widgetType
 type Props = {
   clearForm: () => void,
   deleteInstance: (widgetInstance: WidgetInstanceType) => void,
-  submitForm: () => void,
+  submitForm: () => Promise<void>,
   widgetInstances: Array<WidgetInstanceType>,
   editing: boolean
 }

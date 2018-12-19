@@ -23,7 +23,7 @@ type PatchPayload = {
 }
 
 type Props = {
-  clearForm: () => Promise<void>,
+  clearForm: () => void,
   form: FormValue<Array<WidgetInstanceType>>,
   loaded: boolean,
   widgetListId: number,

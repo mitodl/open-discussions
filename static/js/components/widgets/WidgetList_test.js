@@ -10,11 +10,14 @@ import WidgetList from "./WidgetList"
 import WidgetInstance from "./WidgetInstance"
 
 describe("WidgetList", () => {
-  let listResponse, sandbox
+  let listResponse, sandbox, clearFormStub, submitFormStub, deleteInstanceStub
 
   beforeEach(() => {
     listResponse = makeWidgetListResponse()
     sandbox = sinon.createSandbox()
+    clearFormStub = sandbox.stub()
+    submitFormStub = sandbox.stub()
+    deleteInstanceStub = sandbox.stub()
   })
 
   afterEach(() => {
@@ -22,11 +25,20 @@ describe("WidgetList", () => {
   })
 
   const render = (props = {}) =>
-    mount(<WidgetList widgetInstances={listResponse.widgets} {...props} />)
+    mount(
+      <WidgetList
+        widgetInstances={listResponse.widgets}
+        clearForm={clearFormStub}
+        submitForm={submitFormStub}
+        editing={false}
+        deleteInstance={deleteInstanceStub}
+        {...props}
+      />
+    )
 
   it("renders a list of WidgetInstances", () => {
     const deleteInstance = "delete an instance"
-    const wrapper = render({ editing: true, deleteInstance })
+    const wrapper = render({ editing: true })
     assert.equal(
       wrapper.find(WidgetInstance).length,
       listResponse.widgets.length
@@ -52,17 +64,15 @@ describe("WidgetList", () => {
 
   describe("form", () => {
     it("has a cancel button which cancels", () => {
-      const clearForm = sandbox.stub()
-      const wrapper = render({ editing: true, clearForm })
+      const wrapper = render({ editing: true })
       wrapper.find(".cancel").prop("onClick")()
-      sinon.assert.calledWith(clearForm)
+      sinon.assert.calledWith(clearFormStub)
     })
 
     it("has a done button which submits", () => {
-      const submitForm = sandbox.stub()
-      const wrapper = render({ editing: true, submitForm })
+      const wrapper = render({ editing: true })
       wrapper.find(".submit").prop("onClick")()
-      sinon.assert.calledWith(submitForm)
+      sinon.assert.calledWith(submitFormStub)
     })
   })
 })
