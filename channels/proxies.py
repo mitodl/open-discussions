@@ -1,8 +1,11 @@
 """Object proxies"""
+from urllib.parse import urljoin
+
 from django.utils.functional import SimpleLazyObject
 from wrapt import ObjectProxy
 
 from channels.models import Channel, Post
+from open_discussions.settings import SITE_BASE_URL
 
 
 class PostProxy(ObjectProxy):
@@ -75,6 +78,13 @@ class PostProxy(ObjectProxy):
     def article_content(self):
         """Return the article content for this post"""
         return self.article.content
+
+    @property
+    def cover_image(self):
+        """Return the article content for this post"""
+        if self.article.cover_image:
+            return urljoin(SITE_BASE_URL, self.article.cover_image.url)
+        return None
 
 
 def proxy_post(submission):

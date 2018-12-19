@@ -517,7 +517,7 @@ class RedditChannelFactory(factory.Factory):
     """Factory for reddit-persisted channels"""
 
     api = None
-    name = factory.LazyFunction(_channel_name)
+    name = factory.LazyAttributeSequence(_channel_name)
     title = factory.Faker("text", max_nb_chars=50)
     description = factory.Faker("text", max_nb_chars=500)
     public_description = factory.Faker("text", max_nb_chars=80)

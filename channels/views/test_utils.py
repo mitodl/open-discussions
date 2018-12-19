@@ -57,6 +57,7 @@ def default_post_response_data(channel, post, user):
     return {
         "url": post.url,
         "url_domain": urlparse(post.url).hostname if post.url else None,
+        "cover_image": None,
         "thumbnail": None,
         "text": text,
         "article_content": article.content if article is not None else None,
