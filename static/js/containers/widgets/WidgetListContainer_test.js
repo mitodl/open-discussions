@@ -79,7 +79,7 @@ describe("WidgetListContainer", () => {
       )
       assert.deepEqual(props.editing, hasForm)
       assert.isTrue(props.useDragHandle)
-      wrapper.find("WidgetListContainer").componentWillUnmount()
+      wrapper.find("WidgetListContainer").unmount()
     })
   })
 
