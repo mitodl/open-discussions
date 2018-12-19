@@ -37,7 +37,6 @@ describe("WidgetList", () => {
     )
 
   it("renders a list of WidgetInstances", () => {
-    const deleteInstance = "delete an instance"
     const wrapper = render({ editing: true })
     assert.equal(
       wrapper.find(WidgetInstance).length,
@@ -52,7 +51,7 @@ describe("WidgetList", () => {
       assert.deepEqual(props.widgetInstance, widgetInstance)
       assert.equal(props.index, i)
       assert.isTrue(props.editing)
-      assert.equal(props.deleteInstance, deleteInstance)
+      assert.equal(props.deleteInstance, deleteInstanceStub)
     })
   })
   ;[true, false].forEach(hasForm => {
