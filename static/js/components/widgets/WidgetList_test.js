@@ -25,9 +25,8 @@ describe("WidgetList", () => {
     mount(<WidgetList widgetInstances={listResponse.widgets} {...props} />)
 
   it("renders a list of WidgetInstances", () => {
-    const form = "form"
     const deleteInstance = "delete an instance"
-    const wrapper = render({ form, deleteInstance })
+    const wrapper = render({ editing: true, deleteInstance })
     assert.equal(
       wrapper.find(WidgetInstance).length,
       listResponse.widgets.length
@@ -40,31 +39,28 @@ describe("WidgetList", () => {
         .props()
       assert.deepEqual(props.widgetInstance, widgetInstance)
       assert.equal(props.index, i)
-      assert.equal(props.form, form)
+      assert.isTrue(props.editing)
       assert.equal(props.deleteInstance, deleteInstance)
     })
   })
   ;[true, false].forEach(hasForm => {
     it(`${hasForm ? "has" : "doesn't have"} a form`, () => {
-      const form = hasForm ? "form" : null
-      const wrapper = render({ form })
+      const wrapper = render({ editing: hasForm })
       assert.equal(wrapper.find(".manage-widgets").length, hasForm ? 1 : 0)
     })
   })
 
   describe("form", () => {
     it("has a cancel button which cancels", () => {
-      const form = "form"
       const clearForm = sandbox.stub()
-      const wrapper = render({ form, clearForm })
+      const wrapper = render({ editing: true, clearForm })
       wrapper.find(".cancel").prop("onClick")()
       sinon.assert.calledWith(clearForm)
     })
 
     it("has a done button which submits", () => {
-      const form = "form"
       const submitForm = sandbox.stub()
-      const wrapper = render({ form, submitForm })
+      const wrapper = render({ editing: true, submitForm })
       wrapper.find(".submit").prop("onClick")()
       sinon.assert.calledWith(submitForm)
     })

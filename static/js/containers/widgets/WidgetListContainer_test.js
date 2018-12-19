@@ -64,10 +64,9 @@ describe("WidgetListContainer", () => {
     it(`renders a WidgetList ${
       hasForm ? "with" : "without"
     } a form`, async () => {
-      const form = hasForm ? { value: updatedWidgetList } : null
       const { wrapper, store } = await render({
         forms: {
-          [WIDGET_FORM_KEY]: form
+          [WIDGET_FORM_KEY]: hasForm ? { some: "form" } : null
         }
       })
       const props = wrapper
@@ -78,7 +77,7 @@ describe("WidgetListContainer", () => {
         props.widgetInstances,
         hasForm ? updatedWidgetList : listResponse.widgets
       )
-      assert.deepEqual(props.form, form)
+      assert.deepEqual(props.editing, hasForm)
       assert.isTrue(props.useDragHandle)
       // assert that componentDidMount cleared the form
       assert.isTrue(

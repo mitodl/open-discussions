@@ -12,7 +12,7 @@ import type { WidgetInstance as WidgetInstanceType } from "../../flow/widgetType
 type Props = {
   deleteInstance: (widgetInstance: WidgetInstanceType) => void,
   widgetInstance: WidgetInstanceType,
-  editing: boolean,
+  editing: boolean
 }
 
 const DragHandle = SortableHandle(() => (

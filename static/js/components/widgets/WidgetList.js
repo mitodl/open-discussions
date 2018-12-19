@@ -15,7 +15,13 @@ type Props = {
 }
 
 export default SortableContainer(
-  ({ widgetInstances, editing, clearForm, submitForm, deleteInstance }: Props) => {
+  ({
+    widgetInstances,
+    editing,
+    clearForm,
+    submitForm,
+    deleteInstance
+  }: Props) => {
     return (
       <div className="widget-list">
         {editing ? (

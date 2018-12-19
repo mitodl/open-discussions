@@ -53,13 +53,13 @@ describe("WidgetInstance", () => {
 
   describe("editable", () => {
     it("deletes a widget", () => {
-      const wrapper = render({ form: "form" })
+      const wrapper = render({ editing: true })
       wrapper.find(".delete").prop("onClick")()
       sinon.assert.calledWith(deleteInstanceStub, widgetInstance)
     })
 
     it("has a drag handle", () => {
-      const wrapper = render({ form: "form" })
+      const wrapper = render({ editing: true })
       assert.isTrue(wrapper.find(".drag-handle").exists())
     })
   })
