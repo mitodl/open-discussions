@@ -79,12 +79,17 @@ describe("WidgetListContainer", () => {
       )
       assert.deepEqual(props.editing, hasForm)
       assert.isTrue(props.useDragHandle)
-      // assert that componentDidMount cleared the form
-      assert.isTrue(
-        store.getActions().filter(action => action.type === FORM_END_EDIT)
-          .length >= 1
-      )
+      wrapper.find("WidgetListContainer").componentWillUnmount()
     })
+  })
+
+  it("clears the form on unmount", async () => {
+    const { inner, store } = await render()
+    inner.unmount()
+    assert.isTrue(
+      store.getActions().filter(action => action.type === FORM_END_EDIT)
+        .length >= 1
+    )
   })
 
   it("reorders widgets", async () => {

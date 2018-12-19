@@ -35,9 +35,7 @@ type Props = {
 
 export class WidgetListContainer extends React.Component<Props> {
   componentDidMount() {
-    const { clearForm } = this.props
     this.loadData()
-    clearForm()
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -46,6 +44,12 @@ export class WidgetListContainer extends React.Component<Props> {
       this.loadData()
       clearForm()
     }
+  }
+
+  componentWillUnmount() {
+    console.log("here")
+    const { clearForm } = this.props
+    clearForm()
   }
 
   loadData = async () => {
