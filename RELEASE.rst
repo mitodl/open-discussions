@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.58.1
+Version 0.58.1 (Released December 19, 2018)
 --------------
 
 - Implement moving and removing a widget (#1588)
