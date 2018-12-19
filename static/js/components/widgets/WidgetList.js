@@ -4,6 +4,7 @@ import { SortableContainer } from "react-sortable-hoc"
 
 import WidgetInstance from "./WidgetInstance"
 
+import type { StatelessFunctionalComponent } from "react"
 import type { WidgetInstance as WidgetInstanceType } from "../../flow/widgetTypes"
 
 type Props = {
@@ -14,7 +15,7 @@ type Props = {
   editing: boolean
 }
 
-export default SortableContainer(
+const SortableWidgetList: StatelessFunctionalComponent<Props> = SortableContainer(
   ({
     widgetInstances,
     editing,
@@ -50,3 +51,4 @@ export default SortableContainer(
     )
   }
 )
+export default SortableWidgetList
