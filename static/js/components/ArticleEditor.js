@@ -51,6 +51,10 @@ export default class ArticleEditor extends React.Component<Props> {
         this.node.appendChild(editor.ui.view.editable.element)
       }
       this.editor = editor
+
+      if (!readOnly) {
+        this.editor.editing.view.focus()
+      }
     } catch (err) {
       console.error(err) // eslint-disable-line no-console
     }

@@ -20,18 +20,46 @@
   }
 }
 
+.ck-editor__is-empty.ck-content.ck-editor__editable::before {
+  content: "Write your article here";
+  position: absolute;
+  display: block;
+  margin: var(--ck-spacing-large) 0;
+  color: #aaa;
+  cursor: text;
+}
+
 .ck-editor:not(.read-only) {
-  border: 1px solid $input-border-grey;
-  background: white;
   border-radius: $std-border-radius;
 
   .ck.ck-toolbar {
-    border: none;
-    border-bottom: 1px solid $input-border-grey;
+    border: 1px solid $input-border-grey;
     border-radius: $std-border-radius $std-border-radius 0 0;
+    position: sticky;
+    top: $toolbar-height-desktop;
+    z-index: 1;
+
+    @include breakpoint(materialmobile) {
+      top: $toolbar-height-mobile;
+    }
+
+    > button,
+    > div {
+      margin: 0;
+    }
+
+    .ck-dropdown {
+      .ck-dropdown__button {
+        margin: 0;
+      }
+    }
   }
 
   @include breakpoint(phone) {
     margin-left: 22px;
   }
+}
+
+:root {
+  --ck-icon-size: 22px !important;
 }

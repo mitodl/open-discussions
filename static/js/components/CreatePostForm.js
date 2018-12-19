@@ -208,14 +208,13 @@ export default class CreatePostForm extends React.Component<Props> {
             {validationMessage(validation.channel)}
           </div>
           <div className="titlefield row">
-            <textarea
+            <input
               type="text"
-              placeholder="Add the title of your post..."
+              className="title h1"
+              placeholder="Headline"
               name="title"
               value={title}
               onChange={onUpdate}
-              rows="1"
-              className="no-height"
             />
             {validationMessage(validation.title)}
           </div>

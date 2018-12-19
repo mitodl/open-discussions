@@ -660,3 +660,47 @@ storiesOf("Widgets", module)
       </StoryWrapper>
     )
   })
+
+storiesOf("Form inputs", module)
+  .addDecorator(withKnobs)
+  .add("basic text input", () => {
+    return (
+      <StoryWrapper>
+        <input
+          type="text"
+          placeholder="type something!"
+          value={text("text", "")}
+          onChange={action("change")}
+          disabled={boolean("disabled")}
+        />
+      </StoryWrapper>
+    )
+  })
+  .add("underlined text input", () => {
+    return (
+      <StoryWrapper>
+        <input
+          type="text"
+          className="underlined"
+          placeholder="type something!"
+          value={text("text", "")}
+          onChange={action("change")}
+          disabled={boolean("disabled")}
+        />
+      </StoryWrapper>
+    )
+  })
+  .add("h1/title style text input", () => {
+    return (
+      <StoryWrapper>
+        <input
+          type="text"
+          className="h1"
+          placeholder="type something!"
+          value={text("text", "")}
+          onChange={action("change")}
+          disabled={boolean("disabled")}
+        />
+      </StoryWrapper>
+    )
+  })

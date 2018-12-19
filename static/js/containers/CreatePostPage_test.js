@@ -46,7 +46,7 @@ describe("CreatePostPage", () => {
 
   const setTitle = (wrapper, title) =>
     wrapper
-      .find(".titlefield textarea")
+      .find(".titlefield input")
       .simulate("change", makeEvent("title", title))
 
   const setText = (wrapper, text) => {
@@ -262,7 +262,7 @@ describe("CreatePostPage", () => {
     submitPost(wrapper)
     assert.equal(
       wrapper.find(".titlefield .validation-message").text(),
-      "Title is required"
+      "Headline is required"
     )
     setTitle(wrapper, "title")
     setLinkPost(wrapper)

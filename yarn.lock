@@ -1282,9 +1282,9 @@
   version "0.35.0"
   resolved "https://registry.yarnpkg.com/@material/typography/-/typography-0.35.0.tgz#23ad7eb7c9789e69c7c3fa54df8fc311cd7fc4b1"
 
-"@mitodl/ckeditor-custom-build@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@mitodl/ckeditor-custom-build/-/ckeditor-custom-build-0.0.3.tgz#cddba4bcf73f0d097eb8222a51945d23d7da3665"
+"@mitodl/ckeditor-custom-build@0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@mitodl/ckeditor-custom-build/-/ckeditor-custom-build-0.0.4.tgz#544cab8b1491ee702e99a84800f2c965f95e5474"
 
 "@mitodl/mdl-react-components@^0.0.3":
   version "0.0.3"

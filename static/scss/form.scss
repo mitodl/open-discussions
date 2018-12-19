@@ -93,6 +93,13 @@ input[type="text"] {
     border-left: none;
     border-right: none;
   }
+
+  &.h1 {
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    outline: none;
+  }
 }
 
 textarea {

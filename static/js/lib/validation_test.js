@@ -111,7 +111,7 @@ describe("validation library", () => {
       const post = { value: { postType: LINK_TYPE_TEXT, text: "foobar" } }
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
-          title: "Title is required"
+          title: "Headline is required"
         }
       })
     })

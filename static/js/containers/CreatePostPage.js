@@ -14,7 +14,7 @@ import IntraPageNav from "../components/IntraPageNav"
 import Dialog from "../components/Dialog"
 
 import { actions } from "../actions"
-import { setBannerMessage } from "../actions/ui"
+import { setBannerMessage, setShowDrawerDesktop } from "../actions/ui"
 import { clearPostError } from "../actions/post"
 import {
   LINK_TYPE_LINK,
@@ -212,6 +212,10 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
         }
       })
     )
+
+    if (postType === LINK_TYPE_ARTICLE) {
+      dispatch(setShowDrawerDesktop(false))
+    }
 
     dispatch(
       actions.forms.formValidate({

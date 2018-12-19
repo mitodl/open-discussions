@@ -119,7 +119,7 @@ export const validatePostCreateForm = validate([
     formLens("text"),
     "This post is too long. Please reduce the length and try again."
   ),
-  validation(emptyOrNil, formLens("title"), "Title is required"),
+  validation(emptyOrNil, formLens("title"), "Headline is required"),
   postURLValidation,
   postArticleValidation
 ])
