@@ -64,7 +64,7 @@ describe("WidgetListContainer", () => {
     it(`renders a WidgetList ${
       hasForm ? "with" : "without"
     } a form`, async () => {
-      const { wrapper, store } = await render({
+      const { wrapper } = await render({
         forms: {
           [WIDGET_FORM_KEY]: hasForm ? { some: "form" } : null
         }

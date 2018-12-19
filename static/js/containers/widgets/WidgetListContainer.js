@@ -47,7 +47,6 @@ export class WidgetListContainer extends React.Component<Props> {
   }
 
   componentWillUnmount() {
-    console.log("here")
     const { clearForm } = this.props
     clearForm()
   }
