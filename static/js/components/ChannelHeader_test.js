@@ -10,10 +10,11 @@ import { makeChannel } from "../factories/channels"
 import { channelURL } from "../lib/url"
 
 describe("ChannelHeader", () => {
-  let channel
+  let channel, history
 
   beforeEach(() => {
     channel = makeChannel()
+    history = { some: "history" }
   })
 
   const render = (props = {}) =>
@@ -21,6 +22,7 @@ describe("ChannelHeader", () => {
       <ChannelHeader
         channel={channel}
         isModerator={false}
+        history={history}
         hasNavbar={true}
         {...props}
       />
@@ -58,7 +60,14 @@ describe("ChannelHeader", () => {
     } the moderator edit button`, () => {
       const wrapper = render({ isModerator })
 
-      assert.equal(wrapper.find(".edit-button").length, isModerator ? 1 : 0)
+      const link = wrapper.find("Connect(ChannelSettingsLink)")
+      assert.equal(link.length, isModerator ? 1 : 0)
+      if (isModerator) {
+        assert.deepEqual(link.props(), {
+          history,
+          channel
+        })
+      }
     })
   })
   ;[true, false].forEach(allowSearch => {

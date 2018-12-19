@@ -560,6 +560,14 @@ export const getCKEditorJWT = () => fetchWithAuthFailure("/api/v0/ckeditor/")
 
 export const getWidgetList = (
   widgetListId: number
-): Promise<WidgetListResponse> => {
-  return fetchJSONWithAuthFailure(`/api/v0/widget_lists/${widgetListId}/`)
-}
+): Promise<WidgetListResponse> =>
+  fetchJSONWithAuthFailure(`/api/v0/widget_lists/${widgetListId}/`)
+
+export const patchWidgetList = (
+  widgetListId: number,
+  payload: Object
+): Promise<WidgetListResponse> =>
+  fetchJSONWithAuthFailure(`/api/v0/widget_lists/${widgetListId}/`, {
+    method: PATCH,
+    body:   JSON.stringify(payload)
+  })

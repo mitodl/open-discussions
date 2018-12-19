@@ -1,25 +1,46 @@
 // @flow
 import React from "react"
+import { SortableElement, SortableHandle } from "react-sortable-hoc"
+
 import DefaultWidget from "./DefaultWidget"
 import Card from "../Card"
 
 import { validWidgetRenderers } from "../../lib/widgets"
 
+import type { StatelessFunctionalComponent } from "react"
 import type { WidgetInstance as WidgetInstanceType } from "../../flow/widgetTypes"
 
 type Props = {
-  widgetInstance: WidgetInstanceType
+  deleteInstance: (widgetInstance: WidgetInstanceType) => void,
+  widgetInstance: WidgetInstanceType,
+  editing: boolean
 }
 
-export default class WidgetInstance extends React.Component<Props> {
-  render() {
-    const { widgetInstance } = this.props
-    const WidgetClass =
-      validWidgetRenderers[widgetInstance.react_renderer] || DefaultWidget
-    return (
-      <Card className="widget" key={widgetInstance.id}>
-        <WidgetClass widgetInstance={widgetInstance} />
-      </Card>
-    )
-  }
-}
+const DragHandle = SortableHandle(() => (
+  <i className="material-icons drag-handle">drag_handle</i>
+))
+
+const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElement(({ widgetInstance, editing, deleteInstance }: Props) => {
+  const WidgetClass =
+    validWidgetRenderers[widgetInstance.react_renderer] || DefaultWidget
+  return (
+    <Card className="widget" key={widgetInstance.id}>
+      <WidgetClass widgetInstance={widgetInstance} />
+      {editing ? (
+        <React.Fragment>
+          <hr />
+          <div className="edit-buttons">
+            <i
+              className="material-icons delete"
+              onClick={() => deleteInstance(widgetInstance)}
+            >
+              delete
+            </i>
+            <DragHandle />
+          </div>
+        </React.Fragment>
+      ) : null}
+    </Card>
+  )
+})
+export default SortableWidgetInstance
