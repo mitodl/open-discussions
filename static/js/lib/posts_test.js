@@ -9,7 +9,8 @@ import {
   formatCommentsCount,
   PostTitleAndHostname,
   formatPostTitle,
-  mapPostListResponse
+  mapPostListResponse,
+  postFormIsContentless
 } from "./posts"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import { urlHostname } from "./url"
@@ -17,12 +18,22 @@ import { urlHostname } from "./url"
 describe("Post utils", () => {
   it("should return a new post with empty values", () => {
     assert.deepEqual(newPostForm(), {
-      postType: null,
-      text:     "",
-      url:      "",
-      title:    "",
-      article:  []
+      postType:  null,
+      text:      "",
+      url:       "",
+      title:     "",
+      article:   [],
+      thumbnail: null
     })
+  })
+
+  it("should let us check if a post form is empty of post content", () => {
+    assert.isTrue(postFormIsContentless(newPostForm()))
+    assert.isFalse(postFormIsContentless({ ...newPostForm(), text: "hey!" }))
+    assert.isFalse(postFormIsContentless({ ...newPostForm(), url: "a url" }))
+    assert.isFalse(
+      postFormIsContentless({ ...newPostForm(), article: [{ boop: "doop" }] })
+    )
   })
 
   it("should correctly format comments", () => {

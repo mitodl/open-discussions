@@ -11,6 +11,7 @@ import CreatePostForm from "../components/CreatePostForm"
 import withSingleColumn from "../hoc/withSingleColumn"
 import CanonicalLink from "../components/CanonicalLink"
 import IntraPageNav from "../components/IntraPageNav"
+import Dialog from "../components/Dialog"
 
 import { actions } from "../actions"
 import { setBannerMessage } from "../actions/ui"
@@ -27,6 +28,8 @@ import { formatTitle } from "../lib/title"
 import { validatePostCreateForm } from "../lib/validation"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 import { anyErrorExcept404 } from "../util/rest"
+import { showDialog, hideDialog, DIALOG_CLEAR_POST_TYPE } from "../actions/ui"
+import { preventDefaultAndInvoke } from "../lib/util"
 
 import type {
   Channel,
@@ -54,7 +57,8 @@ type CreatePostPageProps = {
   processing: boolean,
   embedly: Object,
   embedlyInFlight: boolean,
-  errored: boolean
+  errored: boolean,
+  clearPostDialogVisible: boolean
 }
 
 export const CREATE_POST_KEY = "post:new"
@@ -153,7 +157,8 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
                 : channel.allowed_post_types[0],
             url:       "",
             text:      "",
-            thumbnail: null
+            thumbnail: null,
+            article:   []
           }
         })
       )
@@ -199,7 +204,12 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     dispatch(
       actions.forms.formUpdate({
         ...CREATE_POST_PAYLOAD,
-        value: { postType, url: "", text: "" }
+        value: {
+          postType,
+          url:     "",
+          text:    "",
+          article: []
+        }
       })
     )
 
@@ -209,6 +219,21 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
         errors: {}
       })
     )
+  }
+
+  openClearPostTypeDialog = () => {
+    const { dispatch } = this.props
+    dispatch(showDialog(DIALOG_CLEAR_POST_TYPE))
+  }
+
+  hideClearPostTypeDialog = () => {
+    const { dispatch } = this.props
+    dispatch(hideDialog(DIALOG_CLEAR_POST_TYPE))
+  }
+
+  clearPostType = () => {
+    this.updatePostType(null)
+    this.hideClearPostTypeDialog()
   }
 
   onSubmit = async (e: Object) => {
@@ -269,7 +294,8 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       history,
       processing,
       embedly,
-      embedlyInFlight
+      embedlyInFlight,
+      clearPostDialogVisible
     } = this.props
 
     if (!postForm) {
@@ -287,6 +313,18 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
             Draft
           </a>
         </IntraPageNav>
+        <Dialog
+          open={clearPostDialogVisible}
+          hideDialog={preventDefaultAndInvoke(this.hideClearPostTypeDialog)}
+          onCancel={preventDefaultAndInvoke(this.hideClearPostTypeDialog)}
+          onAccept={this.clearPostType}
+          title="Clear Post Content?"
+          submitText="Yes"
+          id="clear-post-type-dialog"
+        >
+          This will clear any input you have made, are you sure you want to
+          continue?
+        </Dialog>
         <CreatePostForm
           onSubmit={this.onSubmit}
           onUpdate={this.onUpdate}
@@ -300,6 +338,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
           channels={channels.data || new Map()}
           embedly={embedly}
           embedlyInFlight={embedlyInFlight}
+          openClearPostTypeDialog={this.openClearPostTypeDialog}
         />
       </React.Fragment>
     )
@@ -318,6 +357,7 @@ const mapStateToProps = (state, props) => {
       : undefined
 
   const embedlyInFlight = state.embedly.getStatus === FETCH_PROCESSING
+  const clearPostDialogVisible = state.ui.dialogs.has(DIALOG_CLEAR_POST_TYPE)
 
   return {
     postForm,
@@ -326,7 +366,8 @@ const mapStateToProps = (state, props) => {
     channels,
     processing,
     embedly,
-    embedlyInFlight
+    embedlyInFlight,
+    clearPostDialogVisible
   }
 }
 

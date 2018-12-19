@@ -1,6 +1,7 @@
 // @flow
 import { assert } from "chai"
 import { shallow } from "enzyme"
+import sinon from "sinon"
 
 import { S } from "./sanctuary"
 import React from "react"
@@ -42,3 +43,8 @@ export const configureShallowRenderer = (
   defaultProps: Object
 ) => (extraProps: Object = {}) =>
   shallow(<Component {...defaultProps} {...extraProps} />)
+
+export const makeEvent = (name: string, value: string) => ({
+  target:         { value, name },
+  preventDefault: sinon.stub()
+})

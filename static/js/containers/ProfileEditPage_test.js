@@ -9,13 +9,13 @@ import { editProfileURL } from "../lib/url"
 import { makeProfile } from "../factories/profiles"
 import { actions } from "../actions"
 import { makeChannelPostList } from "../factories/posts"
+import { makeEvent } from "../lib/test_utils"
 
 import type { ProfilePayload } from "../flow/discussionTypes"
 
 describe("ProfileEditPage", function() {
   let helper, listenForActions, renderComponent, profile
 
-  const makeEvent = (name, value) => ({ target: { value, name } })
   const makeLocationEvent = json => ({ suggestion: json })
 
   const setName = (wrapper, name) =>

@@ -14,8 +14,9 @@ import {
   LINK_TYPE_TEXT,
   LINK_TYPE_ARTICLE
 } from "../lib/channels"
-import { goBackAndHandleEvent } from "../lib/util"
+import { goBackAndHandleEvent, preventDefaultAndInvoke } from "../lib/util"
 import { validationMessage } from "../lib/validation"
+import { postFormIsContentless } from "../lib/posts"
 
 import type { Channel, PostForm, PostValidation } from "../flow/discussionTypes"
 
@@ -31,7 +32,8 @@ type Props = {
   channels: Map<string, Channel>,
   updateChannelSelection: Function,
   embedly: Object,
-  embedlyInFlight: boolean
+  embedlyInFlight: boolean,
+  openClearPostTypeDialog: Function
 }
 
 const channelOptions = (channels: Map<string, Channel>) =>
@@ -94,11 +96,22 @@ export default class CreatePostForm extends React.Component<Props> {
     )
   }
 
+  clearInputClickHandler = () => {
+    const { postForm, updatePostType, openClearPostTypeDialog } = this.props
+    if (postFormIsContentless(postForm)) {
+      updatePostType(null)
+    } else {
+      openClearPostTypeDialog()
+    }
+  }
+
   clearInputButton = () => {
-    const { updatePostType, channel } = this.props
+    const { channel } = this.props
 
     return !channel || channel.allowed_post_types.length > 1 ? (
-      <CloseButton onClick={() => updatePostType(null)} />
+      <CloseButton
+        onClick={preventDefaultAndInvoke(this.clearInputClickHandler)}
+      />
     ) : null
   }
 

@@ -15,12 +15,18 @@ import type {
 } from "../flow/discussionTypes"
 
 export const newPostForm = (): PostForm => ({
-  postType: null,
-  text:     "",
-  url:      "",
-  title:    "",
-  article:  []
+  postType:  null,
+  text:      "",
+  url:       "",
+  title:     "",
+  thumbnail: null,
+  article:   []
 })
+
+export const postFormIsContentless = R.useWith(
+  R.equals,
+  R.repeat(R.omit(["postType", "title"]), 2)
+)(newPostForm())
 
 export const formatCommentsCount = (post: Post): string =>
   post.num_comments === 1 ? "1 comment" : `${post.num_comments || 0} comments`

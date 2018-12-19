@@ -8,13 +8,14 @@ import {
   CreatePostPage as InnerCreatePostPage,
   CREATE_POST_KEY
 } from "../containers/CreatePostPage"
+import Dialog from "../components/Dialog"
 
 import { makeChannelList } from "../factories/channels"
 import { makeCommentsResponse } from "../factories/comments"
 import { makePost, makeChannelPostList } from "../factories/posts"
 import { newPostURL } from "../lib/url"
 import { actions } from "../actions"
-import { SET_BANNER_MESSAGE } from "../actions/ui"
+import { SET_BANNER_MESSAGE, HIDE_DIALOG } from "../actions/ui"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import {
   userCanPost,
@@ -26,10 +27,10 @@ import { formatTitle } from "../lib/title"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import { wait } from "../lib/util"
 import * as embedUtil from "../lib/embed"
-import { shouldIf } from "../lib/test_utils"
+import { shouldIf, makeEvent } from "../lib/test_utils"
+import { newPostForm } from "../lib/posts"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
-import { newPostForm } from "../lib/posts"
 
 describe("CreatePostPage", () => {
   let helper,
@@ -42,8 +43,6 @@ describe("CreatePostPage", () => {
     article,
     twitterEmbedStub,
     sandbox
-
-  const makeEvent = (name, value) => ({ target: { value, name } })
 
   const setTitle = (wrapper, title) =>
     wrapper
@@ -169,6 +168,7 @@ describe("CreatePostPage", () => {
       } else {
         setLinkPost(wrapper)
       }
+
       if (isText) {
         setText(wrapper, text)
       } else {
@@ -327,14 +327,17 @@ describe("CreatePostPage", () => {
       helper.currentLocation.pathname,
       newPostURL(currentChannel.name)
     )
-    wrapper.find(".cancel").simulate("click")
+    wrapper
+      .find(".new-post-form .cancel")
+      .at(0)
+      .simulate("click")
     assert.equal(helper.currentLocation.pathname, "/")
   })
 
   it("cancel button onClick handler should preventDefault", async () => {
     const wrapper = await renderPage()
     const event = { preventDefault: helper.sandbox.stub() }
-    const cancelBtn = wrapper.find(".cancel")
+    const cancelBtn = wrapper.find(".new-post-form .cancel")
     cancelBtn.props().onClick(event)
     sinon.assert.called(event.preventDefault)
   })
@@ -422,6 +425,55 @@ describe("CreatePostPage", () => {
     assert.equal(select.props().value, channels[6].name)
   })
 
+  it("has a dialog", async () => {
+    const wrapper = await renderPage("/create_post/")
+    const dialog = wrapper.find(Dialog)
+    const { title, submitText, id } = dialog.props()
+    assert.equal(title, "Clear Post Content?")
+    assert.equal(submitText, "Yes")
+    assert.equal(id, "clear-post-type-dialog")
+  })
+
+  it("should show the dialog when the right action is dispatched", async () => {
+    const wrapper = await renderPage("/create_post")
+    wrapper
+      .find("CreatePostPage")
+      .instance()
+      .openClearPostTypeDialog()
+    wrapper.update()
+    const dialog = wrapper.find(Dialog)
+    assert.isTrue(dialog.props().open)
+  })
+
+  it("should pass down hide and cancel functions to the dialog", async () => {
+    const { hideDialog, onCancel } = (await renderPage("/create_post"))
+      .find(Dialog)
+      .props()
+
+    await listenForActions([HIDE_DIALOG, HIDE_DIALOG], () => {
+      hideDialog(makeEvent("foo", "bar"))
+      onCancel(makeEvent("foo", "bar"))
+    })
+  })
+
+  it("should pass down a function to null out the post type", async () => {
+    const wrapper = await renderPage("/create_post")
+    setTextPost(wrapper)
+    setText(wrapper, post.text)
+    const { onAccept } = wrapper.find(Dialog).props()
+
+    await listenForActions(
+      [actions.forms.FORM_UPDATE, actions.forms.FORM_VALIDATE, HIDE_DIALOG],
+      () => {
+        onAccept()
+      }
+    )
+    assert.deepEqual(
+      helper.store.getState().forms[CREATE_POST_KEY].value,
+      newPostForm()
+    )
+  })
+
   describe("componentDidUpdate logic", () => {
     const ALL_LINK_TYPES = [LINK_TYPE_TEXT, LINK_TYPE_LINK]
 
@@ -497,6 +549,7 @@ describe("CreatePostPage", () => {
                   : toChannelTypes[0],
               url:       "",
               text:      "",
+              article:   [],
               thumbnail: null
             })
           } else {
@@ -540,7 +593,8 @@ describe("CreatePostPage", () => {
             postType:  postTypes[0],
             url:       "",
             text:      "",
-            thumbnail: null
+            thumbnail: null,
+            article:   []
           })
         } else {
           assert.equal(dispatch.callCount, 0)

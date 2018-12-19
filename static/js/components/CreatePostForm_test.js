@@ -16,28 +16,36 @@ import { makeChannel } from "../factories/channels"
 import { makeArticle } from "../factories/embedly"
 import { newPostForm } from "../lib/posts"
 import { configureShallowRenderer } from "../lib/test_utils"
-import { shouldIf } from "../lib/test_utils"
+import { shouldIf, makeEvent } from "../lib/test_utils"
+import * as postLib from "../lib/posts"
 
 describe("CreatePostForm", () => {
-  let sandbox, isLinkTypeAllowedStub, renderPostForm
+  let sandbox,
+    isLinkTypeAllowedStub,
+    renderPostForm,
+    openClearPostTypeDialogStub,
+    updatePostTypeStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     isLinkTypeAllowedStub = sandbox.stub(channels, "isLinkTypeAllowed")
     isLinkTypeAllowedStub.returns(true)
+    openClearPostTypeDialogStub = sandbox.stub()
+    updatePostTypeStub = sandbox.stub()
     renderPostForm = configureShallowRenderer(CreatePostForm, {
-      validation:             {},
-      channels:               new Map(),
-      channel:                makeChannel(),
-      postForm:               newPostForm(),
-      embedlyInFlight:        false,
-      embedly:                {},
-      history:                {},
-      onSubmit:               sandbox.stub(),
-      nUpdate:                sandbox.stub(),
-      updatePostType:         sandbox.stub(),
-      processing:             false,
-      updateChannelSelection: sandbox.stub()
+      validation:              {},
+      channels:                new Map(),
+      channel:                 makeChannel(),
+      postForm:                newPostForm(),
+      embedlyInFlight:         false,
+      embedly:                 {},
+      history:                 {},
+      onSubmit:                sandbox.stub(),
+      nUpdate:                 sandbox.stub(),
+      updatePostType:          updatePostTypeStub,
+      processing:              false,
+      updateChannelSelection:  sandbox.stub(),
+      openClearPostTypeDialog: openClearPostTypeDialogStub
     })
   })
 
@@ -111,9 +119,9 @@ describe("CreatePostForm", () => {
     [[LINK_TYPE_LINK], LINK_TYPE_LINK, false],
     [[LINK_TYPE_ARTICLE], LINK_TYPE_ARTICLE, false]
   ].forEach(([allowedTypes, selectedType, showClosebutton]) => {
-    it(`${
-      showClosebutton ? "should" : "should not"
-    } show clear button when channel ${allowedTypes.toString()} and form has ${selectedType}`, () => {
+    it(`${shouldIf(
+      showClosebutton
+    )} show clear button when channel ${allowedTypes.toString()} and form has ${selectedType}`, () => {
       const postForm = { ...newPostForm(), postType: selectedType }
       const channel = makeChannel()
       channel.allowed_post_types = allowedTypes
@@ -123,11 +131,32 @@ describe("CreatePostForm", () => {
   })
 
   //
-  ;[LINK_TYPE_LINK, LINK_TYPE_TEXT].forEach(linkType => {
+  ;[LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_ARTICLE].forEach(linkType => {
     it(`should show close button when channel is not present and ${linkType} is selected`, () => {
       const postForm = { ...newPostForm(), postType: linkType }
       const wrapper = renderPostForm({ channel: undefined, postForm })
       assert.isOk(wrapper.find("CloseButton").exists())
+    })
+  })
+
+  //
+  ;[true, false].forEach(formIsEmpty => {
+    it(`${
+      formIsEmpty ? "clears form" : "opens confirm dialog"
+    } when clear button clicked if form is ${
+      formIsEmpty ? "empty" : "not empty"
+    }`, () => {
+      const emptyStub = sandbox.stub(postLib, "postFormIsContentless")
+      emptyStub.returns(formIsEmpty)
+      const postForm = { ...newPostForm(), postType: LINK_TYPE_LINK }
+      const wrapper = renderPostForm({ postForm })
+      wrapper.find("CloseButton").simulate("click", makeEvent("foo", "bar"))
+
+      if (formIsEmpty) {
+        sinon.assert.calledWith(updatePostTypeStub, null)
+      } else {
+        sinon.assert.calledOnce(openClearPostTypeDialogStub)
+      }
     })
   })
 
