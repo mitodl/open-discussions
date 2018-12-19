@@ -1,0 +1,39 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Blanditiis rem ipsam quas inventore maxime autem. Amet quia veritatis animi hic quidem nihil quidem earum. Esse corrupti totam recusandae ea dolore vitae. Fugit cupiditate reiciendis pariatur facere nisi debitis.\nLaborum odio placeat neque. Fuga voluptatibus ut cumque delectus consectetur excepturi. Quod omnis officia accusamus dolor dolor non.\nMaxime laudantium cupiditate iure quidem dolorem voluptates corporis. Ducimus dignissimos molestiae voluptatibus omnis sunt quod.",
+      "name": "1545238302_0_hic",
+      "public_description": "Distinctio consequuntur hic esse fugit.",
+      "title": "Veniam deleniti iusto eos cum ut."
+    }
+  },
+  "posts": {
+    "post": {
+      "article_content": [
+        {
+          "node": "text",
+          "value": "Esse fuga dolor pariatur nisi veniam iste. Omnis iusto sapiente voluptas maxime. Vel accusamus perferendis pariatur."
+        },
+        {
+          "node": "text",
+          "value": "Quibusdam rem nesciunt facilis officiis. Alias totam itaque perspiciatis omnis. Porro doloribus quod maxime dicta."
+        },
+        {
+          "node": "text",
+          "value": "In quidem quia vel quis laudantium. Quas aliquam sint fuga aut doloremque earum ipsum. Consectetur aliquam dolores eveniet ex perspiciatis animi facilis."
+        }
+      ],
+      "id": "1v",
+      "title": "Quasi itaque qui consectetur."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01CZ3P2CWN73NC54F07K7WF8T9"
+    },
+    "staff_user": {
+      "username": "01CZ3P2GAZ27FX7GJE3SZ9S2WX"
+    }
+  }
+}

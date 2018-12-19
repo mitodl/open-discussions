@@ -122,19 +122,17 @@ export class CompactPostDisplay extends React.Component<Props> {
               </div>
             </div>
           </div>
-          {(post.url || post.thumbnail) ? (
+          {post.url ? (
             <div
               className={`column2 ${post.thumbnail ? "link-thumbnail" : ""}`}
             >
-              {post.url ?
-                <div className="top-right">
-                  <a href={post.url} target="_blank" rel="noopener noreferrer">
-                    <i className="material-icons open_in_new top-right overlay-icon">
-                      open_in_new
-                    </i>
-                  </a>
-                </div> : null
-              }
+              <div className="top-right">
+                <a href={post.url} target="_blank" rel="noopener noreferrer">
+                  <i className="material-icons open_in_new top-right overlay-icon">
+                    open_in_new
+                  </i>
+                </a>
+              </div>
               {post.thumbnail ? (
                 <a href={post.url} target="_blank" rel="noopener noreferrer">
                   <img
