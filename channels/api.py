@@ -897,9 +897,6 @@ class Api:
         Args:
             post_id(str): the base36 id for the post
             text (str): The text for the post
-
-
-
             article_content (dict): The article content as a JSON dict
 
         Raises:
@@ -935,7 +932,8 @@ class Api:
         else:
             post.article.content = article_content
             post.article.save()
-            return post
+
+        return post
 
     def pin_post(self, post_id, pinned):
         """
