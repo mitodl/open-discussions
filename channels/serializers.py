@@ -414,7 +414,7 @@ class PostSerializer(BasePostSerializer):
 
     def validate_cover_image(self, value):
         """Validation that cover_image is a file"""
-        if not hasattr(value, "name"):
+        if value is not None and not hasattr(value, "name"):
             raise ValidationError("Expected cover image to be a file")
         return {"cover_image": value}
 

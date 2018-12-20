@@ -81,7 +81,7 @@ class PostProxy(ObjectProxy):
 
     @property
     def cover_image(self):
-        """Return the article content for this post"""
+        """Return the article cover image for this post"""
         if self.article.cover_image:
             return urljoin(SITE_BASE_URL, self.article.cover_image.url)
         return None
