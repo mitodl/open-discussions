@@ -221,30 +221,6 @@ def test_create_article_post_with_cover(user_client, private_channel_and_contrib
     assert len(article.cover_image.read()) == os.path.getsize(png_file)
 
 
-def test_create_article_post_no_cover(user_client, private_channel_and_contributor):
-    """
-    Create a new article post with cover_image set to None
-    """
-    channel, _ = private_channel_and_contributor
-    url = reverse("post-list", kwargs={"channel_name": channel.name})
-    article_content = [{"key": "value", "nested": {"number": 4}}]
-    resp = user_client.post(
-        url,
-        {
-            "title": "parameterized testing",
-            "article_content": article_content,
-            "cover_image": None,
-        },
-    )
-    assert resp.status_code == status.HTTP_201_CREATED
-    assert resp.json()["article_content"] == article_content
-    article = Article.objects.get(post__post_id=resp.json()["id"])
-    assert article.cover_image.name == ""
-    assert article.cover_image_small.name == ""
-    assert resp.json()["cover_image"] is None
-    assert resp.json()["thumbnail"] is None
-
-
 def test_patch_article_validate_cover_image(
     user_client, private_channel_and_contributor
 ):
@@ -732,7 +708,7 @@ def test_update_article_cover(
     user_client, reddit_factories, private_channel_and_contributor
 ):
     """
-    It should upload a cover image for an article
+    It should upload a cover image for an article and delete it if set to None
     """
     channel, user = private_channel_and_contributor
     post = reddit_factories.article_post("post", user=user, channel=channel)
