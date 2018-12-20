@@ -21,7 +21,8 @@ def test_list_subscribers(staff_client, staff_api, public_channel):
     url = reverse("subscriber-list", kwargs={"channel_name": public_channel.name})
     resp = staff_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == [{"subscriber_name": user.username} for user in users]
+    for user in users:
+        assert {"subscriber_name": user.username} in resp.json()
 
 
 @pytest.mark.parametrize("attempts", [1, 2])
