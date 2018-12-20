@@ -708,7 +708,7 @@ def test_update_article_cover(
     user_client, reddit_factories, private_channel_and_contributor
 ):
     """
-    It should upload a cover image for an article and delete it if set to None
+    It should upload a cover image for an existing article
     """
     channel, user = private_channel_and_contributor
     post = reddit_factories.article_post("post", user=user, channel=channel)

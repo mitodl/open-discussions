@@ -932,7 +932,6 @@ class Api:
         else:
             post.article.content = article_content
             post.article.save()
-
         return post
 
     def pin_post(self, post_id, pinned):

@@ -31,7 +31,7 @@
     "@material/rtl": "^0.1.7",
     "@material/snackbar": "^0.25.0",
     "@material/toolbar": "^0.4.4",
-    "@mitodl/ckeditor-custom-build": "0.0.3",
+    "@mitodl/ckeditor-custom-build": "./mitodl-ckeditor-custom-build-0.0.3.tgz",
     "@mitodl/mdl-react-components": "^0.0.3",
     "@trust/webcrypto": "^0.9.2",
     "autoprefixer": "^8.6.4",
