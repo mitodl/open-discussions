@@ -1,4 +1,5 @@
 """ Tests for profiles.utils """
+import re
 from io import BytesIO
 from urllib.parse import urlparse, parse_qs
 import xml.etree.ElementTree as etree
@@ -6,6 +7,7 @@ import xml.etree.ElementTree as etree
 import pytest
 from PIL import Image
 
+from channels.factories import ArticleFactory
 from open_discussions.factories import UserFactory
 from profiles.utils import (
     profile_image_upload_uri,
@@ -17,6 +19,8 @@ from profiles.utils import (
     update_full_name,
     generate_svg_avatar,
     generate_initials,
+    article_image_uri,
+    article_image_uri_small,
 )
 
 
@@ -186,3 +190,33 @@ def test_get_svg_avatar():
 def test_generate_initials(text, initials):
     """ Test that expected initials are returned from text"""
     assert generate_initials(text) == initials
+
+
+@pytest.mark.django_db
+def test_article_image_uri():
+    """ Test that article_image_uri provides the right URI for a post"""
+    article = ArticleFactory.create()
+    assert (
+        re.match(
+            r"article\/"
+            + article.post.post_id
+            + r"\/myfile\-\d{4}\-\d{2}\-\d{2}T\d{6}_article\.jpg",
+            article_image_uri(article, "myfile.jpg"),
+        )
+        is not None
+    )
+
+
+@pytest.mark.django_db
+def test_article_image_uri_small():
+    """ Test that article_image_uri_small provides the right URI for a post"""
+    article = ArticleFactory.create()
+    assert (
+        re.match(
+            r"article\/"
+            + article.post.post_id
+            + r"\/myfile\-\d{4}\-\d{2}\-\d{2}T\d{6}_article_small\.jpg",
+            article_image_uri_small(article, "myfile.jpg"),
+        )
+        is not None
+    )

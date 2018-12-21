@@ -423,7 +423,7 @@ class PostSerializer(BasePostSerializer):
         text = validated_data.get("text", None)
         url = validated_data.get("url", None)
         article_content = validated_data.get("article_content", None)
-        cover_image = validated_data.get("cover_image")
+        cover_image = validated_data.get("cover_image", None)
 
         # validation occurs here rather than validate(), because we only wathc to do this for POST, not PATCH
         if num_items_not_none([text, url, article_content]) > 1:
@@ -440,6 +440,7 @@ class PostSerializer(BasePostSerializer):
                 text=text,
                 url=url,
                 article_content=article_content,
+                cover_image=cover_image,
             )
         except Channel.DoesNotExist as exc:
             raise NotFound("Channel doesn't exist") from exc
@@ -447,12 +448,6 @@ class PostSerializer(BasePostSerializer):
         api.add_post_subscription(post.id)
 
         changed = api.apply_post_vote(post, validated_data)
-
-        if cover_image and hasattr(post, "article"):
-            post.article.cover_image.save(
-                f"article_image_{post.id}.jpg", cover_image, save=False
-            )
-            post.article.save(update_fields=["cover_image"], update_image=True)
 
         if changed or cover_image:
             post = api.get_post(post_id=post.id)

@@ -729,7 +729,14 @@ class Api:
 
     @reddit_object_persist(search_task_helpers.index_new_post)
     def create_post(
-        self, channel_name, title, *, text=None, url=None, article_content=None
+        self,
+        channel_name,
+        title,
+        *,
+        text=None,
+        url=None,
+        article_content=None,
+        cover_image=None,
     ):  # pylint: disable=too-many-arguments
         """
         Create a new post in a channel
@@ -740,6 +747,7 @@ class Api:
             text(str): the text of the post
             url(str): the url of the post
             article_content (dict): the article content of the post as a JSON dict
+            cover_image(bytes): article cover image
 
         Raises:
             ValueError: if both text and url are provided
@@ -784,10 +792,16 @@ class Api:
             )
 
             if created and article_content:
-                Article.objects.get_or_create(
+                article, _ = Article.objects.get_or_create(
                     post=post,
                     defaults={"author": self.user, "content": article_content},
                 )
+
+                if cover_image:
+                    article.cover_image.save(
+                        f"article_image_{post.id}.jpg", cover_image, save=False
+                    )
+                    article.save(update_fields=["cover_image"], update_image=True)
 
             if created and url and post.link_meta is None and settings.EMBEDLY_KEY:
                 post.link_meta = get_or_create_link_meta(url)
@@ -890,7 +904,9 @@ class Api:
         return proxy_post(self.get_submission(post_id))
 
     @reddit_object_persist(search_task_helpers.update_post_text)
-    def update_post(self, post_id, *, text=None, article_content=None):
+    def update_post(
+        self, post_id, *, text=None, article_content=None, cover_image=None
+    ):
         """
         Updates the post
 
@@ -898,6 +914,7 @@ class Api:
             post_id(str): the base36 id for the post
             text (str): The text for the post
             article_content (dict): The article content as a JSON dict
+            cover_image (bytes): The article cover image
 
         Raises:
             ValueError: if the url post was provided
@@ -908,8 +925,10 @@ class Api:
         if text and article_content:
             raise ValueError("Only one of text and article_content can be specified")
 
-        if not text and not article_content:
-            raise ValueError("One of text and article_content must be specified")
+        if not text and not article_content and not cover_image:
+            raise ValueError(
+                "One of text, article_content, or cover_image must be specified"
+            )
 
         post = self.get_post(post_id)
 
@@ -929,9 +948,14 @@ class Api:
 
         if text:
             return post.update(submission=post.edit(text))
-        else:
+        if article_content:
             post.article.content = article_content
-            post.article.save()
+        if cover_image:
+            post.article.cover_image.save(
+                f"article_image_{post.id}.jpg", cover_image, save=False
+            )
+        post.article.save(update_image=(cover_image is not None))
+
         return post
 
     def pin_post(self, post_id, pinned):
