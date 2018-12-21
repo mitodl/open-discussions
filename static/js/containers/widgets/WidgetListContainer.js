@@ -48,6 +48,7 @@ type Props = {
   patchWidgetInstances: (payload: PatchPayload) => Promise<WidgetListResponse>,
   renderers: { [string]: string },
   specs: Array<WidgetSpec>,
+  validation: Object,
   widgetInstances: Array<WidgetInstanceType>
 }
 
@@ -127,7 +128,8 @@ export class WidgetListContainer extends React.Component<Props> {
         configuration: {},
         title:         "",
         widget_type:   ""
-      }
+      },
+      validation: {}
     })
   }
 
@@ -136,9 +138,10 @@ export class WidgetListContainer extends React.Component<Props> {
 
     setDialogVisibility(true)
     setDialogData({
-      isEditing: true,
-      state:     DIALOG_EDIT_WIDGET_CONFIGURATION,
-      instance:  widgetInstance
+      isEditing:  true,
+      state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+      instance:   widgetInstance,
+      validation: {}
     })
   }
 
@@ -178,6 +181,7 @@ export class WidgetListContainer extends React.Component<Props> {
       return <Loading />
     }
 
+    const validation = dialogData ? dialogData.validation : {}
     return (
       <React.Fragment>
         <WidgetList
@@ -198,6 +202,7 @@ export class WidgetListContainer extends React.Component<Props> {
           setDialogData={setDialogData}
           setDialogVisibility={setDialogVisibility}
           specs={specs}
+          validation={validation}
         />
       </React.Fragment>
     )

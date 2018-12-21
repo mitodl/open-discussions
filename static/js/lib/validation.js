@@ -4,11 +4,13 @@ import React from "react"
 import R from "ramda"
 import isURL from "validator/lib/isURL"
 
+import { DIALOG_EDIT_WIDGET_SELECT_TYPE } from "../actions/ui"
 import { S } from "./sanctuary"
 import { LINK_TYPE_LINK, LINK_TYPE_ARTICLE } from "../lib/channels"
 import { emptyOrNil } from "../lib/util"
 
 import type { PostForm, PostFormType } from "../flow/discussionTypes"
+import type { WidgetDialogData } from "../flow/widgetTypes"
 
 export const PASSWORD_LENGTH_MINIMUM = 8
 
@@ -280,3 +282,16 @@ export const validatePasswordChangeForm = validate(
     newPasswordValidations
   )
 )
+
+const validateWidgetDialogType = validate([
+  validation(emptyOrNil, R.lensProp("widget_type"), "Widget type is required")
+])
+
+const validateWidgetDialogConfiguration = validate([
+  validation(emptyOrNil, R.lensProp("title"), "Widget title is required")
+])
+
+export const validateWidgetDialog = (data: WidgetDialogData) =>
+  data.state === DIALOG_EDIT_WIDGET_SELECT_TYPE
+    ? validateWidgetDialogType(data.instance)
+    : validateWidgetDialogConfiguration(data.instance)

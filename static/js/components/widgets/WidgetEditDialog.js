@@ -3,18 +3,16 @@ import React from "react"
 import R from "ramda"
 import { Radio } from "@mitodl/mdl-react-components"
 
-import Dialog from "../../components/Dialog"
+import Dialog from "../Dialog"
+import WidgetField from "./WidgetField"
 
 import {
   DIALOG_EDIT_WIDGET_SELECT_TYPE,
   DIALOG_EDIT_WIDGET_CONFIGURATION
 } from "../../actions/ui"
+import { validateWidgetDialog, validationMessage } from "../../lib/validation"
 
-import type {
-  WidgetDialogData,
-  WidgetFieldSpec,
-  WidgetSpec
-} from "../../flow/widgetTypes"
+import type { WidgetDialogData, WidgetSpec } from "../../flow/widgetTypes"
 
 type Props = {
   dialogOpen: boolean,
@@ -27,7 +25,6 @@ type Props = {
 
 const titleLens = R.lensPath(["title"])
 const widgetTypeLens = R.lensPath(["widget_type"])
-
 export default class WidgetEditDialog extends React.Component<Props> {
   updateValue = R.curry((lens: any, event: any) => {
     const { setDialogData, dialogData } = this.props
@@ -50,73 +47,36 @@ export default class WidgetEditDialog extends React.Component<Props> {
   }
 
   renderSelectWidgetType = () => {
-    const { specs } = this.props
+    const { specs, dialogData } = this.props
 
+    const validation = dialogData ? dialogData.validation : {}
     return (
-      <Radio
-        className="radio"
-        value={this.getValue(widgetTypeLens)}
-        onChange={this.updateValue(widgetTypeLens)}
-        options={specs.map(spec => ({
-          label: spec.widget_type,
-          value: spec.widget_type
-        }))}
-      />
+      <React.Fragment>
+        {validationMessage(validation.widget_type)}
+        <Radio
+          className="radio"
+          value={this.getValue(widgetTypeLens)}
+          onChange={this.updateValue(widgetTypeLens)}
+          options={specs.map(spec => ({
+            label: spec.widget_type,
+            value: spec.widget_type
+          }))}
+        />
+      </React.Fragment>
     )
   }
 
-  renderField = (fieldSpec: WidgetFieldSpec) => {
-    const lens = R.lensPath(["configuration", [fieldSpec.field_name]])
-
-    const value = this.getValue(lens)
-    const valueOrDefault = value !== undefined ? value : fieldSpec.props.default
-    switch (fieldSpec.input_type) {
-    case "textarea":
-      return (
-        <textarea
-          value={valueOrDefault}
-          className="field"
-          onChange={this.updateValue(lens)}
-          minLength={fieldSpec.props.min_length}
-          maxLength={fieldSpec.props.max_length}
-          placeholder={fieldSpec.props.placeholder}
-        />
-      )
-    case "number":
-      return (
-        <input
-          type="number"
-          className="field"
-          value={valueOrDefault}
-          onChange={this.updateValue(lens)}
-          min={fieldSpec.props.min}
-          max={fieldSpec.props.max}
-        />
-      )
-    default:
-      return (
-        <input
-          type="text"
-          className="field"
-          value={valueOrDefault}
-          onChange={this.updateValue(lens)}
-          minLength={fieldSpec.props.min_length}
-          maxLength={fieldSpec.props.max_length}
-          placeholder={fieldSpec.props.placeholder}
-        />
-      )
-    }
-  }
-
   renderConfiguration = () => {
-    const { specs } = this.props
+    const { specs, dialogData } = this.props
 
+    const validation = dialogData ? dialogData.validation : {}
     const spec = specs.filter(
       spec => spec.widget_type === this.getValue(widgetTypeLens)
     )[0]
 
     return (
       <React.Fragment>
+        {validationMessage(validation.title)}
         <label className="widget-title-field">
           Widget title
           <input
@@ -125,12 +85,19 @@ export default class WidgetEditDialog extends React.Component<Props> {
             onChange={this.updateValue(titleLens)}
           />
         </label>
-        {spec.form_spec.map(item => (
-          <label key={item.field_name} className="configuration-field">
-            {item.label}
-            {this.renderField(item)}
-          </label>
-        ))}
+        {spec.form_spec.map(fieldSpec => {
+          const lens = R.lensPath(["configuration", [fieldSpec.field_name]])
+          return (
+            <label key={fieldSpec.field_name} className="configuration-field">
+              {fieldSpec.label}
+              <WidgetField
+                value={this.getValue(lens)}
+                onChange={this.updateValue(lens)}
+                fieldSpec={fieldSpec}
+              />
+            </label>
+          )
+        })}
       </React.Fragment>
     )
   }
@@ -147,10 +114,20 @@ export default class WidgetEditDialog extends React.Component<Props> {
       return
     }
 
+    const validation = validateWidgetDialog(dialogData)
+    if (!R.isEmpty(validation)) {
+      setDialogData({
+        ...dialogData,
+        validation
+      })
+      return
+    }
+
     if (dialogData.state === DIALOG_EDIT_WIDGET_SELECT_TYPE) {
       setDialogData({
         ...dialogData,
-        state: DIALOG_EDIT_WIDGET_CONFIGURATION
+        state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+        validation: {}
       })
       return
     }
@@ -165,7 +142,12 @@ export default class WidgetEditDialog extends React.Component<Props> {
       return null
     }
 
-    const title = dialogData.isEditing ? "Edit widget" : "Add widget"
+    const title =
+      dialogData.state === DIALOG_EDIT_WIDGET_SELECT_TYPE
+        ? "Select widget"
+        : dialogData.isEditing
+          ? "Edit widget"
+          : "Add widget"
     const submitText =
       dialogData.state === DIALOG_EDIT_WIDGET_SELECT_TYPE
         ? "Next"

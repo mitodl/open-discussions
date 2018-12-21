@@ -209,8 +209,9 @@ describe("WidgetListContainer", () => {
               title:         "",
               widget_type:   ""
             },
-            isEditing: false,
-            state:     DIALOG_EDIT_WIDGET_SELECT_TYPE
+            isEditing:  false,
+            state:      DIALOG_EDIT_WIDGET_SELECT_TYPE,
+            validation: {}
           }
         }
       })
@@ -233,9 +234,10 @@ describe("WidgetListContainer", () => {
         payload: {
           dialogKey: DIALOG_EDIT_WIDGET,
           data:      {
-            instance:  instance,
-            isEditing: true,
-            state:     DIALOG_EDIT_WIDGET_CONFIGURATION
+            instance:   instance,
+            isEditing:  true,
+            state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+            validation: {}
           }
         }
       })
@@ -257,9 +259,10 @@ describe("WidgetListContainer", () => {
           item => (item.id === updateId ? replaceInstance : item)
         )
         const data: WidgetDialogData = {
-          instance:  replaceInstance,
-          isEditing: true,
-          state:     DIALOG_EDIT_WIDGET_CONFIGURATION
+          instance:   replaceInstance,
+          isEditing:  true,
+          state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+          validation: {}
         }
         wrapper
           .dive()
@@ -278,9 +281,10 @@ describe("WidgetListContainer", () => {
       it("updates the widget list with a new widget instance", async () => {
         const { wrapper, store } = await render()
         const data: WidgetDialogData = {
-          instance:  makeWidgetInstance(),
-          isEditing: false,
-          state:     DIALOG_EDIT_WIDGET_CONFIGURATION
+          instance:   makeWidgetInstance(),
+          isEditing:  false,
+          state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+          validation: {}
         }
         wrapper
           .dive()
@@ -320,9 +324,10 @@ describe("WidgetListContainer", () => {
     it("sets dialog data", async () => {
       const { wrapper, store } = await render()
       const data: WidgetDialogData = {
-        instance:  makeWidgetInstance(),
-        isEditing: false,
-        state:     DIALOG_EDIT_WIDGET_CONFIGURATION
+        instance:   makeWidgetInstance(),
+        isEditing:  false,
+        state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+        validation: { field: "missing" }
       }
       wrapper
         .dive()
@@ -341,7 +346,7 @@ describe("WidgetListContainer", () => {
       it(`passes props when the dialog is ${
         isOpen ? "" : "not "
       }open`, async () => {
-        const data = { some: "data" }
+        const data = { some: "data", validation: { field: "missing" } }
         const { wrapper } = await render({
           ui: {
             dialogs: new Map(isOpen ? [[DIALOG_EDIT_WIDGET, data]] : [])
@@ -354,6 +359,7 @@ describe("WidgetListContainer", () => {
         assert.equal(props.dialogData, isOpen ? data : undefined)
         assert.equal(props.dialogOpen, isOpen)
         assert.deepEqual(props.specs, listResponse.available_widgets)
+        assert.deepEqual(props.validation, isOpen ? data.validation : {})
       })
     })
   })
