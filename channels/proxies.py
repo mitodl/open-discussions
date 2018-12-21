@@ -107,7 +107,7 @@ def proxy_posts(submissions):
         post.post_id: post
         for post in Post.objects.filter(
             post_id__in=[submission.id for submission in submissions]
-        )
+        ).select_related("article")
     }
     return [
         PostProxy(submission, posts[submission.id])
