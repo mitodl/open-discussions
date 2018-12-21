@@ -475,13 +475,13 @@ class PostSerializer(BasePostSerializer):
                 api.approve_post(post_id)
                 api.ignore_post_reports(post_id)
 
-        if "text" in validated_data:
-            instance = api.update_post(post_id=post_id, text=validated_data["text"])
+        update_kwargs = {}
+        for attr in ("text", "article_content", "cover_image"):
+            if attr in validated_data:
+                update_kwargs[attr] = validated_data[attr]
 
-        if "article_content" in validated_data:
-            instance = api.update_post(
-                post_id=post_id, article_content=validated_data["article_content"]
-            )
+        if update_kwargs:
+            instance = api.update_post(post_id=post_id, **update_kwargs)
 
         if "stickied" in validated_data:
             sticky = validated_data["stickied"]
@@ -492,13 +492,6 @@ class PostSerializer(BasePostSerializer):
                 api.add_post_subscription(post_id)
             elif validated_data["subscribed"] is False:
                 api.remove_post_subscription(post_id)
-
-        cover_image = validated_data.get("cover_image")
-        if instance and cover_image and hasattr(instance, "article"):
-            instance.article.cover_image.save(
-                f"article_image_{post_id}.jpg", cover_image, save=False
-            )
-            instance.article.save(update_fields=["cover_image"], update_image=True)
 
         api.apply_post_vote(instance, validated_data)
         return api.get_post(post_id=post_id)
