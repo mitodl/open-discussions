@@ -105,6 +105,11 @@ def mock_get_client(mocker):
                             subreddit=_mock_channel(name="subreddit"),
                         )
                     ),
+                    edit=Mock(
+                        return_value=_mock_post(
+                            post_id="abc", subreddit=_mock_channel(name="subreddit")
+                        )
+                    ),
                 )
             ),
             comment=Mock(
@@ -492,7 +497,7 @@ def test_create_post_text(mock_client, text):
         post_id=mock_client.subreddit.return_value.submit.return_value.id
     ).delete()  # don't want this for this test
     post = client.create_post(channel.name, "Title", text=text)
-    assert post == mock_client.subreddit.return_value.submit.return_value
+    assert post.__wrapped__ == mock_client.subreddit.return_value.submit.return_value
     mock_client.subreddit.assert_called_once_with(channel.name)
     mock_client.subreddit.return_value.submit.assert_called_once_with(
         "Title", selftext=text or "", url=None
@@ -516,7 +521,7 @@ def test_create_post_url(mock_client):
         post_id=mock_client.subreddit.return_value.submit.return_value.id
     ).delete()  # don't want this for this test
     post = client.create_post(channel.name, "Title", url="http://google.com")
-    assert post == mock_client.subreddit.return_value.submit.return_value
+    assert post.__wrapped__ == mock_client.subreddit.return_value.submit.return_value
     mock_client.subreddit.assert_called_once_with(channel.name)
     mock_client.subreddit.return_value.submit.assert_called_once_with(
         "Title", selftext=None, url="http://google.com"
@@ -540,7 +545,7 @@ def test_create_post_article(mock_client):
         post_id=mock_client.subreddit.return_value.submit.return_value.id
     ).delete()  # don't want this for this test
     post = client.create_post(channel.name, "Title", article_content=["data"])
-    assert post == mock_client.subreddit.return_value.submit.return_value
+    assert post.__wrapped__ == mock_client.subreddit.return_value.submit.return_value
     mock_client.subreddit.assert_called_once_with(channel.name)
     mock_client.subreddit.return_value.submit.assert_called_once_with(
         "Title", selftext="", url=None
@@ -603,7 +608,7 @@ def test_get_post(mock_client):
     client = api.Api(UserFactory.create())
     post = client.get_post("abc")
     assert post.__wrapped__ == mock_client.submission.return_value
-    assert post._post.post_id == "abc"  # pylint: disable=protected-access
+    assert post._self_post.post_id == "abc"  # pylint: disable=protected-access
     mock_client.submission.assert_called_once_with(id="abc")
 
 
@@ -613,7 +618,7 @@ def test_update_post_text(mock_client, indexing_decorator):
     client = api.Api(UserFactory.create())
     post = client.update_post("abc", text="Text")
     assert post.__wrapped__ == mock_client.submission.return_value.edit.return_value
-    assert post._post.post_id == "abc"  # pylint: disable=protected-access
+    assert post._self_post.post_id == "abc"  # pylint: disable=protected-access
     mock_client.submission.assert_called_once_with(id="abc")
     mock_client.submission.return_value.edit.assert_called_once_with("Text")
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
@@ -635,7 +640,7 @@ def test_update_post_article(mock_client, indexing_decorator):
     post_id = article.post.post_id
     post = client.update_post(post_id, article_content=updated_content)
     assert post.__wrapped__ == mock_client.submission.return_value
-    assert post._post.post_id == post_id  # pylint: disable=protected-access
+    assert post._self_post.post_id == post_id  # pylint: disable=protected-access
     mock_client.submission.assert_called_once_with(id=post_id)
     article.refresh_from_db()
     assert article.content == updated_content

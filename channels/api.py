@@ -786,7 +786,7 @@ class Api:
             post, created = Post.objects.select_for_update().get_or_create(
                 post_id=submission.id,
                 defaults={
-                    "channel": channel._channel,  # pylint: disable=protected-access
+                    "channel": channel._self_channel,  # pylint: disable=protected-access
                     "post_type": post_type,
                 },
             )
@@ -947,7 +947,7 @@ class Api:
             raise ValueError("Posts with a url cannot be updated")
 
         if text:
-            return post.update(submission=post.edit(text))
+            return proxy_post(post.edit(text))
         if article_content:
             post.article.content = article_content
         if cover_image:

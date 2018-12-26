@@ -22,59 +22,43 @@ class PostProxy(ObjectProxy):
         # treat submission as the primary proxy target
         super().__init__(submission)
         # store the post so @property overrides can reference it
-        self._submission = submission
-        self._post = post
+        self._self_submission = submission
+        self._self_post = post
 
     def __eq__(self, other):
         """PostProxy equality delegates to submission and post equality checks"""
         # isinstance doesn't work here because ObjectProxy spoofs that
-        if hasattr(other, "_submission") and hasattr(other, "_post"):
+        if hasattr(other, "_self_submission") and hasattr(other, "_self_post"):
             # check the submission first because post may be lazy
-            return other._submission == self._submission and other._post == self._post
+            return (
+                other._self_submission == self._self_submission
+                and other._self_post == self._self_post
+            )
         return False
 
     def __str__(self):
         """String representation"""
-        return f"PostProxy for submission: {self._submission.id}"
-
-    def __getattr__(self, name):
-        """
-        Avoid proxying __getattr__ but "proxy" to the wrapped object on any non-local fields
-        """
-        if name in ("update", "link_meta", "post_type", "article", "article_content"):
-            return super().__getattr__(name)
-        else:
-            return getattr(self.__wrapped__, name)
-
-    def update(self, *, submission=None, post=None):
-        """
-        Return an updated proxy instance by passing one or more of submission/post
-
-        Args:
-            submission (praw.models.reddit.submission.Submission): a PRAW submission object
-            post (channels.models.Post): the post associated with the submission
-        """
-        return PostProxy(submission or self._submission, post or self._post)
+        return f"PostProxy for submission: {self._self_submission.id}"
 
     @property
     def link_meta(self):
         """Return the LinkMeta for this post"""
-        return self._post.link_meta
+        return self._self_post.link_meta
 
     @property
     def post_type(self):
         """Return the post_type"""
-        return self._post.post_type
+        return self._self_post.post_type
 
     @property
     def article(self):
         """Return the Article for this post"""
-        return self._post.article
+        return self._self_post.article
 
     @property
     def article_content(self):
         """Return the article content for this post"""
-        return self.article.content
+        return self.article.content if self.article is not None else None
 
 
 def proxy_post(submission):
@@ -107,7 +91,7 @@ def proxy_posts(submissions):
         post.post_id: post
         for post in Post.objects.filter(
             post_id__in=[submission.id for submission in submissions]
-        ).select_related("article")
+        ).select_related("article", "link_meta", "channel")
     }
     return [
         PostProxy(submission, posts[submission.id])
@@ -132,8 +116,8 @@ class ChannelProxy(ObjectProxy):
         # treat subreddit as the primary proxy target
         super().__init__(subreddit)
         # store the channel so @property overrides can reference it
-        self._subreddit = subreddit
-        self._channel = channel
+        self._self_subreddit = subreddit
+        self._self_channel = channel
 
     def __getattr__(self, name):
         """
@@ -149,14 +133,14 @@ class ChannelProxy(ObjectProxy):
             "banner",
             "widget_list_id",
         ):
-            return getattr(self._channel, name)
+            return getattr(self._self_channel, name)
         else:
             return getattr(self.__wrapped__, name)
 
     @property
     def channel(self):
         """Read-only access to the channel"""
-        return self._channel
+        return self._self_channel
 
 
 def proxy_channel(subreddit):

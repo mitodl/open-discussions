@@ -193,7 +193,7 @@ class ChannelSerializer(serializers.Serializer):
 
         channel = api.update_channel(name=name, **kwargs)
 
-        channel_obj = channel._channel  # pylint: disable=protected-access
+        channel_obj = channel._self_channel  # pylint: disable=protected-access
 
         avatar = validated_data.get("avatar")
         if avatar:
