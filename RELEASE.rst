@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.58.2 (Released December 26, 2018)
+--------------
+
+- Fixed article n+1 query
+
 Version 0.58.1 (Released December 19, 2018)
 --------------
 
