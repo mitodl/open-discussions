@@ -3,7 +3,7 @@ Serializers for channel REST APIs
 """
 # pylint: disable=too-many-lines
 from datetime import datetime, timezone
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 from django.contrib.auth import get_user_model
 from praw.models import Comment, MoreComments
@@ -20,6 +20,7 @@ from channels.utils import (
 from channels.constants import VALID_CHANNEL_TYPES, VALID_LINK_TYPES
 from channels.models import Channel, Subscription, ChannelSubscription
 from channels.proxies import proxy_post
+from open_discussions.settings import SITE_BASE_URL
 from open_discussions.utils import filter_dict_with_renamed_keys
 from open_discussions.serializers import WriteableSerializerMethodField
 from profiles.models import Profile
@@ -295,6 +296,8 @@ class BasePostSerializer(RedditObjectSerializer):
 
     def get_thumbnail(self, instance):
         """Returns a thumbnail url or null"""
+        if hasattr(instance, "article") and instance.article.cover_image_small:
+            return urljoin(SITE_BASE_URL, instance.article.cover_image_small.url)
         return instance.link_meta.thumbnail if instance.link_meta is not None else None
 
     def get_slug(self, instance):
@@ -362,12 +365,19 @@ class PostSerializer(BasePostSerializer):
     and can fetch/serialize Subscription information.
     """
 
+    cover_image = WriteableSerializerMethodField(allow_null=True)
     subscribed = WriteableSerializerMethodField()
 
     @property
     def _current_user(self):
         """Get the current user"""
         return self.context["current_user"]
+
+    def get_cover_image(self, instance):
+        """Get the cover image URL"""
+        if hasattr(instance, "article") and instance.article.cover_image:
+            return urljoin(SITE_BASE_URL, instance.article.cover_image.url)
+        return None
 
     def get_subscribed(self, instance):
         """Returns True if user is subscrisbed to the post"""
@@ -402,11 +412,18 @@ class PostSerializer(BasePostSerializer):
         """Validate that subscribed is a bool"""
         return {"subscribed": _parse_bool(value, "subscribed")}
 
+    def validate_cover_image(self, value):
+        """Validation that cover_image is a file"""
+        if value is not None and not hasattr(value, "name"):
+            raise ValidationError("Expected cover image to be a file")
+        return {"cover_image": value}
+
     def create(self, validated_data):
         title = validated_data["title"]
         text = validated_data.get("text", None)
         url = validated_data.get("url", None)
         article_content = validated_data.get("article_content", None)
+        cover_image = validated_data.get("cover_image", None)
 
         # validation occurs here rather than validate(), because we only wathc to do this for POST, not PATCH
         if num_items_not_none([text, url, article_content]) > 1:
@@ -423,6 +440,7 @@ class PostSerializer(BasePostSerializer):
                 text=text,
                 url=url,
                 article_content=article_content,
+                cover_image=cover_image,
             )
         except Channel.DoesNotExist as exc:
             raise NotFound("Channel doesn't exist") from exc
@@ -431,12 +449,12 @@ class PostSerializer(BasePostSerializer):
 
         changed = api.apply_post_vote(post, validated_data)
 
-        if changed:
+        if changed or cover_image:
             post = api.get_post(post_id=post.id)
 
         return post
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):  # pylint: disable=too-many-branches
         post_id = self.context["view"].kwargs["post_id"]
 
         if "url" in validated_data:
@@ -457,13 +475,13 @@ class PostSerializer(BasePostSerializer):
                 api.approve_post(post_id)
                 api.ignore_post_reports(post_id)
 
-        if "text" in validated_data:
-            instance = api.update_post(post_id=post_id, text=validated_data["text"])
+        update_kwargs = {}
+        for attr in ("text", "article_content", "cover_image"):
+            if attr in validated_data:
+                update_kwargs[attr] = validated_data[attr]
 
-        if "article_content" in validated_data:
-            instance = api.update_post(
-                post_id=post_id, article_content=validated_data["article_content"]
-            )
+        if update_kwargs:
+            instance = api.update_post(post_id=post_id, **update_kwargs)
 
         if "stickied" in validated_data:
             sticky = validated_data["stickied"]

@@ -1,5 +1,7 @@
 """Tests for views for REST APIs for posts"""
 # pylint: disable=unused-argument,too-many-lines
+import json
+import os
 from types import SimpleNamespace
 import pytest
 from django.urls import reverse
@@ -42,6 +44,7 @@ def test_create_url_post_existing_meta(
         "title": "url title 🐨",
         "url": link_url,
         "url_domain": "micromasters.mit.edu",
+        "cover_image": None,
         "thumbnail": thumbnail,
         "text": None,
         "article_content": None,
@@ -122,6 +125,7 @@ def test_create_text_post(user_client, private_channel_and_contributor):
         "article_content": None,
         "url": None,
         "url_domain": None,
+        "cover_image": None,
         "thumbnail": None,
         "author_id": user.username,
         "created": any_instance_of(str),
@@ -147,7 +151,7 @@ def test_create_text_post(user_client, private_channel_and_contributor):
 
 def test_create_article_post(user_client, private_channel_and_contributor):
     """
-    Create a new text post
+    Create a new article post
     """
     channel, user = private_channel_and_contributor
     url = reverse("post-list", kwargs={"channel_name": channel.name})
@@ -162,6 +166,7 @@ def test_create_article_post(user_client, private_channel_and_contributor):
         "article_content": article_content,
         "url": None,
         "url_domain": None,
+        "cover_image": None,
         "thumbnail": None,
         "author_id": user.username,
         "created": any_instance_of(str),
@@ -186,6 +191,59 @@ def test_create_article_post(user_client, private_channel_and_contributor):
     article = Article.objects.filter(post__post_id=resp.json()["id"])
     assert article.exists()
     assert article.first().content == article_content
+
+
+def test_create_article_post_with_cover(user_client, private_channel_and_contributor):
+    """
+    Create a new article post with a cover image
+    """
+    channel, _ = private_channel_and_contributor
+    url = reverse("post-list", kwargs={"channel_name": channel.name})
+    article_content = [{"key": "value", "nested": {"number": 4}}]
+    png_file = os.path.join(
+        os.path.dirname(__file__), "..", "..", "static", "images", "blank.png"
+    )
+    with open(png_file, "rb") as f:
+        resp = user_client.post(
+            url,
+            {
+                "title": "parameterized testing",
+                "article_content": json.dumps(article_content),
+                "cover_image": f,
+            },
+            format="multipart",
+        )
+    assert resp.status_code == status.HTTP_201_CREATED
+    assert resp.json()["article_content"] == article_content
+    article = Article.objects.get(post__post_id=resp.json()["id"])
+    assert resp.json()["cover_image"].endswith(article.cover_image.url)
+    assert resp.json()["thumbnail"].endswith(article.cover_image_small.url)
+    assert len(article.cover_image.read()) == os.path.getsize(png_file)
+
+
+def test_patch_article_validate_cover_image(
+    user_client, private_channel_and_contributor
+):
+    """
+    It should error if the cover image is not a file
+    """
+    channel, _ = private_channel_and_contributor
+    url = reverse("post-list", kwargs={"channel_name": channel.name})
+    article_content = [{"key": "value", "nested": {"number": 4}}]
+    resp = user_client.post(
+        url,
+        {
+            "title": "parameterized testing",
+            "article_content": json.dumps(article_content),
+            "cover_image": b"test",
+        },
+        format="multipart",
+    )
+    assert resp.status_code == status.HTTP_400_BAD_REQUEST
+    assert resp.json() == {
+        "error_type": "ValidationError",
+        "cover_image": [f"Expected cover image to be a file"],
+    }
 
 
 def test_create_text_post_blank(user_client, private_channel_and_contributor):
@@ -606,6 +664,7 @@ def test_create_post_without_upvote(user_client, private_channel_and_contributor
         "article_content": None,
         "url": None,
         "url_domain": None,
+        "cover_image": None,
         "thumbnail": None,
         "author_id": user.username,
         "created": "2018-08-24T18:14:32+00:00",
@@ -643,6 +702,27 @@ def test_update_article_post(
         **default_post_response_data(channel, post, user),
         "article_content": article_content,
     }
+
+
+def test_update_article_cover(
+    user_client, reddit_factories, private_channel_and_contributor
+):
+    """
+    It should upload a cover image for an existing article
+    """
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.article_post("post", user=user, channel=channel)
+    url = reverse("post-detail", kwargs={"post_id": post.id})
+    png_file = os.path.join(
+        os.path.dirname(__file__), "..", "..", "static", "images", "blank.png"
+    )
+    with open(png_file, "rb") as f:
+        resp = user_client.patch(url, {"cover_image": f}, format="multipart")
+    assert resp.status_code == status.HTTP_200_OK
+    article = Article.objects.get(post__post_id=resp.json()["id"])
+    assert len(article.cover_image.read()) == os.path.getsize(png_file)
+    assert "small" in article.cover_image_small.name
+    assert len(article.cover_image_small.read()) > 0
 
 
 class PostDetailTests:

@@ -11,7 +11,11 @@ from widgets.models import WidgetList
 
 
 from channels.constants import ROLE_CHOICES, VALID_EXTENDED_POST_CHOICES
-from channels.utils import AVATAR_MEDIUM_MAX_DIMENSION, AVATAR_SMALL_MAX_DIMENSION
+from channels.utils import (
+    AVATAR_MEDIUM_MAX_DIMENSION,
+    AVATAR_SMALL_MAX_DIMENSION,
+    COVER_IMAGE_THUMBNAIL_DIMENSION,
+)
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
     avatar_uri,
@@ -19,6 +23,8 @@ from profiles.utils import (
     avatar_uri_medium,
     banner_uri,
     make_thumbnail,
+    article_image_uri,
+    article_image_uri_small,
 )
 
 
@@ -206,7 +212,29 @@ class Article(TimestampedModel):
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     post = models.OneToOneField(Post, on_delete=models.CASCADE)
+    cover_image = models.ImageField(
+        null=True, blank=True, max_length=2083, upload_to=article_image_uri
+    )
+    cover_image_small = models.ImageField(
+        null=True, blank=True, max_length=2083, upload_to=article_image_uri_small
+    )
     content = JSONField()
+
+    def save(
+        self, *args, update_image=False, **kwargs
+    ):  # pylint: disable=arguments-differ
+        if update_image:
+            if self.cover_image:
+                small_thumbnail = make_thumbnail(
+                    self.cover_image, COVER_IMAGE_THUMBNAIL_DIMENSION
+                )
+
+                # name doesn't matter here, we use upload_to to produce that
+                self.cover_image_small.save(f"{uuid4().hex}.jpg", small_thumbnail)
+            else:
+                self.cover_image_small = None
+
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.post.id} on channel {self.post.channel} by {self.author.profile.name}"

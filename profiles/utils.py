@@ -193,6 +193,22 @@ def banner_uri(instance, filename):
     return generate_filepath(filename, instance.name, "_banner", "channel")
 
 
+def article_image_uri(instance, filename):
+    """
+    upload_to handler for Article.cover_image
+    """
+    return generate_filepath(filename, instance.post.post_id, "_article", "article")
+
+
+def article_image_uri_small(instance, filename):
+    """
+    upload_to handler for Article.cover_image_small
+    """
+    return generate_filepath(
+        filename, instance.post.post_id, "_article_small", "article"
+    )
+
+
 @contextmanager
 def make_temp_image_file(*, width=500, height=500):
     """

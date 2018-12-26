@@ -19,6 +19,8 @@ from embedly.api import get_embedly, THUMBNAIL_URL
 AVATAR_SMALL_MAX_DIMENSION = 22
 AVATAR_MEDIUM_MAX_DIMENSION = 90
 
+COVER_IMAGE_THUMBNAIL_DIMENSION = 201
+
 User = get_user_model()
 
 ListingParams = namedtuple("ListingParams", ["before", "after", "count", "sort"])
