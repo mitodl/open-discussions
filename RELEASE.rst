@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.59.0
+--------------
+
+- Fixed performance issues around proxies and DB queries
+- Cover image for articles - backend (#1599)
+
 Version 0.58.2 (Released December 26, 2018)
 --------------
 
