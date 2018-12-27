@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.59.1
+--------------
+
+- Fix other calls to fetch()
+- ask for confirmation when the user switches post types
+- Remove the widget list from the channel admin
+
 Version 0.59.0 (Released December 27, 2018)
 --------------
 
