@@ -11,7 +11,10 @@ from profiles.utils import image_uri
 from channels.factories import LinkMetaFactory
 from channels.constants import VALID_POST_SORT_TYPES, POSTS_SORT_HOT
 from channels.models import Subscription, LinkMeta, Article
-from channels.views.test_utils import default_post_response_data
+from channels.views.test_utils import (
+    default_post_response_data,
+    raise_error_on_submission_fetch,
+)
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
     PERMISSION_DENIED_ERROR_TYPE,
@@ -414,7 +417,7 @@ def test_get_post_anonymous(
 
 @pytest.mark.parametrize("missing_user", [True, False])
 def test_list_posts(
-    user_client, missing_user, private_channel_and_contributor, reddit_factories
+    mocker, user_client, missing_user, private_channel_and_contributor, reddit_factories
 ):
     """List posts in a channel"""
     channel, user = private_channel_and_contributor
@@ -432,7 +435,8 @@ def test_list_posts(
         user.save()
 
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    resp = user_client.get(url)
+    with raise_error_on_submission_fetch(mocker):
+        resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
 
     if missing_user:
@@ -447,18 +451,19 @@ def test_list_posts(
         }
 
 
-def test_list_posts_none(user_client, private_channel_and_contributor):
+def test_list_posts_none(mocker, user_client, private_channel_and_contributor):
     """List posts in a channel"""
     channel, _ = private_channel_and_contributor
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    resp = user_client.get(url)
+    with raise_error_on_submission_fetch(mocker):
+        resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {"posts": [], "pagination": {"sort": POSTS_SORT_HOT}}
 
 
 @pytest.mark.parametrize("sort", VALID_POST_SORT_TYPES)
 def test_list_posts_sorted(
-    user_client, private_channel_and_contributor, reddit_factories, sort
+    mocker, user_client, private_channel_and_contributor, reddit_factories, sort
 ):
     """View the channel listing with sorted options"""
     # note: these sort types are difficult to reproduce unique sort orders in the span of a test,
@@ -469,7 +474,8 @@ def test_list_posts_sorted(
     third_post = reddit_factories.text_post("my 3rd post", user, channel=channel)
     fourth_post = reddit_factories.text_post("my 4th post", user, channel=channel)
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    resp = user_client.get(url, {"sort": sort})
+    with raise_error_on_submission_fetch(mocker):
+        resp = user_client.get(url, {"sort": sort})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         "posts": [
@@ -481,7 +487,7 @@ def test_list_posts_sorted(
 
 
 def test_list_posts_stickied(
-    user_client, private_channel_and_contributor, reddit_factories, staff_api
+    mocker, user_client, private_channel_and_contributor, reddit_factories, staff_api
 ):
     """test that the stickied post is first"""
     channel, user = private_channel_and_contributor
@@ -492,7 +498,8 @@ def test_list_posts_stickied(
     post = posts[2]
     staff_api.pin_post(post.id, True)
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    resp = user_client.get(url)
+    with raise_error_on_submission_fetch(mocker):
+        resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["posts"][0] == {
         **default_post_response_data(channel, post, user),
@@ -515,7 +522,7 @@ def test_list_posts_not_found(client, logged_in_profile):
 
 
 def test_list_posts_pagination_first_page_no_params(
-    user_client, settings, private_channel_and_contributor, reddit_factories
+    mocker, user_client, settings, private_channel_and_contributor, reddit_factories
 ):
     """Test that post pagination works for the first page if no params"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
@@ -535,13 +542,14 @@ def test_list_posts_pagination_first_page_no_params(
         "sort": POSTS_SORT_HOT,
     }
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    resp = user_client.get(url, params)
+    with raise_error_on_submission_fetch(mocker):
+        resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["pagination"] == expected
 
 
 def test_list_posts_pagination_first_page_with_params(
-    user_client, settings, private_channel_and_contributor, reddit_factories
+    mocker, user_client, settings, private_channel_and_contributor, reddit_factories
 ):
     """Test that post pagination works for the first page with params"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
@@ -561,13 +569,14 @@ def test_list_posts_pagination_first_page_with_params(
         "sort": POSTS_SORT_HOT,
     }
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    resp = user_client.get(url, params)
+    with raise_error_on_submission_fetch(mocker):
+        resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["pagination"] == expected
 
 
 def test_list_posts_pagination_non_first_page(
-    user_client, settings, private_channel_and_contributor, reddit_factories
+    mocker, user_client, settings, private_channel_and_contributor, reddit_factories
 ):
     """Test that post pagination works for a page that's not the first one"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
@@ -589,13 +598,14 @@ def test_list_posts_pagination_non_first_page(
         "sort": POSTS_SORT_HOT,
     }
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    resp = user_client.get(url, params)
+    with raise_error_on_submission_fetch(mocker):
+        resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["pagination"] == expected
 
 
 def test_list_posts_pagination_non_offset_page(
-    user_client, settings, private_channel_and_contributor, reddit_factories
+    mocker, user_client, settings, private_channel_and_contributor, reddit_factories
 ):
     """Test that post pagination works for a page that doesn't align to the number of results"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
@@ -617,14 +627,15 @@ def test_list_posts_pagination_non_offset_page(
         "sort": POSTS_SORT_HOT,
     }
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    resp = user_client.get(url, params)
+    with raise_error_on_submission_fetch(mocker):
+        resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["pagination"] == expected
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
 def test_list_posts_anonymous(
-    client, public_channel, reddit_factories, settings, allow_anonymous
+    mocker, client, public_channel, reddit_factories, settings, allow_anonymous
 ):
     """Anonymous users can see posts for a public channel, if the feature flag is set"""
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
@@ -632,7 +643,8 @@ def test_list_posts_anonymous(
     post = reddit_factories.link_post("link_post", user=user, channel=public_channel)
 
     url = reverse("post-list", kwargs={"channel_name": public_channel.name})
-    resp = client.get(url)
+    with raise_error_on_submission_fetch(mocker):
+        resp = client.get(url)
     if allow_anonymous:
         assert resp.status_code == status.HTTP_200_OK
         assert resp.json() == {

@@ -5,7 +5,10 @@ from django.urls import reverse
 from rest_framework import status
 
 from channels.constants import POSTS_SORT_HOT, VALID_POST_SORT_TYPES
-from channels.views.test_utils import default_post_response_data
+from channels.views.test_utils import (
+    default_post_response_data,
+    raise_error_on_submission_fetch,
+)
 from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.features import ANONYMOUS_ACCESS
 
@@ -22,7 +25,7 @@ def test_frontpage_empty(client, logged_in_profile):
 
 @pytest.mark.parametrize("missing_user", [True, False])
 def test_frontpage(
-    user_client, private_channel_and_contributor, reddit_factories, missing_user
+    mocker, user_client, private_channel_and_contributor, reddit_factories, missing_user
 ):
     """View the front page"""
     channel, user = private_channel_and_contributor
@@ -32,7 +35,8 @@ def test_frontpage(
     fourth_post = reddit_factories.text_post("my 4th post", user, channel=channel)
 
     url = reverse("frontpage")
-    resp = user_client.get(url)
+    with raise_error_on_submission_fetch(mocker):
+        resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         "posts": [
@@ -45,7 +49,7 @@ def test_frontpage(
 
 @pytest.mark.parametrize("sort", VALID_POST_SORT_TYPES)
 def test_frontpage_sorted(
-    user_client, private_channel_and_contributor, reddit_factories, sort
+    mocker, user_client, private_channel_and_contributor, reddit_factories, sort
 ):
     """View the front page with sorted options"""
     # note: these sort types are difficult to reproduce unique sort orders in the span of a test,
@@ -57,7 +61,9 @@ def test_frontpage_sorted(
     fourth_post = reddit_factories.text_post("my 4th post", user, channel=channel)
 
     url = reverse("frontpage")
-    resp = user_client.get(url, {"sort": sort})
+
+    with raise_error_on_submission_fetch(mocker):
+        resp = user_client.get(url, {"sort": sort})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
         "posts": [
@@ -83,23 +89,27 @@ def test_frontpage_sorted(
         ({"before": "t3_e", "count": "6"}, {"after": "t3_3", "after_count": 5}),
     ],
 )
-def test_frontpage_pagination(client, logged_in_profile, settings, params, expected):
+def test_frontpage_pagination(
+    mocker, client, logged_in_profile, settings, params, expected
+):  # pylint: disable=too-many-arguments
     """Test that post pagination works"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
     url = reverse("frontpage")
-    resp = client.get(url, params)
+    with raise_error_on_submission_fetch(mocker):
+        resp = client.get(url, params)
     expected["sort"] = POSTS_SORT_HOT
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["pagination"] == expected
 
 
 @pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_frontpage_anonymous(client, public_channel, settings, allow_anonymous):
+def test_frontpage_anonymous(mocker, client, public_channel, settings, allow_anonymous):
     """Anonymous users should be able to see the front page"""
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
 
     url = reverse("frontpage")
-    resp = client.get(url)
+    with raise_error_on_submission_fetch(mocker):
+        resp = client.get(url)
     if allow_anonymous:
         assert resp.status_code == status.HTTP_200_OK
         assert resp.json()["pagination"] == {"sort": POSTS_SORT_HOT}

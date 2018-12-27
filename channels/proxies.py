@@ -53,7 +53,7 @@ class PostProxy(ObjectProxy):
     @property
     def article(self):
         """Return the Article for this post"""
-        return self._self_post.article
+        return self._self_post.article if hasattr(self._self_post, "article") else None
 
     @property
     def article_content(self):

@@ -114,3 +114,11 @@ def default_comment_response_data(post, comment, user):
         "text": comment.text,
         **user_dependent_defaults,
     }
+
+
+def raise_error_on_submission_fetch(mocker):
+    """Raise an error if Submission._fetch() is called"""
+    return mocker.patch(
+        "praw.models.reddit.submission.Submission._fetch",
+        side_effect=Exception("_fetch() should not be called"),
+    )

@@ -296,7 +296,7 @@ class BasePostSerializer(RedditObjectSerializer):
 
     def get_thumbnail(self, instance):
         """Returns a thumbnail url or null"""
-        if hasattr(instance, "article") and instance.article.cover_image_small:
+        if instance.article and instance.article.cover_image_small:
             return urljoin(SITE_BASE_URL, instance.article.cover_image_small.url)
         return instance.link_meta.thumbnail if instance.link_meta is not None else None
 
@@ -375,7 +375,7 @@ class PostSerializer(BasePostSerializer):
 
     def get_cover_image(self, instance):
         """Get the cover image URL"""
-        if hasattr(instance, "article") and instance.article.cover_image:
+        if instance.article and instance.article.cover_image:
             return urljoin(SITE_BASE_URL, instance.article.cover_image.url)
         return None
 
