@@ -110,7 +110,13 @@ describe("search functions", () => {
               bool: {
                 filter: {
                   bool: {
-                    must: [{ term: { object_type: objectType } }]
+                    must: ["comment", "post"].includes(objectType)
+                      ? [
+                        { term: { object_type: objectType } },
+                        { term: { deleted: false } },
+                        { term: { removed: false } }
+                      ]
+                      : [{ term: { object_type: objectType } }]
                   }
                 }
               }
@@ -147,7 +153,13 @@ describe("search functions", () => {
               bool: {
                 filter: {
                   bool: {
-                    must: [{ term: { object_type: objectType } }]
+                    must: ["comment", "post"].includes(objectType)
+                      ? [
+                        { term: { object_type: objectType } },
+                        { term: { deleted: false } },
+                        { term: { removed: false } }
+                      ]
+                      : [{ term: { object_type: objectType } }]
                   }
                 }
               }
@@ -166,7 +178,13 @@ describe("search functions", () => {
               bool: {
                 filter: {
                   bool: {
-                    must: [{ term: { object_type: objectType } }]
+                    must: ["comment", "post"].includes(objectType)
+                      ? [
+                        { term: { object_type: objectType } },
+                        { term: { deleted: false } },
+                        { term: { removed: false } }
+                      ]
+                      : [{ term: { object_type: objectType } }]
                   }
                 }
               }
