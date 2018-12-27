@@ -141,10 +141,7 @@ export class CompactPostDisplay extends React.Component<Props> {
                   </div>
                   {post.thumbnail ? (
                     <a
-                      href={
-                        post.url ||
-                        postDetailURL(post.channel_name, post.id, post.slug)
-                      }
+                      href={post.url}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

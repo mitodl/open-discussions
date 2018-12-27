@@ -14,7 +14,7 @@ from channels.constants import ROLE_CHOICES, VALID_EXTENDED_POST_CHOICES
 from channels.utils import (
     AVATAR_MEDIUM_MAX_DIMENSION,
     AVATAR_SMALL_MAX_DIMENSION,
-    COVER_IMAGE_THUMBNAIL_DIMENSIONS,
+    THUMBNAIL_DIMENSIONS,
 )
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
@@ -227,7 +227,7 @@ class Article(TimestampedModel):
         if update_image:
             if self.cover_image:
                 small_thumbnail = make_cropped_thumbnail(
-                    self.cover_image, COVER_IMAGE_THUMBNAIL_DIMENSIONS
+                    self.cover_image, THUMBNAIL_DIMENSIONS.x, THUMBNAIL_DIMENSIONS.y
                 )
 
                 # name doesn't matter here, we use upload_to to produce that

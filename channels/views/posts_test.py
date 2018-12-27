@@ -11,11 +11,16 @@ from profiles.utils import image_uri
 from channels.factories import LinkMetaFactory
 from channels.constants import VALID_POST_SORT_TYPES, POSTS_SORT_HOT
 from channels.models import Subscription, LinkMeta, Article
+<<<<<<< HEAD
 from channels.utils import COVER_IMAGE_THUMBNAIL_DIMENSIONS
 from channels.views.test_utils import (
     default_post_response_data,
     raise_error_on_submission_fetch,
 )
+=======
+from channels.utils import THUMBNAIL_DIMENSIONS
+from channels.views.test_utils import default_post_response_data
+>>>>>>> Improvements based on code review
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
     PERMISSION_DENIED_ERROR_TYPE,
@@ -223,10 +228,10 @@ def test_create_article_post_with_cover(user_client, private_channel_and_contrib
     assert resp.json()["cover_image"].endswith(article.cover_image.url)
     assert resp.json()["thumbnail"].endswith(article.cover_image_small.url)
     assert len(article.cover_image.read()) == os.path.getsize(png_file)
-    assert (
-        article.cover_image_small.width,
-        article.cover_image_small.height,
-    ) == COVER_IMAGE_THUMBNAIL_DIMENSIONS
+    assert (article.cover_image_small.width, article.cover_image_small.height) == (
+        THUMBNAIL_DIMENSIONS.x,
+        THUMBNAIL_DIMENSIONS.y,
+    )
 
 
 def test_patch_article_validate_cover_image(
@@ -731,7 +736,12 @@ def test_update_article_cover(
     post = reddit_factories.article_post("post", user=user, channel=channel)
     url = reverse("post-detail", kwargs={"post_id": post.id})
     png_file = os.path.join(
-        os.path.dirname(__file__), "..", "..", "static", "images", "avatar_default.png"
+        os.path.dirname(__file__),
+        "..",
+        "..",
+        "static",
+        "images",
+        "mit-logo-micromasters.jpg",
     )
     with open(png_file, "rb") as f:
         resp = user_client.patch(url, {"cover_image": f}, format="multipart")
@@ -740,10 +750,9 @@ def test_update_article_cover(
     assert len(article.cover_image.read()) == os.path.getsize(png_file)
     assert "small" in article.cover_image_small.name
     assert len(article.cover_image_small.read()) > 0
-    assert (
-        article.cover_image_small.width,
-        article.cover_image_small.height,
-    ) == COVER_IMAGE_THUMBNAIL_DIMENSIONS
+    assert "{0:0.1f}".format(
+        article.cover_image_small.height / article.cover_image_small.width
+    ) == "{0:0.1f}".format(THUMBNAIL_DIMENSIONS.y / THUMBNAIL_DIMENSIONS.x)
 
 
 class PostDetailTests:
