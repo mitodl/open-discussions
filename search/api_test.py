@@ -1,38 +1,18 @@
 """Search API function tests"""
-from types import SimpleNamespace
-
 from django.contrib.auth.models import AnonymousUser
 import pytest
 
-from channels.constants import (
-    CHANNEL_TYPE_PUBLIC,
-    CHANNEL_TYPE_RESTRICTED,
-    COMMENT_TYPE,
-    POST_TYPE,
-)
+from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.api import add_user_role
 from channels.factories import ChannelFactory
 from search.api import (
     execute_search,
-    get_reddit_object_type,
     is_reddit_object_removed,
     gen_post_id,
     gen_comment_id,
 )
 from search.connection import get_default_alias_name
 from search.constants import ALIAS_ALL_INDICES
-
-
-@pytest.mark.parametrize(
-    "reddit_obj,expected_type",
-    [
-        (SimpleNamespace(id=1), POST_TYPE),
-        (SimpleNamespace(id=1, submission={}), COMMENT_TYPE),
-    ],
-)
-def test_get_reddit_object_type(reddit_obj, expected_type):
-    """Test that get_reddit_object_type returns the right object types"""
-    assert get_reddit_object_type(reddit_obj) == expected_type
 
 
 def test_gen_post_id():

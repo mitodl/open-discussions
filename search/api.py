@@ -14,20 +14,6 @@ from search.connection import get_conn, get_default_alias_name
 from search.constants import ALIAS_ALL_INDICES
 
 
-def get_reddit_object_type(reddit_obj):
-    """
-    Return the type of the given reddit object
-
-    Args:
-        reddit_obj (praw.models.reddit.submission.Submission, praw.models.reddit.comment.Comment):
-            A PRAW post/'submission' or comment object
-
-    Returns:
-        str: A string constant indicating the object type
-    """
-    return COMMENT_TYPE if hasattr(reddit_obj, "submission") else POST_TYPE
-
-
 def gen_post_id(reddit_obj_id):
     """
     Generates the Elasticsearch document id for a post

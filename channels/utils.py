@@ -289,3 +289,38 @@ def num_items_not_none(items):
     """
 
     return len(list(filter(lambda val: val is not None, items)))
+
+
+def _render_article_nodes(node):
+    """
+    Render article nodes into pieces of text
+
+    Args:
+        node (list or dict): A node in the article content
+
+    Yields:
+        str: A string containing text from the article nodes
+    """
+    if isinstance(node, list):
+        for item in node:
+            yield from _render_article_nodes(item)
+    elif isinstance(node, dict):
+        if "text" in node:
+            yield node["text"]
+        if "children" in node:
+            yield from _render_article_nodes(node["children"])
+        if node.get("name") == "p":
+            yield " "
+
+
+def render_article_text(content):
+    """
+    Render article text based on the article content data structure
+
+    Args:
+        content (list or dict): The article content
+
+    Returns:
+         str: A string containing the text from the text nodes of the article
+    """
+    return "".join(_render_article_nodes(content))
