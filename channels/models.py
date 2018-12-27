@@ -14,7 +14,7 @@ from channels.constants import ROLE_CHOICES, VALID_EXTENDED_POST_CHOICES
 from channels.utils import (
     AVATAR_MEDIUM_MAX_DIMENSION,
     AVATAR_SMALL_MAX_DIMENSION,
-    COVER_IMAGE_THUMBNAIL_DIMENSION,
+    COVER_IMAGE_THUMBNAIL_DIMENSIONS,
 )
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
@@ -25,6 +25,7 @@ from profiles.utils import (
     make_thumbnail,
     article_image_uri,
     article_image_uri_small,
+    make_cropped_thumbnail,
 )
 
 
@@ -225,8 +226,8 @@ class Article(TimestampedModel):
     ):  # pylint: disable=arguments-differ
         if update_image:
             if self.cover_image:
-                small_thumbnail = make_thumbnail(
-                    self.cover_image, COVER_IMAGE_THUMBNAIL_DIMENSION
+                small_thumbnail = make_cropped_thumbnail(
+                    self.cover_image, COVER_IMAGE_THUMBNAIL_DIMENSIONS
                 )
 
                 # name doesn't matter here, we use upload_to to produce that

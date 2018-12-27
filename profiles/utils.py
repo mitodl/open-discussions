@@ -263,6 +263,42 @@ def make_thumbnail(full_size_image, max_dimension):
     return buffer
 
 
+def make_cropped_thumbnail(full_size_image, max_dimensions):
+    """
+    Make a cropped thumbnail of the image
+
+    Args:
+        full_size_image (file):
+            A file-like object containing an image. This file will seek back to the beginning after being read.
+        max_dimensions (int, int):
+            The max width and height for the thumbnail
+    Returns:
+        BytesIO:
+            A jpeg image which is a thumbnail of full_size_image
+    """
+    pil_image = Image.open(full_size_image)
+    x, y = max_dimensions
+    if pil_image.height / pil_image.width < y / x:
+        # crop width
+        adjust = int((pil_image.width - (pil_image.height / (y / x))) / 2)
+        pil_image = pil_image.crop(
+            box=(adjust, 0, pil_image.width - adjust, pil_image.height)
+        )
+    elif pil_image.height / pil_image.width > y / x:
+        # crop height
+        adjust = int((pil_image.height - (pil_image.width * y / x)) / 2)
+        pil_image = pil_image.crop(
+            box=(0, adjust, pil_image.width, pil_image.height - adjust)
+        )
+    pil_image.thumbnail(
+        shrink_dimensions(pil_image.width, pil_image.height, x), Image.ANTIALIAS
+    )
+    buffer = BytesIO()
+    pil_image.convert("RGB").save(buffer, "JPEG", quality=90)
+    buffer.seek(0)
+    return buffer
+
+
 def update_full_name(user, name):
     """
     Update the first and last names of a user.

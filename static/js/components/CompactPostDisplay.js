@@ -122,28 +122,45 @@ export class CompactPostDisplay extends React.Component<Props> {
               </div>
             </div>
           </div>
-          {post.url ? (
+          {post.url || post.thumbnail ? (
             <div
               className={`column2 ${post.thumbnail ? "link-thumbnail" : ""}`}
             >
-              <div className="top-right">
-                <a href={post.url} target="_blank" rel="noopener noreferrer">
-                  <i className="material-icons open_in_new top-right overlay-icon">
-                    open_in_new
-                  </i>
-                </a>
-              </div>
-              {post.thumbnail ? (
-                <a href={post.url} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src={embedlyThumbnail(
-                      SETTINGS.embedlyKey,
-                      post.thumbnail,
-                      103,
-                      201
-                    )}
-                  />
-                </a>
+              {post.url ? (
+                <React.Fragment>
+                  <div className="top-right">
+                    <a
+                      href={post.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className="material-icons open_in_new top-right overlay-icon">
+                        open_in_new
+                      </i>
+                    </a>
+                  </div>
+                  {post.thumbnail ? (
+                    <a
+                      href={
+                        post.url ||
+                        postDetailURL(post.channel_name, post.id, post.slug)
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={embedlyThumbnail(
+                          SETTINGS.embedlyKey,
+                          post.thumbnail,
+                          103,
+                          201
+                        )}
+                      />
+                    </a>
+                  ) : null}
+                </React.Fragment>
+              ) : post.thumbnail ? (
+                <img src={post.thumbnail} />
               ) : null}
             </div>
           ) : null}
