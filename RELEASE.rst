@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.59.0
+Version 0.59.0 (Released December 27, 2018)
 --------------
 
 - Fixed performance issues around proxies and DB queries
