@@ -11,16 +11,11 @@ from profiles.utils import image_uri
 from channels.factories import LinkMetaFactory
 from channels.constants import VALID_POST_SORT_TYPES, POSTS_SORT_HOT
 from channels.models import Subscription, LinkMeta, Article
-<<<<<<< HEAD
-from channels.utils import COVER_IMAGE_THUMBNAIL_DIMENSIONS
+from channels.utils import THUMBNAIL_DIMENSIONS
 from channels.views.test_utils import (
     default_post_response_data,
     raise_error_on_submission_fetch,
 )
-=======
-from channels.utils import THUMBNAIL_DIMENSIONS
-from channels.views.test_utils import default_post_response_data
->>>>>>> Improvements based on code review
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
     PERMISSION_DENIED_ERROR_TYPE,
