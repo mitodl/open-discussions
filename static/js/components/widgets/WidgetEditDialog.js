@@ -66,7 +66,7 @@ export default class WidgetEditDialog extends React.Component<Props> {
     )
   }
 
-  renderConfiguration = () => {
+  renderWidgetInputs = () => {
     const { specs, dialogData } = this.props
 
     const validation = dialogData ? dialogData.validation : {}
@@ -165,7 +165,7 @@ export default class WidgetEditDialog extends React.Component<Props> {
       >
         {dialogData.state === DIALOG_EDIT_WIDGET_SELECT_TYPE
           ? this.renderSelectWidgetType()
-          : this.renderConfiguration()}
+          : this.renderWidgetInputs()}
       </Dialog>
     )
   }
