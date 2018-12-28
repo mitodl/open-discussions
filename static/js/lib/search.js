@@ -156,21 +156,6 @@ export const buildSearchQuery = ({
       ]
       : []
 
-    const contentClauses = ["comment", "post"].includes(type)
-      ? [
-        {
-          term: {
-            deleted: false
-          }
-        },
-        {
-          term: {
-            removed: false
-          }
-        }
-      ]
-      : []
-
     builder = builder.orQuery("bool", {
       filter: {
         bool: {
@@ -180,8 +165,7 @@ export const buildSearchQuery = ({
                 object_type: type
               }
             },
-            ...channelClauses,
-            ...contentClauses
+            ...channelClauses
           ]
         }
       },
