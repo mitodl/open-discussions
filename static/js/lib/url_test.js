@@ -25,14 +25,27 @@ import {
   absolutizeURL,
   getNextParam,
   channelSearchURL,
-  siteSearchURL
+  siteSearchURL,
+  channelAboutURL
 } from "./url"
 import { makePost } from "../factories/posts"
 
 describe("url helper functions", () => {
-  describe("channelURL", () => {
-    it("should return a good URL", () => {
-      assert.equal(channelURL("foobar"), "/c/foobar")
+  describe("channel url functions", () => {
+    describe("channelURL", () => {
+      it("should return a good URL", () => {
+        assert.equal(channelURL("foobar"), "/c/foobar")
+      })
+    })
+
+    it("should return the channel search URL", () => {
+      const channelName = "name"
+      assert.equal(channelSearchURL(channelName), `/c/${channelName}/search/`)
+    })
+
+    it("should return the about channel URL", () => {
+      const channelName = "name"
+      assert.equal(channelAboutURL(channelName), `/c/${channelName}/about/`)
     })
   })
 
@@ -277,13 +290,6 @@ describe("url helper functions", () => {
     it("should return the next param when present", () => {
       const next = "/next/url"
       assert.equal(getNextParam(`?next=${encodeURIComponent(next)}`), next)
-    })
-  })
-
-  describe("search", () => {
-    it("should return the channel search URL", () => {
-      const channelName = "name"
-      assert.equal(channelSearchURL(channelName), `/c/${channelName}/search/`)
     })
   })
 })

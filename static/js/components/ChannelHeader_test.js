@@ -3,18 +3,25 @@
 import React from "react"
 import { shallow } from "enzyme"
 import { assert } from "chai"
+import sinon from "sinon"
 
 import ChannelHeader from "./ChannelHeader"
 
 import { makeChannel } from "../factories/channels"
 import { channelURL } from "../lib/url"
+import * as utilFuncs from "../lib/util"
 
 describe("ChannelHeader", () => {
-  let channel, history
+  let channel, history, sandbox
 
   beforeEach(() => {
     channel = makeChannel()
     history = { some: "history" }
+    sandbox = sinon.createSandbox()
+  })
+
+  afterEach(() => {
+    sandbox.restore()
   })
 
   const render = (props = {}) =>
@@ -68,6 +75,18 @@ describe("ChannelHeader", () => {
           channel
         })
       }
+    })
+  })
+  ;[true, false].forEach(isMobileWidth => {
+    it(`${
+      isMobileWidth ? "shows" : "doesn't show"
+    } the link to the about tab`, () => {
+      const isMobileWidthStub = sandbox
+        .stub(utilFuncs, "isMobileWidth")
+        .returns(isMobileWidth)
+      const wrapper = render()
+      assert.equal(wrapper.find(".about-link").exists(), isMobileWidth)
+      sinon.assert.calledWith(isMobileWidthStub)
     })
   })
   ;[true, false].forEach(allowSearch => {

@@ -11,7 +11,8 @@ import ChannelAvatar, {
 import IntraPageNav from "./IntraPageNav"
 import ChannelSettingsLink from "../containers/ChannelSettingsLink"
 
-import { channelURL, channelSearchURL } from "../lib/url"
+import { channelURL, channelSearchURL, channelAboutURL } from "../lib/url"
+import { isMobileWidth } from "../lib/util"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -62,6 +63,16 @@ export default class ChannelHeader extends React.Component<Props> {
                   >
                     Home
                   </NavLink>
+                  {isMobileWidth() ? (
+                    <NavLink
+                      exact
+                      to={channelAboutURL(channel.name)}
+                      activeClassName="active"
+                      className="about-link"
+                    >
+                      About
+                    </NavLink>
+                  ) : null}
                   {SETTINGS.allow_search ? (
                     <NavLink
                       exact

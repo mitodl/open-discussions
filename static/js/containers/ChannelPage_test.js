@@ -16,6 +16,7 @@ import { SET_CHANNEL_DATA } from "../actions/channel"
 import { EVICT_POSTS_FOR_CHANNEL } from "../actions/posts_for_channel"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { channelURL } from "../lib/url"
+import * as utilFuncs from "../lib/util"
 import { formatTitle } from "../lib/title"
 import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/picker"
 import { makeReportRecord } from "../factories/reports"
@@ -278,6 +279,41 @@ describe("ChannelPage", () => {
     assert.deepEqual(store.getActions()[store.getActions().length - 1], {
       type:    SET_POST_DATA,
       payload: postList
+    })
+  })
+
+  describe("mobile", () => {
+    let isMobileStub
+
+    beforeEach(() => {
+      isMobileStub = helper.sandbox.stub(utilFuncs, "isMobileWidth")
+    })
+    ;[
+      [false, false, true, true],
+      [false, true, true, true],
+      [true, false, true, false],
+      [true, true, false, true]
+    ].forEach(([isMobile, isAbout, expectedPosts, expectedSidebar]) => {
+      it(`has posts and/or sidebar on the ${
+        isAbout ? "about channel" : "channel"
+      } page in ${isMobile ? "mobile" : "desktop"} view`, async () => {
+        isMobileStub.returns(isMobile)
+        const { inner } = await render(
+          {},
+          {
+            match: {
+              path:   isAbout ? "/c/:channelName/about/" : "/c/:channelName/",
+              params: {
+                channelName: currentChannel.name
+              }
+            }
+          }
+        )
+
+        assert.equal(inner.find("ChannelSidebar").exists(), expectedSidebar)
+        assert.equal(inner.find("PostList").exists(), expectedPosts)
+        sinon.assert.calledWith(isMobileStub)
+      })
     })
   })
 })
