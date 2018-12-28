@@ -1,5 +1,6 @@
 // @flow
 import React from "react"
+import R from "ramda"
 
 import type { WidgetFieldSpec } from "../../flow/widgetTypes"
 
@@ -10,7 +11,7 @@ type Props = {
 }
 
 const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
-  const valueOrDefault = value !== undefined ? value : fieldSpec.props.default
+  const valueOrDefault = R.defaultTo(fieldSpec.props.default, value)
   switch (fieldSpec.input_type) {
   case "textarea":
     return (
