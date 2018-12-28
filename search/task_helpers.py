@@ -5,9 +5,11 @@ import logging
 from functools import wraps, partial
 
 from django.conf import settings
+from django.core.cache import caches
 
 from open_discussions.features import INDEX_UPDATES, if_feature_enabled
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
+from profiles.api import get_channels
 
 from search.api import (
     gen_post_id,
@@ -193,7 +195,9 @@ def update_author(user_obj):
     if user_obj.username != settings.INDEXING_API_USERNAME:
         profile_data = ESProfileSerializer().serialize(user_obj.profile)
         profile_data.pop("author_id", None)
-        update_fields_by_username(user_obj.username, profile_data, [PROFILE_TYPE])
+        update_document_with_partial.delay(
+            gen_profile_id(user_obj.username), profile_data, PROFILE_TYPE
+        )
 
 
 @if_feature_enabled(INDEX_UPDATES)
