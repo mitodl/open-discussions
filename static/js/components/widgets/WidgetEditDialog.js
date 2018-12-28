@@ -52,7 +52,6 @@ export default class WidgetEditDialog extends React.Component<Props> {
     const validation = dialogData ? dialogData.validation : {}
     return (
       <React.Fragment>
-        {validationMessage(validation.widget_type)}
         <Radio
           className="radio"
           value={this.getValue(widgetTypeLens)}
@@ -62,6 +61,7 @@ export default class WidgetEditDialog extends React.Component<Props> {
             value: spec.widget_type
           }))}
         />
+        {validationMessage(validation.widget_type)}
       </React.Fragment>
     )
   }
@@ -76,7 +76,6 @@ export default class WidgetEditDialog extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        {validationMessage(validation.title)}
         <label className="widget-title-field">
           Widget title
           <input
@@ -85,6 +84,7 @@ export default class WidgetEditDialog extends React.Component<Props> {
             onChange={this.updateValue(titleLens)}
           />
         </label>
+        {validationMessage(validation.title)}
         {spec.form_spec.map(fieldSpec => {
           const lens = R.lensPath(["configuration", [fieldSpec.field_name]])
           return (
