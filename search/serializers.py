@@ -7,7 +7,8 @@ from prawcore import NotFound
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Post
-from channels.serializers import BasePostSerializer, BaseCommentSerializer
+from channels.serializers.posts import BasePostSerializer
+from channels.serializers.comments import BaseCommentSerializer
 from channels.utils import get_reddit_slug
 from profiles.api import get_channels
 from profiles.models import Profile

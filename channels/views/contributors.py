@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from channels.api import Api
-from channels.serializers import ContributorSerializer
+from channels.serializers.contributors import ContributorSerializer
 from open_discussions.permissions import ContributorPermissions
 
 

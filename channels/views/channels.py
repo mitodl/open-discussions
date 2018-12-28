@@ -7,7 +7,7 @@ from rest_framework import status
 
 from channels.api import Api
 from channels.models import Channel
-from channels.serializers import ChannelSerializer
+from channels.serializers.channels import ChannelSerializer
 from channels.utils import translate_praw_exceptions
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,

@@ -6,7 +6,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from channels.api import Api
-from channels.serializers import ModeratorPrivateSerializer, ModeratorPublicSerializer
+from channels.serializers.moderators import (
+    ModeratorPrivateSerializer,
+    ModeratorPublicSerializer,
+)
 from channels.utils import translate_praw_exceptions
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,

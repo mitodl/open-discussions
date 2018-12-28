@@ -4,8 +4,9 @@ from datetime import datetime
 from django.conf import settings
 import pytz
 
-from channels import api, serializers
+from channels import api
 from channels.proxies import proxy_posts
+from channels.serializers import posts as post_serializers
 from channels.utils import ListingParams
 from notifications.models import FREQUENCY_DAILY, FREQUENCY_WEEKLY
 from notifications.notifiers.email import EmailNotifier
@@ -141,7 +142,7 @@ class FrontpageDigestNotifier(EmailNotifier):
 
         return {
             "posts": [
-                serializers.PostSerializer(
+                post_serializers.PostSerializer(
                     post, context={"current_user": self.user}
                 ).data
                 for post in posts

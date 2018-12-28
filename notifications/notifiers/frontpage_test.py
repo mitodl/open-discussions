@@ -117,7 +117,7 @@ def test_send_notification(mocker, user):
     notifier = frontpage.FrontpageDigestNotifier(ns)
     post = PostFactory.create()
     send_messages_mock = mocker.patch("mail.api.send_messages")
-    serializer_mock = mocker.patch("channels.serializers.PostSerializer")
+    serializer_mock = mocker.patch("channels.serializers.posts.PostSerializer")
     serializer_mock.return_value.data = {
         "id": post.post_id,
         "title": "post's title",
@@ -150,7 +150,7 @@ def test_send_notification_no_posts(mocker):
     ns = NotificationSettingsFactory.create(via_email=True, weekly=True)
     notifier = frontpage.FrontpageDigestNotifier(ns)
     send_messages_mock = mocker.patch("mail.api.send_messages")
-    serializer_mock = mocker.patch("channels.serializers.PostSerializer")
+    serializer_mock = mocker.patch("channels.serializers.posts.PostSerializer")
     api_mock = mocker.patch("channels.api.Api")
     api_mock.return_value.front_page.return_value = []
     note = EmailNotificationFactory.create(

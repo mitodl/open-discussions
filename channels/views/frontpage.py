@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 
 from channels.api import Api
 from channels.proxies import proxy_posts
-from channels.serializers import PostSerializer
+from channels.serializers.posts import PostSerializer
 from channels.utils import (
     get_pagination_and_posts,
     get_listing_params,

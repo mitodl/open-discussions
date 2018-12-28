@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 
 from channels.api import Api
 from channels.constants import COMMENTS_SORT_BEST
-from channels.serializers import CommentSerializer, GenericCommentSerializer
+from channels.serializers.comments import CommentSerializer, GenericCommentSerializer
 from channels.utils import translate_praw_exceptions, lookup_subscriptions_for_comments
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 

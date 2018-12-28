@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from open_discussions.permissions import IsStaffOrModeratorPermission
 from channels.api import Api
-from channels.serializers import ReportSerializer, ReportedContentSerializer
+from channels.serializers.reports import ReportSerializer, ReportedContentSerializer
 from channels.utils import translate_praw_exceptions
 
 

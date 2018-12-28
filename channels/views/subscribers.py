@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from channels.api import Api
 from channels.models import Channel, ChannelSubscription
-from channels.serializers import SubscriberSerializer
+from channels.serializers.subscribers import SubscriberSerializer
 from open_discussions.permissions import (
     IsStaffOrReadonlyPermission,
     IsStaffModeratorOrReadonlyPermission,

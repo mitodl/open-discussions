@@ -4,7 +4,8 @@ from praw.models import Comment
 
 from channels import api
 from channels.proxies import proxy_post
-from channels.serializers import CommentSerializer, PostSerializer
+from channels.serializers.comments import CommentSerializer
+from channels.serializers.posts import PostSerializer
 from notifications.models import CommentEvent
 from notifications.notifiers.email import EmailNotifier
 from notifications.utils import praw_error_to_cancelled
