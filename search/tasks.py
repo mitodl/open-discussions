@@ -62,9 +62,13 @@ def create_document(doc_id, data):
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
-def update_document_with_partial(doc_id, partial_data, object_type):
+def update_document_with_partial(
+    doc_id, partial_data, object_type, retry_on_conflict=0
+):
     """Task that makes a request to update an ES document with a partial document"""
-    return api.update_document_with_partial(doc_id, partial_data, object_type)
+    return api.update_document_with_partial(
+        doc_id, partial_data, object_type, retry_on_conflict=retry_on_conflict
+    )
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)

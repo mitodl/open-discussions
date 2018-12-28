@@ -191,7 +191,9 @@ def update_field_values_by_query(query, field_dict, object_types=None):
             )
 
 
-def _update_document_by_id(doc_id, data, object_type, update_key=None):
+def _update_document_by_id(
+    doc_id, data, object_type, update_key=None, retry_on_conflict=0
+):
     """
     Makes a request to ES to update an existing document
 
@@ -201,6 +203,7 @@ def _update_document_by_id(doc_id, data, object_type, update_key=None):
         object_type (str): The object type to update (post, comment, etc)
         update_key (str): A key indicating the type of update request to Elasticsearch
             (e.g.: 'script', 'doc')
+        retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
     """
     conn = get_conn(verify=True)
     for alias in get_active_aliases([object_type]):
@@ -210,6 +213,7 @@ def _update_document_by_id(doc_id, data, object_type, update_key=None):
                 doc_type=GLOBAL_DOC_TYPE,
                 body={update_key: data},
                 id=doc_id,
+                params={"retry_on_conflict": retry_on_conflict},
             )
         # Our policy for document update-related version conflicts right now is to log them
         # and allow the app to continue as normal.
