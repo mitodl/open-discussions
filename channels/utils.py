@@ -19,7 +19,9 @@ from embedly.api import get_embedly, THUMBNAIL_URL
 AVATAR_SMALL_MAX_DIMENSION = 22
 AVATAR_MEDIUM_MAX_DIMENSION = 90
 
-COVER_IMAGE_THUMBNAIL_DIMENSION = 201
+ImageSize = namedtuple("ImageSize", ["x", "y"])
+
+THUMBNAIL_DIMENSIONS = ImageSize(201, 103)
 
 User = get_user_model()
 

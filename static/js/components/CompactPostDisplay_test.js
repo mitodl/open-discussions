@@ -136,6 +136,14 @@ describe("CompactPostDisplay", () => {
     assert.equal(target, "_blank")
   })
 
+  it("should include a local image, if an article post with thumbnail", () => {
+    post.article_content = [{ a: "b" }]
+    post.thumbnail = "/static/media/img.jpg"
+    const wrapper = renderPostDisplay({ post })
+    const { src } = wrapper.find("img").props()
+    assert.equal(src, "/static/media/img.jpg")
+  })
+
   it("should set a class and show icon if stickied and showing pin ui", () => {
     [[true, true], [true, false], [false, true], [false, false]].forEach(
       ([showPinUI, stickied]) => {
