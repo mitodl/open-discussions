@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.59.1
+Version 0.59.1 (Released December 28, 2018)
 --------------
 
 - Fix other calls to fetch()
