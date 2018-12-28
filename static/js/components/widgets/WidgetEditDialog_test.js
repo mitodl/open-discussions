@@ -5,13 +5,13 @@ import { assert } from "chai"
 import sinon from "sinon"
 import casual from "casual-browserify"
 
-import WidgetEditDialog from "./WidgetEditDialog"
+import WidgetEditDialog, {
+  WIDGET_CREATE,
+  WIDGET_EDIT,
+  WIDGET_TYPE_SELECT
+} from "./WidgetEditDialog"
 import * as validationFuncs from "../../lib/validation"
 
-import {
-  DIALOG_EDIT_WIDGET_CONFIGURATION,
-  DIALOG_EDIT_WIDGET_SELECT_TYPE
-} from "../../actions/ui"
 import {
   makeFieldSpec,
   makeWidgetInstance,
@@ -37,8 +37,7 @@ describe("WidgetEditDialog", () => {
 
     dialogData = {
       instance:   makeWidgetInstance(),
-      isEditing:  false,
-      state:      DIALOG_EDIT_WIDGET_SELECT_TYPE,
+      state:      WIDGET_TYPE_SELECT,
       validation: {}
     }
     specs = makeWidgetListResponse().available_widgets
@@ -75,17 +74,13 @@ describe("WidgetEditDialog", () => {
     })
   })
   ;[
-    [true, DIALOG_EDIT_WIDGET_SELECT_TYPE, "Select widget", "Next"],
-    [false, DIALOG_EDIT_WIDGET_SELECT_TYPE, "Select widget", "Next"],
-    [true, DIALOG_EDIT_WIDGET_CONFIGURATION, "Edit widget", "Update widget"],
-    [false, DIALOG_EDIT_WIDGET_CONFIGURATION, "Add widget", "Create widget"]
-  ].forEach(([isEditing, state, expectedTitle, expectedSubmitText]) => {
-    it(`sets the title and submit text based on isEditing=${String(
-      isEditing
-    )} and state=${state}`, () => {
+    [WIDGET_TYPE_SELECT, "Select widget", "Next"],
+    [WIDGET_EDIT, "Edit widget", "Update widget"],
+    [WIDGET_CREATE, "Add widget", "Create widget"]
+  ].forEach(([state, expectedTitle, expectedSubmitText]) => {
+    it(`sets the title and submit text based on isEditing=${String()} and state=${state}`, () => {
       dialogData = {
         ...dialogData,
-        isEditing,
         state
       }
       const wrapper = render()
@@ -107,8 +102,7 @@ describe("WidgetEditDialog", () => {
     beforeEach(() => {
       dialogData = {
         ...dialogData,
-        state:     DIALOG_EDIT_WIDGET_SELECT_TYPE,
-        isEditing: false
+        state: WIDGET_TYPE_SELECT
       }
     })
 
@@ -130,7 +124,7 @@ describe("WidgetEditDialog", () => {
       wrapper.prop("onAccept")()
       sinon.assert.calledWith(setDialogDataStub, {
         ...dialogData,
-        state: DIALOG_EDIT_WIDGET_CONFIGURATION
+        state: WIDGET_CREATE
       })
       assert.equal(updateFormStub.callCount, 0)
       assert.equal(setDialogVisibilityStub.callCount, 0)
@@ -178,8 +172,7 @@ describe("WidgetEditDialog", () => {
     beforeEach(() => {
       dialogData = {
         ...dialogData,
-        state:     DIALOG_EDIT_WIDGET_CONFIGURATION,
-        isEditing: true
+        state: WIDGET_EDIT
       }
     })
 

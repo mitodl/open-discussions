@@ -4,7 +4,7 @@ import React from "react"
 import R from "ramda"
 import isURL from "validator/lib/isURL"
 
-import { DIALOG_EDIT_WIDGET_SELECT_TYPE } from "../actions/ui"
+import { WIDGET_TYPE_SELECT } from "../components/widgets/WidgetEditDialog"
 import { S } from "./sanctuary"
 import { LINK_TYPE_LINK, LINK_TYPE_ARTICLE } from "../lib/channels"
 import { emptyOrNil } from "../lib/util"
@@ -292,6 +292,6 @@ const validateWidgetDialogConfiguration = validate([
 ])
 
 export const validateWidgetDialog = (data: WidgetDialogData) =>
-  data.state === DIALOG_EDIT_WIDGET_SELECT_TYPE
+  data.state === WIDGET_TYPE_SELECT
     ? validateWidgetDialogType(data.instance)
     : validateWidgetDialogConfiguration(data.instance)

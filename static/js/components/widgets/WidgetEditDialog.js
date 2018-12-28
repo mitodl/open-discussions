@@ -6,10 +6,6 @@ import { Radio } from "@mitodl/mdl-react-components"
 import Dialog from "../Dialog"
 import WidgetField from "./WidgetField"
 
-import {
-  DIALOG_EDIT_WIDGET_SELECT_TYPE,
-  DIALOG_EDIT_WIDGET_CONFIGURATION
-} from "../../actions/ui"
 import { validateWidgetDialog, validationMessage } from "../../lib/validation"
 
 import type { WidgetDialogData, WidgetSpec } from "../../flow/widgetTypes"
@@ -25,6 +21,10 @@ type Props = {
 
 const titleLens = R.lensPath(["title"])
 const widgetTypeLens = R.lensPath(["widget_type"])
+export const WIDGET_TYPE_SELECT = "WIDGET_TYPE_SELECT"
+export const WIDGET_EDIT = "WIDGET_EDIT"
+export const WIDGET_CREATE = "WIDGET_CREATE"
+
 export default class WidgetEditDialog extends React.Component<Props> {
   updateValue = R.curry((lens: any, event: any) => {
     const { setDialogData, dialogData } = this.props
@@ -123,10 +123,10 @@ export default class WidgetEditDialog extends React.Component<Props> {
       return
     }
 
-    if (dialogData.state === DIALOG_EDIT_WIDGET_SELECT_TYPE) {
+    if (dialogData.state === WIDGET_TYPE_SELECT) {
       setDialogData({
         ...dialogData,
-        state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+        state:      WIDGET_CREATE,
         validation: {}
       })
       return
@@ -142,18 +142,19 @@ export default class WidgetEditDialog extends React.Component<Props> {
       return null
     }
 
-    const title =
-      dialogData.state === DIALOG_EDIT_WIDGET_SELECT_TYPE
-        ? "Select widget"
-        : dialogData.isEditing
-          ? "Edit widget"
-          : "Add widget"
-    const submitText =
-      dialogData.state === DIALOG_EDIT_WIDGET_SELECT_TYPE
-        ? "Next"
-        : dialogData.isEditing
-          ? "Update widget"
-          : "Create widget"
+    let title = "",
+      submitText = ""
+
+    if (dialogData.state === WIDGET_TYPE_SELECT) {
+      title = "Select widget"
+      submitText = "Next"
+    } else if (dialogData.state === WIDGET_EDIT) {
+      title = "Edit widget"
+      submitText = "Update widget"
+    } else if (dialogData.state === WIDGET_CREATE) {
+      title = "Add widget"
+      submitText = "Create widget"
+    }
 
     return (
       <Dialog
@@ -163,7 +164,7 @@ export default class WidgetEditDialog extends React.Component<Props> {
         title={title}
         submitText={submitText}
       >
-        {dialogData.state === DIALOG_EDIT_WIDGET_SELECT_TYPE
+        {dialogData.state === WIDGET_TYPE_SELECT
           ? this.renderSelectWidgetType()
           : this.renderWidgetInputs()}
       </Dialog>

@@ -6,6 +6,11 @@ import { arrayMove } from "react-sortable-hoc"
 import WidgetListContainer, {
   WidgetListContainer as InnerWidgetListContainer
 } from "./WidgetListContainer"
+import {
+  WIDGET_CREATE,
+  WIDGET_EDIT,
+  WIDGET_TYPE_SELECT
+} from "../../components/widgets/WidgetEditDialog"
 
 import {
   makeWidgetInstance,
@@ -17,8 +22,6 @@ import { FORM_END_EDIT, FORM_UPDATE } from "../../actions/forms"
 import { actions } from "../../actions"
 import {
   DIALOG_EDIT_WIDGET,
-  DIALOG_EDIT_WIDGET_CONFIGURATION,
-  DIALOG_EDIT_WIDGET_SELECT_TYPE,
   HIDE_DIALOG,
   SET_DIALOG_DATA,
   SHOW_DIALOG
@@ -209,8 +212,7 @@ describe("WidgetListContainer", () => {
               title:         "",
               widget_type:   ""
             },
-            isEditing:  false,
-            state:      DIALOG_EDIT_WIDGET_SELECT_TYPE,
+            state:      WIDGET_TYPE_SELECT,
             validation: {}
           }
         }
@@ -235,8 +237,7 @@ describe("WidgetListContainer", () => {
           dialogKey: DIALOG_EDIT_WIDGET,
           data:      {
             instance:   instance,
-            isEditing:  true,
-            state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+            state:      WIDGET_EDIT,
             validation: {}
           }
         }
@@ -260,8 +261,7 @@ describe("WidgetListContainer", () => {
         )
         const data: WidgetDialogData = {
           instance:   replaceInstance,
-          isEditing:  true,
-          state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+          state:      WIDGET_EDIT,
           validation: {}
         }
         wrapper
@@ -282,8 +282,7 @@ describe("WidgetListContainer", () => {
         const { wrapper, store } = await render()
         const data: WidgetDialogData = {
           instance:   makeWidgetInstance(),
-          isEditing:  false,
-          state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+          state:      WIDGET_CREATE,
           validation: {}
         }
         wrapper
@@ -325,8 +324,7 @@ describe("WidgetListContainer", () => {
       const { wrapper, store } = await render()
       const data: WidgetDialogData = {
         instance:   makeWidgetInstance(),
-        isEditing:  false,
-        state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+        state:      WIDGET_CREATE,
         validation: { field: "missing" }
       }
       wrapper

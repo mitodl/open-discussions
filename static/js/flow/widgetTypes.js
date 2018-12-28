@@ -31,7 +31,6 @@ export type WidgetListResponse = {
 }
 
 export type WidgetDialogData = {
-  isEditing: boolean,
   state: string,
   instance: WidgetInstancePatchable,
   validation: Object

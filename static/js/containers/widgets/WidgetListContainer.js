@@ -7,18 +7,19 @@ import { arrayMove } from "react-sortable-hoc"
 
 import { Loading } from "../../components/Loading"
 import WidgetList from "../../components/widgets/WidgetList"
-import WidgetEditDialog from "../../components/widgets/WidgetEditDialog"
+import WidgetEditDialog, {
+  WIDGET_EDIT,
+  WIDGET_TYPE_SELECT
+} from "../../components/widgets/WidgetEditDialog"
 
 import { actions } from "../../actions"
-import { WIDGET_FORM_KEY } from "../../lib/widgets"
 import {
   DIALOG_EDIT_WIDGET,
-  DIALOG_EDIT_WIDGET_SELECT_TYPE,
-  DIALOG_EDIT_WIDGET_CONFIGURATION,
   hideDialog,
   setDialogData,
   showDialog
 } from "../../actions/ui"
+import { WIDGET_FORM_KEY } from "../../lib/widgets"
 
 import type { Dispatch } from "redux"
 import type {
@@ -122,9 +123,8 @@ export class WidgetListContainer extends React.Component<Props> {
 
     setDialogVisibility(true)
     setDialogData({
-      isEditing: false,
-      state:     DIALOG_EDIT_WIDGET_SELECT_TYPE,
-      instance:  {
+      state:    WIDGET_TYPE_SELECT,
+      instance: {
         configuration: {},
         title:         "",
         widget_type:   ""
@@ -138,8 +138,7 @@ export class WidgetListContainer extends React.Component<Props> {
 
     setDialogVisibility(true)
     setDialogData({
-      isEditing:  true,
-      state:      DIALOG_EDIT_WIDGET_CONFIGURATION,
+      state:      WIDGET_EDIT,
       instance:   widgetInstance,
       validation: {}
     })
@@ -155,14 +154,15 @@ export class WidgetListContainer extends React.Component<Props> {
       html:           ""
     }
 
-    const replacementInstances = data.isEditing
-      ? instances.map(
-        instance =>
-          instance.id === instanceFromDialog.id
-            ? instanceFromDialog
-            : instance
-      )
-      : instances.concat([instanceFromDialog])
+    const replacementInstances =
+      data.state === WIDGET_EDIT
+        ? instances.map(
+          instance =>
+            instance.id === instanceFromDialog.id
+              ? instanceFromDialog
+              : instance
+        )
+        : instances.concat([instanceFromDialog])
     updateWidgetInstances(replacementInstances)
   }
 
