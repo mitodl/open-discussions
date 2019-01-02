@@ -114,8 +114,12 @@ def execute_search(*, user, query):
         "terms", channel_type=[CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED]
     ) | ~Q("terms", object_type=[COMMENT_TYPE, POST_TYPE])
 
+    content_filter = (Q("term", deleted=False) & Q("term", removed=False)) | ~Q(
+        "terms", object_type=[COMMENT_TYPE, POST_TYPE]
+    )
+
     if channel_names:
         channels_filter = channels_filter | Q("terms", channel_name=channel_names)
 
-    search = search.filter(channels_filter)
+    search = search.filter(channels_filter).filter(content_filter)
     return search.execute().to_dict()

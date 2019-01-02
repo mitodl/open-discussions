@@ -118,7 +118,35 @@ def test_execute_search(mocker, user):
                                     },
                                 ]
                             }
-                        }
+                        },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must": [
+                                                {"term": {"deleted": False}},
+                                                {"term": {"removed": False}},
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {
+                                                    "terms": {
+                                                        "object_type": [
+                                                            "comment",
+                                                            "post",
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                ]
+                            }
+                        },
                     ]
                 }
             },
@@ -170,7 +198,35 @@ def test_execute_search_anonymous(mocker):
                                     },
                                 ]
                             }
-                        }
+                        },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must": [
+                                                {"term": {"deleted": False}},
+                                                {"term": {"removed": False}},
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {
+                                                    "terms": {
+                                                        "object_type": [
+                                                            "comment",
+                                                            "post",
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                ]
+                            }
+                        },
                     ]
                 }
             },
