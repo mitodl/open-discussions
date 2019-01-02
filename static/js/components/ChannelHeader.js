@@ -1,7 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import { NavLink } from "react-router-dom"
+import { Link, NavLink } from "react-router-dom"
 
 import ChannelBanner from "../containers/ChannelBanner"
 import { Cell, Grid } from "./Grid"
@@ -37,7 +37,9 @@ export default class ChannelHeader extends React.Component<Props> {
                 imageSize={CHANNEL_AVATAR_MEDIUM}
               />
               <div className="title-and-headline">
-                <div className="title">{channel.title}</div>
+                <div className="title">
+                  <Link to={channelURL(channel.name)}>{channel.title}</Link>
+                </div>
                 {channel.public_description ? (
                   <div className="headline">{channel.public_description}</div>
                 ) : null}
