@@ -1,5 +1,5 @@
 """Management command to index reddit content"""
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from open_discussions.utils import now_in_utc
 from search.tasks import start_recreate_index
@@ -18,7 +18,10 @@ class Command(BaseCommand):
         )
         self.stdout.write("Waiting on task...")
         start = now_in_utc()
-        task.get()
+        error = task.get()
+        if error:
+            raise CommandError(f"Recreate index errored: {error}")
+
         total_seconds = (now_in_utc() - start).total_seconds()
         self.stdout.write(
             "Recreate index finished, took {} seconds".format(total_seconds)
