@@ -34,12 +34,15 @@ describe("ChannelHeader", () => {
       wrapper.find("Connect(ChannelAvatar)").prop("channel"),
       channel
     )
-    assert.equal(wrapper.find(".title").text(), channel.title)
 
     const links = wrapper.find("IntraPageNav NavLink")
     assert.equal(links.length, 1)
     const props = links.props()
     assert.equal(props.to, channelURL(channel.name))
+
+    const linkProps = wrapper.find("Link").props()
+    assert.equal(linkProps.to, channelURL(channel.name))
+    assert.equal(linkProps.children, channel.title)
   })
   ;[true, false].forEach(hasHeadline => {
     it(`${
