@@ -197,7 +197,7 @@ def update_author(user_obj):
             gen_profile_id(user_obj.username),
             profile_data,
             PROFILE_TYPE,
-            retry_on_conflict=1,
+            retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
         )
 
 

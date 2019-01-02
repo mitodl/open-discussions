@@ -192,7 +192,7 @@ def update_field_values_by_query(query, field_dict, object_types=None):
 
 
 def _update_document_by_id(
-    doc_id, data, object_type, update_key=None, retry_on_conflict=0
+    doc_id, data, object_type, *, update_key=None, retry_on_conflict=0
 ):
     """
     Makes a request to ES to update an existing document
