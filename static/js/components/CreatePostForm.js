@@ -1,6 +1,7 @@
 /* global SETTINGS: false */
 // @flow
 import React from "react"
+import Dropzone from "react-dropzone"
 
 import Embedly, { EmbedlyLoader } from "./Embedly"
 import Editor, { editorUpdateFormShim } from "./Editor"
@@ -33,8 +34,11 @@ type Props = {
   updateChannelSelection: Function,
   embedly: Object,
   embedlyInFlight: boolean,
-  openClearPostTypeDialog: Function
+  openClearPostTypeDialog: Function,
+  setPhotoError: Function
 }
+
+const imageUploaderName = "coverImage"
 
 const channelOptions = (channels: Map<string, Channel>) =>
   Array.from(channels)
@@ -115,6 +119,37 @@ export default class CreatePostForm extends React.Component<Props> {
     ) : null
   }
 
+  handleImageDrop = (images: Array<File>) => {
+    const { onUpdate } = this.props
+
+    const [image] = images
+    editorUpdateFormShim(imageUploaderName, onUpdate)(image)
+  }
+
+  articleCoverImageInput = () => {
+    const { postForm, setPhotoError } = this.props
+
+    return postForm && postForm.coverImage ? (
+      <img src={URL.createObjectURL(postForm.coverImage)} />
+    ) : (
+      <Dropzone
+        onDrop={this.handleImageDrop}
+        className="photo-upload-dialog photo-active-item photo-dropzone dashed-border"
+        style={{ height: 150 }}
+        accept="image/*"
+        onDropRejected={() => setPhotoError("Please select a valid photo")}
+      >
+        <div className="desktop-upload-message">
+          Optional: Add a cover image to your post<br />Drag an image here or<br />
+          <button type="button" className="outlined">
+            Click to select an image
+          </button>
+        </div>
+        <div className="mobile-upload-message">Click to select a photo.</div>
+      </Dropzone>
+    )
+  }
+
   postContentInputs = () => {
     const {
       postForm,
@@ -143,6 +178,12 @@ export default class CreatePostForm extends React.Component<Props> {
     } else if (postType === LINK_TYPE_ARTICLE) {
       return (
         <div className="article row post-content">
+          <div className="article-banner-image-wrapper">
+            <div className="article-banner-image">
+              {this.articleCoverImageInput()}
+            </div>
+          </div>
+          {validationMessage(validation.coverImage)}
           <ArticleEditor onChange={editorUpdateFormShim("article", onUpdate)} />
           {this.clearInputButton()}
           {validationMessage(validation.article)}

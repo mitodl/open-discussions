@@ -2,6 +2,7 @@
 // @flow
 import { assert } from "chai"
 import sinon from "sinon"
+import Dropzone from "react-dropzone"
 
 import CreatePostForm from "./CreatePostForm"
 import Embedly, { EmbedlyLoader } from "./Embedly"
@@ -24,7 +25,8 @@ describe("CreatePostForm", () => {
     isLinkTypeAllowedStub,
     renderPostForm,
     openClearPostTypeDialogStub,
-    updatePostTypeStub
+    updatePostTypeStub,
+    setPhotoErrorStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -32,6 +34,7 @@ describe("CreatePostForm", () => {
     isLinkTypeAllowedStub.returns(true)
     openClearPostTypeDialogStub = sandbox.stub()
     updatePostTypeStub = sandbox.stub()
+    setPhotoErrorStub = sandbox.stub()
     renderPostForm = configureShallowRenderer(CreatePostForm, {
       validation:              {},
       channels:                new Map(),
@@ -45,7 +48,8 @@ describe("CreatePostForm", () => {
       updatePostType:          updatePostTypeStub,
       processing:              false,
       updateChannelSelection:  sandbox.stub(),
-      openClearPostTypeDialog: openClearPostTypeDialogStub
+      openClearPostTypeDialog: openClearPostTypeDialogStub,
+      setPhotoError:           setPhotoErrorStub
     })
   })
 
@@ -107,6 +111,39 @@ describe("CreatePostForm", () => {
       wrapper.find(".article .validation-message").text(),
       "WHAT?! NO! OF COURSE NOT!"
     )
+  })
+
+  it("should show a cover image input if the user is editing an article", () => {
+    const postForm = { ...newPostForm(), postType: LINK_TYPE_ARTICLE }
+    const wrapper = renderPostForm({
+      postForm
+    })
+    const input = wrapper.find(Dropzone)
+    assert.ok(input.exists())
+    const { className, onDrop, style, accept, onDropRejected } = input.props()
+    assert.equal(
+      className,
+      "photo-upload-dialog photo-active-item photo-dropzone dashed-border"
+    )
+    assert.equal(onDrop, wrapper.instance().handleImageDrop)
+    assert.deepEqual(style, { height: 150 })
+    assert.deepEqual(accept, "image/*")
+    onDropRejected()
+    sinon.assert.calledWith(setPhotoErrorStub, "Please select a valid photo")
+  })
+
+  it("should display a coverImage, if there is one in the form", () => {
+    const image = new File([], "foobar.jpg")
+    const postForm = {
+      ...newPostForm(),
+      postType:   LINK_TYPE_ARTICLE,
+      coverImage: image
+    }
+    const wrapper = renderPostForm({
+      postForm
+    })
+    const img = wrapper.find(".article-banner-image img")
+    assert.ok(img.exists())
   })
 
   //

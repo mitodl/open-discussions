@@ -66,7 +66,7 @@ const CREATE_POST_PAYLOAD = { formKey: CREATE_POST_KEY }
 const getForm = R.prop(CREATE_POST_KEY)
 
 const createPostPayload = (postForm: PostForm): CreatePostPayload => {
-  const { postType, title, url, text, article } = postForm
+  const { postType, title, url, text, article, coverImage } = postForm
 
   switch (postType) {
   case LINK_TYPE_LINK:
@@ -74,7 +74,7 @@ const createPostPayload = (postForm: PostForm): CreatePostPayload => {
   case LINK_TYPE_TEXT:
     return { title, text }
   case LINK_TYPE_ARTICLE:
-    return { title, article }
+    return { title, article, coverImage }
   }
 
   // if no postType was selected, we're dealing with a 'title only' post
@@ -206,9 +206,10 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
         ...CREATE_POST_PAYLOAD,
         value: {
           postType,
-          url:     "",
-          text:    "",
-          article: []
+          url:        "",
+          text:       "",
+          article:    [],
+          coverImage: null
         }
       })
     )
@@ -217,12 +218,39 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       dispatch(setShowDrawerDesktop(false))
     }
 
+    this.setValidationErrors({})
+  }
+
+  getValidationErrors = () => {
+    const { postForm, channel } = this.props
+
+    const validation = R.isNil(channel)
+      ? R.set(
+        R.lensPath(["value", "channel"]),
+        "You need to select a channel",
+        validatePostCreateForm(postForm)
+      )
+      : validatePostCreateForm(postForm)
+
+    return validation
+  }
+
+  setValidationErrors = (errors: Object) => {
+    const { dispatch } = this.props
     dispatch(
       actions.forms.formValidate({
         ...CREATE_POST_PAYLOAD,
-        errors: {}
+        errors
       })
     )
+  }
+
+  setPhotoError = (error: string) => {
+    const validation = this.getValidationErrors()
+    this.setValidationErrors({
+      ...validation.value,
+      coverImage: error
+    })
   }
 
   openClearPostTypeDialog = () => {
@@ -245,21 +273,10 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
 
     e.preventDefault()
 
-    const validation = R.isNil(channel)
-      ? R.set(
-        R.lensPath(["value", "channel"]),
-        "You need to select a channel",
-        validatePostCreateForm(postForm)
-      )
-      : validatePostCreateForm(postForm)
+    const validation = this.getValidationErrors()
 
     if (!postForm || !R.isEmpty(validation)) {
-      dispatch(
-        actions.forms.formValidate({
-          ...CREATE_POST_PAYLOAD,
-          errors: validation.value
-        })
-      )
+      this.setValidationErrors(validation.value)
     } else {
       const channelName = channel.name
       const data = createPostPayload(postForm.value)
@@ -343,6 +360,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
           embedly={embedly}
           embedlyInFlight={embedlyInFlight}
           openClearPostTypeDialog={this.openClearPostTypeDialog}
+          setPhotoError={this.setPhotoError}
         />
       </React.Fragment>
     )

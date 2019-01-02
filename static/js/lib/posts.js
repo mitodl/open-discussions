@@ -15,12 +15,13 @@ import type {
 } from "../flow/discussionTypes"
 
 export const newPostForm = (): PostForm => ({
-  postType:  null,
-  text:      "",
-  url:       "",
-  title:     "",
-  thumbnail: null,
-  article:   []
+  postType:   null,
+  text:       "",
+  url:        "",
+  title:      "",
+  thumbnail:  null,
+  article:    [],
+  coverImage: null
 })
 
 export const postFormIsContentless = R.useWith(

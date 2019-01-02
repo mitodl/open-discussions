@@ -71,6 +71,7 @@ import * as authFuncs from "./fetch_auth"
 import * as searchFuncs from "./search"
 import { makeProfile } from "../factories/profiles"
 import { makeWidgetListResponse } from "../factories/widgets"
+import { objectToFormData } from "../lib/forms"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
@@ -193,15 +194,39 @@ describe("api", function() {
 
     it("creates a post", async () => {
       const post = makePost()
-      fetchJSONStub.returns(Promise.resolve(post))
+      fetchStub.returns(Promise.resolve(JSON.stringify(post)))
 
       const text = "Text"
       const title = "Title"
       const url = "URL"
       const result = await createPost("channelname", { text, title, url })
-      const body = JSON.stringify({ url, text, title })
+      const body = objectToFormData({ url, text, title })
       sinon.assert.calledWith(
-        fetchJSONStub,
+        fetchStub,
+        "/api/v0/channels/channelname/posts/",
+        {
+          body,
+          method: POST
+        }
+      )
+      assert.deepEqual(result, post)
+    })
+
+    it("creates a post with a coverImage", async () => {
+      const post = makePost()
+      fetchStub.returns(Promise.resolve(JSON.stringify(post)))
+
+      const title = "Title"
+      const article = [{ an: "article" }]
+      const coverImage = new File([], "asdf.jpg")
+      const result = await createPost("channelname", {
+        title,
+        coverImage,
+        article
+      })
+      const body = objectToFormData({ title, coverImage, article })
+      sinon.assert.calledWith(
+        fetchStub,
         "/api/v0/channels/channelname/posts/",
         {
           body,

@@ -44,4 +44,31 @@
     display: flex;
     justify-content: flex-end;
   }
+
+  .article {
+    .article-banner-image-wrapper {
+      display: inline-block;
+      width: 100%;
+      background-color: white;
+      border-radius: $std-border-radius;
+
+      .article-banner-image {
+        margin: 10px;
+        min-height: 115px;
+        background-color: $pale-grey;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+
+        .msg {
+          color: $font-grey-light;
+          padding-bottom: 15px;
+        }
+
+        img {
+          max-width: 100%;
+        }
+      }
+    }
+  }
 }

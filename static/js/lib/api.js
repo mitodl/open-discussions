@@ -15,6 +15,7 @@ import {
 } from "./fetch_auth"
 import { toQueryString } from "../lib/url"
 import { getPaginationSortParams } from "../lib/posts"
+import { objectToFormData } from "../lib/forms"
 
 import type { AuthResponse, AuthFlow } from "../flow/authTypes"
 import type {
@@ -209,20 +210,26 @@ export function getPostsForChannel(
   )
 }
 
-export function createPost(
+export async function createPost(
   channelName: string,
   payload: CreatePostPayload
 ): Promise<Post> {
-  const { text, url, title, article } = payload
-  return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/posts/`, {
-    method: "POST",
-    body:   JSON.stringify({
-      url:             url,
-      text:            text,
-      title:           title,
-      article_content: article
+  const formData = objectToFormData(R.pick(["text", "url", "title"], payload))
+
+  if (payload.article && payload.article.length !== 0) {
+    formData.append("article_content", JSON.stringify(payload.article))
+
+    if (payload.coverImage) {
+      formData.append("cover_image", payload.coverImage)
+    }
+  }
+
+  return JSON.parse(
+    await fetchWithAuthFailure(`/api/v0/channels/${channelName}/posts/`, {
+      method: "POST",
+      body:   formData
     })
-  })
+  )
 }
 
 export function getPost(postId: string): Promise<Post> {

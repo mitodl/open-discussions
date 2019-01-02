@@ -296,6 +296,18 @@ describe("CreatePostPage", () => {
     assert.lengthOf(wrapper.find(".channel-select .validation-message"), 0)
   })
 
+  it("should let us set a validation error for invalid cover image", async () => {
+    const wrapper = await renderPage("/create_post/")
+    const state = await listenForActions([actions.forms.FORM_VALIDATE], () => {
+      wrapper
+        .find("CreatePostPage")
+        .instance()
+        .setPhotoError("my error")
+    })
+    const { errors } = state.forms[CREATE_POST_KEY]
+    assert.equal(errors.coverImage, "my error")
+  })
+
   it(`should display a banner message if error on form submit`, async () => {
     helper.createPostStub.returns(Promise.reject({ errorStatusCode: 500 }))
     const wrapper = await renderPage()

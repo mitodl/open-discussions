@@ -67,3 +67,15 @@ export const getAuthResponseFieldErrors = R.curry(
     }
   }
 )
+
+export const objectToFormData = (object: Object) => {
+  const formData = new FormData()
+
+  Object.entries(object).forEach(([k, v]) => {
+    if (!R.isNil(v)) {
+      // $FlowFixMe: flow things that 'v' here can only be a Blob or File
+      formData.append(k, v)
+    }
+  })
+  return formData
+}

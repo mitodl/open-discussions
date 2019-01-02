@@ -7,6 +7,11 @@ import {
 
 import type { LinkType, ChannelType } from "../lib/channels"
 
+export type FormImage = {
+  edit:  Blob,
+  image: File
+}
+
 export type Channel = {
   name:                  string,
   title:                 string,
@@ -34,14 +39,8 @@ export type ChannelForm = {
   channel_type:           ChannelType,
   allowed_post_types:     Array<LinkType>,
   membership_is_managed:  boolean,
-  avatar?:            {
-    edit:  Blob,
-    image: File
-  },
-  banner?:            {
-    edit:  Blob,
-    image: File
-  },
+  avatar?:                FormImage,
+  banner?:                FormImage
 }
 
 export type ChannelAppearanceEditValidation = {
@@ -96,27 +95,30 @@ export type PostFormType =
   | null
 
 export type PostForm = {
-  postType: PostFormType,
-  text:     string,
-  url:      string,
-  title:    string,
-  article:  Array<Object>
+  postType:     PostFormType,
+  text:         string,
+  url:          string,
+  title:        string,
+  article:      Array<Object>,
+  coverImage?:  ?File
 }
 
 export type PostValidation = {
-  text?:      string,
-  url?:       string,
-  title?:     string,
-  channel?:   string,
-  post_type?: string,
-  article?:   string,
+  text?:       string,
+  url?:        string,
+  title?:      string,
+  channel?:    string,
+  post_type?:  string,
+  article?:    string,
+  coverImage?: string,
 }
 
 export type CreatePostPayload = {
-  url?:     string,
-  text?:    string,
-  title:    string,
-  article?: Array<Object>
+  url?:         string,
+  text?:        string,
+  title:        string,
+  article?:     Array<Object>,
+  coverImage?:  ?File,
 }
 
 export type PostListPagination = {

@@ -1,7 +1,11 @@
 // @flow
 import { assert } from "chai"
 
-import { configureForm, getAuthResponseFieldErrors } from "./forms"
+import {
+  configureForm,
+  getAuthResponseFieldErrors,
+  objectToFormData
+} from "./forms"
 import {
   FORM_BEGIN_EDIT,
   FORM_END_EDIT,
@@ -106,6 +110,16 @@ describe("forms lib", () => {
         const returnValue = getAuthResponseFieldErrors(field, responseObj)
         assert.deepEqual(returnValue, expReturnValue)
       })
+    })
+  })
+
+  describe("objectToFormData", () => {
+    it("includes all fields which are not null", () => {
+      const obj = { foo: "bar", biz: null, baz: undefined }
+      const formData = objectToFormData(obj)
+      assert.equal("bar", formData.get("foo"))
+      assert.isFalse(formData.has("biz"))
+      assert.isFalse(formData.has("baz"))
     })
   })
 })
