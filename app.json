@@ -67,6 +67,10 @@
     "INDEXING_API_USERNAME": {
       "description": "Reddit username used for indexing"
     },
+    "INDEXING_ERROR_RETRIES": {
+      "description": "Number of times to retry an indexing operation on failure",
+      "required": false
+    },
     "MAILGUN_URL": {
       "description": "The URL for communicating with Mailgun"
     },

@@ -121,7 +121,11 @@ def test_update_document_with_partial(mocked_es, mocker, object_type):
     mock_get_aliases.assert_called_once_with([object_type])
     mocked_es.get_conn.assert_called_once_with(verify=True)
     mocked_es.conn.update.assert_called_once_with(
-        index=object_type, doc_type=GLOBAL_DOC_TYPE, body={"doc": data}, id=doc_id
+        index=object_type,
+        doc_type=GLOBAL_DOC_TYPE,
+        body={"doc": data},
+        id=doc_id,
+        params={"retry_on_conflict": 0},
     )
 
 
@@ -157,6 +161,7 @@ def test_increment_document_integer_field(mocked_es):
                 }
             },
             id=doc_id,
+            params={"retry_on_conflict": 0},
         )
 
 

@@ -193,7 +193,12 @@ def update_author(user_obj):
     if user_obj.username != settings.INDEXING_API_USERNAME:
         profile_data = ESProfileSerializer().serialize(user_obj.profile)
         profile_data.pop("author_id", None)
-        update_fields_by_username(user_obj.username, profile_data, [PROFILE_TYPE])
+        update_document_with_partial.delay(
+            gen_profile_id(user_obj.username),
+            profile_data,
+            PROFILE_TYPE,
+            retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+        )
 
 
 @if_feature_enabled(INDEX_UPDATES)

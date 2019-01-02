@@ -342,15 +342,16 @@ def test_update_author(mocker, mock_index_functions, mock_es_profile_serializer,
     """
     Tests that update_author calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
+    patched_task = mocker.patch("search.task_helpers.update_document_with_partial")
     call_data = es_profile_serializer_data
     call_data.pop("author_id")
     update_author(user)
     assert patched_task.delay.called is True
-    assert patched_task.delay.call_args[1] == dict(
-        query={"query": {"bool": {"must": [{"match": {"author_id": user.username}}]}}},
-        field_dict=call_data,
-        object_types=[PROFILE_TYPE],
+    assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
+    assert patched_task.delay.call_args[0] == (
+        gen_profile_id(user.username),
+        call_data,
+        "profile",
     )
 
 
