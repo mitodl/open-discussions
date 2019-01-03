@@ -223,9 +223,15 @@ def test_num_items_not_none():
         [{"text": " some text "}, " some text "],
         [[{"text": "first part "}, {"text": "second part"}], "first part second part"],
         [
-            {"name": "p", "children": [{"text": "child text here."}]},
-            "child text here. ",
+            {
+                "name": "p",
+                "children": [{"text": "child text he"}, {"text": "re some more text."}],
+            },
+            " child text here some more text. ",
         ],
+        [{"name": "li", "text": "item in a bullet point"}, " item in a bullet point "],
+        [{"name": "td", "text": "item in a cell"}, " item in a cell "],
+        [{"name": "figcaption", "text": "item in a caption"}, " item in a caption "],
     ],
 )
 def test_render_article_text(input_node, output_text):

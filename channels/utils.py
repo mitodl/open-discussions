@@ -305,11 +305,14 @@ def _render_article_nodes(node):
         for item in node:
             yield from _render_article_nodes(item)
     elif isinstance(node, dict):
+        should_have_spaces = node.get("name") in ("p", "li", "td", "figcaption")
+        if should_have_spaces:
+            yield " "
         if "text" in node:
             yield node["text"]
         if "children" in node:
             yield from _render_article_nodes(node["children"])
-        if node.get("name") == "p":
+        if should_have_spaces:
             yield " "
 
 
