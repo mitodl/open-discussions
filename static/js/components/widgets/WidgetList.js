@@ -8,6 +8,8 @@ import type { StatelessFunctionalComponent } from "react"
 import type { WidgetInstance as WidgetInstanceType } from "../../flow/widgetTypes"
 
 type Props = {
+  startAddInstance: () => void,
+  startEditInstance: (widgetInstance: WidgetInstanceType) => void,
   clearForm: () => void,
   deleteInstance: (widgetInstance: WidgetInstanceType) => void,
   submitForm: () => Promise<void>,
@@ -21,7 +23,9 @@ const SortableWidgetList: StatelessFunctionalComponent<Props> = SortableContaine
     editing,
     clearForm,
     submitForm,
-    deleteInstance
+    deleteInstance,
+    startAddInstance,
+    startEditInstance
   }: Props) => {
     return (
       <div className="widget-list">
@@ -36,12 +40,18 @@ const SortableWidgetList: StatelessFunctionalComponent<Props> = SortableContaine
                 Done
               </button>
             </div>
+            <div className="header-two">
+              <span className="add-widget" onClick={() => startAddInstance()}>
+                + Add widget
+              </span>
+            </div>
           </div>
         ) : null}
         {widgetInstances.map((widgetInstance, i) => (
           <WidgetInstance
+            startEditInstance={startEditInstance}
             widgetInstance={widgetInstance}
-            key={widgetInstance.id}
+            key={i}
             index={i}
             editing={editing}
             deleteInstance={deleteInstance}

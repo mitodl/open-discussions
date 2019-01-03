@@ -10,7 +10,13 @@ import WidgetList from "./WidgetList"
 import WidgetInstance from "./WidgetInstance"
 
 describe("WidgetList", () => {
-  let listResponse, sandbox, clearFormStub, submitFormStub, deleteInstanceStub
+  let listResponse,
+    sandbox,
+    clearFormStub,
+    submitFormStub,
+    deleteInstanceStub,
+    startEditInstanceStub,
+    startAddInstanceStub
 
   beforeEach(() => {
     listResponse = makeWidgetListResponse()
@@ -18,6 +24,8 @@ describe("WidgetList", () => {
     clearFormStub = sandbox.stub()
     submitFormStub = sandbox.stub()
     deleteInstanceStub = sandbox.stub()
+    startEditInstanceStub = sandbox.stub()
+    startAddInstanceStub = sandbox.stub()
   })
 
   afterEach(() => {
@@ -32,6 +40,8 @@ describe("WidgetList", () => {
         submitForm={submitFormStub}
         editing={false}
         deleteInstance={deleteInstanceStub}
+        startEditInstance={startEditInstanceStub}
+        startAddInstance={startAddInstanceStub}
         {...props}
       />
     )
@@ -52,6 +62,7 @@ describe("WidgetList", () => {
       assert.equal(props.index, i)
       assert.isTrue(props.editing)
       assert.equal(props.deleteInstance, deleteInstanceStub)
+      assert.equal(props.startEditInstance, startEditInstanceStub)
     })
   })
   ;[true, false].forEach(hasForm => {
@@ -72,6 +83,12 @@ describe("WidgetList", () => {
       const wrapper = render({ editing: true })
       wrapper.find(".submit").prop("onClick")()
       sinon.assert.calledWith(submitFormStub)
+    })
+
+    it("has a link to add new widgets", () => {
+      const wrapper = render({ editing: true })
+      wrapper.find(".add-widget").prop("onClick")()
+      sinon.assert.calledWith(startAddInstanceStub)
     })
   })
 })

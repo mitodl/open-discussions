@@ -23,17 +23,6 @@
     margin: 0;
   }
 
-  .settings-radio {
-    & > div {
-      display: flex;
-      align-items: center;
-
-      label {
-        margin: 0;
-      }
-    }
-  }
-
   .mdc-form-field {
     display: flex;
     align-items: center;
@@ -69,5 +58,16 @@
 
   a:link {
     font-weight: 700;
+  }
+}
+
+.radio {
+  & > div {
+    display: flex;
+    align-items: center;
+
+    label {
+      margin: 0;
+    }
   }
 }

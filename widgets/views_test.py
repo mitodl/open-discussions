@@ -13,6 +13,7 @@ pytestmark = [pytest.mark.django_db]
 EXPECTED_AVAILABLE_WIDGETS = [
     {
         "widget_type": "Text",
+        "react_renderer": "default",
         "form_spec": [
             {
                 "field_name": "body",
@@ -42,6 +43,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
             }
         ],
         "widget_type": "URL",
+        "react_renderer": "default",
     },
     {
         "form_spec": [
@@ -64,6 +66,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "default": 3,
             },
         ],
+        "react_renderer": "default",
         "widget_type": "RSS Feed",
     },
     {
@@ -80,6 +83,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "default": "",
             }
         ],
+        "react_renderer": "markdown",
         "widget_type": "Markdown",
     },
 ]

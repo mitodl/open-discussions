@@ -39,6 +39,7 @@ class WidgetInstanceSerializer(serializers.ModelSerializer):
         """Returns a specification for building/editing a widget"""
         return {
             "widget_type": cls.name,
+            "react_renderer": cls.get_react_renderer(),
             "form_spec": cls.configuration_serializer_class().get_form_spec(),
         }
 
@@ -46,7 +47,8 @@ class WidgetInstanceSerializer(serializers.ModelSerializer):
         self.fields["widget_type"].choices = get_widget_type_names()
         super().__init__(*args, **kwargs)
 
-    def get_react_renderer(self, instance):  # pylint: disable=unused-argument
+    @classmethod
+    def get_react_renderer(cls, *args):  # pylint: disable=unused-argument
         """Return the react renderer for the widget"""
         return "default"
 

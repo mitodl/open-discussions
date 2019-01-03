@@ -8,12 +8,13 @@ import WidgetInstance from "./WidgetInstance"
 import { makeWidgetInstance } from "../../factories/widgets"
 
 describe("WidgetInstance", () => {
-  let widgetInstance, sandbox, deleteInstanceStub
+  let widgetInstance, sandbox, deleteInstanceStub, startEditInstanceStub
 
   beforeEach(() => {
     widgetInstance = makeWidgetInstance()
     sandbox = sinon.createSandbox()
     deleteInstanceStub = sandbox.stub()
+    startEditInstanceStub = sandbox.stub()
   })
 
   afterEach(() => {
@@ -27,6 +28,7 @@ describe("WidgetInstance", () => {
         deleteInstance={deleteInstanceStub}
         index={3}
         editing={false}
+        startEditInstance={startEditInstanceStub}
         {...props}
       />,
       {
@@ -53,6 +55,12 @@ describe("WidgetInstance", () => {
   )
 
   describe("editable", () => {
+    it("starts editing a widget", () => {
+      const wrapper = render({ editing: true })
+      wrapper.find(".edit").prop("onClick")()
+      sinon.assert.calledWith(startEditInstanceStub, widgetInstance)
+    })
+
     it("deletes a widget", () => {
       const wrapper = render({ editing: true })
       wrapper.find(".delete").prop("onClick")()

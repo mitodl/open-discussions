@@ -1,34 +1,44 @@
-.widget-title {
-  font-size: 16px;
-  font-weight: 700;
-  display: inline-block;
-  margin-bottom: 20px;
-}
+.widget-list {
+  .header-one {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+    justify-content: flex-end;
+    align-items: center;
 
-.widget-text {
-  font-size: 16px;
-  font-weight: normal;
-}
+    .manage-title {
+      font-weight: 700;
+      margin-right: auto;
+    }
 
-.header-one {
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 10px;
-  justify-content: flex-end;
-  align-items: center;
-
-  .manage-title {
-    font-weight: 700;
-    margin-right: auto;
+    button {
+      padding: 5px 15px;
+      margin: 0 5px;
+    }
   }
 
-  button {
-    padding: 5px 15px;
-    margin: 0 5px;
+  .header-two {
+    margin-bottom: 5px;
+
+    .add-widget {
+      cursor: pointer;
+    }
   }
 }
 
 .widget {
+  .widget-title {
+    font-size: 16px;
+    font-weight: 700;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  .widget-text {
+    font-size: 16px;
+    font-weight: normal;
+  }
+
   hr {
     border: 0;
     border-top: 1px solid $border-grey;
@@ -42,7 +52,8 @@
     color: black;
 
     .drag-handle,
-    .delete {
+    .delete,
+    .edit {
       cursor: pointer;
     }
   }
