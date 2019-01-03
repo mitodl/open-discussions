@@ -9,7 +9,7 @@ from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Post
 from channels.serializers.posts import BasePostSerializer
 from channels.serializers.comments import BaseCommentSerializer
-from channels.utils import get_reddit_slug
+from channels.utils import get_reddit_slug, render_article_text
 from profiles.api import get_channels
 from profiles.models import Profile
 from search.api import gen_post_id, gen_comment_id, gen_profile_id
@@ -91,6 +91,7 @@ class ESPostSerializer(ESSerializer):
 
     object_type = POST_TYPE
     use_keys = [
+        "article_content",
         "author_id",
         "author_name",
         "author_headline",
@@ -125,6 +126,7 @@ class ESPostSerializer(ESSerializer):
             "author_name": None
             if serialized_data["author_name"] == "[deleted]"
             else serialized_data["author_name"],
+            "article_text": render_article_text(serialized_data.get("article_content")),
         }
 
 

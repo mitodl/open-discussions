@@ -66,7 +66,7 @@ def proxy_post(submission):
     Helper function to proxy a submission
 
     Args:
-        praw.models.Submission): submission to proxy
+        submission (praw.models.Submission): submission to proxy
 
     Returns:
         ProxyPost: proxied post

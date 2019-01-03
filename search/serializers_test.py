@@ -4,7 +4,7 @@ import pytest
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.factories import PostFactory, CommentFactory
-from channels.utils import get_reddit_slug
+from channels.utils import get_reddit_slug, render_article_text
 from open_discussions.factories import UserFactory
 from profiles.models import Profile
 from profiles.utils import image_uri, IMAGE_MEDIUM
@@ -28,6 +28,7 @@ def patched_base_post_serializer(mocker):
         "author_id": 1,
         "author_name": "Author Name",
         "author_headline": "Author Headline",
+        "article_content": {"text": "hello world"},
         "profile_image": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_small.jpg",
         "channel_title": "channel 1",
         "channel_name": "channel_1",
@@ -106,6 +107,8 @@ def test_es_post_serializer(
     patched_base_post_serializer.assert_called_once_with(reddit_submission_obj)
     assert serialized == {
         "object_type": POST_TYPE,
+        "article_content": base_serialized["article_content"],
+        "article_text": render_article_text(base_serialized["article_content"]),
         "author_id": base_serialized["author_id"],
         "author_name": base_serialized["author_name"],
         "author_headline": base_serialized["author_headline"],

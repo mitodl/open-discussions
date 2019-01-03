@@ -264,7 +264,7 @@ describe("search functions", () => {
 
   describe("searchFields", () => {
     [
-      ["post", ["text.english", "post_title.english"]],
+      ["post", ["text.english", "post_title.english", "article_text.english"]],
       ["comment", ["text.english"]],
       [
         "profile",

@@ -779,8 +779,6 @@ class Api:
 
         submission = channel.submit(title, selftext=text, url=url)
 
-        post = None
-
         with transaction.atomic():
             # select_for_update so no one else can write to this
             post, created = Post.objects.select_for_update().get_or_create(

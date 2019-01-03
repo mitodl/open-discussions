@@ -18,6 +18,7 @@ from channels.utils import (
     get_reddit_slug,
     get_kind_and_id,
     num_items_not_none,
+    render_article_text,
 )
 
 
@@ -214,3 +215,25 @@ def test_num_items_not_none():
     assert num_items_not_none([1, None]) == 1
 
     assert num_items_not_none([0, 1, "", "abc", False, True, None]) == 6
+
+
+@pytest.mark.parametrize(
+    "input_node,output_text",
+    [
+        [{"text": " some text "}, " some text "],
+        [[{"text": "first part "}, {"text": "second part"}], "first part second part"],
+        [
+            {
+                "name": "p",
+                "children": [{"text": "child text he"}, {"text": "re some more text."}],
+            },
+            " child text here some more text. ",
+        ],
+        [{"name": "li", "text": "item in a bullet point"}, " item in a bullet point "],
+        [{"name": "td", "text": "item in a cell"}, " item in a cell "],
+        [{"name": "figcaption", "text": "item in a caption"}, " item in a caption "],
+    ],
+)
+def test_render_article_text(input_node, output_text):
+    """render_article_text should extract the text from any arbitrary article node tree"""
+    assert render_article_text(input_node) == output_text

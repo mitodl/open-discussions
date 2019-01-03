@@ -74,7 +74,11 @@ export const searchResultToProfile = (result: ProfileResult): Profile => ({
   username:             result.author_id
 })
 
-const POST_QUERY_FIELDS = ["text.english", "post_title.english"]
+const POST_QUERY_FIELDS = [
+  "text.english",
+  "post_title.english",
+  "article_text.english"
+]
 const COMMENT_QUERY_FIELDS = ["text.english"]
 const PROFILE_QUERY_FIELDS = [
   "author_headline.english",
