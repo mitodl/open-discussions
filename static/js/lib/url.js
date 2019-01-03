@@ -42,9 +42,6 @@ export const commentPermalink = R.curry(
 export const channelSearchURL = (channelName: string) =>
   `/c/${channelName}/search/`
 
-export const channelAboutURL = (channelName: string) =>
-  `/c/${channelName}/about/`
-
 export const blankThumbnailUrl = () =>
   new URL("/static/images/blank.png", window.location.origin).toString()
 

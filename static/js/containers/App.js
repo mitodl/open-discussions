@@ -191,11 +191,6 @@ class App extends React.Component<AppProps> {
             component={ChannelPage}
           />
           <Switch>
-            <Route
-              exact
-              path={`${match.url}c/:channelName/about/`}
-              component={ChannelPage}
-            />
             {SETTINGS.allow_search ? (
               <Route
                 path={`${match.url}c/:channelName/search/`}
