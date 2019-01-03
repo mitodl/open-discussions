@@ -6,7 +6,7 @@ import ChannelHeader from "../components/ChannelHeader"
 
 const withChannelHeader = R.curry(
   (hasNavbar: boolean, WrappedComponent: Class<React.Component<*, *>>) => {
-    class WithChannelHeader extends React.Component<*, *> {
+    class WithChannelSidebar extends React.Component<*, *> {
       static WrappedComponent: Class<React.Component<*, *>>
 
       render() {
@@ -28,11 +28,11 @@ const withChannelHeader = R.curry(
       }
     }
 
-    WithChannelHeader.WrappedComponent = WrappedComponent
-    WithChannelHeader.displayName = `withChannelHeader(${
+    WithChannelSidebar.WrappedComponent = WrappedComponent
+    WithChannelSidebar.displayName = `withChannelHeader(${
       WrappedComponent.name
     })`
-    return WithChannelHeader
+    return WithChannelSidebar
   }
 )
 

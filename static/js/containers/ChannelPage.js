@@ -5,25 +5,23 @@ import R from "ramda"
 import qs from "query-string"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
-import { Cell, Grid } from "../components/Grid"
 
 import CanonicalLink from "../components/CanonicalLink"
 import { PostLoading, withLoading } from "../components/Loading"
-import ChannelSidebar from "../components/ChannelSidebar"
-import Sidebar from "../components/Sidebar"
 import { PostSortPicker } from "../components/Picker"
 import {
   withPostModeration,
   postModerationSelector
 } from "../hoc/withPostModeration"
 import withChannelHeader from "../hoc/withChannelHeader"
+import withChannelSidebar from "../hoc/withChannelSidebar"
 import withPostList from "../hoc/withPostList"
 import { withChannelTracker } from "../hoc/withChannelTracker"
 
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
 import { safeBulkGet } from "../lib/maps"
-import { getChannelName, isMobileWidth } from "../lib/util"
+import { getChannelName } from "../lib/util"
 import { getPostIds } from "../lib/posts"
 import { anyErrorExcept404 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
@@ -113,11 +111,9 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
       subscribedChannels,
       posts,
       location: { search },
-      renderPosts,
-      isModerator
+      renderPosts
     } = this.props
 
-    const isAbout = match.path === "/c/:channelName/about/"
     if (!channel || !subscribedChannels || !posts) {
       return null
     } else {
@@ -127,26 +123,13 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
             <title>{formatTitle(channel.title)}</title>
             <CanonicalLink match={match} />
           </MetaTags>
-          <Grid className="main-content two-column channel-page">
-            {!isAbout || !isMobileWidth() ? (
-              <Cell width={8}>
-                <div className="post-list-title">
-                  <PostSortPicker
-                    updatePickerParam={updatePostSortParam(this.props)}
-                    value={qs.parse(search).sort || POSTS_SORT_HOT}
-                  />
-                </div>
-                {renderPosts()}
-              </Cell>
-            ) : null}
-            {isAbout || !isMobileWidth() ? (
-              <Cell width={4}>
-                <Sidebar className="sidebar-right">
-                  <ChannelSidebar channel={channel} isModerator={isModerator} />
-                </Sidebar>
-              </Cell>
-            ) : null}
-          </Grid>
+          <div className="post-list-title">
+            <PostSortPicker
+              updatePickerParam={updatePostSortParam(this.props)}
+              value={qs.parse(search).sort || POSTS_SORT_HOT}
+            />
+          </div>
+          {renderPosts()}
         </React.Fragment>
       )
     }
@@ -221,5 +204,6 @@ export default R.compose(
   withPostModeration,
   withChannelTracker,
   withPostList,
+  withChannelSidebar("channel-page"),
   withLoading(PostLoading)
 )(ChannelPage)
