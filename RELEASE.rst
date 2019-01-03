@@ -1,6 +1,20 @@
 Release Notes
 =============
 
+Version 0.60.1
+--------------
+
+- Revert "Implement mobile widget view (#1617)" (#1629)
+- Implement adding and editing widgets (#1598)
+- Fix recreate_index error handling (#1620)
+- Implement mobile widget view (#1617)
+- Change page width from 12 to 8 on withSingleColumn HOC (#1625)
+- Reduce version conflict errors in ES when updating profiles (#1618)
+- Split serializers
+- Make channel title in header a link (#1621)
+- Filter out removed/deleted posts and comments from search (#1614)
+- Display cover image thumbnail on compact post display (#1608)
+
 Version 0.59.1 (Released December 28, 2018)
 --------------
 
