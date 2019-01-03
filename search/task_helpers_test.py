@@ -4,6 +4,7 @@ import pytest
 
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
+from channels.utils import render_article_text
 from search.constants import PROFILE_TYPE
 from search.task_helpers import (
     reddit_object_persist,
@@ -156,7 +157,10 @@ def test_update_post_text(mocker, reddit_submission_obj):
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
         gen_post_id(reddit_submission_obj.id),
-        {"text": reddit_submission_obj.selftext},
+        {
+            "text": reddit_submission_obj.selftext,
+            "article_text": render_article_text(reddit_submission_obj.article_content),
+        },
         POST_TYPE,
     )
 

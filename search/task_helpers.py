@@ -8,6 +8,7 @@ from django.conf import settings
 
 from open_discussions.features import INDEX_UPDATES, if_feature_enabled
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
+from channels.utils import render_article_text
 
 from search.api import (
     gen_post_id,
@@ -102,7 +103,12 @@ def update_post_text(post_obj):
         post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
     """
     update_document_with_partial.delay(
-        gen_post_id(post_obj.id), {"text": post_obj.selftext}, POST_TYPE
+        gen_post_id(post_obj.id),
+        {
+            "article_text": render_article_text(post_obj.article_content),
+            "text": post_obj.selftext,
+        },
+        POST_TYPE,
     )
 
 
