@@ -12,6 +12,7 @@ from channels.utils import get_reddit_slug, num_items_not_none
 from channels.models import Channel, Subscription
 from channels.serializers.base import RedditObjectSerializer
 from channels.serializers.utils import parse_bool
+from channels.utils import render_article_text
 from open_discussions.settings import SITE_BASE_URL
 from open_discussions.serializers import WriteableSerializerMethodField
 from profiles.utils import image_uri
@@ -30,7 +31,9 @@ class BasePostSerializer(RedditObjectSerializer):
     thumbnail = WriteableSerializerMethodField(allow_null=True)
     text = WriteableSerializerMethodField(allow_null=True)
     article_content = serializers.JSONField(allow_null=True, default=None)
+    article_text = serializers.SerializerMethodField()
     title = serializers.CharField()
+    post_type = serializers.CharField(read_only=True)
     slug = serializers.SerializerMethodField()
     upvoted = WriteableSerializerMethodField()
     removed = WriteableSerializerMethodField()
@@ -122,6 +125,14 @@ class BasePostSerializer(RedditObjectSerializer):
     def get_deleted(self, instance):
         """Returns True if the post was deleted"""
         return instance.selftext == "[deleted]"  # only way to tell
+
+    def get_article_text(self, instance):
+        """Return article content rendered as text"""
+        return (
+            render_article_text(instance.article.content)
+            if instance.article is not None
+            else None
+        )
 
 
 class PostSerializer(BasePostSerializer):

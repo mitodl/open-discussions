@@ -6,6 +6,7 @@ import pytest
 from channels import api
 from channels.constants import CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC
 from channels.factories import RedditFactories, FactoryStore
+from channels.utils import render_article_text
 
 
 @pytest.fixture
@@ -112,9 +113,11 @@ def subscribed_channels(reddit_factories, staff_user, staff_api, user):
 @pytest.fixture()
 def reddit_submission_obj():
     """A dummy Post object"""
+    article_content = {"text": "some text"}
     return SimpleNamespace(
         author=SimpleNamespace(name="testuser"),
-        article_content={"text": "some text"},
+        article_content=article_content,
+        article_text=render_article_text(article_content),
         subreddit=SimpleNamespace(
             display_name="channel_1", title="Channel", subreddit_type="public"
         ),

@@ -1,8 +1,8 @@
 """Utilities for tests"""
 from urllib.parse import urlparse
 
-from channels.models import Article, Channel
-from channels.utils import get_reddit_slug
+from channels.models import Article, Channel, Post
+from channels.utils import get_reddit_slug, render_article_text
 from profiles.utils import image_uri
 
 
@@ -47,7 +47,8 @@ def default_post_response_data(channel, post, user):
     else:
         user_dependent_defaults = {"upvoted": True, "num_reports": None}
 
-    article = Article.objects.filter(post__post_id=post.id).first()
+    post_obj = Post.objects.get(post_id=post.id)
+    article = Article.objects.filter(post=post_obj).first()
 
     text = post.text
 
@@ -61,6 +62,10 @@ def default_post_response_data(channel, post, user):
         "thumbnail": None,
         "text": text,
         "article_content": article.content if article is not None else None,
+        "article_text": render_article_text(article.content)
+        if article is not None
+        else None,
+        "post_type": post_obj.post_type,
         "title": post.title,
         "removed": False,
         "deleted": False,

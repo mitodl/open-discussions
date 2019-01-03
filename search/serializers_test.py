@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name,unused-argument
 import pytest
 
-from channels.constants import POST_TYPE, COMMENT_TYPE
+from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories import PostFactory, CommentFactory
 from channels.utils import get_reddit_slug, render_article_text
 from open_discussions.factories import UserFactory
@@ -24,15 +24,18 @@ from search.serializers import (
 @pytest.fixture
 def patched_base_post_serializer(mocker):
     """Fixture that patches the base serializer class for ESPostSerializer"""
+    article_content = {"text": "hello world"}
     base_serialized_data = {
         "author_id": 1,
         "author_name": "Author Name",
         "author_headline": "Author Headline",
-        "article_content": {"text": "hello world"},
+        "article_content": article_content,
+        "article_text": render_article_text(article_content),
         "profile_image": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_small.jpg",
         "channel_title": "channel 1",
         "channel_name": "channel_1",
         "channel_type": "restricted",
+        "post_type": LINK_TYPE_SELF,
         "text": "Post Text",
         "score": 1,
         "created": 123,
@@ -127,6 +130,7 @@ def test_es_post_serializer(
         "post_link_url": base_serialized["url"],
         "post_link_thumbnail": base_serialized["thumbnail"],
         "post_slug": base_serialized["slug"],
+        "post_type": base_serialized["post_type"],
     }
 
 

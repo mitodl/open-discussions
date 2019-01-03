@@ -9,7 +9,13 @@ from rest_framework import status
 
 from profiles.utils import image_uri
 from channels.factories import LinkMetaFactory
-from channels.constants import VALID_POST_SORT_TYPES, POSTS_SORT_HOT
+from channels.constants import (
+    EXTENDED_POST_TYPE_ARTICLE,
+    VALID_POST_SORT_TYPES,
+    POSTS_SORT_HOT,
+    LINK_TYPE_LINK,
+    LINK_TYPE_SELF,
+)
 from channels.models import Subscription, LinkMeta, Article
 from channels.utils import THUMBNAIL_DIMENSIONS
 from channels.views.test_utils import (
@@ -46,12 +52,14 @@ def test_create_url_post_existing_meta(
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         "title": "url title 🐨",
+        "post_type": LINK_TYPE_LINK,
         "url": link_url,
         "url_domain": "micromasters.mit.edu",
         "cover_image": None,
         "thumbnail": thumbnail,
         "text": None,
         "article_content": None,
+        "article_text": None,
         "author_id": user.username,
         "created": any_instance_of(str),
         "upvoted": True,
@@ -127,6 +135,7 @@ def test_create_text_post(user_client, private_channel_and_contributor):
         "title": "parameterized testing",
         "text": "tests are great",
         "article_content": None,
+        "article_text": None,
         "url": None,
         "url_domain": None,
         "cover_image": None,
@@ -150,6 +159,7 @@ def test_create_text_post(user_client, private_channel_and_contributor):
         "edited": False,
         "stickied": False,
         "num_reports": None,
+        "post_type": LINK_TYPE_SELF,
     }
 
 
@@ -159,7 +169,8 @@ def test_create_article_post(user_client, private_channel_and_contributor):
     """
     channel, user = private_channel_and_contributor
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    article_content = [{"key": "value", "nested": {"number": 4}}]
+    article_text = "some text"
+    article_content = [{"key": "value", "nested": {"number": 4}, "text": article_text}]
     resp = user_client.post(
         url, {"title": "parameterized testing", "article_content": article_content}
     )
@@ -168,6 +179,7 @@ def test_create_article_post(user_client, private_channel_and_contributor):
         "title": "parameterized testing",
         "text": "",
         "article_content": article_content,
+        "article_text": article_text,
         "url": None,
         "url_domain": None,
         "cover_image": None,
@@ -191,6 +203,7 @@ def test_create_article_post(user_client, private_channel_and_contributor):
         "edited": False,
         "stickied": False,
         "num_reports": None,
+        "post_type": EXTENDED_POST_TYPE_ARTICLE,
     }
     article = Article.objects.filter(post__post_id=resp.json()["id"])
     assert article.exists()
@@ -679,6 +692,7 @@ def test_create_post_without_upvote(user_client, private_channel_and_contributor
         "title": "x",
         "text": "y",
         "article_content": None,
+        "article_text": None,
         "url": None,
         "url_domain": None,
         "cover_image": None,
@@ -702,6 +716,7 @@ def test_create_post_without_upvote(user_client, private_channel_and_contributor
         "edited": False,
         "stickied": False,
         "num_reports": None,
+        "post_type": LINK_TYPE_SELF,
     }
 
 
