@@ -12,7 +12,7 @@ const withSingleColumn = R.curry(
       render() {
         return (
           <Grid className={`main-content one-column ${className}`}>
-            <Cell width={12}>
+            <Cell width={8}>
               <WrappedComponent {...this.props} />
             </Cell>
           </Grid>
