@@ -24,7 +24,7 @@ djangorestframework==3.9.0
 djangorestframework-jwt==1.11.0
 djoser
 elasticsearch-dsl==6.1.0
-elasticsearch==6.2.0
+elasticsearch==6.3.0
 factory_boy
 faker
 feedparser
@@ -43,5 +43,6 @@ social-auth-app-django==2.1.0
 static3==0.5.1
 tldextract
 ulid-py
+urllib3>=1.23
 uwsgi
 wrapt==1.10.11
