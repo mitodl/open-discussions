@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 import sinon from "sinon"
-import { shallow } from "enzyme"
+import { mount } from "enzyme"
 import { assert } from "chai"
 
 import SearchTextbox from "./SearchTextbox"
@@ -17,7 +17,8 @@ describe("SearchTextbox", () => {
   })
 
   const render = (props = {}) =>
-    shallow(
+    // mount is necessary to check focus
+    mount(
       <SearchTextbox
         onChange={onChangeStub}
         onSubmit={onSubmitStub}
@@ -27,21 +28,22 @@ describe("SearchTextbox", () => {
       />
     )
 
-  it("passes onChange events and the value prop to the input element", () => {
+  it("focuses on the input element, passes onChange events and the value prop to it", () => {
     const value = "hello"
     const wrapper = render({ value })
     assert.equal(wrapper.find("input").prop("value"), value)
-
+    assert.equal(document.activeElement.value, value)
     const event = { target: { value: "new value" } }
     wrapper.find("input").prop("onChange")(event)
     sinon.assert.calledWith(onChangeStub, event)
   })
 
-  it("triggers onClear when the 'x' is clicked", () => {
+  it("triggers onClear when the 'x' is clicked, retains focus on input element", () => {
     const wrapper = render({ value: "text" })
     const event = { target: { value: "click" } }
     wrapper.find(".clear-icon").prop("onClick")(event)
     sinon.assert.calledWith(onClearStub, event)
+    assert.equal(document.activeElement.type, "text")
   })
 
   it("triggers onSubmit when the spyglass is clicked", () => {
