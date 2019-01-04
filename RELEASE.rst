@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.60.1
+Version 0.60.1 (Released January 04, 2019)
 --------------
 
 - Revert "Implement mobile widget view (#1617)" (#1629)
