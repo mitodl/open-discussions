@@ -32,6 +32,7 @@ describe("SearchTextbox", () => {
     const value = "hello"
     const wrapper = render({ value })
     assert.equal(wrapper.find("input").prop("value"), value)
+    // $FlowFixMe: element will have value if focus is working
     assert.equal(document.activeElement.value, value)
     const event = { target: { value: "new value" } }
     wrapper.find("input").prop("onChange")(event)
@@ -43,6 +44,8 @@ describe("SearchTextbox", () => {
     const event = { target: { value: "click" } }
     wrapper.find(".clear-icon").prop("onClick")(event)
     sinon.assert.calledWith(onClearStub, event)
+    wrapper.instance().componentDidUpdate()
+    // $FlowFixMe: element will have type if focus is working
     assert.equal(document.activeElement.type, "text")
   })
 
