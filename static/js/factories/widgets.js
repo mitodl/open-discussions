@@ -2,7 +2,7 @@
 import R from "ramda"
 import casual from "casual-browserify"
 
-import { incrementer } from "../factories/util"
+import { incrementer } from "../lib/util"
 import { validWidgetRenderers } from "../lib/widgets"
 
 import type {

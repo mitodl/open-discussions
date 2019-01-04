@@ -4,6 +4,8 @@ import { SortableContainer } from "react-sortable-hoc"
 
 import WidgetInstance from "./WidgetInstance"
 
+import { getWidgetKey } from "../../lib/widgets"
+
 import type { StatelessFunctionalComponent } from "react"
 import type { WidgetInstance as WidgetInstanceType } from "../../flow/widgetTypes"
 
@@ -51,7 +53,7 @@ const SortableWidgetList: StatelessFunctionalComponent<Props> = SortableContaine
           <WidgetInstance
             startEditInstance={startEditInstance}
             widgetInstance={widgetInstance}
-            key={i}
+            key={getWidgetKey(widgetInstance)}
             index={i}
             editing={editing}
             deleteInstance={deleteInstance}

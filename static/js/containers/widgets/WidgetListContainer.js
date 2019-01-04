@@ -19,7 +19,11 @@ import {
   setDialogData,
   showDialog
 } from "../../actions/ui"
-import { WIDGET_FORM_KEY } from "../../lib/widgets"
+import {
+  WIDGET_FORM_KEY,
+  newWidgetInstance,
+  getWidgetKey
+} from "../../lib/widgets"
 
 import type { Dispatch } from "redux"
 import type {
@@ -90,8 +94,9 @@ export class WidgetListContainer extends React.Component<Props> {
 
   deleteInstance = (widgetInstance: WidgetInstanceType) => {
     const { updateWidgetInstances } = this.props
+    const key = getWidgetKey(widgetInstance)
     const widgetInstances = this.getWidgetInstances().filter(
-      _widgetInstance => _widgetInstance.id !== widgetInstance.id
+      _widgetInstance => getWidgetKey(_widgetInstance) !== key
     )
     updateWidgetInstances(widgetInstances)
   }
@@ -123,12 +128,8 @@ export class WidgetListContainer extends React.Component<Props> {
 
     setDialogVisibility(true)
     setDialogData({
-      state:    WIDGET_TYPE_SELECT,
-      instance: {
-        configuration: {},
-        title:         "",
-        widget_type:   ""
-      },
+      state:      WIDGET_TYPE_SELECT,
+      instance:   newWidgetInstance(),
       validation: {}
     })
   }
@@ -153,14 +154,12 @@ export class WidgetListContainer extends React.Component<Props> {
       react_renderer: renderers[data.instance.widget_type],
       html:           ""
     }
-
+    const key = getWidgetKey(instanceFromDialog)
     const replacementInstances =
       data.state === WIDGET_EDIT
         ? instances.map(
           instance =>
-            instance.id === instanceFromDialog.id
-              ? instanceFromDialog
-              : instance
+            getWidgetKey(instance) === key ? instanceFromDialog : instance
         )
         : instances.concat([instanceFromDialog])
     updateWidgetInstances(replacementInstances)

@@ -7,7 +7,7 @@ import {
   LINK_TYPE_LINK,
   LINK_TYPE_ARTICLE
 } from "../lib/channels"
-import { incrementer } from "../factories/util"
+import { incrementer } from "../lib/util"
 
 import type {
   Channel,

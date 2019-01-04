@@ -1,7 +1,8 @@
 // @flow
 import casual from "casual-browserify"
 
-import { incrementer, arrayN } from "./util"
+import { arrayN } from "./util"
+import { incrementer } from "../lib/util"
 
 import type {
   Post,

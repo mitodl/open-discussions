@@ -12,14 +12,6 @@ export const randomSelection = (n: number, xs: Array<any>) =>
 
 export const draw = (xs: Array<any>) => xs[casual.integer(0, xs.length - 1)]
 
-export function* incrementer(): Generator<number, *, *> {
-  let int = 1
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    yield int++
-  }
-}
-
 export const makeMatch = (url: string): Match => ({
   url:     url,
   isExact: true,

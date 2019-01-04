@@ -4,6 +4,7 @@ export type WidgetInstancePatchable = {
   widget_type: string,
   title: string,
   configuration: Object,
+  newId?: string
 }
 
 export type WidgetInstance = WidgetInstancePatchable & {
