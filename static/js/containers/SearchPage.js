@@ -252,7 +252,8 @@ export class SearchPage extends React.Component<Props, State> {
   render() {
     const {
       location: { search },
-      match
+      match,
+      results
     } = this.props
     const { text } = this.state
 
@@ -267,6 +268,7 @@ export class SearchPage extends React.Component<Props, State> {
             value={text || ""}
             onClear={this.updateText}
             onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
+            validation={results.errors}
           />
           <div className="post-list-title">
             <SearchFilterPicker
