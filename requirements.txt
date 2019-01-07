@@ -70,7 +70,6 @@ python-dateutil==2.6.0
 python3-openid==3.1.0     # via social-auth-core
 python3-saml==1.4.1
 pytz==2017.2              # via celery, django
-pyyaml==3.11
 raven==6.9.0
 redis==2.10.5
 requests-file==1.4.3      # via tldextract
