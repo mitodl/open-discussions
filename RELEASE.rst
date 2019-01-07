@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.61.0
+--------------
+
+- Fix handling of widget ids (#1645)
+- Article search (#1619)
+- Upgrade elasticsearch lib
+
 Version 0.60.1 (Released January 04, 2019)
 --------------
 
