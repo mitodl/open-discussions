@@ -26,7 +26,7 @@ export default class SearchTextbox extends React.Component<Props> {
     this.focus()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     // Focus again if input has been cleared
     const { value } = this.props
     if (!value && prevProps && prevProps.value !== value) {
