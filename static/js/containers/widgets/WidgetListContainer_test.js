@@ -18,6 +18,7 @@ import {
 } from "../../factories/widgets"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import { WIDGET_FORM_KEY } from "../../lib/widgets"
+import * as widgetFuncs from "../../lib/widgets"
 import { FORM_END_EDIT, FORM_UPDATE } from "../../actions/forms"
 import { actions } from "../../actions"
 import {
@@ -192,6 +193,10 @@ describe("WidgetListContainer", () => {
     })
 
     it("opens a dialog to add a new widget", async () => {
+      const aNewWidgetInstance = { widget: "instance" }
+      const newWidgetInstanceStub = helper.sandbox
+        .stub(widgetFuncs, "newWidgetInstance")
+        .returns(aNewWidgetInstance)
       const { wrapper, store } = await render()
       wrapper
         .dive()
@@ -207,16 +212,13 @@ describe("WidgetListContainer", () => {
         payload: {
           dialogKey: DIALOG_EDIT_WIDGET,
           data:      {
-            instance: {
-              configuration: {},
-              title:         "",
-              widget_type:   ""
-            },
+            instance:   aNewWidgetInstance,
             state:      WIDGET_TYPE_SELECT,
             validation: {}
           }
         }
       })
+      sinon.assert.calledWith(newWidgetInstanceStub)
     })
 
     it("opens a dialog to edit a widget", async () => {

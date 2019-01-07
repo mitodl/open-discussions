@@ -26,7 +26,7 @@ const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElem
     const WidgetClass =
       validWidgetRenderers[widgetInstance.react_renderer] || DefaultWidget
     return (
-      <Card className="widget" key={widgetInstance.id}>
+      <Card className="widget">
         <WidgetClass widgetInstance={widgetInstance} />
         {editing ? (
           <React.Fragment>
