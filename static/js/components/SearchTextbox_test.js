@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 import sinon from "sinon"
-import { mount } from "enzyme"
+import { mount, shallow } from "enzyme"
 import { assert } from "chai"
 
 import SearchTextbox from "./SearchTextbox"
@@ -17,7 +17,17 @@ describe("SearchTextbox", () => {
   })
 
   const render = (props = {}) =>
-    // mount is necessary to check focus
+    shallow(
+      <SearchTextbox
+        onChange={onChangeStub}
+        onSubmit={onSubmitStub}
+        onClear={onClearStub}
+        value={""}
+        {...props}
+      />
+    )
+
+  const renderMount = (props = {}) =>
     mount(
       <SearchTextbox
         onChange={onChangeStub}
@@ -30,7 +40,7 @@ describe("SearchTextbox", () => {
 
   it("focuses on the input element, passes onChange events and the value prop to it", () => {
     const value = "hello"
-    const wrapper = render({ value })
+    const wrapper = renderMount({ value })
     assert.equal(wrapper.find("input").prop("value"), value)
     // $FlowFixMe: element will have value if focus is working
     assert.equal(document.activeElement.value, value)
@@ -40,7 +50,7 @@ describe("SearchTextbox", () => {
   })
 
   it("triggers onClear when the 'x' is clicked, retains focus on input element", () => {
-    const wrapper = render({ value: "text" })
+    const wrapper = renderMount({ value: "text" })
     const event = { target: { value: "click" } }
     wrapper.find(".clear-icon").prop("onClick")(event)
     sinon.assert.calledWith(onClearStub, event)
