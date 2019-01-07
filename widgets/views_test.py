@@ -12,23 +12,6 @@ pytestmark = [pytest.mark.django_db]
 
 EXPECTED_AVAILABLE_WIDGETS = [
     {
-        "widget_type": "Text",
-        "react_renderer": "default",
-        "form_spec": [
-            {
-                "field_name": "body",
-                "input_type": "textarea",
-                "label": "Body",
-                "props": {
-                    "max_length": "",
-                    "min_length": "",
-                    "placeholder": "Enter widget text",
-                },
-                "default": "",
-            }
-        ],
-    },
-    {
         "form_spec": [
             {
                 "field_name": "url",
@@ -73,13 +56,9 @@ EXPECTED_AVAILABLE_WIDGETS = [
         "form_spec": [
             {
                 "field_name": "source",
-                "input_type": "textarea",
+                "input_type": "markdown_wysiwyg",
                 "label": "Source",
-                "props": {
-                    "max_length": "",
-                    "min_length": "",
-                    "placeholder": "Enter widget " "text",
-                },
+                "props": {"placeholder": "Enter widget text"},
                 "default": "",
             }
         ],

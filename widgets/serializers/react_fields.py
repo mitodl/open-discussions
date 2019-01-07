@@ -81,3 +81,11 @@ class ReactURLField(serializers.URLField, ReactField):
             "max_length": self.max_length or "",
             "min_length": self.min_length or "",
         }
+
+
+class ReactMarkdownWysiwygField(serializers.CharField, ReactField):
+    """ReactField extension of CharField"""
+
+    def _get_input_type(self):
+        """Returns the field's input type"""
+        return "markdown_wysiwyg"

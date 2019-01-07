@@ -3,13 +3,13 @@ from widgets.serializers.widget_instance import (
     WidgetConfigSerializer,
     WidgetInstanceSerializer,
 )
-from widgets.serializers.react_fields import ReactCharField
+from widgets.serializers.react_fields import ReactMarkdownWysiwygField
 
 
 class MarkdownWidgetSerializerConfigSerializer(WidgetConfigSerializer):
     """Serializer for MarkdownWidgetSerializer config"""
 
-    source = ReactCharField(help_text="Enter widget text")
+    source = ReactMarkdownWysiwygField(help_text="Enter widget text")
 
 
 class MarkdownWidgetSerializer(WidgetInstanceSerializer):
