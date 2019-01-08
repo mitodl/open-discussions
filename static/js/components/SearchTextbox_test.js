@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 import sinon from "sinon"
-import { shallow } from "enzyme"
+import { mount, shallow } from "enzyme"
 import { assert } from "chai"
 
 import SearchTextbox from "./SearchTextbox"
@@ -27,21 +27,36 @@ describe("SearchTextbox", () => {
       />
     )
 
-  it("passes onChange events and the value prop to the input element", () => {
-    const value = "hello"
-    const wrapper = render({ value })
-    assert.equal(wrapper.find("input").prop("value"), value)
+  const renderMount = (props = {}) =>
+    mount(
+      <SearchTextbox
+        onChange={onChangeStub}
+        onSubmit={onSubmitStub}
+        onClear={onClearStub}
+        value={""}
+        {...props}
+      />
+    )
 
+  it("focuses on the input element, passes onChange events and the value prop to it", () => {
+    const value = "hello"
+    const wrapper = renderMount({ value })
+    assert.equal(wrapper.find("input").prop("value"), value)
+    // $FlowFixMe: element will have value if focus is working
+    assert.equal(document.activeElement.value, value)
     const event = { target: { value: "new value" } }
     wrapper.find("input").prop("onChange")(event)
     sinon.assert.calledWith(onChangeStub, event)
   })
 
-  it("triggers onClear when the 'x' is clicked", () => {
-    const wrapper = render({ value: "text" })
+  it("triggers onClear when the 'x' is clicked, retains focus on input element", () => {
+    const wrapper = renderMount({ value: "text" })
     const event = { target: { value: "click" } }
     wrapper.find(".clear-icon").prop("onClick")(event)
     sinon.assert.calledWith(onClearStub, event)
+    wrapper.instance().componentDidUpdate()
+    // $FlowFixMe: element will have type if focus is working
+    assert.equal(document.activeElement.type, "text")
   })
 
   it("triggers onSubmit when the spyglass is clicked", () => {
