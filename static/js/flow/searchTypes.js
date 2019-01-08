@@ -36,6 +36,7 @@ type RESULT_TYPE_POST = "post"
 
 export type PostResult = ResultCommon & {
   article_content: ?Array<Object>,
+  article_text: ?string,
   channel_name: string,
   channel_title: string,
   created: string,
@@ -47,6 +48,7 @@ export type PostResult = ResultCommon & {
   post_link_thumbnail: ?string,
   post_slug: string,
   post_title: string,
+  post_type: string,
   removed: boolean,
   score: number,
   text: string,

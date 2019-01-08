@@ -36,6 +36,7 @@ export const searchResultToComment = (
 
 export const searchResultToPost = (result: PostResult): Post => ({
   article_content: result.article_content,
+  article_text:    result.article_text,
   author_headline: result.author_headline,
   author_id:       result.author_id,
   author_name:     result.author_name,
@@ -46,6 +47,7 @@ export const searchResultToPost = (result: PostResult): Post => ({
   id:              result.post_id,
   num_comments:    result.num_comments,
   num_reports:     0,
+  post_type:       result.post_type,
   profile_image:   result.author_avatar_small,
   removed:         result.removed,
   score:           result.score,

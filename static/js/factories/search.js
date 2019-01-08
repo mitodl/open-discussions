@@ -3,6 +3,8 @@
 import casual from "casual-browserify"
 import R from "ramda"
 
+import { LINK_TYPE_LINK, LINK_TYPE_TEXT } from "../lib/channels"
+
 import type {
   CommentResult,
   PostResult,
@@ -41,6 +43,7 @@ export const makeCommentResult = (): CommentResult => ({
 
 export const makePostResult = (): PostResult => ({
   article_content:     null,
+  article_text:        null,
   author_avatar_small: casual.url,
   author_headline:     casual.text,
   author_id:           casual.username,
@@ -56,6 +59,7 @@ export const makePostResult = (): PostResult => ({
   post_link_thumbnail: casual.url,
   post_slug:           casual.word,
   post_title:          casual.text,
+  post_type:           casual.coin_flip ? LINK_TYPE_LINK : LINK_TYPE_TEXT,
   removed:             casual.coin_flip,
   score:               casual.integer(-5, 15),
   text:                casual.text

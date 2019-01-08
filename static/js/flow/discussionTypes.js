@@ -78,13 +78,15 @@ export type Post = AuthoredContent & {
   url:             ?string,
   text:            ?string,
   article_content: ?Array<Object>,
+  article_text:    ?string,
   slug:            string,
   num_comments:    number,
   channel_name:    string,
   channel_title:   string,
   stickied:        boolean,
   removed:         boolean,
-  thumbnail:       ?string
+  thumbnail:       ?string,
+  post_type:       ?string
 }
 
 export type PostFormType =
