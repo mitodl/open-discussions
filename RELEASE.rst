@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.61.0
+--------------
+
+- post creation page tweaks
+- Remove PyYAML (#1651)
+- Search text input focus (#1642)
+- Peg python-lazy-fixture to 0.4.2 (#1648)
+- Fix handling of widget ids (#1645)
+- Article search (#1619)
+- Upgrade elasticsearch lib
+
 Version 0.60.1 (Released January 04, 2019)
 --------------
 
