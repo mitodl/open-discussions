@@ -53,7 +53,7 @@ export const RegisterPage = ({
           <CanonicalLink match={match} />
         </MetaTags>
         {renderForm({ formError, submitLabel: "Sign Up" })}
-        <ExternalLogins />
+        <ExternalLogins next={next} />
         <div className="alternate-auth-link">
           Already have an account?{" "}
           <Link to={`${LOGIN_URL}?${qs.stringify({ next })}`}>Log in</Link>

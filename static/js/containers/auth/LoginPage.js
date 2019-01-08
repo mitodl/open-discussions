@@ -48,7 +48,7 @@ export class LoginPage extends React.Component<LoginPageProps> {
               <CanonicalLink match={match} />
             </MetaTags>
             {renderForm()}
-            <ExternalLogins />
+            <ExternalLogins next={next} />
             <div className="alternate-auth-link">
               Not a member?{" "}
               <Link to={`${REGISTER_URL}?${qs.stringify({ next })}`}>
