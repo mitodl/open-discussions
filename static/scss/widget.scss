@@ -1,4 +1,8 @@
 .widget-list {
+  .card-contents {
+    padding: 20px 16px 6px 16px;
+  }
+
   .header-one {
     display: flex;
     flex-direction: row;
@@ -28,7 +32,7 @@
 
 .widget {
   .widget-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     display: inline-block;
     margin-bottom: 20px;
@@ -40,21 +44,27 @@
   }
 
   hr {
+    margin: 4px 0;
     border: 0;
-    border-top: 1px solid $border-grey;
+    border-top: 1px solid $pale-grey;
   }
 
   .edit-buttons {
     user-select: none;
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
     color: black;
 
-    .drag-handle,
-    .delete,
-    .edit {
+    .widget-button {
       cursor: pointer;
+      background-color: $pale-grey;
+      font-size: 20px;
+      padding: 4px;
+      border: 2px solid white;
+    }
+
+    .drag-handle {
+      margin-left: auto;
     }
   }
 }
