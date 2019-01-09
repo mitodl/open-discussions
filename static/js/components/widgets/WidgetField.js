@@ -3,6 +3,7 @@ import React from "react"
 import R from "ramda"
 
 import type { WidgetFieldSpec } from "../../flow/widgetTypes"
+import Editor, { editorUpdateFormShim } from "../../components/Editor"
 
 type Props = {
   fieldSpec: WidgetFieldSpec,
@@ -13,6 +14,14 @@ type Props = {
 const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
   const valueOrDefault = R.defaultTo(fieldSpec.props.default, value)
   switch (fieldSpec.input_type) {
+  case "markdown_wysiwyg":
+    return (
+      <Editor
+        initialValue={valueOrDefault}
+        onChange={editorUpdateFormShim("text", onChange)}
+        placeHolder=""
+      />
+    )
   case "textarea":
     return (
       <textarea

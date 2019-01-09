@@ -9,7 +9,7 @@ from widgets.serializers.react_fields import ReactURLField
 
 
 class URLWidgetConfigSerializer(WidgetConfigSerializer):
-    """Serializer for TextWidget config"""
+    """Serializer for URLWidget config"""
 
     url = ReactURLField(help_text="Enter URL")
 

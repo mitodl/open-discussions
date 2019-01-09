@@ -2,10 +2,12 @@
 import React from "react"
 import { shallow } from "enzyme"
 import sinon from "sinon"
-import { makeFieldSpec } from "../../factories/widgets"
 import casual from "casual-browserify"
 import { assert } from "chai"
+
 import WidgetField from "./WidgetField"
+
+import { makeFieldSpec } from "../../factories/widgets"
 
 describe("WidgetField", () => {
   let sandbox, onChangeStub, value, fieldSpec
@@ -58,5 +60,26 @@ describe("WidgetField", () => {
     assert.equal(props.type, "number")
     assert.equal(props.max, fieldSpec.props.max)
     assert.equal(props.min, fieldSpec.props.min)
+  })
+
+  it("renders a wysiwyg markdown field", () => {
+    fieldSpec = makeFieldSpec("markdown_wysiwyg")
+    const value = "some *text*"
+    const wrapper = render({ value })
+
+    const editor = wrapper.find("Connect(Editor)")
+    assert.isTrue(editor.exists())
+    assert.equal(editor.prop("initialValue"), value)
+    assert.equal(editor.prop("placeHolder"), "")
+
+    assert.equal(onChangeStub.callCount, 0)
+    const newValue = "new text"
+    editor.prop("onChange")(newValue)
+    sinon.assert.calledWith(onChangeStub, {
+      target: {
+        name:  "text",
+        value: newValue
+      }
+    })
   })
 })

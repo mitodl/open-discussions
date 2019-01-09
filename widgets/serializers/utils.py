@@ -12,15 +12,9 @@ def get_widget_classes():
 
     from widgets.serializers.markdown import MarkdownWidgetSerializer
     from widgets.serializers.rss import RssFeedWidgetSerializer
-    from widgets.serializers.text import TextWidgetSerializer
     from widgets.serializers.url import URLWidgetSerializer
 
-    return [
-        TextWidgetSerializer,
-        URLWidgetSerializer,
-        RssFeedWidgetSerializer,
-        MarkdownWidgetSerializer,
-    ]
+    return [URLWidgetSerializer, RssFeedWidgetSerializer, MarkdownWidgetSerializer]
 
 
 def get_widget_type_mapping():
