@@ -17,7 +17,7 @@ TIMESTAMP_FORMAT = "%m/%d %I:%M%p"
 class RssFeedWidgetConfigSerializer(WidgetConfigSerializer):
     """Serializer for RssFeedWidget config"""
 
-    url = ReactURLField(help_text="Enter RSS Feed URL")
+    url = ReactURLField(help_text="Enter RSS Feed URL", label="URL")
     feed_display_limit = ReactIntegerField(
         min_value=0, max_value=MAX_FEED_ITEMS, default=3
     )
@@ -29,6 +29,7 @@ class RssFeedWidgetSerializer(WidgetInstanceSerializer):
     configuration_serializer_class = RssFeedWidgetConfigSerializer
 
     name = "RSS Feed"
+    description = "RSS Feed"
 
     def get_html(self, instance):
         """Renders the widget to html based on configuration"""

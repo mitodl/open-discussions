@@ -11,7 +11,7 @@ from widgets.serializers.react_fields import ReactURLField
 class URLWidgetConfigSerializer(WidgetConfigSerializer):
     """Serializer for URLWidget config"""
 
-    url = ReactURLField(help_text="Enter URL")
+    url = ReactURLField(help_text="Enter URL", label="URL")
 
 
 class URLWidgetSerializer(WidgetInstanceSerializer):
@@ -20,6 +20,7 @@ class URLWidgetSerializer(WidgetInstanceSerializer):
     configuration_serializer_class = URLWidgetConfigSerializer
 
     name = "URL"
+    description = "Embedded URL"
 
     def get_html(self, instance):
         """Renders the widget to html based on configuration"""
