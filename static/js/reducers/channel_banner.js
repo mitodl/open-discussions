@@ -1,6 +1,6 @@
 // @flow
 import { PATCH, INITIAL_STATE } from "redux-hammock/constants"
-import * as api from "../lib/api"
+import * as api from "../lib/api/api"
 
 export const channelBannerEndpoint = {
   name:         "channelBanner",

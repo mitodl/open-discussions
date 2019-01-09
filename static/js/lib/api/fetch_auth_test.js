@@ -7,11 +7,11 @@ import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
 import * as auth from "./fetch_auth"
 
-import { AUTH_REQUIRED_URL, LOGIN_URL } from "./url"
+import { AUTH_REQUIRED_URL, LOGIN_URL } from "../url"
 import {
   NOT_AUTHENTICATED_ERROR_TYPE,
   AUTHENTICATION_FAILED_ERROR_TYPE
-} from "../util/rest"
+} from "../../util/rest"
 
 describe("fetch_auth", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this

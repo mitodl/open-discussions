@@ -1,7 +1,7 @@
 // @flow
 import { GET, PATCH, INITIAL_STATE } from "redux-hammock/constants"
 
-import * as api from "../lib/api"
+import * as api from "../lib/api/api"
 
 import type { WidgetListResponse } from "../flow/widgetTypes"
 

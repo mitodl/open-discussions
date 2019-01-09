@@ -1,5 +1,5 @@
 // @flow
-import * as api from "../lib/api"
+import * as embedlyAPI from "../lib/api/embedly"
 import { GET, INITIAL_STATE } from "redux-hammock/constants"
 
 export type EmbedlyResponse = {
@@ -12,7 +12,7 @@ type EmbedlyData = Map<string, Object>
 export const embedlyEndpoint = {
   name:              "embedly",
   verbs:             [GET],
-  getFunc:           (url: string) => api.getEmbedly(url),
+  getFunc:           (url: string) => embedlyAPI.getEmbedly(url),
   getSuccessHandler: (
     payload: EmbedlyResponse,
     data: EmbedlyData

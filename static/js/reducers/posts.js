@@ -1,5 +1,5 @@
 // @flow
-import * as api from "../lib/api"
+import * as postAPI from "../lib/api/posts"
 import {
   GET,
   POST,
@@ -36,11 +36,11 @@ const mergeMultiplePosts = (
 export const postsEndpoint = {
   name:     "posts",
   verbs:    [GET, POST, PATCH, DELETE],
-  getFunc:  (id: string) => api.getPost(id),
+  getFunc:  (id: string) => postAPI.getPost(id),
   postFunc: (name: string, payload: CreatePostPayload) =>
-    api.createPost(name, payload),
-  patchFunc:            (id: string, post: Post) => api.editPost(id, post),
-  deleteFunc:           (id: string) => api.deletePost(id),
+    postAPI.createPost(name, payload),
+  patchFunc:            (id: string, post: Post) => postAPI.editPost(id, post),
+  deleteFunc:           (id: string) => postAPI.deletePost(id),
   postSuccessHandler:   mergePostData,
   initialState:         { ...INITIAL_STATE, data: new Map() },
   getSuccessHandler:    mergePostData,

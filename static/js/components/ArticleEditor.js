@@ -3,7 +3,7 @@
 import React from "react"
 import CustomEditor from "@mitodl/ckeditor-custom-build"
 
-import { getCKEditorJWT } from "../lib/api"
+import { getCKEditorJWT } from "../lib/api/ckeditor"
 
 type Props = {
   initialData?: Array<Object>,

@@ -1,5 +1,5 @@
 // @flow
-import * as api from "../lib/api"
+import * as moderationAPI from "../lib/api/moderation"
 import { GET, POST, INITIAL_STATE } from "redux-hammock/constants"
 
 import type {
@@ -24,8 +24,8 @@ const getReportInitialData = (): ReportData => ({
 export const reportsEndpoint = {
   name:         "reports",
   verbs:        [POST, GET],
-  postFunc:     (report: GenericReport) => api.reportContent(report),
-  getFunc:      (channelName: string) => api.getReports(channelName),
+  postFunc:     (report: GenericReport) => moderationAPI.reportContent(report),
+  getFunc:      (channelName: string) => moderationAPI.getReports(channelName),
   initialState: {
     ...INITIAL_STATE,
     data: getReportInitialData()

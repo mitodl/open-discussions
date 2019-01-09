@@ -1,5 +1,5 @@
 // @flow
-import * as api from "../lib/api"
+import * as api from "../lib/api/api"
 import { GET, PATCH } from "redux-hammock/constants"
 
 export const FREQUENCY_IMMEDIATE: "immediate" = "immediate"

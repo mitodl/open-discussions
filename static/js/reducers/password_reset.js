@@ -1,5 +1,5 @@
 // @flow
-import * as api from "../lib/api"
+import * as api from "../lib/api/api"
 import { INITIAL_STATE } from "redux-hammock/constants"
 import { deriveVerbFuncs } from "redux-hammock/hammock"
 

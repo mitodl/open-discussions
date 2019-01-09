@@ -9,7 +9,7 @@ import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 import ArticleEditor from "./ArticleEditor"
 
 import { wait } from "../lib/util"
-import { getCKEditorJWT } from "../lib/api"
+import { getCKEditorJWT } from "../lib/api/ckeditor"
 
 describe("ArticleEditor", () => {
   let sandbox, fetchStub

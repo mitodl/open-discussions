@@ -2,57 +2,30 @@
 /* global SETTINGS:false, fetch: false */
 // For mocking purposes we need to use "fetch" defined as a global instead of importing as a local.
 import R from "ramda"
-import "isomorphic-fetch"
 import qs from "query-string"
 import { PATCH, POST, DELETE } from "redux-hammock/constants"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 
-import { buildSearchQuery } from "./search"
+import { buildSearchQuery } from "../search"
 import {
   fetchJSONWithAuthFailure,
   fetchWithAuthFailure,
   fetchJSONWithToken
 } from "./fetch_auth"
-import { toQueryString } from "../lib/url"
-import { getPaginationSortParams } from "../lib/posts"
-import { objectToFormData } from "../lib/forms"
+import { getCommentSortQS } from "./util"
 
-import type { AuthResponse, AuthFlow } from "../flow/authTypes"
+import type { AuthResponse, AuthFlow } from "../../flow/authTypes"
 import type {
-  Channel,
-  ChannelContributors,
-  ChannelModerators,
-  Contributor,
-  Moderator,
-  Subscriber,
   GenericComment,
-  CreatePostPayload,
-  PostListPaginationParams,
-  Post,
   CommentFromAPI,
   MoreCommentsFromAPI,
-  GenericReport,
-  ReportRecord,
   Profile,
   ProfilePayload,
-  SocialAuth,
-  PostListResponse
-} from "../flow/discussionTypes"
-import type { NotificationSetting } from "../flow/settingsTypes"
-import type { WidgetListResponse } from "../flow/widgetTypes"
-import type { EmbedlyResponse } from "../reducers/embedly"
-import type { SearchParams } from "../flow/searchTypes"
-
-const paramsToQueryString = paramSelector =>
-  R.compose(
-    toQueryString,
-    R.reject(R.isNil),
-    paramSelector
-  )
-
-const getPaginationSortQS = paramsToQueryString(getPaginationSortParams)
-
-const getCommentSortQS = paramsToQueryString(R.pickAll(["sort"]))
+  SocialAuth
+} from "../../flow/discussionTypes"
+import type { NotificationSetting } from "../../flow/settingsTypes"
+import type { WidgetListResponse } from "../../flow/widgetTypes"
+import type { SearchParams } from "../../flow/searchTypes"
 
 export function search(params: SearchParams): Promise<*> {
   const body = buildSearchQuery(params)
@@ -61,179 +34,6 @@ export function search(params: SearchParams): Promise<*> {
     method: POST,
     body:   JSON.stringify(body)
   })
-}
-
-export function getFrontpage(
-  params: PostListPaginationParams
-): Promise<PostListResponse> {
-  return fetchJSONWithAuthFailure(
-    `/api/v0/frontpage/${getPaginationSortQS(params)}`
-  )
-}
-
-export function getChannel(channelName: string): Promise<Channel> {
-  return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/`)
-}
-
-export function getChannels(): Promise<Array<Channel>> {
-  return fetchJSONWithAuthFailure("/api/v0/channels/")
-}
-
-export function getChannelModerators(
-  channelName: string
-): Promise<ChannelModerators> {
-  return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/moderators/`)
-}
-
-export function addChannelModerator(
-  channelName: string,
-  email: string
-): Promise<Moderator> {
-  return fetchJSONWithAuthFailure(
-    `/api/v0/channels/${channelName}/moderators/`,
-    {
-      method: POST,
-      body:   JSON.stringify({ email })
-    }
-  )
-}
-
-export function deleteChannelModerator(
-  channelName: string,
-  username: string
-): Promise<void> {
-  return fetchWithAuthFailure(
-    `/api/v0/channels/${channelName}/moderators/${username}/`,
-    { method: DELETE }
-  )
-}
-
-export function getChannelContributors(
-  channelName: string
-): Promise<ChannelContributors> {
-  return fetchJSONWithAuthFailure(
-    `/api/v0/channels/${channelName}/contributors/`
-  )
-}
-
-export function addChannelContributor(
-  channelName: string,
-  email: string
-): Promise<Contributor> {
-  return fetchJSONWithAuthFailure(
-    `/api/v0/channels/${channelName}/contributors/`,
-    {
-      method: POST,
-      body:   JSON.stringify({ email })
-    }
-  )
-}
-
-export function deleteChannelContributor(
-  channelName: string,
-  username: string
-): Promise<void> {
-  return fetchWithAuthFailure(
-    `/api/v0/channels/${channelName}/contributors/${username}/`,
-    { method: DELETE }
-  )
-}
-
-export function addChannelSubscriber(
-  channelName: string,
-  username: string
-): Promise<Subscriber> {
-  return fetchJSONWithAuthFailure(
-    `/api/v0/channels/${channelName}/subscribers/`,
-    {
-      method: POST,
-      body:   JSON.stringify({
-        subscriber_name: username
-      })
-    }
-  )
-}
-
-export function deleteChannelSubscriber(
-  channelName: string,
-  username: string
-): Promise<void> {
-  return fetchWithAuthFailure(
-    `/api/v0/channels/${channelName}/subscribers/${username}/`,
-    { method: DELETE }
-  )
-}
-
-export function createChannel(channel: Channel): Promise<Channel> {
-  return fetchJSONWithAuthFailure(`/api/v0/channels/`, {
-    method: POST,
-    body:   JSON.stringify(
-      R.pickAll(
-        [
-          "name",
-          "title",
-          "description",
-          "public_description",
-          "channel_type",
-          "membership_is_managed"
-        ],
-        channel
-      )
-    )
-  })
-}
-
-export function updateChannel(channel: Channel): Promise<Channel> {
-  return fetchJSONWithAuthFailure(`/api/v0/channels/${channel.name}/`, {
-    method: PATCH,
-    body:   JSON.stringify(
-      R.pickAll(
-        [
-          "title",
-          "description",
-          "public_description",
-          "channel_type",
-          "allowed_post_types"
-        ],
-        channel
-      )
-    )
-  })
-}
-
-export function getPostsForChannel(
-  channelName: string,
-  params: PostListPaginationParams
-): Promise<PostListResponse> {
-  return fetchJSONWithAuthFailure(
-    `/api/v0/channels/${channelName}/posts/${getPaginationSortQS(params)}`
-  )
-}
-
-export async function createPost(
-  channelName: string,
-  payload: CreatePostPayload
-): Promise<Post> {
-  const formData = objectToFormData(R.pick(["text", "url", "title"], payload))
-
-  if (payload.article && payload.article.length !== 0) {
-    formData.append("article_content", JSON.stringify(payload.article))
-
-    if (payload.coverImage) {
-      formData.append("cover_image", payload.coverImage)
-    }
-  }
-
-  return JSON.parse(
-    await fetchWithAuthFailure(`/api/v0/channels/${channelName}/posts/`, {
-      method: "POST",
-      body:   formData
-    })
-  )
-}
-
-export function getPost(postId: string): Promise<Post> {
-  return fetchJSONWithAuthFailure(`/api/v0/posts/${postId}/`)
 }
 
 export function getComments(
@@ -261,33 +61,6 @@ export const createComment = (
   return fetchJSONWithAuthFailure(`/api/v0/posts/${postId}/comments/`, {
     method: POST,
     body:   JSON.stringify(body)
-  })
-}
-
-export function updateUpvote(postId: string, upvoted: boolean): Promise<Post> {
-  return fetchJSONWithAuthFailure(`/api/v0/posts/${postId}/`, {
-    method: PATCH,
-    body:   JSON.stringify({ upvoted })
-  })
-}
-
-export function updateRemoved(postId: string, removed: boolean): Promise<Post> {
-  return fetchJSONWithAuthFailure(`/api/v0/posts/${postId}/`, {
-    method: PATCH,
-    body:   JSON.stringify({ removed })
-  })
-}
-
-export function editPost(postId: string, post: Post): Promise<Post> {
-  return fetchJSONWithAuthFailure(`/api/v0/posts/${postId}/`, {
-    method: PATCH,
-    body:   JSON.stringify(R.dissoc("url", post))
-  })
-}
-
-export function deletePost(postId: string): Promise<Post> {
-  return fetchWithAuthFailure(`/api/v0/posts/${postId}/`, {
-    method: DELETE
   })
 }
 
@@ -325,16 +98,6 @@ export function getMoreComments(
   )
 }
 
-export function reportContent(payload: GenericReport): Promise<GenericReport> {
-  return fetchJSONWithAuthFailure(`/api/v0/reports/`, {
-    method: POST,
-    body:   JSON.stringify(payload)
-  })
-}
-
-export const getReports = (channelName: string): Promise<Array<ReportRecord>> =>
-  fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/reports/`)
-
 export const getSettings = (token: ?string = undefined) =>
   token
     ? fetchJSONWithToken("/api/v0/notification_settings/", token)
@@ -367,13 +130,6 @@ export const patchCommentSetting = (
       method: PATCH,
       body:   JSON.stringify(setting)
     })
-
-export const getEmbedly = async (url: string): Promise<EmbedlyResponse> => {
-  const response = await fetchJSONWithAuthFailure(
-    `/api/v0/embedly/${encodeURIComponent(encodeURIComponent(url))}/`
-  )
-  return { url, response }
-}
 
 export function patchProfileImage(
   username: string,
@@ -561,8 +317,6 @@ export const postSetPassword = (
 export function getSocialAuthTypes(): Promise<Array<SocialAuth>> {
   return fetchJSONWithAuthFailure("/api/v0/auths/")
 }
-
-export const getCKEditorJWT = () => fetchWithAuthFailure("/api/v0/ckeditor/")
 
 export const getWidgetList = (
   widgetListId: number

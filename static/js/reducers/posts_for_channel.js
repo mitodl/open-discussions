@@ -1,7 +1,7 @@
 // @flow
 import { GET, INITIAL_STATE } from "redux-hammock/constants"
 
-import * as api from "../lib/api"
+import * as channelAPI from "../lib/api/channels"
 import { mapPostListResponse } from "../lib/posts"
 import { EVICT_POSTS_FOR_CHANNEL } from "../actions/posts_for_channel"
 
@@ -20,7 +20,7 @@ export const postsForChannelEndpoint = {
   name:    "postsForChannel",
   verbs:   [GET],
   getFunc: async (channelName: string, params: PostListPaginationParams) => {
-    const response = await api.getPostsForChannel(channelName, params)
+    const response = await channelAPI.getPostsForChannel(channelName, params)
     return { channelName, response }
   },
   initialState:      { ...INITIAL_STATE, data: new Map() },

@@ -1,5 +1,5 @@
 // @flow
-import * as api from "../lib/api"
+import * as api from "../lib/api/api"
 import { POST, DELETE } from "redux-hammock/constants"
 
 export const userWebsitesEndpoint = {

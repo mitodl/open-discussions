@@ -1,6 +1,5 @@
 /* global SETTINGS: false */
 // @flow
-
 import {
   LOGIN_URL,
   LOGIN_PASSWORD_URL,

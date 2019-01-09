@@ -7,29 +7,15 @@ import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 import R from "ramda"
 
 import {
-  createChannel,
-  getChannel,
-  getChannels,
-  getFrontpage,
-  getPost,
-  getPostsForChannel,
   getComments,
   getComment,
   createComment,
-  createPost,
   updateComment,
-  editPost,
   getMoreComments,
-  updateChannel,
-  updateRemoved,
-  deletePost,
   deleteComment,
-  reportContent,
-  getReports,
   getSettings,
   patchFrontpageSetting,
   patchCommentSetting,
-  getEmbedly,
   getProfile,
   patchProfileImage,
   updateProfile,
@@ -41,37 +27,20 @@ import {
   postPasswordResetEmail,
   postPasswordResetNewPassword,
   postSetPassword,
-  addChannelContributor,
-  addChannelModerator,
-  deleteChannelContributor,
-  deleteChannelModerator,
-  getChannelContributors,
-  getChannelModerators,
   search,
-  getCKEditorJWT,
   getWidgetList,
   patchWidgetList
 } from "./api"
-import {
-  makeChannel,
-  makeChannelList,
-  makeContributors,
-  makeModerators,
-  makeContributor,
-  makeModerator
-} from "../factories/channels"
-import { makeChannelPostList, makePost } from "../factories/posts"
+import { makePost } from "../../factories/posts"
 import {
   makeCommentsResponse,
   makeMoreCommentsResponse
-} from "../factories/comments"
-import { makeReportRecord } from "../factories/reports"
-import { COMMENT_SORT_NEW } from "./picker"
+} from "../../factories/comments"
+import { COMMENT_SORT_NEW } from "../picker"
 import * as authFuncs from "./fetch_auth"
-import * as searchFuncs from "./search"
-import { makeProfile } from "../factories/profiles"
-import { makeWidgetListResponse } from "../factories/widgets"
-import { objectToFormData } from "../lib/forms"
+import * as searchFuncs from "../search"
+import { makeProfile } from "../../factories/profiles"
+import { makeWidgetListResponse } from "../../factories/widgets"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
@@ -95,190 +64,6 @@ describe("api", function() {
     beforeEach(() => {
       fetchJSONStub = sandbox.stub(fetchFuncs, "fetchJSONWithCSRF")
       fetchStub = sandbox.stub(fetchFuncs, "fetchWithCSRF")
-    })
-
-    it("gets channel posts", async () => {
-      const posts = makeChannelPostList()
-      fetchJSONStub.returns(Promise.resolve({ posts }))
-
-      const result = await getPostsForChannel("channelone", {})
-      assert.ok(fetchJSONStub.calledWith("/api/v0/channels/channelone/posts/"))
-      assert.deepEqual(result.posts, posts)
-    })
-
-    it("gets channel posts with pagination params", async () => {
-      const posts = makeChannelPostList()
-      fetchJSONStub.returns(Promise.resolve({ posts }))
-
-      const result = await getPostsForChannel("channelone", {
-        before: "abc",
-        after:  "def",
-        count:  5
-      })
-      assert.ok(
-        fetchJSONStub.calledWith(
-          `/api/v0/channels/channelone/posts/?after=def&before=abc&count=5`
-        )
-      )
-      assert.deepEqual(result.posts, posts)
-    })
-
-    it("gets channel", async () => {
-      const channel = makeChannel()
-      fetchJSONStub.returns(Promise.resolve(channel))
-
-      const result = await getChannel("channelone")
-      assert.ok(fetchJSONStub.calledWith("/api/v0/channels/channelone/"))
-      assert.deepEqual(result, channel)
-    })
-
-    it("gets a list of channels", async () => {
-      const channelList = makeChannelList()
-      fetchJSONStub.returns(Promise.resolve(channelList))
-
-      const result = await getChannels()
-      assert.ok(fetchJSONStub.calledWith("/api/v0/channels/"))
-      assert.deepEqual(result, channelList)
-    })
-
-    it("creates a channel", async () => {
-      const channel = makeChannel()
-      fetchJSONStub.returns(Promise.resolve(channel))
-
-      const input = {
-        name:               "name",
-        title:              "title",
-        description:        "description",
-        public_description: "public_description",
-        channel_type:       "public"
-      }
-
-      const result = await createChannel(input)
-      assert.ok(
-        fetchJSONStub.calledWith(`/api/v0/channels/`, {
-          method: POST,
-          body:   JSON.stringify({
-            ...input
-          })
-        })
-      )
-      assert.deepEqual(result, channel)
-    })
-
-    it("updates a channel", async () => {
-      const channel = makeChannel()
-      fetchJSONStub.returns(Promise.resolve(channel))
-
-      const input = {
-        name:               "name",
-        title:              "title",
-        description:        "description",
-        public_description: "public_description",
-        channel_type:       "public"
-      }
-
-      const result = await updateChannel(input)
-      assert.ok(
-        fetchJSONStub.calledWith(`/api/v0/channels/${input.name}/`, {
-          method: PATCH,
-          body:   JSON.stringify({
-            title:              input.title,
-            description:        input.description,
-            public_description: input.public_description,
-            channel_type:       input.channel_type
-          })
-        })
-      )
-      assert.deepEqual(result, channel)
-    })
-
-    it("creates a post", async () => {
-      const post = makePost()
-      post.score = 1
-      fetchStub.returns(Promise.resolve(JSON.stringify(post)))
-
-      const text = "Text"
-      const title = "Title"
-      const url = "URL"
-      const result = await createPost("channelname", { text, title, url })
-      const body = objectToFormData({ url, text, title })
-      sinon.assert.calledWith(
-        fetchStub,
-        "/api/v0/channels/channelname/posts/",
-        {
-          body,
-          method: POST
-        }
-      )
-      assert.deepEqual(result, post)
-    })
-
-    it("creates a post with a coverImage", async () => {
-      const post = makePost()
-      post.score = 1
-      fetchStub.returns(Promise.resolve(JSON.stringify(post)))
-
-      const title = "Title"
-      const article = [{ an: "article" }]
-      const coverImage = new File([], "asdf.jpg")
-      const result = await createPost("channelname", {
-        title,
-        coverImage,
-        article
-      })
-      const body = objectToFormData({ title, coverImage, article })
-      sinon.assert.calledWith(
-        fetchStub,
-        "/api/v0/channels/channelname/posts/",
-        {
-          body,
-          method: POST
-        }
-      )
-      assert.deepEqual(result, post)
-    })
-
-    it("gets post", async () => {
-      const post = makePost()
-      fetchJSONStub.returns(Promise.resolve(post))
-
-      const result = await getPost("1")
-      assert.ok(fetchJSONStub.calledWith(`/api/v0/posts/1/`))
-      assert.deepEqual(result, post)
-    })
-
-    it("deletes a post", async () => {
-      const post = makePost()
-      fetchStub.returns(Promise.resolve())
-
-      await deletePost(post.id)
-      assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/`))
-    })
-
-    it("gets the frontpage", async () => {
-      const posts = makeChannelPostList()
-      fetchJSONStub.returns(Promise.resolve({ posts }))
-
-      const result = await getFrontpage({})
-      assert.ok(fetchJSONStub.calledWith(`/api/v0/frontpage/`))
-      assert.deepEqual(result.posts, posts)
-    })
-
-    it("gets the frontpage with pagination params", async () => {
-      const posts = makeChannelPostList()
-      fetchJSONStub.returns(Promise.resolve({ posts }))
-
-      const result = await getFrontpage({
-        before: "abc",
-        after:  "def",
-        count:  5
-      })
-      assert.ok(
-        fetchJSONStub.calledWith(
-          `/api/v0/frontpage/?after=def&before=abc&count=5`
-        )
-      )
-      assert.deepEqual(result.posts, posts)
     })
 
     describe("getComments", () => {
@@ -376,59 +161,26 @@ describe("api", function() {
       )
     })
 
-    it("updates a post", async () => {
-      const post = makePost()
+    it("gets profile", async () => {
+      const username = "username"
+      const profile = makeProfile(username)
+      fetchJSONStub.returns(Promise.resolve(profile))
+      const result = await getProfile(username)
+      assert.ok(fetchJSONStub.calledWith(`/api/v0/profiles/${username}/`))
+      assert.deepEqual(result, profile)
+    })
 
-      fetchJSONStub.returns(Promise.resolve())
-
-      post.text = "updated!"
-
-      await editPost(post.id, post)
-
-      assert.ok(fetchJSONStub.calledWith(`/api/v0/posts/${post.id}/`))
+    it("updates a profile", async () => {
+      const profile = makeProfile()
+      profile.headline = "updated!"
+      fetchJSONStub.returns(Promise.resolve(profile))
+      await updateProfile(profile.username, profile)
+      assert.ok(
+        fetchJSONStub.calledWith(`/api/v0/profiles/${profile.username}/`)
+      )
       assert.deepEqual(fetchJSONStub.args[0][1], {
         method: PATCH,
-        body:   JSON.stringify(R.dissoc("url", post))
-      })
-    })
-    ;[true, false].forEach(status => {
-      it(`updates post removed: ${status}`, async () => {
-        const post = makePost()
-
-        fetchJSONStub.returns(Promise.resolve())
-
-        await updateRemoved(post.id, status)
-
-        assert.ok(fetchJSONStub.calledWith(`/api/v0/posts/${post.id}/`))
-        assert.deepEqual(fetchJSONStub.args[0][1], {
-          method: PATCH,
-          body:   JSON.stringify({
-            removed: status
-          })
-        })
-      })
-
-      it("gets profile", async () => {
-        const username = "username"
-        const profile = makeProfile(username)
-        fetchJSONStub.returns(Promise.resolve(profile))
-        const result = await getProfile(username)
-        assert.ok(fetchJSONStub.calledWith(`/api/v0/profiles/${username}/`))
-        assert.deepEqual(result, profile)
-      })
-
-      it("updates a profile", async () => {
-        const profile = makeProfile()
-        profile.headline = "updated!"
-        fetchJSONStub.returns(Promise.resolve(profile))
-        await updateProfile(profile.username, profile)
-        assert.ok(
-          fetchJSONStub.calledWith(`/api/v0/profiles/${profile.username}/`)
-        )
-        assert.deepEqual(fetchJSONStub.args[0][1], {
-          method: PATCH,
-          body:   JSON.stringify(profile)
-        })
+        body:   JSON.stringify(profile)
       })
     })
 
@@ -507,59 +259,6 @@ describe("api", function() {
           )
         )
         assert.deepEqual(response, moreComments)
-      })
-    })
-
-    it("reports a comment", async () => {
-      const payload = {
-        comment_id: 1,
-        reason:     "spam"
-      }
-      fetchJSONStub.returns(Promise.resolve())
-
-      await reportContent(payload)
-      assert.ok(
-        fetchJSONStub.calledWith(`/api/v0/reports/`, {
-          method: POST,
-          body:   JSON.stringify(payload)
-        })
-      )
-    })
-
-    it("reports a post", async () => {
-      const payload = {
-        post_id: 1,
-        reason:  "spam"
-      }
-      fetchJSONStub.returns(Promise.resolve())
-
-      await reportContent(payload)
-      assert.ok(
-        fetchJSONStub.calledWith(`/api/v0/reports/`, {
-          method: POST,
-          body:   JSON.stringify(payload)
-        })
-      )
-    })
-
-    it("gets reports", async () => {
-      const reports = R.times(makeReportRecord, 5)
-      fetchJSONStub.returns(Promise.resolve(reports))
-
-      await getReports("channelName")
-      assert.ok(
-        fetchJSONStub.calledWith(`/api/v0/channels/channelName/reports/`)
-      )
-    })
-
-    describe("getEmbedly", () => {
-      it("issues a request with an escaped URL param", async () => {
-        await getEmbedly("https://en.wikipedia.org/wiki/Giant_panda")
-        assert.ok(
-          fetchJSONStub.calledWith(
-            "/api/v0/embedly/https%253A%252F%252Fen.wikipedia.org%252Fwiki%252FGiant_panda/"
-          )
-        )
       })
     })
 
@@ -689,134 +388,6 @@ describe("api", function() {
       })
     })
 
-    describe("contributors", () => {
-      it("gets a list of contributors", async () => {
-        const channelName = "channel_name"
-        const contributors = makeContributors()
-
-        fetchJSONStub.returns(Promise.resolve(contributors))
-
-        assert.deepEqual(
-          contributors,
-          await getChannelContributors(channelName)
-        )
-
-        assert.ok(
-          fetchJSONStub.calledWith(
-            `/api/v0/channels/${channelName}/contributors/`
-          )
-        )
-      })
-
-      it("adds a contributor", async () => {
-        const channelName = "channel_name"
-        const contributor = makeContributor()
-
-        fetchJSONStub.returns(Promise.resolve(contributor))
-
-        assert.deepEqual(
-          contributor,
-          await addChannelContributor(channelName, contributor.email)
-        )
-
-        assert.ok(
-          fetchJSONStub.calledWith(
-            `/api/v0/channels/${channelName}/contributors/`
-          )
-        )
-        assert.deepEqual(fetchJSONStub.args[0][1], {
-          method: POST,
-          body:   JSON.stringify({
-            email: contributor.email
-          })
-        })
-      })
-
-      it("removes a contributor", async () => {
-        const channelName = "channel_name"
-        const contributor = makeContributor()
-
-        fetchJSONStub.returns(Promise.resolve(contributor))
-
-        await deleteChannelContributor(
-          channelName,
-          contributor.contributor_name
-        )
-
-        assert.ok(
-          fetchStub.calledWith(
-            `/api/v0/channels/${channelName}/contributors/${
-              contributor.contributor_name
-            }/`
-          )
-        )
-        assert.deepEqual(fetchStub.args[0][1], {
-          method: DELETE
-        })
-      })
-    })
-
-    describe("moderators", () => {
-      it("gets a list of moderator", async () => {
-        const channelName = "channel_name"
-        const moderators = makeModerators()
-
-        fetchJSONStub.returns(Promise.resolve(moderators))
-
-        assert.deepEqual(moderators, await getChannelModerators(channelName))
-
-        assert.ok(
-          fetchJSONStub.calledWith(
-            `/api/v0/channels/${channelName}/moderators/`
-          )
-        )
-      })
-
-      it("adds a moderator", async () => {
-        const channelName = "channel_name"
-        const moderator = makeModerator()
-
-        fetchJSONStub.returns(Promise.resolve(moderator))
-
-        assert.deepEqual(
-          moderator,
-          await addChannelModerator(channelName, moderator.email)
-        )
-
-        assert.ok(
-          fetchJSONStub.calledWith(
-            `/api/v0/channels/${channelName}/moderators/`
-          )
-        )
-        assert.deepEqual(fetchJSONStub.args[0][1], {
-          method: POST,
-          body:   JSON.stringify({
-            email: moderator.email
-          })
-        })
-      })
-
-      it("removes a moderator", async () => {
-        const channelName = "channel_name"
-        const moderator = makeModerator()
-
-        fetchJSONStub.returns(Promise.resolve(moderator))
-
-        await deleteChannelModerator(channelName, moderator.moderator_name)
-
-        assert.ok(
-          fetchStub.calledWith(
-            `/api/v0/channels/${channelName}/moderators/${
-              moderator.moderator_name
-            }/`
-          )
-        )
-        assert.deepEqual(fetchStub.args[0][1], {
-          method: DELETE
-        })
-      })
-    })
-
     describe("postSetPassword", () => {
       it("should pass a current and new password", async () => {
         const currentPassword = "abcdefgh"
@@ -847,13 +418,6 @@ describe("api", function() {
           method: POST,
           body:   JSON.stringify(body)
         })
-      })
-    })
-
-    describe("CKEditor endpoint", () => {
-      it("should get the token", async () => {
-        await getCKEditorJWT()
-        sinon.assert.calledWith(fetchStub, "/api/v0/ckeditor/")
       })
     })
 

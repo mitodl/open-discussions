@@ -4,7 +4,7 @@ import R from "ramda"
 
 import type { ChannelModerators, Moderator } from "../flow/discussionTypes"
 
-import * as api from "../lib/api"
+import * as moderationAPI from "../lib/api/moderation"
 
 type ChannelModeratorsEndpointResponse = {
   channelName: string,
@@ -56,7 +56,7 @@ export const channelModeratorsEndpoint = {
   verbs:        [GET, POST, DELETE],
   initialState: { ...INITIAL_STATE, data: new Map() },
   getFunc:      async (channelName: string) => {
-    const response = await api.getChannelModerators(channelName)
+    const response = await moderationAPI.getChannelModerators(channelName)
     return { channelName, response }
   },
   getSuccessHandler: (
@@ -68,12 +68,15 @@ export const channelModeratorsEndpoint = {
     return update
   },
   postFunc: async (channelName: string, email: string) => {
-    const moderator = await api.addChannelModerator(channelName, email)
+    const moderator = await moderationAPI.addChannelModerator(
+      channelName,
+      email
+    )
     return { channelName, moderator }
   },
   postSuccessHandler: addModerator,
   deleteFunc:         async (channelName: string, username: string) => {
-    await api.deleteChannelModerator(channelName, username)
+    await moderationAPI.deleteChannelModerator(channelName, username)
     return { channelName, username }
   },
   deleteSuccessHandler: deleteModerator

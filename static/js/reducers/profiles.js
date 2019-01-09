@@ -1,5 +1,5 @@
 // @flow
-import * as api from "../lib/api"
+import * as api from "../lib/api/api"
 import { GET, PATCH, INITIAL_STATE } from "redux-hammock/constants"
 
 import type { Profile, ProfilePayload } from "../flow/discussionTypes"

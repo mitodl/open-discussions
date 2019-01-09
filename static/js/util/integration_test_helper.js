@@ -10,7 +10,13 @@ import thunk from "redux-thunk"
 
 import Router, { routes } from "../Router"
 
-import * as api from "../lib/api"
+import * as api from "../lib/api/api"
+import * as channelAPI from "../lib/api/channels"
+import * as ckeditorAPI from "../lib/api/ckeditor"
+import * as moderationAPI from "../lib/api/moderation"
+import * as embedlyAPI from "../lib/api/embedly"
+import * as frontpageAPI from "../lib/api/frontpage"
+import * as postAPI from "../lib/api/posts"
 import rootReducer from "../reducers"
 import * as utilFuncs from "../lib/util"
 
@@ -35,14 +41,24 @@ export default class IntegrationTestHelper {
     // stub all the api functions
     // NOTE: due to a regression in sinon 2.x, if you use `callsFake` you must
     //       call `resetBehavior()` on the stub first or the error still raises
-    for (const methodName in api) {
-      if (typeof api[methodName] === "function") {
-        const stubName = `${methodName}Stub`
-        this[stubName] = this.sandbox
-          .stub(api, methodName)
-          .throws(() => new Error(`${stubName} not implemented`))
+    ;[
+      api,
+      channelAPI,
+      ckeditorAPI,
+      moderationAPI,
+      embedlyAPI,
+      frontpageAPI,
+      postAPI
+    ].forEach(apiModule => {
+      for (const methodName in apiModule) {
+        if (typeof apiModule[methodName] === "function") {
+          const stubName = `${methodName}Stub`
+          this[stubName] = this.sandbox
+            .stub(apiModule, methodName)
+            .throws(() => new Error(`${stubName} not implemented`))
+        }
       }
-    }
+    })
 
     this.scrollIntoViewStub = this.sandbox.stub()
     window.HTMLDivElement.prototype.scrollIntoView = this.scrollIntoViewStub

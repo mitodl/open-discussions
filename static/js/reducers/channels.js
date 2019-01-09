@@ -4,7 +4,7 @@ import R from "ramda"
 
 import { SET_CHANNEL_DATA, CLEAR_CHANNEL_ERROR } from "../actions/channel"
 import type { Channel } from "../flow/discussionTypes"
-import * as api from "../lib/api"
+import * as channelAPI from "../lib/api/channels"
 
 const updateChannelHandler = (
   payload: Channel,
@@ -19,11 +19,11 @@ export const channelsEndpoint = {
   name:                "channels",
   verbs:               [GET, POST, PATCH],
   initialState:        { ...INITIAL_STATE, data: new Map() },
-  getFunc:             (name: string) => api.getChannel(name),
+  getFunc:             (name: string) => channelAPI.getChannel(name),
   getSuccessHandler:   updateChannelHandler,
-  postFunc:            (channel: Channel) => api.createChannel(channel),
+  postFunc:            (channel: Channel) => channelAPI.createChannel(channel),
   postSuccessHandler:  updateChannelHandler,
-  patchFunc:           (channel: Channel) => api.updateChannel(channel),
+  patchFunc:           (channel: Channel) => channelAPI.updateChannel(channel),
   patchSuccessHandler: updateChannelHandler,
   extraActions:        {
     [SET_CHANNEL_DATA]: (state, action) => {

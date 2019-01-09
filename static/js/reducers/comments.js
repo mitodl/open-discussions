@@ -10,7 +10,7 @@ import {
 
 import { CLEAR_COMMENT_ERROR, REPLACE_MORE_COMMENTS } from "../actions/comment"
 import { findComment } from "../lib/comments"
-import * as api from "../lib/api"
+import * as api from "../lib/api/api"
 
 import type { Action } from "../flow/reduxTypes"
 import type {

@@ -2,7 +2,7 @@
 import { GET, POST, DELETE, INITIAL_STATE } from "redux-hammock/constants"
 import R from "ramda"
 
-import * as api from "../lib/api"
+import * as channelAPI from "../lib/api/channels"
 
 import type { ChannelContributors, Contributor } from "../flow/discussionTypes"
 
@@ -58,7 +58,7 @@ export const channelContributorsEndpoint = {
   verbs:        [GET, POST, DELETE],
   initialState: { ...INITIAL_STATE, data: new Map() },
   getFunc:      async (channelName: string) => {
-    const response = await api.getChannelContributors(channelName)
+    const response = await channelAPI.getChannelContributors(channelName)
     return { channelName, response }
   },
   getSuccessHandler: (
@@ -70,12 +70,15 @@ export const channelContributorsEndpoint = {
     return update
   },
   postFunc: async (channelName: string, email: string) => {
-    const contributor = await api.addChannelContributor(channelName, email)
+    const contributor = await channelAPI.addChannelContributor(
+      channelName,
+      email
+    )
     return { channelName, contributor }
   },
   postSuccessHandler: addContributor,
   deleteFunc:         async (channelName: string, username: string) => {
-    await api.deleteChannelContributor(channelName, username)
+    await channelAPI.deleteChannelContributor(channelName, username)
     return { channelName, username }
   },
   deleteSuccessHandler: deleteContributor

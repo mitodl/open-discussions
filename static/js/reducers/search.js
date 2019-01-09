@@ -1,7 +1,7 @@
 // @flow
 import { POST, INITIAL_STATE } from "redux-hammock/constants"
 
-import * as api from "../lib/api"
+import * as api from "../lib/api/api"
 
 import type { Result, SearchParams } from "../flow/searchTypes"
 
