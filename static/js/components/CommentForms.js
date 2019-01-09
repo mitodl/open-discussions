@@ -8,6 +8,7 @@ import Editor, { editorUpdateFormShim } from "./Editor"
 import LoginPopup from "./LoginPopup"
 import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
 import ArticleEditor from "./ArticleEditor"
+import CoverImageInput from "./CoverImageInput"
 
 import { actions } from "../actions"
 import { clearCommentError } from "../actions/comment"
@@ -443,14 +444,19 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
     onSubmit = async e => {
       const { formKey, forms, patchPost, post } = this.props
       // eslint-disable-next-line camelcase
-      const { text, article_content } = R.prop(formKey, forms).value
+      const { text, article_content, cover_image } = R.prop(
+        formKey,
+        forms
+      ).value
 
       e.preventDefault()
 
       const { id } = post
       this.setState({ patching: true })
       // eslint-disable-next-line camelcase
-      const content = article_content ? { id, article_content } : { id, text }
+      const content = article_content
+        ? { id, article_content, cover_image }
+        : { id, text }
       try {
         await patchPost(content)
       } catch (_) {
@@ -462,6 +468,7 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
       const { forms, formKey, onUpdate, cancelReply } = this.props
       const { patching } = this.state
       const text = R.pathOr("", [formKey, "value", "text"], forms)
+      const image = R.pathOr(null, [formKey, "value", "cover_image"], forms)
       const article = R.pathOr(
         null,
         [formKey, "value", "article_content"],
@@ -471,17 +478,22 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
       const inputType = article ? ArticleInput : WYSIWYGInput
 
       return (
-        <InputFormHelper
-          onSubmit={this.onSubmit}
-          text={text}
-          article={article}
-          onUpdate={onUpdate}
-          cancelReply={cancelReply}
-          isComment={true}
-          disabled={patching}
-          autoFocus={true}
-          inputType={inputType}
-        />
+        <React.Fragment>
+          {article ? (
+            <CoverImageInput image={image} onUpdate={onUpdate} />
+          ) : null}
+          <InputFormHelper
+            onSubmit={this.onSubmit}
+            text={text}
+            article={article}
+            onUpdate={onUpdate}
+            cancelReply={cancelReply}
+            isComment={true}
+            disabled={patching}
+            autoFocus={true}
+            inputType={inputType}
+          />
+        </React.Fragment>
       )
     }
   }

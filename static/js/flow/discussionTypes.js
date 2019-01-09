@@ -85,7 +85,8 @@ export type Post = AuthoredContent & {
   stickied:        boolean,
   removed:         boolean,
   thumbnail:       ?string,
-  post_type:       ?string
+  post_type:       ?string,
+  cover_image:     ?string
 }
 
 export type PostFormType =
@@ -95,12 +96,12 @@ export type PostFormType =
   | null
 
 export type PostForm = {
-  postType:     PostFormType,
-  text:         string,
-  url:          string,
-  title:        string,
-  article:      Array<Object>,
-  coverImage?:  ?File
+  postType:      PostFormType,
+  text:          string,
+  url:           string,
+  title:         string,
+  article:       Array<Object>,
+  cover_image:   ?File
 }
 
 export type PostValidation = {
@@ -114,11 +115,11 @@ export type PostValidation = {
 }
 
 export type CreatePostPayload = {
-  url?:         string,
-  text?:        string,
-  title:        string,
-  article?:     Array<Object>,
-  coverImage?:  ?File,
+  url?:          string,
+  text?:         string,
+  title:         string,
+  article?:      Array<Object>,
+  cover_image?:  ?File,
 }
 
 export type PostListPagination = {

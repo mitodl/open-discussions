@@ -34,6 +34,20 @@ button.dark-outlined {
   color: $navy;
 }
 
+button.high-contrast-outlined {
+  background-color: $navy;
+  border: 1px solid $border-grey;
+  color: $border-grey;
+}
+
+button.opaque {
+  opacity: 0.4;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
 button.compact {
   font-size: 12px;
   padding: 9px 7px;

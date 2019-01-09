@@ -58,7 +58,8 @@ export const searchResultToPost = (result: PostResult): Post => ({
   thumbnail:       result.post_link_thumbnail,
   title:           result.post_title,
   upvoted:         false,
-  url:             result.post_link_url
+  url:             result.post_link_url,
+  cover_image:     result.post_cover_image
 })
 
 export const searchResultToProfile = (result: ProfileResult): Profile => ({

@@ -16,7 +16,12 @@ import ProfileImage from "../containers/ProfileImage"
 import SharePopup from "./SharePopup"
 
 import { wait } from "../lib/util"
-import { postPermalink, postDetailURL, profileURL } from "../lib/url"
+import {
+  postPermalink,
+  postDetailURL,
+  profileURL,
+  embedlyResizeImage
+} from "../lib/url"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
@@ -398,8 +403,9 @@ describe("ExpandedPostDisplay", () => {
     assert.isTrue(popup.props().hideSocialButtons)
   })
 
-  it("should use ArticleEditor to display if an article post", () => {
+  it("should use ArticleEditor and embedlyResizeImage to display if an article post", () => {
     post.article_content = []
+    post.cover_image = "/img/image.jpg"
     post.text = null
     const wrapper = shallow(<ExpandedPostDisplay {...postProps()} />)
     assert.ok(wrapper.find("ArticleEditor"))
@@ -407,5 +413,12 @@ describe("ExpandedPostDisplay", () => {
       readOnly:    true,
       initialData: []
     })
+    const img = wrapper.find("img.cover-image")
+    assert.ok(img.exists())
+    const { src } = img.props()
+    assert.equal(
+      src,
+      embedlyResizeImage(SETTINGS.embedlyKey, "/img/image.jpg", 300)
+    )
   })
 })

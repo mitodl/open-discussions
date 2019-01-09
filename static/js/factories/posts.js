@@ -38,7 +38,8 @@ export const makePost = (
   thumbnail:       isURLPost ? casual.url : null,
   title:           casual.sentence,
   upvoted:         casual.boolean,
-  url:             isURLPost ? casual.url : null
+  url:             isURLPost ? casual.url : null,
+  cover_image:     casual.url
 })
 
 export const makeChannelPostList = (channelName: string = casual.word) =>

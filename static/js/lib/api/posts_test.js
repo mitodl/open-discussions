@@ -1,5 +1,4 @@
 // @flow
-import R from "ramda"
 import sinon from "sinon"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 import { PATCH, POST } from "redux-hammock/constants"
@@ -84,18 +83,18 @@ describe("Post API", () => {
   })
 
   it("updates a post", async () => {
-    const post = makePost()
-
-    fetchJSONStub.returns(Promise.resolve())
-
+    const post = makePost(false)
+    fetchStub.returns(Promise.resolve(JSON.stringify(post)))
     post.text = "updated!"
+    const { title, text } = post
+    const body = objectToFormData({ title, text })
 
     await editPost(post.id, post)
 
-    assert.ok(fetchJSONStub.calledWith(`/api/v0/posts/${post.id}/`))
-    assert.deepEqual(fetchJSONStub.args[0][1], {
+    assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/`))
+    assert.deepEqual(fetchStub.args[0][1], {
       method: PATCH,
-      body:   JSON.stringify(R.dissoc("url", post))
+      body
     })
   })
 

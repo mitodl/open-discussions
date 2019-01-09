@@ -18,13 +18,13 @@ import { urlHostname } from "./url"
 describe("Post utils", () => {
   it("should return a new post with empty values", () => {
     assert.deepEqual(newPostForm(), {
-      postType:   null,
-      text:       "",
-      url:        "",
-      title:      "",
-      article:    [],
-      thumbnail:  null,
-      coverImage: null
+      postType:    null,
+      text:        "",
+      url:         "",
+      title:       "",
+      article:     [],
+      thumbnail:   null,
+      cover_image: null
     })
   })
 

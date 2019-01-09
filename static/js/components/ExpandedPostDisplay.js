@@ -21,10 +21,12 @@ import { formatPostTitle } from "../lib/posts"
 import { userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
 import { makeProfile } from "../lib/profile"
-import { postPermalink, profileURL } from "../lib/url"
+import { postPermalink, profileURL, embedlyResizeImage } from "../lib/url"
 
 import type { Post, Channel } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
+
+const COVER_IMAGE_DISPLAY_HEIGHT = 300
 
 type Props = {
   post: Post,
@@ -58,7 +60,19 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
       return post.text ? (
         renderTextContent(post)
       ) : (
-        <ArticleEditor readOnly initialData={post.article_content || []} />
+        <React.Fragment>
+          {post.cover_image ? (
+            <img
+              className="cover-image"
+              src={embedlyResizeImage(
+                SETTINGS.embedlyKey,
+                post.cover_image,
+                COVER_IMAGE_DISPLAY_HEIGHT
+              )}
+            />
+          ) : null}
+          <ArticleEditor readOnly initialData={post.article_content || []} />
+        </React.Fragment>
       )
     }
   }

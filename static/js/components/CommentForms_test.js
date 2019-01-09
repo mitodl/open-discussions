@@ -619,10 +619,11 @@ describe("CommentForms", () => {
       assert.isNotOk(wrapper.find("textarea").exists())
     })
 
-    it("should use the ArticleEditor if an article post", () => {
+    it("should use the ArticleEditor and CoverImageInput if an article post", () => {
       post.article = []
       wrapper = renderEditPostForm()
       assert.ok(wrapper.find("ArticleEditor"))
+      assert.ok(wrapper.find("CoverImageInput"))
     })
 
     it("should have the autofocus prop", () => {

@@ -52,6 +52,7 @@ export type PostResult = ResultCommon & {
   removed: boolean,
   score: number,
   text: string,
+  post_cover_image: ?string
 }
 
 export type Result = PostResult | CommentResult | ProfileResult

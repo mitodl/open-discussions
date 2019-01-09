@@ -2,7 +2,6 @@
 // @flow
 import { assert } from "chai"
 import sinon from "sinon"
-import Dropzone from "react-dropzone"
 
 import CreatePostForm from "./CreatePostForm"
 import Embedly, { EmbedlyLoader } from "./Embedly"
@@ -26,7 +25,8 @@ describe("CreatePostForm", () => {
     renderPostForm,
     openClearPostTypeDialogStub,
     updatePostTypeStub,
-    setPhotoErrorStub
+    setPhotoErrorStub,
+    onUpdateStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -35,6 +35,7 @@ describe("CreatePostForm", () => {
     openClearPostTypeDialogStub = sandbox.stub()
     updatePostTypeStub = sandbox.stub()
     setPhotoErrorStub = sandbox.stub()
+    onUpdateStub = sandbox.stub()
     renderPostForm = configureShallowRenderer(CreatePostForm, {
       validation:              {},
       channels:                new Map(),
@@ -44,7 +45,7 @@ describe("CreatePostForm", () => {
       embedly:                 {},
       history:                 {},
       onSubmit:                sandbox.stub(),
-      nUpdate:                 sandbox.stub(),
+      onUpdate:                onUpdateStub,
       updatePostType:          updatePostTypeStub,
       processing:              false,
       updateChannelSelection:  sandbox.stub(),
@@ -118,32 +119,25 @@ describe("CreatePostForm", () => {
     const wrapper = renderPostForm({
       postForm
     })
-    const input = wrapper.find(Dropzone)
+    const input = wrapper.find("CoverImageInput")
     assert.ok(input.exists())
-    const { className, onDrop, style, accept, onDropRejected } = input.props()
-    assert.equal(
-      className,
-      "photo-upload-dialog photo-active-item photo-dropzone dashed-border"
-    )
-    assert.equal(onDrop, wrapper.instance().handleImageDrop)
-    assert.deepEqual(style, { height: 150 })
-    assert.deepEqual(accept, "image/*")
-    onDropRejected()
-    sinon.assert.calledWith(setPhotoErrorStub, "Please select a valid photo")
+    const { setPhotoError, onUpdate } = input.props()
+    assert.equal(onUpdate, onUpdateStub)
+    assert.equal(setPhotoError, setPhotoErrorStub)
   })
 
-  it("should display a coverImage, if there is one in the form", () => {
-    const image = new File([], "foobar.jpg")
+  it("should pass down a coverImage, if there is one in the form", () => {
+    const coverImage = new File([], "foobar.jpg")
     const postForm = {
       ...newPostForm(),
-      postType:   LINK_TYPE_ARTICLE,
-      coverImage: image
+      postType:    LINK_TYPE_ARTICLE,
+      cover_image: coverImage
     }
     const wrapper = renderPostForm({
       postForm
     })
-    const img = wrapper.find(".article-banner-image img")
-    assert.ok(img.exists())
+    const { image } = wrapper.find("CoverImageInput").props()
+    assert.equal(image, coverImage)
   })
 
   //

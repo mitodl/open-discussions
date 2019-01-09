@@ -44,7 +44,7 @@ export const configureShallowRenderer = (
 ) => (extraProps: Object = {}) =>
   shallow(<Component {...defaultProps} {...extraProps} />)
 
-export const makeEvent = (name: string, value: string) => ({
+export const makeEvent = (name: string, value: any) => ({
   target:         { value, name },
   preventDefault: sinon.stub()
 })

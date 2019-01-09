@@ -59,6 +59,7 @@ describe("search functions", () => {
     assert.deepEqual(post, {
       article_content: result.article_content,
       article_text:    result.article_text,
+      cover_image:     null,
       author_id:       result.author_id,
       author_name:     result.author_name,
       author_headline: result.author_headline,

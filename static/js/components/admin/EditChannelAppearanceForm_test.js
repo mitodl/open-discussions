@@ -64,6 +64,7 @@ describe("EditChannelAppearanceForm", () => {
 
   describe("callbacks", () => {
     let onSubmit, onUpdate
+
     beforeEach(() => {
       [onSubmit, onUpdate] = [sandbox.stub(), sandbox.stub()]
     })
@@ -86,6 +87,7 @@ describe("EditChannelAppearanceForm", () => {
         wrapper.find(`[name="public_description"]`).simulate("change", event)
         assert.isOk(onUpdate.calledWith(event))
       })
+
       it(`should be called when the title is modified`, () => {
         const wrapper = renderForm(form, { onSubmit, onUpdate })
         const event = { target: { value: "text" } }
@@ -93,6 +95,8 @@ describe("EditChannelAppearanceForm", () => {
         wrapper.find(`[name="title"]`).simulate("change", event)
         assert.isOk(onUpdate.calledWith(event))
       })
+
+      //
       ;["avatar", "banner"].forEach(field => {
         [true, false].forEach(hasEdit => {
           it(`should modify the ${field} when the blob ${
@@ -100,7 +104,7 @@ describe("EditChannelAppearanceForm", () => {
           }`, () => {
             const blobUrl = `blob_url_${field}`
             const onUpdate = "onUpdateFunc"
-            URL.createObjectURL = sandbox.stub().returns(blobUrl)
+            sandbox.stub(URL, "createObjectURL").returns(blobUrl)
 
             form[field] = makeImage(field)
             if (!hasEdit) {
