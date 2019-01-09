@@ -1,7 +1,10 @@
 """Tasks tests"""
+from urllib.parse import urljoin
+
 import base36
 import pytest
 from django.contrib.auth import get_user_model
+from django.shortcuts import reverse
 from praw.models import Redditor
 from prawcore.exceptions import ResponseException
 
@@ -13,7 +16,11 @@ from channels.constants import (
     ROLE_CONTRIBUTORS,
     LINK_TYPE_ANY,
 )
-from channels.factories.models import ChannelFactory, PostFactory
+from channels.factories.models import (
+    ChannelFactory,
+    PostFactory,
+    ChannelInvitationFactory,
+)
 from channels.models import ChannelSubscription, Channel, Post
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
@@ -342,3 +349,24 @@ def test_populate_all_posts_and_comments(mocker, settings, mocked_celery):
     mock_populate_posts_and_comments.si.assert_any_call(list(range(20, 24)))
     mock_populate_posts_and_comments_merge_results.s.assert_called_once_with()
     assert mocked_celery.replace.call_count == 1
+
+
+def test_send_invitation_email(mocker, settings):
+    """Tests that send_invitation_email sends an email"""
+    invite = ChannelInvitationFactory.create()
+    mock_mail_api = mocker.patch("channels.tasks.mail_api")
+    mock_mail_api.messages_for_recipients.return_value = [1]
+    tasks.send_invitation_email.delay(invite.id)
+
+    mock_mail_api.context_for_user.assert_called_once_with(
+        extra_context={
+            "invite": invite,
+            "signup_url": urljoin(settings.SITE_BASE_URL, reverse("signup")),
+        }
+    )
+    mock_mail_api.messages_for_recipients.assert_called_once_with(
+        [(invite.email, mock_mail_api.context_for_user.return_value)], "invite"
+    )
+    mock_mail_api.send_messages.assert_called_once_with(
+        mock_mail_api.messages_for_recipients.return_value
+    )

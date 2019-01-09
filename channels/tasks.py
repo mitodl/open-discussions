@@ -1,12 +1,14 @@
 """Channels tasks"""
 import logging
 import traceback
+from urllib.parse import urljoin
 
 import base36
 import celery
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.shortcuts import reverse
 from prawcore.exceptions import ResponseException
 
 from channels import api, backpopulate_api
@@ -19,7 +21,8 @@ from channels.api import (
     allowed_post_types_bitmask,
 )
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
-from channels.models import Channel, Post, ChannelGroupRole
+from channels.models import Channel, Post, ChannelGroupRole, ChannelInvitation
+from mail import api as mail_api
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 from search.exceptions import PopulateUserRolesException, RetryException
@@ -344,3 +347,32 @@ def populate_all_posts_and_comments(self):
     )
 
     raise self.replace(results)
+
+
+@app.task
+def send_invitation_email(channel_invitation_id):
+    """
+    Sends a channel invitation
+
+    Args:
+        channel_invitation_id (int): the id of the ChannelInvitation
+    """
+    invite = ChannelInvitation.objects.get(id=channel_invitation_id)
+
+    signup_url = urljoin(settings.SITE_BASE_URL, reverse("signup"))
+
+    mail_api.send_messages(
+        list(
+            mail_api.messages_for_recipients(
+                [
+                    (
+                        invite.email,
+                        mail_api.context_for_user(
+                            extra_context={"invite": invite, "signup_url": signup_url}
+                        ),
+                    )
+                ],
+                "invite",
+            )
+        )
+    )

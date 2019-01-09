@@ -107,3 +107,11 @@ export const makeImage = (imageName: string) => ({
   },
   edit: new Blob([casual.word])
 })
+
+export const makeChannelInvite = (email: ?string = null) => ({
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  id:         incr.next().value,
+  email:      email || casual.email,
+  created_on: casual.moment.format(),
+  updated_on: casual.moment.format()
+})

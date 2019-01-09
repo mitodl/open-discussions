@@ -119,6 +119,7 @@ class IsStaffOrModeratorPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or is a moderator"""
+
         return channel_exists(view) and (
             is_staff_user(request) or is_moderator(request, view)
         )

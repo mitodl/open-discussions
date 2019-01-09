@@ -1,0 +1,1 @@
+{{ invite.inviter.profile.name }} invited you to {{ invite.channel.title }}

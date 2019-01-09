@@ -8,6 +8,7 @@ import { getPaginationSortQS } from "./util"
 import type {
   Channel,
   ChannelContributors,
+  ChannelInvitation,
   Contributor,
   Subscriber,
   PostListPaginationParams,
@@ -121,4 +122,14 @@ export function deleteChannelSubscriber(
     `/api/v0/channels/${channelName}/subscribers/${username}/`,
     { method: DELETE }
   )
+}
+
+export function addChannelInvitation(
+  channelName: string,
+  email: string
+): Promise<ChannelInvitation> {
+  return fetchJSONWithAuthFailure(`/api/v0/channels/${channelName}/invites/`, {
+    method: POST,
+    body:   JSON.stringify({ email })
+  })
 }

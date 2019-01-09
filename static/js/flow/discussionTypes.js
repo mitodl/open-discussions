@@ -233,6 +233,15 @@ export type ChannelSubscribers = Array<Subscriber>
 
 export type Member = Contributor | Moderator
 
+export type ChannelInvitation = {
+  id:         number,
+  email:      string,
+  created_on: string,
+  updated_on: string,
+}
+
+export type ChannelInvites = Array<ChannelInvitation>
+
 export type Report = {
   reason: string
 }

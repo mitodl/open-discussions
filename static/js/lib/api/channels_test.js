@@ -11,13 +11,15 @@ import {
   updateChannel,
   getChannelContributors,
   addChannelContributor,
-  deleteChannelContributor
+  deleteChannelContributor,
+  addChannelInvitation
 } from "./channels"
 import {
   makeChannel,
   makeChannelList,
   makeContributors,
-  makeContributor
+  makeContributor,
+  makeChannelInvite
 } from "../../factories/channels"
 import { makeChannelPostList } from "../../factories/posts"
 
@@ -183,6 +185,30 @@ describe("Channels API", () => {
       )
       assert.deepEqual(fetchStub.args[0][1], {
         method: DELETE
+      })
+    })
+  })
+
+  describe("invitations", () => {
+    it("adds a channel invite", async () => {
+      const channelName = "channel_name"
+      const invitation = makeChannelInvite()
+
+      fetchJSONStub.returns(Promise.resolve(invitation))
+
+      assert.deepEqual(
+        invitation,
+        await addChannelInvitation(channelName, invitation.email)
+      )
+
+      assert.ok(
+        fetchJSONStub.calledWith(`/api/v0/channels/${channelName}/invites/`)
+      )
+      assert.deepEqual(fetchJSONStub.args[0][1], {
+        method: POST,
+        body:   JSON.stringify({
+          email: invitation.email
+        })
       })
     })
   })

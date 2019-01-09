@@ -26,6 +26,7 @@ from channels.models import (
     Subscription,
     LinkMeta,
     Channel,
+    ChannelInvitation,
     Post,
     Comment,
     Article,
@@ -110,6 +111,23 @@ class ChannelFactory(DjangoModelFactory):
 
     class Meta:
         model = Channel
+
+
+class ChannelInvitationFactory(DjangoModelFactory):
+    """Factory for a channels.models.ChannelInvitation object"""
+
+    inviter = SubFactory(UserFactory)
+    channel = SubFactory(ChannelFactory)
+    user = None
+    email = factory.Faker("email")
+
+    class Params:
+        redeemed = factory.Trait(
+            user=SubFactory(UserFactory, email=factory.SelfAttribute("..email"))
+        )
+
+    class Meta:
+        model = ChannelInvitation
 
 
 class PostFactory(DjangoModelFactory):

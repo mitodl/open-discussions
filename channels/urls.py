@@ -1,15 +1,22 @@
 """URL configurations for channels"""
-from django.conf.urls import url
+from django.conf.urls import url, include
+from rest_framework.routers import DefaultRouter
 
 from channels.views import (
     channels,
     comments,
     contributors,
     frontpage,
+    invites,
     moderators,
     posts,
     reports,
     subscribers,
+)
+
+router = DefaultRouter()
+router.register(
+    r"invites", invites.ChannelInvitationViewSet, basename="channel_invitation_api"
 )
 
 urlpatterns = [
@@ -59,6 +66,7 @@ urlpatterns = [
         reports.ChannelReportListView.as_view(),
         name="channel-reports",
     ),
+    url(r"^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/", include(router.urls)),
     url(
         r"api/v0/posts/(?P<post_id>[A-Za-z0-9_]+)/$",
         posts.PostDetailView.as_view(),

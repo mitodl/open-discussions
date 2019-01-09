@@ -1,7 +1,12 @@
 // @flow
 import { assert } from "chai"
 
-import { makeChannel, makeModerators, makeContributors } from "./channels"
+import {
+  makeChannel,
+  makeModerators,
+  makeContributors,
+  makeChannelInvite
+} from "./channels"
 
 describe("channels related factories", () => {
   it("should make a channel", () => {
@@ -12,6 +17,8 @@ describe("channels related factories", () => {
     assert.isString(channel.public_description)
     assert.isNumber(channel.num_users)
   })
+
+  //
   ;[true, false].forEach(specifyUsername => {
     [true, false].forEach(isModerator => {
       it(`should make a moderators list as a ${
@@ -33,8 +40,10 @@ describe("channels related factories", () => {
       })
     })
   })
+
+  //
   ;[true, false].forEach(specifyUsername => {
-    it(`should make a contributors list as a ${
+    it(`should make a contributors list ${
       specifyUsername ? "with a special username" : ""
     }`, () => {
       const contributors = makeContributors(specifyUsername ? "username" : null)
@@ -47,6 +56,21 @@ describe("channels related factories", () => {
         assert.ok(contributor.full_name)
         assert.ok(contributor.email)
       }
+    })
+  })
+
+  //
+  ;[true, false].forEach(specifyEmail => {
+    it(`should make a channel invitation ${
+      specifyEmail ? "with a specific email" : ""
+    }`, () => {
+      const invite = makeChannelInvite(specifyEmail ? "username" : null)
+      if (specifyEmail) {
+        assert.equal(invite.email, "username")
+      }
+      assert.ok(invite.id)
+      assert.ok(invite.created_on)
+      assert.ok(invite.updated_on)
     })
   })
 })

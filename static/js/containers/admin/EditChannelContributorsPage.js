@@ -8,7 +8,7 @@ import withForm from "../../hoc/withForm"
 import withSingleColumn from "../../hoc/withSingleColumn"
 import editChannelMembershipPage from "./EditChannelMembershipPage"
 
-import { newMemberForm } from "../../lib/channels"
+import { newMemberForm, isPrivate } from "../../lib/channels"
 import { configureForm } from "../../lib/forms"
 import { actions } from "../../actions"
 import { mergeAndInjectProps } from "../../lib/redux_props"
@@ -70,18 +70,41 @@ const mapStateToProps = (state, ownProps) => {
 const mergeProps = mergeAndInjectProps(
   (
     { channelName, channel },
-    { loadMembers, loadChannel, addMember, formBeginEdit, setSnackbarMessage }
+    {
+      loadMembers,
+      loadChannel,
+      addMember,
+      formBeginEdit,
+      setSnackbarMessage,
+      inviteMember
+    }
   ) => ({
     loadMembers:    () => loadMembers(channelName),
     loadChannel:    () => loadChannel(channelName),
     onSubmitResult: formBeginEdit,
     onSubmit:       async form => {
-      const newMember = await addMember(channel.name, form.email)
-      setSnackbarMessage({
-        message: `Successfully added ${
-          newMember.contributor.email
-        } as a contributor`
-      })
+      try {
+        const newMember = await addMember(channel.name, form.email)
+        setSnackbarMessage({
+          message: `Successfully added ${
+            newMember.contributor.email
+          } as a contributor`
+        })
+      } catch (e) {
+        // trigger an invite for private channels if the email didn't exist
+        if (
+          isPrivate(channel) &&
+          e.email &&
+          e.email.includes("email does not exist")
+        ) {
+          const { invite } = await inviteMember(channel.name, form.email)
+          setSnackbarMessage({
+            message: `Successfully invited ${invite.email} as a contributor`
+          })
+        } else {
+          throw e
+        }
+      }
     }
   })
 )
@@ -94,6 +117,7 @@ export default R.compose(
       loadChannel:   actions.channels.get,
       addMember:     actions.channelContributors.post,
       removeMember:  actions.channelContributors.delete,
+      inviteMember:  actions.channelInvitations.post,
       setSnackbarMessage,
       setDialogData: (data: any) =>
         setDialogData({ dialogKey: DIALOG_REMOVE_MEMBER, data: data }),

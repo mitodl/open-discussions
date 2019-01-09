@@ -10,7 +10,8 @@ import EditChannelContributorsPage, {
 import {
   makeChannel,
   makeContributor,
-  makeContributors
+  makeContributors,
+  makeChannelInvite
 } from "../../factories/channels"
 import { FORM_VALIDATE, FORM_UPDATE } from "../../actions/forms"
 import {
@@ -21,7 +22,7 @@ import {
   SET_SNACKBAR_MESSAGE
 } from "../../actions/ui"
 
-import { newMemberForm } from "../../lib/channels"
+import { newMemberForm, CHANNEL_TYPE_PRIVATE } from "../../lib/channels"
 import { formatTitle } from "../../lib/title"
 import { wait } from "../../lib/util"
 import IntegrationTestHelper from "../../util/integration_test_helper"
@@ -71,6 +72,9 @@ describe("EditChannelContributorsPage", () => {
     helper.getChannelStub.returns(Promise.resolve(channel))
     helper.getChannelsStub.returns(Promise.resolve([channel]))
     helper.getChannelContributorsStub.returns(Promise.resolve(contributors))
+    helper.addChannelInvitationStub.returns(
+      Promise.resolve(makeChannelInvite())
+    )
     helper.getPostsForChannelStub.returns(
       Promise.resolve({
         pagination: {},
@@ -182,6 +186,43 @@ describe("EditChannelContributorsPage", () => {
           }
         }
       })
+    })
+
+    it("sends a channel invitation if the channel is private and email doesn't exist", async () => {
+      helper.addChannelContributorStub.returns(
+        Promise.reject({
+          email: ["email does not exist"]
+        })
+      )
+
+      const email = "new@email.com"
+      channel.channel_type = CHANNEL_TYPE_PRIVATE
+      const { inner } = await render({
+        forms: {
+          [CONTRIBUTORS_KEY]: {
+            value: {
+              email
+            },
+            errors: {}
+          }
+        }
+      })
+
+      const props = inner.find("EditChannelMembersForm").props()
+      props.onSubmit({ preventDefault: helper.sandbox.stub() })
+
+      // let promise resolve
+      await wait(0)
+      sinon.assert.calledWith(
+        helper.addChannelContributorStub,
+        channel.name,
+        email
+      )
+      sinon.assert.calledWith(
+        helper.addChannelInvitationStub,
+        channel.name,
+        email
+      )
     })
 
     it("adds a new contributor", async () => {
