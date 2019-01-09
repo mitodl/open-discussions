@@ -188,6 +188,32 @@ class Channel(TimestampedModel):
         return f"{self.name}"
 
 
+class ChannelInvitation(TimestampedModel):
+    """A pending invitation to a channel"""
+
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    inviter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="sent_invitations",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="received_invitations",
+    )
+    email = models.EmailField()
+    redeemed = models.BooleanField(default=True, db_index=True)
+
+    class Meta:
+        index_together = (("email", "redeemed"),)
+        unique_together = (("channel", "email"),)
+
+    def __str__(self):
+        return f"Invitation to {self.channel.title} by {self.inviter.profile.name} for {self.email}"
+
+
 class LinkMeta(TimestampedModel):
     """
     The thumbnail embedly provides for a particular URL

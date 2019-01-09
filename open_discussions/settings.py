@@ -267,6 +267,8 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.load_extra_data",
     # Update the user record with any changed info from the auth service.
     "social_core.pipeline.user.user_details",
+    # Resolve outstanding channel invitations
+    "authentication.pipeline.invite.resolve_outstanding_channel_invites",
 )
 
 

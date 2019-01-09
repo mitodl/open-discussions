@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from channels.models import Channel
+from channels.models import Channel, ChannelInvitation
 
 
 class ChannelAdmin(admin.ModelAdmin):
@@ -16,3 +16,16 @@ class ChannelAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Channel, ChannelAdmin)
+
+
+class ChannelInvitationAdmin(admin.ModelAdmin):
+    """Customized ChannelInvitation admin model"""
+
+    model = ChannelInvitation
+    search_fields = ("email", "user__email", "inviter__email")
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+admin.site.register(ChannelInvitation, ChannelInvitationAdmin)
