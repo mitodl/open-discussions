@@ -443,14 +443,18 @@ def allowed_post_types_bitmask(allowed_post_types):
     )
 
 
-def create_channel(name, membership_is_managed, allowed_post_types):
+def create_channel(
+    name, title, membership_is_managed, allowed_post_types, channel_type
+):
     """
     Create a channel and related models
 
     Args:
         name(str): the channel name
+        title(str): the channel title
         membership_is_managed (boolean): True if the channel is managed by another app
         allowed_post_types (list of str): list of allowed post types
+        channel_type (str): the channel type
 
     Returns:
         channels.models.Channel: the created channel
@@ -460,9 +464,11 @@ def create_channel(name, membership_is_managed, allowed_post_types):
     channel, created = Channel.objects.get_or_create(
         name=name,
         defaults={
+            "title": title,
             "widget_list": widget_list,
             "membership_is_managed": membership_is_managed,
             "allowed_post_types": allowed_post_types_bitmask(allowed_post_types),
+            "channel_type": channel_type,
         },
     )
 
@@ -600,7 +606,9 @@ class Api:
 
         # wrap channel creation as an atomic operation across the db and reddit
         with transaction.atomic():
-            channel = create_channel(name, membership_is_managed, allowed_post_types)
+            channel = create_channel(
+                name, title, membership_is_managed, allowed_post_types, channel_type
+            )
 
             # create in reddit after we persist the db records so an error here rolls back everything
             subreddit = self.reddit.subreddit.create(
@@ -643,6 +651,12 @@ class Api:
             if not isinstance(membership_is_managed, bool):
                 raise ValueError("Invalid argument membership_is_managed")
             channel_kwargs["membership_is_managed"] = membership_is_managed
+
+        if channel_type is not None:
+            channel_kwargs["channel_type"] = channel_type
+
+        if title is not None:
+            channel_kwargs["title"] = title
 
         if allowed_post_types is not None:
             channel_kwargs["allowed_post_types"] = allowed_post_types_bitmask(

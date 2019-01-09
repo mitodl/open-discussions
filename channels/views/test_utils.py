@@ -127,3 +127,11 @@ def raise_error_on_submission_fetch(mocker):
         "praw.models.reddit.submission.Submission._fetch",
         side_effect=Exception("_fetch() should not be called"),
     )
+
+
+def raise_error_on_subreddit_fetch(mocker):
+    """Raise an error if Subreddit._fetch() is called"""
+    return mocker.patch(
+        "praw.models.reddit.subreddit.Subreddit._fetch",
+        side_effect=Exception("_fetch() should not be called"),
+    )

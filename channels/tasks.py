@@ -166,31 +166,10 @@ def populate_post_post_type(ids):
         post.save()
 
 
-@app.task
-def populate_channel_post_type(channel_ids):
-    """
-    Populates Channel.allowed_post_types for a range of channels
-
-    Args:
-        channel_ids (list of int): list channel post ids
-    """
-    client = get_admin_api()
-
-    for channel in Channel.objects.filter(id__in=channel_ids).iterator():
-        if channel.allowed_post_types:
-            continue
-
-        subreddit = client.get_subreddit(channel.name)
-        channel.allowed_post_types = allowed_post_types_bitmask(
-            get_allowed_post_types_from_link_type(subreddit.submission_type)
-        )
-        channel.save()
-
-
 @app.task(bind=True)
-def populate_post_and_channel_types(self):
+def populate_post_types(self):
     """
-    Populates Channel.allowed_post_types and Post.post_type
+    Populates Post.post_type
     """
     results = celery.group(
         [
@@ -200,8 +179,51 @@ def populate_post_and_channel_types(self):
                 chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
             )
         ]
-        + [
-            populate_channel_post_type.si(ids)
+    )
+    raise self.replace(results)
+
+
+@app.task
+def populate_channel_fields_batch(channel_ids):
+    """
+    Populates Channel fields from reddit for a list of channel ids
+
+    Args:
+        channel_ids (list of int): list channel post ids
+    """
+    client = get_admin_api()
+
+    for channel in Channel.objects.filter(id__in=channel_ids).iterator():
+        if all(
+            getattr(channel, field)
+            for field in ["allowed_post_types", "title", "channel_type"]
+        ):
+            continue
+
+        subreddit = client.get_subreddit(channel.name)
+
+        if not channel.allowed_post_types:
+            channel.allowed_post_types = allowed_post_types_bitmask(
+                get_allowed_post_types_from_link_type(subreddit.submission_type)
+            )
+
+        if not channel.title:
+            channel.title = subreddit.title
+
+        if not channel.channel_type:
+            channel.channel_type = subreddit.subreddit_type
+
+        channel.save()
+
+
+@app.task(bind=True)
+def populate_channel_fields(self):
+    """
+    Populates Channel fields from reddit for all channels
+    """
+    results = celery.group(
+        [
+            populate_channel_fields_batch.si(ids)
             for ids in chunks(
                 Channel.objects.values_list("id", flat=True),
                 chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,

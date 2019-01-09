@@ -10,7 +10,11 @@ from django.db import models
 from widgets.models import WidgetList
 
 
-from channels.constants import ROLE_CHOICES, VALID_EXTENDED_POST_CHOICES
+from channels.constants import (
+    ROLE_CHOICES,
+    VALID_EXTENDED_POST_CHOICES,
+    VALID_CHANNEL_CHOICES,
+)
 from channels.utils import (
     AVATAR_MEDIUM_MAX_DIMENSION,
     AVATAR_SMALL_MAX_DIMENSION,
@@ -125,6 +129,7 @@ class Channel(TimestampedModel):
     """
 
     name = models.CharField(unique=True, max_length=100)
+    title = models.CharField(unique=True, max_length=100, null=True)
     membership_is_managed = models.BooleanField(default=False)
     avatar = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri)
     avatar_small = models.ImageField(
@@ -139,6 +144,9 @@ class Channel(TimestampedModel):
 
     # Bitfield mutates the list passed to
     allowed_post_types = BitField(flags=VALID_EXTENDED_POST_CHOICES, null=True)
+    channel_type = models.CharField(
+        max_length=20, choices=VALID_CHANNEL_CHOICES, null=True
+    )
 
     def save(
         self, *args, update_image=False, **kwargs

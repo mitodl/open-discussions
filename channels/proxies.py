@@ -41,6 +41,11 @@ class PostProxy(ObjectProxy):
         return f"PostProxy for submission: {self._self_submission.id}"
 
     @property
+    def channel(self):
+        """Return the post channel"""
+        return self._self_post.channel
+
+    @property
     def link_meta(self):
         """Return the LinkMeta for this post"""
         return self._self_post.link_meta

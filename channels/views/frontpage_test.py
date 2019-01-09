@@ -8,6 +8,7 @@ from channels.constants import POSTS_SORT_HOT, VALID_POST_SORT_TYPES
 from channels.views.test_utils import (
     default_post_response_data,
     raise_error_on_submission_fetch,
+    raise_error_on_subreddit_fetch,
 )
 from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.features import ANONYMOUS_ACCESS
@@ -35,7 +36,9 @@ def test_frontpage(
     fourth_post = reddit_factories.text_post("my 4th post", user, channel=channel)
 
     url = reverse("frontpage")
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
@@ -62,7 +65,9 @@ def test_frontpage_sorted(
 
     url = reverse("frontpage")
 
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = user_client.get(url, {"sort": sort})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
@@ -95,7 +100,9 @@ def test_frontpage_pagination(
     """Test that post pagination works"""
     settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT = 5
     url = reverse("frontpage")
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = client.get(url, params)
     expected["sort"] = POSTS_SORT_HOT
     assert resp.status_code == status.HTTP_200_OK
@@ -108,7 +115,9 @@ def test_frontpage_anonymous(mocker, client, public_channel, settings, allow_ano
     settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
 
     url = reverse("frontpage")
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = client.get(url)
     if allow_anonymous:
         assert resp.status_code == status.HTTP_200_OK

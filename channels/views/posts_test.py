@@ -21,6 +21,7 @@ from channels.utils import THUMBNAIL_DIMENSIONS
 from channels.views.test_utils import (
     default_post_response_data,
     raise_error_on_submission_fetch,
+    raise_error_on_subreddit_fetch,
 )
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
@@ -453,7 +454,9 @@ def test_list_posts(
         user.save()
 
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
 
@@ -473,7 +476,9 @@ def test_list_posts_none(mocker, user_client, private_channel_and_contributor):
     """List posts in a channel"""
     channel, _ = private_channel_and_contributor
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {"posts": [], "pagination": {"sort": POSTS_SORT_HOT}}
@@ -492,7 +497,9 @@ def test_list_posts_sorted(
     third_post = reddit_factories.text_post("my 3rd post", user, channel=channel)
     fourth_post = reddit_factories.text_post("my 4th post", user, channel=channel)
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = user_client.get(url, {"sort": sort})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == {
@@ -516,7 +523,9 @@ def test_list_posts_stickied(
     post = posts[2]
     staff_api.pin_post(post.id, True)
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = user_client.get(url)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["posts"][0] == {
@@ -560,7 +569,9 @@ def test_list_posts_pagination_first_page_no_params(
         "sort": POSTS_SORT_HOT,
     }
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["pagination"] == expected
@@ -587,7 +598,9 @@ def test_list_posts_pagination_first_page_with_params(
         "sort": POSTS_SORT_HOT,
     }
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["pagination"] == expected
@@ -616,7 +629,9 @@ def test_list_posts_pagination_non_first_page(
         "sort": POSTS_SORT_HOT,
     }
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["pagination"] == expected
@@ -645,7 +660,9 @@ def test_list_posts_pagination_non_offset_page(
         "sort": POSTS_SORT_HOT,
     }
     url = reverse("post-list", kwargs={"channel_name": channel.name})
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = user_client.get(url, params)
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["pagination"] == expected
@@ -661,7 +678,9 @@ def test_list_posts_anonymous(
     post = reddit_factories.link_post("link_post", user=user, channel=public_channel)
 
     url = reverse("post-list", kwargs={"channel_name": public_channel.name})
-    with raise_error_on_submission_fetch(mocker):
+    with raise_error_on_submission_fetch(mocker), raise_error_on_subreddit_fetch(
+        mocker
+    ):
         resp = client.get(url)
     if allow_anonymous:
         assert resp.status_code == status.HTTP_200_OK

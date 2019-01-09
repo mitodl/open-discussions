@@ -104,15 +104,15 @@ class BasePostSerializer(RedditObjectSerializer):
 
     def get_channel_name(self, instance):
         """The channel which contains the post"""
-        return instance.subreddit.display_name
+        return instance.channel.name or instance.subreddit.display_name
 
     def get_channel_title(self, instance):
         """The title of the channel"""
-        return instance.subreddit.title
+        return instance.channel.title or instance.subreddit.title
 
     def get_channel_type(self, instance):
         """The type of the channel"""
-        return instance.subreddit.subreddit_type
+        return instance.channel.channel_type or instance.subreddit.subreddit_type
 
     def get_edited(self, instance):
         """Return a Boolean signifying if the post has been edited or not"""
