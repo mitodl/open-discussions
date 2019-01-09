@@ -194,6 +194,7 @@ describe("api", function() {
 
     it("creates a post", async () => {
       const post = makePost()
+      post.score = 1
       fetchStub.returns(Promise.resolve(JSON.stringify(post)))
 
       const text = "Text"
@@ -214,6 +215,7 @@ describe("api", function() {
 
     it("creates a post with a coverImage", async () => {
       const post = makePost()
+      post.score = 1
       fetchStub.returns(Promise.resolve(JSON.stringify(post)))
 
       const title = "Title"
