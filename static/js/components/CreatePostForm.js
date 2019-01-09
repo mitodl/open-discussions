@@ -61,7 +61,6 @@ export default class CreatePostForm extends React.Component<Props> {
               className="write-something dark-outlined compact"
               onClick={() => updatePostType(LINK_TYPE_TEXT)}
             >
-              <i className="material-icons text_fields">text_fields</i>
               Write something
             </button>
           ) : null}
@@ -70,7 +69,6 @@ export default class CreatePostForm extends React.Component<Props> {
               className="share-a-link dark-outlined compact"
               onClick={() => updatePostType(LINK_TYPE_LINK)}
             >
-              <i className="material-icons open_in_new">open_in_new</i>
               Share a link
             </button>
           ) : null}
@@ -80,7 +78,6 @@ export default class CreatePostForm extends React.Component<Props> {
                 className="write-an-article dark-outlined compact"
                 onClick={() => updatePostType(LINK_TYPE_ARTICLE)}
               >
-                <i className="material-icons text_fields">text_fields</i>
               Write an Article
               </button>
             ) : null}

@@ -35,10 +35,14 @@ button.dark-outlined {
 }
 
 button.compact {
-  font-size: 14px;
-  padding: 9px 20px;
+  font-size: 12px;
+  padding: 9px 7px;
   display: flex;
   align-items: center;
+
+  @include breakpoint(extrawide) {
+    padding: 9px 20px;
+  }
 
   i {
     font-size: 16px;
