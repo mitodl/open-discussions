@@ -39,6 +39,7 @@ class WidgetInstanceSerializer(serializers.ModelSerializer):
         """Returns a specification for building/editing a widget"""
         return {
             "widget_type": cls.name,
+            "description": cls.description,
             "react_renderer": cls.get_react_renderer(),
             "form_spec": cls.configuration_serializer_class().get_form_spec(),
         }

@@ -14,9 +14,23 @@ EXPECTED_AVAILABLE_WIDGETS = [
     {
         "form_spec": [
             {
+                "field_name": "source",
+                "input_type": "markdown_wysiwyg",
+                "label": "Text",
+                "props": {"placeholder": "Enter widget text"},
+                "default": "",
+            }
+        ],
+        "react_renderer": "markdown",
+        "widget_type": "Markdown",
+        "description": "Rich Text",
+    },
+    {
+        "form_spec": [
+            {
                 "field_name": "url",
                 "input_type": "text",
-                "label": "Url",
+                "label": "URL",
                 "props": {
                     "max_length": "",
                     "min_length": "",
@@ -27,13 +41,14 @@ EXPECTED_AVAILABLE_WIDGETS = [
         ],
         "widget_type": "URL",
         "react_renderer": "default",
+        "description": "Embedded URL",
     },
     {
         "form_spec": [
             {
                 "field_name": "url",
                 "input_type": "text",
-                "label": "Url",
+                "label": "URL",
                 "props": {
                     "max_length": "",
                     "min_length": "",
@@ -51,19 +66,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
         ],
         "react_renderer": "default",
         "widget_type": "RSS Feed",
-    },
-    {
-        "form_spec": [
-            {
-                "field_name": "source",
-                "input_type": "markdown_wysiwyg",
-                "label": "Source",
-                "props": {"placeholder": "Enter widget text"},
-                "default": "",
-            }
-        ],
-        "react_renderer": "markdown",
-        "widget_type": "Markdown",
+        "description": "RSS Feed",
     },
 ]
 
