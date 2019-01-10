@@ -185,6 +185,14 @@ export const validateContentReportForm = validate([
   )
 ])
 
+export const validateSearchQuery = (text: ?string): ?string =>
+  R.compose(
+    R.lte(SETTINGS.search_min_length),
+    R.length
+  )(text)
+    ? null
+    : `Query string must be at least ${SETTINGS.search_min_length} characters`
+
 export const validationMessage = (message: ?string) =>
   R.isEmpty(message) || R.isNil(message) ? null : (
     <div className="validation-message">{message}</div>

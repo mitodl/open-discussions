@@ -26,6 +26,7 @@ import type { SearchInputs, SearchParams, Result } from "../flow/searchTypes"
 import { Cell, Grid } from "../components/Grid"
 
 import { toggleUpvote } from "../util/api_actions"
+import { validateSearchQuery } from "../lib/validation"
 
 type Props = {
   dispatch: Dispatch<any>,
@@ -53,7 +54,8 @@ type Props = {
 type State = {
   text: string,
   from: number,
-  votedComments: Map<string, CommentInTree>
+  votedComments: Map<string, CommentInTree>,
+  error: ?string
 }
 
 const shouldLoadChannel = (currentProps: Props, prevProps: ?Props) => {
@@ -71,9 +73,10 @@ const shouldLoadChannel = (currentProps: Props, prevProps: ?Props) => {
   return !channelLoaded && !channelProcessing
 }
 
-const shouldLoadSearch = (currentProps: Props) => {
+const shouldLoadSearch = (currentProps: Props, currentState: State) => {
   const { searchLoaded, searchProcessing } = currentProps
-  return !searchLoaded && !searchProcessing
+  const { error } = currentState
+  return !searchLoaded && !searchProcessing && !error
 }
 
 export class SearchPage extends React.Component<Props, State> {
@@ -82,22 +85,26 @@ export class SearchPage extends React.Component<Props, State> {
     this.state = {
       text:          qs.parse(props.location.search).q,
       from:          0,
-      votedComments: new Map()
+      votedComments: new Map(),
+      error:         null
     }
   }
 
   componentDidMount() {
+    const { text } = this.state
     if (shouldLoadChannel(this.props)) {
       this.loadChannel()
     }
-    this.runSearch()
+    if (text) {
+      this.runSearch()
+    }
   }
 
   componentDidUpdate(prevProps: Props) {
     if (shouldLoadChannel(this.props, prevProps)) {
       this.loadChannel()
     }
-    if (shouldLoadSearch(this.props)) {
+    if (shouldLoadSearch(this.props, this.state)) {
       this.runSearch()
     }
   }
@@ -144,6 +151,12 @@ export class SearchPage extends React.Component<Props, State> {
     const searchObj = qs.parse(search)
     const text = params.text || this.state.text || undefined
 
+    const error = validateSearchQuery(text)
+    if (error) {
+      this.setState({ error })
+      return
+    }
+
     let type
     if (!R.isNil(params.type)) {
       type = params.type
@@ -164,7 +177,7 @@ export class SearchPage extends React.Component<Props, State> {
       clearSearch()
       from = 0
     }
-    this.setState({ from })
+    this.setState({ from, error })
     await runSearch({
       channelName,
       text,
@@ -252,10 +265,9 @@ export class SearchPage extends React.Component<Props, State> {
   render() {
     const {
       location: { search },
-      match,
-      results
+      match
     } = this.props
-    const { text } = this.state
+    const { text, error } = this.state
 
     return (
       <Grid className="main-content two-column search-page">
@@ -268,7 +280,7 @@ export class SearchPage extends React.Component<Props, State> {
             value={text || ""}
             onClear={this.updateText}
             onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
-            validation={results.errors}
+            validation={error}
           />
           <div className="post-list-title">
             <SearchFilterPicker
@@ -279,7 +291,7 @@ export class SearchPage extends React.Component<Props, State> {
               value={qs.parse(search).type || SEARCH_FILTER_ALL}
             />
           </div>
-          {this.renderResults()}
+          {error || !text ? null : this.renderResults()}
         </Cell>
       </Grid>
     )

@@ -23,6 +23,7 @@ describe("SearchTextbox", () => {
         onSubmit={onSubmitStub}
         onClear={onClearStub}
         value={""}
+        error={""}
         {...props}
       />
     )

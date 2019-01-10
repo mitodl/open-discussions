@@ -26,6 +26,7 @@ declare var SETTINGS: {
   allow_email_auth: boolean,
   allow_search: boolean,
   search_page_size: number,
+  search_min_length: number,
   allow_widgets_ui: boolean,
   use_new_branding: boolean,
   support_email: string,

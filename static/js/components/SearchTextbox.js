@@ -1,14 +1,13 @@
-// @flow
+// @flowarticle
 import React from "react"
-import type {FormErrors} from "../flow/formTypes";
-import {validationMessage} from "../lib/validation";
+import { validationMessage } from "../lib/validation"
 
 type Props = {
   onChange: Function,
   onClear: Function,
   onSubmit: Function,
   value: string,
-  validation: FormErrors<T>
+  validation: ?string
 }
 
 export default class SearchTextbox extends React.Component<Props> {
@@ -52,12 +51,13 @@ export default class SearchTextbox extends React.Component<Props> {
         <input
           ref={this.input}
           type="text"
+          name="query"
           className="underlined"
           value={value}
           onChange={onChange}
           onKeyDown={event => (event.key === "Enter" ? onSubmit(event) : null)}
         />
-        {validationMessage(validation.search)}
+        {validationMessage(validation)}
       </div>
     )
   }

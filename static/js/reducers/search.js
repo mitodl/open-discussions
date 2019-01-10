@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import { POST, INITIAL_STATE } from "redux-hammock/constants"
 
 import * as api from "../lib/api/api"

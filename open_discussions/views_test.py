@@ -85,6 +85,7 @@ def test_webpack_url(
         "release_version": settings.VERSION,
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
         "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,
+        "search_min_length": settings.ELASTICSEARCH_MIN_QUERY_SIZE,
         "accepted_social_sites": list(SOCIAL_SITE_NAME_MAP.values()),
         "article_ui_enabled": settings.FEATURES[features.ARTICLE_UI],
         "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
