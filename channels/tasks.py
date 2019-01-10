@@ -102,7 +102,7 @@ def populate_user_roles(channel_ids):
     for channel in Channel.objects.filter(id__in=channel_ids):
         try:
             role = ROLE_MODERATORS
-            channel_role, _ = ChannelGroupRole.objects.get_or_create(
+            ChannelGroupRole.objects.get_or_create(
                 channel=channel,
                 role=role,
                 group=Group.objects.get_or_create(name=f"{channel.name}_{role}")[0],
@@ -112,7 +112,7 @@ def populate_user_roles(channel_ids):
                 if user:
                     add_user_role(channel, ROLE_MODERATORS, user)
             role = ROLE_CONTRIBUTORS
-            channel_role, _ = ChannelGroupRole.objects.get_or_create(
+            ChannelGroupRole.objects.get_or_create(
                 channel=channel,
                 role=role,
                 group=Group.objects.get_or_create(name=f"{channel.name}_{role}")[0],
