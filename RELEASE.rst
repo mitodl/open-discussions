@@ -1,6 +1,26 @@
 Release Notes
 =============
 
+Version 0.61.0
+--------------
+
+- Remove unique constraint on title
+- refactor API library file to several modules
+- Add description for widget instances (#1672)
+- Fix a flakey JS test
+- Added title and channel_type to Channel to avoid many reddit requests
+- Remove text widget class and add wysiwyg widget field editor (#1646)
+- Fixed next param for touchstone
+- Add cover image to article post
+- Add article_text and post_type to REST API (#1633)
+- post creation page tweaks
+- Remove PyYAML (#1651)
+- Search text input focus (#1642)
+- Peg python-lazy-fixture to 0.4.2 (#1648)
+- Fix handling of widget ids (#1645)
+- Article search (#1619)
+- Upgrade elasticsearch lib
+
 Version 0.60.1 (Released January 04, 2019)
 --------------
 
