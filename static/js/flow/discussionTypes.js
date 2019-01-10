@@ -292,7 +292,3 @@ export type ProfilePayload = {
 export type SocialAuth = {
   provider: string,
 }
-
-export type SearchValidation = {
-  query: string
-}
