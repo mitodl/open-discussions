@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 
 import { postDetailURL, urlHostname } from "./url"
 import { showDropdown, hideDropdownDebounced } from "../actions/ui"
-import { LINK_TYPE_TEXT, LINK_TYPE_ARTICLE } from "./channels"
+import { LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_ARTICLE } from "./channels"
 
 import type { Dispatch } from "redux"
 import type {
@@ -68,7 +68,7 @@ export const getPaginationSortParams = R.pickAll([
 export const PostTitleAndHostname = ({ post }: { post: Post }) => (
   <React.Fragment>
     <span className="post-title">{post.title}</span>
-    {post.url ? (
+    {post.post_type === LINK_TYPE_LINK ? (
       <span className="url-hostname">{`(${urlHostname(post.url)})`}</span>
     ) : null}
   </React.Fragment>
@@ -77,7 +77,7 @@ export const PostTitleAndHostname = ({ post }: { post: Post }) => (
 export const getPostDropdownMenuKey = (post: Post) => `POST_DROPDOWN_${post.id}`
 
 export const formatPostTitle = (post: Post) =>
-  post.url ? (
+  post.post_type === LINK_TYPE_LINK ? (
     <div>
       <a
         className="post-title navy"
@@ -123,3 +123,6 @@ export const getTextContent = (post: Post): ?string => {
   }
   return null
 }
+
+export const isEditablePostType = (post: Post): boolean =>
+  post.post_type === LINK_TYPE_TEXT || post.post_type === LINK_TYPE_ARTICLE

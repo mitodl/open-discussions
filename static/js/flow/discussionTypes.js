@@ -73,6 +73,12 @@ export type AuthoredContent = {
   subscribed:      boolean
 }
 
+export type PostType =
+  | typeof LINK_TYPE_LINK
+  | typeof LINK_TYPE_TEXT
+  | typeof LINK_TYPE_ARTICLE
+
+
 export type Post = AuthoredContent & {
   title:           string,
   url:             ?string,
@@ -86,7 +92,7 @@ export type Post = AuthoredContent & {
   stickied:        boolean,
   removed:         boolean,
   thumbnail:       ?string,
-  post_type:       ?string,
+  post_type:       PostType,
   cover_image:     ?string
 }
 

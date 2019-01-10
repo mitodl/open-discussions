@@ -17,11 +17,16 @@ import PostUpvoteButton from "./PostUpvoteButton"
 import ArticleEditor from "./ArticleEditor"
 
 import { isPrivate } from "../lib/channels"
-import { formatPostTitle } from "../lib/posts"
+import { formatPostTitle, isEditablePostType } from "../lib/posts"
 import { userIsAnonymous } from "../lib/util"
 import { editPostKey } from "../components/CommentForms"
 import { makeProfile } from "../lib/profile"
 import { postPermalink, profileURL, embedlyResizeImage } from "../lib/url"
+import {
+  LINK_TYPE_LINK,
+  LINK_TYPE_TEXT,
+  LINK_TYPE_ARTICLE
+} from "../lib/channels"
 
 import type { Post, Channel } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
@@ -51,15 +56,27 @@ type Props = {
 }
 
 export default class ExpandedPostDisplay extends React.Component<Props> {
-  renderTextOrArticleContent = () => {
-    const { forms, post } = this.props
+  renderPostContent = () => {
+    const { forms, post, embedly, showPermalinkUI } = this.props
 
     if (R.has(editPostKey(post), forms)) {
       return <EditPostForm post={post} editing />
-    } else {
-      return post.text ? (
-        renderTextContent(post)
-      ) : (
+    }
+
+    switch (post.post_type) {
+    case LINK_TYPE_LINK:
+      return (
+        <React.Fragment>
+          {embedly && embedly.provider_name ? (
+            <div className="provider-name">{embedly.provider_name}</div>
+          ) : null}
+          <Embedly embedly={embedly} />
+        </React.Fragment>
+      )
+    case LINK_TYPE_TEXT:
+      return showPermalinkUI ? null : renderTextContent(post)
+    case LINK_TYPE_ARTICLE:
+      return showPermalinkUI ? null : (
         <React.Fragment>
           {post.cover_image ? (
             <img
@@ -81,7 +98,6 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
     const { post, approvePost } = this.props
 
     e.preventDefault()
-
     approvePost(post)
   }
 
@@ -89,7 +105,6 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
     const { post, removePost } = this.props
 
     e.preventDefault()
-
     removePost(post)
   }
 
@@ -118,16 +133,15 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
           <ReportCount count={post.num_reports} />
         </div>
         <div className="right">
-          {SETTINGS.username === post.author_id &&
-          (post.text || post.article_content) ? (
-              <div
-                className="post-action edit-post grey-surround"
-                onClick={beginEditing(editPostKey(post), post)}
-              >
-                <i className="material-icons edit">edit</i>
-                <span>Edit</span>
-              </div>
-            ) : null}
+          {SETTINGS.username === post.author_id && isEditablePostType(post) ? (
+            <div
+              className="post-action edit-post grey-surround"
+              onClick={beginEditing(editPostKey(post), post)}
+            >
+              <i className="material-icons edit">edit</i>
+              <span>Edit</span>
+            </div>
+          ) : null}
           <div
             className="post-action share-action grey-surround"
             onClick={showPostShareMenu}
@@ -192,7 +206,7 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
   }
 
   render() {
-    const { post, forms, showPermalinkUI, embedly } = this.props
+    const { post, forms } = this.props
     const formattedDate = moment(post.created).fromNow()
 
     return (
@@ -224,14 +238,8 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
             </div>
             <div className="right date">{formattedDate}</div>
           </div>
-          {embedly && embedly.provider_name ? (
-            <div className="provider-name">{embedly.provider_name}</div>
-          ) : null}
-          {post && post.url ? <Embedly embedly={embedly} /> : null}
         </div>
-        {!showPermalinkUI && (post.text || post.article_content)
-          ? this.renderTextOrArticleContent()
-          : null}
+        {this.renderPostContent()}
         {R.has(editPostKey(post), forms) ? null : this.postActionButtons()}
       </div>
     )

@@ -25,6 +25,7 @@ import {
   POST_PREVIEW_LINES
 } from "../lib/posts"
 import { userIsAnonymous } from "../lib/util"
+import { LINK_TYPE_LINK } from "../lib/channels"
 
 import type { Dispatch } from "redux"
 import type { Post } from "../flow/discussionTypes"
@@ -134,11 +135,11 @@ export class CompactPostDisplay extends React.Component<Props> {
               </div>
             </div>
           </div>
-          {post.url || post.thumbnail ? (
+          {post.post_type === LINK_TYPE_LINK || post.thumbnail ? (
             <div
               className={`column2 ${post.thumbnail ? "link-thumbnail" : ""}`}
             >
-              {post.url ? (
+              {post.post_type === LINK_TYPE_LINK ? (
                 <React.Fragment>
                   <div className="top-right">
                     <a
@@ -168,9 +169,9 @@ export class CompactPostDisplay extends React.Component<Props> {
                     </a>
                   ) : null}
                 </React.Fragment>
-              ) : post.thumbnail ? (
+              ) : (
                 <img src={post.thumbnail} />
-              ) : null}
+              )}
             </div>
           ) : null}
         </div>

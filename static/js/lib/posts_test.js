@@ -11,7 +11,8 @@ import {
   formatPostTitle,
   mapPostListResponse,
   postFormIsContentless,
-  getTextContent
+  getTextContent,
+  isEditablePostType
 } from "./posts"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import { urlHostname } from "./url"
@@ -179,6 +180,22 @@ describe("Post utils", () => {
       assert.equal(getTextContent(textPost), exampleText)
       assert.equal(getTextContent(articlePost), exampleText)
       assert.isNull(getTextContent(linkPost))
+    })
+  })
+
+  //
+  ;[
+    [LINK_TYPE_LINK, false],
+    [LINK_TYPE_TEXT, true],
+    [LINK_TYPE_ARTICLE, true]
+  ].forEach(([postType, expectation]) => {
+    it(`isEditablePostType should return ${String(
+      expectation
+    )} when ${postType}`, () => {
+      assert.equal(
+        isEditablePostType({ ...makePost(), post_type: postType }),
+        expectation
+      )
     })
   })
 })

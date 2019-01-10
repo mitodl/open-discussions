@@ -19,6 +19,7 @@ import {
   userIsAnonymous,
   preventDefaultAndInvoke
 } from "../lib/util"
+import { LINK_TYPE_ARTICLE } from "../lib/channels"
 
 import type {
   CommentForm,
@@ -454,9 +455,10 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
       const { id } = post
       this.setState({ patching: true })
       // eslint-disable-next-line camelcase
-      const content = article_content
-        ? { id, article_content, cover_image }
-        : { id, text }
+      const content =
+        post.post_type === LINK_TYPE_ARTICLE
+          ? { id, article_content, cover_image }
+          : { id, text }
       try {
         await patchPost(content)
       } catch (_) {
@@ -465,7 +467,7 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
     }
 
     render() {
-      const { forms, formKey, onUpdate, cancelReply } = this.props
+      const { forms, formKey, onUpdate, cancelReply, post } = this.props
       const { patching } = this.state
       const text = R.pathOr("", [formKey, "value", "text"], forms)
       const image = R.pathOr(null, [formKey, "value", "cover_image"], forms)
@@ -475,7 +477,8 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
         forms
       )
 
-      const inputType = article ? ArticleInput : WYSIWYGInput
+      const inputType =
+        post.post_type === LINK_TYPE_ARTICLE ? ArticleInput : WYSIWYGInput
 
       return (
         <React.Fragment>

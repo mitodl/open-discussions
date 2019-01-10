@@ -29,6 +29,7 @@ import { editPostKey } from "../components/CommentForms"
 import * as utilFuncs from "../lib/util"
 import { makeChannel } from "../factories/channels"
 import { shouldIf } from "../lib/test_utils"
+import { LINK_TYPE_ARTICLE } from "../lib/channels"
 
 describe("ExpandedPostDisplay", () => {
   let helper,
@@ -404,6 +405,7 @@ describe("ExpandedPostDisplay", () => {
   })
 
   it("should use ArticleEditor and embedlyResizeImage to display if an article post", () => {
+    post.post_type = LINK_TYPE_ARTICLE
     post.article_content = []
     post.cover_image = "/img/image.jpg"
     post.text = null

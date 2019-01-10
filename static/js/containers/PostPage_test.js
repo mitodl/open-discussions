@@ -41,6 +41,7 @@ import * as utilFuncs from "../lib/util"
 import * as embedUtil from "../lib/embed"
 import { removeTrailingSlash, truncate } from "../lib/util"
 import { NOT_AUTHORIZED_ERROR_TYPE } from "../util/rest"
+import { LINK_TYPE_LINK } from "../lib/channels"
 
 describe("PostPage", function() {
   let helper,
@@ -213,6 +214,7 @@ describe("PostPage", function() {
   it("should call window.twttr.widgets.load() if a twitter embed", async () => {
     post.url = "http://foo.bar.example.com/baz"
     post.text = null
+    post.post_type = LINK_TYPE_LINK
     helper.getEmbedlyStub.returns(Promise.resolve({ response: makeTweet() }))
 
     window.twttr = {
