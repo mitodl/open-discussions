@@ -146,7 +146,7 @@ def populate_subscriptions_and_roles(self):
         + [
             populate_user_roles.si(ids)
             for ids in chunks(
-                Channel.objects.values_list("id", flat=True),
+                Channel.objects.order_by("id").values_list("id", flat=True),
                 chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
             )
         ]
