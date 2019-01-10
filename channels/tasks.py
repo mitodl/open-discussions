@@ -5,6 +5,7 @@ import traceback
 import celery
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from prawcore.exceptions import ResponseException
 
 from channels import api
@@ -23,7 +24,7 @@ from channels.constants import (
     LINK_TYPE_SELF,
     EXTENDED_POST_TYPE_ARTICLE,
 )
-from channels.models import Channel, Post
+from channels.models import Channel, Post, ChannelGroupRole
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 from search.exceptions import PopulateUserRolesException, RetryException
@@ -100,10 +101,22 @@ def populate_user_roles(channel_ids):
     client = get_admin_api()
     for channel in Channel.objects.filter(id__in=channel_ids):
         try:
+            role = ROLE_MODERATORS
+            channel_role, _ = ChannelGroupRole.objects.get_or_create(
+                channel=channel,
+                role=role,
+                group=Group.objects.get_or_create(name=f"{channel.name}_{role}")[0],
+            )
             for moderator in client.list_moderators(channel.name):
                 user = User.objects.filter(username=moderator.name).first()
                 if user:
                     add_user_role(channel, ROLE_MODERATORS, user)
+            role = ROLE_CONTRIBUTORS
+            channel_role, _ = ChannelGroupRole.objects.get_or_create(
+                channel=channel,
+                role=role,
+                group=Group.objects.get_or_create(name=f"{channel.name}_{role}")[0],
+            )
             for contributor in client.list_contributors(channel.name):
                 user = User.objects.filter(username=contributor.name).first()
                 if user:
