@@ -23,7 +23,7 @@ describe("SearchTextbox", () => {
         onSubmit={onSubmitStub}
         onClear={onClearStub}
         value={""}
-        error={null}
+        validation={null}
         {...props}
       />
     )
@@ -35,6 +35,7 @@ describe("SearchTextbox", () => {
         onSubmit={onSubmitStub}
         onClear={onClearStub}
         value={""}
+        validation={null}
         {...props}
       />
     )

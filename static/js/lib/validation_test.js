@@ -4,7 +4,7 @@ import { assert } from "chai"
 import R from "ramda"
 
 import { LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE } from "./channels"
-import { assertIsNothing, assertIsJustNoVal } from "./test_utils"
+import { assertIsNothing, assertIsJustNoVal, shouldIf } from "./test_utils"
 import {
   validation,
   validate,
@@ -19,7 +19,8 @@ import {
   validatePasswordResetForm,
   validatePasswordChangeForm,
   PASSWORD_LENGTH_MINIMUM,
-  validNotMIT
+  validNotMIT,
+  validateSearchQuery
 } from "./validation"
 
 describe("validation library", () => {
@@ -416,6 +417,20 @@ describe("validation library", () => {
         value: {
           new_password: `Password must be at least ${PASSWORD_LENGTH_MINIMUM} characters`
         }
+      })
+    })
+  })
+
+  describe("validateSearchQuery", () => {
+    [
+      ["", false],
+      ["a", false],
+      ["an", true],
+      [null, false],
+      ["a much longer search", true]
+    ].forEach(([query, isValid]) => {
+      it(`a query of '${String(query)}' ${shouldIf(isValid)} be valid`, () => {
+        assert.equal(validateSearchQuery(query) === null, isValid)
       })
     })
   })

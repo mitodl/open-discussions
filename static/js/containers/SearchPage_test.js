@@ -108,7 +108,7 @@ describe("SearchPage", () => {
     })
   })
   ;["", "a"].forEach(query => {
-    it("doesn't run a search if initial search text is empty or < min characters", async () => {
+    it(`doesn't run a search if initial search text is '${query}'`, async () => {
       await renderPage(
         {},
         {
