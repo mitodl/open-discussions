@@ -18,7 +18,7 @@ type Props = {
 }
 
 const DragHandle = SortableHandle(() => (
-  <i className="material-icons drag-handle">drag_handle</i>
+  <i className="material-icons drag-handle widget-button">reorder</i>
 ))
 
 const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElement(
@@ -33,13 +33,13 @@ const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElem
             <hr />
             <div className="edit-buttons">
               <i
-                className="material-icons edit"
+                className="material-icons edit widget-button"
                 onClick={() => startEditInstance(widgetInstance)}
               >
                 edit
               </i>
               <i
-                className="material-icons delete"
+                className="material-icons delete widget-button"
                 onClick={() => deleteInstance(widgetInstance)}
               >
                 delete
