@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.61.1
+--------------
+
+- delete the icons from the post type buttons
+- Create ChannelGroupRoles in populate_user_roles function (#1679)
+- Fixed URL patterns to match post slugs with special characters
+
 Version 0.61.0 (Released January 11, 2019)
 --------------
 
