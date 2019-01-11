@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.61.1
+Version 0.61.1 (Released January 11, 2019)
 --------------
 
 - delete the icons from the post type buttons
