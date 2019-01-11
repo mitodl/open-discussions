@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.61.0
+Version 0.61.0 (Released January 11, 2019)
 --------------
 
 - Remove unique constraint on title
