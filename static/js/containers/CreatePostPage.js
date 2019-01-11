@@ -84,6 +84,52 @@ const createPostPayload = (postForm: PostForm): CreatePostPayload => {
   return { title, text }
 }
 
+const shouldFormReset = (
+  allowedTypes: Array<LinkType>,
+  prevChannelPostTypes: ?Array<string>,
+  postForm: PostFormValue
+) => {
+  // if the post types are the same we don't need to reset the form
+  if (R.equals(allowedTypes, prevChannelPostTypes)) {
+    return false
+  }
+
+  // if there is only one post type allowed on the new channel we should reset
+  // but we don't need to do this if this allowed type is already selected
+  if (
+    allowedTypes.length === 1 &&
+    allowedTypes[0] !== postForm.value.postType
+  ) {
+    return true
+  }
+
+  // if there is no postType selected we don't need to reset the form
+  if (!postForm.value.postType) {
+    return false
+  }
+
+  // if the selected postType is not allowed on the new channel
+  // we always need to reset the form
+  if (!allowedTypes.includes(postForm.value.postType)) {
+    return true
+  }
+
+  // if the currently selected postType is ok on the new channel
+  // we want to reset the form if the user hasn't made any input
+  // so they can see the options on the new channel which are different
+  if (
+    allEmptyOrNil([
+      postForm.value.url,
+      postForm.value.text,
+      postForm.value.article
+    ])
+  ) {
+    return true
+  }
+
+  return false
+}
+
 class CreatePostPage extends React.Component<CreatePostPageProps> {
   async componentDidMount() {
     const { dispatch, channels } = this.props
@@ -112,23 +158,6 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     ensureTwitterEmbedJS()
   }
 
-  shouldFormReset = (
-    allowedTypes: Array<LinkType>,
-    prevChannelPostTypes: ?Array<string>,
-    postForm: PostFormValue
-  ) => {
-    /*
-    If the selected channel accepts any type of post, the form should reset if there was a
-    previously-selected channel and no input has been entered.
-    If the selected channel only takes specific posts, the form should reset if the post type
-    of the current form doesn't match the channel's post type.
-     */
-    return allowedTypes.length > 1
-      ? prevChannelPostTypes &&
-          allEmptyOrNil([postForm.value.url, postForm.value.text])
-      : allowedTypes[0] !== postForm.value.postType
-  }
-
   componentDidUpdate(prevProps: CreatePostPageProps) {
     const { channel, dispatch, postForm } = this.props
 
@@ -141,8 +170,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     if (
       postForm &&
       channel &&
-      !R.equals(channel.allowed_post_types, prevChannelPostTypes) &&
-      this.shouldFormReset(
+      shouldFormReset(
         channel.allowed_post_types,
         prevChannelPostTypes,
         postForm

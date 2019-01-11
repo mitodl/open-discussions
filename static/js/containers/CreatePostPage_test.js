@@ -32,6 +32,9 @@ import { newPostForm } from "../lib/posts"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
 
+type CDUTypeOne = [Array<string>, Array<string>, ?string, boolean, boolean]
+type CDUTypeTwo = [Array<string>, ?string, boolean, boolean]
+
 describe("CreatePostPage", () => {
   let helper,
     listenForActions,
@@ -492,7 +495,7 @@ describe("CreatePostPage", () => {
     //
     ;[
       // starting with ANY
-      ([ALL_LINK_TYPES, [LINK_TYPE_TEXT], LINK_TYPE_LINK, true, true],
+      [ALL_LINK_TYPES, [LINK_TYPE_TEXT], LINK_TYPE_LINK, true, true],
       [ALL_LINK_TYPES, [LINK_TYPE_TEXT], LINK_TYPE_TEXT, true, false],
       [ALL_LINK_TYPES, [LINK_TYPE_TEXT], null, false, true],
       [ALL_LINK_TYPES, [LINK_TYPE_LINK], LINK_TYPE_LINK, true, false],
@@ -502,14 +505,14 @@ describe("CreatePostPage", () => {
       [ALL_LINK_TYPES, ALL_LINK_TYPES, LINK_TYPE_TEXT, true, false],
       [ALL_LINK_TYPES, ALL_LINK_TYPES, null, false, false],
       // starting with LINK
-      [[LINK_TYPE_LINK], LINK_TYPE_TEXT, LINK_TYPE_LINK, true, true],
+      [[LINK_TYPE_LINK], [LINK_TYPE_TEXT], LINK_TYPE_LINK, true, true],
       [[LINK_TYPE_LINK], ALL_LINK_TYPES, LINK_TYPE_LINK, true, false],
       [[LINK_TYPE_LINK], ALL_LINK_TYPES, LINK_TYPE_LINK, false, true],
       // starting with TEXT
       [[LINK_TYPE_TEXT], [LINK_TYPE_TEXT], LINK_TYPE_TEXT, true, false],
       [[LINK_TYPE_TEXT], [LINK_TYPE_LINK], LINK_TYPE_TEXT, true, true],
       [[LINK_TYPE_TEXT], ALL_LINK_TYPES, LINK_TYPE_TEXT, true, false],
-      [[LINK_TYPE_TEXT], ALL_LINK_TYPES, LINK_TYPE_TEXT, false, true])
+      [[LINK_TYPE_TEXT], ALL_LINK_TYPES, LINK_TYPE_TEXT, false, true]
     ].forEach(
       ([
         fromChannelTypes,
@@ -517,7 +520,7 @@ describe("CreatePostPage", () => {
         postType,
         hasInput,
         shouldDispatch
-      ]) => {
+      ]: CDUTypeOne) => {
         it(`${shouldIf(
           shouldDispatch
         )} reset form if channel type changes from ${String(
@@ -573,25 +576,80 @@ describe("CreatePostPage", () => {
 
     //
     ;[
-      [[LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], false],
-      [[LINK_TYPE_LINK, LINK_TYPE_TEXT], false],
-      [[LINK_TYPE_LINK, LINK_TYPE_ARTICLE], false],
-      [[LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], false],
-      [[LINK_TYPE_LINK], true],
-      [[LINK_TYPE_TEXT], true],
-      [[LINK_TYPE_ARTICLE], true]
-    ].forEach(([postTypes, shouldDispatch]) => {
+      // if the user hasn't made any input or selected a post type,
+      // we should only dispatch when going to a one-post-type channel
+      [[LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], null, false, false],
+      [[LINK_TYPE_LINK, LINK_TYPE_TEXT], null, false, false],
+      [[LINK_TYPE_LINK, LINK_TYPE_ARTICLE], null, false, false],
+      [[LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], null, false, false],
+      [[LINK_TYPE_LINK], null, false, true],
+      [[LINK_TYPE_TEXT], null, false, true],
+      [[LINK_TYPE_ARTICLE], null, false, true],
+      // if the user has made an input, without selecting a channel, and that
+      // input is allowed on the channel, they should keep it
+      [
+        [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_ARTICLE],
+        LINK_TYPE_LINK,
+        true,
+        false
+      ],
+      [
+        [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_ARTICLE],
+        LINK_TYPE_TEXT,
+        true,
+        false
+      ],
+      [
+        [LINK_TYPE_LINK, LINK_TYPE_TEXT, LINK_TYPE_ARTICLE],
+        LINK_TYPE_ARTICLE,
+        true,
+        false
+      ],
+      [[LINK_TYPE_LINK, LINK_TYPE_TEXT], LINK_TYPE_LINK, true, false],
+      [[LINK_TYPE_LINK, LINK_TYPE_TEXT], LINK_TYPE_TEXT, true, false],
+      [[LINK_TYPE_LINK, LINK_TYPE_ARTICLE], LINK_TYPE_LINK, true, false],
+      [[LINK_TYPE_LINK, LINK_TYPE_ARTICLE], LINK_TYPE_ARTICLE, true, false],
+      [[LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], LINK_TYPE_TEXT, true, false],
+      [[LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], LINK_TYPE_ARTICLE, true, false],
+      [[LINK_TYPE_LINK], LINK_TYPE_LINK, true, false],
+      [[LINK_TYPE_TEXT], LINK_TYPE_TEXT, true, false],
+      [[LINK_TYPE_ARTICLE], LINK_TYPE_ARTICLE, true, false],
+      // cases where the user has filled out a type, without selecting a channel,
+      // and then that post type is not allowed on the channel they select
+      // (whether or not they've added any content input)
+      [[LINK_TYPE_LINK, LINK_TYPE_TEXT], LINK_TYPE_ARTICLE, false, true],
+      [[LINK_TYPE_LINK, LINK_TYPE_ARTICLE], LINK_TYPE_TEXT, false, true],
+      [[LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], LINK_TYPE_LINK, false, true],
+      [[LINK_TYPE_LINK, LINK_TYPE_TEXT], LINK_TYPE_ARTICLE, true, true],
+      [[LINK_TYPE_LINK, LINK_TYPE_ARTICLE], LINK_TYPE_TEXT, true, true],
+      [[LINK_TYPE_TEXT, LINK_TYPE_ARTICLE], LINK_TYPE_LINK, true, true]
+    ].forEach(([postTypes, postType, hasInput, shouldDispatch]: CDUTypeTwo) => {
       it(`${shouldIf(
         shouldDispatch
-      )} update form when coming from no channel to a channel with allowed post types '${postTypes.toString()}'`, () => {
+      )} going form no channel to a channel with allowed post types '${postTypes.toString()}', user input is ${
+        hasInput ? "not " : ""
+      }empty`, () => {
         const dispatch = helper.sandbox.stub()
         currentChannel.allowed_post_types = postTypes
         const page = new InnerCreatePostPage()
+        const url =
+          hasInput && postType === LINK_TYPE_LINK ? "http://foo.edu" : ""
+        const text = hasInput && postType === LINK_TYPE_TEXT ? "test text" : ""
+        const article =
+          hasInput && postType === LINK_TYPE_ARTICLE ? [{ foo: "bar" }] : null
         const props: any = {
           dispatch,
-          postForm: { value: newPostForm() },
-          channel:  currentChannel
+          postForm: {
+            value: {
+              postType: postType,
+              url,
+              text,
+              article
+            }
+          },
+          channel: currentChannel
         }
+
         page.props = props
         const prevProps = {
           channel: null
@@ -602,7 +660,7 @@ describe("CreatePostPage", () => {
         if (shouldDispatch) {
           assert.equal(dispatch.callCount, 1)
           assert.deepEqual(dispatch.args[0][0].payload.value, {
-            postType:  postTypes[0],
+            postType:  postType ? null : postTypes[0],
             url:       "",
             text:      "",
             thumbnail: null,
