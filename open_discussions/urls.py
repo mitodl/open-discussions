@@ -21,6 +21,12 @@ from rest_framework_jwt.views import refresh_jwt_token
 
 from open_discussions.views import index, saml_metadata, channel_redirect
 
+# Post slugs can contain unicode characters, so a letter-matching pattern like [A-Za-z] doesn't work.
+# "[^\W]" Matches any character that is NOT a non-alphanumeric character, including underscores.
+# "[^\W]" will match all numbers, underscores, and letters, unicode or otherwise. To accept dashes
+# as well, that character is added to the pattern via an alternation (|).
+POST_SLUG_PATTERN = "([^\\W]|-)+"
+
 urlpatterns = [
     url(r"^admin/", admin.site.urls),
     url(r"^status/", include("server_status.urls")),
@@ -39,20 +45,22 @@ urlpatterns = [
     url(r"^$", index, name="open_discussions-index"),
     url(r"^auth_required/$", index),
     url(r"^content_policy/$", index),
-    url(  # so that we can use reverse() to link to this
+    url(
         r"^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/"
-        r"(?P<post_slug>[A-Za-z0-9_\-]+)/comment/(?P<comment_id>[A-Za-z0-9_]+)/$",
+        r"(?P<post_slug>{post_slug_pattern})/comment/(?P<comment_id>[A-Za-z0-9_]+)/$".format(
+            post_slug_pattern=POST_SLUG_PATTERN
+        ),
         index,
         name="channel-post-comment",
     ),
-    url(  # so that we can use reverse() to link to this
-        r"^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/(?P<post_slug>[A-Za-z0-9_\-]+)/$",
+    url(
+        r"^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/(?P<post_slug>{post_slug_pattern})/$".format(
+            post_slug_pattern=POST_SLUG_PATTERN
+        ),
         index,
         name="channel-post",
     ),
-    url(  # so that we can use reverse() to link to this
-        r"^c/(?P<channel_name>[A-Za-z0-9_]+)/$", index, name="channel"
-    ),
+    url(r"^c/(?P<channel_name>[A-Za-z0-9_]+)/$", index, name="channel"),
     url(r"^settings/(?P<token>[^/]+)/$", index, name="settings-anon"),
     url(r"^c/", index),
     url(r"^channel/", channel_redirect),
