@@ -34,11 +34,6 @@ import type {
 } from "../../flow/widgetTypes"
 import type { FormValue } from "../../flow/formTypes"
 
-type PatchPayload = {
-  id: number,
-  widgets: Array<WidgetInstanceType>
-}
-
 type Props = {
   clearForm: () => void,
   dialogData: ?WidgetDialogData,
@@ -50,7 +45,6 @@ type Props = {
   setDialogData: (data: WidgetDialogData) => void,
   setDialogVisibility: (open: boolean) => void,
   updateWidgetInstances: (widgetInstances: Array<WidgetInstanceType>) => void,
-  patchWidgetInstances: (payload: PatchPayload) => Promise<WidgetListResponse>,
   renderers: { [string]: string },
   specs: Array<WidgetSpec>,
   validation: Object,
@@ -107,20 +101,6 @@ export class WidgetListContainer extends React.Component<Props> {
       return widgetInstances
     }
     return form.value
-  }
-
-  submitForm = async () => {
-    const { form, patchWidgetInstances, widgetListId, clearForm } = this.props
-    if (!form || !form.value) {
-      // no need to make any changes
-      return
-    }
-
-    await patchWidgetInstances({
-      widgets: form.value,
-      id:      widgetListId
-    })
-    clearForm()
   }
 
   startAddInstance = () => {
@@ -188,7 +168,6 @@ export class WidgetListContainer extends React.Component<Props> {
           widgetInstances={this.getWidgetInstances()}
           onSortEnd={this.onSortEnd}
           clearForm={clearForm}
-          submitForm={this.submitForm}
           deleteInstance={this.deleteInstance}
           startAddInstance={this.startAddInstance}
           startEditInstance={this.startEditInstance}
@@ -242,9 +221,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>, ownProps) =>
         actions.forms.formUpdate({
           formKey: WIDGET_FORM_KEY,
           value:   widgetInstances
-        }),
-      patchWidgetInstances: (payload: Object) =>
-        actions.widgets.patch(ownProps.widgetListId, payload)
+        })
     },
     dispatch
   )

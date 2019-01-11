@@ -20,7 +20,6 @@ import IntegrationTestHelper from "../../util/integration_test_helper"
 import { WIDGET_FORM_KEY } from "../../lib/widgets"
 import * as widgetFuncs from "../../lib/widgets"
 import { FORM_END_EDIT, FORM_UPDATE } from "../../actions/forms"
-import { actions } from "../../actions"
 import {
   DIALOG_EDIT_WIDGET,
   HIDE_DIALOG,
@@ -42,7 +41,6 @@ describe("WidgetListContainer", () => {
     listResponse = makeWidgetListResponse()
     updatedWidgetList = makeWidgetListResponse().widgets
     helper.getWidgetListStub.returns(Promise.resolve(listResponse))
-    helper.patchWidgetListStub.returns(Promise.resolve(listResponse))
     initialState = {
       widgets: {
         loaded: true,
@@ -139,39 +137,6 @@ describe("WidgetListContainer", () => {
       assert.deepEqual(lastAction, {
         type:    FORM_END_EDIT,
         payload: { formKey: WIDGET_FORM_KEY }
-      })
-    })
-
-    it("won't submit the form if there is no form", async () => {
-      const { wrapper } = await render({
-        forms: {
-          [WIDGET_FORM_KEY]: {
-            value: null
-          }
-        }
-      })
-      wrapper
-        .dive()
-        .find("sortableList")
-        .prop("submitForm")()
-      assert.equal(helper.patchWidgetListStub.callCount, 0)
-    })
-
-    it("submits the form", async () => {
-      const { wrapper, store } = await render()
-      await wrapper
-        .dive()
-        .find("sortableList")
-        .prop("submitForm")()
-
-      const actionsList = store.getActions()
-      assert.deepEqual(actionsList[actionsList.length - 1], {
-        type:    FORM_END_EDIT,
-        payload: { formKey: WIDGET_FORM_KEY }
-      })
-      assert.deepEqual(actionsList[actionsList.length - 2], {
-        type:    actions.widgets.patch.successType,
-        payload: listResponse
       })
     })
 

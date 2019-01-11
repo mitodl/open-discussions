@@ -73,18 +73,6 @@ describe("WidgetList", () => {
   })
 
   describe("form", () => {
-    it("has a cancel button which cancels", () => {
-      const wrapper = render({ editing: true })
-      wrapper.find(".cancel").prop("onClick")()
-      sinon.assert.calledWith(clearFormStub)
-    })
-
-    it("has a done button which submits", () => {
-      const wrapper = render({ editing: true })
-      wrapper.find(".submit").prop("onClick")()
-      sinon.assert.calledWith(submitFormStub)
-    })
-
     it("has a link to add new widgets", () => {
       const wrapper = render({ editing: true })
       wrapper.find(".add-widget").prop("onClick")()

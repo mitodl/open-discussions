@@ -7,6 +7,7 @@ import { assert } from "chai"
 import ChannelHeader from "./ChannelHeader"
 
 import { makeChannel } from "../factories/channels"
+import { shouldIf } from "../lib/test_utils"
 import { channelURL } from "../lib/url"
 
 describe("ChannelHeader", () => {
@@ -23,26 +24,28 @@ describe("ChannelHeader", () => {
         channel={channel}
         isModerator={false}
         history={history}
-        hasNavbar={true}
         {...props}
       />
     )
 
-  it("renders a channel page header", () => {
+  it("renders a channel header", () => {
     const wrapper = render()
     assert.deepEqual(
       wrapper.find("Connect(ChannelAvatar)").prop("channel"),
       channel
     )
-
-    const links = wrapper.find("IntraPageNav NavLink")
-    assert.equal(links.length, 1)
-    const props = links.props()
-    assert.equal(props.to, channelURL(channel.name))
-
     const linkProps = wrapper.find("Link").props()
     assert.equal(linkProps.to, channelURL(channel.name))
     assert.equal(linkProps.children, channel.title)
+  })
+  ;[true, false].forEach(hasNavbar => {
+    it(`${shouldIf(hasNavbar)} navbar items`, () => {
+      const navbarItems = "navbarItems"
+      const wrapper = render({
+        navbarItems: hasNavbar ? navbarItems : null
+      })
+      assert.equal(wrapper.text().includes(navbarItems), hasNavbar)
+    })
   })
   ;[true, false].forEach(hasHeadline => {
     it(`${
@@ -71,23 +74,6 @@ describe("ChannelHeader", () => {
           channel
         })
       }
-    })
-  })
-  ;[true, false].forEach(allowSearch => {
-    it(`${
-      allowSearch ? "shows" : "doesn't show"
-    } the search button depending on if it's allowed`, () => {
-      SETTINGS.allow_search = allowSearch
-      const wrapper = render()
-      assert.equal(wrapper.find(".search-link").length, allowSearch ? 1 : 0)
-    })
-  })
-  ;[true, false].forEach(hasNavbar => {
-    it(`${
-      hasNavbar ? "shows" : "doesn't show"
-    } a navbar depending on the prop`, () => {
-      const wrapper = render({ hasNavbar })
-      assert.equal(wrapper.find("IntraPageNav").exists(), hasNavbar)
     })
   })
 })

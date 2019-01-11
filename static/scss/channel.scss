@@ -45,6 +45,24 @@
       padding-right: 6px;
     }
   }
+
+  .extra-navbar-items {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0;
+    justify-content: flex-end;
+    align-items: center;
+
+    .manage-title {
+      font-weight: 700;
+      margin-right: auto;
+    }
+
+    button {
+      padding: 5px 15px;
+      margin: 0 5px;
+    }
+  }
 }
 
 .channel-page-wrapper {

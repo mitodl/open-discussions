@@ -7,8 +7,10 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
 import CanonicalLink from "../components/CanonicalLink"
+import ChannelNavbar from "../components/ChannelNavbar"
 import { PostLoading, withLoading } from "../components/Loading"
 import { PostSortPicker } from "../components/Picker"
+import ManageWidgetHeader from "./widgets/ManageWidgetHeader"
 import {
   withPostModeration,
   postModerationSelector
@@ -176,7 +178,12 @@ const mapStateToProps = (state, ownProps) => {
       channels,
       state.posts,
       state.subscribedChannels
-    ])
+    ]),
+    navbarItems: (
+      <ChannelNavbar channel={channel}>
+        <ManageWidgetHeader channel={channel} />
+      </ChannelNavbar>
+    )
   }
 }
 
@@ -200,7 +207,7 @@ export default R.compose(
     mapStateToProps,
     mapDispatchToProps
   ),
-  withChannelHeader(true),
+  withChannelHeader,
   withPostModeration,
   withChannelTracker,
   withPostList,
