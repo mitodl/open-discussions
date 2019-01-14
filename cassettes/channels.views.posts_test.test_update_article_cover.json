@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2018-12-20T16:57:32",
+      "recorded_at": "2019-01-14T14:06:33",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -22,11 +22,11 @@
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CZ68SX33A805WVM3F2XF03W6"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01D16AYSQMVQA7Z23TRH0Q7ANN"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA1WNTwuCMADFv4rsGAliltLN/h8SMgi8jTmfbARtbSZq9N1zeer4frzfe2/COIe1tFF3PMjaI2GY+BGyJLVpcY23iqk9Xjce7opT1R4zMvcIOi0NLJVOWKyCYGQ/nza9hhspwQyM61quJjRzyaAeRfH/dlnyQx/7z7wWQwymdaeG7hwJscmdU6GVHFRWbngK5PMFvylG4bgAAAA=",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIyNtD1cSpKKi2vyg5K9w6MSCk2ds7wNSswzQ0sSnFU0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLZF+KZH+UcYGvtUmBS5lUXEhxoHGOe5J5tZGriC9KSklmUmp8ZnpoAMhnCUagHXwvSguAAAAA==",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:32 GMT"
+            "Mon, 14 Jan 2019 14:06:30 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 19-Dec-2020 16:57:32 GMT",
-            "loidcreated=2018-12-20T16%3A57%3A31.952Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 19-Dec-2020 16:57:32 GMT"
+            "loid=YW4qB9Lpq8dY2eQxhL; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 13-Jan-2021 14:06:30 GMT",
+            "loidcreated=2019-01-14T14%3A06%3A29.968Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 13-Jan-2021 14:06:30 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -66,11 +66,11 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CZ68SX33A805WVM3F2XF03W6"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01D16AYSQMVQA7Z23TRH0Q7ANN"
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:35",
+      "recorded_at": "2019-01-14T14:06:36",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -87,18 +87,18 @@
             "keep-alive"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
             "python-requests/2.20.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CZ68T0BYNK14HET25RV7YK8E"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01D16AYX1YMRVG8NJMVD5JNF7C"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIystTN8q8oLXcrcDf3zUx0dEkySSs1MI5wq/Cqys5W0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLZ5eFlGGpr5BmY7mvuWJBnk+2c4epebmZu6GheD9KSklmUmp8ZnpoAMhnCUagF5r1pkuAAAAA==",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIyNtSNyvaJiiowcywrCnJNK/Ar9iw3CEk1DDHJL0lX0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLa5+TqVBRiVpHuZ6hY6eRlUBqUUVVQYGIX5OQaC9KSklmUmp8ZnpoAMhnCUagEPIxhyuAAAAA==",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -112,7 +112,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:35 GMT"
+            "Mon, 14 Jan 2019 14:06:33 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -134,15 +134,15 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CZ68T0BYNK14HET25RV7YK8E"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01D16AYX1YMRVG8NJMVD5JNF7C"
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:35",
+      "recorded_at": "2019-01-14T14:06:37",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "allow_top=True&api_type=json&description=Eos+fuga+ullam+blanditiis+aliquam+cum+dolores+ducimus.+Unde+doloribus+quo+quisquam+laboriosam+doloribus+vero.+Aliquid+blanditiis+autem+dignissimos+facilis.+Tempore+explicabo+esse+nemo+ullam.%0AQuam+dolor+cumque+reiciendis+ullam+accusantium.+Ipsam+dignissimos+amet+nisi+tempora+eum+dolorum.+Libero+possimus+rerum+exercitationem+aperiam+illo+ex+omnis.+A+praesentium+sed+quo+voluptatibus.&link_type=any&name=1545325055_32_vel&public_description=Deleniti+expedita+quibusdam+incidunt+reiciendis.&title=Aliquam+dolor+magnam+quam+sit+quam+earum.&type=private&wikimode=disabled"
+          "string": "allow_top=True&api_type=json&description=Praesentium+quibusdam+tenetur+velit+dolorem.+Corporis+distinctio+ex+eveniet+natus.+Facilis+similique+corporis+expedita+nostrum+dolore.+Aspernatur+fugit+quos+inventore+provident+nostrum.%0AEarum+veniam+laboriosam+soluta+quod+veniam.+Dolorum+numquam+cumque+doloremque+autem+error+fugit+enim.+Commodi+porro+amet+aliquid+molestias+consectetur+id.+Consectetur+commodi+consequuntur+doloremque+quidem+nemo.&link_type=any&name=1547474796_32_dolores&public_description=Laborum+reiciendis+sed+exercitationem+facere.&title=Vel+eos+repellat+debitis+tempore+id+nemo.&type=private&wikimode=disabled"
         },
         "headers": {
           "Accept": [
@@ -152,22 +152,22 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 229-jOxuwFpG7MiaADb4fu03XFxJzkk"
+            "bearer 231-ZkLZZp6AvrREfpNsIw0Te1T4otg"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "610"
+            "625"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -189,7 +189,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:35 GMT"
+            "Mon, 14 Jan 2019 14:06:33 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -210,7 +210,7 @@
             "299.0"
           ],
           "x-ratelimit-reset": [
-            "145"
+            "207"
           ],
           "x-ratelimit-used": [
             "1"
@@ -230,11 +230,11 @@
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:38",
+      "recorded_at": "2019-01-14T14:06:40",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "api_type=json&name=01CZ68SX33A805WVM3F2XF03W6&type=contributor"
+          "string": "api_type=json&name=01D16AYSQMVQA7Z23TRH0Q7ANN&type=contributor"
         },
         "headers": {
           "Accept": [
@@ -244,7 +244,7 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 229-jOxuwFpG7MiaADb4fu03XFxJzkk"
+            "bearer 231-ZkLZZp6AvrREfpNsIw0Te1T4otg"
           ],
           "Connection": [
             "keep-alive"
@@ -256,14 +256,14 @@
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
-        "uri": "https://reddit.local/r/1545325055_32_vel/api/friend/?raw_json=1"
+        "uri": "https://reddit.local/r/1547474796_32_dolores/api/friend/?raw_json=1"
       },
       "response": {
         "body": {
@@ -281,7 +281,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:38 GMT"
+            "Mon, 14 Jan 2019 14:06:37 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -302,7 +302,7 @@
             "298.0"
           ],
           "x-ratelimit-reset": [
-            "142"
+            "204"
           ],
           "x-ratelimit-used": [
             "2"
@@ -318,15 +318,15 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/r/1545325055_32_vel/api/friend/?raw_json=1"
+        "url": "https://reddit.local/r/1547474796_32_dolores/api/friend/?raw_json=1"
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:38",
+      "recorded_at": "2019-01-14T14:06:40",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "action=sub&api_type=json&skip_inital_defaults=True&sr_name=1545325055_32_vel"
+          "string": "action=sub&api_type=json&skip_inital_defaults=True&sr_name=1547474796_32_dolores"
         },
         "headers": {
           "Accept": [
@@ -336,22 +336,22 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 228-4eM8AsAXR7CoaoEeuUc2DXHdvGM"
+            "bearer 230-LBrbuwzkRgKQXds3ChM6p5mQrdA"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "76"
+            "80"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -373,7 +373,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:38 GMT"
+            "Mon, 14 Jan 2019 14:06:37 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -394,7 +394,7 @@
             "299.0"
           ],
           "x-ratelimit-reset": [
-            "142"
+            "203"
           ],
           "x-ratelimit-used": [
             "1"
@@ -414,11 +414,11 @@
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:39",
+      "recorded_at": "2019-01-14T14:06:40",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "api_type=json&kind=self&resubmit=True&sendreplies=True&sr=1545325055_32_vel&text=&title=Sed+deserunt+fugit+eaque+quos+sapiente+repellat."
+          "string": "api_type=json&kind=self&resubmit=True&sendreplies=True&sr=1547474796_32_dolores&text=&title=Quo+suscipit+ea+officiis+et."
         },
         "headers": {
           "Accept": [
@@ -428,22 +428,22 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 228-4eM8AsAXR7CoaoEeuUc2DXHdvGM"
+            "bearer 230-LBrbuwzkRgKQXds3ChM6p5mQrdA"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "136"
+            "120"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -452,20 +452,20 @@
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"json\": {\"errors\": [], \"data\": {\"url\": \"https://reddit.local/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"id\": \"25\", \"name\": \"t3_25\"}}}"
+          "string": "{\"json\": {\"errors\": [], \"data\": {\"url\": \"https://reddit.local/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"id\": \"36\", \"name\": \"t3_36\"}}}"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "175"
+            "159"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:39 GMT"
+            "Mon, 14 Jan 2019 14:06:37 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -486,7 +486,7 @@
             "298.0"
           ],
           "x-ratelimit-reset": [
-            "142"
+            "203"
           ],
           "x-ratelimit-used": [
             "2"
@@ -506,7 +506,7 @@
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:39",
+      "recorded_at": "2019-01-14T14:06:40",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -520,38 +520,38 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 228-4eM8AsAXR7CoaoEeuUc2DXHdvGM"
+            "bearer 230-LBrbuwzkRgKQXds3ChM6p5mQrdA"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/comments/25/?limit=2048&sort=best&raw_json=1"
+        "uri": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1545325055_32_vel\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"25\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01CZ68SX33A805WVM3F2XF03W6\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1545325055_32_vel\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_1j\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"locked\": false, \"name\": \"t3_25\", \"created\": 1545325059.0, \"url\": \"http://reddit.local/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Sed deserunt fugit eaque quos sapiente repellat.\", \"created_utc\": 1545325059.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1547474796_32_dolores\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"36\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01D16AYSQMVQA7Z23TRH0Q7ANN\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1547474796_32_dolores\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_21\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"locked\": false, \"name\": \"t3_36\", \"created\": 1547474797.0, \"url\": \"http://reddit.local/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Quo suscipit ea officiis et.\", \"created_utc\": 1547474797.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "1492"
+            "1448"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:39 GMT"
+            "Mon, 14 Jan 2019 14:06:37 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -572,13 +572,13 @@
             "297.0"
           ],
           "x-ratelimit-reset": [
-            "141"
+            "203"
           ],
           "x-ratelimit-used": [
             "3"
           ],
           "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=Fuyl21qTOKVaqjw84CtaWq%2BVOFehpaQaXhrVcLLTgvMYzbjelCVdvuls8GC7LBbJhTqnvTMpKLTrc6eNZz1rR410FLgPnd1p"
+            "https://reddit.local/pixel/of_destiny.png?v=s3tRC%2Bp8yURdnD650QOnIzi3piXa7dQCJDxxemdfSgb9U9H7LhjI4QMxU2y13vihF%2BTsi4OLH%2B%2B6ENZoZwEDb0Ldum%2BEuEjE"
           ],
           "x-ua-compatible": [
             "IE=edge"
@@ -591,11 +591,11 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/comments/25/?limit=2048&sort=best&raw_json=1"
+        "url": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:42",
+      "recorded_at": "2019-01-14T14:06:43",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -609,38 +609,38 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 228-4eM8AsAXR7CoaoEeuUc2DXHdvGM"
+            "bearer 230-LBrbuwzkRgKQXds3ChM6p5mQrdA"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/comments/25/?limit=2048&sort=best&raw_json=1"
+        "uri": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1545325055_32_vel\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"25\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01CZ68SX33A805WVM3F2XF03W6\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1545325055_32_vel\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_1j\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"locked\": false, \"name\": \"t3_25\", \"created\": 1545325059.0, \"url\": \"http://reddit.local/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Sed deserunt fugit eaque quos sapiente repellat.\", \"created_utc\": 1545325059.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1547474796_32_dolores\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"36\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01D16AYSQMVQA7Z23TRH0Q7ANN\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1547474796_32_dolores\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_21\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"locked\": false, \"name\": \"t3_36\", \"created\": 1547474797.0, \"url\": \"http://reddit.local/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Quo suscipit ea officiis et.\", \"created_utc\": 1547474797.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "1492"
+            "1448"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:42 GMT"
+            "Mon, 14 Jan 2019 14:06:40 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -661,13 +661,13 @@
             "296.0"
           ],
           "x-ratelimit-reset": [
-            "138"
+            "200"
           ],
           "x-ratelimit-used": [
             "4"
           ],
           "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=S2s%2FUxbYVq2hPZk9%2B9Jmsc9eGsgltt8w7PmOsXeGG1%2F1fQ4lAhUodTJYqf0UU3xnMObGIzai%2BTXEsEWKtXVxtpMXIQvKo77z"
+            "https://reddit.local/pixel/of_destiny.png?v=BaY77UGo4Z3T8uYshubNQ1mkLIEHLhsQv9yDaXPPwwcBGhVbP4A1zWCVpE0MjCeNGb8j5Z6Wuuv%2FSPm%2BuiWin9HYIBYjgY6T"
           ],
           "x-ua-compatible": [
             "IE=edge"
@@ -680,11 +680,11 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/comments/25/?limit=2048&sort=best&raw_json=1"
+        "url": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:42",
+      "recorded_at": "2019-01-14T14:06:43",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -698,38 +698,38 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 228-4eM8AsAXR7CoaoEeuUc2DXHdvGM"
+            "bearer 230-LBrbuwzkRgKQXds3ChM6p5mQrdA"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/comments/25/?limit=2048&sort=best&raw_json=1"
+        "uri": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1545325055_32_vel\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"25\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01CZ68SX33A805WVM3F2XF03W6\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1545325055_32_vel\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_1j\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"locked\": false, \"name\": \"t3_25\", \"created\": 1545325059.0, \"url\": \"http://reddit.local/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Sed deserunt fugit eaque quos sapiente repellat.\", \"created_utc\": 1545325059.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1547474796_32_dolores\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"36\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01D16AYSQMVQA7Z23TRH0Q7ANN\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1547474796_32_dolores\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_21\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"locked\": false, \"name\": \"t3_36\", \"created\": 1547474797.0, \"url\": \"http://reddit.local/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Quo suscipit ea officiis et.\", \"created_utc\": 1547474797.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "1492"
+            "1448"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:42 GMT"
+            "Mon, 14 Jan 2019 14:06:40 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -750,13 +750,13 @@
             "295.0"
           ],
           "x-ratelimit-reset": [
-            "138"
+            "200"
           ],
           "x-ratelimit-used": [
             "5"
           ],
           "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=NB%2BMmiKz%2BeycDmy%2ByHQM9WeuylsPEpmyEHDw3Vb7gvr4RmqkJ6max8k2wyEexRtrYASH6OzO0rdhDQq8AwH2lcl35n6H94W0"
+            "https://reddit.local/pixel/of_destiny.png?v=BCWSNieuJrgLtYhnWrI7opT9F8WNcCppOTSdMbfoyYh5PHPut6oPm7cpiuf8P9lYxuhgSnrpwxEYDIfX1nFENmlV6zIw3z%2Bt"
           ],
           "x-ua-compatible": [
             "IE=edge"
@@ -769,11 +769,11 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/comments/25/?limit=2048&sort=best&raw_json=1"
+        "url": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:42",
+      "recorded_at": "2019-01-14T14:06:43",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -787,38 +787,38 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 228-4eM8AsAXR7CoaoEeuUc2DXHdvGM"
+            "bearer 230-LBrbuwzkRgKQXds3ChM6p5mQrdA"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/r/1545325055_32_vel/about/?raw_json=1"
+        "uri": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"1j\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"1545325055_32_vel\", \"header_img\": null, \"description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EEos fuga ullam blanditiis aliquam cum dolores ducimus. Unde doloribus quo quisquam laboriosam doloribus vero. Aliquid blanditiis autem dignissimos facilis. Tempore explicabo esse nemo ullam.\\nQuam dolor cumque reiciendis ullam accusantium. Ipsam dignissimos amet nisi tempora eum dolorum. Libero possimus rerum exercitationem aperiam illo ex omnis. A praesentium sed quo voluptatibus.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"title\": \"Aliquam dolor magnam quam sit quam earum.\", \"collapse_deleted_comments\": false, \"public_description\": \"Deleniti expedita quibusdam incidunt reiciendis.\", \"over18\": false, \"public_description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EDeleniti expedita quibusdam incidunt reiciendis.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"Eos fuga ullam blanditiis aliquam cum dolores ducimus. Unde doloribus quo quisquam laboriosam doloribus vero. Aliquid blanditiis autem dignissimos facilis. Tempore explicabo esse nemo ullam.\\nQuam dolor cumque reiciendis ullam accusantium. Ipsam dignissimos amet nisi tempora eum dolorum. Libero possimus rerum exercitationem aperiam illo ex omnis. A praesentium sed quo voluptatibus.\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 2, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 2, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_1j\", \"created\": 1545325055.0, \"url\": \"/r/1545325055_32_vel/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1545325055.0, \"banner_size\": null, \"user_is_moderator\": false, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"private\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1547474796_32_dolores\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"36\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01D16AYSQMVQA7Z23TRH0Q7ANN\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1547474796_32_dolores\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_21\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"locked\": false, \"name\": \"t3_36\", \"created\": 1547474797.0, \"url\": \"http://reddit.local/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Quo suscipit ea officiis et.\", \"created_utc\": 1547474797.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "2223"
+            "1448"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:42 GMT"
+            "Mon, 14 Jan 2019 14:06:40 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -839,13 +839,13 @@
             "294.0"
           ],
           "x-ratelimit-reset": [
-            "138"
+            "200"
           ],
           "x-ratelimit-used": [
             "6"
           ],
           "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=%2BGIMeCuYSh6nmJl8tN40pmrSBkdTqE85MZ%2F44TT0dt6JDb3YrMVMsfpam%2BYMHx2bj3ek%2BKsLIWVgPXjD5y1pO0IC68r6I%2Bg7"
+            "https://reddit.local/pixel/of_destiny.png?v=%2BA4173POcoILMGP5lnL3BwwzDMdeIYKrRvyNJm36iE0jepRhtGsnO5F9oPTn00aoqHmwqjtzev%2FJ6SHCn2AA5B4O61gzMpog"
           ],
           "x-ua-compatible": [
             "IE=edge"
@@ -858,11 +858,11 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/r/1545325055_32_vel/about/?raw_json=1"
+        "url": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:42",
+      "recorded_at": "2019-01-14T14:06:43",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -876,38 +876,38 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 228-4eM8AsAXR7CoaoEeuUc2DXHdvGM"
+            "bearer 230-LBrbuwzkRgKQXds3ChM6p5mQrdA"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/comments/25/?limit=2048&sort=best&raw_json=1"
+        "uri": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1545325055_32_vel\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"25\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01CZ68SX33A805WVM3F2XF03W6\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1545325055_32_vel\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_1j\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"locked\": false, \"name\": \"t3_25\", \"created\": 1545325059.0, \"url\": \"http://reddit.local/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Sed deserunt fugit eaque quos sapiente repellat.\", \"created_utc\": 1545325059.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1547474796_32_dolores\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"36\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01D16AYSQMVQA7Z23TRH0Q7ANN\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1547474796_32_dolores\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_21\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"locked\": false, \"name\": \"t3_36\", \"created\": 1547474797.0, \"url\": \"http://reddit.local/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Quo suscipit ea officiis et.\", \"created_utc\": 1547474797.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "1492"
+            "1448"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:42 GMT"
+            "Mon, 14 Jan 2019 14:06:40 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -928,13 +928,13 @@
             "293.0"
           ],
           "x-ratelimit-reset": [
-            "138"
+            "200"
           ],
           "x-ratelimit-used": [
             "7"
           ],
           "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=vkMGDyBX9gyAvdXW22eSpkK1Y8LhnpVy1XLFTKpDMMwwV62q0K9Wo%2F24Ag1rV2bra0yi6JsXhQ3v5%2BHOgeMIFdBPaUVPa%2BWX"
+            "https://reddit.local/pixel/of_destiny.png?v=qII0x18SI1S2ubpFFGENSQo6wO%2BSZt8GkZYqFfL6QIl3BuyOs4I%2FFYou8kjn3ycQUnBAkZU2IvBjHzfIUfVv%2FFW8NTKxp3fo"
           ],
           "x-ua-compatible": [
             "IE=edge"
@@ -947,11 +947,11 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/comments/25/?limit=2048&sort=best&raw_json=1"
+        "url": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:42",
+      "recorded_at": "2019-01-14T14:06:43",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -965,38 +965,38 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 228-4eM8AsAXR7CoaoEeuUc2DXHdvGM"
+            "bearer 230-LBrbuwzkRgKQXds3ChM6p5mQrdA"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/comments/25/?limit=2048&sort=best&raw_json=1"
+        "uri": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1545325055_32_vel\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"25\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01CZ68SX33A805WVM3F2XF03W6\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1545325055_32_vel\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_1j\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"locked\": false, \"name\": \"t3_25\", \"created\": 1545325059.0, \"url\": \"http://reddit.local/r/1545325055_32_vel/comments/25/sed_deserunt_fugit_eaque_quos_sapiente_repellat/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Sed deserunt fugit eaque quos sapiente repellat.\", \"created_utc\": 1545325059.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1547474796_32_dolores\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"36\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01D16AYSQMVQA7Z23TRH0Q7ANN\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1547474796_32_dolores\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_21\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"locked\": false, \"name\": \"t3_36\", \"created\": 1547474797.0, \"url\": \"http://reddit.local/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Quo suscipit ea officiis et.\", \"created_utc\": 1547474797.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "1492"
+            "1448"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:42 GMT"
+            "Mon, 14 Jan 2019 14:06:40 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -1017,13 +1017,13 @@
             "292.0"
           ],
           "x-ratelimit-reset": [
-            "138"
+            "200"
           ],
           "x-ratelimit-used": [
             "8"
           ],
           "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=0W3wukqlYFwsT23naxe1M7CTQzaSOmrg3FiHW9em29tylXohX3quBNJFrS6kD5R9yEe0ijbqZAWc71M5mwHVqhRFCVA7xan5"
+            "https://reddit.local/pixel/of_destiny.png?v=ioLXRale%2B0FHSl9WSBP4EB6IaNwRUKTKzumZFHeyYOJkDx%2F%2Flz83zMEZ6R8OfmHd7XI5HbxK5aFvYg%2B1WQeC0hJ134ZbRvbE"
           ],
           "x-ua-compatible": [
             "IE=edge"
@@ -1036,11 +1036,11 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/comments/25/?limit=2048&sort=best&raw_json=1"
+        "url": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       }
     },
     {
-      "recorded_at": "2018-12-20T16:57:42",
+      "recorded_at": "2019-01-14T14:06:43",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -1054,38 +1054,38 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 228-4eM8AsAXR7CoaoEeuUc2DXHdvGM"
+            "bearer 230-LBrbuwzkRgKQXds3ChM6p5mQrdA"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Cookie": [
-            "loid=HFnFT7PqBlh9Tqc0rx; loidcreated=2018-12-20T16%3A57%3A31.952Z"
+            "loid=YW4qB9Lpq8dY2eQxhL; loidcreated=2019-01-14T14%3A06%3A29.968Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.58.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.61.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/r/1545325055_32_vel/about/?raw_json=1"
+        "uri": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       },
       "response": {
         "body": {
           "encoding": "UTF-8",
-          "string": "{\"kind\": \"t5\", \"data\": {\"banner_img\": \"\", \"submit_text_html\": null, \"user_is_banned\": false, \"wiki_enabled\": false, \"show_media\": false, \"id\": \"1j\", \"user_is_contributor\": true, \"submit_text\": \"\", \"display_name\": \"1545325055_32_vel\", \"header_img\": null, \"description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EEos fuga ullam blanditiis aliquam cum dolores ducimus. Unde doloribus quo quisquam laboriosam doloribus vero. Aliquid blanditiis autem dignissimos facilis. Tempore explicabo esse nemo ullam.\\nQuam dolor cumque reiciendis ullam accusantium. Ipsam dignissimos amet nisi tempora eum dolorum. Libero possimus rerum exercitationem aperiam illo ex omnis. A praesentium sed quo voluptatibus.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"title\": \"Aliquam dolor magnam quam sit quam earum.\", \"collapse_deleted_comments\": false, \"public_description\": \"Deleniti expedita quibusdam incidunt reiciendis.\", \"over18\": false, \"public_description_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EDeleniti expedita quibusdam incidunt reiciendis.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"community_rules\": [], \"icon_size\": null, \"suggested_comment_sort\": null, \"icon_img\": \"\", \"header_title\": null, \"description\": \"Eos fuga ullam blanditiis aliquam cum dolores ducimus. Unde doloribus quo quisquam laboriosam doloribus vero. Aliquid blanditiis autem dignissimos facilis. Tempore explicabo esse nemo ullam.\\nQuam dolor cumque reiciendis ullam accusantium. Ipsam dignissimos amet nisi tempora eum dolorum. Libero possimus rerum exercitationem aperiam illo ex omnis. A praesentium sed quo voluptatibus.\", \"user_is_muted\": false, \"submit_link_label\": null, \"accounts_active\": 2, \"public_traffic\": false, \"header_size\": null, \"subscribers\": 2, \"submit_text_label\": null, \"lang\": \"en\", \"name\": \"t5_1j\", \"created\": 1545325055.0, \"url\": \"/r/1545325055_32_vel/\", \"quarantine\": false, \"hide_ads\": false, \"created_utc\": 1545325055.0, \"banner_size\": null, \"user_is_moderator\": false, \"user_sr_theme_enabled\": true, \"show_media_preview\": true, \"comment_score_hide_mins\": 0, \"subreddit_type\": \"private\", \"submission_type\": \"any\", \"user_is_subscriber\": true}}"
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1547474796_32_dolores\", \"selftext_html\": null, \"selftext\": \"\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"36\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01D16AYSQMVQA7Z23TRH0Q7ANN\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1547474796_32_dolores\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_21\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"locked\": false, \"name\": \"t3_36\", \"created\": 1547474797.0, \"url\": \"http://reddit.local/r/1547474796_32_dolores/comments/36/quo_suscipit_ea_officiis_et/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Quo suscipit ea officiis et.\", \"created_utc\": 1547474797.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
         },
         "headers": {
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "2223"
+            "1448"
           ],
           "Content-Type": [
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Thu, 20 Dec 2018 16:57:42 GMT"
+            "Mon, 14 Jan 2019 14:06:40 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -1106,13 +1106,13 @@
             "291.0"
           ],
           "x-ratelimit-reset": [
-            "138"
+            "200"
           ],
           "x-ratelimit-used": [
             "9"
           ],
           "x-reddit-tracking": [
-            "https://reddit.local/pixel/of_destiny.png?v=X2ttETIBm20171RaWTauYlqSpSwwQtzTd%2BkZ3Uc87SeKdt1%2B1UCfdgwme87Jvng4GkRl39Khm%2BBajW3YdQn7EYgV0xz89DvT"
+            "https://reddit.local/pixel/of_destiny.png?v=mBs91H8ZN%2BloRZDIPWdosaPhU87rSaGWYqfiHC2kbp%2FyQJwCiicJf4gODxDcYSCk3VxpKxXCJ2r%2Fget%2FNX%2FsxULLp7ajW1j6"
           ],
           "x-ua-compatible": [
             "IE=edge"
@@ -1125,7 +1125,7 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/r/1545325055_32_vel/about/?raw_json=1"
+        "url": "https://reddit.local/comments/36/?limit=2048&sort=best&raw_json=1"
       }
     }
   ],

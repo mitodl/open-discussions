@@ -264,7 +264,7 @@ def test_patch_article_validate_cover_image(
     assert resp.status_code == status.HTTP_400_BAD_REQUEST
     assert resp.json() == {
         "error_type": "ValidationError",
-        "cover_image": [f"Expected cover image to be a file"],
+        "cover_image": [f"Expected cover image to be a file or url"],
     }
 
 
@@ -782,6 +782,22 @@ def test_update_article_cover(
     assert "{0:0.1f}".format(
         article.cover_image_small.height / article.cover_image_small.width
     ) == "{0:0.1f}".format(THUMBNAIL_DIMENSIONS.y / THUMBNAIL_DIMENSIONS.x)
+
+    # Now update the article again, with the same cover (sent as URL)
+    image_url = "http://localhost/{}".format(article.cover_image.url)
+    resp = user_client.patch(
+        url, {"cover_image": image_url, "article_content": "foo"}, format="json"
+    )
+    assert resp.status_code == status.HTTP_200_OK
+    article = Article.objects.get(post__post_id=resp.json()["id"])
+    assert image_url.endswith(article.cover_image.url)
+
+    # Remove the image
+    resp = user_client.patch(url, {"article_content": "foo"}, format="json")
+    assert resp.status_code == status.HTTP_200_OK
+    article = Article.objects.get(post__post_id=resp.json()["id"])
+    assert article.cover_image.name == ""
+    assert article.cover_image_small.name == ""
 
 
 class PostDetailTests:
