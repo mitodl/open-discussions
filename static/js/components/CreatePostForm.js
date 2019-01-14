@@ -59,7 +59,7 @@ export default class CreatePostForm extends React.Component<Props> {
               className="write-something dark-outlined compact"
               onClick={() => updatePostType(LINK_TYPE_TEXT)}
             >
-              Write something
+              Short post
             </button>
           ) : null}
           {isLinkTypeAllowed(channel, LINK_TYPE_LINK) ? (
@@ -200,7 +200,7 @@ export default class CreatePostForm extends React.Component<Props> {
       <div className="new-post-form">
         <form onSubmit={onSubmit} className="form">
           <div className="row channel-select">
-            <label>Will be published in:</label>
+            <label>Select a channel:</label>
             <select
               onChange={updateChannelSelection}
               name="channel"
@@ -217,7 +217,7 @@ export default class CreatePostForm extends React.Component<Props> {
             <input
               type="text"
               className="title h1"
-              placeholder="Headline"
+              placeholder="title"
               name="title"
               value={title}
               onChange={onUpdate}

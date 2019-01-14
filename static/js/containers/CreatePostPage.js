@@ -360,7 +360,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
         </MetaTags>
         <IntraPageNav>
           <a href="#" className="active">
-            Draft
+            Create a Post
           </a>
         </IntraPageNav>
         <Dialog
