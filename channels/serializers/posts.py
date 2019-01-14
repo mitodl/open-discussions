@@ -189,9 +189,13 @@ class PostSerializer(BasePostSerializer):
         return {"subscribed": parse_bool(value, "subscribed")}
 
     def validate_cover_image(self, value):
-        """Validation that cover_image is a file"""
-        if value is not None and not hasattr(value, "name"):
-            raise ValidationError("Expected cover image to be a file")
+        """Validation that cover_image is a file, url or None"""
+        if (
+            value is not None
+            and not hasattr(value, "name")
+            and not urlparse(value).scheme
+        ):
+            raise ValidationError("Expected cover image to be a file or url")
         return {"cover_image": value}
 
     def create(self, validated_data):

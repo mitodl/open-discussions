@@ -809,7 +809,7 @@ class Api:
                     defaults={"author": self.user, "content": article_content},
                 )
 
-                if cover_image:
+                if cover_image and hasattr(cover_image, "name"):
                     article.cover_image.save(
                         f"article_image_{post.id}.jpg", cover_image, save=False
                     )
@@ -963,9 +963,13 @@ class Api:
         if article_content:
             post.article.content = article_content
         if cover_image:
-            post.article.cover_image.save(
-                f"article_image_{post.id}.jpg", cover_image, save=False
-            )
+            if hasattr(cover_image, "name"):
+                post.article.cover_image.save(
+                    f"article_image_{post.id}.jpg", cover_image, save=False
+                )
+        elif post.article.cover_image:
+            post.article.cover_image = None
+            post.article.cover_image_small = None
         post.article.save(update_image=(cover_image is not None))
 
         return post
