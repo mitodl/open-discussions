@@ -74,12 +74,6 @@ const shouldLoadChannel = (currentProps: Props, prevProps: ?Props) => {
   return !channelLoaded && !channelProcessing
 }
 
-const shouldLoadSearch = (currentProps: Props, currentState: State) => {
-  const { searchLoaded, searchProcessing } = currentProps
-  const { error } = currentState
-  return !searchLoaded && !searchProcessing && !error
-}
-
 export class SearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -93,9 +87,11 @@ export class SearchPage extends React.Component<Props, State> {
 
   componentDidMount() {
     const { text } = this.state
+    const { clearSearch } = this.props
     if (shouldLoadChannel(this.props)) {
       this.loadChannel()
     }
+    clearSearch()
     if (text) {
       this.runSearch()
     }
@@ -104,9 +100,6 @@ export class SearchPage extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     if (shouldLoadChannel(this.props, prevProps)) {
       this.loadChannel()
-    }
-    if (shouldLoadSearch(this.props, this.state)) {
-      this.runSearch()
     }
   }
 
