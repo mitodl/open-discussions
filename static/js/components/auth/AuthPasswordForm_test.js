@@ -49,6 +49,7 @@ describe("AuthPasswordForm component", () => {
     assert.equal(wrapper.find(".validation-message").exists(), false)
     assert.equal(wrapper.find("button").props().disabled, false)
     assert.equal(wrapper.find("Link").prop("to"), "/password_reset")
+    assert.isTrue(wrapper.find("input").prop("autoFocus"))
   })
 
   it("should disable the submit button if processing === true", () => {

@@ -21,6 +21,7 @@ const AuthPasswordForm = ({
         name="password"
         value={form.password}
         onChange={onUpdate}
+        autoFocus
       />
       {validationMessage(validation.password)}
     </div>
