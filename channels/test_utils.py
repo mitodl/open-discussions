@@ -19,3 +19,18 @@ def no_ssl_verification():
         warnings.resetwarnings()
 
         requests.Session.request = old_request
+
+
+def assert_properties_eq(obj, expected):
+    """
+    Asserts that properties on an object are equal to the expected values
+
+    Args:
+        obj(object): the object to assert properties on
+        expected(dict): key/value mapping of expected properties
+    """
+    for key, value in expected.items():
+        if any(value is const_val for const_val in (None, True, False)):
+            assert getattr(obj, key) is value
+        else:
+            assert getattr(obj, key) == value

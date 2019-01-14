@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Repellat voluptates vero quam nihil iste iste. Facilis consequuntur excepturi totam ipsam maxime.\nCorrupti alias voluptatem odit alias facilis reiciendis nisi qui. In enim possimus veniam dolorum tenetur commodi. Minima deserunt illum earum reiciendis. Culpa neque corporis aliquam dignissimos.\nExercitationem optio cum deleniti. Saepe maiores dolorem quae eligendi quis blanditiis.",
+      "name": "1548184603_36_at",
+      "public_description": "Expedita incidunt eaque ut totam quidem qui provident.",
+      "title": "Quam fugit iure id consequatur."
+    }
+  },
+  "posts": {
+    "a post": {
+      "id": "bo",
+      "text": "Vel labore laborum ipsa animi quibusdam. Maxime amet deleniti alias minus facilis earum.",
+      "title": "Inventore vitae neque eius fuga incidunt."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01D1VFWCGJY5ZA51BKH700GYTZ"
+    },
+    "staff_user": {
+      "username": "01D1VFWFV3SK16C00JBYPV74JF"
+    }
+  }
+}

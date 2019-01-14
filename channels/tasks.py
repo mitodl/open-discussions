@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from prawcore.exceptions import ResponseException
 
-from channels import api
+from channels import api, backpopulate_api
 from channels.api import (
     Api,
     sync_channel_subscription_model,
@@ -17,13 +17,7 @@ from channels.api import (
     get_allowed_post_types_from_link_type,
     allowed_post_types_bitmask,
 )
-from channels.constants import (
-    ROLE_MODERATORS,
-    ROLE_CONTRIBUTORS,
-    LINK_TYPE_LINK,
-    LINK_TYPE_SELF,
-    EXTENDED_POST_TYPE_ARTICLE,
-)
+from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel, Post, ChannelGroupRole
 from open_discussions.celery import app
 from open_discussions.utils import chunks
@@ -155,7 +149,7 @@ def populate_subscriptions_and_roles(self):
 
 
 @app.task
-def populate_post_post_type(ids):
+def populate_post_and_comment_fields_batch(ids):
     """
     Populates Post.post_type for a range of posts
 
@@ -165,30 +159,22 @@ def populate_post_post_type(ids):
     client = get_admin_api()
 
     for post in Post.objects.filter(id__in=ids).iterator():
-        if post.post_type:
-            continue
-
         submission = client.get_submission(post.post_id)
-        if submission.url:
-            post.post_type = LINK_TYPE_LINK
-        elif hasattr(post, "article") and post.article:
-            post.post_type = EXTENDED_POST_TYPE_ARTICLE
-        else:
-            post.post_type = LINK_TYPE_SELF
 
-        post.save()
+        backpopulate_api.backpopulate_post(post, submission)
+        backpopulate_api.backpopulate_comments(submission)
 
 
 @app.task(bind=True)
-def populate_post_types(self):
+def populate_post_and_comment_fields(self):
     """
-    Populates Post.post_type
+    Populates Post fields
     """
     results = celery.group(
         [
-            populate_post_post_type.si(ids)
+            populate_post_and_comment_fields_batch.si(ids)
             for ids in chunks(
-                Post.objects.values_list("id", flat=True),
+                Post.objects.order_by("id").values_list("id", flat=True),
                 chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
             )
         ]

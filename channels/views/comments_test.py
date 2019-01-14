@@ -1,5 +1,6 @@
 """Tests for views for REST APIs for comments"""
 # pylint: disable=unused-argument,redefined-outer-name,too-many-lines
+from datetime import datetime
 from itertools import product
 import time
 
@@ -7,7 +8,10 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
+from channels.constants import DELETED_COMMENT_OR_POST_TEXT
+from channels.models import Comment
 from channels.test_constants import LIST_MORE_COMMENTS_RESPONSE
+from channels.test_utils import assert_properties_eq
 from channels.views.test_utils import default_comment_response_data
 from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
@@ -453,7 +457,7 @@ def test_list_deleted_comments(client, logged_in_profile):
             "post_id": "p",
             "profile_image": DEFAULT_PROFILE_IMAGE,
             "score": 1,
-            "text": "[deleted]",
+            "text": DELETED_COMMENT_OR_POST_TEXT,
             "upvoted": False,
             "removed": False,
             "deleted": True,
@@ -558,11 +562,11 @@ def test_get_comment_anonymous(
 
 
 @pytest.mark.parametrize(
-    "extra_params,extra_expected",
+    "extra_params,extra_expected,score",
     [
-        ({}, {}),
-        ({"upvoted": False}, {"upvoted": False}),
-        ({"downvoted": True}, {"upvoted": False, "downvoted": True}),
+        ({}, {}, 1),
+        ({"upvoted": False}, {"upvoted": False}, 0),
+        ({"downvoted": True}, {"upvoted": False, "downvoted": True}, -1),
     ],
 )
 def test_create_comment(
@@ -572,6 +576,7 @@ def test_create_comment(
     mock_notify_subscribed_users,
     extra_params,
     extra_expected,
+    score,
 ):  # pylint: disable=too-many-arguments
     """Create a comment"""
     channel, user = private_channel_and_contributor
@@ -600,6 +605,19 @@ def test_create_comment(
         "num_reports": None,
         **extra_expected,
     }
+
+    assert_properties_eq(
+        Comment.objects.get(comment_id=resp.json()["id"]),
+        {
+            "author": user,
+            "text": "reply_to_post 2",
+            "score": score,
+            "removed": False,
+            "deleted": False,
+            "edited": False,
+            "created_on": any_instance_of(datetime),
+        },
+    )
 
     mock_notify_subscribed_users.assert_called_once_with(
         post.id, None, resp.json()["id"]

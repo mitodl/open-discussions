@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Aspernatur id delectus velit sunt nisi nemo. Pariatur laudantium sed totam qui. Iste necessitatibus aperiam vitae expedita iste similique distinctio quibusdam. Delectus nobis unde quisquam corporis labore nam omnis.\nQuos rem illo beatae possimus fugit provident nostrum reprehenderit. Officiis officia esse culpa deserunt vel nobis in. Non eveniet nostrum nobis. Deleniti laborum vitae recusandae aspernatur.",
+      "name": "1548184617_37_omnis",
+      "public_description": "In ex asperiores in laudantium expedita.",
+      "title": "Nostrum minus soluta ratione optio."
+    }
+  },
+  "posts": {
+    "a post": {
+      "id": "bp",
+      "text": "Ut reiciendis quia nisi maxime. Totam ut sunt amet. Quod vero quam repellat.",
+      "title": "Ipsa dolor temporibus facilis enim."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01D1VFWSRECVPDX6JF8W64EC59"
+    },
+    "staff_user": {
+      "username": "01D1VFWX46NTPD0HP0C3NE4T60"
+    }
+  }
+}

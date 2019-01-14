@@ -2,7 +2,7 @@
 # pylint: disable=too-many-public-methods, too-many-lines
 import logging
 import operator
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import reduce, partialmethod
 from urllib.parse import urljoin
 
@@ -12,13 +12,16 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group
 from django.db import transaction
+from django.db.models.functions import Coalesce
 from django.http.response import Http404
 from guardian.shortcuts import assign_perm
 import praw
 from praw.exceptions import APIException
+from praw.models import Comment as RedditComment
 from praw.models.comment_forest import CommentForest
 from praw.models.reddit import more
 from praw.models.reddit.redditor import Redditor
+from praw.models.reddit.submission import Submission
 import prawcore
 from prawcore.exceptions import (
     Forbidden as PrawForbidden,
@@ -27,6 +30,7 @@ from prawcore.exceptions import (
 )
 from rest_framework.exceptions import PermissionDenied, NotFound
 
+from channels.backpopulate_api import comment_values_from_reddit
 from channels.constants import (
     CHANNEL_TYPE_PUBLIC,
     POSTS_SORT_HOT,
@@ -683,7 +687,76 @@ class Api:
         return self.get_channel(name)
 
     @staticmethod
-    def _apply_vote(instance, validated_data, allow_downvote=False, instance_type=None):
+    def _apply_comment_vote(comment, upvote, downvote, is_upvoted, is_downvoted):
+        """
+        Applies an upvote to the related Comment record
+
+        Args:
+            comment (Comment): the reddit comment
+            upvote (boolean): nullable flag for applying an upvote
+            downvote (boolean): nullable flag for applying a downvote
+            is_upvoted (boolean): True if the user currently has upvoted the post
+            is_downvoted (boolean): True if the user currently has downvoted the post
+        """
+        vote_delta = sum(
+            [
+                # start handle upvote
+                # adds the upvote
+                1 if upvote and not is_upvoted else 0,
+                # removes an opposing downvote, if present
+                1 if upvote and is_downvoted else 0,
+                # clear an existing upvote only, but only count this once if downvoting also
+                -1 if upvote is False and is_upvoted and not downvote else 0,
+                # end handle upvote
+                # --------
+                # start handle downvote
+                # adds the downvote
+                -1 if downvote and not is_downvoted else 0,
+                # removes an opposing upvote, if present
+                -1 if downvote and is_upvoted else 0,
+                # clear an existing downvote, but only count this once if upvoting also
+                1 if downvote is False and is_downvoted and not upvote else 0,
+                # end handle downvote
+            ]
+        )
+
+        if vote_delta:
+            # apply an update to the nullable comment score
+            # by substituting the current score from reddit if there's a null
+            Comment.objects.filter(comment_id=comment.id).update(
+                score=Coalesce("score", comment.score) + vote_delta
+            )
+
+    @staticmethod
+    def _apply_post_vote(submission, upvote, is_upvoted):
+        """
+        Applies an upvote to the related Post record
+
+        Args:
+            submission (Submission): the reddit submission
+            upvote (boolean): nullable flag for applying an upvote
+            is_upvoted (boolean): True if the user currently has upvoted the post
+        """
+        vote_delta = sum(
+            [
+                # adds the upvote
+                1 if upvote and not is_upvoted else 0,
+                # clear an existing upvote
+                -1 if upvote is False and is_upvoted else 0,
+            ]
+        )
+
+        if vote_delta:
+            # apply an update to the nullable post score
+            # by substituting the current ups value from reddit if there's a null
+            Post.objects.filter(post_id=submission.id).update(
+                score=Coalesce("score", submission.ups) + vote_delta
+            )
+
+    @classmethod
+    def _apply_vote(
+        cls, instance, validated_data, allow_downvote=False, instance_type=None
+    ):  # pylint: disable=too-many-branches
         """
         Apply a vote provided by the user to a comment or post, if it's different than before.
 
@@ -717,12 +790,21 @@ class Api:
         else:
             return False
 
-        if vote_action == VoteActions.UPVOTE:
-            instance.upvote()
-        elif vote_action == VoteActions.DOWNVOTE:
-            instance.downvote()
-        elif vote_action in (VoteActions.CLEAR_UPVOTE, VoteActions.CLEAR_DOWNVOTE):
-            instance.clear_vote()
+        with transaction.atomic():
+            # make upvotes atomic
+            if isinstance(instance, Submission):
+                cls._apply_post_vote(instance, upvote, is_upvoted)
+            elif isinstance(instance, RedditComment):
+                cls._apply_comment_vote(
+                    instance, upvote, downvote, is_upvoted, is_downvoted
+                )
+
+            if vote_action == VoteActions.UPVOTE:
+                instance.upvote()
+            elif vote_action == VoteActions.DOWNVOTE:
+                instance.downvote()
+            elif vote_action in (VoteActions.CLEAR_UPVOTE, VoteActions.CLEAR_DOWNVOTE):
+                instance.clear_vote()
 
         try:
             search_task_helpers.update_indexed_score(
@@ -799,7 +881,21 @@ class Api:
                 post_id=submission.id,
                 defaults={
                     "channel": channel._self_channel,  # pylint: disable=protected-access
+                    "title": title,
+                    "text": text
+                    if post_type == LINK_TYPE_SELF
+                    else None,  # don't use empty str for article posts
+                    "url": url,
                     "post_type": post_type,
+                    "author": self.user,
+                    "score": submission.ups,
+                    "num_comments": 0,
+                    "edited": False,
+                    "removed": False,
+                    "deleted": False,
+                    "created_on": datetime.fromtimestamp(
+                        submission.created, tz=timezone.utc
+                    ),
                 },
             )
 
@@ -968,19 +1064,32 @@ class Api:
             # legacy validation
             raise ValueError("Posts with a url cannot be updated")
 
-        if text:
-            return proxy_post(post.edit(text))
-        if article_content:
-            post.article.content = article_content
-        if cover_image:
-            if hasattr(cover_image, "name"):
-                post.article.cover_image.save(
-                    f"article_image_{post.id}.jpg", cover_image, save=False
-                )
-        elif post.article.cover_image:
-            post.article.cover_image = None
-            post.article.cover_image_small = None
-        post.article.save(update_image=(cover_image is not None))
+        with transaction.atomic():
+            if text:
+                Post.objects.filter(post_id=post_id).update(text=text, edited=True)
+                return proxy_post(post.edit(text))
+
+            edited = False
+
+            if article_content:
+                post.article.content = article_content
+                edited = True
+            if cover_image:
+                if hasattr(cover_image, "name"):
+                    post.article.cover_image.save(
+                        f"article_image_{post.id}.jpg", cover_image, save=False
+                    )
+                    edited = True
+            elif post.article.cover_image:
+                post.article.cover_image = None
+                post.article.cover_image_small = None
+                edited = True
+            post.article.save(update_image=(cover_image is not None))
+
+        if edited:
+            # pylint: disable=protected-access
+            post._self_post.edited = True
+            post._self_post.save()
 
         return post
 
@@ -1004,7 +1113,9 @@ class Api:
             post_id(str): the base36 id for the post
         """
         post = self.get_post(post_id)
-        post.mod.remove()
+        with transaction.atomic():
+            Post.objects.filter(post_id=post_id).update(removed=True)
+            post.mod.remove()
         return post
 
     @reddit_object_persist(search_task_helpers.update_post_removal_status)
@@ -1016,7 +1127,9 @@ class Api:
             post_id(str): the base36 id for the post
         """
         post = self.get_post(post_id)
-        post.mod.approve()
+        with transaction.atomic():
+            Post.objects.filter(post_id=post_id).update(removed=False)
+            post.mod.approve()
         return post
 
     @reddit_object_persist(search_task_helpers.set_post_to_deleted)
@@ -1029,7 +1142,11 @@ class Api:
 
         """
         post = self.get_post(post_id)
-        post.delete()
+        with transaction.atomic():
+            # pylint: disable=protected-access
+            post._self_post.deleted = True
+            post._self_post.save()
+            post.delete()
         return post
 
     @reddit_object_persist(search_task_helpers.index_new_comment)
@@ -1058,11 +1175,20 @@ class Api:
 
         _, link_id = get_kind_and_id(comment.link_id)
 
-        Comment.objects.create(
-            comment_id=comment.id,
-            post=Post.objects.get(post_id=link_id),
-            parent_id=post_id or comment_id,
-        )
+        comment_values = comment_values_from_reddit(comment)
+
+        with transaction.atomic():
+            Post.objects.filter(post_id=link_id).update(
+                num_comments=Coalesce("num_comments", 0) + 1
+            )
+
+            Comment.objects.create(
+                comment_id=comment.id,
+                post=Post.objects.get(post_id=link_id),
+                parent_id=post_id or comment_id,
+                author=self.user,
+                **comment_values,
+            )
 
         return comment
 
@@ -1078,7 +1204,11 @@ class Api:
         Returns:
             praw.models.Comment: the updated comment
         """
-        comment = self.get_comment(comment_id).edit(text)
+        comment = self.get_comment(comment_id)
+
+        with transaction.atomic():
+            Comment.objects.filter(comment_id=comment.id).update(text=text, edited=True)
+            comment = comment.edit(text)
         return comment
 
     @reddit_object_persist(search_task_helpers.update_comment_removal_status)
@@ -1090,7 +1220,9 @@ class Api:
             comment_id(str): the id of the comment
         """
         comment = self.get_comment(comment_id)
-        comment.mod.remove()
+        with transaction.atomic():
+            Comment.objects.filter(comment_id=comment_id).update(removed=True)
+            comment.mod.remove()
         return comment
 
     @reddit_object_persist(search_task_helpers.update_comment_removal_status)
@@ -1102,7 +1234,9 @@ class Api:
             comment_id(str): the id of the comment
         """
         comment = self.get_comment(comment_id)
-        comment.mod.approve()
+        with transaction.atomic():
+            Comment.objects.filter(comment_id=comment_id).update(removed=False)
+            comment.mod.approve()
         return comment
 
     @reddit_object_persist(search_task_helpers.set_comment_to_deleted)
@@ -1115,7 +1249,9 @@ class Api:
 
         """
         comment = self.get_comment(comment_id)
-        comment.delete()
+        with transaction.atomic():
+            Comment.objects.filter(comment_id=comment_id).update(deleted=False)
+            comment.delete()
         return comment
 
     def get_comment(self, comment_id):

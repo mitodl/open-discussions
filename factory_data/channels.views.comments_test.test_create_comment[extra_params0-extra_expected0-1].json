@@ -1,0 +1,26 @@
+{
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Saepe itaque repellendus in sunt eveniet ullam. Vitae sequi voluptates eum dolorem porro.\nVeniam tenetur quas voluptas dolor. Quas voluptas natus voluptatum reiciendis rem. Reprehenderit illo aut tempora ea nisi atque consequuntur. Aliquam vel culpa eos id facere atque tempore.",
+      "name": "1548184590_35_qui",
+      "public_description": "Sunt expedita animi non. Odit natus soluta quos eius.",
+      "title": "Repudiandae quos possimus ut ipsum."
+    }
+  },
+  "posts": {
+    "a post": {
+      "id": "bn",
+      "text": "Eum dolore totam dicta facere. Nisi sunt recusandae incidunt aspernatur ipsa.",
+      "title": "Iste tempore atque quo sunt sed tempore."
+    }
+  },
+  "users": {
+    "contributor": {
+      "username": "01D1VFVYEJCFE79D084E2BBWRK"
+    },
+    "staff_user": {
+      "username": "01D1VFW2CMCNRHDHBKVKA7AC6R"
+    }
+  }
+}

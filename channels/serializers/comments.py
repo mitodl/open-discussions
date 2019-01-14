@@ -7,6 +7,7 @@ from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from channels.constants import DELETED_COMMENT_OR_POST_TEXT
 from channels.utils import get_kind_mapping, get_kind_and_id, get_reddit_slug
 from channels.models import Subscription
 from channels.serializers.base import RedditObjectSerializer
@@ -112,7 +113,7 @@ class BaseCommentSerializer(RedditObjectSerializer):
 
     def get_deleted(self, instance):
         """Returns True if the comment was deleted"""
-        return instance.body == "[deleted]"  # only way to tell
+        return instance.body == DELETED_COMMENT_OR_POST_TEXT  # only way to tell
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

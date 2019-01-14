@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils.functional import SimpleLazyObject
+from django.utils.text import slugify
 from praw.config import Config
 from praw.exceptions import APIException
 from praw.models import Comment
@@ -331,3 +332,32 @@ def render_article_text(content):
          str: A string containing the text from the text nodes of the article
     """
     return "".join(_render_article_nodes(content))
+
+
+def reddit_slugify(text, max_length=50):
+    """
+    Slugifies a piece of text in the same manner reddit would
+
+    Args:
+        text(str): text string to slugify
+        max_length(int): optional length limit to output
+
+    Returns:
+        str: slugified and possibly truncated text
+    """
+    text = slugify(text).replace("-", "_").lower()
+
+    while len(text) > max_length:
+        # enforce max length on word boundaries
+        # see https://docs.python.org/3/library/stdtypes.html#str.rpartition
+        before, _, after = text.rpartition("_")
+        if before:
+            text = before
+        else:
+            # there's potential the first word is longer than the limit
+            # so break out of the loop explicitly
+            text = after
+            break
+
+    # hard truncation to max_length if it was just one long word
+    return text[:max_length] or "_"

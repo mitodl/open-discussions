@@ -12,6 +12,7 @@ from prawcore.exceptions import ResponseException
 from rest_framework.exceptions import NotFound
 
 from channels import api
+from channels.backpopulate_api import comment_values_from_reddit
 from channels.constants import (
     COMMENTS_SORT_BEST,
     CHANNEL_TYPE_PUBLIC,
@@ -29,7 +30,7 @@ from channels.constants import (
     EXTENDED_POST_TYPE_ARTICLE,
     POSTS_SORT_HOT,
 )
-from channels.factories import ArticleFactory, ChannelFactory
+from channels.factories import ArticleFactory, ChannelFactory, PostFactory
 from channels.models import (
     Article,
     Channel,
@@ -42,6 +43,7 @@ from channels.models import (
     ChannelGroupRole,
 )
 from channels.utils import DEFAULT_LISTING_PARAMS, ListingParams
+from channels.test_utils import assert_properties_eq
 from search import task_helpers as search_task_helpers
 from open_discussions.factories import UserFactory
 from open_discussions import features
@@ -58,21 +60,49 @@ def _mock_channel(*, name, **kwargs):
 
 def _mock_post(*, post_id, subreddit, **kwargs):
     """Create a mock post and associated DB record"""
-    Post.objects.get_or_create(
-        post_id=post_id,
-        defaults={"channel": Channel.objects.get(name=subreddit.display_name)},
+    if not Post.objects.filter(post_id=post_id).exists():
+        PostFactory.create(
+            post_id=post_id,
+            is_text=True,
+            channel=Channel.objects.get(name=subreddit.display_name),
+        )
+    return Mock(
+        id=post_id,
+        created=1_547_749_404,
+        ups=1,
+        banned_by=None,
+        removed=False,
+        selftext="content",
+        url="http://example.com",
+        **kwargs,
     )
-    return Mock(id=post_id, **kwargs)
 
 
 def _mock_comment(*, comment_id, submission, subreddit, parent_id, **kwargs):
     """Create a mock comment and associated DB record"""
+    user = kwargs.pop("user", None) or UserFactory.create()
+    mock_author = Mock()
+    mock_author.configure_mock(name=user.username)
+    comment = Mock(
+        id=comment_id,
+        body="comment body",
+        removed=False,
+        banned_by=None,
+        created=1_547_749_404,
+        score=1,
+        author=mock_author,
+        submission=submission,
+        subreddit=subreddit,
+        **kwargs,
+    )
     Comment.objects.create(
         comment_id=comment_id,
         post=Post.objects.get(post_id=submission.id),
         parent_id=parent_id,
+        author=user,
+        **comment_values_from_reddit(comment),
     )
-    return Mock(id=comment_id, submission=submission, subreddit=subreddit, **kwargs)
+    return comment
 
 
 @pytest.fixture()
@@ -97,9 +127,10 @@ def mock_get_client(mocker):
                     post_id="abc",
                     subreddit=_mock_channel(name="subreddit"),
                     reply=Mock(
-                        return_value=Mock(
-                            id="456",
-                            link_id="t3_123",
+                        return_value=_mock_comment(
+                            comment_id="456",
+                            parent_id="abc",
+                            link_id="t3_abc",
                             submission=_mock_post(
                                 post_id="abc", subreddit=_mock_channel(name="subreddit")
                             ),
@@ -123,8 +154,9 @@ def mock_get_client(mocker):
                     ),
                     subreddit=_mock_channel(name="other_subreddit"),
                     reply=Mock(
-                        return_value=Mock(
-                            id="789",
+                        return_value=_mock_comment(
+                            comment_id="789",
+                            parent_id="567",
                             link_id="t3_123",
                             submission=_mock_post(
                                 post_id="123",
@@ -203,9 +235,11 @@ def test_vote_indexing(
     mocker, vote_func, expected_allowed_downvote, expected_instance_type
 ):
     """Test that an upvote/downvote calls a function to update the index"""
+    post = PostFactory.create(is_text=True)
     patched_vote_indexer = mocker.patch("search.task_helpers.update_indexed_score")
     # Test upvote
     mock_reddit_obj = Mock()
+    mock_reddit_obj.id = post.post_id
     mock_reddit_obj.likes = False
     vote_func(mock_reddit_obj, {"upvoted": True})
     patched_vote_indexer.assert_called_once_with(
@@ -495,6 +529,11 @@ def test_update_channel_invalid_membership(mock_client):
     assert mock_client.subreddit.call_count == 0
 
 
+DEFAULT_POST_PROPS = dict(
+    title="Title", num_comments=0, edited=False, deleted=False, removed=False, score=1
+)
+
+
 @pytest.mark.parametrize("text", ["Text", None])
 def test_create_post_text(mock_client, text):
     """Test create_post with text"""
@@ -509,14 +548,13 @@ def test_create_post_text(mock_client, text):
     mock_client.subreddit.return_value.submit.assert_called_once_with(
         "Title", selftext=text or "", url=None
     )
-    assert Post.objects.filter(
+    post = Post.objects.filter(
         post_id=mock_client.subreddit.return_value.submit.return_value.id
-    ).exists()
-    assert (
-        Post.objects.get(
-            post_id=mock_client.subreddit.return_value.submit.return_value.id
-        ).post_type
-        == LINK_TYPE_SELF
+    )
+    assert post.exists()
+    assert_properties_eq(
+        post.first(),
+        dict(text=text or "", url=None, post_type=LINK_TYPE_SELF, **DEFAULT_POST_PROPS),
     )
 
 
@@ -533,14 +571,18 @@ def test_create_post_url(mock_client):
     mock_client.subreddit.return_value.submit.assert_called_once_with(
         "Title", selftext=None, url="http://google.com"
     )
-    assert Post.objects.filter(
+    post = Post.objects.filter(
         post_id=mock_client.subreddit.return_value.submit.return_value.id
-    ).exists()
-    assert (
-        Post.objects.get(
-            post_id=mock_client.subreddit.return_value.submit.return_value.id
-        ).post_type
-        == LINK_TYPE_LINK
+    )
+    assert post.exists()
+    assert_properties_eq(
+        post.first(),
+        dict(
+            url="http://google.com",
+            text=None,
+            post_type=LINK_TYPE_LINK,
+            **DEFAULT_POST_PROPS,
+        ),
     )
 
 
@@ -557,14 +599,18 @@ def test_create_post_article(mock_client):
     mock_client.subreddit.return_value.submit.assert_called_once_with(
         "Title", selftext="", url=None
     )
-    assert Post.objects.filter(
+    post = Post.objects.filter(
         post_id=mock_client.subreddit.return_value.submit.return_value.id
-    ).exists()
-    assert (
-        Post.objects.get(
-            post_id=mock_client.subreddit.return_value.submit.return_value.id
-        ).post_type
-        == EXTENDED_POST_TYPE_ARTICLE
+    )
+    assert post.exists()
+    assert_properties_eq(
+        post.first(),
+        dict(
+            url=None,
+            text=None,
+            post_type=EXTENDED_POST_TYPE_ARTICLE,
+            **DEFAULT_POST_PROPS,
+        ),
     )
     assert Article.objects.filter(
         post__post_id=mock_client.subreddit.return_value.submit.return_value.id
@@ -640,9 +686,10 @@ def test_update_post_article(mock_client, indexing_decorator):
     """Test update_post for article passes"""
     mock_client.submission.return_value.selftext = ""
     client = api.Api(UserFactory.create())
-    article = ArticleFactory.create(
-        post=Post.objects.get(post_id=mock_client.submission.return_value.id)
-    )
+    Post.objects.filter(post_id=mock_client.submission.return_value.id).delete()
+    article = PostFactory.create(
+        is_article=True, post_id=mock_client.submission.return_value.id
+    ).article
     updated_content = [{"data": "updated"}]
     post_id = article.post.post_id
     post = client.update_post(post_id, article_content=updated_content)
@@ -724,7 +771,11 @@ def test_remove_post(mock_client, indexing_decorator):
 
 def test_create_comment_on_post(mock_client, indexing_decorator):
     """Makes correct calls for comment on post"""
+    Comment.objects.filter(
+        comment_id=mock_client.submission.return_value.reply.return_value.id
+    ).delete()  # don't want this for this test
     client = api.Api(UserFactory.create())
+    post = Post.objects.get(post_id="abc")
     comment = client.create_comment("text", post_id="abc")
     assert comment == mock_client.submission.return_value.reply.return_value
     assert mock_client.comment.call_count == 0
@@ -740,11 +791,16 @@ def test_create_comment_on_post(mock_client, indexing_decorator):
         comment_id=mock_client.submission.return_value.reply.return_value.id,
         parent_id=mock_client.submission.return_value.id,
     ).exists()
+    assert post.num_comments + 1 == Post.objects.get(post_id="abc").num_comments
 
 
 def test_create_comment_on_comment(mock_client, indexing_decorator):
     """Makes correct calls for comment on comment"""
+    Comment.objects.filter(
+        comment_id=mock_client.comment.return_value.reply.return_value.id
+    ).delete()  # don't want this for this test
     client = api.Api(UserFactory.create())
+    post = Post.objects.get(post_id="abc")
     comment = client.create_comment("text", comment_id="567")
     assert comment == mock_client.comment.return_value.reply.return_value
     assert mock_client.submission.call_count == 0
@@ -760,6 +816,7 @@ def test_create_comment_on_comment(mock_client, indexing_decorator):
         comment_id=mock_client.comment.return_value.reply.return_value.id,
         parent_id=mock_client.comment.return_value.id,
     ).exists()
+    assert post.num_comments + 1 == Post.objects.get(post_id="123").num_comments
 
 
 def test_create_comment_args_error(mock_client):

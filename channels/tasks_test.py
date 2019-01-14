@@ -10,12 +10,9 @@ from channels.constants import (
     ROLE_MODERATORS,
     ROLE_CONTRIBUTORS,
     LINK_TYPE_ANY,
-    LINK_TYPE_LINK,
-    LINK_TYPE_SELF,
-    EXTENDED_POST_TYPE_ARTICLE,
 )
-from channels.factories import ChannelFactory, ArticleFactory, PostFactory
-from channels.models import ChannelSubscription, Post, Channel
+from channels.factories import ChannelFactory, PostFactory
+from channels.models import ChannelSubscription, Channel
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
 
@@ -171,46 +168,52 @@ def test_populate_user_roles_error(
         tasks.populate_user_roles.delay([channel.id for channel in channels])
 
 
-def test_populate_post_types(mocker, mocked_celery, settings):
+def test_populate_post_and_comment_fields(mocker, mocked_celery, settings):
     """
-    populate_post_types should call sub-tasks with correct ids
+    populate_post_and_comment_fields should call sub-tasks with correct ids
     """
-    posts = PostFactory.create_batch(4, channel=ChannelFactory.create())
+    posts = PostFactory.create_batch(4)
     settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
-    mock_populate_post_post_type = mocker.patch(
-        "channels.tasks.populate_post_post_type"
+    mock_populate_post_and_comment_fields_batch = mocker.patch(
+        "channels.tasks.populate_post_and_comment_fields_batch"
     )
 
     with pytest.raises(mocked_celery.replace_exception_class):
-        tasks.populate_post_types.delay()
+        tasks.populate_post_and_comment_fields.delay()
 
     assert mocked_celery.group.call_count == 1
     list(mocked_celery.group.call_args[0][0])
-    mock_populate_post_post_type.si.assert_any_call([posts[0].id, posts[1].id])
-    mock_populate_post_post_type.si.assert_any_call([posts[2].id, posts[3].id])
+    mock_populate_post_and_comment_fields_batch.si.assert_any_call(
+        [posts[0].id, posts[1].id]
+    )
+    mock_populate_post_and_comment_fields_batch.si.assert_any_call(
+        [posts[2].id, posts[3].id]
+    )
     assert mocked_celery.replace.call_count == 1
 
 
-def test_populate_post_post_type(mocker, settings):
+def test_populate_post_and_comment_fields_batch(mocker, settings):
     """
-    populate_post_post_type should set allowed_post_types
+    populate_post_and_comment_fields_batch should call backpopulate APIs for each post
     """
     settings.INDEXING_API_USERNAME = UserFactory.create().username
-    channel = ChannelFactory.create()
-    posts = PostFactory.create_batch(3, channel=channel, post_type=None)
-    ArticleFactory.create(post=posts[2])
+    posts = PostFactory.create_batch(10, unpopulated=True)
     mock_api = mocker.patch("channels.api.Api", autospec=True)
-    mock_api.return_value.get_submission.side_effect = [
-        mocker.Mock(url=True),
-        mocker.Mock(url=False),
-        mocker.Mock(url=False),
-    ]
+    mock_backpopulate_api = mocker.patch("channels.tasks.backpopulate_api")
 
-    tasks.populate_post_post_type.delay([post.id for post in posts])
+    tasks.populate_post_and_comment_fields_batch.delay([post.id for post in posts])
 
-    assert Post.objects.get(id=posts[0].id).post_type == LINK_TYPE_LINK
-    assert Post.objects.get(id=posts[1].id).post_type == LINK_TYPE_SELF
-    assert Post.objects.get(id=posts[2].id).post_type == EXTENDED_POST_TYPE_ARTICLE
+    assert mock_api.return_value.get_submission.call_count == len(posts)
+    assert mock_backpopulate_api.backpopulate_post.call_count == len(posts)
+    assert mock_backpopulate_api.backpopulate_comments.call_count == len(posts)
+    for post in posts:
+        mock_api.return_value.get_submission.assert_any_call(post.post_id)
+        mock_backpopulate_api.backpopulate_post.assert_any_call(
+            post, mock_api.return_value.get_submission.return_value
+        )
+        mock_backpopulate_api.backpopulate_comments.assert_any_call(
+            mock_api.return_value.get_submission.return_value
+        )
 
 
 def test_populate_channel_fields_batch(mocker, settings):

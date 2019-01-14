@@ -19,6 +19,7 @@ from channels.utils import (
     AVATAR_MEDIUM_MAX_DIMENSION,
     AVATAR_SMALL_MAX_DIMENSION,
     THUMBNAIL_DIMENSIONS,
+    reddit_slugify,
 )
 from open_discussions.models import TimestampedModel
 from profiles.utils import (
@@ -201,16 +202,30 @@ class LinkMeta(TimestampedModel):
 
 
 class Post(TimestampedModel):
-    """
-    Keep track of post ids so that we can index all posts
-    """
+    """Data model for posts"""
 
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
-    post_id = Base36IntegerField(unique=True)
+    author = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     link_meta = models.ForeignKey(LinkMeta, null=True, on_delete=models.CASCADE)
+
+    post_id = Base36IntegerField(unique=True)
     post_type = models.CharField(
         max_length=10, choices=VALID_EXTENDED_POST_CHOICES, null=True
     )
+
+    title = models.CharField(max_length=300, null=True)
+    text = models.TextField(null=True)
+    url = models.URLField(max_length=2048, null=True)
+    score = models.BigIntegerField(null=True)
+    num_comments = models.BigIntegerField(null=True)
+    edited = models.BooleanField(null=True)
+    removed = models.BooleanField(null=True)
+    deleted = models.BooleanField(null=True)
+
+    @property
+    def slug(self):
+        """Slugifies the post title"""
+        return reddit_slugify(self.title)
 
     def __str__(self):
         return f"{self.post_id} on channel {self.channel}"
@@ -250,13 +265,19 @@ class Article(TimestampedModel):
 
 
 class Comment(TimestampedModel):
-    """
-    Keep track of comment ids so that we can index all comments efficiently
-    """
+    """Data model for post comments"""
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+
     comment_id = Base36IntegerField(unique=True)
     parent_id = Base36IntegerField(null=True)
+
+    text = models.TextField(null=True)
+    score = models.BigIntegerField(null=True)
+    edited = models.BooleanField(null=True)
+    removed = models.BooleanField(null=True)
+    deleted = models.BooleanField(null=True)
 
     def __str__(self):
         return f"{self.comment_id} on post {self.post}"

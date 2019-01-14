@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, NotFound
 
+from channels.constants import DELETED_COMMENT_OR_POST_TEXT
 from channels.utils import get_reddit_slug, num_items_not_none
 from channels.models import Channel, Subscription
 from channels.serializers.base import RedditObjectSerializer
@@ -124,7 +125,7 @@ class BasePostSerializer(RedditObjectSerializer):
 
     def get_deleted(self, instance):
         """Returns True if the post was deleted"""
-        return instance.selftext == "[deleted]"  # only way to tell
+        return instance.selftext == DELETED_COMMENT_OR_POST_TEXT  # only way to tell
 
     def get_article_text(self, instance):
         """Return article content rendered as text"""
