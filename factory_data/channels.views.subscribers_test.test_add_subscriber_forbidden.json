@@ -1,7 +1,19 @@
 {
+  "channels": {
+    "private_channel": {
+      "channel_type": "private",
+      "description": "Officiis explicabo deserunt aut nesciunt praesentium adipisci optio esse. Libero quidem consectetur iusto. Cumque aspernatur maiores ut voluptate provident aliquid rerum.\nPraesentium amet consequuntur quasi amet neque ipsam esse. Neque veritatis ipsam ullam omnis aliquid. Aut magnam dolorum magnam accusantium.\nEarum ea nostrum atque velit labore. Quis suscipit ullam pariatur voluptas ad ea voluptate. Neque blanditiis doloremque autem corrupti accusantium. Odio adipisci ut blanditiis cum optio.",
+      "name": "1547499296_115_saepe",
+      "public_description": "Natus unde eos saepe tempore laudantium nam exercitationem dolores.",
+      "title": "Repellat ullam quidem sint."
+    }
+  },
   "users": {
+    "contributor": {
+      "username": "01D172ARDZG7Q2X8M2TEAV3SBB"
+    },
     "staff_user": {
-      "username": "01BYXNKW5W94R11K75P2JFX2S4"
+      "username": "01D172AHZRF3Y1F5633EG5AHB7"
     }
   }
 }

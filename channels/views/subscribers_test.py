@@ -55,14 +55,13 @@ def test_add_subscriber_mod(client, public_channel, staff_api, reddit_factories)
     assert resp.json() == {"subscriber_name": new_subscriber.username}
 
 
-def test_add_subscriber_forbidden(staff_client):
+def test_add_subscriber_forbidden(staff_client, private_channel, user):
     """
     If a user gets a 403 from praw we should return a 403 status
     """
-    subscriber = UserFactory.create(username="01BTN6G82RKTS3WF61Q33AA0ND")
-    url = reverse("subscriber-list", kwargs={"channel_name": "admin_channel"})
+    url = reverse("subscriber-list", kwargs={"channel_name": private_channel.name})
     resp = staff_client.post(
-        url, data={"subscriber_name": subscriber.username}, format="json"
+        url, data={"subscriber_name": user.username}, format="json"
     )
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 

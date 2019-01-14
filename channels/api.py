@@ -1244,8 +1244,9 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(contributor_name))
         proxied_channel = self.get_channel(channel_name)
-        proxied_channel.contributor.add(user)
-        add_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
+        with transaction.atomic():
+            add_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
+            proxied_channel.contributor.add(user)
         search_task_helpers.update_author(user)
         return Redditor(self.reddit, name=contributor_name)
 
@@ -1265,8 +1266,9 @@ class Api:
         # This doesn't check if a user is a moderator because they should have access to the channel
         # regardless of their contributor status
         proxied_channel = self.get_channel(channel_name)
-        proxied_channel.contributor.remove(user)
-        remove_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
+        with transaction.atomic():
+            remove_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
+            proxied_channel.contributor.remove(user)
         search_task_helpers.update_author(user)
 
     def list_contributors(self, channel_name):
@@ -1294,13 +1296,14 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
         proxied_channel = self.get_channel(channel_name)
-        try:
-            proxied_channel.moderator.add(user)
-            Api(user).accept_invite(channel_name)
-        except APIException as ex:
-            if ex.error_type != "ALREADY_MODERATOR":
-                raise
-        add_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
+        with transaction.atomic():
+            add_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
+            try:
+                proxied_channel.moderator.add(user)
+                Api(user).accept_invite(channel_name)
+            except APIException as ex:
+                if ex.error_type != "ALREADY_MODERATOR":
+                    raise
         search_task_helpers.update_author(user)
 
     def accept_invite(self, channel_name):
@@ -1326,8 +1329,10 @@ class Api:
             raise NotFound("User {} does not exist".format(moderator_name))
 
         proxied_channel = self.get_channel(channel_name)
-        proxied_channel.moderator.remove(user)
-        remove_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
+
+        with transaction.atomic():
+            remove_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
+            proxied_channel.moderator.remove(user)
         search_task_helpers.update_author(user)
 
     def _list_moderators(self, *, channel_name, moderator_name):
@@ -1395,11 +1400,12 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(subscriber_name))
         channel = Api(user).get_channel(channel_name)
-        try:
-            channel.subscribe()
-        except PrawForbidden as ex:
-            raise PermissionDenied() from ex
-        sync_channel_subscription_model(channel_name, user)
+        with transaction.atomic():
+            sync_channel_subscription_model(channel_name, user)
+            try:
+                channel.subscribe()
+            except PrawForbidden as ex:
+                raise PermissionDenied() from ex
         search_task_helpers.update_author(user)
         return Redditor(self.reddit, name=subscriber_name)
 
@@ -1417,16 +1423,17 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(subscriber_name))
         channel = Api(user).get_channel(channel_name)
-        try:
-            channel.unsubscribe()
-        except PrawNotFound:
-            # User is already unsubscribed,
-            # or maybe there's another unrelated 403 error from reddit, but we can't tell the difference,
-            # and the double removal case is probably more common.
-            pass
-        ChannelSubscription.objects.filter(
-            user=user, channel__name=channel_name
-        ).delete()
+        with transaction.atomic():
+            ChannelSubscription.objects.filter(
+                user=user, channel__name=channel_name
+            ).delete()
+            try:
+                channel.unsubscribe()
+            except PrawNotFound:
+                # User is already unsubscribed,
+                # or maybe there's another unrelated 403 error from reddit, but we can't tell the difference,
+                # and the double removal case is probably more common.
+                pass
         search_task_helpers.update_author(user)
 
     def is_subscriber(self, subscriber_name, channel_name):
