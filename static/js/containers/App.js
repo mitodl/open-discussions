@@ -50,6 +50,7 @@ import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
 import { isAnonAccessiblePath, needsAuthedSite } from "../lib/auth"
 import { isMobileWidth, preventDefaultAndInvoke } from "../lib/util"
 import { getOwnProfile } from "../lib/redux_selectors"
+import { WIDGET_FORM_KEY } from "../lib/widgets"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -67,6 +68,7 @@ type AppProps = {
   banner: BannerState,
   dispatch: Dispatch<*>,
   showUserMenu: boolean,
+  editingWidgets: boolean,
   profile: ?Profile
 }
 
@@ -159,6 +161,7 @@ class App extends React.Component<AppProps> {
       snackbar,
       banner,
       showUserMenu,
+      editingWidgets,
       profile
     } = this.props
 
@@ -183,6 +186,7 @@ class App extends React.Component<AppProps> {
           banner={banner}
           hide={preventDefaultAndInvoke(this.hideBanner)}
         />
+        {editingWidgets ? <div className="opaque-overlay" /> : null}
         <div className="content">
           <Route exact path={match.url} component={HomePage} />
           <Route
@@ -317,6 +321,7 @@ export default connect(state => {
   } = state
 
   const showUserMenu = dropdownMenus.has(USER_MENU_DROPDOWN)
+  const editingWidgets = state.forms[WIDGET_FORM_KEY]
 
   return {
     showDrawerMobile,
@@ -324,6 +329,7 @@ export default connect(state => {
     snackbar,
     banner,
     showUserMenu,
+    editingWidgets,
     profile: getOwnProfile(state)
   }
 })(App)

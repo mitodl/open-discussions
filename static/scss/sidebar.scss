@@ -1,4 +1,8 @@
 .sidebar {
+  // this ensures the sidebar is visible when opaque-overlay covers the screen
+  z-index: 22;
+  position: relative;
+
   .user-count {
     color: $font-grey;
   }

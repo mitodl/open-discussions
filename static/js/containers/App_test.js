@@ -14,6 +14,7 @@ import * as authUtils from "../lib/auth"
 import { makeFrontpageSetting, makeCommentSetting } from "../factories/settings"
 import { makeChannelPostList } from "../factories/posts"
 import { shouldIf, shouldIfGt0 } from "../lib/test_utils"
+import { WIDGET_FORM_KEY } from "../lib/widgets"
 
 describe("App", () => {
   let helper, renderComponent, channels, postList
@@ -125,6 +126,22 @@ describe("App", () => {
           history.push({ pathname: "/" })
         }
       )
+    })
+  })
+  ;[true, false].forEach(editingWidgets => {
+    it(`${
+      editingWidgets ? "shows" : "doesn't show"
+    } the an overlay disabling parts of the UI`, async () => {
+      if (editingWidgets) {
+        helper.store.dispatch(
+          actions.forms.formBeginEdit({
+            formKey: WIDGET_FORM_KEY,
+            value:   null
+          })
+        )
+      }
+      const [wrapper] = await renderComponent("/", [])
+      assert.equal(wrapper.find(".opaque-overlay").exists(), editingWidgets)
     })
   })
 })

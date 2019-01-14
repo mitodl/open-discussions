@@ -16,6 +16,7 @@ $footer-height: 152px;
   height: calc(100vh - #{$toolbar-height-desktop});
   top: $toolbar-height-desktop;
   width: $drawer-width;
+  z-index: 45;
 
   .mdc-drawer__drawer {
     position: absolute;

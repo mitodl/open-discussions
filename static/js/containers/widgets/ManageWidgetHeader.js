@@ -51,7 +51,7 @@ export class ManageWidgetHeader extends React.Component<Props> {
     }
 
     return (
-      <React.Fragment>
+      <span className="manage-widgets-navbar">
         <span className="manage-title">Manage widgets</span>
         <button className="cancel" onClick={clearForm}>
           Cancel
@@ -59,7 +59,7 @@ export class ManageWidgetHeader extends React.Component<Props> {
         <button className="submit" onClick={this.submitForm}>
           Done
         </button>
-      </React.Fragment>
+      </span>
     )
   }
 }
