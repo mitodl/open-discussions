@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.62.0
+--------------
+
+- Widget style changes (#1674)
+- round out article cover image UI
+
 Version 0.61.1 (Released January 11, 2019)
 --------------
 
