@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.62.0
+Version 0.62.0 (Released January 14, 2019)
 --------------
 
 - Widget style changes (#1674)
