@@ -15,6 +15,7 @@ import SearchResult from "../components/SearchResult"
 import withChannelHeader from "../hoc/withChannelHeader"
 
 import { actions } from "../actions"
+import { clearSearch } from "../actions/search"
 import { SEARCH_FILTER_ALL, updateSearchFilterParam } from "../lib/picker"
 import { preventDefaultAndInvoke } from "../lib/util"
 import { getChannelName } from "../lib/util"
@@ -153,6 +154,7 @@ export class SearchPage extends React.Component<Props, State> {
 
     const error = validateSearchQuery(text)
     if (error) {
+      clearSearch()
       this.setState({ error })
       return
     }
@@ -291,7 +293,7 @@ export class SearchPage extends React.Component<Props, State> {
               value={qs.parse(search).type || SEARCH_FILTER_ALL}
             />
           </div>
-          {error || !text ? null : this.renderResults()}
+          {error ? null : this.renderResults()}
         </Cell>
       </Grid>
     )
@@ -339,8 +341,9 @@ const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps: Props) => ({
   runSearch: async (params: SearchParams) => {
     return await dispatch(actions.search.post(params))
   },
-  clearSearch: () => {
+  clearSearch: async () => {
     dispatch(actions.search.clear())
+    await dispatch(clearSearch())
   },
   getChannel: async () => {
     const channelName = getChannelName(ownProps)
