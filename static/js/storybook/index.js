@@ -22,7 +22,10 @@ import {
   makePostResult,
   makeProfileResult
 } from "../factories/search"
-import { makeWidgetInstance } from "../factories/widgets"
+import {
+  makeWidgetInstance,
+  makeWidgetListResponse
+} from "../factories/widgets"
 import { CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC } from "../lib/channels"
 import { dropdownMenuFuncs } from "../lib/ui"
 import { commentPermalink } from "../lib/url"
@@ -46,8 +49,9 @@ import {
 } from "../components/Picker"
 import SearchResult from "../components/SearchResult"
 import SearchTextbox from "../components/SearchTextbox"
-import { WidgetInstance } from "../components/widgets/WidgetInstance"
-import { WIDGET_FORM_KEY } from "../lib/widgets"
+import WidgetInstance from "../components/widgets/WidgetInstance"
+import WidgetList from "../components/widgets/WidgetList"
+import { SortableContainer } from "react-sortable-hoc"
 
 // delay import so fonts get applied first
 setTimeout(() => {
@@ -624,17 +628,18 @@ storiesOf("Widgets", module)
   .addDecorator(withKnobs)
   .add("markdown", () => {
     const editing = boolean("editing")
-    const form = editing
-      ? { [WIDGET_FORM_KEY]: { value: { some: "value" } } }
-      : null
     const instance = makeWidgetInstance("markdown")
     instance.title = text("title", "Markdown widget title")
     instance.configuration.source = text("markdown", "Markdown **body**")
+
+    const SortableWidgetInstance = SortableContainer(props => (
+      <WidgetInstance {...props} />
+    ))
     return (
       <StoryWrapper>
-        <WidgetInstance
+        <SortableWidgetInstance
           widgetInstance={instance}
-          form={form}
+          editing={editing}
           deleteInstance={action("delete")}
           startEditInstance={action("start edit instance")}
         />
@@ -643,19 +648,38 @@ storiesOf("Widgets", module)
   })
   .add("default", () => {
     const editing = boolean("editing")
-    const form = editing
-      ? { [WIDGET_FORM_KEY]: { value: { some: "value" } } }
-      : null
     const instance = makeWidgetInstance("missing")
     instance.title = text("title", "Default widget title")
     instance.html = text("html", "Some <i>unescaped</i> html")
+
+    const SortableWidgetInstance = SortableContainer(props => (
+      <WidgetInstance {...props} />
+    ))
     return (
       <StoryWrapper>
-        <WidgetInstance
+        <SortableWidgetInstance
           widgetInstance={instance}
-          form={form}
+          editing={editing}
           deleteInstance={action("delete")}
           startEditInstance={action("start edit instance")}
+        />
+      </StoryWrapper>
+    )
+  })
+  .add("list", () => {
+    const editing = boolean("editing")
+    const list = makeWidgetListResponse().widgets
+
+    return (
+      <StoryWrapper>
+        <WidgetList
+          startAddInstance={action("start add")}
+          startEditInstance={action("start edit")}
+          clearForm={action("clear")}
+          deleteInstance={action("delete")}
+          submitForm={action("submit")}
+          widgetInstances={list}
+          editing={editing}
         />
       </StoryWrapper>
     )
