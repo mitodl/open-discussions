@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.62.1
+--------------
+
+- Minimum search query length (#1675)
+- Text tweaks on the create post page
+- small tweak to the cover image style
+- Update subscriber/moderator/contributor APIs to be atomic
+- Autofocus the input on the password screen
+- Upgrade Django to 2.1.5 (#1695)
+- Fix a post page form reset bug
+- Allow article cover images to be deleted (#1693)
+
 Version 0.62.0 (Released January 14, 2019)
 --------------
 
