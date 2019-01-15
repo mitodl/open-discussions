@@ -4,6 +4,7 @@ import { POST, INITIAL_STATE } from "redux-hammock/constants"
 import * as api from "../lib/api/api"
 
 import type { Result, SearchParams } from "../flow/searchTypes"
+import { CLEAR_SEARCH } from "../actions/search"
 
 type PostFuncReturn = {
   response: Object,
@@ -42,6 +43,16 @@ export const searchEndpoint = {
       results:     oldResults.concat(response.hits.hits.map(item => item._source)),
       total:       response.hits.total,
       initialLoad: false
+    }
+  },
+  extraActions: {
+    [CLEAR_SEARCH]: () => {
+      return {
+        // $FlowFixMe: doesn't know about ES structure
+        results:     [],
+        total:       0,
+        initialLoad: true
+      }
     }
   }
 }

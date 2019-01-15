@@ -1,11 +1,13 @@
 // @flow
 import React from "react"
+import { validationMessage } from "../lib/validation"
 
 type Props = {
   onChange: Function,
   onClear: Function,
   onSubmit: Function,
-  value: string
+  value: string,
+  validation: ?string
 }
 
 export default class SearchTextbox extends React.Component<Props> {
@@ -35,7 +37,7 @@ export default class SearchTextbox extends React.Component<Props> {
   }
 
   render() {
-    const { onSubmit, onClear, onChange, value } = this.props
+    const { onSubmit, onClear, onChange, value, validation } = this.props
     return (
       <div className="search-textbox">
         <i className="material-icons search-icon" onClick={onSubmit}>
@@ -49,11 +51,13 @@ export default class SearchTextbox extends React.Component<Props> {
         <input
           ref={this.input}
           type="text"
+          name="query"
           className="underlined"
           value={value}
           onChange={onChange}
           onKeyDown={event => (event.key === "Enter" ? onSubmit(event) : null)}
         />
+        {validationMessage(validation)}
       </div>
     )
   }

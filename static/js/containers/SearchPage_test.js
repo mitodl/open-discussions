@@ -59,7 +59,7 @@ describe("SearchPage", () => {
         }
       },
       location: {
-        search: ""
+        search: "q=text"
       },
       history: helper.browserHistory
     }
@@ -83,7 +83,7 @@ describe("SearchPage", () => {
       channelName: channel.name,
       from:        0,
       size:        SETTINGS.search_page_size,
-      text:        undefined,
+      text:        "text",
       type:        undefined
     })
     assert.deepEqual(
@@ -107,6 +107,19 @@ describe("SearchPage", () => {
       )
     })
   })
+  ;["", "a"].forEach(query => {
+    it(`doesn't run a search if initial search text is '${query}'`, async () => {
+      await renderPage(
+        {},
+        {
+          location: {
+            search: `q=${query}`
+          }
+        }
+      )
+      sinon.assert.notCalled(helper.searchStub)
+    })
+  })
 
   it("loads more results", async () => {
     SETTINGS.search_page_size = 5
@@ -118,7 +131,7 @@ describe("SearchPage", () => {
       channelName: channel.name,
       from:        SETTINGS.search_page_size,
       size:        SETTINGS.search_page_size,
-      text:        undefined,
+      text:        "text",
       type:        undefined
     })
     // from is 5, plus 5 is 10 which is == numHits so no more results
@@ -152,28 +165,41 @@ describe("SearchPage", () => {
     it(`${expected ? "shows" : "doesn't show"} PostLoading when we are ${
       searchProcessing ? "loading" : "not loading"
     } search results and initialLoad = ${String(initialLoad)}`, async () => {
-      const { inner } = await renderPage({
-        search: {
-          data: {
-            initialLoad
-          },
-          processing: searchProcessing,
-          loaded:     !searchProcessing
+      const { inner } = await renderPage(
+        {
+          search: {
+            data: {
+              initialLoad
+            },
+            processing: searchProcessing,
+            loaded:     !searchProcessing
+          }
+        },
+        {
+          location: {
+            search: "q=text"
+          }
         }
-      })
-
+      )
       assert.equal(inner.find("PostLoading").length, expected ? 1 : 0)
     })
   })
 
   it("shows a message saying there are no results", async () => {
-    const { inner } = await renderPage({
-      search: {
-        data: {
-          results: []
+    const { inner } = await renderPage(
+      {
+        search: {
+          data: {
+            results: []
+          }
+        }
+      },
+      {
+        location: {
+          search: "q=fghgfh"
         }
       }
-    })
+    )
     assert.equal(
       inner.find(".empty-list-msg").text(),
       "There are no results to display."
@@ -224,7 +250,8 @@ describe("SearchPage", () => {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
       from:          0,
       text,
-      votedComments: new Map()
+      votedComments: new Map(),
+      error:         null
     })
   })
   ;[true, false].forEach(hasChannel => {
@@ -258,7 +285,7 @@ describe("SearchPage", () => {
       {},
       {
         location: {
-          search: `type=${type}`
+          search: `type=${type}&q=text`
         }
       }
     )
@@ -266,7 +293,7 @@ describe("SearchPage", () => {
       channelName: channel.name,
       from:        0,
       size:        SETTINGS.search_page_size,
-      text:        undefined,
+      text:        "text",
       type
     })
   })
@@ -277,7 +304,7 @@ describe("SearchPage", () => {
       channelName: channel.name,
       from:        0,
       size:        SETTINGS.search_page_size,
-      text:        undefined,
+      text:        "text",
       type:        undefined
     })
   })
@@ -286,6 +313,7 @@ describe("SearchPage", () => {
     const { inner, store } = await renderPage()
     inner.setState({ from: 7 })
     const type = "comment"
+    const text = "text"
     helper.searchStub.reset()
     inner.find("SearchFilterPicker").prop("updatePickerParam")(type, {
       preventDefault: helper.sandbox.stub()
@@ -294,14 +322,15 @@ describe("SearchPage", () => {
       channelName: channel.name,
       from:        0,
       size:        SETTINGS.search_page_size,
-      text:        undefined,
+      text,
       type
     })
-    assert.deepEqual(qs.parse(helper.currentLocation.search), { type })
+    assert.deepEqual(qs.parse(helper.currentLocation.search), { type, q: text })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
       from:          0,
-      text:          undefined,
+      text,
+      error:         null,
       votedComments: new Map()
     })
     assert.equal(
