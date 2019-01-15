@@ -7,7 +7,8 @@ import { editorUpdateFormShim } from "./Editor"
 type Props = {
   image: ?File | string,
   onUpdate: Function,
-  setPhotoError?: (err: string) => void
+  setPhotoError?: (err: string) => void,
+  hideCoverImageInput: Function
 }
 
 export default class CoverImageInput extends React.Component<Props> {
@@ -27,6 +28,8 @@ export default class CoverImageInput extends React.Component<Props> {
     const [image] = images
     this.setCoverImage(image)
 
+    // this is to prevent a strange interaction with the ckeditor on MacOS
+    // see https://github.com/mitodl/open-discussions/pull/1676#issuecomment-453261791
     if (this.node.current) {
       this.node.current.focus()
     }
@@ -34,6 +37,14 @@ export default class CoverImageInput extends React.Component<Props> {
 
   clearCoverImage = () => {
     this.setCoverImage(undefined)
+  }
+
+  hideCoverImageInput = (e: Event) => {
+    const { hideCoverImageInput } = this.props
+
+    e.preventDefault()
+    e.stopPropagation()
+    hideCoverImageInput()
   }
 
   render() {
@@ -70,15 +81,18 @@ export default class CoverImageInput extends React.Component<Props> {
                 }
               }}
             >
-              <div className="desktop-upload-message">
-                Optional: Add a cover image to your post<br />Drag an image here
-                or<br />
+              <div className="cover-image-message">
+                <i className="material-icons">add_photo_alternate</i>
                 <button type="button" className="outlined">
-                  Click to select an image
+                  Upload cover image
                 </button>
-              </div>
-              <div className="mobile-upload-message">
-                Click to select a photo.
+                <a
+                  className="navy small-text"
+                  onClick={this.hideCoverImageInput}
+                  href="#"
+                >
+                  remove cover image
+                </a>
               </div>
             </Dropzone>
           )}

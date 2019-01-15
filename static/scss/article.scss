@@ -31,6 +31,26 @@
 
 .ck-editor:not(.read-only) {
   border-radius: $std-border-radius;
+  padding: 25px;
+
+  @include breakpoint(phone) {
+    padding: 10px;
+  }
+
+  .ck-editor__editable.ck-focused {
+    outline: none !important;
+    box-shadow: none !important;
+    border: 1px solid transparent !important;
+  }
+
+  .ck.ck-content.ck-editor__editable {
+    min-height: 300px;
+    padding-left: 0px;
+
+    @include breakpoint(phone) {
+      margin-left: 15px;
+    }
+  }
 
   .ck.ck-toolbar {
     border: 1px solid $input-border-grey;
@@ -53,10 +73,6 @@
         margin: 0;
       }
     }
-  }
-
-  @include breakpoint(phone) {
-    margin-left: 22px;
   }
 }
 

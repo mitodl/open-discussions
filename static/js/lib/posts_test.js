@@ -21,13 +21,14 @@ import { LINK_TYPE_ARTICLE, LINK_TYPE_LINK, LINK_TYPE_TEXT } from "./channels"
 describe("Post utils", () => {
   it("should return a new post with empty values", () => {
     assert.deepEqual(newPostForm(), {
-      postType:    null,
-      text:        "",
-      url:         "",
-      title:       "",
-      article:     [],
-      thumbnail:   null,
-      cover_image: null
+      postType:         null,
+      text:             "",
+      url:              "",
+      title:            "",
+      article:          [],
+      thumbnail:        null,
+      cover_image:      null,
+      show_cover_image: true
     })
   })
 

@@ -32,6 +32,11 @@
     .editor {
       min-height: 300px;
     }
+
+    &.article {
+      background: white;
+      border-radius: $std-border-radius;
+    }
   }
 
   .posting-to-channel,

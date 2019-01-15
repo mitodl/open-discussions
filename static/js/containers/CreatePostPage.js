@@ -158,8 +158,18 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     ensureTwitterEmbedJS()
   }
 
+  updateForm = (update: Object) => {
+    const { dispatch } = this.props
+    dispatch(
+      actions.forms.formUpdate({
+        ...CREATE_POST_PAYLOAD,
+        value: update
+      })
+    )
+  }
+
   componentDidUpdate(prevProps: CreatePostPageProps) {
-    const { channel, dispatch, postForm } = this.props
+    const { channel, postForm } = this.props
 
     // If a newly-selected channel cannot or should not be rendered with the same form state as the
     // previously-selected channel, we need to reset the form state.
@@ -176,21 +186,17 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
         postForm
       )
     ) {
-      dispatch(
-        actions.forms.formUpdate({
-          ...CREATE_POST_PAYLOAD,
-          value: {
-            postType:
-              channel.allowed_post_types.length > 1
-                ? null
-                : channel.allowed_post_types[0],
-            url:       "",
-            text:      "",
-            thumbnail: null,
-            article:   []
-          }
-        })
-      )
+      this.updateForm({
+        postType:
+          channel.allowed_post_types.length > 1
+            ? null
+            : channel.allowed_post_types[0],
+        url:              "",
+        text:             "",
+        thumbnail:        null,
+        article:          [],
+        show_cover_image: true
+      })
     }
   }
 
@@ -206,14 +212,8 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     const { dispatch } = this.props
     const { name, value } = e.target
 
-    dispatch(
-      actions.forms.formUpdate({
-        ...CREATE_POST_PAYLOAD,
-        value: {
-          [name]: value
-        }
-      })
-    )
+    this.updateForm({ [name]: value })
+
     if (name === "url" && isURL(value, { allow_underscores: true })) {
       const embedlyGetFunc = actions.embedly.get(value)
       embedlyGetFunc.meta = {
@@ -228,20 +228,20 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
     }
   }
 
+  hideCoverImageInput = () => {
+    this.updateForm({ show_cover_image: false })
+  }
+
   updatePostType = (postType: ?string) => {
     const { dispatch } = this.props
-    dispatch(
-      actions.forms.formUpdate({
-        ...CREATE_POST_PAYLOAD,
-        value: {
-          postType,
-          url:         "",
-          text:        "",
-          article:     [],
-          cover_image: null
-        }
-      })
-    )
+    this.updateForm({
+      postType,
+      url:              "",
+      text:             "",
+      article:          [],
+      cover_image:      null,
+      show_cover_image: true
+    })
 
     if (postType === LINK_TYPE_ARTICLE) {
       dispatch(setShowDrawerDesktop(false))
@@ -390,6 +390,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
           embedlyInFlight={embedlyInFlight}
           openClearPostTypeDialog={this.openClearPostTypeDialog}
           setPhotoError={this.setPhotoError}
+          hideCoverImageInput={this.hideCoverImageInput}
         />
       </React.Fragment>
     )

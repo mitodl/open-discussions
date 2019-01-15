@@ -103,12 +103,13 @@ export type PostFormType =
   | null
 
 export type PostForm = {
-  postType:      PostFormType,
-  text:          string,
-  url:           string,
-  title:         string,
-  article:       Array<Object>,
-  cover_image:   ?File
+  postType:           PostFormType,
+  text:               string,
+  url:                string,
+  title:              string,
+  article:            Array<Object>,
+  cover_image:        ?File,
+  show_cover_image:   boolean
 }
 
 export type PostValidation = {

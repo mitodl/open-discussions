@@ -18,18 +18,19 @@ import type {
 export const POST_PREVIEW_LINES = 2
 
 export const newPostForm = (): PostForm => ({
-  postType:    null,
-  text:        "",
-  url:         "",
-  title:       "",
-  thumbnail:   null,
-  article:     [],
-  cover_image: null
+  postType:         null,
+  text:             "",
+  url:              "",
+  title:            "",
+  thumbnail:        null,
+  article:          [],
+  cover_image:      null,
+  show_cover_image: true
 })
 
 export const postFormIsContentless = R.useWith(
   R.equals,
-  R.repeat(R.omit(["postType", "title"]), 2)
+  R.repeat(R.omit(["postType", "title", "show_cover_image"]), 2)
 )(newPostForm())
 
 export const formatCommentsCount = (post: Post): string =>

@@ -35,7 +35,12 @@ type Props = {
   embedly: Object,
   embedlyInFlight: boolean,
   openClearPostTypeDialog: Function,
-  setPhotoError: Function
+  setPhotoError: Function,
+  hideCoverImageInput: Function
+}
+
+type State = {
+  showCoverImage: boolean
 }
 
 const channelOptions = (channels: Map<string, Channel>) =>
@@ -47,7 +52,7 @@ const channelOptions = (channels: Map<string, Channel>) =>
       </option>
     ))
 
-export default class CreatePostForm extends React.Component<Props> {
+export default class CreatePostForm extends React.Component<Props, State> {
   postTypeButtons = () => {
     const { channel, updatePostType, validation } = this.props
 
@@ -121,7 +126,8 @@ export default class CreatePostForm extends React.Component<Props> {
       validation,
       embedlyInFlight,
       embedly,
-      setPhotoError
+      setPhotoError,
+      hideCoverImageInput
     } = this.props
     if (!postForm) {
       return null
@@ -143,11 +149,14 @@ export default class CreatePostForm extends React.Component<Props> {
     } else if (postType === LINK_TYPE_ARTICLE) {
       return (
         <div className="article row post-content">
-          <CoverImageInput
-            image={postForm.cover_image}
-            setPhotoError={setPhotoError}
-            onUpdate={onUpdate}
-          />
+          {postForm.show_cover_image ? (
+            <CoverImageInput
+              image={postForm.cover_image}
+              setPhotoError={setPhotoError}
+              onUpdate={onUpdate}
+              hideCoverImageInput={hideCoverImageInput}
+            />
+          ) : null}
           {validationMessage(validation.coverImage)}
           <ArticleEditor onChange={editorUpdateFormShim("article", onUpdate)} />
           {this.clearInputButton()}

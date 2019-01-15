@@ -432,14 +432,16 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
     constructor(props) {
       super(props)
       this.state = {
-        patching: false
+        patching:       false,
+        showCoverImage: true
       }
     }
 
     props: CommentComponentProps
 
     state: {
-      patching: boolean
+      patching: boolean,
+      showCoverImage: boolean
     }
 
     onSubmit = async e => {
@@ -466,9 +468,13 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
       }
     }
 
+    hideCoverImageInput = () => {
+      this.setState({ showCoverImage: false })
+    }
+
     render() {
       const { forms, formKey, onUpdate, cancelReply, post } = this.props
-      const { patching } = this.state
+      const { patching, showCoverImage } = this.state
       const text = R.pathOr("", [formKey, "value", "text"], forms)
       const image = R.pathOr(null, [formKey, "value", "cover_image"], forms)
       const article = R.pathOr(
@@ -482,8 +488,12 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
 
       return (
         <React.Fragment>
-          {article ? (
-            <CoverImageInput image={image} onUpdate={onUpdate} />
+          {article && showCoverImage ? (
+            <CoverImageInput
+              image={image}
+              onUpdate={onUpdate}
+              hideCoverImageInput={this.hideCoverImageInput}
+            />
           ) : null}
           <InputFormHelper
             onSubmit={this.onSubmit}

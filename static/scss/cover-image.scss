@@ -5,15 +5,32 @@
   border-radius: $std-border-radius;
 
   .article-banner-image {
-    margin: 10px;
     min-height: 115px;
     background-color: $pale-grey;
     display: flex;
     align-items: center;
     flex-direction: column;
+    margin: 25px;
+    margin-bottom: 0;
+
+    @include breakpoint(phone) {
+      margin: 10px;
+      margin-bottom: 0;
+    }
 
     .photo-dropzone {
       height: 150px;
+
+      .cover-image-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        i {
+          font-size: 50px;
+          padding-bottom: 15px;
+        }
+      }
     }
 
     .cover-img-container {

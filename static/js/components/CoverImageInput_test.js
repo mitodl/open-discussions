@@ -10,16 +10,23 @@ import CoverImageInput from "./CoverImageInput"
 import { makeEvent } from "../lib/test_utils"
 
 describe("CoverImageInput", () => {
-  let renderInput, onUpdateStub, setPhotoErrorStub, imageFile, sandbox
+  let renderInput,
+    onUpdateStub,
+    setPhotoErrorStub,
+    imageFile,
+    sandbox,
+    hideCoverImageInputStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     onUpdateStub = sandbox.stub()
     setPhotoErrorStub = sandbox.stub()
+    hideCoverImageInputStub = sandbox.stub()
     imageFile = new File([], "foobar.jpg")
     renderInput = configureShallowRenderer(CoverImageInput, {
-      onUpdate:      onUpdateStub,
-      setPhotoError: setPhotoErrorStub
+      onUpdate:            onUpdateStub,
+      setPhotoError:       setPhotoErrorStub,
+      hideCoverImageInput: hideCoverImageInputStub
     })
   })
 
@@ -79,5 +86,19 @@ describe("CoverImageInput", () => {
       onUpdateStub,
       R.omit(["preventDefault"], makeEvent("cover_image", undefined))
     )
+  })
+
+  it("should show a button to remove the input", () => {
+    const wrapper = renderInput()
+    const btn = wrapper.find("a.navy")
+    assert.equal(btn.text(), "remove cover image")
+    const event = {
+      preventDefault:  sandbox.stub(),
+      stopPropagation: sandbox.stub()
+    }
+    btn.props().onClick(event)
+    sinon.assert.called(hideCoverImageInputStub)
+    sinon.assert.called(event.preventDefault)
+    sinon.assert.called(event.stopPropagation)
   })
 })

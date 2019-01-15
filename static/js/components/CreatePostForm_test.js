@@ -26,7 +26,8 @@ describe("CreatePostForm", () => {
     openClearPostTypeDialogStub,
     updatePostTypeStub,
     setPhotoErrorStub,
-    onUpdateStub
+    onUpdateStub,
+    hideCoverImageInputStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -35,6 +36,7 @@ describe("CreatePostForm", () => {
     openClearPostTypeDialogStub = sandbox.stub()
     updatePostTypeStub = sandbox.stub()
     setPhotoErrorStub = sandbox.stub()
+    hideCoverImageInputStub = sandbox.stub()
     onUpdateStub = sandbox.stub()
     renderPostForm = configureShallowRenderer(CreatePostForm, {
       validation:              {},
@@ -50,7 +52,8 @@ describe("CreatePostForm", () => {
       processing:              false,
       updateChannelSelection:  sandbox.stub(),
       openClearPostTypeDialog: openClearPostTypeDialogStub,
-      setPhotoError:           setPhotoErrorStub
+      setPhotoError:           setPhotoErrorStub,
+      hideCoverImageInput:     hideCoverImageInputStub
     })
   })
 
@@ -121,9 +124,10 @@ describe("CreatePostForm", () => {
     })
     const input = wrapper.find("CoverImageInput")
     assert.ok(input.exists())
-    const { setPhotoError, onUpdate } = input.props()
+    const { setPhotoError, onUpdate, hideCoverImageInput } = input.props()
     assert.equal(onUpdate, onUpdateStub)
     assert.equal(setPhotoError, setPhotoErrorStub)
+    assert.equal(hideCoverImageInput, hideCoverImageInputStub)
   })
 
   it("should pass down a coverImage, if there is one in the form", () => {
@@ -138,6 +142,18 @@ describe("CreatePostForm", () => {
     })
     const { image } = wrapper.find("CoverImageInput").props()
     assert.equal(image, coverImage)
+  })
+
+  it("should hide the cover image, if the form says to do so", () => {
+    const postForm = {
+      ...newPostForm(),
+      postType:         LINK_TYPE_ARTICLE,
+      show_cover_image: false
+    }
+    const wrapper = renderPostForm({
+      postForm
+    })
+    assert.isNotOk(wrapper.find("CoverImageInput").exists())
   })
 
   //

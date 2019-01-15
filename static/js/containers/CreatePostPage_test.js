@@ -239,6 +239,16 @@ describe("CreatePostPage", () => {
     assert.ok(window.twttr.widgets.load.called)
   })
 
+  it("should pass down a function to set show_cover_image to false", async () => {
+    const wrapper = await renderPage()
+    const { hideCoverImageInput } = wrapper.find("CreatePostForm").props()
+    const state = await listenForActions(
+      [actions.forms.FORM_UPDATE],
+      hideCoverImageInput
+    )
+    assert.isFalse(state.forms[CREATE_POST_KEY].value.show_cover_image)
+  })
+
   //
   ;[
     ["http", false],
@@ -562,10 +572,11 @@ describe("CreatePostPage", () => {
                 toChannelTypes.length > 1 && !hasInput
                   ? null
                   : toChannelTypes[0],
-              url:       "",
-              text:      "",
-              article:   [],
-              thumbnail: null
+              url:              "",
+              text:             "",
+              article:          [],
+              thumbnail:        null,
+              show_cover_image: true
             })
           } else {
             assert.equal(dispatch.callCount, 0)
@@ -626,7 +637,7 @@ describe("CreatePostPage", () => {
     ].forEach(([postTypes, postType, hasInput, shouldDispatch]: CDUTypeTwo) => {
       it(`${shouldIf(
         shouldDispatch
-      )} going form no channel to a channel with allowed post types '${postTypes.toString()}', user input is ${
+      )} dispatch going from no channel to a channel with allowed post types '${postTypes.toString()}', user input is ${
         hasInput ? "not " : ""
       }empty`, () => {
         const dispatch = helper.sandbox.stub()
@@ -660,11 +671,12 @@ describe("CreatePostPage", () => {
         if (shouldDispatch) {
           assert.equal(dispatch.callCount, 1)
           assert.deepEqual(dispatch.args[0][0].payload.value, {
-            postType:  postType ? null : postTypes[0],
-            url:       "",
-            text:      "",
-            thumbnail: null,
-            article:   []
+            postType:         postType ? null : postTypes[0],
+            url:              "",
+            text:             "",
+            thumbnail:        null,
+            article:          [],
+            show_cover_image: true
           })
         } else {
           assert.equal(dispatch.callCount, 0)
