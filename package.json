@@ -93,6 +93,7 @@
     "react-content-loader": "^3.1.2",
     "react-cropper": "^1.0.1",
     "react-dom": "^16.5.2",
+    "react-dotdotdot": "^1.2.3",
     "react-dropzone": "^4.2.5",
     "react-ga": "^2.5.3",
     "react-google-recaptcha": "^1.0.2",

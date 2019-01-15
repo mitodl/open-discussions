@@ -5,6 +5,7 @@ $button-blue: #0085df;
 $footer-button-blue: #3a6080;
 $font-black: rgba(0, 0, 0, 0.87);
 $font-grey: #888;
+$font-grey-mid: #8a8b8c;
 $font-grey-light: #b0b0b0;
 $font-darkgrey: #666;
 $border-grey: #d3d3d3;
@@ -40,9 +41,9 @@ $banner-slide-trans: top 300ms $banner-slide-timing;
 $banner-slide-content-trans: padding-top 300ms $banner-slide-timing;
 $material-icon-size: 24px;
 $channel-banner-height: 200px;
-$author-font-size: 16px;
 $submission-font-size: 16px;
 $tooltip-font-size: 14px;
+$modest-font-size: 14px;
 
 // Spacing values for items that appear on the left side of the drawer and toolbar
 $icon-padding-left: 19px;
