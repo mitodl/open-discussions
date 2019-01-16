@@ -5,6 +5,7 @@ import ContentLoader from "react-content-loader"
 
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import Card from "./Card"
+import { Cell, Grid } from "./Grid"
 import { contentLoaderSpeed } from "../lib/constants"
 
 type LoadingProps = {
@@ -72,6 +73,12 @@ export const PostLoading = () => (
   </div>
 )
 
+export const SearchLoading = () => (
+  <Grid className="main-content two-column search-page">
+    <Cell width={8}>{PostLoading()}</Cell>
+  </Grid>
+)
+
 export const renderDeferredLoading = ({
   LoadingComponent,
   loaded,
@@ -132,3 +139,4 @@ export const withLoading = R.curry(
 
 export const withSpinnerLoading = withLoading(Loading)
 export const withPostLoading = withLoading(PostLoading)
+export const withSearchLoading = withLoading(SearchLoading)
