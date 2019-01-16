@@ -82,19 +82,23 @@ describe("Post API", () => {
     assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/`))
   })
 
-  it("updates a post", async () => {
-    const post = makePost(false)
-    fetchStub.returns(Promise.resolve(JSON.stringify(post)))
-    post.text = "updated!"
-    const { title, text } = post
-    const body = objectToFormData({ title, text })
-
-    await editPost(post.id, post)
-
-    assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/`))
-    assert.deepEqual(fetchStub.args[0][1], {
-      method: PATCH,
-      body
+  //
+  ;[
+    ["text", "text"],
+    ["title", "title"],
+    ["stickied", true],
+    ["ignore_reports", true],
+    ["subscribed", true]
+  ].forEach(([fieldName, val]) => {
+    it(`lets you update the ${fieldName} field on a post`, async () => {
+      const post = makePost(false)
+      fetchStub.returns(Promise.resolve(JSON.stringify(post)))
+      await editPost(post.id, { [fieldName]: val })
+      const bodyExp = objectToFormData({ [fieldName]: val })
+      assert.ok(fetchStub.calledWith(`/api/v0/posts/${post.id}/`))
+      const { method, body } = fetchStub.args[0][1]
+      assert.equal(method, PATCH)
+      assert.deepEqual([...body.entries()], [...bodyExp.entries()])
     })
   })
 

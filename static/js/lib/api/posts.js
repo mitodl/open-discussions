@@ -48,8 +48,10 @@ export function updateRemoved(postId: string, removed: boolean): Promise<Post> {
   })
 }
 
-export async function editPost(postId: string, post: Post): Promise<Post> {
-  const formData = objectToFormData(R.pick(["text", "title"], post))
+export async function editPost(postId: string, post: Object): Promise<Post> {
+  const formData = objectToFormData(
+    R.pick(["text", "title", "stickied", "ignore_reports", "subscribed"], post)
+  )
 
   if (!emptyOrNil(post.article_content)) {
     formData.append("article_content", JSON.stringify(post.article_content))
