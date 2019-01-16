@@ -78,7 +78,7 @@
     "prop-types": "^15.6.2",
     "prosemirror-commands": "^1.0.7",
     "prosemirror-example-setup": "^1.0.1",
-    "prosemirror-markdown": "^1.1.1",
+    "prosemirror-markdown": "^1.2.2",
     "prosemirror-model": "^1.6.0",
     "prosemirror-schema-basic": "^1.0.0",
     "prosemirror-schema-list": "^1.0.1",
