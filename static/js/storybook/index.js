@@ -628,7 +628,7 @@ storiesOf("Widgets", module)
   .addDecorator(withKnobs)
   .add("markdown", () => {
     const editing = boolean("editing")
-    const instance = makeWidgetInstance("markdown")
+    const instance = makeWidgetInstance("Markdown")
     instance.title = text("title", "Markdown widget title")
     instance.configuration.source = text("markdown", "Markdown **body**")
 
@@ -638,6 +638,7 @@ storiesOf("Widgets", module)
     return (
       <StoryWrapper>
         <SortableWidgetInstance
+          index={0}
           widgetInstance={instance}
           editing={editing}
           deleteInstance={action("delete")}
@@ -646,11 +647,10 @@ storiesOf("Widgets", module)
       </StoryWrapper>
     )
   })
-  .add("default", () => {
+  .add("rss", () => {
     const editing = boolean("editing")
-    const instance = makeWidgetInstance("missing")
+    const instance = makeWidgetInstance("RSS Feed")
     instance.title = text("title", "Default widget title")
-    instance.html = text("html", "Some <i>unescaped</i> html")
 
     const SortableWidgetInstance = SortableContainer(props => (
       <WidgetInstance {...props} />
@@ -658,6 +658,31 @@ storiesOf("Widgets", module)
     return (
       <StoryWrapper>
         <SortableWidgetInstance
+          index={0}
+          widgetInstance={instance}
+          editing={editing}
+          deleteInstance={action("delete")}
+          startEditInstance={action("start edit instance")}
+        />
+      </StoryWrapper>
+    )
+  })
+  .add("url", () => {
+    const editing = boolean("editing")
+    const instance = makeWidgetInstance("URL")
+    instance.title = text("title", "URL widget title")
+    instance.configuration = {
+      url:
+        "https://video.odl.mit.edu/videos/d4984722a10c46d580245aa897695c51/embed/"
+    }
+
+    const SortableWidgetInstance = SortableContainer(props => (
+      <WidgetInstance {...props} />
+    ))
+    return (
+      <StoryWrapper>
+        <SortableWidgetInstance
+          index={0}
           widgetInstance={instance}
           editing={editing}
           deleteInstance={action("delete")}

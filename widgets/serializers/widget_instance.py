@@ -26,8 +26,7 @@ class WidgetInstanceSerializer(serializers.ModelSerializer):
     configuration_serializer_class = _raise_not_implemented
 
     widget_type = serializers.ChoiceField(choices=[])
-    react_renderer = serializers.SerializerMethodField()
-    html = serializers.SerializerMethodField()
+    json = serializers.SerializerMethodField()
     configuration = WriteableSerializerMethodField()
     position = serializers.IntegerField(write_only=True)
 
@@ -40,18 +39,12 @@ class WidgetInstanceSerializer(serializers.ModelSerializer):
         return {
             "widget_type": cls.name,
             "description": cls.description,
-            "react_renderer": cls.get_react_renderer(),
             "form_spec": cls.configuration_serializer_class().get_form_spec(),
         }
 
     def __init__(self, *args, **kwargs):
         self.fields["widget_type"].choices = get_widget_type_names()
         super().__init__(*args, **kwargs)
-
-    @classmethod
-    def get_react_renderer(cls, *args):  # pylint: disable=unused-argument
-        """Return the react renderer for the widget"""
-        return "default"
 
     def validate_configuration(self, value):
         """Returns configuration as validated by configuration_serializer_class"""
@@ -68,8 +61,8 @@ class WidgetInstanceSerializer(serializers.ModelSerializer):
         """Returns the configuration to serialize"""
         return instance.configuration
 
-    def get_html(self, instance):  # pylint: disable=unused-argument
-        """Renders the widget to html based on configuration"""
+    def get_json(self, instance):  # pylint: disable=unused-argument
+        """Renders the widget to json based on configuration"""
         return None
 
     class Meta:
@@ -79,10 +72,9 @@ class WidgetInstanceSerializer(serializers.ModelSerializer):
             "widget_type",
             "title",
             "configuration",
-            "react_renderer",
             "position",
             "widget_list_id",
-            "html",
+            "json",
         )
         write_only = ("position", "widget_list_id")
-        read_only = ("react_renderer", "html")
+        read_only = ("json",)

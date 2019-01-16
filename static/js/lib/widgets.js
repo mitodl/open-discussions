@@ -1,5 +1,7 @@
 // @flow
 import MarkdownWidget from "../components/widgets/MarkdownWidget"
+import RssWidget from "../components/widgets/RssWidget"
+import UrlWidget from "../components/widgets/UrlWidget"
 
 import { incrementer } from "./util"
 
@@ -8,7 +10,9 @@ import type { WidgetInstancePatchable } from "../flow/widgetTypes"
 export const WIDGET_FORM_KEY = "widgets:edit"
 
 export const validWidgetRenderers = {
-  markdown: MarkdownWidget
+  Markdown:   MarkdownWidget,
+  "RSS Feed": RssWidget,
+  URL:        UrlWidget
 }
 
 const newWidgetIncr = incrementer()

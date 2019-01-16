@@ -14,10 +14,10 @@ const MarkdownWidget = ({ widgetInstance }: Props) => {
     configuration: { source }
   } = widgetInstance
   return (
-    <div className="widget-body">
-      <span className="widget-title">{title}</span>
-      <Markdown source={source} className="widget-text" />
-    </div>
+    <React.Fragment>
+      <span className="title">{title}</span>
+      <Markdown source={source} />
+    </React.Fragment>
   )
 }
 

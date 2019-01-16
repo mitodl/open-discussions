@@ -33,6 +33,22 @@ describe("WidgetField", () => {
       />
     )
   }
+
+  it("uses an empty string for a default value if there is none in the spec", () => {
+    fieldSpec = makeFieldSpec()
+    fieldSpec.props.default = undefined
+    value = undefined
+    const wrapper = render()
+    assert.equal(wrapper.find(".field").prop("value"), "")
+  })
+
+  it("uses the default value from the spec if the value is falsey", () => {
+    fieldSpec = makeFieldSpec()
+    fieldSpec.props.default = "value"
+    value = undefined
+    const wrapper = render()
+    assert.equal(wrapper.find(".field").prop("value"), fieldSpec.props.default)
+  })
   ;["text", "textarea"].forEach(fieldType => {
     it(`renders a ${fieldType} input field`, () => {
       fieldSpec = makeFieldSpec(fieldType)

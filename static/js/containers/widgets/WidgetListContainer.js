@@ -45,7 +45,6 @@ type Props = {
   setDialogData: (data: WidgetDialogData) => void,
   setDialogVisibility: (open: boolean) => void,
   updateWidgetInstances: (widgetInstances: Array<WidgetInstanceType>) => void,
-  renderers: { [string]: string },
   specs: Array<WidgetSpec>,
   validation: Object,
   widgetInstances: Array<WidgetInstanceType>
@@ -126,13 +125,12 @@ export class WidgetListContainer extends React.Component<Props> {
   }
 
   updateFrom = (data: WidgetDialogData) => {
-    const { updateWidgetInstances, renderers } = this.props
+    const { updateWidgetInstances } = this.props
     const instances = this.getWidgetInstances()
 
     const instanceFromDialog: WidgetInstanceType = {
       ...data.instance,
-      react_renderer: renderers[data.instance.widget_type],
-      html:           ""
+      json: null
     }
     const key = getWidgetKey(instanceFromDialog)
     const replacementInstances =
@@ -189,20 +187,13 @@ export class WidgetListContainer extends React.Component<Props> {
 
 const mapStateToProps = state => {
   const specs = state.widgets.data.available_widgets
-  const renderers = {}
-  if (specs) {
-    for (const item of specs) {
-      renderers[item.widget_type] = item.react_renderer
-    }
-  }
   return {
     form:            state.forms[WIDGET_FORM_KEY],
     dialogOpen:      state.ui.dialogs.has(DIALOG_EDIT_WIDGET),
     dialogData:      state.ui.dialogs.get(DIALOG_EDIT_WIDGET),
     loaded:          state.widgets.loaded,
     widgetInstances: state.widgets.data.widgets,
-    specs,
-    renderers
+    specs
   }
 }
 

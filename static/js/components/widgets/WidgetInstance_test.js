@@ -40,19 +40,21 @@ describe("WidgetInstance", () => {
         }
       }
     )
-  ;[["missing", "DefaultWidget"], ["markdown", "MarkdownWidget"]].forEach(
-    ([rendererName, widgetClassName]) => {
-      it(`renders a widget instance for ${widgetClassName} given name react_renderer=${rendererName}`, () => {
-        const instance = makeWidgetInstance(rendererName)
-        const wrapper = render({ widgetInstance: instance })
-        assert.isTrue(wrapper.find(widgetClassName).exists())
-        assert.equal(
-          wrapper.find(widgetClassName).prop("widgetInstance"),
-          instance
-        )
-      })
-    }
-  )
+  ;[
+    ["URL", "UrlWidget"],
+    ["RSS Feed", "RssWidget"],
+    ["Markdown", "MarkdownWidget"]
+  ].forEach(([widgetType, widgetClassName]) => {
+    it(`renders a widget instance for ${widgetClassName} given widget_type=${widgetType}`, () => {
+      const instance = makeWidgetInstance(widgetType)
+      const wrapper = render({ widgetInstance: instance })
+      assert.isTrue(wrapper.find(widgetClassName).exists())
+      assert.equal(
+        wrapper.find(widgetClassName).prop("widgetInstance"),
+        instance
+      )
+    })
+  })
 
   describe("editable", () => {
     it("starts editing a widget", () => {

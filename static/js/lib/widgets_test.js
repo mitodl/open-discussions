@@ -2,6 +2,8 @@
 import { assert } from "chai"
 
 import MarkdownWidget from "../components/widgets/MarkdownWidget"
+import RssWidget from "../components/widgets/RssWidget"
+import UrlWidget from "../components/widgets/UrlWidget"
 
 import {
   validWidgetRenderers,
@@ -13,7 +15,15 @@ import { makeWidgetInstance } from "../factories/widgets"
 describe("widget library functions", () => {
   describe("valid widget renderers", () => {
     it("renders with MarkdownWidget", () => {
-      assert.equal(validWidgetRenderers.markdown, MarkdownWidget)
+      assert.equal(validWidgetRenderers.Markdown, MarkdownWidget)
+    })
+
+    it("renders with RssWidget", () => {
+      assert.equal(validWidgetRenderers["RSS Feed"], RssWidget)
+    })
+
+    it("renders with UrlWidget", () => {
+      assert.equal(validWidgetRenderers.URL, UrlWidget)
     })
   })
 
