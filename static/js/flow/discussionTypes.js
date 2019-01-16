@@ -6,6 +6,7 @@ import {
 } from "../lib/channels"
 
 import type { LinkType, ChannelType } from "../lib/channels"
+import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
 
 export type FormImage = {
   edit:  Blob,
@@ -146,6 +147,11 @@ export type PostListResponse = {
   posts:      Array<Post>
 }
 
+export type UserContributionResponse = {
+  pagination: PostListPagination,
+  [POSTS_OBJECT_TYPE | COMMENTS_OBJECT_TYPE]: Array<Post | CommentFromAPI>
+}
+
 type HasParentId = {
   parent_id: ?string
 }
@@ -171,6 +177,11 @@ export type CommentInTree = CommentFromAPI & {
 }
 
 export type MoreCommentsInTree = MoreCommentsFromAPI
+
+// Represents a comment serialized from a user's comment feed rather than from a post
+export type UserFeedComment = CommentFromAPI & {
+  post_slug: string
+}
 
 export type CommentForm = {
   post_id:     string,

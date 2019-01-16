@@ -849,6 +849,16 @@ class Api:
         channel = self.get_channel(channel_name)
         return self._get_listing(channel, listing_params)
 
+    def list_user_posts(self, username, listing_params):
+        """List posts submitted by a given user"""
+        redditor = Redditor(self.reddit, name=username)
+        return self._get_listing(redditor.submissions, listing_params)
+
+    def list_user_comments(self, username, listing_params):
+        """List comments submitted by a given user"""
+        redditor = Redditor(self.reddit, name=username)
+        return self._get_listing(redditor.comments, listing_params)
+
     def _get_listing(self, listing, listing_params):
         """
         List posts using the 'hot' algorithm

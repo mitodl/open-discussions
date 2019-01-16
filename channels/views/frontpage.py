@@ -6,7 +6,7 @@ from channels.api import Api
 from channels.proxies import proxy_posts
 from channels.serializers.posts import PostSerializer
 from channels.utils import (
-    get_pagination_and_posts,
+    get_pagination_and_reddit_obj_list,
     get_listing_params,
     lookup_users_for_posts,
     lookup_subscriptions_for_posts,
@@ -34,7 +34,9 @@ class FrontPageView(APIView):
         listing_params = get_listing_params(self.request)
         api = Api(user=self.request.user)
         paginated_posts = api.front_page(listing_params)
-        pagination, posts = get_pagination_and_posts(paginated_posts, listing_params)
+        pagination, posts = get_pagination_and_reddit_obj_list(
+            paginated_posts, listing_params
+        )
         users = lookup_users_for_posts(posts)
         posts = proxy_posts(
             [post for post in posts if post.author and post.author.name in users]

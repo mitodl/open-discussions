@@ -27,6 +27,7 @@ from channels.constants import (
     LINK_TYPE_SELF,
     LINK_TYPE_ANY,
     EXTENDED_POST_TYPE_ARTICLE,
+    POSTS_SORT_HOT,
 )
 from channels.factories import ArticleFactory, ChannelFactory
 from channels.models import (
@@ -148,6 +149,12 @@ def mock_client(mock_get_client):
 def mock_update_author(mocker):
     """Mock of update_author function"""
     return mocker.patch("channels.api.search_task_helpers.update_author")
+
+
+@pytest.fixture()
+def listing_params():
+    """Fixture for a basic ListingParams object"""
+    return ListingParams(None, None, 0, POSTS_SORT_HOT)
 
 
 @pytest.mark.parametrize(
@@ -976,6 +983,19 @@ def test_more_comments_with_more_comments(
     assert result[:-1] == first_comments
     more_comments = result[-1]
     assert side_effects[1] == more_comments
+
+
+def test_list_user_contributions(
+    mocker, mock_client, listing_params, user
+):  # pylint: disable=unused-argument
+    """Test list_user_posts and list_user_comments"""
+    mock_redditor = Mock()
+    mocker.patch("channels.api.Redditor", autospec=True, return_value=mock_redditor)
+    client = api.Api(user)
+    client.list_user_posts(user.username, listing_params)
+    assert mock_redditor.submissions.hot.call_count == 1
+    client.list_user_comments(user.username, listing_params)
+    assert mock_redditor.comments.hot.call_count == 1
 
 
 def test_frontpage(mock_client):

@@ -308,7 +308,7 @@ export default class CommentTree extends React.Component<Props> {
         </Card>
         {atMaxDepth ? null : (
           <div className="replies">
-            {R.map(renderGenericComment, comment.replies)}
+            {R.map(renderGenericComment, comment.replies || [])}
           </div>
         )}
       </div>

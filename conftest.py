@@ -6,7 +6,7 @@ from fixtures.betamax import *
 from fixtures.common import *
 from fixtures.reddit import *
 from fixtures.users import *
-from open_discussions.exceptions import NoRequestException
+from open_discussions.exceptions import DoNotUseRequestException
 
 
 @pytest.fixture(autouse=True)
@@ -17,5 +17,5 @@ def prevent_requests(mocker, request):
     mocker.patch(
         "requests.sessions.Session.request",
         autospec=True,
-        side_effect=NoRequestException,
+        side_effect=DoNotUseRequestException,
     )

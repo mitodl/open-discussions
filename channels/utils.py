@@ -47,16 +47,17 @@ def get_listing_params(request):
     return ListingParams(before, after, count, sort)
 
 
-def get_pagination_and_posts(posts, listing_params):
+def get_pagination_and_reddit_obj_list(reddit_obj_listing, listing_params):
     """
     Creates pagination data
 
     Args:
-        posts (praw.models.listing.generator.ListingGenerator): listing generator for posts
+        reddit_obj_listing (praw.models.listing.generator.ListingGenerator):
+            listing generator for reddit objects (posts, comments, etc.)
         listing_params (ListingParams): listing params for this page
 
     Returns:
-        (dict, list of praw.models.Submission): pagination and post data
+        (dict, list of reddit objects [e.g.: praw.models.Submission]): pagination and reddit object list
     """
     before, _, count, _ = listing_params
     pagination = {"sort": listing_params.sort}
@@ -64,13 +65,13 @@ def get_pagination_and_posts(posts, listing_params):
     # call _next_batch() so it pulls data
     # pylint: disable=protected-access
     try:
-        posts._next_batch()
+        reddit_obj_listing._next_batch()
     except StopIteration:
         # empty page
         return pagination, []
 
     # pylint: disable=protected-access
-    listing = posts._listing
+    listing = reddit_obj_listing._listing
 
     per_page = settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT
     count = count or 0
@@ -130,6 +131,9 @@ def lookup_users_for_posts(posts):
     Args:
         posts (list of praw.models.Submission):
             A list of submissions
+
+    Return:
+        dict: A map of usernames to the corresponding User object
     """
     users = User.objects.filter(
         username__in=[post.author.name for post in posts if post.author]

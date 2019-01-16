@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import pytest
 from rest_framework.exceptions import ValidationError
 
-from channels.serializers.comments import CommentSerializer
+from channels.serializers.comments import BaseCommentSerializer, CommentSerializer
 
 
 def test_comment_update_with_comment_id():
@@ -42,3 +42,24 @@ def test_comment_validate_removed():
     with pytest.raises(ValidationError) as ex:
         CommentSerializer().validate_removed("not a bool")
     assert ex.value.args[0] == "removed must be a bool"
+
+
+def test_comment_including_permalink_data(mocker, reddit_comment_obj, user):
+    """
+    Tests that including the permalink flag in BaseCommentSerializer context produces the correct
+    values for composing a comment permalink on the front end
+    """
+    mock_slug_value = "slug"
+    patched_slug_helper = mocker.patch(
+        "channels.serializers.comments.get_reddit_slug", return_value=mock_slug_value
+    )
+    data = BaseCommentSerializer(
+        reddit_comment_obj,
+        context={
+            "include_permalink_data": True,
+            "users": {reddit_comment_obj.author.name: user},
+        },
+    ).data
+    assert patched_slug_helper.call_count == 1
+    assert data["post_slug"] == mock_slug_value
+    assert data["channel_name"] == reddit_comment_obj.submission.subreddit.display_name

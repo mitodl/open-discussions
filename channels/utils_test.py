@@ -13,7 +13,7 @@ from channels.utils import (
     ListingParams,
     DEFAULT_LISTING_PARAMS,
     get_listing_params,
-    get_pagination_and_posts,
+    get_pagination_and_reddit_obj_list,
     translate_praw_exceptions,
     get_reddit_slug,
     get_kind_and_id,
@@ -56,7 +56,7 @@ def test_get_pagination_and_posts_empty_page(mocker):
     posts = mocker.Mock()
     # pylint: disable=protected-access
     posts._next_batch.side_effect = StopIteration()
-    assert get_pagination_and_posts(posts, DEFAULT_LISTING_PARAMS) == (
+    assert get_pagination_and_reddit_obj_list(posts, DEFAULT_LISTING_PARAMS) == (
         {"sort": POSTS_SORT_HOT},
         [],
     )
@@ -71,7 +71,7 @@ def test_get_pagination_and_posts_small_page(mocker):
     listing.after = None
     listing.before = None
     posts._listing = listing
-    assert get_pagination_and_posts(posts, DEFAULT_LISTING_PARAMS) == (
+    assert get_pagination_and_reddit_obj_list(posts, DEFAULT_LISTING_PARAMS) == (
         {"sort": POSTS_SORT_HOT},
         list(items),
     )
@@ -87,7 +87,7 @@ def test_get_pagination_and_posts_before_first_page(mocker):
     listing.after = "def"
     listing.before = None
     posts._listing = listing
-    assert get_pagination_and_posts(
+    assert get_pagination_and_reddit_obj_list(
         posts, ListingParams("xyz", None, 26, POSTS_SORT_HOT)
     ) == ({"after": "def", "after_count": 25, "sort": POSTS_SORT_HOT}, list(items))
     posts._next_batch.assert_called_once_with()
@@ -102,7 +102,7 @@ def test_get_pagination_and_posts_before_second_page(mocker):
     listing.after = "def"
     listing.before = "abc"
     posts._listing = listing
-    assert get_pagination_and_posts(
+    assert get_pagination_and_reddit_obj_list(
         posts, ListingParams("xyz", None, 51, POSTS_SORT_HOT)
     ) == (
         {
@@ -126,7 +126,7 @@ def test_get_pagination_and_posts_after(mocker):
     listing.after = "def"
     listing.before = None
     posts._listing = listing
-    assert get_pagination_and_posts(
+    assert get_pagination_and_reddit_obj_list(
         posts, ListingParams(None, None, 25, POSTS_SORT_HOT)
     ) == ({"after": "def", "after_count": 50, "sort": POSTS_SORT_HOT}, list(items))
     posts._next_batch.assert_called_once_with()
@@ -141,7 +141,7 @@ def test_get_pagination_and_posts_before_and_after(mocker):
     listing.after = "def"
     listing.before = "abc"
     posts._listing = listing
-    assert get_pagination_and_posts(
+    assert get_pagination_and_reddit_obj_list(
         posts, ListingParams(None, None, 25, POSTS_SORT_HOT)
     ) == (
         {

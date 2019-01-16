@@ -2,6 +2,7 @@
 # pylint: disable=redefined-outer-name, unused-argument, too-many-arguments
 import json
 from os.path import splitext, basename
+from types import SimpleNamespace
 
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -9,9 +10,11 @@ import pytest
 from social_django.models import UserSocialAuth
 
 from authentication.backends.micromasters import MicroMastersAuth
+from channels.serializers.posts import BasePostSerializer
+from channels.serializers.comments import BaseCommentSerializer
 from profiles.utils import make_temp_image_file, DEFAULT_PROFILE_IMAGE
 
-pytestmark = pytest.mark.django_db
+pytestmark = [pytest.mark.django_db]
 
 
 def test_list_users(staff_client, staff_user):
@@ -297,3 +300,70 @@ def test_initials_avatar_fake_user(client):
     response = client.get(url, follow=True)
     last_url, _ = response.redirect_chain[-1]
     assert last_url.endswith(DEFAULT_PROFILE_IMAGE)
+
+
+class TestUserContributionListView:
+    """Tests for UserContributionListView"""
+
+    @pytest.fixture()
+    def scenario(self, user_client, user):
+        """Common test data needed for class test cases"""
+        return SimpleNamespace(fake_pagination={"fake": "pagination"})
+
+    @pytest.mark.usefixtures("mock_req_channel_api")
+    def test_user_posts_view(self, mocker, user_client, user, scenario, post_proxy):
+        """Test that a request for user posts fetches and serializes a user's posts correctly"""
+        mock_get_obj_list = mocker.patch(
+            "profiles.views.get_pagination_and_reddit_obj_list",
+            return_value=(
+                scenario.fake_pagination,
+                [post_proxy._self_submission],  # pylint: disable=protected-access
+            ),
+        )
+        mock_proxy_posts = mocker.patch(
+            "profiles.views.proxy_posts", return_value=[post_proxy]
+        )
+        url = reverse(
+            "user-contribution-list",
+            kwargs={"username": user.username, "object_type": "posts"},
+        )
+        response = user_client.get(url)
+        assert mock_get_obj_list.called is True
+        assert mock_proxy_posts.called is True
+        resp_data = json.loads(response.content)
+        assert resp_data["pagination"] == scenario.fake_pagination
+        assert "posts" in resp_data
+        serialized_post = resp_data["posts"][0]
+        assert serialized_post == BasePostSerializer(post_proxy).data
+
+    @pytest.mark.usefixtures("mock_req_channel_api")
+    def test_user_comments_view(
+        self, mocker, user_client, user, scenario, reddit_comment_obj
+    ):
+        """Test that a request for user comments fetches and serializes a user's comments correctly"""
+        mock_get_obj_list = mocker.patch(
+            "profiles.views.get_pagination_and_reddit_obj_list",
+            return_value=(scenario.fake_pagination, [reddit_comment_obj]),
+        )
+        url = reverse(
+            "user-contribution-list",
+            kwargs={"username": user.username, "object_type": "comments"},
+        )
+        response = user_client.get(url)
+        assert mock_get_obj_list.called is True
+        resp_data = json.loads(response.content)
+        assert resp_data["pagination"] == scenario.fake_pagination
+        assert "comments" in resp_data
+        serialized_comment = resp_data["comments"][0]
+        assert (
+            serialized_comment
+            == BaseCommentSerializer(
+                reddit_comment_obj, context={"include_permalink_data": True}
+            ).data
+        )
+        # Channel name is not serialized for a comment by default. Since it's needed for the comment permalink, this
+        # view should include a flag that ensures that value is serialized.
+        assert (
+            serialized_comment["channel_name"]
+            == reddit_comment_obj.submission.subreddit.display_name
+        )

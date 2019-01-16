@@ -1,8 +1,10 @@
 // @flow
+import R from "ramda"
 import casual from "casual-browserify"
 
 import { arrayN } from "./util"
 import { incrementer } from "../lib/util"
+import { makePost } from "./posts"
 
 import type {
   Post,
@@ -120,4 +122,8 @@ export const makeMoreCommentsResponse = (
   }
 
   return comments
+}
+
+export const makeCommentsList = (): Array<CommentInTree> => {
+  return R.range(0, 5).map(() => makeComment(makePost()))
 }

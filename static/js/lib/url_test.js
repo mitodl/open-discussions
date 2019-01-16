@@ -115,6 +115,7 @@ describe("url helper functions", () => {
   describe("profileURL", () => {
     it("should return a url to view a profile", () => {
       assert.equal(profileURL("username"), "/profile/username/")
+      assert.equal(profileURL("username", "posts"), "/profile/username/posts")
     })
   })
 

@@ -7,7 +7,7 @@ from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from channels.utils import get_kind_mapping, get_kind_and_id
+from channels.utils import get_kind_mapping, get_kind_and_id, get_reddit_slug
 from channels.models import Subscription
 from channels.serializers.base import RedditObjectSerializer
 from channels.serializers.utils import parse_bool
@@ -114,6 +114,16 @@ class BaseCommentSerializer(RedditObjectSerializer):
         """Returns True if the comment was deleted"""
         return instance.body == "[deleted]"  # only way to tell
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if self.context.get("include_permalink_data", False):
+            return {
+                **data,
+                "post_slug": get_reddit_slug(instance.submission.permalink),
+                "channel_name": instance.submission.subreddit.display_name,
+            }
+        return data
+
 
 class CommentSerializer(BaseCommentSerializer):
     """
@@ -130,6 +140,8 @@ class CommentSerializer(BaseCommentSerializer):
 
     def get_subscribed(self, instance):
         """Returns True if user is subscribed to the comment"""
+        if self.context.get("omit_subscriptions", False):
+            return None
         if "comment_subscriptions" not in self.context:
             # this code is run if a comment was just created
             return Subscription.objects.filter(

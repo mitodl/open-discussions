@@ -18,5 +18,5 @@ def api_exception_handler(exc, context):
     return response
 
 
-class NoRequestException(Exception):
+class DoNotUseRequestException(Exception):
     """This exception is raised during unit tests if an HTTP request is attempted"""

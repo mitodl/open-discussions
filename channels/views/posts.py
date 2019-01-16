@@ -9,7 +9,7 @@ from channels.api import Api
 from channels.proxies import proxy_posts
 from channels.serializers.posts import PostSerializer
 from channels.utils import (
-    get_pagination_and_posts,
+    get_pagination_and_reddit_obj_list,
     get_listing_params,
     lookup_users_for_posts,
     lookup_subscriptions_for_posts,
@@ -42,7 +42,7 @@ class PostListView(APIView):
             paginated_posts = api.list_posts(
                 self.kwargs["channel_name"], listing_params
             )
-            pagination, posts = get_pagination_and_posts(
+            pagination, posts = get_pagination_and_reddit_obj_list(
                 paginated_posts, listing_params
             )
             users = lookup_users_for_posts(posts)
