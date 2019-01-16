@@ -30,7 +30,8 @@ export const postDetailURL = (
 export const newPostURL = (channelName: ?string) =>
   channelName ? `/create_post/${channelName}` : "/create_post/"
 
-export const profileURL = (username: string) => `/profile/${username}/`
+export const profileURL = (username: string, selectedTab: ?string) =>
+  selectedTab ? `/profile/${username}/${selectedTab}` : `/profile/${username}/`
 
 export const editProfileURL = (username: string) => `/profile/${username}/edit`
 

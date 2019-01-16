@@ -9,6 +9,7 @@ import { profileURL } from "../lib/url"
 import { makeProfile } from "../factories/profiles"
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
+import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
 
 describe("ProfilePage", function() {
   let helper, renderComponent, profile
@@ -18,6 +19,8 @@ describe("ProfilePage", function() {
     helper = new IntegrationTestHelper()
     helper.getProfileStub.returns(Promise.resolve(profile))
     helper.getChannelsStub.returns(Promise.resolve([]))
+    helper.getUserPostsStub.returns(Promise.resolve([]))
+    helper.getUserCommentsStub.returns(Promise.resolve([]))
     renderComponent = helper.renderComponent.bind(helper)
   })
 
@@ -29,14 +32,13 @@ describe("ProfilePage", function() {
     actions.profiles.get.requestType,
     actions.profiles.get.successType,
     actions.subscribedChannels.get.requestType,
-    actions.subscribedChannels.get.successType
+    actions.subscribedChannels.get.successType,
+    actions.userContributions.get.requestType
   ]
 
-  const renderPage = async (extraActions = []) => {
-    const [wrapper] = await renderComponent(profileURL(profile.username), [
-      ...basicProfilePageActions,
-      ...extraActions
-    ])
+  const renderPage = async (url: ?string) => {
+    url = url || profileURL(profile.username)
+    const [wrapper] = await renderComponent(url, basicProfilePageActions)
     return wrapper.update()
   }
 
@@ -80,6 +82,23 @@ describe("ProfilePage", function() {
         .props().src,
       profile.profile_image_medium
     )
+  })
+
+  it("should include the user's post/comment feeds", async () => {
+    const wrapper = await renderPage()
+    const feedComponent = wrapper.find("ProfileContributionFeed")
+    assert.isTrue(feedComponent.exists())
+    const { userName, selectedTab } = feedComponent.props()
+    assert.equal(userName, profile.username)
+    assert.equal(selectedTab, POSTS_OBJECT_TYPE)
+  })
+
+  it("should pass the right selected tab value to the post/comment feed component", async () => {
+    const wrapper = await renderPage(
+      profileURL(profile.username, COMMENTS_OBJECT_TYPE)
+    )
+    const feedComponent = wrapper.find("ProfileContributionFeed")
+    assert.equal(feedComponent.prop("selectedTab"), COMMENTS_OBJECT_TYPE)
   })
   ;[true, false].forEach(sameUser => {
     it(`should not include an edit profile button on this page when profile is ${

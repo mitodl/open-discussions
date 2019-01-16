@@ -22,7 +22,7 @@ User = get_user_model()
 
 class BasePostSerializer(RedditObjectSerializer):
     """
-    Basic serializer class for reddit posts. Only includes serialization functionality
+    Basic serializer class for PostProxy objects. Only includes serialization functionality
     (no deserialization or validation), and does not fetch/serialize Subscription data
     """
 

@@ -7,6 +7,7 @@ import { MetaTags } from "react-meta-tags"
 
 import Card from "../components/Card"
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
+import ProfileContributionFeed from "./ProfileContributionFeed"
 import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 import CanonicalLink from "../components/CanonicalLink"
@@ -15,21 +16,25 @@ import { SocialSiteLogoLink, SiteLogoLink } from "../components/SiteLogoLink"
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
 import { getUserName } from "../lib/util"
-import { PERSONAL_SITE_TYPE } from "../lib/constants"
+import { PERSONAL_SITE_TYPE, POSTS_OBJECT_TYPE } from "../lib/constants"
 import { any404Error, anyErrorExcept404 } from "../util/rest"
 import { clearPostError } from "../actions/post"
 
+import type { Match } from "react-router"
 import type { Profile } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
 
 type Props = {
   dispatch: Dispatch<*>,
+  match: Match,
   profile: Profile,
   userName: string,
   history: Object,
   notFound: boolean,
   errored: boolean
 }
+
+const defaultTab = POSTS_OBJECT_TYPE
 
 class ProfilePage extends React.Component<Props> {
   componentDidMount() {
@@ -81,7 +86,7 @@ class ProfilePage extends React.Component<Props> {
   }
 
   render() {
-    const { profile, userName } = this.props
+    const { profile, userName, match } = this.props
     if (!profile) {
       return null
     }
@@ -127,6 +132,10 @@ class ProfilePage extends React.Component<Props> {
             </button>
           </div>
         ) : null}
+        <ProfileContributionFeed
+          userName={userName}
+          selectedTab={match.params.objectType || defaultTab}
+        />
       </React.Fragment>
     )
   }

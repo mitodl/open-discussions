@@ -12,6 +12,8 @@ import {
   createComment,
   updateComment,
   getMoreComments,
+  getUserPosts,
+  getUserComments,
   deleteComment,
   getSettings,
   patchFrontpageSetting,
@@ -31,7 +33,7 @@ import {
   getWidgetList,
   patchWidgetList
 } from "./api"
-import { makePost } from "../../factories/posts"
+import { makePost, makeChannelPostList } from "../../factories/posts"
 import {
   makeCommentsResponse,
   makeMoreCommentsResponse
@@ -260,6 +262,40 @@ describe("api", function() {
         )
         assert.deepEqual(response, moreComments)
       })
+    })
+
+    it("gets user posts", async () => {
+      const posts = makeChannelPostList()
+      fetchJSONStub.returns(Promise.resolve({ posts }))
+
+      const result = await getUserPosts("someuser", {
+        before: "abc",
+        after:  "def",
+        count:  5
+      })
+      assert.ok(
+        fetchJSONStub.calledWith(
+          `/api/v0/profiles/someuser/posts/?after=def&before=abc&count=5`
+        )
+      )
+      assert.deepEqual(result.posts, posts)
+    })
+
+    it("gets user comment", async () => {
+      const comments = makeCommentsResponse(makePost())
+      fetchJSONStub.returns(Promise.resolve({ comments }))
+
+      const result = await getUserComments("someuser", {
+        before: "abc",
+        after:  "def",
+        count:  5
+      })
+      assert.ok(
+        fetchJSONStub.calledWith(
+          `/api/v0/profiles/someuser/comments/?after=def&before=abc&count=5`
+        )
+      )
+      assert.deepEqual(result.comments, comments)
     })
 
     describe("postEmailLogin", () => {

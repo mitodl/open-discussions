@@ -4,8 +4,9 @@ from types import SimpleNamespace
 import pytest
 
 from channels import api
-from channels.constants import CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC
-from channels.factories import RedditFactories, FactoryStore
+from channels.constants import CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC, LINK_TYPE_SELF
+from channels.factories import RedditFactories, FactoryStore, PostFactory
+from channels.proxies import PostProxy
 from channels.utils import render_article_text
 
 
@@ -150,4 +151,21 @@ def reddit_comment_obj(mocker, reddit_submission_obj):
         likes=1,
         banned_by=None,
         edited=False,
+        permalink=lambda: "/r/{}/{}".format(
+            reddit_submission_obj.subreddit.display_name,
+            "/r/{}/comments/a/post-title/43".format(
+                reddit_submission_obj.subreddit.display_name
+            ),
+        ),
     )
+
+
+@pytest.fixture()
+def post_proxy(reddit_submission_obj):
+    """A dummy PostProxy object based on the reddit_submission_obj fixture"""
+    post = PostFactory.create(
+        post_id=reddit_submission_obj.id,
+        channel__name=reddit_submission_obj.subreddit.display_name,
+        post_type=LINK_TYPE_SELF,
+    )
+    return PostProxy(reddit_submission_obj, post)

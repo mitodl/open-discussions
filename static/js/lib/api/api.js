@@ -12,16 +12,19 @@ import {
   fetchWithAuthFailure,
   fetchJSONWithToken
 } from "./fetch_auth"
-import { getCommentSortQS } from "./util"
+import { getCommentSortQS, getPaginationSortQS } from "./util"
 
 import type { AuthResponse, AuthFlow } from "../../flow/authTypes"
 import type {
   GenericComment,
   CommentFromAPI,
   MoreCommentsFromAPI,
+  UserFeedComment,
+  Post,
   Profile,
   ProfilePayload,
-  SocialAuth
+  SocialAuth,
+  PostListPaginationParams
 } from "../../flow/discussionTypes"
 import type { NotificationSetting } from "../../flow/settingsTypes"
 import type { WidgetListResponse } from "../../flow/widgetTypes"
@@ -95,6 +98,24 @@ export function getMoreComments(
   }
   return fetchJSONWithAuthFailure(
     `/api/v0/morecomments/?${qs.stringify(payload)}`
+  )
+}
+
+export function getUserPosts(
+  username: string,
+  params: PostListPaginationParams
+): Promise<Array<Post>> {
+  return fetchJSONWithAuthFailure(
+    `/api/v0/profiles/${username}/posts/${getPaginationSortQS(params)}`
+  )
+}
+
+export function getUserComments(
+  username: string,
+  params: PostListPaginationParams
+): Promise<Array<UserFeedComment>> {
+  return fetchJSONWithAuthFailure(
+    `/api/v0/profiles/${username}/comments/${getPaginationSortQS(params)}`
   )
 }
 

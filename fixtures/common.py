@@ -119,6 +119,14 @@ def mock_channel_exists(mocker):
 
 
 @pytest.fixture()
+def mock_req_channel_api(mocker):
+    """
+    Mocks the channel API object that is made available on a request via middleware
+    """
+    return mocker.patch("open_discussions.middleware.channel_api.Api", autospec=True)
+
+
+@pytest.fixture()
 def mocked_celery(mocker):
     """Mock object that patches certain celery functions"""
     exception_class = TabError

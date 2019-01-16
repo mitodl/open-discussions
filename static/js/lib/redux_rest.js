@@ -16,6 +16,7 @@ import { accountSettingsEndpoint } from "../reducers/account_settings"
 import { embedlyEndpoint } from "../reducers/embedly"
 import { profilesEndpoint } from "../reducers/profiles"
 import { userWebsitesEndpoint } from "../reducers/websites"
+import { userContributionsEndpoint } from "../reducers/user_contributions"
 import { authEndpoint } from "../reducers/auth"
 import { passwordResetEndpoint } from "../reducers/password_reset"
 import { passwordChangeEndpoint } from "../reducers/password_change"
@@ -46,6 +47,7 @@ export const endpoints = [
   embedlyEndpoint,
   profilesEndpoint,
   userWebsitesEndpoint,
+  userContributionsEndpoint,
   authEndpoint,
   passwordResetEndpoint,
   passwordChangeEndpoint,
