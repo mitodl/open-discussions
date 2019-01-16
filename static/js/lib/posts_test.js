@@ -10,10 +10,12 @@ import {
   PostTitleAndHostname,
   formatPostTitle,
   mapPostListResponse,
-  postFormIsContentless
+  postFormIsContentless,
+  getTextContent
 } from "./posts"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import { urlHostname } from "./url"
+import { LINK_TYPE_ARTICLE, LINK_TYPE_LINK, LINK_TYPE_TEXT } from "./channels"
 
 describe("Post utils", () => {
   it("should return a new post with empty values", () => {
@@ -153,6 +155,30 @@ describe("Post utils", () => {
           sort: "hot"
         }
       })
+    })
+  })
+
+  describe("getTextContent", () => {
+    it("gets a post's text content (or null if it has no text content)", () => {
+      const exampleText = "magnets, how do they work?"
+      let textPost = makePost()
+      textPost = R.merge(textPost, {
+        post_type: LINK_TYPE_TEXT,
+        text:      exampleText
+      })
+      let articlePost = makePost()
+      articlePost = R.merge(articlePost, {
+        post_type:    LINK_TYPE_ARTICLE,
+        article_text: exampleText
+      })
+      let linkPost = makePost()
+      linkPost = R.merge(linkPost, {
+        post_type: LINK_TYPE_LINK
+      })
+
+      assert.equal(getTextContent(textPost), exampleText)
+      assert.equal(getTextContent(articlePost), exampleText)
+      assert.isNull(getTextContent(linkPost))
     })
   })
 })

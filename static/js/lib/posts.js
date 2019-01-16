@@ -5,6 +5,7 @@ import { Link } from "react-router-dom"
 
 import { postDetailURL, urlHostname } from "./url"
 import { showDropdown, hideDropdownDebounced } from "../actions/ui"
+import { LINK_TYPE_TEXT, LINK_TYPE_ARTICLE } from "./channels"
 
 import type { Dispatch } from "redux"
 import type {
@@ -13,6 +14,8 @@ import type {
   PostListData,
   PostListResponse
 } from "../flow/discussionTypes"
+
+export const POST_PREVIEW_LINES = 2
 
 export const newPostForm = (): PostForm => ({
   postType:    null,
@@ -110,4 +113,13 @@ export const postMenuDropdownFuncs = (dispatch: Dispatch<*>, post: Post) => {
     showPostMenu: () => dispatch(showDropdown(postMenuKey)),
     hidePostMenu: () => dispatch(hideDropdownDebounced(postMenuKey))
   }
+}
+
+export const getTextContent = (post: Post): ?string => {
+  if (post.post_type === LINK_TYPE_TEXT) {
+    return post.text
+  } else if (post.post_type === LINK_TYPE_ARTICLE) {
+    return post.article_text
+  }
+  return null
 }

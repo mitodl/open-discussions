@@ -76,7 +76,6 @@
 .authored-by {
   display: flex;
   flex-direction: column;
-  font-size: $author-font-size;
 
   div {
     padding-bottom: 2px;
@@ -96,6 +95,18 @@
 }
 
 .compact-post-summary {
+  $child-vert-spacing: 10px;
+
+  font-size: $modest-font-size;
+
+  .preview {
+    color: $font-grey-mid;
+  }
+
+  .author-row {
+    margin-top: $child-vert-spacing;
+  }
+
   .upvote-report-count {
     display: flex;
     align-items: center;
@@ -105,11 +116,10 @@
     }
   }
 
-  .post-title {
+  span.post-title {
     font-size: 18px;
     font-weight: bold;
     color: $navy;
-    margin: 0 0 10px;
   }
 
   &.sticky {
@@ -126,6 +136,8 @@
   }
 
   .title-row {
+    margin: 0 0 $child-vert-spacing;
+
     i {
       color: $font-grey-light;
     }
@@ -295,7 +307,7 @@
     justify-content: space-between;
     display: flex;
     margin-top: 10px;
-    font-size: 14px;
+    font-size: $modest-font-size;
 
     a {
       margin: 0 5px;
@@ -335,7 +347,7 @@
   .provider-name {
     text-transform: uppercase;
     padding-bottom: 10px;
-    font-size: 14px;
+    font-size: $modest-font-size;
   }
 }
 

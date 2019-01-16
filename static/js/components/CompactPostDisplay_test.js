@@ -1,6 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
+import R from "ramda"
 import { assert } from "chai"
 import { mount } from "enzyme"
 import { Link } from "react-router-dom"
@@ -12,11 +13,16 @@ import DropdownMenu from "./DropdownMenu"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { wait } from "../lib/util"
 import { channelURL, postDetailURL, urlHostname, profileURL } from "../lib/url"
-import { PostTitleAndHostname, getPostDropdownMenuKey } from "../lib/posts"
+import {
+  PostTitleAndHostname,
+  getPostDropdownMenuKey,
+  POST_PREVIEW_LINES
+} from "../lib/posts"
 import { makePost } from "../factories/posts"
 import { showDropdown } from "../actions/ui"
 import * as utilFuncs from "../lib/util"
 import { shouldIf } from "../lib/test_utils"
+import { LINK_TYPE_TEXT } from "../lib/channels"
 
 describe("CompactPostDisplay", () => {
   let helper, post, openMenu
@@ -96,6 +102,17 @@ describe("CompactPostDisplay", () => {
       .at(0)
     assert.equal(link.text(), post.author_name)
     assert.equal(link.props().to, profileURL(post.author_id))
+  })
+
+  it("should show preview text", () => {
+    const exampleText = "lorem ipsum"
+    post = R.merge(post, {
+      post_type: LINK_TYPE_TEXT,
+      text:      exampleText
+    })
+    const truncatableText = renderPostDisplay({ post }).find("Dotdotdot")
+    assert.equal(truncatableText.prop("clamp"), POST_PREVIEW_LINES)
+    assert.equal(truncatableText.prop("children"), exampleText)
   })
 
   it("should link to the post detail page via post date", () => {
