@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.62.1
+Version 0.62.1 (Released January 16, 2019)
 --------------
 
 - Minimum search query length (#1675)
