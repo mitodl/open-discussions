@@ -176,6 +176,7 @@ def start_recreate_index(self):
                 for ids in chunks(
                     User.objects.exclude(username=settings.INDEXING_API_USERNAME)
                     .exclude(profile__isnull=True)
+                    .order_by("id")
                     .values_list("profile__id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
