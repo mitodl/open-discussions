@@ -9,6 +9,7 @@ import { MetaTags } from "react-meta-tags"
 
 import { Loading, PostLoading, withLoading } from "../components/Loading"
 import SearchTextbox from "../components/SearchTextbox"
+import ChannelNavbar from "../components/ChannelNavbar"
 import CanonicalLink from "../components/CanonicalLink"
 import { SearchFilterPicker } from "../components/Picker"
 import SearchResult from "../components/SearchResult"
@@ -321,7 +322,8 @@ const mapStateToProps = (state, ownProps) => {
     channelName,
     // loaded is used in withLoading but we only want to look at channel loaded since search loaded will change
     // whenever the user makes a new search
-    loaded: channelName ? channelLoaded : true,
+    loaded:      channelName ? channelLoaded : true,
+    navbarItems: <ChannelNavbar channel={channel} />,
     notFound,
     notAuthorized,
     searchLoaded,
@@ -351,6 +353,6 @@ export default R.compose(
     mapStateToProps,
     mapDispatchToProps
   ),
-  withChannelHeader(true),
+  withChannelHeader,
   withLoading(PostLoading)
 )(SearchPage)

@@ -562,7 +562,7 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
-  withChannelHeader(false),
+  withChannelHeader,
   withPostModeration,
   withCommentModeration,
   withSingleColumn("post-page"),

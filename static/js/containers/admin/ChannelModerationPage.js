@@ -182,6 +182,6 @@ export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
   withCommentModeration,
-  withChannelHeader(false),
+  withChannelHeader,
   withSingleColumn("edit-channel")
 )(ChannelModerationPage)

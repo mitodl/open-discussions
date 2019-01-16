@@ -14,7 +14,6 @@ type Props = {
   startEditInstance: (widgetInstance: WidgetInstanceType) => void,
   clearForm: () => void,
   deleteInstance: (widgetInstance: WidgetInstanceType) => void,
-  submitForm: () => Promise<void>,
   widgetInstances: Array<WidgetInstanceType>,
   editing: boolean
 }
@@ -23,8 +22,6 @@ const SortableWidgetList: StatelessFunctionalComponent<Props> = SortableContaine
   ({
     widgetInstances,
     editing,
-    clearForm,
-    submitForm,
     deleteInstance,
     startAddInstance,
     startEditInstance
@@ -33,20 +30,9 @@ const SortableWidgetList: StatelessFunctionalComponent<Props> = SortableContaine
       <div className="widget-list">
         {editing ? (
           <div className="manage-widgets">
-            <div className="header-one">
-              <span className="manage-title">Manage widgets</span>
-              <button className="cancel" onClick={clearForm}>
-                Cancel
-              </button>
-              <button className="submit" onClick={submitForm}>
-                Done
-              </button>
-            </div>
-            <div className="header-two">
-              <span className="add-widget" onClick={() => startAddInstance()}>
-                + Add widget
-              </span>
-            </div>
+            <span className="add-widget" onClick={() => startAddInstance()}>
+              + Add widget
+            </span>
           </div>
         ) : null}
         {widgetInstances.map((widgetInstance, i) => (

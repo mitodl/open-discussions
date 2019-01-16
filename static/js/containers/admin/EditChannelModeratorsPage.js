@@ -111,6 +111,6 @@ export default R.compose(
     mergeProps
   ),
   withForm(EditChannelMembersForm),
-  withChannelHeader(false),
+  withChannelHeader,
   withSingleColumn("edit-channel")
 )(EditChannelModeratorsPage)

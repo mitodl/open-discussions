@@ -23,6 +23,7 @@ describe("ChannelWidgetList", () => {
   })
 
   it("should not render the list if widget_list_id is null", () => {
+    channel.widget_list_id = null
     const wrapper = renderWidgetList()
     assert.isFalse(wrapper.find("Connect(WidgetListContainer)").exists())
   })

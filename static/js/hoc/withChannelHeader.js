@@ -5,12 +5,12 @@ import R from "ramda"
 import ChannelHeader from "../components/ChannelHeader"
 
 const withChannelHeader = R.curry(
-  (hasNavbar: boolean, WrappedComponent: Class<React.Component<*, *>>) => {
-    class WithChannelSidebar extends React.Component<*, *> {
+  (WrappedComponent: Class<React.Component<*, *>>) => {
+    class WithChannelHeader extends React.Component<*, *> {
       static WrappedComponent: Class<React.Component<*, *>>
 
       render() {
-        const { channel, history } = this.props
+        const { channel, history, navbarItems } = this.props
 
         return (
           <div className="channel-page-wrapper">
@@ -19,7 +19,7 @@ const withChannelHeader = R.curry(
                 channel={channel}
                 history={history}
                 isModerator={channel.user_is_moderator}
-                hasNavbar={hasNavbar}
+                navbarItems={navbarItems}
               />
             ) : null}
             <WrappedComponent {...this.props} />
@@ -28,11 +28,11 @@ const withChannelHeader = R.curry(
       }
     }
 
-    WithChannelSidebar.WrappedComponent = WrappedComponent
-    WithChannelSidebar.displayName = `withChannelHeader(${
+    WithChannelHeader.WrappedComponent = WrappedComponent
+    WithChannelHeader.displayName = `withChannelHeader(${
       WrappedComponent.name
     })`
-    return WithChannelSidebar
+    return WithChannelHeader
   }
 )
 

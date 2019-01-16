@@ -40,7 +40,7 @@ export const makeChannel = (privateChannel: boolean = false): Channel => {
     avatar_small:          hasAvatar ? "http://avatar.small.url" : null,
     avatar_medium:         hasAvatar ? "http://avatar.medium.url" : null,
     banner:                casual.coin_flip ? "http://banner.url" : null,
-    widget_list_id:        null,
+    widget_list_id:        casual.integer(4, 99),
     allowed_post_types:    [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE]
   }
 }

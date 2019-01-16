@@ -1,17 +1,16 @@
 // @flow
 /* global SETTINGS: false */
-import React from "react"
-import { Link, NavLink } from "react-router-dom"
+import * as React from "react"
+import { Link } from "react-router-dom"
 
 import ChannelBanner from "../containers/ChannelBanner"
 import { Cell, Grid } from "./Grid"
 import ChannelAvatar, {
   CHANNEL_AVATAR_MEDIUM
 } from "../containers/ChannelAvatar"
-import IntraPageNav from "./IntraPageNav"
 import ChannelSettingsLink from "../containers/ChannelSettingsLink"
 
-import { channelURL, channelSearchURL } from "../lib/url"
+import { channelURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -19,12 +18,12 @@ type Props = {
   channel: Channel,
   history: Object,
   isModerator: boolean,
-  hasNavbar: boolean
+  navbarItems?: React.Node
 }
 
 export default class ChannelHeader extends React.Component<Props> {
   render() {
-    const { channel, history, isModerator, hasNavbar } = this.props
+    const { channel, history, isModerator, navbarItems } = this.props
     return (
       <div className="channel-page-header">
         <ChannelBanner editable={false} channel={channel} />
@@ -52,33 +51,7 @@ export default class ChannelHeader extends React.Component<Props> {
             </div>
           </Cell>
         </Grid>
-        {hasNavbar ? (
-          <div className="channel-intra-nav-wrapper">
-            <Grid className="main-content two-column channel-intra-nav">
-              <Cell width={8}>
-                <IntraPageNav>
-                  <NavLink
-                    exact
-                    to={channelURL(channel.name)}
-                    activeClassName="active"
-                  >
-                    Home
-                  </NavLink>
-                  {SETTINGS.allow_search ? (
-                    <NavLink
-                      exact
-                      to={channelSearchURL(channel.name)}
-                      activeClassName="active"
-                      className="search-link"
-                    >
-                      <i className="material-icons">search</i>
-                    </NavLink>
-                  ) : null}
-                </IntraPageNav>
-              </Cell>
-            </Grid>
-          </div>
-        ) : null}
+        {navbarItems}
       </div>
     )
   }

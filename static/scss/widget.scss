@@ -3,25 +3,7 @@
     padding: 20px 16px 6px 16px;
   }
 
-  .header-one {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 10px;
-    justify-content: flex-end;
-    align-items: center;
-
-    .manage-title {
-      font-weight: 700;
-      margin-right: auto;
-    }
-
-    button {
-      padding: 5px 15px;
-      margin: 0 5px;
-    }
-  }
-
-  .header-two {
+  .manage-widgets {
     margin-bottom: 5px;
 
     .add-widget {
