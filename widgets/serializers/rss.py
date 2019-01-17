@@ -11,15 +11,15 @@ from widgets.serializers.react_fields import ReactURLField, ReactIntegerField
 
 
 ISOFORMAT = "%Y-%m-%dT%H:%M:%SZ"
-MAX_FEED_ITEMS = 12
+MAX_FEED_ITEMS = 10
 
 
 class RssFeedWidgetConfigSerializer(WidgetConfigSerializer):
     """Serializer for RssFeedWidget config"""
 
-    url = ReactURLField(help_text="Enter RSS Feed URL", label="URL")
+    url = ReactURLField(help_text="RSS feed URL", label="URL")
     feed_display_limit = ReactIntegerField(
-        min_value=0, max_value=MAX_FEED_ITEMS, default=3
+        min_value=1, max_value=MAX_FEED_ITEMS, default=5, label="Max number of items"
     )
 
 

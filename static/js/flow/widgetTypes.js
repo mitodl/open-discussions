@@ -21,6 +21,7 @@ export type WidgetFieldSpec = {
 
 export type WidgetSpec = {
   widget_type: string,
+  description: string,
   form_spec: Array<WidgetFieldSpec>
 }
 

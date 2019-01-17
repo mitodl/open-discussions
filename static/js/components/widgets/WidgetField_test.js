@@ -33,21 +33,36 @@ describe("WidgetField", () => {
       />
     )
   }
+  ;["text", "textarea", "number"].forEach(fieldType => {
+    describe(`${fieldType} field`, () => {
+      it("uses an empty string for a default value if there is none in the spec", () => {
+        fieldSpec = makeFieldSpec(fieldType)
+        fieldSpec.default = undefined
+        value = undefined
+        const wrapper = render()
+        assert.equal(wrapper.find(".field").prop("value"), "")
+      })
 
-  it("uses an empty string for a default value if there is none in the spec", () => {
-    fieldSpec = makeFieldSpec()
-    fieldSpec.props.default = undefined
-    value = undefined
-    const wrapper = render()
-    assert.equal(wrapper.find(".field").prop("value"), "")
-  })
+      it("uses the default value from the spec if the value is falsey", () => {
+        fieldSpec = makeFieldSpec(fieldType)
+        fieldSpec.default = "value"
+        value = undefined
+        const wrapper = render()
+        assert.equal(wrapper.find(".field").prop("value"), fieldSpec.default)
+      })
 
-  it("uses the default value from the spec if the value is falsey", () => {
-    fieldSpec = makeFieldSpec()
-    fieldSpec.props.default = "value"
-    value = undefined
-    const wrapper = render()
-    assert.equal(wrapper.find(".field").prop("value"), fieldSpec.props.default)
+      it("has an onChange prop that updates the value", () => {
+        fieldSpec = makeFieldSpec(fieldType)
+        const wrapper = render()
+        const newValue = "xyz"
+        wrapper.find(".field").prop("onChange")({ target: { value: newValue } })
+        sinon.assert.calledWith(onChangeStub, {
+          target: {
+            value: newValue
+          }
+        })
+      })
+    })
   })
   ;["text", "textarea"].forEach(fieldType => {
     it(`renders a ${fieldType} input field`, () => {
@@ -68,14 +83,19 @@ describe("WidgetField", () => {
     })
   })
 
-  it("renders a number field", () => {
+  it("renders a number field with number options between the min and max", () => {
     fieldSpec = makeFieldSpec("number")
     const wrapper = render()
 
-    const props = wrapper.find(".field").props()
-    assert.equal(props.type, "number")
-    assert.equal(props.max, fieldSpec.props.max)
-    assert.equal(props.min, fieldSpec.props.min)
+    const options = wrapper.find(".field option")
+    const { min, max } = fieldSpec.props
+    assert.equal(options.length, max - min + 1)
+    options.forEach((option, i) => {
+      assert.deepEqual(option.props(), {
+        value:    i + min,
+        children: i + min
+      })
+    })
   })
 
   it("renders a wysiwyg markdown field", () => {

@@ -75,8 +75,7 @@ describe("WidgetEditDialog", () => {
   })
   ;[
     [WIDGET_TYPE_SELECT, "Select widget", "Next"],
-    [WIDGET_EDIT, "Edit widget", "Update widget"],
-    [WIDGET_CREATE, "Add widget", "Create widget"]
+    [WIDGET_EDIT, "Edit widget", "Update widget"]
   ].forEach(([state, expectedTitle, expectedSubmitText]) => {
     it(`sets the title and submit text based on isEditing=${String()} and state=${state}`, () => {
       dialogData = {
@@ -90,6 +89,21 @@ describe("WidgetEditDialog", () => {
         expectedSubmitText
       )
     })
+  })
+
+  it("uses the widget instance title for the dialog for creating a new widget", () => {
+    dialogData = {
+      ...dialogData,
+      state: WIDGET_CREATE
+    }
+    const spec = specs.find(
+      spec => spec.widget_type === dialogData.instance.widget_type
+    )
+    // $FlowFixMe
+    const expectedTitle = `Add ${spec.description} widget`
+    const wrapper = render()
+    assert.equal(wrapper.find("OurDialog").prop("title"), expectedTitle)
+    assert.equal(wrapper.find("OurDialog").prop("submitText"), "Create widget")
   })
 
   it("hides the dialog", () => {
@@ -135,7 +149,7 @@ describe("WidgetEditDialog", () => {
       const props = wrapper.find("Radio").props()
 
       const expectedOptions = specs.map(spec => ({
-        label: spec.widget_type,
+        label: spec.description,
         value: spec.widget_type
       }))
       assert.deepEqual(props.options, expectedOptions)
@@ -180,7 +194,7 @@ describe("WidgetEditDialog", () => {
       const wrapper = render()
 
       const field = wrapper.find(".widget-title-field")
-      assert.equal(field.text(), "Widget title")
+      assert.equal(field.text(), "Title")
 
       assert.equal(field.find("input").prop("value"), dialogData.instance.title)
       const newValue = "newValue"
