@@ -385,6 +385,7 @@ class PostPage extends React.Component<PostPageProps> {
 
     const reportForm = getReportForm(forms)
     const showPermalinkUI = R.not(R.isNil(commentID))
+    const hidePostDialog = this.hidePostDialog(DELETE_POST_DIALOG)
 
     return (
       <div>
@@ -410,8 +411,11 @@ class PostPage extends React.Component<PostPageProps> {
         </Dialog>
         <Dialog
           open={postDeleteDialogVisible}
-          hideDialog={this.hidePostDialog(DELETE_POST_DIALOG)}
-          onAccept={() => this.deletePost(post)}
+          hideDialog={hidePostDialog}
+          onAccept={() => {
+            this.deletePost(post)
+            hidePostDialog()
+          }}
           title="Delete Post"
           submitText="Yes, Delete"
         >

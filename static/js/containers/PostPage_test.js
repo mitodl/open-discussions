@@ -349,7 +349,8 @@ describe("PostPage", function() {
         actions.channels.get.requestType,
         actions.channels.get.successType,
         actions.postsForChannel.get.requestType,
-        SET_SNACKBAR_MESSAGE
+        SET_SNACKBAR_MESSAGE,
+        HIDE_DIALOG
       ],
       () => {
         wrapper
