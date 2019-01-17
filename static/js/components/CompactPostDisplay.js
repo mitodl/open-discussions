@@ -22,7 +22,9 @@ import {
   getPostDropdownMenuKey,
   postMenuDropdownFuncs,
   getTextContent,
-  POST_PREVIEW_LINES
+  POST_PREVIEW_LINES,
+  EMBEDLY_THUMB_HEIGHT,
+  EMBEDLY_THUMB_WIDTH
 } from "../lib/posts"
 import { userIsAnonymous } from "../lib/util"
 import { LINK_TYPE_LINK } from "../lib/channels"
@@ -60,8 +62,9 @@ export class CompactPostDisplay extends React.Component<Props> {
     ) : null
   }
 
-  render() {
+  renderFooterContents() {
     const {
+      dispatch,
       post,
       toggleUpvote,
       showPinUI,
@@ -71,12 +74,69 @@ export class CompactPostDisplay extends React.Component<Props> {
       ignorePostReports,
       reportPost,
       menuOpen,
-      useSearchPageUI,
-      dispatch
+      useSearchPageUI
     } = this.props
 
-    const formattedDate = moment(post.created).fromNow()
     const { showPostMenu, hidePostMenu } = postMenuDropdownFuncs(dispatch, post)
+
+    return (
+      <React.Fragment>
+        <PostUpvoteButton post={post} toggleUpvote={toggleUpvote} />
+        <Link
+          className="comment-link grey-surround"
+          to={postDetailURL(post.channel_name, post.id, post.slug)}
+        >
+          <i className="material-icons chat_bubble_outline">
+            chat_bubble_outline
+          </i>
+          <span>{post.num_comments}</span>
+        </Link>
+        {userIsAnonymous() || useSearchPageUI ? null : (
+          <i
+            className="material-icons more_vert post-menu-button grey-surround"
+            onClick={menuOpen ? null : showPostMenu}
+          >
+            more_vert
+          </i>
+        )}
+        <ReportCount count={post.num_reports} />
+        {menuOpen ? (
+          <DropdownMenu
+            closeMenu={hidePostMenu}
+            className="post-comment-dropdown"
+          >
+            {showPinUI && isModerator && togglePinPost ? (
+              <li>
+                <a onClick={() => togglePinPost(post)}>
+                  {post.stickied ? "Unpin" : "Pin"}
+                </a>
+              </li>
+            ) : null}
+            {isModerator && removePost ? (
+              <li>
+                <a onClick={() => removePost(post)}>Remove</a>
+              </li>
+            ) : null}
+            {isModerator && ignorePostReports ? (
+              <li>
+                <a onClick={() => ignorePostReports(post)}>Ignore reports</a>
+              </li>
+            ) : null}
+            {!userIsAnonymous() && reportPost ? (
+              <li>
+                <a onClick={() => reportPost(post)}>Report</a>
+              </li>
+            ) : null}
+          </DropdownMenu>
+        ) : null}
+      </React.Fragment>
+    )
+  }
+
+  render() {
+    const { post, showPinUI } = this.props
+
+    const formattedDate = moment(post.created).fromNow()
     const previewText = getTextContent(post)
 
     return (
@@ -85,8 +145,8 @@ export class CompactPostDisplay extends React.Component<Props> {
           post.stickied && showPinUI ? "sticky" : ""
         }`}
       >
-        <div className="row post-toprow">
-          <div className="column1">
+        <div className="column1">
+          <div className="preview-body">
             <div className="row title-row">
               {post.stickied && showPinUI ? (
                 <img
@@ -135,102 +195,41 @@ export class CompactPostDisplay extends React.Component<Props> {
               </div>
             </div>
           </div>
-          {post.post_type === LINK_TYPE_LINK || post.thumbnail ? (
-            <div
-              className={`column2 ${post.thumbnail ? "link-thumbnail" : ""}`}
-            >
-              {post.post_type === LINK_TYPE_LINK ? (
-                <React.Fragment>
-                  <div className="top-right">
-                    <a
-                      href={post.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <i className="material-icons open_in_new top-right overlay-icon">
-                        open_in_new
-                      </i>
-                    </a>
-                  </div>
-                  {post.thumbnail ? (
-                    <a
-                      href={post.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src={embedlyThumbnail(
-                          SETTINGS.embedlyKey,
-                          post.thumbnail,
-                          103,
-                          201
-                        )}
-                      />
-                    </a>
-                  ) : null}
-                </React.Fragment>
-              ) : (
-                <img src={post.thumbnail} />
-              )}
-            </div>
-          ) : null}
+          <div className="preview-footer">{this.renderFooterContents()}</div>
         </div>
-        <div className="row">
-          <div className="upvote-report-count">
-            <PostUpvoteButton post={post} toggleUpvote={toggleUpvote} />
-            <ReportCount count={post.num_reports} />
-          </div>
-          <div className="comments-and-menu">
-            <Link
-              className="comment-link grey-surround"
-              to={postDetailURL(post.channel_name, post.id, post.slug)}
-            >
-              <i className="material-icons chat_bubble_outline">
-                chat_bubble_outline
-              </i>
-              <span>{post.num_comments}</span>
-            </Link>
-            {userIsAnonymous() || useSearchPageUI ? null : (
-              <i
-                className="material-icons more_vert post-menu-button grey-surround"
-                onClick={menuOpen ? null : showPostMenu}
-              >
-                more_vert
-              </i>
+        {post.post_type === LINK_TYPE_LINK || post.thumbnail ? (
+          <div
+            className={`column2 ${post.thumbnail ? "link-thumbnail" : ""} ${
+              post.post_type === LINK_TYPE_LINK ? "external-link" : ""
+            }`}
+          >
+            {post.post_type === LINK_TYPE_LINK ? (
+              <React.Fragment>
+                <div className="top-right">
+                  <a href={post.url} target="_blank" rel="noopener noreferrer">
+                    <i className="material-icons open_in_new top-right overlay-icon">
+                      open_in_new
+                    </i>
+                  </a>
+                </div>
+                {post.thumbnail ? (
+                  <a href={post.url} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={embedlyThumbnail(
+                        SETTINGS.embedlyKey,
+                        post.thumbnail,
+                        EMBEDLY_THUMB_HEIGHT,
+                        EMBEDLY_THUMB_WIDTH
+                      )}
+                    />
+                  </a>
+                ) : null}
+              </React.Fragment>
+            ) : (
+              <img src={post.thumbnail} />
             )}
-            {menuOpen ? (
-              <DropdownMenu
-                closeMenu={hidePostMenu}
-                className="post-comment-dropdown"
-              >
-                {showPinUI && isModerator && togglePinPost ? (
-                  <li>
-                    <a onClick={() => togglePinPost(post)}>
-                      {post.stickied ? "Unpin" : "Pin"}
-                    </a>
-                  </li>
-                ) : null}
-                {isModerator && removePost ? (
-                  <li>
-                    <a onClick={() => removePost(post)}>Remove</a>
-                  </li>
-                ) : null}
-                {isModerator && ignorePostReports ? (
-                  <li>
-                    <a onClick={() => ignorePostReports(post)}>
-                      Ignore reports
-                    </a>
-                  </li>
-                ) : null}
-                {!userIsAnonymous() && reportPost ? (
-                  <li>
-                    <a onClick={() => reportPost(post)}>Report</a>
-                  </li>
-                ) : null}
-              </DropdownMenu>
-            ) : null}
           </div>
-        </div>
+        ) : null}
       </Card>
     )
   }

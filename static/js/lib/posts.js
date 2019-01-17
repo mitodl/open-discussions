@@ -16,6 +16,8 @@ import type {
 } from "../flow/discussionTypes"
 
 export const POST_PREVIEW_LINES = 2
+export const EMBEDLY_THUMB_HEIGHT = 123
+export const EMBEDLY_THUMB_WIDTH = 240
 
 export const newPostForm = (): PostForm => ({
   postType:         null,
