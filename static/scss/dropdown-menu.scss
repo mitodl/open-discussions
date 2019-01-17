@@ -13,6 +13,8 @@ ul.dropdown-menu {
     text-decoration: none;
     color: $navy;
     white-space: nowrap;
+    display: inline-block;
+    width: 100%;
   }
 
   li {
