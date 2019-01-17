@@ -382,7 +382,7 @@ describe("SearchPage", () => {
     )} and searchLoaded=${String(searchLoaded)} and it ${
       hasChannel ? "has" : "doesn't have"
     } a channel`, async () => {
-      const { inner } = await renderPage(
+      const { wrapper } = await renderPage(
         {
           channels: {
             loaded:     channelLoaded,
@@ -390,7 +390,10 @@ describe("SearchPage", () => {
           },
           search: {
             loaded:     searchLoaded,
-            processing: !searchLoaded
+            processing: !searchLoaded,
+            data:       {
+              initialLoad: true
+            }
           }
         },
         {
@@ -401,7 +404,7 @@ describe("SearchPage", () => {
           }
         }
       )
-      assert.equal(inner.find("PostLoading").exists(), !loaded)
+      assert.equal(wrapper.props().loaded, loaded)
     })
   })
 

@@ -7,7 +7,7 @@ import InfiniteScroll from "react-infinite-scroller"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
-import { Loading, PostLoading, withLoading } from "../components/Loading"
+import { Loading, PostLoading, withSearchLoading } from "../components/Loading"
 import SearchTextbox from "../components/SearchTextbox"
 import ChannelNavbar from "../components/ChannelNavbar"
 import CanonicalLink from "../components/CanonicalLink"
@@ -354,5 +354,5 @@ export default R.compose(
     mapDispatchToProps
   ),
   withChannelHeader,
-  withLoading(PostLoading)
+  withSearchLoading
 )(SearchPage)
