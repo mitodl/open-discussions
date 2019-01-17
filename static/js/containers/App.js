@@ -50,6 +50,7 @@ import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
 import { isAnonAccessiblePath, needsAuthedSite } from "../lib/auth"
 import { isMobileWidth, preventDefaultAndInvoke } from "../lib/util"
 import { getOwnProfile } from "../lib/redux_selectors"
+import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -255,12 +256,9 @@ class App extends React.Component<AppProps> {
           />
           <Route
             exact
-            path={`${match.url}profile/:userName`}
-            component={ProfilePage}
-          />
-          <Route
-            exact
-            path={`${match.url}profile/:userName/:objectType(posts|comments)`}
+            path={`${
+              match.url
+            }profile/:userName/:objectType(${POSTS_OBJECT_TYPE}|${COMMENTS_OBJECT_TYPE})?`}
             component={ProfilePage}
           />
           <Route exact path={`${match.url}login/`} component={LoginPage} />
