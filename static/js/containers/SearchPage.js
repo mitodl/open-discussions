@@ -209,7 +209,7 @@ export class SearchPage extends React.Component<Props, State> {
         // TODO: fix
         hasMore={from + SETTINGS.search_page_size < total}
         loadMore={this.loadMore}
-        initialLoad={false}
+        initialLoad={from === 0}
         loader={<Loading className="infinite" key="loader" />}
       >
         {results.map((result, i) => (
