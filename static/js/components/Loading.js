@@ -7,6 +7,7 @@ import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import Card from "./Card"
 import { Cell, Grid } from "./Grid"
 import { contentLoaderSpeed } from "../lib/constants"
+import { EMBEDLY_THUMB_HEIGHT } from "../lib/posts"
 
 type LoadingProps = {
   loaded: boolean,
@@ -35,22 +36,26 @@ const AnimatedEmptyPost = (i: number) => {
   return (
     <div className="post-content-loader" key={`loader-${i}`}>
       <Card className="compact-post-summary">
-        <div className="post-toprow">
-          <ContentLoader
-            speed={contentLoaderSpeed}
-            style={{ width: "100%", height: "137px" }}
-            width={1000}
-            height={137}
-            preserveAspectRatio="none"
-          >
-            <rect x="0" y="0" rx="5" ry="5" width="70%" height="20" />
-            <rect x="0" y="40" rx="5" ry="5" width="70%" height="16" />
-            <rect x="0" y="58" rx="5" ry="5" width="70%" height="16" />
-            <rect x="0" y="113" rx="5" ry="5" width="70" height="24" />
-            <rect x="75%" y="0" rx="5" ry="5" width="25%" height="103" />
-            <rect x="89%" y="113" rx="5" ry="5" width="11%" height="24" />
-          </ContentLoader>
-        </div>
+        <ContentLoader
+          speed={contentLoaderSpeed}
+          style={{ width: "100%", height: "137px" }}
+          width={1000}
+          height={137}
+          preserveAspectRatio="none"
+        >
+          <rect x="0" y="0" rx="5" ry="5" width="60%" height="20" />
+          <rect x="0" y="40" rx="5" ry="5" width="60%" height="16" />
+          <rect x="0" y="58" rx="5" ry="5" width="60%" height="16" />
+          <rect x="0" y="113" rx="5" ry="5" width="170" height="24" />
+          <rect
+            x="66%"
+            y="0"
+            rx="5"
+            ry="5"
+            width="34%"
+            height={EMBEDLY_THUMB_HEIGHT}
+          />
+        </ContentLoader>
       </Card>
     </div>
   )

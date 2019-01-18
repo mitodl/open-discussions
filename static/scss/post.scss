@@ -53,26 +53,6 @@
   font-size: $submission-font-size;
 }
 
-.comments-and-menu,
-.post-actions {
-  // to make the user-menu live in it correctly
-  position: relative;
-  display: flex;
-  align-items: center;
-
-  > * {
-    color: $font-grey-light;
-  }
-
-  i {
-    cursor: pointer;
-  }
-
-  .dropdown-menu {
-    top: 22px;
-  }
-}
-
 .authored-by {
   display: flex;
   flex-direction: column;
@@ -94,10 +74,81 @@
   }
 }
 
+.post-content-loader .compact-post-summary .card-contents {
+  // Prevent flexbox styling for post loading animation
+  display: block;
+}
+
 .compact-post-summary {
   $child-vert-spacing: 10px;
 
   font-size: $modest-font-size;
+
+  .card-contents {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: auto;
+    word-break: break-word;
+
+    .column1 {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      word-break: break-word;
+    }
+
+    .column2 {
+      position: relative;
+      overflow: hidden;
+      min-width: 24px;
+      width: 24px;
+      margin-left: 10px;
+      display: flex;
+      justify-content: flex-end;
+
+      &.link-thumbnail {
+        min-width: 34%;
+        width: 34%;
+        overflow: hidden;
+        border-radius: 5px;
+        height: 103px;
+
+        &.external-link {
+          height: 123px;
+        }
+
+        img {
+          border-radius: 5px;
+        }
+      }
+
+      .top-right {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+
+        img {
+          width: 201px;
+          height: 103px;
+        }
+      }
+    }
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .title-row {
+    margin: 0 0 $child-vert-spacing;
+
+    i {
+      color: $font-grey-light;
+    }
+  }
 
   .preview {
     color: $font-grey-mid;
@@ -105,15 +156,6 @@
 
   .author-row {
     margin-top: $child-vert-spacing;
-  }
-
-  .upvote-report-count {
-    display: flex;
-    align-items: center;
-
-    .report-count {
-      margin-left: 10px;
-    }
   }
 
   span.post-title {
@@ -135,21 +177,36 @@
     }
   }
 
-  .title-row {
-    margin: 0 0 $child-vert-spacing;
-
-    i {
-      color: $font-grey-light;
+  @include breakpoint(phone) {
+    .report-count {
+      padding-left: 8px;
+      padding-right: 8px;
     }
   }
 
-  .row {
+  .preview-footer {
+    position: relative;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
 
-    .upvotes {
-      margin-top: 5px;
+    > * {
+      margin: $child-vert-spacing 7px 0 0;
+    }
+
+    i {
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      top: 22px;
+      right: inherit;
+      // HACK: This puts the menu dropdown underneath the three-dot menu icon.
+      // Fix this when we establish a way to position dropdown menus and other
+      // click-to-reveal elements near the element that was clicked to reveal them.
+      left: 50px;
     }
   }
 }
@@ -374,10 +431,6 @@
     margin: 0 6px;
     line-height: 18.7px;
   }
-}
-
-.comment-link {
-  margin-right: 5px;
 }
 
 .upvote-button,

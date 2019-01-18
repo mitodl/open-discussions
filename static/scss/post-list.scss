@@ -18,49 +18,6 @@
   }
 }
 
-.post-toprow {
-  height: auto;
-  margin-bottom: 10px;
-  word-break: break-word;
-
-  .column1 {
-    word-break: break-word;
-  }
-
-  .column2 {
-    position: relative;
-    overflow: hidden;
-    min-width: 24px;
-    width: 24px;
-    margin-left: 5px;
-    display: flex;
-    justify-content: flex-end;
-    height: 103px;
-
-    .top-right {
-      position: absolute;
-      top: 0px;
-      right: 0px;
-
-      img {
-        width: 201px;
-        height: 103px;
-      }
-    }
-  }
-
-  .link-thumbnail {
-    min-width: 25%;
-    width: 25%;
-    overflow: hidden;
-    border-radius: 5px;
-
-    img {
-      border-radius: 5px;
-    }
-  }
-}
-
 .overlay-icon {
   color: $navy;
   background-color: $pale-grey;

@@ -146,8 +146,8 @@ describe("CompactPostDisplay", () => {
     const post = makePost(true)
     const wrapper = renderPostDisplay({ post })
     const { href, target } = wrapper
-      .find("a")
-      .at(3)
+      .find(".external-link a")
+      .at(0)
       .props()
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
