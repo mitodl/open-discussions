@@ -16,9 +16,8 @@ type Props = {
 export default class RssWidget extends React.Component<Props> {
   render() {
     const {
-      widgetInstance: { json }
+      widgetInstance: { json, title }
     } = this.props
-    const title = (json && json.title) || "RSS Feed"
     const entries = (json && json.entries) || []
 
     return (
