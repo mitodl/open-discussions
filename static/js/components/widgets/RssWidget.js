@@ -13,32 +13,28 @@ type Props = {
   widgetInstance: WidgetInstance
 }
 
-export default class RssWidget extends React.Component<Props> {
-  render() {
-    const {
-      widgetInstance: { json, title }
-    } = this.props
-    const entries = (json && json.entries) || []
+const RssWidget = ({ widgetInstance: { json, title } }: Props) => {
+  const entries = (json && json.entries) || []
 
-    return (
-      <React.Fragment>
-        <span className="title">{title}</span>
-        {entries.map(entry => (
-          <div key={entry.link} className="entry">
-            <div className="entry-title">
-              <a href={entry.link} target="_blank" rel="noopener noreferrer">
-                {entry.title}
-              </a>
-            </div>
-            <Dotdotdot clamp={3} className="description">
-              {entities.decode(striptags(entry.description))}
-            </Dotdotdot>
-            <span className="time">
-              {entry.timestamp ? moment(entry.timestamp).fromNow() : null}
-            </span>
+  return (
+    <React.Fragment>
+      <span className="title">{title}</span>
+      {entries.map(entry => (
+        <div key={entry.link} className="entry">
+          <div className="entry-title">
+            <a href={entry.link} target="_blank" rel="noopener noreferrer">
+              {entry.title}
+            </a>
           </div>
-        ))}
-      </React.Fragment>
-    )
-  }
+          <Dotdotdot clamp={3} className="description">
+            {entities.decode(striptags(entry.description))}
+          </Dotdotdot>
+          <span className="time">
+            {entry.timestamp ? moment(entry.timestamp).fromNow() : null}
+          </span>
+        </div>
+      ))}
+    </React.Fragment>
+  )
 }
+export default RssWidget

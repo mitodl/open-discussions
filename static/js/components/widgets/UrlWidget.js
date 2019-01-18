@@ -7,20 +7,15 @@ type Props = {
   widgetInstance: WidgetInstance
 }
 
-export default class UrlWidget extends React.Component<Props> {
-  render() {
-    const {
-      widgetInstance: {
-        title,
-        configuration: { url }
-      }
-    } = this.props
-
-    return (
-      <React.Fragment>
-        <span className="title">{title}</span>
-        <iframe src={url} />
-      </React.Fragment>
-    )
+const UrlWidget = ({
+  widgetInstance: {
+    title,
+    configuration: { url }
   }
-}
+}: Props) => (
+  <React.Fragment>
+    <span className="title">{title}</span>
+    <iframe src={url} />
+  </React.Fragment>
+)
+export default UrlWidget
