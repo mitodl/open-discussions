@@ -11,6 +11,7 @@ import { makePostResult, makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
+import { shouldIf } from "../lib/test_utils"
 
 describe("SearchPage", () => {
   let helper,
@@ -136,6 +137,16 @@ describe("SearchPage", () => {
     })
     // from is 5, plus 5 is 10 which is == numHits so no more results
     assert.isFalse(inner.find("InfiniteScroll").prop("hasMore"))
+  })
+  ;[0, 5].forEach(from => {
+    it(`InfiniteScroll initialLoad ${shouldIf(
+      from > 0
+    )} be false when from is ${from}`, async () => {
+      const { inner } = await renderPage()
+      inner.setState({ from })
+      const infiniteScroll = inner.find("InfiniteScroll")
+      assert.equal(infiniteScroll.prop("initialLoad"), from === 0)
+    })
   })
   ;[true, false].forEach(hasChannel => {
     it(`${hasChannel ? "loads" : "doesn't load"} a channel`, async () => {
