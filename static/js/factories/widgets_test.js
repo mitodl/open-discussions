@@ -13,7 +13,6 @@ describe("widget factories", () => {
     assert.isNumber(instance.id)
     assert.isString(instance.title)
     assert.isString(instance.widget_type)
-    assert.isString(instance.react_renderer)
     assert.isObject(instance.configuration)
   })
 

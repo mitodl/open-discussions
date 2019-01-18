@@ -8,8 +8,7 @@ export type WidgetInstancePatchable = {
 }
 
 export type WidgetInstance = WidgetInstancePatchable & {
-  react_renderer: string,
-  html: string|null,
+  json: any,
 }
 
 export type WidgetFieldSpec = {
@@ -35,4 +34,16 @@ export type WidgetDialogData = {
   state: string,
   instance: WidgetInstancePatchable,
   validation: Object
+}
+
+export type RSSWidgetEntry = {
+  title: string,
+  description: string,
+  link: string,
+  timestamp: string,
+}
+
+export type RSSWidgetJson = {
+  title: string,
+  entries: Array<RSSWidgetEntry>
 }

@@ -219,9 +219,8 @@ describe("WidgetListContainer", () => {
         const updateId = updatedWidgetList[0].id
         const replaceInstance = {
           ...makeWidgetInstance(),
-          id:             updateId,
-          react_renderer: undefined,
-          html:           ""
+          id:   updateId,
+          json: null
         }
         const list = updatedWidgetList.map(
           item => (item.id === updateId ? replaceInstance : item)
@@ -264,8 +263,7 @@ describe("WidgetListContainer", () => {
             value:   updatedWidgetList.concat([
               {
                 ...data.instance,
-                react_renderer: undefined,
-                html:           ""
+                json: null
               }
             ])
           }

@@ -12,7 +12,7 @@ type Props = {
 }
 
 const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
-  const valueOrDefault = R.defaultTo(fieldSpec.props.default, value)
+  const valueOrDefault = R.defaultTo(fieldSpec.props.default || "", value)
   switch (fieldSpec.input_type) {
   case "markdown_wysiwyg":
     return (

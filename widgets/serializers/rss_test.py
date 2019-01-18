@@ -16,8 +16,9 @@ def test_url_widget_serialize(mocker, timestamp_key, item_count, display_limit):
     entries = [
         {
             "title": f"Title {idx}",
+            "description": f"Description {idx}",
             "link": f"http://example.com/{idx}",
-            (timestamp_key): time.gmtime(),
+            timestamp_key: time.gmtime(),
         }
         for idx in range(item_count)
     ]
@@ -32,29 +33,23 @@ def test_url_widget_serialize(mocker, timestamp_key, item_count, display_limit):
 
     mock_parse.assert_called_once_with(widget_instance.configuration["url"])
 
-    # we'll check the hmtl differently than a direct equality check
-    html = data.pop("html")
     assert data == {
         "id": widget_instance.id,
         "widget_type": "RSS Feed",
         "title": widget_instance.title,
         "configuration": widget_instance.configuration,
-        "react_renderer": "default",
+        "json": {
+            "title": widget_instance.title,
+            "entries": [
+                {
+                    "title": entry["title"],
+                    "description": entry["description"],
+                    "link": entry["link"],
+                    "timestamp": time.strftime(
+                        "%Y-%m-%dT%H:%M:%SZ", entry[timestamp_key]
+                    ),
+                }
+                for entry in entries[: min(rss.MAX_FEED_ITEMS, display_limit)]
+            ],
+        },
     }
-
-    if item_count == 0:
-        assert (
-            html
-            == "<p>No RSS entries found. You may have selected an invalid RSS url.</p>"
-        )
-    else:
-        lines = html.splitlines()
-        assert len(lines) == min(len(entries), min(display_limit, rss.MAX_FEED_ITEMS))
-        assert lines == [
-            '<p><a href="{}">{} | {}<a><p>'.format(
-                entry["link"],
-                time.strftime(rss.TIMESTAMP_FORMAT, entry[timestamp_key]),
-                entry["title"],
-            )
-            for entry in entries[: len(lines)]
-        ]

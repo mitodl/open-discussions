@@ -21,7 +21,6 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "default": "",
             }
         ],
-        "react_renderer": "markdown",
         "widget_type": "Markdown",
         "description": "Rich Text",
     },
@@ -40,7 +39,6 @@ EXPECTED_AVAILABLE_WIDGETS = [
             }
         ],
         "widget_type": "URL",
-        "react_renderer": "default",
         "description": "Embedded URL",
     },
     {
@@ -64,7 +62,6 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "default": 3,
             },
         ],
-        "react_renderer": "default",
         "widget_type": "RSS Feed",
         "description": "RSS Feed",
     },
@@ -117,8 +114,7 @@ def test_widget_list_add_widget(widget_list, user_client):
                 "widget_type": "Markdown",
                 "title": "Welcome",
                 "configuration": {"source": "# Markdown content"},
-                "react_renderer": "markdown",
-                "html": None,
+                "json": None,
             }
         ],
         "available_widgets": EXPECTED_AVAILABLE_WIDGETS,
@@ -138,7 +134,7 @@ def test_widget_list_update_widget(widget_list, user_client):
                     "widget_type": "Markdown",
                     "title": "Welcome",
                     "configuration": {"source": "# Markdown content"},
-                    "html": None,
+                    "json": None,
                 }
             ]
         },
@@ -153,8 +149,7 @@ def test_widget_list_update_widget(widget_list, user_client):
                 "widget_type": "Markdown",
                 "title": "Welcome",
                 "configuration": {"source": "# Markdown content"},
-                "react_renderer": "markdown",
-                "html": None,
+                "json": None,
             }
         ],
         "available_widgets": EXPECTED_AVAILABLE_WIDGETS,
@@ -173,14 +168,14 @@ def test_widget_list_add_update_and_reorder_widgets(widget_list, user_client):
                     "widget_type": "Markdown",
                     "title": "Welcome 2",
                     "configuration": {"source": "# Markdown content 2"},
-                    "html": None,
+                    "json": None,
                 },
                 {
                     "id": widget_instance.id,
                     "widget_type": "Markdown",
                     "title": "Welcome",
                     "configuration": {"source": "# Markdown content"},
-                    "html": None,
+                    "json": None,
                 },
             ]
         },
@@ -195,16 +190,14 @@ def test_widget_list_add_update_and_reorder_widgets(widget_list, user_client):
                 "widget_type": "Markdown",
                 "title": "Welcome 2",
                 "configuration": {"source": "# Markdown content 2"},
-                "react_renderer": "markdown",
-                "html": None,
+                "json": None,
             },
             {
                 "id": widget_instance.id,
                 "widget_type": "Markdown",
                 "title": "Welcome",
                 "configuration": {"source": "# Markdown content"},
-                "react_renderer": "markdown",
-                "html": None,
+                "json": None,
             },
         ],
         "available_widgets": EXPECTED_AVAILABLE_WIDGETS,

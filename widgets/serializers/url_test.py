@@ -15,8 +15,5 @@ def test_url_widget_serialize():
         "widget_type": "URL",
         "title": widget_instance.title,
         "configuration": widget_instance.configuration,
-        "react_renderer": "default",
-        "html": '<iframe src="{}"></iframe>'.format(
-            widget_instance.configuration["url"]
-        ),
+        "json": None,
     }

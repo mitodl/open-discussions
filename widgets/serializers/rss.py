@@ -1,7 +1,6 @@
 """RSS widget"""
 import time
 
-from django.utils.html import format_html
 import feedparser
 
 from widgets.serializers.widget_instance import (
@@ -10,8 +9,9 @@ from widgets.serializers.widget_instance import (
 )
 from widgets.serializers.react_fields import ReactURLField, ReactIntegerField
 
+
+ISOFORMAT = "%Y-%m-%dT%H:%M:%SZ"
 MAX_FEED_ITEMS = 12
-TIMESTAMP_FORMAT = "%m/%d %I:%M%p"
 
 
 class RssFeedWidgetConfigSerializer(WidgetConfigSerializer):
@@ -31,33 +31,35 @@ class RssFeedWidgetSerializer(WidgetInstanceSerializer):
     name = "RSS Feed"
     description = "RSS Feed"
 
-    def get_html(self, instance):
+    def get_json(self, instance):
         """Renders the widget to html based on configuration"""
-        feed = feedparser.parse(instance.configuration["url"]).entries
-        if not feed:
-            return (
-                "<p>No RSS entries found. You may have selected an invalid RSS url.</p>"
-            )
+        rss = feedparser.parse(instance.configuration["url"])
+        if not rss:
+            return {"title": "RSS", "entries": []}
+
         timestamp_key = (
-            "published_parsed" if "published_parsed" in feed[0] else "updated_parsed"
+            "published_parsed"
+            if rss.entries and "published_parsed" in rss.entries[0]
+            else "updated_parsed"
         )
-        sorted_feed = sorted(feed, reverse=True, key=lambda entry: entry[timestamp_key])
+        sorted_feed = sorted(
+            rss.entries, reverse=True, key=lambda entry: entry[timestamp_key]
+        )
         display_limit = min(
             instance.configuration["feed_display_limit"], MAX_FEED_ITEMS
         )
-        formatted_items = []
-        for entry in sorted_feed[:display_limit]:
-            entry_title = entry.get("title", None)
-            entry_link = entry.get("link", None)
-            entry_timestamp = entry.get(timestamp_key, None)
-            if entry_timestamp:
-                entry_timestamp = time.strftime(TIMESTAMP_FORMAT, entry_timestamp)
-            formatted_items.append(
-                format_html(
-                    '<p><a href="{entry_link}">{entry_timestamp} | {entry_title}<a><p>',
-                    entry_link=entry_link,
-                    entry_timestamp=entry_timestamp,
-                    entry_title=entry_title,
-                )
-            )
-        return "\n".join(formatted_items)
+
+        return {
+            "title": instance.title,
+            "entries": [
+                {
+                    "title": entry.get("title"),
+                    "description": entry.get("description"),
+                    "link": entry.get("link"),
+                    "timestamp": time.strftime(ISOFORMAT, entry.get(timestamp_key))
+                    if entry.get(timestamp_key)
+                    else None,
+                }
+                for entry in sorted_feed[:display_limit]
+            ],
+        }

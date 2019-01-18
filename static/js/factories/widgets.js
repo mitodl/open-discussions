@@ -9,23 +9,21 @@ import type {
   WidgetFieldSpec,
   WidgetInstance,
   WidgetListResponse,
-  WidgetSpec
+  WidgetSpec,
+  RSSWidgetJson
 } from "../flow/widgetTypes"
 
-export const validWidgetTypes = ["Markdown", "URL", "Text", "RSS Feed"]
 export const validFieldSpecTypes = ["text", "textarea", "number"]
 
 const instanceIncr = incrementer()
 const listIncr = incrementer()
 
-export const makeWidgetConfiguration = (widgetName: string): Object => {
-  switch (widgetName) {
+export const makeWidgetConfiguration = (widgetType: string): Object => {
+  switch (widgetType) {
   case "Markdown":
     return { source: `**${casual.word}**` }
   case "URL":
     return { url: casual.url }
-  case "Text":
-    return { body: casual.sentence }
   case "RSS Feed":
     return {
       url:                casual.url,
@@ -36,26 +34,41 @@ export const makeWidgetConfiguration = (widgetName: string): Object => {
   }
 }
 
+export const makeWidgetJson = (widgetType: string): ?Object => {
+  switch (widgetType) {
+  case "Markdown":
+    return null
+  case "URL":
+    return null
+  case "RSS Feed":
+    return ({
+      title:   casual.title,
+      entries: R.range(1, casual.integer(1, 8)).map(() => ({
+        title:       casual.title,
+        description: casual.description,
+        link:        casual.url,
+        timestamp:   casual.moment
+      }))
+    }: RSSWidgetJson)
+  default:
+    return {}
+  }
+}
+
 export const makeWidgetInstance = (
-  rendererName: ?string = null,
   widgetType: ?string = null
 ): WidgetInstance => {
-  if (!rendererName) {
-    rendererName = casual.random_element(Object.keys(validWidgetRenderers))
-  }
-
   if (!widgetType) {
-    widgetType = casual.random_element(validWidgetTypes)
+    widgetType = casual.random_element(Object.keys(validWidgetRenderers))
   }
 
   return {
     // $FlowFixMe
-    id:             instanceIncr.next().value,
-    widget_type:    widgetType,
-    react_renderer: rendererName,
-    title:          casual.sentence,
-    html:           casual.boolean ? `<b>${casual.words}</b>` : null,
-    configuration:  makeWidgetConfiguration(rendererName)
+    id:            instanceIncr.next().value,
+    widget_type:   widgetType,
+    title:         casual.sentence,
+    json:          makeWidgetJson(widgetType),
+    configuration: makeWidgetConfiguration(widgetType)
   }
 }
 
@@ -99,7 +112,7 @@ export const makeFieldSpec = (
 
 export const makeWidgetSpec = (widgetType: ?string = null): WidgetSpec => {
   if (!widgetType) {
-    widgetType = casual.random_element(validWidgetTypes)
+    widgetType = casual.random_element(Object.keys(validWidgetRenderers))
   }
 
   return {
@@ -112,7 +125,7 @@ export const makeWidgetListResponse = (): WidgetListResponse => ({
   // $FlowFixMe
   id:                listIncr.next().value,
   widgets:           R.range(1, 3).map(() => makeWidgetInstance()),
-  available_widgets: validWidgetTypes.map(widgetType =>
+  available_widgets: Object.keys(validWidgetRenderers).map(widgetType =>
     makeWidgetSpec(widgetType)
   )
 })

@@ -1,6 +1,4 @@
 """URL widget"""
-from django.utils.html import format_html
-
 from widgets.serializers.widget_instance import (
     WidgetConfigSerializer,
     WidgetInstanceSerializer,
@@ -21,9 +19,3 @@ class URLWidgetSerializer(WidgetInstanceSerializer):
 
     name = "URL"
     description = "Embedded URL"
-
-    def get_html(self, instance):
-        """Renders the widget to html based on configuration"""
-        return format_html(
-            '<iframe src="{url}"></iframe>', url=instance.configuration["url"]
-        )

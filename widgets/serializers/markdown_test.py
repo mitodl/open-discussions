@@ -6,7 +6,7 @@ from widgets.serializers.markdown import MarkdownWidgetSerializer
 
 
 @pytest.mark.django_db
-def test_markdownl_widget_serialize():
+def test_markdown_widget_serialize():
     """Tests that the markdown widget serializes correctly"""
     widget_instance = WidgetInstanceFactory.create(type_markdown=True)
 
@@ -15,6 +15,5 @@ def test_markdownl_widget_serialize():
         "widget_type": "Markdown",
         "title": widget_instance.title,
         "configuration": widget_instance.configuration,
-        "react_renderer": "markdown",
-        "html": None,
+        "json": None,
     }

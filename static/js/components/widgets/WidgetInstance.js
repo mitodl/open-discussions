@@ -2,7 +2,6 @@
 import React from "react"
 import { SortableElement, SortableHandle } from "react-sortable-hoc"
 
-import DefaultWidget from "./DefaultWidget"
 import Card from "../Card"
 
 import { validWidgetRenderers } from "../../lib/widgets"
@@ -23,8 +22,7 @@ const DragHandle = SortableHandle(() => (
 
 const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElement(
   ({ widgetInstance, editing, deleteInstance, startEditInstance }: Props) => {
-    const WidgetClass =
-      validWidgetRenderers[widgetInstance.react_renderer] || DefaultWidget
+    const WidgetClass = validWidgetRenderers[widgetInstance.widget_type]
     return (
       <Card className="widget">
         <WidgetClass widgetInstance={widgetInstance} />
