@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.62.3
+--------------
+
+- Refactor widgets, restyle RSS widget (#1730)
+- Fix search loading height issue (#1738)
+- Updated post summary card styling
+- fix issue with post delete dialog staying open
+- fix dropdown menu click targets
+- loading width fix for search pages (#1734)
+- Refactor a few class-based components to be stateless components
+- some adjustments to the cover image and post creation UI
+
 Version 0.62.2 (Released January 18, 2019)
 --------------
 
