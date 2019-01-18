@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.62.2
+Version 0.62.2 (Released January 18, 2019)
 --------------
 
 - use post_type to show UI specific to different post types
