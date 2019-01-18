@@ -22,10 +22,8 @@ def test_url_widget_serialize(mocker, timestamp_key, item_count, display_limit):
         }
         for idx in range(item_count)
     ]
-    feed_title = "feed title"
     mock_parse = mocker.patch(
-        "feedparser.parse",
-        return_value=mocker.Mock(feed=mocker.Mock(title=feed_title), entries=entries),
+        "feedparser.parse", return_value=mocker.Mock(entries=entries)
     )
     widget_instance = WidgetInstanceFactory.create(type_rss=True)
     widget_instance.configuration["feed_display_limit"] = display_limit
@@ -41,7 +39,7 @@ def test_url_widget_serialize(mocker, timestamp_key, item_count, display_limit):
         "title": widget_instance.title,
         "configuration": widget_instance.configuration,
         "json": {
-            "title": feed_title,
+            "title": widget_instance.title,
             "entries": [
                 {
                     "title": entry["title"],

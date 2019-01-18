@@ -50,7 +50,7 @@ class RssFeedWidgetSerializer(WidgetInstanceSerializer):
         )
 
         return {
-            "title": rss.feed.title,
+            "title": instance.title,
             "entries": [
                 {
                     "title": entry.get("title"),
