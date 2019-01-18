@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.62.2 (Released January 18, 2019)
+--------------
+
+- use post_type to show UI specific to different post types
+- make post pinning work again
+- update prosemirror-markdown to latest version
+- Fix flaky test (#1725)
+- Added posts and comments feed to the profile page
+- Fix widget stories (#1716)
+- Move cancel/done widget buttons into channel header navbar (#1692)
+- Added truncated post content preview to post summary card
+
 Version 0.62.1 (Released January 16, 2019)
 --------------
 
