@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.62.3
+Version 0.62.3 (Released January 22, 2019)
 --------------
 
 - Refactor widgets, restyle RSS widget (#1730)
