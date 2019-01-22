@@ -11,9 +11,9 @@ beautifulsoup4==4.6.0
 betamax-serializers==0.2.0
 betamax==0.8.0
 billiard==3.5.0.2         # via celery
-boto3==1.9.83             # via ocw-data-parser
+boto3==1.9.76             # via ocw-data-parser
 boto==2.39.0
-botocore==1.12.83         # via boto3, s3transfer
+botocore==1.12.76         # via boto3, s3transfer
 cairocffi==0.8.1          # via cairosvg
 cairosvg==2.1.3
 celery==4.2.0
