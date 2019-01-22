@@ -10,14 +10,16 @@ import ArticleEditor from "./ArticleEditor"
 
 import { wait } from "../lib/util"
 import { getCKEditorJWT } from "../lib/api/ckeditor"
+import * as embedUtil from "../lib/embed"
 
 describe("ArticleEditor", () => {
-  let sandbox, fetchStub
+  let sandbox, fetchStub, embedlyPlatformStub
 
   beforeEach(() => {
     SETTINGS.ckeditor_upload_url = "/upload/token"
     sandbox = sinon.createSandbox()
     fetchStub = sandbox.stub(fetchFuncs, "fetchWithCSRF")
+    embedlyPlatformStub = sandbox.stub(embedUtil, "loadEmbedlyPlatform")
   })
 
   afterEach(() => {
@@ -33,6 +35,11 @@ describe("ArticleEditor", () => {
       uploadUrl: SETTINGS.ckeditor_upload_url,
       tokenUrl:  getCKEditorJWT
     })
+  })
+
+  it("should load the embedly platform", () => {
+    mount(<ArticleEditor initialData={[]} />)
+    sinon.assert.called(embedlyPlatformStub)
   })
 
   it("should set the readOnly property, if passed", async () => {

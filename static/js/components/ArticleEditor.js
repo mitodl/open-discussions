@@ -1,9 +1,11 @@
 /* global SETTINGS: false */
 // @flow
 import React from "react"
+import ReactDOMServer from "react-dom/server"
 import CustomEditor from "@mitodl/ckeditor-custom-build"
 
 import { getCKEditorJWT } from "../lib/api/ckeditor"
+import { loadEmbedlyPlatform } from "../lib/embed"
 
 type Props = {
   initialData?: Array<Object>,
@@ -21,11 +23,38 @@ export default class ArticleEditor extends React.Component<Props> {
   initializeEditor = async (node: any) => {
     const { initialData, onChange, readOnly } = this.props
 
+    loadEmbedlyPlatform()
+
     this.node = node
 
     try {
       const editor = await CustomEditor.create(initialData || [], {
-        mediaEmbed:    { previewsInData: true },
+        mediaEmbed: {
+          previewsInData: true,
+          providers:      [
+            {
+              name: "embedly",
+              url:  /.+/,
+              html: match => {
+                const url = match[0]
+
+                // we'll render this to a string because CKEditor
+                // doesn't support any other return value for this function.
+                // the embed.ly platform JS finds elements with the .embedly-card
+                // class and turns them into embed cards
+                return ReactDOMServer.renderToStaticMarkup(
+                  <a
+                    data-card-chrome="0"
+                    data-card-controls="0"
+                    data-card-key={SETTINGS.embedlyKey}
+                    href={url}
+                    className="embedly-card"
+                  />
+                )
+              }
+            }
+          ]
+        },
         cloudServices: {
           uploadUrl: SETTINGS.ckeditor_upload_url,
           tokenUrl:  getCKEditorJWT

@@ -35,3 +35,25 @@ export const hasIframe = R.memoizeWith(R.identity, (html: string) => {
   div.innerHTML = html
   return !!div.querySelector("iframe")
 })
+
+export const loadEmbedlyPlatform = () => {
+  const id = "embedly-platform"
+
+  if (!document.getElementById(id)) {
+    window.embedly =
+      window.embedly ||
+      function() {
+        (window.embedly.q = window.embedly.q || []).push(arguments)
+      }
+    const el = document.createElement("script")
+    el.id = id
+    // $FlowFixMe
+    el.async = 1
+    el.src = `${
+      "https:" === document.location.protocol ? "https" : "http"
+    }://cdn.embedly.com/widgets/platform.js`
+    const script = document.getElementsByTagName("script")[0]
+    // $FlowFixMe
+    script.parentNode.insertBefore(el, script)
+  }
+}
