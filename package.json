@@ -16,7 +16,7 @@
     "@babel/plugin-transform-react-jsx": "^7.0.0",
     "@babel/plugin-transform-runtime": "^7.0.0",
     "@babel/polyfill": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-env": "^7.3.1",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.0.0",
@@ -34,7 +34,7 @@
     "@mitodl/ckeditor-custom-build": "0.0.4",
     "@mitodl/mdl-react-components": "^0.0.3",
     "@trust/webcrypto": "^0.9.2",
-    "autoprefixer": "^8.6.4",
+    "autoprefixer": "^9.4.6",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.0",
     "babel-plugin-istanbul": "^4.1.6",
@@ -44,7 +44,7 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "codecov": "^3.0.2",
-    "css-loader": "^0.28.11",
+    "css-loader": "^2.1.0",
     "detect-browser": "^2.5.1",
     "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "^1.6.0",
@@ -156,8 +156,8 @@
     "storybook": "start-storybook -s . -p 9001 -c static/js/storybook"
   },
   "devDependencies": {
-    "@storybook/addon-actions": "^3.4.11",
-    "@storybook/addon-knobs": "^3.4.11",
-    "@storybook/react": "4.0.0-alpha.16"
+    "@storybook/addon-actions": "^4.1.7",
+    "@storybook/addon-knobs": "^4.1.7",
+    "@storybook/react": "^4.1.7"
   }
 }
