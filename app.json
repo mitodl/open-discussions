@@ -103,6 +103,24 @@
     "MAILGUN_SENDER_DOMAIN": {
       "description": "Domain used for emails sent via mailgun"
     },
+    "OCW_CONTENT_BUCKET_NAME": {
+      "description": "Name of S3 bucket containing OCW course data"
+    },
+    "OCW_CONTENT_ACCESS_KEY": {
+      "description": "AWS access key for OCW content bucket"
+    },
+    "OCW_CONTENT_SECRET_ACCESS_KEY": {
+      "description": "AWS secret key for OCW content bucket"
+    },
+    "OCW_LEARNING_COURSE_BUCKET_NAME": {
+      "description": "Name of S3 bucket to upload OCW course media"
+    },
+    "OCW_LEARNING_COURSE_ACCESS_KEY": {
+      "description": "AWS access key for OCW media upload bucket"
+    },
+    "OCW_LEARNING_COURSE_SECRET_ACCESS_KEY": {
+      "description": "AWS secret key for OCW media upload bucket"
+    },
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
     },
