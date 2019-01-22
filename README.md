@@ -14,7 +14,7 @@ Open Discussions follows the same [initial setup steps outlined in the common OD
 Run through those steps **including the addition of `/etc/hosts` aliases and the optional step for running the
 `createsuperuser` command**.
 
-After going through those steps in the common web app guide, run through these additional steps: 
+After going through those steps in the common web app guide, run through these additional steps:
 
 ### Set up a reddit instance
 
@@ -47,23 +47,23 @@ The key value printed above will be used as a value in `.env` settings.
 
 ### Configure required `.env` settings
 
-The following settings must be configured before running the app: 
+The following settings must be configured before running the app:
 
 - `OPEN_DISCUSSIONS_DEFAULT_SITE_KEY`
-    
+
     Set this to `micromasters` (see authenticated site code block above)
-    
+
 - `INDEXING_API_USERNAME`
-    
+
     At least to start out, this should be set to the username of the superuser
     you created above.
 
 - `MAILGUN_KEY` and `MAILGUN_SENDER_DOMAIN`
-    
+
     You can set these values to any non-empty string value if email-sending functionality
-    is not needed. It's recommended that you eventually configure the site to be able 
+    is not needed. It's recommended that you eventually configure the site to be able
     to send emails. Those configuration steps can be found [below](#enabling-email).
-    
+
 ### Run the app and create a new user via the signup flow
 
 The steps for running Open Discussions are outlined in the [common ODL web app guide for running and accessing the app](https://github.com/mitodl/handbook/blob/master/common-web-app-guide.md#running-and-accessing-the-app).
@@ -76,7 +76,7 @@ email to verify your address.
 
 The app UI is not currently usable until a channel exists and the logged-in user has a post associated with the channel.
 The following block will create two channels (one public, one private) and a post in each, and
-it will set your user as a moderator in these new channels. 
+it will set your user as a moderator in these new channels.
 
 Run this in a Django shell (change the channel names as needed):
 ```python
@@ -108,13 +108,13 @@ api = Api(user)
 for channel_tuple in [PUBLIC_CHANNEL, PRIVATE_CHANNEL]:
     # Create channel and post
     channel_req_data = dict(
-      name=channel_tuple[0], 
-      title=channel_tuple[1], 
-      channel_type=channel_tuple[2], 
+      name=channel_tuple[0],
+      title=channel_tuple[1],
+      channel_type=channel_tuple[2],
     )
     channel_resp = client.post(
-      reverse(CHANNEL_URL_NAME), 
-      data=json.dumps(channel_req_data), 
+      reverse(CHANNEL_URL_NAME),
+      data=json.dumps(channel_req_data),
       content_type='application/json'
     )
     if channel_resp.status_code == 409:
@@ -127,7 +127,7 @@ for channel_tuple in [PUBLIC_CHANNEL, PRIVATE_CHANNEL]:
     elif not status.is_success(channel_resp.status_code):
       raise Exception('Failed to create channel - [%s] %s' % (
         channel_resp.status_code, channel_resp.content
-      )) 
+      ))
     post_url = reverse(
       POST_URL_NAME,
       kwargs={'channel_name': channel_tuple[0]}
@@ -146,13 +146,13 @@ for channel_tuple in [PUBLIC_CHANNEL, PRIVATE_CHANNEL]:
 # Running and Accessing the App
 
 Open Discussions follows the same steps outlined in the [common ODL web app guide for running and accessing the app](https://github.com/mitodl/handbook/blob/master/common-web-app-guide.md#running-and-accessing-the-app).
-A reddit instance at the URL indicated by `OPEN_DISCUSSIONS_REDDIT_URL` will need to be running for the app 
+A reddit instance at the URL indicated by `OPEN_DISCUSSIONS_REDDIT_URL` will need to be running for the app
 to work properly.
 
 
 # Testing and Formatting
 
-[The commands outlined in the common ODL web app guide](https://github.com/mitodl/handbook/blob/master/common-web-app-guide.md#testing-and-formatting) 
+[The commands outlined in the common ODL web app guide](https://github.com/mitodl/handbook/blob/master/common-web-app-guide.md#testing-and-formatting)
 are all relevant to Open Discussions.
 
 The following commands are also available:
@@ -160,6 +160,8 @@ The following commands are also available:
 ```
 # Format python code
 docker-compose run --rm web black .
+# Run storybook locally
+docker-compose run -p 9001:9001 watch npm run storybook
 ```
 
 
@@ -171,9 +173,9 @@ for running Open Discussions
 ### Enabling email
 
 The app is usable without email-sending capability, but there is a lot of app functionality
-that depends on it. The following variables will need to be set in your `.env` file - 
+that depends on it. The following variables will need to be set in your `.env` file -
 please reach out to a fellow developer or devops for the correct values.
-  
+
 ```
 MAILGUN_SENDER_DOMAIN
 MAILGUN_URL
@@ -186,7 +188,7 @@ any emails sent from the app will be delivered to you.
 ### Integration with MicroMasters
 
 The following steps assume that you've added `/etc/hosts` aliases for MicroMasters
-and Open Discussions, and that those aliases are `mm.odl.local` and `od.odl.local` 
+and Open Discussions, and that those aliases are `mm.odl.local` and `od.odl.local`
 respectively.
 
 The following variables should be set in your Open Discussions `.env` file:
@@ -200,7 +202,7 @@ MICROMASTERS_BASE_URL=http://mm.odl.local:8079/
 MICROMASTERS_BASE_URL=http://docker.for.mac.localhost:8079/   
 ```
 
-The following variables and their values should copied directly from this `.env` file 
+The following variables and their values should copied directly from this `.env` file
 to the MicroMasters .env file:
 
 ```
