@@ -91,6 +91,7 @@ INSTALLED_APPS = (
     "notifications",
     "search",
     "widgets",
+    "course_catalog",
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -721,3 +722,9 @@ ANONYMOUS_USER_NAME = None
 # Algolia Places API
 ALGOLIA_APP_ID = get_string("ALGOLIA_APP_ID", None)
 ALGOLIA_API_KEY = get_string("ALGOLIA_API_KEY", None)
+
+
+# EdX API
+EDX_API_URL = get_string("EDX_API_URL", None)
+EDX_API_CLIENT_ID = get_string("EDX_API_CLIENT_ID", None)
+EDX_API_CLIENT_SECRET = get_string("EDX_API_CLIENT_SECRET", None)
