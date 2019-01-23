@@ -2,6 +2,7 @@
 import { assert } from "chai"
 import sinon from "sinon"
 import { arrayMove } from "react-sortable-hoc"
+import casual from "casual-browserify"
 
 import WidgetListContainer, {
   WidgetListContainer as InnerWidgetListContainer
@@ -17,7 +18,7 @@ import {
   makeWidgetListResponse
 } from "../../factories/widgets"
 import IntegrationTestHelper from "../../util/integration_test_helper"
-import { WIDGET_FORM_KEY } from "../../lib/widgets"
+import { getWidgetKey, WIDGET_FORM_KEY } from "../../lib/widgets"
 import * as widgetFuncs from "../../lib/widgets"
 import { FORM_END_EDIT, FORM_UPDATE } from "../../actions/forms"
 import {
@@ -27,6 +28,7 @@ import {
   SHOW_DIALOG
 } from "../../actions/ui"
 import type { WidgetDialogData } from "../../flow/widgetTypes"
+import { shouldIf } from "../../lib/test_utils"
 
 describe("WidgetListContainer", () => {
   let helper,
@@ -34,12 +36,19 @@ describe("WidgetListContainer", () => {
     render,
     initialState,
     initialProps,
-    updatedWidgetList
+    updatedWidgetList,
+    updatedExpanded
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     listResponse = makeWidgetListResponse()
     updatedWidgetList = makeWidgetListResponse().widgets
+    updatedExpanded = {}
+    updatedWidgetList.forEach((instance, i) => {
+      if (i % 2 === 0) {
+        updatedExpanded[getWidgetKey(instance)] = casual.boolean
+      }
+    })
     helper.getWidgetListStub.returns(Promise.resolve(listResponse))
     initialState = {
       widgets: {
@@ -48,7 +57,10 @@ describe("WidgetListContainer", () => {
       },
       forms: {
         [WIDGET_FORM_KEY]: {
-          value: updatedWidgetList
+          value: {
+            instances: updatedWidgetList,
+            expanded:  updatedExpanded
+          }
         }
       },
       ui: {
@@ -85,13 +97,22 @@ describe("WidgetListContainer", () => {
       assert.isTrue(inner.find("Loading").exists())
       sinon.assert.calledWith(helper.getWidgetListStub, listResponse.id)
     })
-    ;[true, false].forEach(hasForm => {
-      it(`renders a WidgetList ${
-        hasForm ? "with" : "without"
-      } a form`, async () => {
+    ;[
+      ["is present", { value: { instances: true } }, true],
+      ["is missing the instances", { value: { instances: null } }, false],
+      ["is missing the value", { value: null }, false],
+      ["doesn't exist", null, false]
+    ].forEach(([description, form, expected]) => {
+      it(`${shouldIf(
+        expected
+      )} use the widget instances in a form when the form ${description}`, async () => {
+        if (form && form.value && form.value.instances) {
+          // $FlowFixMe: workaround since this variable isn't defined at test definition time
+          form.value.instances = updatedWidgetList
+        }
         const { wrapper } = await render({
           forms: {
-            [WIDGET_FORM_KEY]: hasForm ? { some: "form" } : null
+            [WIDGET_FORM_KEY]: form
           }
         })
         const props = wrapper
@@ -100,9 +121,9 @@ describe("WidgetListContainer", () => {
           .props()
         assert.deepEqual(
           props.widgetInstances,
-          hasForm ? updatedWidgetList : listResponse.widgets
+          expected ? updatedWidgetList : listResponse.widgets
         )
-        assert.deepEqual(props.editing, hasForm)
+        assert.deepEqual(props.editing, !!form)
         assert.isTrue(props.useDragHandle)
         wrapper.find("WidgetListContainer").unmount()
       })
@@ -122,7 +143,9 @@ describe("WidgetListContainer", () => {
         type:    FORM_UPDATE,
         payload: {
           formKey: WIDGET_FORM_KEY,
-          value:   updated
+          value:   {
+            instances: updated
+          }
         }
       })
     })
@@ -152,7 +175,9 @@ describe("WidgetListContainer", () => {
         type:    FORM_UPDATE,
         payload: {
           formKey: WIDGET_FORM_KEY,
-          value:   updatedWidgetList.slice(1)
+          value:   {
+            instances: updatedWidgetList.slice(1)
+          }
         }
       })
     })
@@ -210,6 +235,61 @@ describe("WidgetListContainer", () => {
         }
       })
     })
+
+    describe("expand/collapse", () => {
+      [
+        ["is present", { value: { expanded: true } }, true],
+        ["is missing expanded", { value: { expanded: null } }, false],
+        ["is missing the value", { value: null }, false],
+        ["doesn't exist", null, false]
+      ].forEach(([description, form, expected]) => {
+        it(`${shouldIf(
+          expected
+        )} use expanded from the form when the form ${description}`, async () => {
+          if (form && form.value && form.value.expanded) {
+            // $FlowFixMe: workaround since this variable isn't defined at test definition time
+            form.value.expanded = updatedExpanded
+          }
+          const { wrapper } = await render({
+            forms: {
+              [WIDGET_FORM_KEY]: form
+            }
+          })
+          const props = wrapper
+            .dive()
+            .find("sortableList")
+            .props()
+          assert.deepEqual(props.expanded, expected ? updatedExpanded : {})
+          assert.deepEqual(props.editing, !!form)
+          assert.isTrue(props.useDragHandle)
+          wrapper.find("WidgetListContainer").unmount()
+        })
+      })
+
+      it("updates the list of expanded items", async () => {
+        const { wrapper, store } = await render()
+        const keys = ["key1", "key2", "key3"]
+        const value = "value"
+        wrapper
+          .dive()
+          .find("sortableList")
+          .prop("setExpanded")(keys, value)
+        const actions = store.getActions()
+        assert.deepEqual(actions[actions.length - 1], {
+          type:    FORM_UPDATE,
+          payload: {
+            formKey: WIDGET_FORM_KEY,
+            value:   {
+              expanded: {
+                key1: value,
+                key2: value,
+                key3: value
+              }
+            }
+          }
+        })
+      })
+    })
   })
 
   describe("WidgetEditDialog", () => {
@@ -239,7 +319,9 @@ describe("WidgetListContainer", () => {
           type:    FORM_UPDATE,
           payload: {
             formKey: WIDGET_FORM_KEY,
-            value:   list
+            value:   {
+              instances: list
+            }
           }
         })
       })
@@ -260,12 +342,14 @@ describe("WidgetListContainer", () => {
           type:    FORM_UPDATE,
           payload: {
             formKey: WIDGET_FORM_KEY,
-            value:   updatedWidgetList.concat([
-              {
-                ...data.instance,
-                json: null
-              }
-            ])
+            value:   {
+              instances: updatedWidgetList.concat([
+                {
+                  ...data.instance,
+                  json: null
+                }
+              ])
+            }
           }
         })
       })

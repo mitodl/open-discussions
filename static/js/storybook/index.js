@@ -7,6 +7,7 @@ import { MemoryRouter } from "react-router"
 import { Provider } from "react-redux"
 import { createStoreWithMiddleware } from "../store/configureStore"
 import casual from "casual-browserify"
+import { SortableContainer } from "react-sortable-hoc"
 
 import {
   editCommentKey,
@@ -29,6 +30,7 @@ import {
 import { CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC } from "../lib/channels"
 import { dropdownMenuFuncs } from "../lib/ui"
 import { commentPermalink } from "../lib/url"
+import { getWidgetKey } from "../lib/widgets"
 import { createCommentTree } from "../reducers/comments"
 import rootReducer from "../reducers"
 
@@ -51,7 +53,6 @@ import SearchResult from "../components/SearchResult"
 import SearchTextbox from "../components/SearchTextbox"
 import WidgetInstance from "../components/widgets/WidgetInstance"
 import WidgetList from "../components/widgets/WidgetList"
-import { SortableContainer } from "react-sortable-hoc"
 
 // delay import so fonts get applied first
 setTimeout(() => {
@@ -693,7 +694,12 @@ storiesOf("Widgets", module)
   })
   .add("list", () => {
     const editing = boolean("editing")
+    const allCollapsed = boolean("collapsed")
     const list = makeWidgetListResponse().widgets
+    const collapsed = {}
+    for (const widget of list) {
+      collapsed[getWidgetKey(widget)] = allCollapsed
+    }
 
     return (
       <StoryWrapper>
@@ -704,6 +710,8 @@ storiesOf("Widgets", module)
           deleteInstance={action("delete")}
           submitForm={action("submit")}
           widgetInstances={list}
+          collapsed={collapsed}
+          setCollapsed={action("collapse")}
           editing={editing}
         />
       </StoryWrapper>

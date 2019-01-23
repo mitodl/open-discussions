@@ -10,10 +10,12 @@ import type { StatelessFunctionalComponent } from "react"
 import type { WidgetInstance as WidgetInstanceType } from "../../flow/widgetTypes"
 
 type Props = {
+  expanded: boolean,
   deleteInstance: (widgetInstance: WidgetInstanceType) => void,
   startEditInstance: (widgetInstance: WidgetInstanceType) => void,
   widgetInstance: WidgetInstanceType,
-  editing: boolean
+  editing: boolean,
+  setExpanded: (newValue: boolean) => void
 }
 
 const DragHandle = SortableHandle(() => (
@@ -21,11 +23,29 @@ const DragHandle = SortableHandle(() => (
 ))
 
 const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElement(
-  ({ widgetInstance, editing, deleteInstance, startEditInstance }: Props) => {
+  ({
+    expanded,
+    widgetInstance,
+    editing,
+    deleteInstance,
+    setExpanded,
+    startEditInstance
+  }: Props) => {
     const WidgetClass = validWidgetRenderers[widgetInstance.widget_type]
     return (
       <Card className="widget">
-        <WidgetClass widgetInstance={widgetInstance} />
+        <div className="title-row">
+          <span className="title">{widgetInstance.title}</span>
+          {editing ? (
+            <span
+              className="toggle-collapse material-icons"
+              onClick={() => setExpanded(!expanded)}
+            >
+              {expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
+            </span>
+          ) : null}
+        </div>
+        {expanded ? <WidgetClass widgetInstance={widgetInstance} /> : null}
         {editing ? (
           <React.Fragment>
             <hr />

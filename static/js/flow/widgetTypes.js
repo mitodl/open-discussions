@@ -48,3 +48,12 @@ export type RSSWidgetJson = {
   title: string,
   entries: Array<RSSWidgetEntry>
 }
+
+export type WidgetForm = {
+  instances: Array<WidgetInstance>,
+  expanded: ?{[string]: boolean}
+}
+
+export type WidgetComponentProps = {
+  widgetInstance: WidgetInstance
+}

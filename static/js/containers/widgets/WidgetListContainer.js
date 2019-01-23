@@ -30,6 +30,7 @@ import type {
   WidgetInstance as WidgetInstanceType,
   WidgetListResponse,
   WidgetDialogData,
+  WidgetForm,
   WidgetSpec
 } from "../../flow/widgetTypes"
 import type { FormValue } from "../../flow/formTypes"
@@ -38,13 +39,14 @@ type Props = {
   clearForm: () => void,
   dialogData: ?WidgetDialogData,
   dialogOpen: boolean,
-  form: FormValue<Array<WidgetInstanceType>>,
+  form: FormValue<WidgetForm>,
   loaded: boolean,
   widgetListId: number,
   loadWidgets: () => Promise<WidgetListResponse>,
   setDialogData: (data: WidgetDialogData) => void,
   setDialogVisibility: (open: boolean) => void,
   updateWidgetInstances: (widgetInstances: Array<WidgetInstanceType>) => void,
+  updateExpanded: (keys: Array<string>, expanded: boolean) => void,
   specs: Array<WidgetSpec>,
   validation: Object,
   widgetInstances: Array<WidgetInstanceType>
@@ -94,12 +96,21 @@ export class WidgetListContainer extends React.Component<Props> {
     updateWidgetInstances(widgetInstances)
   }
 
-  getWidgetInstances = () => {
+  getWidgetInstances = (): Array<WidgetInstanceType> => {
     const { widgetInstances, form } = this.props
-    if (!form || !form.value) {
+    if (!form || !form.value || !form.value.instances) {
       return widgetInstances
     }
-    return form.value
+    return form.value.instances
+  }
+
+  getExpanded = (): { [string]: boolean } => {
+    const { form } = this.props
+    if (!form || !form.value || !form.value.expanded) {
+      // everything is collapsed by default
+      return {}
+    }
+    return form.value.expanded
   }
 
   startAddInstance = () => {
@@ -152,6 +163,7 @@ export class WidgetListContainer extends React.Component<Props> {
       loaded,
       setDialogData,
       setDialogVisibility,
+      updateExpanded,
       specs
     } = this.props
     if (!loaded) {
@@ -162,11 +174,13 @@ export class WidgetListContainer extends React.Component<Props> {
     return (
       <React.Fragment>
         <WidgetList
+          expanded={this.getExpanded()}
           editing={!!form}
           widgetInstances={this.getWidgetInstances()}
           onSortEnd={this.onSortEnd}
           clearForm={clearForm}
           deleteInstance={this.deleteInstance}
+          setExpanded={updateExpanded}
           startAddInstance={this.startAddInstance}
           startEditInstance={this.startEditInstance}
           useDragHandle={true}
@@ -207,11 +221,21 @@ const mapDispatchToProps = (dispatch: Dispatch<any>, ownProps) =>
         visibility
           ? showDialog(DIALOG_EDIT_WIDGET)
           : hideDialog(DIALOG_EDIT_WIDGET),
-      loadWidgets:           () => actions.widgets.get(ownProps.widgetListId),
-      updateWidgetInstances: (widgetInstances: Array<WidgetInstanceType>) =>
+      loadWidgets:    () => actions.widgets.get(ownProps.widgetListId),
+      updateExpanded: (keys: Array<string>, value: boolean) => {
+        const expanded = {}
+        for (const key of keys) {
+          expanded[key] = value
+        }
+        return actions.forms.formUpdate({
+          formKey: WIDGET_FORM_KEY,
+          value:   { expanded }
+        })
+      },
+      updateWidgetInstances: (instances: Array<WidgetInstanceType>) =>
         actions.forms.formUpdate({
           formKey: WIDGET_FORM_KEY,
-          value:   widgetInstances
+          value:   { instances }
         })
     },
     dispatch
