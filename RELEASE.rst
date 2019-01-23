@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.63.0 (Released January 23, 2019)
+--------------
+
+- Added storybook command to readme
+- Upgrade dependencies to fix browserslist warning (#1751)
+
 Version 0.62.3 (Released January 22, 2019)
 --------------
 
