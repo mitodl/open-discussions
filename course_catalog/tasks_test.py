@@ -1,16 +1,27 @@
 """
 Test tasks
 """
+from os import listdir
+from os.path import isfile, join
+
 from unittest.mock import patch, Mock
 
+import boto3
 import pytest
+from moto import mock_s3
 
 from course_catalog.models import Course, CoursePrice, CourseInstructor, CourseTopic
-from course_catalog.tasks import get_edx_data
-
+from course_catalog.tasks import get_edx_data, get_ocw_data
 
 pytestmark = pytest.mark.django_db
 
+TEST_JSON_PATH = (
+    "./test_json/PROD/9/9.15/Fall_2007/"
+    "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/0"
+)
+TEST_JSON_FILES = [
+    f for f in listdir(TEST_JSON_PATH) if isfile(join(TEST_JSON_PATH, f))
+]
 
 TEST_EDX_JSON = {
     "next": "",
@@ -292,6 +303,84 @@ def test_get_mitx_data_unexpected_error(settings):
                 settings.EDX_API_URL = "fake_url"
                 get_edx_data()
                 assert Course.objects.count() == 0
+
+
+@mock_s3
+def test_get_ocw_data(settings):
+    """
+    Test ocw sync task
+    """
+    setup_s3(settings)
+
+    # run ocw sync
+    get_ocw_data()
+    assert Course.objects.count() == 1
+    assert CoursePrice.objects.count() == 1
+    assert CourseInstructor.objects.count() == 1
+    assert CourseTopic.objects.count() == 3
+
+    get_ocw_data()
+    assert Course.objects.count() == 1
+    assert CoursePrice.objects.count() == 1
+    assert CourseInstructor.objects.count() == 1
+    assert CourseTopic.objects.count() == 3
+
+
+def setup_s3(settings):
+    """
+    Set up the fake s3 data
+    """
+    # Fake the settings
+    settings.OCW_CONTENT_ACCESS_KEY = "abc"
+    settings.OCW_CONTENT_SECRET_ACCESS_KEY = "abc"
+    settings.OCW_CONTENT_BUCKET_NAME = "test_bucket"
+
+    # Create our fake bucket
+    conn = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_CONTENT_ACCESS_KEY,
+        aws_secret_access_key=settings.OCW_CONTENT_SECRET_ACCESS_KEY,
+    )
+    conn.create_bucket(Bucket="test_bucket")
+
+    # Add data to the fake bucket
+    test_bucket = conn.Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
+    for file in TEST_JSON_FILES:
+        file_key = TEST_JSON_PATH.replace("./test_json/", "") + "/" + file
+        with open(TEST_JSON_PATH + "/" + file, "r") as f:
+            test_bucket.put_object(Key=file_key, Body=f.read())
+
+
+@mock_s3
+def test_get_ocw_data_error_parsing(settings, mocker):
+    """
+    Test that an error parsing ocw data is correctly logged
+    """
+    mocker.patch(
+        "course_catalog.tasks.OCWParser.setup_s3_uploading", side_effect=Exception
+    )
+    mock_logger = mocker.patch("course_catalog.tasks.log.exception")
+    setup_s3(settings)
+    get_ocw_data()
+    mock_logger.assert_called_once_with(
+        "Error encountered parsing OCW json for %s",
+        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
+    )
+
+
+@mock_s3
+def test_get_ocw_data_error_reading_s3(settings, mocker):
+    """
+    Test that an error reading from S3 is correctly logged
+    """
+    mocker.patch("course_catalog.tasks.get_s3_object_and_read", side_effect=Exception)
+    mock_logger = mocker.patch("course_catalog.tasks.log.exception")
+    setup_s3(settings)
+    get_ocw_data()
+    mock_logger.assert_called_once_with(
+        "Error encountered reading 1.json for %s",
+        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
+    )
 
 
 def cause_error():

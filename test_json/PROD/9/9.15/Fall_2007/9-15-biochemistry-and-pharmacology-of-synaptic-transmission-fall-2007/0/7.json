@@ -1,0 +1,208 @@
+{
+    "text": "<h2 class=\"subhead\">Undergraduate Paper Topic</h2> <p>Several of the proteins involved in neurotransmission have been shown to exist in two or more forms, as determined by which alleles for them a person happens to be carrying.</p> <p>These include, among others,</p> <ul> <li>SERT &mdash; the serotonin reuptake protein</li> <li>MAO &mdash; monoamine oxidases A and B</li> <li>COMT &mdash; catechol-O-methyl transferase</li> </ul> <p>Pick one of these proteins and write a paper describing the evidence that it does exist in two or more forms, the differential abilities between the two alleles in regards to function, and delineate any evidence that a person's susceptibility to a psychiatric or neuropsychiatric disease may depend on which allele he or she carries.</p> <p>Due in Ses #17.</p>", 
+    "_content_type_license": "text/plain", 
+    "_uid": "6db21c67600aa734e6d1b7f8b9963bb5", 
+    "title": "Assignments", 
+    "_ac_local_roles": {
+        "admin": [
+            "Owner"
+        ]
+    }, 
+    "location": "", 
+    "_content_type_course_identifier": "text/plain", 
+    "_atbrefs": {}, 
+    "constrainTypesMode": 0, 
+    "technical_location": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/assignments", 
+    "software_requirements": [
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "40.0", 
+            "software_name_col": "Chrome", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "8.0", 
+            "software_name_col": "Safari", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "38.0", 
+            "software_name_col": "Mozilla Firefox", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "9.0", 
+            "software_name_col": "Internet Explorer", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "13.1", 
+            "software_name_col": "Edge", 
+            "maximum_version_col": ""
+        }
+    ], 
+    "_content_type_technical_location": "text/plain", 
+    "_content_type_rights": "text/html", 
+    "_directly_provided": [
+        "Products.CMFEditions.interfaces.IVersioned"
+    ], 
+    "parent_uid": "16197636c270e1ab179fbc9a56c72787", 
+    "excludeFromNav": false, 
+    "_content_type_unique_identifier": "text/plain", 
+    "allowDiscussion": false, 
+    "metadata_contributor_list": [], 
+    "locallyAllowedTypes": [
+        "OCWImage", 
+        "CourseSection", 
+        "OCWExtFile", 
+        "OCWFile"
+    ], 
+    "_content_type_text": "text/html", 
+    "ad_type": "HOUSE", 
+    "creation_date": "2010/05/14 07:42:21.086 GMT-4", 
+    "aggregationlevel": 3, 
+    "duration": "", 
+    "immediatelyAddableTypes": [
+        "OCWImage", 
+        "CourseSection", 
+        "OCWExtFile", 
+        "OCWFile"
+    ], 
+    "subject": [], 
+    "_content_type_short_page_title": "text/plain", 
+    "effectiveDate": "None", 
+    "parent_module": "16197636c270e1ab179fbc9a56c72787", 
+    "is_mathml_document": false, 
+    "bottomtext": "", 
+    "short_page_title": "Assignments", 
+    "section_identifier": null, 
+    "related_mit_links": "", 
+    "_content_type_ad_type": "text/plain", 
+    "_layout": "custom_view", 
+    "_workflow_history": {
+        "page_workflow": [
+            {
+                "action": null, 
+                "review_state": "waiting_for_authoring", 
+                "comments": "", 
+                "actor": "admin", 
+                "time": "2010/05/14 07:42:21.091 GMT-4"
+            }, 
+            {
+                "action": "approve_to_staging", 
+                "review_state": "ready_for_staging", 
+                "actor": "admin", 
+                "comments": "", 
+                "time": "2010/05/16 11:30:40.347 GMT-4"
+            }
+        ]
+    }, 
+    "_classname": "CourseSection", 
+    "_content_type_materialtype": "text/plain", 
+    "_userdefined_roles": [], 
+    "publisher": "MIT OpenCourseWare", 
+    "nextPreviousEnabled": false, 
+    "language": "", 
+    "url_rewrite_patterns": [], 
+    "widgets_features": [], 
+    "category_features": [], 
+    "firstTimeEdit": true, 
+    "feature_requirements": [], 
+    "list_in_left_nav": false, 
+    "short_name_tlp": "Assignments", 
+    "expirationDate": "None", 
+    "_content_type_id": "text/plain", 
+    "contributor_list": [
+        {}
+    ], 
+    "is_media_gallery": false, 
+    "contributors": [], 
+    "_gopip": 5, 
+    "_content_type_title": "text/plain", 
+    "course_linking": [], 
+    "_atrefs": {
+        "BelongsTo": [
+            "16197636c270e1ab179fbc9a56c72787"
+        ]
+    }, 
+    "other_platform_requirements": "", 
+    "license": "http://creativecommons.org/licenses/by-nc-sa/3.0/us/", 
+    "rights": "This site (c) Massachusetts Institute of Technology 2010.  Content within individual courses is (c) by the individual authors unless otherwise noted. The Massachusetts Institute of Technology is providing this Work (as defined below) under the terms of this Creative Commons public license (\"CCPL\" or \"license\") unless otherwise noted. The Work is protected by copyright and/or other applicable law. Any use of the work other than as authorized under this license is prohibited. By exercising any of the rights to the Work provided here, You (as defined below) accept and agree to be bound by the terms of this license. The Licensor, the Massachusetts Institute of Technology, grants You the rights contained here in consideration of Your acceptance of such terms and conditions.", 
+    "hide_Page_title": null, 
+    "_defaultpage": "", 
+    "tcATmit_subject_tags": [], 
+    "features_tracking": [], 
+    "ad_champion_text": "", 
+    "has_inline_embed": false, 
+    "unique_identifier": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/assignments", 
+    "is_image_gallery": false, 
+    "id": "assignments", 
+    "materialtype": "Other", 
+    "_type": "CourseSection", 
+    "description": "This section provides potential topics for the undergraduate paper assignment.", 
+    "course_identifier": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007", 
+    "_content_type_publisher": "text/plain", 
+    "tcATmit_instructional_tags": [], 
+    "_content_type": "text/html", 
+    "creators": [
+        "admin"
+    ], 
+    "modification_date": "2017/03/28 15:40:35.296 GMT-4", 
+    "always_publish": false, 
+    "_content_type_description": "text/plain", 
+    "_owner": "admin", 
+    "_permissions": {
+        "Change portal events": {
+            "acquire": false, 
+            "roles": [
+                "Editor", 
+                "Manager", 
+                "MetadataEditor", 
+                "Owner"
+            ]
+        }, 
+        "Modify portal content": {
+            "acquire": false, 
+            "roles": [
+                "Manager", 
+                "MetadataEditor"
+            ]
+        }, 
+        "Access contents information": {
+            "acquire": false, 
+            "roles": [
+                "Authenticated"
+            ]
+        }, 
+        "List folder contents": {
+            "acquire": false, 
+            "roles": [
+                "Editor", 
+                "Manager", 
+                "MetadataEditor", 
+                "Owner"
+            ]
+        }, 
+        "View": {
+            "acquire": false, 
+            "roles": [
+                "Authenticated"
+            ]
+        }
+    }, 
+    "_properties": [
+        [
+            "title", 
+            "Assignments", 
+            "string"
+        ]
+    ], 
+    "_id": "assignments", 
+    "courselist_features": [], 
+    "_content_type_short_name_tlp": "text/plain", 
+    "_path": "/Plone/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/assignments"
+}

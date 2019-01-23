@@ -38,12 +38,13 @@ def get_access_token():
     return response.json()["access_token"]
 
 
-def parse_mitx_json_data(course_data):
+def parse_mitx_json_data(course_data, force_overwrite=False):
     """
     Main function to parse edx json data for one course
 
     Args:
         course_data (dict): The JSON object representing the course with all its course runs
+        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
     """
 
     # Make sure this is an MIT course
@@ -74,7 +75,10 @@ def parse_mitx_json_data(course_data):
             compare_datetime = datetime.strptime(
                 max_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
             ).astimezone(pytz.utc)
-            if compare_datetime <= course_instance.last_modified:
+            if (
+                compare_datetime <= course_instance.last_modified
+                and not force_overwrite
+            ):
                 log.debug("(%s, %s) skipped", course_data.get("key"), course_run_key)
                 continue
         except Course.DoesNotExist:
@@ -96,10 +100,16 @@ def parse_mitx_json_data(course_data):
             "end_date": course_run.get("end"),
             "enrollment_start": course_run.get("enrollment_start"),
             "enrollment_end": course_run.get("enrollment_end"),
-            "image_src": (course_run.get("image") or {}).get("src"),
-            "image_description": (course_run.get("image") or {}).get("description"),
+            "image_src": (
+                (course_run.get("image") or {}).get("src")
+                or (course_data.get("image") or {}).get("src")
+            ),
+            "image_description": (
+                (course_run.get("image") or {}).get("description")
+                or (course_data.get("image") or {}).get("description")
+            ),
             "last_modified": max_modified,
-            "raw_json": json.dumps(course_data),
+            "raw_json": course_data,
         }
 
         course_serializer = CourseSerializer(

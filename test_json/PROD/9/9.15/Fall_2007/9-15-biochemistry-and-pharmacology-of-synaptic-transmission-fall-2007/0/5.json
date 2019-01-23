@@ -1,0 +1,215 @@
+{
+    "text": "<h2 class=\"subhead\">Course Meeting Times</h2> <p>Lectures: 2 sessions / week, 1.5 hours / session</p> <p>Recitations: 1 session / week, 1.5 hours / session</p> <h2 class=\"subhead\">Course Description</h2> <p>This course considers the process of neurotransmission, especially chemicals used in the brain and elsewhere to carry signals from nerve terminals to the structures they innervate. We focus on monoamine transmitters (acetylcholine; serotonin; dopamine and norepinephrine); we also examine amino acid and peptide transmitters and neuromodulators like adenosine. Macromolecules that mediate neurotransmitter synthesis, release, inactivation and receptor-mediated actions are discussed, as well as factors that regulate their activity and the second-messenger systems and ion fluxes that they control. The involvement of particular neurotransmitters in human diseases is considered.</p> <h2 class=\"subhead\">Required Text</h2> <p><a href=\"http://www.amazon.com/exec/obidos/ASIN/0195140087/ref=nosim/mitopencourse-20\"><img alt=\"Buy at Amazon\" src=\"/images/a_logo_17.gif\" align=\"absMiddle\" border=\"0\" /></a> Cooper, Jack R., Floyd E. Bloom, and Robert H. Roth. <em>The Biochemical Basis of Neuropharmacology</em>. 8th ed. Oxford, UK: Oxford University Press, 2002. ISBN: 9780195140088.</p> <h2 class=\"subhead\">Grading</h2> <ol> <li>Undergraduate Students: The first exam will count for 50% of the final grade, and the second exam will count for the other 50% of the final grade.</li> <li>Graduate Students: The first exam will count as 1/3 of the final grade, and the second exam will be 1/3 of the final grade, and the term paper will count as the last 1/3 of the course grade.</li> <li>Undergraduate students who are less than satisfied with their performance on the first exam can write a term paper and if the grade on the paper is higher than that earned on the exam then it will be substituted for the first exam grade.</li> <li>All students must prepare to take the second test. <strong>There will be no make-up tests for the second test.</strong> If a student is in the infirmary on the date of that test, it can be administered at the infirmary.</li> <li>Any student who misses <strong>both</strong> tests will fail the course.</li> </ol> <h2 class=\"subhead\">Calendar</h2> <div class=\"maintabletemplate\"><table class=\"tablewidth75\" summary=\"See table caption for summary.\"> <caption class=\"invisible\">Course calendar.</caption> <thead> <tr> <th scope=\"col\">SES&nbsp;#</th> <th scope=\"col\">TOPICS</th> <th scope=\"col\">KEY&nbsp;DATES</th> </tr> </thead> <tbody> <tr class=\"row\"> <td>1</td> <td>Neurotransmitters, receptors, and actions</td> <td>&nbsp;</td> </tr> <tr class=\"alt-row\"> <td>2</td> <td>Membranes and the blood brain barrier</td> <td>&nbsp;</td> </tr> <tr class=\"row\"> <td>3</td> <td>Acetylcholine: biochemistry</td> <td>&nbsp;</td> </tr> <tr class=\"alt-row\"> <td>4</td> <td>Acetylcholine: Alzheimer's disease</td> <td>Student meeting deadline</td> </tr> <tr class=\"row\"> <td>5</td> <td>Dopamine: biochemistry and Parkinson's disease</td> <td>&nbsp;</td> </tr> <tr class=\"alt-row\"> <td>6</td> <td>Norepinephrine and epinephrine</td> <td>&nbsp;</td> </tr> <tr class=\"row\"> <td>7</td> <td>Serotonin: biochemistry</td> <td>&nbsp;</td> </tr> <tr class=\"alt-row\"> <td>8</td> <td>Serotonin: behavior, and obesity</td> <td>&nbsp;</td> </tr> <tr class=\"row\"> <td>9</td> <td>Review</td> <td>&nbsp;</td> </tr> <tr class=\"alt-row\"> <td>10</td> <td>Hour examination - midterm</td> <td>&nbsp;</td> </tr> <tr class=\"row\"> <td>11</td> <td>Melatonin</td> <td>&nbsp;</td> </tr> <tr class=\"alt-row\"> <td>12</td> <td>Glutamate: biochemistry</td> <td>&nbsp;</td> </tr> <tr class=\"row\"> <td>13</td> <td>Glutamate: learning and toxicity</td> <td>&nbsp;</td> </tr> <tr class=\"alt-row\"> <td>14</td> <td>Gaba</td> <td>&nbsp;</td> </tr> <tr class=\"row\"> <td>15</td> <td>Glycine and histamine</td> <td>&nbsp;</td> </tr> <tr class=\"alt-row\"> <td>16</td> <td>Cannabinoids and adenosine</td> <td>&nbsp;</td> </tr> <tr class=\"row\"> <td>17</td> <td>Peptides</td> <td>New paper due date</td> </tr> <tr class=\"alt-row\"> <td>18</td> <td>Drug development and review</td> <td>&nbsp;</td> </tr> <tr class=\"row\"> <td>19</td> <td>Hour examination - final</td> <td>&nbsp;</td> </tr> </tbody> </table></div>", 
+    "_content_type_license": "text/plain", 
+    "_uid": "aef686831bdad18765c487bb22cda36d", 
+    "title": "Syllabus", 
+    "_ac_local_roles": {
+        "admin": [
+            "Owner"
+        ]
+    }, 
+    "location": "", 
+    "_content_type_course_identifier": "text/plain", 
+    "_atbrefs": {
+        "isReferencing": [
+            "aef686831bdad18765c487bb22cda36d"
+        ]
+    }, 
+    "constrainTypesMode": 0, 
+    "technical_location": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/syllabus", 
+    "software_requirements": [
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "40.0", 
+            "software_name_col": "Chrome", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "8.0", 
+            "software_name_col": "Safari", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "38.0", 
+            "software_name_col": "Mozilla Firefox", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "9.0", 
+            "software_name_col": "Internet Explorer", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "13.1", 
+            "software_name_col": "Edge", 
+            "maximum_version_col": ""
+        }
+    ], 
+    "_content_type_technical_location": "text/plain", 
+    "_content_type_rights": "text/html", 
+    "_directly_provided": [
+        "Products.CMFEditions.interfaces.IVersioned"
+    ], 
+    "parent_uid": "16197636c270e1ab179fbc9a56c72787", 
+    "excludeFromNav": false, 
+    "_content_type_unique_identifier": "text/plain", 
+    "allowDiscussion": false, 
+    "metadata_contributor_list": [], 
+    "locallyAllowedTypes": [
+        "OCWImage", 
+        "CourseSection", 
+        "OCWExtFile", 
+        "OCWFile"
+    ], 
+    "_content_type_text": "text/html", 
+    "ad_type": "HOUSE", 
+    "creation_date": "2010/05/14 07:42:20.951 GMT-4", 
+    "aggregationlevel": 3, 
+    "duration": "", 
+    "immediatelyAddableTypes": [
+        "OCWImage", 
+        "CourseSection", 
+        "OCWExtFile", 
+        "OCWFile"
+    ], 
+    "subject": [], 
+    "_content_type_short_page_title": "text/plain", 
+    "effectiveDate": "None", 
+    "parent_module": "16197636c270e1ab179fbc9a56c72787", 
+    "is_mathml_document": false, 
+    "bottomtext": "", 
+    "short_page_title": "Syllabus", 
+    "section_identifier": null, 
+    "related_mit_links": "", 
+    "_content_type_ad_type": "text/plain", 
+    "_layout": "custom_view", 
+    "_workflow_history": {
+        "page_workflow": [
+            {
+                "action": null, 
+                "review_state": "waiting_for_authoring", 
+                "comments": "", 
+                "actor": "admin", 
+                "time": "2010/05/14 07:42:20.957 GMT-4"
+            }, 
+            {
+                "action": "approve_to_staging", 
+                "review_state": "ready_for_staging", 
+                "actor": "admin", 
+                "comments": "", 
+                "time": "2010/05/16 11:30:40.186 GMT-4"
+            }
+        ]
+    }, 
+    "_classname": "CourseSection", 
+    "_content_type_materialtype": "text/plain", 
+    "_userdefined_roles": [], 
+    "publisher": "MIT OpenCourseWare", 
+    "nextPreviousEnabled": false, 
+    "language": "", 
+    "url_rewrite_patterns": [], 
+    "widgets_features": [], 
+    "category_features": [], 
+    "firstTimeEdit": true, 
+    "feature_requirements": [], 
+    "list_in_left_nav": false, 
+    "short_name_tlp": "Syllabus", 
+    "expirationDate": "None", 
+    "_content_type_id": "text/plain", 
+    "contributor_list": [
+        {}
+    ], 
+    "is_media_gallery": false, 
+    "contributors": [], 
+    "_gopip": 3, 
+    "_content_type_title": "text/plain", 
+    "course_linking": [], 
+    "_atrefs": {
+        "BelongsTo": [
+            "16197636c270e1ab179fbc9a56c72787"
+        ], 
+        "isReferencing": [
+            "aef686831bdad18765c487bb22cda36d"
+        ]
+    }, 
+    "other_platform_requirements": "", 
+    "license": "http://creativecommons.org/licenses/by-nc-sa/3.0/us/", 
+    "rights": "This site (c) Massachusetts Institute of Technology 2010.  Content within individual courses is (c) by the individual authors unless otherwise noted. The Massachusetts Institute of Technology is providing this Work (as defined below) under the terms of this Creative Commons public license (\"CCPL\" or \"license\") unless otherwise noted. The Work is protected by copyright and/or other applicable law. Any use of the work other than as authorized under this license is prohibited. By exercising any of the rights to the Work provided here, You (as defined below) accept and agree to be bound by the terms of this license. The Licensor, the Massachusetts Institute of Technology, grants You the rights contained here in consideration of Your acceptance of such terms and conditions.", 
+    "hide_Page_title": null, 
+    "_defaultpage": "", 
+    "tcATmit_subject_tags": [], 
+    "features_tracking": [], 
+    "ad_champion_text": "", 
+    "has_inline_embed": false, 
+    "unique_identifier": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/syllabus", 
+    "is_image_gallery": false, 
+    "id": "syllabus", 
+    "materialtype": "Other", 
+    "_type": "CourseSection", 
+    "description": "This syllabus section provides the course description and information about meeting times, required text, grading, and schedule of course topics and key dates.", 
+    "course_identifier": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007", 
+    "_content_type_publisher": "text/plain", 
+    "tcATmit_instructional_tags": [], 
+    "_content_type": "text/html", 
+    "creators": [
+        "admin"
+    ], 
+    "modification_date": "2017/03/28 15:21:23.660 GMT-4", 
+    "always_publish": false, 
+    "_content_type_description": "text/plain", 
+    "_owner": "admin", 
+    "_permissions": {
+        "Change portal events": {
+            "acquire": false, 
+            "roles": [
+                "Editor", 
+                "Manager", 
+                "MetadataEditor", 
+                "Owner"
+            ]
+        }, 
+        "Modify portal content": {
+            "acquire": false, 
+            "roles": [
+                "Manager", 
+                "MetadataEditor"
+            ]
+        }, 
+        "Access contents information": {
+            "acquire": false, 
+            "roles": [
+                "Authenticated"
+            ]
+        }, 
+        "List folder contents": {
+            "acquire": false, 
+            "roles": [
+                "Editor", 
+                "Manager", 
+                "MetadataEditor", 
+                "Owner"
+            ]
+        }, 
+        "View": {
+            "acquire": false, 
+            "roles": [
+                "Authenticated"
+            ]
+        }
+    }, 
+    "_properties": [
+        [
+            "title", 
+            "Syllabus", 
+            "string"
+        ]
+    ], 
+    "_id": "syllabus", 
+    "courselist_features": [], 
+    "_content_type_short_name_tlp": "text/plain", 
+    "_path": "/Plone/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/syllabus"
+}

@@ -24,8 +24,7 @@ NON_COURSE_DIRECTORIES = [
     "PROD/mathematics",
     "PROD/more",
     "PROD/physics",
-    "QA/do-not-publish",
-    "QA/engineering",
+    "QA",
 ]
 
 
