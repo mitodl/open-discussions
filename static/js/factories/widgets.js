@@ -43,7 +43,7 @@ export const makeWidgetJson = (widgetType: string): ?Object => {
   case "RSS Feed":
     return ({
       title:   casual.title,
-      entries: R.range(1, casual.integer(1, 8)).map(() => ({
+      entries: R.range(1, casual.integer(2, 8)).map(() => ({
         title:       casual.title,
         description: casual.description,
         link:        casual.url,
