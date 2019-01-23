@@ -57,7 +57,7 @@ export default class WidgetEditDialog extends React.Component<Props> {
           value={this.getValue(widgetTypeLens)}
           onChange={this.updateValue(widgetTypeLens)}
           options={specs.map(spec => ({
-            label: spec.widget_type,
+            label: spec.description,
             value: spec.widget_type
           }))}
         />
@@ -77,10 +77,10 @@ export default class WidgetEditDialog extends React.Component<Props> {
     return (
       <React.Fragment>
         <label className="widget-title-field">
-          Widget title
+          Title
           <input
             type="text"
-            value={this.getValue(titleLens)}
+            value={this.getValue(titleLens) || ""}
             onChange={this.updateValue(titleLens)}
           />
         </label>
@@ -88,7 +88,10 @@ export default class WidgetEditDialog extends React.Component<Props> {
         {spec.form_spec.map(fieldSpec => {
           const lens = R.lensPath(["configuration", [fieldSpec.field_name]])
           return (
-            <label key={fieldSpec.field_name} className="configuration-field">
+            <label
+              key={fieldSpec.field_name}
+              className={`configuration-field ${fieldSpec.input_type}`}
+            >
               {fieldSpec.label}
               <WidgetField
                 value={this.getValue(lens)}
@@ -137,7 +140,7 @@ export default class WidgetEditDialog extends React.Component<Props> {
   }
 
   render() {
-    const { dialogData, dialogOpen } = this.props
+    const { dialogData, dialogOpen, specs } = this.props
     if (!dialogData) {
       return null
     }
@@ -152,7 +155,11 @@ export default class WidgetEditDialog extends React.Component<Props> {
       title = "Edit widget"
       submitText = "Update widget"
     } else if (dialogData.state === WIDGET_CREATE) {
-      title = "Add widget"
+      const spec = specs.find(
+        spec => spec.widget_type === this.getValue(widgetTypeLens)
+      )
+      // $FlowFixMe: spec should always exist here
+      title = `Add ${spec.description} widget`
       submitText = "Create widget"
     }
 
@@ -163,6 +170,7 @@ export default class WidgetEditDialog extends React.Component<Props> {
         onAccept={this.acceptDialog}
         title={title}
         submitText={submitText}
+        className="widget-dialog"
       >
         {dialogData.state === WIDGET_TYPE_SELECT
           ? this.renderSelectWidgetType()

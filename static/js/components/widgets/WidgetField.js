@@ -12,7 +12,7 @@ type Props = {
 }
 
 const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
-  const valueOrDefault = R.defaultTo(fieldSpec.props.default || "", value)
+  const valueOrDefault = R.defaultTo(fieldSpec.default || "", value)
   switch (fieldSpec.input_type) {
   case "markdown_wysiwyg":
     return (
@@ -35,14 +35,13 @@ const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
     )
   case "number":
     return (
-      <input
-        type="number"
-        className="field"
-        value={valueOrDefault}
-        onChange={onChange}
-        min={fieldSpec.props.min}
-        max={fieldSpec.props.max}
-      />
+      <select className="field" value={valueOrDefault} onChange={onChange}>
+        {R.range(fieldSpec.props.min, fieldSpec.props.max + 1).map(index => (
+          <option value={index} key={index}>
+            {index}
+          </option>
+        ))}
+      </select>
     )
   default:
     return (

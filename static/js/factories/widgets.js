@@ -90,7 +90,7 @@ export const makeFieldSpec = (
     return {
       ...common,
       props: {
-        min: 0,
+        min: 1,
         max: casual.integer(1, 8)
       },
       default: 3
@@ -117,6 +117,7 @@ export const makeWidgetSpec = (widgetType: ?string = null): WidgetSpec => {
 
   return {
     widget_type: widgetType,
+    description: casual.word,
     form_spec:   R.range(1, 5).map(i => makeFieldSpec(null, i))
   }
 }

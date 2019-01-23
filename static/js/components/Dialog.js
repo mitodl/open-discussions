@@ -18,6 +18,7 @@ type Props = {
   title: string,
   submitText: string,
   id?: string,
+  className?: string,
   children?: any
 }
 
@@ -29,10 +30,11 @@ const OurDialog = ({
   title,
   submitText,
   id,
+  className,
   children
 }: Props) => (
   <Dialog open={open} onClose={hideDialog} id={id}>
-    <DialogSurface>
+    <DialogSurface className={className}>
       <DialogHeader>
         <DialogHeaderTitle>{title}</DialogHeaderTitle>
       </DialogHeader>

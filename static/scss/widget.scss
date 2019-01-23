@@ -12,6 +12,34 @@
   }
 }
 
+.configuration-field.number {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.widget-dialog {
+  min-width: auto;
+  max-width: 400px;
+
+  .mdc-dialog__header {
+    padding: 40px 40px 20px 40px;
+
+    .mdc-dialog__header__title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+  }
+
+  .mdc-dialog__body {
+    padding: 0 40px 20px 40px;
+  }
+
+  .mdc-dialog__footer {
+    padding: 0 30px 30px 30px;
+  }
+}
+
 .widget {
   font-size: 14px;
 
