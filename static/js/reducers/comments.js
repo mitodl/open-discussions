@@ -10,7 +10,7 @@ import {
 
 import { CLEAR_COMMENT_ERROR, REPLACE_MORE_COMMENTS } from "../actions/comment"
 import { findComment } from "../lib/comments"
-import * as api from "../lib/api/api"
+import * as commentsAPI from "../lib/api/comments"
 
 import type { Action } from "../flow/reduxTypes"
 import type {
@@ -220,8 +220,8 @@ export const commentsEndpoint = {
     params?: Object
   ): Promise<GetCommentsPayload> => {
     const comments = commentId
-      ? await api.getComment(commentId)
-      : await api.getComments(postId, params || {})
+      ? await commentsAPI.getComment(commentId)
+      : await commentsAPI.getComments(postId, params || {})
 
     return {
       postId:   postId,
@@ -229,7 +229,7 @@ export const commentsEndpoint = {
     }
   },
   deleteFunc: async (postId: string, commentId: string): Promise<*> => {
-    await api.deleteComment(commentId)
+    await commentsAPI.deleteComment(commentId)
     return { postId, commentId }
   },
   deleteSuccessHandler: (
@@ -257,7 +257,7 @@ export const commentsEndpoint = {
     text: string,
     commentId: ?string
   ): Promise<CreateCommentPayload> => {
-    const comment = await api.createComment(postId, text, commentId)
+    const comment = await commentsAPI.createComment(postId, text, commentId)
     return { postId, commentId, comment }
   },
   postSuccessHandler: (
@@ -275,7 +275,7 @@ export const commentsEndpoint = {
     return update
   },
   patchFunc: (commentId: string, payload: Object) =>
-    api.updateComment(commentId, payload),
+    commentsAPI.updateComment(commentId, payload),
   patchSuccessHandler: (
     response: CommentFromAPI,
     data: CommentData
@@ -312,7 +312,7 @@ export const moreCommentsEndpoint = {
   name:    "morecomments",
   verbs:   [GET],
   getFunc: (postId: string, parentId: string | null, children: Array<string>) =>
-    api.getMoreComments(postId, parentId, children),
+    commentsAPI.getMoreComments(postId, parentId, children),
   initialState:      { ...INITIAL_STATE },
   getSuccessHandler: (
     response: Array<CommentFromAPI | MoreCommentsFromAPI>,

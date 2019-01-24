@@ -17,6 +17,7 @@ import * as moderationAPI from "../lib/api/moderation"
 import * as embedlyAPI from "../lib/api/embedly"
 import * as frontpageAPI from "../lib/api/frontpage"
 import * as postAPI from "../lib/api/posts"
+import * as commentAPI from "../lib/api/comments"
 import rootReducer from "../reducers"
 import * as utilFuncs from "../lib/util"
 
@@ -48,7 +49,8 @@ export default class IntegrationTestHelper {
       moderationAPI,
       embedlyAPI,
       frontpageAPI,
-      postAPI
+      postAPI,
+      commentAPI
     ].forEach(apiModule => {
       for (const methodName in apiModule) {
         if (typeof apiModule[methodName] === "function") {
