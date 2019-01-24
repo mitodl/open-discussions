@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.63.1
+--------------
+
+- Fix flaky test (#1758)
+- Improvements for RSS dialog editing (#1750)
+
 Version 0.63.0 (Released January 23, 2019)
 --------------
 
