@@ -31,7 +31,7 @@ html5lib==0.999999999
 ipython
 markdown2
 newrelic
-ocw-data-parser==0.1.6
+ocw-data-parser==0.1.7
 Pillow==3.4.2
 psycopg2==2.7
 praw==4.5.1
