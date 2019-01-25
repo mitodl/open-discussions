@@ -33,7 +33,7 @@ type Props = {
 export class ManageWidgetHeader extends React.Component<Props> {
   submitForm = async () => {
     const { channel, form, patchWidgetInstances, clearForm } = this.props
-    if (form && form.value) {
+    if (form && form.value && form.value.instances) {
       await patchWidgetInstances({
         widgets: form.value.instances,
         // $FlowFixMe: if we're at this point we definitely have a widget id

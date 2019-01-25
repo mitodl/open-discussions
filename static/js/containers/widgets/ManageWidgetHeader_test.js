@@ -30,7 +30,9 @@ describe("ManageWidgetHeader", () => {
     initialState = {
       forms: {
         [WIDGET_FORM_KEY]: {
-          value: updatedWidgetList
+          value: {
+            instances: updatedWidgetList
+          }
         }
       }
     }
@@ -80,6 +82,21 @@ describe("ManageWidgetHeader", () => {
       forms: {
         [WIDGET_FORM_KEY]: {
           value: null
+        }
+      }
+    })
+    await inner.find(".submit").prop("onClick")()
+    assert.equal(helper.patchWidgetListStub.callCount, 0)
+  })
+
+  it("won't submit the form if there are no instances in the form", async () => {
+    const { inner } = await render({
+      forms: {
+        [WIDGET_FORM_KEY]: {
+          value: {
+            expanded:  { a: "bc" },
+            instances: null
+          }
         }
       }
     })
