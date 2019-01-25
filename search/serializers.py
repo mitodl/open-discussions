@@ -92,7 +92,7 @@ class ESPostSerializer(ESSerializer):
     object_type = POST_TYPE
     use_keys = [
         "article_content",
-        "article_text",
+        "plain_text",
         "author_id",
         "author_name",
         "author_headline",

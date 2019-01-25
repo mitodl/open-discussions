@@ -85,7 +85,7 @@ export type Post = AuthoredContent & {
   url:             ?string,
   text:            ?string,
   article_content: ?Array<Object>,
-  article_text:    ?string,
+  plain_text:      ?string,
   slug:            string,
   num_comments:    number,
   channel_name:    string,

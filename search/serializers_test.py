@@ -30,7 +30,7 @@ def patched_base_post_serializer(mocker):
         "author_name": "Author Name",
         "author_headline": "Author Headline",
         "article_content": article_content,
-        "article_text": render_article_text(article_content),
+        "plain_text": render_article_text(article_content),
         "profile_image": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_small.jpg",
         "channel_title": "channel 1",
         "channel_name": "channel_1",
@@ -111,7 +111,7 @@ def test_es_post_serializer(
     assert serialized == {
         "object_type": POST_TYPE,
         "article_content": base_serialized["article_content"],
-        "article_text": render_article_text(base_serialized["article_content"]),
+        "plain_text": render_article_text(base_serialized["article_content"]),
         "author_id": base_serialized["author_id"],
         "author_name": base_serialized["author_name"],
         "author_headline": base_serialized["author_headline"],

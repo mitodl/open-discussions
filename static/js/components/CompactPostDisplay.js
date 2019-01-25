@@ -21,7 +21,7 @@ import {
   PostTitleAndHostname,
   getPostDropdownMenuKey,
   postMenuDropdownFuncs,
-  getTextContent,
+  getPlainTextContent,
   POST_PREVIEW_LINES,
   EMBEDLY_THUMB_HEIGHT,
   EMBEDLY_THUMB_WIDTH
@@ -137,7 +137,7 @@ export class CompactPostDisplay extends React.Component<Props> {
     const { post, showPinUI } = this.props
 
     const formattedDate = moment(post.created).fromNow()
-    const previewText = getTextContent(post)
+    const previewText = getPlainTextContent(post)
 
     return (
       <Card

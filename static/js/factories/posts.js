@@ -15,7 +15,7 @@ export const makePost = (
   channelName: string = casual.word
 ): Post => ({
   article_content: null,
-  article_text:    null,
+  plain_text:      null,
   author_headline: casual.sentence,
   author_id:       `justareddituser${String(casual.random)}`,
   author_name:     casual.name,

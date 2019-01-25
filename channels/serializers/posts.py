@@ -16,6 +16,7 @@ from channels.serializers.utils import parse_bool
 from channels.utils import render_article_text
 from open_discussions.settings import SITE_BASE_URL
 from open_discussions.serializers import WriteableSerializerMethodField
+from open_discussions.utils import markdown_to_plain_text
 from profiles.utils import image_uri
 
 User = get_user_model()
@@ -32,7 +33,7 @@ class BasePostSerializer(RedditObjectSerializer):
     thumbnail = WriteableSerializerMethodField(allow_null=True)
     text = WriteableSerializerMethodField(allow_null=True)
     article_content = serializers.JSONField(allow_null=True, default=None)
-    article_text = serializers.SerializerMethodField()
+    plain_text = serializers.SerializerMethodField()
     title = serializers.CharField()
     post_type = serializers.CharField(read_only=True)
     slug = serializers.SerializerMethodField()
@@ -127,13 +128,13 @@ class BasePostSerializer(RedditObjectSerializer):
         """Returns True if the post was deleted"""
         return instance.selftext == DELETED_COMMENT_OR_POST_TEXT  # only way to tell
 
-    def get_article_text(self, instance):
-        """Return article content rendered as text"""
-        return (
-            render_article_text(instance.article.content)
-            if instance.article is not None
-            else None
-        )
+    def get_plain_text(self, instance):
+        """Return plain text content"""
+        if instance.article is not None:
+            return render_article_text(instance.article.content)
+        elif instance.is_self:
+            return markdown_to_plain_text(instance.selftext)
+        return None
 
 
 class PostSerializer(BasePostSerializer):

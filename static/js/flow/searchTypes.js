@@ -38,7 +38,7 @@ type RESULT_TYPE_POST = "post"
 
 export type PostResult = ResultCommon & {
   article_content:     ?Array<Object>,
-  article_text:        ?string,
+  plain_text:          ?string,
   channel_name:        string,
   channel_title:       string,
   created:             string,

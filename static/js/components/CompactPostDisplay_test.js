@@ -107,8 +107,8 @@ describe("CompactPostDisplay", () => {
   it("should show preview text", () => {
     const exampleText = "lorem ipsum"
     post = R.merge(post, {
-      post_type: LINK_TYPE_TEXT,
-      text:      exampleText
+      post_type:  LINK_TYPE_TEXT,
+      plain_text: exampleText
     })
     const truncatableText = renderPostDisplay({ post }).find("Dotdotdot")
     assert.equal(truncatableText.prop("clamp"), POST_PREVIEW_LINES)
