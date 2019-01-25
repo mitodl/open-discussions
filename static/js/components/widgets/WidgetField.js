@@ -1,9 +1,12 @@
+/* global SETTINGS: false */
 // @flow
 import React from "react"
 import R from "ramda"
 
+import Editor, { editorUpdateFormShim } from "../Editor"
+import EmbedlyCard from "../EmbedlyCard"
+
 import type { WidgetFieldSpec } from "../../flow/widgetTypes"
-import Editor, { editorUpdateFormShim } from "../../components/Editor"
 
 type Props = {
   fieldSpec: WidgetFieldSpec,
@@ -42,6 +45,21 @@ const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
           </option>
         ))}
       </select>
+    )
+  case "url":
+    return (
+      <React.Fragment>
+        <input
+          type="text"
+          className="field"
+          value={valueOrDefault}
+          onChange={onChange}
+          minLength={fieldSpec.props.min_length}
+          maxLength={fieldSpec.props.max_length}
+          placeholder={fieldSpec.props.placeholder}
+        />
+        <EmbedlyCard url={valueOrDefault} />
+      </React.Fragment>
     )
   default:
     return (
