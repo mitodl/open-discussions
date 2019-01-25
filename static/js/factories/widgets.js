@@ -13,7 +13,7 @@ import type {
   RSSWidgetJson
 } from "../flow/widgetTypes"
 
-export const validFieldSpecTypes = ["text", "textarea", "number"]
+export const validFieldSpecTypes = ["text", "textarea", "number", "url"]
 
 const instanceIncr = incrementer()
 const listIncr = incrementer()

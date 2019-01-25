@@ -33,7 +33,7 @@ describe("WidgetField", () => {
       />
     )
   }
-  ;["text", "textarea", "number"].forEach(fieldType => {
+  ;["text", "textarea", "number", "url"].forEach(fieldType => {
     describe(`${fieldType} field`, () => {
       it("uses an empty string for a default value if there is none in the spec", () => {
         fieldSpec = makeFieldSpec(fieldType)
@@ -64,7 +64,7 @@ describe("WidgetField", () => {
       })
     })
   })
-  ;["text", "textarea"].forEach(fieldType => {
+  ;["text", "textarea", "url"].forEach(fieldType => {
     it(`renders a ${fieldType} input field`, () => {
       fieldSpec = makeFieldSpec(fieldType)
       const wrapper = render()
@@ -117,5 +117,13 @@ describe("WidgetField", () => {
         value: newValue
       }
     })
+  })
+
+  it("renders an embedly component", () => {
+    fieldSpec = makeFieldSpec("url")
+    const wrapper = render()
+    const embedlyContainer = wrapper.find("Connect(EmbedlyContainer)")
+    assert.isTrue(embedlyContainer.exists())
+    assert.equal(embedlyContainer.prop("url"), value)
   })
 })

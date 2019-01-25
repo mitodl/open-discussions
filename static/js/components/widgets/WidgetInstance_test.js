@@ -3,50 +3,70 @@ import React from "react"
 import { mount } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
+import { Provider } from "react-redux"
+import { SortableContainer } from "react-sortable-hoc"
 
 import WidgetInstance from "./WidgetInstance"
 
 import { makeWidgetInstance } from "../../factories/widgets"
+import IntegrationTestHelper from "../../util/integration_test_helper"
+import { makeTweet } from "../../factories/embedly"
+import * as embedUtil from "../../lib/embed"
 import { shouldIf } from "../../lib/test_utils"
 import { validWidgetRenderers } from "../../lib/widgets"
 
 describe("WidgetInstance", () => {
   let widgetInstance,
-    sandbox,
+    helper,
     deleteInstanceStub,
     startEditInstanceStub,
     toggleExpandedStub
 
   beforeEach(() => {
     widgetInstance = makeWidgetInstance()
-    sandbox = sinon.createSandbox()
-    deleteInstanceStub = sandbox.stub()
-    startEditInstanceStub = sandbox.stub()
-    toggleExpandedStub = sandbox.stub()
+    helper = new IntegrationTestHelper()
+    deleteInstanceStub = helper.sandbox.stub()
+    startEditInstanceStub = helper.sandbox.stub()
+    toggleExpandedStub = helper.sandbox.stub()
+
+    // tested in EmbedlyContainer but we need to mock here since testing react-sortable-hoc requires mount()
+    helper.sandbox.stub(embedUtil, "ensureTwitterEmbedJS")
+    helper.sandbox.stub(embedUtil, "handleTwitterWidgets")
+    helper.getEmbedlyStub.returns(
+      Promise.resolve({
+        response: makeTweet()
+      })
+    )
   })
 
   afterEach(() => {
-    sandbox.restore()
+    helper.cleanup()
   })
+
+  const WrappedInstance = SortableContainer(props => (
+    <WidgetInstance {...props} />
+  ))
 
   const render = (props = {}) =>
     mount(
-      <WidgetInstance
-        widgetInstance={widgetInstance}
-        deleteInstance={deleteInstanceStub}
-        index={3}
-        editing={false}
-        startEditInstance={startEditInstanceStub}
-        expanded={true}
-        toggleExpanded={toggleExpandedStub}
-        {...props}
-      />,
+      <Provider store={helper.store}>
+        <WrappedInstance
+          widgetInstance={widgetInstance}
+          deleteInstance={deleteInstanceStub}
+          index={3}
+          editing={false}
+          startEditInstance={startEditInstanceStub}
+          expanded={true}
+          toggleExpanded={toggleExpandedStub}
+          {...props}
+        />
+      </Provider>,
       {
         // for react-sortable-hoc
         context: {
           manager: {
-            add:    sandbox.stub(),
-            remove: sandbox.stub()
+            add:    helper.sandbox.stub(),
+            remove: helper.sandbox.stub()
           }
         }
       }

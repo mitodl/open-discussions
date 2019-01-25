@@ -219,7 +219,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       embedlyGetFunc.meta = {
         debounce: {
           time: 1000,
-          key:  actions.embedly.get.requestType
+          key:  "create-post"
         }
       }
       // $FlowFixMe

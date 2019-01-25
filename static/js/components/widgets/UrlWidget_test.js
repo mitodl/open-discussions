@@ -11,7 +11,7 @@ describe("UrlWidget", () => {
     const widgetInstance = makeWidgetInstance("URL")
     const wrapper = shallow(<UrlWidget widgetInstance={widgetInstance} />)
     assert.equal(
-      wrapper.find("iframe").prop("src"),
+      wrapper.find("Connect(EmbedlyContainer)").prop("url"),
       widgetInstance.configuration.url
     )
   })

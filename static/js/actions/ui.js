@@ -46,5 +46,5 @@ export const setAuthUserDetail = createAction(SET_AUTH_USER_DETAIL)
 export const hideDropdownDebounced = createAction(
   HIDE_DROPDOWN,
   i => i,
-  () => ({ debounce: { time: 100 } })
+  () => ({ debounce: { time: 100, key: HIDE_DROPDOWN } })
 )

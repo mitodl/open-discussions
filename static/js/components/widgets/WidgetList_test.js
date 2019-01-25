@@ -1,25 +1,29 @@
 // @flow
 import React from "react"
 import R from "ramda"
+import casual from "casual-browserify"
 import { mount } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
-import casual from "casual-browserify"
+import { Provider } from "react-redux"
 
-import { getWidgetKey } from "../../lib/widgets"
+import WidgetList from "./WidgetList"
+import WidgetInstance from "./WidgetInstance"
+
 import {
   makeWidgetInstance,
   makeWidgetListResponse
 } from "../../factories/widgets"
-
-import WidgetList from "./WidgetList"
-import WidgetInstance from "./WidgetInstance"
+import IntegrationTestHelper from "../../util/integration_test_helper"
+import { makeTweet } from "../../factories/embedly"
+import * as embedUtil from "../../lib/embed"
+import { getWidgetKey } from "../../lib/widgets"
 import { shouldIf } from "../../lib/test_utils"
 
 describe("WidgetList", () => {
   let listResponse,
-    sandbox,
     expanded,
+    helper,
     clearFormStub,
     submitFormStub,
     deleteInstanceStub,
@@ -36,33 +40,44 @@ describe("WidgetList", () => {
       }
     })
 
-    sandbox = sinon.createSandbox()
-    clearFormStub = sandbox.stub()
-    submitFormStub = sandbox.stub()
-    deleteInstanceStub = sandbox.stub()
-    startEditInstanceStub = sandbox.stub()
-    startAddInstanceStub = sandbox.stub()
-    setExpandedStub = sandbox.stub()
+    helper = new IntegrationTestHelper()
+    clearFormStub = helper.sandbox.stub()
+    submitFormStub = helper.sandbox.stub()
+    deleteInstanceStub = helper.sandbox.stub()
+    startEditInstanceStub = helper.sandbox.stub()
+    startAddInstanceStub = helper.sandbox.stub()
+    setExpandedStub = helper.sandbox.stub()
+
+    // tested in EmbedlyContainer but we need to mock here since testing react-sortable-hoc requires mount()
+    helper.sandbox.stub(embedUtil, "ensureTwitterEmbedJS")
+    helper.sandbox.stub(embedUtil, "handleTwitterWidgets")
+    helper.getEmbedlyStub.returns(
+      Promise.resolve({
+        response: makeTweet()
+      })
+    )
   })
 
   afterEach(() => {
-    sandbox.restore()
+    helper.cleanup()
   })
 
   const render = (props = {}) =>
     mount(
-      <WidgetList
-        widgetInstances={listResponse.widgets}
-        clearForm={clearFormStub}
-        submitForm={submitFormStub}
-        editing={false}
-        expanded={expanded}
-        deleteInstance={deleteInstanceStub}
-        startEditInstance={startEditInstanceStub}
-        startAddInstance={startAddInstanceStub}
-        setExpanded={setExpandedStub}
-        {...props}
-      />
+      <Provider store={helper.store}>
+        <WidgetList
+          widgetInstances={listResponse.widgets}
+          clearForm={clearFormStub}
+          submitForm={submitFormStub}
+          editing={false}
+          expanded={expanded}
+          deleteInstance={deleteInstanceStub}
+          startEditInstance={startEditInstanceStub}
+          startAddInstance={startAddInstanceStub}
+          setExpanded={setExpandedStub}
+          {...props}
+        />
+      </Provider>
     )
 
   it("renders a list of WidgetInstances", () => {

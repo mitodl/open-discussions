@@ -28,12 +28,13 @@ EXPECTED_AVAILABLE_WIDGETS = [
         "form_spec": [
             {
                 "field_name": "url",
-                "input_type": "text",
+                "input_type": "url",
                 "label": "URL",
                 "props": {
                     "max_length": "",
                     "min_length": "",
                     "placeholder": "Enter URL",
+                    "show_embed": True,
                 },
                 "default": "",
             }
@@ -45,12 +46,13 @@ EXPECTED_AVAILABLE_WIDGETS = [
         "form_spec": [
             {
                 "field_name": "url",
-                "input_type": "text",
+                "input_type": "url",
                 "label": "URL",
                 "props": {
                     "max_length": "",
                     "min_length": "",
                     "placeholder": "RSS feed URL",
+                    "show_embed": False,
                 },
                 "default": "",
             },
