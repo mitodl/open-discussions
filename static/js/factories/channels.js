@@ -32,6 +32,7 @@ export const makeChannel = (privateChannel: boolean = false): Channel => {
     public_description:    casual.description,
     num_users:             casual.integer(0, 500),
     user_is_contributor:   casual.coin_flip,
+    user_is_subscriber:    casual.coin_flip,
     user_is_moderator:     casual.coin_flip,
     membership_is_managed: casual.coin_flip,
     allow_widgets_ui:      casual.coin_flip,

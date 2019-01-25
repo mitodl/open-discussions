@@ -31,6 +31,7 @@ class ChannelSerializer(serializers.Serializer):
     allowed_post_types = WriteableSerializerMethodField()
     user_is_contributor = serializers.SerializerMethodField()
     user_is_moderator = serializers.SerializerMethodField()
+    user_is_subscriber = serializers.SerializerMethodField()
     widget_list_id = serializers.IntegerField(
         required=False, allow_null=True, read_only=True
     )
@@ -54,6 +55,13 @@ class ChannelSerializer(serializers.Serializer):
         For some reason reddit returns None instead of False so an explicit conversion is done here.
         """
         return bool(channel.user_is_moderator)
+
+    def get_user_is_subscriber(self, channel):
+        """
+        Get user_is_subscriber from reddit object.
+        For some reason reddit returns None instead of False so an explicit conversion is done here.
+        """
+        return bool(channel.user_is_subscriber)
 
     def get_avatar(self, channel):
         """Get the avatar image URL"""

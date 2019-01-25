@@ -5,6 +5,7 @@ import { Link } from "react-router-dom"
 
 import DropdownMenu from "./DropdownMenu"
 import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
+import { DropUpArrow, DropDownArrow } from "./Arrow"
 
 import { isProfileComplete } from "../lib/util"
 import { profileURL, SETTINGS_URL, LOGIN_URL, REGISTER_URL } from "../lib/url"
@@ -21,14 +22,6 @@ type DropdownMenuProps = {
   closeMenu: Function,
   className?: string
 }
-
-export const DropDownArrow = () => (
-  <i className="material-icons arrow_drop_down">arrow_drop_down</i>
-)
-
-export const DropUpArrow = () => (
-  <i className="material-icons arrow_drop_up">arrow_drop_up</i>
-)
 
 export const LoggedInMenu = (props: DropdownMenuProps) => (
   <DropdownMenu {...props}>

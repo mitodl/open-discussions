@@ -1,5 +1,6 @@
 import R from "ramda"
 import { assert } from "chai"
+import sinon from "sinon"
 
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
@@ -11,7 +12,8 @@ import {
   approveComment,
   removeComment,
   toggleFollowComment,
-  toggleFollowPost
+  toggleFollowPost,
+  leaveChannel
 } from "../util/api_actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
@@ -223,6 +225,40 @@ describe("api_actions util", () => {
         helper.updateCommentStub.calledWith(comment.id, { removed: true })
       )
       assert.equal(resultComment.removed, true)
+    })
+  })
+
+  describe("leaveChannel", () => {
+    const channelName = "some_channel_name",
+      username = "someuser"
+
+    beforeEach(() => {
+      helper.deleteChannelSubscriberStub.returns(Promise.resolve())
+      helper.deleteChannelContributorStub.returns(Promise.resolve())
+    })
+
+    it("should make requests to remove the user as a subscriber and contributor", async () => {
+      await helper.listenForActions(
+        [
+          actions.channelSubscribers.delete.requestType,
+          actions.channelSubscribers.delete.successType,
+          actions.channelContributors.delete.requestType,
+          actions.channelContributors.delete.successType
+        ],
+        async () => {
+          await leaveChannel(helper.store.dispatch, channelName, username)
+        }
+      )
+      sinon.assert.calledWithExactly(
+        helper.deleteChannelSubscriberStub,
+        channelName,
+        username
+      )
+      sinon.assert.calledWithExactly(
+        helper.deleteChannelContributorStub,
+        channelName,
+        username
+      )
     })
   })
 })

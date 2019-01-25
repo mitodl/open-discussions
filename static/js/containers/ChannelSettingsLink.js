@@ -41,7 +41,7 @@ export class ChannelSettingsLink extends React.Component<Props> {
     }
   }
 
-  renderContent = () => {
+  render = () => {
     const { channel, isOpen, hideDropdown } = this.props
 
     if (!SETTINGS.allow_widgets_ui) {
@@ -74,10 +74,6 @@ export class ChannelSettingsLink extends React.Component<Props> {
         ) : null}
       </React.Fragment>
     )
-  }
-
-  render() {
-    return <div className="settings-menu">{this.renderContent()}</div>
   }
 }
 

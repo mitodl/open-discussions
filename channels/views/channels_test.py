@@ -204,6 +204,7 @@ def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous
         assert resp.json() == {
             **default_channel_response_data(public_channel),
             "user_is_contributor": False,
+            "user_is_subscriber": False,
         }
     else:
         assert resp.status_code in (

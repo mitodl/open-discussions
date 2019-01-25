@@ -1,7 +1,8 @@
 button,
 input[type="submit"],
 .mdc-button,
-a.link-button {
+a.link-button,
+.dropdown-button {
   background-color: $rouge;
   color: white;
   margin: 0 10px 5px 0;
