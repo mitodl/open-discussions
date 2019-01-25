@@ -105,7 +105,7 @@ def update_post_text(post_obj):
     update_document_with_partial.delay(
         gen_post_id(post_obj.id),
         {
-            "article_text": render_article_text(post_obj.article_content),
+            "plain_text": render_article_text(post_obj.article_content),
             "text": post_obj.selftext,
         },
         POST_TYPE,

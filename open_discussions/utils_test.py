@@ -13,6 +13,8 @@ from open_discussions.utils import (
     merge_strings,
     filter_dict_keys,
     filter_dict_with_renamed_keys,
+    html_to_plain_text,
+    markdown_to_plain_text,
 )
 
 
@@ -125,3 +127,27 @@ def test_filter_dict_with_renamed_keys():
     assert filter_dict_with_renamed_keys(
         d, {"b": "b1", "missing": "d1"}, optional=True
     ) == {"b1": 2}
+
+
+def test_html_to_plain_text():
+    """
+    html_to_plain_text should turn a string with HTML markup into plain text with line breaks
+    replaced by spaces.
+    """
+    html = "<div><b>bold</b><p>text with\n\nline breaks</p></div>"
+    normal_text = "open discussions"
+    assert html_to_plain_text(html) == "boldtext with  line breaks"
+    assert html_to_plain_text(normal_text) == normal_text
+
+
+def test_markdown_to_plain_text():
+    """
+    markdown_to_plain_text should turn a Markdown string into plain text with line breaks
+    replaced by spaces.
+    """
+    markdown = "# header\n\nsome body text\n\n1. bullet 1\n2. bullet 2"
+    normal_text = "open discussions"
+    assert (
+        markdown_to_plain_text(markdown) == "header some body text  bullet 1 bullet 2"
+    )
+    assert html_to_plain_text(normal_text) == normal_text

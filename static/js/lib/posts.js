@@ -35,6 +35,9 @@ export const postFormIsContentless = R.useWith(
   R.repeat(R.omit(["postType", "title", "show_cover_image"]), 2)
 )(newPostForm())
 
+export const isPostContainingText = (post: Post): boolean =>
+  post.post_type === LINK_TYPE_TEXT || post.post_type === LINK_TYPE_ARTICLE
+
 export const formatCommentsCount = (post: Post): string =>
   post.num_comments === 1 ? "1 comment" : `${post.num_comments || 0} comments`
 
@@ -118,11 +121,10 @@ export const postMenuDropdownFuncs = (dispatch: Dispatch<*>, post: Post) => {
   }
 }
 
-export const getTextContent = (post: Post): ?string => {
-  if (post.post_type === LINK_TYPE_TEXT) {
-    return post.text
-  } else if (post.post_type === LINK_TYPE_ARTICLE) {
-    return post.article_text
+export const getPlainTextContent = (post: Post): ?string => {
+  if (isPostContainingText(post)) {
+    // Default to the 'text' value if 'plain_text' is null for any reason
+    return post.plain_text || post.text
   }
   return null
 }

@@ -118,7 +118,7 @@ def reddit_submission_obj():
     return SimpleNamespace(
         author=SimpleNamespace(name="testuser"),
         article_content=article_content,
-        article_text=render_article_text(article_content),
+        plain_text=render_article_text(article_content),
         subreddit=SimpleNamespace(
             display_name="channel_1", title="Channel", subreddit_type="public"
         ),

@@ -82,7 +82,7 @@ MAPPING = {
         "post_link_url": {"type": "keyword"},
         "post_link_thumbnail": {"type": "keyword"},
         "num_comments": {"type": "long"},
-        "article_text": ENGLISH_TEXT_FIELD,
+        "plain_text": ENGLISH_TEXT_FIELD,
         "post_type": {"type": "keyword"},
     },
     COMMENT_TYPE: {

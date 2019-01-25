@@ -58,7 +58,7 @@ describe("search functions", () => {
     const post = searchResultToPost(result)
     assert.deepEqual(post, {
       article_content: result.article_content,
-      article_text:    result.article_text,
+      plain_text:      result.plain_text,
       cover_image:     null,
       author_id:       result.author_id,
       author_name:     result.author_name,
@@ -267,7 +267,7 @@ describe("search functions", () => {
 
   describe("searchFields", () => {
     [
-      ["post", ["text.english", "post_title.english", "article_text.english"]],
+      ["post", ["text.english", "post_title.english", "plain_text.english"]],
       ["comment", ["text.english"]],
       [
         "profile",

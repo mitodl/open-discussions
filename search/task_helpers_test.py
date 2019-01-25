@@ -159,7 +159,7 @@ def test_update_post_text(mocker, reddit_submission_obj):
         gen_post_id(reddit_submission_obj.id),
         {
             "text": reddit_submission_obj.selftext,
-            "article_text": render_article_text(reddit_submission_obj.article_content),
+            "plain_text": render_article_text(reddit_submission_obj.article_content),
         },
         POST_TYPE,
     )

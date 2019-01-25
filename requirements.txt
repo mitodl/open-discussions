@@ -5,6 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 amqp==2.1.4               # via kombu
+appnope==0.1.0            # via ipython
 base36==0.1.1
 beautifulsoup4==4.6.0
 betamax-serializers==0.2.0
@@ -52,6 +53,7 @@ isodate==0.6.0            # via python3-saml
 jedi==0.10.2              # via ipython
 kombu==4.2.1              # via celery, django-server-status
 lxml==4.1.1               # via xmlsec
+markdown2==2.3.7
 newrelic==4.2.0.100
 oauthlib==2.0.7           # via requests-oauthlib, social-auth-core
 pexpect==4.2.1            # via ipython

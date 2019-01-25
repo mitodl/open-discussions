@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 from channels.models import Article, Channel, Post
 from channels.utils import get_reddit_slug, render_article_text
 from profiles.utils import image_uri
+from open_discussions.utils import markdown_to_plain_text
 
 
 def default_channel_response_data(channel):
@@ -55,6 +56,13 @@ def default_post_response_data(channel, post, user):
     if not text and not post.url:
         text = ""
 
+    if article:
+        plain_text = render_article_text(article.content)
+    elif text:
+        plain_text = markdown_to_plain_text(text)
+    else:
+        plain_text = None
+
     return {
         "url": post.url,
         "url_domain": urlparse(post.url).hostname if post.url else None,
@@ -62,9 +70,7 @@ def default_post_response_data(channel, post, user):
         "thumbnail": None,
         "text": text,
         "article_content": article.content if article is not None else None,
-        "article_text": render_article_text(article.content)
-        if article is not None
-        else None,
+        "plain_text": plain_text,
         "post_type": post_obj.post_type,
         "title": post.title,
         "removed": False,

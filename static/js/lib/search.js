@@ -36,7 +36,7 @@ export const searchResultToComment = (
 
 export const searchResultToPost = (result: PostResult): Post => ({
   article_content: result.article_content,
-  article_text:    result.article_text,
+  plain_text:      result.plain_text,
   author_headline: result.author_headline,
   author_id:       result.author_id,
   author_name:     result.author_name,
@@ -80,7 +80,7 @@ export const searchResultToProfile = (result: ProfileResult): Profile => ({
 const POST_QUERY_FIELDS = [
   "text.english",
   "post_title.english",
-  "article_text.english"
+  "plain_text.english"
 ]
 const COMMENT_QUERY_FIELDS = ["text.english"]
 const PROFILE_QUERY_FIELDS = [

@@ -43,7 +43,7 @@ export const makeCommentResult = (): CommentResult => ({
 
 export const makePostResult = (): PostResult => ({
   article_content:     null,
-  article_text:        null,
+  plain_text:          null,
   post_cover_image:    null,
   author_avatar_small: casual.url,
   author_headline:     casual.text,

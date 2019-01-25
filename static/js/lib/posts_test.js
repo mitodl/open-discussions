@@ -11,12 +11,14 @@ import {
   formatPostTitle,
   mapPostListResponse,
   postFormIsContentless,
-  getTextContent,
+  isPostContainingText,
+  getPlainTextContent,
   isEditablePostType
 } from "./posts"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import { urlHostname } from "./url"
 import { LINK_TYPE_ARTICLE, LINK_TYPE_LINK, LINK_TYPE_TEXT } from "./channels"
+import { shouldIf } from "./test_utils"
 
 describe("Post utils", () => {
   it("should return a new post with empty values", () => {
@@ -160,27 +162,33 @@ describe("Post utils", () => {
     })
   })
 
-  describe("getTextContent", () => {
-    it("gets a post's text content (or null if it has no text content)", () => {
-      const exampleText = "magnets, how do they work?"
-      let textPost = makePost()
-      textPost = R.merge(textPost, {
-        post_type: LINK_TYPE_TEXT,
-        text:      exampleText
-      })
-      let articlePost = makePost()
-      articlePost = R.merge(articlePost, {
-        post_type:    LINK_TYPE_ARTICLE,
-        article_text: exampleText
-      })
-      let linkPost = makePost()
-      linkPost = R.merge(linkPost, {
-        post_type: LINK_TYPE_LINK
-      })
+  it("isPostContainingText returns true for posts that contain text", () => {
+    const post = makePost()
+    assert.isTrue(isPostContainingText({ ...post, post_type: LINK_TYPE_TEXT }))
+    assert.isTrue(
+      isPostContainingText({ ...post, post_type: LINK_TYPE_ARTICLE })
+    )
+    assert.isFalse(isPostContainingText({ ...post, post_type: LINK_TYPE_LINK }))
+  })
 
-      assert.equal(getTextContent(textPost), exampleText)
-      assert.equal(getTextContent(articlePost), exampleText)
-      assert.isNull(getTextContent(linkPost))
+  describe("getPlainTextContent", () => {
+    const exampleText = "magnets, how do they work?"
+    ;[
+      [LINK_TYPE_LINK, {}, null],
+      [LINK_TYPE_ARTICLE, { plain_text: exampleText }, exampleText],
+      [LINK_TYPE_TEXT, { plain_text: exampleText }, exampleText],
+      [LINK_TYPE_TEXT, { text: exampleText }, exampleText]
+    ].forEach(([postType, updatedProperties, expReturnValue]) => {
+      it(`${shouldIf(
+        !!expReturnValue
+      )} return some text content for ${postType}-type post`, () => {
+        const post = {
+          ...makePost(postType === LINK_TYPE_LINK),
+          ...updatedProperties,
+          post_type: postType
+        }
+        assert.equal(getPlainTextContent(post), expReturnValue)
+      })
     })
   })
 

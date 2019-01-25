@@ -29,6 +29,7 @@ faker
 feedparser
 html5lib==0.999999999
 ipython
+markdown2
 newrelic
 Pillow==3.4.2
 psycopg2==2.7

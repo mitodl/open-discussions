@@ -7,6 +7,9 @@ import logging
 import pytz
 from django.conf import settings
 
+from bs4 import BeautifulSoup
+import markdown2
+
 
 log = logging.getLogger(__name__)
 
@@ -154,3 +157,32 @@ def filter_dict_with_renamed_keys(orig_dict, key_rename_dict, *, optional=False)
         for key, new_key in key_rename_dict.items()
         if not optional or key in orig_dict
     }
+
+
+def html_to_plain_text(html_str):
+    """
+    Takes an HTML string and returns text with HTML tags removed and line breaks replaced with spaces
+
+    Args:
+        html_str (str): A string containing HTML tags
+
+    Returns:
+        str: Plain text
+    """
+    soup = BeautifulSoup(html_str, features="html.parser")
+    return soup.get_text().replace("\n", " ")
+
+
+def markdown_to_plain_text(markdown_str):
+    """
+    Takes a string and returns text with Markdown elements removed and line breaks
+    replaced with spaces
+
+    Args:
+        markdown_str (str): A string containing Markdown
+
+    Returns:
+        str: Plain text
+    """
+    html_str = markdown2.markdown(markdown_str)
+    return html_to_plain_text(html_str).strip()
