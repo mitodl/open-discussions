@@ -38,6 +38,12 @@ describe("ChannelHeader", () => {
     assert.equal(linkProps.to, channelURL(channel.name))
     assert.equal(linkProps.children, channel.title)
   })
+  it("renders options for a user to follow/unfollow the channel", () => {
+    const wrapper = render()
+    const followControls = wrapper.find("Connect(ChannelFollowControls)")
+    assert.isTrue(followControls.exists())
+    assert.deepEqual(followControls.prop("channel"), channel)
+  })
   ;[true, false].forEach(hasNavbar => {
     it(`${shouldIf(hasNavbar)} navbar items`, () => {
       const navbarItems = "navbarItems"

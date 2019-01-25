@@ -22,6 +22,7 @@ export type Channel = {
   num_users:             number,
   user_is_contributor:   boolean,
   user_is_moderator:     boolean,
+  user_is_subscriber:    boolean,
   membership_is_managed: boolean,
   ga_tracking_id:        ?string,
   avatar:                string|null,

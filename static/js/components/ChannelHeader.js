@@ -9,6 +9,7 @@ import ChannelAvatar, {
   CHANNEL_AVATAR_MEDIUM
 } from "../containers/ChannelAvatar"
 import ChannelSettingsLink from "../containers/ChannelSettingsLink"
+import ChannelFollowControls from "../containers/ChannelFollowControls"
 
 import { channelURL } from "../lib/url"
 
@@ -44,7 +45,8 @@ export default class ChannelHeader extends React.Component<Props> {
                 ) : null}
               </div>
             </div>
-            <div className="right">
+            <div className="right channel-controls">
+              <ChannelFollowControls channel={channel} />
               {isModerator ? (
                 <ChannelSettingsLink channel={channel} history={history} />
               ) : null}

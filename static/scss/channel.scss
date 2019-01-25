@@ -86,9 +86,14 @@
   align-items: center;
   justify-content: space-between;
 
-  .left {
+  .left,
+  .right {
     display: flex;
     align-items: center;
+  }
+
+  .left {
+    padding-right: 5px;
   }
 
   .avatar-image,
@@ -120,15 +125,77 @@
     color: white;
   }
 
-  .settings-menu {
+  .channel-controls {
     position: relative;
+    flex-grow: 0.5;
+    justify-content: flex-end;
+    min-height: 38px;
+
+    a {
+      cursor: pointer;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    .follow-button,
+    .edit-button {
+      margin-right: 0;
+      margin-left: 10px;
+    }
+
+    .follow-button {
+      flex-grow: 1;
+      padding: $button-vert-padding 0;
+      min-width: 110px;
+      max-width: 145px;
+      text-align: center;
+    }
+
+    .dropdown-button {
+      position: relative;
+
+      span {
+        display: inline-block;
+        padding-right: 10px;
+      }
+
+      i.material-icons {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        margin-top: -12px;
+      }
+    }
+
+    .edit-button {
+      z-index: 20;
+    }
+
+    .dropdown-menu {
+      &.settings-menu-dropdown {
+        right: 0;
+        top: 30px;
+      }
+
+      &.channel-follow-dropdown {
+        right: 34px;
+        top: 39px;
+
+        // HACK: If there is no channel settings icon, this should be the last child, so
+        // the menu should float all the way right. We need to get menus showing up relative
+        // to the clicked item.
+        &:last-child {
+          right: 0;
+        }
+      }
+    }
+  }
+
+  .settings-menu {
     cursor: pointer;
     z-index: 20;
-
-    .settings-menu-dropdown {
-      top: 31px;
-      right: 0;
-    }
   }
 }
 

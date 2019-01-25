@@ -59,6 +59,7 @@ def test_serialize_channel(
         "public_description": "public_description",
         "user_is_moderator": True,
         "user_is_contributor": True,
+        "user_is_subscriber": True,
         "membership_is_managed": membership_is_managed,
         "avatar": channel.avatar.url if has_avatar else None,
         "avatar_small": channel.avatar_small.url if has_avatar else None,

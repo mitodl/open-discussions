@@ -72,3 +72,12 @@ export const toggleFollowComment = R.curry(
     return dispatch(setSnackbarMessage({ message }))
   }
 )
+
+export const leaveChannel = async (
+  dispatch: Dispatch<*>,
+  channelName: string,
+  username: string
+) => {
+  await dispatch(actions.channelSubscribers.delete(channelName, username))
+  await dispatch(actions.channelContributors.delete(channelName, username))
+}

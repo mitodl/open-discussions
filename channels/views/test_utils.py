@@ -19,6 +19,7 @@ def default_channel_response_data(channel):
         "public_description": channel.public_description,
         "channel_type": channel.channel_type,
         "user_is_contributor": True,
+        "user_is_subscriber": True,
         "user_is_moderator": False,
         "link_type": channel.link_type,
         "membership_is_managed": False,

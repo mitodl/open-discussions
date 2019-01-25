@@ -3,7 +3,7 @@ import React from "react"
 import R from "ramda"
 import { Menu, MenuItem, MenuAnchor } from "rmwc/Menu"
 
-import { DropDownArrow, DropUpArrow } from "./UserMenu"
+import { DropDownArrow, DropUpArrow } from "./Arrow"
 
 import {
   VALID_POST_SORT_LABELS,

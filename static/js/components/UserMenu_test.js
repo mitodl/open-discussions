@@ -6,12 +6,8 @@ import sinon from "sinon"
 import { shallow } from "enzyme"
 import { Link } from "react-router-dom"
 
-import UserMenu, {
-  DropDownArrow,
-  DropUpArrow,
-  LoggedInMenu,
-  LoggedOutMenu
-} from "./UserMenu"
+import UserMenu, { LoggedInMenu, LoggedOutMenu } from "./UserMenu"
+import { DropDownArrow, DropUpArrow } from "./Arrow"
 
 import { profileURL, SETTINGS_URL, LOGIN_URL, REGISTER_URL } from "../lib/url"
 import * as utilFuncs from "../lib/util"
