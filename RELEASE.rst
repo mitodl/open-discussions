@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.63.2
+Version 0.63.2 (Released January 25, 2019)
 --------------
 
 - Updated Post and Comment models with missing fields
