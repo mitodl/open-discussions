@@ -1,7 +1,7 @@
 """Tests for notification apis"""
 import pytest
 
-from channels.factories import SubscriptionFactory
+from channels.factories.models import SubscriptionFactory
 from notifications.factories import (
     EmailNotificationFactory,
     NotificationSettingsFactory,

@@ -3,7 +3,7 @@ from django.core.mail import EmailMessage
 import pytest
 
 from channels.models import Subscription
-from channels.factories import SubscriptionFactory
+from channels.factories.models import SubscriptionFactory
 from notifications.factories import NotificationSettingsFactory
 from notifications.models import EmailNotification
 from notifications.notifiers import comments

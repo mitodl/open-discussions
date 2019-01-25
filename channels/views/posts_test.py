@@ -8,7 +8,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from profiles.utils import image_uri
-from channels.factories import LinkMetaFactory
+from channels.factories.models import LinkMetaFactory
 from channels.constants import (
     EXTENDED_POST_TYPE_ARTICLE,
     VALID_POST_SORT_TYPES,

@@ -7,7 +7,7 @@ import xml.etree.ElementTree as etree
 import pytest
 from PIL import Image
 
-from channels.factories import ArticleFactory
+from channels.factories.models import ArticleFactory
 from open_discussions.factories import UserFactory
 from profiles.utils import (
     profile_image_upload_uri,

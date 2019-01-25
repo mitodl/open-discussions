@@ -11,7 +11,7 @@ from channels.constants import (
     VALID_EXTENDED_POST_TYPES,
     DELETED_COMMENT_OR_POST_TEXT,
 )
-from channels.factories import (
+from channels.factories.models import (
     PostFactory,
     CommentFactory,
     ArticleFactory,

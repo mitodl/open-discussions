@@ -11,7 +11,7 @@ from channels.constants import (
     ROLE_CONTRIBUTORS,
     LINK_TYPE_ANY,
 )
-from channels.factories import ChannelFactory, PostFactory
+from channels.factories.models import ChannelFactory, PostFactory
 from channels.models import ChannelSubscription, Channel
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
@@ -32,7 +32,7 @@ def channels_and_users():
 
 def test_evict_expired_access_tokens():
     """Test that the task evicts expired tokens"""
-    from channels.factories import RedditAccessTokenFactory
+    from channels.factories.models import RedditAccessTokenFactory
     from channels.models import RedditAccessToken
 
     future = RedditAccessTokenFactory.create()

@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from channels.constants import LINK_TYPE_ANY
-from channels.factories import STRATEGY_BUILD
+from channels.factories.reddit import STRATEGY_BUILD
 from channels.models import Channel
 from channels.views.test_utils import default_channel_response_data
 from open_discussions.constants import (

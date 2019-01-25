@@ -3,7 +3,7 @@
 import pytest
 
 from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
-from channels.factories import PostFactory, CommentFactory
+from channels.factories.models import PostFactory, CommentFactory
 from channels.utils import get_reddit_slug, render_article_text
 from open_discussions.factories import UserFactory
 from profiles.models import Profile

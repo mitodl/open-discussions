@@ -6,7 +6,7 @@ from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException, NotFound
 import pytest
 
-from channels.factories import ChannelFactory, PostFactory
+from channels.factories.models import ChannelFactory, PostFactory
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
 from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES

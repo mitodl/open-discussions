@@ -30,7 +30,7 @@ from channels.constants import (
     EXTENDED_POST_TYPE_ARTICLE,
     POSTS_SORT_HOT,
 )
-from channels.factories import ArticleFactory, ChannelFactory, PostFactory
+from channels.factories.models import ArticleFactory, ChannelFactory, PostFactory
 from channels.models import (
     Article,
     Channel,

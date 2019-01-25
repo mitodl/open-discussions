@@ -3,7 +3,7 @@ import pytest
 
 from channels.api import sync_channel_subscription_model, add_user_role
 from channels.constants import ROLE_CONTRIBUTORS, ROLE_MODERATORS
-from channels.factories import ChannelFactory
+from channels.factories.models import ChannelFactory
 from open_discussions.factories import UserFactory
 from profiles import api
 from profiles.api import get_channels, get_site_type_from_url

@@ -4,7 +4,7 @@ import pytest
 
 from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.api import add_user_role
-from channels.factories import ChannelFactory
+from channels.factories.models import ChannelFactory
 from search.api import (
     execute_search,
     is_reddit_object_removed,

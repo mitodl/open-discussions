@@ -5,7 +5,8 @@ import pytest
 
 from channels import api
 from channels.constants import CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC, LINK_TYPE_SELF
-from channels.factories import RedditFactories, FactoryStore, PostFactory
+from channels.factories.models import PostFactory
+from channels.factories.reddit import RedditFactories, FactoryStore
 from channels.proxies import PostProxy
 from channels.utils import render_article_text
 

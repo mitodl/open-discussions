@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.core.mail import EmailMessage
 import pytest
 
-from channels.factories import PostFactory
+from channels.factories.models import PostFactory
 from channels.proxies import PostProxy
 from notifications.factories import (
     NotificationSettingsFactory,

@@ -7,7 +7,7 @@ import pytest
 from rest_framework.exceptions import ValidationError
 
 from channels.api import sync_channel_subscription_model
-from channels.factories import ChannelFactory
+from channels.factories.models import ChannelFactory
 from channels.serializers.subscribers import SubscriberSerializer
 from open_discussions.factories import UserFactory
 
