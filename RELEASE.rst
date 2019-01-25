@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.63.2 (Released January 25, 2019)
+--------------
+
+- Updated Post and Comment models with missing fields
+- Add support for rending content using Embedly in the article editor
+- Bump yarn and node version
+- Split comment API functions out into separate module
+
 Version 0.63.1 (Released January 24, 2019)
 --------------
 
