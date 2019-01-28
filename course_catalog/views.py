@@ -7,10 +7,12 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 
-from course_catalog.models import Course
-from course_catalog.serializers import CourseSerializer
+from course_catalog.models import Course, CourseTopic
+from course_catalog.serializers import CourseSerializer, CourseTopicSerializer
+
 
 # pylint:disable=unused-argument
+from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 
 class CoursePagination(LimitOffsetPagination):
@@ -30,6 +32,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Course.objects.all().prefetch_related("topics", "instructors", "prices")
     serializer_class = CourseSerializer
     pagination_class = CoursePagination
+    permission_classes = (AnonymousAccessReadonlyPermission,)
 
     @action(methods=["GET"], detail=False)
     def new(self, request):
@@ -59,3 +62,13 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
         page = self.paginate_queryset(self.queryset.filter(featured=True))
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+
+class CourseTopicViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Viewset for CourseTopics
+    """
+
+    queryset = CourseTopic.objects.all()
+    serializer_class = CourseTopicSerializer
+    permission_classes = (AnonymousAccessReadonlyPermission,)
