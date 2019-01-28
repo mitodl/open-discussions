@@ -10,7 +10,6 @@ describe("RssWidget", () => {
   it("renders a RssWidget", () => {
     const widgetInstance = makeWidgetInstance("RSS Feed")
     const wrapper = shallow(<RssWidget widgetInstance={widgetInstance} />)
-    assert.equal(widgetInstance.title, wrapper.find(".title").text())
     assert.equal(
       widgetInstance.json.entries.length,
       wrapper.find(".entry").length

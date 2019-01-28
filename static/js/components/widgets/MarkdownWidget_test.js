@@ -18,7 +18,6 @@ describe("MarkdownWidget", () => {
 
   it("should display the title and markdown", () => {
     const wrapper = renderWidget()
-    assert.equal(wrapper.find(".title").text(), instance.title)
     assert.ok(wrapper.find("Markdown").exists())
     assert.equal(
       wrapper.find("Markdown").prop("source"),

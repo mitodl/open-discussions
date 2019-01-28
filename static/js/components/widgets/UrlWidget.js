@@ -1,21 +1,11 @@
 // @flow
 import React from "react"
 
-import type { WidgetInstance } from "../../flow/widgetTypes"
-
-type Props = {
-  widgetInstance: WidgetInstance
-}
+import type { WidgetComponentProps } from "../../flow/widgetTypes"
 
 const UrlWidget = ({
   widgetInstance: {
-    title,
     configuration: { url }
   }
-}: Props) => (
-  <React.Fragment>
-    <span className="title">{title}</span>
-    <iframe src={url} />
-  </React.Fragment>
-)
+}: WidgetComponentProps) => <iframe src={url} />
 export default UrlWidget

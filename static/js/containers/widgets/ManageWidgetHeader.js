@@ -9,6 +9,7 @@ import { actions } from "../../actions"
 
 import type { Dispatch } from "redux"
 import type {
+  WidgetForm,
   WidgetInstance as WidgetInstanceType,
   WidgetListResponse
 } from "../../flow/widgetTypes"
@@ -22,7 +23,7 @@ type PatchPayload = {
 
 type Props = {
   clearForm: () => void,
-  form: FormValue<Array<WidgetInstanceType>>,
+  form: FormValue<WidgetForm>,
   patchWidgetInstances: (payload: PatchPayload) => Promise<WidgetListResponse>,
   submitForm: () => Promise<void>,
   channel: Channel,
@@ -32,9 +33,9 @@ type Props = {
 export class ManageWidgetHeader extends React.Component<Props> {
   submitForm = async () => {
     const { channel, form, patchWidgetInstances, clearForm } = this.props
-    if (form && form.value) {
+    if (form && form.value && form.value.instances) {
       await patchWidgetInstances({
-        widgets: form.value,
+        widgets: form.value.instances,
         // $FlowFixMe: if we're at this point we definitely have a widget id
         id:      channel.widget_list_id
       })

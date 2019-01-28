@@ -14,6 +14,5 @@ describe("UrlWidget", () => {
       wrapper.find("iframe").prop("src"),
       widgetInstance.configuration.url
     )
-    assert.equal(wrapper.find(".title").text(), widgetInstance.title)
   })
 })
