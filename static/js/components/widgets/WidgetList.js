@@ -49,6 +49,7 @@ const SortableWidgetList: StatelessFunctionalComponent<Props> = SortableContaine
         ) : null}
         {widgetInstances.map((widgetInstance, i) => {
           const key = getWidgetKey(widgetInstance)
+          const instanceIsExpanded = !!expanded[key]
           return (
             <WidgetInstance
               startEditInstance={startEditInstance}
@@ -57,8 +58,8 @@ const SortableWidgetList: StatelessFunctionalComponent<Props> = SortableContaine
               index={i}
               editing={editing}
               deleteInstance={deleteInstance}
-              expanded={!editing || expanded[key]}
-              setExpanded={newValue => setExpanded([key], newValue)}
+              expanded={!editing || instanceIsExpanded}
+              toggleExpanded={() => setExpanded([key], !instanceIsExpanded)}
             />
           )
         })}

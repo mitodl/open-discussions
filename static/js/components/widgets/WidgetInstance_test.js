@@ -15,14 +15,14 @@ describe("WidgetInstance", () => {
     sandbox,
     deleteInstanceStub,
     startEditInstanceStub,
-    setExpandedStub
+    toggleExpandedStub
 
   beforeEach(() => {
     widgetInstance = makeWidgetInstance()
     sandbox = sinon.createSandbox()
     deleteInstanceStub = sandbox.stub()
     startEditInstanceStub = sandbox.stub()
-    setExpandedStub = sandbox.stub()
+    toggleExpandedStub = sandbox.stub()
   })
 
   afterEach(() => {
@@ -38,7 +38,7 @@ describe("WidgetInstance", () => {
         editing={false}
         startEditInstance={startEditInstanceStub}
         expanded={true}
-        setExpanded={setExpandedStub}
+        toggleExpanded={toggleExpandedStub}
         {...props}
       />,
       {
@@ -117,7 +117,7 @@ describe("WidgetInstance", () => {
       it(expanded ? "collapses" : "expands", () => {
         const wrapper = render({ editing: true, expanded })
         wrapper.find(".toggle-collapse").prop("onClick")()
-        sinon.assert.calledWith(setExpandedStub, !expanded)
+        sinon.assert.calledWith(toggleExpandedStub)
       })
     })
   })

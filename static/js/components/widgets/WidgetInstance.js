@@ -15,7 +15,7 @@ type Props = {
   startEditInstance: (widgetInstance: WidgetInstanceType) => void,
   widgetInstance: WidgetInstanceType,
   editing: boolean,
-  setExpanded: (newValue: boolean) => void
+  toggleExpanded: () => void
 }
 
 const DragHandle = SortableHandle(() => (
@@ -28,7 +28,7 @@ const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElem
     widgetInstance,
     editing,
     deleteInstance,
-    setExpanded,
+    toggleExpanded,
     startEditInstance
   }: Props) => {
     const WidgetClass = validWidgetRenderers[widgetInstance.widget_type]
@@ -39,7 +39,7 @@ const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElem
           {editing ? (
             <span
               className="toggle-collapse material-icons"
-              onClick={() => setExpanded(!expanded)}
+              onClick={toggleExpanded}
             >
               {expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
             </span>

@@ -119,12 +119,9 @@ describe("WidgetList", () => {
       wrapper
         .find(WidgetInstance)
         .at(i)
-        .prop("setExpanded")("abc")
-      sinon.assert.calledWith(
-        setExpandedStub,
-        [getWidgetKey(widgetInstance)],
-        "abc"
-      )
+        .prop("toggleExpanded")()
+      const key = getWidgetKey(widgetInstance)
+      sinon.assert.calledWith(setExpandedStub, [key], !expanded[key])
     })
   })
   ;[true, false].forEach(editing => {
