@@ -538,6 +538,14 @@ CELERY_BEAT_SCHEDULE = {
         "task": "notifications.tasks.send_weekly_frontpage_digests",
         "schedule": crontab(minute=0, hour=14, day_of_week=2),  # 10am EST on tuesdays
     },
+    "update_edx-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_edx_data",
+        "schedule": crontab(minute=0, hour=4),  # 12am EST
+    },
+    "update_ocw-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_ocw_data",
+        "schedule": crontab(minute=0, hour=5),  # 1am EST
+    },
 }
 
 CELERY_TASK_SERIALIZER = "json"
