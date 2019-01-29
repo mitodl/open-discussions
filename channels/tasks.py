@@ -2,6 +2,7 @@
 import logging
 import traceback
 
+import base36
 import celery
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -19,6 +20,7 @@ from channels.api import (
 )
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel, Post, ChannelGroupRole
+from channels.utils import get_kind_mapping
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 from search.exceptions import PopulateUserRolesException, RetryException
@@ -229,4 +231,113 @@ def populate_channel_fields(self):
             )
         ]
     )
+    raise self.replace(results)
+
+
+@app.task()
+def populate_posts_and_comments(post_ids):
+    """
+    Backpopulates a list of post ids
+
+    Args:
+        post_ids (list of int): list of reddit post ids in integer form
+
+    Returns:
+        dict: aggregated result data for this batch
+    """
+    reddit = get_admin_api().reddit
+
+    submission_kind = get_kind_mapping()["submission"]
+
+    # if the post doesn't exist it simply won't be returned here
+    submissions = list(
+        reddit.info(
+            [f"{submission_kind}_{base36.dumps(post_id)}" for post_id in post_ids]
+        )
+    )
+
+    channels_by_name = Channel.objects.in_bulk(
+        [submission.subreddit.display_name for submission in submissions],
+        field_name="name",
+    )
+    post_count = 0
+    comment_count = 0
+    failures = []
+
+    for submission in submissions:
+        channel_name = submission.subreddit.display_name
+
+        # skip posts that don't have a matching channel, we don't want to auto-create these
+        if channel_name not in channels_by_name:
+            log.warning(
+                "Unknown channel name %s, not populating post %s",
+                channel_name,
+                submission.id,
+            )
+            failures.append(
+                {
+                    "thing_type": "post",
+                    "thing_id": submission.id,
+                    "reason": "unknown channel '{}'".format(channel_name),
+                }
+            )
+            continue
+
+        post, _ = Post.objects.get_or_create(
+            post_id=submission.id,
+            defaults={"channel": channels_by_name.get(channel_name)},
+        )
+
+        backpopulate_api.backpopulate_post(post, submission)
+        post_count += 1
+
+        comment_count += backpopulate_api.backpopulate_comments(submission)
+    return {"posts": post_count, "comments": comment_count, "failures": failures}
+
+
+@app.task()
+def populate_posts_and_comments_merge_results(results):
+    """
+    Merges results of backpopulate_posts_and_comments
+
+    Args:
+        results (iterable of dict): iterable of batch task results
+
+    Returns:
+        dict: merged result data for all batches
+    """
+    post_count = 0
+    comment_count = 0
+    failures = []
+
+    for result in results:
+        post_count += result["posts"]
+        comment_count += result["comments"]
+        failures.extend(result["failures"])
+
+    return {"posts": post_count, "comments": comment_count, "failures": failures}
+
+
+@app.task(bind=True)
+def populate_all_posts_and_comments(self):
+    """
+    Backpopulate all posts and comments
+    """
+    reddit_api = get_admin_api().reddit
+
+    # fetch and base36 decode the latest post id
+    newest_post_id = base36.loads(next(reddit_api.front.new()).id)
+
+    # create a celery chord by batching a backpopulate and merging results
+    results = (
+        celery.group(
+            populate_posts_and_comments.si(post_ids)
+            for post_ids in chunks(
+                range(newest_post_id + 1),
+                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            )
+        )
+        | populate_posts_and_comments_merge_results.s()
+    )
+
     raise self.replace(results)

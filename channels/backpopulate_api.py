@@ -91,6 +91,7 @@ def backpopulate_comments(submission):
         comment.author.name for comment in submission.comments if comment.author
     }
     authors_by_username = User.objects.in_bulk(author_usernames, field_name="username")
+    update_count = 0
 
     for comment in submission.comments:
         author = (
@@ -101,6 +102,8 @@ def backpopulate_comments(submission):
         # we may see a comment in reddit before it's created in the database
         # but it should have correct values in that case
         # so this update may affect zero rows, but that's ok
-        Comment.objects.filter(comment_id=comment.id).update(
+        update_count += Comment.objects.filter(comment_id=comment.id).update(
             author=author, **comment_values
         )
+
+    return update_count

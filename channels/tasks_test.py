@@ -1,5 +1,7 @@
 """Tasks tests"""
+import base36
 import pytest
+from django.contrib.auth import get_user_model
 from praw.models import Redditor
 from prawcore.exceptions import ResponseException
 
@@ -12,13 +14,16 @@ from channels.constants import (
     LINK_TYPE_ANY,
 )
 from channels.factories.models import ChannelFactory, PostFactory
-from channels.models import ChannelSubscription, Channel
+from channels.models import ChannelSubscription, Channel, Post
+from channels.utils import get_kind_mapping
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
 
-pytestmark = pytest.mark.django_db
+pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("indexing_user")]
 
 # pylint:disable=redefined-outer-name
+
+User = get_user_model()
 
 
 @pytest.fixture
@@ -45,12 +50,11 @@ def test_evict_expired_access_tokens():
     assert not RedditAccessToken.objects.filter(id=expired.id).exists()
 
 
-def test_subscribe_all_users_to_default_channel(settings, mocker, admin_user):
+def test_subscribe_all_users_to_default_channel(settings, mocker):
     """Test that the main task batches out smaller tasks correctly"""
     mock_add_subscriber = mocker.patch("channels.api.Api.add_subscriber")
     mocker.patch("channels.api._get_client", autospec=True)
     settings.OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE = 5
-    settings.INDEXING_API_USERNAME = admin_user.username
     users = UserFactory.create_batch(17)
 
     tasks.subscribe_all_users_to_default_channel.delay(channel_name="nochannel")
@@ -107,12 +111,9 @@ def test_populate_user_subscriptions(mocker, is_subscriber, channels_and_users):
 
 @pytest.mark.parametrize("is_moderator", [True, False])
 @pytest.mark.parametrize("is_contributor", [True, False])
-def test_populate_user_roles(
-    mocker, is_contributor, is_moderator, channels_and_users, settings
-):
+def test_populate_user_roles(mocker, is_contributor, is_moderator, channels_and_users):
     """populate_user_roles should create ChannelGroupRole objects"""
     channels, users = channels_and_users
-    settings.INDEXING_API_USERNAME = users[0].username
     client_mock = mocker.patch("channels.api.Api", autospec=True)
     redditors = []
     for user in users:
@@ -139,12 +140,9 @@ def test_populate_user_roles(
 
 
 @pytest.mark.parametrize("is_error_moderator", [True, False])
-def test_populate_user_roles_error(
-    mocker, is_error_moderator, channels_and_users, settings
-):
+def test_populate_user_roles_error(mocker, is_error_moderator, channels_and_users):
     """populate_user_roles should raise a PopulateUserRolesException if there is a ResponseException error"""
     channels, users = channels_and_users
-    settings.INDEXING_API_USERNAME = users[0].username
     client_mock = mocker.patch("channels.api.Api", autospec=True)
     redditors = []
     for user in users:
@@ -192,11 +190,10 @@ def test_populate_post_and_comment_fields(mocker, mocked_celery, settings):
     assert mocked_celery.replace.call_count == 1
 
 
-def test_populate_post_and_comment_fields_batch(mocker, settings):
+def test_populate_post_and_comment_fields_batch(mocker):
     """
     populate_post_and_comment_fields_batch should call backpopulate APIs for each post
     """
-    settings.INDEXING_API_USERNAME = UserFactory.create().username
     posts = PostFactory.create_batch(10, unpopulated=True)
     mock_api = mocker.patch("channels.api.Api", autospec=True)
     mock_backpopulate_api = mocker.patch("channels.tasks.backpopulate_api")
@@ -216,11 +213,10 @@ def test_populate_post_and_comment_fields_batch(mocker, settings):
         )
 
 
-def test_populate_channel_fields_batch(mocker, settings):
+def test_populate_channel_fields_batch(mocker):
     """
     populate_channel_fields should set fields from reddit
     """
-    settings.INDEXING_API_USERNAME = UserFactory.create().username
     channels = ChannelFactory.create_batch(2)
     mock_api = mocker.patch("channels.api.Api", autospec=True)
     mock_subreddit = mock_api.return_value.get_subreddit.return_value
@@ -245,3 +241,98 @@ def test_populate_channel_fields_batch(mocker, settings):
     )
     assert updated_channel.channel_type == CHANNEL_TYPE_PUBLIC
     assert updated_channel.title == "A channel title"
+
+
+def test_populate_posts_and_comments(mocker):
+    """
+    populate_posts_and_comments should call the backpopulate API for each post
+    """
+
+    post_ids = [1, 2, 3]
+
+    ChannelFactory.create(name="exists")
+
+    mock_api = mocker.patch("channels.api.Api", autospec=True)
+    mock_api.return_value.reddit.info.return_value = [
+        mocker.Mock(id="1", subreddit=mocker.Mock(display_name="exists")),
+        mocker.Mock(id="2", subreddit=mocker.Mock(display_name="missing")),
+    ]
+
+    mock_backpopulate_api = mocker.patch("channels.tasks.backpopulate_api")
+    mock_backpopulate_api.backpopulate_comments.return_value = 15
+
+    result = tasks.populate_posts_and_comments.delay(post_ids).get()
+
+    kind = get_kind_mapping()["submission"]
+
+    mock_api.return_value.reddit.info.assert_called_once_with(
+        [f"{kind}_{post_id}" for post_id in post_ids]
+    )
+
+    assert Post.objects.filter(post_id="1").exists()
+
+    submission = mock_api.return_value.reddit.info.return_value[0]
+
+    mock_backpopulate_api.backpopulate_post.assert_called_once_with(
+        Post.objects.get(post_id="1"), submission
+    )
+    mock_backpopulate_api.backpopulate_comments.assert_called_once_with(submission)
+
+    assert result == {
+        "posts": 1,
+        "comments": 15,
+        "failures": [
+            {
+                "thing_type": "post",
+                "thing_id": "2",
+                "reason": "unknown channel 'missing'",
+            }
+        ],
+    }
+
+
+def test_populate_posts_and_comments_merge_results():
+    """
+    populate_posts_and_comments_merge_results should aggregate result from other tasks
+    """
+    result = tasks.populate_posts_and_comments_merge_results.delay(
+        [
+            {"posts": 3, "comments": 5, "failures": [1, 2, 3]},
+            {"posts": 6, "comments": 9, "failures": [3, 4, 5]},
+        ]
+    ).get()
+
+    assert result == {"posts": 9, "comments": 14, "failures": [1, 2, 3, 3, 4, 5]}
+
+
+def test_populate_all_posts_and_comments(mocker, settings, mocked_celery):
+    """
+    populate_all_posts_and_comments should create batched subtasks to populate the Posts and Comments
+    """
+    mock_api = mocker.patch("channels.api.Api", autospec=True)
+    mock_api.return_value.reddit.front.new.return_value = iter(
+        [mocker.Mock(id=base36.dumps(23))]
+    )
+
+    mock_populate_posts_and_comments = mocker.patch(
+        "channels.tasks.populate_posts_and_comments"
+    )
+    mock_populate_posts_and_comments_merge_results = mocker.patch(
+        "channels.tasks.populate_posts_and_comments_merge_results"
+    )
+
+    # ensure group consumers the generator passed to it so the other assertions work
+    mocked_celery.group.side_effect = list
+
+    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 10
+
+    with pytest.raises(mocked_celery.replace_exception_class):
+        tasks.populate_all_posts_and_comments.delay()
+
+    assert mocked_celery.group.call_count == 1
+    assert mock_populate_posts_and_comments.si.call_count == 3
+    mock_populate_posts_and_comments.si.assert_any_call(list(range(0, 10)))
+    mock_populate_posts_and_comments.si.assert_any_call(list(range(10, 20)))
+    mock_populate_posts_and_comments.si.assert_any_call(list(range(20, 24)))
+    mock_populate_posts_and_comments_merge_results.s.assert_called_once_with()
+    assert mocked_celery.replace.call_count == 1

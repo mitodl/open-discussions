@@ -15,6 +15,7 @@ from urllib3.exceptions import InsecureRequestWarning
 import channels.api
 import channels.factories
 import channels.serializers
+from open_discussions.factories import UserFactory
 
 
 @pytest.fixture(autouse=True)
@@ -148,3 +149,11 @@ def mocked_celery(mocker):
 def disable_search_tasks(mocker):
     """Patch search tasks so they no-op"""
     return mocker.patch("search.task_helpers")
+
+
+@pytest.fixture
+def indexing_user(settings):
+    """Sets and returns the indexing user"""
+    user = UserFactory.create()
+    settings.INDEXING_API_USERNAME = user.username
+    return user

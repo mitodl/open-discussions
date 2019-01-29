@@ -509,6 +509,10 @@ def create_channel_groups_and_roles(channel):
 class Api:
     """Channel API"""
 
+    # help Mock() spec this object correctly
+    reddit = None
+    user = None
+
     def __init__(self, user):
         """Constructor"""
         if user is None:

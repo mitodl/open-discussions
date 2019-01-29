@@ -183,7 +183,9 @@ def test_backpopulate_comments(mocker):
         ),
     ]
 
-    backpopulate_api.backpopulate_comments(submission)
+    result = backpopulate_api.backpopulate_comments(submission)
+
+    assert result == len(comments)
 
     submission.comments.replace_more.assert_called_once_with(limit=None)
 
