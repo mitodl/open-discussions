@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.64.0
+Version 0.64.0 (Released January 29, 2019)
 --------------
 
 - Fixed subscriber permission to allow self-editing of channel subs
