@@ -90,6 +90,13 @@ class ChannelFactory(DjangoModelFactory):
     allowed_post_types = DEFAULT_ALLOWED_POST_TYPES
     title = factory.Faker("text", max_nb_chars=50)
     channel_type = FuzzyChoice(VALID_CHANNEL_TYPES)
+    about = factory.List(
+        [
+            factory.Dict({"node": "text", "value": factory.Faker("text")}),
+            factory.Dict({"node": "text", "value": factory.Faker("text")}),
+            factory.Dict({"node": "text", "value": factory.Faker("text")}),
+        ]
+    )
 
     @factory.post_generation
     def create_roles(

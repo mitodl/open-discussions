@@ -6,8 +6,8 @@ from unittest.mock import Mock
 import pytest
 from channels.api import get_allowed_post_types_from_link_type
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF, LINK_TYPE_ANY
-from channels.models import Channel
 from channels.serializers.channels import ChannelSerializer
+from channels.factories.models import ChannelFactory
 
 
 pytestmark = pytest.mark.django_db
@@ -15,6 +15,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.parametrize("has_avatar", [True, False])
 @pytest.mark.parametrize("has_banner", [True, False])
+@pytest.mark.parametrize("has_about", [True, False])
 @pytest.mark.parametrize("ga_tracking_id", [None, "abc123"])
 @pytest.mark.parametrize("membership_is_managed", [True, False])
 @pytest.mark.parametrize("allowed_post_types", [{}, {"self": True, "link": False}])
@@ -23,6 +24,7 @@ def test_serialize_channel(
     user,
     has_avatar,
     has_banner,
+    has_about,
     ga_tracking_id,
     membership_is_managed,
     allowed_post_types,
@@ -46,6 +48,7 @@ def test_serialize_channel(
         avatar_medium=Mock() if has_avatar else None,
         ga_tracking_id=ga_tracking_id,
         widget_list_id=123,
+        about=Mock() if has_about else None,
     )
 
     request = Mock(user=user)
@@ -72,6 +75,7 @@ def test_serialize_channel(
         if allowed_post_types
         else get_allowed_post_types_from_link_type(link_type),
         "widget_list_id": channel.widget_list_id,
+        "about": channel.about,
     }
 
 
@@ -146,7 +150,7 @@ def test_update_channel(user, validated_data, expected_kwawrgs):
     Test updating a channel
     """
     display_name = "subreddit"
-    Channel.objects.create(name=display_name)
+    ChannelFactory.create(name=display_name)
     instance = Mock(display_name=display_name)
     request = Mock(user=user)
     api_mock = Mock()
@@ -157,3 +161,22 @@ def test_update_channel(user, validated_data, expected_kwawrgs):
         name=display_name, **expected_kwawrgs
     )
     assert channel == api_mock.update_channel.return_value
+
+
+@pytest.mark.parametrize("about", [None, [{"foo": "bar"}]])
+def test_update_channel_about(user, about):
+    """
+    Test updating the channel about field
+    """
+    channel = ChannelFactory.create(about=None)
+    instance = Mock(display_name=channel.name)
+    request = Mock(user=user)
+    api_mock = Mock()
+    api_mock.update_channel.return_value._self_channel = (  # pylint: disable=protected-access
+        channel
+    )
+    ChannelSerializer(context={"channel_api": api_mock, "request": request}).update(
+        instance, {"about": about}
+    )
+    channel.refresh_from_db()
+    assert channel.about == about

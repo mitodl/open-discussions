@@ -339,6 +339,18 @@ def test_patch_channel_validate_image(staff_client, private_channel, field):
     }
 
 
+def test_patch_channel_about(staff_client, private_channel):
+    """
+    should let you update the about field
+    """
+    url = reverse("channel-detail", kwargs={"channel_name": private_channel.name})
+    about = [{"foo": "bar"}]
+    resp = staff_client.patch(url, {"about": about}, format="json")
+    assert resp.status_code == status.HTTP_200_OK
+    channel = Channel.objects.get(name=private_channel.name)
+    assert channel.about == about
+
+
 def test_patch_channel_forbidden(staff_client):
     """
     Update a channel's settings for a channel the user doesn't have permission to

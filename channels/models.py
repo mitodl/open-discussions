@@ -142,6 +142,7 @@ class Channel(TimestampedModel):
     banner = models.ImageField(null=True, max_length=2083, upload_to=banner_uri)
     ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
     widget_list = models.ForeignKey(WidgetList, on_delete=models.SET_NULL, null=True)
+    about = JSONField(blank=True, null=True)
 
     # Bitfield mutates the list passed to
     allowed_post_types = BitField(flags=VALID_EXTENDED_POST_CHOICES, null=True)

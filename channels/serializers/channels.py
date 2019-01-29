@@ -41,6 +41,7 @@ class ChannelSerializer(serializers.Serializer):
     avatar_medium = serializers.SerializerMethodField()
     banner = WriteableSerializerMethodField()
     ga_tracking_id = serializers.CharField(required=False, allow_blank=True)
+    about = serializers.JSONField(allow_null=True, default=None)
 
     def get_user_is_contributor(self, channel):
         """
@@ -193,5 +194,10 @@ class ChannelSerializer(serializers.Serializer):
         if banner:
             channel_obj.banner.save(f"channel_banner_{name}.jpg", banner, save=False)
             channel_obj.save(update_fields=["banner"], update_image=True)
+
+        if "about" in validated_data:
+            about = validated_data.get("about")
+            channel_obj.about = about
+            channel_obj.save()
 
         return channel

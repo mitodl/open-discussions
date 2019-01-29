@@ -137,6 +137,7 @@ class ChannelProxy(ObjectProxy):
             "ga_tracking_id",
             "banner",
             "widget_list_id",
+            "about",
         ):
             return getattr(self._self_channel, name)
         else:
