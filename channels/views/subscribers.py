@@ -10,10 +10,7 @@ from rest_framework.views import APIView
 from channels.api import Api
 from channels.models import Channel, ChannelSubscription
 from channels.serializers.subscribers import SubscriberSerializer
-from open_discussions.permissions import (
-    IsStaffOrReadonlyPermission,
-    IsStaffModeratorOrReadonlyPermission,
-)
+from open_discussions.permissions import IsOwnSubscriptionOrAdminPermission
 
 
 class SubscriberListView(ListCreateAPIView):
@@ -21,7 +18,7 @@ class SubscriberListView(ListCreateAPIView):
     View to add subscribers in channels
     """
 
-    permission_classes = (IsAuthenticated, IsStaffModeratorOrReadonlyPermission)
+    permission_classes = (IsAuthenticated, IsOwnSubscriptionOrAdminPermission)
     serializer_class = SubscriberSerializer
 
     def get_serializer_context(self):
@@ -44,7 +41,7 @@ class SubscriberDetailView(APIView):
     View to retrieve and remove subscribers in channels
     """
 
-    permission_classes = (IsAuthenticated, IsStaffOrReadonlyPermission)
+    permission_classes = (IsAuthenticated, IsOwnSubscriptionOrAdminPermission)
 
     def get_serializer_context(self):
         """Context for the request and view"""
