@@ -136,6 +136,33 @@ class IsStaffModeratorOrReadonlyPermission(permissions.BasePermission):
         )
 
 
+class IsOwnSubscriptionOrAdminPermission(permissions.BasePermission):
+    """
+    Checks that the user is (1) staff/moderator, (2) editing their own subscription, or (3) making
+    a readonly request
+    """
+
+    @staticmethod
+    def is_own_resource_request(request, view):
+        """Returns True if the request is on the user's own behalf"""
+        resource_owner_username = view.kwargs.get(
+            "subscriber_name", None
+        ) or request.data.get("subscriber_name", None)
+        return resource_owner_username == request.user.username
+
+    def has_permission(self, request, view):
+        """
+        Returns True if user is (1) staff/moderator, (2) editing their own subscription, or (3) making
+        a readonly request
+        """
+        return (
+            is_readonly(request)
+            or self.is_own_resource_request(request, view)
+            or is_staff_user(request)
+            or is_moderator(request, view)
+        )
+
+
 class ContributorPermissions(permissions.BasePermission):
     """
     Only staff and moderators should be able to see and edit the list of contributors

@@ -13,6 +13,7 @@ from open_discussions.permissions import (
     IsStaffOrModeratorPermission,
     IsStaffOrReadonlyPermission,
     IsStaffModeratorOrReadonlyPermission,
+    IsOwnSubscriptionOrAdminPermission,
     ModeratorPermissions,
     ObjectOnlyPermissions,
     channel_is_mod_editable,
@@ -230,6 +231,37 @@ def test_is_staff_moderator_or_readonly_exceptions(mocker, user, exception_cls):
     )
     view = mocker.Mock(kwargs=dict(channel_name="abc"))
     assert perm.has_permission(request, view) is False
+
+
+@pytest.mark.parametrize(
+    "logged_in_username,req_body_username,url_kwarg_username,expected",
+    [
+        ["user1", "user1", None, True],
+        ["user1", None, "user1", True],
+        ["user1", "user1", None, True],
+        ["otheruser", "user1", None, False],
+        ["otheruser", None, "user1", False],
+        ["user1", None, None, False],
+    ],
+)
+def test_is_own_subscription_permission(
+    mocker, logged_in_username, req_body_username, url_kwarg_username, expected
+):
+    """
+    Test that IsOwnSubscriptionOrAdminPermission returns True if the user is adding/deleting
+    their own resource
+    """
+    view = mocker.Mock(kwargs={"subscriber_name": url_kwarg_username})
+    request = mocker.Mock(
+        user=mocker.Mock(username=logged_in_username),
+        data={"subscriber_name": req_body_username} if req_body_username else {},
+    )
+    mocker.patch("open_discussions.permissions.is_staff_user", return_value=False)
+    mocker.patch("open_discussions.permissions.is_moderator", return_value=False)
+    mocker.patch("open_discussions.permissions.is_readonly", return_value=False)
+    assert (
+        IsOwnSubscriptionOrAdminPermission().has_permission(request, view) is expected
+    )
 
 
 # This is essentially is_staff or (moderator and (mod_editable or readonly))
