@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.64.0
+--------------
+
+- Fixed subscriber permission to allow self-editing of channel subs
+- Collapse and expand widgets (#1759)
+- Refactored factories to split model ones vs. reddit ones
+- Fixed bug with post summary showing raw markdown
+- Added button to follow/unfollow channel
+
 Version 0.63.2 (Released January 25, 2019)
 --------------
 
