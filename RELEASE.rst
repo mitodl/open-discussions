@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.64.1
+--------------
+
+- Added script and tasks to backpopulate all posts and comments
+
 Version 0.64.0 (Released January 29, 2019)
 --------------
 
