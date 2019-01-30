@@ -11,12 +11,7 @@ from channels.constants import (
     VALID_EXTENDED_POST_TYPES,
     DELETED_COMMENT_OR_POST_TEXT,
 )
-from channels.factories.models import (
-    PostFactory,
-    CommentFactory,
-    ArticleFactory,
-    LinkMetaFactory,
-)
+from channels.factories.models import PostFactory, ArticleFactory, LinkMetaFactory
 from channels.models import Comment
 from channels.test_utils import assert_properties_eq
 from open_discussions.factories import UserFactory
@@ -84,7 +79,7 @@ def test_backpopulate_post(
         banned_by="abc" if is_removed else None,
         created=CREATED_TIMESTAMP,
     )
-    backpopulate_api.backpopulate_post(post, submission)
+    backpopulate_api.backpopulate_post(post=post, submission=submission)
 
     post.refresh_from_db()
 
@@ -119,11 +114,12 @@ def test_backpopulate_comments(mocker):
     mock_author.configure_mock(name=author.username)
     missing_author = mocker.Mock()
     missing_author.configure_mock(name="missing")
-    comments = CommentFactory.create_batch(6, unpopulated=True)
+    post = PostFactory.create()
     submission = mocker.Mock(comments=mocker.MagicMock())
-    submission.comments.__iter__.return_value = [
+    comments = [
         mocker.Mock(
-            id=comments[0].comment_id,
+            id="1",
+            parent_id=f"t3_{post.post_id}",
             author=mock_author,
             body="comment",
             score=12,
@@ -133,7 +129,8 @@ def test_backpopulate_comments(mocker):
         ),
         # deleted
         mocker.Mock(
-            id=comments[1].comment_id,
+            id="2",
+            parent_id=f"t3_{post.post_id}",
             author=mock_author,
             body=DELETED_COMMENT_OR_POST_TEXT,
             score=12,
@@ -143,7 +140,8 @@ def test_backpopulate_comments(mocker):
         ),
         # removed
         mocker.Mock(
-            id=comments[2].comment_id,
+            id="3",
+            parent_id=f"t3_{post.post_id}",
             author=mock_author,
             body="comment removed",
             score=12,
@@ -153,7 +151,8 @@ def test_backpopulate_comments(mocker):
         ),
         # edited
         mocker.Mock(
-            id=comments[3].comment_id,
+            id="4",
+            parent_id=f"t3_{post.post_id}",
             author=mock_author,
             body="comment edited",
             score=12,
@@ -163,7 +162,8 @@ def test_backpopulate_comments(mocker):
         ),
         # missing author
         mocker.Mock(
-            id=comments[4].comment_id,
+            id="5",
+            parent_id=f"t3_{post.post_id}",
             author=missing_author,
             body="comment missing author",
             score=12,
@@ -173,7 +173,8 @@ def test_backpopulate_comments(mocker):
         ),
         # no author
         mocker.Mock(
-            id=comments[5].comment_id,
+            id="6",
+            parent_id=f"t3_{post.post_id}",
             author=None,
             body="comment no author",
             score=12,
@@ -182,8 +183,9 @@ def test_backpopulate_comments(mocker):
             created=CREATED_TIMESTAMP,
         ),
     ]
+    submission.comments.__iter__.return_value = comments
 
-    result = backpopulate_api.backpopulate_comments(submission)
+    result = backpopulate_api.backpopulate_comments(post=post, submission=submission)
 
     assert result == len(comments)
 
@@ -251,8 +253,10 @@ def test_backpopulate_comments(mocker):
         ),
     ]
 
-    comments = Comment.objects.order_by("id").filter(
-        id__in=[comment.id for comment in comments]
+    populated_comments = list(
+        Comment.objects.order_by("id").filter(
+            comment_id__in=[comment.id for comment in comments]
+        )
     )
-    for comment, expected in zip(comments, expected_values):
+    for comment, expected in zip(populated_comments, expected_values):
         assert_properties_eq(comment, expected)

@@ -30,8 +30,8 @@ from prawcore.exceptions import (
 )
 from rest_framework.exceptions import PermissionDenied, NotFound
 
-from channels.backpopulate_api import comment_values_from_reddit
 from channels.constants import (
+    DELETED_COMMENT_OR_POST_TEXT,
     CHANNEL_TYPE_PUBLIC,
     POSTS_SORT_HOT,
     POSTS_SORT_NEW,
@@ -504,6 +504,59 @@ def create_channel_groups_and_roles(channel):
         )
 
     return roles
+
+
+def comment_values_from_reddit(comment):
+    """
+    Returns the values to populate the comment from a comment
+
+    Args:
+        comment (praw.models.Comment): the reddit comment to source data from
+
+    Returns:
+        dict: property values for a channels.models.Comment record
+    """
+    _, parent_id = get_kind_and_id(comment.parent_id)
+    return dict(
+        parent_id=parent_id,
+        text=comment.body,
+        score=comment.score,
+        edited=comment.edited if comment.edited is False else True,
+        removed=comment.banned_by is not None,
+        deleted=comment.body == DELETED_COMMENT_OR_POST_TEXT,
+        created_on=datetime.fromtimestamp(comment.created, tz=timezone.utc).isoformat(),
+    )
+
+
+def create_comment(*, post, comment, author):
+    """
+    Creates a comment based on values from reddit
+
+    Args:
+        post (channels.models.Post): the post the comment is on
+        comment (praw.models.Comment): the reddit comment
+        author (User): the user who wrote the comment or None if the user doesn't exist anymore
+
+    Returns:
+        channels.models.Comment: a new comment
+    """
+
+    comment_values = comment_values_from_reddit(comment)
+
+    # special case, the field is auto_now_add, so we need to set this by doing an update after create
+    created_on = comment_values.get("created_on")
+
+    comment, created = Comment.objects.update_or_create(
+        comment_id=comment.id,
+        defaults={**comment_values, "post": post, "author": author},
+    )
+
+    if created:
+        # intentionally not an update(), because otherwise we'd have to re-select
+        comment.created_on = created_on
+        comment.save()
+
+    return comment
 
 
 class Api:
@@ -1179,19 +1232,15 @@ class Api:
 
         _, link_id = get_kind_and_id(comment.link_id)
 
-        comment_values = comment_values_from_reddit(comment)
-
         with transaction.atomic():
             Post.objects.filter(post_id=link_id).update(
                 num_comments=Coalesce("num_comments", 0) + 1
             )
 
-            Comment.objects.create(
-                comment_id=comment.id,
+            create_comment(
                 post=Post.objects.get(post_id=link_id),
-                parent_id=post_id or comment_id,
+                comment=comment,
                 author=self.user,
-                **comment_values,
             )
 
         return comment

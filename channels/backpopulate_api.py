@@ -5,20 +5,19 @@ import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+from channels import api, utils
 from channels.constants import (
     LINK_TYPE_LINK,
     LINK_TYPE_SELF,
     EXTENDED_POST_TYPE_ARTICLE,
     DELETED_COMMENT_OR_POST_TEXT,
 )
-from channels.models import Comment
-from channels import utils
 
 User = get_user_model()
 log = logging.getLogger()
 
 
-def backpopulate_post(post, submission):
+def backpopulate_post(*, post, submission):
     """
     Backpopulates a post with values from a submission
 
@@ -59,32 +58,16 @@ def backpopulate_post(post, submission):
     post.save()
 
 
-def comment_values_from_reddit(comment):
-    """
-    Returns the values to populate the comment from a comment
-
-    Args:
-        comment (praw.models.Comment): the reddit comment to source data from
-
-    Returns:
-        dict: property values for a channels.models.Comment record
-    """
-    return dict(
-        text=comment.body,
-        score=comment.score,
-        edited=comment.edited if comment.edited is False else True,
-        removed=comment.banned_by is not None,
-        deleted=comment.body == DELETED_COMMENT_OR_POST_TEXT,
-        created_on=datetime.fromtimestamp(comment.created, tz=timezone.utc).isoformat(),
-    )
-
-
-def backpopulate_comments(submission):
+def backpopulate_comments(*, post, submission):
     """
     Backpopulates a post's comments with values from a submission CommentTree
 
     Args:
+        post (channels.models.Post): the post to backpopulate
         submission (Submission): the reddit submission to source data from
+
+    Returns:
+        int: number of comments backpopulated
     """
     submission.comments.replace_more(limit=None)
     author_usernames = {
@@ -97,13 +80,8 @@ def backpopulate_comments(submission):
         author = (
             authors_by_username.get(comment.author.name) if comment.author else None
         )
-        comment_values = comment_values_from_reddit(comment)
 
-        # we may see a comment in reddit before it's created in the database
-        # but it should have correct values in that case
-        # so this update may affect zero rows, but that's ok
-        update_count += Comment.objects.filter(comment_id=comment.id).update(
-            author=author, **comment_values
-        )
+        api.create_comment(post=post, comment=comment, author=author)
+        update_count += 1
 
     return update_count

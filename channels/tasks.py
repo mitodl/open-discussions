@@ -163,8 +163,8 @@ def populate_post_and_comment_fields_batch(ids):
     for post in Post.objects.filter(id__in=ids).iterator():
         submission = client.get_submission(post.post_id)
 
-        backpopulate_api.backpopulate_post(post, submission)
-        backpopulate_api.backpopulate_comments(submission)
+        backpopulate_api.backpopulate_post(post=post, submission=submission)
+        backpopulate_api.backpopulate_comments(post=post, submission=submission)
 
 
 @app.task(bind=True)
@@ -288,10 +288,12 @@ def populate_posts_and_comments(post_ids):
             defaults={"channel": channels_by_name.get(channel_name)},
         )
 
-        backpopulate_api.backpopulate_post(post, submission)
+        backpopulate_api.backpopulate_post(post=post, submission=submission)
         post_count += 1
 
-        comment_count += backpopulate_api.backpopulate_comments(submission)
+        comment_count += backpopulate_api.backpopulate_comments(
+            post=post, submission=submission
+        )
     return {"posts": post_count, "comments": comment_count, "failures": failures}
 
 

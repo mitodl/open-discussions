@@ -31,8 +31,12 @@ class Command(BaseCommand):
                         post, _ = Post.objects.get_or_create(
                             post_id=post_id, channel=channel
                         )
-                        backpopulate_api.backpopulate_post(post, submission)
-                        backpopulate_api.backpopulate_comments(submission)
+                        backpopulate_api.backpopulate_post(
+                            post=post, submission=submission
+                        )
+                        backpopulate_api.backpopulate_comments(
+                            post=post, submission=submission
+                        )
                         index_post_with_comments.delay(post_id)
                     self.stdout.write(
                         self.style.SUCCESS(

@@ -206,10 +206,10 @@ def test_populate_post_and_comment_fields_batch(mocker):
     for post in posts:
         mock_api.return_value.get_submission.assert_any_call(post.post_id)
         mock_backpopulate_api.backpopulate_post.assert_any_call(
-            post, mock_api.return_value.get_submission.return_value
+            post=post, submission=mock_api.return_value.get_submission.return_value
         )
         mock_backpopulate_api.backpopulate_comments.assert_any_call(
-            mock_api.return_value.get_submission.return_value
+            post=post, submission=mock_api.return_value.get_submission.return_value
         )
 
 
@@ -271,12 +271,16 @@ def test_populate_posts_and_comments(mocker):
 
     assert Post.objects.filter(post_id="1").exists()
 
+    post = Post.objects.get(post_id="1")
+
     submission = mock_api.return_value.reddit.info.return_value[0]
 
     mock_backpopulate_api.backpopulate_post.assert_called_once_with(
-        Post.objects.get(post_id="1"), submission
+        post=post, submission=submission
     )
-    mock_backpopulate_api.backpopulate_comments.assert_called_once_with(submission)
+    mock_backpopulate_api.backpopulate_comments.assert_called_once_with(
+        post=post, submission=submission
+    )
 
     assert result == {
         "posts": 1,

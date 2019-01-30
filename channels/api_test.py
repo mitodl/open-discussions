@@ -12,7 +12,6 @@ from prawcore.exceptions import ResponseException
 from rest_framework.exceptions import NotFound
 
 from channels import api
-from channels.backpopulate_api import comment_values_from_reddit
 from channels.constants import (
     COMMENTS_SORT_BEST,
     CHANNEL_TYPE_PUBLIC,
@@ -80,11 +79,12 @@ def _mock_post(*, post_id, subreddit, **kwargs):
 
 def _mock_comment(*, comment_id, submission, subreddit, parent_id, **kwargs):
     """Create a mock comment and associated DB record"""
-    user = kwargs.pop("user", None) or UserFactory.create()
+    author = kwargs.pop("user", None) or UserFactory.create()
     mock_author = Mock()
-    mock_author.configure_mock(name=user.username)
+    mock_author.configure_mock(name=author.username)
     comment = Mock(
         id=comment_id,
+        parent_id=parent_id,
         body="comment body",
         removed=False,
         banned_by=None,
@@ -95,12 +95,8 @@ def _mock_comment(*, comment_id, submission, subreddit, parent_id, **kwargs):
         subreddit=subreddit,
         **kwargs,
     )
-    Comment.objects.create(
-        comment_id=comment_id,
-        post=Post.objects.get(post_id=submission.id),
-        parent_id=parent_id,
-        author=user,
-        **comment_values_from_reddit(comment),
+    api.create_comment(
+        post=Post.objects.get(post_id=submission.id), comment=comment, author=author
     )
     return comment
 
@@ -129,7 +125,7 @@ def mock_get_client(mocker):
                     reply=Mock(
                         return_value=_mock_comment(
                             comment_id="456",
-                            parent_id="abc",
+                            parent_id="t3_abc",
                             link_id="t3_abc",
                             submission=_mock_post(
                                 post_id="abc", subreddit=_mock_channel(name="subreddit")
@@ -147,7 +143,7 @@ def mock_get_client(mocker):
             comment=Mock(
                 return_value=_mock_comment(
                     comment_id="567",
-                    parent_id="123",
+                    parent_id="t3_123",
                     link_id="t3_123",
                     submission=_mock_post(
                         post_id="123", subreddit=_mock_channel(name="other_subreddit")
@@ -156,7 +152,7 @@ def mock_get_client(mocker):
                     reply=Mock(
                         return_value=_mock_comment(
                             comment_id="789",
-                            parent_id="567",
+                            parent_id="t1_567",
                             link_id="t3_123",
                             submission=_mock_post(
                                 post_id="123",
