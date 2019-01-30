@@ -299,8 +299,7 @@ describe("WidgetListContainer", () => {
         const updateId = updatedWidgetList[0].id
         const replaceInstance = {
           ...makeWidgetInstance(),
-          id:   updateId,
-          json: null
+          id: updateId
         }
         const list = updatedWidgetList.map(
           item => (item.id === updateId ? replaceInstance : item)
@@ -343,12 +342,7 @@ describe("WidgetListContainer", () => {
           payload: {
             formKey: WIDGET_FORM_KEY,
             value:   {
-              instances: updatedWidgetList.concat([
-                {
-                  ...data.instance,
-                  json: null
-                }
-              ])
+              instances: updatedWidgetList.concat([data.instance])
             }
           }
         })

@@ -2,6 +2,7 @@
 import factory
 from factory.django import DjangoModelFactory
 
+from open_discussions.factories import UserFactory
 from widgets.models import WidgetList, WidgetInstance
 
 
@@ -44,4 +45,14 @@ class WidgetInstanceFactory(DjangoModelFactory):
             widget_type="RSS Feed",
             title="RSS Widget",
             configuration={"url": "http://example.com", "feed_display_limit": 10},
+        )
+        type_people = factory.Trait(
+            widget_type="People",
+            title="People Widget",
+            configuration=factory.LazyAttribute(
+                lambda _: {
+                    "title": "",
+                    "people": [UserFactory.create().username for _ in range(10)],
+                }
+            ),
         )

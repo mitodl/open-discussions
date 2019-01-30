@@ -25,6 +25,9 @@ export const WIDGET_TYPE_SELECT = "WIDGET_TYPE_SELECT"
 export const WIDGET_EDIT = "WIDGET_EDIT"
 export const WIDGET_CREATE = "WIDGET_CREATE"
 
+const onChangeWrapper = (valueFunction: Function) => (event: any) =>
+  valueFunction(event.target.value)
+
 export default class WidgetEditDialog extends React.Component<Props> {
   componentDidMount() {
     this.deBlur()
@@ -43,17 +46,25 @@ export default class WidgetEditDialog extends React.Component<Props> {
     }
   }
 
-  updateValue = R.curry((lens: any, event: any) => {
+  updateValues = R.curry((lenses: Array<any>, values: Array<any>) => {
     const { setDialogData, dialogData } = this.props
     if (!dialogData) {
       return
     }
 
-    const updated = R.set(lens, event.target.value, dialogData.instance)
+    let updated = dialogData.instance
+    lenses.forEach((lens, index) => {
+      const value = values[index]
+      updated = R.set(lens, value, updated)
+    })
     setDialogData({
       ...dialogData,
       instance: updated
     })
+  })
+
+  updateValue = R.curry((lens: any, value: any) => {
+    this.updateValues([lens], [value])
   })
 
   getValue = (lens: any) => {
@@ -72,7 +83,7 @@ export default class WidgetEditDialog extends React.Component<Props> {
         <Radio
           className="radio"
           value={this.getValue(widgetTypeLens)}
-          onChange={this.updateValue(widgetTypeLens)}
+          onChange={onChangeWrapper(this.updateValue(widgetTypeLens))}
           options={specs.map(spec => ({
             label: spec.description,
             value: spec.widget_type
@@ -98,12 +109,11 @@ export default class WidgetEditDialog extends React.Component<Props> {
           <input
             type="text"
             value={this.getValue(titleLens) || ""}
-            onChange={this.updateValue(titleLens)}
+            onChange={onChangeWrapper(this.updateValue(titleLens))}
           />
         </label>
         {validationMessage(validation.title)}
         {spec.form_spec.map(fieldSpec => {
-          const lens = R.lensPath(["configuration", [fieldSpec.field_name]])
           return (
             <label
               key={fieldSpec.field_name}
@@ -111,11 +121,16 @@ export default class WidgetEditDialog extends React.Component<Props> {
             >
               {fieldSpec.label}
               <WidgetField
-                value={this.getValue(lens)}
-                onChange={this.updateValue(lens)}
+                getValue={this.getValue}
+                updateValues={this.updateValues}
                 fieldSpec={fieldSpec}
               />
-              {validationMessage(R.view(lens, validation))}
+              {validationMessage(
+                R.view(
+                  R.lensPath(["configuration", fieldSpec.field_name]),
+                  validation
+                )
+              )}
             </label>
           )
         })}

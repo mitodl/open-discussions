@@ -32,7 +32,7 @@ class RssFeedWidgetSerializer(WidgetInstanceSerializer):
     description = "RSS Feed"
 
     def get_json(self, instance):
-        """Renders the widget to html based on configuration"""
+        """Obtains RSS feed data which will then be provided to the React component"""
         rss = feedparser.parse(instance.configuration["url"])
         if not rss:
             return {"title": "RSS", "entries": []}

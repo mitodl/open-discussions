@@ -13,8 +13,14 @@ def get_widget_classes():
     from widgets.serializers.markdown import MarkdownWidgetSerializer
     from widgets.serializers.rss import RssFeedWidgetSerializer
     from widgets.serializers.url import URLWidgetSerializer
+    from widgets.serializers.people import PeopleWidgetSerializer
 
-    return [MarkdownWidgetSerializer, URLWidgetSerializer, RssFeedWidgetSerializer]
+    return [
+        MarkdownWidgetSerializer,
+        URLWidgetSerializer,
+        RssFeedWidgetSerializer,
+        PeopleWidgetSerializer,
+    ]
 
 
 def get_widget_type_mapping():

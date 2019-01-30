@@ -139,10 +139,7 @@ export class WidgetListContainer extends React.Component<Props> {
     const { updateWidgetInstances } = this.props
     const instances = this.getWidgetInstances()
 
-    const instanceFromDialog: WidgetInstanceType = {
-      ...data.instance,
-      json: null
-    }
+    const instanceFromDialog = data.instance
     const key = getWidgetKey(instanceFromDialog)
     const replacementInstances =
       data.state === WIDGET_EDIT

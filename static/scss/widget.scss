@@ -24,12 +24,16 @@
   justify-content: space-between;
 }
 
+$body-x-padding: 40px;
+$dialog-max-width: 400px;
+$person-z-index: 10;
+
 .widget-dialog {
   min-width: auto;
-  max-width: 400px;
+  max-width: $dialog-max-width;
 
   .mdc-dialog__header {
-    padding: 40px 40px 20px 40px;
+    padding: 40px $body-x-padding 20px $body-x-padding;
 
     .mdc-dialog__header__title {
       font-size: 24px;
@@ -38,11 +42,27 @@
   }
 
   .mdc-dialog__body {
-    padding: 0 40px 20px 40px;
+    padding: 0 $body-x-padding 20px $body-x-padding;
   }
 
   .mdc-dialog__footer {
-    padding: 0 30px 30px 30px;
+    padding: 0 $body-x-padding 30px $body-x-padding;
+  }
+
+  .react-autosuggest__suggestions-list {
+    position: absolute;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    max-height: 135px;
+    overflow-y: scroll;
+    max-width: $dialog-max-width - 2 * $body-x-padding;
+    width: 100%;
+    box-shadow: 0 10px 20px 3px #888;
+    background-color: white;
+
+    // autosuggest should float above people list
+    z-index: $person-z-index + 1;
   }
 }
 
@@ -77,25 +97,6 @@
     border-top: 1px solid $pale-grey;
   }
 
-  .edit-buttons {
-    user-select: none;
-    display: flex;
-    flex-direction: row;
-    color: black;
-
-    .widget-button {
-      cursor: pointer;
-      background-color: $pale-grey;
-      font-size: 20px;
-      padding: 4px;
-      border: 2px solid white;
-    }
-
-    .drag-handle {
-      margin-left: auto;
-    }
-  }
-
   .entry {
     margin-bottom: 10px;
 
@@ -122,5 +123,86 @@
 
   iframe {
     width: 100%;
+  }
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  margin: 5px;
+  font-size: 14px;
+  // z-index is to allow for reordering with react-sortable-hoc to float above dialog
+  z-index: $person-z-index;
+
+  // fixing some mdc-dialog overrides
+  font-family: $body-font;
+  color: black;
+  font-weight: unset;
+  line-height: normal;
+  letter-spacing: normal;
+
+  .avatar {
+    margin-right: 5px;
+  }
+
+  .description {
+    display: flex;
+    flex-direction: column;
+
+    .headline {
+      color: $font-grey-light;
+    }
+  }
+
+  .add-profile {
+    margin-left: auto;
+    margin-bottom: 0;
+    padding: 5px 15px;
+    color: black;
+    background-color: $pale-grey;
+  }
+
+  .edit-buttons {
+    margin-left: auto;
+  }
+}
+
+.widget,
+.person {
+  .edit-buttons {
+    user-select: none;
+    display: flex;
+    flex-direction: row;
+    color: black;
+
+    .widget-button {
+      cursor: pointer;
+      background-color: $pale-grey;
+      font-size: 20px;
+      padding: 4px;
+      border: 2px solid white;
+    }
+
+    .drag-handle {
+      margin-left: auto;
+    }
+  }
+}
+
+.mdc-dialog {
+  .people {
+    .search-textbox {
+      input {
+        background-color: $pale-grey;
+        font-weight: inherit;
+        font-size: 14px;
+        padding: 8px 40px 7px 40px;
+      }
+    }
+  }
+
+  .people-list {
+    // shift list so it's offset a little bit from search suggestions
+    margin-top: 15px;
   }
 }

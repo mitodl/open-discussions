@@ -37,7 +37,14 @@ export default class SearchTextbox extends React.Component<Props> {
   }
 
   render() {
-    const { onSubmit, onClear, onChange, value, validation } = this.props
+    const {
+      onSubmit,
+      onClear,
+      onChange,
+      value,
+      validation,
+      ...extraProps
+    } = this.props
     return (
       <div className="search-textbox">
         <i className="material-icons search-icon" onClick={onSubmit}>
@@ -56,6 +63,7 @@ export default class SearchTextbox extends React.Component<Props> {
           value={value}
           onChange={onChange}
           onKeyDown={event => (event.key === "Enter" ? onSubmit(event) : null)}
+          {...extraProps}
         />
         {validationMessage(validation)}
       </div>

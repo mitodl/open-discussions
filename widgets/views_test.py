@@ -67,6 +67,19 @@ EXPECTED_AVAILABLE_WIDGETS = [
         "widget_type": "RSS Feed",
         "description": "RSS Feed",
     },
+    {
+        "description": "People",
+        "form_spec": [
+            {
+                "default": [],
+                "field_name": "people",
+                "input_type": "people",
+                "label": "Add members to widget",
+                "props": {"placeholder": "Enter widget text"},
+            }
+        ],
+        "widget_type": "People",
+    },
 ]
 
 
