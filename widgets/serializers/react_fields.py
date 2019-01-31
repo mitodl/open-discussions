@@ -18,7 +18,7 @@ class ReactField:
 
     def _get_input_type(self):
         """Returns the field's input type"""
-        return "text"
+        raise NotImplementedError()
 
     def get_field_spec(self):
         """
@@ -74,12 +74,25 @@ class ReactIntegerField(serializers.IntegerField, ReactField):
 class ReactURLField(serializers.URLField, ReactField):
     """ReactField extension of DRF UrlField"""
 
+    def __init__(self, **kwargs):
+        if "show_embed" in kwargs:
+            self.show_embed = kwargs.pop("show_embed")
+        else:
+            self.show_embed = False
+
+        super().__init__(**kwargs)
+
+    def _get_input_type(self):
+        """Returns the field's input type"""
+        return "url"
+
     def _get_props(self):
         """Returns the field properties"""
         return {
             **super()._get_props(),
             "max_length": self.max_length or "",
             "min_length": self.min_length or "",
+            "show_embed": self.show_embed,
         }
 
 

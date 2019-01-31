@@ -1,11 +1,10 @@
 /* global SETTINGS: false */
 // @flow
 import React from "react"
-import ReactDOMServer from "react-dom/server"
 import CustomEditor from "@mitodl/ckeditor-custom-build"
 
 import { getCKEditorJWT } from "../lib/api/ckeditor"
-import { loadEmbedlyPlatform } from "../lib/embed"
+import { loadEmbedlyPlatform, renderEmbedlyCard } from "../lib/embed"
 
 type Props = {
   initialData?: Array<Object>,
@@ -42,15 +41,7 @@ export default class ArticleEditor extends React.Component<Props> {
                 // doesn't support any other return value for this function.
                 // the embed.ly platform JS finds elements with the .embedly-card
                 // class and turns them into embed cards
-                return ReactDOMServer.renderToStaticMarkup(
-                  <a
-                    data-card-chrome="0"
-                    data-card-controls="0"
-                    data-card-key={SETTINGS.embedlyKey}
-                    href={url}
-                    className="embedly-card"
-                  />
-                )
+                return renderEmbedlyCard(url)
               }
             }
           ]

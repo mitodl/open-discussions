@@ -1,7 +1,8 @@
+/* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
 
-import { handleTwitterWidgets, hasIframe } from "./embed"
+import { handleTwitterWidgets, hasIframe, renderEmbedlyCard } from "./embed"
 
 describe("embed utils", () => {
   let twitterLoadStub
@@ -33,5 +34,18 @@ describe("embed utils", () => {
     ].forEach(([htmlString, exp]) => {
       assert.equal(hasIframe(htmlString), exp)
     })
+  })
+
+  it("renders static HTML for use with the embedly card API", () => {
+    const url = "https://example.com"
+    const html = renderEmbedlyCard(url)
+    const element = document.createElement("div")
+    element.innerHTML = html
+    const link = element.querySelector("a")
+    assert.equal(link.getAttribute("data-card-chrome"), "0")
+    assert.equal(link.getAttribute("data-card-controls"), "0")
+    assert.equal(link.getAttribute("data-card-key"), SETTINGS.embedlyKey)
+    assert.equal(link.getAttribute("href"), url)
+    assert.equal(link.getAttribute("class"), "embedly-card")
   })
 })
