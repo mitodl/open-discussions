@@ -121,9 +121,18 @@ describe("WidgetField", () => {
 
   it("renders an embedly component", () => {
     fieldSpec = makeFieldSpec("url")
+    fieldSpec.props.show_embed = true
     const wrapper = render()
     const embedlyCard = wrapper.find("EmbedlyCard")
     assert.isTrue(embedlyCard.exists())
     assert.equal(embedlyCard.prop("url"), value)
+  })
+
+  it("doesn't render an embedly component when show_embed is false", () => {
+    fieldSpec = makeFieldSpec("url")
+    fieldSpec.props.show_embed = false
+    const wrapper = render()
+    const embedlyCard = wrapper.find("EmbedlyCard")
+    assert.isFalse(embedlyCard.exists())
   })
 })

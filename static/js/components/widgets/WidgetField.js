@@ -58,7 +58,9 @@ const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
           maxLength={fieldSpec.props.max_length}
           placeholder={fieldSpec.props.placeholder}
         />
-        <EmbedlyCard url={valueOrDefault} />
+        {fieldSpec.props.show_embed ? (
+          <EmbedlyCard url={valueOrDefault} />
+        ) : null}
       </React.Fragment>
     )
   default:
