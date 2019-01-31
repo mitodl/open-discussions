@@ -1,7 +1,10 @@
+/* global SETTINGS: false */
 // @flow
 import R from "ramda"
+import React from "react"
 
 import type { EmbedlyResponse } from "../reducers/embedly"
+import ReactDOMServer from "react-dom/server"
 
 export const ensureTwitterEmbedJS = () => {
   if (!window.twttr) {
@@ -57,3 +60,14 @@ export const loadEmbedlyPlatform = () => {
     script.parentNode.insertBefore(el, script)
   }
 }
+
+export const renderEmbedlyCard = (url: string): string =>
+  ReactDOMServer.renderToStaticMarkup(
+    <a
+      data-card-chrome="0"
+      data-card-controls="0"
+      data-card-key={SETTINGS.embedlyKey}
+      href={url}
+      className="embedly-card"
+    />
+  )

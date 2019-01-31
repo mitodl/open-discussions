@@ -10,12 +10,13 @@ import * as embedFuncs from "../lib/embed"
 import EmbedlyCard from "./EmbedlyCard"
 
 describe("EmbedlyCard", () => {
-  let sandbox, url, loadEmbedlyPlatformStub
+  let sandbox, url, loadEmbedlyPlatformStub, renderEmbedlyCardStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     url = casual.url
     loadEmbedlyPlatformStub = sandbox.stub(embedFuncs, "loadEmbedlyPlatform")
+    renderEmbedlyCardStub = sandbox.stub(embedFuncs, "renderEmbedlyCard")
   })
 
   afterEach(() => {
@@ -25,17 +26,13 @@ describe("EmbedlyCard", () => {
   const render = (props = {}) => shallow(<EmbedlyCard url={url} {...props} />)
 
   it("renders an embedly card", () => {
+    const text = "abcdef"
+    renderEmbedlyCardStub.returns(text)
     const wrapper = render()
-    const element = document.createElement("div")
-    element.innerHTML = wrapper.prop("dangerouslySetInnerHTML").__html
-    const link = element.querySelector("a")
-    assert.equal(link.getAttribute("data-card-chrome"), "0")
-    assert.equal(link.getAttribute("data-card-controls"), "0")
-    assert.equal(link.getAttribute("data-card-key"), SETTINGS.embedlyKey)
-    assert.equal(link.getAttribute("href"), url)
-    assert.equal(link.getAttribute("class"), "embedly-card")
+    assert.equal(wrapper.prop("dangerouslySetInnerHTML").__html, text)
 
     sinon.assert.calledWith(loadEmbedlyPlatformStub)
+    sinon.assert.calledWith(renderEmbedlyCardStub, url)
   })
 
   it("does not render when the url is invalid", () => {
@@ -43,5 +40,6 @@ describe("EmbedlyCard", () => {
     const wrapper = render()
     assert.equal(wrapper.text(), "")
     sinon.assert.calledWith(loadEmbedlyPlatformStub)
+    assert.equal(renderEmbedlyCardStub.callCount, 0)
   })
 })
