@@ -8,6 +8,13 @@ import { assert } from "chai"
 import WidgetField from "./WidgetField"
 
 import { makeFieldSpec } from "../../factories/widgets"
+import {
+  WIDGET_FIELD_TYPE_MARKDOWN,
+  WIDGET_FIELD_TYPE_NUMBER,
+  WIDGET_FIELD_TYPE_TEXT,
+  WIDGET_FIELD_TYPE_TEXTAREA,
+  WIDGET_FIELD_TYPE_URL
+} from "../../lib/constants"
 
 describe("WidgetField", () => {
   let sandbox, onChangeStub, value, fieldSpec
@@ -33,7 +40,12 @@ describe("WidgetField", () => {
       />
     )
   }
-  ;["text", "textarea", "number", "url"].forEach(fieldType => {
+  ;[
+    WIDGET_FIELD_TYPE_TEXT,
+    WIDGET_FIELD_TYPE_TEXTAREA,
+    WIDGET_FIELD_TYPE_NUMBER,
+    WIDGET_FIELD_TYPE_URL
+  ].forEach(fieldType => {
     describe(`${fieldType} field`, () => {
       it("uses an empty string for a default value if there is none in the spec", () => {
         fieldSpec = makeFieldSpec(fieldType)
@@ -64,7 +76,11 @@ describe("WidgetField", () => {
       })
     })
   })
-  ;["text", "textarea", "url"].forEach(fieldType => {
+  ;[
+    WIDGET_FIELD_TYPE_TEXT,
+    WIDGET_FIELD_TYPE_TEXTAREA,
+    WIDGET_FIELD_TYPE_URL
+  ].forEach(fieldType => {
     it(`renders a ${fieldType} input field`, () => {
       fieldSpec = makeFieldSpec(fieldType)
       const wrapper = render()
@@ -84,7 +100,7 @@ describe("WidgetField", () => {
   })
 
   it("renders a number field with number options between the min and max", () => {
-    fieldSpec = makeFieldSpec("number")
+    fieldSpec = makeFieldSpec(WIDGET_FIELD_TYPE_NUMBER)
     const wrapper = render()
 
     const options = wrapper.find(".field option")
@@ -99,7 +115,7 @@ describe("WidgetField", () => {
   })
 
   it("renders a wysiwyg markdown field", () => {
-    fieldSpec = makeFieldSpec("markdown_wysiwyg")
+    fieldSpec = makeFieldSpec(WIDGET_FIELD_TYPE_MARKDOWN)
     const value = "some *text*"
     const wrapper = render({ value })
 
@@ -120,7 +136,7 @@ describe("WidgetField", () => {
   })
 
   it("renders an embedly component", () => {
-    fieldSpec = makeFieldSpec("url")
+    fieldSpec = makeFieldSpec(WIDGET_FIELD_TYPE_URL)
     fieldSpec.props.show_embed = true
     const wrapper = render()
     const embedlyCard = wrapper.find("EmbedlyCard")
@@ -129,7 +145,7 @@ describe("WidgetField", () => {
   })
 
   it("doesn't render an embedly component when show_embed is false", () => {
-    fieldSpec = makeFieldSpec("url")
+    fieldSpec = makeFieldSpec(WIDGET_FIELD_TYPE_URL)
     fieldSpec.props.show_embed = false
     const wrapper = render()
     const embedlyCard = wrapper.find("EmbedlyCard")

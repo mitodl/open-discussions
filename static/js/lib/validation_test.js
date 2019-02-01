@@ -20,8 +20,16 @@ import {
   validatePasswordChangeForm,
   PASSWORD_LENGTH_MINIMUM,
   validNotMIT,
-  validateSearchQuery
+  validateSearchQuery,
+  validateWidgetDialog
 } from "./validation"
+import {
+  WIDGET_CREATE,
+  WIDGET_EDIT,
+  WIDGET_TYPE_SELECT
+} from "../components/widgets/WidgetEditDialog"
+import { makeWidgetInstance } from "../factories/widgets"
+import { WIDGET_TYPE_RSS, WIDGET_TYPE_URL } from "./constants"
 
 describe("validation library", () => {
   describe("validation", () => {
@@ -431,6 +439,47 @@ describe("validation library", () => {
     ].forEach(([query, isValid]) => {
       it(`a query of '${String(query)}' ${shouldIf(isValid)} be valid`, () => {
         assert.equal(validateSearchQuery(query) === null, isValid)
+      })
+    })
+  })
+
+  describe("validateWidgetDialog", () => {
+    it("should require that a widget type is selected", () => {
+      const data = {
+        state:    WIDGET_TYPE_SELECT,
+        instance: makeWidgetInstance()
+      }
+      assert.deepEqual(validateWidgetDialog(data), {})
+      data.instance.widget_type = null
+      assert.deepEqual(validateWidgetDialog(data), {
+        widget_type: "Widget type is required"
+      })
+    })
+
+    it("should require a widget title", () => {
+      const data = {
+        state:    WIDGET_EDIT,
+        instance: makeWidgetInstance()
+      }
+      assert.deepEqual(validateWidgetDialog(data), {})
+      data.instance.title = null
+      assert.deepEqual(validateWidgetDialog(data), {
+        title: "Widget title is required"
+      })
+    })
+    ;[WIDGET_TYPE_RSS, WIDGET_TYPE_URL].forEach(widgetType => {
+      it(`should require a valid URL for widget type ${widgetType}`, () => {
+        const data = {
+          state:    WIDGET_CREATE,
+          instance: makeWidgetInstance(widgetType)
+        }
+        assert.deepEqual(validateWidgetDialog(data), {})
+        data.instance.configuration.url = "url.without.protocol.prefix.edu"
+        assert.deepEqual(validateWidgetDialog(data), {
+          configuration: {
+            url: "URL is not valid"
+          }
+        })
       })
     })
   })

@@ -4,6 +4,7 @@ import { shallow } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
 import casual from "casual-browserify"
+import R from "ramda"
 
 import WidgetEditDialog, {
   WIDGET_CREATE,
@@ -19,6 +20,11 @@ import {
   makeWidgetSpec,
   validFieldSpecTypes
 } from "../../factories/widgets"
+import {
+  WIDGET_TYPE_MARKDOWN,
+  WIDGET_TYPE_RSS,
+  WIDGET_TYPE_URL
+} from "../../lib/constants"
 
 describe("WidgetEditDialog", () => {
   let sandbox,
@@ -208,20 +214,38 @@ describe("WidgetEditDialog", () => {
         }
       })
     })
-
-    it("renders validation for the widget title field", () => {
-      dialogData = {
-        ...dialogData,
-        validation: {
-          title: "Missing field"
+    ;[
+      [
+        "widget title",
+        WIDGET_TYPE_MARKDOWN,
+        { title: "Missing field" },
+        "Missing field"
+      ],
+      [
+        "embed url",
+        WIDGET_TYPE_URL,
+        { configuration: { url: "URL is not valid" } },
+        "URL is not valid"
+      ],
+      [
+        "rss url",
+        WIDGET_TYPE_RSS,
+        { configuration: { url: "URL is not valid" } },
+        "URL is not valid"
+      ]
+    ].forEach(([description, widgetType, validation, expectedMessage]) => {
+      it(`renders validation for ${description}`, () => {
+        dialogData = {
+          ...dialogData,
+          instance: makeWidgetInstance(widgetType),
+          validation
         }
-      }
-      const wrapper = render()
-      assert.equal(
-        wrapper.find(".validation-message").text(),
-        // $FlowFixMe
-        dialogData.validation.title
-      )
+        const wrapper = render()
+        assert.equal(
+          wrapper.find(".validation-message").text(),
+          expectedMessage
+        )
+      })
     })
 
     it("renders fields for a widget configuration", () => {

@@ -2,6 +2,14 @@
 import R from "ramda"
 import casual from "casual-browserify"
 
+import {
+  WIDGET_FIELD_TYPE_MARKDOWN,
+  WIDGET_FIELD_TYPE_NUMBER,
+  WIDGET_FIELD_TYPE_URL,
+  WIDGET_TYPE_MARKDOWN,
+  WIDGET_TYPE_RSS,
+  WIDGET_TYPE_URL
+} from "../lib/constants"
 import { incrementer } from "../lib/util"
 import { validWidgetRenderers } from "../lib/widgets"
 
@@ -20,11 +28,11 @@ const listIncr = incrementer()
 
 export const makeWidgetConfiguration = (widgetType: string): Object => {
   switch (widgetType) {
-  case "Markdown":
+  case WIDGET_TYPE_MARKDOWN:
     return { source: `**${casual.word}**` }
-  case "URL":
+  case WIDGET_TYPE_URL:
     return { url: casual.url }
-  case "RSS Feed":
+  case WIDGET_TYPE_RSS:
     return {
       url:                casual.url,
       feed_display_limit: casual.integer(0, 15)
@@ -36,11 +44,11 @@ export const makeWidgetConfiguration = (widgetType: string): Object => {
 
 export const makeWidgetJson = (widgetType: string): ?Object => {
   switch (widgetType) {
-  case "Markdown":
+  case WIDGET_TYPE_MARKDOWN:
     return null
-  case "URL":
+  case WIDGET_TYPE_URL:
     return null
-  case "RSS Feed":
+  case WIDGET_TYPE_RSS:
     return ({
       title:   casual.title,
       entries: R.range(1, casual.integer(2, 8)).map(() => ({
@@ -74,14 +82,14 @@ export const makeWidgetInstance = (
 
 export const makeFieldSpec = (
   specType: ?string = null,
-  suffix: string = ""
+  name: string
 ): WidgetFieldSpec => {
   if (!specType) {
     specType = casual.random_element(validFieldSpecTypes)
   }
   const common = {
-    field_name: `field_${suffix}`,
-    label:      `Field ${suffix}`,
+    field_name: name,
+    label:      `Field ${name}`,
     input_type: specType
   }
 
@@ -115,10 +123,24 @@ export const makeWidgetSpec = (widgetType: ?string = null): WidgetSpec => {
     widgetType = casual.random_element(Object.keys(validWidgetRenderers))
   }
 
+  let fieldSpecs
+  if (widgetType === WIDGET_TYPE_URL) {
+    fieldSpecs = [makeFieldSpec(WIDGET_FIELD_TYPE_URL, "url")]
+  } else if (widgetType === WIDGET_TYPE_MARKDOWN) {
+    fieldSpecs = [makeFieldSpec(WIDGET_FIELD_TYPE_MARKDOWN, "source")]
+  } else if (widgetType === WIDGET_TYPE_RSS) {
+    fieldSpecs = [
+      makeFieldSpec(WIDGET_FIELD_TYPE_URL, "url"),
+      makeFieldSpec(WIDGET_FIELD_TYPE_NUMBER, "feed_display_limit")
+    ]
+  } else {
+    throw new Error(`Unhandled case ${widgetType}, update factory code`)
+  }
+
   return {
     widget_type: widgetType,
     description: casual.word,
-    form_spec:   R.range(1, 5).map(i => makeFieldSpec(null, i))
+    form_spec:   fieldSpecs
   }
 }
 

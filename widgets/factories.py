@@ -6,14 +6,15 @@ from widgets.models import WidgetList, WidgetInstance
 
 
 class WidgetListFactory(DjangoModelFactory):
-    "Factory for widget lists"
+    """Factory for widget lists"""
 
     class Meta:
         model = WidgetList
 
 
 class WidgetInstanceFactory(DjangoModelFactory):
-    "Factory for widget lists"
+    """Factory for widget lists"""
+
     widget_list = factory.SubFactory(WidgetListFactory)
     widget_type = "Text"
     position = factory.LazyAttribute(lambda inst: inst.widget_list.widgets.count() + 1)

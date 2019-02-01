@@ -7,6 +7,12 @@ import Editor, { editorUpdateFormShim } from "../Editor"
 import EmbedlyCard from "../EmbedlyCard"
 
 import type { WidgetFieldSpec } from "../../flow/widgetTypes"
+import {
+  WIDGET_FIELD_TYPE_MARKDOWN,
+  WIDGET_FIELD_TYPE_NUMBER,
+  WIDGET_FIELD_TYPE_TEXTAREA,
+  WIDGET_FIELD_TYPE_URL
+} from "../../lib/constants"
 
 type Props = {
   fieldSpec: WidgetFieldSpec,
@@ -17,7 +23,7 @@ type Props = {
 const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
   const valueOrDefault = R.defaultTo(fieldSpec.default || "", value)
   switch (fieldSpec.input_type) {
-  case "markdown_wysiwyg":
+  case WIDGET_FIELD_TYPE_MARKDOWN:
     return (
       <Editor
         initialValue={valueOrDefault}
@@ -25,7 +31,7 @@ const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
         placeHolder=""
       />
     )
-  case "textarea":
+  case WIDGET_FIELD_TYPE_TEXTAREA:
     return (
       <textarea
         value={valueOrDefault}
@@ -36,7 +42,7 @@ const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
         placeholder={fieldSpec.props.placeholder}
       />
     )
-  case "number":
+  case WIDGET_FIELD_TYPE_NUMBER:
     return (
       <select className="field" value={valueOrDefault} onChange={onChange}>
         {R.range(fieldSpec.props.min, fieldSpec.props.max + 1).map(index => (
@@ -46,7 +52,7 @@ const WidgetField = ({ fieldSpec, value, onChange }: Props) => {
         ))}
       </select>
     )
-  case "url":
+  case WIDGET_FIELD_TYPE_URL:
     return (
       <React.Fragment>
         <input

@@ -28,6 +28,11 @@ import {
   makeWidgetListResponse
 } from "../factories/widgets"
 import { CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC } from "../lib/channels"
+import {
+  WIDGET_TYPE_MARKDOWN,
+  WIDGET_TYPE_RSS,
+  WIDGET_TYPE_URL
+} from "../lib/constants"
 import { dropdownMenuFuncs } from "../lib/ui"
 import { commentPermalink } from "../lib/url"
 import { getWidgetKey } from "../lib/widgets"
@@ -629,7 +634,7 @@ storiesOf("Widgets", module)
   .addDecorator(withKnobs)
   .add("markdown", () => {
     const editing = boolean("editing")
-    const instance = makeWidgetInstance("Markdown")
+    const instance = makeWidgetInstance(WIDGET_TYPE_MARKDOWN)
     instance.title = text("title", "Markdown widget title")
     instance.configuration.source = text("markdown", "Markdown **body**")
 
@@ -650,7 +655,7 @@ storiesOf("Widgets", module)
   })
   .add("rss", () => {
     const editing = boolean("editing")
-    const instance = makeWidgetInstance("RSS Feed")
+    const instance = makeWidgetInstance(WIDGET_TYPE_RSS)
     instance.title = text("title", "Default widget title")
 
     const SortableWidgetInstance = SortableContainer(props => (
@@ -670,7 +675,7 @@ storiesOf("Widgets", module)
   })
   .add("url", () => {
     const editing = boolean("editing")
-    const instance = makeWidgetInstance("URL")
+    const instance = makeWidgetInstance(WIDGET_TYPE_URL)
     instance.title = text("title", "URL widget title")
     instance.configuration = {
       url:

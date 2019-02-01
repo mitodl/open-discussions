@@ -3,8 +3,9 @@
 import R from "ramda"
 import React from "react"
 
-import type { EmbedlyResponse } from "../reducers/embedly"
 import ReactDOMServer from "react-dom/server"
+
+import type { EmbedlyResponse } from "../reducers/embedly"
 
 export const ensureTwitterEmbedJS = () => {
   if (!window.twttr) {

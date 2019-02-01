@@ -17,8 +17,8 @@ describe("widget factories", () => {
   })
 
   it("makes a widget spec", () => {
-    const spec = makeWidgetSpec("widget_type")
-    assert.deepEqual(spec.widget_type, "widget_type")
+    const spec = makeWidgetSpec()
+    assert.isString(spec.widget_type)
     assert.isArray(spec.form_spec)
     const firstSpec = spec.form_spec[0]
     assert.isString(firstSpec.field_name)

@@ -1,9 +1,9 @@
 /* global SETTINGS: false */
 // @flow
 import React from "react"
-import isURL from "validator/lib/isURL"
 
 import { loadEmbedlyPlatform, renderEmbedlyCard } from "../lib/embed"
+import { isValidUrl } from "../lib/util"
 
 type Props = {
   url: string
@@ -16,7 +16,7 @@ export default class EmbedlyCard extends React.Component<Props> {
   render() {
     const { url } = this.props
 
-    if (!isURL(url, { allow_underscores: true })) {
+    if (!isValidUrl(url)) {
       return null
     }
 
