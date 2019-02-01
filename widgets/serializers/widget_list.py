@@ -27,9 +27,11 @@ class WidgetListSerializer(serializers.ModelSerializer):
 
     def get_widgets(self, instance):
         """Returns the list of widgets"""
+        widget_map = get_widget_type_mapping()
         return [
             _serializer_for_widget_type(widget.widget_type)(widget).data
             for widget in instance.widgets.all()
+            if widget.widget_type in widget_map
         ]
 
     def get_available_widgets(self, instance):  # pylint: disable=unused-argument

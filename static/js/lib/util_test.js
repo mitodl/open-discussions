@@ -15,7 +15,8 @@ import {
   getTokenFromUrl,
   defaultProfileImageUrl,
   makeUUID,
-  spaceSeparated
+  spaceSeparated,
+  isValidUrl
 } from "./util"
 
 describe("utility functions", () => {
@@ -180,6 +181,13 @@ describe("utility functions", () => {
       ].forEach(([inputArr, expectedStr]) => {
         assert.deepEqual(spaceSeparated(inputArr), expectedStr)
       })
+    })
+  })
+
+  describe("isValidUrl", () => {
+    it("should assert that a URL allows underscores and requires a protocol prefix", () => {
+      assert.isFalse(isValidUrl("mit.edu"))
+      assert.isTrue(isValidUrl("http://mit.edu/a_url_here"))
     })
   })
 })

@@ -3,6 +3,7 @@ import { assert } from "chai"
 
 import MarkdownWidget from "./MarkdownWidget"
 
+import { WIDGET_TYPE_MARKDOWN } from "../../lib/constants"
 import { configureShallowRenderer } from "../../lib/test_utils"
 import { makeWidgetInstance } from "../../factories/widgets"
 
@@ -10,7 +11,7 @@ describe("MarkdownWidget", () => {
   let renderWidget, instance
 
   beforeEach(() => {
-    instance = makeWidgetInstance("Markdown")
+    instance = makeWidgetInstance(WIDGET_TYPE_MARKDOWN)
     renderWidget = configureShallowRenderer(MarkdownWidget, {
       widgetInstance: instance
     })

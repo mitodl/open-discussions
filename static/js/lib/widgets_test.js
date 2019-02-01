@@ -6,6 +6,11 @@ import RssWidget from "../components/widgets/RssWidget"
 import UrlWidget from "../components/widgets/UrlWidget"
 
 import {
+  WIDGET_TYPE_URL,
+  WIDGET_TYPE_RSS,
+  WIDGET_TYPE_MARKDOWN
+} from "./constants"
+import {
   validWidgetRenderers,
   getWidgetKey,
   newWidgetInstance
@@ -15,15 +20,15 @@ import { makeWidgetInstance } from "../factories/widgets"
 describe("widget library functions", () => {
   describe("valid widget renderers", () => {
     it("renders with MarkdownWidget", () => {
-      assert.equal(validWidgetRenderers.Markdown, MarkdownWidget)
+      assert.equal(validWidgetRenderers[WIDGET_TYPE_MARKDOWN], MarkdownWidget)
     })
 
     it("renders with RssWidget", () => {
-      assert.equal(validWidgetRenderers["RSS Feed"], RssWidget)
+      assert.equal(validWidgetRenderers[WIDGET_TYPE_RSS], RssWidget)
     })
 
     it("renders with UrlWidget", () => {
-      assert.equal(validWidgetRenderers.URL, UrlWidget)
+      assert.equal(validWidgetRenderers[WIDGET_TYPE_URL], UrlWidget)
     })
   })
 

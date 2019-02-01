@@ -7,10 +7,11 @@ import isURL from "validator/lib/isURL"
 import { WIDGET_TYPE_SELECT } from "../components/widgets/WidgetEditDialog"
 import { S } from "./sanctuary"
 import { LINK_TYPE_LINK, LINK_TYPE_ARTICLE } from "../lib/channels"
-import { emptyOrNil } from "../lib/util"
+import { emptyOrNil, isValidUrl } from "../lib/util"
 
 import type { PostForm, PostFormType } from "../flow/discussionTypes"
 import type { WidgetDialogData } from "../flow/widgetTypes"
+import { WIDGET_TYPE_RSS, WIDGET_TYPE_URL } from "./constants"
 
 export const PASSWORD_LENGTH_MINIMUM = 8
 
@@ -295,11 +296,25 @@ const validateWidgetDialogType = validate([
   validation(emptyOrNil, R.lensProp("widget_type"), "Widget type is required")
 ])
 
-const validateWidgetDialogConfiguration = validate([
-  validation(emptyOrNil, R.lensProp("title"), "Widget title is required")
-])
+export const validateWidgetDialog = (data: WidgetDialogData) => {
+  if (data.state === WIDGET_TYPE_SELECT) {
+    return validateWidgetDialogType(data.instance)
+  }
 
-export const validateWidgetDialog = (data: WidgetDialogData) =>
-  data.state === WIDGET_TYPE_SELECT
-    ? validateWidgetDialogType(data.instance)
-    : validateWidgetDialogConfiguration(data.instance)
+  const validationList = [
+    validation(emptyOrNil, R.lensProp("title"), "Widget title is required")
+  ]
+  if (
+    data.instance.widget_type === WIDGET_TYPE_RSS ||
+    data.instance.widget_type === WIDGET_TYPE_URL
+  ) {
+    validationList.push(
+      validation(
+        R.complement(isValidUrl),
+        R.lensPath(["configuration", "url"]),
+        "URL is not valid"
+      )
+    )
+  }
+  return validate(validationList)(data.instance)
+}

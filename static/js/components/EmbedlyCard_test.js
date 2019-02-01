@@ -35,8 +35,8 @@ describe("EmbedlyCard", () => {
     sinon.assert.calledWith(renderEmbedlyCardStub, url)
   })
 
-  it("does not render when the url is invalid", () => {
-    url = "not_a_url"
+  it("does not render when the url is missing the protocol prefix", () => {
+    url = "mit.edu"
     const wrapper = render()
     assert.equal(wrapper.text(), "")
     sinon.assert.calledWith(loadEmbedlyPlatformStub)

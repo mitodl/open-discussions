@@ -4,11 +4,13 @@ import { shallow } from "enzyme"
 import { assert } from "chai"
 
 import RssWidget from "./RssWidget"
+
+import { WIDGET_TYPE_RSS } from "../../lib/constants"
 import { makeWidgetInstance } from "../../factories/widgets"
 
 describe("RssWidget", () => {
   it("renders a RssWidget", () => {
-    const widgetInstance = makeWidgetInstance("RSS Feed")
+    const widgetInstance = makeWidgetInstance(WIDGET_TYPE_RSS)
     const wrapper = shallow(<RssWidget widgetInstance={widgetInstance} />)
     assert.equal(
       widgetInstance.json.entries.length,
@@ -31,7 +33,7 @@ describe("RssWidget", () => {
   })
 
   it("renders a RssWidget with a missing timestamp", () => {
-    const widgetInstance = makeWidgetInstance("RSS Feed")
+    const widgetInstance = makeWidgetInstance(WIDGET_TYPE_RSS)
     widgetInstance.json.entries[0].timestamp = null
     const wrapper = shallow(<RssWidget widgetInstance={widgetInstance} />)
     const entryWrapper = wrapper.find(".entry").at(0)

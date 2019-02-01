@@ -6,6 +6,7 @@ import qs from "query-string"
 
 import type { Match } from "react-router"
 import type { Profile } from "../flow/discussionTypes"
+import isURL from "validator/lib/isURL"
 
 export const getChannelName = (props: { match: Match }): string =>
   props.match.params.channelName || ""
@@ -123,3 +124,6 @@ export function* incrementer(): Generator<number, *, *> {
     yield int++
   }
 }
+
+export const isValidUrl = (url: string): boolean =>
+  isURL(url, { allow_underscores: true, require_protocol: true })

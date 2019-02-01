@@ -98,6 +98,7 @@ export default class WidgetEditDialog extends React.Component<Props> {
                 onChange={this.updateValue(lens)}
                 fieldSpec={fieldSpec}
               />
+              {validationMessage(R.view(lens, validation))}
             </label>
           )
         })}
