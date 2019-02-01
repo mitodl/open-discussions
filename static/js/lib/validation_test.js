@@ -446,10 +446,12 @@ describe("validation library", () => {
   describe("validateWidgetDialog", () => {
     it("should require that a widget type is selected", () => {
       const data = {
-        state:    WIDGET_TYPE_SELECT,
-        instance: makeWidgetInstance()
+        state:      WIDGET_TYPE_SELECT,
+        instance:   makeWidgetInstance(),
+        validation: {}
       }
       assert.deepEqual(validateWidgetDialog(data), {})
+      // $FlowFixMe
       data.instance.widget_type = null
       assert.deepEqual(validateWidgetDialog(data), {
         widget_type: "Widget type is required"
@@ -458,10 +460,12 @@ describe("validation library", () => {
 
     it("should require a widget title", () => {
       const data = {
-        state:    WIDGET_EDIT,
-        instance: makeWidgetInstance()
+        state:      WIDGET_EDIT,
+        instance:   makeWidgetInstance(),
+        validation: {}
       }
       assert.deepEqual(validateWidgetDialog(data), {})
+      // $FlowFixMe
       data.instance.title = null
       assert.deepEqual(validateWidgetDialog(data), {
         title: "Widget title is required"
@@ -470,8 +474,9 @@ describe("validation library", () => {
     ;[WIDGET_TYPE_RSS, WIDGET_TYPE_URL].forEach(widgetType => {
       it(`should require a valid URL for widget type ${widgetType}`, () => {
         const data = {
-          state:    WIDGET_CREATE,
-          instance: makeWidgetInstance(widgetType)
+          state:      WIDGET_CREATE,
+          instance:   makeWidgetInstance(widgetType),
+          validation: {}
         }
         assert.deepEqual(validateWidgetDialog(data), {})
         data.instance.configuration.url = "url.without.protocol.prefix.edu"

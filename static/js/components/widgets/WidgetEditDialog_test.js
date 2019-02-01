@@ -4,7 +4,6 @@ import { shallow } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
 import casual from "casual-browserify"
-import R from "ramda"
 
 import WidgetEditDialog, {
   WIDGET_CREATE,

@@ -81,11 +81,14 @@ export const makeWidgetInstance = (
 }
 
 export const makeFieldSpec = (
-  specType: ?string = null,
-  name: string
+  specType?: string,
+  name?: string
 ): WidgetFieldSpec => {
   if (!specType) {
     specType = casual.random_element(validFieldSpecTypes)
+  }
+  if (!name) {
+    name = casual.name
   }
   const common = {
     field_name: name,
