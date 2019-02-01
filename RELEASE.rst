@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.64.2
+Version 0.64.2 (Released February 01, 2019)
 --------------
 
 - Fix backpopulate not adding comments
