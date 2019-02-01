@@ -6,6 +6,7 @@ import { shallow } from "enzyme"
 
 import ChannelNavbar from "./ChannelNavbar"
 
+import { shouldIf, isIf } from "../lib/test_utils"
 import { channelURL } from "../lib/url"
 import { makeChannel } from "../factories/channels"
 
@@ -28,9 +29,8 @@ describe("ChannelNavbar", () => {
   it("renders a navbar", () => {
     const children = "some children"
     const wrapper = render({ children })
-    const links = wrapper.find("IntraPageNav NavLink")
-    assert.equal(links.length, 1)
-    const props = links.props()
+    const homeLink = wrapper.find(".home-link")
+    const props = homeLink.props()
     assert.equal(props.to, channelURL(channel.name))
     assert.isTrue(
       wrapper
@@ -40,13 +40,34 @@ describe("ChannelNavbar", () => {
         .includes(children)
     )
   })
+
+  //
   ;[true, false].forEach(allowSearch => {
     it(`${
       allowSearch ? "shows" : "doesn't show"
     } the search button depending on if it's allowed`, () => {
       SETTINGS.allow_search = allowSearch
       const wrapper = render()
-      assert.equal(wrapper.find(".search-link").length, allowSearch ? 1 : 0)
+      assert.equal(wrapper.find(".search-link").exists(), allowSearch)
+    })
+  })
+
+  //
+  ;[
+    [false, undefined, false],
+    [true, undefined, true],
+    [false, [{ foo: "bar" }], true],
+    [true, [{ foo: "bar" }], true]
+  ].forEach(([userIsModerator, channelAbout, shouldShowAboutLink]) => {
+    it(`${shouldIf(
+      shouldShowAboutLink
+    )} render about page link when user ${ifIf(
+      userIsModerator
+    )} moderator and channelabout = ${json.stringify(channelabout)}`, () => {
+      channel.about = channelabout
+      channel.user_is_moderator = userismoderator
+      const wrapper = render()
+      assert.equal(shouldShowAboutLink, wrapper.find(".about-link").exists())
     })
   })
 })

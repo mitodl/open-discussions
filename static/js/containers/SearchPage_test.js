@@ -54,12 +54,8 @@ describe("SearchPage", () => {
       }
     }
     initialProps = {
-      match: {
-        params: {
-          channelName: channel.name
-        }
-      },
-      location: {
+      channelName: channel.name,
+      location:    {
         search: "q=text"
       },
       history: helper.browserHistory
@@ -108,6 +104,8 @@ describe("SearchPage", () => {
       )
     })
   })
+
+  //
   ;["", "a"].forEach(query => {
     it(`doesn't run a search if initial search text is '${query}'`, async () => {
       await renderPage(
@@ -138,6 +136,8 @@ describe("SearchPage", () => {
     // from is 5, plus 5 is 10 which is == numHits so no more results
     assert.isFalse(inner.find("InfiniteScroll").prop("hasMore"))
   })
+
+  //
   ;[0, 5].forEach(from => {
     it(`InfiniteScroll initialLoad ${shouldIf(
       from > 0
@@ -148,25 +148,8 @@ describe("SearchPage", () => {
       assert.equal(infiniteScroll.prop("initialLoad"), from === 0)
     })
   })
-  ;[true, false].forEach(hasChannel => {
-    it(`${hasChannel ? "loads" : "doesn't load"} a channel`, async () => {
-      await renderPage(
-        {},
-        {
-          match: {
-            params: {
-              channelName: hasChannel ? channel.name : null
-            }
-          }
-        }
-      )
-      if (hasChannel) {
-        sinon.assert.calledWith(helper.getChannelStub, channel.name)
-      } else {
-        sinon.assert.notCalled(helper.getChannelStub)
-      }
-    })
-  })
+
+  //
   ;[
     [true, false, false],
     [false, true, false],
@@ -265,30 +248,6 @@ describe("SearchPage", () => {
       error:         null
     })
   })
-  ;[true, false].forEach(hasChannel => {
-    it(`${
-      hasChannel ? "shows" : "doesn't show"
-    } the ChannelHeader`, async () => {
-      const renderPageWithHeader = helper.configureHOCRenderer(
-        ConnectedSearchPage,
-        "withChannelHeader(WithLoading)",
-        initialState,
-        initialProps
-      )
-
-      const { inner } = await renderPageWithHeader(
-        {},
-        {
-          match: {
-            params: {
-              channelName: hasChannel ? channel.name : ""
-            }
-          }
-        }
-      )
-      assert.equal(inner.find("ChannelHeader").length, hasChannel ? 1 : 0)
-    })
-  })
 
   it("populates the type from the query parameter", async () => {
     const type = "post"
@@ -378,6 +337,8 @@ describe("SearchPage", () => {
     inner.find("SearchTextbox").prop("onClear")()
     assert.equal(inner.state().text, "")
   })
+
+  //
   ;[
     [true, true, true, true],
     [true, true, false, true],
@@ -408,11 +369,7 @@ describe("SearchPage", () => {
           }
         },
         {
-          match: {
-            params: {
-              channelName: hasChannel ? channel.name : null
-            }
-          }
+          channelName: hasChannel ? channel.name : null
         }
       )
       assert.equal(wrapper.props().loaded, loaded)

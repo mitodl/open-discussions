@@ -11,19 +11,16 @@ import withSingleColumn from "../../hoc/withSingleColumn"
 import withChannelHeader from "../../hoc/withChannelHeader"
 
 import { actions } from "../../actions"
-import { editChannelForm } from "../../lib/channels"
+import { EDIT_CHANNEL_PAYLOAD, getChannelForm } from "../../lib/channels"
 import { channelURL } from "../../lib/url"
 import { formatTitle } from "../../lib/title"
 import { getChannelName } from "../../lib/util"
 import { validateChannelAppearanceEditForm } from "../../lib/validation"
+import { channelFormDispatchToProps } from "../../util/form_actions"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../../flow/formTypes"
 import type { Channel, ChannelForm } from "../../flow/discussionTypes"
-
-export const EDIT_CHANNEL_KEY = "channel:edit:appearance"
-const EDIT_CHANNEL_PAYLOAD = { formKey: EDIT_CHANNEL_KEY }
-const getForm = R.prop(EDIT_CHANNEL_KEY)
 
 const shouldLoadData = R.complement(R.allPass([R.eqProps("channelName")]))
 
@@ -33,7 +30,9 @@ type Props = {
   channel: Channel,
   channelForm: FormValue<ChannelForm>,
   channelName: string,
-  processing: boolean
+  processing: boolean,
+  updateChannelForm: (e: Object) => void,
+  beginChannelFormEdit: (c: Channel) => void
 }
 
 export class EditChannelAppearancePage extends React.Component<Props> {
@@ -53,36 +52,13 @@ export class EditChannelAppearancePage extends React.Component<Props> {
   }
 
   loadData = async () => {
-    const { dispatch, channel, channelName } = this.props
+    const { dispatch, channelName, beginChannelFormEdit } = this.props
+    let { channel } = this.props
     if (!channel) {
-      await dispatch(actions.channels.get(channelName))
+      channel = await dispatch(actions.channels.get(channelName))
     }
 
-    this.beginFormEdit()
-  }
-
-  beginFormEdit = () => {
-    const { dispatch, channel } = this.props
-    dispatch(
-      actions.forms.formBeginEdit(
-        R.merge(EDIT_CHANNEL_PAYLOAD, {
-          value: editChannelForm(channel)
-        })
-      )
-    )
-  }
-
-  onUpdate = (e: Object) => {
-    const { dispatch } = this.props
-    dispatch(
-      actions.forms.formUpdate(
-        R.merge(EDIT_CHANNEL_PAYLOAD, {
-          value: {
-            [e.target.name]: e.target.value
-          }
-        })
-      )
-    )
+    beginChannelFormEdit(channel)
   }
 
   onSubmit = async (e: Object) => {
@@ -141,7 +117,13 @@ export class EditChannelAppearancePage extends React.Component<Props> {
   }
 
   render() {
-    const { channel, channelForm, processing, history } = this.props
+    const {
+      channel,
+      channelForm,
+      processing,
+      history,
+      updateChannelForm
+    } = this.props
 
     if (!channel) {
       return null
@@ -157,7 +139,7 @@ export class EditChannelAppearancePage extends React.Component<Props> {
           <EditChannelAppearanceForm
             channel={channel}
             onSubmit={this.onSubmit}
-            onUpdate={this.onUpdate}
+            onUpdate={updateChannelForm}
             form={channelForm.value}
             history={history}
             validation={channelForm.errors}
@@ -180,12 +162,15 @@ const mapStateToProps = (state, ownProps) => {
     channel,
     channelName,
     processing,
-    channelForm: getForm(state.forms)
+    channelForm: getChannelForm(state.forms)
   }
 }
 
 export default R.compose(
-  connect(mapStateToProps),
+  connect(
+    mapStateToProps,
+    channelFormDispatchToProps
+  ),
   withChannelHeader,
   withSingleColumn("edit-channel")
 )(EditChannelAppearancePage)

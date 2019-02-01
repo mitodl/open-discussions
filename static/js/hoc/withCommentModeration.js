@@ -119,10 +119,11 @@ export const withCommentModeration = (
 
 export const commentModerationSelector = (state: Object, ownProps: Object) => {
   const { ui, focus } = state
+  const channelName = ownProps.channelName || getChannelName(ownProps)
 
   return {
     showRemoveCommentDialog: ui.dialogs.has(DIALOG_REMOVE_COMMENT),
     focusedComment:          focus.comment,
-    channelName:             getChannelName(ownProps)
+    channelName
   }
 }

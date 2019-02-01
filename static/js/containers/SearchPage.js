@@ -9,17 +9,14 @@ import { MetaTags } from "react-meta-tags"
 
 import { Loading, PostLoading, withSearchLoading } from "../components/Loading"
 import SearchTextbox from "../components/SearchTextbox"
-import ChannelNavbar from "../components/ChannelNavbar"
 import CanonicalLink from "../components/CanonicalLink"
 import { SearchFilterPicker } from "../components/Picker"
 import SearchResult from "../components/SearchResult"
-import withChannelHeader from "../hoc/withChannelHeader"
 
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import { SEARCH_FILTER_ALL, updateSearchFilterParam } from "../lib/picker"
 import { preventDefaultAndInvoke } from "../lib/util"
-import { getChannelName } from "../lib/util"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -60,21 +57,6 @@ type State = {
   error: ?string
 }
 
-const shouldLoadChannel = (currentProps: Props, prevProps: ?Props) => {
-  const { channelName, channelProcessing, channelLoaded } = currentProps
-  if (!channelName) {
-    // This is a site search page
-    return false
-  }
-
-  // If channel, check if the channelName params match. Then check if the sort matches.
-  // For search, we should do an initial load if search doesn't exist
-  if (!prevProps || prevProps.channelName !== channelName) {
-    return true
-  }
-  return !channelLoaded && !channelProcessing
-}
-
 export class SearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -89,18 +71,9 @@ export class SearchPage extends React.Component<Props, State> {
   componentDidMount() {
     const { text } = this.state
     const { clearSearch } = this.props
-    if (shouldLoadChannel(this.props)) {
-      this.loadChannel()
-    }
     clearSearch()
     if (text) {
       this.runSearch()
-    }
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (shouldLoadChannel(this.props, prevProps)) {
-      this.loadChannel()
     }
   }
 
@@ -112,13 +85,6 @@ export class SearchPage extends React.Component<Props, State> {
       })
     )
     this.updateVotedComments(updatedComment)
-  }
-
-  loadChannel = async () => {
-    const { getChannel } = this.props
-    try {
-      await getChannel()
-    } catch (_) {} // eslint-disable-line no-empty
   }
 
   loadMore = async () => {
@@ -295,7 +261,7 @@ export class SearchPage extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const channelName = getChannelName(ownProps)
+  const { channelName } = ownProps
   const { channels, search, posts } = state
   const channel = channels.data.get(channelName)
   const channelLoaded = channels.loaded
@@ -322,8 +288,7 @@ const mapStateToProps = (state, ownProps) => {
     channelName,
     // loaded is used in withLoading but we only want to look at channel loaded since search loaded will change
     // whenever the user makes a new search
-    loaded:      channelName ? channelLoaded : true,
-    navbarItems: <ChannelNavbar channel={channel} />,
+    loaded: channelName ? channelLoaded : true,
     notFound,
     notAuthorized,
     searchLoaded,
@@ -332,17 +297,13 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps: Props) => ({
+const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   runSearch: async (params: SearchParams) => {
     return await dispatch(actions.search.post(params))
   },
   clearSearch: async () => {
     dispatch(actions.search.clear())
     await dispatch(clearSearch())
-  },
-  getChannel: async () => {
-    const channelName = getChannelName(ownProps)
-    await dispatch(actions.channels.get(channelName))
   },
   toggleUpvote: toggleUpvote(dispatch),
   dispatch
@@ -353,6 +314,5 @@ export default R.compose(
     mapStateToProps,
     mapDispatchToProps
   ),
-  withChannelHeader,
   withSearchLoading
 )(SearchPage)

@@ -3,10 +3,10 @@
 import R from "ramda"
 import _ from "lodash"
 import qs from "query-string"
+import isURL from "validator/lib/isURL"
 
 import type { Match } from "react-router"
 import type { Profile } from "../flow/discussionTypes"
-import isURL from "validator/lib/isURL"
 
 export const getChannelName = (props: { match: Match }): string =>
   props.match.params.channelName || ""

@@ -148,6 +148,12 @@ export default class IntegrationTestHelper {
         />
       )
 
+      // just a little convenience method
+      store.getLastAction = function() {
+        const actions = this.getActions()
+        return actions[actions.length - 1]
+      }
+
       // dive through layers of HOCs until we reach the desired inner component
       let inner = wrapper
       while (!inner.is(InnerComponent)) {

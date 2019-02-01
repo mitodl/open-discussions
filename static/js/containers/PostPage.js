@@ -15,7 +15,6 @@ import ReportForm from "../components/ReportForm"
 import { ReplyToPostForm } from "../components/CommentForms"
 import withSingleColumn from "../hoc/withSingleColumn"
 import { withPostDetailSidebar } from "../hoc/withSidebar"
-import withChannelHeader from "../hoc/withChannelHeader"
 import {
   withPostModeration,
   postModerationSelector
@@ -45,7 +44,7 @@ import {
   toggleFollowPost,
   toggleFollowComment
 } from "../util/api_actions"
-import { getChannelName, getPostID, getCommentID, truncate } from "../lib/util"
+import { getPostID, getCommentID, truncate } from "../lib/util"
 import {
   anyErrorExcept404,
   anyErrorExcept404or410,
@@ -163,7 +162,6 @@ class PostPage extends React.Component<PostPageProps> {
       channelName,
       postID,
       commentID,
-      channel,
       location: { search }
     } = this.props
     if (!postID || !channelName) {
@@ -180,10 +178,6 @@ class PostPage extends React.Component<PostPageProps> {
       if (post.url) {
         const embedlyResponse = await dispatch(actions.embedly.get(post.url))
         handleTwitterWidgets(embedlyResponse)
-      }
-
-      if (!channel) {
-        dispatch(actions.channels.get(channelName))
       }
     } catch (_) {} // eslint-disable-line no-empty
   }
@@ -511,7 +505,7 @@ class PostPage extends React.Component<PostPageProps> {
 const mapStateToProps = (state, ownProps) => {
   const { posts, channels, comments, forms, ui, embedly } = state
   const postID = getPostID(ownProps)
-  const channelName = getChannelName(ownProps)
+  const { channelName } = ownProps
   const commentID = getCommentID(ownProps)
   const post = posts.data.get(postID)
   const channel = channels.data.get(channelName)
@@ -567,7 +561,6 @@ const mapStateToProps = (state, ownProps) => {
 
 export default R.compose(
   connect(mapStateToProps),
-  withChannelHeader,
   withPostModeration,
   withCommentModeration,
   SETTINGS.allow_related_posts_ui

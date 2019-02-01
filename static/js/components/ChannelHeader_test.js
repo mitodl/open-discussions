@@ -7,7 +7,6 @@ import { assert } from "chai"
 import ChannelHeader from "./ChannelHeader"
 
 import { makeChannel } from "../factories/channels"
-import { shouldIf } from "../lib/test_utils"
 import { channelURL } from "../lib/url"
 
 describe("ChannelHeader", () => {
@@ -38,6 +37,7 @@ describe("ChannelHeader", () => {
     assert.equal(linkProps.to, channelURL(channel.name))
     assert.equal(linkProps.children, channel.title)
   })
+
   it("renders options for a user to follow/unfollow the channel", () => {
     const wrapper = render()
     const followControls = wrapper.find("Connect(ChannelFollowControls)")
@@ -47,15 +47,17 @@ describe("ChannelHeader", () => {
       channel
     })
   })
-  ;[true, false].forEach(hasNavbar => {
-    it(`${shouldIf(hasNavbar)} navbar items`, () => {
-      const navbarItems = "navbarItems"
-      const wrapper = render({
-        navbarItems: hasNavbar ? navbarItems : null
-      })
-      assert.equal(wrapper.text().includes(navbarItems), hasNavbar)
-    })
+
+  it("should render children", () => {
+    const wrapper = shallow(
+      <ChannelHeader channel={channel} isModerator={false} history={history}>
+        <div className="im-a-child" />
+      </ChannelHeader>
+    )
+    assert.ok(wrapper.find(".im-a-child").exists())
   })
+
+  //
   ;[true, false].forEach(hasHeadline => {
     it(`${
       hasHeadline ? "shows" : "doesn't show"
@@ -69,6 +71,8 @@ describe("ChannelHeader", () => {
       }
     })
   })
+
+  //
   ;[true, false].forEach(isModerator => {
     it(`${
       isModerator ? "shows" : "doesn't show"

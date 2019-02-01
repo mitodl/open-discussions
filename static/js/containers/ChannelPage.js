@@ -7,15 +7,12 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
 import CanonicalLink from "../components/CanonicalLink"
-import ChannelNavbar from "../components/ChannelNavbar"
 import { PostLoading, withLoading } from "../components/Loading"
 import { PostSortPicker } from "../components/Picker"
-import ManageWidgetHeader from "./widgets/ManageWidgetHeader"
 import {
   withPostModeration,
   postModerationSelector
 } from "../hoc/withPostModeration"
-import withChannelHeader from "../hoc/withChannelHeader"
 import { withChannelSidebar } from "../hoc/withSidebar"
 import withPostList from "../hoc/withPostList"
 import { withChannelTracker } from "../hoc/withChannelTracker"
@@ -23,7 +20,6 @@ import { withChannelTracker } from "../hoc/withChannelTracker"
 import { actions } from "../actions"
 import { setPostData, clearPostError } from "../actions/post"
 import { safeBulkGet } from "../lib/maps"
-import { getChannelName } from "../lib/util"
 import { getPostIds } from "../lib/posts"
 import { anyErrorExcept404 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
@@ -91,7 +87,6 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
       dispatch,
       errored,
       notFound,
-      channelName,
       loadPosts,
       location: { search }
     } = this.props
@@ -101,7 +96,6 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
     }
 
     try {
-      await dispatch(actions.channels.get(channelName))
       await loadPosts(qs.parse(search))
     } catch (_) {} // eslint-disable-line no-empty
   }
@@ -140,7 +134,7 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
 
 const mapStateToProps = (state, ownProps) => {
   const { channels } = state
-  const channelName = getChannelName(ownProps)
+  const { channelName } = ownProps
   const postsForChannel = state.postsForChannel.data.get(channelName) || {}
   const channel = channels.data.get(channelName)
   const postIds = getPostIds(postsForChannel)
@@ -159,8 +153,8 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     ...postModerationSelector(state, ownProps),
-    channelName,
     channel,
+    channelName,
     loaded,
     canLoadMore:        !state.postsForChannel.processing,
     notFound,
@@ -178,12 +172,7 @@ const mapStateToProps = (state, ownProps) => {
       channels,
       state.posts,
       state.subscribedChannels
-    ]),
-    navbarItems: (
-      <ChannelNavbar channel={channel}>
-        <ManageWidgetHeader channel={channel} />
-      </ChannelNavbar>
-    )
+    ])
   }
 }
 
@@ -192,7 +181,7 @@ const mapDispatchToProps = (
   ownProps: ChannelPageProps
 ) => ({
   loadPosts: async (search: Object) => {
-    const channelName = getChannelName(ownProps)
+    const { channelName } = ownProps
 
     const response = await dispatch(
       actions.postsForChannel.get(channelName, search)
@@ -207,7 +196,6 @@ export default R.compose(
     mapStateToProps,
     mapDispatchToProps
   ),
-  withChannelHeader,
   withPostModeration,
   withChannelTracker,
   withPostList,

@@ -30,6 +30,7 @@ export type Channel = {
   banner:                string|null,
   widget_list_id:        ?number,
   allowed_post_types:    Array<LinkType>,
+  about:                 ?Array<Object>,
 }
 
 export type ChannelForm = {

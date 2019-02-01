@@ -74,12 +74,8 @@ describe("ChannelPage", () => {
         forms: {}
       },
       {
-        match: {
-          params: {
-            channelName: currentChannel.name
-          }
-        },
-        location: {
+        channelName: currentChannel.name,
+        location:    {
           search:   {},
           pathname: channelURL(currentChannel.name)
         },
@@ -187,12 +183,8 @@ describe("ChannelPage", () => {
     const { inner } = await render(
       {},
       {
-        match: {
-          params: {
-            channelName:
-              "somenamethatshouldnevercollidebecauseitsaridiculouslylongvalue"
-          }
-        }
+        channelName:
+          "somenamethatshouldnevercollidebecauseitsaridiculouslylongvalue"
       }
     )
     assert.lengthOf(inner.find("PostLoading"), 1)
@@ -245,6 +237,8 @@ describe("ChannelPage", () => {
     assert.isFalse(inner.find(NotFound).exists())
     assert.include(inner.find(".errored").text(), "Error loading page")
   })
+
+  //
   ;[true, false].forEach(loaded => {
     it(`sets canLoadMore=${String(loaded)} when loaded=${String(
       loaded

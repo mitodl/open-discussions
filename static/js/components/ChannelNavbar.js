@@ -1,12 +1,13 @@
 // @flow
 /* global SETTINGS: false */
 import * as React from "react"
+import R from "ramda"
 import { NavLink } from "react-router-dom"
 
 import { Cell, Grid } from "./Grid"
 import IntraPageNav from "./IntraPageNav"
 
-import { channelSearchURL, channelURL } from "../lib/url"
+import { channelSearchURL, channelURL, channelAboutURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
@@ -28,9 +29,20 @@ export default class ChannelNavbar extends React.Component<Props> {
                 exact
                 to={channelURL(channel.name)}
                 activeClassName="active"
+                className="home-link"
               >
                 Home
               </NavLink>
+              {!R.isNil(channel.about) || channel.user_is_moderator ? (
+                <NavLink
+                  exact
+                  to={channelAboutURL(channel.name)}
+                  activeClassName="active"
+                  className="about-link"
+                >
+                  About
+                </NavLink>
+              ) : null}
               {SETTINGS.allow_search ? (
                 <NavLink
                   exact

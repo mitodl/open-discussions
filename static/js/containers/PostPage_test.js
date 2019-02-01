@@ -152,6 +152,8 @@ describe("PostPage", function() {
     const wrapper = await renderPage()
     assert.deepEqual(wrapper.find(CommentTree).props().comments, comments)
   })
+
+  //
   ;[
     [true, true, "should upvote a comment"],
     [true, false, "should clear an upvote"],
@@ -273,15 +275,8 @@ describe("PostPage", function() {
     it(`should show a ReplyToPostForm when userIsAnonymous() === ${userIsAnon}`, async () => {
       const anonStub = helper.sandbox.stub(utilFuncs, "userIsAnonymous")
       anonStub.returns(userIsAnon)
-
-      const [wrapper] = await renderComponent(
-        postDetailURL(channel.name, post.id),
-        userIsAnon
-          ? basicPostPageActions
-          : basicPostPageActions.concat(FORM_BEGIN_EDIT)
-      )
+      const wrapper = await renderPage()
       wrapper.update()
-
       assert.ok(wrapper.find(ReplyToPostForm).exists())
     })
   })
@@ -348,8 +343,6 @@ describe("PostPage", function() {
       [
         actions.posts["delete"].requestType,
         actions.posts["delete"].successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
         actions.widgets.get.requestType,
         actions.widgets.get.successType,
         actions.postsForChannel.get.requestType,
@@ -658,6 +651,8 @@ describe("PostPage", function() {
         actions.comments.get.successType,
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType,
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
         SET_CHANNEL_DATA
       ]
     )
@@ -676,6 +671,8 @@ describe("PostPage", function() {
         actions.posts.get.failureType,
         actions.comments.get.requestType,
         actions.comments.get.successType,
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType,
         SET_CHANNEL_DATA
@@ -696,6 +693,8 @@ describe("PostPage", function() {
         actions.comments.get.failureType,
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType,
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
         SET_CHANNEL_DATA
       ]
     )
@@ -715,6 +714,8 @@ describe("PostPage", function() {
         actions.comments.get.failureType,
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType,
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
         SET_CHANNEL_DATA
       ]
     )
@@ -732,6 +733,8 @@ describe("PostPage", function() {
         actions.comments.get.successType,
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType,
+        actions.channels.get.requestType,
+        actions.channels.get.successType,
         SET_CHANNEL_DATA
       ]
     )

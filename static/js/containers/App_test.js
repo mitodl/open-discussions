@@ -26,6 +26,7 @@ describe("App", () => {
     postList = makeChannelPostList()
     helper = new IntegrationTestHelper()
     helper.getChannelsStub.returns(Promise.resolve(channels))
+    helper.getChannelStub.returns(Promise.resolve(channels[0]))
     helper.getSettingsStub.returns(
       Promise.resolve([makeFrontpageSetting(), makeCommentSetting()])
     )

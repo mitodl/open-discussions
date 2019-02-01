@@ -7,8 +7,6 @@ import { MetaTags } from "react-meta-tags"
 import qs from "query-string"
 
 import HomePage from "./HomePage"
-import ChannelPage from "./ChannelPage"
-import PostPage from "./PostPage"
 import SearchPage from "./SearchPage"
 import ContentPolicyPage from "./policies/ContentPolicyPage"
 import PrivacyPolicyPage from "./policies/PrivacyPolicyPage"
@@ -30,6 +28,7 @@ import RegisterDetailsPage from "./auth/RegisterDetailsPage"
 import InactiveUserPage from "./auth/InactiveUserPage"
 import PasswordResetPage from "./auth/PasswordResetPage"
 import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
+import ChannelRouter from "./ChannelRouter"
 
 import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"
@@ -51,6 +50,7 @@ import { isAnonAccessiblePath, needsAuthedSite } from "../lib/auth"
 import { isMobileWidth, preventDefaultAndInvoke } from "../lib/util"
 import { getOwnProfile } from "../lib/redux_selectors"
 import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
+import { channelIndexRoute } from "../lib/routing"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -187,29 +187,8 @@ class App extends React.Component<AppProps> {
         <div className="content">
           <Route exact path={match.url} component={HomePage} />
           <Route
-            exact
-            path={`${match.url}c/:channelName`}
-            component={ChannelPage}
-          />
-          <Switch>
-            {SETTINGS.allow_search ? (
-              <Route
-                path={`${match.url}c/:channelName/search/`}
-                component={SearchPage}
-              />
-            ) : null}
-            <Route
-              exact
-              path={`${match.url}c/:channelName/:postID/:postSlug?`}
-              component={PostPage}
-            />
-          </Switch>
-          <Route
-            exact
-            path={`${
-              match.url
-            }c/:channelName/:postID/:postSlug?/comment/:commentID`}
-            component={PostPage}
+            path={channelIndexRoute(match.url)}
+            component={ChannelRouter}
           />
           <Route path={`${match.url}manage/`} component={AdminPage} />
           <Route

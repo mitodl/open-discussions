@@ -4,7 +4,6 @@ import { assert } from "chai"
 import sinon from "sinon"
 
 import EditChannelAppearancePage, {
-  EDIT_CHANNEL_KEY,
   EditChannelAppearancePage as InnerEditChannelAppearancePage
 } from "./EditChannelAppearancePage"
 
@@ -15,6 +14,7 @@ import { channelURL } from "../../lib/url"
 import * as validationFuncs from "../../lib/validation"
 import { shouldIf, isIf } from "../../lib/test_utils"
 import IntegrationTestHelper from "../../util/integration_test_helper"
+import { EDIT_CHANNEL_KEY } from "../../lib/channels"
 
 describe("EditChannelAppearancePage", () => {
   let helper, render, channel, initialState, initialProps

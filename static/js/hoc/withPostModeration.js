@@ -203,7 +203,7 @@ export const withPostModeration = (
 
 export const postModerationSelector = (state: Object, ownProps: Object) => {
   const { channels, reports, ui, focus, forms } = state
-  const channelName = getChannelName(ownProps)
+  const channelName = ownProps.channelName || getChannelName(ownProps)
   const channel = channels.data.get(channelName)
 
   const userIsModerator = channel && channel.user_is_moderator

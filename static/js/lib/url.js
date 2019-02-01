@@ -6,6 +6,9 @@ import type { Post } from "../flow/discussionTypes"
 
 export const channelURL = (channelName: string) => `/c/${channelName}`
 
+export const channelAboutURL = (channelName: string) =>
+  `/c/${channelName}/about`
+
 export const channelModerationURL = (channelName: string) =>
   `/manage/c/edit/${channelName}/moderation/`
 

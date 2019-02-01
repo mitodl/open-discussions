@@ -54,6 +54,12 @@ export const editChannelForm = (channel: Channel): ChannelForm =>
     channel
   )
 
+export const EDIT_CHANNEL_KEY = "channel:edit"
+
+export const EDIT_CHANNEL_PAYLOAD = { formKey: EDIT_CHANNEL_KEY }
+
+export const getChannelForm = R.prop(EDIT_CHANNEL_KEY)
+
 export const newMemberForm = (): AddMemberForm => ({
   email: ""
 })
