@@ -20,7 +20,6 @@ from channels.api import (
 )
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel, Post, ChannelGroupRole
-from channels.utils import get_kind_mapping
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 from search.exceptions import PopulateUserRolesException, RetryException
@@ -245,16 +244,15 @@ def populate_posts_and_comments(post_ids):
     Returns:
         dict: aggregated result data for this batch
     """
-    reddit = get_admin_api().reddit
+    admin_api = get_admin_api()
 
-    submission_kind = get_kind_mapping()["submission"]
-
-    # if the post doesn't exist it simply won't be returned here
-    submissions = list(
-        reddit.info(
-            [f"{submission_kind}_{base36.dumps(post_id)}" for post_id in post_ids]
-        )
-    )
+    # brute force this because /api/info does not return all submissions for an unknown reason
+    submissions = []
+    for post_id in post_ids:
+        try:
+            submissions.append(admin_api.get_submission(base36.dumps(post_id)))
+        except:  # pylint: disable=bare-except
+            log.exception("Could not find submission '%s'", post_id)
 
     channels_by_name = Channel.objects.in_bulk(
         [submission.subreddit.display_name for submission in submissions],

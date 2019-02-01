@@ -15,7 +15,6 @@ from channels.constants import (
 )
 from channels.factories.models import ChannelFactory, PostFactory
 from channels.models import ChannelSubscription, Channel, Post
-from channels.utils import get_kind_mapping
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
 
@@ -252,9 +251,11 @@ def test_populate_posts_and_comments(mocker):
 
     ChannelFactory.create(name="exists")
 
+    submission_mock = mocker.Mock(id="1", subreddit=mocker.Mock(display_name="exists"))
+
     mock_api = mocker.patch("channels.api.Api", autospec=True)
-    mock_api.return_value.reddit.info.return_value = [
-        mocker.Mock(id="1", subreddit=mocker.Mock(display_name="exists")),
+    mock_api.return_value.get_submission.side_effect = [
+        submission_mock,
         mocker.Mock(id="2", subreddit=mocker.Mock(display_name="missing")),
     ]
 
@@ -263,23 +264,19 @@ def test_populate_posts_and_comments(mocker):
 
     result = tasks.populate_posts_and_comments.delay(post_ids).get()
 
-    kind = get_kind_mapping()["submission"]
-
-    mock_api.return_value.reddit.info.assert_called_once_with(
-        [f"{kind}_{post_id}" for post_id in post_ids]
-    )
+    assert mock_api.return_value.get_submission.call_count == len(post_ids)
+    for post_id in post_ids:
+        mock_api.return_value.get_submission.assert_any_call(base36.dumps(post_id))
 
     assert Post.objects.filter(post_id="1").exists()
 
     post = Post.objects.get(post_id="1")
 
-    submission = mock_api.return_value.reddit.info.return_value[0]
-
     mock_backpopulate_api.backpopulate_post.assert_called_once_with(
-        post=post, submission=submission
+        post=post, submission=submission_mock
     )
     mock_backpopulate_api.backpopulate_comments.assert_called_once_with(
-        post=post, submission=submission
+        post=post, submission=submission_mock
     )
 
     assert result == {
