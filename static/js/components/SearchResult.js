@@ -139,5 +139,6 @@ export default class SearchResult extends React.Component<Props> {
     } else if (result.object_type === "course") {
       return <CourseSearchResult result={result} toggleFacet={toggleFacet} />
     }
+    return null
   }
 }

@@ -5,13 +5,13 @@ import onClickOutside from "react-onclickoutside"
 
 import Button from "./Button"
 
-type LoginPopupProps = {
+type Props = {
   closePopup: Function,
   visible: boolean,
   className?: string
 }
 
-export class LoginPopupHelper extends React.Component<LoginPopupProps> {
+export class LoginPopupHelper extends React.Component<Props> {
   handleClickOutside = () => {
     const { closePopup, visible } = this.props
     if (visible) {
@@ -47,4 +47,4 @@ export class LoginPopupHelper extends React.Component<LoginPopupProps> {
   }
 }
 
-export default onClickOutside(LoginPopupHelper)
+export default onClickOutside<Props, void>(LoginPopupHelper)

@@ -13,11 +13,15 @@ import { EMBEDLY_THUMB_HEIGHT, EMBEDLY_THUMB_WIDTH } from "../lib/posts"
 import type { Course } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
 
-type Props = {
+type OwnProps = {|
   course: Course,
-  dispatch: Dispatch<*>,
   toggleFacet?: Function
-}
+|}
+
+type Props = {|
+  ...OwnProps,
+  dispatch: Dispatch<*>
+|}
 
 export class CompactCourseDisplay extends React.Component<Props> {
   setCourseForDrawer = async () => {
@@ -89,4 +93,4 @@ export class CompactCourseDisplay extends React.Component<Props> {
   }
 }
 
-export default connect()(CompactCourseDisplay)
+export default connect<Props, OwnProps, _, _, _, _>()(CompactCourseDisplay)

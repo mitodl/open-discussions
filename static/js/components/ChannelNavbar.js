@@ -11,10 +11,10 @@ import { channelSearchURL, channelURL, channelAboutURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
-type Props = {
+type Props = {|
   channel: Channel,
   children?: React.Node
-}
+|}
 
 export default class ChannelNavbar extends React.Component<Props> {
   render() {

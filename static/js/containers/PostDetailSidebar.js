@@ -15,19 +15,27 @@ import type { Dispatch } from "redux"
 import type { PostResult } from "../flow/searchTypes"
 import type { Post } from "../flow/discussionTypes"
 
-type PostDetailSidebarProps = {
-  dispatch: Dispatch<*>,
-  post: Post,
+type StateProps = {|
   relatedPosts: Array<PostResult>,
   loading: boolean
-}
+|}
 
-export class PostDetailSidebar extends React.Component<PostDetailSidebarProps> {
+type OwnProps = {|
+  post: Post
+|}
+
+type Props = {|
+  dispatch: Dispatch<*>,
+  ...OwnProps,
+  ...StateProps
+|}
+
+export class PostDetailSidebar extends React.Component<Props> {
   componentDidMount() {
     this.loadData()
   }
 
-  componentDidUpdate(prevProps: PostDetailSidebarProps) {
+  componentDidUpdate(prevProps: Props) {
     if (!R.equals(prevProps.post, this.props.post)) {
       this.loadData()
     }
@@ -89,7 +97,7 @@ export class PostDetailSidebar extends React.Component<PostDetailSidebarProps> {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state: Object): StateProps => {
   const { relatedPosts } = state
 
   return {
@@ -98,4 +106,6 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps)(PostDetailSidebar)
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(
+  PostDetailSidebar
+)

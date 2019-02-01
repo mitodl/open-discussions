@@ -33,7 +33,7 @@ import type { FormsState } from "../flow/formTypes"
 
 const COVER_IMAGE_DISPLAY_HEIGHT = 300
 
-type Props = {
+type Props = {|
   post: Post,
   toggleUpvote: Post => void,
   approvePost: Post => void,
@@ -53,7 +53,7 @@ type Props = {
   hidePostShareMenu: Function,
   postShareMenuOpen: boolean,
   channel: Channel
-}
+|}
 
 export default class ExpandedPostDisplay extends React.Component<Props> {
   renderPostContent = () => {

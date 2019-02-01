@@ -47,7 +47,7 @@ export const postsEndpoint = {
   patchSuccessHandler:  mergePostData,
   deleteSuccessHandler: (_: any, data: Map<string, Post>) => data,
   extraActions:         {
-    [SET_POST_DATA]: (state, action) => {
+    [SET_POST_DATA]: (state: Object, action: Action<string, *>) => {
       const update =
         action.payload instanceof Array
           ? mergeMultiplePosts(action.payload, state.data)

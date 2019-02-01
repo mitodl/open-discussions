@@ -52,7 +52,8 @@ const WrappedPage = withForm(Form)(Page)
 describe("withForm", () => {
   const result = { state: "success" }
 
-  let sandbox, formData
+  let sandbox
+  let formData: any
   let formEndEditStub, formBeginEditStub, formUpdateStub, formValidateStub
   let validateFormStub, onSubmitStub, onSubmitResultStub
 

@@ -34,15 +34,27 @@ const partialTokenFromLocation = R.compose(
 
 const isInvalid = R.pathEq(["data", "state"], STATE_INVALID_EMAIL)
 
-type Props = {
+type OwnProps = {|
   match: Match,
-  confirmCode: Function,
   location: Object,
-  history: Object,
-  invalid: boolean
-}
+  history: Object
+|}
 
-export class RegisterConfirmPage extends React.Component<Props, *> {
+type StateProps = {|
+  invalid: boolean
+|}
+
+type DispatchProps = {|
+  confirmCode: Function
+|}
+
+type Props = {|
+  ...OwnProps,
+  ...StateProps,
+  ...DispatchProps
+|}
+
+export class RegisterConfirmPage extends React.Component<Props> {
   componentDidMount() {
     const { confirmCode, location, history } = this.props
     const code = confirmationCodeFromLocation(location)
@@ -88,13 +100,14 @@ export class RegisterConfirmPage extends React.Component<Props, *> {
 const confirmCode = (partialToken: string, code: string) =>
   actions.auth.registerConfirm(FLOW_REGISTER, partialToken, code)
 
-const mapStateToProps = state => {
+const mapStateToProps = (state: Object): StateProps => {
   const invalid = isInvalid(state.auth)
   return {
     invalid
   }
 }
 
+// $FlowFixMe: just tired of it flow, stop
 export default connect(
   mapStateToProps,
   {

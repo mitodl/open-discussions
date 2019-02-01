@@ -17,11 +17,19 @@ import type { Match } from "react-router"
 import type { SocialAuth } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
 
-type Props = {
-  match: Match,
-  dispatch: Dispatch<*>,
+type OwnProps = {|
+  match: Match
+|}
+
+type StateProps = {|
   socialAuths: Array<SocialAuth>
-}
+|}
+
+type Props = {|
+  ...StateProps,
+  ...OwnProps,
+  dispatch: Dispatch<*>
+|}
 
 class AccountSettingsPage extends React.Component<Props> {
   componentDidMount() {
@@ -93,10 +101,12 @@ class AccountSettingsPage extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state: Object): StateProps => {
   const socialAuths = state.accountSettings.data || []
 
   return { socialAuths }
 }
 
-export default connect(mapStateToProps)(AccountSettingsPage)
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(
+  AccountSettingsPage
+)

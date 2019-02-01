@@ -1,5 +1,5 @@
-/* global SETTINGS: false */
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { Route, Redirect, Switch } from "react-router-dom"
 import { connect } from "react-redux"
@@ -61,19 +61,27 @@ import type { Profile } from "../flow/discussionTypes"
 
 export const USER_MENU_DROPDOWN = "USER_MENU_DROPDOWN"
 
-type AppProps = {
-  match: Match,
-  location: Location,
+type StateProps = {|
   showDrawerDesktop: boolean,
   showDrawerMobile: boolean,
   snackbar: SnackbarState,
   banner: BannerState,
-  dispatch: Dispatch<*>,
   showUserMenu: boolean,
   profile: ?Profile
-}
+|}
 
-class App extends React.Component<AppProps> {
+type OwnProps = {|
+  match: Match,
+  location: Location
+|}
+
+type Props = {|
+  ...StateProps,
+  ...OwnProps,
+  dispatch: Dispatch<*>
+|}
+
+class App extends React.Component<Props> {
   toggleShowDrawer = () => {
     const { dispatch, showDrawerMobile, showDrawerDesktop } = this.props
     dispatch(
@@ -104,7 +112,7 @@ class App extends React.Component<AppProps> {
     this.loadData()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     const {
       location: { pathname },
       showDrawerMobile
@@ -304,7 +312,7 @@ class App extends React.Component<AppProps> {
   }
 }
 
-export default connect(state => {
+const mapStateToProps = state => {
   const {
     ui: { showDrawerMobile, showDrawerDesktop, snackbar, banner, dropdownMenus }
   } = state
@@ -319,4 +327,6 @@ export default connect(state => {
     showUserMenu,
     profile: getOwnProfile(state)
   }
-})(App)
+}
+
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(App)

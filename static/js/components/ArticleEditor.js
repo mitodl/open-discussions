@@ -6,11 +6,11 @@ import CustomEditor from "@mitodl/ckeditor-custom-build"
 import { getCKEditorJWT } from "../lib/api/ckeditor"
 import { loadEmbedlyPlatform, renderEmbedlyCard } from "../lib/embed"
 
-type Props = {
+type Props = {|
   initialData?: Array<Object>,
   readOnly?: boolean,
   onChange?: Function
-}
+|}
 
 const editorClassName = (readOnly?: boolean): string =>
   `ck-editor ${readOnly ? "read-only" : ""}`.trim()

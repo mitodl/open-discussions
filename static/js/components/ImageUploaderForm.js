@@ -26,8 +26,12 @@ type ImageUploaderProps<Form> = {
   width: number
 } & FormProps<Form>
 
-export default class ImageUploaderForm<Form> extends React.Component<
-  ImageUploaderProps<Form>
+type ImageForm = {
+  image: any
+}
+
+export default class ImageUploaderForm extends React.Component<
+  ImageUploaderProps<ImageForm>
 > {
   startPhotoEdit = (photo: File) => {
     const { formBeginEdit, onUpdate } = this.props

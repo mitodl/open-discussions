@@ -9,7 +9,7 @@ export type FormsState = {
   [string]: FormValue<*>,
 }
 
-export type FormErrors<T> = {[$Keys<T>]: string }
+export type FormErrors<T> = $Shape<{[$Keys<T>]: string }>
 
 export type FormActionPayload<T> = {
   formKey: string,
@@ -17,17 +17,18 @@ export type FormActionPayload<T> = {
   errors?: FormErrors<T>,
 }
 
-export type FormActionCreators<T> = {
+export type FormActionCreators = {
   formBeginEdit: () => Action,
   formEndEdit: () => Action,
-  formUpdate: ($Shape<T>) => Action,
-  formValidate: ($Shape<T>) => Action
+  formUpdate: (Object) => Action,
+  formValidate: (Object) => Action
 }
 
 export type NewFormFunc<T> = () => T
+
 export type ConfiguredFormProps<T> = {
   getForm: Object => ?FormValue<T>,
-  actionCreators: FormActionCreators<T>
+  actionCreators: FormActionCreators
 }
 
 export type WithFormProps<T> = {
@@ -41,7 +42,7 @@ export type WithFormProps<T> = {
   useRecaptcha?: boolean,
   validateForm: FormValue<T> => {value: FormErrors<T>},
   renderForm: Function
-} & FormActionCreators<T>
+} & FormActionCreators
 
 export type FormProps<T> = {
   form: T,

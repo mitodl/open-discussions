@@ -42,7 +42,9 @@ describe("Editor component", () => {
   })
 
   const renderEditor = (props = {}) =>
-    mount(<Editor dispatch={dispatch} onChange={onChange} {...props} />)
+    mount(
+      <Editor dispatch={dispatch} onChange={onChange} forms={{}} {...props} />
+    )
 
   const renderConnectedEditor = (props = {}) => {
     const wrapper = mount(

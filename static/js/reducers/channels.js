@@ -26,7 +26,7 @@ export const channelsEndpoint = {
   patchFunc:           (channel: Channel) => channelAPI.updateChannel(channel),
   patchSuccessHandler: updateChannelHandler,
   extraActions:        {
-    [SET_CHANNEL_DATA]: (state, action) => {
+    [SET_CHANNEL_DATA]: (state: Object, action: Action<*>) => {
       const updatedData = new Map(state.data)
       for (const channel of action.payload) {
         updatedData.set(channel.name, channel)

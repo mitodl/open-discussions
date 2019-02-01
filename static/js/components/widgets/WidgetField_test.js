@@ -135,7 +135,6 @@ describe("WidgetField", () => {
     const editor = wrapper.find("Connect(Editor)")
     assert.isTrue(editor.exists())
     assert.equal(editor.prop("initialValue"), value)
-    assert.equal(editor.prop("placeHolder"), "")
 
     const newValue = "new text"
     editor.prop("onChange")(newValue)

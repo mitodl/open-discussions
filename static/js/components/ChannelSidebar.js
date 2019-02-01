@@ -6,9 +6,9 @@ import ChannelWidgetList from "./widgets/ChannelWidgetList"
 
 import type { Channel } from "../flow/discussionTypes"
 
-type ChannelSidebarProps = {
+type ChannelSidebarProps = {|
   channel: ?Channel
-}
+|}
 
 const ChannelSidebar = ({ channel }: ChannelSidebarProps) =>
   channel ? (

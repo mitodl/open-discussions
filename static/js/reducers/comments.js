@@ -290,7 +290,7 @@ export const commentsEndpoint = {
   },
   extraActions: {
     [REPLACE_MORE_COMMENTS]: (
-      state,
+      state: Object,
       action: Action<ReplaceMoreCommentsPayload, *>
     ) => {
       const update = new Map(state.data)

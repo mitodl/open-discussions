@@ -12,17 +12,17 @@ import { FacebookIcon, TwitterIcon, LinkedinIcon } from "react-share"
 
 import { setSnackbarMessage } from "../actions/ui"
 
-type SharePopupProps = {
+type Props = {
   url: string,
   closePopup: Function,
   hideSocialButtons?: boolean,
   setSnackbarMessage: Function
 }
 
-export class SharePopupHelper extends React.Component<SharePopupProps> {
+export class SharePopupHelper extends React.Component<Props> {
   input: { current: null | React$ElementRef<typeof HTMLInputElement> }
 
-  constructor(props: SharePopupProps) {
+  constructor(props: Props) {
     super(props)
     this.input = React.createRef()
   }

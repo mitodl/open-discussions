@@ -5,13 +5,13 @@ import onClickOutside from "react-onclickoutside"
 
 import { spaceSeparated } from "../lib/util"
 
-type DropdownMenuProps = {
+type Props = {
   closeMenu: Function,
   children: any,
   className?: string
 }
 
-export class _DropdownMenu extends React.Component<DropdownMenuProps> {
+export class _DropdownMenu extends React.Component<Props> {
   handleClickOutside = () => {
     const { closeMenu } = this.props
 
@@ -42,5 +42,5 @@ export class _DropdownMenu extends React.Component<DropdownMenuProps> {
   }
 }
 
-const DropdownMenu = onClickOutside(_DropdownMenu)
+const DropdownMenu = onClickOutside<Props, void>(_DropdownMenu)
 export default DropdownMenu

@@ -13,7 +13,7 @@ endpoints.forEach(endpoint => {
   reducers[endpoint.name] = deriveReducers(endpoint, actions[endpoint.name])
 })
 
-export default combineReducers({
+export default combineReducers<Object, Object>({
   ...reducers,
   ...formReducers,
   ui,

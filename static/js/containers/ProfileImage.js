@@ -18,16 +18,28 @@ type ImageSize =
   | typeof PROFILE_IMAGE_SMALL
   | typeof PROFILE_IMAGE_MEDIUM
 
-type Props = {
+type OwnProps = {|
   imageSize: ImageSize,
   profile: ?Profile,
   userName?: ?string,
-  editable: boolean,
-  getProfile: (username: string) => Promise<*>,
-  submitImage: (username: string, edit: Blob, name: string) => Promise<*>,
-  processing: boolean,
+  editable?: boolean,
   className?: string
-}
+|}
+
+type StateProps = {|
+  processing: boolean
+|}
+
+type DispatchProps = {|
+  getProfile: (username: string) => Promise<*>,
+  submitImage: (username: string, edit: Blob, name: string) => Promise<*>
+|}
+
+type Props = {|
+  ...OwnProps,
+  ...StateProps,
+  ...DispatchProps
+|}
 
 const formatPhotoName = photo => `${photo.name.replace(/\.\w*$/, "")}.jpg`
 
@@ -36,7 +48,7 @@ class ProfileImage extends React.Component<Props> {
     editable: false
   }
 
-  submitImage = async event => {
+  submitImage = async (event: Object) => {
     const { submitImage, getProfile, userName } = this.props
     if (!userName) {
       throw new Error(
@@ -95,11 +107,11 @@ class ProfileImage extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: Object): StateProps => ({
   processing: state.profileImage.processing
 })
 
-export default connect(
+export default connect<Props, OwnProps, _, DispatchProps, _, _>(
   mapStateToProps,
   {
     submitImage: actions.profileImage.patch,

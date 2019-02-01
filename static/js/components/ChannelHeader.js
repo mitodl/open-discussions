@@ -15,12 +15,12 @@ import { channelURL } from "../lib/url"
 
 import type { Channel } from "../flow/discussionTypes"
 
-type Props = {
+type Props = {|
   channel: Channel,
   history: Object,
   isModerator: boolean,
   children?: any
-}
+|}
 
 const ChannelHeader = ({ channel, history, isModerator, children }: Props) => (
   <div className="channel-page-header">

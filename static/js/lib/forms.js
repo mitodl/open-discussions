@@ -22,7 +22,7 @@ export const formBeginEditForKey = <T>(
 export const formEndEditForKey = (formKey: string) => () =>
   actions.forms.formEndEdit({ formKey })
 
-export const formUpdateForKey = <T>(formKey: string) => (updates: $Shape<T>) =>
+export const formUpdateForKey = (formKey: string) => (updates: Object) =>
   actions.forms.formUpdate({
     formKey,
     value: {
@@ -30,7 +30,7 @@ export const formUpdateForKey = <T>(formKey: string) => (updates: $Shape<T>) =>
     }
   })
 
-export const formValidateForKey = <T>(formKey: string) => (errors: $Shape<T>) =>
+export const formValidateForKey = (formKey: string) => (errors: Object) =>
   actions.forms.formValidate({
     formKey,
     errors: {

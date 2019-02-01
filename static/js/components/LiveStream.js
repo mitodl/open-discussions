@@ -11,10 +11,18 @@ import { livestreamEventURL } from "../lib/embed"
 
 import type { LiveStreamEvent } from "../flow/livestreamTypes"
 
-type Props = {
-  getLivestream: Function,
+type StateProps = {|
   liveEvent: ?LiveStreamEvent
-}
+|}
+
+type DispatchProps = {|
+  getLivestream: Function
+|}
+
+type Props = {|
+  ...StateProps,
+  ...DispatchProps
+|}
 
 export class LiveStream extends React.Component<Props> {
   componentDidMount() {
@@ -52,7 +60,7 @@ export class LiveStream extends React.Component<Props> {
 
 const getLiveEvent = R.find(R.propEq("isLive", true))
 
-const mapStateToProps = ({ livestream }) => ({
+const mapStateToProps = ({ livestream }): StateProps => ({
   liveEvent: getLiveEvent(livestream.data)
 })
 
@@ -60,7 +68,7 @@ const mapDispatchToProps = {
   getLivestream: actions.livestream.get
 }
 
-export default connect(
+export default connect<Props, {||}, _, DispatchProps, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(LiveStream)

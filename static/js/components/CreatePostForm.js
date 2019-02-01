@@ -138,10 +138,7 @@ export default class CreatePostForm extends React.Component<Props, State> {
     if (postType === LINK_TYPE_TEXT) {
       return (
         <div className="text row post-content">
-          <Editor
-            onChange={editorUpdateFormShim("text", onUpdate)}
-            placeHolder="Tell your story..."
-          />
+          <Editor onChange={editorUpdateFormShim("text", onUpdate)} />
           {this.clearInputButton()}
           {validationMessage(validation.text)}
         </div>

@@ -6,10 +6,10 @@ import { removeTrailingSlash } from "../lib/util"
 
 import type { Match } from "react-router"
 
-type Props = {
+type Props = {|
   relativeUrl?: ?string,
   match?: ?Match
-}
+|}
 
 const CanonicalLink = ({ relativeUrl, match }: Props) => {
   let partialUrl

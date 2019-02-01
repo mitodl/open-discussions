@@ -22,15 +22,6 @@ import { preventDefaultAndInvoke } from "../../lib/util"
 
 import type { Match } from "react-router"
 
-type LoginProviderRequiredPageProps = {
-  match: Match,
-  history: Object,
-  provider: string,
-  email: string,
-  name: string,
-  profileImageUrl: string
-}
-
 const renderExternalProviderLink = (provider: string) => {
   switch (provider) {
   case "micromasters":
@@ -50,6 +41,24 @@ const renderExternalProviderLink = (provider: string) => {
   }
 }
 
+type StateProps = {|
+  provider: string,
+  email: string,
+  name: string,
+  profileImageUrl: string
+|}
+
+type OwnProps = {|
+  match: Match,
+  history: Object,
+  dispatch: Function
+|}
+
+type Props = {|
+  ...OwnProps,
+  ...StateProps
+|}
+
 export const LoginProviderRequiredPage = ({
   history,
   provider,
@@ -57,7 +66,7 @@ export const LoginProviderRequiredPage = ({
   name,
   profileImageUrl,
   match
-}: LoginProviderRequiredPageProps) => {
+}: Props) => {
   const externalLink = renderExternalProviderLink(provider)
   if (!externalLink) {
     return (
@@ -95,7 +104,7 @@ export const LoginProviderRequiredPage = ({
   )
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state: Object): StateProps => {
   const provider = getAuthProviderSelector(state)
   const email = getAuthUiEmailSelector(state)
   const name = getAuthUiNameSelector(state)
@@ -108,4 +117,6 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps)(LoginProviderRequiredPage)
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(
+  LoginProviderRequiredPage
+)

@@ -83,7 +83,7 @@ class ChannelAvatar extends React.Component<Props> {
   }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) =>
+const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps: Props) =>
   // $FlowFixMe
   bindActionCreators(
     {
@@ -93,7 +93,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) =>
     dispatch
   )
 
-export default connect(
+export default connect<Props, Props, _, _, _, _>(
   null,
   mapDispatchToProps
 )(ChannelAvatar)

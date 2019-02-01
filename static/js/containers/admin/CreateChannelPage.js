@@ -20,10 +20,18 @@ const CREATE_CHANNEL_KEY = "channel:new"
 const CREATE_CHANNEL_PAYLOAD = { formKey: CREATE_CHANNEL_KEY }
 const getForm = R.prop(CREATE_CHANNEL_KEY)
 
-type Props = {
-  dispatch: Dispatch<*>,
-  history: Object,
+type StateProps = {|
   channelForm: FormValue<ChannelForm>
+|}
+
+type OwnProps = {|
+  history: Object
+|}
+
+type Props = {
+  ...StateProps,
+  ...OwnProps,
+  dispatch: Dispatch<*>
 }
 
 class CreateChannelPage extends React.Component<Props> {
@@ -92,10 +100,12 @@ class CreateChannelPage extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state: Object): StateProps => {
   return {
     channelForm: getForm(state.forms)
   }
 }
 
-export default connect(mapStateToProps)(CreateChannelPage)
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(
+  CreateChannelPage
+)

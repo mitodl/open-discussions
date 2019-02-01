@@ -33,7 +33,7 @@ import { LINK_TYPE_LINK } from "../lib/channels"
 import type { Dispatch } from "redux"
 import type { Post } from "../flow/discussionTypes"
 
-type Props = {
+type OwnProps = {|
   post: Post,
   showChannelLink?: boolean,
   toggleUpvote?: Post => void,
@@ -43,10 +43,19 @@ type Props = {
   removePost?: ?(post: Post) => void,
   ignorePostReports?: (post: Post) => Promise<*>,
   reportPost?: ?(post: Post) => void,
-  menuOpen: boolean,
   useSearchPageUI?: boolean,
+  menuOpen?: boolean
+|}
+
+type StateProps = {|
+  menuOpen: boolean
+|}
+
+type Props = {|
+  ...OwnProps,
+  ...StateProps,
   dispatch: Dispatch<*>
-}
+|}
 
 export class CompactPostDisplay extends React.Component<Props> {
   showChannelLink = () => {
@@ -258,7 +267,7 @@ export class CompactPostDisplay extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const { post } = ownProps
   const { dropdownMenus } = state.ui
 
@@ -268,4 +277,6 @@ const mapStateToProps = (state, ownProps) => {
   return { menuOpen }
 }
 
-export default connect(mapStateToProps)(CompactPostDisplay)
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(
+  CompactPostDisplay
+)

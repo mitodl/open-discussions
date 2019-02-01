@@ -7,7 +7,7 @@ import IntraPageNav from "./IntraPageNav"
 
 import { NOTIFICATION_SETTINGS_URL, ACCOUNT_SETTINGS_URL } from "../lib/url"
 
-import type { Location } from "react-router"
+import type { ContextRouter, Location } from "react-router"
 
 type LinkSpec = {
   isDefault: boolean,
@@ -37,7 +37,7 @@ const renderNavLinks = (
     )
   })
 
-export const SettingsTabs = ({ location }: { location: Location }) => (
+export const SettingsTabs = ({ location }: ContextRouter) => (
   <IntraPageNav>
     {renderNavLinks(location, {
       [NOTIFICATION_SETTINGS_URL]: {
@@ -52,4 +52,4 @@ export const SettingsTabs = ({ location }: { location: Location }) => (
   </IntraPageNav>
 )
 
-export default withRouter(SettingsTabs)
+export default withRouter<{||}>(SettingsTabs)

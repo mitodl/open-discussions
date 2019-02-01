@@ -44,7 +44,6 @@ describe("CompactPostDisplay", () => {
       reportPost:      helper.sandbox.stub(),
       showChannelLink: false,
       showPinUI:       false,
-      showPostMenu:    helper.sandbox.stub(),
       togglePinPost:   helper.sandbox.stub(),
       ...props
     }

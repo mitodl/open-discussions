@@ -38,7 +38,7 @@ export const postsForChannelEndpoint = {
     return update
   },
   extraActions: {
-    [EVICT_POSTS_FOR_CHANNEL]: (state, action: Action<string, *>) => {
+    [EVICT_POSTS_FOR_CHANNEL]: (state: Object, action: Action<string, *>) => {
       const update = new Map(state.data)
       const channelName = action.payload
       update.delete(channelName)

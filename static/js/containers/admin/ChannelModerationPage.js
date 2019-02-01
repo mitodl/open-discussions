@@ -81,6 +81,7 @@ export class ChannelModerationPage extends React.Component<Props> {
         <div className="empty-message">No outstanding reports</div>
       </Card>
     ) : (
+      // $FlowFixMe: flow being mad pedantic
       reports.map(this.renderReport)
     )
   }
@@ -103,7 +104,6 @@ export class ChannelModerationPage extends React.Component<Props> {
       return (
         <CompactPostDisplay
           post={report.post}
-          report={report}
           isModerator={isModerator}
           removePost={removePost}
           key={report.post.id}

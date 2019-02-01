@@ -3,13 +3,13 @@ import React from "react"
 
 import CloseButton from "./CloseButton"
 
-type Props = {
+type Props = {|
   onSubmit: Function,
   onChange: Function,
   closeMenu: Function,
   text: string,
   url: string
-}
+|}
 
 const AddLinkMenu = ({ onSubmit, onChange, closeMenu, text, url }: Props) => (
   <div className="add-link-menu">

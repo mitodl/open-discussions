@@ -192,7 +192,6 @@ describe("ChannelModerationPage", () => {
       reports.forEach((report, index) => {
         const props = postDisplays.at(index).props()
         assert.deepEqual(props.post, postList[index])
-        assert.deepEqual(props.report, report)
         assert.equal(props.isModerator, channel.user_is_moderator)
       })
     })

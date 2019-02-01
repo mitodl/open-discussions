@@ -1,10 +1,10 @@
 // @flow
 import React from "react"
 
-type BackButtonProps = {
+type BackButtonProps = {|
   onClick: Function,
   className?: string
-}
+|}
 
 const BackButton = ({ onClick, className }: BackButtonProps) => (
   <a

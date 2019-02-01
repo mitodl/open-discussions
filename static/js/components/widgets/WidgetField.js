@@ -44,7 +44,6 @@ const WidgetField = ({ fieldSpec, getValue, updateValues }: Props) => {
       <Editor
         initialValue={configurationOrDefault}
         onChange={editorUpdateFormShim("text", onChange)}
-        placeHolder=""
       />
     )
   case WIDGET_FIELD_TYPE_TEXTAREA:

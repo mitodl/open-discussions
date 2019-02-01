@@ -100,12 +100,21 @@ export const newLinkForm = () => ({
   text: ""
 })
 
-type Props = {
-  onChange: (serialized: string) => void,
+type OwnProps = {|
+  onChange: string => void,
   initialValue?: string,
-  autoFocus?: boolean,
+  autoFocus?: boolean
+|}
+
+type StateProps = {|
+  forms: Object
+|}
+
+type Props = {|
+  ...OwnProps,
+  ...StateProps,
   dispatch: Dispatch<*>
-}
+|}
 
 type State = {
   editorState: Object,
@@ -348,7 +357,9 @@ export class Editor extends React.Component<Props, State> {
   }
 }
 
-export default connect(({ forms }) => ({ forms }))(Editor)
+const mapStateToProps = ({ forms }): StateProps => ({ forms })
+
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(Editor)
 
 // a little helper to make it easier to drop the <Editor />
 // in to existing form-based components

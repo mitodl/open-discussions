@@ -23,14 +23,22 @@ import type { Dispatch } from "redux"
 import type { CommentInTree, Post } from "../flow/discussionTypes"
 import type { UserContributionState } from "../reducers/user_contributions"
 
-type Props = {
-  dispatch: Dispatch<*>,
+type OwnProps = {|
   userName: string,
-  selectedTab: string,
+  selectedTab: string
+|}
+
+type StateProps = {|
   contributions: UserContributionState,
   upvotedPosts: Map<string, Post>,
   canLoadMore: boolean
-}
+|}
+
+type Props = {|
+  ...OwnProps,
+  ...StateProps,
+  dispatch: Dispatch<*>
+|}
 
 type State = {
   votedComments: Map<string, CommentInTree>
@@ -67,7 +75,7 @@ class ProfileContributionFeed extends React.Component<Props, State> {
     }
   }
 
-  loadData = async params => {
+  loadData = async (params: Object) => {
     const { dispatch, userName, selectedTab } = this.props
 
     params = params || profileFeedDefaultParams
@@ -114,7 +122,10 @@ class ProfileContributionFeed extends React.Component<Props, State> {
 
   downvoteComment = this.setCommentVote("downvoted")
 
-  getUpdatedContributionsList = (objectKey, updatedObjects) => {
+  getUpdatedContributionsList = (
+    objectKey: string,
+    updatedObjects: Map<string, Object>
+  ) => {
     const { contributions } = this.props
     return updatedObjects
       ? contributions[objectKey].data.map(
@@ -229,7 +240,7 @@ class ProfileContributionFeed extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state, ownProps): StateProps => {
   const { userContributions, posts } = state
   const contributions = userContributions.data.get(ownProps.userName)
   const upvotedPosts = posts.data
@@ -241,4 +252,6 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps)(ProfileContributionFeed)
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(
+  ProfileContributionFeed
+)
