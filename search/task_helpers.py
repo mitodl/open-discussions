@@ -8,6 +8,7 @@ from django.conf import settings
 
 from open_discussions.features import INDEX_UPDATES, if_feature_enabled
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
+from channels.models import Comment
 from channels.utils import render_article_text
 
 from search.api import (
@@ -75,10 +76,11 @@ def index_new_post(post_obj):
     Serializes a post object and runs a task to create an ES document for it.
 
     Args:
-        post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
+        post_obj (channels.proxies.PostProxy): A proxied post/submission
     """
-    data = ESPostSerializer().serialize(post_obj)
-    create_document.delay(gen_post_id(post_obj.id), data)
+    post = post_obj._self_post  # pylint: disable=protected-access
+    data = ESPostSerializer(instance=post).data
+    create_document.delay(gen_post_id(post.post_id), data)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -89,7 +91,8 @@ def index_new_comment(comment_obj):
     Args:
         comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
     """
-    data = ESCommentSerializer().serialize(comment_obj)
+    comment = Comment.objects.get(comment_id=comment_obj.id)
+    data = ESCommentSerializer(instance=comment).data
     create_document.delay(gen_comment_id(comment_obj.id), data)
     increment_parent_post_comment_count(comment_obj)
 

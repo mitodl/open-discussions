@@ -6,8 +6,7 @@ from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException, NotFound
 import pytest
 
-from channels.factories.models import ChannelFactory, PostFactory
-from open_discussions.factories import UserFactory
+from channels.factories.models import CommentFactory
 from open_discussions.test_utils import assert_not_raises
 from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES
 from search.exceptions import ReindexException, RetryException
@@ -17,11 +16,11 @@ from search.tasks import (
     finish_recreate_index,
     increment_document_integer_field,
     update_field_values_by_query,
-    index_channel,
-    index_post_with_comments,
+    index_posts,
     start_recreate_index,
     wrap_retry_exception,
     index_profiles,
+    index_comments,
 )
 
 
@@ -113,48 +112,33 @@ def test_wrap_retry_exception_matching(matching):
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_index_post_with_comments(
+def test_index_posts(
     mocker, wrap_retry_mock, with_error
 ):  # pylint: disable=unused-argument
     """index_post should call the api function of the same name"""
-    index_post_mock = mocker.patch("search.indexing_api.index_post_with_comments")
+    index_post_mock = mocker.patch("search.indexing_api.index_posts")
     if with_error:
         index_post_mock.side_effect = TabError
-    post_id = "post_id"
-    result = index_post_with_comments.delay(post_id).get()
-    assert result == (
-        "index_post_with_comments threw an error on post post_id"
-        if with_error
-        else None
-    )
+    post_ids = [1, 2, 3]
+    result = index_posts.delay(post_ids).get()
+    assert result == ("index_posts threw an error" if with_error else None)
 
-    index_post_mock.assert_called_once_with(post_id)
+    index_post_mock.assert_called_once_with(post_ids)
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_index_channel(
-    mock_index_functions, mocker, mocked_celery, settings, user, with_error
-):  # pylint: disable=unused-argument,too-many-arguments
-    """index_channel should index all posts of a channel"""
-    settings.INDEXING_API_USERNAME = user.username
-    index_post_mock = mocker.patch(
-        "search.tasks.index_post_with_comments", autospec=True
-    )
-    channel = ChannelFactory.create(id=1, name="channel01")
-    posts = PostFactory.create_batch(2, channel=channel)
+def test_index_comments(
+    mocker, wrap_retry_mock, with_error
+):  # pylint: disable=unused-argument
+    """index_comments should call the api function of the same name"""
+    index_comments_mock = mocker.patch("search.indexing_api.index_comments")
+    if with_error:
+        index_comments_mock.side_effect = TabError
+    post_ids = [1, 2, 3]
+    result = index_comments.delay(post_ids).get()
+    assert result == ("index_comments threw an error" if with_error else None)
 
-    assert (
-        index_channel.delay(channel.id).get()
-        == f"index_channel threw an error on channel id {channel.id}"
-    )
-
-    assert mocked_celery.group.call_count == 1
-    list(mocked_celery.group.call_args[0][0])  # iterate through generator
-    assert index_post_mock.si.call_count == 2
-    for post in posts:
-        index_post_mock.si.assert_any_call(post.post_id)
-    assert mocked_celery.replace.call_count == 1
-    assert mocked_celery.replace.call_args[0][1] == mocked_celery.group.return_value
+    index_comments_mock.assert_called_once_with(post_ids)
 
 
 @pytest.mark.parametrize("with_error", [True, False])
@@ -175,9 +159,11 @@ def test_start_recreate_index(mock_index_functions, mocker, mocked_celery, user)
     """
     settings.INDEXING_API_USERNAME = user.username
     settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
-    users = sorted(UserFactory.create_batch(4), key=lambda user: user.id)
-    channels = [ChannelFactory.create(name=name) for name in ["a", "b", "c"]]
-    index_channel_mock = mocker.patch("search.tasks.index_channel", autospec=True)
+    comments = sorted(CommentFactory.create_batch(4), key=lambda comment: comment.id)
+    posts = sorted([comment.post for comment in comments], key=lambda post: post.id)
+    users = sorted([item.author for item in posts + comments], key=lambda user: user.id)
+    index_posts_mock = mocker.patch("search.tasks.index_posts", autospec=True)
+    index_comments_mock = mocker.patch("search.tasks.index_comments", autospec=True)
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
     backing_index = "backing"
     create_backing_index_mock = mocker.patch(
@@ -201,13 +187,21 @@ def test_start_recreate_index(mock_index_functions, mocker, mocked_celery, user)
     # Celery's 'group' function takes a generator as an argument. In order to make assertions about the items
     # in that generator, 'list' is being called to force iteration through all of those items.
     list(mocked_celery.group.call_args[0][0])
-    for channel in channels:
-        index_channel_mock.si.assert_any_call(channel.id)
-        mocked_celery.chain.assert_called_once_with(
-            mocked_celery.group.return_value, finish_recreate_index_mock.s.return_value
+
+    assert index_posts_mock.si.call_count == 2
+    index_posts_mock.si.assert_any_call([posts[0].id, posts[1].id])
+    index_posts_mock.si.assert_any_call([posts[2].id, posts[3].id])
+
+    assert index_comments_mock.si.call_count == 2
+    index_comments_mock.si.assert_any_call([comments[0].id, comments[1].id])
+    index_comments_mock.si.assert_any_call([comments[2].id, comments[3].id])
+
+    assert index_profiles_mock.si.call_count == 4
+    for offset in range(4):
+        index_profiles_mock.si.assert_any_call(
+            [users[offset * 2].profile.id, users[offset * 2 + 1].profile.id]
         )
-    index_profiles_mock.si.assert_any_call([users[0].profile.id, users[1].profile.id])
-    index_profiles_mock.si.assert_any_call([users[2].profile.id, users[3].profile.id])
+
     assert mocked_celery.replace.call_count == 1
     assert mocked_celery.replace.call_args[0][1] == mocked_celery.chain.return_value
 

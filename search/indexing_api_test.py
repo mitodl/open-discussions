@@ -1,13 +1,14 @@
 """
 Tests for the indexing API
 """
-# pylint: disable=redefined-outer-name,unused-argument
+# pylint: disable=redefined-outer-name
 from types import SimpleNamespace
 
 import pytest
 
 from elasticsearch.exceptions import ConflictError
 
+from channels.factories.models import PostFactory, CommentFactory
 from search.connection import get_default_alias_name
 from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
 from search.exceptions import ReindexException
@@ -19,7 +20,8 @@ from search.indexing_api import (
     get_reindexing_alias_name,
     update_document_with_partial,
     increment_document_integer_field,
-    index_post_with_comments,
+    index_posts,
+    index_comments,
     switch_indices,
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
@@ -27,7 +29,7 @@ from search.indexing_api import (
 )
 
 
-pytestmark = pytest.mark.django_db
+pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
 
 
 @pytest.fixture()
@@ -204,26 +206,71 @@ def test_clear_and_create_index_error(object_type):
         )
 
 
-def test_index_post_with_comments(
-    mocked_es, mocker, settings, user
-):  # pylint:disable=too-many-locals
+@pytest.mark.usefixtures("indexing_user")
+def test_index_posts(mocked_es, mocker, settings):
     """
-    index_post should index the post and all comments recursively
+    index_post should index all posts
     """
     aliases = ["a", "b"]
+
+    posts = PostFactory.create_batch(3)
 
     get_alias_mock = mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=aliases
     )
-    api_mock = mocker.patch("channels.api.Api", autospec=True)
-    serialized_data_post = [{"object_type": POST_TYPE}]
-    serialized_data_comments = [{"object_type": COMMENT_TYPE}]
-    serialize_post_mock = mocker.patch(
-        "search.indexing_api.serialize_bulk_post",
+    serialized_data_posts = [{"object_type": POST_TYPE} for _ in posts]
+    mocker.patch(
+        "search.indexing_api.serialize_bulk_posts",
         autospec=True,
-        return_value=serialized_data_post,
+        return_value=serialized_data_posts,
     )
-    serialize_comments_mock = mocker.patch(
+    bulk_mock = mocker.patch(
+        "search.indexing_api.bulk", autospec=True, return_value=(0, [])
+    )
+
+    index_posts([post.id for post in posts])
+
+    get_alias_mock.assert_any_call([POST_TYPE])
+
+    assert bulk_mock.call_count == 2
+    for alias in aliases:
+        # expect a call per object per alias
+        bulk_mock.assert_any_call(
+            mocked_es.conn,
+            serialized_data_posts,
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+
+
+@pytest.mark.usefixtures("indexing_user")
+def test_index_posts_errors(mocker):
+    """ Test that a ReindexException is raised if an error occurs when indexing posts or comments"""
+    mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
+    )
+    mocker.patch(
+        "search.indexing_api.bulk", autospec=True, side_effect=(({}, ["error"]),)
+    )
+
+    with pytest.raises(ReindexException):
+        index_posts("post_id")
+
+
+@pytest.mark.usefixtures("indexing_user")
+def test_index_comments(mocked_es, mocker, settings):
+    """
+    index_comments should index all comments
+    """
+    aliases = ["a", "b"]
+    comments = CommentFactory.create_batch(3)
+
+    get_alias_mock = mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=aliases
+    )
+    serialized_data_comments = [{"object_type": COMMENT_TYPE} for _ in comments]
+    mocker.patch(
         "search.indexing_api.serialize_bulk_comments",
         autospec=True,
         return_value=serialized_data_comments,
@@ -232,30 +279,13 @@ def test_index_post_with_comments(
         "search.indexing_api.bulk", autospec=True, return_value=(0, [])
     )
 
-    settings.INDEXING_API_USERNAME = user.username
-    post_id = "post_id"
-    index_post_with_comments(post_id)
+    index_comments([comment.id for comment in comments])
 
-    get_alias_mock.assert_any_call([POST_TYPE])
     get_alias_mock.assert_any_call([COMMENT_TYPE])
-    api_mock.assert_called_once_with(user)
-    client = api_mock.return_value
-    client.get_post.assert_called_once_with(post_id)
-    post = client.get_post.return_value
 
-    serialize_post_mock.assert_any_call(post)
-    serialize_comments_mock.assert_any_call(post_id)
-
-    assert bulk_mock.call_count == 4
+    assert bulk_mock.call_count == 2
     for alias in aliases:
         # expect a call per object per alias
-        bulk_mock.assert_any_call(
-            mocked_es.conn,
-            serialized_data_post,
-            index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-        )
         bulk_mock.assert_any_call(
             mocked_es.conn,
             serialized_data_comments,
@@ -265,35 +295,25 @@ def test_index_post_with_comments(
         )
 
 
-@pytest.mark.parametrize("error", [POST_TYPE, COMMENT_TYPE])
-def test_index_post_with_comments_errors(
-    mocked_es, mocker, error, settings, user
-):  # pylint: disable=unused-argument
-    """ Test that a ReindexException is raised if an error occurs when indexing posts or comments"""
-    settings.INDEXING_API_USERNAME = user.username
-    aliases = ["a", "b"]
+@pytest.mark.usefixtures("indexing_user")
+def test_index_comments_errors(mocker):
+    """ Test that a ReindexException is raised if an error occurs when indexing comments"""
     mocker.patch(
-        "search.indexing_api.get_active_aliases", autospec=True, return_value=aliases
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
     )
-    mocker.patch("channels.api.Api", autospec=True)
-    bulk_mock = mocker.patch("search.indexing_api.bulk", autospec=True)
-
-    if error == POST_TYPE:
-        # search.indexing_api.bulk() processes post index on first run
-        bulk_mock.side_effect = (({}, ["error"]),)
-    else:
-        # search.indexing_api.bulk() processes comment index on third run
-        bulk_mock.side_effect = (({}, []), ({}, []), ({}, ["error"]))
+    mocker.patch(
+        "search.indexing_api.bulk", autospec=True, side_effect=(({}, ["error"]),)
+    )
 
     with pytest.raises(ReindexException):
-        index_post_with_comments("post_id")
+        index_comments("comment_id")
 
 
-def test_index_profiles(mocked_es, mocker, settings, user):
+@pytest.mark.usefixtures("indexing_user")
+def test_index_profiles(mocked_es, mocker, settings):
     """
     index_profiles should call bulk with correct arguments
     """
-    settings.INDEXING_API_USERNAME = user.username
     aliases = ["a", "b"]
     mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=aliases
@@ -317,11 +337,11 @@ def test_index_profiles(mocked_es, mocker, settings, user):
         )
 
 
-def test_index_profiles_error(mocked_es, mocker, settings, user):
+@pytest.mark.usefixtures("indexing_user")
+def test_index_profiles_error(mocker):
     """
     index_profiles should raise a ReindexException if the bulk call fails
     """
-    settings.INDEXING_API_USERNAME = user.username
     mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
     )

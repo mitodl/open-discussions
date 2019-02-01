@@ -27,7 +27,7 @@ from search.constants import (
 )
 from search.exceptions import ReindexException
 from search.serializers import (
-    serialize_bulk_post,
+    serialize_bulk_posts,
     serialize_bulk_comments,
     serialize_bulk_profiles,
 )
@@ -251,23 +251,19 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
     )
 
 
-def index_post_with_comments(post_id):
+def index_posts(post_ids):
     """
-    Index a post and its comments
+    Index a list of posts
 
     Args:
-        post_id (str): The post id to index
+        post_ids (list of int): list of Post.id to index
     """
-    from channels.api import get_admin_api
-
     conn = get_conn()
-    client = get_admin_api()
-    reddit_post = client.get_post(post_id)
 
     for alias in get_active_aliases([POST_TYPE]):
         _, errors = bulk(
             conn,
-            serialize_bulk_post(reddit_post),
+            serialize_bulk_posts(post_ids),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable
@@ -278,10 +274,20 @@ def index_post_with_comments(post_id):
                 "Error during bulk post insert: {errors}".format(errors=errors)
             )
 
+
+def index_comments(comment_ids):
+    """
+    Index a list of comments
+
+    Args:
+        comment_ids (list of int): list of Post.id to index
+    """
+    conn = get_conn()
+
     for alias in get_active_aliases([COMMENT_TYPE]):
         _, errors = bulk(
             conn,
-            serialize_bulk_comments(post_id),
+            serialize_bulk_comments(comment_ids),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable

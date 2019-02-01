@@ -10,7 +10,7 @@ from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException, NotFound
 
-from channels.models import Channel, Post
+from channels.models import Post, Comment
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks
 from search import indexing_api as api
@@ -88,7 +88,7 @@ def update_field_values_by_query(query, field_dict, object_types):
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_profiles(ids):
     """
-    Index user profiles
+    Index user profiles by a list of Profile.id
 
     Args:
         ids(list of int): List of profile id's
@@ -96,58 +96,48 @@ def index_profiles(ids):
     """
     try:
         api.index_profiles(ids)
-    except RetryException:
-        raise
-    except Ignore:
+    except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_profiles threw an error"
+        error = "index_profiles threw an error"
         log.exception(error)
         return error
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_post_with_comments(post_id):
+def index_posts(post_ids):
     """
-    Index a post and its comments
+    Index a list of posts by a list of Post.id
 
     Args:
-        post_id (str): The post_id to index
+        post_ids (list of int): list of Post.id to index
     """
     try:
         with wrap_retry_exception(PrawcoreException, PRAWException):
-            api.index_post_with_comments(post_id)
-    except RetryException:
-        raise
-    except Ignore:
+            api.index_posts(post_ids)
+    except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_post_with_comments threw an error on post {post_id}"
+        error = "index_posts threw an error"
         log.exception(error)
         return error
 
 
-@app.task(
-    bind=True, autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m"
-)
-def index_channel(self, channel_id):
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_comments(comment_ids):
     """
-    Index the channel
+    Index a list of comments by a list of Comment.id
 
     Args:
-        channel_id (str): The channel id to index
+        comment_ids (list of int): list of Comment.id to index
     """
     try:
-        posts = Post.objects.filter(channel=channel_id).iterator()
-        raise self.replace(
-            celery.group(index_post_with_comments.si(post.post_id) for post in posts)
-        )
-    except RetryException:
-        raise
-    except Ignore:
+        with wrap_retry_exception(PrawcoreException, PRAWException):
+            api.index_comments(comment_ids)
+    except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_channel threw an error on channel id {channel_id}"
+        error = "index_comments threw an error"
         log.exception(error)
         return error
 
@@ -164,12 +154,22 @@ def start_recreate_index(self):
         }
 
         # Do the indexing on the temp index
-        log.info("starting to index all channels, posts, comments, and profiles...")
+        log.info("starting to index all posts, comments, and profiles...")
 
-        index_channels = celery.group(
+        index_tasks = celery.group(
             [
-                index_channel.si(channel)
-                for channel in Channel.objects.values_list("id", flat=True)
+                index_posts.si(post_ids)
+                for post_ids in chunks(
+                    Post.objects.order_by("id").values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+            + [
+                index_comments.si(comment_ids)
+                for comment_ids in chunks(
+                    Comment.objects.order_by("id").values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
             ]
             + [
                 index_profiles.si(ids)
@@ -190,7 +190,7 @@ def start_recreate_index(self):
 
     # Use self.replace so that code waiting on this task will also wait on the indexing and finish tasks
     raise self.replace(
-        celery.chain(index_channels, finish_recreate_index.s(new_backing_indices))
+        celery.chain(index_tasks, finish_recreate_index.s(new_backing_indices))
     )
 
 

@@ -4,8 +4,9 @@ import pytest
 
 from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories.models import PostFactory, CommentFactory
-from channels.utils import get_reddit_slug, render_article_text
+from channels.utils import render_article_text
 from open_discussions.factories import UserFactory
+from open_discussions.test_utils import drf_datetime
 from profiles.models import Profile
 from profiles.utils import image_uri, IMAGE_MEDIUM
 from search.constants import PROFILE_TYPE
@@ -93,73 +94,82 @@ def patched_base_profile_serializer(mocker, user):
     )
 
 
+@pytest.mark.django_db
 @pytest.mark.parametrize(
-    "post_text,post_url", [["some text", None], ["", "http://example.com"]]
+    "factory_kwargs",
+    [{"is_article": True}, {"is_text": True}, {"is_link": True}, {"author": None}],
 )
-def test_es_post_serializer(
-    patched_base_post_serializer, reddit_submission_obj, post_text, post_url
-):
+def test_es_post_serializer(factory_kwargs):
     """
-    Test that ESPostSerializer correctly serializes a post/submission object
+    Test that ESPostSerializer correctly serializes a post object
     """
-    patched_base_post_serializer.return_value.data.update(
-        {"text": post_text, "url": post_url}
-    )
-    base_serialized = patched_base_post_serializer.return_value.data
-    serialized = ESPostSerializer().serialize(reddit_submission_obj)
-    patched_base_post_serializer.assert_called_once_with(reddit_submission_obj)
+    post = PostFactory.create(**factory_kwargs)
+    serialized = ESPostSerializer(instance=post).data
     assert serialized == {
         "object_type": POST_TYPE,
-        "article_content": base_serialized["article_content"],
-        "plain_text": render_article_text(base_serialized["article_content"]),
-        "author_id": base_serialized["author_id"],
-        "author_name": base_serialized["author_name"],
-        "author_headline": base_serialized["author_headline"],
-        "author_avatar_small": base_serialized["profile_image"],
-        "channel_name": base_serialized["channel_name"],
-        "channel_title": base_serialized["channel_title"],
-        "channel_type": base_serialized["channel_type"],
-        "text": base_serialized["text"],
-        "score": base_serialized["score"],
-        "removed": base_serialized["removed"],
-        "created": base_serialized["created"],
-        "deleted": base_serialized["deleted"],
-        "num_comments": base_serialized["num_comments"],
-        "post_id": base_serialized["id"],
-        "post_title": base_serialized["title"],
-        "post_link_url": base_serialized["url"],
-        "post_link_thumbnail": base_serialized["thumbnail"],
-        "post_slug": base_serialized["slug"],
-        "post_type": base_serialized["post_type"],
+        "article_content": post.article.content
+        if getattr(post, "article", None) is not None
+        else None,
+        "plain_text": post.plain_text,
+        "author_id": post.author.username if post.author is not None else None,
+        "author_name": post.author.profile.name if post.author is not None else None,
+        "author_headline": post.author.profile.headline
+        if post.author is not None
+        else None,
+        "author_avatar_small": image_uri(
+            post.author.profile if post.author is not None else None
+        ),
+        "channel_name": post.channel.name,
+        "channel_title": post.channel.title,
+        "channel_type": post.channel.channel_type,
+        "text": post.text,
+        "score": post.score,
+        "removed": post.removed,
+        "created": drf_datetime(post.created_on),
+        "deleted": post.deleted,
+        "num_comments": post.num_comments,
+        "post_id": post.post_id,
+        "post_title": post.title,
+        "post_link_url": post.url,
+        "post_link_thumbnail": post.thumbnail_url,
+        "post_slug": post.slug,
+        "post_type": post.post_type,
     }
 
 
-def test_es_comment_serializer(patched_base_comment_serializer, reddit_comment_obj):
+@pytest.mark.django_db
+@pytest.mark.parametrize("has_author", [True, False])
+def test_es_comment_serializer(has_author):
     """
     Test that ESCommentSerializer correctly serializes a comment object
     """
-    base_serialized = patched_base_comment_serializer.return_value.data
-    serialized = ESCommentSerializer().serialize(reddit_comment_obj)
-    patched_base_comment_serializer.assert_called_once_with(reddit_comment_obj)
+    comment = CommentFactory.create()
+    serialized = ESCommentSerializer(instance=comment).data
     assert serialized == {
         "object_type": COMMENT_TYPE,
-        "author_id": base_serialized["author_id"],
-        "author_name": base_serialized["author_name"],
-        "author_headline": base_serialized["author_headline"],
-        "author_avatar_small": base_serialized["profile_image"],
-        "text": base_serialized["text"],
-        "score": base_serialized["score"],
-        "created": base_serialized["created"],
-        "removed": base_serialized["removed"],
-        "deleted": base_serialized["deleted"],
-        "comment_id": base_serialized["id"],
-        "parent_comment_id": base_serialized["parent_id"],
-        "channel_name": reddit_comment_obj.subreddit.display_name,
-        "channel_title": reddit_comment_obj.subreddit.title,
-        "channel_type": reddit_comment_obj.subreddit.subreddit_type,
-        "post_id": reddit_comment_obj.submission.id,
-        "post_title": reddit_comment_obj.submission.title,
-        "post_slug": get_reddit_slug(reddit_comment_obj.submission.permalink),
+        "author_id": comment.author.username if comment.author is not None else None,
+        "author_name": comment.author.profile.name
+        if comment.author is not None
+        else None,
+        "author_headline": comment.author.profile.headline
+        if comment.author is not None
+        else None,
+        "author_avatar_small": image_uri(
+            comment.author.profile if comment.author is not None else None
+        ),
+        "text": comment.text,
+        "score": comment.score,
+        "removed": comment.removed,
+        "created": drf_datetime(comment.created_on),
+        "deleted": comment.deleted,
+        "comment_id": comment.comment_id,
+        "parent_comment_id": comment.parent_id,
+        "channel_name": comment.post.channel.name,
+        "channel_title": comment.post.channel.title,
+        "channel_type": comment.post.channel.channel_type,
+        "post_id": comment.post.post_id,
+        "post_title": comment.post.title,
+        "post_slug": comment.post.slug,
     }
 
 
@@ -184,69 +194,42 @@ def test_es_profile_serializer(mocker, user):
     }
 
 
+@pytest.mark.usefixtures("indexing_user")
 @pytest.mark.django_db
-def test_serialize_bulk_comments(mocker, reddit_submission_obj, user, settings):
-    """serialize_bulk_comments should index all comments for a post"""
-    settings.INDEXING_API_USERNAME = user.username
-    post = PostFactory.create(post_id=reddit_submission_obj.id)
-    outer_comment = CommentFactory(post=post)
-    inner_comment = CommentFactory(post=post, parent_id=outer_comment.comment_id)
-    mock_api = mocker.patch("channels.api.Api", autospec=True)
-    mock_serialize_comment = mocker.patch(
-        "search.serializers.serialize_comment_for_bulk"
-    )
-    list(serialize_bulk_comments(post.post_id))
-    mock_api(user).get_comment.assert_any_call(inner_comment.comment_id)
-    mock_api(user).get_comment.assert_any_call(outer_comment.comment_id)
-    assert mock_serialize_comment.call_count == 2
+def test_serialize_bulk_comments():
+    """serialize_bulk_comments should index all comments it is passed"""
+    comments = CommentFactory.create_batch(10)
+    assert len(
+        list(serialize_bulk_comments([comment.id for comment in comments]))
+    ) == len(comments)
 
 
-def test_serialize_post_for_bulk(mocker, reddit_submission_obj):
+def test_serialize_post_for_bulk(mocker):
     """
     Test that serialize_post_for_bulk correctly serializes a post/submission object
     """
     post_id = "post1"
     base_serialized_post = {"serialized": "post"}
     mocker.patch(
-        "search.serializers.ESPostSerializer.serialize",
+        "search.serializers.ESPostSerializer.to_representation",
         return_value=base_serialized_post,
     )
-    mocker.patch("search.serializers.gen_post_id", return_value=post_id)
-    serialized = serialize_post_for_bulk(reddit_submission_obj)
-    assert serialized == {"_id": post_id, **base_serialized_post}
+    serialized = serialize_post_for_bulk(mocker.Mock(post_id=post_id))
+    assert serialized == {"_id": f"p_{post_id}", **base_serialized_post}
 
 
-def test_serialize_comment_for_bulk(mocker, reddit_comment_obj):
+def test_serialize_comment_for_bulk(mocker):
     """
     Test that serialize_comment_for_bulk correctly serializes a comment object
     """
-    comment_id = "comment1"
+    comment_id = "456"
     base_serialized_comment = {"serialized": "comment"}
     mocker.patch(
-        "search.serializers.ESCommentSerializer.serialize",
+        "search.serializers.ESCommentSerializer.to_representation",
         return_value=base_serialized_comment,
     )
-    mocker.patch("search.serializers.gen_comment_id", return_value=comment_id)
-    serialized = serialize_comment_for_bulk(reddit_comment_obj)
-    assert serialized == {"_id": comment_id, **base_serialized_comment}
-
-
-def test_serialize_missing_author(
-    patched_base_post_serializer,
-    patched_base_comment_serializer,
-    reddit_submission_obj,
-    reddit_comment_obj,
-):
-    """Test that objects with missing author information can still be serialized"""
-    deleted_author_dict = {"author_id": "[deleted]", "author_name": "[deleted]"}
-    patched_base_post_serializer.return_value.data.update(deleted_author_dict)
-    patched_base_comment_serializer.return_value.data.update(deleted_author_dict)
-    serialized_post = ESPostSerializer().serialize(reddit_submission_obj)
-    serialized_comment = ESCommentSerializer().serialize(reddit_comment_obj)
-    assert serialized_post["author_id"] is None
-    assert serialized_post["author_name"] is None
-    assert serialized_comment["author_id"] is None
-    assert serialized_comment["author_name"] is None
+    serialized = serialize_comment_for_bulk(mocker.Mock(comment_id=comment_id))
+    assert serialized == {"_id": f"c_{comment_id}", **base_serialized_comment}
 
 
 @pytest.mark.django_db

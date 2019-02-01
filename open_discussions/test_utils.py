@@ -52,3 +52,16 @@ class MockResponse:
     def json(self):
         """ Return content as json """
         return json.loads(self.content)
+
+
+def drf_datetime(dt):
+    """
+    Returns a datetime formatted as a DRF DateTimeField formats it
+
+    Args:
+        dt(datetime): datetime to format
+
+    Returns:
+        str: ISO 8601 formatted datetime
+    """
+    return dt.isoformat().replace("+00:00", "Z")

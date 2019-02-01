@@ -1,17 +1,14 @@
 """Serializers for elasticsearch data"""
 import logging
 
-from django.conf import settings
-from django.contrib.auth.models import User
 from prawcore import NotFound
+from rest_framework import serializers
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
-from channels.models import Post
-from channels.serializers.posts import BasePostSerializer
-from channels.serializers.comments import BaseCommentSerializer
-from channels.utils import get_reddit_slug
+from channels.models import Post, Comment
 from profiles.api import get_channels
 from profiles.models import Profile
+from profiles.utils import image_uri
 from search.api import gen_post_id, gen_comment_id, gen_profile_id
 from search.constants import PROFILE_TYPE
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
@@ -19,9 +16,23 @@ from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_ke
 log = logging.getLogger()
 
 
-class ESSerializer:
+class ESModelSerializer(serializers.ModelSerializer):
     """
-    Serializer class for Elasticsearch objects
+    Base ElasticSearch serializer for model-based objects
+    """
+
+    object_type = None
+
+    def to_representation(self, instance):
+        """Serializes the instance"""
+        ret = super().to_representation(instance)
+        ret["object_type"] = self.object_type
+        return ret
+
+
+class ESProxySerializer:
+    """
+    Serializer class for Elasticsearch objects that proxy to another serializer for serialization
 
     Attributes:
         object_type (str): String indicating the type of reddit/django object
@@ -60,7 +71,7 @@ class ESSerializer:
         return {**serialized, **self.postprocess_fields(discussions_obj, serialized)}
 
 
-class ESProfileSerializer(ESSerializer):
+class ESProfileSerializer(ESProxySerializer):
     """
     Elasticsearch serializer class for profiles
     """
@@ -86,131 +97,178 @@ class ESProfileSerializer(ESSerializer):
         return {"author_channel_membership": sorted(get_channels(discussions_obj.user))}
 
 
-class ESPostSerializer(ESSerializer):
+class ESPostSerializer(ESModelSerializer):
     """Elasticsearch serializer class for posts"""
 
     object_type = POST_TYPE
-    use_keys = [
-        "article_content",
-        "plain_text",
-        "author_id",
-        "author_name",
-        "author_headline",
-        "channel_name",
-        "channel_title",
-        "channel_type",
-        "post_type",
-        "text",
-        "score",
-        "created",
-        "num_comments",
-        "removed",
-        "deleted",
-    ]
-    rename_keys = {
-        "id": "post_id",
-        "title": "post_title",
-        "url": "post_link_url",
-        "thumbnail": "post_link_thumbnail",
-        "profile_image": "author_avatar_small",
-        "slug": "post_slug",
-    }
 
-    @property
-    def base_serializer(self):
-        return BasePostSerializer
+    post_id = serializers.CharField(read_only=True)
+    post_title = serializers.CharField(source="title", read_only=True)
+    post_link_url = serializers.CharField(source="url", read_only=True)
+    post_link_thumbnail = serializers.CharField(source="thumbnail_url", read_only=True)
+    post_slug = serializers.CharField(source="slug", read_only=True)
+    plain_text = serializers.CharField(read_only=True)
 
-    def postprocess_fields(self, discussions_obj, serialized_data):
-        return {
-            "author_id": None
-            if serialized_data["author_id"] == "[deleted]"
-            else serialized_data["author_id"],
-            "author_name": None
-            if serialized_data["author_name"] == "[deleted]"
-            else serialized_data["author_name"],
-        }
+    author_avatar_small = serializers.SerializerMethodField()
+    author_id = serializers.CharField(
+        source="author.username", read_only=True, default=None
+    )
+    author_name = serializers.CharField(
+        source="author.profile.name", read_only=True, default=None
+    )
+    author_headline = serializers.CharField(
+        source="author.profile.headline", read_only=True, default=None
+    )
+
+    channel_name = serializers.CharField(source="channel.name", read_only=True)
+    channel_title = serializers.CharField(source="channel.title", read_only=True)
+    channel_type = serializers.CharField(source="channel.channel_type", read_only=True)
+
+    article_content = serializers.JSONField(
+        source="article.content", default=None, read_only=True
+    )
+
+    created = serializers.DateTimeField(source="created_on", read_only=True)
+
+    def get_author_avatar_small(self, instance):
+        """Returns the small profile image of the author"""
+        profile = (
+            instance.author.profile
+            if instance.author and instance.author.profile
+            else None
+        )
+        return image_uri(profile)
+
+    class Meta:
+        model = Post
+        fields = (
+            "post_type",
+            "post_slug",
+            "post_id",
+            "post_title",
+            "post_link_url",
+            "post_link_thumbnail",
+            "author_avatar_small",
+            "author_id",
+            "author_name",
+            "author_headline",
+            "channel_name",
+            "channel_title",
+            "channel_type",
+            "article_content",
+            "plain_text",
+            "text",
+            "score",
+            "num_comments",
+            "removed",
+            "deleted",
+            "created",
+        )
+        read_only_fields = (
+            "post_type",
+            "text",
+            "score",
+            "num_comments",
+            "created",
+            "removed",
+            "deleted",
+        )
 
 
-class ESCommentSerializer(ESSerializer):
+class ESCommentSerializer(ESModelSerializer):
     """Elasticsearch serializer class for comments"""
 
     object_type = COMMENT_TYPE
-    use_keys = [
-        "author_id",
-        "author_name",
-        "author_headline",
-        "text",
-        "score",
-        "created",
-        "removed",
-        "deleted",
-    ]
-    rename_keys = {
-        "id": "comment_id",
-        "parent_id": "parent_comment_id",
-        "profile_image": "author_avatar_small",
-    }
 
-    @property
-    def base_serializer(self):
-        return BaseCommentSerializer
+    post_id = serializers.CharField(source="post.post_id", read_only=True)
+    post_title = serializers.CharField(source="post.title", read_only=True)
+    post_slug = serializers.CharField(source="post.slug", read_only=True)
 
-    def postprocess_fields(self, discussions_obj, serialized_data):
-        return {
-            "author_id": None
-            if serialized_data["author_id"] == "[deleted]"
-            else serialized_data["author_id"],
-            "author_name": None
-            if serialized_data["author_name"] == "[deleted]"
-            else serialized_data["author_name"],
-            "channel_title": discussions_obj.subreddit.title,
-            "channel_name": discussions_obj.subreddit.display_name,
-            "channel_type": discussions_obj.subreddit.subreddit_type,
-            "post_id": discussions_obj.submission.id,
-            "post_title": discussions_obj.submission.title,
-            "post_slug": get_reddit_slug(discussions_obj.submission.permalink),
-        }
+    comment_id = serializers.CharField(read_only=True)
+    parent_comment_id = serializers.CharField(source="parent_id", read_only=True)
+
+    author_avatar_small = serializers.SerializerMethodField()
+    author_id = serializers.CharField(
+        source="author.username", read_only=True, default=None
+    )
+    author_name = serializers.CharField(
+        source="author.profile.name", read_only=True, default=None
+    )
+    author_headline = serializers.CharField(
+        source="author.profile.headline", read_only=True, default=None
+    )
+
+    channel_name = serializers.CharField(source="post.channel.name", read_only=True)
+    channel_title = serializers.CharField(source="post.channel.title", read_only=True)
+    channel_type = serializers.CharField(
+        source="post.channel.channel_type", read_only=True
+    )
+
+    created = serializers.DateTimeField(source="created_on", read_only=True)
+
+    def get_author_avatar_small(self, instance):
+        """Returns the small profile image of the author"""
+        profile = (
+            instance.author.profile
+            if instance.author and instance.author.profile
+            else None
+        )
+        return image_uri(profile)
+
+    class Meta:
+        model = Comment
+        fields = (
+            "post_title",
+            "post_id",
+            "post_slug",
+            "comment_id",
+            "parent_comment_id",
+            "author_avatar_small",
+            "author_id",
+            "author_name",
+            "author_headline",
+            "channel_name",
+            "channel_title",
+            "channel_type",
+            "text",
+            "score",
+            "removed",
+            "deleted",
+            "created",
+        )
+        read_only_fields = ("text", "score", "created", "removed", "deleted")
 
 
-def _serialize_comment_tree_for_bulk(comment_ids):
+def serialize_bulk_posts(post_ids):
     """
-    Serialize comments by an iterable of their ids for a bulk API request
+    Index a list of Post.ids
 
     Args:
-        comment_ids (iterable of str): An iterable of comment ids
+        post_ids (list of int): a list of Post.id values to serialize
 
     Yields:
-        dict: Documents suitable for indexing in Elasticsearch
+        iter of dict: yields an iterable of serialized posts
     """
-    from channels.api import Api
+    for post in Post.objects.filter(id__in=post_ids).prefetch_related(
+        "article", "link_meta", "author", "author__profile"
+    ):
+        yield serialize_post_for_bulk(post)
 
-    api = Api(user=User.objects.get(username=settings.INDEXING_API_USERNAME))
-    for comment_id in comment_ids:
-        yield serialize_comment_for_bulk(api.get_comment(comment_id))
 
-
-def serialize_bulk_post(post_obj):
+def serialize_bulk_comments(comment_ids):
     """
-    Index a post
+    Index a list of Comment.ids
 
     Args:
-        post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
-    """
-    yield serialize_post_for_bulk(post_obj)
+        comment_ids (list of int): a list of Comment.ids to serialize
 
-
-def serialize_bulk_comments(post_id):
+    Yields:
+        iter of dict: yields an iterable of serialized comments
     """
-    Index comments for a post and recurse to deeper level comments for a bulk API request
-
-    Args:
-        post_id (str): A Post model object's post_id
-    """
-    yield from _serialize_comment_tree_for_bulk(
-        Post.objects.get(post_id=post_id).comment_set.values_list(
-            "comment_id", flat=True
-        )
-    )
+    for comment in Comment.objects.filter(id__in=comment_ids).prefetch_related(
+        "post", "author", "author__profile"
+    ):
+        yield serialize_comment_for_bulk(comment)
 
 
 def serialize_bulk_profiles(ids):
@@ -219,8 +277,11 @@ def serialize_bulk_profiles(ids):
 
     Args:
         ids(list of int): List of profile id's
+
+    Yields:
+        iter of dict: yields an iterable of serialized profiles
     """
-    for profile in Profile.objects.filter(id__in=ids).iterator():
+    for profile in Profile.objects.filter(id__in=ids).prefetch_related("user"):
         yield serialize_profile_for_bulk(profile)
 
 
@@ -230,6 +291,9 @@ def serialize_profile_for_bulk(profile_obj):
 
     Args:
         profile_obj (Profile): A user profile
+
+    Returns:
+        dict: the serialized profile
     """
     return {
         "_id": gen_profile_id(profile_obj.user.username),
@@ -242,12 +306,15 @@ def serialize_post_for_bulk(post_obj):
     Serialize a reddit Submission for a bulk API request
 
     Args:
-        post_obj (praw.models.reddit.submission.Submission): A PRAW post ('submission') object
+        post (channels.models.Post): A Post object
+
+    Returns:
+        dict: the serialized post
     """
     try:
         return {
-            "_id": gen_post_id(post_obj.id),
-            **ESPostSerializer().serialize(post_obj),
+            "_id": gen_post_id(post_obj.post_id),
+            **ESPostSerializer(instance=post_obj).data,
         }
     except NotFound:
         log.exception("Reddit post not found: %s", post_obj.id)
@@ -259,12 +326,15 @@ def serialize_comment_for_bulk(comment_obj):
     Serialize a comment for a bulk API request
 
     Args:
-        comment_obj (Comment): A PRAW comment
+        comment_obj (channels.models.Comment): A Comment object
+
+    Returns:
+        dict: the serialized comment
     """
     try:
         return {
-            "_id": gen_comment_id(comment_obj.id),
-            **ESCommentSerializer().serialize(comment_obj),
+            "_id": gen_comment_id(comment_obj.comment_id),
+            **ESCommentSerializer(instance=comment_obj).data,
         }
     except NotFound:
         log.exception("Reddit comment not found: %s", comment_obj.id)

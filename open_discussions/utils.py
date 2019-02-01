@@ -186,3 +186,32 @@ def markdown_to_plain_text(markdown_str):
     """
     html_str = markdown2.markdown(markdown_str)
     return html_to_plain_text(html_str).strip()
+
+
+def prefetched_iterator(query, chunk_size=2000):
+    """
+    This is a prefetch_related-safe version of what iterator() should do.
+    It will sort and batch on the default django primary key
+
+    Args:
+        query (QuerySet): the django queryset to iterate
+        chunk_size (int): the size of each chunk to fetch
+
+    """
+    # walk the records in ascending id order
+    base_query = query.order_by("id")
+
+    def _next(greater_than_id):
+        """Returns the next batch"""
+        return base_query.filter(id__gt=greater_than_id)[:chunk_size]
+
+    batch = _next(0)
+
+    while batch:
+        item = None
+        # evaluate each batch query here
+        for item in batch:
+            yield item
+
+        # next batch starts after the last item.id
+        batch = _next(item.id) if item is not None else None

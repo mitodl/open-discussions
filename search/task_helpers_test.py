@@ -4,6 +4,7 @@ import pytest
 
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
+from channels.factories.models import CommentFactory
 from channels.utils import render_article_text
 from search.constants import PROFILE_TYPE
 from search.task_helpers import (
@@ -79,48 +80,56 @@ def test_reddit_object_persist(mocker):
     assert reddit_obj == mock_reddit_obj
 
 
-def test_index_new_post(mocker, reddit_submission_obj):
+def test_index_new_post(mocker):
     """
     Test that index_new_post calls the indexing task with the right parameters
     """
     fake_serialized_data = {"serialized": "post"}
+    mock_post = mocker.Mock(post_id="abc")
+    mock_post_proxy = mocker.Mock(_self_post=mock_post)
     patched_serialize_func = mocker.patch(
-        "search.task_helpers.ESPostSerializer.serialize",
+        "search.task_helpers.ESPostSerializer.to_representation",
         return_value=fake_serialized_data,
     )
     patched_task = mocker.patch("search.task_helpers.create_document")
-    index_new_post(reddit_submission_obj)
-    patched_serialize_func.assert_called_once_with(reddit_submission_obj)
+    index_new_post(mock_post_proxy)
+    patched_serialize_func.assert_called_once_with(mock_post)
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
-        gen_post_id(reddit_submission_obj.id),
+        gen_post_id(mock_post.post_id),
         fake_serialized_data,
     )
 
 
-def test_index_new_comment(mocker, reddit_comment_obj):
+@pytest.mark.django_db
+def test_index_new_comment(mocker):
     """
     Test that index_new_comment calls indexing tasks with the right parameters
     """
     fake_serialized_data = {"serialized": "comment"}
+    # ugly mock hack to avoid the index_new_profile.delay() call in Profile.save() of the comment author
+    mocker.patch("search.task_helpers.index_new_profile")
+    comment = CommentFactory.create()
+    mock_submission = mocker.Mock(id="123")
+    mock_comment = mocker.Mock(id=comment.comment_id, submission=mock_submission)
     patched_serialize_func = mocker.patch(
-        "search.task_helpers.ESCommentSerializer.serialize",
+        "search.task_helpers.ESCommentSerializer.to_representation",
         return_value=fake_serialized_data,
     )
     patched_create_task = mocker.patch("search.task_helpers.create_document")
     patched_increment_task = mocker.patch(
         "search.task_helpers.increment_document_integer_field"
     )
-    index_new_comment(reddit_comment_obj)
-    patched_serialize_func.assert_called_once_with(reddit_comment_obj)
+    index_new_comment(mock_comment)
+    patched_serialize_func.assert_called_once_with(comment)
     assert patched_create_task.delay.called is True
     assert patched_create_task.delay.call_args[0] == (
-        gen_comment_id(reddit_comment_obj.id),
+        gen_comment_id(mock_comment.id),
         fake_serialized_data,
     )
     assert patched_increment_task.delay.called is True
     assert patched_increment_task.delay.call_args[0] == (
-        gen_post_id(reddit_comment_obj.submission.id),
+        gen_post_id(mock_submission.id),
     )
     assert patched_increment_task.delay.call_args[1] == {
         "field_name": "num_comments",

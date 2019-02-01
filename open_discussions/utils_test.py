@@ -2,9 +2,11 @@
 import datetime
 from math import ceil
 
+from django.contrib.auth import get_user_model
 import pytest
 import pytz
 
+from open_discussions.factories import UserFactory
 from open_discussions.utils import (
     now_in_utc,
     is_near_now,
@@ -15,7 +17,10 @@ from open_discussions.utils import (
     filter_dict_with_renamed_keys,
     html_to_plain_text,
     markdown_to_plain_text,
+    prefetched_iterator,
 )
+
+User = get_user_model()
 
 
 def test_now_in_utc():
@@ -151,3 +156,16 @@ def test_markdown_to_plain_text():
         markdown_to_plain_text(markdown) == "header some body text  bullet 1 bullet 2"
     )
     assert html_to_plain_text(normal_text) == normal_text
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("chunk_size", [2, 3, 5, 7, 9, 10])
+def test_prefetched_iterator(chunk_size):
+    """
+    prefetched_iterator should yield all items in the record set across chunk boundaries
+    """
+    users = UserFactory.create_batch(10)
+    fetched_users = list(prefetched_iterator(User.objects.all(), chunk_size=chunk_size))
+    assert len(users) == len(fetched_users)
+    for user in users:
+        assert user in fetched_users

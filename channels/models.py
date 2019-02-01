@@ -14,13 +14,16 @@ from channels.constants import (
     ROLE_CHOICES,
     VALID_EXTENDED_POST_CHOICES,
     VALID_CHANNEL_CHOICES,
+    LINK_TYPE_SELF,
 )
 from channels.utils import (
     AVATAR_MEDIUM_MAX_DIMENSION,
     AVATAR_SMALL_MAX_DIMENSION,
     reddit_slugify,
+    render_article_text,
 )
 from open_discussions.models import TimestampedModel
+from open_discussions.utils import markdown_to_plain_text
 from profiles.utils import (
     avatar_uri,
     avatar_uri_small,
@@ -219,6 +222,20 @@ class Post(TimestampedModel):
     edited = models.BooleanField(null=True)
     removed = models.BooleanField(null=True)
     deleted = models.BooleanField(null=True)
+
+    @property
+    def plain_text(self):
+        """Returns a plaintext represention of the post"""
+        if getattr(self, "article", None) is not None:
+            return render_article_text(self.article.content)
+        elif self.post_type == LINK_TYPE_SELF:
+            return markdown_to_plain_text(self.text)
+        return None
+
+    @property
+    def thumbnail_url(self):
+        """Returns the url to the thumbnail"""
+        return self.link_meta.thumbnail if self.link_meta is not None else None
 
     @property
     def slug(self):
