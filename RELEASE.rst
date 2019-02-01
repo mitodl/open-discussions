@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.64.2
+--------------
+
+- Fix backpopulate not adding comments
+- Implement embedly widget (#1786)
+
 Version 0.64.1 (Released January 30, 2019)
 --------------
 
