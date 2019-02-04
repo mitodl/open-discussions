@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.65.0
+Version 0.65.0 (Released February 04, 2019)
 --------------
 
 - Fixed exception with lazy submissions
