@@ -46,7 +46,7 @@ export default class ChannelHeader extends React.Component<Props> {
               </div>
             </div>
             <div className="right channel-controls">
-              <ChannelFollowControls channel={channel} />
+              <ChannelFollowControls channel={channel} history={history} />
               {isModerator ? (
                 <ChannelSettingsLink channel={channel} history={history} />
               ) : null}

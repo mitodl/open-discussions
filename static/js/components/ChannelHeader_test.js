@@ -42,7 +42,10 @@ describe("ChannelHeader", () => {
     const wrapper = render()
     const followControls = wrapper.find("Connect(ChannelFollowControls)")
     assert.isTrue(followControls.exists())
-    assert.deepEqual(followControls.prop("channel"), channel)
+    assert.deepEqual(followControls.props(), {
+      history,
+      channel
+    })
   })
   ;[true, false].forEach(hasNavbar => {
     it(`${shouldIf(hasNavbar)} navbar items`, () => {

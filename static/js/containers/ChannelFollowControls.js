@@ -11,6 +11,7 @@ import { actions } from "../actions"
 import { hideDropdown, showDropdown } from "../actions/ui"
 import { leaveChannel } from "../util/api_actions"
 import { getOwnProfile } from "../lib/redux_selectors"
+import { FRONTPAGE_URL } from "../lib/url"
 import { CHANNEL_TYPE_PUBLIC } from "../lib/channels"
 
 import type { Dispatch } from "redux"
@@ -20,6 +21,7 @@ export const CHANNEL_FOLLOW_DROPDOWN = "CHANNEL_FOLLOW_DROPDOWN"
 
 type Props = {
   channel: Channel,
+  history: Object,
   username: string,
   isDropdownOpen: boolean,
   showDropdown: () => void,
@@ -49,10 +51,10 @@ export class ChannelFollowControls extends React.Component<Props> {
   }
 
   handleLeaveChannelClick = async () => {
-    const { leaveChannel, loadChannel, loadChannels, username } = this.props
+    const { leaveChannel, history, loadChannels, username } = this.props
 
     await leaveChannel(username)
-    await loadChannel()
+    history.push(FRONTPAGE_URL)
     await loadChannels()
   }
 
@@ -87,7 +89,7 @@ export class ChannelFollowControls extends React.Component<Props> {
             </li>
             {channel.channel_type !== CHANNEL_TYPE_PUBLIC &&
             channel.user_is_contributor &&
-            channel.user_is_moderator ? (
+            !channel.user_is_moderator ? (
                 <li>
                   <a onClick={this.handleLeaveChannelClick}>Leave channel</a>
                 </li>

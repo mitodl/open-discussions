@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from channels.api import Api
+from channels.api import get_admin_api
 from channels.serializers.contributors import ContributorSerializer
 from open_discussions.permissions import ContributorPermissions
 
@@ -26,10 +26,11 @@ class ContributorListView(ListCreateAPIView):
 
     def get_queryset(self):
         """Get generator for contributors in channel"""
-        api = Api(user=self.request.user)
         return (
             contributor
-            for contributor in api.list_contributors(self.kwargs["channel_name"])
+            for contributor in self.request.channel_api.list_contributors(
+                self.kwargs["channel_name"]
+            )
             if contributor.name != settings.INDEXING_API_USERNAME
         )
 
@@ -49,9 +50,10 @@ class ContributorDetailView(APIView):
         """
         Removes a contributor from a channel
         """
-        api = Api(user=request.user)
+        # Using the admin API since reddit doesn't let non-mod users remove themselves as contributors
+        admin_api = get_admin_api()
         channel_name = self.kwargs["channel_name"]
         contributor_name = self.kwargs["contributor_name"]
 
-        api.remove_contributor(contributor_name, channel_name)
+        admin_api.remove_contributor(contributor_name, channel_name)
         return Response(status=status.HTTP_204_NO_CONTENT)

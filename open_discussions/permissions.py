@@ -169,12 +169,17 @@ class ContributorPermissions(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return channel_exists(view) and (
-            is_staff_user(request)
-            or (
-                (channel_is_mod_editable(view) or is_readonly(request))
-                and is_moderator(request, view)
-            )
+        if not channel_exists(view):
+            return False
+        # Allow self-delete
+        if (
+            request.method == "DELETE"
+            and view.kwargs.get("contributor_name", None) == request.user.username
+        ):
+            return True
+        return is_staff_user(request) or (
+            (channel_is_mod_editable(view) or is_readonly(request))
+            and is_moderator(request, view)
         )
 
 

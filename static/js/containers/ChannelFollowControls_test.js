@@ -9,12 +9,13 @@ import { SHOW_DROPDOWN, HIDE_DROPDOWN } from "../actions/ui"
 import { makeChannel } from "../factories/channels"
 import { makeProfile } from "../factories/profiles"
 import * as apiActions from "../util/api_actions"
-import * as reduxSelectors from "../lib/redux_selectors"
 import ChannelFollowControls, {
   CHANNEL_FOLLOW_DROPDOWN,
   ChannelFollowControls as InnerChannelFollowControls
 } from "./ChannelFollowControls"
 import { CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC } from "../lib/channels"
+import { FRONTPAGE_URL } from "../lib/url"
+import * as reduxSelectors from "../lib/redux_selectors"
 import { shouldIf } from "../lib/test_utils"
 
 describe("ChannelFollowControls", () => {
@@ -27,7 +28,8 @@ describe("ChannelFollowControls", () => {
       ...makeChannel(),
       membership_is_managed: false,
       channel_type:          CHANNEL_TYPE_PRIVATE,
-      user_is_contributor:   true
+      user_is_contributor:   true,
+      user_is_moderator:     false
     }
     profile = makeProfile()
 
@@ -49,7 +51,8 @@ describe("ChannelFollowControls", () => {
         }
       },
       {
-        channel
+        channel,
+        history: helper.browserHistory
       }
     )
   })
@@ -136,7 +139,6 @@ describe("ChannelFollowControls", () => {
       })
 
       it("with the correct options", async () => {
-        props.channel.user_is_moderator = true
         const { inner } = await render({}, props)
         const menuItems = inner.find(menuItemsSelector)
         assert.equal(menuItems.at(0).text(), unfollowText)
@@ -161,7 +163,6 @@ describe("ChannelFollowControls", () => {
       })
 
       it("with a 'leave' button that removes the user from the channel", async () => {
-        props.channel.user_is_moderator = true
         const { inner } = await render({}, props)
         const menuItems = inner.find(menuItemsSelector)
         await menuItems.at(1).prop("onClick")()
@@ -170,23 +171,22 @@ describe("ChannelFollowControls", () => {
         assert.equal(args[1], props.channel.name)
         assert.equal(args[2], profile.username)
         sinon.assert.calledOnce(helper.getChannelsStub)
+        assert.equal(helper.browserHistory.location.pathname, FRONTPAGE_URL)
       })
-
-      it("without a 'leave' button if the channel is public", async () => {
-        props.channel.channel_type = CHANNEL_TYPE_PUBLIC
-        const { inner } = await render({}, props)
-        const menuItems = inner.find(menuItemsSelector)
-        assert.equal(menuItems.at(0).text(), unfollowText)
-        assert.lengthOf(menuItems, 1)
-      })
-
-      it("without a 'leave' button if the user isn't a contributor and moderator", async () => {
-        props.channel.user_is_contributor = false
-        props.channel.user_is_moderator = false
-        const { inner } = await render({}, props)
-        const menuItems = inner.find(menuItemsSelector)
-        assert.equal(menuItems.at(0).text(), unfollowText)
-        assert.lengthOf(menuItems, 1)
+      ;[
+        ["channel_type", CHANNEL_TYPE_PUBLIC],
+        ["user_is_contributor", false],
+        ["user_is_moderator", true]
+      ].forEach(([channelProp, propValue]) => {
+        it(`without a 'leave' button if ${channelProp}=${String(
+          propValue
+        )}`, async () => {
+          props.channel[channelProp] = propValue
+          const { inner } = await render({}, props)
+          const menuItems = inner.find(menuItemsSelector)
+          assert.equal(menuItems.at(0).text(), unfollowText)
+          assert.lengthOf(menuItems, 1)
+        })
       })
     })
   })

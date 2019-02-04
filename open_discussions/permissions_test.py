@@ -264,6 +264,20 @@ def test_is_own_subscription_permission(
     )
 
 
+def test_contributor_permission_self_delete(mocker):
+    """
+    Test that users can delete their own contributor status
+    """
+    mocker.patch("open_discussions.permissions.is_staff_user", return_value=False)
+    mocker.patch("open_discussions.permissions.is_moderator", return_value=False)
+    username = "user1"
+    request, view = mocker.Mock(), mocker.Mock()
+    request.method = "DELETE"
+    request.user.username = username
+    view.kwargs = {"contributor_name": username}
+    assert ContributorPermissions().has_permission(request, view) is True
+
+
 # This is essentially is_staff or (moderator and (mod_editable or readonly))
 @pytest.mark.parametrize(
     "is_staff, moderator, mod_editable, readonly, expected",

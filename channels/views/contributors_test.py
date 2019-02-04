@@ -1,5 +1,5 @@
 """Tests for views for REST APIs for contributors"""
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, redefined-outer-name
 import pytest
 from django.urls import reverse
 from rest_framework import status
@@ -8,6 +8,14 @@ from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
+
+
+@pytest.fixture()
+def mock_admin_api(mocker, staff_api):
+    """Mocked get_admin_api method"""
+    return mocker.patch(
+        "channels.views.contributors.get_admin_api", return_value=staff_api
+    )
 
 
 def test_list_contributors(
@@ -93,7 +101,9 @@ def test_add_contributor_anonymous(client, settings, allow_anonymous):
 
 
 @pytest.mark.parametrize("attempts", [1, 2])
-def test_remove_contributor(staff_client, private_channel_and_contributor, attempts):
+def test_remove_contributor(
+    staff_client, mock_admin_api, private_channel_and_contributor, attempts
+):
     """
     Removes a contributor from a channel
     """
@@ -102,9 +112,9 @@ def test_remove_contributor(staff_client, private_channel_and_contributor, attem
         "contributor-detail",
         kwargs={"channel_name": channel.name, "contributor_name": contributor.username},
     )
-
-    for _ in range(attempts):
+    for i in range(attempts):
         resp = staff_client.delete(url)
+        assert mock_admin_api.call_count == i + 1
         assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
