@@ -250,9 +250,12 @@ def populate_posts_and_comments(post_ids):
     submissions = []
     for post_id in post_ids:
         try:
-            submissions.append(admin_api.get_submission(base36.dumps(post_id)))
+            submission = admin_api.get_submission(base36.dumps(post_id))
+            # force a fetch so any loading errors get caught now
+            submission._fetch()  # pylint: disable=protected-access
+            submissions.append(submission)
         except:  # pylint: disable=bare-except
-            log.exception("Could not find submission '%s'", post_id)
+            log.warning("Could not find submission '%s'", post_id)
 
     channels_by_name = Channel.objects.in_bulk(
         [submission.subreddit.display_name for submission in submissions],

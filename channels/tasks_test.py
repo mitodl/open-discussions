@@ -253,11 +253,13 @@ def test_populate_posts_and_comments(mocker):
 
     submission_mock = mocker.Mock(id="1", subreddit=mocker.Mock(display_name="exists"))
 
-    mock_api = mocker.patch("channels.api.Api", autospec=True)
-    mock_api.return_value.get_submission.side_effect = [
+    mock_submissions = [
         submission_mock,
         mocker.Mock(id="2", subreddit=mocker.Mock(display_name="missing")),
     ]
+
+    mock_api = mocker.patch("channels.api.Api", autospec=True)
+    mock_api.return_value.get_submission.side_effect = mock_submissions
 
     mock_backpopulate_api = mocker.patch("channels.tasks.backpopulate_api")
     mock_backpopulate_api.backpopulate_comments.return_value = 15
@@ -278,6 +280,9 @@ def test_populate_posts_and_comments(mocker):
     mock_backpopulate_api.backpopulate_comments.assert_called_once_with(
         post=post, submission=submission_mock
     )
+
+    for mock in mock_submissions:
+        mock._fetch.assert_called_once_with()  # pylint: disable=protected-access
 
     assert result == {
         "posts": 1,
