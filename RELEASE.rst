@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.64.3
+Version 0.64.3 (Released February 04, 2019)
 --------------
 
 - Add validation to widget configuration inputs, fix URL validation (#1795)
