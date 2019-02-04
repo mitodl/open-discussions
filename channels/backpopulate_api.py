@@ -70,13 +70,14 @@ def backpopulate_comments(*, post, submission):
         int: number of comments backpopulated
     """
     submission.comments.replace_more(limit=None)
+    all_comments = submission.comments.list()
     author_usernames = {
-        comment.author.name for comment in submission.comments if comment.author
+        comment.author.name for comment in all_comments if comment.author
     }
     authors_by_username = User.objects.in_bulk(author_usernames, field_name="username")
     update_count = 0
 
-    for comment in submission.comments:
+    for comment in all_comments:
         author = (
             authors_by_username.get(comment.author.name) if comment.author else None
         )

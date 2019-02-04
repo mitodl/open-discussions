@@ -183,7 +183,7 @@ def test_backpopulate_comments(mocker):
             created=CREATED_TIMESTAMP,
         ),
     ]
-    submission.comments.__iter__.return_value = comments
+    submission.comments.list.return_value = comments
 
     result = backpopulate_api.backpopulate_comments(post=post, submission=submission)
 
