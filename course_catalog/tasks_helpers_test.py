@@ -233,9 +233,9 @@ def test_parse_mitx_json_data_overwrite(mocker, force_overwrite):
         course_id=mitx_valid_data["course_runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
-    mock_logger = mocker.patch("course_catalog.tasks_helpers.log.debug")
+    mock_save = mocker.patch("course_catalog.tasks_helpers.CourseSerializer.save")
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
-    assert mock_logger.call_count == (0 if force_overwrite else 1)
+    assert mock_save.call_count == (1 if force_overwrite else 0)
 
 
 def test_parse_valid_mitx_json_data():
@@ -334,6 +334,7 @@ def test_deserializing_a_valid_ocw_course():
         ],
         "course_collections": [
             {
+                "ocw_feature": "Engineering",
                 "ocw_subfeature": "Nuclear Engineering",
                 "ocw_feature_url": "",
                 "ocw_speciality": "Health and Exercise Science",
@@ -349,9 +350,9 @@ def test_deserializing_a_valid_ocw_course():
         ],
         "price": {"price": 0.0, "mode": "audit", "upgrade_deadline": None},
     }
-    digest_ocw_course(valid_ocw_obj, timezone.now(), None)
+    digest_ocw_course(valid_ocw_obj, timezone.now(), None, True)
     assert Course.objects.count() == 1
-    digest_ocw_course(valid_ocw_obj, timezone.now() - timedelta(hours=1), None)
+    digest_ocw_course(valid_ocw_obj, timezone.now() - timedelta(hours=1), None, True)
     assert Course.objects.count() == 1
 
     course_instructors_count = CourseInstructor.objects.count()
@@ -435,7 +436,7 @@ def test_deserialzing_an_invalid_ocw_course():
         ],
         "price": {"price": 0.0, "upgrade_deadline": None},
     }
-    digest_ocw_course(invalid_ocw_obj, timezone.now(), None)
+    digest_ocw_course(invalid_ocw_obj, timezone.now(), None, True)
     assert not Course.objects.count()
 
 

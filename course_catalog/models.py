@@ -3,6 +3,7 @@ course_catalog models
 """
 from django.db import models
 from django.contrib.postgres.fields import JSONField
+from course_catalog.constants import ResourceType
 
 
 class TimestampedModel(models.Model):
@@ -63,13 +64,17 @@ class Course(TimestampedModel):
     end_date = models.DateTimeField(null=True, blank=True)
     enrollment_start = models.DateTimeField(null=True, blank=True)
     enrollment_end = models.DateTimeField(null=True, blank=True)
-    image_src = models.URLField(null=True, blank=True)
+    image_src = models.URLField(max_length=400, null=True, blank=True)
     image_description = models.CharField(max_length=1024, null=True, blank=True)
     last_modified = models.DateTimeField(null=True, blank=True)
     raw_json = JSONField(null=True, blank=True)
     featured = models.BooleanField(default=False)
+    published = models.BooleanField(default=True)
     instructors = models.ManyToManyField(
         CourseInstructor, blank=True, related_name="courses"
+    )
+    learning_resource_type = models.CharField(
+        max_length=20, default=ResourceType.course.value
     )
     topics = models.ManyToManyField(CourseTopic, blank=True, related_name="courses")
     prices = models.ManyToManyField(CoursePrice, blank=True, related_name="courses")

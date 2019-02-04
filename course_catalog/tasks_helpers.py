@@ -14,6 +14,8 @@ from course_catalog.constants import (
     semester_mapping,
     MIT_OWNER_KEYS,
     ocw_edx_mapping,
+    NON_COURSE_DIRECTORIES,
+    ResourceType,
 )
 from course_catalog.models import Course, CourseTopic, CourseInstructor, CoursePrice
 from course_catalog.serializers import CourseSerializer
@@ -203,7 +205,6 @@ def get_year_and_semester(course_run, course_run_key):
             year = course_run.get("start")[:4]
         else:
             year = None
-
     return year, semester
 
 
@@ -227,7 +228,10 @@ def safe_load_json(json_string, json_file_key):
         return {}
 
 
-def digest_ocw_course(master_json, last_modified, course_instance):
+# pylint: disable=too-many-locals
+def digest_ocw_course(
+    master_json, last_modified, course_instance, is_published, course_prefix=""
+):
     """
     Takes in OCW course master json to store it in DB
 
@@ -235,6 +239,8 @@ def digest_ocw_course(master_json, last_modified, course_instance):
         master_json (dict): course master JSON object as an output from ocw-data-parser
         last_modified (datetime): timestamp of latest modification of all course files
         course_instance (Course): Course instance if exists, otherwise None
+        is_published (Bool): Flags OCW course as published or not
+        course_prefix (String): (Optional) String used to query S3 bucket for course raw JSONs
     """
     course_fields = {
         "course_id": master_json.get("uid"),
@@ -248,8 +254,11 @@ def digest_ocw_course(master_json, last_modified, course_instance):
         "image_src": master_json.get("image_src"),
         "image_description": master_json.get("image_description"),
         "last_modified": last_modified,
+        "published": is_published,
         "raw_json": master_json,
     }
+    if "PROD/RES" in course_prefix:
+        course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
 
     course_serializer = CourseSerializer(data=course_fields, instance=course_instance)
     if not course_serializer.is_valid():
@@ -333,3 +342,51 @@ def get_s3_object_and_read(obj, iteration=0):
             return get_s3_object_and_read(obj, iteration + 1)
         else:
             raise
+
+
+def format_date(date_str):
+    """
+    Coverts date from 2016/02/02 20:28:06 US/Eastern to 2016-02-02 20:28:06-05:00
+
+    Args:
+        date_str (String): Datetime object as string in the following format (2016/02/02 20:28:06 US/Eastern)
+    Returns:
+        Datetime object if passed date is valid, otherwise None
+    """
+    if date_str and date_str != "None":
+        date_pieces = date_str.split(" ")  # e.g. 2016/02/02 20:28:06 US/Eastern
+        date_pieces[0] = date_pieces[0].replace("/", "-")
+        # Discard milliseconds if exists
+        date_pieces[1] = (
+            date_pieces[1][:-4] if "." in date_pieces[1] else date_pieces[1]
+        )
+        tz = date_pieces.pop(2)
+        timezone = pytz.timezone(tz) if "GMT" not in tz else pytz.timezone("Etc/" + tz)
+        tz_stripped_date = datetime.strptime(" ".join(date_pieces), "%Y-%m-%d %H:%M:%S")
+        tz_aware_date = timezone.localize(tz_stripped_date)
+        tz_aware_date = tz_aware_date.astimezone(pytz.utc)
+        return tz_aware_date
+    return None
+
+
+def generate_course_prefix_list(bucket):
+    """
+    Assembles a list of OCW course prefixes from an S3 Bucket that contains all the raw jsons files
+
+    Args:
+        bucket (s3.Bucket): Instantiated S3 Bucket object
+    Returns:
+        List of course prefixes
+    """
+    ocw_courses = set()
+    log.info("Assembling list of courses...")
+    for file in bucket.objects.all():
+        key_pieces = file.key.split("/")
+        course_prefix = (
+            "/".join(key_pieces[0:2]) if key_pieces[0] == "PROD" else key_pieces[0]
+        )
+        # retrieve courses, skipping non-courses (bootcamps, department topics, etc)
+        if course_prefix not in NON_COURSE_DIRECTORIES:
+            if "/".join(key_pieces[:-2]) != "":
+                ocw_courses.add("/".join(key_pieces[:-2]) + "/")
+    return list(ocw_courses)

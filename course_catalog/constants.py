@@ -13,6 +13,15 @@ class PlatformType(Enum):
     mitx = "mitx"
 
 
+class ResourceType(Enum):
+    """
+    Enum for resource types (for OCW and MitX)
+    """
+
+    course = "course"
+    ocw_resource = "ocw_resource"
+
+
 MIT_OWNER_KEYS = ["MITx", "MITx_PRO"]
 
 NON_COURSE_DIRECTORIES = [
