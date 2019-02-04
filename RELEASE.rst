@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.65.0
+--------------
+
+- Switched backpopulate_posts to a more reliable submission fetch
+
 Version 0.64.3 (Released February 04, 2019)
 --------------
 
