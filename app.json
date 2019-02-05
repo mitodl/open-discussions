@@ -107,19 +107,24 @@
       "description": "Name of S3 bucket containing OCW course data"
     },
     "OCW_CONTENT_ACCESS_KEY": {
-      "description": "AWS access key for OCW content bucket"
+      "description": "AWS access key for OCW content bucket",
+      "required": false
     },
     "OCW_CONTENT_SECRET_ACCESS_KEY": {
-      "description": "AWS secret key for OCW content bucket"
+      "description": "AWS secret key for OCW content bucket",
+      "required": false
     },
     "OCW_LEARNING_COURSE_BUCKET_NAME": {
-      "description": "Name of S3 bucket to upload OCW course media"
+      "description": "Name of S3 bucket to upload OCW course media",
+      "required": false
     },
     "OCW_LEARNING_COURSE_ACCESS_KEY": {
-      "description": "AWS access key for OCW media upload bucket"
+      "description": "AWS access key for OCW media upload bucket",
+      "required": false
     },
     "OCW_LEARNING_COURSE_SECRET_ACCESS_KEY": {
-      "description": "AWS secret key for OCW media upload bucket"
+      "description": "AWS secret key for OCW media upload bucket",
+      "required": false
     },
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
