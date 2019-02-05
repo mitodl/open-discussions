@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.65.1
+--------------
+
+- Switch backpopulate over to the list() api
+- Fix link menu when editing rich text widget (#1816)
+- Fix a z-index issue on the post create page
+- Show related posts on the post detail page
+- Fixed contributor delete permissions and changed logic for showing leave channel option
+
 Version 0.65.0 (Released February 04, 2019)
 --------------
 
