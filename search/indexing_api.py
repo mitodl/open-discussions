@@ -23,6 +23,7 @@ from search.constants import (
     PROFILE_TYPE,
     ALIAS_ALL_INDICES,
     VALID_OBJECT_TYPES,
+    GLOBAL_DOC_TYPE,
 )
 from search.exceptions import ReindexException
 from search.serializers import (
@@ -35,8 +36,6 @@ from search.serializers import (
 log = logging.getLogger(__name__)
 User = get_user_model()
 
-
-GLOBAL_DOC_TYPE = "_doc"
 SCRIPTING_LANG = "painless"
 UPDATE_CONFLICT_SETTING = "proceed"
 

@@ -41,9 +41,10 @@ $banner-slide-trans: top 300ms $banner-slide-timing;
 $banner-slide-content-trans: padding-top 300ms $banner-slide-timing;
 $material-icon-size: 24px;
 $channel-banner-height: 200px;
-$submission-font-size: 16px;
-$tooltip-font-size: 14px;
+$normal-font-size: 16px;
 $modest-font-size: 14px;
+$submission-font-size: $normal-font-size;
+$tooltip-font-size: $modest-font-size;
 $button-vert-padding: 9px;
 
 // Spacing values for items that appear on the left side of the drawer and toolbar

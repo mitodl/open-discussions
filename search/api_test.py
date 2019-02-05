@@ -1,3 +1,4 @@
+# pylint: disable=redefined-outer-name
 """Search API function tests"""
 from django.contrib.auth.models import AnonymousUser
 import pytest
@@ -10,9 +11,24 @@ from search.api import (
     is_reddit_object_removed,
     gen_post_id,
     gen_comment_id,
+    find_related_documents,
 )
 from search.connection import get_default_alias_name
-from search.constants import ALIAS_ALL_INDICES
+from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
+
+
+@pytest.fixture()
+def gen_query_filters_mock(mocker):
+    """Mock _apply_general_query_filters"""
+
+    def return_search_arg(
+        search, *args
+    ):  # pylint: disable=missing-docstring,unused-argument
+        return search
+
+    return mocker.patch(
+        "search.api._apply_general_query_filters", side_effect=return_search_arg
+    )
 
 
 def test_gen_post_id():
@@ -214,3 +230,28 @@ def test_execute_search_anonymous(mocker):
         doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
+
+
+def test_find_related_documents(settings, mocker, user, gen_query_filters_mock):
+    """find_related_documents should execute a more-like-this query"""
+    posts_to_return = 7
+    settings.OPEN_DISCUSSIONS_RELATED_POST_COUNT = posts_to_return
+    post_id = "abc"
+    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
+
+    assert (
+        find_related_documents(user=user, post_id=post_id)
+        == get_conn_mock.return_value.search.return_value
+    )
+    assert gen_query_filters_mock.call_count == 1
+    constructed_query = get_conn_mock.return_value.search.call_args[1]
+    assert constructed_query["body"]["query"] == {
+        "more_like_this": {
+            "like": {"_id": gen_post_id(post_id), "_type": GLOBAL_DOC_TYPE},
+            "fields": ["plain_text", "post_title", "author_id", "channel_name"],
+            "min_term_freq": 1,
+            "min_doc_freq": 1,
+        }
+    }
+    assert constructed_query["body"]["from"] == 0
+    assert constructed_query["body"]["size"] == posts_to_return

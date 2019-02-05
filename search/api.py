@@ -1,6 +1,8 @@
 """API for general search-related functionality"""
 from elasticsearch_dsl import Q, Search
+from elasticsearch_dsl.query import MoreLikeThis
 
+from django.conf import settings
 from channels.constants import (
     CHANNEL_TYPE_PUBLIC,
     CHANNEL_TYPE_RESTRICTED,
@@ -11,7 +13,10 @@ from channels.constants import (
 )
 from channels.models import ChannelGroupRole
 from search.connection import get_conn, get_default_alias_name
-from search.constants import ALIAS_ALL_INDICES
+from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
+
+
+RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 
 
 def gen_post_id(reddit_obj_id):
@@ -68,20 +73,17 @@ def is_reddit_object_removed(reddit_obj):
 
 
 # pylint: disable=invalid-unary-operand-type
-def execute_search(*, user, query):
+def _apply_general_query_filters(search, user):
     """
-    Execute a search based on the query
+    Applies a series of filters to a Search object so permissions are respected, deleted
+    objects are ignored, etc.
 
-    Args:
-        user (User): The user executing the search. Used to determine filters to enforce permissions.
-        query (dict): The Elasticsearch query constructed in the frontend
+    search (elasticsearch_dsl.Search): Search object
+    user (User): The user executing the search
 
     Returns:
-        dict: The Elasticsearch response dict
+        elasticsearch_dsl.Search: Search object with filters applied
     """
-    index = get_default_alias_name(ALIAS_ALL_INDICES)
-    search = Search(index=index, using=get_conn())
-    search.update_from_dict(query)
     channel_names = (
         sorted(
             list(
@@ -107,5 +109,49 @@ def execute_search(*, user, query):
     if channel_names:
         channels_filter = channels_filter | Q("terms", channel_name=channel_names)
 
-    search = search.filter(channels_filter).filter(content_filter)
+    return search.filter(channels_filter).filter(content_filter)
+
+
+def execute_search(*, user, query):
+    """
+    Execute a search based on the query
+
+    Args:
+        user (User): The user executing the search. Used to determine filters to enforce permissions.
+        query (dict): The Elasticsearch query constructed in the frontend
+
+    Returns:
+        dict: The Elasticsearch response dict
+    """
+    index = get_default_alias_name(ALIAS_ALL_INDICES)
+    search = Search(index=index, using=get_conn())
+    search.update_from_dict(query)
+    search = _apply_general_query_filters(search, user)
+    return search.execute().to_dict()
+
+
+def find_related_documents(*, user, post_id):
+    """
+    Execute a "more like this" query to find posts that are related to a specific post
+
+     Args:
+        user (User): The user executing the search
+        post_id (str): The id of the post that you want to find related posts for
+
+    Returns:
+        dict: The Elasticsearch response dict
+    """
+    index = get_default_alias_name(ALIAS_ALL_INDICES)
+    search = Search(index=index, using=get_conn())
+    search = _apply_general_query_filters(search, user)
+    search = search.query(
+        MoreLikeThis(
+            like={"_id": gen_post_id(post_id), "_type": GLOBAL_DOC_TYPE},
+            fields=RELATED_POST_RELEVANT_FIELDS,
+            min_term_freq=1,
+            min_doc_freq=1,
+        )
+    )
+    # Limit results to the number indicated in settings
+    search = search[0 : settings.OPEN_DISCUSSIONS_RELATED_POST_COUNT]
     return search.execute().to_dict()

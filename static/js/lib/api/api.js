@@ -34,6 +34,12 @@ export function search(params: SearchParams): Promise<*> {
   })
 }
 
+export function getRelatedPosts(postId: string): Promise<*> {
+  return fetchJSONWithAuthFailure(`/api/v0/related/${postId}/`, {
+    method: POST
+  })
+}
+
 export function getUserPosts(
   username: string,
   params: PostListPaginationParams

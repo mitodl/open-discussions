@@ -22,6 +22,7 @@ import {
   postPasswordResetNewPassword,
   postSetPassword,
   search,
+  getRelatedPosts,
   getWidgetList,
   patchWidgetList
 } from "./api"
@@ -301,6 +302,16 @@ describe("api", function() {
         sinon.assert.calledWith(fetchJSONStub, "/api/v0/search/", {
           method: POST,
           body:   JSON.stringify(body)
+        })
+      })
+    })
+
+    describe("getRelatedPosts", () => {
+      it("should execute a more-like-this search and return results", async () => {
+        const postId = "abc"
+        await getRelatedPosts(postId)
+        sinon.assert.calledWith(fetchJSONStub, `/api/v0/related/${postId}/`, {
+          method: POST
         })
       })
     })

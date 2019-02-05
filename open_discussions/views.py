@@ -67,6 +67,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "allow_email_auth": features.is_enabled(features.EMAIL_AUTH),
         "allow_saml_auth": features.is_enabled(features.SAML_AUTH),
         "allow_widgets_ui": features.is_enabled(features.WIDGETS_UI),
+        "allow_related_posts_ui": features.is_enabled(features.RELATED_POSTS_UI),
         "use_new_branding": features.is_enabled(features.USE_NEW_BRANDING),
         "allow_search": features.is_enabled(features.SEARCH_UI),
         "embedlyKey": settings.EMBEDLY_KEY,

@@ -16,7 +16,7 @@ import {
   postModerationSelector
 } from "../hoc/withPostModeration"
 import withChannelHeader from "../hoc/withChannelHeader"
-import withChannelSidebar from "../hoc/withChannelSidebar"
+import { withChannelSidebar } from "../hoc/withSidebar"
 import withPostList from "../hoc/withPostList"
 import { withChannelTracker } from "../hoc/withChannelTracker"
 
