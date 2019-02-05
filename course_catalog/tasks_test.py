@@ -1,10 +1,11 @@
 """
 Test tasks
 """
+import json
 from os import listdir
 from os.path import isfile, join
 
-from unittest.mock import patch, Mock
+from unittest.mock import Mock
 
 import boto3
 import pytest
@@ -14,6 +15,7 @@ from course_catalog.models import Course, CoursePrice, CourseInstructor, CourseT
 from course_catalog.tasks import get_edx_data, get_ocw_data
 
 pytestmark = pytest.mark.django_db
+# pylint:disable=redefined-outer-name,unused-argument
 
 TEST_JSON_PATH = (
     "./test_json/PROD/9/9.15/Fall_2007/"
@@ -23,286 +25,128 @@ TEST_JSON_FILES = [
     f for f in listdir(TEST_JSON_PATH) if isfile(join(TEST_JSON_PATH, f))
 ]
 
-TEST_EDX_JSON = {
-    "next": "",
-    "results": [
-        {
-            "key": "MITx+15.071x",
-            "uuid": "ff1df27b-3c97-42ee-a9b3-e031ffd41a4f",
-            "title": "The Analytics Edge",
-            "course_runs": [
-                {
-                    "key": "course-v1:MITx+15.071x+1T2019",
-                    "uuid": "f4b7be41-352f-4c0d-afc5-424dcf498ed6",
-                    "title": "The Analytics Edge",
-                    "image": {
-                        "src": "https://prod-discovery.edx-cdn.org/media/course/image/"
-                        "ff1df27b-3c97-42ee-a9b3-e031ffd41a4f-747c9c2f216e.small.jpg",
-                        "height": None,
-                        "width": None,
-                        "description": None,
-                    },
-                    "short_description": "short_description",
-                    "marketing_url": "marketing_url",
-                    "seats": [
-                        {
-                            "type": "verified",
-                            "price": "150.00",
-                            "currency": "USD",
-                            "upgrade_deadline": "2019-03-20T15:00:00Z",
-                            "credit_provider": None,
-                            "credit_hours": None,
-                            "sku": "E110665",
-                            "bulk_sku": "5B37144",
-                        },
-                        {
-                            "type": "audit",
-                            "price": "0.00",
-                            "currency": "USD",
-                            "upgrade_deadline": None,
-                            "credit_provider": None,
-                            "credit_hours": None,
-                            "sku": "98D6AA9",
-                            "bulk_sku": None,
-                        },
-                    ],
-                    "start": "2019-02-20T15:00:00Z",
-                    "end": "2019-05-22T23:30:00Z",
-                    "enrollment_start": None,
-                    "enrollment_end": None,
-                    "pacing_type": "instructor_paced",
-                    "type": "verified",
-                    "status": "published",
-                    "course": "MITx+15.071x",
-                    "full_description": "<p>Full Description</p>",
-                    "announcement": "2018-12-19T15:50:34Z",
-                    "video": {
-                        "src": "http://www.youtube.com/watch?v=1BMSOBCe07k",
-                        "description": None,
-                        "image": {
-                            "src": "image_source",
-                            "description": None,
-                            "height": None,
-                            "width": None,
-                        },
-                    },
-                    "content_language": "en-us",
-                    "license": "",
-                    "outcome": "outcome",
-                    "transcript_languages": ["en-us"],
-                    "instructors": [],
-                    "staff": [
-                        {
-                            "uuid": "32720429-8290-4ac5-a62d-386fb3c4be80",
-                            "salutation": None,
-                            "given_name": "Dimitris",
-                            "family_name": "Bertsimas",
-                            "bio": "Dimitris Bertsimas bio",
-                            "slug": "dimitris-bertsimas",
-                            "position": {
-                                "title": "Boeing Professor of Operations Research ",
-                                "organization_name": "MIT",
-                                "organization_id": 27,
-                                "organization_override": "MIT",
-                                "organization_marketing_url": "https://www.edx.org/school/mitx",
-                            },
-                            "areas_of_expertise": [],
-                            "profile_image": {
-                                "medium": {
-                                    "height": 110,
-                                    "url": "profile_image",
-                                    "width": 110,
-                                }
-                            },
-                            "works": [],
-                            "urls": {"facebook": None, "blog": None, "twitter": None},
-                            "urls_detailed": [],
-                            "email": None,
-                            "profile_image_url": "profile_image_url",
-                            "major_works": "",
-                            "published": True,
-                        },
-                        {
-                            "uuid": "5bb098d8-76fb-450b-9e59-3a60b041f645",
-                            "salutation": None,
-                            "given_name": "Allison",
-                            "family_name": "O'Hair",
-                            "bio": "bio",
-                            "slug": "allison-ohair",
-                            "position": {
-                                "title": "Lecturer",
-                                "organization_name": "Stanford University",
-                                "organization_id": None,
-                                "organization_override": "Stanford University",
-                                "organization_marketing_url": None,
-                            },
-                            "areas_of_expertise": [],
-                            "profile_image": {
-                                "medium": {
-                                    "height": 110,
-                                    "url": "profile_image_url",
-                                    "width": 110,
-                                }
-                            },
-                            "works": [],
-                            "urls": {"facebook": None, "blog": None, "twitter": None},
-                            "urls_detailed": [],
-                            "email": None,
-                            "profile_image_url": "profile_image_url",
-                            "major_works": "",
-                            "published": True,
-                        },
-                    ],
-                    "min_effort": 10,
-                    "max_effort": 15,
-                    "weeks_to_complete": 13,
-                    "modified": "2019-01-11T18:27:16.466621Z",
-                    "level_type": "Intermediate",
-                    "availability": "Starting Soon",
-                    "mobile_available": True,
-                    "hidden": False,
-                    "reporting_type": "mooc",
-                    "eligible_for_financial_aid": True,
-                    "first_enrollable_paid_seat_price": 150,
-                    "has_ofac_restrictions": False,
-                    "enrollment_count": 1619,
-                    "recent_enrollment_count": 1619,
-                }
-            ],
-            "entitlements": [],
-            "owners": [
-                {
-                    "uuid": "2a73d2ce-c34a-4e08-8223-83bca9d2f01d",
-                    "key": "MITx",
-                    "name": "Massachusetts Institute of Technology",
-                    "certificate_logo_image_url": "https://edxuploads.s3.amazonaws.com/organization_logos/logo-mitx.png",
-                    "description": "description",
-                    "homepage_url": "",
-                    "tags": ["charter", "founder"],
-                    "logo_image_url": "logo_image_url",
-                    "marketing_url": "https://www.edx.org/school/mitx",
-                }
-            ],
-            "image": {
-                "src": "image_src",
-                "height": None,
-                "width": None,
-                "description": None,
-            },
-            "short_description": "short_description",
-            "full_description": "full description",
-            "level_type": "Intermediate",
-            "subjects": [
-                {
-                    "name": "Data Analysis & Statistics",
-                    "subtitle": "subtitle",
-                    "description": "description",
-                    "banner_image_url": "banner_image_url",
-                    "card_image_url": "https://www.edx.org/sites/default/files/subject/image/card/data-science.jpg",
-                    "slug": "data-analysis-statistics",
-                    "uuid": "a168a80a-4b6c-4d92-9f1d-4c235206feaf",
-                }
-            ],
-            "prerequisites": [],
-            "prerequisites_raw": "prerequisites_raw",
-            "expected_learning_items": [],
-            "video": {
-                "src": "http://www.youtube.com/watch?v=1BMSOBCe07k",
-                "description": None,
-                "image": {
-                    "src": "video_image_src",
-                    "description": None,
-                    "height": None,
-                    "width": None,
-                },
-            },
-            "sponsors": [],
-            "modified": "2019-01-11T18:07:29.593570Z",
-            "marketing_url": "marketing_url",
-            "syllabus_raw": "",
-            "outcome": "outcome",
-            "original_image": {
-                "src": "original_image_src",
-                "height": None,
-                "width": None,
-                "description": None,
-            },
-            "card_image_url": "card_image_url",
-            "canonical_course_run_key": "MITx/15.071x/1T2014",
-            "extra_description": None,
-            "additional_information": "",
-            "faq": "faq",
-            "learner_testimonials": "",
-            "enrollment_count": 90600,
-            "recent_enrollment_count": 14365,
-            "topics": [],
-        }
-    ],
-}
+
+@pytest.fixture
+def mitx_data(settings):
+    """
+    Test MITx course data
+    """
+    settings.EDX_API_URL = "fake_url"
+    settings.EDX_API_CLIENT_ID = "fake_id"
+    settings.EDX_API_CLIENT_SECRET = "fake_secret"
+    with open("./test_json/test_mitx_course.json", "r") as test_data:
+        return json.load(test_data)
 
 
-def test_get_mitx_data_valid(settings):
+@pytest.fixture
+def access_token(mocker):
+    """
+    Mock requests.post to retrieve a fake access token
+    """
+    mocker.patch(
+        "requests.post",
+        return_value=Mock(
+            json=Mock(return_value={"access_token": "fake_access_token"})
+        ),
+    )
+
+
+@pytest.fixture
+def get_test_data(mocker, mitx_data):
+    """
+    Mock requests.get to retrieve fake course data
+    """
+    mocker.patch(
+        "requests.get",
+        return_value=Mock(status_code=200, json=Mock(return_value=mitx_data)),
+    )
+
+
+@pytest.fixture
+def mock_logger(mocker):
+    """
+    Mock log exception
+    """
+    return mocker.patch("course_catalog.tasks.log.exception")
+
+
+def setup_s3(settings):
+    """
+    Set up the fake s3 data
+    """
+    # Fake the settings
+    settings.OCW_CONTENT_ACCESS_KEY = "abc"
+    settings.OCW_CONTENT_SECRET_ACCESS_KEY = "abc"
+    settings.OCW_CONTENT_BUCKET_NAME = "test_bucket"
+    settings.OCW_LEARNING_COURSE_BUCKET_NAME = "testbucket2"
+    settings.OCW_LEARNING_COURSE_ACCESS_KEY = "abc"
+    settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY = "abc"
+    # Create our fake bucket
+    conn = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_CONTENT_ACCESS_KEY,
+        aws_secret_access_key=settings.OCW_CONTENT_SECRET_ACCESS_KEY,
+    )
+    conn.create_bucket(Bucket=settings.OCW_CONTENT_BUCKET_NAME)
+
+    # Add data to the fake bucket
+    test_bucket = conn.Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
+    for file in TEST_JSON_FILES:
+        file_key = TEST_JSON_PATH.replace("./test_json/", "") + "/" + file
+        with open(TEST_JSON_PATH + "/" + file, "r") as f:
+            test_bucket.put_object(Key=file_key, Body=f.read())
+
+    # Create our upload bucket
+    conn = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+    )
+    conn.create_bucket(Bucket=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
+
+
+def test_get_mitx_data_valid(settings, access_token, get_test_data):
     """
     Test that mitx sync task successfully creates database objects
     """
-    with patch(
-        "requests.post",
-        return_value=Mock(
-            json=Mock(return_value={"access_token": "fake_access_token"})
-        ),
-    ):
-        with patch(
-            "requests.get",
-            return_value=Mock(status_code=200, json=Mock(return_value=TEST_EDX_JSON)),
-        ):
-            settings.EDX_API_URL = "fake_url"
-            get_edx_data()
-            assert Course.objects.count() == 1
-            assert CoursePrice.objects.count() == 2
-            assert CourseInstructor.objects.count() == 2
-            assert CourseTopic.objects.count() == 1
+    get_edx_data()
+    assert Course.objects.count() == 1
+    assert CoursePrice.objects.count() == 2
+    assert CourseInstructor.objects.count() == 2
+    assert CourseTopic.objects.count() == 1
 
 
-def test_get_mitx_data_status_error(settings):
+def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):
     """
     Test that mitx sync task properly stops when it gets an error status code
     """
-    with patch(
-        "requests.post",
-        return_value=Mock(
-            json=Mock(return_value={"access_token": "fake_access_token"})
-        ),
-    ):
-        with patch(
-            "requests.get",
-            return_value=Mock(status_code=500, json=Mock(return_value=TEST_EDX_JSON)),
-        ):
-            settings.EDX_API_URL = "fake_url"
-            get_edx_data()
-            assert Course.objects.count() == 0
+    mocker.patch(
+        "requests.get",
+        return_value=Mock(status_code=500, json=Mock(return_value=mitx_data)),
+    )
+    settings.EDX_API_URL = "fake_url"
+    get_edx_data()
+    assert Course.objects.count() == 0
 
 
-def test_get_mitx_data_unexpected_error(settings):
+def test_get_mitx_data_unexpected_error(settings, mocker, access_token, get_test_data):
     """
     Test that mitx sync task properly stops when it gets an error status code
     """
-    with patch(
-        "requests.post",
-        return_value=Mock(
-            json=Mock(return_value={"access_token": "fake_access_token"})
-        ),
-    ):
-        with patch(
-            "requests.get",
-            return_value=Mock(status_code=200, json=Mock(return_value=TEST_EDX_JSON)),
-        ):
-            with patch(
-                "course_catalog.tasks_helpers.get_year_and_semester",
-                side_effect=cause_error,
-            ):
-                settings.EDX_API_URL = "fake_url"
-                get_edx_data()
-                assert Course.objects.count() == 0
+    mocker.patch(
+        "course_catalog.task_helpers.get_year_and_semester", side_effect=Exception
+    )
+    settings.EDX_API_URL = "fake_url"
+    get_edx_data()
+    assert Course.objects.count() == 0
+
+
+def test_get_mitx_data_no_settings():
+    """
+    No data should be imported if MITx settings are missing
+    """
+    get_edx_data()
+    assert Course.objects.count() == 0
 
 
 @mock_s3
@@ -326,65 +170,39 @@ def test_get_ocw_data(settings):
     assert CourseTopic.objects.count() == 3
 
 
-def setup_s3(settings):
+def test_get_ocw_data_no_settings():
     """
-    Set up the fake s3 data
+    No data should be imported if OCW settings are missing
     """
-    # Fake the settings
-    settings.OCW_CONTENT_ACCESS_KEY = "abc"
-    settings.OCW_CONTENT_SECRET_ACCESS_KEY = "abc"
-    settings.OCW_CONTENT_BUCKET_NAME = "test_bucket"
-
-    # Create our fake bucket
-    conn = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.OCW_CONTENT_ACCESS_KEY,
-        aws_secret_access_key=settings.OCW_CONTENT_SECRET_ACCESS_KEY,
-    )
-    conn.create_bucket(Bucket="test_bucket")
-
-    # Add data to the fake bucket
-    test_bucket = conn.Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
-    for file in TEST_JSON_FILES:
-        file_key = TEST_JSON_PATH.replace("./test_json/", "") + "/" + file
-        with open(TEST_JSON_PATH + "/" + file, "r") as f:
-            test_bucket.put_object(Key=file_key, Body=f.read())
+    get_ocw_data()
+    assert Course.objects.count() == 0
 
 
 @mock_s3
-def test_get_ocw_data_error_parsing(settings, mocker):
+def test_get_ocw_data_error_parsing(settings, mocker, mock_logger):
     """
     Test that an error parsing ocw data is correctly logged
     """
     mocker.patch(
         "course_catalog.tasks.OCWParser.setup_s3_uploading", side_effect=Exception
     )
-    mock_logger = mocker.patch("course_catalog.tasks.log.exception")
     setup_s3(settings)
     get_ocw_data()
     mock_logger.assert_called_once_with(
         "Error encountered parsing OCW json for %s",
-        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
+        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007",
     )
 
 
 @mock_s3
-def test_get_ocw_data_error_reading_s3(settings, mocker):
+def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger):
     """
     Test that an error reading from S3 is correctly logged
     """
     mocker.patch("course_catalog.tasks.get_s3_object_and_read", side_effect=Exception)
-    mock_logger = mocker.patch("course_catalog.tasks.log.exception")
     setup_s3(settings)
     get_ocw_data()
     mock_logger.assert_called_once_with(
         "Error encountered reading 1.json for %s",
-        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
+        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007",
     )
-
-
-def cause_error():
-    """
-    Helper function created to insert exceptions into otherwise working code
-    """
-    raise Exception("random error")

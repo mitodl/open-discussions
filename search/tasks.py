@@ -42,7 +42,7 @@ def wrap_retry_exception(*exception_classes):
     """
     try:
         yield
-    except Exception as ex:
+    except Exception as ex:  # pylint:disable=bare-except
         if isinstance(ex, NotFound):
             # No corresponding reddit post/comment found for django model object.  Log error and continue indexing.
             log.exception(

@@ -2,7 +2,7 @@
 course_catalog serializers
 """
 from rest_framework import serializers
-from .models import Course, CourseInstructor, CoursePrice, CourseTopic
+from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
 
 
 class CourseInstructorSerializer(serializers.ModelSerializer):

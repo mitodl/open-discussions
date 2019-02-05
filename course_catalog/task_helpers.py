@@ -86,7 +86,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
         except Course.DoesNotExist:
             course_instance = None
 
-        year, semester = get_year_and_semester(course_run, course_run_key)
+        year, semester = get_year_and_semester(course_run)
 
         course_fields = {
             "course_id": course_run_key,
@@ -181,7 +181,7 @@ def is_mit_course(course_data):
     return False
 
 
-def get_year_and_semester(course_run, course_run_key):
+def get_year_and_semester(course_run):
     """
     Parse year and semester out of course run key. If course run key cannot be parsed attempt to get year from start.
 
@@ -194,7 +194,7 @@ def get_year_and_semester(course_run, course_run_key):
 
     """
     match = re.search(
-        "[1|2|3]T[0-9]{4}", course_run_key
+        "[1|2|3]T[0-9]{4}", course_run.get("key")
     )  # e.g. "3T2019" -> Semester "3", Year "2019"
     if match:
         year = int(match.group(0)[-4:])
@@ -263,9 +263,10 @@ def digest_ocw_course(
     course_serializer = CourseSerializer(data=course_fields, instance=course_instance)
     if not course_serializer.is_valid():
         log.error(
-            "Course %s is not valid: %s",
+            "Course %s is not valid: %s %s",
             master_json.get("uid"),
             course_serializer.errors,
+            master_json.get("image_src"),
         )
         return
 
@@ -369,24 +370,25 @@ def format_date(date_str):
     return None
 
 
-def generate_course_prefix_list(bucket):
+def generate_course_prefix_map(bucket):
     """
-    Assembles a list of OCW course prefixes from an S3 Bucket that contains all the raw jsons files
+    Assembles a map of OCW courses & files from an S3 Bucket that contains all the raw jsons files
 
     Args:
         bucket (s3.Bucket): Instantiated S3 Bucket object
     Returns:
         List of course prefixes
     """
-    ocw_courses = set()
+    ocw_courses = {}
     log.info("Assembling list of courses...")
-    for file in bucket.objects.all():
-        key_pieces = file.key.split("/")
-        course_prefix = (
+    for bucket_file in bucket.objects.all():
+        key_pieces = bucket_file.key.split("/")
+        department_prefix = (
             "/".join(key_pieces[0:2]) if key_pieces[0] == "PROD" else key_pieces[0]
         )
         # retrieve courses, skipping non-courses (bootcamps, department topics, etc)
-        if course_prefix not in NON_COURSE_DIRECTORIES:
-            if "/".join(key_pieces[:-2]) != "":
-                ocw_courses.add("/".join(key_pieces[:-2]) + "/")
-    return list(ocw_courses)
+        if department_prefix not in NON_COURSE_DIRECTORIES:
+            course_prefix = "/".join(key_pieces[:-2])
+            if course_prefix != "":
+                ocw_courses.setdefault(course_prefix, []).append(bucket_file)
+    return ocw_courses

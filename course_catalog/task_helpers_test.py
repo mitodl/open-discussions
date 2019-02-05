@@ -1,5 +1,5 @@
 """
-Test course_catalog tasks_helpers
+Test course_catalog task_helpers
 """
 import copy
 from datetime import timedelta, datetime
@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from course_catalog.factories import CourseFactory
 from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
-from course_catalog.tasks_helpers import (
+from course_catalog.task_helpers import (
     parse_mitx_json_data,
     digest_ocw_course,
     get_ocw_topic,
@@ -233,7 +233,7 @@ def test_parse_mitx_json_data_overwrite(mocker, force_overwrite):
         course_id=mitx_valid_data["course_runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
-    mock_save = mocker.patch("course_catalog.tasks_helpers.CourseSerializer.save")
+    mock_save = mocker.patch("course_catalog.task_helpers.CourseSerializer.save")
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save.call_count == (1 if force_overwrite else 0)
 
@@ -442,6 +442,6 @@ def test_deserialzing_an_invalid_ocw_course():
 
 def test_safe_load_bad_json(mocker):
     """ Test that safe_load_json returns an empty dict for invalid JSON"""
-    mock_logger = mocker.patch("course_catalog.tasks_helpers.log.exception")
+    mock_logger = mocker.patch("course_catalog.task_helpers.log.exception")
     assert safe_load_json("badjson", "key") == {}
     mock_logger.assert_called_with("%s has a corrupted JSON", "key")

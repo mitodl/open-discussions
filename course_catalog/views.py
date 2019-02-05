@@ -11,10 +11,9 @@ from rest_framework.response import Response
 from course_catalog.constants import ResourceType, PlatformType
 from course_catalog.models import Course
 from course_catalog.serializers import CourseSerializer
-
+from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 # pylint:disable=unused-argument
-from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 
 @api_view(["GET"])
