@@ -1,0 +1,44 @@
+.related-posts {
+  $vert-spacing: 20px;
+
+  a,
+  a:link {
+    color: $navy;
+  }
+
+  h3 {
+    margin: 0;
+    padding: 0;
+    font-size: $normal-font-size;
+  }
+
+  .related-post-item {
+    margin-top: $vert-spacing;
+
+    .external-link {
+      line-height: 18px;
+      vertical-align: middle;
+    }
+
+    i.open_in_new {
+      font-size: 14px;
+      color: $font-darkgrey;
+      padding-right: 5px;
+    }
+
+    a.title-link {
+      font-size: $normal-font-size;
+      font-weight: bold;
+      color: $navy;
+    }
+
+    .detail {
+      font-size: $modest-font-size;
+      margin-top: 3px;
+
+      .in {
+        color: $font-grey-light;
+      }
+    }
+  }
+}

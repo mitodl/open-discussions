@@ -111,6 +111,10 @@
       "description": "Number of users to sync per backpopulate batch",
       "required": false
     },
+    "OPEN_DISCUSSIONS_RELATED_POST_COUNT": {
+      "description": "Number of related posts to fetch",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_DEFAULT_SITE_KEY": {
       "description": "The default site key to use for JWT tokens missing one"
     },

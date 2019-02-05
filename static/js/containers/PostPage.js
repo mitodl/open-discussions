@@ -14,6 +14,7 @@ import CommentTree from "../components/CommentTree"
 import ReportForm from "../components/ReportForm"
 import { ReplyToPostForm } from "../components/CommentForms"
 import withSingleColumn from "../hoc/withSingleColumn"
+import { withPostDetailSidebar } from "../hoc/withSidebar"
 import withChannelHeader from "../hoc/withChannelHeader"
 import {
   withPostModeration,
@@ -156,15 +157,6 @@ class PostPage extends React.Component<PostPageProps> {
     }
   }
 
-  downvote = async (comment: CommentInTree) => {
-    const { dispatch } = this.props
-    await dispatch(
-      actions.comments.patch(comment.id, {
-        downvoted: !comment.downvoted
-      })
-    )
-  }
-
   loadData = async () => {
     const {
       dispatch,
@@ -196,15 +188,6 @@ class PostPage extends React.Component<PostPageProps> {
     } catch (_) {} // eslint-disable-line no-empty
   }
 
-  upvote = async (comment: CommentInTree) => {
-    const { dispatch } = this.props
-    await dispatch(
-      actions.comments.patch(comment.id, {
-        upvoted: !comment.upvoted
-      })
-    )
-  }
-
   loadMoreComments = async (comment: MoreCommentsInTree) => {
     const { dispatch } = this.props
     const { post_id: postId, parent_id: parentId, children } = comment
@@ -216,6 +199,24 @@ class PostPage extends React.Component<PostPageProps> {
         postId,
         parentId,
         comments
+      })
+    )
+  }
+
+  downvote = async (comment: CommentInTree) => {
+    const { dispatch } = this.props
+    await dispatch(
+      actions.comments.patch(comment.id, {
+        downvoted: !comment.downvoted
+      })
+    )
+  }
+
+  upvote = async (comment: CommentInTree) => {
+    const { dispatch } = this.props
+    await dispatch(
+      actions.comments.patch(comment.id, {
+        upvoted: !comment.upvoted
       })
     )
   }
@@ -400,47 +401,6 @@ class PostPage extends React.Component<PostPageProps> {
           />
           <meta name="description" content={truncate(post.text, 300)} />
         </MetaTags>
-        <Dialog
-          open={commentDeleteDialogVisible}
-          hideDialog={this.hideCommentDialog(DELETE_COMMENT_DIALOG)}
-          onAccept={this.deleteComment}
-          title="Delete Comment"
-          submitText="Yes, Delete"
-        >
-          Are you sure you want to delete this comment?
-        </Dialog>
-        <Dialog
-          open={postDeleteDialogVisible}
-          hideDialog={hidePostDialog}
-          onAccept={() => {
-            this.deletePost(post)
-            hidePostDialog()
-          }}
-          title="Delete Post"
-          submitText="Yes, Delete"
-        >
-          Are you sure you want to delete this post?
-        </Dialog>
-        <Dialog
-          open={commentReportDialogVisible}
-          hideDialog={this.hideReportCommentDialog}
-          onCancel={this.hideReportCommentDialog}
-          onAccept={this.reportComment}
-          validateOnClick={true}
-          title="Report Comment"
-          submitText="Yes, Report"
-          id="report-comment-dialog"
-        >
-          {reportForm ? (
-            <ReportForm
-              reportForm={reportForm.value}
-              validation={reportForm.errors}
-              onUpdate={onReportUpdate(dispatch)}
-              description="Are you sure you want to report this comment for violating the rules of this site?"
-              label="Why are you reporting this comment?"
-            />
-          ) : null}
-        </Dialog>
         <Card className="post-card">
           <div className="post-card-inner">
             <ExpandedPostDisplay
@@ -502,6 +462,47 @@ class PostPage extends React.Component<PostPageProps> {
             dropdownMenus={dropdownMenus}
           />
         ) : null}
+        <Dialog
+          open={commentDeleteDialogVisible}
+          hideDialog={this.hideCommentDialog(DELETE_COMMENT_DIALOG)}
+          onAccept={this.deleteComment}
+          title="Delete Comment"
+          submitText="Yes, Delete"
+        >
+          Are you sure you want to delete this comment?
+        </Dialog>
+        <Dialog
+          open={postDeleteDialogVisible}
+          hideDialog={hidePostDialog}
+          onAccept={() => {
+            this.deletePost(post)
+            hidePostDialog()
+          }}
+          title="Delete Post"
+          submitText="Yes, Delete"
+        >
+          Are you sure you want to delete this post?
+        </Dialog>
+        <Dialog
+          open={commentReportDialogVisible}
+          hideDialog={this.hideReportCommentDialog}
+          onCancel={this.hideReportCommentDialog}
+          onAccept={this.reportComment}
+          validateOnClick={true}
+          title="Report Comment"
+          submitText="Yes, Report"
+          id="report-comment-dialog"
+        >
+          {reportForm ? (
+            <ReportForm
+              reportForm={reportForm.value}
+              validation={reportForm.errors}
+              onUpdate={onReportUpdate(dispatch)}
+              description="Are you sure you want to report this comment for violating the rules of this site?"
+              label="Why are you reporting this comment?"
+            />
+          ) : null}
+        </Dialog>
       </div>
     )
   }
@@ -569,7 +570,9 @@ export default R.compose(
   withChannelHeader,
   withPostModeration,
   withCommentModeration,
-  withSingleColumn("post-page"),
+  SETTINGS.allow_related_posts_ui
+    ? withPostDetailSidebar("post-page")
+    : withSingleColumn("post-page"),
   withChannelTracker,
   withSpinnerLoading
 )(PostPage)

@@ -9,7 +9,7 @@ import pytest
 from elasticsearch.exceptions import ConflictError
 
 from search.connection import get_default_alias_name
-from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES
+from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
 from search.exceptions import ReindexException
 from search.indexing_api import (
     clear_and_create_index,
@@ -21,7 +21,6 @@ from search.indexing_api import (
     increment_document_integer_field,
     index_post_with_comments,
     switch_indices,
-    GLOBAL_DOC_TYPE,
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
     index_profiles,
