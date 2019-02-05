@@ -18,6 +18,7 @@ import ConnectedEditor, {
   menuButtonClass
 } from "./Editor"
 
+import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
 import * as util from "../lib/util"
@@ -365,6 +366,16 @@ describe("Editor component", () => {
       inner.instance().closeLinkMenu()
       wrapper.update()
       assert.isNotOk(wrapper.find(AddLinkMenu).exists())
+    })
+
+    it("should not render <AddLinkMenu /> if the form doesn't exist", () => {
+      const { wrapper, inner } = renderConnectedEditor()
+      inner.instance().openLinkMenu()
+      helper.store.dispatch(
+        actions.forms.formEndEdit({ formKey: inner.instance().uuid })
+      )
+      wrapper.update()
+      assert.isFalse(wrapper.find(AddLinkMenu).exists())
     })
 
     it("should pass the right props to <AddLinkMenu />", () => {
