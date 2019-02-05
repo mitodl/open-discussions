@@ -330,6 +330,8 @@ export class Editor extends React.Component<Props, State> {
 
   render() {
     const { showLinkMenu } = this.state
+    const { getForm } = this.formHelpers
+    const form = getForm(this.props)
 
     return (
       <div className="editor-wrapper">
@@ -340,7 +342,7 @@ export class Editor extends React.Component<Props, State> {
           ref={this.node}
         />
         {this.renderMenuBar()}
-        {showLinkMenu ? this.renderLinkMenu() : null}
+        {showLinkMenu && form ? this.renderLinkMenu() : null}
       </div>
     )
   }
