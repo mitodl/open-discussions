@@ -110,9 +110,13 @@ describe("CompactPostDisplay", () => {
       post_type:  LINK_TYPE_TEXT,
       plain_text: exampleText
     })
-    const truncatableText = renderPostDisplay({ post }).find("Dotdotdot")
-    assert.equal(truncatableText.prop("clamp"), POST_PREVIEW_LINES)
-    assert.equal(truncatableText.prop("children"), exampleText)
+    const truncatableText = renderPostDisplay({ post }).find("TruncatedText")
+    assert.deepEqual(truncatableText.props(), {
+      text:            exampleText,
+      lines:           POST_PREVIEW_LINES,
+      estCharsPerLine: 130,
+      className:       "preview"
+    })
   })
 
   it("should link to the post detail page via post date", () => {

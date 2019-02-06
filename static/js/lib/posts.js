@@ -121,13 +121,8 @@ export const postMenuDropdownFuncs = (dispatch: Dispatch<*>, post: Post) => {
   }
 }
 
-export const getPlainTextContent = (post: Post): ?string => {
-  if (isPostContainingText(post)) {
-    // Default to the 'text' value if 'plain_text' is null for any reason
-    return post.plain_text || post.text
-  }
-  return null
-}
+export const getPlainTextContent = (post: Post): ?string =>
+  isPostContainingText(post) ? post.plain_text : null
 
 export const isEditablePostType = (post: Post): boolean =>
   post.post_type === LINK_TYPE_TEXT || post.post_type === LINK_TYPE_ARTICLE

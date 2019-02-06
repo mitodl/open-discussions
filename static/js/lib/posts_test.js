@@ -172,16 +172,16 @@ describe("Post utils", () => {
   })
 
   describe("getPlainTextContent", () => {
-    const exampleText = "magnets, how do they work?"
+    const txt = "magnets, how do they work?"
     ;[
-      [LINK_TYPE_LINK, {}, null],
-      [LINK_TYPE_ARTICLE, { plain_text: exampleText }, exampleText],
-      [LINK_TYPE_TEXT, { plain_text: exampleText }, exampleText],
-      [LINK_TYPE_TEXT, { text: exampleText }, exampleText]
-    ].forEach(([postType, updatedProperties, expReturnValue]) => {
+      [LINK_TYPE_LINK, {}, null, "link post"],
+      [LINK_TYPE_ARTICLE, { plain_text: txt }, txt, "article post"],
+      [LINK_TYPE_TEXT, { plain_text: txt }, txt, "text post"],
+      [LINK_TYPE_TEXT, { text: txt }, null, "text post w/ empty plain text"]
+    ].forEach(([postType, updatedProperties, expReturnValue, desc]) => {
       it(`${shouldIf(
         !!expReturnValue
-      )} return some text content for ${postType}-type post`, () => {
+      )} return some text content for a ${desc}`, () => {
         const post = {
           ...makePost(postType === LINK_TYPE_LINK),
           ...updatedProperties,
