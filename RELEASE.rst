@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.65.1
+Version 0.65.1 (Released February 06, 2019)
 --------------
 
 - Switch backpopulate over to the list() api
