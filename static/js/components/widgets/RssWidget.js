@@ -12,8 +12,8 @@ import type { WidgetComponentProps } from "../../flow/widgetTypes"
 const RssWidget = ({ widgetInstance: { json } }: WidgetComponentProps) => {
   const entries = (json && json.entries) || []
 
-  return entries.map(entry => (
-    <div key={entry.link} className="entry">
+  return entries.map((entry, idx) => (
+    <div key={idx} className="entry">
       <div className="entry-title">
         <a href={entry.link} target="_blank" rel="noopener noreferrer">
           {entry.title}
