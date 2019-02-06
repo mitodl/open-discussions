@@ -23,7 +23,6 @@ declare var SETTINGS: {
   is_admin: boolean,
   allow_anonymous: boolean,
   allow_saml_auth: boolean,
-  allow_email_auth: boolean,
   allow_search: boolean,
   search_page_size: number,
   search_min_length: number,

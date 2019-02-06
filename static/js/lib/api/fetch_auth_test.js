@@ -7,7 +7,7 @@ import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
 import * as auth from "./fetch_auth"
 
-import { AUTH_REQUIRED_URL, LOGIN_URL } from "../url"
+import { LOGIN_URL } from "../url"
 import {
   NOT_AUTHENTICATED_ERROR_TYPE,
   AUTHENTICATION_FAILED_ERROR_TYPE
@@ -74,17 +74,14 @@ describe("fetch_auth", function() {
 
       //
       [
-        [errorNotAuthenticated, false, AUTH_REQUIRED_URL],
-        [errorAuthenticationFailed, false, AUTH_REQUIRED_URL],
-        [errorNotAuthenticated, true, LOGIN_URL],
-        [errorAuthenticationFailed, true, LOGIN_URL]
-      ].forEach(([error, allowEmailAuth, expectedUrl]) => {
-        it(`redirects to ${expectedUrl} if allow_email_auth: ${allowEmailAuth} for error: ${
+        [errorNotAuthenticated, LOGIN_URL],
+        [errorAuthenticationFailed, LOGIN_URL]
+      ].forEach(([error, expectedUrl]) => {
+        it(`redirects to ${expectedUrl}  for error: ${
           error.error_type
         }`, async () => {
           const next = "/secret/url/?with=params#andhash"
           window.location = next
-          SETTINGS.allow_email_auth = allowEmailAuth
           fetchStub.returns(Promise.reject(error)) // original api call
 
           await assert.isRejected(authFunc("/url"))
@@ -99,7 +96,6 @@ describe("fetch_auth", function() {
           error.error_type
         } if already on login page`, async () => {
           window.location = expectedUrl
-          SETTINGS.allow_email_auth = allowEmailAuth
           fetchStub.returns(Promise.reject(error)) // original api call
 
           await assert.isRejected(authFunc("/url"))
@@ -136,7 +132,7 @@ describe("fetch_auth", function() {
         auth.fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
       )
       assert.equal(err, "You were logged out, please login again")
-      assert.equal(window.location.pathname, AUTH_REQUIRED_URL)
+      assert.equal(window.location.pathname, LOGIN_URL)
     })
 
     it("should just reject if not 401 error", async () => {

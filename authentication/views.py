@@ -53,9 +53,6 @@ class SocialAuthAPIView(APIView):
         if request.session.get("is_hijacked_user", False):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        if not features.is_enabled(features.EMAIL_AUTH):
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
         serializer_cls = self.get_serializer_cls()
         strategy = load_drf_strategy(request)
         backend = load_backend(strategy, EmailAuth.name, None)
@@ -132,9 +129,6 @@ def get_social_auth_types(request):
     """
     View that returns a serialized list of the logged-in user's UserSocialAuth types
     """
-    if not features.is_enabled(features.EMAIL_AUTH):
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
     social_auths = (
         UserSocialAuth.objects.filter(user=request.user).values("provider").distinct()
     )
@@ -199,18 +193,15 @@ class CustomPasswordResetEmail(DjoserPasswordResetEmail):
 
 class CustomDjoserAPIView(ActionViewMixin):
     """
-    Overrides the post method of a Djoser view and adds two bits of logic:
+    Overrides the post method of a Djoser view and adds one extra piece of logic:
 
-    1. Returns 404 if the EMAIL_AUTH feature is not enabled
-    2. In version 0.30.0, the fetch function in redux-hammock does not handle responses
+    In version 0.30.0, the fetch function in redux-hammock does not handle responses
     with empty response data. Djoser returns 204's with empty response data, so we are
     coercing that to a 200 with an empty dict as the response data. This can be removed
     when redux-hammock is changed to support 204's.
     """
 
     def post(self, request):  # pylint: disable=missing-docstring
-        if not features.is_enabled(features.EMAIL_AUTH):
-            return Response(status=status.HTTP_404_NOT_FOUND)
         response = super().post(request)
         if response.status_code == status.HTTP_204_NO_CONTENT:
             return Response({}, status=status.HTTP_200_OK)

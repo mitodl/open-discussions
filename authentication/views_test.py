@@ -16,10 +16,7 @@ from open_discussions import features
 from open_discussions.factories import UserSocialAuthFactory
 from open_discussions.test_utils import any_instance_of, MockResponse
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("authenticated_site", "email_auth_enabled"),
-]
+pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("authenticated_site")]
 lazy = pytest.lazy_fixture
 
 NEW_EMAIL = "test@example.com"
@@ -42,29 +39,6 @@ def mm_user(user):
         user=user, provider=MicroMastersAuth.name, uid=user.email
     )
     return user
-
-
-@pytest.fixture
-def email_auth_enabled(settings):
-    """Ensure email auth is enabled"""
-    settings.FEATURES[features.EMAIL_AUTH] = True
-
-
-@pytest.mark.parametrize(
-    "url",
-    (
-        "psa-login-email",
-        "psa-login-password",
-        "psa-register-email",
-        "psa-register-confirm",
-        "psa-register-details",
-    ),
-)
-def test_auth_views_disabled(settings, client, email_user, url):
-    """Tests all the auth views return a 404 if this feature is disabled"""
-    settings.FEATURES[features.EMAIL_AUTH] = False
-    response = client.post(reverse(url), {"email": email_user.email})
-    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 # pylint:disable=too-many-arguments
@@ -637,10 +611,8 @@ def test_new_register_no_session_partial(client):
     assert PARTIAL_PIPELINE_TOKEN_KEY not in client.session.keys()
 
 
-def test_login_email_error(settings, client, mocker):
+def test_login_email_error(client, mocker):
     """Tests email login with error result"""
-    settings.FEATURES[features.EMAIL_AUTH] = True
-
     assert bool(get_user(client).is_authenticated) is False
 
     mocked_authenticate = mocker.patch(
@@ -667,11 +639,10 @@ def test_login_email_error(settings, client, mocker):
     assert bool(get_user(client).is_authenticated) is False
 
 
-def test_login_email_hijacked(client, user, admin_user, settings):
+def test_login_email_hijacked(client, user, admin_user):
     """ Test that a 403 response is returned for email login view if user is hijacked"""
     client.force_login(admin_user)
     client.post("/hijack/{}/".format(user.id))
-    settings.FEATURES[features.EMAIL_AUTH] = True
     response = client.post(
         reverse("psa-login-email"),
         {"flow": SocialAuthState.FLOW_LOGIN, "email": "anything@example.com"},
@@ -679,11 +650,10 @@ def test_login_email_hijacked(client, user, admin_user, settings):
     assert response.status_code == 403
 
 
-def test_register_email_hijacked(client, user, admin_user, settings):
+def test_register_email_hijacked(client, user, admin_user):
     """ Test that a 403 response is returned for email register view if user is hijacked"""
     client.force_login(admin_user)
     client.post("/hijack/{}/".format(user.id))
-    settings.FEATURES[features.EMAIL_AUTH] = True
     response = client.post(
         reverse("psa-register-email"),
         {"flow": SocialAuthState.FLOW_LOGIN, "email": "anything@example.com"},
@@ -718,33 +688,13 @@ class DjoserViewTests:
 
     # pylint: disable=too-many-arguments
     @pytest.mark.parametrize(
-        "url,parent_view_cls,logged_in",
-        [
-            ["password-reset-api", False],
-            ["password-reset-confirm-api", False],
-            ["set-password-api", True],
-        ],
-    )
-    def test_password_reset_disabled_without_flag(
-        self, settings, client, user, url, logged_in
-    ):
-        """Verify that password reset views return a 404 if the EMAIL_AUTH is disabled"""
-        settings.FEATURES[features.EMAIL_AUTH] = False
-        if logged_in:
-            client.force_login(user)
-        response = client.post(reverse(url), {})
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    # pylint: disable=too-many-arguments
-    @pytest.mark.parametrize(
         "url", ["password-reset-api", "password-reset-confirm-api", "set-password-api"]
     )
-    def test_password_reset_coerce_204(self, settings, mocker, client, user, url):
+    def test_password_reset_coerce_204(self, mocker, client, user, url):
         """
         Verify that password reset views coerce a 204 response to a 200 in order
         to play nice with redux-hammock.
         """
-        settings.FEATURES[features.EMAIL_AUTH] = True
         mocker.patch(
             "authentication.views.ActionViewMixin.post",
             return_value=mocker.Mock(status_code=status.HTTP_400_BAD_REQUEST),
@@ -763,13 +713,12 @@ class DjoserViewTests:
         ],
     )
     def test_password_change_session_update(
-        self, settings, mocker, response_status, expected_session_update, client, user
+        self, mocker, response_status, expected_session_update, client, user
     ):
         """
         Tests that the password change view updates the Django session when the
         request succeeds.
         """
-        settings.FEATURES[features.EMAIL_AUTH] = True
         mocker.patch(
             "authentication.views.ActionViewMixin.post",
             return_value=mocker.Mock(status_code=response_status),

@@ -64,7 +64,6 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "is_authenticated": bool(request.user.is_authenticated),
         "profile_ui_enabled": features.is_enabled(features.PROFILE_UI),
         "allow_anonymous": features.is_enabled(features.ANONYMOUS_ACCESS),
-        "allow_email_auth": features.is_enabled(features.EMAIL_AUTH),
         "allow_saml_auth": features.is_enabled(features.SAML_AUTH),
         "allow_widgets_ui": features.is_enabled(features.WIDGETS_UI),
         "allow_related_posts_ui": features.is_enabled(features.RELATED_POSTS_UI),

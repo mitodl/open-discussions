@@ -33,11 +33,9 @@ export const LoggedInMenu = (props: DropdownMenuProps) => (
         <Link to={profileURL(SETTINGS.username)}>Profile</Link>
       </li>
     ) : null}
-    {SETTINGS.allow_email_auth ? (
-      <li>
-        <a href="/logout">Sign Out</a>
-      </li>
-    ) : null}
+    <li>
+      <a href="/logout">Sign Out</a>
+    </li>
   </DropdownMenu>
 )
 

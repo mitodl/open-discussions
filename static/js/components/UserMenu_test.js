@@ -129,7 +129,6 @@ describe("UserMenu", () => {
     })
 
     it("should include a logout link, if feature is enabled", () => {
-      SETTINGS.allow_email_auth = true
       const wrapper = shallow(<LoggedInMenu {...menuProps} />)
       const { href, children } = wrapper.find("a").props()
       assert.equal(href, "/logout")

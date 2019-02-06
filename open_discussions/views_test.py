@@ -31,7 +31,6 @@ def test_webpack_url(
     settings.ALGOLIA_API_KEY = "fake"
     settings.FEATURES[features.ANONYMOUS_ACCESS] = "access"
     settings.FEATURES[features.SAML_AUTH] = False
-    settings.FEATURES[features.EMAIL_AUTH] = False
     settings.FEATURES[features.USE_NEW_BRANDING] = False
     settings.FEATURES[features.ARTICLE_UI] = False
     settings.CKEDITOR_UPLOAD_URL = "https://foobar.example.com"
@@ -74,7 +73,6 @@ def test_webpack_url(
         "is_authenticated": expect_auth,
         "allow_anonymous": "access",
         "allow_saml_auth": False,
-        "allow_email_auth": False,
         "allow_search": False,
         "allow_widgets_ui": False,
         "allow_related_posts_ui": False,
