@@ -4,12 +4,12 @@ import React from "react"
 import moment from "moment"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
-import Dotdotdot from "react-dotdotdot"
 
 import Card from "./Card"
 import DropdownMenu from "./DropdownMenu"
 import ReportCount from "./ReportCount"
 import PostUpvoteButton from "./PostUpvoteButton"
+import TruncatedText from "./TruncatedText"
 
 import {
   channelURL,
@@ -137,7 +137,7 @@ export class CompactPostDisplay extends React.Component<Props> {
     const { post, showPinUI } = this.props
 
     const formattedDate = moment(post.created).fromNow()
-    const previewText = getPlainTextContent(post)
+    const plainText = getPlainTextContent(post)
 
     return (
       <Card
@@ -163,11 +163,14 @@ export class CompactPostDisplay extends React.Component<Props> {
                 </div>
               </Link>
             </div>
-            {previewText ? (
+            {plainText ? (
               <div className="row">
-                <Dotdotdot clamp={POST_PREVIEW_LINES} className="preview">
-                  {previewText}
-                </Dotdotdot>
+                <TruncatedText
+                  text={plainText}
+                  lines={POST_PREVIEW_LINES}
+                  estCharsPerLine={130}
+                  className="preview"
+                />
               </div>
             ) : null}
             <div className="row author-row">
