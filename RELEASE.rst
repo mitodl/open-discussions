@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.65.3
+--------------
+
+- Copy mitodl/course_catalog app into discussions (#1753)
+- Added reporting of validation errors to sentry
+- Removed EMAIL_AUTH flag
+
 Version 0.65.2 (Released February 07, 2019)
 --------------
 
