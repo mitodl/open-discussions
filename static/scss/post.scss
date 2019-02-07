@@ -108,15 +108,13 @@
       justify-content: flex-end;
 
       &.link-thumbnail {
+        display: flex;
+        justify-content: center;
         min-width: 34%;
         width: 34%;
         overflow: hidden;
         border-radius: 5px;
-        height: 103px;
-
-        &.external-link {
-          height: 123px;
-        }
+        height: 128px;
 
         img {
           border-radius: 5px;
@@ -127,11 +125,6 @@
         position: absolute;
         top: 0px;
         right: 0px;
-
-        img {
-          width: 201px;
-          height: 103px;
-        }
       }
     }
   }

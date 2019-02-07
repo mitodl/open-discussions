@@ -170,6 +170,19 @@ docker-compose run -p 9001:9001 watch npm run storybook
 Described below are some setup steps that are not strictly necessary
 for running Open Discussions
 
+### Enabling article image uploads (i.e.: uploading images to S3)
+
+Article posts give users the option to upload a cover image, and we show a thumbnail for that 
+image in post listings. We use Embedly to generate that thumbnail, so they will appear as 
+broken images unless you configure your app to upload to S3. Steps:
+
+1. Set `OPEN_DISCUSSIONS_USE_S3=True` in `.env`
+1. Also in `.env`, set these AWS variables: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, 
+    `AWS_STORAGE_BUCKET_NAME` 
+    
+    These values can be copied directly from the Open Discussions CI Heroku settings, or a 
+    fellow dev can provide them.
+
 ### Enabling email
 
 The app is usable without email-sending capability, but there is a lot of app functionality

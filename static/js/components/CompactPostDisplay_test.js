@@ -2,6 +2,7 @@
 /* global SETTINGS: false */
 import React from "react"
 import R from "ramda"
+import sinon from "sinon"
 import { assert } from "chai"
 import { mount } from "enzyme"
 import { Link } from "react-router-dom"
@@ -16,13 +17,21 @@ import { channelURL, postDetailURL, urlHostname, profileURL } from "../lib/url"
 import {
   PostTitleAndHostname,
   getPostDropdownMenuKey,
-  POST_PREVIEW_LINES
+  POST_PREVIEW_LINES,
+  EMBEDLY_THUMB_WIDTH,
+  EMBEDLY_THUMB_HEIGHT
 } from "../lib/posts"
+import * as postLib from "../lib/posts"
 import { makePost } from "../factories/posts"
 import { showDropdown } from "../actions/ui"
 import * as utilFuncs from "../lib/util"
 import { shouldIf } from "../lib/test_utils"
-import { LINK_TYPE_TEXT } from "../lib/channels"
+import {
+  LINK_TYPE_ARTICLE,
+  LINK_TYPE_LINK,
+  LINK_TYPE_TEXT
+} from "../lib/channels"
+import * as urlLib from "../lib/url"
 
 describe("CompactPostDisplay", () => {
   let helper, post, openMenu
@@ -147,7 +156,7 @@ describe("CompactPostDisplay", () => {
   })
 
   it("should include an external link, if a url post", () => {
-    const post = makePost(true)
+    post = makePost(true)
     const wrapper = renderPostDisplay({ post })
     const { href, target } = wrapper
       .find(".external-link a")
@@ -157,12 +166,46 @@ describe("CompactPostDisplay", () => {
     assert.equal(target, "_blank")
   })
 
-  it("should include a local image, if an article post with thumbnail", () => {
-    post.article_content = [{ a: "b" }]
-    post.thumbnail = "/static/media/img.jpg"
-    const wrapper = renderPostDisplay({ post })
-    const { src } = wrapper.find("img").props()
-    assert.equal(src, "/static/media/img.jpg")
+  describe("thumbnail image", () => {
+    let embedlyImgStub, embedlyUrl, getThumbnailSrcStub
+
+    beforeEach(() => {
+      embedlyUrl = "https://i.embed.ly/img.jpg"
+      embedlyImgStub = helper.sandbox
+        .stub(urlLib, "embedlyThumbnail")
+        .returns(embedlyUrl)
+      getThumbnailSrcStub = helper.sandbox.stub(postLib, "getThumbnailSrc")
+    })
+    ;[
+      [LINK_TYPE_LINK, "img.jpg", true],
+      [LINK_TYPE_LINK, null, false],
+      [LINK_TYPE_ARTICLE, "img.jpg", true],
+      [LINK_TYPE_ARTICLE, null, false]
+    ].forEach(([postType, thumbnailSrc, expImg]) => {
+      it(`${shouldIf(expImg)} be shown if thumbnail src=${String(
+        thumbnailSrc
+      )}`, () => {
+        const embedlyKeyVal = "abcdefg"
+        SETTINGS.embedlyKey = embedlyKeyVal
+        getThumbnailSrcStub.returns(thumbnailSrc)
+
+        post = makePost(postType === LINK_TYPE_LINK)
+        const wrapper = renderPostDisplay({ post })
+        const thumbnail = wrapper.find(".link-thumbnail img")
+
+        assert.equal(thumbnail.exists(), expImg)
+        if (expImg) {
+          assert.equal(thumbnail.prop("src"), embedlyUrl)
+          sinon.assert.calledWith(
+            embedlyImgStub,
+            embedlyKeyVal,
+            thumbnailSrc,
+            EMBEDLY_THUMB_HEIGHT,
+            EMBEDLY_THUMB_WIDTH
+          )
+        }
+      })
+    })
   })
 
   it("should set a class and show icon if stickied and showing pin ui", () => {

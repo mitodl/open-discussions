@@ -4,6 +4,15 @@ from django.db import migrations, models
 import profiles.utils
 
 
+def article_image_uri_small(instance, filename):
+    """
+    upload_to handler for Article.cover_image_small
+    """
+    return profiles.utils.generate_filepath(
+        filename, instance.post.post_id, "_article_small", "article"
+    )
+
+
 class Migration(migrations.Migration):
 
     dependencies = [("channels", "0014_add_allowed_post_types")]
@@ -26,7 +35,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 max_length=2083,
                 null=True,
-                upload_to=profiles.utils.article_image_uri_small,
+                upload_to=article_image_uri_small,
             ),
         ),
     ]

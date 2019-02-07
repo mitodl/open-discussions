@@ -17,7 +17,6 @@ from channels.constants import (
     LINK_TYPE_SELF,
 )
 from channels.models import Subscription, LinkMeta, Article
-from channels.utils import THUMBNAIL_DIMENSIONS
 from channels.views.test_utils import (
     default_post_response_data,
     raise_error_on_submission_fetch,
@@ -235,12 +234,7 @@ def test_create_article_post_with_cover(user_client, private_channel_and_contrib
     assert resp.json()["article_content"] == article_content
     article = Article.objects.get(post__post_id=resp.json()["id"])
     assert resp.json()["cover_image"].endswith(article.cover_image.url)
-    assert resp.json()["thumbnail"].endswith(article.cover_image_small.url)
     assert len(article.cover_image.read()) == os.path.getsize(png_file)
-    assert (article.cover_image_small.width, article.cover_image_small.height) == (
-        THUMBNAIL_DIMENSIONS.x,
-        THUMBNAIL_DIMENSIONS.y,
-    )
 
 
 def test_patch_article_validate_cover_image(
@@ -777,11 +771,6 @@ def test_update_article_cover(
     assert resp.status_code == status.HTTP_200_OK
     article = Article.objects.get(post__post_id=resp.json()["id"])
     assert len(article.cover_image.read()) == os.path.getsize(png_file)
-    assert "small" in article.cover_image_small.name
-    assert len(article.cover_image_small.read()) > 0
-    assert "{0:0.1f}".format(
-        article.cover_image_small.height / article.cover_image_small.width
-    ) == "{0:0.1f}".format(THUMBNAIL_DIMENSIONS.y / THUMBNAIL_DIMENSIONS.x)
 
     # Now update the article again, with the same cover (sent as URL)
     image_url = "http://localhost/{}".format(article.cover_image.url)
@@ -797,7 +786,6 @@ def test_update_article_cover(
     assert resp.status_code == status.HTTP_200_OK
     article = Article.objects.get(post__post_id=resp.json()["id"])
     assert article.cover_image.name == ""
-    assert article.cover_image_small.name == ""
 
 
 class PostDetailTests:

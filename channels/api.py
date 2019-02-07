@@ -966,7 +966,7 @@ class Api:
                     article.cover_image.save(
                         f"article_image_{post.id}.jpg", cover_image, save=False
                     )
-                    article.save(update_fields=["cover_image"], update_image=True)
+                    article.save(update_fields=["cover_image"])
 
             if created and url and post.link_meta is None and settings.EMBEDLY_KEY:
                 post.link_meta = get_or_create_link_meta(url)
@@ -1139,9 +1139,8 @@ class Api:
                     edited = True
             elif post.article.cover_image:
                 post.article.cover_image = None
-                post.article.cover_image_small = None
                 edited = True
-            post.article.save(update_image=(cover_image is not None))
+            post.article.save()
 
         if edited:
             # pylint: disable=protected-access

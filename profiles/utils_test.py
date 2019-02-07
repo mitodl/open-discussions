@@ -20,7 +20,6 @@ from profiles.utils import (
     generate_svg_avatar,
     generate_initials,
     article_image_uri,
-    article_image_uri_small,
 )
 
 
@@ -202,21 +201,6 @@ def test_article_image_uri():
             + article.post.post_id
             + r"\/myfile\-\d{4}\-\d{2}\-\d{2}T\d{6}_article\.jpg",
             article_image_uri(article, "myfile.jpg"),
-        )
-        is not None
-    )
-
-
-@pytest.mark.django_db
-def test_article_image_uri_small():
-    """ Test that article_image_uri_small provides the right URI for a post"""
-    article = ArticleFactory.create()
-    assert (
-        re.match(
-            r"article\/"
-            + article.post.post_id
-            + r"\/myfile\-\d{4}\-\d{2}\-\d{2}T\d{6}_article_small\.jpg",
-            article_image_uri_small(article, "myfile.jpg"),
         )
         is not None
     )
