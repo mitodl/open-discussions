@@ -104,7 +104,8 @@
       "description": "Domain used for emails sent via mailgun"
     },
     "OCW_CONTENT_BUCKET_NAME": {
-      "description": "Name of S3 bucket containing OCW course data"
+      "description": "Name of S3 bucket containing OCW course data",
+      "required": false
     },
     "OCW_CONTENT_ACCESS_KEY": {
       "description": "AWS access key for OCW content bucket",

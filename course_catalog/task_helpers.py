@@ -370,25 +370,24 @@ def format_date(date_str):
     return None
 
 
-def generate_course_prefix_map(bucket):
+def generate_course_prefix_list(bucket):
     """
-    Assembles a map of OCW courses & files from an S3 Bucket that contains all the raw jsons files
+    Assembles a list of OCW course prefixes from an S3 Bucket that contains all the raw jsons files
 
     Args:
         bucket (s3.Bucket): Instantiated S3 Bucket object
     Returns:
         List of course prefixes
     """
-    ocw_courses = {}
+    ocw_courses = set()
     log.info("Assembling list of courses...")
     for bucket_file in bucket.objects.all():
         key_pieces = bucket_file.key.split("/")
-        department_prefix = (
+        course_prefix = (
             "/".join(key_pieces[0:2]) if key_pieces[0] == "PROD" else key_pieces[0]
         )
         # retrieve courses, skipping non-courses (bootcamps, department topics, etc)
-        if department_prefix not in NON_COURSE_DIRECTORIES:
-            course_prefix = "/".join(key_pieces[:-2])
-            if course_prefix != "":
-                ocw_courses.setdefault(course_prefix, []).append(bucket_file)
-    return ocw_courses
+        if course_prefix not in NON_COURSE_DIRECTORIES:
+            if "/".join(key_pieces[:-2]) != "":
+                ocw_courses.add("/".join(key_pieces[:-2]) + "/")
+    return list(ocw_courses)

@@ -190,7 +190,7 @@ def test_get_ocw_data_error_parsing(settings, mocker, mock_logger):
     get_ocw_data()
     mock_logger.assert_called_once_with(
         "Error encountered parsing OCW json for %s",
-        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007",
+        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
     )
 
 
@@ -204,5 +204,5 @@ def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger):
     get_ocw_data()
     mock_logger.assert_called_once_with(
         "Error encountered reading 1.json for %s",
-        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007",
+        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
     )
