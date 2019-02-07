@@ -5,9 +5,10 @@ import logging
 
 import requests
 import boto3
-from ocw_data_parser import OCWParser
-from celery.task import task
 from django.conf import settings
+from ocw_data_parser import OCWParser
+
+from open_discussions.celery import app
 from course_catalog.models import Course
 from course_catalog.task_helpers import (
     get_access_token,
@@ -23,7 +24,7 @@ from course_catalog.task_helpers import (
 log = logging.getLogger(__name__)
 
 
-@task
+@app.task
 def get_edx_data(force_overwrite=False):
     """
     Task to sync mitx data with the database
@@ -55,7 +56,7 @@ def get_edx_data(force_overwrite=False):
         url = response.json()["next"]
 
 
-@task
+@app.task
 def get_ocw_data(upload_to_s3=True):  # pylint:disable=too-many-locals
     """
     Task to sync OCW course data with database
