@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.65.2 (Released February 07, 2019)
+--------------
+
+- upgrade to react v16.8
+- Fixed bug with preview text for posts including a base64-encoded image
+- Bumped ES docker image version to 6.5.4
+
 Version 0.65.1 (Released February 06, 2019)
 --------------
 
