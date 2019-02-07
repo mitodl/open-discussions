@@ -35,6 +35,7 @@ def get_edx_data(force_overwrite=False):
         and settings.EDX_API_CLIENT_ID
         and settings.EDX_API_CLIENT_SECRET
     ):
+        log.warning("Required settings missing for get_edx_data")
         return
     url = settings.EDX_API_URL
     access_token = get_access_token()
@@ -67,6 +68,7 @@ def get_ocw_data(upload_to_s3=True):  # pylint:disable=too-many-locals
         and settings.OCW_LEARNING_COURSE_ACCESS_KEY
         and settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY
     ):
+        log.warning("Required settings missing for get_ocw_data")
         return
     raw_data_bucket = boto3.resource(
         "s3",
