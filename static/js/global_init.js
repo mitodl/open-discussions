@@ -19,7 +19,6 @@ const _createSettings = () => ({
   },
   allow_anonymous:        false,
   allow_saml_auth:        false,
-  allow_widgets_ui:       false,
   allow_related_posts_ui: false,
   is_authenticated:       true,
   is_admin:               false,

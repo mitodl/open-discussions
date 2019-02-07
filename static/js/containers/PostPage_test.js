@@ -17,6 +17,7 @@ import {
   makeMoreComments
 } from "../factories/comments"
 import { makeChannel } from "../factories/channels"
+import { makeWidgetListResponse } from "../factories/widgets"
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
 import { SET_CHANNEL_DATA } from "../actions/channel"
@@ -77,6 +78,7 @@ describe("PostPage", function() {
     helper.deletePostStub.returns(Promise.resolve())
     helper.getReportsStub.returns(Promise.resolve(R.times(makeReportRecord, 4)))
     helper.getProfileStub.returns(Promise.resolve(""))
+    helper.getWidgetListStub.returns(Promise.resolve(makeWidgetListResponse(0)))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
     twitterEmbedStub = helper.sandbox.stub(embedUtil, "ensureTwitterEmbedJS")
@@ -348,6 +350,8 @@ describe("PostPage", function() {
         actions.posts["delete"].successType,
         actions.channels.get.requestType,
         actions.channels.get.successType,
+        actions.widgets.get.requestType,
+        actions.widgets.get.successType,
         actions.postsForChannel.get.requestType,
         SET_SNACKBAR_MESSAGE,
         HIDE_DIALOG

@@ -147,10 +147,12 @@ export const makeWidgetSpec = (widgetType: ?string = null): WidgetSpec => {
   }
 }
 
-export const makeWidgetListResponse = (): WidgetListResponse => ({
+export const makeWidgetListResponse = (
+  numWidgets: number = 3
+): WidgetListResponse => ({
   // $FlowFixMe
   id:                listIncr.next().value,
-  widgets:           R.range(1, 3).map(() => makeWidgetInstance()),
+  widgets:           R.range(1, numWidgets).map(() => makeWidgetInstance()),
   available_widgets: Object.keys(validWidgetRenderers).map(widgetType =>
     makeWidgetSpec(widgetType)
   )

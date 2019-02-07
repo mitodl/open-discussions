@@ -85,7 +85,6 @@ describe("Channels API", () => {
     const input = {
       name:               "name",
       title:              "title",
-      description:        "description",
       public_description: "public_description",
       channel_type:       "public"
     }
@@ -109,7 +108,6 @@ describe("Channels API", () => {
     const input = {
       name:               "name",
       title:              "title",
-      description:        "description",
       public_description: "public_description",
       channel_type:       "public"
     }
@@ -120,7 +118,6 @@ describe("Channels API", () => {
         method: PATCH,
         body:   JSON.stringify({
           title:              input.title,
-          description:        input.description,
           public_description: input.public_description,
           channel_type:       input.channel_type
         })

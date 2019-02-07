@@ -38,18 +38,6 @@ const CreateChannelForm = ({ onSubmit, onUpdate, form }: Props) => (
       />
     </div>
     <div className="form-item">
-      <label htmlFor="description" className="label">
-        Description
-      </label>
-      <textarea
-        name="description"
-        type="text"
-        className="input"
-        value={form.description}
-        onChange={onUpdate}
-      />
-    </div>
-    <div className="form-item">
       <div className="label">Channel Type</div>
       <div className="input">
         <input

@@ -34,11 +34,9 @@ describe("CreateChannelForm", () => {
   it("should render a blank form", () => {
     const wrapper = renderForm(form)
     const [title, name] = wrapper.find('input[type="text"]')
-    const [description] = wrapper.find("textarea")
     const [radioPublic, radioPrivate] = wrapper.find('input[type="radio"]')
     assert.equal(title.props.value, "")
     assert.equal(name.props.value, "")
-    assert.equal(description.props.value, "")
     assert.equal(radioPublic.props.value, CHANNEL_TYPE_PUBLIC)
     assert.equal(radioPublic.props.checked, true)
     assert.equal(radioPrivate.props.value, CHANNEL_TYPE_PRIVATE)
@@ -62,7 +60,7 @@ describe("CreateChannelForm", () => {
     })
 
     describe("onUpdate", () => {
-      for (const inputName of ["title", "name", "description"]) {
+      for (const inputName of ["title", "name"]) {
         it(`should be called when ${inputName} input is modified`, () => {
           const event = { target: { value: "text" } }
           assert.isNotOk(onSubmit.called)

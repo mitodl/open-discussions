@@ -22,7 +22,6 @@ describe("Channel utils", () => {
     assert.deepEqual(newChannelForm(), {
       title:                 "",
       name:                  "",
-      description:           "",
       public_description:    "",
       channel_type:          CHANNEL_TYPE_PUBLIC,
       allowed_post_types:    [LINK_TYPE_TEXT, LINK_TYPE_LINK],
@@ -36,7 +35,6 @@ describe("Channel utils", () => {
     assert.deepEqual(editChannelForm(channel), {
       title:              channel.title,
       name:               channel.name,
-      description:        channel.description,
       public_description: channel.public_description,
       channel_type:       channel.channel_type,
       allowed_post_types: channel.allowed_post_types

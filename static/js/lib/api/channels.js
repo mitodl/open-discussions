@@ -30,7 +30,6 @@ export function createChannel(channel: Channel): Promise<Channel> {
         [
           "name",
           "title",
-          "description",
           "public_description",
           "channel_type",
           "membership_is_managed"
@@ -46,13 +45,7 @@ export function updateChannel(channel: Channel): Promise<Channel> {
     method: PATCH,
     body:   JSON.stringify(
       R.pickAll(
-        [
-          "title",
-          "description",
-          "public_description",
-          "channel_type",
-          "allowed_post_types"
-        ],
+        ["title", "public_description", "channel_type", "allowed_post_types"],
         channel
       )
     )

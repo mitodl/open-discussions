@@ -13,6 +13,7 @@ import {
   makeModerators,
   makeSubscriber
 } from "../../factories/channels"
+import { makeWidgetListResponse } from "../../factories/widgets"
 import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
 import { FORM_VALIDATE, FORM_UPDATE } from "../../actions/forms"
@@ -88,6 +89,7 @@ describe("EditChannelModeratorsPage", () => {
       })
     )
     helper.getProfileStub.returns(Promise.resolve(""))
+    helper.getWidgetListStub.returns(Promise.resolve(makeWidgetListResponse(0)))
     window.scrollTo = helper.sandbox.stub()
   })
 
@@ -154,6 +156,10 @@ describe("EditChannelModeratorsPage", () => {
       await mountedRenderPage([
         actions.channels.get.requestType,
         actions.channels.get.successType,
+        actions.postsForChannel.get.requestType,
+        actions.postsForChannel.get.successType,
+        actions.widgets.get.requestType,
+        actions.widgets.get.successType,
         actions.forms.FORM_END_EDIT
       ])
 

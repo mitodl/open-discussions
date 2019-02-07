@@ -36,7 +36,6 @@ export const MISSING_TEXT = "<missing>"
 export const newChannelForm = (): ChannelForm => ({
   name:                  "",
   title:                 "",
-  description:           "",
   public_description:    "",
   channel_type:          CHANNEL_TYPE_PUBLIC,
   allowed_post_types:    [LINK_TYPE_TEXT, LINK_TYPE_LINK],
@@ -48,7 +47,6 @@ export const editChannelForm = (channel: Channel): ChannelForm =>
     [
       "name",
       "title",
-      "description",
       "public_description",
       "channel_type",
       "allowed_post_types"

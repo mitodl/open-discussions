@@ -16,7 +16,6 @@ export type FormImage = {
 export type Channel = {
   name:                  string,
   title:                 string,
-  description:           string,
   public_description:    string,
   channel_type:          ChannelType,
   num_users:             number,
@@ -36,7 +35,6 @@ export type Channel = {
 export type ChannelForm = {
   name:                   string,
   title:                  string,
-  description:            string,
   public_description:     string,
   channel_type:           ChannelType,
   allowed_post_types:     Array<LinkType>,
@@ -47,7 +45,6 @@ export type ChannelForm = {
 
 export type ChannelAppearanceEditValidation = {
   title:              string,
-  description:        string,
   public_description: string
 }
 

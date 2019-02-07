@@ -50,7 +50,6 @@ describe("EditChannelBasicForm", () => {
     assert.equal(restrictedOption.props.checked, false)
     assert.equal(privateOption.props.value, CHANNEL_TYPE_PRIVATE)
     assert.equal(privateOption.props.checked, false)
-    assert.equal(wrapper.find("description").value, null)
   })
 
   describe("callbacks", () => {
@@ -72,8 +71,7 @@ describe("EditChannelBasicForm", () => {
     //
     ;[
       ["channel_type", CHANNEL_TYPE_PUBLIC],
-      ["allowed_post_types", LINK_TYPE_TEXT],
-      ["description", "Channel description"]
+      ["allowed_post_types", LINK_TYPE_TEXT]
     ].forEach(([name, value]) => {
       describe("onUpdate", () => {
         it(`should be called when ${name} input is modified`, () => {

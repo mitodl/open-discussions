@@ -37,11 +37,9 @@ describe("ChannelSettingsLink", () => {
   afterEach(() => {
     helper.cleanup()
   })
+
   describe("dropdown menu", () => {
-    beforeEach(() => {
-      SETTINGS.allow_widgets_ui = true
-    })
-    ;[true, false].forEach(isOpen => {
+    [true, false].forEach(isOpen => {
       it(`renders a ${isOpen ? "visible" : "hidden"} menu`, async () => {
         if (isOpen) {
           dropdownMenus.add(CHANNEL_SETTINGS_MENU_DROPDOWN)
@@ -96,20 +94,6 @@ describe("ChannelSettingsLink", () => {
           }
         }
       ])
-    })
-  })
-
-  describe("link", () => {
-    beforeEach(() => {
-      SETTINGS.allow_widgets_ui = false
-    })
-
-    it("renders a link to the channel settings", async () => {
-      const { inner } = await render()
-      assert.equal(
-        inner.find("Link").prop("to"),
-        editChannelBasicURL(channel.name)
-      )
     })
   })
 })

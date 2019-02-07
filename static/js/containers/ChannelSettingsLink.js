@@ -44,14 +44,6 @@ export class ChannelSettingsLink extends React.Component<Props> {
   render = () => {
     const { channel, isOpen, hideDropdown } = this.props
 
-    if (!SETTINGS.allow_widgets_ui) {
-      return (
-        <Link to={editChannelBasicURL(channel.name)} className="edit-button">
-          <i className="material-icons settings">settings</i>
-        </Link>
-      )
-    }
-
     return (
       <React.Fragment>
         <a onClick={this.toggleMenu} className="edit-button">

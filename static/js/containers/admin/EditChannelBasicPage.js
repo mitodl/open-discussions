@@ -110,7 +110,7 @@ class EditChannelBasicPage extends React.Component<Props> {
       )
     } else {
       const patchValue = R.pickAll(
-        ["name", "channel_type", "description", "allowed_post_types"],
+        ["name", "channel_type", "allowed_post_types"],
         channelForm.value
       )
       dispatch(actions.channels.patch(patchValue)).then(channel => {

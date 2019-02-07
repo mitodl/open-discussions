@@ -10,7 +10,9 @@ import ChannelPage, { ChannelPage as InnerChannelPage } from "./ChannelPage"
 
 import { makeChannelList } from "../factories/channels"
 import { makeChannelPostList } from "../factories/posts"
+import { makeWidgetListResponse } from "../factories/widgets"
 import { actions } from "../actions"
+import { FORM_END_EDIT } from "../actions/forms"
 import { SET_POST_DATA } from "../actions/post"
 import { SET_CHANNEL_DATA } from "../actions/channel"
 import { EVICT_POSTS_FOR_CHANNEL } from "../actions/posts_for_channel"
@@ -35,6 +37,7 @@ describe("ChannelPage", () => {
     helper.getPostsForChannelStub.returns(Promise.resolve({ posts: postList }))
     helper.getReportsStub.returns(Promise.resolve(R.times(makeReportRecord, 4)))
     helper.getProfileStub.returns(Promise.resolve(""))
+    helper.getWidgetListStub.returns(Promise.resolve(makeWidgetListResponse(0)))
     render = helper.configureHOCRenderer(
       ChannelPage,
       InnerChannelPage,
@@ -107,6 +110,8 @@ describe("ChannelPage", () => {
         actions.postsForChannel.get.successType,
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType,
+        actions.widgets.get.requestType,
+        actions.widgets.get.successType,
         SET_POST_DATA,
         SET_CHANNEL_DATA
       ])
@@ -132,7 +137,10 @@ describe("ChannelPage", () => {
           actions.channels.get.successType,
           actions.postsForChannel.get.requestType,
           actions.postsForChannel.get.successType,
-          EVICT_POSTS_FOR_CHANNEL
+          actions.widgets.get.requestType,
+          actions.widgets.get.successType,
+          EVICT_POSTS_FOR_CHANNEL,
+          FORM_END_EDIT // this is because of WidgetListContainer
         ],
         () => {
           helper.browserHistory.push(channelURL(otherChannel.name))
