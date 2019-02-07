@@ -27,6 +27,7 @@ from search.indexing_api import (
     UPDATE_CONFLICT_SETTING,
     index_courses,
     index_profiles,
+    delete_document,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
@@ -479,3 +480,14 @@ def test_index_courses_error(mocked_es, mocker, settings, user):
     mocker.patch("search.indexing_api.bulk", autospec=True, return_value=(0, ["error"]))
     with pytest.raises(ReindexException):
         index_courses([1, 2, 3])
+
+
+def test_delete_document(mocked_es, mocker):
+    """
+    ES should try deleting the specified document from the correct index
+    """
+    mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
+    )
+    delete_document(1, "course")
+    mocked_es.conn.delete.assert_called_with(index="a", doc_type=GLOBAL_DOC_TYPE, id=1)

@@ -22,6 +22,7 @@ from search.tasks import (
     index_profiles,
     index_comments,
     index_courses,
+    delete_document,
 )
 
 
@@ -243,3 +244,10 @@ def test_index_courses(mocker, with_error):  # pylint: disable=unused-argument
     assert result == ("index_courses threw an error" if with_error else None)
 
     index_courses_mock.assert_called_once_with([1, 2, 3])
+
+
+def test_delete_document(mocker):
+    """delete_document should call the api function of the same name"""
+    delete_document_mock = mocker.patch("search.indexing_api.delete_document")
+    delete_document.delay(1, "course").get()
+    delete_document_mock.assert_called_once_with(1, "course")
