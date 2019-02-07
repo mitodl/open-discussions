@@ -66,8 +66,6 @@ class BasePostSerializer(RedditObjectSerializer):
 
     def get_thumbnail(self, instance):
         """Returns a thumbnail url or null"""
-        if instance.article and instance.article.cover_image_small:
-            return urljoin(SITE_BASE_URL, instance.article.cover_image_small.url)
         return instance.link_meta.thumbnail if instance.link_meta is not None else None
 
     def get_slug(self, instance):

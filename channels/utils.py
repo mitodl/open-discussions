@@ -22,8 +22,6 @@ AVATAR_MEDIUM_MAX_DIMENSION = 90
 
 ImageSize = namedtuple("ImageSize", ["x", "y"])
 
-THUMBNAIL_DIMENSIONS = ImageSize(201, 103)
-
 User = get_user_model()
 
 ListingParams = namedtuple("ListingParams", ["before", "after", "count", "sort"])

@@ -13,7 +13,8 @@ import {
   postFormIsContentless,
   isPostContainingText,
   getPlainTextContent,
-  isEditablePostType
+  isEditablePostType,
+  getThumbnailSrc
 } from "./posts"
 import { makeChannelPostList, makePost } from "../factories/posts"
 import { urlHostname } from "./url"
@@ -175,13 +176,13 @@ describe("Post utils", () => {
     const txt = "magnets, how do they work?"
     ;[
       [LINK_TYPE_LINK, {}, null, "link post"],
-      [LINK_TYPE_ARTICLE, { plain_text: txt }, txt, "article post"],
-      [LINK_TYPE_TEXT, { plain_text: txt }, txt, "text post"],
-      [LINK_TYPE_TEXT, { text: txt }, null, "text post w/ empty plain text"]
+      [LINK_TYPE_ARTICLE, { plain_text: txt }, txt, "article posts"],
+      [LINK_TYPE_TEXT, { plain_text: txt }, txt, "text posts"],
+      [LINK_TYPE_TEXT, { text: txt }, null, "text posts w/ empty plain text"]
     ].forEach(([postType, updatedProperties, expReturnValue, desc]) => {
       it(`${shouldIf(
         !!expReturnValue
-      )} return some text content for a ${desc}`, () => {
+      )} return some text content for ${desc}`, () => {
         const post = {
           ...makePost(postType === LINK_TYPE_LINK),
           ...updatedProperties,
@@ -205,6 +206,33 @@ describe("Post utils", () => {
         isEditablePostType({ ...makePost(), post_type: postType }),
         expectation
       )
+    })
+  })
+
+  describe("getThumbnailSrc", () => {
+    const src = "img.jpg"
+    ;[
+      [LINK_TYPE_LINK, { thumbnail: src }, src, "link posts w/ thumbnail"],
+      [LINK_TYPE_ARTICLE, { cover_image: src }, src, "articles w/ cover image"],
+      [LINK_TYPE_LINK, { thumbnail: "" }, null, "link posts w/ no thumbnail"],
+      [
+        LINK_TYPE_ARTICLE,
+        { cover_image: "" },
+        null,
+        "articles w/ no cover image"
+      ],
+      [LINK_TYPE_TEXT, {}, null, "text posts"]
+    ].forEach(([postType, updatedProperties, expReturnValue, desc]) => {
+      it(`${shouldIf(
+        !!expReturnValue
+      )} return an image source for ${desc}`, () => {
+        const post = {
+          ...makePost(postType === LINK_TYPE_LINK),
+          ...updatedProperties,
+          post_type: postType
+        }
+        assert.equal(getThumbnailSrc(post), expReturnValue)
+      })
     })
   })
 })

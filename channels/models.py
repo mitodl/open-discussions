@@ -18,7 +18,6 @@ from channels.constants import (
 from channels.utils import (
     AVATAR_MEDIUM_MAX_DIMENSION,
     AVATAR_SMALL_MAX_DIMENSION,
-    THUMBNAIL_DIMENSIONS,
     reddit_slugify,
 )
 from open_discussions.models import TimestampedModel
@@ -29,8 +28,6 @@ from profiles.utils import (
     banner_uri,
     make_thumbnail,
     article_image_uri,
-    article_image_uri_small,
-    make_cropped_thumbnail,
 )
 
 
@@ -240,26 +237,7 @@ class Article(TimestampedModel):
     cover_image = models.ImageField(
         null=True, blank=True, max_length=2083, upload_to=article_image_uri
     )
-    cover_image_small = models.ImageField(
-        null=True, blank=True, max_length=2083, upload_to=article_image_uri_small
-    )
     content = JSONField()
-
-    def save(
-        self, *args, update_image=False, **kwargs
-    ):  # pylint: disable=arguments-differ
-        if update_image:
-            if self.cover_image:
-                small_thumbnail = make_cropped_thumbnail(
-                    self.cover_image, THUMBNAIL_DIMENSIONS.x, THUMBNAIL_DIMENSIONS.y
-                )
-
-                # name doesn't matter here, we use upload_to to produce that
-                self.cover_image_small.save(f"{uuid4().hex}.jpg", small_thumbnail)
-            else:
-                self.cover_image_small = None
-
-        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.post.id} on channel {self.post.channel} by {self.author.profile.name}"

@@ -22,6 +22,7 @@ import {
   getPostDropdownMenuKey,
   postMenuDropdownFuncs,
   getPlainTextContent,
+  getThumbnailSrc,
   POST_PREVIEW_LINES,
   EMBEDLY_THUMB_HEIGHT,
   EMBEDLY_THUMB_WIDTH
@@ -133,6 +134,57 @@ export class CompactPostDisplay extends React.Component<Props> {
     )
   }
 
+  renderThumbnailColumn = (): ?React$Element<*> => {
+    const { post } = this.props
+
+    const thumbnailSrc = getThumbnailSrc(post)
+    if (post.post_type !== LINK_TYPE_LINK && !thumbnailSrc) {
+      return null
+    }
+
+    let thumbnailImg
+    if (thumbnailSrc) {
+      thumbnailImg = (
+        <img
+          alt="Post thumbnail"
+          src={embedlyThumbnail(
+            SETTINGS.embedlyKey,
+            thumbnailSrc,
+            EMBEDLY_THUMB_HEIGHT,
+            EMBEDLY_THUMB_WIDTH
+          )}
+        />
+      )
+    }
+
+    return (
+      <div
+        className={`column2 ${thumbnailImg ? "link-thumbnail" : ""} ${
+          post.post_type === LINK_TYPE_LINK ? "external-link" : ""
+        }`}
+      >
+        <React.Fragment>
+          {post.post_type === LINK_TYPE_LINK ? (
+            <div className="top-right">
+              <a href={post.url} target="_blank" rel="noopener noreferrer">
+                <i className="material-icons open_in_new top-right overlay-icon">
+                  open_in_new
+                </i>
+              </a>
+            </div>
+          ) : null}
+          {post.post_type === LINK_TYPE_LINK ? (
+            <a href={post.url} target="_blank" rel="noopener noreferrer">
+              {thumbnailImg}
+            </a>
+          ) : (
+            thumbnailImg
+          )}
+        </React.Fragment>
+      </div>
+    )
+  }
+
   render() {
     const { post, showPinUI } = this.props
 
@@ -200,39 +252,7 @@ export class CompactPostDisplay extends React.Component<Props> {
           </div>
           <div className="preview-footer">{this.renderFooterContents()}</div>
         </div>
-        {post.post_type === LINK_TYPE_LINK || post.thumbnail ? (
-          <div
-            className={`column2 ${post.thumbnail ? "link-thumbnail" : ""} ${
-              post.post_type === LINK_TYPE_LINK ? "external-link" : ""
-            }`}
-          >
-            {post.post_type === LINK_TYPE_LINK ? (
-              <React.Fragment>
-                <div className="top-right">
-                  <a href={post.url} target="_blank" rel="noopener noreferrer">
-                    <i className="material-icons open_in_new top-right overlay-icon">
-                      open_in_new
-                    </i>
-                  </a>
-                </div>
-                {post.thumbnail ? (
-                  <a href={post.url} target="_blank" rel="noopener noreferrer">
-                    <img
-                      src={embedlyThumbnail(
-                        SETTINGS.embedlyKey,
-                        post.thumbnail,
-                        EMBEDLY_THUMB_HEIGHT,
-                        EMBEDLY_THUMB_WIDTH
-                      )}
-                    />
-                  </a>
-                ) : null}
-              </React.Fragment>
-            ) : (
-              <img src={post.thumbnail} />
-            )}
-          </div>
-        ) : null}
+        {this.renderThumbnailColumn()}
       </Card>
     )
   }
