@@ -1,0 +1,177 @@
+{
+    "tcATmit_subject_tags": [], 
+    "features_tracking": [], 
+    "widgets_features": [], 
+    "chp_image": "999a1828cfd87c370be8c4f13f3305d0", 
+    "_classname": "CourseHomeSection", 
+    "has_inline_embed": false, 
+    "_content_type_text": "text/plain", 
+    "_content_type_image_alternate_text": "text/plain", 
+    "text": "\r\n", 
+    "_content_type_publisher": "text/plain", 
+    "_content_type_license": "text/plain", 
+    "ad_type": "HOUSE", 
+    "other_information_text": "", 
+    "aggregationlevel": 4, 
+    "_uid": "e6e9b56002a4abc57d15f779cab5088a", 
+    "_workflow_history": {
+        "page_workflow": [
+            {
+                "action": null, 
+                "review_state": "waiting_for_authoring", 
+                "comments": "", 
+                "actor": "admin", 
+                "time": "2010/05/14 07:42:20.721 GMT-4"
+            }, 
+            {
+                "action": "approve_to_staging", 
+                "review_state": "ready_for_staging", 
+                "actor": "admin", 
+                "comments": "", 
+                "time": "2010/05/16 11:30:40.088 GMT-4"
+            }
+        ]
+    }, 
+    "expirationDate": "None", 
+    "_content_type_id": "text/plain", 
+    "category_features": [], 
+    "related_content": "", 
+    "id": "index.htm", 
+    "is_media_gallery": false, 
+    "related_mit_links": "", 
+    "rights": "This site (c) Massachusetts Institute of Technology 2010.  Content within individual courses is (c) by the individual authors unless otherwise noted. The Massachusetts Institute of Technology is providing this Work (as defined below) under the terms of this Creative Commons public license (\"CCPL\" or \"license\") unless otherwise noted. The Work is protected by copyright and/or other applicable law. Any use of the work other than as authorized under this license is prohibited. By exercising any of the rights to the Work provided here, You (as defined below) accept and agree to be bound by the terms of this license. The Licensor, the Massachusetts Institute of Technology, grants You the rights contained here in consideration of Your acceptance of such terms and conditions.", 
+    "contributors": [], 
+    "effectiveDate": "None", 
+    "title": "Course Home", 
+    "parent_module": "16197636c270e1ab179fbc9a56c72787", 
+    "_content_type_ad_type": "text/plain", 
+    "_userdefined_roles": [], 
+    "curriculum_information": "", 
+    "unique_identifier": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/index.htm", 
+    "_gopip": 0, 
+    "location": "", 
+    "_atrefs": {
+        "chp_image": [
+            "999a1828cfd87c370be8c4f13f3305d0"
+        ], 
+        "BelongsTo": [
+            "16197636c270e1ab179fbc9a56c72787"
+        ], 
+        "chp_image_thumb": [
+            "58427ca7f9593b1f01a521650370105f"
+        ]
+    }, 
+    "_content_type_title": "text/plain", 
+    "feature_requirements": [], 
+    "_atbrefs": {}, 
+    "_content_type": "text/plain", 
+    "_type": "CourseHomeSection", 
+    "technical_location": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/index.htm", 
+    "other_versions": "", 
+    "description": "\n<p>This course considers the process of neurotransmission, especially chemicals used in the brain and elsewhere to carry signals from nerve terminals to the structures they innervate. We focus on monoamine transmitters (acetylcholine; serotonin; dopamine and norepinephrine); we also examine amino acid and peptide transmitters and neuromodulators like adenosine. Macromolecules that mediate neurotransmitter synthesis, release, inactivation and receptor-mediated actions are discussed, as well as factors that regulate their activity and the second-messenger systems and ion fluxes that they control. The involvement of particular neurotransmitters in human diseases is considered.</p>", 
+    "software_requirements": [
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "40.0", 
+            "software_name_col": "Chrome", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "8.0", 
+            "software_name_col": "Safari", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "38.0", 
+            "software_name_col": "Mozilla Firefox", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "9.0", 
+            "software_name_col": "Internet Explorer", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "13.1", 
+            "software_name_col": "Edge", 
+            "maximum_version_col": ""
+        }
+    ], 
+    "_content_type_technical_location": "text/plain", 
+    "_layout": "custom_view", 
+    "_properties": [
+        [
+            "title", 
+            "Course Home", 
+            "string"
+        ]
+    ], 
+    "subject": [], 
+    "_content_type_rights": "text/html", 
+    "_directly_provided": [
+        "Products.CMFEditions.interfaces.IVersioned"
+    ], 
+    "image_caption_text": "\n<p>Image of the neurotransmitter serotonin. (Image courtesy of MIT's Department of Brain and Cognitive Sciences.)</p>", 
+    "image_alternate_text": "The neurotransmitter serotonin.", 
+    "_content_type_materialtype": "text/plain", 
+    "tcATmit_instructional_tags": [], 
+    "creation_date": "2010/05/14 07:42:20.716 GMT-4", 
+    "highlights_text": "", 
+    "parent_uid": "16197636c270e1ab179fbc9a56c72787", 
+    "modification_date": "2016/09/24 02:10:11.186 GMT-4", 
+    "course_linking": [], 
+    "publisher": "MIT OpenCourseWare", 
+    "excludeFromNav": false, 
+    "language": "", 
+    "license": "http://creativecommons.org/licenses/by-nc-sa/3.0/us/", 
+    "chp_image_thumb": "58427ca7f9593b1f01a521650370105f", 
+    "url_rewrite_patterns": [], 
+    "always_publish": false, 
+    "_id": "index.htm", 
+    "materialtype": "Other", 
+    "technical_requirements_text": "", 
+    "_content_type_unique_identifier": "text/plain", 
+    "_content_type_description": "text/html", 
+    "_owner": "admin", 
+    "_defaultpage": "", 
+    "firstTimeEdit": true, 
+    "_permissions": {
+        "Modify portal content": {
+            "acquire": false, 
+            "roles": [
+                "Manager", 
+                "MetadataEditor"
+            ]
+        }, 
+        "Access contents information": {
+            "acquire": false, 
+            "roles": [
+                "Authenticated"
+            ]
+        }, 
+        "View": {
+            "acquire": false, 
+            "roles": [
+                "Authenticated"
+            ]
+        }
+    }, 
+    "ad_champion_text": "", 
+    "allowDiscussion": false, 
+    "metadata_contributor_list": [], 
+    "_content_type_image_caption_text": "text/html", 
+    "creators": [
+        "admin"
+    ], 
+    "courselist_features": [], 
+    "_ac_local_roles": {
+        "admin": [
+            "Owner"
+        ]
+    }, 
+    "_path": "/Plone/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/index.htm"
+}

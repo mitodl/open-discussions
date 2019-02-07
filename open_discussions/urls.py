@@ -40,6 +40,7 @@ urlpatterns = [
     url(r"", include("search.urls")),
     url(r"", include("ckeditor.urls")),
     url(r"", include("widgets.urls")),
+    url(r"", include("course_catalog.urls")),
     url(r"^api/token/refresh/", refresh_jwt_token),
     # React App
     url(r"^$", index, name="open_discussions-index"),

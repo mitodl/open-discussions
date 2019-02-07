@@ -91,6 +91,7 @@ INSTALLED_APPS = (
     "notifications",
     "search",
     "widgets",
+    "course_catalog",
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -537,6 +538,14 @@ CELERY_BEAT_SCHEDULE = {
         "task": "notifications.tasks.send_weekly_frontpage_digests",
         "schedule": crontab(minute=0, hour=14, day_of_week=2),  # 10am EST on tuesdays
     },
+    "update_edx-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_edx_data",
+        "schedule": crontab(minute=0, hour=4),  # 12am EST
+    },
+    "update_ocw-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_ocw_data",
+        "schedule": crontab(minute=0, hour=5),  # 1am EST
+    },
 }
 
 CELERY_TASK_SERIALIZER = "json"
@@ -721,3 +730,23 @@ ANONYMOUS_USER_NAME = None
 # Algolia Places API
 ALGOLIA_APP_ID = get_string("ALGOLIA_APP_ID", None)
 ALGOLIA_API_KEY = get_string("ALGOLIA_API_KEY", None)
+
+
+# EDX API Credentials
+COURSE_API_DEFAULT_LIMIT = 10
+COURSE_API_MAX_LIMIT = 10
+EDX_API_URL = get_string("EDX_API_URL", None)
+EDX_API_CLIENT_ID = get_string("EDX_API_CLIENT_ID", None)
+EDX_API_CLIENT_SECRET = get_string("EDX_API_CLIENT_SECRET", None)
+
+# S3 Bucket info for OCW Plone CMS exports
+OCW_CONTENT_BUCKET_NAME = get_string("OCW_CONTENT_BUCKET_NAME", None)
+OCW_CONTENT_ACCESS_KEY = get_string("OCW_CONTENT_ACCESS_KEY", None)
+OCW_CONTENT_SECRET_ACCESS_KEY = get_string("OCW_CONTENT_SECRET_ACCESS_KEY", None)
+
+# S3 Bucket info for exporting OCW Plone media files
+OCW_LEARNING_COURSE_BUCKET_NAME = get_string("OCW_LEARNING_COURSE_BUCKET_NAME", None)
+OCW_LEARNING_COURSE_ACCESS_KEY = get_string("OCW_LEARNING_COURSE_ACCESS_KEY", None)
+OCW_LEARNING_COURSE_SECRET_ACCESS_KEY = get_string(
+    "OCW_LEARNING_COURSE_SECRET_ACCESS_KEY", None
+)

@@ -47,6 +47,18 @@
       "description": "Cloudfront distribution",
       "required": false
     },
+    "EDX_API_URL": {
+      "description": "URL to retrieve MITx course data from",
+      "required": false
+    },
+    "EDX_API_CLIENT_ID": {
+      "description": "EdX client id to access the MITx course catalog API",
+      "required": false
+    },
+    "EDX_API_CLIENT_SECRET": {
+      "description": "EdX secret key to access the MITx course catalog API",
+      "required": false
+    },
     "ELASTICSEARCH_HTTP_AUTH": {
       "description": "Basic auth settings for connecting to Elasticsearch"
     },
@@ -90,6 +102,30 @@
     },
     "MAILGUN_SENDER_DOMAIN": {
       "description": "Domain used for emails sent via mailgun"
+    },
+    "OCW_CONTENT_BUCKET_NAME": {
+      "description": "Name of S3 bucket containing OCW course data",
+      "required": false
+    },
+    "OCW_CONTENT_ACCESS_KEY": {
+      "description": "AWS access key for OCW content bucket",
+      "required": false
+    },
+    "OCW_CONTENT_SECRET_ACCESS_KEY": {
+      "description": "AWS secret key for OCW content bucket",
+      "required": false
+    },
+    "OCW_LEARNING_COURSE_BUCKET_NAME": {
+      "description": "Name of S3 bucket to upload OCW course media",
+      "required": false
+    },
+    "OCW_LEARNING_COURSE_ACCESS_KEY": {
+      "description": "AWS access key for OCW media upload bucket",
+      "required": false
+    },
+    "OCW_LEARNING_COURSE_SECRET_ACCESS_KEY": {
+      "description": "AWS secret key for OCW media upload bucket",
+      "required": false
     },
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."

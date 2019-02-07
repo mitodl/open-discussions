@@ -1,0 +1,561 @@
+{
+    "aka_course_number": [], 
+    "_content_type_license": "text/plain", 
+    "_uid": "16197636c270e1ab179fbc9a56c72787", 
+    "_content_type_is_update_boolean": "text/plain", 
+    "_content_type_course_level": "text/plain", 
+    "title": "Biochemistry and Pharmacology of Synaptic Transmission", 
+    "_content_type_ocw_batch_id": "text/plain", 
+    "parent_uid": "c3a20cb57cad494caa1868ff07eb3484", 
+    "location": "", 
+    "_content_type_to_year": "text/plain", 
+    "sort_as": "9.15", 
+    "constrainTypesMode": 0, 
+    "dspace_handle": "", 
+    "technical_location": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007", 
+    "software_requirements": [
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "40.0", 
+            "software_name_col": "Chrome", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "8.0", 
+            "software_name_col": "Safari", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "38.0", 
+            "software_name_col": "Mozilla Firefox", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "9.0", 
+            "software_name_col": "Internet Explorer", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "13.1", 
+            "software_name_col": "Edge", 
+            "maximum_version_col": ""
+        }
+    ], 
+    "_content_type_technical_location": "text/plain", 
+    "instructors": [
+        {
+            "middle_initial": "", 
+            "first_name": "Richard", 
+            "last_name": "Wurtman", 
+            "suffix": "", 
+            "title": "Wurtman, Richard", 
+            "mit_id": "900020771", 
+            "department": "Brain & Cognitive Sciences", 
+            "directory_title": "Professor Emeritus", 
+            "uid": "ef1020ddbbc31bb942970f0557c9daec"
+        }
+    ], 
+    "_content_type_rights": "text/html", 
+    "_directly_provided": [
+        "Products.CMFEditions.interfaces.IVersioned"
+    ], 
+    "_content_type_sort_as": "text/plain", 
+    "_content_type_to_semester": "text/plain", 
+    "_content_type_unique_identifier": "text/plain", 
+    "from_semester": "Fall", 
+    "_content_type_from_year": "text/plain", 
+    "allowDiscussion": false, 
+    "_content_type_materialtype": "text/plain", 
+    "_content_type_from_semester": "text/plain", 
+    "locallyAllowedTypes": [
+        "OCWImage", 
+        "DownloadSection", 
+        "CourseHomeSection", 
+        "CourseSection", 
+        "OCWExtFile", 
+        "OCWFile"
+    ], 
+    "creation_date": "2008/03/20 01:50:43 GMT-4", 
+    "aggregationlevel": 4, 
+    "last_published_to_production": "2012/10/08 07:42:57.970 GMT-4", 
+    "is_update_boolean": "Yes", 
+    "immediatelyAddableTypes": [
+        "OCWImage", 
+        "DownloadSection", 
+        "CourseHomeSection", 
+        "CourseSection", 
+        "OCWExtFile", 
+        "OCWFile"
+    ], 
+    "subject": [
+        "Neurotransmitter", 
+        "antidepressant", 
+        "brain lipid", 
+        "blood brain barrier", 
+        "dopamine", 
+        "parkinson's disease", 
+        "serotonin", 
+        "depression", 
+        "glutamate", 
+        "aspartate", 
+        "NDMA", 
+        "drug", 
+        "drug discovery", 
+        "pharmaceutical", 
+        "signaling pathway", 
+        "receptor", 
+        "spinal cord", 
+        "marijuana", 
+        "adensosine", 
+        "histamine."
+    ], 
+    "effectiveDate": "2012/10/08 05:35:42 GMT-4", 
+    "_content_type_language": "text/plain", 
+    "excludeFromNav": false, 
+    "related_mit_links": "", 
+    "to_semester": "-1", 
+    "_layout": "base_view", 
+    "_workflow_history": {
+        "module_workflow": [
+            {
+                "action": null, 
+                "review_state": "in_process", 
+                "comments": "", 
+                "actor": "admin", 
+                "time": "2010/05/14 07:42:20.661 GMT-4"
+            }, 
+            {
+                "action": "approve_to_staging", 
+                "review_state": "approved_for_staging", 
+                "actor": "admin", 
+                "comments": "", 
+                "time": "2010/05/16 11:30:40.554 GMT-4"
+            }, 
+            {
+                "action": "schedule_for_staging", 
+                "review_state": "scheduled_for_staging", 
+                "comments": "", 
+                "actor": "support", 
+                "time": "2010/05/16 14:53:51.192 GMT-4"
+            }, 
+            {
+                "action": "mark_staged", 
+                "review_state": "staged", 
+                "actor": "system", 
+                "comments": "", 
+                "time": "2010/05/18 10:42:05.093 GMT-4"
+            }, 
+            {
+                "action": "submit_to_fqa", 
+                "review_state": "submitted_for_fqa", 
+                "comments": "", 
+                "actor": "support", 
+                "time": "2010/05/27 08:47:02.617 GMT-4"
+            }, 
+            {
+                "action": "schedule_for_production", 
+                "review_state": "scheduled_for_publishing", 
+                "actor": "support", 
+                "comments": "", 
+                "time": "2010/05/27 10:07:12.961 GMT-4"
+            }, 
+            {
+                "action": "mark_published", 
+                "review_state": "published_in_production", 
+                "comments": "", 
+                "actor": "system", 
+                "time": "2010/05/27 16:57:06.799 GMT-4"
+            }, 
+            {
+                "action": "unlock", 
+                "review_state": "unlocked_for_editing", 
+                "actor": "asingh124", 
+                "comments": "Unlocked to fix resolveUID links as part of downtime project.", 
+                "time": "2012/10/08 05:35:42.785 GMT-4"
+            }, 
+            {
+                "action": "make_in_process", 
+                "review_state": "in_process", 
+                "comments": "", 
+                "actor": "asingh124", 
+                "time": "2012/10/08 05:57:49.474 GMT-4"
+            }, 
+            {
+                "action": "approve_to_staging", 
+                "review_state": "approved_for_staging", 
+                "actor": "asingh124", 
+                "comments": "", 
+                "time": "2012/10/08 06:00:13.957 GMT-4"
+            }, 
+            {
+                "action": "schedule_for_staging", 
+                "review_state": "scheduled_for_staging", 
+                "actor": "asingh124", 
+                "comments": "Staged after fixing resolveUID links as part of downtime project.", 
+                "time": "2012/10/08 06:24:42.352 GMT-4"
+            }, 
+            {
+                "action": "mark_staged", 
+                "review_state": "staged", 
+                "comments": "", 
+                "actor": "system", 
+                "time": "2012/10/08 06:28:45.144 GMT-4"
+            }, 
+            {
+                "action": "submit_to_fqa", 
+                "review_state": "submitted_for_fqa", 
+                "actor": "ndhamija", 
+                "comments": "Submitted for FQA after fixing resolveUID links.", 
+                "time": "2012/10/08 07:19:48.184 GMT-4"
+            }, 
+            {
+                "action": "schedule_for_production", 
+                "review_state": "scheduled_for_publishing", 
+                "comments": "Republished after fixing resolveUID links.", 
+                "actor": "ndhamija", 
+                "time": "2012/10/08 07:21:18.091 GMT-4"
+            }, 
+            {
+                "action": "mark_published", 
+                "review_state": "published_in_production", 
+                "actor": "system", 
+                "comments": "", 
+                "time": "2012/10/08 07:42:57.951 GMT-4"
+            }
+        ]
+    }, 
+    "_classname": "Course", 
+    "metadata_contributor_list": [
+        {
+            "md_contributor_uid": "", 
+            "md_contributor_entity": "Todd Rautenberg", 
+            "md_contributor_hide": "", 
+            "md_contributor_special_title": "", 
+            "md_contributor_role": "Validator"
+        }, 
+        {
+            "md_contributor_uid": "ef1020ddbbc31bb942970f0557c9daec", 
+            "md_contributor_entity": "Wurtman, Richard", 
+            "md_contributor_hide": "N", 
+            "md_contributor_special_title": "", 
+            "md_contributor_role": "Instructor"
+        }, 
+        {
+            "md_contributor_uid": "", 
+            "md_contributor_entity": "Todd Rautenberg", 
+            "md_contributor_hide": "", 
+            "md_contributor_special_title": "", 
+            "md_contributor_role": "Creator"
+        }, 
+        {
+            "md_contributor_uid": "dummy-contributor", 
+            "md_contributor_entity": "", 
+            "md_contributor_hide": "", 
+            "md_contributor_special_title": "", 
+            "md_contributor_role": "Creator"
+        }
+    ], 
+    "_userdefined_roles": [], 
+    "publisher": "MIT OpenCourseWare", 
+    "nextPreviousEnabled": false, 
+    "license": "http://creativecommons.org/licenses/by-nc-sa/3.0/us/", 
+    "widgets_features": [], 
+    "module_comments": [
+        "approved for repub (ccu):", 
+        "kcanavan:3/8/2010 6:23:39 PM", 
+        "code cleaned:", 
+        "katej:3/8/2010 12:57:54 PM", 
+        "unlocking for ccu:", 
+        "katej:3/8/2010 8:37:59 AM", 
+        "editing faculty names:", 
+        "jcplayer:9/17/2009 12:13:02 PM", 
+        "updating CHP image to 320px:", 
+        "katej:9/4/2009 12:54:59 PM", 
+        "approved for repub:", 
+        "katej:6/5/2009 4:48:59 PM", 
+        "translations added:", 
+        "katej:6/5/2009 4:12:37 PM", 
+        "adding translations:", 
+        "katej:6/5/2009 2:03:30 PM", 
+        "approved for repub:", 
+        "kcanavan:4/14/2009 12:20:37 AM", 
+        "approved for repub:", 
+        "kcanavan:4/14/2009 12:20:12 AM", 
+        "unlocking to add DSpace link.:", 
+        "kcanavan:4/13/2009 11:59:41 PM", 
+        "Republishing after fixing tablewidth4:", 
+        "lkumar:8/4/2008 5:17:10 AM", 
+        "Republishing after fixing tablewidth4:", 
+        "lkumar:8/4/2008 5:12:43 AM", 
+        "Staged after fixing tablewidth4:", 
+        "lkumar:7/31/2008 3:06:27 AM", 
+        "Declined for fixing tablewidth4:", 
+        "lkumar:7/31/2008 3:04:07 AM", 
+        "repub after amazon image fix:", 
+        "katej:6/10/2008 1:55:53 PM", 
+        "amazon image fixed:", 
+        "katej:6/10/2008 1:54:26 PM", 
+        "Staged after updating Amazon logo URL:", 
+        "cc_mosinh:6/10/2008 6:14:31 AM", 
+        "Declined for updating URL for Amazon logo:", 
+        "cc_mosinh:6/9/2008 11:47:20 PM", 
+        "approved for publication:", 
+        "katej:5/28/2008 1:12:09 PM", 
+        "FQA approved:", 
+        "gshaneyfelt:5/28/2008 9:26:01 AM", 
+        "FQA ok PENDING DC signoff:", 
+        "gshaneyfelt:5/28/2008 8:54:40 AM", 
+        "ready for FQA:", 
+        "dmariel:5/27/2008 1:56:28 PM", 
+        "Staged after edits:", 
+        "cc_mosinh:5/5/2008 11:50:43 PM", 
+        "Unlocked for edits:", 
+        "cc_mosinh:5/5/2008 11:48:43 PM", 
+        "Staged after India PR:", 
+        "cc_mosinh:3/27/2008 9:53:12 AM", 
+        "restaged after production migration: support:5/16/2010 14:53", 
+        "submitted for fqa for mass republish: support:5/27/2010 8:47", 
+        "republished after content migration: support:5/27/2010 10:7", 
+        "Unlocked to fix resolveUID links as part of downtime project.: asingh124:10/8/2012 5:35", 
+        "Staged after fixing resolveUID links as part of downtime project.: asingh124:10/8/2012 6:24", 
+        "Submitted for FQA after fixing resolveUID links.: ndhamija:10/8/2012 7:19", 
+        "Republished after fixing resolveUID links.: ndhamija:10/8/2012 7:21"
+    ], 
+    "category_features": [
+        {
+            "ocw_feature": "Science", 
+            "ocw_subfeature": "Biology", 
+            "ocw_feature_url": "", 
+            "ocw_speciality": "Biochemistry", 
+            "ocw_feature_notes": ""
+        }, 
+        {
+            "ocw_feature": "Science", 
+            "ocw_subfeature": "Biology", 
+            "ocw_feature_url": "", 
+            "ocw_speciality": "Neurobiology", 
+            "ocw_feature_notes": ""
+        }, 
+        {
+            "ocw_feature": "Science", 
+            "ocw_subfeature": "Cognitive Science", 
+            "ocw_feature_url": "", 
+            "ocw_speciality": "", 
+            "ocw_feature_notes": ""
+        }, 
+        {
+            "ocw_feature": "Health and Medicine", 
+            "ocw_subfeature": "Pharmacology and Toxicology", 
+            "ocw_feature_url": "", 
+            "ocw_speciality": "", 
+            "ocw_feature_notes": ""
+        }
+    ], 
+    "firstTimeEdit": false, 
+    "retirement_date": "None", 
+    "feature_requirements": [
+        {
+            "ocw_feature": "Assignments", 
+            "ocw_subfeature": "written (no examples)", 
+            "ocw_feature_url": "/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/assignments/", 
+            "ocw_speciality": "", 
+            "ocw_feature_notes": ""
+        }
+    ], 
+    "first_published_to_production": "2008/05/30 01:27:49 GMT-4", 
+    "_ac_local_roles": {
+        "admin": [
+            "Owner"
+        ]
+    }, 
+    "fm_record_id": "5983", 
+    "last_unpublishing_date": "None", 
+    "classification": [
+        {
+            "source": "CIP", 
+            "id": "260906", 
+            "description": "Neurobiology and Neurophysiology"
+        }, 
+        {
+            "source": "CIP", 
+            "id": "261003", 
+            "description": "Neuropharmacology"
+        }
+    ], 
+    "course_owner": "mdeblanc", 
+    "last_published_to_staging": "2012/10/08 06:28:45.162 GMT-4", 
+    "expirationDate": "None", 
+    "_content_type_id": "text/plain", 
+    "_content_type_chp_display_level": "text/plain", 
+    "linked_course_number": [
+        {
+            "linked_course_number_col": "9.150", 
+            "sort_as_col": "9.150", 
+            "linked_course_type_col": "Graduate"
+        }
+    ], 
+    "_content_type_fm_record_id": "text/plain", 
+    "_gopip": 67, 
+    "unique_identifier": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007", 
+    "_content_type_title": "text/plain", 
+    "_content_type": "text/plain", 
+    "_atrefs": {
+        "is_update_of": [
+            "0e3ec1e6fe4670e44b55130c4b4205b7"
+        ], 
+        "instructors": [
+            "ef1020ddbbc31bb942970f0557c9daec"
+        ], 
+        "master_subject": [
+            "cccbe3d890e9b01effb2140f002af3da"
+        ]
+    }, 
+    "_id": "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007", 
+    "master_course_number": "9.15", 
+    "editor_notes": "", 
+    "ocw_batch_id": "77", 
+    "language": "en-US", 
+    "rights": "This site (c) Massachusetts Institute of Technology 2010.  Content within individual courses is (c) by the individual authors unless otherwise noted. The Massachusetts Institute of Technology is providing this Work (as defined below) under the terms of this Creative Commons public license (\"CCPL\" or \"license\") unless otherwise noted. The Work is protected by copyright and/or other applicable law. Any use of the work other than as authorized under this license is prohibited. By exercising any of the rights to the Work provided here, You (as defined below) accept and agree to be bound by the terms of this license. The Licensor, the Massachusetts Institute of Technology, grants You the rights contained here in consideration of Your acceptance of such terms and conditions.", 
+    "_atbrefs": {
+        "BelongsTo": [
+            "58427ca7f9593b1f01a521650370105f", 
+            "999a1828cfd87c370be8c4f13f3305d0", 
+            "e6e9b56002a4abc57d15f779cab5088a", 
+            "0d2e2d7914d8eb35e060abe70f9745c4", 
+            "aef686831bdad18765c487bb22cda36d", 
+            "c34bfc6f94a3b414e5259756e0fb812a", 
+            "6db21c67600aa734e6d1b7f8b9963bb5", 
+            "39b60020d4687ffcf41674c0c8e4a4cb", 
+            "994f8d5eedcacb2542dfc3ba224f96f8", 
+            "c8bd9c1d3ce35bc2a6aacb4d0790ba5e", 
+            "2210854cb1082f48efa68e6764b39d90", 
+            "0ccbcb0d20d6d5f89c0214ddfdd1cda4", 
+            "246b00201cf321543236946443da64c6", 
+            "7818f4dd4c3716ed95445c15742bf2e6", 
+            "fa689a4be740da7b04704ac8b98971be"
+        ]
+    }, 
+    "_defaultpage": "index.htm", 
+    "tcATmit_subject_tags": [], 
+    "features_tracking": [
+        {
+            "ocw_feature": "Translations", 
+            "ocw_subfeature": "Chinese (Simplified)", 
+            "ocw_feature_url": "http://www.core.org.cn/OcwWeb/Brain-and-Cognitive-Sciences/9-15Fall-2003/CourseHome/index.htm", 
+            "ocw_feature_notes": "", 
+            "ocw_speciality": ""
+        }, 
+        {
+            "ocw_feature": "Documents not accessible", 
+            "ocw_subfeature": "Scanned", 
+            "ocw_feature_url": "", 
+            "ocw_feature_notes": "Study materials section; notes; file count: 1; file format: .pdf", 
+            "ocw_speciality": ""
+        }, 
+        {
+            "ocw_feature": "Previous version", 
+            "ocw_subfeature": "", 
+            "ocw_feature_url": "http://hdl.handle.net/1721.1/45133", 
+            "ocw_feature_notes": "Fall 2003 version", 
+            "ocw_speciality": ""
+        }, 
+        {
+            "ocw_feature": "Documents not accessible", 
+            "ocw_subfeature": "Technical", 
+            "ocw_feature_url": "", 
+            "ocw_feature_notes": "", 
+            "ocw_speciality": ""
+        }
+    ], 
+    "contributors": [], 
+    "_content_type_unique_id": "text/plain", 
+    "chp_display_level": "Both", 
+    "_content_type_master_course_number": "text/plain", 
+    "id": "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007", 
+    "materialtype": "Other", 
+    "pop_up_image_dict": {}, 
+    "is_update_of": [
+        "0e3ec1e6fe4670e44b55130c4b4205b7"
+    ], 
+    "from_year": "2007", 
+    "_content_type_course_owner": "text/plain", 
+    "_type": "Course", 
+    "description": "", 
+    "master_subject": [
+        "cccbe3d890e9b01effb2140f002af3da"
+    ], 
+    "to_year": "-1", 
+    "_content_type_publisher": "text/plain", 
+    "tcATmit_instructional_tags": [], 
+    "course_linking": [], 
+    "first_published_to_staging": "2008/03/27 09:54:03 GMT-4", 
+    "modification_date": "2017/08/29 05:40:59.067 GMT-4", 
+    "course_level": "Undergraduate", 
+    "always_publish": false, 
+    "last_unstaging_date": "None", 
+    "_owner": "admin", 
+    "_permissions": {
+        "Modify portal content": {
+            "acquire": false, 
+            "roles": [
+                "Contributor", 
+                "Editor", 
+                "Manager", 
+                "MetadataEditor", 
+                "Owner", 
+                "Reader", 
+                "Reviewer", 
+                "System"
+            ]
+        }, 
+        "Access contents information": {
+            "acquire": false, 
+            "roles": [
+                "Anonymous"
+            ]
+        }, 
+        "List folder contents": {
+            "acquire": false, 
+            "roles": [
+                "Contributor", 
+                "Editor", 
+                "Manager", 
+                "MetadataEditor", 
+                "Owner", 
+                "Reader", 
+                "Reviewer"
+            ]
+        }, 
+        "View": {
+            "acquire": false, 
+            "roles": [
+                "Anonymous"
+            ]
+        }
+    }, 
+    "_properties": [
+        [
+            "title", 
+            "Biochemistry and Pharmacology of Synaptic Transmission", 
+            "string"
+        ]
+    ], 
+    "creators": [
+        "admin"
+    ], 
+    "courselist_features": [
+        {
+            "ocw_feature": "Life Sciences at MIT", 
+            "ocw_subfeature": "", 
+            "ocw_feature_url": "", 
+            "ocw_feature_notes": "", 
+            "ocw_speciality": ""
+        }
+    ], 
+    "unique_id": "16197636c270e1ab179fbc9a56c72787", 
+    "_path": "/Plone/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007"
+}

@@ -1,0 +1,235 @@
+{
+    "text": "<p>This page contains handouts from a few recitation and lecture sessions.</p> <h2 class=\"subhead\">Handouts</h2> <p>Introductory Recitation Handout (<a href=\"./resolveuid/7818f4dd4c3716ed95445c15742bf2e6\">PDF</a>)</p> <p>Antidepressants (<a href=\"./resolveuid/0ccbcb0d20d6d5f89c0214ddfdd1cda4\">PDF</a>)</p> <p>Spinal Cord Section (<a href=\"./resolveuid/994f8d5eedcacb2542dfc3ba224f96f8\">PDF</a>)</p> <p>Glutamate Structure (<img alt=\"This resource may not render correctly in a screen reader.\" src=\"/images/inacessible.gif\" /><a href=\"./resolveuid/2210854cb1082f48efa68e6764b39d90\">PDF</a>)</p> <p>Neurotransmitter Release (<img alt=\"This resource may not render correctly in a screen reader.\" src=\"/images/inacessible.gif\" /><a href=\"./resolveuid/c8bd9c1d3ce35bc2a6aacb4d0790ba5e\">PDF - 1.8 MB</a>)</p> <p>LTP and LTD (<a href=\"./resolveuid/246b00201cf321543236946443da64c6\">PDF</a>)</p>", 
+    "_content_type_license": "text/plain", 
+    "_uid": "39b60020d4687ffcf41674c0c8e4a4cb", 
+    "title": "Study Materials", 
+    "_ac_local_roles": {
+        "admin": [
+            "Owner"
+        ]
+    }, 
+    "location": "", 
+    "_content_type_course_identifier": "text/plain", 
+    "_atbrefs": {
+        "isReferencing": [
+            "39b60020d4687ffcf41674c0c8e4a4cb"
+        ]
+    }, 
+    "constrainTypesMode": 0, 
+    "technical_location": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/study-materials", 
+    "software_requirements": [
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "40.0", 
+            "software_name_col": "Chrome", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "8.0", 
+            "software_name_col": "Safari", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "38.0", 
+            "software_name_col": "Mozilla Firefox", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "9.0", 
+            "software_name_col": "Internet Explorer", 
+            "maximum_version_col": ""
+        }, 
+        {
+            "software_type_col": "Browser", 
+            "minimum_version_col": "13.1", 
+            "software_name_col": "Edge", 
+            "maximum_version_col": ""
+        }
+    ], 
+    "_content_type_technical_location": "text/plain", 
+    "_content_type_rights": "text/html", 
+    "_directly_provided": [
+        "Products.CMFEditions.interfaces.IVersioned"
+    ], 
+    "parent_uid": "16197636c270e1ab179fbc9a56c72787", 
+    "excludeFromNav": false, 
+    "_content_type_unique_identifier": "text/plain", 
+    "allowDiscussion": false, 
+    "metadata_contributor_list": [], 
+    "locallyAllowedTypes": [
+        "OCWImage", 
+        "CourseSection", 
+        "OCWExtFile", 
+        "OCWFile"
+    ], 
+    "_content_type_text": "text/html", 
+    "ad_type": "HOUSE", 
+    "creation_date": "2010/05/14 07:42:21.150 GMT-4", 
+    "aggregationlevel": 3, 
+    "duration": "", 
+    "immediatelyAddableTypes": [
+        "OCWImage", 
+        "CourseSection", 
+        "OCWExtFile", 
+        "OCWFile"
+    ], 
+    "subject": [], 
+    "_content_type_short_page_title": "text/plain", 
+    "effectiveDate": "2012/10/08 05:57:49.421 GMT-4", 
+    "parent_module": "16197636c270e1ab179fbc9a56c72787", 
+    "is_mathml_document": false, 
+    "bottomtext": "", 
+    "short_page_title": "Study Materials", 
+    "section_identifier": null, 
+    "related_mit_links": "", 
+    "_content_type_ad_type": "text/plain", 
+    "_layout": "custom_view", 
+    "_workflow_history": {
+        "page_workflow": [
+            {
+                "action": null, 
+                "review_state": "waiting_for_authoring", 
+                "comments": "", 
+                "actor": "admin", 
+                "time": "2010/05/14 07:42:21.156 GMT-4"
+            }, 
+            {
+                "action": "approve_to_staging", 
+                "review_state": "ready_for_staging", 
+                "actor": "admin", 
+                "comments": "", 
+                "time": "2010/05/16 11:30:40.409 GMT-4"
+            }, 
+            {
+                "action": "decline", 
+                "review_state": "waiting_for_authoring", 
+                "comments": "", 
+                "actor": "asingh124", 
+                "time": "2012/10/08 05:57:49.455 GMT-4"
+            }, 
+            {
+                "action": "approve_to_staging", 
+                "review_state": "ready_for_staging", 
+                "actor": "asingh124", 
+                "comments": "", 
+                "time": "2012/10/08 06:00:13.503 GMT-4"
+            }
+        ]
+    }, 
+    "_classname": "CourseSection", 
+    "_content_type_materialtype": "text/plain", 
+    "_userdefined_roles": [], 
+    "publisher": "MIT OpenCourseWare", 
+    "nextPreviousEnabled": false, 
+    "language": "", 
+    "url_rewrite_patterns": [], 
+    "widgets_features": [], 
+    "category_features": [], 
+    "firstTimeEdit": true, 
+    "feature_requirements": [], 
+    "list_in_left_nav": false, 
+    "short_name_tlp": "Study Materials", 
+    "expirationDate": "None", 
+    "_content_type_id": "text/plain", 
+    "contributor_list": [
+        {}
+    ], 
+    "is_media_gallery": false, 
+    "contributors": [], 
+    "_gopip": 6, 
+    "_content_type_title": "text/plain", 
+    "course_linking": [], 
+    "_atrefs": {
+        "BelongsTo": [
+            "16197636c270e1ab179fbc9a56c72787"
+        ], 
+        "isReferencing": [
+            "994f8d5eedcacb2542dfc3ba224f96f8", 
+            "c8bd9c1d3ce35bc2a6aacb4d0790ba5e", 
+            "2210854cb1082f48efa68e6764b39d90", 
+            "0ccbcb0d20d6d5f89c0214ddfdd1cda4", 
+            "246b00201cf321543236946443da64c6", 
+            "7818f4dd4c3716ed95445c15742bf2e6", 
+            "39b60020d4687ffcf41674c0c8e4a4cb"
+        ]
+    }, 
+    "other_platform_requirements": "", 
+    "license": "http://creativecommons.org/licenses/by-nc-sa/3.0/us/", 
+    "rights": "This site (c) Massachusetts Institute of Technology 2010.  Content within individual courses is (c) by the individual authors unless otherwise noted. The Massachusetts Institute of Technology is providing this Work (as defined below) under the terms of this Creative Commons public license (\"CCPL\" or \"license\") unless otherwise noted. The Work is protected by copyright and/or other applicable law. Any use of the work other than as authorized under this license is prohibited. By exercising any of the rights to the Work provided here, You (as defined below) accept and agree to be bound by the terms of this license. The Licensor, the Massachusetts Institute of Technology, grants You the rights contained here in consideration of Your acceptance of such terms and conditions.", 
+    "hide_Page_title": null, 
+    "_defaultpage": "", 
+    "tcATmit_subject_tags": [], 
+    "features_tracking": [], 
+    "ad_champion_text": "", 
+    "has_inline_embed": false, 
+    "unique_identifier": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/study-materials", 
+    "is_image_gallery": false, 
+    "id": "study-materials", 
+    "materialtype": "Other", 
+    "_type": "CourseSection", 
+    "description": "This section contains handouts from the recitation and lecture sessions.", 
+    "course_identifier": "https://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007", 
+    "_content_type_publisher": "text/plain", 
+    "tcATmit_instructional_tags": [], 
+    "_content_type": "text/html", 
+    "creators": [
+        "admin"
+    ], 
+    "modification_date": "2017/03/28 15:42:57.771 GMT-4", 
+    "always_publish": false, 
+    "_content_type_description": "text/plain", 
+    "_owner": "admin", 
+    "_permissions": {
+        "Change portal events": {
+            "acquire": false, 
+            "roles": [
+                "Editor", 
+                "Manager", 
+                "MetadataEditor", 
+                "Owner"
+            ]
+        }, 
+        "Modify portal content": {
+            "acquire": false, 
+            "roles": [
+                "Manager", 
+                "MetadataEditor"
+            ]
+        }, 
+        "Access contents information": {
+            "acquire": false, 
+            "roles": [
+                "Authenticated"
+            ]
+        }, 
+        "List folder contents": {
+            "acquire": false, 
+            "roles": [
+                "Editor", 
+                "Manager", 
+                "MetadataEditor", 
+                "Owner"
+            ]
+        }, 
+        "View": {
+            "acquire": false, 
+            "roles": [
+                "Authenticated"
+            ]
+        }
+    }, 
+    "_properties": [
+        [
+            "title", 
+            "Study Materials", 
+            "string"
+        ]
+    ], 
+    "_id": "study-materials", 
+    "courselist_features": [], 
+    "_content_type_short_name_tlp": "text/plain", 
+    "_path": "/Plone/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/study-materials"
+}
