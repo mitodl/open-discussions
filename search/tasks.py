@@ -10,11 +10,17 @@ from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException, NotFound
 
+<<<<<<< HEAD
 from channels.models import Post, Comment
+=======
+from channels.constants import POST_TYPE
+from channels.models import Channel, Post
+from course_catalog.models import Course
+>>>>>>> Course catalog index for ES
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks
 from search import indexing_api as api
-from search.constants import VALID_OBJECT_TYPES
+from search.constants import VALID_OBJECT_TYPES, PROFILE_TYPE, COURSE_TYPE
 from search.exceptions import RetryException, ReindexException
 
 User = get_user_model()
@@ -69,6 +75,12 @@ def update_document_with_partial(
     return api.update_document_with_partial(
         doc_id, partial_data, object_type, retry_on_conflict=retry_on_conflict
     )
+
+
+@app.task
+def delete_document(doc_id, object_type):
+    """Task that makes a request to remove an ES document"""
+    return api.delete_document(doc_id, object_type)
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
@@ -142,6 +154,27 @@ def index_comments(comment_ids):
         return error
 
 
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_courses(ids):
+    """
+    Index courses
+
+    Args:
+        ids(list of int): List of course id's
+
+    """
+    try:
+        api.index_courses(ids)
+    except RetryException:
+        raise
+    except Ignore:
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_courses threw an error"
+        log.exception(error)
+        return error
+
+
 @app.task(bind=True)
 def start_recreate_index(self):
     """
@@ -178,6 +211,13 @@ def start_recreate_index(self):
                     .exclude(profile__isnull=True)
                     .order_by("id")
                     .values_list("profile__id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+            + [
+                index_courses.si(ids)
+                for ids in chunks(
+                    Course.objects.values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]

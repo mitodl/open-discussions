@@ -5,11 +5,20 @@ import pytest
 from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories.models import PostFactory, CommentFactory
 from channels.utils import render_article_text
+from channels.utils import get_reddit_slug, render_article_text
+from course_catalog.factories import (
+    CourseFactory,
+    CourseTopicFactory,
+    CoursePriceFactory,
+    CourseInstructorFactory,
+)
+from course_catalog.models import Course
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime
 from profiles.models import Profile
 from profiles.utils import image_uri, IMAGE_MEDIUM
-from search.constants import PROFILE_TYPE
+from search.api import gen_course_id
+from search.constants import PROFILE_TYPE, COURSE_TYPE
 from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
@@ -19,6 +28,9 @@ from search.serializers import (
     serialize_bulk_comments,
     serialize_bulk_profiles,
     serialize_profile_for_bulk,
+    serialize_bulk_courses,
+    serialize_course_for_bulk,
+    ESCourseSerializer,
 )
 
 
@@ -204,6 +216,43 @@ def test_serialize_bulk_comments():
     ) == len(comments)
 
 
+def test_es_course_serializer():
+    """
+    Test that ESCourseSerializer correctly serializes a course object
+    """
+    course = CourseFactory(
+        topics=CourseTopicFactory.create_batch(3),
+        prices=CoursePriceFactory.create_batch(2),
+        instructors=CourseInstructorFactory.create_batch(2),
+    )
+    serialized = ESCourseSerializer().serialize(course)
+    assert serialized == {
+        "object_type": COURSE_TYPE,
+        "course_id": course.course_id,
+        "short_description": course.short_description,
+        "full_description": course.full_description,
+        "platform": course.platform,
+        "language": course.language,
+        "semester": course.semester,
+        "year": course.year,
+        "level": course.level,
+        "start_date": course.start_date,
+        "end_date": course.end_date,
+        "enrollment_start": course.enrollment_start,
+        "enrollment_end": course.enrollment_end,
+        "course_title": course.title,
+        "course_image": course.image_src,
+        "instructors": [
+            " ".join([instructor.first_name, instructor.last_name])
+            for instructor in course.instructors.all()
+        ],
+        "topics": [topic.name for topic in course.topics.all()],
+        "prices": [
+            {"price": price.price, "mode": price.mode} for price in course.prices.all()
+        ],
+    }
+
+
 def test_serialize_post_for_bulk(mocker):
     """
     Test that serialize_post_for_bulk correctly serializes a post/submission object
@@ -246,11 +295,35 @@ def test_serialize_bulk_profiles(mocker):
         mock_serialize_profile.assert_any_call(user.profile)
 
 
-def test_serialize_profile_for_bulk(patched_base_profile_serializer, user):
+def test_serialize_profile_for_bulk(user):
     """
     Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
     """
     assert serialize_profile_for_bulk(user.profile) == {
         "_id": "u_{}".format(user.username),
         **ESProfileSerializer().serialize(user.profile),
+    }
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_courses(mocker):
+    """
+    Test that serialize_bulk_courses calls serialize_course_for_bulk for every existing course
+    """
+    mock_serialize_course = mocker.patch("search.serializers.serialize_course_for_bulk")
+    courses = CourseFactory.create_batch(5)
+    list(serialize_bulk_courses([course.id for course in Course.objects.all()]))
+    for course in courses:
+        mock_serialize_course.assert_any_call(course)
+
+
+@pytest.mark.django_db
+def test_serialize_course_for_bulk():
+    """
+    Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
+    """
+    course = CourseFactory.create()
+    assert serialize_course_for_bulk(course) == {
+        "_id": gen_course_id(course.course_id),
+        **ESCourseSerializer().serialize(course),
     }

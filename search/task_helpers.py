@@ -16,18 +16,21 @@ from search.api import (
     gen_comment_id,
     gen_profile_id,
     is_reddit_object_removed,
+    gen_course_id,
 )
-from search.constants import PROFILE_TYPE
+from search.constants import PROFILE_TYPE, COURSE_TYPE
 from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
     ESProfileSerializer,
+    ESCourseSerializer,
 )
 from search.tasks import (
     create_document,
     update_document_with_partial,
     increment_document_integer_field,
     update_field_values_by_query,
+    delete_document,
 )
 
 log = logging.getLogger()
@@ -352,3 +355,44 @@ def update_indexed_score(instance, instance_type, vote_action=None):
         incr_amount=vote_increment,
         object_type=instance_type,
     )
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def index_new_course(course_obj):
+    """
+    Serializes a course object and runs a task to create an ES document for it.
+
+    Args:
+        course_obj (course_catalog.models.Course): A Course object
+    """
+    data = ESCourseSerializer().serialize(course_obj)
+    create_document.delay(gen_course_id(course_obj.course_id), data)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def update_course(course_obj):
+    """
+    Run a task to update all fields of a course Elasticsearch document
+
+    Args:
+        course_obj(Course): the Course to update in ES
+    """
+
+    course_data = ESCourseSerializer().serialize(course_obj)
+    update_document_with_partial.delay(
+        gen_course_id(course_obj.course_id),
+        course_data,
+        COURSE_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def delete_course(course_obj):
+    """
+    Serializes a course object and runs a task to create an ES document for it.
+
+    Args:
+        course_obj (course_catalog.models.Course): A Course object
+    """
+    delete_document.delay(gen_course_id(course_obj.course_id), COURSE_TYPE)

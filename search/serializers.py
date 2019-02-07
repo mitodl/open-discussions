@@ -11,6 +11,15 @@ from profiles.models import Profile
 from profiles.utils import image_uri
 from search.api import gen_post_id, gen_comment_id, gen_profile_id
 from search.constants import PROFILE_TYPE
+from channels.models import Post
+from channels.serializers.posts import BasePostSerializer
+from channels.serializers.comments import BaseCommentSerializer
+from channels.utils import get_reddit_slug
+from course_catalog.models import Course
+from profiles.api import get_channels
+from profiles.models import Profile
+from search.api import gen_post_id, gen_comment_id, gen_profile_id, gen_course_id
+from search.constants import PROFILE_TYPE, COURSE_TYPE
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
 log = logging.getLogger()
@@ -97,7 +106,50 @@ class ESProfileSerializer(ESProxySerializer):
         return {"author_channel_membership": sorted(get_channels(discussions_obj.user))}
 
 
+class ESCourseSerializer(ESModelSerializer):
+    """
+    Elasticsearch serializer class for courses
+    """
+
+    object_type = COURSE_TYPE
+    use_keys = [
+        "course_id",
+        "short_description",
+        "full_description",
+        "platform",
+        "language",
+        "semester",
+        "year",
+        "level",
+        "start_date",
+        "end_date",
+        "enrollment_start",
+        "enrollment_end",
+    ]
+    rename_keys = {"title": "course_title", "image_src": "course_image"}
+
+    @property
+    def base_serializer(self):
+        from course_catalog.serializers import CourseSerializer
+
+        return CourseSerializer
+
+    def postprocess_fields(self, discussions_obj, serialized_data):
+        return {
+            "instructors": [
+                "{} {}".format(i.first_name, i.last_name)
+                for i in discussions_obj.instructors.iterator()
+            ],
+            "topics": [t.name for t in discussions_obj.topics.iterator()],
+            "prices": [
+                {"price": p.price, "mode": p.mode}
+                for p in discussions_obj.prices.iterator()
+            ],
+        }
+
+
 class ESPostSerializer(ESModelSerializer):
+
     """Elasticsearch serializer class for posts"""
 
     object_type = POST_TYPE
@@ -339,3 +391,27 @@ def serialize_comment_for_bulk(comment_obj):
     except NotFound:
         log.exception("Reddit comment not found: %s", comment_obj.id)
         raise
+
+
+def serialize_bulk_courses(ids):
+    """
+    Serialize courses for bulk indexing
+
+    Args:
+        ids(list of int): List of course id's
+    """
+    for course in Course.objects.filter(id__in=ids).iterator():
+        yield serialize_course_for_bulk(course)
+
+
+def serialize_course_for_bulk(course_obj):
+    """
+    Serialize a profile for bulk API request
+
+    Args:
+        course_obj (Course): A course
+    """
+    return {
+        "_id": gen_course_id(course_obj.course_id),
+        **ESCourseSerializer().serialize(course_obj),
+    }

@@ -25,9 +25,9 @@ from search.indexing_api import (
     switch_indices,
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
+    index_courses,
     index_profiles,
 )
-
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
 
@@ -437,3 +437,45 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     conn_mock.indices.put_alias.assert_called_once_with(
         index=backing_index, name=reindexing_alias
     )
+
+
+def test_index_courses(mocked_es, mocker, settings, user):
+    """
+    index_courses should call bulk with correct arguments
+    """
+    settings.INDEXING_API_USERNAME = user.username
+    aliases = ["a", "b"]
+    mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=aliases
+    )
+    mock_serialize_courses = mocker.patch(
+        "search.indexing_api.serialize_bulk_courses",
+        return_value=[{"course_id": "MITx.001"}, {"course_id": "MITX.002"}],
+    )
+    mocker.patch("channels.api.Api", autospec=True)
+    bulk_mock = mocker.patch(
+        "search.indexing_api.bulk", autospec=True, return_value=(0, [])
+    )
+    index_courses([1, 2, 3])
+    for alias in aliases:
+        bulk_mock.assert_any_call(
+            mocked_es.conn,
+            mock_serialize_courses.return_value,
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+
+
+def test_index_courses_error(mocked_es, mocker, settings, user):
+    """
+    index_courses should raise a ReindexException if the bulk call fails
+    """
+    settings.INDEXING_API_USERNAME = user.username
+    mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
+    )
+    mocker.patch("search.indexing_api.serialize_bulk_courses")
+    mocker.patch("search.indexing_api.bulk", autospec=True, return_value=(0, ["error"]))
+    with pytest.raises(ReindexException):
+        index_courses([1, 2, 3])

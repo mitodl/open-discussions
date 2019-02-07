@@ -21,6 +21,7 @@ from search.tasks import (
     wrap_retry_exception,
     index_profiles,
     index_comments,
+    index_courses,
 )
 
 
@@ -143,7 +144,7 @@ def test_index_comments(
 
 @pytest.mark.parametrize("with_error", [True, False])
 def test_index_profiles(mocker, with_error):  # pylint: disable=unused-argument
-    """index_post should call the api function of the same name"""
+    """index_profiles should call the api function of the same name"""
     index_profile_mock = mocker.patch("search.indexing_api.index_profiles")
     if with_error:
         index_profile_mock.side_effect = TabError
@@ -180,7 +181,12 @@ def test_start_recreate_index(mock_index_functions, mocker, mocked_celery, user)
     for doctype in VALID_OBJECT_TYPES:
         create_backing_index_mock.assert_any_call(doctype)
     finish_recreate_index_mock.s.assert_called_once_with(
-        {"post": backing_index, "comment": backing_index, "profile": backing_index}
+        {
+            "post": backing_index,
+            "comment": backing_index,
+            "profile": backing_index,
+            "course": backing_index,
+        }
     )
     assert mocked_celery.group.call_count == 1
 
@@ -225,3 +231,15 @@ def test_finish_recreate_index(mocker, with_error):
         finish_recreate_index.delay(results, backing_indices)
         switch_indices_mock.assert_any_call("backing", POST_TYPE)
         switch_indices_mock.assert_any_call("backing", COMMENT_TYPE)
+
+
+@pytest.mark.parametrize("with_error", [True, False])
+def test_index_courses(mocker, with_error):  # pylint: disable=unused-argument
+    """index_courses should call the api function of the same name"""
+    index_courses_mock = mocker.patch("search.indexing_api.index_courses")
+    if with_error:
+        index_courses_mock.side_effect = TabError
+    result = index_courses.delay([1, 2, 3]).get()
+    assert result == ("index_courses threw an error" if with_error else None)
+
+    index_courses_mock.assert_called_once_with([1, 2, 3])
