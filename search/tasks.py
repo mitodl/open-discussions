@@ -10,17 +10,14 @@ from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException, NotFound
 
-<<<<<<< HEAD
 from channels.models import Post, Comment
-=======
 from channels.constants import POST_TYPE
 from channels.models import Channel, Post
 from course_catalog.models import Course
->>>>>>> Course catalog index for ES
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks
 from search import indexing_api as api
-from search.constants import VALID_OBJECT_TYPES, PROFILE_TYPE, COURSE_TYPE
+from search.constants import VALID_OBJECT_TYPES
 from search.exceptions import RetryException, ReindexException
 
 User = get_user_model()
@@ -217,7 +214,6 @@ def start_recreate_index(self):
             + [
                 index_courses.si(ids)
                 for ids in chunks(
-                    Course.objects.values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]

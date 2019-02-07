@@ -22,6 +22,7 @@ from search.constants import PROFILE_TYPE, COURSE_TYPE
 from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
+    ESCourseSerializer,
     ESProfileSerializer,
     serialize_post_for_bulk,
     serialize_comment_for_bulk,
@@ -30,7 +31,6 @@ from search.serializers import (
     serialize_profile_for_bulk,
     serialize_bulk_courses,
     serialize_course_for_bulk,
-    ESCourseSerializer,
 )
 
 

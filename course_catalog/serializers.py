@@ -2,7 +2,6 @@
 course_catalog serializers
 """
 from rest_framework import serializers
-
 from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
 
 
