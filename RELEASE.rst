@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.65.2
+Version 0.65.2 (Released February 07, 2019)
 --------------
 
 - upgrade to react v16.8
