@@ -7,9 +7,9 @@ from rest_framework import serializers
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
 from course_catalog.models import Course
-from profiles.utils import image_uri
 from profiles.api import get_channels
 from profiles.models import Profile
+from profiles.utils import image_uri
 from search.api import gen_post_id, gen_comment_id, gen_profile_id, gen_course_id
 from search.constants import PROFILE_TYPE, COURSE_TYPE
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
