@@ -98,37 +98,58 @@ class ESProfileSerializer(ESProxySerializer):
         return {"author_channel_membership": sorted(get_channels(discussions_obj.user))}
 
 
-class ESCourseSerializer(ESProxySerializer):
+class ESCourseSerializer(ESModelSerializer):
     """
     Elasticsearch serializer class for courses
     """
 
     object_type = COURSE_TYPE
-    use_keys = [
-        "course_id",
-        "short_description",
-        "full_description",
-        "platform",
-        "language",
-        "semester",
-        "year",
-        "level",
-        "start_date",
-        "end_date",
-        "enrollment_start",
-        "enrollment_end",
-        "title",
-        "image_src",
-        "instructors",
-        "prices",
-        "topics",
-    ]
 
-    @property
-    def base_serializer(self):
-        from course_catalog.serializers import CourseSerializer
+    prices = serializers.SerializerMethodField()
+    instructors = serializers.SerializerMethodField()
+    topics = serializers.SerializerMethodField()
 
-        return CourseSerializer
+    def get_prices(self, course):
+        """
+        Get the prices for a course
+        """
+        return list(course.prices.values("price", "mode"))
+
+    def get_instructors(self, course):
+        """
+        Get a list of instructor names for the course
+        """
+        return [" ".join([i.first_name, i.last_name]) for i in course.instructors.all()]
+
+    def get_topics(self, course):
+        """
+        Get the topic names for a course
+        """
+        return list(course.topics.values_list("name", flat=True))
+
+    class Meta:
+        model = Course
+        fields = [
+            "course_id",
+            "short_description",
+            "full_description",
+            "platform",
+            "language",
+            "semester",
+            "year",
+            "level",
+            "start_date",
+            "end_date",
+            "enrollment_start",
+            "enrollment_end",
+            "title",
+            "image_src",
+            "topics",
+            "prices",
+            "instructors",
+        ]
+
+        read_only_fields = fields
 
 
 class ESPostSerializer(ESModelSerializer):
@@ -397,5 +418,5 @@ def serialize_course_for_bulk(course_obj):
     """
     return {
         "_id": gen_course_id(course_obj.course_id),
-        **ESCourseSerializer().serialize(course_obj),
+        **ESCourseSerializer(course_obj).data,
     }

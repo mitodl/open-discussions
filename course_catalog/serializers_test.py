@@ -28,10 +28,7 @@ def test_serialize_course_related_models():
     for attr in ("mode", "price"):
         assert attr in serializer.data["prices"][0].keys()
     assert len(serializer.data["instructors"]) == 2
-    assert serializer.data["instructors"] == [
-        " ".join([prof.first_name, prof.last_name]) for prof in course.instructors.all()
-    ]
+    for attr in ("first_name", "last_name"):
+        assert attr in serializer.data["instructors"][0].keys()
     assert len(serializer.data["topics"]) == 3
-    assert serializer.data["topics"] == list(
-        course.topics.values_list("name", flat=True)
-    )
+    assert "name" in serializer.data["topics"][0].keys()

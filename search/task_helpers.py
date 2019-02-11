@@ -365,7 +365,7 @@ def index_new_course(course_obj):
     Args:
         course_obj (course_catalog.models.Course): A Course object
     """
-    data = ESCourseSerializer().serialize(course_obj)
+    data = ESCourseSerializer(course_obj).data
     create_document.delay(gen_course_id(course_obj.course_id), data)
 
 
@@ -378,7 +378,7 @@ def update_course(course_obj):
         course_obj(Course): the Course to update in ES
     """
 
-    course_data = ESCourseSerializer().serialize(course_obj)
+    course_data = ESCourseSerializer(course_obj).data
     update_document_with_partial.delay(
         gen_course_id(course_obj.course_id),
         course_data,

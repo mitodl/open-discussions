@@ -443,7 +443,7 @@ def test_update_course(mock_index_functions, mocker):
     assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
     assert patched_task.delay.call_args[0] == (
         gen_course_id(course.course_id),
-        ESCourseSerializer().serialize(course),
+        ESCourseSerializer(course).data,
         COURSE_TYPE,
     )
 
@@ -459,5 +459,5 @@ def test_index_new_course(mock_index_functions, mocker):
     assert patched_create_task.delay.called is True
     assert patched_create_task.delay.call_args[0] == (
         gen_course_id(course.course_id),
-        ESCourseSerializer().serialize(course),
+        ESCourseSerializer(course).data,
     )

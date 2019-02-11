@@ -208,7 +208,7 @@ def test_es_course_serializer():
         prices=CoursePriceFactory.create_batch(2),
         instructors=CourseInstructorFactory.create_batch(2),
     )
-    serialized = ESCourseSerializer().serialize(course)
+    serialized = ESCourseSerializer(course).data
     assert serialized == {
         "object_type": COURSE_TYPE,
         "course_id": course.course_id,
@@ -308,5 +308,5 @@ def test_serialize_course_for_bulk():
     course = CourseFactory.create()
     assert serialize_course_for_bulk(course) == {
         "_id": gen_course_id(course.course_id),
-        **ESCourseSerializer().serialize(course),
+        **ESCourseSerializer(course).data,
     }
