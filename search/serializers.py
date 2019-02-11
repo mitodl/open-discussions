@@ -5,17 +5,9 @@ from prawcore import NotFound
 from rest_framework import serializers
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
-from channels.models import Post, Comment
-from profiles.api import get_channels
-from profiles.models import Profile
-from profiles.utils import image_uri
-from search.api import gen_post_id, gen_comment_id, gen_profile_id
-from search.constants import PROFILE_TYPE
-from channels.models import Post
-from channels.serializers.posts import BasePostSerializer
-from channels.serializers.comments import BaseCommentSerializer
-from channels.utils import get_reddit_slug
+from channels.models import Comment, Post
 from course_catalog.models import Course
+from profiles.utils import image_uri
 from profiles.api import get_channels
 from profiles.models import Profile
 from search.api import gen_post_id, gen_comment_id, gen_profile_id, gen_course_id
@@ -106,7 +98,7 @@ class ESProfileSerializer(ESProxySerializer):
         return {"author_channel_membership": sorted(get_channels(discussions_obj.user))}
 
 
-class ESCourseSerializer(ESModelSerializer):
+class ESCourseSerializer(ESProxySerializer):
     """
     Elasticsearch serializer class for courses
     """
@@ -125,27 +117,18 @@ class ESCourseSerializer(ESModelSerializer):
         "end_date",
         "enrollment_start",
         "enrollment_end",
+        "title",
+        "image_src",
+        "instructors",
+        "prices",
+        "topics",
     ]
-    rename_keys = {"title": "course_title", "image_src": "course_image"}
 
     @property
     def base_serializer(self):
         from course_catalog.serializers import CourseSerializer
 
         return CourseSerializer
-
-    def postprocess_fields(self, discussions_obj, serialized_data):
-        return {
-            "instructors": [
-                "{} {}".format(i.first_name, i.last_name)
-                for i in discussions_obj.instructors.iterator()
-            ],
-            "topics": [t.name for t in discussions_obj.topics.iterator()],
-            "prices": [
-                {"price": p.price, "mode": p.mode}
-                for p in discussions_obj.prices.iterator()
-            ],
-        }
 
 
 class ESPostSerializer(ESModelSerializer):
@@ -400,7 +383,9 @@ def serialize_bulk_courses(ids):
     Args:
         ids(list of int): List of course id's
     """
-    for course in Course.objects.filter(id__in=ids).iterator():
+    for course in Course.objects.filter(id__in=ids).prefetch_related(
+        "topics", "instructors", "prices"
+    ):
         yield serialize_course_for_bulk(course)
 
 

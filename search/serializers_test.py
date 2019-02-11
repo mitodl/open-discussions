@@ -5,7 +5,6 @@ import pytest
 from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories.models import PostFactory, CommentFactory
 from channels.utils import render_article_text
-from channels.utils import get_reddit_slug, render_article_text
 from course_catalog.factories import (
     CourseFactory,
     CourseTopicFactory,
@@ -216,6 +215,7 @@ def test_serialize_bulk_comments():
     ) == len(comments)
 
 
+@pytest.mark.django_db
 def test_es_course_serializer():
     """
     Test that ESCourseSerializer correctly serializes a course object
@@ -240,8 +240,8 @@ def test_es_course_serializer():
         "end_date": course.end_date,
         "enrollment_start": course.enrollment_start,
         "enrollment_end": course.enrollment_end,
-        "course_title": course.title,
-        "course_image": course.image_src,
+        "title": course.title,
+        "image_src": course.image_src,
         "instructors": [
             " ".join([instructor.first_name, instructor.last_name])
             for instructor in course.instructors.all()

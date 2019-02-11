@@ -234,14 +234,17 @@ def test_parse_mitx_json_data_overwrite(mocker, force_overwrite):
         last_modified=datetime.now().astimezone(pytz.utc),
     )
     mock_save = mocker.patch("course_catalog.task_helpers.CourseSerializer.save")
+    mock_update_index = mocker.patch("course_catalog.task_helpers.update_course")
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save.call_count == (1 if force_overwrite else 0)
+    assert mock_update_index.call_count == (1 if force_overwrite else 0)
 
 
-def test_parse_valid_mitx_json_data():
+def test_parse_valid_mitx_json_data(mocker):
     """
     Test parsing valid mitx json data
     """
+    mock_new_course_index = mocker.patch("course_catalog.task_helpers.index_new_course")
     parse_mitx_json_data(mitx_valid_data)
     courses_count = Course.objects.count()
     assert courses_count == 1
@@ -254,6 +257,8 @@ def test_parse_valid_mitx_json_data():
 
     course_topics_count = CourseTopic.objects.count()
     assert course_topics_count == 1
+
+    mock_new_course_index.assert_called_once_with(Course.objects.first())
 
 
 def test_parse_invalid_mitx_json_data():

@@ -10,9 +10,8 @@ from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException, NotFound
 
-from channels.models import Post, Comment
-from channels.constants import POST_TYPE
-from channels.models import Channel, Post
+from channels.models import Comment
+from channels.models import Post
 from course_catalog.models import Course
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks
@@ -157,7 +156,7 @@ def index_courses(ids):
     Index courses
 
     Args:
-        ids(list of string): List of course id's
+        ids(list of int): List of course id's
 
     """
     try:
@@ -214,6 +213,7 @@ def start_recreate_index(self):
             + [
                 index_courses.si(ids)
                 for ids in chunks(
+                    Course.objects.order_by("id").values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]

@@ -78,7 +78,7 @@ CONTENT_OBJECT_TYPE = {
 
 COURSE_OBJECT_TYPE = {
     "course_id": {"type": "keyword"},
-    "course_title": ENGLISH_TEXT_FIELD,
+    "title": ENGLISH_TEXT_FIELD,
     "short_description": ENGLISH_TEXT_FIELD,
     "full_description": ENGLISH_TEXT_FIELD,
     "platform": {"type": "keyword"},
@@ -93,7 +93,7 @@ COURSE_OBJECT_TYPE = {
     "topics": {"type": "keyword"},
     "instructors": {"type": "keyword"},
     "price": {"type": "nested"},
-    "course_image": {"type": "keyword"},
+    "image_src": {"type": "keyword"},
 }
 
 MAPPING = {

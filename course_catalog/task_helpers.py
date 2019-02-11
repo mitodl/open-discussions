@@ -19,7 +19,7 @@ from course_catalog.constants import (
 )
 from course_catalog.models import Course, CourseTopic, CourseInstructor, CoursePrice
 from course_catalog.serializers import CourseSerializer
-
+from search.task_helpers import update_course, index_new_course
 
 log = logging.getLogger(__name__)
 
@@ -83,8 +83,10 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
             ):
                 log.debug("(%s, %s) skipped", course_data.get("key"), course_run_key)
                 continue
+            index_func = update_course
         except Course.DoesNotExist:
             course_instance = None
+            index_func = index_new_course
 
         year, semester = get_year_and_semester(course_run)
 
@@ -127,6 +129,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
         with transaction.atomic():
             course = course_serializer.save()
             handle_many_to_many_fields(course, course_data, course_run)
+            index_func(course)
 
 
 def handle_many_to_many_fields(course, course_data, course_run):
@@ -260,6 +263,7 @@ def digest_ocw_course(
     if "PROD/RES" in course_prefix:
         course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
 
+    index_func = update_course if course_instance else index_new_course
     course_serializer = CourseSerializer(data=course_fields, instance=course_instance)
     if not course_serializer.is_valid():
         log.error(
@@ -299,6 +303,7 @@ def digest_ocw_course(
             price="0.00", mode="audit", upgrade_deadline=None
         )
         course.prices.add(course_price)
+        index_func(course)
 
 
 def get_ocw_topic(topic_object):

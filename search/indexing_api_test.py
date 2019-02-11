@@ -440,11 +440,11 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     )
 
 
-def test_index_courses(mocked_es, mocker, settings, user):
+@pytest.mark.usefixtures("indexing_user")
+def test_index_courses(mocked_es, mocker, settings):
     """
     index_courses should call bulk with correct arguments
     """
-    settings.INDEXING_API_USERNAME = user.username
     aliases = ["a", "b"]
     mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=aliases
@@ -468,11 +468,11 @@ def test_index_courses(mocked_es, mocker, settings, user):
         )
 
 
-def test_index_courses_error(mocked_es, mocker, settings, user):
+@pytest.mark.usefixtures("indexing_user")
+def test_index_courses_error(mocked_es, mocker):  # pylint:disable=unused-argument
     """
     index_courses should raise a ReindexException if the bulk call fails
     """
-    settings.INDEXING_API_USERNAME = user.username
     mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
     )
