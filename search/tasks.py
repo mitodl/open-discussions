@@ -157,7 +157,7 @@ def index_courses(ids):
     Index courses
 
     Args:
-        ids(list of int): List of course id's
+        ids(list of string): List of course id's
 
     """
     try:

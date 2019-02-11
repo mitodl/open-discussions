@@ -406,7 +406,7 @@ def serialize_bulk_courses(ids):
 
 def serialize_course_for_bulk(course_obj):
     """
-    Serialize a profile for bulk API request
+    Serialize a course for bulk API request
 
     Args:
         course_obj (Course): A course
