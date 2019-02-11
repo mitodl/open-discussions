@@ -206,3 +206,22 @@ def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger):
         "Error encountered reading 1.json for %s",
         "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
     )
+
+
+@mock_s3
+@pytest.mark.parametrize("image_only", [True, False])
+def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only):
+    """
+    Test that the ocw parser uploads all files or just images depending on settings
+    """
+    settings.OCW_UPLOAD_IMAGE_ONLY = image_only
+    mock_upload_all = mocker.patch(
+        "course_catalog.tasks.OCWParser.upload_all_media_to_s3"
+    )
+    mock_upload_image = mocker.patch(
+        "course_catalog.tasks.OCWParser.upload_course_image"
+    )
+    setup_s3(settings)
+    get_ocw_data()
+    assert mock_upload_image.call_count == (1 if image_only else 0)
+    assert mock_upload_all.call_count == (0 if image_only else 1)

@@ -57,7 +57,7 @@ def get_edx_data(force_overwrite=False):
 
 
 @app.task
-def get_ocw_data(upload_to_s3=True):  # pylint:disable=too-many-locals
+def get_ocw_data(upload_to_s3=True):  # pylint:disable=too-many-locals,too-many-branches
     """
     Task to sync OCW course data with database
     """
@@ -145,7 +145,11 @@ def get_ocw_data(upload_to_s3=True):  # pylint:disable=too-many-locals
                     # actual element and [-1] is an empty string
                     course_prefix.split("/")[-2],
                 )
-                parser.upload_all_media_to_s3()
+                if settings.OCW_UPLOAD_IMAGE_ONLY:
+                    parser.upload_course_image()
+                else:
+                    parser.upload_all_media_to_s3()
+
             digest_ocw_course(
                 parser.get_master_json(),
                 last_modified,
