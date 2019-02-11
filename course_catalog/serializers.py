@@ -48,7 +48,7 @@ class CourseSerializer(serializers.ModelSerializer):
         """
         Get the prices for a course
         """
-        return [{"price": p.price, "mode": p.mode} for p in course.prices.all()]
+        return list(course.prices.values("price", "mode"))
 
     def get_instructors(self, course):
         """
