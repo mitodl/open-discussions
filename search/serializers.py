@@ -132,7 +132,6 @@ class ESCourseSerializer(ESProxySerializer):
 
 
 class ESPostSerializer(ESModelSerializer):
-
     """Elasticsearch serializer class for posts"""
 
     object_type = POST_TYPE

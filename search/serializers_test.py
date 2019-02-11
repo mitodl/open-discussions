@@ -88,23 +88,6 @@ def patched_base_comment_serializer(mocker):
     )
 
 
-@pytest.fixture
-def patched_base_profile_serializer(mocker, user):
-    """Fixture that patches the base serializer class for ESProfileSerializer"""
-    base_serialized_data = {
-        "username": user.username,
-        "name": "Author Name",
-        "profile_image_small": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_small.jpg",
-        "profile_image_medium": "/media/profile/1/208c7d959608417eb13bc87392cb5f77-2018-09-21T163449_medium.jpg",
-        "bio": "Test bio",
-        "headline": "Test headline",
-    }
-    yield mocker.patch(
-        "search.serializers.ESProfileSerializer.base_serializer",
-        return_value=mocker.Mock(data=base_serialized_data, _get_user=mocker.Mock()),
-    )
-
-
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "factory_kwargs",
