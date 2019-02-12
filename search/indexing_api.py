@@ -77,6 +77,7 @@ CONTENT_OBJECT_TYPE = {
 }
 
 COURSE_OBJECT_TYPE = {
+    "id": {"type": "long"},
     "course_id": {"type": "keyword"},
     "title": ENGLISH_TEXT_FIELD,
     "short_description": ENGLISH_TEXT_FIELD,

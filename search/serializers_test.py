@@ -211,6 +211,7 @@ def test_es_course_serializer():
     serialized = ESCourseSerializer(course).data
     assert serialized == {
         "object_type": COURSE_TYPE,
+        "id": course.id,
         "course_id": course.course_id,
         "short_description": course.short_description,
         "full_description": course.full_description,

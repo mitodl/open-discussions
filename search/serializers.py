@@ -130,6 +130,7 @@ class ESCourseSerializer(ESModelSerializer):
     class Meta:
         model = Course
         fields = [
+            "id",
             "course_id",
             "short_description",
             "full_description",
