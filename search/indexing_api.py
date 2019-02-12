@@ -21,6 +21,7 @@ from search.constants import (
     POST_TYPE,
     COMMENT_TYPE,
     PROFILE_TYPE,
+    COURSE_TYPE,
     ALIAS_ALL_INDICES,
     VALID_OBJECT_TYPES,
     GLOBAL_DOC_TYPE,
@@ -30,6 +31,7 @@ from search.serializers import (
     serialize_bulk_posts,
     serialize_bulk_comments,
     serialize_bulk_profiles,
+    serialize_bulk_courses,
 )
 
 
@@ -74,6 +76,27 @@ CONTENT_OBJECT_TYPE = {
     "removed": {"type": "boolean"},
 }
 
+COURSE_OBJECT_TYPE = {
+    "id": {"type": "long"},
+    "course_id": {"type": "keyword"},
+    "title": ENGLISH_TEXT_FIELD,
+    "short_description": ENGLISH_TEXT_FIELD,
+    "full_description": ENGLISH_TEXT_FIELD,
+    "platform": {"type": "keyword"},
+    "language": {"type": "keyword"},
+    "level": {"type": "keyword"},
+    "semester": {"type": "keyword"},
+    "year": {"type": "keyword"},
+    "start_date": {"type": "date"},
+    "end_date": {"type": "date"},
+    "enrollment_start": {"type": "date"},
+    "enrollment_end": {"type": "date"},
+    "topics": {"type": "keyword"},
+    "instructors": {"type": "text"},
+    "price": {"type": "nested"},
+    "image_src": {"type": "keyword"},
+    "published": {"type": "boolean"},
+}
 
 MAPPING = {
     POST_TYPE: {
@@ -91,6 +114,7 @@ MAPPING = {
         "parent_post_removed": {"type": "boolean"},
     },
     PROFILE_TYPE: PROFILE_OBJECT_TYPE,
+    COURSE_TYPE: COURSE_OBJECT_TYPE,
 }
 
 
@@ -145,6 +169,19 @@ def create_document(doc_id, data):
     conn = get_conn(verify=True)
     for alias in get_active_aliases([data["object_type"]]):
         conn.create(index=alias, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id)
+
+
+def delete_document(doc_id, object_type):
+    """
+    Makes a request to ES to delete a document
+
+    Args:
+        doc_id (str): The ES document id
+        object_type (str): The object type
+    """
+    conn = get_conn(verify=True)
+    for alias in get_active_aliases([object_type]):
+        conn.delete(index=alias, doc_type=GLOBAL_DOC_TYPE, id=doc_id)
 
 
 def update_field_values_by_query(query, field_dict, object_types=None):
@@ -319,6 +356,29 @@ def index_profiles(ids):
         if len(errors) > 0:
             raise ReindexException(
                 "Error during bulk profile insert: {errors}".format(errors=errors)
+            )
+
+
+def index_courses(ids):
+    """
+    Index courses based on list of course ids
+
+    Args:
+        ids(list of int): List of course id's
+    """
+    conn = get_conn()
+    for alias in get_active_aliases([COURSE_TYPE]):
+        _, errors = bulk(
+            conn,
+            serialize_bulk_courses(ids),
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            # Adjust chunk size from 500 depending on environment variable
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+        if len(errors) > 0:
+            raise ReindexException(
+                "Error during bulk course insert: {errors}".format(errors=errors)
             )
 
 

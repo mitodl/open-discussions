@@ -1,4 +1,6 @@
 """API for general search-related functionality"""
+from base64 import urlsafe_b64encode
+
 from elasticsearch_dsl import Q, Search
 from elasticsearch_dsl.query import MoreLikeThis
 
@@ -56,6 +58,20 @@ def gen_profile_id(profile_id):
         str: The Elasticsearch document id for this object
     """
     return "u_{}".format(profile_id)
+
+
+def gen_course_id(course_id):
+    """
+    Generates the Elasticsearch document id for a course
+
+    Args:
+        course_id (str): The course_id of a Course object
+
+    Returns:
+        str: The Elasticsearch document id for this object
+    """
+    safe_id = urlsafe_b64encode(course_id.encode("utf-8")).decode("utf-8").rstrip("=")
+    return "co_{}".format(safe_id)
 
 
 def is_reddit_object_removed(reddit_obj):

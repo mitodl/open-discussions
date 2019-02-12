@@ -18,7 +18,7 @@ from course_catalog.task_helpers import (
 )
 
 pytestmark = pytest.mark.django_db
-
+# pylint:disable=redefined-outer-name
 
 mitx_valid_data = {
     "key": "MITx+15.071x",
@@ -225,7 +225,9 @@ mitx_valid_data = {
 
 
 @pytest.mark.parametrize("force_overwrite", [True, False])
-def test_parse_mitx_json_data_overwrite(mocker, force_overwrite):
+def test_parse_mitx_json_data_overwrite(
+    mocker, mock_course_index_functions, force_overwrite
+):
     """
     Test that valid mitx json data is skipped if it doesn't need an update
     """
@@ -236,9 +238,12 @@ def test_parse_mitx_json_data_overwrite(mocker, force_overwrite):
     mock_save = mocker.patch("course_catalog.task_helpers.CourseSerializer.save")
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save.call_count == (1 if force_overwrite else 0)
+    assert mock_course_index_functions.update_course.call_count == (
+        1 if force_overwrite else 0
+    )
 
 
-def test_parse_valid_mitx_json_data():
+def test_parse_valid_mitx_json_data(mock_course_index_functions):
     """
     Test parsing valid mitx json data
     """
@@ -254,6 +259,10 @@ def test_parse_valid_mitx_json_data():
 
     course_topics_count = CourseTopic.objects.count()
     assert course_topics_count == 1
+
+    mock_course_index_functions.index_new_course.assert_called_once_with(
+        Course.objects.first()
+    )
 
 
 def test_parse_invalid_mitx_json_data():
@@ -278,6 +287,7 @@ def test_parse_wrong_owner_json_data():
     assert courses_count == 0
 
 
+@pytest.mark.usefixtures("mock_index_functions")
 def test_deserializing_a_valid_ocw_course():
     """
     Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance

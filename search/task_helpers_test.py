@@ -2,11 +2,13 @@
 # pylint: disable=redefined-outer-name,unused-argument
 import pytest
 
+from course_catalog.factories import CourseFactory
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 from channels.factories.models import CommentFactory
 from channels.utils import render_article_text
-from search.constants import PROFILE_TYPE
+from search.constants import PROFILE_TYPE, COURSE_TYPE
+from search.serializers import ESCourseSerializer
 from search.task_helpers import (
     reddit_object_persist,
     index_new_post,
@@ -24,9 +26,10 @@ from search.task_helpers import (
     update_author,
     update_author_posts_comments,
     update_channel_index,
+    update_course,
+    index_new_course,
 )
-from search.api import gen_post_id, gen_comment_id, gen_profile_id
-
+from search.api import gen_post_id, gen_comment_id, gen_profile_id, gen_course_id
 
 es_profile_serializer_data = {
     "object_type": PROFILE_TYPE,
@@ -425,4 +428,36 @@ def test_update_channel_index(mocker, mock_index_functions):
             "channel_type": channel.subreddit_type,
         },
         object_types=[COMMENT_TYPE, POST_TYPE],
+    )
+
+
+@pytest.mark.django_db
+def test_update_course(mock_index_functions, mocker):
+    """
+    Tests that update_course calls update_field_values_by_query with the right parameters
+    """
+    patched_task = mocker.patch("search.task_helpers.update_document_with_partial")
+    course = CourseFactory.create()
+    update_course(course)
+    assert patched_task.delay.called is True
+    assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
+    assert patched_task.delay.call_args[0] == (
+        gen_course_id(course.course_id),
+        ESCourseSerializer(course).data,
+        COURSE_TYPE,
+    )
+
+
+@pytest.mark.django_db
+def test_index_new_course(mock_index_functions, mocker):
+    """
+    Test that index_new_course calls indexing tasks with the right parameters
+    """
+    patched_create_task = mocker.patch("search.task_helpers.create_document")
+    course = CourseFactory.create()
+    index_new_course(course)
+    assert patched_create_task.delay.called is True
+    assert patched_create_task.delay.call_args[0] == (
+        gen_course_id(course.course_id),
+        ESCourseSerializer(course).data,
     )
