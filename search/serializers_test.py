@@ -231,6 +231,7 @@ def test_es_course_serializer():
         ],
         "topics": list(course.topics.values_list("name", flat=True)),
         "prices": list(course.prices.values("price", "mode")),
+        "published": True,
     }
 
 

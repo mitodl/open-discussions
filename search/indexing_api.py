@@ -94,6 +94,7 @@ COURSE_OBJECT_TYPE = {
     "instructors": {"type": "text"},
     "price": {"type": "nested"},
     "image_src": {"type": "keyword"},
+    "published": {"type": "boolean"},
 }
 
 MAPPING = {
