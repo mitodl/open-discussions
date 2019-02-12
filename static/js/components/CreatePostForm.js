@@ -158,9 +158,11 @@ export default class CreatePostForm extends React.Component<Props, State> {
             />
           ) : null}
           {validationMessage(validation.coverImage)}
-          <ArticleEditor onChange={editorUpdateFormShim("article", onUpdate)} />
+          <ArticleEditor
+            onChange={editorUpdateFormShim("article_content", onUpdate)}
+          />
           {this.clearInputButton()}
-          {validationMessage(validation.article)}
+          {validationMessage(validation.article_content)}
         </div>
       )
     } else {

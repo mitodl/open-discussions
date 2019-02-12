@@ -14,8 +14,8 @@ export async function createPost(
 ): Promise<Post> {
   const formData = objectToFormData(R.pick(["text", "url", "title"], payload))
 
-  if (!emptyOrNil(payload.article)) {
-    formData.append("article_content", JSON.stringify(payload.article))
+  if (!emptyOrNil(payload.article_content)) {
+    formData.append("article_content", JSON.stringify(payload.article_content))
 
     if (payload.cover_image) {
       formData.append("cover_image", payload.cover_image)

@@ -3,7 +3,7 @@ import React from "react"
 import R from "ramda"
 import { Provider } from "react-redux"
 import { assert } from "chai"
-import { mount } from "enzyme"
+import { mount, shallow } from "enzyme"
 import sinon from "sinon"
 import { EditorView } from "prosemirror-view"
 
@@ -12,15 +12,20 @@ import {
   ReplyToPostForm,
   EditCommentForm,
   EditPostForm,
+  InputFormHelper,
   replyToPostKey,
   replyToCommentKey,
   editCommentKey,
   beginEditing,
   getCommentReplyInitialValue,
-  editPostKey
+  editPostKey,
+  ArticleInput,
+  WYSIWYGInput,
+  TextInput
 } from "./CommentForms"
 import Router from "../Router"
 import LoginPopup from "./LoginPopup"
+import Editor from "./Editor"
 
 import * as forms from "../actions/forms"
 import { actions } from "../actions"
@@ -607,20 +612,79 @@ describe("CommentForms", () => {
     })
   })
 
+  describe("InputFormhelper", () => {
+    let props
+
+    const renderInputFormHelper = (extraProps = {}) =>
+      shallow(<InputFormHelper {...props} {...extraProps} />)
+
+    beforeEach(() => {
+      props = {
+        onSubmit:      helper.sandbox.stub(),
+        text:          "",
+        onUpdate:      helper.sandbox.stub(),
+        cancelReply:   helper.sandbox.stub(),
+        isComment:     false,
+        disabled:      false,
+        autoFocus:     false,
+        onTogglePopup: helper.sandbox.stub(),
+        profile:       null,
+        article:       null
+      }
+    })
+
+    it("should use an <Editor /> if WYSIWYGInput", () => {
+      const wrapper = renderInputFormHelper({
+        inputType: WYSIWYGInput
+      })
+      assert.ok(wrapper.find(Editor).exists())
+    })
+
+    it("should use a text input if TextInput", () => {
+      const wrapper = renderInputFormHelper({
+        inputType: TextInput
+      })
+      assert.ok(wrapper.find("textarea.input").exists())
+    })
+
+    it("should use an article editor if ArticleInput", () => {
+      const wrapper = renderInputFormHelper({
+        inputType: ArticleInput
+      })
+      assert.ok(wrapper.find("ArticleEditor").exists())
+    })
+
+    it("should show article validation errors", () => {
+      const wrapper = renderInputFormHelper({
+        inputType:  ArticleInput,
+        validation: {
+          article_content: "BAD"
+        }
+      })
+      assert.equal(wrapper.find(".validation-message").text(), "BAD")
+    })
+
+    it("should show text validation errors", () => {
+      const wrapper = renderInputFormHelper({
+        inputType:  WYSIWYGInput,
+        validation: {
+          text: "BAD"
+        }
+      })
+      assert.equal(wrapper.find(".validation-message").text(), "BAD")
+    })
+  })
+
   describe("EditPostForm", () => {
     let wrapper
 
     beforeEach(() => {
       wrapper = renderEditPostForm()
-    })
-
-    it("should use the <Editor /> if a text post", () => {
-      assert.ok(wrapper.find("Editor").exists())
-      assert.isNotOk(wrapper.find("textarea").exists())
+      helper.getCKEditorJWTStub.returns(Promise.resolve())
     })
 
     it("should use the ArticleEditor and CoverImageInput if an article post", () => {
-      post.article = []
+      post.article_content = []
       wrapper = renderEditPostForm()
       assert.ok(wrapper.find("ArticleEditor"))
       assert.ok(wrapper.find("CoverImageInput"))

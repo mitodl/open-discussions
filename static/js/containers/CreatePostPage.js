@@ -67,7 +67,7 @@ const getForm = R.prop(CREATE_POST_KEY)
 
 const createPostPayload = (postForm: PostForm): CreatePostPayload => {
   // eslint-disable-next-line camelcase
-  const { postType, title, url, text, article, cover_image } = postForm
+  const { postType, title, url, text, article_content, cover_image } = postForm
 
   switch (postType) {
   case LINK_TYPE_LINK:
@@ -75,7 +75,7 @@ const createPostPayload = (postForm: PostForm): CreatePostPayload => {
   case LINK_TYPE_TEXT:
     return { title, text }
   case LINK_TYPE_ARTICLE:
-    return { title, article, cover_image }
+    return { title, article_content, cover_image }
   }
 
   // if no postType was selected, we're dealing with a 'title only' post
@@ -121,7 +121,7 @@ const shouldFormReset = (
     allEmptyOrNil([
       postForm.value.url,
       postForm.value.text,
-      postForm.value.article
+      postForm.value.article_content
     ])
   ) {
     return true
@@ -194,7 +194,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
         url:              "",
         text:             "",
         thumbnail:        null,
-        article:          [],
+        article_content:  [],
         show_cover_image: true
       })
     }
@@ -238,7 +238,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       postType,
       url:              "",
       text:             "",
-      article:          [],
+      article_content:  [],
       cover_image:      null,
       show_cover_image: true
     })

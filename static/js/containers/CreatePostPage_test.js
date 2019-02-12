@@ -584,7 +584,7 @@ describe("CreatePostPage", () => {
                   : toChannelTypes[0],
               url:              "",
               text:             "",
-              article:          [],
+              article_content:  [],
               thumbnail:        null,
               show_cover_image: true
             })
@@ -656,7 +656,8 @@ describe("CreatePostPage", () => {
         const url =
           hasInput && postType === LINK_TYPE_LINK ? "http://foo.edu" : ""
         const text = hasInput && postType === LINK_TYPE_TEXT ? "test text" : ""
-        const article =
+        // eslint-disable-next-line camelcase
+        const article_content =
           hasInput && postType === LINK_TYPE_ARTICLE ? [{ foo: "bar" }] : null
         const props: any = {
           dispatch,
@@ -665,7 +666,7 @@ describe("CreatePostPage", () => {
               postType: postType,
               url,
               text,
-              article
+              article_content
             }
           },
           channel: currentChannel
@@ -685,7 +686,7 @@ describe("CreatePostPage", () => {
             url:              "",
             text:             "",
             thumbnail:        null,
-            article:          [],
+            article_content:  [],
             show_cover_image: true
           })
         } else {

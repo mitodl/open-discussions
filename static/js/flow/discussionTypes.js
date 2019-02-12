@@ -102,31 +102,32 @@ export type PostFormType =
   | null
 
 export type PostForm = {
-  postType:           PostFormType,
-  text:               string,
-  url:                string,
-  title:              string,
-  article:            Array<Object>,
-  cover_image:        ?File,
-  show_cover_image:   boolean
+  postType:         PostFormType,
+  post_type?:       PostFormType,
+  text:             string,
+  url:              string,
+  title:            string,
+  article_content:  Array<Object>,
+  cover_image:      ?File,
+  show_cover_image: boolean
 }
 
 export type PostValidation = {
-  text?:       string,
-  url?:        string,
-  title?:      string,
-  channel?:    string,
-  post_type?:  string,
-  article?:    string,
-  coverImage?: string,
+  text?:            string,
+  url?:             string,
+  title?:           string,
+  channel?:         string,
+  post_type?:       string,
+  article_content?: string,
+  coverImage?:      string,
 }
 
 export type CreatePostPayload = {
-  url?:          string,
-  text?:         string,
-  title:         string,
-  article?:      Array<Object>,
-  cover_image?:  ?File,
+  url?:             string,
+  text?:            string,
+  title:            string,
+  article_content?: Array<Object>,
+  cover_image?:     ?File,
 }
 
 export type PostListPagination = {

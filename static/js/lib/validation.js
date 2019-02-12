@@ -68,7 +68,13 @@ const validateIfPostType = (
   postType: PostFormType,
   validator: Function
 ) => (postForm: { value: PostForm }) => {
-  if (R.isEmpty(postForm) || postForm.value.postType !== postType) {
+  if (R.isEmpty(postForm)) {
+    return S.Nothing
+  }
+
+  const formPostType = postForm.value.postType || postForm.value.post_type
+
+  if (formPostType !== postType) {
     return S.Nothing
   } else {
     return validator(postForm)
@@ -91,12 +97,32 @@ export const postURLValidation = validateIfPostType(
   }
 )
 
+const isEmptyArticle = (article: Array<Object>): boolean => {
+  // unfortunately detecting an empty article is non-trivial :/
+
+  // if it's an empty array that's easy
+  if (R.equals(article, [])) {
+    return true
+  }
+
+  // sometimes the editor will leave one empty tag in it
+  if (article.length === 1) {
+    const [obj] = article
+    if (R.equals(obj.attributes, {}) || R.equals(obj.children, [])) {
+      return true
+    }
+  }
+  return false
+}
+
 export const postArticleValidation = validateIfPostType(
   LINK_TYPE_ARTICLE,
   (postForm: { value: PostForm }) => {
     const { value: post } = postForm
-    if (R.equals(post.article, [])) {
-      return S.Just(formLensSetter("article", "Article must not be empty"))
+    if (isEmptyArticle(post.article_content)) {
+      return S.Just(
+        formLensSetter("article_content", "Article must not be empty")
+      )
     } else {
       return S.Nothing
     }

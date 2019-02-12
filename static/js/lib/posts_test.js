@@ -28,7 +28,7 @@ describe("Post utils", () => {
       text:             "",
       url:              "",
       title:            "",
-      article:          [],
+      article_content:  [],
       thumbnail:        null,
       cover_image:      null,
       show_cover_image: true

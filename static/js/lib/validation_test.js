@@ -167,21 +167,25 @@ describe("validation library", () => {
 
     it("should complain about an empty article post", () => {
       const post = {
-        value: { postType: LINK_TYPE_ARTICLE, title: "potato", article: [] }
+        value: {
+          postType:        LINK_TYPE_ARTICLE,
+          title:           "potato",
+          article_content: []
+        }
       }
       assert.deepEqual(validatePostCreateForm(post), {
         value: {
-          article: "Article must not be empty"
+          article_content: "Article must not be empty"
         }
       })
     })
 
-    it("should allow an non-empty article post", () => {
+    it("should allow a non-empty article post", () => {
       const post = {
         value: {
-          postType: LINK_TYPE_ARTICLE,
-          title:    "potato",
-          article:  [{ hey: "there" }]
+          postType:        LINK_TYPE_ARTICLE,
+          title:           "potato",
+          article_content: [{ hey: "there" }]
         }
       }
       assert.deepEqual(validatePostCreateForm(post), {})

@@ -25,7 +25,7 @@ export const newPostForm = (): PostForm => ({
   url:              "",
   title:            "",
   thumbnail:        null,
-  article:          [],
+  article_content:  [],
   cover_image:      null,
   show_cover_image: true
 })

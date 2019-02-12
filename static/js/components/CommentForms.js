@@ -10,6 +10,7 @@ import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
 import ArticleEditor from "./ArticleEditor"
 import CoverImageInput from "./CoverImageInput"
 
+import { validationMessage } from "../lib/validation"
 import { actions } from "../actions"
 import { clearCommentError } from "../actions/comment"
 import { setPostData } from "../actions/post"
@@ -20,6 +21,7 @@ import {
   preventDefaultAndInvoke
 } from "../lib/util"
 import { LINK_TYPE_ARTICLE } from "../lib/channels"
+import { validatePostCreateForm } from "../lib/validation"
 
 import type {
   CommentForm,
@@ -46,7 +48,8 @@ type CommentComponentProps = {
   patchPost: (p: Object) => void,
   comment: CommentInTree,
   editing: boolean,
-  profile?: Profile
+  profile?: Profile,
+  setValidationErrors: (errors: Object) => void
 }
 
 type CommentFormState = {
@@ -83,9 +86,9 @@ const userOrAnonymousFunction = (
     ? preventDefaultAndInvoke(anonymousFunc)
     : userFunc
 
-const ArticleInput: "ArticleInput" = "ArticleInput"
-const WYSIWYGInput: "WYSIWYGInput" = "WYSIWYGInput"
-const TextInput: "TextInput" = "TextInput"
+export const ArticleInput: "ArticleInput" = "ArticleInput"
+export const WYSIWYGInput: "WYSIWYGInput" = "WYSIWYGInput"
+export const TextInput: "TextInput" = "TextInput"
 type InputFormHelperInputType =
   | typeof ArticleInput
   | typeof WYSIWYGInput
@@ -102,10 +105,11 @@ type InputFormProps = {
   onTogglePopup?: Function,
   profile?: Profile,
   article?: Array<Object>,
-  inputType: InputFormHelperInputType
+  inputType: InputFormHelperInputType,
+  validation?: Object
 }
 
-const InputFormHelper = ({
+export const InputFormHelper = ({
   onSubmit,
   text,
   onUpdate,
@@ -116,25 +120,32 @@ const InputFormHelper = ({
   onTogglePopup,
   profile,
   article,
-  inputType
+  inputType,
+  validation
 }: InputFormProps) => {
   let input
   switch (inputType) {
   case ArticleInput:
     input = (
-      <ArticleEditor
-        initialData={article}
-        onChange={editorUpdateFormShim("article_content", onUpdate)}
-      />
+      <React.Fragment>
+        <ArticleEditor
+          initialData={article}
+          onChange={editorUpdateFormShim("article_content", onUpdate)}
+        />
+        {validation ? validationMessage(validation.article_content) : null}
+      </React.Fragment>
     )
     break
   case WYSIWYGInput:
     input = (
-      <Editor
-        initialValue={text || ""}
-        onChange={editorUpdateFormShim("text", onUpdate)}
-        autoFocus={autoFocus}
-      />
+      <React.Fragment>
+        <Editor
+          initialValue={text || ""}
+          onChange={editorUpdateFormShim("text", onUpdate)}
+          autoFocus={autoFocus}
+        />
+        {validation ? validationMessage(validation.text) : null}
+      </React.Fragment>
     )
     break
   case TextInput:
@@ -295,6 +306,13 @@ const mapDispatchToProps = (dispatch: any, ownProps: CommentComponentProps) => {
         }
       }
     }),
+    setValidationErrors: errors =>
+      dispatch(
+        actions.forms.formValidate({
+          formKey,
+          errors
+        })
+      ),
     patchComment: async comment => {
       try {
         await dispatch(actions.comments.patch(comment.id, comment))
@@ -445,26 +463,35 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
     }
 
     onSubmit = async e => {
-      const { formKey, forms, patchPost, post } = this.props
-      // eslint-disable-next-line camelcase
-      const { text, article_content, cover_image } = R.prop(
+      const {
         formKey,
-        forms
-      ).value
-
+        forms,
+        patchPost,
+        post,
+        setValidationErrors
+      } = this.props
       e.preventDefault()
-
-      const { id } = post
-      this.setState({ patching: true })
+      const form = R.prop(formKey, forms)
       // eslint-disable-next-line camelcase
-      const content =
-        post.post_type === LINK_TYPE_ARTICLE
-          ? { id, article_content, cover_image }
-          : { id, text }
-      try {
-        await patchPost(content)
-      } catch (_) {
-        this.setState({ patching: false })
+      const { text, article_content, cover_image } = form.value
+
+      const validation = validatePostCreateForm(form)
+
+      if (!R.isEmpty(validation)) {
+        setValidationErrors(validation)
+      } else {
+        const { id } = post
+        this.setState({ patching: true })
+        // eslint-disable-next-line camelcase
+        const content =
+          post.post_type === LINK_TYPE_ARTICLE
+            ? { id, article_content, cover_image }
+            : { id, text }
+        try {
+          await patchPost(content)
+        } catch (_) {
+          this.setState({ patching: false })
+        }
       }
     }
 
@@ -482,6 +509,8 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
         [formKey, "value", "article_content"],
         forms
       )
+
+      const validation = R.pathOr({}, [formKey, "errors", "value"], forms)
 
       const inputType =
         post.post_type === LINK_TYPE_ARTICLE ? ArticleInput : WYSIWYGInput
@@ -505,6 +534,7 @@ export const EditPostForm: Class<React$Component<*, *>> = connect(
             disabled={patching}
             autoFocus={true}
             inputType={inputType}
+            validation={validation}
           />
         </React.Fragment>
       )

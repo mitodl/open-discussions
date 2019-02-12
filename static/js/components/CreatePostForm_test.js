@@ -108,7 +108,7 @@ describe("CreatePostForm", () => {
   it("should show article validation message", () => {
     const postForm = { ...newPostForm(), postType: LINK_TYPE_ARTICLE }
     const wrapper = renderPostForm({
-      validation: { article: "WHAT?! NO! OF COURSE NOT!" },
+      validation: { article_content: "WHAT?! NO! OF COURSE NOT!" },
       postForm
     })
     assert.equal(
