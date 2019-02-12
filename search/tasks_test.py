@@ -244,7 +244,7 @@ def test_finish_recreate_index(mocker, with_error):
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_index_courses(mocker, with_error):  # pylint: disable=unused-argument
+def test_index_courses(mocker, with_error):
     """index_courses should call the api function of the same name"""
     index_courses_mock = mocker.patch("search.indexing_api.index_courses")
     if with_error:

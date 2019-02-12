@@ -161,9 +161,7 @@ def index_courses(ids):
     """
     try:
         api.index_courses(ids)
-    except RetryException:
-        raise
-    except Ignore:
+    except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
         error = f"index_courses threw an error"

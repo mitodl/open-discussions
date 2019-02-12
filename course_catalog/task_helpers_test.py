@@ -287,9 +287,8 @@ def test_parse_wrong_owner_json_data():
     assert courses_count == 0
 
 
-def test_deserializing_a_valid_ocw_course(
-    mock_index_functions
-):  # pylint:disable=unused-argument
+@pytest.mark.usefixtures("mock_index_functions")
+def test_deserializing_a_valid_ocw_course():
     """
     Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance
     """

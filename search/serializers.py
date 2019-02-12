@@ -405,9 +405,7 @@ def serialize_bulk_courses(ids):
     Args:
         ids(list of int): List of course id's
     """
-    for course in Course.objects.filter(id__in=ids).prefetch_related(
-        "topics", "instructors", "prices"
-    ):
+    for course in Course.objects.filter(id__in=ids).prefetch_related("instructors"):
         yield serialize_course_for_bulk(course)
 
 

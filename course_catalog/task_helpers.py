@@ -263,7 +263,7 @@ def digest_ocw_course(
     if "PROD/RES" in course_prefix:
         course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
 
-    index_func = update_course if course_instance else index_new_course
+    index_func = update_course if course_instance is not None else index_new_course
     course_serializer = CourseSerializer(data=course_fields, instance=course_instance)
     if not course_serializer.is_valid():
         log.error(

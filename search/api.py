@@ -1,5 +1,5 @@
 """API for general search-related functionality"""
-import re
+from base64 import urlsafe_b64encode
 
 from elasticsearch_dsl import Q, Search
 from elasticsearch_dsl.query import MoreLikeThis
@@ -70,7 +70,7 @@ def gen_course_id(course_id):
     Returns:
         str: The Elasticsearch document id for this object
     """
-    safe_id = re.sub(r"\W+", "", course_id)
+    safe_id = urlsafe_b64encode(course_id.encode("utf-8")).decode("utf-8").rstrip("=")
     return "co_{}".format(safe_id)
 
 
