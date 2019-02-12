@@ -229,10 +229,8 @@ def test_es_course_serializer():
             " ".join([instructor.first_name, instructor.last_name])
             for instructor in course.instructors.all()
         ],
-        "topics": [topic.name for topic in course.topics.all()],
-        "prices": [
-            {"price": price.price, "mode": price.mode} for price in course.prices.all()
-        ],
+        "topics": list(course.topics.values_list("name", flat=True)),
+        "prices": list(course.prices.values("price", "mode")),
     }
 
 

@@ -4,7 +4,6 @@ Test tasks
 import json
 from os import listdir
 from os.path import isfile, join
-
 from unittest.mock import Mock
 
 import boto3
@@ -105,7 +104,9 @@ def setup_s3(settings):
     conn.create_bucket(Bucket=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
 
 
-def test_get_mitx_data_valid(settings, access_token, get_test_data):
+def test_get_mitx_data_valid(
+    settings, access_token, get_test_data, mock_course_index_functions
+):
     """
     Test that mitx sync task successfully creates database objects
     """
@@ -150,7 +151,7 @@ def test_get_mitx_data_no_settings():
 
 
 @mock_s3
-def test_get_ocw_data(settings):
+def test_get_ocw_data(settings, mock_course_index_functions):
     """
     Test ocw sync task
     """

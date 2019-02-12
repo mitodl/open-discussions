@@ -91,7 +91,7 @@ COURSE_OBJECT_TYPE = {
     "enrollment_start": {"type": "date"},
     "enrollment_end": {"type": "date"},
     "topics": {"type": "keyword"},
-    "instructors": {"type": "keyword"},
+    "instructors": {"type": "text"},
     "price": {"type": "nested"},
     "image_src": {"type": "keyword"},
 }

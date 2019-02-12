@@ -7,6 +7,7 @@ from prawcore.exceptions import PrawcoreException, NotFound
 import pytest
 
 from channels.factories.models import CommentFactory
+from course_catalog.factories import CourseFactory
 from open_discussions.test_utils import assert_not_raises
 from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES
 from search.exceptions import ReindexException, RetryException
@@ -155,7 +156,9 @@ def test_index_profiles(mocker, with_error):  # pylint: disable=unused-argument
     index_profile_mock.assert_called_once_with([1, 2, 3])
 
 
-def test_start_recreate_index(mock_index_functions, mocker, mocked_celery, user):
+def test_start_recreate_index(
+    mock_index_functions, mocker, mocked_celery, user
+):  # pylint:disable=too-many-locals
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
     """
@@ -164,9 +167,11 @@ def test_start_recreate_index(mock_index_functions, mocker, mocked_celery, user)
     comments = sorted(CommentFactory.create_batch(4), key=lambda comment: comment.id)
     posts = sorted([comment.post for comment in comments], key=lambda post: post.id)
     users = sorted([item.author for item in posts + comments], key=lambda user: user.id)
+    courses = sorted(CourseFactory.create_batch(4), key=lambda course: course.id)
     index_posts_mock = mocker.patch("search.tasks.index_posts", autospec=True)
     index_comments_mock = mocker.patch("search.tasks.index_comments", autospec=True)
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
+    index_courses_mock = mocker.patch("search.tasks.index_courses", autospec=True)
     backing_index = "backing"
     create_backing_index_mock = mocker.patch(
         "search.indexing_api.create_backing_index",
@@ -208,6 +213,10 @@ def test_start_recreate_index(mock_index_functions, mocker, mocked_celery, user)
         index_profiles_mock.si.assert_any_call(
             [users[offset * 2].profile.id, users[offset * 2 + 1].profile.id]
         )
+
+    assert index_courses_mock.si.call_count == 2
+    index_courses_mock.si.assert_any_call([courses[0].id, courses[1].id])
+    index_courses_mock.si.assert_any_call([courses[2].id, courses[3].id])
 
     assert mocked_celery.replace.call_count == 1
     assert mocked_celery.replace.call_args[0][1] == mocked_celery.chain.return_value
