@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.65.3
+Version 0.65.3 (Released February 12, 2019)
 --------------
 
 - replace @task with @app.task (#1832)
