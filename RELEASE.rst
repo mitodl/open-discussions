@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.66.0
+--------------
+
+- RFC: Caching system for third party data
+- Create and update course documents in Elasticsearch (#1721)
+- Switched search to index posts/comments from db
+- Remove accidental file
+- Fixed template typo
+- Added a few issue templates
+- Remove usages of channel description and allow_widget_ui
+
 Version 0.65.3 (Released February 12, 2019)
 --------------
 
