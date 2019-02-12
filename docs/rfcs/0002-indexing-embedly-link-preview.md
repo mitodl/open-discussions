@@ -39,7 +39,7 @@ The `title` and `provider_name` are potentially significant in terms of the sear
 
 *Potential Issues*: There might still be some application logic on the back- _or_ front-end that considers a post with non-blank `text` value to be a self/text post. This would break that logic.
 
-#### 4) (Possible) Getting rid of either the `plain_text` or `text` field in ES documents
+#### 4) (Related, but separate issue) Getting rid of either the `plain_text` or `text` field in ES documents
 
 After reviewing this a bit, it became clear that we don't seem to be using the ES documents' `text` field. We only care about the plain text content of these posts (stored in the `plain_text` field). 
 
@@ -47,4 +47,4 @@ After reviewing this a bit, it became clear that we don't seem to be using the E
 
 *Drawbacks*: For (a) there may still be some application logic that makes use of that value. For (b) it could be jarring to have two properties with the same name on the model object and its corresponding ES document with different values.
 
-This could, of course, be done in a separate issue.
+If this makes sense, this change would be made in a separate issue (i.e.: not as part of #1811)
