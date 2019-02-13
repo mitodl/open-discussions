@@ -24,6 +24,7 @@ import {
   WIDGET_TYPE_RSS,
   WIDGET_TYPE_URL
 } from "../../lib/constants"
+import { isIf, shouldIf } from "../../lib/test_utils"
 
 describe("WidgetEditDialog", () => {
   let sandbox,
@@ -185,29 +186,41 @@ describe("WidgetEditDialog", () => {
         dialogData.validation.widget_type
       )
     })
+    ;[
+      [true, WIDGET_TYPE_SELECT, true],
+      [false, WIDGET_TYPE_SELECT, false],
+      [false, WIDGET_CREATE, true],
+      [false, WIDGET_CREATE, false],
+      [false, WIDGET_EDIT, true],
+      [false, WIDGET_EDIT, false]
+    ].forEach(([expected, dialogState, dialogOpen]) => {
+      it.only(`${shouldIf(
+        expected
+      )} shift focus from radio buttons when state=${dialogState} and dialog ${isIf(
+        dialogOpen
+      )} open`, () => {
+        const div = document.createElement("div")
+        // $FlowFixMe: document.body should almost never be null
+        document.body.appendChild(div)
 
-    it("disables automatic focus on radio buttons by focusing on the submit button", () => {
-      const div = document.createElement("div")
-      // $FlowFixMe: document.body should almost never be null
-      document.body.appendChild(div)
-
-      mount(
-        <WidgetEditDialog
-          dialogData={dialogData}
-          dialogOpen={true}
-          setDialogData={setDialogDataStub}
-          setDialogVisibility={setDialogVisibilityStub}
-          specs={specs}
-          updateForm={updateFormStub}
-        />,
-        {
-          attachTo: div
-        }
-      )
-      // $FlowFixMe: if it's null it will fail the test anyway
-      const focusedElement: HTMLElement = document.activeElement
-      assert.equal(focusedElement.tagName, "BUTTON")
-      assert.equal(focusedElement.className, "submit")
+        mount(
+          <WidgetEditDialog
+            dialogData={dialogData}
+            dialogOpen={true}
+            setDialogData={setDialogDataStub}
+            setDialogVisibility={setDialogVisibilityStub}
+            specs={specs}
+            updateForm={updateFormStub}
+          />,
+          {
+            attachTo: div
+          }
+        )
+        // $FlowFixMe: if it's null it will fail the test anyway
+        const focusedElement: HTMLElement = document.activeElement
+        assert.equal(focusedElement.tagName, "BUTTON")
+        assert.equal(focusedElement.className, "submit")
+      })
     })
   })
 
