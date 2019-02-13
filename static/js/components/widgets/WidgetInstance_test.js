@@ -3,7 +3,6 @@ import React from "react"
 import { mount } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
-import { Provider } from "react-redux"
 import { SortableContainer } from "react-sortable-hoc"
 
 import WidgetInstance from "./WidgetInstance"
