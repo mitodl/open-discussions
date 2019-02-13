@@ -5,10 +5,10 @@ import casual from "casual-browserify"
 import { mount } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
-import { Provider } from "react-redux"
 
 import WidgetList from "./WidgetList"
 import WidgetInstance from "./WidgetInstance"
+import Router from "../../Router"
 
 import {
   makeWidgetInstance,
@@ -63,7 +63,7 @@ describe("WidgetList", () => {
 
   const render = (props = {}) =>
     mount(
-      <Provider store={helper.store}>
+      <Router store={helper.store} history={helper.browserHistory}>
         <WidgetList
           widgetInstances={listResponse.widgets}
           clearForm={clearFormStub}
@@ -76,7 +76,7 @@ describe("WidgetList", () => {
           setExpanded={setExpandedStub}
           {...props}
         />
-      </Provider>
+      </Router>
     )
 
   it("renders a list of WidgetInstances", () => {

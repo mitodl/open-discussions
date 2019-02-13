@@ -3,10 +3,10 @@ import React from "react"
 import R from "ramda"
 import { mount } from "enzyme"
 import { assert } from "chai"
-import { Provider } from "react-redux"
 
 import PeopleList from "./PeopleList"
 import PeopleItem from "./PeopleItem"
+import Router from "../../Router"
 
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import { makeProfile } from "../../factories/profiles"
@@ -28,7 +28,7 @@ describe("PeopleList", () => {
 
   const render = (props = {}) =>
     mount(
-      <Provider store={helper.store}>
+      <Router store={helper.store} history={helper.browserHistory}>
         <PeopleList
           profiles={profiles}
           deleteProfile={deleteProfileStub}
@@ -36,7 +36,7 @@ describe("PeopleList", () => {
           editing={false}
           {...props}
         />
-      </Provider>
+      </Router>
     )
   ;[true, false].forEach(editing => {
     it(`renders a list of PeopleItem with editing=${String(editing)}`, () => {

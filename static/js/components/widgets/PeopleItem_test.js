@@ -1,12 +1,12 @@
 // @flow
 import React from "react"
 import { mount } from "enzyme/build"
-import { Provider } from "react-redux"
 import { assert } from "chai"
 import sinon from "sinon"
 import { SortableContainer } from "react-sortable-hoc"
 
 import PeopleItem from "./PeopleItem"
+import Router from "../../Router"
 
 import { makeProfile } from "../../factories/profiles"
 import { shouldIf } from "../../lib/test_utils"
@@ -32,7 +32,7 @@ describe("PeopleItem", () => {
 
   const render = (props = {}) =>
     mount(
-      <Provider store={helper.store}>
+      <Router store={helper.store} history={helper.browserHistory}>
         <WrappedPeopleItem
           profile={profile}
           deleteProfile={deleteProfileStub}
@@ -41,7 +41,7 @@ describe("PeopleItem", () => {
           addProfile={addProfileStub}
           {...props}
         />
-      </Provider>,
+      </Router>,
       {
         // for react-sortable-hoc
         context: {
@@ -56,7 +56,7 @@ describe("PeopleItem", () => {
   it("renders a PeopleItem", () => {
     const wrapper = render()
     assert.deepEqual(wrapper.find("ProfileImage").prop("profile"), profile)
-    assert.equal(wrapper.find(".description .name").text(), profile.name)
+    assert.equal(wrapper.find("Link").text(), profile.name)
     assert.equal(
       wrapper.find(".description .headline").text(),
       profile.headline

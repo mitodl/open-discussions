@@ -9,6 +9,8 @@ import ProfileImage, {
 
 import type { StatelessFunctionalComponent } from "react"
 import type { Profile } from "../../flow/discussionTypes"
+import { Link } from "react-router-dom"
+import { profileURL } from "../../lib/url"
 
 type Props = {
   addProfile?: (profile: Profile) => void,
@@ -25,7 +27,9 @@ export const PeopleItem: StatelessFunctionalComponent<Props> = ({
   <div className="person">
     <ProfileImage imageSize={PROFILE_IMAGE_MICRO} profile={profile} />
     <div className="description">
-      <span className="name">{profile.name}</span>
+      <Link to={profileURL(profile.username)} className="name navy">
+        {profile.name}
+      </Link>
       <span className="headline">{profile.headline}</span>
     </div>
     {editing ? (
