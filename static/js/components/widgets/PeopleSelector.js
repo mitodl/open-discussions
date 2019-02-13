@@ -26,6 +26,12 @@ type Props = {
 type State = {
   text: string
 }
+type FetchRequestArgs = {
+  value: string,
+  reason: string
+}
+type OnChangeTextArgs = { newValue: string, method: string }
+
 export class PeopleSelector extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -40,13 +46,7 @@ export class PeopleSelector extends React.Component<Props, State> {
     clearSearch()
   }
 
-  onSuggestionsFetchRequested = ({
-    value,
-    reason
-  }: {
-    value: string,
-    reason: string
-  }) => {
+  onSuggestionsFetchRequested = ({ value, reason }: FetchRequestArgs) => {
     const { clearSearch, fetchSuggestions } = this.props
     if (reason !== "input-changed") {
       return
@@ -65,10 +65,7 @@ export class PeopleSelector extends React.Component<Props, State> {
     <SearchTextbox {...inputProps} />
   )
 
-  onChangeText = (
-    event: Event,
-    { newValue, method }: { newValue: string, method: string }
-  ) => {
+  onChangeText = (event: Event, { newValue, method }: OnChangeTextArgs) => {
     if (method !== "type") {
       return
     }
@@ -151,6 +148,7 @@ export class PeopleSelector extends React.Component<Props, State> {
     )
   }
 }
+
 const mapStateToProps = (state, ownProps) => {
   const { profiles } = ownProps
   const suggestions = state.search.data.results.map(searchResultToProfile)
