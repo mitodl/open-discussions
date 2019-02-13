@@ -127,6 +127,10 @@
       "description": "AWS secret key for OCW media upload bucket",
       "required": false
     },
+    "OCW_UPLOAD_IMAGE_ONLY": {
+      "description": "Upload course image only instead of all OCW files",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
     },
