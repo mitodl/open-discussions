@@ -90,7 +90,7 @@ describe("EditChannelModeratorsPage", () => {
     )
     helper.getProfileStub.returns(Promise.resolve(""))
     helper.getWidgetListStub.returns(Promise.resolve(makeWidgetListResponse(0)))
-    window.scrollTo = helper.sandbox.stub()
+    helper.sandbox.stub(window, "scrollTo")
   })
 
   afterEach(() => {

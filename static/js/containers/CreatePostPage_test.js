@@ -45,7 +45,8 @@ describe("CreatePostPage", () => {
     commentsResponse,
     article,
     twitterEmbedStub,
-    sandbox
+    sandbox,
+    scrollToStub
 
   const setTitle = (wrapper, title) =>
     wrapper
@@ -96,6 +97,7 @@ describe("CreatePostPage", () => {
     window.twttr = {
       widgets: { load: helper.sandbox.stub() }
     }
+    scrollToStub = helper.sandbox.stub(window, "scrollTo")
   })
 
   afterEach(() => {
@@ -281,6 +283,10 @@ describe("CreatePostPage", () => {
     setLinkPost(wrapper)
     submitPost(wrapper)
     assert.lengthOf(wrapper.find(".titlefield .validation-message"), 0)
+    sinon.assert.calledWith(scrollToStub, {
+      top:      0,
+      behavior: "smooth"
+    })
   })
 
   it("should show validation errors when the url post is empty", async () => {
@@ -307,6 +313,10 @@ describe("CreatePostPage", () => {
     select.simulate("change", { target: { value: channels[6].name } })
     submitPost(wrapper)
     assert.lengthOf(wrapper.find(".channel-select .validation-message"), 0)
+    sinon.assert.calledWith(scrollToStub, {
+      top:      0,
+      behavior: "smooth"
+    })
   })
 
   it("should let us set a validation error for invalid cover image", async () => {

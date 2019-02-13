@@ -36,7 +36,7 @@ describe("EditChannelBasicPage", () => {
     helper.getWidgetListStub.returns(Promise.resolve(makeWidgetListResponse(0)))
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
-    window.scrollTo = helper.sandbox.stub()
+    helper.sandbox.stub(window, "scrollTo")
   })
 
   afterEach(() => {

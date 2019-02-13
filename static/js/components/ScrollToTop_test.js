@@ -14,8 +14,8 @@ describe("ScrollToTop", () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     scrollStub = sandbox.stub()
-    window.scrollTo = scrollStub
     browserHistory = createMemoryHistory()
+    scrollStub = sandbox.stub(window, "scrollTo")
   })
 
   afterEach(() => {
@@ -34,7 +34,7 @@ describe("ScrollToTop", () => {
   it("should scroll to top when visiting a new link", () => {
     renderComponent()
     browserHistory.push("/foo")
-    sinon.assert.calledWith(window.scrollTo, 0, 0)
+    sinon.assert.calledWith(scrollStub, 0, 0)
   })
 
   it("should not scroll to top when user clicks forward or back", () => {
@@ -43,7 +43,7 @@ describe("ScrollToTop", () => {
     renderComponent()
     browserHistory.goBack()
     browserHistory.goForward()
-    sinon.assert.notCalled(window.scrollTo)
+    sinon.assert.notCalled(scrollStub)
   })
 
   it("should render children", () => {

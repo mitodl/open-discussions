@@ -306,6 +306,13 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
 
     if (!postForm || !R.isEmpty(validation)) {
       this.setValidationErrors(validation.value)
+
+      if (validation.value.title || validation.value.channel) {
+        window.scrollTo({
+          top:      0,
+          behavior: "smooth"
+        })
+      }
     } else {
       const channelName = channel.name
       const data = createPostPayload(postForm.value)

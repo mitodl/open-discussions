@@ -84,7 +84,7 @@ describe("EditChannelContributorsPage", () => {
       })
     )
     helper.getProfileStub.returns(Promise.resolve(""))
-    window.scrollTo = helper.sandbox.stub()
+    helper.sandbox.stub(window, "scrollTo")
   })
 
   afterEach(() => {
