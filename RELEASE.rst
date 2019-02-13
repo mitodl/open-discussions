@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.66.0
+Version 0.66.0 (Released February 13, 2019)
 --------------
 
 - RFC: Caching system for third party data
