@@ -4,6 +4,7 @@ import { shallow, mount } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
 import casual from "casual-browserify"
+import { Provider } from "react-redux"
 
 import WidgetEditDialog, {
   WIDGET_CREATE,
@@ -25,9 +26,10 @@ import {
   WIDGET_TYPE_URL
 } from "../../lib/constants"
 import { isIf, shouldIf } from "../../lib/test_utils"
+import IntegrationTestHelper from "../../util/integration_test_helper"
 
 describe("WidgetEditDialog", () => {
-  let sandbox,
+  let helper,
     setDialogDataStub,
     setDialogVisibilityStub,
     updateFormStub,
@@ -36,10 +38,10 @@ describe("WidgetEditDialog", () => {
     specs
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
-    setDialogDataStub = sandbox.stub()
-    setDialogVisibilityStub = sandbox.stub()
-    updateFormStub = sandbox.stub()
+    helper = new IntegrationTestHelper()
+    setDialogDataStub = helper.sandbox.stub()
+    setDialogVisibilityStub = helper.sandbox.stub()
+    updateFormStub = helper.sandbox.stub()
 
     dialogData = {
       instance:   makeWidgetInstance(),
@@ -47,13 +49,13 @@ describe("WidgetEditDialog", () => {
       validation: {}
     }
     specs = makeWidgetListResponse().available_widgets
-    validationStub = sandbox
+    validationStub = helper.sandbox
       .stub(validationFuncs, "validateWidgetDialog")
       .returns({})
   })
 
   afterEach(() => {
-    sandbox.restore()
+    helper.cleanup()
   })
 
   const render = (props = {}) =>
@@ -194,32 +196,38 @@ describe("WidgetEditDialog", () => {
       [false, WIDGET_EDIT, true],
       [false, WIDGET_EDIT, false]
     ].forEach(([expected, dialogState, dialogOpen]) => {
-      it.only(`${shouldIf(
+      it(`${shouldIf(
         expected
       )} shift focus from radio buttons when state=${dialogState} and dialog ${isIf(
         dialogOpen
       )} open`, () => {
+        dialogData.state = dialogState
+
         const div = document.createElement("div")
         // $FlowFixMe: document.body should almost never be null
         document.body.appendChild(div)
 
         mount(
-          <WidgetEditDialog
-            dialogData={dialogData}
-            dialogOpen={true}
-            setDialogData={setDialogDataStub}
-            setDialogVisibility={setDialogVisibilityStub}
-            specs={specs}
-            updateForm={updateFormStub}
-          />,
+          <Provider store={helper.store}>
+            <WidgetEditDialog
+              dialogData={dialogData}
+              dialogOpen={dialogOpen}
+              setDialogData={setDialogDataStub}
+              setDialogVisibility={setDialogVisibilityStub}
+              specs={specs}
+              updateForm={updateFormStub}
+            />
+          </Provider>,
           {
             attachTo: div
           }
         )
         // $FlowFixMe: if it's null it will fail the test anyway
         const focusedElement: HTMLElement = document.activeElement
-        assert.equal(focusedElement.tagName, "BUTTON")
-        assert.equal(focusedElement.className, "submit")
+        assert.equal(focusedElement.tagName, expected ? "BUTTON" : "BODY")
+        if (expected) {
+          assert.equal(focusedElement.className, "submit")
+        }
       })
     })
   })
