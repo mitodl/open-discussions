@@ -43,6 +43,7 @@ class CourseFactory(DjangoModelFactory):
 
     course_id = factory.Sequence(lambda n: "COURSE%03d.MIT" % n)
     platform = FuzzyChoice((PlatformType.mitx.value, PlatformType.ocw.value))
+    url = factory.Faker("url")
 
     @factory.post_generation
     def instructors(self, create, extracted, **kwargs):

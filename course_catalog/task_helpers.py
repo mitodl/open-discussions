@@ -5,6 +5,8 @@ import json
 import logging
 import re
 from datetime import datetime
+from urllib.parse import urljoin
+
 import pytz
 import requests
 from django.db import transaction
@@ -16,6 +18,9 @@ from course_catalog.constants import (
     ocw_edx_mapping,
     NON_COURSE_DIRECTORIES,
     ResourceType,
+    OCW_BASE_URL,
+    MITX_BASE_URL,
+    MITX_ALT_URL,
 )
 from course_catalog.models import Course, CourseTopic, CourseInstructor, CoursePrice
 from course_catalog.serializers import CourseSerializer
@@ -114,6 +119,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
             ),
             "last_modified": max_modified,
             "raw_json": course_data,
+            "url": get_course_url(course_run_key, course_data, PlatformType.mitx.value),
         }
 
         course_serializer = CourseSerializer(
@@ -245,8 +251,9 @@ def digest_ocw_course(
         is_published (Bool): Flags OCW course as published or not
         course_prefix (String): (Optional) String used to query S3 bucket for course raw JSONs
     """
+    course_id = master_json.get("uid")
     course_fields = {
-        "course_id": master_json.get("uid"),
+        "course_id": course_id,
         "title": master_json.get("title"),
         "short_description": master_json.get("description"),
         "level": master_json.get("course_level"),
@@ -259,6 +266,7 @@ def digest_ocw_course(
         "last_modified": last_modified,
         "published": is_published,
         "raw_json": master_json,
+        "url": get_course_url(course_id, master_json, PlatformType.ocw.value),
     }
     if "PROD/RES" in course_prefix:
         course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
@@ -396,3 +404,25 @@ def generate_course_prefix_list(bucket):
             if "/".join(key_pieces[:-2]) != "":
                 ocw_courses.add("/".join(key_pieces[:-2]) + "/")
     return list(ocw_courses)
+
+
+def get_course_url(course_id, course_json, platform):
+    """
+    Get the url for a course if any
+    """
+    if platform == PlatformType.ocw.value:
+        if course_json is not None:
+            urlpath = course_json.get("url")
+            if urlpath:
+                return urljoin(OCW_BASE_URL, urlpath)
+    elif platform == PlatformType.mitx.value:
+        if course_json is not None:
+            preferred_urls = [
+                run["marketing_url"]
+                for run in course_json.get("course_runs", [])
+                if MITX_BASE_URL in run.get("marketing_url", "")
+            ]
+            if preferred_urls:
+                return preferred_urls[0].split("?")[0]
+        return "{}{}/course/".format(MITX_ALT_URL, course_id)
+    return None

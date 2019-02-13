@@ -15,7 +15,7 @@
 				"description": null
 			},
 			"short_description": "short_description",
-			"marketing_url": "marketing_url",
+			"marketing_url": "https://www.edx.org/course/the-analytics-edge",
 			"seats": [{
 					"type": "verified",
 					"price": "150.00",

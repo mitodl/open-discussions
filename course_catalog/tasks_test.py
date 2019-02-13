@@ -33,7 +33,7 @@ def mitx_data(settings):
     settings.EDX_API_URL = "fake_url"
     settings.EDX_API_CLIENT_ID = "fake_id"
     settings.EDX_API_CLIENT_SECRET = "fake_secret"
-    with open("./test_json/test_mitx_course.json", "r") as test_data:
+    with open("./test_json/test_mitx_course01.json", "r") as test_data:
         return json.load(test_data)
 
 
@@ -115,6 +115,7 @@ def test_get_mitx_data_valid(
     assert CoursePrice.objects.count() == 2
     assert CourseInstructor.objects.count() == 2
     assert CourseTopic.objects.count() == 1
+    assert Course.objects.first().url == "https://www.edx.org/course/the-analytics-edge"
 
 
 def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):
