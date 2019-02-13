@@ -26,6 +26,23 @@ export const WIDGET_EDIT = "WIDGET_EDIT"
 export const WIDGET_CREATE = "WIDGET_CREATE"
 
 export default class WidgetEditDialog extends React.Component<Props> {
+  componentDidMount() {
+    this.deBlur()
+  }
+
+  componentDidUpdate() {
+    this.deBlur()
+  }
+
+  deBlur = () => {
+    const { dialogOpen } = this.props
+    const node = document.querySelector(".widget-dialog button.submit")
+    if (dialogOpen && node) {
+      // deblur radio buttons by putting focus on submit button
+      node.focus()
+    }
+  }
+
   updateValue = R.curry((lens: any, event: any) => {
     const { setDialogData, dialogData } = this.props
     if (!dialogData) {

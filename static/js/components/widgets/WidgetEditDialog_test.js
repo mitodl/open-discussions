@@ -1,6 +1,6 @@
 // @flow
 import React from "react"
-import { shallow } from "enzyme"
+import { shallow, mount } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
 import casual from "casual-browserify"
@@ -184,6 +184,30 @@ describe("WidgetEditDialog", () => {
         // $FlowFixMe
         dialogData.validation.widget_type
       )
+    })
+
+    it("disables automatic focus on radio buttons by focusing on the submit button", () => {
+      const div = document.createElement("div")
+      // $FlowFixMe: document.body should almost never be null
+      document.body.appendChild(div)
+
+      mount(
+        <WidgetEditDialog
+          dialogData={dialogData}
+          dialogOpen={true}
+          setDialogData={setDialogDataStub}
+          setDialogVisibility={setDialogVisibilityStub}
+          specs={specs}
+          updateForm={updateFormStub}
+        />,
+        {
+          attachTo: div
+        }
+      )
+      // $FlowFixMe: if it's null it will fail the test anyway
+      const focusedElement: HTMLElement = document.activeElement
+      assert.equal(focusedElement.tagName, "BUTTON")
+      assert.equal(focusedElement.className, "submit")
     })
   })
 
