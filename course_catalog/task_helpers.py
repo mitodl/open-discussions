@@ -408,7 +408,7 @@ def get_course_url(course_id, course_json, platform):
     Get the url for a course if any
 
     Args:
-        course_id (string): The course_id of the course
+        course_id (str): The course_id of the course
         course_json (dict): The raw json for the course
         platform (str): The platform (mitx or ocw)
 
