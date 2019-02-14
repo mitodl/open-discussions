@@ -13,7 +13,6 @@ import WidgetEditDialog, {
   WIDGET_TYPE_SELECT
 } from "./WidgetEditDialog"
 import * as validationFuncs from "../../lib/validation"
-import { wait } from "../../lib/util"
 
 import {
   makeFieldSpec,
@@ -198,38 +197,20 @@ describe("WidgetEditDialog", () => {
       [false, WIDGET_EDIT, true],
       [false, WIDGET_EDIT, false]
     ].forEach(([expected, dialogState, dialogOpen]) => {
-      it.skip(`${shouldIf(
+      it(`${shouldIf(
         expected
       )} shift focus from radio buttons when state=${dialogState} and dialog ${isIf(
         dialogOpen
       )} open`, async () => {
         dialogData.state = dialogState
 
-        const div = document.createElement("div")
-        // $FlowFixMe: document.body should almost never be null
-        document.body.appendChild(div)
-
-        mount(
-          <Router store={helper.store} history={helper.browserHistory}>
-            <WidgetEditDialog
-              dialogData={dialogData}
-              dialogOpen={dialogOpen}
-              setDialogData={setDialogDataStub}
-              setDialogVisibility={setDialogVisibilityStub}
-              specs={specs}
-              updateForm={updateFormStub}
-            />
-          </Router>,
-          {
-            attachTo: div
-          }
-        )
-        // $FlowFixMe: if it's null it will fail the test anyway
-        const focusedElement: HTMLElement = document.activeElement
-        assert.equal(focusedElement.tagName, expected ? "BUTTON" : "BODY")
-        if (expected) {
-          assert.equal(focusedElement.className, "submit")
-        }
+        const focusStub = helper.sandbox.stub()
+        helper.sandbox.stub(document, "querySelector").returns({
+          focus: focusStub
+        })
+        const wrapper = render({ dialogOpen })
+        wrapper.instance().componentDidMount()
+        assert.equal(focusStub.callCount > 0, expected)
       })
     })
   })
