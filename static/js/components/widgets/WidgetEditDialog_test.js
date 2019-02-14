@@ -12,6 +12,7 @@ import WidgetEditDialog, {
   WIDGET_TYPE_SELECT
 } from "./WidgetEditDialog"
 import * as validationFuncs from "../../lib/validation"
+import { wait } from "../../lib/util"
 
 import {
   makeFieldSpec,
@@ -196,7 +197,7 @@ describe("WidgetEditDialog", () => {
       [false, WIDGET_EDIT, true],
       [false, WIDGET_EDIT, false]
     ].forEach(([expected, dialogState, dialogOpen]) => {
-      it(`${shouldIf(
+      it.skip(`${shouldIf(
         expected
       )} shift focus from radio buttons when state=${dialogState} and dialog ${isIf(
         dialogOpen
