@@ -115,7 +115,6 @@ def test_get_mitx_data_valid(
     assert CoursePrice.objects.count() == 2
     assert CourseInstructor.objects.count() == 2
     assert CourseTopic.objects.count() == 1
-    assert Course.objects.first().url == "https://www.edx.org/course/the-analytics-edge"
 
 
 def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):

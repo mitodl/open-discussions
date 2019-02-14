@@ -69,9 +69,9 @@ def test_parse_valid_mitx_json_data(mock_course_index_functions, mitx_valid_data
     course_topics_count = CourseTopic.objects.count()
     assert course_topics_count == 1
 
-    course = Course.objects.first()
-
-    mock_course_index_functions.index_new_course.assert_called_once_with(course)
+    mock_course_index_functions.index_new_course.assert_called_once_with(
+        Course.objects.first()
+    )
 
 
 def test_parse_invalid_mitx_json_data(mitx_valid_data):
