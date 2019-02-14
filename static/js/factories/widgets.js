@@ -5,8 +5,10 @@ import casual from "casual-browserify"
 import {
   WIDGET_FIELD_TYPE_MARKDOWN,
   WIDGET_FIELD_TYPE_NUMBER,
+  WIDGET_FIELD_TYPE_PEOPLE,
   WIDGET_FIELD_TYPE_URL,
   WIDGET_TYPE_MARKDOWN,
+  WIDGET_TYPE_PEOPLE,
   WIDGET_TYPE_RSS,
   WIDGET_TYPE_URL
 } from "../lib/constants"
@@ -26,16 +28,26 @@ export const validFieldSpecTypes = ["text", "textarea", "number", "url"]
 const instanceIncr = incrementer()
 const listIncr = incrementer()
 
+const numPeople = 5
+
+// Urls which are real so we can test them with storybook
+const validRssUrls = ["https://xkcd.com/rss.xml"]
+const validEmbedUrls = ["https://www.youtube.com/embed/IAIPUGO1iko"]
+
 export const makeWidgetConfiguration = (widgetType: string): Object => {
   switch (widgetType) {
   case WIDGET_TYPE_MARKDOWN:
     return { source: `**${casual.word}**` }
   case WIDGET_TYPE_URL:
-    return { url: casual.url }
+    return { url: casual.random_element(validEmbedUrls) }
   case WIDGET_TYPE_RSS:
     return {
-      url:                casual.url,
+      url:                casual.random_element(validRssUrls),
       feed_display_limit: casual.integer(0, 15)
+    }
+  case WIDGET_TYPE_PEOPLE:
+    return {
+      people: R.range(1, numPeople).map(i => `person_${i}`)
     }
   default:
     return {}
@@ -54,10 +66,18 @@ export const makeWidgetJson = (widgetType: string): ?Object => {
       entries: R.range(1, casual.integer(2, 8)).map(() => ({
         title:       casual.title,
         description: casual.description,
-        link:        casual.url,
+        link:        casual.random_element(validRssUrls),
         timestamp:   casual.moment
       }))
     }: RSSWidgetJson)
+  case WIDGET_TYPE_PEOPLE:
+    return {
+      people: R.range(1, numPeople).map(i => ({
+        username: `person_${i}`,
+        name:     casual.full_name,
+        headline: casual.sentence
+      }))
+    }
   default:
     return {}
   }
@@ -136,6 +156,8 @@ export const makeWidgetSpec = (widgetType: ?string = null): WidgetSpec => {
       makeFieldSpec(WIDGET_FIELD_TYPE_URL, "url"),
       makeFieldSpec(WIDGET_FIELD_TYPE_NUMBER, "feed_display_limit")
     ]
+  } else if (widgetType === WIDGET_TYPE_PEOPLE) {
+    fieldSpecs = [makeFieldSpec(WIDGET_FIELD_TYPE_PEOPLE, "people")]
   } else {
     throw new Error(`Unhandled case ${widgetType}, update factory code`)
   }

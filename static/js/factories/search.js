@@ -66,8 +66,10 @@ export const makePostResult = (): PostResult => ({
   text:                casual.text
 })
 
-export const makeSearchResult = () => {
-  const type = casual.random_element(["post", "comment", "profile"])
+export const makeSearchResult = (type: ?string) => {
+  if (!type) {
+    type = casual.random_element(["post", "comment", "profile"])
+  }
   let hit
   switch (type) {
   case "post":
@@ -92,9 +94,10 @@ export const makeSearchResult = () => {
 
 export const makeSearchResponse = (
   pageSize: number = SETTINGS.search_page_size,
-  total: number = SETTINGS.search_page_size * 2
+  total: number = SETTINGS.search_page_size * 2,
+  type: ?string
 ) => {
-  const hits = R.range(0, pageSize).map(makeSearchResult)
+  const hits = R.range(0, pageSize).map(() => makeSearchResult(type))
   return {
     hits: {
       total,

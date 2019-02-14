@@ -102,3 +102,13 @@ class ReactMarkdownWysiwygField(serializers.CharField, ReactField):
     def _get_input_type(self):
         """Returns the field's input type"""
         return "markdown_wysiwyg"
+
+
+class ReactPeopleField(serializers.ListField, ReactField):
+    """ReactField extension of ListField"""
+
+    child = serializers.CharField()
+
+    def _get_input_type(self):
+        """Returns the field's input type"""
+        return "people"

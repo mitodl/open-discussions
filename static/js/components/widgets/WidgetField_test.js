@@ -1,4 +1,5 @@
 // @flow
+import R from "ramda"
 import React from "react"
 import { shallow } from "enzyme"
 import sinon from "sinon"
@@ -7,39 +8,55 @@ import { assert } from "chai"
 
 import WidgetField from "./WidgetField"
 
-import { makeFieldSpec } from "../../factories/widgets"
+import { makeFieldSpec, makeWidgetListResponse } from "../../factories/widgets"
 import {
   WIDGET_FIELD_TYPE_MARKDOWN,
   WIDGET_FIELD_TYPE_NUMBER,
+  WIDGET_FIELD_TYPE_PEOPLE,
   WIDGET_FIELD_TYPE_TEXT,
   WIDGET_FIELD_TYPE_TEXTAREA,
   WIDGET_FIELD_TYPE_URL
 } from "../../lib/constants"
+import { makeProfile } from "../../factories/profiles"
 
 describe("WidgetField", () => {
-  let sandbox, onChangeStub, value, fieldSpec
+  let sandbox, value, instance, fieldSpec
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
-    onChangeStub = sandbox.stub()
     value = casual.sentence
-    fieldSpec = makeFieldSpec()
+    const response = makeWidgetListResponse()
+    instance = response.widgets[0]
+    const spec = response.available_widgets.filter(
+      _spec => _spec.widget_type === instance.widget_type
+    )
+    fieldSpec = spec[0].form_spec[0]
   })
 
   afterEach(() => {
     sandbox.restore()
   })
 
-  const render = (props = {}) => {
-    return shallow(
+  const getValue = lens => {
+    const ret = R.view(lens, instance)
+    return ret
+  }
+
+  const updateValues = (lenses, values) => {
+    lenses.forEach((lens, i) => {
+      instance = R.set(lens, values[i], instance)
+    })
+  }
+
+  const render = (props = {}) =>
+    shallow(
       <WidgetField
         fieldSpec={fieldSpec}
-        onChange={onChangeStub}
-        value={value}
+        getValue={getValue}
+        updateValues={updateValues}
         {...props}
       />
     )
-  }
   ;[
     WIDGET_FIELD_TYPE_TEXT,
     WIDGET_FIELD_TYPE_TEXTAREA,
@@ -68,11 +85,6 @@ describe("WidgetField", () => {
         const wrapper = render()
         const newValue = "xyz"
         wrapper.find(".field").prop("onChange")({ target: { value: newValue } })
-        sinon.assert.calledWith(onChangeStub, {
-          target: {
-            value: newValue
-          }
-        })
       })
     })
   })
@@ -117,31 +129,56 @@ describe("WidgetField", () => {
   it("renders a wysiwyg markdown field", () => {
     fieldSpec = makeFieldSpec(WIDGET_FIELD_TYPE_MARKDOWN)
     const value = "some *text*"
-    const wrapper = render({ value })
+    instance.configuration[fieldSpec.field_name] = value
+    const wrapper = render()
 
     const editor = wrapper.find("Connect(Editor)")
     assert.isTrue(editor.exists())
     assert.equal(editor.prop("initialValue"), value)
     assert.equal(editor.prop("placeHolder"), "")
 
-    assert.equal(onChangeStub.callCount, 0)
     const newValue = "new text"
     editor.prop("onChange")(newValue)
-    sinon.assert.calledWith(onChangeStub, {
-      target: {
-        name:  "text",
-        value: newValue
-      }
-    })
+    assert.equal(instance.configuration[fieldSpec.field_name], newValue)
   })
 
   it("renders an embedly component", () => {
     fieldSpec = makeFieldSpec(WIDGET_FIELD_TYPE_URL)
     fieldSpec.props.show_embed = true
+    instance.configuration[fieldSpec.field_name] = value
     const wrapper = render()
     const embedlyCard = wrapper.find("EmbedlyCard")
     assert.isTrue(embedlyCard.exists())
     assert.equal(embedlyCard.prop("url"), value)
+  })
+
+  describe("people", () => {
+    [true, false].forEach(hasJson => {
+      it(`renders ${hasJson ? "with" : "without"} JSON data`, () => {
+        fieldSpec = makeFieldSpec(WIDGET_FIELD_TYPE_PEOPLE)
+        value = makeProfile()
+        instance.configuration[fieldSpec.field_name] = value.username
+        instance.json = hasJson ? { [fieldSpec.field_name]: [value] } : null
+        const wrapper = render()
+        const props = wrapper.find("Connect(PeopleSelector)").props()
+        assert.deepEqual(
+          props.profiles,
+          hasJson ? instance.json[fieldSpec.field_name] : []
+        )
+      })
+    })
+
+    it("updates profiles", () => {
+      fieldSpec = makeFieldSpec(WIDGET_FIELD_TYPE_PEOPLE)
+      const wrapper = render()
+      const profiles = R.range(1, 5).map(() => makeProfile())
+      wrapper.find("Connect(PeopleSelector)").prop("updateProfiles")(profiles)
+      assert.deepEqual(instance.json[fieldSpec.field_name], profiles)
+      assert.deepEqual(
+        instance.configuration[fieldSpec.field_name],
+        profiles.map(profile => profile.username)
+      )
+    })
   })
 
   it("doesn't render an embedly component when show_embed is false", () => {

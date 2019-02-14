@@ -1,5 +1,6 @@
 // @flow
 import React from "react"
+import R from "ramda"
 import { shallow, mount } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
@@ -271,55 +272,104 @@ describe("WidgetEditDialog", () => {
       })
     })
 
-    it("renders fields for a widget configuration", () => {
-      const spec = {
-        ...makeWidgetSpec(),
-        form_spec: validFieldSpecTypes.map(specType =>
-          makeFieldSpec(specType, specType)
-        )
-      }
-      specs = [spec]
-      const configuration = {}
-      for (const fieldSpec of spec.form_spec) {
-        configuration[fieldSpec.field_name] = casual.word
-      }
+    describe("fields", () => {
+      let spec
 
-      dialogData = {
-        ...dialogData,
-        instance: {
-          ...dialogData.instance,
-          widget_type: spec.widget_type,
-          configuration
+      beforeEach(() => {
+        spec = {
+          ...makeWidgetSpec(),
+          form_spec: validFieldSpecTypes.map(specType =>
+            makeFieldSpec(specType, specType)
+          )
         }
-      }
-      const wrapper = render()
+        specs = [spec]
+        const configuration = {}
+        const json = {}
+        for (const fieldSpec of spec.form_spec) {
+          configuration[fieldSpec.field_name] = casual.word
+          json[fieldSpec.field_name] = casual.word
+        }
 
-      assert.equal(
-        wrapper.find(".configuration-field").length,
-        validFieldSpecTypes.length
-      )
-      wrapper.find(".configuration-field").forEach((field, i) => {
-        const fieldSpec = spec.form_spec[i]
-        assert.equal(field.childAt(0).text(), fieldSpec.label)
-        assert.equal(
-          field.find("WidgetField").prop("value"),
-          configuration[fieldSpec.field_name]
-        )
-        const newValue = "newValue"
-
-        setDialogDataStub.reset()
-        field.find("WidgetField").prop("onChange")({
-          target: { value: newValue }
-        })
-        sinon.assert.calledWith(setDialogDataStub, {
+        dialogData = {
           ...dialogData,
           instance: {
             ...dialogData.instance,
-            configuration: {
-              ...dialogData.instance.configuration,
-              [fieldSpec.field_name]: newValue
-            }
+            widget_type: spec.widget_type,
+            configuration,
+            json
           }
+        }
+      })
+
+      it("renders fields for a widget configuration", () => {
+        const wrapper = render()
+
+        assert.equal(
+          wrapper.find(".configuration-field").length,
+          validFieldSpecTypes.length
+        )
+        wrapper.find(".configuration-field").forEach((field, i) => {
+          const fieldSpec = spec.form_spec[i]
+          assert.equal(field.childAt(0).text(), fieldSpec.label)
+          const fieldWrapper = field.find("WidgetField")
+          assert.deepEqual(fieldWrapper.prop("fieldSpec"), fieldSpec)
+          assert.equal(
+            wrapper.instance().getValue,
+            fieldWrapper.prop("getValue")
+          )
+          assert.equal(
+            wrapper.instance().updateValues,
+            fieldWrapper.prop("updateValues")
+          )
+        })
+      })
+
+      describe("lenses", () => {
+        let configurationLens, jsonLens, fieldSpec
+
+        beforeEach(() => {
+          // make a people widget since they have both configuration and json set
+          fieldSpec = spec.form_spec[0]
+          configurationLens = R.lensPath([
+            "configuration",
+            fieldSpec.field_name
+          ])
+          jsonLens = R.lensPath(["json", fieldSpec.field_name])
+        })
+
+        it("gets a value", () => {
+          const wrapper = render()
+          const value = wrapper.instance().getValue(configurationLens)
+          assert.equal(
+            dialogData.instance.configuration[fieldSpec.field_name],
+            value
+          )
+        })
+
+        it("sets multiple values", () => {
+          const wrapper = render()
+          const configValue = "config value here"
+          const jsonValue = "json value here"
+          wrapper
+            .instance()
+            .updateValues(
+              [configurationLens, jsonLens],
+              [configValue, jsonValue]
+            )
+          sinon.assert.calledWith(setDialogDataStub, {
+            ...dialogData,
+            instance: {
+              ...dialogData.instance,
+              json: {
+                ...dialogData.instance.json,
+                [fieldSpec.field_name]: jsonValue
+              },
+              configuration: {
+                ...dialogData.instance.configuration,
+                [fieldSpec.field_name]: configValue
+              }
+            }
+          })
         })
       })
     })

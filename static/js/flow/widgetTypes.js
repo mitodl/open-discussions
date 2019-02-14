@@ -1,14 +1,11 @@
 // @flow
-export type WidgetInstancePatchable = {
+export type WidgetInstance = {
   id?: number,
   widget_type: string,
   title: string,
   configuration: Object,
-  newId?: string
-}
-
-export type WidgetInstance = WidgetInstancePatchable & {
   json: any,
+  newId?: string
 }
 
 export type WidgetFieldSpec = {
@@ -33,7 +30,7 @@ export type WidgetListResponse = {
 
 export type WidgetDialogData = {
   state: string,
-  instance: WidgetInstancePatchable,
+  instance: WidgetInstance,
   validation: Object
 }
 

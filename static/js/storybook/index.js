@@ -30,6 +30,7 @@ import {
 import { CHANNEL_TYPE_PRIVATE, CHANNEL_TYPE_PUBLIC } from "../lib/channels"
 import {
   WIDGET_TYPE_MARKDOWN,
+  WIDGET_TYPE_PEOPLE,
   WIDGET_TYPE_RSS,
   WIDGET_TYPE_URL
 } from "../lib/constants"
@@ -632,8 +633,11 @@ storiesOf("Search results", module)
 
 storiesOf("Widgets", module)
   .addDecorator(withKnobs)
+  .addDecorator(withRandom)
+  .addDecorator(withRedux)
   .add("markdown", () => {
     const editing = boolean("editing")
+    const expanded = boolean("expanded", true)
     const instance = makeWidgetInstance(WIDGET_TYPE_MARKDOWN)
     instance.title = text("title", "Markdown widget title")
     instance.configuration.source = text("markdown", "Markdown **body**")
@@ -647,6 +651,7 @@ storiesOf("Widgets", module)
           index={0}
           widgetInstance={instance}
           editing={editing}
+          expanded={expanded}
           deleteInstance={action("delete")}
           startEditInstance={action("start edit instance")}
         />
@@ -655,6 +660,7 @@ storiesOf("Widgets", module)
   })
   .add("rss", () => {
     const editing = boolean("editing")
+    const expanded = boolean("expanded", true)
     const instance = makeWidgetInstance(WIDGET_TYPE_RSS)
     instance.title = text("title", "Default widget title")
 
@@ -667,6 +673,7 @@ storiesOf("Widgets", module)
           index={0}
           widgetInstance={instance}
           editing={editing}
+          expanded={expanded}
           deleteInstance={action("delete")}
           startEditInstance={action("start edit instance")}
         />
@@ -675,6 +682,7 @@ storiesOf("Widgets", module)
   })
   .add("url", () => {
     const editing = boolean("editing")
+    const expanded = boolean("expanded", true)
     const instance = makeWidgetInstance(WIDGET_TYPE_URL)
     instance.title = text("title", "URL widget title")
     instance.configuration = {
@@ -691,6 +699,29 @@ storiesOf("Widgets", module)
           index={0}
           widgetInstance={instance}
           editing={editing}
+          expanded={expanded}
+          deleteInstance={action("delete")}
+          startEditInstance={action("start edit instance")}
+        />
+      </StoryWrapper>
+    )
+  })
+  .add("people", () => {
+    const editing = boolean("editing")
+    const expanded = boolean("expanded", true)
+    const instance = makeWidgetInstance(WIDGET_TYPE_PEOPLE)
+    instance.title = text("title", "URL widget title")
+
+    const SortableWidgetInstance = SortableContainer(props => (
+      <WidgetInstance {...props} />
+    ))
+    return (
+      <StoryWrapper>
+        <SortableWidgetInstance
+          index={0}
+          widgetInstance={instance}
+          editing={editing}
+          expanded={expanded}
           deleteInstance={action("delete")}
           startEditInstance={action("start edit instance")}
         />
@@ -699,11 +730,11 @@ storiesOf("Widgets", module)
   })
   .add("list", () => {
     const editing = boolean("editing")
-    const allCollapsed = boolean("collapsed")
+    const allExpanded = boolean("expanded")
     const list = makeWidgetListResponse().widgets
-    const collapsed = {}
+    const expanded = {}
     for (const widget of list) {
-      collapsed[getWidgetKey(widget)] = allCollapsed
+      expanded[getWidgetKey(widget)] = allExpanded
     }
 
     return (
@@ -715,7 +746,7 @@ storiesOf("Widgets", module)
           deleteInstance={action("delete")}
           submitForm={action("submit")}
           widgetInstances={list}
-          collapsed={collapsed}
+          expanded={expanded}
           setCollapsed={action("collapse")}
           editing={editing}
         />

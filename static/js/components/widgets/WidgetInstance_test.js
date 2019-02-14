@@ -3,10 +3,10 @@ import React from "react"
 import { mount } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
-import { Provider } from "react-redux"
 import { SortableContainer } from "react-sortable-hoc"
 
 import WidgetInstance from "./WidgetInstance"
+import Router from "../../Router"
 
 import { makeWidgetInstance } from "../../factories/widgets"
 import IntegrationTestHelper from "../../util/integration_test_helper"
@@ -48,7 +48,7 @@ describe("WidgetInstance", () => {
 
   const render = (props = {}) =>
     mount(
-      <Provider store={helper.store}>
+      <Router store={helper.store} history={helper.browserHistory}>
         <WrappedInstance
           widgetInstance={widgetInstance}
           deleteInstance={deleteInstanceStub}
@@ -59,7 +59,7 @@ describe("WidgetInstance", () => {
           toggleExpanded={toggleExpandedStub}
           {...props}
         />
-      </Provider>,
+      </Router>,
       {
         // for react-sortable-hoc
         context: {

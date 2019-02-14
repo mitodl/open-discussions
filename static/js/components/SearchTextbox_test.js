@@ -82,4 +82,9 @@ describe("SearchTextbox", () => {
     wrapper.find("input").prop("onKeyDown")(event)
     sinon.assert.calledWith(onSubmitStub, event)
   })
+
+  it("passes extra props to the internal input component", () => {
+    const wrapper = render({ xyzzy: "abcde" })
+    assert.equal(wrapper.find("input").prop("xyzzy"), "abcde")
+  })
 })

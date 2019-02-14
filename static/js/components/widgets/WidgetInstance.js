@@ -1,8 +1,9 @@
 // @flow
 import React from "react"
-import { SortableElement, SortableHandle } from "react-sortable-hoc"
+import { SortableElement } from "react-sortable-hoc"
 
 import Card from "../Card"
+import DragHandle from "./DragHandle"
 
 import { validWidgetRenderers } from "../../lib/widgets"
 
@@ -17,10 +18,6 @@ type Props = {
   editing: boolean,
   toggleExpanded: () => void
 }
-
-const DragHandle = SortableHandle(() => (
-  <i className="material-icons drag-handle widget-button">reorder</i>
-))
 
 const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElement(
   ({
