@@ -61,11 +61,11 @@ describe("ChannelNavbar", () => {
   ].forEach(([userIsModerator, channelAbout, shouldShowAboutLink]) => {
     it(`${shouldIf(
       shouldShowAboutLink
-    )} render about page link when user ${ifIf(
+    )} render about page link when user ${isIf(
       userIsModerator
-    )} moderator and channelabout = ${json.stringify(channelabout)}`, () => {
-      channel.about = channelabout
-      channel.user_is_moderator = userismoderator
+    )} moderator and channelabout = ${JSON.stringify(channelAbout)}`, () => {
+      channel.about = channelAbout
+      channel.user_is_moderator = userIsModerator
       const wrapper = render()
       assert.equal(shouldShowAboutLink, wrapper.find(".about-link").exists())
     })

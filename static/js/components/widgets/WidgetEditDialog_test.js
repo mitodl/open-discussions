@@ -1,11 +1,10 @@
 // @flow
 import React from "react"
 import R from "ramda"
-import { shallow, mount } from "enzyme"
+import { shallow } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
 import casual from "casual-browserify"
-import { Provider } from "react-redux"
 
 import WidgetEditDialog, {
   WIDGET_CREATE,
@@ -201,34 +200,16 @@ describe("WidgetEditDialog", () => {
         expected
       )} shift focus from radio buttons when state=${dialogState} and dialog ${isIf(
         dialogOpen
-      )} open`, () => {
+      )} open`, async () => {
         dialogData.state = dialogState
 
-        const div = document.createElement("div")
-        // $FlowFixMe: document.body should almost never be null
-        document.body.appendChild(div)
-
-        mount(
-          <Provider store={helper.store}>
-            <WidgetEditDialog
-              dialogData={dialogData}
-              dialogOpen={dialogOpen}
-              setDialogData={setDialogDataStub}
-              setDialogVisibility={setDialogVisibilityStub}
-              specs={specs}
-              updateForm={updateFormStub}
-            />
-          </Provider>,
-          {
-            attachTo: div
-          }
-        )
-        // $FlowFixMe: if it's null it will fail the test anyway
-        const focusedElement: HTMLElement = document.activeElement
-        assert.equal(focusedElement.tagName, expected ? "BUTTON" : "BODY")
-        if (expected) {
-          assert.equal(focusedElement.className, "submit")
-        }
+        const focusStub = helper.sandbox.stub()
+        helper.sandbox.stub(document, "querySelector").returns({
+          focus: focusStub
+        })
+        const wrapper = render({ dialogOpen })
+        wrapper.instance().componentDidMount()
+        assert.equal(focusStub.callCount > 0, expected)
       })
     })
   })
