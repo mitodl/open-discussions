@@ -45,11 +45,7 @@ def get_edx_data(force_overwrite=False):
     url = settings.EDX_API_URL
     access_token = get_access_token()
 
-    edx_data = {
-        "count": None,
-        "catalog_url": settings.EDX_API_URL,
-        "results": [],
-    }
+    edx_data = {"count": None, "catalog_url": settings.EDX_API_URL, "results": []}
 
     while url:
         response = requests.get(url, headers={"Authorization": "JWT " + access_token})
