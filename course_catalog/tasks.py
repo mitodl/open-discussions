@@ -3,6 +3,7 @@ course_catalog tasks
 """
 import logging
 
+import json
 import requests
 import boto3
 from django.conf import settings
@@ -35,16 +36,26 @@ def get_edx_data(force_overwrite=False):
         settings.EDX_API_URL
         and settings.EDX_API_CLIENT_ID
         and settings.EDX_API_CLIENT_SECRET
+        and settings.OCW_LEARNING_COURSE_BUCKET_NAME
+        and settings.OCW_LEARNING_COURSE_ACCESS_KEY
+        and settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY
     ):
         log.warning("Required settings missing for get_edx_data")
         return
     url = settings.EDX_API_URL
     access_token = get_access_token()
 
+    edx_data = {
+        "count": 0,
+        "catalog_url": "",
+        "results": [],
+    }
+
     while url:
         response = requests.get(url, headers={"Authorization": "JWT " + access_token})
         if response.status_code == 200:
             for course_data in response.json()["results"]:
+                edx_data["results"].append(course_data)
                 try:
                     parse_mitx_json_data(course_data, force_overwrite)
                 except:  # pylint: disable=bare-except
@@ -54,6 +65,13 @@ def get_edx_data(force_overwrite=False):
             break
 
         url = response.json()["next"]
+    edx_data["count"] = len(edx_data["results"])
+    raw_data_bucket = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_CONTENT_ACCESS_KEY,
+        aws_secret_access_key=settings.OCW_CONTENT_SECRET_ACCESS_KEY,
+    ).Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
+    raw_data_bucket.put_object(Key="edx_courses.json", Body=json.dumps(edx_data), ACL="public-read")
 
 
 @app.task
