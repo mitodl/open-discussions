@@ -70,6 +70,7 @@ class Course(TimestampedModel):
     raw_json = JSONField(null=True, blank=True)
     featured = models.BooleanField(default=False)
     published = models.BooleanField(default=True)
+    url = models.URLField(null=True, max_length=2048)
     instructors = models.ManyToManyField(
         CourseInstructor, blank=True, related_name="courses"
     )

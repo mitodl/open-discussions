@@ -5,6 +5,8 @@ import json
 import logging
 import re
 from datetime import datetime
+from urllib.parse import urljoin
+
 import pytz
 import requests
 from django.db import transaction
@@ -114,6 +116,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
             ),
             "last_modified": max_modified,
             "raw_json": course_data,
+            "url": get_course_url(course_run_key, course_data, PlatformType.mitx.value),
         }
 
         course_serializer = CourseSerializer(
@@ -190,10 +193,10 @@ def get_year_and_semester(course_run):
 
     Args:
         course_run (dict): The JSON object representing the particular course run
-        course_run_key (string): course run identifier
+        course_run_key (str): course run identifier
 
     Returns:
-        tuple (string, string): year, semester
+        tuple (str, str): year, semester
 
     """
     match = re.search(
@@ -217,8 +220,8 @@ def safe_load_json(json_string, json_file_key):
     Some OCW JSON content may be malformed.
 
     Args:
-        json_string (string): The JSON contents as a string
-        json_file_key: file ID for the JSON file
+        json_string (str): The JSON contents as a string
+        json_file_key (str): file ID for the JSON file
 
     Returns:
         JSON (dict): the JSON contents as JSON
@@ -242,11 +245,12 @@ def digest_ocw_course(
         master_json (dict): course master JSON object as an output from ocw-data-parser
         last_modified (datetime): timestamp of latest modification of all course files
         course_instance (Course): Course instance if exists, otherwise None
-        is_published (Bool): Flags OCW course as published or not
-        course_prefix (String): (Optional) String used to query S3 bucket for course raw JSONs
+        is_published (bool): Flags OCW course as published or not
+        course_prefix (str): (Optional) String used to query S3 bucket for course raw JSONs
     """
+    course_id = master_json.get("uid")
     course_fields = {
-        "course_id": master_json.get("uid"),
+        "course_id": course_id,
         "title": master_json.get("title"),
         "short_description": master_json.get("description"),
         "level": master_json.get("course_level"),
@@ -259,6 +263,7 @@ def digest_ocw_course(
         "last_modified": last_modified,
         "published": is_published,
         "raw_json": master_json,
+        "url": get_course_url(course_id, master_json, PlatformType.ocw.value),
     }
     if "PROD/RES" in course_prefix:
         course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
@@ -396,3 +401,33 @@ def generate_course_prefix_list(bucket):
             if "/".join(key_pieces[:-2]) != "":
                 ocw_courses.add("/".join(key_pieces[:-2]) + "/")
     return list(ocw_courses)
+
+
+def get_course_url(course_id, course_json, platform):
+    """
+    Get the url for a course if any
+
+    Args:
+        course_id (str): The course_id of the course
+        course_json (dict): The raw json for the course
+        platform (str): The platform (mitx or ocw)
+
+    Returns:
+        str: The url for the course if any
+    """
+    if platform == PlatformType.ocw.value:
+        if course_json is not None:
+            urlpath = course_json.get("url")
+            if urlpath:
+                return urljoin(settings.OCW_BASE_URL, urlpath)
+    elif platform == PlatformType.mitx.value:
+        if course_json is not None:
+            preferred_urls = [
+                run["marketing_url"]
+                for run in course_json.get("course_runs", [])
+                if settings.MITX_BASE_URL in run.get("marketing_url", "")
+            ]
+            if preferred_urls:
+                return preferred_urls[0].split("?")[0]
+        return "{}{}/course/".format(settings.MITX_ALT_URL, course_id)
+    return None

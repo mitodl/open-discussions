@@ -33,7 +33,7 @@ def mitx_data(settings):
     settings.EDX_API_URL = "fake_url"
     settings.EDX_API_CLIENT_ID = "fake_id"
     settings.EDX_API_CLIENT_SECRET = "fake_secret"
-    with open("./test_json/test_mitx_course.json", "r") as test_data:
+    with open("./test_json/test_mitx_course01.json", "r") as test_data:
         return json.load(test_data)
 
 
