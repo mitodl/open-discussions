@@ -198,6 +198,44 @@ MAILGUN_KEY
 Additionally, you'll need to set `MAILGUN_RECIPIENT_OVERRIDE` to your own email address so
 any emails sent from the app will be delivered to you.
 
+### Running the app in a notebook
+
+This repo includes a config for running a [Jupyter notebook](https://jupyter.org/) in a
+Docker container. This enables you to do in a Jupyter notebook anything you might 
+otherwise do in a Django shell. To get started:
+
+- Copy the example file
+    ```bash
+    # Choose any name for the resulting .ipynb file
+    cp app.ipynb.example app.ipynb
+    ```
+- Build the `notebook` container _(for first time use, or when requirements change)_
+    ```bash
+    docker-compose -f docker-compose-notebook.yml build
+    ```
+- Run all the standard containers (`docker-compose up`)
+- In another terminal window, run the `notebook` container
+    ```bash
+    docker-compose -f docker-compose-notebook.yml up
+    ```
+- Visit the running notebook server in your browser. You'll need to do
+  some copy/paste from the `notebook` container log output. You should
+  see some log line that look like this:
+    ```
+    notebook_1  |     To access the notebook, open this file in a browser:
+    notebook_1  |         file:///home/mitodl/.local/share/jupyter/runtime/nbserver-8-open.html
+    notebook_1  |     Or copy and paste one of these URLs:
+    notebook_1  |         http://(2c19429d04d0 or 127.0.0.1):8080/?token=2566e5cbcd723e47bdb1b058398d6bb9fbf7a31397e752ea
+    ```
+  Copy the URL at the bottom and paste it into a browser window, replacing the parenthetical with
+  the normal local site URL. The example above would turn into `http://od.odl.local:8080/?token=2566e5cbcd723e47bdb1b058398d6bb9fbf7a31397e752ea`
+- Click the `.ipynb` file that you created to run the notebook
+- Execute the first block to confirm it's working properly (click inside the block
+  and press Shift+Enter)
+  
+From there, you should be able to run code snippets with a live Django app just like you 
+would in a Django shell.
+
 ### Integration with MicroMasters
 
 The following steps assume that you've added `/etc/hosts` aliases for MicroMasters
