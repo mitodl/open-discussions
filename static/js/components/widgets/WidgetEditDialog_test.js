@@ -5,8 +5,8 @@ import { shallow, mount } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
 import casual from "casual-browserify"
-import { Provider } from "react-redux"
 
+import Router from "../../Router"
 import WidgetEditDialog, {
   WIDGET_CREATE,
   WIDGET_EDIT,
@@ -209,7 +209,7 @@ describe("WidgetEditDialog", () => {
         document.body.appendChild(div)
 
         mount(
-          <Provider store={helper.store}>
+          <Router store={helper.store} history={helper.browserHistory}>
             <WidgetEditDialog
               dialogData={dialogData}
               dialogOpen={dialogOpen}
@@ -218,7 +218,7 @@ describe("WidgetEditDialog", () => {
               specs={specs}
               updateForm={updateFormStub}
             />
-          </Provider>,
+          </Router>,
           {
             attachTo: div
           }
