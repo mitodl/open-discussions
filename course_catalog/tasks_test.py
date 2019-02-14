@@ -104,12 +104,14 @@ def setup_s3(settings):
     conn.create_bucket(Bucket=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
 
 
+@mock_s3
 def test_get_mitx_data_valid(
     settings, access_token, get_test_data, mock_course_index_functions
 ):
     """
     Test that mitx sync task successfully creates database objects
     """
+    setup_s3(settings)
     get_edx_data()
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 2
@@ -117,6 +119,19 @@ def test_get_mitx_data_valid(
     assert CourseTopic.objects.count() == 1
 
 
+@mock_s3
+def test_get_mitx_data_saves_json(
+    settings, mocker, access_token, get_test_data, mock_course_index_functions
+):
+    """
+    Test that mitx sync task successfully saves edx API response results in S3
+    """
+    setup_s3(settings)
+    get_edx_data()
+    # todo: patch boto3.resource.Bucket.put_objects and check "edx_courses.json" is passed as argument
+
+
+@mock_s3
 def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):
     """
     Test that mitx sync task properly stops when it gets an error status code
@@ -126,10 +141,12 @@ def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):
         return_value=Mock(status_code=500, json=Mock(return_value=mitx_data)),
     )
     settings.EDX_API_URL = "fake_url"
+    setup_s3(settings)
     get_edx_data()
     assert Course.objects.count() == 0
 
 
+@mock_s3
 def test_get_mitx_data_unexpected_error(settings, mocker, access_token, get_test_data):
     """
     Test that mitx sync task properly stops when it gets an error status code
@@ -138,6 +155,7 @@ def test_get_mitx_data_unexpected_error(settings, mocker, access_token, get_test
         "course_catalog.task_helpers.get_year_and_semester", side_effect=Exception
     )
     settings.EDX_API_URL = "fake_url"
+    setup_s3(settings)
     get_edx_data()
     assert Course.objects.count() == 0
 

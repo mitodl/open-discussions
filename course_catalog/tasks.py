@@ -45,7 +45,7 @@ def get_edx_data(force_overwrite=False):
     url = settings.EDX_API_URL
     access_token = get_access_token()
 
-    edx_data = {"count": None, "catalog_url": settings.EDX_API_URL, "results": []}
+    edx_data = {"count": 0, "catalog_url": settings.EDX_API_URL, "results": []}
 
     while url:
         response = requests.get(url, headers={"Authorization": "JWT " + access_token})
@@ -55,18 +55,23 @@ def get_edx_data(force_overwrite=False):
                 try:
                     parse_mitx_json_data(course_data, force_overwrite)
                 except:  # pylint: disable=bare-except
-                    log.exception("Error encountered parsing MITx json")
+                    log.exception(
+                        "Error encountered parsing MITx json for %s", course_data["key"]
+                    )
         else:
             log.error("Bad response status %s for %s", str(response.status_code), url)
             break
 
         url = response.json()["next"]
+
     edx_data["count"] = len(edx_data["results"])
+
     raw_data_bucket = boto3.resource(
         "s3",
-        aws_access_key_id=settings.OCW_CONTENT_ACCESS_KEY,
-        aws_secret_access_key=settings.OCW_CONTENT_SECRET_ACCESS_KEY,
-    ).Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
+        aws_access_key_id=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+        aws_secret_access_key=settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
+    ).Bucket(name=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
+    # saves edx API response results in S3 as one file
     raw_data_bucket.put_object(Key="edx_courses.json", Body=json.dumps(edx_data))
 
 
