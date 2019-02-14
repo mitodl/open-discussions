@@ -216,7 +216,7 @@ otherwise do in a Django shell. To get started:
 - Run all the standard containers (`docker-compose up`)
 - In another terminal window, run the `notebook` container
     ```bash
-    docker-compose -f docker-compose-notebook.yml up
+    docker-compose -f docker-compose-notebook.yml run --rm --service-ports notebook
     ```
 - Visit the running notebook server in your browser. You'll need to do
   some copy/paste from the `notebook` container log output. You should
