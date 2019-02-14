@@ -67,6 +67,7 @@ services:
       sleep 3 &&
       python3 manage.py collectstatic --noinput &&
       python3 manage.py migrate --no-input &&
+      python3 manage.py createcachetable &&
       uwsgi uwsgi.ini --honour-stdin'
     tty: true
     ports:

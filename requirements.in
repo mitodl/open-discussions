@@ -10,6 +10,7 @@ celery==4.2.0
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-bitfield==1.9.3
+django-cache-memoize==0.1.6
 django-redis==4.7.0
 django-guardian==1.4.9
 django-server-status==0.5.0

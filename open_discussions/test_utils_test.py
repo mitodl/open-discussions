@@ -1,7 +1,14 @@
 """Tests for test utils"""
+import pickle
+
 import pytest
 
-from open_discussions.test_utils import any_instance_of, assert_not_raises, MockResponse
+from open_discussions.test_utils import (
+    any_instance_of,
+    assert_not_raises,
+    MockResponse,
+    PickleableMock,
+)
 
 
 def test_any_instance_of():
@@ -45,3 +52,8 @@ def test_mock_response():
     response = MockResponse(content, 404)
     assert response.status_code == 404
     assert response.content == content
+
+
+def test_pickleable_mock():
+    """Tests that a mock can be pickled"""
+    pickle.dumps(PickleableMock(field_name=dict()))

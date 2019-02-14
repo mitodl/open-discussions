@@ -3,6 +3,7 @@ import time
 
 import pytest
 
+from open_discussions.test_utils import PickleableMock
 from widgets.factories import WidgetInstanceFactory
 from widgets.serializers import rss
 
@@ -23,7 +24,7 @@ def test_url_widget_serialize(mocker, timestamp_key, item_count, display_limit):
         for idx in range(item_count)
     ]
     mock_parse = mocker.patch(
-        "feedparser.parse", return_value=mocker.Mock(entries=entries)
+        "feedparser.parse", return_value=PickleableMock(entries=entries)
     )
     widget_instance = WidgetInstanceFactory.create(type_rss=True)
     widget_instance.configuration["feed_display_limit"] = display_limit

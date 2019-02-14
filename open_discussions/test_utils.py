@@ -3,6 +3,7 @@ import abc
 import json
 from contextlib import contextmanager
 import traceback
+from unittest.mock import Mock
 
 import pytest
 
@@ -65,3 +66,15 @@ def drf_datetime(dt):
         str: ISO 8601 formatted datetime
     """
     return dt.isoformat().replace("+00:00", "Z")
+
+
+class PickleableMock(Mock):
+    """
+    A Mock that can be passed to pickle.dumps()
+
+    Source: https://github.com/testing-cabal/mock/issues/139#issuecomment-122128815
+    """
+
+    def __reduce__(self):
+        """Required method for being pickleable"""
+        return (Mock, ())

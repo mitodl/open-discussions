@@ -560,12 +560,17 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "local-in-memory-cache",
     },
+    "external_assets": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "external_asset_cache",
+    },
     "redis": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": CELERY_BROKER_URL,
         "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
     },
 }
+
 
 # Elasticsearch
 ELASTICSEARCH_DEFAULT_PAGE_SIZE = get_int("ELASTICSEARCH_DEFAULT_PAGE_SIZE", 5)
@@ -756,3 +761,6 @@ OCW_UPLOAD_IMAGE_ONLY = get_bool("OCW_UPLOAD_IMAGE_ONLY", False)
 OCW_BASE_URL = get_string("OCW_BASE_URL", "http://ocw.mit.edu/")
 MITX_BASE_URL = get_string("MITX_BASE_URL", "https://www.edx.org/course/")
 MITX_ALT_URL = get_string("MITX_ALT_URL", "https://courses.edx.org/courses/")
+
+# Widgets
+WIDGETS_RSS_CACHE_TTL = get_int("WIDGETS_RSS_CACHE_TTL", 15 * 60)
