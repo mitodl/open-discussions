@@ -46,8 +46,8 @@ def get_edx_data(force_overwrite=False):
     access_token = get_access_token()
 
     edx_data = {
-        "count": 0,
-        "catalog_url": "",
+        "count": None,
+        "catalog_url": settings.EDX_API_URL,
         "results": [],
     }
 
