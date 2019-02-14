@@ -38,9 +38,14 @@ export default class WidgetEditDialog extends React.Component<Props> {
   }
 
   deBlur = () => {
-    const { dialogOpen } = this.props
+    const { dialogData, dialogOpen } = this.props
     const node = document.querySelector(".widget-dialog button.submit")
-    if (dialogOpen && node) {
+    if (
+      dialogOpen &&
+      dialogData &&
+      dialogData.state === WIDGET_TYPE_SELECT &&
+      node
+    ) {
       // deblur radio buttons by putting focus on submit button
       node.focus()
     }
