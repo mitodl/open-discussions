@@ -3,10 +3,6 @@ course_catalog constants
 """
 from enum import Enum
 
-OCW_BASE_URL = "http://ocw.mit.edu/"
-MITX_BASE_URL = "https://www.edx.org/course/"
-MITX_ALT_URL = "https://courses.edx.org/courses/"
-
 
 class PlatformType(Enum):
     """

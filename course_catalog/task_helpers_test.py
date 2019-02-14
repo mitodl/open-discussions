@@ -311,4 +311,8 @@ def test_safe_load_bad_json(mocker):
 )
 def test_get_course_url(course_id, course_json, platform, expected):
     """ Test that url's are calculated as expected """
-    assert get_course_url(course_id, course_json, platform) == expected
+    actual_url = get_course_url(course_id, course_json, platform)
+    if expected is None:
+        assert actual_url is expected
+    else:
+        assert actual_url == expected

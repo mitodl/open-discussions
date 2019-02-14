@@ -751,3 +751,8 @@ OCW_LEARNING_COURSE_SECRET_ACCESS_KEY = get_string(
     "OCW_LEARNING_COURSE_SECRET_ACCESS_KEY", None
 )
 OCW_UPLOAD_IMAGE_ONLY = get_bool("OCW_UPLOAD_IMAGE_ONLY", False)
+
+# Base URL's for courses
+OCW_BASE_URL = get_string("OCW_BASE_URL", "http://ocw.mit.edu/")
+MITX_BASE_URL = get_string("MITX_BASE_URL", "https://www.edx.org/course/")
+MITX_ALT_URL = get_string("MITX_ALT_URL", "https://courses.edx.org/courses/")

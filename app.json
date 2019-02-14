@@ -103,6 +103,18 @@
     "MAILGUN_SENDER_DOMAIN": {
       "description": "Domain used for emails sent via mailgun"
     },
+    "MITX_ALT_URL": {
+      "description": "Base alternate URL for MITx courses",
+      "required": false
+    },
+    "MITX_BASE_URL": {
+      "description": "Base default URL for MITx courses",
+      "required": false
+    },
+    "OCW_BASE_URL": {
+      "description": "Base URL for OCW courses",
+      "required": false
+    },
     "OCW_CONTENT_BUCKET_NAME": {
       "description": "Name of S3 bucket containing OCW course data",
       "required": false

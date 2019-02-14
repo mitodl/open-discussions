@@ -10,8 +10,7 @@ def populate_urls(apps, schema_editor):
     Calculates url's for courses
     """
     Course = apps.get_model("course_catalog", "Course")
-    # At the point the migration runs
-    for course in Course.objects.all():
+    for course in Course.objects.iterator():
         course.url = get_course_url(course.course_id, course.raw_json, course.platform)
         course.save(update_fields=["url"])
 
