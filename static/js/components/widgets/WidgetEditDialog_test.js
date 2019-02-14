@@ -1,12 +1,11 @@
 // @flow
 import React from "react"
 import R from "ramda"
-import { shallow, mount } from "enzyme"
+import { shallow } from "enzyme"
 import { assert } from "chai"
 import sinon from "sinon"
 import casual from "casual-browserify"
 
-import Router from "../../Router"
 import WidgetEditDialog, {
   WIDGET_CREATE,
   WIDGET_EDIT,
