@@ -11,9 +11,10 @@ beautifulsoup4==4.6.0
 betamax-serializers==0.2.0
 betamax==0.8.0
 billiard==3.5.0.2         # via celery
-boto3==1.9.76             # via ocw-data-parser
+boto3==1.9.76             # via ocw-data-parser, smart-open
 boto==2.39.0
 botocore==1.12.76         # via boto3, s3transfer
+bz2file==0.98             # via smart-open
 cairocffi==0.8.1          # via cairosvg
 cairosvg==2.1.3
 celery==4.2.0
@@ -60,7 +61,7 @@ lxml==4.1.1               # via xmlsec
 markdown2==2.3.7
 newrelic==4.2.0.100
 oauthlib==2.0.7           # via requests-oauthlib, social-auth-core
-ocw-data-parser==0.2.1
+ocw-data-parser==0.2.3
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 pillow==3.4.2
@@ -85,6 +86,7 @@ requests==2.21.0
 s3transfer==0.1.13        # via boto3
 simplegeneric==0.8.1      # via ipython
 six==1.10.0               # via django-anymail, django-bitfield, django-compat, django-guardian, django-server-status, elasticsearch-dsl, faker, html5lib, isodate, prompt-toolkit, python-dateutil, requests-file, social-auth-app-django, social-auth-core, traitlets
+smart-open==1.8.0         # via ocw-data-parser
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0   # via social-auth-app-django
 static3==0.5.1
