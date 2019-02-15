@@ -128,7 +128,16 @@ def test_get_mitx_data_saves_json(
     """
     setup_s3(settings)
     get_edx_data()
-    # todo: patch boto3.resource.Bucket.put_objects and check "edx_courses.json" is passed as argument
+    conn = boto3.client(
+        "s3",
+        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+    )
+    json_is_uploaded = conn.list_objects(
+        Bucket=settings.OCW_LEARNING_COURSE_BUCKET_NAME, Prefix="edx_courses.json"
+    )
+    # check that pub_object call to create edx_courses.json succeeded
+    assert json_is_uploaded
 
 
 @mock_s3
