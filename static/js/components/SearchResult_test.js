@@ -6,11 +6,13 @@ import { shallow } from "enzyme"
 import SearchResult from "./SearchResult"
 import {
   makeCommentResult,
+  makeCourseResult,
   makePostResult,
   makeProfileResult
 } from "../factories/search"
 import {
   searchResultToComment,
+  searchResultToCourse,
   searchResultToPost,
   searchResultToProfile
 } from "../lib/search"
@@ -83,5 +85,14 @@ describe("SearchResult", () => {
     const wrapper = render(result, { votedComment }).dive()
     const commentTree = wrapper.find("CommentTree")
     assert.deepEqual(commentTree.prop("comments"), [votedComment])
+  })
+
+  it("renders a course", () => {
+    const result = makeCourseResult()
+    const wrapper = render(result).dive()
+    const course = searchResultToCourse(result)
+    course.instructors = []
+    const courseDisplay = wrapper.find("CompactCourseDisplay")
+    assert.deepEqual(courseDisplay.prop("course"), course)
   })
 })

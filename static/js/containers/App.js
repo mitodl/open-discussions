@@ -8,6 +8,7 @@ import qs from "query-string"
 
 import HomePage from "./HomePage"
 import SearchPage from "./SearchPage"
+import CourseSearchPage from "./CourseSearchPage"
 import ContentPolicyPage from "./policies/ContentPolicyPage"
 import PrivacyPolicyPage from "./policies/PrivacyPolicyPage"
 import TermsOfServicePage from "./policies/TermsOfServicePage"
@@ -287,6 +288,15 @@ class App extends React.Component<AppProps> {
             path={`${match.url}privacy-statement`}
             component={PrivacyPolicyPage}
           />
+          <Switch>
+            {SETTINGS.course_ui_enabled ? (
+              <Route
+                exact
+                path={`${match.url}courses/search`}
+                component={CourseSearchPage}
+              />
+            ) : null}
+          </Switch>
         </div>
       </div>
     )

@@ -33,6 +33,7 @@ def test_webpack_url(
     settings.FEATURES[features.SAML_AUTH] = False
     settings.FEATURES[features.USE_NEW_BRANDING] = False
     settings.FEATURES[features.ARTICLE_UI] = False
+    settings.FEATURES[features.COURSE_UI] = False
     settings.CKEDITOR_UPLOAD_URL = "https://foobar.example.com"
     settings.ENVIRONMENT = "test"
     settings.VERSION = "1.2.3"
@@ -89,6 +90,7 @@ def test_webpack_url(
         "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
         "algolia_appId": settings.ALGOLIA_APP_ID,
         "algolia_apiKey": settings.ALGOLIA_API_KEY,
+        "course_ui_enabled": settings.FEATURES[features.COURSE_UI],
         **expected_user_values,
     }
 
