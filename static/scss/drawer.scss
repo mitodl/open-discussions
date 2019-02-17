@@ -33,6 +33,19 @@ $footer-height: 152px;
   }
 }
 
+.align-right {
+  &.mdc-drawer--open {
+    left: initial;
+    right: 0px;
+    top: $banner-height;
+
+    nav {
+      right: 0px;
+      max-width: 486px;
+    }
+  }
+}
+
 .mdc-drawer__content {
   &.mdc-list {
     padding: 0;

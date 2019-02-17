@@ -60,7 +60,9 @@ export type PostResult = ResultCommon & {
 type RESULT_TYPE_COURSE = "course"
 
 export type CourseResult = {
+  id:                 number,
   course_id:          string,
+  url:                string,
   title:              string,
   image_src:          ?string,
   object_type:        RESULT_TYPE_COURSE,

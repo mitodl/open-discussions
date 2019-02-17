@@ -13,6 +13,9 @@ export const setShowDrawerDesktop = createAction(SET_SHOW_DRAWER_DESKTOP)
 export const SET_SHOW_DRAWER_MOBILE = "SET_SHOW_DRAWER_MOBILE"
 export const setShowDrawerMobile = createAction(SET_SHOW_DRAWER_MOBILE)
 
+export const SET_SHOW_COURSE_DRAWER = "SET_SHOW_COURSE_DRAWER"
+export const setShowCourseDrawer = createAction(SET_SHOW_COURSE_DRAWER)
+
 export const SET_SNACKBAR_MESSAGE = "SET_SNACKBAR_MESSAGE"
 export const setSnackbarMessage = createAction(SET_SNACKBAR_MESSAGE)
 

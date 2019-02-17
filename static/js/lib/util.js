@@ -3,6 +3,7 @@
 import R from "ramda"
 import _ from "lodash"
 import qs from "query-string"
+import LocaleCode from "locale-code"
 import isURL from "validator/lib/isURL"
 
 import type { Match } from "react-router"
@@ -130,3 +131,8 @@ export const isValidUrl = (url: string): boolean =>
 
 export const toArray = (obj: any) =>
   Array.isArray(obj) ? obj : obj ? [obj] : undefined
+
+export const languageName = (langCode: ?string): string =>
+  LocaleCode.getLanguageName(
+    `${langCode ? langCode.split("-")[0].toLowerCase() : "en"}-US`
+  )

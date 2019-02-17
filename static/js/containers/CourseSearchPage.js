@@ -11,6 +11,7 @@ import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import Checkbox from "rmwc/Checkbox/index"
 
+import CourseDrawer from "./CourseDrawer"
 import CanonicalLink from "../components/CanonicalLink"
 import Card from "../components/Card"
 import { Cell, Grid } from "../components/Grid"
@@ -210,73 +211,76 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const { text, error, topics, platforms, availabilities } = this.state
 
     return (
-      <Grid className="main-content two-column search-page">
-        <Cell width={12}>
-          <MetaTags>
-            <CanonicalLink match={match} />
-          </MetaTags>
-          <div className="course-search-input">
-            <SearchTextbox
-              onChange={this.updateText}
-              value={text || ""}
-              onClear={this.updateText}
-              onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
-              validation={error}
-            />
-          </div>
-        </Cell>
-        <Cell width={4}>
-          <Card>
-            <div className="course-facets">
-              <div className="facet-title">Subject area</div>
-              {_.sortBy(facetChoices.topics).map((topic, i) => (
-                <div key={i}>
-                  <Checkbox
-                    name="topics"
-                    value={topic}
-                    checked={R.contains(topic, topics || [])}
-                    onChange={this.onUpdateFacets}
-                  >
-                    {topic}
-                  </Checkbox>
-                </div>
-              ))}
+      <React.Fragment>
+        <Grid className="main-content two-column search-page">
+          <Cell width={12}>
+            <MetaTags>
+              <CanonicalLink match={match} />
+            </MetaTags>
+            <div className="course-search-input">
+              <SearchTextbox
+                onChange={this.updateText}
+                value={text || ""}
+                onClear={this.updateText}
+                onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
+                validation={error}
+              />
             </div>
+          </Cell>
+          <Cell width={4}>
+            <Card>
+              <div className="course-facets">
+                <div className="facet-title">Subject area</div>
+                {_.sortBy(facetChoices.topics).map((topic, i) => (
+                  <div key={i}>
+                    <Checkbox
+                      name="topics"
+                      value={topic}
+                      checked={R.contains(topic, topics || [])}
+                      onChange={this.onUpdateFacets}
+                    >
+                      {topic}
+                    </Checkbox>
+                  </div>
+                ))}
+              </div>
 
-            <div className="course-facets">
-              <div className="facet-title divider">Availability</div>
-              {COURSE_AVAILABILITIES.map((availability, i) => (
-                <div key={i}>
-                  <Checkbox
-                    name="availabilities"
-                    value={availability}
-                    checked={R.contains(availability, availabilities || [])}
-                    onChange={this.onUpdateFacets}
-                  >
-                    {_.capitalize(availability)}
-                  </Checkbox>
-                </div>
-              ))}
-            </div>
-            <div className="course-facets">
-              <div className="facet-title divider">Platforms</div>
-              {_.sortBy(facetChoices.platforms).map((platform, i) => (
-                <div key={i}>
-                  <Checkbox
-                    name="platforms"
-                    value={platform}
-                    checked={R.contains(platform, platforms || [])}
-                    onChange={this.onUpdateFacets}
-                  >
-                    {_.upperCase(platform)}
-                  </Checkbox>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </Cell>
-        <Cell width={8}>{error ? null : this.renderResults()}</Cell>
-      </Grid>
+              <div className="course-facets">
+                <div className="facet-title divider">Availability</div>
+                {COURSE_AVAILABILITIES.map((availability, i) => (
+                  <div key={i}>
+                    <Checkbox
+                      name="availabilities"
+                      value={availability}
+                      checked={R.contains(availability, availabilities || [])}
+                      onChange={this.onUpdateFacets}
+                    >
+                      {_.capitalize(availability)}
+                    </Checkbox>
+                  </div>
+                ))}
+              </div>
+              <div className="course-facets">
+                <div className="facet-title divider">Platforms</div>
+                {_.sortBy(facetChoices.platforms).map((platform, i) => (
+                  <div key={i}>
+                    <Checkbox
+                      name="platforms"
+                      value={platform}
+                      checked={R.contains(platform, platforms || [])}
+                      onChange={this.onUpdateFacets}
+                    >
+                      {_.upperCase(platform)}
+                    </Checkbox>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </Cell>
+          <Cell width={8}>{error ? null : this.renderResults()}</Cell>
+        </Grid>
+        <CourseDrawer />
+      </React.Fragment>
     )
   }
 }
