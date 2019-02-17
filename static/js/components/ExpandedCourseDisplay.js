@@ -13,7 +13,6 @@ import { maxPrice } from "../lib/courses"
 import { platforms } from "../lib/constants"
 import { languageName } from "../lib/util"
 
-
 const COURSE_IMAGE_DISPLAY_HEIGHT = 300
 const entities = new AllHtmlEntities()
 

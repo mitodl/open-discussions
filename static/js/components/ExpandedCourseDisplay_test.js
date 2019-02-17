@@ -61,25 +61,21 @@ describe("ExpandedCourseDisplay", () => {
       course.topics
     )
   })
-  ;
-  [
-    ["mitx", "As taught in:"],
-    ["ocw", "Semester:"]
-  ].forEach(([platform, label]) => {
-    it(`should display the correct semester label for ${platform} courses`, () => {
-      course.platform = platform
-      const wrapper = render()
-      const dateLabel = wrapper
-        .find(".history")
-        .closest(".course-info-row")
-        .find(".course-info-label")
-        .text()
-      assert.equal(dateLabel, label)
-    })
-  })
-
-  ;
-  ["mitx", "ocw"].forEach((platform) => {
+  ;[["mitx", "As taught in:"], ["ocw", "Semester:"]].forEach(
+    ([platform, label]) => {
+      it(`should display the correct semester label for ${platform} courses`, () => {
+        course.platform = platform
+        const wrapper = render()
+        const dateLabel = wrapper
+          .find(".history")
+          .closest(".course-info-row")
+          .find(".course-info-label")
+          .text()
+        assert.equal(dateLabel, label)
+      })
+    }
+  )
+  ;["mitx", "ocw"].forEach(platform => {
     it(`should display the correct start date for ${platform} courses`, () => {
       course.platform = platform
       const wrapper = render()
@@ -88,7 +84,12 @@ describe("ExpandedCourseDisplay", () => {
         .closest(".course-info-row")
         .find(".course-info-value")
         .text()
-      assert.equal(dateValue, course.platform === "ocw" ? "Ongoing" : moment(course.start_date).format("DD MMMM YYYY"))
+      assert.equal(
+        dateValue,
+        course.platform === "ocw"
+          ? "Ongoing"
+          : moment(course.start_date).format("DD MMMM YYYY")
+      )
     })
   })
 
