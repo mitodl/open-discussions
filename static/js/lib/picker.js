@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import R from "ramda"
 import qs from "query-string"
 
@@ -38,6 +39,8 @@ export const SEARCH_FILTER_ALL = ""
 export const SEARCH_FILTER_POST = "post"
 export const SEARCH_FILTER_COMMENT = "comment"
 export const SEARCH_FILTER_PROFILE = "profile"
+export const SEARCH_FILTER_COURSE = "course"
+
 export const VALID_SEARCH_FILTER_TYPES = [
   SEARCH_FILTER_ALL,
   SEARCH_FILTER_POST,

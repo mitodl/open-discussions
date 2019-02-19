@@ -7,9 +7,11 @@ import { LINK_TYPE_LINK, LINK_TYPE_TEXT } from "../lib/channels"
 
 import type {
   CommentResult,
+  CourseResult,
   PostResult,
   ProfileResult
 } from "../flow/searchTypes"
+import { platforms } from "../lib/constants"
 
 export const makeProfileResult = (): ProfileResult => ({
   author_avatar_medium: casual.url,
@@ -66,6 +68,27 @@ export const makePostResult = (): PostResult => ({
   text:                casual.text
 })
 
+export const makeCourseResult = (): CourseResult => ({
+  course_id:         `course_${String(casual.random)}`,
+  title:             casual.title,
+  image_src:         "http://image.medium.url",
+  short_description: casual.description,
+  full_description:  casual.description,
+  platform:          casual.random_element([platforms.edX, platforms.OCW]),
+  language:          casual.random_element(["en-US", "fr", null]),
+  semester:          casual.random_element(["Fall", "Spring", null]),
+  year:              casual.year,
+  level:             casual.random_element(["Graduate", "Undergraduate", null]),
+  start_date:        casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  end_date:          casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  enrollment_start:  casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  enrollment_end:    casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  instructors:       ["instuctor 1", "instructor 2"],
+  topics:            [casual.word, casual.word],
+  prices:            [{ mode: "audit", price: casual.number }],
+  object_type:       "course"
+})
+
 export const makeSearchResult = (type: ?string) => {
   if (!type) {
     type = casual.random_element(["post", "comment", "profile"])
@@ -80,6 +103,9 @@ export const makeSearchResult = (type: ?string) => {
     break
   case "profile":
     hit = makeProfileResult()
+    break
+  case "course":
+    hit = makeCourseResult()
     break
   default:
     // make flow happy

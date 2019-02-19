@@ -15,8 +15,7 @@ from channels.constants import (
 )
 from channels.models import ChannelGroupRole
 from search.connection import get_conn, get_default_alias_name
-from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
-
+from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE, COURSE_TYPE
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 
@@ -122,10 +121,12 @@ def _apply_general_query_filters(search, user):
         "terms", object_type=[COMMENT_TYPE, POST_TYPE]
     )
 
+    course_filter = Q("term", published=True) | ~Q("terms", object_type=[COURSE_TYPE])
+
     if channel_names:
         channels_filter = channels_filter | Q("terms", channel_name=channel_names)
 
-    return search.filter(channels_filter).filter(content_filter)
+    return search.filter(channels_filter).filter(content_filter).filter(course_filter)
 
 
 def execute_search(*, user, query):

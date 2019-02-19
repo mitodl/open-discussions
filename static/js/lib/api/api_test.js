@@ -24,7 +24,8 @@ import {
   search,
   getRelatedPosts,
   getWidgetList,
-  patchWidgetList
+  patchWidgetList,
+  aggregate
 } from "./api"
 import { makePost, makeChannelPostList } from "../../factories/posts"
 import { makeCommentsResponse } from "../../factories/comments"
@@ -299,6 +300,28 @@ describe("api", function() {
         const params = { some: "params" }
         await search(params)
         sinon.assert.calledWith(buildStub, params)
+        sinon.assert.calledWith(fetchJSONStub, "/api/v0/search/", {
+          method: POST,
+          body:   JSON.stringify(body)
+        })
+      })
+    })
+
+    describe("aggregate", () => {
+      it("should execute an aggregate search and return results", async () => {
+        const param = "topics"
+        const body = {
+          size: "0",
+          aggs: {
+            [param]: {
+              terms: {
+                field: param,
+                size:  100000
+              }
+            }
+          }
+        }
+        await aggregate([param])
         sinon.assert.calledWith(fetchJSONStub, "/api/v0/search/", {
           method: POST,
           body:   JSON.stringify(body)

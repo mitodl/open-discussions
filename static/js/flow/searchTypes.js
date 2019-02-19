@@ -1,5 +1,5 @@
 // @flow
-import type { PostType } from './discussionTypes'
+import type {CoursePrice, PostType} from './discussionTypes'
 
 type ResultCommon = {
   author_avatar_small: string,
@@ -57,18 +57,52 @@ export type PostResult = ResultCommon & {
   post_cover_image:    ?string
 }
 
-export type Result = PostResult | CommentResult | ProfileResult
+type RESULT_TYPE_COURSE = "course"
+
+export type CourseResult = {
+  course_id:          string,
+  title:              string,
+  image_src:          ?string,
+  object_type:        RESULT_TYPE_COURSE,
+  short_description:  ?string,
+  full_description:   ?string,
+  platform:           string,
+  language:           ?string,
+  semester:           ?string,
+  year:               ?string,
+  level:              ?string,
+  start_date:         ?string,
+  end_date:           ?string,
+  enrollment_start:   ?string,
+  enrollment_end:     ?string,
+  instructors:        Array<string>,
+  topics:             Array<string>,
+  prices:             Array<CoursePrice>
+}
+
+export type CourseFacetResult = {
+  platforms:  Array<string>,
+  topics:     Array<string>
+}
+
+export type Result = PostResult | CommentResult | ProfileResult | CourseResult
 
 export type SearchInputs = {
-  text?:       string,
-  type?:       string,
-  incremental: boolean
+  text?:            string,
+  type?:            string,
+  platforms?:       string,
+  topics?:          string,
+  availabilities?:  string,
+  incremental:      boolean
 }
 
 export type SearchParams = {
-  type:        ?string,
-  text:        ?string,
-  from:        number,
-  size:        number,
-  channelName: ?string,
+  type:             ?string,
+  text:             ?string,
+  from:             number,
+  size:             number,
+  channelName:      ?string,
+  platforms?:       ?Array<string>,
+  topics?:          ?Array<string>,
+  availabilities?:  ?Array<string>
 }

@@ -9,14 +9,16 @@ import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 
 import {
   searchResultToComment,
+  searchResultToCourse,
   searchResultToPost,
   searchResultToProfile
 } from "../lib/search"
 import { commentPermalink, profileURL } from "../lib/url"
 import { dropdownMenuFuncs } from "../lib/ui"
 
-import type { ProfileResult, Result } from "../flow/searchTypes"
+import type { CourseResult, ProfileResult, Result } from "../flow/searchTypes"
 import type { CommentInTree, Post } from "../flow/discussionTypes"
+import { CompactCourseDisplay } from "./CompactCourseDisplay"
 
 type PostProps = {
   post: Post,
@@ -81,6 +83,14 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
   )
 }
 
+type CourseProps = {
+  result: CourseResult
+}
+const CourseSearchResult = ({ result }: CourseProps) => {
+  const course = searchResultToCourse(result)
+  return <CompactCourseDisplay course={course} />
+}
+
 type Props = {
   commentUpvote?: Function,
   commentDownvote?: Function,
@@ -123,6 +133,8 @@ export default class SearchResult extends React.Component<Props> {
       )
     } else if (result.object_type === "profile") {
       return <ProfileSearchResult result={result} />
+    } else if (result.object_type === "course") {
+      return <CourseSearchResult result={result} />
     }
   }
 }

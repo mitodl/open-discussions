@@ -310,3 +310,37 @@ export type ProfilePayload = {
 export type SocialAuth = {
   provider: string,
 }
+
+export type Course = {
+  course_id:          string,
+  title:              string,
+  image_src:          ?string,
+  short_description:  ?string,
+  full_description:   ?string,
+  platform:           string,
+  language:           ?string,
+  semester:           ?string,
+  year:               ?string,
+  level:              ?string,
+  start_date:         ?string,
+  end_date:           ?string,
+  enrollment_start:   ?string,
+  enrollment_end:     ?string,
+  instructors:        ?Array<CourseInstructor>,
+  topics:             ?Array<CourseTopic>,
+  prices:             ?Array<CoursePrice>
+}
+
+export type CoursePrice = {
+  price: number,
+  mode: string
+}
+
+export type CourseTopic = {
+  name: string
+}
+
+export type CourseInstructor = {
+  first_name: string,
+  last_name: string
+}

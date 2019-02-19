@@ -38,7 +38,8 @@ declare var SETTINGS: {
   ckeditor_upload_url: string,
   article_ui_enabled: boolean,
   algolia_appId: ?string,
-  algolia_apiKey: ?string
+  algolia_apiKey: ?string,
+  course_ui_enabled: boolean
 }
 
 // mocha

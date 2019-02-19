@@ -1,8 +1,10 @@
 import { assert } from "chai"
 import sinon from "sinon"
+import { fn as moment } from "moment"
 
 import {
   makeCommentResult,
+  makeCourseResult,
   makePostResult,
   makeProfileResult
 } from "../factories/search"
@@ -11,10 +13,12 @@ import {
   channelField,
   searchFields,
   searchResultToComment,
+  searchResultToCourse,
   searchResultToPost,
   searchResultToProfile
 } from "./search"
 import * as searchFuncs from "./search"
+import { COURSE_CURRENT, COURSE_PRIOR, COURSE_UPCOMING } from "./constants"
 
 describe("search functions", () => {
   let sandbox
@@ -101,6 +105,30 @@ describe("search functions", () => {
       profile_image_medium: result.author_avatar_medium,
       profile_image_small:  result.author_avatar_small,
       username:             result.author_id
+    })
+  })
+
+  it("converts a course search result to a course", () => {
+    const result = makeCourseResult()
+    const course = searchResultToCourse(result)
+    assert.deepEqual(course, {
+      course_id:         result.course_id,
+      title:             result.title,
+      image_src:         result.image_src,
+      short_description: result.short_description,
+      full_description:  result.full_description,
+      platform:          result.platform,
+      language:          result.language,
+      semester:          result.semester,
+      year:              result.year,
+      level:             result.level,
+      start_date:        result.start_date,
+      end_date:          result.end_date,
+      enrollment_start:  result.enrollment_start,
+      enrollment_end:    result.enrollment_end,
+      instructors:       [],
+      topics:            result.topics.map(topic => ({ name: topic })),
+      prices:            result.prices
     })
   })
 
@@ -251,6 +279,149 @@ describe("search functions", () => {
       })
       sinon.assert.calledWith(stub, type)
     })
+
+    //
+    ;[
+      [
+        [COURSE_PRIOR, COURSE_CURRENT],
+        [
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    platform: "ocw"
+                  }
+                },
+                {
+                  bool: {
+                    filter: [
+                      {
+                        range: {
+                          start_date: {
+                            lte: "2019-01-31T16:06:08.098Z"
+                          }
+                        }
+                      },
+                      {
+                        range: {
+                          end_date: {
+                            gte: "2019-01-31T16:06:08.098Z"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  range: {
+                    end_date: {
+                      lte: "2019-01-31T16:06:08.098Z"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      ],
+      [
+        [COURSE_UPCOMING],
+        [
+          {
+            bool: {
+              should: [
+                {
+                  range: {
+                    start_date: {
+                      gte: "2019-01-31T16:06:08.098Z"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      ],
+      [[COURSE_PRIOR, COURSE_CURRENT, COURSE_UPCOMING], []],
+      [[], []]
+    ].forEach(([availabilities, availableQuery]) => {
+      it(`filters courses by platform, availability ([${availabilities.toString()}]), and topics`, () => {
+        const fieldNames = ["field1", "field2", "field3"]
+        const stub = sandbox
+          .stub(searchFuncs, "searchFields")
+          .returns(fieldNames)
+        sandbox.stub(moment, "format").returns("2019-01-31T16:06:08.098Z")
+        const type = "course"
+        const text = "some text here"
+        const platforms = ["mitx"]
+        const topics = ["Engineering", "Science"]
+
+        const mustQuery = [
+          {
+            term: {
+              object_type: "course"
+            }
+          },
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    topics: "Engineering"
+                  }
+                },
+                {
+                  term: {
+                    topics: "Science"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    platform: "mitx"
+                  }
+                }
+              ]
+            }
+          },
+          ...availableQuery
+        ]
+
+        assert.deepEqual(
+          buildSearchQuery({ type, text, platforms, availabilities, topics }),
+          {
+            query: {
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      filter: {
+                        bool: {
+                          must: mustQuery
+                        }
+                      },
+                      must: {
+                        multi_match: {
+                          query:  text,
+                          fields: fieldNames
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        )
+        sinon.assert.calledWith(stub, type)
+      })
+    })
   })
 
   describe("channelField", () => {
@@ -272,6 +443,21 @@ describe("search functions", () => {
       [
         "profile",
         ["author_headline.english", "author_bio.english", "author_name"]
+      ],
+      [
+        "course",
+        [
+          "course_title.english",
+          "short_description.english",
+          "full_description.english",
+          "year",
+          "semester",
+          "level",
+          "instructors",
+          "prices",
+          "topics",
+          "platform"
+        ]
       ]
     ].forEach(([type, fields]) => {
       it(`has the right searchFields for ${type}`, () => {

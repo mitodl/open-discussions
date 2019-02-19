@@ -77,6 +77,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
         "algolia_appId": settings.ALGOLIA_APP_ID,
         "algolia_apiKey": settings.ALGOLIA_API_KEY,
+        "course_ui_enabled": features.is_enabled(features.COURSE_UI),
     }
 
     return render(

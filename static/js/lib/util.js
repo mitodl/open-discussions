@@ -127,3 +127,6 @@ export function* incrementer(): Generator<number, *, *> {
 
 export const isValidUrl = (url: string): boolean =>
   isURL(url, { allow_underscores: true, require_protocol: true })
+
+export const toArray = (obj: any) =>
+  Array.isArray(obj) ? obj : obj ? [obj] : undefined

@@ -143,6 +143,20 @@ def test_execute_search(mocker, user):
                                 ]
                             }
                         },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {"terms": {"object_type": ["course"]}}
+                                            ]
+                                        }
+                                    },
+                                    {"term": {"published": True}},
+                                ]
+                            }
+                        },
                     ]
                 }
             },
@@ -220,6 +234,20 @@ def test_execute_search_anonymous(mocker):
                                             ]
                                         }
                                     },
+                                ]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {"terms": {"object_type": ["course"]}}
+                                            ]
+                                        }
+                                    },
+                                    {"term": {"published": True}},
                                 ]
                             }
                         },

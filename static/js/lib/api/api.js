@@ -3,6 +3,7 @@
 // For mocking purposes we need to use "fetch" defined as a global instead of importing as a local.
 import { PATCH, POST, DELETE } from "redux-hammock/constants"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
+import _ from "lodash"
 
 import { buildSearchQuery } from "../search"
 import {
@@ -31,6 +32,27 @@ export function search(params: SearchParams): Promise<*> {
   return fetchJSONWithAuthFailure("/api/v0/search/", {
     method: POST,
     body:   JSON.stringify(body)
+  })
+}
+
+export function aggregate(fields: Array<string>): Promise<*> {
+  const aggs = _.fromPairs(
+    fields.map(field => [
+      field,
+      {
+        terms: {
+          field: field,
+          size:  100000
+        }
+      }
+    ])
+  )
+  return fetchJSONWithAuthFailure("/api/v0/search/", {
+    method: POST,
+    body:   JSON.stringify({
+      size: "0",
+      aggs: aggs
+    })
   })
 }
 

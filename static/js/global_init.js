@@ -25,6 +25,7 @@ const _createSettings = () => ({
   username:               "greatusername",
   user_full_name:         "Great User",
   profile_ui_enabled:     false,
+  course_ui_enabled:      false,
   support_email:          "support@fake.url",
   reactGaDebug:           true,
   gaTrackingID:           "fake",
