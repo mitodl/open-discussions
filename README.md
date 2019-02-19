@@ -263,17 +263,19 @@ otherwise do in a Django shell. To get started:
     ```bash
     docker-compose -f docker-compose-notebook.yml run --rm --service-ports notebook
     ```
-- Visit the running notebook server in your browser. You'll need to do
-  some copy/paste from the `notebook` container log output. You should
-  see some log line that look like this:
+- Visit the running notebook server in your browser. The `notebook` container log output will
+  indicate the URL and `token` param with some output that looks like this:
     ```
     notebook_1  |     To access the notebook, open this file in a browser:
     notebook_1  |         file:///home/mitodl/.local/share/jupyter/runtime/nbserver-8-open.html
     notebook_1  |     Or copy and paste one of these URLs:
     notebook_1  |         http://(2c19429d04d0 or 127.0.0.1):8080/?token=2566e5cbcd723e47bdb1b058398d6bb9fbf7a31397e752ea
     ```
-  Copy the URL at the bottom and paste it into a browser window, replacing the parenthetical with
-  the normal local site URL. The example above would turn into `http://od.odl.local:8080/?token=2566e5cbcd723e47bdb1b058398d6bb9fbf7a31397e752ea`
+  Here is a one-line command that will produce a browser-ready URL from that output. Run this in a separate terminal:
+    ```bash
+    APP_HOST="od.odl.local"; docker logs $(docker ps --format '{{.Names}}' | grep "_notebook_run_") | grep -E "http://(.*):8080[^ ]+\w" | tail -1 | sed -e 's/^[[:space:]]*//' | sed -e "s/(.*)/$APP_HOST/"
+    ```
+  OSX users can pipe that output to `xargs open` to open a browser window directly with the URL from that command.
 - Click the `.ipynb` file that you created to run the notebook
 - Execute the first block to confirm it's working properly (click inside the block
   and press Shift+Enter)
