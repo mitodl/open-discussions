@@ -134,7 +134,7 @@ const shouldLoadData = R.complement(
   ])
 )
 
-class PostPage extends React.Component<PostPageProps> {
+export class PostPage extends React.Component<PostPageProps> {
   componentDidMount() {
     this.loadData()
 
@@ -150,7 +150,7 @@ class PostPage extends React.Component<PostPageProps> {
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: PostPageProps) {
     if (shouldLoadData(prevProps, this.props)) {
       this.loadData()
     }
@@ -459,7 +459,10 @@ class PostPage extends React.Component<PostPageProps> {
         <Dialog
           open={commentDeleteDialogVisible}
           hideDialog={this.hideCommentDialog(DELETE_COMMENT_DIALOG)}
-          onAccept={this.deleteComment}
+          onAccept={async () => {
+            await this.deleteComment()
+            this.hideCommentDialog(DELETE_COMMENT_DIALOG)()
+          }}
           title="Delete Comment"
           submitText="Yes, Delete"
         >
@@ -468,8 +471,8 @@ class PostPage extends React.Component<PostPageProps> {
         <Dialog
           open={postDeleteDialogVisible}
           hideDialog={hidePostDialog}
-          onAccept={() => {
-            this.deletePost(post)
+          onAccept={async () => {
+            await this.deletePost(post)
             hidePostDialog()
           }}
           title="Delete Post"

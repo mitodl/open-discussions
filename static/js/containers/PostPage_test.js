@@ -7,10 +7,11 @@ import { Link } from "react-router-dom"
 import CommentTree from "../components/CommentTree"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
-import PostPage from "./PostPage"
+import PostPage, { PostPage as InnerPostPage } from "./PostPage"
 import { ReplyToPostForm } from "../components/CommentForms"
 
-import { makePost, makeChannelPostList } from "../factories/posts"
+import { wait } from "../lib/util"
+import { makePost } from "../factories/posts"
 import {
   makeComment,
   makeCommentsResponse,
@@ -20,9 +21,8 @@ import { makeChannel } from "../factories/channels"
 import { makeWidgetListResponse } from "../factories/widgets"
 import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
-import { SET_CHANNEL_DATA } from "../actions/channel"
 import { REPLACE_MORE_COMMENTS } from "../actions/comment"
-import { FORM_BEGIN_EDIT, FORM_END_EDIT, FORM_VALIDATE } from "../actions/forms"
+import { FORM_BEGIN_EDIT, FORM_END_EDIT, FORM_UPDATE } from "../actions/forms"
 import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG, HIDE_DIALOG } from "../actions/ui"
 import {
   SET_FOCUSED_POST,
@@ -31,7 +31,6 @@ import {
   CLEAR_FOCUSED_COMMENT
 } from "../actions/focus"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { findComment } from "../lib/comments"
 import { postDetailURL, channelURL, commentPermalink } from "../lib/url"
 import { formatTitle } from "../lib/title"
 import { createCommentTree } from "../reducers/comments"
@@ -40,20 +39,14 @@ import { VALID_COMMENT_SORT_TYPES } from "../lib/picker"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import * as utilFuncs from "../lib/util"
 import * as embedUtil from "../lib/embed"
-import { removeTrailingSlash, truncate } from "../lib/util"
+import * as validationFuncs from "../lib/validation"
+import { truncate } from "../lib/util"
 import { NOT_AUTHORIZED_ERROR_TYPE } from "../util/rest"
 import { LINK_TYPE_LINK } from "../lib/channels"
+import { REPORT_FORM_KEY } from "../lib/reports"
 
 describe("PostPage", function() {
-  let helper,
-    renderComponent,
-    listenForActions,
-    post,
-    comments,
-    channel,
-    twitterEmbedStub
-
-  this.timeout(5000)
+  let helper, render, post, comments, channel, twitterEmbedStub
 
   beforeEach(() => {
     post = makePost()
@@ -65,22 +58,83 @@ describe("PostPage", function() {
     helper.getPostStub.returns(Promise.resolve(post))
     helper.getEmbedlyStub.returns(Promise.resolve(makeArticle()))
     helper.getChannelStub.returns(Promise.resolve(channel))
-    helper.getChannelsStub.returns(Promise.resolve([]))
+    helper.getChannelsStub.returns(Promise.resolve([channel]))
     helper.getCommentsStub.returns(Promise.resolve(commentsResponse))
     helper.getCommentStub.returns(
       Promise.resolve(R.slice(0, 1, commentsResponse))
     )
+    helper.updateCommentStub.returns(Promise.resolve())
     helper.getPostsForChannelStub.returns(
       Promise.resolve({
-        posts: makeChannelPostList()
+        posts: [post]
       })
     )
     helper.deletePostStub.returns(Promise.resolve())
+    helper.deleteCommentStub.returns(Promise.resolve())
     helper.getReportsStub.returns(Promise.resolve(R.times(makeReportRecord, 4)))
     helper.getProfileStub.returns(Promise.resolve(""))
     helper.getWidgetListStub.returns(Promise.resolve(makeWidgetListResponse(0)))
-    renderComponent = helper.renderComponent.bind(helper)
-    listenForActions = helper.listenForActions.bind(helper)
+    render = helper.configureHOCRenderer(
+      PostPage,
+      InnerPostPage,
+      {
+        posts: {
+          data:       new Map([[post.id, post]]),
+          processing: false,
+          loaded:     true
+        },
+        postsForChannel: {
+          data:       new Map([[channel.name, { postIds: [post.id] }]]),
+          processing: false,
+          loaded:     true
+        },
+        channels: {
+          data:       new Map([[channel.name, channel]]),
+          processing: false,
+          loaded:     true
+        },
+        comments: {
+          data:       new Map([[post.id, comments]]),
+          processing: false,
+          loaded:     true
+        },
+        reports: {
+          data:       {},
+          processing: false,
+          loaded:     true
+        },
+        subscribedChannels: {
+          data:       [channel.name],
+          processing: false,
+          loaded:     true
+        },
+        ui: {
+          dialogs:       new Map(),
+          dropdownMenus: new Map()
+        },
+        profiles: {
+          data:       new Map(),
+          processing: false,
+          loaded:     true
+        },
+        focus: {},
+        forms: {}
+      },
+      {
+        channelName: channel.name,
+        match:       {
+          params: {
+            postID:      post.id,
+            channelName: channel.name
+          }
+        },
+        location: {
+          search:   {},
+          pathname: "/"
+        },
+        history: helper.browserHistory
+      }
+    )
     twitterEmbedStub = helper.sandbox.stub(embedUtil, "ensureTwitterEmbedJS")
   })
 
@@ -88,48 +142,22 @@ describe("PostPage", function() {
     helper.cleanup()
   })
 
-  const basicPostPageActions = [
-    actions.profiles.get.requestType,
-    actions.profiles.get.successType,
-    actions.posts.get.requestType,
-    actions.posts.get.successType,
-    actions.comments.get.requestType,
-    actions.comments.get.successType,
-    actions.subscribedChannels.get.requestType,
-    actions.subscribedChannels.get.successType,
-    actions.channels.get.requestType,
-    actions.channels.get.successType,
-    SET_CHANNEL_DATA
-  ]
-
-  const renderPage = async () => {
-    const [wrapper] = await renderComponent(
-      postDetailURL(channel.name, post.id),
-      basicPostPageActions.concat(FORM_BEGIN_EDIT)
-    )
-    return wrapper.update()
-  }
-
   it("should set the document title", async () => {
-    await renderPage()
-    assert.equal(document.title, formatTitle(post.title))
+    const { inner } = await render()
+    assert.equal(inner.find("title").text(), formatTitle(post.title))
   })
 
   it("should set the document meta description", async () => {
-    await renderPage()
-    assert.equal(
-      document.head.querySelector("[name=description]").content,
-      truncate(post.text, 300)
-    )
+    const { inner } = await render()
+    assert.equal(inner.find("meta").prop("content"), truncate(post.text, 300))
   })
 
   it("should set the document meta canonical link to the post detail url", async () => {
-    await renderPage()
+    const { inner } = await render()
+
     assert.equal(
-      document.head.querySelector("[rel=canonical]").href,
-      removeTrailingSlash(
-        `http://fake.open.url${postDetailURL(channel.name, post.id, post.slug)}`
-      )
+      inner.find("CanonicalLink").prop("relativeUrl"),
+      postDetailURL(channel.name, post.id, post.slug)
     )
   })
 
@@ -140,17 +168,24 @@ describe("PostPage", function() {
       post.slug,
       comments[0].id
     )
-    const [wrapper] = await renderComponent(commentLink, basicPostPageActions)
-    wrapper.update()
-    assert.equal(
-      document.head.querySelector("[rel=canonical]").href,
-      removeTrailingSlash(`http://fake.open.url${commentLink}`)
+    const { inner } = await render(
+      {},
+      {
+        match: {
+          params: {
+            postID:      post.id,
+            channelName: channel.name,
+            commentID:   comments[0].id
+          }
+        }
+      }
     )
+    assert.equal(inner.find("CanonicalLink").prop("relativeUrl"), commentLink)
   })
 
-  it("should fetch post, comments, channel, and render", async () => {
-    const wrapper = await renderPage()
-    assert.deepEqual(wrapper.find(CommentTree).props().comments, comments)
+  it("should render comments", async () => {
+    const { inner } = await render()
+    assert.deepEqual(inner.find(CommentTree).props().comments, comments)
   })
 
   //
@@ -163,44 +198,24 @@ describe("PostPage", function() {
     it(testName, async () => {
       const comment = comments[0].replies[2]
       assert(comment, "comment not found")
-      // set initial state for upvoted or downvoted so we can flip it the other way
-      const expectedPayload = {}
       if (isUpvote) {
         comment.upvoted = wasClear
-        expectedPayload.upvoted = !wasClear
       } else {
         comment.downvoted = wasClear
-        expectedPayload.downvoted = !wasClear
       }
-      const wrapper = await renderPage()
+      const { inner } = await render()
 
-      const expectedComment = {
-        ...comment,
-        ...expectedPayload
-      }
-      helper.updateCommentStub.returns(Promise.resolve(expectedComment))
+      const props = inner.find("CommentTree").props()
+      const voteFunc = isUpvote ? props.upvote : props.downvote
+      await voteFunc(comment)
 
-      const newState = await listenForActions(
-        [
-          actions.comments.patch.requestType,
-          actions.comments.patch.successType
-        ],
-        () => {
-          const props = wrapper.find("CommentTree").props()
-          const voteFunc = isUpvote ? props.upvote : props.downvote
-          voteFunc(comment)
+      const expectedPayload = isUpvote
+        ? {
+          upvoted: !comment.upvoted
         }
-      )
-
-      const commentTree = newState.comments.data.get(post.id)
-      const lens = findComment(commentTree, comment.id)
-      const updatedComment = R.view(lens, commentTree)
-      if (isUpvote) {
-        assert.equal(comment.upvoted, !updatedComment.upvoted)
-      } else {
-        assert.equal(comment.downvoted, !updatedComment.downvoted)
-      }
-      assert.deepEqual(updatedComment, expectedComment)
+        : {
+          downvoted: !comment.downvoted
+        }
 
       sinon.assert.calledWith(
         helper.updateCommentStub,
@@ -211,8 +226,8 @@ describe("PostPage", function() {
   })
 
   it("should load twitter JS on page load", async () => {
-    await renderPage()
-    assert.ok(twitterEmbedStub.called)
+    await render()
+    sinon.assert.calledWith(twitterEmbedStub)
   })
 
   it("should call window.twttr.widgets.load() if a twitter embed", async () => {
@@ -225,30 +240,33 @@ describe("PostPage", function() {
       widgets: { load: helper.sandbox.stub() }
     }
 
-    await renderComponent(
-      postDetailURL(channel.name, post.id),
-      basicPostPageActions.concat([
-        FORM_BEGIN_EDIT,
-        actions.embedly.get.requestType,
-        actions.embedly.get.successType
-      ])
-    )
-    assert.ok(window.twttr.widgets.load.called)
+    await render({
+      embedly: {
+        data: new Map([[post.url, null]])
+      }
+    })
+    // wait a cycle to let posts and comments resolve
+    await wait(0)
+    sinon.assert.calledWith(window.twttr.widgets.load)
   })
 
   it("should show a comment permalink UI if at the right URL", async () => {
-    const [wrapper] = await renderComponent(
-      commentPermalink(channel.name, post.id, post.slug, comments[0].id),
-      basicPostPageActions
+    const { inner } = await render(
+      {},
+      {
+        match: {
+          params: {
+            postID:      post.id,
+            channelName: channel.name,
+            commentID:   comments[0].id
+          }
+        }
+      }
     )
-    wrapper.update()
-    const card = wrapper.find(".comment-detail-card")
+    const card = inner.find(".comment-detail-card")
     assert(card.exists())
     assert.equal(
-      card
-        .find("div")
-        .at(2)
-        .text(),
+      card.find("div").text(),
       "You are viewing a single comment's thread."
     )
     assert.equal(
@@ -259,15 +277,15 @@ describe("PostPage", function() {
       card.find(Link).props().children,
       "View the rest of the comments"
     )
-    assert.isTrue(wrapper.find(ExpandedPostDisplay).props().showPermalinkUI)
+    assert.isTrue(inner.find(ExpandedPostDisplay).props().showPermalinkUI)
   })
 
   it("should hide the comments header section when there are no comments", async () => {
     post.num_comments = 0
     helper.getPostStub.returns(Promise.resolve(post))
     helper.getCommentsStub.returns(Promise.resolve([]))
-    const wrapper = await renderPage()
-    assert.isFalse(wrapper.find(".count-and-sort").exists())
+    const { inner } = await render()
+    assert.isFalse(inner.find(".count-and-sort").exists())
   })
 
   //
@@ -275,17 +293,16 @@ describe("PostPage", function() {
     it(`should show a ReplyToPostForm when userIsAnonymous() === ${userIsAnon}`, async () => {
       const anonStub = helper.sandbox.stub(utilFuncs, "userIsAnonymous")
       anonStub.returns(userIsAnon)
-      const wrapper = await renderPage()
-      wrapper.update()
-      assert.ok(wrapper.find(ReplyToPostForm).exists())
+      const { inner } = await render()
+      assert.ok(inner.find(ReplyToPostForm).exists())
     })
   })
 
   it("passed props to each CommentVoteForm", async () => {
-    const wrapper = await renderPage()
-    const commentTree = wrapper.find("CommentTree")
+    const { inner } = await render()
+    const commentTree = inner.find("CommentTree")
     const commentTreeProps = commentTree.props()
-    for (const form of wrapper.find("CommentVoteForm")) {
+    for (const form of inner.find("CommentVoteForm")) {
       const fromProps = form.props
       assert.equal(fromProps.downvote, commentTreeProps.downvote)
       assert.equal(fromProps.upvote, commentTreeProps.upvote)
@@ -293,10 +310,10 @@ describe("PostPage", function() {
   })
 
   it("passed props to each CommentRemovalForm", async () => {
-    const wrapper = await renderPage()
-    const commentTree = wrapper.find("CommentTree")
+    const { inner } = await render()
+    const commentTree = inner.find("CommentTree")
     const commentTreeProps = commentTree.props()
-    for (const form of wrapper.find("CommentRemovalForm")) {
+    for (const form of inner.find("CommentRemovalForm")) {
       const fromProps = form.props
       assert.equal(fromProps.approve, commentTreeProps.approve)
       assert.equal(fromProps.remove, commentTreeProps.remove)
@@ -304,8 +321,8 @@ describe("PostPage", function() {
   })
 
   it("loads more comments when the function is called", async () => {
-    const wrapper = await renderPage()
-    const commentTree = wrapper.find("CommentTree")
+    const { inner, store } = await render()
+    const commentTree = inner.find("CommentTree")
     const commentTreeProps = commentTree.props()
     const parent = comments[0]
     const moreComments = makeMoreComments(post, parent.id)
@@ -313,15 +330,15 @@ describe("PostPage", function() {
     const newComments = [newComment]
 
     helper.getMoreCommentsStub.returns(Promise.resolve(newComments))
-    await listenForActions(
+    await commentTreeProps.loadMoreComments(moreComments)
+    const actionsList = store.getActions()
+    assert.deepEqual(
+      actionsList.slice(actionsList.length - 3).map(action => action.type),
       [
         actions.morecomments.get.requestType,
         actions.morecomments.get.successType,
         REPLACE_MORE_COMMENTS
-      ],
-      () => {
-        commentTreeProps.loadMoreComments(moreComments)
-      }
+      ]
     )
 
     sinon.assert.calledWith(
@@ -330,37 +347,126 @@ describe("PostPage", function() {
       parent.id,
       moreComments.children
     )
-    const reducerTree = helper.store.getState().comments.data.get(post.id)
-    const newCommentInTree =
-      reducerTree[0].replies[reducerTree[0].replies.length - 1]
-    assert.deepEqual(newCommentInTree, newComment)
   })
 
-  it("should let a user delete their own post, then redirect to channel page", async () => {
-    SETTINGS.username = post.author_id
-    const wrapper = await renderPage()
-    await listenForActions(
-      [
-        actions.posts["delete"].requestType,
-        actions.posts["delete"].successType,
-        actions.widgets.get.requestType,
-        actions.widgets.get.successType,
-        actions.postsForChannel.get.requestType,
-        SET_SNACKBAR_MESSAGE,
-        HIDE_DIALOG
-      ],
-      () => {
-        wrapper
-          .find("OurDialog")
-          .at(4)
-          .props()
-          .onAccept()
-      }
-    )
-    const {
-      location: { pathname }
-    } = helper.browserHistory
-    assert.equal(pathname, channelURL(channel.name))
+  describe("deleting post", () => {
+    it("opens a confirmation dialog for deleting a post", async () => {
+      const { inner, store } = await render()
+      inner.find("ExpandedPostDisplay").prop("showPostDeleteDialog")()
+      const actionsList = store.getActions()
+      assert.deepEqual(actionsList[actionsList.length - 1], {
+        type:    SHOW_DIALOG,
+        payload: "DELETE_POST_DIALOG"
+      })
+    })
+
+    it("deletes a post", async () => {
+      SETTINGS.username = post.author_id
+      const { inner, store } = await render({
+        forms: {
+          [REPORT_FORM_KEY]: {
+            value: {}
+          }
+        }
+      })
+
+      const props = inner
+        .find("OurDialog")
+        .at(1)
+        .props()
+
+      assert.equal(props.title, "Delete Post")
+      await props.onAccept()
+      sinon.assert.calledWith(helper.deletePostStub, post.id)
+      const actionsList = store.getActions()
+      assert.deepEqual(actionsList.slice(actionsList.length - 4), [
+        {
+          type:    actions.posts.delete.requestType,
+          payload: post.id
+        },
+        {
+          type: actions.posts.delete.successType
+        },
+        {
+          type:    SET_SNACKBAR_MESSAGE,
+          payload: { message: "Post has been deleted" }
+        },
+        {
+          type:    HIDE_DIALOG,
+          payload: "DELETE_POST_DIALOG"
+        }
+      ])
+
+      const {
+        location: { pathname }
+      } = helper.browserHistory
+      assert.equal(pathname, channelURL(channel.name))
+    })
+  })
+
+  describe("deleting comment", () => {
+    it("opens a confirmation dialog for deleting a comment", async () => {
+      const { inner, store } = await render()
+      const comment = comments[0]
+
+      inner.find("CommentTree").prop("deleteComment")(comment)
+      const actionsList = store.getActions()
+      assert.deepEqual(actionsList.slice(actionsList.length - 2), [
+        {
+          type:    SET_FOCUSED_COMMENT,
+          payload: comment
+        },
+        {
+          type:    SHOW_DIALOG,
+          payload: "DELETE_COMMENT_DIALOG"
+        }
+      ])
+    })
+
+    it("deletes a comment", async () => {
+      const comment = comments[0].replies[2]
+      assert(comment, "comment not found")
+
+      const { inner, store } = await render({
+        focus: {
+          comment
+        }
+      })
+
+      const dialogProps = inner
+        .find("OurDialog")
+        .at(0)
+        .props()
+      assert.equal(dialogProps.title, "Delete Comment")
+      await dialogProps.onAccept()
+
+      const actionsList = store.getActions()
+      sinon.assert.calledWith(helper.deleteCommentStub, comment.id)
+      assert.deepEqual(actionsList.slice(actionsList.length - 5), [
+        {
+          type:    actions.comments.delete.requestType,
+          payload: post.id
+        },
+        {
+          type:    actions.comments.delete.successType,
+          payload: {
+            commentId: comment.id,
+            postId:    post.id
+          }
+        },
+        {
+          type:    SET_SNACKBAR_MESSAGE,
+          payload: { message: "Comment has been deleted" }
+        },
+        {
+          type: CLEAR_FOCUSED_COMMENT
+        },
+        {
+          type:    HIDE_DIALOG,
+          payload: "DELETE_COMMENT_DIALOG"
+        }
+      ])
+    })
   })
 
   describe("as a moderator user", () => {
@@ -368,418 +474,653 @@ describe("PostPage", function() {
       channel.user_is_moderator = true
     })
 
-    it("should remove the post", async () => {
-      post.removed = false
-      const wrapper = await renderPage()
-      const expected = {
-        ...post,
-        removed: true
-      }
-      helper.updateRemovedStub.returns(Promise.resolve(expected))
+    describe("removing or approving", () => {
+      describe("posts", () => {
+        it("should show a dialog to remove the post", async () => {
+          post.removed = false
+          const { inner, store } = await render()
 
-      const newState = await listenForActions(
-        [
-          SHOW_DIALOG,
-          SET_FOCUSED_POST,
-          actions.postRemoved.patch.requestType,
-          actions.postRemoved.patch.successType,
-          HIDE_DIALOG,
-          CLEAR_FOCUSED_POST,
-          SET_POST_DATA,
-          SET_SNACKBAR_MESSAGE
-        ],
-        () => {
-          const props = wrapper.find("ExpandedPostDisplay").props()
-          props.removePost(post)
-          wrapper
+          await inner.find("ExpandedPostDisplay").prop("removePost")(post)
+          const actionsList = store.getActions()
+          assert.deepEqual(actionsList.slice(actionsList.length - 2), [
+            {
+              type:    SET_FOCUSED_POST,
+              payload: post
+            },
+            {
+              type:    SHOW_DIALOG,
+              payload: "DIALOG_REMOVE_POST"
+            }
+          ])
+        })
+
+        it("removes the post", async () => {
+          post.removed = false
+          const expected = {
+            ...post,
+            removed: true
+          }
+          helper.updateRemovedStub.returns(Promise.resolve(expected))
+
+          const { wrapper, store } = await render({
+            focus: {
+              post
+            }
+          })
+          const dialogProps = wrapper
+            .dive()
             .find("OurDialog")
             .at(1)
             .props()
-            .onAccept({ preventDefault: helper.sandbox.stub() })
-        }
-      )
+          assert.equal(dialogProps.title, "Remove Post")
+          await dialogProps.onAccept({ preventDefault: helper.sandbox.stub() })
 
-      assert.deepEqual(newState.posts.data.get(post.id), expected)
-      assert.deepEqual(newState.ui.snackbar, {
-        id:      0,
-        message: "Post has been removed"
-      })
+          const actionsList = store.getActions()
+          assert.deepEqual(actionsList.slice(actionsList.length - 6), [
+            {
+              type:    actions.postRemoved.patch.requestType,
+              payload: post.id
+            },
+            {
+              type:    actions.postRemoved.patch.successType,
+              payload: expected
+            },
+            {
+              type:    SET_POST_DATA,
+              payload: expected
+            },
+            {
+              type: CLEAR_FOCUSED_POST
+            },
+            {
+              type:    HIDE_DIALOG,
+              payload: "DIALOG_REMOVE_POST"
+            },
+            {
+              type:    SET_SNACKBAR_MESSAGE,
+              payload: {
+                message: "Post has been removed"
+              }
+            }
+          ])
 
-      sinon.assert.calledWith(helper.updateRemovedStub, post.id, true)
-    })
-
-    it("should approve the post", async () => {
-      post.removed = true
-      const wrapper = await renderPage()
-      const expected = {
-        ...post,
-        removed: false
-      }
-      helper.updateRemovedStub.returns(Promise.resolve(expected))
-
-      const newState = await listenForActions(
-        [
-          actions.postRemoved.patch.requestType,
-          actions.postRemoved.patch.successType,
-          SET_POST_DATA,
-          SET_SNACKBAR_MESSAGE
-        ],
-        () => {
-          const props = wrapper.find("ExpandedPostDisplay").props()
-          props.approvePost(post)
-        }
-      )
-
-      assert.deepEqual(newState.posts.data.get(post.id), expected)
-      assert.deepEqual(newState.ui.snackbar, {
-        id:      0,
-        message: "Post has been approved"
-      })
-
-      sinon.assert.calledWith(helper.updateRemovedStub, post.id, false)
-    })
-
-    //
-    ;[
-      [false, "should remove a comment"],
-      [true, "should approve a comment"]
-    ].forEach(([isRemoved, testName]) => {
-      it(testName, async () => {
-        const comment = comments[0].replies[2]
-        assert(comment, "comment not found")
-        // set initial state for removed so we can flip it the other way
-        const expectedPayload = { removed: !isRemoved }
-        comment.removed = isRemoved
-
-        const wrapper = await renderPage()
-
-        const expectedComment = {
-          ...comment,
-          ...expectedPayload
-        }
-        helper.updateCommentStub.returns(Promise.resolve(expectedComment))
-
-        const patchActions = [
-          actions.comments.patch.requestType,
-          actions.comments.patch.successType
-        ]
-        let expectedActions = []
-        if (isRemoved) {
-          // if we're approving it, the patch actions fire immediately
-          expectedActions = patchActions
-        } else {
-          // otherwise a confirmation dialog shows
-          expectedActions = [SHOW_DIALOG, SET_FOCUSED_COMMENT]
-        }
-
-        let newState = await listenForActions(expectedActions, () => {
-          const props = wrapper.find("CommentTree").props()
-          const modFunc = isRemoved ? props.approve : props.remove
-          modFunc(comment)
+          sinon.assert.calledWith(helper.updateRemovedStub, post.id, true)
         })
 
-        if (!isRemoved) {
-          // if we are removing the comment, handle the confirmation dialog
-          newState = await listenForActions(patchActions, () => {
-            wrapper
-              .find("OurDialog")
-              .at(2)
-              .props()
-              .onAccept({ preventDefault: helper.sandbox.stub() })
-          })
-        }
+        it("approves the post", async () => {
+          post.removed = true
+          const { inner, store } = await render()
+          const expected = {
+            ...post,
+            removed: false
+          }
+          helper.updateRemovedStub.returns(Promise.resolve(expected))
 
-        const commentTree = newState.comments.data.get(post.id)
-        const lens = findComment(commentTree, comment.id)
-        const updatedComment = R.view(lens, commentTree)
-        assert.deepEqual(updatedComment, expectedComment)
+          await inner.find("ExpandedPostDisplay").prop("approvePost")(post)
+          const actionsList = store.getActions()
 
-        sinon.assert.calledWith(
-          helper.updateCommentStub,
-          comment.id,
-          expectedPayload
-        )
-      })
-    })
+          assert.deepEqual(actionsList.slice(actionsList.length - 1), [
+            {
+              type:    SET_SNACKBAR_MESSAGE,
+              payload: {
+                message: "Post has been approved"
+              }
+            }
+          ])
 
-    it("should report a comment", async () => {
-      const comment = comments[0].replies[2]
-      assert(comment, "comment not found")
-
-      const wrapper = await renderPage()
-
-      helper.reportContentStub.returns(Promise.resolve())
-
-      await listenForActions(
-        [SHOW_DIALOG, SET_FOCUSED_COMMENT, FORM_BEGIN_EDIT],
-        () => {
-          const reportFunc = wrapper.find("CommentTree").props().reportComment
-          reportFunc(comment)
-        }
-      )
-
-      wrapper.update()
-      const dialog = wrapper.find("OurDialog").at(5)
-      dialog.find("input").simulate("change", {
-        target: {
-          name:  "reason",
-          value: "spam"
-        }
+          sinon.assert.calledWith(helper.updateRemovedStub, post.id, false)
+        })
       })
 
-      await listenForActions(
-        [
-          actions.reports.post.requestType,
-          actions.reports.post.successType,
-          CLEAR_FOCUSED_COMMENT,
-          HIDE_DIALOG,
-          FORM_END_EDIT
-        ],
-        () => {
-          dialog.props().onAccept()
-        }
-      )
-      sinon.assert.calledWith(helper.reportContentStub, {
-        comment_id: comment.id,
-        reason:     "spam"
-      })
-    })
-  })
-
-  it("should report a post", async () => {
-    const wrapper = await renderPage()
-
-    helper.reportContentStub.returns(Promise.resolve())
-
-    const preventDefaultStub = helper.sandbox.stub()
-    await listenForActions(
-      [SHOW_DIALOG, FORM_BEGIN_EDIT, SET_FOCUSED_POST],
-      () => {
-        const reportPostFunc = wrapper.find("ExpandedPostDisplay").props()
-          .showPostReportDialog
-        reportPostFunc({ preventDefault: preventDefaultStub })
-      }
-    )
-    assert.ok(preventDefaultStub.called)
-    wrapper.update()
-
-    const dialog = wrapper.find("OurDialog").at(0)
-    dialog.find("input").simulate("change", {
-      target: {
-        name:  "reason",
-        value: "spam"
-      }
-    })
-
-    await listenForActions(
-      [
-        actions.reports.post.requestType,
-        actions.reports.post.successType,
-        HIDE_DIALOG,
-        FORM_END_EDIT
-      ],
-      () => {
-        dialog.props().onAccept()
-      }
-    )
-    sinon.assert.calledWith(helper.reportContentStub, {
-      post_id: post.id,
-      reason:  "spam"
-    })
-  })
-
-  //
-  ;[
-    ["should render validation for a comment report", true],
-    ["should render validation for a post report", false]
-  ].forEach(([testName, isComment]) => {
-    it(testName, async () => {
-      const wrapper = await renderPage()
-
-      helper.reportContentStub.returns(Promise.resolve())
-
-      const expectedActions = [SHOW_DIALOG, FORM_BEGIN_EDIT]
-
-      if (isComment) {
-        expectedActions.push(SET_FOCUSED_COMMENT)
-      } else {
-        expectedActions.push(SET_FOCUSED_POST)
-      }
-
-      const preventDefaultStub = helper.sandbox.stub()
-
-      await listenForActions(expectedActions, () => {
-        if (isComment) {
+      describe("comments", () => {
+        it("shows a dialog to remove a comment", async () => {
           const comment = comments[0].replies[2]
           assert(comment, "comment not found")
-          const reportFunc = wrapper.find("CommentTree").props().reportComment
-          reportFunc(comment)
-        } else {
-          const reportPostFunc = wrapper.find("ExpandedPostDisplay").props()
-            .showPostReportDialog
-          reportPostFunc({ preventDefault: preventDefaultStub })
-          assert.ok(preventDefaultStub.called)
-        }
-      })
-      wrapper.update()
+          // set initial state for removed so we can flip it the other way
 
-      const dialog = wrapper.find("OurDialog").at(isComment ? 5 : 0)
+          const { inner, store } = await render()
 
-      dialog.find("input").simulate("change", {
-        target: {
-          name:  "reason",
-          value: "sp"
-        }
+          inner.find("CommentTree").prop("remove")(comment)
+
+          const actionsList = store.getActions()
+          assert.deepEqual(actionsList.slice(actionsList.length - 2), [
+            {
+              type:    SET_FOCUSED_COMMENT,
+              payload: comment
+            },
+            {
+              type:    SHOW_DIALOG,
+              payload: "DIALOG_REMOVE_COMMENT"
+            }
+          ])
+        })
+
+        it("removes a comment", async () => {
+          const comment = comments[0].replies[2]
+          assert(comment, "comment not found")
+
+          comment.removed = true
+          const { store, wrapper } = await render({
+            focus: {
+              comment
+            }
+          })
+
+          const dialogProps = wrapper
+            .dive()
+            .find("WithCommentModeration")
+            .dive()
+            .find("OurDialog")
+            .at(0)
+            .props()
+
+          assert.equal(dialogProps.title, "Remove Comment")
+          await dialogProps.onAccept({ preventDefault: helper.sandbox.stub() })
+          const actionsList = store.getActions()
+
+          assert.deepEqual(actionsList.slice(actionsList.length - 5), [
+            {
+              type:    actions.comments.patch.requestType,
+              payload: comment.id
+            },
+            {
+              type: actions.comments.patch.successType
+            },
+            {
+              type: CLEAR_FOCUSED_COMMENT
+            },
+            {
+              type:    HIDE_DIALOG,
+              payload: "DIALOG_REMOVE_COMMENT"
+            },
+            {
+              type:    SET_SNACKBAR_MESSAGE,
+              payload: {
+                message: "Comment has been removed"
+              }
+            }
+          ])
+
+          sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
+            removed: true
+          })
+        })
+
+        it("approves a comment", async () => {
+          const comment = comments[0].replies[2]
+          assert(comment, "comment not found")
+
+          comment.removed = true
+          const { inner, store } = await render()
+
+          await inner.find("CommentTree").prop("approve")(comment)
+          const actionsList = store.getActions()
+
+          assert.deepEqual(actionsList.slice(actionsList.length - 3), [
+            {
+              type:    actions.comments.patch.requestType,
+              payload: comment.id
+            },
+            {
+              type: actions.comments.patch.successType
+            },
+            {
+              type:    SET_SNACKBAR_MESSAGE,
+              payload: {
+                message: "Comment has been approved"
+              }
+            }
+          ])
+
+          sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
+            removed: false
+          })
+        })
+      })
+    })
+  })
+
+  describe("reporting", () => {
+    beforeEach(() => {
+      helper.reportContentStub.returns(Promise.resolve())
+    })
+
+    describe("comments", () => {
+      it("should show a dialog to report a comment", async () => {
+        const comment = comments[0].replies[2]
+        assert(comment, "comment not found")
+
+        const { inner, store } = await render()
+
+        await inner.find("CommentTree").prop("reportComment")(comment)
+
+        const actionsList = store.getActions()
+        assert.deepEqual(actionsList.slice(actionsList.length - 3), [
+          {
+            type:    FORM_BEGIN_EDIT,
+            payload: {
+              formKey: REPORT_FORM_KEY,
+              value:   {
+                reason: ""
+              }
+            }
+          },
+          {
+            type:    SET_FOCUSED_COMMENT,
+            payload: comment
+          },
+          {
+            type:    SHOW_DIALOG,
+            payload: "REPORT_COMMENT_DIALOG"
+          }
+        ])
       })
 
-      await listenForActions([FORM_VALIDATE], () => {
-        dialog.props().onAccept()
+      it("edits text in the report comment form", async () => {
+        const comment = comments[0].replies[2]
+        assert(comment, "comment not found")
+
+        const reason = "a reason here"
+
+        const { inner, store } = await render({
+          forms: {
+            [REPORT_FORM_KEY]: {
+              value: {
+                reason: reason
+              }
+            }
+          },
+          focus: {
+            comment
+          }
+        })
+        const dialog = inner.find("OurDialog").at(2)
+        assert.equal(dialog.prop("title"), "Report Comment")
+
+        const newValue = "new value"
+        dialog.find("ReportForm").prop("onUpdate")({
+          target: {
+            name:  "reason",
+            value: newValue
+          }
+        })
+
+        const actionsList = store.getActions()
+        assert.deepEqual(actionsList[actionsList.length - 1], {
+          type:    FORM_UPDATE,
+          payload: {
+            formKey: REPORT_FORM_KEY,
+            value:   {
+              reason: newValue
+            }
+          }
+        })
       })
-      wrapper.update()
-      assert.include(dialog.text(), "Reason must be at least 3 characters")
+
+      it("reports a comment", async () => {
+        const comment = comments[0].replies[2]
+        assert(comment, "comment not found")
+
+        const reason = "a reason here"
+
+        const { inner, store } = await render({
+          forms: {
+            [REPORT_FORM_KEY]: {
+              value: {
+                reason: reason
+              }
+            }
+          },
+          focus: {
+            comment
+          }
+        })
+        const dialog = inner.find("OurDialog").at(2)
+        assert.equal(dialog.prop("title"), "Report Comment")
+        await dialog.props().onAccept()
+        sinon.assert.calledWith(helper.reportContentStub, {
+          comment_id: comment.id,
+          reason:     reason
+        })
+
+        const actionsList = store.getActions()
+        assert.deepEqual(actionsList.slice(actionsList.length - 6), [
+          {
+            type:    actions.reports.post.requestType,
+            payload: {
+              comment_id: comment.id,
+              reason:     reason
+            }
+          },
+          {
+            type: actions.reports.post.successType
+          },
+          {
+            type:    FORM_END_EDIT,
+            payload: {
+              formKey: REPORT_FORM_KEY
+            }
+          },
+          {
+            type: CLEAR_FOCUSED_COMMENT
+          },
+          {
+            type:    HIDE_DIALOG,
+            payload: "REPORT_COMMENT_DIALOG"
+          },
+          {
+            type:    SET_SNACKBAR_MESSAGE,
+            payload: {
+              message: "Comment has been reported"
+            }
+          }
+        ])
+      })
+    })
+
+    describe("posts", () => {
+      it("opens a dialog for reporting a post", async () => {
+        const { inner, store } = await render()
+
+        const preventDefaultStub = helper.sandbox.stub()
+        inner.find("ExpandedPostDisplay").prop("showPostReportDialog")({
+          preventDefault: preventDefaultStub
+        })
+        assert.ok(preventDefaultStub.called)
+
+        const actionsList = store.getActions()
+        assert.deepEqual(actionsList.slice(actionsList.length - 3), [
+          {
+            type:    SET_FOCUSED_POST,
+            payload: post
+          },
+          {
+            type:    FORM_BEGIN_EDIT,
+            payload: {
+              formKey: REPORT_FORM_KEY,
+              value:   {
+                reason: ""
+              }
+            }
+          },
+          {
+            type:    SHOW_DIALOG,
+            payload: "REPORT_POST_DIALOG"
+          }
+        ])
+      })
+
+      it("edits text in the report post dialog", async () => {
+        const { store, wrapper } = await render({
+          forms: {
+            [REPORT_FORM_KEY]: {
+              value: {}
+            }
+          },
+          focus: post
+        })
+
+        const dialog = wrapper
+          .dive()
+          .find("OurDialog")
+          .at(0)
+        assert.equal(dialog.prop("title"), "Report Post")
+        dialog.find("ReportForm").prop("onUpdate")({
+          target: {
+            name:  "reason",
+            value: "spam"
+          }
+        })
+
+        const actionsList = store.getActions()
+        assert.deepEqual(actionsList[actionsList.length - 1], {
+          type:    FORM_UPDATE,
+          payload: {
+            formKey: REPORT_FORM_KEY,
+            value:   {
+              reason: "spam"
+            }
+          }
+        })
+      })
+
+      it("should report a post", async () => {
+        const reason = "a reason goes here"
+        const { store, wrapper } = await render({
+          forms: {
+            [REPORT_FORM_KEY]: {
+              value: {
+                reason
+              }
+            }
+          },
+          focus: {
+            post
+          }
+        })
+
+        const dialog = wrapper
+          .dive()
+          .find("OurDialog")
+          .at(0)
+        assert.equal(dialog.prop("title"), "Report Post")
+
+        await dialog.props().onAccept()
+        sinon.assert.calledWith(helper.reportContentStub, {
+          post_id: post.id,
+          reason:  reason
+        })
+
+        const actionsList = store.getActions()
+        assert.deepEqual(actionsList.slice(actionsList.length - 6), [
+          {
+            type:    actions.reports.post.requestType,
+            payload: {
+              post_id: post.id,
+              reason
+            }
+          },
+          {
+            type: actions.reports.post.successType
+          },
+          {
+            type:    FORM_END_EDIT,
+            payload: {
+              formKey: REPORT_FORM_KEY
+            }
+          },
+          {
+            type:    HIDE_DIALOG,
+            payload: "REPORT_POST_DIALOG"
+          },
+          {
+            type: CLEAR_FOCUSED_POST
+          },
+          {
+            type:    SET_SNACKBAR_MESSAGE,
+            payload: {
+              message: "Post has been reported"
+            }
+          }
+        ])
+      })
+    })
+
+    describe("validation", () => {
+      describe("posts", () => {
+        it("validates post report content", async () => {
+          const reason = "a reason goes here"
+          const form = {
+            value: {
+              reason
+            }
+          }
+          const { wrapper } = await render({
+            forms: {
+              [REPORT_FORM_KEY]: form
+            },
+            focus: {
+              post
+            }
+          })
+
+          const dialog = wrapper
+            .dive()
+            .find("OurDialog")
+            .at(0)
+          assert.equal(dialog.prop("title"), "Report Post")
+
+          const validationStub = helper.sandbox
+            .stub(validationFuncs, "validateContentReportForm")
+            .returns({ a: "complaint" })
+          await dialog.props().onAccept()
+          assert.equal(helper.reportContentStub.callCount, 0)
+          sinon.assert.calledWith(validationStub, form)
+        })
+
+        it("passes validation errors to ReportForm for display", async () => {
+          const errors = "some errors"
+          const { wrapper } = await render({
+            forms: {
+              [REPORT_FORM_KEY]: {
+                value:  {},
+                errors: errors
+              }
+            },
+            focus: {
+              post
+            }
+          })
+
+          const dialog = wrapper
+            .dive()
+            .find("OurDialog")
+            .at(0)
+          assert.equal(dialog.prop("title"), "Report Post")
+
+          assert.equal(dialog.find("ReportForm").prop("validation"), errors)
+        })
+      })
+
+      describe("comments", () => {
+        it("validates comment report content", async () => {
+          const reason = "a reason goes here"
+          const form = {
+            value: {
+              reason
+            }
+          }
+          const { inner } = await render({
+            forms: {
+              [REPORT_FORM_KEY]: form
+            },
+            focus: {
+              comment: comments[0]
+            }
+          })
+
+          const dialog = inner.find("OurDialog").at(2)
+          assert.equal(dialog.prop("title"), "Report Comment")
+
+          const validationStub = helper.sandbox
+            .stub(validationFuncs, "validateContentReportForm")
+            .returns({ a: "complaint" })
+          await dialog.props().onAccept()
+          assert.equal(helper.reportContentStub.callCount, 0)
+          sinon.assert.calledWith(validationStub, form)
+        })
+
+        it("passes validation errors to ReportForm for display", async () => {
+          const errors = "some errors"
+          const { inner } = await render({
+            forms: {
+              [REPORT_FORM_KEY]: {
+                value:  {},
+                errors: errors
+              }
+            },
+            focus: {
+              comment: comments[0]
+            }
+          })
+
+          const dialog = inner.find("OurDialog").at(2)
+          assert.equal(dialog.prop("title"), "Report Comment")
+
+          assert.equal(dialog.find("ReportForm").prop("validation"), errors)
+        })
+      })
     })
   })
 
   it("should show a 404 page", async () => {
-    helper.getPostStub.returns(Promise.reject({ errorStatusCode: 404 }))
-    const [wrapper] = await renderComponent(
-      postDetailURL(channel.name, post.id),
-      [
-        actions.posts.get.requestType,
-        actions.posts.get.failureType,
-        actions.comments.get.requestType,
-        actions.comments.get.successType,
-        actions.subscribedChannels.get.requestType,
-        actions.subscribedChannels.get.successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        SET_CHANNEL_DATA
-      ]
-    )
-    wrapper.update()
-    assert(wrapper.find(NotFound).exists())
+    const { inner } = await render({
+      posts: {
+        error: {
+          errorStatusCode: 404
+        }
+      }
+    })
+    assert(inner.find(NotFound).exists())
   })
 
   it("should show an unauthorized page", async () => {
-    helper.getPostStub.returns(
-      Promise.reject({ error_type: NOT_AUTHORIZED_ERROR_TYPE })
-    )
-    const [wrapper] = await renderComponent(
-      postDetailURL(channel.name, post.id),
-      [
-        actions.posts.get.requestType,
-        actions.posts.get.failureType,
-        actions.comments.get.requestType,
-        actions.comments.get.successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        actions.subscribedChannels.get.requestType,
-        actions.subscribedChannels.get.successType,
-        SET_CHANNEL_DATA
-      ]
-    )
-    wrapper.update()
-    assert(wrapper.find(NotAuthorized).exists())
+    const { inner } = await render({
+      posts: {
+        error: {
+          error_type: NOT_AUTHORIZED_ERROR_TYPE
+        }
+      }
+    })
+    assert(inner.find(NotAuthorized).exists())
   })
 
   it("should show a 404 page for a comment 404", async () => {
-    helper.getCommentsStub.returns(Promise.reject({ errorStatusCode: 404 }))
-    const [wrapper] = await renderComponent(
-      postDetailURL(channel.name, post.id),
-      [
-        actions.posts.get.requestType,
-        actions.posts.get.successType,
-        actions.comments.get.requestType,
-        actions.comments.get.failureType,
-        actions.subscribedChannels.get.requestType,
-        actions.subscribedChannels.get.successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        SET_CHANNEL_DATA
-      ]
-    )
-    wrapper.update()
-    assert(wrapper.find(NotFound).exists())
+    const { inner } = await render({
+      comments: {
+        error: {
+          errorStatusCode: 404
+        }
+      }
+    })
+    assert(inner.find(NotFound).exists())
   })
 
   it("should show the PostPage if a 410 happens on comments", async () => {
     // really this only happens on comments.post, but we don't have per-verb status codes so this is close enough
-    helper.getCommentsStub.returns(Promise.reject({ errorStatusCode: 410 }))
-    const [wrapper] = await renderComponent(
-      postDetailURL(channel.name, post.id),
-      [
-        actions.posts.get.requestType,
-        actions.posts.get.successType,
-        actions.comments.get.requestType,
-        actions.comments.get.failureType,
-        actions.subscribedChannels.get.requestType,
-        actions.subscribedChannels.get.successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        SET_CHANNEL_DATA
-      ]
-    )
-    assert.isNotOk(wrapper.find(NotFound).exists())
+    const { inner } = await render({
+      comments: {
+        error: {
+          errorStatusCode: 410
+        }
+      }
+    })
+    assert.isNotOk(inner.find(NotFound).exists())
   })
 
   it("should show the normal error page for non 404 errors", async () => {
-    helper.getPostStub.returns(Promise.reject({ errorStatusCode: 401 }))
-    const [wrapper] = await renderComponent(
-      postDetailURL(channel.name, post.id),
-      [
-        actions.posts.get.requestType,
-        actions.posts.get.failureType,
-        actions.comments.get.requestType,
-        actions.comments.get.successType,
-        actions.subscribedChannels.get.requestType,
-        actions.subscribedChannels.get.successType,
-        actions.channels.get.requestType,
-        actions.channels.get.successType,
-        SET_CHANNEL_DATA
-      ]
-    )
-    assert.equal(
-      wrapper
-        .find(".main-content")
-        .at(0)
-        .text(),
-      "Error loading page"
-    )
-    assert.isFalse(wrapper.find(NotFound).exists())
+    const { inner } = await render({
+      posts: {
+        error: {
+          errorStatusCode: 500
+        }
+      }
+    })
+    assert.equal(inner.find(".errored").text(), "Error loading page")
+    assert.isFalse(inner.find(NotFound).exists())
   })
 
   it("should switch the sorting method when an option is selected", async () => {
     post.num_comments = 5
-    const wrapper = await renderPage()
+    const { inner, wrapper } = await render()
 
     for (const sortType of VALID_COMMENT_SORT_TYPES) {
-      await listenForActions(
-        [
-          actions.posts.get.requestType,
-          actions.posts.get.successType,
-          actions.comments.get.requestType,
-          actions.comments.get.successType
-        ],
-        () => {
-          const select = wrapper
-            .find(".count-and-sort")
-            .find("CommentSortPicker")
-          select.props().updatePickerParam(sortType, {
-            preventDefault: helper.sandbox.stub()
-          })
-        }
-      )
-      wrapper.update()
+      const select = inner.find(".count-and-sort").find("CommentSortPicker")
+      select.props().updatePickerParam(sortType, {
+        preventDefault: helper.sandbox.stub()
+      })
 
-      assert.equal(
-        wrapper.find(PostPage).props().location.search,
-        `?sort=${sortType}`
-      )
+      assert.equal(wrapper.props().history.location.search, `?sort=${sortType}`)
     }
-  })
-
-  it("has a channel header", async () => {
-    const wrapper = await renderPage()
-    assert.isTrue(wrapper.find("ChannelHeader").exists())
   })
 })
