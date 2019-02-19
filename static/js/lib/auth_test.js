@@ -2,6 +2,7 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
+import qs from "query-string"
 
 import {
   LOGIN_URL,
@@ -30,6 +31,7 @@ import {
 } from "../reducers/auth"
 
 import {
+  generateLoginRedirectUrl,
   processAuthResponse,
   isAnonAccessiblePath,
   needsAuthedSite,
@@ -55,6 +57,18 @@ describe("auth lib", () => {
 
   afterEach(() => {
     sandbox.restore()
+  })
+
+  describe("generateLoginRedirectUrl", () => {
+    it("generates a URL for the login page with a 'next' param", () => {
+      const next = "/path/to/resource?param=value#anchor"
+      window.location = next
+
+      assert.equal(
+        generateLoginRedirectUrl(),
+        `${LOGIN_URL}?${qs.stringify({ next })}`
+      )
+    })
   })
 
   describe("processAuthResponse", () => {

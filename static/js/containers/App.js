@@ -31,6 +31,7 @@ import PasswordResetPage from "./auth/PasswordResetPage"
 import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
 import ChannelRouter from "./ChannelRouter"
 
+import PrivateRoute from "../components/auth/PrivateRoute"
 import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"
 import Drawer from "../containers/Drawer"
@@ -192,7 +193,7 @@ class App extends React.Component<AppProps> {
             component={ChannelRouter}
           />
           <Route path={`${match.url}manage/`} component={AdminPage} />
-          <Route
+          <PrivateRoute
             path={`${match.url}create_post/:channelName?`}
             component={CreatePostPage}
           />
