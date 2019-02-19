@@ -1,6 +1,22 @@
 Release Notes
 =============
 
+Version 0.66.1 (Released February 19, 2019)
+--------------
+
+- Fix tests (#1864)
+- Updated Jupyter notebook command in README
+- Add channel about page frontend UI
+- Add some scrolling to post create page to make errors visible
+- Add url to Course model and helper method to determine its value (#1851)
+- Limit widget dialog focus to widget type selection (#1854)
+- People widget (#1803)
+- Created docker container config for running the app in a Jupyter notebook
+- Remove automatic focus from dialog radio buttons (#1848)
+- New setting to specify if only course images should be uploaded during import (#1839)
+- clarified concern for a separate issue
+- Added embedly link preview indexing RFC
+
 Version 0.66.0 (Released February 13, 2019)
 --------------
 
