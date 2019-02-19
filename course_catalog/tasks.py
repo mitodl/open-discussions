@@ -48,8 +48,8 @@ def sync_and_upload_edx_data(force_overwrite=False):
 
     edx_data = {"count": 0, "catalog_url": settings.EDX_API_URL, "results": []}
 
+    log.info("Syncing edX data...")
     while url:
-        log.info("Syncing edX data...")
         response = requests.get(url, headers={"Authorization": "JWT " + access_token})
         if response.status_code == 200:
             for course_data in response.json()["results"]:
