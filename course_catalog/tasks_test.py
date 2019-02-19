@@ -4,14 +4,16 @@ Test tasks
 import json
 from os import listdir
 from os.path import isfile, join
+
 from unittest.mock import Mock
 
 import boto3
+import botocore
 import pytest
 from moto import mock_s3
 
 from course_catalog.models import Course, CoursePrice, CourseInstructor, CourseTopic
-from course_catalog.tasks import get_edx_data, get_ocw_data
+from course_catalog.tasks import sync_and_upload_edx_data, get_ocw_data
 
 pytestmark = pytest.mark.django_db
 # pylint:disable=redefined-outer-name,unused-argument
@@ -104,19 +106,42 @@ def setup_s3(settings):
     conn.create_bucket(Bucket=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
 
 
+@mock_s3
 def test_get_mitx_data_valid(
     settings, access_token, get_test_data, mock_course_index_functions
 ):
     """
     Test that mitx sync task successfully creates database objects
     """
-    get_edx_data()
+    setup_s3(settings)
+    sync_and_upload_edx_data()
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 2
     assert CourseInstructor.objects.count() == 2
     assert CourseTopic.objects.count() == 1
 
 
+@mock_s3
+def test_get_mitx_data_saves_json(
+    settings, mocker, access_token, get_test_data, mock_course_index_functions
+):
+    """
+    Test that mitx sync task successfully saves edx data results file in S3
+    """
+    setup_s3(settings)
+    sync_and_upload_edx_data()
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+    )
+    obj = s3.Object(settings.OCW_LEARNING_COURSE_BUCKET_NAME, "edx_courses.json")
+    # check that pub_object call to create edx_courses.json succeeded
+    contents = json.loads(obj.get()["Body"].read())
+    assert "results" in contents
+
+
+@mock_s3
 def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):
     """
     Test that mitx sync task properly stops when it gets an error status code
@@ -126,10 +151,21 @@ def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):
         return_value=Mock(status_code=500, json=Mock(return_value=mitx_data)),
     )
     settings.EDX_API_URL = "fake_url"
-    get_edx_data()
+    setup_s3(settings)
+    sync_and_upload_edx_data()
+    # check that no courses were created
     assert Course.objects.count() == 0
+    # check that edx API data results file was not uploaded to s3
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+    )
+    with pytest.raises(botocore.exceptions.ClientError):
+        s3.Object(settings.OCW_LEARNING_COURSE_BUCKET_NAME, "edx_courses.json").load()
 
 
+@mock_s3
 def test_get_mitx_data_unexpected_error(settings, mocker, access_token, get_test_data):
     """
     Test that mitx sync task properly stops when it gets an error status code
@@ -138,7 +174,8 @@ def test_get_mitx_data_unexpected_error(settings, mocker, access_token, get_test
         "course_catalog.task_helpers.get_year_and_semester", side_effect=Exception
     )
     settings.EDX_API_URL = "fake_url"
-    get_edx_data()
+    setup_s3(settings)
+    sync_and_upload_edx_data()
     assert Course.objects.count() == 0
 
 
@@ -146,7 +183,7 @@ def test_get_mitx_data_no_settings():
     """
     No data should be imported if MITx settings are missing
     """
-    get_edx_data()
+    sync_and_upload_edx_data()
     assert Course.objects.count() == 0
 
 
