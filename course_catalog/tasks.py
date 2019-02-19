@@ -44,6 +44,7 @@ def sync_and_upload_edx_data(force_overwrite=False):
         return
     url = settings.EDX_API_URL
     access_token = get_access_token()
+    error_occurred = False
 
     edx_data = {"count": 0, "catalog_url": settings.EDX_API_URL, "results": []}
 
@@ -60,19 +61,20 @@ def sync_and_upload_edx_data(force_overwrite=False):
                     )
         else:
             log.error("Bad response status %s for %s", str(response.status_code), url)
+            error_occurred = True
             break
 
         url = response.json()["next"]
 
-    edx_data["count"] = len(edx_data["results"])
-
-    raw_data_bucket = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
-        aws_secret_access_key=settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
-    ).Bucket(name=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
-    # saves edx API response results in S3 as one file
-    raw_data_bucket.put_object(Key="edx_courses.json", Body=json.dumps(edx_data))
+    if error_occurred:
+        edx_data["count"] = len(edx_data["results"])
+        raw_data_bucket = boto3.resource(
+            "s3",
+            aws_access_key_id=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+            aws_secret_access_key=settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
+        ).Bucket(name=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
+        # saves edx API response results in S3 as one file
+        raw_data_bucket.put_object(Key="edx_courses.json", Body=json.dumps(edx_data))
 
 
 @app.task
