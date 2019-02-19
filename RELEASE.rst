@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.66.1
+Version 0.66.1 (Released February 19, 2019)
 --------------
 
 - Fix tests (#1864)
