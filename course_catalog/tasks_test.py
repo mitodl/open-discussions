@@ -11,7 +11,7 @@ import pytest
 from moto import mock_s3
 
 from course_catalog.models import Course, CoursePrice, CourseInstructor, CourseTopic
-from course_catalog.tasks import get_edx_data, get_ocw_data
+from course_catalog.tasks import sync_and_upload_edx_data, get_ocw_data
 
 pytestmark = pytest.mark.django_db
 # pylint:disable=redefined-outer-name,unused-argument
@@ -112,7 +112,7 @@ def test_get_mitx_data_valid(
     Test that mitx sync task successfully creates database objects
     """
     setup_s3(settings)
-    get_edx_data()
+    sync_and_upload_edx_data()
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 2
     assert CourseInstructor.objects.count() == 2
@@ -127,7 +127,7 @@ def test_get_mitx_data_saves_json(
     Test that mitx sync task successfully saves edx API response results in S3
     """
     setup_s3(settings)
-    get_edx_data()
+    sync_and_upload_edx_data()
     s3 = boto3.resource(
         "s3",
         aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
@@ -150,7 +150,7 @@ def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):
     )
     settings.EDX_API_URL = "fake_url"
     setup_s3(settings)
-    get_edx_data()
+    sync_and_upload_edx_data()
     assert Course.objects.count() == 0
 
 
@@ -164,7 +164,7 @@ def test_get_mitx_data_unexpected_error(settings, mocker, access_token, get_test
     )
     settings.EDX_API_URL = "fake_url"
     setup_s3(settings)
-    get_edx_data()
+    sync_and_upload_edx_data()
     assert Course.objects.count() == 0
 
 
@@ -172,7 +172,7 @@ def test_get_mitx_data_no_settings():
     """
     No data should be imported if MITx settings are missing
     """
-    get_edx_data()
+    sync_and_upload_edx_data()
     assert Course.objects.count() == 0
 
 

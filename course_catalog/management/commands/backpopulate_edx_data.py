@@ -1,7 +1,7 @@
 """Management command for populating edx course data"""
 from django.core.management import BaseCommand
 
-from course_catalog.tasks import get_edx_data
+from course_catalog.tasks import sync_and_upload_edx_data
 from open_discussions.utils import now_in_utc
 
 
@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Run Populate edx courses"""
-        task = get_edx_data.delay()
+        task = sync_and_upload_edx_data.delay()
         self.stdout.write(
             "Started celery task {task} to get edx course data".format(task=task)
         )

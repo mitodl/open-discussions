@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 
 @app.task
-def get_edx_data(force_overwrite=False):
+def sync_and_upload_edx_data(force_overwrite=False):
     """
     Task to sync mitx data with the database
     Args:
@@ -40,7 +40,7 @@ def get_edx_data(force_overwrite=False):
         and settings.OCW_LEARNING_COURSE_ACCESS_KEY
         and settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY
     ):
-        log.warning("Required settings missing for get_edx_data")
+        log.warning("Required settings missing for sync_and_upload_edx_data")
         return
     url = settings.EDX_API_URL
     access_token = get_access_token()
