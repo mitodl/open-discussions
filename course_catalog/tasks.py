@@ -66,7 +66,7 @@ def sync_and_upload_edx_data(force_overwrite=False):
 
         url = response.json()["next"]
 
-    if error_occurred:
+    if not error_occurred:
         edx_data["count"] = len(edx_data["results"])
         raw_data_bucket = boto3.resource(
             "s3",

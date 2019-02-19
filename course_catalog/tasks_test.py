@@ -4,9 +4,11 @@ Test tasks
 import json
 from os import listdir
 from os.path import isfile, join
+
 from unittest.mock import Mock
 
 import boto3
+import botocore
 import pytest
 from moto import mock_s3
 
@@ -124,7 +126,7 @@ def test_get_mitx_data_saves_json(
     settings, mocker, access_token, get_test_data, mock_course_index_functions
 ):
     """
-    Test that mitx sync task successfully saves edx API response results in S3
+    Test that mitx sync task successfully saves edx data results file in S3
     """
     setup_s3(settings)
     sync_and_upload_edx_data()
@@ -151,7 +153,16 @@ def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):
     settings.EDX_API_URL = "fake_url"
     setup_s3(settings)
     sync_and_upload_edx_data()
+    # check that no courses were created
     assert Course.objects.count() == 0
+    # check that edx API data results file was not uploaded to s3
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+    )
+    with pytest.raises(botocore.exceptions.ClientError):
+        s3.Object(settings.OCW_LEARNING_COURSE_BUCKET_NAME, "edx_courses.json").load()
 
 
 @mock_s3
