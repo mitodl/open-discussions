@@ -44,11 +44,12 @@ def sync_and_upload_edx_data(force_overwrite=False):
         return
     url = settings.EDX_API_URL
     access_token = get_access_token()
-    error_occurred = False
+    should_upload_to_s3 = True
 
     edx_data = {"count": 0, "catalog_url": settings.EDX_API_URL, "results": []}
 
     while url:
+        log.info("Syncing edX data...")
         response = requests.get(url, headers={"Authorization": "JWT " + access_token})
         if response.status_code == 200:
             for course_data in response.json()["results"]:
@@ -59,14 +60,16 @@ def sync_and_upload_edx_data(force_overwrite=False):
                     log.exception(
                         "Error encountered parsing MITx json for %s", course_data["key"]
                     )
+                    should_upload_to_s3 = False
         else:
             log.error("Bad response status %s for %s", str(response.status_code), url)
-            error_occurred = True
+            should_upload_to_s3 = False
             break
 
         url = response.json()["next"]
 
-    if not error_occurred:
+    if should_upload_to_s3:
+        log.info("Uploading edX courses data to S3")
         edx_data["count"] = len(edx_data["results"])
         raw_data_bucket = boto3.resource(
             "s3",
