@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.67.0
+--------------
+
+- Fixed anonymous create post page bug
+- Adding caching to RSS widget
+- Update README.md
+- Course search UI (#1784)
+- Updates ocw-data-parser package
+- updates requirements
+- Readme updates
+- add validtion to post editing
+
 Version 0.66.1 (Released February 19, 2019)
 --------------
 
