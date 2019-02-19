@@ -6,19 +6,18 @@ import {
   fetchJSONWithCSRF,
   fetchWithCSRF
 } from "redux-hammock/django_csrf_fetch"
-import qs from "query-string"
 
 import { LOGIN_URL } from "../url"
+import { generateLoginRedirectUrl } from "../../lib/auth"
 import { isNotAuthenticatedErrorType } from "../../util/rest"
 
 const redirectAndReject = async () => {
   // redirect to the authenticating app
-  const { pathname, search, hash } = window.location
+  const { pathname } = window.location
 
   // ensure that we don't end up in a redirect loop
   if (pathname !== LOGIN_URL) {
-    const next = `${pathname}${search}${hash}`
-    window.location = `${LOGIN_URL}?${qs.stringify({ next })}`
+    window.location = generateLoginRedirectUrl()
   }
 
   return Promise.reject("You were logged out, please login again")

@@ -1,11 +1,15 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
-import qs from "query-string"
 import fetchMock from "fetch-mock/src/server"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
-import * as auth from "./fetch_auth"
+import {
+  fetchJSONWithAuthFailure,
+  fetchWithAuthFailure,
+  fetchJSONWithToken
+} from "./fetch_auth"
+import * as authHelpers from "../../lib/auth"
 
 import { LOGIN_URL } from "../url"
 import {
@@ -22,11 +26,15 @@ describe("fetch_auth", function() {
     error_type: AUTHENTICATION_FAILED_ERROR_TYPE
   }
   const typeError = new TypeError()
+  const fakeRedirectUrl = "http://example.com/fake"
 
-  let sandbox, fetchStub
+  let sandbox, fetchStub, loginRedirectUrlStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
+    loginRedirectUrlStub = sandbox
+      .stub(authHelpers, "generateLoginRedirectUrl")
+      .returns(fakeRedirectUrl)
   })
 
   afterEach(() => {
@@ -34,10 +42,10 @@ describe("fetch_auth", function() {
     fetchMock.restore()
   })
   ;[
-    [auth.fetchJSONWithAuthFailure, "fetchJSONWithCSRF"],
-    [auth.fetchWithAuthFailure, "fetchWithCSRF"]
-  ].forEach(([authFunc, djangoCSRFFunc]) => {
-    describe(authFunc.name, () => {
+    [fetchJSONWithAuthFailure, "fetchJSONWithAuthFailure", "fetchJSONWithCSRF"],
+    [fetchWithAuthFailure, "fetchWithAuthFailure", "fetchWithCSRF"]
+  ].forEach(([authFunc, funcName, djangoCSRFFunc]) => {
+    describe(funcName, () => {
       beforeEach(() => {
         fetchStub = sandbox.stub(fetchFuncs, djangoCSRFFunc)
         SETTINGS.is_authenticated = false
@@ -73,38 +81,30 @@ describe("fetch_auth", function() {
       }
 
       //
-      [
-        [errorNotAuthenticated, LOGIN_URL],
-        [errorAuthenticationFailed, LOGIN_URL]
-      ].forEach(([error, expectedUrl]) => {
-        it(`redirects to ${expectedUrl}  for error: ${
+      [errorNotAuthenticated, errorAuthenticationFailed].forEach(error => {
+        it(`redirects to login page for error: ${
           error.error_type
         }`, async () => {
-          const next = "/secret/url/?with=params#andhash"
-          window.location = next
           fetchStub.returns(Promise.reject(error)) // original api call
 
           await assert.isRejected(authFunc("/url"))
 
           assert.ok(fetchStub.calledOnce)
           assert.ok(fetchStub.calledWith("/url"))
-          assert.equal(window.location.pathname, expectedUrl)
-          assert.equal(qs.parse(window.location.search).next, next)
+          sinon.assert.calledOnce(loginRedirectUrlStub)
+          assert.equal(window.location.toString(), fakeRedirectUrl)
         })
+      })
 
-        it(`does not redirect for error: ${
-          error.error_type
-        } if already on login page`, async () => {
-          window.location = expectedUrl
-          fetchStub.returns(Promise.reject(error)) // original api call
+      it("does not redirect for error if already on login page", async () => {
+        window.location = LOGIN_URL
+        fetchStub.returns(Promise.reject({ error_type: "abc" }))
 
-          await assert.isRejected(authFunc("/url"))
+        await assert.isRejected(authFunc("/url"))
 
-          assert.ok(fetchStub.calledOnce)
-          assert.ok(fetchStub.calledWith("/url"))
-          assert.equal(window.location.pathname, expectedUrl)
-          assert.equal(window.location.search, "") // this asserts we didn't redirect back onto the login page with a next param
-        })
+        assert.ok(fetchStub.calledOnce)
+        assert.ok(fetchStub.calledWith("/url"))
+        sinon.assert.notCalled(loginRedirectUrlStub)
       })
     })
   })
@@ -116,7 +116,7 @@ describe("fetch_auth", function() {
 
     it("should include the token!", async () => {
       fetchStub.returns(Promise.resolve())
-      await auth.fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
+      await fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
 
       assert.ok(fetchStub.calledWith, "/beep/boop/", {
         headers: {
@@ -129,16 +129,17 @@ describe("fetch_auth", function() {
       fetchStub.returns(Promise.reject(errorNotAuthenticated))
 
       const err = await assert.isRejected(
-        auth.fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
+        fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
       )
       assert.equal(err, "You were logged out, please login again")
-      assert.equal(window.location.pathname, LOGIN_URL)
+      sinon.assert.calledOnce(loginRedirectUrlStub)
+      assert.equal(window.location.toString(), fakeRedirectUrl)
     })
 
     it("should just reject if not 401 error", async () => {
       fetchStub.returns(Promise.reject(error500))
       const err = await assert.isRejected(
-        auth.fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
+        fetchJSONWithToken("/beep/boop/", "mygreatsecuretoken==")
       )
       assert.deepEqual(err, error500)
       assert.equal(window.location.pathname, "/")

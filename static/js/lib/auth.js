@@ -1,5 +1,7 @@
 /* global SETTINGS: false */
 // @flow
+import qs from "query-string"
+
 import {
   LOGIN_URL,
   LOGIN_PASSWORD_URL,
@@ -25,6 +27,13 @@ import {
 } from "../reducers/auth"
 
 import type { AuthResponse } from "../flow/authTypes"
+
+export const generateLoginRedirectUrl = () => {
+  const { pathname, search, hash } = window.location
+
+  const next = `${pathname}${search}${hash}`
+  return `${LOGIN_URL}?${qs.stringify({ next })}`
+}
 
 export const processAuthResponse = (
   history: Object,
