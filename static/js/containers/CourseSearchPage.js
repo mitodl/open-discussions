@@ -195,7 +195,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
     return (
       <InfiniteScroll
-        // TODO: fix
         hasMore={from + SETTINGS.search_page_size < total}
         loadMore={this.loadMore}
         initialLoad={from === 0}
