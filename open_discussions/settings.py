@@ -765,3 +765,7 @@ MITX_ALT_URL = get_string("MITX_ALT_URL", "https://courses.edx.org/courses/")
 
 # Widgets
 WIDGETS_RSS_CACHE_TTL = get_int("WIDGETS_RSS_CACHE_TTL", 15 * 60)
+
+# livestream API credentials
+LIVESTREAM_SECRET_KEY = get_string("LIVESTREAM_SECRET_KEY", None)
+LIVESTREAM_ACCOUNT_ID = get_string("LIVESTREAM_ACCOUNT_ID", None)

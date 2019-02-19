@@ -57,6 +57,7 @@ describe("ProfileEditPage", function() {
     helper.getChannelStub.returns(Promise.resolve([]))
     helper.getUserPostsStub.returns(Promise.resolve([]))
     helper.getUserCommentsStub.returns(Promise.resolve([]))
+    helper.getLivestreamEventsStub.returns(Promise.resolve({ data: [] }))
     helper.getFrontpageStub.returns(
       Promise.resolve({ posts: makeChannelPostList() })
     )

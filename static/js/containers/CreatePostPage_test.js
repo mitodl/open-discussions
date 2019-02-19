@@ -91,6 +91,7 @@ describe("CreatePostPage", () => {
       Promise.resolve({ url: post.url, response: article })
     )
     helper.getProfileStub.returns(Promise.resolve(""))
+    helper.getLivestreamEventsStub.returns(Promise.resolve({ data: [] }))
     listenForActions = helper.listenForActions.bind(helper)
     renderComponent = helper.renderComponent.bind(helper)
     twitterEmbedStub = helper.sandbox.stub(embedUtil, "ensureTwitterEmbedJS")

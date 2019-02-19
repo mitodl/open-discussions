@@ -27,6 +27,7 @@ import { searchEndpoint } from "../reducers/search"
 import { relatedPostsEndpoint } from "../reducers/related_posts"
 import { widgetsEndpoint } from "../reducers/widgets"
 import { courseFacetsEndpoint } from "../reducers/courses"
+import { livestreamEndpoint } from "../reducers/livestream"
 
 import type { Dispatch } from "redux"
 
@@ -59,7 +60,8 @@ export const endpoints = [
   searchEndpoint,
   relatedPostsEndpoint,
   widgetsEndpoint,
-  courseFacetsEndpoint
+  courseFacetsEndpoint,
+  livestreamEndpoint
 ]
 
 /**

@@ -32,6 +32,7 @@ describe("App", () => {
     )
     helper.getFrontpageStub.returns(Promise.resolve({ posts: postList }))
     helper.getProfileStub.returns(Promise.resolve(""))
+    helper.getLivestreamEventsStub.returns(Promise.resolve({ data: [] }))
     renderComponent = helper.renderComponent.bind(helper)
   })
 
@@ -118,6 +119,8 @@ describe("App", () => {
         [
           actions.subscribedChannels.get.requestType,
           actions.subscribedChannels.get.successType,
+          actions.livestream.get.requestType,
+          actions.livestream.get.successType,
           actions.frontpage.get.requestType,
           actions.frontpage.get.successType
         ],

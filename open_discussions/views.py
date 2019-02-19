@@ -51,6 +51,12 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         else False
     )
 
+    livestream_ui_enabled = (
+        features.is_enabled(features.LIVESTREAM_UI)
+        if settings.LIVESTREAM_ACCOUNT_ID and settings.LIVESTREAM_SECRET_KEY
+        else False
+    )
+
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
         "environment": settings.ENVIRONMENT,
@@ -88,6 +94,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "algolia_appId": settings.ALGOLIA_APP_ID,
         "algolia_apiKey": settings.ALGOLIA_API_KEY,
         "course_ui_enabled": features.is_enabled(features.COURSE_UI),
+        "livestream_ui_enabled": livestream_ui_enabled,
     }
 
     return render(

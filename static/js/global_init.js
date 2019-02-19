@@ -37,7 +37,8 @@ const _createSettings = () => ({
   search_min_length:      2,
   accepted_social_sites:  [],
   algolia_appId:          "",
-  algolia_appKey:         ""
+  algolia_appKey:         "",
+  livestream_ui_enabled:  true
 })
 
 global.SETTINGS = _createSettings()

@@ -72,3 +72,6 @@ export const renderEmbedlyCard = (url: string): string =>
       className="embedly-card"
     />
   )
+
+export const livestreamEventURL = (accountId: number, eventId: number) =>
+  `https://livestream.com/accounts/${accountId}/events/${eventId}/player`

@@ -7,7 +7,7 @@ import PostDetailSidebar from "../containers/PostDetailSidebar"
 import Sidebar from "../components/Sidebar"
 import { Cell, Grid } from "../components/Grid"
 
-const withSidebar = R.curry(
+export const withSidebar = R.curry(
   (
     SidebarComponent: Class<React.Component<*, *>>,
     className: string,

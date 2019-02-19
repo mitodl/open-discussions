@@ -18,6 +18,7 @@ import * as embedlyAPI from "../lib/api/embedly"
 import * as frontpageAPI from "../lib/api/frontpage"
 import * as postAPI from "../lib/api/posts"
 import * as commentAPI from "../lib/api/comments"
+import * as livestreamAPI from "../lib/api/livestream"
 import rootReducer from "../reducers"
 import * as utilFuncs from "../lib/util"
 
@@ -50,7 +51,8 @@ export default class IntegrationTestHelper {
       embedlyAPI,
       frontpageAPI,
       postAPI,
-      commentAPI
+      commentAPI,
+      livestreamAPI
     ].forEach(apiModule => {
       for (const methodName in apiModule) {
         if (typeof apiModule[methodName] === "function") {

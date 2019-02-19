@@ -26,6 +26,7 @@ describe("HomePage", () => {
     helper.getFrontpageStub.returns(Promise.resolve({ posts: postList }))
     helper.getChannelsStub.returns(Promise.resolve(channels))
     helper.getProfileStub.returns(Promise.resolve(""))
+    helper.getLivestreamEventsStub.returns(Promise.resolve({ data: [] }))
     render = helper.configureHOCRenderer(
       HomePage,
       InnerHomePage,
@@ -89,6 +90,8 @@ describe("HomePage", () => {
         actions.frontpage.get.successType,
         actions.subscribedChannels.get.requestType,
         actions.subscribedChannels.get.successType,
+        actions.livestream.get.requestType,
+        actions.livestream.get.successType,
         SET_POST_DATA,
         SET_CHANNEL_DATA
       ])

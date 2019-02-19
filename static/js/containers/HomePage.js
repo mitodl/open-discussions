@@ -10,13 +10,14 @@ import { Link } from "react-router-dom"
 import Card from "../components/Card"
 import CanonicalLink from "../components/CanonicalLink"
 import { withPostLoading } from "../components/Loading"
-import withSingleColumn from "../hoc/withSingleColumn"
+import { withSidebar } from "../hoc/withSidebar"
 import { PostSortPicker } from "../components/Picker"
 import {
   withPostModeration,
   postModerationSelector
 } from "../hoc/withPostModeration"
 import withPostList from "../hoc/withPostList"
+import LiveStream from "../components/LiveStream"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
@@ -176,7 +177,7 @@ export default R.compose(
     mapDispatchToProps
   ),
   withPostModeration,
-  withSingleColumn("home-page"),
+  withSidebar(LiveStream, "home-page"),
   withPostList,
   withPostLoading
 )(HomePage)

@@ -7,7 +7,7 @@ declare var SETTINGS: {
   site_url: string,
   max_comment_depth: number,
   FEATURES: {
-    [key: string]: boolean,
+    [key: string]: boolean
   },
   username: ?string,
   user_full_name: ?string,
@@ -39,7 +39,8 @@ declare var SETTINGS: {
   article_ui_enabled: boolean,
   algolia_appId: ?string,
   algolia_apiKey: ?string,
-  course_ui_enabled: boolean
+  course_ui_enabled: boolean,
+  livestream_ui_enabled: boolean
 }
 
 // mocha
@@ -52,5 +53,5 @@ declare var describe: Function
 declare var __webpack_public_path__: string // eslint-disable-line camelcase
 
 declare var module: {
-  hot: any,
+  hot: any
 }
