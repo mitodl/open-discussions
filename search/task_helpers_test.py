@@ -94,7 +94,7 @@ def test_index_new_post(mocker):
         "search.task_helpers.ESPostSerializer.to_representation",
         return_value=fake_serialized_data,
     )
-    patched_task = mocker.patch("search.task_helpers.create_document")
+    patched_task = mocker.patch("search.task_helpers.create_post_document")
     index_new_post(mock_post_proxy)
     patched_serialize_func.assert_called_once_with(mock_post)
     assert patched_task.delay.called is True

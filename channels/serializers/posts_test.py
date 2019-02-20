@@ -39,7 +39,7 @@ def test_post_both_text_and_url():
         PostSerializer().create({"title": "title", "text": "text", "url": "url"})
     assert (
         ex.value.args[0]
-        == "Only one of text, article_content, or url can be used to create a post"
+        == "Not more than one of text, url, or article_content can be provided"
     )
 
 

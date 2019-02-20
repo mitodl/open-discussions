@@ -394,6 +394,7 @@ SOCIAL_AUTH_SAML_SECURITY_CONFIG = {
 # embed.ly configuration
 EMBEDLY_KEY = get_string("EMBEDLY_KEY", None)
 EMBEDLY_EMBED_URL = get_string("EMBEDLY_EMBED_URL", "https://api.embed.ly/1/oembed")
+EMBEDLY_EXTRACT_URL = get_string("EMBEDLY_EMBED_URL", "https://api.embed.ly/1/extract")
 
 # configuration for CKEditor token endpoint
 CKEDITOR_ENVIRONMENT_ID = get_string("CKEDITOR_ENVIRONMENT_ID", None)

@@ -15,7 +15,7 @@ from rest_framework.exceptions import NotAuthenticated, NotFound, PermissionDeni
 
 from channels.constants import POSTS_SORT_HOT
 from channels.exceptions import ConflictException, GoneException
-from embedly.api import get_embedly, THUMBNAIL_URL
+from embedly.api import get_embedly_summary, THUMBNAIL_URL
 
 AVATAR_SMALL_MAX_DIMENSION = 22
 AVATAR_MEDIUM_MAX_DIMENSION = 90
@@ -261,7 +261,7 @@ def get_or_create_link_meta(url):
 
     link_meta = LinkMeta.objects.filter(url=url).first()
     if link_meta is None and settings.EMBEDLY_KEY:
-        response = get_embedly(url).json()
+        response = get_embedly_summary(url).json()
         if THUMBNAIL_URL in response:
             link_meta, _ = LinkMeta.objects.get_or_create(
                 url=url, defaults={"thumbnail": response[THUMBNAIL_URL]}

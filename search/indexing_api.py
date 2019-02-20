@@ -32,6 +32,7 @@ from search.serializers import (
     serialize_bulk_comments,
     serialize_bulk_profiles,
     serialize_bulk_courses,
+    ESPostSerializer,
 )
 
 
@@ -285,6 +286,19 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
         },
         object_type,
         update_key="script",
+    )
+
+
+def update_post(doc_id, post):
+    """
+    Serializes a Post object and updates it in the index
+
+    Args:
+        doc_id (str): The ES document id
+        post (channels.models.Post): A Post object
+    """
+    return update_document_with_partial(
+        doc_id, ESPostSerializer(instance=post).data, POST_TYPE
     )
 
 

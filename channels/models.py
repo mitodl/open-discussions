@@ -15,6 +15,7 @@ from channels.constants import (
     VALID_EXTENDED_POST_CHOICES,
     VALID_CHANNEL_CHOICES,
     LINK_TYPE_SELF,
+    LINK_TYPE_LINK,
 )
 from channels.utils import (
     AVATAR_MEDIUM_MAX_DIMENSION,
@@ -216,6 +217,7 @@ class Post(TimestampedModel):
 
     title = models.CharField(max_length=300, null=True)
     text = models.TextField(null=True)
+    preview_text = models.TextField(null=True)
     url = models.URLField(max_length=2048, null=True)
     score = models.BigIntegerField(null=True)
     num_comments = models.BigIntegerField(null=True)
@@ -230,6 +232,8 @@ class Post(TimestampedModel):
             return render_article_text(self.article.content)
         elif self.post_type == LINK_TYPE_SELF:
             return markdown_to_plain_text(self.text)
+        elif self.post_type == LINK_TYPE_LINK:
+            return self.preview_text
         return None
 
     @property

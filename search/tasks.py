@@ -10,11 +10,12 @@ from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException, NotFound
 
-from channels.models import Comment
-from channels.models import Post
+from channels.constants import LINK_TYPE_LINK
+from channels.models import Comment, Post
 from course_catalog.models import Course
+from embedly.api import get_embedly_content
 from open_discussions.celery import app
-from open_discussions.utils import merge_strings, chunks
+from open_discussions.utils import merge_strings, chunks, html_to_plain_text
 from search import indexing_api as api
 from search.constants import VALID_OBJECT_TYPES
 from search.exceptions import RetryException, ReindexException
@@ -61,6 +62,45 @@ def wrap_retry_exception(*exception_classes):
 def create_document(doc_id, data):
     """Task that makes a request to create an ES document"""
     return api.create_document(doc_id, data)
+
+
+@app.task
+def update_link_post_with_preview(doc_id, data):
+    """
+    Task that fetches Embedly preview data for a link post and updates the corresponding
+    database and Elasticsearch objects
+
+    Args:
+        doc_id (str): ES document ID
+        data (dict): Dict of serialized post data produced by ESPostSerializer
+    """
+    if not data["post_link_url"]:
+        return None
+    response = get_embedly_content(data["post_link_url"]).json()
+    # Parse the embedly response to produce the link preview text
+    preview_text = (
+        html_to_plain_text(response["content"]).strip()
+        if response.get("content")
+        else response["description"]
+    )
+    # Update the post in the database
+    post = Post.objects.get(post_id=data["post_id"])
+    post.preview_text = preview_text
+    post.save()
+    # Update the post in ES
+    return api.update_post(doc_id, post)
+
+
+@app.task
+def create_post_document(doc_id, data):
+    """
+    Task that makes a request to create an ES document for a post, and if it's a link-type
+    post, updates the newly-created post with preview text
+    """
+    tasks = [create_document.si(doc_id, data)]
+    if data.get("post_type") == LINK_TYPE_LINK and data.get("post_link_url"):
+        tasks.append(update_link_post_with_preview.si(doc_id, data))
+    return celery.chain(tasks)()
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)

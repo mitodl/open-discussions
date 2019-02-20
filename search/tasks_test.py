@@ -6,13 +6,17 @@ from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException, NotFound
 import pytest
 
-from channels.factories.models import CommentFactory
+from channels.factories.models import CommentFactory, PostFactory
+from channels.models import Post
+from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
 from course_catalog.factories import CourseFactory
 from open_discussions.test_utils import assert_not_raises
 from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES
 from search.exceptions import ReindexException, RetryException
 from search.tasks import (
     create_document,
+    create_post_document,
+    update_link_post_with_preview,
     update_document_with_partial,
     finish_recreate_index,
     increment_document_integer_field,
@@ -83,6 +87,57 @@ def test_update_field_values_by_query(mocked_api):
     update_field_values_by_query(*indexing_api_args)
     assert mocked_api.update_field_values_by_query.call_count == 1
     assert mocked_api.update_field_values_by_query.call_args[0] == indexing_api_args
+
+
+@pytest.mark.parametrize(
+    "post_type,post_url,exp_update_link_post",
+    [[LINK_TYPE_LINK, "example.com", True], [LINK_TYPE_SELF, None, False]],
+)
+def test_create_post_document(mocker, post_type, post_url, exp_update_link_post):
+    """
+    Test that the create_post_document task calls the API method to create a post document, and for link posts,
+    also calls the API method to fetch preview data and update the post
+    """
+    create_document_mock = mocker.patch("search.tasks.create_document")
+    update_link_post_mock = mocker.patch("search.tasks.update_link_post_with_preview")
+    indexing_api_args = (
+        "doc_id",
+        {"post_id": "a", "post_type": post_type, "post_link_url": post_url},
+    )
+    create_post_document(*indexing_api_args)
+    assert create_document_mock.si.call_count == 1
+    assert create_document_mock.si.call_args[0] == indexing_api_args
+    assert update_link_post_mock.si.called is exp_update_link_post
+
+
+@pytest.mark.parametrize(
+    "resp_content,resp_description,exp_preview_text",
+    [
+        ["<a> content", None, "content"],
+        ["", "description", "description"],
+        [None, "description", "description"],
+    ],
+)
+def test_update_link_post_with_preview(
+    mocker, mocked_api, resp_content, resp_description, exp_preview_text
+):
+    """
+    Test that update_link_post_with_preview fetches embedly content and updates the given post in the
+    database and in ES
+    """
+    get_embedly_content_mock = mocker.patch("search.tasks.get_embedly_content")
+    get_embedly_content_mock.return_value.json.return_value = {
+        "content": resp_content,
+        "description": resp_description,
+    }
+    post_data = {"post_id": "a", "post_link_url": "example.com"}
+    post = PostFactory.create(post_id=post_data["post_id"])
+
+    update_link_post_with_preview("abc", post_data)
+
+    assert get_embedly_content_mock.call_args[0][0] == post_data["post_link_url"]
+    assert Post.objects.get(id=post.id).preview_text == exp_preview_text
+    assert mocked_api.update_post.call_count == 1
 
 
 @pytest.mark.parametrize("error", [KeyError, NotFound])

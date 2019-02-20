@@ -27,6 +27,7 @@ from search.serializers import (
 )
 from search.tasks import (
     create_document,
+    create_post_document,
     update_document_with_partial,
     increment_document_integer_field,
     update_field_values_by_query,
@@ -83,7 +84,7 @@ def index_new_post(post_obj):
     """
     post = post_obj._self_post  # pylint: disable=protected-access
     data = ESPostSerializer(instance=post).data
-    create_document.delay(gen_post_id(post.post_id), data)
+    create_post_document.delay(gen_post_id(post.post_id), data)
 
 
 @if_feature_enabled(INDEX_UPDATES)
