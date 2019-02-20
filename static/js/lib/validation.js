@@ -108,7 +108,7 @@ const isEmptyArticle = (article: Array<Object>): boolean => {
   // sometimes the editor will leave one empty tag in it
   if (article.length === 1) {
     const [obj] = article
-    if (R.equals(obj.attributes, {}) || R.equals(obj.children, [])) {
+    if (R.equals(obj.attributes, {}) && R.equals(obj.children, [])) {
       return true
     }
   }

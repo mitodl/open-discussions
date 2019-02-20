@@ -165,18 +165,32 @@ describe("validation library", () => {
       })
     })
 
-    it("should complain about an empty article post", () => {
-      const post = {
-        value: {
-          postType:        LINK_TYPE_ARTICLE,
-          title:           "potato",
-          article_content: []
+    //
+    ;[
+      [[], true],
+      [[{ attributes: {}, children: [] }], true],
+      [[{ attributes: {}, children: [{ hey: "there" }] }], false]
+    ].forEach(([articleContent, shouldGiveError]) => {
+      it(`${shouldIf(shouldGiveError)} if articleContent = ${JSON.stringify(
+        articleContent
+      )}`, () => {
+        const post = {
+          value: {
+            postType:        LINK_TYPE_ARTICLE,
+            title:           "potato",
+            article_content: articleContent
+          }
         }
-      }
-      assert.deepEqual(validatePostCreateForm(post), {
-        value: {
-          article_content: "Article must not be empty"
-        }
+        assert.deepEqual(
+          validatePostCreateForm(post),
+          shouldGiveError
+            ? {
+              value: {
+                article_content: "Article must not be empty"
+              }
+            }
+            : {}
+        )
       })
     })
 
