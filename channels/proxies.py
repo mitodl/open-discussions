@@ -65,6 +65,11 @@ class PostProxy(ObjectProxy):
         """Return the article content for this post"""
         return self.article.content if self.article is not None else None
 
+    @property
+    def preview_text(self):
+        """Return preview_text for this post"""
+        return self._self_post.preview_text
+
 
 def proxy_post(submission):
     """

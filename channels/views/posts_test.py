@@ -44,7 +44,7 @@ def test_create_url_post_existing_meta(
     channel, user = private_channel_and_contributor
     link_url = "http://micromasters.mit.edu/🐨"
     thumbnail = "http://fake/thumb.jpg"
-    embedly_stub = mocker.patch("channels.utils.get_embedly")
+    embedly_stub = mocker.patch("channels.utils.get_embedly_summary")
     LinkMetaFactory.create(url=link_url, thumbnail=thumbnail)
     url = reverse("post-list", kwargs={"channel_name": channel.name})
     resp = user_client.post(url, {"title": "url title 🐨", "url": link_url})
@@ -95,7 +95,7 @@ def test_post_create_post_new_meta(
         **{"json.return_value": {"some": "json", "thumbnail_url": thumbnail}}
     )
     embedly_stub = mocker.patch(
-        "channels.utils.get_embedly", return_value=embed_return_value
+        "channels.utils.get_embedly_summary", return_value=embed_return_value
     )
     url = reverse("post-list", kwargs={"channel_name": channel.name})
     user_client.post(url, {"title": "url title 🐨", "url": link_url})
@@ -113,7 +113,7 @@ def test_post_create_post_no_thumbnail(
     embed_return_value = mocker.Mock()
     embed_return_value.configure_mock(**{"json.return_value": {"some": "json"}})
     embedly_stub = mocker.patch(
-        "channels.utils.get_embedly", return_value=embed_return_value
+        "channels.utils.get_embedly_summary", return_value=embed_return_value
     )
     url = reverse("post-list", kwargs={"channel_name": channel.name})
     user_client.post(url, {"title": "url title 🐨", "url": link_url})

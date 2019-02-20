@@ -378,12 +378,19 @@ def get_post_type(*, text, url, article_content):
     Returns the post type given the passed input values
 
     Args:
-        text (str): the post text
+        text (str or None): the post text
         url (str): the post url
         article_content (dict): the post article text data
     Returns:
-        str: the link type
+        str: the type of post
+    Raises:
+        ValueError: If incompatible pieces of content are being submitted (e.g.: a URL is
+            being submitted for a text post)
     """
+    if not any([text, url, article_content]):
+        # title-only text post
+        return LINK_TYPE_SELF
+
     if num_items_not_none([text, url, article_content]) != 1:
         raise ValueError(
             "Not more than one of text, url, or article_content can be provided"
@@ -393,8 +400,6 @@ def get_post_type(*, text, url, article_content):
         return LINK_TYPE_LINK
     elif article_content is not None:
         return EXTENDED_POST_TYPE_ARTICLE
-
-    # title-only or text
     return LINK_TYPE_SELF
 
 
@@ -901,27 +906,16 @@ class Api:
             url(str): the url of the post
             article_content (dict): the article content of the post as a JSON dict
             cover_image(bytes): article cover image
-
         Raises:
             ValueError: if both text and url are provided
 
         Returns:
             channels.proxies.PostProxy: the proxied submission and post
         """
-
-        if not url and not article_content:
-            # Reddit requires at least an empty selftext string for title-only or article post types
-            text = text or ""
-
         post_type = get_post_type(text=text, url=url, article_content=article_content)
-
-        if article_content:
-            # article posts shadow an empty text post, because reddit requires at least an empty string
-            text = ""
-
         channel = self.get_channel(channel_name)
 
-        # if the channel has allowed_post_types configured, use that, otherwise delegate to reddit via the submit() call
+        # If the channel has allowed_post_types configured, use that, otherwise delegate to reddit via the submit() call
         if channel.allowed_post_types:
             if not channel.allowed_post_types & getattr(
                 Channel.allowed_post_types, post_type
@@ -930,7 +924,14 @@ class Api:
                     f"Post type {post_type} is not permitted in this channel"
                 )
 
+        # Reddit requires at least an empty string for text posts (article posts shadow an empty text post)
+        if post_type != LINK_TYPE_LINK and not text:
+            text = ""
         submission = channel.submit(title, selftext=text, url=url)
+
+        # Don't use empty str for article posts in the database
+        if post_type == EXTENDED_POST_TYPE_ARTICLE:
+            text = None
 
         with transaction.atomic():
             # select_for_update so no one else can write to this
@@ -939,9 +940,7 @@ class Api:
                 defaults={
                     "channel": channel._self_channel,  # pylint: disable=protected-access
                     "title": title,
-                    "text": text
-                    if post_type == LINK_TYPE_SELF
-                    else None,  # don't use empty str for article posts
+                    "text": text,
                     "url": url,
                     "post_type": post_type,
                     "author": self.user,

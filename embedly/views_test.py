@@ -22,7 +22,7 @@ def test_get_embedly(client, user, mocker, settings):
         **{"json.return_value": {"some": "json", "thumbnail_url": external_thumb}}
     )
     get_stub = mocker.patch(
-        "embedly.views.get_embedly", return_value=embed_return_value
+        "embedly.views.get_embedly_summary", return_value=embed_return_value
     )
     resp = client.get(embedly_url)
     get_stub.assert_called_once_with("https://en.wikipedia.org/wiki/Giant_panda/")
@@ -41,7 +41,7 @@ def test_get_embedly_no_thumbnail(client, user, mocker, settings):
     embedly_url = reverse("embedly-detail", kwargs={"url": external_url})
     embed_return_value = mocker.Mock()
     embed_return_value.configure_mock(**{"json.return_value": {"some": "json"}})
-    mocker.patch("embedly.views.get_embedly", return_value=embed_return_value)
+    mocker.patch("embedly.views.get_embedly_summary", return_value=embed_return_value)
     client.get(embedly_url)
     assert LinkMeta.objects.filter(url=external_url).first() is None
 
@@ -75,7 +75,7 @@ def test_get_embedly_anon(client, mocker, settings, allow_anonymous):
     embed_return_value = mocker.Mock()
     embed_return_value.configure_mock(**{"json.return_value": {"some": "json"}})
     get_stub = mocker.patch(
-        "embedly.views.get_embedly", return_value=embed_return_value
+        "embedly.views.get_embedly_summary", return_value=embed_return_value
     )
     resp = client.get(embedly_url)
 

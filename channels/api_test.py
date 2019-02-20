@@ -2,6 +2,7 @@
 # pylint: disable=redefined-outer-name,too-many-lines
 from unittest.mock import Mock, MagicMock
 from urllib.parse import urljoin
+from types import SimpleNamespace
 
 from django.contrib.auth.models import AnonymousUser
 import pytest
@@ -530,90 +531,94 @@ DEFAULT_POST_PROPS = dict(
 )
 
 
-@pytest.mark.parametrize("text", ["Text", None])
-def test_create_post_text(mock_client, text):
-    """Test create_post with text"""
-    channel = Channel.objects.create(name="123")
-    client = api.Api(UserFactory.create())
-    Post.objects.filter(
-        post_id=mock_client.subreddit.return_value.submit.return_value.id
-    ).delete()  # don't want this for this test
-    post = client.create_post(channel.name, "Title", text=text)
-    assert post.__wrapped__ == mock_client.subreddit.return_value.submit.return_value
-    mock_client.subreddit.assert_called_once_with(channel.name)
-    mock_client.subreddit.return_value.submit.assert_called_once_with(
-        "Title", selftext=text or "", url=None
-    )
-    post = Post.objects.filter(
-        post_id=mock_client.subreddit.return_value.submit.return_value.id
-    )
-    assert post.exists()
-    assert_properties_eq(
-        post.first(),
-        dict(text=text or "", url=None, post_type=LINK_TYPE_SELF, **DEFAULT_POST_PROPS),
-    )
+class TestCreatePost:
+    """Tests for channel API create_post method"""
 
+    @pytest.fixture()
+    def scenario(self, mock_client):
+        """Fixture for setup and test data needed for all create_post tests"""
+        mock_reddit_post_submit = mock_client.subreddit.return_value.submit
+        mock_returned_post = mock_reddit_post_submit.return_value
+        Post.objects.filter(
+            post_id=mock_returned_post.id
+        ).delete()  # don't want this for this test
+        channel = Channel.objects.create(name="123")
+        return SimpleNamespace(
+            mock_reddit_post_submit=mock_reddit_post_submit,
+            mock_returned_post=mock_returned_post,
+            channel=channel,
+        )
 
-def test_create_post_url(mock_client):
-    """Test create_post with url"""
-    channel = Channel.objects.create(name="123")
-    client = api.Api(UserFactory.create())
-    Post.objects.filter(
-        post_id=mock_client.subreddit.return_value.submit.return_value.id
-    ).delete()  # don't want this for this test
-    post = client.create_post(channel.name, "Title", url="http://google.com")
-    assert post.__wrapped__ == mock_client.subreddit.return_value.submit.return_value
-    mock_client.subreddit.assert_called_once_with(channel.name)
-    mock_client.subreddit.return_value.submit.assert_called_once_with(
-        "Title", selftext=None, url="http://google.com"
-    )
-    post = Post.objects.filter(
-        post_id=mock_client.subreddit.return_value.submit.return_value.id
-    )
-    assert post.exists()
-    assert_properties_eq(
-        post.first(),
-        dict(
-            url="http://google.com",
-            text=None,
-            post_type=LINK_TYPE_LINK,
-            **DEFAULT_POST_PROPS,
-        ),
-    )
+    @pytest.mark.parametrize("text", ["Text", None])
+    def test_create_post_text(self, mock_client, contributor_api, scenario, text):
+        """Test create_post with text"""
+        post = contributor_api.create_post(scenario.channel.name, "Title", text=text)
+        assert post.__wrapped__ == scenario.mock_returned_post
+        mock_client.subreddit.assert_called_once_with(scenario.channel.name)
+        scenario.mock_reddit_post_submit.assert_called_once_with(
+            "Title", selftext=text or "", url=None
+        )
+        post = Post.objects.filter(post_id=scenario.mock_returned_post.id)
+        assert post.exists()
+        assert_properties_eq(
+            post.first(),
+            dict(
+                text=text or "",
+                url=None,
+                post_type=LINK_TYPE_SELF,
+                **DEFAULT_POST_PROPS,
+            ),
+        )
 
+    def test_create_post_url(self, mock_client, contributor_api, scenario):
+        """Test create_post with url"""
+        post = contributor_api.create_post(
+            scenario.channel.name, "Title", url="http://google.com"
+        )
+        assert post.__wrapped__ == scenario.mock_returned_post
+        mock_client.subreddit.assert_called_once_with(scenario.channel.name)
+        scenario.mock_reddit_post_submit.assert_called_once_with(
+            "Title", selftext=None, url="http://google.com"
+        )
+        post = Post.objects.filter(post_id=scenario.mock_returned_post.id)
+        assert post.exists()
+        assert_properties_eq(
+            post.first(),
+            dict(
+                url="http://google.com",
+                text=None,
+                post_type=LINK_TYPE_LINK,
+                **DEFAULT_POST_PROPS,
+            ),
+        )
 
-def test_create_post_article(mock_client):
-    """Test create_post with url"""
-    channel = Channel.objects.create(name="123")
-    client = api.Api(UserFactory.create())
-    Post.objects.filter(
-        post_id=mock_client.subreddit.return_value.submit.return_value.id
-    ).delete()  # don't want this for this test
-    post = client.create_post(channel.name, "Title", article_content=["data"])
-    assert post.__wrapped__ == mock_client.subreddit.return_value.submit.return_value
-    mock_client.subreddit.assert_called_once_with(channel.name)
-    mock_client.subreddit.return_value.submit.assert_called_once_with(
-        "Title", selftext="", url=None
-    )
-    post = Post.objects.filter(
-        post_id=mock_client.subreddit.return_value.submit.return_value.id
-    )
-    assert post.exists()
-    assert_properties_eq(
-        post.first(),
-        dict(
-            url=None,
-            text=None,
-            post_type=EXTENDED_POST_TYPE_ARTICLE,
-            **DEFAULT_POST_PROPS,
-        ),
-    )
-    assert Article.objects.filter(
-        post__post_id=mock_client.subreddit.return_value.submit.return_value.id
-    ).exists()
-    assert Article.objects.get(
-        post__post_id=mock_client.subreddit.return_value.submit.return_value.id
-    ).content == ["data"]
+    def test_create_post_article(self, mock_client, contributor_api, scenario):
+        """Test create_post with article content"""
+        post = contributor_api.create_post(
+            scenario.channel.name, "Title", article_content=["data"]
+        )
+        assert post.__wrapped__ == scenario.mock_returned_post
+        mock_client.subreddit.assert_called_once_with(scenario.channel.name)
+        scenario.mock_reddit_post_submit.assert_called_once_with(
+            "Title", selftext="", url=None
+        )
+        post = Post.objects.filter(post_id=scenario.mock_returned_post.id)
+        assert post.exists()
+        assert_properties_eq(
+            post.first(),
+            dict(
+                url=None,
+                text=None,
+                post_type=EXTENDED_POST_TYPE_ARTICLE,
+                **DEFAULT_POST_PROPS,
+            ),
+        )
+        article_query = Article.objects.filter(
+            post__post_id=scenario.mock_returned_post.id
+        )
+        assert article_query.exists() is True
+        assert article_query.count() == 1
+        assert article_query.first().content == ["data"]
 
 
 @pytest.mark.parametrize(

@@ -8,12 +8,12 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, NotFound
 
+from channels.api import get_post_type
 from channels.constants import DELETED_COMMENT_OR_POST_TEXT
-from channels.utils import get_reddit_slug, num_items_not_none
+from channels.utils import get_reddit_slug, render_article_text
 from channels.models import Channel, Subscription
 from channels.serializers.base import RedditObjectSerializer
 from channels.serializers.utils import parse_bool
-from channels.utils import render_article_text
 from open_discussions.settings import SITE_BASE_URL
 from open_discussions.serializers import WriteableSerializerMethodField
 from open_discussions.utils import markdown_to_plain_text
@@ -132,7 +132,8 @@ class BasePostSerializer(RedditObjectSerializer):
             return render_article_text(instance.article.content)
         elif instance.is_self:
             return markdown_to_plain_text(instance.selftext)
-        return None
+        else:
+            return instance.preview_text
 
 
 class PostSerializer(BasePostSerializer):
@@ -205,11 +206,12 @@ class PostSerializer(BasePostSerializer):
         article_content = validated_data.get("article_content", None)
         cover_image = validated_data.get("cover_image", None)
 
-        # validation occurs here rather than validate(), because we only wathc to do this for POST, not PATCH
-        if num_items_not_none([text, url, article_content]) > 1:
-            raise ValidationError(
-                "Only one of text, article_content, or url can be used to create a post"
-            )
+        # Validation occurs here rather than validate(), because we only want to do this when we create posts,
+        # not when we update them
+        try:
+            get_post_type(text=text, url=url, article_content=article_content)
+        except ValueError as exc:
+            raise ValidationError(exc.args[0]) from exc
 
         api = self.context["channel_api"]
         channel_name = self.context["view"].kwargs["channel_name"]

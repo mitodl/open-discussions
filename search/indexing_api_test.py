@@ -19,6 +19,7 @@ from search.indexing_api import (
     update_field_values_by_query,
     get_reindexing_alias_name,
     update_document_with_partial,
+    update_post,
     increment_document_integer_field,
     index_posts,
     index_comments,
@@ -140,6 +141,26 @@ def test_update_partial_conflict_logging(mocker, mocked_es):
     mocked_es.conn.update.side_effect = ConflictError
     update_document_with_partial(doc_id, data, POST_TYPE)
     assert patched_logger.error.called is True
+
+
+def test_update_post(mocker):
+    """Test that update_post serializes a Post object and updates the corresponding ES document"""
+    fake_post = mocker.Mock(post_id="1")
+    fake_serialized_post = mocker.Mock(data={"key": "value"})
+    mock_update_document = mocker.patch(
+        "search.indexing_api.update_document_with_partial"
+    )
+    mocker.patch(
+        "search.indexing_api.ESPostSerializer", return_value=fake_serialized_post
+    )
+
+    update_post("abc", fake_post)
+    assert mock_update_document.called is True
+    assert mock_update_document.call_args[0] == (
+        "abc",
+        fake_serialized_post.data,
+        POST_TYPE,
+    )
 
 
 def test_increment_document_integer_field(mocked_es):
