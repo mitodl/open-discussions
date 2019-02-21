@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.67.0
+Version 0.67.0 (Released February 21, 2019)
 --------------
 
 - fix an issue with article validation
