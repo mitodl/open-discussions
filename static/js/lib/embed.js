@@ -1,4 +1,4 @@
-/* global SETTINGS: false */
+/* globals SETTINGS: false, embedly: false */
 // @flow
 import R from "ramda"
 import React from "react"
@@ -59,6 +59,19 @@ export const loadEmbedlyPlatform = () => {
     const script = document.getElementsByTagName("script")[0]
     // $FlowFixMe
     script.parentNode.insertBefore(el, script)
+
+    // $FlowFixMe
+    embedly("on", "card.rendered", function(iframe) {
+      // IE does not provide Element.closest, but it's not essential functionality
+      if (iframe.closest && iframe.closest(".no-embedly-title")) {
+        const head = iframe.contentDocument.head
+        const style = iframe.contentDocument.createElement("style")
+        style.setAttribute("type", "text/css")
+        // hide the title
+        style.innerText = ".hdr { display: none; }"
+        head.appendChild(style)
+      }
+    })
   }
 }
 

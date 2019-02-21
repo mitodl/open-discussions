@@ -2,16 +2,26 @@
 import { assert } from "chai"
 import sinon from "sinon"
 
-import { handleTwitterWidgets, hasIframe, renderEmbedlyCard } from "./embed"
+import {
+  handleTwitterWidgets,
+  hasIframe,
+  loadEmbedlyPlatform,
+  renderEmbedlyCard
+} from "./embed"
 
 describe("embed utils", () => {
-  let twitterLoadStub
+  let twitterLoadStub, sandbox
 
   beforeEach(() => {
-    twitterLoadStub = sinon.stub()
+    sandbox = sinon.createSandbox()
+    twitterLoadStub = sandbox.stub()
     window.twttr = {
       widgets: { load: twitterLoadStub }
     }
+  })
+
+  afterEach(() => {
+    sandbox.restore()
   })
 
   //
@@ -47,5 +57,60 @@ describe("embed utils", () => {
     assert.equal(link.getAttribute("data-card-key"), SETTINGS.embedlyKey)
     assert.equal(link.getAttribute("href"), url)
     assert.equal(link.getAttribute("class"), "embedly-card")
+  })
+
+  describe("initialization", () => {
+    let embedlyStub
+
+    beforeEach(() => {
+      document.head.innerHTML = ""
+      document.body.innerHTML = ""
+
+      // this expects at least one script element to already exist
+      embedlyStub = sandbox.stub()
+      global.embedly = embedlyStub
+
+      const script = document.createElement("script")
+      document.head.appendChild(script)
+    })
+
+    it("loads embedly", () => {
+      loadEmbedlyPlatform()
+      assert.equal(document.querySelectorAll("script").length, 2)
+      const firstScript = document.querySelectorAll("script")[0]
+      assert.equal(
+        firstScript.getAttribute("src"),
+        "http://cdn.embedly.com/widgets/platform.js"
+      )
+    })
+    ;[true, false].forEach(hidesTitle => {
+      it(`${
+        hidesTitle ? "adds" : "doesn't add"
+      } a style element to hide the title`, () => {
+        loadEmbedlyPlatform()
+
+        const container = document.createElement("div")
+        document.body.append(container)
+        if (hidesTitle) {
+          container.setAttribute("class", "no-embedly-title")
+        }
+        const iframe = document.createElement("iframe")
+        container.appendChild(iframe)
+
+        const callback = embedlyStub.firstCall.args[2]
+        callback(iframe)
+        if (hidesTitle) {
+          assert.equal(
+            iframe.contentDocument.querySelector("style").innerText,
+            ".hdr { display: none; }"
+          )
+        } else {
+          assert.equal(
+            iframe.contentDocument.querySelectorAll("style").length,
+            0
+          )
+        }
+      })
+    })
   })
 })

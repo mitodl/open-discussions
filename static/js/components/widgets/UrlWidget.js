@@ -9,5 +9,7 @@ const UrlWidget = ({
   widgetInstance: {
     configuration: { url }
   }
-}: WidgetComponentProps) => <EmbedlyCard url={url} />
+}: WidgetComponentProps) => (
+  <EmbedlyCard url={url} className="no-embedly-title" />
+)
 export default UrlWidget
