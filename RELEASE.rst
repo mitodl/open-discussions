@@ -1,6 +1,33 @@
 Release Notes
 =============
 
+Version 0.67.0
+--------------
+
+- fix an issue with article validation
+- Remove comments (#1868)
+- Added embedly link preview content to index
+- moves log info statement
+- adds log info statements, renames variable and adds other case to not upload, per PR review comments
+- flips if statement; adds case check to unit tests
+- adds error_occurred flag to check for cases where we would not like to upload to s3
+- renames "get_edx_data" -> sync_and_upload_edx_data
+- Fixed anonymous create post page bug
+- Adding caching to RSS widget
+- Update README.md
+- Course search UI (#1784)
+- updates unit test
+- adds unit test
+- Updates ocw-data-parser package
+- updates requirements
+- Readme updates
+- add validtion to post editing
+- fixes bucket; fixes failing tests; adds stub for new test
+- format change from running `black course_catalog`
+- Changes permission for edx json export
+- minor changes
+- Adds functionality to export edx courses into json format and upload it to s3
+
 Version 0.66.1 (Released February 19, 2019)
 --------------
 
