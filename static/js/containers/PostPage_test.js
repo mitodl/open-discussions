@@ -348,14 +348,11 @@ describe("PostPage", function() {
     helper.getMoreCommentsStub.returns(Promise.resolve(newComments))
     await commentTreeProps.loadMoreComments(moreComments)
     const actionsList = store.getActions()
-    assert.deepEqual(
-      actionsList.slice(actionsList.length - 3).map(action => action.type),
-      [
-        actions.morecomments.get.requestType,
-        actions.morecomments.get.successType,
-        REPLACE_MORE_COMMENTS
-      ]
-    )
+    assert.includeMembers(R.pluck("type")(actionsList), [
+      actions.morecomments.get.requestType,
+      actions.morecomments.get.successType,
+      REPLACE_MORE_COMMENTS
+    ])
 
     sinon.assert.calledWith(
       helper.getMoreCommentsStub,
@@ -394,8 +391,7 @@ describe("PostPage", function() {
       assert.equal(props.title, "Delete Post")
       await props.onAccept()
       sinon.assert.calledWith(helper.deletePostStub, post.id)
-      const actionsList = store.getActions()
-      assert.deepEqual(actionsList.slice(actionsList.length - 4), [
+      assert.includeDeepMembers(store.getActions(), [
         {
           type:    actions.posts.delete.requestType,
           payload: post.id
@@ -426,8 +422,7 @@ describe("PostPage", function() {
       const comment = comments[0]
 
       inner.find("CommentTree").prop("deleteComment")(comment)
-      const actionsList = store.getActions()
-      assert.deepEqual(actionsList.slice(actionsList.length - 2), [
+      assert.includeDeepMembers(store.getActions(), [
         {
           type:    SET_FOCUSED_COMMENT,
           payload: comment
@@ -456,9 +451,8 @@ describe("PostPage", function() {
       assert.equal(dialogProps.title, "Delete Comment")
       await dialogProps.onAccept()
 
-      const actionsList = store.getActions()
       sinon.assert.calledWith(helper.deleteCommentStub, comment.id)
-      assert.deepEqual(actionsList.slice(actionsList.length - 5), [
+      assert.includeDeepMembers(store.getActions(), [
         {
           type:    actions.comments.delete.requestType,
           payload: post.id
@@ -497,8 +491,7 @@ describe("PostPage", function() {
           const { inner, store } = await render()
 
           await inner.find("ExpandedPostDisplay").prop("removePost")(post)
-          const actionsList = store.getActions()
-          assert.deepEqual(actionsList.slice(actionsList.length - 2), [
+          assert.includeDeepMembers(store.getActions(), [
             {
               type:    SET_FOCUSED_POST,
               payload: post
@@ -531,8 +524,7 @@ describe("PostPage", function() {
           assert.equal(dialogProps.title, "Remove Post")
           await dialogProps.onAccept({ preventDefault: helper.sandbox.stub() })
 
-          const actionsList = store.getActions()
-          assert.deepEqual(actionsList.slice(actionsList.length - 6), [
+          assert.includeDeepMembers(store.getActions(), [
             {
               type:    actions.postRemoved.patch.requestType,
               payload: post.id
@@ -573,9 +565,8 @@ describe("PostPage", function() {
           helper.updateRemovedStub.returns(Promise.resolve(expected))
 
           await inner.find("ExpandedPostDisplay").prop("approvePost")(post)
-          const actionsList = store.getActions()
 
-          assert.deepEqual(actionsList.slice(actionsList.length - 1), [
+          assert.includeDeepMembers(store.getActions(), [
             {
               type:    SET_SNACKBAR_MESSAGE,
               payload: {
@@ -598,8 +589,7 @@ describe("PostPage", function() {
 
           inner.find("CommentTree").prop("remove")(comment)
 
-          const actionsList = store.getActions()
-          assert.deepEqual(actionsList.slice(actionsList.length - 2), [
+          assert.includeDeepMembers(store.getActions(), [
             {
               type:    SET_FOCUSED_COMMENT,
               payload: comment
@@ -632,9 +622,8 @@ describe("PostPage", function() {
 
           assert.equal(dialogProps.title, "Remove Comment")
           await dialogProps.onAccept({ preventDefault: helper.sandbox.stub() })
-          const actionsList = store.getActions()
 
-          assert.deepEqual(actionsList.slice(actionsList.length - 5), [
+          assert.includeDeepMembers(store.getActions(), [
             {
               type:    actions.comments.patch.requestType,
               payload: comment.id
@@ -670,9 +659,8 @@ describe("PostPage", function() {
           const { inner, store } = await render()
 
           await inner.find("CommentTree").prop("approve")(comment)
-          const actionsList = store.getActions()
 
-          assert.deepEqual(actionsList.slice(actionsList.length - 3), [
+          assert.includeDeepMembers(store.getActions(), [
             {
               type:    actions.comments.patch.requestType,
               payload: comment.id
@@ -710,8 +698,7 @@ describe("PostPage", function() {
 
         await inner.find("CommentTree").prop("reportComment")(comment)
 
-        const actionsList = store.getActions()
-        assert.deepEqual(actionsList.slice(actionsList.length - 3), [
+        assert.includeDeepMembers(store.getActions(), [
           {
             type:    FORM_BEGIN_EDIT,
             payload: {
@@ -799,8 +786,7 @@ describe("PostPage", function() {
           reason:     reason
         })
 
-        const actionsList = store.getActions()
-        assert.deepEqual(actionsList.slice(actionsList.length - 6), [
+        assert.includeDeepMembers(store.getActions(), [
           {
             type:    actions.reports.post.requestType,
             payload: {
@@ -844,8 +830,7 @@ describe("PostPage", function() {
         })
         assert.ok(preventDefaultStub.called)
 
-        const actionsList = store.getActions()
-        assert.deepEqual(actionsList.slice(actionsList.length - 3), [
+        assert.includeDeepMembers(store.getActions(), [
           {
             type:    SET_FOCUSED_POST,
             payload: post
@@ -927,8 +912,7 @@ describe("PostPage", function() {
           reason:  reason
         })
 
-        const actionsList = store.getActions()
-        assert.deepEqual(actionsList.slice(actionsList.length - 6), [
+        assert.includeDeepMembers(store.getActions(), [
           {
             type:    actions.reports.post.requestType,
             payload: {
