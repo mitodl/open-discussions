@@ -1,24 +1,20 @@
+{% load i18n static hijack_tags render_bundle raven %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     {% spaceless %}
-    {% load i18n static %}
-    {% load hijack_tags %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% load raven %}
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack-styles.css' %}" />
-    {% load raven %}
     <link rel="icon" href="{% static 'images/favicon.ico' %}" />
     {% if js_settings_json %}
     <script type="text/javascript">
     var SETTINGS = {{ js_settings_json|safe }};
     </script>
-    {% endif %}
-    {% load render_bundle %}
     {% render_bundle 'style' %}
+    {% endif %}
     <title>{% block title %}{% trans "Open Discussions" %}{% endblock %}</title>
     <meta name="description" content="{% block description %}{% endblock %}">
     <meta name="keywords" content="{% block keywords %}{% endblock %}">

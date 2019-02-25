@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block description %}{{ description_value }}{% endblock %}
+{% block extrahead %}
+    <meta property="og:description" content="{{ description_value }}">
+    <meta property="og:title" content="MIT Open Learning">
+    <meta property="og:image" content="{% static 'images/mit-dome.jpg' %}">
+    <meta property="og:url" content="{{ url }}">
+{% endblock %}
