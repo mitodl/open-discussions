@@ -60,8 +60,7 @@ export const loadEmbedlyPlatform = () => {
     // $FlowFixMe
     script.parentNode.insertBefore(el, script)
 
-    // $FlowFixMe
-    embedly("on", "card.rendered", function(iframe) {
+    window.embedly("on", "card.rendered", function(iframe) {
       // IE does not provide Element.closest, but it's not essential functionality
       if (iframe.closest && iframe.closest(".no-embedly-title")) {
         const head = iframe.contentDocument.head

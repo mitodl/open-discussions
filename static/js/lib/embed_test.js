@@ -68,7 +68,7 @@ describe("embed utils", () => {
 
       // this expects at least one script element to already exist
       embedlyStub = sandbox.stub()
-      global.embedly = embedlyStub
+      window.embedly = embedlyStub
 
       const script = document.createElement("script")
       document.head.appendChild(script)
