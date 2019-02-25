@@ -4,7 +4,7 @@ import sinon from "sinon"
 import R from "ramda"
 import { Link } from "react-router-dom"
 
-import CommentTree from "../components/CommentTree"
+import CommentTree, { commentDropdownKey } from "../components/CommentTree"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import PostPage, { PostPage as InnerPostPage } from "./PostPage"
@@ -46,11 +46,17 @@ import { LINK_TYPE_LINK } from "../lib/channels"
 import { REPORT_FORM_KEY } from "../lib/reports"
 
 describe("PostPage", function() {
-  let helper, render, post, comments, channel, twitterEmbedStub
+  let helper,
+    render,
+    post,
+    comments,
+    commentsResponse,
+    channel,
+    twitterEmbedStub
 
   beforeEach(() => {
     post = makePost()
-    const commentsResponse = makeCommentsResponse(post, 3)
+    commentsResponse = makeCommentsResponse(post, 3)
     comments = createCommentTree(commentsResponse)
     channel = makeChannel()
 
@@ -302,7 +308,9 @@ describe("PostPage", function() {
     const { inner } = await render()
     const commentTree = inner.find("CommentTree")
     const commentTreeProps = commentTree.props()
-    for (const form of inner.find("CommentVoteForm")) {
+    const forms = commentTree.dive().find("CommentVoteForm")
+    assert.isTrue(forms.length > 0)
+    for (const form of forms) {
       const fromProps = form.props
       assert.equal(fromProps.downvote, commentTreeProps.downvote)
       assert.equal(fromProps.upvote, commentTreeProps.upvote)
@@ -310,10 +318,18 @@ describe("PostPage", function() {
   })
 
   it("passed props to each CommentRemovalForm", async () => {
-    const { inner } = await render()
+    const { inner } = await render({
+      ui: {
+        dropdownMenus: new Map(
+          commentsResponse.map(comment => [commentDropdownKey(comment), true])
+        )
+      }
+    })
     const commentTree = inner.find("CommentTree")
     const commentTreeProps = commentTree.props()
-    for (const form of inner.find("CommentRemovalForm")) {
+    const forms = commentTree.dive().find("CommentRemovalForm")
+    assert.isTrue(forms.length > 0)
+    for (const form of forms) {
       const fromProps = form.props
       assert.equal(fromProps.approve, commentTreeProps.approve)
       assert.equal(fromProps.remove, commentTreeProps.remove)
