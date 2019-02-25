@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.68.0
+--------------
+
+- Bumped ocw-data-parser version
+
 Version 0.67.0 (Released February 21, 2019)
 --------------
 
