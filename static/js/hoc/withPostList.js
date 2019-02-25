@@ -8,6 +8,7 @@ import PostList from "../components/PostList"
 
 import { toggleUpvote } from "../util/api_actions"
 import { actions } from "../actions"
+import { evictPostsForChannel } from "../actions/posts_for_channel"
 
 import type { Location } from "react-router"
 import type { Dispatch } from "redux"
@@ -28,7 +29,8 @@ type Props = {
   showReportPost: boolean,
   showRemovePost: boolean,
   showTogglePinPost: boolean,
-  showPinUI: boolean
+  showPinUI: boolean,
+  channelName?: string
 }
 
 const withPostList = (WrappedComponent: Class<React.Component<*, *>>) => {
@@ -62,10 +64,12 @@ const withPostList = (WrappedComponent: Class<React.Component<*, *>>) => {
       const {
         dispatch,
         loadPosts,
+        channelName,
         location: { search }
       } = this.props
 
       await dispatch(actions.posts.patch(post.id, { stickied: !post.stickied }))
+      dispatch(evictPostsForChannel(channelName))
       await loadPosts(qs.parse(search))
     }
 

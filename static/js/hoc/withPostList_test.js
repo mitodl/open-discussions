@@ -2,17 +2,19 @@
 import React from "react"
 import sinon from "sinon"
 import { assert } from "chai"
+import R from "ramda"
+
+import withPostList from "./withPostList"
 
 import {
   makeChannelPostList,
   makePagination,
   makePost
 } from "../factories/posts"
-
-import withPostList from "./withPostList"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import * as apiActions from "../util/api_actions"
-import R from "ramda"
+import { actions } from "../actions"
+import { EVICT_POSTS_FOR_CHANNEL } from "../actions/posts_for_channel"
 
 class Page extends React.Component<*, *> {
   render() {
@@ -187,7 +189,7 @@ describe("withPostList", () => {
         })
       })
 
-      it("has a prop for pinning the post if showTogglePinPost=false", async () => {
+      it("does not have a prop for pinning the post if showTogglePinPost=false", async () => {
         const { inner } = await render(
           {},
           {
@@ -199,7 +201,7 @@ describe("withPostList", () => {
 
       it("toggles pinning a post", async () => {
         helper.editPostStub.returns(Promise.resolve(makePost()))
-        const { inner } = await render(
+        const { inner, store } = await render(
           {},
           {
             showTogglePinPost: true
@@ -207,7 +209,7 @@ describe("withPostList", () => {
         )
         const post = postList[0]
 
-        inner
+        await inner
           .find("PostList")
           .props()
           .togglePinPost(post)
@@ -215,6 +217,14 @@ describe("withPostList", () => {
         sinon.assert.calledWith(helper.editPostStub, post.id, {
           stickied: !post.stickied
         })
+        assert.deepEqual(
+          [
+            actions.posts.patch.requestType,
+            actions.posts.patch.successType,
+            EVICT_POSTS_FOR_CHANNEL
+          ],
+          store.getActions().map(R.prop("type"))
+        )
       })
     })
   })
