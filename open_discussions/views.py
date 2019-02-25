@@ -19,6 +19,16 @@ from profiles.models import SOCIAL_SITE_NAME_MAP
 
 def index(request, **kwargs):  # pylint: disable=unused-argument
     """Render the react app"""
+    if request.META.get("HTTP_USER_AGENT", "").startswith("facebookexternalhit"):
+        return render(
+            request,
+            "social.html",
+            context={
+                "url": request.build_absolute_uri(),
+                "description_value": "MIT Open Learning's discussion platform",
+            },
+        )
+
     username = None
     user_full_name = None
     user_email = None

@@ -177,3 +177,13 @@ def test_channel_redirect(client, url, redirect):
     response = client.get(url, follow=True)
     last_url, _ = response.redirect_chain[-1]
     assert last_url == redirect
+
+
+def test_facebook_user_agent(client):
+    """Test that a Facebook crawler will be served a special html template"""
+    response = client.get(
+        "/",
+        {},
+        HTTP_USER_AGENT="facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
+    )
+    assert response.templates[0].name == "social.html"
