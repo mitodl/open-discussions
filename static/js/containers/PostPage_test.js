@@ -367,7 +367,7 @@ describe("PostPage", function() {
       const { inner, store } = await render()
       inner.find("ExpandedPostDisplay").prop("showPostDeleteDialog")()
       const actionsList = store.getActions()
-      assert.deepEqual(actionsList[actionsList.length - 1], {
+      assert.deepEqual(R.last(actionsList), {
         type:    SHOW_DIALOG,
         payload: "DELETE_POST_DIALOG"
       })
@@ -749,7 +749,7 @@ describe("PostPage", function() {
         })
 
         const actionsList = store.getActions()
-        assert.deepEqual(actionsList[actionsList.length - 1], {
+        assert.deepEqual(R.last(actionsList), {
           type:    FORM_UPDATE,
           payload: {
             formKey: REPORT_FORM_KEY,
@@ -874,7 +874,7 @@ describe("PostPage", function() {
         })
 
         const actionsList = store.getActions()
-        assert.deepEqual(actionsList[actionsList.length - 1], {
+        assert.deepEqual(R.last(actionsList), {
           type:    FORM_UPDATE,
           payload: {
             formKey: REPORT_FORM_KEY,
