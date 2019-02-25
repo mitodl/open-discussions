@@ -83,6 +83,8 @@ describe("embed utils", () => {
         "http://cdn.embedly.com/widgets/platform.js"
       )
     })
+
+    //
     ;[true, false].forEach(hidesTitle => {
       it(`${
         hidesTitle ? "adds" : "doesn't add"
