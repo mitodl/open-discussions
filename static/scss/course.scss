@@ -207,3 +207,20 @@
     }
   }
 }
+
+.clamp-lines {
+  div {
+    float: left;
+    margin-top: 10px;
+  }
+
+  button {
+    display: inline;
+    background-color: transparent;
+    color: $navy;
+    margin: 0px;
+    padding: 0px;
+    font-size: inherit;
+    font-family: inherit;
+  }
+}

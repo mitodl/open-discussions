@@ -5,7 +5,6 @@ import { connect } from "react-redux"
 import { withRouter } from "react-router"
 import { Drawer, DrawerContent } from "rmwc/Drawer"
 import { Theme } from "rmwc/Theme"
-import ScrollArea from "react-scrollbar"
 
 import { setShowCourseDrawer } from "../actions/ui"
 import { getViewportWidth } from "../lib/util"
@@ -84,15 +83,13 @@ export class CourseDrawer extends React.Component<Props> {
             dir="rtl"
             className="align-right"
           >
-            <ScrollArea horizontal={false}>
-              <DrawerContent dir="ltr" className="alignRight">
-                <div className="drawer-close" onClick={this.onDrawerClose}>
-                  <i className="material-icons clear">clear</i>
-                </div>
-                <ExpandedCourseDisplay course={course} />
-                <div className="footer" />
-              </DrawerContent>
-            </ScrollArea>
+            <DrawerContent dir="ltr" className="alignRight">
+              <div className="drawer-close" onClick={this.onDrawerClose}>
+                <i className="material-icons clear">clear</i>
+              </div>
+              <ExpandedCourseDisplay course={course} />
+              <div className="footer" />
+            </DrawerContent>
           </Drawer>
         </Theme>
       </div>

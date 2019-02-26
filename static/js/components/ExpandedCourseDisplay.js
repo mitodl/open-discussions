@@ -2,7 +2,6 @@
 /* global SETTINGS: false */
 import React from "react"
 import _ from "lodash"
-import Dotdotdot from "react-dotdotdot"
 import moment from "moment"
 import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
@@ -12,6 +11,7 @@ import { embedlyResizeImage } from "../lib/url"
 import { maxPrice } from "../lib/courses"
 import { platforms } from "../lib/constants"
 import { languageName } from "../lib/util"
+import ClampLines from "react-clamp-lines"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 300
 const entities = new AllHtmlEntities()
@@ -20,26 +20,9 @@ type Props = {
   course: Course
 }
 
-type State = {
-  showMore: boolean
-}
-
-export default class ExpandedCourseDisplay extends React.Component<Props, State> {
-
-  constructor() {
-    super()
-    this.state = {
-      showMore: false
-    }
-  }
-
-  toggleDescription = () => {
-    this.setState({showMore: !this.state.showMore})
-  }
-
+export default class ExpandedCourseDisplay extends React.Component<Props> {
   render() {
     const { course } = this.props
-    const { showMore } = this.state
 
     return (
       <div className="expanded-course-summary">
@@ -83,19 +66,13 @@ export default class ExpandedCourseDisplay extends React.Component<Props, State>
           ) : null}
           <div className="course-title">{course.title}</div>
           <div className="course-description">
-            {
-              showMore ? (
-                <div>
-                {entities.decode(striptags(course.short_description))}
-                </div>
-                ) : (
-                  <Dotdotdot clamp={4}>
-                    {entities.decode(striptags(course.short_description))}
-                  </Dotdotdot>
-              )
-            }
-
-            <button onClick={this.toggleDescription}>{showMore ? 'Less' : 'More'} </button>
+            <ClampLines
+              text={entities.decode(striptags(course.short_description))}
+              lines={5}
+              ellipsis="..."
+              moreText="Read more"
+              lessText="Read less"
+            />
           </div>
           <div className="course-subheader row">Topics</div>
           <div className="course-topics">

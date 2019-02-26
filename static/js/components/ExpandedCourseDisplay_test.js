@@ -46,6 +46,12 @@ describe("ExpandedCourseDisplay", () => {
     assert.equal(links.at(0).prop("href"), course.url)
   })
 
+  it("should render course description as a ClampLines tag", () => {
+    const wrapper = render()
+    const clampLines = wrapper.find("ClampLines")
+    assert.equal(clampLines.props().text, course.short_description)
+  })
+
   it("should not render course links if url is null", () => {
     course.url = null
     const wrapper = render()
