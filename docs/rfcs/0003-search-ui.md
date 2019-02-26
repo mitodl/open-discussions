@@ -1,7 +1,14 @@
 ## Search UI framework
 
 #### Abstract
-Previously, a decision was made to develop a custom elasticsearch UI rather than use searchkit (reasons?).
+Previously, a decision was made to develop a custom elasticsearch UI rather than use searchkit.
+
+From the MIT Open Search Technical Detail doc:
+>We considered using a react component library that constructed queries in the front end, but discarded this approach 
+as not flexible enough for our styling and security needs...and also decided against searchkit due to previous 
+negative experiences using it in MicroMasters.
+
+
 That decision is being revisited due to the increased complexity of the course search UI, which includes facets.
 
 
