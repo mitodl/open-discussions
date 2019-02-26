@@ -9519,6 +9519,13 @@ react-autowhatever@^10.1.2:
     react-themeable "^1.1.0"
     section-iterator "^2.0.0"
 
+react-clamp-lines@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-clamp-lines/-/react-clamp-lines-2.2.0.tgz#c14b7f6d8b6f31e5fd7182a3f1b2e9daae1e998a"
+  integrity sha512-yvgnU0Y6H9i3jomlyx8ZE0GeKxAWJnx/bNnagVP1MW45wI+dgx9I+VtDmAetbGsCj91kaO/esCW4RpjuCCdxEA==
+  dependencies:
+    prop-types "^15.6.2"
+
 react-color@^2.14.1:
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/react-color/-/react-color-2.17.0.tgz#e14b8a11f4e89163f65a34c8b43faf93f7f02aaa"

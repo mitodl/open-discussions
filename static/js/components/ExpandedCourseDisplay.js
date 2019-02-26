@@ -20,9 +20,26 @@ type Props = {
   course: Course
 }
 
-export default class ExpandedCourseDisplay extends React.Component<Props> {
+type State = {
+  showMore: boolean
+}
+
+export default class ExpandedCourseDisplay extends React.Component<Props, State> {
+
+  constructor() {
+    super()
+    this.state = {
+      showMore: false
+    }
+  }
+
+  toggleDescription = () => {
+    this.setState({showMore: !this.state.showMore})
+  }
+
   render() {
     const { course } = this.props
+    const { showMore } = this.state
 
     return (
       <div className="expanded-course-summary">
@@ -66,9 +83,19 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
           ) : null}
           <div className="course-title">{course.title}</div>
           <div className="course-description">
-            <Dotdotdot clamp={4}>
-              {entities.decode(striptags(course.short_description))}
-            </Dotdotdot>
+            {
+              showMore ? (
+                <div>
+                {entities.decode(striptags(course.short_description))}
+                </div>
+                ) : (
+                  <Dotdotdot clamp={4}>
+                    {entities.decode(striptags(course.short_description))}
+                  </Dotdotdot>
+              )
+            }
+
+            <button onClick={this.toggleDescription}>{showMore ? 'Less' : 'More'} </button>
           </div>
           <div className="course-subheader row">Topics</div>
           <div className="course-topics">
