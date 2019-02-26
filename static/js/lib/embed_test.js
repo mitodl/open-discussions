@@ -6,6 +6,7 @@ import {
   handleTwitterWidgets,
   hasIframe,
   loadEmbedlyPlatform,
+  onCardRendered,
   renderEmbedlyCard
 } from "./embed"
 
@@ -82,6 +83,9 @@ describe("embed utils", () => {
         firstScript.getAttribute("src"),
         "http://cdn.embedly.com/widgets/platform.js"
       )
+
+      const callback = embedlyStub.firstCall.args[2]
+      assert.equal(callback, onCardRendered)
     })
 
     //
@@ -89,8 +93,6 @@ describe("embed utils", () => {
       it(`${
         hidesTitle ? "adds" : "doesn't add"
       } a style element to hide the title`, () => {
-        loadEmbedlyPlatform()
-
         const container = document.createElement("div")
         document.body.append(container)
         if (hidesTitle) {
@@ -99,8 +101,7 @@ describe("embed utils", () => {
         const iframe = document.createElement("iframe")
         container.appendChild(iframe)
 
-        const callback = embedlyStub.firstCall.args[2]
-        callback(iframe)
+        onCardRendered(iframe)
         if (hidesTitle) {
           assert.equal(
             iframe.contentDocument.querySelector("style").innerText,
