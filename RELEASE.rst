@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.68.1
+--------------
+
+- get rid of the docker setup for JavaScript tests on travis
+- Hide embedly title for embedly widgets (#1878)
+- Add livestream widget to the homepage
+- tweak post pinning so that the UI fully reflects the newly pinned post
+- Fix comment dialog dialog bug and refactor PostPage_test (#1875)
+- Added opengraph metadata tags for social sharing
+
 Version 0.68.0 (Released February 25, 2019)
 --------------
 
