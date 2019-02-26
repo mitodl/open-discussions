@@ -6,7 +6,8 @@ import { loadEmbedlyPlatform, renderEmbedlyCard } from "../lib/embed"
 import { isValidUrl } from "../lib/util"
 
 type Props = {
-  url: string
+  url: string,
+  className?: string
 }
 export default class EmbedlyCard extends React.Component<Props> {
   componentDidMount() {
@@ -14,12 +15,17 @@ export default class EmbedlyCard extends React.Component<Props> {
   }
 
   render() {
-    const { url } = this.props
+    const { className, url } = this.props
 
     if (!isValidUrl(url)) {
       return null
     }
 
-    return <div dangerouslySetInnerHTML={{ __html: renderEmbedlyCard(url) }} />
+    return (
+      <div
+        className={className}
+        dangerouslySetInnerHTML={{ __html: renderEmbedlyCard(url) }}
+      />
+    )
   }
 }
