@@ -42,8 +42,8 @@ _https://opensource.appbase.io/reactivesearch/v2_
   - Potential issues with our schema? Using simplest possible search component (`DataSearch`), and connecting directly to Elasticsearch, no results are returned:
   ```
       <ReactiveBase
-        app="search"
-        url="http://localhost:9101/discussions_local_all_default"
+        app="discussions_local_all_default"
+        url="http://localhost:9101"
       >
         <DataSearch
           componentId="searchbox"
