@@ -4,10 +4,11 @@ import { assert } from "chai"
 import { shallow } from "enzyme"
 import sinon from "sinon"
 
-import { setShowCourseDrawer } from "../actions/ui"
-import { makeCourse } from "../factories/courses"
 import { CourseDrawer, mapStateToProps } from "./CourseDrawer"
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
+
+import { setShowCourseDrawer } from "../actions/ui"
+import { makeCourse } from "../factories/courses"
 import { shouldIf } from "../lib/test_utils"
 
 describe("CourseDrawer", () => {

@@ -103,7 +103,7 @@ describe("CourseSearchPage", () => {
     })
   })
   ;["", "a"].forEach(query => {
-    it(`doesn't run a search if initial search text is '${query}'`, async () => {
+    it(`still runs a search if initial search text is '${query}'`, async () => {
       await renderPage(
         {},
         {
@@ -112,7 +112,7 @@ describe("CourseSearchPage", () => {
           }
         }
       )
-      sinon.assert.notCalled(helper.searchStub)
+      sinon.assert.calledOnce(helper.searchStub)
     })
   })
 

@@ -5,13 +5,14 @@ import _ from "lodash"
 import moment from "moment"
 import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
+import ClampLines from "react-clamp-lines"
 
 import type { Course } from "../flow/discussionTypes"
-import { embedlyResizeImage } from "../lib/url"
-import { maxPrice } from "../lib/courses"
+
 import { platforms } from "../lib/constants"
+import { maxPrice } from "../lib/courses"
+import { embedlyResizeImage } from "../lib/url"
 import { languageName } from "../lib/util"
-import ClampLines from "react-clamp-lines"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 300
 const entities = new AllHtmlEntities()

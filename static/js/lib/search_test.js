@@ -449,7 +449,7 @@ describe("search functions", () => {
       [
         "course",
         [
-          "course_title.english",
+          "title.english",
           "short_description.english",
           "full_description.english",
           "year",

@@ -4,8 +4,9 @@ import { assert } from "chai"
 import { shallow } from "enzyme"
 import moment from "moment"
 
-import { makeCourse } from "../factories/courses"
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
+
+import { makeCourse } from "../factories/courses"
 
 describe("ExpandedCourseDisplay", () => {
   let course

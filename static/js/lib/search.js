@@ -120,7 +120,7 @@ const PROFILE_QUERY_FIELDS = [
   "author_name"
 ]
 const COURSE_QUERY_FIELDS = [
-  "course_title.english",
+  "title.english",
   "short_description.english",
   "full_description.english",
   "year",

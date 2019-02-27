@@ -6,13 +6,13 @@ import { withRouter } from "react-router"
 import { Drawer, DrawerContent } from "rmwc/Drawer"
 import { Theme } from "rmwc/Theme"
 
-import { setShowCourseDrawer } from "../actions/ui"
-import { getViewportWidth } from "../lib/util"
-
 import type { Dispatch } from "redux"
 import type { Course } from "../flow/discussionTypes"
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
+
 import { actions } from "../actions"
+import { setShowCourseDrawer } from "../actions/ui"
+import { getViewportWidth } from "../lib/util"
 
 type Props = {
   showCourseDrawer: boolean,

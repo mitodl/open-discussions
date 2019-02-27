@@ -23,13 +23,11 @@ import {
 } from "../components/Loading"
 import SearchTextbox from "../components/SearchTextbox"
 import SearchResult from "../components/SearchResult"
-
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import { COURSE_AVAILABILITIES } from "../lib/constants"
 import { SEARCH_FILTER_COURSE } from "../lib/picker"
 import { preventDefaultAndInvoke, toArray } from "../lib/util"
-import { validateSearchQuery } from "../lib/validation"
 
 import type {
   SearchInputs,
@@ -78,15 +76,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { text } = this.state
     const { clearSearch, loaded, facetChoiceProcessing } = this.props
     clearSearch()
     if (!loaded && !facetChoiceProcessing) {
       this.loadFacetChoices()
     }
-    if (text) {
-      this.runSearch()
-    }
+    this.runSearch()
   }
 
   loadFacetChoices = async () => {
@@ -121,13 +116,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const availabilities =
       params.availabilities || this.state.availabilities || undefined
 
-    const error = validateSearchQuery(text)
-    if (error) {
-      clearSearch()
-      this.setState({ error })
-      return
-    }
-
     const type = SEARCH_FILTER_COURSE
     history.replace({
       pathname: pathname,
@@ -145,7 +133,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       clearSearch()
       from = 0
     }
-    this.setState({ from, error })
+    this.setState({ from })
     await runSearch({
       channelName:    null,
       text,
@@ -159,7 +147,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   onUpdateFacets = async (e: Object) => {
-    const { text } = this.state
     if (e.target.checked) {
       await this.setState({
         [e.target.name]: _.union(this.state[e.target.name], [e.target.value])
@@ -169,9 +156,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
         [e.target.name]: _.without(this.state[e.target.name], e.target.value)
       })
     }
-    if (text) {
-      this.runSearch()
-    }
+    this.runSearch()
   }
 
   updateText = (event: ?Event) => {
@@ -206,6 +191,30 @@ export class CourseSearchPage extends React.Component<Props, State> {
     )
   }
 
+  renderFacets(
+    choices: Array<string>,
+    name: string,
+    prop: Array<string>,
+    func: ?Function
+  ) {
+    return (
+      <React.Fragment>
+        {_.sortBy(choices).map((choice, i) => (
+          <div key={i}>
+            <Checkbox
+              name={name}
+              value={choice}
+              checked={R.contains(choice, prop || [])}
+              onChange={this.onUpdateFacets}
+            >
+              {func ? func(choice) : choice}
+            </Checkbox>
+          </div>
+        ))}
+      </React.Fragment>
+    )
+  }
+
   render() {
     const { match, facetChoices } = this.props
     const { text, error, topics, platforms, availabilities } = this.state
@@ -231,49 +240,26 @@ export class CourseSearchPage extends React.Component<Props, State> {
             <Card>
               <div className="course-facets">
                 <div className="facet-title">Subject area</div>
-                {_.sortBy(facetChoices.topics).map((topic, i) => (
-                  <div key={i}>
-                    <Checkbox
-                      name="topics"
-                      value={topic}
-                      checked={R.contains(topic, topics || [])}
-                      onChange={this.onUpdateFacets}
-                    >
-                      {topic}
-                    </Checkbox>
-                  </div>
-                ))}
+                {this.renderFacets(facetChoices.topics, "topics", topics, null)}
               </div>
 
               <div className="course-facets">
                 <div className="facet-title divider">Availability</div>
-                {COURSE_AVAILABILITIES.map((availability, i) => (
-                  <div key={i}>
-                    <Checkbox
-                      name="availabilities"
-                      value={availability}
-                      checked={R.contains(availability, availabilities || [])}
-                      onChange={this.onUpdateFacets}
-                    >
-                      {_.capitalize(availability)}
-                    </Checkbox>
-                  </div>
-                ))}
+                {this.renderFacets(
+                  COURSE_AVAILABILITIES,
+                  "availabilities",
+                  availabilities,
+                  _.capitalize
+                )}
               </div>
               <div className="course-facets">
                 <div className="facet-title divider">Platforms</div>
-                {_.sortBy(facetChoices.platforms).map((platform, i) => (
-                  <div key={i}>
-                    <Checkbox
-                      name="platforms"
-                      value={platform}
-                      checked={R.contains(platform, platforms || [])}
-                      onChange={this.onUpdateFacets}
-                    >
-                      {_.upperCase(platform)}
-                    </Checkbox>
-                  </div>
-                ))}
+                {this.renderFacets(
+                  facetChoices.platforms,
+                  "platforms",
+                  platforms,
+                  _.upperCase
+                )}
               </div>
             </Card>
           </Cell>
