@@ -19,6 +19,8 @@ The following enhancements are desired for the course search UI:
 - Display search result counts next to each facet option
 - Update the list of facets to only show those included in search results
 - Display only the first ~10 topic facets, with a 'More' button to show the entire list
+- Display a list of the currently applied filters, with an option to clear them all, like this:
+  <img src="https://user-images.githubusercontent.com/430126/53447610-7b452800-39e3-11e9-804b-8b837a76d1ff.png" />
 
 It should be possible to add these enhancements to the current custom UI, probably in less time than
 it would take to replace all the search UI code that's been written to date with Searchkit or ReactiveSearch.
