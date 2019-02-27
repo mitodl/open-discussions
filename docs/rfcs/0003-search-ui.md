@@ -29,7 +29,9 @@ _http://www.searchkit.co/_
   - Demos indicate it includes the desired search enhancements.
 - Cons: 
   - It was initially rejected due to problems experienced in Micromasters.
-  - 
+  - Difficult to test
+  - Difficult to customize non-standard queries
+  - Slow to upgrade dependencies
 
 ##### ReactiveSearch 
 _https://opensource.appbase.io/reactivesearch/v2_
@@ -59,6 +61,6 @@ _https://opensource.appbase.io/reactivesearch/v2_
   - Needs to be modified to include the enhancements mentioned above
 
 #### Security Considerations
-- Would be best to avoid connecting directly to Elasticsearch URL's
+- Regardless of the UI framework, direct ES connections from the front-end should be avoided and certain restrictions on the query should be imposed on the backend before submitting to ES.
 
 #### Testing & Rollout
