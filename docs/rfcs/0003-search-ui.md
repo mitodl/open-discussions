@@ -26,14 +26,31 @@ it would take to replace all the search UI code that's been written to date with
 ##### Searchkit
 _http://www.searchkit.co/_
 - Pros:
+  - Demos indicate it includes the desired search enhancements.
 - Cons: 
-
+  - It was initially rejected due to problems experienced in Micromasters.
+  - 
 
 ##### ReactiveSearch 
 _https://opensource.appbase.io/reactivesearch/v2_
 - Pros:
+  - Demos indicate it includes the desired search enhancements.
+  - Seems to be gaining [popularity over Searchkit](https://www.npmtrends.com/@appbaseio/reactivesearch-vs-searchkit)
 - Cons:
-
+  - Designed to connect directly to an Elasticsearch URL.  Using a proxy is possible but it does not seem to play nice 
+  with Django Rest Framework; sends data as `application/x-ndjson` instead of `application/json` resulting in `UnsupportedMediaType` error. 
+  - Potential issues with our schema? Using simplest possible search component (`DataSearch`), and connecting directly to Elasticsearch, no results are returned:
+  ```
+      <ReactiveBase
+        app="search"
+        url="http://localhost:9101/discussions_local_all_default"
+      >
+        <DataSearch
+          componentId="searchbox"
+          dataField={["course_title.english,course_title,short_description.english,short_description"]}
+        />
+      </ReactiveBase>  
+  ```
 
 ##### Custom UI
 - Pros:
@@ -42,6 +59,6 @@ _https://opensource.appbase.io/reactivesearch/v2_
   - Needs to be modified to include the enhancements mentioned above
 
 #### Security Considerations
-
+- Would be best to avoid connecting directly to Elasticsearch URL's
 
 #### Testing & Rollout
