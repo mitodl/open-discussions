@@ -9,7 +9,7 @@ as not flexible enough for our styling and security needs...and also decided aga
 negative experiences using it in MicroMasters.
 
 
-That decision is being revisited due to the increased complexity of the course search UI, which includes facets.
+That decision was revisited due to the increased complexity of the course search UI, which includes facets.  Overall, it seems as though continuing with a custom implementation is still the best approach.  It offers maximum flexibility and customization which outweighs the cost of developing additional UI features that are already included with other frameworks.
 
 
 #### Architecture Changes
@@ -38,29 +38,22 @@ _https://opensource.appbase.io/reactivesearch/v2_
 - Pros:
   - Demos indicate it includes the desired search enhancements.
   - Seems to be gaining [popularity over Searchkit](https://www.npmtrends.com/@appbaseio/reactivesearch-vs-searchkit)
+  - Possible in theory to customize queries via the `customQuery` property of components.
 - Cons:
-  - Designed to connect directly to an Elasticsearch URL.  Using a proxy is possible but it does not seem to play nice 
-  with Django Rest Framework; sends data as `application/x-ndjson` instead of `application/json` resulting in `UnsupportedMediaType` error. 
-  - Potential issues with our current schema? Using simplest possible search component (`DataSearch`), and connecting directly to Elasticsearch, no results are found when searching for title text.  However results are returned searching for platform("ocw" or "mitx").
-  ```
-      <ReactiveBase
-        app="discussions_local_all_default"
-        url="http://localhost:9101"
-      >
-        <DataSearch
-          componentId="searchbox2"
-          dataField={["course_title.english", "course_title", "platform"]}
-        />
-      </ReactiveBase>
-  ```
+  - Although designed to connect directly to an Elasticsearch URL, using a proxy view is possible. However, it does not seem 
+  to play nice with Django Rest Framework; sends data as `application/x-ndjson` instead of `application/json` resulting 
+  in an `UnsupportedMediaType` error. 
+  - Difficult to take individual components and integrate them to our workflow, since every component needs to be wrapped by `<ReactiveBase />`
 
 ##### Custom UI
 - Pros:
-  - UI is already implemented for post/comment/profile/course search, with working facets for course search
+  - Already implemented, with working facets for course search
+  - More flexibility in defining queries via `bodybuilder`
 - Cons:
-  - Needs to be modified to include the enhancements mentioned above
+  - Needs to be modified to include the facet enhancements mentioned above, and perhaps more in the future.
 
 #### Security Considerations
-- Regardless of the UI framework, direct ES connections from the front-end should be avoided and certain restrictions on the query should be imposed on the backend before submitting to ES.
+Regardless of the UI framework, direct ES connections from the front-end should be avoided and certain restrictions on the queries should be imposed on the backend before submitting to ES.
 
 #### Testing & Rollout
+The current custom search UI will be enhanced with additional features and tested via the usual PR/release process.
