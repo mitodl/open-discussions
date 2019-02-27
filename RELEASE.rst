@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.68.1
+Version 0.68.1 (Released February 27, 2019)
 --------------
 
 - get rid of the docker setup for JavaScript tests on travis
