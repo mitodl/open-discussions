@@ -39,17 +39,17 @@ _https://opensource.appbase.io/reactivesearch/v2_
 - Cons:
   - Designed to connect directly to an Elasticsearch URL.  Using a proxy is possible but it does not seem to play nice 
   with Django Rest Framework; sends data as `application/x-ndjson` instead of `application/json` resulting in `UnsupportedMediaType` error. 
-  - Potential issues with our schema? Using simplest possible search component (`DataSearch`), and connecting directly to Elasticsearch, no results are returned:
+  - Potential issues with our current schema? Using simplest possible search component (`DataSearch`), and connecting directly to Elasticsearch, no results are found when searching for title text.  However results are returned searching for platform("ocw" or "mitx").
   ```
       <ReactiveBase
         app="discussions_local_all_default"
         url="http://localhost:9101"
       >
         <DataSearch
-          componentId="searchbox"
-          dataField={["course_title.english,course_title,short_description.english,short_description"]}
+          componentId="searchbox2"
+          dataField={["course_title.english", "course_title", "platform"]}
         />
-      </ReactiveBase>  
+      </ReactiveBase>
   ```
 
 ##### Custom UI
