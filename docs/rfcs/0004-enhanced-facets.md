@@ -25,17 +25,17 @@ active and so that they can be removed.
 #### Architecture Changes
 
 Currently, a separate aggregation request is made once to Elasticsearch to get the list of all unique subject and 
-platform facet values, and stored in state.  This includes counts, which are not displayed.  The aggregation query can 
-be appended to the standard search query so that both are returned in the same response, with facet counts based on the 
+platform facet values, and stored in state.  This includes counts, which are not displayed.  The aggregation query
+can be appended to the standard search query so that both are returned in the same response, with facet counts based on the 
 search results returned.  The subject facets are sorted alphabetically, this will be changed to sort by hits, which 
 will be displayed next to the facet name.  
 
 In order to get availability counts (prior, upcoming, current), an availability field needs to be added to the Course 
 model and populated from each Course object's raw JSON.  The search query will also need to be modified to use this field instead of a date range based on the start_date and end_date fields. 
 
-All the search parameters are stored in state, and can be used to dynamically create/update a list of search filters
-above the search results, and just below the search text box.  Each displayed filter will have an x button to remove
-the filter (by triggering a function to remove it from state).
+All the search parameters are stored in the CourseSearchPage container's state, and can be used to dynamically create/update
+a list of search filters above the search results, and just below the search text box.  Each displayed filter will have an 
+x button to remove the filter (by triggering a function to remove it from state).
 
 Some functionality has already been implemented: when the checkbox next to a facet is checked, it is added to the 
 search filters via a state change.
