@@ -31,7 +31,7 @@ search results returned.  The subject facets are sorted alphabetically, this wil
 will be displayed next to the facet name.  
 
 In order to get availability counts (prior, upcoming, current), an availability field needs to be added to the Course 
-model and populated from each Course object's raw JSON.  The search query will also need to be modified to use this field instead of a date range based on the start_date and end_date fields. 
+model, populated from each Course object's raw JSON, and added to the search index.  The aggregate ES query will need to include this field, and the search query will also need to be modified to use it instead of a date range based on the start_date and end_date fields. 
 
 All the search parameters are stored in the CourseSearchPage container's state, and can be used to dynamically create/update
 a list of search filters above the search results, and just below the search text box.  Each displayed filter will have an 
@@ -44,5 +44,5 @@ search filters via a state change.
 None
 
 #### Testing & Rollout
-The current custom search facets will be enhanced with the additional features and tested via the usual PR/release 
+The current search facets will be enhanced with the additional features and tested via the usual PR/release 
 process.
