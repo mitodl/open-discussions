@@ -4,7 +4,8 @@ import _ from "lodash"
 
 import { makeCourse } from "../factories/courses"
 import {
-  COURSE_AVAILABLE_NOW, COURSE_CURRENT,
+  COURSE_AVAILABLE_NOW,
+  COURSE_CURRENT,
   COURSE_PRIOR,
   COURSE_UPCOMING
 } from "./constants"

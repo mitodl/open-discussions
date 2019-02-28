@@ -36,7 +36,14 @@ describe("CompactCourseDisplay", () => {
     const wrapper = renderCourseDisplay({ course })
     assert.equal(wrapper.find(".course-title").text(), course.title)
     // $FlowFixMe: course.topics is not null here
-    assert.equal(wrapper.find(".topics-row").find(".flexless").at(0).text(), course.topics[0].name)
+    assert.equal(
+      wrapper
+        .find(".topics-row")
+        .find(".flexless")
+        .at(0)
+        .text(),
+      course.topics[0].name
+    )
     assert.equal(
       wrapper.find(".course-platform").text(),
       course.platform.toUpperCase()
