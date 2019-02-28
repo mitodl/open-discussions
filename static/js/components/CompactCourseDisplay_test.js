@@ -12,18 +12,19 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import * as uiActions from "../actions/ui"
 
 describe("CompactCourseDisplay", () => {
-  let helper
+  let helper, toggleFacetStub
 
   const renderCourseDisplay = props => {
     return mount(
       <Router store={helper.store} history={helper.browserHistory}>
-        <CompactCourseDisplay {...props} />
+        <CompactCourseDisplay toggleFacet={toggleFacetStub} {...props} />
       </Router>
     )
   }
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
+    toggleFacetStub = helper.sandbox.stub()
   })
 
   afterEach(() => {
@@ -35,7 +36,7 @@ describe("CompactCourseDisplay", () => {
     const wrapper = renderCourseDisplay({ course })
     assert.equal(wrapper.find(".course-title").text(), course.title)
     // $FlowFixMe: course.topics is not null here
-    assert.equal(wrapper.find(".course-topics").text(), course.topics[0].name)
+    assert.equal(wrapper.find(".topics-row").find(".flexless").at(0).text(), course.topics[0].name)
     assert.equal(
       wrapper.find(".course-platform").text(),
       course.platform.toUpperCase()
@@ -43,7 +44,7 @@ describe("CompactCourseDisplay", () => {
     assert.equal(wrapper.find(".course-price").text(), maxPrice(course))
     assert.equal(
       wrapper.find(".course-availability").text(),
-      courseAvailability(course)
+      courseAvailability(course, false)
     )
     assert.ok(
       wrapper

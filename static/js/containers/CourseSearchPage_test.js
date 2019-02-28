@@ -277,7 +277,7 @@ describe("CourseSearchPage", () => {
       .find("Checkbox")
       .at(0)
       .props()
-      .onChange({
+      .onClick({
         target: {
           value:   "Engineering",
           name:    "topics",

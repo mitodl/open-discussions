@@ -84,11 +84,12 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 }
 
 type CourseProps = {
-  result: CourseResult
+  result: CourseResult,
+  toggleFacet: ?Function
 }
-const CourseSearchResult = ({ result }: CourseProps) => {
+const CourseSearchResult = ({ result, toggleFacet }: CourseProps) => {
   const course = searchResultToCourse(result)
-  return <CompactCourseDisplay course={course} />
+  return <CompactCourseDisplay course={course} toggleFacet={toggleFacet} />
 }
 
 type Props = {
@@ -97,7 +98,8 @@ type Props = {
   result: Result,
   toggleUpvote?: Post => void,
   upvotedPost?: ?Post,
-  votedComment?: ?CommentInTree
+  votedComment?: ?CommentInTree,
+  toggleFacet?: Function
 }
 export default class SearchResult extends React.Component<Props> {
   render() {
@@ -107,7 +109,8 @@ export default class SearchResult extends React.Component<Props> {
       upvotedPost,
       votedComment,
       commentUpvote,
-      commentDownvote
+      commentDownvote,
+      toggleFacet
     } = this.props
     if (result.object_type === "post") {
       const post = upvotedPost || searchResultToPost(result)
@@ -134,7 +137,7 @@ export default class SearchResult extends React.Component<Props> {
     } else if (result.object_type === "profile") {
       return <ProfileSearchResult result={result} />
     } else if (result.object_type === "course") {
-      return <CourseSearchResult result={result} />
+      return <CourseSearchResult result={result} toggleFacet={toggleFacet} />
     }
   }
 }

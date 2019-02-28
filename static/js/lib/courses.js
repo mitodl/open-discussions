@@ -8,17 +8,26 @@ import {
   platforms,
   COURSE_AVAILABLE_NOW,
   COURSE_PRIOR,
-  COURSE_UPCOMING
+  COURSE_UPCOMING,
+  COURSE_CURRENT
 } from "./constants"
 
-export const courseAvailability = (course: Course) =>
+export const courseAvailability = (course: Course, isFacet: boolean) =>
   course.platform === platforms.OCW
-    ? COURSE_AVAILABLE_NOW
+    ? isFacet
+      ? COURSE_CURRENT
+      : COURSE_AVAILABLE_NOW
     : moment(course.start_date).isAfter(moment())
-      ? _.capitalize(COURSE_UPCOMING)
+      ? isFacet
+        ? COURSE_UPCOMING
+        : _.capitalize(COURSE_UPCOMING)
       : moment(course.end_date).isBefore(moment())
-        ? _.capitalize(COURSE_PRIOR)
-        : COURSE_AVAILABLE_NOW
+        ? isFacet
+          ? COURSE_PRIOR
+          : _.capitalize(COURSE_PRIOR)
+        : isFacet
+          ? COURSE_CURRENT
+          : COURSE_AVAILABLE_NOW
 
 export const maxPrice = (course: Course) => {
   const price = Math.max(...R.map(R.view(R.lensProp("price")), course.prices))

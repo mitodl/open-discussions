@@ -4,7 +4,7 @@ import _ from "lodash"
 
 import { makeCourse } from "../factories/courses"
 import {
-  COURSE_AVAILABLE_NOW,
+  COURSE_AVAILABLE_NOW, COURSE_CURRENT,
   COURSE_PRIOR,
   COURSE_UPCOMING
 } from "./constants"
@@ -12,17 +12,21 @@ import { courseAvailability, maxPrice } from "./courses"
 
 describe("Course utils", () => {
   [
-    ["2000-01-01", "2000-02-02", "mitx", _.capitalize(COURSE_PRIOR)],
-    ["2000-01-01", "2500-02-02", "mitx", COURSE_AVAILABLE_NOW],
-    ["2400-01-01", "2500-02-02", "mitx", _.capitalize(COURSE_UPCOMING)],
-    ["2000-01-01", "2000-02-02", "ocw", COURSE_AVAILABLE_NOW]
-  ].forEach(([startDate, endDate, platform, expected]) => {
+    ["2000-01-01", "2000-02-02", "mitx", _.capitalize(COURSE_PRIOR), false],
+    ["2000-01-01", "2000-02-02", "mitx", COURSE_PRIOR, true],
+    ["2000-01-01", "2500-02-02", "mitx", COURSE_AVAILABLE_NOW, false],
+    ["2000-01-01", "2500-02-02", "mitx", COURSE_CURRENT, true],
+    ["2400-01-01", "2500-02-02", "mitx", _.capitalize(COURSE_UPCOMING), false],
+    ["2400-01-01", "2500-02-02", "mitx", COURSE_UPCOMING, true],
+    ["2000-01-01", "2000-02-02", "ocw", COURSE_AVAILABLE_NOW, false],
+    ["2000-01-01", "2000-02-02", "ocw", COURSE_CURRENT, true]
+  ].forEach(([startDate, endDate, platform, expected, isFacet]) => {
     it(`courseAvailability should return ${expected} for ${platform} course running ${startDate} to ${endDate}`, () => {
       const course = makeCourse()
       course.start_date = startDate
       course.end_date = endDate
       course.platform = platform
-      assert.equal(courseAvailability(course), expected)
+      assert.equal(courseAvailability(course, isFacet), expected)
     })
   })
   ;[
