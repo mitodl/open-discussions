@@ -34,7 +34,7 @@ export class CompactCourseDisplay extends React.Component<Props> {
             </div>
             <div className="row">
               <div className="course-topics">
-                {course.topics ? course.topics[0].name : ""}
+                {course.topics[0] ? course.topics[0].name : ""}
               </div>
             </div>
           </div>
