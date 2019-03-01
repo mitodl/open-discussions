@@ -37,7 +37,6 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
                   course.image_src,
                   COURSE_IMAGE_DISPLAY_HEIGHT
                 )}
-                height={COURSE_IMAGE_DISPLAY_HEIGHT}
               />
             </div>
           ) : null}
