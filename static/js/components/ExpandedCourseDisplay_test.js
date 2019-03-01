@@ -67,6 +67,8 @@ describe("ExpandedCourseDisplay", () => {
       course.topics
     )
   })
+
+  //
   ;[["mitx", "As taught in:"], ["ocw", "Semester:"]].forEach(
     ([platform, label]) => {
       it(`should display the correct semester label for ${platform} courses`, () => {
@@ -81,6 +83,8 @@ describe("ExpandedCourseDisplay", () => {
       })
     }
   )
+
+  //
   ;["mitx", "ocw"].forEach(platform => {
     it(`should display the correct start date for ${platform} courses`, () => {
       course.platform = platform
@@ -114,6 +118,8 @@ describe("ExpandedCourseDisplay", () => {
       )
     })
   })
+
+  //
   ;[
     ["en-us", "English"],
     ["fr", "French"],

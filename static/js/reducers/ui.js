@@ -31,8 +31,7 @@ export type BannerState = {
 }
 
 export type CourseDetailState = {
-  courseId: ?number,
-  visible: boolean
+  courseId: ?number
 }
 
 export type UIState = {
@@ -52,8 +51,7 @@ const INITIAL_BANNER_STATE = {
 }
 
 const INITIAL_COURSE_STATE = {
-  courseId: null,
-  visible:  false
+  courseId: null
 }
 
 export const INITIAL_UI_STATE: UIState = {
@@ -125,7 +123,6 @@ export const ui = (
     return {
       ...state,
       courseDetail: {
-        visible:  action.payload.visible,
         courseId: action.payload.courseId
       }
     }

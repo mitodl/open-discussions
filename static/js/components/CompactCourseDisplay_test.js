@@ -53,6 +53,7 @@ describe("CompactCourseDisplay", () => {
         .includes(encodeURIComponent(course.image_src))
     )
   })
+
   //
   ;[true, false].forEach(hasImage => {
     it(`${shouldIf(
@@ -73,8 +74,6 @@ describe("CompactCourseDisplay", () => {
       .returns({ type: "action" })
     const wrapper = renderCourseDisplay({ course: course })
     await wrapper.find(".column1").simulate("click")
-    assert.ok(
-      showCourseDrawerStub.calledWith({ visible: true, courseId: course.id })
-    )
+    assert.ok(showCourseDrawerStub.calledWith({ courseId: course.id }))
   })
 })

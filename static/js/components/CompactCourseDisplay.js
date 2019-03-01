@@ -4,12 +4,12 @@ import React from "react"
 import { connect } from "react-redux"
 
 import Card from "./Card"
+import { setShowCourseDrawer } from "../actions/ui"
 import { courseAvailability, maxPrice } from "../lib/courses"
 import { embedlyThumbnail } from "../lib/url"
 import { EMBEDLY_THUMB_HEIGHT, EMBEDLY_THUMB_WIDTH } from "../lib/posts"
 
 import type { Course } from "../flow/discussionTypes"
-import { setShowCourseDrawer } from "../actions/ui"
 import type { Dispatch } from "redux"
 
 type Props = {
@@ -20,7 +20,7 @@ type Props = {
 export class CompactCourseDisplay extends React.Component<Props> {
   setCourseForDrawer = async () => {
     const { dispatch, course } = this.props
-    dispatch(setShowCourseDrawer({ visible: true, courseId: course.id }))
+    dispatch(setShowCourseDrawer({ courseId: course.id }))
   }
 
   render() {

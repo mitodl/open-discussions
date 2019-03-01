@@ -40,7 +40,7 @@ describe("CourseDrawer", () => {
     await wrapper.instance().onDrawerClose()
     sinon.assert.calledWith(
       dispatchStub,
-      setShowCourseDrawer({ courseId: null, visible: false })
+      setShowCourseDrawer({ courseId: null })
     )
   })
 
@@ -63,6 +63,8 @@ describe("CourseDrawer", () => {
     const wrapper = renderCourseDrawer({ course: null })
     assert.isNotOk(wrapper.find(ExpandedCourseDisplay).exists())
   })
+
+  //
   ;[
     [true, false, false, true],
     [false, false, true, true],
@@ -87,18 +89,25 @@ describe("CourseDrawer", () => {
     })
   })
 
-  it("should grab state props", () => {
-    const state = {
-      courses: {
-        data: new Map([[[course.id], course]])
-      },
-      ui: {
-        courseDetail: { visible: true, courseId: 782 }
-      }
+  //
+  ;[[782, true], [null, false], [undefined, false], ["a7", false]].forEach(
+    ([courseId, showDrawer]) => {
+      it(`should grab state props and ${shouldIf(
+        showDrawer
+      )} show drawer if courseId is ${String(courseId)}`, () => {
+        const state = {
+          courses: {
+            data: new Map([[[course.id], course]])
+          },
+          ui: {
+            courseDetail: { courseId: courseId }
+          }
+        }
+        const props = mapStateToProps(state)
+        assert.equal(props.showCourseDrawer, showDrawer)
+        assert.equal(props.courseId, state.ui.courseDetail.courseId)
+        assert.deepEqual(props.course, state.courses[course.id])
+      })
     }
-    const props = mapStateToProps(state)
-    assert.equal(props.showCourseDrawer, state.ui.courseDetail.visible)
-    assert.equal(props.courseId, state.ui.courseDetail.courseId)
-    assert.deepEqual(props.course, state.courses[course.id])
-  })
+  )
 })

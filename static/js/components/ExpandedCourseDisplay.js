@@ -7,12 +7,12 @@ import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
-import type { Course } from "../flow/discussionTypes"
-
 import { platforms } from "../lib/constants"
 import { maxPrice } from "../lib/courses"
 import { embedlyResizeImage } from "../lib/url"
 import { languageName } from "../lib/util"
+
+import type { Course } from "../flow/discussionTypes"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 300
 const entities = new AllHtmlEntities()

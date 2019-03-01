@@ -1,6 +1,7 @@
 // @flow
 import React from "react"
 import R from "ramda"
+import _ from "lodash"
 import { connect } from "react-redux"
 import { withRouter } from "react-router"
 import { Drawer, DrawerContent } from "rmwc/Drawer"
@@ -67,32 +68,30 @@ export class CourseDrawer extends React.Component<Props> {
 
   onDrawerClose = () => {
     const { dispatch } = this.props
-    dispatch(setShowCourseDrawer({ visible: false, courseId: null }))
+    dispatch(setShowCourseDrawer({ courseId: null }))
   }
 
   render() {
     const { course, showCourseDrawer } = this.props
     return course ? (
-      <div>
-        <Theme>
-          <Drawer
-            persistent={false}
-            temporary={true}
-            open={showCourseDrawer}
-            onClose={this.onDrawerClose}
-            dir="rtl"
-            className="align-right"
-          >
-            <DrawerContent dir="ltr" className="alignRight">
-              <div className="drawer-close" onClick={this.onDrawerClose}>
-                <i className="material-icons clear">clear</i>
-              </div>
-              <ExpandedCourseDisplay course={course} />
-              <div className="footer" />
-            </DrawerContent>
-          </Drawer>
-        </Theme>
-      </div>
+      <Theme>
+        <Drawer
+          persistent={false}
+          temporary={true}
+          open={showCourseDrawer}
+          onClose={this.onDrawerClose}
+          dir="rtl"
+          className="align-right"
+        >
+          <DrawerContent dir="ltr" className="alignRight">
+            <div className="drawer-close" onClick={this.onDrawerClose}>
+              <i className="material-icons clear">clear</i>
+            </div>
+            <ExpandedCourseDisplay course={course} />
+            <div className="footer" />
+          </DrawerContent>
+        </Drawer>
+      </Theme>
     ) : null
   }
 }
@@ -104,7 +103,7 @@ export const mapStateToProps = (state: Object) => {
   const course = courses.data.get(courseId)
 
   return {
-    showCourseDrawer: ui.courseDetail.visible,
+    showCourseDrawer: _.isFinite(ui.courseDetail.courseId),
     courseId,
     course
   }
