@@ -53,16 +53,6 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
                   Take Course on {course.platform.toUpperCase()}
                 </a>
               </div>
-              <div className="course-links-right">
-                Offered by
-                <a
-                  href={course.url || ""}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img src={`/static/images/${course.platform}-logo.png`} />
-                </a>
-              </div>
             </div>
           ) : null}
           <div className="course-title">{course.title}</div>
