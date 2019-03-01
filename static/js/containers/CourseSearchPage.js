@@ -194,22 +194,21 @@ export class CourseSearchPage extends React.Component<Props, State> {
   renderFacets(
     choices: Array<string>,
     name: string,
-    prop: Array<string>,
-    func: ?Function
+    currentlySelected: Array<string>,
+    labelFunction: ?Function
   ) {
     return (
       <React.Fragment>
         {_.sortBy(choices).map((choice, i) => (
-          <div key={i}>
-            <Checkbox
-              name={name}
-              value={choice}
-              checked={R.contains(choice, prop || [])}
-              onChange={this.onUpdateFacets}
-            >
-              {func ? func(choice) : choice}
-            </Checkbox>
-          </div>
+          <Checkbox
+            key={i}
+            name={name}
+            value={choice}
+            checked={R.contains(choice, currentlySelected || [])}
+            onChange={this.onUpdateFacets}
+          >
+            {labelFunction ? labelFunction(choice) : choice}
+          </Checkbox>
         ))}
       </React.Fragment>
     )

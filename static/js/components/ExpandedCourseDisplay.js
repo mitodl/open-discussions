@@ -9,12 +9,13 @@ import ClampLines from "react-clamp-lines"
 
 import { platforms } from "../lib/constants"
 import { maxPrice } from "../lib/courses"
-import { embedlyResizeImage } from "../lib/url"
+import { embedlyThumbnail } from "../lib/url"
 import { languageName } from "../lib/util"
 
 import type { Course } from "../flow/discussionTypes"
 
-const COURSE_IMAGE_DISPLAY_HEIGHT = 300
+const COURSE_IMAGE_DISPLAY_HEIGHT = 239
+const COURSE_IMAGE_DISPLAY_WIDTH = 440
 const entities = new AllHtmlEntities()
 
 type Props = {
@@ -31,11 +32,11 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
           {course.image_src ? (
             <div className="course-image-div">
               <img
-                className="course-image"
-                src={embedlyResizeImage(
+                src={embedlyThumbnail(
                   SETTINGS.embedlyKey,
                   course.image_src,
-                  COURSE_IMAGE_DISPLAY_HEIGHT
+                  COURSE_IMAGE_DISPLAY_HEIGHT,
+                  COURSE_IMAGE_DISPLAY_WIDTH
                 )}
               />
             </div>

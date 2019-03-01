@@ -66,23 +66,23 @@ describe("CourseDrawer", () => {
 
   //
   ;[
-    [true, false, false, true],
-    [false, false, true, true],
-    [false, true, true, true],
-    [true, false, true, false],
-    [true, true, true, false]
-  ].forEach(([sameId, nullId, sameCourse, needsLoad]) => {
+    [10, 10, false, true],
+    [10, 11, true, true],
+    [10, null, true, true],
+    [10, 10, true, false]
+  ].forEach(([prevId, nextId, sameCourse, needsLoad]) => {
     it(`${shouldIf(
       needsLoad
-    )} load data on component update w/ same id ${String(
-      sameId
-    )}, null id ${String(nullId)}, same course ${String(sameCourse)}`, () => {
+    )} load data on component update w/ prev id ${String(
+      prevId
+    )}, next id ${String(nextId)}, same course ${String(sameCourse)}`, () => {
+      course.id = prevId
       const wrapper = renderCourseDrawer()
       const loadDataStub = sandbox.stub(wrapper.instance(), "loadData")
       wrapper.instance().componentDidUpdate({
         dispatch:         wrapper.props().dispatch,
         showCourseDrawer: true,
-        courseId:         sameId ? course.id : nullId ? null : course.id + 1,
+        courseId:         nextId,
         course:           sameCourse ? course : null
       })
       sinon.assert.callCount(loadDataStub, needsLoad ? 1 : 0)

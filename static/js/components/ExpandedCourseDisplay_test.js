@@ -21,13 +21,15 @@ describe("ExpandedCourseDisplay", () => {
     const wrapper = render()
     assert.ok(
       wrapper
-        .find(".course-image")
+        .find(".course-image-div")
+        .find("img")
         .prop("src")
-        .includes("https://i.embed.ly/1/display/resize")
+        .includes("https://i.embed.ly/1/display/crop")
     )
     assert.ok(
       wrapper
-        .find(".course-image")
+        .find(".course-image-div")
+        .find("img")
         .prop("src")
         // $FlowFixMe: this won't be null
         .includes(encodeURIComponent(course.image_src))
@@ -37,7 +39,7 @@ describe("ExpandedCourseDisplay", () => {
   it(`should not render a course image if none exists`, () => {
     course.image_src = null
     const wrapper = render()
-    assert.isNotOk(wrapper.find(".course-image").exists())
+    assert.isNotOk(wrapper.find(".course-image-div").exists())
   })
 
   it("should render course links", () => {

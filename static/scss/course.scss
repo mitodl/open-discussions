@@ -145,8 +145,12 @@
   padding: 0px 20px;
 
   .course-image-div {
-    img.course-image {
-      width: 100%;
+    width: 100%;
+    margin-bottom: 10px;
+
+    img {
+      display: block;
+      margin: auto;
     }
   }
 
