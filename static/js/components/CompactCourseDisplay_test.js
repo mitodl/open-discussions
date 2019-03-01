@@ -81,7 +81,7 @@ describe("CompactCourseDisplay", () => {
       .stub(uiActions, "setShowCourseDrawer")
       .returns({ type: "action" })
     const wrapper = renderCourseDisplay({ course: course })
-    await wrapper.find(".column1").simulate("click")
+    await wrapper.find(".course-title").simulate("click")
     assert.ok(showCourseDrawerStub.calledWith({ courseId: course.id }))
   })
 })

@@ -20,7 +20,6 @@ type Props = {
 }
 
 export class CompactCourseDisplay extends React.Component<Props> {
-
   setCourseForDrawer = async () => {
     const { dispatch, course } = this.props
     dispatch(setShowCourseDrawer({ courseId: course.id }))
@@ -40,7 +39,9 @@ export class CompactCourseDisplay extends React.Component<Props> {
         <div className="column1">
           <div className="preview-body">
             <div className="row title-row">
-              <div className="course-title" onClick={this.setCourseForDrawer}>{course.title}</div>
+              <div className="course-title" onClick={this.setCourseForDrawer}>
+                {course.title}
+              </div>
             </div>
             <div className="row topics-row">
               {_.sortBy(course.topics).map((topic, i) => (
