@@ -35,13 +35,13 @@ describe("CompactCourseDisplay", () => {
     const course = makeCourse()
     const wrapper = renderCourseDisplay({ course })
     assert.equal(wrapper.find(".course-title").text(), course.title)
-    // $FlowFixMe: course.topics is not null here
     assert.equal(
       wrapper
         .find(".topics-row")
         .find(".flexless")
         .at(0)
         .text(),
+      // $FlowFixMe: course.topics is not null here
       course.topics[0].name
     )
     assert.equal(
@@ -51,7 +51,7 @@ describe("CompactCourseDisplay", () => {
     assert.equal(wrapper.find(".course-price").text(), maxPrice(course))
     assert.equal(
       wrapper.find(".course-availability").text(),
-      courseAvailability(course, false)
+      courseAvailability(course)
     )
     assert.ok(
       wrapper
