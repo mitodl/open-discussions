@@ -11,6 +11,7 @@ import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import Checkbox from "rmwc/Checkbox/index"
 
+import CourseDrawer from "./CourseDrawer"
 import CanonicalLink from "../components/CanonicalLink"
 import Card from "../components/Card"
 import { Cell, Grid } from "../components/Grid"
@@ -22,13 +23,11 @@ import {
 } from "../components/Loading"
 import SearchTextbox from "../components/SearchTextbox"
 import SearchResult from "../components/SearchResult"
-
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import { COURSE_AVAILABILITIES } from "../lib/constants"
 import { SEARCH_FILTER_COURSE } from "../lib/picker"
 import { preventDefaultAndInvoke, toArray } from "../lib/util"
-import { validateSearchQuery } from "../lib/validation"
 
 import type {
   SearchInputs,
@@ -77,15 +76,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { text } = this.state
     const { clearSearch, loaded, facetChoiceProcessing } = this.props
     clearSearch()
     if (!loaded && !facetChoiceProcessing) {
       this.loadFacetChoices()
     }
-    if (text) {
-      this.runSearch()
-    }
+    this.runSearch()
   }
 
   loadFacetChoices = async () => {
@@ -120,13 +116,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const availabilities =
       params.availabilities || this.state.availabilities || undefined
 
-    const error = validateSearchQuery(text)
-    if (error) {
-      clearSearch()
-      this.setState({ error })
-      return
-    }
-
     const type = SEARCH_FILTER_COURSE
     history.replace({
       pathname: pathname,
@@ -144,7 +133,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       clearSearch()
       from = 0
     }
-    this.setState({ from, error })
+    this.setState({ from })
     await runSearch({
       channelName:    null,
       text,
@@ -158,7 +147,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   onUpdateFacets = async (e: Object) => {
-    const { text } = this.state
     if (e.target.checked) {
       await this.setState({
         [e.target.name]: _.union(this.state[e.target.name], [e.target.value])
@@ -168,9 +156,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
         [e.target.name]: _.without(this.state[e.target.name], e.target.value)
       })
     }
-    if (text) {
-      this.runSearch()
-    }
+    this.runSearch()
   }
 
   updateText = (event: ?Event) => {
@@ -205,78 +191,81 @@ export class CourseSearchPage extends React.Component<Props, State> {
     )
   }
 
+  renderFacets(
+    choices: Array<string>,
+    name: string,
+    currentlySelected: Array<string>,
+    labelFunction: ?Function
+  ) {
+    return (
+      <React.Fragment>
+        {_.sortBy(choices).map((choice, i) => (
+          <Checkbox
+            key={i}
+            name={name}
+            value={choice}
+            checked={R.contains(choice, currentlySelected || [])}
+            onChange={this.onUpdateFacets}
+          >
+            {labelFunction ? labelFunction(choice) : choice}
+          </Checkbox>
+        ))}
+      </React.Fragment>
+    )
+  }
+
   render() {
     const { match, facetChoices } = this.props
     const { text, error, topics, platforms, availabilities } = this.state
 
     return (
-      <Grid className="main-content two-column search-page">
-        <Cell width={12}>
-          <MetaTags>
-            <CanonicalLink match={match} />
-          </MetaTags>
-          <div className="course-search-input">
-            <SearchTextbox
-              onChange={this.updateText}
-              value={text || ""}
-              onClear={this.updateText}
-              onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
-              validation={error}
-            />
-          </div>
-        </Cell>
-        <Cell width={4}>
-          <Card>
-            <div className="course-facets">
-              <div className="facet-title">Subject area</div>
-              {_.sortBy(facetChoices.topics).map((topic, i) => (
-                <div key={i}>
-                  <Checkbox
-                    name="topics"
-                    value={topic}
-                    checked={R.contains(topic, topics || [])}
-                    onChange={this.onUpdateFacets}
-                  >
-                    {topic}
-                  </Checkbox>
-                </div>
-              ))}
+      <React.Fragment>
+        <Grid className="main-content two-column search-page">
+          <Cell width={12}>
+            <MetaTags>
+              <CanonicalLink match={match} />
+            </MetaTags>
+            <div className="course-search-input">
+              <SearchTextbox
+                onChange={this.updateText}
+                value={text || ""}
+                onClear={this.updateText}
+                onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
+                validation={error}
+              />
             </div>
+          </Cell>
+          <Cell width={4}>
+            <Card>
+              <div className="course-facets">
+                <div className="facet-title">Subject area</div>
+                {this.renderFacets(facetChoices.topics, "topics", topics, null)}
+              </div>
 
-            <div className="course-facets">
-              <div className="facet-title divider">Availability</div>
-              {COURSE_AVAILABILITIES.map((availability, i) => (
-                <div key={i}>
-                  <Checkbox
-                    name="availabilities"
-                    value={availability}
-                    checked={R.contains(availability, availabilities || [])}
-                    onChange={this.onUpdateFacets}
-                  >
-                    {_.capitalize(availability)}
-                  </Checkbox>
-                </div>
-              ))}
-            </div>
-            <div className="course-facets">
-              <div className="facet-title divider">Platforms</div>
-              {_.sortBy(facetChoices.platforms).map((platform, i) => (
-                <div key={i}>
-                  <Checkbox
-                    name="platforms"
-                    value={platform}
-                    checked={R.contains(platform, platforms || [])}
-                    onChange={this.onUpdateFacets}
-                  >
-                    {_.upperCase(platform)}
-                  </Checkbox>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </Cell>
-        <Cell width={8}>{error ? null : this.renderResults()}</Cell>
-      </Grid>
+              <div className="course-facets">
+                <div className="facet-title divider">Availability</div>
+                {this.renderFacets(
+                  COURSE_AVAILABILITIES,
+                  "availabilities",
+                  availabilities,
+                  _.capitalize
+                )}
+              </div>
+              <div className="course-facets">
+                <div className="facet-title divider">Platforms</div>
+                {this.renderFacets(
+                  facetChoices.platforms,
+                  "platforms",
+                  platforms,
+                  _.upperCase
+                )}
+              </div>
+            </Card>
+          </Cell>
+          <Cell width={8}>{error ? null : this.renderResults()}</Cell>
+        </Grid>
+        <CourseDrawer />
+      </React.Fragment>
     )
   }
 }

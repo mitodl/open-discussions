@@ -35,7 +35,8 @@ type DrawerPropsFromState = {
 
 type DrawerProps = DrawerPropsFromState & {
   location: Location,
-  dispatch: Dispatch<*>
+  dispatch: Dispatch<*>,
+  reversed?: boolean
 }
 
 export class ResponsiveDrawer extends React.Component<DrawerProps> {

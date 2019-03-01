@@ -9,6 +9,7 @@ import { makeCourse } from "../factories/courses"
 import { courseAvailability, maxPrice } from "../lib/courses"
 import { shouldIf } from "../lib/test_utils"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import * as uiActions from "../actions/ui"
 
 describe("CompactCourseDisplay", () => {
   let helper
@@ -52,6 +53,7 @@ describe("CompactCourseDisplay", () => {
         .includes(encodeURIComponent(course.image_src))
     )
   })
+
   //
   ;[true, false].forEach(hasImage => {
     it(`${shouldIf(
@@ -63,5 +65,15 @@ describe("CompactCourseDisplay", () => {
       assert.equal(wrapper.find(".column2").exists(), hasImage)
       assert.equal(wrapper.find("img").exists(), hasImage)
     })
+  })
+
+  it("should dispatch the setShowCourseDrawer function", async () => {
+    const course = makeCourse()
+    const showCourseDrawerStub = helper.sandbox
+      .stub(uiActions, "setShowCourseDrawer")
+      .returns({ type: "action" })
+    const wrapper = renderCourseDisplay({ course: course })
+    await wrapper.find(".column1").simulate("click")
+    assert.ok(showCourseDrawerStub.calledWith({ courseId: course.id }))
   })
 })

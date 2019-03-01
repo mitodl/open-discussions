@@ -312,7 +312,9 @@ export type SocialAuth = {
 }
 
 export type Course = {
+  id:                 number,
   course_id:          string,
+  url:                ?string,
   title:              string,
   image_src:          ?string,
   short_description:  ?string,
@@ -326,9 +328,9 @@ export type Course = {
   end_date:           ?string,
   enrollment_start:   ?string,
   enrollment_end:     ?string,
-  instructors:        ?Array<CourseInstructor>,
-  topics:             ?Array<CourseTopic>,
-  prices:             ?Array<CoursePrice>
+  instructors:        Array<CourseInstructor>,
+  topics:             Array<CourseTopic>,
+  prices:             Array<CoursePrice>
 }
 
 export type CoursePrice = {

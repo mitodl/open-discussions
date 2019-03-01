@@ -112,6 +112,7 @@ describe("search functions", () => {
     const result = makeCourseResult()
     const course = searchResultToCourse(result)
     assert.deepEqual(course, {
+      id:                result.id,
       course_id:         result.course_id,
       title:             result.title,
       image_src:         result.image_src,
@@ -128,7 +129,8 @@ describe("search functions", () => {
       enrollment_end:    result.enrollment_end,
       instructors:       [],
       topics:            result.topics.map(topic => ({ name: topic })),
-      prices:            result.prices
+      prices:            result.prices,
+      url:               result.url
     })
   })
 
@@ -447,7 +449,7 @@ describe("search functions", () => {
       [
         "course",
         [
-          "course_title.english",
+          "title.english",
           "short_description.english",
           "full_description.english",
           "year",

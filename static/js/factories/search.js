@@ -69,8 +69,10 @@ export const makePostResult = (): PostResult => ({
 })
 
 export const makeCourseResult = (): CourseResult => ({
+  id:                casual.number,
   course_id:         `course_${String(casual.random)}`,
   title:             casual.title,
+  url:               casual.url,
   image_src:         "http://image.medium.url",
   short_description: casual.description,
   full_description:  casual.description,

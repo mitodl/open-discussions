@@ -12,7 +12,8 @@ import {
   SHOW_DROPDOWN,
   HIDE_DROPDOWN,
   SET_DIALOG_DATA,
-  SET_AUTH_USER_DETAIL
+  SET_AUTH_USER_DETAIL,
+  SET_SHOW_COURSE_DRAWER
 } from "../actions/ui"
 
 import type { Action } from "../flow/reduxTypes"
@@ -29,9 +30,14 @@ export type BannerState = {
   visible: boolean
 }
 
+export type CourseDetailState = {
+  courseId: ?number
+}
+
 export type UIState = {
   showDrawerDesktop: boolean,
   showDrawerMobile: boolean,
+  courseDetail?: CourseDetailState,
   snackbar: ?SnackbarState,
   banner: BannerState,
   dialogs: Map<string, any>,
@@ -44,9 +50,14 @@ const INITIAL_BANNER_STATE = {
   visible: false
 }
 
+const INITIAL_COURSE_STATE = {
+  courseId: null
+}
+
 export const INITIAL_UI_STATE: UIState = {
   showDrawerDesktop: true,
   showDrawerMobile:  false,
+  courseDetail:      INITIAL_COURSE_STATE,
   snackbar:          null,
   banner:            INITIAL_BANNER_STATE,
   dialogs:           new Map(),
@@ -108,6 +119,13 @@ export const ui = (
     return { ...state, showDrawerDesktop: action.payload }
   case SET_SHOW_DRAWER_MOBILE:
     return { ...state, showDrawerMobile: action.payload }
+  case SET_SHOW_COURSE_DRAWER:
+    return {
+      ...state,
+      courseDetail: {
+        courseId: action.payload.courseId
+      }
+    }
   case SET_SNACKBAR_MESSAGE:
     return {
       ...state,

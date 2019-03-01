@@ -92,7 +92,7 @@ describe("SearchResult", () => {
     const wrapper = render(result).dive()
     const course = searchResultToCourse(result)
     course.instructors = []
-    const courseDisplay = wrapper.find("CompactCourseDisplay")
+    const courseDisplay = wrapper.find("Connect(CompactCourseDisplay)")
     assert.deepEqual(courseDisplay.prop("course"), course)
   })
 })

@@ -10,7 +10,9 @@ export const makeCourse = (): Course => {
   return {
     // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
     course_id:         `course_${incr.next().value}`,
+    id:                casual.integer,
     title:             casual.title,
+    url:               casual.url,
     image_src:         "http://image.medium.url",
     short_description: casual.description,
     full_description:  casual.description,

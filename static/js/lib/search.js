@@ -87,7 +87,9 @@ export const searchResultToProfile = (result: ProfileResult): Profile => ({
 })
 
 export const searchResultToCourse = (result: CourseResult): Course => ({
+  id:                result.id,
   course_id:         result.course_id,
+  url:               result.url,
   title:             result.title,
   image_src:         result.image_src,
   short_description: result.short_description,
@@ -118,7 +120,7 @@ const PROFILE_QUERY_FIELDS = [
   "author_name"
 ]
 const COURSE_QUERY_FIELDS = [
-  "course_title.english",
+  "title.english",
   "short_description.english",
   "full_description.english",
   "year",

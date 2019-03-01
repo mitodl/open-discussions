@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 
 import Card from "./Card"
 import CompactPostDisplay from "./CompactPostDisplay"
+import CompactCourseDisplay from "./CompactCourseDisplay"
 import CommentTree from "./CommentTree"
 import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 
@@ -18,7 +19,6 @@ import { dropdownMenuFuncs } from "../lib/ui"
 
 import type { CourseResult, ProfileResult, Result } from "../flow/searchTypes"
 import type { CommentInTree, Post } from "../flow/discussionTypes"
-import { CompactCourseDisplay } from "./CompactCourseDisplay"
 
 type PostProps = {
   post: Post,
