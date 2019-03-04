@@ -46,7 +46,7 @@ export class CompactCourseDisplay extends React.Component<Props> {
             <div className="row topics-row">
               {_.sortBy(course.topics).map((topic, i) => (
                 <div
-                  className="grey-surround flexless"
+                  className="grey-surround facet topic"
                   key={i}
                   onClick={() => this.onToggleFacet("topics", topic.name)}
                 >
@@ -55,16 +55,14 @@ export class CompactCourseDisplay extends React.Component<Props> {
               ))}
             </div>
           </div>
-          <div className="row preview-footer" onClick={this.setCourseForDrawer}>
-            <div className="course-info">
-              <span className="course-availability grey-surround flexless">
-                {courseAvailability(course)}
-              </span>
-              <span className="course-platform grey-surround flexless">
-                {course.platform.toUpperCase()}
-              </span>
+          <div className="row preview-footer">
+            <div className="course-availability">
+              {courseAvailability(course)}
             </div>
-            <div className="course-price grey-surround">{maxPrice(course)}</div>
+            <div className="course-platform">
+              {course.platform.toUpperCase()}
+            </div>
+            <div className="course-price">{maxPrice(course)}</div>
           </div>
         </div>
         {course.image_src ? (

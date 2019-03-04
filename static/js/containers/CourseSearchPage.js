@@ -64,10 +64,10 @@ type State = {
 
 const shouldRunSearch = R.complement(
   R.allPass([
-    R.eqBy(R.path(["text"])),
-    R.eqBy(R.path(["topics"])),
-    R.eqBy(R.path(["platforms"])),
-    R.eqBy(R.path(["availabilities"]))
+    R.eqProps("text"),
+    R.eqProps("topics"),
+    R.eqProps("platforms"),
+    R.eqProps("availabilities")
   ])
 )
 

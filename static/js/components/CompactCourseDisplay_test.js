@@ -38,7 +38,7 @@ describe("CompactCourseDisplay", () => {
     assert.equal(
       wrapper
         .find(".topics-row")
-        .find(".flexless")
+        .find(".grey-surround")
         .at(0)
         .text(),
       // $FlowFixMe: course.topics is not null here
@@ -90,8 +90,8 @@ describe("CompactCourseDisplay", () => {
     const wrapper = renderCourseDisplay({ course: course })
     const topicDiv = wrapper
       .find(".topics-row")
-      .find("div")
-      .at(1)
+      .find(".grey-surround")
+      .at(0)
     await topicDiv.simulate("click")
     assert.ok(toggleFacetStub.calledWith("topics", topicDiv.text(), true))
   })
