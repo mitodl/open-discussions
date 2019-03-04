@@ -24,7 +24,7 @@ describe("CompactCourseDisplay", () => {
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
-    toggleFacetStub = helper.sandbox.stub()
+    toggleFacetStub = helper.sandbox.stub().returns({ type: "action" })
   })
 
   afterEach(() => {
@@ -83,5 +83,16 @@ describe("CompactCourseDisplay", () => {
     const wrapper = renderCourseDisplay({ course: course })
     await wrapper.find(".course-title").simulate("click")
     assert.ok(showCourseDrawerStub.calledWith({ courseId: course.id }))
+  })
+
+  it("should dispatch the toggleFacet function", async () => {
+    const course = makeCourse()
+    const wrapper = renderCourseDisplay({ course: course })
+    const topicDiv = wrapper
+      .find(".topics-row")
+      .find("div")
+      .at(1)
+    await topicDiv.simulate("click")
+    assert.ok(toggleFacetStub.calledWith("topics", topicDiv.text(), true))
   })
 })
