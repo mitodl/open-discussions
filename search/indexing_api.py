@@ -97,6 +97,7 @@ COURSE_OBJECT_TYPE = {
     "price": {"type": "nested"},
     "image_src": {"type": "keyword"},
     "published": {"type": "boolean"},
+    "availability": {"type": "keyword"},
 }
 
 MAPPING = {

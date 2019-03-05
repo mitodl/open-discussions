@@ -48,6 +48,7 @@ class CourseFactory(DjangoModelFactory):
             AvailabilityType.current.value,
             AvailabilityType.upcoming.value,
             AvailabilityType.starting_soon.value,
+            AvailabilityType.archived.value,
         )
     )
 

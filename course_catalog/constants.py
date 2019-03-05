@@ -31,6 +31,7 @@ class AvailabilityType(Enum):
     current = "Current"
     upcoming = "Upcoming"
     starting_soon = "Starting Soon"
+    archived = "Archived"
 
 
 MIT_OWNER_KEYS = ["MITx", "MITx_PRO"]
