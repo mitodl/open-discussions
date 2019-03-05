@@ -52,7 +52,6 @@
     justify-content: space-between;
     height: auto;
     word-break: break-word;
-    cursor: pointer;
 
     .column1 {
       display: flex;
@@ -60,7 +59,7 @@
       justify-content: left;
       word-break: break-word;
       width: 100%;
-      height: 123px;
+      min-height: 128px;
     }
 
     .column2 {
@@ -77,7 +76,8 @@
         width: 34%;
         overflow: hidden;
         border-radius: 5px;
-        height: 123px;
+        height: 128px;
+        cursor: pointer;
 
         img {
           border-radius: 5px;
@@ -85,29 +85,15 @@
       }
     }
 
-    .flexless {
-      display: inline;
-    }
-
-    .course-info {
-      span,
-      div {
-        cursor: default;
-      }
-    }
-
     .course-platform {
       margin-left: 10px;
-    }
-
-    .course-price {
-      cursor: default;
     }
 
     .course-title {
       font-size: 18px;
       font-weight: bold;
       color: $navy;
+      cursor: pointer;
     }
   }
 
@@ -121,14 +107,14 @@
 
   .preview-body {
     color: $font-grey-mid;
-    height: 123px;
   }
 
   .preview-footer {
     position: relative;
     display: flex;
+    flex: auto;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-end;
     flex-wrap: wrap;
 
     > * {
@@ -177,13 +163,6 @@
   .course-topics {
     display: flex;
     flex-flow: wrap;
-
-    .grey-surround {
-      font-size: 16px !important;
-      margin-right: 5px;
-      cursor: default;
-      padding: 2px 10px;
-    }
   }
 
   .course-info-row {
@@ -200,6 +179,18 @@
     display: flex;
     justify-content: space-between;
   }
+}
+
+.facet {
+  display: inline-flex;
+  cursor: default;
+  padding: 2px 10px;
+  font-size: 14px;
+  margin: 0px 5px 5px 0px;
+}
+
+.topic {
+  cursor: pointer;
 }
 
 .clamp-lines {

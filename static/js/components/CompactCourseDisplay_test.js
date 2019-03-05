@@ -12,18 +12,19 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import * as uiActions from "../actions/ui"
 
 describe("CompactCourseDisplay", () => {
-  let helper
+  let helper, toggleFacetStub
 
   const renderCourseDisplay = props => {
     return mount(
       <Router store={helper.store} history={helper.browserHistory}>
-        <CompactCourseDisplay {...props} />
+        <CompactCourseDisplay toggleFacet={toggleFacetStub} {...props} />
       </Router>
     )
   }
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
+    toggleFacetStub = helper.sandbox.stub().returns({ type: "action" })
   })
 
   afterEach(() => {
@@ -34,8 +35,15 @@ describe("CompactCourseDisplay", () => {
     const course = makeCourse()
     const wrapper = renderCourseDisplay({ course })
     assert.equal(wrapper.find(".course-title").text(), course.title)
-    // $FlowFixMe: course.topics is not null here
-    assert.equal(wrapper.find(".course-topics").text(), course.topics[0].name)
+    assert.equal(
+      wrapper
+        .find(".topics-row")
+        .find(".grey-surround")
+        .at(0)
+        .text(),
+      // $FlowFixMe: course.topics is not null here
+      course.topics[0].name
+    )
     assert.equal(
       wrapper.find(".course-platform").text(),
       course.platform.toUpperCase()
@@ -73,7 +81,18 @@ describe("CompactCourseDisplay", () => {
       .stub(uiActions, "setShowCourseDrawer")
       .returns({ type: "action" })
     const wrapper = renderCourseDisplay({ course: course })
-    await wrapper.find(".column1").simulate("click")
+    await wrapper.find(".course-title").simulate("click")
     assert.ok(showCourseDrawerStub.calledWith({ courseId: course.id }))
+  })
+
+  it("should dispatch the toggleFacet function", async () => {
+    const course = makeCourse()
+    const wrapper = renderCourseDisplay({ course: course })
+    const topicDiv = wrapper
+      .find(".topics-row")
+      .find(".grey-surround")
+      .at(0)
+    await topicDiv.simulate("click")
+    assert.ok(toggleFacetStub.calledWith("topics", topicDiv.text(), true))
   })
 })

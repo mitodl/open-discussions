@@ -68,7 +68,7 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
           <div className="course-subheader row">Topics</div>
           <div className="course-topics">
             {course.topics.map((topic, i) => (
-              <div className="grey-surround" key={i}>
+              <div className="grey-surround facet" key={i}>
                 {topic.name}
               </div>
             ))}

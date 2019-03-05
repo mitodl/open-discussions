@@ -277,7 +277,7 @@ describe("CourseSearchPage", () => {
       .find("Checkbox")
       .at(0)
       .props()
-      .onChange({
+      .onClick({
         target: {
           value:   "Engineering",
           name:    "topics",
@@ -308,6 +308,18 @@ describe("CourseSearchPage", () => {
       platforms:      undefined,
       availabilities: undefined
     })
+  })
+
+  it("does not trigger a search if no search parameters were changed", async () => {
+    const { inner } = await renderPage()
+    helper.searchStub.reset()
+    inner.setState({
+      text:           inner.state().text,
+      topics:         inner.state().topics,
+      platforms:      inner.state().platforms,
+      availabilities: inner.state().availabilities
+    })
+    sinon.assert.notCalled(helper.searchStub)
   })
 
   it("clears the text when the onClear prop is triggered", async () => {

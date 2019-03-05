@@ -62,6 +62,15 @@ type State = {
   error: ?string
 }
 
+const shouldRunSearch = R.complement(
+  R.allPass([
+    R.eqProps("text"),
+    R.eqProps("topics"),
+    R.eqProps("platforms"),
+    R.eqProps("availabilities")
+  ])
+)
+
 export class CourseSearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -82,6 +91,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
       this.loadFacetChoices()
     }
     this.runSearch()
+  }
+
+  componentDidUpdate(prevProps: Object, prevState: Object) {
+    if (shouldRunSearch(prevState, this.state)) {
+      this.runSearch()
+    }
   }
 
   loadFacetChoices = async () => {
@@ -146,17 +161,20 @@ export class CourseSearchPage extends React.Component<Props, State> {
     })
   }
 
-  onUpdateFacets = async (e: Object) => {
-    if (e.target.checked) {
-      await this.setState({
-        [e.target.name]: _.union(this.state[e.target.name], [e.target.value])
+  toggleFacet = async (name: string, value: string, isEnabled: boolean) => {
+    if (isEnabled) {
+      this.setState({
+        [name]: _.union(this.state[name], [value])
       })
     } else {
-      await this.setState({
-        [e.target.name]: _.without(this.state[e.target.name], e.target.value)
+      this.setState({
+        [name]: _.without(this.state[name], value)
       })
     }
-    this.runSearch()
+  }
+
+  onUpdateFacets = (e: Object) => {
+    this.toggleFacet(e.target.name, e.target.value, e.target.checked)
   }
 
   updateText = (event: ?Event) => {
@@ -186,7 +204,13 @@ export class CourseSearchPage extends React.Component<Props, State> {
         initialLoad={from === 0}
         loader={<Loading className="infinite" key="loader" />}
       >
-        {results.map((result, i) => <SearchResult key={i} result={result} />)}
+        {results.map((result, i) => (
+          <SearchResult
+            key={i}
+            result={result}
+            toggleFacet={this.toggleFacet}
+          />
+        ))}
       </InfiniteScroll>
     )
   }
@@ -205,7 +229,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
             name={name}
             value={choice}
             checked={R.contains(choice, currentlySelected || [])}
-            onChange={this.onUpdateFacets}
+            onClick={this.onUpdateFacets}
           >
             {labelFunction ? labelFunction(choice) : choice}
           </Checkbox>

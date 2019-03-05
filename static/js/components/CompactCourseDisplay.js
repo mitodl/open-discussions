@@ -2,6 +2,7 @@
 /* global SETTINGS:false */
 import React from "react"
 import { connect } from "react-redux"
+import _ from "lodash"
 
 import Card from "./Card"
 import { setShowCourseDrawer } from "../actions/ui"
@@ -14,7 +15,8 @@ import type { Dispatch } from "redux"
 
 type Props = {
   course: Course,
-  dispatch: Dispatch<*>
+  dispatch: Dispatch<*>,
+  toggleFacet?: Function
 }
 
 export class CompactCourseDisplay extends React.Component<Props> {
@@ -23,31 +25,44 @@ export class CompactCourseDisplay extends React.Component<Props> {
     dispatch(setShowCourseDrawer({ courseId: course.id }))
   }
 
+  onToggleFacet = async (name: string, value: string) => {
+    const { toggleFacet } = this.props
+    if (toggleFacet) {
+      toggleFacet(name, value, true)
+    }
+  }
+
   render() {
     const { course } = this.props
     return (
       <Card className={`compact-course-summary`}>
-        <div className="column1" onClick={this.setCourseForDrawer}>
+        <div className="column1">
           <div className="preview-body">
             <div className="row title-row">
-              <div className="course-title">{course.title}</div>
-            </div>
-            <div className="row">
-              <div className="course-topics">
-                {course.topics[0] ? course.topics[0].name : ""}
+              <div className="course-title" onClick={this.setCourseForDrawer}>
+                {course.title}
               </div>
+            </div>
+            <div className="row topics-row">
+              {_.sortBy(course.topics).map((topic, i) => (
+                <div
+                  className="grey-surround facet topic"
+                  key={i}
+                  onClick={() => this.onToggleFacet("topics", topic.name)}
+                >
+                  {topic.name}
+                </div>
+              ))}
             </div>
           </div>
           <div className="row preview-footer">
-            <div className="course-info">
-              <span className="course-availability grey-surround flexless">
-                {courseAvailability(course)}
-              </span>
-              <span className="course-platform grey-surround flexless">
-                {course.platform.toUpperCase()}
-              </span>
+            <div className="course-availability">
+              {courseAvailability(course)}
             </div>
-            <div className="course-price grey-surround">{maxPrice(course)}</div>
+            <div className="course-platform">
+              {course.platform.toUpperCase()}
+            </div>
+            <div className="course-price">{maxPrice(course)}</div>
           </div>
         </div>
         {course.image_src ? (
