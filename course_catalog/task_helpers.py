@@ -18,6 +18,7 @@ from course_catalog.constants import (
     ocw_edx_mapping,
     NON_COURSE_DIRECTORIES,
     ResourceType,
+    AvailabilityType,
 )
 from course_catalog.models import Course, CourseTopic, CourseInstructor, CoursePrice
 from course_catalog.serializers import CourseSerializer
@@ -117,6 +118,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
             "last_modified": max_modified,
             "raw_json": course_data,
             "url": get_course_url(course_run_key, course_data, PlatformType.mitx.value),
+            "availability": course_run.get("availability"),
         }
 
         course_serializer = CourseSerializer(
@@ -264,6 +266,7 @@ def digest_ocw_course(
         "published": is_published,
         "raw_json": master_json,
         "url": get_course_url(course_id, master_json, PlatformType.ocw.value),
+        "availability": AvailabilityType.current.value,
     }
     if "PROD/RES" in course_prefix:
         course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
