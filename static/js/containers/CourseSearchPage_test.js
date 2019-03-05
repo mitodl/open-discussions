@@ -310,6 +310,18 @@ describe("CourseSearchPage", () => {
     })
   })
 
+  it("does not trigger a search if no search parameters were changed", async () => {
+    const { inner } = await renderPage()
+    helper.searchStub.reset()
+    inner.setState({
+      text:           inner.state().text,
+      topics:         inner.state().topics,
+      platforms:      inner.state().platforms,
+      availabilities: inner.state().availabilities
+    })
+    sinon.assert.notCalled(helper.searchStub)
+  })
+
   it("clears the text when the onClear prop is triggered", async () => {
     const { inner } = await renderPage()
     inner.setState({ text: "some text" })

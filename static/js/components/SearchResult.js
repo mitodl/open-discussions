@@ -85,7 +85,7 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 
 type CourseProps = {
   result: CourseResult,
-  toggleFacet: ?Function
+  toggleFacet?: Function
 }
 const CourseSearchResult = ({ result, toggleFacet }: CourseProps) => {
   const course = searchResultToCourse(result)

@@ -16,7 +16,7 @@ import type { Dispatch } from "redux"
 type Props = {
   course: Course,
   dispatch: Dispatch<*>,
-  toggleFacet: ?Function
+  toggleFacet?: Function
 }
 
 export class CompactCourseDisplay extends React.Component<Props> {
