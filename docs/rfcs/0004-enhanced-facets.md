@@ -40,7 +40,7 @@ a list of search filters above the search results, and just below the search tex
 x button to remove the filter (by triggering a function to remove it from state).
 
 Some functionality has already been implemented: when the checkbox next to a facet is checked, it is added to the 
-search filters via a state change.
+search filters via a state change in the CourseSearchPage container.  The facet choices should probably be stored in the global search state instead, with the facet widgets and associated code modified to the extent necessary to make them  more generic and suitable for use with other searches besides courses.
 
 #### Security Considerations
 None
