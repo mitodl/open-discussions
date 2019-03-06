@@ -9,7 +9,7 @@ import pytest
 import pytz
 from django.utils import timezone
 
-from course_catalog.constants import PlatformType
+from course_catalog.constants import PlatformType, AvailabilityType
 from course_catalog.factories import CourseFactory
 from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
 from course_catalog.task_helpers import (
@@ -18,6 +18,7 @@ from course_catalog.task_helpers import (
     get_ocw_topic,
     safe_load_json,
     get_course_url,
+    get_course_availability,
 )
 
 pytestmark = pytest.mark.django_db
@@ -316,3 +317,30 @@ def test_get_course_url(course_id, course_json, platform, expected):
         assert actual_url is expected
     else:
         assert actual_url == expected
+
+
+def test_get_course_availability(mitx_valid_data):
+    """ Test that availability is calculated as expected """
+    ocw_course = CourseFactory.create(platform=PlatformType.ocw.value)
+    # test mitx course with raw_json
+    assert get_course_availability(ocw_course) == AvailabilityType.current.value
+    mitx_course_with_json = CourseFactory.create(
+        course_id=mitx_valid_data["course_runs"][0]["key"],
+        raw_json=mitx_valid_data,
+        platform=PlatformType.mitx.value,
+    )
+    # test mitx course without raw_json
+    assert (
+        get_course_availability(mitx_course_with_json)
+        == mitx_valid_data["course_runs"][0]["availability"]
+    )
+    mitx_course_no_json = CourseFactory.create(
+        raw_json=None, platform=PlatformType.mitx.value
+    )
+    assert get_course_availability(mitx_course_no_json) is None
+    # test mitx course without course_runs
+    mitx_valid_data["course_runs"] = None  # pop course_runs json
+    mitx_course_no_runs_json = CourseFactory.create(
+        raw_json=mitx_valid_data, platform=PlatformType.mitx.value
+    )
+    assert get_course_availability(mitx_course_no_runs_json) is None

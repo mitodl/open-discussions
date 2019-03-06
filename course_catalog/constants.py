@@ -22,6 +22,18 @@ class ResourceType(Enum):
     ocw_resource = "ocw_resource"
 
 
+class AvailabilityType(Enum):
+    """
+    Enum for Course availability options dictated by edX API values.
+    All OCW courses should be set to "Current"
+    """
+
+    current = "Current"
+    upcoming = "Upcoming"
+    starting_soon = "Starting Soon"
+    archived = "Archived"
+
+
 MIT_OWNER_KEYS = ["MITx", "MITx_PRO"]
 
 NON_COURSE_DIRECTORIES = [
