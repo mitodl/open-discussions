@@ -1,4 +1,4 @@
-FROM mitodl/open_discussions_web_travis_5eb177
+FROM mitodl/open_discussions_web_travis_71c17d
 
 WORKDIR /tmp
 
