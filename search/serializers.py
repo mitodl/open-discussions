@@ -149,6 +149,7 @@ class ESCourseSerializer(ESModelSerializer):
             "prices",
             "instructors",
             "published",
+            "availability",
         ]
 
         read_only_fields = fields

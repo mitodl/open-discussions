@@ -3,7 +3,7 @@ import factory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
-from course_catalog.constants import PlatformType
+from course_catalog.constants import PlatformType, AvailabilityType
 from course_catalog.models import Course, CourseInstructor, CourseTopic, CoursePrice
 
 # pylint: disable=unused-argument
@@ -43,6 +43,14 @@ class CourseFactory(DjangoModelFactory):
 
     course_id = factory.Sequence(lambda n: "COURSE%03d.MIT" % n)
     platform = FuzzyChoice((PlatformType.mitx.value, PlatformType.ocw.value))
+    availability = FuzzyChoice(
+        (
+            AvailabilityType.current.value,
+            AvailabilityType.upcoming.value,
+            AvailabilityType.starting_soon.value,
+            AvailabilityType.archived.value,
+        )
+    )
 
     @factory.post_generation
     def instructors(self, create, extracted, **kwargs):

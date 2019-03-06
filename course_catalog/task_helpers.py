@@ -18,6 +18,7 @@ from course_catalog.constants import (
     ocw_edx_mapping,
     NON_COURSE_DIRECTORIES,
     ResourceType,
+    AvailabilityType,
 )
 from course_catalog.models import Course, CourseTopic, CourseInstructor, CoursePrice
 from course_catalog.serializers import CourseSerializer
@@ -117,6 +118,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
             "last_modified": max_modified,
             "raw_json": course_data,
             "url": get_course_url(course_run_key, course_data, PlatformType.mitx.value),
+            "availability": course_run.get("availability"),
         }
 
         course_serializer = CourseSerializer(
@@ -264,6 +266,7 @@ def digest_ocw_course(
         "published": is_published,
         "raw_json": master_json,
         "url": get_course_url(course_id, master_json, PlatformType.ocw.value),
+        "availability": AvailabilityType.current.value,
     }
     if "PROD/RES" in course_prefix:
         course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
@@ -431,3 +434,28 @@ def get_course_url(course_id, course_json, platform):
                 return preferred_urls[0].split("?")[0]
         return "{}{}/course/".format(settings.MITX_ALT_URL, course_id)
     return None
+
+
+def get_course_availability(course):
+    """
+    Gets the attribute `availability` for a course if any
+
+    Args:
+        course (Course): Course model instance
+
+    Returns:
+        str: The url for the course if any
+    """
+    if course.platform == PlatformType.ocw.value:
+        return AvailabilityType.current.value
+    elif course.platform == PlatformType.mitx.value:
+        course_json = course.raw_json
+        if course_json is None:
+            return
+        course_runs = course_json.get("course_runs")
+        if course_runs is None:
+            return
+        # get appropriate course_run
+        for run in course_runs:
+            if run.get("key") == course.course_id:
+                return run.get("availability")
