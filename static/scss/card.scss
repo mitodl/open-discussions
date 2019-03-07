@@ -18,4 +18,10 @@
 
 .card {
   @extend %card;
+
+  &.borderless {
+    .card-contents {
+      padding: 0;
+    }
+  }
 }

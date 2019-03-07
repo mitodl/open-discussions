@@ -1,8 +1,10 @@
 //@flow
-import type { Course } from "../flow/discussionTypes"
 import casual from "casual-browserify"
+
 import { incrementer } from "../lib/util"
 import { platforms } from "../lib/constants"
+
+import type { Course } from "../flow/discussionTypes"
 
 const incr = incrementer()
 

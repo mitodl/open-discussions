@@ -63,6 +63,11 @@ button.compact {
     font-size: 16px;
     margin-right: 5px;
   }
+
+  &.extra-compact {
+    padding: 3px 8px;
+    margin-bottom: 0;
+  }
 }
 
 .grey-surround {

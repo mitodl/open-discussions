@@ -1,12 +1,12 @@
 // @flow
 import { assert } from "chai"
-import { configureShallowRenderer } from "../lib/test_utils"
 import sinon from "sinon"
 import Dropzone from "react-dropzone"
 import R from "ramda"
 
 import CoverImageInput from "./CoverImageInput"
 
+import { configureShallowRenderer } from "../lib/test_utils"
 import { makeEvent } from "../lib/test_utils"
 
 describe("CoverImageInput", () => {

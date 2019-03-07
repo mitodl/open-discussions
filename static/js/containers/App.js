@@ -30,6 +30,7 @@ import InactiveUserPage from "./auth/InactiveUserPage"
 import PasswordResetPage from "./auth/PasswordResetPage"
 import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
 import ChannelRouter from "./ChannelRouter"
+import CourseIndexPage from "./CourseIndexPage"
 
 import PrivateRoute from "../components/auth/PrivateRoute"
 import Snackbar from "../components/material/Snackbar"
@@ -313,15 +314,20 @@ class App extends React.Component<Props> {
             path={`${match.url}privacy-statement`}
             component={PrivacyPolicyPage}
           />
-          <Switch>
-            {SETTINGS.course_ui_enabled ? (
+          {SETTINGS.course_ui_enabled ? (
+            <Switch>
+              <Route
+                exact
+                path={`${match.url}courses`}
+                component={CourseIndexPage}
+              />
               <Route
                 exact
                 path={`${match.url}courses/search`}
                 component={CourseSearchPage}
               />
-            ) : null}
-          </Switch>
+            </Switch>
+          ) : null}
         </div>
       </div>
     )

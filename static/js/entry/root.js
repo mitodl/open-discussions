@@ -4,7 +4,7 @@ require("react-hot-loader/patch")
 __webpack_public_path__ = SETTINGS.public_path // eslint-disable-line no-undef, camelcase
 import React from "react"
 import ReactDOM from "react-dom"
-import { AppContainer } from "react-hot-loader"
+import { AppContainer, setConfig } from "react-hot-loader"
 import { createBrowserHistory } from "history"
 
 import configureStore from "../store/configureStore"
@@ -14,6 +14,8 @@ import Raven from "raven-js"
 
 // requirement for creating blob from crop canvas.
 import "blueimp-canvas-to-blob/js/canvas-to-blob.js"
+
+setConfig({ pureSFC: true })
 
 Raven.config(SETTINGS.sentry_dsn, {
   release:     SETTINGS.release_version,

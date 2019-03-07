@@ -2,6 +2,7 @@
 import React from "react"
 import { shallow } from "enzyme"
 import { assert } from "chai"
+import sinon from "sinon"
 
 import Card from "./Card"
 
@@ -23,5 +24,17 @@ describe("Card component", () => {
   it("should display a title, if passed one", () => {
     const wrapper = mountCard(<div />, { title: "HEY THERE" })
     assert.equal(wrapper.text(), "HEY THERE")
+  })
+
+  it("should add .borderless if given the prop", () => {
+    const wrapper = mountCard(<div />, { borderless: true })
+    assert.equal(wrapper.props().className, "card borderless")
+  })
+
+  it("should set an onClick handler, if given one", () => {
+    const onClick = sinon.stub()
+    const wrapper = mountCard(<div />, { onClick })
+    wrapper.simulate("click")
+    sinon.assert.called(onClick)
   })
 })

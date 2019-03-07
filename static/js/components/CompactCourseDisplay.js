@@ -5,6 +5,7 @@ import { connect } from "react-redux"
 import _ from "lodash"
 
 import Card from "./Card"
+
 import { setShowCourseDrawer } from "../actions/ui"
 import { courseAvailability, minPrice } from "../lib/courses"
 import { embedlyThumbnail } from "../lib/url"
@@ -74,18 +75,16 @@ export class CompactCourseDisplay extends React.Component<Props> {
             className="column2 link-thumbnail"
             onClick={this.setCourseForDrawer}
           >
-            <React.Fragment>
-              <img
-                src={embedlyThumbnail(
-                  SETTINGS.embedlyKey,
-                  course.image_src,
-                  EMBEDLY_THUMB_HEIGHT,
-                  EMBEDLY_THUMB_WIDTH
-                )}
-                height={EMBEDLY_THUMB_HEIGHT}
-                width={EMBEDLY_THUMB_WIDTH}
-              />
-            </React.Fragment>
+            <img
+              src={embedlyThumbnail(
+                SETTINGS.embedlyKey,
+                course.image_src,
+                EMBEDLY_THUMB_HEIGHT,
+                EMBEDLY_THUMB_WIDTH
+              )}
+              height={EMBEDLY_THUMB_HEIGHT}
+              width={EMBEDLY_THUMB_WIDTH}
+            />
           </div>
         ) : null}
       </Card>

@@ -1,0 +1,69 @@
+.course-carousel {
+  .slider-list {
+    max-height: 303px;
+  }
+
+  .title {
+    font-size: $highlight-font-size;
+    color: $navy;
+    font-weight: bold;
+  }
+
+  .title-and-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    .controls {
+      display: flex;
+      align-items: flex-end;
+
+      button {
+        font-size: 14px;
+
+        &.next {
+          i {
+            margin-right: 0;
+            margin-left: 5px;
+          }
+        }
+
+        &.disabled {
+          color: $font-grey-light;
+          border: 1px solid $border-grey;
+        }
+      }
+    }
+  }
+
+  .card {
+    .cover-image {
+      img {
+        border-radius: 5px 5px 0 0;
+        width: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .row {
+      margin: 0 20px;
+      display: flex;
+
+      &.topic-and-platform {
+        font-size: $modest-font-size;
+        color: $navy;
+      }
+
+      &.course-title {
+        margin-bottom: 28px;
+        min-height: 70px;
+      }
+
+      &.availability-and-price {
+        font-size: $modest-font-size;
+        color: $font-grey-mid;
+        padding-bottom: 14px;
+      }
+    }
+  }
+}

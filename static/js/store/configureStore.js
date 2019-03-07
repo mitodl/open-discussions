@@ -3,18 +3,31 @@ import { compose, createStore, applyMiddleware } from "redux"
 import thunkMiddleware from "redux-thunk"
 import { createLogger } from "redux-logger"
 import createDebounce from "redux-debounced"
+import { queryMiddleware } from "redux-query"
 
 import rootReducer from "../reducers"
+
+export const getQueries = state => state.queries
+export const getEntities = state => state.entities
 
 export let createStoreWithMiddleware
 if (process.env.NODE_ENV !== "production") {
   createStoreWithMiddleware = compose(
-    applyMiddleware(createDebounce(), thunkMiddleware, createLogger()),
+    applyMiddleware(
+      queryMiddleware(getQueries, getEntities),
+      createDebounce(),
+      thunkMiddleware,
+      createLogger()
+    ),
     window.devToolsExtension ? window.devToolsExtension() : f => f
   )(createStore)
 } else {
   createStoreWithMiddleware = compose(
-    applyMiddleware(createDebounce(), thunkMiddleware)
+    applyMiddleware(
+      queryMiddleware(getQueries, getEntities),
+      createDebounce(),
+      thunkMiddleware
+    )
   )(createStore)
 }
 

@@ -1,6 +1,7 @@
 // @flow
 import { combineReducers } from "redux"
 import { deriveReducers } from "redux-hammock"
+import { entitiesReducer, queriesReducer } from "redux-query"
 
 import { actions } from "../actions"
 import { endpoints } from "../lib/redux_rest"
@@ -17,5 +18,7 @@ export default combineReducers<Object, Object>({
   ...reducers,
   ...formReducers,
   ui,
-  focus
+  focus,
+  entities: entitiesReducer,
+  queries:  queriesReducer
 })
