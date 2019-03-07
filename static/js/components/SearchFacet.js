@@ -66,9 +66,7 @@ export class SearchFacet extends React.Component<Props> {
                   <div className="facet-key">
                     {labelFunction ? labelFunction(facet.key) : facet.key}
                   </div>
-                  <div className="facet-count">
-                    {facet.doc_count}
-                  </div>
+                  <div className="facet-count">{facet.doc_count}</div>
                 </div>
               </Checkbox>
             </div>
