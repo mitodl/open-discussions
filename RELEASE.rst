@@ -1,6 +1,20 @@
 Release Notes
 =============
 
+Version 0.69.0
+--------------
+
+- update a few JS deps
+- Bump django to 2.1.7
+- upgrade flow to @latest
+- Updated Python runtime version
+- RFC for enhanced search facets (#1891)
+- Adds new availability field to course_catalog/Course model for Course search
+- Display all topics in CompactCourseDisplay, make clickable (#1892)
+- Search UI RFC (#1885)
+- Added channel invitation backend and frontend
+- Course detail view (#1866)
+
 Version 0.68.1 (Released February 27, 2019)
 --------------
 
