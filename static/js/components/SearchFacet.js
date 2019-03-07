@@ -1,5 +1,4 @@
 import React from "react"
-import _ from "lodash"
 import R from "ramda"
 import { Dispatch } from "redux"
 import { connect } from "react-redux"
@@ -50,7 +49,7 @@ export class SearchFacet extends React.Component<Props> {
     return (
       <div className="facets">
         <div className="facet-title">{title}</div>
-        {_.sortBy(results.buckets).map((facet, i) => (
+        {results.buckets.map((facet, i) => (
           <React.Fragment key={i}>
             <div
               className={
