@@ -62,9 +62,14 @@ export class SearchFacet extends React.Component<Props> {
                 checked={R.contains(facet.key, currentlySelected || [])}
                 onClick={onUpdate}
               >
-                {labelFunction ? labelFunction(facet.key) : facet.key} ({
-                  facet.doc_count
-                })
+                <div className="facet-label-div">
+                  <div className="facet-key">
+                    {labelFunction ? labelFunction(facet.key) : facet.key}
+                  </div>
+                  <div className="facet-count">
+                    {facet.doc_count}
+                  </div>
+                </div>
               </Checkbox>
             </div>
             {i === maxCount && !showAll && maxCount < results.buckets.length ? (

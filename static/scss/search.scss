@@ -71,6 +71,7 @@
 
     label {
       margin: 0;
+      width: 100%;
     }
   }
 }
@@ -82,4 +83,10 @@
 .facet-more-less {
   cursor: pointer;
   color: $link-blue;
+}
+
+.facet-label-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
