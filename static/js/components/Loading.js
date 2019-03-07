@@ -84,12 +84,6 @@ export const SearchLoading = () => (
   </Grid>
 )
 
-export const CourseSearchLoading = () => (
-  <Grid className="main-content two-column search-page">
-    <Cell width={12}>{PostLoading()}</Cell>
-  </Grid>
-)
-
 export const renderDeferredLoading = ({
   LoadingComponent,
   loaded,

@@ -1,6 +1,5 @@
 import { assert } from "chai"
 import sinon from "sinon"
-import { fn as moment } from "moment"
 
 import {
   makeCommentResult,
@@ -18,7 +17,6 @@ import {
   searchResultToProfile
 } from "./search"
 import * as searchFuncs from "./search"
-import { COURSE_CURRENT, COURSE_PRIOR, COURSE_UPCOMING } from "./constants"
 
 describe("search functions", () => {
   let sandbox
@@ -282,147 +280,109 @@ describe("search functions", () => {
       sinon.assert.calledWith(stub, type)
     })
 
-    //
-    ;[
-      [
-        [COURSE_PRIOR, COURSE_CURRENT],
-        [
-          {
-            bool: {
-              should: [
-                {
-                  term: {
-                    platform: "ocw"
-                  }
-                },
-                {
-                  bool: {
-                    filter: [
-                      {
-                        range: {
-                          start_date: {
-                            lte: "2019-01-31T16:06:08.098Z"
-                          }
-                        }
-                      },
-                      {
-                        range: {
-                          end_date: {
-                            gte: "2019-01-31T16:06:08.098Z"
-                          }
-                        }
-                      }
-                    ]
-                  }
-                },
-                {
-                  range: {
-                    end_date: {
-                      lte: "2019-01-31T16:06:08.098Z"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      ],
-      [
-        [COURSE_UPCOMING],
-        [
-          {
-            bool: {
-              should: [
-                {
-                  range: {
-                    start_date: {
-                      gte: "2019-01-31T16:06:08.098Z"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      ],
-      [[COURSE_PRIOR, COURSE_CURRENT, COURSE_UPCOMING], []],
-      [[], []]
-    ].forEach(([availabilities, availableQuery]) => {
-      it(`filters courses by platform, availability ([${availabilities.toString()}]), and topics`, () => {
-        const fieldNames = ["field1", "field2", "field3"]
-        const stub = sandbox
-          .stub(searchFuncs, "searchFields")
-          .returns(fieldNames)
-        sandbox.stub(moment, "format").returns("2019-01-31T16:06:08.098Z")
-        const type = "course"
-        const text = "some text here"
-        const platforms = ["mitx"]
-        const topics = ["Engineering", "Science"]
+    it(`filters courses by platform, availability, and topics`, () => {
+      const fieldNames = ["field1", "field2", "field3"]
+      const stub = sandbox.stub(searchFuncs, "searchFields").returns(fieldNames)
+      const type = "course"
+      const text = "some text here"
+      const facets = new Map(
+        Object.entries({
+          platform:     ["mitx"],
+          topics:       ["Engineering", "Science"],
+          availability: ["Upcoming"]
+        })
+      )
 
-        const mustQuery = [
-          {
-            term: {
-              object_type: "course"
-            }
-          },
-          {
-            bool: {
-              should: [
-                {
-                  term: {
-                    topics: "Engineering"
-                  }
-                },
-                {
-                  term: {
-                    topics: "Science"
-                  }
+      const mustQuery = [
+        {
+          term: {
+            object_type: "course"
+          }
+        },
+        {
+          bool: {
+            should: [
+              {
+                term: {
+                  platform: "mitx"
                 }
-              ]
-            }
-          },
-          {
-            bool: {
-              should: [
-                {
-                  term: {
-                    platform: "mitx"
-                  }
-                }
-              ]
-            }
-          },
-          ...availableQuery
-        ]
-
-        assert.deepEqual(
-          buildSearchQuery({ type, text, platforms, availabilities, topics }),
-          {
-            query: {
-              bool: {
-                should: [
-                  {
-                    bool: {
-                      filter: {
-                        bool: {
-                          must: mustQuery
-                        }
-                      },
-                      must: {
-                        multi_match: {
-                          query:  text,
-                          fields: fieldNames
-                        }
-                      }
-                    }
-                  }
-                ]
               }
+            ]
+          }
+        },
+        {
+          bool: {
+            should: [
+              {
+                term: {
+                  topics: "Engineering"
+                }
+              },
+              {
+                term: {
+                  topics: "Science"
+                }
+              }
+            ]
+          }
+        },
+        {
+          bool: {
+            should: [
+              {
+                term: {
+                  availability: "Upcoming"
+                }
+              }
+            ]
+          }
+        }
+      ]
+
+      assert.deepEqual(buildSearchQuery({ type, text, facets }), {
+        aggs: {
+          availability: {
+            terms: {
+              field: "availability",
+              size:  10000
+            }
+          },
+          platform: {
+            terms: {
+              field: "platform",
+              size:  10000
+            }
+          },
+          topics: {
+            terms: {
+              field: "topics",
+              size:  10000
             }
           }
-        )
-        sinon.assert.calledWith(stub, type)
+        },
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: mustQuery
+                    }
+                  },
+                  must: {
+                    multi_match: {
+                      query:  text,
+                      fields: fieldNames
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
       })
+      sinon.assert.calledWith(stub, type)
     })
   })
 

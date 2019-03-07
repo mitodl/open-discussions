@@ -3,7 +3,7 @@ import { POST, INITIAL_STATE } from "redux-hammock/constants"
 
 import * as api from "../lib/api/api"
 
-import type { Result, SearchParams } from "../flow/searchTypes"
+import type { FacetResult, Result, SearchParams } from "../flow/searchTypes"
 import { CLEAR_SEARCH } from "../actions/search"
 
 type PostFuncReturn = {
@@ -12,6 +12,7 @@ type PostFuncReturn = {
 }
 type SearchState = {
   results: Array<Result>,
+  facets: ?Map<string, FacetResult>,
   total: number,
   initialLoad: boolean
 }
@@ -24,6 +25,7 @@ export const searchEndpoint = {
     data: {
       initialLoad: true,
       results:     [],
+      facets:      null,
       total:       0
     }
   },
@@ -41,6 +43,8 @@ export const searchEndpoint = {
     return {
       // $FlowFixMe: doesn't know about ES structure
       results:     oldResults.concat(response.hits.hits.map(item => item._source)),
+      // $FlowFixMe: doesn't know about ES structure
+      facets:      new Map(Object.entries(response.aggregations || {})),
       total:       response.hits.total,
       initialLoad: false
     }
@@ -50,6 +54,7 @@ export const searchEndpoint = {
       return {
         // $FlowFixMe: doesn't know about ES structure
         results:     [],
+        facets:      null,
         total:       0,
         initialLoad: true
       }

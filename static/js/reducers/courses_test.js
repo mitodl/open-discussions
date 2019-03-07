@@ -1,52 +1,32 @@
 // @flow
-import { actions } from "../actions"
-import IntegrationTestHelper from "../util/integration_test_helper"
 import { assert } from "chai"
+import sinon from "sinon"
+
+import IntegrationTestHelper from "../util/integration_test_helper"
+import { actions } from "../actions"
+import { makeCourse } from "../factories/courses"
 
 describe("course reducers", () => {
-  let helper, dispatchThen
-
-  const aggregateResponse = {
-    hits:         { total: 1313, max_score: 0.0, hits: [] },
-    aggregations: {
-      topics: {
-        buckets: [
-          { key: "Engineering", doc_count: 323 },
-          { key: "Science", doc_count: 234 },
-          { key: "Math", doc_count: 214 }
-        ]
-      },
-      platform: {
-        buckets: [
-          { key: "mitx", doc_count: 632 },
-          { key: "ocw", doc_count: 398 }
-        ]
-      }
-    }
-  }
+  let helper, response, dispatchThen
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
-    dispatchThen = helper.store.createDispatchThen(state => state.coursefacets)
-    helper.aggregateStub.returns(Promise.resolve(aggregateResponse))
+    response = makeCourse()
+    helper.getCourseStub.returns(Promise.resolve(response))
+    dispatchThen = helper.store.createDispatchThen(state => state.courses)
   })
 
   afterEach(() => {
     helper.cleanup()
   })
 
-  it("should fetch aggregation results", async () => {
-    const { data } = await dispatchThen(actions.coursefacets.get(), [
-      actions.coursefacets.get.requestType,
-      actions.coursefacets.get.successType
+  it("should fetch course data", async () => {
+    const { requestType, successType } = actions.courses.get
+    const { data } = await dispatchThen(actions.courses.get(response.id), [
+      requestType,
+      successType
     ])
-    assert.deepEqual(data, {
-      platforms: aggregateResponse.aggregations.platform.buckets.map(
-        bucket => bucket.key
-      ),
-      topics: aggregateResponse.aggregations.topics.buckets.map(
-        bucket => bucket.key
-      )
-    })
+    sinon.assert.calledWith(helper.getCourseStub, response.id)
+    assert.equal(data.get(response.id), response)
   })
 })

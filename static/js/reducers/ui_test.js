@@ -23,7 +23,11 @@ import {
   showDropdown,
   hideDropdown,
   setBannerMessage,
-  hideBanner
+  hideBanner,
+  showSearchFacets,
+  hideSearchFacets,
+  HIDE_SEARCH_FACETS,
+  SHOW_SEARCH_FACETS
 } from "../actions/ui"
 import { USER_MENU_DROPDOWN } from "../containers/App"
 
@@ -151,6 +155,26 @@ describe("ui reducer", () => {
     assert.deepEqual(state.banner, {
       message: "",
       visible: false
+    })
+  })
+
+  //
+  ;[true, false].forEach(show => {
+    it(`should let you ${
+      show ? "show" : "hide"
+    } additional facets`, async () => {
+      const facetKey = "topics"
+      await dispatchThen(showSearchFacets(facetKey), [SHOW_SEARCH_FACETS])
+      let state = await dispatchThen(showSearchFacets(facetKey), [
+        SHOW_SEARCH_FACETS
+      ])
+      // make sure we start with dialog state so we can assert that it's cleared
+      assert.ok(state.facets.has(facetKey))
+
+      state = await dispatchThen(hideSearchFacets(facetKey), [
+        HIDE_SEARCH_FACETS
+      ])
+      assert.isNotOk(state.facets.has(facetKey))
     })
   })
 })
