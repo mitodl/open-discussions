@@ -1,13 +1,13 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import { NavLink } from "react-router-dom"
+import { Link, NavLink } from "react-router-dom"
 import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
 
 import UserMenu from "./UserMenu"
 import HamburgerAndLogo from "../components/HamburgerAndLogo"
 
-import { siteSearchURL } from "../lib/url"
+import { coursesURL, siteSearchURL } from "../lib/url"
 
 import type { Profile } from "../flow/discussionTypes"
 
@@ -15,7 +15,8 @@ type Props = {
   profile: ?Profile,
   showUserMenu: boolean,
   toggleShowDrawer: Function,
-  toggleShowUserMenu: Function
+  toggleShowUserMenu: Function,
+  isCourseUrl: boolean
 }
 
 export default class Toolbar extends React.Component<Props> {
@@ -39,17 +40,41 @@ export default class Toolbar extends React.Component<Props> {
   }
 
   render() {
-    const { toggleShowUserMenu, showUserMenu, profile } = this.props
+    const {
+      toggleShowUserMenu,
+      showUserMenu,
+      profile,
+      isCourseUrl
+    } = this.props
 
     return (
       <div className="navbar">
         <header className="mdc-toolbar" ref={div => (this.toolbarRoot = div)}>
           <div className="mdc-toolbar__row">
             <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
-              <HamburgerAndLogo onHamburgerClick={this.toggleShowDrawer} />
+              {isCourseUrl ? (
+                <React.Fragment>
+                  <a href="http://www.mit.edu" className="mitlogo">
+                    <img
+                      src={`/static/images/${
+                        SETTINGS.use_new_branding
+                          ? "MIT_circle.svg"
+                          : "mit-logo-transparent3.svg"
+                      }`}
+                    />
+                  </a>
+                  <span className="mdc-toolbar__title">
+                    <Link to="/">MIT Open</Link>
+                    {" | "}
+                    <Link to={coursesURL()}>Courses</Link>
+                  </span>
+                </React.Fragment>
+              ) : (
+                <HamburgerAndLogo onHamburgerClick={this.toggleShowDrawer} />
+              )}
             </section>
             <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
-              {SETTINGS.allow_search ? (
+              {SETTINGS.allow_search && !isCourseUrl ? (
                 <NavLink
                   exact
                   to={siteSearchURL()}
@@ -59,6 +84,7 @@ export default class Toolbar extends React.Component<Props> {
                   <i className="material-icons">search</i>
                 </NavLink>
               ) : null}
+
               <UserMenu
                 toggleShowUserMenu={toggleShowUserMenu}
                 showUserMenu={showUserMenu}

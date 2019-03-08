@@ -25,7 +25,8 @@ import {
   absolutizeURL,
   getNextParam,
   channelSearchURL,
-  siteSearchURL
+  siteSearchURL,
+  coursesURL
 } from "./url"
 import { makePost } from "../factories/posts"
 
@@ -225,6 +226,12 @@ describe("url helper functions", () => {
   describe("siteSearchURL", () => {
     it("returns a site search URL", () => {
       assert.equal(siteSearchURL(), "/search/")
+    })
+  })
+
+  describe("coursesURL", () => {
+    it("returns a courses URL", () => {
+      assert.equal(coursesURL(), "/courses/")
     })
   })
 

@@ -177,6 +177,8 @@ class App extends React.Component<Props> {
       return <Redirect to={AUTH_REQUIRED_URL} />
     }
 
+    const isCourseUrl = pathname.startsWith(`/courses`)
+
     return (
       <div className="app">
         <MetaTags>
@@ -187,8 +189,9 @@ class App extends React.Component<Props> {
           toggleShowUserMenu={this.toggleShowUserMenu}
           showUserMenu={showUserMenu}
           profile={profile}
+          isCourseUrl={isCourseUrl}
         />
-        <Drawer />
+        {isCourseUrl ? null : <Drawer />}
         <Snackbar snackbar={snackbar} />
         <Banner
           banner={banner}

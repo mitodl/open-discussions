@@ -131,4 +131,12 @@ describe("App", () => {
       )
     })
   })
+
+  //
+  ;[["/courses/", false], ["/", true]].forEach(([url, hasDrawer]) => {
+    it(`${shouldIf(hasDrawer)} include a Drawer if url is ${url}`, async () => {
+      const [wrapper] = await renderComponent(url, [])
+      assert.equal(wrapper.find("Drawer").exists(), hasDrawer)
+    })
+  })
 })

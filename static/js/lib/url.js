@@ -71,6 +71,7 @@ export const postPermalink = (post: Post): string =>
   absolutizeURL(postDetailURL(post.channel_name, post.id, post.slug))
 
 export const siteSearchURL = (): string => "/search/"
+export const coursesURL = (): string => "/courses/"
 
 // pull the channel name out of location.pathname
 // see here for why this hackish approach was necessary:
