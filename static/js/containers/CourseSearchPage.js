@@ -216,7 +216,14 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   render() {
-    const { match, facets, total, facetVisibility } = this.props
+    const {
+      match,
+      facets,
+      total,
+      facetVisibility,
+      loaded,
+      processing
+    } = this.props
     const { text, error, topics, platforms, availabilities } = this.state
 
     return (
@@ -235,7 +242,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
                 validation={error}
               />
             </div>
-            {total === 0 ? (
+            {total === 0 && !processing && loaded ? (
               <div className="empty-list-msg">
                 There are no results to display.
               </div>
