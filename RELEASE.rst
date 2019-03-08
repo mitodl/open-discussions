@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.69.0
+Version 0.69.0 (Released March 08, 2019)
 --------------
 
 - update a few JS deps
