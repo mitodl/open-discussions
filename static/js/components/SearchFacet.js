@@ -21,13 +21,6 @@ type Props = {
 }
 
 export class SearchFacet extends React.Component<Props> {
-  constructor() {
-    super()
-    this.state = {
-      showAll: false
-    }
-  }
-
   toggleAllFacets = async (key: string) => {
     const { dispatch, showAll } = this.props
     await dispatch(showAll ? hideSearchFacets(key) : showSearchFacets(key))
@@ -70,24 +63,19 @@ export class SearchFacet extends React.Component<Props> {
                 </div>
               </Checkbox>
             </div>
-            {i === maxCount && !showAll && maxCount < results.buckets.length ? (
-              <div
-                className="facet-more-less"
-                onClick={() => this.toggleAllFacets(name)}
-              >
-                View more
-              </div>
-            ) : null}
+            {(!showAll &&
+              i === maxCount &&
+              maxCount < results.buckets.length) ||
+            (showAll && i === results.buckets.length - 1) ? (
+                <div
+                  className="facet-more-less"
+                  onClick={() => this.toggleAllFacets(name)}
+                >
+                  {showAll ? "View less" : "View more"}
+                </div>
+              ) : null}
           </React.Fragment>
         ))}
-        {showAll && maxCount < results.buckets.length ? (
-          <div
-            className="facet-more-less"
-            onClick={() => this.toggleAllFacets(name)}
-          >
-            View less
-          </div>
-        ) : null}
       </div>
     )
   }

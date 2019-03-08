@@ -212,21 +212,17 @@ export const buildSearchQuery = ({
     const facetClauses = []
     if (facets) {
       facets.forEach((values, key) => {
-        const facetClause =
-          values && values.length > 0
-            ? [
-              {
-                bool: {
-                  should: values.map(value => ({
-                    term: {
-                      [key]: value
-                    }
-                  }))
+        if (values && values.length > 0) {
+          facetClauses.push({
+            bool: {
+              should: values.map(value => ({
+                term: {
+                  [key]: value
                 }
-              }
-            ]
-            : []
-        facetClauses.push(...facetClause)
+              }))
+            }
+          })
+        }
         builder.agg("terms", key, { size: 10000 }, key)
       })
     }

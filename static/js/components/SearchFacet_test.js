@@ -35,7 +35,7 @@ describe("SearchFacet", () => {
     dispatchStub = helper.sandbox.stub().returns({ type: "action" })
     results = new Map(Object.entries(makeSearchFacetResult())).get("topics")
     // $FlowFixMe: buckets not missing here
-    facet = facet = results.buckets[0]
+    facet = results.buckets[0]
   })
 
   afterEach(() => {
