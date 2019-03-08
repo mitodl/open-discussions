@@ -30,22 +30,38 @@ import type {
   FacetResult
 } from "../flow/searchTypes"
 
-type Props = {
+type OwnProps = {|
   dispatch: Dispatch<any>,
   location: Location,
   history: Object,
-  initialLoad: boolean,
   isModerator: boolean,
   match: Match,
   runSearch: (params: SearchParams) => Promise<*>,
+  clearSearch: () => void
+|}
+
+type StateProps = {|
+  initialLoad: boolean,
   results: Array<Result>,
   facets: Map<string, FacetResult>,
   loaded: boolean,
   processing: boolean,
   total: number,
-  facetVisibility: Map<string, boolean>,
-  clearSearch: () => void
-}
+  facetVisibility: Map<string, boolean>
+|}
+
+type DispatchProps = {|
+  runSearch: (params: SearchParams) => Promise<*>,
+  clearSearch: () => Promise<*>,
+  dispatch: Dispatch<*>
+|}
+
+type Props = {|
+  ...OwnProps,
+  ...StateProps,
+  ...DispatchProps
+|}
+
 type State = {
   text: string,
   topics: Array<string>,
@@ -200,14 +216,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      match,
-      facets,
-      total,
-      facetVisibility,
-      loaded,
-      processing
-    } = this.props
+    const { match, facets, total, facetVisibility } = this.props
     const { text, error, topics, platforms, availabilities } = this.state
 
     return (
@@ -226,7 +235,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
                 validation={error}
               />
             </div>
-            {total === 0 && !processing && loaded ? (
+            {total === 0 ? (
               <div className="empty-list-msg">
                 There are no results to display.
               </div>
@@ -271,7 +280,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state): StateProps => {
   const { search, ui } = state
   const { results, total, initialLoad, facets } = search.data
 
@@ -297,8 +306,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   dispatch
 })
 
-// $FlowFixMe: looking for unused ownProps?
-export default connect(
+export default connect<Props, OwnProps, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(CourseSearchPage)
