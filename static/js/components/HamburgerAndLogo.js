@@ -1,6 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
+
 import MITLogoLink from "./MITLogoLink"
 
 type Props = {
