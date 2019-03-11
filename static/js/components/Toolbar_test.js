@@ -8,20 +8,17 @@ import { shallow } from "enzyme"
 import Toolbar from "./Toolbar"
 
 import { makeProfile } from "../factories/profiles"
-import { shouldIf } from "../lib/test_utils"
 
 describe("Toolbar", () => {
   let toggleShowDrawerStub, sandbox
 
-  const renderToolbar = (props = {}) =>
+  const renderToolbar = () =>
     shallow(
       <Toolbar
         toggleShowDrawer={toggleShowDrawerStub}
         toggleShowUserMenu={sandbox.stub()}
         showUserMenu={false}
         profile={makeProfile()}
-        isCourseUrl={false}
-        {...props}
       />,
       { disableLifecycleMethods: true }
     )
@@ -51,23 +48,6 @@ describe("Toolbar", () => {
         .find("UserMenu")
         .exists()
     )
-  })
-
-  //
-  ;[true, false].forEach(isCourseUrl => {
-    it(`${shouldIf(isCourseUrl)} have a courses link, ${shouldIf(
-      !isCourseUrl
-    )} have a Hamburger`, () => {
-      const wrapper = renderToolbar({ isCourseUrl })
-      assert.equal(wrapper.find("HamburgerAndLogo").exists(), !isCourseUrl)
-      assert.equal(
-        wrapper
-          .find("Link")
-          .at(1)
-          .exists(),
-        isCourseUrl
-      )
-    })
   })
 
   //

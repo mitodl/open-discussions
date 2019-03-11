@@ -1,6 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
+import MITLogoLink from "./MITLogoLink"
 
 type Props = {
   onHamburgerClick: Function
@@ -15,15 +16,7 @@ const HamburgerAndLogo = ({ onHamburgerClick }: Props) => (
     >
       menu
     </a>
-    <a href="http://www.mit.edu" className="mitlogo">
-      <img
-        src={`/static/images/${
-          SETTINGS.use_new_branding
-            ? "MIT_circle.svg"
-            : "mit-logo-transparent3.svg"
-        }`}
-      />
-    </a>
+    <MITLogoLink />
     <span className="mdc-toolbar__title">
       <a href={SETTINGS.authenticated_site.base_url}>
         {SETTINGS.authenticated_site.title}

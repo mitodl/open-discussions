@@ -58,6 +58,7 @@ import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { SnackbarState, BannerState } from "../reducers/ui"
 import type { Profile } from "../flow/discussionTypes"
+import CourseToolbar from "../components/CourseToolbar"
 
 export const USER_MENU_DROPDOWN = "USER_MENU_DROPDOWN"
 
@@ -177,21 +178,33 @@ class App extends React.Component<Props> {
       return <Redirect to={AUTH_REQUIRED_URL} />
     }
 
-    const isCourseUrl = pathname.startsWith(`/courses`)
-
     return (
       <div className="app">
         <MetaTags>
           <title>MIT Open Learning</title>
         </MetaTags>
-        <Toolbar
-          toggleShowDrawer={this.toggleShowDrawer}
-          toggleShowUserMenu={this.toggleShowUserMenu}
-          showUserMenu={showUserMenu}
-          profile={profile}
-          isCourseUrl={isCourseUrl}
-        />
-        {isCourseUrl ? null : <Drawer />}
+        <Switch>
+          <Route path={`${match.url}courses/`}>
+            <CourseToolbar
+              toggleShowUserMenu={this.toggleShowUserMenu}
+              showUserMenu={showUserMenu}
+              profile={profile}
+            />
+          </Route>
+          <Route
+            render={() => (
+              <React.Fragment>
+                <Toolbar
+                  toggleShowDrawer={this.toggleShowDrawer}
+                  toggleShowUserMenu={this.toggleShowUserMenu}
+                  showUserMenu={showUserMenu}
+                  profile={profile}
+                />
+                <Drawer />
+              </React.Fragment>
+            )}
+          />
+        </Switch>
         <Snackbar snackbar={snackbar} />
         <Banner
           banner={banner}
