@@ -133,10 +133,14 @@ describe("App", () => {
   })
 
   //
-  ;[["/courses/", false], ["/", true]].forEach(([url, hasDrawer]) => {
-    it(`${shouldIf(hasDrawer)} include a Drawer if url is ${url}`, async () => {
+  ;[["/courses/", true], ["/", false]].forEach(([url, isCourseUrl]) => {
+    it(`${shouldIf(!isCourseUrl)} include a Drawer, ${shouldIf(
+      isCourseUrl
+    )} include CourseToolbar if url is ${url}`, async () => {
       const [wrapper] = await renderComponent(url, [])
-      assert.equal(wrapper.find("Drawer").exists(), hasDrawer)
+      assert.equal(wrapper.find("CourseToolbar").exists(), isCourseUrl)
+      assert.equal(wrapper.find("Toolbar").exists(), !isCourseUrl)
+      assert.equal(wrapper.find("Drawer").exists(), !isCourseUrl)
     })
   })
 })
