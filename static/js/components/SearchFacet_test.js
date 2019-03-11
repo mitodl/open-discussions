@@ -23,7 +23,10 @@ describe("SearchFacet", () => {
         title={title}
         onUpdate={onUpdateStub}
         dispatch={dispatchStub}
+        // $FlowFixMe: test results are fine
         results={results}
+        currentlySelected={[]}
+        showAll={false}
         {...props}
       />
     )

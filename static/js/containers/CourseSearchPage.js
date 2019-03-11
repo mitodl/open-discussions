@@ -7,8 +7,6 @@ import InfiniteScroll from "react-infinite-scroller"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
-import type { Location, Match } from "react-router"
-import type { Dispatch } from "redux"
 
 import CourseDrawer from "./CourseDrawer"
 import CanonicalLink from "../components/CanonicalLink"
@@ -23,6 +21,8 @@ import { clearSearch } from "../actions/search"
 import { SEARCH_FILTER_COURSE } from "../lib/picker"
 import { preventDefaultAndInvoke, toArray } from "../lib/util"
 
+import type { Location, Match } from "react-router"
+import type { Dispatch } from "redux"
 import type {
   SearchInputs,
   SearchParams,
@@ -43,11 +43,10 @@ type OwnProps = {|
 type StateProps = {|
   initialLoad: boolean,
   results: Array<Result>,
-  facets: Map<string, FacetResult>,
+  facets: Map<string, ?FacetResult>,
   loaded: boolean,
   processing: boolean,
-  total: number,
-  facetVisibility: Map<string, boolean>
+  total: number
 |}
 
 type DispatchProps = {|
@@ -216,14 +215,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      match,
-      facets,
-      total,
-      facetVisibility,
-      loaded,
-      processing
-    } = this.props
+    const { match, facets, total, loaded, processing } = this.props
     const { text, error, topics, platforms, availabilities } = this.state
 
     return (
@@ -257,7 +249,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
                   results={facets.get("topics")}
                   onUpdate={this.onUpdateFacets}
                   currentlySelected={topics}
-                  showAll={facetVisibility.has("topics")}
                 />
                 <SearchFacet
                   title="Availability"
@@ -265,7 +256,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
                   results={facets.get("availability")}
                   onUpdate={this.onUpdateFacets}
                   currentlySelected={availabilities}
-                  showAll={facetVisibility.has("availabilities")}
                 />
                 <SearchFacet
                   title="Platform"
@@ -274,7 +264,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
                   onUpdate={this.onUpdateFacets}
                   labelFunction={_.upperCase}
                   currentlySelected={platforms}
-                  showAll={facetVisibility.has("platforms")}
                 />
               </Card>
             ) : null}
@@ -288,7 +277,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state): StateProps => {
-  const { search, ui } = state
+  const { search } = state
   const { results, total, initialLoad, facets } = search.data
 
   return {
@@ -296,9 +285,8 @@ const mapStateToProps = (state): StateProps => {
     facets,
     total,
     initialLoad,
-    loaded:          search.loaded,
-    processing:      search.processing,
-    facetVisibility: ui.facets
+    loaded:     search.loaded,
+    processing: search.processing
   }
 }
 

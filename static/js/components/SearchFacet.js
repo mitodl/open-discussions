@@ -1,24 +1,38 @@
+// @flow
 import React from "react"
 import R from "ramda"
-import { Dispatch } from "redux"
 import { connect } from "react-redux"
+import _ from "lodash"
 import Checkbox from "rmwc/Checkbox/index"
 
 import { hideSearchFacets, showSearchFacets } from "../actions/ui"
 
+import type { Dispatch } from "redux"
 import type { FacetResult } from "../flow/searchTypes"
 
-type Props = {
-  results: FacetResult,
+type OwnProps = {|
+  results: ?FacetResult,
   name: string,
   title: string,
   currentlySelected: Array<string>,
   labelFunction?: Function,
   onUpdate: Function,
-  displayCount?: number,
-  showAll: boolean,
+  displayCount?: number
+|}
+
+type StateProps = {|
+  showAll: boolean
+|}
+
+type DispatchProps = {|
   dispatch: Dispatch<*>
-}
+|}
+
+type Props = {|
+  ...StateProps,
+  ...DispatchProps,
+  ...OwnProps
+|}
 
 export class SearchFacet extends React.Component<Props> {
   toggleAllFacets = async (key: string) => {
@@ -39,7 +53,7 @@ export class SearchFacet extends React.Component<Props> {
     } = this.props
     const maxCount = displayCount || 5
 
-    return (
+    return results ? (
       <div className="facets">
         <div className="facet-title">{title}</div>
         {results.buckets.map((facet, i) => (
@@ -77,8 +91,18 @@ export class SearchFacet extends React.Component<Props> {
           </React.Fragment>
         ))}
       </div>
-    )
+    ) : null
   }
 }
 
-export default connect()(SearchFacet)
+const mapStateToProps = (state, ownProps): StateProps => {
+  const { ui } = state
+  const { name } = ownProps
+  return {
+    showAll: ui.facets.has(name)
+  }
+}
+
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(
+  SearchFacet
+)
