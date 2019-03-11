@@ -36,6 +36,7 @@ import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"
 import Drawer from "../containers/Drawer"
 import Toolbar from "../components/Toolbar"
+import CourseToolbar from "../components/CourseToolbar"
 
 import { actions } from "../actions"
 import {
@@ -58,7 +59,6 @@ import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { SnackbarState, BannerState } from "../reducers/ui"
 import type { Profile } from "../flow/discussionTypes"
-import CourseToolbar from "../components/CourseToolbar"
 
 export const USER_MENU_DROPDOWN = "USER_MENU_DROPDOWN"
 
