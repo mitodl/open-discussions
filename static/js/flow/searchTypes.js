@@ -82,9 +82,13 @@ export type CourseResult = {
   prices:             Array<CoursePrice>
 }
 
-export type CourseFacetResult = {
-  platforms:  Array<string>,
-  topics:     Array<string>
+export type FacetBucket = {
+  key:       string,
+  doc_count: number
+}
+
+export type FacetResult = {
+  buckets:    Array<FacetBucket>
 }
 
 export type Result = PostResult | CommentResult | ProfileResult | CourseResult
@@ -104,7 +108,5 @@ export type SearchParams = {
   from:             number,
   size:             number,
   channelName:      ?string,
-  platforms?:       ?Array<string>,
-  topics?:          ?Array<string>,
-  availabilities?:  ?Array<string>
+  facets?:           Map<string, Array<string>>
 }

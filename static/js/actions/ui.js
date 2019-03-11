@@ -49,6 +49,12 @@ export const hideDropdown = createAction<string, *>(HIDE_DROPDOWN)
 export const SET_AUTH_USER_DETAIL = "SET_AUTH_USER_DETAIL"
 export const setAuthUserDetail = createAction<string, *>(SET_AUTH_USER_DETAIL)
 
+export const SHOW_SEARCH_FACETS = "SHOW_SEARCH_FACETS"
+export const showSearchFacets = createAction<string, *>(SHOW_SEARCH_FACETS)
+
+export const HIDE_SEARCH_FACETS = "HIDE_SEARCH_FACETS"
+export const hideSearchFacets = createAction<string, *>(HIDE_SEARCH_FACETS)
+
 // this is a hack :/
 // needed to debounce just a little bit to get around a race
 // condition with the post dropdown menu

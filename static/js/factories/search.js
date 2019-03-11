@@ -120,16 +120,38 @@ export const makeSearchResult = (type: ?string) => {
   }
 }
 
+export const makeSearchFacetResult = () => {
+  return {
+    platform: {
+      buckets: [{ key: "mitx", doc_count: 88 }, { key: "ocw", doc_count: 102 }]
+    },
+    topics: {
+      buckets: [
+        { key: "Science", doc_count: 172 },
+        { key: "Physics", doc_count: 32 }
+      ]
+    },
+    availability: {
+      buckets: [
+        { key: "Archived", doc_count: 33 },
+        { key: "Upcoming", doc_count: 67 }
+      ]
+    }
+  }
+}
+
 export const makeSearchResponse = (
   pageSize: number = SETTINGS.search_page_size,
   total: number = SETTINGS.search_page_size * 2,
-  type: ?string
+  type: ?string,
+  withFacets: boolean = false
 ) => {
   const hits = R.range(0, pageSize).map(() => makeSearchResult(type))
   return {
     hits: {
       total,
       hits
-    }
+    },
+    aggregations: withFacets ? makeSearchFacetResult() : {}
   }
 }

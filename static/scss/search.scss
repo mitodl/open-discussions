@@ -52,3 +52,41 @@
     }
   }
 }
+
+.facets {
+  margin-bottom: 20px;
+
+  .facet-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .divider {
+    padding-top: 20px;
+  }
+
+  .mdc-form-field {
+    display: flex;
+    align-items: center;
+
+    label {
+      margin: 0;
+      width: 100%;
+    }
+  }
+}
+
+.facet-hidden {
+  display: none;
+}
+
+.facet-more-less {
+  cursor: pointer;
+  color: $link-blue;
+}
+
+.facet-label-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

@@ -11,24 +11,17 @@ import { makeCourseResult, makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 
 describe("CourseSearchPage", () => {
-  let helper,
-    renderPage,
-    searchResponse,
-    aggregateResponse,
-    initialState,
-    initialProps
+  let helper, renderPage, searchResponse, initialState, initialProps
 
   beforeEach(() => {
     const channel = makeChannel()
     const numHits = 10
-    searchResponse = makeSearchResponse(SETTINGS.search_page_size, numHits)
-    aggregateResponse = {
-      data: {
-        platforms: ["ocw", "mitx"],
-        topics:    ["Engineering", "Science"]
-      },
-      loaded: true
-    }
+    searchResponse = makeSearchResponse(
+      SETTINGS.search_page_size,
+      numHits,
+      "course",
+      true
+    )
     // Simulate an upvoted post
     const searchCourse = makeCourseResult()
     searchCourse.course_id = "course_mitx_1"
@@ -36,7 +29,6 @@ describe("CourseSearchPage", () => {
 
     helper = new IntegrationTestHelper()
     helper.searchStub.returns(Promise.resolve(searchResponse))
-    helper.aggregateStub.returns(Promise.resolve(aggregateResponse))
     initialState = {
       channels: {
         data:   new Map([[channel.name, channel]]),
@@ -46,24 +38,28 @@ describe("CourseSearchPage", () => {
         data: new Map()
       },
       search: {
-        loaded: true,
-        data:   {
+        loaded:     true,
+        processing: false,
+        data:       {
           results:     searchResponse.hits.hits,
+          facets:      new Map(Object.entries(searchResponse.aggregations)),
           total:       searchResponse.hits.total,
           incremental: false
         }
       },
-      coursefacets: aggregateResponse
+      ui: {
+        facets: new Map(Object.entries({ topics: true }))
+      }
     }
     initialProps = {
-      loaded: true,
-      match:  {
+      match: {
         params: {}
       },
       location: {
         search: "q=text"
       },
-      history: helper.browserHistory
+      history:         helper.browserHistory,
+      facetVisibility: new Map(Object.entries({ topics: true }))
     }
 
     renderPage = helper.configureHOCRenderer(
@@ -80,18 +76,6 @@ describe("CourseSearchPage", () => {
 
   it("renders search results", async () => {
     const { inner } = await renderPage()
-    //assert.equal(inner.find("").exists(), true)
-
-    sinon.assert.calledWith(helper.searchStub, {
-      channelName:    null,
-      from:           0,
-      size:           SETTINGS.search_page_size,
-      text:           "text",
-      type:           "course",
-      platforms:      undefined,
-      topics:         undefined,
-      availabilities: undefined
-    })
     searchResponse.hits.hits.forEach((result, i) => {
       assert.deepEqual(
         inner
@@ -104,33 +88,41 @@ describe("CourseSearchPage", () => {
   })
   ;["", "a"].forEach(query => {
     it(`still runs a search if initial search text is '${query}'`, async () => {
-      await renderPage(
-        {},
-        {
-          location: {
-            search: `q=${query}`
-          }
+      await renderPage({
+        search: {
+          loaded:     false,
+          processing: false
+        },
+        location: {
+          search: `q=${query}`
         }
-      )
+      })
       sinon.assert.calledOnce(helper.searchStub)
     })
   })
 
   it("loads more results", async () => {
     SETTINGS.search_page_size = 5
-    const { inner } = await renderPage()
-
-    helper.searchStub.reset()
+    const { inner } = await renderPage({
+      search: {
+        processing: false,
+        loaded:     true
+      }
+    })
     await inner.find("InfiniteScroll").prop("loadMore")()
     sinon.assert.calledWith(helper.searchStub, {
-      channelName:    null,
-      from:           SETTINGS.search_page_size,
-      size:           SETTINGS.search_page_size,
-      text:           "text",
-      type:           "course",
-      platforms:      undefined,
-      topics:         undefined,
-      availabilities: undefined
+      channelName: null,
+      from:        SETTINGS.search_page_size,
+      size:        SETTINGS.search_page_size,
+      text:        "text",
+      type:        "course",
+      facets:      new Map(
+        Object.entries({
+          platform:     undefined,
+          topics:       undefined,
+          availability: undefined
+        })
+      )
     })
     // from is 5, plus 5 is 10 which is == numHits so no more results
     assert.isFalse(inner.find("InfiniteScroll").prop("hasMore"))
@@ -138,7 +130,12 @@ describe("CourseSearchPage", () => {
   it("searches with parameters", async () => {
     SETTINGS.search_page_size = 5
     await renderPage(
-      {},
+      {
+        search: {
+          processing: false,
+          loaded:     false
+        }
+      },
       {
         location: {
           search: "q=text&p=ocw&t=Science&t=Engineering&a=prior"
@@ -146,14 +143,18 @@ describe("CourseSearchPage", () => {
       }
     )
     sinon.assert.calledWith(helper.searchStub, {
-      channelName:    null,
-      from:           0,
-      size:           SETTINGS.search_page_size,
-      text:           "text",
-      type:           "course",
-      platforms:      ["ocw"],
-      topics:         ["Science", "Engineering"],
-      availabilities: ["prior"]
+      channelName: null,
+      from:        0,
+      size:        SETTINGS.search_page_size,
+      text:        "text",
+      type:        "course",
+      facets:      new Map(
+        Object.entries({
+          platforms:      ["ocw"],
+          topics:         ["Science", "Engineering"],
+          availabilities: ["prior"]
+        })
+      )
     })
   })
   ;[0, 5].forEach(from => {
@@ -168,21 +169,18 @@ describe("CourseSearchPage", () => {
   })
   ;[
     [true, false, false],
-    [false, true, false],
-    [false, false, false],
+    [false, true, true],
+    [false, false, true],
     [true, true, true]
-  ].forEach(([initialLoad, searchProcessing, expected]) => {
+  ].forEach(([loaded, processing, expected]) => {
     it(`${expected ? "shows" : "doesn't show"} PostLoading when we are ${
-      searchProcessing ? "loading" : "not loading"
-    } search results and initialLoad = ${String(initialLoad)}`, async () => {
+      processing ? "processing" : "not processing"
+    } search results or loaded  = ${String(loaded)}`, async () => {
       const { inner } = await renderPage(
         {
           search: {
-            data: {
-              initialLoad
-            },
-            processing: searchProcessing,
-            loaded:     !searchProcessing
+            processing: processing,
+            loaded:     loaded
           }
         },
         {
@@ -200,7 +198,8 @@ describe("CourseSearchPage", () => {
       {
         search: {
           data: {
-            results: []
+            results: [],
+            total:   0
           }
         }
       },
@@ -271,28 +270,28 @@ describe("CourseSearchPage", () => {
   it("triggers a non-incremental search when the facet changes", async () => {
     const { inner } = await renderPage()
     helper.searchStub.reset()
-    const text = "text"
+    const text = "new text"
     inner.setState({ from: 7, text })
-    await inner
-      .find("Checkbox")
+    inner
+      .find("Connect(SearchFacet)")
       .at(0)
       .props()
-      .onClick({
-        target: {
-          value:   "Engineering",
-          name:    "topics",
-          checked: true
-        }
+      .onUpdate({
+        target: { name: "topics", value: "Engineering", checked: true }
       })
     sinon.assert.calledWith(helper.searchStub, {
-      channelName:    null,
-      from:           0,
-      size:           SETTINGS.search_page_size,
+      channelName: null,
+      from:        0,
+      size:        SETTINGS.search_page_size,
       text,
-      type:           "course",
-      platforms:      undefined,
-      topics:         ["Engineering"],
-      availabilities: undefined
+      type:        "course",
+      facets:      new Map(
+        Object.entries({
+          platforms:      ["ocw"],
+          topics:         ["Engineering"],
+          availabilities: ["prior"]
+        })
+      )
     })
     assert.deepEqual(qs.parse(helper.currentLocation.search), {
       type: "course",
@@ -328,12 +327,6 @@ describe("CourseSearchPage", () => {
     inner.find("SearchTextbox").prop("onClear")()
     assert.equal(inner.state().text, "")
   })
-
-  it("triggers an aggregate query when loadFacetChoices is called", async () => {
-    const { inner } = await renderPage()
-    await inner.instance().loadFacetChoices()
-    sinon.assert.callCount(helper.aggregateStub, 1)
-  })
   ;[false, true].forEach(isChecked => {
     it(`${shouldIf(
       isChecked
@@ -349,14 +342,18 @@ describe("CourseSearchPage", () => {
         }
       })
       sinon.assert.calledWith(helper.searchStub, {
-        channelName:    null,
-        from:           0,
-        size:           SETTINGS.search_page_size,
-        text:           "some text",
-        type:           "course",
-        platforms:      undefined,
-        topics:         isChecked ? ["Science"] : [],
-        availabilities: undefined
+        channelName: null,
+        from:        0,
+        size:        SETTINGS.search_page_size,
+        text:        "some text",
+        type:        "course",
+        facets:      new Map(
+          Object.entries({
+            platforms:      undefined,
+            topics:         isChecked ? ["Science"] : [],
+            availabilities: undefined
+          })
+        )
       })
     })
   })

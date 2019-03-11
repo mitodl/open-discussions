@@ -13,7 +13,9 @@ import {
   HIDE_DROPDOWN,
   SET_DIALOG_DATA,
   SET_AUTH_USER_DETAIL,
-  SET_SHOW_COURSE_DRAWER
+  SET_SHOW_COURSE_DRAWER,
+  SHOW_SEARCH_FACETS,
+  HIDE_SEARCH_FACETS
 } from "../actions/ui"
 
 import type { Action } from "../flow/reduxTypes"
@@ -42,7 +44,8 @@ export type UIState = {
   banner: BannerState,
   dialogs: Map<string, any>,
   dropdownMenus: Set<string>,
-  authUserDetail: Object
+  authUserDetail: Object,
+  facets: Map<string, any>
 }
 
 const INITIAL_BANNER_STATE = {
@@ -62,7 +65,8 @@ export const INITIAL_UI_STATE: UIState = {
   banner:            INITIAL_BANNER_STATE,
   dialogs:           new Map(),
   dropdownMenus:     new Set(),
-  authUserDetail:    {}
+  authUserDetail:    {},
+  facets:            new Map()
 }
 
 // this generates a new sequential id for each snackbar state that is pushed
@@ -191,6 +195,16 @@ export const ui = (
     return {
       ...state,
       authUserDetail: action.payload
+    }
+  case SHOW_SEARCH_FACETS:
+    return {
+      ...state,
+      facets: updateVisibilityMap(state.facets, action.payload, true)
+    }
+  case HIDE_SEARCH_FACETS:
+    return {
+      ...state,
+      facets: updateVisibilityMap(state.facets, action.payload, false)
     }
   }
   return state

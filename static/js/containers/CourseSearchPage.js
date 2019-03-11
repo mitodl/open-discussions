@@ -7,52 +7,60 @@ import InfiniteScroll from "react-infinite-scroller"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
-import type { Location, Match } from "react-router"
-import type { Dispatch } from "redux"
-import Checkbox from "rmwc/Checkbox/index"
 
 import CourseDrawer from "./CourseDrawer"
 import CanonicalLink from "../components/CanonicalLink"
 import Card from "../components/Card"
 import { Cell, Grid } from "../components/Grid"
-import {
-  CourseSearchLoading,
-  Loading,
-  PostLoading,
-  withLoading
-} from "../components/Loading"
+import { Loading, PostLoading } from "../components/Loading"
+import SearchFacet from "../components/SearchFacet"
 import SearchTextbox from "../components/SearchTextbox"
 import SearchResult from "../components/SearchResult"
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
-import { COURSE_AVAILABILITIES } from "../lib/constants"
 import { SEARCH_FILTER_COURSE } from "../lib/picker"
 import { preventDefaultAndInvoke, toArray } from "../lib/util"
 
+import type { Location, Match } from "react-router"
+import type { Dispatch } from "redux"
 import type {
   SearchInputs,
   SearchParams,
   Result,
-  CourseFacetResult
+  FacetResult
 } from "../flow/searchTypes"
 
-type Props = {
+type OwnProps = {|
   dispatch: Dispatch<any>,
   location: Location,
   history: Object,
-  initialLoad: boolean,
   isModerator: boolean,
   match: Match,
   runSearch: (params: SearchParams) => Promise<*>,
+  clearSearch: () => void
+|}
+
+type StateProps = {|
+  initialLoad: boolean,
   results: Array<Result>,
-  searchLoaded: boolean,
+  facets: Map<string, ?FacetResult>,
   loaded: boolean,
-  searchProcessing: boolean,
-  total: number,
-  clearSearch: () => void,
-  facetChoices: CourseFacetResult,
-  facetChoiceProcessing: boolean
-}
+  processing: boolean,
+  total: number
+|}
+
+type DispatchProps = {|
+  runSearch: (params: SearchParams) => Promise<*>,
+  clearSearch: () => Promise<*>,
+  dispatch: Dispatch<*>
+|}
+
+type Props = {|
+  ...OwnProps,
+  ...StateProps,
+  ...DispatchProps
+|}
+
 type State = {
   text: string,
   topics: Array<string>,
@@ -85,12 +93,11 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { clearSearch, loaded, facetChoiceProcessing } = this.props
+    const { clearSearch, loaded, processing } = this.props
     clearSearch()
-    if (!loaded && !facetChoiceProcessing) {
-      this.loadFacetChoices()
+    if (!loaded && !processing) {
+      this.runSearch()
     }
-    this.runSearch()
   }
 
   componentDidUpdate(prevProps: Object, prevState: Object) {
@@ -99,15 +106,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
     }
   }
 
-  loadFacetChoices = async () => {
-    const { dispatch } = this.props
-    dispatch(actions.coursefacets.get())
-  }
-
   loadMore = async () => {
-    const { searchLoaded } = this.props
+    const { loaded } = this.props
 
-    if (!searchLoaded) {
+    if (!loaded) {
       // this function will be triggered repeatedly by <InfiniteScroll />, filter it to just once at a time
       return
     }
@@ -149,15 +151,18 @@ export class CourseSearchPage extends React.Component<Props, State> {
       from = 0
     }
     this.setState({ from })
+    const facets = new Map([
+      ["platform", toArray(platforms) || []],
+      ["topics", toArray(topics) || []],
+      ["availability", toArray(availabilities) || []]
+    ])
     await runSearch({
-      channelName:    null,
+      channelName: null,
       text,
+      facets,
       type,
       from,
-      size:           SETTINGS.search_page_size,
-      platforms:      toArray(platforms),
-      topics:         toArray(topics),
-      availabilities: toArray(availabilities)
+      size:        SETTINGS.search_page_size
     })
   }
 
@@ -184,17 +189,11 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   renderResults = () => {
-    const { results, searchProcessing, initialLoad, total } = this.props
+    const { results, processing, loaded, total } = this.props
     const { from } = this.state
 
-    if (searchProcessing && initialLoad) {
+    if (processing || !loaded) {
       return <PostLoading />
-    }
-
-    if (!results.length) {
-      return (
-        <div className="empty-list-msg">There are no results to display.</div>
-      )
     }
 
     return (
@@ -215,31 +214,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
     )
   }
 
-  renderFacets(
-    choices: Array<string>,
-    name: string,
-    currentlySelected: Array<string>,
-    labelFunction: ?Function
-  ) {
-    return (
-      <React.Fragment>
-        {_.sortBy(choices).map((choice, i) => (
-          <Checkbox
-            key={i}
-            name={name}
-            value={choice}
-            checked={R.contains(choice, currentlySelected || [])}
-            onClick={this.onUpdateFacets}
-          >
-            {labelFunction ? labelFunction(choice) : choice}
-          </Checkbox>
-        ))}
-      </React.Fragment>
-    )
-  }
-
   render() {
-    const { match, facetChoices } = this.props
+    const { match, facets, total, loaded, processing } = this.props
     const { text, error, topics, platforms, availabilities } = this.state
 
     return (
@@ -258,33 +234,39 @@ export class CourseSearchPage extends React.Component<Props, State> {
                 validation={error}
               />
             </div>
+            {total === 0 && !processing && loaded ? (
+              <div className="empty-list-msg">
+                There are no results to display.
+              </div>
+            ) : null}
           </Cell>
           <Cell width={4}>
-            <Card>
-              <div className="course-facets">
-                <div className="facet-title">Subject area</div>
-                {this.renderFacets(facetChoices.topics, "topics", topics, null)}
-              </div>
-
-              <div className="course-facets">
-                <div className="facet-title divider">Availability</div>
-                {this.renderFacets(
-                  COURSE_AVAILABILITIES,
-                  "availabilities",
-                  availabilities,
-                  _.capitalize
-                )}
-              </div>
-              <div className="course-facets">
-                <div className="facet-title divider">Platforms</div>
-                {this.renderFacets(
-                  facetChoices.platforms,
-                  "platforms",
-                  platforms,
-                  _.upperCase
-                )}
-              </div>
-            </Card>
+            {facets && total > 0 ? (
+              <Card>
+                <SearchFacet
+                  title="Subject area"
+                  name="topics"
+                  results={facets.get("topics")}
+                  onUpdate={this.onUpdateFacets}
+                  currentlySelected={topics}
+                />
+                <SearchFacet
+                  title="Availability"
+                  name="availabilities"
+                  results={facets.get("availability")}
+                  onUpdate={this.onUpdateFacets}
+                  currentlySelected={availabilities}
+                />
+                <SearchFacet
+                  title="Platform"
+                  name="platforms"
+                  results={facets.get("platform")}
+                  onUpdate={this.onUpdateFacets}
+                  labelFunction={_.upperCase}
+                  currentlySelected={platforms}
+                />
+              </Card>
+            ) : null}
           </Cell>
           <Cell width={8}>{error ? null : this.renderResults()}</Cell>
         </Grid>
@@ -294,23 +276,17 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = state => {
-  const { search, coursefacets } = state
-  const facetChoices = coursefacets.data || []
-  const factorChoiceProcessing = coursefacets.processing
-  const searchLoaded = search.loaded
-  const searchProcessing = search.processing
-  const { results, total, initialLoad } = search.data
+const mapStateToProps = (state): StateProps => {
+  const { search } = state
+  const { results, total, initialLoad, facets } = search.data
 
   return {
     results,
+    facets,
     total,
     initialLoad,
-    loaded:                coursefacets.loaded,
-    facetChoices:          facetChoices,
-    facetChoiceProcessing: factorChoiceProcessing,
-    searchLoaded,
-    searchProcessing
+    loaded:     search.loaded,
+    processing: search.processing
   }
 }
 
@@ -325,10 +301,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   dispatch
 })
 
-export default R.compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
-  withLoading(CourseSearchLoading)
+export default connect<Props, OwnProps, _, _, _, _>(
+  mapStateToProps,
+  mapDispatchToProps
 )(CourseSearchPage)

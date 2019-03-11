@@ -2,7 +2,7 @@
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { assert } from "chai"
-import { makeSearchResponse } from "../factories/search"
+import { makeSearchFacetResult, makeSearchResponse } from "../factories/search"
 
 describe("search reducers", () => {
   let helper, dispatchThen, response
@@ -26,6 +26,22 @@ describe("search reducers", () => {
     assert.deepEqual(data, {
       initialLoad: false,
       results:     response.hits.hits.map(item => item._source),
+      facets:      new Map(),
+      total:       response.hits.total
+    })
+  })
+
+  it("should fetch search results with facets", async () => {
+    response = makeSearchResponse(5, 10, "course", true)
+    helper.searchStub.returns(Promise.resolve(response))
+    const { data } = await dispatchThen(
+      actions.search.post({ from: 0, size: 5 }),
+      [actions.search.post.requestType, actions.search.post.successType]
+    )
+    assert.deepEqual(data, {
+      initialLoad: false,
+      results:     response.hits.hits.map(item => item._source),
+      facets:      new Map(Object.entries(makeSearchFacetResult())),
       total:       response.hits.total
     })
   })
@@ -43,6 +59,7 @@ describe("search reducers", () => {
     assert.deepEqual(data, {
       initialLoad: false,
       results:     hits.slice(0, 2).concat(hits.slice(0, 5)),
+      facets:      new Map(),
       total:       response.hits.total
     })
   })

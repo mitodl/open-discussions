@@ -2,8 +2,6 @@
 /* global SETTINGS: false */
 import bodybuilder from "bodybuilder"
 import R from "ramda"
-import _ from "lodash"
-import moment from "moment"
 
 import type {
   CommentInTree,
@@ -168,79 +166,6 @@ const _channelField = (type: ?string) => {
 }
 export { _channelField as channelField }
 import { channelField } from "./search"
-import {
-  platforms,
-  COURSE_AVAILABILITIES,
-  COURSE_CURRENT,
-  COURSE_PRIOR,
-  COURSE_UPCOMING
-} from "./constants"
-
-const buildAvailabilityClause = (availabilities: ?Array<string>) => {
-  if (
-    !availabilities ||
-    _.isEqual(_.sortBy(availabilities), _.sortBy(COURSE_AVAILABILITIES))
-  ) {
-    return []
-  }
-  const dates = []
-  const now = moment().format("YYYY-MM-DD[T]HH:mm:ss[Z]")
-  if (availabilities.includes(COURSE_CURRENT)) {
-    dates.push({
-      term: {
-        ["platform"]: platforms.OCW
-      }
-    })
-    dates.push({
-      bool: {
-        filter: [
-          {
-            range: {
-              ["start_date"]: {
-                lte: now
-              }
-            }
-          },
-          {
-            range: {
-              ["end_date"]: {
-                gte: now
-              }
-            }
-          }
-        ]
-      }
-    })
-  }
-  if (availabilities.includes(COURSE_PRIOR)) {
-    dates.push({
-      range: {
-        ["end_date"]: {
-          lte: now
-        }
-      }
-    })
-  }
-  if (availabilities.includes(COURSE_UPCOMING)) {
-    dates.push({
-      range: {
-        ["start_date"]: {
-          gte: now
-        }
-      }
-    })
-  }
-
-  return dates.length > 0
-    ? [
-      {
-        bool: {
-          should: dates
-        }
-      }
-    ]
-    : []
-}
 
 export const buildSearchQuery = ({
   text,
@@ -248,9 +173,7 @@ export const buildSearchQuery = ({
   channelName,
   from,
   size,
-  platforms,
-  topics,
-  availabilities
+  facets
 }: SearchParams): Object => {
   let builder = bodybuilder()
 
@@ -285,44 +208,24 @@ export const buildSearchQuery = ({
       ]
       : []
 
-    // Add a filter for topics
-    const topicClauses =
-      topics && topics.length > 0
-        ? [
-          {
+    // Add filters for facets if necessary
+    const facetClauses = []
+    if (facets) {
+      facets.forEach((values, key) => {
+        if (values && values.length > 0) {
+          facetClauses.push({
             bool: {
-              should: topics.map(topic => ({
+              should: values.map(value => ({
                 term: {
-                  ["topics"]: topic
+                  [key]: value
                 }
               }))
             }
-          }
-        ]
-        : []
-
-    // Add a filter for platforms
-    const platformClauses =
-      platforms && platforms.length > 0
-        ? [
-          {
-            bool: {
-              should: platforms.map(platform => ({
-                term: {
-                  ["platform"]: platform
-                }
-              }))
-            }
-          }
-        ]
-        : []
-
-    const availabilityClause = buildAvailabilityClause(availabilities)
-
-    const courseClauses =
-      type === "course"
-        ? [...topicClauses, ...platformClauses, ...availabilityClause]
-        : []
+          })
+        }
+        builder.agg("terms", key, { size: 10000 }, key)
+      })
+    }
 
     builder = builder.orQuery("bool", {
       filter: {
@@ -334,7 +237,7 @@ export const buildSearchQuery = ({
               }
             },
             ...channelClauses,
-            ...courseClauses
+            ...facetClauses
           ]
         }
       },
