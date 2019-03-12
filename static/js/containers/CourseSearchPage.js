@@ -29,6 +29,7 @@ import type {
   Result,
   FacetResult
 } from "../flow/searchTypes"
+import SearchFilter from "../components/SearchFilter"
 
 type OwnProps = {|
   dispatch: Dispatch<any>,
@@ -43,7 +44,7 @@ type OwnProps = {|
 type StateProps = {|
   initialLoad: boolean,
   results: Array<Result>,
-  facets: Map<string, ?FacetResult>,
+  facets: Map<string, FacetResult>,
   loaded: boolean,
   processing: boolean,
   total: number
@@ -62,33 +63,28 @@ type Props = {|
 |}
 
 type State = {
-  text: string,
-  topics: Array<string>,
-  platforms: Array<string>,
-  availabilities: Array<string>,
+  text: ?string,
+  activeFacets: Map<string, Array<string>>,
   from: number,
   error: ?string
 }
 
 const shouldRunSearch = R.complement(
-  R.allPass([
-    R.eqProps("text"),
-    R.eqProps("topics"),
-    R.eqProps("platforms"),
-    R.eqProps("availabilities")
-  ])
+  R.allPass([R.eqProps("text"), R.eqProps("activeFacets")])
 )
 
 export class CourseSearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      text:           qs.parse(props.location.search).q,
-      topics:         qs.parse(props.location.search).t,
-      platforms:      qs.parse(props.location.search).p,
-      availabilities: qs.parse(props.location.search).a,
-      from:           0,
-      error:          null
+      text:         qs.parse(props.location.search).q,
+      activeFacets: new Map([
+        ["platform", toArray(qs.parse(props.location.search).p) || []],
+        ["topics", toArray(qs.parse(props.location.search).t) || []],
+        ["availability", toArray(qs.parse(props.location.search).a) || []]
+      ]),
+      from:  0,
+      error: null
     }
   }
 
@@ -104,6 +100,17 @@ export class CourseSearchPage extends React.Component<Props, State> {
     if (shouldRunSearch(prevState, this.state)) {
       this.runSearch()
     }
+  }
+
+  clearAllFilters = async () => {
+    this.setState({
+      text:         null,
+      activeFacets: new Map([
+        ["platform", []],
+        ["availability", []],
+        ["topics", []]
+      ])
+    })
   }
 
   loadMore = async () => {
@@ -127,11 +134,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       runSearch
     } = this.props
 
-    const text = params.text || this.state.text || undefined
-    const platforms = params.platforms || this.state.platforms || undefined
-    const topics = params.topics || this.state.topics || undefined
-    const availabilities =
-      params.availabilities || this.state.availabilities || undefined
+    const { activeFacets, text } = this.state
 
     const type = SEARCH_FILTER_COURSE
     history.replace({
@@ -140,9 +143,9 @@ export class CourseSearchPage extends React.Component<Props, State> {
         ...qs.parse(search),
         q: text,
         type,
-        p: platforms,
-        t: topics,
-        a: availabilities
+        p: activeFacets.get("platform"),
+        t: activeFacets.get("topics"),
+        a: activeFacets.get("availability")
       })
     })
     let from = this.state.from + SETTINGS.search_page_size
@@ -151,15 +154,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
       from = 0
     }
     this.setState({ from })
-    const facets = new Map([
-      ["platform", toArray(platforms) || []],
-      ["topics", toArray(topics) || []],
-      ["availability", toArray(availabilities) || []]
-    ])
     await runSearch({
       channelName: null,
       text,
-      facets,
+      facets:      activeFacets,
       type,
       from,
       size:        SETTINGS.search_page_size
@@ -167,15 +165,14 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   toggleFacet = async (name: string, value: string, isEnabled: boolean) => {
+    const { activeFacets } = this.state
+    const updatedFacets = new Map(activeFacets)
     if (isEnabled) {
-      this.setState({
-        [name]: _.union(this.state[name], [value])
-      })
+      updatedFacets.set(name, _.union(activeFacets.get(name) || [], [value]))
     } else {
-      this.setState({
-        [name]: _.without(this.state[name], value)
-      })
+      updatedFacets.set(name, _.without(activeFacets.get(name) || [], value))
     }
+    this.setState({ activeFacets: updatedFacets })
   }
 
   onUpdateFacets = (e: Object) => {
@@ -216,7 +213,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
   render() {
     const { match, facets, total, loaded, processing } = this.props
-    const { text, error, topics, platforms, availabilities } = this.state
+    const { text, error, activeFacets } = this.state
+    const facetDisplayMap = [
+      ["topics", "Subject Area", null],
+      ["availability", "Availability", _.capitalize],
+      ["platform", "Platform", _.upperCase]
+    ]
 
     return (
       <React.Fragment>
@@ -234,6 +236,29 @@ export class CourseSearchPage extends React.Component<Props, State> {
                 validation={error}
               />
             </div>
+            <div className="search-filters-row">
+              {facetDisplayMap.map(([name, title, labelFunction]) =>
+                (activeFacets
+                  .get(name) || [])
+                  .map((facet, i) => (
+                    <SearchFilter
+                      key={i}
+                      title={title}
+                      value={facet}
+                      clearFacet={() => this.toggleFacet(name, facet, false)}
+                      labelFunction={labelFunction}
+                    />
+                  ))
+              )}
+              {_.flatten(_.toArray(activeFacets.values())).length > 0 ? (
+                <div
+                  className="search-filters-clear"
+                  onClick={this.clearAllFilters}
+                >
+                  Clear all filters
+                </div>
+              ) : null}
+            </div>
             {total === 0 && !processing && loaded ? (
               <div className="empty-list-msg">
                 There are no results to display.
@@ -243,28 +268,17 @@ export class CourseSearchPage extends React.Component<Props, State> {
           <Cell width={4}>
             {facets && total > 0 ? (
               <Card>
-                <SearchFacet
-                  title="Subject area"
-                  name="topics"
-                  results={facets.get("topics")}
-                  onUpdate={this.onUpdateFacets}
-                  currentlySelected={topics}
-                />
-                <SearchFacet
-                  title="Availability"
-                  name="availabilities"
-                  results={facets.get("availability")}
-                  onUpdate={this.onUpdateFacets}
-                  currentlySelected={availabilities}
-                />
-                <SearchFacet
-                  title="Platform"
-                  name="platforms"
-                  results={facets.get("platform")}
-                  onUpdate={this.onUpdateFacets}
-                  labelFunction={_.upperCase}
-                  currentlySelected={platforms}
-                />
+                {facetDisplayMap.map(([name, title, labelFunction], i) => (
+                  <SearchFacet
+                    key={i}
+                    title={title}
+                    name={name}
+                    results={facets.get(name)}
+                    onUpdate={this.onUpdateFacets}
+                    currentlySelected={activeFacets.get(name) || []}
+                    labelFunction={labelFunction}
+                  />
+                ))}
               </Card>
             ) : null}
           </Cell>
