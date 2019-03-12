@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.70.1
+--------------
+
+- Search facet improvements (#1906)
+
 Version 0.70.0 (Released March 12, 2019)
 --------------
 
