@@ -19,11 +19,18 @@ type Props = {
 }
 
 export default class Toolbar extends React.Component<Props> {
-  toolbarRoot: HTMLElement | null
+  toolbarRoot: { current: null | React$ElementRef<typeof HTMLElement> }
   toolbar: Object
 
+  constructor(props: Props) {
+    super(props)
+    this.toolbarRoot = React.createRef()
+  }
+
   componentDidMount() {
-    this.toolbar = new MDCToolbar(this.toolbarRoot)
+    if (this.toolbarRoot.current) {
+      this.toolbar = new MDCToolbar(this.toolbarRoot.current)
+    }
   }
 
   componentWillUnmount() {
@@ -43,7 +50,7 @@ export default class Toolbar extends React.Component<Props> {
 
     return (
       <div className="navbar">
-        <header className="mdc-toolbar" ref={div => (this.toolbarRoot = div)}>
+        <header className="mdc-toolbar" ref={this.toolbarRoot}>
           <div className="mdc-toolbar__row">
             <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
               <HamburgerAndLogo onHamburgerClick={this.toggleShowDrawer} />
