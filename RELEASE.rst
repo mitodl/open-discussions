@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.70.0
+Version 0.70.0 (Released March 12, 2019)
 --------------
 
 - kill some sluggishness with the ArticleEditor
