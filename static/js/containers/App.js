@@ -36,6 +36,7 @@ import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"
 import Drawer from "../containers/Drawer"
 import Toolbar from "../components/Toolbar"
+import CourseToolbar from "../components/CourseToolbar"
 
 import { actions } from "../actions"
 import {
@@ -182,13 +183,28 @@ class App extends React.Component<Props> {
         <MetaTags>
           <title>MIT Open Learning</title>
         </MetaTags>
-        <Toolbar
-          toggleShowDrawer={this.toggleShowDrawer}
-          toggleShowUserMenu={this.toggleShowUserMenu}
-          showUserMenu={showUserMenu}
-          profile={profile}
-        />
-        <Drawer />
+        <Switch>
+          <Route path={`${match.url}courses/`}>
+            <CourseToolbar
+              toggleShowUserMenu={this.toggleShowUserMenu}
+              showUserMenu={showUserMenu}
+              profile={profile}
+            />
+          </Route>
+          <Route
+            render={() => (
+              <React.Fragment>
+                <Toolbar
+                  toggleShowDrawer={this.toggleShowDrawer}
+                  toggleShowUserMenu={this.toggleShowUserMenu}
+                  showUserMenu={showUserMenu}
+                  profile={profile}
+                />
+                <Drawer />
+              </React.Fragment>
+            )}
+          />
+        </Switch>
         <Snackbar snackbar={snackbar} />
         <Banner
           banner={banner}

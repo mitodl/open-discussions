@@ -131,4 +131,16 @@ describe("App", () => {
       )
     })
   })
+
+  //
+  ;[["/courses/", true], ["/", false]].forEach(([url, isCourseUrl]) => {
+    it(`${shouldIf(!isCourseUrl)} include a Drawer, ${shouldIf(
+      isCourseUrl
+    )} include CourseToolbar if url is ${url}`, async () => {
+      const [wrapper] = await renderComponent(url, [])
+      assert.equal(wrapper.find("CourseToolbar").exists(), isCourseUrl)
+      assert.equal(wrapper.find("Toolbar").exists(), !isCourseUrl)
+      assert.equal(wrapper.find("Drawer").exists(), !isCourseUrl)
+    })
+  })
 })

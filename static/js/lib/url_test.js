@@ -25,7 +25,8 @@ import {
   absolutizeURL,
   getNextParam,
   channelSearchURL,
-  siteSearchURL
+  SITE_SEARCH_URL,
+  COURSE_URL
 } from "./url"
 import { makePost } from "../factories/posts"
 
@@ -167,6 +168,8 @@ describe("url helper functions", () => {
     it("should have appropriate values for each constant", () => {
       assert.equal(AUTH_REQUIRED_URL, "/auth_required/")
       assert.equal(FRONTPAGE_URL, "/")
+      assert.equal(SITE_SEARCH_URL, "/search/")
+      assert.equal(COURSE_URL, "/courses/")
     })
   })
 
@@ -219,12 +222,6 @@ describe("url helper functions", () => {
       assert.ok(
         url.includes(postDetailURL(post.channel_name, post.id, post.slug))
       )
-    })
-  })
-
-  describe("siteSearchURL", () => {
-    it("returns a site search URL", () => {
-      assert.equal(siteSearchURL(), "/search/")
     })
   })
 
