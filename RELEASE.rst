@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.70.2
+Version 0.70.2 (Released March 13, 2019)
 --------------
 
 - Different toolbar and no channel drawer for courses (#1913)
