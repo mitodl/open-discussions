@@ -24,3 +24,8 @@ export const maxPrice = (course: Course) => {
   const price = Math.max(...R.map(R.view(R.lensProp("price")), course.prices))
   return price > 0 ? `$${price}` : "Free"
 }
+
+export const minPrice = (course: Course) => {
+  const price = Math.min(...R.map(R.view(R.lensProp("price")), course.prices))
+  return price > 0 && price !== Infinity ? `$${price}` : "Free"
+}

@@ -6,7 +6,7 @@ import _ from "lodash"
 
 import Card from "./Card"
 import { setShowCourseDrawer } from "../actions/ui"
-import { courseAvailability, maxPrice } from "../lib/courses"
+import { courseAvailability, minPrice } from "../lib/courses"
 import { embedlyThumbnail } from "../lib/url"
 import { EMBEDLY_THUMB_HEIGHT, EMBEDLY_THUMB_WIDTH } from "../lib/posts"
 
@@ -66,7 +66,7 @@ export class CompactCourseDisplay extends React.Component<Props> {
             <div className="course-platform">
               {course.platform.toUpperCase()}
             </div>
-            <div className="course-price">{maxPrice(course)}</div>
+            <div className="course-price">{minPrice(course)}</div>
           </div>
         </div>
         {course.image_src ? (

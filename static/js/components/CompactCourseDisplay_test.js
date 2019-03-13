@@ -6,7 +6,7 @@ import { mount } from "enzyme"
 import Router from "../Router"
 import CompactCourseDisplay from "./CompactCourseDisplay"
 import { makeCourse } from "../factories/courses"
-import { courseAvailability, maxPrice } from "../lib/courses"
+import { courseAvailability, minPrice } from "../lib/courses"
 import { shouldIf } from "../lib/test_utils"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import * as uiActions from "../actions/ui"
@@ -48,7 +48,7 @@ describe("CompactCourseDisplay", () => {
       wrapper.find(".course-platform").text(),
       course.platform.toUpperCase()
     )
-    assert.equal(wrapper.find(".course-price").text(), maxPrice(course))
+    assert.equal(wrapper.find(".course-price").text(), minPrice(course))
     assert.equal(
       wrapper.find(".course-availability").text(),
       courseAvailability(course)
