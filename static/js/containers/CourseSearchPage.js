@@ -14,6 +14,7 @@ import Card from "../components/Card"
 import { Cell, Grid } from "../components/Grid"
 import { Loading, PostLoading } from "../components/Loading"
 import SearchFacet from "../components/SearchFacet"
+import SearchFilter from "../components/SearchFilter"
 import SearchTextbox from "../components/SearchTextbox"
 import SearchResult from "../components/SearchResult"
 import { actions } from "../actions"
@@ -29,7 +30,6 @@ import type {
   Result,
   FacetResult
 } from "../flow/searchTypes"
-import SearchFilter from "../components/SearchFilter"
 
 type OwnProps = {|
   dispatch: Dispatch<any>,

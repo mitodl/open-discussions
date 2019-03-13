@@ -1,5 +1,4 @@
 // @flow
-// using the 'import * as' syntax to include types
 import React from "react"
 
 type Props = {|
