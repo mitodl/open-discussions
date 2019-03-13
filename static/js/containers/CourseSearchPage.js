@@ -238,17 +238,15 @@ export class CourseSearchPage extends React.Component<Props, State> {
             </div>
             <div className="search-filters-row">
               {facetDisplayMap.map(([name, title, labelFunction]) =>
-                (activeFacets
-                  .get(name) || [])
-                  .map((facet, i) => (
-                    <SearchFilter
-                      key={i}
-                      title={title}
-                      value={facet}
-                      clearFacet={() => this.toggleFacet(name, facet, false)}
-                      labelFunction={labelFunction}
-                    />
-                  ))
+                (activeFacets.get(name) || []).map((facet, i) => (
+                  <SearchFilter
+                    key={i}
+                    title={title}
+                    value={facet}
+                    clearFacet={() => this.toggleFacet(name, facet, false)}
+                    labelFunction={labelFunction}
+                  />
+                ))
               )}
               {_.flatten(_.toArray(activeFacets.values())).length > 0 ? (
                 <div
