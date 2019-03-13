@@ -8,7 +8,7 @@ import {
   COURSE_PRIOR,
   COURSE_UPCOMING
 } from "./constants"
-import { courseAvailability, maxPrice } from "./courses"
+import { courseAvailability, minPrice, maxPrice } from "./courses"
 
 describe("Course utils", () => {
   [
@@ -25,18 +25,20 @@ describe("Course utils", () => {
       assert.equal(courseAvailability(course), expected)
     })
   })
+
+  //
   ;[
-    [[0.0, 50.0], "$50"],
-    [[null, null], "Free"],
-    [[null, 0], "Free"],
-    [[20, 100], "$100"],
-    [[null, 100], "$100"]
-  ].forEach(([prices, expected]) => {
-    it(`maxPrice should return ${expected} for price range ${prices.toString()}`, () => {
+    [[0.0, 50.0, 25.0], "$50", "Free"],
+    [[null, null], "Free", "Free"],
+    [[null, 0], "Free", "Free"],
+    [[20, 100, 50], "$100", "$20"],
+    [[null, 100, 75], "$100", "Free"]
+  ].forEach(([prices, expectedMax, expectedMin]) => {
+    it(`minPrice, maxPrice should return ${expectedMin}, ${expectedMax} for price range ${prices.toString()}`, () => {
       const course = makeCourse()
       course.prices = []
       prices.forEach(price => {
-        if (price) {
+        if (!isNaN(price)) {
           // $FlowFixMe: course.prices is definitely not null here
           course.prices.push({
             mode:  "test",
@@ -44,7 +46,8 @@ describe("Course utils", () => {
           })
         }
       })
-      assert.equal(maxPrice(course), expected)
+      assert.equal(minPrice(course), expectedMin)
+      assert.equal(maxPrice(course), expectedMax)
     })
   })
 })
