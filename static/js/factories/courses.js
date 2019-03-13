@@ -2,7 +2,7 @@
 import casual from "casual-browserify"
 
 import { incrementer } from "../lib/util"
-import { platforms } from "../lib/constants"
+import {COURSE_ARCHIVED, COURSE_CURRENT, platforms} from "../lib/constants"
 
 import type { Course } from "../flow/discussionTypes"
 
@@ -27,6 +27,7 @@ export const makeCourse = (): Course => {
     end_date:          casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
     enrollment_start:  casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
     enrollment_end:    casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+    availability:      casual.random_element([COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming"]),
     instructors:       [
       { first_name: casual.name, last_name: casual.name },
       { first_name: casual.name, last_name: casual.name }

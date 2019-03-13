@@ -11,7 +11,7 @@ import type {
   PostResult,
   ProfileResult
 } from "../flow/searchTypes"
-import { platforms } from "../lib/constants"
+import {COURSE_ARCHIVED, COURSE_CURRENT, platforms} from "../lib/constants"
 
 export const makeProfileResult = (): ProfileResult => ({
   author_avatar_medium: casual.url,
@@ -88,7 +88,8 @@ export const makeCourseResult = (): CourseResult => ({
   instructors:       ["instuctor 1", "instructor 2"],
   topics:            [casual.word, casual.word],
   prices:            [{ mode: "audit", price: casual.number }],
-  object_type:       "course"
+  object_type:       "course",
+  availability:      casual.random_element[COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming"]
 })
 
 export const makeSearchResult = (type: ?string) => {

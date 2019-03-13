@@ -101,6 +101,7 @@ export const searchResultToCourse = (result: CourseResult): Course => ({
   end_date:          result.end_date,
   enrollment_start:  result.enrollment_start,
   enrollment_end:    result.enrollment_end,
+  availability:      result.availability,
   instructors:       [],
   topics:            result.topics.map(topic => ({ name: topic })),
   prices:            result.prices

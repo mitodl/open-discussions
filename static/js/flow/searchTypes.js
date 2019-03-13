@@ -77,6 +77,7 @@ export type CourseResult = {
   end_date:           ?string,
   enrollment_start:   ?string,
   enrollment_end:     ?string,
+  availability:       ?string,
   instructors:        Array<string>,
   topics:             Array<string>,
   prices:             Array<CoursePrice>

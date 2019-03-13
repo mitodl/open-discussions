@@ -1,23 +1,23 @@
 //@flow
-import moment from "moment"
-import _ from "lodash"
-
-import type { Course } from "../flow/discussionTypes"
 import {
-  platforms,
+  COURSE_ARCHIVED,
   COURSE_AVAILABLE_NOW,
-  COURSE_PRIOR,
-  COURSE_UPCOMING
+  COURSE_CURRENT,
+  COURSE_PRIOR
 } from "./constants"
 
-export const courseAvailability = (course: Course) =>
-  course.platform === platforms.OCW
-    ? COURSE_AVAILABLE_NOW
-    : moment(course.start_date).isAfter(moment())
-      ? _.capitalize(COURSE_UPCOMING)
-      : moment(course.end_date).isBefore(moment())
-        ? _.capitalize(COURSE_PRIOR)
-        : COURSE_AVAILABLE_NOW
+import type { Course } from "../flow/discussionTypes"
+
+export const courseAvailability = (course: Course) => {
+  switch (course.availability) {
+  case COURSE_CURRENT:
+    return COURSE_AVAILABLE_NOW
+  case COURSE_ARCHIVED:
+    return COURSE_PRIOR
+  default:
+    return course.availability
+  }
+}
 
 export const maxPrice = (course: Course) => {
   const price = Math.max(...course.prices.map(price => price.price))
