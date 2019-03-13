@@ -239,6 +239,26 @@ describe("CourseSearchPage", () => {
     assert.equal(inner.state().text, text)
   })
 
+  it("displays filters and clicking 'Clear all filters' removes all active facets", async () => {
+    const { inner } = await renderPage()
+    const text = "text"
+    const activeFacets = new Map([
+      ["platform", ["ocw"]],
+      ["topics", ["Science", "Law"]],
+      ["availability", ["Current"]]
+    ])
+    inner.setState({ text, activeFacets })
+    assert.equal(inner.state().text, text)
+    assert.deepEqual(inner.state().activeFacets, activeFacets)
+    assert.equal(inner.find("SearchFilter").length, 4)
+    inner.find(".search-filters-clear").simulate("click")
+    assert.equal(inner.state().text, null)
+    assert.deepEqual(
+      inner.state().activeFacets,
+      new Map([["platform", []], ["topics", []], ["availability", []]])
+    )
+  })
+
   it("triggers a non-incremental search from textbox input", async () => {
     const { inner } = await renderPage(
       {},
