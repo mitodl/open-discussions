@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.70.3
+--------------
+
+- Add course index page
+- Show min price instead of max price for courses (#1920)
+
 Version 0.70.2 (Released March 13, 2019)
 --------------
 
