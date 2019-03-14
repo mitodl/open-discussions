@@ -21,6 +21,7 @@ import SearchResult from "../components/SearchResult"
 
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
+import { availabilityLabel } from "../lib/courses"
 import { SEARCH_FILTER_COURSE } from "../lib/picker"
 import { preventDefaultAndInvoke, toArray } from "../lib/util"
 
@@ -73,7 +74,7 @@ type State = {
 
 const facetDisplayMap = [
   ["topics", "Subject Area", null],
-  ["availability", "Availability", null],
+  ["availability", "Availability", availabilityLabel],
   ["platform", "Platform", _.upperCase]
 ]
 

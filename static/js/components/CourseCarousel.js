@@ -7,7 +7,7 @@ import R from "ramda"
 
 import Card from "./Card"
 
-import { courseAvailability, minPrice } from "../lib/courses"
+import { availabilityLabel, minPrice } from "../lib/courses"
 import { embedlyThumbnail } from "../lib/url"
 
 import type { Course } from "../flow/discussionTypes"
@@ -58,7 +58,9 @@ export const CarouselCourseCard = ({
       <Dotdotdot clamp={3}>{course.title}</Dotdotdot>
     </div>
     <div className="row availability-and-price">
-      <div className="availability">{courseAvailability(course)}</div>
+      <div className="availability">
+        {availabilityLabel(course.availability)}
+      </div>
       <div className="price">{minPrice(course)}</div>
     </div>
   </Card>

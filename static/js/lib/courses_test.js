@@ -1,6 +1,5 @@
 // @flow
 import { assert } from "chai"
-import _ from "lodash"
 
 import { makeCourse } from "../factories/courses"
 import {
@@ -9,7 +8,7 @@ import {
   COURSE_CURRENT,
   COURSE_PRIOR
 } from "./constants"
-import { courseAvailability, minPrice, maxPrice } from "./courses"
+import { availabilityLabel, minPrice, maxPrice } from "./courses"
 
 describe("Course utils", () => {
   [
@@ -17,10 +16,10 @@ describe("Course utils", () => {
     [COURSE_CURRENT, COURSE_AVAILABLE_NOW],
     ["Upcoming", "Upcoming"]
   ].forEach(([availability, expected]) => {
-    it(`courseAvailability should return ${expected} for course.availability of ${availability}`, () => {
+    it(`availabilityLabel should return ${expected} for course.availability of ${availability}`, () => {
       const course = makeCourse()
       course.availability = availability
-      assert.equal(courseAvailability(course), expected)
+      assert.equal(availabilityLabel(course.availability), expected)
     })
   })
 

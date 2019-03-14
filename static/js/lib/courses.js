@@ -8,14 +8,14 @@ import {
 
 import type { Course } from "../flow/discussionTypes"
 
-export const courseAvailability = (course: Course) => {
-  switch (course.availability) {
+export const availabilityLabel = (availability: ?string) => {
+  switch (availability) {
   case COURSE_CURRENT:
     return COURSE_AVAILABLE_NOW
   case COURSE_ARCHIVED:
     return COURSE_PRIOR
   default:
-    return course.availability
+    return availability
   }
 }
 
