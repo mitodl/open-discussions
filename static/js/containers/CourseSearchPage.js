@@ -216,7 +216,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const { text, error, activeFacets } = this.state
     const facetDisplayMap = [
       ["topics", "Subject Area", null],
-      ["availability", "Availability", _.capitalize],
+      ["availability", "Availability", null],
       ["platform", "Platform", _.upperCase]
     ]
 
