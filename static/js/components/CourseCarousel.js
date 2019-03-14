@@ -12,16 +12,15 @@ import { embedlyThumbnail } from "../lib/url"
 
 import type { Course } from "../flow/discussionTypes"
 
+const CAROUSEL_PAGE_SIZE = 3
+const CAROUSEL_IMG_HEIGHT = 130
+const CAROUSEL_IMG_WIDTH = 306
+
 type Props = {|
   title: string,
   courses: Array<Course>,
   setShowCourseDrawer: Function
 |}
-
-const CAROUSEL_PAGE_SIZE = 3
-
-const CAROUSEL_IMG_HEIGHT = 130
-const CAROUSEL_IMG_WIDTH = 306
 
 type CardProps = {|
   course: Course,

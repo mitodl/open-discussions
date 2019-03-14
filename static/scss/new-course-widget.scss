@@ -1,0 +1,31 @@
+.new-course-widget {
+  .course {
+    margin-bottom: 15px;
+    display: flex;
+
+    img {
+      margin-right: 10px;
+    }
+
+    .course-info-col {
+      color: $navy;
+
+      .course-title {
+        font-size: $highlight-font-size;
+      }
+
+      .availability-and-platform {
+        color: $font-grey-mid;
+      }
+    }
+  }
+
+  .link-container {
+    display: flex;
+    justify-content: flex-end;
+
+    .more-link {
+      font-size: $normal-font-size;
+    }
+  }
+}

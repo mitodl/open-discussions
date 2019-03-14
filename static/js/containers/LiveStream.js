@@ -4,7 +4,7 @@ import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
 
-import Card from "./Card"
+import Card from "../components/Card"
 
 import { actions } from "../actions"
 import { livestreamEventURL } from "../lib/embed"

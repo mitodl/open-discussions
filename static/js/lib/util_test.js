@@ -16,7 +16,8 @@ import {
   defaultProfileImageUrl,
   makeUUID,
   spaceSeparated,
-  isValidUrl
+  isValidUrl,
+  flatZip
 } from "./util"
 
 describe("utility functions", () => {
@@ -189,5 +190,9 @@ describe("utility functions", () => {
       assert.isFalse(isValidUrl("mit.edu"))
       assert.isTrue(isValidUrl("http://mit.edu/a_url_here"))
     })
+  })
+
+  it("flattens and zips", () => {
+    assert.deepEqual([1, 2, 3, 4, 5, 6], flatZip([1, 3, 5], [2, 4, 6]))
   })
 })

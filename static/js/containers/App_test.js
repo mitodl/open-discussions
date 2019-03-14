@@ -13,7 +13,7 @@ import { channelURL, SETTINGS_URL } from "../lib/url"
 import * as authUtils from "../lib/auth"
 import { makeFrontpageSetting, makeCommentSetting } from "../factories/settings"
 import { makeChannelPostList } from "../factories/posts"
-import { shouldIf, shouldIfGt0 } from "../lib/test_utils"
+import { shouldIf, shouldIfGt0, mockCourseAPIMethods } from "../lib/test_utils"
 
 describe("App", () => {
   let helper, renderComponent, channels, postList
@@ -34,6 +34,7 @@ describe("App", () => {
     helper.getProfileStub.returns(Promise.resolve(""))
     helper.getLivestreamEventsStub.returns(Promise.resolve({ data: [] }))
     renderComponent = helper.renderComponent.bind(helper)
+    mockCourseAPIMethods(helper)
   })
 
   afterEach(() => {

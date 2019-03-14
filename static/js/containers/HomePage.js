@@ -7,6 +7,9 @@ import qs from "query-string"
 import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
 
+import LiveStream from "../containers/LiveStream"
+import NewCoursesWidget from "../containers/NewCoursesWidget"
+
 import Card from "../components/Card"
 import CanonicalLink from "../components/CanonicalLink"
 import { withPostLoading } from "../components/Loading"
@@ -17,7 +20,6 @@ import {
   postModerationSelector
 } from "../hoc/withPostModeration"
 import withPostList from "../hoc/withPostList"
-import LiveStream from "../components/LiveStream"
 
 import { actions } from "../actions"
 import { setPostData } from "../actions/post"
@@ -171,13 +173,20 @@ const mapDispatchToProps = (dispatch: Dispatch<any>) => ({
   dispatch: dispatch
 })
 
+const HomepageSidebar = () => (
+  <React.Fragment>
+    <LiveStream />
+    {SETTINGS.course_ui_enabled ? <NewCoursesWidget /> : null}
+  </React.Fragment>
+)
+
 export default R.compose(
   connect(
     mapStateToProps,
     mapDispatchToProps
   ),
   withPostModeration,
-  withSidebar(LiveStream, "home-page"),
+  withSidebar(HomepageSidebar, "home-page"),
   withPostList,
   withPostLoading
 )(HomePage)

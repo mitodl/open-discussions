@@ -1,10 +1,12 @@
 // @flow
+import React from "react"
+import sinon from "sinon"
+import R from "ramda"
 import { assert } from "chai"
 import { shallow } from "enzyme"
-import sinon from "sinon"
 
+import { makeCourse } from "../factories/courses"
 import { S } from "./sanctuary"
-import React from "react"
 const { Maybe } = S
 
 export const assertMaybeEquality = (m1: Maybe, m2: Maybe) => {
@@ -48,3 +50,10 @@ export const makeEvent = (name: string, value: any) => ({
   target:         { value, name },
   preventDefault: sinon.stub()
 })
+
+export const mockCourseAPIMethods = (helper: Object) => {
+  helper.newCoursesSelectorStub.returns(R.times(makeCourse, 10))
+  helper.newCoursesRequestStub.returns({})
+  helper.upcomingCoursesSelectorStub.returns(R.times(makeCourse, 10))
+  helper.upcomingCoursesRequestStub.returns({})
+}

@@ -3,8 +3,10 @@
 import { assert } from "chai"
 import sinon from "sinon"
 
+import LiveStream from "../containers/LiveStream"
 import PostList from "../components/PostList"
 import HomePage, { HomePage as InnerHomePage } from "./HomePage"
+import NewCoursesWidget from "../containers/NewCoursesWidget"
 
 import { makeChannelList } from "../factories/channels"
 import { makeChannelPostList } from "../factories/posts"
@@ -14,6 +16,7 @@ import { SET_POST_DATA } from "../actions/post"
 import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/picker"
 import { REGISTER_URL, newPostURL } from "../lib/url"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import { shouldIf, mockCourseAPIMethods } from "../lib/test_utils"
 
 describe("HomePage", () => {
   let helper, render, postList, postIds, channels
@@ -82,6 +85,7 @@ describe("HomePage", () => {
 
     beforeEach(() => {
       renderComponent = helper.renderComponent.bind(helper)
+      mockCourseAPIMethods(helper)
     })
 
     const renderPage = async () => {
@@ -101,6 +105,24 @@ describe("HomePage", () => {
     it("should fetch frontpage, set post data, render", async () => {
       const wrapper = await renderPage()
       assert.deepEqual(wrapper.find(PostList).props().posts, postList)
+    })
+
+    it("should render a livestream component", async () => {
+      const wrapper = await renderPage()
+      assert.ok(wrapper.find(LiveStream).exists())
+    })
+
+    //
+    ;[true, false].forEach(courseUIEnabled => {
+      it(`${shouldIf(
+        courseUIEnabled
+      )} render a new courses widget when course_ui_enabled === ${String(
+        courseUIEnabled
+      )}`, async () => {
+        SETTINGS.course_ui_enabled = courseUIEnabled
+        const wrapper = await renderPage()
+        assert.equal(courseUIEnabled, wrapper.find(NewCoursesWidget).exists())
+      })
     })
   })
 
@@ -136,6 +158,8 @@ describe("HomePage", () => {
       }
     })
   })
+
+  //
   ;[
     [true, makeChannelPostList(), true],
     [true, [], false],
@@ -158,6 +182,8 @@ describe("HomePage", () => {
       assert.equal(wrapper.props().loaded, expectedLoaded)
     })
   })
+
+  //
   ;[true, false].forEach(loaded => {
     it(`sets canLoadMore=${String(loaded)} when loaded=${String(
       loaded
@@ -194,6 +220,8 @@ describe("HomePage", () => {
       payload: postList
     })
   })
+
+  //
   ;[
     ["username1", "Create a post", newPostURL()],
     [null, "Become a member", REGISTER_URL]

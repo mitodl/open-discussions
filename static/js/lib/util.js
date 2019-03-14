@@ -136,3 +136,8 @@ export const languageName = (langCode: ?string): string =>
   LocaleCode.getLanguageName(
     `${langCode ? langCode.split("-")[0].toLowerCase() : "en"}-US`
   )
+
+export const flatZip = R.compose(
+  R.flatten,
+  R.zip
+)

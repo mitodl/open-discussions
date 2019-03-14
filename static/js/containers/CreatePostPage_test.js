@@ -27,7 +27,7 @@ import { formatTitle } from "../lib/title"
 import { makeArticle, makeTweet } from "../factories/embedly"
 import { wait } from "../lib/util"
 import * as embedUtil from "../lib/embed"
-import { shouldIf, makeEvent } from "../lib/test_utils"
+import { shouldIf, makeEvent, mockCourseAPIMethods } from "../lib/test_utils"
 import { newPostForm } from "../lib/posts"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
@@ -99,6 +99,7 @@ describe("CreatePostPage", () => {
       widgets: { load: helper.sandbox.stub() }
     }
     scrollToStub = helper.sandbox.stub(window, "scrollTo")
+    mockCourseAPIMethods(helper)
   })
 
   afterEach(() => {

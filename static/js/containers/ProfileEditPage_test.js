@@ -9,7 +9,7 @@ import { editProfileURL } from "../lib/url"
 import { makeProfile } from "../factories/profiles"
 import { actions } from "../actions"
 import { makeChannelPostList } from "../factories/posts"
-import { makeEvent } from "../lib/test_utils"
+import { makeEvent, mockCourseAPIMethods } from "../lib/test_utils"
 
 import type { ProfilePayload } from "../flow/discussionTypes"
 
@@ -63,6 +63,7 @@ describe("ProfileEditPage", function() {
     )
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
+    mockCourseAPIMethods(helper)
   })
 
   afterEach(() => {
