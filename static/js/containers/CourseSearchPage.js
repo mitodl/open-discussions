@@ -69,6 +69,12 @@ type State = {
   error: ?string
 }
 
+const facetDisplayMap = [
+  ["topics", "Subject Area", null],
+  ["availability", "Availability", null],
+  ["platform", "Platform", _.upperCase]
+]
+
 const shouldRunSearch = R.complement(
   R.allPass([R.eqProps("text"), R.eqProps("activeFacets")])
 )
@@ -214,11 +220,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
   render() {
     const { match, facets, total, loaded, processing } = this.props
     const { text, error, activeFacets } = this.state
-    const facetDisplayMap = [
-      ["topics", "Subject Area", null],
-      ["availability", "Availability", null],
-      ["platform", "Platform", _.upperCase]
-    ]
 
     return (
       <React.Fragment>
