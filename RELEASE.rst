@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.70.3
+Version 0.70.3 (Released March 15, 2019)
 --------------
 
 - Add course index page
