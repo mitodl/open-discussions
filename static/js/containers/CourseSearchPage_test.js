@@ -239,6 +239,26 @@ describe("CourseSearchPage", () => {
     assert.equal(inner.state().text, text)
   })
 
+  it("displays filters and clicking 'Clear all filters' removes all active facets", async () => {
+    const { inner } = await renderPage()
+    const text = "text"
+    const activeFacets = new Map([
+      ["platform", ["ocw"]],
+      ["topics", ["Science", "Law"]],
+      ["availability", ["Current"]]
+    ])
+    inner.setState({ text, activeFacets })
+    assert.equal(inner.state().text, text)
+    assert.deepEqual(inner.state().activeFacets, activeFacets)
+    assert.equal(inner.find("SearchFilter").length, 4)
+    inner.find(".search-filters-clear").simulate("click")
+    assert.equal(inner.state().text, null)
+    assert.deepEqual(
+      inner.state().activeFacets,
+      new Map([["platform", []], ["topics", []], ["availability", []]])
+    )
+  })
+
   it("triggers a non-incremental search from textbox input", async () => {
     const { inner } = await renderPage(
       {},
@@ -258,12 +278,16 @@ describe("CourseSearchPage", () => {
       type: "course"
     })
     assert.deepEqual(inner.state(), {
-      from:           0,
       text,
-      error:          null,
-      topics:         undefined,
-      platforms:      undefined,
-      availabilities: undefined
+      activeFacets: new Map(
+        Object.entries({
+          topics:       [],
+          platform:     [],
+          availability: []
+        })
+      ),
+      from:  0,
+      error: null
     })
   })
 
@@ -287,9 +311,9 @@ describe("CourseSearchPage", () => {
       type:        "course",
       facets:      new Map(
         Object.entries({
-          platforms:      ["ocw"],
-          topics:         ["Engineering"],
-          availabilities: ["prior"]
+          platform:     ["ocw"],
+          topics:       ["Engineering"],
+          availability: ["prior"]
         })
       )
     })
@@ -300,12 +324,16 @@ describe("CourseSearchPage", () => {
     })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
-      from:           0,
       text,
-      error:          null,
-      topics:         ["Engineering"],
-      platforms:      undefined,
-      availabilities: undefined
+      activeFacets: new Map(
+        Object.entries({
+          topics:       ["Engineering"],
+          platform:     [],
+          availability: []
+        })
+      ),
+      from:  0,
+      error: null
     })
   })
 
@@ -313,10 +341,8 @@ describe("CourseSearchPage", () => {
     const { inner } = await renderPage()
     helper.searchStub.reset()
     inner.setState({
-      text:           inner.state().text,
-      topics:         inner.state().topics,
-      platforms:      inner.state().platforms,
-      availabilities: inner.state().availabilities
+      text:         inner.state().text,
+      activeFacets: inner.state().activeFacets
     })
     sinon.assert.notCalled(helper.searchStub)
   })
@@ -332,7 +358,16 @@ describe("CourseSearchPage", () => {
       isChecked
     )} include a topic facet in search after checkbox change`, async () => {
       const { inner } = await renderPage()
-      inner.setState({ text: "some text" })
+      inner.setState({
+        text:         "some text",
+        activeFacets: new Map(
+          Object.entries({
+            platform:     [],
+            topics:       isChecked ? [] : ["Science"],
+            availability: []
+          })
+        )
+      })
       helper.searchStub.reset()
       await inner.instance().onUpdateFacets({
         target: {
@@ -349,9 +384,9 @@ describe("CourseSearchPage", () => {
         type:        "course",
         facets:      new Map(
           Object.entries({
-            platforms:      undefined,
-            topics:         isChecked ? ["Science"] : [],
-            availabilities: undefined
+            platform:     [],
+            topics:       isChecked ? ["Science"] : [],
+            availability: []
           })
         )
       })

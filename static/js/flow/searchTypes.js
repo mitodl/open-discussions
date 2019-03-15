@@ -96,9 +96,6 @@ export type Result = PostResult | CommentResult | ProfileResult | CourseResult
 export type SearchInputs = {
   text?:            string,
   type?:            string,
-  platforms?:       string,
-  topics?:          string,
-  availabilities?:  string,
   incremental:      boolean
 }
 

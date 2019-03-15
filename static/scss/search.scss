@@ -90,3 +90,35 @@
   flex-direction: row;
   justify-content: space-between;
 }
+
+.search-filters-row {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.search-filter-div {
+  margin: 0px 0px 5px 10px;
+  background-color: #ddeff7;
+  padding: 6px 10px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.search-filter-close {
+  display: flex;
+  cursor: pointer;
+
+  i {
+    transform: scale(0.75);
+  }
+}
+
+.search-filters-clear {
+  margin-left: 10px;
+  display: inline-flex;
+  cursor: pointer;
+  color: $link-blue;
+}
