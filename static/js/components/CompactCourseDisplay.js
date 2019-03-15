@@ -7,7 +7,7 @@ import _ from "lodash"
 import Card from "./Card"
 
 import { setShowCourseDrawer } from "../actions/ui"
-import { courseAvailability, minPrice } from "../lib/courses"
+import { availabilityLabel, minPrice } from "../lib/courses"
 import { embedlyThumbnail } from "../lib/url"
 import { EMBEDLY_THUMB_HEIGHT, EMBEDLY_THUMB_WIDTH } from "../lib/posts"
 
@@ -62,7 +62,7 @@ export class CompactCourseDisplay extends React.Component<Props> {
           </div>
           <div className="row preview-footer">
             <div className="course-availability">
-              {courseAvailability(course)}
+              {availabilityLabel(course.availability)}
             </div>
             <div className="course-platform">
               {course.platform.toUpperCase()}

@@ -6,16 +6,10 @@ export const SOCIAL_SITE_TYPE = "social"
 export const POSTS_OBJECT_TYPE = "posts"
 export const COMMENTS_OBJECT_TYPE = "comments"
 
-export const COURSE_CURRENT = "current"
-export const COURSE_UPCOMING = "upcoming"
-export const COURSE_PRIOR = "prior"
+export const COURSE_CURRENT = "Current"
 export const COURSE_AVAILABLE_NOW = "Available Now"
-
-export const COURSE_AVAILABILITIES = [
-  COURSE_CURRENT,
-  COURSE_UPCOMING,
-  COURSE_PRIOR
-]
+export const COURSE_ARCHIVED = "Archived"
+export const COURSE_PRIOR = "Prior"
 
 export const platforms = {
   OCW: "ocw",

@@ -7,7 +7,7 @@ import { mount } from "enzyme"
 
 import CourseCarousel, { CarouselCourseCard } from "./CourseCarousel"
 
-import { courseAvailability, minPrice } from "../lib/courses"
+import { availabilityLabel, minPrice } from "../lib/courses"
 import { configureShallowRenderer, shouldIf } from "../lib/test_utils"
 import { makeCourse } from "../factories/courses"
 
@@ -88,7 +88,7 @@ describe("CourseCarousel", () => {
     assert.equal(wrapper.find("Dotdotdot").props().children, course.title)
     assert.equal(
       wrapper.find(".availability").text(),
-      courseAvailability(course)
+      availabilityLabel(course.availability)
     )
     assert.equal(wrapper.find(".price").text(), minPrice(course))
   })

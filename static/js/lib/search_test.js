@@ -128,7 +128,8 @@ describe("search functions", () => {
       instructors:       [],
       topics:            result.topics.map(topic => ({ name: topic })),
       prices:            result.prices,
-      url:               result.url
+      url:               result.url,
+      availability:      result.availability
     })
   })
 

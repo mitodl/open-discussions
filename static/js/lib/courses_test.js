@@ -1,28 +1,25 @@
 // @flow
 import { assert } from "chai"
-import _ from "lodash"
 
 import { makeCourse } from "../factories/courses"
 import {
+  COURSE_ARCHIVED,
   COURSE_AVAILABLE_NOW,
-  COURSE_PRIOR,
-  COURSE_UPCOMING
+  COURSE_CURRENT,
+  COURSE_PRIOR
 } from "./constants"
-import { courseAvailability, minPrice, maxPrice } from "./courses"
+import { availabilityLabel, minPrice, maxPrice } from "./courses"
 
 describe("Course utils", () => {
   [
-    ["2000-01-01", "2000-02-02", "mitx", _.capitalize(COURSE_PRIOR)],
-    ["2000-01-01", "2500-02-02", "mitx", COURSE_AVAILABLE_NOW],
-    ["2400-01-01", "2500-02-02", "mitx", _.capitalize(COURSE_UPCOMING)],
-    ["2000-01-01", "2000-02-02", "ocw", COURSE_AVAILABLE_NOW]
-  ].forEach(([startDate, endDate, platform, expected]) => {
-    it(`courseAvailability should return ${expected} for ${platform} course running ${startDate} to ${endDate}`, () => {
+    [COURSE_ARCHIVED, COURSE_PRIOR],
+    [COURSE_CURRENT, COURSE_AVAILABLE_NOW],
+    ["Upcoming", "Upcoming"]
+  ].forEach(([availability, expected]) => {
+    it(`availabilityLabel should return ${expected} for course.availability of ${availability}`, () => {
       const course = makeCourse()
-      course.start_date = startDate
-      course.end_date = endDate
-      course.platform = platform
-      assert.equal(courseAvailability(course), expected)
+      course.availability = availability
+      assert.equal(availabilityLabel(course.availability), expected)
     })
   })
 

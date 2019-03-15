@@ -339,7 +339,8 @@ export type Course = {
   enrollment_end:     ?string,
   instructors:        Array<CourseInstructor>,
   topics:             Array<CourseTopic>,
-  prices:             Array<CoursePrice>
+  prices:             Array<CoursePrice>,
+  availability:       ?string
 }
 
 export type CoursePrice = {
