@@ -85,9 +85,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
     this.state = {
       text:         qs.parse(props.location.search).q,
       activeFacets: new Map([
-        ["platform", toArray(qs.parse(props.location.search).p) || []],
-        ["topics", toArray(qs.parse(props.location.search).t) || []],
-        ["availability", toArray(qs.parse(props.location.search).a) || []]
+        ["platform", _.union(toArray(qs.parse(props.location.search).p) || [])],
+        ["topics", _.union(toArray(qs.parse(props.location.search).t) || [])],
+        [
+          "availability",
+          _.union(toArray(qs.parse(props.location.search).a) || [])
+        ]
       ]),
       from:  0,
       error: null
