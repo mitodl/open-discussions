@@ -44,9 +44,7 @@ export class SearchFacet extends React.Component<Props> {
     const { results, currentlySelected, showAll } = this.props
     const nextResults = nextProps.results
     return (
-      // $FlowFixMe: Flow is confused, this does return a boolean
-      nextResults &&
-      nextResults.buckets &&
+      _.has(nextResults, "buckets") &&
       (results !== nextResults ||
         currentlySelected !== nextProps.currentlySelected ||
         showAll !== nextProps.showAll)

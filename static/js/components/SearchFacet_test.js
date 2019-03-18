@@ -101,4 +101,23 @@ describe("SearchFacet", () => {
       )
     })
   })
+
+  //
+  ;[
+    // [true, false, false],
+    // [false, true, false],
+    // [false, false, true],
+    [false, false, false]
+  ].forEach(([newResults, isSelected, showAll]) => {
+    it(`component ${shouldIf(newResults || isSelected || showAll)} update when ${newResults ? "facets" : isSelected ? "selected facets" : showAll ? "showAll toggle" : "nothing"} changed`, () => {
+      const wrapper = renderSearchFacet()
+      const currentlySelected = isSelected ? ["fakeSelection"] : wrapper.props().currentlySelected
+      const nextResults = newResults ? new Map(Object.entries(makeSearchFacetResult())).get("availability") : results
+      assert.equal(wrapper.instance().shouldComponentUpdate({
+        showAll: wrapper.props().showAll,
+        currentlySelected: wrapper.props().currentlySelected,
+        results: wrapper.props().results
+      }), (showAll))
+    })
+  })
 })

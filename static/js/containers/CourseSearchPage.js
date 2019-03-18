@@ -132,7 +132,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const resultFacets = facets ? facets.get(group) : null
 
     // add any selected facets not in results to the group
-    if (resultFacets && resultFacets.buckets) {
+    if (resultFacets && _.has(resultFacets, "buckets")) {
       // $FlowFixMe: this is not undefined
       activeFacets.get(group).map(facet => {
         if (!_.find(resultFacets.buckets, { key: facet })) {
@@ -147,7 +147,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     // if this is the currentFacetGroup, add any new facets in that group from search results
     if (currentFacetGroup && currentFacetGroup.keys().next().value === group) {
       const mergedFacetGroup = _.clone(currentFacetGroup).get(group)
-      if (mergedFacetGroup && resultFacets) {
+      if (mergedFacetGroup && resultFacets && _.has(resultFacets, "buckets")) {
         resultFacets.buckets.map(facet => {
           if (!_.find(mergedFacetGroup.buckets, { key: facet.key })) {
             mergedFacetGroup.buckets.push(facet)
