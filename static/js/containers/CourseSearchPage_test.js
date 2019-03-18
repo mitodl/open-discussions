@@ -7,7 +7,11 @@ import sinon from "sinon"
 import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
-import { makeCourseResult, makeSearchResponse } from "../factories/search"
+import {
+  makeCourseResult,
+  makeSearchFacetResult,
+  makeSearchResponse
+} from "../factories/search"
 import { makeChannel } from "../factories/channels"
 
 describe("CourseSearchPage", () => {
@@ -286,8 +290,9 @@ describe("CourseSearchPage", () => {
           availability: []
         })
       ),
-      from:  0,
-      error: null
+      currentFacetGroup: null,
+      from:              0,
+      error:             null
     })
   })
 
@@ -301,7 +306,7 @@ describe("CourseSearchPage", () => {
       .at(0)
       .props()
       .onUpdate({
-        target: { name: "topics", value: "Engineering", checked: true }
+        target: { name: "topics", value: "Physics", checked: true }
       })
     sinon.assert.calledWith(helper.searchStub, {
       channelName: null,
@@ -312,7 +317,7 @@ describe("CourseSearchPage", () => {
       facets:      new Map(
         Object.entries({
           platform:     ["ocw"],
-          topics:       ["Engineering"],
+          topics:       ["Physics"],
           availability: ["prior"]
         })
       )
@@ -320,20 +325,21 @@ describe("CourseSearchPage", () => {
     assert.deepEqual(qs.parse(helper.currentLocation.search), {
       type: "course",
       q:    text,
-      t:    "Engineering"
+      t:    "Physics"
     })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
       text,
       activeFacets: new Map(
         Object.entries({
-          topics:       ["Engineering"],
+          topics:       ["Physics"],
           platform:     [],
           availability: []
         })
       ),
-      from:  0,
-      error: null
+      from:              0,
+      error:             null,
+      currentFacetGroup: new Map([["topics", makeSearchFacetResult().topics]])
     })
   })
 
