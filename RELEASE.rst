@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.71.0
+--------------
+
+- add new courses widget to the home page
+- Label course availability by model field instead of dates in UI (#1922)
+- Buttons to clear facets (#1916)
+
 Version 0.70.3 (Released March 15, 2019)
 --------------
 
