@@ -3,6 +3,7 @@
 import { assert } from "chai"
 import qs from "query-string"
 import sinon from "sinon"
+import _ from "lodash"
 
 import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
 import IntegrationTestHelper from "../util/integration_test_helper"
@@ -397,5 +398,37 @@ describe("CourseSearchPage", () => {
         )
       })
     })
+  })
+
+  it("mergeFacetOptions adds any selected facets not in results to the group", async () => {
+    const { inner } = await renderPage()
+    const activeFacets = new Map([
+      ["platform", []],
+      ["topics", ["NewTopic"]],
+      ["availability", []]
+    ])
+    inner.setState({ activeFacets })
+    const mergedFacets = inner.instance().mergeFacetOptions("topics")
+    assert.isTrue(
+      _.findIndex(mergedFacets.buckets, { doc_count: 0, key: "NewTopic" }) > -1
+    )
+  })
+
+  it("mergeFacetOptions adds any search facets not in current facet group", async () => {
+    const { inner } = await renderPage()
+    const currentFacetGroup = new Map([
+      ["platform", { buckets: [{ key: "ocw", doc_count: 20 }] }]
+    ])
+    const missingFacetGroup = _.find(
+      // $FlowFixMe: platform exists in aggregation result
+      searchResponse.aggregations.platform.buckets,
+      { key: "mitx" }
+    )
+    inner.setState({ currentFacetGroup })
+    const mergedFacets = inner.instance().mergeFacetOptions("platform")
+    assert.isTrue(
+      _.findIndex(mergedFacets.buckets, { doc_count: 20, key: "ocw" }) > -1
+    )
+    assert.isTrue(_.findIndex(mergedFacets.buckets, missingFacetGroup) > -1)
   })
 })
