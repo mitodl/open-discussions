@@ -104,20 +104,38 @@ describe("SearchFacet", () => {
 
   //
   ;[
-    // [true, false, false],
-    // [false, true, false],
-    // [false, false, true],
+    [true, false, false],
+    [false, true, false],
+    [false, false, true],
     [false, false, false]
-  ].forEach(([newResults, isSelected, showAll]) => {
-    it(`component ${shouldIf(newResults || isSelected || showAll)} update when ${newResults ? "facets" : isSelected ? "selected facets" : showAll ? "showAll toggle" : "nothing"} changed`, () => {
-      const wrapper = renderSearchFacet()
-      const currentlySelected = isSelected ? ["fakeSelection"] : wrapper.props().currentlySelected
-      const nextResults = newResults ? new Map(Object.entries(makeSearchFacetResult())).get("availability") : results
-      assert.equal(wrapper.instance().shouldComponentUpdate({
-        showAll: wrapper.props().showAll,
-        currentlySelected: wrapper.props().currentlySelected,
-        results: wrapper.props().results
-      }), (showAll))
+  ].forEach(([newResults, newSelected, newShow]) => {
+    it(`component ${shouldIf(
+      newResults || newSelected || newShow
+    )} update when ${
+      newResults
+        ? "facets"
+        : newSelected
+          ? "selected facets"
+          : newShow
+            ? "showAll toggle"
+            : "nothing"
+    } changed`, () => {
+      const instance = renderSearchFacet().instance()
+      const nextSelected = newSelected
+        ? ["fakeSelection"]
+        : instance.props.currentlySelected
+      const nextResults = newResults ? { buckets: [] } : instance.props.results
+      const nextShowAll = newShow
+        ? !instance.props.showAll
+        : instance.props.showAll
+      assert.equal(
+        instance.shouldComponentUpdate({
+          showAll:           nextShowAll,
+          currentlySelected: nextSelected,
+          results:           nextResults
+        }),
+        newShow || newSelected || newResults
+      )
     })
   })
 })
