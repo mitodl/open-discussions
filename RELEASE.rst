@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.71.0
+Version 0.71.0 (Released March 19, 2019)
 --------------
 
 - add new courses widget to the home page
