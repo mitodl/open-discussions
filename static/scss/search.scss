@@ -1,5 +1,10 @@
 .search-textbox {
   position: relative;
+  min-width: 330px;
+
+  @include breakpoint(mobile) {
+    min-width: unset;
+  }
 
   input {
     padding: 3px 40px 2px 40px;

@@ -7,6 +7,15 @@ import { compose } from "redux"
 import CourseDrawer from "./CourseDrawer"
 
 import CourseCarousel from "../components/CourseCarousel"
+import {
+  BannerPageWrapper,
+  BannerPageHeader,
+  BannerContainer,
+  BannerImage,
+  Gradient
+} from "../components/PageBanner"
+import { Cell, Grid } from "../components/Grid"
+import SearchTextbox from "../components/SearchTextbox"
 
 import { setShowCourseDrawer } from "../actions/ui"
 import {
@@ -17,10 +26,13 @@ import {
   newCoursesRequest,
   newCoursesSelector
 } from "../lib/api/courses"
+import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
 
 import type { Course } from "../flow/discussionTypes"
 
-type OwnProps = {||}
+type OwnProps = {|
+  history: Object
+|}
 
 type StateProps = {|
   featuredCourses: Array<Course>,
@@ -44,12 +56,38 @@ export const CourseIndexPage = ({
   featuredCourses,
   newCourses,
   loaded,
-  setShowCourseDrawer
+  setShowCourseDrawer,
+  history
 }: Props) => (
-  <React.Fragment>
-    <div className="main-content one-column">
+  <BannerPageWrapper>
+    <BannerPageHeader>
+      <BannerContainer>
+        <BannerImage src={null} />
+        <Gradient />
+      </BannerContainer>
+      <Grid className="main-content two-column channel-header course-index-page">
+        <Cell width={12} className="avatar-headline-row">
+          <div className="course-search-greeting">
+            <div className="headline">MIT Online Learning</div>
+          </div>
+          <SearchTextbox
+            onSubmit={e => {
+              const { value } = e.target
+              const newLocation = `${COURSE_SEARCH_URL}${toQueryString({
+                q:    value,
+                type: "course"
+              })}`
+              history.push(newLocation)
+            }}
+            placeholder="Search Learning offerings"
+            noFocusOnLoad
+          />
+        </Cell>
+      </Grid>
+    </BannerPageHeader>
+    <Grid className="main-content one-column">
       {loaded ? (
-        <React.Fragment>
+        <Cell width={12}>
           {featuredCourses.length !== 0 ? (
             <CourseCarousel
               title="Featured Courses"
@@ -67,13 +105,13 @@ export const CourseIndexPage = ({
             courses={newCourses}
             setShowCourseDrawer={setShowCourseDrawer}
           />
-        </React.Fragment>
+        </Cell>
       ) : (
         "loading"
       )}
-    </div>
+    </Grid>
     <CourseDrawer />
-  </React.Fragment>
+  </BannerPageWrapper>
 )
 
 const mapStateToProps = (state: Object): StateProps => ({

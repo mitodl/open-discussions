@@ -6,6 +6,12 @@ import { bindActionCreators } from "redux"
 
 import ImageUploader, { makeDialogKey } from "./ImageUploader"
 
+import {
+  BannerContainer,
+  BannerImage,
+  Gradient
+} from "../components/PageBanner"
+
 import { showDialog } from "../actions/ui"
 
 import type { Dispatch } from "redux"
@@ -38,36 +44,29 @@ class ChannelBanner extends React.Component<Props> {
     const imageUrl = formImageUrl || channel.banner
 
     return (
-      <div className="banner-container row">
-        <div className="channel-banner">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={`Channel banner for ${channel.name}`}
-              className="banner-image"
+      <BannerContainer className="channel-banner">
+        <BannerImage
+          src={imageUrl}
+          alt={`Channel banner for ${channel.name}`}
+        />
+        <Gradient />
+        {editable ? (
+          <React.Fragment>
+            <ImageUploader
+              name={name}
+              showButton={false}
+              onUpdate={onUpdate}
+              isAdd={!imageUrl}
+              description="Channel Banner"
+              width={1150}
+              height={200}
             />
-          ) : (
-            <div className="banner-image default-image" />
-          )}
-          <div className="gradient" />
-          {editable ? (
-            <React.Fragment>
-              <ImageUploader
-                name={name}
-                showButton={false}
-                onUpdate={onUpdate}
-                isAdd={!imageUrl}
-                description="Channel Banner"
-                width={1150}
-                height={200}
-              />
-              <a onClick={showDialog} className="upload-banner grey-surround">
-                Upload cover image
-              </a>
-            </React.Fragment>
-          ) : null}
-        </div>
-      </div>
+            <a onClick={showDialog} className="upload-banner grey-surround">
+              Upload cover image
+            </a>
+          </React.Fragment>
+        ) : null}
+      </BannerContainer>
     )
   }
 }

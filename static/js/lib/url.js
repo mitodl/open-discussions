@@ -107,6 +107,7 @@ export const PRIVACY_POLICY_URL = "/privacy-statement"
 
 export const SITE_SEARCH_URL = "/search/"
 export const COURSE_URL = "/courses/"
+export const COURSE_SEARCH_URL = "/courses/search"
 
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`

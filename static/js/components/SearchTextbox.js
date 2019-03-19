@@ -3,11 +3,12 @@ import React from "react"
 import { validationMessage } from "../lib/validation"
 
 type Props = {
-  onChange: Function,
-  onClear: Function,
+  onChange?: Function,
+  onClear?: Function,
   onSubmit: Function,
-  value: string,
-  validation: ?string
+  value?: string,
+  validation?: ?string,
+  noFocusOnLoad?: boolean
 }
 
 export default class SearchTextbox extends React.Component<Props> {
@@ -25,7 +26,10 @@ export default class SearchTextbox extends React.Component<Props> {
   }
 
   componentDidMount() {
-    this.focus()
+    const { noFocusOnLoad } = this.props
+    if (!noFocusOnLoad) {
+      this.focus()
+    }
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -43,6 +47,8 @@ export default class SearchTextbox extends React.Component<Props> {
       onChange,
       value,
       validation,
+      // eslint-disable-next-line no-unused-vars
+      noFocusOnLoad, // have to pull this out here to avoid a console error
       ...extraProps
     } = this.props
     return (

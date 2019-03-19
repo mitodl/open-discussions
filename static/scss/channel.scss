@@ -65,21 +65,6 @@
   }
 }
 
-.channel-page-wrapper {
-  position: relative;
-  width: 100%;
-
-  .channel-page-header {
-    margin-bottom: 20px;
-
-    .banner-container {
-      position: absolute;
-      width: 100%;
-      z-index: -1;
-    }
-  }
-}
-
 .avatar-headline-row {
   height: $channel-banner-height;
   display: flex;

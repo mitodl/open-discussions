@@ -123,6 +123,6 @@ describe("EditChannelBasicPage", () => {
 
   it("has a channel header", async () => {
     const wrapper = await renderPage()
-    assert.isTrue(wrapper.find(".channel-page-header").exists())
+    assert.isTrue(wrapper.find("ChannelHeader").exists())
   })
 })

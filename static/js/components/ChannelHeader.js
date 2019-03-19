@@ -10,6 +10,7 @@ import ChannelAvatar, {
 } from "../containers/ChannelAvatar"
 import ChannelSettingsLink from "../containers/ChannelSettingsLink"
 import ChannelFollowControls from "../containers/ChannelFollowControls"
+import { BannerPageHeader } from "../components/PageBanner"
 
 import { channelURL } from "../lib/url"
 
@@ -23,7 +24,7 @@ type Props = {|
 |}
 
 const ChannelHeader = ({ channel, history, isModerator, children }: Props) => (
-  <div className="channel-page-header">
+  <BannerPageHeader>
     <ChannelBanner editable={false} channel={channel} />
     <Grid className="main-content two-column channel-header">
       <Cell className="avatar-headline-row" width={12}>
@@ -51,7 +52,7 @@ const ChannelHeader = ({ channel, history, isModerator, children }: Props) => (
       </Cell>
     </Grid>
     {children}
-  </div>
+  </BannerPageHeader>
 )
 
 export default ChannelHeader

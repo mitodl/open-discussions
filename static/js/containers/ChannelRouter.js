@@ -13,6 +13,7 @@ import ChannelAboutPage from "./ChannelAboutPage"
 
 import ChannelHeader from "../components/ChannelHeader"
 import ChannelNavbar from "../components/ChannelNavbar"
+import { BannerPageWrapper } from "../components/PageBanner"
 
 import { actions } from "../actions"
 import { getChannelName } from "../lib/util"
@@ -79,7 +80,7 @@ class ChannelRouter extends React.Component<Props> {
     const { channel, match, history } = this.props
 
     return (
-      <div className="channel-page-wrapper">
+      <BannerPageWrapper>
         {channel ? (
           <ChannelHeader
             channel={channel}
@@ -124,7 +125,7 @@ class ChannelRouter extends React.Component<Props> {
             component={this.renderPostPage}
           />
         </Switch>
-      </div>
+      </BannerPageWrapper>
     )
   }
 }

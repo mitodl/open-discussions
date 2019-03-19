@@ -101,18 +101,20 @@ export default class EditChannelAppearanceForm extends React.Component<Props> {
             </label>
             {validationMessage(validation.public_description)}
           </div>
-          <ChannelBanner
-            channel={channel}
-            channelName={form.name}
-            editable={true}
-            name="banner"
-            onUpdate={onUpdate}
-            formImageUrl={
-              form.banner &&
-              form.banner.edit &&
-              URL.createObjectURL(form.banner.edit)
-            }
-          />
+          <div className="channel-banner-wrapper">
+            <ChannelBanner
+              channel={channel}
+              channelName={form.name}
+              editable={true}
+              name="banner"
+              onUpdate={onUpdate}
+              formImageUrl={
+                form.banner &&
+                form.banner.edit &&
+                URL.createObjectURL(form.banner.edit)
+              }
+            />
+          </div>
         </Card>
         <div className="row actions">
           <button

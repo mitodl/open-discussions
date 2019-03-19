@@ -5,6 +5,11 @@ import sinon from "sinon"
 
 import CourseDrawer from "./CourseDrawer"
 import { CourseIndexPage } from "./CourseIndexPage"
+import {
+  BannerPageWrapper,
+  BannerPageHeader,
+  BannerContainer
+} from "../components/PageBanner"
 
 import { configureShallowRenderer } from "../lib/test_utils"
 import { makeCourse } from "../factories/courses"
@@ -77,5 +82,33 @@ describe("CourseIndexPage", () => {
       "Upcoming Courses",
       "New Courses"
     ])
+  })
+
+  it("should include a banner image", () => {
+    const wrapper = renderCourseIndexPage()
+    ;[BannerPageWrapper, BannerPageHeader, BannerContainer].forEach(
+      component => {
+        assert.ok(wrapper.find(component).exists())
+      }
+    )
+    const { src } = wrapper.find("BannerImage").props()
+    assert.equal(src, null)
+  })
+
+  it("should have a search textbox which redirects you", () => {
+    const pushStub = sandbox.stub()
+    const wrapper = renderCourseIndexPage({
+      history: {
+        push: pushStub
+      }
+    })
+    const searchBox = wrapper.find("SearchTextbox")
+    assert.equal(searchBox.prop("placeholder"), "Search Learning offerings")
+    assert.isTrue(searchBox.prop("noFocusOnLoad"))
+    searchBox.simulate("submit", { target: { value: "search term" } })
+    sinon.assert.calledWith(
+      pushStub,
+      "/courses/search?q=search%20term&type=course"
+    )
   })
 })

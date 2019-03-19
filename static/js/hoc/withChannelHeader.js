@@ -3,6 +3,7 @@ import React from "react"
 import R from "ramda"
 
 import ChannelHeader from "../components/ChannelHeader"
+import { BannerPageWrapper } from "../components/PageBanner"
 
 const withChannelHeader = R.curry(
   (WrappedComponent: Class<React.Component<*, *>>) => {
@@ -13,7 +14,7 @@ const withChannelHeader = R.curry(
         const { channel, history } = this.props
 
         return (
-          <div className="channel-page-wrapper">
+          <BannerPageWrapper>
             {channel ? (
               <ChannelHeader
                 channel={channel}
@@ -22,7 +23,7 @@ const withChannelHeader = R.curry(
               />
             ) : null}
             <WrappedComponent {...this.props} />
-          </div>
+          </BannerPageWrapper>
         )
       }
     }

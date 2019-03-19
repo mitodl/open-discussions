@@ -143,14 +143,20 @@
   }
 }
 
-.avatar-container,
-.banner-container {
-  .cropper-view-box {
-    border-radius: inherit;
+.channel-banner-wrapper {
+  position: relative;
+  height: 250px;
+
+  .channel-banner {
+    z-index: 0;
   }
 }
 
 .avatar-container {
+  .cropper-view-box {
+    border-radius: inherit;
+  }
+
   .upload-avatar {
     margin-left: 20px;
   }
