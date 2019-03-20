@@ -24,6 +24,7 @@ import { clearSearch } from "../actions/search"
 import { availabilityLabel } from "../lib/courses"
 import { SEARCH_FILTER_COURSE } from "../lib/picker"
 import { preventDefaultAndInvoke, toArray } from "../lib/util"
+import { mergeFacetResults } from "../lib/search"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -31,7 +32,8 @@ import type {
   SearchInputs,
   SearchParams,
   Result,
-  FacetResult
+  FacetResult,
+  CurrentFacet
 } from "../flow/searchTypes"
 
 type OwnProps = {|
@@ -70,7 +72,7 @@ type State = {
   activeFacets: Map<string, Array<string>>,
   from: number,
   error: ?string,
-  currentFacetGroup: ?Map<string, FacetResult>
+  currentFacetGroup: ?CurrentFacet
 }
 
 const facetDisplayMap = [
@@ -129,35 +131,30 @@ export class CourseSearchPage extends React.Component<Props, State> {
   mergeFacetOptions = (group: string) => {
     const { facets } = this.props
     const { activeFacets, currentFacetGroup } = this.state
-    const resultFacets = facets ? facets.get(group) : null
-
-    // add any selected facets not in results to the group
-    if (resultFacets && _.has(resultFacets, "buckets")) {
-      // $FlowFixMe: this is not undefined
-      activeFacets.get(group).map(facet => {
-        if (!_.find(resultFacets.buckets, { key: facet })) {
-          resultFacets.buckets.push({
-            key:       facet,
-            doc_count: 0
-          })
-        }
-      })
+    const emptyFacet = { buckets: [] }
+    const emptyActiveFacets = {
+      buckets: (activeFacets.get(group) || []).map(facet => ({
+        key:       facet,
+        doc_count: 0
+      }))
     }
 
-    // if this is the currentFacetGroup, add any new facets in that group from search results
-    if (currentFacetGroup && currentFacetGroup.keys().next().value === group) {
-      const mergedFacetGroup = _.clone(currentFacetGroup).get(group)
-      if (mergedFacetGroup && resultFacets && _.has(resultFacets, "buckets")) {
-        resultFacets.buckets.map(facet => {
-          if (!_.find(mergedFacetGroup.buckets, { key: facet.key })) {
-            mergedFacetGroup.buckets.push(facet)
-          }
-        })
-      }
-      return mergedFacetGroup
+    if (!facets) {
+      return null
     }
 
-    return resultFacets
+    if (currentFacetGroup && currentFacetGroup.group === group) {
+      return mergeFacetResults(
+        currentFacetGroup.result,
+        emptyActiveFacets,
+        facets.get(group) || emptyFacet
+      )
+    } else {
+      return mergeFacetResults(
+        facets.get(group) || emptyFacet,
+        emptyActiveFacets
+      )
+    }
   }
 
   loadMore = async () => {
@@ -222,12 +219,15 @@ export class CourseSearchPage extends React.Component<Props, State> {
     }
     // Retain the current facet options and counts for this facet group
     const updatedFacetGroup =
-      currentFacetGroup && currentFacetGroup.get(name)
+      currentFacetGroup && currentFacetGroup.group === name
         ? currentFacetGroup
-        : new Map([[name, facets.get(name)]])
+        : {
+          group:  name,
+          result: facets.get(name)
+        }
+    // $FlowFixMe: nothing undefined here
     this.setState({
       activeFacets:      updatedFacets,
-      // $FlowFixMe: this isn't going to be undefined
       currentFacetGroup: updatedFacetGroup
     })
   }
@@ -239,7 +239,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
   updateText = async (event: ?Event) => {
     // $FlowFixMe: event.target.value exists
     const text = event ? event.target.value : ""
-    await this.setState({ text, currentFacetGroup: new Map() })
+    await this.setState({ text, currentFacetGroup: null })
     if (!text) {
       this.runSearch()
     }

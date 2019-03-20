@@ -340,7 +340,10 @@ describe("CourseSearchPage", () => {
       ),
       from:              0,
       error:             null,
-      currentFacetGroup: new Map([["topics", makeSearchFacetResult().topics]])
+      currentFacetGroup: {
+        group:  "topics",
+        result: makeSearchFacetResult().topics
+      }
     })
   })
 
@@ -416,9 +419,10 @@ describe("CourseSearchPage", () => {
 
   it("mergeFacetOptions adds any search facets not in current facet group", async () => {
     const { inner } = await renderPage()
-    const currentFacetGroup = new Map([
-      ["platform", { buckets: [{ key: "ocw", doc_count: 20 }] }]
-    ])
+    const currentFacetGroup = {
+      group:  "platform",
+      result: { buckets: [{ key: "ocw", doc_count: 20 }] }
+    }
     const missingFacetGroup = _.find(
       // $FlowFixMe: platform exists in aggregation result
       searchResponse.aggregations.platform.buckets,
