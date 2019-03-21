@@ -9,6 +9,7 @@ import { arrayMove } from "react-sortable-hoc"
 import PeopleSelector, {
   PeopleSelector as InnerPeopleSelector
 } from "./PeopleSelector"
+import PeopleList from "./PeopleList"
 
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import { shouldIf } from "../../lib/test_utils"
@@ -103,13 +104,11 @@ describe("PeopleSelector", () => {
       const component = inner.find("Autosuggest").prop("renderSuggestion")(
         profile
       )
-      const props = shallow(<div>{component}</div>)
-        .find("PeopleItem")
-        .props()
-      assert.deepEqual(props.profile, profile)
-      assert.isFalse(props.editing)
 
-      props.addProfile(profile)
+      const props = shallow(<div>{component}</div>)
+        .find(".person-suggestion")
+        .props()
+      props.onClick(profile)
       sinon.assert.calledWith(updateProfilesStub, [...profiles, profile])
 
       const actionsList = store.getActions()
@@ -187,7 +186,7 @@ describe("PeopleSelector", () => {
   describe("PeopleList", () => {
     it("has props", async () => {
       const { inner } = await render()
-      const props = inner.find("sortableList").props()
+      const props = inner.find(PeopleList).props()
       assert.deepEqual(props.profiles, profiles)
       assert.isTrue(props.useDragHandle)
       assert.isNull(props.addProfile)
@@ -200,7 +199,7 @@ describe("PeopleSelector", () => {
       const updatedProfiles = profiles.filter(
         _profile => _profile.username !== profile.username
       )
-      inner.find("sortableList").prop("deleteProfile")(profile)
+      inner.find(PeopleList).prop("deleteProfile")(profile)
       sinon.assert.calledWith(updateProfilesStub, updatedProfiles)
     })
 
@@ -209,10 +208,12 @@ describe("PeopleSelector", () => {
       const oldIndex = 3,
         newIndex = 1
       const reordered = arrayMove(profiles, oldIndex, newIndex)
-      inner.find("sortableList").prop("onSortEnd")({ oldIndex, newIndex })
+      inner.find(PeopleList).prop("onSortEnd")({ oldIndex, newIndex })
       sinon.assert.calledWith(updateProfilesStub, reordered)
     })
   })
+
+  //
   ;[true, false].forEach(hasDuplicate => {
     it(`${shouldIf(
       hasDuplicate

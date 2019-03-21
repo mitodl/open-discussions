@@ -135,7 +135,7 @@ export class WidgetListContainer extends React.Component<Props> {
     })
   }
 
-  updateFrom = (data: WidgetDialogData) => {
+  updateForm = (data: WidgetDialogData) => {
     const { updateWidgetInstances } = this.props
     const instances = this.getWidgetInstances()
 
@@ -183,7 +183,7 @@ export class WidgetListContainer extends React.Component<Props> {
           useDragHandle={true}
         />
         <WidgetEditDialog
-          updateForm={this.updateFrom}
+          updateForm={this.updateForm}
           dialogData={dialogData}
           dialogOpen={dialogOpen}
           setDialogData={setDialogData}

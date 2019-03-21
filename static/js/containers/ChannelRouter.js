@@ -10,6 +10,7 @@ import SearchPage from "./SearchPage"
 import PostPage from "./PostPage"
 import ManageWidgetHeader from "./widgets/ManageWidgetHeader"
 import ChannelAboutPage from "./ChannelAboutPage"
+import ChannelMembersPage from "./ChannelMembersPage"
 
 import ChannelHeader from "../components/ChannelHeader"
 import ChannelNavbar from "../components/ChannelNavbar"
@@ -57,6 +58,11 @@ class ChannelRouter extends React.Component<Props> {
     return <SearchPage channelName={channelName} {...routeProps} />
   }
 
+  renderMembersPage = () => {
+    const { channelName } = this.props
+    return <ChannelMembersPage channelName={channelName} />
+  }
+
   renderPostPage = routeProps => {
     const { channelName } = this.props
     return <PostPage channelName={channelName} {...routeProps} />
@@ -96,6 +102,10 @@ class ChannelRouter extends React.Component<Props> {
               path={`${match.url}/about/`}
               render={() => this.renderChannelNavbar(true)}
             />
+            <Route
+              path={`${match.url}/members/`}
+              render={() => this.renderChannelNavbar(true)}
+            />
             {SETTINGS.allow_search ? (
               <Route
                 path={searchRoute(match.url)}
@@ -112,8 +122,13 @@ class ChannelRouter extends React.Component<Props> {
               render={this.renderSearchPage}
             />
           ) : null}
-          <Route path={`${match.url}/about/`} render={this.renderAboutPage} />
+          {SETTINGS.allow_search ? (
+            <Route
+              path={`${match.url}/members/`}
+              render={this.renderMembersPage}
+            />
           ) : null}
+          <Route path={`${match.url}/about/`} render={this.renderAboutPage} />
           <Route
             exact
             path={`${match.url}/:postID/:postSlug?`}

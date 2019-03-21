@@ -53,6 +53,7 @@ class WidgetInstanceFactory(DjangoModelFactory):
                 lambda _: {
                     "title": "",
                     "people": [UserFactory.create().username for _ in range(10)],
+                    "show_all_members_link": False,
                 }
             ),
         )

@@ -96,6 +96,14 @@ class ReactURLField(serializers.URLField, ReactField):
         }
 
 
+class ReactCheckboxField(serializers.BooleanField, ReactField):
+    """ReactField extension for storing a boolean"""
+
+    def _get_input_type(self):
+        """return the input type"""
+        return "checkbox"
+
+
 class ReactMarkdownWysiwygField(serializers.CharField, ReactField):
     """ReactField extension of CharField"""
 

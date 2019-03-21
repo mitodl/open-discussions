@@ -12,7 +12,8 @@ import {
   WIDGET_FIELD_TYPE_NUMBER,
   WIDGET_FIELD_TYPE_PEOPLE,
   WIDGET_FIELD_TYPE_TEXTAREA,
-  WIDGET_FIELD_TYPE_URL
+  WIDGET_FIELD_TYPE_URL,
+  WIDGET_FIELD_TYPE_CHECKBOX
 } from "../../lib/constants"
 
 import type { WidgetFieldSpec } from "../../flow/widgetTypes"
@@ -99,6 +100,17 @@ const WidgetField = ({ fieldSpec, getValue, updateValues }: Props) => {
       <PeopleSelector updateProfiles={updateProfiles} profiles={json || []} />
     )
   }
+  case WIDGET_FIELD_TYPE_CHECKBOX:
+    return (
+      <input
+        type="checkbox"
+        className="field"
+        checked={configurationOrDefault}
+        onChange={(event: any) =>
+          updateValues([configurationLens], [event.target.checked])
+        }
+      />
+    )
   default:
     return (
       <input

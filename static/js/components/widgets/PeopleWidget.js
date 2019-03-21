@@ -7,9 +7,13 @@ import type { WidgetComponentProps } from "../../flow/widgetTypes"
 
 const PeopleWidget = ({
   widgetInstance: {
-    json: { people }
+    json: { people, show_all_members_link } // eslint-disable-line camelcase
   }
 }: WidgetComponentProps) => (
-  <PeopleList profiles={people} useDragHandle={true} />
+  <PeopleList
+    profiles={people}
+    showAllMembersLink={show_all_members_link} // eslint-disable-line camelcase
+    useDragHandle={true}
+  />
 )
 export default PeopleWidget

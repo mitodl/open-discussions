@@ -76,7 +76,14 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "input_type": "people",
                 "label": "Add members to widget",
                 "props": {"placeholder": "Enter widget text"},
-            }
+            },
+            {
+                "default": False,
+                "field_name": "show_all_members_link",
+                "input_type": "checkbox",
+                "label": "Show all members link",
+                "props": {},
+            },
         ],
         "widget_type": "People",
     },

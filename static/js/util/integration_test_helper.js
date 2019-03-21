@@ -127,13 +127,22 @@ export default class IntegrationTestHelper {
     return cls.name === "WithLoading" || cls.name === "WithPostLoading"
   }
 
+  createMockStore(initialState) {
+    const mockStore = configureStore([thunk])
+    const store = mockStore(initialState)
+    store.getLastAction = function() {
+      const actions = this.getActions()
+      return actions[actions.length - 1]
+    }
+    return store
+  }
+
   configureHOCRenderer(
     WrappedComponent: Class<React.Component<*, *>>,
     InnerComponent: Class<React.Component<*, *>>,
     defaultState: Object,
     defaultProps = {}
   ) {
-    const mockStore = configureStore([thunk])
     const history = this.browserHistory
     return async (
       extraState = {},
@@ -142,7 +151,7 @@ export default class IntegrationTestHelper {
       }
     ) => {
       const initialState = R.mergeDeepRight(defaultState, extraState)
-      const store = mockStore(initialState)
+      const store = this.createMockStore(initialState)
       const wrapper = await shallow(
         <WrappedComponent
           store={store}
@@ -151,12 +160,6 @@ export default class IntegrationTestHelper {
           {...extraProps}
         />
       )
-
-      // just a little convenience method
-      store.getLastAction = function() {
-        const actions = this.getActions()
-        return actions[actions.length - 1]
-      }
 
       // dive through layers of HOCs until we reach the desired inner component
       let inner = wrapper

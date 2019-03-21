@@ -1,16 +1,18 @@
 // @flow
 import React from "react"
+import { Link } from "react-router-dom"
 import { SortableElement } from "react-sortable-hoc"
 
-import DragHandle from "./DragHandle"
 import ProfileImage, {
   PROFILE_IMAGE_MICRO
 } from "../../containers/ProfileImage"
 
+import DragHandle from "./DragHandle"
+
+import { profileURL } from "../../lib/url"
+
 import type { StatelessFunctionalComponent } from "react"
 import type { Profile } from "../../flow/discussionTypes"
-import { Link } from "react-router-dom"
-import { profileURL } from "../../lib/url"
 
 type Props = {
   addProfile?: (profile: Profile) => void,
@@ -18,6 +20,7 @@ type Props = {
   editing: boolean,
   profile: Profile
 }
+
 export const PeopleItem: StatelessFunctionalComponent<Props> = ({
   addProfile,
   deleteProfile,

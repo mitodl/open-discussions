@@ -5,7 +5,7 @@ from widgets.serializers.widget_instance import (
     WidgetConfigSerializer,
     WidgetInstanceSerializer,
 )
-from widgets.serializers.react_fields import ReactPeopleField
+from widgets.serializers.react_fields import ReactPeopleField, ReactCheckboxField
 
 
 class PeopleWidgetSerializerConfigSerializer(WidgetConfigSerializer):
@@ -14,6 +14,7 @@ class PeopleWidgetSerializerConfigSerializer(WidgetConfigSerializer):
     people = ReactPeopleField(
         help_text="Enter widget text", label="Add members to widget", default=[]
     )
+    show_all_members_link = ReactCheckboxField(default=False)
 
 
 class PeopleWidgetSerializer(WidgetInstanceSerializer):
@@ -34,5 +35,8 @@ class PeopleWidgetSerializer(WidgetInstanceSerializer):
         return {
             "people": [
                 ProfileSerializer(lookup[username]).data for username in usernames
-            ]
+            ],
+            "show_all_members_link": instance.configuration.get(
+                "show_all_members_link", False
+            ),
         }

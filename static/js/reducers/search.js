@@ -2,14 +2,15 @@
 import { POST, INITIAL_STATE } from "redux-hammock/constants"
 
 import * as api from "../lib/api/api"
+import { CLEAR_SEARCH } from "../actions/search"
 
 import type { FacetResult, Result, SearchParams } from "../flow/searchTypes"
-import { CLEAR_SEARCH } from "../actions/search"
 
 type PostFuncReturn = {
   response: Object,
   params: SearchParams
 }
+
 type SearchState = {
   results: Array<Result>,
   facets: ?Map<string, FacetResult>,

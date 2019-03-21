@@ -15,7 +15,8 @@ import {
   WIDGET_FIELD_TYPE_PEOPLE,
   WIDGET_FIELD_TYPE_TEXT,
   WIDGET_FIELD_TYPE_TEXTAREA,
-  WIDGET_FIELD_TYPE_URL
+  WIDGET_FIELD_TYPE_URL,
+  WIDGET_FIELD_TYPE_CHECKBOX
 } from "../../lib/constants"
 import { makeProfile } from "../../factories/profiles"
 
@@ -57,6 +58,8 @@ describe("WidgetField", () => {
         {...props}
       />
     )
+
+  //
   ;[
     WIDGET_FIELD_TYPE_TEXT,
     WIDGET_FIELD_TYPE_TEXTAREA,
@@ -88,6 +91,8 @@ describe("WidgetField", () => {
       })
     })
   })
+
+  //
   ;[
     WIDGET_FIELD_TYPE_TEXT,
     WIDGET_FIELD_TYPE_TEXTAREA,
@@ -149,6 +154,26 @@ describe("WidgetField", () => {
     const embedlyCard = wrapper.find("EmbedlyCard")
     assert.isTrue(embedlyCard.exists())
     assert.equal(embedlyCard.prop("url"), value)
+  })
+
+  //
+  ;[true, false].forEach(checked => {
+    it(`renders a checkbox component with value ${String(value)}`, () => {
+      fieldSpec = makeFieldSpec(WIDGET_FIELD_TYPE_CHECKBOX)
+      instance.configuration[fieldSpec.field_name] = checked
+      const wrapper = render()
+      const input = wrapper.find("input")
+      assert.isTrue(input.exists())
+      assert.equal(input.prop("checked"), checked)
+    })
+  })
+
+  it("puts a good click handler thingun on the checkbox", () => {
+    fieldSpec = makeFieldSpec(WIDGET_FIELD_TYPE_CHECKBOX)
+    instance.configuration[fieldSpec.field_name] = false
+    const wrapper = render()
+    wrapper.simulate("change", { target: { checked: true } })
+    assert.isTrue(instance.configuration[fieldSpec.field_name])
   })
 
   describe("people", () => {

@@ -9,6 +9,9 @@ export const channelURL = (channelName: string) => `/c/${channelName}`
 export const channelAboutURL = (channelName: string) =>
   `/c/${channelName}/about`
 
+export const channelMembersURL = (channelName: string) =>
+  `/c/${channelName}/members`
+
 export const channelModerationURL = (channelName: string) =>
   `/manage/c/edit/${channelName}/moderation/`
 

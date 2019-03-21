@@ -126,10 +126,19 @@ $person-z-index: 10;
   }
 }
 
+.people-list {
+  display: flex;
+  flex-direction: column;
+
+  .see-all-members {
+    align-self: flex-end;
+  }
+}
+
 .person {
   display: flex;
   align-items: center;
-  margin: 5px;
+  margin: 2px 5px;
   font-size: 14px;
   // z-index is to allow for reordering with react-sortable-hoc to float above dialog
   z-index: $person-z-index;
@@ -164,6 +173,15 @@ $person-z-index: 10;
 
   .edit-buttons {
     margin-left: auto;
+  }
+
+  &.person-suggestion {
+    cursor: pointer;
+
+    .name {
+      color: $navy;
+      font-size: $modest-font-size;
+    }
   }
 }
 

@@ -5,8 +5,11 @@ import Autosuggest from "react-autosuggest"
 import { arrayMove } from "react-sortable-hoc"
 import { connect } from "react-redux"
 
+import ProfileImage, {
+  PROFILE_IMAGE_MICRO
+} from "../../containers/ProfileImage"
+
 import PeopleList from "./PeopleList"
-import { PeopleItem } from "./PeopleItem"
 import SearchTextbox from "../SearchTextbox"
 
 import { actions } from "../../actions"
@@ -23,13 +26,16 @@ type Props = {
   suggestions: Array<Profile>,
   fetchSuggestions: (text: string) => Promise<Array<Profile>>
 }
+
 type State = {
   text: string
 }
+
 type FetchRequestArgs = {
   value: string,
   reason: string
 }
+
 type OnChangeTextArgs = { newValue: string, method: string }
 
 export class PeopleSelector extends React.Component<Props, State> {
@@ -110,6 +116,22 @@ export class PeopleSelector extends React.Component<Props, State> {
     this.clear()
   }
 
+  renderPersonSuggestion = (profile: Profile) => (
+    <div
+      className="person person-suggestion"
+      onClick={() => {
+        this.addProfile(profile)
+      }}
+    >
+      <ProfileImage imageSize={PROFILE_IMAGE_MICRO} profile={profile} />
+      <div className="description">
+        <span className="name">{profile.name}</span>
+        <span className="headline">{profile.headline}</span>
+      </div>
+      <button className="add-profile">Add</button>
+    </div>
+  )
+
   render() {
     const { text } = this.state
     const { profiles, suggestions } = this.props
@@ -122,13 +144,7 @@ export class PeopleSelector extends React.Component<Props, State> {
           onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
           alwaysRenderSuggestions={true}
           renderInputComponent={this.renderInputComponent}
-          renderSuggestion={profile => (
-            <PeopleItem
-              profile={profile}
-              editing={false}
-              addProfile={this.addProfile}
-            />
-          )}
+          renderSuggestion={this.renderPersonSuggestion}
           inputProps={{
             value:        text,
             onChange:     this.onChangeText,

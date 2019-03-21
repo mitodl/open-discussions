@@ -7,6 +7,7 @@ import sinon from "sinon"
 import ConnectedSearchPage, { SearchPage } from "./SearchPage"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
+import { CLEAR_SEARCH } from "../actions/search"
 import { makePostResult, makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 import { makePost } from "../factories/posts"
@@ -336,6 +337,12 @@ describe("SearchPage", () => {
     inner.setState({ text: "some text" })
     inner.find("SearchTextbox").prop("onClear")()
     assert.equal(inner.state().text, "")
+  })
+
+  it("clears the search on dismount", async () => {
+    const { store, inner } = await renderPage()
+    inner.instance().componentWillUnmount()
+    assert(store.getLastAction().type === CLEAR_SEARCH)
   })
 
   //

@@ -7,6 +7,7 @@ import {
   WIDGET_FIELD_TYPE_NUMBER,
   WIDGET_FIELD_TYPE_PEOPLE,
   WIDGET_FIELD_TYPE_URL,
+  WIDGET_FIELD_TYPE_CHECKBOX,
   WIDGET_TYPE_MARKDOWN,
   WIDGET_TYPE_PEOPLE,
   WIDGET_TYPE_RSS,
@@ -47,7 +48,8 @@ export const makeWidgetConfiguration = (widgetType: string): Object => {
     }
   case WIDGET_TYPE_PEOPLE:
     return {
-      people: R.range(1, numPeople).map(i => `person_${i}`)
+      people:                R.range(1, numPeople).map(i => `person_${i}`),
+      show_all_members_link: casual.boolean
     }
   default:
     return {}
@@ -76,7 +78,8 @@ export const makeWidgetJson = (widgetType: string): ?Object => {
         username: `person_${i}`,
         name:     casual.full_name,
         headline: casual.sentence
-      }))
+      })),
+      show_all_members_link: casual.boolean
     }
   default:
     return {}
@@ -157,7 +160,10 @@ export const makeWidgetSpec = (widgetType: ?string = null): WidgetSpec => {
       makeFieldSpec(WIDGET_FIELD_TYPE_NUMBER, "feed_display_limit")
     ]
   } else if (widgetType === WIDGET_TYPE_PEOPLE) {
-    fieldSpecs = [makeFieldSpec(WIDGET_FIELD_TYPE_PEOPLE, "people")]
+    fieldSpecs = [
+      makeFieldSpec(WIDGET_FIELD_TYPE_PEOPLE, "people"),
+      makeFieldSpec(WIDGET_FIELD_TYPE_CHECKBOX, "show_all_members_link")
+    ]
   } else {
     throw new Error(`Unhandled case ${widgetType}, update factory code`)
   }

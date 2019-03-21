@@ -12,20 +12,19 @@ import SearchTextbox from "../components/SearchTextbox"
 import CanonicalLink from "../components/CanonicalLink"
 import { SearchFilterPicker } from "../components/Picker"
 import SearchResult from "../components/SearchResult"
+import { Cell, Grid } from "../components/Grid"
 
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import { SEARCH_FILTER_ALL, updateSearchFilterParam } from "../lib/picker"
 import { preventDefaultAndInvoke } from "../lib/util"
+import { toggleUpvote } from "../util/api_actions"
+import { validateSearchQuery } from "../lib/validation"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { Channel, CommentInTree, Post } from "../flow/discussionTypes"
 import type { SearchInputs, SearchParams, Result } from "../flow/searchTypes"
-import { Cell, Grid } from "../components/Grid"
-
-import { toggleUpvote } from "../util/api_actions"
-import { validateSearchQuery } from "../lib/validation"
 
 type Props = {
   dispatch: Dispatch<any>,
@@ -50,6 +49,7 @@ type Props = {
   toggleUpvote: () => void,
   upvotedPosts: Map<string, Post>
 }
+
 type State = {
   text: string,
   from: number,
@@ -75,6 +75,11 @@ export class SearchPage extends React.Component<Props, State> {
     if (text) {
       this.runSearch()
     }
+  }
+
+  componentWillUnmount() {
+    const { clearSearch } = this.props
+    clearSearch()
   }
 
   downvote = async (comment: CommentInTree) => {
