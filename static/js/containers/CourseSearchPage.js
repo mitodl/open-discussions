@@ -103,11 +103,9 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { clearSearch, loaded, processing } = this.props
+    const { clearSearch } = this.props
     clearSearch()
-    if (!loaded && !processing) {
-      this.runSearch()
-    }
+    this.runSearch()
   }
 
   componentDidUpdate(prevProps: Object, prevState: Object) {
@@ -212,23 +210,22 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const { activeFacets, currentFacetGroup } = this.state
     const { facets } = this.props
     const updatedFacets = new Map(activeFacets)
+    const facetsGroup = facets.get(name) || { buckets: [] }
     if (isEnabled) {
       updatedFacets.set(name, _.union(activeFacets.get(name) || [], [value]))
     } else {
       updatedFacets.set(name, _.without(activeFacets.get(name) || [], value))
     }
-    // Retain the current facet options and counts for this facet group
-    const updatedFacetGroup =
-      currentFacetGroup && currentFacetGroup.group === name
-        ? currentFacetGroup
-        : {
-          group:  name,
-          result: facets.get(name)
-        }
     // $FlowFixMe: nothing undefined here
     this.setState({
       activeFacets:      updatedFacets,
-      currentFacetGroup: updatedFacetGroup
+      currentFacetGroup: {
+        group:  name,
+        result:
+          currentFacetGroup && currentFacetGroup.group === name
+            ? mergeFacetResults(currentFacetGroup.result, facetsGroup)
+            : facetsGroup
+      }
     })
   }
 
