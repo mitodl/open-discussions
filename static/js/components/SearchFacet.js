@@ -40,6 +40,17 @@ export class SearchFacet extends React.Component<Props> {
     await dispatch(showAll ? hideSearchFacets(key) : showSearchFacets(key))
   }
 
+  shouldComponentUpdate(nextProps: Props) {
+    const { results, currentlySelected, showAll } = this.props
+    const nextResults = nextProps.results
+    return (
+      _.has(nextResults, "buckets") &&
+      (results !== nextResults ||
+        currentlySelected !== nextProps.currentlySelected ||
+        showAll !== nextProps.showAll)
+    )
+  }
+
   render() {
     const {
       name,
@@ -53,45 +64,47 @@ export class SearchFacet extends React.Component<Props> {
     } = this.props
     const maxCount = displayCount || 5
 
-    return results ? (
+    return (
       <div className="facets">
         <div className="facet-title">{title}</div>
-        {results.buckets.map((facet, i) => (
-          <React.Fragment key={i}>
-            <div
-              className={
-                showAll || i < maxCount ? "facet-visible" : "facet-hidden"
-              }
-            >
-              <Checkbox
-                name={name}
-                value={facet.key}
-                checked={R.contains(facet.key, currentlySelected || [])}
-                onClick={onUpdate}
+        {results && results.buckets
+          ? results.buckets.map((facet, i) => (
+            <React.Fragment key={i}>
+              <div
+                className={
+                  showAll || i < maxCount ? "facet-visible" : "facet-hidden"
+                }
               >
-                <div className="facet-label-div">
-                  <div className="facet-key">
-                    {labelFunction ? labelFunction(facet.key) : facet.key}
-                  </div>
-                  <div className="facet-count">{facet.doc_count}</div>
-                </div>
-              </Checkbox>
-            </div>
-            {(!showAll &&
-              i === maxCount &&
-              maxCount < results.buckets.length) ||
-            (showAll && i === results.buckets.length - 1) ? (
-                <div
-                  className="facet-more-less"
-                  onClick={() => this.toggleAllFacets(name)}
+                <Checkbox
+                  name={name}
+                  value={facet.key}
+                  checked={R.contains(facet.key, currentlySelected || [])}
+                  onClick={onUpdate}
                 >
-                  {showAll ? "View less" : "View more"}
-                </div>
-              ) : null}
-          </React.Fragment>
-        ))}
+                  <div className="facet-label-div">
+                    <div className="facet-key">
+                      {labelFunction ? labelFunction(facet.key) : facet.key}
+                    </div>
+                    <div className="facet-count">{facet.doc_count}</div>
+                  </div>
+                </Checkbox>
+              </div>
+              {(!showAll &&
+                  i === maxCount &&
+                  maxCount < results.buckets.length) ||
+                (showAll && i === results.buckets.length - 1) ? (
+                  <div
+                    className="facet-more-less"
+                    onClick={() => this.toggleAllFacets(name)}
+                  >
+                    {showAll ? "View less" : "View more"}
+                  </div>
+                ) : null}
+            </React.Fragment>
+          ))
+          : null}
       </div>
-    ) : null
+    )
   }
 }
 

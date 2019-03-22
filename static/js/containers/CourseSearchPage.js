@@ -24,6 +24,7 @@ import { clearSearch } from "../actions/search"
 import { availabilityLabel } from "../lib/courses"
 import { SEARCH_FILTER_COURSE } from "../lib/picker"
 import { preventDefaultAndInvoke, toArray } from "../lib/util"
+import { mergeFacetResults } from "../lib/search"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -31,7 +32,8 @@ import type {
   SearchInputs,
   SearchParams,
   Result,
-  FacetResult
+  FacetResult,
+  CurrentFacet
 } from "../flow/searchTypes"
 
 type OwnProps = {|
@@ -69,7 +71,8 @@ type State = {
   text: ?string,
   activeFacets: Map<string, Array<string>>,
   from: number,
-  error: ?string
+  error: ?string,
+  currentFacetGroup: ?CurrentFacet
 }
 
 const facetDisplayMap = [
@@ -78,9 +81,7 @@ const facetDisplayMap = [
   ["platform", "Platform", _.upperCase]
 ]
 
-const shouldRunSearch = R.complement(
-  R.allPass([R.eqProps("text"), R.eqProps("activeFacets")])
-)
+const shouldRunSearch = R.complement(R.eqProps("activeFacets"))
 
 export class CourseSearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -95,17 +96,16 @@ export class CourseSearchPage extends React.Component<Props, State> {
           _.union(toArray(qs.parse(props.location.search).a) || [])
         ]
       ]),
-      from:  0,
-      error: null
+      from:              0,
+      error:             null,
+      currentFacetGroup: null
     }
   }
 
   componentDidMount() {
-    const { clearSearch, loaded, processing } = this.props
+    const { clearSearch } = this.props
     clearSearch()
-    if (!loaded && !processing) {
-      this.runSearch()
-    }
+    this.runSearch()
   }
 
   componentDidUpdate(prevProps: Object, prevState: Object) {
@@ -121,8 +121,38 @@ export class CourseSearchPage extends React.Component<Props, State> {
         ["platform", []],
         ["availability", []],
         ["topics", []]
-      ])
+      ]),
+      currentFacetGroup: null
     })
+  }
+
+  mergeFacetOptions = (group: string) => {
+    const { facets } = this.props
+    const { activeFacets, currentFacetGroup } = this.state
+    const emptyFacet = { buckets: [] }
+    const emptyActiveFacets = {
+      buckets: (activeFacets.get(group) || []).map(facet => ({
+        key:       facet,
+        doc_count: 0
+      }))
+    }
+
+    if (!facets) {
+      return null
+    }
+
+    if (currentFacetGroup && currentFacetGroup.group === group) {
+      return mergeFacetResults(
+        currentFacetGroup.result,
+        emptyActiveFacets,
+        facets.get(group) || emptyFacet
+      )
+    } else {
+      return mergeFacetResults(
+        facets.get(group) || emptyFacet,
+        emptyActiveFacets
+      )
+    }
   }
 
   loadMore = async () => {
@@ -177,24 +207,39 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   toggleFacet = async (name: string, value: string, isEnabled: boolean) => {
-    const { activeFacets } = this.state
+    const { activeFacets, currentFacetGroup } = this.state
+    const { facets } = this.props
     const updatedFacets = new Map(activeFacets)
+    const facetsGroup = facets.get(name) || { buckets: [] }
     if (isEnabled) {
       updatedFacets.set(name, _.union(activeFacets.get(name) || [], [value]))
     } else {
       updatedFacets.set(name, _.without(activeFacets.get(name) || [], value))
     }
-    this.setState({ activeFacets: updatedFacets })
+    // $FlowFixMe: nothing undefined here
+    this.setState({
+      activeFacets:      updatedFacets,
+      currentFacetGroup: {
+        group:  name,
+        result:
+          currentFacetGroup && currentFacetGroup.group === name
+            ? mergeFacetResults(currentFacetGroup.result, facetsGroup)
+            : facetsGroup
+      }
+    })
   }
 
   onUpdateFacets = (e: Object) => {
     this.toggleFacet(e.target.name, e.target.value, e.target.checked)
   }
 
-  updateText = (event: ?Event) => {
+  updateText = async (event: ?Event) => {
     // $FlowFixMe: event.target.value exists
     const text = event ? event.target.value : ""
-    this.setState({ text })
+    await this.setState({ text, currentFacetGroup: null })
+    if (!text) {
+      this.runSearch()
+    }
   }
 
   renderResults = () => {
@@ -203,6 +248,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
     if (processing || !loaded) {
       return <PostLoading />
+    }
+
+    if (total === 0 && !processing && loaded) {
+      return (
+        <div className="empty-list-msg">There are no results to display.</div>
+      )
     }
 
     return (
@@ -224,7 +275,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   render() {
-    const { match, facets, total, loaded, processing } = this.props
+    const { match } = this.props
     const { text, error, activeFacets } = this.state
 
     return (
@@ -264,28 +315,21 @@ export class CourseSearchPage extends React.Component<Props, State> {
                 </div>
               ) : null}
             </div>
-            {total === 0 && !processing && loaded ? (
-              <div className="empty-list-msg">
-                There are no results to display.
-              </div>
-            ) : null}
           </Cell>
           <Cell width={4}>
-            {facets && total > 0 ? (
-              <Card>
-                {facetDisplayMap.map(([name, title, labelFunction], i) => (
-                  <SearchFacet
-                    key={i}
-                    title={title}
-                    name={name}
-                    results={facets.get(name)}
-                    onUpdate={this.onUpdateFacets}
-                    currentlySelected={activeFacets.get(name) || []}
-                    labelFunction={labelFunction}
-                  />
-                ))}
-              </Card>
-            ) : null}
+            <Card>
+              {facetDisplayMap.map(([name, title, labelFunction], i) => (
+                <SearchFacet
+                  key={i}
+                  title={title}
+                  name={name}
+                  results={this.mergeFacetOptions(name)}
+                  onUpdate={this.onUpdateFacets}
+                  currentlySelected={activeFacets.get(name) || []}
+                  labelFunction={labelFunction}
+                />
+              ))}
+            </Card>
           </Cell>
           <Cell width={8}>{error ? null : this.renderResults()}</Cell>
         </Grid>

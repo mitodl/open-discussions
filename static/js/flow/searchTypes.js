@@ -92,6 +92,11 @@ export type FacetResult = {
   buckets:    Array<FacetBucket>
 }
 
+export type CurrentFacet = {
+  group: string,
+  result: FacetResult
+}
+
 export type Result = PostResult | CommentResult | ProfileResult | CourseResult
 
 export type SearchInputs = {

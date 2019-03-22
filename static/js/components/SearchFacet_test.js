@@ -101,4 +101,41 @@ describe("SearchFacet", () => {
       )
     })
   })
+
+  //
+  ;[
+    [true, false, false],
+    [false, true, false],
+    [false, false, true],
+    [false, false, false]
+  ].forEach(([newResults, newSelected, newShow]) => {
+    it(`component ${shouldIf(
+      newResults || newSelected || newShow
+    )} update when ${
+      newResults
+        ? "facets"
+        : newSelected
+          ? "selected facets"
+          : newShow
+            ? "showAll toggle"
+            : "nothing"
+    } changed`, () => {
+      const instance = renderSearchFacet().instance()
+      const nextSelected = newSelected
+        ? ["fakeSelection"]
+        : instance.props.currentlySelected
+      const nextResults = newResults ? { buckets: [] } : instance.props.results
+      const nextShowAll = newShow
+        ? !instance.props.showAll
+        : instance.props.showAll
+      assert.equal(
+        instance.shouldComponentUpdate({
+          showAll:           nextShowAll,
+          currentlySelected: nextSelected,
+          results:           nextResults
+        }),
+        newShow || newSelected || newResults
+      )
+    })
+  })
 })

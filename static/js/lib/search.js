@@ -14,7 +14,8 @@ import type {
   CommentResult,
   ProfileResult,
   SearchParams,
-  CourseResult
+  CourseResult,
+  FacetResult
 } from "../flow/searchTypes"
 
 export const searchResultToComment = (
@@ -247,3 +248,9 @@ export const buildSearchQuery = ({
   }
   return builder.build()
 }
+
+export const mergeFacetResults = (...args: Array<FacetResult>) => ({
+  buckets: args
+    .map(R.prop("buckets"))
+    .reduce((buckets, acc) => R.unionWith(R.eqBy(R.prop("key")), buckets, acc))
+})
