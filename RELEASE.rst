@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.72.0
+--------------
+
+- Add cover image to the course index page
+- Modify facet behavior within/between groups (#1928)
+
 Version 0.71.0 (Released March 19, 2019)
 --------------
 
