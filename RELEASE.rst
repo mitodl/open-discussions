@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.72.0
+Version 0.72.0 (Released March 27, 2019)
 --------------
 
 - Add cover image to the course index page
