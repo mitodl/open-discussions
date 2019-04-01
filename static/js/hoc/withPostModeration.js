@@ -2,6 +2,7 @@
 /* global SETTINGS: false */
 import React from "react"
 import R from "ramda"
+import qs from "query-string"
 
 import ReportForm from "../components/ReportForm"
 import Dialog from "../components/Dialog"
@@ -64,13 +65,21 @@ export const withPostModeration = (
         dispatch,
         focusedPost,
         channelName,
-        shouldGetReports
+        shouldGetReports,
+        loadPosts,
+        clearPosts,
+        location: { search }
       } = this.props
       event.preventDefault()
 
       await removePost(dispatch, focusedPost)
       if (shouldGetReports) {
         await dispatch(actions.reports.get(channelName))
+      }
+
+      if (loadPosts && clearPosts) {
+        clearPosts()
+        await loadPosts(qs.parse(search))
       }
       this.hideRemoveDialog()
       dispatch(

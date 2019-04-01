@@ -188,6 +188,11 @@ const mapDispatchToProps = (
     )
     dispatch(setPostData(response.response.posts))
   },
+  clearPosts: async () => {
+    const { channelName } = ownProps
+
+    dispatch(actions.postsForChannel.clear(channelName))
+  },
   dispatch: dispatch
 })
 
