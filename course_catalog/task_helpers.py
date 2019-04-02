@@ -61,6 +61,10 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
 
     # Parse each course run individually
     for course_run in course_data.get("course_runs"):
+
+        if should_skip_course(course_run.get("title")):
+            continue
+
         course_run_key = course_run.get("key")
 
         # Get the last modified date from the course run
@@ -459,3 +463,27 @@ def get_course_availability(course):
         for run in course_runs:
             if run.get("key") == course.course_id:
                 return run.get("availability")
+
+
+def should_skip_course(course_title):
+    """
+    Returns True if '[delete]', 'delete ' (note the ending space character)
+    exists in a course's title or if the course title equals 'delete' for the
+    purpose of skipping the course
+
+    Args:
+        course_title (str): The course.title of the course
+
+    Returns:
+        bool
+
+    """
+    title = course_title.strip().lower()
+    if (
+        "[delete]" in title
+        or "(delete)" in title
+        or "delete " in title
+        or title == "delete"
+    ):
+        return True
+    return False
