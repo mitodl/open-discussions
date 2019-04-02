@@ -19,6 +19,7 @@ from course_catalog.task_helpers import (
     safe_load_json,
     get_course_url,
     get_course_availability,
+    should_skip_course,
 )
 
 pytestmark = pytest.mark.django_db
@@ -344,3 +345,13 @@ def test_get_course_availability(mitx_valid_data):
         raw_json=mitx_valid_data, platform=PlatformType.mitx.value
     )
     assert get_course_availability(mitx_course_no_runs_json) is None
+
+
+def test_should_skip_course():
+    """ Tests should_skip_course returns as expected """
+    assert should_skip_course("DELETE")
+    assert should_skip_course("Delete")
+    assert should_skip_course("Delete ")
+    assert should_skip_course("Delete wrong institution")
+    assert should_skip_course("[DELETE]Management in Engineering II]")
+    assert should_skip_course("Introduction to Syntax") is False
