@@ -41,6 +41,7 @@ type OwnProps = {|
   showPinUI?: boolean,
   isModerator: boolean,
   removePost?: ?(post: Post) => void,
+  deletePost?: ?(post: Post) => void,
   ignorePostReports?: (post: Post) => Promise<*>,
   reportPost?: ?(post: Post) => void,
   useSearchPageUI?: boolean,
@@ -81,6 +82,7 @@ export class CompactPostDisplay extends React.Component<Props> {
       togglePinPost,
       isModerator,
       removePost,
+      deletePost,
       ignorePostReports,
       reportPost,
       menuOpen,
@@ -122,9 +124,16 @@ export class CompactPostDisplay extends React.Component<Props> {
                 </a>
               </li>
             ) : null}
-            {isModerator && removePost ? (
+            {isModerator &&
+            removePost &&
+            post.author_id !== SETTINGS.username ? (
+                <li>
+                  <a onClick={() => removePost(post)}>Remove</a>
+                </li>
+              ) : null}
+            {deletePost && post.author_id === SETTINGS.username ? (
               <li>
-                <a onClick={() => removePost(post)}>Remove</a>
+                <a onClick={() => deletePost(post)}>Delete</a>
               </li>
             ) : null}
             {isModerator && ignorePostReports ? (

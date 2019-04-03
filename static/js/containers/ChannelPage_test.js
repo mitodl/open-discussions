@@ -259,6 +259,7 @@ describe("ChannelPage", () => {
     assert.isTrue(wrapper.props().showPinUI)
     assert.isTrue(wrapper.props().showReportPost)
     assert.isTrue(wrapper.props().showRemovePost)
+    assert.isTrue(wrapper.props().showDeletePost)
     assert.isTrue(wrapper.props().showTogglePinPost)
     assert.isFalse(wrapper.props().showChannelLinks)
   })

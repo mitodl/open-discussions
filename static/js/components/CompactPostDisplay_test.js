@@ -366,18 +366,58 @@ describe("CompactPostDisplay", () => {
       assert.isNotOk(count.exists())
     })
 
-    it("should put a remove button, if it gets the right props", () => {
-      const removePostStub = helper.sandbox.stub()
-      const wrapper = renderPostDisplay({
-        post,
-        isModerator: true,
-        removePost:  removePostStub
+    //
+    ;[true, false].forEach(userIsAuthor => {
+      it(`${shouldIf(
+        !userIsAuthor
+      )} put a remove button, if it gets the right props and user ${
+        userIsAuthor ? "is" : "is not"
+      } author`, () => {
+        const removePostStub = helper.sandbox.stub()
+        if (userIsAuthor) {
+          // $FlowFixMe: go home flow, you're drunk
+          post.author_id = SETTINGS.username
+        }
+        const wrapper = renderPostDisplay({
+          post,
+          isModerator: true,
+          removePost:  removePostStub
+        })
+        const link = wrapper.find({ children: "Remove" })
+        assert.equal(link.exists(), !userIsAuthor)
+        if (!userIsAuthor) {
+          link.simulate("click")
+          assert.ok(removePostStub.calledWith(post))
+        }
       })
-      const link = wrapper.find({ children: "Remove" })
-      assert(link.exists())
-      link.simulate("click")
-      assert.ok(removePostStub.calledWith(post))
     })
+
+    //
+    ;[[true, true], [true, false], [false, true], [false, false]].forEach(
+      ([userIsAuthor, passDeleteFunc]) => {
+        it(`${shouldIf(
+          userIsAuthor && passDeleteFunc
+        )} put a delete button, if it ${
+          passDeleteFunc ? "gets" : "doesn't get"
+        } the prop and user ${userIsAuthor ? "is" : "is not"} author`, () => {
+          const deletePostStub = helper.sandbox.stub()
+          if (userIsAuthor) {
+            // $FlowFixMe: go home flow, you're drunk
+            post.author_id = SETTINGS.username
+          }
+          const wrapper = renderPostDisplay({
+            post,
+            deletePost: passDeleteFunc ? deletePostStub : null
+          })
+          const link = wrapper.find({ children: "Delete" })
+          assert.equal(link.exists(), userIsAuthor && passDeleteFunc)
+          if (userIsAuthor && passDeleteFunc) {
+            link.simulate("click")
+            assert.ok(deletePostStub.calledWith(post))
+          }
+        })
+      }
+    )
 
     it("should put an ignore button, if it gets the right props", () => {
       const ignorePostStub = helper.sandbox.stub()

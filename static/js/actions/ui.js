@@ -2,6 +2,7 @@
 import { createAction } from "redux-actions"
 
 export const DIALOG_REMOVE_POST = "DIALOG_REMOVE_POST"
+export const DIALOG_DELETE_POST = "DIALOG_DELETE_POST"
 export const DIALOG_REMOVE_COMMENT = "DIALOG_REMOVE_COMMENT"
 export const DIALOG_REMOVE_MEMBER = "DIALOG_REMOVE_MEMBER"
 export const DIALOG_CLEAR_POST_TYPE = "DIALOG_CLEAR_POST_TYPE"

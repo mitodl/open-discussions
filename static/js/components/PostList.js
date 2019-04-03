@@ -13,7 +13,8 @@ type Props = {
   togglePinPost?: ?(post: Post) => Promise<*>,
   isModerator: boolean,
   reportPost?: ?(post: Post) => void,
-  removePost?: ?(post: Post) => void
+  removePost?: ?(post: Post) => void,
+  deletePost?: ?(post: Post) => void
 }
 
 const PostList = ({
@@ -24,7 +25,8 @@ const PostList = ({
   toggleUpvote,
   togglePinPost,
   reportPost,
-  removePost
+  removePost,
+  deletePost
 }: Props) => (
   <div className="post-list">
     {posts.length > 0 ? (
@@ -39,6 +41,7 @@ const PostList = ({
           togglePinPost={togglePinPost}
           reportPost={reportPost}
           removePost={removePost}
+          deletePost={deletePost}
         />
       ))
     ) : (

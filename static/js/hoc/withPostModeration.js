@@ -13,7 +13,8 @@ import {
   setSnackbarMessage,
   showDialog,
   hideDialog,
-  DIALOG_REMOVE_POST
+  DIALOG_REMOVE_POST,
+  DIALOG_DELETE_POST
 } from "../actions/ui"
 import { setFocusedPost, clearFocusedPost } from "../actions/focus"
 import { getChannelName } from "../lib/util"
@@ -31,7 +32,7 @@ import { validateContentReportForm } from "../lib/validation"
 
 import type { Post } from "../flow/discussionTypes"
 
-const REPORT_POST_DIALOG = "REPORT_POST_DIALOG"
+export const REPORT_POST_DIALOG = "REPORT_POST_DIALOG"
 
 export const withPostModeration = (
   WrappedComponent: Class<React.Component<*, *>>
@@ -44,6 +45,13 @@ export const withPostModeration = (
 
       dispatch(setFocusedPost(post))
       dispatch(showDialog(DIALOG_REMOVE_POST))
+    }
+
+    openDeletePostDialog = (post: Post) => {
+      const { dispatch } = this.props
+
+      dispatch(setFocusedPost(post))
+      dispatch(showDialog(DIALOG_DELETE_POST))
     }
 
     openReportPostDialog = (post: Post) => {
@@ -60,31 +68,68 @@ export const withPostModeration = (
       dispatch(hideDialog(DIALOG_REMOVE_POST))
     }
 
+    hideDeleteDialog = () => {
+      const { dispatch } = this.props
+      dispatch(clearFocusedPost())
+      dispatch(hideDialog(DIALOG_DELETE_POST))
+    }
+
     removePost = async (event: Event) => {
       const {
         dispatch,
         focusedPost,
         channelName,
-        shouldGetReports,
-        loadPosts,
-        clearPosts,
-        location: { search }
+        shouldGetReports
       } = this.props
-      event.preventDefault()
 
+      event.preventDefault()
       await removePost(dispatch, focusedPost)
       if (shouldGetReports) {
         await dispatch(actions.reports.get(channelName))
       }
+      await this.refreshPostList()
+
+      this.hideRemoveDialog()
+      dispatch(
+        setSnackbarMessage({
+          message: "Post has been removed"
+        })
+      )
+    }
+
+    refreshPostList = async () => {
+      const {
+        loadPosts,
+        clearPosts,
+        location: { search }
+      } = this.props
 
       if (loadPosts && clearPosts) {
         clearPosts()
         await loadPosts(qs.parse(search))
       }
-      this.hideRemoveDialog()
+    }
+
+    deletePost = async (event: Event) => {
+      // ⚠️  this is a destructive action! ⚠️
+      const {
+        dispatch,
+        shouldGetReports,
+        focusedPost,
+        channelName
+      } = this.props
+
+      event.preventDefault()
+      await dispatch(actions.posts["delete"](focusedPost.id))
+      if (shouldGetReports) {
+        await dispatch(actions.reports.get(channelName))
+      }
+      await this.refreshPostList()
+
+      this.hideDeleteDialog()
       dispatch(
         setSnackbarMessage({
-          message: "Post has been removed"
+          message: "Post has been deleted"
         })
       )
     }
@@ -148,6 +193,7 @@ export const withPostModeration = (
     render() {
       const {
         showRemovePostDialog,
+        showDeletePostDialog,
         reportPostDialogVisible,
         forms,
         dispatch
@@ -191,9 +237,23 @@ export const withPostModeration = (
               this later by clicking "approve".
             </p>
           </Dialog>
+          <Dialog
+            id="delete-post-dialog"
+            open={showDeletePostDialog}
+            onAccept={this.deletePost}
+            hideDialog={this.hideDeleteDialog}
+            submitText="Yes, delete"
+            title="Delete Post"
+          >
+            <p>
+              Are you sure you want to delete this post? This is a permanent
+              action and cannot be reversed.
+            </p>
+          </Dialog>
           <WrappedComponent
             {...this.props}
             removePost={this.openRemovePostDialog}
+            deletePost={this.openDeletePostDialog}
             approvePost={this.approvePost}
             ignorePostReports={this.ignoreReports}
             reportPost={this.openReportPostDialog}
@@ -240,6 +300,7 @@ export const postModerationSelector = (state: Object, ownProps: Object) => {
     subscribedChannels:      getSubscribedChannels(state),
     reports:                 reports.data.reports,
     showRemovePostDialog:    ui.dialogs.has(DIALOG_REMOVE_POST),
+    showDeletePostDialog:    ui.dialogs.has(DIALOG_DELETE_POST),
     reportPostDialogVisible: ui.dialogs.has(REPORT_POST_DIALOG),
     focusedPost:             focus.post,
     errored:                 anyErrorExcept404([

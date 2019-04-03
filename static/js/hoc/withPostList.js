@@ -23,11 +23,13 @@ type Props = {
   posts: ?Array<Post>,
   reportPost: (p: Post) => void,
   removePost: (p: Post) => void,
+  deletePost: (p: Post) => void,
   toggleUpvote: (post: Post) => Promise<*>,
   dispatch: Dispatch<any>,
   showChannelLinks: boolean,
   showReportPost: boolean,
   showRemovePost: boolean,
+  showDeletePost: boolean,
   showTogglePinPost: boolean,
   showPinUI: boolean,
   channelName?: string
@@ -81,9 +83,11 @@ const withPostList = (WrappedComponent: Class<React.Component<*, *>>) => {
         isModerator,
         reportPost,
         removePost,
+        deletePost,
         showPinUI,
         showReportPost,
         showRemovePost,
+        showDeletePost,
         showChannelLinks,
         showTogglePinPost
       } = this.props
@@ -99,6 +103,7 @@ const withPostList = (WrappedComponent: Class<React.Component<*, *>>) => {
           isModerator={isModerator}
           togglePinPost={showTogglePinPost ? this.togglePinPost : null}
           reportPost={showReportPost ? reportPost : null}
+          deletePost={showDeletePost ? deletePost : null}
           removePost={showRemovePost ? removePost : null}
           showPinUI={showPinUI}
           showChannelLinks={showChannelLinks}

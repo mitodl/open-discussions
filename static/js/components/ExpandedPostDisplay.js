@@ -177,20 +177,24 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
                   </a>
                 </li>
               ) : null}
-              {isModerator && !post.removed ? (
-                <li className="comment-action-button remove-post">
-                  <a onClick={this.removePost.bind(this)} href="#">
+              {isModerator &&
+              !post.removed &&
+              SETTINGS.username !== post.author_id ? (
+                  <li className="comment-action-button remove-post">
+                    <a onClick={this.removePost.bind(this)} href="#">
                     Remove
-                  </a>
-                </li>
-              ) : null}
-              {isModerator && post.removed ? (
-                <li className="comment-action-button approve-post">
-                  <a onClick={this.approvePost.bind(this)} href="#">
+                    </a>
+                  </li>
+                ) : null}
+              {isModerator &&
+              post.removed &&
+              SETTINGS.username !== post.author_id ? (
+                  <li className="comment-action-button approve-post">
+                    <a onClick={this.approvePost.bind(this)} href="#">
                     Approve
-                  </a>
-                </li>
-              ) : null}
+                    </a>
+                  </li>
+                ) : null}
               {!userIsAnonymous() ? (
                 <li className="comment-action-button report-post">
                   <a onClick={showPostReportDialog} href="#">

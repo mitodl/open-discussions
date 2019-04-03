@@ -189,15 +189,20 @@ describe("ExpandedPostDisplay", () => {
     assert.equal(to, postDetailURL(post.channel_name, post.id, post.slug))
   })
 
-  it("should show an edit link if a text or article post and authored by the user", () => {
-    [
-      ["text", true, true],
-      ["article", true, true],
-      ["url", true, false],
-      ["text", false, false],
-      ["article", false, false],
-      ["url", false, false]
-    ].forEach(([postType, userAuthor, shouldShowLink]) => {
+  //
+  ;[
+    ["text", true, true],
+    ["article", true, true],
+    ["url", true, false],
+    ["text", false, false],
+    ["article", false, false],
+    ["url", false, false]
+  ].forEach(([postType, userAuthor, shouldShowLink]) => {
+    it(`${shouldIf(
+      shouldShowLink
+    )} show an edit link if post is ${postType} and user ${
+      userAuthor ? "is" : "is not"
+    } author`, () => {
       const post = makePost(postType === "url")
 
       if (postType === "article") {
@@ -222,8 +227,11 @@ describe("ExpandedPostDisplay", () => {
     assert.equal(followButton.props().toggleFollowPost, toggleFollowPostStub)
   })
 
-  it("should show a delete button if authored by the user", () => {
-    [true, false].forEach(userAuthor => {
+  //
+  ;[true, false].forEach(userAuthor => {
+    it(`${shouldIf(userAuthor)} show a delete button if user ${
+      userAuthor ? "is" : "is not"
+    } author`, () => {
       post = makePost()
       if (userAuthor) {
         SETTINGS.username = post.author_id
@@ -336,21 +344,38 @@ describe("ExpandedPostDisplay", () => {
     })
   })
 
-  it("should display approve and remove links only if user is a moderator", () => {
-    [[true, false], [true, true], [false, false], [false, true]].forEach(
-      ([isModerator, removed]) => {
-        post.removed = removed
-        const wrapper = renderPostDisplay({ isModerator })
-        assert.equal(
-          wrapper.find(".approve-post").exists(),
-          isModerator && removed
-        )
-        assert.equal(
-          wrapper.find(".remove-post").exists(),
-          isModerator && !removed
-        )
+  //
+  ;[
+    [true, false, true],
+    [true, false, false],
+    [true, true, true],
+    [true, true, false],
+    [false, false, true],
+    [false, false, false],
+    [false, true, true],
+    [false, true, false]
+  ].forEach(([isModerator, removed, isPostAuthor]) => {
+    it(`${shouldIf(
+      isModerator && !removed && !isPostAuthor
+    )} display approve and remove links if isModerator=${String(
+      isModerator
+    )}, removed=${String(removed)}, isPostAuthor=${String(
+      isPostAuthor
+    )}`, () => {
+      post.removed = removed
+      if (isPostAuthor) {
+        post.author_id = SETTINGS.username
       }
-    )
+      const wrapper = renderPostDisplay({ isModerator })
+      assert.equal(
+        wrapper.find(".approve-post").exists(),
+        isModerator && removed && !isPostAuthor
+      )
+      assert.equal(
+        wrapper.find(".remove-post").exists(),
+        isModerator && !removed && !isPostAuthor
+      )
+    })
   })
 
   it('should call approvePost when user clicks "approve"', () => {

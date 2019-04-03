@@ -159,6 +159,7 @@ const mapStateToProps = (state, ownProps) => {
     showPinUI:          false,
     showReportPost:     true,
     showRemovePost:     false,
+    showDeletePost:     true,
     showTogglePinPost:  false,
     showChannelLinks:   true,
     isModerator:        false // for the intents of CompactPostDisplay UI

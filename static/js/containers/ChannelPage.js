@@ -167,6 +167,7 @@ const mapStateToProps = (state, ownProps) => {
     showChannelLinks:   false,
     showReportPost:     true,
     showRemovePost:     true,
+    showDeletePost:     true,
     showTogglePinPost:  true,
     errored:            anyErrorExcept404([
       channels,
