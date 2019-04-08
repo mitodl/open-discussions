@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.72.1
+Version 0.72.1 (Released April 08, 2019)
 --------------
 
 - refresh the post list after you remove a post
