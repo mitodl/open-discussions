@@ -3,12 +3,18 @@ import { assert } from "chai"
 import R from "ramda"
 import sinon from "sinon"
 
-import { PostSortPicker, CommentSortPicker, SearchFilterPicker } from "./Picker"
+import {
+  PostSortPicker,
+  CommentSortPicker,
+  SearchFilterPicker,
+  ChannelMembersSortPicker
+} from "./Picker"
 
 import {
   VALID_POST_SORT_LABELS,
   VALID_COMMENT_SORT_LABELS,
-  VALID_SEARCH_FILTER_LABELS
+  VALID_SEARCH_FILTER_LABELS,
+  VALID_MEMBERS_SORT_LABELS
 } from "../lib/picker"
 import { configureShallowRenderer } from "../lib/test_utils"
 
@@ -27,7 +33,8 @@ describe("Picker", () => {
     [
       [VALID_POST_SORT_LABELS, PostSortPicker],
       [VALID_COMMENT_SORT_LABELS, CommentSortPicker],
-      [VALID_SEARCH_FILTER_LABELS, SearchFilterPicker]
+      [VALID_SEARCH_FILTER_LABELS, SearchFilterPicker],
+      [VALID_MEMBERS_SORT_LABELS, ChannelMembersSortPicker]
     ].forEach(([labels, Component]) => {
       const wrapper = renderComponent(Component)()
       // $FlowFixMe
@@ -47,7 +54,8 @@ describe("Picker", () => {
     [
       [PostSortPicker, VALID_POST_SORT_LABELS],
       [CommentSortPicker, VALID_COMMENT_SORT_LABELS],
-      [SearchFilterPicker, VALID_SEARCH_FILTER_LABELS]
+      [SearchFilterPicker, VALID_SEARCH_FILTER_LABELS],
+      [ChannelMembersSortPicker, VALID_MEMBERS_SORT_LABELS]
     ].forEach(([Component, labels]) => {
       labels.forEach(([value, label]) => {
         const wrapper = renderComponent(Component)({ value })
@@ -60,7 +68,8 @@ describe("Picker", () => {
     [
       [PostSortPicker, VALID_POST_SORT_LABELS],
       [CommentSortPicker, VALID_COMMENT_SORT_LABELS],
-      [SearchFilterPicker, VALID_SEARCH_FILTER_LABELS]
+      [SearchFilterPicker, VALID_SEARCH_FILTER_LABELS],
+      [ChannelMembersSortPicker, VALID_MEMBERS_SORT_LABELS]
     ].forEach(([Component, labels]) => {
       labels.forEach(([type, label], idx) => {
         updateParamStub = sinon.stub()
@@ -76,24 +85,28 @@ describe("Picker", () => {
   })
 
   it("should open and close", () => {
-    [PostSortPicker, CommentSortPicker, SearchFilterPicker].forEach(
-      Component => {
-        const wrapper = renderComponent(Component)()
-        assert.isFalse(wrapper.find("Menu").props().open)
-        assert.isFalse(wrapper.state("menuOpen"))
-        wrapper.instance().toggleMenuOpen()
-        wrapper.update()
-        assert.isTrue(wrapper.find("Menu").props().open)
-        assert.isTrue(wrapper.state("menuOpen"))
-      }
-    )
+    [
+      PostSortPicker,
+      CommentSortPicker,
+      SearchFilterPicker,
+      ChannelMembersSortPicker
+    ].forEach(Component => {
+      const wrapper = renderComponent(Component)()
+      assert.isFalse(wrapper.find("Menu").props().open)
+      assert.isFalse(wrapper.state("menuOpen"))
+      wrapper.instance().toggleMenuOpen()
+      wrapper.update()
+      assert.isTrue(wrapper.find("Menu").props().open)
+      assert.isTrue(wrapper.state("menuOpen"))
+    })
   })
 
   it("sets the className", () => {
     [
       ["post-sort-picker", PostSortPicker],
       ["comment-sort-picker", CommentSortPicker],
-      ["search-filter-picker", SearchFilterPicker]
+      ["search-filter-picker", SearchFilterPicker],
+      ["channel-member-sort-picker", ChannelMembersSortPicker]
     ].forEach(([cssClass, Component]) => {
       const wrapper = renderComponent(Component)()
       assert.equal(wrapper.prop("className"), `picker ${cssClass}`)

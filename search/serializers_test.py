@@ -1,5 +1,6 @@
 """Tests for elasticsearch serializers"""
 # pylint: disable=redefined-outer-name,unused-argument
+from datetime import datetime
 import pytest
 
 from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
@@ -170,11 +171,12 @@ def test_es_comment_serializer(has_author):
 def test_es_profile_serializer(mocker, user):
     """
     Test that ESProfileSerializer correctly serializes a profile object
-
     """
     mocker.patch(
         "search.serializers.get_channels", return_value={"channel01", "channel02"}
     )
+    return_value = [("channel01", datetime.now()), ("channel02", datetime.now())]
+    mocker.patch("search.serializers.get_channel_join_dates", return_value=return_value)
     serialized = ESProfileSerializer().serialize(user.profile)
     assert serialized == {
         "object_type": PROFILE_TYPE,
@@ -185,6 +187,9 @@ def test_es_profile_serializer(mocker, user):
         "author_bio": user.profile.bio,
         "author_headline": user.profile.headline,
         "author_channel_membership": ["channel01", "channel02"],
+        "author_channel_join_data": [
+            {"name": name, "joined": created_on} for name, created_on in return_value
+        ],
     }
 
 

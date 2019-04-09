@@ -1,5 +1,6 @@
 import { assert } from "chai"
 import sinon from "sinon"
+import _ from "lodash"
 
 import {
   makeCommentResult,
@@ -268,8 +269,9 @@ describe("search functions", () => {
                   },
                   must: {
                     multi_match: {
-                      fields: fieldNames,
-                      query:  text
+                      fields:    fieldNames,
+                      query:     text,
+                      fuzziness: "AUTO"
                     }
                   }
                 }
@@ -373,8 +375,9 @@ describe("search functions", () => {
                   },
                   must: {
                     multi_match: {
-                      query:  text,
-                      fields: fieldNames
+                      query:     text,
+                      fields:    fieldNames,
+                      fuzziness: "AUTO"
                     }
                   }
                 }
@@ -384,6 +387,54 @@ describe("search functions", () => {
         }
       })
       sinon.assert.calledWith(stub, type)
+    })
+
+    //
+    ;[
+      ["asc", "simple option"],
+      [
+        {
+          order:       "asc",
+          nested_path: "hey there",
+          mode:        "min"
+        },
+        "custom sort option"
+      ]
+    ].forEach(([searchOption, description]) => {
+      it(`puts in a sort value when given a ${description}`, () => {
+        assert.deepEqual(
+          buildSearchQuery({
+            sort: {
+              field:  "bestfield",
+              option: searchOption
+            }
+          }),
+          {
+            query: {
+              bool: {
+                should: ["comment", "post", "profile"].map(objectType => ({
+                  bool: {
+                    filter: {
+                      bool: {
+                        must: [{ term: { object_type: objectType } }]
+                      }
+                    }
+                  }
+                }))
+              }
+            },
+            sort: [
+              {
+                bestfield: _.isString(searchOption)
+                  ? {
+                    order: "asc"
+                  }
+                  : searchOption
+              }
+            ]
+          }
+        )
+      })
     })
   })
 
@@ -405,7 +456,7 @@ describe("search functions", () => {
       ["comment", ["text.english"]],
       [
         "profile",
-        ["author_headline.english", "author_bio.english", "author_name"]
+        ["author_headline.english", "author_bio.english", "author_name.english"]
       ],
       [
         "course",

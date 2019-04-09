@@ -6,19 +6,42 @@ import { connect } from "react-redux"
 import SearchResult from "../components/SearchResult"
 import { Grid, Cell } from "../components/Grid"
 import { Loading } from "../components/Loading"
+import { ChannelMembersSortPicker } from "../components/Picker"
 
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
+import { MEMBERS_SORT_AUTHOR_NAME, MEMBERS_SORT_JOIN_DATE } from "../lib/picker"
 
 import type { SearchParams, Result } from "../flow/searchTypes"
 
 export const CHANNEL_MEMBERS_PAGE_SIZE = 50
 
-const channelMemberParams = (channelName, from) => ({
+export const getSortOption = (sortField: string, channelName: string) => {
+  switch (sortField) {
+  case MEMBERS_SORT_AUTHOR_NAME:
+    return "asc"
+  case MEMBERS_SORT_JOIN_DATE:
+    return {
+      order:         "desc",
+      nested_path:   "author_channel_join_data",
+      nested_filter: {
+        term: {
+          "author_channel_join_data.name": channelName
+        }
+      }
+    }
+  }
+}
+
+const channelMemberParams = (channelName, from, sortField) => ({
   channelName,
   from,
   type: "profile",
-  size: CHANNEL_MEMBERS_PAGE_SIZE
+  size: CHANNEL_MEMBERS_PAGE_SIZE,
+  sort: {
+    field:  sortField,
+    option: getSortOption(sortField, channelName)
+  }
 })
 
 type StateProps = {|
@@ -53,22 +76,35 @@ function ChannelMembersPage(props: Props) {
   } = props
 
   const [from, setFrom] = useState(0)
+  const [sortField, setSortField] = useState(MEMBERS_SORT_AUTHOR_NAME)
 
   useEffect(() => {
-    runSearch(channelMemberParams(channelName, from))
+    runSearch(channelMemberParams(channelName, from, sortField))
     setFrom(from + CHANNEL_MEMBERS_PAGE_SIZE)
     return clearSearch
   }, [])
 
   return (
     <div className="main-content two-column channel-member-page">
+      <div className="header-row">
+        <div className="picker-label">Sort by:</div>
+        <ChannelMembersSortPicker
+          value={sortField}
+          updatePickerParam={param => () => {
+            setSortField(param)
+            clearSearch()
+            setFrom(0)
+            runSearch(channelMemberParams(channelName, 0, param))
+          }}
+        />
+      </div>
       <InfiniteScroll
         hasMore={from + CHANNEL_MEMBERS_PAGE_SIZE < total}
         loadMore={() => {
           if (!searchLoaded) {
             return
           }
-          runSearch(channelMemberParams(channelName, from))
+          runSearch(channelMemberParams(channelName, from, sortField))
           setFrom(from + CHANNEL_MEMBERS_PAGE_SIZE)
         }}
         initialLoad={from === 0}

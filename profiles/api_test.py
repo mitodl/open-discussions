@@ -4,9 +4,10 @@ import pytest
 from channels.api import sync_channel_subscription_model, add_user_role
 from channels.constants import ROLE_CONTRIBUTORS, ROLE_MODERATORS
 from channels.factories.models import ChannelFactory
+from channels.models import ChannelGroupRole
 from open_discussions.factories import UserFactory
 from profiles import api
-from profiles.api import get_channels, get_site_type_from_url
+from profiles.api import get_channels, get_channel_join_dates, get_site_type_from_url
 from profiles.models import (
     Profile,
     FACEBOOK_DOMAIN,
@@ -45,6 +46,22 @@ def test_get_channels(user):
     add_user_role(channels[1], ROLE_CONTRIBUTORS, user)
     add_user_role(channels[2], ROLE_MODERATORS, user)
     assert get_channels(user) == {channel.name for channel in channels[:3]}
+
+
+def test_get_channel_join_dates(user):
+    """
+    Test out the get_channel_join_dates function
+    """
+    channels = ChannelFactory.create_batch(4)
+    sync_channel_subscription_model(channels[0], user)
+    sync_channel_subscription_model(channels[1], user)
+    add_user_role(channels[2], "moderators", user)
+    add_user_role(channels[3], "contributors", user)
+    assert get_channel_join_dates(user) == [
+        (obj.channel.name, obj.created_on)
+        for obj in list(user.channelsubscription_set.all())
+        + list(ChannelGroupRole.objects.filter(group__in=user.groups.all()))
+    ]
 
 
 @pytest.mark.parametrize(

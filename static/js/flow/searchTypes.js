@@ -105,11 +105,17 @@ export type SearchInputs = {
   incremental:      boolean
 }
 
+export type SortParam = {
+  field: string,
+  option: string | Object
+}
+
 export type SearchParams = {
-  type:             ?string,
-  text:             ?string,
-  from:             number,
-  size:             number,
-  channelName:      ?string,
-  facets?:           Map<string, Array<string>>
+  type:              ?string,
+  text:              ?string,
+  from:              number,
+  size:              number,
+  channelName:       ?string,
+  facets?:           Map<string, Array<string>>,
+  sort?:             SortParam,
 }

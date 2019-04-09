@@ -55,6 +55,19 @@ export const VALID_SEARCH_FILTER_LABELS = [
   [SEARCH_FILTER_PROFILE, "Profile"]
 ]
 
+export const MEMBERS_SORT_AUTHOR_NAME = "author_name.raw"
+export const MEMBERS_SORT_JOIN_DATE = "author_channel_join_data.joined"
+
+export const VALID_MEMBERS_SORT_TYPES = [
+  MEMBERS_SORT_AUTHOR_NAME,
+  MEMBERS_SORT_JOIN_DATE
+]
+
+export const VALID_MEMBERS_SORT_LABELS = [
+  [MEMBERS_SORT_AUTHOR_NAME, "Name"],
+  [MEMBERS_SORT_JOIN_DATE, "New"]
+]
+
 const updatePickerParam = R.curry(
   (validPickerTypes, fieldName, props, value, e) => {
     const {

@@ -4,4 +4,14 @@
   .profile-search-result {
     margin: 0;
   }
+
+  .header-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+
+    .picker-label {
+      margin-right: 5px;
+    }
+  }
 }

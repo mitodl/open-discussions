@@ -117,7 +117,7 @@ const COMMENT_QUERY_FIELDS = ["text.english"]
 const PROFILE_QUERY_FIELDS = [
   "author_headline.english",
   "author_bio.english",
-  "author_name"
+  "author_name.english"
 ]
 const COURSE_QUERY_FIELDS = [
   "title.english",
@@ -155,6 +155,7 @@ import { searchFields } from "./search"
 const POST_CHANNEL_FIELD = "channel_name"
 const COMMENT_CHANNEL_FIELD = "channel_name"
 const PROFILE_CHANNEL_FIELD = "author_channel_membership"
+
 const _channelField = (type: ?string) => {
   if (type === "post") {
     return POST_CHANNEL_FIELD
@@ -175,7 +176,8 @@ export const buildSearchQuery = ({
   channelName,
   from,
   size,
-  facets
+  facets,
+  sort
 }: SearchParams): Object => {
   let builder = bodybuilder()
 
@@ -185,6 +187,11 @@ export const buildSearchQuery = ({
   if (!R.isNil(size)) {
     builder = builder.size(size)
   }
+  if (sort !== undefined) {
+    const { field, option } = sort
+    builder.sort(field, option)
+  }
+
   const types = type ? [type] : ["comment", "post", "profile"]
   for (const type of types) {
     // One of the text fields must match
@@ -192,8 +199,9 @@ export const buildSearchQuery = ({
       ? {
         must: {
           multi_match: {
-            query:  text,
-            fields: searchFields(type)
+            query:     text,
+            fields:    searchFields(type),
+            fuzziness: "AUTO"
           }
         }
       }

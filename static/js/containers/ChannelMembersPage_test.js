@@ -6,13 +6,15 @@ import { Provider } from "react-redux"
 import R from "ramda"
 
 import ChannelMembersPage, {
-  CHANNEL_MEMBERS_PAGE_SIZE
+  CHANNEL_MEMBERS_PAGE_SIZE,
+  getSortOption
 } from "./ChannelMembersPage"
 import SearchResult from "../components/SearchResult"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeChannel } from "../factories/channels"
 import { makeSearchResponse } from "../factories/search"
+import { MEMBERS_SORT_AUTHOR_NAME, MEMBERS_SORT_JOIN_DATE } from "../lib/picker"
 
 describe("ChannelMembersPage", () => {
   let helper, renderPage, searchResponse, initialState, channel
@@ -67,5 +69,37 @@ describe("ChannelMembersPage", () => {
     assert.equal(helper.searchStub.callCount, 1)
     page.find("InfiniteScroll").prop("loadMore")()
     assert.equal(helper.searchStub.callCount, 2)
+  })
+
+  it("should have a dropdown for selecting the sort", () => {
+    const picker = renderPage().find("ChannelMembersSortPicker")
+    assert.equal(picker.prop("value"), MEMBERS_SORT_AUTHOR_NAME)
+    assert.equal(helper.searchStub.callCount, 1)
+    picker.prop("updatePickerParam")(MEMBERS_SORT_JOIN_DATE)()
+    assert.equal(helper.searchStub.callCount, 2)
+  })
+
+  //
+  ;[
+    [MEMBERS_SORT_AUTHOR_NAME, "asc"],
+    [
+      MEMBERS_SORT_JOIN_DATE,
+      {
+        order:         "desc",
+        nested_path:   "author_channel_join_data",
+        nested_filter: {
+          term: {
+            "author_channel_join_data.name": "worst-channel-ever.jpg"
+          }
+        }
+      }
+    ]
+  ].forEach(([sortField, expectation]) => {
+    it(`getSortOption returns what we want for ${sortField}`, () => {
+      assert.deepEqual(
+        getSortOption(sortField, "worst-channel-ever.jpg"),
+        expectation
+      )
+    })
   })
 })

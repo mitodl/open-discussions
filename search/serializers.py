@@ -7,7 +7,7 @@ from rest_framework import serializers
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
 from course_catalog.models import Course
-from profiles.api import get_channels
+from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
 from profiles.utils import image_uri
 from search.api import gen_post_id, gen_comment_id, gen_profile_id, gen_course_id
@@ -95,7 +95,13 @@ class ESProfileSerializer(ESProxySerializer):
         return ProfileSerializer
 
     def postprocess_fields(self, discussions_obj, serialized_data):
-        return {"author_channel_membership": sorted(get_channels(discussions_obj.user))}
+        join_data = get_channel_join_dates(discussions_obj.user)
+        return {
+            "author_channel_membership": sorted(get_channels(discussions_obj.user)),
+            "author_channel_join_data": [
+                {"name": name, "joined": created_on} for name, created_on in join_data
+            ],
+        }
 
 
 class ESCourseSerializer(ESModelSerializer):

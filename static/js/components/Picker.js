@@ -8,7 +8,8 @@ import { DropDownArrow, DropUpArrow } from "./Arrow"
 import {
   VALID_POST_SORT_LABELS,
   VALID_COMMENT_SORT_LABELS,
-  VALID_SEARCH_FILTER_LABELS
+  VALID_SEARCH_FILTER_LABELS,
+  VALID_MEMBERS_SORT_LABELS
 } from "../lib/picker"
 
 type Props = {
@@ -71,3 +72,9 @@ export const SearchFilterPicker = Picker(
   "search-filter-picker"
 )
 SearchFilterPicker.displayName = "SearchFilterPicker"
+
+export const ChannelMembersSortPicker = Picker(
+  VALID_MEMBERS_SORT_LABELS,
+  "channel-member-sort-picker"
+)
+ChannelMembersSortPicker.displayName = "ChannelMembersSortPicker"

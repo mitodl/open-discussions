@@ -50,7 +50,13 @@ ENGLISH_TEXT_FIELD = {
 BASE_OBJECT_TYPE = {
     "object_type": {"type": "keyword"},
     "author_id": {"type": "keyword"},
-    "author_name": {"type": "text"},
+    "author_name": {
+        "type": "text",
+        "fields": {
+            "english": {"type": "text", "analyzer": "english"},
+            "raw": {"type": "keyword"},
+        },
+    },
     "author_avatar_small": {"type": "keyword"},
     "author_headline": ENGLISH_TEXT_FIELD,
 }
@@ -59,6 +65,10 @@ PROFILE_OBJECT_TYPE = {
     **BASE_OBJECT_TYPE,
     "author_bio": ENGLISH_TEXT_FIELD,
     "author_channel_membership": {"type": "keyword"},
+    "author_channel_join_data": {
+        "type": "nested",
+        "properties": {"name": {"type": "keyword"}, "joined": {"type": "date"}},
+    },
     "author_avatar_medium": {"type": "keyword"},
 }
 
