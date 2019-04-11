@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.73.0
+Version 0.73.0 (Released April 11, 2019)
 --------------
 
 - shuffle post overflow menu options around a bit
