@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.73.0 (Released April 11, 2019)
+--------------
+
+- shuffle post overflow menu options around a bit
+- Add 'members' page for showing the people who are members of a channel
+
 Version 0.72.1 (Released April 08, 2019)
 --------------
 
