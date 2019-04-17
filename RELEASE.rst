@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.73.1
+Version 0.73.1 (Released April 17, 2019)
 --------------
 
 - Added a redirect rule to handle traffic to the lemelsonx subdomain
