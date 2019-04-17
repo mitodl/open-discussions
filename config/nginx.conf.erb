@@ -45,6 +45,12 @@ http {
     }
 
     server {
+        server_name themove.mit.edu;
+        listen <%= ENV["PORT"] %>;
+        return 301 https://open.mit.edu/c/themove;
+    }
+
+    server {
         listen <%= ENV["PORT"] %> default_server;
         server_name _;
         root /app;
