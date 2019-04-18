@@ -13,7 +13,7 @@ from praw.models import Comment
 from prawcore.exceptions import Forbidden, NotFound as PrawNotFound, Redirect
 from rest_framework.exceptions import NotAuthenticated, NotFound, PermissionDenied
 
-from channels.constants import POSTS_SORT_HOT
+from channels.constants import POSTS_SORT_HOT, POSTS_SORT_NEW
 from channels.exceptions import ConflictException, GoneException
 from embedly.api import get_embedly_summary, THUMBNAIL_URL
 
@@ -26,7 +26,9 @@ User = get_user_model()
 
 ListingParams = namedtuple("ListingParams", ["before", "after", "count", "sort"])
 
-DEFAULT_LISTING_PARAMS = ListingParams(None, None, 0, POSTS_SORT_HOT)
+SORT_HOT_LISTING_PARAMS = ListingParams(None, None, 0, POSTS_SORT_HOT)
+SORT_NEW_LISTING_PARAMS = ListingParams(None, None, 0, POSTS_SORT_NEW)
+DEFAULT_LISTING_PARAMS = SORT_HOT_LISTING_PARAMS
 
 
 def get_listing_params(request):

@@ -204,6 +204,14 @@
       "required": true,
       "value": "INFO"
     },
+    "OPEN_DISCUSSIONS_HOT_POST_REPAIR_DELAY": {
+      "description": "How many second to wait until attempting to repair a missing post",
+      "required": false
+    },
+    "OPEN_DISCUSSIONS_HOT_POST_REPAIR_LIMIT": {
+      "description": "Maximum number of posts in the history to check for a missing post",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_JWT_SECRET": {
       "description": "Shared secret for JWT auth tokens",
       "required": true

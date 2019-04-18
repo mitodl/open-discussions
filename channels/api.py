@@ -30,6 +30,7 @@ from prawcore.exceptions import (
 )
 from rest_framework.exceptions import PermissionDenied, NotFound
 
+from channels import task_helpers as channel_task_helpers
 from channels.constants import (
     DELETED_COMMENT_OR_POST_TEXT,
     CHANNEL_TYPE_PUBLIC,
@@ -885,7 +886,10 @@ class Api:
         _apply_vote, allow_downvote=True, instance_type=COMMENT_TYPE
     )
 
-    @reddit_object_persist(search_task_helpers.index_new_post)
+    @reddit_object_persist(
+        search_task_helpers.index_new_post,
+        channel_task_helpers.maybe_repair_post_in_host_listing,
+    )
     def create_post(
         self,
         channel_name,

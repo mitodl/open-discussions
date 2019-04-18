@@ -1,4 +1,5 @@
 """Channels tasks"""
+from itertools import islice
 import logging
 import traceback
 from urllib.parse import urljoin
@@ -22,6 +23,7 @@ from channels.api import (
 )
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel, Post, ChannelGroupRole, ChannelInvitation
+from channels.utils import SORT_NEW_LISTING_PARAMS, SORT_HOT_LISTING_PARAMS
 from mail import api as mail_api
 from open_discussions.celery import app
 from open_discussions.utils import chunks
@@ -391,3 +393,55 @@ def send_invitation_email(channel_invitation_id):
             )
         )
     )
+
+
+@app.task
+def maybe_repair_post_in_host_listing(channel_name, reddit_post_id):
+    """
+    Repair a post on the condition that it's in the new post listing but not in the hot listing
+
+    Args:
+        channel_name(str): the channel name to search for the post in
+        reddit_post_id(str): the reddit post id to check
+    """
+    admin_api = get_admin_api()
+
+    limit = settings.OPEN_DISCUSSIONS_HOT_POST_REPAIR_LIMIT
+
+    def _find_missing_submission():
+        """Find the missing submission"""
+        new_posts = admin_api.list_posts(channel_name, SORT_NEW_LISTING_PARAMS)
+        new_posts_by_id = {post.id: post for post in islice(new_posts, limit)}
+        new_posts_ids = set(new_posts_by_id.keys())
+
+        hot_posts = admin_api.list_posts(channel_name, SORT_HOT_LISTING_PARAMS)
+        hot_posts_ids = {post.id for post in islice(hot_posts, limit)}
+
+        missing_post_ids = new_posts_ids - hot_posts_ids
+
+        if reddit_post_id in missing_post_ids and reddit_post_id in new_posts_ids:
+            return new_posts_by_id[reddit_post_id]
+        return None
+
+    # check to see if this submission existing in hot listing
+    submission = _find_missing_submission()
+
+    if submission is None:
+        return
+
+    submission.upvote()
+    submission.clear_vote()
+
+    # check again and if it's missing still, just report an error so we can investigate
+    if _find_missing_submission() is not None:
+        log.error(
+            "Failed to repair submission %s missing from hot posts in channel %s",
+            reddit_post_id,
+            channel_name,
+        )
+    else:
+        log.info(
+            "Successfully repaired submission %s missing from hot posts in channel %s",
+            reddit_post_id,
+            channel_name,
+        )

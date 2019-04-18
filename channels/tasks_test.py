@@ -397,3 +397,59 @@ def test_send_invitation_email(mocker, settings):
     mock_mail_api.send_messages.assert_called_once_with(
         mock_mail_api.messages_for_recipients.return_value
     )
+
+
+@pytest.mark.parametrize("is_in_new_posts", [True, False])
+@pytest.mark.parametrize("is_missing", [True, False])
+@pytest.mark.parametrize("will_fail_repair", [True, False])
+def test_maybe_repair_post_in_host_listing(
+    mocker, settings, is_in_new_posts, is_missing, will_fail_repair
+):
+    """Tests that maybe_repair_post_in_host_listing correctly repairs if the post is missing"""
+
+    get_admin_api_mock = mocker.patch("channels.tasks.get_admin_api")
+    log_mock = mocker.patch("channels.tasks.log")
+    will_attempt_repair = is_in_new_posts and is_missing
+
+    channel_name = "channel"
+    post_id = base36.dumps(23)
+
+    missing_post = mocker.Mock(id=post_id)
+    posts = list(mocker.Mock(id=str(x)) for x in range(5))
+
+    admin_api_mock = get_admin_api_mock.return_value
+    admin_api_mock.list_posts.side_effect = [
+        ([missing_post] if is_in_new_posts else []) + posts,
+        ([] if is_missing else [missing_post]) + posts,
+        ([missing_post] if is_in_new_posts else []) + posts,
+        ([] if will_fail_repair else [missing_post]) + posts,
+    ]
+
+    settings.OPEN_DISCUSSIONS_HOT_POST_REPAIR_LIMIT = 4
+
+    tasks.maybe_repair_post_in_host_listing.delay(channel_name, post_id)
+
+    get_admin_api_mock.assert_called_once_with()
+
+    assert admin_api_mock.list_posts.call_count == (4 if will_attempt_repair else 2)
+
+    if will_attempt_repair:
+        missing_post.upvote.assert_called_once_with()
+        missing_post.clear_vote.assert_called_once_with()
+    else:
+        missing_post.upvote.assert_not_called()
+        missing_post.clear_vote.assert_not_called()
+
+    if will_attempt_repair:
+        if will_fail_repair:
+            log_mock.error.assert_called_once_with(
+                "Failed to repair submission %s missing from hot posts in channel %s",
+                post_id,
+                channel_name,
+            )
+        else:
+            log_mock.info.assert_called_once_with(
+                "Successfully repaired submission %s missing from hot posts in channel %s",
+                post_id,
+                channel_name,
+            )
