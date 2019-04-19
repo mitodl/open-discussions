@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.73.2
+--------------
+
+- Added redirect for handling themove.mit.edu
+
 Version 0.73.1 (Released April 17, 2019)
 --------------
 
