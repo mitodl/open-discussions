@@ -1,10 +1,12 @@
 /* global SETTINGS */
 // @flow
+import React from "react"
 import { assert } from "chai"
+import { Router } from "react-router"
+import { mount } from "enzyme"
 
 import ChannelSettingsLink, {
-  CHANNEL_SETTINGS_MENU_DROPDOWN,
-  ChannelSettingsLink as InnerChannelSettingsLink
+  CHANNEL_SETTINGS_MENU_DROPDOWN
 } from "./ChannelSettingsLink"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
@@ -14,24 +16,25 @@ import { FORM_BEGIN_EDIT } from "../actions/forms"
 import { WIDGET_FORM_KEY } from "../lib/widgets"
 
 describe("ChannelSettingsLink", () => {
-  let helper, render, dropdownMenus, channel
+  let helper, render, dropdownMenus, channel, state, store
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     dropdownMenus = new Set()
     channel = makeChannel()
-    render = helper.configureHOCRenderer(
-      ChannelSettingsLink,
-      InnerChannelSettingsLink,
-      {
-        ui: {
-          dropdownMenus
-        }
-      },
-      {
-        channel
-      }
-    )
+    state = { ui: { dropdownMenus } }
+    store = helper.createMockStore(state)
+    render = props =>
+      mount(
+        <Router history={helper.browserHistory}>
+          <ChannelSettingsLink
+            history={helper.browserHistory}
+            store={store}
+            channel={channel}
+            {...props}
+          />
+        </Router>
+      )
   })
 
   afterEach(() => {
@@ -44,13 +47,15 @@ describe("ChannelSettingsLink", () => {
         if (isOpen) {
           dropdownMenus.add(CHANNEL_SETTINGS_MENU_DROPDOWN)
         }
-        const { inner } = await render()
+        const wrapper = render()
         assert.equal(
-          inner.find("OnClickOutside(_DropdownMenu)").exists(),
+          wrapper.find("OnClickOutside(_DropdownMenu)").exists(),
           isOpen
         )
       })
     })
+
+    //
     ;[true, false].forEach(isOpen => {
       it(`toggles the menu state to ${
         isOpen ? "closed" : "open"
@@ -58,8 +63,8 @@ describe("ChannelSettingsLink", () => {
         if (isOpen) {
           dropdownMenus.add(CHANNEL_SETTINGS_MENU_DROPDOWN)
         }
-        const { inner, store } = await render()
-        inner.find(".edit-button").prop("onClick")()
+        const wrapper = render()
+        wrapper.find(".edit-button").prop("onClick")()
         assert.equal(
           store.getActions()[0].type,
           isOpen ? "HIDE_DROPDOWN" : "SHOW_DROPDOWN"
@@ -67,12 +72,12 @@ describe("ChannelSettingsLink", () => {
       })
     })
 
-    it("has two links in the menu", async () => {
+    it("has two links in the menu normally", async () => {
       dropdownMenus.add(CHANNEL_SETTINGS_MENU_DROPDOWN)
-      const { inner, store } = await render()
-      assert.equal(inner.find("li").length, 2)
+      const wrapper = render()
+      assert.equal(wrapper.find("li").length, 2)
       assert.equal(
-        inner
+        wrapper
           .find("li")
           .at(0)
           .find("Link")
@@ -80,7 +85,7 @@ describe("ChannelSettingsLink", () => {
         editChannelBasicURL(channel.name)
       )
 
-      inner
+      wrapper
         .find("li")
         .at(1)
         .find("a")
@@ -94,6 +99,21 @@ describe("ChannelSettingsLink", () => {
           }
         }
       ])
+    })
+
+    it("renders only one link on the post page", async () => {
+      dropdownMenus.add(CHANNEL_SETTINGS_MENU_DROPDOWN)
+      helper.browserHistory.push(`${channelURL(channel.name)}/postID/postSlug`)
+      const wrapper = render()
+      assert.equal(wrapper.find("li").length, 1)
+      assert.equal(
+        wrapper
+          .find("li")
+          .at(0)
+          .find("Link")
+          .prop("to"),
+        editChannelBasicURL(channel.name)
+      )
     })
   })
 })

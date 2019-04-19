@@ -4,6 +4,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 import R from "ramda"
 import { connect } from "react-redux"
+import { Route } from "react-router-dom"
 
 import DropdownMenu from "../components/DropdownMenu"
 
@@ -50,19 +51,25 @@ export class ChannelSettingsLink extends React.Component<Props> {
           <i className="material-icons settings">settings</i>
         </a>
         {isOpen ? (
-          <DropdownMenu
-            closeMenu={hideDropdown}
-            className="settings-menu-dropdown"
-          >
-            <li>
-              <Link to={editChannelBasicURL(channel.name)}>
-                Channel settings
-              </Link>
-            </li>
-            <li>
-              <a onClick={this.startEdit}>Manage widgets</a>
-            </li>
-          </DropdownMenu>
+          <Route path={`${channelURL(channel.name)}/:postID/:postSlug?`}>
+            {({ match }) => (
+              <DropdownMenu
+                closeMenu={hideDropdown}
+                className="settings-menu-dropdown"
+              >
+                <li>
+                  <Link to={editChannelBasicURL(channel.name)}>
+                    Channel settings
+                  </Link>
+                </li>
+                {match ? null : (
+                  <li>
+                    <a onClick={this.startEdit}>Manage widgets</a>
+                  </li>
+                )}
+              </DropdownMenu>
+            )}
+          </Route>
         ) : null}
       </React.Fragment>
     )
