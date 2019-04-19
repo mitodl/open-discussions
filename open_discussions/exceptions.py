@@ -1,6 +1,4 @@
 """Exceptions for open discussions"""
-from raven.contrib.django.raven_compat.models import client
-from rest_framework.exceptions import ValidationError
 from rest_framework.views import exception_handler
 
 
@@ -11,10 +9,6 @@ def api_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
     response = exception_handler(exc, context)
-
-    if isinstance(exc, ValidationError):
-        # validation errors should get sent to Sentry
-        client.captureException()
 
     # now add the error type to the response
     # sometimes this is a list() if such an api was called
