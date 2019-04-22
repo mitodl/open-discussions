@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.74.0
+Version 0.74.0 (Released April 22, 2019)
 --------------
 
 - Upgraded urllib3
