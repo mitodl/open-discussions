@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.74.0
+--------------
+
+- Upgraded urllib3
+- hide manage widgets link on the post page
+
 Version 0.73.2 (Released April 19, 2019)
 --------------
 
