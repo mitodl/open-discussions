@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.74.1
+--------------
+
+- fix a flaky test
+- Added test for app.json validity
+- add sorting to the channel members page
+- Revert "Added reporting of validation errors to sentry"
+
 Version 0.74.0 (Released April 22, 2019)
 --------------
 
