@@ -57,11 +57,13 @@ def test_get_channel_join_dates(user):
     sync_channel_subscription_model(channels[1], user)
     add_user_role(channels[2], "moderators", user)
     add_user_role(channels[3], "contributors", user)
-    assert get_channel_join_dates(user) == [
-        (obj.channel.name, obj.created_on)
-        for obj in list(user.channelsubscription_set.all())
-        + list(ChannelGroupRole.objects.filter(group__in=user.groups.all()))
-    ]
+    assert sorted(get_channel_join_dates(user)) == sorted(
+        [
+            (obj.channel.name, obj.created_on)
+            for obj in list(user.channelsubscription_set.all())
+            + list(ChannelGroupRole.objects.filter(group__in=user.groups.all()))
+        ]
+    )
 
 
 @pytest.mark.parametrize(
