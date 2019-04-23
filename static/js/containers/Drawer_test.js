@@ -3,9 +3,12 @@ import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 import sinon from "sinon"
+import { Drawer } from "rmwc/Drawer"
+
+import { ResponsiveDrawer, mapStateToProps } from "./Drawer"
 
 import Navigation from "../components/Navigation"
-import { ResponsiveDrawer, mapStateToProps } from "./Drawer"
+import { NavigationExpansion } from "../components/NavigationItem"
 
 import { setShowDrawerMobile } from "../actions/ui"
 import { DRAWER_BREAKPOINT } from "../lib/util"
@@ -41,6 +44,7 @@ describe("Drawer", () => {
         channels={new Map(channels.map(channel => [channel.name, channel]))}
         showDrawerDesktop={false}
         showDrawerMobile={false}
+        showDrawerHover={false}
         {...props}
       />
     )
@@ -52,7 +56,9 @@ describe("Drawer", () => {
 
       assert.equal(
         wrapper.props().className,
-        showDrawerDesktop ? "persistent-drawer-open" : ""
+        showDrawerDesktop
+          ? "persistent-drawer-open"
+          : "persistent-drawer-closed"
       )
     })
   })
@@ -74,6 +80,41 @@ describe("Drawer", () => {
       .instance()
       .onDrawerClose()
     assert.ok(dispatchStub.calledWith(setShowDrawerMobile(false)))
+  })
+
+  it("should set onPointerEnter and onPointerLeave handlers on the Drawer", () => {
+    const wrapper = renderDrawer()
+    const { onPointerEnter, onPointerLeave } = wrapper.find(Drawer).props()
+    assert.equal(onPointerEnter, wrapper.instance().onMouseEnter)
+    assert.equal(onPointerLeave, wrapper.instance().onMouseExit)
+  })
+
+  //
+  ;[
+    [true, true, true, true],
+    [true, false, true, true],
+    [true, true, false, true],
+    [true, false, false, true],
+    [false, true, true, true],
+    [false, false, true, true],
+    [false, true, false, true],
+    [false, false, false, false]
+  ].forEach(([isMobile, showDrawerDesktop, showDrawerHover, expandedExp]) => {
+    it(`should have expanded==${String(expandedExp)} when isMobile==${String(
+      isMobile
+    )}, showDrawerDesktop=${String(
+      showDrawerDesktop
+    )}, showDrawerHover=${String(showDrawerHover)}`, () => {
+      isMobileWidthStub.returns(isMobile)
+      const wrapper = renderDrawer({
+        showDrawerDesktop,
+        showDrawerHover
+      })
+      assert.equal(
+        wrapper.find(NavigationExpansion.Provider).prop("value"),
+        expandedExp
+      )
+    })
   })
 
   it("should close the mobile drawer when resizing above the breakpoint", () => {
@@ -187,7 +228,11 @@ describe("Drawer", () => {
     beforeEach(() => {
       state = {
         channels: ["one", "two"],
-        ui:       { showDrawerMobile: true, showDrawerDesktop: true }
+        ui:       {
+          showDrawerMobile:  true,
+          showDrawerDesktop: true,
+          showDrawerHover:   true
+        }
       }
       getSubscribedChannelsStub = sandbox.stub(
         selectors,
@@ -196,9 +241,14 @@ describe("Drawer", () => {
     })
 
     it("should grab state.ui.showDrawer props", () => {
-      const { showDrawerMobile, showDrawerDesktop } = mapStateToProps(state)
+      const {
+        showDrawerMobile,
+        showDrawerDesktop,
+        showDrawerHover
+      } = mapStateToProps(state)
       assert.equal(showDrawerMobile, state.ui.showDrawerMobile)
       assert.equal(showDrawerDesktop, state.ui.showDrawerDesktop)
+      assert.equal(showDrawerHover, state.ui.showDrawerHover)
     })
 
     it("should call getSubscribedChannels", () => {

@@ -4,6 +4,7 @@ import R from "ramda"
 import {
   SET_SHOW_DRAWER_DESKTOP,
   SET_SHOW_DRAWER_MOBILE,
+  SET_SHOW_DRAWER_HOVER,
   SET_SNACKBAR_MESSAGE,
   SET_BANNER_MESSAGE,
   HIDE_BANNER,
@@ -39,6 +40,7 @@ export type CourseDetailState = {
 export type UIState = {
   showDrawerDesktop: boolean,
   showDrawerMobile: boolean,
+  showDrawerHover: boolean,
   courseDetail?: CourseDetailState,
   snackbar: ?SnackbarState,
   banner: BannerState,
@@ -58,8 +60,9 @@ const INITIAL_COURSE_STATE = {
 }
 
 export const INITIAL_UI_STATE: UIState = {
-  showDrawerDesktop: true,
+  showDrawerDesktop: false,
   showDrawerMobile:  false,
+  showDrawerHover:   false,
   courseDetail:      INITIAL_COURSE_STATE,
   snackbar:          null,
   banner:            INITIAL_BANNER_STATE,
@@ -123,6 +126,8 @@ export const ui = (
     return { ...state, showDrawerDesktop: action.payload }
   case SET_SHOW_DRAWER_MOBILE:
     return { ...state, showDrawerMobile: action.payload }
+  case SET_SHOW_DRAWER_HOVER:
+    return { ...state, showDrawerHover: action.payload }
   case SET_SHOW_COURSE_DRAWER:
     return {
       ...state,

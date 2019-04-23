@@ -6,6 +6,7 @@ import { INITIAL_UI_STATE } from "./ui"
 import {
   SET_SHOW_DRAWER_DESKTOP,
   SET_SHOW_DRAWER_MOBILE,
+  SET_SHOW_DRAWER_HOVER,
   SET_SNACKBAR_MESSAGE,
   SHOW_DIALOG,
   HIDE_DIALOG,
@@ -16,6 +17,7 @@ import {
   HIDE_BANNER,
   setShowDrawerDesktop,
   setShowDrawerMobile,
+  setShowDrawerHover,
   setSnackbarMessage,
   showDialog,
   hideDialog,
@@ -68,6 +70,17 @@ describe("ui reducer", () => {
       SET_SHOW_DRAWER_MOBILE
     ])
     assert.isFalse(state.showDrawerMobile)
+  })
+
+  it("should let you toggle desktop drawer hover state", async () => {
+    let state = await dispatchThen(setShowDrawerHover(true), [
+      SET_SHOW_DRAWER_HOVER
+    ])
+    assert.isTrue(state.showDrawerHover)
+    state = await dispatchThen(setShowDrawerHover(false), [
+      SET_SHOW_DRAWER_HOVER
+    ])
+    assert.isFalse(state.showDrawerHover)
   })
 
   it("should set snackbar message", async () => {

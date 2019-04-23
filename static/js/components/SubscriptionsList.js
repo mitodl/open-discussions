@@ -3,7 +3,10 @@ import React from "react"
 import { Link } from "react-router-dom"
 
 import ChannelAvatar from "../containers/ChannelAvatar"
+import NavigationItem from "./NavigationItem"
+
 import { channelURL } from "../lib/url"
+
 import type { Channel } from "../flow/discussionTypes"
 
 type Props = {
@@ -24,8 +27,10 @@ export default class SubscriptionsList extends React.Component<Props> {
         key={channel.name}
       >
         <Link to={channelURL(channel.name)} className="channel-link">
-          <ChannelAvatar channel={channel} imageSize="small" />
-          <span className="title">{channel.title}</span>
+          <NavigationItem
+            badge={() => <ChannelAvatar channel={channel} imageSize="small" />}
+            whenExpanded={() => <span className="title">{channel.title}</span>}
+          />
         </Link>
       </div>
     )
@@ -45,13 +50,19 @@ export default class SubscriptionsList extends React.Component<Props> {
       <div className="location-list subscribed-channels">
         {myChannels.length > 0 ? (
           <div className="my-channels">
-            <div className="heading">Channels you moderate</div>
+            <NavigationItem
+              whenExpanded={() => (
+                <div className="heading">Channels you moderate</div>
+              )}
+            />
             {myChannels.map(this.makeChannelLink)}
           </div>
         ) : null}
         {otherChannels.length > 0 ? (
           <div className="channels">
-            <div className="heading">Channels</div>
+            <NavigationItem
+              whenExpanded={() => <div className="heading">Channels</div>}
+            />
             {otherChannels.map(this.makeChannelLink)}
           </div>
         ) : null}

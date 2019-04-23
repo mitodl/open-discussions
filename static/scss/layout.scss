@@ -85,6 +85,10 @@ body {
     padding-left: $drawer-width;
   }
 
+  .persistent-drawer-closed ~ .content {
+    padding-left: $collapse-drawer-width;
+  }
+
   .banner--active ~ .content {
     padding-top: $toolbar-height-desktop + $banner-height;
   }

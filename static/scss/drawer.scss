@@ -10,18 +10,28 @@ $footer-height: 152px;
   z-index: 45;
 }
 
+.persistent-drawer-open {
+  .mdc-drawer.mdc-drawer--persistent {
+    width: $drawer-width;
+
+    .mdc-drawer__drawer {
+      width: $drawer-width;
+    }
+  }
+}
+
 .mdc-drawer.mdc-drawer--persistent {
   position: fixed;
   left: 0;
   height: calc(100vh - #{$toolbar-height-desktop});
   top: $toolbar-height-desktop;
-  width: $drawer-width;
+  width: $collapse-drawer-width;
 
   .mdc-drawer__drawer {
     position: absolute;
     top: 0px;
     left: 0px;
-    width: $drawer-width;
+    width: $collapse-drawer-width;
 
     .scrollbar-container {
       display: none;
@@ -71,11 +81,15 @@ $footer-height: 152px;
       color: $red-link-color;
       display: inline-flex;
       align-items: center;
-      padding: 5px 20px 5px 5px;
+      padding: 5px 5px 5px 5px;
       margin-left: 13px;
       border: 1px solid $red-link-color;
       border-radius: 30px;
       height: 26px;
+
+      .title {
+        padding-right: 15px;
+      }
     }
   }
 

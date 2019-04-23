@@ -4,11 +4,19 @@ import { Link } from "react-router-dom"
 
 import SubscriptionsList from "./SubscriptionsList"
 import LoginPopup from "./LoginPopup"
+import NavigationItem from "./NavigationItem"
 
 import { getChannelNameFromPathname, FRONTPAGE_URL } from "../lib/url"
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 
 import type { Channel } from "../flow/discussionTypes"
+
+const ComposeButtonContents = () => (
+  <NavigationItem
+    badge={() => <i className="material-icons add">add</i>}
+    whenExpanded={() => <span className="title">Compose</span>}
+  />
+)
 
 type NavigationProps = {
   pathname: string,
@@ -52,13 +60,6 @@ class Navigation extends React.Component<NavigationProps, State> {
 
     let composeBtn
     if (showComposeLink) {
-      const composeBtnContents = (
-        <React.Fragment>
-          <i className="material-icons add">add</i>
-          <span className="title">Compose</span>
-        </React.Fragment>
-      )
-
       if (useLoginPopup) {
         composeBtn = (
           <a
@@ -66,13 +67,13 @@ class Navigation extends React.Component<NavigationProps, State> {
             onClick={preventDefaultAndInvoke(this.onTogglePopup)}
             className="new-post-link"
           >
-            {composeBtnContents}
+            <ComposeButtonContents />
           </a>
         )
       } else if (composeHref) {
         composeBtn = (
           <Link to={composeHref} className="new-post-link">
-            {composeBtnContents}
+            <ComposeButtonContents />
           </Link>
         )
       }
@@ -83,8 +84,10 @@ class Navigation extends React.Component<NavigationProps, State> {
         <div className="location-list">
           <div className={homeClassName}>
             <Link className="home-link" to={FRONTPAGE_URL}>
-              <i className="material-icons home">home</i>
-              <span className="title">Home</span>
+              <NavigationItem
+                badge={() => <i className="material-icons home">home</i>}
+                whenExpanded={() => <span className="title">Home</span>}
+              />
             </Link>
           </div>
         </div>

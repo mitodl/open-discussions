@@ -3,6 +3,7 @@ import { assert } from "chai"
 
 import SubscriptionsList from "./SubscriptionsList"
 
+import NavigationItem from "./NavigationItem"
 import { channelURL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
 import { configureShallowRenderer } from "../lib/test_utils"
@@ -26,7 +27,6 @@ describe("SubscriptionsList", function() {
 
   it("should show each channel", () => {
     const wrapper = renderSubscriptionsList()
-
     assert.equal(wrapper.find(".channel-link").length, channels.length)
     assert.equal(
       wrapper.find(".my-channels .channel-link").length,
@@ -38,21 +38,17 @@ describe("SubscriptionsList", function() {
     )
 
     wrapper.find(".my-channels .channel-link").forEach((link, index) => {
-      assert.equal(link.find(".title").text(), myChannels[index].title)
       assert.equal(link.props().to, channelURL(myChannels[index].name))
-      assert.deepEqual(
-        link.find("Connect(ChannelAvatar)").props().channel,
-        myChannels[index]
-      )
+      const { badge, whenExpanded } = link.find(NavigationItem).props()
+      assert.equal(whenExpanded().props.children, myChannels[index].title)
+      assert.deepEqual(badge().props.channel, myChannels[index])
     })
 
     wrapper.find(".channels .channel-link").forEach((link, index) => {
-      assert.equal(link.find(".title").text(), notMyChannels[index].title)
       assert.equal(link.props().to, channelURL(notMyChannels[index].name))
-      assert.deepEqual(
-        link.find("Connect(ChannelAvatar)").props().channel,
-        notMyChannels[index]
-      )
+      const { badge, whenExpanded } = link.find(NavigationItem).props()
+      assert.equal(whenExpanded().props.children, notMyChannels[index].title)
+      assert.deepEqual(badge().props.channel, notMyChannels[index])
     })
   })
 
@@ -61,7 +57,6 @@ describe("SubscriptionsList", function() {
     const currentLocation = wrapper.find(".current-location")
     assert.lengthOf(currentLocation, 1)
     assert.equal(currentLocation.props().className, "location current-location")
-    assert.equal(currentLocation.find(".title").text(), channels[0].title)
     assert.equal(
       currentLocation
         .find(".channel-link")

@@ -18,6 +18,9 @@ export const setShowDrawerMobile = createAction<string, *>(
   SET_SHOW_DRAWER_MOBILE
 )
 
+export const SET_SHOW_DRAWER_HOVER = "SET_SHOW_DRAWER_HOVER"
+export const setShowDrawerHover = createAction<string, *>(SET_SHOW_DRAWER_HOVER)
+
 export const SET_SHOW_COURSE_DRAWER = "SET_SHOW_COURSE_DRAWER"
 export const setShowCourseDrawer = createAction<string, *>(
   SET_SHOW_COURSE_DRAWER

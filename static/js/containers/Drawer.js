@@ -8,10 +8,17 @@ import { Theme } from "rmwc/Theme"
 import ScrollArea from "react-scrollbar"
 
 import Navigation from "../components/Navigation"
+import NavigationItem, {
+  NavigationExpansion
+} from "../components/NavigationItem"
 import HamburgerAndLogo from "../components/HamburgerAndLogo"
 import Footer from "../components/Footer"
 
-import { setShowDrawerMobile, setShowDrawerDesktop } from "../actions/ui"
+import {
+  setShowDrawerMobile,
+  setShowDrawerHover,
+  setShowDrawerDesktop
+} from "../actions/ui"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import {
   getViewportWidth,
@@ -29,6 +36,7 @@ import type { Location } from "react-router"
 type DrawerPropsFromState = {
   showDrawerDesktop: boolean,
   showDrawerMobile: boolean,
+  showDrawerHover: boolean,
   subscribedChannels: Array<Channel>,
   channels: Map<string, Channel>
 }
@@ -71,6 +79,16 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
     this.setState({})
   }
 
+  onMouseEnter = () => {
+    const { dispatch } = this.props
+    dispatch(setShowDrawerHover(true))
+  }
+
+  onMouseExit = () => {
+    const { dispatch } = this.props
+    dispatch(setShowDrawerHover(false))
+  }
+
   onDrawerClose = () => {
     const { dispatch } = this.props
 
@@ -85,14 +103,18 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
     const {
       channels,
       showDrawerDesktop,
+      showDrawerHover,
       showDrawerMobile,
       subscribedChannels,
       location: { pathname }
     } = this.props
     const isMobile = isMobileWidth()
 
-    const wrappingClass =
-      !isMobile && showDrawerDesktop ? "persistent-drawer-open" : ""
+    const wrappingClass = isMobile
+      ? ""
+      : showDrawerDesktop || showDrawerHover
+        ? "persistent-drawer-open"
+        : "persistent-drawer-closed"
 
     const channelName = getChannelNameFromPathname(pathname)
     const currentChannel = channels.get(channelName)
@@ -108,32 +130,40 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
       useLoginPopup = false
     }
 
+    const expanded = isMobile ? true : showDrawerDesktop || showDrawerHover
+
     return (
       <div className={wrappingClass}>
         <Theme>
           <Drawer
             persistent={!isMobile}
             temporary={isMobile}
-            open={isMobile ? showDrawerMobile : showDrawerDesktop}
+            open={isMobile ? showDrawerMobile : true}
             onClose={this.onDrawerClose}
+            onPointerEnter={this.onMouseEnter}
+            onPointerLeave={this.onMouseExit}
           >
             <ScrollArea horizontal={false}>
               <DrawerContent>
-                <div>
-                  {isMobile ? (
-                    <div className="drawer-mobile-header">
-                      <HamburgerAndLogo onHamburgerClick={this.onDrawerClose} />
-                    </div>
-                  ) : null}
-                  <Navigation
-                    subscribedChannels={subscribedChannels}
-                    pathname={pathname}
-                    showComposeLink={showComposeLink}
-                    composeHref={composeHref}
-                    useLoginPopup={useLoginPopup}
-                  />
-                </div>
-                <Footer />
+                <NavigationExpansion.Provider value={expanded}>
+                  <div>
+                    {isMobile ? (
+                      <div className="drawer-mobile-header">
+                        <HamburgerAndLogo
+                          onHamburgerClick={this.onDrawerClose}
+                        />
+                      </div>
+                    ) : null}
+                    <Navigation
+                      subscribedChannels={subscribedChannels}
+                      pathname={pathname}
+                      showComposeLink={showComposeLink}
+                      composeHref={composeHref}
+                      useLoginPopup={useLoginPopup}
+                    />
+                  </div>
+                  <NavigationItem whenExpanded={() => <Footer />} />
+                </NavigationExpansion.Provider>
               </DrawerContent>
             </ScrollArea>
           </Drawer>
@@ -146,6 +176,7 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
 export const mapStateToProps = (state: Object): DrawerPropsFromState => ({
   subscribedChannels: getSubscribedChannels(state),
   showDrawerDesktop:  state.ui.showDrawerDesktop,
+  showDrawerHover:    state.ui.showDrawerHover,
   showDrawerMobile:   state.ui.showDrawerMobile,
   channels:           state.channels.data
 })
