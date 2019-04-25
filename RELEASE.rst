@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.74.1
+Version 0.74.1 (Released April 25, 2019)
 --------------
 
 - fix a flaky test
