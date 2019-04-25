@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.74.2
+--------------
+
+- Updated command to populate user subscriptions to take a list of channels
+
 Version 0.74.1 (Released April 25, 2019)
 --------------
 
