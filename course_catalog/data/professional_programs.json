@@ -1,0 +1,77 @@
+[{
+		"id": "SysEngx",
+		"program_name": "Architecture and Systems Engineering: Models and Methods to Manage Complex Systems",
+		"program_url": "",
+		"course_keys": [
+			"course-v1:MITProfessionalX+SysEngx1+1T2017",
+			"course-v1:MITProfessionalX+SysEngx1+3T2016",
+			"course-v1:MITProfessionalX+SysEngx2+1T2017",
+			"course-v1:MITProfessionalX+SysEngx2+3T2016",
+			"course-v1:MITProfessionalX+SysEngx3+1T2017",
+			"course-v1:MITProfessionalX+SysEngx3+3T2016",
+			"course-v1:MITProfessionalX+SysEngx4+1T2017",
+			"course-v1:MITProfessionalX+SysEngx4+3T2016",
+			"course-v1:MITProfessionalX+SysEngxB1+1T2017",
+			"course-v1:MITProfessionalX+SysEngxB1+3T2016",
+			"course-v1:MITProfessionalX+SysEngxB2+1T2017",
+			"course-v1:MITProfessionalX+SysEngxB2+3T2016",
+			"course-v1:MITProfessionalX+SysEngxB3+1T2017",
+			"course-v1:MITProfessionalX+SysEngxB3+3T2016",
+			"course-v1:MITProfessionalX+SysEngxB4+1T2017",
+			"course-v1:MITProfessionalX+SysEngxB4+3T2016",
+			"course-v1:MITxPRO+SysEngx+1T2019",
+			"course-v1:MITxPRO+SysEngx1+1T2018",
+			"course-v1:MITxPRO+SysEngx1+1T2019",
+			"course-v1:MITxPRO+SysEngx1+3T2017",
+			"course-v1:MITxPRO+SysEngx2+1T2018",
+			"course-v1:MITxPRO+SysEngx2+1T2019",
+			"course-v1:MITxPRO+SysEngx2+3T2017",
+			"course-v1:MITxPRO+SysEngx3+1T2018",
+			"course-v1:MITxPRO+SysEngx3+1T2019",
+			"course-v1:MITxPRO+SysEngx3+3T2017",
+			"course-v1:MITxPRO+SysEngx3+3T2018",
+			"course-v1:MITxPRO+SysEngx4+1T2018",
+			"course-v1:MITxPRO+SysEngx4+1T2019",
+			"course-v1:MITxPRO+SysEngx4+3T2017",
+			"course-v1:MITxPRO+SysEngx4+3T2018",
+			"course-v1:MITxPRO+SysEngxB1+1T2018",
+			"course-v1:MITxPRO+SysEngxB1+3T2017",
+			"course-v1:MITxPRO+SysEngxB2+1T2018",
+			"course-v1:MITxPRO+SysEngxB2+3T2017",
+			"course-v1:MITxPRO+SysEngxB3+1T2018",
+			"course-v1:MITxPRO+SysEngxB3+3T2017",
+			"course-v1:MITxPRO+SysEngxB4+1T2018",
+			"course-v1:MITxPRO+SysEngxB4+3T2017"
+		]
+	},
+	{
+		"id": "AMx",
+		"program_name": "Additive Manufacturing for Innovative Design and Production",
+		"program_url": "",
+		"course_keys": [
+			"course-v1:MITxPRO+AMx+1T2018",
+			"course-v1:MITxPRO+AMx+1T2019",
+			"course-v1:MITxPRO+AMxB+1T2018"
+		]
+	}, {
+		"id": "QCx",
+		"program_name": "Quantum Computing Fundamentals Online Program",
+		"program_url": "",
+		"course_keys": [
+			"course-v1:MITxPRO+QCx1+1T2019",
+			"course-v1:MITxPRO+QCx1+2T2017",
+			"course-v1:MITxPRO+QCx1+2T2018",
+			"course-v1:MITxPRO+QCx1B+2T2018",
+			"course-v1:MITxPRO+QCx2+1T2019",
+			"course-v1:MITxPRO+QCx2+2T2017",
+			"course-v1:MITxPRO+QCx2+2T2018",
+			"course-v1:MITxPRO+QCx2B+2T2018",
+			"course-v1:MITxPRO+QCx3+1T2019",
+			"course-v1:MITxPRO+QCx3+2T2017",
+			"course-v1:MITxPRO+QCx3+2T2018",
+			"course-v1:MITxPRO+QCx4+1T2019",
+			"course-v1:MITxPRO+QCx4+2T2017",
+			"course-v1:MITxPRO+QCx4+2T2018"
+		]
+	}
+]
