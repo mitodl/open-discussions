@@ -37,40 +37,55 @@ def evict_expired_access_tokens():
     api.evict_expired_access_tokens()
 
 
-@app.task
-def subscribe_all_users_to_default_channel(*, channel_name):
+@app.task(bind=True)
+def subscribe_all_users_to_channels(self, *, channel_names):
     """
-    Subscribes all users to a new default channel
+    Subscribes all users to a set of channels
 
     Args:
-        channel_name (str): The name of the channel
+        channel_names (list of str): the names of the channels to subscribe to
     """
     chunk_size = settings.OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE
     query = (
         User.objects.exclude(username=settings.INDEXING_API_USERNAME)
+        .order_by("username")
         .values_list("username", flat=True)
         .iterator()
     )
 
-    for usernames in chunks(query, chunk_size=chunk_size):
-        subscribe_user_range_to_default_channel.delay(
-            channel_name=channel_name, usernames=usernames
-        )
+    results = celery.group(
+        [
+            subscribe_user_range_to_channels.si(
+                channel_names=channel_names, usernames=usernames
+            )
+            for usernames in chunks(query, chunk_size=chunk_size)
+        ]
+    )
+
+    raise self.replace(results)
 
 
 @app.task
-def subscribe_user_range_to_default_channel(*, channel_name, usernames):
+def subscribe_user_range_to_channels(*, channel_names, usernames):
     """
-    Subscribes all users to a new default channel
+    Subscribes a range of user ids to a set of channels
 
     Args:
-        channel_name (str): The name of the channel
+        channel_names (list of str): the names of the channels to subscribe to
         usernames (list of str): list of user usernames
     """
     admin_api = get_admin_api()
     # walk the usernames and add them as subscribers
     for username in usernames:
-        admin_api.add_subscriber(username, channel_name)
+        for channel_name in channel_names:
+            try:
+                admin_api.add_subscriber(username, channel_name)
+            except Exception:  # pylint: disable=broad-except
+                log.exception(
+                    "Failed to subscribe username '%s' to channel '%s'",
+                    username,
+                    channel_name,
+                )
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")

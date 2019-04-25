@@ -56,19 +56,46 @@ def test_evict_expired_access_tokens():
     assert not RedditAccessToken.objects.filter(id=expired.id).exists()
 
 
-def test_subscribe_all_users_to_default_channel(settings, mocker):
+def test_subscribe_all_users_to_channels(settings, mocker, mocked_celery):
+    """Test that the main task batches out smaller tasks correctly"""
+    settings.OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE = 2
+    users = sorted(UserFactory.create_batch(4), key=lambda user: user.username)
+    channel_names = ["nochannel_1", "nochannel_2"]
+
+    mock_subscribe_user_range_to_channels = mocker.patch(
+        "channels.tasks.subscribe_user_range_to_channels"
+    )
+
+    with pytest.raises(mocked_celery.replace_exception_class):
+        tasks.subscribe_all_users_to_channels.delay(channel_names=channel_names)
+
+    assert mocked_celery.group.call_count == 1
+    list(mocked_celery.group.call_args[0][0])
+
+    mock_subscribe_user_range_to_channels.si.assert_any_call(
+        usernames=[users[0].username, users[1].username], channel_names=channel_names
+    )
+    mock_subscribe_user_range_to_channels.si.assert_any_call(
+        usernames=[users[2].username, users[3].username], channel_names=channel_names
+    )
+
+
+def test_subscribe_user_range_to_channels(mocker):
     """Test that the main task batches out smaller tasks correctly"""
     mock_add_subscriber = mocker.patch("channels.api.Api.add_subscriber")
     mocker.patch("channels.api._get_client", autospec=True)
-    settings.OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE = 5
-    users = UserFactory.create_batch(17)
+    usernames = [user.username for user in UserFactory.create_batch(5)]
+    channel_names = ["nochannel_1", "nochannel_2"]
 
-    tasks.subscribe_all_users_to_default_channel.delay(channel_name="nochannel")
+    tasks.subscribe_user_range_to_channels.delay(
+        usernames=usernames, channel_names=channel_names
+    )
 
-    assert mock_add_subscriber.call_count == len(users)
+    assert mock_add_subscriber.call_count == (len(usernames) * len(channel_names))
 
-    for user in users:
-        mock_add_subscriber.asset_any_call(user.username, "nochannel")
+    for username in usernames:
+        for channel_name in channel_names:
+            mock_add_subscriber.assert_any_call(username, channel_name)
 
 
 def test_populate_subscriptions_and_roles(
