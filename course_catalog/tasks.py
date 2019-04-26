@@ -10,6 +10,7 @@ from django.conf import settings
 from ocw_data_parser import OCWParser
 
 from open_discussions.celery import app
+from course_catalog.constants import PlatformType
 from course_catalog.models import Course
 from course_catalog.task_helpers import (
     get_access_token,
@@ -172,7 +173,7 @@ def get_ocw_data(upload_to_s3=True):  # pylint:disable=too-many-locals,too-many-
                 if settings.OCW_UPLOAD_IMAGE_ONLY:
                     parser.upload_course_image()
                 else:
-                    parser.upload_all_media_to_s3()
+                    parser.upload_all_media_to_s3(upload_master_json=True)
 
             digest_ocw_course(
                 parser.get_master_json(),
@@ -183,3 +184,28 @@ def get_ocw_data(upload_to_s3=True):  # pylint:disable=too-many-locals,too-many-
             )
         except Exception:  # pylint: disable=broad-except
             log.exception("Error encountered parsing OCW json for %s", course_prefix)
+
+
+@app.task
+def upload_ocw_master_json():
+    """
+    Task to upload all OCW Course master json data to S3
+    """
+    s3_bucket = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+        aws_secret_access_key=settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
+    ).Bucket(settings.OCW_LEARNING_COURSE_BUCKET_NAME)
+
+    for course in Course.objects.filter(platform=PlatformType.ocw.value):
+        # Approximate course_prefix from course.url
+        course_url = course.url
+        if course_url[-1] == "/":
+            course_url = course_url[:-1]
+        s3_folder = course_url.split("/")[-1]
+
+        s3_bucket.put_object(
+            Key=s3_folder + f"/{course.course_id}_master.json",
+            Body=json.dumps(course.raw_json),
+            ACL="private",
+        )
