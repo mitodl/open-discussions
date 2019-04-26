@@ -12,8 +12,14 @@ import botocore
 import pytest
 from moto import mock_s3
 
+from course_catalog.constants import PlatformType
+from course_catalog.factories import CourseFactory
 from course_catalog.models import Course, CoursePrice, CourseInstructor, CourseTopic
-from course_catalog.tasks import sync_and_upload_edx_data, get_ocw_data
+from course_catalog.tasks import (
+    sync_and_upload_edx_data,
+    get_ocw_data,
+    upload_ocw_master_json,
+)
 
 pytestmark = pytest.mark.django_db
 # pylint:disable=redefined-outer-name,unused-argument
@@ -206,6 +212,17 @@ def test_get_ocw_data(settings, mock_course_index_functions):
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 3
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+    )
+    # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
+    obj = s3.Object(
+        settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/16197636c270e1ab179fbc9a56c72787_master.json",
+    )
+    assert json.loads(obj.get()["Body"].read())
 
 
 def test_get_ocw_data_no_settings():
@@ -263,3 +280,30 @@ def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only):
     get_ocw_data()
     assert mock_upload_image.call_count == (1 if image_only else 0)
     assert mock_upload_all.call_count == (0 if image_only else 1)
+
+
+@mock_s3
+def test_upload_ocw_master_json(settings, mocker):
+    """
+    Test that ocw_upload_master_json uploads to S3
+    """
+    setup_s3(settings)
+
+    course = CourseFactory.create(platform=PlatformType.ocw.value)
+    course.url = "http://ocw.mit.edu/courses/brain-and-cognitive-sciences/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007"
+    course.raw_json = {"test": "json"}
+    course.save()
+
+    upload_ocw_master_json()
+
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+    )
+    # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
+    obj = s3.Object(
+        settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        f"9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/{course.course_id}_master.json",
+    )
+    assert json.loads(obj.get()["Body"].read())
