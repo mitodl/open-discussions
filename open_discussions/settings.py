@@ -81,6 +81,7 @@ INSTALLED_APPS = (
     "hijack",
     "hijack_admin",
     "guardian",
+    "django_json_widget",
     # Put our apps after this point
     "open_discussions",
     "authentication",

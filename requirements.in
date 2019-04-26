@@ -20,6 +20,7 @@ django-anymail[mailgun]==3.*
 django-compat==1.0.15
 django-hijack==2.1.10
 django-hijack-admin==2.1.10
+django-json-widget==0.2.0
 djangorestframework==3.9.0
 djangorestframework-jwt==1.11.0
 djoser

@@ -5,6 +5,7 @@ import time
 from cache_memoize import cache_memoize
 from django.conf import settings
 import feedparser
+from rest_framework.serializers import ValidationError
 
 from widgets.serializers.widget_instance import (
     WidgetConfigSerializer,
@@ -56,8 +57,15 @@ class RssFeedWidgetSerializer(WidgetInstanceSerializer):
 
     def get_json(self, instance):
         """Obtains RSS feed data which will then be provided to the React component"""
-        rss = _fetch_rss(instance.configuration["url"])
-        entries = getattr(rss, "entries", [])
+        try:
+            rss = _fetch_rss(instance.configuration["url"])
+            entries = getattr(rss, "entries", [])
+        except:  # pylint: disable=bare-except
+            # log an exception and coerce this to an empty list so the feed and UI don't crash
+            log.exception(
+                "Error trying to refresh cached RSS feed for widget id: %s", instance.id
+            )
+            entries = []
 
         timestamp_key = (
             "published_parsed"
@@ -90,13 +98,16 @@ class RssFeedWidgetSerializer(WidgetInstanceSerializer):
         """Saves the widget settings"""
         instance = super().save(**kwargs)
 
-        try:
-            url = instance.configuration["url"]
+        url = instance.configuration["url"]
 
+        try:
             # force a cache refresh immediately after a successful save by invalidating and then loading it
             _fetch_rss.invalidate(url)
             _fetch_rss(url)
         except:  # pylint: disable=bare-except
-            log.exception("Error trying to refresh cached RSS feed")
+            log.exception("Error trying to load new RSS feed url: %s", url)
+            raise ValidationError(
+                {"configuration": f"Unable to load the RSS feed: '{url}'"}
+            )
 
         return instance
