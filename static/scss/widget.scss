@@ -1,6 +1,11 @@
 .widget-list {
   .card-contents {
     padding: 20px 16px 6px 16px;
+
+    .twitter-embed {
+      max-height: 400px;
+      overflow: scroll;
+    }
   }
 
   .manage-widgets {
@@ -31,6 +36,8 @@ $person-z-index: 10;
 .widget-dialog {
   min-width: auto;
   max-width: $dialog-max-width;
+  max-height: 80%;
+  overflow: scroll;
 
   .mdc-dialog__header {
     padding: 40px $body-x-padding 20px $body-x-padding;
@@ -47,6 +54,12 @@ $person-z-index: 10;
 
   .mdc-dialog__footer {
     padding: 0 $body-x-padding 30px $body-x-padding;
+  }
+
+  .under-text {
+    font-size: 14px;
+    line-height: 15px;
+    margin-top: 5px;
   }
 
   .react-autosuggest__suggestions-list {

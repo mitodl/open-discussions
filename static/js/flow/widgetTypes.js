@@ -13,7 +13,8 @@ export type WidgetFieldSpec = {
   label: string,
   input_type: string,
   props: Object,
-  default: any
+  default: any,
+  under_text: ?string,
 }
 
 export type WidgetSpec = {

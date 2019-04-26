@@ -14,6 +14,7 @@ import * as authUtils from "../lib/auth"
 import { makeFrontpageSetting, makeCommentSetting } from "../factories/settings"
 import { makeChannelPostList } from "../factories/posts"
 import { shouldIf, shouldIfGt0, mockCourseAPIMethods } from "../lib/test_utils"
+import * as embedLib from "../lib/embed"
 
 describe("App", () => {
   let helper, renderComponent, channels, postList
@@ -35,6 +36,7 @@ describe("App", () => {
     helper.getLivestreamEventsStub.returns(Promise.resolve({ data: [] }))
     renderComponent = helper.renderComponent.bind(helper)
     mockCourseAPIMethods(helper)
+    helper.sandbox.stub(embedLib, "ensureTwitterEmbedJS")
   })
 
   afterEach(() => {

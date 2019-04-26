@@ -30,6 +30,7 @@ import { formatTitle } from "../../lib/title"
 import { editChannelModeratorsURL, channelURL } from "../../lib/url"
 import { wait } from "../../lib/util"
 import IntegrationTestHelper from "../../util/integration_test_helper"
+import * as embedLib from "../../lib/embed"
 
 describe("EditChannelModeratorsPage", () => {
   let helper, render, channel, moderators, initialState, initialProps
@@ -91,6 +92,7 @@ describe("EditChannelModeratorsPage", () => {
     helper.getProfileStub.returns(Promise.resolve(""))
     helper.getWidgetListStub.returns(Promise.resolve(makeWidgetListResponse(0)))
     helper.sandbox.stub(window, "scrollTo")
+    helper.sandbox.stub(embedLib, "ensureTwitterEmbedJS")
   })
 
   afterEach(() => {

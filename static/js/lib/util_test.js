@@ -188,7 +188,15 @@ describe("utility functions", () => {
   describe("isValidUrl", () => {
     it("should assert that a URL allows underscores and requires a protocol prefix", () => {
       assert.isFalse(isValidUrl("mit.edu"))
+      assert.isFalse(isValidUrl(""))
       assert.isTrue(isValidUrl("http://mit.edu/a_url_here"))
+    })
+
+    it("should be null safe", () => {
+      // $FlowFixMe
+      assert.isFalse(isValidUrl(null))
+      // $FlowFixMe
+      assert.isFalse(isValidUrl(undefined))
     })
   })
 

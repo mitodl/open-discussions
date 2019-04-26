@@ -4,14 +4,15 @@ import React from "react"
 import R from "ramda"
 import isURL from "validator/lib/isURL"
 
+import { WIDGET_TYPE_RSS, WIDGET_TYPE_URL } from "./constants"
 import { WIDGET_TYPE_SELECT } from "../components/widgets/WidgetEditDialog"
 import { S } from "./sanctuary"
 import { LINK_TYPE_LINK, LINK_TYPE_ARTICLE } from "../lib/channels"
 import { emptyOrNil, isValidUrl } from "../lib/util"
+import { hasOnlyTwitterURLS } from "./html"
 
 import type { PostForm, PostFormType } from "../flow/discussionTypes"
 import type { WidgetDialogData } from "../flow/widgetTypes"
-import { WIDGET_TYPE_RSS, WIDGET_TYPE_URL } from "./constants"
 
 export const PASSWORD_LENGTH_MINIMUM = 8
 
@@ -322,6 +323,12 @@ const validateWidgetDialogType = validate([
   validation(emptyOrNil, R.lensProp("widget_type"), "Widget type is required")
 ])
 
+const widgetURLValidation = validation(
+  R.complement(isValidUrl),
+  R.lensPath(["configuration", "url"]),
+  "URL is not valid"
+)
+
 export const validateWidgetDialog = (data: WidgetDialogData) => {
   if (data.state === WIDGET_TYPE_SELECT) {
     return validateWidgetDialogType(data.instance)
@@ -330,17 +337,58 @@ export const validateWidgetDialog = (data: WidgetDialogData) => {
   const validationList = [
     validation(emptyOrNil, R.lensProp("title"), "Widget title is required")
   ]
-  if (
-    data.instance.widget_type === WIDGET_TYPE_RSS ||
-    data.instance.widget_type === WIDGET_TYPE_URL
-  ) {
+
+  if (data.instance.widget_type === WIDGET_TYPE_RSS) {
+    validationList.push(widgetURLValidation)
     validationList.push(
       validation(
-        R.complement(isValidUrl),
+        emptyOrNil,
         R.lensPath(["configuration", "url"]),
-        "URL is not valid"
+        "URL is required"
       )
     )
   }
+
+  if (data.instance.widget_type === WIDGET_TYPE_URL) {
+    validationList.push(form => {
+      const urlPath = ["configuration", "url"]
+      const htmlPath = ["configuration", "custom_html"]
+      const url = R.pathOr(null, urlPath, form)
+      const customHtml = R.pathOr(null, htmlPath, form)
+
+      if (!url && !customHtml) {
+        return S.Just(
+          R.set(R.lensPath(urlPath), "You must enter a URL or custom html")
+        )
+      }
+
+      if (url && customHtml) {
+        return S.Just(
+          R.set(
+            R.lensPath(urlPath),
+            "You must enter either a URL or custom html, not both"
+          )
+        )
+      }
+
+      if (url) {
+        return widgetURLValidation(form)
+      }
+
+      if (customHtml) {
+        if (!hasOnlyTwitterURLS(customHtml)) {
+          return S.Just(
+            R.set(
+              R.lensPath(htmlPath),
+              "You may only embed custom content from twitter"
+            )
+          )
+        }
+      }
+
+      return S.Nothing
+    })
+  }
+
   return validate(validationList)(data.instance)
 }

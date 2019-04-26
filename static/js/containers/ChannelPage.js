@@ -27,6 +27,7 @@ import { formatTitle } from "../lib/title"
 import { clearChannelError } from "../actions/channel"
 import { evictPostsForChannel } from "../actions/posts_for_channel"
 import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/picker"
+import { ensureTwitterEmbedJS } from "../lib/embed"
 
 import type { Dispatch } from "redux"
 import type { Match, Location } from "react-router"
@@ -64,6 +65,7 @@ const shouldLoadData = R.complement(
 export class ChannelPage extends React.Component<ChannelPageProps> {
   componentDidMount() {
     this.loadData()
+    ensureTwitterEmbedJS()
   }
 
   componentWillUnmount() {

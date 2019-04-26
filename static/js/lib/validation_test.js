@@ -2,6 +2,7 @@
 /* global SETTINGS:false */
 import { assert } from "chai"
 import R from "ramda"
+import sinon from "sinon"
 
 import { LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE } from "./channels"
 import { assertIsNothing, assertIsJustNoVal, shouldIf } from "./test_utils"
@@ -30,6 +31,7 @@ import {
 } from "../components/widgets/WidgetEditDialog"
 import { makeWidgetInstance } from "../factories/widgets"
 import { WIDGET_TYPE_RSS, WIDGET_TYPE_URL } from "./constants"
+import * as htmlLib from "./html"
 
 describe("validation library", () => {
   describe("validation", () => {
@@ -462,6 +464,16 @@ describe("validation library", () => {
   })
 
   describe("validateWidgetDialog", () => {
+    let sandbox
+
+    beforeEach(() => {
+      sandbox = sinon.createSandbox()
+    })
+
+    afterEach(() => {
+      sandbox.restore()
+    })
+
     it("should require that a widget type is selected", () => {
       const data = {
         state:      WIDGET_TYPE_SELECT,
@@ -489,20 +501,100 @@ describe("validation library", () => {
         title: "Widget title is required"
       })
     })
+
+    //
     ;[WIDGET_TYPE_RSS, WIDGET_TYPE_URL].forEach(widgetType => {
-      it(`should require a valid URL for widget type ${widgetType}`, () => {
+      it(`should work with a valid url with widget type ${widgetType}`, () => {
         const data = {
           state:      WIDGET_CREATE,
           instance:   makeWidgetInstance(widgetType),
           validation: {}
         }
         assert.deepEqual(validateWidgetDialog(data), {})
+      })
+
+      it(`should error on an invalid URL for widget type ${widgetType}`, () => {
+        const data = {
+          state:      WIDGET_CREATE,
+          instance:   makeWidgetInstance(widgetType),
+          validation: {}
+        }
+
         data.instance.configuration.url = "url.without.protocol.prefix.edu"
         assert.deepEqual(validateWidgetDialog(data), {
           configuration: {
             url: "URL is not valid"
           }
         })
+      })
+    })
+
+    it(`should validate an empty URL for ${WIDGET_TYPE_RSS}`, () => {
+      const data = {
+        state:      WIDGET_CREATE,
+        instance:   makeWidgetInstance(WIDGET_TYPE_RSS),
+        validation: {}
+      }
+      data.instance.configuration.url = null
+      assert.deepEqual(validateWidgetDialog(data), {
+        configuration: {
+          url: "URL is required"
+        }
+      })
+    })
+
+    it("should yell about having an url and custom html", () => {
+      const data = {
+        state:      WIDGET_CREATE,
+        instance:   makeWidgetInstance(WIDGET_TYPE_URL),
+        validation: {}
+      }
+      data.instance.configuration.url = "asdfasdfasdf"
+      data.instance.configuration.custom_html = "AICH TEE EMM ELLL!"
+      assert.deepEqual(validateWidgetDialog(data), {
+        configuration: {
+          url: "You must enter either a URL or custom html, not both"
+        }
+      })
+    })
+
+    it("should yell about having neither a url nor a custom html", () => {
+      const data = {
+        state:      WIDGET_CREATE,
+        instance:   makeWidgetInstance(WIDGET_TYPE_URL),
+        validation: {}
+      }
+      data.instance.configuration.url = null
+      assert.deepEqual(validateWidgetDialog(data), {
+        configuration: {
+          url: "You must enter a URL or custom html"
+        }
+      })
+    })
+
+    //
+    ;[true, false].forEach(hasOnlyTwitterURLS => {
+      it(`${shouldIf(!hasOnlyTwitterURLS)} yell when non-twitter urls ${
+        !hasOnlyTwitterURLS ? "present" : "not present"
+      } in custom_html`, () => {
+        const data = {
+          state:      WIDGET_CREATE,
+          instance:   makeWidgetInstance(WIDGET_TYPE_URL),
+          validation: {}
+        }
+        data.instance.configuration.url = null
+        data.instance.configuration.custom_html = "AICH TEE EMM ELLL!"
+        sandbox.stub(htmlLib, "hasOnlyTwitterURLS").returns(hasOnlyTwitterURLS)
+        assert.deepEqual(
+          validateWidgetDialog(data),
+          hasOnlyTwitterURLS
+            ? {}
+            : {
+              configuration: {
+                custom_html: "You may only embed custom content from twitter"
+              }
+            }
+        )
       })
     })
   })

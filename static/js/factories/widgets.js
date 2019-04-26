@@ -127,7 +127,8 @@ export const makeFieldSpec = (
         min: 1,
         max: casual.integer(1, 8)
       },
-      default: 3
+      default:    3,
+      under_text: null
     }
 
   default:
@@ -139,7 +140,8 @@ export const makeFieldSpec = (
         min_length:  "",
         placeholder: `Placeholder ${casual.words}`
       },
-      default: ""
+      default:    "",
+      under_text: null
     }
   }
 }

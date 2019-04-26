@@ -17,6 +17,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "field_name": "source",
                 "input_type": "markdown_wysiwyg",
                 "label": "Text",
+                "under_text": None,
                 "props": {"placeholder": "Enter widget text"},
                 "default": "",
             }
@@ -30,6 +31,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "field_name": "url",
                 "input_type": "url",
                 "label": "URL",
+                "under_text": "Paste url from YouTube, New York Times, Instragram and more than 400 content providers. Or any other web url",
                 "props": {
                     "max_length": "",
                     "min_length": "",
@@ -37,7 +39,19 @@ EXPECTED_AVAILABLE_WIDGETS = [
                     "show_embed": True,
                 },
                 "default": "",
-            }
+            },
+            {
+                "field_name": "custom_html",
+                "input_type": "textarea",
+                "label": "Custom html",
+                "under_text": "For security reasons, we only allow embed code from Twitter. If you have something else in mind, contact us.",
+                "props": {
+                    "max_length": "",
+                    "min_length": "",
+                    "placeholder": "For more specific embeds, enter the embed code here",
+                },
+                "default": None,
+            },
         ],
         "widget_type": "URL",
         "description": "Embedded URL",
@@ -48,6 +62,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "field_name": "url",
                 "input_type": "url",
                 "label": "URL",
+                "under_text": None,
                 "props": {
                     "max_length": "",
                     "min_length": "",
@@ -60,6 +75,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "field_name": "feed_display_limit",
                 "input_type": "number",
                 "label": "Max number of items",
+                "under_text": None,
                 "props": {"max": 10, "min": 1},
                 "default": 5,
             },
@@ -75,6 +91,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "field_name": "people",
                 "input_type": "people",
                 "label": "Add members to widget",
+                "under_text": None,
                 "props": {"placeholder": "Enter widget text"},
             },
             {
@@ -82,6 +99,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
                 "field_name": "show_all_members_link",
                 "input_type": "checkbox",
                 "label": "Show all members link",
+                "under_text": None,
                 "props": {},
             },
         ],

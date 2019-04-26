@@ -10,6 +10,7 @@ import { LINK_TYPE_TEXT, CHANNEL_TYPE_RESTRICTED } from "../../lib/channels"
 import { formatTitle } from "../../lib/title"
 import { editChannelBasicURL, channelURL } from "../../lib/url"
 import IntegrationTestHelper from "../../util/integration_test_helper"
+import * as embedLib from "../../lib/embed"
 
 describe("EditChannelBasicPage", () => {
   let helper, renderComponent, channel, listenForActions
@@ -37,6 +38,7 @@ describe("EditChannelBasicPage", () => {
     renderComponent = helper.renderComponent.bind(helper)
     listenForActions = helper.listenForActions.bind(helper)
     helper.sandbox.stub(window, "scrollTo")
+    helper.sandbox.stub(embedLib, "ensureTwitterEmbedJS")
   })
 
   afterEach(() => {

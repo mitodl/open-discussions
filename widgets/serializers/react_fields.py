@@ -30,6 +30,7 @@ class ReactField:
         return {
             "field_name": self.field_name,
             "label": self.label,
+            "under_text": getattr(self, "under_text", None),
             "input_type": self._get_input_type(),
             "props": self._get_props(),
             # DRF uses empty as a marker for no-input, but it's not JSON serializable
@@ -39,6 +40,12 @@ class ReactField:
 
 class ReactCharField(serializers.CharField, ReactField):
     """ReactField extension of DRF CharField"""
+
+    def __init__(self, **kwargs):
+        if "under_text" in kwargs:
+            self.under_text = kwargs.pop("under_text")
+
+        super().__init__(**kwargs)
 
     def _get_input_type(self):
         """Returns the field's input type"""
@@ -79,6 +86,9 @@ class ReactURLField(serializers.URLField, ReactField):
             self.show_embed = kwargs.pop("show_embed")
         else:
             self.show_embed = False
+
+        if "under_text" in kwargs:
+            self.under_text = kwargs.pop("under_text")
 
         super().__init__(**kwargs)
 

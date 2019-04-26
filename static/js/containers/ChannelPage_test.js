@@ -21,9 +21,17 @@ import { channelURL } from "../lib/url"
 import { formatTitle } from "../lib/title"
 import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/picker"
 import { makeReportRecord } from "../factories/reports"
+import * as embedLib from "../lib/embed"
 
 describe("ChannelPage", () => {
-  let helper, render, channels, currentChannel, otherChannel, postList, postIds
+  let helper,
+    render,
+    channels,
+    currentChannel,
+    otherChannel,
+    postList,
+    postIds,
+    ensureTwitterStub
 
   beforeEach(() => {
     channels = makeChannelList(10)
@@ -82,6 +90,7 @@ describe("ChannelPage", () => {
         history: helper.browserHistory
       }
     )
+    ensureTwitterStub = helper.sandbox.stub(embedLib, "ensureTwitterEmbedJS")
   })
 
   afterEach(() => {
@@ -177,6 +186,11 @@ describe("ChannelPage", () => {
         assert.equal(helper.currentLocation.search, `?sort=${sortType}`)
       }
     })
+  })
+
+  it("should call the ensure twitter function", async () => {
+    await render()
+    sinon.assert.called(ensureTwitterStub)
   })
 
   it("should handle missing data gracefully", async () => {

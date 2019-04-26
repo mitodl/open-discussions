@@ -136,6 +136,9 @@ export default class WidgetEditDialog extends React.Component<Props> {
                   validation
                 )
               )}
+              {fieldSpec.under_text ? (
+                <div className="under-text">{fieldSpec.under_text}</div>
+              ) : null}
             </label>
           )
         })}

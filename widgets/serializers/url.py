@@ -3,13 +3,27 @@ from widgets.serializers.widget_instance import (
     WidgetConfigSerializer,
     WidgetInstanceSerializer,
 )
-from widgets.serializers.react_fields import ReactURLField
+from widgets.serializers.react_fields import ReactURLField, ReactCharField
 
 
 class URLWidgetConfigSerializer(WidgetConfigSerializer):
     """Serializer for URLWidget config"""
 
-    url = ReactURLField(help_text="Enter URL", label="URL", show_embed=True)
+    url = ReactURLField(
+        help_text="Enter URL",
+        label="URL",
+        under_text="Paste url from YouTube, New York Times, Instragram and more than 400 content providers. Or any other web url",
+        show_embed=True,
+        required=False,
+        allow_null=True,
+    )
+    custom_html = ReactCharField(
+        help_text="For more specific embeds, enter the embed code here",
+        under_text="For security reasons, we only allow embed code from Twitter. If you have something else in mind, contact us.",
+        default=None,
+        required=False,
+        allow_null=True,
+    )
 
 
 class URLWidgetSerializer(WidgetInstanceSerializer):
