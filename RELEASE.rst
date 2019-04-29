@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.75.0
+--------------
+
+- make desktop drawer collapse instead of hide
+- Repair posts if they don't appear in the hot posts list
+- Modifies ocw parsing and adds task/management command to upload ocw master json data to S3.
+
 Version 0.74.2 (Released April 26, 2019)
 --------------
 
