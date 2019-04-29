@@ -198,7 +198,7 @@ def upload_ocw_master_json():
     ).Bucket(settings.OCW_LEARNING_COURSE_BUCKET_NAME)
 
     for course in Course.objects.filter(platform=PlatformType.ocw.value).iterator(
-        chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+        chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE
     ):
         # Approximate course_prefix from course.url
         course_url = course.url
