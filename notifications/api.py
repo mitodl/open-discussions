@@ -1,6 +1,7 @@
 """Notifications API"""
 import logging
 
+from django.conf import settings
 from django.db.models import Q
 
 from channels.models import Subscription
@@ -47,34 +48,46 @@ def ensure_notification_settings(user):
         )
 
 
-def _send_frontpage_digests(notification_settings):
+def attempt_send_notification_batch(notification_settings_ids):
     """
-    Sends email notifications via the specified settings
+    Attempts to send notification for the given batch of ids
 
     Args:
-        notification_settings (QuerySet of NotificationSettings): a QuerySet for the settings to send
+        notification_settings_ids (list of int): list of NotificationSettings.ids
     """
-    for notification_setting in notification_settings.iterator():
-        notifier = frontpage.FrontpageDigestNotifier(notification_setting)
-        notifier.attempt_notify()
+    notification_settings = NotificationSettings.objects.filter(
+        id__in=notification_settings_ids
+    )
+    for notification_setting in notification_settings:
+        try:
+            notifier = frontpage.FrontpageDigestNotifier(notification_setting)
+            notifier.attempt_notify()
+        except:  # pylint: disable=bare-except
+            log.exception(
+                "Error attempting notification for user %s", notification_setting.user
+            )
 
 
-def send_daily_frontpage_digests():
-    """Sends daily frontpage digest emails"""
-    notification_settings = NotificationSettings.frontpage_settings().filter(
-        trigger_frequency=FREQUENCY_DAILY
+def get_daily_frontpage_settings_ids():
+    """Returns daily frontpage digest NotificationSettings"""
+    return (
+        NotificationSettings.frontpage_settings()
+        .filter(trigger_frequency=FREQUENCY_DAILY)
+        .values_list("id", flat=True)
+        .order_by("id")
+        .iterator()
     )
 
-    _send_frontpage_digests(notification_settings)
 
-
-def send_weekly_frontpage_digests():
-    """Sends weekly frontpage digest emails"""
-    notification_settings = NotificationSettings.frontpage_settings().filter(
-        trigger_frequency=FREQUENCY_WEEKLY
+def get_weekly_frontpage_settings_ids():
+    """Returns weekly frontpage digest NotificationSettings"""
+    return (
+        NotificationSettings.frontpage_settings()
+        .filter(trigger_frequency=FREQUENCY_WEEKLY)
+        .values_list("id", flat=True)
+        .order_by("id")
+        .iterator()
     )
-
-    _send_frontpage_digests(notification_settings)
 
 
 def _get_notifier_for_notification(notification):
@@ -111,7 +124,7 @@ def send_unsent_email_notifications():
         EmailNotification.objects.filter(
             state=EmailNotification.STATE_PENDING
         ).values_list("id", flat=True),
-        chunk_size=100,
+        chunk_size=settings.NOTIFICATION_SEND_CHUNK_SIZE,
     ):
         EmailNotification.objects.filter(id__in=notification_ids).update(
             state=EmailNotification.STATE_SENDING
@@ -131,7 +144,7 @@ def send_email_notification_batch(notification_ids):
             notifier = _get_notifier_for_notification(notification)
             notifier.send_notification(notification)
         except:  # pylint: disable=bare-except
-            log.exception("Error sending notification")
+            log.exception("Error sending notification %s", notification)
 
 
 def send_comment_notifications(post_id, comment_id, new_comment_id):

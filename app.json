@@ -224,6 +224,18 @@
       "description": "Maximum depth of a comment",
       "required": false
     },
+    "OPEN_DISCUSSIONS_NOTIFICATION_ATTEMPT_RATE_LIMIT": {
+      "description": "The per-worker rate limit at which to generate pending EmailNotification frontpage records",
+      "required": false
+    },
+    "OPEN_DISCUSSIONS_NOTIFICATION_ATTEMPT_CHUNK_SIZE": {
+      "description": "The size of each attempt batch",
+      "required": false
+    },
+    "OPEN_DISCUSSIONS_NOTIFICATION_SEND_CHUNK_SIZE": {
+      "description": "The size of each sending batch",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_REDDIT_ACCESS_TOKEN": {
       "description": "Access token for securing trusted APIs to reddit",
       "required": false

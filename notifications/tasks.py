@@ -1,19 +1,70 @@
 """Notification tasks"""
+import celery
+from django.conf import settings
+
 from open_discussions.celery import app
+from open_discussions.utils import chunks
 
 from notifications import api
 
 
-@app.task
-def send_daily_frontpage_digests():
+def _gen_attempt_send_notification_batches(notification_settings):
+    """
+    Generates the set of attempt_send_notification_batch tasks in a fan-out structure
+
+    Args:
+        notification_settings (iterable of NotificationSettings): an iterable of NotificationSettings to attempt the sends for
+
+    Returns:
+        celery.group: the celery group of tasks to execute
+    """
+    return celery.group(
+        [
+            attempt_send_notification_batch.si(notification_settings_ids)
+            for notification_settings_ids in chunks(
+                notification_settings,
+                chunk_size=settings.NOTIFICATION_ATTEMPT_CHUNK_SIZE,
+            )
+        ]
+    )
+
+
+@app.task(bind=True)
+def send_daily_frontpage_digests(self):
     """Daily frontpage digest task"""
-    api.send_daily_frontpage_digests()
+    notification_settings = api.get_daily_frontpage_settings_ids()
+
+    tasks = _gen_attempt_send_notification_batches(notification_settings)
+
+    # to reduce the risk of triggering these multiple times, we trigger and replace this task all at once
+    raise self.replace(tasks)
 
 
-@app.task
-def send_weekly_frontpage_digests():
+@app.task(bind=True)
+def send_weekly_frontpage_digests(self):
     """Weekly frontpage digest task"""
-    api.send_weekly_frontpage_digests()
+    notification_settings = api.get_weekly_frontpage_settings_ids()
+
+    tasks = _gen_attempt_send_notification_batches(notification_settings)
+
+    # to reduce the risk of triggering these multiple times, we trigger and replace this task all at once
+    raise self.replace(tasks)
+
+
+@app.task(
+    # The two settings below *should* ensure a task is never dropped, but it may be executed several times
+    acks_late=True,  # don't acknowledge the task until it's done
+    reject_on_worker_lost=True,  # if the worker gets killed, don't acknowledge the task
+    rate_limit=settings.NOTIFICATION_ATTEMPT_RATE_LIMIT,  # an option to rate limit these if they become too much
+)
+def attempt_send_notification_batch(notification_settings_ids):
+    """
+    Attempt to send a notification batch
+
+    Args:
+        notification_settings_ids (list of int): list of NotificationSettings.ids
+    """
+    api.attempt_send_notification_batch(notification_settings_ids)
 
 
 @app.task

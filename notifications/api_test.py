@@ -61,50 +61,58 @@ def test_ensure_notification_settings_existing(user):
     assert comments_settings.trigger_frequency == settings_for_user[1].trigger_frequency
 
 
-def test_send_daily_frontpage_digests(mocker):
-    """Tests that send_daily_frontpage_digests only triggers for daily settings"""
+def test_get_daily_frontpage_settings_ids():
+    """Tests that get_daily_frontpage_settings_ids only triggers for daily settings"""
     notification_settings = NotificationSettingsFactory.create_batch(
         50, daily=True, frontpage_type=True
     )
     NotificationSettingsFactory.create_batch(50, weekly=True, frontpage_type=True)
 
-    mock_notifier_cls = mocker.patch(
-        "notifications.notifiers.frontpage.FrontpageDigestNotifier"
-    )
-
-    api.send_daily_frontpage_digests()
-
-    assert mock_notifier_cls.return_value.attempt_notify.call_count == len(
-        notification_settings
-    )
-    for setting in notification_settings:
-        mock_notifier_cls.assert_any_call(setting)
-        mock_notifier_cls.return_value.attempt_notify.assert_any_call()
+    assert set(api.get_daily_frontpage_settings_ids()) == {
+        ns.id for ns in notification_settings
+    }
 
 
-def test_send_weekly_frontpage_digests(mocker):
-    """Tests that send_weekly_frontpage_digests only triggers for weekly settings"""
+def test_get_weekly_frontpage_settings_ids():
+    """Tests that get_weekly_frontpage_settings_ids only returns weekly settings"""
     notification_settings = NotificationSettingsFactory.create_batch(
         50, weekly=True, frontpage_type=True
     )
     NotificationSettingsFactory.create_batch(50, daily=True, frontpage_type=True)
 
-    mock_notifier_cls = mocker.patch(
-        "notifications.notifiers.frontpage.FrontpageDigestNotifier"
+    assert set(api.get_weekly_frontpage_settings_ids()) == {
+        ns.id for ns in notification_settings
+    }
+
+
+@pytest.mark.parametrize("side_effect", [None, Exception("bad_attempt_notify")])
+def test_attempt_send_notification_batch(mocker, side_effect):
+    """Verifies that attempt_send_notification_batch will attempt a notify on all settings"""
+    notification_settings = NotificationSettingsFactory.create_batch(
+        5, weekly=True, frontpage_type=True
     )
+    mock_notifier = mocker.patch(
+        "notifications.notifiers.frontpage.FrontpageDigestNotifier", autospec=True
+    )
+    mock_notifier_instance = mock_notifier.return_value
+    mock_notifier_instance.side_effect = side_effect
 
-    api.send_weekly_frontpage_digests()
+    api.attempt_send_notification_batch([ns.id for ns in notification_settings])
 
-    assert mock_notifier_cls.return_value.attempt_notify.call_count == len(
+    assert mock_notifier.call_count == len(notification_settings)
+
+    for notificiation_setting in notification_settings:
+        mock_notifier.assert_any_call(notificiation_setting)
+
+    assert mock_notifier_instance.attempt_notify.call_count == len(
         notification_settings
     )
-    for setting in notification_settings:
-        mock_notifier_cls.assert_any_call(setting)
-        mock_notifier_cls.return_value.attempt_notify.assert_any_call()
 
 
-def test_send_unsent_email_notifications(mocker):
+def test_send_unsent_email_notifications(mocker, settings):
     """Tests that send_unsent_email_notifications triggers a task for each batch"""
+
+    settings.NOTIFICATION_SEND_CHUNK_SIZE = 75
 
     notifications_ids = sorted(
         [note.id for note in EmailNotificationFactory.create_batch(150)]
@@ -119,8 +127,8 @@ def test_send_unsent_email_notifications(mocker):
     api.send_unsent_email_notifications()
 
     assert mock_task.call_count == 2
-    mock_task.assert_any_call(notifications_ids[:100])
-    mock_task.assert_any_call(notifications_ids[100:])
+    mock_task.assert_any_call(notifications_ids[:75])
+    mock_task.assert_any_call(notifications_ids[75:])
     assert EmailNotification.objects.filter(
         state=EmailNotification.STATE_SENDING
     ).count() == len(notifications_ids)

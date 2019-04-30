@@ -307,10 +307,6 @@ EMAIL_USE_TLS = get_bool("OPEN_DISCUSSIONS_EMAIL_TLS", False)
 EMAIL_SUPPORT = get_string("OPEN_DISCUSSIONS_SUPPORT_EMAIL", "support@example.com")
 DEFAULT_FROM_EMAIL = get_string("OPEN_DISCUSSIONS_FROM_EMAIL", "webmaster@localhost")
 
-NOTIFICATION_EMAIL_BACKEND = get_string(
-    "OPEN_DISCUSSIONS_NOTIFICATION_EMAIL_BACKEND",
-    "anymail.backends.mailgun.EmailBackend",
-)
 
 MAILGUN_SENDER_DOMAIN = get_string("MAILGUN_SENDER_DOMAIN", None)
 if not MAILGUN_SENDER_DOMAIN:
@@ -333,6 +329,24 @@ if ADMIN_EMAIL != "":
     ADMINS = (("Admins", ADMIN_EMAIL),)
 else:
     ADMINS = ()
+
+# Email Notifications config
+
+NOTIFICATION_EMAIL_BACKEND = get_string(
+    "OPEN_DISCUSSIONS_NOTIFICATION_EMAIL_BACKEND",
+    "anymail.backends.mailgun.EmailBackend",
+)
+# See https://docs.celeryproject.org/en/latest/reference/celery.app.task.html#celery.app.task.Task.rate_limit
+NOTIFICATION_ATTEMPT_RATE_LIMIT = get_string(
+    "OPEN_DISCUSSIONS_NOTIFICATION_ATTEMPT_RATE_LIMIT", None  # default is no rate limit
+)
+
+NOTIFICATION_ATTEMPT_CHUNK_SIZE = get_int(
+    "OPEN_DISCUSSIONS_NOTIFICATION_ATTEMPT_CHUNK_SIZE", 100
+)
+NOTIFICATION_SEND_CHUNK_SIZE = get_int(
+    "OPEN_DISCUSSIONS_NOTIFICATION_SEND_CHUNK_SIZE", 100
+)
 
 # SAML settings
 SOCIAL_AUTH_SAML_SP_ENTITY_ID = get_string(

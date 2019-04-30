@@ -1,7 +1,7 @@
-Email
+Email Notifications Infrastructure
 ---
 
-#### Considerations
+#### Summary
 
 - Be able to send frontpage email notifications on a daily or weekly basis
   - Frequency is user-configurable
@@ -21,27 +21,50 @@ Email
       - Weekly (digest/aggregation of new events)
 
 
-#### Proposal
+#### Architecture
 
-For frontpage digests the workflow would be:
+##### State Machine
 
- - Daily and weekly tasks to:
-  - Walk `NotificationSettings` matching the corresponding `notification_type`
-  - For each of these settings, get frontpage data for that user
-  - Filter the list of frontpage posts to those that were made since the last frontpage email we sent this user
-    - A record needs to be stored at send time of when that happened
-  - If we have at least 1 post to send, render and send the emails
-  - Long a record of the sent email
+Email Notifications proceed through the following state machine:
 
-For event-specific notifications:
+- `PENDING` - notification is ready to send
+- `SENDING` - notification is in the process of being sent (rendered and delivered to ESP)
+- `CANCELED` - notification was canceled
+- `SENT` - notification was delivered to ESP\*
 
- - When an event happens, trigger a django signal (so we can tie multiple handlers into it down the road)
- - On that event, fire a celery task to check subscriptions
- - Walk all subscriptions to that object and for each one create an `EmailNotification` record
-   - If their `NotificationSettings` record for that type has `frequency_type` of `never`, then we don't create this record. This has the effect of muting subscriptions temporarily with necessitating the removal of the subscriptions or effecting a massive catch-up of notifications if they turn it back on
- - For each of those `EmailNotification` records, if the user has their `NotificationSettings` for that type set to immediate, send the email immediately, marking the notification as sent
- - **For later implementation:**
-  - For weekly and daily settings, appropriate cron tasks to aggregate, render and send those emails
+**\* NOTE:** to ensure we don't send an email multiple times we follow a `At Most Once` sending strategy where we mark the record as sent first, then attempt to send the email. This can cause some emails to be dropped if the ESP errors.
+
+##### Frontpage Emails:
+
+ - Tasks are triggered on a daily and weekly basis. Each of these tasks triggers the following task flow:
+   - For all users with notifications enabled, fan out a set of batch tasks to determine if the user has posts in their feed since the last notification.
+     - These tasks are idempotent and will be retried if there's any failure
+   - If the user has posts in their feed, create a `PENDING` `EmailNotification` record for that user
+
+##### Comment Notifications
+
+ - When a comment occurs, fire a celery task to check subscriptions
+ - Walk all subscriptions to that the posts and/or a comment (if the new comment was a reply to another comment) and for each one create a pending `EmailNotification` record
+   - If their `NotificationSettings` record for that type has `frequency_type` of `never`, then we don't create this record. This has the effect of muting subscriptions temporarily without necessitating the removal of the subscriptions or effecting a massive catch-up of notifications if they turn it back on
 
 
-There is common behavior between these two mechanisms which we should implement in a reusable manner.
+##### Notification Email Sending
+
+For both notification types, an asynchronous task set to run every minute via `crontab` will trigger another set of batch tasks in the following manner:
+ - Marks the notifications as being in the `SENDING` state, trigers batch tasks for these to send the email
+ - Takes a lock on the `EmailNotification` record
+   - Continues if and only if the record is still pending
+   - Re-checks that there is still data to send for this record (race condition coverage)
+   - Marks the `EmailNotification` as sent
+ - Sends the email to the ESP
+
+
+##### Configuration
+
+We have a number of configuration options available to control our sending:
+
+| Environment Variable | Description | Examples |
+|---|---|
+| `OPEN_DISCUSSIONS_NOTIFICATION_ATTEMPT_RATE_LIMIT` | The per-worker rate limit at which to generate pending `EmailNotification` frontpage records | `100/s`, `2/h`, etc<br/>[See Celery Docs](https://docs.celeryproject.org/en/latest/reference/celery.app.task.html#celery.app.task.Task.rate_limit)|
+| `OPEN_DISCUSSIONS_NOTIFICATION_ATTEMPT_CHUNK_SIZE` | The size of each attempt batch |`100`, `150`, etc|
+| `OPEN_DISCUSSIONS_NOTIFICATION_SEND_CHUNK_SIZE` | The size of each sending batch |`100`, `150`, etc|
