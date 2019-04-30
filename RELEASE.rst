@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.75.0
+Version 0.75.0 (Released April 30, 2019)
 --------------
 
 - Send courses in chunks for master json parsing (#1987)
