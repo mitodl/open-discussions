@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.75.1
+--------------
+
+- Improved resilience and sending speed of frontpage notifications
+
 Version 0.75.0 (Released April 30, 2019)
 --------------
 
