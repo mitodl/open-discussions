@@ -35,8 +35,6 @@ class SearchView(ESView):
 
     def post(self, request, *args, **kwargs):
         """Execute a search. Despite being POST this should not modify any data."""
-        if not features.is_enabled(features.SEARCH_UI):
-            return Response(status=HTTP_405_METHOD_NOT_ALLOWED)
         response = execute_search(user=request.user, query=request.data)
         return Response(response)
 

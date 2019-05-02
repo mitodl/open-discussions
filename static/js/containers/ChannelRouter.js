@@ -106,28 +106,19 @@ class ChannelRouter extends React.Component<Props> {
               path={`${match.url}/members/`}
               render={() => this.renderChannelNavbar(true)}
             />
-            {SETTINGS.allow_search ? (
-              <Route
-                path={searchRoute(match.url)}
-                render={() => this.renderChannelNavbar(false)}
-              />
-            ) : null}
+            <Route
+              path={searchRoute(match.url)}
+              render={() => this.renderChannelNavbar(false)}
+            />
           </ChannelHeader>
         ) : null}
         <Route exact path={match.url} render={this.renderChannelIndexPage} />
         <Switch>
-          {SETTINGS.allow_search ? (
-            <Route
-              path={`${match.url}/search/`}
-              render={this.renderSearchPage}
-            />
-          ) : null}
-          {SETTINGS.allow_search ? (
-            <Route
-              path={`${match.url}/members/`}
-              render={this.renderMembersPage}
-            />
-          ) : null}
+          <Route path={`${match.url}/search/`} render={this.renderSearchPage} />
+          <Route
+            path={`${match.url}/members/`}
+            render={this.renderMembersPage}
+          />
           <Route path={`${match.url}/about/`} render={this.renderAboutPage} />
           <Route
             exact

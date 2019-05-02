@@ -56,16 +56,14 @@ export default class Toolbar extends React.Component<Props> {
               <HamburgerAndLogo onHamburgerClick={this.toggleShowDrawer} />
             </section>
             <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
-              {SETTINGS.allow_search ? (
-                <NavLink
-                  exact
-                  to={SITE_SEARCH_URL}
-                  activeClassName="active"
-                  className="search-link navy"
-                >
-                  <i className="material-icons">search</i>
-                </NavLink>
-              ) : null}
+              <NavLink
+                exact
+                to={SITE_SEARCH_URL}
+                activeClassName="active"
+                className="search-link navy"
+              >
+                <i className="material-icons">search</i>
+              </NavLink>
               <UserMenu
                 toggleShowUserMenu={toggleShowUserMenu}
                 showUserMenu={showUserMenu}

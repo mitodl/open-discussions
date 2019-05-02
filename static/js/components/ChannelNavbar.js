@@ -43,16 +43,14 @@ export default class ChannelNavbar extends React.Component<Props> {
                   About
                 </NavLink>
               ) : null}
-              {SETTINGS.allow_search ? (
-                <NavLink
-                  exact
-                  to={channelSearchURL(channel.name)}
-                  activeClassName="active"
-                  className="search-link"
-                >
-                  <i className="material-icons">search</i>
-                </NavLink>
-              ) : null}
+              <NavLink
+                exact
+                to={channelSearchURL(channel.name)}
+                activeClassName="active"
+                className="search-link"
+              >
+                <i className="material-icons">search</i>
+              </NavLink>
             </IntraPageNav>
           </Cell>
           <Cell className="extra-navbar-items" width={4}>

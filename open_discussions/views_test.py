@@ -75,7 +75,6 @@ def test_webpack_url(
         "is_authenticated": expect_auth,
         "allow_anonymous": "access",
         "allow_saml_auth": False,
-        "allow_search": False,
         "allow_related_posts_ui": False,
         "use_new_branding": False,
         "support_email": settings.EMAIL_SUPPORT,

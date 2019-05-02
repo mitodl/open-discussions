@@ -1,5 +1,4 @@
 // @flow
-/* global SETTINGS: false */
 import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
@@ -41,15 +40,9 @@ describe("ChannelNavbar", () => {
     )
   })
 
-  //
-  ;[true, false].forEach(allowSearch => {
-    it(`${
-      allowSearch ? "shows" : "doesn't show"
-    } the search button depending on if it's allowed`, () => {
-      SETTINGS.allow_search = allowSearch
-      const wrapper = render()
-      assert.equal(wrapper.find(".search-link").exists(), allowSearch)
-    })
+  it("shows the search button", () => {
+    const wrapper = render()
+    assert.ok(wrapper.find(".search-link").exists())
   })
 
   //

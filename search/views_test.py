@@ -67,9 +67,8 @@ FAKE_SEARCH_RESPONSE = {
 
 
 @pytest.fixture()
-def search_view(settings):
+def search_view():
     """Fixture with relevant properties for testing the search view"""
-    settings.FEATURES["SEARCH_UI"] = True
     return SimpleNamespace(url=reverse("search"))
 
 
@@ -110,13 +109,6 @@ def test_related_posts_es_exception(mocker, client, related_posts_view):
     related_documents_mock.assert_called_once_with(
         user=AnonymousUser(), post_id=related_posts_view.post_id
     )
-
-
-def test_search_feature_flag(settings, client, search_view):
-    """If the feature flag is off the url should not exist"""
-    settings.FEATURES["SEARCH_UI"] = False
-    resp = client.post(search_view.url, {})
-    assert resp.status_code == HTTP_405_METHOD_NOT_ALLOWED
 
 
 def test_search(mocker, client, search_view):
