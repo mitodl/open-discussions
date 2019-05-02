@@ -487,3 +487,49 @@ def should_skip_course(course_title):
     ):
         return True
     return False
+
+
+def tag_edx_course_program():
+    """
+    Mark courses that are part of professional education or MicroMasters programs
+    """
+    micromasters_courses = {
+        micro_course["edx_course_key"]: micro_course["program_title"]
+        for micro_course in get_micromasters_data()
+    }
+
+    with open("course_catalog/data/professional_programs.json", "r") as json_file:
+        prof_ed_json = json.load(json_file)
+    prof_ed_courses = {
+        prof_ed_course["edx_course_key"]: prof_ed_course["program_title"]
+        for prof_ed_course in prof_ed_json
+    }
+
+    with transaction.atomic():
+        courses = Course.objects.filter(platform=PlatformType.mitx.value)
+        # Clear program information to handle situations where a course is removed from a program
+        courses.update(program_type=None, program_name=None)
+        for course in courses:
+            # Check Professional Education
+            if "ProfessionalX" in course.course_id or "MITxPRO" in course.course_id:
+                course.program_type = "Professional"
+                prof_ed_program = prof_ed_courses.get(course.course_id)
+                if prof_ed_program:
+                    course.program_name = prof_ed_program
+                course.save()
+                continue
+
+            # Check MicroMasters
+            micromasters_program = micromasters_courses.get(course.course_id)
+            if micromasters_program:
+                course.program_type = "MicroMasters"
+                course.program_name = micromasters_program
+                course.save()
+                continue
+
+
+def get_micromasters_data():
+    """
+    Get json course data from micromasters
+    """
+    return requests.get(settings.MICROMASTERS_COURSE_URL).json()

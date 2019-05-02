@@ -20,6 +20,7 @@ from course_catalog.task_helpers import (
     get_s3_object_and_read,
     format_date,
     generate_course_prefix_list,
+    tag_edx_course_program,
 )
 
 
@@ -79,6 +80,8 @@ def sync_and_upload_edx_data(force_overwrite=False):
         ).Bucket(name=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
         # saves edx API response results in S3 as one file
         raw_data_bucket.put_object(Key="edx_courses.json", Body=json.dumps(edx_data))
+
+    tag_edx_course_program()
 
 
 @app.task

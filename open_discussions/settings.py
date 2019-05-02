@@ -788,6 +788,11 @@ OCW_BASE_URL = get_string("OCW_BASE_URL", "http://ocw.mit.edu/")
 MITX_BASE_URL = get_string("MITX_BASE_URL", "https://www.edx.org/course/")
 MITX_ALT_URL = get_string("MITX_ALT_URL", "https://courses.edx.org/courses/")
 
+# URL for MicroMasters course info
+MICROMASTERS_COURSE_URL = get_string(
+    "MICROMASTERS_COURSE_URL", "https://micromasters.mit.edu/api/v0/courseruns/"
+)
+
 # Widgets
 WIDGETS_RSS_CACHE_TTL = get_int("WIDGETS_RSS_CACHE_TTL", 15 * 60)
 
