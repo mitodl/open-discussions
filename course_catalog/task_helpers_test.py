@@ -20,10 +20,11 @@ from course_catalog.task_helpers import (
     get_course_url,
     get_course_availability,
     should_skip_course,
+    tag_edx_course_program,
 )
 
 pytestmark = pytest.mark.django_db
-# pylint:disable=redefined-outer-name
+# pylint:disable=redefined-outer-name,unused-argument
 
 
 @pytest.fixture
@@ -355,3 +356,48 @@ def test_should_skip_course():
     assert should_skip_course("Delete wrong institution")
     assert should_skip_course("[DELETE]Management in Engineering II]")
     assert should_skip_course("Introduction to Syntax") is False
+
+
+def test_tag_edx_course_program(get_micromasters_data):
+    """ Tests that edx courses are tagged with programs """
+    course_pro = CourseFactory.create(
+        platform=PlatformType.mitx.value,
+        course_id="course-v1:MITProfessionalX+SysEngx4+1T2017",
+    )
+    course_micro = CourseFactory.create(
+        platform=PlatformType.mitx.value, course_id="course-v1:MITx+ESD.SCM1x+3T2014"
+    )
+    course_blank_pro = CourseFactory.create(
+        platform=PlatformType.mitx.value,
+        course_id="course-v1:MITProfessionalX+Something+1T2017",
+    )
+    course_none = CourseFactory.create(
+        platform=PlatformType.mitx.value, course_id="MyTestCourse"
+    )
+    course_ocw = CourseFactory.create(
+        platform=PlatformType.ocw.value, course_id="abc123"
+    )
+    tag_edx_course_program()
+
+    course_pro.refresh_from_db()
+    assert course_pro.program_type == "Professional"
+    assert (
+        course_pro.program_name
+        == "Architecture and Systems Engineering: Models and Methods to Manage Complex Systems"
+    )
+
+    course_micro.refresh_from_db()
+    assert course_micro.program_type == "MicroMasters"
+    assert course_micro.program_name == "Supply Chain Management"
+
+    course_blank_pro.refresh_from_db()
+    assert course_blank_pro.program_type == "Professional"
+    assert course_blank_pro.program_name is None
+
+    course_none.refresh_from_db()
+    assert course_none.program_type is None
+    assert course_none.program_name is None
+
+    course_ocw.refresh_from_db()
+    assert course_ocw.program_type is None
+    assert course_ocw.program_name is None

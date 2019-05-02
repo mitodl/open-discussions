@@ -103,6 +103,10 @@
     "MAILGUN_SENDER_DOMAIN": {
       "description": "Domain used for emails sent via mailgun"
     },
+    "MICROMASTERS_COURSE_URL": {
+      "description": "URL for MicroMasters course info",
+      "required": false
+    },
     "MITX_ALT_URL": {
       "description": "Base alternate URL for MITx courses",
       "required": false

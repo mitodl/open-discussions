@@ -72,6 +72,8 @@ class Course(TimestampedModel):
     published = models.BooleanField(default=True)
     availability = models.CharField(max_length=128, null=True, blank=True)
     url = models.URLField(null=True, max_length=2048)
+    program_type = models.CharField(max_length=32, null=True, blank=True)
+    program_name = models.CharField(max_length=256, null=True, blank=True)
     instructors = models.ManyToManyField(
         CourseInstructor, blank=True, related_name="courses"
     )

@@ -22,7 +22,7 @@ from course_catalog.tasks import (
 )
 
 pytestmark = pytest.mark.django_db
-# pylint:disable=redefined-outer-name,unused-argument
+# pylint:disable=redefined-outer-name,unused-argument,too-many-arguments
 
 TEST_JSON_PATH = (
     "./test_json/PROD/9/9.15/Fall_2007/"
@@ -114,7 +114,11 @@ def setup_s3(settings):
 
 @mock_s3
 def test_get_mitx_data_valid(
-    settings, access_token, get_test_data, mock_course_index_functions
+    settings,
+    access_token,
+    get_test_data,
+    mock_course_index_functions,
+    get_micromasters_data,
 ):
     """
     Test that mitx sync task successfully creates database objects
@@ -129,7 +133,12 @@ def test_get_mitx_data_valid(
 
 @mock_s3
 def test_get_mitx_data_saves_json(
-    settings, mocker, access_token, get_test_data, mock_course_index_functions
+    settings,
+    mocker,
+    access_token,
+    get_test_data,
+    mock_course_index_functions,
+    get_micromasters_data,
 ):
     """
     Test that mitx sync task successfully saves edx data results file in S3
@@ -148,7 +157,9 @@ def test_get_mitx_data_saves_json(
 
 
 @mock_s3
-def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):
+def test_get_mitx_data_status_error(
+    settings, mocker, access_token, mitx_data, get_micromasters_data
+):
     """
     Test that mitx sync task properly stops when it gets an error status code
     """
@@ -172,7 +183,9 @@ def test_get_mitx_data_status_error(settings, mocker, access_token, mitx_data):
 
 
 @mock_s3
-def test_get_mitx_data_unexpected_error(settings, mocker, access_token, get_test_data):
+def test_get_mitx_data_unexpected_error(
+    settings, mocker, access_token, get_test_data, get_micromasters_data
+):
     """
     Test that mitx sync task properly stops when it gets an error status code
     """
@@ -185,7 +198,7 @@ def test_get_mitx_data_unexpected_error(settings, mocker, access_token, get_test
     assert Course.objects.count() == 0
 
 
-def test_get_mitx_data_no_settings():
+def test_get_mitx_data_no_settings(get_micromasters_data):
     """
     No data should be imported if MITx settings are missing
     """
