@@ -70,7 +70,7 @@ export const isAnonAccessiblePath = (pathname: string): boolean =>
   pathname === AUTH_REQUIRED_URL || pathname.startsWith(SETTINGS_URL)
 
 export const needsAuthedSite = (): boolean =>
-  !SETTINGS.allow_anonymous && !SETTINGS.authenticated_site.session_url
+  !SETTINGS.authenticated_site.session_url
 
 export const goToFirstLoginStep = (history: Object) => {
   history.push(LOGIN_URL)

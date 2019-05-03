@@ -14,7 +14,6 @@ from open_discussions.constants import (
     NOT_AUTHENTICATED_ERROR_TYPE,
     PERMISSION_DENIED_ERROR_TYPE,
 )
-from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
 
@@ -40,24 +39,14 @@ def test_list_channels_ordered(user_client, subscribed_channels, request):
         assert channel_list[i]["title"].lower() < channel_list[i + 1]["title"].lower()
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_list_channels_anonymous(client, settings, allow_anonymous):
+def test_list_channels_anonymous(client):
     """
     List anonymous channels
     """
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("channel-list")
     resp = client.get(url)
-    if allow_anonymous:
-        assert resp.status_code == status.HTTP_200_OK
-        # Until we decide otherwise this should always be an empty list.
-        assert resp.json() == []
-    else:
-        assert resp.status_code in (
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-        )
-        assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == []
 
 
 @pytest.mark.parametrize("managed", [True, False, None])
@@ -191,27 +180,18 @@ def test_get_channel(user_client, private_channel_and_contributor):
     assert resp.json() == default_channel_response_data(channel)
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_get_channel_anonymous(client, public_channel, settings, allow_anonymous):
+def test_get_channel_anonymous(client, public_channel):
     """
     An anonymous user should be able to see a public channel
     """
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("channel-detail", kwargs={"channel_name": public_channel.name})
     resp = client.get(url)
-    if allow_anonymous:
-        assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == {
-            **default_channel_response_data(public_channel),
-            "user_is_contributor": False,
-            "user_is_subscriber": False,
-        }
-    else:
-        assert resp.status_code in (
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-        )
-        assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        **default_channel_response_data(public_channel),
+        "user_is_contributor": False,
+        "user_is_subscriber": False,
+    }
 
 
 def test_get_short_channel(user_client):

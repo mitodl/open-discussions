@@ -6,7 +6,6 @@ from rest_framework import status
 
 from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
 from open_discussions.factories import UserFactory
-from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
 
@@ -66,17 +65,13 @@ def test_add_subscriber_forbidden(staff_client, private_channel, user):
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_add_subscriber_anonymous(
-    client, user, public_channel, settings, allow_anonymous
-):
+def test_add_subscriber_anonymous(client, user, public_channel):
     """
     Anonymous users can't add subscribers
     """
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("subscriber-list", kwargs={"channel_name": public_channel.name})
     resp = client.post(url, data={"subscriber_name": user.username}, format="json")
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
@@ -106,18 +101,14 @@ def test_detail_subscriber_missing(user_client, private_channel, user):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_detail_subscriber_anonymous(
-    client, user, public_channel, settings, allow_anonymous
-):
+def test_detail_subscriber_anonymous(client, user, public_channel):
     """Anonymous users can't see subscriber information"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse(
         "subscriber-detail",
         kwargs={"channel_name": public_channel.name, "subscriber_name": user.username},
     )
     resp = client.get(url)
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
@@ -136,16 +127,12 @@ def test_remove_subscriber(staff_client, staff_api, user, public_channel, attemp
         assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_remove_subscriber_anonymous(
-    client, user, public_channel, settings, allow_anonymous
-):
+def test_remove_subscriber_anonymous(client, user, public_channel):
     """Anonymous users can't remove subscribers"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse(
         "subscriber-detail",
         kwargs={"channel_name": public_channel.name, "subscriber_name": user.username},
     )
     resp = client.delete(url)
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE

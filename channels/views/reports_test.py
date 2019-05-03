@@ -10,7 +10,6 @@ from open_discussions.constants import (
     PERMISSION_DENIED_ERROR_TYPE,
 )
 from open_discussions.factories import UserFactory
-from open_discussions.features import ANONYMOUS_ACCESS
 from profiles.utils import image_uri
 
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
@@ -39,12 +38,8 @@ def test_report_comment(user_client, private_channel_and_contributor, reddit_fac
     assert resp.json() == payload
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_report_anonymous(
-    client, public_channel, reddit_factories, settings, allow_anonymous
-):
+def test_report_anonymous(client, public_channel, reddit_factories):
     """Anonymous users can't report posts or comments"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     user = UserFactory.create()
     post = reddit_factories.text_post("post", user, channel=public_channel)
     comment = reddit_factories.comment("comment", user, post_id=post.id)
@@ -52,12 +47,12 @@ def test_report_anonymous(
 
     # Post
     resp = client.post(url, data={"post_id": post.id, "reason": "spam"})
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
     # Comment
     resp = client.post(url, data={"comment_id": comment.id, "reason": "spam"})
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 

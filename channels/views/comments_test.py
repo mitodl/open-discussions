@@ -18,7 +18,6 @@ from open_discussions.constants import (
     PERMISSION_DENIED_ERROR_TYPE,
 )
 from open_discussions.factories import UserFactory
-from open_discussions.features import ANONYMOUS_ACCESS
 from open_discussions.test_utils import any_instance_of
 from profiles.utils import image_uri, DEFAULT_PROFILE_IMAGE
 
@@ -102,12 +101,8 @@ def test_list_comments(
         } in json
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_list_comments_anonymous(
-    client, public_channel, reddit_factories, settings, allow_anonymous
-):
+def test_list_comments_anonymous(client, public_channel, reddit_factories):
     """List comments as an anonymous user"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     user = UserFactory.create(username="01CBD756K3RS4Z59TCJ46QCHZJ")
     post = reddit_factories.text_post(
         "a post with comments", user, channel=public_channel
@@ -116,36 +111,29 @@ def test_list_comments_anonymous(
 
     url = reverse("comment-list", kwargs={"post_id": post.id})
     resp = client.get(url)
-    if allow_anonymous:
-        assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == [
-            {
-                "id": comment.id,
-                "parent_id": None,
-                "post_id": post.id,
-                "text": comment.text,
-                "author_id": user.username,
-                "score": 1,
-                "upvoted": False,
-                "downvoted": False,
-                "removed": False,
-                "deleted": False,
-                "subscribed": False,
-                "created": comment.created,
-                "profile_image": image_uri(user.profile),
-                "author_name": user.profile.name,
-                "author_headline": user.profile.headline,
-                "edited": False,
-                "comment_type": "comment",
-                "num_reports": None,
-            }
-        ]
-    else:
-        assert resp.status_code in (
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-        )
-        assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [
+        {
+            "id": comment.id,
+            "parent_id": None,
+            "post_id": post.id,
+            "text": comment.text,
+            "author_id": user.username,
+            "score": 1,
+            "upvoted": False,
+            "downvoted": False,
+            "removed": False,
+            "deleted": False,
+            "subscribed": False,
+            "created": comment.created,
+            "profile_image": image_uri(user.profile),
+            "author_name": user.profile.name,
+            "author_headline": user.profile.headline,
+            "edited": False,
+            "comment_type": "comment",
+            "num_reports": None,
+        }
+    ]
 
 
 def test_list_comments_none(
@@ -350,12 +338,8 @@ def test_more_comments_children(client, logged_in_profile):
     ]
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_more_comments_anonymous(
-    client, public_channel, reddit_factories, settings, allow_anonymous
-):
+def test_more_comments_anonymous(client, public_channel, reddit_factories):
     """List more comments as an anonymous user"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     user = UserFactory.create(username="01CBDB4ZD2QXBM0ERGB3C5GEA5")
     post = reddit_factories.text_post(
         "a post with comments", user, channel=public_channel
@@ -371,36 +355,29 @@ def test_more_comments_anonymous(
         base=reverse("morecomments-detail"), post_id=post.id, comment_id=last_comment.id
     )
     resp = client.get(url)
-    if allow_anonymous:
-        assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == [
-            {
-                "author_id": user.username,
-                "author_name": user.profile.name,
-                "author_headline": user.profile.headline,
-                "comment_type": "comment",
-                "created": last_comment.created,
-                "deleted": False,
-                "downvoted": False,
-                "edited": False,
-                "id": last_comment.id,
-                "num_reports": None,
-                "parent_id": None,
-                "post_id": post.id,
-                "profile_image": image_uri(user.profile),
-                "removed": False,
-                "score": 1,
-                "subscribed": False,
-                "text": last_comment.text,
-                "upvoted": False,
-            }
-        ]
-    else:
-        assert resp.status_code in (
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-        )
-        assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [
+        {
+            "author_id": user.username,
+            "author_name": user.profile.name,
+            "author_headline": user.profile.headline,
+            "comment_type": "comment",
+            "created": last_comment.created,
+            "deleted": False,
+            "downvoted": False,
+            "edited": False,
+            "id": last_comment.id,
+            "num_reports": None,
+            "parent_id": None,
+            "post_id": post.id,
+            "profile_image": image_uri(user.profile),
+            "removed": False,
+            "score": 1,
+            "subscribed": False,
+            "text": last_comment.text,
+            "upvoted": False,
+        }
+    ]
 
 
 @pytest.mark.parametrize(
@@ -536,12 +513,8 @@ def test_get_comment_404(
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_get_comment_anonymous(
-    client, public_channel, reddit_factories, settings, allow_anonymous
-):
+def test_get_comment_anonymous(client, public_channel, reddit_factories):
     """Get a comment as an anonymous user"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     user = UserFactory.create(username="01CBDBP5F8XRQ1T5GATHDWA99Z")
     post = reddit_factories.text_post(
         "a post with a comment", user, channel=public_channel
@@ -550,15 +523,8 @@ def test_get_comment_anonymous(
 
     url = reverse("comment-detail", kwargs={"comment_id": comment.id})
     resp = client.get(url)
-    if allow_anonymous:
-        assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == [default_comment_response_data(post, comment, user)]
-    else:
-        assert resp.status_code in (
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-        )
-        assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [default_comment_response_data(post, comment, user)]
 
 
 @pytest.mark.parametrize(
@@ -632,13 +598,11 @@ def test_create_comment_forbidden(user_client):
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_create_comment_anonymous(client, settings, allow_anonymous):
+def test_create_comment_anonymous(client):
     """Anonymous users can't create comments"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("comment-list", kwargs={"post_id": "doesntmatter"})
     resp = client.post(url, data={"text": "reply_to_post 2"})
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
@@ -725,13 +689,11 @@ def test_update_comment_forbidden(user_client):
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_update_comment_anonymous(client, settings, allow_anonymous):
+def test_update_comment_anonymous(client):
     """Anonymous users can't update comments"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("comment-detail", kwargs={"comment_id": "doesntmatter"})
     resp = client.patch(url, type="json", data={"text": "missing"})
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
@@ -853,13 +815,11 @@ def test_delete_comment(user_client):
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_delete_comment_anonymous(client, settings, allow_anonymous):
+def test_delete_comment_anonymous(client):
     """Anonymous users can't delete comments"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("comment-detail", kwargs={"comment_id": "doesntmatter"})
     resp = client.delete(url)
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 

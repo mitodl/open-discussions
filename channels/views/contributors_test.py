@@ -5,7 +5,6 @@ from django.urls import reverse
 from rest_framework import status
 
 from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
-from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
 
@@ -39,10 +38,8 @@ def test_list_contributors(
     ]
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_list_contributors_anonymous(client, settings, allow_anonymous):
+def test_list_contributors_anonymous(client):
     """Anonymous users can't list contributors in a channel"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     # Well, maybe we could allow it but there's no point since this list is only meaningful for private channels.
     url = reverse("contributor-list", kwargs={"channel_name": "some_channel"})
     resp = client.get(url)
@@ -88,15 +85,13 @@ def test_add_contributor_email(client, public_channel, staff_api, reddit_factori
     }
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_add_contributor_anonymous(client, settings, allow_anonymous):
+def test_add_contributor_anonymous(client):
     """
     Anonymous users can't add contributors to a channel
     """
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("contributor-list", kwargs={"channel_name": "admin_channel"})
     resp = client.post(url, data={"contributor_name": "some_username"}, format="json")
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
@@ -118,14 +113,12 @@ def test_remove_contributor(
         assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_remove_contributor_anonymous(client, settings, allow_anonymous):
+def test_remove_contributor_anonymous(client):
     """Anonymous users can't remove contributors"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse(
         "contributor-detail",
         kwargs={"channel_name": "a_channel", "contributor_name": "a_contributor"},
     )
     resp = client.delete(url)
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE

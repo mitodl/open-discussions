@@ -109,24 +109,20 @@ describe("auth lib", () => {
   })
 
   describe("needsAuthedSite", () => {
-    [
-      [undefined, false, true],
-      ["", false, true],
-      ["some_url", false, false],
-      [undefined, true, false]
-    ].forEach(([sessionUrl, allowAnon, exp]) => {
-      it(`returns ${String(exp)} when session url=${String(
-        sessionUrl
-      )}, anon allowed=${String(allowAnon)}`, () => {
-        if (sessionUrl === undefined) {
-          delete SETTINGS.authenticated_site.session_url
-        } else {
-          SETTINGS.authenticated_site.session_url = sessionUrl
-        }
-        SETTINGS.allow_anonymous = allowAnon
-        assert.equal(needsAuthedSite(), exp)
-      })
-    })
+    [[undefined, true], ["", true], ["some_url", false]].forEach(
+      ([sessionUrl, exp]) => {
+        it(`returns ${String(exp)} when session url=${String(
+          sessionUrl
+        )}`, () => {
+          if (sessionUrl === undefined) {
+            delete SETTINGS.authenticated_site.session_url
+          } else {
+            SETTINGS.authenticated_site.session_url = sessionUrl
+          }
+          assert.equal(needsAuthedSite(), exp)
+        })
+      }
+    )
   })
 
   it(`goToFirstLoginStep goes to the first login step`, () => {

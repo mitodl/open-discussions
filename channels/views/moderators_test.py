@@ -5,7 +5,6 @@ from django.urls import reverse
 from rest_framework import status
 
 from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
-from open_discussions.features import ANONYMOUS_ACCESS
 
 pytestmark = [pytest.mark.betamax, pytest.mark.usefixtures("mock_channel_exists")]
 
@@ -124,23 +123,12 @@ def test_list_moderators_many_moderator(
     ]
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_list_moderators_anonymous(
-    client, public_channel, staff_user, settings, allow_anonymous
-):
+def test_list_moderators_anonymous(client, public_channel, staff_user):
     """Anonymous users should see the moderator list"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("moderator-list", kwargs={"channel_name": public_channel.name})
     resp = client.get(url)
-    if allow_anonymous:
-        assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == [{"moderator_name": staff_user.username}]
-    else:
-        assert resp.status_code in (
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-        )
-        assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == [{"moderator_name": staff_user.username}]
 
 
 def test_add_moderator(staff_client, public_channel, reddit_factories):
@@ -198,13 +186,11 @@ def test_add_moderator_again(staff_client, public_channel, staff_api, reddit_fac
     }
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_add_moderator_anonymous(client, settings, allow_anonymous):
+def test_add_moderator_anonymous(client):
     """Anonymous users can't add moderators"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("moderator-list", kwargs={"channel_name": "a_channel"})
     resp = client.post(url, data={"moderator_name": "some_moderator"}, format="json")
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
@@ -230,14 +216,12 @@ def test_remove_moderator(
         )
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_remove_moderator_anonymous(client, settings, allow_anonymous):
+def test_remove_moderator_anonymous(client):
     """Anonymous users can't add moderators"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse(
         "moderator-detail",
         kwargs={"channel_name": "a_channel", "moderator_name": "doesnt_matter"},
     )
     resp = client.delete(url, data={"moderator_name": "some_moderator"}, format="json")
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE

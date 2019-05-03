@@ -28,7 +28,6 @@ from open_discussions.constants import (
     DJANGO_PERMISSION_ERROR_TYPES,
 )
 from open_discussions.factories import UserFactory
-from open_discussions.features import ANONYMOUS_ACCESS
 from open_discussions.test_utils import any_instance_of
 
 pytestmark = pytest.mark.betamax
@@ -295,17 +294,15 @@ def test_create_post_not_found(client, logged_in_profile):
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_create_post_anonymous(client, settings, allow_anonymous):
+def test_create_post_anonymous(client):
     """
     Anonymous users can't create posts
     """
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("post-list", kwargs={"channel_name": "doesnt_matter"})
     resp = client.post(
         url, {"title": "parameterized testing", "text": "tests are great"}
     )
-    assert resp.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN)
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
     assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
 
 
@@ -403,29 +400,18 @@ def test_get_post_stickied(
     }
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_get_post_anonymous(
-    client, public_channel, reddit_factories, settings, allow_anonymous
-):
+def test_get_post_anonymous(client, public_channel, reddit_factories):
     """Anonymous users can see posts for a public channel, if the feature flag is set"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     user = UserFactory.create(username="01CBFJMB9PD3JP17KAX3E5JQ46")
     post = reddit_factories.link_post("link_post", user=user, channel=public_channel)
 
     url = reverse("post-detail", kwargs={"post_id": post.id})
     resp = client.get(url)
-    if allow_anonymous:
-        assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == {
-            **default_post_response_data(public_channel, post, user),
-            "upvoted": False,
-        }
-    else:
-        assert resp.status_code in (
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-        )
-        assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        **default_post_response_data(public_channel, post, user),
+        "upvoted": False,
+    }
 
 
 @pytest.mark.parametrize("missing_user", [True, False])
@@ -662,12 +648,8 @@ def test_list_posts_pagination_non_offset_page(
     assert resp.json()["pagination"] == expected
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_list_posts_anonymous(
-    mocker, client, public_channel, reddit_factories, settings, allow_anonymous
-):
+def test_list_posts_anonymous(mocker, client, public_channel, reddit_factories):
     """Anonymous users can see posts for a public channel, if the feature flag is set"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     user = UserFactory.create(username="01CBFJMB9PD3JP17KAX3E5JQ46")
     post = reddit_factories.link_post("link_post", user=user, channel=public_channel)
 
@@ -676,23 +658,13 @@ def test_list_posts_anonymous(
         mocker
     ):
         resp = client.get(url)
-    if allow_anonymous:
-        assert resp.status_code == status.HTTP_200_OK
-        assert resp.json() == {
-            "pagination": {"sort": "hot"},
-            "posts": [
-                {
-                    **default_post_response_data(public_channel, post, user),
-                    "upvoted": False,
-                }
-            ],
-        }
-    else:
-        assert resp.status_code in (
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-        )
-        assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == {
+        "pagination": {"sort": "hot"},
+        "posts": [
+            {**default_post_response_data(public_channel, post, user), "upvoted": False}
+        ],
+    }
 
 
 def test_create_post_without_upvote(user_client, private_channel_and_contributor):
@@ -935,10 +907,8 @@ class PostDetailTests:
         assert resp.json() == {**scenario.default_response, "subscribed": False}
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_post_anonymous(client, settings, allow_anonymous):
+def test_post_anonymous(client):
     """Anonymous users can't update or delete posts"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     url = reverse("post-detail", kwargs={"post_id": "doesntmatter"})
     update_resp = client.patch(url, format="json", data={"text": "overwrite"})
     delete_resp = client.delete(url)

@@ -4,7 +4,6 @@ from prawcore.exceptions import Forbidden as PrawForbidden, Redirect as PrawRedi
 from rest_framework import permissions
 
 from channels.models import Channel
-from open_discussions import features
 
 
 def channel_exists(view):
@@ -202,13 +201,9 @@ class AnonymousAccessReadonlyPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Is the user authenticated or allowed anonymous access?"""
-        if not request.user.is_anonymous:
-            return True
-
-        if not is_readonly(request):
+        if request.user.is_anonymous and not is_readonly(request):
             return False
-
-        return features.is_enabled(features.ANONYMOUS_ACCESS)
+        return True
 
 
 class ReadOnly(permissions.BasePermission):

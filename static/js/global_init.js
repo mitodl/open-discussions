@@ -17,7 +17,6 @@ const _createSettings = () => ({
     session_url: "http://fake.session.url",
     tos_url:     "http://fake.tos.url/"
   },
-  allow_anonymous:        false,
   allow_saml_auth:        false,
   allow_related_posts_ui: false,
   is_authenticated:       true,

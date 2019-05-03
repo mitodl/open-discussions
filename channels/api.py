@@ -78,7 +78,6 @@ from channels.utils import (
     num_items_not_none,
 )
 
-from open_discussions import features
 from open_discussions.utils import now_in_utc
 from search import task_helpers as search_task_helpers
 from search.task_helpers import reddit_object_persist
@@ -576,10 +575,6 @@ class Api:
         """Constructor"""
         if user is None:
             user = AnonymousUser()
-
-        if user.is_anonymous and not features.is_enabled(features.ANONYMOUS_ACCESS):
-            # This feature flag is also checked in the permissions layer, but just in case
-            raise Exception("Anonymous access is not allowed")
 
         self.user = user
         try:

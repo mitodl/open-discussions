@@ -1,13 +1,10 @@
 """tests for the embedly views"""
 from urllib.parse import unquote
-import pytest
 
 from django.urls import reverse
 from rest_framework import status
 
 from channels.models import LinkMeta
-from open_discussions.constants import NOT_AUTHENTICATED_ERROR_TYPE
-from open_discussions.features import ANONYMOUS_ACCESS
 
 
 def test_get_embedly(client, user, mocker, settings):
@@ -61,10 +58,8 @@ def test_get_embedly_no_key(client, user, settings):
     assert resp.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
 
 
-@pytest.mark.parametrize("allow_anonymous", [True, False])
-def test_get_embedly_anon(client, mocker, settings, allow_anonymous):
+def test_get_embedly_anon(client, mocker, settings):
     """test that an anonymous user can get embedly"""
-    settings.FEATURES[ANONYMOUS_ACCESS] = allow_anonymous
     settings.EMBEDLY_KEY = "a great key"
     embedly_url = reverse(
         "embedly-detail",
@@ -79,13 +74,6 @@ def test_get_embedly_anon(client, mocker, settings, allow_anonymous):
     )
     resp = client.get(embedly_url)
 
-    if allow_anonymous:
-        assert resp.json() == {"some": "json"}
-        assert resp.status_code == status.HTTP_200_OK
-        get_stub.assert_called_once_with("https://en.wikipedia.org/wiki/Giant_panda/")
-    else:
-        assert resp.status_code in (
-            status.HTTP_401_UNAUTHORIZED,
-            status.HTTP_403_FORBIDDEN,
-        )
-        assert resp.data["error_type"] == NOT_AUTHENTICATED_ERROR_TYPE
+    assert resp.json() == {"some": "json"}
+    assert resp.status_code == status.HTTP_200_OK
+    get_stub.assert_called_once_with("https://en.wikipedia.org/wiki/Giant_panda/")

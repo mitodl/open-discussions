@@ -29,7 +29,6 @@ def test_webpack_url(
     settings.EMBEDLY_KEY = "fake"
     settings.ALGOLIA_APP_ID = "fake"
     settings.ALGOLIA_API_KEY = "fake"
-    settings.FEATURES[features.ANONYMOUS_ACCESS] = "access"
     settings.FEATURES[features.SAML_AUTH] = False
     settings.FEATURES[features.USE_NEW_BRANDING] = False
     settings.FEATURES[features.ARTICLE_UI] = False
@@ -73,7 +72,6 @@ def test_webpack_url(
             "tos_url": authenticated_site.tos_url,
         },
         "is_authenticated": expect_auth,
-        "allow_anonymous": "access",
         "allow_saml_auth": False,
         "allow_related_posts_ui": False,
         "use_new_branding": False,
