@@ -3,7 +3,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 
 import ChannelAvatar from "../containers/ChannelAvatar"
-import NavigationItem from "./NavigationItem"
+import NavigationItem, { NavigationExpansion } from "./NavigationItem"
 
 import { channelURL } from "../lib/url"
 
@@ -16,6 +16,12 @@ type Props = {
 
 const channelClassName = (channelName, currentChannel) =>
   currentChannel === channelName ? "location current-location" : "location"
+
+const NavigationHeading = ({ children }) => (
+  <NavigationExpansion.Consumer>
+    {expanded => <div className="heading">{expanded ? children : null}</div>}
+  </NavigationExpansion.Consumer>
+)
 
 export default class SubscriptionsList extends React.Component<Props> {
   makeChannelLink = (channel: Channel) => {
@@ -50,19 +56,13 @@ export default class SubscriptionsList extends React.Component<Props> {
       <div className="location-list subscribed-channels">
         {myChannels.length > 0 ? (
           <div className="my-channels">
-            <NavigationItem
-              whenExpanded={() => (
-                <div className="heading">Channels you moderate</div>
-              )}
-            />
+            <NavigationHeading>Channels you moderate</NavigationHeading>
             {myChannels.map(this.makeChannelLink)}
           </div>
         ) : null}
         {otherChannels.length > 0 ? (
           <div className="channels">
-            <NavigationItem
-              whenExpanded={() => <div className="heading">Channels</div>}
-            />
+            <NavigationHeading>Channels</NavigationHeading>
             {otherChannels.map(this.makeChannelLink)}
           </div>
         ) : null}

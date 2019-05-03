@@ -2,6 +2,8 @@ $red-link-color: #9a2a33;
 $link-padding: 11px 20px 11px $icon-padding-left;
 $footer-height: 152px;
 
+$drawer-trans: width 500ms;
+
 .mdc-list {
   font-family: inherit;
 }
@@ -26,12 +28,14 @@ $footer-height: 152px;
   height: calc(100vh - #{$toolbar-height-desktop});
   top: $toolbar-height-desktop;
   width: $collapse-drawer-width;
+  transition: $drawer-trans;
+  overflow: hidden;
 
   .mdc-drawer__drawer {
     position: absolute;
     top: 0px;
     left: 0px;
-    width: $collapse-drawer-width;
+    width: $drawer-width;
 
     .scrollbar-container {
       display: none;
@@ -113,6 +117,7 @@ $footer-height: 152px;
       color: #8a8b8c;
       padding: 11px 0;
       font-size: 18px;
+      min-height: 25px;
     }
   }
 
@@ -131,6 +136,10 @@ $footer-height: 152px;
       flex-grow: 1;
     }
 
+    .avatar-image {
+      height: 25px;
+    }
+
     .settings-link {
       padding: 11px 20px;
       color: $red-link-color;
@@ -143,6 +152,7 @@ $footer-height: 152px;
 
     .home-link {
       display: flex;
+      min-height: 25px;
       align-items: center;
       padding: $link-padding;
       color: $navigation-text;
