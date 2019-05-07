@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.75.2
+Version 0.75.2 (Released May 07, 2019)
 --------------
 
 - add professional programs data (#1980)
