@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.76.0
+--------------
+
+- Fix RSS widgets for invalid urls and add admin ui for them
+- Use MM and PE data to tag edx courses with program_name and program_type
+
 Version 0.75.2 (Released May 07, 2019)
 --------------
 
