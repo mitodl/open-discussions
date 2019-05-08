@@ -18,7 +18,6 @@ import { BannerPageWrapper } from "../components/PageBanner"
 
 import { actions } from "../actions"
 import { getChannelName } from "../lib/util"
-import { searchRoute } from "../lib/routing"
 
 import type { Channel } from "../flow/discussionTypes"
 import type { Match } from "react-router"
@@ -73,15 +72,6 @@ class ChannelRouter extends React.Component<Props> {
     return <ChannelAboutPage channel={channel} />
   }
 
-  renderChannelNavbar = (withWidgetHeader: boolean) => {
-    const { channel } = this.props
-    return (
-      <ChannelNavbar channel={channel}>
-        {withWidgetHeader ? <ManageWidgetHeader channel={channel} /> : null}
-      </ChannelNavbar>
-    )
-  }
-
   render() {
     const { channel, match, history } = this.props
 
@@ -93,23 +83,9 @@ class ChannelRouter extends React.Component<Props> {
             history={history}
             isModerator={channel.user_is_moderator}
           >
-            <Route
-              exact
-              path={match.url}
-              render={() => this.renderChannelNavbar(true)}
-            />
-            <Route
-              path={`${match.url}/about/`}
-              render={() => this.renderChannelNavbar(true)}
-            />
-            <Route
-              path={`${match.url}/members/`}
-              render={() => this.renderChannelNavbar(true)}
-            />
-            <Route
-              path={searchRoute(match.url)}
-              render={() => this.renderChannelNavbar(false)}
-            />
+            <ChannelNavbar channel={channel}>
+              <ManageWidgetHeader channel={channel} />
+            </ChannelNavbar>
           </ChannelHeader>
         ) : null}
         <Route exact path={match.url} render={this.renderChannelIndexPage} />
