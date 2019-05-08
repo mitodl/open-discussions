@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.76.0
+Version 0.76.0 (Released May 08, 2019)
 --------------
 
 - Fix RSS widgets for invalid urls and add admin ui for them
