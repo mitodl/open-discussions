@@ -91,6 +91,16 @@ $person-z-index: 10;
     color: black;
   }
 
+  .markdown {
+    a {
+      color: $link-blue;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
   hr {
     margin: 4px 0;
     border: 0;
