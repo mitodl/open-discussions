@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.76.1
+--------------
+
+- add channel nav bar to the post detail page
+- CSS tweak for links in the markdown widget
+- add an animation for the drawer expand / contract on desktop
+- remove the SEARCH_UI feature flag
+
 Version 0.76.0 (Released May 08, 2019)
 --------------
 
