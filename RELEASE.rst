@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.76.1
+Version 0.76.1 (Released May 10, 2019)
 --------------
 
 - add channel nav bar to the post detail page
