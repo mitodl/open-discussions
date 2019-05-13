@@ -19,6 +19,7 @@ from course_catalog.tasks import (
     sync_and_upload_edx_data,
     get_ocw_data,
     upload_ocw_master_json,
+    get_bootcamp_data,
 )
 
 pytestmark = pytest.mark.django_db
@@ -75,6 +76,20 @@ def mock_logger(mocker):
     Mock log exception
     """
     return mocker.patch("course_catalog.tasks.log.exception")
+
+
+@pytest.fixture
+def mock_get_bootcamps(mocker):
+    """
+    Mock the call to get bootcamps json
+    """
+    with open("test_json/bootcamps.json", "r") as bootcamp_file:
+        bootcamp_json = json.load(bootcamp_file)
+
+    mocker.patch(
+        "requests.get",
+        return_value=Mock(status_code=200, json=Mock(return_value=bootcamp_json)),
+    )
 
 
 def setup_s3(settings):
@@ -320,3 +335,27 @@ def test_upload_ocw_master_json(settings, mocker):
         f"9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/{course.course_id}_master.json",
     )
     assert json.loads(obj.get()["Body"].read())
+
+
+def test_process_bootcamps(mock_get_bootcamps):
+    """
+    Test that bootcamp json data is properly parsed
+    """
+    get_bootcamp_data()
+    assert Course.objects.count() == 3
+
+    course = Course.objects.get(course_id="Bootcamp1")
+    assert course.platform == PlatformType.bootcamps.value
+    assert course.title == "MIT HMS Healthcare Innovation Bootcamp"
+
+    course = Course.objects.get(course_id="Bootcamp2")
+    assert course.platform == PlatformType.bootcamps.value
+    assert course.title == "MIT Deep Technology Bootcamp"
+
+    course = Course.objects.get(course_id="Bootcamp3")
+    assert course.platform == PlatformType.bootcamps.value
+    assert course.title == "MIT Sports Entrepreneurship Bootcamp"
+    assert course.location == "Hoffenheim, Germany"
+
+    get_bootcamp_data()
+    assert Course.objects.count() == 3

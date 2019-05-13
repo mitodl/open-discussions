@@ -11,6 +11,7 @@ class PlatformType(Enum):
 
     ocw = "ocw"
     mitx = "mitx"
+    bootcamps = "bootcamps"
 
 
 class ResourceType(Enum):

@@ -43,6 +43,10 @@
       "description": "S3 Bucket name.",
       "required": false
     },
+    "BOOTCAMPS_URL": {
+      "description": "URL to retrieve bootcamps data",
+      "required": false
+    },
     "CLOUDFRONT_DIST": {
       "description": "Cloudfront distribution",
       "required": false
