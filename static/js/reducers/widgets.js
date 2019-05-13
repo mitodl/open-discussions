@@ -1,7 +1,7 @@
 // @flow
 import { GET, PATCH, INITIAL_STATE } from "redux-hammock/constants"
 
-import * as api from "../lib/api/api"
+import * as widgetAPI from "../lib/api/widgets"
 
 import type { WidgetListResponse } from "../flow/widgetTypes"
 
@@ -16,7 +16,7 @@ export const widgetsEndpoint = {
     }
   },
   getFunc: (widgetListId: number): Promise<WidgetListResponse> =>
-    api.getWidgetList(widgetListId),
+    widgetAPI.getWidgetList(widgetListId),
   patchFunc: (widgetListId: number, payload: Object) =>
-    api.patchWidgetList(widgetListId, payload)
+    widgetAPI.patchWidgetList(widgetListId, payload)
 }

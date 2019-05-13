@@ -22,7 +22,6 @@ import type {
   PostListPaginationParams
 } from "../../flow/discussionTypes"
 import type { NotificationSetting } from "../../flow/settingsTypes"
-import type { WidgetListResponse } from "../../flow/widgetTypes"
 import type { SearchParams } from "../../flow/searchTypes"
 
 export function search(params: SearchParams): Promise<*> {
@@ -277,17 +276,3 @@ export const postSetPassword = (
 export function getSocialAuthTypes(): Promise<Array<SocialAuth>> {
   return fetchJSONWithAuthFailure("/api/v0/auths/")
 }
-
-export const getWidgetList = (
-  widgetListId: number
-): Promise<WidgetListResponse> =>
-  fetchJSONWithAuthFailure(`/api/v0/widget_lists/${widgetListId}/`)
-
-export const patchWidgetList = (
-  widgetListId: number,
-  payload: Object
-): Promise<WidgetListResponse> =>
-  fetchJSONWithAuthFailure(`/api/v0/widget_lists/${widgetListId}/`, {
-    method: PATCH,
-    body:   JSON.stringify(payload)
-  })

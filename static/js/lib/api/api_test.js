@@ -22,16 +22,13 @@ import {
   postPasswordResetNewPassword,
   postSetPassword,
   search,
-  getRelatedPosts,
-  getWidgetList,
-  patchWidgetList
+  getRelatedPosts
 } from "./api"
 import { makePost, makeChannelPostList } from "../../factories/posts"
 import { makeCommentsResponse } from "../../factories/comments"
 import * as authFuncs from "./fetch_auth"
 import * as searchFuncs from "../search"
 import { makeProfile } from "../../factories/profiles"
-import { makeWidgetListResponse } from "../../factories/widgets"
 
 describe("api", function() {
   this.timeout(5000) // eslint-disable-line no-invalid-this
@@ -313,37 +310,6 @@ describe("api", function() {
         sinon.assert.calledWith(fetchJSONStub, `/api/v0/related/${postId}/`, {
           method: POST
         })
-      })
-    })
-
-    describe("widget functions", () => {
-      it("fetches a widget list", async () => {
-        const widgetList = makeWidgetListResponse()
-        fetchJSONStub.returns(Promise.resolve(widgetList))
-        const widgetListId = widgetList.id
-        const response = await getWidgetList(widgetListId)
-        assert.deepEqual(response, widgetList)
-        sinon.assert.calledWith(
-          fetchJSONStub,
-          `/api/v0/widget_lists/${widgetListId}/`
-        )
-      })
-
-      it("patches a widget list", async () => {
-        const widgetList = makeWidgetListResponse()
-        fetchJSONStub.returns(Promise.resolve(widgetList))
-        const widgetListId = widgetList.id
-        const args = { some: "args" }
-        const response = await patchWidgetList(widgetListId, args)
-        assert.deepEqual(response, widgetList)
-        sinon.assert.calledWith(
-          fetchJSONStub,
-          `/api/v0/widget_lists/${widgetListId}/`,
-          {
-            method: "PATCH",
-            body:   JSON.stringify(args)
-          }
-        )
       })
     })
   })
