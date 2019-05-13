@@ -564,6 +564,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_ocw_data",
         "schedule": crontab(minute=0, hour=5),  # 1am EST
     },
+    "update_bootcamp-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_bootcamp_data",
+        "schedule": crontab(minute=0, hour=6),  # 2am EST
+    },
 }
 
 CELERY_TASK_SERIALIZER = "json"
@@ -788,6 +792,12 @@ OCW_ITERATOR_CHUNK_SIZE = get_int("OCW_ITERATOR_CHUNK_SIZE", 100)
 OCW_BASE_URL = get_string("OCW_BASE_URL", "http://ocw.mit.edu/")
 MITX_BASE_URL = get_string("MITX_BASE_URL", "https://www.edx.org/course/")
 MITX_ALT_URL = get_string("MITX_ALT_URL", "https://courses.edx.org/courses/")
+
+# Base URL for bootcamps data
+BOOTCAMPS_URL = get_string(
+    "BOOTCAMPS_URL",
+    "https://raw.githubusercontent.com/mitodl/bootcamps.json/master/bootcamps.json",
+)
 
 # URL for MicroMasters course info
 MICROMASTERS_COURSE_URL = get_string(

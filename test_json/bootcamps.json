@@ -1,0 +1,111 @@
+[
+  {
+    "course_id": "Bootcamp1",
+    "title": "MIT HMS Healthcare Innovation Bootcamp",
+    "short_description":
+      "The MIT-Harvard Medical School Healthcare Innovation Bootcamp",
+    "level": null,
+    "semester": null,
+    "language": null,
+    "platform": "Bootcamps",
+    "year": 2019,
+    "full_description":
+      "<p>The MIT-HMS Healthcare Innovation Bootcamp is a new accelerated-learning program by Harvard Medical School’s Center for Primary Care and the MIT Bootcamps.</p><p>You will attend lectures on healthcare, innovation, and entrepreneurship from faculty at both universities, and work on project teams to start a new healthcare venture in one week.</p><p>You will come out the other end armed with a comprehensive toolkit for healthcare innovation.</p><p>What’s more, you will join a global community of innovators passionate about solving healthcare related problems and other innovation challenges. In one week, the Bootcamp will provide you with experiences healthcare entrepreneurs face in the first 1-2 years of a new venture.</p>",
+    "start_date": "2019-06-15T00:00:01Z",
+    "end_date": "2019-06-21T23:59:59Z",
+    "enrollment_start": null,
+    "enrollment_end": "2019-04-15T23:59:59Z",
+    "image_src":
+      "https://bootcamp.mit.edu/wp-content/uploads/2019/01/healthcare-600x231.png",
+    "image_description": null,
+    "featured": false,
+    "published": true,
+    "availability": null,
+    "url": "https://bootcamp.mit.edu/entrepreneurship/healthcare-innovation/",
+    "last_modified": "2019-04-30T16:18:02.759103Z",
+    "program_type": null,
+    "program_name": null,
+    "location": null,
+    "instructors": [],
+    "learning_resource_type": "course",
+    "topics": [
+      { "name": "Business & Management" },
+      { "name": "Entrepreneurship" },
+      { "name": "Innovation" }
+    ],
+    "prices": [
+      { "price": 8500, "mode": "Early Bird" },
+      { "price": 9500, "mode": "Standard" }
+    ]
+  },
+  {
+    "course_id": "Bootcamp2",
+    "title": "MIT Deep Technology Bootcamp",
+    "short_description": "The MIT Deep Technology Bootcamp",
+    "level": null,
+    "semester": null,
+    "language": null,
+    "platform": "Bootcamps",
+    "year": 2019,
+    "full_description":
+      "<p>Technologies like Artificial Intelligence, Internet of Things, and Blockchain are rapidly changing the future of work, our economy, and how we interact with devices. Learning the skill sets necessary to manage these “deep technologies” will be crucial for thriving amidst these radically transformative changes. At the MIT Deep Technology Bootcamp, you will be immersed in these technologies and gain hands-on experience building devices that can sense, connect, infer and act. You will learn MIT’s framework for frontier technology innovation, and learn directly from experts in these fields about new trends and how to generate new innovations.</p>",
+    "start_date": "2019-06-15T00:00:01Z",
+    "end_date": "2019-06-21T23:59:59Z",
+    "enrollment_start": null,
+    "enrollment_end": "2019-04-15T23:59:59Z",
+    "image_src":
+      "https://bootcamp.mit.edu/wp-content/uploads/2019/01/deep-tech-600x231.png",
+    "image_description": null,
+    "featured": false,
+    "published": true,
+    "availability": null,
+    "url": "https://bootcamp.mit.edu/deeptech/",
+    "last_modified": "2019-04-30T16:18:02.759103Z",
+    "program_type": null,
+    "program_name": null,
+    "location": null,
+    "instructors": [
+      { "first_name": "Josh", "last_name": "Siegel" },
+      { "first_name": "Sanjay", "last_name": "Sarma" },
+      { "first_name": "Brian", "last_name": "Subirana" }
+    ],
+    "learning_resource_type": "course",
+    "topics": [],
+    "prices": [{ "price": 8500, "mode": "Standard" }]
+  },
+  {
+    "course_id": "Bootcamp3",
+    "title": "MIT Sports Entrepreneurship Bootcamp",
+    "short_description":
+      "LEARN TO INNOVATE AND BUILD ENTREPRENEURIAL VENTURES IN SPORTS INDUSTRY",
+    "level": null,
+    "semester": null,
+    "language": null,
+    "platform": "Bootcamps",
+    "year": 2019,
+    "full_description":
+      "<p>The sports business is experiencing an astonishing growth and interest from investors due to technological disruptions and societal changes. The pace of on-field and off-field innovation has accelerated with advances in hardware, software, technology, and data analytics making the sports industry the most exciting leader in fan engagement and human performance advancements.</p>",
+    "start_date": "2019-09-07T00:00:01Z",
+    "end_date": "2019-09-13T23:59:59Z",
+    "enrollment_start": null,
+    "enrollment_end": "2019-06-01T23:59:59Z",
+    "image_src":
+      "https://bootcamp.mit.edu/wp-content/uploads/2019/02/sports-menu-banner-600x231.png",
+    "image_description": null,
+    "featured": false,
+    "published": true,
+    "availability": null,
+    "url": "http://bootcamp.mit.edu/sports/",
+    "last_modified": "2019-04-30T16:18:02.759103Z",
+    "program_type": null,
+    "program_name": null,
+    "location": "Hoffenheim, Germany",
+    "instructors": [
+      { "first_name": "Ben", "last_name": "Shields" },
+      { "first_name": "Sascha", "last_name": "L. Schmidt" }
+    ],
+    "learning_resource_type": "course",
+    "topics": [],
+    "prices": [{ "price": 8500, "mode": "Standard" }]
+  }
+]

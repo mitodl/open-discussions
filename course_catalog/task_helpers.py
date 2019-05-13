@@ -533,3 +533,75 @@ def get_micromasters_data():
     Get json course data from micromasters
     """
     return requests.get(settings.MICROMASTERS_COURSE_URL).json()
+
+
+def parse_bootcamp_json_data(course_data, force_overwrite=False):
+    """
+    Main function to parse bootcamp json data for one course
+
+    Args:
+        course_data (dict): The JSON object representing the course with all its course runs
+        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
+    """
+    # Get the last modified date from the course run
+    course_run_modified = course_data.get("last_modified")
+
+    # Try and get the course instance. If it exists check to see if it needs updating
+    try:
+        course_instance = Course.objects.get(course_id=course_data.get("course_id"))
+        compare_datetime = datetime.strptime(
+            course_run_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
+        ).astimezone(pytz.utc)
+        if compare_datetime <= course_instance.last_modified and not force_overwrite:
+            log.debug(
+                "(%s, %s) skipped", course_data.get("key"), course_data.get("course_id")
+            )
+            return
+        index_func = update_course
+    except Course.DoesNotExist:
+        course_instance = None
+        index_func = index_new_course
+
+    topics = course_data.pop("topics")
+    prices = course_data.pop("prices")
+    instructors = course_data.pop("instructors")
+
+    # Overwrite platform with our own enum value
+    course_data["platform"] = PlatformType.bootcamps.value
+
+    course_serializer = CourseSerializer(data=course_data, instance=course_instance)
+    if not course_serializer.is_valid():
+        log.error(
+            "Course %s is not valid: %s",
+            course_data.get("course_id"),
+            course_serializer.errors,
+        )
+        return
+
+    # Make changes atomically so we don't end up with partially saved/deleted data
+    with transaction.atomic():
+        course = course_serializer.save()
+        course.topics.clear()
+        for topic in topics:
+            course_topic, _ = CourseTopic.objects.get_or_create(name=topic.get("name"))
+            course.topics.add(course_topic)
+
+        # Clear out the instructors and re-add them
+        course.instructors.clear()
+        for instructor in instructors:
+            course_instructor, _ = CourseInstructor.objects.get_or_create(
+                first_name=instructor.get("first_name"),
+                last_name=instructor.get("last_name"),
+            )
+            course.instructors.add(course_instructor)
+
+        # Clear out the prices and re-add them
+        course.prices.clear()
+        for price in prices:
+            course_price, _ = CoursePrice.objects.get_or_create(
+                price=price.get("price"),
+                mode=price.get("mode"),
+                upgrade_deadline=price.get("upgrade_deadline"),
+            )
+            course.prices.add(course_price)
+        index_func(course)

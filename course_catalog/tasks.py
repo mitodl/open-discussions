@@ -21,6 +21,7 @@ from course_catalog.task_helpers import (
     format_date,
     generate_course_prefix_list,
     tag_edx_course_program,
+    parse_bootcamp_json_data,
 )
 
 
@@ -214,3 +215,19 @@ def upload_ocw_master_json():
             Body=json.dumps(course.raw_json),
             ACL="private",
         )
+
+
+@app.task
+def get_bootcamp_data():
+    """
+    Task to create/update courses from bootcamp.json
+    """
+    if not settings.BOOTCAMPS_URL:
+        log.warning("Required settings missing for get_bootcamp_data")
+        return
+
+    response = requests.get(settings.BOOTCAMPS_URL)
+    if response.status_code == 200:
+        bootcamp_json = response.json()
+        for bootcamp in bootcamp_json:
+            parse_bootcamp_json_data(bootcamp)
