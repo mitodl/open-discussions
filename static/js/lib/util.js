@@ -85,6 +85,11 @@ export const DRAWER_BREAKPOINT = 950
 
 export const isMobileWidth = () => getViewportWidth() < DRAWER_BREAKPOINT
 
+export const GRID_MOBILE_BREAKPOINT = 840
+
+export const isMobileGridWidth = () =>
+  getViewportWidth() < GRID_MOBILE_BREAKPOINT
+
 export const truncate = (text: ?string, length: number): string =>
   text ? _.truncate(text, { length: length, separator: " " }) : ""
 

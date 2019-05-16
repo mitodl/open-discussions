@@ -23,7 +23,7 @@ export default class ChannelNavbar extends React.Component<Props> {
     return (
       <div className="channel-intra-nav-wrapper">
         <Grid className="main-content two-column channel-intra-nav">
-          <Cell width={8}>
+          <Cell mobileWidth={8} width={7}>
             <IntraPageNav>
               <NavLink
                 exact

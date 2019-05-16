@@ -19,10 +19,10 @@ export const withSidebar = R.curry(
       render() {
         return (
           <Grid className={`main-content two-column ${className}`}>
-            <Cell width={8}>
+            <Cell mobileWidth={8} width={7}>
               <WrappedComponent {...this.props} />
             </Cell>
-            <Cell width={4}>
+            <Cell width={5}>
               <Sidebar className="sidebar-right">
                 <SidebarComponent {...this.props} />
               </Sidebar>

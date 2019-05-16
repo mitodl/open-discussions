@@ -130,7 +130,7 @@ body {
         width: 90%;
 
         @include breakpoint(desktop) {
-          max-width: 960px;
+          max-width: 1440px;
         }
 
         @include breakpoint(phone) {

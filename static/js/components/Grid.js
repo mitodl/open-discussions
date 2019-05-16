@@ -1,5 +1,7 @@
 // @flow
-import React from "react"
+import React, { useState, useEffect } from "react"
+
+import { isMobileGridWidth } from "../lib/util"
 
 type GridProps = {
   children: any,
@@ -48,12 +50,37 @@ type CellWidth =
 type CellProps = {
   children: any,
   width: CellWidth,
+  mobileWidth?: CellWidth,
   className?: string
 }
 
 const cellClassName = (width, className) =>
   `mdc-layout-grid__cell--span-${width} ${className || ""}`.trim()
 
-export const Cell = ({ children, width, className }: CellProps) => (
-  <div className={cellClassName(width, className)}>{children}</div>
-)
+export const Cell = ({
+  children,
+  width,
+  mobileWidth,
+  className
+}: CellProps) => {
+  const [, setState] = useState(null)
+
+  useEffect(() => {
+    window.addEventListener("resize", setState)
+
+    return () => {
+      window.removeEventListener("resize", setState)
+    }
+  })
+
+  return (
+    <div
+      className={cellClassName(
+        mobileWidth && isMobileGridWidth() ? mobileWidth : width,
+        className
+      )}
+    >
+      {children}
+    </div>
+  )
+}

@@ -237,7 +237,7 @@ export class SearchPage extends React.Component<Props, State> {
 
     return (
       <Grid className="main-content two-column search-page">
-        <Cell width={8}>
+        <Cell mobileWidth={8} width={7}>
           <MetaTags>
             <CanonicalLink match={match} />
           </MetaTags>

@@ -1,11 +1,25 @@
 // @flow
 import React from "react"
-import { shallow } from "enzyme"
+import { mount, shallow } from "enzyme"
 import { assert } from "chai"
+import sinon from "sinon"
 
 import { Grid, Cell } from "./Grid"
+import * as utils from "../lib/util"
+import { shouldIf } from "../lib/test_utils"
 
 describe("Grid components", () => {
+  let sandbox, isMobileWidthStub
+
+  beforeEach(() => {
+    sandbox = sinon.createSandbox()
+    isMobileWidthStub = sandbox.stub(utils, "isMobileGridWidth").returns(false)
+  })
+
+  afterEach(() => {
+    sandbox.restore()
+  })
+
   it("should render a grid with children", () => {
     const wrapper = shallow(
       <Grid>
@@ -20,21 +34,18 @@ describe("Grid components", () => {
   //
   ;[1, 12].forEach(width => {
     it(`should create a cell with width ${width}`, () => {
-      const wrapper = shallow(
+      const wrapper = mount(
         <Cell width={width}>
           <div className="child" />
         </Cell>
       )
-      assert.equal(
-        wrapper.props().className,
-        `mdc-layout-grid__cell--span-${width}`
-      )
+      assert.ok(wrapper.find(`.mdc-layout-grid__cell--span-${width}`).exists())
       assert.ok(wrapper.find(".child").exists())
     })
   })
 
   it("should allow passing a className to Grid", () => {
-    const wrapper = shallow(
+    const wrapper = mount(
       <Grid width={2} className="foobar">
         <div />
       </Grid>
@@ -42,8 +53,27 @@ describe("Grid components", () => {
     assert.ok(wrapper.find(".foobar"))
   })
 
+  //
+  ;[true, false].forEach(isMobileWidth => {
+    it(`${shouldIf(
+      isMobileWidth
+    )} use mobileWidth if present and mobile==${String(isMobileWidth)}`, () => {
+      isMobileWidthStub.returns(isMobileWidth)
+      const wrapper = mount(
+        <Cell width={4} mobileWidth={7}>
+          <div />
+        </Cell>
+      )
+      assert.ok(
+        wrapper
+          .find(`.mdc-layout-grid__cell--span-${isMobileWidth ? 7 : 4}`)
+          .exists()
+      )
+    })
+  })
+
   it("should allow passing a className to Cell", () => {
-    const wrapper = shallow(
+    const wrapper = mount(
       <Cell width={2} className="foobar">
         <div />
       </Cell>
