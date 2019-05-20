@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.77.0
+Version 0.77.0 (Released May 20, 2019)
 --------------
 
 - Add functionality to parse Bootcamps data into course_catalog
