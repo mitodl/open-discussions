@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.78.0
+--------------
+
+- site 'grid' (basic layout) tweaks
+- split out widget-related API functions from main api.js file
+- Fix email url to go through static assets
+- Update ocw data parser in requirements to use version that removes certain fields from master_json
+- remove ANONYMOUS_ACCESS feature flag
+- fix URL widget help text font size
+- fix rendering height of channel navbar on mobile
+- fix drawer animation
+
 Version 0.77.0 (Released May 20, 2019)
 --------------
 
