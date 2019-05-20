@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.78.0
+Version 0.78.0 (Released May 20, 2019)
 --------------
 
 - site 'grid' (basic layout) tweaks
