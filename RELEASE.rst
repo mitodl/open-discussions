@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.77.0 (Released May 20, 2019)
+--------------
+
+- Add functionality to parse Bootcamps data into course_catalog
+- add option for custom html on URL widgets
+
 Version 0.76.1 (Released May 10, 2019)
 --------------
 
