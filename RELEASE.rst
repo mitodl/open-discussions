@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.78.1
+Version 0.78.1 (Released May 24, 2019)
 --------------
 
 - Added workers to pgbouncer
