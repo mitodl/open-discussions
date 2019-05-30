@@ -21,7 +21,7 @@ django-compat==1.0.15
 django-hijack==2.1.10
 django-hijack-admin==2.1.10
 django-json-widget==0.2.0
-djangorestframework==3.9.0
+djangorestframework==3.9.1
 djangorestframework-jwt==1.11.0
 djoser
 elasticsearch-dsl==6.1.0
