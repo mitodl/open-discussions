@@ -51,14 +51,14 @@ describe("ProfilePage", function() {
     const wrapper = await renderPage()
     assert.deepEqual(
       wrapper
-        .find(".name-and-headline .name")
+        .find(".name-headline-location .name")
         .at(0)
         .text(),
       profile.name
     )
     assert.deepEqual(
       wrapper
-        .find(".name-and-headline .headline")
+        .find(".name-headline-location .headline")
         .at(0)
         .text(),
       profile.headline

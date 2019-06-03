@@ -98,19 +98,19 @@ class ProfilePage extends React.Component<Props> {
           <CanonicalLink relativeUrl="profile" />
         </MetaTags>
         <Card className="profile-card">
-          <div className="row">
+          <div className="row basic-info">
             <ProfileImage
               profile={profile}
               userName={userName}
               editable={false}
               imageSize={PROFILE_IMAGE_MEDIUM}
             />
-            <div className="name-and-headline">
+            <div className="name-headline-location">
               <div className="name">{profile.name}</div>
               <div className="headline">{profile.headline}</div>
+              <div className="location">{profile.placename || ""}</div>
             </div>
           </div>
-          <div className="row location">{profile.placename || ""}</div>
           <div className="row bio">
             {profile.bio
               ? profile.bio.split("\n").map((item, key) => {
@@ -124,14 +124,14 @@ class ProfilePage extends React.Component<Props> {
               : profile.bio}
             {this.renderUserWebsiteLinks()}
           </div>
+          {userName === SETTINGS.username ? (
+            <div className="row actions">
+              <button type="submit" onClick={this.onClick}>
+                Edit
+              </button>
+            </div>
+          ) : null}
         </Card>
-        {userName === SETTINGS.username ? (
-          <div className="row actions">
-            <button type="submit" onClick={this.onClick}>
-              Edit
-            </button>
-          </div>
-        ) : null}
         <ProfileContributionFeed
           userName={userName}
           selectedTab={match.params.objectType || defaultTab}

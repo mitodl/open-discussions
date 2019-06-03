@@ -18,19 +18,37 @@
 
   .actions {
     justify-content: flex-end;
+    margin-top: 0;
   }
 
   .profile-image-container {
     margin-right: 40px;
   }
 
-  .name-and-headline {
-    .name {
-      font-size: 24px;
-    }
+  .basic-info {
+    justify-content: flex-start;
 
-    .headline {
-      font-size: 16px;
+    .name-headline-location {
+      .name {
+        font-size: 24px;
+        color: $navy;
+        font-weight: bold;
+      }
+
+      .headline {
+        font-size: 16px;
+        color: $font-grey;
+      }
+
+      .location {
+        font-size: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+
+        div {
+          width: 100%;
+        }
+      }
     }
   }
 
@@ -39,17 +57,6 @@
     margin-top: 22px;
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .location {
-    font-size: 16px;
-    margin-top: 22px;
-    flex-direction: column;
-    align-items: flex-start;
-
-    div {
-      width: 100%;
-    }
   }
 
   h4 {
