@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.79.0
+--------------
+
+- Periodic bump of drf
+
 Version 0.78.1 (Released May 24, 2019)
 --------------
 
