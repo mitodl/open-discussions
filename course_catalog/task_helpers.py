@@ -134,47 +134,70 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
             )
             continue
 
-        # Make changes atomically so we don't end up with partially saved/deleted data
-        with transaction.atomic():
-            course = course_serializer.save()
-            handle_many_to_many_fields(course, course_data, course_run)
-            index_func(course)
+        save_course_and_many_to_many(
+            course_serializer,
+            course_data.get("subjects"),
+            [
+                {
+                    "first_name": staff.get("given_name"),
+                    "last_name": staff.get("family_name"),
+                }
+                for staff in course_run.get("staff")
+            ],
+            [
+                {
+                    "price": seat.get("price"),
+                    "mode": seat.get("type"),
+                    "upgrade_deadline": seat.get("upgrade_deadline"),
+                }
+                for seat in course_run.get("seats")
+            ],
+            index_func,
+        )
 
 
-def handle_many_to_many_fields(course, course_data, course_run):
+def save_course_and_many_to_many(
+    course_serializer, topics, instructors, prices, index_func
+):
     """
     Helper function to create or link the many to many fields
 
     Args:
-        course (Course): Course instance
-        course_data (dict): The JSON object representing the course with all its course runs
-        course_run (dict): The JSON object representing the particular course run
+        course_serializer (CourseSerializer): CourseSerializer containing course data
+        topics (list): A list of dictionaries representing course topics
+        instructors (list): A list of dictionaries representing course instructors
+        prices (list): A list of dictionaries representing course prices
+        index_func (callable): index function to run after saving data (new course or update)
     """
-    # Clear out topics and re-add them
-    course.topics.clear()
-    for topic in course_data.get("subjects"):
-        course_topic, _ = CourseTopic.objects.get_or_create(name=topic.get("name"))
-        course.topics.add(course_topic)
+    # Make changes atomically so we don't end up with partially saved/deleted data
+    with transaction.atomic():
+        course = course_serializer.save()
+        # Clear out topics and re-add them
+        course.topics.clear()
+        for topic in topics:
+            course_topic, _ = CourseTopic.objects.get_or_create(name=topic.get("name"))
+            course.topics.add(course_topic)
 
-    # Clear out the instructors and re-add them
-    course.instructors.clear()
-    # In the samples it looks like instructors is never populated and staff is
-    for instructor in course_run.get("staff"):
-        course_instructor, _ = CourseInstructor.objects.get_or_create(
-            first_name=instructor.get("given_name"),
-            last_name=instructor.get("family_name"),
-        )
-        course.instructors.add(course_instructor)
+        # Clear out the instructors and re-add them
+        course.instructors.clear()
+        # In the samples it looks like instructors is never populated and staff is
+        for instructor in instructors:
+            course_instructor, _ = CourseInstructor.objects.get_or_create(
+                first_name=instructor.get("first_name"),
+                last_name=instructor.get("last_name"),
+            )
+            course.instructors.add(course_instructor)
 
-    # Clear out the prices and re-add them
-    course.prices.clear()
-    for price in course_run.get("seats"):
-        course_price, _ = CoursePrice.objects.get_or_create(
-            price=price.get("price"),
-            mode=price.get("type"),
-            upgrade_deadline=price.get("upgrade_deadline"),
-        )
-        course.prices.add(course_price)
+        # Clear out the prices and re-add them
+        course.prices.clear()
+        for price in prices:
+            course_price, _ = CoursePrice.objects.get_or_create(
+                price=price.get("price"),
+                mode=price.get("mode"),
+                upgrade_deadline=price.get("upgrade_deadline"),
+            )
+            course.prices.add(course_price)
+        index_func(course)
 
 
 def is_mit_course(course_data):
@@ -240,7 +263,6 @@ def safe_load_json(json_string, json_file_key):
         return {}
 
 
-# pylint: disable=too-many-locals
 def digest_ocw_course(
     master_json, last_modified, course_instance, is_published, course_prefix=""
 ):
@@ -286,36 +308,18 @@ def digest_ocw_course(
         )
         return
 
-    # Make changes atomically so we don't end up with partially saved/deleted data
-    with transaction.atomic():
-        course = course_serializer.save()
+    topics = []
+    for topic_obj in master_json.get("course_collections"):
+        for topic in get_ocw_topic(topic_obj):
+            topics.append({"name": topic})
 
-        # Clear previous topics, instructors, and prices
-        course.topics.clear()
-        course.instructors.clear()
-        course.prices.clear()
-
-        # Handle topics
-        for topic_obj in master_json.get("course_collections"):
-            topics = get_ocw_topic(topic_obj)
-            for topic in topics:
-                course_topic, _ = CourseTopic.objects.get_or_create(name=topic)
-                course.topics.add(course_topic)
-
-        # Handle instructors
-        for instructor in master_json.get("instructors"):
-            course_instructor, _ = CourseInstructor.objects.get_or_create(
-                first_name=instructor.get("first_name"),
-                last_name=instructor.get("last_name"),
-            )
-            course.instructors.add(course_instructor)
-
-        # Handle price
-        course_price, _ = CoursePrice.objects.get_or_create(
-            price="0.00", mode="audit", upgrade_deadline=None
-        )
-        course.prices.add(course_price)
-        index_func(course)
+    save_course_and_many_to_many(
+        course_serializer,
+        topics,
+        master_json.get("instructors"),
+        [{"price": "0.00", "mode": "audit", "upgrade_deadline": None}],
+        index_func,
+    )
 
 
 def get_ocw_topic(topic_object):
@@ -579,29 +583,6 @@ def parse_bootcamp_json_data(course_data, force_overwrite=False):
         return
 
     # Make changes atomically so we don't end up with partially saved/deleted data
-    with transaction.atomic():
-        course = course_serializer.save()
-        course.topics.clear()
-        for topic in topics:
-            course_topic, _ = CourseTopic.objects.get_or_create(name=topic.get("name"))
-            course.topics.add(course_topic)
-
-        # Clear out the instructors and re-add them
-        course.instructors.clear()
-        for instructor in instructors:
-            course_instructor, _ = CourseInstructor.objects.get_or_create(
-                first_name=instructor.get("first_name"),
-                last_name=instructor.get("last_name"),
-            )
-            course.instructors.add(course_instructor)
-
-        # Clear out the prices and re-add them
-        course.prices.clear()
-        for price in prices:
-            course_price, _ = CoursePrice.objects.get_or_create(
-                price=price.get("price"),
-                mode=price.get("mode"),
-                upgrade_deadline=price.get("upgrade_deadline"),
-            )
-            course.prices.add(course_price)
-        index_func(course)
+    save_course_and_many_to_many(
+        course_serializer, topics, instructors, prices, index_func
+    )
