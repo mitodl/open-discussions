@@ -72,7 +72,8 @@ type State = {
   activeFacets: Map<string, Array<string>>,
   from: number,
   error: ?string,
-  currentFacetGroup: ?CurrentFacet
+  currentFacetGroup: ?CurrentFacet,
+  incremental: boolean
 }
 
 const facetDisplayMap = [
@@ -98,7 +99,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
       ]),
       from:              0,
       error:             null,
-      currentFacetGroup: null
+      currentFacetGroup: null,
+      incremental:       false
     }
   }
 
@@ -191,11 +193,13 @@ export class CourseSearchPage extends React.Component<Props, State> {
       })
     })
     let from = this.state.from + SETTINGS.search_page_size
-    if (!params.incremental) {
+
+    const { incremental } = params
+    if (!incremental) {
       clearSearch()
       from = 0
     }
-    this.setState({ from })
+    this.setState({ from, incremental })
     await runSearch({
       channelName: null,
       text,
@@ -244,9 +248,9 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
   renderResults = () => {
     const { results, processing, loaded, total } = this.props
-    const { from } = this.state
+    const { from, incremental } = this.state
 
-    if (processing || !loaded) {
+    if ((processing || !loaded) && !incremental) {
       return <PostLoading />
     }
 

@@ -91,6 +91,8 @@ describe("CourseSearchPage", () => {
       )
     })
   })
+
+  //
   ;["", "a"].forEach(query => {
     it(`still runs a search if initial search text is '${query}'`, async () => {
       await renderPage({
@@ -131,7 +133,23 @@ describe("CourseSearchPage", () => {
     })
     // from is 5, plus 5 is 10 which is == numHits so no more results
     assert.isFalse(inner.find("InfiniteScroll").prop("hasMore"))
+    assert.deepEqual(inner.state(), {
+      // Because this is non-incremental the previous from value of 7 is replaced with 0
+      text:         "text",
+      activeFacets: new Map(
+        Object.entries({
+          platform:     [],
+          topics:       [],
+          availability: []
+        })
+      ),
+      from:              5,
+      error:             null,
+      currentFacetGroup: null,
+      incremental:       true
+    })
   })
+
   it("searches with parameters", async () => {
     SETTINGS.search_page_size = 5
     await renderPage(
@@ -162,6 +180,8 @@ describe("CourseSearchPage", () => {
       )
     })
   })
+
+  //
   ;[0, 5].forEach(from => {
     it(`InfiniteScroll initialLoad ${shouldIf(
       from > 0
@@ -172,6 +192,8 @@ describe("CourseSearchPage", () => {
       assert.equal(infiniteScroll.prop("initialLoad"), from === 0)
     })
   })
+
+  //
   ;[
     [true, false, false],
     [false, true, true],
@@ -293,7 +315,8 @@ describe("CourseSearchPage", () => {
       ),
       currentFacetGroup: null,
       from:              0,
-      error:             null
+      error:             null,
+      incremental:       false
     })
   })
 
@@ -343,7 +366,8 @@ describe("CourseSearchPage", () => {
       currentFacetGroup: {
         group:  "topics",
         result: makeSearchFacetResult().topics
-      }
+      },
+      incremental: false
     })
   })
 
@@ -363,6 +387,8 @@ describe("CourseSearchPage", () => {
     inner.find("SearchTextbox").prop("onClear")()
     assert.equal(inner.state().text, "")
   })
+
+  //
   ;[false, true].forEach(isChecked => {
     it(`${shouldIf(
       isChecked

@@ -127,9 +127,10 @@ describe("CreatePostPage", () => {
     return wrapper.update()
   }
 
-  it("should set the document title", async () => {
+  it("should set the document title and load channels", async () => {
     await renderPage()
     assert.equal(document.title, formatTitle("Submit a Post"))
+    sinon.assert.calledOnce(helper.getChannelStub)
   })
 
   //
@@ -151,12 +152,6 @@ describe("CreatePostPage", () => {
       const { postType } = helper.store.getState().forms[CREATE_POST_KEY].value
       assert.equal(postType, shouldSetPostType ? postTypes[0] : null)
     })
-  })
-
-  it("attempts to clear form and load channels on mount", async () => {
-    const wrapper = await renderPage()
-    assert.include(wrapper.text(), currentChannel.title)
-    sinon.assert.calledOnce(helper.getChannelStub)
   })
 
   for (const isText of [true, false]) {
