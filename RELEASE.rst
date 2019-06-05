@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.79.1
+--------------
+
+- Implement proposed changes to new course_catalog models
+- upgrade of a few dependencies (nothing serious)
+- tweak the two-column layout width and cell ratio
+- fix course search page infinite scroll issue
+
 Version 0.79.0 (Released June 04, 2019)
 --------------
 
