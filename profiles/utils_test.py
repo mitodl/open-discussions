@@ -9,11 +9,11 @@ from PIL import Image
 
 from channels.factories.models import ArticleFactory
 from open_discussions.factories import UserFactory
+from open_discussions.utils import generate_filepath
 from profiles.utils import (
     profile_image_upload_uri,
     profile_image_upload_uri_small,
     profile_image_upload_uri_medium,
-    generate_filepath,
     image_uri,
     DEFAULT_PROFILE_IMAGE,
     update_full_name,
