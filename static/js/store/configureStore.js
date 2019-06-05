@@ -4,15 +4,26 @@ import thunkMiddleware from "redux-thunk"
 import { createLogger } from "redux-logger"
 import createDebounce from "redux-debounced"
 import { queryMiddleware } from "redux-query"
+import persistState from "redux-localstorage"
+import R from "ramda"
 
 import rootReducer from "../reducers"
 
 export const getQueries = state => state.queries
 export const getEntities = state => state.entities
 
+const persistConfig = {
+  slicer: () => state => {
+    const lens = R.lensPath(["ui", "showDrawerDesktop"])
+    return R.set(lens, R.view(lens, state), {})
+  },
+  merge: R.mergeDeepRight
+}
+
 export let createStoreWithMiddleware
 if (process.env.NODE_ENV !== "production") {
   createStoreWithMiddleware = compose(
+    persistState(null, persistConfig),
     applyMiddleware(
       queryMiddleware(getQueries, getEntities),
       createDebounce(),
@@ -23,6 +34,7 @@ if (process.env.NODE_ENV !== "production") {
   )(createStore)
 } else {
   createStoreWithMiddleware = compose(
+    persistState(null, persistConfig),
     applyMiddleware(
       queryMiddleware(getQueries, getEntities),
       createDebounce(),
@@ -32,7 +44,15 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export default function configureStore(initialState: Object) {
-  const store = createStoreWithMiddleware(rootReducer, initialState)
+  const store = createStoreWithMiddleware(
+    rootReducer,
+    // calling the reducer with `undefined` and a no-op action
+    // returns the default state. we need this because the
+    // persistState middleware merges the persisted data into this
+    // default state, so we need to ensure that `createStore` is passed
+    // an initialState value in all cases.
+    initialState || rootReducer(undefined, { type: "NOOP" })
+  )
 
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers

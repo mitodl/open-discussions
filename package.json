@@ -120,6 +120,7 @@
     "redux-asserts": "^0.0.10",
     "redux-debounced": "^0.5.0",
     "redux-hammock": "^0.3.0",
+    "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
     "redux-mock-store": "^1.5.3",
     "redux-query": "^2.3.1",
