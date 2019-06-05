@@ -355,7 +355,6 @@ def test_process_bootcamps(mock_get_bootcamps):
     course = Course.objects.get(course_id="Bootcamp3")
     assert course.platform == PlatformType.bootcamps.value
     assert course.title == "MIT Sports Entrepreneurship Bootcamp"
-    assert course.location == "Hoffenheim, Germany"
 
     get_bootcamp_data()
     assert Course.objects.count() == 3

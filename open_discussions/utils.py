@@ -2,6 +2,7 @@
 import datetime
 from enum import auto, Flag
 from itertools import islice
+from os import path
 import logging
 
 import pytz
@@ -12,6 +13,9 @@ import markdown2
 
 
 log = logging.getLogger(__name__)
+
+# This is the Django ImageField max path size
+IMAGE_PATH_MAX_LENGTH = 100
 
 
 class FeatureFlag(Flag):
@@ -215,3 +219,48 @@ def prefetched_iterator(query, chunk_size=2000):
 
         # next batch starts after the last item.id
         batch = _next(item.id) if item is not None else None
+
+
+def generate_filepath(filename, directory_name, suffix, prefix):
+    """
+    Generate and return the filepath for an uploaded image
+
+    Args:
+        filename(str): The name of the image file
+        directory_name (str): A directory name
+        suffix(str): 'small', 'medium', or ''
+        prefix (str): A directory name to use as a prefix
+
+    Returns:
+        str: The filepath for the uploaded image.
+    """
+    name, ext = path.splitext(filename)
+    timestamp = now_in_utc().replace(microsecond=0)
+    path_format = "{prefix}/{directory_name}/{name}-{timestamp}{suffix}{ext}"
+
+    path_without_name = path_format.format(
+        timestamp=timestamp.strftime("%Y-%m-%dT%H%M%S"),
+        prefix=prefix,
+        directory_name=directory_name,
+        suffix=suffix,
+        ext=ext,
+        name="",
+    )
+    if len(path_without_name) >= IMAGE_PATH_MAX_LENGTH:
+        raise ValueError(
+            "path is longer than max length even without name: {}".format(
+                path_without_name
+            )
+        )
+
+    max_name_length = IMAGE_PATH_MAX_LENGTH - len(path_without_name)
+    full_path = path_format.format(
+        name=name[:max_name_length],
+        timestamp=timestamp.strftime("%Y-%m-%dT%H%M%S"),
+        prefix=prefix,
+        directory_name=directory_name,
+        suffix=suffix,
+        ext=ext,
+    )
+
+    return full_path

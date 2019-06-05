@@ -35,6 +35,16 @@ class AvailabilityType(Enum):
     archived = "Archived"
 
 
+class PrivacyLevel(Enum):
+    """
+    Enum tracking privacy levels for user-created LearningPaths
+    """
+
+    private = "private"
+    shared = "shared"
+    public = "public"
+
+
 MIT_OWNER_KEYS = ["MITx", "MITx_PRO"]
 
 NON_COURSE_DIRECTORIES = [

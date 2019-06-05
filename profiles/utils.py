@@ -2,7 +2,6 @@
 import hashlib
 import re
 from io import BytesIO
-from os import path
 from urllib.parse import urljoin, quote
 from xml.sax.saxutils import escape as xml_escape
 
@@ -12,8 +11,7 @@ from django.core.files.temp import NamedTemporaryFile
 
 from PIL import Image
 
-from open_discussions.utils import now_in_utc
-
+from open_discussions.utils import generate_filepath
 
 # Max dimension of either height or width for small and medium images
 IMAGE_SMALL_MAX_DIMENSION = 64
@@ -96,51 +94,6 @@ def image_uri(profile, image_field=IMAGE_SMALL):
             return image_file
         return image_file.url
     return DEFAULT_PROFILE_IMAGE
-
-
-def generate_filepath(filename, directory_name, suffix, prefix):
-    """
-    Generate and return the filepath for an uploaded image
-
-    Args:
-        filename(str): The name of the image file
-        directory_name (str): A directory name
-        suffix(str): 'small', 'medium', or ''
-        prefix (str): A directory name to use as a prefix
-
-    Returns:
-        str: The filepath for the uploaded image.
-    """
-    name, ext = path.splitext(filename)
-    timestamp = now_in_utc().replace(microsecond=0)
-    path_format = "{prefix}/{directory_name}/{name}-{timestamp}{suffix}{ext}"
-
-    path_without_name = path_format.format(
-        timestamp=timestamp.strftime("%Y-%m-%dT%H%M%S"),
-        prefix=prefix,
-        directory_name=directory_name,
-        suffix=suffix,
-        ext=ext,
-        name="",
-    )
-    if len(path_without_name) >= IMAGE_PATH_MAX_LENGTH:
-        raise ValueError(
-            "path is longer than max length even without name: {}".format(
-                path_without_name
-            )
-        )
-
-    max_name_length = IMAGE_PATH_MAX_LENGTH - len(path_without_name)
-    full_path = path_format.format(
-        name=name[:max_name_length],
-        timestamp=timestamp.strftime("%Y-%m-%dT%H%M%S"),
-        prefix=prefix,
-        directory_name=directory_name,
-        suffix=suffix,
-        ext=ext,
-    )
-
-    return full_path
 
 
 # These functions are referenced in migrations so be careful refactoring
