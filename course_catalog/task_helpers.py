@@ -20,8 +20,14 @@ from course_catalog.constants import (
     ResourceType,
     AvailabilityType,
 )
-from course_catalog.models import Course, CourseTopic, CourseInstructor, CoursePrice
-from course_catalog.serializers import CourseSerializer
+from course_catalog.models import (
+    Course,
+    CourseTopic,
+    CourseInstructor,
+    CoursePrice,
+    Bootcamp,
+)
+from course_catalog.serializers import CourseSerializer, BootcampSerializer
 from search.task_helpers import update_course, index_new_course
 
 log = logging.getLogger(__name__)
@@ -535,7 +541,7 @@ def get_micromasters_data():
     return requests.get(settings.MICROMASTERS_COURSE_URL).json()
 
 
-def parse_bootcamp_json_data(course_data, force_overwrite=False):
+def parse_bootcamp_json_data_course(course_data, force_overwrite=False):
     """
     Main function to parse bootcamp json data for one course
 
@@ -605,3 +611,81 @@ def parse_bootcamp_json_data(course_data, force_overwrite=False):
             )
             course.prices.add(course_price)
         index_func(course)
+
+
+def parse_bootcamp_json_data_bootcamp(bootcamp_data, force_overwrite=False):
+    """
+    Main function to parse bootcamp json data for one bootcamp
+
+    Args:
+        bootcamp_data (dict): The JSON object representing the bootcamp
+        force_overwrite (bool): A boolean value to force the incoming bootcamp data to overwrite existing data
+    """
+    # Get the last modified date from the bootcamp
+    bootcamp_modified = bootcamp_data.get("last_modified")
+
+    # Try and get the bootcamp instance. If it exists check to see if it needs updating
+    try:
+        bootcamp_instance = Bootcamp.objects.get(
+            course_id=bootcamp_data.get("course_id")
+        )
+        compare_datetime = datetime.strptime(
+            bootcamp_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
+        ).astimezone(pytz.utc)
+        if compare_datetime <= bootcamp_instance.last_modified and not force_overwrite:
+            log.debug(
+                "(%s, %s) skipped",
+                bootcamp_data.get("key"),
+                bootcamp_data.get("course_id"),
+            )
+            return
+        index_func = update_course
+    except Bootcamp.DoesNotExist:
+        bootcamp_instance = None
+        index_func = index_new_course
+
+    topics = bootcamp_data.pop("topics")
+    prices = bootcamp_data.pop("prices")
+    instructors = bootcamp_data.pop("instructors")
+
+    # Overwrite platform with our own enum value
+    bootcamp_data["platform"] = PlatformType.bootcamps.value
+
+    bootcamp_serializer = BootcampSerializer(
+        data=bootcamp_data, instance=bootcamp_instance
+    )
+    if not bootcamp_serializer.is_valid():
+        log.error(
+            "Bootcamp %s is not valid: %s",
+            bootcamp_data.get("course_id"),
+            bootcamp_serializer.errors,
+        )
+        return
+
+    # Make changes atomically so we don't end up with partially saved/deleted data
+    with transaction.atomic():
+        bootcamp = bootcamp_serializer.save()
+        bootcamp.topics.clear()
+        for topic in topics:
+            course_topic, _ = CourseTopic.objects.get_or_create(name=topic.get("name"))
+            bootcamp.topics.add(course_topic)
+
+        # Clear out the instructors and re-add them
+        bootcamp.instructors.clear()
+        for instructor in instructors:
+            course_instructor, _ = CourseInstructor.objects.get_or_create(
+                first_name=instructor.get("first_name"),
+                last_name=instructor.get("last_name"),
+            )
+            bootcamp.instructors.add(course_instructor)
+
+        # Clear out the prices and re-add them
+        bootcamp.prices.clear()
+        for price in prices:
+            course_price, _ = CoursePrice.objects.get_or_create(
+                price=price.get("price"),
+                mode=price.get("mode"),
+                upgrade_deadline=price.get("upgrade_deadline"),
+            )
+            bootcamp.prices.add(course_price)
+        index_func(bootcamp)

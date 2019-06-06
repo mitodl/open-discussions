@@ -2,7 +2,13 @@
 course_catalog serializers
 """
 from rest_framework import serializers
-from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
+from course_catalog.models import (
+    Course,
+    CourseInstructor,
+    CoursePrice,
+    CourseTopic,
+    Bootcamp,
+)
 
 
 class CourseInstructorSerializer(serializers.ModelSerializer):
@@ -48,3 +54,17 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = "__all__"
         extra_kwargs = {"raw_json": {"write_only": True}}
+
+
+class BootcampSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Bootcamp model
+    """
+
+    instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
+    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
+
+    class Meta:
+        model = Bootcamp
+        fields = "__all__"
