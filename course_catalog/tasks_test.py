@@ -14,7 +14,13 @@ from moto import mock_s3
 
 from course_catalog.constants import PlatformType
 from course_catalog.factories import CourseFactory
-from course_catalog.models import Course, CoursePrice, CourseInstructor, CourseTopic
+from course_catalog.models import (
+    Course,
+    CoursePrice,
+    CourseInstructor,
+    CourseTopic,
+    Bootcamp,
+)
 from course_catalog.tasks import (
     sync_and_upload_edx_data,
     get_ocw_data,
@@ -342,19 +348,27 @@ def test_process_bootcamps(mock_get_bootcamps):
     Test that bootcamp json data is properly parsed
     """
     get_bootcamp_data()
+    assert Bootcamp.objects.count() == 3
     assert Course.objects.count() == 3
 
-    course = Course.objects.get(course_id="Bootcamp1")
-    assert course.platform == PlatformType.bootcamps.value
-    assert course.title == "MIT HMS Healthcare Innovation Bootcamp"
+    bootcamp = Course.objects.get(course_id="Bootcamp1")
+    assert bootcamp.title == "MIT HMS Healthcare Innovation Bootcamp"
 
-    course = Course.objects.get(course_id="Bootcamp2")
-    assert course.platform == PlatformType.bootcamps.value
-    assert course.title == "MIT Deep Technology Bootcamp"
+    bootcamp = Course.objects.get(course_id="Bootcamp2")
+    assert bootcamp.title == "MIT Deep Technology Bootcamp"
 
-    course = Course.objects.get(course_id="Bootcamp3")
-    assert course.platform == PlatformType.bootcamps.value
-    assert course.title == "MIT Sports Entrepreneurship Bootcamp"
+    bootcamp = Course.objects.get(course_id="Bootcamp3")
+    assert bootcamp.title == "MIT Sports Entrepreneurship Bootcamp"
 
+    bootcamp = Course.objects.get(course_id="Bootcamp1")
+    assert bootcamp.title == "MIT HMS Healthcare Innovation Bootcamp"
+
+    bootcamp = Course.objects.get(course_id="Bootcamp2")
+    assert bootcamp.title == "MIT Deep Technology Bootcamp"
+
+    bootcamp = Course.objects.get(course_id="Bootcamp3")
+    assert bootcamp.title == "MIT Sports Entrepreneurship Bootcamp"
     get_bootcamp_data()
+
+    assert Bootcamp.objects.count() == 3
     assert Course.objects.count() == 3

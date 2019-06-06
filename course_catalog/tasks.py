@@ -4,6 +4,8 @@ course_catalog tasks
 import logging
 
 import json
+
+import copy
 import requests
 import boto3
 from django.conf import settings
@@ -21,7 +23,8 @@ from course_catalog.task_helpers import (
     format_date,
     generate_course_prefix_list,
     tag_edx_course_program,
-    parse_bootcamp_json_data,
+    parse_bootcamp_json_data_course,
+    parse_bootcamp_json_data_bootcamp,
 )
 
 
@@ -230,4 +233,5 @@ def get_bootcamp_data():
     if response.status_code == 200:
         bootcamp_json = response.json()
         for bootcamp in bootcamp_json:
-            parse_bootcamp_json_data(bootcamp)
+            parse_bootcamp_json_data_course(copy.deepcopy(bootcamp))
+            parse_bootcamp_json_data_bootcamp(bootcamp)
