@@ -110,6 +110,30 @@ class CourseSerializer(CourseRelatedFieldSerializer):
         extra_kwargs = {"raw_json": {"write_only": True}}
 
 
+class CourseSerializerTemporary(CourseRelatedFieldSerializer):
+    """
+    Serializer for Course model. Exists to properly serialize bootcamps as courses.
+    """
+
+    instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
+    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
+
+    def to_internal_value(self, data):
+        """
+        Custom function to parse data out of the raw bootcamp json
+        """
+        self.topics = data.pop("topics") if "topics" in data else []
+        self.instructors = data.pop("instructors") if "instructors" in data else []
+        self.prices = data.pop("prices") if "prices" in data else []
+        return super().to_internal_value(data)
+
+    class Meta:
+        model = Course
+        fields = "__all__"
+        extra_kwargs = {"raw_json": {"write_only": True}}
+
+
 class EDXSerializer(CourseSerializer):
     """
     Serializer for creating Course objects from edx data

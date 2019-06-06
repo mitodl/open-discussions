@@ -18,10 +18,10 @@ from course_catalog.constants import (
 )
 from course_catalog.models import Course, Bootcamp
 from course_catalog.serializers import (
-    CourseSerializer,
     BootcampSerializer,
     EDXSerializer,
     OCWSerializer,
+    CourseSerializerTemporary,
 )
 from search.task_helpers import update_course, index_new_course
 
@@ -420,7 +420,9 @@ def parse_bootcamp_json_data_course(course_data, force_overwrite=False):
     # Overwrite platform with our own enum value
     course_data["platform"] = PlatformType.bootcamps.value
 
-    course_serializer = CourseSerializer(data=course_data, instance=course_instance)
+    course_serializer = CourseSerializerTemporary(
+        data=course_data, instance=course_instance
+    )
     if not course_serializer.is_valid():
         log.error(
             "Course %s is not valid: %s",

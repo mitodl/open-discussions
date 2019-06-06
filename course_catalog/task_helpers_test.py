@@ -46,7 +46,7 @@ def test_parse_mitx_json_data_overwrite(
         course_id=mitx_valid_data["course_runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
-    mock_save = mocker.patch("course_catalog.task_helpers.CourseSerializer.save")
+    mock_save = mocker.patch("course_catalog.task_helpers.EDXSerializer.save")
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save.call_count == (1 if force_overwrite else 0)
     assert mock_course_index_functions.update_course.call_count == (
