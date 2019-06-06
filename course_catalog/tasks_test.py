@@ -211,7 +211,7 @@ def test_get_mitx_data_unexpected_error(
     Test that mitx sync task properly stops when it gets an error status code
     """
     mocker.patch(
-        "course_catalog.task_helpers.get_year_and_semester", side_effect=Exception
+        "course_catalog.task_helpers.is_mit_course", side_effect=Exception
     )
     settings.EDX_API_URL = "fake_url"
     setup_s3(settings)

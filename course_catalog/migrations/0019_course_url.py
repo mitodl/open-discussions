@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 
-from course_catalog.task_helpers import get_course_url
+from course_catalog.serializer_helpers import get_course_url
 
 
 def populate_urls(apps, schema_editor):
