@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.79.1
+Version 0.79.1 (Released June 06, 2019)
 --------------
 
 - Implement proposed changes to new course_catalog models
