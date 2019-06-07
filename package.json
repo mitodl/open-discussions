@@ -60,6 +60,7 @@
     "fetch-mock": "^6.4.4",
     "flow-bin": "^0.94.0",
     "flow-typed": "^2.4.0",
+    "formik": "^1.5.7",
     "history": "^4.7.2",
     "html-entities": "^1.2.1",
     "isomorphic-fetch": "^2.2.1",

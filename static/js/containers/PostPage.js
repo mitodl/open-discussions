@@ -12,7 +12,7 @@ import { withSpinnerLoading } from "../components/Loading"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"
 import ReportForm from "../components/ReportForm"
-import { ReplyToPostForm } from "../components/CommentForms"
+import CommentForm from "../components/CommentForm"
 import withSingleColumn from "../hoc/withSingleColumn"
 import { withPostDetailSidebar } from "../hoc/withSidebar"
 import {
@@ -52,7 +52,7 @@ import {
   anyNotAuthorizedErrorType
 } from "../util/rest"
 import { getSubscribedChannels } from "../lib/redux_selectors"
-import { beginEditing } from "../components/CommentForms"
+import { beginEditing } from "../components/EditPostForm"
 import { isPrivate } from "../lib/channels"
 import { formatTitle } from "../lib/title"
 import { channelURL, postDetailURL, commentPermalink } from "../lib/url"
@@ -422,14 +422,7 @@ export class PostPage extends React.Component<PostPageProps> {
             />
           </div>
         </Card>
-        {showPermalinkUI ? null : (
-          <ReplyToPostForm
-            forms={forms}
-            post={post}
-            processing={commentInFlight}
-            profile={profile}
-          />
-        )}
+        {showPermalinkUI ? null : <CommentForm post={post} profile={profile} />}
         {this.renderCommentSectionHeader()}
         {commentsTree.length > 0 ? (
           <CommentTree
@@ -446,6 +439,7 @@ export class PostPage extends React.Component<PostPageProps> {
             loadMoreComments={this.loadMoreComments}
             beginEditing={beginEditing(dispatch)}
             processing={commentInFlight}
+            post={post}
             commentPermalink={commentPermalink(
               channel.name,
               post.id,

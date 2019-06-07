@@ -25,7 +25,7 @@ import {
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
-import { editPostKey } from "../components/CommentForms"
+import { editPostKey } from "../components/EditPostForm"
 import * as utilFuncs from "../lib/util"
 import { makeChannel } from "../factories/channels"
 import { shouldIf } from "../lib/test_utils"
