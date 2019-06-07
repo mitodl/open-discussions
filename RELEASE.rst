@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.79.2
+--------------
+
+- persist desktop drawer open / close value to localStorage
+- Update bootcamps tasks and tests to use new Bootcamp model
+- fix styling of profile page
+
 Version 0.79.1 (Released June 06, 2019)
 --------------
 
