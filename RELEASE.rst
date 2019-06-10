@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.79.2
+Version 0.79.2 (Released June 10, 2019)
 --------------
 
 - persist desktop drawer open / close value to localStorage
