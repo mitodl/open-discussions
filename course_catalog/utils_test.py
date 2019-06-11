@@ -1,10 +1,10 @@
 """
-Test course_catalog serializer_helpers
+Test course_catalog utils
 """
 import pytest
 
 from course_catalog.constants import PlatformType
-from course_catalog.serializer_helpers import get_course_url
+from course_catalog.utils import get_course_url
 
 
 @pytest.mark.parametrize(

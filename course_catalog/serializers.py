@@ -11,7 +11,7 @@ from course_catalog.models import (
     CourseTopic,
     Bootcamp,
 )
-from course_catalog.serializer_helpers import (
+from course_catalog.utils import (
     get_ocw_topic,
     get_year_and_semester,
     get_course_url,
@@ -48,10 +48,14 @@ class CourseTopicSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CourseRelatedFieldSerializer(serializers.ModelSerializer):
+class BaseCourseSerializer(serializers.ModelSerializer):
     """
     Serializer with common functions to be used by CourseSerializer and BootcampSerialzer
     """
+
+    instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
+    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
 
     def create(self, validated_data):
         """
@@ -95,38 +99,10 @@ class CourseRelatedFieldSerializer(serializers.ModelSerializer):
             course.prices.add(course_price)
 
 
-class CourseSerializer(CourseRelatedFieldSerializer):
+class CourseSerializer(BaseCourseSerializer):
     """
     Serializer for Course model
     """
-
-    instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
-    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
-    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
-
-    class Meta:
-        model = Course
-        fields = "__all__"
-        extra_kwargs = {"raw_json": {"write_only": True}}
-
-
-class CourseSerializerTemporary(CourseRelatedFieldSerializer):
-    """
-    Serializer for Course model. Exists to properly serialize bootcamps as courses.
-    """
-
-    instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
-    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
-    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
-
-    def to_internal_value(self, data):
-        """
-        Custom function to parse data out of the raw bootcamp json
-        """
-        self.topics = data.pop("topics") if "topics" in data else []
-        self.instructors = data.pop("instructors") if "instructors" in data else []
-        self.prices = data.pop("prices") if "prices" in data else []
-        return super().to_internal_value(data)
 
     class Meta:
         model = Course
@@ -241,15 +217,10 @@ class OCWSerializer(CourseSerializer):
         return super().to_internal_value(course_fields)
 
 
-class BootcampSerializer(CourseRelatedFieldSerializer):
+class BootcampSerializer(BaseCourseSerializer):
     """
     Serializer for Bootcamp model
     """
-
-    instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
-    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
-    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
-
     def to_internal_value(self, data):
         """
         Custom function to parse data out of the raw bootcamp json
@@ -262,3 +233,14 @@ class BootcampSerializer(CourseRelatedFieldSerializer):
     class Meta:
         model = Bootcamp
         fields = "__all__"
+
+
+class BootcampAsCourseSerializer(BootcampSerializer):
+    """
+    Serializer for Course model. Exists to properly serialize bootcamps as courses.
+    """
+
+    class Meta:
+        model = Course
+        fields = "__all__"
+        extra_kwargs = {"raw_json": {"write_only": True}}

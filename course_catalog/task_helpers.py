@@ -21,7 +21,7 @@ from course_catalog.serializers import (
     BootcampSerializer,
     EDXSerializer,
     OCWSerializer,
-    CourseSerializerTemporary,
+    BootcampAsCourseSerializer,
 )
 from search.task_helpers import update_course, index_new_course
 
@@ -420,7 +420,7 @@ def parse_bootcamp_json_data_course(course_data, force_overwrite=False):
     # Overwrite platform with our own enum value
     course_data["platform"] = PlatformType.bootcamps.value
 
-    course_serializer = CourseSerializerTemporary(
+    course_serializer = BootcampAsCourseSerializer(
         data=course_data, instance=course_instance
     )
     if not course_serializer.is_valid():

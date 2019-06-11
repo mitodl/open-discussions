@@ -9,10 +9,10 @@ import pytest
 import pytz
 from django.utils import timezone
 
-from course_catalog.constants import PlatformType, AvailabilityType
+from course_catalog.constants import PlatformType, AvailabilityType, ResourceType
 from course_catalog.factories import CourseFactory
 from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
-from course_catalog.serializer_helpers import get_ocw_topic
+from course_catalog.utils import get_ocw_topic
 from course_catalog.task_helpers import (
     parse_mitx_json_data,
     digest_ocw_course,
@@ -175,6 +175,11 @@ def test_deserializing_a_valid_ocw_course():
     assert Course.objects.count() == 1
     digest_ocw_course(valid_ocw_obj, timezone.now() - timedelta(hours=1), None, True)
     assert Course.objects.count() == 1
+
+    course = Course.objects.last()
+    digest_ocw_course(valid_ocw_obj, timezone.now() + timedelta(hours=1), course, True, "PROD/RES")
+    assert Course.objects.count() == 1
+    assert Course.objects.last().learning_resource_type == ResourceType.ocw_resource.value
 
     course_instructors_count = CourseInstructor.objects.count()
     assert course_instructors_count == len(valid_ocw_obj.get("instructors"))
