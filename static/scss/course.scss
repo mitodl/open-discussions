@@ -1,3 +1,24 @@
+.course-toolbar {
+  .mdc-toolbar__title {
+    display: flex;
+    align-items: center;
+
+    .bar {
+      margin-bottom: 3px;
+    }
+
+    .home-link {
+      margin-right: 8px;
+    }
+
+    .learning-link {
+      font-size: 24px;
+      color: $nice-red;
+      margin-left: 8px;
+    }
+  }
+}
+
 .course-search-input {
   max-width: 600px;
   margin: auto;
