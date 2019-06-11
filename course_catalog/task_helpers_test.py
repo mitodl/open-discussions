@@ -177,9 +177,13 @@ def test_deserializing_a_valid_ocw_course():
     assert Course.objects.count() == 1
 
     course = Course.objects.last()
-    digest_ocw_course(valid_ocw_obj, timezone.now() + timedelta(hours=1), course, True, "PROD/RES")
+    digest_ocw_course(
+        valid_ocw_obj, timezone.now() + timedelta(hours=1), course, True, "PROD/RES"
+    )
     assert Course.objects.count() == 1
-    assert Course.objects.last().learning_resource_type == ResourceType.ocw_resource.value
+    assert (
+        Course.objects.last().learning_resource_type == ResourceType.ocw_resource.value
+    )
 
     course_instructors_count = CourseInstructor.objects.count()
     assert course_instructors_count == len(valid_ocw_obj.get("instructors"))

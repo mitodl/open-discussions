@@ -11,11 +11,7 @@ from course_catalog.models import (
     CourseTopic,
     Bootcamp,
 )
-from course_catalog.utils import (
-    get_ocw_topic,
-    get_year_and_semester,
-    get_course_url,
-)
+from course_catalog.utils import get_ocw_topic, get_year_and_semester, get_course_url
 
 
 class CourseInstructorSerializer(serializers.ModelSerializer):
@@ -221,6 +217,7 @@ class BootcampSerializer(BaseCourseSerializer):
     """
     Serializer for Bootcamp model
     """
+
     def to_internal_value(self, data):
         """
         Custom function to parse data out of the raw bootcamp json
