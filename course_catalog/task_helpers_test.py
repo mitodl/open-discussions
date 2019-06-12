@@ -9,15 +9,14 @@ import pytest
 import pytz
 from django.utils import timezone
 
-from course_catalog.constants import PlatformType, AvailabilityType
+from course_catalog.constants import PlatformType, AvailabilityType, ResourceType
 from course_catalog.factories import CourseFactory
 from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
+from course_catalog.utils import get_ocw_topic
 from course_catalog.task_helpers import (
     parse_mitx_json_data,
     digest_ocw_course,
-    get_ocw_topic,
     safe_load_json,
-    get_course_url,
     get_course_availability,
     should_skip_course,
     tag_edx_course_program,
@@ -47,7 +46,7 @@ def test_parse_mitx_json_data_overwrite(
         course_id=mitx_valid_data["course_runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
-    mock_save = mocker.patch("course_catalog.task_helpers.CourseSerializer.save")
+    mock_save = mocker.patch("course_catalog.task_helpers.EDXSerializer.save")
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save.call_count == (1 if force_overwrite else 0)
     assert mock_course_index_functions.update_course.call_count == (
@@ -177,6 +176,15 @@ def test_deserializing_a_valid_ocw_course():
     digest_ocw_course(valid_ocw_obj, timezone.now() - timedelta(hours=1), None, True)
     assert Course.objects.count() == 1
 
+    course = Course.objects.last()
+    digest_ocw_course(
+        valid_ocw_obj, timezone.now() + timedelta(hours=1), course, True, "PROD/RES"
+    )
+    assert Course.objects.count() == 1
+    assert (
+        Course.objects.last().learning_resource_type == ResourceType.ocw_resource.value
+    )
+
     course_instructors_count = CourseInstructor.objects.count()
     assert course_instructors_count == len(valid_ocw_obj.get("instructors"))
 
@@ -267,58 +275,6 @@ def test_safe_load_bad_json(mocker):
     mock_logger = mocker.patch("course_catalog.task_helpers.log.exception")
     assert safe_load_json("badjson", "key") == {}
     mock_logger.assert_called_with("%s has a corrupted JSON", "key")
-
-
-@pytest.mark.parametrize(
-    "course_id,course_json,platform, expected",
-    [
-        [
-            "MITX-01",
-            {"course_runs": [{"marketing_url": "https://www.edx.org/course/someurl"}]},
-            PlatformType.mitx.value,
-            "https://www.edx.org/course/someurl",
-        ],
-        [
-            "MITX-01",
-            {"course_runs": [{"marketing_url": "https://www.edx.org/"}]},
-            PlatformType.mitx.value,
-            "https://courses.edx.org/courses/MITX-01/course/",
-        ],
-        [
-            "MITX-01",
-            {"course_runs": [{"marketing_url": ""}]},
-            PlatformType.mitx.value,
-            "https://courses.edx.org/courses/MITX-01/course/",
-        ],
-        [
-            "MITX-01",
-            {"course_runs": [{}]},
-            PlatformType.mitx.value,
-            "https://courses.edx.org/courses/MITX-01/course/",
-        ],
-        [
-            "MITX-01",
-            {},
-            PlatformType.mitx.value,
-            "https://courses.edx.org/courses/MITX-01/course/",
-        ],
-        [
-            "e9387c256bae4ca99cce88fd8b7f8272",
-            {"url": "/someurl"},
-            PlatformType.ocw.value,
-            "http://ocw.mit.edu/someurl",
-        ],
-        ["e9387c256bae4ca99cce88fd8b7f8272", {"url": ""}, PlatformType.ocw.value, None],
-        ["e9387c256bae4ca99cce88fd8b7f8272", {}, PlatformType.ocw.value, None],
-    ],
-)
-def test_get_course_url(course_id, course_json, platform, expected):
-    """ Test that url's are calculated as expected """
-    actual_url = get_course_url(course_id, course_json, platform)
-    if expected is None:
-        assert actual_url is expected
-    else:
-        assert actual_url == expected
 
 
 def test_get_course_availability(mitx_valid_data):
