@@ -11,8 +11,7 @@ import {
   BannerPageWrapper,
   BannerPageHeader,
   BannerContainer,
-  BannerImage,
-  Gradient
+  BannerImage
 } from "../components/PageBanner"
 import { Cell, Grid } from "../components/Grid"
 import SearchTextbox from "../components/SearchTextbox"
@@ -26,7 +25,7 @@ import {
   newCoursesRequest,
   newCoursesSelector
 } from "../lib/api/courses"
-import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
+import { toQueryString, COURSE_SEARCH_URL, COURSE_BANNER_URL } from "../lib/url"
 
 import type { Course } from "../flow/discussionTypes"
 
@@ -60,10 +59,9 @@ export const CourseIndexPage = ({
   history
 }: Props) => (
   <BannerPageWrapper>
-    <BannerPageHeader>
-      <BannerContainer>
-        <BannerImage src={null} />
-        <Gradient />
+    <BannerPageHeader tall>
+      <BannerContainer tall>
+        <BannerImage src={COURSE_BANNER_URL} tall />
       </BannerContainer>
       <Grid className="main-content two-column channel-header course-index-page">
         <Cell width={12} className="avatar-headline-row">
