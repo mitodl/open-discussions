@@ -1,4 +1,5 @@
 // @flow
+
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
@@ -99,6 +100,23 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
     }
   }
 
+  get wrappingClass() {
+    const { showDrawerDesktop, showDrawerHover } = this.props
+
+    const isMobile = isMobileWidth()
+
+    if (isMobile) {
+      return ""
+    }
+    if (showDrawerDesktop) {
+      return "persistent-drawer-open"
+    }
+    if (showDrawerHover) {
+      return "persistent-drawer-hover"
+    }
+    return "persistent-drawer-closed"
+  }
+
   render() {
     const {
       channels,
@@ -109,12 +127,6 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
       location: { pathname }
     } = this.props
     const isMobile = isMobileWidth()
-
-    const wrappingClass = isMobile
-      ? ""
-      : showDrawerDesktop || showDrawerHover
-        ? "persistent-drawer-open"
-        : "persistent-drawer-closed"
 
     const channelName = getChannelNameFromPathname(pathname)
     const currentChannel = channels.get(channelName)
@@ -133,7 +145,7 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
     const expanded = isMobile ? true : showDrawerDesktop || showDrawerHover
 
     return (
-      <div className={wrappingClass}>
+      <div className={this.wrappingClass}>
         <Theme>
           <Drawer
             persistent={!isMobile}
@@ -162,7 +174,7 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
                       useLoginPopup={useLoginPopup}
                     />
                   </div>
-                  <NavigationItem whenExpanded={() => <Footer />} />
+                  <NavigationItem fading whenExpanded={() => <Footer />} />
                 </NavigationExpansion.Provider>
               </DrawerContent>
             </ScrollArea>
