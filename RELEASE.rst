@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.80.0
+--------------
+
+- run black
+- Address comments on PR
+- fix tests
+- Refactor course_catalog course parsing
+- upgrade a few dependencies
+
 Version 0.79.2 (Released June 10, 2019)
 --------------
 
