@@ -397,3 +397,42 @@ def delete_course(course_obj):
         course_obj (course_catalog.models.Course): A Course object
     """
     delete_document.delay(gen_course_id(course_obj.course_id), COURSE_TYPE)
+
+
+# @if_feature_enabled(INDEX_UPDATES)
+# def index_new_bootcamp(bootcamp_obj):
+#     pass
+#
+# @if_feature_enabled(INDEX_UPDATES)
+# def update_bootcamp(bootcamp_obj):
+#     pass
+#
+# @if_feature_enabled(INDEX_UPDATES)
+# def delete_bootcamp(bootcamp_obj):
+#     pass
+#
+#
+# @if_feature_enabled(INDEX_UPDATES)
+# def index_new_program(program_obj):
+#     pass
+#
+# @if_feature_enabled(INDEX_UPDATES)
+# def update_program(program_obj):
+#     pass
+#
+# @if_feature_enabled(INDEX_UPDATES)
+# def delete_program(program_obj):
+#     pass
+#
+#
+# @if_feature_enabled(INDEX_UPDATES)
+# def index_new_learning_path(learning_path_obj):
+#     pass
+#
+# @if_feature_enabled(INDEX_UPDATES)
+# def update_learning_path(learning_path_obj):
+#     pass
+#
+# @if_feature_enabled(INDEX_UPDATES)
+# def delete_learning_path(learning_path_obj):
+#     pass
