@@ -25,6 +25,9 @@ from search.constants import (
     ALIAS_ALL_INDICES,
     VALID_OBJECT_TYPES,
     GLOBAL_DOC_TYPE,
+    BOOTCAMP_TYPE,
+    PROGRAM_TYPE,
+    LEARNING_PATH_TYPE,
 )
 from search.exceptions import ReindexException
 from search.serializers import (
@@ -33,6 +36,9 @@ from search.serializers import (
     serialize_bulk_profiles,
     serialize_bulk_courses,
     ESPostSerializer,
+    serialize_bulk_bootcamps,
+    serialize_bulk_programs,
+    serialize_bulk_learning_paths,
 )
 
 
@@ -404,6 +410,75 @@ def index_courses(ids):
         if len(errors) > 0:
             raise ReindexException(
                 "Error during bulk course insert: {errors}".format(errors=errors)
+            )
+
+
+def index_bootcamps(ids):
+    """
+    Index bootcamps based on list of bootcamp ids
+
+    Args:
+        ids(list of int): List of bootcamp id's
+    """
+    conn = get_conn()
+    for alias in get_active_aliases([BOOTCAMP_TYPE]):
+        _, errors = bulk(
+            conn,
+            serialize_bulk_bootcamps(ids),
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            # Adjust chunk size from 500 depending on environment variable
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+        if len(errors) > 0:
+            raise ReindexException(
+                "Error during bulk bootcamp insert: {errors}".format(errors=errors)
+            )
+
+
+def index_programs(ids):
+    """
+    Index programs based on list of program ids
+
+    Args:
+        ids(list of int): List of program id's
+    """
+    conn = get_conn()
+    for alias in get_active_aliases([PROGRAM_TYPE]):
+        _, errors = bulk(
+            conn,
+            serialize_bulk_programs(ids),
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            # Adjust chunk size from 500 depending on environment variable
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+        if len(errors) > 0:
+            raise ReindexException(
+                "Error during bulk program insert: {errors}".format(errors=errors)
+            )
+
+
+def index_learning_paths(ids):
+    """
+    Index learning_paths based on list of learning_path ids
+
+    Args:
+        ids(list of int): List of learning_path id's
+    """
+    conn = get_conn()
+    for alias in get_active_aliases([LEARNING_PATH_TYPE]):
+        _, errors = bulk(
+            conn,
+            serialize_bulk_learning_paths(ids),
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            # Adjust chunk size from 500 depending on environment variable
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+        if len(errors) > 0:
+            raise ReindexException(
+                "Error during bulk learning_path insert: {errors}".format(errors=errors)
             )
 
 
