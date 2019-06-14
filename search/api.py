@@ -95,18 +95,18 @@ def gen_bootcamp_id(bootcamp_id):
     return "b_{}".format(safe_id)
 
 
-def gen_program_id(program_title):
+def gen_program_id(program_obj):
     """
     Generates the Elasticsearch document id for a program
 
     Args:
-        program_id (str): The title of a Program object
+        program_obj (Program): The Program object
 
     Returns:
         str: The Elasticsearch document id for this object
     """
     safe_id = (
-        urlsafe_b64encode(program_title.encode("utf-8"))
+        urlsafe_b64encode(program_obj.title.encode("utf-8"))
         .decode("utf-8")
         .rstrip("=")
         .replace(" ", "_")
@@ -114,17 +114,17 @@ def gen_program_id(program_title):
     return "prog_{}".format(safe_id)
 
 
-def gen_learning_path_id(learning_path):
+def gen_learning_path_id(learning_path_obj):
     """
     Generates the Elasticsearch document id for a learning_path
 
     Args:
-        learning_path (LearningPath): The LearningPath object
+        learning_path_obj (LearningPath): The LearningPath object
 
     Returns:
         str: The Elasticsearch document id for this object
     """
-    learning_path_id = str(learning_path.author.username + learning_path.title)
+    learning_path_id = str(learning_path_obj.author.username + learning_path_obj.title)
     safe_id = (
         urlsafe_b64encode(learning_path_id.encode("utf-8"))
         .decode("utf-8")

@@ -535,7 +535,7 @@ def serialize_bootcamp_for_bulk(bootcamp_obj):
     Serialize a bootcamp for bulk API request
 
     Args:
-        bootcamp_obj (Course): A bootcamp
+        bootcamp_obj (Bootcamp): A bootcamp
     """
     return {
         "_id": gen_bootcamp_id(bootcamp_obj.course_id),
@@ -550,7 +550,7 @@ def serialize_bulk_programs(ids):
     Args:
         ids(list of int): List of program id's
     """
-    for program in Course.objects.filter(id__in=ids):
+    for program in Program.objects.filter(id__in=ids):
         yield serialize_program_for_bulk(program)
 
 
@@ -559,7 +559,7 @@ def serialize_program_for_bulk(program_obj):
     Serialize a program for bulk API request
 
     Args:
-        program_obj (Course): A program
+        program_obj (Program): A program
     """
     return {"_id": gen_program_id(program_obj), **ESProgramSerializer(program_obj).data}
 
@@ -571,7 +571,7 @@ def serialize_bulk_learning_paths(ids):
     Args:
         ids(list of int): List of learning_path id's
     """
-    for learning_path in Course.objects.filter(id__in=ids):
+    for learning_path in LearningPath.objects.filter(id__in=ids):
         yield serialize_learning_path_for_bulk(learning_path)
 
 
@@ -580,7 +580,7 @@ def serialize_learning_path_for_bulk(learning_path_obj):
     Serialize a learning_path for bulk API request
 
     Args:
-        learning_path_obj (Course): A learning_path
+        learning_path_obj (LearningPath): A learning_path
     """
     return {
         "_id": gen_learning_path_id(learning_path_obj),
