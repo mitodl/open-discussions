@@ -24,7 +24,7 @@ from search.constants import (
     COURSE_TYPE,
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
-    LEARNING_PATH,
+    LEARNING_PATH_TYPE,
 )
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
@@ -376,7 +376,7 @@ class ESLearningPathSerializer(ESModelSerializer):
     Elasticsearch serializer class for learning_paths
     """
 
-    object_type = LEARNING_PATH
+    object_type = LEARNING_PATH_TYPE
 
     topics = serializers.SerializerMethodField()
 

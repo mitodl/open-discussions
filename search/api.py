@@ -22,7 +22,7 @@ from search.constants import (
     COURSE_TYPE,
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
-    LEARNING_PATH,
+    LEARNING_PATH_TYPE,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -191,7 +191,7 @@ def _apply_general_query_filters(search, user):
     program_filter = ~Q("terms", object_type=[PROGRAM_TYPE])
 
     learning_path_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
-        "terms", object_type=[LEARNING_PATH]
+        "terms", object_type=[LEARNING_PATH_TYPE]
     )
 
     if channel_names:
