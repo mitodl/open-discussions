@@ -6,6 +6,7 @@ import pytest
 from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.api import add_user_role
 from channels.factories.models import ChannelFactory
+from course_catalog.constants import PrivacyLevel
 from search.api import (
     execute_search,
     is_reddit_object_removed,
@@ -157,6 +158,47 @@ def test_execute_search(mocker, user):
                                 ]
                             }
                         },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {"terms": {"object_type": ["bootcamp"]}}
+                                            ]
+                                        }
+                                    },
+                                    {"term": {"published": True}},
+                                ]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "must_not": [{"terms": {"object_type": ["program"]}}]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {
+                                                    "terms": {
+                                                        "object_type": ["learning_path"]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "term": {
+                                            "privacy_level": PrivacyLevel.public.value
+                                        }
+                                    },
+                                ]
+                            }
+                        },
                     ]
                 }
             },
@@ -248,6 +290,47 @@ def test_execute_search_anonymous(mocker):
                                         }
                                     },
                                     {"term": {"published": True}},
+                                ]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {"terms": {"object_type": ["bootcamp"]}}
+                                            ]
+                                        }
+                                    },
+                                    {"term": {"published": True}},
+                                ]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "must_not": [{"terms": {"object_type": ["program"]}}]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {
+                                                    "terms": {
+                                                        "object_type": ["learning_path"]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "term": {
+                                            "privacy_level": PrivacyLevel.public.value
+                                        }
+                                    },
                                 ]
                             }
                         },
