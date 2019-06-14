@@ -6,12 +6,26 @@ from rest_framework import serializers
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
-from course_catalog.models import Course
+from course_catalog.models import Course, Bootcamp, Program, LearningPath
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
 from profiles.utils import image_uri
-from search.api import gen_post_id, gen_comment_id, gen_profile_id, gen_course_id
-from search.constants import PROFILE_TYPE, COURSE_TYPE
+from search.api import (
+    gen_post_id,
+    gen_comment_id,
+    gen_profile_id,
+    gen_course_id,
+    gen_bootcamp_id,
+    gen_learning_path_id,
+    gen_program_id,
+)
+from search.constants import (
+    PROFILE_TYPE,
+    COURSE_TYPE,
+    BOOTCAMP_TYPE,
+    PROGRAM_TYPE,
+    LEARNING_PATH,
+)
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
 log = logging.getLogger()
@@ -303,6 +317,82 @@ class ESCommentSerializer(ESModelSerializer):
         read_only_fields = ("text", "score", "created", "removed", "deleted")
 
 
+class ESBootcampSerializer(ESCourseSerializer):
+    """
+    Elasticsearch serializer class for bootcamps
+    """
+
+    object_type = BOOTCAMP_TYPE
+
+    class Meta:
+        model = Bootcamp
+        fields = [
+            "id",
+            "course_id",
+            "short_description",
+            "full_description",
+            "language",
+            "year",
+            "start_date",
+            "end_date",
+            "enrollment_start",
+            "enrollment_end",
+            "title",
+            "image_src",
+            "topics",
+            "prices",
+            "instructors",
+            "published",
+            "availability",
+        ]
+
+        read_only_fields = fields
+
+
+class ESProgramSerializer(ESModelSerializer):
+    """
+    Elasticsearch serializer class for programs
+    """
+
+    object_type = PROGRAM_TYPE
+
+    topics = serializers.SerializerMethodField()
+
+    def get_topics(self, program):
+        """
+        Get the topic names for a program
+        """
+        return list(program.topics.values_list("name", flat=True))
+
+    class Meta:
+        model = Program
+        fields = ["id", "short_description", "title", "image_src", "topics"]
+
+        read_only_fields = fields
+
+
+class ESLearningPathSerializer(ESModelSerializer):
+    """
+    Elasticsearch serializer class for learning_paths
+    """
+
+    object_type = LEARNING_PATH
+
+    topics = serializers.SerializerMethodField()
+
+    def get_topics(self, learning_path):
+        """
+        Get the topic names for a learning_path
+        """
+        return list(learning_path.topics.values_list("name", flat=True))
+
+    class Meta:
+        model = LearningPath
+        fields = ["id", "short_description", "title", "image_src", "topics"]
+
+        read_only_fields = fields
+
+
 def serialize_bulk_posts(post_ids):
     """
     Index a list of Post.ids
@@ -426,4 +516,73 @@ def serialize_course_for_bulk(course_obj):
     return {
         "_id": gen_course_id(course_obj.course_id),
         **ESCourseSerializer(course_obj).data,
+    }
+
+
+def serialize_bulk_bootcamps(ids):
+    """
+    Serialize bootcamps for bulk indexing
+
+    Args:
+        ids(list of int): List of bootcamp id's
+    """
+    for bootcamp in Bootcamp.objects.filter(id__in=ids).prefetch_related("instructors"):
+        yield serialize_bootcamp_for_bulk(bootcamp)
+
+
+def serialize_bootcamp_for_bulk(bootcamp_obj):
+    """
+    Serialize a bootcamp for bulk API request
+
+    Args:
+        bootcamp_obj (Course): A bootcamp
+    """
+    return {
+        "_id": gen_bootcamp_id(bootcamp_obj.course_id),
+        **ESBootcampSerializer(bootcamp_obj).data,
+    }
+
+
+def serialize_bulk_programs(ids):
+    """
+    Serialize programs for bulk indexing
+
+    Args:
+        ids(list of int): List of program id's
+    """
+    for program in Course.objects.filter(id__in=ids):
+        yield serialize_program_for_bulk(program)
+
+
+def serialize_program_for_bulk(program_obj):
+    """
+    Serialize a program for bulk API request
+
+    Args:
+        program_obj (Course): A program
+    """
+    return {"_id": gen_program_id(program_obj), **ESProgramSerializer(program_obj).data}
+
+
+def serialize_bulk_learning_paths(ids):
+    """
+    Serialize learning_paths for bulk indexing
+
+    Args:
+        ids(list of int): List of learning_path id's
+    """
+    for learning_path in Course.objects.filter(id__in=ids):
+        yield serialize_learning_path_for_bulk(learning_path)
+
+
+def serialize_learning_path_for_bulk(learning_path_obj):
+    """
+    Serialize a learning_path for bulk API request
+
+    Args:
+        learning_path_obj (Course): A learning_path
+    """
+    return {
+        "_id": gen_learning_path_id(learning_path_obj),
+        **ESLearningPathSerializer(learning_path_obj).data,
     }
