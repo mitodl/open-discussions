@@ -17,13 +17,25 @@ from search.api import (
     gen_profile_id,
     is_reddit_object_removed,
     gen_course_id,
+    gen_bootcamp_id,
+    gen_program_id,
+    gen_learning_path_id,
 )
-from search.constants import PROFILE_TYPE, COURSE_TYPE
+from search.constants import (
+    PROFILE_TYPE,
+    COURSE_TYPE,
+    BOOTCAMP_TYPE,
+    PROGRAM_TYPE,
+    LEARNING_PATH_TYPE,
+)
 from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
     ESProfileSerializer,
     ESCourseSerializer,
+    ESBootcampSerializer,
+    ESLearningPathSerializer,
+    ESProgramSerializer,
 )
 from search.tasks import (
     create_document,
@@ -399,40 +411,124 @@ def delete_course(course_obj):
     delete_document.delay(gen_course_id(course_obj.course_id), COURSE_TYPE)
 
 
-# @if_feature_enabled(INDEX_UPDATES)
-# def index_new_bootcamp(bootcamp_obj):
-#     pass
-#
-# @if_feature_enabled(INDEX_UPDATES)
-# def update_bootcamp(bootcamp_obj):
-#     pass
-#
-# @if_feature_enabled(INDEX_UPDATES)
-# def delete_bootcamp(bootcamp_obj):
-#     pass
-#
-#
-# @if_feature_enabled(INDEX_UPDATES)
-# def index_new_program(program_obj):
-#     pass
-#
-# @if_feature_enabled(INDEX_UPDATES)
-# def update_program(program_obj):
-#     pass
-#
-# @if_feature_enabled(INDEX_UPDATES)
-# def delete_program(program_obj):
-#     pass
-#
-#
-# @if_feature_enabled(INDEX_UPDATES)
-# def index_new_learning_path(learning_path_obj):
-#     pass
-#
-# @if_feature_enabled(INDEX_UPDATES)
-# def update_learning_path(learning_path_obj):
-#     pass
-#
-# @if_feature_enabled(INDEX_UPDATES)
-# def delete_learning_path(learning_path_obj):
-#     pass
+@if_feature_enabled(INDEX_UPDATES)
+def index_new_bootcamp(bootcamp_obj):
+    """
+    Serializes a bootcamp object and runs a task to create an ES document for it.
+
+    Args:
+        bootcamp_obj (course_catalog.models.Bootcamp): A Bootcamp object
+    """
+    data = ESBootcampSerializer(bootcamp_obj).data
+    create_document.delay(gen_bootcamp_id(bootcamp_obj.course_id), data)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def update_bootcamp(bootcamp_obj):
+    """
+    Run a task to update all fields of a bootcamp Elasticsearch document
+
+    Args:
+        bootcamp_obj(Bootcamp): the Bootcamp to update in ES
+    """
+
+    bootcamp_data = ESBootcampSerializer(bootcamp_obj).data
+    update_document_with_partial.delay(
+        gen_bootcamp_id(bootcamp_obj.course_id),
+        bootcamp_data,
+        BOOTCAMP_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def delete_bootcamp(bootcamp_obj):
+    """
+    Serializes a bootcamp object and runs a task to create an ES document for it.
+
+    Args:
+        bootcamp_obj (course_catalog.models.Bootcamp): A Bootcamp object
+    """
+    delete_document.delay(gen_bootcamp_id(bootcamp_obj.course_id), BOOTCAMP_TYPE)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def index_new_program(program_obj):
+    """
+    Serializes a program object and runs a task to create an ES document for it.
+
+    Args:
+        program_obj (course_catalog.models.Program): A Program object
+    """
+    data = ESProgramSerializer(program_obj).data
+    create_document.delay(gen_program_id(program_obj), data)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def update_program(program_obj):
+    """
+    Run a task to update all fields of a program Elasticsearch document
+
+    Args:
+        program_obj(Program): the Program to update in ES
+    """
+
+    program_data = ESProgramSerializer(program_obj).data
+    update_document_with_partial.delay(
+        gen_program_id(program_obj),
+        program_data,
+        PROGRAM_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def delete_program(program_obj):
+    """
+    Serializes a program object and runs a task to create an ES document for it.
+
+    Args:
+        program_obj (course_catalog.models.Program): A Program object
+    """
+    delete_document.delay(gen_program_id(program_obj), PROGRAM_TYPE)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def index_new_learning_path(learning_path_obj):
+    """
+    Serializes a learning_path object and runs a task to create an ES document for it.
+
+    Args:
+        learning_path_obj (course_catalog.models.LearningPath): A LearningPath object
+    """
+    data = ESLearningPathSerializer(learning_path_obj).data
+    create_document.delay(gen_learning_path_id(learning_path_obj), data)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def update_learning_path(learning_path_obj):
+    """
+    Run a task to update all fields of a learning_path Elasticsearch document
+
+    Args:
+        learning_path_obj(LearningPath): the LearningPath to update in ES
+    """
+
+    learning_path_data = ESLearningPathSerializer(learning_path_obj).data
+    update_document_with_partial.delay(
+        gen_learning_path_id(learning_path_obj),
+        learning_path_data,
+        LEARNING_PATH_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def delete_learning_path(learning_path_obj):
+    """
+    Serializes a learning_path object and runs a task to create an ES document for it.
+
+    Args:
+        learning_path_obj (course_catalog.models.LearningPath): A LearningPath object
+    """
+    delete_document.delay(gen_learning_path_id(learning_path_obj), LEARNING_PATH_TYPE)
