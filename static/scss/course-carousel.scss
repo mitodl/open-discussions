@@ -1,38 +1,45 @@
 .course-carousel {
+  &:first-child {
+    .title-row {
+      margin-top: 10px;
+    }
+  }
+
   .slider-list {
     max-height: 303px;
   }
 
   .title {
-    font-size: $highlight-font-size;
-    color: $navy;
+    font-size: $title-font-size;
+    color: $nice-red;
     font-weight: bold;
   }
 
-  .title-and-controls {
+  .title-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin: 30px 0;
+  }
 
-    .controls {
-      display: flex;
-      align-items: flex-end;
+  .slider-control-centerright {
+    right: -40px !important;
+  }
 
-      button {
-        font-size: 14px;
+  .slider-control-centerleft {
+    left: -42px !important;
+  }
 
-        &.next {
-          i {
-            margin-right: 0;
-            margin-left: 5px;
-          }
-        }
+  .carousel-control {
+    height: 60px;
+    width: 60px;
+    background: #d8d8d8;
+    border-radius: 200px;
+    opacity: 0.5;
+    cursor: pointer;
 
-        &.disabled {
-          color: $font-grey-light;
-          border: 1px solid $border-grey;
-        }
-      }
+    i {
+      color: white;
+      font-size: 62px;
     }
   }
 
@@ -57,6 +64,9 @@
       &.course-title {
         margin-bottom: 28px;
         min-height: 70px;
+        font-size: 16px;
+        color: black;
+        font-weight: 500;
       }
 
       &.availability-and-price {
