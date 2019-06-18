@@ -196,6 +196,7 @@ def test_execute_search(mocker, user):
                                             "privacy_level": PrivacyLevel.public.value
                                         }
                                     },
+                                    {"term": {"author": user}},
                                 ]
                             }
                         },
@@ -212,9 +213,10 @@ def test_execute_search_anonymous(mocker):
     """execute_search should execute an Elasticsearch search with an anonymous user"""
     get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
 
+    user = AnonymousUser()
     query = {"a": "query"}
     assert (
-        execute_search(user=AnonymousUser(), query=query)
+        execute_search(user=user, query=query)
         == get_conn_mock.return_value.search.return_value
     )
     get_conn_mock.return_value.search.assert_called_once_with(
@@ -331,6 +333,7 @@ def test_execute_search_anonymous(mocker):
                                             "privacy_level": PrivacyLevel.public.value
                                         }
                                     },
+                                    {"term": {"author": user}},
                                 ]
                             }
                         },
