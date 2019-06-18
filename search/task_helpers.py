@@ -19,14 +19,14 @@ from search.api import (
     gen_course_id,
     gen_bootcamp_id,
     gen_program_id,
-    gen_learning_path_id,
+    gen_user_list_id,
 )
 from search.constants import (
     PROFILE_TYPE,
     COURSE_TYPE,
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
-    LEARNING_PATH_TYPE,
+    USER_LIST_TYPE,
 )
 from search.serializers import (
     ESPostSerializer,
@@ -34,7 +34,7 @@ from search.serializers import (
     ESProfileSerializer,
     ESCourseSerializer,
     ESBootcampSerializer,
-    ESLearningPathSerializer,
+    ESUserListSerializer,
     ESProgramSerializer,
 )
 from search.tasks import (
@@ -494,41 +494,41 @@ def delete_program(program_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_new_learning_path(learning_path_obj):
+def index_new_user_list(user_list_obj):
     """
-    Serializes a learning_path object and runs a task to create an ES document for it.
+    Serializes a UserList object and runs a task to create an ES document for it.
 
     Args:
-        learning_path_obj (course_catalog.models.LearningPath): A LearningPath object
+        user_list_obj (course_catalog.models.UserList): A UserList object
     """
-    data = ESLearningPathSerializer(learning_path_obj).data
-    create_document.delay(gen_learning_path_id(learning_path_obj), data)
+    data = ESUserListSerializer(user_list_obj).data
+    create_document.delay(gen_user_list_id(user_list_obj), data)
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_learning_path(learning_path_obj):
+def update_user_list(user_list_obj):
     """
-    Run a task to update all fields of a learning_path Elasticsearch document
+    Run a task to update all fields of a UserList Elasticsearch document
 
     Args:
-        learning_path_obj(LearningPath): the LearningPath to update in ES
+        user_list_obj(UserList): the UserList to update in ES
     """
 
-    learning_path_data = ESLearningPathSerializer(learning_path_obj).data
+    user_list_data = ESUserListSerializer(user_list_obj).data
     update_document_with_partial.delay(
-        gen_learning_path_id(learning_path_obj),
-        learning_path_data,
-        LEARNING_PATH_TYPE,
+        gen_user_list_id(user_list_obj),
+        user_list_data,
+        USER_LIST_TYPE,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def delete_learning_path(learning_path_obj):
+def delete_user_list(user_list_obj):
     """
-    Serializes a learning_path object and runs a task to create an ES document for it.
+    Serializes a UserList object and runs a task to create an ES document for it.
 
     Args:
-        learning_path_obj (course_catalog.models.LearningPath): A LearningPath object
+        user_list_obj (course_catalog.models.UserList): A UserList object
     """
-    delete_document.delay(gen_learning_path_id(learning_path_obj), LEARNING_PATH_TYPE)
+    delete_document.delay(gen_user_list_id(user_list_obj), USER_LIST_TYPE)

@@ -185,7 +185,7 @@ def test_execute_search(mocker, user):
                                             "must_not": [
                                                 {
                                                     "terms": {
-                                                        "object_type": ["learning_path"]
+                                                        "object_type": ["user_list"]
                                                     }
                                                 }
                                             ]
@@ -320,7 +320,7 @@ def test_execute_search_anonymous(mocker):
                                             "must_not": [
                                                 {
                                                     "terms": {
-                                                        "object_type": ["learning_path"]
+                                                        "object_type": ["user_list"]
                                                     }
                                                 }
                                             ]

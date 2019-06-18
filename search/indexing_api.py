@@ -27,7 +27,7 @@ from search.constants import (
     GLOBAL_DOC_TYPE,
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
-    LEARNING_PATH_TYPE,
+    USER_LIST_TYPE,
 )
 from search.exceptions import ReindexException
 from search.serializers import (
@@ -38,7 +38,7 @@ from search.serializers import (
     ESPostSerializer,
     serialize_bulk_bootcamps,
     serialize_bulk_programs,
-    serialize_bulk_learning_paths,
+    serialize_bulk_user_lists,
 )
 
 
@@ -459,18 +459,18 @@ def index_programs(ids):
             )
 
 
-def index_learning_paths(ids):
+def index_user_lists(ids):
     """
-    Index learning_paths based on list of learning_path ids
+    Index user_lists based on list of user_list ids
 
     Args:
-        ids(list of int): List of learning_path id's
+        ids(list of int): List of user_list id's
     """
     conn = get_conn()
-    for alias in get_active_aliases([LEARNING_PATH_TYPE]):
+    for alias in get_active_aliases([USER_LIST_TYPE]):
         _, errors = bulk(
             conn,
-            serialize_bulk_learning_paths(ids),
+            serialize_bulk_user_lists(ids),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable
@@ -478,7 +478,7 @@ def index_learning_paths(ids):
         )
         if len(errors) > 0:
             raise ReindexException(
-                "Error during bulk learning_path insert: {errors}".format(errors=errors)
+                "Error during bulk user_list insert: {errors}".format(errors=errors)
             )
 
 

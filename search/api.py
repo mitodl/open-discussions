@@ -22,7 +22,7 @@ from search.constants import (
     COURSE_TYPE,
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
-    LEARNING_PATH_TYPE,
+    USER_LIST_TYPE,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -92,12 +92,12 @@ def gen_bootcamp_id(bootcamp_id):
         str: The Elasticsearch document id for this object
     """
     safe_id = urlsafe_b64encode(bootcamp_id.encode("utf-8")).decode("utf-8").rstrip("=")
-    return "b_{}".format(safe_id)
+    return "bootcamp_{}".format(safe_id)
 
 
 def gen_program_id(program_obj):
     """
-    Generates the Elasticsearch document id for a program
+    Generates the Elasticsearch document id for a Program
 
     Args:
         program_obj (Program): The Program object
@@ -105,33 +105,22 @@ def gen_program_id(program_obj):
     Returns:
         str: The Elasticsearch document id for this object
     """
-    safe_id = (
-        urlsafe_b64encode(program_obj.title.encode("utf-8"))
-        .decode("utf-8")
-        .rstrip("=")
-        .replace(" ", "_")
-    )
-    return "prog_{}".format(safe_id)
+    safe_id = urlsafe_b64encode(program_obj.id.encode("utf-8")).decode("utf-8")
+    return "program_{}".format(safe_id)
 
 
-def gen_learning_path_id(learning_path_obj):
+def gen_user_list_id(user_list_obj):
     """
-    Generates the Elasticsearch document id for a learning_path
+    Generates the Elasticsearch document id for a UserList
 
     Args:
-        learning_path_obj (LearningPath): The LearningPath object
+        user_list_obj (UserList): The UserList object
 
     Returns:
         str: The Elasticsearch document id for this object
     """
-    learning_path_id = str(learning_path_obj.author.username + learning_path_obj.title)
-    safe_id = (
-        urlsafe_b64encode(learning_path_id.encode("utf-8"))
-        .decode("utf-8")
-        .rstrip("=")
-        .replace(" ", "_")
-    )
-    return "lp_{}".format(safe_id)
+    safe_id = urlsafe_b64encode(user_list_obj.id.encode("utf-8")).decode("utf-8")
+    return "user_list_{}".format(safe_id)
 
 
 def is_reddit_object_removed(reddit_obj):
@@ -190,8 +179,10 @@ def _apply_general_query_filters(search, user):
 
     program_filter = ~Q("terms", object_type=[PROGRAM_TYPE])
 
-    learning_path_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
-        "terms", object_type=[LEARNING_PATH_TYPE]
+    user_list_filter = (
+        Q("term", privacy_level=PrivacyLevel.public.value)
+        | Q("term", author=user)
+        | ~Q("terms", object_type=[USER_LIST_TYPE])
     )
 
     if channel_names:
@@ -203,7 +194,7 @@ def _apply_general_query_filters(search, user):
         .filter(course_filter)
         .filter(bootcamp_filter)
         .filter(program_filter)
-        .filter(learning_path_filter)
+        .filter(user_list_filter)
     )
 
 

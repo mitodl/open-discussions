@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
-from course_catalog.models import Course, Bootcamp, Program, LearningPath
+from course_catalog.models import Course, Bootcamp, Program, UserList
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
 from profiles.utils import image_uri
@@ -16,7 +16,7 @@ from search.api import (
     gen_profile_id,
     gen_course_id,
     gen_bootcamp_id,
-    gen_learning_path_id,
+    gen_user_list_id,
     gen_program_id,
 )
 from search.constants import (
@@ -24,7 +24,7 @@ from search.constants import (
     COURSE_TYPE,
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
-    LEARNING_PATH_TYPE,
+    USER_LIST_TYPE,
 )
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
@@ -371,23 +371,23 @@ class ESProgramSerializer(ESModelSerializer):
         read_only_fields = fields
 
 
-class ESLearningPathSerializer(ESModelSerializer):
+class ESUserListSerializer(ESModelSerializer):
     """
-    Elasticsearch serializer class for learning_paths
+    Elasticsearch serializer class for user_lists
     """
 
-    object_type = LEARNING_PATH_TYPE
+    object_type = USER_LIST_TYPE
 
     topics = serializers.SerializerMethodField()
 
-    def get_topics(self, learning_path):
+    def get_topics(self, user_list):
         """
-        Get the topic names for a learning_path
+        Get the topic names for a user_list
         """
-        return list(learning_path.topics.values_list("name", flat=True))
+        return list(user_list.topics.values_list("name", flat=True))
 
     class Meta:
-        model = LearningPath
+        model = UserList
         fields = ["id", "short_description", "title", "image_src", "topics"]
 
         read_only_fields = fields
@@ -564,25 +564,25 @@ def serialize_program_for_bulk(program_obj):
     return {"_id": gen_program_id(program_obj), **ESProgramSerializer(program_obj).data}
 
 
-def serialize_bulk_learning_paths(ids):
+def serialize_bulk_user_lists(ids):
     """
-    Serialize learning_paths for bulk indexing
+    Serialize user_lists for bulk indexing
 
     Args:
-        ids(list of int): List of learning_path id's
+        ids(list of int): List of user_list id's
     """
-    for learning_path in LearningPath.objects.filter(id__in=ids):
-        yield serialize_learning_path_for_bulk(learning_path)
+    for user_list in UserList.objects.filter(id__in=ids):
+        yield serialize_user_list_for_bulk(user_list)
 
 
-def serialize_learning_path_for_bulk(learning_path_obj):
+def serialize_user_list_for_bulk(user_list_obj):
     """
-    Serialize a learning_path for bulk API request
+    Serialize a user_list for bulk API request
 
     Args:
-        learning_path_obj (LearningPath): A learning_path
+        user_list_obj (UserList): A user_list
     """
     return {
-        "_id": gen_learning_path_id(learning_path_obj),
-        **ESLearningPathSerializer(learning_path_obj).data,
+        "_id": gen_user_list_id(user_list_obj),
+        **ESUserListSerializer(user_list_obj).data,
     }

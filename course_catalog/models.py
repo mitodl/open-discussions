@@ -8,10 +8,7 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 
 from course_catalog.constants import ResourceType
-from course_catalog.utils import (
-    program_image_upload_uri,
-    learning_path_image_upload_uri,
-)
+from course_catalog.utils import program_image_upload_uri, user_list_image_upload_uri
 from open_discussions.models import TimestampedModel
 
 
@@ -149,25 +146,26 @@ class ListItem(TimestampedModel):
         abstract = True
 
 
-class LearningPath(List):
+class UserList(List):
     """
-    LearningPath is a user-created model tracking a restricted list of LearningResources.
+    UserList is a user-created model tracking a restricted list of LearningResources.
     """
 
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     privacy_level = models.CharField(max_length=32, null=True, blank=True)
     image_src = models.ImageField(
-        null=True, max_length=2083, upload_to=learning_path_image_upload_uri
+        null=True, max_length=2083, upload_to=user_list_image_upload_uri
     )
+    list_type = models.CharField(max_length=128)
 
 
-class LearningPathItem(ListItem):
+class UserListItem(ListItem):
     """
-    ListItem model for LearningPaths
+    ListItem model for UserLists
     """
 
-    learning_path = models.ForeignKey(
-        LearningPath, related_name="items", on_delete=models.CASCADE
+    user_List = models.ForeignKey(
+        UserList, related_name="items", on_delete=models.CASCADE
     )
 
 
@@ -187,3 +185,21 @@ class ProgramItem(ListItem):
     """
 
     program = models.ForeignKey(Program, related_name="items", on_delete=models.CASCADE)
+
+
+class FavoriteItem(TimestampedModel):
+    """
+    FavoriteItem model tracks LearningResources that are marked by user as favorite.
+    Favorites don't need to track an user-specified order, although they can be
+    displayed ordered by timestamp. Users should be able to favorite an
+    LearningResource, including other other Lists like Programs and UserLists.
+    """
+
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    content_type = models.ForeignKey(
+        ContentType,
+        limit_choices_to={"model__in": ("Course", "Bootcamp", "UserList", "Program")},
+        on_delete=models.CASCADE,
+    )
+    object_id = models.PositiveIntegerField()
+    item = GenericForeignKey("content_type", "object_id")

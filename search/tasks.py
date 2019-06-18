@@ -12,7 +12,7 @@ from prawcore.exceptions import PrawcoreException, NotFound
 
 from channels.constants import LINK_TYPE_LINK
 from channels.models import Comment, Post
-from course_catalog.models import Course, Bootcamp, Program, LearningPath
+from course_catalog.models import Course, Bootcamp, Program, UserList
 from embedly.api import get_embedly_content
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks, html_to_plain_text
@@ -248,20 +248,20 @@ def index_programs(ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_learning_paths(ids):
+def index_user_lists(ids):
     """
-    Index learning_paths
+    Index UserLists
 
     Args:
-        ids(list of int): List of learning_path id's
+        ids(list of int): List of UserList id's
 
     """
     try:
-        api.index_learning_paths(ids)
+        api.index_user_lists(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_learning_paths threw an error"
+        error = f"index_user_lists threw an error"
         log.exception(error)
         return error
 
@@ -329,9 +329,9 @@ def start_recreate_index(self):
                 )
             ]
             + [
-                index_learning_paths.si(ids)
+                index_user_lists.si(ids)
                 for ids in chunks(
-                    LearningPath.objects.order_by("id").values_list("id", flat=True),
+                    UserList.objects.order_by("id").values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]

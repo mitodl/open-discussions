@@ -6,7 +6,7 @@ PROFILE_TYPE = "profile"
 COURSE_TYPE = "course"
 BOOTCAMP_TYPE = "bootcamp"
 PROGRAM_TYPE = "program"
-LEARNING_PATH_TYPE = "learning_path"
+USER_LIST_TYPE = "user_list"
 
 VALID_OBJECT_TYPES = (
     POST_TYPE,
@@ -15,6 +15,6 @@ VALID_OBJECT_TYPES = (
     COURSE_TYPE,
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
-    LEARNING_PATH_TYPE,
+    USER_LIST_TYPE,
 )
 GLOBAL_DOC_TYPE = "_doc"
