@@ -388,7 +388,15 @@ class ESUserListSerializer(ESModelSerializer):
 
     class Meta:
         model = UserList
-        fields = ["id", "short_description", "title", "image_src", "topics"]
+        fields = [
+            "id",
+            "short_description",
+            "title",
+            "image_src",
+            "topics",
+            "author",
+            "list_type",
+        ]
 
         read_only_fields = fields
 
