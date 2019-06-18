@@ -181,7 +181,7 @@ def _apply_general_query_filters(search, user):
 
     user_list_filter = (
         Q("term", privacy_level=PrivacyLevel.public.value)
-        | Q("term", author=user)
+        | Q("term", author_id=user.id)
         | ~Q("terms", object_type=[USER_LIST_TYPE])
     )
 

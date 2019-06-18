@@ -2,6 +2,8 @@
 
 from django.db import migrations, models
 
+from course_catalog.constants import ListType
+
 
 class Migration(migrations.Migration):
 
@@ -14,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="userlist",
             name="list_type",
-            field=models.CharField(default=1, max_length=128),
+            field=models.CharField(default=ListType.list.value, max_length=128),
             preserve_default=False,
         ),
     ]
