@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             field=models.ImageField(
                 max_length=2083,
                 null=True,
-                upload_to=course_catalog.utils.learning_path_image_upload_uri,
+                upload_to=course_catalog.utils.user_list_image_upload_uri,
             ),
         ),
         migrations.AlterField(

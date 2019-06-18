@@ -164,7 +164,7 @@ class UserListItem(ListItem):
     ListItem model for UserLists
     """
 
-    user_List = models.ForeignKey(
+    user_list = models.ForeignKey(
         UserList, related_name="items", on_delete=models.CASCADE
     )
 
