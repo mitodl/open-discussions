@@ -219,7 +219,7 @@ class UserListFactory(DjangoModelFactory):
     """Factory for Learning Paths"""
 
     title = FuzzyText()
-    list_type = FuzzyChoice(ListType.LEARNING_PATH.value, ListType.LIST.value)
+    list_type = FuzzyChoice((ListType.LEARNING_PATH.value, ListType.LIST.value))
 
     @factory.post_generation
     def topics(self, create, extracted, **kwargs):
