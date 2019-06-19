@@ -5,7 +5,7 @@ from factory.fuzzy import FuzzyChoice, FuzzyText
 
 from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.constants import PlatformType, AvailabilityType
+from course_catalog.constants import PlatformType, AvailabilityType, ListType
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -219,6 +219,7 @@ class UserListFactory(DjangoModelFactory):
     """Factory for Learning Paths"""
 
     title = FuzzyText()
+    list_type = FuzzyChoice(ListType.LEARNING_PATH.value, ListType.LIST.value)
 
     @factory.post_generation
     def topics(self, create, extracted, **kwargs):
