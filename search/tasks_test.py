@@ -227,9 +227,6 @@ def test_start_recreate_index(
     index_comments_mock = mocker.patch("search.tasks.index_comments", autospec=True)
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
     index_courses_mock = mocker.patch("search.tasks.index_courses", autospec=True)
-    index_bootcamps_mock = mocker.patch("search.tasks.index_bootcamps", autospec=True)
-    index_programs_mock = mocker.patch("search.tasks.index_programs", autospec=True)
-    index_user_lists_mock = mocker.patch("search.tasks.index_user_lists", autospec=True)
     backing_index = "backing"
     create_backing_index_mock = mocker.patch(
         "search.indexing_api.create_backing_index",
