@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.81.0
+--------------
+
+- Serializers, views, factories, and tests for course_catalog models (#2058)
+- update the top bar in the courses section
+
 Version 0.80.0 (Released June 13, 2019)
 --------------
 
