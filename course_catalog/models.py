@@ -189,10 +189,10 @@ class ProgramItem(ListItem):
 
 class FavoriteItem(TimestampedModel):
     """
-    FavoriteItem model tracks LearningResources that are marked by user as favorite.
-    Favorites don't need to track an user-specified order, although they can be
-    displayed ordered by timestamp. Users should be able to favorite an
-    LearningResource, including other other Lists like Programs and UserLists.
+    FavoriteItem model tracks LearningResources that are marked by user as their favorite.
+    Favorites don't need to track an user-specified order, although they can by
+    default be displayed ordered by timestamp. Users should be able to favorite any
+    LearningResource, including Lists like Programs and UserLists.
     """
 
     user = models.ForeignKey(User, on_delete=models.PROTECT)
