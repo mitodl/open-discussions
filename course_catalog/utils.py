@@ -9,12 +9,12 @@ from course_catalog.constants import ocw_edx_mapping, semester_mapping, Platform
 from open_discussions.utils import generate_filepath
 
 
-def learning_path_image_upload_uri(instance, filename):
+def user_list_image_upload_uri(instance, filename):
     """
-    upload_to handler for user-created Learning Path image
+    upload_to handler for user-created UserList image
     """
     return generate_filepath(
-        filename, instance.author.username, instance.title, "learning_path"
+        filename, instance.author.username, instance.title, "user_list"
     )
 
 
