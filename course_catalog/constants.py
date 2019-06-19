@@ -35,9 +35,19 @@ class AvailabilityType(Enum):
     archived = "Archived"
 
 
+class ListType(Enum):
+    """
+    Enum for UserLists. User-created lists that are not Learning Paths are displayed
+    to the user as "Your Lists"
+    """
+
+    LEARNING_PATH = "Learning Path"
+    LIST = "List"
+
+
 class PrivacyLevel(Enum):
     """
-    Enum tracking privacy levels for user-created LearningPaths
+    Enum tracking privacy levels for user-created UserLists
     """
 
     private = "private"

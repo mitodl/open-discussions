@@ -9,10 +9,10 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from course_catalog.constants import ResourceType, PlatformType
-from course_catalog.models import Course, LearningPath, Program, Bootcamp
+from course_catalog.models import Course, UserList, Program, Bootcamp
 from course_catalog.serializers import (
     CourseSerializer,
-    LearningPathSerializer,
+    UserListSerializer,
     ProgramSerializer,
     BootcampSerializer,
 )
@@ -112,13 +112,13 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
 
-class LearningPathViewSet(viewsets.ReadOnlyModelViewSet):
+class UserListViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Viewset for Learning Paths
     """
 
-    queryset = LearningPath.objects.all().prefetch_related("items")
-    serializer_class = LearningPathSerializer
+    queryset = UserList.objects.all().prefetch_related("items")
+    serializer_class = UserListSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
