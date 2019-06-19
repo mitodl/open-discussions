@@ -9,8 +9,13 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from course_catalog.constants import ResourceType, PlatformType
-from course_catalog.models import Course
-from course_catalog.serializers import CourseSerializer
+from course_catalog.models import Course, LearningPath, Program, Bootcamp
+from course_catalog.serializers import (
+    CourseSerializer,
+    LearningPathSerializer,
+    ProgramSerializer,
+    BootcampSerializer,
+)
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 # pylint:disable=unused-argument
@@ -45,9 +50,9 @@ def ocw_course_report(request):
     )
 
 
-class CoursePagination(LimitOffsetPagination):
+class DefaultPagination(LimitOffsetPagination):
     """
-    Pagination class for CourseViewSet which gets default_limit and max_limit from settings
+    Pagination class for course_catalog viewsets which gets default_limit and max_limit from settings
     """
 
     default_limit = settings.COURSE_API_DEFAULT_LIMIT
@@ -61,7 +66,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Course.objects.all().prefetch_related("topics", "instructors", "prices")
     serializer_class = CourseSerializer
-    pagination_class = CoursePagination
+    pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
     @action(methods=["GET"], detail=False)
@@ -92,3 +97,38 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
         page = self.paginate_queryset(self.queryset.filter(featured=True))
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+
+class BootcampViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Viewset for Bootcamps
+    """
+
+    queryset = Bootcamp.objects.all().prefetch_related(
+        "topics", "instructors", "prices"
+    )
+    serializer_class = BootcampSerializer
+    pagination_class = DefaultPagination
+    permission_classes = (AnonymousAccessReadonlyPermission,)
+
+
+class LearningPathViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Viewset for Learning Paths
+    """
+
+    queryset = LearningPath.objects.all().prefetch_related("items")
+    serializer_class = LearningPathSerializer
+    pagination_class = DefaultPagination
+    permission_classes = (AnonymousAccessReadonlyPermission,)
+
+
+class ProgramViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Viewset for Programs
+    """
+
+    queryset = Program.objects.all().prefetch_related("items")
+    serializer_class = ProgramSerializer
+    pagination_class = DefaultPagination
+    permission_classes = (AnonymousAccessReadonlyPermission,)

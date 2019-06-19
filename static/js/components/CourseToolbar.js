@@ -41,16 +41,20 @@ export default class CourseToolbar extends React.Component<Props> {
     const { toggleShowUserMenu, showUserMenu, profile } = this.props
 
     return (
-      <div className="navbar">
+      <div className="navbar course-toolbar">
         <header className="mdc-toolbar" ref={this.toolbarRoot}>
           <div className="mdc-toolbar__row">
             <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
               <MITLogoLink />
-              <span className="mdc-toolbar__title">
-                <Link to="/">MIT Open</Link>
-                {" | "}
-                <Link to={COURSE_URL}>Courses</Link>
-              </span>
+              <div className="mdc-toolbar__title">
+                <Link className="home-link" to="/">
+                  MIT Open
+                </Link>
+                <div className="bar">{" | "}</div>
+                <Link className="learning-link" to={COURSE_URL}>
+                  LEARNING
+                </Link>
+              </div>
             </section>
             <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
               <UserMenu

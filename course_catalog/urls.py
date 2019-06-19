@@ -17,12 +17,17 @@ from django.conf.urls import url
 from django.urls import include
 from rest_framework.routers import DefaultRouter
 
-from course_catalog.views import CourseViewSet, ocw_course_report
+from course_catalog import views
 
 router = DefaultRouter()
-router.register(r"courses", CourseViewSet, basename="courses")
+router.register(r"courses", views.CourseViewSet, basename="courses")
+router.register(r"bootcamps", views.BootcampViewSet, basename="bootcamps")
+router.register(r"programs", views.ProgramViewSet, basename="programs")
+router.register(r"learningpaths", views.LearningPathViewSet, basename="learningpaths")
 
 urlpatterns = [
     url(r"^api/v0/", include(router.urls)),
-    url(r"^api/v0/ocw-course-report", ocw_course_report, name="ocw-course-report"),
+    url(
+        r"^api/v0/ocw-course-report", views.ocw_course_report, name="ocw-course-report"
+    ),
 ]

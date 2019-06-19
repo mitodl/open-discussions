@@ -184,16 +184,15 @@ class App extends React.Component<Props> {
         <MetaTags>
           <title>MIT Open Learning</title>
         </MetaTags>
-        <Switch>
-          <Route path={`${match.url}courses/`}>
-            <CourseToolbar
-              toggleShowUserMenu={this.toggleShowUserMenu}
-              showUserMenu={showUserMenu}
-              profile={profile}
-            />
-          </Route>
-          <Route
-            render={() => (
+        <Route path={`${match.url}courses/`}>
+          {({ match }) =>
+            match ? (
+              <CourseToolbar
+                toggleShowUserMenu={this.toggleShowUserMenu}
+                showUserMenu={showUserMenu}
+                profile={profile}
+              />
+            ) : (
               <React.Fragment>
                 <Toolbar
                   toggleShowDrawer={this.toggleShowDrawer}
@@ -203,9 +202,9 @@ class App extends React.Component<Props> {
                 />
                 <Drawer />
               </React.Fragment>
-            )}
-          />
-        </Switch>
+            )
+          }
+        </Route>
         <Snackbar snackbar={snackbar} />
         <Banner
           banner={banner}
