@@ -10,8 +10,28 @@ from course_catalog.models import (
     CoursePrice,
     CourseTopic,
     Bootcamp,
+    LearningPathItem,
+    LearningPath,
+    Program,
+    ProgramItem,
 )
 from course_catalog.utils import get_ocw_topic, get_year_and_semester, get_course_url
+
+
+class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
+    """
+    Special field to handle the generic foreign key in ListItem
+    """
+
+    def to_representation(self, instance):
+        if isinstance(instance, Bootcamp):
+            serializer = BootcampSerializer(instance)
+        elif isinstance(instance, Course):
+            serializer = CourseSerializer(instance)
+        else:
+            raise Exception("Unexpected type of tagged object")
+
+        return serializer.data
 
 
 class CourseInstructorSerializer(serializers.ModelSerializer):
@@ -241,3 +261,55 @@ class BootcampAsCourseSerializer(BootcampSerializer):
         model = Course
         fields = "__all__"
         extra_kwargs = {"raw_json": {"write_only": True}}
+
+
+class LearningPathItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for LearningPathItem model
+    """
+
+    content_data = GenericForeignKeyFieldSerializer(source="item")
+    content_type = serializers.CharField(source="content_type.name")
+
+    class Meta:
+        model = LearningPathItem
+        fields = "__all__"
+
+
+class LearningPathSerializer(serializers.ModelSerializer):
+    """
+    Serializer for LearningPath model
+    """
+
+    items = LearningPathItemSerializer(many=True, allow_null=True)
+    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+
+    class Meta:
+        model = LearningPath
+        fields = "__all__"
+
+
+class ProgramItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for ProgramItem model
+    """
+
+    content_data = GenericForeignKeyFieldSerializer(source="item")
+    content_type = serializers.CharField(source="content_type.name")
+
+    class Meta:
+        model = ProgramItem
+        fields = "__all__"
+
+
+class ProgramSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Program model
+    """
+
+    items = ProgramItemSerializer(many=True, allow_null=True)
+    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+
+    class Meta:
+        model = Program
+        fields = "__all__"
