@@ -130,7 +130,7 @@ class ListItem(TimestampedModel):
     """
     ListItem model tracks associated metadata and LearningResource.
     `content_type` is restricted to the learning resources we want.
-    Lists should not contain other Lists (Programs, LearningPaths).
+    Lists should not contain other Lists such as Programs and UserLists (such as learning paths).
     """
 
     position = models.PositiveIntegerField()
@@ -189,10 +189,10 @@ class ProgramItem(ListItem):
 
 class FavoriteItem(TimestampedModel):
     """
-    FavoriteItem model tracks LearningResources that are marked by user as favorite.
-    Favorites don't need to track an user-specified order, although they can be
-    displayed ordered by timestamp. Users should be able to favorite an
-    LearningResource, including other other Lists like Programs and UserLists.
+    FavoriteItem model tracks LearningResources that are marked by user as their favorite.
+    Favorites don't need to track an user-specified order, although they can by
+    default be displayed ordered by timestamp. Users should be able to favorite any
+    LearningResource, including Lists like Programs and UserLists.
     """
 
     user = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -203,3 +203,6 @@ class FavoriteItem(TimestampedModel):
     )
     object_id = models.PositiveIntegerField()
     item = GenericForeignKey("content_type", "object_id")
+
+    class Meta:
+        unique_together = ("user", "content_type", "object_id")

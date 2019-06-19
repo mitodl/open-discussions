@@ -23,7 +23,7 @@ router = DefaultRouter()
 router.register(r"courses", views.CourseViewSet, basename="courses")
 router.register(r"bootcamps", views.BootcampViewSet, basename="bootcamps")
 router.register(r"programs", views.ProgramViewSet, basename="programs")
-router.register(r"learningpaths", views.LearningPathViewSet, basename="learningpaths")
+router.register(r"userlists", views.UserListViewSet, basename="userlists")
 
 urlpatterns = [
     url(r"^api/v0/", include(router.urls)),

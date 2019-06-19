@@ -9,9 +9,9 @@ from course_catalog.factories import (
     CourseInstructorFactory,
     BootcampFactory,
     ProgramFactory,
-    LearningPathFactory,
-    LearningPathBootcampFactory,
-    LearningPathCourseFactory,
+    UserListFactory,
+    UserListBootcampFactory,
+    UserListCourseFactory,
     ProgramItemCourseFactory,
     ProgramItemBootcampFactory,
 )
@@ -66,20 +66,18 @@ def test_program_endpoint(client):
             assert item.get("id") == course_item.id
 
 
-def test_learning_path_endpoint(client):
+def test_user_list_endpoint(client):
     """Test learning path endpoint"""
     user = UserFactory()
-    learning_path = LearningPathFactory(
-        topics=CourseTopicFactory.create_batch(3), author=user
-    )
-    bootcamp_item = LearningPathBootcampFactory(learning_path=learning_path, position=1)
-    course_item = LearningPathCourseFactory(learning_path=learning_path, position=2)
+    user_list = UserListFactory(topics=CourseTopicFactory.create_batch(3), author=user)
+    bootcamp_item = UserListBootcampFactory(user_list=user_list, position=1)
+    course_item = UserListCourseFactory(user_list=user_list, position=2)
 
-    resp = client.get(reverse("learningpaths-list"))
+    resp = client.get(reverse("userlists-list"))
     assert resp.data.get("count") == 1
 
-    resp = client.get(reverse("learningpaths-detail", args=[learning_path.id]))
-    assert resp.data.get("title") == learning_path.title
+    resp = client.get(reverse("userlists-detail", args=[user_list.id]))
+    assert resp.data.get("title") == user_list.title
     for item in resp.data.get("items"):
         if item.get("position") == 1:
             assert item.get("id") == bootcamp_item.id

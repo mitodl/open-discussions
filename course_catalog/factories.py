@@ -5,7 +5,7 @@ from factory.fuzzy import FuzzyChoice, FuzzyText
 
 from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.constants import PlatformType, AvailabilityType
+from course_catalog.constants import PlatformType, AvailabilityType, ListType
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -14,8 +14,8 @@ from course_catalog.models import (
     Bootcamp,
     Program,
     ProgramItem,
-    LearningPath,
-    LearningPathItem,
+    UserList,
+    UserListItem,
 )
 
 
@@ -197,28 +197,29 @@ class ProgramFactory(DjangoModelFactory):
         model = Program
 
 
-class LearningPathCourseFactory(ListItemFactory):
+class UserListCourseFactory(ListItemFactory):
     """Factory for Learning Path Item Courses"""
 
     content_object = factory.SubFactory(CourseFactory)
 
     class Meta:
-        model = LearningPathItem
+        model = UserListItem
 
 
-class LearningPathBootcampFactory(ListItemFactory):
+class UserListBootcampFactory(ListItemFactory):
     """Factory for Learning Path Item Bootcamps"""
 
     content_object = factory.SubFactory(BootcampFactory)
 
     class Meta:
-        model = LearningPathItem
+        model = UserListItem
 
 
-class LearningPathFactory(DjangoModelFactory):
+class UserListFactory(DjangoModelFactory):
     """Factory for Learning Paths"""
 
     title = FuzzyText()
+    list_type = FuzzyChoice((ListType.LEARNING_PATH.value, ListType.LIST.value))
 
     @factory.post_generation
     def topics(self, create, extracted, **kwargs):
@@ -231,4 +232,4 @@ class LearningPathFactory(DjangoModelFactory):
                 self.topics.add(topic)
 
     class Meta:
-        model = LearningPath
+        model = UserList
