@@ -10,8 +10,8 @@ from course_catalog.models import (
     CoursePrice,
     CourseTopic,
     Bootcamp,
-    LearningPathItem,
-    LearningPath,
+    UserListItem,
+    UserList,
     Program,
     ProgramItem,
 )
@@ -263,29 +263,29 @@ class BootcampAsCourseSerializer(BootcampSerializer):
         extra_kwargs = {"raw_json": {"write_only": True}}
 
 
-class LearningPathItemSerializer(serializers.ModelSerializer):
+class UserListItemSerializer(serializers.ModelSerializer):
     """
-    Serializer for LearningPathItem model
+    Serializer for UserListItem model
     """
 
     content_data = GenericForeignKeyFieldSerializer(source="item")
     content_type = serializers.CharField(source="content_type.name")
 
     class Meta:
-        model = LearningPathItem
+        model = UserListItem
         fields = "__all__"
 
 
-class LearningPathSerializer(serializers.ModelSerializer):
+class UserListSerializer(serializers.ModelSerializer):
     """
-    Serializer for LearningPath model
+    Serializer for UserList model
     """
 
-    items = LearningPathItemSerializer(many=True, allow_null=True)
+    items = UserListItemSerializer(many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
 
     class Meta:
-        model = LearningPath
+        model = UserList
         fields = "__all__"
 
 
