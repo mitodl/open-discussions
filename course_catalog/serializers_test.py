@@ -9,9 +9,14 @@ from course_catalog.factories import (
     CoursePriceFactory,
     CourseInstructorFactory,
     BootcampFactory,
-    ProgramFactory)
+    ProgramFactory,
+)
 from course_catalog.models import ProgramItem
-from course_catalog.serializers import CourseSerializer, BootcampSerializer, ProgramItemSerializer
+from course_catalog.serializers import (
+    CourseSerializer,
+    BootcampSerializer,
+    ProgramItemSerializer,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -62,10 +67,7 @@ def test_generic_foreign_key_serializer():
     """
     program = ProgramFactory()
     course_topic = CourseTopicFactory()
-    program_item = ProgramItem(
-        program=program,
-        item=course_topic,
-    )
+    program_item = ProgramItem(program=program, item=course_topic)
     serializer = ProgramItemSerializer(program_item)
     with pytest.raises(Exception):
-        assert serializer.data.get('item').get('id') == course_topic.id
+        assert serializer.data.get("item").get("id") == course_topic.id
