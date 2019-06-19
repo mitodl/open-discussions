@@ -130,7 +130,7 @@ class ListItem(TimestampedModel):
     """
     ListItem model tracks associated metadata and LearningResource.
     `content_type` is restricted to the learning resources we want.
-    Lists should not contain other Lists (Programs, LearningPaths).
+    Lists should not contain other Lists such as Programs and UserLists (such as learning paths).
     """
 
     position = models.PositiveIntegerField()
