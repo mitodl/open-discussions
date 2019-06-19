@@ -105,8 +105,7 @@ def gen_program_id(program_obj):
     Returns:
         str: The Elasticsearch document id for this object
     """
-    safe_id = urlsafe_b64encode(program_obj.id.encode("utf-8")).decode("utf-8")
-    return "program_{}".format(safe_id)
+    return "program_{}".format(program_obj.id)
 
 
 def gen_user_list_id(user_list_obj):
@@ -119,8 +118,7 @@ def gen_user_list_id(user_list_obj):
     Returns:
         str: The Elasticsearch document id for this object
     """
-    safe_id = urlsafe_b64encode(user_list_obj.id.encode("utf-8")).decode("utf-8")
-    return "user_list_{}".format(safe_id)
+    return "user_list_{}".format(user_list_obj.id)
 
 
 def is_reddit_object_removed(reddit_obj):
