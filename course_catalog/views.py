@@ -2,6 +2,8 @@
 course_catalog views
 """
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.utils import timezone
 from rest_framework import viewsets, status
@@ -67,26 +69,36 @@ class FavoriteViewMixin:
     """
 
     @action(methods=["POST"], detail=True)
-    def favorite(self, request):
+    def favorite(self, request, pk=None):
         """
         Create a favorite item for this object
         """
         obj = self.get_object()
         try:
-            FavoriteItem.objects.create(user=request.user, item=obj)
+            if isinstance(request.user, User):
+                FavoriteItem.objects.create(user=request.user, item=obj)
+            else:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
         except IntegrityError:
             pass
         return Response(status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=True)
-    def unfavorite(self, request):
+    def unfavorite(self, request, pk=None):
         """
         Delete a favorite item for this object
         """
         obj = self.get_object()
         try:
-            favorite_item = FavoriteItem.objects.get(user=request.user, item=obj)
-            favorite_item.delete()
+            if isinstance(request.user, User):
+                favorite_item = FavoriteItem.objects.filter(
+                    user=request.user,
+                    object_id=obj.id,
+                    content_type=ContentType.objects.get_for_model(obj),
+                )
+                favorite_item.delete()
+            else:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
         except FavoriteItem.DoesNotExist:
             pass
         return Response(status=status.HTTP_200_OK)
