@@ -306,7 +306,7 @@ def get_course_availability(course):
         str: The url for the course if any
     """
     if course.platform == PlatformType.ocw.value:
-        return AvailabilityType.current.value
+        return AvailabilityType.available_now.value
     elif course.platform == PlatformType.mitx.value:
         course_json = course.raw_json
         if course_json is None:

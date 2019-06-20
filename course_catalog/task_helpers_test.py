@@ -281,7 +281,7 @@ def test_get_course_availability(mitx_valid_data):
     """ Test that availability is calculated as expected """
     ocw_course = CourseFactory.create(platform=PlatformType.ocw.value)
     # test mitx course with raw_json
-    assert get_course_availability(ocw_course) == AvailabilityType.current.value
+    assert get_course_availability(ocw_course) == AvailabilityType.available_now.value
     mitx_course_with_json = CourseFactory.create(
         course_id=mitx_valid_data["course_runs"][0]["key"],
         raw_json=mitx_valid_data,

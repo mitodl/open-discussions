@@ -58,10 +58,10 @@ class CourseFactory(DjangoModelFactory):
     platform = FuzzyChoice((PlatformType.mitx.value, PlatformType.ocw.value))
     availability = FuzzyChoice(
         (
-            AvailabilityType.current.value,
+            AvailabilityType.available_now.value,
             AvailabilityType.upcoming.value,
             AvailabilityType.starting_soon.value,
-            AvailabilityType.archived.value,
+            AvailabilityType.prior.value,
         )
     )
 
@@ -105,10 +105,10 @@ class BootcampFactory(DjangoModelFactory):
     course_id = factory.Sequence(lambda n: "BOOTCAMP%03d.MIT" % n)
     availability = FuzzyChoice(
         (
-            AvailabilityType.current.value,
+            AvailabilityType.available_now.value,
             AvailabilityType.upcoming.value,
             AvailabilityType.starting_soon.value,
-            AvailabilityType.archived.value,
+            AvailabilityType.prior.value,
         )
     )
 
