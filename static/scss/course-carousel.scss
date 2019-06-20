@@ -6,7 +6,7 @@
   }
 
   .slider-list {
-    max-height: 303px;
+    max-height: 475px;
   }
 
   .title {
@@ -40,40 +40,6 @@
     i {
       color: white;
       font-size: 62px;
-    }
-  }
-
-  .card {
-    .cover-image {
-      img {
-        border-radius: 5px 5px 0 0;
-        width: 100%;
-        object-fit: cover;
-      }
-    }
-
-    .row {
-      margin: 0 20px;
-      display: flex;
-
-      &.topic-and-platform {
-        font-size: $modest-font-size;
-        color: $navy;
-      }
-
-      &.course-title {
-        margin-bottom: 28px;
-        min-height: 70px;
-        font-size: 16px;
-        color: black;
-        font-weight: 500;
-      }
-
-      &.availability-and-price {
-        font-size: $modest-font-size;
-        color: $font-grey-mid;
-        padding-bottom: 14px;
-      }
     }
   }
 }

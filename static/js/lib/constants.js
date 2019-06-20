@@ -11,9 +11,21 @@ export const COURSE_AVAILABLE_NOW = "Available Now"
 export const COURSE_ARCHIVED = "Archived"
 export const COURSE_PRIOR = "Prior"
 
+const ocwPlatform = "ocw"
+const edxPlatform = "mitx"
+const bootcampsPlatform = "bootcamps"
+const micromastersPlatform = "micromasters"
 export const platforms = {
-  OCW: "ocw",
-  edX: "mitx"
+  OCW:          ocwPlatform,
+  edX:          edxPlatform,
+  bootcamps:    bootcampsPlatform,
+  micromasters: micromastersPlatform
+}
+export const platformLogoUrls = {
+  [ocwPlatform]:          "/static/images/mit-ocw-logo-square.png",
+  [edxPlatform]:          "/static/images/mitx-logo.png",
+  [bootcampsPlatform]:    "/static/images/mit-bootcamp-logo.png",
+  [micromastersPlatform]: "/static/images/mit-micromasters-logo.png"
 }
 
 export const WIDGET_TYPE_MARKDOWN = "Markdown"
@@ -28,3 +40,7 @@ export const WIDGET_FIELD_TYPE_URL = "url"
 export const WIDGET_FIELD_TYPE_MARKDOWN = "markdown_wysiwyg"
 export const WIDGET_FIELD_TYPE_PEOPLE = "people"
 export const WIDGET_FIELD_TYPE_CHECKBOX = "checkbox"
+
+export const CAROUSEL_PAGE_SIZE = 3
+export const CAROUSEL_IMG_HEIGHT = 130
+export const CAROUSEL_IMG_WIDTH = 306
