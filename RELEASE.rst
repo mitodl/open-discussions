@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.81.0
+Version 0.81.0 (Released June 21, 2019)
 --------------
 
 - Serializers, views, factories, and tests for course_catalog models (#2058)
