@@ -215,7 +215,7 @@ class OCWSerializer(CourseSerializer):
             "published": data.get("is_published"),
             "raw_json": data.get("raw_json"),
             "url": get_course_url(data.get("uid"), data, PlatformType.ocw.value),
-            "availability": AvailabilityType.available_now.value,
+            "availability": AvailabilityType.current.value,
         }
         if "PROD/RES" in data.get("course_prefix"):
             course_fields["learning_resource_type"] = ResourceType.ocw_resource.value

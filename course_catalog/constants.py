@@ -26,13 +26,13 @@ class ResourceType(Enum):
 class AvailabilityType(Enum):
     """
     Enum for Course availability options dictated by edX API values.
-    All OCW courses should be set to "Available Now"
+    All OCW courses should be set to "Current"
     """
 
-    available_now = "Available Now"
+    current = "Current"
     upcoming = "Upcoming"
     starting_soon = "Starting Soon"
-    prior = "Prior"
+    archived = "Archived"
 
 
 class ListType(Enum):
