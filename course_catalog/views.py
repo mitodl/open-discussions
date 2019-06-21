@@ -2,7 +2,6 @@
 course_catalog views
 """
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.utils import timezone
@@ -75,10 +74,7 @@ class FavoriteViewMixin:
         """
         obj = self.get_object()
         try:
-            if isinstance(request.user, User):
-                FavoriteItem.objects.create(user=request.user, item=obj)
-            else:
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            FavoriteItem.objects.create(user=request.user, item=obj)
         except IntegrityError:
             pass
         return Response(status=status.HTTP_200_OK)
@@ -89,18 +85,12 @@ class FavoriteViewMixin:
         Delete a favorite item for this object
         """
         obj = self.get_object()
-        try:
-            if isinstance(request.user, User):
-                favorite_item = FavoriteItem.objects.filter(
-                    user=request.user,
-                    object_id=obj.id,
-                    content_type=ContentType.objects.get_for_model(obj),
-                )
-                favorite_item.delete()
-            else:
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
-        except FavoriteItem.DoesNotExist:
-            pass
+        favorite_item = FavoriteItem.objects.filter(
+            user=request.user,
+            object_id=obj.id,
+            content_type=ContentType.objects.get_for_model(obj),
+        )
+        favorite_item.delete()
         return Response(status=status.HTTP_200_OK)
 
 
