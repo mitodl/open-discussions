@@ -4,6 +4,21 @@ course_catalog constants
 from enum import Enum
 
 
+class OfferedBy(Enum):
+    """
+    Enum for our Offered By labels. They are our MIT "brands" for LearningResources
+    (Courses, Bootcamps, Programs) and are independent of what platform.
+    User generated lists UserLists (like a learning path) don't have offered by "brand".
+    Values are user-facing.
+    """
+
+    mitx = "MITx"
+    ocw = "OCW"
+    micromasters = "MicroMasters"
+    bootcamps = "Bootcamps"
+    xpro = "xPro"
+
+
 class PlatformType(Enum):
     """
     Enum for platforms
