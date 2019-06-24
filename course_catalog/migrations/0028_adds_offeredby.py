@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 
-from course_catalog.constants import OfferedBy
+from course_catalog.constants import OfferedBy, PlatformType
 
 
 def backfill_offeredby(apps, schema_editor):
@@ -13,10 +13,22 @@ def backfill_offeredby(apps, schema_editor):
     for course in Course.objects.iterator():
         if course.program_type == "Professional":
             course.offered_by = OfferedBy.xpro.value
-            course.save(update_fields=["offered_by"])
         elif course.program_type == "MicroMasters":
             course.offered_by = OfferedBy.micromasters.value
-            course.save(update_fields=["offered_by"])
+        elif course.platform == PlatformType.ocw.value:
+            course.offered_by = OfferedBy.ocw.value
+        elif course.platform == PlatformType.mitx.value:
+            course.offered_by = OfferedBy.mitx.value
+        elif course.platform == PlatformType.bootcamps.value:
+            course.offered_by = OfferedBy.bootcamps.value
+        else:
+            continue
+        course.save(update_fields=["offered_by"])
+
+    Bootcamp = apps.get_model("course_catalog", "Bootcamp")
+    for bootcamp in Bootcamp.objects.iterator():
+        bootcamp.offered_by = OfferedBy.bootcamps.value
+        bootcamp.save(update_fields=["offered_by"])
 
 
 class Migration(migrations.Migration):
