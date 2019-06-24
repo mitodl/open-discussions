@@ -145,7 +145,7 @@ class ESCourseSerializer(ESModelSerializer):
         """
         Get the topic names for a course
         """
-        return list(course.topics.values_list("name", flat=True))
+        return [topic.name for topic in course.topics.all()]
 
     class Meta:
         model = Course
@@ -362,7 +362,7 @@ class ESProgramSerializer(ESModelSerializer):
         """
         Get the topic names for a program
         """
-        return list(program.topics.values_list("name", flat=True))
+        return [topic.name for topic in program.topics.all()]
 
     class Meta:
         model = Program
@@ -384,7 +384,7 @@ class ESUserListSerializer(ESModelSerializer):
         """
         Get the topic names for a user_list
         """
-        return list(user_list.topics.values_list("name", flat=True))
+        return [topic.name for topic in user_list.topics.all()]
 
     class Meta:
         model = UserList
@@ -510,7 +510,9 @@ def serialize_bulk_courses(ids):
     Args:
         ids(list of int): List of course id's
     """
-    for course in Course.objects.filter(id__in=ids).prefetch_related("instructors"):
+    for course in Course.objects.filter(id__in=ids).prefetch_related(
+        "instructors", "topics"
+    ):
         yield serialize_course_for_bulk(course)
 
 
@@ -534,7 +536,9 @@ def serialize_bulk_bootcamps(ids):
     Args:
         ids(list of int): List of bootcamp id's
     """
-    for bootcamp in Bootcamp.objects.filter(id__in=ids).prefetch_related("instructors"):
+    for bootcamp in Bootcamp.objects.filter(id__in=ids).prefetch_related(
+        "instructors", "topics"
+    ):
         yield serialize_bootcamp_for_bulk(bootcamp)
 
 
@@ -558,7 +562,7 @@ def serialize_bulk_programs(ids):
     Args:
         ids(list of int): List of program id's
     """
-    for program in Program.objects.filter(id__in=ids):
+    for program in Program.objects.filter(id__in=ids).prefetch_related("topics"):
         yield serialize_program_for_bulk(program)
 
 
@@ -579,7 +583,7 @@ def serialize_bulk_user_lists(ids):
     Args:
         ids(list of int): List of user_list id's
     """
-    for user_list in UserList.objects.filter(id__in=ids):
+    for user_list in UserList.objects.filter(id__in=ids).prefetch_related("topics"):
         yield serialize_user_list_for_bulk(user_list)
 
 
