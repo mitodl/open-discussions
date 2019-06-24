@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.81.1
+Version 0.81.1 (Released June 24, 2019)
 --------------
 
 - add to README and docstring (#2066)
