@@ -156,43 +156,6 @@ USER_LIST_OBJECT_TYPE = {
     "list_type": {"type": "keyword"},
 }
 
-BOOTCAMP_OBJECT_TYPE = {
-    "id": {"type": "long"},
-    "course_id": {"type": "keyword"},
-    "title": ENGLISH_TEXT_FIELD,
-    "short_description": ENGLISH_TEXT_FIELD,
-    "full_description": ENGLISH_TEXT_FIELD,
-    "start_date": {"type": "date"},
-    "end_date": {"type": "date"},
-    "enrollment_start": {"type": "date"},
-    "enrollment_end": {"type": "date"},
-    "topics": {"type": "keyword"},
-    "instructors": {"type": "text"},
-    "price": {"type": "nested"},
-    "image_src": {"type": "keyword"},
-    "published": {"type": "boolean"},
-    "availability": {"type": "keyword"},
-    "location": {"type": "keyword"},
-}
-
-PROGRAM_OBJECT_TYPE = {
-    "id": {"type": "long"},
-    "title": ENGLISH_TEXT_FIELD,
-    "short_description": ENGLISH_TEXT_FIELD,
-    "image_src": {"type": "keyword"},
-    "topics": {"type": "keyword"},
-}
-
-USER_LIST_OBJECT_TYPE = {
-    "id": {"type": "long"},
-    "title": ENGLISH_TEXT_FIELD,
-    "short_description": ENGLISH_TEXT_FIELD,
-    "image_src": {"type": "keyword"},
-    "topics": {"type": "keyword"},
-    "author": {"type": "keyword"},
-    "list_type": {"type": "keyword"},
-}
-
 MAPPING = {
     POST_TYPE: {
         **CONTENT_OBJECT_TYPE,
