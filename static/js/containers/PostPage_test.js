@@ -8,7 +8,7 @@ import CommentTree, { commentDropdownKey } from "../components/CommentTree"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import PostPage, { PostPage as InnerPostPage } from "./PostPage"
-import { ReplyToPostForm } from "../components/CommentForms"
+import CommentForm from "../components/CommentForm"
 
 import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"
@@ -296,11 +296,11 @@ describe("PostPage", function() {
 
   //
   ;[true, false].forEach(userIsAnon => {
-    it(`should show a ReplyToPostForm when userIsAnonymous() === ${userIsAnon}`, async () => {
+    it(`should show a CommentForm when userIsAnonymous() === ${userIsAnon}`, async () => {
       const anonStub = helper.sandbox.stub(utilFuncs, "userIsAnonymous")
       anonStub.returns(userIsAnon)
       const { inner } = await render()
-      assert.ok(inner.find(ReplyToPostForm).exists())
+      assert.ok(inner.find(CommentForm).exists())
     })
   })
 

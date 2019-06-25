@@ -3,12 +3,12 @@ import React from "react"
 import R from "ramda"
 import { assert } from "chai"
 import sinon from "sinon"
-import { mount } from "enzyme"
+import { shallow } from "enzyme"
 
 import CourseCarousel, { CarouselCourseCard } from "./CourseCarousel"
 
 import { availabilityLabel, minPrice } from "../lib/courses"
-import { configureShallowRenderer, shouldIf } from "../lib/test_utils"
+import { configureShallowRenderer } from "../lib/test_utils"
 import { makeCourse } from "../factories/courses"
 
 describe("CourseCarousel", () => {
@@ -25,7 +25,7 @@ describe("CourseCarousel", () => {
   })
 
   const renderCarousel = (props = {}) =>
-    mount(
+    shallow(
       <CourseCarousel
         title="Greatest Courses Ever"
         courses={courses}
@@ -41,7 +41,7 @@ describe("CourseCarousel", () => {
   it("should display the provided title", () => {
     const wrapper = renderCarousel()
     assert.equal(
-      wrapper.find(".title-and-controls .title").text(),
+      wrapper.find(".title-row .title").text(),
       "Greatest Courses Ever"
     )
   })
@@ -54,27 +54,6 @@ describe("CourseCarousel", () => {
         assert.deepEqual(el.prop("course"), course)
       }
     )
-  })
-
-  //
-  ;[
-    ["button.prev", true, true, "previous"],
-    ["button.next", false, true, "next"],
-    ["button.prev", false, false, "previous"],
-    ["button.next", true, false, "next"]
-  ].forEach(([selector, shouldDisable, atBeginning, name]) => {
-    it(`${shouldIf(shouldDisable)} disable the ${name} button at the ${
-      atBeginning ? "beginning" : "end"
-    }`, () => {
-      const wrapper = renderCarousel()
-      if (!atBeginning) {
-        R.times(() => wrapper.find("button.next").simulate("click"), 4)
-      }
-      const btn = wrapper.find(selector)
-      const { disabled, className } = btn.props()
-      assert.equal(disabled, shouldDisable)
-      assert.equal(shouldDisable, className.includes("disabled"))
-    })
   })
 
   it("Card should render title, availability, price, platform, topic", () => {

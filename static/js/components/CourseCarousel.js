@@ -1,9 +1,8 @@
 // @flow
 /* global SETTINGS:false */
-import React, { useState } from "react"
+import React from "react"
 import Carousel from "nuka-carousel"
 import Dotdotdot from "react-dotdotdot"
-import R from "ramda"
 
 import Card from "./Card"
 
@@ -12,7 +11,6 @@ import { embedlyThumbnail } from "../lib/url"
 
 import type { Course } from "../flow/discussionTypes"
 
-const CAROUSEL_PAGE_SIZE = 3
 const CAROUSEL_IMG_HEIGHT = 130
 const CAROUSEL_IMG_WIDTH = 306
 
@@ -53,7 +51,7 @@ export const CarouselCourseCard = ({
       ) : null}
       <div className="platform">{course.platform.toUpperCase()}</div>
     </div>
-    <div className="row title course-title">
+    <div className="row course-title">
       <Dotdotdot clamp={3}>{course.title}</Dotdotdot>
     </div>
     <div className="row availability-and-price">
@@ -65,65 +63,50 @@ export const CarouselCourseCard = ({
   </Card>
 )
 
-export default function CourseCarousel(props: Props) {
-  const { title, courses, setShowCourseDrawer } = props
+const prevButton = ({ previousSlide, currentSlide }) =>
+  currentSlide === 0 ? null : (
+    <div onClick={previousSlide} className="carousel-control prev">
+      <i className="material-icons">chevron_left</i>
+    </div>
+  )
 
-  const [index, setIndex] = useState(0)
-  const canPageUp = index + CAROUSEL_PAGE_SIZE < courses.length
-  const canPageDown = index !== 0
+// const nextButton = ({ nextSlide }) => {
+const nextButton = props => {
+  const { slideCount, nextSlide, currentSlide, slidesToShow } = props
+  const lastSlideIndex = slideCount - 1
 
-  return (
-    <div className="course-carousel">
-      <div className="title-and-controls">
-        <div className="title">{title}</div>
-        <div className="controls">
-          <button
-            className={`dark-outlined compact extra-compact prev ${
-              canPageDown ? "" : "disabled"
-            }`}
-            disabled={!canPageDown}
-            onClick={
-              canPageDown
-                ? () => setIndex(R.max(index - CAROUSEL_PAGE_SIZE, 0))
-                : null
-            }
-          >
-            <i className="material-icons">arrow_back</i>
-            Previous
-          </button>
-          <button
-            className={`dark-outlined compact extra-compact next ${
-              canPageUp ? "" : "disabled"
-            }`}
-            onClick={
-              canPageUp ? () => setIndex(index + CAROUSEL_PAGE_SIZE) : null
-            }
-            disabled={!canPageUp}
-          >
-            Next
-            <i className="material-icons">arrow_forward</i>
-          </button>
-        </div>
-      </div>
-      <Carousel
-        slideIndex={index}
-        slidesToShow={3}
-        slidesToScroll="auto"
-        withoutControls={true}
-        afterSlide={slideIndex => setIndex(slideIndex)}
-        speed={800}
-        easing="easeQuadInOut"
-        cellSpacing={22}
-        heightMode="current"
-      >
-        {courses.map((course, idx) => (
-          <CarouselCourseCard
-            key={idx}
-            course={course}
-            setShowCourseDrawer={setShowCourseDrawer}
-          />
-        ))}
-      </Carousel>
+  const disabled = currentSlide + slidesToShow > lastSlideIndex
+  return disabled ? null : (
+    <div onClick={nextSlide} className="carousel-control next">
+      <i className="material-icons">chevron_right</i>
     </div>
   )
 }
+
+const CourseCarousel = ({ title, courses, setShowCourseDrawer }: Props) => (
+  <div className="course-carousel">
+    <div className="title-row">
+      <div className="title">{title}</div>
+    </div>
+    <Carousel
+      slidesToShow={3}
+      slidesToScroll="auto"
+      speed={800}
+      easing="easeQuadInOut"
+      cellSpacing={22}
+      heightMode="current"
+      renderCenterLeftControls={prevButton}
+      renderCenterRightControls={nextButton}
+      renderBottomCenterControls={null}
+    >
+      {courses.map((course, idx) => (
+        <CarouselCourseCard
+          key={idx}
+          course={course}
+          setShowCourseDrawer={setShowCourseDrawer}
+        />
+      ))}
+    </Carousel>
+  </div>
+)
+export default CourseCarousel

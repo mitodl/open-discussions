@@ -41,13 +41,17 @@ class ResourceType(Enum):
 class AvailabilityType(Enum):
     """
     Enum for Course availability options dictated by edX API values.
-    All OCW courses should be set to "Current"
+    While these are the options coming in from edX that we store as is, we
+    display some values differently. Namely "Current" is displayed to the user
+    as "Available Now" and "Archived" is displayed as "Prior".
+    As of 06/21/2019, the above mapping occurs in `courses.js:availabilityLabel()`.
+    All OCW courses should be set to "Current".
     """
 
-    current = "Current"
+    current = "Current"  # displayed as "Available Now"
     upcoming = "Upcoming"
     starting_soon = "Starting Soon"
-    archived = "Archived"
+    archived = "Archived"  # displayed as "Prior"
 
 
 class ListType(Enum):

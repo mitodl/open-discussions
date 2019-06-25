@@ -26,49 +26,33 @@ type Props = {
   onUpdate?: (event: Object) => Promise<*>
 }
 
-class ChannelBanner extends React.Component<Props> {
-  static defaultProps = {
-    editable: false
-  }
+const ChannelBanner = (props: Props) => {
+  const { channel, editable, formImageUrl, showDialog, onUpdate, name } = props
 
-  render() {
-    const {
-      channel,
-      editable,
-      formImageUrl,
-      showDialog,
-      onUpdate,
-      name
-    } = this.props
+  const imageUrl = formImageUrl || channel.banner
 
-    const imageUrl = formImageUrl || channel.banner
-
-    return (
-      <BannerContainer className="channel-banner">
-        <BannerImage
-          src={imageUrl}
-          alt={`Channel banner for ${channel.name}`}
-        />
-        <Gradient />
-        {editable ? (
-          <React.Fragment>
-            <ImageUploader
-              name={name}
-              showButton={false}
-              onUpdate={onUpdate}
-              isAdd={!imageUrl}
-              description="Channel Banner"
-              width={1150}
-              height={200}
-            />
-            <a onClick={showDialog} className="upload-banner grey-surround">
-              Upload cover image
-            </a>
-          </React.Fragment>
-        ) : null}
-      </BannerContainer>
-    )
-  }
+  return (
+    <BannerContainer className="channel-banner">
+      <BannerImage src={imageUrl} alt={`Channel banner for ${channel.name}`} />
+      <Gradient />
+      {editable ? (
+        <React.Fragment>
+          <ImageUploader
+            name={name}
+            showButton={false}
+            onUpdate={onUpdate}
+            isAdd={!imageUrl}
+            description="Channel Banner"
+            width={1150}
+            height={200}
+          />
+          <a onClick={showDialog} className="upload-banner grey-surround">
+            Upload cover image
+          </a>
+        </React.Fragment>
+      ) : null}
+    </BannerContainer>
+  )
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps: Props) =>

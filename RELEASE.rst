@@ -1,6 +1,20 @@
 Release Notes
 =============
 
+Version 0.81.1 (Released June 24, 2019)
+--------------
+
+- add to README and docstring (#2066)
+- install Formik and use it to implement a separate <CommentForm />
+- Add tests for course_catalog.views (#2065)
+- adds new catalog model FavoriteItem; renames LearningPath model (#2061)
+
+Version 0.81.0 (Released June 21, 2019)
+--------------
+
+- Serializers, views, factories, and tests for course_catalog models (#2058)
+- update the top bar in the courses section
+
 Version 0.80.0 (Released June 13, 2019)
 --------------
 

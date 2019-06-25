@@ -190,7 +190,7 @@ export type UserFeedComment = CommentFromAPI & {
   post_slug: string
 }
 
-export type CommentForm = {
+export type CommentFormType = {
   post_id:     string,
   comment_id?: string,
   text:        string

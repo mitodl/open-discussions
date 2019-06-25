@@ -8,11 +8,7 @@ import ReactMarkdown from "react-markdown"
 
 import Card from "../components/Card"
 import CommentTree, { commentDropdownKey, commentShareKey } from "./CommentTree"
-import {
-  ReplyToCommentForm,
-  replyToCommentKey,
-  editCommentKey
-} from "./CommentForms"
+import CommentForm from "./CommentForm"
 import { commentPermalink, profileURL, absolutizeURL } from "../lib/url"
 import Router from "../Router"
 import SharePopup from "./SharePopup"
@@ -81,6 +77,7 @@ describe("CommentTree", () => {
           curriedDropdownMenufunc={dropdownMenuFuncs(helper.sandbox.stub())}
           dropdownMenus={new Set()}
           isPrivateChannel={true}
+          post={post}
           {...props}
         />
       </Router>
@@ -176,8 +173,9 @@ describe("CommentTree", () => {
       .find(".comment-action-button.reply-button")
       .at(0)
       .simulate("click")
-    assert.ok(beginEditingStub.called)
-    assert.ok(beginEditingStub.calledWith(replyToCommentKey(comments[0])))
+    const form = wrapper.find(CommentForm)
+    assert.deepEqual(comments[0], form.prop("comment"))
+    assert.include(wrapper.find(CommentTree).state().replying, comments[0].id)
   })
 
   it('should not include a "reply" button if useSearchPageUI is true', () => {
@@ -254,9 +252,9 @@ describe("CommentTree", () => {
     SETTINGS.username = comments[0].author_id
     const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
     wrapper.find(".edit-button").simulate("click")
-    assert.ok(beginEditingStub.called)
-    assert.ok(beginEditingStub.calledWith(editCommentKey(comments[0])))
-    assert.deepEqual(beginEditingStub.args[0][1], comments[0])
+    const form = wrapper.find(CommentForm)
+    assert.deepEqual(comments[0], form.prop("comment"))
+    assert.include(wrapper.find(CommentTree).state().editing, comments[0].id)
   })
 
   //
@@ -352,9 +350,6 @@ describe("CommentTree", () => {
 
     assert.ok(topCommentWrapper.find(".reply-button").exists())
     assert.isNotOk(nextCommentWrapper.find(".reply-button").exists())
-
-    assert.ok(topCommentWrapper.find(ReplyToCommentForm).exists())
-    assert.isNotOk(nextCommentWrapper.find(ReplyToCommentForm).exists())
 
     assert.ok(topCommentWrapper.find(".replies").exists())
     assert.isNotOk(nextCommentWrapper.find(".replies").exists())

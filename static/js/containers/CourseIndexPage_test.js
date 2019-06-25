@@ -11,6 +11,7 @@ import {
   BannerContainer
 } from "../components/PageBanner"
 
+import { COURSE_BANNER_URL } from "../lib/url"
 import { configureShallowRenderer } from "../lib/test_utils"
 import { makeCourse } from "../factories/courses"
 
@@ -92,7 +93,7 @@ describe("CourseIndexPage", () => {
       }
     )
     const { src } = wrapper.find("BannerImage").props()
-    assert.equal(src, null)
+    assert.equal(src, COURSE_BANNER_URL)
   })
 
   it("should have a search textbox which redirects you", () => {

@@ -8,7 +8,7 @@ import { Link } from "react-router-dom"
 import ReportCount from "./ReportCount"
 import Card from "./Card"
 import SpinnerButton from "./SpinnerButton"
-import { ReplyToCommentForm, EditCommentForm } from "./CommentForms"
+import CommentForm from "../components/CommentForm"
 import CommentVoteForm from "./CommentVoteForm"
 import CommentRemovalForm from "./CommentRemovalForm"
 import { renderTextContent } from "./Markdown"
@@ -18,18 +18,14 @@ import ReplyButton from "./ReplyButton"
 import SharePopup from "./SharePopup"
 
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
-import {
-  replyToCommentKey,
-  editCommentKey,
-  getCommentReplyInitialValue
-} from "../components/CommentForms"
 import { makeProfile } from "../lib/profile"
 import { profileURL, absolutizeURL } from "../lib/url"
 
 import type {
   GenericComment,
   CommentInTree,
-  MoreCommentsInTree
+  MoreCommentsInTree,
+  Post
 } from "../flow/discussionTypes"
 import type { FormsState } from "../flow/formTypes"
 import type { CommentRemoveFunc } from "./CommentRemovalForm"
@@ -59,7 +55,13 @@ type Props = {
   toggleFollowComment?: Function,
   curriedDropdownMenufunc: (key: string) => Object,
   dropdownMenus: Set<string>,
-  useSearchPageUI?: boolean
+  useSearchPageUI?: boolean,
+  post?: Post
+}
+
+type State = {
+  editing: Set<string>,
+  replying: Set<string>
 }
 
 export const commentDropdownKey = (c: CommentInTree) =>
@@ -68,7 +70,20 @@ export const commentDropdownKey = (c: CommentInTree) =>
 export const commentShareKey = (c: CommentInTree) =>
   `COMMENT_SHARE_MENU_${c.id}`
 
-export default class CommentTree extends React.Component<Props> {
+export const EDITING: "editing" = "editing"
+export const REPLYING: "replying" = "replying"
+type CommentStateKey = "editing" | "replying"
+
+export default class CommentTree extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+
+    this.state = {
+      editing:  new Set(),
+      replying: new Set()
+    }
+  }
+
   renderFollowButton = (comment: CommentInTree) => {
     const { toggleFollowComment } = this.props
 
@@ -90,6 +105,18 @@ export default class CommentTree extends React.Component<Props> {
     )
   }
 
+  removeCommentFromState = (key: CommentStateKey, comment: CommentInTree) => {
+    const newSet = new Set(this.state[key])
+    newSet.delete(comment.id)
+    this.setState({ [key]: newSet })
+  }
+
+  addCommentToState = (key: CommentStateKey, comment: CommentInTree) => {
+    const current = this.state[key]
+    current.add(comment.id)
+    this.setState({ [key]: new Set(current) })
+  }
+
   renderCommentActions = (comment: CommentInTree, atMaxDepth: boolean) => {
     const {
       upvote,
@@ -97,7 +124,6 @@ export default class CommentTree extends React.Component<Props> {
       approve,
       remove,
       deleteComment,
-      beginEditing,
       isPrivateChannel,
       isModerator,
       reportComment,
@@ -108,8 +134,6 @@ export default class CommentTree extends React.Component<Props> {
       dropdownMenus,
       useSearchPageUI
     } = this.props
-    const editFormKey = editCommentKey(comment)
-
     const { showDropdown, hideDropdown } = curriedDropdownMenufunc(
       commentDropdownKey(comment)
     )
@@ -135,13 +159,8 @@ export default class CommentTree extends React.Component<Props> {
         useSearchPageUI ? null : (
             <ReplyButton
               beginEditing={e => {
-                if (beginEditing) {
-                  beginEditing(
-                    replyToCommentKey(comment),
-                    getCommentReplyInitialValue(comment),
-                    e
-                  )
-                }
+                e.preventDefault()
+                this.addCommentToState(REPLYING, comment)
               }}
             />
           )}
@@ -178,9 +197,8 @@ export default class CommentTree extends React.Component<Props> {
                     <div
                       className="comment-action-button edit-button"
                       onClick={e => {
-                        if (beginEditing) {
-                          beginEditing(editFormKey, comment, e)
-                        }
+                        e.preventDefault()
+                        this.addCommentToState(EDITING, comment)
                       }}
                     >
                       <a href="#">Edit</a>
@@ -241,8 +259,8 @@ export default class CommentTree extends React.Component<Props> {
   }
 
   renderComment = (depth: number, comment: CommentInTree) => {
-    const { forms, processing, commentPermalink } = this.props
-    const editFormKey = editCommentKey(comment)
+    const { commentPermalink, post } = this.props
+    const { editing, replying } = this.state
     // ramda can't determine arity here so use curryN
     const renderGenericComment = R.curryN(2, this.renderGenericComment)(
       depth + 1
@@ -283,26 +301,32 @@ export default class CommentTree extends React.Component<Props> {
               </span>
             </div>
             <div className="row text">
-              {forms && R.has(editFormKey, forms) ? (
-                <EditCommentForm
-                  forms={forms}
+              {editing.has(comment.id) && post ? (
+                <CommentForm
                   comment={comment}
-                  processing={processing}
+                  post={post}
+                  closeReply={() => {
+                    this.removeCommentFromState(EDITING, comment)
+                  }}
                   editing
+                  autoFocus
                 />
               ) : (
                 renderTextContent(comment)
               )}
             </div>
-            {atMaxDepth ? null : (
+            {replying.has(comment.id) && !atMaxDepth && post ? (
               <div>
-                <ReplyToCommentForm
-                  forms={forms}
+                <CommentForm
+                  post={post}
                   comment={comment}
-                  processing={processing}
+                  closeReply={() => {
+                    this.removeCommentFromState(REPLYING, comment)
+                  }}
+                  autoFocus
                 />
               </div>
-            )}
+            ) : null}
             {this.renderCommentActions(comment, atMaxDepth)}
           </div>
         </Card>

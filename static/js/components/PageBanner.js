@@ -2,8 +2,14 @@
 import React from "react"
 import styled from "styled-components"
 
+import { isMobileWidth } from "../lib/util"
+
 const bannerHeight = "200px"
+const tallBannerHeight = "400px"
 const channelBannerBg = "#20316d"
+
+const imageHeight = props =>
+  props.tall && !isMobileWidth() ? tallBannerHeight : bannerHeight
 
 export const BannerContainer = styled.div`
   position: absolute;
@@ -14,25 +20,31 @@ export const BannerContainer = styled.div`
 const imageStylesheet = `
   width: 100%;
   display: block;
-  height: ${bannerHeight};
 `
 
 const StyledImage = styled.img`
   ${imageStylesheet} object-fit: cover;
+  height: ${imageHeight};
 `
 
 const PlaceholderDiv = styled.div`
   ${imageStylesheet}
   background-color: ${channelBannerBg};
+  height: ${imageHeight}
 `
 
 type ImgProps = {
   src: ?string,
-  alt?: string
+  alt?: string,
+  tall?: boolean
 }
 
-export const BannerImage = ({ src, alt }: ImgProps) =>
-  src ? <StyledImage src={src} alt={alt || ""} /> : <PlaceholderDiv />
+export const BannerImage = ({ src, alt, tall }: ImgProps) =>
+  src ? (
+    <StyledImage src={src} tall={tall} alt={alt || ""} />
+  ) : (
+    <PlaceholderDiv />
+  )
 
 export const BannerPageWrapper = styled.div`
   position: relative;
@@ -41,7 +53,7 @@ export const BannerPageWrapper = styled.div`
 
 export const BannerPageHeader = styled.div`
   margin-bottom: 20px;
-  min-height: ${bannerHeight};
+  min-height: ${imageHeight};
 `
 
 export const Gradient = styled.div`
@@ -51,7 +63,7 @@ export const Gradient = styled.div`
     rgba(0, 0, 0, 0.5)
   );
   position: absolute;
-  height: ${bannerHeight};
+  height: ${imageHeight}
   width: 100%;
   display: block;
   top: 0;

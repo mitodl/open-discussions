@@ -119,3 +119,5 @@ export const urlHostname = (url: ?string) =>
   url ? new URL(url).hostname.replace(/^www\.(.*\.\w)/i, "$1") : ""
 
 export const getNextParam = (search: string) => qs.parse(search).next || "/"
+
+export const COURSE_BANNER_URL = "/static/images/lawn_and_river_banner.png"

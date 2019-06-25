@@ -1,7 +1,11 @@
 """Tests for course_catalog views"""
+from datetime import timedelta
 
+from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 
+from course_catalog.constants import PlatformType, ResourceType
 from course_catalog.factories import (
     CourseFactory,
     CourseTopicFactory,
@@ -31,6 +35,23 @@ def test_course_endpoint(client):
 
     resp = client.get(reverse("courses-detail", args=[course.id]))
     assert resp.data.get("course_id") == course.course_id
+
+    resp = client.get(reverse("courses-list") + "new/")
+    assert resp.data.get("count") == 1
+
+    resp = client.get(reverse("courses-list") + "featured/")
+    assert resp.data.get("count") == 0
+    course.featured = True
+    course.save()
+    resp = client.get(reverse("courses-list") + "featured/")
+    assert resp.data.get("count") == 1
+
+    resp = client.get(reverse("courses-list") + "upcoming/")
+    assert resp.data.get("count") == 0
+    course.start_date = timezone.now() + timedelta(days=1)
+    course.save()
+    resp = client.get(reverse("courses-list") + "upcoming/")
+    assert resp.data.get("count") == 1
 
 
 def test_bootcamp_endpoint(client):
@@ -83,3 +104,42 @@ def test_user_list_endpoint(client):
             assert item.get("id") == bootcamp_item.id
         else:
             assert item.get("id") == course_item.id
+
+
+def test_course_report(client):
+    """Test ocw course report"""
+    CourseFactory(
+        platform=PlatformType.ocw.value,
+        learning_resource_type=ResourceType.course.value,
+        published=False,
+    )
+    CourseFactory(
+        platform=PlatformType.ocw.value,
+        learning_resource_type=ResourceType.course.value,
+        published=True,
+        image_src="",
+    )
+    CourseFactory(
+        platform=PlatformType.ocw.value,
+        learning_resource_type=ResourceType.course.value,
+        published=True,
+        image_src="abc123",
+    )
+    CourseFactory(
+        platform=PlatformType.ocw.value,
+        learning_resource_type=ResourceType.ocw_resource.value,
+        published=False,
+    )
+
+    username = "test_user"
+    password = "test_password"
+    User.objects.create_user(username=username, password=password)
+    client.login(username=username, password=password)
+    resp = client.get(reverse("ocw-course-report"))
+    assert resp.data == {
+        "total_number_of_ocw_courses": 3,
+        "published_ocw_courses_with_image": 2,
+        "unpublished_ocw_courses": 1,
+        "ocw_courses_without_image": 1,
+        "ocw_resources": 1,
+    }

@@ -85,7 +85,8 @@ body {
     padding-left: $drawer-width;
   }
 
-  .persistent-drawer-closed ~ .content {
+  .persistent-drawer-closed ~ .content,
+  .persistent-drawer-hover ~ .content {
     padding-left: $collapse-drawer-width;
   }
 

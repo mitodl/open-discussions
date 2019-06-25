@@ -3,7 +3,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 
 import ChannelAvatar from "../containers/ChannelAvatar"
-import NavigationItem, { NavigationExpansion } from "./NavigationItem"
+import NavigationItem from "./NavigationItem"
 
 import { channelURL } from "../lib/url"
 
@@ -18,9 +18,10 @@ const channelClassName = (channelName, currentChannel) =>
   currentChannel === channelName ? "location current-location" : "location"
 
 const NavigationHeading = ({ children }) => (
-  <NavigationExpansion.Consumer>
-    {expanded => <div className="heading">{expanded ? children : null}</div>}
-  </NavigationExpansion.Consumer>
+  <NavigationItem
+    fading
+    whenExpanded={() => <div className="heading">{children}</div>}
+  />
 )
 
 export default class SubscriptionsList extends React.Component<Props> {
@@ -34,6 +35,7 @@ export default class SubscriptionsList extends React.Component<Props> {
       >
         <Link to={channelURL(channel.name)} className="channel-link">
           <NavigationItem
+            fading
             badge={() => <ChannelAvatar channel={channel} imageSize="small" />}
             whenExpanded={() => <span className="title">{channel.title}</span>}
           />
