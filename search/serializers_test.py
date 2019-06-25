@@ -239,6 +239,7 @@ def test_es_course_serializer():
         "prices": list(course.prices.values("price", "mode")),
         "published": True,
         "availability": course.availability,
+        "offered_by": course.offered_by,
     }
 
 

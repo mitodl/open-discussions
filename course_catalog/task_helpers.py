@@ -15,6 +15,7 @@ from course_catalog.constants import (
     MIT_OWNER_KEYS,
     NON_COURSE_DIRECTORIES,
     AvailabilityType,
+    OfferedBy,
 )
 from course_catalog.models import Course, Bootcamp
 from course_catalog.serializers import (
@@ -371,6 +372,7 @@ def tag_edx_course_program():
                 prof_ed_program = prof_ed_courses.get(course.course_id)
                 if prof_ed_program:
                     course.program_name = prof_ed_program
+                course.offered_by = OfferedBy.xpro.value
                 course.save()
                 continue
 
@@ -379,6 +381,7 @@ def tag_edx_course_program():
             if micromasters_program:
                 course.program_type = "MicroMasters"
                 course.program_name = micromasters_program
+                course.offered_by = OfferedBy.micromasters.value
                 course.save()
                 continue
 

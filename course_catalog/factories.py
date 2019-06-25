@@ -5,7 +5,7 @@ from factory.fuzzy import FuzzyChoice, FuzzyText
 
 from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.constants import PlatformType, AvailabilityType, ListType
+from course_catalog.constants import PlatformType, AvailabilityType, ListType, OfferedBy
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -62,6 +62,15 @@ class CourseFactory(DjangoModelFactory):
             AvailabilityType.upcoming.value,
             AvailabilityType.starting_soon.value,
             AvailabilityType.archived.value,
+        )
+    )
+    offered_by = FuzzyChoice(
+        (
+            OfferedBy.mitx.value,
+            OfferedBy.ocw.value,
+            OfferedBy.micromasters.value,
+            OfferedBy.bootcamps.value,
+            OfferedBy.xpro.value,
         )
     )
 

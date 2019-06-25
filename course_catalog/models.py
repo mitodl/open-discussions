@@ -47,6 +47,7 @@ class LearningResource(TimestampedModel):
     title = models.CharField(max_length=256)
     short_description = models.TextField(null=True, blank=True)
     topics = models.ManyToManyField(CourseTopic, blank=True)
+    offered_by = models.CharField(max_length=128, null=True, blank=True)
 
     class Meta:
         abstract = True

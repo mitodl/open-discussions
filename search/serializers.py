@@ -170,6 +170,7 @@ class ESCourseSerializer(ESModelSerializer):
             "instructors",
             "published",
             "availability",
+            "offered_by",
         ]
 
         read_only_fields = fields
@@ -344,6 +345,7 @@ class ESBootcampSerializer(ESCourseSerializer):
             "instructors",
             "published",
             "availability",
+            "offered_by",
         ]
 
         read_only_fields = fields
@@ -366,7 +368,14 @@ class ESProgramSerializer(ESModelSerializer):
 
     class Meta:
         model = Program
-        fields = ["id", "short_description", "title", "image_src", "topics"]
+        fields = [
+            "id",
+            "short_description",
+            "title",
+            "image_src",
+            "topics",
+            "offered_by",
+        ]
 
         read_only_fields = fields
 
