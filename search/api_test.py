@@ -6,6 +6,7 @@ import pytest
 from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.api import add_user_role
 from channels.factories.models import ChannelFactory
+from course_catalog.constants import PrivacyLevel
 from search.api import (
     execute_search,
     is_reddit_object_removed,
@@ -157,6 +158,48 @@ def test_execute_search(mocker, user):
                                 ]
                             }
                         },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {"terms": {"object_type": ["bootcamp"]}}
+                                            ]
+                                        }
+                                    },
+                                    {"term": {"published": True}},
+                                ]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "must_not": [{"terms": {"object_type": ["program"]}}]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "term": {
+                                            "privacy_level": PrivacyLevel.public.value
+                                        }
+                                    },
+                                    {"term": {"author_id": user.id}},
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {
+                                                    "terms": {
+                                                        "object_type": ["user_list"]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                ]
+                            }
+                        },
                     ]
                 }
             },
@@ -170,9 +213,10 @@ def test_execute_search_anonymous(mocker):
     """execute_search should execute an Elasticsearch search with an anonymous user"""
     get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
 
+    user = AnonymousUser()
     query = {"a": "query"}
     assert (
-        execute_search(user=AnonymousUser(), query=query)
+        execute_search(user=user, query=query)
         == get_conn_mock.return_value.search.return_value
     )
     get_conn_mock.return_value.search.assert_called_once_with(
@@ -248,6 +292,48 @@ def test_execute_search_anonymous(mocker):
                                         }
                                     },
                                     {"term": {"published": True}},
+                                ]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {"terms": {"object_type": ["bootcamp"]}}
+                                            ]
+                                        }
+                                    },
+                                    {"term": {"published": True}},
+                                ]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "must_not": [{"terms": {"object_type": ["program"]}}]
+                            }
+                        },
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "term": {
+                                            "privacy_level": PrivacyLevel.public.value
+                                        }
+                                    },
+                                    {"term": {"author_id": user.id}},
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {
+                                                    "terms": {
+                                                        "object_type": ["user_list"]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
                                 ]
                             }
                         },

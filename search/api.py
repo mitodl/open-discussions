@@ -14,8 +14,16 @@ from channels.constants import (
     ROLE_MODERATORS,
 )
 from channels.models import ChannelGroupRole
+from course_catalog.constants import PrivacyLevel
 from search.connection import get_conn, get_default_alias_name
-from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE, COURSE_TYPE
+from search.constants import (
+    ALIAS_ALL_INDICES,
+    GLOBAL_DOC_TYPE,
+    COURSE_TYPE,
+    BOOTCAMP_TYPE,
+    PROGRAM_TYPE,
+    USER_LIST_TYPE,
+)
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 
@@ -73,6 +81,46 @@ def gen_course_id(course_id):
     return "co_{}".format(safe_id)
 
 
+def gen_bootcamp_id(bootcamp_id):
+    """
+    Generates the Elasticsearch document id for a bootcamp
+
+    Args:
+        bootcamp_id (str): The course_id of a Bootcamp object
+
+    Returns:
+        str: The Elasticsearch document id for this object
+    """
+    safe_id = urlsafe_b64encode(bootcamp_id.encode("utf-8")).decode("utf-8").rstrip("=")
+    return "bootcamp_{}".format(safe_id)
+
+
+def gen_program_id(program_obj):
+    """
+    Generates the Elasticsearch document id for a Program
+
+    Args:
+        program_obj (Program): The Program object
+
+    Returns:
+        str: The Elasticsearch document id for this object
+    """
+    return "program_{}".format(program_obj.id)
+
+
+def gen_user_list_id(user_list_obj):
+    """
+    Generates the Elasticsearch document id for a UserList
+
+    Args:
+        user_list_obj (UserList): The UserList object
+
+    Returns:
+        str: The Elasticsearch document id for this object
+    """
+    return "user_list_{}".format(user_list_obj.id)
+
+
 def is_reddit_object_removed(reddit_obj):
     """
     Indicates whether or not a given reddit object is considered to be removed by moderators
@@ -123,10 +171,29 @@ def _apply_general_query_filters(search, user):
 
     course_filter = Q("term", published=True) | ~Q("terms", object_type=[COURSE_TYPE])
 
+    bootcamp_filter = Q("term", published=True) | ~Q(
+        "terms", object_type=[BOOTCAMP_TYPE]
+    )
+
+    program_filter = ~Q("terms", object_type=[PROGRAM_TYPE])
+
+    user_list_filter = (
+        Q("term", privacy_level=PrivacyLevel.public.value)
+        | Q("term", author_id=user.id)
+        | ~Q("terms", object_type=[USER_LIST_TYPE])
+    )
+
     if channel_names:
         channels_filter = channels_filter | Q("terms", channel_name=channel_names)
 
-    return search.filter(channels_filter).filter(content_filter).filter(course_filter)
+    return (
+        search.filter(channels_filter)
+        .filter(content_filter)
+        .filter(course_filter)
+        .filter(bootcamp_filter)
+        .filter(program_filter)
+        .filter(user_list_filter)
+    )
 
 
 def execute_search(*, user, query):

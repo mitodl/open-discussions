@@ -247,6 +247,9 @@ def test_start_recreate_index(
             "comment": backing_index,
             "profile": backing_index,
             "course": backing_index,
+            "bootcamp": backing_index,
+            "program": backing_index,
+            "user_list": backing_index,
         }
     )
     assert mocked_celery.group.call_count == 1

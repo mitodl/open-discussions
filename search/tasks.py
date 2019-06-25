@@ -12,7 +12,7 @@ from prawcore.exceptions import PrawcoreException, NotFound
 
 from channels.constants import LINK_TYPE_LINK
 from channels.models import Comment, Post
-from course_catalog.models import Course
+from course_catalog.models import Course, Bootcamp, Program, UserList
 from embedly.api import get_embedly_content
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks, html_to_plain_text
@@ -209,6 +209,63 @@ def index_courses(ids):
         return error
 
 
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_bootcamps(ids):
+    """
+    Index bootcamps
+
+    Args:
+        ids(list of int): List of bootcamp id's
+
+    """
+    try:
+        api.index_bootcamps(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_bootcamps threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_programs(ids):
+    """
+    Index programs
+
+    Args:
+        ids(list of int): List of program id's
+
+    """
+    try:
+        api.index_programs(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_programs threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_user_lists(ids):
+    """
+    Index UserLists
+
+    Args:
+        ids(list of int): List of UserList id's
+
+    """
+    try:
+        api.index_user_lists(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_user_lists threw an error"
+        log.exception(error)
+        return error
+
+
 @app.task(bind=True)
 def start_recreate_index(self):
     """
@@ -221,7 +278,9 @@ def start_recreate_index(self):
         }
 
         # Do the indexing on the temp index
-        log.info("starting to index all posts, comments, and profiles...")
+        log.info(
+            "starting to index all posts, comments, profiles, and course catalog objects..."
+        )
 
         index_tasks = celery.group(
             [
@@ -252,6 +311,27 @@ def start_recreate_index(self):
                 index_courses.si(ids)
                 for ids in chunks(
                     Course.objects.order_by("id").values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+            + [
+                index_bootcamps.si(ids)
+                for ids in chunks(
+                    Bootcamp.objects.order_by("id").values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+            + [
+                index_programs.si(ids)
+                for ids in chunks(
+                    Program.objects.order_by("id").values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+            + [
+                index_user_lists.si(ids)
+                for ids in chunks(
+                    UserList.objects.order_by("id").values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]

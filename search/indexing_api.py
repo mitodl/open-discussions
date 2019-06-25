@@ -25,6 +25,9 @@ from search.constants import (
     ALIAS_ALL_INDICES,
     VALID_OBJECT_TYPES,
     GLOBAL_DOC_TYPE,
+    BOOTCAMP_TYPE,
+    PROGRAM_TYPE,
+    USER_LIST_TYPE,
 )
 from search.exceptions import ReindexException
 from search.serializers import (
@@ -33,6 +36,9 @@ from search.serializers import (
     serialize_bulk_profiles,
     serialize_bulk_courses,
     ESPostSerializer,
+    serialize_bulk_bootcamps,
+    serialize_bulk_programs,
+    serialize_bulk_user_lists,
 )
 
 
@@ -110,6 +116,43 @@ COURSE_OBJECT_TYPE = {
     "availability": {"type": "keyword"},
 }
 
+BOOTCAMP_OBJECT_TYPE = {
+    "id": {"type": "long"},
+    "course_id": {"type": "keyword"},
+    "title": ENGLISH_TEXT_FIELD,
+    "short_description": ENGLISH_TEXT_FIELD,
+    "full_description": ENGLISH_TEXT_FIELD,
+    "start_date": {"type": "date"},
+    "end_date": {"type": "date"},
+    "enrollment_start": {"type": "date"},
+    "enrollment_end": {"type": "date"},
+    "topics": {"type": "keyword"},
+    "instructors": {"type": "text"},
+    "price": {"type": "nested"},
+    "image_src": {"type": "keyword"},
+    "published": {"type": "boolean"},
+    "availability": {"type": "keyword"},
+    "location": {"type": "keyword"},
+}
+
+PROGRAM_OBJECT_TYPE = {
+    "id": {"type": "long"},
+    "title": ENGLISH_TEXT_FIELD,
+    "short_description": ENGLISH_TEXT_FIELD,
+    "image_src": {"type": "keyword"},
+    "topics": {"type": "keyword"},
+}
+
+USER_LIST_OBJECT_TYPE = {
+    "id": {"type": "long"},
+    "title": ENGLISH_TEXT_FIELD,
+    "short_description": ENGLISH_TEXT_FIELD,
+    "image_src": {"type": "keyword"},
+    "topics": {"type": "keyword"},
+    "author": {"type": "keyword"},
+    "list_type": {"type": "keyword"},
+}
+
 MAPPING = {
     POST_TYPE: {
         **CONTENT_OBJECT_TYPE,
@@ -127,6 +170,9 @@ MAPPING = {
     },
     PROFILE_TYPE: PROFILE_OBJECT_TYPE,
     COURSE_TYPE: COURSE_OBJECT_TYPE,
+    BOOTCAMP_TYPE: BOOTCAMP_OBJECT_TYPE,
+    PROGRAM_TYPE: PROGRAM_OBJECT_TYPE,
+    USER_LIST_TYPE: USER_LIST_OBJECT_TYPE,
 }
 
 
@@ -404,6 +450,75 @@ def index_courses(ids):
         if len(errors) > 0:
             raise ReindexException(
                 "Error during bulk course insert: {errors}".format(errors=errors)
+            )
+
+
+def index_bootcamps(ids):
+    """
+    Index bootcamps based on list of bootcamp ids
+
+    Args:
+        ids(list of int): List of bootcamp id's
+    """
+    conn = get_conn()
+    for alias in get_active_aliases([BOOTCAMP_TYPE]):
+        _, errors = bulk(
+            conn,
+            serialize_bulk_bootcamps(ids),
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            # Adjust chunk size from 500 depending on environment variable
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+        if len(errors) > 0:
+            raise ReindexException(
+                "Error during bulk bootcamp insert: {errors}".format(errors=errors)
+            )
+
+
+def index_programs(ids):
+    """
+    Index programs based on list of program ids
+
+    Args:
+        ids(list of int): List of program id's
+    """
+    conn = get_conn()
+    for alias in get_active_aliases([PROGRAM_TYPE]):
+        _, errors = bulk(
+            conn,
+            serialize_bulk_programs(ids),
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            # Adjust chunk size from 500 depending on environment variable
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+        if len(errors) > 0:
+            raise ReindexException(
+                "Error during bulk program insert: {errors}".format(errors=errors)
+            )
+
+
+def index_user_lists(ids):
+    """
+    Index user_lists based on list of user_list ids
+
+    Args:
+        ids(list of int): List of user_list id's
+    """
+    conn = get_conn()
+    for alias in get_active_aliases([USER_LIST_TYPE]):
+        _, errors = bulk(
+            conn,
+            serialize_bulk_user_lists(ids),
+            index=alias,
+            doc_type=GLOBAL_DOC_TYPE,
+            # Adjust chunk size from 500 depending on environment variable
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+        if len(errors) > 0:
+            raise ReindexException(
+                "Error during bulk user_list insert: {errors}".format(errors=errors)
             )
 
 
