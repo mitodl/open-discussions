@@ -114,6 +114,7 @@ COURSE_OBJECT_TYPE = {
     "image_src": {"type": "keyword"},
     "published": {"type": "boolean"},
     "availability": {"type": "keyword"},
+    "offered_by": {"type": "keyword"},
 }
 
 BOOTCAMP_OBJECT_TYPE = {
@@ -133,6 +134,7 @@ BOOTCAMP_OBJECT_TYPE = {
     "published": {"type": "boolean"},
     "availability": {"type": "keyword"},
     "location": {"type": "keyword"},
+    "offered_by": {"type": "keyword"},
 }
 
 PROGRAM_OBJECT_TYPE = {
@@ -141,6 +143,7 @@ PROGRAM_OBJECT_TYPE = {
     "short_description": ENGLISH_TEXT_FIELD,
     "image_src": {"type": "keyword"},
     "topics": {"type": "keyword"},
+    "offered_by": {"type": "keyword"},
 }
 
 USER_LIST_OBJECT_TYPE = {

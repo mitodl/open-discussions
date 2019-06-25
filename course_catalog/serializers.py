@@ -3,7 +3,12 @@ course_catalog serializers
 """
 from rest_framework import serializers
 
-from course_catalog.constants import PlatformType, AvailabilityType, ResourceType
+from course_catalog.constants import (
+    PlatformType,
+    AvailabilityType,
+    ResourceType,
+    OfferedBy,
+)
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -164,6 +169,7 @@ class EDXSerializer(CourseSerializer):
                 data.get("key"), data.get("raw_json"), PlatformType.mitx.value
             ),
             "availability": data.get("availability"),
+            "offered_by": OfferedBy.mitx.value,
         }
         self.topics = [
             {"name": subject.get("name")}
@@ -216,6 +222,7 @@ class OCWSerializer(CourseSerializer):
             "raw_json": data.get("raw_json"),
             "url": get_course_url(data.get("uid"), data, PlatformType.ocw.value),
             "availability": AvailabilityType.current.value,
+            "offered_by": OfferedBy.ocw.value,
         }
         if "PROD/RES" in data.get("course_prefix"):
             course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
@@ -245,6 +252,7 @@ class BootcampSerializer(BaseCourseSerializer):
         self.topics = data.pop("topics") if "topics" in data else []
         self.instructors = data.pop("instructors") if "instructors" in data else []
         self.prices = data.pop("prices") if "prices" in data else []
+        data["offered_by"] = OfferedBy.bootcamps.value
         return super().to_internal_value(data)
 
     class Meta:
