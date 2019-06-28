@@ -4,7 +4,6 @@ course_catalog helper functions for tasks
 import json
 import logging
 from datetime import datetime
-from urllib.parse import urljoin
 
 import pytz
 import requests
