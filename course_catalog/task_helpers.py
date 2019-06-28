@@ -266,36 +266,6 @@ def generate_course_prefix_list(bucket):
     return list(ocw_courses)
 
 
-def get_course_url(course_id, course_json, platform):
-    """
-    Get the url for a course if any
-
-    Args:
-        course_id (str): The course_id of the course
-        course_json (dict): The raw json for the course
-        platform (str): The platform (mitx or ocw)
-
-    Returns:
-        str: The url for the course if any
-    """
-    if platform == PlatformType.ocw.value:
-        if course_json is not None:
-            urlpath = course_json.get("url")
-            if urlpath:
-                return urljoin(settings.OCW_BASE_URL, urlpath)
-    elif platform == PlatformType.mitx.value:
-        if course_json is not None:
-            preferred_urls = [
-                run["marketing_url"]
-                for run in course_json.get("course_runs", [])
-                if settings.MITX_BASE_URL in run.get("marketing_url", "")
-            ]
-            if preferred_urls:
-                return preferred_urls[0].split("?")[0]
-        return "{}{}/course/".format(settings.MITX_ALT_URL, course_id)
-    return None
-
-
 def get_course_availability(course):
     """
     Gets the attribute `availability` for a course if any
