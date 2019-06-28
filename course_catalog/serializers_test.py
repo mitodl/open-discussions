@@ -18,6 +18,8 @@ from course_catalog.serializers import (
     BootcampSerializer,
     ProgramItemSerializer,
     FavoriteItemSerializer,
+    UserListSerializer,
+    ProgramSerializer,
 )
 from open_discussions.factories import UserFactory
 
@@ -97,11 +99,11 @@ def test_favorites_serializer():
 
     favorite_item = FavoriteItem(user=user, item=user_list)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data") == UserListFactory(user_list).data
+    assert serializer.data.get("content_data") == UserListSerializer(user_list).data
 
     favorite_item = FavoriteItem(user=user, item=program)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data") == ProgramFactory(program).data
+    assert serializer.data.get("content_data") == ProgramSerializer(program).data
 
     favorite_item = FavoriteItem(user=user, item=course_topic)
     serializer = FavoriteItemSerializer(favorite_item)
