@@ -89,19 +89,19 @@ def test_favorites_serializer():
 
     favorite_item = FavoriteItem(user=user, item=course)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data").get("id") == course.id
+    assert serializer.data.get("content_data") == CourseSerializer(course).data
 
     favorite_item = FavoriteItem(user=user, item=bootcamp)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data").get("id") == bootcamp.id
+    assert serializer.data.get("content_data") == BootcampSerializer(bootcamp).data
 
     favorite_item = FavoriteItem(user=user, item=user_list)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data").get("id") == user_list.id
+    assert serializer.data.get("content_data") == UserListFactory(user_list).data
 
     favorite_item = FavoriteItem(user=user, item=program)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data").get("id") == program.id
+    assert serializer.data.get("content_data") == ProgramFactory(program).data
 
     favorite_item = FavoriteItem(user=user, item=course_topic)
     serializer = FavoriteItemSerializer(favorite_item)
