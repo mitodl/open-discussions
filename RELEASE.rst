@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.82.0
+--------------
+
+- add config_change_template (#2050)
+- adds offered_by to models and indexing (#2072)
+- updates indexing code for course catalog models (#2056)
+- restyle the course carousel to match new designs
+- add new banner image to the course pages
+- tweak to the drawer open / close animation and behavior
+
 Version 0.81.1 (Released June 24, 2019)
 --------------
 
