@@ -2,19 +2,22 @@
 course_catalog views
 """
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.db import IntegrityError
 from django.utils import timezone
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from course_catalog.constants import ResourceType, PlatformType
-from course_catalog.models import Course, UserList, Program, Bootcamp
+from course_catalog.models import Course, UserList, Program, Bootcamp, FavoriteItem
 from course_catalog.serializers import (
     CourseSerializer,
     UserListSerializer,
     ProgramSerializer,
     BootcampSerializer,
+    FavoriteItemSerializer,
 )
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
@@ -59,7 +62,39 @@ class DefaultPagination(LimitOffsetPagination):
     max_limit = settings.COURSE_API_MAX_LIMIT
 
 
-class CourseViewSet(viewsets.ReadOnlyModelViewSet):
+class FavoriteViewMixin:
+    """
+    Mixin for viewsets with models that can be favorited
+    """
+
+    @action(methods=["POST"], detail=True)
+    def favorite(self, request, pk=None):
+        """
+        Create a favorite item for this object
+        """
+        obj = self.get_object()
+        try:
+            FavoriteItem.objects.create(user=request.user, item=obj)
+        except IntegrityError:
+            pass
+        return Response(status=status.HTTP_200_OK)
+
+    @action(methods=["POST"], detail=True)
+    def unfavorite(self, request, pk=None):
+        """
+        Delete a favorite item for this object
+        """
+        obj = self.get_object()
+        favorite_item = FavoriteItem.objects.filter(
+            user=request.user,
+            object_id=obj.id,
+            content_type=ContentType.objects.get_for_model(obj),
+        )
+        favorite_item.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     """
     Viewset for Courses
     """
@@ -99,7 +134,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
         return self.get_paginated_response(serializer.data)
 
 
-class BootcampViewSet(viewsets.ReadOnlyModelViewSet):
+class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     """
     Viewset for Bootcamps
     """
@@ -112,7 +147,7 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
 
-class UserListViewSet(viewsets.ReadOnlyModelViewSet):
+class UserListViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     """
     Viewset for Learning Paths
     """
@@ -123,7 +158,7 @@ class UserListViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
 
-class ProgramViewSet(viewsets.ReadOnlyModelViewSet):
+class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     """
     Viewset for Programs
     """
@@ -132,3 +167,15 @@ class ProgramViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ProgramSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
+
+
+class FavoriteItemViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Viewset for favorites
+    """
+
+    serializer_class = FavoriteItemSerializer
+    pagination_class = DefaultPagination
+
+    def get_queryset(self):
+        return FavoriteItem.objects.filter(user=self.request.user)

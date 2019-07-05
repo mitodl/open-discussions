@@ -10,13 +10,18 @@ from course_catalog.factories import (
     CourseInstructorFactory,
     BootcampFactory,
     ProgramFactory,
+    UserListFactory,
 )
-from course_catalog.models import ProgramItem
+from course_catalog.models import ProgramItem, FavoriteItem
 from course_catalog.serializers import (
     CourseSerializer,
     BootcampSerializer,
     ProgramItemSerializer,
+    FavoriteItemSerializer,
+    UserListSerializer,
+    ProgramSerializer,
 )
+from open_discussions.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -71,3 +76,36 @@ def test_generic_foreign_key_serializer():
     serializer = ProgramItemSerializer(program_item)
     with pytest.raises(Exception):
         assert serializer.data.get("item").get("id") == course_topic.id
+
+
+def test_favorites_serializer():
+    """
+    Test that the favorite serializer generic foreign key works and also rejects unexpected classes
+    """
+    user = UserFactory()
+    course = CourseFactory()
+    bootcamp = BootcampFactory()
+    user_list = UserListFactory(author=user)
+    program = ProgramFactory()
+    course_topic = CourseTopicFactory()
+
+    favorite_item = FavoriteItem(user=user, item=course)
+    serializer = FavoriteItemSerializer(favorite_item)
+    assert serializer.data.get("content_data") == CourseSerializer(course).data
+
+    favorite_item = FavoriteItem(user=user, item=bootcamp)
+    serializer = FavoriteItemSerializer(favorite_item)
+    assert serializer.data.get("content_data") == BootcampSerializer(bootcamp).data
+
+    favorite_item = FavoriteItem(user=user, item=user_list)
+    serializer = FavoriteItemSerializer(favorite_item)
+    assert serializer.data.get("content_data") == UserListSerializer(user_list).data
+
+    favorite_item = FavoriteItem(user=user, item=program)
+    serializer = FavoriteItemSerializer(favorite_item)
+    assert serializer.data.get("content_data") == ProgramSerializer(program).data
+
+    favorite_item = FavoriteItem(user=user, item=course_topic)
+    serializer = FavoriteItemSerializer(favorite_item)
+    with pytest.raises(Exception):
+        assert serializer.data.get("content_data").get("id") == course_topic.id

@@ -1,6 +1,8 @@
 """
 course_catalog serializers
 """
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 
 from course_catalog.constants import (
@@ -19,6 +21,7 @@ from course_catalog.models import (
     UserList,
     Program,
     ProgramItem,
+    FavoriteItem,
 )
 from course_catalog.utils import get_ocw_topic, get_year_and_semester, get_course_url
 
@@ -37,6 +40,50 @@ class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
             raise Exception("Unexpected type of tagged object")
 
         return serializer.data
+
+
+class FavoriteItemContentSerializer(serializers.ModelSerializer):
+    """
+    Special field to handle the generic foreign key in FavoriteItem
+    """
+
+    def to_representation(self, instance):
+        # Pass context on to the serializers so that they have access to the user
+        context = self.context
+        if isinstance(instance, Bootcamp):
+            serializer = BootcampSerializer(instance, context=context)
+        elif isinstance(instance, Course):
+            serializer = CourseSerializer(instance, context=context)
+        elif isinstance(instance, UserList):
+            serializer = UserListSerializer(instance, context=context)
+        elif isinstance(instance, Program):
+            serializer = ProgramSerializer(instance, context=context)
+        else:
+            raise Exception("Unexpected type of tagged object")
+
+        return serializer.data
+
+
+class FavoriteSerializerMixin(serializers.Serializer):
+    """
+    Mixin to serializer is_favorite for various models
+    """
+
+    is_favorite = serializers.SerializerMethodField()
+
+    def get_is_favorite(self, obj):
+        """
+        Check if user has a favorite item for object, otherwise return false
+        """
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and isinstance(request.user, User):
+            return FavoriteItem.objects.filter(
+                user=request.user,
+                object_id=obj.id,
+                content_type=ContentType.objects.get_for_model(obj),
+            ).exists()
+        else:
+            return False
 
 
 class CourseInstructorSerializer(serializers.ModelSerializer):
@@ -69,7 +116,7 @@ class CourseTopicSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class BaseCourseSerializer(serializers.ModelSerializer):
+class BaseCourseSerializer(FavoriteSerializerMixin, serializers.ModelSerializer):
     """
     Serializer with common functions to be used by CourseSerializer and BootcampSerialzer
     """
@@ -284,7 +331,7 @@ class UserListItemSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class UserListSerializer(serializers.ModelSerializer):
+class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     """
     Serializer for UserList model
     """
@@ -310,7 +357,7 @@ class ProgramItemSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ProgramSerializer(serializers.ModelSerializer):
+class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     """
     Serializer for Program model
     """
@@ -320,4 +367,17 @@ class ProgramSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Program
+        fields = "__all__"
+
+
+class FavoriteItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Favorite Item
+    """
+
+    content_data = FavoriteItemContentSerializer(source="item")
+    content_type = serializers.CharField(source="content_type.name")
+
+    class Meta:
+        model = FavoriteItem
         fields = "__all__"

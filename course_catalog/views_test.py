@@ -2,6 +2,7 @@
 from datetime import timedelta
 
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 
@@ -104,6 +105,54 @@ def test_user_list_endpoint(client):
             assert item.get("id") == bootcamp_item.id
         else:
             assert item.get("id") == course_item.id
+
+
+def test_favorites(client):
+    """Test favoriting and unfavoriting"""
+    username = "test_user"
+    password = "test_password"
+    User.objects.create_user(username=username, password=password)
+    client.login(username=username, password=password)
+
+    # Test course is not favorited by default
+    course = CourseFactory()
+    resp = client.get(reverse("courses-detail", args=[course.id]))
+    assert not resp.data.get("is_favorite")
+
+    # Favorite course and test that it is favorited
+    client.post(reverse("courses-detail", args=[course.id]) + "favorite/")
+    resp = client.get(reverse("courses-detail", args=[course.id]))
+    assert resp.data.get("is_favorite")
+
+    # Test that viewset gracefully handles favoriting an already favorited object
+    with transaction.atomic():
+        client.post(reverse("courses-detail", args=[course.id]) + "favorite/")
+    resp = client.get(reverse("courses-detail", args=[course.id]))
+    assert resp.data.get("is_favorite")
+
+    # Test that course shows up in favorites endpoint
+    resp = client.get(reverse("favorites-list"))
+    assert resp.data.get("results")[0].get("content_data").get("id") == course.id
+
+    # Unfavorite course and test that it is no longer favorited
+    client.post(reverse("courses-detail", args=[course.id]) + "unfavorite/")
+    resp = client.get(reverse("courses-detail", args=[course.id]))
+    assert not resp.data.get("is_favorite")
+
+    # Test that viewset gracefully handles unfavoriting an already unfavorited object
+    client.post(reverse("courses-detail", args=[course.id]) + "unfavorite/")
+    resp = client.get(reverse("courses-detail", args=[course.id]))
+    assert not resp.data.get("is_favorite")
+
+
+def test_unautharized_favorites(client):
+    """Test favoriting and unfavoriting when not logged in"""
+    course = CourseFactory()
+    resp = client.post(reverse("courses-detail", args=[course.id]) + "favorite/")
+    assert resp.status_code == 403
+
+    resp = client.post(reverse("courses-detail", args=[course.id]) + "unfavorite/")
+    assert resp.status_code == 403
 
 
 def test_course_report(client):
