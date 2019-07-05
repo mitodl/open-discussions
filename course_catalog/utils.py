@@ -93,11 +93,11 @@ def get_course_url(course_id, course_json, platform):
                 return urljoin(settings.OCW_BASE_URL, urlpath)
     elif platform == PlatformType.mitx.value:
         if course_json is not None:
-            preferred_urls = [
-                run["marketing_url"]
-                for run in course_json.get("course_runs", [])
-                if settings.MITX_BASE_URL in run.get("marketing_url", "")
-            ]
+            preferred_urls = []
+            for run in course_json.get("course_runs", []):
+                url = run.get("marketing_url", "")
+                if url and settings.MITX_BASE_URL in url:
+                    preferred_urls.append(url)
             if preferred_urls:
                 return preferred_urls[0].split("?")[0]
         return "{}{}/course/".format(settings.MITX_ALT_URL, course_id)
