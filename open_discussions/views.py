@@ -81,7 +81,6 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "profile_ui_enabled": features.is_enabled(features.PROFILE_UI),
         "allow_saml_auth": features.is_enabled(features.SAML_AUTH),
         "allow_related_posts_ui": features.is_enabled(features.RELATED_POSTS_UI),
-        "use_new_branding": features.is_enabled(features.USE_NEW_BRANDING),
         "embedlyKey": settings.EMBEDLY_KEY,
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
         "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,

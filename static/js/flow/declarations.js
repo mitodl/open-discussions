@@ -25,7 +25,6 @@ declare var SETTINGS: {
   search_page_size: number,
   search_min_length: number,
   allow_related_posts_ui: boolean,
-  use_new_branding: boolean,
   support_email: string,
   embedlyKey: string,
   sentry_dsn: string,

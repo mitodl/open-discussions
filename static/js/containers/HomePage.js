@@ -29,7 +29,7 @@ import { getSubscribedChannels } from "../lib/redux_selectors"
 import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/picker"
 import { REGISTER_URL, newPostURL } from "../lib/url"
 import { userIsAnonymous } from "../lib/util"
-import { logoImageSrc } from "../lib/ui"
+import { MIT_LOGO_URL } from "../lib/url"
 
 import type { Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -98,7 +98,7 @@ export class HomePage extends React.Component<Props> {
     return (
       <Card className="home-callout">
         <div className="logo-col">
-          <img src={logoImageSrc()} alt="MIT Logo" />
+          <img src={MIT_LOGO_URL} alt="MIT Logo" />
         </div>
         <div className="callout-body">
           <div className="text-col">

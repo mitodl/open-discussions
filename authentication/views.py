@@ -24,7 +24,6 @@ from djoser.views import (
 from djoser.utils import ActionViewMixin
 from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
 
-from open_discussions import features
 from authentication.serializers import (
     LoginEmailSerializer,
     LoginPasswordSerializer,
@@ -187,7 +186,6 @@ class CustomPasswordResetEmail(DjoserPasswordResetEmail):
         """Adds base_url to the template context"""
         context = super().get_context_data()
         context["base_url"] = settings.SITE_BASE_URL
-        context["use_new_branding"] = features.is_enabled(features.USE_NEW_BRANDING)
         return context
 
 

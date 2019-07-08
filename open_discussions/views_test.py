@@ -30,7 +30,6 @@ def test_webpack_url(
     settings.ALGOLIA_APP_ID = "fake"
     settings.ALGOLIA_API_KEY = "fake"
     settings.FEATURES[features.SAML_AUTH] = False
-    settings.FEATURES[features.USE_NEW_BRANDING] = False
     settings.FEATURES[features.ARTICLE_UI] = False
     settings.FEATURES[features.COURSE_UI] = False
     settings.FEATURES[features.LIVESTREAM_UI] = False
@@ -74,7 +73,6 @@ def test_webpack_url(
         "is_authenticated": expect_auth,
         "allow_saml_auth": False,
         "allow_related_posts_ui": False,
-        "use_new_branding": False,
         "support_email": settings.EMAIL_SUPPORT,
         "embedlyKey": "fake",
         "environment": settings.ENVIRONMENT,

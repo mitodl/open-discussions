@@ -9,7 +9,6 @@ from mail.api import (
     send_messages,
     messages_for_recipients,
 )
-from open_discussions import features
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import any_instance_of
 from sites.api import get_default_site
@@ -55,7 +54,6 @@ def test_context_for_user(settings, test_user, extra_context):
     assert context_for_user(user=test_user, extra_context=extra_context) == {
         "base_url": settings.SITE_BASE_URL,
         "site_name": get_default_site().title,
-        "use_new_branding": features.is_enabled(features.USE_NEW_BRANDING),
         **(extra_context or {}),
         **user_ctx,
     }

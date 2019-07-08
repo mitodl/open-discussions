@@ -121,3 +121,5 @@ export const urlHostname = (url: ?string) =>
 export const getNextParam = (search: string) => qs.parse(search).next || "/"
 
 export const COURSE_BANNER_URL = "/static/images/lawn_and_river_banner.png"
+
+export const MIT_LOGO_URL = "/static/images/MIT_circle.svg"

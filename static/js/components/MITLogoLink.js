@@ -1,16 +1,11 @@
 // @flow
-/* global SETTINGS: false */
 import React from "react"
+
+import { MIT_LOGO_URL } from "../lib/url"
 
 const MITLogoLink = () => (
   <a href="http://www.mit.edu" className="mitlogo">
-    <img
-      src={`/static/images/${
-        SETTINGS.use_new_branding
-          ? "MIT_circle.svg"
-          : "mit-logo-transparent3.svg"
-      }`}
-    />
+    <img src={MIT_LOGO_URL} alt="MIT logo" />
   </a>
 )
 

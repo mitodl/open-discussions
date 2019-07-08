@@ -10,7 +10,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 from mail import api
 from mail.forms import EmailDebuggerForm
-from open_discussions import features
 from sites.api import get_default_site
 
 
@@ -41,7 +40,6 @@ class EmailDebuggerView(View):
         email_type = form.cleaned_data["email_type"]
         context = {
             "base_url": settings.SITE_BASE_URL,
-            "use_new_branding": features.is_enabled(features.USE_NEW_BRANDING),
             "anon_token": "abc123",
             "site_name": get_default_site().title,
         }

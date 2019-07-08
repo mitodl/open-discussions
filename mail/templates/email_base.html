@@ -238,17 +238,12 @@
 	            <tr>
 	                <td style="padding: 20px;">
                       {% block logo %}
-                      {% if use_new_branding %}
                       <h1>
                         <img src="{% static 'images/MIT_circle_red.jpg' %}" width="40" height="40" alt="{{ site_name }}" style="height: auto; background: #ffffff; font-family: sans-serif; font-size: 15px; line-height: 15px; color: #A31F34; margin-bottom: -10px;"/>
                         <span style="color: #A31F34; font-family: sans-serif; font-size: 28px; line-height: 28px;">{{ site_name }}</span>
                       </h1>
-                      {% else %}
-                      <img src="{% static 'images/mit-logo.jpg' %}" width="78" height="41" alt="{{ site_name }}" style="height: auto; background: #ffffff; font-family: sans-serif; font-size: 15px; line-height: 15px; color: #A31F34; margin-bottom: -10px;  margin-right: 10px;""/>
-                        <span style="color: #A31F34; font-family: sans-serif; font-size: 28px; line-height: 28px;">{{ site_name }}</span>
-                      {% endif %}
                       {% endblock %}
-	                </td>
+                        </td>
 	            </tr>
 		        <!-- Email Header : END -->
 
