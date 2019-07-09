@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.82.0
+Version 0.82.0 (Released July 09, 2019)
 --------------
 
 - add config_change_template (#2050)
