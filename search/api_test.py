@@ -191,7 +191,11 @@ def test_execute_search(mocker, user):
                                             ]
                                         }
                                     },
-                                    {"term": {"privacy_level": PrivacyLevel.public.value}},
+                                    {
+                                        "term": {
+                                            "privacy_level": PrivacyLevel.public.value
+                                        }
+                                    },
                                     {"term": {"author_id": user.id}},
                                 ]
                             }
@@ -324,7 +328,11 @@ def test_execute_search_anonymous(mocker):
                                             ]
                                         }
                                     },
-                                    {"term": {"privacy_level": PrivacyLevel.public.value}},
+                                    {
+                                        "term": {
+                                            "privacy_level": PrivacyLevel.public.value
+                                        }
+                                    },
                                 ]
                             }
                         },

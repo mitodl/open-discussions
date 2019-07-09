@@ -184,9 +184,8 @@ def _apply_general_query_filters(search, user):
     program_filter = ~Q("terms", object_type=[PROGRAM_TYPE])
 
     # Search public lists (and user's own lists if logged in)
-    user_list_filter = (
-        Q("term", privacy_level=PrivacyLevel.public.value)
-        | ~Q("terms", object_type=[USER_LIST_TYPE])
+    user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
+        "terms", object_type=[USER_LIST_TYPE]
     )
     if not user.is_anonymous:
         user_list_filter = user_list_filter | Q("term", author_id=user.id)
