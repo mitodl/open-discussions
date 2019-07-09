@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.82.1
+Version 0.82.1 (Released July 09, 2019)
 --------------
 
 - Fix search query for anonymous users (#2079)
