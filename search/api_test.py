@@ -313,7 +313,7 @@ def test_execute_search_anonymous(mocker):
                             "bool": {
                                 "must_not": [{"terms": {"object_type": ["program"]}}]
                             }
-                        }
+                        },
                     ]
                 }
             },
