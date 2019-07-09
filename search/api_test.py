@@ -181,12 +181,6 @@ def test_execute_search(mocker, user):
                             "bool": {
                                 "should": [
                                     {
-                                        "term": {
-                                            "privacy_level": PrivacyLevel.public.value
-                                        }
-                                    },
-                                    {"term": {"author_id": user.id}},
-                                    {
                                         "bool": {
                                             "must_not": [
                                                 {
@@ -197,6 +191,12 @@ def test_execute_search(mocker, user):
                                             ]
                                         }
                                     },
+                                    {
+                                        "term": {
+                                            "privacy_level": PrivacyLevel.public.value
+                                        }
+                                    },
+                                    {"term": {"author_id": user.id}},
                                 ]
                             }
                         },
@@ -318,12 +318,6 @@ def test_execute_search_anonymous(mocker):
                             "bool": {
                                 "should": [
                                     {
-                                        "term": {
-                                            "privacy_level": PrivacyLevel.public.value
-                                        }
-                                    },
-                                    {"term": {"author_id": user.id}},
-                                    {
                                         "bool": {
                                             "must_not": [
                                                 {
@@ -332,6 +326,11 @@ def test_execute_search_anonymous(mocker):
                                                     }
                                                 }
                                             ]
+                                        }
+                                    },
+                                    {
+                                        "term": {
+                                            "privacy_level": PrivacyLevel.public.value
                                         }
                                     },
                                 ]
