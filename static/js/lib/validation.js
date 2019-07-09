@@ -214,6 +214,25 @@ export const validateContentReportForm = validate([
   )
 ])
 
+export const validateCommentReportForm = validate([
+  validation(
+    R.compose(
+      R.lt(100),
+      R.length
+    ),
+    formLens("reason"),
+    "Reason length is limited to 100 characters"
+  ),
+  validation(
+    R.compose(
+      R.gt(3),
+      R.length
+    ),
+    formLens("reason"),
+    "Reason must be at least 3 characters"
+  )
+])
+
 export const validateSearchQuery = (text: ?string): ?string =>
   R.compose(
     R.lte(SETTINGS.search_min_length),

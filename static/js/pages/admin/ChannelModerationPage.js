@@ -11,17 +11,12 @@ import {
   withPostModeration,
   postModerationSelector
 } from "../../hoc/withPostModeration"
-import {
-  withCommentModeration,
-  commentModerationSelector
-} from "../../hoc/withCommentModeration"
 import CompactPostDisplay from "../../components/CompactPostDisplay"
-import CommentTree from "../../components/CommentTree"
+import Comment from "../../components/Comment"
 
 import { commentPermalink, channelURL } from "../../lib/url"
 import { actions } from "../../actions"
 import { formatTitle } from "../../lib/title"
-import { dropdownMenuFuncs } from "../../lib/ui"
 import { isPrivate } from "../../lib/channels"
 
 import type { Match } from "react-router"
@@ -36,8 +31,6 @@ import withSingleColumn from "../../hoc/withSingleColumn"
 import withChannelHeader from "../../hoc/withChannelHeader"
 import { renderDeferredLoading, Loading } from "../../components/Loading"
 
-const addDummyReplies = R.over(R.lensPath(["replies"]), () => [])
-
 type Props = {
   match: Match,
   dispatch: Dispatch<*>,
@@ -50,9 +43,6 @@ type Props = {
   notFound: boolean,
   removePost: Function,
   ignorePostReports: Function,
-  approveComment: Function,
-  removeComment: Function,
-  ignoreCommentReports: Function,
   dropdownMenus: Set<string>,
   loaded: boolean
 }
@@ -90,14 +80,9 @@ export class ChannelModerationPage extends React.Component<Props> {
     const {
       isModerator,
       removePost,
-      approveComment,
-      removeComment,
       channel,
       channelName,
-      ignorePostReports,
-      ignoreCommentReports,
-      dropdownMenus,
-      dispatch
+      ignorePostReports
     } = this.props
 
     if (report.post) {
@@ -112,22 +97,19 @@ export class ChannelModerationPage extends React.Component<Props> {
       )
     } else {
       return (
-        <CommentTree
-          comments={[addDummyReplies(report.comment)]}
+        <Comment
+          comment={report.comment}
           commentPermalink={commentPermalink(
             channelName,
             report.comment.post_id,
             null
           )}
-          approve={approveComment}
-          remove={removeComment}
-          ignoreCommentReports={ignoreCommentReports}
           key={`${report.comment.id}-${report.comment.post_id}`}
           moderationUI
           isModerator={isModerator}
           isPrivateChannel={isPrivate(channel)}
-          dropdownMenus={dropdownMenus}
-          curriedDropdownMenufunc={dropdownMenuFuncs(dispatch)}
+          channelName={channelName}
+          shouldGetReports
         />
       )
     }
@@ -173,7 +155,6 @@ export class ChannelModerationPage extends React.Component<Props> {
 
 const mapStateToProps = (state, ownProps) => ({
   ...postModerationSelector(state, ownProps),
-  ...commentModerationSelector(state, ownProps),
   shouldGetReports: true,
   dropdownMenus:    state.ui.dropdownMenus
 })
@@ -181,7 +162,6 @@ const mapStateToProps = (state, ownProps) => ({
 export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
-  withCommentModeration,
   withChannelHeader,
   withSingleColumn("edit-channel")
 )(ChannelModerationPage)

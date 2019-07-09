@@ -4,7 +4,7 @@ import sinon from "sinon"
 import R from "ramda"
 import { Link } from "react-router-dom"
 
-import CommentTree, { commentDropdownKey } from "../components/CommentTree"
+import CommentTree from "../components/CommentTree"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import PostPage, { PostPage as InnerPostPage } from "./PostPage"
@@ -25,12 +25,7 @@ import { SET_POST_DATA } from "../actions/post"
 import { REPLACE_MORE_COMMENTS } from "../actions/comment"
 import { FORM_BEGIN_EDIT, FORM_END_EDIT, FORM_UPDATE } from "../actions/forms"
 import { SET_SNACKBAR_MESSAGE, SHOW_DIALOG, HIDE_DIALOG } from "../actions/ui"
-import {
-  SET_FOCUSED_POST,
-  CLEAR_FOCUSED_POST,
-  SET_FOCUSED_COMMENT,
-  CLEAR_FOCUSED_COMMENT
-} from "../actions/focus"
+import { SET_FOCUSED_POST, CLEAR_FOCUSED_POST } from "../actions/focus"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { postDetailURL, channelURL, commentPermalink } from "../lib/url"
 import { formatTitle } from "../lib/title"
@@ -221,43 +216,6 @@ describe("PostPage", function() {
     assert.deepEqual(inner.find(CommentTree).props().comments, comments)
   })
 
-  //
-  ;[
-    [true, true, "should upvote a comment"],
-    [true, false, "should clear an upvote"],
-    [false, true, "should downvote a comment"],
-    [false, false, "should clear a downvote"]
-  ].forEach(([isUpvote, wasClear, testName]) => {
-    it(testName, async () => {
-      const comment = comments[0].replies[2]
-      assert(comment, "comment not found")
-      if (isUpvote) {
-        comment.upvoted = wasClear
-      } else {
-        comment.downvoted = wasClear
-      }
-      const { inner } = await render()
-
-      const props = inner.find("CommentTree").props()
-      const voteFunc = isUpvote ? props.upvote : props.downvote
-      await voteFunc(comment)
-
-      const expectedPayload = isUpvote
-        ? {
-          upvoted: !comment.upvoted
-        }
-        : {
-          downvoted: !comment.downvoted
-        }
-
-      sinon.assert.calledWith(
-        helper.updateCommentStub,
-        comment.id,
-        expectedPayload
-      )
-    })
-  })
-
   it("should load twitter JS on page load", async () => {
     await render()
     sinon.assert.calledWith(twitterEmbedStub)
@@ -347,25 +305,6 @@ describe("PostPage", function() {
     }
   })
 
-  it("passed props to each CommentRemovalForm", async () => {
-    const { inner } = await render({
-      ui: {
-        dropdownMenus: new Map(
-          commentsResponse.map(comment => [commentDropdownKey(comment), true])
-        )
-      }
-    })
-    const commentTree = inner.find("CommentTree")
-    const commentTreeProps = commentTree.props()
-    const forms = commentTree.find("CommentRemovalForm")
-    assert.isTrue(forms.length > 0)
-    for (const form of forms) {
-      const fromProps = form.props
-      assert.equal(fromProps.approve, commentTreeProps.approve)
-      assert.equal(fromProps.remove, commentTreeProps.remove)
-    }
-  })
-
   it("loads more comments when the function is called", async () => {
     const { inner, store } = await render()
     const commentTree = inner.find("CommentTree")
@@ -416,7 +355,7 @@ describe("PostPage", function() {
 
       const props = inner
         .find("OurDialog")
-        .at(1)
+        .at(0)
         .props()
 
       assert.equal(props.title, "Delete Post")
@@ -444,69 +383,6 @@ describe("PostPage", function() {
         location: { pathname }
       } = helper.browserHistory
       assert.equal(pathname, channelURL(channel.name))
-    })
-  })
-
-  describe("deleting comment", () => {
-    it("opens a confirmation dialog for deleting a comment", async () => {
-      const { inner, store } = await render()
-      const comment = comments[0]
-
-      inner.find("CommentTree").prop("deleteComment")(comment)
-      assert.includeDeepMembers(store.getActions(), [
-        {
-          type:    SET_FOCUSED_COMMENT,
-          payload: comment
-        },
-        {
-          type:    SHOW_DIALOG,
-          payload: "DELETE_COMMENT_DIALOG"
-        }
-      ])
-    })
-
-    it("deletes a comment", async () => {
-      const comment = comments[0].replies[2]
-      assert(comment, "comment not found")
-
-      const { inner, store } = await render({
-        focus: {
-          comment
-        }
-      })
-
-      const dialogProps = inner
-        .find("OurDialog")
-        .at(0)
-        .props()
-      assert.equal(dialogProps.title, "Delete Comment")
-      await dialogProps.onAccept()
-
-      sinon.assert.calledWith(helper.deleteCommentStub, comment.id)
-      assert.includeDeepMembers(store.getActions(), [
-        {
-          type:    actions.comments.delete.requestType,
-          payload: post.id
-        },
-        {
-          type:    actions.comments.delete.successType,
-          payload: {
-            commentId: comment.id,
-            postId:    post.id
-          }
-        },
-        {
-          type:    SET_SNACKBAR_MESSAGE,
-          payload: { message: "Comment has been deleted" }
-        },
-        {
-          type: CLEAR_FOCUSED_COMMENT
-        },
-        {
-          type:    HIDE_DIALOG,
-          payload: "DELETE_COMMENT_DIALOG"
-        }
-      ])
     })
   })
 
@@ -608,246 +484,12 @@ describe("PostPage", function() {
           sinon.assert.calledWith(helper.updateRemovedStub, post.id, false)
         })
       })
-
-      describe("comments", () => {
-        it("shows a dialog to remove a comment", async () => {
-          const comment = comments[0].replies[2]
-          assert(comment, "comment not found")
-          // set initial state for removed so we can flip it the other way
-
-          const { inner, store } = await render()
-
-          inner.find("CommentTree").prop("remove")(comment)
-
-          assert.includeDeepMembers(store.getActions(), [
-            {
-              type:    SET_FOCUSED_COMMENT,
-              payload: comment
-            },
-            {
-              type:    SHOW_DIALOG,
-              payload: "DIALOG_REMOVE_COMMENT"
-            }
-          ])
-        })
-
-        it("removes a comment", async () => {
-          const comment = comments[0].replies[2]
-          assert(comment, "comment not found")
-
-          comment.removed = true
-          const { store, wrapper } = await render({
-            focus: {
-              comment
-            }
-          })
-
-          const dialogProps = wrapper
-            .find("WithCommentModeration")
-            .find("OurDialog")
-            .at(0)
-            .props()
-
-          assert.equal(dialogProps.title, "Remove Comment")
-          await dialogProps.onAccept({ preventDefault: helper.sandbox.stub() })
-
-          assert.includeDeepMembers(store.getActions(), [
-            {
-              type:    actions.comments.patch.requestType,
-              payload: comment.id
-            },
-            {
-              type: actions.comments.patch.successType
-            },
-            {
-              type: CLEAR_FOCUSED_COMMENT
-            },
-            {
-              type:    HIDE_DIALOG,
-              payload: "DIALOG_REMOVE_COMMENT"
-            },
-            {
-              type:    SET_SNACKBAR_MESSAGE,
-              payload: {
-                message: "Comment has been removed"
-              }
-            }
-          ])
-
-          sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
-            removed: true
-          })
-        })
-
-        it("approves a comment", async () => {
-          const comment = comments[0].replies[2]
-          assert(comment, "comment not found")
-
-          comment.removed = true
-          const { inner, store } = await render()
-
-          await inner.find("CommentTree").prop("approve")(comment)
-
-          assert.includeDeepMembers(store.getActions(), [
-            {
-              type:    actions.comments.patch.requestType,
-              payload: comment.id
-            },
-            {
-              type: actions.comments.patch.successType
-            },
-            {
-              type:    SET_SNACKBAR_MESSAGE,
-              payload: {
-                message: "Comment has been approved"
-              }
-            }
-          ])
-
-          sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
-            removed: false
-          })
-        })
-      })
     })
   })
 
   describe("reporting", () => {
     beforeEach(() => {
       helper.reportContentStub.returns(Promise.resolve())
-    })
-
-    describe("comments", () => {
-      it("should show a dialog to report a comment", async () => {
-        const comment = comments[0].replies[2]
-        assert(comment, "comment not found")
-
-        const { inner, store } = await render()
-
-        await inner.find("CommentTree").prop("reportComment")(comment)
-
-        assert.includeDeepMembers(store.getActions(), [
-          {
-            type:    FORM_BEGIN_EDIT,
-            payload: {
-              formKey: REPORT_FORM_KEY,
-              value:   {
-                reason: ""
-              }
-            }
-          },
-          {
-            type:    SET_FOCUSED_COMMENT,
-            payload: comment
-          },
-          {
-            type:    SHOW_DIALOG,
-            payload: "REPORT_COMMENT_DIALOG"
-          }
-        ])
-      })
-
-      it("edits text in the report comment form", async () => {
-        const comment = comments[0].replies[2]
-        assert(comment, "comment not found")
-
-        const reason = "a reason here"
-
-        const { inner, store } = await render({
-          forms: {
-            [REPORT_FORM_KEY]: {
-              value: {
-                reason: reason
-              },
-              errors: {}
-            }
-          },
-          focus: {
-            comment
-          }
-        })
-        const dialog = inner.find("OurDialog").at(2)
-        assert.equal(dialog.prop("title"), "Report Comment")
-
-        const newValue = "new value"
-        dialog.find("ReportForm").prop("onUpdate")({
-          target: {
-            name:  "reason",
-            value: newValue
-          }
-        })
-
-        const actionsList = store.getActions()
-        assert.deepEqual(R.last(actionsList), {
-          type:    FORM_UPDATE,
-          payload: {
-            formKey: REPORT_FORM_KEY,
-            value:   {
-              reason: newValue
-            }
-          }
-        })
-      })
-
-      it("reports a comment", async () => {
-        const comment = comments[0].replies[2]
-        assert(comment, "comment not found")
-
-        const reason = "a reason here"
-
-        const { inner, store } = await render({
-          forms: {
-            [REPORT_FORM_KEY]: {
-              value: {
-                reason: reason
-              },
-              errors: {}
-            }
-          },
-          focus: {
-            comment
-          }
-        })
-        const dialog = inner.find("OurDialog").at(2)
-        assert.equal(dialog.prop("title"), "Report Comment")
-        await dialog.props().onAccept()
-        sinon.assert.calledWith(helper.reportContentStub, {
-          comment_id: comment.id,
-          reason:     reason
-        })
-
-        assert.includeDeepMembers(store.getActions(), [
-          {
-            type:    actions.reports.post.requestType,
-            payload: {
-              comment_id: comment.id,
-              reason:     reason
-            }
-          },
-          {
-            type: actions.reports.post.successType
-          },
-          {
-            type:    FORM_END_EDIT,
-            payload: {
-              formKey: REPORT_FORM_KEY
-            }
-          },
-          {
-            type: CLEAR_FOCUSED_COMMENT
-          },
-          {
-            type:    HIDE_DIALOG,
-            payload: "REPORT_COMMENT_DIALOG"
-          },
-          {
-            type:    SET_SNACKBAR_MESSAGE,
-            payload: {
-              message: "Comment has been reported"
-            }
-          }
-        ])
-      })
     })
 
     describe("posts", () => {
@@ -1018,56 +660,6 @@ describe("PostPage", function() {
 
           const dialog = wrapper.find("OurDialog").at(0)
           assert.equal(dialog.prop("title"), "Report Post")
-
-          assert.equal(dialog.find("ReportForm").prop("validation"), errors)
-        })
-      })
-
-      describe("comments", () => {
-        it("validates comment report content", async () => {
-          const reason = "a reason goes here"
-          const form = {
-            value: {
-              reason
-            },
-            errors: {}
-          }
-          const { inner } = await render({
-            forms: {
-              [REPORT_FORM_KEY]: form
-            },
-            focus: {
-              comment: comments[0]
-            }
-          })
-
-          const dialog = inner.find("OurDialog").at(2)
-          assert.equal(dialog.prop("title"), "Report Comment")
-
-          const validationStub = helper.sandbox
-            .stub(validationFuncs, "validateContentReportForm")
-            .returns({ a: "complaint" })
-          await dialog.props().onAccept()
-          assert.equal(helper.reportContentStub.callCount, 0)
-          sinon.assert.calledWith(validationStub, form)
-        })
-
-        it("passes validation errors to ReportForm for display", async () => {
-          const errors = "some errors"
-          const { inner } = await render({
-            forms: {
-              [REPORT_FORM_KEY]: {
-                value:  {},
-                errors: errors
-              }
-            },
-            focus: {
-              comment: comments[0]
-            }
-          })
-
-          const dialog = inner.find("OurDialog").at(2)
-          assert.equal(dialog.prop("title"), "Report Comment")
 
           assert.equal(dialog.find("ReportForm").prop("validation"), errors)
         })

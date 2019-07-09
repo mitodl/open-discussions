@@ -186,7 +186,7 @@ export default class IntegrationTestHelper {
   }
 
   stubComponent(module, displayName, name = "default") {
-    const Stubber = () => <div />
+    const Stubber = ({ children }) => <div>{children} </div>
     Stubber.displayName = displayName
     this[`${displayName}Stub`] = this.sandbox
       .stub(module, name)

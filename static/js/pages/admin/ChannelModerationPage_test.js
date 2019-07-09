@@ -12,14 +12,8 @@ import * as CommentTreeModule from "../../components/CommentTree"
 
 import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
+import { CLEAR_FOCUSED_POST, SET_FOCUSED_POST } from "../../actions/focus"
 import {
-  CLEAR_FOCUSED_COMMENT,
-  CLEAR_FOCUSED_POST,
-  SET_FOCUSED_COMMENT,
-  SET_FOCUSED_POST
-} from "../../actions/focus"
-import {
-  DIALOG_REMOVE_COMMENT,
   DIALOG_REMOVE_POST,
   HIDE_DIALOG,
   SET_SNACKBAR_MESSAGE
@@ -147,8 +141,7 @@ describe("ChannelModerationPage", () => {
     it("should fetch reports", async () => {
       const wrapper = await renderPage()
       assert.deepEqual(
-        wrapper.find("withPostModeration(WithCommentModeration)").props()
-          .reports,
+        wrapper.find("ChannelModerationPage").props().reports,
         reports
       )
     })
@@ -342,12 +335,12 @@ describe("ChannelModerationPage", () => {
         }
       })
 
-      const commentTrees = inner.find("CommentTree")
-      assert.equal(commentTrees.length, postList.length)
+      const comments = inner.find("Comment")
+      assert.equal(comments.length, postList.length)
 
       reports.forEach((report, index) => {
-        const props = commentTrees.at(index).props()
-        assert.deepEqual(props.comments, [report.comment])
+        const props = comments.at(index).props()
+        assert.deepEqual(props.comment, report.comment)
         assert.equal(
           props.commentPermalink("commentId"),
           commentPermalink(
@@ -359,128 +352,8 @@ describe("ChannelModerationPage", () => {
         )
         assert.equal(props.moderationUI, true)
         assert.equal(props.isModerator, channel.user_is_moderator)
-        assert.equal(props.dropdownMenus, dropdownMenus)
-      })
-    })
-
-    it("opens a dialog for removing a comment", async () => {
-      const { inner, store } = await render({
-        reports: {
-          data: {
-            reports: reports
-          },
-          processing: false,
-          loaded:     true
-        }
-      })
-
-      const props = inner
-        .find("CommentTree")
-        .first()
-        .props()
-      const comment = reports[0].comment
-      props.remove(comment)
-      const actions = store.getActions()
-      assert.deepEqual(actions[actions.length - 2], {
-        type:    SET_FOCUSED_COMMENT,
-        payload: comment
-      })
-    })
-
-    it("removes a report for a comment", async () => {
-      const comment = reports[0].comment
-      const event = { preventDefault: helper.sandbox.stub() }
-      helper.updateCommentStub.returns(Promise.resolve(comment))
-      const { wrapper, store } = await render({
-        reports: {
-          data: {
-            reports: reports
-          },
-          processing: false,
-          loaded:     true
-        },
-        focus: {
-          comment
-        }
-      })
-
-      const props = wrapper
-        .find("WithCommentModeration")
-        .find("OurDialog[id='remove-comment-dialog']")
-        .first()
-        .props()
-
-      await props.onAccept(event)
-      const actions = store.getActions()
-      sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
-        removed: true
-      })
-      sinon.assert.calledWith(helper.getReportsStub, channel.name)
-      assert.deepEqual(actions[actions.length - 1], {
-        type:    SET_SNACKBAR_MESSAGE,
-        payload: {
-          message: "Comment has been removed"
-        }
-      })
-    })
-
-    it("ignores a report for a comment", async () => {
-      const comment = reports[0].comment
-      helper.updateCommentStub.returns(Promise.resolve(comment))
-      const { wrapper } = await render({
-        reports: {
-          data: {
-            reports: reports
-          },
-          processing: false,
-          loaded:     true
-        },
-        focus: {
-          comment
-        }
-      })
-
-      const props = wrapper
-        .find("CommentTree")
-        .first()
-        .props()
-
-      await props.ignoreCommentReports(comment)
-      sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
-        ignore_reports: true
-      })
-      sinon.assert.calledWith(helper.getReportsStub, channel.name)
-    })
-
-    it("dismisses the dialog for removing a comment", async () => {
-      const comment = reports[0].comment
-      const { store, wrapper } = await render({
-        reports: {
-          data: {
-            reports: reports
-          },
-          processing: false,
-          loaded:     true
-        },
-        focus: {
-          comment
-        }
-      })
-
-      const props = wrapper
-        .find("WithCommentModeration")
-        .find("OurDialog[id='remove-comment-dialog']")
-        .first()
-        .props()
-
-      props.hideDialog()
-      const actions = store.getActions()
-      assert.deepEqual(actions[actions.length - 2], {
-        type: CLEAR_FOCUSED_COMMENT
-      })
-      assert.deepEqual(actions[actions.length - 1], {
-        type:    HIDE_DIALOG,
-        payload: DIALOG_REMOVE_COMMENT
+        assert.equal(props.channelName, channel.name)
+        assert.isTrue(props.shouldGetReports)
       })
     })
   })

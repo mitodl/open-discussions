@@ -7,14 +7,6 @@ $replyPaddingLeftDesktop: 30px;
 $replyPaddingLeftPhone: 10px;
 
 .comments {
-  .card {
-    margin-bottom: 14px;
-  }
-
-  .card-contents {
-    display: flex;
-  }
-
   .top-level-comment {
     @include breakpoint(phone) {
       padding: 0;
@@ -24,212 +16,188 @@ $replyPaddingLeftPhone: 10px;
   .top-level-comment > .comment {
     margin-top: 0;
   }
+}
 
-  .comment {
+.comment {
+  display: flex;
+  flex-direction: column;
+
+  .card {
+    margin-bottom: 14px;
+  }
+
+  .card-contents {
     display: flex;
-    flex-direction: column;
+  }
 
-    img.profile-image {
-      flex-shrink: 0;
+  img.profile-image {
+    flex-shrink: 0;
 
-      @include breakpoint(phone) {
-        display: none;
-      }
-    }
-
-    .comment-contents {
-      padding-left: $commentPaddingLeftDesktop;
-      width: 100%;
-
-      @include breakpoint(phone) {
-        width: auto;
-        padding-left: $commentPaddingLeftPhone;
-      }
-    }
-
-    &.removed {
-      > .profile-image {
-        opacity: 0.5;
-      }
-
-      > .comment-contents {
-        > .row.text,
-        > .comment-actions .votes-form,
-        > .author-info .author-name,
-        > .author-info .authored-date,
-        > .comment-actions .reply-button,
-        > .comment-actions .edit-button {
-          opacity: 0.5;
-        }
-      }
-    }
-
-    .row {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-
-      &.comment-actions {
-        margin: 4px 5px 0 5px;
-        position: relative;
-        display: flex;
-        justify-content: flex-start;
-
-        i {
-          font-size: 14px;
-          cursor: pointer;
-        }
-
-        .share-button-wrapper {
-          position: relative;
-        }
-
-        .dropdown-menu {
-          top: 20px;
-          margin-left: 5px;
-          right: inherit;
-        }
-
-        .report-count {
-          margin-left: 10px;
-        }
-
-        > * {
-          color: $font-grey-light;
-        }
-
-        .votes-form {
-          margin-right: 5px;
-        }
-
-        a {
-          margin: 0 5px;
-        }
-      }
-
-      p {
-        margin: 0;
-        color: $white-smoky;
-        line-height: 1.3;
-        font-size: $submission-font-size;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        word-break: break-word;
-        hyphens: auto;
-
-        &:not(:last-child) {
-          margin: 0 0 15px 0;
-        }
-      }
-
-      tt,
-      code,
-      kbd,
-      samp {
-        white-space: pre-wrap;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        word-break: break-word;
-        hyphens: auto;
-      }
-
-      @include breakpoint(phone) {
-        display: block;
-      }
-    }
-
-    .votes-form {
-      display: inline-block;
-
-      .score {
-        display: inline-block;
-        font-weight: 500;
-        font-size: 14px;
-        color: $font-grey-light;
-      }
-
-      .upvote-button,
-      .downvote-button {
-        margin: 0 10px;
-      }
-
-      .pipe {
-        color: #b5b5b5;
-        font-weight: 200;
-      }
-    }
-
-    .author-info {
-      color: $font-grey;
-      margin: 0 0 5px;
-
-      .authored-date {
-        font-size: 14px;
-        color: $font-grey-light;
-      }
-
-      .author-name {
-        display: inline;
-        padding-right: 6px;
-        font-weight: 500;
-        font-size: 16px;
-        color: $navy;
-      }
-
-      .removed-note {
-        font-style: italic;
-        color: $font-black;
-        padding-left: 6px;
-      }
-    }
-
-    .replies {
-      margin-left: 0;
-
-      @include breakpoint(phone) {
-        margin-left: 0px;
-      }
-    }
-
-    .replies > .comment {
-      padding-left: $replyPaddingLeftDesktop;
-
-      @include breakpoint(phone) {
-        padding-left: $replyPaddingLeftPhone;
-      }
+    @include breakpoint(phone) {
+      display: none;
     }
   }
 
-  .more-comments {
-    margin: $commentTopMargin 0 0;
-    padding-left: $profileImageWidth + $commentPaddingLeftDesktop;
-
-    .replies > .more-comments {
-      padding-left: $replyPaddingLeftDesktop;
-
-      @include breakpoint(phone) {
-        padding-left: $replyPaddingLeftPhone;
-      }
-    }
+  .comment-contents {
+    padding-left: $commentPaddingLeftDesktop;
+    width: 100%;
 
     @include breakpoint(phone) {
       width: auto;
       padding-left: $commentPaddingLeftPhone;
     }
+  }
 
-    .load-more-comments {
-      // style button as a link
-      background: none !important;
-      color: $link-blue;
-      border: none;
-      padding: 0 !important;
-      font: inherit;
-      cursor: pointer;
+  &.removed {
+    > .profile-image {
+      opacity: 0.5;
+    }
 
-      .sk-fading-circle {
-        margin: 0;
+    > .comment-contents {
+      > .row.text,
+      > .comment-actions .votes-form,
+      > .author-info .author-name,
+      > .author-info .authored-date,
+      > .comment-actions .reply-button,
+      > .comment-actions .edit-button {
+        opacity: 0.5;
       }
+    }
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    &.comment-actions {
+      margin: 4px 5px 0 5px;
+      position: relative;
+      display: flex;
+      justify-content: flex-start;
+
+      i {
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .share-button-wrapper {
+        position: relative;
+      }
+
+      .dropdown-menu {
+        top: 20px;
+        margin-left: 5px;
+        right: inherit;
+      }
+
+      .report-count {
+        margin-left: 10px;
+      }
+
+      > * {
+        color: $font-grey-light;
+      }
+
+      .votes-form {
+        margin-right: 5px;
+      }
+
+      a {
+        margin: 0 5px;
+      }
+    }
+
+    p {
+      margin: 0;
+      color: $white-smoky;
+      line-height: 1.3;
+      font-size: $submission-font-size;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      word-break: break-word;
+      hyphens: auto;
+
+      &:not(:last-child) {
+        margin: 0 0 15px 0;
+      }
+    }
+
+    tt,
+    code,
+    kbd,
+    samp {
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      word-break: break-word;
+      hyphens: auto;
+    }
+
+    @include breakpoint(phone) {
+      display: block;
+    }
+  }
+
+  .votes-form {
+    display: inline-block;
+
+    .score {
+      display: inline-block;
+      font-weight: 500;
+      font-size: 14px;
+      color: $font-grey-light;
+    }
+
+    .upvote-button,
+    .downvote-button {
+      margin: 0 10px;
+    }
+
+    .pipe {
+      color: #b5b5b5;
+      font-weight: 200;
+    }
+  }
+
+  .author-info {
+    color: $font-grey;
+    margin: 0 0 5px;
+
+    .authored-date {
+      font-size: 14px;
+      color: $font-grey-light;
+    }
+
+    .author-name {
+      display: inline;
+      padding-right: 6px;
+      font-weight: 500;
+      font-size: 16px;
+      color: $navy;
+    }
+
+    .removed-note {
+      font-style: italic;
+      color: $font-black;
+      padding-left: 6px;
+    }
+  }
+
+  .replies {
+    margin-left: 0;
+
+    @include breakpoint(phone) {
+      margin-left: 0px;
+    }
+  }
+
+  .replies > .comment {
+    padding-left: $replyPaddingLeftDesktop;
+
+    @include breakpoint(phone) {
+      padding-left: $replyPaddingLeftPhone;
     }
   }
 
@@ -238,6 +206,38 @@ $replyPaddingLeftPhone: 10px;
     font-weight: 400;
     cursor: pointer;
     margin-right: 10px;
+  }
+}
+
+.more-comments {
+  margin: $commentTopMargin 0 0;
+  padding-left: $profileImageWidth + $commentPaddingLeftDesktop;
+
+  .replies > .more-comments {
+    padding-left: $replyPaddingLeftDesktop;
+
+    @include breakpoint(phone) {
+      padding-left: $replyPaddingLeftPhone;
+    }
+  }
+
+  @include breakpoint(phone) {
+    width: auto;
+    padding-left: $commentPaddingLeftPhone;
+  }
+
+  .load-more-comments {
+    // style button as a link
+    background: none !important;
+    color: $link-blue;
+    border: none;
+    padding: 0 !important;
+    font: inherit;
+    cursor: pointer;
+
+    .sk-fading-circle {
+      margin: 0;
+    }
   }
 }
 

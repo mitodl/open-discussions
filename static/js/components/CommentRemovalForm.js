@@ -5,11 +5,9 @@ import { preventDefaultAndInvoke } from "../lib/util"
 
 import type { CommentInTree } from "../flow/discussionTypes"
 
-export type CommentRemoveFunc = CommentInTree => void
-
 type CommentRemovalFormProps = {
-  approve: CommentRemoveFunc,
-  remove: CommentRemoveFunc,
+  approve: Function,
+  remove: Function,
   isModerator: boolean,
   comment: CommentInTree
 }

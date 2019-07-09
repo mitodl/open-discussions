@@ -1,51 +1,43 @@
 // @flow
-import sinon from "sinon"
 import { assert } from "chai"
 
 import CommentVoteForm from "./CommentVoteForm"
 import LoginTooltip from "./LoginTooltip"
+import * as LoginTooltipMod from "./LoginTooltip"
 
 import * as utilFuncs from "../lib/util"
 import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
-import { configureShallowRenderer } from "../lib/test_utils"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("CommentVoteForm", () => {
-  let sandbox,
-    upvoteStub,
-    downvoteStub,
-    comment,
-    resolveUpvote,
-    resolveDownvote,
-    renderForm
+  let comment, resolveRequest, helper, render, anonStub
 
-  beforeEach(() => {
-    sandbox = sinon.createSandbox()
+  beforeEach(async () => {
     // use promise which will never resolve
-    upvoteStub = sandbox.stub().returns(
-      new Promise(resolve => {
-        resolveUpvote = resolve
-      })
-    )
-    downvoteStub = sandbox.stub().returns(
-      new Promise(resolve => {
-        resolveDownvote = resolve
-      })
+    helper = new IntegrationTestHelper()
+    helper.updateCommentStub.resetBehavior()
+    helper.updateCommentStub.callsFake(
+      () =>
+        new Promise(resolve => {
+          resolveRequest = comment => {
+            resolve(comment)
+          }
+        })
     )
     comment = makeComment(makePost())
     comment.upvoted = false
     comment.downvoted = false
+    anonStub = helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
 
-    renderForm = configureShallowRenderer(CommentVoteForm, {
-      comment,
-      upvote:   upvoteStub,
-      downvote: downvoteStub
+    render = helper.configureReduxQueryRenderer(CommentVoteForm, {
+      comment
     })
   })
 
-  afterEach(() => {
-    sandbox.restore()
+  afterEach(async () => {
+    helper.cleanup()
   })
 
   const assertButtons = (wrapper, isUpvote, isClear, isVoting) => {
@@ -61,6 +53,7 @@ describe("CommentVoteForm", () => {
 
     assert.equal(wrapper.find(clickedButtonSelector).props().disabled, isVoting)
     assert.equal(wrapper.find(otherButtonSelector).props().disabled, isVoting)
+
     if (isClear) {
       assert.notInclude(
         wrapper.find(clickedButtonSelector).props().className,
@@ -86,52 +79,48 @@ describe("CommentVoteForm", () => {
         `${imgPrefix}_on.png`
       )
     }
+
     assert.notInclude(
       wrapper.find(otherButtonSelector).props().className,
       otherVoteClass
     )
   }
 
-  it("should have a LoginTooltip", () => {
-    const wrapper = renderForm()
+  it("should have a LoginTooltip", async () => {
+    const { wrapper } = await render()
     wrapper.find(LoginTooltip).exists()
   })
 
-  it("clicking a vote button should not trigger vote function", () => {
-    sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-    const wrapper = renderForm()
-    const voteStub = upvoteStub
-    wrapper.find(".upvote-button").simulate("click")
-    sinon.assert.notCalled(voteStub)
+  it("clicking a vote button should not trigger vote function for anons", async () => {
+    anonStub.returns(true)
+    // have to stub out b/c LoginTooltip overrides click handlers
+    helper.stubComponent(LoginTooltipMod, "LoginTooltip")
+    const { wrapper } = await render()
+    assert.isNull(wrapper.find(".upvote-button").prop("onClick"))
+    assert.isNull(wrapper.find(".downvote-button").prop("onClick"))
   })
 
   //
   ;[true, false].forEach(isUpvote => {
     describe(`clicks the ${isUpvote ? "upvote" : "downvote"} button`, () => {
       it("when the previous state was clear", async () => {
-        const wrapper = renderForm()
-        const voteStub = isUpvote ? upvoteStub : downvoteStub
+        const { wrapper } = await render()
 
         wrapper
           .find(isUpvote ? ".upvote-button" : ".downvote-button")
           .simulate("click")
-        sinon.assert.calledWith(voteStub, comment)
-        assert.deepEqual(wrapper.state(), {
-          downvoting: !isUpvote,
-          upvoting:   isUpvote
-        })
+        wrapper.update()
+
         assertButtons(wrapper, isUpvote, false, true)
 
         if (isUpvote) {
-          resolveUpvote()
           comment.upvoted = true
         } else {
-          resolveDownvote()
           comment.downvoted = true
         }
 
-        wrapper.setProps({ comment })
-        // wait for event loop to handle resolved promise
+        resolveRequest(comment)
+
         await wait(10)
         wrapper.update()
         assertButtons(wrapper, isUpvote, false, false)
@@ -141,13 +130,13 @@ describe("CommentVoteForm", () => {
       ;[true, false].forEach(wasUpvote => {
         it(`when the previous state was ${
           wasUpvote ? "upvote" : "downvote"
-        }`, () => {
+        }`, async () => {
           if (wasUpvote) {
             comment.upvoted = true
           } else {
             comment.downvoted = true
           }
-          const wrapper = renderForm()
+          const { wrapper } = await render()
 
           assertButtons(wrapper, wasUpvote, false, false)
 

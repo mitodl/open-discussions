@@ -10,14 +10,13 @@ import InfiniteScroll from "react-infinite-scroller"
 import { Loading } from "../components/Loading"
 import IntraPageNav from "../components/IntraPageNav"
 import CompactPostDisplay from "../components/CompactPostDisplay"
-import CommentTree from "../components/CommentTree"
+import Comment from "../components/Comment"
 
 import { actions } from "../actions"
 import { toggleUpvote } from "../util/api_actions"
 import { POSTS_SORT_NEW } from "../lib/picker"
 import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
 import { commentPermalink } from "../lib/url"
-import { dropdownMenuFuncs } from "../lib/ui"
 
 import type { Dispatch } from "redux"
 import type { CommentInTree, Post } from "../flow/discussionTypes"
@@ -177,13 +176,9 @@ class ProfileContributionFeed extends React.Component<Props, State> {
       return (
         <div className="comment-list">
           {comments.map((comment, i) => (
-            <CommentTree
+            <Comment
               key={i}
-              comments={[comment]}
-              remove={() => undefined}
-              approve={() => undefined}
-              upvote={this.upvoteComment}
-              downvote={this.downvoteComment}
+              comment={comment}
               isModerator={false}
               isPrivateChannel={false}
               commentPermalink={commentPermalink(
@@ -191,8 +186,6 @@ class ProfileContributionFeed extends React.Component<Props, State> {
                 comment.post_id,
                 comment.post_slug
               )}
-              curriedDropdownMenufunc={dropdownMenuFuncs(() => null)}
-              dropdownMenus={new Set()}
               useSearchPageUI
             />
           ))}

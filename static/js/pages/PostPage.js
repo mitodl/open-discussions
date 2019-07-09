@@ -11,7 +11,6 @@ import Card from "../components/Card"
 import { withSpinnerLoading } from "../components/Loading"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"
-import ReportForm from "../components/ReportForm"
 import CommentForm from "../components/CommentForm"
 import withSingleColumn from "../hoc/withSingleColumn"
 import { withPostDetailSidebar } from "../hoc/withSidebar"
@@ -19,10 +18,6 @@ import {
   withPostModeration,
   postModerationSelector
 } from "../hoc/withPostModeration"
-import {
-  withCommentModeration,
-  commentModerationSelector
-} from "../hoc/withCommentModeration"
 import { CommentSortPicker } from "../components/Picker"
 import CanonicalLink from "../components/CanonicalLink"
 import Dialog from "../components/Dialog"
@@ -33,17 +28,10 @@ import {
   getPostDropdownMenuKey,
   postMenuDropdownFuncs
 } from "../lib/posts"
-import { validateContentReportForm } from "../lib/validation"
 import { actions } from "../actions"
 import { clearCommentError, replaceMoreComments } from "../actions/comment"
-import { setFocusedComment, clearFocusedComment } from "../actions/focus"
-import { formBeginEdit, formEndEdit } from "../actions/forms"
 import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
-import {
-  toggleUpvote,
-  toggleFollowPost,
-  toggleFollowComment
-} from "../util/api_actions"
+import { toggleUpvote, toggleFollowPost } from "../util/api_actions"
 import { getPostID, getCommentID, truncate } from "../lib/util"
 import {
   anyErrorExcept404,
@@ -58,15 +46,8 @@ import { formatTitle } from "../lib/title"
 import { channelURL, postDetailURL, commentPermalink } from "../lib/url"
 import { clearPostError } from "../actions/post"
 import { preventDefaultAndInvoke } from "../lib/util"
-import {
-  getReportForm,
-  onReportUpdate,
-  REPORT_CONTENT_NEW_FORM,
-  REPORT_CONTENT_PAYLOAD
-} from "../lib/reports"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
 import { withChannelTracker } from "../hoc/withChannelTracker"
-import { dropdownMenuFuncs } from "../lib/ui"
 import { getOwnProfile } from "../lib/redux_selectors"
 
 import type { Dispatch } from "redux"
@@ -212,30 +193,6 @@ export class PostPage extends React.Component<PostPageProps> {
     )
   }
 
-  showCommentDialog = R.curry((dialogKey: string, comment: CommentInTree) => {
-    const { dispatch } = this.props
-    dispatch(setFocusedComment(comment))
-    dispatch(showDialog(dialogKey))
-  })
-
-  hideCommentDialog = (dialogKey: string) => () => {
-    const { dispatch } = this.props
-    dispatch(clearFocusedComment())
-    dispatch(hideDialog(dialogKey))
-  }
-
-  showReportCommentDialog = (comment: CommentInTree) => {
-    const { dispatch } = this.props
-    dispatch(formBeginEdit({ ...REPORT_CONTENT_NEW_FORM }))
-    this.showCommentDialog(REPORT_COMMENT_DIALOG, comment)
-  }
-
-  hideReportCommentDialog = () => {
-    const { dispatch } = this.props
-    dispatch(formEndEdit({ ...REPORT_CONTENT_PAYLOAD }))
-    this.hideCommentDialog(REPORT_COMMENT_DIALOG)()
-  }
-
   showPostDialog = (dialogKey: string) => () => {
     const { dispatch } = this.props
     dispatch(showDialog(dialogKey))
@@ -244,19 +201,6 @@ export class PostPage extends React.Component<PostPageProps> {
   hidePostDialog = (dialogKey: string) => () => {
     const { dispatch } = this.props
     dispatch(hideDialog(dialogKey))
-  }
-
-  deleteComment = async () => {
-    // ⚠️  this is a destructive action! ⚠️
-    const { dispatch, focusedComment, post } = this.props
-    if (focusedComment) {
-      await dispatch(actions.comments["delete"](post.id, focusedComment.id))
-      dispatch(
-        setSnackbarMessage({
-          message: "Comment has been deleted"
-        })
-      )
-    }
   }
 
   deletePost = async (post: Post) => {
@@ -269,37 +213,6 @@ export class PostPage extends React.Component<PostPageProps> {
         message: "Post has been deleted"
       })
     )
-  }
-
-  reportComment = async () => {
-    const { dispatch, focusedComment, forms } = this.props
-    const form = getReportForm(forms)
-    const { reason } = form.value
-    if (focusedComment) {
-      const validation = validateContentReportForm(form)
-
-      if (!R.isEmpty(validation)) {
-        dispatch(
-          actions.forms.formValidate({
-            ...REPORT_CONTENT_PAYLOAD,
-            errors: validation.value
-          })
-        )
-      } else {
-        await dispatch(
-          actions.reports.post({
-            comment_id: focusedComment.id,
-            reason:     reason
-          })
-        )
-        this.hideReportCommentDialog()
-        dispatch(
-          setSnackbarMessage({
-            message: "Comment has been reported"
-          })
-        )
-      }
-    }
   }
 
   renderCommentSectionHeader = () => {
@@ -344,17 +257,12 @@ export class PostPage extends React.Component<PostPageProps> {
       commentInFlight,
       isModerator,
       postDeleteDialogVisible,
-      commentDeleteDialogVisible,
-      commentReportDialogVisible,
       commentID,
       removePost,
       approvePost,
-      removeComment,
-      approveComment,
       embedly,
       reportPost,
       postDropdownMenuOpen,
-      dropdownMenus,
       profile
     } = this.props
 
@@ -364,7 +272,6 @@ export class PostPage extends React.Component<PostPageProps> {
 
     const { showPostMenu, hidePostMenu } = postMenuDropdownFuncs(dispatch, post)
 
-    const reportForm = getReportForm(forms)
     const showPermalinkUI = R.not(R.isNil(commentID))
     const hidePostDialog = this.hidePostDialog(DELETE_POST_DIALOG)
 
@@ -411,16 +318,8 @@ export class PostPage extends React.Component<PostPageProps> {
           <CommentTree
             comments={commentsTree}
             isPrivateChannel={isPrivate(channel)}
-            forms={forms}
-            upvote={this.upvote}
-            downvote={this.downvote}
-            approve={approveComment}
-            remove={removeComment}
-            deleteComment={this.showCommentDialog(DELETE_COMMENT_DIALOG)}
-            reportComment={this.showReportCommentDialog}
             isModerator={isModerator}
             loadMoreComments={this.loadMoreComments}
-            beginEditing={beginEditing(dispatch)}
             processing={commentInFlight}
             post={post}
             commentPermalink={commentPermalink(
@@ -428,23 +327,8 @@ export class PostPage extends React.Component<PostPageProps> {
               post.id,
               post.slug
             )}
-            toggleFollowComment={toggleFollowComment(dispatch)}
-            curriedDropdownMenufunc={dropdownMenuFuncs(dispatch)}
-            dropdownMenus={dropdownMenus}
           />
         ) : null}
-        <Dialog
-          open={commentDeleteDialogVisible}
-          hideDialog={this.hideCommentDialog(DELETE_COMMENT_DIALOG)}
-          onAccept={async () => {
-            await this.deleteComment()
-            this.hideCommentDialog(DELETE_COMMENT_DIALOG)()
-          }}
-          title="Delete Comment"
-          submitText="Yes, Delete"
-        >
-          Are you sure you want to delete this comment?
-        </Dialog>
         <Dialog
           open={postDeleteDialogVisible}
           hideDialog={hidePostDialog}
@@ -456,26 +340,6 @@ export class PostPage extends React.Component<PostPageProps> {
           submitText="Yes, Delete"
         >
           Are you sure you want to delete this post?
-        </Dialog>
-        <Dialog
-          open={commentReportDialogVisible}
-          hideDialog={this.hideReportCommentDialog}
-          onCancel={this.hideReportCommentDialog}
-          onAccept={this.reportComment}
-          validateOnClick={true}
-          title="Report Comment"
-          submitText="Yes, Report"
-          id="report-comment-dialog"
-        >
-          {reportForm ? (
-            <ReportForm
-              reportForm={reportForm.value}
-              validation={reportForm.errors}
-              onUpdate={onReportUpdate(dispatch)}
-              description="Are you sure you want to report this comment for violating the rules of this site?"
-              label="Why are you reporting this comment?"
-            />
-          ) : null}
         </Dialog>
       </div>
     )
@@ -490,8 +354,8 @@ const mapStateToProps = (state, ownProps) => {
   const post = posts.data.get(postID)
   const channel = channels.data.get(channelName)
   const commentsTree = comments.data.get(postID)
-  const embedlyResponse =
-    post && post.url ? embedly.data.get(post.url) : undefined
+  // $FlowFixMe
+  const embedlyResponse = embedly?.data?.get(post?.url)
 
   const notFound = any404Error([posts, comments, channels])
   const notAuthorized = anyNotAuthorizedErrorType([posts, comments])
@@ -504,11 +368,8 @@ const mapStateToProps = (state, ownProps) => {
     ? ui.dropdownMenus.has(getPostDropdownMenuKey(post))
     : false
 
-  const { dropdownMenus } = ui
-
   return {
     ...postModerationSelector(state, ownProps),
-    ...commentModerationSelector(state, ownProps),
     postID,
     channelName,
     commentID,
@@ -520,9 +381,8 @@ const mapStateToProps = (state, ownProps) => {
     notFound,
     notAuthorized,
     postDropdownMenuOpen,
-    dropdownMenus,
     profile:     getOwnProfile(state),
-    isModerator: channel && channel.user_is_moderator,
+    isModerator: channel?.user_is_moderator ?? false, // eslint-disable-line camelcase
     errored:
       anyErrorExcept404([posts, channels]) ||
       anyErrorExcept404or410([comments]),
@@ -539,7 +399,6 @@ const mapStateToProps = (state, ownProps) => {
 export default R.compose(
   connect(mapStateToProps),
   withPostModeration,
-  withCommentModeration,
   SETTINGS.allow_related_posts_ui
     ? withPostDetailSidebar("post-page")
     : withSingleColumn("post-page"),

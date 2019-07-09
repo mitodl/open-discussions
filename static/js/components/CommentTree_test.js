@@ -4,53 +4,24 @@ import sinon from "sinon"
 import R from "ramda"
 import { assert } from "chai"
 import { mount } from "enzyme"
-import ReactMarkdown from "react-markdown"
 
-import Card from "../components/Card"
-import CommentTree, { commentDropdownKey } from "./CommentTree"
-import CommentForm from "./CommentForm"
-import { commentPermalink, profileURL, absolutizeURL } from "../lib/url"
+import CommentTree from "./CommentTree"
+import { commentPermalink } from "../lib/url"
 import Router from "../Router"
-import ShareTooltip from "./ShareTooltip"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeCommentsResponse, makeMoreComments } from "../factories/comments"
 import { makePost } from "../factories/posts"
 import { createCommentTree } from "../reducers/comments"
-import { makeCommentReport } from "../factories/reports"
-import * as utilFuncs from "../lib/util"
-import { dropdownMenuFuncs } from "../lib/ui"
-import { shouldIf } from "../lib/test_utils"
-import { flattenCommentTree } from "../lib/comments"
 
 describe("CommentTree", () => {
-  let comments,
-    post,
-    upvoteStub,
-    downvoteStub,
-    removeStub,
-    approveStub,
-    beginEditingStub,
-    loadMoreCommentsStub,
-    deleteCommentStub,
-    reportCommentStub,
-    toggleFollowCommentStub,
-    permalinkFunc,
-    helper
+  let comments, post, loadMoreCommentsStub, permalinkFunc, helper
 
   beforeEach(() => {
     post = makePost()
     helper = new IntegrationTestHelper()
     comments = createCommentTree(makeCommentsResponse(post))
-    upvoteStub = helper.sandbox.stub()
-    downvoteStub = helper.sandbox.stub()
-    removeStub = helper.sandbox.stub()
-    approveStub = helper.sandbox.stub()
-    beginEditingStub = helper.sandbox.stub()
     loadMoreCommentsStub = helper.sandbox.stub()
-    deleteCommentStub = helper.sandbox.stub()
-    reportCommentStub = helper.sandbox.stub()
-    toggleFollowCommentStub = helper.sandbox.stub()
     permalinkFunc = commentPermalink("channel", post.id, post.slug)
   })
 
@@ -63,20 +34,9 @@ describe("CommentTree", () => {
       <Router store={helper.store} history={helper.browserHistory}>
         <CommentTree
           comments={comments}
-          forms={{}}
-          upvote={upvoteStub}
-          downvote={downvoteStub}
-          approveStub={approveStub}
-          removeStub={removeStub}
-          beginEditing={R.curry(beginEditingStub)}
           processing={false}
           loadMoreComments={loadMoreCommentsStub}
-          deleteComment={deleteCommentStub}
-          reportComment={reportCommentStub}
           commentPermalink={permalinkFunc}
-          toggleFollowComment={toggleFollowCommentStub}
-          curriedDropdownMenufunc={dropdownMenuFuncs(helper.sandbox.stub())}
-          dropdownMenus={new Set()}
           isPrivateChannel={true}
           post={post}
           {...props}
@@ -84,343 +44,81 @@ describe("CommentTree", () => {
       </Router>
     )
 
-  const openMenu = R.curry((keyFunc, comment) => {
-    const dropdownMenus = new Set()
-    dropdownMenus.add(keyFunc(comment))
-    return { dropdownMenus }
+  it("should pass basic props down to comments", () => {
+    const comment = renderCommentTree()
+      .find("Comment")
+      .at(0)
+    assert.deepEqual(comment.prop("post"), post)
+    assert.deepEqual(comment.prop("commentPermalink"), permalinkFunc)
+    assert.isTrue(comment.prop("isPrivateChannel"))
   })
 
-  const openDropdownMenu = openMenu(commentDropdownKey)
+  //
+  ;[true, false].forEach(isModerator => {
+    it(`should  pass isModerator = ${String(isModerator)} down`, () => {
+      const comment = renderCommentTree({ isModerator })
+        .find("Comment")
+        .at(0)
+      assert.equal(comment.prop("isModerator"), isModerator)
+    })
+  })
+
+  //
+  ;[true, false].forEach(isPrivateChannel => {
+    it(`should  pass isPrivateChannel = ${String(
+      isPrivateChannel
+    )} down`, () => {
+      const comment = renderCommentTree({ isPrivateChannel })
+        .find("Comment")
+        .at(0)
+      assert.equal(comment.prop("isPrivateChannel"), isPrivateChannel)
+    })
+  })
 
   it("should wrap all top-level comments in a div", () => {
     const wrapper = renderCommentTree()
     assert.equal(wrapper.find("div.top-level-comment").length, comments.length)
   })
 
-  //
-  ;[true, false].forEach(isPrivateChannel => {
-    it(`should render a ShareTooltip for each comment on a ${
-      isPrivateChannel ? "private" : "public"
-    } channel`, () => {
-      const wrapper = renderCommentTree({ isPrivateChannel })
-      R.zip(
-        wrapper.find(ShareTooltip).map(R.identity),
-        flattenCommentTree(comments)
-      ).forEach(([toolTip, comment]) => {
-        const { url, hideSocialButtons, objectType } = toolTip.props()
-        assert.equal(objectType, "comment")
-        assert.equal(url, absolutizeURL(permalinkFunc(comment.id)))
-        assert.equal(hideSocialButtons, isPrivateChannel)
-      })
+  it("should render replies to a comment as children of that comment", () => {
+    // no replies-to-replies, for simplicity
+    comments[0].replies.map(comment => {
+      comment.replies = []
     })
-  })
-
-  //
-  ;[true, false].forEach(useSearchPageUI => {
-    it(`${shouldIf(!useSearchPageUI)} show the Share button`, () => {
-      const wrapper = renderCommentTree({ useSearchPageUI })
-      assert.equal(
-        wrapper.find(".share-button-wrapper").exists(),
-        !useSearchPageUI
-      )
-    })
-  })
-
-  it("should render all replies to a top-level comment", () => {
-    const wrapper = renderCommentTree()
-    const firstComment = wrapper.find(".top-level-comment").at(0)
-    const replies = firstComment.find(".comment")
-    const countReplies = R.compose(
-      R.reduce((acc, val) => acc + countReplies(val), 1),
-      R.prop("replies")
-    )
-    assert.equal(replies.length, countReplies(comments[0]))
-  })
-
-  it("should use markdown to render comments, should skip images", () => {
-    comments[0].text = "# MARKDOWN!\n![](https://images.example.com/potato.jpg)"
-    comments[0].edited = false
     const wrapper = renderCommentTree()
     const firstComment = wrapper
       .find(".top-level-comment")
       .at(0)
-      .find(ReactMarkdown)
-
-    assert.equal(
-      firstComment
-        .find(ReactMarkdown)
-        .first()
-        .props().source,
-      comments[0].text
-    )
-    assert.lengthOf(firstComment.find("img"), 0)
-  })
-
-  it("should render a profile image", () => {
-    const wrapper = renderCommentTree()
-    const { src } = wrapper
-      .find(".profile-image")
+      .find("Comment")
       .at(0)
-      .props()
-    assert.equal(src, comments[0].profile_image)
-  })
-
-  it("should put a className on replies, to allow for indentation", () => {
-    const wrapper = renderCommentTree()
-    const firstComment = wrapper.find(".top-level-comment").at(0)
-    assert.ok(
-      firstComment
-        .find(".comment")
-        .at(0)
-        .hasClass("comment")
-    )
-    assert.ok(firstComment.find(".replies > .comment").at(0))
-  })
-
-  it('should include a "reply" button', () => {
-    const wrapper = renderCommentTree()
-    wrapper
-      .find(".comment-action-button.reply-button")
-      .at(0)
-      .simulate("click")
-    const form = wrapper.find(CommentForm)
-    assert.deepEqual(comments[0], form.prop("comment"))
-    assert.include(wrapper.find(CommentTree).state().replying, comments[0].id)
-  })
-
-  it('should not include a "reply" button if useSearchPageUI is true', () => {
-    const wrapper = renderCommentTree({ useSearchPageUI: true })
-    assert.notOk(wrapper.find(".comment-action-button.reply-button").exists())
-  })
-
-  it('should not include a "reply" button for deleted posts', () => {
-    comments[0].deleted = true
-    const wrapper = renderCommentTree()
-    assert.notOk(
-      wrapper
-        .find(".top-level-comment .comment-actions")
-        .at(0)
-        .find(".comment-action-button.reply-button")
-        .exists()
-    )
-  })
-
-  //
-  ;[true, false].forEach(useSearchPageUI => {
-    ["testuser", null].forEach(username => {
-      it(`${shouldIf(
-        username !== null && !useSearchPageUI
-      )} include a showMenu icon`, () => {
-        SETTINGS.username = username
-        const wrapper = renderCommentTree({ useSearchPageUI })
-        assert.equal(
-          wrapper.find(".more_vert").exists(),
-          username !== null && !useSearchPageUI
-        )
-      })
+    const replies = firstComment.find(".replies").find("Comment")
+    assert.equal(replies.length, comments[0].replies.length)
+    R.zip(...replies, comments[0].replies).forEach(([wrapper, comment]) => {
+      assert.deepEqual(wrapper.props.comment, comment)
     })
-  })
-
-  it('should include a "report" button', () => {
-    const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
-    wrapper
-      .find(".comment-action-button.report-button")
-      .at(0)
-      .simulate("click", null)
-    assert.ok(reportCommentStub.called)
-    assert.ok(reportCommentStub.calledWith(comments[0]))
-  })
-
-  it("should hide the report button if userIsAnonymous", () => {
-    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-    assert.isNotOk(
-      renderCommentTree()
-        .find(".report-button")
-        .exists()
-    )
-  })
-
-  it('should hide the "report" button for anons', () => {
-    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-    assert.isNotOk(
-      renderCommentTree()
-        .find(".comment-action-button.report-button")
-        .exists()
-    )
-  })
-
-  it("should hide the 'follow' button for anons", () => {
-    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
-    assert.isNotOk(
-      renderCommentTree()
-        .find(".comment-action-button.subscribe-comment")
-        .exists()
-    )
-  })
-
-  it('should include an "Edit" button, if the user wrote the comment', () => {
-    SETTINGS.username = comments[0].author_id
-    const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
-    wrapper.find(".edit-button").simulate("click")
-    const form = wrapper.find(CommentForm)
-    assert.deepEqual(comments[0], form.prop("comment"))
-    assert.include(wrapper.find(CommentTree).state().editing, comments[0].id)
-  })
-
-  //
-  ;[[true, "Unfollow"], [false, "Follow"]].forEach(
-    ([subscribed, buttonText]) => {
-      it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
-        comments[0].subscribed = subscribed
-        const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
-        const button = wrapper.find(".subscribe-comment").at(0)
-        assert.equal(button.text(), buttonText)
-        button.simulate("click")
-        assert.ok(toggleFollowCommentStub.called)
-      })
-    }
-  )
-
-  it("should include a 'delete' button, if the user wrote the comment", () => {
-    SETTINGS.username = comments[0].author_id
-    const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
-    const eventStub = {
-      preventDefault: helper.sandbox.stub()
-    }
-    wrapper
-      .find(".comment-action-button.delete-button")
-      .props()
-      .onClick(eventStub)
-    assert.ok(deleteCommentStub.called)
-    assert.ok(deleteCommentStub.calledWith(comments[0]))
-    assert.ok(eventStub.preventDefault.called)
-  })
-
-  it("should not show a delete button, otherwise", () => {
-    assert.isNotOk(
-      renderCommentTree()
-        .find(".delete-button")
-        .exists()
-    )
-  })
-
-  it("should show the author name", () => {
-    const wrapper = renderCommentTree()
-    const authorName = wrapper
-      .find(".comment")
-      .at(0)
-      .find(".author-name")
-      .at(0)
-      .text()
-    assert.equal(authorName, comments[0].author_name)
-  })
-
-  it("should link to the author's profile", () => {
-    const wrapper = renderCommentTree()
-    const link = wrapper
-      .find(".author-info")
-      .at(0)
-      .find("Link")
-      .at(0)
-    assert.equal(link.text(), comments[0].author_name)
-    assert.equal(link.props().to, profileURL(comments[0].author_id))
-    const secondLink = wrapper
-      .find(".comment")
-      .at(0)
-      .find("Link")
-      .at(0)
-    assert.equal(secondLink.props().to, profileURL(comments[0].author_id))
-    assert(secondLink.find("ProfileImage").exists())
-  })
-
-  it("should link to the comment URL", () => {
-    const wrapper = renderCommentTree()
-    const link = wrapper
-      .find(".author-info")
-      .at(0)
-      .find("Link")
-      .at(1)
-      .props()
-    assert.equal(link.to, permalinkFunc(comments[0].id))
   })
 
   it("should limit replies to the max comment depth", () => {
     SETTINGS.max_comment_depth = 2
 
-    // assert that there are at least three comments deep at index 0 for each one
+    // assert that there are at least three comments deep at index 0
+    // these first two comments will be rendered
     assert.ok(comments[0])
     assert.ok(comments[0].replies[0])
+    // this comment will not be rendered
+    // because we stop rendering *at* the max comment depth
     assert.ok(comments[0].replies[0].replies[0])
 
     const wrapper = renderCommentTree()
-    const topCommentWrapper = wrapper.find(".comment").first()
-    const nextCommentWrapper = topCommentWrapper
-      .find(".replies .comment")
+    const topLevelComment = wrapper.find("Comment").first()
+    const reply = topLevelComment
+      .find(".replies")
+      .find("Comment")
       .first()
 
-    assert.ok(topCommentWrapper.find(".reply-button").exists())
-    assert.isNotOk(nextCommentWrapper.find(".reply-button").exists())
-
-    assert.ok(topCommentWrapper.find(".replies").exists())
-    assert.isNotOk(nextCommentWrapper.find(".replies").exists())
-  })
-
-  describe("moderation UI", () => {
-    const moderationUI = true
-    const isModerator = true
-    let report
-    beforeEach(() => {
-      report = makeCommentReport(makePost())
-    })
-
-    it("should hide the reply button", () => {
-      const wrapper = renderCommentTree({ moderationUI })
-      assert.isNotOk(wrapper.find(".reply-button").exists())
-    })
-
-    it("should hide the report button", () => {
-      const wrapper = renderCommentTree({ moderationUI })
-      assert.isNotOk(wrapper.find(".report-button").exists())
-    })
-
-    it("should render top level comments as cards with moderationUI", () => {
-      const wrapper = renderCommentTree({ moderationUI })
-      assert.isOk(wrapper.find(Card).exists())
-    })
-
-    it("should include the report count if the user is a moderator", () => {
-      const wrapper = renderCommentTree({
-        isModerator,
-        comments: [report.comment],
-        ...openDropdownMenu(report.comment)
-      })
-      assert.ok(wrapper.find(".report-count").exists())
-      assert.equal(wrapper.find(".report-count").text(), "2 Reports")
-    })
-
-    it("should not render a report count, if comment has no report data", () => {
-      const wrapper = renderCommentTree({ moderationUI })
-      const count = wrapper.find(".report-count")
-      assert.isNotOk(count.exists())
-    })
-
-    it("should include an ignoreCommentReports button if report and moderator", () => {
-      const ignoreCommentReportsStub = helper.sandbox.stub()
-      const wrapper = renderCommentTree({
-        isModerator,
-        ignoreCommentReports: ignoreCommentReportsStub,
-        comments:             [report.comment],
-        ...openDropdownMenu(report.comment)
-      })
-      const ignoreButton = wrapper.find(".ignore-button")
-      assert.equal(ignoreButton.text(), "Ignore reports")
-      const eventStub = {
-        preventDefault: helper.sandbox.stub()
-      }
-      ignoreButton.props().onClick(eventStub)
-      assert.ok(eventStub.preventDefault.called)
-      assert.ok(ignoreCommentReportsStub.calledWith(report.comment))
-    })
+    assert.isFalse(topLevelComment.prop("atMaxDepth"))
+    assert.isTrue(reply.prop("atMaxDepth"))
+    assert.isNotOk(reply.find(".replies").exists())
   })
 
   describe("more_comments", () => {
@@ -432,7 +130,7 @@ describe("CommentTree", () => {
       const moreCommentsDiv = wrapper.find(
         ".top-level-comment > .more-comments"
       )
-      assert.lengthOf(moreCommentsDiv, 1)
+      assert.ok(moreCommentsDiv.exists())
 
       await moreCommentsDiv
         .find("SpinnerButton")
