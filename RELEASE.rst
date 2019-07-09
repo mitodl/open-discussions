@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.82.1
+--------------
+
+- Fix search query for anonymous users (#2079)
+- Add endpoints for users to favorite and view favorited items (#2064)
+- Addresses #2068  (#2074)
+
 Version 0.82.0 (Released July 09, 2019)
 --------------
 
