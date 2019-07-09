@@ -183,27 +183,26 @@ def _apply_general_query_filters(search, user):
     # Search programs
     program_filter = ~Q("terms", object_type=[PROGRAM_TYPE])
 
+    # Search public lists (and user's own lists if logged in)
+    user_list_filter = (
+        Q("term", privacy_level=PrivacyLevel.public.value)
+        | ~Q("terms", object_type=[USER_LIST_TYPE])
+    )
+    if not user.is_anonymous:
+        user_list_filter = user_list_filter | Q("term", author_id=user.id)
+
     # Search public channels and channels user is a contributor/moderator of
     if channel_names:
         channels_filter = channels_filter | Q("terms", channel_name=channel_names)
 
-    filters = (
+    return (
         search.filter(channels_filter)
         .filter(content_filter)
         .filter(course_filter)
         .filter(bootcamp_filter)
         .filter(program_filter)
+        .filter(user_list_filter)
     )
-
-    if not user.is_anonymous:
-        # Search the user's lists
-        user_list_filter = (
-            Q("term", privacy_level=PrivacyLevel.public.value)
-            | Q("term", author_id=user.id)
-            | ~Q("terms", object_type=[USER_LIST_TYPE])
-        )
-        filters = filters.filter(user_list_filter)
-    return filters
 
 
 def execute_search(*, user, query):
