@@ -313,30 +313,7 @@ def test_execute_search_anonymous(mocker):
                             "bool": {
                                 "must_not": [{"terms": {"object_type": ["program"]}}]
                             }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "term": {
-                                            "privacy_level": PrivacyLevel.public.value
-                                        }
-                                    },
-                                    {"term": {"author_id": user.id}},
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": ["user_list"]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
+                        }
                     ]
                 }
             },

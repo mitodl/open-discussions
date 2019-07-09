@@ -147,6 +147,7 @@ def _apply_general_query_filters(search, user):
     Returns:
         elasticsearch_dsl.Search: Search object with filters applied
     """
+    # Get the list of channels a logged in user is a contributor/moderator of
     channel_names = (
         sorted(
             list(
@@ -161,39 +162,48 @@ def _apply_general_query_filters(search, user):
         else []
     )
 
+    # Search for comments and posts from channels
     channels_filter = Q(
         "terms", channel_type=[CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED]
     ) | ~Q("terms", object_type=[COMMENT_TYPE, POST_TYPE])
 
+    # Exclude deleted comments and posts
     content_filter = (Q("term", deleted=False) & Q("term", removed=False)) | ~Q(
         "terms", object_type=[COMMENT_TYPE, POST_TYPE]
     )
 
+    # Search only published courses
     course_filter = Q("term", published=True) | ~Q("terms", object_type=[COURSE_TYPE])
 
+    # Search only published bootcamps
     bootcamp_filter = Q("term", published=True) | ~Q(
         "terms", object_type=[BOOTCAMP_TYPE]
     )
 
+    # Search programs
     program_filter = ~Q("terms", object_type=[PROGRAM_TYPE])
 
-    user_list_filter = (
-        Q("term", privacy_level=PrivacyLevel.public.value)
-        | Q("term", author_id=user.id)
-        | ~Q("terms", object_type=[USER_LIST_TYPE])
-    )
-
+    # Search public channels and channels user is a contributor/moderator of
     if channel_names:
         channels_filter = channels_filter | Q("terms", channel_name=channel_names)
 
-    return (
+    filters = (
         search.filter(channels_filter)
         .filter(content_filter)
         .filter(course_filter)
         .filter(bootcamp_filter)
         .filter(program_filter)
-        .filter(user_list_filter)
     )
+
+    if not user.is_anonymous:
+        # Search the user's lists
+        user_list_filter = (
+            Q("term", privacy_level=PrivacyLevel.public.value)
+            | Q("term", author_id=user.id)
+            | ~Q("terms", object_type=[USER_LIST_TYPE])
+        )
+        filters = filters.filter(user_list_filter)
+    return filters
 
 
 def execute_search(*, user, query):
