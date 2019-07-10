@@ -27,7 +27,9 @@ $drawer-trans: width 500ms;
 .persistent-drawer-closed {
   z-index: 1;
   position: relative;
+}
 
+.persistent-drawer-hover {
   .mdc-drawer.mdc-drawer--persistent {
     transition: $drawer-trans 300ms;
   }
@@ -87,6 +89,7 @@ $drawer-trans: width 500ms;
     margin-left: $text-padding-left;
     font-size: 18px;
     word-break: break-word;
+    display: block;
   }
 
   .new-post-link-container {
@@ -147,6 +150,10 @@ $drawer-trans: width 500ms;
       font-size: 18px;
       padding: $link-padding;
       flex-grow: 1;
+
+      .title {
+        margin-left: 7px;
+      }
     }
 
     .avatar-image {
