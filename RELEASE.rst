@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.82.2
+--------------
+
+- few small dependency upgrades
+- Upgrade version of psycopg2 to work with heroku-18 stack
+
 Version 0.82.1 (Released July 09, 2019)
 --------------
 
