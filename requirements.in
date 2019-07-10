@@ -35,7 +35,7 @@ markdown2
 newrelic
 ocw-data-parser==0.2.7
 Pillow==3.4.2
-psycopg2==2.7
+psycopg2==2.8.3
 praw==4.5.1
 python-dateutil
 python3-saml==1.4.1
