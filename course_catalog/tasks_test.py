@@ -347,26 +347,18 @@ def test_process_bootcamps(mock_get_bootcamps):
     """
     get_bootcamp_data()
     assert Bootcamp.objects.count() == 3
-    assert Course.objects.count() == 3
+    assert Course.objects.count() == 0
 
-    bootcamp = Course.objects.get(course_id="Bootcamp1")
+    bootcamp = Bootcamp.objects.get(course_id="Bootcamp1")
     assert bootcamp.title == "MIT HMS Healthcare Innovation Bootcamp"
 
-    bootcamp = Course.objects.get(course_id="Bootcamp2")
+    bootcamp = Bootcamp.objects.get(course_id="Bootcamp2")
     assert bootcamp.title == "MIT Deep Technology Bootcamp"
 
-    bootcamp = Course.objects.get(course_id="Bootcamp3")
+    bootcamp = Bootcamp.objects.get(course_id="Bootcamp3")
     assert bootcamp.title == "MIT Sports Entrepreneurship Bootcamp"
 
-    bootcamp = Course.objects.get(course_id="Bootcamp1")
-    assert bootcamp.title == "MIT HMS Healthcare Innovation Bootcamp"
-
-    bootcamp = Course.objects.get(course_id="Bootcamp2")
-    assert bootcamp.title == "MIT Deep Technology Bootcamp"
-
-    bootcamp = Course.objects.get(course_id="Bootcamp3")
-    assert bootcamp.title == "MIT Sports Entrepreneurship Bootcamp"
     get_bootcamp_data()
 
     assert Bootcamp.objects.count() == 3
-    assert Course.objects.count() == 3
+    assert Course.objects.count() == 0

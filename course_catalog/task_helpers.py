@@ -17,12 +17,7 @@ from course_catalog.constants import (
     OfferedBy,
 )
 from course_catalog.models import Course, Bootcamp
-from course_catalog.serializers import (
-    BootcampSerializer,
-    EDXSerializer,
-    OCWSerializer,
-    BootcampAsCourseSerializer,
-)
+from course_catalog.serializers import BootcampSerializer, EDXSerializer, OCWSerializer
 from search.task_helpers import update_course, index_new_course
 
 log = logging.getLogger(__name__)
@@ -360,53 +355,6 @@ def get_micromasters_data():
     Get json course data from micromasters
     """
     return requests.get(settings.MICROMASTERS_COURSE_URL).json()
-
-
-def parse_bootcamp_json_data_course(course_data, force_overwrite=False):
-    """
-    Main function to parse bootcamp json data for one course
-
-    Args:
-        course_data (dict): The JSON object representing the course with all its course runs
-        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
-    """
-    # Get the last modified date from the course run
-    course_run_modified = course_data.get("last_modified")
-
-    # Try and get the course instance. If it exists check to see if it needs updating
-    try:
-        course_instance = Course.objects.get(course_id=course_data.get("course_id"))
-        compare_datetime = datetime.strptime(
-            course_run_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
-        ).astimezone(pytz.utc)
-        if compare_datetime <= course_instance.last_modified and not force_overwrite:
-            log.debug(
-                "(%s, %s) skipped", course_data.get("key"), course_data.get("course_id")
-            )
-            return
-        index_func = update_course
-    except Course.DoesNotExist:
-        course_instance = None
-        index_func = index_new_course
-
-    # Overwrite platform with our own enum value
-    course_data["platform"] = PlatformType.bootcamps.value
-
-    course_serializer = BootcampAsCourseSerializer(
-        data=course_data, instance=course_instance
-    )
-    if not course_serializer.is_valid():
-        log.error(
-            "Course %s is not valid: %s",
-            course_data.get("course_id"),
-            course_serializer.errors,
-        )
-        return
-
-    # Make changes atomically so we don't end up with partially saved/deleted data
-    with transaction.atomic():
-        course = course_serializer.save()
-        index_func(course)
 
 
 def parse_bootcamp_json_data_bootcamp(bootcamp_data, force_overwrite=False):

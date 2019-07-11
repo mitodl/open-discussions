@@ -307,17 +307,6 @@ class BootcampSerializer(BaseCourseSerializer):
         fields = "__all__"
 
 
-class BootcampAsCourseSerializer(BootcampSerializer):
-    """
-    Serializer for Course model. Exists to properly serialize bootcamps as courses.
-    """
-
-    class Meta:
-        model = Course
-        fields = "__all__"
-        extra_kwargs = {"raw_json": {"write_only": True}}
-
-
 class UserListItemSerializer(serializers.ModelSerializer):
     """
     Serializer for UserListItem model
