@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.82.3
+--------------
+
+- remove USE_NEW_BRANDING feature flag
+
 Version 0.82.2 (Released July 11, 2019)
 --------------
 
