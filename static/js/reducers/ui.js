@@ -14,7 +14,7 @@ import {
   HIDE_DROPDOWN,
   SET_DIALOG_DATA,
   SET_AUTH_USER_DETAIL,
-  SET_SHOW_COURSE_DRAWER,
+  SET_SHOW_LEARNING_RESOURCE_DRAWER,
   SHOW_SEARCH_FACETS,
   HIDE_SEARCH_FACETS
 } from "../actions/ui"
@@ -34,7 +34,8 @@ export type BannerState = {
 }
 
 export type CourseDetailState = {
-  courseId: ?number
+  objectId: ?number,
+  objectType: ?string
 }
 
 export type UIState = {
@@ -56,7 +57,8 @@ const INITIAL_BANNER_STATE = {
 }
 
 const INITIAL_COURSE_STATE = {
-  courseId: null
+  objectId:   null,
+  objectType: null
 }
 
 export const INITIAL_UI_STATE: UIState = {
@@ -128,11 +130,12 @@ export const ui = (
     return { ...state, showDrawerMobile: action.payload }
   case SET_SHOW_DRAWER_HOVER:
     return { ...state, showDrawerHover: action.payload }
-  case SET_SHOW_COURSE_DRAWER:
+  case SET_SHOW_LEARNING_RESOURCE_DRAWER:
     return {
       ...state,
       courseDetail: {
-        courseId: action.payload.courseId
+        objectId:   action.payload.objectId,
+        objectType: action.payload.objectType
       }
     }
   case SET_SNACKBAR_MESSAGE:

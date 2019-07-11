@@ -24,7 +24,7 @@ describe("CourseCarousel", () => {
       <CourseCarousel
         title="Greatest Courses Ever"
         courses={courses}
-        setShowCourseDrawer={setShowCourseDrawerStub}
+        setShowLearningDrawer={setShowLearningDrawerStub}
         {...props}
       />
     )

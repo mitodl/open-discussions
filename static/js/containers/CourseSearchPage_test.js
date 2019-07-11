@@ -16,6 +16,7 @@ import {
   makeSearchResponse
 } from "../factories/search"
 import { makeChannel } from "../factories/channels"
+import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
 
 describe("CourseSearchPage", () => {
   let helper,
@@ -141,12 +142,13 @@ describe("CourseSearchPage", () => {
       from:        SETTINGS.search_page_size,
       size:        SETTINGS.search_page_size,
       text:        "text",
-      type:        "course",
+      type:        SEARCH_FILTER_ALL_RESOURCES,
       facets:      new Map(
         Object.entries({
           platform:     undefined,
           topics:       undefined,
-          availability: undefined
+          availability: undefined,
+          type:         SEARCH_FILTER_ALL_RESOURCES
         })
       )
     })
@@ -159,7 +161,8 @@ describe("CourseSearchPage", () => {
         Object.entries({
           platform:     [],
           topics:       [],
-          availability: []
+          availability: [],
+          type:         SEARCH_FILTER_ALL_RESOURCES
         })
       ),
       from:              5,
@@ -189,9 +192,10 @@ describe("CourseSearchPage", () => {
       from:        0,
       size:        SETTINGS.search_page_size,
       text:        "text",
-      type:        "course",
+      type:        SEARCH_FILTER_ALL_RESOURCES,
       facets:      new Map(
         Object.entries({
+          type:           SEARCH_FILTER_ALL_RESOURCES,
           platforms:      ["ocw"],
           topics:         ["Science", "Engineering"],
           availabilities: ["prior"]
@@ -291,17 +295,23 @@ describe("CourseSearchPage", () => {
     const activeFacets = new Map([
       ["platform", ["ocw"]],
       ["topics", ["Science", "Law"]],
-      ["availability", ["Current"]]
+      ["availability", ["Current"]],
+      ["type", SEARCH_FILTER_ALL_RESOURCES]
     ])
     inner.setState({ text, activeFacets })
     assert.equal(inner.state().text, text)
     assert.deepEqual(inner.state().activeFacets, activeFacets)
-    assert.equal(inner.find("SearchFilter").length, 4)
+    assert.equal(inner.find("SearchFilter").length, 6)
     inner.find(".search-filters-clear").simulate("click")
     assert.equal(inner.state().text, null)
     assert.deepEqual(
       inner.state().activeFacets,
-      new Map([["platform", []], ["topics", []], ["availability", []]])
+      new Map([
+        ["platform", []],
+        ["topics", []],
+        ["availability", []],
+        ["type", SEARCH_FILTER_ALL_RESOURCES]
+      ])
     )
   })
 
@@ -329,7 +339,8 @@ describe("CourseSearchPage", () => {
         Object.entries({
           topics:       [],
           platform:     [],
-          availability: []
+          availability: [],
+          type:         ["course"]
         })
       ),
       currentFacetGroup: null,
@@ -356,17 +367,18 @@ describe("CourseSearchPage", () => {
       from:        0,
       size:        SETTINGS.search_page_size,
       text,
-      type:        "course",
+      type:        SEARCH_FILTER_ALL_RESOURCES,
       facets:      new Map(
         Object.entries({
           platform:     ["ocw"],
           topics:       ["Physics"],
-          availability: ["prior"]
+          availability: ["prior"],
+          type:         SEARCH_FILTER_ALL_RESOURCES
         })
       )
     })
     assert.deepEqual(qs.parse(helper.currentLocation.search), {
-      type: "course",
+      type: SEARCH_FILTER_ALL_RESOURCES,
       q:    text,
       t:    "Physics"
     })
@@ -377,7 +389,8 @@ describe("CourseSearchPage", () => {
         Object.entries({
           topics:       ["Physics"],
           platform:     [],
-          availability: []
+          availability: [],
+          type:         SEARCH_FILTER_ALL_RESOURCES
         })
       ),
       from:              0,
@@ -436,7 +449,7 @@ describe("CourseSearchPage", () => {
         from:        0,
         size:        SETTINGS.search_page_size,
         text:        "some text",
-        type:        "course",
+        type:        SEARCH_FILTER_ALL_RESOURCES,
         facets:      new Map(
           Object.entries({
             platform:     [],

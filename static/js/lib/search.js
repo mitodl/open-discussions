@@ -4,6 +4,7 @@ import bodybuilder from "bodybuilder"
 import R from "ramda"
 
 import type {
+  Bootcamp,
   CommentInTree,
   Course,
   Post,
@@ -15,7 +16,8 @@ import type {
   ProfileResult,
   SearchParams,
   CourseResult,
-  FacetResult
+  FacetResult,
+  BootcampResult
 } from "../flow/searchTypes"
 
 export const searchResultToComment = (
@@ -108,6 +110,28 @@ export const searchResultToCourse = (result: CourseResult): Course => ({
   prices:            result.prices
 })
 
+export const searchResultToBootcamp = (result: BootcampResult): Bootcamp => ({
+  id:                result.id,
+  course_id:         result.course_id,
+  url:               result.url,
+  title:             result.title,
+  image_src:         result.image_src,
+  short_description: result.short_description,
+  full_description:  result.full_description,
+  language:          result.language,
+  semester:          result.semester,
+  year:              result.year,
+  level:             result.level,
+  start_date:        result.start_date,
+  end_date:          result.end_date,
+  enrollment_start:  result.enrollment_start,
+  enrollment_end:    result.enrollment_end,
+  availability:      result.availability,
+  instructors:       [],
+  topics:            result.topics.map(topic => ({ name: topic })),
+  prices:            result.prices
+})
+
 const POST_QUERY_FIELDS = [
   "text.english",
   "post_title.english",
@@ -131,6 +155,8 @@ const COURSE_QUERY_FIELDS = [
   "topics",
   "platform"
 ]
+
+const OBJECT_TYPE = "type"
 
 const _searchFields = (type: ?string) => {
   if (type === "post") {
@@ -192,7 +218,11 @@ export const buildSearchQuery = ({
     builder.sort(field, option)
   }
 
-  const types = type ? [type] : ["comment", "post", "profile"]
+  const types = type
+    ? Array.isArray(type)
+      ? type
+      : [type]
+    : ["comment", "post", "profile"]
   for (const type of types) {
     // One of the text fields must match
     const matchQuery = text
@@ -222,7 +252,7 @@ export const buildSearchQuery = ({
     const facetClauses = []
     if (facets) {
       facets.forEach((values, key) => {
-        if (values && values.length > 0) {
+        if (key !== OBJECT_TYPE && values && values.length > 0) {
           facetClauses.push({
             bool: {
               should: values.map(value => ({
@@ -233,7 +263,12 @@ export const buildSearchQuery = ({
             }
           })
         }
-        builder.agg("terms", key, { size: 10000 }, key)
+        builder.agg(
+          "terms",
+          key === OBJECT_TYPE ? "object_type.keyword" : key,
+          { size: 10000 },
+          key
+        )
       })
     }
 

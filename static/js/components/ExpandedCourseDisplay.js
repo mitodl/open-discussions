@@ -12,14 +12,14 @@ import { minPrice } from "../lib/courses"
 import { embedlyThumbnail } from "../lib/url"
 import { languageName } from "../lib/util"
 
-import type { Course } from "../flow/discussionTypes"
+import type { Course, Bootcamp } from "../flow/discussionTypes"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
 const entities = new AllHtmlEntities()
 
 type Props = {
-  course: Course
+  course: Course | Bootcamp
 }
 
 export default class ExpandedCourseDisplay extends React.Component<Props> {
@@ -50,7 +50,8 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Take Course on {course.platform.toUpperCase()}
+                  Take Course{" "}
+                  {course.platform ? `on ${course.platform.toUpperCase()}` : ""}
                 </a>
               </div>
             </div>

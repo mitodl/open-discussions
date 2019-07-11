@@ -8,30 +8,31 @@ import { Drawer, DrawerContent } from "rmwc/Drawer"
 import { Theme } from "rmwc/Theme"
 
 import type { Dispatch } from "redux"
-import type { Course } from "../flow/discussionTypes"
+import type { Bootcamp, Course } from "../flow/discussionTypes"
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
 
 import { actions } from "../actions"
-import { setShowCourseDrawer } from "../actions/ui"
+import { setShowLearningResourceDrawer } from "../actions/ui"
 import { getViewportWidth } from "../lib/util"
 
 type Props = {
-  showCourseDrawer: boolean,
+  showLearningDrawer: boolean,
   dispatch: Dispatch<*>,
-  course: ?Course,
-  courseId: number
+  object: Course | Bootcamp | null,
+  objectId: number,
+  objectType: string
 }
 
 const shouldLoadData = R.complement(
   R.allPass([
     // if course id's don't match
-    R.eqProps("courseId"),
+    R.eqProps("objectId"),
     // courses don't match
-    R.eqProps("course")
+    R.eqProps("object")
   ])
 )
 
-export class CourseDrawer extends React.Component<Props> {
+export class LearningResourceDrawer extends React.Component<Props> {
   width: number
 
   constructor(props: Props) {
@@ -40,24 +41,30 @@ export class CourseDrawer extends React.Component<Props> {
   }
 
   componentDidMount() {
-    const { courseId } = this.props
+    const { objectId } = this.props
     window.addEventListener("resize", () => this.onResize())
-    if (courseId) {
+    if (objectId) {
       this.loadData()
     }
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { courseId } = this.props
-    if (courseId && shouldLoadData(prevProps, this.props)) {
+    const { objectId } = this.props
+    if (objectId && shouldLoadData(prevProps, this.props)) {
       this.loadData()
     }
   }
 
   loadData = async () => {
-    const { dispatch, courseId } = this.props
-
-    dispatch(actions.courses.get(courseId))
+    const { dispatch, objectId, objectType } = this.props
+    switch (objectType) {
+    case "course":
+      dispatch(actions.courses.get(objectId))
+      break
+    case "bootcamp":
+      dispatch(actions.bootcamps.get(objectId))
+      break
+    }
   }
 
   onResize() {
@@ -68,17 +75,17 @@ export class CourseDrawer extends React.Component<Props> {
 
   onDrawerClose = () => {
     const { dispatch } = this.props
-    dispatch(setShowCourseDrawer({ courseId: null }))
+    dispatch(setShowLearningResourceDrawer({ objectId: null }))
   }
 
   render() {
-    const { course, showCourseDrawer } = this.props
-    return course ? (
+    const { object, showLearningDrawer } = this.props
+    return object ? (
       <Theme>
         <Drawer
           persistent={false}
           temporary={true}
-          open={showCourseDrawer}
+          open={showLearningDrawer}
           onClose={this.onDrawerClose}
           dir="rtl"
           className="align-right"
@@ -87,7 +94,7 @@ export class CourseDrawer extends React.Component<Props> {
             <div className="drawer-close" onClick={this.onDrawerClose}>
               <i className="material-icons clear">clear</i>
             </div>
-            <ExpandedCourseDisplay course={course} />
+            <ExpandedCourseDisplay course={object} />
             <div className="footer" />
           </DrawerContent>
         </Drawer>
@@ -96,20 +103,36 @@ export class CourseDrawer extends React.Component<Props> {
   }
 }
 
-export const mapStateToProps = (state: Object) => {
-  const { courses, ui } = state
+export const getObject = (
+  objectId: number,
+  objectType: string,
+  state: Object
+) => {
+  const { courses, bootcamps } = state
+  switch (objectType) {
+  case "course":
+    return courses.data.get(objectId)
+  case "bootcamp":
+    return bootcamps.data.get(objectId)
+  }
+}
 
-  const courseId = ui.courseDetail.courseId
-  const course = courses.data.get(courseId)
+export const mapStateToProps = (state: Object) => {
+  const { ui } = state
+
+  const objectId = ui.courseDetail.objectId
+  const objectType = ui.courseDetail.objectType
+  const object = getObject(objectId, objectType, state)
 
   return {
-    showCourseDrawer: _.isFinite(ui.courseDetail.courseId),
-    courseId,
-    course
+    showLearningDrawer: _.isFinite(ui.courseDetail.objectId),
+    objectId,
+    objectType,
+    object
   }
 }
 
 export default R.compose(
   connect(mapStateToProps),
   withRouter
-)(CourseDrawer)
+)(LearningResourceDrawer)

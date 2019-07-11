@@ -17,7 +17,7 @@ import {
 } from "./courses"
 import { makeCourse } from "../../factories/courses"
 
-describe("Channels API", () => {
+describe("Courses API", () => {
   let fetchJSONStub, sandbox, transformTestObject
 
   beforeEach(() => {

@@ -343,6 +343,28 @@ export type Course = {
   availability:       ?string
 }
 
+export type Bootcamp = {
+  id:                 number,
+  course_id:          string,
+  url:                ?string,
+  title:              string,
+  image_src:          ?string,
+  short_description:  ?string,
+  full_description:   ?string,
+  language:           ?string,
+  semester:           ?string,
+  year:               ?string,
+  level:              ?string,
+  start_date:         ?string,
+  end_date:           ?string,
+  enrollment_start:   ?string,
+  enrollment_end:     ?string,
+  instructors:        Array<CourseInstructor>,
+  topics:             Array<CourseTopic>,
+  prices:             Array<CoursePrice>,
+  availability:       ?string
+}
+
 export type CoursePrice = {
   price: number,
   mode: string

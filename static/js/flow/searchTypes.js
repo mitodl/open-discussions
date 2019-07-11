@@ -83,6 +83,31 @@ export type CourseResult = {
   prices:             Array<CoursePrice>
 }
 
+type RESULT_TYPE_BOOTCAMP = "bootcamp"
+
+export type BootcampResult = {
+  id:                 number,
+  course_id:          string,
+  url:                string,
+  title:              string,
+  image_src:          ?string,
+  object_type:        RESULT_TYPE_BOOTCAMP,
+  short_description:  ?string,
+  full_description:   ?string,
+  language:           ?string,
+  semester:           ?string,
+  year:               ?string,
+  level:              ?string,
+  start_date:         ?string,
+  end_date:           ?string,
+  enrollment_start:   ?string,
+  enrollment_end:     ?string,
+  availability:       ?string,
+  instructors:        Array<string>,
+  topics:             Array<string>,
+  prices:             Array<CoursePrice>
+}
+
 export type FacetBucket = {
   key:       string,
   doc_count: number
@@ -111,7 +136,7 @@ export type SortParam = {
 }
 
 export type SearchParams = {
-  type:              ?string,
+  type:              ?string|?Array<string>,
   text:              ?string,
   from:              number,
   size:              number,

@@ -8,7 +8,7 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
 
-import CourseDrawer from "./CourseDrawer"
+import CourseDrawer from "./LearningResourceDrawer"
 
 import CanonicalLink from "../components/CanonicalLink"
 import Card from "../components/Card"
@@ -22,9 +22,9 @@ import SearchResult from "../components/SearchResult"
 import { actions } from "../actions"
 import { setShowCourseDrawer } from "../actions/ui"
 import { clearSearch } from "../actions/search"
-import { availabilityLabel } from "../lib/courses"
-import { SEARCH_FILTER_COURSE } from "../lib/picker"
-import { preventDefaultAndInvoke, toArray } from "../lib/util"
+import { availabilityLabel, resourceLabel } from "../lib/courses"
+import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
+import { emptyOrNil, preventDefaultAndInvoke, toArray } from "../lib/util"
 import { mergeFacetResults } from "../lib/search"
 
 import type { Location, Match } from "react-router"
@@ -79,6 +79,7 @@ type State = {
 }
 
 const facetDisplayMap = [
+  ["type", "Learning Resource", resourceLabel],
   ["topics", "Subject Area", null],
   ["availability", "Availability", availabilityLabel],
   ["platform", "Platform", _.upperCase]
@@ -92,6 +93,13 @@ export class CourseSearchPage extends React.Component<Props, State> {
     this.state = {
       text:         qs.parse(props.location.search).q,
       activeFacets: new Map([
+        [
+          "type",
+          _.union(
+            toArray(qs.parse(props.location.search).type) ||
+              SEARCH_FILTER_ALL_RESOURCES
+          )
+        ],
         ["platform", _.union(toArray(qs.parse(props.location.search).p) || [])],
         ["topics", _.union(toArray(qs.parse(props.location.search).t) || [])],
         [
@@ -124,7 +132,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
       activeFacets: new Map([
         ["platform", []],
         ["availability", []],
-        ["topics", []]
+        ["topics", []],
+        ["type", SEARCH_FILTER_ALL_RESOURCES]
       ]),
       currentFacetGroup: null
     })
@@ -182,16 +191,19 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
     const { activeFacets, text } = this.state
 
-    const type = SEARCH_FILTER_COURSE
+    if (emptyOrNil(activeFacets.get("type"))) {
+      activeFacets.set("type", SEARCH_FILTER_ALL_RESOURCES)
+    }
+
     history.replace({
       pathname: pathname,
       search:   qs.stringify({
         ...qs.parse(search),
-        q: text,
-        type,
-        p: activeFacets.get("platform"),
-        t: activeFacets.get("topics"),
-        a: activeFacets.get("availability")
+        q:    text,
+        type: activeFacets.get("type"),
+        p:    activeFacets.get("platform"),
+        t:    activeFacets.get("topics"),
+        a:    activeFacets.get("availability")
       })
     })
     let from = this.state.from + SETTINGS.search_page_size
@@ -205,8 +217,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
     await runSearch({
       channelName: null,
       text,
+      type:        activeFacets.get("type"),
       facets:      activeFacets,
-      type,
       from,
       size:        SETTINGS.search_page_size
     })

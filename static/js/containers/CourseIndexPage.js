@@ -4,7 +4,7 @@ import { connectRequest, querySelectors } from "redux-query"
 import { connect } from "react-redux"
 import { compose } from "redux"
 
-import CourseDrawer from "./CourseDrawer"
+import CourseDrawer from "./LearningResourceDrawer"
 
 import CourseCarousel from "../components/CourseCarousel"
 import {
@@ -16,7 +16,7 @@ import {
 import { Cell, Grid } from "../components/Grid"
 import SearchTextbox from "../components/SearchTextbox"
 
-import { setShowCourseDrawer } from "../actions/ui"
+import { setShowLearningResourceDrawer } from "../actions/ui"
 import {
   featuredCoursesRequest,
   featuredCoursesSelector,
@@ -41,7 +41,7 @@ type StateProps = {|
 |}
 
 type DispatchProps = {|
-  setShowCourseDrawer: Function
+  setShowLearningDrawer: Function
 |}
 
 type Props = {|
@@ -55,7 +55,7 @@ export const CourseIndexPage = ({
   featuredCourses,
   newCourses,
   loaded,
-  setShowCourseDrawer,
+  setShowLearningDrawer,
   history
 }: Props) => (
   <BannerPageWrapper>
@@ -90,18 +90,18 @@ export const CourseIndexPage = ({
             <CourseCarousel
               title="Featured Courses"
               courses={featuredCourses}
-              setShowCourseDrawer={setShowCourseDrawer}
+              setShowLearningDrawer={setShowLearningDrawer}
             />
           ) : null}
           <CourseCarousel
             title="Upcoming Courses"
             courses={upcomingCourses}
-            setShowCourseDrawer={setShowCourseDrawer}
+            setShowLearningDrawer={setShowLearningDrawer}
           />
           <CourseCarousel
             title="New Courses"
             courses={newCourses}
-            setShowCourseDrawer={setShowCourseDrawer}
+            setShowLearningDrawer={setShowLearningDrawer}
           />
         </Cell>
       ) : (
@@ -123,7 +123,7 @@ const mapStateToProps = (state: Object): StateProps => ({
 })
 
 const mapDispatchToProps = {
-  setShowCourseDrawer
+  setShowLearningDrawer: setShowLearningResourceDrawer
 }
 
 const mapPropsToConfig = () => [

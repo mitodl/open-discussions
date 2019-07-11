@@ -12,6 +12,7 @@ import type {
   PostResult,
   ProfileResult
 } from "../flow/searchTypes"
+import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
 
 export const makeProfileResult = (): ProfileResult => ({
   author_avatar_medium: casual.url,
@@ -138,7 +139,8 @@ export const makeSearchFacetResult = () => {
         { key: "Archived", doc_count: 33 },
         { key: "Upcoming", doc_count: 67 }
       ]
-    }
+    },
+    type: SEARCH_FILTER_ALL_RESOURCES
   }
 }
 

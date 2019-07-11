@@ -283,7 +283,7 @@ describe("search functions", () => {
       sinon.assert.calledWith(stub, type)
     })
 
-    it(`filters courses by platform, availability, and topics`, () => {
+    it(`filters courses by platform, availability, type, and topics`, () => {
       const fieldNames = ["field1", "field2", "field3"]
       const stub = sandbox.stub(searchFuncs, "searchFields").returns(fieldNames)
       const type = "course"
@@ -292,7 +292,8 @@ describe("search functions", () => {
         Object.entries({
           platform:     ["mitx"],
           topics:       ["Engineering", "Science"],
-          availability: ["Upcoming"]
+          availability: ["Upcoming"],
+          type:         [type]
         })
       )
 
@@ -359,6 +360,12 @@ describe("search functions", () => {
           topics: {
             terms: {
               field: "topics",
+              size:  10000
+            }
+          },
+          type: {
+            terms: {
+              field: "object_type.keyword",
               size:  10000
             }
           }
