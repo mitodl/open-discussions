@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.82.2
+Version 0.82.2 (Released July 11, 2019)
 --------------
 
 - few small dependency upgrades
