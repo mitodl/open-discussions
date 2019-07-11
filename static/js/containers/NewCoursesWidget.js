@@ -3,7 +3,8 @@
 import React from "react"
 import Dotdotdot from "react-dotdotdot"
 import { Link } from "react-router-dom"
-import { connectRequest, querySelectors } from "redux-query"
+import { querySelectors } from "redux-query"
+import { connectRequest } from "redux-query-react"
 import { connect } from "react-redux"
 import { compose } from "redux"
 

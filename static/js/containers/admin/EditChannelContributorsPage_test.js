@@ -97,7 +97,10 @@ describe("EditChannelContributorsPage", () => {
 
   it("should set the document title", async () => {
     const { inner } = await render()
-    assert.equal(inner.find("title").text(), formatTitle("Edit Channel"))
+    assert.equal(
+      inner.find("MetaTags").props().children.props.children,
+      formatTitle("Edit Channel")
+    )
   })
 
   it("displays a notice that membership is managed by micromasters", async () => {

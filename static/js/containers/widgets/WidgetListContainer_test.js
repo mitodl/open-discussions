@@ -7,11 +7,13 @@ import casual from "casual-browserify"
 import WidgetListContainer, {
   WidgetListContainer as InnerWidgetListContainer
 } from "./WidgetListContainer"
+
 import {
   WIDGET_CREATE,
   WIDGET_EDIT,
   WIDGET_TYPE_SELECT
 } from "../../components/widgets/WidgetEditDialog"
+import * as WidgetEditDialogModule from "../../components/widgets/WidgetEditDialog"
 
 import {
   makeWidgetInstance,
@@ -27,8 +29,9 @@ import {
   SET_DIALOG_DATA,
   SHOW_DIALOG
 } from "../../actions/ui"
-import type { WidgetDialogData } from "../../flow/widgetTypes"
 import { shouldIf } from "../../lib/test_utils"
+
+import type { WidgetDialogData } from "../../flow/widgetTypes"
 
 describe("WidgetListContainer", () => {
   let helper,
@@ -83,8 +86,9 @@ describe("WidgetListContainer", () => {
   })
 
   it("clears the form on unmount", async () => {
-    const { inner, store } = await render()
-    inner.unmount()
+    const { wrapper, store } = await render()
+    wrapper.unmount()
+    delete helper.wrapper
     assert.isTrue(
       store.getActions().filter(action => action.type === FORM_END_EDIT)
         .length >= 1
@@ -97,6 +101,8 @@ describe("WidgetListContainer", () => {
       assert.isTrue(inner.find("Loading").exists())
       sinon.assert.calledWith(helper.getWidgetListStub, listResponse.id)
     })
+
+    //
     ;[
       ["is present", { value: { instances: true } }, true],
       ["is missing the instances", { value: { instances: null } }, false],
@@ -116,8 +122,8 @@ describe("WidgetListContainer", () => {
           }
         })
         const props = wrapper
-          .dive()
           .find("sortableList")
+          .at(0)
           .props()
         assert.deepEqual(
           props.widgetInstances,
@@ -125,7 +131,6 @@ describe("WidgetListContainer", () => {
         )
         assert.deepEqual(props.editing, !!form)
         assert.isTrue(props.useDragHandle)
-        wrapper.find("WidgetListContainer").unmount()
       })
     })
 
@@ -134,8 +139,8 @@ describe("WidgetListContainer", () => {
       const oldIndex = 1
       const newIndex = 0
       wrapper
-        .dive()
         .find("sortableList")
+        .at(0)
         .prop("onSortEnd")({ oldIndex, newIndex })
       const updated = arrayMove(updatedWidgetList, oldIndex, newIndex)
       const lastAction = store.getActions()[store.getActions().length - 1]
@@ -153,8 +158,8 @@ describe("WidgetListContainer", () => {
     it("clears the form", async () => {
       const { wrapper, store } = await render()
       wrapper
-        .dive()
         .find("sortableList")
+        .at(0)
         .prop("clearForm")()
       const lastAction = store.getActions()[store.getActions().length - 1]
       assert.deepEqual(lastAction, {
@@ -167,8 +172,8 @@ describe("WidgetListContainer", () => {
       const { wrapper, store } = await render()
       const deletedInstance = updatedWidgetList[0]
       wrapper
-        .dive()
         .find("sortableList")
+        .at(0)
         .prop("deleteInstance")(deletedInstance)
       const lastAction = store.getActions()[store.getActions().length - 1]
       assert.deepEqual(lastAction, {
@@ -189,8 +194,8 @@ describe("WidgetListContainer", () => {
         .returns(aNewWidgetInstance)
       const { wrapper, store } = await render()
       wrapper
-        .dive()
         .find("sortableList")
+        .at(0)
         .prop("startAddInstance")()
       const actions = store.getActions()
       assert.deepEqual(actions[actions.length - 2], {
@@ -215,8 +220,8 @@ describe("WidgetListContainer", () => {
       const { wrapper, store } = await render()
       const instance = updatedWidgetList[0]
       wrapper
-        .dive()
         .find("sortableList")
+        .at(0)
         .prop("startEditInstance")(instance)
       const actions = store.getActions()
       assert.deepEqual(actions[actions.length - 2], {
@@ -256,13 +261,12 @@ describe("WidgetListContainer", () => {
             }
           })
           const props = wrapper
-            .dive()
             .find("sortableList")
+            .at(0)
             .props()
           assert.deepEqual(props.expanded, expected ? updatedExpanded : {})
           assert.deepEqual(props.editing, !!form)
           assert.isTrue(props.useDragHandle)
-          wrapper.find("WidgetListContainer").unmount()
         })
       })
 
@@ -271,8 +275,8 @@ describe("WidgetListContainer", () => {
         const keys = ["key1", "key2", "key3"]
         const value = "value"
         wrapper
-          .dive()
           .find("sortableList")
+          .at(0)
           .prop("setExpanded")(keys, value)
         const actions = store.getActions()
         assert.deepEqual(actions[actions.length - 1], {
@@ -309,10 +313,7 @@ describe("WidgetListContainer", () => {
           state:      WIDGET_EDIT,
           validation: {}
         }
-        wrapper
-          .dive()
-          .find("WidgetEditDialog")
-          .prop("updateForm")(data)
+        wrapper.find("WidgetEditDialog").prop("updateForm")(data)
         const actions = store.getActions()
         assert.deepEqual(actions[actions.length - 1], {
           type:    FORM_UPDATE,
@@ -332,10 +333,7 @@ describe("WidgetListContainer", () => {
           state:      WIDGET_CREATE,
           validation: {}
         }
-        wrapper
-          .dive()
-          .find("WidgetEditDialog")
-          .prop("updateForm")(data)
+        wrapper.find("WidgetEditDialog").prop("updateForm")(data)
         const actions = store.getActions()
         assert.deepEqual(actions[actions.length - 1], {
           type:    FORM_UPDATE,
@@ -348,13 +346,14 @@ describe("WidgetListContainer", () => {
         })
       })
     })
+
+    //
     ;[true, false].forEach(newVisibility => {
       it(`sets dialog visibility=${String(newVisibility)}`, async () => {
         const { wrapper, store } = await render()
-        wrapper
-          .dive()
-          .find("WidgetEditDialog")
-          .prop("setDialogVisibility")(newVisibility)
+        wrapper.find("WidgetEditDialog").prop("setDialogVisibility")(
+          newVisibility
+        )
         const actions = store.getActions()
         assert.deepEqual(actions[actions.length - 1], {
           type:    newVisibility ? SHOW_DIALOG : HIDE_DIALOG,
@@ -370,10 +369,7 @@ describe("WidgetListContainer", () => {
         state:      WIDGET_CREATE,
         validation: { field: "missing" }
       }
-      wrapper
-        .dive()
-        .find("WidgetEditDialog")
-        .prop("setDialogData")(data)
+      wrapper.find("WidgetEditDialog").prop("setDialogData")(data)
       const actions = store.getActions()
       assert.deepEqual(actions[actions.length - 1], {
         type:    SET_DIALOG_DATA,
@@ -383,10 +379,14 @@ describe("WidgetListContainer", () => {
         }
       })
     })
+
+    //
     ;[true, false].forEach(isOpen => {
       it(`passes props when the dialog is ${
         isOpen ? "" : "not "
       }open`, async () => {
+        helper.stubComponent(WidgetEditDialogModule, "WidgetEditDialog")
+
         const data = { some: "data", validation: { field: "missing" } }
         const { wrapper } = await render({
           ui: {
@@ -394,8 +394,8 @@ describe("WidgetListContainer", () => {
           }
         })
         const props = wrapper
-          .dive()
           .find("WidgetEditDialog")
+          .at(0)
           .props()
         assert.equal(props.dialogData, isOpen ? data : undefined)
         assert.equal(props.dialogOpen, isOpen)

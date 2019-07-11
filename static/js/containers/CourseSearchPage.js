@@ -7,7 +7,7 @@ import InfiniteScroll from "react-infinite-scroller"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
-import { connectRequest } from "redux-query"
+import { connectRequest } from "redux-query-react"
 import { compose } from "redux"
 import debounce from "lodash/debounce"
 

@@ -119,7 +119,10 @@ describe("EditChannelAppearancePage", () => {
 
   it("should set the document title", async () => {
     const { inner } = await render()
-    assert.equal(inner.find("title").text(), formatTitle("Edit Channel"))
+    assert.equal(
+      inner.find("MetaTags").props().children.props.children,
+      formatTitle("Edit Channel")
+    )
   })
 
   it("should set a field value on the form when onUpdate is called", async () => {

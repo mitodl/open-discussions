@@ -2,15 +2,14 @@ import { compose, createStore, applyMiddleware } from "redux"
 import thunkMiddleware from "redux-thunk"
 import { createLogger } from "redux-logger"
 import createDebounce from "redux-debounced"
-import { queryMiddlewareAdvanced } from "redux-query"
+import { queryMiddleware } from "redux-query"
 import persistState from "redux-localstorage"
 import R from "ramda"
 
 import rootReducer from "../reducers"
 import { makeRequest } from "./network_interface"
 
-export const getQueries = state => state.queries
-export const getEntities = state => state.entities
+import { getQueries, getEntities } from "../lib/redux-query"
 
 const persistConfig = {
   slicer: () => state => {
@@ -25,7 +24,7 @@ if (process.env.NODE_ENV !== "production") {
   createStoreWithMiddleware = compose(
     persistState(null, persistConfig),
     applyMiddleware(
-      queryMiddlewareAdvanced(makeRequest)(getQueries, getEntities),
+      queryMiddleware(makeRequest, getQueries, getEntities),
       createDebounce(),
       thunkMiddleware,
       createLogger()
@@ -36,7 +35,7 @@ if (process.env.NODE_ENV !== "production") {
   createStoreWithMiddleware = compose(
     persistState(null, persistConfig),
     applyMiddleware(
-      queryMiddlewareAdvanced(makeRequest)(getQueries, getEntities),
+      queryMiddleware(makeRequest, getQueries, getEntities),
       createDebounce(),
       thunkMiddleware
     )

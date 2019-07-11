@@ -100,8 +100,8 @@ describe("PasswordResetPage", () => {
       [{}, "Error resetting password", "empty reset API response"]
     ].forEach(([submitResponse, expErrorText, responseDesc]) => {
       it(`should return correct error object when given ${responseDesc}`, async () => {
-        const { wrapper } = await renderPage()
-        const onSubmitFailure = wrapper.prop("onSubmitFailure")
+        const { inner } = await renderPage()
+        const onSubmitFailure = inner.prop("onSubmitFailure")
         const submitFailureResult = onSubmitFailure(submitResponse)
         assert.deepEqual(submitFailureResult, { email: expErrorText })
       })

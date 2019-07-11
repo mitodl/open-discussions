@@ -85,7 +85,7 @@ describe("SearchPage", () => {
       type:        undefined
     })
     assert.deepEqual(
-      wrapper.props().upvotedPosts.get(upvotedPost.id),
+      inner.props().upvotedPosts.get(upvotedPost.id),
       upvotedPost
     )
     searchResponse.hits.hits.forEach((result, i) => {
@@ -123,7 +123,7 @@ describe("SearchPage", () => {
 
   it("loads more results", async () => {
     SETTINGS.search_page_size = 5
-    const { inner } = await renderPage()
+    const { wrapper, inner } = await renderPage()
 
     helper.searchStub.reset()
     await inner.find("InfiniteScroll").prop("loadMore")()
@@ -135,7 +135,8 @@ describe("SearchPage", () => {
       type:        undefined
     })
     // from is 5, plus 5 is 10 which is == numHits so no more results
-    assert.isFalse(inner.find("InfiniteScroll").prop("hasMore"))
+    wrapper.update()
+    assert.isFalse(wrapper.find("InfiniteScroll").prop("hasMore"))
   })
 
   //
@@ -143,9 +144,9 @@ describe("SearchPage", () => {
     it(`InfiniteScroll initialLoad ${shouldIf(
       from > 0
     )} be false when from is ${from}`, async () => {
-      const { inner } = await renderPage()
+      const { wrapper, inner } = await renderPage()
       inner.setState({ from })
-      const infiniteScroll = inner.find("InfiniteScroll")
+      const infiniteScroll = wrapper.find("InfiniteScroll")
       assert.equal(infiniteScroll.prop("initialLoad"), from === 0)
     })
   })
@@ -340,8 +341,9 @@ describe("SearchPage", () => {
   })
 
   it("clears the search on dismount", async () => {
-    const { store, inner } = await renderPage()
-    inner.instance().componentWillUnmount()
+    const { store, wrapper } = await renderPage()
+    wrapper.unmount()
+    helper.wrapper = null
     assert(store.getLastAction().type === CLEAR_SEARCH)
   })
 
@@ -361,7 +363,7 @@ describe("SearchPage", () => {
     )} and searchLoaded=${String(searchLoaded)} and it ${
       hasChannel ? "has" : "doesn't have"
     } a channel`, async () => {
-      const { wrapper } = await renderPage(
+      const { inner } = await renderPage(
         {
           channels: {
             loaded:     channelLoaded,
@@ -379,15 +381,19 @@ describe("SearchPage", () => {
           channelName: hasChannel ? channel.name : null
         }
       )
-      assert.equal(wrapper.props().loaded, loaded)
+      assert.equal(inner.props().loaded, loaded)
     })
   })
 
   it("calls updateVotedComments when upvote or downvote is triggered", async () => {
-    const { inner } = await renderPage()
+    const { wrapper, inner } = await renderPage()
     const comments = [makeComment(makePost()), makeComment(makePost())]
     helper.updateCommentStub.returns(Promise.resolve(comments[0]))
-    await inner.instance().upvote(comments[0])
+    await inner
+      .find("SearchResult")
+      .at(0)
+      .props()
+      .commentUpvote(comments[0])
     assert.deepEqual(
       inner.state().votedComments.get(comments[0].id),
       comments[0]

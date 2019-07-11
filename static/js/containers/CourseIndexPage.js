@@ -1,6 +1,7 @@
 // @flow
 import React from "react"
-import { connectRequest, querySelectors } from "redux-query"
+import { querySelectors } from "redux-query"
+import { connectRequest } from "redux-query-react"
 import { connect } from "react-redux"
 import { compose } from "redux"
 import { Link } from "react-router-dom"

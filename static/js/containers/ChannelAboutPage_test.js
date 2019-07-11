@@ -7,6 +7,8 @@ import ChannelAboutPage, {
   ChannelAboutPage as InnerChannelAboutPage
 } from "./ChannelAboutPage"
 
+import * as ArticleEditorModule from "../components/ArticleEditor"
+
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeChannel } from "../factories/channels"
 import { shouldIf } from "../lib/test_utils"
@@ -28,6 +30,7 @@ describe("ChannelAboutPage", () => {
       },
       { channel }
     )
+    helper.stubComponent(ArticleEditorModule, "ArticleEditor")
   })
 
   afterEach(() => {
@@ -35,7 +38,7 @@ describe("ChannelAboutPage", () => {
   })
 
   it("should render about content, if present", async () => {
-    channel.about = [{ foo: "bar" }]
+    channel.about = []
     const { inner } = await render()
     const { readOnly, initialData } = inner.find("ArticleEditor").props()
     assert.isTrue(readOnly)

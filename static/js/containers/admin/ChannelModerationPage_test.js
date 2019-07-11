@@ -1,10 +1,14 @@
 // @flow
 import { assert } from "chai"
 import sinon from "sinon"
+import { shallow } from "enzyme"
+import React from "react"
 
 import ChannelModerationPage, {
   ChannelModerationPage as InnerChannelModerationPage
 } from "./ChannelModerationPage"
+
+import * as CommentTreeModule from "../../components/CommentTree"
 
 import { actions } from "../../actions"
 import { SET_CHANNEL_DATA } from "../../actions/channel"
@@ -108,6 +112,7 @@ describe("ChannelModerationPage", () => {
     )
 
     helper.getProfileStub.returns(Promise.resolve(""))
+    helper.stubComponent(CommentTreeModule, "CommentTree")
   })
 
   afterEach(() => {
@@ -150,10 +155,12 @@ describe("ChannelModerationPage", () => {
   })
 
   it("redirects if the user isn't a moderator", async () => {
-    channel.user_is_moderator = false
-    const { inner } = await render()
-
-    assert.equal(inner.find("Redirect").prop("to"), channelURL(channel.name))
+    // we have to use shallow rendering here because
+    const wrapper = shallow(
+      // $FlowFixMe
+      <InnerChannelModerationPage {...initialProps} channel={channel} />
+    )
+    assert.equal(wrapper.find("Redirect").prop("to"), channelURL(channel.name))
   })
 
   it("has a channel header", async () => {
@@ -238,7 +245,6 @@ describe("ChannelModerationPage", () => {
       })
 
       const props = wrapper
-        .dive()
         .find("OurDialog[id='remove-post-dialog']")
         .first()
         .props()
@@ -258,7 +264,7 @@ describe("ChannelModerationPage", () => {
     it("ignores a report for a post", async () => {
       const post = postList[0]
       helper.editPostStub.returns(Promise.resolve(post))
-      const { inner } = await render({
+      const { wrapper } = await render({
         reports: {
           data: {
             reports: reports
@@ -271,7 +277,7 @@ describe("ChannelModerationPage", () => {
         }
       })
 
-      const props = inner
+      const props = wrapper
         .find("Connect(CompactPostDisplay)")
         .first()
         .props()
@@ -299,7 +305,6 @@ describe("ChannelModerationPage", () => {
       })
 
       const props = wrapper
-        .dive()
         .find("OurDialog[id='remove-post-dialog']")
         .first()
         .props()
@@ -400,9 +405,7 @@ describe("ChannelModerationPage", () => {
       })
 
       const props = wrapper
-        .dive()
         .find("WithCommentModeration")
-        .dive()
         .find("OurDialog[id='remove-comment-dialog']")
         .first()
         .props()
@@ -424,7 +427,7 @@ describe("ChannelModerationPage", () => {
     it("ignores a report for a comment", async () => {
       const comment = reports[0].comment
       helper.updateCommentStub.returns(Promise.resolve(comment))
-      const { inner } = await render({
+      const { wrapper } = await render({
         reports: {
           data: {
             reports: reports
@@ -437,7 +440,7 @@ describe("ChannelModerationPage", () => {
         }
       })
 
-      const props = inner
+      const props = wrapper
         .find("CommentTree")
         .first()
         .props()
@@ -465,9 +468,7 @@ describe("ChannelModerationPage", () => {
       })
 
       const props = wrapper
-        .dive()
         .find("WithCommentModeration")
-        .dive()
         .find("OurDialog[id='remove-comment-dialog']")
         .first()
         .props()

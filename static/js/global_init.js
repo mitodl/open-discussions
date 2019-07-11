@@ -37,7 +37,8 @@ const _createSettings = () => ({
   accepted_social_sites:  [],
   algolia_appId:          "",
   algolia_appKey:         "",
-  livestream_ui_enabled:  true
+  livestream_ui_enabled:  true,
+  ckeditor_upload_url:    "/upload/token"
 })
 
 global.SETTINGS = _createSettings()

@@ -4,6 +4,7 @@ import { assert } from "chai"
 import qs from "query-string"
 import sinon from "sinon"
 import _ from "lodash"
+import InfiniteScroll from "react-infinite-scroller"
 
 import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
 
@@ -17,10 +18,12 @@ import {
   makeSearchFacetResult,
   makeSearchResponse
 } from "../factories/search"
+import { makeBootcamp } from "../factories/learning_resources"
 import { makeChannel } from "../factories/channels"
 import { LR_TYPE_COURSE, LR_TYPE_ALL } from "../lib/constants"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 import { wait } from "../lib/util"
+import { favoritesURL } from "../lib/url"
 
 describe("CourseSearchPage", () => {
   let helper,
@@ -92,7 +95,7 @@ describe("CourseSearchPage", () => {
   })
 
   afterEach(() => {
-    helper.cleanup()
+    helper.cleanup(false)
   })
 
   it("renders search results", async () => {
@@ -152,7 +155,7 @@ describe("CourseSearchPage", () => {
 
   it("loads more results", async () => {
     SETTINGS.search_page_size = 5
-    const { inner } = await renderPage({
+    const { wrapper, inner } = await renderPage({
       search: {
         processing: false,
         loaded:     true
@@ -174,8 +177,9 @@ describe("CourseSearchPage", () => {
         })
       )
     })
+    wrapper.update()
     // from is 5, plus 5 is 10 which is == numHits so no more results
-    assert.isFalse(inner.find("InfiniteScroll").prop("hasMore"))
+    assert.isFalse(wrapper.find("InfiniteScroll").prop("hasMore"))
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
       text:         "text",
@@ -232,9 +236,9 @@ describe("CourseSearchPage", () => {
     it(`InfiniteScroll initialLoad ${shouldIf(
       from > 0
     )} be false when from is ${from}`, async () => {
-      const { inner } = await renderPage()
+      const { wrapper, inner } = await renderPage()
       inner.setState({ from })
-      const infiniteScroll = inner.find("InfiniteScroll")
+      const infiniteScroll = wrapper.find("InfiniteScroll")
       assert.equal(infiniteScroll.prop("initialLoad"), from === 0)
     })
   })
@@ -313,7 +317,7 @@ describe("CourseSearchPage", () => {
   })
 
   it("displays filters and clicking 'Clear all filters' removes all active facets", async () => {
-    const { inner } = await renderPage()
+    const { wrapper, inner } = await renderPage()
     const text = "text"
     const activeFacets = new Map([
       ["platform", ["ocw"]],
@@ -324,8 +328,8 @@ describe("CourseSearchPage", () => {
     inner.setState({ text, activeFacets })
     assert.equal(inner.state().text, text)
     assert.deepEqual(inner.state().activeFacets, activeFacets)
-    assert.equal(inner.find("SearchFilter").length, 8)
-    inner.find(".search-filters-clear").simulate("click")
+    assert.equal(wrapper.find("SearchFilter").length, 8)
+    wrapper.find(".search-filters-clear").simulate("click")
     assert.equal(inner.state().text, null)
     assert.deepEqual(
       inner.state().activeFacets,

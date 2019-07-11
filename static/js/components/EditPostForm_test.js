@@ -16,7 +16,6 @@ import * as forms from "../actions/forms"
 import { actions } from "../actions"
 import { makePost } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import * as embedUtil from "../lib/embed"
 
 describe("EditPostForm", () => {
   let helper, post, wrapper
@@ -41,9 +40,6 @@ describe("EditPostForm", () => {
     helper.store.dispatch(actions.posts.get(post.id))
     helper.sandbox.stub(EditorView.prototype, "focus")
     wrapper = renderEditPostForm()
-    SETTINGS.ckeditor_upload_url = "/upload/token"
-    helper.getCKEditorJWTStub.returns(Promise.resolve())
-    helper.sandbox.stub(embedUtil, "loadEmbedlyPlatform")
   })
 
   afterEach(() => {

@@ -68,8 +68,8 @@ describe("LoginPage", () => {
         )} return error object if API response error count == ${String(
           errors.length
         )}`, async () => {
-          const { wrapper } = await renderPage()
-          const getSubmitResultErrors = wrapper.prop("getSubmitResultErrors")
+          const { inner } = await renderPage()
+          const getSubmitResultErrors = inner.prop("getSubmitResultErrors")
           const submitResultErrors = getSubmitResultErrors({ errors: errors })
 
           const expectedResult = expectErrorObject

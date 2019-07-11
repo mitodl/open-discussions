@@ -257,36 +257,36 @@ describe("ChannelPage", () => {
     it(`sets canLoadMore=${String(loaded)} when loaded=${String(
       loaded
     )}`, async () => {
-      const { wrapper } = await render({
+      const { inner } = await render({
         postsForChannel: {
           processing: !loaded,
           loaded:     loaded
         }
       })
-      assert.equal(wrapper.props().canLoadMore, loaded)
+      assert.equal(inner.props().canLoadMore, loaded)
     })
   })
 
   it("sets props used by withPostList", async () => {
-    const { wrapper } = await render()
+    const { inner } = await render()
 
-    assert.isTrue(wrapper.props().showPinUI)
-    assert.isTrue(wrapper.props().showReportPost)
-    assert.isTrue(wrapper.props().showRemovePost)
-    assert.isTrue(wrapper.props().showDeletePost)
-    assert.isTrue(wrapper.props().showTogglePinPost)
-    assert.isFalse(wrapper.props().showChannelLinks)
+    assert.isTrue(inner.props().showPinUI)
+    assert.isTrue(inner.props().showReportPost)
+    assert.isTrue(inner.props().showRemovePost)
+    assert.isTrue(inner.props().showDeletePost)
+    assert.isTrue(inner.props().showTogglePinPost)
+    assert.isFalse(inner.props().showChannelLinks)
   })
 
   it("sets isModerator based on the channel", async () => {
-    const { wrapper } = await render()
-    assert.equal(currentChannel.user_is_moderator, wrapper.props().isModerator)
+    const { inner } = await render()
+    assert.equal(currentChannel.user_is_moderator, inner.props().isModerator)
   })
 
   it("defines loadMore to fetch from postsForChannel", async () => {
-    const { wrapper, store } = await render()
+    const { inner, store } = await render()
     const search = { sort: "hot" }
-    await wrapper.props().loadPosts(search)
+    await inner.props().loadPosts(search)
     sinon.assert.calledWith(
       helper.getPostsForChannelStub,
       currentChannel.name,

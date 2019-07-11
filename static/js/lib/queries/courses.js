@@ -17,7 +17,7 @@ import type { Course } from "../../flow/discussionTypes"
 export const courseRequest = (courseId: string) => ({
   queryKey:  `courseRequest${courseId}`,
   url:       `${courseURL}/${courseId}/`,
-  transform: (course: Course) => ({
+  transform: (course: any) => ({
     courses: { [course.id]: course }
   }),
   update: {

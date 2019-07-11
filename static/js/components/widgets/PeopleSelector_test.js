@@ -121,9 +121,9 @@ describe("PeopleSelector", () => {
 
     it("passes input props to the input component", async () => {
       const initialText = "initialText"
-      const { inner, store } = await render()
+      const { wrapper, inner, store } = await render()
       inner.setState({ text: initialText })
-      const inputProps = inner.find("Autosuggest").prop("inputProps")
+      const inputProps = wrapper.find("Autosuggest").prop("inputProps")
       assert.equal(inputProps.value, initialText)
       assert.equal(inputProps.autoComplete, "off")
 

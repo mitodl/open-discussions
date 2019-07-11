@@ -2,10 +2,13 @@
 import React from "react"
 import { Provider } from "react-redux"
 import { Route, Router as ReactRouter } from "react-router-dom"
+import { Provider as ReduxQueryProvider } from "redux-query-react"
 
 import App from "./containers/App"
 import withTracker from "./util/withTracker"
 import ScrollToTop from "./components/ScrollToTop"
+
+import { getQueries } from "./lib/redux-query"
 
 import type { Store } from "redux"
 
@@ -22,9 +25,11 @@ export default class Router extends React.Component<Props> {
     return (
       <div>
         <Provider store={store}>
-          <ReactRouter history={history}>
-            <ScrollToTop>{children}</ScrollToTop>
-          </ReactRouter>
+          <ReduxQueryProvider queriesSelector={getQueries}>
+            <ReactRouter history={history}>
+              <ScrollToTop>{children}</ScrollToTop>
+            </ReactRouter>
+          </ReduxQueryProvider>
         </Provider>
       </div>
     )

@@ -143,13 +143,13 @@ export class HomePage extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
+export const mapStateToProps = (state: Object, ownProps: Object) => {
   const frontpage = state.frontpage.data
   const posts = state.posts.data
 
   return {
     ...postModerationSelector(state, ownProps),
-    posts:              safeBulkGet(getPostIds(frontpage), posts),
+    posts:              safeBulkGet<Post>(getPostIds(frontpage), posts),
     subscribedChannels: getSubscribedChannels(state),
     pagination:         frontpage.pagination,
     channels:           state.channels,

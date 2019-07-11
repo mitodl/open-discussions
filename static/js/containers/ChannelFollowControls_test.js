@@ -110,6 +110,8 @@ describe("ChannelFollowControls", () => {
       button.prop("onClick")()
       assert.equal(store.getActions()[0].type, SHOW_DROPDOWN)
     })
+
+    //
     ;[true, false].forEach(isOpen => {
       it(`${shouldIf(
         isOpen
@@ -121,7 +123,7 @@ describe("ChannelFollowControls", () => {
         const menu = inner.find(".channel-follow-dropdown")
         assert.equal(menu.exists(), isOpen)
         if (isOpen) {
-          menu.prop("closeMenu")()
+          menu.at(0).prop("closeMenu")()
           assert.equal(store.getActions()[0].type, HIDE_DROPDOWN)
         }
       })

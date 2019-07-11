@@ -111,9 +111,9 @@ describe("RegisterPage", () => {
   })
 
   it("form onSubmitResult prop redirects and sets a banner message", async () => {
-    const { wrapper, store } = await renderPage()
+    const { inner, store } = await renderPage()
 
-    const { onSubmitResult } = wrapper.props()
+    const { onSubmitResult } = inner.props()
 
     onSubmitResult({
       state:  STATE_REGISTER_CONFIRM_SENT,

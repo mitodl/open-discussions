@@ -26,8 +26,8 @@ describe("ImageUploader", () => {
     const name = "name",
       image = "image",
       edit = "edit"
-    const { wrapper } = await renderPage({}, { name, onUpdate })
-    wrapper.props().onSubmit({ image, edit })
+    const { inner } = await renderPage({}, { name, onUpdate })
+    inner.props().onSubmit({ image, edit })
     sinon.assert.calledWith(onUpdate, {
       target: {
         name,

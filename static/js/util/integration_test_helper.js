@@ -25,6 +25,7 @@ import * as widgetAPI from "../lib/api/widgets"
 import rootReducer from "../reducers"
 import * as utilFuncs from "../lib/util"
 import * as networkInterfaceFuncs from "../store/network_interface"
+import * as embedUtil from "../lib/embed"
 
 import type { Sandbox } from "../flow/sinonTypes"
 
@@ -82,6 +83,11 @@ export default class IntegrationTestHelper {
     this.getViewportWidthStub = this.sandbox
       .stub(utilFuncs, "getViewportWidth")
       .returns(700)
+    this.embedlyPlatformStub = this.sandbox.stub(
+      embedUtil,
+      "loadEmbedlyPlatform"
+    )
+    this.getCKEditorJWTStub.returns(Promise.resolve())
 
     const defaultResponse = {
       body:   {},
@@ -107,8 +113,16 @@ export default class IntegrationTestHelper {
       }))
   }
 
-  cleanup() {
+  cleanup(unmount = true) {
     this.sandbox.restore()
+
+    // the unmount call helps keep memory usage under control
+    // sometimes we don't want to though b/c it can cause some issues
+    // with redux-query
+    if (this.wrapper && unmount) {
+      this.wrapper.unmount()
+      delete this.wrapper
+    }
   }
 
   /**
@@ -129,14 +143,14 @@ export default class IntegrationTestHelper {
       expectedTypes = typesToAssert
     }
 
-    let wrapper, div
+    let div
 
     return this.listenForActions(expectedTypes, () => {
       this.browserHistory.push(url)
       div = document.createElement("div")
       div.setAttribute("id", "integration_test_div")
       document.body.appendChild(div)
-      wrapper = mount(
+      this.wrapper = mount(
         <div>
           <Router history={this.browserHistory} store={this.store}>
             {routes}
@@ -147,12 +161,20 @@ export default class IntegrationTestHelper {
         }
       )
     }).then(() => {
-      return Promise.resolve([wrapper, div])
+      return Promise.resolve([this.wrapper, div])
     })
   }
 
   isLoadingComponentClass(cls) {
     return cls.name === "WithLoading" || cls.name === "WithPostLoading"
+  }
+
+  stubComponent(module, displayName, name = "default") {
+    const Stubber = props => <div />
+    Stubber.displayName = displayName
+    this[`${displayName}Stub`] = this.sandbox
+      .stub(module, name)
+      .callsFake(props => <Stubber {...props} />)
   }
 
   createMockStore(initialState) {
@@ -180,48 +202,28 @@ export default class IntegrationTestHelper {
     ) => {
       const initialState = R.mergeDeepRight(defaultState, extraState)
       const store = this.createMockStore(initialState)
-      const wrapper = await shallow(
-        <WrappedComponent
-          store={store}
-          dispatch={store.dispatch}
-          {...defaultProps}
-          {...extraProps}
-        />,
-        {
-          context: {
-            store
-          }
-        }
+      const wrapper = await mount(
+        <Router history={this.browserHistory} store={this.store}>
+          <WrappedComponent
+            store={store}
+            dispatch={store.dispatch}
+            {...defaultProps}
+            {...extraProps}
+          />
+        </Router>
       )
 
-      // dive through layers of HOCs until we reach the desired inner component
-      let inner = wrapper
-      while (!inner.is(InnerComponent)) {
-        // determine the type before we dive
-        const cls = inner.type()
-        if (
-          this.isLoadingComponentClass(cls) &&
-          InnerComponent === cls.WrappedComponent
-        ) {
-          // WithLoading is actually subclassing the component, not rendering it as an inner component so there's
-          // no extra step to dive here.
-          break
-        }
+      this.wrapper = wrapper
 
-        // shallow render this component
-        inner = await inner.dive()
-
-        // if it defines WrappedComponent, find() that so we skip over any intermediaries
-        if (
-          cls &&
-          cls.hasOwnProperty("WrappedComponent") && // eslint-disable-line no-prototype-builtins
-          inner.find(cls.WrappedComponent).length
-        ) {
-          inner = inner.find(cls.WrappedComponent)
-        }
-      }
-      // one more time to shallow render the InnerComponent
-      inner = await inner.dive()
+      const inner = wrapper.find(InnerComponent).exists()
+        ? wrapper.find(InnerComponent)
+        : wrapper
+          .findWhere(
+            component =>
+              component.type() &&
+                component.type().WrappedComponent === InnerComponent
+          )
+          .last()
 
       return { wrapper, inner, store }
     }

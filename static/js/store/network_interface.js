@@ -1,4 +1,4 @@
 // @flow
-import { networkInterfaces } from "redux-query"
+import superagentInterface from "redux-query-interface-superagent"
 
-export const makeRequest = networkInterfaces.superagent
+export const makeRequest = superagentInterface

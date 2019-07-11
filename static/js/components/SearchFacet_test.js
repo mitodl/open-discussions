@@ -3,6 +3,7 @@ import React from "react"
 import { assert } from "chai"
 import { mount } from "enzyme"
 import * as sinon from "sinon"
+import Checkbox from "rmwc/Checkbox/index"
 
 import SearchFacet from "./SearchFacet"
 
@@ -54,8 +55,8 @@ describe("SearchFacet", () => {
     wrapper
       .find("input")
       .at(0)
-      .simulate("change", event)
-    sinon.assert.called(onUpdateStub)
+      .prop("onChange")(event)
+    sinon.assert.calledWith(onUpdateStub, event)
   })
 
   it("checkbox should call the label function if assigned", () => {

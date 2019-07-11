@@ -1,6 +1,6 @@
 // @flow
 import React from "react"
-import NavLink from "react-router-dom/NavLink"
+import { NavLink } from "react-router-dom"
 import R from "ramda"
 
 import IntraPageNav from "../IntraPageNav"

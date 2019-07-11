@@ -9,6 +9,7 @@ import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import PostPage, { PostPage as InnerPostPage } from "./PostPage"
 import CommentForm from "../components/CommentForm"
+import CanonicalLink from "../components/CanonicalLink"
 
 import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"
@@ -150,19 +151,36 @@ describe("PostPage", function() {
 
   it("should set the document title", async () => {
     const { inner } = await render()
-    assert.equal(inner.find("title").text(), formatTitle(post.title))
+    assert.equal(
+      inner
+        .find("MetaTags")
+        .props()
+        .children.find(child => child.type === "title").props.children,
+      formatTitle(post.title)
+    )
   })
 
   it("should set the document meta description", async () => {
     const { inner } = await render()
-    assert.equal(inner.find("meta").prop("content"), truncate(post.text, 300))
+    assert.equal(
+      inner
+        .find("MetaTags")
+        .props()
+        .children.find(child => child.type === "meta").props["content"],
+      truncate(post.text, 300)
+    )
   })
 
   it("should set the document meta canonical link to the post detail url", async () => {
     const { inner } = await render()
 
     assert.equal(
-      inner.find("CanonicalLink").prop("relativeUrl"),
+      inner
+        .find("MetaTags")
+        .props()
+        .children.find(child => child.type === CanonicalLink).props[
+          "relativeUrl"
+        ],
       postDetailURL(channel.name, post.id, post.slug)
     )
   })
@@ -186,7 +204,16 @@ describe("PostPage", function() {
         }
       }
     )
-    assert.equal(inner.find("CanonicalLink").prop("relativeUrl"), commentLink)
+
+    assert.equal(
+      inner
+        .find("MetaTags")
+        .props()
+        .children.find(child => child.type === CanonicalLink).props[
+          "relativeUrl"
+        ],
+      commentLink
+    )
   })
 
   it("should render comments", async () => {
@@ -271,8 +298,11 @@ describe("PostPage", function() {
     )
     const card = inner.find(".comment-detail-card")
     assert(card.exists())
-    assert.equal(
-      card.find("div").text(),
+    assert.include(
+      card
+        .find("div")
+        .at(0)
+        .text(),
       "You are viewing a single comment's thread."
     )
     assert.equal(
@@ -308,7 +338,7 @@ describe("PostPage", function() {
     const { inner } = await render()
     const commentTree = inner.find("CommentTree")
     const commentTreeProps = commentTree.props()
-    const forms = commentTree.dive().find("CommentVoteForm")
+    const forms = commentTree.find("CommentVoteForm")
     assert.isTrue(forms.length > 0)
     for (const form of forms) {
       const fromProps = form.props
@@ -327,7 +357,7 @@ describe("PostPage", function() {
     })
     const commentTree = inner.find("CommentTree")
     const commentTreeProps = commentTree.props()
-    const forms = commentTree.dive().find("CommentRemovalForm")
+    const forms = commentTree.find("CommentRemovalForm")
     assert.isTrue(forms.length > 0)
     for (const form of forms) {
       const fromProps = form.props
@@ -378,7 +408,8 @@ describe("PostPage", function() {
       const { inner, store } = await render({
         forms: {
           [REPORT_FORM_KEY]: {
-            value: {}
+            value:  {},
+            errors: {}
           }
         }
       })
@@ -517,7 +548,6 @@ describe("PostPage", function() {
             }
           })
           const dialogProps = wrapper
-            .dive()
             .find("OurDialog")
             .at(1)
             .props()
@@ -613,9 +643,7 @@ describe("PostPage", function() {
           })
 
           const dialogProps = wrapper
-            .dive()
             .find("WithCommentModeration")
-            .dive()
             .find("OurDialog")
             .at(0)
             .props()
@@ -730,7 +758,8 @@ describe("PostPage", function() {
             [REPORT_FORM_KEY]: {
               value: {
                 reason: reason
-              }
+              },
+              errors: {}
             }
           },
           focus: {
@@ -771,7 +800,8 @@ describe("PostPage", function() {
             [REPORT_FORM_KEY]: {
               value: {
                 reason: reason
-              }
+              },
+              errors: {}
             }
           },
           focus: {
@@ -855,16 +885,14 @@ describe("PostPage", function() {
         const { store, wrapper } = await render({
           forms: {
             [REPORT_FORM_KEY]: {
-              value: {}
+              value:  {},
+              errors: {}
             }
           },
           focus: post
         })
 
-        const dialog = wrapper
-          .dive()
-          .find("OurDialog")
-          .at(0)
+        const dialog = wrapper.find("OurDialog").at(0)
         assert.equal(dialog.prop("title"), "Report Post")
         dialog.find("ReportForm").prop("onUpdate")({
           target: {
@@ -892,7 +920,8 @@ describe("PostPage", function() {
             [REPORT_FORM_KEY]: {
               value: {
                 reason
-              }
+              },
+              errors: {}
             }
           },
           focus: {
@@ -900,10 +929,7 @@ describe("PostPage", function() {
           }
         })
 
-        const dialog = wrapper
-          .dive()
-          .find("OurDialog")
-          .at(0)
+        const dialog = wrapper.find("OurDialog").at(0)
         assert.equal(dialog.prop("title"), "Report Post")
 
         await dialog.props().onAccept()
@@ -953,7 +979,8 @@ describe("PostPage", function() {
           const form = {
             value: {
               reason
-            }
+            },
+            errors: {}
           }
           const { wrapper } = await render({
             forms: {
@@ -964,10 +991,7 @@ describe("PostPage", function() {
             }
           })
 
-          const dialog = wrapper
-            .dive()
-            .find("OurDialog")
-            .at(0)
+          const dialog = wrapper.find("OurDialog").at(0)
           assert.equal(dialog.prop("title"), "Report Post")
 
           const validationStub = helper.sandbox
@@ -992,10 +1016,7 @@ describe("PostPage", function() {
             }
           })
 
-          const dialog = wrapper
-            .dive()
-            .find("OurDialog")
-            .at(0)
+          const dialog = wrapper.find("OurDialog").at(0)
           assert.equal(dialog.prop("title"), "Report Post")
 
           assert.equal(dialog.find("ReportForm").prop("validation"), errors)
@@ -1008,7 +1029,8 @@ describe("PostPage", function() {
           const form = {
             value: {
               reason
-            }
+            },
+            errors: {}
           }
           const { inner } = await render({
             forms: {

@@ -16,7 +16,6 @@ import {
 } from "../../factories/widgets"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import { makeTweet } from "../../factories/embedly"
-import * as embedUtil from "../../lib/embed"
 import { getWidgetKey } from "../../lib/widgets"
 import { shouldIf } from "../../lib/test_utils"
 
@@ -49,7 +48,6 @@ describe("WidgetList", () => {
     setExpandedStub = helper.sandbox.stub()
 
     // tested in EmbedlyCard but we need to mock here since testing react-sortable-hoc requires mount()
-    helper.sandbox.stub(embedUtil, "loadEmbedlyPlatform")
     helper.getEmbedlyStub.returns(
       Promise.resolve({
         response: makeTweet()
