@@ -9,7 +9,7 @@ class ChannelAdmin(admin.ModelAdmin):
     """Customized Channel admin model"""
 
     model = Channel
-    exclude = ("banner", "avatar", "widget_list")
+    exclude = ("banner", "avatar", "widget_list", "allowed_post_types")
     search_fields = ("name",)
     readonly_fields = ("name",)
     list_filter = ("ga_tracking_id",)
