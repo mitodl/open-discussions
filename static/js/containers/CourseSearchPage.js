@@ -96,8 +96,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
         [
           "type",
           _.union(
-            toArray(qs.parse(props.location.search).type) ||
-              SEARCH_FILTER_ALL_RESOURCES
+            toArray(qs.parse(props.location.search).type) || []
           )
         ],
         ["platform", _.union(toArray(qs.parse(props.location.search).p) || [])],
@@ -133,7 +132,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
         ["platform", []],
         ["availability", []],
         ["topics", []],
-        ["type", SEARCH_FILTER_ALL_RESOURCES]
+        ["type", []]
       ]),
       currentFacetGroup: null
     })
@@ -191,10 +190,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
     const { activeFacets, text } = this.state
 
-    if (emptyOrNil(activeFacets.get("type"))) {
-      activeFacets.set("type", SEARCH_FILTER_ALL_RESOURCES)
-    }
-
     history.replace({
       pathname: pathname,
       search:   qs.stringify({
@@ -214,11 +209,16 @@ export class CourseSearchPage extends React.Component<Props, State> {
       from = 0
     }
     this.setState({ from, incremental })
+
+    // clone the facts so we can search a default of searching all resources if type isn't specified
+    const queryFacets = new Map(activeFacets)
+    const type = queryFacets.get("type")
+    queryFacets.set("type", R.isEmpty(type) ? SEARCH_FILTER_ALL_RESOURCES : type)
     await runSearch({
       channelName: null,
       text,
-      type:        activeFacets.get("type"),
-      facets:      activeFacets,
+      type:        queryFacets.get("type"),
+      facets:      queryFacets,
       from,
       size:        SETTINGS.search_page_size
     })
