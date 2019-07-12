@@ -27,8 +27,6 @@ import { channelBannerEndpoint } from "../reducers/channel_banner"
 import { searchEndpoint } from "../reducers/search"
 import { relatedPostsEndpoint } from "../reducers/related_posts"
 import { widgetsEndpoint } from "../reducers/widgets"
-import { coursesEndpoint } from "../reducers/courses"
-import { bootcampsEndpoint } from "../reducers/bootcamps"
 import { livestreamEndpoint } from "../reducers/livestream"
 
 import type { Dispatch } from "redux"
@@ -63,8 +61,6 @@ export const endpoints = [
   searchEndpoint,
   relatedPostsEndpoint,
   widgetsEndpoint,
-  coursesEndpoint,
-  bootcampsEndpoint,
   livestreamEndpoint
 ]
 

@@ -126,6 +126,7 @@
     "redux-mock-store": "^1.5.3",
     "redux-query": "^2.3.1",
     "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0",
     "rmwc": "^1.6.4",
     "sanctuary": "0.13.2",
     "sass-lint": "^1.12.1",

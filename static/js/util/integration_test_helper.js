@@ -19,11 +19,12 @@ import * as frontpageAPI from "../lib/api/frontpage"
 import * as postAPI from "../lib/api/posts"
 import * as commentAPI from "../lib/api/comments"
 import * as livestreamAPI from "../lib/api/livestream"
-import * as courseAPI from "../lib/api/courses"
-import * as bootcampAPI from "../lib/api/bootcamps"
+import * as courseAPI from "../lib/queries/courses"
+import * as bootcampAPI from "../lib/queries/bootcamps"
 import * as widgetAPI from "../lib/api/widgets"
 import rootReducer from "../reducers"
 import * as utilFuncs from "../lib/util"
+import * as networkInterfaceFuncs from "../store/network_interface"
 
 import type { Sandbox } from "../flow/sinonTypes"
 
@@ -81,6 +82,29 @@ export default class IntegrationTestHelper {
     this.getViewportWidthStub = this.sandbox
       .stub(utilFuncs, "getViewportWidth")
       .returns(700)
+
+    const defaultResponse = {
+      body:   {},
+      status: 200
+    }
+    this.handleRequestStub = this.sandbox.stub().returns(defaultResponse)
+    this.sandbox
+      .stub(networkInterfaceFuncs, "makeRequest")
+      .callsFake((url, method, options) => ({
+        execute: callback => {
+          const response = this.handleRequestStub(url, method, options)
+          const err = null
+          const resStatus = (response && response.status) || 0
+          const resBody = (response && response.body) || undefined
+          const resText = (response && response.text) || undefined
+          const resHeaders = (response && response.header) || undefined
+
+          callback(err, resStatus, resBody, resText, resHeaders)
+        },
+        abort: () => {
+          throw new Error("Aborts currently unhandled")
+        }
+      }))
   }
 
   cleanup() {
@@ -162,7 +186,12 @@ export default class IntegrationTestHelper {
           dispatch={store.dispatch}
           {...defaultProps}
           {...extraProps}
-        />
+        />,
+        {
+          context: {
+            store
+          }
+        }
       )
 
       // dive through layers of HOCs until we reach the desired inner component

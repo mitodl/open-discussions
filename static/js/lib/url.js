@@ -125,3 +125,13 @@ export const COURSE_SEARCH_BANNER_URL =
   "/static/images/course_search_banner.png"
 
 export const MIT_LOGO_URL = "/static/images/MIT_circle.svg"
+
+export const starSelectedURL = "/static/images/star_selected.png"
+export const starUnselectedURL = "/static/images/star_unselected.png"
+
+export const featuredCoursesURL = "/api/v0/courses/featured"
+export const upcomingCoursesURL = "/api/v0/courses/upcoming"
+export const newCoursesURL = "/api/v0/courses/new"
+export const favoritesURL = "/api/v0/favorites"
+export const courseURL = "/api/v0/courses"
+export const bootcampURL = "/api/v0/bootcamps"

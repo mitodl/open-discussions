@@ -17,6 +17,7 @@ import type {
   FacetResult,
   LearningResourceResult
 } from "../flow/searchTypes"
+import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
 
 export const searchResultToComment = (
   result: CommentResult
@@ -86,8 +87,10 @@ export const searchResultToProfile = (result: ProfileResult): Profile => ({
 })
 
 export const searchResultToLearningResource = (
-  result: LearningResourceResult
+  result: LearningResourceResult,
+  overrideObject: LearningResource = {}
 ): LearningResource => ({
+  ...overrideObject,
   id:           result.id,
   title:        result.title,
   image_src:    result.image_src,
@@ -140,9 +143,9 @@ const _searchFields = (type: ?string) => {
     return COMMENT_QUERY_FIELDS
   } else if (type === "profile") {
     return PROFILE_QUERY_FIELDS
-  } else if (type === "course") {
+  } else if (type === LR_TYPE_COURSE) {
     return COURSE_QUERY_FIELDS
-  } else if (type === "bootcamp") {
+  } else if (type === LR_TYPE_BOOTCAMP) {
     return BOOTCAMP_QUERY_FIELDS
   } else {
     return R.uniq([

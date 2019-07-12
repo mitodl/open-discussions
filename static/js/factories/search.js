@@ -4,7 +4,13 @@ import casual from "casual-browserify"
 import R from "ramda"
 
 import { LINK_TYPE_LINK, LINK_TYPE_TEXT } from "../lib/channels"
-import { COURSE_ARCHIVED, COURSE_CURRENT, platforms } from "../lib/constants"
+import {
+  COURSE_ARCHIVED,
+  COURSE_CURRENT,
+  platforms,
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP
+} from "../lib/constants"
 
 import type {
   CommentResult,
@@ -89,7 +95,7 @@ export const makeCourseResult = (): LearningResourceResult => ({
   instructors:       ["instuctor 1", "instructor 2"],
   topics:            [casual.word, casual.word],
   prices:            [{ mode: "audit", price: casual.number }],
-  object_type:       "course",
+  object_type:       LR_TYPE_COURSE,
   availability:
     casual.random_element[(COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming")]
 })
@@ -111,10 +117,19 @@ export const makeBootcampResult = (): LearningResourceResult => ({
   instructors:       ["instuctor 1", "instructor 2"],
   topics:            [casual.word, casual.word],
   prices:            [{ mode: "audit", price: casual.number }],
-  object_type:       "bootcamp",
+  object_type:       LR_TYPE_BOOTCAMP,
   availability:
     casual.random_element[(COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming")]
 })
+
+export const makeLearningResourceResult = (objectType: string) => {
+  switch (objectType) {
+  case LR_TYPE_COURSE:
+    return makeCourseResult()
+  case LR_TYPE_BOOTCAMP:
+    return makeBootcampResult()
+  }
+}
 
 export const makeSearchResult = (type: ?string) => {
   if (!type) {
@@ -131,8 +146,11 @@ export const makeSearchResult = (type: ?string) => {
   case "profile":
     hit = makeProfileResult()
     break
-  case "course":
+  case LR_TYPE_COURSE:
     hit = makeCourseResult()
+    break
+  case LR_TYPE_BOOTCAMP:
+    hit = makeBootcampResult()
     break
   default:
     // make flow happy

@@ -1,16 +1,17 @@
-// @flow
 import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 
+import LearningResourceCard from "./LearningResourceCard"
 import SearchResult from "./SearchResult"
+
 import {
-  makeBootcampResult,
   makeCommentResult,
-  makeCourseResult,
   makePostResult,
-  makeProfileResult
+  makeProfileResult,
+  makeLearningResourceResult
 } from "../factories/search"
+import { makeLearningResource } from "../factories/learning_resources"
 import {
   searchResultToComment,
   searchResultToLearningResource,
@@ -19,6 +20,7 @@ import {
 } from "../lib/search"
 import { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 import { profileURL } from "../lib/url"
+import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
 
 describe("SearchResult", () => {
   const render = (result, props = {}) =>
@@ -88,19 +90,26 @@ describe("SearchResult", () => {
     assert.deepEqual(commentTree.prop("comments"), [votedComment])
   })
 
-  it("renders a course", () => {
-    const result = makeCourseResult()
-    const course = searchResultToLearningResource(result)
-    const wrapper = render(result).dive()
-    const courseDisplay = wrapper.find("LearningResourceCard")
-    assert.deepEqual(courseDisplay.prop("object"), course)
-  })
+  //
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+    it(`renders a ${objectType}`, () => {
+      const result = makeLearningResourceResult(objectType)
+      const object = searchResultToLearningResource(result)
+      const wrapper = render(result).dive()
+      const resourceDisplay = wrapper.find(LearningResourceCard)
+      assert.deepEqual(resourceDisplay.prop("object"), object)
+    })
 
-  it("renders a bootcamp", () => {
-    const result = makeBootcampResult()
-    const bootcamp = searchResultToLearningResource(result)
-    const wrapper = render(result).dive()
-    const bootcampDisplay = wrapper.find("LearningResourceCard")
-    assert.deepEqual(bootcampDisplay.prop("object"), bootcamp)
+    it(`should pass down an override ${objectType}, if passed one`, () => {
+      const result = makeLearningResourceResult(objectType)
+      const overrideObject = makeLearningResource(objectType)
+      const resourceCard = render(result, { overrideObject })
+        .dive()
+        .find(LearningResourceCard)
+      assert.deepEqual(
+        resourceCard.prop("object"),
+        searchResultToLearningResource(result, overrideObject)
+      )
+    })
   })
 })

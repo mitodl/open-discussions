@@ -7,7 +7,8 @@ import {
   makeCommentResult,
   makeCourseResult,
   makePostResult,
-  makeProfileResult
+  makeProfileResult,
+  makeLearningResourceResult
 } from "../factories/search"
 import {
   buildSearchQuery,
@@ -19,6 +20,7 @@ import {
   searchResultToProfile
 } from "./search"
 import * as searchFuncs from "./search"
+import { LR_TYPE_BOOTCAMP, LR_TYPE_COURSE } from "../lib/constants"
 
 describe("search functions", () => {
   let sandbox
@@ -119,7 +121,7 @@ describe("search functions", () => {
       topics:       result.topics.map(topic => ({ name: topic })),
       availability: result.availability,
       prices:       result.prices,
-      object_type:  "course"
+      object_type:  LR_TYPE_COURSE
     })
   })
 
@@ -134,7 +136,18 @@ describe("search functions", () => {
       topics:       result.topics.map(topic => ({ name: topic })),
       availability: result.availability,
       prices:       result.prices,
-      object_type:  "bootcamp"
+      object_type:  LR_TYPE_BOOTCAMP
+    })
+  })
+
+  //
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+    it(`takes an overrideObject with ${objectType}`, () => {
+      const result = makeLearningResourceResult(objectType)
+      const object = searchResultToLearningResource(result, {
+        test_field: true
+      })
+      assert.isTrue(object.test_field)
     })
   })
 
@@ -286,8 +299,9 @@ describe("search functions", () => {
       })
       sinon.assert.calledWith(stub, type)
     })
+
     //
-    ;["course", "bootcamp"].forEach(type => {
+    ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(type => {
       it(`filters courses by platform, availability, type, and topics`, () => {
         const fieldNames = ["field1", "field2", "field3"]
         const stub = sandbox

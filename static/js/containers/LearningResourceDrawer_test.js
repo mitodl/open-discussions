@@ -1,4 +1,3 @@
-// @flow
 import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
@@ -8,19 +7,23 @@ import {
   LearningResourceDrawer,
   mapStateToProps
 } from "./LearningResourceDrawer"
-import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
+import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 
-import { setShowResourceDrawer } from "../actions/ui"
 import { makeBootcamp, makeCourse } from "../factories/learning_resources"
 import { shouldIf } from "../lib/test_utils"
+import { LR_TYPE_BOOTCAMP, LR_TYPE_COURSE } from "../lib/constants"
+import { courseRequest } from "../lib/queries/courses"
+import { bootcampRequest } from "../lib/queries/bootcamps"
 
 describe("LearningResourceDrawer", () => {
-  let sandbox, dispatchStub, course
+  let sandbox, dispatchStub, course, bootcamp, setShowResourceDrawerStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     dispatchStub = sandbox.stub()
     course = makeCourse()
+    bootcamp = makeBootcamp()
+    setShowResourceDrawerStub = sandbox.stub()
   })
 
   afterEach(() => {
@@ -34,18 +37,16 @@ describe("LearningResourceDrawer", () => {
         showLearningDrawer={true}
         object={course}
         objectId={course.id}
-        objectType="course"
+        objectType={LR_TYPE_COURSE}
+        setShowResourceDrawer={setShowResourceDrawerStub}
         {...props}
       />
     )
 
-  it("should have an onDrawerClose function to hide the course drawer", async () => {
+  it("should have a button to hide the course drawer", async () => {
     const wrapper = renderLearningResourceDrawer()
-    await wrapper.instance().onDrawerClose()
-    sinon.assert.calledWith(
-      dispatchStub,
-      setShowResourceDrawer({ objectId: null })
-    )
+    wrapper.find(".drawer-close").simulate("click")
+    sinon.assert.calledWith(setShowResourceDrawerStub, { objectId: null })
   })
 
   it("should put an event listener on window resize", () => {
@@ -60,73 +61,89 @@ describe("LearningResourceDrawer", () => {
     assert.ok(onResizeStub.called)
   })
 
-  it("should include an ExpandedCourseDisplay", () => {
+  it("should include an ExpandedLearningResourceDisplay", () => {
     const wrapper = renderLearningResourceDrawer()
-    const expandedDisplay = wrapper.find(ExpandedCourseDisplay)
+    const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
     assert.deepEqual(expandedDisplay.prop("object"), course)
   })
 
-  it("should not include an ExpandedCourseDisplay if course is null", () => {
+  it("should not include an ExpandedLearningResourceDisplay if object is null", () => {
     const wrapper = renderLearningResourceDrawer({ object: null })
-    assert.isNotOk(wrapper.find(ExpandedCourseDisplay).exists())
+    assert.isNotOk(wrapper.find(ExpandedLearningResourceDisplay).exists())
   })
 
-  it("should include an ExpandedCourseDisplay for a bootcamp", () => {
+  it("should include an ExpandedLearningResourceDisplay for a bootcamp", () => {
     const bootcamp = makeBootcamp()
     const wrapper = renderLearningResourceDrawer({
       object:     bootcamp,
       objectId:   bootcamp.id,
-      objectType: "bootcamp"
+      objectType: LR_TYPE_BOOTCAMP
     })
-    const expandedDisplay = wrapper.find(ExpandedCourseDisplay)
+    const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
     assert.deepEqual(expandedDisplay.prop("object"), bootcamp)
   })
 
-  //
-  ;[
-    [10, 10, false, true],
-    [10, 11, true, true],
-    [10, null, true, true],
-    [10, 10, true, false]
-  ].forEach(([prevId, nextId, sameCourse, needsLoad]) => {
-    it(`${shouldIf(
-      needsLoad
-    )} load data on component update w/ prev id ${String(
-      prevId
-    )}, next id ${String(nextId)}, same course ${String(sameCourse)}`, () => {
-      course.id = prevId
-      const wrapper = renderLearningResourceDrawer()
-      const loadDataStub = sandbox.stub(wrapper.instance(), "loadData")
-      wrapper.instance().componentDidUpdate({
-        dispatch:           wrapper.props().dispatch,
-        showLearningDrawer: true,
-        objectId:           nextId,
-        object:             sameCourse ? course : null,
-        objectType:         "course"
+  describe("mapStateToProps", () => {
+    let state
+
+    beforeEach(() => {
+      state = {
+        entities: {
+          courses: {
+            [course.id]: course
+          },
+          bootcamps: {
+            [bootcamp.id]: bootcamp
+          }
+        },
+        queries: {
+          [courseRequest(course.id).queryKey]: {
+            isFinished: true
+          },
+          [bootcampRequest(bootcamp.id).queryKey]: {
+            isFinished: true
+          }
+        },
+        ui: {
+          courseDetail: { objectId: course.id, objectType: LR_TYPE_COURSE }
+        }
+      }
+    })
+
+    //
+    ;[[782, true], [null, false], [undefined, false]].forEach(
+      ([courseId, showDrawer]) => {
+        it(`${shouldIf(showDrawer)} show drawer if courseId is ${String(
+          courseId
+        )}`, () => {
+          state.ui.courseDetail.objectId = courseId
+          const props = mapStateToProps(state)
+          assert.equal(props.showLearningDrawer, showDrawer)
+          assert.equal(props.objectId, state.ui.courseDetail.objectId)
+        })
+      }
+    )
+
+    //
+    ;[LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].forEach(testObjectType => {
+      it(`mapStateToProps should grab the right ${testObjectType}`, () => {
+        state.ui.courseDetail.objectType = testObjectType
+        let expectedObject
+        switch (testObjectType) {
+        case LR_TYPE_COURSE:
+          expectedObject = course
+          state.ui.courseDetail.objectId = course.id
+          break
+        case LR_TYPE_BOOTCAMP:
+          expectedObject = bootcamp
+          state.ui.courseDetail.objectId = bootcamp.id
+          break
+        }
+        const { object, objectType, objectId } = mapStateToProps(state)
+        assert.deepEqual(object, expectedObject)
+        assert.equal(objectType, testObjectType)
+        assert.equal(objectId, expectedObject.id)
       })
-      sinon.assert.callCount(loadDataStub, needsLoad ? 1 : 0)
     })
   })
-
-  //
-  ;[[782, true], [null, false], [undefined, false], ["a7", false]].forEach(
-    ([courseId, showDrawer]) => {
-      it(`should grab state props and ${shouldIf(
-        showDrawer
-      )} show drawer if courseId is ${String(courseId)}`, () => {
-        const state = {
-          courses: {
-            data: new Map([[[course.id], course]])
-          },
-          ui: {
-            courseDetail: { objectId: courseId, objectType: "course" }
-          }
-        }
-        const props = mapStateToProps(state)
-        assert.equal(props.showLearningDrawer, showDrawer)
-        assert.equal(props.objectId, state.ui.courseDetail.objectId)
-        assert.deepEqual(props.object, state.courses[course.id])
-      })
-    }
-  )
 })

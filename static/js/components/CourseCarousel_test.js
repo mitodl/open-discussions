@@ -9,6 +9,7 @@ import CourseCarousel from "./CourseCarousel"
 import LearningResourceCard from "./LearningResourceCard"
 
 import { makeCourse } from "../factories/learning_resources"
+import { LR_TYPE_COURSE } from "../lib/constants"
 
 describe("CourseCarousel", () => {
   let courses, sandbox, setShowResourceDrawerStub
@@ -46,7 +47,7 @@ describe("CourseCarousel", () => {
     const carousel = wrapper.find("Carousel")
     R.zip(carousel.find(LearningResourceCard).map(R.identity), courses).forEach(
       ([el, course]) => {
-        course.object_type = "course"
+        course.object_type = LR_TYPE_COURSE
         assert.deepEqual(el.prop("object"), course)
       }
     )

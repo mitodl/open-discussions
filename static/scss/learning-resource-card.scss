@@ -1,4 +1,4 @@
-.course-card {
+.learning-resource-card {
   @extend %card;
 
   width: initial;
@@ -65,5 +65,11 @@
   .course-platform {
     max-height: 32px;
     margin: 7px 0;
+  }
+
+  .favorite {
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
   }
 }

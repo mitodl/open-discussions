@@ -17,6 +17,7 @@ import {
 } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
+import { LR_TYPE_COURSE } from "../lib/constants"
 
 describe("CourseSearchPage", () => {
   let helper,
@@ -62,6 +63,10 @@ describe("CourseSearchPage", () => {
       },
       ui: {
         facets: new Map(Object.entries({ topics: true }))
+      },
+      entities: {
+        courses:   {},
+        bootcamps: {}
       }
     }
     initialProps = {
@@ -118,11 +123,11 @@ describe("CourseSearchPage", () => {
       .at(0)
       .prop("setShowResourceDrawer")({
         objectId:   searchCourse.course_id,
-        objectType: "course"
+        objectType: LR_TYPE_COURSE
       })
     assert.deepEqual(store.getLastAction(), {
       type:    SET_SHOW_RESOURCE_DRAWER,
-      payload: { objectId: searchCourse.course_id, objectType: "course" }
+      payload: { objectId: searchCourse.course_id, objectType: LR_TYPE_COURSE }
     })
   })
 

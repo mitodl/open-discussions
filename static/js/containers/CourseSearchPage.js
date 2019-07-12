@@ -7,6 +7,9 @@ import InfiniteScroll from "react-infinite-scroller"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
+import { connectRequest } from "redux-query"
+import { compose } from "redux"
+import { createSelector } from "reselect"
 
 import LearningResourceDrawer from "./LearningResourceDrawer"
 
@@ -33,6 +36,7 @@ import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
 import { emptyOrNil, preventDefaultAndInvoke, toArray } from "../lib/util"
 import { mergeFacetResults } from "../lib/search"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
+import { favoritesRequest } from "../lib/queries/learning_resources"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -61,7 +65,8 @@ type StateProps = {|
   facets: Map<string, FacetResult>,
   loaded: boolean,
   processing: boolean,
-  total: number
+  total: number,
+  favorites: Object
 |}
 
 type DispatchProps = {|
@@ -272,9 +277,11 @@ export class CourseSearchPage extends React.Component<Props, State> {
       processing,
       loaded,
       total,
-      setShowResourceDrawer
+      setShowResourceDrawer,
+      favorites
     } = this.props
     const { from, incremental } = this.state
+    const { bootcamps, courses } = favorites
 
     if ((processing || !loaded) && !incremental) {
       return <PostLoading />
@@ -298,6 +305,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
             <Cell width={4} key={i}>
               <SearchResult
                 result={result}
+                overrideObject={
+                  // $FlowFixMe
+                  bootcamps[result.id] || courses[result.id]
+                }
                 toggleFacet={this.toggleFacet}
                 setShowResourceDrawer={setShowResourceDrawer}
               />
@@ -386,6 +397,15 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 }
 
+const getFavorites = createSelector(
+  state => state.entities.courses,
+  state => state.entities.bootcamps,
+  (courses, bootcamps) => ({
+    courses:   R.filter(R.propEq("is_favorite", true), courses || {}),
+    bootcamps: R.filter(R.propEq("is_favorite", true), bootcamps || {})
+  })
+)
+
 const mapStateToProps = (state): StateProps => {
   const { search } = state
   const { results, total, initialLoad, facets } = search.data
@@ -396,7 +416,8 @@ const mapStateToProps = (state): StateProps => {
     total,
     initialLoad,
     loaded:     search.loaded,
-    processing: search.processing
+    processing: search.processing,
+    favorites:  getFavorites(state)
   }
 }
 
@@ -420,7 +441,12 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   dispatch
 })
 
-export default connect<Props, OwnProps, _, _, _, _>(
-  mapStateToProps,
-  mapDispatchToProps
+const mapPropsToConfig = () => [favoritesRequest()]
+
+export default compose(
+  connect<Props, OwnProps, _, _, _, _>(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
+  connectRequest(mapPropsToConfig)
 )(CourseSearchPage)

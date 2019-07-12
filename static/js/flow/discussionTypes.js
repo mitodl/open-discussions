@@ -352,7 +352,8 @@ export type Course = {
   instructors:        Array<CourseInstructor>,
   topics:             Array<CourseTopic>,
   prices:             Array<CoursePrice>,
-  availability:       ?string
+  availability:       ?string,
+  is_favorite:        boolean
 }
 
 export type Bootcamp = {
@@ -372,7 +373,8 @@ export type Bootcamp = {
   instructors:        Array<CourseInstructor>,
   topics:             Array<CourseTopic>,
   prices:             Array<CoursePrice>,
-  availability:       ?string
+  availability:       ?string,
+  is_favorite:        boolean
 }
 
 export type CoursePrice = {

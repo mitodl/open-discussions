@@ -2,34 +2,60 @@
 /* global SETTINGS:false */
 import React from "react"
 import Dotdotdot from "react-dotdotdot"
+import { mutateAsync } from "redux-query"
+import { connect } from "react-redux"
 
 import { availabilityLabel, minPrice } from "../lib/learning_resources"
-import { embedlyThumbnail } from "../lib/url"
+import {
+  embedlyThumbnail,
+  starSelectedURL,
+  starUnselectedURL
+} from "../lib/url"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
   platformLogoUrls,
-  platforms
+  platforms,
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP
 } from "../lib/constants"
+import { favoriteCourseMutation } from "../lib/queries/courses"
+import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
 
 import type { LearningResource } from "../flow/discussionTypes"
 
-type CardProps = {|
+type OwnProps = {|
   object: LearningResource,
   setShowResourceDrawer: Function,
   toggleFacet?: Function
 |}
 
-const LearningResourceCard = ({
+type DispatchProps = {|
+  toggleFavorite: Function
+|}
+
+type Props = {|
+  ...OwnProps,
+  ...DispatchProps
+|}
+
+const getPlatform = (object: Object): string =>
+  object.object_type === LR_TYPE_COURSE ? object.platform : platforms.bootcamps
+
+export const LearningResourceCard = ({
   object,
   setShowResourceDrawer,
-  toggleFacet
-}: CardProps) => {
-  const objectType = object.object_type
+  toggleFacet,
+  toggleFavorite
+}: Props) => {
   const showResourceDrawer = () =>
-    setShowResourceDrawer({ objectId: object.id, objectType: objectType })
+    setShowResourceDrawer({
+      objectId:   object.id,
+      objectType: object.object_type
+    })
+
   return (
-    <div className="course-card">
+    <div className="learning-resource-card">
       <div className="card-contents">
         <div className="cover-image" onClick={showResourceDrawer}>
           <img
@@ -66,19 +92,19 @@ const LearningResourceCard = ({
         <div className="row availability">
           {availabilityLabel(object.availability)}
         </div>
-        <div className="row platform">
+        <div className="row platform-favorite">
           <img
             className="course-platform"
+            src={platformLogoUrls[getPlatform(object)]}
+            alt={`logo for ${getPlatform(object)}`}
+          />
+          <img
+            className="favorite"
             src={
-              platformLogoUrls[
-                // $FlowFixMe: object.platform should not be null if it exists
-                objectType === "course" ? object.platform : platforms.bootcamps
-              ]
+              // $FlowFixMe
+              object.is_favorite ? starSelectedURL : starUnselectedURL
             }
-            alt={`logo for ${
-              // $FlowFixMe: object.platform should not be null if it exists
-              objectType === "course" ? object.platform : platforms.bootcamps
-            }`}
+            onClick={() => toggleFavorite(object)}
           />
         </div>
         <div className="row price">{minPrice(object)}</div>
@@ -88,4 +114,18 @@ const LearningResourceCard = ({
   )
 }
 
-export default LearningResourceCard
+const mapDispatchToProps = dispatch => ({
+  toggleFavorite: payload => {
+    if (payload.object_type === LR_TYPE_COURSE) {
+      dispatch(mutateAsync(favoriteCourseMutation(payload)))
+    }
+    if (payload.object_type === LR_TYPE_BOOTCAMP) {
+      dispatch(mutateAsync(favoriteBootcampMutation(payload)))
+    }
+  }
+})
+
+export default connect<Props, OwnProps, _, _, _, _>(
+  null,
+  mapDispatchToProps
+)(LearningResourceCard)

@@ -44,3 +44,6 @@ export const WIDGET_FIELD_TYPE_CHECKBOX = "checkbox"
 export const CAROUSEL_PAGE_SIZE = 3
 export const CAROUSEL_IMG_HEIGHT = 130
 export const CAROUSEL_IMG_WIDTH = 306
+
+export const LR_TYPE_COURSE = "course"
+export const LR_TYPE_BOOTCAMP = "bootcamp"

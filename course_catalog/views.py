@@ -169,13 +169,23 @@ class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
 
+class FavoriteViewPagination(LimitOffsetPagination):
+    """
+    Pagination class for the favorites list view
+    on the frontend we have to fetch all the results :/
+    """
+
+    default_limit = 1000
+    max_limit = 1000
+
+
 class FavoriteItemViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Viewset for favorites
     """
 
     serializer_class = FavoriteItemSerializer
-    pagination_class = DefaultPagination
+    pagination_class = FavoriteViewPagination
 
     def get_queryset(self):
         return FavoriteItem.objects.filter(user=self.request.user)

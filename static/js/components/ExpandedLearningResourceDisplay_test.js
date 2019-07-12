@@ -4,12 +4,16 @@ import { assert } from "chai"
 import { shallow } from "enzyme"
 import moment from "moment"
 
-import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
+import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 
-import { makeBootcamp, makeCourse } from "../factories/learning_resources"
-import { shouldIf } from "../lib/test_utils"
+import {
+  makeBootcamp,
+  makeCourse,
+  makeLearningResource
+} from "../factories/learning_resources"
+import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
 
-describe("ExpandedCourseDisplay", () => {
+describe("ExpandedLearningResourceDisplay", () => {
   let course
 
   beforeEach(() => {
@@ -18,7 +22,11 @@ describe("ExpandedCourseDisplay", () => {
 
   const render = ({ ...props }) =>
     shallow(
-      <ExpandedCourseDisplay object={course} objectType="course" {...props} />
+      <ExpandedLearningResourceDisplay
+        object={course}
+        objectType={LR_TYPE_COURSE}
+        {...props}
+      />
     )
 
   it(`should render a course image`, () => {
@@ -151,7 +159,7 @@ describe("ExpandedCourseDisplay", () => {
 
   it(`should display year and not semester for bootcamps`, () => {
     const bootcamp = makeBootcamp()
-    const wrapper = render({ object: bootcamp, objectType: "bootcamp" })
+    const wrapper = render({ object: bootcamp, objectType: LR_TYPE_BOOTCAMP })
     const historyValue = wrapper
       .find(".history")
       .closest(".course-info-row")
@@ -165,20 +173,19 @@ describe("ExpandedCourseDisplay", () => {
     assert.equal(historyValue, bootcamp.year)
     assert.equal(historyLabel, "As taught in:")
   })
+
   //
-  ;[true, false].forEach(isCourse => {
-    it(`${shouldIf(
-      isCourse
-    )} display the platform in the link button text`, () => {
-      const object = isCourse ? makeCourse() : makeBootcamp()
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+    it(`should display the platform in the link button text for ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
       const wrapper = render({
-        object:     object,
-        objectType: isCourse ? "course" : "bootcamp"
+        object,
+        objectType
       })
       const linkText = wrapper.find(".link-button").text()
       assert.equal(
         linkText,
-        isCourse
+        objectType === LR_TYPE_COURSE
           ? // $FlowFixMe: only courses will access platform
           `Take Course on ${object.platform.toUpperCase()}`
           : "Take Bootcamp"

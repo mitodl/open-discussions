@@ -6,31 +6,28 @@ import { connect } from "react-redux"
 import { withRouter } from "react-router"
 import { Drawer, DrawerContent } from "rmwc/Drawer"
 import { Theme } from "rmwc/Theme"
+import { connectRequest, querySelectors } from "redux-query"
+import { createSelector } from "reselect"
+
+import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
+
+import { setShowResourceDrawer } from "../actions/ui"
+import { getViewportWidth } from "../lib/util"
+import { courseRequest } from "../lib/queries/courses"
+import { bootcampRequest } from "../lib/queries/bootcamps"
+import { LR_TYPE_BOOTCAMP, LR_TYPE_COURSE } from "../lib/constants"
 
 import type { Dispatch } from "redux"
 import type { Bootcamp, Course } from "../flow/discussionTypes"
-import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
-
-import { actions } from "../actions"
-import { setShowResourceDrawer } from "../actions/ui"
-import { getViewportWidth } from "../lib/util"
 
 type Props = {
   showLearningDrawer: boolean,
   dispatch: Dispatch<*>,
   object: Course | Bootcamp | null,
   objectId: number,
-  objectType: string
+  objectType: string,
+  setShowResourceDrawer: Function
 }
-
-const shouldLoadData = R.complement(
-  R.allPass([
-    // if course id's don't match
-    R.eqProps("objectId"),
-    // courses don't match
-    R.eqProps("object")
-  ])
-)
 
 export class LearningResourceDrawer extends React.Component<Props> {
   width: number
@@ -41,30 +38,7 @@ export class LearningResourceDrawer extends React.Component<Props> {
   }
 
   componentDidMount() {
-    const { objectId } = this.props
     window.addEventListener("resize", () => this.onResize())
-    if (objectId) {
-      this.loadData()
-    }
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    const { objectId } = this.props
-    if (objectId && shouldLoadData(prevProps, this.props)) {
-      this.loadData()
-    }
-  }
-
-  loadData = async () => {
-    const { dispatch, objectId, objectType } = this.props
-    switch (objectType) {
-    case "course":
-      dispatch(actions.courses.get(objectId))
-      break
-    case "bootcamp":
-      dispatch(actions.bootcamps.get(objectId))
-      break
-    }
   }
 
   onResize() {
@@ -73,28 +47,34 @@ export class LearningResourceDrawer extends React.Component<Props> {
     this.setState({})
   }
 
-  onDrawerClose = () => {
-    const { dispatch } = this.props
-    dispatch(setShowResourceDrawer({ objectId: null }))
-  }
-
   render() {
-    const { object, objectType, showLearningDrawer } = this.props
+    const {
+      object,
+      objectType,
+      showLearningDrawer,
+      setShowResourceDrawer
+    } = this.props
+
+    const onDrawerClose = () => setShowResourceDrawer({ objectId: null })
+
     return object ? (
       <Theme>
         <Drawer
           persistent={false}
           temporary={true}
           open={showLearningDrawer}
-          onClose={this.onDrawerClose}
+          onClose={onDrawerClose}
           dir="rtl"
           className="align-right"
         >
           <DrawerContent dir="ltr" className="alignRight">
-            <div className="drawer-close" onClick={this.onDrawerClose}>
+            <div className="drawer-close" onClick={onDrawerClose}>
               <i className="material-icons clear">clear</i>
             </div>
-            <ExpandedCourseDisplay object={object} objectType={objectType} />
+            <ExpandedLearningResourceDisplay
+              object={object}
+              objectType={objectType}
+            />
             <div className="footer" />
           </DrawerContent>
         </Drawer>
@@ -103,36 +83,62 @@ export class LearningResourceDrawer extends React.Component<Props> {
   }
 }
 
-export const getObject = (
-  objectId: number,
-  objectType: string,
-  state: Object
-) => {
-  const { courses, bootcamps } = state
-  switch (objectType) {
-  case "course":
-    return courses.data.get(objectId)
-  case "bootcamp":
-    return bootcamps.data.get(objectId)
+const getObject = createSelector(
+  state => state.ui,
+  state => state.entities.courses,
+  state => state.entities.bootcamps,
+  state => state.queries,
+  (ui, courses, bootcamps, queries) => {
+    const { objectId, objectType } = ui.courseDetail
+
+    switch (objectType) {
+    case LR_TYPE_COURSE:
+      return querySelectors.isFinished(queries, courseRequest(objectId))
+        ? courses[objectId]
+        : null
+    case LR_TYPE_BOOTCAMP:
+      return querySelectors.isFinished(queries, bootcampRequest(objectId))
+        ? bootcamps[objectId]
+        : null
+    }
   }
-}
+)
 
 export const mapStateToProps = (state: Object) => {
   const { ui } = state
 
   const objectId = ui.courseDetail.objectId
   const objectType = ui.courseDetail.objectType
-  const object = getObject(objectId, objectType, state)
 
   return {
-    showLearningDrawer: _.isFinite(ui.courseDetail.objectId),
+    showLearningDrawer: _.isFinite(state.ui.courseDetail.objectId),
     objectId,
     objectType,
-    object
+    object:             getObject(state)
   }
 }
 
+const mapDispatchToProps = {
+  setShowResourceDrawer
+}
+
+const mapPropsToConfig = props => {
+  const { objectType, objectId } = props
+
+  switch (objectType) {
+  case LR_TYPE_COURSE:
+    return [courseRequest(objectId)]
+  case LR_TYPE_BOOTCAMP:
+    return [bootcampRequest(objectId)]
+  }
+  return []
+}
+
 export default R.compose(
-  connect(mapStateToProps),
-  withRouter
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
+  withRouter,
+  connectRequest(mapPropsToConfig)
 )(LearningResourceDrawer)

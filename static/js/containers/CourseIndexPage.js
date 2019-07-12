@@ -25,7 +25,7 @@ import {
   upcomingCoursesSelector,
   newCoursesRequest,
   newCoursesSelector
-} from "../lib/api/courses"
+} from "../lib/queries/courses"
 import { toQueryString, COURSE_SEARCH_URL, COURSE_BANNER_URL } from "../lib/url"
 
 import type { Course } from "../flow/discussionTypes"

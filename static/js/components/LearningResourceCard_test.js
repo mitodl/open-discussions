@@ -1,33 +1,48 @@
-// @flow
 /* global SETTINGS:false */
 import R from "ramda"
 import { assert } from "chai"
 import sinon from "sinon"
 
-import LearningResourceCard from "./LearningResourceCard"
+import { LearningResourceCard } from "./LearningResourceCard"
 
 import { availabilityLabel, minPrice } from "../lib/learning_resources"
-import { makeBootcamp, makeCourse } from "../factories/learning_resources"
+import {
+  makeCourse,
+  makeLearningResource
+} from "../factories/learning_resources"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
   platformLogoUrls,
-  platforms
+  platforms,
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP
 } from "../lib/constants"
-import { embedlyThumbnail } from "../lib/url"
+import {
+  embedlyThumbnail,
+  starSelectedURL,
+  starUnselectedURL
+} from "../lib/url"
 import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("LearningResourceCard", () => {
-  let render, courses, course, sandbox, setShowResourceDrawerStub
+  let render,
+    courses,
+    course,
+    sandbox,
+    setShowResourceDrawerStub,
+    toggleFavoriteStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     courses = R.times(makeCourse, 10)
     setShowResourceDrawerStub = sandbox.stub()
+    toggleFavoriteStub = sandbox.stub()
     course = courses[0]
     render = configureShallowRenderer(LearningResourceCard, {
       object:                course,
-      setShowResourceDrawer: setShowResourceDrawerStub
+      setShowResourceDrawer: setShowResourceDrawerStub,
+      toggleFavorite:        toggleFavoriteStub
     })
   })
 
@@ -89,17 +104,17 @@ describe("LearningResourceCard", () => {
       course.topics[0].name
     )
   })
+
   //
-  ;[true, false].forEach(isCourse => {
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
     it(`should render the platform image`, () => {
-      const object = isCourse
-        ? R.merge({ object_type: "course" }, makeCourse())
-        : R.merge({ object_type: "bootcamp" }, makeBootcamp())
+      const object = makeLearningResource(objectType)
+      const isCourse = objectType === LR_TYPE_COURSE
       const platformImg = render({
-        object: object
+        object
       })
-        .find(".platform")
-        .find("img")
+        .find(".platform-favorite")
+        .find("img.course-platform")
       assert.equal(
         platformImg.prop("src"),
         // $FlowFixMe: only courses will access platform
@@ -110,6 +125,37 @@ describe("LearningResourceCard", () => {
         // $FlowFixMe: only courses will access platform
         `logo for ${isCourse ? object.platform : platforms.bootcamps}`
       )
+    })
+  })
+
+  //
+  ;[true, false].forEach(isFavorite => {
+    [LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+      it(`should render ${
+        isFavorite ? "filled-in" : "empty"
+      } star when ${objectType} is ${
+        isFavorite ? "a" : "not a"
+      } favorite`, () => {
+        const object = makeLearningResource(objectType)
+        object.is_favorite = isFavorite
+        const src = render({
+          object
+        })
+          .find(".platform-favorite")
+          .find("img.favorite")
+          .prop("src")
+        assert.equal(src, isFavorite ? starSelectedURL : starUnselectedURL)
+      })
+    })
+  })
+
+  //
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+    it(`should call the toggleFavorite with a ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      const wrapper = render({ object })
+      wrapper.find(".favorite").simulate("click")
+      sinon.assert.calledWith(toggleFavoriteStub, object)
     })
   })
 
