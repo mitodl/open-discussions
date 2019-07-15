@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.83.0
+Version 0.83.0 (Released July 15, 2019)
 --------------
 
 - implement new course card design
