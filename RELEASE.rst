@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.83.0
+--------------
+
+- implement new course card design
+- Bumped django version
+- fix styling issues with the drawer
+
 Version 0.82.3 (Released July 12, 2019)
 --------------
 
