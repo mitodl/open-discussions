@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.83.1
+--------------
+
+- Remove writing bootcamps to Course model
+- Ignore allowed_post_types from django-admin
+
 Version 0.83.0 (Released July 15, 2019)
 --------------
 
