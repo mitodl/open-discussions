@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.83.1
+Version 0.83.1 (Released July 16, 2019)
 --------------
 
 - Remove writing bootcamps to Course model
