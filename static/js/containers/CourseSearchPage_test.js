@@ -6,6 +6,8 @@ import sinon from "sinon"
 import _ from "lodash"
 
 import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
+
+import { SET_SHOW_COURSE_DRAWER } from "../actions/ui"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
 import {
@@ -16,7 +18,12 @@ import {
 import { makeChannel } from "../factories/channels"
 
 describe("CourseSearchPage", () => {
-  let helper, renderPage, searchResponse, initialState, initialProps
+  let helper,
+    renderPage,
+    searchResponse,
+    initialState,
+    initialProps,
+    searchCourse
 
   beforeEach(() => {
     const channel = makeChannel()
@@ -28,7 +35,7 @@ describe("CourseSearchPage", () => {
       true
     )
     // Simulate an upvoted post
-    const searchCourse = makeCourseResult()
+    searchCourse = makeCourseResult()
     searchCourse.course_id = "course_mitx_1"
     searchResponse.hits.hits[0] = searchCourse
 
@@ -89,6 +96,18 @@ describe("CourseSearchPage", () => {
           .prop("result"),
         result
       )
+    })
+  })
+
+  it("passes a setShowCourseDrawer to search results", async () => {
+    const { inner, store } = await renderPage()
+    inner
+      .find("SearchResult")
+      .at(0)
+      .prop("setShowCourseDrawer")({ courseId: searchCourse.course_id })
+    assert.deepEqual(store.getLastAction(), {
+      type:    SET_SHOW_COURSE_DRAWER,
+      payload: { courseId: searchCourse.course_id }
     })
   })
 

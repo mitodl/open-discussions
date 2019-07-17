@@ -20,6 +20,7 @@ import SearchTextbox from "../components/SearchTextbox"
 import SearchResult from "../components/SearchResult"
 
 import { actions } from "../actions"
+import { setShowCourseDrawer } from "../actions/ui"
 import { clearSearch } from "../actions/search"
 import { availabilityLabel } from "../lib/courses"
 import { SEARCH_FILTER_COURSE } from "../lib/picker"
@@ -43,7 +44,8 @@ type OwnProps = {|
   isModerator: boolean,
   match: Match,
   runSearch: (params: SearchParams) => Promise<*>,
-  clearSearch: () => void
+  clearSearch: () => void,
+  setShowCourseDrawer: ({ courseId: string }) => void
 |}
 
 type StateProps = {|
@@ -247,7 +249,13 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   renderResults = () => {
-    const { results, processing, loaded, total } = this.props
+    const {
+      results,
+      processing,
+      loaded,
+      total,
+      setShowCourseDrawer
+    } = this.props
     const { from, incremental } = this.state
 
     if ((processing || !loaded) && !incremental) {
@@ -267,13 +275,17 @@ export class CourseSearchPage extends React.Component<Props, State> {
         initialLoad={from === 0}
         loader={<Loading className="infinite" key="loader" />}
       >
-        {results.map((result, i) => (
-          <SearchResult
-            key={i}
-            result={result}
-            toggleFacet={this.toggleFacet}
-          />
-        ))}
+        <Grid>
+          {results.map((result, i) => (
+            <Cell width={4} key={i}>
+              <SearchResult
+                result={result}
+                toggleFacet={this.toggleFacet}
+                setShowCourseDrawer={setShowCourseDrawer}
+              />
+            </Cell>
+          ))}
+        </Grid>
       </InfiniteScroll>
     )
   }
@@ -284,7 +296,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <Grid className="main-content two-column search-page">
+        <Grid className="main-content two-column-extrawide search-page">
           <Cell width={12}>
             <MetaTags>
               <CanonicalLink match={match} />
@@ -320,7 +332,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
               ) : null}
             </div>
           </Cell>
-          <Cell width={4}>
+          <Cell width={3}>
             <Card>
               {facetDisplayMap.map(([name, title, labelFunction], i) => (
                 <SearchFacet
@@ -335,7 +347,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
               ))}
             </Card>
           </Cell>
-          <Cell width={8}>{error ? null : this.renderResults()}</Cell>
+          <Cell width={9}>{error ? null : this.renderResults()}</Cell>
         </Grid>
         <CourseDrawer />
       </React.Fragment>
@@ -364,6 +376,9 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   clearSearch: async () => {
     dispatch(actions.search.clear())
     await dispatch(clearSearch())
+  },
+  setShowCourseDrawer: ({ courseId }: { courseId: string }) => {
+    dispatch(setShowCourseDrawer({ courseId }))
   },
   dispatch
 })

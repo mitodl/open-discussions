@@ -34,10 +34,23 @@ describe("CourseCard", () => {
     sandbox.restore()
   })
 
-  it("Card should set an onClick handler with the provided function", () => {
+  it("should set an onClick handler with the setShowCourseDrawer function", () => {
     const wrapper = renderCarouselCard()
-    wrapper.simulate("click")
-    sinon.assert.called(setShowCourseDrawerStub)
+    wrapper.find(".cover-image").simulate("click")
+    wrapper.find(".course-title").simulate("click")
+    sinon.assert.calledTwice(setShowCourseDrawerStub)
+  })
+
+  it("should set a click handler on the topics, if passed a function", () => {
+    const setTopicStub = sandbox.stub()
+    const wrapper = renderCarouselCard({
+      toggleFacet: setTopicStub
+    })
+    wrapper
+      .find(".topic")
+      .at(0)
+      .simulate("click")
+    sinon.assert.calledWith(setTopicStub, "topics", course.topics[0].name, true)
   })
 
   it("should render the image", () => {

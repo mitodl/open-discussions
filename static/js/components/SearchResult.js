@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 
 import Card from "./Card"
 import CompactPostDisplay from "./CompactPostDisplay"
-import CompactCourseDisplay from "./CompactCourseDisplay"
+import CourseCard from "./CourseCard"
 import CommentTree from "./CommentTree"
 import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 
@@ -85,11 +85,22 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 
 type CourseProps = {
   result: CourseResult,
-  toggleFacet?: Function
+  toggleFacet?: Function,
+  setShowCourseDrawer?: ({ courseId: string }) => void
 }
-const CourseSearchResult = ({ result, toggleFacet }: CourseProps) => {
+const CourseSearchResult = ({
+  result,
+  toggleFacet,
+  setShowCourseDrawer
+}: CourseProps) => {
   const course = searchResultToCourse(result)
-  return <CompactCourseDisplay course={course} toggleFacet={toggleFacet} />
+  return (
+    <CourseCard
+      course={course}
+      toggleFacet={toggleFacet}
+      setShowCourseDrawer={setShowCourseDrawer}
+    />
+  )
 }
 
 type Props = {
@@ -99,7 +110,8 @@ type Props = {
   toggleUpvote?: Post => void,
   upvotedPost?: ?Post,
   votedComment?: ?CommentInTree,
-  toggleFacet?: Function
+  toggleFacet?: Function,
+  setShowCourseDrawer?: ({ courseId: string }) => void
 }
 export default class SearchResult extends React.Component<Props> {
   render() {
@@ -110,7 +122,8 @@ export default class SearchResult extends React.Component<Props> {
       votedComment,
       commentUpvote,
       commentDownvote,
-      toggleFacet
+      toggleFacet,
+      setShowCourseDrawer
     } = this.props
     if (result.object_type === "post") {
       const post = upvotedPost || searchResultToPost(result)
@@ -137,7 +150,13 @@ export default class SearchResult extends React.Component<Props> {
     } else if (result.object_type === "profile") {
       return <ProfileSearchResult result={result} />
     } else if (result.object_type === "course") {
-      return <CourseSearchResult result={result} toggleFacet={toggleFacet} />
+      return (
+        <CourseSearchResult
+          result={result}
+          toggleFacet={toggleFacet}
+          setShowCourseDrawer={setShowCourseDrawer}
+        />
+      )
     }
     return null
   }

@@ -139,6 +139,18 @@ body {
           width: 95%;
         }
       }
+
+      &.two-column-extrawide {
+        width: 90%;
+
+        @include breakpoint(desktop) {
+          max-width: 1400px;
+        }
+
+        @include breakpoint(phone) {
+          width: 95%;
+        }
+      }
     }
   }
 }
