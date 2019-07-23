@@ -283,10 +283,12 @@ describe("search functions", () => {
       sinon.assert.calledWith(stub, type)
     })
     //
-    ;["course", "bootcamp"].forEach(type =>{
+    ;["course", "bootcamp"].forEach(type => {
       it(`filters courses by platform, availability, type, and topics`, () => {
         const fieldNames = ["field1", "field2", "field3"]
-        const stub = sandbox.stub(searchFuncs, "searchFields").returns(fieldNames)
+        const stub = sandbox
+          .stub(searchFuncs, "searchFields")
+          .returns(fieldNames)
         const text = "some text here"
         const facets = new Map(
           Object.entries({
@@ -296,7 +298,7 @@ describe("search functions", () => {
             type:         [type]
           })
         )
-  
+
         const mustQuery = [
           {
             term: {

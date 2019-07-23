@@ -95,9 +95,7 @@ export type BootcampResult = {
   short_description:  ?string,
   full_description:   ?string,
   language:           ?string,
-  semester:           ?string,
   year:               ?string,
-  level:              ?string,
   start_date:         ?string,
   end_date:           ?string,
   enrollment_start:   ?string,
@@ -122,7 +120,7 @@ export type CurrentFacet = {
   result: FacetResult
 }
 
-export type Result = PostResult | CommentResult | ProfileResult | CourseResult
+export type Result = PostResult | CommentResult | ProfileResult | CourseResult | BootcampResult
 
 export type SearchInputs = {
   text?:            string,
