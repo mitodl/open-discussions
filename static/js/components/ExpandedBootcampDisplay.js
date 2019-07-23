@@ -91,13 +91,6 @@ export default class ExpandedBootcampDisplay extends React.Component<Props> {
             <div className="course-info-value">{minPrice(bootcamp)}</div>
           </div>
           <div className="course-info-row">
-            <i className="material-icons bar_chart">bar_chart</i>
-            <div className="course-info-label">Level:</div>
-            <div className="course-info-value">
-              {bootcamp.level || "Unspecified"}
-            </div>
-          </div>
-          <div className="course-info-row">
             <i className="material-icons school">school</i>
             <div className="course-info-label">Instructors:</div>
             <div className="course-info-value">
