@@ -15,21 +15,22 @@ import type { Course } from "../flow/discussionTypes"
 
 type CardProps = {|
   course: Course,
-  setShowLearningResourceDrawer: Function,
+  setShowResourceDrawer: Function,
   toggleFacet?: Function
 |}
 
 const CourseCard = ({
   course,
-  setShowLearningResourceDrawer,
+  setShowResourceDrawer,
   toggleFacet
 }: CardProps) => {
-  const showLearningResourceDrawer = () => setShowLearningResourceDrawer({ objectId: course.id, objectType: "course" })
+  const showResourceDrawer = () =>
+    setShowResourceDrawer({ objectId: course.id, objectType: "course" })
 
   return (
     <div className="course-card">
       <div className="card-contents">
-        <div className="cover-image" onClick={showLearningResourceDrawer}>
+        <div className="cover-image" onClick={showResourceDrawer}>
           <img
             src={embedlyThumbnail(
               SETTINGS.embedlyKey,
@@ -41,7 +42,7 @@ const CourseCard = ({
             alt={`cover image for ${course.title}`}
           />
         </div>
-        <div className="row course-title" onClick={showLearningResourceDrawer}>
+        <div className="row course-title" onClick={showResourceDrawer}>
           <Dotdotdot clamp={2}>{course.title}</Dotdotdot>
         </div>
         <div className="row topics">

@@ -5,30 +5,28 @@ import Dotdotdot from "react-dotdotdot"
 
 import { availabilityLabel, minPrice } from "../lib/courses"
 import { embedlyThumbnail } from "../lib/url"
-import {
-  CAROUSEL_IMG_WIDTH,
-  CAROUSEL_IMG_HEIGHT,
-} from "../lib/constants"
+import { CAROUSEL_IMG_WIDTH, CAROUSEL_IMG_HEIGHT } from "../lib/constants"
 
 import type { Bootcamp } from "../flow/discussionTypes"
 
 type CardProps = {|
   bootcamp: Bootcamp,
-  setShowLearningResourceDrawer: Function,
+  setShowResourceDrawer: Function,
   toggleFacet?: Function
 |}
 
 const BootcampCard = ({
   bootcamp,
-  setShowLearningResourceDrawer,
+  setShowResourceDrawer,
   toggleFacet
 }: CardProps) => {
-  const showLearningResourceDrawer = () => setShowLearningResourceDrawer({ objectId: bootcamp.id, objectType: "bootcamp" })
+  const showResourceDrawer = () =>
+    setShowResourceDrawer({ objectId: bootcamp.id, objectType: "bootcamp" })
 
   return (
     <div className="course-card">
       <div className="card-contents">
-        <div className="cover-image" onClick={showLearningResourceDrawer}>
+        <div className="cover-image" onClick={showResourceDrawer}>
           <img
             src={embedlyThumbnail(
               SETTINGS.embedlyKey,
@@ -40,7 +38,7 @@ const BootcampCard = ({
             alt={`cover image for ${bootcamp.title}`}
           />
         </div>
-        <div className="row course-title" onClick={showLearningResourceDrawer}>
+        <div className="row course-title" onClick={showResourceDrawer}>
           <Dotdotdot clamp={2}>{bootcamp.title}</Dotdotdot>
         </div>
         <div className="row topics">

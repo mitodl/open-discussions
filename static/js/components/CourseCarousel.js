@@ -12,7 +12,7 @@ import type { Course } from "../flow/discussionTypes"
 type Props = {|
   title: string,
   courses: Array<Course>,
-  setShowLearningDrawer: Function
+  setShowResourceDrawer: Function
 |}
 
 const prevButton = ({ previousSlide, currentSlide }) =>
@@ -34,7 +34,7 @@ const nextButton = props => {
   )
 }
 
-const CourseCarousel = ({ title, courses, setShowLearningDrawer }: Props) => (
+const CourseCarousel = ({ title, courses, setShowResourceDrawer }: Props) => (
   <div className="course-carousel">
     <div className="title-row">
       <div className="title">{title}</div>
@@ -54,7 +54,7 @@ const CourseCarousel = ({ title, courses, setShowLearningDrawer }: Props) => (
         <CourseCard
           key={idx}
           course={course}
-          setShowLearningDrawer={setShowLearningDrawer}
+          setShowResourceDrawer={setShowResourceDrawer}
         />
       ))}
     </Carousel>

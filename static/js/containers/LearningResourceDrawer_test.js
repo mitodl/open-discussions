@@ -10,7 +10,7 @@ import {
 } from "./LearningResourceDrawer"
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
 
-import { setShowLearningResourceDrawer } from "../actions/ui"
+import { setShowResourceDrawer } from "../actions/ui"
 import { makeBootcamp, makeCourse } from "../factories/courses"
 import { shouldIf } from "../lib/test_utils"
 import ExpandedBootcampDisplay from "../components/ExpandedBootcampDisplay"
@@ -45,7 +45,7 @@ describe("LearningResourceDrawer", () => {
     await wrapper.instance().onDrawerClose()
     sinon.assert.calledWith(
       dispatchStub,
-      setShowLearningResourceDrawer({ objectId: null })
+      setShowResourceDrawer({ objectId: null })
     )
   })
 

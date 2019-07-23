@@ -7,7 +7,7 @@ import _ from "lodash"
 
 import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
 
-import { SET_SHOW_COURSE_DRAWER } from "../actions/ui"
+import { SET_SHOW_RESOURCE_DRAWER } from "../actions/ui"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
 import {
@@ -100,15 +100,18 @@ describe("CourseSearchPage", () => {
     })
   })
 
-  it("passes a setShowCourseDrawer to search results", async () => {
+  it("passes a setShowResourceDrawer to search results", async () => {
     const { inner, store } = await renderPage()
     inner
       .find("SearchResult")
       .at(0)
-      .prop("setShowCourseDrawer")({ courseId: searchCourse.course_id })
+      .prop("setShowResourceDrawer")({
+        objectId:   searchCourse.course_id,
+        objectType: "course"
+      })
     assert.deepEqual(store.getLastAction(), {
-      type:    SET_SHOW_COURSE_DRAWER,
-      payload: { courseId: searchCourse.course_id }
+      type:    SET_SHOW_RESOURCE_DRAWER,
+      payload: { objectId: searchCourse.course_id, objectType: "course" }
     })
   })
 

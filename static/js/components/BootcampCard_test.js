@@ -8,24 +8,25 @@ import BootcampCard from "./BootcampCard"
 
 import { availabilityLabel, minPrice } from "../lib/courses"
 import { configureShallowRenderer } from "../lib/test_utils"
-import {makeBootcamp} from "../factories/courses"
-import {
-  CAROUSEL_IMG_WIDTH,
-  CAROUSEL_IMG_HEIGHT,
-} from "../lib/constants"
+import { makeBootcamp } from "../factories/courses"
+import { CAROUSEL_IMG_WIDTH, CAROUSEL_IMG_HEIGHT } from "../lib/constants"
 import { embedlyThumbnail } from "../lib/url"
 
 describe("BootcampCard", () => {
-  let renderBootcampCard, bootcamps, bootcamp, sandbox, setShowLearningResourceDrawerStub
+  let renderBootcampCard,
+    bootcamps,
+    bootcamp,
+    sandbox,
+    setShowResourceDrawerStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     bootcamps = R.times(makeBootcamp, 10)
-    setShowLearningResourceDrawerStub = sandbox.stub()
+    setShowResourceDrawerStub = sandbox.stub()
     bootcamp = bootcamps[0]
     renderBootcampCard = configureShallowRenderer(BootcampCard, {
       bootcamp,
-      setShowLearningResourceDrawer: setShowLearningResourceDrawerStub
+      setShowResourceDrawer: setShowResourceDrawerStub
     })
   })
 
@@ -33,11 +34,11 @@ describe("BootcampCard", () => {
     sandbox.restore()
   })
 
-  it("should set an onClick handler with the setShowLearningResourceDrawer function", () => {
+  it("should set an onClick handler with the setShowResourceDrawer function", () => {
     const wrapper = renderBootcampCard()
     wrapper.find(".cover-image").simulate("click")
     wrapper.find(".course-title").simulate("click")
-    sinon.assert.calledTwice(setShowLearningResourceDrawerStub)
+    sinon.assert.calledTwice(setShowResourceDrawerStub)
   })
 
   it("should set a click handler on the topics, if passed a function", () => {
@@ -49,7 +50,12 @@ describe("BootcampCard", () => {
       .find(".topic")
       .at(0)
       .simulate("click")
-    sinon.assert.calledWith(setTopicStub, "topics", bootcamp.topics[0].name, true)
+    sinon.assert.calledWith(
+      setTopicStub,
+      "topics",
+      bootcamp.topics[0].name,
+      true
+    )
   })
 
   it("should render the image", () => {
@@ -65,7 +71,7 @@ describe("BootcampCard", () => {
         CAROUSEL_IMG_WIDTH
       )
     )
-    assert.equal(coverImage.prop("alt"), `cover image for ${course.title}`)
+    assert.equal(coverImage.prop("alt"), `cover image for ${bootcamp.title}`)
   })
 
   it("should render the title", () => {

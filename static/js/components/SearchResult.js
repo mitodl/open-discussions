@@ -90,21 +90,24 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
   )
 }
 
-
 type LearningResourceProps = {
   result: CourseResult | BootcampResult,
   toggleFacet?: Function,
-  setShowLearningResourceDrawer?: ({objectId: string,  objectType: string }) => void
+  setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void
 }
 
-const CourseSearchResult = ({ result, toggleFacet, setShowLearningResourceDrawer}: LearningResourceProps) => {
+const CourseSearchResult = ({
+  result,
+  toggleFacet,
+  setShowResourceDrawer
+}: LearningResourceProps) => {
   // $FlowFixMe: this should only be used for courses
   const course = searchResultToCourse(result)
   return (
     <CourseCard
       course={course}
       toggleFacet={toggleFacet}
-      setShowLearningResourceDrawer={setShowLearningResourceDrawer}
+      setShowResourceDrawer={setShowResourceDrawer}
     />
   )
 }
@@ -112,7 +115,7 @@ const CourseSearchResult = ({ result, toggleFacet, setShowLearningResourceDrawer
 const BootcampSearchResult = ({
   result,
   toggleFacet,
-  setShowLearningResourceDrawer
+  setShowResourceDrawer
 }: LearningResourceProps) => {
   // $FlowFixMe: this should only be used for bootcamps
   const bootcamp = searchResultToBootcamp(result)
@@ -120,7 +123,8 @@ const BootcampSearchResult = ({
     <BootcampCard
       bootcamp={bootcamp}
       toggleFacet={toggleFacet}
-      setShowLearningResourceDrawer={setShowLearningResourceDrawer}/>
+      setShowResourceDrawer={setShowResourceDrawer}
+    />
   )
 }
 
@@ -132,7 +136,7 @@ type Props = {
   upvotedPost?: ?Post,
   votedComment?: ?CommentInTree,
   toggleFacet?: Function,
-  setShowLearningResourceDrawer?: ({ courseId: string }) => void
+  setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void
 }
 export default class SearchResult extends React.Component<Props> {
   render() {
@@ -144,7 +148,7 @@ export default class SearchResult extends React.Component<Props> {
       commentUpvote,
       commentDownvote,
       toggleFacet,
-      setShowLearningResourceDrawer
+      setShowResourceDrawer
     } = this.props
     if (result.object_type === "post") {
       const post = upvotedPost || searchResultToPost(result)
@@ -175,11 +179,17 @@ export default class SearchResult extends React.Component<Props> {
         <CourseSearchResult
           result={result}
           toggleFacet={toggleFacet}
-          setShowLearningDrawer={setShowLearningResourceDrawer}
+          setShowResourceDrawer={setShowResourceDrawer}
         />
       )
     } else if (result.object_type === "bootcamp") {
-      return <BootcampSearchResult result={result} toggleFacet={toggleFacet} />
+      return (
+        <BootcampSearchResult
+          result={result}
+          toggleFacet={toggleFacet}
+          setShowResourceDrawer={setShowResourceDrawer}
+        />
+      )
     }
     return null
   }

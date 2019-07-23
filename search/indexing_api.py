@@ -123,6 +123,7 @@ BOOTCAMP_OBJECT_TYPE = {
     "title": ENGLISH_TEXT_FIELD,
     "short_description": ENGLISH_TEXT_FIELD,
     "full_description": ENGLISH_TEXT_FIELD,
+    "year": {"type": "keyword"},
     "start_date": {"type": "date"},
     "end_date": {"type": "date"},
     "enrollment_start": {"type": "date"},

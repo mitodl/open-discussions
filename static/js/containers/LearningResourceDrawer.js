@@ -12,7 +12,7 @@ import type { Bootcamp, Course } from "../flow/discussionTypes"
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
 
 import { actions } from "../actions"
-import { setShowLearningResourceDrawer } from "../actions/ui"
+import { setShowResourceDrawer } from "../actions/ui"
 import { getViewportWidth } from "../lib/util"
 import ExpandedBootcampDisplay from "../components/ExpandedBootcampDisplay"
 
@@ -76,7 +76,7 @@ export class LearningResourceDrawer extends React.Component<Props> {
 
   onDrawerClose = () => {
     const { dispatch } = this.props
-    dispatch(setShowLearningResourceDrawer({ objectId: null }))
+    dispatch(setShowResourceDrawer({ objectId: null }))
   }
 
   renderExpandedDisplay = () => {

@@ -14,7 +14,7 @@ import {
   HIDE_DROPDOWN,
   SET_DIALOG_DATA,
   SET_AUTH_USER_DETAIL,
-  SET_SHOW_LEARNING_RESOURCE_DRAWER,
+  SET_SHOW_RESOURCE_DRAWER,
   SHOW_SEARCH_FACETS,
   HIDE_SEARCH_FACETS
 } from "../actions/ui"
@@ -130,7 +130,7 @@ export const ui = (
     return { ...state, showDrawerMobile: action.payload }
   case SET_SHOW_DRAWER_HOVER:
     return { ...state, showDrawerHover: action.payload }
-  case SET_SHOW_LEARNING_RESOURCE_DRAWER:
+  case SET_SHOW_RESOURCE_DRAWER:
     return {
       ...state,
       courseDetail: {

@@ -8,7 +8,7 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
 
-import CourseDrawer from "./LearningResourceDrawer"
+import LearningResourceDrawer from "./LearningResourceDrawer"
 
 import CanonicalLink from "../components/CanonicalLink"
 import Card from "../components/Card"
@@ -20,7 +20,7 @@ import SearchTextbox from "../components/SearchTextbox"
 import SearchResult from "../components/SearchResult"
 
 import { actions } from "../actions"
-import { setShowCourseDrawer } from "../actions/ui"
+import { setShowResourceDrawer } from "../actions/ui"
 import { clearSearch } from "../actions/search"
 import { availabilityLabel, resourceLabel } from "../lib/courses"
 import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
@@ -45,7 +45,7 @@ type OwnProps = {|
   match: Match,
   runSearch: (params: SearchParams) => Promise<*>,
   clearSearch: () => void,
-  setShowCourseDrawer: ({ courseId: string }) => void
+  setShowResourceDrawer: ({ objectId: string, objectType: string }) => void
 |}
 
 type StateProps = {|
@@ -265,7 +265,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       processing,
       loaded,
       total,
-      setShowCourseDrawer
+      setShowResourceDrawer
     } = this.props
     const { from, incremental } = this.state
 
@@ -292,7 +292,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
               <SearchResult
                 result={result}
                 toggleFacet={this.toggleFacet}
-                setShowCourseDrawer={setShowCourseDrawer}
+                setShowResourceDrawer={setShowResourceDrawer}
               />
             </Cell>
           ))}
@@ -360,7 +360,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
           </Cell>
           <Cell width={9}>{error ? null : this.renderResults()}</Cell>
         </Grid>
-        <CourseDrawer />
+        <LearningResourceDrawer />
       </React.Fragment>
     )
   }
@@ -388,8 +388,14 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
     dispatch(actions.search.clear())
     await dispatch(clearSearch())
   },
-  setShowCourseDrawer: ({ courseId }: { courseId: string }) => {
-    dispatch(setShowCourseDrawer({ courseId }))
+  setShowResourceDrawer: ({
+    objectId,
+    objectType
+  }: {
+    objectId: string,
+    objectType: string
+  }) => {
+    dispatch(setShowResourceDrawer({ objectId, objectType }))
   },
   dispatch
 })

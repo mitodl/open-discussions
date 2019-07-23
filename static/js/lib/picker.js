@@ -41,9 +41,7 @@ export const SEARCH_FILTER_COMMENT = "comment"
 export const SEARCH_FILTER_PROFILE = "profile"
 export const SEARCH_FILTER_COURSE = "course"
 export const SEARCH_FILTER_BOOTCAMP = "bootcamp"
-export const SEARCH_FILTER_PROGRAM = "program"
 export const SEARCH_FILTER_USERLIST = "user_list"
-// TODO: Add 'program' and 'user_list' to SEARCH_FILTER_ALL_RESOURCES when ready
 export const SEARCH_FILTER_ALL_RESOURCES = [
   SEARCH_FILTER_COURSE,
   SEARCH_FILTER_BOOTCAMP

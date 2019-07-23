@@ -3,7 +3,7 @@ import { assert } from "chai"
 import R from "ramda"
 import sinon from "sinon"
 
-import CourseDrawer from "./LearningResourceDrawer"
+import LearningResourceDrawer from "./LearningResourceDrawer"
 import { CourseIndexPage } from "./CourseIndexPage"
 import {
   BannerPageWrapper,
@@ -19,7 +19,7 @@ describe("CourseIndexPage", () => {
   let featuredCourses,
     upcomingCourses,
     newCourses,
-    setShowLearningDrawerStub,
+    setShowResourceDrawerStub,
     renderCourseIndexPage,
     sandbox,
     courseLists
@@ -34,9 +34,9 @@ describe("CourseIndexPage", () => {
       newCourses
     }
     sandbox = sinon.createSandbox()
-    setShowLearningDrawerStub = sandbox.stub()
+    setShowResourceDrawerStub = sandbox.stub()
     renderCourseIndexPage = configureShallowRenderer(CourseIndexPage, {
-      setShowLearningDrawer: setShowLearningDrawerStub,
+      setShowResourceDrawer: setShowResourceDrawerStub,
       loaded:                true,
       ...courseLists
     })
@@ -59,14 +59,14 @@ describe("CourseIndexPage", () => {
         .at(idx)
       assert.equal(title, carousel.prop("title"))
       assert.deepEqual(courseList, carousel.prop("courses"))
-      carousel.prop("setShowLearningDrawer")()
-      sinon.assert.called(setShowLearningDrawerStub)
+      carousel.prop("setShowResourceDrawer")()
+      sinon.assert.called(setShowResourceDrawerStub)
     })
   })
 
   it("should render a LearningResourceDrawer", () => {
     const wrapper = renderCourseIndexPage()
-    assert.ok(wrapper.find(CourseDrawer).exists())
+    assert.ok(wrapper.find(LearningResourceDrawer).exists())
   })
 
   it("shouldnt render carousels if loaded === false", () => {
@@ -107,9 +107,6 @@ describe("CourseIndexPage", () => {
     assert.equal(searchBox.prop("placeholder"), "Search Learning offerings")
     assert.isTrue(searchBox.prop("noFocusOnLoad"))
     searchBox.simulate("submit", { target: { value: "search term" } })
-    sinon.assert.calledWith(
-      pushStub,
-      "/courses/search?q=search%20term&type=course"
-    )
+    sinon.assert.calledWith(pushStub, "/courses/search?q=search%20term")
   })
 })

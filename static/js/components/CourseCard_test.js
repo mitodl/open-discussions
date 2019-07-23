@@ -17,16 +17,16 @@ import {
 import { embedlyThumbnail } from "../lib/url"
 
 describe("CourseCard", () => {
-  let renderCarouselCard, courses, course, sandbox, setShowLearningDrawerStub
+  let renderCarouselCard, courses, course, sandbox, setShowResourceDrawerStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     courses = R.times(makeCourse, 10)
-    setShowLearningDrawerStub = sandbox.stub()
+    setShowResourceDrawerStub = sandbox.stub()
     course = courses[0]
     renderCarouselCard = configureShallowRenderer(CourseCard, {
       course,
-      setShowLearningDrawer: setShowLearningDrawerStub
+      setShowResourceDrawer: setShowResourceDrawerStub
     })
   })
 
@@ -34,11 +34,11 @@ describe("CourseCard", () => {
     sandbox.restore()
   })
 
-  it("should set an onClick handler with the setShowCourseDrawer function", () => {
+  it("should set an onClick handler with the setShowResourceDrawer function", () => {
     const wrapper = renderCarouselCard()
     wrapper.find(".cover-image").simulate("click")
     wrapper.find(".course-title").simulate("click")
-    sinon.assert.calledTwice(setShowLearningDrawerStub)
+    sinon.assert.calledTwice(setShowResourceDrawerStub)
   })
 
   it("should set a click handler on the topics, if passed a function", () => {
