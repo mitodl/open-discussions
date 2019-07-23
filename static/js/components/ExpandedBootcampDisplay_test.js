@@ -5,7 +5,7 @@ import { shallow } from "enzyme"
 
 import ExpandedBootcampDisplay from "../components/ExpandedBootcampDisplay"
 
-import { makeBootcamp } from "../factories/courses"
+import { makeBootcamp } from "../factories/resources"
 
 describe("ExpandedBootcampDisplay", () => {
   let bootcamp

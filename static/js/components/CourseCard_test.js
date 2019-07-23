@@ -8,7 +8,7 @@ import CourseCard from "./CourseCard"
 
 import { availabilityLabel, minPrice } from "../lib/courses"
 import { configureShallowRenderer } from "../lib/test_utils"
-import { makeCourse } from "../factories/courses"
+import { makeCourse } from "../factories/resources"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,

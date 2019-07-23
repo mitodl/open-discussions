@@ -8,7 +8,7 @@ import BootcampCard from "./BootcampCard"
 
 import { availabilityLabel, minPrice } from "../lib/courses"
 import { configureShallowRenderer } from "../lib/test_utils"
-import { makeBootcamp } from "../factories/courses"
+import { makeBootcamp } from "../factories/resources"
 import { CAROUSEL_IMG_WIDTH, CAROUSEL_IMG_HEIGHT } from "../lib/constants"
 import { embedlyThumbnail } from "../lib/url"
 

@@ -1,7 +1,7 @@
 // @flow
 import { assert } from "chai"
 
-import { makeCourse } from "../factories/courses"
+import { makeCourse } from "../factories/resources"
 import {
   COURSE_ARCHIVED,
   COURSE_AVAILABLE_NOW,

@@ -6,7 +6,7 @@ import moment from "moment"
 
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
 
-import { makeCourse } from "../factories/courses"
+import { makeCourse } from "../factories/resources"
 
 describe("ExpandedCourseDisplay", () => {
   let course

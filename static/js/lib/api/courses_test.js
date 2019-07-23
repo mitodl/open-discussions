@@ -15,7 +15,7 @@ import {
   nextUpdate,
   courseArrayUpdate
 } from "./courses"
-import { makeCourse } from "../../factories/courses"
+import { makeCourse } from "../../factories/resources"
 
 describe("Courses API", () => {
   let fetchJSONStub, sandbox, transformTestObject

@@ -8,7 +8,7 @@ import { shallow } from "enzyme"
 import CourseCarousel from "./CourseCarousel"
 import CourseCard from "./CourseCard"
 
-import { makeCourse } from "../factories/courses"
+import { makeCourse } from "../factories/resources"
 
 describe("CourseCarousel", () => {
   let courses, sandbox, setShowResourceDrawerStub

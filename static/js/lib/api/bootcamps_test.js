@@ -4,7 +4,7 @@ import { assert } from "chai"
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
 import { getBootcamp, nextUpdate } from "./bootcamps"
-import { makeBootcamp } from "../../factories/courses"
+import { makeBootcamp } from "../../factories/resources"
 
 describe("Bootcamps API", () => {
   let fetchJSONStub, sandbox
